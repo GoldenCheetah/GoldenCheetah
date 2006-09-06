@@ -1,0 +1,26 @@
+<!-- $Id: index.content,v 1.1 2006/05/16 14:24:50 srhea Exp $ -->
+
+<p>
+The goal of the Golden Cheetah project is to develop a software package that:
+<ul>
+<li>Downloads ride data from power measurement devices, such as the <a
+href="http://www.cycleops.com/products/powertap.htm">CycleOps PowerTap</a>,
+the <a href="http://www.ergomo.net/Home-_14.html">ergomo</a>, the <a
+href="http://www.polarusa.com/consumer/powerkit/default.asp">Polar
+Electro</a>, and the <a href="http://www.srm.de/usa/index.html">SRM Training
+System</a><p>
+<li>Helps athletes analyze downloaded data with features akin to commercial
+power analysis software, such as <a href="http://cyclingpeaks.com/">Cycling
+Peaks</a><p>
+<li>Works on non-Microsoft Windows-based systems, such as FreeBSD, Linux, and
+Mac OS X<p>
+<li>Is available under an 
+<a href="http://www.opensource.org/docs/definition.php">Open Source</a> 
+license
+</ul>
+
+<p>
+In short, we believe that cyclists should be able to download their power data
+to the computer of their choice, analyze it in whatever way they see fit, and
+share their methods of analysis with others.
+

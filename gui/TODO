@@ -1,0 +1,10 @@
+
+ - Recalc y-max after changing showPower or showHr
+ - Add cadence, speed, torque to graph
+ - Remember last settings for showPower, showHr, etc.
+ - Add interval summary to ride summary
+ - Switch x-axis from minutes to miles
+ - Add units to ride summary
+ - Add weekly summary
+ - Add cpint
+

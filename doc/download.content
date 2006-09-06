@@ -1,0 +1,43 @@
+<!-- $Id: download.content,v 1.6 2006/08/11 20:21:03 srhea Exp $ -->
+
+Right now we're only distributing tarballs of the Golden Cheetah source.
+
+<p>
+<center>
+<table width="100%">
+<tr>
+<td width="20%"><i>Date</i></td>
+<td width="25%"><i>Source</i></td>
+<td><i>Description</i></td>
+</tr>
+
+<tr>
+<td valign="top">Aug 11, 2006</td>
+<td valign="top"><a href="gc_2006-08-11.tgz">gc_2006-08-11.tgz</a></td>
+<td valign="top">ptdl now works with Keyspan USB-to-serial adaptor, after
+debugging help from Rob Carlsen.
+</td>
+</tr>
+
+<tr>
+<td valign="top">May 27, 2006</td>
+<td valign="top"><a href="gc_2006-05-27.tgz">gc_2006-05-27.tgz</a></td>
+<td valign="top">Adds the <code>cpint</code> program for computing critical
+power intervals and the <code>ptpk</code> program for converting from
+PowerTuned data files (see the <a href="users-guide.html">User's
+Guide</a>).</td>
+</tr>
+
+<tr>
+<td valign="top">May 16, 2006</td>
+<td valign="top"><a href="gc_2006-05-16.tgz">gc_2006-05-16.tgz</a></td>
+<td valign="top">The first code release, containing <code>ptdl</code> and
+<code>ptunpk</code>.</td>
+</tr>
+
+</table>
+</center>
+
+<p>
+We hope to have anonymous CVS access set up soon.
+

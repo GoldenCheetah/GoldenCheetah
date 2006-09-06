@@ -1,0 +1,75 @@
+
+Version header:
+
+sometimes bytes added before 0x56
+
+00 56 45 52 20 30       .VER 0
+32 2e 32 31 20 50       2.21 P
+52 4f 00 00 00 00       RO....
+00 00 00 00 00 00       ......
+00 00 00 00 0d 0a       ....\r\n
+
+
+Data:
+
+Get 12 packets of 1542 (0x606) bytes each.  
+Where is that encoded?
+
+Each row is 6 bytes.  
+Rows that start with 0x8? are the data for one period.
+
+Column  Meaning         Format                              
+1       ???
+2, n1   torque          4 most sig bits, N m
+2, n2   km/h            4 most sig bits, 0x24000 / value * 0.1
+3       torque          8 least sig bits, N m
+4       km/h            8 least sig bits, 0x24000 / value * 0.1
+5       Cadence         1-byte integer
+6       Heartrate       1-byte integer
+                              
+
+First row is always:
+
+57 56 55 64 02 15                              
+
+Base period in thousands of a minute = 0x15...
+
+
+A row starting with 0x60 encodes the time of day that measurements started.
+This is always the second record in the stream.  Also, when the computer goes
+to sleep and then wakes up again, it writes one of these records first.
+
+Example: 60 06 04 9c 2a 30                              
+
+byte 2                  year
+byte 3                  month
+byte 4, bottom 5 bits   day
+byte 5, bottom 5 bits   hour
+byte 6, bottom 6 bits   minute
+
+top 3 bits of byte 4 followed by top 3 bits of byte 5 is pretty close to the
+right seconds value, but not perfect...
+
+               
+A row starting with 0x40 encodes:
+
+  bytes 2-3     the wheel circumference in mm
+  byte 4        the interval number
+  byte 5        the recording interval, where
+
+                byte value      interval
+                0x0             1
+                0x1             2
+                0x3             5
+                0x7             10
+                0x17            30
+
+Example:
+
+40 08 30 02 07 00
+   wheel size in mm = 0x0830               
+   interval 2
+   recording interval 10
+
+
+
