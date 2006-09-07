@@ -20,8 +20,11 @@
 
 SUBDIRS=lib cmd gui # order is important!
 
-all: subdirs 
-.PHONY: all subdirs clean
+all: gui-makefile subdirs 
+.PHONY: all gui-makefile subdirs clean
+
+gui-makefile:
+	cd gui; qmake GoldenCheetah.pro
 
 clean:
 	@for dir in $(SUBDIRS); do $(MAKE) -wC $$dir clean; done
