@@ -14,8 +14,6 @@ install:
 	rsync -avz -e ssh $(HTML) $(TARBALLS) $(OTHER) \
 		srhea.net:public_html/goldencheetah/
 
-#	ftp -u ftp://srhea@ftp.goldencheetah.org/ $(HTML) $(TARBALLS) $(OTHER)
-
 contact.html: contact.content genpage.pl
 	./genpage.pl "Contact Us" $< > $@
 
