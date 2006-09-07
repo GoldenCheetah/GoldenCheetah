@@ -87,24 +87,24 @@ MainWindow::MainWindow(const QDir &home) :
     QVBoxLayout *vlayout = new QVBoxLayout;
 
     QHBoxLayout *showLayout = new QHBoxLayout;
-    QLabel *showLabel = new QLabel("Show:", this);
+    QLabel *showLabel = new QLabel("Show:", window);
     showLayout->addWidget(showLabel);
 
-    QCheckBox *showGrid = new QCheckBox("Grid", this);
+    QCheckBox *showGrid = new QCheckBox("Grid", window);
     showGrid->setCheckState(Qt::Checked);
     showLayout->addWidget(showGrid);
 
-    QCheckBox *showPower = new QCheckBox("Power", this);
+    QCheckBox *showPower = new QCheckBox("Power", window);
     showPower->setCheckState(Qt::Checked);
     showLayout->addWidget(showPower);
 
-    QCheckBox *showHr = new QCheckBox("Heart Rate", this);
+    QCheckBox *showHr = new QCheckBox("Heart Rate", window);
     showHr->setCheckState(Qt::Checked);
     showLayout->addWidget(showHr);
 
     QHBoxLayout *smoothLayout = new QHBoxLayout;
-    QLabel *smoothLabel = new QLabel(tr("Smoothing (secs)"), this);
-    smoothLineEdit = new QLineEdit(this);
+    QLabel *smoothLabel = new QLabel(tr("Smoothing (secs)"), window);
+    smoothLineEdit = new QLineEdit(window);
     smoothLineEdit->setFixedWidth(30);
     
     smoothLayout->addWidget(smoothLabel);
