@@ -32,6 +32,9 @@ index.html: index.content genpage.pl
 license.html: license.content genpage.pl
 	./genpage.pl "License" $< > $@
 
+screenshots.html: screenshots.content genpage.pl
+	./genpage.pl "Screenshots" $< > $@
+
 search.html: search.content genpage.pl
 	./genpage.pl "Search" $< > $@
 

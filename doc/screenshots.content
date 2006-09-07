@@ -1,0 +1,18 @@
+<!-- $Id: faq.content,v 1.4 2006/07/05 16:59:56 srhea Exp $ -->
+
+<p>
+<center>
+<big><font face="arial,helvetica,sanserif">
+The Ride Summary Screen
+</font></big>
+<p>
+<img src="screenshot-summary.png" alt="Ride Summary Screen" align="center">
+<p>
+<big><font face="arial,helvetica,sanserif">
+The Power and Heart Rate Graph
+</font></big>
+<p>
+<img src="screenshot-plot.png" alt="Power and HR Graph" align="center">
+</center>
+
+

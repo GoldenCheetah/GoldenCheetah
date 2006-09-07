@@ -1,13 +1,40 @@
 <!-- $Id: download.content,v 1.6 2006/08/11 20:21:03 srhea Exp $ -->
 
-Right now we're only distributing tarballs of the Golden Cheetah source.
+As of September 6, 2006, we're now distributing the Golden Cheetah GUI built
+for PowerPC processors.  Also included in this distribution is the source code
+for the GUI and the older, command-line programs.
 
 <p>
 <center>
 <table width="100%">
 <tr>
 <td width="20%"><i>Date</i></td>
-<td width="25%"><i>Source</i></td>
+<td width="25%"><i>File</i></td>
+<td><i>Description</i></td>
+</tr>
+
+<tr>
+<td valign="top">Sep 6, 2006</td>
+<td valign="top"><a href="GoldenCheetah_2006-09-06_Darwin_powerpc.dmg">Darwin
+PowerPC</a></td>
+<td valign="top">The first release of the Golden Cheetah GUI.
+</td>
+</tr>
+</table>
+</center>
+
+<p>
+<hr width="50%">
+
+<p>
+These are the older, source-only, command-line distributions.  I don't
+recommend using them unless you know your way around a C compiler.
+
+<center>
+<table width="100%">
+<tr>
+<td width="20%"><i>Date</i></td>
+<td width="25%"><i>File</i></td>
 <td><i>Description</i></td>
 </tr>
 

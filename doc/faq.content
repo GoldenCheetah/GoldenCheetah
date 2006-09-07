@@ -1,19 +1,6 @@
 <!-- $Id: faq.content,v 1.4 2006/07/05 16:59:56 srhea Exp $ -->
 
 <p>
-<i>Why does Golden Cheetah only include command-line utilities?  Where's the
-GUI?</i>
-
-<p>
-Because this project is only a hobby of ours, and we haven't had time to
-finish it yet.  That said, we are working on it.  Here's a teaser screenshot
-to keep you interested:
-
-<center>
-<img src="gui-preview.png" alt="GUI Screen Shot" align="center">
-</center>
-
-<p>
 <i>Does the output of <code>ptunpk</code> exactly match that of the software
 included with the PowerTap?</i>
 

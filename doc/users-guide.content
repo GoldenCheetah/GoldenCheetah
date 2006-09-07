@@ -1,5 +1,24 @@
 <!-- $Id: users-guide.content,v 1.5 2006/05/27 16:32:46 srhea Exp $ -->
-Currently, Golden Cheetah consists of several command line utilities:
+
+<big><font face="arial,helvetica,sanserif">
+Using the GUI
+</font></big>
+
+<p>
+Using the graphical version of Golden Cheetah should be pretty
+self-explanatory.  Download the disk image from the <a
+href="download.html">download page</a>, drag the Golden Cheetah application
+into your Applications folder, open your Applications folder, and then double
+click on Golden Cheetah.
+
+<p>
+<big><font face="arial,helvetica,sanserif">
+Using the Command Line Utilities
+</font></big>
+
+<p>
+In addition to the GUI, Golden Cheetah comes with 
+several command line utilities:
 <code>ptdl</code>, which downloads ride data from a PowerTap Pro version 2.21
 cycling computer, <code>ptunpk</code>, which unpacks the raw bytes downloaded
 by <code>ptdl</code> and outputs more human-friendly ride information, and

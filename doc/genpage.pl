@@ -43,6 +43,7 @@ print<<EOF;
 <img src="logo.png" width="128" height="184" alt="Picture of Cheetah">
 
 <p>  <b><a href="index.html">Introduction</a></b>
+<br> <b><a href="screenshots.html">Screenshots</a>
 <br> <b><a href="users-guide.html">User's Guide</a>
 <br> <b><a href="faq.html">FAQ</a>
 <br> <b><a href="license.html">License</a></b>
