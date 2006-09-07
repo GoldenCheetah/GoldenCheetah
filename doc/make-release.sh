@@ -12,6 +12,8 @@ cd goldencheetah
 make
 mv src/gui/GoldenCheetah.app ..
 make clean
+rm doc/gc_*.tgz
+rm doc/GoldenCheetah_*.dmg
 cd ..
 strip GoldenCheetah.app/Contents/MacOS/GoldenCheetah
 find . -name .svn | xargs rm -rf
