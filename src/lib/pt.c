@@ -541,8 +541,10 @@ pt_read_raw(FILE *in, int compat, void *context,
             since_epoch = pt_unpack_time(buf, &time);
             if (start_secs == 0.0)
                 start_secs = since_epoch;
-            else
-                secs = since_epoch - start_secs;
+            else if (since_epoch - start_secs > secs)
+                    secs = since_epoch - start_secs;
+            else 
+                return; /* ignore it; don't let time go backwards */
             if (time_cb) time_cb(&time, since_epoch, context);
         }
         else if (pt_is_data(buf)) {
