@@ -35,6 +35,8 @@ class AllPlot : public QwtPlot
 
         QwtPlotCurve *wattsCurve;
         QwtPlotCurve *hrCurve;
+        QwtPlotCurve *speedCurve;
+        QwtPlotCurve *cadCurve;
 
         AllPlot();
 
@@ -46,6 +48,8 @@ class AllPlot : public QwtPlot
 
         void showPower(int state);
         void showHr(int state);
+        void showSpeed(int state);
+        void showCad(int state);
         void showGrid(int state);
         void setSmoothing(int value);
 
@@ -55,12 +59,15 @@ class AllPlot : public QwtPlot
 
         double *hrArray;
         double *wattsArray;
+        double *speedArray;
+        double *cadArray;
         double *timeArray;
         int arrayLength;
 
         int smooth;
 
         void recalc();
+        void setYMax();
 };
 
 #endif // _GC_AllPlot_h

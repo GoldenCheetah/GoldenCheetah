@@ -102,6 +102,14 @@ MainWindow::MainWindow(const QDir &home) :
     showHr->setCheckState(Qt::Checked);
     showLayout->addWidget(showHr);
 
+    QCheckBox *showSpeed = new QCheckBox("Speed", window);
+    showSpeed->setCheckState(Qt::Checked);
+    showLayout->addWidget(showSpeed);
+
+    QCheckBox *showCad = new QCheckBox("Cadence", window);
+    showCad->setCheckState(Qt::Checked);
+    showLayout->addWidget(showCad);
+
     QHBoxLayout *smoothLayout = new QHBoxLayout;
     QLabel *smoothLabel = new QLabel(tr("Smoothing (secs)"), window);
     smoothLineEdit = new QLineEdit(window);
@@ -148,6 +156,10 @@ MainWindow::MainWindow(const QDir &home) :
             allPlot, SLOT(showPower(int)));
     connect(showHr, SIGNAL(stateChanged(int)),
             allPlot, SLOT(showHr(int)));
+    connect(showSpeed, SIGNAL(stateChanged(int)),
+            allPlot, SLOT(showSpeed(int)));
+    connect(showCad, SIGNAL(stateChanged(int)),
+            allPlot, SLOT(showCad(int)));
     connect(showGrid, SIGNAL(stateChanged(int)),
             allPlot, SLOT(showGrid(int)));
     connect(smoothSlider, SIGNAL(valueChanged(int)),
