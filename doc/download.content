@@ -14,12 +14,21 @@ for the GUI and the older, command-line programs.
 </tr>
 
 <tr>
+<td valign="top">Sep 7, 2006</td>
+<td valign="top"><a href="GoldenCheetah_2006-09-07_Darwin_powerpc.dmg">Darwin
+PowerPC</a></td>
+<td valign="top">Adds speed and cadence to the ride plot.  Fixes a bug
+found by George Gilliland where reseting the time during a ride could cause
+the GUI to crash.</td>
+</tr>
+
+<tr>
 <td valign="top">Sep 6, 2006</td>
 <td valign="top"><a href="GoldenCheetah_2006-09-06_Darwin_powerpc.dmg">Darwin
 PowerPC</a></td>
-<td valign="top">The first release of the Golden Cheetah GUI.
-</td>
+<td valign="top">The first release of the Golden Cheetah GUI.</td>
 </tr>
+
 </table>
 </center>
 

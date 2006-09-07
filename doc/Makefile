@@ -2,7 +2,10 @@
 CONTENT=$(wildcard *.content)
 HTML=$(subst .content,.html,$(CONTENT))
 TARBALLS=$(wildcard gc_*.tgz)
-OTHER=logo.png sample.gp sample.png cpint.gp cpint.png gui-preview.png
+OTHER=logo.png sample.gp sample.png cpint.gp cpint.png \
+	screenshot-summary.png screenshot-plot.png
+DISTRIB=GoldenCheetah_2006-09-06_Darwin_powerpc.dmg \
+	GoldenCheetah_2006-09-07_Darwin_powerpc.dmg
 
 all: $(HTML)
 .PHONY: all clean install
@@ -11,7 +14,7 @@ clean:
 	rm -f $(HTML)
 
 install:
-	rsync -avz -e ssh $(HTML) $(TARBALLS) $(OTHER) \
+	rsync -avz -e ssh $(HTML) $(TARBALLS) $(OTHER) $(DISTRIB) \
 		srhea.net:public_html/goldencheetah/
 
 contact.html: contact.content genpage.pl
