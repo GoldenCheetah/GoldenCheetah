@@ -21,7 +21,7 @@
 #include "RawFile.h"
 #include <QMessageBox>
 extern "C" {
-#include "../pt.h"
+#include "pt.h"
 }
 
 struct RawFileReadState

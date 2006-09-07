@@ -5,10 +5,9 @@
 TEMPLATE = app
 TARGET += 
 DEPENDPATH += .
-INCLUDEPATH += ../qwt-20060130/include
+INCLUDEPATH += /usr/local/include/qwt ../lib
 CONFIG += static
-OBJECTS += ../pt.o
-LIBS += /usr/local/lib/libqwt.a
+LIBS += /usr/local/lib/libqwt.a ../lib/libgc.a
 LIBS += -lz -framework Carbon
 
 # Input

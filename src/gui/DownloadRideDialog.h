@@ -23,7 +23,7 @@
 
 #include <QtGui>
 extern "C" {
-#include "../pt.h"
+#include "pt.h"
 }
 
 class MainWindow;

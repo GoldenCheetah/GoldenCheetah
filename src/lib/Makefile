@@ -20,31 +20,14 @@
 
 CC=gcc
 CFLAGS=-g -W -Wall -Werror -ansi -pedantic
-CMDS=ptdl ptpk ptunpk cpint
-LIBS=../lib/libgc.a
-INCLUDES=-I../lib
+LIBTOOL=libtool
 
-all: $(CMDS)
+all: libgc.a
 .PHONY: all clean
 
 clean:
-	rm -f *.o $(CMDS)
+	rm -f *.o libgc.a
 
-%.o: %.c
-	$(CC) -c $(CFLAGS) $(INCLUDES) $< 
-
-cpint: cpint.o $(LIBS)
-	$(CXX) -o $@ $^
-
-ptdl: ptdl.o $(LIBS)
-	$(CC) -o $@ $^
-
-ptunpk: ptunpk.o $(LIBS)
-	$(CC) -o $@ $^
-
-ptpk: ptpk.o $(LIBS)
-	$(CC) -o $@ $^
-
-ptdl.o: ../lib/pt.h
-ptunpk.o: ../lib/pt.h
+libgc.a: pt.o cpint.o
+	$(LIBTOOL) -static -o $@ $^
 

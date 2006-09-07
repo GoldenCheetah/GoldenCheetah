@@ -18,33 +18,14 @@
 # Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-CC=gcc
-CFLAGS=-g -W -Wall -Werror -ansi -pedantic
-CMDS=ptdl ptpk ptunpk cpint
-LIBS=../lib/libgc.a
-INCLUDES=-I../lib
+SUBDIRS=doc src
 
-all: $(CMDS)
-.PHONY: all clean
+all: subdirs 
+.PHONY: all subdirs clean
 
 clean:
-	rm -f *.o $(CMDS)
+	@for dir in $(SUBDIRS); do $(MAKE) -wC $$dir clean; done
 
-%.o: %.c
-	$(CC) -c $(CFLAGS) $(INCLUDES) $< 
-
-cpint: cpint.o $(LIBS)
-	$(CXX) -o $@ $^
-
-ptdl: ptdl.o $(LIBS)
-	$(CC) -o $@ $^
-
-ptunpk: ptunpk.o $(LIBS)
-	$(CC) -o $@ $^
-
-ptpk: ptpk.o $(LIBS)
-	$(CC) -o $@ $^
-
-ptdl.o: ../lib/pt.h
-ptunpk.o: ../lib/pt.h
+subdirs:
+	@for dir in $(SUBDIRS); do $(MAKE) -wC $$dir; done
 
