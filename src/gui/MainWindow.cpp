@@ -21,6 +21,7 @@
 #include "MainWindow.h"
 #include "AllPlot.h"
 #include "ChooseCyclistDialog.h"
+#include "CpintPlot.h"
 #include "DownloadRideDialog.h"
 #include "RawFile.h"
 #include "RideItem.h"
@@ -135,7 +136,7 @@ MainWindow::MainWindow(const QDir &home) :
     window->setLayout(vlayout);
     window->show();
 
-    tabWidget->addTab(window, "All-in-One Graph");
+    tabWidget->addTab(window, "Ride Plot");
     splitter->addWidget(tabWidget);
 
     QVariant splitterSizes = settings.value(GC_SETTINGS_SPLITTER_SIZES); 
@@ -147,6 +148,9 @@ MainWindow::MainWindow(const QDir &home) :
         sizes.append(390);
         splitter->setSizes(sizes);
     }
+
+    cpintPlot = new CpintPlot(home.path());
+    tabWidget->addTab(cpintPlot, "Critical Power Plot");
 
     connect(treeWidget, SIGNAL(itemSelectionChanged()),
             this, SLOT(rideSelected()));
@@ -166,6 +170,8 @@ MainWindow::MainWindow(const QDir &home) :
             this, SLOT(setSmoothingFromSlider()));
     connect(smoothLineEdit, SIGNAL(returnPressed()),
             this, SLOT(setSmoothingFromLineEdit()));
+    connect(tabWidget, SIGNAL(currentChanged(int)), 
+            this, SLOT(tabChanged(int)));
 
     QMenu *fileMenu = new QMenu(tr("&File"), this); 
     fileMenu->addAction(tr("&New..."), this, 
@@ -246,6 +252,8 @@ MainWindow::rideSelected()
             rideSummary->setHtml(ride->htmlSummary());
             rideSummary->setAlignment(Qt::AlignCenter);
             allPlot->setData(ride->raw);
+            if (tabWidget->currentIndex() == 2)
+                cpintPlot->calculate(ride->fileName, ride->dateTime);
             return;
         }
     }
@@ -286,6 +294,21 @@ MainWindow::setSmoothingFromLineEdit()
     if (value != allPlot->smoothing()) {
         allPlot->setSmoothing(value);
         smoothSlider->setValue(value);
+    }
+}
+
+void
+MainWindow::tabChanged(int index)
+{
+    if (index == 2) {
+        if (treeWidget->selectedItems().size() == 1) {
+            QTreeWidgetItem *which = treeWidget->selectedItems().first();
+            if (which->type() == RIDE_TYPE) {
+                RideItem *ride = (RideItem*) which;
+                cpintPlot->calculate(ride->fileName, ride->dateTime);
+                return;
+            }
+        }
     }
 }
 

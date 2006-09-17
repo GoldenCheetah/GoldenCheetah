@@ -14,6 +14,7 @@ LIBS += -lz -framework Carbon
 HEADERS += \
 	AllPlot.h \
 	ChooseCyclistDialog.h \
+	CpintPlot.h \
 	DownloadRideDialog.h \
 	MainWindow.h \
 	RawFile.h \
@@ -21,6 +22,7 @@ HEADERS += \
 SOURCES += \
 	AllPlot.cpp \
 	ChooseCyclistDialog.cpp \
+	CpintPlot.cpp \
 	DownloadRideDialog.cpp \
 	MainWindow.cpp \
 	RawFile.cpp \

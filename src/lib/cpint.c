@@ -23,10 +23,10 @@
 #include <assert.h>
 #include <dirent.h>
 #include <math.h>
-#include <regex.h>
 #include <stdlib.h>
 #include <string.h>
 #include "pt.h"
+#include "cpint.h"
 
 struct point 
 {
@@ -94,14 +94,78 @@ error_cb(const char *msg, void *context)
     exit(1);
 }
 
-void
-one_file(FILE *in, FILE *out) 
+struct cpi_file_info *
+cpi_files_to_update(const char *dir)
 {
+    DIR *dirp;
+    struct dirent *dp;
+    regex_t reg;
+    struct stat sbi, sbo;
+    char *inname, *outname;
+    struct cpi_file_info *head = NULL, *tail = NULL;
+
+    if (regcomp(&reg, "^([0-9][0-9][0-9][0-9])_([0-9][0-9])_([0-9][0-9])"
+                "_([0-9][0-9])_([0-9][0-9])_([0-9][0-9])\\.raw$", REG_EXTENDED))
+        assert(0);
+
+    dirp = opendir(dir);
+    while ((dp = readdir(dirp)) != NULL) {
+        int nmatch = 7;
+        regmatch_t *pmatch = (regmatch_t*) calloc(nmatch, sizeof(regmatch_t));
+        if (regexec(&reg, dp->d_name, nmatch, pmatch, 0) == 0) {
+            inname = malloc(strlen(dir) + 25);
+            outname = malloc(strlen(dir) + 25);
+            sprintf(inname, "%s/%s", dir, dp->d_name);
+            if (stat(inname, &sbi))
+                assert(0);
+            sprintf(outname, "%s/%s", dir, dp->d_name);
+            strcpy(outname + strlen(outname) - 4, ".cpi");
+            if ((stat(outname, &sbo)) || (sbo.st_mtime < sbi.st_mtime)) {
+                struct cpi_file_info *info = (struct cpi_file_info*) 
+                        malloc(sizeof(struct cpi_file_info));
+                info->file = strdup(dp->d_name);
+                info->inname = inname;
+                info->outname = outname;
+                info->pmatch = pmatch;
+                info->next = NULL;
+                if (head == NULL)
+                    head = tail = info;
+                else {
+                    tail->next = info;
+                    tail = info;
+                }
+            }
+            else {
+                free(inname);
+                free(outname);
+            }
+        }
+        else {
+            free(pmatch);
+        }
+    }
+    closedir(dirp);
+
+    return head;
+}
+            
+void
+update_cpi_file(struct cpi_file_info *info, 
+                int (*cancel_cb)(void *user_data),
+                void *user_data) 
+{
+    FILE *in, *out;
+    int canceled = 0;
     double start_secs, prev_secs, dur_secs, avg, sum;
     int dur_ints, i, total_intervals;
     double *bests;
     struct point *p, *q;
+    int progress_count = 0;
 
+    in = fopen(info->inname, "r");
+    assert(in);
+    out = fopen(info->outname, "w");
+    assert(out);
     if (head) {
         p = head;
         while (p) { q = p; p = p->next; free(q); }
@@ -120,6 +184,12 @@ one_file(FILE *in, FILE *out)
     for (p = head; p; p = p->next) {
         sum = 0.0;
         for (q = p; q; q = q->next) {
+            if (cancel_cb && (++progress_count % 1000 == 0)) {
+                if (cancel_cb(user_data)) {
+                    canceled = 1;
+                    goto done;
+                }
+            }
             sum += (q->secs - prev_secs) * q->watts;
             dur_secs = q->secs - start_secs;
             dur_ints = secs_to_interval(dur_secs);
@@ -136,78 +206,32 @@ one_file(FILE *in, FILE *out)
             fprintf(out, "%6.3f %3.0f\n", i * rec_int_ms / 1000.0 / 60.0, 
                    round(bests[i]));
     }
+
+done:
+    fclose(in);
+    fclose(out);
+    if (canceled)
+        unlink(info->outname);
 }
 
 void
-update_cpi_files(const char *dir, void (*one_done_cb)(const char *date))
+free_cpi_file_info(struct cpi_file_info *head) 
 {
-    DIR *dirp;
-    struct dirent *dp;
-    regex_t reg;
-    struct stat sbi, sbo;
-    FILE *in, *out;
-    char *outname;
-    char year[5], mon[3], day[3], hour[3], min[3], sec[3];
-    char longdate[26];
-    struct tm time;
-    time_t t;
-
-    int nmatch = 7;
-    regmatch_t *pmatch = (regmatch_t*) calloc(nmatch, sizeof(regmatch_t));
-
-    if (regcomp(&reg, "^([0-9][0-9][0-9][0-9])_([0-9][0-9])_([0-9][0-9])"
-                "_([0-9][0-9])_([0-9][0-9])_([0-9][0-9])\\.raw$", REG_EXTENDED))
-        assert(0);
-
-    outname = malloc(strlen(dir) + 25);
-    dirp = opendir(dir);
-    while ((dp = readdir(dirp)) != NULL) {
-        if (regexec(&reg, dp->d_name, nmatch, pmatch, 0) == 0) {
-            if (stat(dp->d_name, &sbi))
-                assert(0);
-            sprintf(outname, "%s/%s", dir, dp->d_name);
-            strcpy(outname + strlen(outname) - 4, ".cpi");
-            if ((stat(outname, &sbo)) || (sbo.st_mtime < sbi.st_mtime)) {
-                strncpy(year, dp->d_name + pmatch[1].rm_so, 4); year[4] = '\0';
-                strncpy(mon, dp->d_name + pmatch[2].rm_so, 2); mon[2] = '\0';
-                strncpy(day, dp->d_name + pmatch[3].rm_so, 2); day[2] = '\0';
-                strncpy(hour, dp->d_name + pmatch[4].rm_so, 2); hour[2] = '\0';
-                strncpy(min, dp->d_name + pmatch[5].rm_so, 2); min[2] = '\0';
-                strncpy(sec, dp->d_name + pmatch[6].rm_so, 2); sec[2] = '\0';
-                memset(&time, 0, sizeof(time));
-                time.tm_year = atoi(year) - 1900;
-                time.tm_mon = atoi(mon) - 1;
-                time.tm_mday = atoi(day);
-                time.tm_hour = atoi(hour);
-                time.tm_min = atoi(min);
-                time.tm_sec = atoi(sec);
-                time.tm_isdst = -1;
-                t = mktime(&time);
-                assert(t != -1);
-                ctime_r(&t, longdate);
-                longdate[24] = '\0'; /* get rid of newline */
-                one_done_cb(longdate);
-                fflush(stderr);
-                in = fopen(dp->d_name, "r");
-                assert(in);
-                out = fopen(outname, "w");
-                assert(out);
-                one_file(in, out);
-                fclose(in);
-                fclose(out);
-                fprintf(stderr, "done.\n");
-            }
-        }
+    struct cpi_file_info *tmp;
+    while (head) {
+        free(head->file);
+        free(head->inname);
+        free(head->outname);
+        free(head->pmatch);
+        tmp = head;
+        head = head->next;
+        free(tmp);
     }
-    closedir(dirp);
-    free(pmatch);
 }
 
-void
-combine_cpi_files(const char *dir, double *bests[], int *bestlen)
+static void 
+read_one(const char *inname, double *bests[], int *bestlen)
 {
-    DIR *dirp;
-    struct dirent *dp;
     FILE *in;
     char line[40];
     int lineno;
@@ -216,36 +240,63 @@ combine_cpi_files(const char *dir, double *bests[], int *bestlen)
     double *tmp;
     int interval;
 
-    *bestlen = 1000;
+    in = fopen(inname, "r");
+    assert(in);
+    lineno = 1;
+    while (fgets(line, sizeof(line), in) != NULL) {
+        if (sscanf(line, "%lf %d\n", &mins, &watts) != 2) {
+            fprintf(stderr, "Bad match on line %d: %s", lineno, line);
+            exit(1);
+        }
+        interval = secs_to_interval(mins * 60.0);
+        while (interval >= *bestlen) {
+            tmp = calloc(*bestlen * 2, sizeof(double));
+            memcpy(tmp, *bests, *bestlen * sizeof(double));
+            free(*bests);
+            *bests = tmp;
+            *bestlen *= 2;
+        }
+        if ((*bests)[interval] < watts)
+            (*bests)[interval] = watts;
+        ++lineno;
+    }
+    fclose(in);
+}
 
+void
+read_cpi_file(const char *dir, const char *raw, double *bests[], int *bestlen)
+{
+    char *inname;
+
+    *bestlen = 1000;
     *bests = calloc(*bestlen, sizeof(double));
+    inname = malloc(strlen(dir) + 25);
+    sprintf(inname, "%s/%s", dir, raw);
+    strcpy(inname + strlen(inname) - 4, ".cpi");
+    read_one(inname, bests, bestlen);
+    free(inname);
+}
+
+
+void
+combine_cpi_files(const char *dir, double *bests[], int *bestlen)
+{
+    DIR *dirp;
+    struct dirent *dp;
+    char *inname;
+
+    *bestlen = 1000;
+    *bests = calloc(*bestlen, sizeof(double));
+    inname = malloc(strlen(dir) + 25);
     dirp = opendir(dir);
     while ((dp = readdir(dirp)) != NULL) {
         if (strcmp(".cpi", dp->d_name + dp->d_namlen - 4) == 0) {
-            in = fopen(dp->d_name, "r");
-            assert(in);
-            lineno = 1;
-            while (fgets(line, sizeof(line), in) != NULL) {
-                if (sscanf(line, "%lf %d\n", &mins, &watts) != 2) {
-                    fprintf(stderr, "Bad match on line %d: %s", lineno, line);
-                    exit(1);
-                }
-                interval = secs_to_interval(mins * 60.0);
-                while (interval >= *bestlen) {
-                    tmp = calloc(*bestlen * 2, sizeof(double));
-                    memcpy(tmp, *bests, *bestlen * sizeof(double));
-                    free(*bests);
-                    *bests = tmp;
-                    *bestlen *= 2;
-                }
-                if ((*bests)[interval] < watts)
-                    (*bests)[interval] = watts;
-                ++lineno;
-            }
-            fclose(in);
+            sprintf(inname, "%s/%s", dir, dp->d_name);
+            read_one(inname, bests, bestlen);
         }
     }
     closedir(dirp);
+    free(inname);
 }
 
 

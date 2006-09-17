@@ -27,12 +27,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "cpint.h"
 
+struct cpi_file_info *head;
+
 static void
-one_done_cb(const char *longdate) 
+canceled(int unused) 
 {
-    fprintf(stderr, "Compiling data for ride on %s...", longdate);
+    unused = 0;
+    if (head) {
+        fprintf(stderr, "calceled.\n");
+        unlink(head->outname);
+    }
+    exit(1);
 }
 
 int
@@ -44,7 +52,15 @@ main(int argc, char *argv[])
     char *dir = ".";
     if (argc > 1)
         dir = argv[1];
-    update_cpi_files(dir, one_done_cb);
+    signal(SIGINT, canceled);
+    head = cpi_files_to_update(dir);
+    while (head) {
+        fprintf(stderr, "Processing ride file %s...", head->file);
+        fflush(stderr);
+        update_cpi_file(head, NULL, NULL);
+        fprintf(stderr, "done.\n");
+        head = head->next;
+    }
     combine_cpi_files(dir, &bests, &bestlen);
     for (i = 0; i < bestlen; ++i) {
         if (bests[i] != 0)

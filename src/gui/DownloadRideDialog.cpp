@@ -23,6 +23,7 @@
 #include <QtGui>
 #include <errno.h>
 #include <fcntl.h>
+#include <math.h>
 
 #define MAX_DEVICES 10
 
@@ -165,7 +166,8 @@ DownloadRideDialog::time_cb(struct tm *time)
                                   + tr(" for writing: ") + strerror(errno));
             reject();
         }
-        label->setText(label->text() + tr("\nReading ride data..."));
+        label->setText(label->text() + tr("\nRide data read: "));
+        endingOffset = label->text().size();
     }
     timer->start(5000);
 }
@@ -182,7 +184,13 @@ DownloadRideDialog::record_cb(unsigned char *buf)
     for (int i = 0; i < 6; ++i)
         fprintf(out, "%02x%s", buf[i], (i == 5) ? "\n" : " ");
     if ((++blockCount % 256) == 0) {
-        label->setText(label->text() + ".");
+        QString existing = label->text();
+        existing.chop(existing.size() - endingOffset);
+        int minutes = (int) round(blockCount * 0.021);
+        existing.append(QString("%1:%2").arg(minutes / 60)
+                        .arg(minutes % 60, 2, 10, QLatin1Char('0')));
+        label->setText(existing);
+        repaint();
     }
     timer->start(5000);
 }
@@ -259,7 +267,7 @@ DownloadRideDialog::readData()
             delete timer;
             timer = NULL;
         }
-        label->setText(label->text() + tr("done."));
+        // label->setText(label->text() + tr("done."));
         QMessageBox::information(this, tr("Success"), tr("Download complete."));
         fclose(out);
         out = NULL;

@@ -25,6 +25,7 @@
 #include <QtGui>
 
 class AllPlot;
+class CpintPlot;
 
 class MainWindow : public QMainWindow 
 {
@@ -46,6 +47,7 @@ class MainWindow : public QMainWindow
         void downloadRide();
         void setSmoothingFromSlider();
         void setSmoothingFromLineEdit();
+        void tabChanged(int index);
 
     private:
 
@@ -57,6 +59,7 @@ class MainWindow : public QMainWindow
         QTabWidget *tabWidget;
         QTextEdit *rideSummary;
         AllPlot *allPlot;
+        CpintPlot *cpintPlot;
         QSlider *smoothSlider;
         QLineEdit *smoothLineEdit;
         QTreeWidgetItem *allRides;

@@ -55,6 +55,7 @@ class DownloadRideDialog : public QDialog
         QListWidget *listWidget;
         QPushButton *downloadButton, *rescanButton, *cancelButton;
         QLabel *label;
+        int endingOffset;
         int fd;
         FILE *out;
         char outname[24];

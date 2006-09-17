@@ -1,5 +1,5 @@
 /* 
- * $Id: cpint.h,v 1.1 2006/08/11 19:53:07 srhea Exp $
+ * $Id: CpintPlot.h,v 1.2 2006/07/12 02:13:57 srhea Exp $
  *
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
  *
@@ -18,29 +18,36 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef __cpint_h
-#define __cpint_h 1
+#ifndef _GC_CpintPlot_h
+#define _GC_CpintPlot_h 1
 
-#include <regex.h>
+#include <qwt_plot.h>
+#include <QtGui>
 
-struct cpi_file_info {
-    char *file, *inname, *outname;
-    regmatch_t *pmatch;
-    struct cpi_file_info *next;
+class QwtPlotCurve;
+class QwtPlotGrid;
+
+class CpintPlot : public QwtPlot
+{
+    Q_OBJECT
+
+    public:
+
+        CpintPlot(QString path);
+        QProgressDialog *progress;
+
+    public slots:
+
+        void showGrid(int state);
+        void calculate(QString fileName, QDateTime dateTime);
+
+    protected:
+
+        QString path;
+        QwtPlotCurve *allCurve;
+        QwtPlotCurve *thisCurve;
+        QwtPlotGrid *grid;
 };
 
-extern struct cpi_file_info * cpi_files_to_update(const char *dir);
-
-extern void update_cpi_file(struct cpi_file_info *info, 
-                            int (*cancel_cb)(void *user_data),
-                            void *user_data);
-
-extern void free_cpi_file_info(struct cpi_file_info *head);
-
-extern void read_cpi_file(const char *dir, const char *raw, 
-                          double *bests[], int *bestlen);
-
-extern void combine_cpi_files(const char *dir, double *bests[], int *bestlen);
-
-#endif /* __cpint_h */
+#endif // _GC_CpintPlot_h
 
