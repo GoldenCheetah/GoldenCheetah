@@ -16,6 +16,8 @@ HEADERS += \
 	ChooseCyclistDialog.h \
 	CpintPlot.h \
 	DownloadRideDialog.h \
+        LogTimeScaleDraw.h \
+        LogTimeScaleEngine.h \
 	MainWindow.h \
 	RawFile.h \
 	RideItem.h
@@ -24,6 +26,8 @@ SOURCES += \
 	ChooseCyclistDialog.cpp \
 	CpintPlot.cpp \
 	DownloadRideDialog.cpp \
+        LogTimeScaleDraw.cpp \
+        LogTimeScaleEngine.cpp \
 	MainWindow.cpp \
 	RawFile.cpp \
 	RideItem.cpp \

@@ -28,16 +28,19 @@ extern "C" {
 #include <qwt_legend.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
-#include <qwt_scale_engine.h>
+#include "LogTimeScaleDraw.h"
+#include "LogTimeScaleEngine.h"
 
-CpintPlot::CpintPlot(QString p) : path(p), allCurve(NULL), thisCurve(NULL),
-                                  grid(NULL)
+CpintPlot::CpintPlot(QString p) : 
+    progress(NULL), path(p), allCurve(NULL), thisCurve(NULL), grid(NULL)
 {
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setCanvasBackground(Qt::white);
     setAxisTitle(yLeft, "Average Power (watts)");
-    setAxisTitle(xBottom, "Interval Length (minutes)");
-    setAxisScaleEngine(xBottom, new QwtLog10ScaleEngine);
+    setAxisTitle(xBottom, "Interval Length");
+    setAxisScaleDraw(xBottom, new LogTimeScaleDraw);
+    setAxisScaleEngine(xBottom, new LogTimeScaleEngine);
+    setAxisScale(xBottom, 0.021, 60);
 }
 
 static int
@@ -75,33 +78,34 @@ CpintPlot::calculate(QString fileName, QDateTime dateTime)
         progress = new QProgressDialog(
             QString(tr("Computing critical power intervals.\n"
                        "This may take a while.\n")),
-            tr("Abort"), 0, count, this);
+            tr("Abort"), 0, count + 1, this);
         int endingOffset = progress->labelText().size();
-        tmp = head;
-        progress->show();
-        count = 0;
-        while (tmp) {
+        if (count) {
+            tmp = head;
+            count = 1;
+            while (tmp) {
+                QString existing = progress->labelText();
+                existing.chop(progress->labelText().size() - endingOffset);
+                progress->setLabelText(
+                    existing + QString(tr("Processing %1...")).arg(tmp->file));
+                progress->setValue(count++);
+                update_cpi_file(tmp, cancel_cb, this);
+                QCoreApplication::processEvents();
+                if (progress->wasCanceled()) {
+                    aborted = true;
+                    break;
+                }
+                tmp = tmp->next;
+            }
+            free_cpi_file_info(head);
+        }
+
+        if (!aborted) {
             QString existing = progress->labelText();
             existing.chop(progress->labelText().size() - endingOffset);
             progress->setLabelText(
-                existing + QString(tr("Processing %1...")).arg(tmp->file));
-            progress->setValue(count++);
-            update_cpi_file(tmp, cancel_cb, this);
-            QCoreApplication::processEvents();
-            if (progress->wasCanceled()) {
-                aborted = true;
-                break;
-            }
-            tmp = tmp->next;
-        }
-        free_cpi_file_info(head);
-
-        if (head && !aborted) {
-            QString existing = progress->labelText();
-            existing.chop(progress->labelText().size() - endingOffset);
-            progress->setValue(count++);
-            progress->setLabelText(existing 
-                                   + tr("Aggregating over all files."));
+                existing + tr("Aggregating over all files."));
+            progress->show();
             int i;
             double *bests;
             int bestlen;
