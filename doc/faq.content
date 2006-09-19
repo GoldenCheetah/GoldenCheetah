@@ -1,26 +1,6 @@
 <!-- $Id: faq.content,v 1.4 2006/07/05 16:59:56 srhea Exp $ -->
 
 <p>
-<i>Does the output of <code>ptunpk</code> exactly match that of the software
-included with the PowerTap?</i>
-
-<p>
-Almost.  If you run it in compatibility mode, using the <code>-c</code>
-option, it matches the PowerTap software's output exactly on everything but
-the time values, at least for the five sample rides we've tried it with.
-The times are a little off, but not by more than 0.1%, so we don't consider it
-a big deal.
-
-<p>
-That said, the PowerTap software does some weird things, like converting from
-kilometers to miles by multiplying by 0.62, but then reporting the miles
-values with five digits after the decimal place.  If you run
-<code>ptunpk</code> without the <code>-c</code> option, it will unpack the
-data in the way we think it should.  The results mostly match up with the
-official ones, and are almost certainly identical within the range of accuracy
-of the device.
-
-<p>
 <i>I've downloaded and unpacked the data.  Now what do I do with it?</i>
 
 <p>
@@ -46,4 +26,24 @@ src="http://rcm.amazon.com/e/cm?t=goldencheetah-20&o=1&p=8&l=as1&asins=193138279
 style="width:120px;height:240px;" scrolling="no" marginwidth="0"
 marginheight="0" frameborder="0"></iframe>
 </center>
+
+<p>
+<i>Does the output of <code>ptunpk</code> exactly match that of the software
+included with the PowerTap?</i>
+
+<p>
+Almost.  If you run it in compatibility mode, using the <code>-c</code>
+option, it matches the PowerTap software's output exactly on everything but
+the time values, at least for the five sample rides we've tried it with.
+The times are a little off, but not by more than 0.1%, so we don't consider it
+a big deal.
+
+<p>
+That said, the PowerTap software does some weird things, like converting from
+kilometers to miles by multiplying by 0.62, but then reporting the miles
+values with five digits after the decimal place.  If you run
+<code>ptunpk</code> without the <code>-c</code> option, it will unpack the
+data in the way we think it should.  The results mostly match up with the
+official ones, and are almost certainly identical within the range of accuracy
+of the device.
 
