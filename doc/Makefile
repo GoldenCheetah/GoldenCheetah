@@ -3,9 +3,11 @@ CONTENT=$(wildcard *.content)
 HTML=$(subst .content,.html,$(CONTENT))
 TARBALLS=$(wildcard gc_*.tgz)
 OTHER=logo.png sample.gp sample.png cpint.gp cpint.png \
-	screenshot-summary.png screenshot-plot.png
+	screenshot-summary.png screenshot-plot.png \
+	screenshot-cpint.png
 DISTRIB=GoldenCheetah_2006-09-06_Darwin_powerpc.dmg \
-	GoldenCheetah_2006-09-07_Darwin_powerpc.dmg
+	GoldenCheetah_2006-09-07_Darwin_powerpc.dmg \
+	GoldenCheetah_2006-09-19_Darwin_powerpc.dmg
 
 all: $(HTML)
 .PHONY: all clean install
