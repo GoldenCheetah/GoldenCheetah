@@ -35,6 +35,7 @@ class CpintPlot : public QwtPlot
 
         CpintPlot(QString path);
         QProgressDialog *progress;
+        bool needToScanRides;
 
     public slots:
 

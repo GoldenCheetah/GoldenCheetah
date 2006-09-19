@@ -201,6 +201,8 @@ MainWindow::addRide(QString name)
     QTime time(rx.cap(4).toInt(), rx.cap(5).toInt(),rx.cap(6).toInt()); 
     QDateTime dt(date, time);
     RideItem *last = new RideItem(allRides, RIDE_TYPE, home.path(), name, dt);
+    cpintPlot->needToScanRides = true;
+    tabWidget->setCurrentIndex(0);
     treeWidget->setCurrentItem(last);
 }
 

@@ -32,7 +32,8 @@ extern "C" {
 #include "LogTimeScaleEngine.h"
 
 CpintPlot::CpintPlot(QString p) : 
-    progress(NULL), path(p), allCurve(NULL), thisCurve(NULL), grid(NULL)
+    progress(NULL), needToScanRides(true), path(p), allCurve(NULL), 
+    thisCurve(NULL), grid(NULL)
 {
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setCanvasBackground(Qt::white);
@@ -41,6 +42,18 @@ CpintPlot::CpintPlot(QString p) :
     setAxisScaleDraw(xBottom, new LogTimeScaleDraw);
     setAxisScaleEngine(xBottom, new LogTimeScaleEngine);
     setAxisScale(xBottom, 0.021, 60);
+
+    allCurve = new QwtPlotCurve("All Rides");
+    allCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    allCurve->setPen(QPen(Qt::red));
+    allCurve->attach(this);
+
+    grid = new QwtPlotGrid();
+    grid->enableX(false);
+    QPen gridPen;
+    gridPen.setStyle(Qt::DotLine);
+    grid->setPen(gridPen);
+    grid->attach(this);
 }
 
 static int
@@ -57,16 +70,9 @@ CpintPlot::calculate(QString fileName, QDateTime dateTime)
     char *dir = strdup(path.toAscii().constData());
     char *file = strdup(fileName.toAscii().constData());
 
-    if (grid == NULL) {
-        grid = new QwtPlotGrid();
-        grid->enableX(false);
-        QPen gridPen;
-        gridPen.setStyle(Qt::DotLine);
-        grid->setPen(gridPen);
-        grid->attach(this);
-    }
-
-    if (allCurve == NULL) {
+    if (needToScanRides) {
+        fprintf(stderr, "Scanning rides...\n");
+        fflush(stderr);
         bool aborted = false;
         struct cpi_file_info *head = cpi_files_to_update(dir);
         int count = 0;
@@ -117,22 +123,19 @@ CpintPlot::calculate(QString fileName, QDateTime dateTime)
                 if (bests[i] > 0) maxNonZero = i;
             }
             if (maxNonZero > 1) {
-                allCurve = new QwtPlotCurve("All Rides");
-                allCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-                allCurve->setPen(QPen(Qt::red));
                 allCurve->setData(timeArray + 1, bests + 1, maxNonZero - 1);
                 setAxisScale(xBottom, 0.021, maxNonZero * 0.021);
-                allCurve->attach(this);
             }
             delete [] timeArray;
             free(bests);
+            needToScanRides = false;
         }
 
         delete progress; 
         progress = NULL;
     }
 
-    if (allCurve) {
+    if (!needToScanRides) {
         delete thisCurve;
         int i;
         double *bests;
@@ -159,7 +162,6 @@ CpintPlot::calculate(QString fileName, QDateTime dateTime)
     replot();
     free(dir);
     free(file);
-
 }
 
 void
