@@ -2,17 +2,27 @@
 
 <p>
 <center>
+
 <big><font face="arial,helvetica,sanserif">
-The Ride Summary Screen
+The Ride Summary
 </font></big>
 <p>
 <img src="screenshot-summary.png" alt="Ride Summary Screen" align="center">
+
 <p>
 <big><font face="arial,helvetica,sanserif">
-The Power and Heart Rate Graph
+The Power, Heart Rate, Speed, and Cadence Plot
 </font></big>
 <p>
-<img src="screenshot-plot.png" alt="Power and HR Graph" align="center">
+<img src="screenshot-plot.png" alt="Power and HR Plot" align="center">
+
+<p>
+<big><font face="arial,helvetica,sanserif">
+The Critical Power Plot
+</font></big>
+<p>
+<img src="screenshot-cpint.png" alt="The Critical Power Plot" align="center">
+
 </center>
 
 

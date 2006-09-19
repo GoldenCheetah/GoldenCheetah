@@ -26,7 +26,8 @@ print<<EOF;
 
 <html>
 <head>
-<title>Golden Cheetah: Power for the Masses</title>
+<title>Golden Cheetah: PowerTap Software for Mac OS X</title>
+ <meta name="keywords" content="powertap mac cycling performance">
 </head>
 
 <body    text="#000000" 
@@ -85,7 +86,7 @@ google_color_text = "000000";
 Cheetah</font></b></big></big></big>
 <br>
 <big><font face="arial,helvetica,sanserif">
-Power for the Masses
+PowerTap Software for Mac OS X
 </font></big>
 <p>
 </td></tr>

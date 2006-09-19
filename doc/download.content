@@ -14,6 +14,16 @@ for the GUI and the older, command-line programs.
 </tr>
 
 <tr>
+<td valign="top">Sep 19, 2006</td>
+<td valign="top"><a href="GoldenCheetah_2006-09-19_Darwin_powerpc.dmg">Darwin
+PowerPC</a></td>
+<td valign="top">Adds the Critical Power Plot, which shows the highest average
+power you've achieved for every interval length over all your rides and the
+selected ride.  Also shows download progress in minutes of ride data
+downloaded.</td>
+</tr>
+
+<tr>
 <td valign="top">Sep 7, 2006</td>
 <td valign="top"><a href="GoldenCheetah_2006-09-07_Darwin_powerpc.dmg">Darwin
 PowerPC</a></td>
