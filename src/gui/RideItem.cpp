@@ -121,7 +121,8 @@ RideItem::htmlSummary()
                 .arg((unsigned) round(total_hr / secs_hr));
             summary += QString("<tr><td>Average cadence:</td>"
                                "<td align=\"right\">%1</td></tr>")
-                .arg((unsigned) round(total_cad / secs_cad));
+                .arg((unsigned) ((secs_cad == 0) ? 0
+                                 : round(total_cad / secs_cad)));
             summary += "</table>";
         }
         else {
