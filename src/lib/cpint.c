@@ -38,7 +38,7 @@ struct point
 static struct point *head, *tail;
 time_t start_since_epoch;
 static double last_secs;
-static int rec_int_ms = 1.26 * 1000.0;
+static int rec_int_ms;
 
 static int
 secs_to_interval(double secs)
@@ -59,6 +59,17 @@ add_point(double secs, double watts)
     p->next = NULL;
     if (tail) tail->next = p; else head = p;
     tail = p;
+}
+
+static void 
+config_cb(unsigned interval, unsigned rec_int, 
+          unsigned wheel_sz_mm, void *context) 
+{
+    double new_rec_int_ms = rec_int * 1.26 * 1000.0;
+    interval = wheel_sz_mm = 0;
+    context = NULL;
+    assert((rec_int_ms == 0.0) || (rec_int_ms == new_rec_int_ms));
+    rec_int_ms = new_rec_int_ms;
 }
 
 static void
@@ -174,8 +185,8 @@ update_cpi_file(struct cpi_file_info *info,
     start_since_epoch = 0;
     last_secs = 0.0;
 
-    pt_read_raw(in, 0 /* not compat */, NULL, NULL, 
-                &time_cb, &data_cb, &error_cb);
+    pt_read_raw(in, 0 /* not compat */, NULL, 
+                &config_cb, &time_cb, &data_cb, &error_cb);
 
     total_intervals = secs_to_interval(tail->secs);
     bests = (double*) calloc(total_intervals + 1, sizeof(double));
@@ -248,6 +259,8 @@ read_one(const char *inname, double *bests[], int *bestlen)
             fprintf(stderr, "Bad match on line %d: %s", lineno, line);
             exit(1);
         }
+        if (rec_int_ms == 0)
+            rec_int_ms = mins * 60.0 * 1000.0;
         interval = secs_to_interval(mins * 60.0);
         while (interval >= *bestlen) {
             tmp = calloc(*bestlen * 2, sizeof(double));
