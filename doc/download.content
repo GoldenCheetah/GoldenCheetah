@@ -1,22 +1,43 @@
 <!-- $Id: download.content,v 1.6 2006/08/11 20:21:03 srhea Exp $ -->
 
-As of September 6, 2006, we're now distributing the Golden Cheetah GUI built
-for PowerPC processors.  Also included in this distribution is the source code
-for the GUI and the older, command-line programs.
+Right now Golden Cheetah is available as source code and in binary form for
+Mac OS X on PowerPC processors.
+
+<p>
+<font face="arial,helvetica,sanserif">
+<big><strong>Source Code</strong></big>
+</font>
+
+<p>
+The Golden Cheetah source code is available via 
+<a href="http://subversion.tigris.org/">Subversion</a>.
+Use this command to check out the current version of the repository:
+
+<pre>
+  svn checkout http://goldencheetah.org/svn/trunk goldencheetah
+</pre>
+
+You can also browse the source <a
+href="http://goldencheetah.org/svn/trunk">here</a>.
+
+<p>
+<font face="arial,helvetica,sanserif">
+<big><strong>Binaries</strong></big>
+</font>
 
 <p>
 <center>
 <table width="100%">
 <tr>
 <td width="20%"><i>Date</i></td>
-<td width="25%"><i>File</i></td>
+<td width="30%"><i>File</i></td>
 <td><i>Description</i></td>
 </tr>
 
 <tr>
 <td valign="top">Sep 19, 2006</td>
-<td valign="top"><a href="GoldenCheetah_2006-09-19_Darwin_powerpc.dmg">Darwin
-PowerPC</a></td>
+<td valign="top"><a href="GoldenCheetah_2006-09-19_Darwin_powerpc.dmg">Mac OS
+X PowerPC</a></td>
 <td valign="top">Adds the Critical Power Plot, which shows the highest average
 power you've achieved for every interval length over all your rides and the
 selected ride.  Also shows download progress in minutes of ride data
@@ -25,8 +46,8 @@ downloaded.</td>
 
 <tr>
 <td valign="top">Sep 7, 2006</td>
-<td valign="top"><a href="GoldenCheetah_2006-09-07_Darwin_powerpc.dmg">Darwin
-PowerPC</a></td>
+<td valign="top"><a href="GoldenCheetah_2006-09-07_Darwin_powerpc.dmg">Mac OS
+X PowerPC</a></td>
 <td valign="top">Adds speed and cadence to the ride plot.  Fixes a bug
 found by George Gilliland where reseting the time during a ride could cause
 the GUI to crash.</td>
@@ -34,8 +55,8 @@ the GUI to crash.</td>
 
 <tr>
 <td valign="top">Sep 6, 2006</td>
-<td valign="top"><a href="GoldenCheetah_2006-09-06_Darwin_powerpc.dmg">Darwin
-PowerPC</a></td>
+<td valign="top"><a href="GoldenCheetah_2006-09-06_Darwin_powerpc.dmg">Mac OS
+X PowerPC</a></td>
 <td valign="top">The first release of the Golden Cheetah GUI.</td>
 </tr>
 
@@ -46,14 +67,19 @@ PowerPC</a></td>
 <hr width="50%">
 
 <p>
-These are the older, source-only, command-line distributions.  I don't
-recommend using them unless you know your way around a C compiler.
+<font face="arial,helvetica,sanserif">
+<big><strong>Older Stuff</strong></big>
+</font>
+
+<p>
+These are the older, source-only, command-line distributions.  I've left them
+up for historical purposes only; I don't recommend using them. 
 
 <center>
 <table width="100%">
 <tr>
 <td width="20%"><i>Date</i></td>
-<td width="25%"><i>File</i></td>
+<td width="30%"><i>File</i></td>
 <td><i>Description</i></td>
 </tr>
 
@@ -83,7 +109,4 @@ Guide</a>).</td>
 
 </table>
 </center>
-
-<p>
-We hope to have anonymous CVS access set up soon.
 
