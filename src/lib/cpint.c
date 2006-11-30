@@ -120,6 +120,7 @@ cpi_files_to_update(const char *dir)
         assert(0);
 
     dirp = opendir(dir);
+    assert(dirp);
     while ((dp = readdir(dirp)) != NULL) {
         int nmatch = 7;
         regmatch_t *pmatch = (regmatch_t*) calloc(nmatch, sizeof(regmatch_t));
@@ -302,6 +303,7 @@ combine_cpi_files(const char *dir, double *bests[], int *bestlen)
     *bests = calloc(*bestlen, sizeof(double));
     inname = malloc(strlen(dir) + 25);
     dirp = opendir(dir);
+    assert(dirp);
     while ((dp = readdir(dirp)) != NULL) {
         if (strcmp(".cpi", dp->d_name + dp->d_namlen - 4) == 0) {
             sprintf(inname, "%s/%s", dir, dp->d_name);

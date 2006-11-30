@@ -19,9 +19,10 @@
 #
 
 CC=gcc
-CFLAGS=-g -W -Wall -Werror -ansi -pedantic
+CFLAGS=-g -W -Wall -Werror -ansi -pedantic -std=c99
 CMDS=ptdl ptpk ptunpk cpint
 LIBS=../lib/libgc.a
+LIBRARIES=-lm
 INCLUDES=-I../lib
 
 all: $(CMDS)
@@ -34,16 +35,16 @@ clean:
 	$(CC) -c $(CFLAGS) $(INCLUDES) $< 
 
 cpint: cpint.o $(LIBS)
-	$(CXX) -o $@ $^
+	$(CXX) -o $@ $^ $(LIBRARIES)
 
 ptdl: ptdl.o $(LIBS)
-	$(CC) -o $@ $^
+	$(CC) -o $@ $^ $(LIBRARIES)
 
 ptunpk: ptunpk.o $(LIBS)
-	$(CC) -o $@ $^
+	$(CC) -o $@ $^ $(LIBRARIES)
 
 ptpk: ptpk.o $(LIBS)
-	$(CC) -o $@ $^
+	$(CC) -o $@ $^ $(LIBRARIES)
 
 ptdl.o: ../lib/pt.h
 ptunpk.o: ../lib/pt.h

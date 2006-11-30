@@ -19,7 +19,7 @@
 #
 
 CC=gcc
-CFLAGS=-g -W -Wall -Werror -ansi -pedantic
+CFLAGS=-g -W -Wall -Werror -ansi -pedantic -std=c99
 LIBTOOL=libtool
 
 all: libgc.a
@@ -30,4 +30,6 @@ clean:
 
 libgc.a: pt.o cpint.o
 	$(LIBTOOL) -static -o $@ $^
+
+pt.o: pt.h
 

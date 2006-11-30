@@ -23,7 +23,8 @@
 
 #include <stdio.h>
 #include <unistd.h>
-#include <time.h>
+#include <sys/time.h>
+#include <getopt.h>
 
 #define PT_DEBUG_NONE 0
 #define PT_DEBUG_MAX 1

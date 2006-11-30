@@ -25,7 +25,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include "pt.h"
 
 void
@@ -116,9 +115,11 @@ pt_pack(FILE *in, FILE *out, int wheel_sz_mm, int rec_int)
                 hr = atoi(line + rider_pmatch[10].rm_so);
             interval = atoi(line + rider_pmatch[11].rm_so);
             if (mins - last_mins - 0.021 > 1.0 / 60.0) {
+                struct tm *tm_p;
                 inc_time = start_time + round((mins - 0.021000001) * 60.0);
-                if (!localtime_r(&inc_time, &inc_tm))
-                    assert(0);
+                tm_p = localtime(&inc_time);
+                assert(tm_p);
+                inc_tm = *tm_p;
                 pt_pack_time(buf, &inc_tm);
                 pt_write_data(out, buf);
                 pt_pack_config(buf, interval, rec_int, wheel_sz_mm);
