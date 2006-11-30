@@ -40,8 +40,9 @@ print<<EOF;
 <tr>
 
 <!-- Left Column -->
-<td width="150" valign="top">
-<img src="logo.png" width="128" height="184" alt="Picture of Cheetah">
+<td width="175" valign="top">
+<center>
+<img src="logo.jpg" width="175" height="175" alt="Picture of Cheetah">
 
 <p>  <b><a href="index.html">Introduction</a></b>
 <br> <b><a href="screenshots.html">Screenshots</a>
@@ -71,7 +72,7 @@ google_color_text = "000000";
   src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
   </script>
 
-
+</center>
 </td>
 <!-- End of Left Column -->
 
