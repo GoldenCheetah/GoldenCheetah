@@ -44,7 +44,7 @@ sub sumarize {
     my $len = $mile_end - $mile_start;
     my $minutes = int($dur);
     my $seconds = int(60 * ($dur - int($dur)));
-    my $watts_avg = int($watts_sum / $watts_cnt);
+    my $watts_avg = ($watts_cnt == 0) ? 0 : int($watts_sum / $watts_cnt);
     my $hrate_avg = ($hrate_cnt == 0) ? 0 : int($hrate_sum / $hrate_cnt);
     my $caden_avg = ($caden_cnt == 0) ? 0 : int($caden_sum / $caden_cnt);
     my $speed_avg = int($speed_sum / $speed_cnt);
@@ -76,6 +76,14 @@ while (<>) {
             exit 1;
         }
         my ($min, $torq, $speed, $watts, $miles, $caden, $hrate, $id) = @cols;
+        if ($id != $interval) {
+            if ($interval != -1) {
+                sumarize();
+            }
+            $interval = $id;
+            $time_start = $min;
+            $mile_start = $miles;
+        }
         $mile_end = $miles;
         $time_end = $min;
         if ($watts != "NaN") {
@@ -97,14 +105,6 @@ while (<>) {
             $speed_sum += $speed;
             $speed_cnt += 1;
             if ($speed > $speed_max) { $speed_max = $speed; }
-        }
-        if ($id != $interval) {
-            if ($interval != -1) {
-                sumarize();
-            }
-            $interval = $id;
-            $time_start = $min;
-            $mile_start = $miles;
         }
     }
 }
