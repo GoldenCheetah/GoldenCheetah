@@ -18,6 +18,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#define _GNU_SOURCE
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <assert.h>
@@ -305,7 +306,7 @@ combine_cpi_files(const char *dir, double *bests[], int *bestlen)
     dirp = opendir(dir);
     assert(dirp);
     while ((dp = readdir(dirp)) != NULL) {
-        if (strcmp(".cpi", dp->d_name + dp->d_namlen - 4) == 0) {
+        if (strcmp(".cpi", dp->d_name + strlen(dp->d_name) - 4) == 0) {
             sprintf(inname, "%s/%s", dir, dp->d_name);
             read_one(inname, bests, bestlen);
         }

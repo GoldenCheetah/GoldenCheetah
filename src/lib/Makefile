@@ -29,7 +29,7 @@ clean:
 	rm -f *.o libgc.a
 
 libgc.a: pt.o cpint.o
-	$(LIBTOOL) -static -o $@ $^
+	ar q $@ $^
 
 pt.o: pt.h
 

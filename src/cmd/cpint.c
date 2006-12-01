@@ -18,6 +18,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <assert.h>
