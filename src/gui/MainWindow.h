@@ -26,6 +26,7 @@
 
 class AllPlot;
 class CpintPlot;
+class PowerHist;
 
 class MainWindow : public QMainWindow 
 {
@@ -47,6 +48,8 @@ class MainWindow : public QMainWindow
         void downloadRide();
         void setSmoothingFromSlider();
         void setSmoothingFromLineEdit();
+        void setBinWidthFromSlider();
+        void setBinWidthFromLineEdit();
         void tabChanged(int index);
 
     private:
@@ -62,7 +65,10 @@ class MainWindow : public QMainWindow
         CpintPlot *cpintPlot;
         QSlider *smoothSlider;
         QLineEdit *smoothLineEdit;
+        QSlider *binWidthSlider;
+        QLineEdit *binWidthLineEdit;
         QTreeWidgetItem *allRides;
+        PowerHist *powerHist;
 };
 
 #endif // _GC_MainWindow_h

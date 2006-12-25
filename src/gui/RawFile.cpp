@@ -27,14 +27,17 @@ extern "C" {
 struct RawFileReadState
 {
     QList<RawFilePoint*> &points;
+    QMap<double,double> &powerHist;
     QStringList &errors;
     double last_secs, last_miles;
     unsigned last_interval;
     time_t start_since_epoch;
     unsigned rec_int;
-    RawFileReadState(QList<RawFilePoint*> &points, QStringList &errors) : 
-        points(points), errors(errors), last_secs(0.0), last_miles(0.0), 
-        last_interval(0), start_since_epoch(0), rec_int(0) {}
+    RawFileReadState(QList<RawFilePoint*> &points, 
+                     QMap<double,double> &powerHist,
+                     QStringList &errors) : 
+        points(points), powerHist(powerHist), errors(errors), last_secs(0.0), 
+        last_miles(0.0), last_interval(0), start_since_epoch(0), rec_int(0) {}
 };
 
 static void 
@@ -72,6 +75,12 @@ data_cb(double secs, double nm, double mph, double watts, double miles,
     state->last_secs = secs;
     state->last_miles = miles;
     state->last_interval = interval;
+    double sum = state->rec_int * 0.021;
+    if (state->powerHist.contains(watts)) {
+        sum += state->powerHist.value(watts);
+        state->powerHist.remove(watts);
+    }
+    state->powerHist.insert(watts, sum);
 }
 
 static void
@@ -90,7 +99,7 @@ RawFile *RawFile::readFile(const QFile &file, QStringList &errors)
     }
     FILE *f = fdopen(result->file.handle(), "r");
     assert(f);
-    RawFileReadState state(result->points, errors);
+    RawFileReadState state(result->points, result->powerHist, errors);
     pt_read_raw(f, 0 /* not compat */, &state, config_cb, 
                 time_cb, data_cb, error_cb);
     result->rec_int = state.rec_int;

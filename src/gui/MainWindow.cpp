@@ -23,6 +23,7 @@
 #include "ChooseCyclistDialog.h"
 #include "CpintPlot.h"
 #include "DownloadRideDialog.h"
+#include "PowerHist.h"
 #include "RawFile.h"
 #include "RideItem.h"
 #include "Settings.h"
@@ -152,6 +153,34 @@ MainWindow::MainWindow(const QDir &home) :
     cpintPlot = new CpintPlot(home.path());
     tabWidget->addTab(cpintPlot, "Critical Power Plot");
 
+    window = new QWidget;
+    vlayout = new QVBoxLayout;
+    QHBoxLayout *binWidthLayout = new QHBoxLayout;
+    QLabel *binWidthLabel = new QLabel(tr("Bin width (watts)"), window);
+    binWidthLineEdit = new QLineEdit(window);
+    binWidthLineEdit->setFixedWidth(30);
+    
+    binWidthLayout->addWidget(binWidthLabel);
+    binWidthLayout->addWidget(binWidthLineEdit);
+    binWidthSlider = new QSlider(Qt::Horizontal);
+    binWidthSlider->setTickPosition(QSlider::TicksBelow);
+    binWidthSlider->setTickInterval(1);
+    binWidthSlider->setMinimum(1);
+    binWidthSlider->setMaximum(100);
+    binWidthLineEdit->setValidator(new QIntValidator(binWidthSlider->minimum(),
+                                                     binWidthSlider->maximum(), 
+                                                     binWidthLineEdit));
+    binWidthLayout->addWidget(binWidthSlider);
+    powerHist = new PowerHist();
+    binWidthSlider->setValue(powerHist->binWidth());
+    binWidthLineEdit->setText(QString("%1").arg(powerHist->binWidth()));
+    vlayout->addWidget(powerHist);
+    vlayout->addLayout(binWidthLayout);
+    window->setLayout(vlayout);
+    window->show();
+
+    tabWidget->addTab(window, "Power Histogram");
+
     connect(treeWidget, SIGNAL(itemSelectionChanged()),
             this, SLOT(rideSelected()));
     connect(splitter, SIGNAL(splitterMoved(int,int)), 
@@ -170,6 +199,10 @@ MainWindow::MainWindow(const QDir &home) :
             this, SLOT(setSmoothingFromSlider()));
     connect(smoothLineEdit, SIGNAL(returnPressed()),
             this, SLOT(setSmoothingFromLineEdit()));
+    connect(binWidthSlider, SIGNAL(valueChanged(int)),
+            this, SLOT(setBinWidthFromSlider()));
+    connect(binWidthLineEdit, SIGNAL(returnPressed()),
+            this, SLOT(setBinWidthFromLineEdit()));
     connect(tabWidget, SIGNAL(currentChanged(int)), 
             this, SLOT(tabChanged(int)));
 
@@ -256,6 +289,7 @@ MainWindow::rideSelected()
             allPlot->setData(ride->raw);
             if (tabWidget->currentIndex() == 2)
                 cpintPlot->calculate(ride->fileName, ride->dateTime);
+            powerHist->setData(ride->raw);
             return;
         }
     }
@@ -296,6 +330,25 @@ MainWindow::setSmoothingFromLineEdit()
     if (value != allPlot->smoothing()) {
         allPlot->setSmoothing(value);
         smoothSlider->setValue(value);
+    }
+}
+
+void
+MainWindow::setBinWidthFromSlider()
+{
+    if (powerHist->binWidth() != binWidthSlider->value()) {
+        powerHist->setBinWidth(binWidthSlider->value());
+        binWidthLineEdit->setText(QString("%1").arg(powerHist->binWidth()));
+    }
+}
+
+void
+MainWindow::setBinWidthFromLineEdit()
+{
+    int value = binWidthLineEdit->text().toInt();
+    if (value != powerHist->binWidth()) {
+        powerHist->setBinWidth(value);
+        binWidthSlider->setValue(value);
     }
 }
 

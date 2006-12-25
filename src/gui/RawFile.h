@@ -24,6 +24,7 @@
 #include <QDateTime>
 #include <QFile>
 #include <QList>
+#include <QMap>
 #include <QStringList>
 
 struct RawFilePoint 
@@ -51,6 +52,7 @@ class RawFile
         QDateTime startTime;
         int rec_int;
         QList<RawFilePoint*> points;
+        QMap<double,double> powerHist;
         static RawFile *readFile(const QFile &file, QStringList &errors);
 };
 
