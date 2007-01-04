@@ -1,6 +1,22 @@
 <!-- $Id: faq.content,v 1.4 2006/07/05 16:59:56 srhea Exp $ -->
 
 <p>
+<i>I downloaded a .dmg, opened it, dragged and dropped GoldenCheetah into
+Applications, double-clicked on it, and nothing happened.  What gives?</i>
+
+<p>
+Are you running OS X Tiger?  You need to be.  If you are, and you're still
+having this problem, open Terminal (in Applications -&gt; Utilities) and type
+this at the prompt:
+
+<blockquote><pre>
+/Applications/GoldenCheetah.app/Contents/MacOS/GoldenCheetah
+</pre></blockquote>
+
+then press &lt;return&gt; and send an email to the mailing list with
+whatever it prints out.  We'll help you debug it.
+
+<p>
 <i>I've downloaded and unpacked the data.  Now what do I do with it?</i>
 
 <p>
