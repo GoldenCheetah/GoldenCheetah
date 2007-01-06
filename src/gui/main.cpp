@@ -30,7 +30,8 @@ main(int argc, char *argv[])
     QApplication app(argc, argv);
     QDir home = QDir::home();
     if (!home.exists("Library")) 
-        assert(false);
+        if (!home.mkdir("Library"))
+            assert(false);
     home.cd("Library");
     if (!home.exists("GoldenCheetah"))
         if (!home.mkdir("GoldenCheetah"))
