@@ -71,7 +71,6 @@ CpintPlot::calculate(QString fileName, QDateTime dateTime)
     char *file = strdup(fileName.toAscii().constData());
 
     if (needToScanRides) {
-        fprintf(stderr, "Scanning rides...\n");
         fflush(stderr);
         bool aborted = false;
         struct cpi_file_info *head = cpi_files_to_update(dir);
