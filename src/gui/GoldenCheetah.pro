@@ -8,7 +8,10 @@ DEPENDPATH += .
 INCLUDEPATH += /usr/local/include/qwt ../lib
 CONFIG += static
 LIBS += /usr/local/lib/libqwt.a ../lib/libgc.a
-LIBS += -lz -framework Carbon
+LIBS += -lm -lz
+macx {
+    LIBS += -framework Carbon
+}
 
 # Input
 HEADERS += \
