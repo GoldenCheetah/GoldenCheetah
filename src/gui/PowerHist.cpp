@@ -84,6 +84,7 @@ void
 PowerHist::setData(RawFile *raw)
 {
     setTitle(raw->startTime.toString(GC_DATETIME_FORMAT));
+    assert(raw->powerHist.keys().first() >= 0);
     int maxPower = (int) round(raw->powerHist.keys().last());
     delete [] array;
     arrayLength = maxPower + 1;
