@@ -29,6 +29,7 @@ clean:
 	rm -f *.o libgc.a
 
 libgc.a: pt.o cpint.o
+	rm -f $@
 	ar q $@ $^
 
 pt.o: pt.h
