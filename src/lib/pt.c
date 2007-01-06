@@ -100,8 +100,10 @@ pt_make_async(int fd)
     tty.c_cflag &= ~CSIZE; /* clear size bits */
     tty.c_cflag |= CS8; /* 8 bits */
     tty.c_cflag |= CLOCAL | CREAD; /* ignore modem control lines */
-    tty.c_cflag &= ~CBAUD; /* clear baud rate */
-    tty.c_cflag |= B9600; /* set to 9600 baud */
+    if (cfsetspeed(&tty, B9600) == -1) {
+        perror("cfsetspeed");
+        assert(0);
+    }
     tty.c_iflag = IGNBRK; /* ignore BREAK condition on input */
     tty.c_lflag = 0;
     tty.c_oflag = 0;
