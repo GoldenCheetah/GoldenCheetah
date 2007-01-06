@@ -76,11 +76,13 @@ data_cb(double secs, double nm, double mph, double watts, double miles,
     state->last_miles = miles;
     state->last_interval = interval;
     double sum = state->rec_int * 0.021;
-    if (state->powerHist.contains(watts)) {
-        sum += state->powerHist.value(watts);
-        state->powerHist.remove(watts);
+    if (watts >= 0.0) {
+        if (state->powerHist.contains(watts)) {
+            sum += state->powerHist.value(watts);
+            state->powerHist.remove(watts);
+        }
+        state->powerHist.insert(watts, sum);
     }
-    state->powerHist.insert(watts, sum);
 }
 
 static void
