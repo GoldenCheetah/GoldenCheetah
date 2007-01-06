@@ -90,7 +90,6 @@ ChooseCyclistDialog::newCyclistDialog(QDir &homeDir, QWidget *parent)
                                          tr("Enter New Cyclist's Name"),
                                          QLineEdit::Normal, "", &ok);
     if (ok && !name.isEmpty()) {
-        fprintf(stderr, "New name: %s\n", name.toAscii().data());
         if (!home.exists(name)) {
             if (home.mkdir(name))
                 return name;
