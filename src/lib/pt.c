@@ -27,6 +27,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <termios.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
 #include "pt.h"
 
 #define MAGIC_CONSTANT 147375.0
@@ -81,11 +84,40 @@ pt_hwecho(const char *device)
 void
 pt_make_async(int fd) 
 {
+    struct termios tty;
     int flags = fcntl(fd, F_GETFL, 0);
     if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1) {
         perror("fcntl");
         assert(0);
     }
+    if (tcgetattr(fd, &tty) == -1) {
+        perror("tcgetattr");
+        assert(0);
+    }
+    tty.c_cflag &= ~CRTSCTS; /* no hardware flow control */
+    tty.c_cflag &= ~(PARENB | PARODD); /* no parity */
+    tty.c_cflag &= ~CSTOPB; /* 1 stop bit */
+    tty.c_cflag &= ~CSIZE; /* clear size bits */
+    tty.c_cflag |= CS8; /* 8 bits */
+    tty.c_cflag |= CLOCAL | CREAD; /* ignore modem control lines */
+    tty.c_cflag &= ~CBAUD; /* clear baud rate */
+    tty.c_cflag |= B9600; /* set to 9600 baud */
+    tty.c_iflag = IGNBRK; /* ignore BREAK condition on input */
+    tty.c_lflag = 0;
+    tty.c_oflag = 0;
+    tty.c_cc[VMIN] = 1; /* all reads return at least one character */
+    if (tcsetattr(fd, TCSANOW, &tty) == -1) {
+        perror("tcsetattr");
+        assert(0);
+    }
+}
+
+static void
+fprintb(FILE *file, unsigned char *buf, int cnt) 
+{
+    unsigned char *end = buf + cnt;
+    while (buf < end)
+        fprintf(file, "%02x", 0xff & *buf++);
 }
 
 int
@@ -120,7 +152,7 @@ pt_read_version(struct pt_read_version_state *state, int fd, int hwecho)
                 exit(1);
             }
             if (pt_debug_level >= PT_DEBUG_MAX)
-                fprintf(stderr, "Read %d bytes.\n", n);
+                fprintf(stderr, "Read %d bytes: %02x.\n", n, 0xff & c);
             assert(n == 1);
         }
         state->state = 2;
@@ -141,8 +173,11 @@ pt_read_version(struct pt_read_version_state *state, int fd, int hwecho)
             perror("read");
             exit(1);
         }
-        if (pt_debug_level >= PT_DEBUG_MAX)
-            fprintf(stderr, "Read %d bytes.\n", n);
+        if (pt_debug_level >= PT_DEBUG_MAX) {
+            fprintf(stderr, "Read %d bytes: ", n);
+            fprintb(stderr, state->buf + state->i, n);
+            fprintf(stderr, ".\n");
+        }
         state->i += n;
     }
 
@@ -188,7 +223,7 @@ pt_read_data(struct pt_read_data_state *state,
                 exit(1);
             }
             if (pt_debug_level >= PT_DEBUG_MAX)
-                fprintf(stderr, "Read %d bytes.\n", n);
+                fprintf(stderr, "Read %d bytes: %02x.\n", n, 0xff & c);
             assert(n == 1);
         }
         state->state = 2;
@@ -209,8 +244,11 @@ pt_read_data(struct pt_read_data_state *state,
                 perror("read");
                 exit(1);
             }
-            if (pt_debug_level >= PT_DEBUG_MAX)
-                fprintf(stderr, "Read %d bytes.\n", n);
+            if (pt_debug_level >= PT_DEBUG_MAX) {
+                fprintf(stderr, "Read %d bytes: ", n);
+                fprintb(stderr, state->buf + state->i, n);
+                fprintf(stderr, ".\n");
+            }
             state->i += n;
         }
         state->state = 3;
@@ -233,8 +271,11 @@ pt_read_data(struct pt_read_data_state *state,
                     perror("read");
                     exit(1);
                 }
-                if (pt_debug_level >= PT_DEBUG_MAX)
-                    fprintf(stderr, "Read %d bytes.\n", n);
+                if (pt_debug_level >= PT_DEBUG_MAX) {
+                    fprintf(stderr, "Read %d bytes: ", n);
+                    fprintb(stderr, state->buf + state->i, n);
+                    fprintf(stderr, ".\n");
+                }
                 state->i += n;
                 /* TODO: why is this next if statement here? */
                 if ((state->i == 2) && (state->buf[0] == 0x0d) 
@@ -293,8 +334,11 @@ pt_read_data(struct pt_read_data_state *state,
                 perror("read");
                 exit(1);
             }
-            if (pt_debug_level >= PT_DEBUG_MAX)
-                fprintf(stderr, "Read %d bytes.\n", n);
+            if (pt_debug_level >= PT_DEBUG_MAX) {
+                fprintf(stderr, "Read %d bytes: ", n);
+                fprintb(stderr, state->buf + state->i, n);
+                fprintf(stderr, ".\n");
+            }
             assert(n == 1);
         }
         state->state = 3;

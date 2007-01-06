@@ -21,7 +21,6 @@
 #ifndef __pt_h
 #define __pt_h 1
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>

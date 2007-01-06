@@ -19,7 +19,7 @@
 #
 
 CC=gcc
-CFLAGS=-g -W -Wall -Werror -ansi -pedantic -std=c99
+CFLAGS=-g -W -Wall -Werror -ansi -pedantic -std=c99 -D_BSD_SOURCE
 LIBTOOL=libtool
 
 all: libgc.a
