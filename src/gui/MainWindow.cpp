@@ -206,21 +206,18 @@ MainWindow::MainWindow(const QDir &home) :
     connect(tabWidget, SIGNAL(currentChanged(int)), 
             this, SLOT(tabChanged(int)));
 
-    QMenu *fileMenu = new QMenu(tr("&File"), this); 
+    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(tr("&New..."), this, 
                         SLOT(newCyclist()), tr("Ctrl+N")); 
     fileMenu->addAction(tr("&Open..."), this, 
                         SLOT(openCyclist()), tr("Ctrl+O")); 
     fileMenu->addAction(tr("&Download ride..."), this, 
                         SLOT(downloadRide()), tr("Ctrl+D")); 
+    fileMenu->addAction(tr("&Quit GoldenCheetah"), this, 
+                        SLOT(close()), tr("Ctrl+Q")); 
 
-    QMenuBar *menuBar = new QMenuBar(this); 
-    menuBar->addMenu(fileMenu); 
-
-    if (last != NULL) {
+    if (last != NULL)
         treeWidget->setCurrentItem(last);
-        rideSelected();
-    }
 }
 
 void
