@@ -59,7 +59,8 @@ pt_find_device(char *result[], int capacity)
     DIR *dirp;
     struct dirent *dp;
     int count = 0;
-    if (regcomp(&reg, "^cu\\.(usbserial-[0-9A-F]+|KeySerial[0-9])$", 
+    if (regcomp(&reg, 
+                "^(cu\\.(usbserial-[0-9A-F]+|KeySerial[0-9])|ttyUSB[0-9])$", 
                 REG_EXTENDED|REG_NOSUB)) {
         assert(0);
     }
