@@ -86,22 +86,22 @@ while (<>) {
         }
         $mile_end = $miles;
         $time_end = $min;
-        if ($watts != "NaN") {
+        if ($watts ne "NaN") {
             $watts_sum += $watts;
             $watts_cnt += 1;
             if ($watts > $watts_max) { $watts_max = $watts; }
         }
-        if ($hrate != "NaN") {
+        if ($hrate ne "NaN") {
             $hrate_sum += $hrate;
             $hrate_cnt += 1;
             if ($hrate > $hrate_max) { $hrate_max = $hrate; }
         }
-        if ($caden != "NaN") {
+        if ($caden ne "NaN") {
             $caden_sum += $caden;
             $caden_cnt += 1;
             if ($caden > $caden_max) { $caden_max = $caden; }
         }
-        if ($speed != "NaN") {
+        if ($speed ne "NaN") {
             $speed_sum += $speed;
             $speed_cnt += 1;
             if ($speed > $speed_max) { $speed_max = $speed; }
