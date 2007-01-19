@@ -22,6 +22,7 @@
 #include "RawFile.h"
 #include "Settings.h"
 
+#include <assert.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
 #include <qwt_legend.h>

@@ -18,6 +18,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <assert.h>
 #include <QApplication>
 #include <QtGui>
 #include "ChooseCyclistDialog.h"

@@ -24,6 +24,7 @@ extern "C" {
 #include "cpint.h"
 }
 
+#include <assert.h>
 #include <qwt_data.h>
 #include <qwt_legend.h>
 #include <qwt_plot_curve.h>

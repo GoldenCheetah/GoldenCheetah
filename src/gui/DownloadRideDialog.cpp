@@ -20,6 +20,7 @@
 
 #include "DownloadRideDialog.h"
 #include "MainWindow.h"
+#include <assert.h>
 #include <QtGui>
 #include <errno.h>
 #include <fcntl.h>
