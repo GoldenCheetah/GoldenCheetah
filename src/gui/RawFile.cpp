@@ -19,6 +19,7 @@
  */
 
 #include "RawFile.h"
+#include <assert.h>
 #include <QMessageBox>
 extern "C" {
 #include "pt.h"

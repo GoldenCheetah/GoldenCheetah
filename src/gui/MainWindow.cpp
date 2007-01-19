@@ -27,6 +27,7 @@
 #include "RawFile.h"
 #include "RideItem.h"
 #include "Settings.h"
+#include <assert.h>
 #include <QApplication>
 #include <QtGui>
 #include <QRegExp>
