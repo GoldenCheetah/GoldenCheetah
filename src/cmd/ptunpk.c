@@ -30,6 +30,8 @@
 
 static FILE *out;
 
+int metric; /* Non zero if distance units should be output in metric. */
+
 static void 
 config_cb(unsigned interval, unsigned rec_int, unsigned wheel_sz_mm, 
           void *context)
@@ -57,13 +59,28 @@ data_cb(double secs, double nm, double mph, double watts, double miles,
     if (mph == -1.0)
         fprintf(out, " NaN NaN");
     else
-        fprintf(out, " %0.3f %.0f", mph, watts);
-    fprintf(out, " %.5f %d", miles, cad);
+        fprintf(out, " %0.3f %.0f", metric ? (mph / KM_TO_MI) : mph, watts);
+    fprintf(out, " %.5f %d", metric ? (miles / KM_TO_MI) : miles, cad);
     if (hr == 0)
         fprintf(out, " NaN");
     else
         fprintf(out, " %d", hr);
     fprintf(out, " %d\n", interval);
+}
+
+/* Like data_cb, but output PowerTap CSV format. */
+static void
+csv_data_cb(double secs, double nm, double mph, double watts, double miles, 
+            unsigned cad, unsigned hr, unsigned interval, void *context)
+{
+    context = NULL;
+    fprintf(out, "%7.3f, %10.1f,", secs / 60.0, nm);
+    if (mph == -1.0)
+        fprintf(out, "   0.0,   0.0,");
+    else
+        fprintf(out, "%6.1f, %5.0f,", metric ? (mph / KM_TO_MI) : mph, watts);
+    fprintf(out, "%8.3f, %7d,", metric ? (miles / KM_TO_MI) : miles, cad);
+    fprintf(out, "%6d, %3d\n", hr, interval);
 }
 
 static void
@@ -77,7 +94,8 @@ error_cb(const char *msg, void *context)
 static void
 usage(const char *progname) 
 {
-    fprintf(stderr, "usage: %s [-c] [-o <output file>] [<input file>]\n", 
+    fprintf(stderr,
+            "usage: %s [-c] [-p] [-m] [-o <output file>] [<input file>]\n", 
             progname);
     exit(1);
 }
@@ -85,11 +103,11 @@ usage(const char *progname)
 int 
 main(int argc, char *argv[])
 {
-    int ch, i, compat = 0;
+    int ch, i, compat = 0, csv_output = 0;
     char *inname = NULL, *outname = NULL;
     FILE *in;
 
-    while ((ch = getopt(argc, argv, "cho:")) != -1) {
+    while ((ch = getopt(argc, argv, "chmpo:")) != -1) {
         switch (ch) {
             case 'c':
                 compat = 1;
@@ -101,6 +119,12 @@ main(int argc, char *argv[])
                     outname = "STDOUT";
                 }
                 break;
+	    case 'p':
+	        csv_output = 1;
+	        break;
+	    case 'm':
+	        metric = 1;
+		break;
             case 'h':
             case '?':
             default:
@@ -143,9 +167,24 @@ main(int argc, char *argv[])
         exit(1);
     }
 
-    fprintf(out, "# Time Torq MPH Watts Miles Cad HR Int\n");
-
-    pt_read_raw(in, compat, NULL, config_cb, time_cb, data_cb, error_cb);
+    if (csv_output) {
+        if (metric) {
+            fprintf(out, "Minutes, Torq (N-m),  Km/h, Watts,      Km,"
+                    " Cadence, Hrate,  ID\n");
+        }
+	else {
+            fprintf(out, "Minutes, Torq (N-m),  Mi/h, Watts,      Mi,"
+                    " Cadence, Hrate,  ID\n");
+        }
+	pt_read_raw(in, compat, NULL, NULL, NULL, csv_data_cb, error_cb);
+    }
+    else {
+        if (metric)
+            fprintf(out, "# Time Torq KPH Watts KMs   Cad HR Int\n");
+	else
+	    fprintf(out, "# Time Torq MPH Watts Miles Cad HR Int\n");
+	pt_read_raw(in, compat, NULL, config_cb, time_cb, data_cb, error_cb);
+    }
 
     return 0;
 }
