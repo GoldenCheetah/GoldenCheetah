@@ -1,10 +1,10 @@
 <!-- $Id: download.content,v 1.6 2006/08/11 20:21:03 srhea Exp $ -->
 
 Right now Golden Cheetah is available as source code and in binary form for
-Mac OS X on PowerPC processors.  Depending on your operating system, you may
-need to install the <a
-href="http://www.ftdichip.com/Drivers/VCP.htm">FTDI virtual COM port driver</a>
-if you're using the PowerTap's new USB download cradle.
+Mac OS X on PowerPC processors and Linux on x86 processors.  Depending on your
+operating system, you may need to install the <a
+href="http://www.ftdichip.com/Drivers/VCP.htm">FTDI virtual COM port
+driver</a> if you're using the PowerTap's new USB download cradle.
 
 <p>
 <font face="arial,helvetica,sanserif">
@@ -13,7 +13,11 @@ if you're using the PowerTap's new USB download cradle.
 
 <p>
 The Golden Cheetah source code is available via 
-<a href="http://subversion.tigris.org/">Subversion</a>.
+<a href="http://subversion.tigris.org/">Subversion</a>.  You need to install
+<a href="http://www.trolltech.com/products/qt">QT 4</a> and 
+<a href="http://qwt.sourceforge.net/">qwt-20060130</a> and 
+edit <code>goldencheetah/src/gui/GoldenCheetah.pro</code> to point to them
+before building GoldenCheetah.
 Use this command to check out the current version of the repository:
 
 <pre>
@@ -30,11 +34,18 @@ href="http://goldencheetah.org/svn/trunk">here</a>.
 
 <p>
 <center>
-<table width="100%">
+<table width="100%" cellspacing="10">
 <tr>
 <td width="20%"><i>Date</i></td>
 <td width="30%"><i>File</i></td>
 <td><i>Description</i></td>
+</tr>
+
+<tr>
+<td valign="top">Jan 6, 2007</td>
+<td valign="top"><a href="GoldenCheetah_2007-01-06_Linux_x86.tgz">Linux 
+x86</a></td>
+<td valign="top">First release for Linux.</td>
 </tr>
 
 <tr>
@@ -87,7 +98,7 @@ These are the older, source-only, command-line distributions.  I've left them
 up for historical purposes only; I don't recommend using them. 
 
 <center>
-<table width="100%">
+<table width="100%" cellspacing="10">
 <tr>
 <td width="20%"><i>Date</i></td>
 <td width="30%"><i>File</i></td>

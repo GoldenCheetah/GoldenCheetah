@@ -14,5 +14,6 @@ utilities, <code>ptdl</code> and <code>ptunpk</code>.
 Rob Carlsen helped get the serial port version of the PowerTap Pro working
 with the Keyspan USB-to-serial adaptor.  Scott Overfield helped me figure out
 that we should be using the <code>/dev/cu.*</code> devices instead of the
-<code>/dev/tty.*</code> ones.
+<code>/dev/tty.*</code> ones.  Aldy Hernandez and Andrew Kruse helped get
+things working under Linux.
 

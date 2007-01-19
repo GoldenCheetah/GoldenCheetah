@@ -9,7 +9,8 @@ OTHER=logo.jpg sample.gp sample.png cpint.gp cpint.png \
 DISTRIB=GoldenCheetah_2006-12-25_Darwin_powerpc.dmg \
 	GoldenCheetah_2006-09-06_Darwin_powerpc.dmg \
 	GoldenCheetah_2006-09-07_Darwin_powerpc.dmg \
-	GoldenCheetah_2006-09-19_Darwin_powerpc.dmg
+	GoldenCheetah_2006-09-19_Darwin_powerpc.dmg \
+	GoldenCheetah_2007-01-06_Linux_x86.tgz
 
 all: $(HTML)
 .PHONY: all clean install
