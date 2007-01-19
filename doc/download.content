@@ -1,7 +1,10 @@
 <!-- $Id: download.content,v 1.6 2006/08/11 20:21:03 srhea Exp $ -->
 
 Right now Golden Cheetah is available as source code and in binary form for
-Mac OS X on PowerPC processors.
+Mac OS X on PowerPC processors.  Depending on your operating system, you may
+need to install the <a
+href="http://www.ftdichip.com/Drivers/VCP.htm">FTDI virtual COM port driver</a>
+if you're using the PowerTap's new USB download cradle.
 
 <p>
 <font face="arial,helvetica,sanserif">
