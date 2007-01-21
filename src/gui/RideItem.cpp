@@ -111,17 +111,20 @@ RideItem::htmlSummary()
                 .arg(raw->points.back()->miles, 0, 'f', 1);
             summary += QString("<tr><td>Average speed:</td>"
                                "<td align=\"right\">%1</td></tr>")
-                .arg(raw->points.back()->miles / secs_moving * 3600.0, 
+                .arg(((secs_moving == 0.0) ? 0.0
+                      : raw->points.back()->miles / secs_moving * 3600.0), 
                      0, 'f', 1);
             summary += QString("<tr><td>Average power:</td>"
                                "<td align=\"right\">%1</td></tr>")
-                .arg((unsigned) round(total_watts / secs_watts));
+                .arg((unsigned) ((secs_watts == 0.0) ? 0.0
+                                 : round(total_watts / secs_watts)));
             summary +=QString("<tr><td>Average heart rate:</td>"
                               "<td align=\"right\">%1</td></tr>")
-                .arg((unsigned) round(total_hr / secs_hr));
+                .arg((unsigned) ((secs_hr == 0.0) ? 0.0
+                                 : round(total_hr / secs_hr)));
             summary += QString("<tr><td>Average cadence:</td>"
                                "<td align=\"right\">%1</td></tr>")
-                .arg((unsigned) ((secs_cad == 0) ? 0
+                .arg((unsigned) ((secs_cad == 0.0) ? 0.0
                                  : round(total_cad / secs_cad)));
             summary += "</table>";
         }
