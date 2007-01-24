@@ -38,6 +38,12 @@ my $caden_cnt = 0;
 my $speed_max = 0; 
 my $speed_sum = 0; 
 my $speed_cnt = 0; 
+my $ignore_power_zeros = 0;
+
+if ($#ARGV >= 0 && $ARGV[0] eq "--ignore-power-zeros") {
+    $ignore_power_zeros = 1;
+    shift;
+}
 
 sub sumarize {
     my $dur = $time_end - $time_start;
@@ -86,17 +92,17 @@ while (<>) {
         }
         $mile_end = $miles;
         $time_end = $min;
-        if ($watts ne "NaN") {
+        if ($watts ne "NaN" && ($watts > 0 || !$ignore_power_zeros)) {
             $watts_sum += $watts;
             $watts_cnt += 1;
             if ($watts > $watts_max) { $watts_max = $watts; }
         }
-        if ($hrate ne "NaN") {
+        if ($hrate ne "NaN" && $hrate > 0) {
             $hrate_sum += $hrate;
             $hrate_cnt += 1;
             if ($hrate > $hrate_max) { $hrate_max = $hrate; }
         }
-        if ($caden ne "NaN") {
+        if ($caden ne "NaN" && $caden > 0) {
             $caden_sum += $caden;
             $caden_cnt += 1;
             if ($caden > $caden_max) { $caden_max = $caden; }
