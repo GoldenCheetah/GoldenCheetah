@@ -90,7 +90,8 @@ AllPlot::recalc()
     double *smoothSpeed = new double[rideTimeSecs + 1];
     double *smoothCad   = new double[rideTimeSecs + 1];
     double *smoothTime  = new double[rideTimeSecs + 1];
-    for (int secs = 0; secs < smooth; ++secs) {
+    for (int secs = 0; ((secs < smooth) 
+                        && (secs < rideTimeSecs)); ++secs) {
         smoothWatts[secs] = 0.0;
         smoothHr[secs]    = 0.0;
         smoothSpeed[secs] = 0.0;
