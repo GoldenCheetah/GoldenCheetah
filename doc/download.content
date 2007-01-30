@@ -37,8 +37,16 @@ href="http://goldencheetah.org/svn/trunk">here</a>.
 <table width="100%" cellspacing="10">
 <tr>
 <td width="20%"><i>Date</i></td>
-<td width="30%"><i>File</i></td>
+<td width="30%"><i>Files</i></td>
 <td><i>Description</i></td>
+</tr>
+
+<tr>
+<td valign="top">Jan 30, 2007</td>
+<td valign="top">
+<a href="GoldenCheetah_2006-12-25_Darwin_powerpc.dmg">Mac OS</a>,
+<a href="GoldenCheetah_2007-01-30_Linux_x86.tgz">Linux x86</a></td>
+<td valign="top">Bug fix release.</td>
 </tr>
 
 <tr>
