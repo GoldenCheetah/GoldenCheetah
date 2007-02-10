@@ -53,6 +53,8 @@ PowerHist::PowerHist() :
 void
 PowerHist::recalc()
 {
+    if (!array)
+        return;
     int count = (int) ceil((arrayLength - 1) / binw);
     double *smoothWatts = new double[count+1];
     double *smoothTime  = new double[count+1];
