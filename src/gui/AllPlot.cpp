@@ -78,6 +78,8 @@ struct DataPoint {
 void
 AllPlot::recalc()
 {
+    if (!timeArray)
+        return;
     int rideTimeSecs = (int) ceil(timeArray[arrayLength - 1]);
     double totalWatts = 0.0;
     double totalHr = 0.0;
