@@ -58,6 +58,54 @@ RideItem::RideItem(QTreeWidgetItem *parent, int type, QString path,
     setTextAlignment(2, Qt::AlignRight);
 }
 
+static void summarize(QString &intervals,
+                      unsigned last_interval,
+                      double time_start, double time_end,
+                      double mile_start, double mile_end,
+                      unsigned &int_watts_cnt,
+                      double &int_watts_sum,
+                      unsigned &int_hr_cnt,
+                      double &int_hr_sum,
+                      unsigned &int_cad_cnt,
+                      double &int_cad_sum,
+                      unsigned &int_mph_cnt,
+                      double &int_mph_sum) 
+{
+    double dur = time_end - time_start;
+    double len = mile_end - mile_start;
+    double minutes = (int) (dur/60.0);
+    double seconds = dur - (60 * minutes);
+    double watts_avg = (int_watts_cnt == 0) ? 0 
+        : (int) (int_watts_sum / int_watts_cnt);
+    double hr_avg = (int_hr_cnt == 0) ? 0 
+        : (int) (int_hr_sum / int_hr_cnt);
+    double cad_avg = (int_cad_cnt == 0) ? 0 
+        : (int) (int_cad_sum / int_cad_cnt);
+    double mph_avg = (int_mph_cnt == 0) ? 0 
+        : (int) (int_mph_sum / int_mph_cnt);
+
+    intervals += "<tr><td align=\"center\">%1</td>";
+    intervals += "<td align=\"center\">%2:%3</td>";
+    intervals += "<td align=\"center\">%4</td>";
+    intervals += "<td align=\"center\">%5</td>";
+    intervals += "<td align=\"center\">%6</td>";
+    intervals += "<td align=\"center\">%7</td>";
+    intervals += "<td align=\"center\">%8</td>";
+    intervals = intervals.arg(last_interval);
+    intervals = intervals.arg(minutes, 0, 'f', 0);
+    intervals = intervals.arg(seconds, 0, 'f', 0);
+    intervals = intervals.arg(len, 0, 'f', 1);
+    intervals = intervals.arg(watts_avg, 0, 'f', 0);
+    intervals = intervals.arg(hr_avg, 0, 'f', 0);
+    intervals = intervals.arg(cad_avg, 0, 'f', 0);
+    intervals = intervals.arg(mph_avg, 0, 'f', 1);
+
+    int_watts_cnt = 0; int_watts_sum = 0.0;
+    int_hr_cnt = 0; int_hr_sum = 0.0;
+    int_cad_cnt = 0; int_cad_sum = 0.0;
+    int_mph_cnt = 0; int_mph_sum = 0.0;
+}
+
 QString 
 RideItem::htmlSummary()
 {
@@ -65,9 +113,9 @@ RideItem::htmlSummary()
         QFile file(path + "/" + fileName);
         QStringList errors;
         raw = RawFile::readFile(file, errors);
-        summary = ("<center><h2>" 
+        summary = ("<p><center><h2>" 
                    + dateTime.toString("dddd MMMM d, yyyy, h:mm AP") 
-                   + "</h2></center>");
+                   + "</h2><p><h2>Summary</h2>");
         if (raw == NULL) {
             summary += "<p>Error: Can't read file.";
         }
@@ -80,28 +128,77 @@ RideItem::htmlSummary()
             double secs_cad = 0.0;
             double total_cad = 0.0;
             double last_secs = 0.0;
+
+            QString intervals = "";
+            unsigned last_interval = UINT_MAX;
+            double int_watts_sum = 0.0;
+            unsigned int_watts_cnt = 0;
+            double int_hr_sum = 0.0;
+            unsigned int_hr_cnt = 0;
+            double int_cad_sum = 0.0;
+            unsigned int_cad_cnt = 0;
+            double int_mph_sum = 0.0;
+            unsigned int_mph_cnt = 0;
+
+            double time_start, time_end, mile_start, mile_end;
+
             QListIterator<RawFilePoint*> i(raw->points);
             while (i.hasNext()) {
                 RawFilePoint *point = i.next();
+
+                if (point->interval != last_interval) {
+
+                    if (last_interval != UINT_MAX) {
+                        summarize(intervals, last_interval, time_start, 
+                                  time_end, mile_start, mile_end, 
+                                  int_watts_cnt, int_watts_sum, int_hr_cnt,
+                                  int_hr_sum, int_cad_cnt, int_cad_sum,
+                                  int_mph_cnt, int_mph_sum);
+                    }
+
+                    last_interval = point->interval;
+                    time_start = point->secs;
+                    mile_start = point->miles;
+                }
+
                 double secs_delta = point->secs - last_secs;
                 if (point->mph > 0.0)
                     secs_moving += secs_delta;
                 if (point->watts >= 0.0) {
                     total_watts += point->watts * secs_delta;
                     secs_watts += secs_delta;
+                    int_watts_sum += point->watts;
+                    int_watts_cnt += 1;
                 }
                 if (point->hr > 0) {
                     total_hr += point->hr * secs_delta;
                     secs_hr += secs_delta;
+                    int_hr_sum += point->hr;
+                    int_hr_cnt += 1;
                 }
                 if (point->cad > 0) {
                     total_cad += point->cad * secs_delta;
                     secs_cad += secs_delta;
+                    int_cad_sum += point->cad;
+                    int_cad_cnt += 1;
                 }
+                if (point->mph >= 0) {
+                    int_mph_sum += point->mph;
+                    int_mph_cnt += 1;
+                }
+
                 last_secs = point->secs;
+                mile_end = point->miles;
+                time_end = point->secs;
             }
-            summary += "<br><table width=\"80%\" "
-                "align=\"center\" border=0>";
+
+            summarize(intervals, last_interval, time_start, 
+                      time_end, mile_start, mile_end, 
+                      int_watts_cnt, int_watts_sum, int_hr_cnt,
+                      int_hr_sum, int_cad_cnt, int_cad_sum,
+                      int_mph_cnt, int_mph_sum);
+
+            summary += "<p><table width=\"60%\" border=0>";
             summary += "<tr><td>Total workout time:</td><td align=\"right\">" + 
                 time_to_string(raw->points.back()->secs);
             summary += "<tr><td>Total time riding:</td><td align=\"right\">" + 
@@ -127,6 +224,20 @@ RideItem::htmlSummary()
                 .arg((unsigned) ((secs_cad == 0.0) ? 0.0
                                  : round(total_cad / secs_cad)));
             summary += "</table>";
+
+            if (last_interval > 0) {
+                summary += "<p><h2>Intervals</h2>\n<p>\n";
+                summary += "<table width=\"90%\" cellspacing=0 border=0><tr>";
+                summary += "<td align=\"center\">Interval</td>";
+                summary += "<td align=\"center\">Time</td>";
+                summary += "<td align=\"center\">Distance</td>";
+                summary += "<td align=\"center\">Avg Watts</td>";
+                summary += "<td align=\"center\">Avg HR</td>";
+                summary += "<td align=\"center\">Avg Cadence</td>";
+                summary += "<td align=\"center\">Avg MPH</td></tr>";
+                summary += intervals;
+                summary += "</table></center>";
+            }
         }
         else {
             summary += "<br>Errors reading file:<ul>";
