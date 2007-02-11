@@ -207,15 +207,19 @@ MainWindow::MainWindow(const QDir &home) :
     connect(tabWidget, SIGNAL(currentChanged(int)), 
             this, SLOT(tabChanged(int)));
 
-    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+    QMenu *fileMenu = menuBar()->addMenu(tr("&Cyclist"));
     fileMenu->addAction(tr("&New..."), this, 
                         SLOT(newCyclist()), tr("Ctrl+N")); 
     fileMenu->addAction(tr("&Open..."), this, 
                         SLOT(openCyclist()), tr("Ctrl+O")); 
-    fileMenu->addAction(tr("&Download ride..."), this, 
-                        SLOT(downloadRide()), tr("Ctrl+D")); 
-    fileMenu->addAction(tr("&Quit GoldenCheetah"), this, 
+    fileMenu->addAction(tr("&Quit"), this, 
                         SLOT(close()), tr("Ctrl+Q")); 
+
+    QMenu *rideMenu = menuBar()->addMenu(tr("&Ride"));
+    rideMenu->addAction(tr("&Download from device..."), this, 
+                        SLOT(downloadRide()), tr("Ctrl+D")); 
+    rideMenu->addAction(tr("&Export to CSV..."), this, 
+                        SLOT(exportCSV()), tr("Ctrl+E")); 
 
     if (last != NULL)
         treeWidget->setCurrentItem(last);
@@ -272,6 +276,60 @@ void
 MainWindow::downloadRide()
 {
     (new DownloadRideDialog(this, home))->show();
+}
+
+void
+MainWindow::exportCSV()
+{
+    if ((treeWidget->selectedItems().size() != 1)
+        || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
+        QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
+        return;
+    }
+
+    RideItem *ride = (RideItem*) treeWidget->selectedItems().first();
+
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Export CSV"), QDir::homePath(),
+        tr("Comma-Separated Values (*.csv)"));
+    if (fileName.length() == 0)
+        return;
+
+    QFile file(fileName);
+    // QFileDialog::getSaveFileName checks whether the file exists.
+    if (!file.open(QFile::WriteOnly | QFile::Truncate)) {
+        QMessageBox::critical(
+            this, tr("Open Error"),
+            tr("Can't open %1 for writing").arg(fileName));
+        return;
+    }
+
+    QTextStream out(&file);
+    out << "Time (min),Torq (N-m),Speed (MPH),Power (watts),"
+        << "Distance (miles),Cadence (RPM),Heart rate (BPM),"
+        << "Interval\n";
+
+    QListIterator<RawFilePoint*> i(ride->raw->points);
+    while (i.hasNext()) {
+        RawFilePoint *point = i.next();
+        out << point->secs/60.0;
+        out << ",";
+        if (point->nm >= 0) out << point->nm;
+        out << ",";
+        if (point->mph >= 0) out << point->mph;
+        out << ",";
+        if (point->watts >= 0) out << point->watts;
+        out << ",";
+        out << point->miles;
+        out << ",";
+        out << point->cad;
+        out << ",";
+        out << point->hr;
+        out << ",";
+        out << point->interval << "\n";
+    }
+
+    file.close();
 }
 
 void 
