@@ -141,10 +141,10 @@ DownloadRideDialog::time_cb(struct tm *time)
             QMessageBox::critical(this, tr("Read error"), 
                                   tr("Can't find ride time"));
             reject();
-        }
-        sprintf(outname, "%04d_%02d_%02d_%02d_%02d_%02d.raw", 
-                time->tm_year + 1900, time->tm_mon + 1, time->tm_mday, 
-                time->tm_hour, time->tm_min, time->tm_sec);
+        } else
+            sprintf(outname, "%04d_%02d_%02d_%02d_%02d_%02d.raw", 
+                    time->tm_year + 1900, time->tm_mon + 1, time->tm_mday, 
+                    time->tm_hour, time->tm_min, time->tm_sec);
         assert(strlen(outname) == sizeof(outname) - 1);
         label->setText(label->text() + tr("done.\nWriting to ") 
                        + outname + ".");

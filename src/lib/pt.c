@@ -60,7 +60,7 @@ pt_find_device(char *result[], int capacity)
     struct dirent *dp;
     int count = 0;
     if (regcomp(&reg, 
-                "^(cu\\.(usbserial-[0-9A-F]+|KeySerial[0-9])|ttyUSB[0-9])$", 
+                "^(cu\\.(usbserial-[0-9A-F]+|KeySerial[0-9])|ttyUSB[0-9]|ttyS[0-2])$", 
                 REG_EXTENDED|REG_NOSUB)) {
         assert(0);
     }
@@ -76,10 +76,12 @@ pt_find_device(char *result[], int capacity)
 }
 
 #define KSDEVSTR "/dev/cu.KeySerial"
+#define LINUXSERIALSTR "/dev/ttyS"
 int
 pt_hwecho(const char *device)
 {
-    return strncmp(device, KSDEVSTR, strlen(KSDEVSTR)) == 0;
+    return (strncmp(device, KSDEVSTR, strlen(KSDEVSTR)) == 0
+	    || strncmp(device, LINUXSERIALSTR, strlen(LINUXSERIALSTR)) == 0);
 }
 
 void
@@ -434,7 +436,11 @@ pt_unpack_data(unsigned char *buf, int compat, unsigned rec_int,
     if (torque_inlbs == 0xfff)
         torque_inlbs = 0;
     speed = ((buf[1] & 0x0f) << 8) | buf[3];
-    if ((speed == 0) || (speed == 0xfff)) {
+    if ((speed < 100) || (speed == 0xfff)) {
+        if ((speed != 0) && (speed < 1000)) {
+            fprintf(stderr, "possible error: speed=%.1f; ignoring it\n", 
+                    MAGIC_CONSTANT / speed / 10.0);
+        }
         *mph = -1.0;
         *watts = -1.0;
     }
