@@ -75,15 +75,6 @@ pt_find_device(char *result[], int capacity)
     return count;
 }
 
-#define KSDEVSTR "/dev/cu.KeySerial"
-#define LINUXSERIALSTR "/dev/ttyS"
-int
-pt_hwecho(const char *device)
-{
-    return (strncmp(device, KSDEVSTR, strlen(KSDEVSTR)) == 0
-	    || strncmp(device, LINUXSERIALSTR, strlen(LINUXSERIALSTR)) == 0);
-}
-
 void
 pt_make_async(int fd) 
 {
@@ -126,7 +117,7 @@ fprintb(FILE *file, unsigned char *buf, int cnt)
 }
 
 int
-pt_read_version(struct pt_read_version_state *state, int fd, int hwecho) 
+pt_read_version(struct pt_read_version_state *state, int fd, int *hwecho) 
 {
     char c = 0x56;
     int n;
@@ -142,28 +133,7 @@ pt_read_version(struct pt_read_version_state *state, int fd, int hwecho)
         state->i = 0;
     }
 
-    if (state->state == 1) {
-        if (hwecho) {
-            if (pt_debug_level >= PT_DEBUG_MAX)
-                fprintf(stderr, "Calling read on device.\n");
-            n = read(fd, &c, 1);
-            if (n <= 0) {
-                if ((n < 0) && (errno == EAGAIN)) {
-                    if (pt_debug_level >= PT_DEBUG_MAX)
-                        fprintf(stderr, "Need read.\n");
-                    return PT_NEED_READ;
-                }
-                perror("read");
-                exit(1);
-            }
-            if (pt_debug_level >= PT_DEBUG_MAX)
-                fprintf(stderr, "Read %d bytes: %02x.\n", n, 0xff & c);
-            assert(n == 1);
-        }
-        state->state = 2;
-    }
-
-    assert(state->state == 2);
+    assert(state->state == 1);
     while (state->i < 29) {
         if (pt_debug_level >= PT_DEBUG_MAX)
             fprintf(stderr, "Need %d bytes.  Calling read on device.\n",
@@ -183,7 +153,17 @@ pt_read_version(struct pt_read_version_state *state, int fd, int hwecho)
             fprintb(stderr, state->buf + state->i, n);
             fprintf(stderr, ".\n");
         }
-        state->i += n;
+        if ((state->i == 0) && (state->buf[0] == 0x56)) {
+            if (pt_debug_level >= PT_DEBUG_MAX)
+                fprintf(stderr, "Hardware echo detected.\n");
+            *hwecho = 1;
+            for (int j = 0; j < n - 1; ++j)
+                state->buf[j] = state->buf[j+1];
+            state->i = n - 1;
+        }
+        else {
+            state->i += n;
+        }
     }
 
     return PT_DONE;
