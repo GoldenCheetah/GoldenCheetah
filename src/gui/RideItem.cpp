@@ -71,7 +71,7 @@ static void summarize(QString &intervals,
                       unsigned &int_mph_cnt,
                       double &int_mph_sum) 
 {
-    double dur = time_end - time_start;
+    double dur = round(time_end - time_start);
     double len = mile_end - mile_start;
     double minutes = (int) (dur/60.0);
     double seconds = dur - (60 * minutes);
