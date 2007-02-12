@@ -11,8 +11,16 @@ used, and Sean Rhea coded up their combined discoveries into the two
 utilities, <code>ptdl</code> and <code>ptunpk</code>.  
 
 <p>
+Later that year, Sean needed to learn QT for his real job, and he set about
+writing a graphical version of <code>ptdl</code> and <code>ptunpk</code> for
+practice.  He released the first graphical version on September 6, 2006,
+changing the name to GoldenCheetah in reference to an old legend from his days
+as a runner.
+
+<p>
+Since then, a number of others have helped out in various ways.
 Rob Carlsen helped get the serial port version of the PowerTap Pro working
-with the Keyspan USB-to-serial adaptor.  Scott Overfield helped me figure out
+with the Keyspan USB-to-serial adaptor.  Scott Overfield helped figure out
 that we should be using the <code>/dev/cu.*</code> devices instead of the
 <code>/dev/tty.*</code> ones.  Aldy Hernandez and Andrew Kruse helped get
 things working under Linux, and Aldy has been averaging one patch a week or
