@@ -42,10 +42,23 @@ href="http://goldencheetah.org/svn/trunk">here</a>.
 </tr>
 
 <tr>
+<td valign="top">Feb 12, 2007</td>
+<td valign="top">
+<a href="GoldenCheetah_2007-02-12_Linux_x86.tgz">Linux x86</a>,<br>
+<a href="GoldenCheetah_2007-02-12_Darwin_powerpc.dmg">Mac OS X PowerPC</a>
+</td>
+<td valign="top">Interval information now included in ride summary, rides can
+now be exported as comma-separated values for import into Excel, and better
+automatic detection of hardware echo.  Also includes a number of bux 
+fixes.</td>
+</tr>
+
+<tr>
 <td valign="top">Jan 30, 2007</td>
 <td valign="top">
-<a href="GoldenCheetah_2007-01-30_Darwin_powerpc.dmg">Mac OS</a>,
-<a href="GoldenCheetah_2007-01-30_Linux_x86.tgz">Linux x86</a></td>
+<a href="GoldenCheetah_2007-01-30_Linux_x86.tgz">Linux x86</a>,<br>
+<a href="GoldenCheetah_2007-01-30_Darwin_powerpc.dmg">Mac OS X PowerPC</a>
+</td>
 <td valign="top">Bug fix release.</td>
 </tr>
 
