@@ -141,10 +141,11 @@ DownloadRideDialog::time_cb(struct tm *time)
             QMessageBox::critical(this, tr("Read error"), 
                                   tr("Can't find ride time"));
             reject();
-        } else
-            sprintf(outname, "%04d_%02d_%02d_%02d_%02d_%02d.raw", 
-                    time->tm_year + 1900, time->tm_mon + 1, time->tm_mday, 
-                    time->tm_hour, time->tm_min, time->tm_sec);
+            return;
+        } 
+        sprintf(outname, "%04d_%02d_%02d_%02d_%02d_%02d.raw", 
+                time->tm_year + 1900, time->tm_mon + 1, time->tm_mday, 
+                time->tm_hour, time->tm_min, time->tm_sec);
         assert(strlen(outname) == sizeof(outname) - 1);
         label->setText(label->text() + tr("done.\nWriting to ") 
                        + outname + ".");
@@ -159,6 +160,7 @@ DownloadRideDialog::time_cb(struct tm *time)
                                      tr("&Overwrite"), tr("&Cancel"), 
                                      QString(), 1, 1) == 1) {
                 reject();
+                return;
             }
         }
         if ((out = fopen(path.c_str(), "w")) == NULL) {
@@ -166,6 +168,7 @@ DownloadRideDialog::time_cb(struct tm *time)
                                   tr("Can't open ") + path.c_str() 
                                   + tr(" for writing: ") + strerror(errno));
             reject();
+            return;
         }
         label->setText(label->text() + tr("\nRide data read: "));
         endingOffset = label->text().size();
@@ -201,7 +204,7 @@ DownloadRideDialog::readVersion()
 {
     if (notifier)
         notifier->setEnabled(false);
-    int r = pt_read_version(&vstate, fd, hwecho);
+    int r = pt_read_version(&vstate, fd, &hwecho);
     if (r == PT_DONE) {
         if (notifier) {
             delete notifier;
@@ -299,7 +302,7 @@ DownloadRideDialog::downloadClicked()
     if (device)
         free(device);
     device = strdup(listWidget->currentItem()->text().toAscii().data());
-    hwecho = pt_hwecho(device);
+    hwecho = 0;
     fd = open(device, O_RDWR | O_NOCTTY);
     if (fd < 0) {
         QMessageBox::critical(this, tr("Read error"), 

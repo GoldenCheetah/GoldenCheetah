@@ -45,7 +45,7 @@ struct pt_read_version_state {
     unsigned char buf[30];
 };
 extern int pt_read_version(struct pt_read_version_state *state, 
-                           int fd, int hwecho);
+                           int fd, int *hwecho);
 
 struct pt_read_data_state {
     int state;

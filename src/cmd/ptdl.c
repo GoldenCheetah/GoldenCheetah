@@ -83,7 +83,7 @@ record_cb(unsigned char *buf, void *user_data)
 static void
 usage(const char *progname) 
 {
-    fprintf(stderr, "usage: %s [-d <device>] [-e] [-f] [-o <output file>]\n", 
+    fprintf(stderr, "usage: %s [-d <device>] [-f] [-o <output file>]\n", 
             progname);
     exit(1);
 }
@@ -107,9 +107,6 @@ main(int argc, char *argv[])
             case 'd':
                 devices[0] = optarg;
                 dev_cnt = 1;
-                break;
-            case 'e':
-                hwecho = 1;
                 break;
             case 'f':
                 force = 1;
@@ -151,11 +148,6 @@ main(int argc, char *argv[])
     }
 
     fprintf(stderr, "Reading from %s.\n", devices[0]);
-    if (pt_hwecho(devices[0]))
-        hwecho = 1;
-
-    if (hwecho)
-        fprintf(stderr, "Expecting hardware echo.\n");
 
     if (pt_debug_level >= PT_DEBUG_MAX)
         fprintf(stderr, "Opening device %s.\n", devices[0]);
@@ -171,7 +163,7 @@ main(int argc, char *argv[])
     memset(&vstate, 0, sizeof(vstate));
     if (pt_debug_level >= PT_DEBUG_MAX)
         fprintf(stderr, "\nCalling pt_read_version.\n");
-    while ((r = pt_read_version(&vstate, fd, hwecho)) != PT_DONE) {
+    while ((r = pt_read_version(&vstate, fd, &hwecho)) != PT_DONE) {
         assert(r == PT_NEED_READ);
         FD_ZERO(&readfds);
         FD_SET(fd, &readfds);
