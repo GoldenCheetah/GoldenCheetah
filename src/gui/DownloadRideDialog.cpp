@@ -309,6 +309,7 @@ DownloadRideDialog::downloadClicked()
                               tr("Could not open device, ") + device +
                               + ": " + strerror(errno));
         reject();
+        return;
     }
     pt_make_async(fd);
     label->setText(tr("Reading version information..."));
