@@ -83,6 +83,7 @@ static void summarize(QString &intervals,
         : (int) (int_cad_sum / int_cad_cnt);
     double mph_avg = (int_mph_cnt == 0) ? 0 
         : (int) (int_mph_sum / int_mph_cnt);
+    double energy = watts_avg / 1000.0 * dur;
 
     intervals += "<tr><td align=\"center\">%1</td>";
     intervals += "<td align=\"center\">%2:%3</td>";
@@ -91,10 +92,12 @@ static void summarize(QString &intervals,
     intervals += "<td align=\"center\">%6</td>";
     intervals += "<td align=\"center\">%7</td>";
     intervals += "<td align=\"center\">%8</td>";
+    intervals += "<td align=\"center\">%9</td>";
     intervals = intervals.arg(last_interval);
     intervals = intervals.arg(minutes, 0, 'f', 0);
     intervals = intervals.arg(seconds, 0, 'f', 0);
     intervals = intervals.arg(len, 0, 'f', 1);
+    intervals = intervals.arg(energy, 0, 'f', 0);
     intervals = intervals.arg(watts_avg, 0, 'f', 0);
     intervals = intervals.arg(hr_avg, 0, 'f', 0);
     intervals = intervals.arg(cad_avg, 0, 'f', 0);
@@ -123,6 +126,7 @@ RideItem::htmlSummary()
             double secs_moving = 0.0;
             double total_watts = 0.0;
             double secs_watts = 0.0;
+	    double avg_watts = 0.0;
             double secs_hr = 0.0;
             double total_hr = 0.0;
             double secs_cad = 0.0;
@@ -198,28 +202,33 @@ RideItem::htmlSummary()
                       int_hr_sum, int_cad_cnt, int_cad_sum,
                       int_mph_cnt, int_mph_sum);
 
+	    avg_watts = (secs_watts == 0.0) ? 0.0
+	      : round(total_watts / secs_watts);
+
             summary += "<p><table width=\"60%\" border=0>";
             summary += "<tr><td>Total workout time:</td><td align=\"right\">" + 
                 time_to_string(raw->points.back()->secs);
             summary += "<tr><td>Total time riding:</td><td align=\"right\">" + 
                 time_to_string(secs_moving) + "</td></tr>";
-            summary += QString("<tr><td>Total distance:</td>"
+            summary += QString("<tr><td>Total distance (miles):</td>"
                                "<td align=\"right\">%1</td></tr>")
                 .arg(raw->points.back()->miles, 0, 'f', 1);
-            summary += QString("<tr><td>Average speed:</td>"
+	    summary += QString("<tr><td>Total work (kJ):</td>"
+			       "<td align=\"right\">%1</td></tr>")
+	        .arg((unsigned) (avg_watts / 1000.0 * secs_moving));
+            summary += QString("<tr><td>Average speed (mph):</td>"
                                "<td align=\"right\">%1</td></tr>")
                 .arg(((secs_moving == 0.0) ? 0.0
                       : raw->points.back()->miles / secs_moving * 3600.0), 
                      0, 'f', 1);
-            summary += QString("<tr><td>Average power:</td>"
+            summary += QString("<tr><td>Average power (watts):</td>"
                                "<td align=\"right\">%1</td></tr>")
-                .arg((unsigned) ((secs_watts == 0.0) ? 0.0
-                                 : round(total_watts / secs_watts)));
-            summary +=QString("<tr><td>Average heart rate:</td>"
+                .arg((unsigned) avg_watts);
+            summary +=QString("<tr><td>Average heart rate (bpm):</td>"
                               "<td align=\"right\">%1</td></tr>")
                 .arg((unsigned) ((secs_hr == 0.0) ? 0.0
                                  : round(total_hr / secs_hr)));
-            summary += QString("<tr><td>Average cadence:</td>"
+            summary += QString("<tr><td>Average cadence (rpm):</td>"
                                "<td align=\"right\">%1</td></tr>")
                 .arg((unsigned) ((secs_cad == 0.0) ? 0.0
                                  : round(total_cad / secs_cad)));
@@ -229,12 +238,23 @@ RideItem::htmlSummary()
                 summary += "<p><h2>Intervals</h2>\n<p>\n";
                 summary += "<table width=\"90%\" cellspacing=0 border=0><tr>";
                 summary += "<td align=\"center\">Interval</td>";
-                summary += "<td align=\"center\">Time</td>";
+                summary += "<td align=\"center\"></td>";
                 summary += "<td align=\"center\">Distance</td>";
-                summary += "<td align=\"center\">Avg Watts</td>";
+		summary += "<td align=\"center\">Work</td>";
+                summary += "<td align=\"center\">Avg Power</td>";
                 summary += "<td align=\"center\">Avg HR</td>";
                 summary += "<td align=\"center\">Avg Cadence</td>";
-                summary += "<td align=\"center\">Avg MPH</td></tr>";
+                summary += "<td align=\"center\">Avg Speed</td>";
+                summary += "</tr><tr>";
+                summary += "<td align=\"center\">Number</td>";
+                summary += "<td align=\"center\">Duration</td>";
+                summary += "<td align=\"center\">(miles)</td>";
+		summary += "<td align=\"center\">(kJ)</td>";
+                summary += "<td align=\"center\">(watts)</td>";
+                summary += "<td align=\"center\">(bpm)</td>";
+                summary += "<td align=\"center\">(rpm)</td>";
+                summary += "<td align=\"center\">(mph)</td>";
+                summary += "</tr>";
                 summary += intervals;
                 summary += "</table></center>";
             }
