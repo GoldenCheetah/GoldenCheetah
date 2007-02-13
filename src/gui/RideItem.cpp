@@ -95,7 +95,7 @@ static void summarize(QString &intervals,
     intervals += "<td align=\"center\">%9</td>";
     intervals = intervals.arg(last_interval);
     intervals = intervals.arg(minutes, 0, 'f', 0);
-    intervals = intervals.arg(seconds, 0, 'f', 0);
+    intervals = intervals.arg(seconds, 2, 'f', 0, QLatin1Char('0'));
     intervals = intervals.arg(len, 0, 'f', 1);
     intervals = intervals.arg(energy, 0, 'f', 0);
     intervals = intervals.arg(watts_avg, 0, 'f', 0);
