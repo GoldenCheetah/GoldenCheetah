@@ -369,15 +369,7 @@ pt_unpack_config(unsigned char *buf, unsigned *interval,
         *last_interval = buf[3];
         ++*interval;
     }
-    switch (buf[4]) {
-        case 0x0:  *rec_int = 1;  break;
-        case 0x1:  *rec_int = 2;  break;
-        case 0x3:  *rec_int = 5;  break;
-        case 0x7:  *rec_int = 10; break;
-        case 0x17: *rec_int = 30; break;
-        default:
-            return -1;
-    }
+    *rec_int = buf[4] + 1;
     return 0;
 }
 
@@ -490,14 +482,7 @@ pt_pack_config(unsigned char *buf, unsigned interval,
     buf[1] = check(wheel_sz_mm >> 8);
     buf[2] = wheel_sz_mm & 0xff;
     buf[3] = check(interval % 9);
-    switch (rec_int) {
-        case 1:  buf[4] = 0x0; break;
-        case 2:  buf[4] = 0x1; break;
-        case 5:  buf[4] = 0x3; break;
-        case 10: buf[4] = 0x7; break;
-        case 30: buf[4] = 0x17; break;
-        default: assert(0);
-    }
+    buf[4] = rec_int - 1;
     buf[5] = 0x0;
 }
 
@@ -576,8 +561,13 @@ pt_read_raw(FILE *in, int compat, void *context,
                 start_secs = since_epoch;
             else if (since_epoch - start_secs > secs)
                     secs = since_epoch - start_secs;
-            else 
-                return; /* ignore it; don't let time go backwards */
+            else {
+                sprintf(ebuf, "Warning: %0.3f minutes into the ride, "
+                        "time jumps backwards by %0.3f minutes; ignoring it.",
+                        secs / 60.0, (secs - since_epoch + start_secs) / 60.0);
+                if (error_cb) error_cb(ebuf, context);
+                return;
+            }
             if (time_cb) time_cb(&time, since_epoch, context);
         }
         else if (pt_is_data(buf)) {
