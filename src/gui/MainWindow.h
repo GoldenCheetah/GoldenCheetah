@@ -27,6 +27,7 @@
 class AllPlot;
 class CpintPlot;
 class PowerHist;
+class QwtPlotPicker;
 
 class MainWindow : public QMainWindow 
 {
@@ -52,6 +53,7 @@ class MainWindow : public QMainWindow
         void setBinWidthFromSlider();
         void setBinWidthFromLineEdit();
         void tabChanged(int index);
+        void pickerMoved(const QPoint &);
 
     private:
 
@@ -64,6 +66,10 @@ class MainWindow : public QMainWindow
         QTextEdit *rideSummary;
         AllPlot *allPlot;
         CpintPlot *cpintPlot;
+        QLabel *cpintTimeLabel;
+        QLabel *cpintTodayLabel;
+        QLabel *cpintAllLabel;
+        QwtPlotPicker *picker;
         QSlider *smoothSlider;
         QLineEdit *smoothLineEdit;
         QSlider *binWidthSlider;
