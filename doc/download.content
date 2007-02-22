@@ -42,6 +42,18 @@ href="http://goldencheetah.org/svn/trunk">here</a>.
 </tr>
 
 <tr>
+<td valign="top">Feb 21, 2007</td>
+<td valign="top">
+<a href="GoldenCheetah_2007-02-21_Linux_x86.tgz">Linux x86</a>,<br>
+<a href="GoldenCheetah_2007-02-21_Darwin_powerpc.dmg">Mac OS X PowerPC</a>
+</td>
+<td valign="top">Clicking on the Critical Power Plot now displays the
+interval duration, maximum power for that ride, and maximum power for all
+rides below the plot.  Also fixes a bug for recording intervals longer than
+two seconds.</td>
+</tr>
+
+<tr>
 <td valign="top">Feb 12, 2007</td>
 <td valign="top">
 <a href="GoldenCheetah_2007-02-12_Linux_x86.tgz">Linux x86</a>,<br>
