@@ -37,6 +37,9 @@ class CpintPlot : public QwtPlot
         QProgressDialog *progress;
         bool needToScanRides;
 
+        const QwtPlotCurve *getAllCurve() const { return allCurve; }
+        const QwtPlotCurve *getThisCurve() const { return thisCurve; }
+
     public slots:
 
         void showGrid(int state);

@@ -31,6 +31,9 @@
 #include <QApplication>
 #include <QtGui>
 #include <QRegExp>
+#include <qwt_plot_curve.h>
+#include <qwt_plot_picker.h>
+#include <qwt_data.h>
 
 #define FOLDER_TYPE 0
 #define RIDE_TYPE 1
@@ -85,6 +88,8 @@ MainWindow::MainWindow(const QDir &home) :
     rideSummary = new QTextEdit;
     rideSummary->setReadOnly(true);
     tabWidget->addTab(rideSummary, "Ride Summary");
+
+    /////////////////////////// Ride Plot Tab ///////////////////////////
 
     QWidget *window = new QWidget;
     QVBoxLayout *vlayout = new QVBoxLayout;
@@ -151,8 +156,34 @@ MainWindow::MainWindow(const QDir &home) :
         splitter->setSizes(sizes);
     }
 
+    ////////////////////// Critical Power Plot Tab //////////////////////
+
+    window = new QWidget;
+    vlayout = new QVBoxLayout;
+    QHBoxLayout *cpintPickerLayout = new QHBoxLayout;
+    cpintTimeLabel = new QLabel(tr("Interval Duration:"), window);
+    cpintTodayLabel = new QLabel(tr("Today:"), window);
+    cpintAllLabel = new QLabel(tr("All Rides:"), window);
+    cpintPickerLayout->addWidget(cpintTimeLabel);
+    cpintPickerLayout->addWidget(cpintTodayLabel);
+    cpintPickerLayout->addWidget(cpintAllLabel);
     cpintPlot = new CpintPlot(home.path());
-    tabWidget->addTab(cpintPlot, "Critical Power Plot");
+    vlayout->addWidget(cpintPlot);
+    vlayout->addLayout(cpintPickerLayout);
+    window->setLayout(vlayout);
+    window->show();
+    tabWidget->addTab(window, "Critical Power Plot");
+
+    picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
+                               QwtPicker::PointSelection, 
+                               QwtPicker::VLineRubberBand, 
+                               QwtPicker::AlwaysOff, cpintPlot->canvas());
+    picker->setRubberBandPen(QColor(Qt::blue));
+
+    connect(picker, SIGNAL(moved(const QPoint &)),
+            SLOT(pickerMoved(const QPoint &)));
+
+    //////////////////////// Power Histogram Tab ////////////////////////
 
     window = new QWidget;
     vlayout = new QVBoxLayout;
@@ -182,6 +213,8 @@ MainWindow::MainWindow(const QDir &home) :
 
     tabWidget->addTab(window, "Power Histogram");
 
+    ////////////////////////////// Signals ////////////////////////////// 
+
     connect(treeWidget, SIGNAL(itemSelectionChanged()),
             this, SLOT(rideSelected()));
     connect(splitter, SIGNAL(splitterMoved(int,int)), 
@@ -206,6 +239,8 @@ MainWindow::MainWindow(const QDir &home) :
             this, SLOT(setBinWidthFromLineEdit()));
     connect(tabWidget, SIGNAL(currentChanged(int)), 
             this, SLOT(tabChanged(int)));
+
+    /////////////////////////////// Menus ///////////////////////////////
 
     QMenu *fileMenu = menuBar()->addMenu(tr("&Cyclist"));
     fileMenu->addAction(tr("&New..."), this, 
@@ -421,5 +456,65 @@ MainWindow::tabChanged(int index)
             }
         }
     }
+}
+
+static QString
+time_to_string(double secs) {
+    if (secs < 60.0)
+        return QString("%1s").arg(secs, 0, 'f', 2, QLatin1Char('0'));
+    QString result;
+    unsigned rounded = (unsigned) round(secs);
+    bool needs_colon = false;
+    if (rounded >= 3600) {
+        result += QString("%1h").arg(rounded / 3600);
+        rounded %= 3600;
+        needs_colon = true;
+    }
+    if (needs_colon || rounded >= 60) {
+        if (needs_colon)
+            result += " ";
+        result += QString("%1m").arg(rounded / 60, 2, 10, QLatin1Char('0'));
+        rounded %= 60;
+        needs_colon = true;
+    }
+    if (needs_colon)
+        result += " ";
+    result += QString("%1s").arg(rounded, 2, 10, QLatin1Char('0'));
+    return result;
+}
+
+static unsigned 
+curve_to_point(double x, const QwtPlotCurve *curve)
+{
+    unsigned result = 0;
+    if (curve) {
+        const QwtData &data = curve->data();
+        if (data.size() > 0) {
+            unsigned min = 0, mid = 0, max = data.size();
+            while (min < max - 1) {
+                mid = (max - min) / 2 + min;
+                if (x < data.x(mid)) {
+                    result = (unsigned) round(data.y(mid));
+                    max = mid;
+                }
+                else {
+                    min = mid;
+                }
+            }
+        }
+    }
+    return result;
+}
+
+void 
+MainWindow::pickerMoved(const QPoint &pos)
+{
+    double minutes = cpintPlot->invTransform(QwtPlot::xBottom, pos.x());
+    cpintTimeLabel->setText(tr("Interval Duration: %1")
+                            .arg(time_to_string(60.0*minutes)));
+    cpintAllLabel->setText(tr("All Rides: %1 watts").arg(
+            curve_to_point(minutes, cpintPlot->getAllCurve())));
+    cpintTodayLabel->setText(tr("Today: %1 watts").arg(
+            curve_to_point(minutes, cpintPlot->getThisCurve())));
 }
 
