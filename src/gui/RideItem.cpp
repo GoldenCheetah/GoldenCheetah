@@ -205,7 +205,7 @@ RideItem::htmlSummary()
 	    avg_watts = (secs_watts == 0.0) ? 0.0
 	      : round(total_watts / secs_watts);
 
-            summary += "<p><table width=\"60%\" border=0>";
+            summary += "<p><table align=\"center\" width=\"60%\" border=0>";
             summary += "<tr><td>Total workout time:</td><td align=\"right\">" + 
                 time_to_string(raw->points.back()->secs);
             summary += "<tr><td>Total time riding:</td><td align=\"right\">" + 
@@ -236,7 +236,7 @@ RideItem::htmlSummary()
 
             if (last_interval > 0) {
                 summary += "<p><h2>Intervals</h2>\n<p>\n";
-                summary += "<table width=\"90%\" cellspacing=0 border=0><tr>";
+                summary += "<table align=\"center\" width=\"90%\" cellspacing=0 border=0><tr>";
                 summary += "<td align=\"center\">Interval</td>";
                 summary += "<td align=\"center\"></td>";
                 summary += "<td align=\"center\">Distance</td>";
@@ -256,7 +256,7 @@ RideItem::htmlSummary()
                 summary += "<td align=\"center\">(mph)</td>";
                 summary += "</tr>";
                 summary += intervals;
-                summary += "</table></center>";
+                summary += "</table>";
             }
         }
         else {
@@ -266,6 +266,7 @@ RideItem::htmlSummary()
                 summary += " <li>" + i.next();
             summary += "</ul>";
         }
+        summary += "</center>";
     }
     return summary;
 }
