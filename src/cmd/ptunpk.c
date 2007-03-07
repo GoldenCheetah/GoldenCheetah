@@ -76,7 +76,7 @@ csv_data_cb(double secs, double nm, double mph, double watts, double miles,
     context = NULL;
     fprintf(out, "%7.3f, %10.1f,", secs / 60.0, nm);
     if (mph == -1.0)
-        fprintf(out, "   0.0,   0.0,");
+        fprintf(out, "   0.0,     0,");
     else
         fprintf(out, "%6.1f, %5.0f,", metric ? (mph / KM_TO_MI) : mph, watts);
     fprintf(out, "%8.3f, %7d,", metric ? (miles / KM_TO_MI) : miles, cad);
