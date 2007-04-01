@@ -134,10 +134,9 @@ pt_read_version(struct pt_read_version_state *state, int fd, int *hwecho)
     }
 
     assert(state->state == 1);
-    while (state->i < 29) {
+    while (1) {
         if (pt_debug_level >= PT_DEBUG_MAX)
-            fprintf(stderr, "Need %d bytes.  Calling read on device.\n",
-                    29 - state->i);
+            fprintf(stderr, "Calling read on device.\n");
         n = read(fd, state->buf + state->i, sizeof(state->buf) - state->i);
         if (n <= 0) {
             if ((n < 0) && (errno == EAGAIN)) {
@@ -153,16 +152,47 @@ pt_read_version(struct pt_read_version_state *state, int fd, int *hwecho)
             fprintb(stderr, state->buf + state->i, n);
             fprintf(stderr, ".\n");
         }
-        if ((state->i == 0) && (state->buf[0] == 0x56)) {
+        state->i += n;
+        if ((state->i >= 2) 
+            && (state->buf[state->i - 2] == 0x0d)
+            && (state->buf[state->i - 1] == 0x0a)) { 
+            break;
+        }
+    }
+
+    /* 
+     * We expect the version string to be something like 
+     * "VER 02.21 PRO...", so if we see two V's, it's probably 
+     * because there's a hardware echo going on.
+     */
+
+    int start = -1;
+    for (int i = 0; i < state->i - 3; ++i) {
+        if (strncmp((char*) state->buf + i, "VER", 3) == 0) {
+            start = i;
+            break;
+        }
+    }
+
+    if (start < 0) {
+        // TODO: return something like PT_ERROR?
+        fprintf(stderr, "Unrecognized version string.\n");
+    }
+    else {
+        int count = 0;
+        for (int i = 0; i < start; ++i) {
+            if (state->buf[i] == 0x56)
+                ++count;
+        }
+        if (count > 0) {
             if (pt_debug_level >= PT_DEBUG_MAX)
                 fprintf(stderr, "Hardware echo detected.\n");
             *hwecho = 1;
-            for (int j = 0; j < n - 1; ++j)
-                state->buf[j] = state->buf[j+1];
-            state->i = n - 1;
         }
-        else {
-            state->i += n;
+        else { 
+            if (pt_debug_level >= PT_DEBUG_MAX)
+                fprintf(stderr, "No hardware echo detected.\n");
+            *hwecho = 0;
         }
     }
 
