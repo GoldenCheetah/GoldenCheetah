@@ -216,7 +216,7 @@ DownloadRideDialog::readVersion()
         }
         label->setText(label->text() + tr("done."));
         ::close(fd);
-        fd = open(device, O_RDWR | O_NOCTTY);
+        fd = open(device, O_RDWR | O_NOCTTY | O_NONBLOCK);
         if (fd < 0) {
             QMessageBox::critical(this, tr("Read error"), 
                                   tr("Could not open device, ") + device +
@@ -303,7 +303,7 @@ DownloadRideDialog::downloadClicked()
         free(device);
     device = strdup(listWidget->currentItem()->text().toAscii().data());
     hwecho = 0;
-    fd = open(device, O_RDWR | O_NOCTTY);
+    fd = open(device, O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (fd < 0) {
         QMessageBox::critical(this, tr("Read error"), 
                               tr("Could not open device, ") + device +
