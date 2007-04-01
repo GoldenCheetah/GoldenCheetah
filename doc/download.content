@@ -42,6 +42,19 @@ href="http://goldencheetah.org/svn/trunk">here</a>.
 </tr>
 
 <tr>
+<td valign="top">Apr 1, 2007</td>
+<td valign="top">
+<a href="GoldenCheetah_2007-04-01_Linux_x86.tgz">Linux x86</a>,<br>
+<a href="GoldenCheetah_2007-04-01_Darwin_powerpc.dmg">Mac OS X PowerPC</a>
+</td>
+<td valign="top">This release fixes a bug that was introduced with the
+hardware echo detection code.  If you're using the CycleOps-supplied USB
+cable to download from your PowerTap unit, this release should make
+downloads more reliable.  (Those using the KeySpan USB-to-serial adaptor
+or a plain-old serial port shouldn't see any difference.)</td>
+</tr>
+
+<tr>
 <td valign="top">Feb 22, 2007</td>
 <td valign="top">
 <a href="GoldenCheetah_2007-02-22_Linux_x86.tgz">Linux x86</a>,<br>
