@@ -39,7 +39,7 @@
 #define RIDE_TYPE 1
 
 static char *rideFileRegExp = ("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)"
-                               "_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.raw$");
+                               "_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.(raw|srm)$");
 
 MainWindow::MainWindow(const QDir &home) : 
     home(home), settings(GC_SETTINGS_CO, GC_SETTINGS_APP)
@@ -70,13 +70,13 @@ MainWindow::MainWindow(const QDir &home) :
 
     QRegExp rx(rideFileRegExp);
     QStringList filters;
-    filters << "*.raw";
+    filters << "*.raw" << "*.srm";
     QTreeWidgetItem *last = NULL;
     QStringListIterator i(home.entryList(filters, QDir::Files));
     while (i.hasNext()) {
         QString name = i.next();
         if (rx.exactMatch(name)) {
-            assert(rx.numCaptures() == 6);
+            assert(rx.numCaptures() == 7);
             QDate date(rx.cap(1).toInt(), rx.cap(2).toInt(),rx.cap(3).toInt()); 
             QTime time(rx.cap(4).toInt(), rx.cap(5).toInt(),rx.cap(6).toInt()); 
             QDateTime dt(date, time);
