@@ -53,7 +53,7 @@ class RawFile
         int rec_int;
         QList<RawFilePoint*> points;
         QMap<double,double> powerHist;
-        static RawFile *readFile(const QFile &file, QStringList &errors);
+        static RawFile *readFile(QFile &file, QStringList &errors);
 };
 
 #endif // _GC_RawFile_h

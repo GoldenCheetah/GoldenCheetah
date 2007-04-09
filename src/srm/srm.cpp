@@ -3,9 +3,7 @@
 // (http://www.stephanmantler.com/?page_id=86).
 //
 
-#include <QDataStream>
-#include <QDate>
-#include <QFile>
+#include "srm.h"
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -32,18 +30,23 @@ static quint32 readLong(QDataStream &in)
     return htonl(value); // SRM uses big endian
 }
 
+struct marker 
+{
+    int start, end;
+};
+
 struct blockhdr 
 {
     QDateTime dt;
     quint16 chunkcnt;
 };
 
-int main(int argc, char *argv[])
+bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings) 
 {
-    assert(argc > 1);
-    QFile file(argv[1]);
-    if (!file.open(QFile::ReadOnly))
-       assert(false); 
+    if (!file.open(QFile::ReadOnly)) {
+        errorStrings << QString("can't open file %1").arg(file.fileName());
+        return false;
+    }
     QDataStream in(&file);
 
     char magic[5];
@@ -65,13 +68,13 @@ int main(int argc, char *argv[])
     in.readRawData(comment, sizeof(comment) - 1);
     comment[commentlen - 1] = '\0';
 
-    double recint = ((double) recint1) / recint2;
-    unsigned recintms = (unsigned) round(recint * 1000.0);
+    data.recint = ((double) recint1) / recint2;
+    unsigned recintms = (unsigned) round(data.recint * 1000.0);
 
     printf("magic=%s\n", magic);
     printf("wheelcirc=%d\n", wheelcirc);
     printf("dayssince1880=%d\n", dayssince1880);
-    printf("recint=%f sec\n", recint);
+    printf("recint=%f sec\n", data.recint);
     printf("blockcnt=%d\n", blockcnt);
     printf("markercnt=%d\n", markercnt);
     printf("commentlen=%d\n", commentlen);
@@ -82,6 +85,7 @@ int main(int argc, char *argv[])
 
     printf("date=%s\n", date.toString().toAscii().constData());
 
+    marker *markers = new marker[markercnt + 1];
     for (int i = 0; i <= markercnt; ++i) {
         char mcomment[256];
         in.readRawData(mcomment, sizeof(mcomment) - 1);
@@ -95,6 +99,8 @@ int main(int argc, char *argv[])
         quint16 avgcad = readShort(in);
         quint16 avgspeed = readShort(in);
         quint16 pwc150 = readShort(in);
+        markers[i].start = start;
+        markers[i].end = end;
 
         printf("marker %d:\n", i);
         printf("  mcomment=%s\n", mcomment);
@@ -129,7 +135,15 @@ int main(int argc, char *argv[])
     printf("slope=%d\n", slope);
     printf("datacnt=%d\n", datacnt);
 
-    for (int i = 0, blknum = 0, blkidx = 0; i < datacnt; ++i) {
+    assert(blockcnt > 0);
+
+    int blknum = 0, blkidx = 0, mrknum = 0, interval = 0;
+    double km = 0.0, secs = 0.0;
+
+    if (markercnt > 0)
+        mrknum = 1;
+
+    for (int i = 0; i < datacnt; ++i) {
         quint8 ps[3];
         in.readRawData((char*) ps, sizeof(ps));
         quint8 cad = readByte(in);
@@ -137,17 +151,76 @@ int main(int argc, char *argv[])
         double kph = (((((unsigned) ps[1]) & 0xf0) << 3) 
                       | (ps[0] & 0x7f)) * 3.0 / 26.0;
         unsigned watts = (ps[1] & 0x0f) | (ps[2] << 0x4);
-        QDateTime dt = blockhdrs[blknum].dt.addMSecs(recintms * blkidx);
-        printf("  %s %5.1f %4d %3d %3d\n", 
-               dt.toString().toAscii().constData(), kph, watts, hr, cad);
+        if (i == 0) {
+            data.startTime = blockhdrs[blknum].dt;
+            printf("startTime=%s\n", 
+                   data.startTime.toString().toAscii().constData());
+        }
+        if (i == markers[mrknum].end) {
+            ++interval;
+            ++mrknum;
+        }
+
+        if ((i > 0) && (i == markers[mrknum].start))
+            ++interval;
+
+        km += data.recint * kph / 3600.0;
+
+        SrmDataPoint *point = new SrmDataPoint;
+        point->cad = cad;
+        point->hr = hr;
+        point->watts = watts;
+        point->interval = interval;
+        point->kph = kph;
+        point->km = km;
+        point->secs = secs;
+        data.dataPoints.append(point);
+
+        printf("%5.1f %5.1f %5.1f %4d %3d %3d %2d\n", 
+               secs, km, kph, watts, hr, cad, interval);
+
         ++blkidx;
-        if (blkidx == blockhdrs[blknum].chunkcnt) {
+        if ((blkidx == blockhdrs[blknum].chunkcnt) && (blknum + 1 < blockcnt)) {
+            QDateTime end = blockhdrs[blknum].dt.addMSecs(
+                recintms * blockhdrs[blknum].chunkcnt);
             ++blknum;
             blkidx = 0;
+            QDateTime start = blockhdrs[blknum].dt;
+            qint64 endms = 
+                ((qint64) end.toTime_t()) * 1000 + end.time().msec();
+            qint64 startms = 
+                ((qint64) start.toTime_t()) * 1000 + start.time().msec();
+            qint64 diff = startms - endms;
+            if (diff < 0) {
+                errorStrings << QString("ERROR: time goes backwards by %1 ms"
+                                        " on trans " "to block %2"
+                                        ).arg(diff).arg(blknum);
+                secs += data.recint; // for lack of a better option
+            }
+            else {
+                // printf("jumping forward %lld ms\n", diff);
+                secs += diff / 1000.0;
+            }
+        }
+        else {
+            secs += data.recint;
         }
     }
 
     file.close();
-    return 0;
+    return true;
 }
+
+/*
+int main(int argc, char *argv[]) {
+    assert(argc > 1);
+    QFile file(argv[1]);
+    QStringList errorStrings;
+    SrmData data;
+    if (readSrmFile(file, data, errorStrings))
+        return 0;
+    else 
+        return -1;
+}
+*/
 

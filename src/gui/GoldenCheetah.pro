@@ -5,9 +5,10 @@
 TEMPLATE = app
 TARGET += 
 DEPENDPATH += .
-INCLUDEPATH += /usr/local/include/qwt ../lib
+INCLUDEPATH += /home/srhea/src/qwt-20060130/include ../lib ../srm
 CONFIG += static
-LIBS += /usr/local/lib/libqwt.a ../lib/libgc.a
+LIBS += /home/srhea/src/qwt-20060130/lib/libqwt.a ../lib/libgc.a
+LIBS += ../srm/libsrm.a
 LIBS += -lm -lz
 macx {
     LIBS += -framework Carbon

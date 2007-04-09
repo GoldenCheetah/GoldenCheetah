@@ -19,8 +19,11 @@
  */
 
 #include "RawFile.h"
+#include <math.h>
 #include <assert.h>
 #include <QMessageBox>
+#include "srm.h"
+
 extern "C" {
 #include "pt.h"
 }
@@ -93,19 +96,43 @@ error_cb(const char *msg, void *context)
     state->errors.append(QString(msg));
 }
 
-RawFile *RawFile::readFile(const QFile &file, QStringList &errors)
+RawFile *RawFile::readFile(QFile &file, QStringList &errors)
 {
     RawFile *result = new RawFile(file.fileName());
-    if (!result->file.open(QIODevice::ReadOnly)) {
-        delete result;
-        return NULL;
+    if (file.fileName().indexOf(".srm") == file.fileName().size() - 4) {
+        SrmData data;
+        if (!readSrmFile(file, data, errors)) {
+            delete result;
+            return NULL;
+        }
+        result->startTime = data.startTime;
+        result->rec_int = (unsigned) round(data.recint); // TODO
+
+        QListIterator<SrmDataPoint*> i(data.dataPoints);
+        while (i.hasNext()) {
+            SrmDataPoint *p1 = i.next();
+            RawFilePoint *p2 = new RawFilePoint(
+                p1->secs, 0, p1->kph * 0.62137119, p1->watts,
+                p1->km * 0.62137119, p1->cad, p1->hr, p1->interval);
+            if (result->powerHist.contains(p2->watts))
+                result->powerHist[p2->watts] += data.recint;
+            else
+                result->powerHist[p2->watts] = data.recint;
+            result->points.append(p2);
+        }
     }
-    FILE *f = fdopen(result->file.handle(), "r");
-    assert(f);
-    RawFileReadState state(result->points, result->powerHist, errors);
-    pt_read_raw(f, 0 /* not compat */, &state, config_cb, 
-                time_cb, data_cb, error_cb);
-    result->rec_int = state.rec_int;
+    else {
+        if (!result->file.open(QIODevice::ReadOnly)) {
+            delete result;
+            return NULL;
+        }
+        FILE *f = fdopen(result->file.handle(), "r");
+        assert(f);
+        RawFileReadState state(result->points, result->powerHist, errors);
+        pt_read_raw(f, 0 /* not compat */, &state, config_cb, 
+                    time_cb, data_cb, error_cb);
+        result->rec_int = state.rec_int;
+    }
     return result;
 }
 
