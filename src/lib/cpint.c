@@ -241,7 +241,7 @@ free_cpi_file_info(struct cpi_file_info *head)
     }
 }
 
-static void 
+static int 
 read_one(const char *inname, double *bests[], int *bestlen)
 {
     FILE *in;
@@ -252,8 +252,8 @@ read_one(const char *inname, double *bests[], int *bestlen)
     double *tmp;
     int interval;
 
-    in = fopen(inname, "r");
-    assert(in);
+    if (!(in = fopen(inname, "r")))
+        return -1;
     lineno = 1;
     while (fgets(line, sizeof(line), in) != NULL) {
         if (sscanf(line, "%lf %d\n", &mins, &watts) != 2) {
@@ -275,22 +275,24 @@ read_one(const char *inname, double *bests[], int *bestlen)
         ++lineno;
     }
     fclose(in);
+    return 0;
 }
 
-void
+int
 read_cpi_file(const char *dir, const char *raw, double *bests[], int *bestlen)
 {
     char *inname;
+    int result;
 
     *bestlen = 1000;
     *bests = calloc(*bestlen, sizeof(double));
     inname = malloc(strlen(dir) + 25);
     sprintf(inname, "%s/%s", dir, raw);
     strcpy(inname + strlen(inname) - 4, ".cpi");
-    read_one(inname, bests, bestlen);
+    result = read_one(inname, bests, bestlen);
     free(inname);
+    return result;
 }
-
 
 void
 combine_cpi_files(const char *dir, double *bests[], int *bestlen)

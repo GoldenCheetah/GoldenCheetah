@@ -255,6 +255,8 @@ MainWindow::MainWindow(const QDir &home) :
                         SLOT(downloadRide()), tr("Ctrl+D")); 
     rideMenu->addAction(tr("&Export to CSV..."), this, 
                         SLOT(exportCSV()), tr("Ctrl+E")); 
+    rideMenu->addAction(tr("&Import from SRM..."), this, 
+                        SLOT(importSRM()), tr("Ctrl+I")); 
 
     if (last != NULL)
         treeWidget->setCurrentItem(last);
@@ -264,9 +266,11 @@ void
 MainWindow::addRide(QString name) 
 {
     QRegExp rx(rideFileRegExp);
-    if (!rx.exactMatch(name))
+    if (!rx.exactMatch(name)) {
+        fprintf(stderr, "bad name: %s\n", name.toAscii().constData());
         assert(false);
-    assert(rx.numCaptures() == 6);
+    }
+    assert(rx.numCaptures() == 7);
     QDate date(rx.cap(1).toInt(), rx.cap(2).toInt(),rx.cap(3).toInt()); 
     QTime time(rx.cap(4).toInt(), rx.cap(5).toInt(),rx.cap(6).toInt()); 
     QDateTime dt(date, time);
@@ -365,6 +369,52 @@ MainWindow::exportCSV()
     }
 
     file.close();
+}
+
+void
+MainWindow::importSRM()
+{
+    QString fileName = QFileDialog::getOpenFileName(
+        this, tr("Import SRM"), QDir::homePath(),
+        tr("SRM Binary Format (*.srm)"));
+    if (fileName.length() == 0)
+        return;
+
+    QFile file(fileName);
+    QStringList errors;
+    RawFile *raw = RawFile::readFile(file, errors);
+    if (!raw || !errors.empty()) {
+        QString all = (raw 
+            ? tr("Non-fatal problem(s) opening %1:")
+            : tr("Fatal problem(s) opening %1:")).arg(fileName);
+        QStringListIterator i(errors);
+        while (i.hasNext())
+            all += "\n" + i.next();
+        if (raw)
+            QMessageBox::warning(this, tr("Open Warning"), all);
+        else {
+            QMessageBox::critical(this, tr("Open Error"), all);
+            return;
+        }
+    }
+
+    QChar zero = QLatin1Char('0'); 
+    QString name = QString("%1_%2_%3_%4_%5_%6.srm")
+        .arg(raw->startTime.date().year(), 4, 10, zero)
+        .arg(raw->startTime.date().month(), 2, 10, zero)
+        .arg(raw->startTime.date().day(), 2, 10, zero)
+        .arg(raw->startTime.time().hour(), 2, 10, zero)
+        .arg(raw->startTime.time().minute(), 2, 10, zero)
+        .arg(raw->startTime.time().second(), 2, 10, zero);
+
+    if (!file.copy(home.absolutePath() + "/" + name)) {
+        QMessageBox::critical(this, tr("Copy Error"), 
+                              tr("Couldn't copy %1").arg(fileName));
+        return;
+    }
+
+    delete raw;
+    addRide(name);
 }
 
 void 

@@ -137,26 +137,28 @@ CpintPlot::calculate(QString fileName, QDateTime dateTime)
 
     if (!needToScanRides) {
         delete thisCurve;
+        thisCurve = NULL;
         int i;
         double *bests;
         int bestlen;
-        read_cpi_file(dir, file, &bests, &bestlen);
-        double *timeArray = new double[bestlen];
-        int maxNonZero = 0;
-        for (i = 0; i < bestlen; ++i) {
-            timeArray[i] = i * 0.021;
-            if (bests[i] > 0) maxNonZero = i;
+        if (read_cpi_file(dir, file, &bests, &bestlen) == 0) {
+            double *timeArray = new double[bestlen];
+            int maxNonZero = 0;
+            for (i = 0; i < bestlen; ++i) {
+                timeArray[i] = i * 0.021;
+                if (bests[i] > 0) maxNonZero = i;
+            }
+            if (maxNonZero > 1) {
+                thisCurve = new QwtPlotCurve(
+                    dateTime.toString("ddd MMM d, yyyy h:mm AP"));
+                thisCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+                thisCurve->setPen(QPen(Qt::green));
+                thisCurve->attach(this);
+                thisCurve->setData(timeArray + 1, bests + 1, maxNonZero - 1);
+            }
+            delete [] timeArray;
+            free(bests);
         }
-        if (maxNonZero > 1) {
-            thisCurve = new QwtPlotCurve(
-                dateTime.toString("ddd MMM d, yyyy h:mm AP"));
-            thisCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-            thisCurve->setPen(QPen(Qt::green));
-            thisCurve->attach(this);
-            thisCurve->setData(timeArray + 1, bests + 1, maxNonZero - 1);
-        }
-        delete [] timeArray;
-        free(bests);
     }
  
     replot();

@@ -48,6 +48,7 @@ class MainWindow : public QMainWindow
         void openCyclist();
         void downloadRide();
         void exportCSV();
+        void importSRM();
         void setSmoothingFromSlider();
         void setSmoothingFromLineEdit();
         void setBinWidthFromSlider();

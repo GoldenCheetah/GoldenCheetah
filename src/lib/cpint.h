@@ -37,8 +37,8 @@ extern void update_cpi_file(struct cpi_file_info *info,
 
 extern void free_cpi_file_info(struct cpi_file_info *head);
 
-extern void read_cpi_file(const char *dir, const char *raw, 
-                          double *bests[], int *bestlen);
+extern int read_cpi_file(const char *dir, const char *raw, 
+                         double *bests[], int *bestlen);
 
 extern void combine_cpi_files(const char *dir, double *bests[], int *bestlen);
 
