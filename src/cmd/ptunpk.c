@@ -154,10 +154,14 @@ main(int argc, char *argv[])
             strcpy(outname, inname);
             for (i = strlen(outname); i >= 0; --i)
                 if (outname[i] == '.') break;
-            if (i >= 0)
-                strcpy(outname + i + 1, "dat");
-            else
-                strcpy(outname + strlen(outname), ".dat");
+            if (i >= 0) {
+                strcpy(outname + i + 1, 
+                       csv_output ? "csv" : "dat");
+            }
+            else {
+                strcpy(outname + strlen(outname), 
+                       csv_output ? ".csv" : ".dat");
+            }
         }
     }
 
