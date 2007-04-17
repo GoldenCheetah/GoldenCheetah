@@ -18,13 +18,13 @@
 # Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-SUBDIRS=lib cmd gui # order is important!
+SUBDIRS=lib cmd srm gui # order is important!
 
-all: gui-makefile subdirs 
-.PHONY: all gui-makefile subdirs clean
+all: qmakefiles subdirs 
+.PHONY: all qmakefiles subdirs clean
 
-gui-makefile:
-	cd gui; qmake GoldenCheetah.pro
+qmakefiles:
+	@for dir in $(SUBDIRS); do cd $$dir; if test -f *.pro; then qmake; fi; cd ..; done
 
 clean:
 	@for dir in $(SUBDIRS); do $(MAKE) -wC $$dir clean; done
