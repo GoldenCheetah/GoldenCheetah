@@ -7,7 +7,7 @@ TARGET =
 DEPENDPATH += .
 INCLUDEPATH += .
 
-CONFIG += static
+CONFIG += static debug
 LIBS += -lm
 
 # Input
