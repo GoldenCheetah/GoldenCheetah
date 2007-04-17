@@ -21,9 +21,9 @@
 CC=gcc
 CFLAGS=-g -W -Wall -Werror -ansi -pedantic -std=c99
 CMDS=ptdl ptpk ptunpk cpint
-LIBS=../lib/libgc.a
-LIBRARIES=-lm
-INCLUDES=-I../lib
+LIBS=../lib/libgc.a ../cpint/libcpint.a
+LIBRARIES=-lm -lQtCore
+INCLUDES=-I../lib -I../cpint
 
 all: $(CMDS)
 .PHONY: all clean
@@ -35,7 +35,7 @@ clean:
 	$(CC) -c $(CFLAGS) $(INCLUDES) $< 
 
 cpint: cpint.o $(LIBS)
-	$(CXX) -o $@ $^ $(LIBRARIES)
+	$(CXX) -o $@ $^ $(LIBS) $(LIBRARIES)
 
 ptdl: ptdl.o $(LIBS)
 	$(CC) -o $@ $^ $(LIBRARIES)
