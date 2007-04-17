@@ -21,6 +21,10 @@
 #ifndef __pt_h
 #define __pt_h 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
@@ -95,6 +99,10 @@ extern void pt_read_dat(FILE *in,
                         void (*record_cb)(double, double, double, int, 
                                           double, int, int, int, void*),
                         void *user_data);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /* __pt_h */
 

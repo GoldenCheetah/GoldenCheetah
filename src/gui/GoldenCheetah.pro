@@ -5,10 +5,10 @@
 TEMPLATE = app
 TARGET += 
 DEPENDPATH += .
-INCLUDEPATH += /home/srhea/src/qwt-5.0.1/src ../lib ../srm
+INCLUDEPATH += /home/srhea/src/qwt-5.0.1/src ../lib ../srm ../cpint
 CONFIG += static debug
-LIBS += /home/srhea/src/qwt-5.0.1/lib/libqwt.a ../lib/libgc.a
-LIBS += ../srm/libsrm.a
+LIBS += /home/srhea/src/qwt-5.0.1/lib/libqwt.a 
+LIBS += ../lib/libgc.a ../cpint/libcpint.a ../srm/libsrm.a
 LIBS += -lm -lz
 macx {
     LIBS += -framework Carbon

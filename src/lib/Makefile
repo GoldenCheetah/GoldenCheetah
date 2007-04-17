@@ -28,7 +28,7 @@ all: libgc.a
 clean:
 	rm -f *.o libgc.a
 
-libgc.a: pt.o cpint.o
+libgc.a: pt.o # cpint.o
 	rm -f $@
 	ar q $@ $^
 

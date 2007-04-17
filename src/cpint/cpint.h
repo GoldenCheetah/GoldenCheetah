@@ -23,6 +23,10 @@
 
 #include <regex.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct cpi_file_info {
     char *file, *inname, *outname;
     regmatch_t *pmatch;
@@ -41,6 +45,10 @@ extern int read_cpi_file(const char *dir, const char *raw,
                          double *bests[], int *bestlen);
 
 extern void combine_cpi_files(const char *dir, double *bests[], int *bestlen);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /* __cpint_h */
 
