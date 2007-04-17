@@ -42,22 +42,22 @@ AllPlot::AllPlot() :
     setAxisTitle(xBottom, "Time (minutes)");
     
     wattsCurve = new QwtPlotCurve("Power");
-    wattsCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    // wattsCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     wattsCurve->setPen(QPen(Qt::red));
     wattsCurve->attach(this);
 
     hrCurve = new QwtPlotCurve("Heart Rate");
-    hrCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    // hrCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     hrCurve->setPen(QPen(Qt::blue));
     hrCurve->attach(this);
 
     speedCurve = new QwtPlotCurve("Speed");
-    speedCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    // speedCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     speedCurve->setPen(QPen(Qt::green));
     speedCurve->attach(this);
 
     cadCurve = new QwtPlotCurve("Cadence");
-    cadCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    // cadCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     cadCurve->setPen(QPen(Qt::cyan));
     cadCurve->attach(this);
 
