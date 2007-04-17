@@ -71,19 +71,19 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
     data.recint = ((double) recint1) / recint2;
     unsigned recintms = (unsigned) round(data.recint * 1000.0);
 
-    printf("magic=%s\n", magic);
-    printf("wheelcirc=%d\n", wheelcirc);
-    printf("dayssince1880=%d\n", dayssince1880);
-    printf("recint=%f sec\n", data.recint);
-    printf("blockcnt=%d\n", blockcnt);
-    printf("markercnt=%d\n", markercnt);
-    printf("commentlen=%d\n", commentlen);
-    printf("comment=%s\n", comment);
+    // printf("magic=%s\n", magic);
+    // printf("wheelcirc=%d\n", wheelcirc);
+    // printf("dayssince1880=%d\n", dayssince1880);
+    // printf("recint=%f sec\n", data.recint);
+    // printf("blockcnt=%d\n", blockcnt);
+    // printf("markercnt=%d\n", markercnt);
+    // printf("commentlen=%d\n", commentlen);
+    // printf("comment=%s\n", comment);
 
     QDate date(1880, 1, 1);
     date = date.addDays(dayssince1880);
 
-    printf("date=%s\n", date.toString().toAscii().constData());
+    // printf("date=%s\n", date.toString().toAscii().constData());
 
     marker *markers = new marker[markercnt + 1];
     for (int i = 0; i <= markercnt; ++i) {
@@ -102,16 +102,16 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
         markers[i].start = start;
         markers[i].end = end;
 
-        printf("marker %d:\n", i);
-        printf("  mcomment=%s\n", mcomment);
-        printf("  active=%d\n", active);
-        printf("  start=%d\n", start);
-        printf("  end=%d\n", end);
-        printf("  avgwatts=%0.1f\n", avgwatts / 8.0);
-        printf("  avghr=%0.1f\n", avghr / 64.0);
-        printf("  avgcad=%0.1f\n", avgcad / 32.0);
-        printf("  avgspeed=%0.1f km/h\n", avgspeed / 2500.0 * 9.0);
-        printf("  pwc150=%d\n", pwc150);
+        // printf("marker %d:\n", i);
+        // printf("  mcomment=%s\n", mcomment);
+        // printf("  active=%d\n", active);
+        // printf("  start=%d\n", start);
+        // printf("  end=%d\n", end);
+        // printf("  avgwatts=%0.1f\n", avgwatts / 8.0);
+        // printf("  avghr=%0.1f\n", avghr / 64.0);
+        // printf("  avgcad=%0.1f\n", avgcad / 32.0);
+        // printf("  avgspeed=%0.1f km/h\n", avgspeed / 2500.0 * 9.0);
+        // printf("  pwc150=%d\n", pwc150);
     }
 
     blockhdr *blockhdrs = new blockhdr[blockcnt];
@@ -120,10 +120,10 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
         blockhdrs[i].chunkcnt = readShort(in);
         blockhdrs[i].dt = QDateTime(date);
         blockhdrs[i].dt = blockhdrs[i].dt.addMSecs(hsecsincemidn * 10);
-        printf("block %d:\n", i);
-        printf("  start=%s\n", 
-               blockhdrs[i].dt.toString().toAscii().constData());
-        printf("  chunkcnt=%d\n", blockhdrs[i].chunkcnt);
+        // printf("block %d:\n", i);
+        // printf("  start=%s\n", 
+        //        blockhdrs[i].dt.toString().toAscii().constData());
+        // printf("  chunkcnt=%d\n", blockhdrs[i].chunkcnt);
     }
 
     quint16 zero = readShort(in);
@@ -131,9 +131,9 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
     quint16 datacnt = readShort(in);
     readByte(in); // padding
 
-    printf("zero=%d\n", zero);
-    printf("slope=%d\n", slope);
-    printf("datacnt=%d\n", datacnt);
+    // printf("zero=%d\n", zero);
+    // printf("slope=%d\n", slope);
+    // printf("datacnt=%d\n", datacnt);
 
     assert(blockcnt > 0);
 
@@ -153,8 +153,8 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
         unsigned watts = (ps[1] & 0x0f) | (ps[2] << 0x4);
         if (i == 0) {
             data.startTime = blockhdrs[blknum].dt;
-            printf("startTime=%s\n", 
-                   data.startTime.toString().toAscii().constData());
+            // printf("startTime=%s\n", 
+            //        data.startTime.toString().toAscii().constData());
         }
         if (i == markers[mrknum].end) {
             ++interval;
@@ -176,8 +176,8 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
         point->secs = secs;
         data.dataPoints.append(point);
 
-        printf("%5.1f %5.1f %5.1f %4d %3d %3d %2d\n", 
-               secs, km, kph, watts, hr, cad, interval);
+        // printf("%5.1f %5.1f %5.1f %4d %3d %3d %2d\n", 
+        //        secs, km, kph, watts, hr, cad, interval);
 
         ++blkidx;
         if ((blkidx == blockhdrs[blknum].chunkcnt) && (blknum + 1 < blockcnt)) {
