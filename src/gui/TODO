@@ -1,4 +1,16 @@
 
+
+ - Sort ride into tree list, don't just append
+ - For cpint, calculate a value for every whole second, using the same or next
+   largest actual time value from the actual data.  That way, SRM and PT
+   values will align
+ - Pop up an "importing rides" thermometer when importing
+
+
+
+
+
+
  - Remember last settings for showPower, showHr, etc.
  - Add interval summary to ride summary
  - Switch x-axis from minutes to miles
