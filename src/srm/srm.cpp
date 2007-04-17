@@ -102,6 +102,14 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
         markers[i].start = start;
         markers[i].end = end;
 
+        (void) active;
+        (void) avgwatts;
+        (void) avghr;
+        (void) avgcad;
+        (void) avgspeed;
+        (void) pwc150;
+        (void) wheelcirc;
+
         // printf("marker %d:\n", i);
         // printf("  mcomment=%s\n", mcomment);
         // printf("  active=%d\n", active);
@@ -130,6 +138,9 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
     quint16 slope = readShort(in);
     quint16 datacnt = readShort(in);
     readByte(in); // padding
+
+    (void) zero;
+    (void) slope;
 
     // printf("zero=%d\n", zero);
     // printf("slope=%d\n", slope);
@@ -161,7 +172,7 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
             ++mrknum;
         }
 
-        if ((i > 0) && (i == markers[mrknum].start))
+        if ((i > 0) && (i == markers[mrknum].start - 1)) // markers count from 1
             ++interval;
 
         km += data.recint * kph / 3600.0;
