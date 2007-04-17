@@ -5,9 +5,9 @@
 TEMPLATE = app
 TARGET += 
 DEPENDPATH += .
-INCLUDEPATH += /home/srhea/src/qwt-20060130/include ../lib ../srm
+INCLUDEPATH += /home/srhea/src/qwt-5.0.1/src ../lib ../srm
 CONFIG += static debug
-LIBS += /home/srhea/src/qwt-20060130/lib/libqwt.a ../lib/libgc.a
+LIBS += /home/srhea/src/qwt-5.0.1/lib/libqwt.a ../lib/libgc.a
 LIBS += ../srm/libsrm.a
 LIBS += -lm -lz
 macx {
