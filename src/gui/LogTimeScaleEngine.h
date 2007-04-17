@@ -41,7 +41,7 @@ class LogTimeScaleEngine : public QwtScaleEngine
                                         int numMajorSteps, int numMinorSteps,
                                         double stepSize = 0.0) const;
 
-        virtual QwtScaleTransformation transformation() const;
+        virtual QwtScaleTransformation *transformation() const;
 
     protected:
         QwtDoubleInterval log10(const QwtDoubleInterval&) const;
@@ -53,13 +53,13 @@ class LogTimeScaleEngine : public QwtScaleEngine
 
         void buildTicks(
             const QwtDoubleInterval &, double stepSize, int maxMinSteps,
-            QwtTickList ticks[QwtScaleDiv::NTickTypes]) const;
+            QwtValueList ticks[QwtScaleDiv::NTickTypes]) const;
 
-        QwtTickList buildMinorTicks(
-            const QwtTickList& majorTicks,
+        QwtValueList buildMinorTicks(
+            const QwtValueList& majorTicks,
             int maxMinMark, double step) const;
 
-        QwtTickList buildMajorTicks(
+        QwtValueList buildMajorTicks(
             const QwtDoubleInterval &interval, double stepSize) const;
 };
 

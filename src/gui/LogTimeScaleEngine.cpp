@@ -34,10 +34,10 @@
 /*!
   Return a transformation, for logarithmic (base 10) scales
 */
-QwtScaleTransformation LogTimeScaleEngine::transformation() const
+QwtScaleTransformation *LogTimeScaleEngine::transformation() const
 {
-    return QwtScaleTransformation(QwtScaleTransformation::log10XForm, 
-        QwtScaleTransformation::log10InvXForm);
+    return new QwtScaleTransformation(QwtScaleTransformation::Log10);
+    //, log10XForm, QwtScaleTransformation::log10InvXForm);
 }
 
 /*!
@@ -73,7 +73,7 @@ void LogTimeScaleEngine::autoScale(int maxNumSteps,
     if (testAttribute(QwtScaleEngine::IncludeReference))
         interval = interval.extend(logRef);
 
-    interval = interval.limit(LOG_MIN, LOG_MAX);
+    interval = interval.limited(LOG_MIN, LOG_MAX);
 
     if (interval.width() == 0.0)
         interval = buildInterval(interval.minValue());
@@ -111,7 +111,7 @@ QwtScaleDiv LogTimeScaleEngine::divideScale(double x1, double x2,
     int maxMajSteps, int maxMinSteps, double stepSize) const
 {
     QwtDoubleInterval interval = QwtDoubleInterval(x1, x2).normalized();
-    interval = interval.limit(LOG_MIN, LOG_MAX);
+    interval = interval.limited(LOG_MIN, LOG_MAX);
 
     if (interval.width() <= 0 )
         return QwtScaleDiv();
@@ -143,7 +143,7 @@ QwtScaleDiv LogTimeScaleEngine::divideScale(double x1, double x2,
     QwtScaleDiv scaleDiv;
     if ( stepSize != 0.0 )
     {
-        QwtTickList ticks[QwtScaleDiv::NTickTypes];
+        QwtValueList ticks[QwtScaleDiv::NTickTypes];
         buildTicks(interval, stepSize, maxMinSteps, ticks);
 
         scaleDiv = QwtScaleDiv(interval, ticks);
@@ -157,7 +157,7 @@ QwtScaleDiv LogTimeScaleEngine::divideScale(double x1, double x2,
 
 void LogTimeScaleEngine::buildTicks(
     const QwtDoubleInterval& interval, double stepSize, int maxMinSteps,
-    QwtTickList ticks[QwtScaleDiv::NTickTypes]) const
+    QwtValueList ticks[QwtScaleDiv::NTickTypes]) const
 {
     const QwtDoubleInterval boundingInterval =
         align(interval, stepSize);
@@ -199,10 +199,10 @@ tick_info_t tick_info[] = {
     {      -1.0,    NULL }
 };
 
-QwtTickList LogTimeScaleEngine::buildMajorTicks(
+QwtValueList LogTimeScaleEngine::buildMajorTicks(
     const QwtDoubleInterval &interval, double stepSize) const
 {
-    QwtTickList ticks;
+    QwtValueList ticks;
     tick_info_t *walker = tick_info;
     while (walker->label) {
         ticks += walker->x;
@@ -211,11 +211,11 @@ QwtTickList LogTimeScaleEngine::buildMajorTicks(
     return ticks;
 }
 
-QwtTickList LogTimeScaleEngine::buildMinorTicks(
-    const QwtTickList &majorTicks, 
+QwtValueList LogTimeScaleEngine::buildMinorTicks(
+    const QwtValueList &majorTicks, 
     int maxMinSteps, double stepSize) const
 {   
-    QwtTickList minorTicks;
+    QwtValueList minorTicks;
     return minorTicks;
 }
 
