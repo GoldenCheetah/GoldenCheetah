@@ -106,7 +106,7 @@ RawFile *RawFile::readFile(QFile &file, QStringList &errors)
             return NULL;
         }
         result->startTime = data.startTime;
-        result->rec_int = (unsigned) round(data.recint); // TODO
+        result->rec_int_ms = (unsigned) round(data.recint * 1000.0);
 
         QListIterator<SrmDataPoint*> i(data.dataPoints);
         while (i.hasNext()) {
@@ -131,7 +131,7 @@ RawFile *RawFile::readFile(QFile &file, QStringList &errors)
         RawFileReadState state(result->points, result->powerHist, errors);
         pt_read_raw(f, 0 /* not compat */, &state, config_cb, 
                     time_cb, data_cb, error_cb);
-        result->rec_int = state.rec_int;
+        result->rec_int_ms = (unsigned) round(state.rec_int * 1.26 * 1000.0);
     }
     return result;
 }
