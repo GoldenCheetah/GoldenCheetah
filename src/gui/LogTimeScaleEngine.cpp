@@ -202,6 +202,8 @@ tick_info_t tick_info[] = {
 QwtValueList LogTimeScaleEngine::buildMajorTicks(
     const QwtDoubleInterval &interval, double stepSize) const
 {
+    (void) interval;
+    (void) stepSize;
     QwtValueList ticks;
     tick_info_t *walker = tick_info;
     while (walker->label) {
@@ -215,6 +217,9 @@ QwtValueList LogTimeScaleEngine::buildMinorTicks(
     const QwtValueList &majorTicks, 
     int maxMinSteps, double stepSize) const
 {   
+    (void) majorTicks;
+    (void) maxMinSteps;
+    (void) stepSize;
     QwtValueList minorTicks;
     return minorTicks;
 }
