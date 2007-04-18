@@ -133,7 +133,6 @@ RideItem::htmlSummary()
         double total_hr = 0.0;
         double secs_cad = 0.0;
         double total_cad = 0.0;
-        double last_secs = 0.0;
 
         QString intervals = "";
         unsigned last_interval = UINT_MAX;
@@ -167,7 +166,7 @@ RideItem::htmlSummary()
                 mile_start = point->miles;
             }
 
-            double secs_delta = point->secs - last_secs;
+            double secs_delta = raw->rec_int_ms / 1000.0;
             if ((point->mph > 0.0) || (point->cad > 0.0))
                 secs_moving_or_pedaling += secs_delta;
             if (point->mph > 0.0)
@@ -195,7 +194,6 @@ RideItem::htmlSummary()
                 int_mph_cnt += 1;
             }
 
-            last_secs = point->secs;
             mile_end = point->miles;
             time_end = point->secs;
         }

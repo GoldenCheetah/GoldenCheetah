@@ -50,7 +50,7 @@ class RawFile
     public:
 
         QDateTime startTime;
-        int rec_int;
+        int rec_int_ms;
         QList<RawFilePoint*> points;
         QMap<double,double> powerHist;
         static RawFile *readFile(QFile &file, QStringList &errors);
