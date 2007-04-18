@@ -201,16 +201,16 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
                 ((qint64) end.toTime_t()) * 1000 + end.time().msec();
             qint64 startms = 
                 ((qint64) start.toTime_t()) * 1000 + start.time().msec();
-            qint64 diff = startms - endms;
-            if (diff < 0) {
-                errorStrings << QString("ERROR: time goes backwards by %1 ms"
+            double diff_secs = (startms - endms) / 1000.0;
+            if (diff_secs < data.recint) {
+                errorStrings << QString("ERROR: time goes backwards by %1 s"
                                         " on trans " "to block %2"
-                                        ).arg(diff).arg(blknum);
+                                        ).arg(diff_secs).arg(blknum);
                 secs += data.recint; // for lack of a better option
             }
             else {
                 // printf("jumping forward %lld ms\n", diff);
-                secs += diff / 1000.0;
+                secs += diff_secs;
             }
         }
         else {
