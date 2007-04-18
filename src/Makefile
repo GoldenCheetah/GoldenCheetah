@@ -18,7 +18,7 @@
 # Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-SUBDIRS=lib cmd srm gui # order is important!
+SUBDIRS=lib cpint cmd srm gui # order is important!
 
 all: qmakefiles subdirs 
 .PHONY: all qmakefiles subdirs clean
