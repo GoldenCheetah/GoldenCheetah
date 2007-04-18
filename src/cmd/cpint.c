@@ -65,7 +65,7 @@ main(int argc, char *argv[])
     combine_cpi_files(dir, &bests, &bestlen);
     for (i = 0; i < bestlen; ++i) {
         if (bests[i] != 0)
-            printf("%6.3f %3.0f\n", i * 0.021, round(bests[i]));
+            printf("%6.3f %3.0f\n", i / 60.0, round(bests[i]));
     }
     return 0;
 }

@@ -44,16 +44,6 @@ struct cpint_data {
     cpint_data() : start_since_epoch(0), last_secs(0.0), rec_int_ms(0) {}
 };
 
-static int
-secs_to_interval(double secs, int rec_int_ms)
-{
-    if (rec_int_ms == 0) {
-        fprintf(stderr, "Missing recording interval.\n");
-        exit(1);
-    }
-    return (int) round(secs * 1000.0 / rec_int_ms);
-}
-
 static void 
 config_cb(unsigned interval, unsigned rec_int, 
           unsigned wheel_sz_mm, void *context) 
@@ -164,53 +154,49 @@ update_cpi_file(cpi_file_info *info,
                 int (*cancel_cb)(void *user_data),
                 void *user_data) 
 {
-    FILE *in, *out;
-    int canceled = 0;
-    double start_secs, prev_secs, dur_secs, avg, sum;
-    int dur_ints, total_intervals;
-    double *bests;
-    int progress_count = 0;
-
-    in = fopen(info->inname, "r");
+    FILE *in = fopen(info->inname, "r");
     assert(in);
-    out = fopen(info->outname, "w");
+    FILE *out = fopen(info->outname, "w");
     assert(out);
 
     cpint_data data;
     pt_read_raw(in, 0 /* not compat */, &data, 
                 &config_cb, &time_cb, &data_cb, &error_cb);
 
-    total_intervals = 
-        secs_to_interval(data.points.back().secs, data.rec_int_ms);
-    bests = (double*) calloc(total_intervals + 1, sizeof(double));
+    int total_secs = (int) ceil(data.points.back().secs);
+    double *bests = (double*) calloc(total_secs + 1, sizeof(double));
 
-    start_secs = prev_secs = 0.0;
-    for (int i = 0; i < data.points.size(); ++i) {
+    bool canceled = false;
+    int progress_count = 0;
+    for (int i = 0; i < data.points.size() - 1; ++i) {
         cpint_point *p = &data.points[i];
-        for (int j = i; j < data.points.size(); ++j) {
-            sum = 0.0;
+        double sum = 0.0;
+        double prev_secs = p->secs;
+        for (int j = i + 1; j < data.points.size(); ++j) {
             cpint_point *q = &data.points[j];
             if (cancel_cb && (++progress_count % 1000 == 0)) {
                 if (cancel_cb(user_data)) {
-                    canceled = 1;
+                    canceled = true;
                     goto done;
                 }
             }
             sum += (q->secs - prev_secs) * q->watts;
-            dur_secs = q->secs - start_secs;
-            dur_ints = secs_to_interval(dur_secs, data.rec_int_ms);
-            avg = sum / dur_secs;
-            if (bests[dur_ints] < avg)
-                bests[dur_ints] = avg;
+            double dur_secs = q->secs - p->secs;
+            double avg = sum / dur_secs;
+            int dur_secs_top = (int) floor(dur_secs);
+            int dur_secs_bot = 
+                qMax((int) floor(dur_secs - data.rec_int_ms / 1000.0), 0);
+            for (int k = dur_secs_top; k > dur_secs_bot; --k) {
+                if (bests[k] < avg)
+                    bests[k] = avg;
+            }
             prev_secs = q->secs;
         } 
-        start_secs = prev_secs = p->secs;
     }
 
-    for (int i = 0; i <= total_intervals; ++i) {
+    for (int i = 1; i <= total_secs; ++i) {
         if (bests[i] != 0)
-            fprintf(out, "%6.3f %3.0f\n", i * data.rec_int_ms / 1000.0 / 60.0, 
-                   round(bests[i]));
+            fprintf(out, "%6.3f %3.0f\n", i / 60.0, round(bests[i]));
     }
 
 done:
@@ -242,7 +228,6 @@ read_one(const char *inname, double *bests[], int *bestlen)
     if (!in)
         return -1;
     int lineno = 1;
-    int rec_int_ms = 0;
     char line[40];
     while (fgets(line, sizeof(line), in) != NULL) {
         double mins;
@@ -251,18 +236,16 @@ read_one(const char *inname, double *bests[], int *bestlen)
             fprintf(stderr, "Bad match on line %d: %s", lineno, line);
             exit(1);
         }
-        if (rec_int_ms == 0)
-            rec_int_ms = (int) round(mins * 60.0 * 1000.0);
-        int interval = secs_to_interval(mins * 60.0, rec_int_ms);
-        while (interval >= *bestlen) {
+        int secs = (int) round(mins * 60.0);
+        while (secs >= *bestlen) {
             double *tmp = (double*) calloc(*bestlen * 2, sizeof(double));
             memcpy(tmp, *bests, *bestlen * sizeof(double));
             free(*bests);
             *bests = tmp;
             *bestlen *= 2;
         }
-        if ((*bests)[interval] < watts)
-            (*bests)[interval] = watts;
+        if ((*bests)[secs] < watts)
+            (*bests)[secs] = watts;
         ++lineno;
     }
     fclose(in);

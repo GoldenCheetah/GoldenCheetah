@@ -42,7 +42,7 @@ CpintPlot::CpintPlot(QString p) :
     setAxisTitle(xBottom, "Interval Length");
     setAxisScaleDraw(xBottom, new LogTimeScaleDraw);
     setAxisScaleEngine(xBottom, new LogTimeScaleEngine);
-    setAxisScale(xBottom, 0.021, 60);
+    setAxisScale(xBottom, 1.0 / 60.0, 60);
 
     allCurve = new QwtPlotCurve("All Rides");
     allCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -119,12 +119,12 @@ CpintPlot::calculate(QString fileName, QDateTime dateTime)
             double *timeArray = new double[bestlen];
             int maxNonZero = 0;
             for (i = 0; i < bestlen; ++i) {
-                timeArray[i] = i * 0.021;
+                timeArray[i] = i / 60.0;
                 if (bests[i] > 0) maxNonZero = i;
             }
             if (maxNonZero > 1) {
                 allCurve->setData(timeArray + 1, bests + 1, maxNonZero - 1);
-                setAxisScale(xBottom, 0.021, maxNonZero * 0.021);
+                setAxisScale(xBottom, 1.0 / 60.0, maxNonZero / 60.0);
             }
             delete [] timeArray;
             free(bests);
@@ -145,7 +145,7 @@ CpintPlot::calculate(QString fileName, QDateTime dateTime)
             double *timeArray = new double[bestlen];
             int maxNonZero = 0;
             for (i = 0; i < bestlen; ++i) {
-                timeArray[i] = i * 0.021;
+                timeArray[i] = i / 60.0;
                 if (bests[i] > 0) maxNonZero = i;
             }
             if (maxNonZero > 1) {
