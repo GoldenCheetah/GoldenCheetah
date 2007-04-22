@@ -21,7 +21,7 @@
 CC=gcc
 CFLAGS=-g -W -Wall -Werror -ansi -pedantic -std=c99
 CMDS=ptdl ptpk ptunpk cpint
-LIBS=../lib/libgc.a ../cpint/libcpint.a
+LIBS=../lib/libgc.a ../cpint/libcpint.a ../srm/libsrm.a
 LIBRARIES=-lm -lQtCore
 INCLUDES=-I../lib -I../cpint
 

@@ -39,9 +39,8 @@ struct cpint_point
 struct cpint_data {
     QList<cpint_point> points;
     time_t start_since_epoch;
-    double last_secs;
     int rec_int_ms;
-    cpint_data() : start_since_epoch(0), last_secs(0.0), rec_int_ms(0) {}
+    cpint_data() : start_since_epoch(0), rec_int_ms(0) {}
 };
 
 static void 
@@ -66,7 +65,6 @@ time_cb(struct tm *time, time_t since_epoch, void *context)
     double secs = since_epoch - data->start_since_epoch;
     /* Be conservative: a sleep interval counts as all zeros. */
     data->points.append(cpint_point(secs, 0));
-    data->last_secs = secs;
 }
 
 static void
@@ -82,7 +80,6 @@ data_cb(double secs, double nm, double mph, double watts, double miles,
     /* Be conservative: count NaN's as zeros. */
     data->points.append(cpint_point(secs, ((mph == -1.0) ? 0 
                                            : (int) round(watts)))); 
-    data->last_secs = secs;
 }
 
 static void
@@ -104,7 +101,8 @@ cpi_files_to_update(const char *dir)
     cpi_file_info *head = NULL, *tail = NULL;
 
     if (regcomp(&reg, "^([0-9][0-9][0-9][0-9])_([0-9][0-9])_([0-9][0-9])"
-                "_([0-9][0-9])_([0-9][0-9])_([0-9][0-9])\\.raw$", REG_EXTENDED))
+                "_([0-9][0-9])_([0-9][0-9])_([0-9][0-9])\\.(raw|srm)$", 
+                REG_EXTENDED))
         assert(0);
 
     dirp = opendir(dir);
@@ -154,14 +152,35 @@ update_cpi_file(cpi_file_info *info,
                 int (*cancel_cb)(void *user_data),
                 void *user_data) 
 {
-    FILE *in = fopen(info->inname, "r");
-    assert(in);
+    cpint_data data;
+
+    if (strcmp(info->inname + strlen(info->inname) - 4, ".raw") == 0) {
+        FILE *in = fopen(info->inname, "r");
+        assert(in);
+        pt_read_raw(in, 0 /* not compat */, &data, 
+                    &config_cb, &time_cb, &data_cb, &error_cb);
+        fclose(in);
+    }
+    else if (strcmp(info->inname + strlen(info->inname) - 4, ".srm") == 0) {
+        QFile infile(info->inname);
+        SrmData srmdata;
+        QStringList errorStrings;
+        if (!readSrmFile(infile, srmdata, errorStrings))
+            assert(false);
+        data.start_since_epoch = srmdata.startTime.toTime_t();
+        data.rec_int_ms = (int) round(srmdata.recint * 1000.0);
+        QListIterator<SrmDataPoint*> i(srmdata.dataPoints);
+        while (i.hasNext()) {
+            SrmDataPoint *point = i.next();
+            data.points.append(cpint_point(point->secs, point->watts));
+        }
+    }
+    else {
+        assert(false);
+    }
+
     FILE *out = fopen(info->outname, "w");
     assert(out);
-
-    cpint_data data;
-    pt_read_raw(in, 0 /* not compat */, &data, 
-                &config_cb, &time_cb, &data_cb, &error_cb);
 
     int total_secs = (int) ceil(data.points.back().secs);
     double *bests = (double*) calloc(total_secs + 1, sizeof(double));
@@ -200,7 +219,6 @@ update_cpi_file(cpi_file_info *info,
     }
 
 done:
-    fclose(in);
     fclose(out);
     if (canceled)
         unlink(info->outname);
