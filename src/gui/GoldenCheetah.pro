@@ -25,7 +25,9 @@ HEADERS += \
 	MainWindow.h \
 	PowerHist.h \
 	RawFile.h \
-	RideItem.h
+	RideItem.h \
+        Zones.h
+
 SOURCES += \
 	AllPlot.cpp \
 	ChooseCyclistDialog.cpp \
@@ -37,5 +39,6 @@ SOURCES += \
 	PowerHist.cpp \
 	RawFile.cpp \
 	RideItem.cpp \
+        Zones.cpp \
 	\
 	main.cpp
