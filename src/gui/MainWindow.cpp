@@ -87,7 +87,7 @@ MainWindow::MainWindow(const QDir &home) :
     tabWidget = new QTabWidget;
     rideSummary = new QTextEdit;
     rideSummary->setReadOnly(true);
-    tabWidget->addTab(rideSummary, "Ride Summary");
+    tabWidget->addTab(rideSummary, tr("Ride Summary"));
 
     /////////////////////////// Ride Plot Tab ///////////////////////////
 
@@ -121,15 +121,15 @@ MainWindow::MainWindow(const QDir &home) :
     QHBoxLayout *smoothLayout = new QHBoxLayout;
     QLabel *smoothLabel = new QLabel(tr("Smoothing (secs)"), window);
     smoothLineEdit = new QLineEdit(window);
-    smoothLineEdit->setFixedWidth(30);
+    smoothLineEdit->setFixedWidth(40);
     
     smoothLayout->addWidget(smoothLabel);
     smoothLayout->addWidget(smoothLineEdit);
     smoothSlider = new QSlider(Qt::Horizontal);
     smoothSlider->setTickPosition(QSlider::TicksBelow);
-    smoothSlider->setTickInterval(1);
+    smoothSlider->setTickInterval(10);
     smoothSlider->setMinimum(2);
-    smoothSlider->setMaximum(60);
+    smoothSlider->setMaximum(600);
     smoothLineEdit->setValidator(new QIntValidator(smoothSlider->minimum(),
                                                    smoothSlider->maximum(), 
                                                    smoothLineEdit));
@@ -212,6 +212,12 @@ MainWindow::MainWindow(const QDir &home) :
     window->show();
 
     tabWidget->addTab(window, "Power Histogram");
+
+    //////////////////////// Power Histogram Tab ////////////////////////
+    
+    weeklySummary = new QTextEdit;
+    weeklySummary->setReadOnly(true);
+    tabWidget->addTab(weeklySummary, tr("Weekly Summary"));
 
     ////////////////////////////// Signals ////////////////////////////// 
 
@@ -432,6 +438,55 @@ MainWindow::rideSelected()
             if (tabWidget->currentIndex() == 2)
                 cpintPlot->calculate(ride->fileName, ride->dateTime);
             powerHist->setData(ride->raw);
+
+            QDate wstart = ride->dateTime.date();
+            wstart = wstart.addDays(Qt::Monday - wstart.dayOfWeek());
+            assert(wstart.dayOfWeek() == Qt::Monday);
+            QDate wend = wstart.addDays(7);
+            double weeklySeconds = 0.0;
+            double weeklyDistance = 0.0;
+            double weeklyWork = 0.0;
+
+            for (int i = 0; i < allRides->childCount(); ++i) {
+                if (allRides->child(i)->type() == RIDE_TYPE) {
+                    RideItem *item = (RideItem*) allRides->child(i);
+                    if ((item->dateTime.date() >= wstart)
+                        && (item->dateTime.date() < wend)) {
+                        weeklySeconds += item->secsMovingOrPedaling();
+                        weeklyDistance += item->totalDistance();
+                        weeklyWork += item->totalWork();
+                    }
+                }
+            }
+
+            int minutes = ((int) round(weeklySeconds)) / 60;
+            int hours = (int) minutes / 60;
+            minutes %= 60;
+
+            const char *dateFormat = "MM/dd/yyyy";
+            weeklySummary->setHtml(tr(
+                "<center>"
+                "<h2>Week of %1 through %2</h2>"
+                "<h2>Summary</h2>"
+                "<p>"
+                "<table align=\"center\" width=\"60%\" border=0>"
+                "<tr><td>Total time riding:</td>"
+                "    <td align=\"right\">%3:%4</td></tr>"
+                "<tr><td>Total distance (miles):</td>"
+                "    <td align=\"right\">%5</td></tr>"
+                "<tr><td>Total work (kJ):</td>"
+                "    <td align=\"right\">%6</td></tr>"
+                "</table>"
+                "</center>"
+                )
+                .arg(wstart.toString(dateFormat))
+                .arg(wstart.addDays(6).toString(dateFormat))
+                .arg(hours)
+                .arg(minutes, 2, 10, QLatin1Char('0'))
+                .arg((unsigned) round(weeklyDistance))
+                .arg((unsigned) round(weeklyWork))
+                );
+
             return;
         }
     }

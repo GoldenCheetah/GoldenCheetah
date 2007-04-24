@@ -65,6 +65,7 @@ class MainWindow : public QMainWindow
         QTreeWidget *treeWidget;
         QTabWidget *tabWidget;
         QTextEdit *rideSummary;
+        QTextEdit *weeklySummary;
         AllPlot *allPlot;
         CpintPlot *cpintPlot;
         QLabel *cpintTimeLabel;
