@@ -25,17 +25,29 @@
 
 class RawFile;
 
-struct RideItem : public QTreeWidgetItem {
-    QString path;
-    QString fileName;
-    QDateTime dateTime;
-    QString summary;
-    RawFile *raw;
+class RideItem : public QTreeWidgetItem {
 
-    RideItem(QTreeWidgetItem *parent, int type, QString path, 
-             QString fileName, const QDateTime &dateTime);
+    protected:
 
-    QString htmlSummary();
+        double secs_moving_or_pedaling;
+        double total_distance;
+        double total_work;
+
+    public:
+
+        QString path;
+        QString fileName;
+        QDateTime dateTime;
+        QString summary;
+        RawFile *raw;
+
+        RideItem(QTreeWidgetItem *parent, int type, QString path, 
+                 QString fileName, const QDateTime &dateTime);
+
+        QString htmlSummary();
+        double secsMovingOrPedaling();
+        double totalDistance();
+        double totalWork();
 };
  
 #endif // _GC_RideItem_h

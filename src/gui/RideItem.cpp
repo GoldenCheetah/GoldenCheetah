@@ -62,28 +62,20 @@ static void summarize(QString &intervals,
                       unsigned last_interval,
                       double time_start, double time_end,
                       double mile_start, double mile_end,
-                      unsigned &int_watts_cnt,
                       double &int_watts_sum,
-                      unsigned &int_hr_cnt,
                       double &int_hr_sum,
-                      unsigned &int_cad_cnt,
                       double &int_cad_sum,
-                      unsigned &int_mph_cnt,
                       double &int_mph_sum) 
 {
     double dur = round(time_end - time_start);
     double len = mile_end - mile_start;
     double minutes = (int) (dur/60.0);
     double seconds = dur - (60 * minutes);
-    double watts_avg = (int_watts_cnt == 0) ? 0 
-        : (int) (int_watts_sum / int_watts_cnt);
-    double hr_avg = (int_hr_cnt == 0) ? 0 
-        : (int) (int_hr_sum / int_hr_cnt);
-    double cad_avg = (int_cad_cnt == 0) ? 0 
-        : (int) (int_cad_sum / int_cad_cnt);
-    double mph_avg = (int_mph_cnt == 0) ? 0 
-        : (int) (int_mph_sum / int_mph_cnt);
-    double energy = watts_avg / 1000.0 * dur;
+    double watts_avg = int_watts_sum / dur;
+    double hr_avg = int_hr_sum / dur;
+    double cad_avg = int_cad_sum / dur;
+    double mph_avg = int_mph_sum / dur;
+    double energy = int_watts_sum / 1000.0; // watts_avg / 1000.0 * dur;
 
     intervals += "<tr><td align=\"center\">%1</td>";
     intervals += "<td align=\"center\">%2:%3</td>";
@@ -103,10 +95,31 @@ static void summarize(QString &intervals,
     intervals = intervals.arg(cad_avg, 0, 'f', 0);
     intervals = intervals.arg(mph_avg, 0, 'f', 1);
 
-    int_watts_cnt = 0; int_watts_sum = 0.0;
-    int_hr_cnt = 0; int_hr_sum = 0.0;
-    int_cad_cnt = 0; int_cad_sum = 0.0;
-    int_mph_cnt = 0; int_mph_sum = 0.0;
+    int_watts_sum = 0.0;
+    int_hr_sum = 0.0;
+    int_cad_sum = 0.0;
+    int_mph_sum = 0.0;
+}
+
+double RideItem::secsMovingOrPedaling()
+{
+    if (summary.isEmpty())
+        htmlSummary();
+    return secs_moving_or_pedaling;
+}
+
+double RideItem::totalDistance()
+{
+    if (summary.isEmpty())
+        htmlSummary();
+    return total_distance;
+}
+
+double RideItem::totalWork()
+{
+    if (summary.isEmpty())
+        htmlSummary();
+    return total_work;
 }
 
 QString 
@@ -124,7 +137,7 @@ RideItem::htmlSummary()
             return summary;
         }
 
-        double secs_moving_or_pedaling = 0.0;
+        secs_moving_or_pedaling = 0.0;
         double secs_moving = 0.0;
         double total_watts = 0.0;
         double secs_watts = 0.0;
@@ -137,13 +150,9 @@ RideItem::htmlSummary()
         QString intervals = "";
         unsigned last_interval = UINT_MAX;
         double int_watts_sum = 0.0;
-        unsigned int_watts_cnt = 0;
         double int_hr_sum = 0.0;
-        unsigned int_hr_cnt = 0;
         double int_cad_sum = 0.0;
-        unsigned int_cad_cnt = 0;
         double int_mph_sum = 0.0;
-        unsigned int_mph_cnt = 0;
 
         double time_start, time_end, mile_start, mile_end;
 
@@ -155,10 +164,8 @@ RideItem::htmlSummary()
 
                 if (last_interval != UINT_MAX) {
                     summarize(intervals, last_interval, time_start, 
-                              time_end, mile_start, mile_end, 
-                              int_watts_cnt, int_watts_sum, int_hr_cnt,
-                              int_hr_sum, int_cad_cnt, int_cad_sum,
-                              int_mph_cnt, int_mph_sum);
+                              time_end, mile_start, mile_end, int_watts_sum, 
+                              int_hr_sum, int_cad_sum, int_mph_sum);
                 }
 
                 last_interval = point->interval;
@@ -174,24 +181,20 @@ RideItem::htmlSummary()
             if (point->watts >= 0.0) {
                 total_watts += point->watts * secs_delta;
                 secs_watts += secs_delta;
-                int_watts_sum += point->watts;
-                int_watts_cnt += 1;
+                int_watts_sum += point->watts * secs_delta;
             }
             if (point->hr > 0) {
                 total_hr += point->hr * secs_delta;
                 secs_hr += secs_delta;
-                int_hr_sum += point->hr;
-                int_hr_cnt += 1;
+                int_hr_sum += point->hr * secs_delta;
             }
             if (point->cad > 0) {
                 total_cad += point->cad * secs_delta;
                 secs_cad += secs_delta;
-                int_cad_sum += point->cad;
-                int_cad_cnt += 1;
+                int_cad_sum += point->cad * secs_delta;
             }
             if (point->mph >= 0) {
-                int_mph_sum += point->mph;
-                int_mph_cnt += 1;
+                int_mph_sum += point->mph * secs_delta;
             }
 
             mile_end = point->miles;
@@ -199,13 +202,14 @@ RideItem::htmlSummary()
         }
 
         summarize(intervals, last_interval, time_start, 
-                  time_end, mile_start, mile_end, 
-                  int_watts_cnt, int_watts_sum, int_hr_cnt,
-                  int_hr_sum, int_cad_cnt, int_cad_sum,
-                  int_mph_cnt, int_mph_sum);
+                  time_end, mile_start, mile_end, int_watts_sum, 
+                  int_hr_sum, int_cad_sum, int_mph_sum);
 
         avg_watts = (secs_watts == 0.0) ? 0.0
             : round(total_watts / secs_watts);
+
+        total_distance = raw->points.back()->miles;
+        total_work = total_watts / 1000.0;
 
         summary += "<p><table align=\"center\" width=\"60%\" border=0>";
         summary += "<tr><td>Total workout time:</td><td align=\"right\">" + 
@@ -214,10 +218,10 @@ RideItem::htmlSummary()
             time_to_string(secs_moving_or_pedaling) + "</td></tr>";
         summary += QString("<tr><td>Total distance (miles):</td>"
                            "<td align=\"right\">%1</td></tr>")
-            .arg(raw->points.back()->miles, 0, 'f', 1);
+            .arg(total_distance, 0, 'f', 1);
         summary += QString("<tr><td>Total work (kJ):</td>"
                            "<td align=\"right\">%1</td></tr>")
-            .arg((unsigned) (avg_watts / 1000.0 * secs_moving_or_pedaling));
+            .arg((unsigned) round(total_work));
         summary += QString("<tr><td>Average speed (mph):</td>"
                            "<td align=\"right\">%1</td></tr>")
             .arg(((secs_moving == 0.0) ? 0.0
