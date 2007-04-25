@@ -27,6 +27,8 @@
 #include "RawFile.h"
 #include "RideItem.h"
 #include "Settings.h"
+#include "Time.h"
+#include "Zones.h"
 #include <assert.h>
 #include <QApplication>
 #include <QtGui>
@@ -46,6 +48,17 @@ MainWindow::MainWindow(const QDir &home) :
 {
     setWindowTitle(home.dirName());
     settings.setValue(GC_SETTINGS_LAST, home.dirName());
+
+    QFile zonesFile(home.absolutePath() + "/power.zones");
+    if (zonesFile.exists()) {
+        zones = new Zones();
+        if (!zones->read(zonesFile)) {
+            QMessageBox::warning(this, tr("Zones File Error"),
+                                 zones->errorString());
+            delete zones;
+            zones = NULL;
+        }
+    }
 
     QVariant geom = settings.value(GC_SETTINGS_MAIN_GEOM);
     if (geom == QVariant())
@@ -80,7 +93,8 @@ MainWindow::MainWindow(const QDir &home) :
             QDate date(rx.cap(1).toInt(), rx.cap(2).toInt(),rx.cap(3).toInt()); 
             QTime time(rx.cap(4).toInt(), rx.cap(5).toInt(),rx.cap(6).toInt()); 
             QDateTime dt(date, time);
-            last = new RideItem(allRides, RIDE_TYPE, home.path(), name, dt);
+            last = new RideItem(allRides, RIDE_TYPE, home.path(), 
+                                name, dt, zones);
         }
     }
 
@@ -280,7 +294,8 @@ MainWindow::addRide(QString name)
     QDate date(rx.cap(1).toInt(), rx.cap(2).toInt(),rx.cap(3).toInt()); 
     QTime time(rx.cap(4).toInt(), rx.cap(5).toInt(),rx.cap(6).toInt()); 
     QDateTime dt(date, time);
-    RideItem *last = new RideItem(allRides, RIDE_TYPE, home.path(), name, dt);
+    RideItem *last = new RideItem(allRides, RIDE_TYPE, home.path(), 
+                                  name, dt, zones);
     cpintPlot->needToScanRides = true;
     tabWidget->setCurrentIndex(0);
     treeWidget->setCurrentItem(last);
@@ -447,6 +462,11 @@ MainWindow::rideSelected()
             double weeklyDistance = 0.0;
             double weeklyWork = 0.0;
 
+            double *time_in_zone = NULL;
+            int zone_range = -1;
+            int num_zones = -1;
+            bool zones_ok = true;
+
             for (int i = 0; i < allRides->childCount(); ++i) {
                 if (allRides->child(i)->type() == RIDE_TYPE) {
                     RideItem *item = (RideItem*) allRides->child(i);
@@ -455,6 +475,18 @@ MainWindow::rideSelected()
                         weeklySeconds += item->secsMovingOrPedaling();
                         weeklyDistance += item->totalDistance();
                         weeklyWork += item->totalWork();
+                        if (zone_range == -1) {
+                            zone_range = item->zoneRange();
+                            num_zones = item->numZones();
+                            time_in_zone = new double[num_zones];
+                        }
+                        else if (item->zoneRange() != zone_range) {
+                            zones_ok = false;
+                        }
+                        if (zone_range != -1) {
+                            for (int j = 0; j < num_zones; ++j)
+                                time_in_zone[j] += item->timeInZone(j);
+                        }
                     }
                 }
             }
@@ -464,7 +496,7 @@ MainWindow::rideSelected()
             minutes %= 60;
 
             const char *dateFormat = "MM/dd/yyyy";
-            weeklySummary->setHtml(tr(
+            QString summary = tr(
                 "<center>"
                 "<h2>Week of %1 through %2</h2>"
                 "<h2>Summary</h2>"
@@ -477,15 +509,30 @@ MainWindow::rideSelected()
                 "<tr><td>Total work (kJ):</td>"
                 "    <td align=\"right\">%6</td></tr>"
                 "</table>"
-                "</center>"
+                // TODO: add averages
                 )
                 .arg(wstart.toString(dateFormat))
                 .arg(wstart.addDays(6).toString(dateFormat))
                 .arg(hours)
                 .arg(minutes, 2, 10, QLatin1Char('0'))
                 .arg((unsigned) round(weeklyDistance))
-                .arg((unsigned) round(weeklyWork))
-                );
+                .arg((unsigned) round(weeklyWork));
+                
+            if (zone_range != -1) {
+                summary += "<h2>Power Zones</h2>";
+                if (!zones_ok)
+                    summary += "Error: Week spans more than one zone range.";
+                else {
+                    summary += 
+                        zones->summarize(zone_range, time_in_zone, num_zones);
+                }
+            }
+
+            summary += "</center>";
+
+            // TODO: add daily breakdown
+
+            weeklySummary->setHtml(summary);
 
             return;
         }
@@ -564,31 +611,6 @@ MainWindow::tabChanged(int index)
     }
 }
 
-static QString
-time_to_string(double secs) {
-    if (secs < 60.0)
-        return QString("%1s").arg(secs, 0, 'f', 2, QLatin1Char('0'));
-    QString result;
-    unsigned rounded = (unsigned) round(secs);
-    bool needs_colon = false;
-    if (rounded >= 3600) {
-        result += QString("%1h").arg(rounded / 3600);
-        rounded %= 3600;
-        needs_colon = true;
-    }
-    if (needs_colon || rounded >= 60) {
-        if (needs_colon)
-            result += " ";
-        result += QString("%1m").arg(rounded / 60, 2, 10, QLatin1Char('0'));
-        rounded %= 60;
-        needs_colon = true;
-    }
-    if (needs_colon)
-        result += " ";
-    result += QString("%1s").arg(rounded, 2, 10, QLatin1Char('0'));
-    return result;
-}
-
 static unsigned 
 curve_to_point(double x, const QwtPlotCurve *curve)
 {
@@ -617,10 +639,10 @@ MainWindow::pickerMoved(const QPoint &pos)
 {
     double minutes = cpintPlot->invTransform(QwtPlot::xBottom, pos.x());
     cpintTimeLabel->setText(tr("Interval Duration: %1")
-                            .arg(time_to_string(60.0*minutes)));
-    cpintAllLabel->setText(tr("All Rides: %1 watts").arg(
-            curve_to_point(minutes, cpintPlot->getAllCurve())));
+                            .arg(interval_to_str(60.0*minutes)));
     cpintTodayLabel->setText(tr("Today: %1 watts").arg(
             curve_to_point(minutes, cpintPlot->getThisCurve())));
+    cpintAllLabel->setText(tr("All Rides: %1 watts").arg(
+            curve_to_point(minutes, cpintPlot->getAllCurve())));
 }
 

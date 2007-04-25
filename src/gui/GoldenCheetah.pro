@@ -26,6 +26,7 @@ HEADERS += \
 	PowerHist.h \
 	RawFile.h \
 	RideItem.h \
+	Time.h \
         Zones.h
 
 SOURCES += \
@@ -39,6 +40,7 @@ SOURCES += \
 	PowerHist.cpp \
 	RawFile.cpp \
 	RideItem.cpp \
+        Time.cpp \
         Zones.cpp \
 	\
 	main.cpp

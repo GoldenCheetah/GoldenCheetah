@@ -24,6 +24,7 @@
 #include <QtGui>
 
 class RawFile;
+class Zones;
 
 class RideItem : public QTreeWidgetItem {
 
@@ -32,6 +33,9 @@ class RideItem : public QTreeWidgetItem {
         double secs_moving_or_pedaling;
         double total_distance;
         double total_work;
+        double *time_in_zone;
+        int num_zones;
+        int zone_range;
 
     public:
 
@@ -40,14 +44,20 @@ class RideItem : public QTreeWidgetItem {
         QDateTime dateTime;
         QString summary;
         RawFile *raw;
+        const Zones *zones;
 
         RideItem(QTreeWidgetItem *parent, int type, QString path, 
-                 QString fileName, const QDateTime &dateTime);
+                 QString fileName, const QDateTime &dateTime,
+                 const Zones *zones);
 
         QString htmlSummary();
         double secsMovingOrPedaling();
         double totalDistance();
         double totalWork();
+
+        int zoneRange();
+        int numZones();
+        double timeInZone(int zone);
 };
  
 #endif // _GC_RideItem_h

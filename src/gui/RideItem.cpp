@@ -21,41 +21,26 @@
 #include "RideItem.h"
 #include "RawFile.h"
 #include "Settings.h"
+#include "Time.h"
+#include "Zones.h"
+#include <assert.h>
 #include <math.h>
 
-static QString
-time_to_string(double secs) {
-    QString result;
-    unsigned rounded = (unsigned) round(secs);
-    bool needs_colon = false;
-    if (rounded >= 3600) {
-        result += QString("%1").arg(rounded / 3600);
-        rounded %= 3600;
-        needs_colon = true;
-    }
-    if (needs_colon || rounded >= 60) {
-        if (needs_colon)
-            result += ":";
-        result += QString("%1").arg(rounded / 60, 2, 10, QLatin1Char('0'));
-        rounded %= 60;
-        needs_colon = true;
-    }
-    if (needs_colon)
-        result += ":";
-    result += QString("%1").arg(rounded, 2, 10, QLatin1Char('0'));
-    return result;
-}
-
 RideItem::RideItem(QTreeWidgetItem *parent, int type, QString path, 
-                   QString fileName, const QDateTime &dateTime) : 
+                   QString fileName, const QDateTime &dateTime, 
+                   const Zones *zones) : 
     QTreeWidgetItem(parent, type), path(path),
-    fileName(fileName), dateTime(dateTime)
+    fileName(fileName), dateTime(dateTime), zones(zones)
 {
     setText(0, dateTime.toString("ddd"));
     setText(1, dateTime.toString("MMM d, yyyy"));
     setText(2, dateTime.toString("h:mm AP"));
     setTextAlignment(1, Qt::AlignRight);
     setTextAlignment(2, Qt::AlignRight);
+
+    time_in_zone = NULL;
+    num_zones = -1;
+    zone_range = -1;
 }
 
 static void summarize(QString &intervals,
@@ -122,6 +107,30 @@ double RideItem::totalWork()
     return total_work;
 }
 
+int RideItem::zoneRange() 
+{
+    if (summary.isEmpty())
+        htmlSummary();
+    return zone_range;
+}
+
+int RideItem::numZones() 
+{
+    if (summary.isEmpty())
+        htmlSummary();
+    assert(zone_range >= 0);
+    return num_zones;
+}
+
+double RideItem::timeInZone(int zone)
+{
+    if (summary.isEmpty())
+        htmlSummary();
+    assert(zone_range >= 0);
+    assert(zone < num_zones);
+    return time_in_zone[zone];
+}
+
 QString 
 RideItem::htmlSummary()
 {
@@ -135,6 +144,16 @@ RideItem::htmlSummary()
         if (raw == NULL) {
             summary += "<p>Error: Can't read file.";
             return summary;
+        }
+
+        if (zones) {
+            zone_range = zones->whichRange(dateTime.date());
+            if (zone_range >= 0) {
+                num_zones = zones->numZones(zone_range);
+                time_in_zone = new double[num_zones];
+                for (int i = 0; i < num_zones; ++i)
+                    time_in_zone[i] = 0.0;
+            }
         }
 
         secs_moving_or_pedaling = 0.0;
@@ -174,14 +193,20 @@ RideItem::htmlSummary()
             }
 
             double secs_delta = raw->rec_int_ms / 1000.0;
-            if ((point->mph > 0.0) || (point->cad > 0.0))
+            if ((point->mph > 0.0) || (point->cad > 0.0)) {
                 secs_moving_or_pedaling += secs_delta;
+            }
             if (point->mph > 0.0)
                 secs_moving += secs_delta;
             if (point->watts >= 0.0) {
                 total_watts += point->watts * secs_delta;
                 secs_watts += secs_delta;
                 int_watts_sum += point->watts * secs_delta;
+                if (zones) {
+                    int zone = zones->whichZone(zone_range, point->watts);
+                    if (zone >= 0)
+                        time_in_zone[zone] += secs_delta;
+                }
             }
             if (point->hr > 0) {
                 total_hr += point->hr * secs_delta;
@@ -211,34 +236,47 @@ RideItem::htmlSummary()
         total_distance = raw->points.back()->miles;
         total_work = total_watts / 1000.0;
 
-        summary += "<p><table align=\"center\" width=\"60%\" border=0>";
-        summary += "<tr><td>Total workout time:</td><td align=\"right\">" + 
+        summary += "<p>";
+        summary += "<table align=\"center\" width=\"90%\" border=0>";
+        summary += "<tr><td align=\"center\"><h2>Totals</h2></td>";
+        summary += "<td align=\"center\"><h2>Averages</h2></td></tr>";
+        summary += "<tr><td>";
+        summary += "<table align=\"center\" width=\"70%\" border=0>";
+        summary += "<tr><td>Workout time:</td><td align=\"right\">" + 
             time_to_string(raw->points.back()->secs);
-        summary += "<tr><td>Total time riding:</td><td align=\"right\">" + 
+        summary += "<tr><td>Time riding:</td><td align=\"right\">" + 
             time_to_string(secs_moving_or_pedaling) + "</td></tr>";
-        summary += QString("<tr><td>Total distance (miles):</td>"
+        summary += QString("<tr><td>Distance (miles):</td>"
                            "<td align=\"right\">%1</td></tr>")
             .arg(total_distance, 0, 'f', 1);
-        summary += QString("<tr><td>Total work (kJ):</td>"
+        summary += QString("<tr><td>Work (kJ):</td>"
                            "<td align=\"right\">%1</td></tr>")
             .arg((unsigned) round(total_work));
-        summary += QString("<tr><td>Average speed (mph):</td>"
+        summary += "</table></td><td>";
+        summary += "<table align=\"center\" width=\"70%\" border=0>";
+        summary += QString("<tr><td>Speed (mph):</td>"
                            "<td align=\"right\">%1</td></tr>")
             .arg(((secs_moving == 0.0) ? 0.0
                   : raw->points.back()->miles / secs_moving * 3600.0), 
                  0, 'f', 1);
-        summary += QString("<tr><td>Average power (watts):</td>"
+        summary += QString("<tr><td>Power (watts):</td>"
                            "<td align=\"right\">%1</td></tr>")
             .arg((unsigned) avg_watts);
-        summary +=QString("<tr><td>Average heart rate (bpm):</td>"
+        summary +=QString("<tr><td>Heart rate (bpm):</td>"
                           "<td align=\"right\">%1</td></tr>")
             .arg((unsigned) ((secs_hr == 0.0) ? 0.0
                              : round(total_hr / secs_hr)));
-        summary += QString("<tr><td>Average cadence (rpm):</td>"
+        summary += QString("<tr><td>Cadence (rpm):</td>"
                            "<td align=\"right\">%1</td></tr>")
             .arg((unsigned) ((secs_cad == 0.0) ? 0.0
                              : round(total_cad / secs_cad)));
+        summary += "</table></td></tr>";
         summary += "</table>";
+
+        if (zones) {
+            summary += "<h2>Power Zones</h2>";
+            summary += zones->summarize(zone_range, time_in_zone, num_zones);
+        }
 
         if (last_interval > 0) {
             summary += "<p><h2>Intervals</h2>\n<p>\n";
@@ -277,5 +315,4 @@ RideItem::htmlSummary()
     }
     return summary;
 }
-
 
