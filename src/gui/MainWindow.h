@@ -28,6 +28,7 @@ class AllPlot;
 class CpintPlot;
 class PowerHist;
 class QwtPlotPicker;
+class Zones;
 
 class MainWindow : public QMainWindow 
 {
@@ -78,6 +79,7 @@ class MainWindow : public QMainWindow
         QLineEdit *binWidthLineEdit;
         QTreeWidgetItem *allRides;
         PowerHist *powerHist;
+        Zones *zones;
 };
 
 #endif // _GC_MainWindow_h

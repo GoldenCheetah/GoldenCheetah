@@ -62,10 +62,14 @@ class Zones : public QObject
 
         bool read(QFile &file);
         const QString &errorString() const { return err; }
-        int whichZone(const QDate &date, double value) const;
-        void zoneInfo(const QDate &date, int zone, 
+
+        int whichRange(const QDate &date) const;
+        int numZones(int range) const;
+        int whichZone(int range, double value) const;
+        void zoneInfo(int range, int zone, 
                       QString &name, QString &description,
-                      int &low, int &high);
+                      int &low, int &high) const;
+        QString summarize(int rnum, double *time_in_zone, int num_zones) const;
 
 };
 
