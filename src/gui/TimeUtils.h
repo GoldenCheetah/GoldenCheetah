@@ -18,13 +18,13 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _Time_h
-#define _Time_h
+#ifndef _TimeUtils_h
+#define _TimeUtils_h
 
 #include <QString>
 
 QString interval_to_str(double secs);  // output like 1h 2m 3s
 QString time_to_string(double secs);   // output like 1:02:03
 
-#endif // _Time_h
+#endif // _TimeUtils_h
 

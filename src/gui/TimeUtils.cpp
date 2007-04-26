@@ -1,5 +1,5 @@
 
-#include "Time.h"
+#include "TimeUtils.h"
 #include <math.h>
 
 QString time_to_string(double secs) 

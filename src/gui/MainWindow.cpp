@@ -27,7 +27,7 @@
 #include "RawFile.h"
 #include "RideItem.h"
 #include "Settings.h"
-#include "Time.h"
+#include "TimeUtils.h"
 #include "Zones.h"
 #include <assert.h>
 #include <QApplication>
@@ -44,7 +44,7 @@ static char *rideFileRegExp = ("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)"
                                "_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.(raw|srm)$");
 
 MainWindow::MainWindow(const QDir &home) : 
-    home(home), settings(GC_SETTINGS_CO, GC_SETTINGS_APP)
+    home(home), settings(GC_SETTINGS_CO, GC_SETTINGS_APP), zones(NULL)
 {
     setWindowTitle(home.dirName());
     settings.setValue(GC_SETTINGS_LAST, home.dirName());
@@ -462,8 +462,8 @@ MainWindow::rideSelected()
             double weeklyDistance = 0.0;
             double weeklyWork = 0.0;
 
-            double *time_in_zone = NULL;
             int zone_range = -1;
+            double *time_in_zone = NULL;
             int num_zones = -1;
             bool zones_ok = true;
 
@@ -475,17 +475,19 @@ MainWindow::rideSelected()
                         weeklySeconds += item->secsMovingOrPedaling();
                         weeklyDistance += item->totalDistance();
                         weeklyWork += item->totalWork();
-                        if (zone_range == -1) {
-                            zone_range = item->zoneRange();
-                            num_zones = item->numZones();
-                            time_in_zone = new double[num_zones];
-                        }
-                        else if (item->zoneRange() != zone_range) {
-                            zones_ok = false;
-                        }
-                        if (zone_range != -1) {
-                            for (int j = 0; j < num_zones; ++j)
-                                time_in_zone[j] += item->timeInZone(j);
+                        if (zones) {
+                            if (zone_range == -1) {
+                                zone_range = item->zoneRange();
+                                num_zones = item->numZones();
+                                time_in_zone = new double[num_zones];
+                            }
+                            else if (item->zoneRange() != zone_range) {
+                                zones_ok = false;
+                            }
+                            if (zone_range != -1) {
+                                for (int j = 0; j < num_zones; ++j)
+                                    time_in_zone[j] += item->timeInZone(j);
+                            }
                         }
                     }
                 }

@@ -5,14 +5,16 @@
 TEMPLATE = app
 TARGET += 
 DEPENDPATH += .
-INCLUDEPATH += /home/srhea/src/qwt-5.0.1/src ../lib ../srm ../cpint
+INCLUDEPATH += /usr/local/qwt/include ../lib ../srm ../cpint
 CONFIG += static debug
-LIBS += /home/srhea/src/qwt-5.0.1/lib/libqwt.a 
+LIBS += /usr/local/qwt/lib/libqwt.a 
 LIBS += ../lib/libgc.a ../cpint/libcpint.a ../srm/libsrm.a
 LIBS += -lm -lz
 macx {
     LIBS += -framework Carbon
 }
+QMAKE_CC=/usr/bin/gcc-4.0
+QMAKE_CXX=/usr/bin/g++-4.0
 
 # Input
 HEADERS += \
@@ -26,7 +28,7 @@ HEADERS += \
 	PowerHist.h \
 	RawFile.h \
 	RideItem.h \
-	Time.h \
+	TimeUtils.h \
         Zones.h
 
 SOURCES += \
@@ -40,7 +42,7 @@ SOURCES += \
 	PowerHist.cpp \
 	RawFile.cpp \
 	RideItem.cpp \
-        Time.cpp \
+        TimeUtils.cpp \
         Zones.cpp \
 	\
 	main.cpp
