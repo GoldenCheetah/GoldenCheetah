@@ -1,0 +1,69 @@
+<!-- $Id: download.content,v 1.6 2006/08/11 20:21:03 srhea Exp $ -->
+
+The zone file format consists of a list of date ranges and the power
+zones that should be used for all rides within each range.  Someday I'll
+add a dialog to GC that allows you to type in your zones within the
+application.  Right now, you'll have to write them into a text file
+yourself.  For example:
+
+<blockquote>
+<pre>
+# Power zones for Sean Rhea
+
+From BEGIN until 2006/07/17: # after original testing
+  1, Active Recovery,     122, 167
+  2, Endurance,           167, 228
+  3, Tempo,               228, 274
+  4, Lactate Threshold,   274, 319
+  5, VO2 Max,             319, 365
+  6, Anaerobic Capacity,  365, 678
+  7, Sprinting,           678, MAX
+
+From 2006/07/17 until 2007/02/05: # since Workingman's ITT
+  1, Active Recovery,     135, 185
+  2, Endurance,           185, 253
+  3, Tempo,               253, 303
+  4, Lactate Threshold,   303, 354
+  5, VO2 Max,             354, 404
+  6, Anaerobic Capacity,  404, 752
+  7, Sprinting,           752, MAX
+
+From 2007/02/05 until END: # since 20-min Diablo ITT
+  1, Active Recovery,     139, 191
+  2, Endurance,           191, 260
+  3, Tempo,               260, 312
+  4, Lactate Threshold,   312, 364
+  5, VO2 Max,             364, 416
+  6, Anaerobic Capacity,  416, 774
+  7, Sprinting,           774, MAX
+</pre>
+</blockquote>
+
+If you copy the above into a file named "power.zones" in your
+GoldenCheetah directory (e.g., "~/Library/GoldenCheetah/YourName"), GC
+will display power zone information for all your rides using my power
+zones.
+
+<p>
+The format should be pretty obvious.  Comments start from a '#'
+character and run until the end of a line.
+
+<p>
+A range goes from a date (in YYYY/MM/DD format) at which to start using
+the following zones to a date before which to stop doing so.  Also, you
+can start the first range in a file with the keyword "BEGIN", which will
+be treated as the earliest possible date, and you can end the last range
+with the keyword "END", which will be treated as the latest.  Also, in
+order to have your zones displayed in the "Weekly Summary", each range
+needs to start on a Monday.
+
+<p>
+After a range, you enter the zones to use during that range.  Each zone
+has a name (e.g., "2"), a description (e.g., "Endurance"), a low power
+and a high power.  The number of zones, their names and descriptions are
+entirely up to you; I use ones similar to those advocated by Allen and
+Coggan, as you might have noticed.  The lower number in each range is
+inclusive, and the upper one is not; i.e., you should read the range as
+[low, high).  Also, you can use the keywork "MAX" to indicate the
+maximum possible power.
+

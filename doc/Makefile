@@ -18,7 +18,9 @@ DISTRIB=GoldenCheetah_2006-12-25_Darwin_powerpc.dmg \
 	GoldenCheetah_2007-02-22_Darwin_powerpc.dmg \
 	GoldenCheetah_2007-02-22_Linux_x86.tgz \
 	GoldenCheetah_2007-04-01_Darwin_powerpc.dmg \
-	GoldenCheetah_2007-04-01_Linux_x86.tgz
+	GoldenCheetah_2007-04-01_Linux_x86.tgz \
+	GoldenCheetah_2007-04-26_Darwin_powerpc.dmg \
+	GoldenCheetah_2007-04-26_Linux_x86.tgz
 
 all: $(HTML)
 .PHONY: all clean install
@@ -56,4 +58,7 @@ search.html: search.content genpage.pl
 
 users-guide.html: users-guide.content genpage.pl
 	./genpage.pl "User's Guide" $< > $@
+
+zones.html: zones.content genpage.pl
+	./genpage.pl "Power Zones File Guide" $< > $@
 
