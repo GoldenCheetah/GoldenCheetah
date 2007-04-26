@@ -42,6 +42,26 @@ href="http://goldencheetah.org/svn/trunk">here</a>.
 </tr>
 
 <tr>
+<td valign="top">Apr 26, 2007</td>
+<td valign="top">
+<a href="GoldenCheetah_2007-04-26_Linux_x86.tgz">Linux x86</a>,<br>
+<a href="GoldenCheetah_2007-04-26_Darwin_powerpc.dmg">Mac OS X PowerPC</a>
+</td>
+<td valign="top">This release fixes some bugs and adds a whole bunch of
+new features:
+<ul>
+<li>Now imports .srm files (direct download from SRM hopefully coming
+soon)
+<li>New "Weekly Summary" tab shows total weekly hours, miles, and work
+<li>Power zones can now be entered into a text file, after which GC will
+display time in each zone in the ride and weekly summaries; for more
+information on the zone file format, <a href="zones.html">see this
+page</a>.
+</ul>
+</td>
+</tr>
+
+<tr>
 <td valign="top">Apr 1, 2007</td>
 <td valign="top">
 <a href="GoldenCheetah_2007-04-01_Linux_x86.tgz">Linux x86</a>,<br>
