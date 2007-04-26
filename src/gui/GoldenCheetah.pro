@@ -13,8 +13,6 @@ LIBS += -lm -lz
 macx {
     LIBS += -framework Carbon
 }
-QMAKE_CC=/usr/bin/gcc-4.0
-QMAKE_CXX=/usr/bin/g++-4.0
 
 # Input
 HEADERS += \
