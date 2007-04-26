@@ -5,7 +5,7 @@ TARBALLS=$(wildcard gc_*.tgz)
 OTHER=logo.jpg sample.gp sample.png cpint.gp cpint.png \
 	screenshot-summary.png screenshot-plot.png \
 	screenshot-cpint.png screenshot-phist.png \
-	screenshot-download.png
+	screenshot-download.png screenshot-weekly.png
 DISTRIB=GoldenCheetah_2006-12-25_Darwin_powerpc.dmg \
 	GoldenCheetah_2006-09-06_Darwin_powerpc.dmg \
 	GoldenCheetah_2006-09-07_Darwin_powerpc.dmg \
