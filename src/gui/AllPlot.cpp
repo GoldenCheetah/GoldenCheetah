@@ -18,6 +18,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <time.h>
 #include "AllPlot.h"
 #include "RawFile.h"
 #include "Settings.h"

@@ -21,7 +21,7 @@
 #include "RideItem.h"
 #include "RawFile.h"
 #include "Settings.h"
-#include "Time.h"
+#include "TimeUtils.h"
 #include "Zones.h"
 #include <assert.h>
 #include <math.h>
