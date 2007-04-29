@@ -52,8 +52,7 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     connect(rescanButton, SIGNAL(clicked()), this, SLOT(scanDevices()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
     connect(listWidget, 
-            SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),
-            this, SLOT(setReadyInstruct()));
+            SIGNAL(currentRowChanged(int)), this, SLOT(setReadyInstruct(int)));
     connect(listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
             this, SLOT(downloadClicked())); 
 
@@ -83,11 +82,26 @@ DownloadRideDialog::~DownloadRideDialog()
 }
 
 void 
-DownloadRideDialog::setReadyInstruct()
+DownloadRideDialog::setReadyInstruct(int row)
 {
-    label->setText(tr("Make sure the PowerTap unit is turned on,\n"
-                      "and that the screen display says, \"Host\",\n"
-                      "then click Download to begin downloading."));
+    if (row == -1) {
+        if (listWidget->count() > 1) {
+            label->setText(tr("Select the device from the above list from\n"
+                              "which you would like to download a ride."));
+        }
+        else {
+            label->setText(tr("No devices found.  Make sure the PowerTap\n"
+                              "unit is plugged into the computer's USB port,\n"
+                              "then click \"Rescan\" to check again."));
+        }
+        downloadButton->setEnabled(false);
+    }
+    else {
+        label->setText(tr("Make sure the PowerTap unit is turned on,\n"
+                          "and that the screen display says, \"Host\",\n"
+                          "then click Download to begin downloading."));
+        downloadButton->setEnabled(true);
+    }
 }
 
 void
@@ -102,10 +116,14 @@ DownloadRideDialog::scanDevices()
     }
     if (listWidget->count() == 1) {
         listWidget->setCurrentRow(0);
-        setReadyInstruct();
-        downloadButton->setEnabled(true);
+        setReadyInstruct(0);
+        // downloadButton->setEnabled(true);
         downloadButton->setFocus();
     }
+    else {
+        setReadyInstruct(-1);
+    }
+    /*
     else {
         downloadButton->setEnabled(false);
         if (listWidget->count() > 1) {
@@ -118,6 +136,7 @@ DownloadRideDialog::scanDevices()
                               "then click \"Rescan\" to check again."));
         }
     }
+    */
 }
 
 static void
