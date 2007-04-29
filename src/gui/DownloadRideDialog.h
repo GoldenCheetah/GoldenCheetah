@@ -42,7 +42,7 @@ class DownloadRideDialog : public QDialog
     private slots:
         void downloadClicked();
         void cancelClicked();
-        void setReadyInstruct();
+        void setReadyInstruct(int row);
         void scanDevices();
         void readVersion();
         void readData();
