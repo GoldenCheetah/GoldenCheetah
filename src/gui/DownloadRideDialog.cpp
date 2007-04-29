@@ -52,7 +52,7 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     connect(rescanButton, SIGNAL(clicked()), this, SLOT(scanDevices()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
     connect(listWidget, 
-            SIGNAL(currentRowChanged(int)), this, SLOT(setReadyInstruct(int)));
+            SIGNAL(itemSelectionChanged()), this, SLOT(setReadyInstruct()));
     connect(listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
             this, SLOT(downloadClicked())); 
 
@@ -82,9 +82,11 @@ DownloadRideDialog::~DownloadRideDialog()
 }
 
 void 
-DownloadRideDialog::setReadyInstruct(int row)
+DownloadRideDialog::setReadyInstruct()
 {
-    if (row == -1) {
+    int selected = listWidget->selectedItems().size();
+    assert(selected <= 1);
+    if (selected == 0) {
         if (listWidget->count() > 1) {
             label->setText(tr("Select the device from the above list from\n"
                               "which you would like to download a ride."));
@@ -116,27 +118,9 @@ DownloadRideDialog::scanDevices()
     }
     if (listWidget->count() == 1) {
         listWidget->setCurrentRow(0);
-        setReadyInstruct(0);
-        // downloadButton->setEnabled(true);
         downloadButton->setFocus();
     }
-    else {
-        setReadyInstruct(-1);
-    }
-    /*
-    else {
-        downloadButton->setEnabled(false);
-        if (listWidget->count() > 1) {
-            label->setText(tr("Select the device from the above list from\n"
-                              "which you would like to download a ride."));
-        }
-        else {
-            label->setText(tr("No devices found.  Make sure the PowerTap\n"
-                              "unit is plugged into the computer's USB port,\n"
-                              "then click \"Rescan\" to check again."));
-        }
-    }
-    */
+    setReadyInstruct();
 }
 
 static void
@@ -290,7 +274,6 @@ DownloadRideDialog::readData()
             delete timer;
             timer = NULL;
         }
-        // label->setText(label->text() + tr("done."));
         QMessageBox::information(this, tr("Success"), tr("Download complete."));
         fclose(out);
         out = NULL;
