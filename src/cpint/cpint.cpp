@@ -37,6 +37,7 @@ struct cpint_point
 };
 
 struct cpint_data {
+    QStringList errors;
     QList<cpint_point> points;
     time_t start_since_epoch;
     int rec_int_ms;
@@ -85,9 +86,9 @@ data_cb(double secs, double nm, double mph, double watts, double miles,
 static void
 error_cb(const char *msg, void *context) 
 {
-    (void) context;
+    cpint_data *data = (cpint_data*) context;
     fprintf(stderr, "%s\n", msg);
-    exit(1);
+    data->errors << msg;
 }
 
 cpi_file_info *

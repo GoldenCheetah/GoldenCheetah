@@ -596,7 +596,6 @@ pt_read_raw(FILE *in, int compat, void *context,
                         "time jumps backwards by %0.3f minutes; ignoring it.",
                         secs / 60.0, (secs - since_epoch + start_secs) / 60.0);
                 if (error_cb) error_cb(ebuf, context);
-                return;
             }
             if (time_cb) time_cb(&time, since_epoch, context);
         }
