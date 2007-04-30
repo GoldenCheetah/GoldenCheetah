@@ -83,12 +83,13 @@ csv_data_cb(double secs, double nm, double mph, double watts, double miles,
     fprintf(out, "%6d, %3d\n", hr, interval);
 }
 
+static int errors;
 static void
 error_cb(const char *msg, void *context) 
 {
     context = NULL;
     fprintf(stderr, "%s\n", msg);
-    exit(1);
+    ++errors;
 }
 
 static void
@@ -190,6 +191,6 @@ main(int argc, char *argv[])
 	pt_read_raw(in, compat, NULL, config_cb, time_cb, data_cb, error_cb);
     }
 
-    return 0;
+    return errors ? 1 : 0;
 }
 
