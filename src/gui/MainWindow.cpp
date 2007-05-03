@@ -175,12 +175,21 @@ MainWindow::MainWindow(const QDir &home) :
     window = new QWidget;
     vlayout = new QVBoxLayout;
     QHBoxLayout *cpintPickerLayout = new QHBoxLayout;
-    cpintTimeLabel = new QLabel(tr("Interval Duration:"), window);
-    cpintTodayLabel = new QLabel(tr("Today:"), window);
-    cpintAllLabel = new QLabel(tr("All Rides:"), window);
+    QLabel *cpintTimeLabel = new QLabel(tr("Interval Duration:"), window);
+    cpintTimeValue = new QLineEdit("0 s");
+    QLabel *cpintTodayLabel = new QLabel(tr("Today:"), window);
+    cpintTodayValue = new QLineEdit("0 watts");
+    QLabel *cpintAllLabel = new QLabel(tr("All Rides:"), window);
+    cpintAllValue = new QLineEdit("0 watts");
+    cpintTimeValue->setReadOnly(true);
+    cpintTodayValue->setReadOnly(true);
+    cpintAllValue->setReadOnly(true);
     cpintPickerLayout->addWidget(cpintTimeLabel);
+    cpintPickerLayout->addWidget(cpintTimeValue);
     cpintPickerLayout->addWidget(cpintTodayLabel);
+    cpintPickerLayout->addWidget(cpintTodayValue);
     cpintPickerLayout->addWidget(cpintAllLabel);
+    cpintPickerLayout->addWidget(cpintAllValue);
     cpintPlot = new CpintPlot(home.path());
     vlayout->addWidget(cpintPlot);
     vlayout->addLayout(cpintPickerLayout);
@@ -640,11 +649,10 @@ void
 MainWindow::pickerMoved(const QPoint &pos)
 {
     double minutes = cpintPlot->invTransform(QwtPlot::xBottom, pos.x());
-    cpintTimeLabel->setText(tr("Interval Duration: %1")
-                            .arg(interval_to_str(60.0*minutes)));
-    cpintTodayLabel->setText(tr("Today: %1 watts").arg(
+    cpintTimeValue->setText(interval_to_str(60.0*minutes));
+    cpintTodayValue->setText(tr("%1 watts").arg(
             curve_to_point(minutes, cpintPlot->getThisCurve())));
-    cpintAllLabel->setText(tr("All Rides: %1 watts").arg(
+    cpintAllValue->setText(tr("%1 watts").arg(
             curve_to_point(minutes, cpintPlot->getAllCurve())));
 }
 
