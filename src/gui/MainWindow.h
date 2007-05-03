@@ -69,9 +69,9 @@ class MainWindow : public QMainWindow
         QTextEdit *weeklySummary;
         AllPlot *allPlot;
         CpintPlot *cpintPlot;
-        QLabel *cpintTimeLabel;
-        QLabel *cpintTodayLabel;
-        QLabel *cpintAllLabel;
+        QLineEdit *cpintTimeValue;
+        QLineEdit *cpintTodayValue;
+        QLineEdit *cpintAllValue;
         QwtPlotPicker *picker;
         QSlider *smoothSlider;
         QLineEdit *smoothLineEdit;
