@@ -18,11 +18,18 @@
 # Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
+OS=$(shell uname)
+QT=$(subst /bin/qmake,,$(shell which qmake))
 CC=gcc
 CFLAGS=-g -W -Wall -Werror -ansi -pedantic -std=c99
 CMDS=ptdl ptpk ptunpk cpint
 LIBS=../lib/libgc.a ../cpint/libcpint.a ../srm/libsrm.a
-LIBRARIES=-lm -lQtCore
+LIBRARIES=-lm
+ifeq ($(OS),Darwin)
+  LIBRARIES+=-lm -F$(QT)/lib -framework QtCore
+else
+  LIBRARIES+=-L$(QT)/lib -lQtCore
+endif
 INCLUDES=-I../lib -I../cpint
 
 all: $(CMDS)
