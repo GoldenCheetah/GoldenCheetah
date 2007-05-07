@@ -13,6 +13,7 @@ LIBS += -lm -lz
 macx {
     LIBS += -framework Carbon
 }
+QMAKE_CXXFLAGS = -DGC_BUILD_DATE="`date +'\"%a_%b_%d,_%Y\"'`"
 
 # Input
 HEADERS += \

@@ -56,6 +56,7 @@ class MainWindow : public QMainWindow
         void setBinWidthFromLineEdit();
         void tabChanged(int index);
         void pickerMoved(const QPoint &);
+        void aboutDialog();
 
     private:
 

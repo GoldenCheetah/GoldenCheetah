@@ -287,6 +287,9 @@ MainWindow::MainWindow(const QDir &home) :
     rideMenu->addAction(tr("&Import from SRM..."), this, 
                         SLOT(importSRM()), tr("Ctrl+I")); 
 
+    QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
+    helpMenu->addAction(tr("&About GoldenCheetah"), this, SLOT(aboutDialog()));
+
     if (last != NULL)
         treeWidget->setCurrentItem(last);
 }
@@ -654,5 +657,23 @@ MainWindow::pickerMoved(const QPoint &pos)
             curve_to_point(minutes, cpintPlot->getThisCurve())));
     cpintAllValue->setText(tr("%1 watts").arg(
             curve_to_point(minutes, cpintPlot->getAllCurve())));
+}
+
+void
+MainWindow::aboutDialog()
+{
+    QMessageBox::about(this, tr("About GoldenCheetah"), tr(
+            "<center>"
+            "<h2>GoldenCheetah</h2>"
+            "<i>Cycling Power Analysis Software for Linux and Mac OS X</i>"
+            "<p><i>Build date: "
+            "") + QString(GC_BUILD_DATE).replace("_", " ") + ("</i>"
+            "</center>"
+            "<p>GoldenCheetah is licensed under the "
+            "<a href=\"http://www.gnu.org/copyleft/gpl.html\">GNU General "
+            "Public License</a>.  Source code can be obtained from "
+            "<a href=\"http://goldencheetah.org/\">"
+            "http://goldencheetah.org/</a>."
+            ));
 }
 
