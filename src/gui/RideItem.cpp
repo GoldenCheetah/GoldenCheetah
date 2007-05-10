@@ -179,6 +179,8 @@ RideItem::htmlSummary()
         while (i.hasNext()) {
             RawFilePoint *point = i.next();
 
+            double secs_delta = raw->rec_int_ms / 1000.0;
+
             if (point->interval != last_interval) {
 
                 if (last_interval != UINT_MAX) {
@@ -192,7 +194,6 @@ RideItem::htmlSummary()
                 mile_start = point->miles;
             }
 
-            double secs_delta = raw->rec_int_ms / 1000.0;
             if ((point->mph > 0.0) || (point->cad > 0.0)) {
                 secs_moving_or_pedaling += secs_delta;
             }
@@ -223,7 +224,7 @@ RideItem::htmlSummary()
             }
 
             mile_end = point->miles;
-            time_end = point->secs;
+            time_end = point->secs + secs_delta;
         }
 
         summarize(intervals, last_interval, time_start, 
