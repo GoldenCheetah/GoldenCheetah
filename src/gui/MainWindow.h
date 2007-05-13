@@ -27,7 +27,9 @@
 class AllPlot;
 class CpintPlot;
 class PowerHist;
+class QwtPlotPanner;
 class QwtPlotPicker;
+class QwtPlotZoomer;
 class Zones;
 
 class MainWindow : public QMainWindow 
@@ -69,6 +71,8 @@ class MainWindow : public QMainWindow
         QTextEdit *rideSummary;
         QTextEdit *weeklySummary;
         AllPlot *allPlot;
+        QwtPlotZoomer *allZoomer;
+        QwtPlotPanner *allPanner;
         CpintPlot *cpintPlot;
         QLineEdit *cpintTimeValue;
         QLineEdit *cpintTodayValue;
