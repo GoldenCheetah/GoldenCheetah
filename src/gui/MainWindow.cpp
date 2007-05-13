@@ -34,7 +34,9 @@
 #include <QtGui>
 #include <QRegExp>
 #include <qwt_plot_curve.h>
+#include <qwt_plot_panner.h>
 #include <qwt_plot_picker.h>
+#include <qwt_plot_zoomer.h>
 #include <qwt_data.h>
 
 #define FOLDER_TYPE 0
@@ -151,6 +153,28 @@ MainWindow::MainWindow(const QDir &home) :
     allPlot = new AllPlot;
     smoothSlider->setValue(allPlot->smoothing());
     smoothLineEdit->setText(QString("%1").arg(allPlot->smoothing()));
+
+    allZoomer = new QwtPlotZoomer(allPlot->canvas());
+    allZoomer->setRubberBand(QwtPicker::RectRubberBand);
+    allZoomer->setRubberBandPen(QColor(Qt::black));
+    allZoomer->setSelectionFlags(QwtPicker::DragSelection 
+                                 | QwtPicker::CornerToCorner);
+    allZoomer->setTrackerMode(QwtPicker::AlwaysOff);
+    allZoomer->setEnabled(true);
+
+    // RightButton: zoom out by 1
+    // Ctrl+RightButton: zoom out to full size
+
+    allZoomer->setMousePattern(QwtEventPattern::MouseSelect2,
+                               Qt::RightButton, Qt::ControlModifier);
+    allZoomer->setMousePattern(QwtEventPattern::MouseSelect3,
+                               Qt::RightButton);
+
+    allPanner = new QwtPlotPanner(allPlot->canvas());
+    allPanner->setMouseButton(Qt::MidButton);
+
+    // TODO: zoomer doesn't interact well with automatic axis resizing
+
     vlayout->addWidget(allPlot);
     vlayout->addLayout(showLayout);
     vlayout->addLayout(smoothLayout);
