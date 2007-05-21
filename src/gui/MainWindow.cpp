@@ -408,13 +408,15 @@ MainWindow::exportCSV()
     QListIterator<RawFilePoint*> i(ride->raw->points);
     while (i.hasNext()) {
         RawFilePoint *point = i.next();
+        if (point->secs == 0.0)
+            continue;
         out << point->secs/60.0;
         out << ",";
-        if (point->nm >= 0) out << point->nm;
+        out << ((point->nm >= 0) ? point->nm : 0.0);
         out << ",";
-        if (point->mph >= 0) out << point->mph;
+        out << ((point->mph >= 0) ? point->mph : 0.0);
         out << ",";
-        if (point->watts >= 0) out << point->watts;
+        out << ((point->watts >= 0) ? point->watts : 0.0);
         out << ",";
         out << point->miles;
         out << ",";
