@@ -30,7 +30,7 @@ clean:
 
 install:
 	rsync -avz -e ssh $(HTML) $(TARBALLS) $(OTHER) $(DISTRIB) \
-		srhea.net:public_html/goldencheetah/
+		srhea.net:wwwroot/goldencheetah.org/
 
 contact.html: contact.content genpage.pl
 	./genpage.pl "Contact Us" $< > $@
