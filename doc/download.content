@@ -15,7 +15,8 @@ driver</a> if you're using the PowerTap's new USB download cradle.
 The Golden Cheetah source code is available via 
 <a href="http://subversion.tigris.org/">Subversion</a>.  You need to install
 <a href="http://www.trolltech.com/products/qt">QT 4</a> and 
-<a href="http://qwt.sourceforge.net/">qwt-20060130</a> and 
+<a href="http://qwt.sourceforge.net/">qwt 5.0.1</a> (as a static, not
+dynamic, library) and 
 edit <code>goldencheetah/src/gui/GoldenCheetah.pro</code> to point to them
 before building GoldenCheetah.
 Use this command to check out the current version of the repository:
