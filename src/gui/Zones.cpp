@@ -36,7 +36,8 @@ bool Zones::read(QFile &file)
     QRegExp rangerx("^\\s*from\\s+"
                     "((\\d\\d\\d\\d)/(\\d\\d)/(\\d\\d)|BEGIN)"
                     "\\s+until\\s+"
-                    "((\\d\\d\\d\\d)/(\\d\\d)/(\\d\\d)|END)\\s*:\\s*$",
+                    "((\\d\\d\\d\\d)/(\\d\\d)/(\\d\\d)|END)\\s*"
+                    "(,\\s*FTP\\s*=\\s*(\\d+)\\s*)?:\\s*$",
                     Qt::CaseInsensitive);
     QRegExp zonerx("^\\s*([^ ,][^,]*),\\s*([^ ,][^,]*),\\s*"
                    "(\\d+)\\s*,\\s*(\\d+|MAX)\\s*$",
@@ -92,6 +93,8 @@ bool Zones::read(QFile &file)
                 ranges.append(range);
             }
             range = new ZoneRange(begin, end);
+            if (rangerx.numCaptures() == 10)
+                range->ftp = rangerx.cap(10).toInt();
         }
         else if (zonerx.indexIn(line, 0) != -1) {
             if (!range) {
