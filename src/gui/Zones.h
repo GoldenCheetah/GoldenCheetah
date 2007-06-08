@@ -38,6 +38,7 @@ class Zones : public QObject
 
         struct ZoneRange {
             QDate begin, end;
+            int ftp;
             QList<ZoneInfo*> zones;
             ZoneRange(const QDate &b, const QDate &e) : begin(b), end(e) {}
             ~ZoneRange() {
