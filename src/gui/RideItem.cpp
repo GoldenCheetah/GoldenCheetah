@@ -28,9 +28,9 @@
 
 RideItem::RideItem(QTreeWidgetItem *parent, int type, QString path, 
                    QString fileName, const QDateTime &dateTime, 
-                   const Zones *zones) : 
-    QTreeWidgetItem(parent, type), path(path),
-    fileName(fileName), dateTime(dateTime), zones(zones)
+                   const Zones *zones, QString notesFileName) : 
+    QTreeWidgetItem(parent, type), path(path), fileName(fileName), 
+    dateTime(dateTime), zones(zones), notesFileName(notesFileName)
 {
     setText(0, dateTime.toString("ddd"));
     setText(1, dateTime.toString("MMM d, yyyy"));

@@ -45,8 +45,19 @@
 static char *rideFileRegExp = ("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)"
                                "_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.(raw|srm)$");
 
+QString
+MainWindow::notesFileName(QString rideFileName) {
+    if (rideFileName.endsWith(".raw"))
+        return rideFileName.left(rideFileName.length() - 4) + ".notes";
+    else if (rideFileName.endsWith(".srm"))
+        return rideFileName.left(rideFileName.length() - 4) + ".notes";
+    else 
+        assert(false);
+}
+
 MainWindow::MainWindow(const QDir &home) : 
-    home(home), settings(GC_SETTINGS_CO, GC_SETTINGS_APP), zones(NULL)
+    home(home), settings(GC_SETTINGS_CO, GC_SETTINGS_APP), 
+    zones(NULL), currentNotesChanged(false)
 {
     setWindowTitle(home.dirName());
     settings.setValue(GC_SETTINGS_LAST, home.dirName());
@@ -96,7 +107,7 @@ MainWindow::MainWindow(const QDir &home) :
             QTime time(rx.cap(4).toInt(), rx.cap(5).toInt(),rx.cap(6).toInt()); 
             QDateTime dt(date, time);
             last = new RideItem(allRides, RIDE_TYPE, home.path(), 
-                                name, dt, zones);
+                                name, dt, zones, notesFileName(name));
         }
     }
 
@@ -259,8 +270,13 @@ MainWindow::MainWindow(const QDir &home) :
     window->show();
 
     tabWidget->addTab(window, "Power Histogram");
-
-    //////////////////////// Power Histogram Tab ////////////////////////
+    
+    //////////////////////// Ride Notes ////////////////////////
+    
+    rideNotes = new QTextEdit;
+    tabWidget->addTab(rideNotes, tr("Notes"));
+    
+    //////////////////////// Weekly Summary ////////////////////////
     
     weeklySummary = new QTextEdit;
     weeklySummary->setReadOnly(true);
@@ -292,6 +308,8 @@ MainWindow::MainWindow(const QDir &home) :
             this, SLOT(setBinWidthFromLineEdit()));
     connect(tabWidget, SIGNAL(currentChanged(int)), 
             this, SLOT(tabChanged(int)));
+    connect(rideNotes, SIGNAL(textChanged()),
+            this, SLOT(notesChanged()));
 
     /////////////////////////////// Menus ///////////////////////////////
 
@@ -331,7 +349,7 @@ MainWindow::addRide(QString name)
     QTime time(rx.cap(4).toInt(), rx.cap(5).toInt(),rx.cap(6).toInt()); 
     QDateTime dt(date, time);
     RideItem *last = new RideItem(allRides, RIDE_TYPE, home.path(), 
-                                  name, dt, zones);
+                                  name, dt, zones, notesFileName(name));
     cpintPlot->needToScanRides = true;
     tabWidget->setCurrentIndex(0);
     treeWidget->setCurrentItem(last);
@@ -385,6 +403,15 @@ MainWindow::exportCSV()
 
     RideItem *ride = (RideItem*) treeWidget->selectedItems().first();
 
+    // Ask the user if they prefer to export with English or metric units.
+    QStringList items;
+    items << tr("Metric") << tr("English");
+    bool ok;
+    QString units = QInputDialog::getItem(
+        this, tr("Select Units"), tr("Units:"), items, 0, false, &ok);
+    if(!ok) 
+        return;
+
     QString fileName = QFileDialog::getSaveFileName(
         this, tr("Export CSV"), QDir::homePath(),
         tr("Comma-Separated Values (*.csv)"));
@@ -400,11 +427,19 @@ MainWindow::exportCSV()
         return;
     }
 
+    // Use the column headers that make WKO+ happy.
+    double convertUnit;
     QTextStream out(&file);
-    out << "Time (min),Torq (N-m),Speed (MPH),Power (watts),"
-        << "Distance (miles),Cadence (RPM),Heart rate (BPM),"
-        << "Interval\n";
-
+    if (units=="English"){
+        out << "Minutes,Torq (N-m),MPH,Watts,Miles,Cadence,Hrate,ID\n";
+        convertUnit = 1.0;
+    }
+    else {
+        out << "Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID\n";
+        // TODO: use KM_TO_MI from lib/pt.c instead?
+        convertUnit = 1.60934;
+    }
+        
     QListIterator<RawFilePoint*> i(ride->raw->points);
     while (i.hasNext()) {
         RawFilePoint *point = i.next();
@@ -414,11 +449,11 @@ MainWindow::exportCSV()
         out << ",";
         out << ((point->nm >= 0) ? point->nm : 0.0);
         out << ",";
-        out << ((point->mph >= 0) ? point->mph : 0.0);
+        out << ((point->mph >= 0) ? (point->mph * convertUnit) : 0.0);
         out << ",";
         out << ((point->watts >= 0) ? point->watts : 0.0);
         out << ",";
-        out << point->miles;
+        out << point->miles * convertUnit;
         out << ",";
         out << point->cad;
         out << ",";
@@ -573,11 +608,62 @@ MainWindow::rideSelected()
             // TODO: add daily breakdown
 
             weeklySummary->setHtml(summary);
+            
+            // First save the contents of the notes window.
+            saveNotes();
 
+            // Now open any notes associated with the new ride.
+            rideNotes->setPlainText("");
+            QString notesPath = 
+                home.absolutePath() + "/" + ride->notesFileName;  
+            QFile notesFile(notesPath);
+
+            if (notesFile.exists()) {
+                if (notesFile.open(QFile::ReadOnly | QFile::Text)) {
+                    QTextStream in(&notesFile);
+                    rideNotes->setPlainText(in.readAll());
+                    notesFile.close();
+                } 
+                else {
+                    QMessageBox::critical(
+                        this, tr("Read Error"),
+                        tr("Can't read notes file %1").arg(notesPath));
+                }
+            }
+
+            currentNotesFile = ride->notesFileName; 
+            currentNotesChanged = false;
             return;
         }
     }
     rideSummary->clear();
+}
+
+void MainWindow::saveNotes() 
+{
+    if ((currentNotesFile != "") && currentNotesChanged) {
+        QString notesPath = 
+            home.absolutePath() + "/" + currentNotesFile;
+        QString tmpPath = notesPath + ".tmp";
+        QFile tmp(tmpPath);
+        if (tmp.open(QFile::WriteOnly | QFile::Truncate)) {
+            QTextStream out(&tmp);
+            out << rideNotes->toPlainText();
+            tmp.close();
+            if (rename(tmpPath.toAscii().constData(),
+                       notesPath.toAscii().constData()) == -1) {
+                QMessageBox::critical(
+                    this, tr("Write Error"),
+                    tr("Can't rename %1 to %2")
+                    .arg(tmpPath).arg(notesPath));
+            }
+        } 
+        else {
+            QMessageBox::critical(
+                this, tr("Write Error"),
+                tr("Can't write notes file %1").arg(tmpPath));
+        }
+    }
 }
 
 void 
@@ -590,6 +676,12 @@ void
 MainWindow::moveEvent(QMoveEvent*)
 {
     settings.setValue(GC_SETTINGS_MAIN_GEOM, geometry());
+}
+
+void
+MainWindow::closeEvent(QCloseEvent*)
+{
+    saveNotes();
 }
 
 void 
@@ -701,5 +793,11 @@ MainWindow::aboutDialog()
             "<a href=\"http://goldencheetah.org/\">"
             "http://goldencheetah.org/</a>."
             ));
+}
+
+void
+MainWindow::notesChanged()
+{
+    currentNotesChanged = true;
 }
 

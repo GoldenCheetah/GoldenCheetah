@@ -45,10 +45,11 @@ class RideItem : public QTreeWidgetItem {
         QString summary;
         RawFile *raw;
         const Zones *zones;
+        QString notesFileName;
 
         RideItem(QTreeWidgetItem *parent, int type, QString path, 
                  QString fileName, const QDateTime &dateTime,
-                 const Zones *zones);
+                 const Zones *zones, QString notesFileName);
 
         QString htmlSummary();
         double secsMovingOrPedaling();
