@@ -43,6 +43,7 @@ class MainWindow : public QMainWindow
     protected:
         virtual void resizeEvent(QResizeEvent*);
         virtual void moveEvent(QMoveEvent*);
+        virtual void closeEvent(QCloseEvent*);
     
     private slots:
         void rideSelected();
@@ -59,6 +60,12 @@ class MainWindow : public QMainWindow
         void tabChanged(int index);
         void pickerMoved(const QPoint &);
         void aboutDialog();
+        void notesChanged();
+        void saveNotes();
+
+    protected: 
+
+        static QString notesFileName(QString rideFileName);
 
     private:
 
@@ -85,6 +92,10 @@ class MainWindow : public QMainWindow
         QTreeWidgetItem *allRides;
         PowerHist *powerHist;
         Zones *zones;
+
+        QTextEdit *rideNotes;
+        QString currentNotesFile;
+        bool currentNotesChanged;
 };
 
 #endif // _GC_MainWindow_h
