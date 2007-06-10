@@ -178,12 +178,24 @@ void Zones::zoneInfo(int rnum, int znum,
     high = zone->hi;
 }
 
+int Zones::getFTP(int rnum) const
+{
+    assert(rnum < ranges.size());
+    return ranges[rnum]->ftp;
+}
+
 QString Zones::summarize(int rnum, double *time_in_zone, int num_zones) const
 {
     assert(rnum < ranges.size());
     ZoneRange *range = ranges[rnum];
     assert(num_zones == range->zones.size());
     QString summary;
+    if(range->ftp > 0){
+        summary += "<table align=\"center\" width=\"70%\" border=\"0\">";
+        summary += "<tr><td align=\"center\">";
+        summary += "Functional Threshold Power: " + range->ftp;
+        summary += "</td></tr></table>";
+    }
     summary += "<table align=\"center\" width=\"70%\" ";
     summary += "border=\"0\">";
     summary += "<tr>";

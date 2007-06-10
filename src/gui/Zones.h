@@ -40,7 +40,8 @@ class Zones : public QObject
             QDate begin, end;
             int ftp;
             QList<ZoneInfo*> zones;
-            ZoneRange(const QDate &b, const QDate &e) : begin(b), end(e) {}
+            ZoneRange(const QDate &b, const QDate &e) : 
+                begin(b), end(e), ftp(0) {}
             ~ZoneRange() {
                 QListIterator<ZoneInfo*> i(zones); 
                 while (i.hasNext()) 
@@ -71,8 +72,7 @@ class Zones : public QObject
                       QString &name, QString &description,
                       int &low, int &high) const;
         QString summarize(int rnum, double *time_in_zone, int num_zones) const;
-
+        int getFTP(int rnum) const;
 };
 
 #endif // _Zones_h
-
