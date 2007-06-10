@@ -193,7 +193,7 @@ QString Zones::summarize(int rnum, double *time_in_zone, int num_zones) const
     if(range->ftp > 0){
         summary += "<table align=\"center\" width=\"70%\" border=\"0\">";
         summary += "<tr><td align=\"center\">";
-        summary += "Functional Threshold Power: " + range->ftp;
+        summary += tr("Functional Threshold Power: %1").arg(range->ftp);
         summary += "</td></tr></table>";
     }
     summary += "<table align=\"center\" width=\"70%\" ";
