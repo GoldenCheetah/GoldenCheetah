@@ -200,7 +200,7 @@ update_cpi_file(cpi_file_info *info,
                     goto done;
                 }
             }
-            sum += (q->secs - prev_secs) * q->watts;
+            sum += data.rec_int_ms / 1000.0 * q->watts;
             double dur_secs = q->secs - p->secs;
             double avg = sum / dur_secs;
             int dur_secs_top = (int) floor(dur_secs);
