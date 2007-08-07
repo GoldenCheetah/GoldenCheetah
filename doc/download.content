@@ -43,6 +43,21 @@ href="http://goldencheetah.org/svn/trunk">here</a>.
 </tr>
 
 <tr>
+<td valign="top">Aug 7, 2007</td>
+<td valign="top">
+<a href="GoldenCheetah_2007-08-07_Linux_x86.tgz">Linux x86</a>,<br>
+<a href="GoldenCheetah_2007-08-07_Darwin_powerpc.dmg">Mac OS X PowerPC</a>
+</td>
+<td valign="top">This release fixes a bug in the critical power
+intervals graph where you could get bad data if you started an interval
+after a long period of not moving.  It also adds really basic zooming to
+the ride plot: use the left mouse button to zoom in and the right one to
+return to the previous zoom state.  It's pretty crappy right now, but
+it's better than nothing.
+</td>
+</tr>
+
+<tr>
 <td valign="top">Apr 26, 2007</td>
 <td valign="top">
 <a href="GoldenCheetah_2007-04-26_Linux_x86.tgz">Linux x86</a>,<br>
