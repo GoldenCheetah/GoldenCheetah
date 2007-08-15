@@ -50,7 +50,8 @@ static void summarize(QString &intervals,
                       double &int_watts_sum,
                       double &int_hr_sum,
                       double &int_cad_sum,
-                      double &int_mph_sum) 
+                      double &int_mph_sum,
+                      double &int_max_power) 
 {
     double dur = round(time_end - time_start);
     double len = mile_end - mile_start;
@@ -70,11 +71,13 @@ static void summarize(QString &intervals,
     intervals += "<td align=\"center\">%7</td>";
     intervals += "<td align=\"center\">%8</td>";
     intervals += "<td align=\"center\">%9</td>";
+    intervals += "<td align=\"center\">%10</td>";
     intervals = intervals.arg(last_interval);
     intervals = intervals.arg(minutes, 0, 'f', 0);
     intervals = intervals.arg(seconds, 2, 'f', 0, QLatin1Char('0'));
     intervals = intervals.arg(len, 0, 'f', 1);
     intervals = intervals.arg(energy, 0, 'f', 0);
+    intervals = intervals.arg(int_max_power, 0, 'f', 0);
     intervals = intervals.arg(watts_avg, 0, 'f', 0);
     intervals = intervals.arg(hr_avg, 0, 'f', 0);
     intervals = intervals.arg(cad_avg, 0, 'f', 0);
@@ -84,6 +87,7 @@ static void summarize(QString &intervals,
     int_hr_sum = 0.0;
     int_cad_sum = 0.0;
     int_mph_sum = 0.0;
+    int_max_power = 0.0;
 }
 
 double RideItem::secsMovingOrPedaling()
@@ -172,6 +176,7 @@ RideItem::htmlSummary()
         double int_hr_sum = 0.0;
         double int_cad_sum = 0.0;
         double int_mph_sum = 0.0;
+        double int_max_power = 0.0;
 
         double time_start, time_end, mile_start, mile_end;
 
@@ -186,7 +191,7 @@ RideItem::htmlSummary()
                 if (last_interval != UINT_MAX) {
                     summarize(intervals, last_interval, time_start, 
                               time_end, mile_start, mile_end, int_watts_sum, 
-                              int_hr_sum, int_cad_sum, int_mph_sum);
+                              int_hr_sum, int_cad_sum, int_mph_sum, int_max_power);
                 }
 
                 last_interval = point->interval;
@@ -202,7 +207,9 @@ RideItem::htmlSummary()
             if (point->watts >= 0.0) {
                 total_watts += point->watts * secs_delta;
                 secs_watts += secs_delta;
+
                 int_watts_sum += point->watts * secs_delta;
+                if(point->watts > int_max_power) {int_max_power = point->watts;}
                 if (zones) {
                     int zone = zones->whichZone(zone_range, point->watts);
                     if (zone >= 0)
@@ -226,14 +233,13 @@ RideItem::htmlSummary()
             mile_end = point->miles;
             time_end = point->secs + secs_delta;
         }
-
         summarize(intervals, last_interval, time_start, 
                   time_end, mile_start, mile_end, int_watts_sum, 
-                  int_hr_sum, int_cad_sum, int_mph_sum);
+                  int_hr_sum, int_cad_sum, int_mph_sum, int_max_power);
 
         avg_watts = (secs_watts == 0.0) ? 0.0
             : round(total_watts / secs_watts);
-
+                
         total_distance = raw->points.back()->miles;
         total_work = total_watts / 1000.0;
 
@@ -287,6 +293,7 @@ RideItem::htmlSummary()
             summary += "<td align=\"center\"></td>";
             summary += "<td align=\"center\">Distance</td>";
             summary += "<td align=\"center\">Work</td>";
+            summary += "<td align=\"center\">Max Power</td>";
             summary += "<td align=\"center\">Avg Power</td>";
             summary += "<td align=\"center\">Avg HR</td>";
             summary += "<td align=\"center\">Avg Cadence</td>";
@@ -296,6 +303,7 @@ RideItem::htmlSummary()
             summary += "<td align=\"center\">Duration</td>";
             summary += "<td align=\"center\">(miles)</td>";
             summary += "<td align=\"center\">(kJ)</td>";
+            summary += "<td align=\"center\">(watts)</td>";
             summary += "<td align=\"center\">(watts)</td>";
             summary += "<td align=\"center\">(bpm)</td>";
             summary += "<td align=\"center\">(rpm)</td>";
@@ -316,4 +324,3 @@ RideItem::htmlSummary()
     }
     return summary;
 }
-
