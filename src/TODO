@@ -1,7 +1,8 @@
 
+ - Split into multiple workouts when there are long gaps in time data
  - Sort ride into tree list, don't just append
  - Pop up an "importing rides" thermometer when importing
  - Remember last settings for showPower, showHr, etc.
  - Switch x-axis from minutes to miles
- - Power and HR zones
+ - Power zones dialog
 
