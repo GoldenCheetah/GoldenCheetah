@@ -51,6 +51,7 @@ static void summarize(QString &intervals,
                       double &int_hr_sum,
                       double &int_cad_sum,
                       double &int_mph_sum,
+                      double &int_secs_hr,
                       double &int_max_power) 
 {
     double dur = round(time_end - time_start);
@@ -58,7 +59,7 @@ static void summarize(QString &intervals,
     double minutes = (int) (dur/60.0);
     double seconds = dur - (60 * minutes);
     double watts_avg = int_watts_sum / dur;
-    double hr_avg = int_hr_sum / dur;
+    double hr_avg = int_hr_sum / int_secs_hr;
     double cad_avg = int_cad_sum / dur;
     double mph_avg = int_mph_sum / dur;
     double energy = int_watts_sum / 1000.0; // watts_avg / 1000.0 * dur;
@@ -169,13 +170,14 @@ RideItem::htmlSummary()
         double total_hr = 0.0;
         double secs_cad = 0.0;
         double total_cad = 0.0;
-
+       
         QString intervals = "";
         unsigned last_interval = UINT_MAX;
         double int_watts_sum = 0.0;
         double int_hr_sum = 0.0;
         double int_cad_sum = 0.0;
         double int_mph_sum = 0.0;
+        double int_secs_hr = 0.0;
         double int_max_power = 0.0;
 
         double time_start, time_end, mile_start, mile_end;
@@ -191,12 +193,13 @@ RideItem::htmlSummary()
                 if (last_interval != UINT_MAX) {
                     summarize(intervals, last_interval, time_start, 
                               time_end, mile_start, mile_end, int_watts_sum, 
-                              int_hr_sum, int_cad_sum, int_mph_sum, int_max_power);
+                              int_hr_sum, int_cad_sum, int_mph_sum, int_secs_hr,  int_max_power);
                 }
 
                 last_interval = point->interval;
                 time_start = point->secs;
                 mile_start = point->miles;
+                int_secs_hr = secs_delta;
             }
 
             if ((point->mph > 0.0) || (point->cad > 0.0)) {
@@ -220,6 +223,7 @@ RideItem::htmlSummary()
                 total_hr += point->hr * secs_delta;
                 secs_hr += secs_delta;
                 int_hr_sum += point->hr * secs_delta;
+                int_secs_hr += secs_delta;
             }
             if (point->cad > 0) {
                 total_cad += point->cad * secs_delta;
@@ -235,14 +239,14 @@ RideItem::htmlSummary()
         }
         summarize(intervals, last_interval, time_start, 
                   time_end, mile_start, mile_end, int_watts_sum, 
-                  int_hr_sum, int_cad_sum, int_mph_sum, int_max_power);
+                  int_hr_sum, int_cad_sum, int_mph_sum, int_secs_hr, int_max_power);
 
         avg_watts = (secs_watts == 0.0) ? 0.0
             : round(total_watts / secs_watts);
                 
         total_distance = raw->points.back()->miles;
         total_work = total_watts / 1000.0;
-
+                
         summary += "<p>";
         summary += "<table align=\"center\" width=\"90%\" border=0>";
         summary += "<tr><td align=\"center\"><h2>Totals</h2></td>";
