@@ -20,6 +20,8 @@ HEADERS += \
 	AllPlot.h \
 	ChooseCyclistDialog.h \
 	CpintPlot.h \
+        CsvData.h \
+        DatePickerDialog.h \
 	DownloadRideDialog.h \
         LogTimeScaleDraw.h \
         LogTimeScaleEngine.h \
@@ -34,6 +36,8 @@ SOURCES += \
 	AllPlot.cpp \
 	ChooseCyclistDialog.cpp \
 	CpintPlot.cpp \
+        CsvData.cpp \
+        DatePickerDialog.cpp \
 	DownloadRideDialog.cpp \
         LogTimeScaleDraw.cpp \
         LogTimeScaleEngine.cpp \

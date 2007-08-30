@@ -23,6 +23,7 @@
 #include <assert.h>
 #include <QMessageBox>
 #include "srm.h"
+#include "CsvData.h"
 
 extern "C" {
 #include "pt.h"
@@ -121,6 +122,16 @@ RawFile *RawFile::readFile(QFile &file, QStringList &errors)
             result->points.append(p2);
         }
     }
+    else if (file.fileName().indexOf(".csv") == file.fileName().size() - 4) 
+    {
+        CsvData data;
+ 	if (!file.open(QFile::ReadOnly)) {
+           errors << QString("can't open file %1").arg(file.fileName());
+           return false;
+        }
+        
+	data.readCsvFile(file, result);
+   }  
     else {
         if (!result->file.open(QIODevice::ReadOnly)) {
             delete result;
