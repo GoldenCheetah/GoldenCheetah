@@ -39,11 +39,14 @@
 #include <qwt_plot_zoomer.h>
 #include <qwt_data.h>
 
+#include "DatePickerDialog.h"
+
+
 #define FOLDER_TYPE 0
 #define RIDE_TYPE 1
 
 static char *rideFileRegExp = ("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)"
-                               "_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.(raw|srm)$");
+                               "_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.(raw|srm|csv)$");
 
 QString
 MainWindow::notesFileName(QString rideFileName) {
@@ -51,6 +54,8 @@ MainWindow::notesFileName(QString rideFileName) {
         return rideFileName.left(rideFileName.length() - 4) + ".notes";
     else if (rideFileName.endsWith(".srm"))
         return rideFileName.left(rideFileName.length() - 4) + ".notes";
+    else if ( rideFileName.endsWith (".csv"))
+	return rideFileName.left ( rideFileName.length() - 4) + ".notes";
     else 
         assert(false);
 }
@@ -96,7 +101,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     QRegExp rx(rideFileRegExp);
     QStringList filters;
-    filters << "*.raw" << "*.srm";
+    filters << "*.raw" << "*.srm"<<"*.csv";
     QTreeWidgetItem *last = NULL;
     QStringListIterator i(home.entryList(filters, QDir::Files));
     while (i.hasNext()) {
@@ -328,6 +333,8 @@ MainWindow::MainWindow(const QDir &home) :
                         SLOT(exportCSV()), tr("Ctrl+E")); 
     rideMenu->addAction(tr("&Import from SRM..."), this, 
                         SLOT(importSRM()), tr("Ctrl+I")); 
+	rideMenu->addAction ( tr ( "&Import from CSV..." ), this,
+	                      SLOT (importCSV()), tr ("Ctrl+S"));
 
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(tr("&About GoldenCheetah"), this, SLOT(aboutDialog()));
@@ -463,6 +470,62 @@ MainWindow::exportCSV()
     }
 
     file.close();
+}
+
+void MainWindow::importCSV()
+{
+    // Ask the user if they prefer to export with English or metric units.
+    DatePickerDialog *dpd = new DatePickerDialog(this);
+    dpd->exec();
+
+    if(dpd->canceled == true)
+        return;
+
+    QFile file ( dpd->fileName );
+    QStringList errors;
+    RawFile *raw = RawFile::readFile ( file, errors );
+
+    raw->startTime = dpd->date; 
+
+    if ( !raw || !errors.empty() )
+    {
+        QString all = 
+            ( raw
+              ? tr ( "Non-fatal problem(s) opening %1:" )
+              : tr ( "Fatal problem(s) opening %1:" ) ).arg ( dpd->fileName );
+        QStringListIterator i ( errors );
+        while ( i.hasNext() )
+            all += "\n" + i.next();
+        if ( raw )
+            QMessageBox::warning ( this, tr ( "Open Warning" ), all );
+        else
+        {
+            QMessageBox::critical ( this, tr ( "Open Error" ), all );
+            return;
+        }
+    }
+
+    QChar zero = QLatin1Char ( '0' );
+
+    QString name = QString ( "%1_%2_%3_%4_%5_%6.csv" )
+        .arg ( raw->startTime.date().year(), 4, 10, zero )
+        .arg ( raw->startTime.date().month(), 2, 10, zero )
+        .arg ( raw->startTime.date().day(), 2, 10, zero )
+        .arg ( raw->startTime.time().hour(), 2, 10, zero )
+        .arg ( raw->startTime.time().minute(), 2, 10, zero )
+        .arg ( raw->startTime.time().second(), 2, 10, zero );
+
+    if ( !file.copy ( home.absolutePath() + "/" + name ) )
+    {
+        QMessageBox::critical ( this, tr ( "Copy Error" ),
+                                tr ( "Couldn't copy %1" )
+                                .arg ( dpd->fileName ) );
+        return;
+    }
+
+    delete raw;
+    delete dpd;
+    addRide ( name );
 }
 
 void
