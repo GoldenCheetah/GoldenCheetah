@@ -25,6 +25,7 @@
 
 class QwtPlotCurve;
 class QwtPlotGrid;
+class QwtPlotMarker;
 class RawFile;
 
 class AllPlot : public QwtPlot
@@ -37,6 +38,7 @@ class AllPlot : public QwtPlot
         QwtPlotCurve *hrCurve;
         QwtPlotCurve *speedCurve;
         QwtPlotCurve *cadCurve;
+        QwtPlotMarker *d_mrk;
 
         AllPlot();
 
@@ -63,6 +65,8 @@ class AllPlot : public QwtPlot
         double *cadArray;
         double *timeArray;
         int arrayLength;
+        int *interArray;
+        
 
         int smooth;
 
