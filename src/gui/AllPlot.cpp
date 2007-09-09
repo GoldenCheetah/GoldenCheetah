@@ -26,6 +26,8 @@
 #include <assert.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
+#include <qwt_plot_marker.h>
+#include <qwt_text.h>
 #include <qwt_legend.h>
 #include <qwt_data.h>
 
@@ -33,9 +35,9 @@ static const inline double
 max(double a, double b) { if (a > b) return a; else return b; }
 
 AllPlot::AllPlot() : 
-    hrArray(NULL), wattsArray(NULL), 
+    d_mrk(NULL), hrArray(NULL), wattsArray(NULL), 
     speedArray(NULL), cadArray(NULL), 
-    timeArray(NULL), smooth(30)
+    timeArray(NULL), interArray(NULL), smooth(30)
 {
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setCanvasBackground(Qt::white);
@@ -72,8 +74,9 @@ AllPlot::AllPlot() :
 
 struct DataPoint {
     double time, hr, watts, speed, cad;
-    DataPoint(double t, double h, double w, double s, double c) : 
-        time(t), hr(h), watts(w), speed(s), cad(c) {}
+    int inter;
+    DataPoint(double t, double h, double w, double s, double c, int i) : 
+        time(t), hr(h), watts(w), speed(s), cad(c), inter(i) {}
 };
 
 void
@@ -93,6 +96,13 @@ AllPlot::recalc()
     double *smoothSpeed = new double[rideTimeSecs + 1];
     double *smoothCad   = new double[rideTimeSecs + 1];
     double *smoothTime  = new double[rideTimeSecs + 1];
+    
+    delete [] d_mrk;
+    QList<double> interList; //Just store the time that it happened. 
+                             //Intervals are sequential.
+
+    int lastInterval = 0; //Detect if we hit a new interval
+
     for (int secs = 0; ((secs < smooth) 
                         && (secs < rideTimeSecs)); ++secs) {
         smoothWatts[secs] = 0.0;
@@ -105,12 +115,17 @@ AllPlot::recalc()
         while ((i < arrayLength) && (timeArray[i] <= secs)) {
             DataPoint *dp = 
                 new DataPoint(timeArray[i], hrArray[i], wattsArray[i], 
-                              speedArray[i], cadArray[i]);
+                              speedArray[i], cadArray[i], interArray[i]);
             totalWatts += wattsArray[i];
             totalHr    += hrArray[i];
             totalSpeed += speedArray[i];
             totalCad   += cadArray[i];
             list.append(dp);
+            //Figure out when and if we have a new interval..
+            if(lastInterval != interArray[i]) {
+                lastInterval = interArray[i];
+                interList.append(secs/60);
+            }
             ++i;
         }
         while (!list.empty() && (list.front()->time < secs - smooth)) {
@@ -144,6 +159,25 @@ AllPlot::recalc()
     cadCurve->setData(smoothTime, smoothCad, rideTimeSecs + 1);
     setAxisScale(xBottom, 0.0, smoothTime[rideTimeSecs]);
     setYMax();
+    
+    QString label[interList.size()];
+    QwtText text[interList.size()];
+    d_mrk = new QwtPlotMarker[interList.size()];
+
+    for(int x = 0; x < interList.size(); x++) {
+        // marker
+        d_mrk[x].setValue(0,0);
+        d_mrk[x].setLineStyle(QwtPlotMarker::VLine);
+        d_mrk[x].setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
+        d_mrk[x].setLinePen(QPen(Qt::black, 0, Qt::DashDotLine));
+        d_mrk[x].attach(this);
+        label[x].setNum(x+1);
+        text[x] = QwtText(label[x]);
+        text[x].setFont(QFont("Helvetica", 10, QFont::Bold));
+        text[x].setColor(Qt::black);
+        d_mrk[x].setValue(interList.at(x), 0.0);
+        d_mrk[x].setLabel(text[x]);
+    }
 
     replot();
     delete [] smoothWatts;
@@ -186,12 +220,15 @@ AllPlot::setData(RawFile *raw)
     delete [] speedArray;
     delete [] cadArray;
     delete [] timeArray;
+    delete [] interArray;
+    
     setTitle(raw->startTime.toString(GC_DATETIME_FORMAT));
     wattsArray = new double[raw->points.size()];
     hrArray    = new double[raw->points.size()];
     speedArray    = new double[raw->points.size()];
     cadArray    = new double[raw->points.size()];
     timeArray  = new double[raw->points.size()];
+    interArray = new int[raw->points.size()];
     arrayLength = 0;
     QListIterator<RawFilePoint*> i(raw->points); 
     while (i.hasNext()) {
@@ -201,6 +238,7 @@ AllPlot::setData(RawFile *raw)
         hrArray[arrayLength]    = max(0, point->hr);
         speedArray[arrayLength] = max(0, point->mph);
         cadArray[arrayLength]   = max(0, point->cad);
+        interArray[arrayLength] = point->interval;
         ++arrayLength;
     }
     recalc();
