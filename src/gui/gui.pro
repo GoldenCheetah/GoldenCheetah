@@ -3,7 +3,7 @@
 ######################################################################
 
 TEMPLATE = app
-TARGET += 
+TARGET = GoldenCheetah
 DEPENDPATH += .
 INCLUDEPATH += /usr/local/qwt/include ../lib ../srm
 CONFIG += static debug
