@@ -36,7 +36,7 @@ pt_pack(FILE *in, FILE *out, int wheel_sz_mm, int rec_int)
     int last_interval = 0;
     int i;
     struct tm start_tm, inc_tm;
-    time_t start_time, inc_time;
+    time_t start_time = 0, inc_time;
     int lineno = 1;
     char line[256];
     unsigned char buf[6];
@@ -116,7 +116,8 @@ pt_pack(FILE *in, FILE *out, int wheel_sz_mm, int rec_int)
             interval = atoi(line + rider_pmatch[11].rm_so);
             if (mins - last_mins - 0.021 > 1.0 / 60.0) {
                 struct tm *tm_p;
-                inc_time = start_time + round((mins - 0.021000001) * 60.0);
+                inc_time = start_time 
+                    + (unsigned) round((mins - 0.021000001) * 60.0);
                 tm_p = localtime(&inc_time);
                 assert(tm_p);
                 inc_tm = *tm_p;
@@ -203,7 +204,7 @@ main(int argc, char *argv[])
             exit(1);
         }
         if (outname == NULL) {
-            outname = malloc(strlen(inname) + 5);
+            outname = (char*) malloc(strlen(inname) + 5);
             strcpy(outname, inname);
             for (i = strlen(outname); i >= 0; --i)
                 if (outname[i] == '.') break;

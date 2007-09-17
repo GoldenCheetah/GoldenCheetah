@@ -94,7 +94,7 @@ main(int argc, char *argv[])
     int i, ch, fd, r;
     char *devices[MAX_DEVICES];
     int dev_cnt = 0;
-    char *outname;
+    char *outname = NULL;
     FILE *out = NULL;
     struct pt_read_version_state vstate;
     struct pt_read_data_state dstate;

@@ -151,7 +151,7 @@ main(int argc, char *argv[])
             exit(1);
         }
         if (outname == NULL) {
-            outname = malloc(strlen(inname) + 5);
+            outname = (char*) malloc(strlen(inname) + 5);
             strcpy(outname, inname);
             for (i = strlen(outname); i >= 0; --i)
                 if (outname[i] == '.') break;
