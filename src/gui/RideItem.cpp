@@ -131,6 +131,8 @@ double RideItem::timeInZone(int zone)
 {
     if (summary.isEmpty())
         htmlSummary();
+    if (!raw)
+        return 0.0;
     assert(zone_range >= 0);
     assert(zone < num_zones);
     return time_in_zone[zone];
@@ -143,6 +145,14 @@ RideItem::htmlSummary()
         QFile file(path + "/" + fileName);
         QStringList errors;
         raw = RawFile::readFile(file, errors);
+        if (!raw) {
+            summary = ("<p>Couldn't read file \"" + 
+                       file.fileName() + "\":");
+            QListIterator<QString> i(errors);
+            while (i.hasNext())
+                summary += "<br>" + i.next();
+            return summary;
+        }
         summary = ("<p><center><h2>" 
                    + dateTime.toString("dddd MMMM d, yyyy, h:mm AP") 
                    + "</h2><p><h2>Summary</h2>");

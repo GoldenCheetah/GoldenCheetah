@@ -26,6 +26,7 @@
 #include "PowerHist.h"
 #include "RawFile.h"
 #include "RideItem.h"
+#include "RideFile.h"
 #include "Settings.h"
 #include "TimeUtils.h"
 #include "Zones.h"
@@ -50,14 +51,9 @@ static char *rideFileRegExp = ("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)"
 
 QString
 MainWindow::notesFileName(QString rideFileName) {
-    if (rideFileName.endsWith(".raw"))
-        return rideFileName.left(rideFileName.length() - 4) + ".notes";
-    else if (rideFileName.endsWith(".srm"))
-        return rideFileName.left(rideFileName.length() - 4) + ".notes";
-    else if ( rideFileName.endsWith (".csv"))
-	return rideFileName.left ( rideFileName.length() - 4) + ".notes";
-    else 
-        assert(false);
+    int i = rideFileName.lastIndexOf(".");
+    assert(i >= 0);
+    return rideFileName.left(i) + ".notes";
 }
 
 MainWindow::MainWindow(const QDir &home) : 
@@ -100,10 +96,8 @@ MainWindow::MainWindow(const QDir &home) :
     splitter->addWidget(treeWidget);
 
     QRegExp rx(rideFileRegExp);
-    QStringList filters;
-    filters << "*.raw" << "*.srm"<<"*.csv";
     QTreeWidgetItem *last = NULL;
-    QStringListIterator i(home.entryList(filters, QDir::Files));
+    QStringListIterator i(CombinedFileReader::instance().listRideFiles(home));
     while (i.hasNext()) {
         QString name = i.next();
         if (rx.exactMatch(name)) {
@@ -585,10 +579,12 @@ MainWindow::rideSelected()
             RideItem *ride = (RideItem*) which;
             rideSummary->setHtml(ride->htmlSummary());
             rideSummary->setAlignment(Qt::AlignCenter);
-            allPlot->setData(ride->raw);
+            if (ride->raw)
+                allPlot->setData(ride->raw);
             if (tabWidget->currentIndex() == 2)
                 cpintPlot->calculate(ride->fileName, ride->dateTime);
-            powerHist->setData(ride->raw);
+            if (ride->raw)
+                powerHist->setData(ride->raw);
 
             QDate wstart = ride->dateTime.date();
             wstart = wstart.addDays(Qt::Monday - wstart.dayOfWeek());
