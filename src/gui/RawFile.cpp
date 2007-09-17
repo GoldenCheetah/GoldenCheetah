@@ -19,132 +19,33 @@
  */
 
 #include "RawFile.h"
-#include <math.h>
+#include "RideFile.h"
 #include <assert.h>
-#include <QMessageBox>
-#include "srm.h"
-#include "CsvData.h"
+#include <math.h>
 
-extern "C" {
-#include "pt.h"
-}
-
-struct RawFileReadState
-{
-    QList<RawFilePoint*> &points;
-    QMap<double,double> &powerHist;
-    QStringList &errors;
-    double last_secs, last_miles;
-    unsigned last_interval;
-    time_t start_since_epoch;
-    unsigned rec_int;
-    RawFileReadState(QList<RawFilePoint*> &points, 
-                     QMap<double,double> &powerHist,
-                     QStringList &errors) : 
-        points(points), powerHist(powerHist), errors(errors), last_secs(0.0), 
-        last_miles(0.0), last_interval(0), start_since_epoch(0), rec_int(0) {}
-};
-
-static void 
-config_cb(unsigned /*interval*/, unsigned rec_int, 
-          unsigned /*wheel_sz_mm*/, void *context) 
-{
-    RawFileReadState *state = (RawFileReadState*) context;
-    // Assume once set, rec_int should never change.
-    assert((state->rec_int == 0) || (state->rec_int == rec_int));
-    state->rec_int = rec_int;
-}
-
-static void
-time_cb(struct tm *, time_t since_epoch, void *context)
-{
-    RawFileReadState *state = (RawFileReadState*) context;
-    if (state->start_since_epoch == 0)
-        state->start_since_epoch = since_epoch;
-    double secs = since_epoch - state->start_since_epoch;
-    RawFilePoint *point = new RawFilePoint(secs, -1.0, -1.0, -1.0, 
-                                           state->last_miles, 0, 0, 
-                                           state->last_interval);
-    state->points.append(point);
-    state->last_secs = secs;
-}
-
-static void
-data_cb(double secs, double nm, double mph, double watts, double miles, 
-        unsigned cad, unsigned hr, unsigned interval, void *context)
-{
-    RawFileReadState *state = (RawFileReadState*) context;
-    RawFilePoint *point = new RawFilePoint(secs, nm, mph, watts, miles,
-                                           cad, hr, interval);
-    state->points.append(point);
-    state->last_secs = secs;
-    state->last_miles = miles;
-    state->last_interval = interval;
-    double sum = state->rec_int * 0.021;
-    if (watts >= 0.0) {
-        if (state->powerHist.contains(watts)) {
-            sum += state->powerHist.value(watts);
-            state->powerHist.remove(watts);
-        }
-        state->powerHist.insert(watts, sum);
-    }
-}
-
-static void
-error_cb(const char *msg, void *context) 
-{
-    RawFileReadState *state = (RawFileReadState*) context;
-    state->errors.append(QString(msg));
-}
+#define KM_TO_MILES 0.62137119
 
 RawFile *RawFile::readFile(QFile &file, QStringList &errors)
 {
+    RideFile *rideFile = 
+        CombinedFileReader::instance().openRideFile(file, errors);
+    if (!rideFile)
+        return NULL;
     RawFile *result = new RawFile(file.fileName());
-    if (file.fileName().indexOf(".srm") == file.fileName().size() - 4) {
-        SrmData data;
-        if (!readSrmFile(file, data, errors)) {
-            delete result;
-            return NULL;
-        }
-        result->startTime = data.startTime;
-        result->rec_int_ms = (unsigned) round(data.recint * 1000.0);
-
-        QListIterator<SrmDataPoint*> i(data.dataPoints);
-        while (i.hasNext()) {
-            SrmDataPoint *p1 = i.next();
-            RawFilePoint *p2 = new RawFilePoint(
-                p1->secs, 0, p1->kph * 0.62137119, p1->watts,
-                p1->km * 0.62137119, p1->cad, p1->hr, p1->interval);
-            if (result->powerHist.contains(p2->watts))
-                result->powerHist[p2->watts] += data.recint;
-            else
-                result->powerHist[p2->watts] = data.recint;
-            result->points.append(p2);
-        }
-    }
-    else if (file.fileName().indexOf(".csv") == file.fileName().size() - 4) 
-    {
-        CsvData data;
- 	if (!file.open(QFile::ReadOnly)) {
-           errors << QString("can't open file %1").arg(file.fileName());
-           return false;
-        }
-        
-	data.readCsvFile(file, result);
-   }  
-    else {
-        if (!result->file.open(QIODevice::ReadOnly)) {
-            delete result;
-            return NULL;
-        }
-        FILE *f = fdopen(result->file.handle(), "r");
-        assert(f);
-        RawFileReadState state(result->points, result->powerHist, errors);
-        pt_read_raw(f, 0 /* not compat */, &state, config_cb, 
-                    time_cb, data_cb, error_cb);
-        result->rec_int_ms = (unsigned) round(state.rec_int * 1.26 * 1000.0);
+    result->startTime = rideFile->startTime();
+    result->rec_int_ms = (unsigned) round(rideFile->recIntSecs() * 1000.0);
+    QListIterator<RideFilePoint*> i(rideFile->dataPoints());
+    while (i.hasNext()) {
+        const RideFilePoint *p1 = i.next();
+        RawFilePoint *p2 = new RawFilePoint(
+            p1->secs, p1->nm, p1->kph * KM_TO_MILES, p1->watts,
+            p1->km * KM_TO_MILES, (int) p1->cad, (int) p1->hr, p1->interval);
+        if (result->powerHist.contains(p2->watts))
+            result->powerHist[p2->watts] += rideFile->recIntSecs();
+        else
+            result->powerHist[p2->watts] = rideFile->recIntSecs();
+        result->points.append(p2);
     }
     return result;
 }
-
 
