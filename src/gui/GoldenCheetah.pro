@@ -5,10 +5,10 @@
 TEMPLATE = app
 TARGET += 
 DEPENDPATH += .
-INCLUDEPATH += /usr/local/qwt/include ../lib ../srm ../cpint
+INCLUDEPATH += /usr/local/qwt/include ../lib ../srm
 CONFIG += static debug
 LIBS += /usr/local/qwt/lib/libqwt.a 
-LIBS += ../lib/libgc.a ../cpint/libcpint.a ../srm/libsrm.a
+LIBS += ../lib/libgc.a ../srm/libsrm.a
 LIBS += -lm -lz
 macx {
     LIBS += -framework Carbon
@@ -33,7 +33,8 @@ HEADERS += \
 	RideItem.h \
 	SrmRideFile.h \
 	TimeUtils.h \
-        Zones.h
+        Zones.h \
+	cpint.h
 
 SOURCES += \
 	AllPlot.cpp \
@@ -53,5 +54,6 @@ SOURCES += \
 	SrmRideFile.cpp \
         TimeUtils.cpp \
         Zones.cpp \
+	cpint.cpp \
 	\
 	main.cpp

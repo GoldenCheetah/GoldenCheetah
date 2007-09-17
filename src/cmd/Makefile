@@ -23,14 +23,19 @@ QT=$(subst /bin/qmake,,$(shell which qmake))
 CC=gcc
 CFLAGS=-g -W -Wall -Werror -ansi -pedantic -std=c99
 CMDS=ptdl ptpk ptunpk cpint
-LIBS=../lib/libgc.a ../cpint/libcpint.a ../srm/libsrm.a
+GUIOBJ=../gui/cpint.o \
+	../gui/RideFile.o \
+	../gui/CsvRideFile.o \
+	../gui/SrmRideFile.o \
+	../gui/RawRideFile.o
+LIBS=../lib/libgc.a ../srm/libsrm.a
 LIBRARIES=-lm
 ifeq ($(OS),Darwin)
   LIBRARIES+=-lm -F$(QT)/lib -framework QtCore
 else
   LIBRARIES+=-L$(QT)/lib -lQtCore
 endif
-INCLUDES=-I../lib -I../cpint
+INCLUDES=-I../lib -I../gui
 
 all: $(CMDS)
 .PHONY: all clean
@@ -42,7 +47,7 @@ clean:
 	$(CC) -c $(CFLAGS) $(INCLUDES) $< 
 
 cpint: cpint.o $(LIBS)
-	$(CXX) -o $@ $^ $(LIBS) $(LIBRARIES)
+	$(CXX) -o $@ $^ $(GUIOBJ) $(LIBS) $(LIBRARIES)
 
 ptdl: ptdl.o $(LIBS)
 	$(CC) -o $@ $^ $(LIBRARIES)
