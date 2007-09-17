@@ -25,9 +25,8 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include "srm.h"
-#include "pt.h"
 #include "cpint.h"
+#include "RideFile.h"
 
 struct cpint_point 
 {
@@ -44,85 +43,38 @@ struct cpint_data {
     cpint_data() : start_since_epoch(0), rec_int_ms(0) {}
 };
 
-static void 
-config_cb(unsigned interval, unsigned rec_int, 
-          unsigned wheel_sz_mm, void *context) 
-{
-    (void) interval;
-    (void) wheel_sz_mm;
-    cpint_data *data = (cpint_data*) context;
-    int new_rec_int_ms = rec_int * 1260;
-    assert((data->rec_int_ms == 0) || (data->rec_int_ms == new_rec_int_ms));
-    data->rec_int_ms = new_rec_int_ms;
-}
-
-static void
-time_cb(struct tm *time, time_t since_epoch, void *context)
-{
-    (void) time;
-    cpint_data *data = (cpint_data*) context;
-    if (data->start_since_epoch == 0)
-        data->start_since_epoch = since_epoch;
-    double secs = since_epoch - data->start_since_epoch;
-    /* Be conservative: a sleep interval counts as all zeros. */
-    data->points.append(cpint_point(secs, 0));
-}
-
-static void
-data_cb(double secs, double nm, double mph, double watts, double miles, 
-        unsigned cad, unsigned hr, unsigned interval, void *context)
-{
-    cpint_data *data = (cpint_data*) context;
-    (void) nm;
-    (void) miles;
-    (void) cad;
-    (void) hr;
-    (void) interval;
-    /* Be conservative: count NaN's as zeros. */
-    data->points.append(cpint_point(secs, ((mph == -1.0) ? 0 
-                                           : (int) round(watts)))); 
-}
-
-static void
-error_cb(const char *msg, void *context) 
-{
-    cpint_data *data = (cpint_data*) context;
-    fprintf(stderr, "%s\n", msg);
-    data->errors << msg;
-}
-
 cpi_file_info *
 cpi_files_to_update(const char *dir)
 {
-    DIR *dirp;
-    struct dirent *dp;
     regex_t reg;
     struct stat sbi, sbo;
     char *inname, *outname;
     cpi_file_info *head = NULL, *tail = NULL;
 
     if (regcomp(&reg, "^([0-9][0-9][0-9][0-9])_([0-9][0-9])_([0-9][0-9])"
-                "_([0-9][0-9])_([0-9][0-9])_([0-9][0-9])\\.(raw|srm)$", 
+                "_([0-9][0-9])_([0-9][0-9])_([0-9][0-9])\\.(raw|srm|csv)$", 
                 REG_EXTENDED))
         assert(0);
 
-    dirp = opendir(dir);
-    assert(dirp);
-    while ((dp = readdir(dirp)) != NULL) {
+    QStringList filenames = 
+        CombinedFileReader::instance().listRideFiles(QDir(dir));
+    QListIterator<QString> i(filenames);
+    while (i.hasNext()) {
+        QString filename = i.next();
         int nmatch = 7;
         regmatch_t *pmatch = (regmatch_t*) calloc(nmatch, sizeof(regmatch_t));
-        if (regexec(&reg, dp->d_name, nmatch, pmatch, 0) == 0) {
+        if (regexec(&reg, filename.toAscii().constData(), nmatch, pmatch, 0) == 0) {
             inname = (char*) malloc(strlen(dir) + 25);
             outname = (char*) malloc(strlen(dir) + 25);
-            sprintf(inname, "%s/%s", dir, dp->d_name);
+            sprintf(inname, "%s/%s", dir, filename.toAscii().constData());
             if (stat(inname, &sbi))
                 assert(0);
-            sprintf(outname, "%s/%s", dir, dp->d_name);
+            sprintf(outname, "%s/%s", dir, filename.toAscii().constData());
             strcpy(outname + strlen(outname) - 4, ".cpi");
             if ((stat(outname, &sbo)) || (sbo.st_mtime < sbi.st_mtime)) {
                 cpi_file_info *info = 
                     (cpi_file_info*) malloc(sizeof(cpi_file_info));
-                info->file = strdup(dp->d_name);
+                info->file = strdup(filename.toAscii().constData());
                 info->inname = inname;
                 info->outname = outname;
                 info->pmatch = pmatch;
@@ -143,7 +95,6 @@ cpi_files_to_update(const char *dir)
             free(pmatch);
         }
     }
-    closedir(dirp);
 
     return head;
 }
@@ -153,32 +104,21 @@ update_cpi_file(cpi_file_info *info,
                 int (*cancel_cb)(void *user_data),
                 void *user_data) 
 {
+    QFile file(info->inname);
+    QStringList errors;
+    RideFile *rideFile = 
+        CombinedFileReader::instance().openRideFile(file, errors);
+    assert(rideFile);
     cpint_data data;
-
-    if (strcmp(info->inname + strlen(info->inname) - 4, ".raw") == 0) {
-        FILE *in = fopen(info->inname, "r");
-        assert(in);
-        pt_read_raw(in, 0 /* not compat */, &data, 
-                    &config_cb, &time_cb, &data_cb, &error_cb);
-        fclose(in);
+    data.start_since_epoch = rideFile->startTime().toTime_t();
+    data.rec_int_ms = (int) round(rideFile->recIntSecs() * 1000.0);
+    QListIterator<RideFilePoint*> i(rideFile->dataPoints());
+    while (i.hasNext()) {
+        const RideFilePoint *p = i.next();
+        double secs = round(p->secs * 1000.0) / 1000;
+        data.points.append(cpint_point(secs, (int) round(p->watts)));
     }
-    else if (strcmp(info->inname + strlen(info->inname) - 4, ".srm") == 0) {
-        QFile infile(info->inname);
-        SrmData srmdata;
-        QStringList errorStrings;
-        if (!readSrmFile(infile, srmdata, errorStrings))
-            assert(false);
-        data.start_since_epoch = srmdata.startTime.toTime_t();
-        data.rec_int_ms = (int) round(srmdata.recint * 1000.0);
-        QListIterator<SrmDataPoint*> i(srmdata.dataPoints);
-        while (i.hasNext()) {
-            SrmDataPoint *point = i.next();
-            data.points.append(cpint_point(point->secs, point->watts));
-        }
-    }
-    else {
-        assert(false);
-    }
+    delete rideFile;
 
     FILE *out = fopen(info->outname, "w");
     assert(out);
