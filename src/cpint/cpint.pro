@@ -4,8 +4,8 @@
 
 TEMPLATE = lib
 TARGET = 
-DEPENDPATH += .
-INCLUDEPATH += . ../lib ../srm
+DEPENDPATH += . ../gui
+INCLUDEPATH += . ../lib ../srm ../gui
 
 CONFIG += static debug
 LIBS += -lm
