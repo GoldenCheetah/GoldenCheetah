@@ -67,7 +67,7 @@ pt_find_device(char *result[], int capacity)
     dirp = opendir("/dev");
     while ((count < capacity) && ((dp = readdir(dirp)) != NULL)) {
         if (regexec(&reg, dp->d_name, 0, NULL, 0) == 0) {
-            result[count] = malloc(6 + strlen(dp->d_name));
+            result[count] = (char*) malloc(6 + strlen(dp->d_name));
             sprintf(result[count], "/dev/%s", dp->d_name);
             ++count;
         }
@@ -521,14 +521,14 @@ pt_pack_data(unsigned char *buf, unsigned wheel_sz_mm, double nm,
              double mph, double miles, unsigned cad, unsigned hr) 
 {
     double rotations = miles / BAD_KM_TO_MI * 1000.00 * 1000.0 / wheel_sz_mm;
-    unsigned inlbs = round(nm / BAD_LBFIN_TO_NM_2);
+    unsigned inlbs = (unsigned) round(nm / BAD_LBFIN_TO_NM_2);
     double kph10 = mph * 10.0 / BAD_KM_TO_MI;
     unsigned speed;
     if (mph == -1.0)
         speed = 0xfff;
     else
-        speed = round(MAGIC_CONSTANT / kph10); 
-    buf[0] = 0x80 | check(round(rotations));
+        speed = (unsigned) round(MAGIC_CONSTANT / kph10); 
+    buf[0] = 0x80 | check((unsigned) round(rotations));
     buf[1] = ((inlbs & 0xf00) >> 4) | ((speed & 0xf00) >> 8);
     buf[2] = inlbs & 0xff;
     buf[3] = speed & 0xff;
