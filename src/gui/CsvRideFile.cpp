@@ -1,5 +1,6 @@
 /* 
- * Copyright (c) 2007 Sean C. Rhea (srhea@srhea.net)
+ * Copyright (c) 2007 Sean C. Rhea (srhea@srhea.net), 
+ *                    Justin F. Knotzke (jknotzke@shampoo.ca)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -45,15 +46,6 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                              rideTime.cap(6).toInt()));
     QRegExp metricUnits("(km|kph)", Qt::CaseInsensitive);
     QRegExp englishUnits("(miles|mph)", Qt::CaseInsensitive);
-    QRegExp sample("^\\s*"
-                   "(\\d+|\\d+\\.\\d+)\\s*,\\s*"
-                   "(\\d+|\\d+\\.\\d+)\\s*,\\s*"
-                   "(\\d+|\\d+\\.\\d+)\\s*,\\s*"
-                   "(\\d+|\\d+\\.\\d+)\\s*,\\s*"
-                   "(\\d+|\\d+\\.\\d+)\\s*,\\s*"
-                   "(\\d+|\\d+\\.\\d+)\\s*,\\s*"
-                   "(\\d+|\\d+\\.\\d+)\\s*,\\s*"
-                   "(\\d+)\\s*$");
     bool metric;
     if (!file.open(QFile::ReadOnly)) {
         errors << ("Could not open ride file: \"" 
@@ -77,25 +69,21 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                 return NULL;
             }
         }
-        else if (sample.indexIn(line) != -1) {
-            assert(sample.numCaptures() == 8);
-            double minutes = sample.cap(1).toDouble();
-            double nm      = sample.cap(2).toDouble();
-            double kph     = sample.cap(3).toDouble();
-            double watts   = sample.cap(4).toDouble();
-            double km      = sample.cap(5).toDouble();
-            double cad     = sample.cap(6).toDouble();
-            double hr      = sample.cap(7).toDouble();
-            int interval   = sample.cap(8).toInt();
+        else {
+            double minutes = line.section(',', 0, 0).toDouble();
+            double nm      = line.section(',', 1, 1).toDouble();
+            double kph     = line.section(',', 2, 2).toDouble();
+            double watts   = line.section(',', 3, 3).toDouble();
+            double km      = line.section(',', 4, 4).toDouble();
+            double cad     = line.section(',', 5, 5).toDouble();
+            double hr      = line.section(',', 6, 6).toDouble();
+            int interval   = line.section(',', 7, 7).toInt();
             if (!metric) {
                 km *= MILES_TO_KM;
                 kph *= MILES_TO_KM;
             }
             rideFile->appendPoint(minutes * 60.0, cad, hr, km, 
-                                 kph, nm, watts, interval);
-        }
-        else {
-            errors << ("Couldn't parse line: \"" + line + "\"");
+                                  kph, nm, watts, interval);
         }
         ++lineno;
     }
