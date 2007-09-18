@@ -18,14 +18,15 @@
 # Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-SUBDIRS=doc src
-
 all: subdirs 
 .PHONY: all subdirs clean
 
 clean:
-	@for dir in $(SUBDIRS); do $(MAKE) -wC $$dir clean; done
+	$(MAKE) -wC src distclean
+	$(MAKE) -wC doc clean
 
 subdirs:
-	@for dir in $(SUBDIRS); do $(MAKE) -wC $$dir; done
+	cd src; qmake; cd ..
+	$(MAKE) -wC src
+	$(MAKE) -wC doc
 
