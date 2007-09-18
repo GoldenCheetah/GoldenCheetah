@@ -24,5 +24,7 @@ with the Keyspan USB-to-serial adaptor.  Scott Overfield helped figure out
 that we should be using the <code>/dev/cu.*</code> devices instead of the
 <code>/dev/tty.*</code> ones.  Aldy Hernandez and Andrew Kruse helped get
 things working under Linux, and Aldy has been averaging one patch a week or
-more ever since.  Dan Connelly helped find and fix several core dumps.  
+more ever since.  Dan Connelly helped find and fix several core dumps.
+Justin Knotzke contributed code to import comma-separated value files
+and visually mark intervals on the ride plot.
 
