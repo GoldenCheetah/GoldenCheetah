@@ -43,6 +43,18 @@ href="http://goldencheetah.org/svn/trunk">here</a>.
 </tr>
 
 <tr>
+<td valign="top">Sep 18, 2007</td>
+<td valign="top">
+<a href="GoldenCheetah_2007-09-18_Linux_x86.tgz">Linux x86</a>,<br>
+<a href="GoldenCheetah_2007-09-18_Darwin_powerpc.dmg">Mac OS X PowerPC</a>
+</td>
+<td valign="top">
+This release adds two small, but excellent features from Justin Knotzke:
+CSV file imports and visual interval markers in the ride plot.
+</td>
+</tr>
+
+<tr>
 <td valign="top">Aug 7, 2007</td>
 <td valign="top">
 <a href="GoldenCheetah_2007-08-07_Linux_x86.tgz">Linux x86</a>,<br>

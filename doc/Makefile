@@ -22,7 +22,9 @@ DISTRIB=GoldenCheetah_2006-12-25_Darwin_powerpc.dmg \
 	GoldenCheetah_2007-04-26_Darwin_powerpc.dmg \
 	GoldenCheetah_2007-04-26_Linux_x86.tgz \
 	GoldenCheetah_2007-08-07_Darwin_powerpc.dmg \
-	GoldenCheetah_2007-08-07_Linux_x86.tgz
+	GoldenCheetah_2007-08-07_Linux_x86.tgz \
+	GoldenCheetah_2007-09-18_Darwin_powerpc.dmg \
+	GoldenCheetah_2007-09-18_Linux_x86.tgz
 
 all: $(HTML)
 .PHONY: all clean install
