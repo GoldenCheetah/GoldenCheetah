@@ -124,7 +124,7 @@ AllPlot::recalc()
             //Figure out when and if we have a new interval..
             if(lastInterval != interArray[i]) {
                 lastInterval = interArray[i];
-                interList.append(secs/60);
+                interList.append(secs/60.0);
             }
             ++i;
         }
