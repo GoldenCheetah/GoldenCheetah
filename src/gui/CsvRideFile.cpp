@@ -31,19 +31,6 @@ static int csvFileReaderRegistered =
  
 RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const 
 {
-    QRegExp rideTime("^.*/(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_"
-                     "(\\d\\d)_(\\d\\d)_(\\d\\d)\\.csv$");
-    if (rideTime.indexIn(file.fileName()) == -1) {
-        errors << ("file name does not encode ride time: \"" 
-                   + file.fileName() + "\"");
-        return NULL;
-    }
-    QDateTime datetime(QDate(rideTime.cap(1).toInt(),
-                             rideTime.cap(2).toInt(),
-                             rideTime.cap(3).toInt()),
-                       QTime(rideTime.cap(4).toInt(),
-                             rideTime.cap(5).toInt(),
-                             rideTime.cap(6).toInt()));
     QRegExp metricUnits("(km|kph)", Qt::CaseInsensitive);
     QRegExp englishUnits("(miles|mph)", Qt::CaseInsensitive);
     bool metric;
@@ -103,7 +90,17 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
         double recint = round(secs[mid] * 1000.0) / 1000.0;
         rideFile->setRecIntSecs(recint);
     }
-    rideFile->setStartTime(datetime);
+    QRegExp rideTime("^.*/(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_"
+                     "(\\d\\d)_(\\d\\d)_(\\d\\d)\\.csv$");
+    if (rideTime.indexIn(file.fileName()) >= 0) {
+        QDateTime datetime(QDate(rideTime.cap(1).toInt(),
+                                 rideTime.cap(2).toInt(),
+                                 rideTime.cap(3).toInt()),
+                           QTime(rideTime.cap(4).toInt(),
+                                 rideTime.cap(5).toInt(),
+                                 rideTime.cap(6).toInt()));
+        rideFile->setStartTime(datetime);
+    }
     file.close();
     return rideFile;
 }

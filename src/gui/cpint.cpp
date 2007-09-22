@@ -38,9 +38,8 @@ struct cpint_point
 struct cpint_data {
     QStringList errors;
     QList<cpint_point> points;
-    time_t start_since_epoch;
     int rec_int_ms;
-    cpint_data() : start_since_epoch(0), rec_int_ms(0) {}
+    cpint_data() : rec_int_ms(0) {}
 };
 
 cpi_file_info *
@@ -110,7 +109,6 @@ update_cpi_file(cpi_file_info *info,
         CombinedFileReader::instance().openRideFile(file, errors);
     assert(rideFile);
     cpint_data data;
-    data.start_since_epoch = rideFile->startTime().toTime_t();
     data.rec_int_ms = (int) round(rideFile->recIntSecs() * 1000.0);
     QListIterator<RideFilePoint*> i(rideFile->dataPoints());
     while (i.hasNext()) {
