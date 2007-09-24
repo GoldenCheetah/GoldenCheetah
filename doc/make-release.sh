@@ -10,6 +10,7 @@ mkdir tmp
 cd tmp
 svn checkout svn+ssh://goldencheetah.org/home/srhea/svnroot/goldencheetah/trunk/src goldencheetah
 cd goldencheetah
+qmake
 make
 mv gui/GoldenCheetah.app ..
 #make clean
