@@ -6,28 +6,6 @@ OTHER=logo.jpg sample.gp sample.png cpint.gp cpint.png \
 	screenshot-summary.png screenshot-plot.png \
 	screenshot-cpint.png screenshot-phist.png \
 	screenshot-download.png screenshot-weekly.png
-DISTRIB=GoldenCheetah_2006-12-25_Darwin_powerpc.dmg \
-	GoldenCheetah_2006-09-06_Darwin_powerpc.dmg \
-	GoldenCheetah_2006-09-07_Darwin_powerpc.dmg \
-	GoldenCheetah_2006-09-19_Darwin_powerpc.dmg \
-	GoldenCheetah_2007-01-06_Linux_x86.tgz \
-	GoldenCheetah_2007-01-30_Darwin_powerpc.dmg \
-	GoldenCheetah_2007-01-30_Linux_x86.tgz \
-	GoldenCheetah_2007-02-12_Darwin_powerpc.dmg \
-	GoldenCheetah_2007-02-12_Linux_x86.tgz \
-	GoldenCheetah_2007-02-22_Darwin_powerpc.dmg \
-	GoldenCheetah_2007-02-22_Linux_x86.tgz \
-	GoldenCheetah_2007-04-01_Darwin_powerpc.dmg \
-	GoldenCheetah_2007-04-01_Linux_x86.tgz \
-	GoldenCheetah_2007-04-26_Darwin_powerpc.dmg \
-	GoldenCheetah_2007-04-26_Linux_x86.tgz \
-	GoldenCheetah_2007-08-07_Darwin_powerpc.dmg \
-	GoldenCheetah_2007-08-07_Linux_x86.tgz \
-	GoldenCheetah_2007-09-18_Darwin_powerpc.dmg \
-	GoldenCheetah_2007-09-18_Linux_x86.tgz \
-	GoldenCheetah_2007-09-23_Darwin_powerpc.dmg \
-	GoldenCheetah_2007-09-23_Linux_x86.tgz
-	
 
 all: $(HTML)
 .PHONY: all clean install
@@ -36,7 +14,7 @@ clean:
 	rm -f $(HTML)
 
 install:
-	rsync -avz -e ssh $(HTML) $(TARBALLS) $(OTHER) $(DISTRIB) \
+	rsync -avz -e ssh $(HTML) $(TARBALLS) $(OTHER) \
 		srhea.net:wwwroot/goldencheetah.org/
 
 contact.html: contact.content genpage.pl
