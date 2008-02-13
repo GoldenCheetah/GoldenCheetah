@@ -21,6 +21,7 @@
 #include "MainWindow.h"
 #include "AllPlot.h"
 #include "ChooseCyclistDialog.h"
+#include "ConfigDialog.h"
 #include "CpintPlot.h"
 #include "DownloadRideDialog.h"
 #include "PowerHist.h"
@@ -42,7 +43,6 @@
 
 #include "DatePickerDialog.h"
 
-
 #define FOLDER_TYPE 0
 #define RIDE_TYPE 1
 
@@ -62,6 +62,8 @@ MainWindow::MainWindow(const QDir &home) :
 {
     setWindowTitle(home.dirName());
     settings.setValue(GC_SETTINGS_LAST, home.dirName());
+
+    setWindowIcon(QIcon(":images/gc.png"));
 
     QFile zonesFile(home.absolutePath() + "/power.zones");
     if (zonesFile.exists()) {
@@ -86,9 +88,14 @@ MainWindow::MainWindow(const QDir &home) :
     treeWidget = new QTreeWidget;
     treeWidget->setColumnCount(3);
     treeWidget->setSelectionMode(QAbstractItemView::SingleSelection);
-    // TODO:
-    // treeWidget->header()->resizeSection(0,80);
+    // TODO: Test this on various systems with differing font settings (looks good on Leopard :)
+    treeWidget->header()->resizeSection(0,70);
+    treeWidget->header()->resizeSection(1,95);
+    treeWidget->header()->resizeSection(2,70);
+    treeWidget->setMaximumWidth(250);
     treeWidget->header()->hide();
+    treeWidget->setAlternatingRowColors (true);
+    treeWidget->setIndentation(5);
 
     allRides = new QTreeWidgetItem(treeWidget, FOLDER_TYPE);
     allRides->setText(0, tr("All Rides"));
@@ -171,10 +178,12 @@ MainWindow::MainWindow(const QDir &home) :
                                  | QwtPicker::CornerToCorner);
     allZoomer->setTrackerMode(QwtPicker::AlwaysOff);
     allZoomer->setEnabled(true);
-
+    
+    // TODO: Hack for OS X one-button mouse
+    // allZoomer->initMousePattern(1);
+    
     // RightButton: zoom out by 1
-    // Ctrl+RightButton: zoom out to full size
-
+    // Ctrl+RightButton: zoom out to full size                          
     allZoomer->setMousePattern(QwtEventPattern::MouseSelect2,
                                Qt::RightButton, Qt::ControlModifier);
     allZoomer->setMousePattern(QwtEventPattern::MouseSelect3,
@@ -327,9 +336,12 @@ MainWindow::MainWindow(const QDir &home) :
                         SLOT(exportCSV()), tr("Ctrl+E")); 
     rideMenu->addAction(tr("&Import from SRM..."), this, 
                         SLOT(importSRM()), tr("Ctrl+I")); 
-	rideMenu->addAction ( tr ( "&Import from CSV..." ), this,
-	                      SLOT (importCSV()), tr ("Ctrl+S"));
-
+    rideMenu->addAction(tr("&Import from CSV..."), this,
+                        SLOT (importCSV()), tr ("Ctrl+S"));
+    QMenu *optionsMenu = menuBar()->addMenu(tr("&Options"));
+    optionsMenu->addAction(tr("&Options..."), this, 
+                           SLOT(showOptions()), tr("Ctrl+O")); 
+ 
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(tr("&About GoldenCheetah"), this, SLOT(aboutDialog()));
 
@@ -630,28 +642,62 @@ MainWindow::rideSelected()
             minutes %= 60;
 
             const char *dateFormat = "MM/dd/yyyy";
-            QString summary = tr(
-                "<center>"
-                "<h2>Week of %1 through %2</h2>"
-                "<h2>Summary</h2>"
-                "<p>"
-                "<table align=\"center\" width=\"60%\" border=0>"
-                "<tr><td>Total time riding:</td>"
-                "    <td align=\"right\">%3:%4</td></tr>"
-                "<tr><td>Total distance (miles):</td>"
-                "    <td align=\"right\">%5</td></tr>"
-                "<tr><td>Total work (kJ):</td>"
-                "    <td align=\"right\">%6</td></tr>"
-                "</table>"
-                // TODO: add averages
-                )
+           
+            QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
+            QVariant unit = settings.value(GC_UNIT);
+
+            QString summary;
+            if (unit.toString() == "Metric") {
+                summary = tr(
+                    "<center>"
+                    "<h2>Week of %1 through %2</h2>"
+                    "<h2>Summary</h2>"
+                    "<p>"
+                    "<table align=\"center\" width=\"60%\" border=0>"
+                    "<tr><td>Total time riding:</td>"
+                    "    <td align=\"right\">%3:%4</td></tr>"
+                    "<tr><td>Total distance (kilometers):</td>"
+                    "    <td align=\"right\">%5</td></tr>"
+                    "<tr><td>Total work (kJ):</td>"
+                    "    <td align=\"right\">%6</td></tr>"
+                    "<tr><td>Daily Average work (kJ):</td>"
+                    "    <td align=\"right\">%7</td></tr>"
+                    "</table>"
+                 )
                 .arg(wstart.toString(dateFormat))
                 .arg(wstart.addDays(6).toString(dateFormat))
                 .arg(hours)
                 .arg(minutes, 2, 10, QLatin1Char('0'))
-                .arg((unsigned) round(weeklyDistance))
-                .arg((unsigned) round(weeklyWork));
-                
+                .arg((unsigned) round(weeklyDistance * 1.60934))
+                .arg((unsigned) round(weeklyWork))
+                .arg((unsigned) round(weeklyWork / 7));
+             } 
+            else {
+                summary = tr(
+                    "<center>"
+                    "<h2>Week of %1 through %2</h2>"
+                    "<h2>Summary</h2>"
+                    "<p>"
+                    "<table align=\"center\" width=\"60%\" border=0>"
+                    "<tr><td>Total time riding:</td>"
+                    "    <td align=\"right\">%3:%4</td></tr>"
+                    "<tr><td>Total distance (miles):</td>"
+                    "    <td align=\"right\">%5</td></tr>"
+                    "<tr><td>Total work (kJ):</td>"
+                    "    <td align=\"right\">%6</td></tr>"
+                    "<tr><td>Daily Average work (kJ):</td>"
+                    "    <td align=\"right\">%7</td></tr>"
+                    "</table>"
+                    // TODO: add averages
+                    )
+                    .arg(wstart.toString(dateFormat))
+                    .arg(wstart.addDays(6).toString(dateFormat))
+                    .arg(hours)
+                    .arg(minutes, 2, 10, QLatin1Char('0'))
+                    .arg((unsigned) round(weeklyDistance))
+                    .arg((unsigned) round(weeklyWork))
+                    .arg((unsigned) round(weeklyWork / 7));
+            }    
             if (zone_range != -1) {
                 summary += "<h2>Power Zones</h2>";
                 if (!zones_ok)
@@ -730,6 +776,14 @@ MainWindow::resizeEvent(QResizeEvent*)
 {
     settings.setValue(GC_SETTINGS_MAIN_GEOM, geometry());
 }
+
+void 
+MainWindow::showOptions()
+{
+   ConfigDialog *cd = new ConfigDialog(home);
+   cd->exec();
+}
+
 
 void 
 MainWindow::moveEvent(QMoveEvent*)

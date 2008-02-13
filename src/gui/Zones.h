@@ -63,6 +63,7 @@ class Zones : public QObject
         }
 
         bool read(QFile &file);
+        void write(int LT, QDir home);
         const QString &errorString() const { return err; }
 
         int whichRange(const QDate &date) const;

@@ -31,6 +31,7 @@
 #define GC_SETTINGS_MAIN_GEOM       "mainwindow/geometry"
 #define GC_SETTINGS_SPLITTER_SIZES  "mainwindow/splitterSizes"
 #define GC_DATETIME_FORMAT          "ddd MMM dd, yyyy, hh:mm AP"
+#define GC_UNIT                     "unit"
 
 #endif // _GC_Settings_h
 

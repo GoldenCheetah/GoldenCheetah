@@ -23,6 +23,7 @@
 #include <assert.h>
 #include <math.h>
 
+
 #define KM_TO_MILES 0.62137119
 
 RawFile *RawFile::readFile(QFile &file, QStringList &errors)
@@ -40,12 +41,14 @@ RawFile *RawFile::readFile(QFile &file, QStringList &errors)
         RawFilePoint *p2 = new RawFilePoint(
             p1->secs, p1->nm, p1->kph * KM_TO_MILES, p1->watts,
             p1->km * KM_TO_MILES, (int) p1->cad, (int) p1->hr, p1->interval);
+
         if (result->powerHist.contains(p2->watts))
             result->powerHist[p2->watts] += rideFile->recIntSecs();
         else
             result->powerHist[p2->watts] = rideFile->recIntSecs();
         result->points.append(p2);
     }
+
     return result;
 }
 

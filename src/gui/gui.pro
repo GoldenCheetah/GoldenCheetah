@@ -14,6 +14,7 @@ macx {
     LIBS += -framework Carbon
 }
 QMAKE_CXXFLAGS = -DGC_BUILD_DATE="`date +'\"%a_%b_%d,_%Y\"'`"
+RC_FILE = images/gc.icns
 
 # Input
 HEADERS += \
@@ -34,7 +35,9 @@ HEADERS += \
 	SrmRideFile.h \
 	TimeUtils.h \
         Zones.h \
-	cpint.h
+        Pages.h \
+        ConfigDialog.h \
+        cpint.h
 
 SOURCES += \
 	AllPlot.cpp \
@@ -54,6 +57,10 @@ SOURCES += \
 	SrmRideFile.cpp \
         TimeUtils.cpp \
         Zones.cpp \
+        Pages.cpp \
+        ConfigDialog.cpp \
 	cpint.cpp \
 	\
 	main.cpp
+
+RESOURCES     = application.qrc

@@ -39,7 +39,7 @@ class MainWindow : public QMainWindow
     public:
         MainWindow(const QDir &home);
         void addRide(QString name);
-
+        QDir home;
     protected:
         virtual void resizeEvent(QResizeEvent*);
         virtual void moveEvent(QMoveEvent*);
@@ -63,6 +63,7 @@ class MainWindow : public QMainWindow
         void aboutDialog();
         void notesChanged();
         void saveNotes();
+        void showOptions();
 
     protected: 
 
@@ -70,7 +71,6 @@ class MainWindow : public QMainWindow
 
     private:
 
-        QDir home;
         QSettings settings;
 
         QSplitter *splitter;
