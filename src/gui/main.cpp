@@ -40,6 +40,8 @@ main(int argc, char *argv[])
     home.cd("GoldenCheetah");
     QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
     QVariant lastOpened = settings.value(GC_SETTINGS_LAST);
+    QVariant unit = settings.value(GC_UNIT);
+
     bool anyOpened = false;
     if (lastOpened != QVariant()) {
         QStringList list = lastOpened.toStringList();

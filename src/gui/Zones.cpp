@@ -227,4 +227,75 @@ QString Zones::summarize(int rnum, double *time_in_zone, int num_zones) const
     return summary;
 }
 
+/*  
+//  Eventually for automatically generating the power.zones file 
+//  Disabled for now until multiple date ranges are respected.
+*/
+/*
+void Zones::write(int LT, QDir home)
+{
+    int active_recovery = 0;
+    int endurance_start = 0;
+    int endurance_end = 0;
+    int tempo_start = 0;
+    int tempo_end = 0;
+    int threshold_start = 0;
+    int threshold_end = 0;
+    int vo2max_start = 0;
+    int vo2max_end = 0;
+    int anaerobicCapacity_start = 0;
+    int anaerobicCapacity_end = 0;
+    int neuromuscular = 0;
 
+    active_recovery = int(LT * .55);
+    endurance_start = int(LT * .56);
+    endurance_end = int(LT * .75);
+    tempo_start = int(LT * .76);
+    tempo_end = int(LT * .90);
+    threshold_start = int(LT * .91);
+    threshold_end = int(LT * 1.05);
+    vo2max_start = int(LT * 1.06);
+    vo2max_end = int(LT * 1.2);
+    anaerobicCapacity_start = int(LT * 1.21);
+    anaerobicCapacity_end = int(LT * 1.5);
+    neuromuscular =  int(LT * 1.51);
+
+    QString strzones;
+    strzones += QString("From BEGIN until END, FTP=%1:").arg(LT);
+    strzones += QString("\n");
+    strzones += QString("1,Active Recovery, 1, %1").arg(active_recovery);
+    strzones += QString("\n");
+    strzones += QString("2,Endurance, %1, %2").arg(endurance_start).arg(endurance_end); 
+    strzones += QString("\n");
+    strzones += QString("3,Tempo, %1, %2").arg(tempo_start).arg(tempo_end); 
+    strzones += QString("\n");
+    strzones += QString("4,Threshold, %1, %2").arg(threshold_start).arg(threshold_end); 
+    strzones += QString("\n");
+    strzones += QString("5,VO2Max, %1, %2").arg(vo2max_start).arg(vo2max_end); 
+    strzones += QString("\n");
+    strzones += QString("6,Anaerobic, %1, %2").arg(anaerobicCapacity_start).arg(anaerobicCapacity_end); 
+    strzones += QString("\n");
+    strzones += QString("7,Neuromuscular, %1,").arg(neuromuscular); 
+    strzones += QString("MAX");
+    strzones += QString("\n"); 
+    qDebug() << "Zones are:" << strzones; 
+   
+    QFile file( home.absolutePath() + "/power.zones" );
+     if ( file.open( QFile::WriteOnly ) ) {
+        QTextStream stream( &file );
+         stream << strzones;
+     file.close();
+     }
+
+*/
+
+/*
+From 2008/01/01 until END,FTP=270:
+    1,Active Recovery,      1, 150
+    2,Endurance,          151, 204
+    3,Tempo,              205, 245
+    4,Threshold,          246, 285
+    5,VO2Max,             286, 326
+    6,Anaerobic,          327, MAX
+*/
+//}

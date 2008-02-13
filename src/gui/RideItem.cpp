@@ -26,8 +26,8 @@
 #include <assert.h>
 #include <math.h>
 
-RideItem::RideItem(QTreeWidgetItem *parent, int type, QString path, 
-                   QString fileName, const QDateTime &dateTime, 
+RideItem::RideItem(QTreeWidgetItem *parent, int type,
+                   QString path, QString fileName, const QDateTime &dateTime, 
                    const Zones *zones, QString notesFileName) : 
     QTreeWidgetItem(parent, type), path(path), fileName(fileName), 
     dateTime(dateTime), zones(zones), notesFileName(notesFileName)
@@ -45,16 +45,16 @@ RideItem::RideItem(QTreeWidgetItem *parent, int type, QString path,
 
 static void summarize(QString &intervals,
                       unsigned last_interval,
-                      double time_start, double time_end,
                       double mile_start, double mile_end,
                       double &int_watts_sum,
                       double &int_hr_sum,
                       double &int_cad_sum,
                       double &int_mph_sum,
                       double &int_secs_hr,
-                      double &int_max_power) 
+                      double &int_max_power,
+                      double int_dur) 
 {
-    double dur = round(time_end - time_start);
+    double dur = int_dur;
     double len = mile_end - mile_start;
     double minutes = (int) (dur/60.0);
     double seconds = dur - (60 * minutes);
@@ -82,7 +82,12 @@ static void summarize(QString &intervals,
     intervals = intervals.arg(watts_avg, 0, 'f', 0);
     intervals = intervals.arg(hr_avg, 0, 'f', 0);
     intervals = intervals.arg(cad_avg, 0, 'f', 0);
-    intervals = intervals.arg(mph_avg, 0, 'f', 1);
+    QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
+    QVariant unit = settings.value(GC_UNIT);
+    if(unit.toString() == "Metric")
+        intervals = intervals.arg(mph_avg * 1.60934, 0, 'f', 1);
+    else
+        intervals = intervals.arg(mph_avg, 0, 'f', 1);
 
     int_watts_sum = 0.0;
     int_hr_sum = 0.0;
@@ -170,7 +175,9 @@ RideItem::htmlSummary()
                     time_in_zone[i] = 0.0;
             }
         }
-
+        QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
+        QVariant unit = settings.value(GC_UNIT);
+ 
         secs_moving_or_pedaling = 0.0;
         double secs_moving = 0.0;
         double total_watts = 0.0;
@@ -190,7 +197,21 @@ RideItem::htmlSummary()
         double int_secs_hr = 0.0;
         double int_max_power = 0.0;
 
-        double time_start, time_end, mile_start, mile_end;
+        // for computing "Bike Score"
+        // we're interested in a 25 second moving average
+        double moving_avg_len = 25000 / raw->rec_int_ms;
+        double moving_avg_watts[int(ceil(moving_avg_len))];
+        double fourthPower_watts = 0.0;
+        double fourth_counter = 0.0;
+        double int_fourth_watts = 0.0;
+        double int_fourth_counter = 0.0;
+        double xpower = 0.0;
+        double relative_intensity = 0.0;
+        double bike_score = 0.0;
+
+        double time_start, time_end, mile_start, mile_end, int_dur;
+
+        int j = 0; // an index for the moving average function
 
         QListIterator<RawFilePoint*> i(raw->points);
         while (i.hasNext()) {
@@ -201,19 +222,22 @@ RideItem::htmlSummary()
             if (point->interval != last_interval) {
 
                 if (last_interval != UINT_MAX) {
-                    summarize(intervals, last_interval, time_start, 
-                              time_end, mile_start, mile_end, int_watts_sum, 
-                              int_hr_sum, int_cad_sum, int_mph_sum, int_secs_hr,  int_max_power);
+                    summarize(intervals, last_interval,
+                              mile_start, mile_end, int_watts_sum, 
+                              int_hr_sum, int_cad_sum, int_mph_sum, 
+                              int_secs_hr, int_max_power, int_dur);
                 }
 
                 last_interval = point->interval;
                 time_start = point->secs;
                 mile_start = point->miles;
                 int_secs_hr = secs_delta;
+                int_dur = 0.0;
             }
 
             if ((point->mph > 0.0) || (point->cad > 0.0)) {
                 secs_moving_or_pedaling += secs_delta;
+                int_dur += secs_delta;
             }
             if (point->mph > 0.0)
                 secs_moving += secs_delta;
@@ -221,8 +245,27 @@ RideItem::htmlSummary()
                 total_watts += point->watts * secs_delta;
                 secs_watts += secs_delta;
 
+                // 25 second moving average
+                // populate the array in the first 25 seconds
+                if (secs_watts <= 25)
+                    moving_avg_watts[j] = point->watts;
+                else {
+                    // add the most recent value, and calculate average
+                    moving_avg_watts[j] = point->watts;
+                    double mov_avg = 0.0;
+                    for(int jj = 0;jj < moving_avg_len; jj++)
+                        mov_avg += moving_avg_watts[jj];
+                    double current_fourth = pow(mov_avg / moving_avg_len, 4.0);
+                    fourthPower_watts += current_fourth;
+                    fourth_counter++;
+                    int_fourth_watts += current_fourth;
+                    int_fourth_counter++;
+                }
+                j = (j + 1) % ((int)(moving_avg_len));
+
                 int_watts_sum += point->watts * secs_delta;
-                if(point->watts > int_max_power) {int_max_power = point->watts;}
+                if (point->watts > int_max_power)
+                    int_max_power = point->watts;
                 if (zones) {
                     int zone = zones->whichZone(zone_range, point->watts);
                     if (zone >= 0)
@@ -247,13 +290,21 @@ RideItem::htmlSummary()
             mile_end = point->miles;
             time_end = point->secs + secs_delta;
         }
-        summarize(intervals, last_interval, time_start, 
-                  time_end, mile_start, mile_end, int_watts_sum, 
-                  int_hr_sum, int_cad_sum, int_mph_sum, int_secs_hr, int_max_power);
+        summarize(intervals, last_interval,
+                  mile_start, mile_end, int_watts_sum, 
+                  int_hr_sum, int_cad_sum, int_mph_sum, 
+                  int_secs_hr, int_max_power, int_dur);
 
         avg_watts = (secs_watts == 0.0) ? 0.0
             : round(total_watts / secs_watts);
-                
+
+        if (zones) {
+           xpower =  pow(int_fourth_watts/int_fourth_counter,0.25);
+           relative_intensity = xpower / ((float) zones->getFTP(zone_range));
+           bike_score = ((raw->points.back()->secs / 60) / 60) 
+               * (pow(relative_intensity, 2)) * 100.0;
+        }
+               
         total_distance = raw->points.back()->miles;
         total_work = total_watts / 1000.0;
                 
@@ -267,19 +318,39 @@ RideItem::htmlSummary()
             time_to_string(raw->points.back()->secs);
         summary += "<tr><td>Time riding:</td><td align=\"right\">" + 
             time_to_string(secs_moving_or_pedaling) + "</td></tr>";
-        summary += QString("<tr><td>Distance (miles):</td>"
-                           "<td align=\"right\">%1</td></tr>")
-            .arg(total_distance, 0, 'f', 1);
+
+        if (unit.toString() == "Metric") {
+            summary += QString("<tr><td>Disitance (kilometers):</td>"
+                               "<td align=\"right\">%1</td></tr>")
+                .arg(total_distance * 1.60934, 0, 'f', 1);
+        }
+        else {
+            summary += QString("<tr><td>Disitance (miles):</td>"
+                               "<td align=\"right\">%1</td></tr>")
+                .arg(total_distance, 0, 'f', 1);
+        }
+ 
         summary += QString("<tr><td>Work (kJ):</td>"
                            "<td align=\"right\">%1</td></tr>")
             .arg((unsigned) round(total_work));
         summary += "</table></td><td>";
         summary += "<table align=\"center\" width=\"70%\" border=0>";
-        summary += QString("<tr><td>Speed (mph):</td>"
-                           "<td align=\"right\">%1</td></tr>")
-            .arg(((secs_moving == 0.0) ? 0.0
-                  : raw->points.back()->miles / secs_moving * 3600.0), 
-                 0, 'f', 1);
+
+        if (unit.toString() == "Metric") {
+             summary += QString("<tr><td>Speed (km/h):</td>"
+                             "<td align=\"right\">%1</td></tr>")
+             .arg(((secs_moving == 0.0) ? 0.0
+                   : ((raw->points.back()->miles * 1.60934) 
+                      / secs_moving * 3600.0)), 
+                  0, 'f', 1);
+        }
+        else {
+             summary += QString("<tr><td>Speed (mph):</td>"
+                            "<td align=\"right\">%1</td></tr>")
+             .arg(((secs_moving == 0.0) ? 0.0
+                   : raw->points.back()->miles / secs_moving * 3600.0), 
+                  0, 'f', 1);
+        }
         summary += QString("<tr><td>Power (watts):</td>"
                            "<td align=\"right\">%1</td></tr>")
             .arg((unsigned) avg_watts);
@@ -293,6 +364,22 @@ RideItem::htmlSummary()
                              : round(total_cad / secs_cad)));
         summary += "</table></td></tr>";
         summary += "</table>";
+ 
+        if (xpower != 0) {
+            summary += "<h2>Dr. Skiba's BikeScore</h2>";
+            summary += "<table align=\"center\" width=\"40%\" ";
+            summary += "cellspacing=0 border=0>";
+            summary += QString("<tr><td>xPower:</td>"
+                               "<td align=\"left\">%1</td></tr>")
+                .arg((unsigned) xpower);
+            summary += QString("<tr><td>Relative Intensity:</td>"
+                               "<td align=\"left\">%1</td></tr>")
+                .arg(relative_intensity, 0, 'f', 3);
+            summary += QString("<tr><td>Bike Score: </td>"
+                               "<td align=\"left\">%1</td></tr>")
+                .arg(bike_score, 0, 'f', 2);
+            summary += "</table>";
+        }
 
         if (zones) {
             summary += "<h2>Power Zones</h2>";
@@ -315,13 +402,19 @@ RideItem::htmlSummary()
             summary += "</tr><tr>";
             summary += "<td align=\"center\">Number</td>";
             summary += "<td align=\"center\">Duration</td>";
-            summary += "<td align=\"center\">(miles)</td>";
+            if(unit.toString() == "Metric")
+                summary += "<td align=\"center\">(km)</td>";
+            else
+                summary += "<td align=\"center\">(miles)</td>";
             summary += "<td align=\"center\">(kJ)</td>";
             summary += "<td align=\"center\">(watts)</td>";
             summary += "<td align=\"center\">(watts)</td>";
             summary += "<td align=\"center\">(bpm)</td>";
             summary += "<td align=\"center\">(rpm)</td>";
-            summary += "<td align=\"center\">(mph)</td>";
+            if(unit.toString() == "Metric")
+                summary += "<td align=\"center\">(km/h)</td>";
+            else
+                summary += "<td align=\"center\">(mph)</td>";
             summary += "</tr>";
             summary += intervals;
             summary += "</table>";
@@ -336,5 +429,7 @@ RideItem::htmlSummary()
         }
         summary += "</center>";
     }
+
     return summary;
 }
+
