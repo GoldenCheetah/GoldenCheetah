@@ -19,6 +19,7 @@
  */
 
 #include "RideItem.h"
+#include "RideMetric.h"
 #include "RawFile.h"
 #include "Settings.h"
 #include "TimeUtils.h"
@@ -41,6 +42,15 @@ RideItem::RideItem(QTreeWidgetItem *parent, int type,
     time_in_zone = NULL;
     num_zones = -1;
     zone_range = -1;
+}
+
+RideItem::~RideItem()
+{
+    MetricIter i(metrics);
+    while (i.hasNext()) {
+        i.next();
+        delete i.value();
+    }
 }
 
 static void summarize(QString &intervals,
@@ -101,13 +111,6 @@ double RideItem::secsMovingOrPedaling()
     if (summary.isEmpty())
         htmlSummary();
     return secs_moving_or_pedaling;
-}
-
-double RideItem::totalDistance()
-{
-    if (summary.isEmpty())
-        htmlSummary();
-    return total_distance;
 }
 
 double RideItem::totalWork()
@@ -178,6 +181,16 @@ RideItem::htmlSummary()
         QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
         QVariant unit = settings.value(GC_UNIT);
  
+        const RideMetricFactory &factory = RideMetricFactory::instance();
+        RideMetricFactory::RideMetricIter metricIter(factory.metrics());
+        while (metricIter.hasNext()) {
+            metricIter.next();
+            QString name = metricIter.key();
+            RideMetric *metric = factory.newMetric(name);
+            metric->compute(raw, zones, zone_range);
+            metrics.insert(name, metric);
+        }
+
         secs_moving_or_pedaling = 0.0;
         double secs_moving = 0.0;
         double total_watts = 0.0;
@@ -305,7 +318,6 @@ RideItem::htmlSummary()
                * (pow(relative_intensity, 2)) * 100.0;
         }
                
-        total_distance = raw->points.back()->miles;
         total_work = total_watts / 1000.0;
                 
         summary += "<p>";
@@ -319,16 +331,14 @@ RideItem::htmlSummary()
         summary += "<tr><td>Time riding:</td><td align=\"right\">" + 
             time_to_string(secs_moving_or_pedaling) + "</td></tr>";
 
-        if (unit.toString() == "Metric") {
-            summary += QString("<tr><td>Disitance (kilometers):</td>"
-                               "<td align=\"right\">%1</td></tr>")
-                .arg(total_distance * 1.60934, 0, 'f', 1);
-        }
-        else {
-            summary += QString("<tr><td>Disitance (miles):</td>"
-                               "<td align=\"right\">%1</td></tr>")
-                .arg(total_distance, 0, 'f', 1);
-        }
+        bool metric = (unit.toString() == "Metric");
+
+        assert(metrics.contains("total_distance"));
+        const RideMetric *totalDistanceMetric = metrics.value("total_distance");
+        summary += ("<tr><td>Distance (" 
+                    + totalDistanceMetric->units(metric) 
+                    + "):</td><td align=\"right\">%1</td></tr>")
+                   .arg(totalDistanceMetric->value(metric), 0, 'f', 1);
  
         summary += QString("<tr><td>Work (kJ):</td>"
                            "<td align=\"right\">%1</td></tr>")

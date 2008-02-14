@@ -28,6 +28,7 @@
 #include "RawFile.h"
 #include "RideItem.h"
 #include "RideFile.h"
+#include "RideMetric.h"
 #include "Settings.h"
 #include "TimeUtils.h"
 #include "Zones.h"
@@ -603,7 +604,8 @@ MainWindow::rideSelected()
             assert(wstart.dayOfWeek() == Qt::Monday);
             QDate wend = wstart.addDays(7);
             double weeklySeconds = 0.0;
-            double weeklyDistance = 0.0;
+            const RideMetricFactory &factory = RideMetricFactory::instance();
+            RideMetric *weeklyDistance = factory.newMetric("total_distance");
             double weeklyWork = 0.0;
 
             int zone_range = -1;
@@ -617,7 +619,7 @@ MainWindow::rideSelected()
                     if ((item->dateTime.date() >= wstart)
                         && (item->dateTime.date() < wend)) {
                         weeklySeconds += item->secsMovingOrPedaling();
-                        weeklyDistance += item->totalDistance();
+                        weeklyDistance->aggregateWith(item->metrics.value(weeklyDistance->name()));
                         weeklyWork += item->totalWork();
                         if (zones) {
                             if (zone_range == -1) {
@@ -668,7 +670,7 @@ MainWindow::rideSelected()
                 .arg(wstart.addDays(6).toString(dateFormat))
                 .arg(hours)
                 .arg(minutes, 2, 10, QLatin1Char('0'))
-                .arg((unsigned) round(weeklyDistance * 1.60934))
+                .arg((unsigned) round(weeklyDistance->value(true)))
                 .arg((unsigned) round(weeklyWork))
                 .arg((unsigned) round(weeklyWork / 7));
              } 
@@ -694,7 +696,7 @@ MainWindow::rideSelected()
                     .arg(wstart.addDays(6).toString(dateFormat))
                     .arg(hours)
                     .arg(minutes, 2, 10, QLatin1Char('0'))
-                    .arg((unsigned) round(weeklyDistance))
+                    .arg((unsigned) round(weeklyDistance->value(false)))
                     .arg((unsigned) round(weeklyWork))
                     .arg((unsigned) round(weeklyWork / 7));
             }    
@@ -709,6 +711,8 @@ MainWindow::rideSelected()
             }
 
             summary += "</center>";
+
+            delete weeklyDistance;
 
             // TODO: add daily breakdown
 
