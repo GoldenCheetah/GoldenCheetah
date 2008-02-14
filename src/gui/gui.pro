@@ -19,6 +19,7 @@ RC_FILE = images/gc.icns
 # Input
 HEADERS += \
 	AllPlot.h \
+        BasicRideMetrics.h \
 	ChooseCyclistDialog.h \
 	CpintPlot.h \
 	CsvRideFile.h \
@@ -32,6 +33,7 @@ HEADERS += \
 	RawRideFile.h \
 	RideFile.h \
 	RideItem.h \
+	RideMetric.h \
 	SrmRideFile.h \
 	TimeUtils.h \
         Zones.h \
@@ -41,6 +43,7 @@ HEADERS += \
 
 SOURCES += \
 	AllPlot.cpp \
+        BasicRideMetrics.cpp \
 	ChooseCyclistDialog.cpp \
 	CpintPlot.cpp \
 	CsvRideFile.cpp \
@@ -54,6 +57,7 @@ SOURCES += \
 	RawRideFile.cpp \
 	RideFile.cpp \
 	RideItem.cpp \
+	RideMetric.cpp \
 	SrmRideFile.cpp \
         TimeUtils.cpp \
         Zones.cpp \

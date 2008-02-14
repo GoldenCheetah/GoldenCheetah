@@ -25,6 +25,7 @@
 
 class RawFile;
 class Zones;
+class RideMetric;
 
 class RideItem : public QTreeWidgetItem {
 
@@ -47,13 +48,19 @@ class RideItem : public QTreeWidgetItem {
         const Zones *zones;
         QString notesFileName;
 
+        typedef QHash<QString,RideMetric*> MetricMap;
+        typedef QHashIterator<QString,RideMetric*> MetricIter;
+
+        MetricMap metrics;
+
         RideItem(QTreeWidgetItem *parent, int type, QString path, 
                  QString fileName, const QDateTime &dateTime,
                  const Zones *zones, QString notesFileName);
 
+        ~RideItem();
+
         QString htmlSummary();
         double secsMovingOrPedaling();
-        double totalDistance();
         double totalWork();
 
         int zoneRange();
