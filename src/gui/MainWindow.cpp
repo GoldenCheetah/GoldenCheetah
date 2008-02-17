@@ -481,7 +481,7 @@ MainWindow::exportCSV()
 
 void MainWindow::importCSV()
 {
-    // Ask the user if they prefer to export with English or metric units.
+    // Prompt the user for the ride date
     DatePickerDialog *dpd = new DatePickerDialog(this);
     dpd->exec();
 

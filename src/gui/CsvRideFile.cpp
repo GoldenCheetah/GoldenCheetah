@@ -31,9 +31,21 @@ static int csvFileReaderRegistered =
  
 RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const 
 {
-    QRegExp metricUnits("(km|kph)", Qt::CaseInsensitive);
-    QRegExp englishUnits("(miles|mph)", Qt::CaseInsensitive);
+    QRegExp metricUnits("(km|kph|km/h)", Qt::CaseInsensitive);
+    QRegExp englishUnits("(miles|mph|mp/h)", Qt::CaseInsensitive);
     bool metric;
+    
+    // TODO: a more robust regex for ergomo files
+    // i don't have an example with english headers
+    // the ergomo CSV has two rows of headers. units are on the second row.
+    /*
+    ZEIT,STRECKE,POWER,RPM,SPEED,PULS,HÖHE,TEMP,INTERVAL,PAUSE
+    L_SEC,KM,WATT,RPM,KM/H,BPM,METER,°C,NUM,SEC
+    */
+    QRegExp ergomoCSV("(ZEIT|STRECKE)", Qt::CaseInsensitive);
+    bool ergomo;
+    int unitsHeader = 1;
+    
     if (!file.open(QFile::ReadOnly)) {
         errors << ("Could not open ride file: \"" 
                    + file.fileName() + "\"");
@@ -45,6 +57,17 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
     while (!is.atEnd()) {
         QString line = is.readLine();
         if (lineno == 1) {
+            if (ergomoCSV.indexIn(line) != -1) {
+                ergomo = true;
+                unitsHeader = 2;
+                ++lineno;
+                continue;
+            }
+            else {
+                ergomo = false;
+            }
+        }
+        if (lineno == unitsHeader) {
             if (metricUnits.indexIn(line) != -1)
                 metric = true;
             else if (englishUnits.indexIn(line) != -1) 
@@ -57,17 +80,41 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
             }
         }
         else {
-            double minutes = line.section(',', 0, 0).toDouble();
-            double nm      = line.section(',', 1, 1).toDouble();
-            double kph     = line.section(',', 2, 2).toDouble();
-            double watts   = line.section(',', 3, 3).toDouble();
-            double km      = line.section(',', 4, 4).toDouble();
-            double cad     = line.section(',', 5, 5).toDouble();
-            double hr      = line.section(',', 6, 6).toDouble();
-            int interval   = line.section(',', 7, 7).toInt();
-            if (!metric) {
-                km *= MILES_TO_KM;
-                kph *= MILES_TO_KM;
+            double minutes,nm,kph,watts,km,cad,hr;
+            int interval;
+            if (!ergomo) {
+                 minutes = line.section(',', 0, 0).toDouble();
+                 nm      = line.section(',', 1, 1).toDouble();
+                 kph     = line.section(',', 2, 2).toDouble();
+                 watts   = line.section(',', 3, 3).toDouble();
+                 km      = line.section(',', 4, 4).toDouble();
+                 cad     = line.section(',', 5, 5).toDouble();
+                 hr      = line.section(',', 6, 6).toDouble();
+                 interval   = line.section(',', 7, 7).toInt();
+                if (!metric) {
+                    km *= MILES_TO_KM;
+                    kph *= MILES_TO_KM;
+                }
+            } 
+            else {
+                // for ergomo formatted CSV files
+                 minutes = line.section(',', 0, 0).toDouble();
+                 km      = line.section(',', 1, 1).toDouble();
+                 watts   = line.section(',', 2, 2).toDouble();
+                 cad     = line.section(',', 3, 3).toDouble();
+                 kph     = line.section(',', 4, 4).toDouble();
+                 hr      = line.section(',', 5, 5).toDouble();
+                 interval   = line.section(',', 8, 8).toInt();
+                 nm      = NULL; // torque is not provided in the Ergomo file
+                
+                // the ergomo records the time in whole seconds
+                // RECORDING INT. 1, 2, 5, 10, 15 or 30 per sec
+                minutes = minutes/60.0;
+                
+                if (!metric) {
+                    km *= MILES_TO_KM;
+                    kph *= MILES_TO_KM;
+                }
             }
             rideFile->appendPoint(minutes * 60.0, cad, hr, km, 
                                   kph, nm, watts, interval);
