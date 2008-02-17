@@ -202,6 +202,7 @@ RideItem::htmlSummary()
         double total_cad = 0.0;
        
         QString intervals = "";
+        int interval_count = 0;
         unsigned last_interval = UINT_MAX;
         double int_watts_sum = 0.0;
         double int_hr_sum = 0.0;
@@ -240,7 +241,7 @@ RideItem::htmlSummary()
                               int_hr_sum, int_cad_sum, int_mph_sum, 
                               int_secs_hr, int_max_power, int_dur);
                 }
-
+                interval_count++;
                 last_interval = point->interval;
                 time_start = point->secs;
                 mile_start = point->miles;
@@ -396,7 +397,12 @@ RideItem::htmlSummary()
             summary += zones->summarize(zone_range, time_in_zone, num_zones);
         }
 
-        if (last_interval > 0) {
+        // TODO: Ergomo uses non-consecutive interval numbers.
+        // Seems to use 0 when not in an interval
+        // and an integer < 30 when in an interval.
+        // We'll need to create a counter for the intervals
+        // rather than relying on the final data point's interval number.
+        if (interval_count > 1) { 
             summary += "<p><h2>Intervals</h2>\n<p>\n";
             summary += "<table align=\"center\" width=\"90%\" ";
             summary += "cellspacing=0 border=0><tr>";
