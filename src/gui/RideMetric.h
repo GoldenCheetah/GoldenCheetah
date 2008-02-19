@@ -4,6 +4,7 @@
 
 #include <QHash>
 #include <QString>
+#include <assert.h>
 
 class RawFile;
 class Zones;
