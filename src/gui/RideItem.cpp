@@ -107,20 +107,6 @@ static void summarize(QString &intervals,
     int_max_power = 0.0;
 }
 
-double RideItem::secsMovingOrPedaling()
-{
-    if (summary.isEmpty())
-        htmlSummary();
-    return secs_moving_or_pedaling;
-}
-
-double RideItem::totalWork()
-{
-    if (summary.isEmpty())
-        htmlSummary();
-    return total_work;
-}
-
 int RideItem::zoneRange() 
 {
     if (summary.isEmpty())
@@ -150,9 +136,23 @@ double RideItem::timeInZone(int zone)
 static const char *metricsXml =  
     "<metrics>\n"
     "  <metric_group name=\"Totals\">\n"
+    "    <metric name=\"workout_time\" display_name=\"Workout time\"\n"
+    "            precision=\"0\"/>\n"    
+    "    <metric name=\"time_riding\" display_name=\"Time riding\"\n"
+    "            precision=\"0\"/>\n"    
     "    <metric name=\"total_distance\" display_name=\"Distance\"\n"
     "            precision=\"1\"/>\n"    
     "    <metric name=\"total_work\" display_name=\"Work\"\n"
+    "            precision=\"0\"/>\n"
+    "  </metric_group>\n"
+    "  <metric_group name=\"Averages\">\n"
+    "    <metric name=\"average_speed\" display_name=\"Speed\"\n"
+    "            precision=\"1\"/>\n"
+    "    <metric name=\"average_power\" display_name=\"Power\"\n"
+    "            precision=\"0\"/>\n"
+    "    <metric name=\"average_hr\" display_name=\"Heart rate\"\n"
+    "            precision=\"0\"/>\n"
+    "    <metric name=\"average_cad\" display_name=\"Cadence\"\n"
     "            precision=\"0\"/>\n"
     "  </metric_group>\n"
     "</metrics>\n";
@@ -202,15 +202,7 @@ RideItem::htmlSummary()
             metrics.insert(name, metric);
         }
 
-        secs_moving_or_pedaling = 0.0;
-        double secs_moving = 0.0;
-        double total_watts = 0.0;
         double secs_watts = 0.0;
-        double avg_watts = 0.0;
-        double secs_hr = 0.0;
-        double total_hr = 0.0;
-        double secs_cad = 0.0;
-        double total_cad = 0.0;
        
         QString intervals = "";
         int interval_count = 0;
@@ -261,13 +253,9 @@ RideItem::htmlSummary()
             }
 
             if ((point->mph > 0.0) || (point->cad > 0.0)) {
-                secs_moving_or_pedaling += secs_delta;
                 int_dur += secs_delta;
             }
-            if (point->mph > 0.0)
-                secs_moving += secs_delta;
             if (point->watts >= 0.0) {
-                total_watts += point->watts * secs_delta;
                 secs_watts += secs_delta;
 
                 // 25 second moving average
@@ -298,19 +286,13 @@ RideItem::htmlSummary()
                 }
             }
             if (point->hr > 0) {
-                total_hr += point->hr * secs_delta;
-                secs_hr += secs_delta;
                 int_hr_sum += point->hr * secs_delta;
                 int_secs_hr += secs_delta;
             }
-            if (point->cad > 0) {
-                total_cad += point->cad * secs_delta;
-                secs_cad += secs_delta;
+            if (point->cad > 0)
                 int_cad_sum += point->cad * secs_delta;
-            }
-            if (point->mph >= 0) {
+            if (point->mph >= 0)
                 int_mph_sum += point->mph * secs_delta;
-            }
 
             mile_end = point->miles;
             time_end = point->secs + secs_delta;
@@ -320,9 +302,6 @@ RideItem::htmlSummary()
                   int_hr_sum, int_cad_sum, int_mph_sum, 
                   int_secs_hr, int_max_power, int_dur);
 
-        avg_watts = (secs_watts == 0.0) ? 0.0
-            : round(total_watts / secs_watts);
-
         if (zones) {
            xpower =  pow(int_fourth_watts/int_fourth_counter,0.25);
            relative_intensity = xpower / ((float) zones->getFTP(zone_range));
@@ -330,23 +309,12 @@ RideItem::htmlSummary()
                * (pow(relative_intensity, 2)) * 100.0;
         }
                
-        total_work = total_watts / 1000.0;
-                
         summary += "<p>";
-        summary += "<table align=\"center\" width=\"90%\" border=0>";
-        summary += "<tr><td align=\"center\"><h2>Totals</h2></td>";
-        summary += "<td align=\"center\"><h2>Averages</h2></td></tr>";
-        summary += "<tr><td>";
-        summary += "<table align=\"center\" width=\"70%\" border=0>";
-        summary += "<tr><td>Workout time:</td><td align=\"right\">" + 
-            time_to_string(raw->points.back()->secs);
-        summary += "<tr><td>Time riding:</td><td align=\"right\">" + 
-            time_to_string(secs_moving_or_pedaling) + "</td></tr>";
 
         bool metricUnits = (unit.toString() == "Metric");
 
+        QDomDocument doc;
         {
-            QDomDocument doc;
             QString err;
             int errLine, errCol;
             if (!doc.setContent(QString(metricsXml), &err, &errLine, &errCol)){
@@ -354,13 +322,19 @@ RideItem::htmlSummary()
                         err.toAscii().constData(), errLine, errCol);
                 assert(false);
             }
-            QDomNodeList groups = doc.elementsByTagName("metric_group");
-            assert(groups.size() == 1); // for now...
-            QDomElement group = groups.at(0).toElement();
+        }
+
+        QDomNodeList groups = doc.elementsByTagName("metric_group");
+        for (int groupNum = 0; groupNum < groups.size(); ++groupNum) {
+            QDomElement group = groups.at(groupNum).toElement();
             assert(!group.isNull());
             QString groupName = group.attribute("name");
             assert(groupName.length() > 0);
-            assert(groupName == "Totals"); // for now...
+            if (groupNum % 2 == 0)
+                summary += "<table border=0 cellspacing=10><tr>";
+            summary += "<td align=\"center\" width=\"45%\"><table>"
+                "<tr><td align=\"center\" colspan=2><h2>%1</h2></td></tr>";
+            summary = summary.arg(groupName);
             QDomNodeList metricsList = group.childNodes();
             for (int i = 0; i < metricsList.size(); ++i) {
                 QDomElement metric = metricsList.at(i).toElement();
@@ -370,49 +344,30 @@ RideItem::htmlSummary()
                 assert(name.length() > 0);
                 assert(displayName.length() > 0);
                 const RideMetric *m = metrics.value(name);
-                QString s("<tr><td>%1 (%2):</td><td "
-                          "align=\"right\">%3</td></tr>");
-                s = s.arg(displayName).arg(m->units(metricUnits));
-                if (precision == 0)
-                    s = s.arg((unsigned) round(m->value(metricUnits)));
-                else
-                    s = s.arg(m->value(metricUnits), 0, 'f', precision);
-                summary += s;
+                assert(m);
+                if (m->units(metricUnits) == "seconds") {
+                    QString s("<tr><td>%1:</td><td "
+                              "align=\"right\">%2</td></tr>");
+                    s = s.arg(displayName);
+                    s = s.arg(time_to_string(m->value(metricUnits)));
+                    summary += s;
+                }
+                else {
+                    QString s("<tr><td>%1 (%2):</td><td "
+                              "align=\"right\">%3</td></tr>");
+                    s = s.arg(displayName).arg(m->units(metricUnits));
+                    if (precision == 0)
+                        s = s.arg((unsigned) round(m->value(metricUnits)));
+                    else
+                        s = s.arg(m->value(metricUnits), 0, 'f', precision);
+                    summary += s;
+                }
             }
+            summary += "</table></td>";
+            if ((groupNum % 2 == 1) || (groupNum == groups.size() - 1))
+                summary += "</tr></table>";
         }
 
-        summary += "</table></td><td>";
-        summary += "<table align=\"center\" width=\"70%\" border=0>";
-
-        if (unit.toString() == "Metric") {
-             summary += QString("<tr><td>Speed (km/h):</td>"
-                             "<td align=\"right\">%1</td></tr>")
-             .arg(((secs_moving == 0.0) ? 0.0
-                   : ((raw->points.back()->miles * 1.60934) 
-                      / secs_moving * 3600.0)), 
-                  0, 'f', 1);
-        }
-        else {
-             summary += QString("<tr><td>Speed (mph):</td>"
-                            "<td align=\"right\">%1</td></tr>")
-             .arg(((secs_moving == 0.0) ? 0.0
-                   : raw->points.back()->miles / secs_moving * 3600.0), 
-                  0, 'f', 1);
-        }
-        summary += QString("<tr><td>Power (watts):</td>"
-                           "<td align=\"right\">%1</td></tr>")
-            .arg((unsigned) avg_watts);
-        summary +=QString("<tr><td>Heart rate (bpm):</td>"
-                          "<td align=\"right\">%1</td></tr>")
-            .arg((unsigned) ((secs_hr == 0.0) ? 0.0
-                             : round(total_hr / secs_hr)));
-        summary += QString("<tr><td>Cadence (rpm):</td>"
-                           "<td align=\"right\">%1</td></tr>")
-            .arg((unsigned) ((secs_cad == 0.0) ? 0.0
-                             : round(total_cad / secs_cad)));
-        summary += "</table></td></tr>";
-        summary += "</table>";
- 
         if (xpower != 0) {
             summary += "<h2>Dr. Skiba's BikeScore</h2>";
             summary += "<table align=\"center\" width=\"40%\" ";

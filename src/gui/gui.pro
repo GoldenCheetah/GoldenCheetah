@@ -20,7 +20,6 @@ RC_FILE = images/gc.icns
 # Input
 HEADERS += \
 	AllPlot.h \
-        BasicRideMetrics.h \
 	ChooseCyclistDialog.h \
 	CpintPlot.h \
 	CsvRideFile.h \

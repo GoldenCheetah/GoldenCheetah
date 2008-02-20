@@ -6,7 +6,8 @@
 #include <QString>
 #include <assert.h>
 
-class RawFile;
+#include "RawFile.h"
+
 class Zones;
 
 struct RideMetric {
@@ -18,6 +19,42 @@ struct RideMetric {
                          const Zones *zones, int zoneRange) = 0;
     virtual void aggregateWith(RideMetric *other) = 0;
     virtual RideMetric *clone() const = 0;
+};
+
+struct PointwiseRideMetric : public RideMetric {
+    void compute(const RawFile *raw, const Zones *zones, int zoneRange) {
+        QListIterator<RawFilePoint*> i(raw->points);
+        double secsDelta = raw->rec_int_ms / 1000.0;
+        while (i.hasNext()) {
+            const RawFilePoint *point = i.next();
+            perPoint(point, secsDelta, raw, zones, zoneRange);
+        }
+    }
+    virtual void perPoint(const RawFilePoint *point, double secsDelta,
+                          const RawFile *raw, const Zones *zones,
+                          int zoneRange) = 0;
+};
+
+class AvgRideMetric : public PointwiseRideMetric {
+
+    protected:
+
+    int count;
+    double total;
+
+    public:
+
+    AvgRideMetric() : count(0), total(0.0) {}
+    double value(bool) const {
+        if (count == 0) return 0.0;
+        return total / count;
+    }
+    void aggregateWith(RideMetric *other) { 
+        assert(name() == other->name());
+        AvgRideMetric *as = dynamic_cast<AvgRideMetric*>(other);
+        count += as->count;
+        total += as->total;
+    }
 };
 
 class RideMetricFactory {
