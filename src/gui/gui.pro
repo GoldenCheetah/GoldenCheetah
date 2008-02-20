@@ -7,6 +7,7 @@ TARGET = GoldenCheetah
 DEPENDPATH += .
 INCLUDEPATH += /usr/local/qwt/include ../lib ../srm
 CONFIG += static debug
+QT += xml
 LIBS += /usr/local/qwt/lib/libqwt.a 
 LIBS += ../lib/libgc.a ../srm/libsrm.a
 LIBS += -lm -lz
