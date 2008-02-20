@@ -603,10 +603,12 @@ MainWindow::rideSelected()
             wstart = wstart.addDays(Qt::Monday - wstart.dayOfWeek());
             assert(wstart.dayOfWeek() == Qt::Monday);
             QDate wend = wstart.addDays(7);
-            double weeklySeconds = 0.0;
             const RideMetricFactory &factory = RideMetricFactory::instance();
+            RideMetric *weeklySeconds = factory.newMetric("time_riding");
+            assert(weeklySeconds);
             RideMetric *weeklyDistance = factory.newMetric("total_distance");
-            double weeklyWork = 0.0;
+            assert(weeklyDistance);
+            RideMetric *weeklyWork = factory.newMetric("total_work");
 
             int zone_range = -1;
             double *time_in_zone = NULL;
@@ -618,9 +620,17 @@ MainWindow::rideSelected()
                     RideItem *item = (RideItem*) allRides->child(i);
                     if ((item->dateTime.date() >= wstart)
                         && (item->dateTime.date() < wend)) {
-                        weeklySeconds += item->secsMovingOrPedaling();
-                        weeklyDistance->aggregateWith(item->metrics.value(weeklyDistance->name()));
-                        weeklyWork += item->totalWork();
+                        RideMetric *m;
+                        item->htmlSummary(); // compute metrics
+                        m = item->metrics.value(weeklySeconds->name());
+                        assert(m);
+                        weeklySeconds->aggregateWith(m);
+                        m = item->metrics.value(weeklyDistance->name());
+                        assert(m);
+                        weeklyDistance->aggregateWith(m);
+                        m = item->metrics.value(weeklyWork->name());
+                        assert(m);
+                        weeklyWork->aggregateWith(m);
                         if (zones) {
                             if (zone_range == -1) {
                                 zone_range = item->zoneRange();
@@ -639,7 +649,7 @@ MainWindow::rideSelected()
                 }
             }
 
-            int minutes = ((int) round(weeklySeconds)) / 60;
+            int minutes = ((int) round(weeklySeconds->value(true))) / 60;
             int hours = (int) minutes / 60;
             minutes %= 60;
 
@@ -671,8 +681,8 @@ MainWindow::rideSelected()
                 .arg(hours)
                 .arg(minutes, 2, 10, QLatin1Char('0'))
                 .arg((unsigned) round(weeklyDistance->value(true)))
-                .arg((unsigned) round(weeklyWork))
-                .arg((unsigned) round(weeklyWork / 7));
+                .arg((unsigned) round(weeklyWork->value(true)))
+                .arg((unsigned) round(weeklyWork->value(true) / 7));
              } 
             else {
                 summary = tr(
@@ -697,8 +707,8 @@ MainWindow::rideSelected()
                     .arg(hours)
                     .arg(minutes, 2, 10, QLatin1Char('0'))
                     .arg((unsigned) round(weeklyDistance->value(false)))
-                    .arg((unsigned) round(weeklyWork))
-                    .arg((unsigned) round(weeklyWork / 7));
+                    .arg((unsigned) round(weeklyWork->value(true)))
+                    .arg((unsigned) round(weeklyWork->value(true) / 7));
             }    
             if (zone_range != -1) {
                 summary += "<h2>Power Zones</h2>";
@@ -713,6 +723,7 @@ MainWindow::rideSelected()
             summary += "</center>";
 
             delete weeklyDistance;
+            delete weeklySeconds;
 
             // TODO: add daily breakdown
 

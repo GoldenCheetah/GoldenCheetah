@@ -31,9 +31,6 @@ class RideItem : public QTreeWidgetItem {
 
     protected:
 
-        double secs_moving_or_pedaling;
-        double total_distance;
-        double total_work;
         double *time_in_zone;
         int num_zones;
         int zone_range;
@@ -60,8 +57,6 @@ class RideItem : public QTreeWidgetItem {
         ~RideItem();
 
         QString htmlSummary();
-        double secsMovingOrPedaling();
-        double totalWork();
 
         int zoneRange();
         int numZones();
