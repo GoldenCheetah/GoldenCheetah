@@ -26,6 +26,7 @@
 #include "Zones.h"
 #include <assert.h>
 #include <math.h>
+#include <QtXml/QtXml>
 
 RideItem::RideItem(QTreeWidgetItem *parent, int type,
                    QString path, QString fileName, const QDateTime &dateTime, 
@@ -145,6 +146,16 @@ double RideItem::timeInZone(int zone)
     assert(zone < num_zones);
     return time_in_zone[zone];
 }
+
+static const char *metricsXml =  
+    "<metrics>\n"
+    "  <metric_group name=\"Totals\">\n"
+    "    <metric name=\"total_distance\" display_name=\"Distance\"\n"
+    "            precision=\"1\"/>\n"    
+    "    <metric name=\"total_work\" display_name=\"Work\"\n"
+    "            precision=\"0\"/>\n"
+    "  </metric_group>\n"
+    "</metrics>\n";
 
 QString 
 RideItem::htmlSummary()
@@ -332,18 +343,44 @@ RideItem::htmlSummary()
         summary += "<tr><td>Time riding:</td><td align=\"right\">" + 
             time_to_string(secs_moving_or_pedaling) + "</td></tr>";
 
-        bool metric = (unit.toString() == "Metric");
+        bool metricUnits = (unit.toString() == "Metric");
 
-        assert(metrics.contains("total_distance"));
-        const RideMetric *totalDistanceMetric = metrics.value("total_distance");
-        summary += ("<tr><td>Distance (" 
-                    + totalDistanceMetric->units(metric) 
-                    + "):</td><td align=\"right\">%1</td></tr>")
-                   .arg(totalDistanceMetric->value(metric), 0, 'f', 1);
- 
-        summary += QString("<tr><td>Work (kJ):</td>"
-                           "<td align=\"right\">%1</td></tr>")
-            .arg((unsigned) round(total_work));
+        {
+            QDomDocument doc;
+            QString err;
+            int errLine, errCol;
+            if (!doc.setContent(QString(metricsXml), &err, &errLine, &errCol)){
+                fprintf(stderr, "error: %s, line %d, col %d\n",
+                        err.toAscii().constData(), errLine, errCol);
+                assert(false);
+            }
+            QDomNodeList groups = doc.elementsByTagName("metric_group");
+            assert(groups.size() == 1); // for now...
+            QDomElement group = groups.at(0).toElement();
+            assert(!group.isNull());
+            QString groupName = group.attribute("name");
+            assert(groupName.length() > 0);
+            assert(groupName == "Totals"); // for now...
+            QDomNodeList metricsList = group.childNodes();
+            for (int i = 0; i < metricsList.size(); ++i) {
+                QDomElement metric = metricsList.at(i).toElement();
+                QString name = metric.attribute("name");
+                QString displayName = metric.attribute("display_name");
+                int precision = metric.attribute("precision", "0").toInt();
+                assert(name.length() > 0);
+                assert(displayName.length() > 0);
+                const RideMetric *m = metrics.value(name);
+                QString s("<tr><td>%1 (%2):</td><td "
+                          "align=\"right\">%3</td></tr>");
+                s = s.arg(displayName).arg(m->units(metricUnits));
+                if (precision == 0)
+                    s = s.arg((unsigned) round(m->value(metricUnits)));
+                else
+                    s = s.arg(m->value(metricUnits), 0, 'f', precision);
+                summary += s;
+            }
+        }
+
         summary += "</table></td><td>";
         summary += "<table align=\"center\" width=\"70%\" border=0>";
 
