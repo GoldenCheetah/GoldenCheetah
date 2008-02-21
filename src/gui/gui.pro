@@ -44,6 +44,7 @@ HEADERS += \
 SOURCES += \
 	AllPlot.cpp \
         BasicRideMetrics.cpp \
+        BikeScore.cpp \
 	ChooseCyclistDialog.cpp \
 	CpintPlot.cpp \
 	CsvRideFile.cpp \
