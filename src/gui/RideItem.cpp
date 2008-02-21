@@ -155,13 +155,14 @@ static const char *metricsXml =
     "    <metric name=\"average_cad\" display_name=\"Cadence\"\n"
     "            precision=\"0\"/>\n"
     "  </metric_group>\n"
-    "  <metric_group name=\"Dr. Skiba's BikeScore\">\n"
+    "  <metric_group name=\"BikeScore(TM)\" note=\"BikeScore is a trademark "
+    "      of Dr. Philip Friere Skiba, PhysFarm Training Systems LLC\">\n"
     "    <metric name=\"skiba_xpower\" display_name=\"xPower\"\n"
     "            precision=\"0\"/>\n"
     "    <metric name=\"skiba_relative_intensity\"\n"
     "            display_name=\"Relative Intensity\" precision=\"3\"/>\n"
     "    <metric name=\"skiba_bike_score\" display_name=\"BikeScore\"\n"
-    "            precision=\"2\"/>\n"
+    "            precision=\"0\"/>\n"
     "  </metric_group>\n"
     "</metrics>\n";
 
@@ -303,17 +304,27 @@ later:
             }
         }
 
+        QString noteString = "";
+        QString stars;
         QDomNodeList groups = doc.elementsByTagName("metric_group");
         for (int groupNum = 0; groupNum < groups.size(); ++groupNum) {
             QDomElement group = groups.at(groupNum).toElement();
             assert(!group.isNull());
             QString groupName = group.attribute("name");
+            QString groupNote = group.attribute("note");
             assert(groupName.length() > 0);
             if (groupNum % 2 == 0)
                 summary += "<table border=0 cellspacing=10><tr>";
             summary += "<td align=\"center\" width=\"45%\"><table>"
                 "<tr><td align=\"center\" colspan=2><h2>%1</h2></td></tr>";
-            summary = summary.arg(groupName);
+            if (groupNote.length() > 0) {
+                stars += "*";
+                summary = summary.arg(groupName + stars);
+                noteString += "<br>" + stars + " " + groupNote;
+            }
+            else {
+                summary = summary.arg(groupName);
+            }
             QDomNodeList metricsList = group.childNodes();
             for (int i = 0; i < metricsList.size(); ++i) {
                 QDomElement metric = metricsList.at(i).toElement();
@@ -399,6 +410,8 @@ later:
                 summary += " <li>" + i.next();
             summary += "</ul>";
         }
+        if (noteString.length() > 0)
+            summary += "<br><hr width=\"80%\">" + noteString;
         summary += "</center>";
     }
 
