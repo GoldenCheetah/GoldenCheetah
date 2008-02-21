@@ -4,6 +4,7 @@
 
 #include <QHash>
 #include <QString>
+#include <QVector>
 #include <assert.h>
 
 #include "RawFile.h"
@@ -16,13 +17,20 @@ struct RideMetric {
     virtual QString units(bool metric) const = 0;
     virtual double value(bool metric) const = 0;
     virtual void compute(const RawFile *raw, 
-                         const Zones *zones, int zoneRange) = 0;
-    virtual void aggregateWith(RideMetric *other) = 0;
+                         const Zones *zones, 
+                         int zoneRange,
+                         const QHash<QString,RideMetric*> &deps) = 0;
+    virtual bool canAggregate() const { return false; }
+    virtual void aggregateWith(RideMetric *other) { 
+        (void) other; 
+        assert(false); 
+    }
     virtual RideMetric *clone() const = 0;
 };
 
 struct PointwiseRideMetric : public RideMetric {
-    void compute(const RawFile *raw, const Zones *zones, int zoneRange) {
+    void compute(const RawFile *raw, const Zones *zones, int zoneRange,
+                 const QHash<QString,RideMetric*> &) {
         QListIterator<RawFilePoint*> i(raw->points);
         double secsDelta = raw->rec_int_ms / 1000.0;
         while (i.hasNext()) {
@@ -59,15 +67,12 @@ class AvgRideMetric : public PointwiseRideMetric {
 
 class RideMetricFactory {
 
-    public:
-
-    typedef QHash<QString,RideMetric*> RideMetricMap;
-    typedef QHashIterator<QString,RideMetric*> RideMetricIter;
-
-    private:
-
     static RideMetricFactory *_instance;
-    RideMetricMap _metrics;
+    static QVector<QString> noDeps;
+
+    QVector<QString> metricNames;
+    QHash<QString,RideMetric*> metrics;
+    QHash<QString,QVector<QString>*> dependencyMap;
 
     RideMetricFactory() {}
     RideMetricFactory(const RideMetricFactory &other);
@@ -81,19 +86,35 @@ class RideMetricFactory {
         return *_instance;
     }
 
-    const RideMetricMap &metrics() const { return _metrics; }
+    int metricCount() const { return metricNames.size(); }
+
+    const QString &metricName(int i) const { return metricNames[i]; }
 
     RideMetric *newMetric(const QString &name) const {
-        if (!_metrics.contains(name))
-            return NULL;
-        RideMetric *metric = _metrics.value(name);
-        return metric->clone();
+        assert(metrics.contains(name));
+        return metrics.value(name)->clone();
     }
 
-    bool addMetric(const RideMetric &metric) {
-        assert(!_metrics.contains(metric.name()));
-        _metrics.insert(metric.name(), metric.clone());
+    bool addMetric(const RideMetric &metric,
+                   const QVector<QString> *deps = NULL) {
+        assert(!metrics.contains(metric.name()));
+        metrics.insert(metric.name(), metric.clone());
+        metricNames.append(metric.name());
+        if (deps) {
+            QVector<QString> *copy = new QVector<QString>;
+            for (int i = 0; i < deps->size(); ++i) {
+                assert(metrics.contains((*deps)[i]));
+                copy->append((*deps)[i]);
+            }
+            dependencyMap.insert(metric.name(), copy);
+        }
         return true;
+    }
+
+    const QVector<QString> &dependencies(const QString &name) const {
+        assert(metrics.contains(name));
+        QVector<QString> *result = dependencyMap.value(name);
+        return result ? *result : noDeps;
     }
 };
 

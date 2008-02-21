@@ -155,6 +155,14 @@ static const char *metricsXml =
     "    <metric name=\"average_cad\" display_name=\"Cadence\"\n"
     "            precision=\"0\"/>\n"
     "  </metric_group>\n"
+    "  <metric_group name=\"Dr. Skiba's BikeScore\">\n"
+    "    <metric name=\"skiba_xpower\" display_name=\"xPower\"\n"
+    "            precision=\"0\"/>\n"
+    "    <metric name=\"skiba_relative_intensity\"\n"
+    "            display_name=\"Relative Intensity\" precision=\"3\"/>\n"
+    "    <metric name=\"skiba_bike_score\" display_name=\"BikeScore\"\n"
+    "            precision=\"2\"/>\n"
+    "  </metric_group>\n"
     "</metrics>\n";
 
 QString 
@@ -193,13 +201,24 @@ RideItem::htmlSummary()
         QVariant unit = settings.value(GC_UNIT);
  
         const RideMetricFactory &factory = RideMetricFactory::instance();
-        RideMetricFactory::RideMetricIter metricIter(factory.metrics());
-        while (metricIter.hasNext()) {
-            metricIter.next();
-            QString name = metricIter.key();
-            RideMetric *metric = factory.newMetric(name);
-            metric->compute(raw, zones, zone_range);
-            metrics.insert(name, metric);
+        QSet<QString> todo;
+        for (int i = 0; i < factory.metricCount(); ++i)
+            todo.insert(factory.metricName(i));
+
+        while (!todo.empty()) {
+            QMutableSetIterator<QString> i(todo);
+later:
+            while (i.hasNext()) {
+                const QString &name = i.next();
+                const QVector<QString> &deps = factory.dependencies(name);
+                for (int j = 0; j < deps.size(); ++j)
+                    if (!metrics.contains(deps[j]))
+                        goto later;
+                RideMetric *metric = factory.newMetric(name);
+                metric->compute(raw, zones, zone_range, metrics);
+                metrics.insert(name, metric);
+                i.remove();
+            }
         }
 
         double secs_watts = 0.0;
@@ -214,21 +233,7 @@ RideItem::htmlSummary()
         double int_secs_hr = 0.0;
         double int_max_power = 0.0;
 
-        // for computing "Bike Score"
-        // we're interested in a 25 second moving average
-        double moving_avg_len = 25000 / raw->rec_int_ms;
-        double moving_avg_watts[int(ceil(moving_avg_len))];
-        double fourthPower_watts = 0.0;
-        double fourth_counter = 0.0;
-        double int_fourth_watts = 0.0;
-        double int_fourth_counter = 0.0;
-        double xpower = 0.0;
-        double relative_intensity = 0.0;
-        double bike_score = 0.0;
-
         double time_start, time_end, mile_start, mile_end, int_dur;
-
-        int j = 0; // an index for the moving average function
 
         QListIterator<RawFilePoint*> i(raw->points);
         while (i.hasNext()) {
@@ -257,25 +262,6 @@ RideItem::htmlSummary()
             }
             if (point->watts >= 0.0) {
                 secs_watts += secs_delta;
-
-                // 25 second moving average
-                // populate the array in the first 25 seconds
-                if (secs_watts <= 25)
-                    moving_avg_watts[j] = point->watts;
-                else {
-                    // add the most recent value, and calculate average
-                    moving_avg_watts[j] = point->watts;
-                    double mov_avg = 0.0;
-                    for(int jj = 0;jj < moving_avg_len; jj++)
-                        mov_avg += moving_avg_watts[jj];
-                    double current_fourth = pow(mov_avg / moving_avg_len, 4.0);
-                    fourthPower_watts += current_fourth;
-                    fourth_counter++;
-                    int_fourth_watts += current_fourth;
-                    int_fourth_counter++;
-                }
-                j = (j + 1) % ((int)(moving_avg_len));
-
                 int_watts_sum += point->watts * secs_delta;
                 if (point->watts > int_max_power)
                     int_max_power = point->watts;
@@ -302,13 +288,6 @@ RideItem::htmlSummary()
                   int_hr_sum, int_cad_sum, int_mph_sum, 
                   int_secs_hr, int_max_power, int_dur);
 
-        if (zones) {
-           xpower =  pow(int_fourth_watts/int_fourth_counter,0.25);
-           relative_intensity = xpower / ((float) zones->getFTP(zone_range));
-           bike_score = ((raw->points.back()->secs / 60) / 60) 
-               * (pow(relative_intensity, 2)) * 100.0;
-        }
-               
         summary += "<p>";
 
         bool metricUnits = (unit.toString() == "Metric");
@@ -353,9 +332,10 @@ RideItem::htmlSummary()
                     summary += s;
                 }
                 else {
-                    QString s("<tr><td>%1 (%2):</td><td "
-                              "align=\"right\">%3</td></tr>");
-                    s = s.arg(displayName).arg(m->units(metricUnits));
+                    QString s = "<tr><td>" + displayName;
+                    if (m->units(metricUnits) != "")
+                        s += " (" + m->units(metricUnits) + ")";
+                    s += ":</td><td align=\"right\">%1</td></tr>";
                     if (precision == 0)
                         s = s.arg((unsigned) round(m->value(metricUnits)));
                     else
@@ -366,22 +346,6 @@ RideItem::htmlSummary()
             summary += "</table></td>";
             if ((groupNum % 2 == 1) || (groupNum == groups.size() - 1))
                 summary += "</tr></table>";
-        }
-
-        if (xpower != 0) {
-            summary += "<h2>Dr. Skiba's BikeScore</h2>";
-            summary += "<table align=\"center\" width=\"40%\" ";
-            summary += "cellspacing=0 border=0>";
-            summary += QString("<tr><td>xPower:</td>"
-                               "<td align=\"left\">%1</td></tr>")
-                .arg((unsigned) xpower);
-            summary += QString("<tr><td>Relative Intensity:</td>"
-                               "<td align=\"left\">%1</td></tr>")
-                .arg(relative_intensity, 0, 'f', 3);
-            summary += QString("<tr><td>Bike Score: </td>"
-                               "<td align=\"left\">%1</td></tr>")
-                .arg(bike_score, 0, 'f', 2);
-            summary += "</table>";
         }
 
         if (zones) {

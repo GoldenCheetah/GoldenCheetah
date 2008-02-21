@@ -12,9 +12,11 @@ class WorkoutTime : public RideMetric {
     QString name() const { return "workout_time"; }
     QString units(bool) const { return "seconds"; }
     double value(bool) const { return seconds; }
-    void compute(const RawFile *raw, const Zones *, int) {
+    void compute(const RawFile *raw, const Zones *, int,
+                 const QHash<QString,RideMetric*> &) {
         seconds = raw->points.back()->secs;
     }
+    bool canAggregate() const { return true; }
     void aggregateWith(RideMetric *other) { seconds += other->value(true); }
     RideMetric *clone() const { return new WorkoutTime(*this); }
 };
@@ -38,6 +40,7 @@ class TimeRiding : public PointwiseRideMetric {
         if ((point->mph > 0.0) || (point->cad > 0.0))
             secsMovingOrPedaling += secsDelta;
     }
+    bool canAggregate() const { return true; }
     void aggregateWith(RideMetric *other) {
         secsMovingOrPedaling += other->value(true);
     }
@@ -60,9 +63,11 @@ class TotalDistance : public RideMetric {
     double value(bool metric) const {
         return metric ? (miles / MILES_PER_KM) : miles;
     }
-    void compute(const RawFile *raw, const Zones *, int) {
+    void compute(const RawFile *raw, const Zones *, int,
+                 const QHash<QString,RideMetric*> &) {
         miles = raw->points.back()->miles;
     }
+    bool canAggregate() const { return true; }
     void aggregateWith(RideMetric *other) { miles += other->value(false); }
     RideMetric *clone() const { return new TotalDistance(*this); }
 };
@@ -86,6 +91,7 @@ class TotalWork : public PointwiseRideMetric {
         if (point->watts >= 0.0)
             joules += point->watts * secsDelta;
     }
+    bool canAggregate() const { return true; }
     void aggregateWith(RideMetric *other) { 
         assert(name() == other->name());
         TotalWork *tw = dynamic_cast<TotalWork*>(other);
@@ -113,14 +119,16 @@ class AvgSpeed : public PointwiseRideMetric {
         double mph = miles / secsMoving * 3600.0;
         return metric ? (mph / MILES_PER_KM) : mph;
     }
-    void compute(const RawFile *raw, const Zones *zones, int zoneRange) {
-        PointwiseRideMetric::compute(raw, zones, zoneRange);
+    void compute(const RawFile *raw, const Zones *zones, int zoneRange,
+                 const QHash<QString,RideMetric*> &deps) {
+        PointwiseRideMetric::compute(raw, zones, zoneRange, deps);
         miles = raw->points.back()->miles;
     }
     void perPoint(const RawFilePoint *point, double secsDelta, 
                   const RawFile *, const Zones *, int) {
         if (point->mph > 0.0) secsMoving += secsDelta;
     }
+    bool canAggregate() const { return true; }
     void aggregateWith(RideMetric *other) { 
         assert(name() == other->name());
         AvgSpeed *as = dynamic_cast<AvgSpeed*>(other);
