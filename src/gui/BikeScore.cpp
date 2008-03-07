@@ -96,6 +96,8 @@ class BikeScore : public RideMetric {
     double value(bool) const { return score; }
     void compute(const RawFile *, const Zones *zones, int zoneRange,
                  const QHash<QString,RideMetric*> &deps) {
+        if (!zones)
+            return;
         assert(deps.contains("skiba_xpower"));
         assert(deps.contains("skiba_relative_intensity"));
         XPower *xp = dynamic_cast<XPower*>(deps.value("skiba_xpower"));
