@@ -65,7 +65,7 @@ PowerHist::recalc()
         smoothWatts[i] = low;
         smoothTime[i]  = 0.0;
         while (low < high)
-            smoothTime[i] += array[low++];
+            smoothTime[i] += array[low++] / 60.0;
     }
     smoothTime[i] = 0.0;
     smoothWatts[i] = i * binw;
