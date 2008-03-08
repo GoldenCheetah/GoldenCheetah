@@ -12,9 +12,9 @@ class WorkoutTime : public RideMetric {
     QString name() const { return "workout_time"; }
     QString units(bool) const { return "seconds"; }
     double value(bool) const { return seconds; }
-    void compute(const RawFile *raw, const Zones *, int,
+    void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
-        seconds = raw->points.back()->secs;
+        seconds = ride->dataPoints().back()->secs;
     }
     bool canAggregate() const { return true; }
     void aggregateWith(RideMetric *other) { seconds += other->value(true); }
@@ -35,9 +35,9 @@ class TimeRiding : public PointwiseRideMetric {
     QString name() const { return "time_riding"; }
     QString units(bool) const { return "seconds"; }
     double value(bool) const { return secsMovingOrPedaling; }
-    void perPoint(const RawFilePoint *point, double secsDelta, 
-                  const RawFile *, const Zones *, int) {
-        if ((point->mph > 0.0) || (point->cad > 0.0))
+    void perPoint(const RideFilePoint *point, double secsDelta, 
+                  const RideFile *, const Zones *, int) {
+        if ((point->kph > 0.0) || (point->cad > 0.0))
             secsMovingOrPedaling += secsDelta;
     }
     bool canAggregate() const { return true; }
@@ -53,22 +53,22 @@ static bool timeRidingAdded =
 //////////////////////////////////////////////////////////////////////////////
 
 class TotalDistance : public RideMetric {
-    double miles;
+    double km;
 
     public:
 
-    TotalDistance() : miles(0.0) {}
+    TotalDistance() : km(0.0) {}
     QString name() const { return "total_distance"; }
     QString units(bool metric) const { return metric ? "km" : "miles"; }
     double value(bool metric) const {
-        return metric ? (miles / MILES_PER_KM) : miles;
+        return metric ? km : (km * MILES_PER_KM);
     }
-    void compute(const RawFile *raw, const Zones *, int,
+    void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
-        miles = raw->points.back()->miles;
+        km = ride->dataPoints().back()->km;
     }
     bool canAggregate() const { return true; }
-    void aggregateWith(RideMetric *other) { miles += other->value(false); }
+    void aggregateWith(RideMetric *other) { km += other->value(false); }
     RideMetric *clone() const { return new TotalDistance(*this); }
 };
 
@@ -86,8 +86,8 @@ class TotalWork : public PointwiseRideMetric {
     QString name() const { return "total_work"; }
     QString units(bool) const { return "kJ"; }
     double value(bool) const { return joules / 1000.0; }
-    void perPoint(const RawFilePoint *point, double secsDelta, 
-                  const RawFile *, const Zones *, int) {
+    void perPoint(const RideFilePoint *point, double secsDelta, 
+                  const RideFile *, const Zones *, int) {
         if (point->watts >= 0.0)
             joules += point->watts * secsDelta;
     }
@@ -107,33 +107,33 @@ static bool totalWorkAdded =
 
 class AvgSpeed : public PointwiseRideMetric {
     double secsMoving;
-    double miles;
+    double km;
 
     public:
 
-    AvgSpeed() : secsMoving(0.0), miles(0.0) {}
+    AvgSpeed() : secsMoving(0.0), km(0.0) {}
     QString name() const { return "average_speed"; }
     QString units(bool metric) const { return metric ? "kph" : "mph"; }
     double value(bool metric) const {
         if (secsMoving == 0.0) return 0.0;
-        double mph = miles / secsMoving * 3600.0;
-        return metric ? (mph / MILES_PER_KM) : mph;
+        double kph = km / secsMoving * 3600.0;
+        return metric ? kph : (kph * MILES_PER_KM);
     }
-    void compute(const RawFile *raw, const Zones *zones, int zoneRange,
+    void compute(const RideFile *ride, const Zones *zones, int zoneRange,
                  const QHash<QString,RideMetric*> &deps) {
-        PointwiseRideMetric::compute(raw, zones, zoneRange, deps);
-        miles = raw->points.back()->miles;
+        PointwiseRideMetric::compute(ride, zones, zoneRange, deps);
+        km = ride->dataPoints().back()->km;
     }
-    void perPoint(const RawFilePoint *point, double secsDelta, 
-                  const RawFile *, const Zones *, int) {
-        if (point->mph > 0.0) secsMoving += secsDelta;
+    void perPoint(const RideFilePoint *point, double secsDelta, 
+                  const RideFile *, const Zones *, int) {
+        if (point->kph > 0.0) secsMoving += secsDelta;
     }
     bool canAggregate() const { return true; }
     void aggregateWith(RideMetric *other) { 
         assert(name() == other->name());
         AvgSpeed *as = dynamic_cast<AvgSpeed*>(other);
         secsMoving += as->secsMoving;
-        miles += as->miles;
+        km += as->km;
     }
     RideMetric *clone() const { return new AvgSpeed(*this); }
 };
@@ -147,8 +147,8 @@ struct AvgPower : public AvgRideMetric {
 
     QString name() const { return "average_power"; }
     QString units(bool) const { return "watts"; }
-    void perPoint(const RawFilePoint *point, double, 
-                  const RawFile *, const Zones *, int) {
+    void perPoint(const RideFilePoint *point, double, 
+                  const RideFile *, const Zones *, int) {
         if (point->watts >= 0.0) {
             total += point->watts;
             ++count;
@@ -166,8 +166,8 @@ struct AvgHeartRate : public AvgRideMetric {
 
     QString name() const { return "average_hr"; }
     QString units(bool) const { return "bpm"; }
-    void perPoint(const RawFilePoint *point, double, 
-                  const RawFile *, const Zones *, int) {
+    void perPoint(const RideFilePoint *point, double, 
+                  const RideFile *, const Zones *, int) {
         if (point->hr > 0) {
             total += point->hr;
             ++count;
@@ -185,8 +185,8 @@ struct AvgCadence : public AvgRideMetric {
 
     QString name() const { return "average_cad"; }
     QString units(bool) const { return "bpm"; }
-    void perPoint(const RawFilePoint *point, double, 
-                  const RawFile *, const Zones *, int) {
+    void perPoint(const RideFilePoint *point, double, 
+                  const RideFile *, const Zones *, int) {
         if (point->cad > 0) {
             total += point->cad;
             ++count;

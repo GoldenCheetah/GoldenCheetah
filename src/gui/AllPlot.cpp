@@ -20,7 +20,7 @@
 
 #include <time.h>
 #include "AllPlot.h"
-#include "RawFile.h"
+#include "RideFile.h"
 #include "Settings.h"
 
 #include <assert.h>
@@ -213,7 +213,7 @@ AllPlot::setYMax()
 }
 
 void
-AllPlot::setData(RawFile *raw)
+AllPlot::setData(RideFile *ride)
 {
     delete [] wattsArray;
     delete [] hrArray;
@@ -222,21 +222,21 @@ AllPlot::setData(RawFile *raw)
     delete [] timeArray;
     delete [] interArray;
     
-    setTitle(raw->startTime.toString(GC_DATETIME_FORMAT));
-    wattsArray = new double[raw->points.size()];
-    hrArray    = new double[raw->points.size()];
-    speedArray    = new double[raw->points.size()];
-    cadArray    = new double[raw->points.size()];
-    timeArray  = new double[raw->points.size()];
-    interArray = new int[raw->points.size()];
+    setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
+    wattsArray = new double[ride->dataPoints().size()];
+    hrArray    = new double[ride->dataPoints().size()];
+    speedArray    = new double[ride->dataPoints().size()];
+    cadArray    = new double[ride->dataPoints().size()];
+    timeArray  = new double[ride->dataPoints().size()];
+    interArray = new int[ride->dataPoints().size()];
     arrayLength = 0;
-    QListIterator<RawFilePoint*> i(raw->points); 
+    QListIterator<RideFilePoint*> i(ride->dataPoints()); 
     while (i.hasNext()) {
-        RawFilePoint *point = i.next();
+        RideFilePoint *point = i.next();
         timeArray[arrayLength]  = point->secs;
         wattsArray[arrayLength] = max(0, point->watts);
         hrArray[arrayLength]    = max(0, point->hr);
-        speedArray[arrayLength] = max(0, point->mph);
+        speedArray[arrayLength] = max(0, point->kph * 0.62137119);
         cadArray[arrayLength]   = max(0, point->cad);
         interArray[arrayLength] = point->interval;
         ++arrayLength;

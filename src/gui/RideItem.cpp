@@ -20,13 +20,15 @@
 
 #include "RideItem.h"
 #include "RideMetric.h"
-#include "RawFile.h"
+#include "RideFile.h"
 #include "Settings.h"
 #include "TimeUtils.h"
 #include "Zones.h"
 #include <assert.h>
 #include <math.h>
 #include <QtXml/QtXml>
+
+#define MILES_PER_KM 0.62137119
 
 RideItem::RideItem(QTreeWidgetItem *parent, int type,
                    QString path, QString fileName, const QDateTime &dateTime, 
@@ -56,23 +58,23 @@ RideItem::~RideItem()
 
 static void summarize(QString &intervals,
                       unsigned last_interval,
-                      double mile_start, double mile_end,
+                      double km_start, double km_end,
                       double &int_watts_sum,
                       double &int_hr_sum,
                       double &int_cad_sum,
-                      double &int_mph_sum,
+                      double &int_kph_sum,
                       double &int_secs_hr,
                       double &int_max_power,
                       double int_dur) 
 {
     double dur = int_dur;
-    double len = mile_end - mile_start;
+    double mile_len = (km_end - km_start) * MILES_PER_KM;
     double minutes = (int) (dur/60.0);
     double seconds = dur - (60 * minutes);
     double watts_avg = int_watts_sum / dur;
     double hr_avg = int_hr_sum / int_secs_hr;
     double cad_avg = int_cad_sum / dur;
-    double mph_avg = int_mph_sum / dur;
+    double mph_avg = int_kph_sum * MILES_PER_KM / dur;
     double energy = int_watts_sum / 1000.0; // watts_avg / 1000.0 * dur;
 
     intervals += "<tr><td align=\"center\">%1</td>";
@@ -87,7 +89,7 @@ static void summarize(QString &intervals,
     intervals = intervals.arg(last_interval);
     intervals = intervals.arg(minutes, 0, 'f', 0);
     intervals = intervals.arg(seconds, 2, 'f', 0, QLatin1Char('0'));
-    intervals = intervals.arg(len, 0, 'f', 1);
+    intervals = intervals.arg(mile_len, 0, 'f', 1);
     intervals = intervals.arg(energy, 0, 'f', 0);
     intervals = intervals.arg(int_max_power, 0, 'f', 0);
     intervals = intervals.arg(watts_avg, 0, 'f', 0);
@@ -103,7 +105,7 @@ static void summarize(QString &intervals,
     int_watts_sum = 0.0;
     int_hr_sum = 0.0;
     int_cad_sum = 0.0;
-    int_mph_sum = 0.0;
+    int_kph_sum = 0.0;
     int_max_power = 0.0;
 }
 
@@ -126,7 +128,7 @@ double RideItem::timeInZone(int zone)
 {
     if (summary.isEmpty())
         htmlSummary();
-    if (!raw)
+    if (!ride)
         return 0.0;
     assert(zone_range >= 0);
     assert(zone < num_zones);
@@ -172,10 +174,9 @@ RideItem::htmlSummary()
     if (summary.isEmpty()) {
         QFile file(path + "/" + fileName);
         QStringList errors;
-        raw = RawFile::readFile(file, errors);
-        if (!raw) {
-            summary = ("<p>Couldn't read file \"" + 
-                       file.fileName() + "\":");
+        ride = CombinedFileReader::instance().openRideFile(file, errors);
+        if (!ride) {
+            summary = "<p>Couldn't read file \"" + file.fileName() + "\":";
             QListIterator<QString> i(errors);
             while (i.hasNext())
                 summary += "<br>" + i.next();
@@ -184,10 +185,6 @@ RideItem::htmlSummary()
         summary = ("<p><center><h2>" 
                    + dateTime.toString("dddd MMMM d, yyyy, h:mm AP") 
                    + "</h2><p><h2>Summary</h2>");
-        if (raw == NULL) {
-            summary += "<p>Error: Can't read file.";
-            return summary;
-        }
 
         if (zones) {
             zone_range = zones->whichRange(dateTime.date());
@@ -216,7 +213,7 @@ later:
                     if (!metrics.contains(deps[j]))
                         goto later;
                 RideMetric *metric = factory.newMetric(name);
-                metric->compute(raw, zones, zone_range, metrics);
+                metric->compute(ride, zones, zone_range, metrics);
                 metrics.insert(name, metric);
                 i.remove();
             }
@@ -226,39 +223,39 @@ later:
        
         QString intervals = "";
         int interval_count = 0;
-        unsigned last_interval = UINT_MAX;
+        int last_interval = INT_MAX;
         double int_watts_sum = 0.0;
         double int_hr_sum = 0.0;
         double int_cad_sum = 0.0;
-        double int_mph_sum = 0.0;
+        double int_kph_sum = 0.0;
         double int_secs_hr = 0.0;
         double int_max_power = 0.0;
 
-        double time_start, time_end, mile_start, mile_end, int_dur;
+        double time_start, time_end, km_start, km_end, int_dur;
 
-        QListIterator<RawFilePoint*> i(raw->points);
+        QListIterator<RideFilePoint*> i(ride->dataPoints());
         while (i.hasNext()) {
-            RawFilePoint *point = i.next();
+            RideFilePoint *point = i.next();
 
-            double secs_delta = raw->rec_int_ms / 1000.0;
+            double secs_delta = ride->recIntSecs();
 
             if (point->interval != last_interval) {
 
-                if (last_interval != UINT_MAX) {
+                if (last_interval != INT_MAX) {
                     summarize(intervals, last_interval,
-                              mile_start, mile_end, int_watts_sum, 
-                              int_hr_sum, int_cad_sum, int_mph_sum, 
+                              km_start, km_end, int_watts_sum, 
+                              int_hr_sum, int_cad_sum, int_kph_sum, 
                               int_secs_hr, int_max_power, int_dur);
                 }
                 interval_count++;
                 last_interval = point->interval;
                 time_start = point->secs;
-                mile_start = point->miles;
+                km_start = point->km;
                 int_secs_hr = secs_delta;
                 int_dur = 0.0;
             }
 
-            if ((point->mph > 0.0) || (point->cad > 0.0)) {
+            if ((point->kph > 0.0) || (point->cad > 0.0)) {
                 int_dur += secs_delta;
             }
             if (point->watts >= 0.0) {
@@ -278,15 +275,15 @@ later:
             }
             if (point->cad > 0)
                 int_cad_sum += point->cad * secs_delta;
-            if (point->mph >= 0)
-                int_mph_sum += point->mph * secs_delta;
+            if (point->kph >= 0)
+                int_kph_sum += point->kph * secs_delta;
 
-            mile_end = point->miles;
+            km_end = point->km;
             time_end = point->secs + secs_delta;
         }
         summarize(intervals, last_interval,
-                  mile_start, mile_end, int_watts_sum, 
-                  int_hr_sum, int_cad_sum, int_mph_sum, 
+                  km_start, km_end, int_watts_sum, 
+                  int_hr_sum, int_cad_sum, int_kph_sum, 
                   int_secs_hr, int_max_power, int_dur);
 
         summary += "<p>";

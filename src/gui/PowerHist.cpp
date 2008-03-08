@@ -19,7 +19,7 @@
  */
 
 #include "PowerHist.h"
-#include "RawFile.h"
+#include "RideFile.h"
 #include "Settings.h"
 
 #include <assert.h>
@@ -84,17 +84,26 @@ PowerHist::setYMax()
 }
 
 void
-PowerHist::setData(RawFile *raw)
+PowerHist::setData(RideFile *ride)
 {
-    setTitle(raw->startTime.toString(GC_DATETIME_FORMAT));
-    assert(raw->powerHist.keys().first() >= 0);
-    int maxPower = (int) round(raw->powerHist.keys().last());
+    setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
+    QMap<double,double> powerHist;
+    QListIterator<RideFilePoint*> j(ride->dataPoints());
+    while (j.hasNext()) {
+        const RideFilePoint *p1 = j.next();
+        if (powerHist.contains(p1->watts))
+            powerHist[p1->watts] += ride->recIntSecs();
+        else
+            powerHist[p1->watts] = ride->recIntSecs();
+    }
+    assert(powerHist.keys().first() >= 0);
+    int maxPower = (int) round(powerHist.keys().last());
     delete [] array;
     arrayLength = maxPower + 1;
     array = new double[arrayLength];
     for (int i = 0; i < arrayLength; ++i)
         array[i] = 0.0;
-    QMapIterator<double,double> i(raw->powerHist);
+    QMapIterator<double,double> i(powerHist);
     while (i.hasNext()) {
         i.next();
         array[(int) round(i.key())] += i.value();

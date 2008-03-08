@@ -25,7 +25,6 @@
 #include "CpintPlot.h"
 #include "DownloadRideDialog.h"
 #include "PowerHist.h"
-#include "RawFile.h"
 #include "RideItem.h"
 #include "RideFile.h"
 #include "RideMetric.h"
@@ -46,6 +45,7 @@
 
 #define FOLDER_TYPE 0
 #define RIDE_TYPE 1
+#define MILES_PER_KM 0.62137119
 
 static char *rideFileRegExp = ("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)"
                                "_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.(raw|srm|csv)$");
@@ -446,28 +446,28 @@ MainWindow::exportCSV()
     QTextStream out(&file);
     if (units=="English"){
         out << "Minutes,Torq (N-m),MPH,Watts,Miles,Cadence,Hrate,ID\n";
-        convertUnit = 1.0;
+        convertUnit = MILES_PER_KM;
     }
     else {
         out << "Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID\n";
         // TODO: use KM_TO_MI from lib/pt.c instead?
-        convertUnit = 1.60934;
+        convertUnit = 1.0;
     }
         
-    QListIterator<RawFilePoint*> i(ride->raw->points);
+    QListIterator<RideFilePoint*> i(ride->ride->dataPoints());
     while (i.hasNext()) {
-        RawFilePoint *point = i.next();
+        RideFilePoint *point = i.next();
         if (point->secs == 0.0)
             continue;
         out << point->secs/60.0;
         out << ",";
         out << ((point->nm >= 0) ? point->nm : 0.0);
         out << ",";
-        out << ((point->mph >= 0) ? (point->mph * convertUnit) : 0.0);
+        out << ((point->kph >= 0) ? (point->kph * convertUnit) : 0.0);
         out << ",";
         out << ((point->watts >= 0) ? point->watts : 0.0);
         out << ",";
-        out << point->miles * convertUnit;
+        out << point->km * convertUnit;
         out << ",";
         out << point->cad;
         out << ",";
@@ -490,37 +490,36 @@ void MainWindow::importCSV()
 
     QFile file ( dpd->fileName );
     QStringList errors;
-    RawFile *raw = RawFile::readFile ( file, errors );
+    RideFile *ride =
+        CombinedFileReader::instance().openRideFile(file, errors);
 
-    raw->startTime = dpd->date; 
-
-    if ( !raw || !errors.empty() )
+    if (!ride || !errors.empty())
     {
         QString all = 
-            ( raw
+            ( ride
               ? tr ( "Non-fatal problem(s) opening %1:" )
               : tr ( "Fatal problem(s) opening %1:" ) ).arg ( dpd->fileName );
         QStringListIterator i ( errors );
         while ( i.hasNext() )
             all += "\n" + i.next();
-        if ( raw )
+        if (ride)
             QMessageBox::warning ( this, tr ( "Open Warning" ), all );
-        else
-        {
+        else {
             QMessageBox::critical ( this, tr ( "Open Error" ), all );
             return;
         }
     }
+    ride->setStartTime(dpd->date); 
 
     QChar zero = QLatin1Char ( '0' );
 
     QString name = QString ( "%1_%2_%3_%4_%5_%6.csv" )
-        .arg ( raw->startTime.date().year(), 4, 10, zero )
-        .arg ( raw->startTime.date().month(), 2, 10, zero )
-        .arg ( raw->startTime.date().day(), 2, 10, zero )
-        .arg ( raw->startTime.time().hour(), 2, 10, zero )
-        .arg ( raw->startTime.time().minute(), 2, 10, zero )
-        .arg ( raw->startTime.time().second(), 2, 10, zero );
+        .arg ( ride->startTime().date().year(), 4, 10, zero )
+        .arg ( ride->startTime().date().month(), 2, 10, zero )
+        .arg ( ride->startTime().date().day(), 2, 10, zero )
+        .arg ( ride->startTime().time().hour(), 2, 10, zero )
+        .arg ( ride->startTime().time().minute(), 2, 10, zero )
+        .arg ( ride->startTime().time().second(), 2, 10, zero );
 
     if ( !file.copy ( home.absolutePath() + "/" + name ) )
     {
@@ -530,7 +529,7 @@ void MainWindow::importCSV()
         return;
     }
 
-    delete raw;
+    delete ride;
     delete dpd;
     addRide ( name );
 }
@@ -546,15 +545,16 @@ MainWindow::importSRM()
         QString fileName = i.next();
         QFile file(fileName);
         QStringList errors;
-        RawFile *raw = RawFile::readFile(file, errors);
-        if (!raw || !errors.empty()) {
-            QString all = (raw 
+        RideFile *ride =
+            CombinedFileReader::instance().openRideFile(file, errors);
+        if (!ride || !errors.empty()) {
+            QString all = (ride 
                            ? tr("Non-fatal problem(s) opening %1:")
                            : tr("Fatal problem(s) opening %1:")).arg(fileName);
             QStringListIterator i(errors);
             while (i.hasNext())
                 all += "\n" + i.next();
-            if (raw)
+            if (ride)
                 QMessageBox::warning(this, tr("Open Warning"), all);
             else {
                 QMessageBox::critical(this, tr("Open Error"), all);
@@ -564,12 +564,12 @@ MainWindow::importSRM()
 
         QChar zero = QLatin1Char('0'); 
         QString name = QString("%1_%2_%3_%4_%5_%6.srm")
-            .arg(raw->startTime.date().year(), 4, 10, zero)
-            .arg(raw->startTime.date().month(), 2, 10, zero)
-            .arg(raw->startTime.date().day(), 2, 10, zero)
-            .arg(raw->startTime.time().hour(), 2, 10, zero)
-            .arg(raw->startTime.time().minute(), 2, 10, zero)
-            .arg(raw->startTime.time().second(), 2, 10, zero);
+            .arg(ride->startTime().date().year(), 4, 10, zero)
+            .arg(ride->startTime().date().month(), 2, 10, zero)
+            .arg(ride->startTime().date().day(), 2, 10, zero)
+            .arg(ride->startTime().time().hour(), 2, 10, zero)
+            .arg(ride->startTime().time().minute(), 2, 10, zero)
+            .arg(ride->startTime().time().second(), 2, 10, zero);
 
         if (!file.copy(home.absolutePath() + "/" + name)) {
             QMessageBox::critical(this, tr("Copy Error"), 
@@ -577,7 +577,7 @@ MainWindow::importSRM()
             return;
         }
 
-        delete raw;
+        delete ride;
         addRide(name);
     }
 }
@@ -592,12 +592,12 @@ MainWindow::rideSelected()
             RideItem *ride = (RideItem*) which;
             rideSummary->setHtml(ride->htmlSummary());
             rideSummary->setAlignment(Qt::AlignCenter);
-            if (ride->raw)
-                allPlot->setData(ride->raw);
+            if (ride->ride)
+                allPlot->setData(ride->ride);
             if (tabWidget->currentIndex() == 2)
                 cpintPlot->calculate(ride->fileName, ride->dateTime);
-            if (ride->raw)
-                powerHist->setData(ride->raw);
+            if (ride->ride)
+                powerHist->setData(ride->ride);
 
             QDate wstart = ride->dateTime.date();
             wstart = wstart.addDays(Qt::Monday - wstart.dayOfWeek());

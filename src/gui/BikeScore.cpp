@@ -25,13 +25,13 @@ class XPower : public RideMetric {
     QString name() const { return "skiba_xpower"; }
     QString units(bool) const { return "watts"; }
     double value(bool) const { return xpower; }
-    void compute(const RawFile *raw, const Zones *, int,
+    void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
 
         static const double EPSILON = 0.1;
         static const double NEGLIGIBLE = 0.1;
 
-        double secsDelta = raw->rec_int_ms / 1000.0;
+        double secsDelta = ride->recIntSecs();
         double sampsPerWindow = 25.0 / secsDelta;
         double attenuation = sampsPerWindow / (sampsPerWindow + secsDelta);
         double sampleWeight = secsDelta / (sampsPerWindow + secsDelta);
@@ -42,9 +42,9 @@ class XPower : public RideMetric {
         double total = 0.0;
         int count = 0;
 
-        QListIterator<RawFilePoint*> i(raw->points);
+        QListIterator<RideFilePoint*> i(ride->dataPoints());
         while (i.hasNext()) {
-            const RawFilePoint *point = i.next();
+            const RideFilePoint *point = i.next();
             while ((weighted > NEGLIGIBLE) 
                    && (point->secs > lastSecs + secsDelta + EPSILON)) {
                 weighted *= attenuation;
@@ -72,7 +72,7 @@ class RelativeIntensity : public RideMetric {
     QString name() const { return "skiba_relative_intensity"; }
     QString units(bool) const { return ""; }
     double value(bool) const { return reli; }
-    void compute(const RawFile *, const Zones *zones, int zoneRange,
+    void compute(const RideFile *, const Zones *zones, int zoneRange,
                  const QHash<QString,RideMetric*> &deps) {
         if (zones) {
             assert(deps.contains("skiba_xpower"));
@@ -94,7 +94,7 @@ class BikeScore : public RideMetric {
     QString name() const { return "skiba_bike_score"; }
     QString units(bool) const { return ""; }
     double value(bool) const { return score; }
-    void compute(const RawFile *, const Zones *zones, int zoneRange,
+    void compute(const RideFile *, const Zones *zones, int zoneRange,
                  const QHash<QString,RideMetric*> &deps) {
         if (!zones)
             return;

@@ -23,7 +23,7 @@
 
 #include <QtGui>
 
-class RawFile;
+class RideFile;
 class Zones;
 class RideMetric;
 
@@ -41,7 +41,7 @@ class RideItem : public QTreeWidgetItem {
         QString fileName;
         QDateTime dateTime;
         QString summary;
-        RawFile *raw;
+        RideFile *ride;
         const Zones *zones;
         QString notesFileName;
 

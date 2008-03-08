@@ -26,7 +26,7 @@
 class QwtPlotCurve;
 class QwtPlotGrid;
 class QwtPlotMarker;
-class RawFile;
+class RideFile;
 
 class AllPlot : public QwtPlot
 {
@@ -44,7 +44,7 @@ class AllPlot : public QwtPlot
 
         int smoothing() const { return smooth; }
 
-        void setData(RawFile *raw);
+        void setData(RideFile *ride);
 
     public slots:
 
