@@ -22,7 +22,7 @@
 #define PI 3.14159265
         
 static int srmFileReaderRegistered = 
-    CombinedFileReader::instance().registerReader("srm", new SrmFileReader());
+    RideFileFactory::instance().registerReader("srm", new SrmFileReader());
  
 RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errors) const 
 {

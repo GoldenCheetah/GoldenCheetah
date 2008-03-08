@@ -75,21 +75,21 @@ struct RideFileReader {
     virtual RideFile *openRideFile(QFile &file, QStringList &errors) const = 0;
 };
 
-class CombinedFileReader : public RideFileReader {
+class RideFileFactory {
 
     private:
 
-        static CombinedFileReader *instance_;
+        static RideFileFactory *instance_;
         QMap<QString,RideFileReader*> readFuncs_;
 
-        CombinedFileReader() {}
+        RideFileFactory() {}
 
     public:
 
-        static CombinedFileReader &instance();
+        static RideFileFactory &instance();
 
         int registerReader(const QString &suffix, RideFileReader *reader);
-        virtual RideFile *openRideFile(QFile &file, QStringList &errors) const;
+        RideFile *openRideFile(QFile &file, QStringList &errors) const;
         QStringList listRideFiles(const QDir &dir) const;
 };
 

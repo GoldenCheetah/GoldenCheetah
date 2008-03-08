@@ -105,7 +105,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     QRegExp rx(rideFileRegExp);
     QTreeWidgetItem *last = NULL;
-    QStringListIterator i(CombinedFileReader::instance().listRideFiles(home));
+    QStringListIterator i(RideFileFactory::instance().listRideFiles(home));
     while (i.hasNext()) {
         QString name = i.next();
         if (rx.exactMatch(name)) {
@@ -491,7 +491,7 @@ void MainWindow::importCSV()
     QFile file ( dpd->fileName );
     QStringList errors;
     RideFile *ride =
-        CombinedFileReader::instance().openRideFile(file, errors);
+        RideFileFactory::instance().openRideFile(file, errors);
 
     if (!ride || !errors.empty())
     {
@@ -546,7 +546,7 @@ MainWindow::importSRM()
         QFile file(fileName);
         QStringList errors;
         RideFile *ride =
-            CombinedFileReader::instance().openRideFile(file, errors);
+            RideFileFactory::instance().openRideFile(file, errors);
         if (!ride || !errors.empty()) {
             QString all = (ride 
                            ? tr("Non-fatal problem(s) opening %1:")

@@ -19,16 +19,16 @@
 #include "RideFile.h"
 #include <assert.h>
 
-CombinedFileReader *CombinedFileReader::instance_;
+RideFileFactory *RideFileFactory::instance_;
 
-CombinedFileReader &CombinedFileReader::instance() 
+RideFileFactory &RideFileFactory::instance() 
 { 
     if (!instance_) 
-        instance_ = new CombinedFileReader();
+        instance_ = new RideFileFactory();
     return *instance_;
 }
 
-int CombinedFileReader::registerReader(const QString &suffix, 
+int RideFileFactory::registerReader(const QString &suffix, 
                                        RideFileReader *reader) 
 {
     assert(!readFuncs_.contains(suffix));
@@ -36,7 +36,7 @@ int CombinedFileReader::registerReader(const QString &suffix,
     return 1;
 }
 
-RideFile *CombinedFileReader::openRideFile(QFile &file, 
+RideFile *RideFileFactory::openRideFile(QFile &file, 
                                            QStringList &errors) const 
 {
     QString suffix = file.fileName();
@@ -48,7 +48,7 @@ RideFile *CombinedFileReader::openRideFile(QFile &file,
     return reader->openRideFile(file, errors);
 }
 
-QStringList CombinedFileReader::listRideFiles(const QDir &dir) const 
+QStringList RideFileFactory::listRideFiles(const QDir &dir) const 
 {
     QStringList filters;
     QMapIterator<QString,RideFileReader*> i(readFuncs_);
