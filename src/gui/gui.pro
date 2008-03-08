@@ -29,7 +29,6 @@ HEADERS += \
         LogTimeScaleEngine.h \
 	MainWindow.h \
 	PowerHist.h \
-	RawFile.h \
 	RawRideFile.h \
 	RideFile.h \
 	RideItem.h \
@@ -54,7 +53,6 @@ SOURCES += \
         LogTimeScaleEngine.cpp \
 	MainWindow.cpp \
 	PowerHist.cpp \
-	RawFile.cpp \
 	RawRideFile.cpp \
 	RideFile.cpp \
 	RideItem.cpp \

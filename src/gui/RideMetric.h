@@ -7,7 +7,7 @@
 #include <QVector>
 #include <assert.h>
 
-#include "RawFile.h"
+#include "RideFile.h"
 
 class Zones;
 
@@ -16,7 +16,7 @@ struct RideMetric {
     virtual QString name() const = 0;
     virtual QString units(bool metric) const = 0;
     virtual double value(bool metric) const = 0;
-    virtual void compute(const RawFile *raw, 
+    virtual void compute(const RideFile *ride, 
                          const Zones *zones, 
                          int zoneRange,
                          const QHash<QString,RideMetric*> &deps) = 0;
@@ -29,17 +29,16 @@ struct RideMetric {
 };
 
 struct PointwiseRideMetric : public RideMetric {
-    void compute(const RawFile *raw, const Zones *zones, int zoneRange,
+    void compute(const RideFile *ride, const Zones *zones, int zoneRange,
                  const QHash<QString,RideMetric*> &) {
-        QListIterator<RawFilePoint*> i(raw->points);
-        double secsDelta = raw->rec_int_ms / 1000.0;
+        QListIterator<RideFilePoint*> i(ride->dataPoints());
         while (i.hasNext()) {
-            const RawFilePoint *point = i.next();
-            perPoint(point, secsDelta, raw, zones, zoneRange);
+            const RideFilePoint *point = i.next();
+            perPoint(point, ride->recIntSecs(), ride, zones, zoneRange);
         }
     }
-    virtual void perPoint(const RawFilePoint *point, double secsDelta,
-                          const RawFile *raw, const Zones *zones,
+    virtual void perPoint(const RideFilePoint *point, double secsDelta,
+                          const RideFile *ride, const Zones *zones,
                           int zoneRange) = 0;
 };
 

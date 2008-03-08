@@ -25,7 +25,7 @@
 
 class QwtPlotCurve;
 class QwtPlotGrid;
-class RawFile;
+class RideFile;
 
 class PowerHist : public QwtPlot
 {
@@ -39,7 +39,7 @@ class PowerHist : public QwtPlot
 
         int binWidth() const { return binw; }
 
-        void setData(RawFile *raw);
+        void setData(RideFile *ride);
 
     public slots:
 
