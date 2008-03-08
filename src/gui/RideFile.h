@@ -25,6 +25,21 @@
 #include <QList>
 #include <QMap>
 
+// This file defines four classes:
+//
+// RideFile, as the name suggests, represents the data stored in a ride file,
+// regardless of what type of file it is (.raw, .srm, .csv).
+// 
+// RideFilePoint represents the data for a single sample in a RideFile.
+//
+// RideFileReader is an abstract base class for function-objects that take a
+// filename and return a RideFile object representing the ride stored in the
+// corresponding file.
+//
+// RideFileFactory is a singleton that maintains a mapping from ride file
+// suffixes to the RideFileReader objects capable of converting those files
+// into RideFile objects.
+
 struct RideFilePoint 
 {
     double secs, cad, hr, km, kph, nm, watts;
