@@ -27,7 +27,7 @@
 #define MILES_TO_KM 1.609344
         
 static int csvFileReaderRegistered = 
-    CombinedFileReader::instance().registerReader("csv", new CsvFileReader());
+    RideFileFactory::instance().registerReader("csv", new CsvFileReader());
  
 RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const 
 {

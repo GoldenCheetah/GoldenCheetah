@@ -24,7 +24,7 @@
 #define MILES_TO_KM 1.609344
         
 static int rawFileReaderRegistered = 
-    CombinedFileReader::instance().registerReader("raw", new RawFileReader());
+    RideFileFactory::instance().registerReader("raw", new RawFileReader());
  
 struct ReadState
 {

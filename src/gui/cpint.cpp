@@ -56,7 +56,7 @@ cpi_files_to_update(const char *dir)
         assert(0);
 
     QStringList filenames = 
-        CombinedFileReader::instance().listRideFiles(QDir(dir));
+        RideFileFactory::instance().listRideFiles(QDir(dir));
     QListIterator<QString> i(filenames);
     while (i.hasNext()) {
         QString filename = i.next();
@@ -106,7 +106,7 @@ update_cpi_file(cpi_file_info *info,
     QFile file(info->inname);
     QStringList errors;
     RideFile *rideFile = 
-        CombinedFileReader::instance().openRideFile(file, errors);
+        RideFileFactory::instance().openRideFile(file, errors);
     assert(rideFile);
     cpint_data data;
     data.rec_int_ms = (int) round(rideFile->recIntSecs() * 1000.0);

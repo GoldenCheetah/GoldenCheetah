@@ -174,7 +174,7 @@ RideItem::htmlSummary()
     if (summary.isEmpty()) {
         QFile file(path + "/" + fileName);
         QStringList errors;
-        ride = CombinedFileReader::instance().openRideFile(file, errors);
+        ride = RideFileFactory::instance().openRideFile(file, errors);
         if (!ride) {
             summary = "<p>Couldn't read file \"" + file.fileName() + "\":";
             QListIterator<QString> i(errors);
