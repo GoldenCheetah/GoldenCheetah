@@ -1,0 +1,232 @@
+<!-- $Id: users-guide.content,v 1.5 2006/05/27 16:32:46 srhea Exp $ -->
+
+<p>
+<big><font face="arial,helvetica,sanserif">
+Using the Command Line Utilities
+</font></big>
+
+<p>
+In addition to the GUI, Golden Cheetah comes with 
+several command line utilities:
+<code>ptdl</code>, which downloads ride data from a PowerTap Pro version 2.21
+cycling computer, <code>ptunpk</code>, which unpacks the raw bytes downloaded
+by <code>ptdl</code> and outputs more human-friendly ride information, and
+<code>cpint</code>, which computes your critical power (see below).  We've
+also written several Perl scripts to help you graph and summarize the data.
+
+<p>
+NOTE: We no longer support the use of the command-line tools.  Please use the
+graphical version of GoldenCheetah instead.  This documentation is here for
+the benefit of the brave alone.
+
+<p>
+<big><font face="arial,helvetica,sanserif">
+Extracting the Data
+</font></big>
+<p>
+First, make sure you have the FTDI drivers installed, as described in the <a
+href="users-guide.html">User's Guide</a>.  You can then run <code>ptdl</code>
+without arguments:  
+
+<pre>
+$ ./ptdl 
+Reading from /dev/tty.usbserial-3B1.
+Reading version information...done.
+Reading ride time...done.
+Writing to 2006_05_15_11_34_03.raw.
+Reading ride data..............done.
+$ head -5 2006_05_15_11_34_03.raw
+57 56 55 64 02 15
+60 06 05 0f 6b 22
+40 08 30 00 00 00
+86 0e 74 99 00 55
+81 06 77 a8 40 55
+</pre>
+
+<p>
+If everything goes well, <code>ptdl</code> will automatically detect the
+device (<code>/dev/tty.usbserial-3B1</code> in the example above), read the
+ride data from it, and write to a file named by the date and time at which the
+ride started (<code>2006_05_15_11_34_03.raw</code> in the example; the format
+is YYYY_MM_DD_hh_mm_ss.raw).  
+
+<p>
+<big><font face="arial,helvetica,sanserif">
+Unpacking the Data
+</font></big>
+<p>As shown by the <code>head</code> command above, the data in this
+<code>.raw</code> file is just the raw bytes that represent your ride.  To
+unpack those bytes and display them in a more human-friendly format, use
+<code>ptunpk</code>:
+
+<pre>
+$ ./ptunpk 2006_05_15_11_34_03.raw
+$ head -5 2006_05_15_11_34_03.dat 
+# Time Torq MPH Watts Miles Cad HR Int
+# 2006/5/15 11:34:03 1147707243
+# wheel size=2096 mm, interval=0, rec int=1
+0.021 13.1 2.450 43 0.00781 0 85 0
+0.042 13.4 5.374 97 0.00912 64 85 0
+</pre>
+
+<code>ptunpk</code> takes a <code>.raw</code> file for input and writes a
+<code>.dat</code> file as output.  Lines that start with an ampersand ("#") in
+this file are comments; the other lines represent measured samples.  As shown
+by the first comment in the file, the columns are: time in minutes, torque in
+Newton-meters, speed in miles per hour, power in watts, distance in miles,
+cadence, heart rate, and interval number.
+
+<p>
+<big><font face="arial,helvetica,sanserif">
+Summarizing the Data
+</font></big>
+<p>
+We hope to have a graphical interface to these programs soon, but until then,
+the only summarization tools we have are command-line programs.  The script
+<code>intervals.pl</code> summarizes the intervals performed in a workout:
+
+<small>
+<pre>
+$ ./intervals.pl 2006_05_03_16_24_04.dat 
+                        Power           Heart Rate      Cadence         Speed
+Int      Dur    Dist     Avg     Max    Avg     Max     Avg     Max     Avg     Max
+ 0      77:10    19.3    213     693    134     167      82     141     16.0    27.8
+ 1       4:03     0.9    433     728    175     203      84     122     13.0    18.8
+ 2       7:23     1.0     86     502    135     179      71     141     16.0    28.2
+ 3       4:27     0.9    390     628    170     181      70     100     12.0    17.6
+ 4       8:04     0.9     60     203    130     178      50     120     18.0    30.1
+ 5       4:30     0.9    384     682    170     179      79     113     11.0    18.6
+ 6       8:51     1.1     53     245    125     176      70     141     8.0     26.6
+ 7       2:48     0.4    400     614    164     178      62      91     8.0     13.6
+ 8       7:01     1.1     46     268    128     170      71     141     12.0    28.8
+ 9       4:30     0.9    379     560    168     180      81     170     11.0    18.3
+10      28:46     6.5    120     409    128     179      79     141     15.0    31.0
+</pre>
+</small>
+
+<p>
+In the example above, a rider performed five hill intervals, four of which
+climbed a medium size hill that took about 4-5 minutes to climb (intervals
+1, 3, 5, and 9), and one on a shorter hill that took just under 3 minutes to
+climb (interval 7).  
+
+<p>
+<big><font face="arial,helvetica,sanserif">
+Graphing the Data
+</font></big>
+<p>
+For graphing the data in the ride, we use <code>smooth.pl</code> and the
+<code>gnuplot</code> program.  You can use <a href="sample.gp">sample.gp</a>
+to graph the power, heart rate, cadence, and speed for the hill workout above:
+
+<pre>
+$ gnuplot sample.gp
+</pre>
+
+<img align="center" alt="Sample Plot" src="sample.png">
+
+<p>
+<big><font face="arial,helvetica,sanserif">
+Finding Your "Critical Power"
+</font></big>
+<p>
+Joe Friel calls the maximum average power a rider can sustain over an interval
+the rider's "critical power" for that duration.  The <code>cpint</code>
+program automatically computes your critical power over all interval lengths
+using the data from all your past rides.  This program looks at all the
+<code>.raw</code> files in a directory, calculating your maximum power over
+every subinterval length and storing them in a corresponding <code>.cpi</code>
+file.  It then combines the data in all of the <code>.cpi</code> files to find
+your critical power over <i>all</i> subintervals of <i>all</i> your rides.
+
+<pre>
+$ ls *.raw
+2006_04_28_10_48_33.raw 2006_05_10_17_08_30.raw 2006_05_18_16_32_53.raw
+2006_05_03_16_24_04.raw 2006_05_13_10_29_12.raw 2006_05_21_12_25_07.raw
+2006_05_05_10_52_05.raw 2006_05_15_11_34_03.raw 2006_05_22_18_28_47.raw
+...
+2006_05_09_09_54_29.raw 2006_05_17_16_44_35.raw
+$ ./cpint 
+Compiling data for ride on Fri Apr 28 10:48:33 2006...done.
+Compiling data for ride on Sat Apr 29 10:07:48 2006...done.
+Compiling data for ride on Sun Apr 30 14:00:17 2006...done.
+ ...
+Compiling data for ride on Mon May 22 18:28:47 2006...done.
+ 0.021 1264
+ 0.042 1221
+ 0.063 1216
+ ...
+ 5.019 391
+ ...
+171.885 163
+</pre>
+
+<p>
+Over this set of rides, the rider's maximum power is 1264 watts, achieved over
+an interval of 0.021 minutes (1.26 seconds).  Over all five-minute
+subintervals, he has achieved a maximum average power of 391 watts.  The
+longest ride in this set was 171.885 minutes long, and he averaged 163 watts
+over it.
+
+<p>
+We can graph the output of <code>cpint</code> using <code>gnuplot</code> with
+<a href="cpint.gp">cpint.gp</a>:
+
+<pre>
+$ ./cpint > cpint.out
+$ gnuplot cpint.gp
+</pre>
+
+<img src="cpint.png">
+
+<p>
+The first time you run <code>cpint</code> it will take a while, as it has to
+analyze all your past rides.  On subsequent runs, however, it will only
+analyze new files.
+
+<p><i>Training and Racing with a Power Meter</i> (see the <a
+href="faq.html">FAQ</a>) contains a table of critical powers of Cat 5 cyclists
+up through international pros at interval lengths of 5 seconds, 1 minute, 5
+minutes, and 60 minutes.  Using this table and the <code>cpint</code> program,
+you can determine whether you're stronger than others in your racing category
+at each interval length and adapt your training program accordingly.
+
+<p>
+<big><font face="arial,helvetica,sanserif">
+Converting Old Data
+</font></big>
+
+<p>
+If you've used the PowerTuned software that comes with the PowerTap you may
+have lots of old ride data in that program that you'd like to include in your
+critical power graph.  You can convert the <code>.xml</code> files that
+PowerTuned produces to <code>.raw</code> files using the <code>ptpk</code>
+program:
+
+<p>
+<pre>
+$ ./ptpk 2006_04_27_00_23_28.xml 
+$ head -5 2006_04_27_00_23_28.raw 
+57 56 55 64 02 15
+60 06 04 7b 80 17
+40 08 30 00 00 00
+84 04 00 24 00 ff
+83 03 00 d7 00 ff
+</pre>
+
+<p>
+<code>ptpk</code> assumes the input <code>.xml</code> file was generated with
+a wheel size of 2,096 mm and a recording interval of 1.  If this is not the
+case, you should specify the correct values with the <code>-w</code> and
+<code>-r</code> options.
+
+<p>
+Note that the PowerTuned software computes the output speed in miles per hour
+by multiplying the measured speed in kilometers per hour by 0.62, and the
+miles per hour values in a <code>.xml</code> file are thus only accurate to
+two significant figures, even though they're printed out to three decimal
+places.  Because of this limitation, the sequence <code>ptpk</code>,
+<code>ptunpk</code> is not quite the identity function; in particular, the
+wattage values from <code>ptpk</code> may only be accurate to two significant
+digits.
+
