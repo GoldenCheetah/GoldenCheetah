@@ -1,0 +1,27 @@
+From BEGIN until 2006/07/17, CP=297:
+  1, Active Recovery,     122, 167
+  2, Endurance,           167, 228
+  3, Tempo,               228, 274
+  4, Lactate Threshold,   274, 319
+  5, VO2 Max,             319, 365
+  6, Anaerobic Capacity,  365, 678
+  7, Sprinting,           678, MAX
+
+From 2006/07/17 until 2007/02/05, CP=329:
+  1, Active Recovery,     135, 185
+  2, Endurance,           185, 253
+  3, Tempo,               253, 303
+  4, Lactate Threshold,   303, 354
+  5, VO2 Max,             354, 404
+  6, Anaerobic Capacity,  404, 752
+  7, Sprinting,           752, MAX
+
+From 2007/02/05 until END, CP=347:
+  1, Active Recovery,     139, 191
+  2, Endurance,           191, 260
+  3, Tempo,               260, 312
+  4, Lactate Threshold,   312, 364
+  5, VO2 Max,             364, 416
+  6, Anaerobic Capacity,  416, 774
+  7, Sprinting,           774, MAX
+

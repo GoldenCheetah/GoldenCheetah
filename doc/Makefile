@@ -17,6 +17,9 @@ install:
 	rsync -avz -e ssh $(HTML) $(TARBALLS) $(OTHER) \
 		srhea.net:wwwroot/goldencheetah.org/
 
+command-line.html: command-line.content genpage.pl
+	./genpage.pl "Legacy Command-Line Tools" $< > $@
+
 contact.html: contact.content genpage.pl
 	./genpage.pl "Contact Us" $< > $@
 
