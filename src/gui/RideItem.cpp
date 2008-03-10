@@ -157,7 +157,7 @@ static const char *metricsXml =
     "    <metric name=\"average_cad\" display_name=\"Cadence\"\n"
     "            precision=\"0\"/>\n"
     "  </metric_group>\n"
-    "  <metric_group name=\"BikeScore(TM)\" note=\"BikeScore is a trademark "
+    "  <metric_group name=\"BikeScore&#8482;\" note=\"BikeScore is a trademark "
     "      of Dr. Philip Friere Skiba, PhysFarm Training Systems LLC\">\n"
     "    <metric name=\"skiba_xpower\" display_name=\"xPower\"\n"
     "            precision=\"0\"/>\n"
@@ -407,8 +407,11 @@ later:
                 summary += " <li>" + i.next();
             summary += "</ul>";
         }
-        if (noteString.length() > 0)
-            summary += "<br><hr width=\"80%\">" + noteString;
+        if (noteString.length() > 0) {
+            // The extra </center><center> works around a bug in QT 4.3.1,
+            // which will otherwise put the noteString above the <hr>.
+            summary += "<br><hr width=\"80%\"></center><center>" + noteString;
+        }
         summary += "</center>";
     }
 
