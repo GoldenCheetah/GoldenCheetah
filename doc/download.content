@@ -17,7 +17,7 @@ The Golden Cheetah source code is available via
 <a href="http://www.trolltech.com/products/qt">QT 4</a> and 
 <a href="http://qwt.sourceforge.net/">qwt 5.0.1</a> (as a static, not
 dynamic, library) and 
-edit <code>goldencheetah/src/gui/GoldenCheetah.pro</code> to point to them
+edit <code>goldencheetah/src/gui/gui.pro</code> to point to them
 before building GoldenCheetah.
 Use this command to check out the current version of the repository:
 
@@ -40,6 +40,19 @@ href="http://goldencheetah.org/svn/trunk">here</a>.
 <td width="20%"><i>Date</i></td>
 <td width="30%"><i>Files</i></td>
 <td><i>Description</i></td>
+</tr>
+
+<tr>
+<td valign="top">Mar 10, 2008</td>
+<td valign="top">
+<a href="GoldenCheetah_2008-03-10_Linux_x86.tgz">Linux x86</a>,<br>
+<a href="GoldenCheetah_2007-03-10_Darwin_Universal.dmg">Mac OS X Universal</a>
+</td>
+<td valign="top">
+This release introduces BikeScore&#8482;, a metric of training stress
+developed by Dr. Philip Skiba.  It also fixes several small bugs in earlier
+releases.
+</td>
 </tr>
 
 <tr>
