@@ -5,7 +5,8 @@ TARBALLS=$(wildcard gc_*.tgz)
 OTHER=logo.jpg sample.gp sample.png cpint.gp cpint.png \
 	screenshot-summary.png screenshot-plot.png \
 	screenshot-cpint.png screenshot-phist.png \
-	screenshot-download.png screenshot-weekly.png
+	screenshot-download.png screenshot-weekly.png \
+	choose-a-cyclist.png main-window.png critical-power.png
 
 all: $(HTML)
 .PHONY: all clean install
