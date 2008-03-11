@@ -587,17 +587,19 @@ pt_read_raw(FILE *in, int compat, void *context,
         }
         else if (pt_is_time(buf)) {
             since_epoch = pt_unpack_time(buf, &time);
+            bool ignore = false;
             if (start_secs == 0.0)
                 start_secs = since_epoch;
             else if (since_epoch - start_secs > secs)
-                    secs = since_epoch - start_secs;
+                secs = since_epoch - start_secs;
             else {
                 sprintf(ebuf, "Warning: %0.3f minutes into the ride, "
                         "time jumps backwards by %0.3f minutes; ignoring it.",
                         secs / 60.0, (secs - since_epoch + start_secs) / 60.0);
                 if (error_cb) error_cb(ebuf, context);
+                ignore = true;
             }
-            if (time_cb) time_cb(&time, since_epoch, context);
+            if (time_cb && !ignore) time_cb(&time, since_epoch, context);
         }
         else if (pt_is_data(buf)) {
             if (wheel_sz_mm == 0) {
