@@ -49,9 +49,9 @@ href="http://goldencheetah.org/svn/trunk">here</a>.
 <a href="GoldenCheetah_2008-03-10_Darwin_Universal.dmg">Mac OS X Universal</a>
 </td>
 <td valign="top">
-This release introduces BikeScore&#8482;, a metric of training stress
-developed by Dr. Philip Skiba.  It also fixes several small bugs in earlier
-releases.
+This release introduces <a href="http://www.physfarm.com/Analysis%20of%20Power%20Output%20and%20Training%20Stress%20in%20Cyclists-%20BikeScore.pdf">BikeScore&#8482;</a>,
+a metric of training stress developed by Dr. Philip Skiba.  It also
+fixes several small bugs in earlier releases.
 </td>
 </tr>
 
