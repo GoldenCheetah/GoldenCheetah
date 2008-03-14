@@ -160,7 +160,11 @@ rose by any other name would smell as sweet.
 We'll have a dialog box that will let you set up your power zones and
 critical power in a future version of GoldenCheetah, but for now you'll need
 to use a text editor.  On Linux, that probably means nano, vi, or emacs.
-On Mac, it means TextEdit, which is in your Applications folder.  Start by
+On Mac, the easiest editor to use is TextEdit, which is in your Applications
+folder.  
+
+<p>
+Start by
 downloading <a href="power.zones">this sample file</a> and saving it in 
 
 <pre>
@@ -213,6 +217,12 @@ number, a name, a minimum power value, and a maximum power value.  You can
 have as many time ranges and zones as you like.  Most people enter a new time
 range every time their critical power goes up--right after a fitness test, for
 example.
+
+<p>
+NOTE: By default, Mac OS's TextEdit will try and save the power.zones file
+with a <code>.txt</code> extension.  Use the menu command "Format->Make Plain
+Text" to get it to let you save the file with a <code>.zones</code> extension
+instead.
 
 <p>
 <big><font face="arial,helvetica,sanserif">
