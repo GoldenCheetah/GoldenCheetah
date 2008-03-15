@@ -20,6 +20,7 @@
 
 #include "MainWindow.h"
 #include "AllPlot.h"
+#include "BestIntervalDialog.h"
 #include "ChooseCyclistDialog.h"
 #include "ConfigDialog.h"
 #include "CpintPlot.h"
@@ -339,6 +340,8 @@ MainWindow::MainWindow(const QDir &home) :
                         SLOT(importSRM()), tr("Ctrl+I")); 
     rideMenu->addAction(tr("&Import from CSV..."), this,
                         SLOT (importCSV()), tr ("Ctrl+S"));
+    rideMenu->addAction(tr("Find &best intervals..."), this, 
+                        SLOT(findBestIntervals()), tr ("Ctrl+B")); 
     QMenu *optionsMenu = menuBar()->addMenu(tr("&Options"));
     optionsMenu->addAction(tr("&Options..."), this, 
                            SLOT(showOptions()), tr("Ctrl+O")); 
@@ -404,6 +407,16 @@ void
 MainWindow::downloadRide()
 {
     (new DownloadRideDialog(this, home))->show();
+}
+
+const RideFile *
+MainWindow::currentRide()
+{
+    if ((treeWidget->selectedItems().size() != 1)
+        || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
+        return NULL;
+    }
+    return ((RideItem*) treeWidget->selectedItems().first())->ride;
 }
 
 void
@@ -580,6 +593,12 @@ MainWindow::importSRM()
         delete ride;
         addRide(name);
     }
+}
+
+void
+MainWindow::findBestIntervals()
+{
+    (new BestIntervalDialog(this))->show();
 }
 
 void 

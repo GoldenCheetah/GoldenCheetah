@@ -30,6 +30,7 @@ class PowerHist;
 class QwtPlotPanner;
 class QwtPlotPicker;
 class QwtPlotZoomer;
+class RideFile;
 class Zones;
 
 class MainWindow : public QMainWindow 
@@ -39,6 +40,7 @@ class MainWindow : public QMainWindow
     public:
         MainWindow(const QDir &home);
         void addRide(QString name);
+        const RideFile *currentRide();
         QDir home;
     protected:
         virtual void resizeEvent(QResizeEvent*);
@@ -54,6 +56,7 @@ class MainWindow : public QMainWindow
         void exportCSV();
         void importCSV();
         void importSRM();
+        void findBestIntervals();
         void setSmoothingFromSlider();
         void setSmoothingFromLineEdit();
         void setBinWidthFromSlider();

@@ -20,6 +20,7 @@ RC_FILE = images/gc.icns
 # Input
 HEADERS += \
 	AllPlot.h \
+	BestIntervalDialog.h \
 	ChooseCyclistDialog.h \
 	CpintPlot.h \
 	CsvRideFile.h \
@@ -43,6 +44,7 @@ HEADERS += \
 SOURCES += \
 	AllPlot.cpp \
         BasicRideMetrics.cpp \
+	BestIntervalDialog.cpp \
         BikeScore.cpp \
 	ChooseCyclistDialog.cpp \
 	CpintPlot.cpp \
