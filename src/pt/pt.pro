@@ -6,8 +6,9 @@ TEMPLATE = app
 TARGET = 
 DEPENDPATH += .
 INCLUDEPATH += /sw/include
-LIBS += -lftd2xx
+LIBS += -lftd2xx ../lib/libgc.a
 
 # Input
-SOURCES += PowerTap.cpp
+HEADERS += D2XX.h
+SOURCES += D2XX.cpp PowerTap.cpp
 
