@@ -1,110 +1,26 @@
+/* 
+ * Copyright (c) 2008 Sean C. Rhea (srhea@srhea.net)
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 
-#include <QtCore>
-#include <D2XX/ftd2xx.h>
-#include <boost/shared_ptr.hpp>
-#include <ctype.h>
-
-class Device
-{
-    Device(const Device &);
-    Device& operator=(const Device &);
-
-    FT_DEVICE_LIST_INFO_NODE info;
-    FT_HANDLE ftHandle;
-    bool isOpen;
-
-    public:
-
-    Device(const FT_DEVICE_LIST_INFO_NODE &info) : info(info), isOpen(false) {}
-
-    ~Device() {
-        if (isOpen)
-            close();
-    }
-
-    bool open(QString &err) {
-        assert(!isOpen);
-        FT_STATUS ftStatus =
-            FT_OpenEx(info.Description, FT_OPEN_BY_DESCRIPTION, &ftHandle);
-        if (ftStatus == FT_OK)
-            isOpen = true;
-        else
-            err = QString("FT_Open: %1").arg(ftStatus);
-        ftStatus = FT_SetBaudRate(ftHandle, 9600);
-        if (ftStatus != FT_OK) {
-            err = QString("FT_SetBaudRate: %1").arg(ftStatus);
-            close();
-        }
-        return isOpen;
-    }
-
-    void close() {
-        assert(isOpen);
-        FT_Close(ftHandle); 
-        isOpen = false;
-    }
-
-    int read(void *buf, size_t nbyte, QString &err) {
-        assert(isOpen);
-        DWORD rxbytes;
-        FT_STATUS ftStatus = FT_GetQueueStatus(ftHandle, &rxbytes);
-        if (ftStatus != FT_OK) {
-            err = QString("FT_GetQueueStatus: %1").arg(ftStatus);
-            return -1;
-        }
-        // printf("rxbytes=%d\n", (int) rxbytes);
-        // Return immediately whenever there's something to read.
-        if (rxbytes > 0 && rxbytes < nbyte)
-            nbyte = rxbytes;
-        if (nbyte > rxbytes)
-            FT_SetTimeouts(ftHandle, 5000, 5000);
-        DWORD n;
-        ftStatus = FT_Read(ftHandle, buf, nbyte, &n);
-        if (ftStatus == FT_OK)
-            return n;
-        err = QString("FT_Read: %1").arg(ftStatus);
-        return -1;
-    }
-
-    int write(void *buf, size_t nbyte, QString &err) {
-        assert(isOpen);
-        DWORD n;
-        FT_STATUS ftStatus = FT_Write(ftHandle, buf, nbyte, &n);
-        if (ftStatus == FT_OK)
-            return n;
-        err = QString("FT_Write: %1").arg(ftStatus);
-        return -1;
-    }
-
-    void setTimeout(int millis) {
-        assert(isOpen);
-        FT_SetTimeouts(ftHandle, millis, millis);
-    }
-};
-
-typedef boost::shared_ptr<Device> DevicePtr;
-
-static QVector<DevicePtr>
-listDevices(QString &err)
-{
-    QVector<DevicePtr> result;
-    DWORD numDevs;
-    FT_STATUS ftStatus = FT_CreateDeviceInfoList(&numDevs); 
-    if(ftStatus != FT_OK) {
-        err = QString("FT_CreateDeviceInfoList: %1").arg(ftStatus); 
-        return result;
-    }
-    FT_DEVICE_LIST_INFO_NODE *devInfo = new FT_DEVICE_LIST_INFO_NODE[numDevs];
-    ftStatus = FT_GetDeviceInfoList(devInfo, &numDevs); 
-    if (ftStatus != FT_OK)
-        err = QString("FT_GetDeviceInfoList: %1").arg(ftStatus); 
-    else {
-        for (DWORD i = 0; i < numDevs; i++)
-            result.append(DevicePtr(new Device(devInfo[i])));
-    }
-    delete [] devInfo;
-    return result;
-}
+#include "D2XX.h"
+#include "../lib/pt.h"
+#include <math.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 static bool
 hasNewline(const char *buf, int len)
@@ -179,24 +95,16 @@ readUntilNewline(DevicePtr dev, char *buf, int len)
     return sofar;
 }
 
-int
-main()
+typedef void (*StatusCallback)(QString status);
+
+static bool
+download(DevicePtr dev, QString &version,
+         QVector<unsigned char> &records,
+         StatusCallback statusCallback, QString &err)
 {
-    QString err;
-    QVector<DevicePtr> devList = listDevices(err);
-    if (devList.empty()) {
-        printf("ERROR: no devices\n");
-        exit(1);
-    }
-    if (devList.size() > 1) {
-        printf("ERROR: found %d devices\n", devList.size());
-        exit(1);
-    }
-    printf("opening device\n");
-    DevicePtr dev = devList[0];
     if (!dev->open(err)) {
-        printf("ERROR: open failed: %s\n", err.toAscii().constData());
-        exit(1);
+        err = "ERROR: open failed: " + err;
+        return false;
     } 
 
     /*
@@ -210,28 +118,37 @@ main()
     */
 
     doWrite(dev, 0x56); // 'V'
-    printf("reading version string\n");
-    char version[256];
-    int version_len = readUntilNewline(dev, version, sizeof(version));
+    statusCallback("Reading version string...");
+    char vbuf[256];
+    int version_len = readUntilNewline(dev, vbuf, sizeof(vbuf));
     printf("read version \"%s\"\n",
-           cEscape(version, version_len).toAscii().constData());
+           cEscape(vbuf, version_len).toAscii().constData());
+    vbuf[version_len] = '\0';
+    version = vbuf;
 
-    printf("reading header\n");
+    statusCallback("Reading header...");
+
     doWrite(dev, 0x44); // 'D'
     unsigned char header[6];
     int header_len = dev->read(header, sizeof(header), err);
     if (header_len != 6) {
         if (header_len < 0)
-            printf("ERROR: reading header: %s\n", err.toAscii().constData());
+            err = "ERROR: reading header: " + err;
         else
-            printf("ERROR: timeout reading header\n");
-        exit(1);
+            err = "ERROR: timeout reading header";
+        return false;
     }
     /*printf("read header \"%s\"\n",
            cEscape((char*) header, 
                    sizeof(header)).toAscii().constData());*/
+    for (size_t i = 0; i < sizeof(header); ++i)
+        records.append(header[i]);
 
-    printf("reading blocks...");
+    statusCallback("Downloading ride data...");
+
+    unsigned recInt = 0;
+    double secs = 0.0;
+
     fflush(stdout);
     while (true) {
         // printf("reading block\n");
@@ -239,11 +156,10 @@ main()
         int n = dev->read(buf, 2, err);
         if (n < 2) {
             if (n < 0)
-                printf("\nERROR: reading first two: %s\n",
-                       err.toAscii().constData());
+                err = "ERROR: reading first two: " + err;
             else
-                printf("\nERROR: timeout reading first two\n");
-            exit(1);
+                err = "ERROR: timeout reading first two";
+            return false;
         }
         /*printf("read 2 bytes: \"%s\"\n", 
                cEscape((char*) buf, 2).toAscii().constData());*/
@@ -253,12 +169,12 @@ main()
         while (count < sizeof(buf)) {
             n = dev->read(buf + count, sizeof(buf) - count, err);
             if (n < 0) {
-                printf("\nERROR: reading block: %s\n", err.toAscii().constData());
-                exit(1);
+                err = "ERROR: reading block: " + err;
+                return false;
             }
             if (n == 0) {
-                printf("\nERROR: timeout reading block\n");
-                exit(1);
+                err = "ERROR: timeout reading block";
+                return false;
             }
             /*printf("read %d bytes: \"%s\"\n", n, 
                    cEscape((char*) buf + count, n).toAscii().constData());*/
@@ -268,15 +184,99 @@ main()
         for (int i = 0; i < ((int) sizeof(buf)) - 1; ++i) 
             csum += buf[i];
         if ((csum % 256) != buf[sizeof(buf) - 1]) {
-            printf("\nERROR: bad checksum\n");
-            exit(1);
+            err = "ERROR: bad checksum";
+            return false;
         }
-        printf(".");
-        fflush(stdout);
+        for (size_t i = 0; i < sizeof(buf) - 1; ++i) {
+            records.append(buf[i]);
+            if (i % 6 == 0) {
+                if (pt_is_config(buf + i)) {
+                    unsigned unused1, unused2, unused3;
+                    pt_unpack_config(buf + i, &unused1, &unused2,
+                                     &recInt, &unused3);
+                 }
+                else if (pt_is_data(buf + i)) {
+                    secs += recInt * 1.26;
+                }
+            }
+        }
+        int rem = (int) round(secs);
+        int min = rem / 60;
+        statusCallback(QString("%1 minutes downloaded...").arg(min));
         doWrite(dev, 0x71); // 'q'
     }
-    printf("done\n");
-    printf("download complete\n");
+    return true;
+}
+
+static void
+statusCallback(QString status)
+{
+    printf("STATUS: %s\n", status.toAscii().constData());
+}
+
+int
+main()
+{
+    QString err;
+    QVector<DevicePtr> devList = Device::listDevices(err);
+    if (devList.empty()) {
+        printf("ERROR: no devices\n");
+        exit(1);
+    }
+    if (devList.size() > 1) {
+        printf("ERROR: found %d devices\n", devList.size());
+        exit(1);
+    }
+    printf("Opening device\n");
+    DevicePtr dev = devList[0];
+    QString version;
+    QVector<unsigned char> records;
+    if (!download(dev, version, records, &statusCallback, err)) {
+        printf("%s\n", err.toAscii().constData());
+        exit(1);
+    }
+    char tmpname[32];
+    snprintf(tmpname, sizeof(tmpname), ".ptdl.XXXXXX");
+    int fd = mkstemp(tmpname);
+    if (fd == -1)
+        assert(false);
+    FILE *file = fdopen(fd, "w");
+    if (file == NULL)
+        assert(false);
+    unsigned char *data = records.data();
+    struct tm time;
+    bool time_set = false;
+
+    for (int i = 0; i < records.size(); i += 6) {
+        if (data[i] == 0)
+            continue;
+        fprintf(file, "%02x %02x %02x %02x %02x %02x\n", 
+                data[i], data[i+1], data[i+2],
+                data[i+3], data[i+4], data[i+5]); 
+        if (!time_set && pt_is_time(data + i)) {
+            pt_unpack_time(data + i, &time);
+            time_set = true;
+        }
+    }
+    fclose(file);
+    assert(time_set);
+
+    if (chmod(tmpname, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH) == -1) {
+        perror("chmod");
+        assert(false);
+    }
+
+    char filename[64];
+    sprintf(filename, "%04d_%02d_%02d_%02d_%02d_%02d.raw", 
+            time.tm_year + 1900, time.tm_mon + 1, time.tm_mday, 
+            time.tm_hour, time.tm_min, time.tm_sec);
+
+    if (rename(tmpname, filename) == -1) {
+        perror("rename");
+        assert(false);
+    }
+
+    printf("Ride successfully downloaded to %s!\n", filename);
     return 0;
 }
 
