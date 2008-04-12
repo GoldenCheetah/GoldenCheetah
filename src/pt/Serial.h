@@ -16,27 +16,25 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _GC_PT_D2XX_h
-#define _GC_PT_D2XX_h 1
+#ifndef _GC_PT_Serial_h
+#define _GC_PT_Serial_h 1
 
 #include "Device.h"
-#include <D2XX/ftd2xx.h>
 
-class D2XX : public Device
+class Serial : public Device
 {
-    D2XX(const D2XX &);
-    D2XX& operator=(const D2XX &);
+    Serial(const Serial &);
+    Serial& operator=(const Serial &);
 
-    FT_DEVICE_LIST_INFO_NODE info;
-    FT_HANDLE ftHandle;
-    bool isOpen;
-    D2XX(const FT_DEVICE_LIST_INFO_NODE &info);
+    QString path;
+    int fd;
+    Serial(const QString &path);
 
     public:
 
     static QVector<DevicePtr> myListDevices(QString &err);
 
-    virtual ~D2XX();
+    virtual ~Serial();
     virtual bool open(QString &err);
     virtual void close();
     virtual int read(void *buf, size_t nbyte, QString &err);
@@ -44,5 +42,5 @@ class D2XX : public Device
     virtual QString name() const;
 };
 
-#endif // _GC_PT_D2XX_h
+#endif // _GC_PT_Serial_h
 

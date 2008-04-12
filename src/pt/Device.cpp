@@ -16,33 +16,30 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _GC_PT_D2XX_h
-#define _GC_PT_D2XX_h 1
-
 #include "Device.h"
-#include <D2XX/ftd2xx.h>
+#include "Serial.h"
 
-class D2XX : public Device
+QVector<Device::ListFunction> Device::listFunctions;
+
+bool
+Device::addListFunction(ListFunction f)
 {
-    D2XX(const D2XX &);
-    D2XX& operator=(const D2XX &);
+    listFunctions.append(f);
+    return true;
+}
 
-    FT_DEVICE_LIST_INFO_NODE info;
-    FT_HANDLE ftHandle;
-    bool isOpen;
-    D2XX(const FT_DEVICE_LIST_INFO_NODE &info);
-
-    public:
-
-    static QVector<DevicePtr> myListDevices(QString &err);
-
-    virtual ~D2XX();
-    virtual bool open(QString &err);
-    virtual void close();
-    virtual int read(void *buf, size_t nbyte, QString &err);
-    virtual int write(void *buf, size_t nbyte, QString &err);
-    virtual QString name() const;
-};
-
-#endif // _GC_PT_D2XX_h
+QVector<DevicePtr>
+Device::listDevices(QString &err)
+{
+    err = "";
+    QVector<DevicePtr> result;
+    for (int i = 0; i < listFunctions.size(); ++i) {
+        QVector<DevicePtr> tmp = listFunctions[i](err);
+        if (err != "")
+            return result;
+        for (int j = 0; j < tmp.size(); ++j)
+            result.append(tmp[j]);
+    }
+    return result;
+}
 
