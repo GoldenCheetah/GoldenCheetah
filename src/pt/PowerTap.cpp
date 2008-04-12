@@ -16,11 +16,9 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "D2XX.h"
+#include "PowerTap.h"
 #include "../lib/pt.h"
 #include <math.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 static bool
 hasNewline(const char *buf, int len)
@@ -58,20 +56,30 @@ cEscape(const char *buf, int len)
     return result;
 }
 
-static void
-doWrite(DevicePtr dev, char c)
+static bool
+doWrite(DevicePtr dev, char c, bool hwecho, QString &err)
 {
     // printf("writing '%c' to device\n", c);
-    QString err;
     int n = dev->write(&c, 1, err);
     if (n != 1) {
         if (n < 0)
-            printf("ERROR: failed to write %c to device: %s\n",
-                   c, err.toAscii().constData());
+            err = QString("failed to write %1 to device: %2").arg(c).arg(err);
         else
-            printf("ERROR: timeout writing %c to device\n", c);
-        exit(1);
+            err = QString("timeout writing %1 to device").arg(c);
+        return false;
     }
+    if (hwecho) {
+        char c;
+        int n = dev->read(&c, 1, err);
+        if (n != 1) {
+            if (n < 0)
+                err = QString("failed to read back hardware echo: %2").arg(err);
+            else
+                err = "timeout reading back hardware echo";
+            return false;
+        }
+    }
+    return true;
 }
 
 static int
@@ -95,40 +103,42 @@ readUntilNewline(DevicePtr dev, char *buf, int len)
     return sofar;
 }
 
-typedef void (*StatusCallback)(QString status);
-
-static bool
-download(DevicePtr dev, QString &version,
-         QVector<unsigned char> &records,
-         StatusCallback statusCallback, QString &err)
+bool
+PowerTap::download(DevicePtr dev, QByteArray &version,
+                   QVector<unsigned char> &records,
+                   StatusCallback statusCallback, QString &err)
 {
     if (!dev->open(err)) {
         err = "ERROR: open failed: " + err;
         return false;
     } 
 
-    /*
-    printf("clearing read buffer\n");
-    while (true) {
-        QString err;
-        char buf[256];
-        if (dev->read(buf, sizeof(buf), err) < (int) sizeof(buf))
-            break;
-    }
-    */
-
-    doWrite(dev, 0x56); // 'V'
+    if (!doWrite(dev, 0x56, false, err)) // 'V'
+        return false;
     statusCallback("Reading version string...");
     char vbuf[256];
     int version_len = readUntilNewline(dev, vbuf, sizeof(vbuf));
     printf("read version \"%s\"\n",
            cEscape(vbuf, version_len).toAscii().constData());
-    vbuf[version_len] = '\0';
-    version = vbuf;
+    version = QByteArray(vbuf, version_len);
+
+    // We expect the version string to be something like 
+    // "VER 02.21 PRO...", so if we see two V's, it's probably 
+    // because there's a hardware echo going on.
+
+    int veridx = version.indexOf("VER");
+    if (veridx < 0) {
+        err = QString("Unrecognized version \"%1\"")
+                .arg(cEscape(vbuf, version_len));
+        return false;
+    }
+    bool hwecho = version.indexOf('V') < veridx;
+    printf("hwecho=%s\n", hwecho ? "true" : "false");
 
     statusCallback("Reading header...");
 
-    doWrite(dev, 0x44); // 'D'
+    if (!doWrite(dev, 0x44, hwecho, err)) // 'D'
+        return false;
     unsigned char header[6];
     int header_len = dev->read(header, sizeof(header), err);
     if (header_len != 6) {
@@ -203,80 +213,10 @@ download(DevicePtr dev, QString &version,
         int rem = (int) round(secs);
         int min = rem / 60;
         statusCallback(QString("%1 minutes downloaded...").arg(min));
-        doWrite(dev, 0x71); // 'q'
+        if (!doWrite(dev, 0x71, hwecho, err)) // 'q'
+            return false;
     }
     return true;
 }
 
-static void
-statusCallback(QString status)
-{
-    printf("STATUS: %s\n", status.toAscii().constData());
-}
-
-int
-main()
-{
-    QString err;
-    QVector<DevicePtr> devList = Device::listDevices(err);
-    if (devList.empty()) {
-        printf("ERROR: no devices\n");
-        exit(1);
-    }
-    if (devList.size() > 1) {
-        printf("ERROR: found %d devices\n", devList.size());
-        exit(1);
-    }
-    printf("Opening device\n");
-    DevicePtr dev = devList[0];
-    QString version;
-    QVector<unsigned char> records;
-    if (!download(dev, version, records, &statusCallback, err)) {
-        printf("%s\n", err.toAscii().constData());
-        exit(1);
-    }
-    char tmpname[32];
-    snprintf(tmpname, sizeof(tmpname), ".ptdl.XXXXXX");
-    int fd = mkstemp(tmpname);
-    if (fd == -1)
-        assert(false);
-    FILE *file = fdopen(fd, "w");
-    if (file == NULL)
-        assert(false);
-    unsigned char *data = records.data();
-    struct tm time;
-    bool time_set = false;
-
-    for (int i = 0; i < records.size(); i += 6) {
-        if (data[i] == 0)
-            continue;
-        fprintf(file, "%02x %02x %02x %02x %02x %02x\n", 
-                data[i], data[i+1], data[i+2],
-                data[i+3], data[i+4], data[i+5]); 
-        if (!time_set && pt_is_time(data + i)) {
-            pt_unpack_time(data + i, &time);
-            time_set = true;
-        }
-    }
-    fclose(file);
-    assert(time_set);
-
-    if (chmod(tmpname, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH) == -1) {
-        perror("chmod");
-        assert(false);
-    }
-
-    char filename[64];
-    sprintf(filename, "%04d_%02d_%02d_%02d_%02d_%02d.raw", 
-            time.tm_year + 1900, time.tm_mon + 1, time.tm_mday, 
-            time.tm_hour, time.tm_min, time.tm_sec);
-
-    if (rename(tmpname, filename) == -1) {
-        perror("rename");
-        assert(false);
-    }
-
-    printf("Ride successfully downloaded to %s!\n", filename);
-    return 0;
-}
 

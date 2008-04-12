@@ -16,33 +16,33 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _GC_PT_D2XX_h
-#define _GC_PT_D2XX_h 1
+#ifndef _GC_PT_Device_h
+#define _GC_PT_Device_h 1
 
-#include "Device.h"
-#include <D2XX/ftd2xx.h>
+#include <QtCore>
+#include <boost/shared_ptr.hpp>
 
-class D2XX : public Device
+class Device;
+typedef boost::shared_ptr<Device> DevicePtr;
+
+class Device
 {
-    D2XX(const D2XX &);
-    D2XX& operator=(const D2XX &);
-
-    FT_DEVICE_LIST_INFO_NODE info;
-    FT_HANDLE ftHandle;
-    bool isOpen;
-    D2XX(const FT_DEVICE_LIST_INFO_NODE &info);
+    typedef QVector<DevicePtr> (*ListFunction)(QString &err);
+    static QVector<ListFunction> listFunctions;
 
     public:
 
-    static QVector<DevicePtr> myListDevices(QString &err);
+    static bool addListFunction(ListFunction f);
+    static QVector<DevicePtr> listDevices(QString &err);
 
-    virtual ~D2XX();
-    virtual bool open(QString &err);
-    virtual void close();
-    virtual int read(void *buf, size_t nbyte, QString &err);
-    virtual int write(void *buf, size_t nbyte, QString &err);
-    virtual QString name() const;
+    virtual ~Device() {}
+    virtual bool open(QString &err) = 0;
+    virtual void close() = 0;
+    virtual int read(void *buf, size_t nbyte, QString &err) = 0;
+    virtual int write(void *buf, size_t nbyte, QString &err) = 0;
+    virtual QString name() const = 0;
+
 };
 
-#endif // _GC_PT_D2XX_h
+#endif // _GC_PT_Device_h
 

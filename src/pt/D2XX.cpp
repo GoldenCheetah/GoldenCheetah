@@ -19,42 +19,48 @@
 #include "D2XX.h"
 #include <ctype.h>
 
-Device::Device(const FT_DEVICE_LIST_INFO_NODE &info) :
+bool D2XXRegistered = Device::addListFunction(&D2XX::myListDevices);
+
+D2XX::D2XX(const FT_DEVICE_LIST_INFO_NODE &info) :
     info(info), isOpen(false)
 {
 }
 
-Device::~Device()
+D2XX::~D2XX()
 {
     if (isOpen)
         close();
 }
 
-bool Device::open(QString &err)
+bool
+D2XX::open(QString &err)
 {
     assert(!isOpen);
     FT_STATUS ftStatus =
         FT_OpenEx(info.Description, FT_OPEN_BY_DESCRIPTION, &ftHandle);
-    if (ftStatus == FT_OK)
-        isOpen = true;
-    else
+    if (ftStatus != FT_OK) {
         err = QString("FT_Open: %1").arg(ftStatus);
+        return false;
+    }
+    isOpen = true;
     ftStatus = FT_SetBaudRate(ftHandle, 9600);
     if (ftStatus != FT_OK) {
         err = QString("FT_SetBaudRate: %1").arg(ftStatus);
         close();
     }
-    return isOpen;
+    return true;
 }
 
-void Device::close()
+void
+D2XX::close()
 {
     assert(isOpen);
     FT_Close(ftHandle); 
     isOpen = false;
 }
 
-int Device::read(void *buf, size_t nbyte, QString &err)
+int
+D2XX::read(void *buf, size_t nbyte, QString &err)
 {
     assert(isOpen);
     DWORD rxbytes;
@@ -77,7 +83,8 @@ int Device::read(void *buf, size_t nbyte, QString &err)
     return -1;
 }
 
-int Device::write(void *buf, size_t nbyte, QString &err)
+int
+D2XX::write(void *buf, size_t nbyte, QString &err)
 {
     assert(isOpen);
     DWORD n;
@@ -88,8 +95,14 @@ int Device::write(void *buf, size_t nbyte, QString &err)
     return -1;
 }
 
+QString
+D2XX::name() const
+{
+    return QString("D2XX: ") + info.Description;
+}
+
 QVector<DevicePtr>
-Device::listDevices(QString &err)
+D2XX::myListDevices(QString &err)
 {
     QVector<DevicePtr> result;
     DWORD numDevs;
@@ -104,10 +117,19 @@ Device::listDevices(QString &err)
         err = QString("FT_GetDeviceInfoList: %1").arg(ftStatus); 
     else {
         for (DWORD i = 0; i < numDevs; i++)
-            result.append(DevicePtr(new Device(devInfo[i])));
+            result.append(DevicePtr(new D2XX(devInfo[i])));
     }
     delete [] devInfo;
+    // If we can't open a D2XX device, it's usually because the VCP drivers
+    // are installed, so it should also show up in the list of serial devices.
+    for (int i = 0; i < result.size(); ++i) {
+        DevicePtr dev = result[i];
+        QString tmp;
+        if (dev->open(tmp))
+            dev->close();
+        else
+            result.remove(i--);
+    }
     return result;
 }
-
 

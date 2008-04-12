@@ -9,6 +9,6 @@ INCLUDEPATH += /sw/include
 LIBS += -lftd2xx ../lib/libgc.a
 
 # Input
-HEADERS += D2XX.h
-SOURCES += D2XX.cpp PowerTap.cpp
+HEADERS += Device.h Serial.h D2XX.h PowerTap.h
+SOURCES += Device.cpp Serial.cpp D2XX.cpp PowerTap.cpp main.cpp
 
