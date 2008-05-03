@@ -22,11 +22,14 @@
 #define _GC_DownloadRideDialog_h 1
 
 #include <QtGui>
+#include "../pt/PowerTap.h"
+
 extern "C" {
 #include "pt.h"
 }
 
 class MainWindow;
+class DownloadThread;
 
 class DownloadRideDialog : public QDialog 
 {
@@ -39,14 +42,17 @@ class DownloadRideDialog : public QDialog
         void time_cb(struct tm *time);
         void record_cb(unsigned char *buf);
 
+        void DownloadRideDialog::downloadFinished();
+        bool DownloadRideDialog::statusCallback(PowerTap::State state);
+
     private slots:
         void downloadClicked();
         void cancelClicked();
         void setReadyInstruct();
         void scanDevices();
-        void readVersion();
-        void readData();
-        void versionTimeout();
+        // void readVersion();
+        // void readData();
+        // void versionTimeout();
 
     private:
  
@@ -55,7 +61,7 @@ class DownloadRideDialog : public QDialog
         QListWidget *listWidget;
         QPushButton *downloadButton, *rescanButton, *cancelButton;
         QLabel *label;
-        int endingOffset;
+        /*
         int fd;
         FILE *out;
         char outname[24];
@@ -67,6 +73,14 @@ class DownloadRideDialog : public QDialog
         QTimer *timer;
         int blockCount;
         int hwecho;
+        */
+
+        QVector<DevicePtr> devList;
+        bool cancelled, downloadInProgress;
+        unsigned recInt;
+        int endingOffset;
+        QVector<unsigned char> records;
+        QString filename, filepath;
 };
 
 #endif // _GC_DownloadRideDialog_h

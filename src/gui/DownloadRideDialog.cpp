@@ -25,13 +25,17 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <math.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <boost/bind.hpp>
 
 #define MAX_DEVICES 10
 
 DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
                                        const QDir &home) : 
-    mainWindow(mainWindow), home(home), fd(-1), out(NULL), device(NULL), 
-    notifier(NULL), timer(NULL), blockCount(0)
+    mainWindow(mainWindow), home(home), /*fd(-1), out(NULL), device(NULL), 
+    notifier(NULL), timer(NULL), blockCount(0),*/ cancelled(false),
+    downloadInProgress(false), recInt(0), endingOffset(0)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("Download Ride Data");
@@ -73,12 +77,12 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
 
 DownloadRideDialog::~DownloadRideDialog()
 {
-    if (device)
+    /*if (device)
         free(device);
     if (fd >= 0)
         ::close(fd);
     if (out)
-        fclose(out);
+        fclose(out);*/
 }
 
 void 
@@ -110,31 +114,18 @@ void
 DownloadRideDialog::scanDevices()
 {
     listWidget->clear();
-    char *devices[MAX_DEVICES];
-    int devcnt = pt_find_device(devices, MAX_DEVICES);
-    for (int i = 0; i < devcnt; ++i) {
-        new QListWidgetItem(devices[i], listWidget);
-        free(devices[i]);
-    }
-    if (listWidget->count() == 1) {
+    QString err;
+    devList = Device::listDevices(err);
+    for (int i = 0; i < devList.size(); ++i)
+        new QListWidgetItem(devList[i]->name(), listWidget);
+    if (listWidget->count() > 0) {
         listWidget->setCurrentRow(0);
         downloadButton->setFocus();
     }
     setReadyInstruct();
 }
 
-static void
-time_cb(struct tm *time, void *self) 
-{
-    ((DownloadRideDialog*) self)->time_cb(time);
-}
-
-static void
-record_cb(unsigned char *buf, void *self) 
-{
-    ((DownloadRideDialog*) self)->record_cb(buf);
-}
-
+/*
 void
 DownloadRideDialog::time_cb(struct tm *time)
 {
@@ -259,6 +250,18 @@ DownloadRideDialog::versionTimeout()
     reject();
 }
 
+static void
+time_cb(struct tm *time, void *self) 
+{
+    ((DownloadRideDialog*) self)->time_cb(time);
+}
+
+static void
+record_cb(unsigned char *buf, void *self) 
+{
+    ((DownloadRideDialog*) self)->record_cb(buf);
+}
+
 void
 DownloadRideDialog::readData()
 {
@@ -295,33 +298,164 @@ DownloadRideDialog::readData()
         }
     }
 }
+*/
+
+bool
+DownloadRideDialog::statusCallback(PowerTap::State state)
+{
+    switch (state) {
+        case PowerTap::STATE_READING_VERSION:
+            label->setText("Reading version...");
+            break;
+        case PowerTap::STATE_READING_HEADER:
+            label->setText(label->text() + "done.\nReading header...");
+            break;
+        case PowerTap::STATE_READING_DATA:
+            label->setText(label->text() + "done.\nReading ride data...\n");
+            endingOffset = label->text().length();
+            break;
+        case PowerTap::STATE_DATA_AVAILABLE:
+            unsigned char *buf = records.data();
+            if (recInt == 0.0) {
+                for (int i = 0; i < records.size(); i += 6) {
+                    if (pt_is_config(buf + i)) {
+                        unsigned unused1, unused2, unused3;
+                        pt_unpack_config(buf + i, &unused1, &unused2,
+                                         &recInt, &unused3);
+                    }
+                }
+            }
+            if (recInt != 0.0) {
+                int min = (int) round(records.size() / 6 * recInt * 0.021);
+                printf("records.size()=%d, min=%d\n", records.size(), min);
+                QString existing = label->text();
+                existing.chop(existing.size() - endingOffset);
+                existing.append(QString("Ride data read: %1:%2").arg(min / 60)
+                                .arg(min % 60, 2, 10, QLatin1Char('0')));
+                label->setText(existing);
+            }
+            if (filename == "") {
+                struct tm time;
+                for (int i = 0; i < records.size(); i += 6) {
+                    if (pt_is_time(buf + i)) {
+                        pt_unpack_time(buf + i, &time);
+                        char tmp[32];
+                        sprintf(tmp, "%04d_%02d_%02d_%02d_%02d_%02d.raw", 
+                                time.tm_year + 1900, time.tm_mon + 1, 
+                                time.tm_mday, time.tm_hour, time.tm_min,
+                                time.tm_sec);
+                        filename = tmp;
+                        filepath = home.absolutePath() + "/" + filename;
+                        FILE *out = fopen(filepath.toAscii().constData(), "r"); 
+                        if (out) {
+                            fclose(out);
+                            if (QMessageBox::warning(
+                                    this,
+                                    tr("Ride Already Downloaded"),
+                                    tr("This ride appears to have already ")
+                                    + tr("been downloaded.  Do you want to ")
+                                    + tr("download it again and overwrite ")
+                                    + tr("the previous download?"),
+                                    tr("&Overwrite"), tr("&Cancel"), 
+                                    QString(), 1, 1) == 1) {
+                                reject();
+                                return false;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+            break;
+        default:
+            assert(false);
+    }
+    QCoreApplication::processEvents();
+    return !cancelled;
+}
 
 void 
 DownloadRideDialog::downloadClicked()
 {
     downloadButton->setEnabled(false);
     rescanButton->setEnabled(false);
-    if (device)
-        free(device);
-    device = strdup(listWidget->currentItem()->text().toAscii().data());
-    hwecho = 0;
-    fd = open(device, O_RDWR | O_NOCTTY | O_NONBLOCK);
-    if (fd < 0) {
-        QMessageBox::critical(this, tr("Read error"), 
-                              tr("Could not open device, ") + device +
-                              + ": " + strerror(errno));
+    downloadInProgress = true;
+    DevicePtr dev;
+    for (int i = 0; i < devList.size(); ++i) {
+        if (devList[i]->name() == listWidget->currentItem()->text()) {
+            dev = devList[i];
+            break;
+        }
+    }
+    assert(dev);
+    QString err;
+    QByteArray version;
+    if (!PowerTap::download(
+            dev, version, records,
+            boost::bind(&DownloadRideDialog::statusCallback, this, _1), err))
+    {
+        if (cancelled) {
+            QMessageBox::information(this, tr("Download canceled"),
+                                     tr("Cancel clicked by user."));
+            cancelled = false;
+        }
+        else {
+            QMessageBox::information(this, tr("Download failed"), err);
+        }
+        downloadInProgress = false;
         reject();
         return;
     }
-    pt_make_async(fd);
-    label->setText(tr("Reading version information..."));
-    memset(&vstate, 0, sizeof(vstate));
-    readVersion();
+    char *tmpname = new char[home.absolutePath().length() + 32];
+    sprintf(tmpname, "%s/.ptdl.XXXXXX",
+            home.absolutePath().toAscii().constData());
+    int fd = mkstemp(tmpname);
+    if (fd == -1)
+        assert(false);
+    FILE *file = fdopen(fd, "w");
+    if (file == NULL)
+        assert(false);
+    unsigned char *data = records.data();
+    struct tm time;
+    bool time_set = false;
+
+    for (int i = 0; i < records.size(); i += 6) {
+        if (data[i] == 0)
+            continue;
+        fprintf(file, "%02x %02x %02x %02x %02x %02x\n", 
+                data[i], data[i+1], data[i+2],
+                data[i+3], data[i+4], data[i+5]); 
+        if (!time_set && pt_is_time(data + i)) {
+            pt_unpack_time(data + i, &time);
+            time_set = true;
+        }
+    }
+    fclose(file);
+    assert(time_set);
+
+    if (chmod(tmpname, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH) == -1) {
+        perror("chmod");
+        assert(false);
+    }
+
+    if (rename(tmpname, filepath.toAscii().constData()) == -1) {
+        perror("rename");
+        assert(false);
+    }
+    delete [] tmpname;
+
+    QMessageBox::information(this, tr("Success"), tr("Download complete."));
+    mainWindow->addRide(filename);
+    downloadInProgress = false;
+    accept();
 }
 
 void 
 DownloadRideDialog::cancelClicked()
 {
-    reject();
+    if (!downloadInProgress)
+        reject();
+    else
+        cancelled = true;
 }
 

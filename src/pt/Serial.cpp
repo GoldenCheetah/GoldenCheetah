@@ -58,31 +58,71 @@ Serial::close()
     fd = -1;
 }
 
+static struct timeval &
+operator-=(struct timeval &left, const struct timeval &right)
+{
+    if (left.tv_usec < right.tv_usec) {
+        left.tv_sec -= 1;
+        left.tv_usec += 1000000;
+    }
+    left.tv_sec -= right.tv_sec;
+    left.tv_usec -= right.tv_usec;
+    return left;
+}
+
+static bool
+operator<(struct timeval &left, const struct timeval &right)
+{
+    if (left.tv_sec < right.tv_sec)
+        return true;
+    if (left.tv_sec > right.tv_sec)
+        return false;
+    return left.tv_usec < right.tv_usec;
+}
+
 int
 Serial::read(void *buf, size_t nbyte, QString &err)
 {
-    fd_set fdset;
-    FD_ZERO(&fdset);
-    FD_SET(fd, &fdset);
-    struct timeval tv;
-    memset(&tv, 0, sizeof(tv));
-    tv.tv_sec = 5;
-    int n = select(fd + 1, &fdset, NULL, NULL, &tv);
-    if (n == 0)
-        return 0;
-    if (n < 0) {
-        err = QString("select: ") + strerror(errno);
-        return -1;
+    assert(fd >= 0);
+    assert(nbyte > 0);
+    struct timeval start;
+    if (gettimeofday(&start, NULL) < 0)
+        assert(false);
+    struct timeval stop = start;
+    stop.tv_sec += 5;
+    size_t count = 0;
+    while (start < stop) {
+        fd_set fdset;
+        FD_ZERO(&fdset);
+        FD_SET(fd, &fdset);
+        struct timeval remaining = stop;
+        remaining -= start;
+        int n = select(fd + 1, &fdset, NULL, NULL, &remaining);
+        if (n == 0)
+            break;
+        if (n < 0) {
+            err = QString("select: ") + strerror(errno);
+            return -1;
+        }
+        assert(nbyte > count);
+        int result = ::read(fd, ((char*) buf) + count, nbyte - count);
+        if (result < 0)
+            err = QString("read: ") + strerror(errno);
+        assert(result > 0); // else why did select return > 0?
+        count += result;
+        assert(count <= nbyte);
+        if (count == nbyte)
+            break;
+        if (gettimeofday(&start, NULL) < 0)
+            assert(false);
     }
-    int result = ::read(fd, buf, nbyte);
-    if (result < 0)
-        err = QString("read: ") + strerror(errno);
-    return result;
+    return count;
 }
 
 int
 Serial::write(void *buf, size_t nbyte, QString &err)
 {
+    assert(fd >= 0);
     fd_set fdset;
     FD_ZERO(&fdset);
     FD_SET(fd, &fdset);

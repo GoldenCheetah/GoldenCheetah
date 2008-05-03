@@ -20,10 +20,19 @@
 #define _GC_PT_PowerTap_h 1
 
 #include "Device.h"
+#include <boost/function.hpp>
 
 struct PowerTap 
 {
-    typedef void (*StatusCallback)(QString status);
+    enum State {
+        STATE_READING_VERSION,
+        STATE_READING_HEADER,
+        STATE_READING_DATA,
+        STATE_DATA_AVAILABLE
+    };
+
+    typedef boost::function<bool (State state)> StatusCallback;
+    // typedef void (*StatusCallback)(QString status);
 
     static bool download(DevicePtr dev, QByteArray &version,
                          QVector<unsigned char> &records,
