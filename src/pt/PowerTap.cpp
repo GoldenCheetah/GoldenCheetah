@@ -59,7 +59,7 @@ cEscape(const char *buf, int len)
 static bool
 doWrite(DevicePtr dev, char c, bool hwecho, QString &err)
 {
-    // printf("writing '%c' to device\n", c);
+    printf("writing '%c' to device\n", c);
     int n = dev->write(&c, 1, err);
     if (n != 1) {
         if (n < 0)
@@ -94,8 +94,8 @@ readUntilNewline(DevicePtr dev, char *buf, int len)
                 printf("read error: %s\n", err.toAscii().constData());
             else
                 printf("read timeout\n");
-            /*printf("read %d bytes so far: \"%s\"\n", sofar, 
-                   cEscape(buf, sofar).toAscii().constData());*/
+            printf("read %d bytes so far: \"%s\"\n", sofar, 
+                   cEscape(buf, sofar).toAscii().constData());
             exit(1);
         }
         sofar += n;
@@ -115,7 +115,10 @@ PowerTap::download(DevicePtr dev, QByteArray &version,
 
     if (!doWrite(dev, 0x56, false, err)) // 'V'
         return false;
-    statusCallback("Reading version string...");
+    if (!statusCallback(STATE_READING_VERSION)) {
+        err = "download cancelled";
+        return false;
+    }
     char vbuf[256];
     int version_len = readUntilNewline(dev, vbuf, sizeof(vbuf));
     printf("read version \"%s\"\n",
@@ -135,7 +138,10 @@ PowerTap::download(DevicePtr dev, QByteArray &version,
     bool hwecho = version.indexOf('V') < veridx;
     printf("hwecho=%s\n", hwecho ? "true" : "false");
 
-    statusCallback("Reading header...");
+    if (!statusCallback(STATE_READING_HEADER)) {
+        err = "download cancelled";
+        return false;
+    }
 
     if (!doWrite(dev, 0x44, hwecho, err)) // 'D'
         return false;
@@ -148,20 +154,20 @@ PowerTap::download(DevicePtr dev, QByteArray &version,
             err = "ERROR: timeout reading header";
         return false;
     }
-    /*printf("read header \"%s\"\n",
+    printf("read header \"%s\"\n",
            cEscape((char*) header, 
-                   sizeof(header)).toAscii().constData());*/
+                   sizeof(header)).toAscii().constData());
     for (size_t i = 0; i < sizeof(header); ++i)
         records.append(header[i]);
 
-    statusCallback("Downloading ride data...");
-
-    unsigned recInt = 0;
-    double secs = 0.0;
+    if (!statusCallback(STATE_READING_DATA)) {
+        err = "download cancelled";
+        return false;
+    }
 
     fflush(stdout);
     while (true) {
-        // printf("reading block\n");
+        printf("reading block\n");
         unsigned char buf[256 * 6 + 1];
         int n = dev->read(buf, 2, err);
         if (n < 2) {
@@ -171,8 +177,8 @@ PowerTap::download(DevicePtr dev, QByteArray &version,
                 err = "ERROR: timeout reading first two";
             return false;
         }
-        /*printf("read 2 bytes: \"%s\"\n", 
-               cEscape((char*) buf, 2).toAscii().constData());*/
+        printf("read 2 bytes: \"%s\"\n", 
+               cEscape((char*) buf, 2).toAscii().constData());
         if (hasNewline((char*) buf, 2))
             break;
         unsigned count = 2;
@@ -186,8 +192,8 @@ PowerTap::download(DevicePtr dev, QByteArray &version,
                 err = "ERROR: timeout reading block";
                 return false;
             }
-            /*printf("read %d bytes: \"%s\"\n", n, 
-                   cEscape((char*) buf + count, n).toAscii().constData());*/
+            printf("read %d bytes: \"%s\"\n", n, 
+                   cEscape((char*) buf + count, n).toAscii().constData());
             count += n;
         }
         unsigned csum = 0;
@@ -197,22 +203,13 @@ PowerTap::download(DevicePtr dev, QByteArray &version,
             err = "ERROR: bad checksum";
             return false;
         }
-        for (size_t i = 0; i < sizeof(buf) - 1; ++i) {
+        printf("good checksum\n");
+        for (size_t i = 0; i < sizeof(buf) - 1; ++i)
             records.append(buf[i]);
-            if (i % 6 == 0) {
-                if (pt_is_config(buf + i)) {
-                    unsigned unused1, unused2, unused3;
-                    pt_unpack_config(buf + i, &unused1, &unused2,
-                                     &recInt, &unused3);
-                 }
-                else if (pt_is_data(buf + i)) {
-                    secs += recInt * 1.26;
-                }
-            }
+        if (!statusCallback(STATE_DATA_AVAILABLE)) {
+            err = "download cancelled";
+            return false;
         }
-        int rem = (int) round(secs);
-        int min = rem / 60;
-        statusCallback(QString("%1 minutes downloaded...").arg(min));
         if (!doWrite(dev, 0x71, hwecho, err)) // 'q'
             return false;
     }

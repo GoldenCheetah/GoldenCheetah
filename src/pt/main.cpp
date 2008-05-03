@@ -20,11 +20,45 @@
 #include "../lib/pt.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <math.h>
 
-static void
-statusCallback(QString status)
+static unsigned recInt;
+static QVector<unsigned char> records;
+static bool
+statusCallback(PowerTap::State state)
 {
-    printf("STATUS: %s\n", status.toAscii().constData());
+    switch (state) {
+        case PowerTap::STATE_READING_VERSION:
+            printf("reading version...");
+            break;
+        case PowerTap::STATE_READING_HEADER:
+            printf("done.\nreading header...");
+            break;
+        case PowerTap::STATE_READING_DATA:
+            printf("done.\nreading ride data...\n");
+            break;
+        case PowerTap::STATE_DATA_AVAILABLE:
+            if (recInt == 0.0) {
+                for (int i = 0; i < records.size(); i += 6) {
+                    unsigned char *buf = records.data() + i;
+                    if (pt_is_config(buf)) {
+                        unsigned unused1, unused2, unused3;
+                        pt_unpack_config(buf, &unused1, &unused2,
+                                         &recInt, &unused3);
+                    }
+                }
+            }
+            if (recInt != 0.0) {
+                double secs = records.size() * recInt * 1.26;
+                int rem = (int) round(secs);
+                int min = rem / 60;
+                printf("%d minutes downloaded.", min);
+            }
+            break;
+        default:
+            assert(false);
+    }
+    return true;
 }
 
 int
@@ -48,8 +82,7 @@ main()
     DevicePtr dev = devList[0];
     printf("Downloading from device %s\n", dev->name().toAscii().constData());
     QByteArray version;
-    QVector<unsigned char> records;
-    if (!PowerTap::download(dev, version, records, &statusCallback, err)) {
+    if (!PowerTap::download(dev, version, records, statusCallback, err)) {
         printf("%s\n", err.toAscii().constData());
         exit(1);
     }

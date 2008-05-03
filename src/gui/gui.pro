@@ -5,12 +5,14 @@
 TEMPLATE = app
 TARGET = GoldenCheetah
 DEPENDPATH += .
-INCLUDEPATH += /usr/local/qwt/include ../lib ../srm
+INCLUDEPATH += /usr/local/qwt/include ../lib ../srm /sw/include
 CONFIG += static debug
 QT += xml
 LIBS += /usr/local/qwt/lib/libqwt.a 
-LIBS += ../lib/libgc.a ../srm/libsrm.a
+LIBS += ../lib/libgc.a ../srm/libsrm.a ../pt/libpt.a
 LIBS += -lm -lz
+LIBS +=  ../pt/Device.o ../pt/D2XX.o ../pt/Serial.o ../pt/PowerTap.o
+LIBS += -lftd2xx
 macx {
     LIBS += -framework Carbon
 }
