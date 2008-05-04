@@ -17,7 +17,6 @@
  */
 
 #include "PowerTap.h"
-#include "../lib/pt.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <math.h>
@@ -41,9 +40,9 @@ statusCallback(PowerTap::State state)
             if (recInt == 0.0) {
                 for (int i = 0; i < records.size(); i += 6) {
                     unsigned char *buf = records.data() + i;
-                    if (pt_is_config(buf)) {
+                    if (PowerTap::is_config(buf)) {
                         unsigned unused1, unused2, unused3;
-                        pt_unpack_config(buf, &unused1, &unused2,
+                        PowerTap::unpack_config(buf, &unused1, &unused2,
                                          &recInt, &unused3);
                     }
                 }
@@ -104,8 +103,8 @@ main()
         fprintf(file, "%02x %02x %02x %02x %02x %02x\n", 
                 data[i], data[i+1], data[i+2],
                 data[i+3], data[i+4], data[i+5]); 
-        if (!time_set && pt_is_time(data + i)) {
-            pt_unpack_time(data + i, &time);
+        if (!time_set && PowerTap::is_time(data + i)) {
+            PowerTap::unpack_time(data + i, &time);
             time_set = true;
         }
     }

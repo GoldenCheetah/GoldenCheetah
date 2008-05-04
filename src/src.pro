@@ -1,3 +1,6 @@
 TEMPLATE = subdirs
-SUBDIRS = lib srm gui cmd pt
 CONFIG += ordered
+macx || unix {
+    SUBDIRS = lib cmd
+}
+SUBDIRS = srm pt gui

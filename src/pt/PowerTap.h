@@ -32,11 +32,24 @@ struct PowerTap
     };
 
     typedef boost::function<bool (State state)> StatusCallback;
-    // typedef void (*StatusCallback)(QString status);
 
     static bool download(DevicePtr dev, QByteArray &version,
                          QVector<unsigned char> &records,
                          StatusCallback statusCallback, QString &err);
+
+    static int is_time(unsigned char *buf);
+    static time_t unpack_time(unsigned char *buf, struct tm *time);
+
+    static int is_config(unsigned char *buf);
+    static int unpack_config(unsigned char *buf, unsigned *interval, 
+                                unsigned *last_interval, unsigned *rec_int, 
+                                unsigned *wheel_sz_mm);
+
+    static int is_data(unsigned char *buf);
+    static void unpack_data(unsigned char *buf, int compat, unsigned rec_int, 
+                            unsigned wheel_sz_mm, double *time_secs,
+                            double *torque_Nm, double *mph, double *watts,
+                            double *dist_m, unsigned *cad, unsigned *hr);
 };
  
 #endif // _GC_PT_PowerTap_h

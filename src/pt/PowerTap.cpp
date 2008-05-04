@@ -17,8 +17,9 @@
  */
 
 #include "PowerTap.h"
-#include "../lib/pt.h"
 #include <math.h>
+
+#define PT_DEBUG false
 
 static bool
 hasNewline(const char *buf, int len)
@@ -59,7 +60,7 @@ cEscape(const char *buf, int len)
 static bool
 doWrite(DevicePtr dev, char c, bool hwecho, QString &err)
 {
-    printf("writing '%c' to device\n", c);
+    if (PT_DEBUG) printf("writing '%c' to device\n", c);
     int n = dev->write(&c, 1, err);
     if (n != 1) {
         if (n < 0)
@@ -83,20 +84,18 @@ doWrite(DevicePtr dev, char c, bool hwecho, QString &err)
 }
 
 static int
-readUntilNewline(DevicePtr dev, char *buf, int len)
+readUntilNewline(DevicePtr dev, char *buf, int len, QString &err)
 {
     int sofar = 0;
     while (!hasNewline(buf, sofar)) {
-        QString err;
-        int n = dev->read(buf + sofar, len - sofar, err);
+        assert(sofar < len);
+        // Read one byte at a time to avoid waiting for timeout.
+        int n = dev->read(buf + sofar, 1, err);
         if (n <= 0) {
-            if (n < 0)
-                printf("read error: %s\n", err.toAscii().constData());
-            else
-                printf("read timeout\n");
-            printf("read %d bytes so far: \"%s\"\n", sofar, 
-                   cEscape(buf, sofar).toAscii().constData());
-            exit(1);
+            err = (n < 0) ? ("read error: " + err) : "read timeout";
+            err += QString(", read %1 bytes so far: \"%2\"")
+                .arg(sofar).arg(cEscape(buf, sofar));
+            return -1;
         }
         sofar += n;
     }
@@ -120,9 +119,15 @@ PowerTap::download(DevicePtr dev, QByteArray &version,
         return false;
     }
     char vbuf[256];
-    int version_len = readUntilNewline(dev, vbuf, sizeof(vbuf));
-    printf("read version \"%s\"\n",
-           cEscape(vbuf, version_len).toAscii().constData());
+    int version_len = readUntilNewline(dev, vbuf, sizeof(vbuf), err);
+    if (version_len < 0) {
+        err = "Error reading version: " + err;
+        return false;
+    }
+    if (PT_DEBUG) {
+        printf("read version \"%s\"\n",
+               cEscape(vbuf, version_len).toAscii().constData());
+    }
     version = QByteArray(vbuf, version_len);
 
     // We expect the version string to be something like 
@@ -136,7 +141,7 @@ PowerTap::download(DevicePtr dev, QByteArray &version,
         return false;
     }
     bool hwecho = version.indexOf('V') < veridx;
-    printf("hwecho=%s\n", hwecho ? "true" : "false");
+    if (PT_DEBUG) printf("hwecho=%s\n", hwecho ? "true" : "false");
 
     if (!statusCallback(STATE_READING_HEADER)) {
         err = "download cancelled";
@@ -154,9 +159,11 @@ PowerTap::download(DevicePtr dev, QByteArray &version,
             err = "ERROR: timeout reading header";
         return false;
     }
-    printf("read header \"%s\"\n",
-           cEscape((char*) header, 
-                   sizeof(header)).toAscii().constData());
+    if (PT_DEBUG) {
+        printf("read header \"%s\"\n",
+               cEscape((char*) header, 
+                       sizeof(header)).toAscii().constData());
+    }
     for (size_t i = 0; i < sizeof(header); ++i)
         records.append(header[i]);
 
@@ -167,7 +174,7 @@ PowerTap::download(DevicePtr dev, QByteArray &version,
 
     fflush(stdout);
     while (true) {
-        printf("reading block\n");
+        if (PT_DEBUG) printf("reading block\n");
         unsigned char buf[256 * 6 + 1];
         int n = dev->read(buf, 2, err);
         if (n < 2) {
@@ -177,8 +184,10 @@ PowerTap::download(DevicePtr dev, QByteArray &version,
                 err = "ERROR: timeout reading first two";
             return false;
         }
-        printf("read 2 bytes: \"%s\"\n", 
-               cEscape((char*) buf, 2).toAscii().constData());
+        if (PT_DEBUG) {
+            printf("read 2 bytes: \"%s\"\n", 
+                   cEscape((char*) buf, 2).toAscii().constData());
+        }
         if (hasNewline((char*) buf, 2))
             break;
         unsigned count = 2;
@@ -192,8 +201,10 @@ PowerTap::download(DevicePtr dev, QByteArray &version,
                 err = "ERROR: timeout reading block";
                 return false;
             }
-            printf("read %d bytes: \"%s\"\n", n, 
-                   cEscape((char*) buf + count, n).toAscii().constData());
+            if (PT_DEBUG) {
+                printf("read %d bytes: \"%s\"\n", n, 
+                       cEscape((char*) buf + count, n).toAscii().constData());
+            }
             count += n;
         }
         unsigned csum = 0;
@@ -203,7 +214,7 @@ PowerTap::download(DevicePtr dev, QByteArray &version,
             err = "ERROR: bad checksum";
             return false;
         }
-        printf("good checksum\n");
+        if (PT_DEBUG) printf("good checksum\n");
         for (size_t i = 0; i < sizeof(buf) - 1; ++i)
             records.append(buf[i]);
         if (!statusCallback(STATE_DATA_AVAILABLE)) {
@@ -214,6 +225,132 @@ PowerTap::download(DevicePtr dev, QByteArray &version,
             return false;
     }
     return true;
+}
+
+int
+PowerTap::is_time(unsigned char *buf)
+{
+    return buf[0] == 0x60;
+}
+
+time_t 
+PowerTap::unpack_time(unsigned char *buf, struct tm *time) 
+{
+    memset(time, 0, sizeof(*time));
+    time->tm_year = 2000 + buf[1] - 1900;
+    time->tm_mon = buf[2] - 1;
+    time->tm_mday = buf[3] & 0x1f;
+    time->tm_hour = buf[4] & 0x1f;
+    time->tm_min = buf[5] & 0x3f;
+    time->tm_sec = ((buf[3] >> 5) << 3) | (buf[4] >> 5);
+    time->tm_isdst = -1;
+    return mktime(time);
+}
+
+int
+PowerTap::is_config(unsigned char *buf)
+{
+    return buf[0] == 0x40;
+}
+
+int 
+PowerTap::unpack_config(unsigned char *buf, unsigned *interval, 
+                        unsigned *last_interval, unsigned *rec_int, 
+                        unsigned *wheel_sz_mm)
+{
+    *wheel_sz_mm = (buf[1] << 8) | buf[2];
+    /* Data from device wraps interval after 9... */
+    if (buf[3] != *last_interval) {
+        *last_interval = buf[3];
+        ++*interval;
+    }
+    *rec_int = buf[4] + 1;
+    return 0;
+}
+
+int
+PowerTap::is_data(unsigned char *buf) 
+{
+    return (buf[0] & 0x80) == 0x80;
+}
+
+static double 
+my_round(double x)
+{
+    int i = (int) x;
+    double z = x - i;
+    /* For some unknown reason, the PowerTap software rounds 196.5 down... */
+    if ((z > 0.5) || ((z == 0.5) && (i != 196)))
+        ++i;
+    return i;
+}
+
+#define MAGIC_CONSTANT 147375.0
+#define PI 3.14159265
+#define TIME_UNIT_MIN 0.021
+
+#define LBFIN_TO_NM 0.11298483
+#define KM_TO_MI 0.62137119
+
+#define BAD_LBFIN_TO_NM_1 0.112984
+#define BAD_LBFIN_TO_NM_2 0.1129824
+#define BAD_KM_TO_MI 0.62
+
+void
+PowerTap::unpack_data(unsigned char *buf, int compat, unsigned rec_int, 
+                      unsigned wheel_sz_mm, double *time_secs,
+                      double *torque_Nm, double *mph, double *watts,
+                      double *dist_m, unsigned *cad, unsigned *hr)
+{
+    double kph10;
+    unsigned speed;
+    unsigned torque_inlbs;
+    double rotations;
+    double radians;
+    double joules;
+
+    *time_secs += rec_int * TIME_UNIT_MIN * 60.0;
+    torque_inlbs = ((buf[1] & 0xf0) << 4) | buf[2];
+    if (torque_inlbs == 0xfff)
+        torque_inlbs = 0;
+    speed = ((buf[1] & 0x0f) << 8) | buf[3];
+    if ((speed < 100) || (speed == 0xfff)) {
+        if ((speed != 0) && (speed < 1000)) {
+            fprintf(stderr, "possible error: speed=%.1f; ignoring it\n", 
+                    MAGIC_CONSTANT / speed / 10.0);
+        }
+        *mph = -1.0;
+        *watts = -1.0;
+    }
+    else {
+        if (compat)
+            *torque_Nm = torque_inlbs * BAD_LBFIN_TO_NM_2;
+        else
+            *torque_Nm = torque_inlbs * LBFIN_TO_NM;
+        kph10 = MAGIC_CONSTANT / speed;
+        if (compat)
+            *mph = my_round(kph10) / 10.0 * BAD_KM_TO_MI;
+        else
+            *mph = kph10 / 10.0 * KM_TO_MI;
+        rotations = rec_int * TIME_UNIT_MIN * 100000.0 * kph10 
+            / wheel_sz_mm / 60.0;
+        radians = rotations * 2.0 * PI;
+        joules = *torque_Nm * radians;
+        *watts = joules / (rec_int * TIME_UNIT_MIN * 60);
+        if (compat)
+            *watts = my_round(*watts);
+        else 
+            *watts = round(*watts);
+    }
+    if (compat)
+        *torque_Nm = torque_inlbs * BAD_LBFIN_TO_NM_1;
+    *dist_m += (buf[0] & 0x7f) * wheel_sz_mm / 1000.0;
+    *cad = buf[4];
+    if (*cad == 0xff)
+        *cad = 0;
+    *hr = buf[5];
+    if (*hr == 0xff)
+        *hr = 0;
 }
 
 
