@@ -51,7 +51,7 @@ cpi_files_to_update(const char *dir)
     cpi_file_info *head = NULL, *tail = NULL;
 
     if (regcomp(&reg, "^([0-9][0-9][0-9][0-9])_([0-9][0-9])_([0-9][0-9])"
-                "_([0-9][0-9])_([0-9][0-9])_([0-9][0-9])\\.(raw|srm|csv)$", 
+                "_([0-9][0-9])_([0-9][0-9])_([0-9][0-9])\\.(raw|srm|csv|tcx)$", 
                 REG_EXTENDED))
         assert(0);
 
