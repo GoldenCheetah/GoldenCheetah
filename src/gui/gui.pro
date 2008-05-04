@@ -37,11 +37,14 @@ HEADERS += \
 	RideItem.h \
 	RideMetric.h \
 	SrmRideFile.h \
+	TcxParser.h \
+	TcxRideFile.h \
 	TimeUtils.h \
         Zones.h \
         Pages.h \
         ConfigDialog.h \
-        cpint.h
+        cpint.h \
+	PfPvPlot.h
 
 SOURCES += \
 	AllPlot.cpp \
@@ -62,12 +65,14 @@ SOURCES += \
 	RideItem.cpp \
 	RideMetric.cpp \
 	SrmRideFile.cpp \
-        TimeUtils.cpp \
+	TcxParser.cpp \
+	TcxRideFile.cpp \
+	TimeUtils.cpp \
         Zones.cpp \
         Pages.cpp \
         ConfigDialog.cpp \
 	cpint.cpp \
-	\
+	PfPvPlot.cpp \
 	main.cpp
 
 RESOURCES = application.qrc

@@ -26,6 +26,7 @@
 
 class AllPlot;
 class CpintPlot;
+class PfPvPlot;
 class PowerHist;
 class QwtPlotPanner;
 class QwtPlotPicker;
@@ -56,11 +57,15 @@ class MainWindow : public QMainWindow
         void exportCSV();
         void importCSV();
         void importSRM();
+        void importTCX();
         void findBestIntervals();
         void setSmoothingFromSlider();
         void setSmoothingFromLineEdit();
         void setBinWidthFromSlider();
         void setBinWidthFromLineEdit();
+        void setQaCPFromLineEdit();
+        void setQaCADFromLineEdit();
+        void setQaCLFromLineEdit();
         void tabChanged(int index);
         void pickerMoved(const QPoint &);
         void aboutDialog();
@@ -96,6 +101,12 @@ class MainWindow : public QMainWindow
         QTreeWidgetItem *allRides;
         PowerHist *powerHist;
         Zones *zones;
+
+	// pedal force/pedal velocity scatter plot widgets
+	PfPvPlot *pfPvPlot;
+        QLineEdit *qaCPValue;
+        QLineEdit *qaCadValue;
+	QLineEdit *qaClValue;
 
         QTextEdit *rideNotes;
         QString currentNotesFile;

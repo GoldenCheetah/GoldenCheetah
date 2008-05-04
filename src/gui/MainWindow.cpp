@@ -24,6 +24,7 @@
 #include "ChooseCyclistDialog.h"
 #include "ConfigDialog.h"
 #include "CpintPlot.h"
+#include "PfPvPlot.h"
 #include "DownloadRideDialog.h"
 #include "PowerHist.h"
 #include "RideItem.h"
@@ -49,7 +50,7 @@
 #define MILES_PER_KM 0.62137119
 
 static char *rideFileRegExp = ("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)"
-                               "_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.(raw|srm|csv)$");
+                               "_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.(raw|srm|csv|tcx)$");
 
 QString
 MainWindow::notesFileName(QString rideFileName) {
@@ -281,6 +282,33 @@ MainWindow::MainWindow(const QDir &home) :
 
     tabWidget->addTab(window, "Power Histogram");
     
+    //////////////////////// Pedal Force/Velocity Plot ////////////////////////
+
+    window = new QWidget;
+    vlayout = new QVBoxLayout;
+    QHBoxLayout *qaLayout = new QHBoxLayout;
+
+    pfPvPlot = new PfPvPlot();
+    QLabel *qaCPLabel = new QLabel(tr("CP:"), window);
+    qaCPValue = new QLineEdit(QString("%1").arg(pfPvPlot->getCP()));
+    QLabel *qaCadLabel = new QLabel(tr("Cadence:"), window);
+    qaCadValue = new QLineEdit(QString("%1").arg(pfPvPlot->getCAD()));
+    QLabel *qaClLabel = new QLabel(tr("Crank Length:"), window);
+    qaClValue = new QLineEdit(QString("%1").arg(pfPvPlot->getCL()));
+    qaLayout->addWidget(qaCPLabel);
+    qaLayout->addWidget(qaCPValue);
+    qaLayout->addWidget(qaCadLabel);
+    qaLayout->addWidget(qaCadValue);
+    qaLayout->addWidget(qaClLabel);
+    qaLayout->addWidget(qaClValue);
+
+    vlayout->addWidget(pfPvPlot);
+    vlayout->addLayout(qaLayout);
+    window->setLayout(vlayout);
+    window->show();
+
+    tabWidget->addTab(window, tr("PF/PV Plot"));
+
     //////////////////////// Ride Notes ////////////////////////
     
     rideNotes = new QTextEdit;
@@ -316,6 +344,12 @@ MainWindow::MainWindow(const QDir &home) :
             this, SLOT(setBinWidthFromSlider()));
     connect(binWidthLineEdit, SIGNAL(returnPressed()),
             this, SLOT(setBinWidthFromLineEdit()));
+    connect(qaCPValue, SIGNAL(returnPressed()),
+	    this, SLOT(setQaCPFromLineEdit()));
+    connect(qaCadValue, SIGNAL(returnPressed()),
+	    this, SLOT(setQaCADFromLineEdit()));
+    connect(qaClValue, SIGNAL(returnPressed()),
+	    this, SLOT(setQaCLFromLineEdit()));
     connect(tabWidget, SIGNAL(currentChanged(int)), 
             this, SLOT(tabChanged(int)));
     connect(rideNotes, SIGNAL(textChanged()),
@@ -340,6 +374,8 @@ MainWindow::MainWindow(const QDir &home) :
                         SLOT(importSRM()), tr("Ctrl+I")); 
     rideMenu->addAction(tr("&Import from CSV..."), this,
                         SLOT (importCSV()), tr ("Ctrl+S"));
+    rideMenu->addAction(tr("&Import from TCX..."), this,
+                        SLOT (importTCX()));
     rideMenu->addAction(tr("Find &best intervals..."), this, 
                         SLOT(findBestIntervals()), tr ("Ctrl+B")); 
     QMenu *optionsMenu = menuBar()->addMenu(tr("&Options"));
@@ -596,6 +632,54 @@ MainWindow::importSRM()
 }
 
 void
+MainWindow::importTCX()
+{
+    QStringList fileNames = QFileDialog::getOpenFileNames(
+        this, tr("Import SRM"), QDir::homePath(),
+        tr("TCX Format (*.tcx)"));
+    QStringListIterator i(fileNames);
+    while (i.hasNext()) {
+        QString fileName = i.next();
+        QFile file(fileName);
+        QStringList errors;
+        RideFile *ride =
+            RideFileFactory::instance().openRideFile(file, errors);
+        if (!ride || !errors.empty()) {
+            QString all = (ride 
+                           ? tr("Non-fatal problem(s) opening %1:")
+                           : tr("Fatal problem(s) opening %1:")).arg(fileName);
+            QStringListIterator i(errors);
+            while (i.hasNext())
+                all += "\n" + i.next();
+            if (ride)
+                QMessageBox::warning(this, tr("Open Warning"), all);
+            else {
+                QMessageBox::critical(this, tr("Open Error"), all);
+                return;
+            }
+        }
+
+        QChar zero = QLatin1Char('0'); 
+        QString name = QString("%1_%2_%3_%4_%5_%6.tcx")
+            .arg(ride->startTime().date().year(), 4, 10, zero)
+            .arg(ride->startTime().date().month(), 2, 10, zero)
+            .arg(ride->startTime().date().day(), 2, 10, zero)
+            .arg(ride->startTime().time().hour(), 2, 10, zero)
+            .arg(ride->startTime().time().minute(), 2, 10, zero)
+            .arg(ride->startTime().time().second(), 2, 10, zero);
+
+        if (!file.copy(home.absolutePath() + "/" + name)) {
+            QMessageBox::critical(this, tr("Copy Error"), 
+                                  tr("Couldn't copy %1").arg(fileName));
+            return;
+        }
+
+        delete ride;
+        addRide(name);
+    }
+}
+
+void
 MainWindow::findBestIntervals()
 {
     (new BestIntervalDialog(this))->show();
@@ -617,6 +701,8 @@ MainWindow::rideSelected()
                 cpintPlot->calculate(ride->fileName, ride->dateTime);
             if (ride->ride)
                 powerHist->setData(ride->ride);
+	    if (ride->ride)
+		pfPvPlot->setData(ride->ride);
 
             QDate wstart = ride->dateTime.date();
             wstart = wstart.addDays(Qt::Monday - wstart.dayOfWeek());
@@ -873,6 +959,27 @@ MainWindow::setBinWidthFromLineEdit()
         powerHist->setBinWidth(value);
         binWidthSlider->setValue(value);
     }
+}
+
+void
+MainWindow::setQaCPFromLineEdit()
+{
+    int value = qaCPValue->text().toInt();
+    pfPvPlot->setCP(value);
+}
+
+void
+MainWindow::setQaCADFromLineEdit()
+{
+    int value = qaCadValue->text().toInt();
+    pfPvPlot->setCAD(value);
+}
+
+void
+MainWindow::setQaCLFromLineEdit()
+{
+    double value = qaClValue->text().toDouble();
+    pfPvPlot->setCL(value);
 }
 
 void
