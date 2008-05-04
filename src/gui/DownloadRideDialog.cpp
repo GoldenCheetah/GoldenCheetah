@@ -117,71 +117,66 @@ DownloadRideDialog::scanDevices()
 bool
 DownloadRideDialog::statusCallback(PowerTap::State state)
 {
-    switch (state) {
-        case PowerTap::STATE_READING_VERSION:
-            label->setText("Reading version...");
-            break;
-        case PowerTap::STATE_READING_HEADER:
-            label->setText(label->text() + "done.\nReading header...");
-            break;
-        case PowerTap::STATE_READING_DATA:
-            label->setText(label->text() + "done.\nReading ride data...\n");
-            endingOffset = label->text().length();
-            break;
-        case PowerTap::STATE_DATA_AVAILABLE:
-            unsigned char *buf = records.data();
-            if (recInt == 0.0) {
-                for (int i = 0; i < records.size(); i += 6) {
-                    if (PowerTap::is_config(buf + i)) {
-                        unsigned unused1, unused2, unused3;
-                        PowerTap::unpack_config(buf + i, &unused1, &unused2,
-                                                &recInt, &unused3);
-                    }
+    if (state == PowerTap::STATE_READING_VERSION)
+        label->setText("Reading version...");
+    else if (state == PowerTap::STATE_READING_HEADER)
+        label->setText(label->text() + "done.\nReading header...");
+    else if (state == PowerTap::STATE_READING_DATA) {
+        label->setText(label->text() + "done.\nReading ride data...\n");
+        endingOffset = label->text().length();
+    }
+    else {
+        assert(state == PowerTap::STATE_DATA_AVAILABLE);
+        unsigned char *buf = records.data();
+        if (recInt == 0.0) {
+            for (int i = 0; i < records.size(); i += 6) {
+                if (PowerTap::is_config(buf + i)) {
+                    unsigned unused1, unused2, unused3;
+                    PowerTap::unpack_config(buf + i, &unused1, &unused2,
+                                            &recInt, &unused3);
                 }
             }
-            if (recInt != 0.0) {
-                int min = (int) round(records.size() / 6 * recInt * 0.021);
-                QString existing = label->text();
-                existing.chop(existing.size() - endingOffset);
-                existing.append(QString("Ride data read: %1:%2").arg(min / 60)
-                                .arg(min % 60, 2, 10, QLatin1Char('0')));
-                label->setText(existing);
-            }
-            if (filename == "") {
-                struct tm time;
-                for (int i = 0; i < records.size(); i += 6) {
-                    if (PowerTap::is_time(buf + i)) {
-                        PowerTap::unpack_time(buf + i, &time);
-                        char tmp[32];
-                        sprintf(tmp, "%04d_%02d_%02d_%02d_%02d_%02d.raw", 
-                                time.tm_year + 1900, time.tm_mon + 1, 
-                                time.tm_mday, time.tm_hour, time.tm_min,
-                                time.tm_sec);
-                        filename = tmp;
-                        filepath = home.absolutePath() + "/" + filename;
-                        FILE *out = fopen(filepath.toAscii().constData(), "r"); 
-                        if (out) {
-                            fclose(out);
-                            if (QMessageBox::warning(
-                                    this,
-                                    tr("Ride Already Downloaded"),
-                                    tr("This ride appears to have already ")
-                                    + tr("been downloaded.  Do you want to ")
-                                    + tr("download it again and overwrite ")
-                                    + tr("the previous download?"),
-                                    tr("&Overwrite"), tr("&Cancel"), 
-                                    QString(), 1, 1) == 1) {
-                                reject();
-                                return false;
-                            }
+        }
+        if (recInt != 0.0) {
+            int min = (int) round(records.size() / 6 * recInt * 0.021);
+            QString existing = label->text();
+            existing.chop(existing.size() - endingOffset);
+            existing.append(QString("Ride data read: %1:%2").arg(min / 60)
+                            .arg(min % 60, 2, 10, QLatin1Char('0')));
+            label->setText(existing);
+        }
+        if (filename == "") {
+            struct tm time;
+            for (int i = 0; i < records.size(); i += 6) {
+                if (PowerTap::is_time(buf + i)) {
+                    PowerTap::unpack_time(buf + i, &time);
+                    char tmp[32];
+                    sprintf(tmp, "%04d_%02d_%02d_%02d_%02d_%02d.raw", 
+                            time.tm_year + 1900, time.tm_mon + 1, 
+                            time.tm_mday, time.tm_hour, time.tm_min,
+                            time.tm_sec);
+                    filename = tmp;
+                    filepath = home.absolutePath() + "/" + filename;
+                    FILE *out = fopen(filepath.toAscii().constData(), "r"); 
+                    if (out) {
+                        fclose(out);
+                        if (QMessageBox::warning(
+                                this,
+                                tr("Ride Already Downloaded"),
+                                tr("This ride appears to have already ")
+                                + tr("been downloaded.  Do you want to ")
+                                + tr("download it again and overwrite ")
+                                + tr("the previous download?"),
+                                tr("&Overwrite"), tr("&Cancel"), 
+                                QString(), 1, 1) == 1) {
+                            reject();
+                            return false;
                         }
-                        break;
                     }
+                    break;
                 }
             }
-            break;
-        default:
-            assert(false);
+        }
     }
     QCoreApplication::processEvents();
     return !cancelled;
