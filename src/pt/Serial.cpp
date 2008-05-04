@@ -17,13 +17,21 @@
  */
 
 #include "Serial.h"
-#include "../lib/pt.h"
+#include <assert.h>
+#include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <math.h>
+#include <regex.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+#include <sys/ioctl.h>
 #include <sys/select.h>
 #include <sys/socket.h>
+#include <sys/time.h>
+#include <termios.h>
+#include <unistd.h>
 
 bool SerialRegistered = Device::addListFunction(&Serial::myListDevices);
 
@@ -46,7 +54,34 @@ Serial::open(QString &err)
         err = QString("open: ") + strerror(errno);
         return false;
     }
-    pt_make_async(fd);
+    struct termios tty;
+    int flags = fcntl(fd, F_GETFL, 0);
+    if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1) {
+        perror("fcntl");
+        assert(0);
+    }
+    if (tcgetattr(fd, &tty) == -1) {
+        perror("tcgetattr");
+        assert(0);
+    }
+    tty.c_cflag &= ~CRTSCTS; /* no hardware flow control */
+    tty.c_cflag &= ~(PARENB | PARODD); /* no parity */
+    tty.c_cflag &= ~CSTOPB; /* 1 stop bit */
+    tty.c_cflag &= ~CSIZE; /* clear size bits */
+    tty.c_cflag |= CS8; /* 8 bits */
+    tty.c_cflag |= CLOCAL | CREAD; /* ignore modem control lines */
+    if (cfsetspeed(&tty, B9600) == -1) {
+        perror("cfsetspeed");
+        assert(0);
+    }
+    tty.c_iflag = IGNBRK; /* ignore BREAK condition on input */
+    tty.c_lflag = 0;
+    tty.c_oflag = 0;
+    tty.c_cc[VMIN] = 1; /* all reads return at least one character */
+    if (tcsetattr(fd, TCSANOW, &tty) == -1) {
+        perror("tcsetattr");
+        assert(0);
+    }
     return true;
 }
 
@@ -150,6 +185,29 @@ Serial::name() const
     return QString("Serial: ") + path;
 }
 
+static int
+find_devices(char *result[], int capacity)
+{
+    regex_t reg;
+    DIR *dirp;
+    struct dirent *dp;
+    int count = 0;
+    if (regcomp(&reg, 
+                "^(cu\\.(usbmodem[0-9A-F]+|usbserial-[0-9A-F]+|KeySerial[0-9])|ttyUSB[0-9]|ttyS[0-2])$", 
+                REG_EXTENDED|REG_NOSUB)) {
+        assert(0);
+    }
+    dirp = opendir("/dev");
+    while ((count < capacity) && ((dp = readdir(dirp)) != NULL)) {
+        if (regexec(&reg, dp->d_name, 0, NULL, 0) == 0) {
+            result[count] = (char*) malloc(6 + strlen(dp->d_name));
+            sprintf(result[count], "/dev/%s", dp->d_name);
+            ++count;
+        }
+    }
+    return count;
+}
+
 QVector<DevicePtr>
 Serial::myListDevices(QString &err)
 {
@@ -157,7 +215,7 @@ Serial::myListDevices(QString &err)
     (void) err;
     QVector<DevicePtr> result;
     char *devices[MAX_DEVICES];
-    int devcnt = pt_find_device(devices, MAX_DEVICES);
+    int devcnt = find_devices(devices, MAX_DEVICES);
     for (int i = 0; i < devcnt; ++i) {
         result.append(DevicePtr(new Serial(devices[i])));
         free(devices[i]);

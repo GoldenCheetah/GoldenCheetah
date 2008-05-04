@@ -1,7 +1,7 @@
 /* 
  * $Id: DownloadRideDialog.h,v 1.4 2006/08/11 20:02:13 srhea Exp $
  *
- * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
+ * Copyright (c) 2006-2008 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -24,10 +24,6 @@
 #include <QtGui>
 #include "../pt/PowerTap.h"
 
-extern "C" {
-#include "pt.h"
-}
-
 class MainWindow;
 class DownloadThread;
 
@@ -37,22 +33,15 @@ class DownloadRideDialog : public QDialog
 
     public:
         DownloadRideDialog(MainWindow *mainWindow, const QDir &home);
-        ~DownloadRideDialog();
 
-        void time_cb(struct tm *time);
-        void record_cb(unsigned char *buf);
-
-        void DownloadRideDialog::downloadFinished();
-        bool DownloadRideDialog::statusCallback(PowerTap::State state);
+        void downloadFinished();
+        bool statusCallback(PowerTap::State state);
 
     private slots:
         void downloadClicked();
         void cancelClicked();
         void setReadyInstruct();
         void scanDevices();
-        // void readVersion();
-        // void readData();
-        // void versionTimeout();
 
     private:
  
@@ -61,19 +50,6 @@ class DownloadRideDialog : public QDialog
         QListWidget *listWidget;
         QPushButton *downloadButton, *rescanButton, *cancelButton;
         QLabel *label;
-        /*
-        int fd;
-        FILE *out;
-        char outname[24];
-
-        char *device;
-        struct pt_read_version_state vstate;
-        struct pt_read_data_state dstate;
-        QSocketNotifier *notifier;
-        QTimer *timer;
-        int blockCount;
-        int hwecho;
-        */
 
         QVector<DevicePtr> devList;
         bool cancelled, downloadInProgress;

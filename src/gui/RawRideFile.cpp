@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2007 Sean C. Rhea (srhea@srhea.net)
+ * Copyright (c) 2007-2008 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -17,12 +17,14 @@
  */
 
 #include "RawRideFile.h"
-#include "pt.h"
+#include "../pt/PowerTap.h"
 #include <assert.h>
 #include <math.h>
 
 #define MILES_TO_KM 1.609344
-        
+#define KM_TO_MI 0.62137119
+#define BAD_KM_TO_MI 0.62
+
 static int rawFileReaderRegistered = 
     RideFileFactory::instance().registerReader("raw", new RawFileReader());
  
@@ -88,6 +90,99 @@ error_cb(const char *msg, void *context)
 {
     ReadState *state = (ReadState*) context;
     state->errors.append(QString(msg));
+}
+
+static void 
+pt_read_raw(FILE *in, int compat, void *context,
+            void (*config_cb)(unsigned interval, unsigned rec_int, 
+                              unsigned wheel_sz_mm, void *context),
+            void (*time_cb)(struct tm *time, time_t since_epoch, void *context),
+            void (*data_cb)(double secs, double nm, double mph, 
+                            double watts, double miles, unsigned cad, 
+                            unsigned hr, unsigned interval, void *context),
+            void (*error_cb)(const char *msg, void *context))
+{
+    unsigned interval = 0;
+    unsigned last_interval = 0;
+    unsigned wheel_sz_mm = 0;
+    unsigned rec_int = 0;
+    int i, n, row = 0;
+    unsigned char buf[6];
+    unsigned sbuf[6];
+    double meters = 0.0;
+    double secs = 0.0, start_secs = 0.0;
+    double miles;
+    double mph;
+    double nm;
+    double watts;
+    unsigned cad;
+    unsigned hr;
+    struct tm time;
+    time_t since_epoch;
+    char ebuf[256];
+
+    while ((n = fscanf(in, "%x %x %x %x %x %x\n", 
+            sbuf, sbuf+1, sbuf+2, sbuf+3, sbuf+4, sbuf+5)) == 6) {
+        ++row;
+        for (i = 0; i < 6; ++i) {
+            if (sbuf[i] > 0xff) { n = 1; break; }
+            buf[i] = sbuf[i];
+        }
+        if (row == 1) {
+            /* Serial number? */
+        }
+        else if (PowerTap::is_config(buf)) {
+            if (PowerTap::unpack_config(buf, &interval, &last_interval, 
+                                        &rec_int, &wheel_sz_mm) < 0) {
+                sprintf(ebuf, "Couldn't unpack config record.");
+                if (error_cb) error_cb(ebuf, context);
+                return;
+            }
+            if (config_cb) config_cb(interval, rec_int, wheel_sz_mm, context);
+        }
+        else if (PowerTap::is_time(buf)) {
+            since_epoch = PowerTap::unpack_time(buf, &time);
+            bool ignore = false;
+            if (start_secs == 0.0)
+                start_secs = since_epoch;
+            else if (since_epoch - start_secs > secs)
+                secs = since_epoch - start_secs;
+            else {
+                sprintf(ebuf, "Warning: %0.3f minutes into the ride, "
+                        "time jumps backwards by %0.3f minutes; ignoring it.",
+                        secs / 60.0, (secs - since_epoch + start_secs) / 60.0);
+                if (error_cb) error_cb(ebuf, context);
+                ignore = true;
+            }
+            if (time_cb && !ignore) time_cb(&time, since_epoch, context);
+        }
+        else if (PowerTap::is_data(buf)) {
+            if (wheel_sz_mm == 0) {
+                sprintf(ebuf, "Read data row before wheel size set.");
+                if (error_cb) error_cb(ebuf, context);
+                return;
+            }
+            PowerTap::unpack_data(buf, compat, rec_int, wheel_sz_mm, &secs, 
+                                  &nm, &mph, &watts, &meters, &cad, &hr);
+            if (compat)
+                miles = round(meters) / 1000.0 * BAD_KM_TO_MI;
+            else 
+                miles = meters / 1000.0 * KM_TO_MI;
+            if (data_cb) 
+                data_cb(secs, nm, mph, watts, miles, cad, 
+                        hr, interval, context);
+        }
+        else { 
+            sprintf(ebuf, "Unknown record type 0x%x on row %d.", buf[0], row);
+            if (error_cb) error_cb(ebuf, context);
+            return;
+        }
+    }
+    if (n != -1) {
+        sprintf(ebuf, "Parse error on row %d.", row);
+        if (error_cb) error_cb(ebuf, context);
+        return;
+    }
 }
 
 RideFile *RawFileReader::openRideFile(QFile &file, QStringList &errors) const 
