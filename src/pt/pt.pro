@@ -7,7 +7,7 @@ LIBS += -lftd2xx
 CONFIG += static debug
 
 HEADERS += Device.h D2XX.h PowerTap.h
-SOURCES += Device.cpp D2XX.cpp PowerTap.cpp main.cpp
+SOURCES += Device.cpp D2XX.cpp PowerTap.cpp
 
 macx || unix {
     HEADERS += Serial.h
