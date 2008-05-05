@@ -19,10 +19,7 @@
  */
 
 #include "CpintPlot.h"
-
-extern "C" {
 #include "cpint.h"
-}
 
 #include <assert.h>
 #include <qwt_data.h>
@@ -74,36 +71,30 @@ CpintPlot::calculate(QString fileName, QDateTime dateTime)
     if (needToScanRides) {
         fflush(stderr);
         bool aborted = false;
-        struct cpi_file_info *head = cpi_files_to_update(dir);
-        int count = 0;
-        struct cpi_file_info *tmp = head;
-        while (tmp) {
-            ++count;
-            tmp = tmp->next;
-        }
+        QList<cpi_file_info> to_update; 
+        cpi_files_to_update(dir, to_update);
         progress = new QProgressDialog(
             QString(tr("Computing critical power intervals.\n"
                        "This may take a while.\n")),
-            tr("Abort"), 0, count + 1, this);
+            tr("Abort"), 0, to_update.size() + 1, this);
         int endingOffset = progress->labelText().size();
-        if (count) {
-            tmp = head;
-            count = 1;
-            while (tmp) {
+        if (!to_update.empty()) {
+            QListIterator<cpi_file_info> i(to_update);
+            int count = 1;
+            while (i.hasNext()) {
+                const cpi_file_info &info = i.next();
                 QString existing = progress->labelText();
                 existing.chop(progress->labelText().size() - endingOffset);
                 progress->setLabelText(
-                    existing + QString(tr("Processing %1...")).arg(tmp->file));
+                    existing + QString(tr("Processing %1...")).arg(info.file));
                 progress->setValue(count++);
-                update_cpi_file(tmp, cancel_cb, this);
+                update_cpi_file(&info, cancel_cb, this);
                 QCoreApplication::processEvents();
                 if (progress->wasCanceled()) {
                     aborted = true;
                     break;
                 }
-                tmp = tmp->next;
             }
-            free_cpi_file_info(head);
         }
 
         if (!aborted) {
