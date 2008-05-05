@@ -21,34 +21,22 @@
 #ifndef __cpint_h
 #define __cpint_h 1
 
-#include <regex.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <QString>
 
 struct cpi_file_info {
-    char *file, *inname, *outname;
-    regmatch_t *pmatch;
-    struct cpi_file_info *next;
+    QString file, inname, outname;
 };
 
-extern struct cpi_file_info * cpi_files_to_update(const char *dir);
+extern void cpi_files_to_update(const char *dir, QList<cpi_file_info> &result);
 
-extern void update_cpi_file(struct cpi_file_info *info, 
+extern void update_cpi_file(const cpi_file_info *info, 
                             int (*cancel_cb)(void *user_data),
                             void *user_data);
-
-extern void free_cpi_file_info(struct cpi_file_info *head);
 
 extern int read_cpi_file(const char *dir, const char *raw, 
                          double *bests[], int *bestlen);
 
 extern void combine_cpi_files(const char *dir, double *bests[], int *bestlen);
-
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
 
 #endif /* __cpint_h */
 
