@@ -19,12 +19,14 @@
 #include "Device.h"
 #include "Serial.h"
 
-QVector<Device::ListFunction> Device::listFunctions;
+static QVector<Device::ListFunction> *listFunctions;
 
 bool
 Device::addListFunction(ListFunction f)
 {
-    listFunctions.append(f);
+    if (!listFunctions)
+        listFunctions = new QVector<Device::ListFunction>;
+    listFunctions->append(f);
     return true;
 }
 
@@ -33,8 +35,8 @@ Device::listDevices(QString &err)
 {
     err = "";
     QVector<DevicePtr> result;
-    for (int i = 0; i < listFunctions.size(); ++i) {
-        QVector<DevicePtr> tmp = listFunctions[i](err);
+    for (int i = 0; listFunctions && i < listFunctions->size(); ++i) {
+        QVector<DevicePtr> tmp = (*listFunctions)[i](err);
         if (err != "")
             return result;
         for (int j = 0; j < tmp.size(); ++j)

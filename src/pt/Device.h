@@ -27,11 +27,9 @@ typedef boost::shared_ptr<Device> DevicePtr;
 
 class Device
 {
-    typedef QVector<DevicePtr> (*ListFunction)(QString &err);
-    static QVector<ListFunction> listFunctions;
-
     public:
 
+    typedef QVector<DevicePtr> (*ListFunction)(QString &err);
     static bool addListFunction(ListFunction f);
     static QVector<DevicePtr> listDevices(QString &err);
 
