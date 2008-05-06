@@ -1,6 +1,4 @@
 /* 
- * $Id: RideItem.cpp,v 1.3 2006/07/09 15:30:34 srhea Exp $
- *
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
