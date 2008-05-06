@@ -1,6 +1,4 @@
 /* 
- * $Id: CpintPlot.cpp,v 1.2 2006/07/12 02:13:57 srhea Exp $
- *
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -65,8 +63,8 @@ cancel_cb(void *user_data)
 void
 CpintPlot::calculate(QString fileName, QDateTime dateTime) 
 {
-    char *dir = strdup(path.toAscii().constData());
-    char *file = strdup(fileName.toAscii().constData());
+    QDir dir(path);
+    QFileInfo file(fileName);
 
     if (needToScanRides) {
         fflush(stderr);
@@ -96,32 +94,28 @@ CpintPlot::calculate(QString fileName, QDateTime dateTime)
                 }
             }
         }
-
         if (!aborted) {
             QString existing = progress->labelText();
             existing.chop(progress->labelText().size() - endingOffset);
             progress->setLabelText(
                 existing + tr("Aggregating over all files."));
             progress->show();
-            int i;
-            double *bests;
-            int bestlen;
-            combine_cpi_files(dir, &bests, &bestlen);
-            double *timeArray = new double[bestlen];
+            QVector<double> bests;
+            combine_cpi_files(dir, bests);
+            double *timeArray = new double[bests.size()];
             int maxNonZero = 0;
-            for (i = 0; i < bestlen; ++i) {
+            for (int i = 0; i < bests.size(); ++i) {
                 timeArray[i] = i / 60.0;
                 if (bests[i] > 0) maxNonZero = i;
             }
-            if (maxNonZero > 1) {
-                allCurve->setData(timeArray + 1, bests + 1, maxNonZero - 1);
+            if (bests.size() > 1) {
+                allCurve->setData(timeArray + 1, bests.constData() + 1,
+                                  maxNonZero - 1);
                 setAxisScale(xBottom, 1.0 / 60.0, maxNonZero / 60.0);
             }
             delete [] timeArray;
-            free(bests);
             needToScanRides = false;
         }
-
         delete progress; 
         progress = NULL;
     }
@@ -129,13 +123,11 @@ CpintPlot::calculate(QString fileName, QDateTime dateTime)
     if (!needToScanRides) {
         delete thisCurve;
         thisCurve = NULL;
-        int i;
-        double *bests;
-        int bestlen;
-        if (read_cpi_file(dir, file, &bests, &bestlen) == 0) {
-            double *timeArray = new double[bestlen];
+        QVector<double> bests;
+        if (read_cpi_file(dir, file, bests) == 0) {
+            double *timeArray = new double[bests.size()];
             int maxNonZero = 0;
-            for (i = 0; i < bestlen; ++i) {
+            for (int i = 0; i < bests.size(); ++i) {
                 timeArray[i] = i / 60.0;
                 if (bests[i] > 0) maxNonZero = i;
             }
@@ -145,16 +137,14 @@ CpintPlot::calculate(QString fileName, QDateTime dateTime)
                 thisCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
                 thisCurve->setPen(QPen(Qt::green));
                 thisCurve->attach(this);
-                thisCurve->setData(timeArray + 1, bests + 1, maxNonZero - 1);
+                thisCurve->setData(timeArray + 1, bests.constData() + 1,
+                                   maxNonZero - 1);
             }
             delete [] timeArray;
-            free(bests);
         }
     }
  
     replot();
-    free(dir);
-    free(file);
 }
 
 void

@@ -1,6 +1,4 @@
 /* 
- * $Id: cpint.c,v 1.4 2006/08/11 19:53:07 srhea Exp $
- *
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -18,6 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <QVector>
 #include <assert.h>
 #include <math.h>
 #include <stdlib.h>
@@ -39,19 +38,18 @@ struct cpint_data {
 };
 
 void
-cpi_files_to_update(const char *dir, QList<cpi_file_info> &result)
+cpi_files_to_update(const QDir &dir, QList<cpi_file_info> &result)
 {
     QRegExp re("^([0-9][0-9][0-9][0-9])_([0-9][0-9])_([0-9][0-9])"
                 "_([0-9][0-9])_([0-9][0-9])_([0-9][0-9])\\.(raw|srm|csv|tcx)$");
-    QStringList filenames = 
-        RideFileFactory::instance().listRideFiles(QDir(dir));
+    QStringList filenames = RideFileFactory::instance().listRideFiles(dir);
     QListIterator<QString> i(filenames);
     while (i.hasNext()) {
         const QString &filename = i.next();
         if (re.exactMatch(filename)) {
-            QString inname = QString("%1/%2").arg(dir).arg(filename);
-            QString outname = inname;
-            outname.replace(outname.length() - 3, 3, "cpi");
+            QString inname = dir.absoluteFilePath(filename);
+            QString outname = dir.absoluteFilePath(
+                QFileInfo(filename).completeBaseName() + ".cpi");
             QFileInfo ifi(inname), ofi(outname);
             if (!ofi.exists() || (ofi.lastModified() < ifi.lastModified())) {
                 cpi_file_info info;
@@ -130,7 +128,7 @@ done:
 }
 
 static int 
-read_one(const char *inname, double *bests[], int *bestlen)
+read_one(const char *inname, QVector<double> &bests)
 {
     FILE *in = fopen(inname, "r");
     if (!in)
@@ -145,15 +143,10 @@ read_one(const char *inname, double *bests[], int *bestlen)
             exit(1);
         }
         int secs = (int) round(mins * 60.0);
-        while (secs >= *bestlen) {
-            double *tmp = (double*) calloc(*bestlen * 2, sizeof(double));
-            memcpy(tmp, *bests, *bestlen * sizeof(double));
-            free(*bests);
-            *bests = tmp;
-            *bestlen *= 2;
-        }
-        if ((*bests)[secs] < watts)
-            (*bests)[secs] = watts;
+        if (secs >= bests.size())
+            bests.resize(secs + 1);
+        if (bests[secs] < watts)
+            bests[secs] = watts;
         ++lineno;
     }
     fclose(in);
@@ -161,32 +154,23 @@ read_one(const char *inname, double *bests[], int *bestlen)
 }
 
 int
-read_cpi_file(const char *dir, const char *raw, double *bests[], int *bestlen)
+read_cpi_file(const QDir &dir, const QFileInfo &raw, QVector<double> &bests)
 {
-    *bestlen = 1000;
-    *bests = (double*) calloc(*bestlen, sizeof(double));
-    char *inname = (char*) malloc(strlen(dir) + 25);
-    sprintf(inname, "%s/%s", dir, raw);
-    strcpy(inname + strlen(inname) - 4, ".cpi");
-    int result = read_one(inname, bests, bestlen);
-    free(inname);
-    return result;
+    QString inname = dir.absoluteFilePath(raw.completeBaseName() + ".cpi");
+    return read_one(inname.toAscii().constData(), bests);
 }
 
 void
-combine_cpi_files(const char *dir, double *bests[], int *bestlen)
+combine_cpi_files(const QDir &dir, QVector<double> &bests)
 {
-    QDir qdir(dir);
     QStringList filters;
     filters << "*.cpi";
-    QStringList list = qdir.entryList(filters, QDir::Files, QDir::Name);
-    *bestlen = 1000;
-    *bests = (double*) calloc(*bestlen, sizeof(double));
+    QStringList list = dir.entryList(filters, QDir::Files, QDir::Name);
     QListIterator<QString> i(list);
     while (i.hasNext()) {
         const QString &filename = i.next();
-        QString path = qdir.absoluteFilePath(filename);
-        read_one(path.toAscii().constData(), bests, bestlen);
+        QString path = dir.absoluteFilePath(filename);
+        read_one(path.toAscii().constData(), bests);
     }
 }
 
