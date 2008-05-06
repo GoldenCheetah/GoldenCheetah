@@ -17,7 +17,6 @@
  */
 
 #include "D2XX.h"
-#include <ctype.h>
 
 bool D2XXRegistered = Device::addListFunction(&D2XX::myListDevices);
 
