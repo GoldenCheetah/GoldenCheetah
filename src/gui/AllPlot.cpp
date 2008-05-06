@@ -1,6 +1,4 @@
 /* 
- * $Id: AllPlot.cpp,v 1.2 2006/07/12 02:13:57 srhea Exp $
- *
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -18,7 +16,6 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <time.h>
 #include "AllPlot.h"
 #include "RideFile.h"
 #include "Settings.h"

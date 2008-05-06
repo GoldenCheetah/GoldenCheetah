@@ -1,6 +1,4 @@
 /* 
- * $Id: Settings.h,v 1.2 2006/07/04 12:55:40 srhea Exp $
- *
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
