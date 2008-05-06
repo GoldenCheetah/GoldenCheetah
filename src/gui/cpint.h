@@ -1,6 +1,4 @@
 /* 
- * $Id: cpint.h,v 1.1 2006/08/11 19:53:07 srhea Exp $
- *
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -21,22 +19,22 @@
 #ifndef __cpint_h
 #define __cpint_h 1
 
-#include <QString>
+#include <QtCore>
 
 struct cpi_file_info {
     QString file, inname, outname;
 };
 
-extern void cpi_files_to_update(const char *dir, QList<cpi_file_info> &result);
+extern void cpi_files_to_update(const QDir &dir, QList<cpi_file_info> &result);
 
 extern void update_cpi_file(const cpi_file_info *info, 
                             int (*cancel_cb)(void *user_data),
                             void *user_data);
 
-extern int read_cpi_file(const char *dir, const char *raw, 
-                         double *bests[], int *bestlen);
+extern int read_cpi_file(const QDir &dir, const QFileInfo &raw,
+                         QVector<double> &bests);
 
-extern void combine_cpi_files(const char *dir, double *bests[], int *bestlen);
+extern void combine_cpi_files(const QDir &dir, QVector<double> &bests);
 
 #endif /* __cpint_h */
 
