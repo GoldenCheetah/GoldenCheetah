@@ -22,14 +22,8 @@
 #include "MainWindow.h"
 #include <assert.h>
 #include <QtGui>
-#include <errno.h>
-#include <fcntl.h>
 #include <math.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <boost/bind.hpp>
-
-#define MAX_DEVICES 10
 
 DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
                                        const QDir &home) : 
@@ -214,43 +208,49 @@ DownloadRideDialog::downloadClicked()
         reject();
         return;
     }
-    char *tmpname = new char[home.absolutePath().length() + 32];
-    sprintf(tmpname, "%s/.ptdl.XXXXXX",
-            home.absolutePath().toAscii().constData());
-    int fd = mkstemp(tmpname);
-    if (fd == -1)
+
+    QTemporaryFile tmp(home.absoluteFilePath(".ptdl.XXXXXX"));
+    tmp.setAutoRemove(false);
+    if (!tmp.open())
         assert(false);
-    FILE *file = fdopen(fd, "w");
-    if (file == NULL)
-        assert(false);
-    unsigned char *data = records.data();
+    QTextStream os(&tmp);
+    os << hex;
+    os.setPadChar('0');
+
     struct tm time;
     bool time_set = false;
-
+    unsigned char *data = records.data();
     for (int i = 0; i < records.size(); i += 6) {
         if (data[i] == 0)
             continue;
-        fprintf(file, "%02x %02x %02x %02x %02x %02x\n", 
-                data[i], data[i+1], data[i+2],
-                data[i+3], data[i+4], data[i+5]); 
+        for (int j = 0; j < 6; ++j) {
+            os.setFieldWidth(2);
+            os << data[i+j];
+            os.setFieldWidth(1);
+            os << ((j == 5) ? "\n" : " ");
+        }
         if (!time_set && PowerTap::is_time(data + i)) {
             PowerTap::unpack_time(data + i, &time);
             time_set = true;
         }
     }
-    fclose(file);
     assert(time_set);
+    QString tmpname = tmp.fileName(); // after close(), tmp.fileName() is ""
+    tmp.close();
 
-    if (chmod(tmpname, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH) == -1) {
-        perror("chmod");
-        assert(false);
-    }
+    printf("filepath=%s\n, tmp.fileName()=%s\n",
+           filepath.toAscii().constData(),
+           tmpname.toAscii().constData());
+           
+    tmp.setPermissions(QFile::ReadOwner | QFile::WriteOwner
+                       | QFile::ReadUser | QFile::WriteUser
+                       | QFile::ReadGroup | QFile::ReadOther);
 
-    if (rename(tmpname, filepath.toAscii().constData()) == -1) {
+    // Use ::rename() instead of QFile::rename() to get forced overwrite.
+    if (rename(QFile::encodeName(tmpname), QFile::encodeName(filepath)) < 0) {
         perror("rename");
         assert(false);
     }
-    delete [] tmpname;
 
     QMessageBox::information(this, tr("Success"), tr("Download complete."));
     mainWindow->addRide(filename);
