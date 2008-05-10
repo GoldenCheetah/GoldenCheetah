@@ -21,6 +21,8 @@
 #include "DownloadRideDialog.h"
 #include "MainWindow.h"
 #include <assert.h>
+#include <string.h>
+#include <errno.h>
 #include <QtGui>
 #include <math.h>
 #include <boost/bind.hpp>
@@ -209,47 +211,83 @@ DownloadRideDialog::downloadClicked()
         return;
     }
 
-    QTemporaryFile tmp(home.absoluteFilePath(".ptdl.XXXXXX"));
-    tmp.setAutoRemove(false);
-    if (!tmp.open())
-        assert(false);
-    QTextStream os(&tmp);
-    os << hex;
-    os.setPadChar('0');
+    QString tmpname;
+    {
+        // QTemporaryFile doesn't actually close the file on .close(); it
+        // closes the file when in its destructor.  On Windows, we can't
+        // rename an open file.  So let tmp go out of scope before calling
+        // rename.
 
-    struct tm time;
-    bool time_set = false;
-    unsigned char *data = records.data();
-    for (int i = 0; i < records.size(); i += 6) {
-        if (data[i] == 0)
-            continue;
-        for (int j = 0; j < 6; ++j) {
-            os.setFieldWidth(2);
-            os << data[i+j];
-            os.setFieldWidth(1);
-            os << ((j == 5) ? "\n" : " ");
+        QString tmpl = home.absoluteFilePath(".ptdl.XXXXXX");
+        QTemporaryFile tmp(tmpl);
+        tmp.setAutoRemove(false);
+        if (!tmp.open()) {
+            QMessageBox::critical(this, tr("Error"), 
+                                  tr("Failed to create temporary file ")
+                                  + tmpl + ": " + tmp.error());
+            reject();
+            return;
         }
-        if (!time_set && PowerTap::is_time(data + i)) {
-            PowerTap::unpack_time(data + i, &time);
-            time_set = true;
+        QTextStream os(&tmp);
+        os << hex;
+        os.setPadChar('0');
+
+        struct tm time;
+        bool time_set = false;
+        unsigned char *data = records.data();
+        for (int i = 0; i < records.size(); i += 6) {
+            if (data[i] == 0)
+                continue;
+            for (int j = 0; j < 6; ++j) {
+                os.setFieldWidth(2);
+                os << data[i+j];
+                os.setFieldWidth(1);
+                os << ((j == 5) ? "\n" : " ");
+            }
+            if (!time_set && PowerTap::is_time(data + i)) {
+                PowerTap::unpack_time(data + i, &time);
+                time_set = true;
+            }
+        }
+        if (!time_set) {
+            QMessageBox::critical(this, tr("Error"), 
+                                  tr("Failed to find ride time."));
+            tmp.setAutoRemove(true);
+            reject();
+            return;
+        }
+        tmpname = tmp.fileName(); // after close(), tmp.fileName() is ""
+        tmp.close();
+
+        // QTemporaryFile initially has permissions set to 0600.
+        // Make it readable by everyone.
+        tmp.setPermissions(tmp.permissions() 
+                           | QFile::ReadOwner | QFile::ReadUser
+                           | QFile::ReadGroup | QFile::ReadOther);
+    }
+
+#ifdef __WIN32__
+    // Windows ::rename won't overwrite an existing file.
+    if (QFile::exists(filepath)) {
+        QFile old(filepath);
+        if (!old.remove()) {
+            QMessageBox::critical(this, tr("Error"), 
+                                  tr("Failed to remove existing file ") 
+                                  + filepath + ": " + old.error()); 
+            QFile::remove(tmpname);
+            reject();
         }
     }
-    assert(time_set);
-    QString tmpname = tmp.fileName(); // after close(), tmp.fileName() is ""
-    tmp.close();
-
-    printf("filepath=%s\n, tmp.fileName()=%s\n",
-           filepath.toAscii().constData(),
-           tmpname.toAscii().constData());
-           
-    tmp.setPermissions(QFile::ReadOwner | QFile::WriteOwner
-                       | QFile::ReadUser | QFile::WriteUser
-                       | QFile::ReadGroup | QFile::ReadOther);
+#endif
 
     // Use ::rename() instead of QFile::rename() to get forced overwrite.
     if (rename(QFile::encodeName(tmpname), QFile::encodeName(filepath)) < 0) {
-        perror("rename");
-        assert(false);
+        QMessageBox::critical(this, tr("Error"), 
+                              tr("Failed to rename ") + tmpname + tr(" to ")
+                              + filepath + ": " + strerror(errno));
+        QFile::remove(tmpname);
+        reject();
+        return;
     }
 
     QMessageBox::information(this, tr("Success"), tr("Download complete."));
