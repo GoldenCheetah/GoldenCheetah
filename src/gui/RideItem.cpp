@@ -28,10 +28,10 @@
 
 #define MILES_PER_KM 0.62137119
 
-RideItem::RideItem(QTreeWidgetItem *parent, int type,
+RideItem::RideItem(int type,
                    QString path, QString fileName, const QDateTime &dateTime, 
                    const Zones *zones, QString notesFileName) : 
-    QTreeWidgetItem(parent, type), path(path), fileName(fileName), 
+    QTreeWidgetItem(type), path(path), fileName(fileName), 
     dateTime(dateTime), zones(zones), notesFileName(notesFileName)
 {
     setText(0, dateTime.toString("ddd"));

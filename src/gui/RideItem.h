@@ -48,7 +48,7 @@ class RideItem : public QTreeWidgetItem {
 
         MetricMap metrics;
 
-        RideItem(QTreeWidgetItem *parent, int type, QString path, 
+        RideItem(int type, QString path, 
                  QString fileName, const QDateTime &dateTime,
                  const Zones *zones, QString notesFileName);
 

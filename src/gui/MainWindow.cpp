@@ -113,8 +113,9 @@ MainWindow::MainWindow(const QDir &home) :
             QDate date(rx.cap(1).toInt(), rx.cap(2).toInt(),rx.cap(3).toInt()); 
             QTime time(rx.cap(4).toInt(), rx.cap(5).toInt(),rx.cap(6).toInt()); 
             QDateTime dt(date, time);
-            last = new RideItem(allRides, RIDE_TYPE, home.path(), 
+            last = new RideItem(RIDE_TYPE, home.path(), 
                                 name, dt, zones, notesFileName(name));
+            allRides->addChild(last);
         }
     }
 
@@ -399,8 +400,23 @@ MainWindow::addRide(QString name)
     QDate date(rx.cap(1).toInt(), rx.cap(2).toInt(),rx.cap(3).toInt()); 
     QTime time(rx.cap(4).toInt(), rx.cap(5).toInt(),rx.cap(6).toInt()); 
     QDateTime dt(date, time);
-    RideItem *last = new RideItem(allRides, RIDE_TYPE, home.path(), 
+    RideItem *last = new RideItem(RIDE_TYPE, home.path(), 
                                   name, dt, zones, notesFileName(name));
+    int index = 0;
+    while (index < allRides->childCount()) {
+        QTreeWidgetItem *item = allRides->child(index);
+        if (item->type() != RIDE_TYPE)
+            continue;
+        RideItem *other = reinterpret_cast<RideItem*>(item);
+        if (other->dateTime > dt)
+            break;
+        else if (other->fileName == name) {
+            delete allRides->takeChild(index);
+            break;
+        }
+        ++index;
+    }
+    allRides->insertChild(index, last);
     cpintPlot->needToScanRides = true;
     tabWidget->setCurrentIndex(0);
     treeWidget->setCurrentItem(last);
