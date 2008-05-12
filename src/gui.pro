@@ -2,20 +2,19 @@
 TEMPLATE = app
 TARGET = GoldenCheetah
 DEPENDPATH += .
-INCLUDEPATH += /usr/local/qwt/include ../srm /sw/include
+INCLUDEPATH += /usr/local/qwt/include /sw/include
 CONFIG += static debug
 QT += xml
 LIBS += /usr/local/qwt/lib/libqwt.a 
-LIBS += ../srm/libsrm.a ../pt/libpt.a
 LIBS += -lm -lz -lftd2xx
 macx {
     LIBS += -framework Carbon
 }
 
 macx || unix {
-    LIBS += ../pt/Serial.o
+    HEADERS += Serial.h
+    SOURCES += Serial.cpp
 }
-LIBS += ../pt/D2XX.o
 
 QMAKE_CXXFLAGS = -DGC_BUILD_DATE="`date +'\"%a_%b_%d,_%Y\"'`"
 RC_FILE = images/gc.icns
@@ -26,11 +25,9 @@ HEADERS += \
 	ChooseCyclistDialog.h \
 	CpintPlot.h \
 	CsvRideFile.h \
-        DatePickerDialog.h \
 	DownloadRideDialog.h \
-        LogTimeScaleDraw.h \
-        LogTimeScaleEngine.h \
 	MainWindow.h \
+	PfPvPlot.h \
 	PowerHist.h \
 	RawRideFile.h \
 	RideFile.h \
@@ -40,25 +37,27 @@ HEADERS += \
 	TcxParser.h \
 	TcxRideFile.h \
 	TimeUtils.h \
-        Zones.h \
-        Pages.h \
         ConfigDialog.h \
+        D2XX.h \
+        DatePickerDialog.h \
+        Device.h \
+        LogTimeScaleDraw.h \
+        LogTimeScaleEngine.h \
+        Pages.h \
+        PowerTap.h \
+        Zones.h \
         cpint.h \
-	PfPvPlot.h
+        srm.h
 
 SOURCES += \
 	AllPlot.cpp \
-        BasicRideMetrics.cpp \
 	BestIntervalDialog.cpp \
-        BikeScore.cpp \
 	ChooseCyclistDialog.cpp \
 	CpintPlot.cpp \
 	CsvRideFile.cpp \
-        DatePickerDialog.cpp \
 	DownloadRideDialog.cpp \
-        LogTimeScaleDraw.cpp \
-        LogTimeScaleEngine.cpp \
 	MainWindow.cpp \
+	PfPvPlot.cpp \
 	PowerHist.cpp \
 	RawRideFile.cpp \
 	RideFile.cpp \
@@ -68,12 +67,20 @@ SOURCES += \
 	TcxParser.cpp \
 	TcxRideFile.cpp \
 	TimeUtils.cpp \
-        Zones.cpp \
-        Pages.cpp \
-        ConfigDialog.cpp \
 	cpint.cpp \
-	PfPvPlot.cpp \
-	main.cpp
+        BasicRideMetrics.cpp \
+        BikeScore.cpp \
+        ConfigDialog.cpp \
+        D2XX.cpp \
+        DatePickerDialog.cpp \
+        Device.cpp \
+        LogTimeScaleDraw.cpp \
+        LogTimeScaleEngine.cpp \
+        Pages.cpp \
+        PowerTap.cpp \
+        Zones.cpp \
+	main.cpp \
+        srm.cpp
 
 RESOURCES = application.qrc
 
