@@ -49,6 +49,9 @@ search.html: search.content genpage.pl
 users-guide.html: users-guide.content genpage.pl
 	./genpage.pl "User's Guide" $< > $@
 
+wishlist.html: wishlist.content genpage.pl
+	./genpage.pl "Wish List" $< > $@
+
 zones.html: zones.content genpage.pl
 	./genpage.pl "Power Zones File Guide" $< > $@
 

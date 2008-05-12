@@ -1,0 +1,27 @@
+<big><font face="arial,helvetica,sanserif">
+I wish GoldenCheetah would let me...
+</font></big>
+<ul>
+<li>Split one ride into multiple rides</li>
+<li>Download directly from SRM</li>
+<li>Graph ride metrics (daily hours, work, BikeScore) over the long
+    term (weeks, seasons)</li>
+<li>Automatically calculate CP from .cpi files</li>
+<li>Display the numbers at the bottom of the ride plot, like the 
+    critical power graph does</li>
+<li>Select intervals in the ride plot and display metrics for them
+    at the bottom</li>
+<li>Pop up an "importing rides" thermometer when importing</li>
+<li>Remember last settings for showPower, showHr, etc., in ride plot</li>
+<li>Switch ride plot x-axis from time to distance</li>
+<li>Edit power zones in a dialog</li>
+<li>Sort rides in AllRides newest to oldest</li>
+<li>Group rides list into seasons</li>
+<li>Add lines to CP plot for seasons, last six (eight?) weeks, etc.</li>
+<li>Create new intervals</li>
+<li>Ignore zeros in power histogram</li>
+<li>Show mulitple rides (seasons, etc.) in power histogram</li>
+<li>Annotate ride plot</li>
+<li>Label rides by type, course</li>
+</ul>
+
