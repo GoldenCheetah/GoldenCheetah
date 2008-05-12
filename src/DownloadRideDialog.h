@@ -20,7 +20,7 @@
 #define _GC_DownloadRideDialog_h 1
 
 #include <QtGui>
-#include "../pt/PowerTap.h"
+#include "PowerTap.h"
 
 class MainWindow;
 class DownloadThread;

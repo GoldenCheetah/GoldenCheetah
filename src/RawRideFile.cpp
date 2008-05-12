@@ -17,7 +17,7 @@
  */
 
 #include "RawRideFile.h"
-#include "../pt/PowerTap.h"
+#include "PowerTap.h"
 #include <assert.h>
 #include <math.h>
 
