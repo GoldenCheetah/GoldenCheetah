@@ -70,6 +70,7 @@ class MainWindow : public QMainWindow
         void notesChanged();
         void saveNotes();
         void showOptions();
+	void showTools();
 
     protected: 
 
