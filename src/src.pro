@@ -58,7 +58,6 @@ HEADERS += \
         PowerTap.h \
 	ToolsDialog.h \
         Zones.h \
-        cpint.h \
         srm.h
 
 SOURCES += \
@@ -79,7 +78,6 @@ SOURCES += \
 	TcxParser.cpp \
 	TcxRideFile.cpp \
 	TimeUtils.cpp \
-	cpint.cpp \
         BasicRideMetrics.cpp \
         BikeScore.cpp \
         ConfigDialog.cpp \
