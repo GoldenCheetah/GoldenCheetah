@@ -42,6 +42,7 @@
 #include <qwt_data.h>
 
 #include "DatePickerDialog.h"
+#include "ToolsDialog.h"
 
 #define FOLDER_TYPE 0
 #define RIDE_TYPE 1
@@ -377,9 +378,12 @@ MainWindow::MainWindow(const QDir &home) :
                         SLOT (importTCX()));
     rideMenu->addAction(tr("Find &best intervals..."), this, 
                         SLOT(findBestIntervals()), tr ("Ctrl+B")); 
-    QMenu *optionsMenu = menuBar()->addMenu(tr("&Options"));
+    QMenu *optionsMenu = menuBar()->addMenu(tr("&Tools"));
     optionsMenu->addAction(tr("&Options..."), this, 
                            SLOT(showOptions()), tr("Ctrl+O")); 
+    optionsMenu->addAction(tr("&Tools..."), this, 
+                           SLOT(showTools()), tr("Ctrl+T")); 
+
  
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(tr("&About GoldenCheetah"), this, SLOT(aboutDialog()));
@@ -1067,5 +1071,12 @@ void
 MainWindow::notesChanged()
 {
     currentNotesChanged = true;
+}
+
+void MainWindow::showTools()
+{
+   ToolsDialog *td = new ToolsDialog();
+   td->exec();
+
 }
 
