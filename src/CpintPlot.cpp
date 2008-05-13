@@ -201,20 +201,6 @@ read_cpi_file(const QDir &dir, const QFileInfo &raw, QVector<double> &bests)
     return read_one(inname.toAscii().constData(), bests);
 }
 
-static void
-combine_cpi_files(const QDir &dir, QVector<double> &bests)
-{
-    QStringList filters;
-    filters << "*.cpi";
-    QStringList list = dir.entryList(filters, QDir::Files, QDir::Name);
-    QListIterator<QString> i(list);
-    while (i.hasNext()) {
-        const QString &filename = i.next();
-        QString path = dir.absoluteFilePath(filename);
-        read_one(path.toAscii().constData(), bests);
-    }
-}
-
 void
 CpintPlot::calculate(QString fileName, QDateTime dateTime) 
 {
@@ -249,14 +235,32 @@ CpintPlot::calculate(QString fileName, QDateTime dateTime)
                 }
             }
         }
+        QVector<double> bests;
         if (!aborted) {
             QString existing = progress->labelText();
             existing.chop(progress->labelText().size() - endingOffset);
+            QStringList filters;
+            filters << "*.cpi";
+            QStringList list = dir.entryList(filters, QDir::Files, QDir::Name);
             progress->setLabelText(
                 existing + tr("Aggregating over all files."));
+            progress->setRange(0, list.size());
+            progress->setValue(0);
             progress->show();
-            QVector<double> bests;
-            combine_cpi_files(dir, bests);
+            QListIterator<QString> i(list);
+            while (i.hasNext()) {
+                const QString &filename = i.next();
+                QString path = dir.absoluteFilePath(filename);
+                read_one(path.toAscii().constData(), bests);
+                progress->setValue(progress->value() + 1);
+                QCoreApplication::processEvents();
+                if (progress->wasCanceled()) {
+                    aborted = true;
+                    break;
+                }
+            }
+        }
+        if (!aborted) {
             double *timeArray = new double[bests.size()];
             int maxNonZero = 0;
             for (int i = 0; i < bests.size(); ++i) {
