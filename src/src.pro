@@ -14,10 +14,21 @@ macx {
 macx || unix {
     HEADERS += Serial.h
     SOURCES += Serial.cpp
+    QMAKE_CXXFLAGS = -DGC_BUILD_DATE="`date +'\"%a_%b_%d,_%Y\"'`"
+    RC_FILE = images/gc.icns
 }
 
-QMAKE_CXXFLAGS = -DGC_BUILD_DATE="`date +'\"%a_%b_%d,_%Y\"'`"
-RC_FILE = images/gc.icns
+win32 { 
+    LIBS = ..\lib\libregex.a \
+        C:\qwt-5.1.0\lib\libqwtd5.a \
+        -lws2_32 \
+        C:\ftdi\libftd2xx.a
+    QMAKE_LFLAGS = -Wl,--enable-runtime-pseudo-reloc \
+        -Wl,--script,i386pe.x-no-rdata
+    QMAKE_CXXFLAGS = -fdata-sections
+    INCLUDEPATH += C:\qwt-5.1.0\include \
+        C:\boost
+}
 
 HEADERS += \
 	AllPlot.h \
