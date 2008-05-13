@@ -27,7 +27,11 @@
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
-#include <arpa/inet.h>
+#ifdef WIN32
+    #include <winsock.h>
+#else
+    #include <arpa/inet.h>
+#endif
 
 static quint8 readByte(QDataStream &in) 
 {
