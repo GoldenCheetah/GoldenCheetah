@@ -95,7 +95,7 @@ class RelativeIntensity : public RideMetric {
             assert(deps.contains("skiba_xpower"));
             XPower *xp = dynamic_cast<XPower*>(deps.value("skiba_xpower"));
             assert(xp);
-            reli = xp->xpower / zones->getFTP(zoneRange);
+            reli = xp->xpower / zones->getCP(zoneRange);
             secs = xp->secs;
         }
     }
@@ -122,8 +122,7 @@ class BikeScore : public RideMetric {
         assert(ri);
         double normWork = xp->xpower * xp->secs;
         double rawBikeScore = normWork * ri->value(true);
-        // TODO: use CP, not FTP here
-        double workInAnHourAtCP = zones->getFTP(zoneRange) * 3600; 
+        double workInAnHourAtCP = zones->getCP(zoneRange) * 3600; 
         score = rawBikeScore / workInAnHourAtCP * 100.0;
     }
     RideMetric *clone() const { return new BikeScore(*this); }

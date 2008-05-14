@@ -41,34 +41,72 @@ ConfigurationPage::ConfigurationPage(QWidget *parent)
     setLayout(mainLayout);
 }
 
-/*
-CyclistPage::CyclistPage(QWidget *parent)
-: QWidget(parent)
+
+CyclistPage::CyclistPage(QWidget *parent, Zones *_zones)
+        : QWidget(parent)
 {
     QGroupBox *cyclistGroup = new QGroupBox(tr("Cyclist Options"));
 
-    QLabel *lblThreshold = new QLabel(tr("Threshold Power:"));
+    zones = _zones;
+
+    setChoseNewZone(false);
+
+    QLabel *lblThreshold = new QLabel(tr("Critical Power:"));
     txtThreshold = new QLineEdit();
+    txtThreshold->setInputMask("999");
 
-    //QLabel *lblWeight = new QLabel(tr("Weight:"));
-    //QLineEdit *txtWeight = new QLineEdit(this);
 
+    calendar = new QCalendarWidget(this);
+    setCurrentRange(zones->ranges.size() - 1);
+    QDate date = zones->getStartDate(getCurrentRange());
+    calendar->setSelectedDate(date);
+    calendar->setMinimumDate(date);
+    calendar->setEnabled(false);
+
+    QString strCP;
+
+    setCurrentRange((zones->ranges.size() - 1));
+    int ftp = zones->getCP(zones->ranges.size() - 1);
+    txtThreshold->setText(strCP.setNum(ftp));
+
+    lblCurRange = new QLabel(this);
+    lblCurRange->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    lblCurRange->setText(QString("Current Zone Range: %1").arg(getCurrentRange() + 1));
+
+    btnBack = new QPushButton(this);
+    btnBack->setText(tr("Back"));
+    btnForward = new QPushButton(this);
+    btnForward->setText(tr("Forward"));
+    btnNew = new QPushButton(this);
+    btnNew->setText(tr("New Zone Range"));
+
+    btnForward->setEnabled(false);
 
     //Layout
-    QHBoxLayout *powerLayout = new QHBoxLayout;
+    QHBoxLayout *powerLayout = new QHBoxLayout();
     powerLayout->addWidget(lblThreshold);
     powerLayout->addWidget(txtThreshold);
 
-    
-    //QHBoxLayout *thresholdLayout = new QHBoxLayout;
-    //thresholdLayout->addWidget(lblWeight);
-    //thresholdLayout->addWidget(txtWeight);
+    QHBoxLayout *rangeLayout = new QHBoxLayout();
+    rangeLayout->addWidget(lblCurRange);
+
+    QHBoxLayout *zoneLayout = new QHBoxLayout();
+    zoneLayout->addWidget(btnBack);
+    zoneLayout->addWidget(btnForward);
+    zoneLayout->addWidget(btnNew);
+
+    QHBoxLayout *calendarLayout = new QHBoxLayout();
+    calendarLayout->addWidget(calendar);
 
     QVBoxLayout *cyclistLayout = new QVBoxLayout;
     cyclistLayout->addLayout(powerLayout);
-    //cyclistLayout->addLayout(thresholdLayout);
+    cyclistLayout->addLayout(rangeLayout);
+    cyclistLayout->addLayout(zoneLayout);
+    cyclistLayout->addLayout(calendarLayout);
+
     cyclistGroup->setLayout(cyclistLayout);
-    
+
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(cyclistGroup);
     mainLayout->addStretch(1);
@@ -77,50 +115,27 @@ CyclistPage::CyclistPage(QWidget *parent)
 
 QString CyclistPage::getText()
 {
-     qDebug() << txtThreshold->text();
-     return txtThreshold->text();
+    return txtThreshold->text();
 }
-*/
 
-/*
-PowerPage::PowerPage(QWidget *parent)
-: QWidget(parent)
+void CyclistPage::setCurrentRange(int _range)
 {
-    QGroupBox *powerGroup = new QGroupBox(tr("Power Levels"));
-
-    QLabel *lblThreshold = new QLabel(tr("Threshold Power:"));
-    QLineEdit *txtThreshold = new QLineEdit(this);
-
-    QLabel *lblWeight = new QLabel(tr("Weight:"));
-    QLineEdit *txtWeight = new QLineEdit(this);
-
-
-    //Layout
-    QHBoxLayout *powerLayout = new QHBoxLayout;
-    powerLayout->addWidget(lblThreshold);
-    powerLayout->addWidget(txtThreshold);
-
-    
-    QHBoxLayout *thresholdLayout = new QHBoxLayout;
-    thresholdLayout->addWidget(lblWeight);
-    thresholdLayout->addWidget(txtWeight);
-
-    QVBoxLayout *cyclistLayout = new QVBoxLayout;
-    cyclistLayout->addLayout(powerLayout);
-    cyclistLayout->addLayout(thresholdLayout);
-    powerGroup->setLayout(cyclistLayout);
-    
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(powerGroup);
-    mainLayout->addStretch(1);
-    setLayout(mainLayout);
+    currentRange = _range;
 }
-*/
 
-//Active recovery: <55%
-//Endurance: 56-75%
-//Tempo: 76-90%
-//Threshold: 91-105%
-//VO2 max: 106-120%
-//Anaerobic Capacity: 121-150%
-//Neuromuscular power: N/A but could be anything >151%
+int CyclistPage::getCurrentRange()
+{
+    return currentRange;
+}
+
+bool CyclistPage::isNewZone()
+{
+    return newZone;
+}
+
+void CyclistPage::setChoseNewZone(bool _newZone)
+{
+    newZone = _newZone;
+}
+
+

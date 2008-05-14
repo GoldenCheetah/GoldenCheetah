@@ -176,11 +176,17 @@ void Zones::zoneInfo(int rnum, int znum,
     high = zone->hi;
 }
 
-int Zones::getFTP(int rnum) const
+int Zones::getCP(int rnum) const
 {
     assert(rnum < ranges.size());
     return ranges[rnum]->ftp;
 }
+
+void Zones::setCP(int rnum, int ftp)
+{
+    ranges[rnum]->ftp = ftp;
+}
+
 
 QString Zones::summarize(int rnum, double *time_in_zone, int num_zones) const
 {
@@ -225,70 +231,100 @@ QString Zones::summarize(int rnum, double *time_in_zone, int num_zones) const
     return summary;
 }
 
-/*  
-//  Eventually for automatically generating the power.zones file 
-//  Disabled for now until multiple date ranges are respected.
-*/
-/*
-void Zones::write(int LT, QDir home)
+void Zones::write(QDir home)
 {
-    int active_recovery = 0;
-    int endurance_start = 0;
-    int endurance_end = 0;
-    int tempo_start = 0;
-    int tempo_end = 0;
-    int threshold_start = 0;
-    int threshold_end = 0;
-    int vo2max_start = 0;
-    int vo2max_end = 0;
-    int anaerobicCapacity_start = 0;
-    int anaerobicCapacity_end = 0;
-    int neuromuscular = 0;
-
-    active_recovery = int(LT * .55);
-    endurance_start = int(LT * .56);
-    endurance_end = int(LT * .75);
-    tempo_start = int(LT * .76);
-    tempo_end = int(LT * .90);
-    threshold_start = int(LT * .91);
-    threshold_end = int(LT * 1.05);
-    vo2max_start = int(LT * 1.06);
-    vo2max_end = int(LT * 1.2);
-    anaerobicCapacity_start = int(LT * 1.21);
-    anaerobicCapacity_end = int(LT * 1.5);
-    neuromuscular =  int(LT * 1.51);
-
+    int active_recovery;
+    int endurance_start;
+    int endurance_end;
+    int tempo_start;
+    int tempo_end;
+    int threshold_start;
+    int threshold_end;
+    int vo2max_start;
+    int vo2max_end;
+    int anaerobicCapacity_start;
+    int anaerobicCapacity_end;
+    int neuromuscular;
     QString strzones;
-    strzones += QString("From BEGIN until END, FTP=%1:").arg(LT);
-    strzones += QString("\n");
-    strzones += QString("1,Active Recovery, 1, %1").arg(active_recovery);
-    strzones += QString("\n");
-    strzones += QString("2,Endurance, %1, %2").arg(endurance_start).arg(endurance_end); 
-    strzones += QString("\n");
-    strzones += QString("3,Tempo, %1, %2").arg(tempo_start).arg(tempo_end); 
-    strzones += QString("\n");
-    strzones += QString("4,Threshold, %1, %2").arg(threshold_start).arg(threshold_end); 
-    strzones += QString("\n");
-    strzones += QString("5,VO2Max, %1, %2").arg(vo2max_start).arg(vo2max_end); 
-    strzones += QString("\n");
-    strzones += QString("6,Anaerobic, %1, %2").arg(anaerobicCapacity_start).arg(anaerobicCapacity_end); 
-    strzones += QString("\n");
-    strzones += QString("7,Neuromuscular, %1,").arg(neuromuscular); 
-    strzones += QString("MAX");
-    strzones += QString("\n"); 
-    qDebug() << "Zones are:" << strzones; 
-   
-    QFile file( home.absolutePath() + "/power.zones" );
-     if ( file.open( QFile::WriteOnly ) ) {
-        QTextStream stream( &file );
-         stream << strzones;
-     file.close();
-     }
 
-*/
+    for (int i = 0; i < ranges.size(); i++)
+    {
+        int LT = getCP(i);
 
+        active_recovery = 0;
+        endurance_start = 0;
+        endurance_end = 0;
+        tempo_start = 0;
+        tempo_end = 0;
+        threshold_start = 0;
+        threshold_end = 0;
+        vo2max_start = 0;
+        vo2max_end = 0;
+        anaerobicCapacity_start = 0;
+        anaerobicCapacity_end = 0;
+        neuromuscular = 0;
+
+
+        active_recovery = int (LT * .55);
+        endurance_start = int (LT * .56);
+        endurance_end = int (LT * .75);
+        tempo_start = int (LT * .76);
+        tempo_end = int (LT * .90);
+        threshold_start = int (LT * .91);
+        threshold_end = int (LT * 1.05);
+        vo2max_start = int (LT * 1.06);
+        vo2max_end = int (LT * 1.2);
+        anaerobicCapacity_start = int (LT * 1.21);
+        anaerobicCapacity_end = int (LT * 1.5);
+        neuromuscular =  int (LT * 1.51);
+
+        if (i == 0)
+            strzones += QString("FROM BEGIN UNTIL %1, CP=%2:").arg(getEndDate(i).toString("yyyy/MM/dd")).arg(LT);
+        else if (i == ranges.size() - 1)
+            strzones += QString("FROM %1 UNTIL END, CP=%2:").arg(getStartDate(i).toString("yyyy/MM/dd")).arg(LT);
+        else
+            strzones += QString("FROM %1 UNTIL %2, CP=%3:").arg(getStartDate(i).toString("yyyy/MM/yy")).arg(getEndDate(i).toString("yyyy/MM/dd")).arg(LT);
+
+
+        strzones += QString("\n");
+        strzones += QString("1,Active Recovery, 1, %1").arg(active_recovery);
+        strzones += QString("\n");
+        strzones += QString("2,Endurance, %1, %2").arg(endurance_start).arg(endurance_end);
+        strzones += QString("\n");
+        strzones += QString("3,Tempo, %1, %2").arg(tempo_start).arg(tempo_end);
+        strzones += QString("\n");
+        strzones += QString("4,Threshold, %1, %2").arg(threshold_start).arg(threshold_end);
+        strzones += QString("\n");
+        strzones += QString("5,VO2Max, %1, %2").arg(vo2max_start).arg(vo2max_end);
+        strzones += QString("\n");
+        strzones += QString("6,Anaerobic, %1, %2").arg(anaerobicCapacity_start).arg(anaerobicCapacity_end);
+        strzones += QString("\n");
+        strzones += QString("7,Neuromuscular, %1,").arg(neuromuscular);
+        strzones += QString("MAX");
+        strzones += QString("\n");
+        strzones += QString("\n");
+
+    }
+
+
+    QFile file(home.absolutePath() + "/power.zones");
+    if (file.open(QFile::WriteOnly))
+    {
+        QTextStream stream(&file);
+        stream << strzones << endl;
+        file.close();
+    }
+
+}
+
+void Zones::addZoneRange(QDate _start, QDate _end, int _ftp)
+{
+    ZoneRange *range = new ZoneRange(_start, _end);
+    range->ftp = _ftp;
+    ranges.append(range);
+}
 /*
-From 2008/01/01 until END,FTP=270:
+From 2008/01/01 until END,CP=270:
     1,Active Recovery,      1, 150
     2,Endurance,          151, 204
     3,Tempo,              205, 245
@@ -296,4 +332,12 @@ From 2008/01/01 until END,FTP=270:
     5,VO2Max,             286, 326
     6,Anaerobic,          327, MAX
 */
-//}
+
+void Zones::setEndDate(int rnum, QDate endDate)
+{
+    ranges[rnum]->end = endDate;
+}
+void Zones::setStartDate(int rnum, QDate startDate)
+{
+    ranges[rnum]->begin = startDate;
+}

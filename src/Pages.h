@@ -3,6 +3,11 @@
 
 #include <QWidget>
 #include <QComboBox>
+#include <QCalendarWidget>
+#include <QPushButton>
+#include <QList>
+#include "Zones.h"
+#include <QLabel>
 
 class ConfigurationPage : public QWidget
 {
@@ -14,11 +19,26 @@ class ConfigurationPage : public QWidget
 class CyclistPage : public QWidget
 {
     public:
-       CyclistPage(QWidget *parent = 0);
-       int thresholdPower;
-       QLineEdit *txtThreshold; 
-       QString getText();
-       //int weight;
+        CyclistPage(QWidget *parent = 0, Zones *_zones = 0);
+        int thresholdPower;
+        QLineEdit *txtThreshold;
+        QString getText();
+        QCalendarWidget *calendar;
+        void setCurrentRange(int range);
+        QPushButton *btnBack;
+        QPushButton *btnForward;
+        QPushButton *btnNew;
+        QLabel *lblCurRange;
+
+        int getCurrentRange();
+        void setChoseNewZone(bool _newZone);
+        bool isNewZone();
+
+    private:
+        Zones *zones;
+        int currentRange;
+        bool newZone;
+
 };
 
 /*
