@@ -52,14 +52,6 @@ CpintPlot::CpintPlot(QString p) :
     grid->attach(this);
 }
 
-static int
-cancel_cb(void *user_data) 
-{
-    CpintPlot *self = (CpintPlot*) user_data;
-    QCoreApplication::processEvents();
-    return self->progress->wasCanceled();
-}
-
 struct cpi_file_info {
     QString file, inname, outname;
 };
@@ -104,9 +96,8 @@ struct cpint_data {
 };
 
 static void
-update_cpi_file(const cpi_file_info *info, 
-                int (*cancel_cb)(void *user_data),
-                void *user_data) 
+update_cpi_file(const cpi_file_info *info, QProgressDialog *progress,
+                double &progress_sum, double progress_max)
 {
     QFile file(info->inname);
     QStringList errors;
@@ -137,8 +128,14 @@ update_cpi_file(const cpi_file_info *info,
         double prev_secs = p->secs;
         for (int j = i + 1; j < data.points.size(); ++j) {
             cpint_point *q = &data.points[j];
-            if (cancel_cb && (++progress_count % 1000 == 0)) {
-                if (cancel_cb(user_data)) {
+            if (++progress_count % 1000 == 0) {
+                double x = (progress_count + progress_sum)
+                    / progress_max * 1000.0;
+                // Use min() just in case math is wrong...
+                int n = qMin((int) round(x), 1000);
+                progress->setValue(n);
+                QCoreApplication::processEvents();
+                if (progress->wasCanceled()) {
                     canceled = true;
                     goto done;
                 }
@@ -166,6 +163,7 @@ done:
     fclose(out);
     if (canceled)
         unlink(info->outname.toAscii().constData());
+    progress_sum += progress_count;
 }
 
 static int 
@@ -212,10 +210,26 @@ CpintPlot::calculate(QString fileName, QDateTime dateTime)
         bool aborted = false;
         QList<cpi_file_info> to_update; 
         cpi_files_to_update(dir, to_update);
+        double progress_max = 0.0;
+        if (!to_update.empty()) {
+            QListIterator<cpi_file_info> i(to_update);
+            while (i.hasNext()) {
+                const cpi_file_info &info = i.next();
+                QFile file(info.inname);
+                QStringList errors;
+                RideFile *rideFile = 
+                    RideFileFactory::instance().openRideFile(file, errors);
+                assert(rideFile);
+                double x = rideFile->dataPoints().size();
+                progress_max += x * (x - 1.0) / 2.0;
+                delete rideFile;
+            }
+        }
         progress = new QProgressDialog(
             QString(tr("Computing critical power intervals.\n"
                        "This may take a while.\n")),
-            tr("Abort"), 0, to_update.size() + 1, this);
+            tr("Abort"), 0, 1000, this);
+        double progress_sum = 0.0;
         int endingOffset = progress->labelText().size();
         if (!to_update.empty()) {
             QListIterator<cpi_file_info> i(to_update);
@@ -227,7 +241,7 @@ CpintPlot::calculate(QString fileName, QDateTime dateTime)
                 progress->setLabelText(
                     existing + QString(tr("Processing %1...")).arg(info.file));
                 progress->setValue(count++);
-                update_cpi_file(&info, cancel_cb, this);
+                update_cpi_file(&info, progress, progress_sum, progress_max);
                 QCoreApplication::processEvents();
                 if (progress->wasCanceled()) {
                     aborted = true;
