@@ -56,6 +56,7 @@ HEADERS += \
         LogTimeScaleEngine.h \
         Pages.h \
         PowerTap.h \
+        Serial.h \
 	ToolsDialog.h \
         Zones.h \
         srm.h
@@ -88,6 +89,7 @@ SOURCES += \
         LogTimeScaleEngine.cpp \
         Pages.cpp \
         PowerTap.cpp \
+        Serial.cpp \
 	ToolsDialog.cpp \
         Zones.cpp \
 	main.cpp \
