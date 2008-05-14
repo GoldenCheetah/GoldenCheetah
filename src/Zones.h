@@ -47,7 +47,6 @@ class Zones : public QObject
             }
         };
 
-        QList<ZoneRange*> ranges;
         QString err;
 
     public:
@@ -79,6 +78,8 @@ class Zones : public QObject
         QDate getEndDate(int rnum);
         void setEndDate(int rnum, QDate date);
         void setStartDate(int rnum, QDate date);
+        QList<ZoneRange*> ranges;
+
 };
 
 #endif // _Zones_h

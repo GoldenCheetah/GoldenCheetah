@@ -341,3 +341,15 @@ void Zones::setStartDate(int rnum, QDate startDate)
 {
     ranges[rnum]->begin = startDate;
 }
+
+QDate Zones::getStartDate(int rnum)
+{
+    return ranges[rnum]->begin;
+}
+
+QDate Zones::getEndDate(int rnum)
+{
+    return ranges[rnum]->end;
+}
+
+
