@@ -60,18 +60,25 @@ class Zones : public QObject
                 delete i.next();
         }
 
+        void addZoneRange(QDate _start, QDate _end, int _ftp);
+
         bool read(QFile &file);
-        void write(int LT, QDir home);
+        void write(QDir home);
         const QString &errorString() const { return err; }
 
         int whichRange(const QDate &date) const;
         int numZones(int range) const;
         int whichZone(int range, double value) const;
-        void zoneInfo(int range, int zone, 
+        void zoneInfo(int range, int zone,
                       QString &name, QString &description,
                       int &low, int &high) const;
         QString summarize(int rnum, double *time_in_zone, int num_zones) const;
-        int getFTP(int rnum) const;
+        int getCP(int rnum) const;
+        void setCP(int rnum, int ftp);
+        QDate getStartDate(int rnum);
+        QDate getEndDate(int rnum);
+        void setEndDate(int rnum, QDate date);
+        void setStartDate(int rnum, QDate date);
 };
 
 #endif // _Zones_h

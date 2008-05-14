@@ -23,10 +23,22 @@ ConfigDialog::ConfigDialog(QDir _home)
 
 
     configPage = new ConfigurationPage();
-    //cyclistPage = new CyclistPage();
+
+    QFile zonesFile(_home.absolutePath() + "/power.zones");
+    if (zonesFile.exists())
+    {
+        zones = new Zones();
+        if (!zones->read(zonesFile))
+        {
+            QMessageBox::warning(this, tr("Zones File Error"), zones->errorString());
+            zones = NULL;
+        }
+    }
+
+    cyclistPage = new CyclistPage(this, zones);
     pagesWidget = new QStackedWidget;
     pagesWidget->addWidget(configPage);
-    //pagesWidget->addWidget(cyclistPage);
+    pagesWidget->addWidget(cyclistPage);
     //pagesWidget->addWidget(new QueryPage);
 
     QPushButton *closeButton = new QPushButton(tr("Close"));
@@ -37,6 +49,9 @@ ConfigDialog::ConfigDialog(QDir _home)
 
     connect(closeButton, SIGNAL(clicked()), this, SLOT(reject()));
     connect(saveButton, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(cyclistPage->btnBack, SIGNAL(clicked()), this, SLOT(back_Clicked()));
+    connect(cyclistPage->btnForward, SIGNAL(clicked()), this, SLOT(forward_Clicked()));
+    connect(cyclistPage->btnNew, SIGNAL(clicked()), this, SLOT(new_Clicked()));
 
     QHBoxLayout *horizontalLayout = new QHBoxLayout;
     horizontalLayout->addWidget(contentsWidget);
@@ -65,28 +80,14 @@ void ConfigDialog::createIcons()
     configButton->setTextAlignment(Qt::AlignHCenter);
     configButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
-    /*
+
     QListWidgetItem *cyclistButton = new QListWidgetItem(contentsWidget);
     cyclistButton->setIcon(QIcon(":images/cyclist.png"));
     cyclistButton->setText(tr("Cyclist Info"));
     cyclistButton->setTextAlignment(Qt::AlignHCenter);
     cyclistButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    */
-    
-    /*
-    QListWidgetItem *powerButton = new QListWidgetItem(contentsWidget);
-    powerButton->setIcon(QIcon("images/power.png"));
-    powerButton->setText(tr("Power Levels"));
-    powerButton->setTextAlignment(Qt::AlignHCenter);
-    powerButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
- 
-       QListWidgetItem *queryButton = new QListWidgetItem(contentsWidget);
-       queryButton->setIcon(QIcon(":/images/query.png"));
-       queryButton->setText(tr("Query"));
-       queryButton->setTextAlignment(Qt::AlignHCenter);
-       queryButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-       */
+
     connect(contentsWidget,
             SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
             this, SLOT(changePage(QListWidgetItem *, QListWidgetItem*)));
@@ -106,19 +107,138 @@ void ConfigDialog::save_Clicked()
 {
     QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
     settings.setValue(GC_UNIT, configPage->unitCombo->currentText());
-    
-/*
-    QString strLT = cyclistPage->txtThreshold->text();
-    qDebug() << "LT is: " << strLT;
-    double LT = strLT.toDouble();
- 
 
-    Zones *zones = new Zones();
-    zones->write(LT, QDir(home));
-    
-    delete zones;
-*/
+    //If the user never switched pages, then make sure we have up to date data.
+    if (cyclistPage->getCurrentRange() == zones->ranges.size() - 1)
+    {
+        // Record the End Date..
+        zones->setStartDate(zones->ranges.size() - 1, cyclistPage->calendar->selectedDate());
+        //Swap the end date for the previous zone..
+        zones->setEndDate(zones->ranges.size() - 2, cyclistPage->calendar->selectedDate());
+        
+        //Store the CP for the new Zone..
+        zones->setCP(cyclistPage->getCurrentRange(), cyclistPage->txtThreshold->text().toInt());
+    }
+
+    zones->write(home);
+
     accept();
 
+}
+
+void ConfigDialog::back_Clicked()
+{
+
+    if ((cyclistPage->txtThreshold->isModified() == true) || cyclistPage->btnNew->isEnabled() == true)
+    {
+        if (cyclistPage->txtThreshold->text().length() == 0)
+        {
+            QMessageBox::warning(this, tr("Missing Field"), "CP cannot be empty.");
+            cyclistPage->txtThreshold->setFocus();
+            return;
+        }
+
+        //Store the current CP before changing zones.
+        zones->setCP(cyclistPage->getCurrentRange(), cyclistPage->txtThreshold->text().toInt());
+    }
+    cyclistPage->setCurrentRange(cyclistPage->getCurrentRange() - 1);
+    cyclistPage->btnForward->setEnabled(true);
+    int ftp = zones->getCP(cyclistPage->getCurrentRange());
+    QString strCP;
+    cyclistPage->txtThreshold->setText(strCP.setNum(ftp));
+
+    QDate _date = zones->getEndDate(cyclistPage->getCurrentRange());
+    if (cyclistPage->btnNew->isEnabled() == true)
+        cyclistPage->calendar->setEnabled(false);
+    cyclistPage->calendar->setMinimumDate(zones->getStartDate(0));
+    cyclistPage->calendar->setSelectedDate(_date);
+
+    if (cyclistPage->getCurrentRange() == 0)
+        cyclistPage->btnBack->setEnabled(false);
+    cyclistPage->lblCurRange->setText(QString("Current Zone Range: %1").arg(cyclistPage->getCurrentRange() + 1));
+
+}
+
+void ConfigDialog::forward_Clicked()
+{
+
+    if ((cyclistPage->txtThreshold->isModified() == true) || cyclistPage->btnNew->isEnabled() == true)
+    {
+        if (cyclistPage->txtThreshold->text().length() == 0)
+        {
+            QMessageBox::warning(this, tr("Missing Field"), "CP cannot be empty");
+            cyclistPage->txtThreshold->setFocus();
+            return;
+        }
+
+        //Store the current CP before changing zones.
+        zones->setCP(cyclistPage->getCurrentRange(), cyclistPage->txtThreshold->text().toInt());
+    }
+    if (cyclistPage->btnNew->isEnabled() == true)
+        cyclistPage->calendar->setEnabled(false);
+    //Now switch zones
+    QDate date;
+    cyclistPage->setCurrentRange(cyclistPage->getCurrentRange() + 1);
+
+    int ftp = zones->getCP(cyclistPage->getCurrentRange());
+    QString strCP;
+    cyclistPage->txtThreshold->setText(strCP.setNum(ftp));
+
+    if (cyclistPage->getCurrentRange() + 1 == zones->ranges.size())
+    {
+        cyclistPage->btnForward->setEnabled(false);
+        date = zones->getStartDate(cyclistPage->getCurrentRange());
+    }
+    else
+        date = zones->getEndDate(cyclistPage->getCurrentRange());
+
+    cyclistPage->calendar->setSelectedDate(date);
+    cyclistPage->calendar->setMinimumDate(zones->getStartDate(cyclistPage->getCurrentRange()));
+    cyclistPage->btnBack->setEnabled(true);
+    cyclistPage->lblCurRange->setText(QString("Current Zone Range: %1").arg(cyclistPage->getCurrentRange() + 1));
+}
+
+void ConfigDialog::new_Clicked()
+{
+
+    if ((cyclistPage->txtThreshold->isModified() == true) || cyclistPage->btnNew->isEnabled() == true)
+    {
+        if (cyclistPage->txtThreshold->text().length() == 0)
+        {
+            QMessageBox::warning(this, tr("Missing Field"), "CP cannot be empty");
+            cyclistPage->txtThreshold->setFocus();
+            return;
+        }
+
+        //Store the current CP before changing zones.
+        zones->setCP(cyclistPage->getCurrentRange(), cyclistPage->txtThreshold->text().toInt());
+    }
+
+
+    cyclistPage->setChoseNewZone(true);
+    cyclistPage->txtThreshold->setText("");
+    cyclistPage->btnNew->setEnabled(false);
+    cyclistPage->calendar->setEnabled(true);
+
+    //Modify the current zone..
+    zones->setEndDate(cyclistPage->getCurrentRange(), cyclistPage->calendar->selectedDate());
+    
+    
+    //Create the Zone
+    cyclistPage->calendar->setMinimumDate(zones->getStartDate(zones->ranges.size() - 1));
+    zones->addZoneRange(zones->getStartDate(cyclistPage->getCurrentRange()), cyclistPage->calendar->selectedDate(), 0);
+    cyclistPage->setCurrentRange(zones->ranges.size() - 1);
+    cyclistPage->lblCurRange->setText(QString("Current Zone Range: %1").arg(cyclistPage->getCurrentRange() + 1));
+    
+    
+    
+
+
+
+}
+
+ConfigDialog::~ConfigDialog()
+{
+    delete zones;
 }
 
