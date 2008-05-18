@@ -118,6 +118,10 @@ update_cpi_file(const cpi_file_info *info, QProgressDialog *progress,
     assert(out);
 
     int total_secs = (int) ceil(data.points.back().secs);
+    if (total_secs > 7*24*60*60) {
+        fclose(out);
+        return;
+    }
     double *bests = (double*) calloc(total_secs + 1, sizeof(double));
 
     bool canceled = false;

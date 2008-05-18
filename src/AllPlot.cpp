@@ -82,6 +82,14 @@ AllPlot::recalc()
     if (!timeArray)
         return;
     int rideTimeSecs = (int) ceil(timeArray[arrayLength - 1]);
+    if (rideTimeSecs > 7*24*60*60) {
+        QwtArray<double> data;
+        wattsCurve->setData(data, data);
+        hrCurve->setData(data, data);
+        speedCurve->setData(data, data);
+        cadCurve->setData(data, data);
+        return;
+    }
     double totalWatts = 0.0;
     double totalHr = 0.0;
     double totalSpeed = 0.0;
