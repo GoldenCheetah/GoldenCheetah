@@ -116,6 +116,11 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                     kph *= MILES_TO_KM;
                 }
             }
+            
+            // PT reports no data as watts == -1.
+            if (watts == -1)
+                watts = 0;
+            
             rideFile->appendPoint(minutes * 60.0, cad, hr, km, 
                                   kph, nm, watts, interval);
         }
