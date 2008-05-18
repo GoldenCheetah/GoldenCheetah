@@ -21,7 +21,6 @@ ConfigDialog::ConfigDialog(QDir _home)
     contentsWidget->setMinimumHeight(128);
     contentsWidget->setSpacing(12);
 
-
     configPage = new ConfigurationPage();
 
     QFile zonesFile(_home.absolutePath() + "/power.zones");
@@ -33,15 +32,22 @@ ConfigDialog::ConfigDialog(QDir _home)
             QMessageBox::warning(this, tr("Zones File Error"), zones->errorString());
             zones = NULL;
         }
+        cyclistPage = new CyclistPage(this, zones, false);
+    }
+    else
+    {
+        //If there is no zones file, create one in memory.
+   	    QDate date;
+    	zones = new Zones();
+   	    zones->addZoneRange(date.currentDate(), date.currentDate(), 0);
+        cyclistPage = new CyclistPage(this, zones, true);
     }
 
-    cyclistPage = new CyclistPage(this, zones);
     pagesWidget = new QStackedWidget;
     pagesWidget->addWidget(configPage);
     pagesWidget->addWidget(cyclistPage);
-    //pagesWidget->addWidget(new QueryPage);
 
-    QPushButton *closeButton = new QPushButton(tr("Close"));
+    QPushButton *closeButton = new QPushButton(tr("Cancel"));
     saveButton = new QPushButton(tr("Save"));
 
     createIcons();
@@ -109,15 +115,26 @@ void ConfigDialog::save_Clicked()
     settings.setValue(GC_UNIT, configPage->unitCombo->currentText());
 
     //If the user never switched pages, then make sure we have up to date data.
-    if (cyclistPage->getCurrentRange() == zones->ranges.size() - 1)
+    if (cyclistPage->getCurrentRange() == 0 || cyclistPage->getCurrentRange() == zones->getRangeSize() - 1)
     {
-        // Record the End Date..
-        zones->setStartDate(zones->ranges.size() - 1, cyclistPage->calendar->selectedDate());
-        //Swap the end date for the previous zone..
-        zones->setEndDate(zones->ranges.size() - 2, cyclistPage->calendar->selectedDate());
+    	if(cyclistPage->getCurrentRange() != 0)
+    	{
+            // Record the End Date..
+            zones->setStartDate(zones->getRangeSize() - 1, cyclistPage->calendar->selectedDate());
+            //Swap the end date for the previous zone..
+            zones->setEndDate(zones->getRangeSize() - 2, cyclistPage->calendar->selectedDate());
         
-        //Store the CP for the new Zone..
-        zones->setCP(cyclistPage->getCurrentRange(), cyclistPage->txtThreshold->text().toInt());
+            //Store the CP for the new Zone..
+            zones->setCP(cyclistPage->getCurrentRange(), cyclistPage->txtThreshold->text().toInt());
+    	} 
+    	else 
+    	{
+    		QDate date;
+    		zones->setStartDate(0, cyclistPage->calendar->selectedDate());
+    		zones->setEndDate(0, date.currentDate());
+    		zones->setCP(0, cyclistPage->txtThreshold->text().toInt());
+    		cyclistPage->setCurrentRange(1);
+        }
     }
 
     zones->write(home);
@@ -156,6 +173,10 @@ void ConfigDialog::back_Clicked()
     if (cyclistPage->getCurrentRange() == 0)
         cyclistPage->btnBack->setEnabled(false);
     cyclistPage->lblCurRange->setText(QString("Current Zone Range: %1").arg(cyclistPage->getCurrentRange() + 1));
+    
+	cyclistPage->txtStartDate->setDate(zones->getStartDate(cyclistPage->getCurrentRange()));
+	cyclistPage->txtEndDate->setDate(zones->getEndDate(cyclistPage->getCurrentRange()));
+
 
 }
 
@@ -184,7 +205,7 @@ void ConfigDialog::forward_Clicked()
     QString strCP;
     cyclistPage->txtThreshold->setText(strCP.setNum(ftp));
 
-    if (cyclistPage->getCurrentRange() + 1 == zones->ranges.size())
+    if (cyclistPage->getCurrentRange() + 1 == zones->getRangeSize())
     {
         cyclistPage->btnForward->setEnabled(false);
         date = zones->getStartDate(cyclistPage->getCurrentRange());
@@ -196,6 +217,10 @@ void ConfigDialog::forward_Clicked()
     cyclistPage->calendar->setMinimumDate(zones->getStartDate(cyclistPage->getCurrentRange()));
     cyclistPage->btnBack->setEnabled(true);
     cyclistPage->lblCurRange->setText(QString("Current Zone Range: %1").arg(cyclistPage->getCurrentRange() + 1));
+    
+	cyclistPage->txtStartDate->setDate(zones->getStartDate(cyclistPage->getCurrentRange()));
+	cyclistPage->txtEndDate->setDate(zones->getEndDate(cyclistPage->getCurrentRange()));
+
 }
 
 void ConfigDialog::new_Clicked()
@@ -225,16 +250,14 @@ void ConfigDialog::new_Clicked()
     
     
     //Create the Zone
-    cyclistPage->calendar->setMinimumDate(zones->getStartDate(zones->ranges.size() - 1));
+    cyclistPage->calendar->setMinimumDate(zones->getStartDate(zones->getRangeSize() - 1));
     zones->addZoneRange(zones->getStartDate(cyclistPage->getCurrentRange()), cyclistPage->calendar->selectedDate(), 0);
-    cyclistPage->setCurrentRange(zones->ranges.size() - 1);
+    cyclistPage->setCurrentRange(zones->getRangeSize() - 1);
     cyclistPage->lblCurRange->setText(QString("Current Zone Range: %1").arg(cyclistPage->getCurrentRange() + 1));
     
+    QDate date;
+    cyclistPage->calendar->setSelectedDate(date.currentDate());
     
-    
-
-
-
 }
 
 ConfigDialog::~ConfigDialog()
