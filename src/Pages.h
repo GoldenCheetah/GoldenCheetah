@@ -8,6 +8,7 @@
 #include <QList>
 #include "Zones.h"
 #include <QLabel>
+#include <QDateEdit>
 
 class ConfigurationPage : public QWidget
 {
@@ -19,7 +20,7 @@ class ConfigurationPage : public QWidget
 class CyclistPage : public QWidget
 {
     public:
-        CyclistPage(QWidget *parent = 0, Zones *_zones = 0);
+        CyclistPage(QWidget *parent = 0, Zones *_zones = 0, bool emptyZone = true);
         int thresholdPower;
         QLineEdit *txtThreshold;
         QString getText();
@@ -29,6 +30,10 @@ class CyclistPage : public QWidget
         QPushButton *btnForward;
         QPushButton *btnNew;
         QLabel *lblCurRange;
+        QDateEdit *txtStartDate;
+        QDateEdit *txtEndDate;
+        QLabel *lblStartDate;
+        QLabel *lblEndDate;
 
         int getCurrentRange();
         void setChoseNewZone(bool _newZone);

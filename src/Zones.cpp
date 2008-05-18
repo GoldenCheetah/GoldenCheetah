@@ -278,7 +278,9 @@ void Zones::write(QDir home)
         anaerobicCapacity_end = int (LT * 1.5);
         neuromuscular =  int (LT * 1.51);
 
-        if (i == 0)
+        if(ranges.size() <= 1)
+            strzones += QString("FROM BEGIN UNTIL END, CP=%1:").arg(LT);
+        else if (i == 0)
             strzones += QString("FROM BEGIN UNTIL %1, CP=%2:").arg(getEndDate(i).toString("yyyy/MM/dd")).arg(LT);
         else if (i == ranges.size() - 1)
             strzones += QString("FROM %1 UNTIL END, CP=%2:").arg(getStartDate(i).toString("yyyy/MM/dd")).arg(LT);
@@ -352,4 +354,8 @@ QDate Zones::getEndDate(int rnum)
     return ranges[rnum]->end;
 }
 
+int Zones::getRangeSize()
+{
+    return ranges.size();
+}
 
