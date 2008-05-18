@@ -27,7 +27,7 @@ win32 {
     INCLUDEPATH += C:\qwt-5.1.0\include\
         C:\boost
     RC_FILE -= images/gc.icns
-
+    RC_FILE += windowsico.rc
 }
 
 HEADERS += \
