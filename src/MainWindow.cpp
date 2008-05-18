@@ -707,179 +707,181 @@ void
 MainWindow::rideSelected()
 {
     assert(treeWidget->selectedItems().size() <= 1);
-    if (treeWidget->selectedItems().size() == 1) {
-        QTreeWidgetItem *which = treeWidget->selectedItems().first();
-        if (which->type() == RIDE_TYPE) {
-            RideItem *ride = (RideItem*) which;
-            rideSummary->setHtml(ride->htmlSummary());
-            rideSummary->setAlignment(Qt::AlignCenter);
-            if (ride->ride)
-                allPlot->setData(ride->ride);
-            if (tabWidget->currentIndex() == 2)
-                cpintPlot->calculate(ride->fileName, ride->dateTime);
-            if (ride->ride)
-                powerHist->setData(ride->ride);
-	    if (ride->ride)
-		pfPvPlot->setData(ride->ride);
+    if (treeWidget->selectedItems().size() == 0) {
+        rideSummary->clear();
+        return;
+    }
 
-            QDate wstart = ride->dateTime.date();
-            wstart = wstart.addDays(Qt::Monday - wstart.dayOfWeek());
-            assert(wstart.dayOfWeek() == Qt::Monday);
-            QDate wend = wstart.addDays(7);
-            const RideMetricFactory &factory = RideMetricFactory::instance();
-            RideMetric *weeklySeconds = factory.newMetric("time_riding");
-            assert(weeklySeconds);
-            RideMetric *weeklyDistance = factory.newMetric("total_distance");
-            assert(weeklyDistance);
-            RideMetric *weeklyWork = factory.newMetric("total_work");
+    QTreeWidgetItem *which = treeWidget->selectedItems().first();
+    if (which->type() != RIDE_TYPE) {
+        rideSummary->clear();
+        return;
+    }
 
-            int zone_range = -1;
-            double *time_in_zone = NULL;
-            int num_zones = -1;
-            bool zones_ok = true;
+    RideItem *ride = (RideItem*) which;
+    rideSummary->setHtml(ride->htmlSummary());
+    rideSummary->setAlignment(Qt::AlignCenter);
+    if (ride->ride)
+        allPlot->setData(ride->ride);
+    if (tabWidget->currentIndex() == 2)
+        cpintPlot->calculate(ride->fileName, ride->dateTime);
+    if (ride->ride)
+        powerHist->setData(ride->ride);
+    if (ride->ride)
+        pfPvPlot->setData(ride->ride);
 
-            for (int i = 0; i < allRides->childCount(); ++i) {
-                if (allRides->child(i)->type() == RIDE_TYPE) {
-                    RideItem *item = (RideItem*) allRides->child(i);
-                    if ((item->dateTime.date() >= wstart)
-                        && (item->dateTime.date() < wend)) {
-                        RideMetric *m;
-                        item->htmlSummary(); // compute metrics
-                        m = item->metrics.value(weeklySeconds->name());
-                        assert(m);
-                        weeklySeconds->aggregateWith(m);
-                        m = item->metrics.value(weeklyDistance->name());
-                        assert(m);
-                        weeklyDistance->aggregateWith(m);
-                        m = item->metrics.value(weeklyWork->name());
-                        assert(m);
-                        weeklyWork->aggregateWith(m);
-                        if (zones) {
-                            if (zone_range == -1) {
-                                zone_range = item->zoneRange();
-                                num_zones = item->numZones();
-                                time_in_zone = new double[num_zones];
-                            }
-                            else if (item->zoneRange() != zone_range) {
-                                zones_ok = false;
-                            }
-                            if (zone_range != -1) {
-                                for (int j = 0; j < num_zones; ++j)
-                                    time_in_zone[j] += item->timeInZone(j);
-                            }
-                        }
+    QDate wstart = ride->dateTime.date();
+    wstart = wstart.addDays(Qt::Monday - wstart.dayOfWeek());
+    assert(wstart.dayOfWeek() == Qt::Monday);
+    QDate wend = wstart.addDays(7);
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    RideMetric *weeklySeconds = factory.newMetric("time_riding");
+    assert(weeklySeconds);
+    RideMetric *weeklyDistance = factory.newMetric("total_distance");
+    assert(weeklyDistance);
+    RideMetric *weeklyWork = factory.newMetric("total_work");
+
+    int zone_range = -1;
+    double *time_in_zone = NULL;
+    int num_zones = -1;
+    bool zones_ok = true;
+
+    for (int i = 0; i < allRides->childCount(); ++i) {
+        if (allRides->child(i)->type() == RIDE_TYPE) {
+            RideItem *item = (RideItem*) allRides->child(i);
+            if ((item->dateTime.date() >= wstart)
+                && (item->dateTime.date() < wend)) {
+                RideMetric *m;
+                item->htmlSummary(); // compute metrics
+                m = item->metrics.value(weeklySeconds->name());
+                assert(m);
+                weeklySeconds->aggregateWith(m);
+                m = item->metrics.value(weeklyDistance->name());
+                assert(m);
+                weeklyDistance->aggregateWith(m);
+                m = item->metrics.value(weeklyWork->name());
+                assert(m);
+                weeklyWork->aggregateWith(m);
+                if (zones) {
+                    if (zone_range == -1) {
+                        zone_range = item->zoneRange();
+                        num_zones = item->numZones();
+                        time_in_zone = new double[num_zones];
+                    }
+                    else if (item->zoneRange() != zone_range) {
+                        zones_ok = false;
+                    }
+                    if (zone_range != -1) {
+                        for (int j = 0; j < num_zones; ++j)
+                            time_in_zone[j] += item->timeInZone(j);
                     }
                 }
             }
-
-            int minutes = ((int) round(weeklySeconds->value(true))) / 60;
-            int hours = (int) minutes / 60;
-            minutes %= 60;
-
-            const char *dateFormat = "MM/dd/yyyy";
-           
-            QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-            QVariant unit = settings.value(GC_UNIT);
-
-            QString summary;
-            if (unit.toString() == "Metric") {
-                summary = tr(
-                    "<center>"
-                    "<h2>Week of %1 through %2</h2>"
-                    "<h2>Summary</h2>"
-                    "<p>"
-                    "<table align=\"center\" width=\"60%\" border=0>"
-                    "<tr><td>Total time riding:</td>"
-                    "    <td align=\"right\">%3:%4</td></tr>"
-                    "<tr><td>Total distance (kilometers):</td>"
-                    "    <td align=\"right\">%5</td></tr>"
-                    "<tr><td>Total work (kJ):</td>"
-                    "    <td align=\"right\">%6</td></tr>"
-                    "<tr><td>Daily Average work (kJ):</td>"
-                    "    <td align=\"right\">%7</td></tr>"
-                    "</table>"
-                 )
-                .arg(wstart.toString(dateFormat))
-                .arg(wstart.addDays(6).toString(dateFormat))
-                .arg(hours)
-                .arg(minutes, 2, 10, QLatin1Char('0'))
-                .arg((unsigned) round(weeklyDistance->value(true)))
-                .arg((unsigned) round(weeklyWork->value(true)))
-                .arg((unsigned) round(weeklyWork->value(true) / 7));
-             } 
-            else {
-                summary = tr(
-                    "<center>"
-                    "<h2>Week of %1 through %2</h2>"
-                    "<h2>Summary</h2>"
-                    "<p>"
-                    "<table align=\"center\" width=\"60%\" border=0>"
-                    "<tr><td>Total time riding:</td>"
-                    "    <td align=\"right\">%3:%4</td></tr>"
-                    "<tr><td>Total distance (miles):</td>"
-                    "    <td align=\"right\">%5</td></tr>"
-                    "<tr><td>Total work (kJ):</td>"
-                    "    <td align=\"right\">%6</td></tr>"
-                    "<tr><td>Daily Average work (kJ):</td>"
-                    "    <td align=\"right\">%7</td></tr>"
-                    "</table>"
-                    // TODO: add averages
-                    )
-                    .arg(wstart.toString(dateFormat))
-                    .arg(wstart.addDays(6).toString(dateFormat))
-                    .arg(hours)
-                    .arg(minutes, 2, 10, QLatin1Char('0'))
-                    .arg((unsigned) round(weeklyDistance->value(false)))
-                    .arg((unsigned) round(weeklyWork->value(true)))
-                    .arg((unsigned) round(weeklyWork->value(true) / 7));
-            }    
-            if (zone_range != -1) {
-                summary += "<h2>Power Zones</h2>";
-                if (!zones_ok)
-                    summary += "Error: Week spans more than one zone range.";
-                else {
-                    summary += 
-                        zones->summarize(zone_range, time_in_zone, num_zones);
-                }
-            }
-
-            summary += "</center>";
-
-            delete weeklyDistance;
-            delete weeklySeconds;
-
-            // TODO: add daily breakdown
-
-            weeklySummary->setHtml(summary);
-            
-            // First save the contents of the notes window.
-            saveNotes();
-
-            // Now open any notes associated with the new ride.
-            rideNotes->setPlainText("");
-            QString notesPath = 
-                home.absolutePath() + "/" + ride->notesFileName;  
-            QFile notesFile(notesPath);
-
-            if (notesFile.exists()) {
-                if (notesFile.open(QFile::ReadOnly | QFile::Text)) {
-                    QTextStream in(&notesFile);
-                    rideNotes->setPlainText(in.readAll());
-                    notesFile.close();
-                } 
-                else {
-                    QMessageBox::critical(
-                        this, tr("Read Error"),
-                        tr("Can't read notes file %1").arg(notesPath));
-                }
-            }
-
-            currentNotesFile = ride->notesFileName; 
-            currentNotesChanged = false;
-            return;
         }
     }
-    rideSummary->clear();
+
+    int minutes = ((int) round(weeklySeconds->value(true))) / 60;
+    int hours = (int) minutes / 60;
+    minutes %= 60;
+
+    const char *dateFormat = "MM/dd/yyyy";
+
+    QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
+    QVariant unit = settings.value(GC_UNIT);
+
+    QString summary;
+    if (unit.toString() == "Metric") {
+        summary = tr(
+            "<center>"
+            "<h2>Week of %1 through %2</h2>"
+            "<h2>Summary</h2>"
+            "<p>"
+            "<table align=\"center\" width=\"60%\" border=0>"
+            "<tr><td>Total time riding:</td>"
+            "    <td align=\"right\">%3:%4</td></tr>"
+            "<tr><td>Total distance (kilometers):</td>"
+            "    <td align=\"right\">%5</td></tr>"
+            "<tr><td>Total work (kJ):</td>"
+            "    <td align=\"right\">%6</td></tr>"
+            "<tr><td>Daily Average work (kJ):</td>"
+            "    <td align=\"right\">%7</td></tr>"
+            "</table>"
+            )
+            .arg(wstart.toString(dateFormat))
+            .arg(wstart.addDays(6).toString(dateFormat))
+            .arg(hours)
+            .arg(minutes, 2, 10, QLatin1Char('0'))
+            .arg((unsigned) round(weeklyDistance->value(true)))
+            .arg((unsigned) round(weeklyWork->value(true)))
+            .arg((unsigned) round(weeklyWork->value(true) / 7));
+    } 
+    else {
+        summary = tr(
+            "<center>"
+            "<h2>Week of %1 through %2</h2>"
+            "<h2>Summary</h2>"
+            "<p>"
+            "<table align=\"center\" width=\"60%\" border=0>"
+            "<tr><td>Total time riding:</td>"
+            "    <td align=\"right\">%3:%4</td></tr>"
+            "<tr><td>Total distance (miles):</td>"
+            "    <td align=\"right\">%5</td></tr>"
+            "<tr><td>Total work (kJ):</td>"
+            "    <td align=\"right\">%6</td></tr>"
+            "<tr><td>Daily Average work (kJ):</td>"
+            "    <td align=\"right\">%7</td></tr>"
+            "</table>"
+            // TODO: add averages
+            )
+            .arg(wstart.toString(dateFormat))
+            .arg(wstart.addDays(6).toString(dateFormat))
+            .arg(hours)
+            .arg(minutes, 2, 10, QLatin1Char('0'))
+            .arg((unsigned) round(weeklyDistance->value(false)))
+            .arg((unsigned) round(weeklyWork->value(true)))
+            .arg((unsigned) round(weeklyWork->value(true) / 7));
+    }    
+    if (zone_range != -1) {
+        summary += "<h2>Power Zones</h2>";
+        if (!zones_ok)
+            summary += "Error: Week spans more than one zone range.";
+        else {
+            summary += zones->summarize(zone_range, time_in_zone, num_zones);
+        }
+    }
+
+    summary += "</center>";
+
+    delete weeklyDistance;
+    delete weeklySeconds;
+
+    // TODO: add daily breakdown
+
+    weeklySummary->setHtml(summary);
+
+    // First save the contents of the notes window.
+    saveNotes();
+
+    // Now open any notes associated with the new ride.
+    rideNotes->setPlainText("");
+    QString notesPath = home.absolutePath() + "/" + ride->notesFileName;  
+    QFile notesFile(notesPath);
+
+    if (notesFile.exists()) {
+        if (notesFile.open(QFile::ReadOnly | QFile::Text)) {
+            QTextStream in(&notesFile);
+            rideNotes->setPlainText(in.readAll());
+            notesFile.close();
+        } 
+        else {
+            QMessageBox::critical(
+                this, tr("Read Error"),
+                tr("Can't read notes file %1").arg(notesPath));
+        }
+    }
+
+    currentNotesFile = ride->notesFileName; 
+    currentNotesChanged = false;
 }
 
 void MainWindow::saveNotes() 
