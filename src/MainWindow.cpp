@@ -850,6 +850,9 @@ MainWindow::rideSelected()
         }
     }
 
+    if (time_in_zone)
+        delete [] time_in_zone;
+
     summary += "</center>";
 
     delete weeklyDistance;
