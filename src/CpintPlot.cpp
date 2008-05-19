@@ -225,7 +225,7 @@ CpintPlot::calculate(QString fileName, QDateTime dateTime)
                     RideFileFactory::instance().openRideFile(file, errors);
                 assert(rideFile);
                 double x = rideFile->dataPoints().size();
-                progress_max += x * (x - 1.0) / 2.0;
+                progress_max += x * (x + 1.0) / 2.0;
                 delete rideFile;
             }
         }
