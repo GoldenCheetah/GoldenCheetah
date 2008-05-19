@@ -84,6 +84,42 @@ CyclistPage::CyclistPage(QWidget *parent, Zones *_zones, bool emptyZone)
     else if(zones->getRangeSize() == 1)
     {
     	setCurrentRange(0);
+    	QDate date;
+    	btnNew->setEnabled(true);
+    	btnBack->setEnabled(false);
+    	calendar->setSelectedDate(date.currentDate());
+    	calendar->setEnabled(false);
+    	//txtStartDate->setDate(date.currentDate()));
+    	//txtEndDate->setDate(date.currentDate()));
+
+    }
+    else
+    {
+    	setCurrentRange(zones->getRangeSize() - 1);
+    	QDate date = zones->getStartDate(getCurrentRange());
+    	calendar->setSelectedDate(date);
+    	calendar->setMinimumDate(date);
+    	calendar->setEnabled(false);
+    	txtStartDate->setDate(zones->getStartDate(getCurrentRange()));
+    	txtEndDate->setDate(zones->getEndDate(getCurrentRange()));
+    }
+
+    txtStartDate->setEnabled(false);
+    txtEndDate->setEnabled(false);
+    
+    if(emptyZone)
+    {
+    	setCurrentRange(0);
+    	QDate date;
+    	btnNew->setEnabled(false);
+    	calendar->setSelectedDate(date.currentDate());
+    	calendar->setEnabled(true);
+    	btnBack->setEnabled(false);
+    	txtEndDate->setDate(date.currentDate());
+    }
+    else if(zones->getRangeSize() == 1)
+    {
+    	setCurrentRange(0);
     	QDate date = zones->getEndDate(getCurrentRange());
     	calendar->setMinimumDate(date);
     	btnNew->setEnabled(true);

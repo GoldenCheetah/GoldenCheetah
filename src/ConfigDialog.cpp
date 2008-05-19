@@ -251,9 +251,13 @@ void ConfigDialog::new_Clicked()
     
     //Create the Zone
     cyclistPage->calendar->setMinimumDate(zones->getStartDate(zones->getRangeSize() - 1));
+
     zones->addZoneRange(zones->getStartDate(cyclistPage->getCurrentRange()), cyclistPage->calendar->selectedDate(), 0);
     cyclistPage->setCurrentRange(zones->getRangeSize() - 1);
     cyclistPage->lblCurRange->setText(QString("Current Zone Range: %1").arg(cyclistPage->getCurrentRange() + 1));
+
+    if(cyclistPage->getCurrentRange() > 1)
+    	cyclistPage->calendar->setMinimumDate(zones->getEndDate(zones->getRangeSize() - 1));
     
     QDate date;
     cyclistPage->calendar->setSelectedDate(date.currentDate());
