@@ -47,6 +47,21 @@ D2XX::open(QString &err)
         err = QString("FT_SetBaudRate: %1").arg(ftStatus);
         close();
     }
+
+    ftStatus = FT_SetDataCharacteristics(ftHandle,FT_BITS_8,FT_STOP_BITS_1,
+                                         FT_PARITY_NONE);
+    if (ftStatus != FT_OK) {
+        err = QString("FT_SetDataCharacteristics: %1").arg(ftStatus);
+        close();
+    }
+
+    ftStatus = FT_SetFlowControl (ftHandle,FT_FLOW_NONE,
+                                  '0','0'); //the 0's are ignored
+    if (ftStatus != FT_OK) {
+        err = QString("FT_SetFlowControl: %1").arg(ftStatus);
+        close();
+    }
+
     return true;
 }
 
