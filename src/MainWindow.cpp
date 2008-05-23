@@ -1060,7 +1060,7 @@ MainWindow::aboutDialog()
     QMessageBox::about(this, tr("About GoldenCheetah"), tr(
             "<center>"
             "<h2>GoldenCheetah</h2>"
-            "<i>Cycling Power Analysis Software for Linux and Mac OS X</i>"
+            "<i>Cycling Power Analysis Software for Linux, Mac, and Windows</i>"
             "<p><i>Build date: "
             "") + QString(GC_BUILD_DATE).replace("_", " ") + ("</i>"
             "</center>"
