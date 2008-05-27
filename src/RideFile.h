@@ -59,12 +59,14 @@ class RideFile
         QDateTime startTime_;  // time of day that the ride started
         double recIntSecs_;    // recording interval in seconds
         QList<RideFilePoint*> dataPoints_;
+        QString deviceType_;
 
     public:
 
-        RideFile() : recIntSecs_(0.0) {}
+        RideFile() : recIntSecs_(0.0), deviceType_("unknown") {}
         RideFile(const QDateTime &startTime, double recIntSecs) :
-            startTime_(startTime), recIntSecs_(recIntSecs) {}
+            startTime_(startTime), recIntSecs_(recIntSecs),
+            deviceType_("unknown") {}
 
         virtual ~RideFile() {
             QListIterator<RideFilePoint*> i(dataPoints_);
@@ -75,9 +77,12 @@ class RideFile
         const QDateTime &startTime() const { return startTime_; }
         double recIntSecs() const { return recIntSecs_; }
         const QList<RideFilePoint*> dataPoints() const { return dataPoints_; }
+        const QString &deviceType() const { return deviceType_; }
 
         void setStartTime(const QDateTime &value) { startTime_ = value; }
         void setRecIntSecs(double value) { recIntSecs_ = value; }
+        void setDeviceType(const QString &value) { deviceType_ = value; }
+        
         void appendPoint(double secs, double cad, double hr, double km, 
                          double kph, double nm, double watts, int interval) {
             dataPoints_.append(new RideFilePoint(secs, cad, hr, km, kph, 

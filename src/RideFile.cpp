@@ -50,6 +50,9 @@ RideFile::writeAsXml(QFile &file, QString &err)
     QDomElement xstart = xroot.createElement("start").toElement();
     xride.appendChild(xstart);
     xstart.setAttribute("date", startTime_.toString("yyyy/MM/dd hh:mm:ss"));
+    QDomElement xdevtype = xroot.createElement("device_type").toElement();
+    xride.appendChild(xdevtype);
+    xdevtype.setAttribute("name", deviceType_);
     QDomElement xrecint = xroot.createElement("sampling_period").toElement();
     xride.appendChild(xrecint);
     xrecint.setAttribute("secs", QString("%1").arg(recIntSecs_, 0, 'f', 3));
