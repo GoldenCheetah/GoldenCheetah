@@ -83,6 +83,8 @@ class RideFile
             dataPoints_.append(new RideFilePoint(secs, cad, hr, km, kph, 
                                                  nm, watts, interval));
         }
+
+        bool writeAsXml(QFile &file, QString &err);
 };
 
 struct RideFileReader {
