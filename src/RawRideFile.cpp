@@ -188,6 +188,7 @@ pt_read_raw(FILE *in, int compat, void *context,
 RideFile *RawFileReader::openRideFile(QFile &file, QStringList &errors) const 
 {
     RideFile *rideFile = new RideFile;
+    rideFile->setDeviceType("PowerTap");
     if (!file.open(QIODevice::ReadOnly)) {
         delete rideFile;
         return NULL;

@@ -182,7 +182,7 @@ RideItem::htmlSummary()
         }
         summary = ("<p><center><h2>" 
                    + dateTime.toString("dddd MMMM d, yyyy, h:mm AP") 
-                   + "</h2><p><h2>Summary</h2>");
+                   + "</h2><h3>Device Type: " + ride->deviceType() + "</h3>");
 
         if (zones) {
             zone_range = zones->whichRange(dateTime.date());

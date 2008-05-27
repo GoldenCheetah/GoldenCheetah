@@ -30,6 +30,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errors) const
     if (!readSrmFile(file, srmData, errors))
         return NULL;
     RideFile *rideFile = new RideFile(srmData.startTime, srmData.recint);
+    rideFile->setDeviceType("SRM");
     QListIterator<SrmDataPoint*> i(srmData.dataPoints);
     while (i.hasNext()) {
         SrmDataPoint *p = i.next();
