@@ -604,10 +604,18 @@ void MainWindow::importCSV()
 void
 MainWindow::importSRM()
 {
+    QVariant lastDirVar = settings.value(GC_SETTINGS_LAST_IMPORT_PATH);
+    QString lastDir = (lastDirVar == QVariant()) 
+        ? lastDirVar.toString() : QDir::homePath();
     QStringList fileNames = QFileDialog::getOpenFileNames(
-        this, tr("Import SRM"), QDir::homePath(),
+        this, tr("Import SRM"), lastDir,
         tr("SRM Binary Format (*.srm)"));
-    QStringListIterator i(fileNames);
+    if (!fileNames.isEmpty()) {
+        lastDir = QFileInfo(fileNames.front()).absolutePath();
+        settings.setValue("lastImportPath", lastDir);
+    }
+    QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
+    QStringListIterator i(fileNamesCopy);
     while (i.hasNext()) {
         QString fileName = i.next();
         QFile file(fileName);
