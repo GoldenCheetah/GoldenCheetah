@@ -20,6 +20,7 @@
 #define _GC_AllPlot_h 1
 
 #include <qwt_plot.h>
+#include <QtGui>
 
 class QwtPlotCurve;
 class QwtPlotGrid;
@@ -70,6 +71,10 @@ class AllPlot : public QwtPlot
 
         void recalc();
         void setYMax();
+
+    private:
+        QSettings settings;
+        QVariant unit;
 };
 
 #endif // _GC_AllPlot_h

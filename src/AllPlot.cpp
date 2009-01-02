@@ -31,10 +31,14 @@
 static const inline double
 max(double a, double b) { if (a > b) return a; else return b; }
 
+#define MILES_PER_KM 0.62137119
+
 AllPlot::AllPlot() : 
     d_mrk(NULL), hrArray(NULL), wattsArray(NULL), 
     speedArray(NULL), cadArray(NULL), 
-    timeArray(NULL), interArray(NULL), smooth(30)
+    timeArray(NULL), interArray(NULL), smooth(30),
+    settings(GC_SETTINGS_CO, GC_SETTINGS_APP),
+    unit(settings.value(GC_UNIT))
 {
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setCanvasBackground(Qt::white);
@@ -207,7 +211,8 @@ AllPlot::setYMax()
     }
     if (speedCurve->isVisible()) {
         ymax = max(ymax, speedCurve->maxYValue());
-        ylabel += QString((ylabel == "") ? "" : " / ") + "MPH";
+        ylabel += QString((ylabel == "") ? "" : " / ") + 
+	  QString((unit.toString() == "Metric") ? "KPH" : "MPH");
     }
     if (cadCurve->isVisible()) {
         ymax = max(ymax, cadCurve->maxYValue());
@@ -241,7 +246,10 @@ AllPlot::setData(RideFile *ride)
         timeArray[arrayLength]  = point->secs;
         wattsArray[arrayLength] = max(0, point->watts);
         hrArray[arrayLength]    = max(0, point->hr);
-        speedArray[arrayLength] = max(0, point->kph * 0.62137119);
+        speedArray[arrayLength] = max(0, 
+				      ((unit.toString() == "Metric") 
+					? point->kph
+					: point->kph * MILES_PER_KM));
         cadArray[arrayLength]   = max(0, point->cad);
         interArray[arrayLength] = point->interval;
         ++arrayLength;
