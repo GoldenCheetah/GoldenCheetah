@@ -45,7 +45,6 @@ void ToolsDialog::setupUi(QDialog *ToolsDialog)
     btnOK = new QPushButton(this);
     btnCalculate = new QPushButton(this);
     mainGrid->addWidget(lblBest3Min, 0, 0);
-    mainGrid->addWidget(lblBest3Min, 0, 0);
     mainGrid->addWidget(txtBest3Min, 0, 1);
 
     mainGrid->addWidget(lblBest20Min, 1, 0);
