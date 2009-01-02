@@ -21,6 +21,7 @@
 
 void ToolsDialog::setupUi(QDialog *ToolsDialog)
 {
+    setAttribute(Qt::WA_DeleteOnClose);
     if (ToolsDialog->objectName().isEmpty())
         ToolsDialog->setObjectName(QString::fromUtf8("ToolsDialog"));
     ToolsDialog->setWindowModality(Qt::WindowModal);
