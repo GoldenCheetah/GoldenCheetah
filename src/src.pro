@@ -7,11 +7,13 @@ CONFIG += static debug
 QT += xml
 LIBS += /usr/local/qwt/lib/libqwt.a 
 LIBS += -lm -lz -lftd2xx
-QMAKE_CXXFLAGS = -DGC_BUILD_DATE="`date +'\"%a_%b_%d,_%Y\"'`"
+#QMAKE_CXXFLAGS = -DGC_BUILD_DATE="`date +'\"%a_%b_%d,_%Y\"'`"
 RC_FILE = images/gc.icns
 
 macx {
     LIBS += -framework Carbon
+    QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.4u.sdk
+    CONFIG+=x86 ppc
 }
 
 win32 {
