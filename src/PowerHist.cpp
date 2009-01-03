@@ -78,7 +78,7 @@ PowerHist::recalc()
 void
 PowerHist::setYMax() 
 {
-    setAxisScale(yLeft, 0.0, curve->maxYValue() + 10.0);
+    setAxisScale(yLeft, 0.0, curve->maxYValue() * 1.1);
 }
 
 void
