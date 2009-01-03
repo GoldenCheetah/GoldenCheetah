@@ -70,7 +70,7 @@ class MainWindow : public QMainWindow
         void notesChanged();
         void saveNotes();
         void showOptions();
-	void showTools();
+        void showTools();
 
     protected: 
 
@@ -101,11 +101,11 @@ class MainWindow : public QMainWindow
         PowerHist *powerHist;
         Zones *zones;
 
-	// pedal force/pedal velocity scatter plot widgets
-	PfPvPlot *pfPvPlot;
+        // pedal force/pedal velocity scatter plot widgets
+        PfPvPlot *pfPvPlot;
         QLineEdit *qaCPValue;
         QLineEdit *qaCadValue;
-	QLineEdit *qaClValue;
+        QLineEdit *qaClValue;
 
         QTextEdit *rideNotes;
         QString currentNotesFile;
