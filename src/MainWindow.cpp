@@ -44,7 +44,10 @@
 #include "DatePickerDialog.h"
 #include "ToolsDialog.h"
 
-#define GC_BUILD_DATE
+#ifndef GC_BUILD_DATE
+/* temp for the qmake/QMAKE_CXXFLAGS bug with xcode */
+#define GC_BUILD_DATE "Todo: Fix xcode/qmake bug"
+#endif
 
 #define FOLDER_TYPE 0
 #define RIDE_TYPE 1
@@ -607,14 +610,14 @@ void
 MainWindow::importSRM()
 {
     QVariant lastDirVar = settings.value(GC_SETTINGS_LAST_IMPORT_PATH);
-    QString lastDir = (lastDirVar == QVariant()) 
+    QString lastDir = (lastDirVar != QVariant()) 
         ? lastDirVar.toString() : QDir::homePath();
     QStringList fileNames = QFileDialog::getOpenFileNames(
         this, tr("Import SRM"), lastDir,
         tr("SRM Binary Format (*.srm)"));
     if (!fileNames.isEmpty()) {
         lastDir = QFileInfo(fileNames.front()).absolutePath();
-        settings.setValue("lastImportPath", lastDir);
+        settings.setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
     }
     QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
     QStringListIterator i(fileNamesCopy);
@@ -662,9 +665,17 @@ MainWindow::importSRM()
 void
 MainWindow::importTCX()
 {
+    QVariant lastDirVar = settings.value(GC_SETTINGS_LAST_IMPORT_PATH);
+    QString lastDir = (lastDirVar != QVariant()) 
+        ? lastDirVar.toString() : QDir::homePath();
     QStringList fileNames = QFileDialog::getOpenFileNames(
-        this, tr("Import SRM"), QDir::homePath(),
+        this, tr("Import TCX"), lastDir,
         tr("TCX Format (*.tcx)"));
+    if (!fileNames.isEmpty()) {
+        lastDir = QFileInfo(fileNames.front()).absolutePath();
+        settings.setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
+    }
+    QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
     QStringListIterator i(fileNames);
     while (i.hasNext()) {
         QString fileName = i.next();
@@ -821,7 +832,7 @@ MainWindow::rideSelected()
             .arg(wstart.addDays(6).toString(dateFormat))
             .arg(hours)
             .arg(minutes, 2, 10, QLatin1Char('0'))
-            .arg((unsigned) round(weeklyDistance->value(true)))
+            .arg(weeklyDistance->value(true), 0, 'f', 1)
             .arg((unsigned) round(weeklyWork->value(true)))
             .arg((unsigned) round(weeklyWork->value(true) / 7));
     } 
@@ -847,7 +858,7 @@ MainWindow::rideSelected()
             .arg(wstart.addDays(6).toString(dateFormat))
             .arg(hours)
             .arg(minutes, 2, 10, QLatin1Char('0'))
-            .arg((unsigned) round(weeklyDistance->value(false)))
+            .arg(weeklyDistance->value(false), 0, 'f', 1)
             .arg((unsigned) round(weeklyWork->value(true)))
             .arg((unsigned) round(weeklyWork->value(true) / 7));
     }    
