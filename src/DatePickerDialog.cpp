@@ -17,6 +17,7 @@
  */
 
 #include "DatePickerDialog.h"
+#include "Settings.h"
 #include <QtGui>
     
 void DatePickerDialog::setupUi(QDialog *DatePickerDialog)
@@ -80,11 +81,18 @@ void DatePickerDialog::on_btnOK_clicked()
 
 void DatePickerDialog::on_btnBrowse_clicked()
 {
+    QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
+    QVariant lastDirVar = settings.value(GC_SETTINGS_LAST_IMPORT_PATH);
+    QString lastDir = (lastDirVar != QVariant()) 
+        ? lastDirVar.toString() : QDir::homePath();
     fileName = QFileDialog::getOpenFileName(
-        this, tr("Import CSV"), QDir::homePath(),
+        this, tr("Import CSV"), lastDir,
         tr("Comma Seperated Values (*.csv)"));
+    if (!fileName.isEmpty()) {
+        lastDir = QFileInfo(fileName).absolutePath();
+        settings.setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
+    }
     txtBrowse->setText(fileName);
-
 }
 
 void DatePickerDialog::on_btnCancel_clicked()
