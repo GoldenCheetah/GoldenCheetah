@@ -58,6 +58,7 @@ AllPlot::AllPlot() :
     speedCurve = new QwtPlotCurve("Speed");
     // speedCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     speedCurve->setPen(QPen(Qt::green));
+    speedCurve->setYAxis(yRight);
     speedCurve->attach(this);
 
     cadCurve = new QwtPlotCurve("Cadence");
@@ -209,17 +210,15 @@ AllPlot::setYMax()
         ymax = max(ymax, hrCurve->maxYValue());
         ylabel += QString((ylabel == "") ? "" : " / ") + "BPM";
     }
-    if (speedCurve->isVisible()) {
-        ymax = max(ymax, speedCurve->maxYValue());
-        ylabel += QString((ylabel == "") ? "" : " / ") + 
-	  QString((unit.toString() == "Metric") ? "KPH" : "MPH");
-    }
     if (cadCurve->isVisible()) {
         ymax = max(ymax, cadCurve->maxYValue());
         ylabel += QString((ylabel == "") ? "" : " / ") + "RPM";
     }
     setAxisScale(yLeft, 0.0, ymax * 1.1);
     setAxisTitle(yLeft, ylabel);
+
+    enableAxis(yRight, speedCurve->isVisible());
+    setAxisTitle(yRight, ((unit.toString() == "Metric") ? "KPH" : "MPH"));
 }
 
 void
