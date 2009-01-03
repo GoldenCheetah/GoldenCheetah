@@ -44,6 +44,8 @@
 #include "DatePickerDialog.h"
 #include "ToolsDialog.h"
 
+#define GC_BUILD_DATE
+
 #define FOLDER_TYPE 0
 #define RIDE_TYPE 1
 #define MILES_PER_KM 0.62137119
@@ -1071,12 +1073,13 @@ MainWindow::aboutDialog()
             "<i>Cycling Power Analysis Software for Linux, Mac, and Windows</i>"
             "<p><i>Build date: "
             "") + QString(GC_BUILD_DATE).replace("_", " ") + ("</i>"
-            "</center>"
             "<p>GoldenCheetah is licensed under the "
             "<a href=\"http://www.gnu.org/copyleft/gpl.html\">GNU General "
-            "Public License</a>.  Source code can be obtained from "
+            "Public License</a>."
+            "<p>Source code can be obtained from "
             "<a href=\"http://goldencheetah.org/\">"
             "http://goldencheetah.org/</a>."
+            "</center>"
             ));
 }
 
