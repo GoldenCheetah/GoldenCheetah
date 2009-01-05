@@ -31,7 +31,7 @@
 #define GC_DATETIME_FORMAT          "ddd MMM dd, yyyy, hh:mm AP"
 #define GC_UNIT                     "unit"
 #define GC_SETTINGS_LAST_IMPORT_PATH "mainwindow/lastImportPath"
-
+#define GC_ALLRIDES_ASCENDING       "allRidesAscending"
 
 #endif // _GC_Settings_h
 

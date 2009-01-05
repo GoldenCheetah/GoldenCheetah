@@ -9,12 +9,14 @@
 #include "Zones.h"
 #include <QLabel>
 #include <QDateEdit>
+#include <QCheckbox>
 
 class ConfigurationPage : public QWidget
 {
     public:
         ConfigurationPage(QWidget *parent = 0);
         QComboBox *unitCombo;
+        QCheckBox *allRidesAscending;
 };
 
 class CyclistPage : public QWidget

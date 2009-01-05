@@ -19,6 +19,7 @@
 #include "RideFile.h"
 #include <QtXml/QtXml>
 #include <assert.h>
+#include "Settings.h"
 
 static void
 markInterval(QDomDocument &xroot, QDomNode &xride, QDomNode &xintervals,
@@ -140,6 +141,12 @@ QStringList RideFileFactory::listRideFiles(const QDir &dir) const
         i.next();
         filters << ("*." + i.key());
     }
-    return dir.entryList(filters, QDir::Files, QDir::Name);
+    // This will read the user preferences and change the file list order as necessary:
+    QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
+    QVariant isAscending = settings.value(GC_ALLRIDES_ASCENDING,Qt::Checked);
+    if(isAscending.toInt()>0){
+        return dir.entryList(filters, QDir::Files, QDir::Name);
+    }
+    return dir.entryList(filters, QDir::Files, QDir::Name|QDir::Reversed);
 }
 

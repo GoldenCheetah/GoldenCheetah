@@ -91,6 +91,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     splitter = new QSplitter(this);
     setCentralWidget(splitter);
+    splitter->setContentsMargins(10, 20, 10, 10); // attempting to follow some UI guides
 
     treeWidget = new QTreeWidget;
     treeWidget->setColumnCount(3);
@@ -393,8 +394,19 @@ MainWindow::MainWindow(const QDir &home) :
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(tr("&About GoldenCheetah"), this, SLOT(aboutDialog()));
 
-    if (last != NULL)
-        treeWidget->setCurrentItem(last);
+    // This will read the user preferences and change the file list order as necessary:
+    QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
+    QVariant isAscending = settings.value(GC_ALLRIDES_ASCENDING,Qt::Checked);
+    if(isAscending.toInt()>0){
+            if (last != NULL)
+                treeWidget->setCurrentItem(last);
+    } else {
+        // selects the first ride in the list:
+        if (allRides->child(0) != NULL){
+            treeWidget->scrollToItem(allRides->child(0), QAbstractItemView::EnsureVisible);
+            treeWidget->setCurrentItem(allRides->child(0));
+        }
+    }
 }
 
 void
