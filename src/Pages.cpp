@@ -21,6 +21,14 @@ ConfigurationPage::ConfigurationPage(QWidget *parent)
     else
        unitCombo->setCurrentIndex(1);
 
+    allRidesAscending = new QCheckBox("Sort ride list ascending.", this);
+    QVariant isAscending = settings.value(GC_ALLRIDES_ASCENDING,Qt::Checked); // default is ascending sort
+    if(isAscending.toInt() > 0 ){
+        allRidesAscending->setCheckState(Qt::Checked);
+    } else {
+        allRidesAscending->setCheckState(Qt::Unchecked);
+    }
+    
     QLabel *warningLabel = new QLabel(tr("Requires Restart To Take Effect"));
 
     QHBoxLayout *unitLayout = new QHBoxLayout;
@@ -32,6 +40,7 @@ ConfigurationPage::ConfigurationPage(QWidget *parent)
  
     QVBoxLayout *configLayout = new QVBoxLayout;
     configLayout->addLayout(unitLayout);
+    configLayout->addWidget(allRidesAscending);
     configLayout->addLayout(warningLayout);
     configGroup->setLayout(configLayout);
 
