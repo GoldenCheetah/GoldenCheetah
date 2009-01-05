@@ -85,7 +85,7 @@ class TotalDistance : public RideMetric {
         km = ride->dataPoints().back()->km;
     }
     bool canAggregate() const { return true; }
-    void aggregateWith(RideMetric *other) { km += other->value(false); }
+    void aggregateWith(RideMetric *other) { km += other->value(true); }
     RideMetric *clone() const { return new TotalDistance(*this); }
 };
 
