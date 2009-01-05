@@ -423,15 +423,23 @@ MainWindow::addRide(QString name)
     QDateTime dt(date, time);
     RideItem *last = new RideItem(RIDE_TYPE, home.path(), 
                                   name, dt, zones, notesFileName(name));
+    
+    QVariant isAscending = settings.value(GC_ALLRIDES_ASCENDING,Qt::Checked); // default is ascending sort
     int index = 0;
     while (index < allRides->childCount()) {
         QTreeWidgetItem *item = allRides->child(index);
         if (item->type() != RIDE_TYPE)
             continue;
         RideItem *other = reinterpret_cast<RideItem*>(item);
-        if (other->dateTime > dt)
-            break;
-        else if (other->fileName == name) {
+        
+        if(isAscending.toInt() > 0 ){
+            if (other->dateTime > dt)
+                break;
+        } else {
+            if (other->dateTime < dt)
+                break; 
+        }
+        if (other->fileName == name) {
             delete allRides->takeChild(index);
             break;
         }
