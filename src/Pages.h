@@ -9,7 +9,7 @@
 #include "Zones.h"
 #include <QLabel>
 #include <QDateEdit>
-#include <QCheckbox>
+#include <QCheckBox>
 
 class ConfigurationPage : public QWidget
 {
