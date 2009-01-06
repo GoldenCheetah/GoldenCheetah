@@ -8,7 +8,7 @@ QT += xml
 LIBS += /usr/local/qwt/lib/libqwt.a 
 LIBS += -lm -lz -lftd2xx
 QMAKE_CXXFLAGS += -DGC_BUILD_DATE="`date +'\"%a_%b_%d,_%Y\"'`"
-QMAKE_CXXFLAGS += -DGC_SVN_VERSION="`svnversion . | cut -f '2' -d ':'`"
+QMAKE_CXXFLAGS += -DGC_SVN_VERSION=\\\"`svnversion . | cut -f '2' -d ':'`\\\"
 QMAKE_CXXFLAGS += -DGC_MAJOR_VER=1
 QMAKE_CXXFLAGS += -DGC_MINOR_VER=0
 RC_FILE = images/gc.icns
