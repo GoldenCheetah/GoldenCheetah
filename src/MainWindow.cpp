@@ -44,9 +44,12 @@
 #include "DatePickerDialog.h"
 #include "ToolsDialog.h"
 
-#ifndef GC_BUILD_DATE
 /* temp for the qmake/QMAKE_CXXFLAGS bug with xcode */
-#define GC_BUILD_DATE "Todo: Fix xcode/qmake bug"
+#ifndef GC_SVN_VERSION
+#define GC_SVN_VERSION "0"
+#endif
+#ifndef GC_BUILD_DATE
+#define GC_BUILD_DATE GC_SVN_VERSION
 #endif
 
 #define FOLDER_TYPE 0
@@ -1102,8 +1105,10 @@ MainWindow::aboutDialog()
             "<center>"
             "<h2>GoldenCheetah</h2>"
             "<i>Cycling Power Analysis Software for Linux, Mac, and Windows</i>"
-            "<p><i>Build date: "
-            "") + QString(GC_BUILD_DATE).replace("_", " ") + ("</i>"
+//            "<p><i>Build date: "
+//            "") + QString(GC_BUILD_DATE).replace("_", " ") + ("</i>"
+            "<p><i>Version: "
+            "")+QString::number(GC_MAJOR_VER)+(".") +QString::number(GC_MINOR_VER)+(".")+QString(GC_SVN_VERSION) + ("</i>"
             "<p>GoldenCheetah is licensed under the "
             "<a href=\"http://www.gnu.org/copyleft/gpl.html\">GNU General "
             "Public License</a>."
