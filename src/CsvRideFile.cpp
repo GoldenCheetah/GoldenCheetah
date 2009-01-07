@@ -43,8 +43,22 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
     L_SEC,KM,WATT,RPM,KM/H,BPM,METER,°C,NUM,SEC
     */
     QRegExp ergomoCSV("(ZEIT|STRECKE)", Qt::CaseInsensitive);
-    bool ergomo;
+    bool ergomo = false;
     int unitsHeader = 1;
+    
+    // TODO: with all these formats, should the logic change to a switch/case structure?
+    // The iBike format CSV file has five lines of headers (data begins on line 6)
+    // starting with:
+    /*
+    iBike,8,english
+    2008,8,8,6,32,52
+    
+    {Various configuration data, recording interval at line[4][4]}
+    Speed (mph),Wind Speed (mph),Power (W),Distance (miles),Cadence (RPM),Heartrate (BPM),Elevation (feet),Hill slope (%),Internal,Internal,Internal,DFPM Power,Latitude,Longitude
+    */
+    QRegExp iBikeCSV("iBike,[0-9],[a-z]+", Qt::CaseInsensitive);
+    bool iBike = false;
+    int recInterval;
     
     if (!file.open(QFile::ReadOnly)) {
         errors << ("Could not open ride file: \"" 
@@ -55,76 +69,123 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
     QTextStream is(&file);
     RideFile *rideFile = new RideFile();
     while (!is.atEnd()) {
-        QString line = is.readLine();
-        if (lineno == 1) {
-            if (ergomoCSV.indexIn(line) != -1) {
-                ergomo = true;
-                unitsHeader = 2;
-                ++lineno;
-                continue;
-            }
-            else {
-                ergomo = false;
-            }
+        // the readLine() method doesn't handle old Macintosh CR line endings
+        // this workaround will load the the entire file if it has CR endings
+        // then split and loop through each line
+        // otherwise, there will be nothing to split and it will read each line as expected.
+        QString linesIn = is.readLine();
+        QStringList lines = linesIn.split('\r');
+        // workaround for empty lines
+        if(lines.size() == 0) {
+            lineno++;
+            continue;
         }
-        if (lineno == unitsHeader) {
-            if (metricUnits.indexIn(line) != -1)
-                metric = true;
-            else if (englishUnits.indexIn(line) != -1) 
-                metric = false;
-            else {
-                errors << ("Can't find units in first line: \"" + line + "\"");
-                delete rideFile;
-                file.close();
-                return NULL;
-            }
-        }
-        else {
-            double minutes,nm,kph,watts,km,cad,hr;
-            int interval;
-            if (!ergomo) {
-                 minutes = line.section(',', 0, 0).toDouble();
-                 nm      = line.section(',', 1, 1).toDouble();
-                 kph     = line.section(',', 2, 2).toDouble();
-                 watts   = line.section(',', 3, 3).toDouble();
-                 km      = line.section(',', 4, 4).toDouble();
-                 cad     = line.section(',', 5, 5).toDouble();
-                 hr      = line.section(',', 6, 6).toDouble();
-                 interval   = line.section(',', 7, 7).toInt();
-                if (!metric) {
-                    km *= MILES_TO_KM;
-                    kph *= MILES_TO_KM;
+        for (int li = 0; li < lines.size(); ++li) { 
+            QString line = lines[li];
+
+            if (lineno == 1) {
+                if (ergomoCSV.indexIn(line) != -1) {
+                    ergomo = true;
+                    rideFile->setDeviceType("Ergomo CSV");
+                    unitsHeader = 2;
+                    ++lineno;
+                    continue;
                 }
-            } 
-            else {
-                // for ergomo formatted CSV files
-                 minutes = line.section(',', 0, 0).toDouble();
-                 km      = line.section(',', 1, 1).toDouble();
-                 watts   = line.section(',', 2, 2).toDouble();
-                 cad     = line.section(',', 3, 3).toDouble();
-                 kph     = line.section(',', 4, 4).toDouble();
-                 hr      = line.section(',', 5, 5).toDouble();
-                 interval   = line.section(',', 8, 8).toInt();
-                 nm      = NULL; // torque is not provided in the Ergomo file
-                
-                // the ergomo records the time in whole seconds
-                // RECORDING INT. 1, 2, 5, 10, 15 or 30 per sec
-                minutes = minutes/60.0;
-                
-                if (!metric) {
-                    km *= MILES_TO_KM;
-                    kph *= MILES_TO_KM;
+                else {
+                    if(iBikeCSV.indexIn(line) != -1) {
+                        iBike = true;
+                        rideFile->setDeviceType("iBike CSV");
+                        unitsHeader = 5;
+                        ++lineno;
+                        continue;
+                    }
+                    rideFile->setDeviceType("PowerTap CSV");
                 }
             }
-            
-            // PT reports no data as watts == -1.
-            if (watts == -1)
-                watts = 0;
-            
-            rideFile->appendPoint(minutes * 60.0, cad, hr, km, 
-                                  kph, nm, watts, interval);
-        }
+            if (iBike && lineno == 4) {
+                // this is the line with the iBike configuration data
+                // recording interval is in the [4] location (zero-based array)
+                // the trailing zeroes in the configuration area seem to be causing an error
+                // the number is in the format 5.000000
+                recInterval	  = (int)line.section(',',4,4).toDouble();
+            }
+            if (lineno == unitsHeader) {
+                if (metricUnits.indexIn(line) != -1)
+                    metric = true;
+                else if (englishUnits.indexIn(line) != -1) 
+                    metric = false;
+                else {
+                    errors << ("Can't find units in first line: \"" + line + "\"");
+                    delete rideFile;
+                    file.close();
+                    return NULL;
+                }
+            }
+            else if (lineno > unitsHeader) {
+                double minutes,nm,kph,watts,km,cad,hr;
+                int interval;
+                if (!ergomo && !iBike) {
+                     minutes = line.section(',', 0, 0).toDouble();
+                     nm		 = line.section(',', 1, 1).toDouble();
+                     kph	 = line.section(',', 2, 2).toDouble();
+                     watts	 = line.section(',', 3, 3).toDouble();
+                     km		 = line.section(',', 4, 4).toDouble();
+                     cad	 = line.section(',', 5, 5).toDouble();
+                     hr		 = line.section(',', 6, 6).toDouble();
+                     interval	= line.section(',', 7, 7).toInt();
+                    if (!metric) {
+                        km *= MILES_TO_KM;
+                        kph *= MILES_TO_KM;
+                    }
+                } 
+                else if (iBike) {
+                    // this must be iBike
+                    // can't find time as a column. 
+                    // will we have to extrapolate based on the recording interval?
+                    // reading recording interval from config data in ibike csv file
+                     minutes = (recInterval * lineno - unitsHeader)/60.0;
+                     nm		 = NULL; //no torque
+                     kph	 = line.section(',', 0, 0).toDouble();
+                     watts	 = line.section(',', 2, 2).toDouble();
+                     km		 = line.section(',', 3, 3).toDouble();
+                     cad	 = line.section(',', 4, 4).toDouble();
+                     hr		 = line.section(',', 5, 5).toDouble();
+                     interval	= NULL; //not provided?
+                    if (!metric) {
+                        km *= MILES_TO_KM;
+                        kph *= MILES_TO_KM;
+                    }			 
+                }
+                else {
+                    // for ergomo formatted CSV files
+                     minutes = line.section(',', 0, 0).toDouble();
+                     km		 = line.section(',', 1, 1).toDouble();
+                     watts	 = line.section(',', 2, 2).toDouble();
+                     cad	 = line.section(',', 3, 3).toDouble();
+                     kph	 = line.section(',', 4, 4).toDouble();
+                     hr		 = line.section(',', 5, 5).toDouble();
+                     interval	= line.section(',', 8, 8).toInt();
+                     nm		 = NULL; // torque is not provided in the Ergomo file
+                    
+                    // the ergomo records the time in whole seconds
+                    // RECORDING INT. 1, 2, 5, 10, 15 or 30 per sec
+                    minutes = minutes/60.0;
+                    
+                    if (!metric) {
+                        km *= MILES_TO_KM;
+                        kph *= MILES_TO_KM;
+                    }
+                }
+                
+                // PT reports no data as watts == -1.
+                if (watts == -1)
+                    watts = 0;
+                
+                rideFile->appendPoint(minutes * 60.0, cad, hr, km, 
+                                      kph, nm, watts, interval);
+            }
         ++lineno;
+        }
     }
     // To estimate the recording interval, take the median of the
     // first 1000 samples and round to nearest millisecond.
