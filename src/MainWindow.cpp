@@ -347,11 +347,11 @@ MainWindow::MainWindow(const QDir &home) :
             allPlot, SLOT(showGrid(int)));
     connect(smoothSlider, SIGNAL(valueChanged(int)),
             this, SLOT(setSmoothingFromSlider()));
-    connect(smoothLineEdit, SIGNAL(returnPressed()),
+    connect(smoothLineEdit, SIGNAL(editingFinished()),
             this, SLOT(setSmoothingFromLineEdit()));
     connect(binWidthSlider, SIGNAL(valueChanged(int)),
             this, SLOT(setBinWidthFromSlider()));
-    connect(binWidthLineEdit, SIGNAL(returnPressed()),
+    connect(binWidthLineEdit, SIGNAL(editingFinished()),
             this, SLOT(setBinWidthFromLineEdit()));
     connect(qaCPValue, SIGNAL(returnPressed()),
 	    this, SLOT(setQaCPFromLineEdit()));
