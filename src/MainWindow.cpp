@@ -784,7 +784,8 @@ MainWindow::rideSelected()
     RideMetric *weeklyDistance = factory.newMetric("total_distance");
     assert(weeklyDistance);
     RideMetric *weeklyWork = factory.newMetric("total_work");
-
+    assert(weeklyWork);
+    
     int zone_range = -1;
     double *time_in_zone = NULL;
     int num_zones = -1;
@@ -901,6 +902,7 @@ MainWindow::rideSelected()
 
     delete weeklyDistance;
     delete weeklySeconds;
+    delete weeklyWork;
 
     // TODO: add daily breakdown
 
