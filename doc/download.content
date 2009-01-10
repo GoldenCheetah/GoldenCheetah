@@ -43,6 +43,22 @@ href="http://goldencheetah.org/svn/trunk">here</a>.
 </tr>
 
 <tr>
+<td valign="top">1.0.277</td>
+<td valign="top">
+<a href="GoldenCheetah_1.0.277_Linux_x86.gz">Linux x86_64</a>,<br>
+<a href="GoldenCheetah_1.0.277_Linux_x86_64.tar.gz">Linux x86_64</a>,<br>
+<a href="GoldenCheetah_1.0.277_Darwin_Universal.dmg">Mac OS X Universal</a>
+</td>
+<td valign="top">
+<p>*Note: Beginning with this release we are changing to a numbered versioning system. Minor point releases will generally indicate builds with new features, while bugfix releases will increment the final number, which represents the svn revision*</p>
+<p>Several new features in this release: Critical Power calculator, find best intervals utility, Pedal Force / Pedal Velocity chart, iBike and Ergomo CSV import, GUI power zones creator, separate vertical axes for Power / HR / Cadence and Speed in the Ride plot, sorting rides with the most recent at the top of the list, and many bug fixes courtesy of JT Conklin.
+</p>
+<p>You may need to install <a href="http://www.ftdichip.com/Drivers/D2XX.htm">USB drivers</a> from FTDI.
+</p>
+</td>
+</tr>
+
+<tr>
 <td valign="top">Mar 10, 2008</td>
 <td valign="top">
 <a href="GoldenCheetah_2008-03-10_Linux_x86.tgz">Linux x86</a>,<br>
