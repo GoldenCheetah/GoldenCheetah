@@ -40,6 +40,7 @@
 #include <qwt_plot_picker.h>
 #include <qwt_plot_zoomer.h>
 #include <qwt_data.h>
+#include <boost/scoped_ptr.hpp>
 
 #include "DatePickerDialog.h"
 #include "ToolsDialog.h"
@@ -353,11 +354,11 @@ MainWindow::MainWindow(const QDir &home) :
             this, SLOT(setBinWidthFromSlider()));
     connect(binWidthLineEdit, SIGNAL(editingFinished()),
             this, SLOT(setBinWidthFromLineEdit()));
-    connect(qaCPValue, SIGNAL(returnPressed()),
+    connect(qaCPValue, SIGNAL(editingFinished()),
 	    this, SLOT(setQaCPFromLineEdit()));
-    connect(qaCadValue, SIGNAL(returnPressed()),
+    connect(qaCadValue, SIGNAL(editingFinished()),
 	    this, SLOT(setQaCADFromLineEdit()));
-    connect(qaClValue, SIGNAL(returnPressed()),
+    connect(qaClValue, SIGNAL(editingFinished()),
 	    this, SLOT(setQaCLFromLineEdit()));
     connect(tabWidget, SIGNAL(currentChanged(int)), 
             this, SLOT(tabChanged(int)));
@@ -577,7 +578,8 @@ MainWindow::exportCSV()
 void MainWindow::importCSV()
 {
     // Prompt the user for the ride date
-    DatePickerDialog *dpd = new DatePickerDialog(this);
+    boost::scoped_ptr<DatePickerDialog> dpd(new DatePickerDialog(this));
+
     dpd->exec();
 
     if(dpd->canceled == true)
@@ -585,8 +587,8 @@ void MainWindow::importCSV()
 
     QFile file ( dpd->fileName );
     QStringList errors;
-    RideFile *ride =
-        RideFileFactory::instance().openRideFile(file, errors);
+    boost::scoped_ptr<RideFile> ride(
+        RideFileFactory::instance().openRideFile(file, errors));
 
     if (!ride || !errors.empty())
     {
@@ -624,8 +626,6 @@ void MainWindow::importCSV()
         return;
     }
 
-    delete ride;
-    delete dpd;
     addRide ( name );
 }
 
@@ -648,8 +648,10 @@ MainWindow::importSRM()
         QString fileName = i.next();
         QFile file(fileName);
         QStringList errors;
-        RideFile *ride =
-            RideFileFactory::instance().openRideFile(file, errors);
+
+        boost::scoped_ptr<RideFile> ride(
+            RideFileFactory::instance().openRideFile(file, errors));
+
         if (!ride || !errors.empty()) {
             QString all = (ride 
                            ? tr("Non-fatal problem(s) opening %1:")
@@ -680,7 +682,6 @@ MainWindow::importSRM()
             return;
         }
 
-        delete ride;
         addRide(name);
     }
 }
@@ -704,8 +705,10 @@ MainWindow::importTCX()
         QString fileName = i.next();
         QFile file(fileName);
         QStringList errors;
-        RideFile *ride =
-            RideFileFactory::instance().openRideFile(file, errors);
+
+        boost::scoped_ptr<RideFile> ride(
+            RideFileFactory::instance().openRideFile(file, errors));
+
         if (!ride || !errors.empty()) {
             QString all = (ride 
                            ? tr("Non-fatal problem(s) opening %1:")
@@ -736,7 +739,6 @@ MainWindow::importTCX()
             return;
         }
 
-        delete ride;
         addRide(name);
     }
 }
@@ -771,8 +773,12 @@ MainWindow::rideSelected()
         cpintPlot->calculate(ride->fileName, ride->dateTime);
     if (ride->ride)
         powerHist->setData(ride->ride);
-    if (ride->ride)
-        pfPvPlot->setData(ride->ride);
+    if (ride){
+        // using a RideItem rather than RideFile to provide access to zones information
+        pfPvPlot->setData(ride);
+        // update the QLabel widget with the CP value set in PfPvPlot::setData()
+        qaCPValue->setText(QString("%1").arg(pfPvPlot->getCP()));
+    }
 
     QDate wstart = ride->dateTime.date();
     wstart = wstart.addDays(Qt::Monday - wstart.dayOfWeek());
