@@ -24,6 +24,7 @@
 
 // forward references
 class RideFile;
+class RideItem;
 class QwtPlotCurve;
 class QwtPlotMarker;
 
@@ -34,7 +35,7 @@ class PfPvPlot : public QwtPlot
     public:
 
         PfPvPlot();
-        void setData(RideFile *ride);
+        void setData(RideItem *rideItem);
 
 	int getCP();
 	void setCP(int cp);

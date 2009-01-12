@@ -19,7 +19,9 @@
 
 #include "PfPvPlot.h"
 #include "RideFile.h"
+#include "RideItem.h"
 #include "Settings.h"
+#include "Zones.h"
 
 #include <assert.h>
 #include <qwt_data.h>
@@ -63,10 +65,11 @@ PfPvPlot::PfPvPlot()
 }
 
 void
-PfPvPlot::setData(RideFile *ride)
+PfPvPlot::setData(RideItem *rideItem)
 {
+    RideFile *ride = rideItem->ride;
     setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
-
+    
     // due to the discrete power and cadence values returned by the
     // power meter, there will very likely be many duplicate values.
     // Rather than pass them all to the curve, use a set to strip
@@ -98,6 +101,14 @@ PfPvPlot::setData(RideFile *ride)
 	++j;
     }
 
+    // get the current zone's CP if available:
+    if(rideItem->zones){
+        int zone_range = rideItem->zones->whichRange(rideItem->dateTime.date());
+        if (zone_range >= 0) {
+            setCP(rideItem->zones->getCP(rideItem->zones->whichRange(rideItem->dateTime.date())));
+        }
+    }
+    
     curve->setData(cpvArray, aepfArray);
     replot();
 }

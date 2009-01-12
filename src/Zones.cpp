@@ -146,6 +146,8 @@ int Zones::whichRange(const QDate &date) const
 
 int Zones::numZones(int rnum) const
 {
+    // TODO: Fix an array index out of range error when a gap in the zones ranges 
+    // is causing rnum to be -1, but the program still thinks that zones info is available 
     assert(rnum < ranges.size());
     return ranges[rnum]->zones.size();
 }
