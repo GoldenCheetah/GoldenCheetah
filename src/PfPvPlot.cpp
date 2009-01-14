@@ -28,6 +28,7 @@
 #include <qwt_legend.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
+#include <qwt_symbol.h>
 #include <set>
 
 #define PI	3.14159
@@ -57,8 +58,15 @@ PfPvPlot::PfPvPlot()
     cpCurve->attach(this);
 
     curve = new QwtPlotCurve();
-    curve->setPen(QPen(Qt::red));
+    QwtSymbol sym;
+    sym.setStyle(QwtSymbol::Ellipse);
+    sym.setSize(6);
+    sym.setPen(QPen(Qt::red));
+    sym.setBrush(QBrush(Qt::NoBrush));
+    
+    curve->setSymbol(sym);
     curve->setStyle(QwtPlotCurve::Dots);
+    curve->setRenderHint(QwtPlotItem::RenderAntialiased);
     curve->attach(this);
 
     recalc();
