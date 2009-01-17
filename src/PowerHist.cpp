@@ -54,8 +54,8 @@ PowerHist::recalc()
     if (!array)
         return;
     int count = (int) ceil((arrayLength - 1) / binw);
-    double *smoothWatts = new double[count+1];
-    double *smoothTime  = new double[count+1];
+    QVector<double> smoothWatts(count+1);
+    QVector<double> smoothTime(count+1);
     int i;
     for (i = 0; i < count; ++i) {
         int low = i * binw;
@@ -67,12 +67,10 @@ PowerHist::recalc()
     }
     smoothTime[i] = 0.0;
     smoothWatts[i] = i * binw;
-    curve->setData(smoothWatts, smoothTime, count+1);
+    curve->setData(smoothWatts.data(), smoothTime.data(), count+1);
     setAxisScale(xBottom, 0.0, smoothWatts[count]);
     setYMax();
     replot();
-    delete [] smoothWatts;
-    delete [] smoothTime;
 }
 
 void
