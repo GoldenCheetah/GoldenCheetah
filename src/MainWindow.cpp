@@ -831,8 +831,10 @@ MainWindow::rideSelected()
         }
     }
 
-    int minutes = ((int) round(weeklySeconds->value(true))) / 60;
-    int hours = (int) minutes / 60;
+    int seconds = ((int) round(weeklySeconds->value(true)));
+    int minutes = seconds / 60;
+    seconds %= 60;
+    int hours = minutes / 60;
     minutes %= 60;
 
     const char *dateFormat = "MM/dd/yyyy";
@@ -849,19 +851,20 @@ MainWindow::rideSelected()
             "<p>"
             "<table align=\"center\" width=\"60%\" border=0>"
             "<tr><td>Total time riding:</td>"
-            "    <td align=\"right\">%3:%4</td></tr>"
-            "<tr><td>Total distance (kilometers):</td>"
-            "    <td align=\"right\">%5</td></tr>"
-            "<tr><td>Total work (kJ):</td>"
+            "    <td align=\"right\">%3:%4:%5</td></tr>"
+            "<tr><td>Total distance (km):</td>"
             "    <td align=\"right\">%6</td></tr>"
-            "<tr><td>Daily Average work (kJ):</td>"
+            "<tr><td>Total work (kJ):</td>"
             "    <td align=\"right\">%7</td></tr>"
+            "<tr><td>Daily Average work (kJ):</td>"
+            "    <td align=\"right\">%8</td></tr>"
             "</table>"
             )
             .arg(wstart.toString(dateFormat))
             .arg(wstart.addDays(6).toString(dateFormat))
             .arg(hours)
             .arg(minutes, 2, 10, QLatin1Char('0'))
+            .arg(seconds, 2, 10, QLatin1Char('0'))
             .arg(weeklyDistance->value(true), 0, 'f', 1)
             .arg((unsigned) round(weeklyWork->value(true)))
             .arg((unsigned) round(weeklyWork->value(true) / 7));
@@ -874,13 +877,13 @@ MainWindow::rideSelected()
             "<p>"
             "<table align=\"center\" width=\"60%\" border=0>"
             "<tr><td>Total time riding:</td>"
-            "    <td align=\"right\">%3:%4</td></tr>"
+            "    <td align=\"right\">%3:%4:%5</td></tr>"
             "<tr><td>Total distance (miles):</td>"
-            "    <td align=\"right\">%5</td></tr>"
-            "<tr><td>Total work (kJ):</td>"
             "    <td align=\"right\">%6</td></tr>"
-            "<tr><td>Daily Average work (kJ):</td>"
+            "<tr><td>Total work (kJ):</td>"
             "    <td align=\"right\">%7</td></tr>"
+            "<tr><td>Daily Average work (kJ):</td>"
+            "    <td align=\"right\">%8</td></tr>"
             "</table>"
             // TODO: add averages
             )
@@ -888,6 +891,7 @@ MainWindow::rideSelected()
             .arg(wstart.addDays(6).toString(dateFormat))
             .arg(hours)
             .arg(minutes, 2, 10, QLatin1Char('0'))
+            .arg(seconds, 2, 10, QLatin1Char('0'))
             .arg(weeklyDistance->value(false), 0, 'f', 1)
             .arg((unsigned) round(weeklyWork->value(true)))
             .arg((unsigned) round(weeklyWork->value(true) / 7));
