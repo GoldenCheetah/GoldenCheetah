@@ -101,6 +101,12 @@ DownloadRideDialog::scanDevices()
     listWidget->clear();
     QString err;
     devList = Device::listDevices(err);
+    if (err != "") {
+        QString msg = "Warning:\n\n" + err + "You may need to (re)install "
+            "the FTDI drivers before downloading.";
+        QMessageBox::warning(0, "Error Loading Device Drivers", msg, 
+                             QMessageBox::Ok, QMessageBox::NoButton);
+    }
     for (int i = 0; i < devList.size(); ++i)
         new QListWidgetItem(devList[i]->name(), listWidget);
     if (listWidget->count() > 0) {

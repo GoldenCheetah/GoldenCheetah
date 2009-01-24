@@ -60,7 +60,7 @@ struct D2XXWrapper {
         const char *libname = "libftd2xx.dylib";
         handle = dlopen(libname, RTLD_NOW);
         if (!handle) {
-            error = QString("couldn't load library ") + libname;
+            error = QString("Couldn't load library ") + libname + ".";
             return false;
         }
         LOAD_SYM(FP_OpenEx, open_ex, "FT_OpenEx");
