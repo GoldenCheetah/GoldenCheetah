@@ -201,7 +201,7 @@ static bool avgHeartRateAdded =
 struct AvgCadence : public AvgRideMetric {
 
     QString name() const { return "average_cad"; }
-    QString units(bool) const { return "bpm"; }
+    QString units(bool) const { return "rpm"; }
     void perPoint(const RideFilePoint *point, double, 
                   const RideFile *, const Zones *, int) {
         if (point->cad > 0) {
