@@ -17,6 +17,68 @@
  */
 
 #include "D2XX.h"
+#include <dlfcn.h>
+
+// D2XXWrapper is a wrapper around libftd2xx to make it amenable to loading
+// with dlopen().
+
+#define LOAD_SYM(type,var,name) \
+    var = (type*) dlsym(handle, name); \
+    if (!var) { \
+        error = QString("could not load symbol ") + name; \
+        return false; \
+    }
+
+typedef FT_STATUS FP_OpenEx(PVOID pArg1, DWORD Flags, FT_HANDLE *pHandle);
+typedef FT_STATUS FP_Close(FT_HANDLE ftHandle);
+typedef FT_STATUS FP_SetBaudRate(FT_HANDLE ftHandle, ULONG BaudRate);
+typedef FT_STATUS FP_SetDataCharacteristics(FT_HANDLE ftHandle, UCHAR WordLength, UCHAR StopBits, UCHAR Parity);
+typedef FT_STATUS FP_SetFlowControl(FT_HANDLE ftHandle, USHORT FlowControl, UCHAR XonChar, UCHAR XoffChar);
+typedef FT_STATUS FP_GetQueueStatus(FT_HANDLE ftHandle, DWORD *dwRxBytes);
+typedef FT_STATUS FP_SetTimeouts(FT_HANDLE ftHandle, ULONG ReadTimeout, ULONG WriteTimeout);
+typedef FT_STATUS FP_Read(FT_HANDLE ftHandle, LPVOID lpBuffer, DWORD nBufferSize, LPDWORD lpBytesReturned);
+typedef FT_STATUS FP_Write(FT_HANDLE ftHandle, LPVOID lpBuffer, DWORD nBufferSize, LPDWORD lpBytesWritten);
+typedef FT_STATUS FP_CreateDeviceInfoList(LPDWORD lpdwNumDevs);
+typedef FT_STATUS FP_GetDeviceInfoList(FT_DEVICE_LIST_INFO_NODE *pDest, LPDWORD lpdwNumDevs);
+
+struct D2XXWrapper {
+    void *handle;
+    FP_OpenEx *open_ex;
+    FP_Close *close;
+    FP_SetBaudRate *set_baud_rate;
+    FP_SetDataCharacteristics *set_data_characteristics;
+    FP_SetFlowControl *set_flow_control;
+    FP_GetQueueStatus *get_queue_status;
+    FP_SetTimeouts *set_timeouts;
+    FP_Read *read;
+    FP_Write *write;
+    FP_CreateDeviceInfoList *create_device_info_list;
+    FP_GetDeviceInfoList *get_device_info_list;
+    D2XXWrapper() : handle(NULL) {}
+    ~D2XXWrapper() { if (handle) dlclose(handle); }
+    bool init(QString &error) {
+        const char *libname = "libftd2xx.dylib";
+        handle = dlopen(libname, RTLD_NOW);
+        if (!handle) {
+            error = QString("couldn't load library ") + libname;
+            return false;
+        }
+        LOAD_SYM(FP_OpenEx, open_ex, "FT_OpenEx");
+        LOAD_SYM(FP_Close, close, "FT_Close");
+        LOAD_SYM(FP_SetBaudRate, set_baud_rate, "FT_SetBaudRate");
+        LOAD_SYM(FP_SetDataCharacteristics, set_data_characteristics, "FT_SetDataCharacteristics");
+        LOAD_SYM(FP_SetFlowControl, set_flow_control, "FT_SetFlowControl");
+        LOAD_SYM(FP_GetQueueStatus, get_queue_status, "FT_GetQueueStatus");
+        LOAD_SYM(FP_SetTimeouts, set_timeouts, "FT_SetTimeouts");
+        LOAD_SYM(FP_Read, read, "FT_Read");
+        LOAD_SYM(FP_Write, write, "FT_Write");
+        LOAD_SYM(FP_CreateDeviceInfoList, create_device_info_list, "FT_CreateDeviceInfoList");
+        LOAD_SYM(FP_GetDeviceInfoList, get_device_info_list, "FT_GetDeviceInfoList");
+        return true;
+    }
+};
+
+static D2XXWrapper *lib; // singleton lib instance
 
 bool D2XXRegistered = Device::addListFunction(&D2XX::myListDevices);
 
@@ -36,27 +98,27 @@ D2XX::open(QString &err)
 {
     assert(!isOpen);
     FT_STATUS ftStatus =
-        FT_OpenEx(info.Description, FT_OPEN_BY_DESCRIPTION, &ftHandle);
+        lib->open_ex(info.Description, FT_OPEN_BY_DESCRIPTION, &ftHandle);
     if (ftStatus != FT_OK) {
         err = QString("FT_Open: %1").arg(ftStatus);
         return false;
     }
     isOpen = true;
-    ftStatus = FT_SetBaudRate(ftHandle, 9600);
+    ftStatus = lib->set_baud_rate(ftHandle, 9600);
     if (ftStatus != FT_OK) {
         err = QString("FT_SetBaudRate: %1").arg(ftStatus);
         close();
     }
 
-    ftStatus = FT_SetDataCharacteristics(ftHandle,FT_BITS_8,FT_STOP_BITS_1,
-                                         FT_PARITY_NONE);
+    ftStatus = lib->set_data_characteristics(ftHandle,FT_BITS_8,FT_STOP_BITS_1,
+                                             FT_PARITY_NONE);
     if (ftStatus != FT_OK) {
         err = QString("FT_SetDataCharacteristics: %1").arg(ftStatus);
         close();
     }
 
-    ftStatus = FT_SetFlowControl (ftHandle,FT_FLOW_NONE,
-                                  '0','0'); //the 0's are ignored
+    ftStatus = lib->set_flow_control(ftHandle,FT_FLOW_NONE,
+                                     '0','0'); //the 0's are ignored
     if (ftStatus != FT_OK) {
         err = QString("FT_SetFlowControl: %1").arg(ftStatus);
         close();
@@ -69,7 +131,7 @@ void
 D2XX::close()
 {
     assert(isOpen);
-    FT_Close(ftHandle); 
+    lib->close(ftHandle); 
     isOpen = false;
 }
 
@@ -78,7 +140,7 @@ D2XX::read(void *buf, size_t nbyte, QString &err)
 {
     assert(isOpen);
     DWORD rxbytes;
-    FT_STATUS ftStatus = FT_GetQueueStatus(ftHandle, &rxbytes);
+    FT_STATUS ftStatus = lib->get_queue_status(ftHandle, &rxbytes);
     if (ftStatus != FT_OK) {
         err = QString("FT_GetQueueStatus: %1").arg(ftStatus);
         return -1;
@@ -88,9 +150,9 @@ D2XX::read(void *buf, size_t nbyte, QString &err)
     if (rxbytes > 0 && rxbytes < nbyte)
         nbyte = rxbytes;
     if (nbyte > rxbytes)
-        FT_SetTimeouts(ftHandle, 5000, 5000);
+        lib->set_timeouts(ftHandle, 5000, 5000);
     DWORD n;
-    ftStatus = FT_Read(ftHandle, buf, nbyte, &n);
+    ftStatus = lib->read(ftHandle, buf, nbyte, &n);
     if (ftStatus == FT_OK)
         return n;
     err = QString("FT_Read: %1").arg(ftStatus);
@@ -102,7 +164,7 @@ D2XX::write(void *buf, size_t nbyte, QString &err)
 {
     assert(isOpen);
     DWORD n;
-    FT_STATUS ftStatus = FT_Write(ftHandle, buf, nbyte, &n);
+    FT_STATUS ftStatus = lib->write(ftHandle, buf, nbyte, &n);
     if (ftStatus == FT_OK)
         return n;
     err = QString("FT_Write: %1").arg(ftStatus);
@@ -119,14 +181,22 @@ QVector<DevicePtr>
 D2XX::myListDevices(QString &err)
 {
     QVector<DevicePtr> result;
+    if (!lib) {
+        lib = new D2XXWrapper;
+        if (!lib->init(err)) {
+            delete lib;
+            lib = NULL;
+            return result;
+        }
+    }
     DWORD numDevs;
-    FT_STATUS ftStatus = FT_CreateDeviceInfoList(&numDevs); 
+    FT_STATUS ftStatus = lib->create_device_info_list(&numDevs); 
     if(ftStatus != FT_OK) {
         err = QString("FT_CreateDeviceInfoList: %1").arg(ftStatus); 
         return result;
     }
     FT_DEVICE_LIST_INFO_NODE *devInfo = new FT_DEVICE_LIST_INFO_NODE[numDevs];
-    ftStatus = FT_GetDeviceInfoList(devInfo, &numDevs); 
+    ftStatus = lib->get_device_info_list(devInfo, &numDevs); 
     if (ftStatus != FT_OK)
         err = QString("FT_GetDeviceInfoList: %1").arg(ftStatus); 
     else {

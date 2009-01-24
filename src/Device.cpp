@@ -37,10 +37,13 @@ Device::listDevices(QString &err)
     QVector<DevicePtr> result;
     for (int i = 0; listFunctions && i < listFunctions->size(); ++i) {
         QVector<DevicePtr> tmp = (*listFunctions)[i](err);
-        if (err != "")
-            return result;
-        for (int j = 0; j < tmp.size(); ++j)
-            result.append(tmp[j]);
+        if (err == "") {
+            for (int j = 0; j < tmp.size(); ++j)
+                result.append(tmp[j]);
+        }
+        else {
+            err += "\n";
+        }
     }
     return result;
 }
