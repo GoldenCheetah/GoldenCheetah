@@ -164,6 +164,11 @@ MainWindow::MainWindow(const QDir &home) :
     showCad->setCheckState(Qt::Checked);
     showLayout->addWidget(showCad);
 
+    QComboBox *comboDistance = new QComboBox();
+    comboDistance->addItem(tr("X Axis Shows Time"));
+    comboDistance->addItem(tr("X Axis Shows Distance"));
+    showLayout->addWidget(comboDistance);
+
     QHBoxLayout *smoothLayout = new QHBoxLayout;
     QLabel *smoothLabel = new QLabel(tr("Smoothing (secs)"), window);
     smoothLineEdit = new QLineEdit(window);
@@ -282,7 +287,13 @@ MainWindow::MainWindow(const QDir &home) :
                                                      binWidthSlider->maximum(), 
                                                      binWidthLineEdit));
     binWidthLayout->addWidget(binWidthSlider);
+
+    withZerosCheckBox = new QCheckBox;
+    withZerosCheckBox->setText("With zeros");
+    binWidthLayout->addWidget(withZerosCheckBox);
+
     powerHist = new PowerHist();
+    withZerosCheckBox->setChecked(powerHist->withZeros());
     binWidthSlider->setValue(powerHist->binWidth());
     binWidthLineEdit->setText(QString("%1").arg(powerHist->binWidth()));
     vlayout->addWidget(powerHist);
@@ -346,6 +357,8 @@ MainWindow::MainWindow(const QDir &home) :
             allPlot, SLOT(showCad(int)));
     connect(showGrid, SIGNAL(stateChanged(int)),
             allPlot, SLOT(showGrid(int)));
+    connect(comboDistance, SIGNAL(activated(int)),
+            allPlot, SLOT(setByDistance(int)));
     connect(smoothSlider, SIGNAL(valueChanged(int)),
             this, SLOT(setSmoothingFromSlider()));
     connect(smoothLineEdit, SIGNAL(editingFinished()),
@@ -354,6 +367,8 @@ MainWindow::MainWindow(const QDir &home) :
             this, SLOT(setBinWidthFromSlider()));
     connect(binWidthLineEdit, SIGNAL(editingFinished()),
             this, SLOT(setBinWidthFromLineEdit()));
+    connect(withZerosCheckBox, SIGNAL(stateChanged(int)),
+            this, SLOT(setWithZerosFromCheckBox()));
     connect(qaCPValue, SIGNAL(editingFinished()),
 	    this, SLOT(setQaCPFromLineEdit()));
     connect(qaCadValue, SIGNAL(editingFinished()),
@@ -1027,6 +1042,14 @@ MainWindow::setBinWidthFromSlider()
     if (powerHist->binWidth() != binWidthSlider->value()) {
         powerHist->setBinWidth(binWidthSlider->value());
         binWidthLineEdit->setText(QString("%1").arg(powerHist->binWidth()));
+    }
+}
+
+void
+MainWindow::setWithZerosFromCheckBox()
+{
+    if (powerHist->withZeros() != withZerosCheckBox->isChecked()) {
+        powerHist->setWithZeros(withZerosCheckBox->isChecked());
     }
 }
 

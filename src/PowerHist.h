@@ -37,9 +37,13 @@ class PowerHist : public QwtPlot
 
         int binWidth() const { return binw; }
 
+        bool withZeros() const { return withz; }
+
         void setData(RideFile *ride);
 
     public slots:
+
+        void setWithZeros(bool value);
 
         void setBinWidth(int value);
 
@@ -49,6 +53,8 @@ class PowerHist : public QwtPlot
 
         double *array;
         int arrayLength;
+
+        bool withz;
 
         int binw;
 

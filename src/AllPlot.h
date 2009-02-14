@@ -37,11 +37,14 @@ class AllPlot : public QwtPlot
         QwtPlotCurve *hrCurve;
         QwtPlotCurve *speedCurve;
         QwtPlotCurve *cadCurve;
+        QwtPlotCurve *distanceCurve;
         QwtPlotMarker *d_mrk;
 
         AllPlot();
 
         int smoothing() const { return smooth; }
+
+        bool byDistance() const { return bydist; }
 
         void setData(RideFile *ride);
 
@@ -53,6 +56,7 @@ class AllPlot : public QwtPlot
         void showCad(int state);
         void showGrid(int state);
         void setSmoothing(int value);
+        void setByDistance(int value);
 
     protected:
 
@@ -63,14 +67,18 @@ class AllPlot : public QwtPlot
         double *speedArray;
         double *cadArray;
         double *timeArray;
+        double *distanceArray;
         int arrayLength;
         int *interArray;
         
 
         int smooth;
 
+        bool bydist;
+
         void recalc();
         void setYMax();
+        void setXTitle();
 
     private:
         QSettings settings;

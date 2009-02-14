@@ -26,8 +26,8 @@
 #include <qwt_legend.h>
 #include <qwt_data.h>
 
-PowerHist::PowerHist() : 
-    array(NULL), binw(20)
+PowerHist::PowerHist() :
+    array(NULL), binw(20), withz(true)
 {
     setCanvasBackground(Qt::white);
 
@@ -60,6 +60,8 @@ PowerHist::recalc()
     for (i = 0; i < count; ++i) {
         int low = i * binw;
         int high = low + binw;
+        if (low==0 && !withz)
+            low++;
         smoothWatts[i] = low;
         smoothTime[i]  = 0.0;
         while (low < high)
@@ -111,6 +113,13 @@ void
 PowerHist::setBinWidth(int value)
 {
     binw = value;
+    recalc();
+}
+
+void
+PowerHist::setWithZeros(bool value)
+{
+    withz = value;
     recalc();
 }
 
