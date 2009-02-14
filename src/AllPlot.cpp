@@ -36,14 +36,14 @@ max(double a, double b) { if (a > b) return a; else return b; }
 AllPlot::AllPlot() : 
     d_mrk(NULL), hrArray(NULL), wattsArray(NULL), 
     speedArray(NULL), cadArray(NULL), 
-    timeArray(NULL), interArray(NULL), smooth(30),
+    timeArray(NULL), interArray(NULL), smooth(30), bydist(false),
     settings(GC_SETTINGS_CO, GC_SETTINGS_APP),
     unit(settings.value(GC_UNIT))
 {
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setCanvasBackground(Qt::white);
 
-    setAxisTitle(xBottom, "Time (minutes)");
+    setXTitle();
     
     wattsCurve = new QwtPlotCurve("Power");
     // wattsCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -99,16 +99,18 @@ AllPlot::recalc()
     double totalHr = 0.0;
     double totalSpeed = 0.0;
     double totalCad = 0.0;
+    double totalDist = 0.0;
     QList<DataPoint*> list;
     int i = 0;
-    double *smoothWatts = new double[rideTimeSecs + 1];
-    double *smoothHr    = new double[rideTimeSecs + 1];
-    double *smoothSpeed = new double[rideTimeSecs + 1];
-    double *smoothCad   = new double[rideTimeSecs + 1];
-    double *smoothTime  = new double[rideTimeSecs + 1];
-    
+    double *smoothWatts     = new double[rideTimeSecs + 1];
+    double *smoothHr        = new double[rideTimeSecs + 1];
+    double *smoothSpeed     = new double[rideTimeSecs + 1];
+    double *smoothCad       = new double[rideTimeSecs + 1];
+    double *smoothTime      = new double[rideTimeSecs + 1];
+    double *smoothDistance  = new double[rideTimeSecs + 1];
+
     delete [] d_mrk;
-    QList<double> interList; //Just store the time that it happened. 
+    QList<double> interList; //Just store the time that it happened.
                              //Intervals are sequential.
 
     int lastInterval = 0; //Detect if we hit a new interval
@@ -120,6 +122,7 @@ AllPlot::recalc()
         smoothSpeed[secs] = 0.0;
         smoothCad[secs]   = 0.0;
         smoothTime[secs]  = secs / 60.0;
+        smoothDistance[secs]  = 0.0;
     }
     for (int secs = smooth; secs <= rideTimeSecs; ++secs) {
         while ((i < arrayLength) && (timeArray[i] <= secs)) {
@@ -130,6 +133,7 @@ AllPlot::recalc()
             totalHr    += hrArray[i];
             totalSpeed += speedArray[i];
             totalCad   += cadArray[i];
+            totalDist   = distanceArray[i];
             list.append(dp);
             //Figure out when and if we have a new interval..
             if(lastInterval != interArray[i]) {
@@ -156,18 +160,27 @@ AllPlot::recalc()
             smoothCad[secs]   = 0.0;
         }
         else {
-            smoothWatts[secs] = totalWatts / list.size();
-            smoothHr[secs]    = totalHr / list.size();
+            smoothWatts[secs]    = totalWatts / list.size();
+            smoothHr[secs]       = totalHr / list.size();
             smoothSpeed[secs]    = totalSpeed / list.size();
-            smoothCad[secs]    = totalCad / list.size();
+            smoothCad[secs]      = totalCad / list.size();
         }
+        smoothDistance[secs] = totalDist;
         smoothTime[secs]  = secs / 60.0;
     }
-    wattsCurve->setData(smoothTime, smoothWatts, rideTimeSecs + 1);
-    hrCurve->setData(smoothTime, smoothHr, rideTimeSecs + 1);
-    speedCurve->setData(smoothTime, smoothSpeed, rideTimeSecs + 1);
-    cadCurve->setData(smoothTime, smoothCad, rideTimeSecs + 1);
-    setAxisScale(xBottom, 0.0, smoothTime[rideTimeSecs]);
+    if (!bydist) {
+        wattsCurve->setData(smoothTime, smoothWatts, rideTimeSecs + 1);
+        hrCurve->setData(smoothTime, smoothHr, rideTimeSecs + 1);
+        speedCurve->setData(smoothTime, smoothSpeed, rideTimeSecs + 1);
+        cadCurve->setData(smoothTime, smoothCad, rideTimeSecs + 1);
+        setAxisScale(xBottom, 0.0, smoothTime[rideTimeSecs]);
+    } else {
+        wattsCurve->setData(smoothDistance, smoothWatts, rideTimeSecs + 1);
+        hrCurve->setData(smoothDistance, smoothHr, rideTimeSecs + 1);
+        speedCurve->setData(smoothDistance, smoothSpeed, rideTimeSecs + 1);
+        cadCurve->setData(smoothDistance, smoothCad, rideTimeSecs + 1);
+        setAxisScale(xBottom, 0.0, totalDist);
+    }
     setYMax();
     
     QString label[interList.size()];
@@ -185,7 +198,10 @@ AllPlot::recalc()
         text[x] = QwtText(label[x]);
         text[x].setFont(QFont("Helvetica", 10, QFont::Bold));
         text[x].setColor(Qt::black);
-        d_mrk[x].setValue(interList.at(x), 0.0);
+        if (!bydist)
+            d_mrk[x].setValue(interList.at(x), 0.0);
+        else
+            d_mrk[x].setValue(smoothDistance[int(ceil(60*interList.at(x)))], 0.0);
         d_mrk[x].setLabel(text[x]);
     }
 
@@ -195,6 +211,7 @@ AllPlot::recalc()
     delete [] smoothSpeed;
     delete [] smoothCad;
     delete [] smoothTime;
+    delete [] smoothDistance;
 }
 
 void
@@ -222,6 +239,15 @@ AllPlot::setYMax()
 }
 
 void
+AllPlot::setXTitle()
+{
+    if (bydist)
+        setAxisTitle(xBottom, "Distance "+QString(unit.toString() == "Metric"?"(km)":"(miles)"));
+    else
+        setAxisTitle(xBottom, "Time (minutes)");
+}
+
+void
 AllPlot::setData(RideFile *ride)
 {
     delete [] wattsArray;
@@ -230,7 +256,8 @@ AllPlot::setData(RideFile *ride)
     delete [] cadArray;
     delete [] timeArray;
     delete [] interArray;
-    
+    delete [] distanceArray;
+
     setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
     wattsArray = new double[ride->dataPoints().size()];
     hrArray    = new double[ride->dataPoints().size()];
@@ -238,6 +265,7 @@ AllPlot::setData(RideFile *ride)
     cadArray    = new double[ride->dataPoints().size()];
     timeArray  = new double[ride->dataPoints().size()];
     interArray = new int[ride->dataPoints().size()];
+    distanceArray = new double[ride->dataPoints().size()];
     arrayLength = 0;
     QListIterator<RideFilePoint*> i(ride->dataPoints()); 
     while (i.hasNext()) {
@@ -246,11 +274,15 @@ AllPlot::setData(RideFile *ride)
         wattsArray[arrayLength] = max(0, point->watts);
         hrArray[arrayLength]    = max(0, point->hr);
         speedArray[arrayLength] = max(0, 
-				      ((unit.toString() == "Metric") 
-					? point->kph
-					: point->kph * MILES_PER_KM));
+                    ((unit.toString() == "Metric")
+                    ? point->kph
+                    : point->kph * MILES_PER_KM));
         cadArray[arrayLength]   = max(0, point->cad);
         interArray[arrayLength] = point->interval;
+        distanceArray[arrayLength] = max(0,
+                  ((unit.toString() == "Metric")
+                  ? point->km
+                  : point->km * MILES_PER_KM));
         ++arrayLength;
     }
     recalc();
@@ -307,3 +339,10 @@ AllPlot::setSmoothing(int value)
     recalc();
 }
 
+void
+AllPlot::setByDistance(int id)
+{
+    bydist = (id == 1);
+    setXTitle();
+    recalc();
+}
