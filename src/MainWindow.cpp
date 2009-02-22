@@ -1156,10 +1156,12 @@ MainWindow::aboutDialog()
             ));
 }
 
+/*
 void MainWindow::importRideToDB()
-{
-	
+{	
 }
+
+*/
 
 void
 MainWindow::notesChanged()
