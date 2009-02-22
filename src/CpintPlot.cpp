@@ -171,13 +171,24 @@ done:
 }
 
 static int 
-read_one(const char *inname, QVector<double> &bests)
+read_one(const char *inname, QVector<double> &bests, QVector<QDate> &bestDates)
 {
     FILE *in = fopen(inname, "r");
     if (!in)
         return -1;
     int lineno = 1;
     char line[40];
+    
+    QRegExp rx(".*([0-9][0-9][0-9][0-9])_([0-9][0-9])_([0-9][0-9])"
+                "_([0-9][0-9])_([0-9][0-9])_([0-9][0-9])\\.cpi$");
+    QDate date;
+    if (rx.exactMatch(inname)) {
+        assert(rx.numCaptures() == 6);
+        date = QDate(rx.cap(1).toInt(), rx.cap(2).toInt(),rx.cap(3).toInt()); 
+    }
+    else
+        date = QDate(2009,1,1);
+        
     while (fgets(line, sizeof(line), in) != NULL) {
         double mins;
         int watts;
@@ -186,10 +197,14 @@ read_one(const char *inname, QVector<double> &bests)
             exit(1);
         }
         int secs = (int) round(mins * 60.0);
-        if (secs >= bests.size())
+        if (secs >= bests.size()) {
             bests.resize(secs + 1);
-        if (bests[secs] < watts)
+            bestDates.resize(secs + 1);
+        }
+        if (bests[secs] < watts){
             bests[secs] = watts;
+            bestDates[secs] = date;
+        }
         ++lineno;
     }
     fclose(in);
@@ -197,10 +212,10 @@ read_one(const char *inname, QVector<double> &bests)
 }
 
 static int
-read_cpi_file(const QDir &dir, const QFileInfo &raw, QVector<double> &bests)
+read_cpi_file(const QDir &dir, const QFileInfo &raw, QVector<double> &bests, QVector<QDate> &bestDates)
 {
     QString inname = dir.absoluteFilePath(raw.completeBaseName() + ".cpi");
-    return read_one(inname.toAscii().constData(), bests);
+    return read_one(inname.toAscii().constData(), bests, bestDates);
 }
 
 void
@@ -269,7 +284,7 @@ CpintPlot::calculate(QString fileName, QDateTime dateTime)
             while (i.hasNext()) {
                 const QString &filename = i.next();
                 QString path = dir.absoluteFilePath(filename);
-                read_one(path.toAscii().constData(), bests);
+                read_one(path.toAscii().constData(), bests, bestDates);
                 progress->setValue(progress->value() + 1);
                 QCoreApplication::processEvents();
                 if (progress->wasCanceled()) {
@@ -301,7 +316,8 @@ CpintPlot::calculate(QString fileName, QDateTime dateTime)
         delete thisCurve;
         thisCurve = NULL;
         QVector<double> bests;
-        if (read_cpi_file(dir, file, bests) == 0) {
+        QVector<QDate> bestDates;
+        if (read_cpi_file(dir, file, bests, bestDates) == 0) {
             double *timeArray = new double[bests.size()];
             int maxNonZero = 0;
             for (int i = 0; i < bests.size(); ++i) {
