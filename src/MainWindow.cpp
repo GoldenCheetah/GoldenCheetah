@@ -31,6 +31,7 @@
 #include "Settings.h"
 #include "TimeUtils.h"
 #include "Zones.h"
+#include "MetricView.h"
 #include <assert.h>
 #include <QApplication>
 #include <QtGui>
@@ -44,6 +45,8 @@
 
 #include "DatePickerDialog.h"
 #include "ToolsDialog.h"
+
+#include "DBAccess.h"
 
 /* temp for the qmake/QMAKE_CXXFLAGS bug with xcode */
 #ifndef GC_SVN_VERSION
@@ -341,6 +344,12 @@ MainWindow::MainWindow(const QDir &home) :
     weeklySummary->setReadOnly(true);
     tabWidget->addTab(weeklySummary, tr("Weekly Summary"));
 
+	////////////////////////////// MetricView //////////////////////////////
+	
+	metricView = new MetricView(this);
+	tabWidget->addTab(metricView, tr("Metric View"));
+	
+	
     ////////////////////////////// Signals ////////////////////////////// 
 
     connect(treeWidget, SIGNAL(itemSelectionChanged()),
@@ -408,6 +417,8 @@ MainWindow::MainWindow(const QDir &home) :
                            SLOT(showOptions()), tr("Ctrl+O")); 
     optionsMenu->addAction(tr("&Tools..."), this, 
                            SLOT(showTools()), tr("Ctrl+T")); 
+   // optionsMenu->addAction(tr("&Import Ride to DB..."), this, 
+   //                        SLOT(importRideToDB()), tr("Ctrl+R")); 
 
  
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
@@ -1130,7 +1141,7 @@ MainWindow::pickerMoved(const QPoint &pos)
     cpintTodayValue->setText(tr("%1 watts").arg(
             curve_to_point(minutes, cpintPlot->getThisCurve())));
     cpintAllValue->setText(tr("%1 watts").arg(
-            curve_to_point(minutes, cpintPlot->getAllCurve())));
+            curve_to_point(minutes, cpintPlot->getAllCurve()))+(cpintPlot->getBestDates().count()>minutes*60?" ("+cpintPlot->getBestDates()[(int) ceil(minutes*60)].toString("MM/dd/yyyy")+")":""));
 }
 
 void
@@ -1152,6 +1163,11 @@ MainWindow::aboutDialog()
             "http://goldencheetah.org/</a>."
             "</center>"
             ));
+}
+
+void MainWindow::importRideToDB()
+{
+	
 }
 
 void
