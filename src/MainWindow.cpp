@@ -45,8 +45,6 @@
 #include "DatePickerDialog.h"
 #include "ToolsDialog.h"
 
-#include "DBAccess.h"
-
 /* temp for the qmake/QMAKE_CXXFLAGS bug with xcode */
 #ifndef GC_SVN_VERSION
 #define GC_SVN_VERSION "0"
