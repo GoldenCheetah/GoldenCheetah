@@ -31,7 +31,6 @@
 #include "Settings.h"
 #include "TimeUtils.h"
 #include "Zones.h"
-#include "MetricView.h"
 #include <assert.h>
 #include <QApplication>
 #include <QtGui>
@@ -344,12 +343,6 @@ MainWindow::MainWindow(const QDir &home) :
     weeklySummary->setReadOnly(true);
     tabWidget->addTab(weeklySummary, tr("Weekly Summary"));
 
-	////////////////////////////// MetricView //////////////////////////////
-	
-	metricView = new MetricView(this);
-	tabWidget->addTab(metricView, tr("Metric View"));
-	
-	
     ////////////////////////////// Signals ////////////////////////////// 
 
     connect(treeWidget, SIGNAL(itemSelectionChanged()),
