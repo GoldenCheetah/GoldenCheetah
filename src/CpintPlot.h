@@ -38,6 +38,8 @@ class CpintPlot : public QwtPlot
         const QwtPlotCurve *getAllCurve() const { return allCurve; }
         const QwtPlotCurve *getThisCurve() const { return thisCurve; }
 
+        QVector<QDate> getBestDates() { return bestDates; }
+
     public slots:
 
         void showGrid(int state);
@@ -49,6 +51,8 @@ class CpintPlot : public QwtPlot
         QwtPlotCurve *allCurve;
         QwtPlotCurve *thisCurve;
         QwtPlotGrid *grid;
+        
+        QVector<QDate> bestDates;
 };
 
 #endif // _GC_CpintPlot_h
