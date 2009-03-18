@@ -51,7 +51,7 @@ class DownloadRideDialog : public QDialog
 
         QVector<DevicePtr> devList;
         bool cancelled, downloadInProgress;
-        unsigned recInt;
+        double recIntSecs;
         int endingOffset;
         QVector<unsigned char> records;
         QString filename, filepath;
