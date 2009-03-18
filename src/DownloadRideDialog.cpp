@@ -30,7 +30,7 @@
 DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
                                        const QDir &home) : 
     mainWindow(mainWindow), home(home), cancelled(false),
-    downloadInProgress(false), recInt(0), endingOffset(0)
+    downloadInProgress(false), recIntSecs(0.0), endingOffset(0)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("Download Ride Data");
@@ -130,17 +130,18 @@ DownloadRideDialog::statusCallback(PowerTap::State state)
     else {
         assert(state == PowerTap::STATE_DATA_AVAILABLE);
         unsigned char *buf = records.data();
-        if (recInt == 0.0) {
+        bool bIsVer81 = PowerTap::is_Ver81(buf);
+        if (recIntSecs == 0.0) {
             for (int i = 0; i < records.size(); i += 6) {
-                if (PowerTap::is_config(buf + i)) {
+                if (PowerTap::is_config(buf + i, bIsVer81)) {
                     unsigned unused1, unused2, unused3;
                     PowerTap::unpack_config(buf + i, &unused1, &unused2,
-                                            &recInt, &unused3);
+                                            &recIntSecs, &unused3, bIsVer81);
                 }
             }
         }
-        if (recInt != 0.0) {
-            int min = (int) round(records.size() / 6 * recInt * 0.021);
+        if (recIntSecs != 0.0) {
+            int min = (int) round(records.size() / 6 * recIntSecs);
             QString existing = label->text();
             existing.chop(existing.size() - endingOffset);
             existing.append(QString("Ride data read: %1:%2").arg(min / 60)
@@ -150,8 +151,8 @@ DownloadRideDialog::statusCallback(PowerTap::State state)
         if (filename == "") {
             struct tm time;
             for (int i = 0; i < records.size(); i += 6) {
-                if (PowerTap::is_time(buf + i)) {
-                    PowerTap::unpack_time(buf + i, &time);
+                if (PowerTap::is_time(buf + i, bIsVer81)) {
+                    PowerTap::unpack_time(buf + i, &time, bIsVer81);
                     char tmp[32];
                     sprintf(tmp, "%04d_%02d_%02d_%02d_%02d_%02d.raw", 
                             time.tm_year + 1900, time.tm_mon + 1, 
@@ -241,8 +242,10 @@ DownloadRideDialog::downloadClicked()
         struct tm time;
         bool time_set = false;
         unsigned char *data = records.data();
+        bool bIsVer81 = PowerTap::is_Ver81(data);
+
         for (int i = 0; i < records.size(); i += 6) {
-            if (data[i] == 0)
+            if (data[i] == 0 && !bIsVer81)
                 continue;
             for (int j = 0; j < 6; ++j) {
                 os.setFieldWidth(2);
@@ -250,8 +253,8 @@ DownloadRideDialog::downloadClicked()
                 os.setFieldWidth(1);
                 os << ((j == 5) ? "\n" : " ");
             }
-            if (!time_set && PowerTap::is_time(data + i)) {
-                PowerTap::unpack_time(data + i, &time);
+            if (!time_set && PowerTap::is_time(data + i, bIsVer81)) {
+                PowerTap::unpack_time(data + i, &time, bIsVer81);
                 time_set = true;
             }
         }

@@ -35,25 +35,26 @@ struct ReadState
     double last_secs, last_miles;
     unsigned last_interval;
     time_t start_since_epoch;
-    unsigned rec_int;
+    // this seems to not be used
+    //unsigned rec_int;
     ReadState(RideFile *rideFile,
                      QStringList &errors) : 
         rideFile(rideFile), errors(errors), last_secs(0.0), 
-        last_miles(0.0), last_interval(0), start_since_epoch(0), rec_int(0) {}
+        last_miles(0.0), last_interval(0), start_since_epoch(0)/*, rec_int(0)*/ {}
 };
 
 static void 
-config_cb(unsigned interval, unsigned rec_int, 
+config_cb(unsigned interval, double rec_int_secs,
           unsigned wheel_sz_mm, void *context) 
 {
     (void) interval;
     (void) wheel_sz_mm;
     ReadState *state = (ReadState*) context;
     // Assume once set, rec_int should never change.
-    double recIntSecs = rec_int * 1.26;
+    //double recIntSecs = rec_int * 1.26;
     assert((state->rideFile->recIntSecs() == 0.0)
-           || (state->rideFile->recIntSecs() == recIntSecs));
-    state->rideFile->setRecIntSecs(recIntSecs);
+           || (state->rideFile->recIntSecs() == rec_int_secs));
+    state->rideFile->setRecIntSecs(rec_int_secs);
 }
 
 static void
@@ -94,7 +95,7 @@ error_cb(const char *msg, void *context)
 
 static void 
 pt_read_raw(FILE *in, int compat, void *context,
-            void (*config_cb)(unsigned interval, unsigned rec_int, 
+            void (*config_cb)(unsigned interval, double rec_int_secs,
                               unsigned wheel_sz_mm, void *context),
             void (*time_cb)(struct tm *time, time_t since_epoch, void *context),
             void (*data_cb)(double secs, double nm, double mph, 
@@ -105,7 +106,7 @@ pt_read_raw(FILE *in, int compat, void *context,
     unsigned interval = 0;
     unsigned last_interval = 0;
     unsigned wheel_sz_mm = 0;
-    unsigned rec_int = 0;
+    double rec_int_secs = 0.0;
     int i, n, row = 0;
     unsigned char buf[6];
     unsigned sbuf[6];
@@ -120,6 +121,7 @@ pt_read_raw(FILE *in, int compat, void *context,
     struct tm time;
     time_t since_epoch;
     char ebuf[256];
+    bool bIsVer81 = false;
 
     while ((n = fscanf(in, "%x %x %x %x %x %x\n", 
             sbuf, sbuf+1, sbuf+2, sbuf+3, sbuf+4, sbuf+5)) == 6) {
@@ -128,20 +130,25 @@ pt_read_raw(FILE *in, int compat, void *context,
             if (sbuf[i] > 0xff) { n = 1; break; }
             buf[i] = sbuf[i];
         }
-        if (row == 1) {
+        if (row == 1)
+        {
             /* Serial number? */
+            bIsVer81 = PowerTap::is_Ver81(buf);
         }
-        else if (PowerTap::is_config(buf)) {
+        else if (PowerTap::is_ignore_record(buf, bIsVer81)) {
+            // do nothing
+        }
+        else if (PowerTap::is_config(buf, bIsVer81)) {
             if (PowerTap::unpack_config(buf, &interval, &last_interval, 
-                                        &rec_int, &wheel_sz_mm) < 0) {
+                                        &rec_int_secs, &wheel_sz_mm, bIsVer81) < 0) {
                 sprintf(ebuf, "Couldn't unpack config record.");
                 if (error_cb) error_cb(ebuf, context);
                 return;
             }
-            if (config_cb) config_cb(interval, rec_int, wheel_sz_mm, context);
+            if (config_cb) config_cb(interval, rec_int_secs, wheel_sz_mm, context);
         }
-        else if (PowerTap::is_time(buf)) {
-            since_epoch = PowerTap::unpack_time(buf, &time);
+        else if (PowerTap::is_time(buf, bIsVer81)) {
+            since_epoch = PowerTap::unpack_time(buf, &time, bIsVer81);
             bool ignore = false;
             if (start_secs == 0.0)
                 start_secs = since_epoch;
@@ -156,14 +163,14 @@ pt_read_raw(FILE *in, int compat, void *context,
             }
             if (time_cb && !ignore) time_cb(&time, since_epoch, context);
         }
-        else if (PowerTap::is_data(buf)) {
+        else if (PowerTap::is_data(buf, bIsVer81)) {
             if (wheel_sz_mm == 0) {
                 sprintf(ebuf, "Read data row before wheel size set.");
                 if (error_cb) error_cb(ebuf, context);
                 return;
             }
-            PowerTap::unpack_data(buf, compat, rec_int, wheel_sz_mm, &secs, 
-                                  &nm, &mph, &watts, &meters, &cad, &hr);
+            PowerTap::unpack_data(buf, compat, rec_int_secs, wheel_sz_mm, &secs,
+                                  &nm, &mph, &watts, &meters, &cad, &hr, bIsVer81);
             if (compat)
                 miles = round(meters) / 1000.0 * BAD_KM_TO_MI;
             else 
