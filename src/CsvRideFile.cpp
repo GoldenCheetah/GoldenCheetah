@@ -56,7 +56,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
     {Various configuration data, recording interval at line[4][4]}
     Speed (mph),Wind Speed (mph),Power (W),Distance (miles),Cadence (RPM),Heartrate (BPM),Elevation (feet),Hill slope (%),Internal,Internal,Internal,DFPM Power,Latitude,Longitude
     */
-    QRegExp iBikeCSV("iBike,[0-9],[a-z]+", Qt::CaseInsensitive);
+	//  Modified the regExp string to allow for 2-digit version numbers - 23 Mar 2009, thm
+    QRegExp iBikeCSV("iBike,\\d\\d?,[a-z]+", Qt::CaseInsensitive);
     bool iBike = false;
     int recInterval;
     
