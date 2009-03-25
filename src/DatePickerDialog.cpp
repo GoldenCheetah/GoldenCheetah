@@ -32,6 +32,12 @@ void DatePickerDialog::setupUi(QDialog *DatePickerDialog)
     lblOccur = new QLabel("When did this ride occur?", this);
     mainGrid->addWidget(lblOccur, 0,0);
     dateTimeEdit = new QDateTimeEdit(this);
+	
+	// preset dialog to today's date  -thm
+	QDateTime *dt = new QDateTime;
+	date = dt->currentDateTime();
+	dateTimeEdit->setDateTime(date);
+	
     mainGrid->addWidget(dateTimeEdit,0,1);
     lblBrowse = new QLabel("Choose a CSV file to upload", this);
     mainGrid->addWidget(lblBrowse, 1,0);
