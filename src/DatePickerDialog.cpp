@@ -32,7 +32,7 @@ void DatePickerDialog::setupUi(QDialog *DatePickerDialog)
     lblOccur = new QLabel("When did this ride occur?", this);
     mainGrid->addWidget(lblOccur, 0,0);
     dateTimeEdit = new QDateTimeEdit(this);
-	
+
 	// preset dialog to today's date  -thm
 	QDateTime *dt = new QDateTime;
 	date = dt->currentDateTime();
@@ -52,7 +52,7 @@ void DatePickerDialog::setupUi(QDialog *DatePickerDialog)
     mainGrid->addWidget(btnCancel, 3,1);
 
     DatePickerDialog->setWindowTitle(
-        QApplication::translate("DatePickerDialog", "Choose a date", 0, 
+        QApplication::translate("DatePickerDialog", "Import CSV file", 0, 
                                 QApplication::UnicodeUTF8));
 
     btnBrowse->setText(
@@ -69,6 +69,11 @@ void DatePickerDialog::setupUi(QDialog *DatePickerDialog)
     connect(btnBrowse, SIGNAL(clicked()), this, SLOT(on_btnBrowse_clicked()));
     connect(btnCancel, SIGNAL(clicked()), this, SLOT(on_btnCancel_clicked()));
 
+	// disable date picker and OK button until a file has been selected
+	dateTimeEdit->setEnabled(FALSE);
+	lblOccur->setEnabled(FALSE);
+	btnOK->setEnabled(FALSE);
+	
     Q_UNUSED(DatePickerDialog);
 } 
 
@@ -93,12 +98,24 @@ void DatePickerDialog::on_btnBrowse_clicked()
         ? lastDirVar.toString() : QDir::homePath();
     fileName = QFileDialog::getOpenFileName(
         this, tr("Import CSV"), lastDir,
-        tr("Comma Seperated Values (*.csv)"));
+        tr("Comma Separated Values (*.csv)"));
     if (!fileName.isEmpty()) {
         lastDir = QFileInfo(fileName).absolutePath();
         settings.setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
+		
+		// get the creation date of the selected file
+		QFileInfo *qfi = new QFileInfo(fileName);
+		date = qfi->created();
+		// and put it into the datePicker dialog
+		dateTimeEdit->setDateTime(date);
+		
     }
     txtBrowse->setText(fileName);
+	
+	// allow date to be changed, and enable OK button
+	dateTimeEdit->setEnabled(TRUE);
+	lblOccur->setEnabled(TRUE);
+	btnOK->setEnabled(TRUE);
 }
 
 void DatePickerDialog::on_btnCancel_clicked()
