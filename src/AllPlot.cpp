@@ -35,8 +35,8 @@ max(double a, double b) { if (a > b) return a; else return b; }
 
 AllPlot::AllPlot() : 
     d_mrk(NULL), hrArray(NULL), wattsArray(NULL), 
-    speedArray(NULL), cadArray(NULL), 
-    timeArray(NULL), interArray(NULL), smooth(30), bydist(false),
+    speedArray(NULL), cadArray(NULL), timeArray(NULL),
+     distanceArray(NULL), interArray(NULL), smooth(30), bydist(false),
     settings(GC_SETTINGS_CO, GC_SETTINGS_APP),
     unit(settings.value(GC_UNIT))
 {
@@ -206,12 +206,20 @@ AllPlot::recalc()
     }
 
     replot();
-    delete [] smoothWatts;
-    delete [] smoothHr;
-    delete [] smoothSpeed;
-    delete [] smoothCad;
-    delete [] smoothTime;
-    delete [] smoothDistance;
+    
+    if(smoothWatts != NULL)
+        delete [] smoothWatts;
+    
+    if(smoothHr != NULL)
+        delete [] smoothHr;
+    if(smoothSpeed != NULL)
+        delete [] smoothSpeed;
+    if(smoothCad != NULL)
+        delete [] smoothCad;
+    if(smoothTime != NULL)
+        delete [] smoothTime;
+    if(smoothDistance != NULL)
+       delete [] smoothDistance;
 }
 
 void
@@ -250,13 +258,20 @@ AllPlot::setXTitle()
 void
 AllPlot::setData(RideFile *ride)
 {
-    delete [] wattsArray;
-    delete [] hrArray;
-    delete [] speedArray;
-    delete [] cadArray;
-    delete [] timeArray;
-    delete [] interArray;
-    delete [] distanceArray;
+    if(wattsArray != NULL)
+        delete [] wattsArray;
+    if(hrArray != NULL)
+        delete [] hrArray;
+    if(speedArray != NULL)
+        delete [] speedArray;
+    if(cadArray != NULL)
+        delete [] cadArray;
+    if(timeArray != NULL)
+        delete [] timeArray;
+    if(interArray != NULL)
+        delete [] interArray;
+    if(distanceArray != NULL)
+        delete [] distanceArray;
 
     setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
     wattsArray = new double[ride->dataPoints().size()];
