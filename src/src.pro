@@ -1,16 +1,16 @@
-
 TEMPLATE = app
 TARGET = GoldenCheetah
 DEPENDPATH += .
 INCLUDEPATH += /usr/local/qwt/include /sw/include /usr/local/include
 CONFIG += static debug
-QT += xml
-LIBS += /usr/local/qwt/lib/libqwt.a 
+QT += xml sql
+LIBS += /usr/local/qwt/lib/libqwt.5.dylib /usr/local/lib/libftd2xx.0.1.4.dylib 
 LIBS += -lm -lz
-QMAKE_CXXFLAGS += -DGC_BUILD_DATE=\\\"`date +'\"%a_%b_%d,_%Y\"'`\\\"
+QMAKE_CXXFLAGS = -DGC_BUILD_DATE="`date +'\"%a_%b_%d,_%Y\"'`"
 QMAKE_CXXFLAGS += -DGC_SVN_VERSION=\\\"`svnversion . | cut -f '2' -d ':'`\\\"
 QMAKE_CXXFLAGS += -DGC_MAJOR_VER=1
 QMAKE_CXXFLAGS += -DGC_MINOR_VER=0
+
 RC_FILE = images/gc.icns
 
 macx {
@@ -41,6 +41,7 @@ HEADERS += \
 	ChooseCyclistDialog.h \
 	CpintPlot.h \
 	CsvRideFile.h \
+	DBAccess.h \
 	DownloadRideDialog.h \
 	MainWindow.h \
 	PfPvPlot.h \
@@ -65,15 +66,18 @@ HEADERS += \
 	ToolsDialog.h \
         Zones.h \
         srm.h \
-        SplitRideDialog.h
+        MetricAggregator.h \
+        Season.h \
+        SummaryMetrics.h \
+        SplitRideDialog.h \  
  
-
 SOURCES += \
 	AllPlot.cpp \
 	BestIntervalDialog.cpp \
 	ChooseCyclistDialog.cpp \
 	CpintPlot.cpp \
 	CsvRideFile.cpp \
+        DBAccess.cpp \
 	DownloadRideDialog.cpp \
 	MainWindow.cpp \
 	PfPvPlot.cpp \
@@ -101,7 +105,11 @@ SOURCES += \
         Zones.cpp \
 	main.cpp \
         srm.cpp \
-        SplitRideDialog.cpp
+        Season.cpp \
+        MetricAggregator.cpp \
+        SummaryMetrics.cpp \
+        SplitRideDialog.cpp   
+
 
 RESOURCES = application.qrc
 
