@@ -16,7 +16,7 @@ RC_FILE = images/gc.icns
 macx {
     LIBS += -framework Carbon
     QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.4u.sdk
-    CONFIG+=x86 
+    CONFIG+=x86 ppc 
 }
 
 win32 {
