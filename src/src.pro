@@ -4,7 +4,7 @@ DEPENDPATH += .
 INCLUDEPATH += /usr/local/qwt/include /sw/include /usr/local/include
 CONFIG += static debug
 QT += xml sql
-LIBS += /usr/local/qwt/lib/libqwt.5.dylib /usr/local/lib/libftd2xx.0.1.4.dylib 
+LIBS += /usr/local/qwt/lib/libqwt.a
 LIBS += -lm -lz
 QMAKE_CXXFLAGS = -DGC_BUILD_DATE="`date +'\"%a_%b_%d,_%Y\"'`"
 QMAKE_CXXFLAGS += -DGC_SVN_VERSION=\\\"`svnversion . | cut -f '2' -d ':'`\\\"
