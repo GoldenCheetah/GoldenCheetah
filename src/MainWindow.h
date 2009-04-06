@@ -38,7 +38,8 @@ class MainWindow : public QMainWindow
 
     public:
         MainWindow(const QDir &home);
-        void addRide(QString name);
+        void addRide(QString name, bool bSelect=true);
+        void removeCurrentRide();
         const RideFile *currentRide();
         QDir home;
     protected:
@@ -57,6 +58,7 @@ class MainWindow : public QMainWindow
         void importSRM();
         void importTCX();
         void findBestIntervals();
+        void splitRide();
         void setSmoothingFromSlider();
         void setSmoothingFromLineEdit();
         void setBinWidthFromSlider();

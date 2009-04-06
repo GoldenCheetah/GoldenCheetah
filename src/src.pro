@@ -16,7 +16,7 @@ RC_FILE = images/gc.icns
 macx {
     LIBS += -framework Carbon
     QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.4u.sdk
-    CONFIG+=x86 ppc
+    CONFIG+=x86 
 }
 
 win32 {
@@ -64,7 +64,9 @@ HEADERS += \
         Serial.h \
 	ToolsDialog.h \
         Zones.h \
-        srm.h
+        srm.h \
+        SplitRideDialog.h
+ 
 
 SOURCES += \
 	AllPlot.cpp \
@@ -98,7 +100,8 @@ SOURCES += \
 	ToolsDialog.cpp \
         Zones.cpp \
 	main.cpp \
-        srm.cpp
+        srm.cpp \
+        SplitRideDialog.cpp
 
 RESOURCES = application.qrc
 

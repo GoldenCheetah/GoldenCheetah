@@ -104,6 +104,49 @@ RideFile::writeAsXml(QFile &file, QString &err)
     return true;
 }
 
+void RideFile::writeAsCsv(QFile &file, bool bIsMetric) const
+{
+
+    // Use the column headers that make WKO+ happy.
+    double convertUnit;
+    QTextStream out(&file);
+    if (!bIsMetric)
+    {
+        out << "Minutes,Torq (N-m),MPH,Watts,Miles,Cadence,Hrate,ID\n";
+        const double MILES_PER_KM = 0.62137119;
+        convertUnit = MILES_PER_KM;
+    }
+    else {
+        out << "Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID\n";
+        // TODO: use KM_TO_MI from lib/pt.c instead?
+        convertUnit = 1.0;
+    }
+
+    QListIterator<RideFilePoint*> i(dataPoints());
+    while (i.hasNext()) {
+        RideFilePoint *point = i.next();
+        if (point->secs == 0.0)
+            continue;
+        out << point->secs/60.0;
+        out << ",";
+        out << ((point->nm >= 0) ? point->nm : 0.0);
+        out << ",";
+        out << ((point->kph >= 0) ? (point->kph * convertUnit) : 0.0);
+        out << ",";
+        out << ((point->watts >= 0) ? point->watts : 0.0);
+        out << ",";
+        out << point->km * convertUnit;
+        out << ",";
+        out << point->cad;
+        out << ",";
+        out << point->hr;
+        out << ",";
+        out << point->interval << "\n";
+    }
+
+    file.close();
+}
+
 RideFileFactory *RideFileFactory::instance_;
 
 RideFileFactory &RideFileFactory::instance() 
@@ -149,4 +192,3 @@ QStringList RideFileFactory::listRideFiles(const QDir &dir) const
     }
     return dir.entryList(filters, QDir::Files, QDir::Name|QDir::Reversed);
 }
-
