@@ -44,6 +44,7 @@
 
 #include "DatePickerDialog.h"
 #include "ToolsDialog.h"
+#include "MetricAggregator.h"
 #include "SplitRideDialog.h"
 
 /* temp for the qmake/QMAKE_CXXFLAGS bug with xcode */
@@ -410,8 +411,10 @@ MainWindow::MainWindow(const QDir &home) :
                            SLOT(showOptions()), tr("Ctrl+O")); 
     optionsMenu->addAction(tr("&Tools..."), this, 
                            SLOT(showTools()), tr("Ctrl+T")); 
-   // optionsMenu->addAction(tr("&Import Ride to DB..."), this, 
-   //                        SLOT(importRideToDB()), tr("Ctrl+R")); 
+    //optionsMenu->addAction(tr("&Reset Metrics..."), this, 
+    //                       SLOT(importRideToDB()), tr("Ctrl+R")); 
+    //optionsMenu->addAction(tr("&Update Metrics..."), this, 
+    //                       SLOT(importRideToDB()), tr("Ctrl+U")); 
 
  
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
@@ -1164,12 +1167,22 @@ MainWindow::aboutDialog()
             ));
 }
 
-/*
+
 void MainWindow::importRideToDB()
-{	
+{
+	MetricAggregator *aggregator = new MetricAggregator();
+	aggregator->aggregateRides(home, zones);
+    delete aggregator;
 }
 
-*/
+void MainWindow::scanForMissing()
+{
+    MetricAggregator *aggregator = new MetricAggregator();
+    aggregator->scanForMissing(home, zones);
+    delete aggregator;
+}
+
+
 
 void
 MainWindow::notesChanged()

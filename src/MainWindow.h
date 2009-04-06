@@ -74,6 +74,8 @@ class MainWindow : public QMainWindow
         void saveNotes();
         void showOptions();
         void showTools();
+		void importRideToDB();
+        void scanForMissing();
 
     protected: 
 
@@ -104,7 +106,7 @@ class MainWindow : public QMainWindow
         QTreeWidgetItem *allRides;
         PowerHist *powerHist;
         Zones *zones;
-
+	    
         // pedal force/pedal velocity scatter plot widgets
         PfPvPlot *pfPvPlot;
         QLineEdit *qaCPValue;
