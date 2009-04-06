@@ -61,6 +61,12 @@ static void
 time_cb(struct tm *, time_t since_epoch, void *context)
 {
     ReadState *state = (ReadState*) context;
+    if (state->rideFile->startTime().isNull())
+    {
+        QDateTime t;
+        t.setTime_t(since_epoch);
+        state->rideFile->setStartTime(t);
+    }
     if (state->start_since_epoch == 0)
         state->start_since_epoch = since_epoch;
     double secs = since_epoch - state->start_since_epoch;

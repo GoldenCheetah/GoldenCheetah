@@ -44,6 +44,7 @@
 
 #include "DatePickerDialog.h"
 #include "ToolsDialog.h"
+#include "SplitRideDialog.h"
 
 /* temp for the qmake/QMAKE_CXXFLAGS bug with xcode */
 #ifndef GC_SVN_VERSION
@@ -55,7 +56,6 @@
 
 #define FOLDER_TYPE 0
 #define RIDE_TYPE 1
-#define MILES_PER_KM 0.62137119
 
 static char *rideFileRegExp = ("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)"
                                "_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.(raw|srm|csv|tcx)$");
@@ -401,8 +401,10 @@ MainWindow::MainWindow(const QDir &home) :
                         SLOT (importCSV()), tr ("Ctrl+S"));
     rideMenu->addAction(tr("&Import from TCX..."), this,
                         SLOT (importTCX()));
-    rideMenu->addAction(tr("Find &best intervals..."), this, 
-                        SLOT(findBestIntervals()), tr ("Ctrl+B")); 
+    rideMenu->addAction(tr("Find &best intervals..."), this,
+                        SLOT(findBestIntervals()), tr ("Ctrl+B"));
+    rideMenu->addAction(tr("Split &ride..."), this,
+                        SLOT(splitRide()));
     QMenu *optionsMenu = menuBar()->addMenu(tr("&Tools"));
     optionsMenu->addAction(tr("&Options..."), this, 
                            SLOT(showOptions()), tr("Ctrl+O")); 
@@ -431,7 +433,7 @@ MainWindow::MainWindow(const QDir &home) :
 }
 
 void
-MainWindow::addRide(QString name) 
+MainWindow::addRide(QString name, bool bSelect /*=true*/)
 {
     QRegExp rx(rideFileRegExp);
     if (!rx.exactMatch(name)) {
@@ -468,8 +470,51 @@ MainWindow::addRide(QString name)
     }
     allRides->insertChild(index, last);
     cpintPlot->needToScanRides = true;
+    if (bSelect)
+    {
+        tabWidget->setCurrentIndex(0);
+        treeWidget->setCurrentItem(last);
+    }
+}
+
+void
+MainWindow::removeCurrentRide()
+{
+    QTreeWidgetItem *_item = treeWidget->currentItem();
+    if (_item->type() != RIDE_TYPE)
+        return;
+    RideItem *item = reinterpret_cast<RideItem*>(_item);
+
+    QTreeWidgetItem *itemToSelect = NULL;
+    for (int x=0; x<allRides->childCount(); ++x)
+    {
+        if (item==allRides->child(x))
+        {
+            if ((x+1)<allRides->childCount())
+                itemToSelect = allRides->child(x+1);
+            else if (x>0)
+                itemToSelect = allRides->child(x-1);
+            break;
+        }
+    }
+
+    QString strOldFileName = item->fileName;
+    allRides->removeChild(item);
+    delete item;
+
+    QFile file(home.absolutePath() + "/" + strOldFileName);
+    // purposefully don't remove the old ext so the user wouldn't have to figure out what the old file type was
+    QString strNewName = strOldFileName + ".bak";
+    if (!file.rename(home.absolutePath() + "/" + strNewName))
+    {
+        QMessageBox::critical(
+            this, "Rename Error",
+            tr("Can't rename %1 to %2")
+            .arg(strOldFileName).arg(strNewName));
+    }
+
     tabWidget->setCurrentIndex(0);
-    treeWidget->setCurrentItem(last);
+    treeWidget->setCurrentItem(itemToSelect);
 }
 
 void
@@ -546,50 +591,13 @@ MainWindow::exportCSV()
         return;
 
     QFile file(fileName);
-    // QFileDialog::getSaveFileName checks whether the file exists.
-    if (!file.open(QFile::WriteOnly | QFile::Truncate)) {
-        QMessageBox::critical(
-            this, tr("Open Error"),
-            tr("Can't open %1 for writing").arg(fileName));
+    if (!file.open(QFile::WriteOnly | QFile::Truncate))
+    {
+        QMessageBox::critical(this, tr("Split Ride"), tr("The file %1 can't be opened for writing").arg(fileName));
         return;
     }
 
-    // Use the column headers that make WKO+ happy.
-    double convertUnit;
-    QTextStream out(&file);
-    if (units=="English"){
-        out << "Minutes,Torq (N-m),MPH,Watts,Miles,Cadence,Hrate,ID\n";
-        convertUnit = MILES_PER_KM;
-    }
-    else {
-        out << "Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID\n";
-        // TODO: use KM_TO_MI from lib/pt.c instead?
-        convertUnit = 1.0;
-    }
-        
-    QListIterator<RideFilePoint*> i(ride->ride->dataPoints());
-    while (i.hasNext()) {
-        RideFilePoint *point = i.next();
-        if (point->secs == 0.0)
-            continue;
-        out << point->secs/60.0;
-        out << ",";
-        out << ((point->nm >= 0) ? point->nm : 0.0);
-        out << ",";
-        out << ((point->kph >= 0) ? (point->kph * convertUnit) : 0.0);
-        out << ",";
-        out << ((point->watts >= 0) ? point->watts : 0.0);
-        out << ",";
-        out << point->km * convertUnit;
-        out << ",";
-        out << point->cad;
-        out << ",";
-        out << point->hr;
-        out << ",";
-        out << point->interval << "\n";
-    }
-
-    file.close();
+    ride->ride->writeAsCsv(file, units!="English");
 }
 
 void MainWindow::importCSV()
@@ -1174,5 +1182,10 @@ void MainWindow::showTools()
    ToolsDialog *td = new ToolsDialog();
    td->exec();
 
+}
+void
+MainWindow::splitRide()
+{
+    (new SplitRideDialog(this))->exec();
 }
 

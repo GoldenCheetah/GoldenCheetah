@@ -90,6 +90,7 @@ class RideFile
         }
 
         bool writeAsXml(QFile &file, QString &err);
+        void writeAsCsv(QFile &file, bool bIsMetric) const;
 };
 
 struct RideFileReader {
