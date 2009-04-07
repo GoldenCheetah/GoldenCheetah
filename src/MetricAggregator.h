@@ -37,7 +37,7 @@ class MetricAggregator
 	    typedef QHash<QString,RideMetric*> MetricMap;
 	bool importRide(QDir path, Zones *zones, RideFile *ride, QString fileName, DBAccess *dbaccess);
 	MetricMap metrics;
-    void MetricAggregator::scanForMissing(QDir home, Zones *zones);
+    void scanForMissing(QDir home, Zones *zones);
     void resetMetricTable(QDir home);
 
 
