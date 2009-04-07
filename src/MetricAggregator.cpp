@@ -116,8 +116,8 @@ bool MetricAggregator::importRide(QDir path, Zones *zones, RideFile *ride, QStri
 				summaryMetric->setCadence(value);
 			else if(name == "total_distance")
 				summaryMetric->setDistance(value);
-			else if(name == "skibax_power")
-				summaryMetric->setXPower(value);
+			else if(name == "skiba_xpower")
+                summaryMetric->setXPower(value);
 			else if(name == "average_speed")
 				summaryMetric->setSpeed(value);
 			else if(name == "total_work")
