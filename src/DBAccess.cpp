@@ -34,8 +34,6 @@
 DBAccess::DBAccess(QDir home)
 {
 	initDatabase(home);
-	if(!createDatabase())
-		createIndex();
 }
 
 void DBAccess::closeConnection()
@@ -93,7 +91,7 @@ bool DBAccess::createMetricsTable()
 bool DBAccess::createSeasonsTable()
 {
     QSqlQuery query;
-    bool rc = query.exec("CREAATE TABLE seasons(id integer primary key autoincrement,"
+    bool rc = query.exec("CREATE TABLE seasons(id integer primary key autoincrement,"
                          "start_date date,"
                          "end_date date,"
                          "name varchar)");
@@ -109,11 +107,6 @@ bool DBAccess::createDatabase()
 {
 
     bool rc = false;
-    
-	//Check to see if the table already exists..
-	QStringList tableList = db.tables(QSql::Tables);
-	if(!tableList.empty())
-		return true;
 
 	rc = createMetricsTable();
     
@@ -123,8 +116,13 @@ bool DBAccess::createDatabase()
     rc = createIndex();
     if(!rc)
         return rc;
-    return createSeasonsTable();
+    
+    //Check to see if the table already exists..
+	QStringList tableList = db.tables(QSql::Tables);
+	if(!tableList.contains("seasons"))
+        return createSeasonsTable();
 	
+    return true;
     
 }
 
@@ -270,4 +268,17 @@ QList<Season> DBAccess::getAllSeasons()
     }
     return seasons;
     
+}
+
+bool DBAccess::dropMetricTable()
+{
+    
+    
+    QStringList tableList = db.tables(QSql::Tables);
+	if(!tableList.contains("metrics"))
+		return true;
+    
+    QSqlQuery query("DROP TABLE metrics");
+    
+    return query.exec();
 }
