@@ -43,6 +43,8 @@ void MetricAggregator::aggregateRides(QDir home, Zones *zones)
 {
 	qDebug() << QDateTime::currentDateTime();
 	DBAccess *dbaccess = new DBAccess(home);
+    dbaccess->dropMetricTable();
+    dbaccess->createDatabase();
 	QRegExp rx(rideFileRegExp);
 	QStringList errors;
     QStringListIterator i(RideFileFactory::instance().listRideFiles(home));
@@ -165,4 +167,9 @@ void MetricAggregator::scanForMissing(QDir home, Zones *zones)
     
 }
 
+void MetricAggregator::resetMetricTable(QDir home)
+{
+    DBAccess dbAccess(home);
+    dbAccess.dropMetricTable();
+}
 
