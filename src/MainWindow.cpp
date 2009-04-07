@@ -414,7 +414,7 @@ MainWindow::MainWindow(const QDir &home) :
     //optionsMenu->addAction(tr("&Reset Metrics..."), this, 
     //                       SLOT(importRideToDB()), tr("Ctrl+R")); 
     //optionsMenu->addAction(tr("&Update Metrics..."), this, 
-    //                       SLOT(importRideToDB()), tr("Ctrl+U")); 
+    //                       SLOT(scanForMissing()()), tr("Ctrl+U")); 
 
  
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
