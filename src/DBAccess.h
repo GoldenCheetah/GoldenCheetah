@@ -23,7 +23,7 @@
 
 #import <QDir>
 #import <QHash>
-#import <QTSql>
+#import <QtSql>
 #import "SummaryMetrics.h"
 #import "Season.h"
 
