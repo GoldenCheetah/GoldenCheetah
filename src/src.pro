@@ -6,8 +6,12 @@ CONFIG += static debug
 QT += xml sql
 LIBS += /usr/local/qwt/lib/libqwt.a
 LIBS += -lm -lz
-QMAKE_CXXFLAGS = -DGC_BUILD_DATE="`date +'\"%a_%b_%d,_%Y\"'`"
-QMAKE_CXXFLAGS += -DGC_SVN_VERSION=\\\"`svnversion . | cut -f '2' -d ':'`\\\"
+
+!win32 {
+    QMAKE_CXXFLAGS = -DGC_BUILD_DATE="`date +'\"%a_%b_%d,_%Y\"'`"
+    QMAKE_CXXFLAGS += -DGC_SVN_VERSION=\\\"`svnversion . | cut -f '2' -d ':'`\\\"
+}
+
 QMAKE_CXXFLAGS += -DGC_MAJOR_VER=1
 QMAKE_CXXFLAGS += -DGC_MINOR_VER=0
 
@@ -19,41 +23,25 @@ macx {
     CONFIG+=x86 ppc 
 }
 
-win32 {
-    HEADERS -= Serial.h
-    HEADERS -= Serial.cpp
-    LIBS = ..\lib\libregex.a \
-        C:\qwt-5.1.0\lib\libqwtd5.a \
-        -lws2_32 \
-        C:\ftdi\libftd2xx.a
-    QMAKE_LFLAGS = -Wl,--enable-runtime-pseudo-reloc \
-        -Wl,--script,i386pe.x-no-rdata
-    QMAKE_CXXFLAGS += -fdata-sections
-    INCLUDEPATH += C:\qwt-5.1.0\include\
-        C:\boost
-    RC_FILE -= images/gc.icns
-    RC_FILE += windowsico.rc
-}
-
 HEADERS += \
-	AllPlot.h \
-	BestIntervalDialog.h \
-	ChooseCyclistDialog.h \
-	CpintPlot.h \
-	CsvRideFile.h \
-	DBAccess.h \
-	DownloadRideDialog.h \
-	MainWindow.h \
-	PfPvPlot.h \
-	PowerHist.h \
-	RawRideFile.h \
-	RideFile.h \
-	RideItem.h \
-	RideMetric.h \
-	SrmRideFile.h \
-	TcxParser.h \
-	TcxRideFile.h \
-	TimeUtils.h \
+        AllPlot.h \
+        BestIntervalDialog.h \
+        ChooseCyclistDialog.h \
+        CpintPlot.h \
+        CsvRideFile.h \
+        DBAccess.h \
+        DownloadRideDialog.h \
+        MainWindow.h \
+        PfPvPlot.h \
+        PowerHist.h \
+        RawRideFile.h \
+        RideFile.h \
+        RideItem.h \
+        RideMetric.h \
+        SrmRideFile.h \
+        TcxParser.h \
+        TcxRideFile.h \
+        TimeUtils.h \
         ConfigDialog.h \
         D2XX.h \
         DatePickerDialog.h \
@@ -63,33 +51,33 @@ HEADERS += \
         Pages.h \
         PowerTap.h \
         Serial.h \
-	ToolsDialog.h \
+        ToolsDialog.h \
         Zones.h \
         srm.h \
         MetricAggregator.h \
         Season.h \
         SummaryMetrics.h \
-        SplitRideDialog.h \  
- 
+        SplitRideDialog.h \
+
 SOURCES += \
-	AllPlot.cpp \
-	BestIntervalDialog.cpp \
-	ChooseCyclistDialog.cpp \
-	CpintPlot.cpp \
-	CsvRideFile.cpp \
+        AllPlot.cpp \
+        BestIntervalDialog.cpp \
+        ChooseCyclistDialog.cpp \
+        CpintPlot.cpp \
+        CsvRideFile.cpp \
         DBAccess.cpp \
-	DownloadRideDialog.cpp \
-	MainWindow.cpp \
-	PfPvPlot.cpp \
-	PowerHist.cpp \
-	RawRideFile.cpp \
-	RideFile.cpp \
-	RideItem.cpp \
-	RideMetric.cpp \
-	SrmRideFile.cpp \
-	TcxParser.cpp \
-	TcxRideFile.cpp \
-	TimeUtils.cpp \
+        DownloadRideDialog.cpp \
+        MainWindow.cpp \
+        PfPvPlot.cpp \
+        PowerHist.cpp \
+        RawRideFile.cpp \
+        RideFile.cpp \
+        RideItem.cpp \
+        RideMetric.cpp \
+        SrmRideFile.cpp \
+        TcxParser.cpp \
+        TcxRideFile.cpp \
+        TimeUtils.cpp \
         BasicRideMetrics.cpp \
         BikeScore.cpp \
         ConfigDialog.cpp \
@@ -101,14 +89,42 @@ SOURCES += \
         Pages.cpp \
         PowerTap.cpp \
         Serial.cpp \
-	ToolsDialog.cpp \
+        ToolsDialog.cpp \
         Zones.cpp \
-	main.cpp \
+        main.cpp \
         srm.cpp \
         Season.cpp \
         MetricAggregator.cpp \
         SummaryMetrics.cpp \
-        SplitRideDialog.cpp   
+        SplitRideDialog.cpp
+
+# win32 is after SOURCES and HEADERS so we can remove Serial.h/.cpp
+win32 {
+    INCLUDEPATH += ../../../2009.01/qt/include \
+        ../../qwt-5.1.1/src \
+        ../../boost_1_38_0 \
+        ./win32
+
+    LIBS = ../../qwt-5.1.1/lib/libqwt5.a \
+        -lws2_32
+
+    QMAKE_LFLAGS = -Wl,--enable-runtime-pseudo-reloc \
+        -Wl,--script,i386pe.x-no-rdata
+    //QMAKE_CXXFLAGS += -fdata-sections
+    RC_FILE -= images/gc.icns
+    RC_FILE += windowsico.rc
+    HEADERS -= Serial.h
+    SOURCES -= Serial.cpp
+
+    QMAKE_EXTRA_TARGETS += revtarget
+    PRE_TARGETDEPS      += temp_version.h
+    revtarget.target     = temp_version.h
+    revtarget.commands   = @echo "const char * const g_builddate = \"$(shell date /t)\";" \
+                                 "const char * const g_svnversion = \"$(shell svnversion .)\";" > $$revtarget.target
+
+    # this line has to be after SOURCES and HEADERS is declared or it doesn't work
+    revtarget.depends = $$SOURCES $$HEADERS $$FORMS
+}
 
 
 RESOURCES = application.qrc
