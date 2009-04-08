@@ -47,12 +47,20 @@
 #include "MetricAggregator.h"
 #include "SplitRideDialog.h"
 
-/* temp for the qmake/QMAKE_CXXFLAGS bug with xcode */
-#ifndef GC_SVN_VERSION
-#define GC_SVN_VERSION "0"
+#ifdef WIN32
+    #include "temp_version.h"
+    #define GC_SVN_VERSION g_svnversion
+    #define GC_BUILD_DATE g_builddate
+
+#else
+    /* temp for the qmake/QMAKE_CXXFLAGS bug with xcode */
+    #ifndef GC_SVN_VERSION
+    #define GC_SVN_VERSION "0"
+    #endif
+    #ifndef GC_BUILD_DATE
+    #define GC_BUILD_DATE GC_SVN_VERSION
 #endif
-#ifndef GC_BUILD_DATE
-#define GC_BUILD_DATE GC_SVN_VERSION
+
 #endif
 
 #define FOLDER_TYPE 0

@@ -56,8 +56,13 @@ struct D2XXWrapper {
     FP_GetDeviceInfoList *get_device_info_list;
     D2XXWrapper() : handle(NULL) {}
     ~D2XXWrapper() { if (handle) dlclose(handle); }
-    bool init(QString &error) {
+    bool init(QString &error)
+    {
+#ifdef WIN32
+        const char *libname = "ftd2xx.dll";
+#else
         const char *libname = "libftd2xx.dylib";
+#endif
         handle = dlopen(libname, RTLD_NOW);
         if (!handle) {
             error = QString("Couldn't load library ") + libname + ".";
