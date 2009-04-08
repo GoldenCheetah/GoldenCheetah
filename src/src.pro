@@ -109,7 +109,7 @@ win32 {
         -lws2_32
 
     QMAKE_LFLAGS = -Wl,--enable-runtime-pseudo-reloc \
-        -Wl,--script,i386pe.x-no-rdata
+        -Wl,--script,win32/i386pe.x-no-rdata
     //QMAKE_CXXFLAGS += -fdata-sections
     RC_FILE -= images/gc.icns
     RC_FILE += windowsico.rc
