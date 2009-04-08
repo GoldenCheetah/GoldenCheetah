@@ -28,18 +28,23 @@
         error = QString("could not load symbol ") + name; \
         return false; \
     }
+#ifdef WIN32
+#define WIN32_STDCALL __stdcall
+#else
+#define WIN32_STDCALL
+#endif
 
-typedef FT_STATUS FP_OpenEx(PVOID pArg1, DWORD Flags, FT_HANDLE *pHandle);
-typedef FT_STATUS FP_Close(FT_HANDLE ftHandle);
-typedef FT_STATUS FP_SetBaudRate(FT_HANDLE ftHandle, ULONG BaudRate);
-typedef FT_STATUS FP_SetDataCharacteristics(FT_HANDLE ftHandle, UCHAR WordLength, UCHAR StopBits, UCHAR Parity);
-typedef FT_STATUS FP_SetFlowControl(FT_HANDLE ftHandle, USHORT FlowControl, UCHAR XonChar, UCHAR XoffChar);
-typedef FT_STATUS FP_GetQueueStatus(FT_HANDLE ftHandle, DWORD *dwRxBytes);
-typedef FT_STATUS FP_SetTimeouts(FT_HANDLE ftHandle, ULONG ReadTimeout, ULONG WriteTimeout);
-typedef FT_STATUS FP_Read(FT_HANDLE ftHandle, LPVOID lpBuffer, DWORD nBufferSize, LPDWORD lpBytesReturned);
-typedef FT_STATUS FP_Write(FT_HANDLE ftHandle, LPVOID lpBuffer, DWORD nBufferSize, LPDWORD lpBytesWritten);
-typedef FT_STATUS FP_CreateDeviceInfoList(LPDWORD lpdwNumDevs);
-typedef FT_STATUS FP_GetDeviceInfoList(FT_DEVICE_LIST_INFO_NODE *pDest, LPDWORD lpdwNumDevs);
+typedef FT_STATUS WIN32_STDCALL FP_OpenEx(PVOID pArg1, DWORD Flags, FT_HANDLE *pHandle);
+typedef FT_STATUS WIN32_STDCALL FP_Close(FT_HANDLE ftHandle);
+typedef FT_STATUS WIN32_STDCALL FP_SetBaudRate(FT_HANDLE ftHandle, ULONG BaudRate);
+typedef FT_STATUS WIN32_STDCALL FP_SetDataCharacteristics(FT_HANDLE ftHandle, UCHAR WordLength, UCHAR StopBits, UCHAR Parity);
+typedef FT_STATUS WIN32_STDCALL FP_SetFlowControl(FT_HANDLE ftHandle, USHORT FlowControl, UCHAR XonChar, UCHAR XoffChar);
+typedef FT_STATUS WIN32_STDCALL FP_GetQueueStatus(FT_HANDLE ftHandle, DWORD *dwRxBytes);
+typedef FT_STATUS WIN32_STDCALL FP_SetTimeouts(FT_HANDLE ftHandle, ULONG ReadTimeout, ULONG WriteTimeout);
+typedef FT_STATUS WIN32_STDCALL FP_Read(FT_HANDLE ftHandle, LPVOID lpBuffer, DWORD nBufferSize, LPDWORD lpBytesReturned);
+typedef FT_STATUS WIN32_STDCALL FP_Write(FT_HANDLE ftHandle, LPVOID lpBuffer, DWORD nBufferSize, LPDWORD lpBytesWritten);
+typedef FT_STATUS WIN32_STDCALL FP_CreateDeviceInfoList(LPDWORD lpdwNumDevs);
+typedef FT_STATUS WIN32_STDCALL FP_GetDeviceInfoList(FT_DEVICE_LIST_INFO_NODE *pDest, LPDWORD lpdwNumDevs);
 
 struct D2XXWrapper {
     void *handle;
