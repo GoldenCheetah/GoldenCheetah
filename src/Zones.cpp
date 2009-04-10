@@ -268,17 +268,17 @@ void Zones::write(QDir home)
 
 
         active_recovery = int (LT * .55);
-        endurance_start = int (LT * .56);
+	endurance_start = active_recovery + 1;    // changed djconnel
         endurance_end = int (LT * .75);
-        tempo_start = int (LT * .76);
+        tempo_start = endurance_end + 1;          // changed djconnel
         tempo_end = int (LT * .90);
-        threshold_start = int (LT * .91);
+        threshold_start = tempo_end + 1;          // changed djconnel
         threshold_end = int (LT * 1.05);
-        vo2max_start = int (LT * 1.06);
+        vo2max_start = threshold_end + 1;         // changed djconnel
         vo2max_end = int (LT * 1.2);
-        anaerobicCapacity_start = int (LT * 1.21);
+        anaerobicCapacity_start = vo2max_end + 1; // changed djconnel
         anaerobicCapacity_end = int (LT * 1.5);
-        neuromuscular =  int (LT * 1.51);
+        neuromuscular =  anaerobicCapacity_end + 1; // changed djconnel
 
         if(ranges.size() <= 1)
             strzones += QString("FROM BEGIN UNTIL END, CP=%1:").arg(LT);
