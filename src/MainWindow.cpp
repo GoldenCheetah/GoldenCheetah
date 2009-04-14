@@ -1226,11 +1226,14 @@ MainWindow::deleteRide()
     RideItem *item = reinterpret_cast<RideItem*>(_item);
 
     QMessageBox msgBox;
-    msgBox.setText("Are you sure you want to delete the ride:");
+    msgBox.setText(tr("Are you sure you want to delete the ride:"));
     msgBox.setInformativeText(item->fileName);
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msgBox.setDefaultButton(QMessageBox::No);
-    if (msgBox.exec()==QMessageBox::Yes)
+    QPushButton *deleteButton = msgBox.addButton(tr("Delete"),QMessageBox::YesRole);
+    msgBox.setStandardButtons(QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
+    msgBox.setIcon(QMessageBox::Critical);
+    msgBox.exec();
+    if(msgBox.clickedButton() == deleteButton)
         removeCurrentRide();
 }
 
