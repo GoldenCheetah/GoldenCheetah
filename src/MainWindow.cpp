@@ -414,6 +414,8 @@ MainWindow::MainWindow(const QDir &home) :
                         SLOT(findBestIntervals()), tr ("Ctrl+B"));
     rideMenu->addAction(tr("Split &ride..."), this,
                         SLOT(splitRide()));
+    rideMenu->addAction(tr("D&elete ride..."), this,
+                        SLOT(deleteRide()));
     QMenu *optionsMenu = menuBar()->addMenu(tr("&Tools"));
     optionsMenu->addAction(tr("&Options..."), this, 
                            SLOT(showOptions()), tr("Ctrl+O")); 
@@ -516,6 +518,11 @@ MainWindow::removeCurrentRide()
     QFile file(home.absolutePath() + "/" + strOldFileName);
     // purposefully don't remove the old ext so the user wouldn't have to figure out what the old file type was
     QString strNewName = strOldFileName + ".bak";
+
+    // in case there was an existing bak file, delete it
+    // ignore errors since it probably isn't there.
+    QFile::remove(home.absolutePath() + "/" + strNewName);
+
     if (!file.rename(home.absolutePath() + "/" + strNewName))
     {
         QMessageBox::critical(
@@ -1209,4 +1216,22 @@ MainWindow::splitRide()
 {
     (new SplitRideDialog(this))->exec();
 }
+
+void
+MainWindow::deleteRide()
+{
+    QTreeWidgetItem *_item = treeWidget->currentItem();
+    if (_item==NULL || _item->type() != RIDE_TYPE)
+        return;
+    RideItem *item = reinterpret_cast<RideItem*>(_item);
+
+    QMessageBox msgBox;
+    msgBox.setText("Are you sure you want to delete the ride:");
+    msgBox.setInformativeText(item->fileName);
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::No);
+    if (msgBox.exec()==QMessageBox::Yes)
+        removeCurrentRide();
+}
+
 

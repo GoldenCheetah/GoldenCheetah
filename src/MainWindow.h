@@ -59,6 +59,7 @@ class MainWindow : public QMainWindow
         void importTCX();
         void findBestIntervals();
         void splitRide();
+        void deleteRide();
         void setSmoothingFromSlider();
         void setSmoothingFromLineEdit();
         void setBinWidthFromSlider();
