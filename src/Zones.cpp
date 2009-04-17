@@ -287,7 +287,7 @@ void Zones::write(QDir home)
         else if (i == ranges.size() - 1)
             strzones += QString("FROM %1 UNTIL END, CP=%2:").arg(getStartDate(i).toString("yyyy/MM/dd")).arg(LT);
         else
-            strzones += QString("FROM %1 UNTIL %2, CP=%3:").arg(getStartDate(i).toString("yyyy/MM/yy")).arg(getEndDate(i).toString("yyyy/MM/dd")).arg(LT);
+            strzones += QString("FROM %1 UNTIL %2, CP=%3:").arg(getStartDate(i).toString("yyyy/MM/dd")).arg(getEndDate(i).toString("yyyy/MM/dd")).arg(LT);
 
 
         strzones += QString("\n");
