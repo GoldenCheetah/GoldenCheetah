@@ -89,7 +89,7 @@ class RideFile
                                                  nm, watts, interval));
         }
 
-        bool writeAsXml(QFile &file, QString &err);
+        bool writeAsXml(QFile &file, QString &err) const;
         void writeAsCsv(QFile &file, bool bIsMetric) const;
 };
 

@@ -54,6 +54,7 @@ class MainWindow : public QMainWindow
         void openCyclist();
         void downloadRide();
         void exportCSV();
+        void exportXML();
         void importCSV();
         void importSRM();
         void importTCX();
