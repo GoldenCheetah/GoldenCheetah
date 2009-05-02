@@ -22,44 +22,43 @@
 #include "Settings.h"
 
 static void
-markInterval(QDomDocument &xroot, QDomNode &xride, QDomNode &xintervals,
+markInterval(QDomDocument &doc, QDomNode &xride, QDomNode &xintervals,
              double &startSecs, double prevSecs,
              int &thisInterval, RideFilePoint *sample)
 {
     if (xintervals.isNull()) {
-        xintervals = xroot.createElement("intervals");
+        xintervals = doc.createElement("intervals");
         xride.appendChild(xintervals);
     }
-    QDomElement xinterval = xroot.createElement("interval").toElement();
-    xintervals.appendChild(xinterval);
-    xinterval.setAttribute("name", thisInterval);
-    xinterval.setAttribute("begin_secs",
-                           QString("%1").arg(startSecs, 0, 'f', 2));
-    xinterval.setAttribute("end_secs", 
-                           QString("%1").arg(prevSecs, 0, 'f', 2));
+    QDomElement xint = doc.createElement("interval").toElement();
+    xintervals.appendChild(xint);
+    xint.setAttribute("name", thisInterval);
+    xint.setAttribute("from_secs", QString("%1").arg(startSecs, 0, 'f', 2));
+    xint.setAttribute("thru_secs", QString("%1").arg(prevSecs, 0, 'f', 2));
     startSecs = sample->secs;
     thisInterval = sample->interval;
 }
 
+static void
+append_text(QDomDocument &doc, QDomNode &parent,
+            const QString &child_name, const QString &child_value)
+{
+    QDomNode child = parent.appendChild(doc.createElement(child_name));
+    child.appendChild(doc.createTextNode(child_value));
+}
+
 bool
-RideFile::writeAsXml(QFile &file, QString &err)
+RideFile::writeAsXml(QFile &file, QString &err) const
 {
     (void) err;
-    QDomDocument xroot("GoldenCheetah 1.0");
-    QDomNode xride = xroot.createElement("ride");
-    xroot.appendChild(xride);
-    QDomElement xstart = xroot.createElement("start").toElement();
-    xride.appendChild(xstart);
-    xstart.setAttribute("date", startTime_.toString("yyyy/MM/dd hh:mm:ss"));
-    QDomElement xdevtype = xroot.createElement("device_type").toElement();
-    xride.appendChild(xdevtype);
-    xdevtype.setAttribute("name", deviceType_);
-    QDomElement xrecint = xroot.createElement("sampling_period").toElement();
-    xride.appendChild(xrecint);
-    xrecint.setAttribute("secs", QString("%1").arg(recIntSecs_, 0, 'f', 3));
+    QDomDocument doc("GoldenCheetah 1.0");
+    QDomNode xride = doc.appendChild(doc.createElement("ride"));
+    QDomNode xheader = xride.appendChild(doc.createElement("header"));
+    append_text(doc, xheader, "start_time", startTime_.toString("yyyy/MM/dd hh:mm:ss"));
+    append_text(doc, xheader, "device_type", deviceType_);
+    append_text(doc, xheader, "rec_int_secs", QString("%1").arg(recIntSecs_, 0, 'f', 3));
     QDomNode xintervals;
     bool hasNm = false;
-    QVector<double> intervalStart, intervalStop;
     double startSecs = 0.0, prevSecs = 0.0;
     int thisInterval = 0;
     QListIterator<RideFilePoint*> i(dataPoints_);
@@ -70,21 +69,21 @@ RideFile::writeAsXml(QFile &file, QString &err)
             hasNm = true;
         assert(sample->secs >= 0.0);
         if (sample->interval != thisInterval) {
-            markInterval(xroot, xride, xintervals, startSecs,
+            markInterval(doc, xride, xintervals, startSecs,
                          prevSecs, thisInterval, sample);
         }
         prevSecs = sample->secs;
     }
     if (sample) {
-        markInterval(xroot, xride, xintervals, startSecs,
+        markInterval(doc, xride, xintervals, startSecs,
                      prevSecs, thisInterval, sample);
     }
-    QDomNode xsamples = xroot.createElement("samples");
+    QDomNode xsamples = doc.createElement("samples");
     xride.appendChild(xsamples);
     i.toFront();
     while (i.hasNext()) {
         RideFilePoint *sample = i.next();
-        QDomElement xsamp = xroot.createElement("sample").toElement();
+        QDomElement xsamp = doc.createElement("sample").toElement();
         xsamples.appendChild(xsamp);
         xsamp.setAttribute("secs", QString("%1").arg(sample->secs, 0, 'f', 2));
         xsamp.setAttribute("cad", QString("%1").arg(sample->cad, 0, 'f', 0));
@@ -99,7 +98,7 @@ RideFile::writeAsXml(QFile &file, QString &err)
     }
     file.open(QFile::WriteOnly);
     QTextStream ts(&file);
-    xroot.save(ts, 4);
+    doc.save(ts, 4);
     file.close();
     return true;
 }

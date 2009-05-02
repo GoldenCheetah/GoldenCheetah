@@ -404,6 +404,8 @@ MainWindow::MainWindow(const QDir &home) :
                         SLOT(downloadRide()), tr("Ctrl+D")); 
     rideMenu->addAction(tr("&Export to CSV..."), this, 
                         SLOT(exportCSV()), tr("Ctrl+E")); 
+    rideMenu->addAction(tr("&Export to XML..."), this, 
+                        SLOT(exportXML()));
     rideMenu->addAction(tr("&Import from SRM..."), this, 
                         SLOT(importSRM()), tr("Ctrl+I")); 
     rideMenu->addAction(tr("&Import from CSV..."), this,
@@ -616,6 +618,32 @@ MainWindow::exportCSV()
     }
 
     ride->ride->writeAsCsv(file, units!="English");
+}
+
+void
+MainWindow::exportXML()
+{
+    if ((treeWidget->selectedItems().size() != 1)
+        || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
+        QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
+        return;
+    }
+
+    RideItem *ride = (RideItem*) treeWidget->selectedItems().first();
+
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Export XML"), QDir::homePath(), tr("XML (*.xml)"));
+    if (fileName.length() == 0)
+        return;
+
+    QString err;
+    QFile file(fileName);
+    ride->ride->writeAsXml(file, err);
+    if (err.length() > 0) {
+        QMessageBox::critical(this, tr("Export XML"),
+                              tr("Error writing %1: %2").arg(fileName).arg(err));
+        return;
+    }
 }
 
 void MainWindow::importCSV()
