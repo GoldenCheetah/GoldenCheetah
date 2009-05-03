@@ -66,16 +66,22 @@
 #define FOLDER_TYPE 0
 #define RIDE_TYPE 1
 
-static char *rideFileRegExp = ("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)"
-                               "_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.(raw|srm|csv|tcx|xml)$");
-
-QString
-MainWindow::notesFileName(QString rideFileName) {
-    int i = rideFileName.lastIndexOf(".");
-    assert(i >= 0);
-    return rideFileName.left(i) + ".notes";
+static bool
+parseRideFileName(const QString &name, QString *notesFileName, QDateTime *dt)
+{
+    static char *rideFileRegExp = ("^((\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)"
+                                   "_(\\d\\d)_(\\d\\d)_(\\d\\d))\\.(.+)$");
+    QRegExp rx(rideFileRegExp);
+    if (!rx.exactMatch(name))
+        return false;
+    assert(rx.numCaptures() == 8);
+    QDate date(rx.cap(2).toInt(), rx.cap(3).toInt(),rx.cap(4).toInt()); 
+    QTime time(rx.cap(5).toInt(), rx.cap(6).toInt(),rx.cap(7).toInt()); 
+    *dt = QDateTime(date, time);
+    *notesFileName = rx.cap(1) + ".notes";
+    return true;
 }
-
+ 
 MainWindow::MainWindow(const QDir &home) : 
     home(home), settings(GC_SETTINGS_CO, GC_SETTINGS_APP), 
     zones(NULL), currentNotesChanged(false)
@@ -123,18 +129,14 @@ MainWindow::MainWindow(const QDir &home) :
     treeWidget->expandItem(allRides);
     splitter->addWidget(treeWidget);
 
-    QRegExp rx(rideFileRegExp);
     QTreeWidgetItem *last = NULL;
     QStringListIterator i(RideFileFactory::instance().listRideFiles(home));
     while (i.hasNext()) {
-        QString name = i.next();
-        if (rx.exactMatch(name)) {
-            assert(rx.numCaptures() == 7);
-            QDate date(rx.cap(1).toInt(), rx.cap(2).toInt(),rx.cap(3).toInt()); 
-            QTime time(rx.cap(4).toInt(), rx.cap(5).toInt(),rx.cap(6).toInt()); 
-            QDateTime dt(date, time);
+        QString name = i.next(), notesFileName;
+        QDateTime dt;
+        if (parseRideFileName(name, &notesFileName, &dt)) {
             last = new RideItem(RIDE_TYPE, home.path(), 
-                                name, dt, zones, notesFileName(name));
+                                name, dt, zones, notesFileName);
             allRides->addChild(last);
         }
     }
@@ -450,17 +452,14 @@ MainWindow::MainWindow(const QDir &home) :
 void
 MainWindow::addRide(QString name, bool bSelect /*=true*/)
 {
-    QRegExp rx(rideFileRegExp);
-    if (!rx.exactMatch(name)) {
+    QString notesFileName;
+    QDateTime dt;
+    if (!parseRideFileName(name, &notesFileName, &dt)) {
         fprintf(stderr, "bad name: %s\n", name.toAscii().constData());
         assert(false);
     }
-    assert(rx.numCaptures() == 7);
-    QDate date(rx.cap(1).toInt(), rx.cap(2).toInt(),rx.cap(3).toInt()); 
-    QTime time(rx.cap(4).toInt(), rx.cap(5).toInt(),rx.cap(6).toInt()); 
-    QDateTime dt(date, time);
     RideItem *last = new RideItem(RIDE_TYPE, home.path(), 
-                                  name, dt, zones, notesFileName(name));
+                                  name, dt, zones, notesFileName);
     
     QVariant isAscending = settings.value(GC_ALLRIDES_ASCENDING,Qt::Checked); // default is ascending sort
     int index = 0;
