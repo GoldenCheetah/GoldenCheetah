@@ -838,18 +838,16 @@ MainWindow::rideSelected()
     RideItem *ride = (RideItem*) which;
     rideSummary->setHtml(ride->htmlSummary());
     rideSummary->setAlignment(Qt::AlignCenter);
-    if (ride->ride)
+    if (ride->ride) {
         allPlot->setData(ride->ride);
-    if (tabWidget->currentIndex() == 2)
-        cpintPlot->calculate(ride->fileName, ride->dateTime);
-    if (ride->ride)
         powerHist->setData(ride->ride);
-    if (ride){
         // using a RideItem rather than RideFile to provide access to zones information
         pfPvPlot->setData(ride);
         // update the QLabel widget with the CP value set in PfPvPlot::setData()
         qaCPValue->setText(QString("%1").arg(pfPvPlot->getCP()));
     }
+    if (tabWidget->currentIndex() == 2)
+        cpintPlot->calculate(ride->fileName, ride->dateTime);
 
     QDate wstart = ride->dateTime.date();
     wstart = wstart.addDays(Qt::Monday - wstart.dayOfWeek());
@@ -875,6 +873,8 @@ MainWindow::rideSelected()
                 && (item->dateTime.date() < wend)) {
                 RideMetric *m;
                 item->htmlSummary(); // compute metrics
+                if (item->ride == NULL)
+                    continue;
                 m = item->metrics.value(weeklySeconds->name());
                 assert(m);
                 weeklySeconds->aggregateWith(m);
