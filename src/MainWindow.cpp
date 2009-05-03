@@ -67,7 +67,7 @@
 #define RIDE_TYPE 1
 
 static char *rideFileRegExp = ("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)"
-                               "_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.(raw|srm|csv|tcx)$");
+                               "_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.(raw|srm|csv|tcx|xml)$");
 
 QString
 MainWindow::notesFileName(QString rideFileName) {

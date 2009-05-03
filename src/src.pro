@@ -58,6 +58,7 @@ HEADERS += \
         Season.h \
         SummaryMetrics.h \
         SplitRideDialog.h \
+        XmlRideFile.h \
 
 SOURCES += \
         AllPlot.cpp \
@@ -96,7 +97,8 @@ SOURCES += \
         Season.cpp \
         MetricAggregator.cpp \
         SummaryMetrics.cpp \
-        SplitRideDialog.cpp
+        SplitRideDialog.cpp \
+        XmlRideFile.cpp \
 
 # win32 is after SOURCES and HEADERS so we can remove Serial.h/.cpp
 win32 {
