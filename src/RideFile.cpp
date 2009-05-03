@@ -51,7 +51,7 @@ bool
 RideFile::writeAsXml(QFile &file, QString &err) const
 {
     (void) err;
-    QDomDocument doc("GoldenCheetah 1.0");
+    QDomDocument doc("GoldenCheetah-1.0");
     QDomNode xride = doc.appendChild(doc.createElement("ride"));
     QDomNode xheader = xride.appendChild(doc.createElement("header"));
     append_text(doc, xheader, "start_time", startTime_.toString("yyyy/MM/dd hh:mm:ss"));
