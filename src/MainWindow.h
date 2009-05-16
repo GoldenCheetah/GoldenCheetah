@@ -65,6 +65,7 @@ class MainWindow : public QMainWindow
         void setSmoothingFromLineEdit();
         void setBinWidthFromSlider();
         void setBinWidthFromLineEdit();
+	void setlnYHistFromCheckBox();
         void setWithZerosFromCheckBox();
         void setQaCPFromLineEdit();
         void setQaCADFromLineEdit();
@@ -104,6 +105,7 @@ class MainWindow : public QMainWindow
         QLineEdit *smoothLineEdit;
         QSlider *binWidthSlider;
         QLineEdit *binWidthLineEdit;
+        QCheckBox *lnYHistCheckBox;
         QCheckBox *withZerosCheckBox;
         QTreeWidgetItem *allRides;
         PowerHist *powerHist;

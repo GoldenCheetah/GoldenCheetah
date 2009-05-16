@@ -34,15 +34,18 @@ class PowerHist : public QwtPlot
         QwtPlotCurve *curve;
 
         PowerHist();
+        ~PowerHist();
 
         int binWidth() const { return binw; }
 
-        bool withZeros() const { return withz; }
+        inline bool withZeros() const { return withz; }
+        inline bool islnY() const { return lny; }
 
         void setData(RideFile *ride);
 
     public slots:
 
+        void setlnY(bool value);
         void setWithZeros(bool value);
 
         void setBinWidth(int value);
@@ -54,7 +57,8 @@ class PowerHist : public QwtPlot
         double *array;
         int arrayLength;
 
-        bool withz;
+        bool withz;   // whether P=0 are omitted from hisogram
+	bool lny;     // whether y-axis is a log scale
 
         int binw;
 
