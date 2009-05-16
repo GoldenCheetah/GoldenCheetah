@@ -299,11 +299,16 @@ MainWindow::MainWindow(const QDir &home) :
                                                      binWidthLineEdit));
     binWidthLayout->addWidget(binWidthSlider);
 
+    lnYHistCheckBox = new QCheckBox;
+    lnYHistCheckBox->setText("Log y");
+    binWidthLayout->addWidget(lnYHistCheckBox);
+
     withZerosCheckBox = new QCheckBox;
     withZerosCheckBox->setText("With zeros");
     binWidthLayout->addWidget(withZerosCheckBox);
 
     powerHist = new PowerHist();
+    lnYHistCheckBox->setChecked(powerHist->islnY());
     withZerosCheckBox->setChecked(powerHist->withZeros());
     binWidthSlider->setValue(powerHist->binWidth());
     binWidthLineEdit->setText(QString("%1").arg(powerHist->binWidth()));
@@ -378,6 +383,8 @@ MainWindow::MainWindow(const QDir &home) :
             this, SLOT(setBinWidthFromSlider()));
     connect(binWidthLineEdit, SIGNAL(editingFinished()),
             this, SLOT(setBinWidthFromLineEdit()));
+    connect(lnYHistCheckBox, SIGNAL(stateChanged(int)),
+            this, SLOT(setlnYHistFromCheckBox()));
     connect(withZerosCheckBox, SIGNAL(stateChanged(int)),
             this, SLOT(setWithZerosFromCheckBox()));
     connect(qaCPValue, SIGNAL(editingFinished()),
@@ -1098,6 +1105,13 @@ MainWindow::setBinWidthFromSlider()
         powerHist->setBinWidth(binWidthSlider->value());
         binWidthLineEdit->setText(QString("%1").arg(powerHist->binWidth()));
     }
+}
+
+void
+MainWindow::setlnYHistFromCheckBox()
+{
+    if (powerHist->islnY() != lnYHistCheckBox->isChecked())
+	powerHist->setlnY(! powerHist->islnY());
 }
 
 void

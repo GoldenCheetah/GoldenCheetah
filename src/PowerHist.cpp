@@ -23,11 +23,12 @@
 #include <assert.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
+#include <qwt_scale_engine.h>
 #include <qwt_legend.h>
 #include <qwt_data.h>
 
 PowerHist::PowerHist() :
-    array(NULL), binw(20), withz(true)
+    array(NULL), binw(20), withz(true), lny(false)
 {
     setCanvasBackground(Qt::white);
 
@@ -48,6 +49,11 @@ PowerHist::PowerHist() :
     grid->attach(this);
 }
 
+PowerHist::~PowerHist() {
+    delete curve;
+    delete grid;
+}
+
 void
 PowerHist::recalc()
 {
@@ -63,11 +69,11 @@ PowerHist::recalc()
         if (low==0 && !withz)
             low++;
         smoothWatts[i] = low;
-        smoothTime[i]  = 0.0;
+        smoothTime[i]  = 1e-9;   // non-zero for log axis
         while (low < high)
             smoothTime[i] += array[low++] / 60.0;
     }
-    smoothTime[i] = 0.0;
+    smoothTime[i] = 1e-9;
     smoothWatts[i] = i * binw;
     curve->setData(smoothWatts.data(), smoothTime.data(), count+1);
     setAxisScale(xBottom, 0.0, smoothWatts[count]);
@@ -78,7 +84,7 @@ PowerHist::recalc()
 void
 PowerHist::setYMax() 
 {
-    setAxisScale(yLeft, 0.0, curve->maxYValue() * 1.1);
+    setAxisScale(yLeft, (lny ? 0.1 : 0.0), curve->maxYValue() * 1.1);
 }
 
 void
@@ -121,5 +127,29 @@ PowerHist::setWithZeros(bool value)
 {
     withz = value;
     recalc();
+}
+
+void
+PowerHist::setlnY(bool value)
+{
+    // note: setAxisScaleEngine deletes the old ScaleEngine, so specifying
+    // "new" in the argument list is not a leak
+
+    if (lny = value) {
+	setAxisScaleEngine(
+			   yLeft,
+			   new QwtLog10ScaleEngine
+			   );
+	curve->setBaseline(1e-6);
+    }
+    else {
+	setAxisScaleEngine(
+			   yLeft,
+			   new QwtLinearScaleEngine
+			   );
+	curve->setBaseline(0);
+    }
+    setYMax();
+    replot();
 }
 
