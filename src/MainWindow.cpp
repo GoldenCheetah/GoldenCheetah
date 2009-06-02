@@ -895,6 +895,8 @@ MainWindow::rideSelected()
                         zone_range = item->zoneRange();
                         num_zones = item->numZones();
                         time_in_zone = new double[num_zones];
+                        for (int j = 0; j < num_zones; ++j)
+                            time_in_zone[j] = 0;
                     }
                     else if (item->zoneRange() != zone_range) {
                         zones_ok = false;
