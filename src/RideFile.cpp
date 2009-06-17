@@ -170,7 +170,7 @@ RideFile *RideFileFactory::openRideFile(QFile &file,
     int dot = suffix.lastIndexOf(".");
     assert(dot >= 0);
     suffix.remove(0, dot + 1);
-    RideFileReader *reader = readFuncs_.value(suffix);
+    RideFileReader *reader = readFuncs_.value(suffix.toLower());
     assert(reader);
     return reader->openRideFile(file, errors);
 }
