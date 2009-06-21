@@ -114,6 +114,7 @@ void ConfigDialog::save_Clicked()
     QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
     settings.setValue(GC_UNIT, configPage->unitCombo->currentText());
     settings.setValue(GC_ALLRIDES_ASCENDING, configPage->allRidesAscending->checkState());
+    settings.setValue(GC_CRANKLENGTH, configPage->crankLengthCombo->currentText());
     
     //If the user never switched pages, then make sure we have up to date data.
     if (cyclistPage->getCurrentRange() == 0 || cyclistPage->getCurrentRange() == zones->getRangeSize() - 1)

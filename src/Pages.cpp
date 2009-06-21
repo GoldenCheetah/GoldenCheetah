@@ -21,6 +21,45 @@ ConfigurationPage::ConfigurationPage(QWidget *parent)
     else
        unitCombo->setCurrentIndex(1);
 
+    QLabel *crankLengthLabel = new QLabel(tr("Crank Length:"));
+    
+    QVariant crankLength = settings.value(GC_CRANKLENGTH);
+
+    crankLengthCombo = new QComboBox();
+    crankLengthCombo->addItem("160");
+    crankLengthCombo->addItem("162.5");
+    crankLengthCombo->addItem("165");
+    crankLengthCombo->addItem("167.5");
+    crankLengthCombo->addItem("170");
+    crankLengthCombo->addItem("172.5");
+    crankLengthCombo->addItem("175");
+    crankLengthCombo->addItem("177.5");
+    crankLengthCombo->addItem("180");
+    crankLengthCombo->addItem("182.5");
+    crankLengthCombo->addItem("185");
+    if(crankLength.toString() == "160")
+       crankLengthCombo->setCurrentIndex(0);
+    if(crankLength.toString() == "162.5")
+       crankLengthCombo->setCurrentIndex(1);
+    if(crankLength.toString() == "165")
+       crankLengthCombo->setCurrentIndex(2);
+    if(crankLength.toString() == "167.5")
+       crankLengthCombo->setCurrentIndex(3);
+    if(crankLength.toString() == "170")
+       crankLengthCombo->setCurrentIndex(4);
+    if(crankLength.toString() == "172.5")
+       crankLengthCombo->setCurrentIndex(5);
+    if(crankLength.toString() == "175")
+       crankLengthCombo->setCurrentIndex(6);
+    if(crankLength.toString() == "177.5")
+       crankLengthCombo->setCurrentIndex(7);
+    if(crankLength.toString() == "180")
+       crankLengthCombo->setCurrentIndex(8);
+    if(crankLength.toString() == "182.5")
+       crankLengthCombo->setCurrentIndex(9);
+    if(crankLength.toString() == "185")
+       crankLengthCombo->setCurrentIndex(10);
+
     allRidesAscending = new QCheckBox("Sort ride list ascending.", this);
     QVariant isAscending = settings.value(GC_ALLRIDES_ASCENDING,Qt::Checked); // default is ascending sort
     if(isAscending.toInt() > 0 ){
@@ -37,10 +76,15 @@ ConfigurationPage::ConfigurationPage(QWidget *parent)
 
     QHBoxLayout *warningLayout = new QHBoxLayout;
     warningLayout->addWidget(warningLabel);
+    
+    QHBoxLayout *crankLengthLayout = new QHBoxLayout;
+    crankLengthLayout->addWidget(crankLengthLabel);
+    crankLengthLayout->addWidget(crankLengthCombo);
  
     QVBoxLayout *configLayout = new QVBoxLayout;
     configLayout->addLayout(unitLayout);
     configLayout->addWidget(allRidesAscending);
+    configLayout->addLayout(crankLengthLayout);
     configLayout->addLayout(warningLayout);
     configGroup->setLayout(configLayout);
 

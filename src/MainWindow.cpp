@@ -344,6 +344,13 @@ MainWindow::MainWindow(const QDir &home) :
     window->setLayout(vlayout);
     window->show();
 
+    connect(pfPvPlot, SIGNAL(changedCP(const QString&)),
+            qaCPValue, SLOT(setText(const QString&)) );
+    connect(pfPvPlot, SIGNAL(changedCAD(const QString&)),
+            qaCadValue, SLOT(setText(const QString&)) );
+    connect(pfPvPlot, SIGNAL(changedCL(const QString&)),
+            qaClValue, SLOT(setText(const QString&)) );
+
     tabWidget->addTab(window, tr("PF/PV Plot"));
 
     //////////////////////// Ride Notes ////////////////////////

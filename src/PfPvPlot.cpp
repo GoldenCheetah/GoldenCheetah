@@ -69,6 +69,9 @@ PfPvPlot::PfPvPlot()
     curve->setRenderHint(QwtPlotItem::RenderAntialiased);
     curve->attach(this);
 
+    QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
+    cl_ = settings.value(GC_CRANKLENGTH).toDouble() / 1000.0;
+
     recalc();
 }
 
@@ -83,6 +86,8 @@ PfPvPlot::setData(RideItem *rideItem)
     // Rather than pass them all to the curve, use a set to strip
     // out duplicates.
     std::set<std::pair<double, double> > dataSet;
+    long tot_cad = 0;
+    long tot_cad_points = 0;
     QListIterator<RideFilePoint*> i(ride->dataPoints());
     while (i.hasNext()) {
 	const RideFilePoint *p1 = i.next();
@@ -92,6 +97,9 @@ PfPvPlot::setData(RideItem *rideItem)
 	    double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
 
 	    dataSet.insert(std::make_pair<double, double>(aepf, cpv));
+	
+	    tot_cad += p1->cad;
+	    tot_cad_points++;
 	}
     }
 
@@ -116,6 +124,8 @@ PfPvPlot::setData(RideItem *rideItem)
             setCP(rideItem->zones->getCP(rideItem->zones->whichRange(rideItem->dateTime.date())));
         }
     }
+    
+    setCAD(tot_cad / tot_cad_points);
     
     curve->setData(cpvArray, aepfArray);
     replot();
@@ -155,6 +165,7 @@ PfPvPlot::setCP(int cp)
 {
     cp_ = cp;
     recalc();
+    emit changedCP( QString("%1").arg(cp) );
 }
 
 int
@@ -168,6 +179,7 @@ PfPvPlot::setCAD(int cadence)
 {
     cad_ = cadence;
     recalc();
+    emit changedCAD( QString("%1").arg(cadence) );
 }
 
 double
@@ -181,4 +193,5 @@ PfPvPlot::setCL(double cranklen)
 {
     cl_ = cranklen;
     recalc();
+    emit changedCL( QString("%1").arg(cranklen) );
 }

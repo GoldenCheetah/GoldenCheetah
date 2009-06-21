@@ -45,6 +45,12 @@ class PfPvPlot : public QwtPlot
 	void setCL(double cranklen);
 	
     public slots:
+    
+    signals:
+    
+        void changedCP( const QString& );
+        void changedCAD( const QString& );
+        void changedCL( const QString& );
 
     protected:
 	void recalc();
