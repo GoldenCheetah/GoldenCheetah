@@ -100,7 +100,9 @@ PfPvPlot::setData(RideItem *rideItem)
 	
 	    tot_cad += p1->cad;
 	    tot_cad_points++;
-	}
+        }
+        QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
+        setCL(settings.value(GC_CRANKLENGTH).toDouble() / 1000.0);
     }
 
     // Now that we have the set of points, transform them into the
