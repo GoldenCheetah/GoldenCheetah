@@ -23,9 +23,32 @@
 #include <assert.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
+#include <qwt_plot_zoomer.h>
 #include <qwt_scale_engine.h>
 #include <qwt_legend.h>
 #include <qwt_data.h>
+
+class penTooltip: public QwtPlotZoomer
+{
+public:
+    penTooltip(QwtPlotCanvas *canvas):
+        QwtPlotZoomer(canvas)
+    {
+        setTrackerMode(AlwaysOn);
+    }
+
+    virtual QwtText trackerText(const QwtDoublePoint &pos) const
+    {
+        QColor bg(Qt::white);
+#if QT_VERSION >= 0x040300
+        bg.setAlpha(200);
+#endif
+
+        QwtText text = QString("%1").arg((int)pos.x());
+        text.setBackgroundBrush( QBrush( bg ));
+        return text;
+    }
+};
 
 PowerHist::PowerHist() :
     array(NULL), binw(20), withz(true), lny(false)
@@ -47,6 +70,8 @@ PowerHist::PowerHist() :
     gridPen.setStyle(Qt::DotLine);
     grid->setPen(gridPen);
     grid->attach(this);
+
+    QwtPlotZoomer* zoomer = new penTooltip(this->canvas());
 }
 
 PowerHist::~PowerHist() {
