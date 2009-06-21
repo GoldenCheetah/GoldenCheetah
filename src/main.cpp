@@ -39,6 +39,10 @@ main(int argc, char *argv[])
     QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
     QVariant lastOpened = settings.value(GC_SETTINGS_LAST);
     QVariant unit = settings.value(GC_UNIT);
+    double crankLength = settings.value(GC_CRANKLENGTH).toDouble();
+    if(crankLength<=0) {
+       settings.setValue(GC_CRANKLENGTH,172.5);
+    }
 
     bool anyOpened = false;
     if (lastOpened != QVariant()) {
