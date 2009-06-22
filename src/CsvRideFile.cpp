@@ -34,6 +34,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
     QRegExp metricUnits("(km|kph|km/h)", Qt::CaseInsensitive);
     QRegExp englishUnits("(miles|mph|mp/h)", Qt::CaseInsensitive);
     bool metric;
+
     
     // TODO: a more robust regex for ergomo files
     // i don't have an example with english headers
@@ -77,7 +78,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
         QString linesIn = is.readLine();
         QStringList lines = linesIn.split('\r');
         // workaround for empty lines
-        if(lines.size() == 0) {
+        if(lines.isEmpty()) {
             lineno++;
             continue;
         }
@@ -116,7 +117,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                 else if (englishUnits.indexIn(line) != -1) 
                     metric = false;
                 else {
-                    errors << ("Can't find units in first line: \"" + line + "\"");
+                    errors << "Can't find units in first line: \"" + line + "\" of file \"" + file.fileName() +	"\".";
                     delete rideFile;
                     file.close();
                     return NULL;
@@ -141,7 +142,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                 } 
                 else if (iBike) {
                     // this must be iBike
-                    // can't find time as a column. 
+                    // can't find time as a column.
                     // will we have to extrapolate based on the recording interval?
                     // reading recording interval from config data in ibike csv file
                      minutes = (recInterval * lineno - unitsHeader)/60.0;
@@ -188,6 +189,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
         ++lineno;
         }
     }
+    file.close();
+
     // To estimate the recording interval, take the median of the
     // first 1000 samples and round to nearest millisecond.
     int n = rideFile->dataPoints().size();
@@ -204,6 +207,14 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
         double recint = round(secs[mid] * 1000.0) / 1000.0;
         rideFile->setRecIntSecs(recint);
     }
+    // less than 2 data points is not a valid ride file
+    else {
+	errors << "Insufficient valid data in file \"" + file.fileName() + "\".";
+	delete rideFile;
+	file.close();
+	return NULL;
+    }
+
     QRegExp rideTime("^.*/(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_"
                      "(\\d\\d)_(\\d\\d)_(\\d\\d)\\.csv$");
     if (rideTime.indexIn(file.fileName()) >= 0) {
@@ -215,7 +226,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                                  rideTime.cap(6).toInt()));
         rideFile->setStartTime(datetime);
     }
-    file.close();
+
     return rideFile;
 }
 
