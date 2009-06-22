@@ -30,8 +30,6 @@ class RideItem : public QTreeWidgetItem {
     protected:
 
         double *time_in_zone;
-        int num_zones;
-        int zone_range;
 
     public:
 
@@ -39,8 +37,9 @@ class RideItem : public QTreeWidgetItem {
         QString fileName;
         QDateTime dateTime;
         QString summary;
+	QDateTime summaryGenerationTime;
         RideFile *ride;
-        const Zones *zones;
+        Zones **zones;
         QString notesFileName;
 
         typedef QHash<QString,RideMetric*> MetricMap;
@@ -50,7 +49,7 @@ class RideItem : public QTreeWidgetItem {
 
         RideItem(int type, QString path, 
                  QString fileName, const QDateTime &dateTime,
-                 const Zones *zones, QString notesFileName);
+                 Zones **zones, QString notesFileName);
 
         ~RideItem();
 
