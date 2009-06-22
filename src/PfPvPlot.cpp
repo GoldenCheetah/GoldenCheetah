@@ -162,9 +162,6 @@ PfPvPlot::PfPvPlot()
     curve->setRenderHint(QwtPlotItem::RenderAntialiased);
     curve->attach(this);
 
-    QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-    cl_ = settings.value(GC_CRANKLENGTH).toDouble() / 1000.0;
-
     recalc();
 }
 
@@ -181,6 +178,7 @@ PfPvPlot::refreshZoneItems()
 	}
     }
     zoneCurves.clear();
+
     
     // delete any existing power zone labels
     if (zoneLabels.size()) {
@@ -192,16 +190,7 @@ PfPvPlot::refreshZoneItems()
 	}
     }
     zoneLabels.clear();
-    // due to the discrete power and cadence values returned by the
-    // power meter, there will very likely be many duplicate values.
-    // Rather than pass them all to the curve, use a set to strip
-    // out duplicates.
-    std::set<std::pair<double, double> > dataSet;
-    long tot_cad = 0;
-    long tot_cad_points = 0;
-    QListIterator<RideFilePoint*> i(ride->dataPoints());
-    while (i.hasNext()) {
-	const RideFilePoint *p1 = i.next();
+
     if (! rideItem)
 	return;
 
@@ -278,12 +267,7 @@ PfPvPlot::refreshZoneItems()
 	    // get the zones visible, even if data may take awhile
 	    replot();
 
-	
-	    tot_cad += p1->cad;
-	    tot_cad_points++;
-        }
-        QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-        setCL(settings.value(GC_CRANKLENGTH).toDouble() / 1000.0);
+	}
     }
 }
 
@@ -343,17 +327,7 @@ PfPvPlot::setData(RideItem *_rideItem)
 	refreshZoneItems();
 	curve->setVisible(false);
     }
-    // get the current zone's CP if available:
-    if(rideItem->zones){
-        int zone_range = rideItem->zones->whichRange(rideItem->dateTime.date());
-        if (zone_range >= 0) {
-            setCP(rideItem->zones->getCP(rideItem->zones->whichRange(rideItem->dateTime.date())));
-        }
-    }
-    
-    setCAD(tot_cad / tot_cad_points);
-    
-    curve->setData(cpvArray, aepfArray);
+
     replot();
 }
 
@@ -402,7 +376,6 @@ PfPvPlot::setCP(int cp)
 {
     cp_ = cp;
     recalc();
-    emit changedCP( QString("%1").arg(cp) );
 }
 
 int
@@ -416,7 +389,6 @@ PfPvPlot::setCAD(int cadence)
 {
     cad_ = cadence;
     recalc();
-    emit changedCAD( QString("%1").arg(cadence) );
 }
 
 double
@@ -430,7 +402,6 @@ PfPvPlot::setCL(double cranklen)
 {
     cl_ = cranklen;
     recalc();
-    emit changedCL( QString("%1").arg(cranklen) );
 }
 // process checkbox for zone shading
 void

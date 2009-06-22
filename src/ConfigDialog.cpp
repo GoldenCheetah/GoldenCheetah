@@ -144,29 +144,6 @@ void ConfigDialog::save_Clicked()
 	QMessageBox::warning(this, tr("Invalid CP"), "Please enter valid CP and try again.");
 	cyclistPage->setCPFocus();
 	return;
-    settings.setValue(GC_CRANKLENGTH, configPage->crankLengthCombo->currentText());
-    
-    //If the user never switched pages, then make sure we have up to date data.
-    if (cyclistPage->getCurrentRange() == 0 || cyclistPage->getCurrentRange() == zones->getRangeSize() - 1)
-    {
-    	if(cyclistPage->getCurrentRange() != 0)
-    	{
-            // Record the End Date..
-            zones->setStartDate(zones->getRangeSize() - 1, cyclistPage->calendar->selectedDate());
-            //Swap the end date for the previous zone..
-            zones->setEndDate(zones->getRangeSize() - 2, cyclistPage->calendar->selectedDate());
-        
-            //Store the CP for the new Zone..
-            zones->setCP(cyclistPage->getCurrentRange(), cyclistPage->txtThreshold->text().toInt());
-    	} 
-    	else 
-    	{
-    		QDate date;
-    		zones->setStartDate(0, cyclistPage->calendar->selectedDate());
-    		zones->setEndDate(0, date.currentDate());
-    		zones->setCP(0, cyclistPage->txtThreshold->text().toInt());
-    		cyclistPage->setCurrentRange(1);
-        }
     }
 
     // if for some reason we have no zones yet, then create them
