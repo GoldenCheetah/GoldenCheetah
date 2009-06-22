@@ -52,12 +52,6 @@ class PfPvPlot : public QwtPlot
         bool shadeZones() const { return shade_zones; }
 
     public slots:
-    
-    signals:
-    
-        void changedCP( const QString& );
-        void changedCAD( const QString& );
-        void changedCL( const QString& );
 
         void setShadeZones(bool value);
 
