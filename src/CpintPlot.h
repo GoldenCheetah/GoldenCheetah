@@ -19,11 +19,21 @@
 #ifndef _GC_CpintPlot_h
 #define _GC_CpintPlot_h 1
 
+#include "Zones.h"
 #include <qwt_plot.h>
+#include <qwt_plot_marker.h>   // added djconnel 06Apr2009
 #include <QtGui>
+#include <QHash>
 
 class QwtPlotCurve;
 class QwtPlotGrid;
+class RideItem;
+
+#define USE_T0_IN_CP_MODEL 0 // added djconnel 08Apr2009: allow 3-parameter CP model
+
+bool is_ride_filename(const QString filename);
+QString ride_filename_to_cpi_filename(const QString filename);
+QDate cpi_filename_to_date(const QString filename);
 
 class CpintPlot : public QwtPlot
 {
@@ -35,24 +45,48 @@ class CpintPlot : public QwtPlot
         QProgressDialog *progress;
         bool needToScanRides;
 
-        const QwtPlotCurve *getAllCurve() const { return allCurve; }
         const QwtPlotCurve *getThisCurve() const { return thisCurve; }
 
-        QVector<QDate> getBestDates() { return bestDates; }
+	QVector<QDate> getBestDates() { return bestDates; }
+	QVector<double> getBests() { return bests; }
+	double cp, tau, t0;                   // CP model parameters
+	void deriveCPParameters();            // derive the CP model parameters
+	bool deleteCpiFile(QString filename); // delete a CPI file and clean up
+
 
     public slots:
 
         void showGrid(int state);
-        void calculate(QString fileName, QDateTime dateTime);
+        void calculate(RideItem *rideItem);
+	void plot_CP_curve(
+			   CpintPlot *plot,
+			   double cp,
+			   double tau,
+			   double t0n
+			   );
+	void plot_allCurve(
+			   CpintPlot *plot,
+			   int n_values,
+			   const double *power_values
+			   );
 
     protected:
 
         QString path;
-        QwtPlotCurve *allCurve;
         QwtPlotCurve *thisCurve;
+	QwtPlotCurve *CPCurve;
+	QList <QwtPlotCurve *> allCurves;
+	QList <QwtPlotMarker *> allZoneLabels;
+	void clear_CP_Curves();
+
         QwtPlotGrid *grid;
         
-        QVector<QDate> bestDates;
+        QVector<double> bests;
+	QVector<QDate> bestDates;
+
+	Zones **zones;                // pointer to power zones added djconnel 24Apr2009
+
+	QHash <QString, bool> cpiDataInBests;  // hash: keys are CPI files contributing to bests (at least originally)
 };
 
 #endif // _GC_CpintPlot_h
