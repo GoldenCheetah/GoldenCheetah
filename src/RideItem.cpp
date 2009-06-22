@@ -22,6 +22,7 @@
 #include "Settings.h"
 #include "TimeUtils.h"
 #include "Zones.h"
+#include <iostream> // delete me
 #include <assert.h>
 #include <math.h>
 #include <QtXml/QtXml>
@@ -30,7 +31,7 @@
 
 RideItem::RideItem(int type,
                    QString path, QString fileName, const QDateTime &dateTime, 
-                   const Zones *zones, QString notesFileName) : 
+                   Zones **zones, QString notesFileName) : 
     QTreeWidgetItem(type), path(path), fileName(fileName), 
     dateTime(dateTime), zones(zones), notesFileName(notesFileName)
 {
@@ -41,8 +42,6 @@ RideItem::RideItem(int type,
     setTextAlignment(2, Qt::AlignRight);
 
     time_in_zone = NULL;
-    num_zones = -1;
-    zone_range = -1;
 }
 
 RideItem::~RideItem()
@@ -109,27 +108,32 @@ static void summarize(QString &intervals,
 
 int RideItem::zoneRange() 
 {
-    if (summary.isEmpty())
-        htmlSummary();
-    return zone_range;
+    return (
+	    (zones && *zones) ?
+	    (*zones)->whichRange(dateTime.date()) :
+	    -1
+	    );
 }
 
 int RideItem::numZones() 
 {
-    if (summary.isEmpty())
-        htmlSummary();
-    assert(zone_range >= 0);
-    return num_zones;
+    if (zones && *zones) {
+	int zone_range = zoneRange();
+	return ((zone_range >= 0) ?
+		(*zones)->numZones(zone_range) :
+		0
+		);
+    }
+    else
+	return 0;
 }
 
 double RideItem::timeInZone(int zone)
 {
-    if (summary.isEmpty())
-        htmlSummary();
+    htmlSummary();
     if (!ride)
         return 0.0;
-    assert(zone_range >= 0);
-    assert(zone < num_zones);
+    assert(zone < numZones());
     return time_in_zone[zone];
 }
 
@@ -169,7 +173,14 @@ static const char *metricsXml =
 QString 
 RideItem::htmlSummary()
 {
-    if (summary.isEmpty()) {
+    if (summary.isEmpty() ||
+	(zones && *zones && (summaryGenerationTime < (*zones)->modificationTime))) {
+	// set defaults for zone range and number of zones
+	int zone_range = -1;
+	int num_zones = 0;
+
+        summaryGenerationTime = QDateTime::currentDateTime();
+
         QFile file(path + "/" + fileName);
         QStringList errors;
         ride = RideFileFactory::instance().openRideFile(file, errors);
@@ -184,38 +195,50 @@ RideItem::htmlSummary()
                    + dateTime.toString("dddd MMMM d, yyyy, h:mm AP") 
                    + "</h2><h3>Device Type: " + ride->deviceType() + "</h3>");
 
-        if (zones) {
-            zone_range = zones->whichRange(dateTime.date());
-            if (zone_range >= 0) {
-                num_zones = zones->numZones(zone_range);
-                time_in_zone = new double[num_zones];
-                for (int i = 0; i < num_zones; ++i)
-                    time_in_zone[i] = 0.0;
-            }
-        }
-        QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-        QVariant unit = settings.value(GC_UNIT);
- 
-        const RideMetricFactory &factory = RideMetricFactory::instance();
-        QSet<QString> todo;
-        for (int i = 0; i < factory.metricCount(); ++i)
-            todo.insert(factory.metricName(i));
+	QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
+	QVariant unit = settings.value(GC_UNIT);
 
-        while (!todo.empty()) {
-            QMutableSetIterator<QString> i(todo);
-later:
-            while (i.hasNext()) {
-                const QString &name = i.next();
-                const QVector<QString> &deps = factory.dependencies(name);
-                for (int j = 0; j < deps.size(); ++j)
-                    if (!metrics.contains(deps[j]))
-                        goto later;
-                RideMetric *metric = factory.newMetric(name);
-                metric->compute(ride, zones, zone_range, metrics);
-                metrics.insert(name, metric);
-                i.remove();
-            }
-        }
+        if (zones &&
+	    *zones &&
+	    ((zone_range = (*zones)->whichRange(dateTime.date())) >= 0) &&
+	    ((num_zones = (*zones)->numZones(zone_range)) > 0)
+	    )
+	    {
+		time_in_zone = new double[num_zones];
+		for (int i = 0; i < num_zones; ++i)
+		    time_in_zone[i] = 0.0;
+	    }
+ 
+	const RideMetricFactory &factory = RideMetricFactory::instance();
+	QSet<QString> todo;
+
+	// hack djconnel: do the metrics TWICE, to catch dependencies
+	// on displayed variables.  Presently if a variable depends on zones,
+	// for example, and zones change, the value may be considered still
+	// value even though it will change.  This is presently happening
+	// where bikescore depends on relative intensity.
+	// note metrics are only calculated if zones are defined
+	for (int metriciteration = 0; metriciteration < 2; metriciteration ++) {
+	    for (int i = 0; i < factory.metricCount(); ++i) {
+		todo.insert(factory.metricName(i));
+
+		while (!todo.empty()) {
+		    QMutableSetIterator<QString> i(todo);
+		later:
+		    while (i.hasNext()) {
+			const QString &name = i.next();
+			const QVector<QString> &deps = factory.dependencies(name);
+			for (int j = 0; j < deps.size(); ++j)
+			    if (!metrics.contains(deps[j]))
+				goto later;
+			RideMetric *metric = factory.newMetric(name);
+			metric->compute(ride, *zones, zone_range, metrics);
+			metrics.insert(name, metric);
+			i.remove();
+		    }
+		}
+	    }
+	}
 
         double secs_watts = 0.0;
        
@@ -261,8 +284,8 @@ later:
                 int_watts_sum += point->watts * secs_delta;
                 if (point->watts > int_max_power)
                     int_max_power = point->watts;
-                if (zones) {
-                    int zone = zones->whichZone(zone_range, point->watts);
+		if (num_zones > 0) {
+                    int zone = (*zones)->whichZone(zone_range, point->watts);
                     if (zone >= 0)
                         time_in_zone[zone] += secs_delta;
                 }
@@ -353,10 +376,10 @@ later:
             if ((groupNum % 2 == 1) || (groupNum == groups.size() - 1))
                 summary += "</tr></table>";
         }
-
-        if (zones) {
+	
+        if (num_zones > 0) {
             summary += "<h2>Power Zones</h2>";
-            summary += zones->summarize(zone_range, time_in_zone, num_zones);
+            summary += (*zones)->summarize(zone_range, time_in_zone, num_zones);
         }
 
         // TODO: Ergomo uses non-consecutive interval numbers.
