@@ -39,8 +39,10 @@
 #include <qwt_plot_panner.h>
 #include <qwt_plot_picker.h>
 #include <qwt_plot_zoomer.h>
+#include <qwt_plot_grid.h>
 #include <qwt_data.h>
 #include <boost/scoped_ptr.hpp>
+#include "DaysScaleDraw.h"
 
 #include "DatePickerDialog.h"
 #include "ToolsDialog.h"
@@ -66,26 +68,37 @@
 #define FOLDER_TYPE 0
 #define RIDE_TYPE 1
 
-static bool
-parseRideFileName(const QString &name, QString *notesFileName, QDateTime *dt)
+bool
+MainWindow::parseRideFileName(const QString &name, QString *notesFileName, QDateTime *dt)
 {
-    static char *rideFileRegExp = ("^((\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)"
-                                   "_(\\d\\d)_(\\d\\d)_(\\d\\d))\\.(.+)$");
+    static char rideFileRegExp[] = "^((\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)"
+                                   "_(\\d\\d)_(\\d\\d)_(\\d\\d))\\.(.+)$";
     QRegExp rx(rideFileRegExp);
     if (!rx.exactMatch(name))
         return false;
     assert(rx.numCaptures() == 8);
     QDate date(rx.cap(2).toInt(), rx.cap(3).toInt(),rx.cap(4).toInt()); 
     QTime time(rx.cap(5).toInt(), rx.cap(6).toInt(),rx.cap(7).toInt()); 
+    if ((! date.isValid()) || (! time.isValid())) {
+	QMessageBox::warning(this,
+			     tr("Invalid Ride File Name"),
+			     tr("Invalid date/time in filename:\n%1\nSkipping file...").arg(name)
+			     );
+	return false;
+    }
     *dt = QDateTime(date, time);
     *notesFileName = rx.cap(1) + ".notes";
     return true;
 }
- 
+
 MainWindow::MainWindow(const QDir &home) : 
     home(home), settings(GC_SETTINGS_CO, GC_SETTINGS_APP), 
-    zones(NULL), currentNotesChanged(false)
+    zones(NULL), currentNotesChanged(false),
+    ride(NULL)
 {
+    QVariant unit = settings.value(GC_UNIT);
+    useMetricUnits = (unit.toString() == "Metric");
+
     setWindowTitle(home.dirName());
     settings.setValue(GC_SETTINGS_LAST, home.dirName());
 
@@ -95,11 +108,13 @@ MainWindow::MainWindow(const QDir &home) :
     if (zonesFile.exists()) {
         zones = new Zones();
         if (!zones->read(zonesFile)) {
-            QMessageBox::warning(this, tr("Zones File Error"),
-                                 zones->errorString());
+            QMessageBox::critical(this, tr("Zones File Error"),
+				  zones->errorString());
             delete zones;
             zones = NULL;
         }
+	else if (! zones->warningString().isEmpty())
+            QMessageBox::warning(this, tr("Reading Zones File"), zones->warningString());
     }
 
     QVariant geom = settings.value(GC_SETTINGS_MAIN_GEOM);
@@ -136,7 +151,7 @@ MainWindow::MainWindow(const QDir &home) :
         QDateTime dt;
         if (parseRideFileName(name, &notesFileName, &dt)) {
             last = new RideItem(RIDE_TYPE, home.path(), 
-                                name, dt, zones, notesFileName);
+                                name, dt, &zones, notesFileName);
             allRides->addChild(last);
         }
     }
@@ -147,7 +162,6 @@ MainWindow::MainWindow(const QDir &home) :
     tabWidget->addTab(rideSummary, tr("Ride Summary"));
 
     /////////////////////////// Ride Plot Tab ///////////////////////////
-
     QWidget *window = new QWidget;
     QVBoxLayout *vlayout = new QVBoxLayout;
 
@@ -159,21 +173,23 @@ MainWindow::MainWindow(const QDir &home) :
     showGrid->setCheckState(Qt::Checked);
     showLayout->addWidget(showGrid);
 
-    QCheckBox *showPower = new QCheckBox("Power", window);
-    showPower->setCheckState(Qt::Checked);
-    showLayout->addWidget(showPower);
-
-    QCheckBox *showHr = new QCheckBox("Heart Rate", window);
+    showHr = new QCheckBox("Heart Rate", window);
     showHr->setCheckState(Qt::Checked);
     showLayout->addWidget(showHr);
 
-    QCheckBox *showSpeed = new QCheckBox("Speed", window);
+    showSpeed = new QCheckBox("Speed", window);
     showSpeed->setCheckState(Qt::Checked);
     showLayout->addWidget(showSpeed);
 
-    QCheckBox *showCad = new QCheckBox("Cadence", window);
+    showCad = new QCheckBox("Cadence", window);
     showCad->setCheckState(Qt::Checked);
     showLayout->addWidget(showCad);
+
+    showPower = new QComboBox();
+    showPower->addItem(tr("Power + shade"));
+    showPower->addItem(tr("Power - shade"));
+    showPower->addItem(tr("No Power"));
+    showLayout->addWidget(showPower);
 
     QComboBox *comboDistance = new QComboBox();
     comboDistance->addItem(tr("X Axis Shows Time"));
@@ -196,7 +212,7 @@ MainWindow::MainWindow(const QDir &home) :
                                                    smoothSlider->maximum(), 
                                                    smoothLineEdit));
     smoothLayout->addWidget(smoothSlider);
-    allPlot = new AllPlot;
+    allPlot = new AllPlot();
     smoothSlider->setValue(allPlot->smoothing());
     smoothLineEdit->setText(QString("%1").arg(allPlot->smoothing()));
 
@@ -250,18 +266,23 @@ MainWindow::MainWindow(const QDir &home) :
     QLabel *cpintTimeLabel = new QLabel(tr("Interval Duration:"), window);
     cpintTimeValue = new QLineEdit("0 s");
     QLabel *cpintTodayLabel = new QLabel(tr("Today:"), window);
-    cpintTodayValue = new QLineEdit("0 watts");
+    cpintTodayValue = new QLineEdit(tr("no data"));
     QLabel *cpintAllLabel = new QLabel(tr("All Rides:"), window);
-    cpintAllValue = new QLineEdit("0 watts");
+    cpintAllValue = new QLineEdit(tr("no data"));
     cpintTimeValue->setReadOnly(true);
     cpintTodayValue->setReadOnly(true);
     cpintAllValue->setReadOnly(true);
+
+    cpintSetCPButton = new QPushButton(tr("&Save CP value"), this);
+    cpintSetCPButton->setEnabled(false);
+
     cpintPickerLayout->addWidget(cpintTimeLabel);
     cpintPickerLayout->addWidget(cpintTimeValue);
     cpintPickerLayout->addWidget(cpintTodayLabel);
     cpintPickerLayout->addWidget(cpintTodayValue);
     cpintPickerLayout->addWidget(cpintAllLabel);
     cpintPickerLayout->addWidget(cpintAllValue);
+    cpintPickerLayout->addWidget(cpintSetCPButton);
     cpintPlot = new CpintPlot(home.path());
     vlayout->addWidget(cpintPlot);
     vlayout->addLayout(cpintPickerLayout);
@@ -283,7 +304,7 @@ MainWindow::MainWindow(const QDir &home) :
     window = new QWidget;
     vlayout = new QVBoxLayout;
     QHBoxLayout *binWidthLayout = new QHBoxLayout;
-    QLabel *binWidthLabel = new QLabel(tr("Bin width (watts)"), window);
+    QLabel *binWidthLabel = new QLabel(tr("Bin width"), window);
     binWidthLineEdit = new QLineEdit(window);
     binWidthLineEdit->setFixedWidth(30);
     
@@ -294,9 +315,6 @@ MainWindow::MainWindow(const QDir &home) :
     binWidthSlider->setTickInterval(1);
     binWidthSlider->setMinimum(1);
     binWidthSlider->setMaximum(100);
-    binWidthLineEdit->setValidator(new QIntValidator(binWidthSlider->minimum(),
-                                                     binWidthSlider->maximum(), 
-                                                     binWidthLineEdit));
     binWidthLayout->addWidget(binWidthSlider);
 
     lnYHistCheckBox = new QCheckBox;
@@ -306,12 +324,16 @@ MainWindow::MainWindow(const QDir &home) :
     withZerosCheckBox = new QCheckBox;
     withZerosCheckBox->setText("With zeros");
     binWidthLayout->addWidget(withZerosCheckBox);
+    histParameterCombo = new QComboBox();
+    binWidthLayout->addWidget(histParameterCombo);
 
     powerHist = new PowerHist();
+    setHistTextValidator();
+
     lnYHistCheckBox->setChecked(powerHist->islnY());
     withZerosCheckBox->setChecked(powerHist->withZeros());
     binWidthSlider->setValue(powerHist->binWidth());
-    binWidthLineEdit->setText(QString("%1").arg(powerHist->binWidth()));
+    setHistBinWidthText();
     vlayout->addWidget(powerHist);
     vlayout->addLayout(binWidthLayout);
     window->setLayout(vlayout);
@@ -326,18 +348,25 @@ MainWindow::MainWindow(const QDir &home) :
     QHBoxLayout *qaLayout = new QHBoxLayout;
 
     pfPvPlot = new PfPvPlot();
-    QLabel *qaCPLabel = new QLabel(tr("CP:"), window);
+    QLabel *qaCPLabel = new QLabel(tr("Watts:"), window);
     qaCPValue = new QLineEdit(QString("%1").arg(pfPvPlot->getCP()));
-    QLabel *qaCadLabel = new QLabel(tr("Cadence:"), window);
+    qaCPValue->setValidator(new QIntValidator(0, 9999, qaCPValue));
+    QLabel *qaCadLabel = new QLabel(tr("RPM:"), window);
     qaCadValue = new QLineEdit(QString("%1").arg(pfPvPlot->getCAD()));
-    QLabel *qaClLabel = new QLabel(tr("Crank Length:"), window);
-    qaClValue = new QLineEdit(QString("%1").arg(pfPvPlot->getCL()));
+    qaCadValue->setValidator(new QIntValidator(0, 999, qaCadValue));
+    QLabel *qaClLabel = new QLabel(tr("Crank Length (mm):"), window);
+    qaClValue = new QLineEdit(QString("%1").arg(1000 * pfPvPlot->getCL()));
+    shadeZonesPfPvCheckBox = new QCheckBox;
+    shadeZonesPfPvCheckBox->setText("Shade zones");
+    shadeZonesPfPvCheckBox->setCheckState(Qt::Checked);
+
     qaLayout->addWidget(qaCPLabel);
     qaLayout->addWidget(qaCPValue);
     qaLayout->addWidget(qaCadLabel);
     qaLayout->addWidget(qaCadValue);
     qaLayout->addWidget(qaClLabel);
     qaLayout->addWidget(qaClValue);
+    qaLayout->addWidget(shadeZonesPfPvCheckBox);
 
     vlayout->addWidget(pfPvPlot);
     vlayout->addLayout(qaLayout);
@@ -360,9 +389,105 @@ MainWindow::MainWindow(const QDir &home) :
     
     //////////////////////// Weekly Summary ////////////////////////
     
+    // add daily distance / duration graph:
+    window = new QWidget;
+    QGridLayout *glayout = new QGridLayout;
+    
+    // set up the weekly distance / duration plot:
+    weeklyPlot = new QwtPlot();
+    weeklyPlot->enableAxis(QwtPlot::yRight, true);
+    weeklyPlot->setAxisMaxMinor(QwtPlot::xBottom,0);
+    weeklyPlot->setAxisScaleDraw(QwtPlot::xBottom, new DaysScaleDraw());
+    QFont weeklyPlotAxisFont = weeklyPlot->axisFont(QwtPlot::yLeft);
+    weeklyPlotAxisFont.setPointSize(weeklyPlotAxisFont.pointSize() * 4 / 5);
+    weeklyPlot->setAxisFont(QwtPlot::xBottom, weeklyPlotAxisFont);
+    weeklyPlot->setAxisFont(QwtPlot::yLeft, weeklyPlotAxisFont);
+    weeklyPlot->setAxisFont(QwtPlot::yRight, weeklyPlotAxisFont);
+    
+    weeklyDistCurve = new QwtPlotCurve();
+    weeklyDistCurve->setStyle(QwtPlotCurve::Steps);
+    QPen pen(Qt::SolidLine);
+    weeklyDistCurve->setPen(pen);
+    weeklyDistCurve->setBrush(Qt::red);
+    weeklyDistCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    weeklyDistCurve->setCurveAttribute(QwtPlotCurve::Inverted, true); // inverted, right-to-left
+    weeklyDistCurve->attach(weeklyPlot); 
+
+    weeklyDurationCurve = new QwtPlotCurve();
+    weeklyDurationCurve->setStyle(QwtPlotCurve::Steps);
+    weeklyDurationCurve->setPen(pen); 
+    weeklyDurationCurve->setBrush(QColor(255,200,0,255));
+    weeklyDurationCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    weeklyDurationCurve->setCurveAttribute(QwtPlotCurve::Inverted, true); // inverted, right-to-left
+    weeklyDurationCurve->setYAxis(QwtPlot::yRight);
+    weeklyDurationCurve->attach(weeklyPlot); 
+    
+    // set up the weekly bike score plot:
+    weeklyBSPlot = new QwtPlot();
+    weeklyBSPlot->enableAxis(QwtPlot::yRight, true);
+    weeklyBSPlot->setAxisMaxMinor(QwtPlot::xBottom,0);
+    weeklyBSPlot->setAxisScaleDraw(QwtPlot::xBottom, new DaysScaleDraw());
+    QwtText textLabel = QwtText();
+    weeklyBSPlot->setAxisFont(QwtPlot::xBottom, weeklyPlotAxisFont);
+    weeklyBSPlot->setAxisFont(QwtPlot::yLeft, weeklyPlotAxisFont);
+    weeklyBSPlot->setAxisFont(QwtPlot::yRight, weeklyPlotAxisFont);
+    
+    weeklyBSCurve = new QwtPlotCurve();
+    weeklyBSCurve->setStyle(QwtPlotCurve::Steps);
+    weeklyBSCurve->setPen(pen);
+    weeklyBSCurve->setBrush(Qt::blue);
+    weeklyBSCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    weeklyBSCurve->setCurveAttribute(QwtPlotCurve::Inverted, true); // inverted, right-to-left
+    weeklyBSCurve->attach(weeklyBSPlot); 
+    
+    weeklyRICurve = new QwtPlotCurve();
+    weeklyRICurve->setStyle(QwtPlotCurve::Steps);
+    weeklyRICurve->setPen(pen);
+    weeklyRICurve->setBrush(Qt::green);
+    weeklyRICurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    weeklyRICurve->setCurveAttribute(QwtPlotCurve::Inverted, true); // inverted, right-to-left
+    weeklyRICurve->setYAxis(QwtPlot::yRight);
+    weeklyRICurve->attach(weeklyBSPlot); 
+
+    // set baseline curves to obscure linewidth variations along baseline
+    pen.setWidth(2);
+    weeklyBaselineCurve   = new QwtPlotCurve();
+    weeklyBaselineCurve->setPen(pen);
+    weeklyBaselineCurve->attach(weeklyPlot);
+    weeklyBSBaselineCurve = new QwtPlotCurve();
+    weeklyBSBaselineCurve->setPen(pen);
+    weeklyBSBaselineCurve->attach(weeklyBSPlot);
+   
+    QwtPlotGrid *grid = new QwtPlotGrid();
+    grid->enableX(false);
+    QPen gridPen;
+    gridPen.setStyle(Qt::DotLine);
+    grid->setPen(gridPen);
+    grid->attach(weeklyPlot);
+    
+    QwtPlotGrid *grid1 = new QwtPlotGrid();
+    grid1->enableX(false);
+    gridPen.setStyle(Qt::DotLine);
+    grid1->setPen(gridPen);
+    grid1->attach(weeklyBSPlot);
+    
     weeklySummary = new QTextEdit;
     weeklySummary->setReadOnly(true);
-    tabWidget->addTab(weeklySummary, tr("Weekly Summary"));
+    
+    glayout->addWidget(weeklySummary,0,0,1,-1); // row, col, rowspan, colspan. -1 == fill to edge
+    glayout->addWidget(weeklyPlot,1,0);
+    glayout->addWidget(weeklyBSPlot,1,1);
+    
+    glayout->setRowStretch(0, 3);           // stretch factor of summary
+    glayout->setRowStretch(1, 2);           // stretch factor of weekly plots
+    glayout->setColumnStretch(0, 1);        // stretch first column
+    glayout->setColumnStretch(1, 1);        // stretch second column
+    glayout->setRowMinimumHeight(0, 180);   // minimum height of weekly summary
+    glayout->setRowMinimumHeight(1, 120);   // minimum height of weekly plots
+    
+    window->setLayout(glayout);
+    window->show();
+    tabWidget->addTab(window, tr("Weekly Summary"));
 
     ////////////////////////////// Signals ////////////////////////////// 
 
@@ -370,7 +495,7 @@ MainWindow::MainWindow(const QDir &home) :
             this, SLOT(rideSelected()));
     connect(splitter, SIGNAL(splitterMoved(int,int)), 
             this, SLOT(splitterMoved()));
-    connect(showPower, SIGNAL(stateChanged(int)),
+    connect(showPower, SIGNAL(currentIndexChanged(int)),
             allPlot, SLOT(showPower(int)));
     connect(showHr, SIGNAL(stateChanged(int)),
             allPlot, SLOT(showHr(int)));
@@ -380,12 +505,14 @@ MainWindow::MainWindow(const QDir &home) :
             allPlot, SLOT(showCad(int)));
     connect(showGrid, SIGNAL(stateChanged(int)),
             allPlot, SLOT(showGrid(int)));
-    connect(comboDistance, SIGNAL(activated(int)),
+    connect(comboDistance, SIGNAL(currentIndexChanged(int)),
             allPlot, SLOT(setByDistance(int)));
     connect(smoothSlider, SIGNAL(valueChanged(int)),
             this, SLOT(setSmoothingFromSlider()));
     connect(smoothLineEdit, SIGNAL(editingFinished()),
             this, SLOT(setSmoothingFromLineEdit()));
+    connect(cpintSetCPButton, SIGNAL(clicked()),
+	    this, SLOT(cpintSetCPButtonClicked()));
     connect(binWidthSlider, SIGNAL(valueChanged(int)),
             this, SLOT(setBinWidthFromSlider()));
     connect(binWidthLineEdit, SIGNAL(editingFinished()),
@@ -394,6 +521,10 @@ MainWindow::MainWindow(const QDir &home) :
             this, SLOT(setlnYHistFromCheckBox()));
     connect(withZerosCheckBox, SIGNAL(stateChanged(int)),
             this, SLOT(setWithZerosFromCheckBox()));
+    connect(histParameterCombo, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(setHistSelection(int)));
+    connect(shadeZonesPfPvCheckBox, SIGNAL(stateChanged(int)),
+            this, SLOT(setShadeZonesPfPvFromCheckBox()));
     connect(qaCPValue, SIGNAL(editingFinished()),
 	    this, SLOT(setQaCPFromLineEdit()));
     connect(qaCadValue, SIGNAL(editingFinished()),
@@ -473,8 +604,8 @@ MainWindow::addRide(QString name, bool bSelect /*=true*/)
         assert(false);
     }
     RideItem *last = new RideItem(RIDE_TYPE, home.path(), 
-                                  name, dt, zones, notesFileName);
-    
+                                  name, dt, &zones, notesFileName);
+
     QVariant isAscending = settings.value(GC_ALLRIDES_ASCENDING,Qt::Checked); // default is ascending sort
     int index = 0;
     while (index < allRides->childCount()) {
@@ -546,8 +677,12 @@ MainWindow::removeCurrentRide()
             .arg(strOldFileName).arg(strNewName));
     }
 
-    tabWidget->setCurrentIndex(0);
+    // added djconnel: remove old cpi file, then update bests which are associated with the file
+    cpintPlot->deleteCpiFile(home.absolutePath() + "/" + ride_filename_to_cpi_filename(strOldFileName));
+
     treeWidget->setCurrentItem(itemToSelect);
+    rideSelected();
+    cpintPlot->replot();
 }
 
 void
@@ -598,42 +733,6 @@ MainWindow::currentRide()
 }
 
 void
-MainWindow::exportCSV()
-{
-    if ((treeWidget->selectedItems().size() != 1)
-        || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
-        QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
-        return;
-    }
-
-    RideItem *ride = (RideItem*) treeWidget->selectedItems().first();
-
-    // Ask the user if they prefer to export with English or metric units.
-    QStringList items;
-    items << tr("Metric") << tr("English");
-    bool ok;
-    QString units = QInputDialog::getItem(
-        this, tr("Select Units"), tr("Units:"), items, 0, false, &ok);
-    if(!ok) 
-        return;
-
-    QString fileName = QFileDialog::getSaveFileName(
-        this, tr("Export CSV"), QDir::homePath(),
-        tr("Comma-Separated Values (*.csv)"));
-    if (fileName.length() == 0)
-        return;
-
-    QFile file(fileName);
-    if (!file.open(QFile::WriteOnly | QFile::Truncate))
-    {
-        QMessageBox::critical(this, tr("Split Ride"), tr("The file %1 can't be opened for writing").arg(fileName));
-        return;
-    }
-
-    ride->ride->writeAsCsv(file, units!="English");
-}
-
-void
 MainWindow::exportXML()
 {
     if ((treeWidget->selectedItems().size() != 1)
@@ -657,6 +756,43 @@ MainWindow::exportXML()
                               tr("Error writing %1: %2").arg(fileName).arg(err));
         return;
     }
+}
+
+void
+MainWindow::exportCSV()
+{
+    if ((treeWidget->selectedItems().size() != 1)
+        || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
+        QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
+        return;
+    }
+
+    ride = (RideItem*) treeWidget->selectedItems().first();
+
+    // Ask the user if they prefer to export with English or metric units.
+    QStringList items;
+    items << tr("Metric") << tr("English");
+    bool ok;
+    QString units = QInputDialog::getItem(
+        this, tr("Select Units"), tr("Units:"), items, 0, false, &ok);
+    if(!ok) 
+        return;
+    bool useMetricUnits = (units == items[0]);
+
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Export CSV"), QDir::homePath(),
+        tr("Comma-Separated Values (*.csv)"));
+    if (fileName.length() == 0)
+        return;
+
+    QFile file(fileName);
+    if (!file.open(QFile::WriteOnly | QFile::Truncate))
+    {
+        QMessageBox::critical(this, tr("Split Ride"), tr("The file %1 can't be opened for writing").arg(fileName));
+        return;
+    }
+
+    ride->ride->writeAsCsv(file, useMetricUnits);
 }
 
 void MainWindow::importCSV()
@@ -837,7 +973,7 @@ void
 MainWindow::rideSelected()
 {
     assert(treeWidget->selectedItems().size() <= 1);
-    if (treeWidget->selectedItems().size() == 0) {
+    if (treeWidget->selectedItems().isEmpty()) {
         rideSummary->clear();
         return;
     }
@@ -848,20 +984,35 @@ MainWindow::rideSelected()
         return;
     }
 
-    RideItem *ride = (RideItem*) which;
+    ride = (RideItem*) which;
     rideSummary->setHtml(ride->htmlSummary());
     rideSummary->setAlignment(Qt::AlignCenter);
-    if (ride->ride) {
-        allPlot->setData(ride->ride);
-        powerHist->setData(ride->ride);
-        // using a RideItem rather than RideFile to provide access to zones information
+    if (ride) {
+	setAllPlotWidgets(ride);
+        allPlot->setData(ride);
+
+	// set the histogram data
+        powerHist->setData(ride);
+	// make sure the histogram has a legal selection
+	powerHist->fixSelection();
+	// update the options in the histogram combobox
+	setHistWidgets(ride);
+	
         pfPvPlot->setData(ride);
         // update the QLabel widget with the CP value set in PfPvPlot::setData()
         qaCPValue->setText(QString("%1").arg(pfPvPlot->getCP()));
     }
-    if (tabWidget->currentIndex() == 2)
-        cpintPlot->calculate(ride->fileName, ride->dateTime);
+    if (tabWidget->currentIndex() == 2) {
+        cpintPlot->calculate(ride);
+	cpintSetCPButton->setEnabled(cpintPlot->cp > 0);
+    }
 
+    // generate a weekly summary of the week associated with the current ride
+    generateWeeklySummary();
+}
+
+void MainWindow::generateWeeklySummary()
+{
     QDate wstart = ride->dateTime.date();
     wstart = wstart.addDays(Qt::Monday - wstart.dayOfWeek());
     assert(wstart.dayOfWeek() == Qt::Monday);
@@ -873,6 +1024,32 @@ MainWindow::rideSelected()
     assert(weeklyDistance);
     RideMetric *weeklyWork = factory.newMetric("total_work");
     assert(weeklyWork);
+    RideMetric *weeklyBS = factory.newMetric("skiba_bike_score");
+    assert(weeklyBS);
+    RideMetric *weeklyRelIntensity = factory.newMetric("skiba_relative_intensity");
+    assert(weeklyRelIntensity);
+
+    RideMetric *dailySeconds[7];
+    RideMetric *dailyDistance[7];
+    RideMetric *dailyBS[7];
+    RideMetric *dailyRI[7];
+    RideMetric *dailyW[7];
+    RideMetric *dailyXP[7];
+
+    for (int i = 0; i < 7; i++) {
+	dailySeconds[i] = factory.newMetric("time_riding");
+	assert(dailySeconds[i]);
+	dailyDistance[i] = factory.newMetric("total_distance");
+	assert(dailyDistance[i]);
+	dailyBS[i] = factory.newMetric("skiba_bike_score");
+	assert(dailyBS[i]);
+	dailyRI[i] = factory.newMetric("skiba_relative_intensity");
+	assert(dailyRI[i]);
+	dailyW[i] = factory.newMetric("total_work");
+	assert(dailyW[i]);
+	dailyXP[i] = factory.newMetric("skiba_xpower");
+	assert(dailyXP[i]);
+    }
     
     int zone_range = -1;
     double *time_in_zone = NULL;
@@ -880,40 +1057,62 @@ MainWindow::rideSelected()
     bool zones_ok = true;
 
     for (int i = 0; i < allRides->childCount(); ++i) {
-        if (allRides->child(i)->type() == RIDE_TYPE) {
-            RideItem *item = (RideItem*) allRides->child(i);
-            if ((item->dateTime.date() >= wstart)
-                && (item->dateTime.date() < wend)) {
-                RideMetric *m;
-                item->htmlSummary(); // compute metrics
-                if (item->ride == NULL)
-                    continue;
-                m = item->metrics.value(weeklySeconds->name());
-                assert(m);
-                weeklySeconds->aggregateWith(m);
-                m = item->metrics.value(weeklyDistance->name());
-                assert(m);
-                weeklyDistance->aggregateWith(m);
-                m = item->metrics.value(weeklyWork->name());
-                assert(m);
-                weeklyWork->aggregateWith(m);
-                if (zones) {
-                    if (zone_range == -1) {
-                        zone_range = item->zoneRange();
-                        num_zones = item->numZones();
-                        time_in_zone = new double[num_zones];
-                        for (int j = 0; j < num_zones; ++j)
-                            time_in_zone[j] = 0;
-                    }
-                    else if (item->zoneRange() != zone_range) {
-                        zones_ok = false;
-                    }
-                    if (zone_range != -1) {
-                        for (int j = 0; j < num_zones; ++j)
-                            time_in_zone[j] += item->timeInZone(j);
-                    }
-                }
-            }
+	RideItem *item = (RideItem*) allRides->child(i);
+	int day;
+        if (
+	    (item->type() == RIDE_TYPE) &&
+	    (item->ride) &&
+	    ((day = wstart.daysTo(item->dateTime.date())) >= 0) && 
+	    (day < 7)
+	    ) {
+
+	    RideMetric *m;
+	    item->htmlSummary(); // compute metrics
+	    if (m = item->metrics.value(weeklySeconds->name())) {
+		weeklySeconds->aggregateWith(m);
+		dailySeconds[day]->aggregateWith(m);
+	    }
+
+	    if (m = item->metrics.value(weeklyDistance->name())) {
+		weeklyDistance->aggregateWith(m);
+		dailyDistance[day]->aggregateWith(m);
+	    }
+
+	    if (m = item->metrics.value(weeklyWork->name())) {
+		weeklyWork->aggregateWith(m);
+		dailyW[day]->aggregateWith(m);
+	    }
+
+            if (m = item->metrics.value(weeklyBS->name())) {
+		weeklyBS->aggregateWith(m);
+		dailyBS[day]->aggregateWith(m);
+	    }
+
+	    if (m = item->metrics.value(weeklyRelIntensity->name())) {
+		weeklyRelIntensity->aggregateWith(m);
+		dailyRI[day]->aggregateWith(m);
+	    }
+
+	    if (m = item->metrics.value("skiba_xpower"))
+		dailyXP[day]->aggregateWith(m);
+
+	    // compute time in zones
+	    if (zones) {
+		if (zone_range == -1) {
+		    zone_range = item->zoneRange();
+		    num_zones = item->numZones();
+		    time_in_zone = new double[num_zones];
+		    for (int j = 0; j < num_zones; ++j)
+			time_in_zone[j] = 0;
+		}
+		else if (item->zoneRange() != zone_range) {
+		    zones_ok = false;
+		}
+		if (zone_range != -1) {
+		    for (int j = 0; j < num_zones; ++j)
+			time_in_zone[j] += item->timeInZone(j);
+		}
+	    }
         }
     }
 
@@ -926,64 +1125,54 @@ MainWindow::rideSelected()
     const char *dateFormat = "MM/dd/yyyy";
 
     QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-    QVariant unit = settings.value(GC_UNIT);
 
     QString summary;
-    if (unit.toString() == "Metric") {
-        summary = tr(
-            "<center>"
-            "<h2>Week of %1 through %2</h2>"
-            "<h2>Summary</h2>"
-            "<p>"
-            "<table align=\"center\" width=\"60%\" border=0>"
-            "<tr><td>Total time riding:</td>"
-            "    <td align=\"right\">%3:%4:%5</td></tr>"
-            "<tr><td>Total distance (km):</td>"
-            "    <td align=\"right\">%6</td></tr>"
-            "<tr><td>Total work (kJ):</td>"
-            "    <td align=\"right\">%7</td></tr>"
-            "<tr><td>Daily Average work (kJ):</td>"
-            "    <td align=\"right\">%8</td></tr>"
-            "</table>"
-            )
-            .arg(wstart.toString(dateFormat))
-            .arg(wstart.addDays(6).toString(dateFormat))
-            .arg(hours)
-            .arg(minutes, 2, 10, QLatin1Char('0'))
-            .arg(seconds, 2, 10, QLatin1Char('0'))
-            .arg(weeklyDistance->value(true), 0, 'f', 1)
-            .arg((unsigned) round(weeklyWork->value(true)))
-            .arg((unsigned) round(weeklyWork->value(true) / 7));
-    } 
-    else {
-        summary = tr(
-            "<center>"
-            "<h2>Week of %1 through %2</h2>"
-            "<h2>Summary</h2>"
-            "<p>"
-            "<table align=\"center\" width=\"60%\" border=0>"
-            "<tr><td>Total time riding:</td>"
-            "    <td align=\"right\">%3:%4:%5</td></tr>"
-            "<tr><td>Total distance (miles):</td>"
-            "    <td align=\"right\">%6</td></tr>"
-            "<tr><td>Total work (kJ):</td>"
-            "    <td align=\"right\">%7</td></tr>"
-            "<tr><td>Daily Average work (kJ):</td>"
-            "    <td align=\"right\">%8</td></tr>"
-            "</table>"
-            // TODO: add averages
-            )
-            .arg(wstart.toString(dateFormat))
-            .arg(wstart.addDays(6).toString(dateFormat))
-            .arg(hours)
-            .arg(minutes, 2, 10, QLatin1Char('0'))
-            .arg(seconds, 2, 10, QLatin1Char('0'))
-            .arg(weeklyDistance->value(false), 0, 'f', 1)
-            .arg((unsigned) round(weeklyWork->value(true)))
-            .arg((unsigned) round(weeklyWork->value(true) / 7));
-    }    
+    summary =
+	tr(
+	   "<center>"
+	   "<h2>Week of %1 through %2</h2>"
+	   "<h2>Summary</h2>"
+	   "<p>"
+	   "<table align=\"center\" width=\"60%\" border=0>"
+	   "<tr><td>Total time riding:</td>"
+	   "    <td align=\"right\">%3:%4:%5</td></tr>"
+	   "<tr><td>Total distance (%6):</td>"
+	   "    <td align=\"right\">%7</td></tr>"
+	   "<tr><td>Total work (kJ):</td>"
+	   "    <td align=\"right\">%8</td></tr>"
+	   "<tr><td>Daily Average work (kJ):</td>"
+	   "    <td align=\"right\">%9</td></tr>"
+	   )
+	.arg(wstart.toString(dateFormat))
+	.arg(wstart.addDays(6).toString(dateFormat))
+	.arg(hours)
+	.arg(minutes, 2, 10, QLatin1Char('0'))
+	.arg(seconds, 2, 10, QLatin1Char('0'))
+	.arg(useMetricUnits ? "km" : "miles")
+	.arg(weeklyDistance->value(useMetricUnits), 0, 'f', 1)
+	.arg((unsigned) round(weeklyWork->value(useMetricUnits)))
+	.arg((unsigned) round(weeklyWork->value(useMetricUnits) / 7));
+
+    double weeklyBSValue = weeklyBS->value(useMetricUnits);
+    bool useBikeScore = (zone_range != -1) && (weeklyBSValue > 0);
+
     if (zone_range != -1) {
-        summary += "<h2>Power Zones</h2>";
+	if (useBikeScore)
+	    summary += 
+		tr(
+		   "<tr><td>Total BikeScore:</td>"
+		   "    <td align=\"right\">%1</td></tr>"
+		   "<tr><td>Net Relative Intensity:</td>"
+		   "    <td align=\"right\">%2</td></tr>"
+		   )
+		.arg((unsigned) round(weeklyBSValue))
+		.arg(weeklyRelIntensity->value(useMetricUnits), 0, 'f', 3);
+
+        summary +=
+	    tr(
+	       "</table>"
+	       "<h2>Power Zones</h2>"
+	       );
         if (!zones_ok)
             summary += "Error: Week spans more than one zone range.";
         else {
@@ -999,9 +1188,139 @@ MainWindow::rideSelected()
     delete weeklyDistance;
     delete weeklySeconds;
     delete weeklyWork;
+    delete weeklyBS;
+    delete weeklyRelIntensity;
 
-    // TODO: add daily breakdown
+    // set the axis labels of the weekly plots
+    QwtText textLabel = QwtText(useMetricUnits ? "km" : "miles");
+    QFont weeklyPlotAxisTitleFont = textLabel.font();
+    weeklyPlotAxisTitleFont.setPointSize(10);
+    weeklyPlotAxisTitleFont.setBold(true);
+    textLabel.setFont(weeklyPlotAxisTitleFont);
+    weeklyPlot->setAxisTitle(QwtPlot::yLeft, textLabel);
+    textLabel.setText("Minutes");
+    weeklyPlot->setAxisTitle(QwtPlot::yRight, textLabel);
+    textLabel.setText(useBikeScore ? "BikeScore" : "kJoules");
+    weeklyBSPlot->setAxisTitle(QwtPlot::yLeft, textLabel);
+    textLabel.setText(useBikeScore ? "Intensity" : "xPower");
+    weeklyBSPlot->setAxisTitle(QwtPlot::yRight, textLabel);
 
+    // for the daily distance/duration and bikescore plots:
+    // first point: establish zero position
+    // points 2N, 2N+1: Nth day (N from 1 to 7), up then down
+    // 16th point: move to draw baseline off right of plot
+    
+    double xdist[16];
+    double xdur[16];
+    double xbsorw[16];
+    double xriorxp[16];
+
+    double ydist[16];   // daily distance
+    double ydur[16];    // daily total time
+    double ybsorw[16];     // daily minutes
+    double yriorxp[16];     // daily relative intensity
+
+    // data for a "baseline" curve to draw a baseline
+    double xbaseline[] = {0, 8};
+    double ybaseline[] = {0, 0};
+    weeklyBaselineCurve->setData(xbaseline, ybaseline, 2);
+    weeklyBSBaselineCurve->setData(xbaseline, ybaseline, 2);
+
+    const double bar_width = 0.3;
+
+    int i = 0;
+    xdist[i] =
+	xdur[i] =
+	xbsorw[i] =
+	xriorxp[i] =
+	0;
+
+    ydist[i] =
+	ydur[i] =
+	ybsorw[i] =
+	yriorxp[i] =
+	0;
+
+    for(int day = 0; day < 7; day++){
+	double x;
+
+	i++;
+        xdist[i]         = x = day + 1 - bar_width;
+        xdist[i + 1]     = x += bar_width;
+        xdur[i]          = x;
+        xdur[i + 1]      = x += bar_width;
+
+        xbsorw[i]        = x = day + 1 - bar_width;
+        xbsorw[i + 1]    = x += bar_width;
+        xriorxp[i]       = x;
+	xriorxp[i + 1]   = x += bar_width;
+
+	ydist[i]         = dailyDistance[day]->value(useMetricUnits);
+	ydur[i]          = dailySeconds[day]->value(useMetricUnits) / 60;
+	ybsorw[i]        = useBikeScore ? dailyBS[day]->value(useMetricUnits) : dailyW[day]->value(useMetricUnits) / 1000;
+	yriorxp[i]       = useBikeScore ? dailyRI[day]->value(useMetricUnits) : dailyXP[day]->value(useMetricUnits);
+
+	i++;
+	ydist[i] = 0;
+	ydur[i]  = 0;
+	ybsorw[i]   = 0;
+	yriorxp[i]   = 0;
+
+	delete dailyDistance[day];
+	delete dailySeconds[day];
+	delete dailyBS[day];
+	delete dailyRI[day];
+	delete dailyW[day];
+	delete dailyXP[day];
+    }
+
+    // sweep a baseline off the right of the plot
+    i++;
+    xdist[i] =
+	xdur[i] =
+	xbsorw[i] =
+	xriorxp[i] =
+	8;
+
+    ydist[i] =
+	ydur[i] =
+	ybsorw[i] =
+	yriorxp[i] =
+	0;
+
+    // Distance/Duration plot:
+    weeklyDistCurve->setData(xdist, ydist, 16);
+    weeklyPlot->setAxisScale(QwtPlot::yLeft, 0, weeklyDistCurve->maxYValue()*1.1, 0);
+    weeklyPlot->setAxisScale(QwtPlot::xBottom, 0.5, 7.5, 0);
+    weeklyPlot->setAxisTitle(QwtPlot::yLeft, useMetricUnits ? "Kilometers" : "Miles");
+
+    weeklyDurationCurve->setData(xdur, ydur, 16);
+    weeklyPlot->setAxisScale(QwtPlot::yRight, 0, weeklyDurationCurve->maxYValue()*1.1, 0);
+    weeklyPlot->replot();
+    
+    // BikeScore/Relative Intensity plot
+    weeklyBSCurve->setData(xbsorw, ybsorw, 16);
+    weeklyBSPlot->setAxisScale(QwtPlot::yLeft, 0, weeklyBSCurve->maxYValue()*1.1, 0);
+    weeklyBSPlot->setAxisScale(QwtPlot::xBottom, 0.5, 7.5, 0);
+    
+    // set axis minimum for relative intensity
+    double RImin = -1;
+    for(int i = 1; i < 16; i += 2)
+        if (yriorxp[i] > 0 && ((RImin < 0) || (yriorxp[i] < RImin)))
+	    RImin = yriorxp[i];
+    if (RImin < 0)
+	RImin = 0;
+    RImin *= 0.8;
+    for (int i = 0; i < 16; i ++)
+	if (yriorxp[i] < RImin)
+	    yriorxp[i] = RImin;
+    weeklyRICurve->setBaseline(RImin);
+    weeklyRICurve->setData(xriorxp, yriorxp, 16);
+    weeklyBSPlot->setAxisScale(QwtPlot::yRight, RImin, weeklyRICurve->maxYValue()*1.1, 0);
+
+    weeklyBSPlot->replot();
+    
+    
     weeklySummary->setHtml(summary);
 
     // First save the contents of the notes window.
@@ -1065,10 +1384,31 @@ MainWindow::resizeEvent(QResizeEvent*)
 void 
 MainWindow::showOptions()
 {
-   ConfigDialog *cd = new ConfigDialog(home);
-   cd->exec();
-}
+    ConfigDialog *cd = new ConfigDialog(home, &zones);
+    cd->exec();
 
+    // update other items in case zones were changed
+    if (ride) {
+	// daily summary
+	rideSummary->setHtml(ride->htmlSummary());
+	
+	// weekly summary
+	generateWeeklySummary();
+
+	// all plot
+	allPlot->refreshZoneLabels();
+	allPlot->replot();
+
+	// histogram
+	powerHist->refreshZoneLabels();
+	powerHist->replot();
+
+	// force-versus-pedal velocity plot
+	pfPvPlot->refreshZoneItems();
+	pfPvPlot->replot();
+        qaCPValue->setText(QString("%1").arg(pfPvPlot->getCP()));
+    }
+}
 
 void 
 MainWindow::moveEvent(QMoveEvent*)
@@ -1107,12 +1447,74 @@ MainWindow::setSmoothingFromLineEdit()
     }
 }
 
+// set the rider value of CP to the value derived from the CP model extraction
+void
+MainWindow::cpintSetCPButtonClicked()
+{
+  int cp = (int) cpintPlot->cp;
+  if (cp <= 0) {
+    QMessageBox::critical(
+			  this,
+			  tr("Set CP value to extracted value"),
+			  tr("No non-zero extracted value was identified:\n") +
+			  tr("Zones were unchanged.")
+			  );
+    return;
+  }
+  
+  if (zones == NULL)
+    // set up new zones
+    zones = new Zones();
+
+
+  // determine in which range to write the value: use the range associated with the presently selected ride
+  int range;
+  if (ride)
+      range = ride->zoneRange();
+  else {
+      QDate today = QDate::currentDate();
+      range = zones->whichRange(today);
+  }
+
+  // add a new range if we failed to find a valid one
+  if (range < 0) {
+    // create an infinite range
+    zones->addZoneRange(cp);
+    range = 0;
+  }
+
+  zones->setCP(range, cp);        // update the CP value
+  zones->setZonesFromCP(range);   // update the zones based on the value of CP
+  zones->write(home);             // write the output file
+
+  QDate startDate = zones->getStartDate(range);
+  QDate endDate   =  zones->getEndDate(range);
+  QMessageBox::information(
+			   this,
+			   tr("CP saved"),
+			   tr("Range from %1 to %2\nRider CP set to %3 watts") .
+			   arg(startDate.isNull() ? "BEGIN" : startDate.toString()) .
+			   arg(endDate.isNull() ? "END" : endDate.toString()) .
+			   arg(cp)
+			   );
+
+  // regenerate the ride and weekly summaries associated with the present ride
+  if (ride) {
+    // daily summary
+    rideSummary->setHtml(ride->htmlSummary());
+
+    // weekly summary
+    generateWeeklySummary();
+  }
+
+}
+
 void
 MainWindow::setBinWidthFromSlider()
 {
     if (powerHist->binWidth() != binWidthSlider->value()) {
         powerHist->setBinWidth(binWidthSlider->value());
-        binWidthLineEdit->setText(QString("%1").arg(powerHist->binWidth()));
+	setHistBinWidthText();
     }
 }
 
@@ -1132,12 +1534,72 @@ MainWindow::setWithZerosFromCheckBox()
 }
 
 void
+MainWindow::setHistBinWidthText()
+{
+    binWidthLineEdit->setText(QString("%1").arg(powerHist->getBinWidthRealUnits(), 0, 'g', 3));
+}
+
+void
+MainWindow::setHistTextValidator()
+{
+    double delta = powerHist->getDelta();
+    int digits = powerHist->getDigits();
+    binWidthLineEdit->setValidator(
+				   (digits == 0) ?
+				   (QValidator *) (
+						   new QIntValidator(binWidthSlider->minimum() * delta,
+								     binWidthSlider->maximum() * delta,
+								     binWidthLineEdit
+								     )
+						   ) :
+				   (QValidator *) (
+						   new QDoubleValidator(binWidthSlider->minimum() * delta,
+									binWidthSlider->maximum() * delta,
+									digits,
+									binWidthLineEdit
+									)
+						   )
+				   );
+
+}
+
+void
+MainWindow::setHistSelection(int id)
+{
+    if (id == histWattsShadedID)
+	powerHist->setSelection(PowerHist::wattsShaded);
+    else if (id == histWattsUnshadedID)
+	powerHist->setSelection(PowerHist::wattsUnshaded);
+    else if (id == histNmID)
+	powerHist->setSelection(PowerHist::nm);
+    else if (id == histHrID)
+	powerHist->setSelection(PowerHist::hr);
+    else if (id == histKphID)
+	powerHist->setSelection(PowerHist::kph);
+    else if (id == histCadID)
+	powerHist->setSelection(PowerHist::cad);
+    else
+	fprintf(stderr, "Illegal id encountered: %d", id);
+
+    setHistBinWidthText();
+    setHistTextValidator();
+}
+
+void
+MainWindow::setShadeZonesPfPvFromCheckBox()
+{
+    if (pfPvPlot->shadeZones() != shadeZonesPfPvCheckBox->isChecked()) {
+        pfPvPlot->setShadeZones(shadeZonesPfPvCheckBox->isChecked());
+    }
+}
+
+void
 MainWindow::setBinWidthFromLineEdit()
 {
-    int value = binWidthLineEdit->text().toInt();
+    double value = binWidthLineEdit->text().toDouble();
     if (value != powerHist->binWidth()) {
-        powerHist->setBinWidth(value);
-        binWidthSlider->setValue(value);
+	binWidthSlider->setValue(powerHist->setBinWidthRealUnits(value));
+	setHistBinWidthText();
     }
 }
 
@@ -1159,7 +1621,7 @@ void
 MainWindow::setQaCLFromLineEdit()
 {
     double value = qaClValue->text().toDouble();
-    pfPvPlot->setCL(value);
+    pfPvPlot->setCL(value / 1000);
 }
 
 void
@@ -1170,7 +1632,8 @@ MainWindow::tabChanged(int index)
             QTreeWidgetItem *which = treeWidget->selectedItems().first();
             if (which->type() == RIDE_TYPE) {
                 RideItem *ride = (RideItem*) which;
-                cpintPlot->calculate(ride->fileName, ride->dateTime);
+                cpintPlot->calculate(ride);
+		cpintSetCPButton->setEnabled(cpintPlot->cp > 0);
                 return;
             }
         }
@@ -1205,10 +1668,33 @@ MainWindow::pickerMoved(const QPoint &pos)
 {
     double minutes = cpintPlot->invTransform(QwtPlot::xBottom, pos.x());
     cpintTimeValue->setText(interval_to_str(60.0*minutes));
-    cpintTodayValue->setText(tr("%1 watts").arg(
-            curve_to_point(minutes, cpintPlot->getThisCurve())));
-    cpintAllValue->setText(tr("%1 watts").arg(
-            curve_to_point(minutes, cpintPlot->getAllCurve()))+(cpintPlot->getBestDates().count()>minutes*60?" ("+cpintPlot->getBestDates()[(int) ceil(minutes*60)].toString("MM/dd/yyyy")+")":""));
+
+    // current ride
+    {
+      unsigned watts = curve_to_point(minutes, cpintPlot->getThisCurve());
+      QString label;
+      if (watts > 0)
+	label = QString("%1 watts").arg(watts);
+      else
+	label = tr("no data");
+      cpintTodayValue->setText(label);
+    }
+
+    // global ride
+    {
+      QString label;
+      int index = (int) ceil(minutes * 60);
+      if (cpintPlot->getBests().count() > index) {
+	  QDate date = cpintPlot->getBestDates()[index];
+	  label =
+	      QString("%1 watts (%2)").
+	      arg(cpintPlot->getBests()[index]).
+	      arg(date.isValid() ? date.toString("MM/dd/yyyy") : "no date");
+      }
+      else
+	  label = tr("no data");
+      cpintAllValue->setText(label);
+    }
 }
 
 void
@@ -1274,7 +1760,6 @@ MainWindow::deleteRide()
     if (_item==NULL || _item->type() != RIDE_TYPE)
         return;
     RideItem *item = reinterpret_cast<RideItem*>(_item);
-
     QMessageBox msgBox;
     msgBox.setText(tr("Are you sure you want to delete the ride:"));
     msgBox.setInformativeText(item->fileName);
@@ -1287,4 +1772,115 @@ MainWindow::deleteRide()
         removeCurrentRide();
 }
 
+void MainWindow::setAllPlotWidgets(RideItem *ride)
+{
+    if (ride->ride) {
+	RideFileDataPresent *dataPresent = ride->ride->areDataPresent();
+	showPower->setEnabled(dataPresent->watts);
+	showHr->setEnabled(dataPresent->hr);
+	showSpeed->setEnabled(dataPresent->kph);
+	showCad->setEnabled(dataPresent->cad);
+	allPlot->showPower(showPower->currentIndex());
+	allPlot->wattsCurve->setVisible(dataPresent->watts && (showPower->currentIndex() < 2));
+	allPlot->hrCurve->setVisible(dataPresent->hr && showHr->isChecked());
+	allPlot->speedCurve->setVisible(dataPresent->kph && showSpeed->isChecked());
+	allPlot->cadCurve->setVisible(dataPresent->cad && showCad->isChecked());
+    }
+    else {
+	showPower->setEnabled(false);
+	showHr->setEnabled(false);
+	showSpeed->setEnabled(false);
+	showCad->setEnabled(false);
+	allPlot->showPower(false);
+	allPlot->wattsCurve->setVisible(false);
+	allPlot->hrCurve->setVisible(false);
+	allPlot->speedCurve->setVisible(false);
+	allPlot->cadCurve->setVisible(false);
+    }
+}
 
+void MainWindow::setHistWidgets(RideItem *rideItem)
+{
+    int count = 0;
+    assert(rideItem);
+    RideFile *ride = rideItem->ride;
+
+    // prevent selection from changing during reconstruction of options
+    disconnect(histParameterCombo, SIGNAL(currentIndexChanged(int)),
+	       this, SLOT(setHistSelection(int)));
+
+    if (ride) {
+	// we want to retain the present selection
+	PowerHist::Selection s = powerHist->selection();
+    
+	histParameterCombo->clear();
+
+
+	histWattsShadedID =
+	    histWattsUnshadedID =
+	    histNmID =
+	    histHrID =
+	    histKphID =
+	    histCadID =
+	    -1;
+
+	if (ride->areDataPresent()->watts) {
+	    histWattsShadedID = count ++;
+	    histParameterCombo->addItem(tr("Watts(shaded)"));
+	    histWattsUnshadedID = count ++;
+	    histParameterCombo->addItem(tr("Watts(unshaded)"));
+	}
+	if (ride->areDataPresent()->nm) {
+	    histNmID = count ++;
+	    histParameterCombo->addItem(tr("Torque"));
+	}
+	if (ride->areDataPresent()->hr) {
+	    histHrID = count ++;
+	    histParameterCombo->addItem(tr("Heartrate"));
+	}
+	if (ride->areDataPresent()->kph) {
+	    histKphID = count ++;
+	    histParameterCombo->addItem(tr("Speed"));
+	}
+	if (ride->areDataPresent()->cad) {
+	    histCadID = count ++;
+	    histParameterCombo->addItem(tr("Cadence"));
+	}
+	if (count > 0) {
+	    histParameterCombo->setEnabled(true);
+	    binWidthLineEdit->setEnabled(true);
+	    binWidthSlider->setEnabled(true);
+	    withZerosCheckBox->setEnabled(true);
+	    lnYHistCheckBox->setEnabled(true);    
+
+	    // set widget to proper value
+	    if ((s == PowerHist::wattsShaded) && (histWattsShadedID >= 0))
+		histParameterCombo->setCurrentIndex(histWattsShadedID);
+	    else if ((s == PowerHist::wattsUnshaded) && (histWattsUnshadedID >= 0))
+		histParameterCombo->setCurrentIndex(histWattsUnshadedID);
+	    else if ((s == PowerHist::nm) && (histNmID >= 0))
+		histParameterCombo->setCurrentIndex(histNmID);
+	    else if ((s == PowerHist::hr) && (histHrID >= 0))
+		histParameterCombo->setCurrentIndex(histHrID);
+	    else if ((s == PowerHist::kph) && (histKphID >= 0))
+		histParameterCombo->setCurrentIndex(histKphID);
+	    else if ((s == PowerHist::cad) && (histCadID >= 0))
+		histParameterCombo->setCurrentIndex(histCadID);
+	    else
+		histParameterCombo->setCurrentIndex(0);
+
+	    // reconnect widget
+	    connect(histParameterCombo, SIGNAL(currentIndexChanged(int)),
+		    this, SLOT(setHistSelection(int)));
+
+	    return;
+	}
+    }
+
+    histParameterCombo->addItem(tr("no data"));
+    histParameterCombo->setEnabled(false);
+    binWidthLineEdit->setEnabled(false);
+    binWidthSlider->setEnabled(false);
+    withZerosCheckBox->setEnabled(false);
+    lnYHistCheckBox->setEnabled(false);    
+}
