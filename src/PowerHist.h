@@ -20,10 +20,14 @@
 #define _GC_PowerHist_h 1
 
 #include <qwt_plot.h>
+#include <qsettings.h>
+#include <qvariant.h>
 
 class QwtPlotCurve;
 class QwtPlotGrid;
-class RideFile;
+class RideItem;
+class PowerHistBackground;
+class PowerHistZoneLabel;
 
 class PowerHist : public QwtPlot
 {
@@ -32,39 +36,96 @@ class PowerHist : public QwtPlot
     public:
 
         QwtPlotCurve *curve;
+	QList <PowerHistZoneLabel *> zoneLabels;
 
         PowerHist();
-        ~PowerHist();
+	~PowerHist();
 
         int binWidth() const { return binw; }
-
-        inline bool withZeros() const { return withz; }
         inline bool islnY() const { return lny; }
+        inline bool withZeros() const { return withz; }
+        bool shadeZones() const;
 
-        void setData(RideFile *ride);
+	enum Selection {
+	    wattsShaded,
+	    wattsUnshaded,
+	    nm,
+	    hr,
+	    kph,
+	    cad
+	} selected;
+	inline Selection selection() { return selected; }
+
+        void setData(RideItem *_rideItem);
+
+	void setSelection(Selection selection);
+	void fixSelection();
+
+        void setBinWidth(int value);
+	double getDelta();
+	int    getDigits();
+        double getBinWidthRealUnits();
+        int setBinWidthRealUnits(double value);
+
+	void refreshZoneLabels();
+
+	RideItem *rideItem;
 
     public slots:
 
         void setlnY(bool value);
         void setWithZeros(bool value);
 
-        void setBinWidth(int value);
-
     protected:
 
         QwtPlotGrid *grid;
 
-        double *array;
-        int arrayLength;
+	// storage for data counts
+        QVector<unsigned int>
+	    *wattsArray,
+	    *nmArray,
+	    *hrArray,
+	    *kphArray,
+	    *cadArray;
 
-        bool withz;   // whether P=0 are omitted from hisogram
-	bool lny;     // whether y-axis is a log scale
-
+        int wattsArrayLength,
+	    nmArrayLength,
+	    hrArrayLength,
+	    kphArrayLength,
+	    cadArrayLength;
         int binw;
+
+        bool withz;        // whether zeros are included in histogram
+	double dt;         // length of sample
 
         void recalc();
         void setYMax();
+
+    private:
+        QSettings settings;
+        QVariant unit;
+
+	PowerHistBackground *bg;
+	bool lny;
+
+	// discritized unit for smoothing
+        static const double wattsDelta = 1.0;
+	static const double nmDelta    = 0.1;
+	static const double hrDelta    = 1.0;
+	static const double kphDelta   = 0.1;
+	static const double cadDelta   = 1.0;
+
+	// digits for text entry validator
+        static const int wattsDigits = 0;
+	static const int nmDigits    = 1;
+	static const int hrDigits    = 0;
+	static const int kphDigits   = 1;
+	static const int cadDigits   = 0;
+
+	void setParameterAxisTitle();
+
+
+	bool useMetricUnits;  // whether metric units are used (or imperial)
 };
 
 #endif // _GC_PowerHist_h
-
