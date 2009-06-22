@@ -1,13 +1,28 @@
 #include <QtGui>
+#include <QIntValidator>
+#include <assert.h>
 #include "Pages.h"
 #include "Settings.h"
 
-ConfigurationPage::ConfigurationPage(QWidget *parent)
-: QWidget(parent)
-{
-    QGroupBox *configGroup = new QGroupBox(tr("Golden Cheetah Configuration"));
 
-    QLabel *unitLabel = new QLabel(tr("Unit of Measurement:"));
+ConfigurationPage::~ConfigurationPage()
+{
+    delete configGroup;
+    delete unitLabel;
+    delete unitCombo;
+    delete allRidesAscending;
+    delete warningLabel;
+    delete unitLayout;
+    delete warningLayout;
+    delete configLayout;
+    delete mainLayout;
+}
+
+ConfigurationPage::ConfigurationPage()
+{
+    configGroup = new QGroupBox(tr("Golden Cheetah Configuration"));
+
+    unitLabel = new QLabel(tr("Unit of Measurement:"));
 
     unitCombo = new QComboBox();
     unitCombo->addItem(tr("Metric"));
@@ -68,165 +83,135 @@ ConfigurationPage::ConfigurationPage(QWidget *parent)
         allRidesAscending->setCheckState(Qt::Unchecked);
     }
     
-    QLabel *warningLabel = new QLabel(tr("Requires Restart To Take Effect"));
+    warningLabel = new QLabel(tr("Requires Restart To Take Effect"));
 
-    QHBoxLayout *unitLayout = new QHBoxLayout;
+    unitLayout = new QHBoxLayout;
     unitLayout->addWidget(unitLabel);
     unitLayout->addWidget(unitCombo);
 
-    QHBoxLayout *warningLayout = new QHBoxLayout;
+    warningLayout = new QHBoxLayout;
     warningLayout->addWidget(warningLabel);
     
     QHBoxLayout *crankLengthLayout = new QHBoxLayout;
     crankLengthLayout->addWidget(crankLengthLabel);
     crankLengthLayout->addWidget(crankLengthCombo);
  
-    QVBoxLayout *configLayout = new QVBoxLayout;
+    configLayout = new QVBoxLayout;
     configLayout->addLayout(unitLayout);
     configLayout->addWidget(allRidesAscending);
     configLayout->addLayout(crankLengthLayout);
     configLayout->addLayout(warningLayout);
     configGroup->setLayout(configLayout);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout = new QVBoxLayout;
     mainLayout->addWidget(configGroup);
     mainLayout->addStretch(1);
     setLayout(mainLayout);
 }
 
 
-CyclistPage::CyclistPage(QWidget *parent, Zones *_zones, bool emptyZone)
-        : QWidget(parent)
+CyclistPage::~CyclistPage()
 {
-    QGroupBox *cyclistGroup = new QGroupBox(tr("Cyclist Options"));
+    delete cyclistGroup;
+    delete lblThreshold;
+    delete txtThreshold;
+    delete txtThresholdValidator;
+    delete btnBack;
+    delete btnForward;
+    delete btnDelete;
+    delete checkboxNew;
+    delete txtStartDate;
+    delete txtEndDate;
+    delete lblStartDate;
+    delete lblEndDate;
+    delete calendar;
+    delete lblCurRange;
+    delete powerLayout;
+    delete rangeLayout;
+    delete dateRangeLayout;
+    delete zoneLayout;
+    delete calendarLayout;
+    delete cyclistLayout;
+    delete mainLayout;
+}
 
-    zones = _zones;
-
-    setChoseNewZone(false);
-
-    QLabel *lblThreshold = new QLabel(tr("Critical Power:"));
+CyclistPage::CyclistPage(Zones **_zones):
+    zones(_zones)
+{
+    cyclistGroup = new QGroupBox(tr("Cyclist Options"));
+    lblThreshold = new QLabel(tr("Critical Power:"));
     txtThreshold = new QLineEdit();
-    txtThreshold->setInputMask("999");
+
+    // the validator will prevent numbers above the upper limit
+    // from being entered, but will not prevent non-negative numbers
+    // below the lower limit (since it is still plausible a valid
+    // entry will result)
+    txtThresholdValidator = new QIntValidator(20,999,this);
+    txtThreshold->setValidator(txtThresholdValidator);
+
     btnBack = new QPushButton(this);
     btnBack->setText(tr("Back"));
     btnForward = new QPushButton(this);
     btnForward->setText(tr("Forward"));
-    btnNew = new QPushButton(this);
-    btnNew->setText(tr("New Zone Range"));
+    btnDelete = new QPushButton(this);
+    btnDelete->setText(tr("Delete Range"));
+    checkboxNew = new QCheckBox(this);
+    checkboxNew->setText(tr("New Range from Date"));
     btnForward->setEnabled(false);
-    txtStartDate = new QDateEdit();
-    txtEndDate = new QDateEdit();
-    lblStartDate = new QLabel("Start");
-    lblEndDate = new QLabel("End");
+    txtStartDate = new QLabel("BEGIN");
+    txtEndDate = new QLabel("END");
+    lblStartDate = new QLabel("Start: ");
+    lblStartDate->setAlignment(Qt::AlignRight);
+    lblEndDate = new QLabel("End: ");
+    lblEndDate->setAlignment(Qt::AlignRight);
+
 
     calendar = new QCalendarWidget(this);
 
-    txtStartDate->setEnabled(false);
-    txtEndDate->setEnabled(false);
-    
-    if(emptyZone)
-    {
-    	setCurrentRange(0);
-    	QDate date;
-    	btnNew->setEnabled(false);
-    	calendar->setSelectedDate(date.currentDate());
-    	calendar->setEnabled(true);
-    	btnBack->setEnabled(false);
-    	txtEndDate->setDate(date.currentDate());
-    }
-    else if(zones->getRangeSize() == 1)
-    {
-    	setCurrentRange(0);
-    	QDate date;
-    	btnNew->setEnabled(true);
-    	btnBack->setEnabled(false);
-    	calendar->setSelectedDate(date.currentDate());
-    	calendar->setEnabled(false);
-    	//txtStartDate->setDate(date.currentDate()));
-    	//txtEndDate->setDate(date.currentDate()));
-
-    }
-    else
-    {
-    	setCurrentRange(zones->getRangeSize() - 1);
-    	QDate date = zones->getStartDate(getCurrentRange());
-    	calendar->setSelectedDate(date);
-    	calendar->setMinimumDate(date);
-    	calendar->setEnabled(false);
-    	txtStartDate->setDate(zones->getStartDate(getCurrentRange()));
-    	txtEndDate->setDate(zones->getEndDate(getCurrentRange()));
-    }
-
-    txtStartDate->setEnabled(false);
-    txtEndDate->setEnabled(false);
-    
-    if(emptyZone)
-    {
-    	setCurrentRange(0);
-    	QDate date;
-    	btnNew->setEnabled(false);
-    	calendar->setSelectedDate(date.currentDate());
-    	calendar->setEnabled(true);
-    	btnBack->setEnabled(false);
-    	txtEndDate->setDate(date.currentDate());
-    }
-    else if(zones->getRangeSize() == 1)
-    {
-    	setCurrentRange(0);
-    	QDate date = zones->getEndDate(getCurrentRange());
-    	calendar->setMinimumDate(date);
-    	btnNew->setEnabled(true);
-    	btnBack->setEnabled(false);
-    	calendar->setSelectedDate(date);
-    	calendar->setEnabled(false);
-    	txtStartDate->setDate(zones->getStartDate(getCurrentRange()));
-    	txtEndDate->setDate(zones->getEndDate(getCurrentRange()));
-
-    }
-    else
-    {
-    	setCurrentRange(zones->getRangeSize() - 1);
-    	QDate date = zones->getStartDate(getCurrentRange());
-    	calendar->setSelectedDate(date);
-    	calendar->setMinimumDate(date);
-    	calendar->setEnabled(false);
-    	txtStartDate->setDate(zones->getStartDate(getCurrentRange()));
-    	txtEndDate->setDate(zones->getEndDate(getCurrentRange()));
-    }
-
-    QString strCP;
-    int ftp = zones->getCP(getCurrentRange());
-    txtThreshold->setText(strCP.setNum(ftp));
-
     lblCurRange = new QLabel(this);
     lblCurRange->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    lblCurRange->setText(QString("Current Zone Range: %1").arg(getCurrentRange() + 1));
+    lblCurRange->setText(QString("Current Zone Range: %1").arg(currentRange + 1));
 
+    QDate today = QDate::currentDate();
+    calendar->setSelectedDate(today);
+
+    if ((! *zones) || ((*zones)->getRangeSize() == 0))
+    	setCurrentRange();
+    else
+    {
+    	setCurrentRange((*zones)->whichRange(today));
+    	btnDelete->setEnabled(true);
+	checkboxNew->setCheckState(Qt::Unchecked);
+    }
     
+    int cp = (*zones ? (*zones)->getCP(currentRange) : 0);
+    if (cp > 0)
+	setCP(cp);
 
     //Layout
-    QHBoxLayout *powerLayout = new QHBoxLayout();
+    powerLayout = new QHBoxLayout();
     powerLayout->addWidget(lblThreshold);
     powerLayout->addWidget(txtThreshold);
 
-    QHBoxLayout *rangeLayout = new QHBoxLayout();
+    rangeLayout = new QHBoxLayout();
     rangeLayout->addWidget(lblCurRange);
     
-    QHBoxLayout *dateRangeLayout = new QHBoxLayout();
+    dateRangeLayout = new QHBoxLayout();
     dateRangeLayout->addWidget(lblStartDate);
     dateRangeLayout->addWidget(txtStartDate);
     dateRangeLayout->addWidget(lblEndDate);
     dateRangeLayout->addWidget(txtEndDate);
 
-    QHBoxLayout *zoneLayout = new QHBoxLayout();
+    zoneLayout = new QHBoxLayout();
     zoneLayout->addWidget(btnBack);
     zoneLayout->addWidget(btnForward);
-    zoneLayout->addWidget(btnNew);
+    zoneLayout->addWidget(btnDelete);
+    zoneLayout->addWidget(checkboxNew);
 
-    QHBoxLayout *calendarLayout = new QHBoxLayout();
+    calendarLayout = new QHBoxLayout();
     calendarLayout->addWidget(calendar);
 
-    QVBoxLayout *cyclistLayout = new QVBoxLayout;
+    cyclistLayout = new QVBoxLayout;
     cyclistLayout->addLayout(powerLayout);
     cyclistLayout->addLayout(rangeLayout);
     cyclistLayout->addLayout(zoneLayout);
@@ -235,8 +220,7 @@ CyclistPage::CyclistPage(QWidget *parent, Zones *_zones, bool emptyZone)
 
     cyclistGroup->setLayout(cyclistLayout);
 
-
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout = new QVBoxLayout;
     mainLayout->addWidget(cyclistGroup);
     mainLayout->addStretch(1);
     setLayout(mainLayout);
@@ -247,24 +231,79 @@ QString CyclistPage::getText()
     return txtThreshold->text();
 }
 
-void CyclistPage::setCurrentRange(int _range)
+int CyclistPage::getCP()
 {
-    currentRange = _range;
+    int cp = txtThreshold->text().toInt();
+    return (
+	    (
+	     (cp >= txtThresholdValidator->bottom()) &&
+	     (cp <= txtThresholdValidator->top())
+	     ) ?
+	    cp :
+	    0
+	    );
 }
+
+void CyclistPage::setCP(int cp)
+{
+    txtThreshold->setText(QString("%1").arg(cp));
+}
+
+void CyclistPage::setSelectedDate(QDate date)
+{
+    calendar->setSelectedDate(date);
+}
+
+void CyclistPage::setCurrentRange(int range)
+{
+    int num_ranges =
+	*zones ?
+	(*zones)->getRangeSize() :
+	0;
+
+    if ((num_ranges == 0) || (range < 0)) {
+	btnBack->setEnabled(false);
+	btnDelete->setEnabled(false);
+	btnForward->setEnabled(false);
+	calendar->setEnabled(false);
+	checkboxNew->setCheckState(Qt::Checked);
+	checkboxNew->setEnabled(false);
+	currentRange = -1;
+	lblCurRange->setText("no Current Zone Range");
+	txtEndDate->setText("undefined");
+	txtStartDate->setText("undefined");
+	return;
+    }
+
+    assert ((range >= 0) && (range < num_ranges));
+    currentRange = range;
+
+    // update the labels
+    lblCurRange->setText(QString("Current Zone Range: %1").arg(currentRange + 1));
+
+    // update the visibility of the range select buttons
+    btnForward->setEnabled(currentRange < num_ranges - 1);
+    btnBack->setEnabled(currentRange > 0);
+
+    // if we have ranges to set to, then the calendar must be on
+    calendar->setEnabled(true);
+
+    // update the CP display
+    setCP((*zones)->getCP(currentRange));
+
+    // update date limits
+    txtStartDate->setText((*zones)->getStartDateString(currentRange));
+    txtEndDate->setText((*zones)->getEndDateString(currentRange));
+}
+
 
 int CyclistPage::getCurrentRange()
 {
     return currentRange;
 }
 
-bool CyclistPage::isNewZone()
+
+bool CyclistPage::isNewMode()
 {
-    return newZone;
+    return (checkboxNew->checkState() == Qt::Checked);
 }
-
-void CyclistPage::setChoseNewZone(bool _newZone)
-{
-    newZone = _newZone;
-}
-
-
