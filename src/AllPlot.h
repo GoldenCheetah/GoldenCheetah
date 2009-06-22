@@ -21,15 +21,27 @@
 
 #include <qwt_plot.h>
 #include <QtGui>
+#include <qpainter.h>
 
+class QPen;
 class QwtPlotCurve;
 class QwtPlotGrid;
 class QwtPlotMarker;
+class RideItem;
 class RideFile;
+class AllPlot;
+class AllPlotBackground;
+class AllPlotZoneLabel;
 
 class AllPlot : public QwtPlot
 {
     Q_OBJECT
+
+    private:
+
+	AllPlotBackground *bg;
+        QSettings settings;
+        QVariant unit;
 
     public:
 
@@ -37,8 +49,8 @@ class AllPlot : public QwtPlot
         QwtPlotCurve *hrCurve;
         QwtPlotCurve *speedCurve;
         QwtPlotCurve *cadCurve;
-        QwtPlotCurve *distanceCurve;
         QwtPlotMarker *d_mrk;
+	QList <AllPlotZoneLabel *> zoneLabels;
 
         AllPlot();
 
@@ -46,7 +58,12 @@ class AllPlot : public QwtPlot
 
         bool byDistance() const { return bydist; }
 
-        void setData(RideFile *ride);
+	bool shadeZones() const;
+	void refreshZoneLabels();
+
+        void setData(RideItem *_rideItem);
+
+	RideItem *rideItem;
 
     public slots:
 
@@ -70,7 +87,6 @@ class AllPlot : public QwtPlot
         double *distanceArray;
         int arrayLength;
         int *interArray;
-        
 
         int smooth;
 
@@ -80,9 +96,8 @@ class AllPlot : public QwtPlot
         void setYMax();
         void setXTitle();
 
-    private:
-        QSettings settings;
-        QVariant unit;
+	bool shade_zones;     // whether power should be shaded
+	bool useMetricUnits;  // whether metric units are used (or imperial)
 };
 
 #endif // _GC_AllPlot_h
