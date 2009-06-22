@@ -58,7 +58,8 @@ HEADERS += \
         Season.h \
         SummaryMetrics.h \
         SplitRideDialog.h \
-        XmlRideFile.h \
+        DaysScaleDraw.h \
+        XmlRideFile.h 
 
 SOURCES += \
         AllPlot.cpp \
