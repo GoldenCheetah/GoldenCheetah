@@ -191,3 +191,18 @@ QStringList RideFileFactory::listRideFiles(const QDir &dir) const
     }
     return dir.entryList(filters, QDir::Files, QDir::Name|QDir::Reversed);
 }
+
+void RideFile::appendPoint(double secs, double cad, double hr, double km, 
+                      double kph, double nm, double watts, int interval)
+{
+    dataPoints_.append(new RideFilePoint(secs, cad, hr, km, kph, 
+                                         nm, watts, interval));
+    dataPresent.secs  |= (secs != 0);
+    dataPresent.cad   |= (cad != 0);
+    dataPresent.hr    |= (hr != 0);
+    dataPresent.km    |= (km != 0);
+    dataPresent.kph   |= (kph != 0);
+    dataPresent.nm    |= (nm != 0);
+    dataPresent.watts |= (watts != 0);
+    dataPresent.interval |= (interval != 0);
+}
