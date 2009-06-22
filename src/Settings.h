@@ -32,6 +32,7 @@
 #define GC_UNIT                     "unit"
 #define GC_SETTINGS_LAST_IMPORT_PATH "mainwindow/lastImportPath"
 #define GC_ALLRIDES_ASCENDING       "allRidesAscending"
+#define GC_CRANKLENGTH              "crankLength"
 
 #endif // _GC_Settings_h
 
