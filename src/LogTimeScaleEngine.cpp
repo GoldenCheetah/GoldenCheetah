@@ -54,8 +54,8 @@ void LogTimeScaleEngine::autoScale(int maxNumSteps,
         qSwap(x1, x2);
 
     QwtDoubleInterval interval(
-			       x1 / pow(10.0, lowerMargin()), 
-			       x2 * pow(10.0, upperMargin())
+			       x1 / pow(10.0, loMargin()), 
+			       x2 * pow(10.0, hiMargin())
     );
 
     double logRef = 1.0;
