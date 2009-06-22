@@ -26,6 +26,7 @@
 #include <qpainter.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
+#include <qwt_plot_zoomer.h>
 #include <qwt_scale_engine.h>
 #include <qwt_text.h>
 #include <qwt_legend.h>
@@ -36,6 +37,32 @@ max(int a, int b) { if (a > b) return a; else return b; }
 
 static inline int
 min(int a, int b) { if (a < b) return a; else return b; }
+
+class penTooltip: public QwtPlotZoomer
+{
+    public:
+         penTooltip(QwtPlotCanvas *canvas):
+             QwtPlotZoomer(canvas)
+         {
+                 setTrackerMode(AlwaysOn);
+         }
+    
+         virtual QwtText trackerText(const QwtDoublePoint &pos) const
+         {
+                 QColor bg(Qt::white);
+         #if QT_VERSION >= 0x040300
+                     bg.setAlpha(200);
+             #endif
+            
+                     QwtText text = QString("%1").arg((int)pos.x());
+                     text.setBackgroundBrush( QBrush( bg ));
+                     return text;
+         }
+ };
+
+
+
+
 
 // define a background class to handle shading of power zones
 // draws power zone bands IF zones are defined and the option
@@ -222,6 +249,8 @@ PowerHist::PowerHist():
     grid->attach(this);
 
     zoneLabels = QList <PowerHistZoneLabel *>::QList();
+
+ QwtPlotZoomer* zoomer = new penTooltip(this->canvas());
 }
 
 PowerHist::~PowerHist() {
