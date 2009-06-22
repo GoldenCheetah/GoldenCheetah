@@ -53,8 +53,10 @@ void LogTimeScaleEngine::autoScale(int maxNumSteps,
     if ( x1 > x2 )
         qSwap(x1, x2);
 
-    QwtDoubleInterval interval(x1 / pow(10.0, loMargin()), 
-        x2 * pow(10.0, hiMargin()) );
+    QwtDoubleInterval interval(
+			       x1 / pow(10.0, lowerMargin()), 
+			       x2 * pow(10.0, upperMargin())
+    );
 
     double logRef = 1.0;
     if (reference() > LOG_MIN / 2)
@@ -120,7 +122,13 @@ QwtScaleDiv LogTimeScaleEngine::divideScale(double x1, double x2,
         QwtLinearScaleEngine linearScaler;
         linearScaler.setAttributes(attributes());
         linearScaler.setReference(reference());
-        linearScaler.setMargins(loMargin(), hiMargin());
+        linearScaler.setMargins(
+                                #if (QWT_VERSION >= 0x050200)
+				lowerMargin(), upperMargin()
+				#else
+				loMargin(), hiMargin()
+				#endif
+				);
 
         return linearScaler.divideScale(x1, x2, 
             maxMajSteps, maxMinSteps, stepSize);
