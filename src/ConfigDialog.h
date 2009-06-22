@@ -9,34 +9,42 @@
 class QListWidget;
 class QListWidgetItem;
 class QStackedWidget;
+class Zones;
 
 class ConfigDialog : public QDialog
 {
     Q_OBJECT
     public:
-        ConfigDialog(QDir home);
+        ConfigDialog(QDir home, Zones **zones);
         ~ConfigDialog();
+
     public slots:
         void changePage(QListWidgetItem *current, QListWidgetItem *previous);
         void save_Clicked();
         void back_Clicked();
         void forward_Clicked();
-        void new_Clicked();
+        void delete_Clicked();
+	void calendarDateChanged();
 
     private:
         void createIcons();
         void calculateZones();
+	void createNewRange();
+	void moveCalendarToCurrentRange();
 
-        QListWidget *contentsWidget;
-        QStackedWidget *pagesWidget;
-
-        QSettings settings;
         ConfigurationPage *configPage;
         CyclistPage *cyclistPage;
         QPushButton *saveButton;
-        QDir home;
-        Zones *zones;
+        QStackedWidget *pagesWidget;
+	QPushButton *closeButton;
+	QHBoxLayout *horizontalLayout;
+	QHBoxLayout *buttonsLayout;
+	QVBoxLayout *mainLayout;
+        QListWidget *contentsWidget;
 
+        QSettings settings;
+        QDir home;
+        Zones **zones;
 };
 
 #endif
