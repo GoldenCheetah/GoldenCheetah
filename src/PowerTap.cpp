@@ -317,7 +317,7 @@ my_round(double x)
 }
 
 #define MAGIC_CONSTANT 147375.0
-#define PI 3.14159265
+#define PI M_PI
 
 #define LBFIN_TO_NM 0.11298483
 #define KM_TO_MI 0.62137119
