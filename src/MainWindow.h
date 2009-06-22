@@ -21,6 +21,9 @@
 
 #include <QDir>
 #include <QtGui>
+#include <qwt_plot.h>
+#include <qwt_plot_curve.h>
+#include "RideItem.h"
 
 class AllPlot;
 class CpintPlot;
@@ -42,6 +45,7 @@ class MainWindow : public QMainWindow
         void removeCurrentRide();
         const RideFile *currentRide();
         QDir home;
+
     protected:
         virtual void resizeEvent(QResizeEvent*);
         virtual void moveEvent(QMoveEvent*);
@@ -61,15 +65,20 @@ class MainWindow : public QMainWindow
         void findBestIntervals();
         void splitRide();
         void deleteRide();
+	void setAllPlotWidgets(RideItem *rideItem);
+	void setHistWidgets(RideItem *rideItem);
         void setSmoothingFromSlider();
         void setSmoothingFromLineEdit();
+	void cpintSetCPButtonClicked();
         void setBinWidthFromSlider();
         void setBinWidthFromLineEdit();
 	void setlnYHistFromCheckBox();
         void setWithZerosFromCheckBox();
+        void setHistSelection(int id);
         void setQaCPFromLineEdit();
         void setQaCADFromLineEdit();
         void setQaCLFromLineEdit();
+        void setShadeZonesPfPvFromCheckBox();
         void tabChanged(int index);
         void pickerMoved(const QPoint &);
         void aboutDialog();
@@ -77,14 +86,18 @@ class MainWindow : public QMainWindow
         void saveNotes();
         void showOptions();
         void showTools();
-		void importRideToDB();
+	void importRideToDB();
         void scanForMissing();
+	void generateWeeklySummary();
 
     protected: 
 
         static QString notesFileName(QString rideFileName);
 
     private:
+	bool parseRideFileName(const QString &name, QString *notesFileName, QDateTime *dt);
+	void setHistBinWidthText();
+	void setHistTextValidator();
 
         QSettings settings;
 
@@ -96,10 +109,15 @@ class MainWindow : public QMainWindow
         AllPlot *allPlot;
         QwtPlotZoomer *allZoomer;
         QwtPlotPanner *allPanner;
+	QCheckBox *showHr;
+	QCheckBox *showSpeed;
+	QCheckBox *showCad;
+	QComboBox *showPower;
         CpintPlot *cpintPlot;
         QLineEdit *cpintTimeValue;
         QLineEdit *cpintTodayValue;
         QLineEdit *cpintAllValue;
+	QPushButton *cpintSetCPButton;
         QwtPlotPicker *picker;
         QSlider *smoothSlider;
         QLineEdit *smoothLineEdit;
@@ -107,12 +125,24 @@ class MainWindow : public QMainWindow
         QLineEdit *binWidthLineEdit;
         QCheckBox *lnYHistCheckBox;
         QCheckBox *withZerosCheckBox;
+        QComboBox *histParameterCombo;
+        QCheckBox *shadeZonesPfPvCheckBox;
         QTreeWidgetItem *allRides;
         PowerHist *powerHist;
+        QwtPlot *weeklyPlot;
+        QwtPlotCurve *weeklyDistCurve;
+        QwtPlotCurve *weeklyDurationCurve;
+        QwtPlotCurve *weeklyBaselineCurve;
+        QwtPlotCurve *weeklyBSBaselineCurve;
+        QwtPlot *weeklyBSPlot;
+
+        QwtPlotCurve *weeklyBSCurve;
+        QwtPlotCurve *weeklyRICurve;
+
         Zones *zones;
-	    
+
         // pedal force/pedal velocity scatter plot widgets
-        PfPvPlot *pfPvPlot;
+        PfPvPlot  *pfPvPlot;
         QLineEdit *qaCPValue;
         QLineEdit *qaCadValue;
         QLineEdit *qaClValue;
@@ -120,6 +150,17 @@ class MainWindow : public QMainWindow
         QTextEdit *rideNotes;
         QString currentNotesFile;
         bool currentNotesChanged;
+
+	RideItem *ride;  // the currently selected ride
+
+	int histWattsShadedID;
+	int histWattsUnshadedID;
+	int histNmID;
+	int histHrID;
+	int histKphID;
+	int histCadID;
+
+	bool useMetricUnits;  // whether metric units are used (or imperial)
 };
 
 #endif // _GC_MainWindow_h
