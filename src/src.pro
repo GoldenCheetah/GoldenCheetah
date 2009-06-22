@@ -59,6 +59,7 @@ HEADERS += \
         SummaryMetrics.h \
         SplitRideDialog.h \
         DaysScaleDraw.h \
+        Settings.h \
         XmlRideFile.h 
 
 SOURCES += \
