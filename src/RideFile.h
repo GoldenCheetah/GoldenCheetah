@@ -52,6 +52,15 @@ struct RideFilePoint
         watts(watts), interval(interval) {}
 };
 
+struct RideFileDataPresent
+{
+    bool secs, cad, hr, km, kph, nm, watts, interval;
+    // whether non-zero data of each field is present
+    RideFileDataPresent():
+        secs(false), cad(false), hr(false), km(false),
+	    kph(false), nm(false), watts(false), interval(false) {}
+};
+
 class RideFile 
 {
     private:
@@ -59,6 +68,7 @@ class RideFile
         QDateTime startTime_;  // time of day that the ride started
         double recIntSecs_;    // recording interval in seconds
         QList<RideFilePoint*> dataPoints_;
+	RideFileDataPresent dataPresent;
         QString deviceType_;
 
     public:
@@ -66,7 +76,7 @@ class RideFile
         RideFile() : recIntSecs_(0.0), deviceType_("unknown") {}
         RideFile(const QDateTime &startTime, double recIntSecs) :
             startTime_(startTime), recIntSecs_(recIntSecs),
-            deviceType_("unknown") {}
+  	    deviceType_("unknown") {}
 
         virtual ~RideFile() {
             QListIterator<RideFilePoint*> i(dataPoints_);
@@ -77,6 +87,7 @@ class RideFile
         const QDateTime &startTime() const { return startTime_; }
         double recIntSecs() const { return recIntSecs_; }
         const QList<RideFilePoint*> dataPoints() const { return dataPoints_; }
+        inline RideFileDataPresent *areDataPresent() { return &dataPresent; }
         const QString &deviceType() const { return deviceType_; }
 
         void setStartTime(const QDateTime &value) { startTime_ = value; }
@@ -84,13 +95,12 @@ class RideFile
         void setDeviceType(const QString &value) { deviceType_ = value; }
         
         void appendPoint(double secs, double cad, double hr, double km, 
-                         double kph, double nm, double watts, int interval) {
-            dataPoints_.append(new RideFilePoint(secs, cad, hr, km, kph, 
-                                                 nm, watts, interval));
-        }
+                         double kph, double nm, double watts, int interval);
 
         bool writeAsXml(QFile &file, QString &err) const;
         void writeAsCsv(QFile &file, bool bIsMetric) const;
+
+	void resetDataPresent();
 };
 
 struct RideFileReader {
