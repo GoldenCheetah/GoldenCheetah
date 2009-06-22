@@ -2,60 +2,87 @@
 #define PAGES_H
 
 #include <QWidget>
+#include <QLineEdit>
 #include <QComboBox>
 #include <QCalendarWidget>
 #include <QPushButton>
+#include <QCheckBox>
 #include <QList>
 #include "Zones.h"
 #include <QLabel>
 #include <QDateEdit>
 #include <QCheckBox>
+#include <QValidator>
+
+class QGroupBox;
+class QHBoxLayout;
+class QVBoxLayout;
 
 class ConfigurationPage : public QWidget
 {
     public:
-        ConfigurationPage(QWidget *parent = 0);
+        ~ConfigurationPage();
+        ConfigurationPage();
         QComboBox *unitCombo;
         QComboBox *crankLengthCombo;
         QCheckBox *allRidesAscending;
+
+    private:
+	QGroupBox *configGroup;
+	QLabel *unitLabel;
+	QLabel *warningLabel;
+	QHBoxLayout *unitLayout;
+	QHBoxLayout *warningLayout;
+	QVBoxLayout *configLayout;
+	QVBoxLayout *mainLayout;
 };
 
 class CyclistPage : public QWidget
 {
     public:
-        CyclistPage(QWidget *parent = 0, Zones *_zones = 0, bool emptyZone = true);
+        ~CyclistPage();
+        CyclistPage(Zones **_zones);
         int thresholdPower;
-        QLineEdit *txtThreshold;
         QString getText();
-        QCalendarWidget *calendar;
-        void setCurrentRange(int range);
+        int getCP();
+	void setCP(int cp);
+	void setSelectedDate(QDate date);
+        void setCurrentRange(int range = -1);
         QPushButton *btnBack;
         QPushButton *btnForward;
-        QPushButton *btnNew;
+        QPushButton *btnDelete;
+        QCheckBox *checkboxNew;
+        QCalendarWidget *calendar;
         QLabel *lblCurRange;
-        QDateEdit *txtStartDate;
-        QDateEdit *txtEndDate;
+        QLabel *txtStartDate;
+        QLabel *txtEndDate;
         QLabel *lblStartDate;
         QLabel *lblEndDate;
 
         int getCurrentRange();
-        void setChoseNewZone(bool _newZone);
-        bool isNewZone();
+	bool isNewMode();
+
+	inline void setCPFocus() {
+	    txtThreshold->setFocus();
+	}
+
+	inline QDate selectedDate() {
+	    return calendar->selectedDate();
+	}
 
     private:
-        Zones *zones;
+	QGroupBox *cyclistGroup;
+        Zones **zones;
         int currentRange;
-        bool newZone;
-
+	QLabel *lblThreshold;
+        QLineEdit *txtThreshold;
+	QIntValidator *txtThresholdValidator;
+	QHBoxLayout *powerLayout;
+	QHBoxLayout *rangeLayout;
+	QHBoxLayout *dateRangeLayout;
+	QHBoxLayout *zoneLayout;
+	QHBoxLayout *calendarLayout;
+	QVBoxLayout *cyclistLayout;
+	QVBoxLayout *mainLayout;
 };
-
-/*
-class PowerPage : QWidget
-{
-    public:
-        PowerPage(QWidget *parent = 0);
-        
-};
-
-*/
 #endif
