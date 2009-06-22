@@ -399,7 +399,7 @@ MainWindow::MainWindow(const QDir &home) :
     weeklyPlot->setAxisMaxMinor(QwtPlot::xBottom,0);
     weeklyPlot->setAxisScaleDraw(QwtPlot::xBottom, new DaysScaleDraw());
     QFont weeklyPlotAxisFont = weeklyPlot->axisFont(QwtPlot::yLeft);
-    weeklyPlotAxisFont.setPointSize(weeklyPlotAxisFont.pointSize() * 4 / 5);
+    weeklyPlotAxisFont.setPointSize(weeklyPlotAxisFont.pointSize() * 0.9f);
     weeklyPlot->setAxisFont(QwtPlot::xBottom, weeklyPlotAxisFont);
     weeklyPlot->setAxisFont(QwtPlot::yLeft, weeklyPlotAxisFont);
     weeklyPlot->setAxisFont(QwtPlot::yRight, weeklyPlotAxisFont);
@@ -1068,32 +1068,32 @@ void MainWindow::generateWeeklySummary()
 
 	    RideMetric *m;
 	    item->htmlSummary(); // compute metrics
-	    if (m = item->metrics.value(weeklySeconds->name())) {
+	    if ((m = item->metrics.value(weeklySeconds->name()))) {
 		weeklySeconds->aggregateWith(m);
 		dailySeconds[day]->aggregateWith(m);
 	    }
 
-	    if (m = item->metrics.value(weeklyDistance->name())) {
+	    if ((m = item->metrics.value(weeklyDistance->name()))) {
 		weeklyDistance->aggregateWith(m);
 		dailyDistance[day]->aggregateWith(m);
 	    }
 
-	    if (m = item->metrics.value(weeklyWork->name())) {
+	    if ((m = item->metrics.value(weeklyWork->name()))) {
 		weeklyWork->aggregateWith(m);
 		dailyW[day]->aggregateWith(m);
 	    }
 
-            if (m = item->metrics.value(weeklyBS->name())) {
+        if ((m = item->metrics.value(weeklyBS->name()))) {
 		weeklyBS->aggregateWith(m);
 		dailyBS[day]->aggregateWith(m);
 	    }
 
-	    if (m = item->metrics.value(weeklyRelIntensity->name())) {
+	    if ((m = item->metrics.value(weeklyRelIntensity->name()))) {
 		weeklyRelIntensity->aggregateWith(m);
 		dailyRI[day]->aggregateWith(m);
 	    }
 
-	    if (m = item->metrics.value("skiba_xpower"))
+	    if ((m = item->metrics.value("skiba_xpower")))
 		dailyXP[day]->aggregateWith(m);
 
 	    // compute time in zones
