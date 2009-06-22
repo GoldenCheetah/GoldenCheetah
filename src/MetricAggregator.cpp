@@ -30,9 +30,9 @@
 #include <math.h>
 #include <QtXml/QtXml>
 
-static char *rideFileRegExp = ("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)"
-                               "_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.(raw|srm|csv|tcx)$");
-
+static char rideFileRegExp[] =
+    "^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)"
+    "_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.(raw|srm|csv|tcx)$";
 
 MetricAggregator::MetricAggregator()
 {
@@ -97,43 +97,43 @@ bool MetricAggregator::importRide(QDir path, Zones *zones, RideFile *ride, QStri
 	
 	
 	while (!todo.empty()) {
-		QMutableSetIterator<QString> i(todo);
+	    QMutableSetIterator<QString> i(todo);
 	later:
-		while (i.hasNext()) {
-			const QString &name = i.next();
-			const QVector<QString> &deps = factory.dependencies(name);
-			for (int j = 0; j < deps.size(); ++j)
-				if (!metrics.contains(deps[j]))
-					goto later;
-			RideMetric *metric = factory.newMetric(name);
-			metric->compute(ride, zones, zone_range, metrics);
-			metrics.insert(name, metric);
-			i.remove();
-			double value = metric->value(true);
-			if(name ==  "workout_time")
-				summaryMetric->setWorkoutTime(value);
-			else if(name == "average_cad")
-				summaryMetric->setCadence(value);
-			else if(name == "total_distance")
-				summaryMetric->setDistance(value);
-			else if(name == "skiba_xpower")
-                summaryMetric->setXPower(value);
-			else if(name == "average_speed")
-				summaryMetric->setSpeed(value);
-			else if(name == "total_work")
-				summaryMetric->setTotalWork(value);
-			else if(name == "average_power")
-				summaryMetric->setWatts(value);
-			else if(name == "time_riding")
-				summaryMetric->setRideTime(value);
-			else if(name == "average_hr")
-				summaryMetric->setHeartRate(value);
-			else if(name == "skiba_relative_intensity")
-				summaryMetric->setRelativeIntensity(value);
-			else if(name == "skiba_bike_score")
-				summaryMetric->setBikeScore(value);
+	    while (i.hasNext()) {
+		const QString &name = i.next();
+		const QVector<QString> &deps = factory.dependencies(name);
+		for (int j = 0; j < deps.size(); ++j)
+		    if (!metrics.contains(deps[j]))
+			goto later;
+		RideMetric *metric = factory.newMetric(name);
+		metric->compute(ride, zones, zone_range, metrics);
+		metrics.insert(name, metric);
+		i.remove();
+		double value = metric->value(true);
+		if(name ==  "workout_time")
+		    summaryMetric->setWorkoutTime(value);
+		else if(name == "average_cad")
+		    summaryMetric->setCadence(value);
+		else if(name == "total_distance")
+		    summaryMetric->setDistance(value);
+		else if(name == "skiba_xpower")
+		    summaryMetric->setXPower(value);
+		else if(name == "average_speed")
+		    summaryMetric->setSpeed(value);
+		else if(name == "total_work")
+		    summaryMetric->setTotalWork(value);
+		else if(name == "average_power")
+		    summaryMetric->setWatts(value);
+		else if(name == "time_riding")
+		    summaryMetric->setRideTime(value);
+		else if(name == "average_hr")
+		    summaryMetric->setHeartRate(value);
+		else if(name == "skiba_relative_intensity")
+		    summaryMetric->setRelativeIntensity(value);
+		else if(name == "skiba_bike_score")
+		    summaryMetric->setBikeScore(value);
 			
-		}
+	    }
 	}
 
 	dbaccess->importRide(summaryMetric);
