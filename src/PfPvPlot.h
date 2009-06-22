@@ -27,6 +27,7 @@ class RideFile;
 class RideItem;
 class QwtPlotCurve;
 class QwtPlotMarker;
+class PfPvPlotZoneLabel;
 
 class PfPvPlot : public QwtPlot
 {
@@ -35,7 +36,8 @@ class PfPvPlot : public QwtPlot
     public:
 
         PfPvPlot();
-        void setData(RideItem *rideItem);
+	void refreshZoneItems();
+        void setData(RideItem *_rideItem);
 
 	int getCP();
 	void setCP(int cp);
@@ -43,7 +45,12 @@ class PfPvPlot : public QwtPlot
 	void setCAD(int cadence);
 	double getCL();
 	void setCL(double cranklen);
-	
+	void recalc();
+
+	RideItem *rideItem;
+
+        bool shadeZones() const { return shade_zones; }
+
     public slots:
     
     signals:
@@ -52,17 +59,22 @@ class PfPvPlot : public QwtPlot
         void changedCAD( const QString& );
         void changedCL( const QString& );
 
+        void setShadeZones(bool value);
+
     protected:
-	void recalc();
-	
         QwtPlotCurve *curve;
 	QwtPlotCurve *cpCurve;
+	QList <QwtPlotCurve *> zoneCurves;
+	QList <PfPvPlotZoneLabel *> zoneLabels;
 	QwtPlotMarker *mX;
 	QwtPlotMarker *mY;
+
+	static QwtArray<double> contour_xvalues;   // values used in CP and contour plots: djconnel
 	
 	int cp_;
 	int cad_;
 	double cl_;
+	bool shade_zones;    // whether to shade zones, added 27Apr2009 djconnel
 };
 
 #endif // _GC_QaPlot_h
