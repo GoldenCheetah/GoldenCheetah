@@ -16,10 +16,11 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <math.h>
 #include "SrmRideFile.h"
 #include "srm.h"
 
-#define PI 3.14159265
+#define PI M_PI
         
 static int srmFileReaderRegistered = 
     RideFileFactory::instance().registerReader("srm", new SrmFileReader());
