@@ -50,13 +50,17 @@ class PfPvPlot : public QwtPlot
 	RideItem *rideItem;
 
         bool shadeZones() const { return shade_zones; }
-
-    public slots:
-
         void setShadeZones(bool value);
 
+    public slots:
+signals:
+        
+        void changedCP( const QString& );
+        void changedCAD( const QString& );
+        void changedCL( const QString& );
+
     protected:
-        QwtPlotCurve *curve;
+    QwtPlotCurve *curve;
 	QwtPlotCurve *cpCurve;
 	QList <QwtPlotCurve *> zoneCurves;
 	QList <PfPvPlotZoneLabel *> zoneLabels;

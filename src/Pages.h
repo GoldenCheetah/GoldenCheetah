@@ -26,6 +26,7 @@ class ConfigurationPage : public QWidget
         QComboBox *unitCombo;
         QComboBox *crankLengthCombo;
         QCheckBox *allRidesAscending;
+        
 
     private:
 	QGroupBox *configGroup;
