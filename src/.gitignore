@@ -1,0 +1,26 @@
+# xcode noise
+build/*
+*.pbxuser
+*.mode1v3
+Info.plist
+*.xcodeproj
+
+# old skool
+.svn
+
+# osx noise
+.DS_Store
+profile
+
+# ignore Qt moc files
+moc_*
+qrc_application.cpp
+
+# ignore other object files
+*.o
+
+# ignore qmake-generated Makefile
+Makefile
+
+# ignore executables
+GoldenCheetah*
