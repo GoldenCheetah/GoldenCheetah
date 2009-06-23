@@ -33,6 +33,7 @@ HEADERS += \
         DownloadRideDialog.h \
         MainWindow.h \
         PfPvPlot.h \
+        PolarRideFile.h \
         PowerHist.h \
         RawRideFile.h \
         RideFile.h \
@@ -72,6 +73,7 @@ SOURCES += \
         DownloadRideDialog.cpp \
         MainWindow.cpp \
         PfPvPlot.cpp \
+        PolarRideFile.cpp \
         PowerHist.cpp \
         RawRideFile.cpp \
         RideFile.cpp \

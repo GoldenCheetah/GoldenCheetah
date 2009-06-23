@@ -20,12 +20,7 @@
 #define _GC_PT_D2XX_h 1
 
 #include "Device.h"
-#ifdef WIN32
-    #include <windows.h>
-    #include "../ftdi/FTD2XX.H"
-#else
-    #include <D2XX/ftd2xx.h>
-#endif
+#include <D2XX/ftd2xx.h>
 
 class D2XX : public Device
 {
