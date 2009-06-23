@@ -1,10 +1,14 @@
-<!-- $Id: download.content,v 1.6 2006/08/11 20:21:03 srhea Exp $ -->
+<!-- $Id: download.content,v 1.6 2009/01/09 20:45:03 rcarlsen Exp $ -->
 
-Right now Golden Cheetah is available as source code and in binary form for
-Mac OS X on PowerPC processors and Linux on x86 processors.  Depending on your
-operating system, you may need to install the <a
-href="http://www.ftdichip.com/Drivers/VCP.htm">FTDI virtual COM port
-driver</a> if you're using the PowerTap's new USB download cradle.
+<p>
+Golden Cheetah is available as source code and in binary form for
+Mac OS X Universal Binary, Linux on x86 processors and Windows 32-bit. 
+</p>
+<p>
+Depending on your operating system, you may need to install the <a
+href="http://www.ftdichip.com/Drivers/D2XX.htm">FTDI USB
+driver</a> if you're using the PowerTap's new USB download cradle. The FTDI USB drivers are an optional install if you do not plan on downloading from your device using Golden Cheetah.
+</p>
 
 <p>
 <font face="arial,helvetica,sanserif">
@@ -15,9 +19,9 @@ driver</a> if you're using the PowerTap's new USB download cradle.
 The Golden Cheetah source code is available via 
 <a href="http://subversion.tigris.org/">Subversion</a>.  You need to install
 <a href="http://www.trolltech.com/products/qt">QT 4</a> and 
-<a href="http://qwt.sourceforge.net/">qwt 5.0.1</a> (as a static, not
+<a href="http://qwt.sourceforge.net/">qwt 5.0.2</a> (as a static, not
 dynamic, library) and 
-edit <code>goldencheetah/src/gui/gui.pro</code> to point to them
+edit <code>goldencheetah/src/src.pro</code> to point to them
 before building GoldenCheetah.
 Use this command to check out the current version of the repository:
 
@@ -37,15 +41,36 @@ href="http://goldencheetah.org/svn/trunk">here</a>.
 <center>
 <table width="100%" cellspacing="10">
 <tr>
-<td width="20%"><i>Date</i></td>
+<td width="20%"><i>Version</i></td>
 <td width="30%"><i>Files</i></td>
 <td><i>Description</i></td>
 </tr>
 
 <tr>
+<td valign="top">1.1.325</td>
+<td valign="top">
+<a href="GoldenCheetah_1.1.325_Linux_x86.gz">Linux x86</a><br>
+<a href="GoldenCheetah_1.1.325_Linux_x86_64.gz">Linux x86_64</a><br>
+<a href="GoldenCheetah_1.1.325_Darwin_Universal.dmg">Mac OS X Universal</a><br>
+<a href="GoldenCheetah_1.1.325_Windows_Installer.exe">Windows 32-bit</a>
+</td>
+<td valign="top">
+<p>
+First official Windows release courtesy of Ned Harding. Ned put much effort into the port to make the download reliable and created a nice installer, too (Thanks Ned!). He also provided the long-awaited Split Ride feature - break up a ride file into separate rides easily using long time gaps and intervals.
+<ul>
+<li>Ant+Sport PowerTap support. 
+<li>Split Rides by time gaps or intervals. 
+<li>Delete ride from list. 
+<li>Use distance or time for x-axis in Ride Plot (Thanks Damain). 
+<li>Numerous bug fixes (Thanks Tom, Dan).
+</p>
+</td>
+</tr>
+
+<tr>
 <td valign="top">1.0.277</td>
 <td valign="top">
-<a href="GoldenCheetah_1.0.277_Linux_x86.gz">Linux x86_64</a>,<br>
+<a href="GoldenCheetah_1.0.277_Linux_x86.gz">Linux x86</a>,<br>
 <a href="GoldenCheetah_1.0.277_Linux_x86_64.tar.gz">Linux x86_64</a>,<br>
 <a href="GoldenCheetah_1.0.277_Darwin_Universal.dmg">Mac OS X Universal</a>
 </td>
@@ -54,6 +79,9 @@ href="http://goldencheetah.org/svn/trunk">here</a>.
 <p>Several new features in this release: Critical Power calculator, find best intervals utility, Pedal Force / Pedal Velocity chart, iBike and Ergomo CSV import, GUI power zones creator, separate vertical axes for Power / HR / Cadence and Speed in the Ride plot, sorting rides with the most recent at the top of the list, and many bug fixes courtesy of JT Conklin.
 </p>
 <p>You may need to install <a href="http://www.ftdichip.com/Drivers/D2XX.htm">USB drivers</a> from FTDI.
+</p>
+<p>
+For posterity, the <a href="http://robertcarlsen.net/blog/?page_id=49">beta version</a> for Windows, based on r295. 
 </p>
 </td>
 </tr>
