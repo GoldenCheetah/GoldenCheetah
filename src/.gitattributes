@@ -1,0 +1,2 @@
+# Added this line to .gitattributes
+*.pbxproj -crlf -diff -merge

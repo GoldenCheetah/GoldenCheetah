@@ -50,6 +50,7 @@ TcxParser::startElement( const QString&, const QString&,
 	watts_ = 0.0;
 	cad_ = 0.0;
 	hr_ = 0.0;
+        km_ = -1;  // nh - we set this to -1 so we can detect if there was a distance in the trackpoint.
     }
 
     return TRUE;
@@ -69,37 +70,44 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 	hr_    = buf_.toDouble();
     } else if (qName == "Cadence") {
 	cad_   = buf_.toDouble();
-    } else if (qName == "Trackpoint") {
-	// compute the elapsed time and distance traveled since the
-	// last recorded trackpoint
-	double delta_d = km_ - last_km_;
-	double delta_t = last_time_.secsTo(time_);
+    } else if (qName == "Trackpoint")
+    {
+        // nh - there are track points that don't have any distance info.  We need to ignore them
+        if (km_>=0)
+        {
+            // compute the elapsed time and distance traveled since the
+            // last recorded trackpoint
+            double delta_t = last_time_.secsTo(time_);
+            double delta_d = km_ - last_km_;
+            assert(delta_d>=0);
 
-	// compute speed for this trackpoint by dividing the distance
-	// traveled by the elapsed time. The elapsed time will be 0.0
-	// for the first trackpoint -- so set speed to 0.0 instead of
-	// dividing by zero.
-	double kph = ((delta_t != 0.0) ? ((delta_d / delta_t) * 3600.0) : 0.0);
-	
-	// Don't know what to do about torque
-	double nm  = 0.0;
+            // compute speed for this trackpoint by dividing the distance
+            // traveled by the elapsed time. The elapsed time will be 0.0
+            // for the first trackpoint -- so set speed to 0.0 instead of
+            // dividing by zero.
+            double kph = ((delta_t != 0.0) ? ((delta_d / delta_t) * 3600.0) : 0.0);
+            assert(kph>=0);
 
-	// Time from beginning of activity
-	double secs = start_time_.secsTo(time_);
+            // Don't know what to do about torque
+            double nm  = 0.0;
 
-	// Work around bug in 705 firmware where cadence and
-	// power values repeat when stopped.
-	if (delta_d == 0.0) {
-	    watts_ = 0.0;
-	    cad_ = 0.0;
-	}
+            // Time from beginning of activity
+            double secs = start_time_.secsTo(time_);
 
-	// Record trackpoint
-	rideFile_->appendPoint(secs, cad_, hr_, km_,
-			       kph, nm, watts_, lap_);
+            // Work around bug in 705 firmware where cadence and
+            // power values repeat when stopped.
+            if (delta_d == 0.0) {
+                watts_ = 0.0;
+                cad_ = 0.0;
+            }
 
-	last_km_ = km_;
-	last_time_ = time_;
+            // Record trackpoint
+            rideFile_->appendPoint(secs, cad_, hr_, km_,
+                                   kph, nm, watts_, lap_);
+
+            last_km_ = km_;
+        }
+        last_time_ = time_;
     }
 	
 

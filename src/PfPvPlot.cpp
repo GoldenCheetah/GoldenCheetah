@@ -331,7 +331,8 @@ PfPvPlot::setData(RideItem *_rideItem)
 	    ++j;
 	}
 	
-    setCAD(tot_cad / tot_cad_points);
+    if (tot_cad_points!=0)
+        setCAD(tot_cad / tot_cad_points);
         
     curve->setData(cpvArray, aepfArray);
 
