@@ -15,7 +15,7 @@ I wish GoldenCheetah would let me...
 <li>Remember last settings for showPower, showHr, etc., in ride plot</li>
 <li>Switch ride plot x-axis from time to distance</li>
 <li>Edit power zones in a dialog</li>
-<li>Sort rides in AllRides newest to oldest</li>
+<li>-done- Sort rides in AllRides newest to oldest</li>
 <li>Group rides list into seasons</li>
 <li>Group rides list by type, course</li>
 <li>Add lines to CP plot for seasons, last six (eight?) weeks, etc.</li>
@@ -24,5 +24,6 @@ I wish GoldenCheetah would let me...
 <li>Show mulitple rides (seasons, etc.) in power histogram</li>
 <li>Annotate ride plot</li>
 <li>Label rides by type, course</li>
+<li>Use the current date as default when importing CSV files</li>
 </ul>
 
