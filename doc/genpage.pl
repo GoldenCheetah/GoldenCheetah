@@ -26,7 +26,7 @@ print<<EOF;
 
 <html>
 <head>
-<title>Golden Cheetah: PowerTap Software for Linux and Mac OS X (and Windows)</title>
+<title>Golden Cheetah: Cycling Performance Software for Linux, Mac OS X, and Windows</title>
  <meta name="keywords" content="powertap mac cycling performance">
 </head>
 
