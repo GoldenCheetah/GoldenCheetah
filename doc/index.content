@@ -1,25 +1,26 @@
 <!-- $Id: index.content,v 1.1 2006/05/16 14:24:50 srhea Exp $ -->
 
 <p>
-The goal of the Golden Cheetah project is to develop a software package that:
+GoldenCheetah is a software package that:
+
 <ul>
-<li>Downloads ride data from power measurement devices, such as the <a
-href="http://www.cycleops.com/products/powertap.htm">CycleOps PowerTap</a>,
-the <a href="http://www.ergomo.net/Home-_14.html">ergomo</a>, the <a
-href="http://www.polarusa.com/consumer/powerkit/default.asp">Polar
-Electro</a>, and the <a href="http://www.srm.de/usa/index.html">SRM Training
-System</a><p>
-<li>Helps athletes analyze downloaded data with features akin to commercial
-power analysis software, such as <a href="http://cyclingpeaks.com/">Cycling
-Peaks</a><p>
-<li>Works several operating systems such as FreeBSD, Linux, Mac OS X and Microsoft Windows.<p>
-<li>Is available under an 
-<a href="http://www.opensource.org/docs/definition.php">Open Source</a> 
-license
+<li>Downloads ride data directly from the CycleOps PowerTap, including the
+newer Ant+Sport models.<p>
+
+<li>Imports ride data from SRM, Garmin TCX, Polar HRM, and CSV files,
+including those from Cycling Peaks&nbsp;(TM) and the ergomo.<p>
+
+<li>Provides a rich set of analysis tools, including critial power,
+BikeScore&nbsp;(TM), power histograms, a best interval finder, and pedal force
+versus pedal velocity, to name just a few.<p>
+
+<li>Works identically under Linux, Mac OS X, and Windows.<p>
+
+<li>Is available under an Open Source license.
 </ul>
 
 <p>
-In short, we believe that cyclists should be able to download their power data
+We believe that cyclists should be able to download their power data
 to the computer of their choice, analyze it in whatever way they see fit, and
 share their methods of analysis with others.
 

@@ -27,7 +27,7 @@ print<<EOF;
 <html>
 <head>
 <title>Golden Cheetah: Cycling Performance Software for Linux, Mac OS X, and Windows</title>
- <meta name="keywords" content="powertap mac cycling performance">
+ <meta name="keywords" content="powertap srm linux mac cycling performance">
 </head>
 
 <body    text="#000000" 
@@ -88,7 +88,7 @@ google_color_text = "000000";
 Cheetah</font></b></big></big></big>
 <br>
 <big><font face="arial,helvetica,sanserif">
-PowerTap Software for Linux and Mac OS X (and Windows)
+Cycling Performance Software for Linux, Mac OS X, and Windows
 </font></big>
 <p>
 </td></tr>
