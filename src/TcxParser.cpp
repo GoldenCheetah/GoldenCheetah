@@ -18,6 +18,7 @@
  */
 
 #include <QString>
+#include <assert.h>
 #include "TcxParser.h"
 
 TcxParser::TcxParser (RideFile* rideFile)
