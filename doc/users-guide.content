@@ -5,13 +5,10 @@ Step 1: Installing the FTDI drivers
 </font></big>
 
 <p>
-Before you can download rides from your PowerTap, you may need to install the
-FTDI Virtual COM Port (VCP) drivers.  If you're running Linux kernel 2.6.9 or
-greater, they're already included.  If you're running Mac OS X or an earlier
-version of Linux, download them from 
-<a href="http://www.ftdichip.com/Drivers/VCP.htm">FTDI's website</a> and follow
-<a href="http://www.ftdichip.com/Documents/InstallGuides.htm">FTDI's
-instructions</a> to install them.  
+Depending on your operating system, you may need to install the <a
+href="http://www.ftdichip.com/Drivers/D2XX.htm">FTDI USB
+driver</a> if you're using the PowerTap's new USB download cradle. The FTDI USB drivers are an optional install if you do not plan on downloading from your device using Golden Cheetah.
+</p>
 
 <p>
 If you're running Linux, you may also need to uninstall the <code>brtty</code>
