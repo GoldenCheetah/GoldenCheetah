@@ -310,34 +310,41 @@ PfPvPlot::setData(RideItem *_rideItem)
 
 		dataSet.insert(std::make_pair<double, double>(aepf, cpv));
             
-        tot_cad += p1->cad;
-        tot_cad_points++;
+		tot_cad += p1->cad;
+		tot_cad_points++;
 
         
-        }
+	    }
 	}
 
-	// Now that we have the set of points, transform them into the
-	// QwtArrays needed to set the curve's data.
-	QwtArray<double> aepfArray;
-	QwtArray<double> cpvArray;
-	std::set<std::pair<double, double> >::const_iterator j(dataSet.begin());
-	while (j != dataSet.end()) {
-	    const std::pair<double, double>& dataPoint = *j;
-
-	    aepfArray.push_back(dataPoint.first);
-	    cpvArray.push_back(dataPoint.second);
-
-	    ++j;
+	if (tot_cad_points == 0) {
+	    setTitle("no cadence");
+	    refreshZoneItems();
+	    curve->setVisible(false);
 	}
+	    
+	else {
+	    // Now that we have the set of points, transform them into the
+	    // QwtArrays needed to set the curve's data.
+	    QwtArray<double> aepfArray;
+	    QwtArray<double> cpvArray;
+	    std::set<std::pair<double, double> >::const_iterator j(dataSet.begin());
+	    while (j != dataSet.end()) {
+		const std::pair<double, double>& dataPoint = *j;
+
+		aepfArray.push_back(dataPoint.first);
+		cpvArray.push_back(dataPoint.second);
+
+		++j;
+	    }
 	
-    if (tot_cad_points!=0)
-        setCAD(tot_cad / tot_cad_points);
+	    setCAD(tot_cad / tot_cad_points);
         
-    curve->setData(cpvArray, aepfArray);
+	    curve->setData(cpvArray, aepfArray);
 
-	// now show the data (zone shading would already be visible)
-	curve->setVisible(true);
+	    // now show the data (zone shading would already be visible)
+	    curve->setVisible(true);
+	}
     }
     else {
 	setTitle("no data");
