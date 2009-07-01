@@ -17,6 +17,30 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+/*
+ * Sample Ergomo .CSV file:
+ *
+     1,   0.000,    0,   0,  2.3,   0,1348.4, 11.7,  0,     0
+     2,   0.004,    0,   0,  2.3,   0,1348.4, 11.7,  0,     0
+     3,   0.004,    0,   0,  2.3,   0,1348.4, 11.7,  0,     0
+     4,   0.004,    0,   0,  2.3,   0,1348.6, 11.7,  0,     0
+     5,   0.004,    0,   0,  8.5,   0,1350.4, 11.7,  0,     0
+     6,   0.008,    0,   0,  8.5,   0,1350.4, 11.7,  0,     0
+     7,   0.008,    0,   0,  8.5,   0,1350.4, 11.7,  0,     0
+     8,   0.008,    0,   0,  8.5,   0,1350.4, 11.7,  0,     0
+     9,   0.008,    0,   0, 12.5,   0,1350.4, 11.7,  0,     0
+    10,   0.013,    0,   0, 12.7,   0,1350.4, 11.7,  0,     0
+    11,   0.015,    0,   0, 12.7,   0,1350.2, 11.7,  0,     0
+    12,   0.015,    0,   0, 12.7,   0,1350.0, 11.7,  0,     0
+    13,   0.015,    0,   0, 12.7,   0,1350.0, 11.7,  0, 35607
+    14,   0.015,    0,   0,  2.9,  70,1095.2,  4.7,  0,     0
+    15,   0.021,    0,   0,  2.9,  70,1094.0,  4.7,  0,     0
+    16,   0.021,    0,   0,  5.6,  70,1093.2,  4.7,  0,     0
+    17,   0.023,    0,   0, 10.0,  72,1092.6,  4.7,  0,     0
+    18,   0.027,  197,  32, 11.0,  76,1092.0,  4.7,  0,     0
+    19,   0.029,  197,  32, 12.1,  78,1091.8,  4.7,  0,     0
+*/
+
 #include "CsvRideFile.h"
 #include <QRegExp>
 #include <QTextStream>
@@ -46,6 +70,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
     QRegExp ergomoCSV("(ZEIT|STRECKE)", Qt::CaseInsensitive);
     bool ergomo = false;
     int unitsHeader = 1;
+    int total_pause = 0;
     
     // TODO: with all these formats, should the logic change to a switch/case structure?
     // The iBike format CSV file has five lines of headers (data begins on line 6)
@@ -126,8 +151,9 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
             else if (lineno > unitsHeader) {
                 double minutes,nm,kph,watts,km,cad,hr;
                 int interval;
+                int counter, pause;
                 if (!ergomo && !iBike) {
-                     minutes = line.section(',', 0, 0).toDouble();
+                     minutes     = line.section(',', 0, 0).toDouble();
                      nm		 = line.section(',', 1, 1).toDouble();
                      kph	 = line.section(',', 2, 2).toDouble();
                      watts	 = line.section(',', 3, 3).toDouble();
@@ -159,24 +185,28 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                     }			 
                 }
                 else {
-                    // for ergomo formatted CSV files
-                     minutes = line.section(',', 0, 0).toDouble();
+                     // for ergomo formatted CSV files
+                     minutes     = line.section(',', 0, 0).toDouble() + total_pause;
                      km		 = line.section(',', 1, 1).toDouble();
                      watts	 = line.section(',', 2, 2).toDouble();
                      cad	 = line.section(',', 3, 3).toDouble();
                      kph	 = line.section(',', 4, 4).toDouble();
                      hr		 = line.section(',', 5, 5).toDouble();
-                     interval	= line.section(',', 8, 8).toInt();
+                     interval	 = line.section(',', 8, 8).toInt();
+                     pause	 = line.section(',', 9, 9).toInt();
+                     total_pause += pause;
                      nm		 = NULL; // torque is not provided in the Ergomo file
                     
-                    // the ergomo records the time in whole seconds
-                    // RECORDING INT. 1, 2, 5, 10, 15 or 30 per sec
-                    minutes = minutes/60.0;
+                     // the ergomo records the time in whole seconds
+                     // RECORDING INT. 1, 2, 5, 10, 15 or 30 per sec
+                     // Time is *always* perfectly sequential.  To find pauses,
+                     // you need to read the PAUSE column.
+                     minutes = minutes/60.0;
                     
-                    if (!metric) {
-                        km *= MILES_TO_KM;
-                        kph *= MILES_TO_KM;
-                    }
+                     if (!metric) {
+                         km *= MILES_TO_KM;
+                         kph *= MILES_TO_KM;
+                     }
                 }
                 
                 // PT reports no data as watts == -1.
