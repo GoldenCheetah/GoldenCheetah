@@ -63,11 +63,13 @@ struct D2XXWrapper {
     ~D2XXWrapper() { if (handle) dlclose(handle); }
     bool init(QString &error)
     {
-#ifdef WIN32
-        const char *libname = "ftd2xx.dll";
-#else
-        const char *libname = "libftd2xx.dylib";
-#endif
+        #if defined(Q_OS_LINUX)
+            const char *libname = "libftd2xx.so";
+        #elif defined(Q_OS_WIN32)
+            const char *libname = "ftd2xx.dll";
+        #elif defined(Q_OS_DARWIN)
+            const char *libname = "libftd2xx.dylib";
+        #endif
         handle = dlopen(libname, RTLD_NOW);
         if (!handle) {
             error = QString("Couldn't load library ") + libname + ".";
