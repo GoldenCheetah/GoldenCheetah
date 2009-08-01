@@ -450,19 +450,21 @@ PowerHist::setData(RideItem *_rideItem)
 		    maxWattsIndex = wattsIndex;
 	    }
 
-	    int nmIndex = int(floor(p1->nm * torque_factor / nmDelta));
-	    if (nmIndex < maxSize) {
-		if (nmIndex >= nmArray->size()) {
-		    int size = nmArray->size();
-		    int newsize = min(1.5 * nmIndex, maxSize);
-		    nmArray->resize(newsize);
-		    for (int i = size + 1; i < newsize; i ++)
-			(*nmArray)[i] = 0;
-		}
-		(*nmArray)[nmIndex] ++;
-		if (nmIndex >= maxNmIndex)
-		    maxNmIndex = nmIndex;
-	    }
+            if (p1->nm > 0) {
+                int nmIndex = int(floor(p1->nm * torque_factor / nmDelta));
+                if (nmIndex < maxSize) {
+                    if (nmIndex >= nmArray->size()) {
+                        int size = nmArray->size();
+                        int newsize = min(1.5 * nmIndex, maxSize);
+                        nmArray->resize(newsize);
+                        for (int i = size + 1; i < newsize; i ++)
+                            (*nmArray)[i] = 0;
+                    }
+                    (*nmArray)[nmIndex] ++;
+                    if (nmIndex >= maxNmIndex)
+                        maxNmIndex = nmIndex;
+                }
+            }
 
 	    int hrIndex = int(floor(p1->hr / hrDelta));
 	    if (hrIndex < maxSize) {
