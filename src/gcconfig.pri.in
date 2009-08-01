@@ -1,0 +1,16 @@
+# To build, copy this file to gcconfig.pri and then fill in the paths to your
+# local installs of Boost, QWT, and srmio in the copy.  If you don't want
+# support for SRM downloads, just comment out the SRMIO_INSTALL line.
+
+BOOST_INSTALL = /usr/local/boost
+QWT_INSTALL = /usr/local/qwt
+SRMIO_INSTALL = /usr/local/srmio
+
+macx {
+    # Uncomment this line to build with OS X Tiger support on a Leopard system:
+    #QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.4u.sdk
+
+    # Uncomment this line to build a OS X universal binary:
+    #CONFIG+=x86 ppc
+}
+

@@ -4,6 +4,7 @@ build/*
 *.mode1v3
 Info.plist
 *.xcodeproj
+gcconfig.pri
 
 # old skool
 .svn
