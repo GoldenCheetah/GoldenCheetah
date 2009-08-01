@@ -16,6 +16,9 @@ driver</a> if you're using the PowerTap's new USB download cradle. The FTDI USB 
 </font>
 
 <p>
+We've switched from <i>subversion</i> to <i>git</i>.  Stay tuned for details!
+
+<p>
 The Golden Cheetah source code is available via 
 <a href="http://subversion.tigris.org/">Subversion</a>.  You need to install
 <a href="http://www.trolltech.com/products/qt">QT 4</a> and 
