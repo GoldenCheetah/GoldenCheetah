@@ -1,17 +1,24 @@
+# To build, see the instructions in gcconfig.pri.in.
+
+include( gcconfig.pri )
+
 TEMPLATE = app
 TARGET = GoldenCheetah
 DEPENDPATH += .
-INCLUDEPATH += /usr/local/qwt/include /sw/include /usr/local/include
+INCLUDEPATH += $${BOOST_INSTALL}/include $${QWT_INSTALL}/include
 CONFIG += static debug
 QT += xml sql
-LIBS += /usr/local/qwt/lib/libqwt.a
+LIBS += $${QWT_INSTALL}/lib/libqwt.a
 LIBS += -lm -lz
 
 !win32 {
     QMAKE_CXXFLAGS = -DGC_BUILD_DATE="`date +'\"%a_%b_%d,_%Y\"'`"
     QMAKE_CXXFLAGS += -DGC_SVN_VERSION=\\\"`svnversion . | cut -f '2' -d ':'`\\\"
-    INCLUDEPATH += /usr/local/srmio/include
-    LIBS +=  /usr/local/srmio/lib/libsrmio.a
+}
+
+!isEmpty( SRMIO_INSTALL ) {
+    INCLUDEPATH += $${SRMIO_INSTALL}/include
+    LIBS += $${SRMIO_INSTALL}/lib/libsrmio.a
     HEADERS += SrmDevice.h
     SOURCES += SrmDevice.cpp
 }
@@ -23,8 +30,6 @@ RC_FILE = images/gc.icns
 
 macx {
     LIBS += -framework Carbon
-    QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.4u.sdk
-    CONFIG+=x86 ppc 
 }
 
 HEADERS += \
