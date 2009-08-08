@@ -102,7 +102,7 @@ class PowerHist : public QwtPlot
         void setYMax();
 
     private:
-        QSettings settings;
+        QSettings *settings;
         QVariant unit;
 
 	PowerHistBackground *bg;

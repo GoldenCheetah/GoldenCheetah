@@ -27,9 +27,15 @@ ConfigurationPage::ConfigurationPage()
     unitCombo = new QComboBox();
     unitCombo->addItem(tr("Metric"));
     unitCombo->addItem(tr("English"));
+    //First check to see if the Library folder exists where the executable is (for USB sticks)
+    QDir home = QDir();
+    QSettings *settings;
+    if(!home.exists("Library/GoldenCheetah"))
+        settings = new QSettings(GC_SETTINGS_CO, GC_SETTINGS_APP);
+  else
+        settings = new QSettings(home.absolutePath()+"/gc", QSettings::IniFormat);
 
-    QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-    QVariant unit = settings.value(GC_UNIT);
+    QVariant unit = settings->value(GC_UNIT);
 
     if(unit.toString() == "Metric")
 	unitCombo->setCurrentIndex(0);
@@ -38,7 +44,7 @@ ConfigurationPage::ConfigurationPage()
 
     QLabel *crankLengthLabel = new QLabel(tr("Crank Length:"));
 
-    QVariant crankLength = settings.value(GC_CRANKLENGTH);
+    QVariant crankLength = settings->value(GC_CRANKLENGTH);
 
     crankLengthCombo = new QComboBox();
     crankLengthCombo->addItem("160");
@@ -76,7 +82,7 @@ ConfigurationPage::ConfigurationPage()
 	crankLengthCombo->setCurrentIndex(10);
 
     allRidesAscending = new QCheckBox("Sort ride list ascending.", this);
-    QVariant isAscending = settings.value(GC_ALLRIDES_ASCENDING,Qt::Checked); // default is ascending sort
+    QVariant isAscending = settings->value(GC_ALLRIDES_ASCENDING,Qt::Checked); // default is ascending sort
     if(isAscending.toInt() > 0 ){
 	allRidesAscending->setCheckState(Qt::Checked);
     } else {
@@ -98,8 +104,8 @@ ConfigurationPage::ConfigurationPage()
 
 
     // BikeScore Estimate
-    QVariant BSdays = settings.value(GC_BIKESCOREDAYS);
-    QVariant BSmode = settings.value(GC_BIKESCOREMODE);
+    QVariant BSdays = settings->value(GC_BIKESCOREDAYS);
+    QVariant BSmode = settings->value(GC_BIKESCOREMODE);
 
     QGridLayout *bsDaysLayout = new QGridLayout;
     bsModeLayout = new QHBoxLayout;

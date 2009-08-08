@@ -169,14 +169,22 @@ max(double a, double b) { if (a > b) return a; else return b; }
 #define MILES_PER_KM 0.62137119
 
 AllPlot::AllPlot():
-    settings(GC_SETTINGS_CO, GC_SETTINGS_APP),
-    unit(settings.value(GC_UNIT)),
+    settings(NULL),
+    unit(NULL),
     d_mrk(NULL), rideItem(NULL),
     hrArray(NULL), wattsArray(NULL), 
     speedArray(NULL), cadArray(NULL), timeArray(NULL),
     distanceArray(NULL), interArray(NULL), smooth(30), bydist(false),
     shade_zones(false)
 {
+    QSettings *settings;
+    QDir home = QDir();
+    if(!home.exists("Library/GoldenCheetah"))
+        settings = new QSettings(GC_SETTINGS_CO, GC_SETTINGS_APP);
+    else
+        settings = new QSettings(home.absolutePath()+"/gc", QSettings::IniFormat);
+    
+    
     useMetricUnits = (unit.toString() == "Metric");
 
     // create a background object for shading

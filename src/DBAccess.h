@@ -38,7 +38,6 @@ class DBAccess
 	typedef QHash<QString,RideMetric*> MetricMap;
 	void importAllRides(QDir path, Zones *zones);
 	bool importRide(SummaryMetrics *summaryMetrics);
-	QSqlDatabase initDatabase(QDir home);
 	bool createDatabase();
 	QStringList getAllFileNames();
     void closeConnection();
@@ -56,6 +55,7 @@ class DBAccess
 	private:
 	QSqlDatabase db;
 	bool createIndex();
+	QSqlDatabase initDatabase(QDir home);
 
 };
 #endif

@@ -102,7 +102,7 @@ class MainWindow : public QMainWindow
 	void setHistBinWidthText();
 	void setHistTextValidator();
 
-        QSettings settings;
+        QSettings *settings;
 
         QSplitter *splitter;
         QTreeWidget *treeWidget;

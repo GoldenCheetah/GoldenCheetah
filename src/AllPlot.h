@@ -40,7 +40,7 @@ class AllPlot : public QwtPlot
     private:
 
 	AllPlotBackground *bg;
-        QSettings settings;
+        QSettings *settings;
         QVariant unit;
 
     public:
