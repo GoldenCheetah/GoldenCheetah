@@ -92,8 +92,15 @@ void DatePickerDialog::on_btnOK_clicked()
 
 void DatePickerDialog::on_btnBrowse_clicked()
 {
-    QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-    QVariant lastDirVar = settings.value(GC_SETTINGS_LAST_IMPORT_PATH);
+    //First check to see if the Library folder exists where the executable is (for USB sticks)
+    QDir home = QDir();
+    QSettings *settings;
+    if(!home.exists("Library/GoldenCheetah"))
+        settings = new QSettings(GC_SETTINGS_CO, GC_SETTINGS_APP);
+    else
+        settings = new QSettings(home.absolutePath()+"/gc", QSettings::IniFormat);
+    
+    QVariant lastDirVar = settings->value(GC_SETTINGS_LAST_IMPORT_PATH);
     QString lastDir = (lastDirVar != QVariant()) 
         ? lastDirVar.toString() : QDir::homePath();
     fileName = QFileDialog::getOpenFileName(
@@ -101,7 +108,7 @@ void DatePickerDialog::on_btnBrowse_clicked()
         tr("Comma Separated Values (*.csv)"));
     if (!fileName.isEmpty()) {
         lastDir = QFileInfo(fileName).absolutePath();
-        settings.setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
+        settings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
 		
 		// get the creation date of the selected file
 		QFileInfo *qfi = new QFileInfo(fileName);

@@ -93,15 +93,23 @@ MainWindow::parseRideFileName(const QString &name, QString *notesFileName, QDate
 }
 
 MainWindow::MainWindow(const QDir &home) : 
-    home(home), settings(GC_SETTINGS_CO, GC_SETTINGS_APP), 
+    home(home), settings(NULL), 
     zones(NULL), currentNotesChanged(false),
     ride(NULL)
 {
-    QVariant unit = settings.value(GC_UNIT);
+
+    QDir tempHome = QDir();
+    if(!tempHome.exists("Library/GoldenCheetah"))
+        settings = new QSettings(GC_SETTINGS_CO, GC_SETTINGS_APP);
+    else
+        settings = new QSettings(tempHome.absolutePath()+"/gc", QSettings::IniFormat);
+    
+    
+    QVariant unit = settings->value(GC_UNIT);
     useMetricUnits = (unit.toString() == "Metric");
 
     setWindowTitle(home.dirName());
-    settings.setValue(GC_SETTINGS_LAST, home.dirName());
+    settings->setValue(GC_SETTINGS_LAST, home.dirName());
 
     setWindowIcon(QIcon(":images/gc.png"));
 
@@ -118,7 +126,7 @@ MainWindow::MainWindow(const QDir &home) :
             QMessageBox::warning(this, tr("Reading Zones File"), zones->warningString());
     }
 
-    QVariant geom = settings.value(GC_SETTINGS_MAIN_GEOM);
+    QVariant geom = settings->value(GC_SETTINGS_MAIN_GEOM);
     if (geom == QVariant())
         resize(640, 480);
     else
@@ -249,7 +257,7 @@ MainWindow::MainWindow(const QDir &home) :
     tabWidget->addTab(window, "Ride Plot");
     splitter->addWidget(tabWidget);
 
-    QVariant splitterSizes = settings.value(GC_SETTINGS_SPLITTER_SIZES); 
+    QVariant splitterSizes = settings->value(GC_SETTINGS_SPLITTER_SIZES); 
     if (splitterSizes != QVariant())
         splitter->restoreState(splitterSizes.toByteArray());
     else {
@@ -586,9 +594,8 @@ MainWindow::MainWindow(const QDir &home) :
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(tr("&About GoldenCheetah"), this, SLOT(aboutDialog()));
 
-    // This will read the user preferences and change the file list order as necessary:
-    QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-    QVariant isAscending = settings.value(GC_ALLRIDES_ASCENDING,Qt::Checked);
+       
+    QVariant isAscending = settings->value(GC_ALLRIDES_ASCENDING,Qt::Checked);
     if(isAscending.toInt()>0){
             if (last != NULL)
                 treeWidget->setCurrentItem(last);
@@ -613,7 +620,7 @@ MainWindow::addRide(QString name, bool bSelect /*=true*/)
     RideItem *last = new RideItem(RIDE_TYPE, home.path(), 
                                   name, dt, &zones, notesFileName);
 
-    QVariant isAscending = settings.value(GC_ALLRIDES_ASCENDING,Qt::Checked); // default is ascending sort
+    QVariant isAscending = settings->value(GC_ALLRIDES_ASCENDING,Qt::Checked); // default is ascending sort
     int index = 0;
     while (index < allRides->childCount()) {
         QTreeWidgetItem *item = allRides->child(index);
@@ -866,7 +873,7 @@ void MainWindow::importCSV()
 void
 MainWindow::importSRM()
 {
-    QVariant lastDirVar = settings.value(GC_SETTINGS_LAST_IMPORT_PATH);
+    QVariant lastDirVar = settings->value(GC_SETTINGS_LAST_IMPORT_PATH);
     QString lastDir = (lastDirVar != QVariant()) 
         ? lastDirVar.toString() : QDir::homePath();
     QStringList fileNames = QFileDialog::getOpenFileNames(
@@ -874,7 +881,7 @@ MainWindow::importSRM()
         tr("SRM Binary Format (*.srm)"));
     if (!fileNames.isEmpty()) {
         lastDir = QFileInfo(fileNames.front()).absolutePath();
-        settings.setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
+        settings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
     }
     QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
     QStringListIterator i(fileNamesCopy);
@@ -923,7 +930,7 @@ MainWindow::importSRM()
 void
 MainWindow::importTCX()
 {
-    QVariant lastDirVar = settings.value(GC_SETTINGS_LAST_IMPORT_PATH);
+    QVariant lastDirVar = settings->value(GC_SETTINGS_LAST_IMPORT_PATH);
     QString lastDir = (lastDirVar != QVariant()) 
         ? lastDirVar.toString() : QDir::homePath();
     QStringList fileNames = QFileDialog::getOpenFileNames(
@@ -931,7 +938,7 @@ MainWindow::importTCX()
         tr("TCX Format (*.tcx)"));
     if (!fileNames.isEmpty()) {
         lastDir = QFileInfo(fileNames.front()).absolutePath();
-        settings.setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
+        settings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
     }
     QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
     QStringListIterator i(fileNames);
@@ -980,7 +987,7 @@ MainWindow::importTCX()
 void
 MainWindow::importPolar()
 {
-    QVariant lastDirVar = settings.value(GC_SETTINGS_LAST_IMPORT_PATH);
+    QVariant lastDirVar = settings->value(GC_SETTINGS_LAST_IMPORT_PATH);
     QString lastDir = (lastDirVar != QVariant())
         ? lastDirVar.toString() : QDir::homePath();
     QStringList fileNames = QFileDialog::getOpenFileNames(
@@ -988,7 +995,7 @@ MainWindow::importPolar()
         tr("Polar Format (*.hrm)"));
     if (!fileNames.isEmpty()) {
         lastDir = QFileInfo(fileNames.front()).absolutePath();
-        settings.setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
+        settings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
     }
     QStringList fileNamesCopy = fileNames;
     QStringListIterator i(fileNames);
@@ -1106,7 +1113,7 @@ void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
     distance = bs = 0;
     timeBS = distanceBS = 0.0;
 
-    QVariant BSdays = settings.value(GC_BIKESCOREDAYS);
+    QVariant BSdays = settings->value(GC_BIKESCOREDAYS);
     if (BSdays.isNull() || BSdays.toInt() == 0)
 	BSdays.setValue(30); // by default look back no more than 30 days
 
@@ -1265,9 +1272,7 @@ void MainWindow::generateWeeklySummary()
     minutes %= 60;
 
     const char *dateFormat = "MM/dd/yyyy";
-
-    QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-
+    
     QString summary;
     summary =
 	tr(
@@ -1520,7 +1525,7 @@ void MainWindow::saveNotes()
 void 
 MainWindow::resizeEvent(QResizeEvent*)
 {
-    settings.setValue(GC_SETTINGS_MAIN_GEOM, geometry());
+    settings->setValue(GC_SETTINGS_MAIN_GEOM, geometry());
 }
 
 void 
@@ -1555,7 +1560,7 @@ MainWindow::showOptions()
 void 
 MainWindow::moveEvent(QMoveEvent*)
 {
-    settings.setValue(GC_SETTINGS_MAIN_GEOM, geometry());
+    settings->setValue(GC_SETTINGS_MAIN_GEOM, geometry());
 }
 
 void
@@ -1567,7 +1572,7 @@ MainWindow::closeEvent(QCloseEvent*)
 void 
 MainWindow::splitterMoved()
 {
-    settings.setValue(GC_SETTINGS_SPLITTER_SIZES, splitter->saveState());
+    settings->setValue(GC_SETTINGS_SPLITTER_SIZES, splitter->saveState());
 }
 
 void

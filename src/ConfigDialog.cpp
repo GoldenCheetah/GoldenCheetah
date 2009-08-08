@@ -134,12 +134,25 @@ void ConfigDialog::changePage(QListWidgetItem *current, QListWidgetItem *previou
 //   ! new mode: change the CP associated with the present mode
 void ConfigDialog::save_Clicked()
 {
-    QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-    settings.setValue(GC_UNIT, configPage->unitCombo->currentText());
-    settings.setValue(GC_ALLRIDES_ASCENDING, configPage->allRidesAscending->checkState());
-    settings.setValue(GC_CRANKLENGTH, configPage->crankLengthCombo->currentText());
-    settings.setValue(GC_BIKESCOREDAYS, configPage->BSdaysEdit->text());
-    settings.setValue(GC_BIKESCOREMODE, configPage->bsModeCombo->currentText());
+    QDir home = QDir();
+    QSettings *settings;
+    
+    if(!home.exists("Library/GoldenCheetah"))
+    {
+        settings = new QSettings(GC_SETTINGS_CO, GC_SETTINGS_APP);
+        home = QDir::home();
+    }
+    else
+    {
+        settings = new QSettings(home.absolutePath()+"/gc", QSettings::IniFormat);
+        
+    }
+  
+    settings->setValue(GC_UNIT, configPage->unitCombo->currentText());
+    settings->setValue(GC_ALLRIDES_ASCENDING, configPage->allRidesAscending->checkState());
+    settings->setValue(GC_CRANKLENGTH, configPage->crankLengthCombo->currentText());
+    settings->setValue(GC_BIKESCOREDAYS, configPage->BSdaysEdit->text());
+    settings->setValue(GC_BIKESCOREMODE, configPage->bsModeCombo->currentText());
 
     // if the CP text entry reads invalid, there's nothing we can do
     int cp = cyclistPage->getCP();

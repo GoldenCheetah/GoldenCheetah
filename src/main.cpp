@@ -27,7 +27,21 @@ int
 main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    QDir home = QDir::home();
+    QSettings *settings;
+
+    //First check to see if the Library folder exists where the executable is (for USB sticks)
+    QDir home = QDir();
+    if(!home.exists("Library/GoldenCheetah"))
+    {
+        settings = new QSettings(GC_SETTINGS_CO, GC_SETTINGS_APP);
+        home = QDir::home();
+    }
+    else
+    {
+        settings = new QSettings(home.absolutePath()+"/gc", QSettings::IniFormat);
+
+    }
+
     if (!home.exists("Library")) 
         if (!home.mkdir("Library"))
             assert(false);
@@ -36,12 +50,12 @@ main(int argc, char *argv[])
         if (!home.mkdir("GoldenCheetah"))
             assert(false);
     home.cd("GoldenCheetah");
-    QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-    QVariant lastOpened = settings.value(GC_SETTINGS_LAST);
-    QVariant unit = settings.value(GC_UNIT);
-    double crankLength = settings.value(GC_CRANKLENGTH).toDouble();
+    
+    QVariant lastOpened = settings->value(GC_SETTINGS_LAST);
+    QVariant unit = settings->value(GC_UNIT);
+    double crankLength = settings->value(GC_CRANKLENGTH).toDouble();
     if(crankLength<=0) {
-       settings.setValue(GC_CRANKLENGTH,172.5);
+       settings->setValue(GC_CRANKLENGTH,172.5);
     }
 
     bool anyOpened = false;

@@ -86,9 +86,6 @@ bool MetricAggregator::importRide(QDir path, Zones *zones, RideFile *ride, QStri
 	if (zones)
 		zone_range = zones->whichRange(dateTime.date());
 	
-	QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-	QVariant unit = settings.value(GC_UNIT);
-	
 	const RideMetricFactory &factory = RideMetricFactory::instance();
 	QSet<QString> todo;
 	

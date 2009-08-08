@@ -42,7 +42,7 @@ class ConfigDialog : public QDialog
 	QVBoxLayout *mainLayout;
         QListWidget *contentsWidget;
 
-        QSettings settings;
+        QSettings *settings;
         QDir home;
         Zones **zones;
 };
