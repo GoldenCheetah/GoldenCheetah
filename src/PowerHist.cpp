@@ -250,7 +250,7 @@ PowerHist::PowerHist():
 
     zoneLabels = QList <PowerHistZoneLabel *>::QList();
 
- QwtPlotZoomer* zoomer = new penTooltip(this->canvas());
+    new penTooltip(this->canvas());
 }
 
 PowerHist::~PowerHist() {
