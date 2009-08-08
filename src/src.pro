@@ -61,7 +61,9 @@ HEADERS += \
         SplitRideDialog.h \
         DaysScaleDraw.h \
         Settings.h \
-        XmlRideFile.h 
+        XmlRideFile.h \
+        ManualRideFile.h \
+        ManualRideDialog.h
 
 SOURCES += \
         AllPlot.cpp \
@@ -103,6 +105,8 @@ SOURCES += \
         SummaryMetrics.cpp \
         SplitRideDialog.cpp \
         XmlRideFile.cpp \
+        ManualRideFile.cpp \
+        ManualRideDialog.cpp
 
 # win32 is after SOURCES and HEADERS so we can remove Serial.h/.cpp
 win32 {
