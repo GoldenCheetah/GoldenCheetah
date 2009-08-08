@@ -383,6 +383,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     tabWidget->addTab(window, tr("PF/PV Plot"));
 
+
     //////////////////////// Ride Notes ////////////////////////
     
     rideNotes = new QTextEdit;
@@ -1099,8 +1100,8 @@ MainWindow::rideSelected()
 void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
 {
 
-    int seconds, rides;
-    float distance, bs;
+    int rides;
+    double seconds, distance, bs, convertUnit;
     seconds = rides = 0;
     distance = bs = 0;
     timeBS = distanceBS = 0.0;
@@ -1136,10 +1137,18 @@ void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
         }
     }
     if (rides) {
-	bs /= rides;
-	seconds /= rides;
-	distance /= rides;
-	timeBS = bs / (seconds / 3600);  // BS per hour
+	// convert distance from metric:
+	if (!useMetricUnits)
+	{
+	    const double MILES_PER_KM = 0.62137119;
+	    convertUnit = MILES_PER_KM;
+	}
+	else {
+	    convertUnit = 1.0;
+	}
+	distance *= convertUnit;
+
+	timeBS = (bs * 3600) / seconds;  // BS per hour
 	distanceBS = bs / distance;  // BS per mile or km
     }
 }
