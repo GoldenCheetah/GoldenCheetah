@@ -128,7 +128,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
             else if (lineno > unitsHeader) {
                 double minutes,nm,kph,watts,km,cad,hr;
                 int interval;
-                int counter, pause;
+                int pause;
                 if (!ergomo && !iBike) {
                      minutes     = line.section(',', 0, 0).toDouble();
                      nm		 = line.section(',', 1, 1).toDouble();
