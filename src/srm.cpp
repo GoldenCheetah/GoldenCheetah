@@ -73,11 +73,11 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
     }
     QDataStream in(&file);
 
-    char magic[5];
-    in.readRawData(magic, sizeof(magic) - 1);
-    magic[sizeof(magic) - 1] = '\0';
-    if (strncmp(magic, "SRM6", sizeof(magic)) != 0)
-        assert(false);
+    char magic[4];
+    in.readRawData(magic, sizeof(magic));
+    assert(strncmp(magic, "SRM", 3) == 0);
+    int version = magic[3] - '0';
+    assert(version == 6 || version == 7);
 
     quint16 dayssince1880 = readShort(in);
     quint16 wheelcirc = readShort(in);
@@ -179,13 +179,32 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
         mrknum = 1;
 
     for (int i = 0; i < datacnt; ++i) {
-        quint8 ps[3];
-        in.readRawData((char*) ps, sizeof(ps));
-        quint8 cad = readByte(in);
-        quint8 hr = readByte(in);
-        double kph = (((((unsigned) ps[1]) & 0xf0) << 3) 
-                      | (ps[0] & 0x7f)) * 3.0 / 26.0;
-        unsigned watts = (ps[1] & 0x0f) | (ps[2] << 0x4);
+        SrmDataPoint *point = new SrmDataPoint;
+        if (version == 6) {
+            quint8 ps[3];
+            in.readRawData((char*) ps, sizeof(ps));
+            quint8 cad = readByte(in);
+            quint8 hr = readByte(in);
+            double kph = (((((unsigned) ps[1]) & 0xf0) << 3) 
+                          | (ps[0] & 0x7f)) * 3.0 / 26.0;
+            unsigned watts = (ps[1] & 0x0f) | (ps[2] << 0x4);
+            point->watts = watts;
+            point->cad = cad;
+            point->hr = hr;
+            point->kph = kph;
+        }
+        else {
+            assert(version == 7);
+            point->watts = readShort(in);
+            point->cad = readByte(in);
+            point->hr = readByte(in);
+            point->kph = readLong(in) * 3.6 / 1000.0;
+            quint32 ele = readLong(in);
+            double temp = 0.1 * (qint16) readShort(in);
+            (void) ele; // unused for now
+            (void) temp; // unused for now
+        }
+
         if (i == 0) {
             data.startTime = blockhdrs[blknum].dt;
             // printf("startTime=%s\n", 
@@ -196,19 +215,15 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
             ++mrknum;
         }
 
-        if ((i > 0) && (i == markers[mrknum].start - 1)) // markers count from 1
+        // markers count from 1
+        if ((i > 0) && (i == markers[mrknum].start - 1))
             ++interval;
 
-        km += data.recint * kph / 3600.0;
+        km += data.recint * point->kph / 3600.0;
 
-        SrmDataPoint *point = new SrmDataPoint;
-        point->cad = cad;
-        point->hr = hr;
-        point->watts = watts;
-        point->interval = interval;
-        point->kph = kph;
         point->km = km;
         point->secs = secs;
+        point->interval = interval;
         data.dataPoints.append(point);
 
         // printf("%5.1f %5.1f %5.1f %4d %3d %3d %2d\n", 
