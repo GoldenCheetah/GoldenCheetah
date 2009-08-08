@@ -138,6 +138,8 @@ void ConfigDialog::save_Clicked()
     settings.setValue(GC_UNIT, configPage->unitCombo->currentText());
     settings.setValue(GC_ALLRIDES_ASCENDING, configPage->allRidesAscending->checkState());
     settings.setValue(GC_CRANKLENGTH, configPage->crankLengthCombo->currentText());
+    settings.setValue(GC_BIKESCOREDAYS, configPage->BSdaysEdit->text());
+    settings.setValue(GC_BIKESCOREMODE, configPage->bsModeCombo->currentText());
 
     // if the CP text entry reads invalid, there's nothing we can do
     int cp = cyclistPage->getCP();

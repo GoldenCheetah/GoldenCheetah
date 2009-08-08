@@ -13,6 +13,7 @@
 #include <QDateEdit>
 #include <QCheckBox>
 #include <QValidator>
+#include <QGridLayout>
 
 class QGroupBox;
 class QHBoxLayout;
@@ -26,6 +27,8 @@ class ConfigurationPage : public QWidget
         QComboBox *unitCombo;
         QComboBox *crankLengthCombo;
         QCheckBox *allRidesAscending;
+	QLineEdit *BSdaysEdit;
+	QComboBox *bsModeCombo;
         
 
     private:
@@ -36,6 +39,8 @@ class ConfigurationPage : public QWidget
 	QHBoxLayout *warningLayout;
 	QVBoxLayout *configLayout;
 	QVBoxLayout *mainLayout;
+	QGridLayout *bsDaysLayout;
+	QHBoxLayout *bsModeLayout;
 };
 
 class CyclistPage : public QWidget

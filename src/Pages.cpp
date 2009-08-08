@@ -32,12 +32,12 @@ ConfigurationPage::ConfigurationPage()
     QVariant unit = settings.value(GC_UNIT);
 
     if(unit.toString() == "Metric")
-       unitCombo->setCurrentIndex(0);
+	unitCombo->setCurrentIndex(0);
     else
-       unitCombo->setCurrentIndex(1);
+	unitCombo->setCurrentIndex(1);
 
     QLabel *crankLengthLabel = new QLabel(tr("Crank Length:"));
-    
+
     QVariant crankLength = settings.value(GC_CRANKLENGTH);
 
     crankLengthCombo = new QComboBox();
@@ -53,36 +53,36 @@ ConfigurationPage::ConfigurationPage()
     crankLengthCombo->addItem("182.5");
     crankLengthCombo->addItem("185");
     if(crankLength.toString() == "160")
-       crankLengthCombo->setCurrentIndex(0);
+	crankLengthCombo->setCurrentIndex(0);
     if(crankLength.toString() == "162.5")
-       crankLengthCombo->setCurrentIndex(1);
+	crankLengthCombo->setCurrentIndex(1);
     if(crankLength.toString() == "165")
-       crankLengthCombo->setCurrentIndex(2);
+	crankLengthCombo->setCurrentIndex(2);
     if(crankLength.toString() == "167.5")
-       crankLengthCombo->setCurrentIndex(3);
+	crankLengthCombo->setCurrentIndex(3);
     if(crankLength.toString() == "170")
-       crankLengthCombo->setCurrentIndex(4);
+	crankLengthCombo->setCurrentIndex(4);
     if(crankLength.toString() == "172.5")
-       crankLengthCombo->setCurrentIndex(5);
+	crankLengthCombo->setCurrentIndex(5);
     if(crankLength.toString() == "175")
-       crankLengthCombo->setCurrentIndex(6);
+	crankLengthCombo->setCurrentIndex(6);
     if(crankLength.toString() == "177.5")
-       crankLengthCombo->setCurrentIndex(7);
+	crankLengthCombo->setCurrentIndex(7);
     if(crankLength.toString() == "180")
-       crankLengthCombo->setCurrentIndex(8);
+	crankLengthCombo->setCurrentIndex(8);
     if(crankLength.toString() == "182.5")
-       crankLengthCombo->setCurrentIndex(9);
+	crankLengthCombo->setCurrentIndex(9);
     if(crankLength.toString() == "185")
-       crankLengthCombo->setCurrentIndex(10);
+	crankLengthCombo->setCurrentIndex(10);
 
     allRidesAscending = new QCheckBox("Sort ride list ascending.", this);
     QVariant isAscending = settings.value(GC_ALLRIDES_ASCENDING,Qt::Checked); // default is ascending sort
     if(isAscending.toInt() > 0 ){
-        allRidesAscending->setCheckState(Qt::Checked);
+	allRidesAscending->setCheckState(Qt::Checked);
     } else {
-        allRidesAscending->setCheckState(Qt::Unchecked);
+	allRidesAscending->setCheckState(Qt::Unchecked);
     }
-    
+
     warningLabel = new QLabel(tr("Requires Restart To Take Effect"));
 
     unitLayout = new QHBoxLayout;
@@ -91,17 +91,51 @@ ConfigurationPage::ConfigurationPage()
 
     warningLayout = new QHBoxLayout;
     warningLayout->addWidget(warningLabel);
-    
+
     QHBoxLayout *crankLengthLayout = new QHBoxLayout;
     crankLengthLayout->addWidget(crankLengthLabel);
     crankLengthLayout->addWidget(crankLengthCombo);
- 
+
+
+    // BikeScore Estimate
+    QVariant BSdays = settings.value(GC_BIKESCOREDAYS);
+    QVariant BSmode = settings.value(GC_BIKESCOREMODE);
+
+    QGridLayout *bsDaysLayout = new QGridLayout;
+    bsModeLayout = new QHBoxLayout;
+    QLabel *BSDaysLabel1 = new QLabel(tr("BikeScore Estimate: use rides within last "));
+    QLabel *BSDaysLabel2 = new QLabel(tr(" days"));
+    BSdaysEdit = new QLineEdit(BSdays.toString(),this);
+    BSdaysEdit->setInputMask("009");
+
+    QLabel *BSModeLabel = new QLabel(tr("BikeScore estimate mode: "));
+    bsModeCombo = new QComboBox();
+    bsModeCombo->addItem("time");
+    bsModeCombo->addItem("distance");
+    if (BSmode.toString() == "time")
+	bsModeCombo->setCurrentIndex(0);
+    else
+	bsModeCombo->setCurrentIndex(1);
+
+    bsDaysLayout->addWidget(BSDaysLabel1,0,0);
+    bsDaysLayout->addWidget(BSdaysEdit,0,1);
+    bsDaysLayout->addWidget(BSDaysLabel2,0,2);
+
+    bsModeLayout->addWidget(BSModeLabel);
+    bsModeLayout->addWidget(bsModeCombo);
+
+
+
+
     configLayout = new QVBoxLayout;
     configLayout->addLayout(unitLayout);
     configLayout->addWidget(allRidesAscending);
     configLayout->addLayout(crankLengthLayout);
+    configLayout->addLayout(bsDaysLayout);
+    configLayout->addLayout(bsModeLayout);
     configLayout->addLayout(warningLayout);
     configGroup->setLayout(configLayout);
+
 
     mainLayout = new QVBoxLayout;
     mainLayout->addWidget(configGroup);

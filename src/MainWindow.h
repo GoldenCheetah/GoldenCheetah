@@ -44,6 +44,7 @@ class MainWindow : public QMainWindow
         void addRide(QString name, bool bSelect=true);
         void removeCurrentRide();
         const RideFile *currentRide();
+	void getBSFactors(float &timeBS, float &distanceBS);
         QDir home;
 
     protected:
@@ -57,6 +58,7 @@ class MainWindow : public QMainWindow
         void newCyclist();
         void openCyclist();
         void downloadRide();
+        void manualRide();
         void exportCSV();
         void exportXML();
         void importCSV();
@@ -162,6 +164,9 @@ class MainWindow : public QMainWindow
 	int histCadID;
 
 	bool useMetricUnits;  // whether metric units are used (or imperial)
+
+	float timebsfactor;
+	float distancebsfactor;
 };
 
 #endif // _GC_MainWindow_h

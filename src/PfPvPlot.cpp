@@ -289,18 +289,18 @@ PfPvPlot::setData(RideItem *_rideItem)
 
 	// handle zone stuff
 	refreshZoneItems();
- 
+
 	// due to the discrete power and cadence values returned by the
 	// power meter, there will very likely be many duplicate values.
 	// Rather than pass them all to the curve, use a set to strip
 	// out duplicates.
 	std::set<std::pair<double, double> > dataSet;
-	
-    long tot_cad = 0;
-    long tot_cad_points = 0;
-    
-        
-    QListIterator<RideFilePoint*> i(ride->dataPoints());
+
+	long tot_cad = 0;
+	long tot_cad_points = 0;
+
+
+	QListIterator<RideFilePoint*> i(ride->dataPoints());
 	while (i.hasNext()) {
 	    const RideFilePoint *p1 = i.next();
 
@@ -353,7 +353,7 @@ PfPvPlot::setData(RideItem *_rideItem)
     }
 
     replot();
-    
+
     QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
     setCL(settings.value(GC_CRANKLENGTH).toDouble() / 1000.0);
 }

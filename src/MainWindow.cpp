@@ -24,6 +24,7 @@
 #include "CpintPlot.h"
 #include "PfPvPlot.h"
 #include "DownloadRideDialog.h"
+#include "ManualRideDialog.h"
 #include "PowerHist.h"
 #include "RideItem.h"
 #include "RideFile.h"
@@ -567,6 +568,9 @@ MainWindow::MainWindow(const QDir &home) :
                         SLOT(splitRide()));
     rideMenu->addAction(tr("D&elete ride..."), this,
                         SLOT(deleteRide()));
+    rideMenu->addAction(tr("&Manual ride entry..."), this,
+          SLOT(manualRide()), tr("Ctrl+M"));
+
     QMenu *optionsMenu = menuBar()->addMenu(tr("&Tools"));
     optionsMenu->addAction(tr("&Options..."), this, 
                            SLOT(showOptions()), tr("Ctrl+O")); 
@@ -722,6 +726,13 @@ void
 MainWindow::downloadRide()
 {
     (new DownloadRideDialog(this, home))->show();
+}
+
+
+void
+MainWindow::manualRide()
+{
+    (new ManualRideDialog(this, home, useMetricUnits))->show();
 }
 
 const RideFile *
@@ -1033,33 +1044,47 @@ MainWindow::rideSelected()
 {
     assert(treeWidget->selectedItems().size() <= 1);
     if (treeWidget->selectedItems().isEmpty()) {
-        rideSummary->clear();
-        return;
+	rideSummary->clear();
+	return;
     }
 
     QTreeWidgetItem *which = treeWidget->selectedItems().first();
     if (which->type() != RIDE_TYPE) {
-        rideSummary->clear();
-        return;
+	rideSummary->clear();
+	return;
     }
 
     ride = (RideItem*) which;
     rideSummary->setHtml(ride->htmlSummary());
     rideSummary->setAlignment(Qt::AlignCenter);
     if (ride) {
+
 	setAllPlotWidgets(ride);
-        allPlot->setData(ride);
+	allPlot->setData(ride);
 
 	// set the histogram data
-        powerHist->setData(ride);
+	powerHist->setData(ride);
 	// make sure the histogram has a legal selection
 	powerHist->fixSelection();
 	// update the options in the histogram combobox
 	setHistWidgets(ride);
-	
-        pfPvPlot->setData(ride);
-        // update the QLabel widget with the CP value set in PfPvPlot::setData()
-        qaCPValue->setText(QString("%1").arg(pfPvPlot->getCP()));
+
+	pfPvPlot->setData(ride);
+	// update the QLabel widget with the CP value set in PfPvPlot::setData()
+	qaCPValue->setText(QString("%1").arg(pfPvPlot->getCP()));
+
+	// turn off tabs that don't make sense for manual file entry
+	if (ride->ride && ride->ride->deviceType() == QString("Manual CSV")) {
+	    tabWidget->setTabEnabled(1,false); // Ride Plot
+	    tabWidget->setTabEnabled(3,false); // Power Histogram
+	    tabWidget->setTabEnabled(4,false); // PF/PV Plot
+	}
+ 	else {
+	    // enable
+	    tabWidget->setTabEnabled(1,true); // Ride Plot
+	    tabWidget->setTabEnabled(3,true); // Power Histogram
+	    tabWidget->setTabEnabled(4,true); // PF/PV Plot
+	}
     }
     if (tabWidget->currentIndex() == 2) {
         cpintPlot->calculate(ride);
@@ -1068,6 +1093,55 @@ MainWindow::rideSelected()
 
     // generate a weekly summary of the week associated with the current ride
     generateWeeklySummary();
+}
+
+
+void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
+{
+
+    int seconds, rides;
+    float distance, bs;
+    seconds = rides = 0;
+    distance = bs = 0;
+    timeBS = distanceBS = 0.0;
+
+    QVariant BSdays = settings.value(GC_BIKESCOREDAYS);
+    if (BSdays.isNull() || BSdays.toInt() == 0)
+	BSdays.setValue(30); // by default look back no more than 30 days
+
+    for (int i = 0; i < allRides->childCount(); ++i) {
+	RideItem *item = (RideItem*) allRides->child(i);
+	int days =  item->dateTime.daysTo(ride->dateTime);
+        if (
+	    (item->type() == RIDE_TYPE) &&
+	    (item->ride) &&
+	    (days  >= 0) && 
+	    (days < BSdays.toInt())  
+	    ) {
+
+	    RideMetric *m;
+	    item->htmlSummary(); // compute metrics
+	    if ((m = item->metrics.value("time_riding"))) {
+		seconds += m->value(true);
+	    }
+
+	    if ((m = item->metrics.value("total_distance"))) {
+		distance += m->value(true);
+	    }
+
+            if ((m = item->metrics.value("skiba_bike_score"))) {
+		bs += m->value(true);
+	    }
+	    rides++;
+        }
+    }
+    if (rides) {
+	bs /= rides;
+	seconds /= rides;
+	distance /= rides;
+	timeBS = bs / (seconds / 3600);  // BS per hour
+	distanceBS = bs / distance;  // BS per mile or km
+    }
 }
 
 void MainWindow::generateWeeklySummary()
@@ -1604,21 +1678,21 @@ MainWindow::setHistTextValidator()
     double delta = powerHist->getDelta();
     int digits = powerHist->getDigits();
     binWidthLineEdit->setValidator(
-				   (digits == 0) ?
-				   (QValidator *) (
-						   new QIntValidator(binWidthSlider->minimum() * delta,
-								     binWidthSlider->maximum() * delta,
-								     binWidthLineEdit
-								     )
-						   ) :
-				   (QValidator *) (
-						   new QDoubleValidator(binWidthSlider->minimum() * delta,
-									binWidthSlider->maximum() * delta,
-									digits,
-									binWidthLineEdit
-									)
-						   )
-				   );
+	    (digits == 0) ?
+	    (QValidator *) (
+		new QIntValidator(binWidthSlider->minimum() * delta,
+		    binWidthSlider->maximum() * delta,
+		    binWidthLineEdit
+		    )
+		) :
+	    (QValidator *) (
+		new QDoubleValidator(binWidthSlider->minimum() * delta,
+		    binWidthSlider->maximum() * delta,
+		    digits,
+		    binWidthLineEdit
+		    )
+		)
+	    );
 
 }
 
