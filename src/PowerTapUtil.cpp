@@ -16,7 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "PowerTap.h"
+#include "PowerTapUtil.h"
 #include <math.h>
 
 #define PT_DEBUG false
