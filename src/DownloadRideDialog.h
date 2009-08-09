@@ -19,12 +19,10 @@
 #ifndef _GC_DownloadRideDialog_h
 #define _GC_DownloadRideDialog_h 1
 
+#include "CommPort.h"
 #include <QtGui>
-#include "PowerTapDevice.h"
-#include "PowerTapUtil.h"
 
 class MainWindow;
-class DownloadThread;
 
 class DownloadRideDialog : public QDialog 
 {

@@ -20,11 +20,11 @@
 
 #include "DownloadRideDialog.h"
 #include "MainWindow.h"
+#include "PowerTapDevice.h"
+#include "PowerTapUtil.h"
 #include <assert.h>
-#include <string.h>
 #include <errno.h>
 #include <QtGui>
-#include <math.h>
 #include <boost/bind.hpp>
 
 DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
