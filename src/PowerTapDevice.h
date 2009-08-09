@@ -24,6 +24,7 @@
 
 struct PowerTapDevice : public Device
 {
+    virtual QString downloadInstructions() const;
     virtual bool download(CommPortPtr dev, const QDir &tmpdir,
                           QString &tmpname, QString &filename,
                           StatusCallback statusCallback, QString &err);

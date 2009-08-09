@@ -44,9 +44,8 @@ class DownloadRideDialog : public QDialog
  
         MainWindow *mainWindow;
         QDir home;
-        QListWidget *listWidget;
         QPushButton *downloadButton, *rescanButton, *cancelButton;
-        QComboBox *deviceCombo;
+        QComboBox *portCombo, *deviceCombo;
         QLabel *label;
 
         QVector<CommPortPtr> devList;

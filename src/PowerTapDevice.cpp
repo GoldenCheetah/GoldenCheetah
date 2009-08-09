@@ -25,6 +25,13 @@
 static bool powerTapRegistered =
     Device::addDevice("PowerTap", new PowerTapDevice());
 
+QString
+PowerTapDevice::downloadInstructions() const
+{
+    return ("Make sure the PowerTap unit is turned\n"
+            "on and that its display says, \"Host\"");
+}
+
 static bool
 hasNewline(const char *buf, int len)
 {

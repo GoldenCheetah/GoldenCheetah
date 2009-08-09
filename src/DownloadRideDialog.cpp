@@ -35,15 +35,13 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("Download Ride Data");
 
-    listWidget = new QListWidget(this);
-    listWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    portCombo = new QComboBox(this);
 
-    QLabel *availLabel = new QLabel(tr("Available devices:"), this);
     QLabel *instructLabel = new QLabel(tr("Instructions:"), this);
     label = new QLabel(this);
     label->setIndent(10);
 
-    deviceCombo = new QComboBox();
+    deviceCombo = new QComboBox(this);
     QList<QString> deviceTypes = Device::deviceTypes();
     assert(deviceTypes.size() > 0);
     BOOST_FOREACH(QString device, deviceTypes) {
@@ -57,10 +55,6 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     connect(downloadButton, SIGNAL(clicked()), this, SLOT(downloadClicked()));
     connect(rescanButton, SIGNAL(clicked()), this, SLOT(scanCommPorts()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
-    connect(listWidget, 
-            SIGNAL(itemSelectionChanged()), this, SLOT(setReadyInstruct()));
-    connect(listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
-            this, SLOT(downloadClicked())); 
 
     QHBoxLayout *buttonLayout = new QHBoxLayout; 
     buttonLayout->addWidget(downloadButton); 
@@ -68,8 +62,8 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     buttonLayout->addWidget(cancelButton); 
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->addWidget(availLabel);
-    mainLayout->addWidget(listWidget);
+    mainLayout->addWidget(new QLabel(tr("Select port:"), this));
+    mainLayout->addWidget(portCombo);
     mainLayout->addWidget(new QLabel(tr("Select device type:"), this));
     mainLayout->addWidget(deviceCombo);
     mainLayout->addWidget(instructLabel);
@@ -82,24 +76,19 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
 void 
 DownloadRideDialog::setReadyInstruct()
 {
-    int selected = listWidget->selectedItems().size();
-    assert(selected <= 1);
-    if (selected == 0) {
-        if (listWidget->count() > 1) {
-            label->setText(tr("Select the device from the above list from\n"
-                              "which you would like to download a ride."));
-        }
-        else {
-            label->setText(tr("No devices found.  Make sure the PowerTap\n"
-                              "unit is plugged into the computer's USB port,\n"
-                              "then click \"Rescan\" to check again."));
-        }
+    if (portCombo->count() == 0) {
+        label->setText(tr("No devices found.  Make sure the device\n"
+                          "unit is plugged into the computer,\n"
+                          "then click \"Rescan\" to check again."));
         downloadButton->setEnabled(false);
     }
     else {
-        label->setText(tr("Make sure the PowerTap unit is turned on,\n"
-                          "and that the screen display says, \"Host\",\n"
-                          "then click Download to begin downloading."));
+        Device &device = Device::device(deviceCombo->currentText());
+        QString inst = device.downloadInstructions();
+        if (inst.size() == 0)
+            label->setText("Click Download to begin downloading.");
+        else
+            label->setText(inst + ", \nthen click Download.");
         downloadButton->setEnabled(true);
     }
 }
@@ -107,7 +96,7 @@ DownloadRideDialog::setReadyInstruct()
 void
 DownloadRideDialog::scanCommPorts()
 {
-    listWidget->clear();
+    portCombo->clear();
     QString err;
     devList = CommPort::listCommPorts(err);
     if (err != "") {
@@ -117,11 +106,9 @@ DownloadRideDialog::scanCommPorts()
                              QMessageBox::Ok, QMessageBox::NoButton);
     }
     for (int i = 0; i < devList.size(); ++i)
-        new QListWidgetItem(devList[i]->name(), listWidget);
-    if (listWidget->count() > 0) {
-        listWidget->setCurrentRow(0);
+        portCombo->addItem(devList[i]->name());
+    if (portCombo->count() > 0)
         downloadButton->setFocus();
-    }
     setReadyInstruct();
 }
 
@@ -141,7 +128,7 @@ DownloadRideDialog::downloadClicked()
     downloadInProgress = true;
     CommPortPtr dev;
     for (int i = 0; i < devList.size(); ++i) {
-        if (devList[i]->name() == listWidget->currentItem()->text()) {
+        if (devList[i]->name() == portCombo->currentText()) {
             dev = devList[i];
             break;
         }
