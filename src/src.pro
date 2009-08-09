@@ -50,7 +50,7 @@ HEADERS += \
         LogTimeScaleDraw.h \
         LogTimeScaleEngine.h \
         Pages.h \
-        PowerTap.h \
+        PowerTapUtil.h \
         Serial.h \
         ToolsDialog.h \
         Zones.h \
@@ -94,7 +94,7 @@ SOURCES += \
         LogTimeScaleDraw.cpp \
         LogTimeScaleEngine.cpp \
         Pages.cpp \
-        PowerTap.cpp \
+        PowerTapUtil.cpp \
         Serial.cpp \
         ToolsDialog.cpp \
         Zones.cpp \
