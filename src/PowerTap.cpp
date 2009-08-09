@@ -251,6 +251,7 @@ PowerTap::is_time(unsigned char *buf, bool bVer81)
 time_t 
 PowerTap::unpack_time(unsigned char *buf, struct tm *time, bool bVer81)
 {
+    (void) bVer81; // unused
     memset(time, 0, sizeof(*time));
     time->tm_year = 2000 + buf[1] - 1900;
     time->tm_mon = buf[2] - 1;
