@@ -50,7 +50,6 @@ class DownloadRideDialog : public QDialog
 
         QVector<CommPortPtr> devList;
         bool cancelled, downloadInProgress;
-        QVector<unsigned char> records;
 };
 
 #endif // _GC_DownloadRideDialog_h

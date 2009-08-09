@@ -139,9 +139,9 @@ DownloadRideDialog::downloadClicked()
     }
     assert(dev);
     QString err;
-    QByteArray version;
+    QVector<unsigned char> records;
     if (!PowerTapDevice::download(
-            dev, version, records,
+            dev, records,
             boost::bind(&DownloadRideDialog::statusCallback, this, _1), err))
     {
         if (cancelled) {
@@ -157,40 +157,7 @@ DownloadRideDialog::downloadClicked()
         return;
     }
 
-    QString filename, filepath;
-    struct tm time;
-    unsigned char *buf = records.data();
-    bool bIsVer81 = PowerTapUtil::is_Ver81(buf);
-    for (int i = 0; i < records.size(); i += 6) {
-        if (PowerTapUtil::is_time(buf + i, bIsVer81)) {
-            PowerTapUtil::unpack_time(buf + i, &time, bIsVer81);
-            char tmp[32];
-            sprintf(tmp, "%04d_%02d_%02d_%02d_%02d_%02d.raw", 
-                    time.tm_year + 1900, time.tm_mon + 1, 
-                    time.tm_mday, time.tm_hour, time.tm_min,
-                    time.tm_sec);
-            filename = tmp;
-            filepath = home.absolutePath() + "/" + filename;
-            FILE *out = fopen(filepath.toAscii().constData(), "r"); 
-            if (out) {
-                fclose(out);
-                if (QMessageBox::warning(
-                        this,
-                        tr("Ride Already Downloaded"),
-                        tr("This ride appears to have already ")
-                        + tr("been downloaded.  Do you want to ")
-                        + tr("overwrite the previous download?"),
-                        tr("&Overwrite"), tr("&Cancel"), 
-                        QString(), 1, 1) == 1) {
-                    reject();
-                    return;
-                }
-            }
-            break;
-        }
-    }
-
-    QString tmpname;
+    QString tmpname, filename;
     {
         // QTemporaryFile doesn't actually close the file on .close(); it
         // closes the file when in its destructor.  On Windows, we can't
@@ -214,6 +181,7 @@ DownloadRideDialog::downloadClicked()
         struct tm time;
         bool time_set = false;
         unsigned char *data = records.data();
+        bool bIsVer81 = PowerTapUtil::is_Ver81(data);
 
         for (int i = 0; i < records.size(); i += 6) {
             if (data[i] == 0 && !bIsVer81)
@@ -238,12 +206,33 @@ DownloadRideDialog::downloadClicked()
         }
         tmpname = tmp.fileName(); // after close(), tmp.fileName() is ""
         tmp.close();
-
         // QTemporaryFile initially has permissions set to 0600.
         // Make it readable by everyone.
         tmp.setPermissions(tmp.permissions() 
                            | QFile::ReadOwner | QFile::ReadUser
                            | QFile::ReadGroup | QFile::ReadOther);
+
+        char filename_tmp[32];
+        sprintf(filename_tmp, "%04d_%02d_%02d_%02d_%02d_%02d.raw", 
+                time.tm_year + 1900, time.tm_mon + 1, 
+                time.tm_mday, time.tm_hour, time.tm_min,
+                time.tm_sec);
+        filename = filename_tmp;
+    }
+
+    QString filepath = home.absolutePath() + "/" + filename;
+    if (QFile::exists(filepath)) {
+        if (QMessageBox::warning(
+                this,
+                tr("Ride Already Downloaded"),
+                tr("This ride appears to have already ")
+                + tr("been downloaded.  Do you want to ")
+                + tr("overwrite the previous download?"),
+                tr("&Overwrite"), tr("&Cancel"), 
+                QString(), 1, 1) == 1) {
+            reject();
+            return;
+        }
     }
 
 #ifdef __WIN32__

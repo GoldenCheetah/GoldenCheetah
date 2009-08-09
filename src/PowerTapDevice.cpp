@@ -104,8 +104,7 @@ readUntilNewline(CommPortPtr dev, char *buf, int len, QString &err)
 }
 
 bool
-PowerTapDevice::download(CommPortPtr dev, QByteArray &version,
-                         QVector<unsigned char> &records,
+PowerTapDevice::download(CommPortPtr dev, QVector<unsigned char> &records,
                          StatusCallback statusCallback, QString &err)
 {
     if (!dev->open(err)) {
@@ -131,7 +130,7 @@ PowerTapDevice::download(CommPortPtr dev, QByteArray &version,
         printf("read version \"%s\"\n",
                cEscape(vbuf, version_len).toAscii().constData());
     }
-    version = QByteArray(vbuf, version_len);
+    QByteArray version = QByteArray(vbuf, version_len);
 
     // We expect the version string to be something like 
     // "VER 02.21 PRO...", so if we see two V's, it's probably 

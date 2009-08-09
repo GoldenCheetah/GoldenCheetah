@@ -26,8 +26,7 @@ struct PowerTapDevice
 {
     typedef boost::function<bool (const QString &statusText)> StatusCallback;
 
-    static bool download(CommPortPtr dev, QByteArray &version,
-                         QVector<unsigned char> &records,
+    static bool download(CommPortPtr dev, QVector<unsigned char> &records,
                          StatusCallback statusCallback, QString &err);
 };
  
