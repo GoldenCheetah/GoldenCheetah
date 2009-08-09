@@ -46,6 +46,7 @@ class DownloadRideDialog : public QDialog
         QDir home;
         QListWidget *listWidget;
         QPushButton *downloadButton, *rescanButton, *cancelButton;
+        QComboBox *deviceCombo;
         QLabel *label;
 
         QVector<CommPortPtr> devList;
