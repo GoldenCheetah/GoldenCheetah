@@ -20,6 +20,7 @@
 #define _GC_DownloadRideDialog_h 1
 
 #include <QtGui>
+#include "PowerTapDevice.h"
 #include "PowerTapUtil.h"
 
 class MainWindow;
@@ -33,7 +34,7 @@ class DownloadRideDialog : public QDialog
         DownloadRideDialog(MainWindow *mainWindow, const QDir &home);
 
         void downloadFinished();
-        bool statusCallback(PowerTap::State state);
+        bool statusCallback(PowerTapDevice::State state);
 
     private slots:
         void downloadClicked();
