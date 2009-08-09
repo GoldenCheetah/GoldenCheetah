@@ -139,13 +139,13 @@ pt_read_raw(FILE *in, int compat, void *context,
         if (row == 1)
         {
             /* Serial number? */
-            bIsVer81 = PowerTap::is_Ver81(buf);
+            bIsVer81 = PowerTapUtil::is_Ver81(buf);
         }
-        else if (PowerTap::is_ignore_record(buf, bIsVer81)) {
+        else if (PowerTapUtil::is_ignore_record(buf, bIsVer81)) {
             // do nothing
         }
-        else if (PowerTap::is_config(buf, bIsVer81)) {
-            if (PowerTap::unpack_config(buf, &interval, &last_interval, 
+        else if (PowerTapUtil::is_config(buf, bIsVer81)) {
+            if (PowerTapUtil::unpack_config(buf, &interval, &last_interval, 
                                         &rec_int_secs, &wheel_sz_mm, bIsVer81) < 0) {
                 sprintf(ebuf, "Couldn't unpack config record.");
                 if (error_cb) error_cb(ebuf, context);
@@ -153,8 +153,8 @@ pt_read_raw(FILE *in, int compat, void *context,
             }
             if (config_cb) config_cb(interval, rec_int_secs, wheel_sz_mm, context);
         }
-        else if (PowerTap::is_time(buf, bIsVer81)) {
-            since_epoch = PowerTap::unpack_time(buf, &time, bIsVer81);
+        else if (PowerTapUtil::is_time(buf, bIsVer81)) {
+            since_epoch = PowerTapUtil::unpack_time(buf, &time, bIsVer81);
             bool ignore = false;
             if (start_secs == 0.0)
                 start_secs = since_epoch;
@@ -169,14 +169,14 @@ pt_read_raw(FILE *in, int compat, void *context,
             }
             if (time_cb && !ignore) time_cb(&time, since_epoch, context);
         }
-        else if (PowerTap::is_data(buf, bIsVer81)) {
+        else if (PowerTapUtil::is_data(buf, bIsVer81)) {
             if (wheel_sz_mm == 0) {
                 sprintf(ebuf, "Read data row before wheel size set.");
                 if (error_cb) error_cb(ebuf, context);
                 return;
             }
-            PowerTap::unpack_data(buf, compat, rec_int_secs, wheel_sz_mm, &secs,
-                                  &nm, &mph, &watts, &meters, &cad, &hr, bIsVer81);
+            PowerTapUtil::unpack_data(buf, compat, rec_int_secs, wheel_sz_mm, &secs,
+                                      &nm, &mph, &watts, &meters, &cad, &hr, bIsVer81);
             if (compat)
                 miles = round(meters) / 1000.0 * BAD_KM_TO_MI;
             else 

@@ -117,26 +117,27 @@ DownloadRideDialog::scanCommPorts()
 }
 
 bool
-DownloadRideDialog::statusCallback(PowerTap::State state)
+DownloadRideDialog::statusCallback(PowerTapDevice::State state)
 {
-    if (state == PowerTap::STATE_READING_VERSION)
+    if (state == PowerTapDevice::STATE_READING_VERSION)
         label->setText("Reading version...");
-    else if (state == PowerTap::STATE_READING_HEADER)
+    else if (state == PowerTapDevice::STATE_READING_HEADER)
         label->setText(label->text() + "done.\nReading header...");
-    else if (state == PowerTap::STATE_READING_DATA) {
+    else if (state == PowerTapDevice::STATE_READING_DATA) {
         label->setText(label->text() + "done.\nReading ride data...\n");
         endingOffset = label->text().length();
     }
     else {
-        assert(state == PowerTap::STATE_DATA_AVAILABLE);
+        assert(state == PowerTapDevice::STATE_DATA_AVAILABLE);
         unsigned char *buf = records.data();
-        bool bIsVer81 = PowerTap::is_Ver81(buf);
+        bool bIsVer81 = PowerTapUtil::is_Ver81(buf);
         if (recIntSecs == 0.0) {
             for (int i = 0; i < records.size(); i += 6) {
-                if (PowerTap::is_config(buf + i, bIsVer81)) {
+                if (PowerTapUtil::is_config(buf + i, bIsVer81)) {
                     unsigned unused1, unused2, unused3;
-                    PowerTap::unpack_config(buf + i, &unused1, &unused2,
-                                            &recIntSecs, &unused3, bIsVer81);
+                    PowerTapUtil::unpack_config(buf + i, &unused1, &unused2,
+                                                &recIntSecs, &unused3,
+                                                bIsVer81);
                 }
             }
         }
@@ -151,8 +152,8 @@ DownloadRideDialog::statusCallback(PowerTap::State state)
         if (filename == "") {
             struct tm time;
             for (int i = 0; i < records.size(); i += 6) {
-                if (PowerTap::is_time(buf + i, bIsVer81)) {
-                    PowerTap::unpack_time(buf + i, &time, bIsVer81);
+                if (PowerTapUtil::is_time(buf + i, bIsVer81)) {
+                    PowerTapUtil::unpack_time(buf + i, &time, bIsVer81);
                     char tmp[32];
                     sprintf(tmp, "%04d_%02d_%02d_%02d_%02d_%02d.raw", 
                             time.tm_year + 1900, time.tm_mon + 1, 
@@ -201,7 +202,7 @@ DownloadRideDialog::downloadClicked()
     assert(dev);
     QString err;
     QByteArray version;
-    if (!PowerTap::download(
+    if (!PowerTapDevice::download(
             dev, version, records,
             boost::bind(&DownloadRideDialog::statusCallback, this, _1), err))
     {
@@ -242,7 +243,7 @@ DownloadRideDialog::downloadClicked()
         struct tm time;
         bool time_set = false;
         unsigned char *data = records.data();
-        bool bIsVer81 = PowerTap::is_Ver81(data);
+        bool bIsVer81 = PowerTapUtil::is_Ver81(data);
 
         for (int i = 0; i < records.size(); i += 6) {
             if (data[i] == 0 && !bIsVer81)
@@ -253,8 +254,8 @@ DownloadRideDialog::downloadClicked()
                 os.setFieldWidth(1);
                 os << ((j == 5) ? "\n" : " ");
             }
-            if (!time_set && PowerTap::is_time(data + i, bIsVer81)) {
-                PowerTap::unpack_time(data + i, &time, bIsVer81);
+            if (!time_set && PowerTapUtil::is_time(data + i, bIsVer81)) {
+                PowerTapUtil::unpack_time(data + i, &time, bIsVer81);
                 time_set = true;
             }
         }

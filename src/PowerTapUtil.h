@@ -16,27 +16,13 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _GC_PT_PowerTap_h
-#define _GC_PT_PowerTap_h 1
+#ifndef _GC_PowerTapUtil_h
+#define _GC_PowerTapUtil_h 1
 
-#include "CommPort.h"
-#include <boost/function.hpp>
+#include <time.h>
 
-struct PowerTap 
+struct PowerTapUtil
 {
-    enum State {
-        STATE_READING_VERSION,
-        STATE_READING_HEADER,
-        STATE_READING_DATA,
-        STATE_DATA_AVAILABLE
-    };
-
-    typedef boost::function<bool (State state)> StatusCallback;
-
-    static bool download(CommPortPtr dev, QByteArray &version,
-                         QVector<unsigned char> &records,
-                         StatusCallback statusCallback, QString &err);
-
     static bool is_Ver81(unsigned char *bufHeader);
 
     static bool is_ignore_record(unsigned char *buf, bool bVer81);
@@ -56,5 +42,5 @@ struct PowerTap
                             double *dist_m, unsigned *cad, unsigned *hr, bool bVer81);
 };
  
-#endif // _GC_PT_PowerTap_h
+#endif // _GC_PowerTapUtil_h
 
