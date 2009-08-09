@@ -30,7 +30,7 @@
 DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
                                        const QDir &home) : 
     mainWindow(mainWindow), home(home), cancelled(false),
-    downloadInProgress(false), recIntSecs(0.0), endingOffset(0)
+    downloadInProgress(false)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("Download Ride Data");
@@ -117,39 +117,9 @@ DownloadRideDialog::scanCommPorts()
 }
 
 bool
-DownloadRideDialog::statusCallback(PowerTapDevice::State state)
+DownloadRideDialog::statusCallback(const QString &statusText)
 {
-    if (state == PowerTapDevice::STATE_READING_VERSION)
-        label->setText("Reading version...");
-    else if (state == PowerTapDevice::STATE_READING_HEADER)
-        label->setText(label->text() + "done.\nReading header...");
-    else if (state == PowerTapDevice::STATE_READING_DATA) {
-        label->setText(label->text() + "done.\nReading ride data...\n");
-        endingOffset = label->text().length();
-    }
-    else {
-        assert(state == PowerTapDevice::STATE_DATA_AVAILABLE);
-        unsigned char *buf = records.data();
-        bool bIsVer81 = PowerTapUtil::is_Ver81(buf);
-        if (recIntSecs == 0.0) {
-            for (int i = 0; i < records.size(); i += 6) {
-                if (PowerTapUtil::is_config(buf + i, bIsVer81)) {
-                    unsigned unused1, unused2, unused3;
-                    PowerTapUtil::unpack_config(buf + i, &unused1, &unused2,
-                                                &recIntSecs, &unused3,
-                                                bIsVer81);
-                }
-            }
-        }
-        if (recIntSecs != 0.0) {
-            int min = (int) round(records.size() / 6 * recIntSecs);
-            QString existing = label->text();
-            existing.chop(existing.size() - endingOffset);
-            existing.append(QString("Ride data read: %1:%2").arg(min / 60)
-                            .arg(min % 60, 2, 10, QLatin1Char('0')));
-            label->setText(existing);
-        }
-    }
+    label->setText(statusText);
     QCoreApplication::processEvents();
     return !cancelled;
 }
