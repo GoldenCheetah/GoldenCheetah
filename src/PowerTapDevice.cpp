@@ -22,6 +22,9 @@
 
 #define PT_DEBUG false
 
+static bool powerTapRegistered =
+    Device::addDevice("PowerTap", new PowerTapDevice());
+
 static bool
 hasNewline(const char *buf, int len)
 {

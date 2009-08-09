@@ -16,18 +16,26 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _GC_PowerTapDevice_h
-#define _GC_PowerTapDevice_h 1
+#ifndef _GC_Device_h
+#define _GC_Device_h 1
 
 #include "CommPort.h"
-#include "Device.h"
+#include <boost/function.hpp>
 
-struct PowerTapDevice : public Device
+struct Device
 {
+    virtual ~Device() {}
+
+    typedef boost::function<bool (const QString &statusText)> StatusCallback;
+
     virtual bool download(CommPortPtr dev, const QDir &tmpdir,
                           QString &tmpname, QString &filename,
-                          StatusCallback statusCallback, QString &err);
+                          StatusCallback statusCallback, QString &err) = 0;
+
+    static QList<QString> deviceTypes();
+    static Device &device(const QString &deviceType);
+    static bool addDevice(const QString &deviceType, Device *device);
 };
  
-#endif // _GC_PowerTapDevice_h
+#endif // _GC_Device_h
 

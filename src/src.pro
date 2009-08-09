@@ -30,6 +30,7 @@ HEADERS += \
         CpintPlot.h \
         CsvRideFile.h \
         DBAccess.h \
+        Device.h \
         DownloadRideDialog.h \
         MainWindow.h \
         PfPvPlot.h \
@@ -73,6 +74,7 @@ SOURCES += \
         CpintPlot.cpp \
         CsvRideFile.cpp \
         DBAccess.cpp \
+        Device.cpp \
         DownloadRideDialog.cpp \
         MainWindow.cpp \
         PfPvPlot.cpp \

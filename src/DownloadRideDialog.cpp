@@ -19,8 +19,8 @@
  */
 
 #include "DownloadRideDialog.h"
+#include "Device.h"
 #include "MainWindow.h"
-#include "PowerTapDevice.h"
 #include <assert.h>
 #include <errno.h>
 #include <QtGui>
@@ -139,7 +139,8 @@ DownloadRideDialog::downloadClicked()
     assert(dev);
     QString err;
     QString tmpname, filename;
-    if (!PowerTapDevice::download(
+    Device &device = Device::device("PowerTap");
+    if (!device.download(
             dev, home, tmpname, filename,
             boost::bind(&DownloadRideDialog::statusCallback, this, _1), err))
     {
