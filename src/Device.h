@@ -28,6 +28,7 @@ struct Device
 
     typedef boost::function<bool (const QString &statusText)> StatusCallback;
 
+    virtual QString downloadInstructions() const = 0;
     virtual bool download(CommPortPtr dev, const QDir &tmpdir,
                           QString &tmpname, QString &filename,
                           StatusCallback statusCallback, QString &err) = 0;
