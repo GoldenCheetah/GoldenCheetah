@@ -104,7 +104,8 @@ readUntilNewline(CommPortPtr dev, char *buf, int len, QString &err)
 }
 
 bool
-PowerTapDevice::download(CommPortPtr dev, QVector<unsigned char> &records,
+PowerTapDevice::download(CommPortPtr dev, const QDir &tmpdir,
+                         QString &tmpname, QString &filename,
                          StatusCallback statusCallback, QString &err)
 {
     if (!dev->open(err)) {
@@ -167,6 +168,7 @@ PowerTapDevice::download(CommPortPtr dev, QVector<unsigned char> &records,
                cEscape((char*) header, 
                        sizeof(header)).toAscii().constData());
     }
+    QVector<unsigned char> records;
     for (size_t i = 0; i < sizeof(header); ++i)
         records.append(header[i]);
 
@@ -248,6 +250,58 @@ PowerTapDevice::download(CommPortPtr dev, QVector<unsigned char> &records,
         if (!doWrite(dev, 0x71, hwecho, err)) // 'q'
             return false;
     }
+
+    QString tmpl = tmpdir.absoluteFilePath(".ptdl.XXXXXX");
+    QTemporaryFile tmp(tmpl);
+    tmp.setAutoRemove(false);
+    if (!tmp.open()) {
+        err = "Failed to create temporary file "
+            + tmpl + ": " + tmp.error();
+        return false;
+    }
+    QTextStream os(&tmp);
+    os << hex;
+    os.setPadChar('0');
+
+    struct tm time;
+    bool time_set = false;
+    unsigned char *data = records.data();
+    bool bIsVer81 = PowerTapUtil::is_Ver81(data);
+
+    for (int i = 0; i < records.size(); i += 6) {
+        if (data[i] == 0 && !bIsVer81)
+            continue;
+        for (int j = 0; j < 6; ++j) {
+            os.setFieldWidth(2);
+            os << data[i+j];
+            os.setFieldWidth(1);
+            os << ((j == 5) ? "\n" : " ");
+        }
+        if (!time_set && PowerTapUtil::is_time(data + i, bIsVer81)) {
+            PowerTapUtil::unpack_time(data + i, &time, bIsVer81);
+            time_set = true;
+        }
+    }
+    if (!time_set) {
+        err = "Failed to find ride time.";
+        tmp.setAutoRemove(true);
+        return false;
+    }
+    tmpname = tmp.fileName(); // after close(), tmp.fileName() is ""
+    tmp.close();
+    // QTemporaryFile initially has permissions set to 0600.
+    // Make it readable by everyone.
+    tmp.setPermissions(tmp.permissions()
+                       | QFile::ReadOwner | QFile::ReadUser
+                       | QFile::ReadGroup | QFile::ReadOther);
+
+    char filename_tmp[32];
+    sprintf(filename_tmp, "%04d_%02d_%02d_%02d_%02d_%02d.raw",
+            time.tm_year + 1900, time.tm_mon + 1,
+            time.tm_mday, time.tm_hour, time.tm_min,
+            time.tm_sec);
+    filename = filename_tmp;
+
     return true;
 }
 

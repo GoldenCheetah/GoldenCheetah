@@ -21,7 +21,6 @@
 #include "DownloadRideDialog.h"
 #include "MainWindow.h"
 #include "PowerTapDevice.h"
-#include "PowerTapUtil.h"
 #include <assert.h>
 #include <errno.h>
 #include <QtGui>
@@ -139,9 +138,9 @@ DownloadRideDialog::downloadClicked()
     }
     assert(dev);
     QString err;
-    QVector<unsigned char> records;
+    QString tmpname, filename;
     if (!PowerTapDevice::download(
-            dev, records,
+            dev, home, tmpname, filename,
             boost::bind(&DownloadRideDialog::statusCallback, this, _1), err))
     {
         if (cancelled) {
@@ -155,69 +154,6 @@ DownloadRideDialog::downloadClicked()
         downloadInProgress = false;
         reject();
         return;
-    }
-
-    QString tmpname, filename;
-    {
-        // QTemporaryFile doesn't actually close the file on .close(); it
-        // closes the file when in its destructor.  On Windows, we can't
-        // rename an open file.  So let tmp go out of scope before calling
-        // rename.
-
-        QString tmpl = home.absoluteFilePath(".ptdl.XXXXXX");
-        QTemporaryFile tmp(tmpl);
-        tmp.setAutoRemove(false);
-        if (!tmp.open()) {
-            QMessageBox::critical(this, tr("Error"), 
-                                  tr("Failed to create temporary file ")
-                                  + tmpl + ": " + tmp.error());
-            reject();
-            return;
-        }
-        QTextStream os(&tmp);
-        os << hex;
-        os.setPadChar('0');
-
-        struct tm time;
-        bool time_set = false;
-        unsigned char *data = records.data();
-        bool bIsVer81 = PowerTapUtil::is_Ver81(data);
-
-        for (int i = 0; i < records.size(); i += 6) {
-            if (data[i] == 0 && !bIsVer81)
-                continue;
-            for (int j = 0; j < 6; ++j) {
-                os.setFieldWidth(2);
-                os << data[i+j];
-                os.setFieldWidth(1);
-                os << ((j == 5) ? "\n" : " ");
-            }
-            if (!time_set && PowerTapUtil::is_time(data + i, bIsVer81)) {
-                PowerTapUtil::unpack_time(data + i, &time, bIsVer81);
-                time_set = true;
-            }
-        }
-        if (!time_set) {
-            QMessageBox::critical(this, tr("Error"), 
-                                  tr("Failed to find ride time."));
-            tmp.setAutoRemove(true);
-            reject();
-            return;
-        }
-        tmpname = tmp.fileName(); // after close(), tmp.fileName() is ""
-        tmp.close();
-        // QTemporaryFile initially has permissions set to 0600.
-        // Make it readable by everyone.
-        tmp.setPermissions(tmp.permissions() 
-                           | QFile::ReadOwner | QFile::ReadUser
-                           | QFile::ReadGroup | QFile::ReadOther);
-
-        char filename_tmp[32];
-        sprintf(filename_tmp, "%04d_%02d_%02d_%02d_%02d_%02d.raw", 
-                time.tm_year + 1900, time.tm_mon + 1, 
-                time.tm_mday, time.tm_hour, time.tm_min,
-                time.tm_sec);
-        filename = filename_tmp;
     }
 
     QString filepath = home.absolutePath() + "/" + filename;
