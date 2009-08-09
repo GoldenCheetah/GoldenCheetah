@@ -21,7 +21,6 @@
 
 #include <QtGui>
 #include <qdatetimeedit.h>
-#include "PowerTap.h"
 
 class MainWindow;
 
