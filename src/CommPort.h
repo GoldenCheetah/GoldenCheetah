@@ -16,24 +16,24 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _GC_PT_Device_h
-#define _GC_PT_Device_h 1
+#ifndef _GC_CommPort_h
+#define _GC_CommPort_h 1
 
 #include <QtCore>
 #include <boost/shared_ptr.hpp>
 
-class Device;
-typedef boost::shared_ptr<Device> DevicePtr;
+class CommPort;
+typedef boost::shared_ptr<CommPort> CommPortPtr;
 
-class Device
+class CommPort
 {
     public:
 
-    typedef QVector<DevicePtr> (*ListFunction)(QString &err);
+    typedef QVector<CommPortPtr> (*ListFunction)(QString &err);
     static bool addListFunction(ListFunction f);
-    static QVector<DevicePtr> listDevices(QString &err);
+    static QVector<CommPortPtr> listCommPorts(QString &err);
 
-    virtual ~Device() {}
+    virtual ~CommPort() {}
     virtual bool open(QString &err) = 0;
     virtual void close() = 0;
     virtual int read(void *buf, size_t nbyte, QString &err) = 0;
@@ -42,5 +42,5 @@ class Device
 
 };
 
-#endif // _GC_PT_Device_h
+#endif // _GC_CommPort_h
 

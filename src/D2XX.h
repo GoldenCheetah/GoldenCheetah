@@ -19,10 +19,10 @@
 #ifndef _GC_PT_D2XX_h
 #define _GC_PT_D2XX_h 1
 
-#include "Device.h"
+#include "CommPort.h"
 #include <D2XX/ftd2xx.h>
 
-class D2XX : public Device
+class D2XX : public CommPort
 {
     D2XX(const D2XX &);
     D2XX& operator=(const D2XX &);
@@ -34,7 +34,7 @@ class D2XX : public Device
 
     public:
 
-    static QVector<DevicePtr> myListDevices(QString &err);
+    static QVector<CommPortPtr> myListCommPorts(QString &err);
 
     virtual ~D2XX();
     virtual bool open(QString &err);

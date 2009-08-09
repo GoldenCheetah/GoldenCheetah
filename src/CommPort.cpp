@@ -16,27 +16,27 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "Device.h"
+#include "CommPort.h"
 #include "Serial.h"
 
-static QVector<Device::ListFunction> *listFunctions;
+static QVector<CommPort::ListFunction> *listFunctions;
 
 bool
-Device::addListFunction(ListFunction f)
+CommPort::addListFunction(ListFunction f)
 {
     if (!listFunctions)
-        listFunctions = new QVector<Device::ListFunction>;
+        listFunctions = new QVector<CommPort::ListFunction>;
     listFunctions->append(f);
     return true;
 }
 
-QVector<DevicePtr>
-Device::listDevices(QString &err)
+QVector<CommPortPtr>
+CommPort::listCommPorts(QString &err)
 {
     err = "";
-    QVector<DevicePtr> result;
+    QVector<CommPortPtr> result;
     for (int i = 0; listFunctions && i < listFunctions->size(); ++i) {
-        QVector<DevicePtr> tmp = (*listFunctions)[i](err);
+        QVector<CommPortPtr> tmp = (*listFunctions)[i](err);
         if (err == "")
             result << tmp;
         else

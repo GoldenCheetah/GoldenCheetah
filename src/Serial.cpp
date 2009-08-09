@@ -33,7 +33,7 @@
 #include <termios.h>
 #include <unistd.h>
 
-bool SerialRegistered = Device::addListFunction(&Serial::myListDevices);
+bool SerialRegistered = CommPort::addListFunction(&Serial::myListCommPorts);
 
 Serial::Serial(const QString &path) : path(path), fd(-1) 
 {
@@ -208,16 +208,16 @@ find_devices(char *result[], int capacity)
     return count;
 }
 
-QVector<DevicePtr>
-Serial::myListDevices(QString &err)
+QVector<CommPortPtr>
+Serial::myListCommPorts(QString &err)
 {
     static const int MAX_DEVICES = 100;
     (void) err;
-    QVector<DevicePtr> result;
+    QVector<CommPortPtr> result;
     char *devices[MAX_DEVICES];
     int devcnt = find_devices(devices, MAX_DEVICES);
     for (int i = 0; i < devcnt; ++i) {
-        result.append(DevicePtr(new Serial(devices[i])));
+        result.append(CommPortPtr(new Serial(devices[i])));
         free(devices[i]);
     }
     return result;

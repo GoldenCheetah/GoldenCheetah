@@ -39,7 +39,7 @@ class DownloadRideDialog : public QDialog
         void downloadClicked();
         void cancelClicked();
         void setReadyInstruct();
-        void scanDevices();
+        void scanCommPorts();
 
     private:
  
@@ -49,7 +49,7 @@ class DownloadRideDialog : public QDialog
         QPushButton *downloadButton, *rescanButton, *cancelButton;
         QLabel *label;
 
-        QVector<DevicePtr> devList;
+        QVector<CommPortPtr> devList;
         bool cancelled, downloadInProgress;
         double recIntSecs;
         int endingOffset;
