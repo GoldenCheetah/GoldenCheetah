@@ -25,6 +25,7 @@
 #include <errno.h>
 #include <QtGui>
 #include <boost/bind.hpp>
+#include <boost/foreach.hpp>
 
 DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
                                        const QDir &home) : 
@@ -41,6 +42,13 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     QLabel *instructLabel = new QLabel(tr("Instructions:"), this);
     label = new QLabel(this);
     label->setIndent(10);
+
+    deviceCombo = new QComboBox();
+    QList<QString> deviceTypes = Device::deviceTypes();
+    assert(deviceTypes.size() > 0);
+    BOOST_FOREACH(QString device, deviceTypes) {
+        deviceCombo->addItem(device);
+    }
 
     downloadButton = new QPushButton(tr("&Download"), this);
     rescanButton = new QPushButton(tr("&Rescan"), this);
@@ -62,6 +70,8 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(availLabel);
     mainLayout->addWidget(listWidget);
+    mainLayout->addWidget(new QLabel(tr("Select device type:"), this));
+    mainLayout->addWidget(deviceCombo);
     mainLayout->addWidget(instructLabel);
     mainLayout->addWidget(label);
     mainLayout->addLayout(buttonLayout);
@@ -139,7 +149,7 @@ DownloadRideDialog::downloadClicked()
     assert(dev);
     QString err;
     QString tmpname, filename;
-    Device &device = Device::device("PowerTap");
+    Device &device = Device::device(deviceCombo->currentText());
     if (!device.download(
             dev, home, tmpname, filename,
             boost::bind(&DownloadRideDialog::statusCallback, this, _1), err))
