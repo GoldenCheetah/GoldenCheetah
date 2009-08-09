@@ -58,7 +58,7 @@ cEscape(const char *buf, int len)
 }
 
 static bool
-doWrite(DevicePtr dev, char c, bool hwecho, QString &err)
+doWrite(CommPortPtr dev, char c, bool hwecho, QString &err)
 {
     if (PT_DEBUG) printf("writing '%c' to device\n", c);
     int n = dev->write(&c, 1, err);
@@ -84,7 +84,7 @@ doWrite(DevicePtr dev, char c, bool hwecho, QString &err)
 }
 
 static int
-readUntilNewline(DevicePtr dev, char *buf, int len, QString &err)
+readUntilNewline(CommPortPtr dev, char *buf, int len, QString &err)
 {
     int sofar = 0;
     while (!hasNewline(buf, sofar)) {
@@ -103,7 +103,7 @@ readUntilNewline(DevicePtr dev, char *buf, int len, QString &err)
 }
 
 bool
-PowerTap::download(DevicePtr dev, QByteArray &version,
+PowerTap::download(CommPortPtr dev, QByteArray &version,
                    QVector<unsigned char> &records,
                    StatusCallback statusCallback, QString &err)
 {

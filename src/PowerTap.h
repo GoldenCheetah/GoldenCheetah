@@ -19,7 +19,7 @@
 #ifndef _GC_PT_PowerTap_h
 #define _GC_PT_PowerTap_h 1
 
-#include "Device.h"
+#include "CommPort.h"
 #include <boost/function.hpp>
 
 struct PowerTap 
@@ -33,7 +33,7 @@ struct PowerTap
 
     typedef boost::function<bool (State state)> StatusCallback;
 
-    static bool download(DevicePtr dev, QByteArray &version,
+    static bool download(CommPortPtr dev, QByteArray &version,
                          QVector<unsigned char> &records,
                          StatusCallback statusCallback, QString &err);
 

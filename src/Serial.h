@@ -19,9 +19,9 @@
 #ifndef _GC_PT_Serial_h
 #define _GC_PT_Serial_h 1
 
-#include "Device.h"
+#include "CommPort.h"
 
-class Serial : public Device
+class Serial : public CommPort
 {
     Serial(const Serial &);
     Serial& operator=(const Serial &);
@@ -32,7 +32,7 @@ class Serial : public Device
 
     public:
 
-    static QVector<DevicePtr> myListDevices(QString &err);
+    static QVector<CommPortPtr> myListCommPorts(QString &err);
 
     virtual ~Serial();
     virtual bool open(QString &err);

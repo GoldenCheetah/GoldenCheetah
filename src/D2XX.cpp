@@ -92,7 +92,7 @@ struct D2XXWrapper {
 
 static D2XXWrapper *lib; // singleton lib instance
 
-bool D2XXRegistered = Device::addListFunction(&D2XX::myListDevices);
+bool D2XXRegistered = CommPort::addListFunction(&D2XX::myListCommPorts);
 
 D2XX::D2XX(const FT_DEVICE_LIST_INFO_NODE &info) :
     info(info), isOpen(false)
@@ -189,10 +189,10 @@ D2XX::name() const
     return QString("D2XX: ") + info.Description;
 }
 
-QVector<DevicePtr>
-D2XX::myListDevices(QString &err)
+QVector<CommPortPtr>
+D2XX::myListCommPorts(QString &err)
 {
-    QVector<DevicePtr> result;
+    QVector<CommPortPtr> result;
     if (!lib) {
         lib = new D2XXWrapper;
         if (!lib->init(err)) {
@@ -213,13 +213,13 @@ D2XX::myListDevices(QString &err)
         err = QString("FT_GetDeviceInfoList: %1").arg(ftStatus); 
     else {
         for (DWORD i = 0; i < numDevs; i++)
-            result.append(DevicePtr(new D2XX(devInfo[i])));
+            result.append(CommPortPtr(new D2XX(devInfo[i])));
     }
     delete [] devInfo;
     // If we can't open a D2XX device, it's usually because the VCP drivers
     // are installed, so it should also show up in the list of serial devices.
     for (int i = 0; i < result.size(); ++i) {
-        DevicePtr dev = result[i];
+        CommPortPtr dev = result[i];
         QString tmp;
         if (dev->open(tmp))
             dev->close();

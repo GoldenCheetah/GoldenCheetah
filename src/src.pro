@@ -46,7 +46,7 @@ HEADERS += \
         ConfigDialog.h \
         D2XX.h \
         DatePickerDialog.h \
-        Device.h \
+        CommPort.h \
         LogTimeScaleDraw.h \
         LogTimeScaleEngine.h \
         Pages.h \
@@ -90,7 +90,7 @@ SOURCES += \
         ConfigDialog.cpp \
         D2XX.cpp \
         DatePickerDialog.cpp \
-        Device.cpp \
+        CommPort.cpp \
         LogTimeScaleDraw.cpp \
         LogTimeScaleEngine.cpp \
         Pages.cpp \

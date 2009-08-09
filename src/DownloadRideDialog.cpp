@@ -48,7 +48,7 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     cancelButton = new QPushButton(tr("&Cancel"), this);
 
     connect(downloadButton, SIGNAL(clicked()), this, SLOT(downloadClicked()));
-    connect(rescanButton, SIGNAL(clicked()), this, SLOT(scanDevices()));
+    connect(rescanButton, SIGNAL(clicked()), this, SLOT(scanCommPorts()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
     connect(listWidget, 
             SIGNAL(itemSelectionChanged()), this, SLOT(setReadyInstruct()));
@@ -67,7 +67,7 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     mainLayout->addWidget(label);
     mainLayout->addLayout(buttonLayout);
 
-    scanDevices();
+    scanCommPorts();
 }
 
 void 
@@ -96,11 +96,11 @@ DownloadRideDialog::setReadyInstruct()
 }
 
 void
-DownloadRideDialog::scanDevices()
+DownloadRideDialog::scanCommPorts()
 {
     listWidget->clear();
     QString err;
-    devList = Device::listDevices(err);
+    devList = CommPort::listCommPorts(err);
     if (err != "") {
         QString msg = "Warning:\n\n" + err + "You may need to (re)install "
             "the FTDI drivers before downloading.";
@@ -191,7 +191,7 @@ DownloadRideDialog::downloadClicked()
     downloadButton->setEnabled(false);
     rescanButton->setEnabled(false);
     downloadInProgress = true;
-    DevicePtr dev;
+    CommPortPtr dev;
     for (int i = 0; i < devList.size(); ++i) {
         if (devList[i]->name() == listWidget->currentItem()->text()) {
             dev = devList[i];
