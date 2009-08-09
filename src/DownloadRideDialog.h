@@ -34,7 +34,7 @@ class DownloadRideDialog : public QDialog
         DownloadRideDialog(MainWindow *mainWindow, const QDir &home);
 
         void downloadFinished();
-        bool statusCallback(PowerTapDevice::State state);
+        bool statusCallback(const QString &statusText);
 
     private slots:
         void downloadClicked();
@@ -52,8 +52,6 @@ class DownloadRideDialog : public QDialog
 
         QVector<CommPortPtr> devList;
         bool cancelled, downloadInProgress;
-        double recIntSecs;
-        int endingOffset;
         QVector<unsigned char> records;
 };
 

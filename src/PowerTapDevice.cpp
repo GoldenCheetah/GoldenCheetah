@@ -115,7 +115,9 @@ PowerTapDevice::download(CommPortPtr dev, QByteArray &version,
 
     if (!doWrite(dev, 0x56, false, err)) // 'V'
         return false;
-    if (!statusCallback(STATE_READING_VERSION)) {
+
+    QString cbtext = "Reading version...";
+    if (!statusCallback(cbtext)) {
         err = "download cancelled";
         return false;
     }
@@ -144,7 +146,8 @@ PowerTapDevice::download(CommPortPtr dev, QByteArray &version,
     bool hwecho = version.indexOf('V') < veridx;
     if (PT_DEBUG) printf("hwecho=%s\n", hwecho ? "true" : "false");
 
-    if (!statusCallback(STATE_READING_HEADER)) {
+    cbtext += "done.\nReading header...";
+    if (!statusCallback(cbtext)) {
         err = "download cancelled";
         return false;
     }
@@ -168,10 +171,13 @@ PowerTapDevice::download(CommPortPtr dev, QByteArray &version,
     for (size_t i = 0; i < sizeof(header); ++i)
         records.append(header[i]);
 
-    if (!statusCallback(STATE_READING_DATA)) {
+    cbtext += "done.\nReading ride data...\n";
+    if (!statusCallback(cbtext)) {
         err = "download cancelled";
         return false;
     }
+    int cbtextlen = cbtext.length();
+    double recIntSecs = 0.0;
 
     fflush(stdout);
     while (true) {
@@ -218,7 +224,25 @@ PowerTapDevice::download(CommPortPtr dev, QByteArray &version,
         if (PT_DEBUG) printf("good checksum\n");
         for (size_t i = 0; i < sizeof(buf) - 1; ++i)
             records.append(buf[i]);
-        if (!statusCallback(STATE_DATA_AVAILABLE)) {
+        if (recIntSecs == 0.0) {
+            unsigned char *data = records.data();
+            bool bIsVer81 = PowerTapUtil::is_Ver81(data);
+            for (int i = 0; i < records.size(); i += 6) {
+                if (PowerTapUtil::is_config(data + i, bIsVer81)) {
+                    unsigned unused1, unused2, unused3;
+                    PowerTapUtil::unpack_config(
+                        data + i, &unused1, &unused2,
+                        &recIntSecs, &unused3, bIsVer81);
+                }
+            }
+        }
+        if (recIntSecs != 0.0) {
+            int min = (int) round(records.size() / 6 * recIntSecs);
+            cbtext.chop(cbtext.size() - cbtextlen);
+            cbtext.append(QString("Ride data read: %1:%2").arg(min / 60)
+                            .arg(min % 60, 2, 10, QLatin1Char('0')));
+        }
+        if (!statusCallback(cbtext)) {
             err = "download cancelled";
             return false;
         }

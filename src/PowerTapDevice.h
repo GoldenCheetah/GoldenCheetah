@@ -24,14 +24,7 @@
 
 struct PowerTapDevice
 {
-    enum State {
-        STATE_READING_VERSION,
-        STATE_READING_HEADER,
-        STATE_READING_DATA,
-        STATE_DATA_AVAILABLE
-    };
-
-    typedef boost::function<bool (State state)> StatusCallback;
+    typedef boost::function<bool (const QString &statusText)> StatusCallback;
 
     static bool download(CommPortPtr dev, QByteArray &version,
                          QVector<unsigned char> &records,
