@@ -16,18 +16,28 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _GC_PowerTapDevice_h
-#define _GC_PowerTapDevice_h 1
-
-#include "CommPort.h"
 #include "Device.h"
 
-struct PowerTapDevice : public Device
-{
-    virtual bool download(CommPortPtr dev, const QDir &tmpdir,
-                          QString &tmpname, QString &filename,
-                          StatusCallback statusCallback, QString &err);
-};
- 
-#endif // _GC_PowerTapDevice_h
+static QMap<QString,Device*> devices;
 
+QList<QString>
+Device::deviceTypes()
+{
+    return devices.keys();
+}
+
+Device &
+Device::device(const QString &deviceType)
+{
+    assert(devices.contains(deviceType));
+    return *devices.value(deviceType);
+}
+
+bool
+Device::addDevice(const QString &deviceType, Device *device)
+{
+    assert(!devices.contains(deviceType));
+    devices.insert(deviceType, device);
+    return true;
+}
+ 
