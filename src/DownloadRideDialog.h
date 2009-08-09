@@ -55,7 +55,6 @@ class DownloadRideDialog : public QDialog
         double recIntSecs;
         int endingOffset;
         QVector<unsigned char> records;
-        QString filename, filepath;
 };
 
 #endif // _GC_DownloadRideDialog_h
