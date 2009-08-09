@@ -149,38 +149,6 @@ DownloadRideDialog::statusCallback(PowerTapDevice::State state)
                             .arg(min % 60, 2, 10, QLatin1Char('0')));
             label->setText(existing);
         }
-        if (filename == "") {
-            struct tm time;
-            for (int i = 0; i < records.size(); i += 6) {
-                if (PowerTapUtil::is_time(buf + i, bIsVer81)) {
-                    PowerTapUtil::unpack_time(buf + i, &time, bIsVer81);
-                    char tmp[32];
-                    sprintf(tmp, "%04d_%02d_%02d_%02d_%02d_%02d.raw", 
-                            time.tm_year + 1900, time.tm_mon + 1, 
-                            time.tm_mday, time.tm_hour, time.tm_min,
-                            time.tm_sec);
-                    filename = tmp;
-                    filepath = home.absolutePath() + "/" + filename;
-                    FILE *out = fopen(filepath.toAscii().constData(), "r"); 
-                    if (out) {
-                        fclose(out);
-                        if (QMessageBox::warning(
-                                this,
-                                tr("Ride Already Downloaded"),
-                                tr("This ride appears to have already ")
-                                + tr("been downloaded.  Do you want to ")
-                                + tr("download it again and overwrite ")
-                                + tr("the previous download?"),
-                                tr("&Overwrite"), tr("&Cancel"), 
-                                QString(), 1, 1) == 1) {
-                            reject();
-                            return false;
-                        }
-                    }
-                    break;
-                }
-            }
-        }
     }
     QCoreApplication::processEvents();
     return !cancelled;
@@ -219,6 +187,39 @@ DownloadRideDialog::downloadClicked()
         return;
     }
 
+    QString filename, filepath;
+    struct tm time;
+    unsigned char *buf = records.data();
+    bool bIsVer81 = PowerTapUtil::is_Ver81(buf);
+    for (int i = 0; i < records.size(); i += 6) {
+        if (PowerTapUtil::is_time(buf + i, bIsVer81)) {
+            PowerTapUtil::unpack_time(buf + i, &time, bIsVer81);
+            char tmp[32];
+            sprintf(tmp, "%04d_%02d_%02d_%02d_%02d_%02d.raw", 
+                    time.tm_year + 1900, time.tm_mon + 1, 
+                    time.tm_mday, time.tm_hour, time.tm_min,
+                    time.tm_sec);
+            filename = tmp;
+            filepath = home.absolutePath() + "/" + filename;
+            FILE *out = fopen(filepath.toAscii().constData(), "r"); 
+            if (out) {
+                fclose(out);
+                if (QMessageBox::warning(
+                        this,
+                        tr("Ride Already Downloaded"),
+                        tr("This ride appears to have already ")
+                        + tr("been downloaded.  Do you want to ")
+                        + tr("overwrite the previous download?"),
+                        tr("&Overwrite"), tr("&Cancel"), 
+                        QString(), 1, 1) == 1) {
+                    reject();
+                    return;
+                }
+            }
+            break;
+        }
+    }
+
     QString tmpname;
     {
         // QTemporaryFile doesn't actually close the file on .close(); it
@@ -243,7 +244,6 @@ DownloadRideDialog::downloadClicked()
         struct tm time;
         bool time_set = false;
         unsigned char *data = records.data();
-        bool bIsVer81 = PowerTapUtil::is_Ver81(data);
 
         for (int i = 0; i < records.size(); i += 6) {
             if (data[i] == 0 && !bIsVer81)
