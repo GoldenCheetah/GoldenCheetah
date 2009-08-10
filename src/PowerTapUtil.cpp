@@ -17,7 +17,7 @@
  */
 
 #include "PowerTapUtil.h"
-#include <QString.h>
+#include <QString>
 #include <math.h>
 
 bool 
