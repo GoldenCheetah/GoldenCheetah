@@ -170,7 +170,7 @@ max(double a, double b) { if (a > b) return a; else return b; }
 
 AllPlot::AllPlot():
     settings(NULL),
-    unit(NULL),
+    unit(0),
     d_mrk(NULL), rideItem(NULL),
     hrArray(NULL), wattsArray(NULL), 
     speedArray(NULL), cadArray(NULL), timeArray(NULL),
