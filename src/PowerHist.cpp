@@ -209,7 +209,7 @@ PowerHist::PowerHist():
     binw(20),
     withz(true),
     settings(NULL),
-    unit(NULL),
+    unit(0),
     lny(false)
 {
     
