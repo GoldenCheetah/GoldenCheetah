@@ -18,26 +18,36 @@
 
 #include "Device.h"
 
-static QMap<QString,Device*> devices;
+typedef QMap<QString,Device*> DevicesMap;
+
+static DevicesMap *devicesPtr;
+
+inline DevicesMap &
+devices()
+{
+    if (devicesPtr == NULL)
+        devicesPtr = new QMap<QString,Device*>;
+    return *devicesPtr;
+}
 
 QList<QString>
 Device::deviceTypes()
 {
-    return devices.keys();
+    return devices().keys();
 }
 
 Device &
 Device::device(const QString &deviceType)
 {
-    assert(devices.contains(deviceType));
-    return *devices.value(deviceType);
+    assert(devices().contains(deviceType));
+    return *devices().value(deviceType);
 }
 
 bool
 Device::addDevice(const QString &deviceType, Device *device)
 {
-    assert(!devices.contains(deviceType));
-    devices.insert(deviceType, device);
+    assert(!devices().contains(deviceType));
+    devices().insert(deviceType, device);
     return true;
 }
  
