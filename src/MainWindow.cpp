@@ -1109,6 +1109,7 @@ void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
 
     int rides;
     double seconds, distance, bs, convertUnit;
+    RideItem * lastRideItem;
     seconds = rides = 0;
     distance = bs = 0;
     timeBS = distanceBS = 0.0;
@@ -1117,30 +1118,40 @@ void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
     if (BSdays.isNull() || BSdays.toInt() == 0)
 	BSdays.setValue(30); // by default look back no more than 30 days
 
+    // if there are rides, find most recent ride so we count back from there:
+    if (allRides->childCount() > 0) 
+	lastRideItem =  (RideItem*) allRides->child(allRides->childCount() - 1);
+    else
+	lastRideItem = ride; // not enough rides, use current ride
+    
     for (int i = 0; i < allRides->childCount(); ++i) {
 	RideItem *item = (RideItem*) allRides->child(i);
-	int days =  item->dateTime.daysTo(ride->dateTime);
+	int days =  item->dateTime.daysTo(lastRideItem->dateTime);
         if (
 	    (item->type() == RIDE_TYPE) &&
-	    (item->ride) &&
+	    // (item->ride) &&
 	    (days  >= 0) && 
 	    (days < BSdays.toInt())  
 	    ) {
 
 	    RideMetric *m;
 	    item->htmlSummary(); // compute metrics
-	    if ((m = item->metrics.value("time_riding"))) {
-		seconds += m->value(true);
-	    }
 
-	    if ((m = item->metrics.value("total_distance"))) {
-		distance += m->value(true);
-	    }
-
-            if ((m = item->metrics.value("skiba_bike_score"))) {
+	    // only count rides with BS > 0
+            if ((m = item->metrics.value("skiba_bike_score")) &&
+		    m->value(true)) {
 		bs += m->value(true);
+
+		if ((m = item->metrics.value("time_riding"))) {
+		    seconds += m->value(true);
+		}
+
+		if ((m = item->metrics.value("total_distance"))) {
+		    distance += m->value(true);
+		}
+
+		rides++;
 	    }
-	    rides++;
         }
     }
     if (rides) {
