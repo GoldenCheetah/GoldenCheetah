@@ -55,21 +55,26 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
     hrslbl = new QLabel(tr("hours"),this);
     hrslbl->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     hrsentry = new QLineEdit(this);
-    hrsentry->setInputMask("00"); 
+    QIntValidator * hoursValidator = new QIntValidator(0,99,this);
+    //hrsentry->setInputMask("09"); 
+    hrsentry->setValidator(hoursValidator);
     manualLengthLayout->addWidget(hrslbl);
     manualLengthLayout->addWidget(hrsentry);
 
     minslbl = new QLabel(tr("mins"),this);
     minslbl->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     minsentry = new QLineEdit(this);
-    minsentry->setInputMask("00");
+    QIntValidator * secsValidator = new QIntValidator(0,60,this);
+    //minsentry->setInputMask("00");
+    minsentry->setValidator(secsValidator);
     manualLengthLayout->addWidget(minslbl);
     manualLengthLayout->addWidget(minsentry);
 
     secslbl = new QLabel(tr("secs"),this);
     secslbl->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     secsentry = new QLineEdit(this);
-    secsentry->setInputMask("00");
+    //secsentry->setInputMask("00");
+    secsentry->setValidator(secsValidator);
     manualLengthLayout->addWidget(secslbl);
     manualLengthLayout->addWidget(secsentry);
 
@@ -81,13 +86,17 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
 	DistanceString->append("(" + tr("miles") + "):");
 
     QLabel *DistanceLabel = new QLabel(*DistanceString, this);
+    QDoubleValidator * distanceValidator = new QDoubleValidator(0,1000,2,this);
     distanceentry = new QLineEdit(this);
-    distanceentry->setInputMask("009.00");
+    //distanceentry->setInputMask("009.00");
+    distanceentry->setValidator(distanceValidator);
 
     // AvgHR
     QLabel *HRLabel = new QLabel(tr("Average HR: "), this);  
     HRentry = new QLineEdit(this);
-    HRentry->setInputMask("099");
+    QIntValidator *hrValidator =  new QIntValidator(0,200,this);
+    //HRentry->setInputMask("099");
+    HRentry->setValidator(hrValidator);
 
     // how to estimate BikeScore:
     QLabel *BSEstLabel;
@@ -125,10 +134,14 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
     QLabel *ManualBSLabel = new QLabel(tr("BikeScore: "), this);
     BSentry = new QLineEdit(this);
     BSentry->setInputMask("009");
+    BSentry->clear();
 
     // buttons
     enterButton = new QPushButton(tr("&OK"), this);
     cancelButton = new QPushButton(tr("&Cancel"), this);
+    // don't let Enter write a new (and possibly incomplete) manual file:
+    enterButton->setDefault(false);
+    cancelButton->setDefault(true);
 
     // Set up the layout:
     QGridLayout *glayout = new QGridLayout(this);
