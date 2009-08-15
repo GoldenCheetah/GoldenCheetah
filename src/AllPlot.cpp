@@ -184,6 +184,7 @@ AllPlot::AllPlot():
     else
         settings = new QSettings(home.absolutePath()+"/gc", QSettings::IniFormat);
     
+    unit = settings->value(GC_UNIT);
     
     useMetricUnits = (unit.toString() == "Metric");
 
