@@ -221,6 +221,7 @@ srm_marker_t *srm_data_blocks( srm_data_t data )
 		goto clean1;
 	blocks[0]->first = 0;
 	blocks[0]->last = data->cused -1;
+        blocks[1] = NULL;
 
 	for( i=1; i < data->cused; ++i ){
 		srm_chunk_t prev = data->chunks[i-1];
