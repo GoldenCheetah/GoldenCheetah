@@ -10,7 +10,7 @@ LIBS += -lm -lz
 !win32 {
     QMAKE_CXXFLAGS = -DGC_BUILD_DATE="`date +'\"%a_%b_%d,_%Y\"'`"
     QMAKE_CXXFLAGS += -DGC_SVN_VERSION=\\\"`svnversion . | cut -f '2' -d ':'`\\\"
-    LIBS += srmio/libsrmio.a
+    LIBS +=  /usr/local/srmio/lib/libsrmio.a
     HEADERS += SrmDevice.h
     SOURCES += SrmDevice.cpp
 }
