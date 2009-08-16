@@ -28,6 +28,7 @@ struct SrmDevice : public Device
     virtual bool download(CommPortPtr dev, const QDir &tmpdir,
                           QString &tmpname, QString &filename,
                           StatusCallback statusCallback, QString &err);
+    virtual void cleanup(CommPortPtr dev);
 };
  
 #endif // _GC_SrmDevice_h

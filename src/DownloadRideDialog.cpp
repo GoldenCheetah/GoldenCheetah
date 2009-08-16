@@ -195,6 +195,9 @@ DownloadRideDialog::downloadClicked()
 
     QMessageBox::information(this, tr("Success"), tr("Download complete."));
     mainWindow->addRide(filename);
+
+    device.cleanup(dev);
+
     downloadInProgress = false;
     accept();
 }

@@ -19,6 +19,7 @@
 #include "SrmDevice.h"
 #include "SrmRideFile.h"
 #include <srmio.h>
+#include <QMessageBox>
 #include <boost/scoped_ptr.hpp>
 #include <boost/foreach.hpp>
 #include <errno.h>
@@ -57,6 +58,19 @@ get_tmpname(const QDir &tmpdir, QString &tmpname, QString &err)
     return true;
 }
 
+static bool
+dev2path(CommPortPtr dev, QString &path, QString &err)
+{
+    // Read device path out of device name.  Sketchy.
+    QRegExp rx("^Serial: (.+)$");
+    if (!rx.exactMatch(dev->name())) {
+        err = "SRM download not supported by device " + dev->name();
+        return false;
+    }
+    path = rx.cap(1);
+    return true;
+}
+
 bool
 SrmDevice::download(CommPortPtr dev, const QDir &tmpdir,
                     QString &tmpname, QString &filename,
@@ -64,13 +78,9 @@ SrmDevice::download(CommPortPtr dev, const QDir &tmpdir,
 {
     // Totally ghetto, proof-of-concept integration with srmio.
     cb = statusCallback;
-    // Read device path out of device name.  Sketchy.
-    QRegExp rx("^Serial: (.+)$");
-    if (!rx.exactMatch(dev->name())) {
-        err = "SRM download not supported by device " + dev->name();
+    QString path;
+    if (!dev2path(dev, path, err))
         return false;
-    }
-    QString path = rx.cap(1);
     if (!get_tmpname(tmpdir, tmpname, err))
         return false;
     srmpc_conn_t srm;
@@ -106,5 +116,26 @@ SrmDevice::download(CommPortPtr dev, const QDir &tmpdir,
     }
     filename = ride->startTime().toString("yyyy_MM_dd_hh_mm_ss") + ".srm";
     return true;
+}
+
+void
+SrmDevice::cleanup(CommPortPtr dev)
+{
+    QString path, err;
+    if (!dev2path(dev, path, err))
+        assert(false);
+    if (QMessageBox::question(
+            0, "Powercontrol",
+            "Erase downloaded ride from device memory?",
+            "&Erase", "&Save Only",
+            QString(), 1, 1) == 0) {
+        srmpc_conn_t srm = srmpc_open(path.toAscii().constData(), 0, NULL);
+        if(srmpc_clear_chunks(srm) < 0) {
+            QMessageBox::warning(
+                0, "Error",
+                "Error communicating with device.");
+        }
+        srmpc_close(srm);
+    }
 }
 

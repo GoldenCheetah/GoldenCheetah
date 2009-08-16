@@ -32,6 +32,7 @@ struct Device
     virtual bool download(CommPortPtr dev, const QDir &tmpdir,
                           QString &tmpname, QString &filename,
                           StatusCallback statusCallback, QString &err) = 0;
+    virtual void cleanup(CommPortPtr dev) { (void) dev; }
 
     static QList<QString> deviceTypes();
     static Device &device(const QString &deviceType);
