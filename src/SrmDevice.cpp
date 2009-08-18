@@ -58,6 +58,23 @@ get_tmpname(const QDir &tmpdir, QString &tmpname, QString &err)
     return true;
 }
 
+struct SrmpcConn : public boost::noncopyable
+{
+    srmpc_conn_t d;
+    SrmpcConn(const QString &path, srmpc_log_callback_t logfunc = NULL) {
+        int opt_force = 0; // setting this to 1 is potentially dangerous
+        d = srmpc_open(path.toAscii().constData(), opt_force, logfunc);
+    }
+    ~SrmpcConn() { if (d) srmpc_close(d); }
+};
+
+struct SrmData : public boost::noncopyable
+{
+    srm_data_t d;
+    SrmData(srm_data_t d) : d(d) {}
+    ~SrmData() { if (d) srm_data_free(d); }
+};
+
 static bool
 dev2path(CommPortPtr dev, QString &path, QString &err)
 {
@@ -83,27 +100,22 @@ SrmDevice::download(CommPortPtr dev, const QDir &tmpdir,
         return false;
     if (!get_tmpname(tmpdir, tmpname, err))
         return false;
-    srmpc_conn_t srm;
-    int opt_force = 0; // setting this to 1 is potentially dangerous
-    srm = srmpc_open(path.toAscii().constData(), opt_force, logfunc);
-    if (!srm) {
+    SrmpcConn srm(path, logfunc);
+    if (!srm.d) {
         err = "Couldn't open device " + path + ": " + strerror(errno);
         return false;
     }
     int opt_all = 0; // XXX: what does this do?
     int opt_fixup = 1; // fix bad data like srmwin.exe does
-    srm_data_t srmdata = srmpc_get_data(srm, opt_all, opt_fixup);
-    if (!srmdata) {
+    SrmData srmdata(srmpc_get_data(srm.d, opt_all, opt_fixup));
+    if (!srmdata.d) {
         err = "srmpc_get_data failed";
-        srmpc_close(srm);
         return false;
     }
-    if (srm_data_write_srm7(srmdata, tmpname.toAscii().constData()) < 0)
+    if (srm_data_write_srm7(srmdata.d, tmpname.toAscii().constData()) < 0) {
         err = "Couldn't write to file " + tmpname + ": " + strerror(errno);
-    srm_data_free(srmdata);
-    srmpc_close(srm);
-    if (err.size() > 0)
         return false;
+    }
     // Read it back in to get the ride start time.
     SrmFileReader reader;
     QStringList errs;
@@ -111,9 +123,8 @@ SrmDevice::download(CommPortPtr dev, const QDir &tmpdir,
     QStringList errors;
     boost::scoped_ptr<RideFile> ride(
         RideFileFactory::instance().openRideFile(file, errors));
-    BOOST_FOREACH(QString err, errors) {
+    BOOST_FOREACH(QString err, errors)
         fprintf(stderr, "error: %s\n", err.toAscii().constData());
-    }
     filename = ride->startTime().toString("yyyy_MM_dd_hh_mm_ss") + ".srm";
     return true;
 }
@@ -124,18 +135,14 @@ SrmDevice::cleanup(CommPortPtr dev)
     QString path, err;
     if (!dev2path(dev, path, err))
         assert(false);
-    if (QMessageBox::question(
-            0, "Powercontrol",
-            "Erase downloaded ride from device memory?",
-            "&Erase", "&Save Only",
-            QString(), 1, 1) == 0) {
-        srmpc_conn_t srm = srmpc_open(path.toAscii().constData(), 0, NULL);
-        if (!srm || (srmpc_clear_chunks(srm) < 0)) {
-            QMessageBox::warning(
-                0, "Error",
-                "Error communicating with device.");
+    if (QMessageBox::question(0, "Powercontrol",
+                              "Erase downloaded ride from device memory?",
+                              "&Erase", "&Save Only", "", 1, 1) == 0) {
+        SrmpcConn srm(path);
+        if(!srm.d || (srmpc_clear_chunks(srm.d) < 0)) {
+            QMessageBox::warning(0, "Error",
+                                 "Error communicating with device.");
         }
-        if (srm) srmpc_close(srm);
     }
 }
 
