@@ -130,12 +130,12 @@ SrmDevice::cleanup(CommPortPtr dev)
             "&Erase", "&Save Only",
             QString(), 1, 1) == 0) {
         srmpc_conn_t srm = srmpc_open(path.toAscii().constData(), 0, NULL);
-        if(srmpc_clear_chunks(srm) < 0) {
+        if (!srm || (srmpc_clear_chunks(srm) < 0)) {
             QMessageBox::warning(
                 0, "Error",
                 "Error communicating with device.");
         }
-        srmpc_close(srm);
+        if (srm) srmpc_close(srm);
     }
 }
 
