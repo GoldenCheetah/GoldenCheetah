@@ -18,7 +18,7 @@
 
 #include "SrmDevice.h"
 #include "SrmRideFile.h"
-#include "srmio/srmio.h"
+#include <srmio.h>
 #include <boost/scoped_ptr.hpp>
 #include <boost/foreach.hpp>
 #include <errno.h>
