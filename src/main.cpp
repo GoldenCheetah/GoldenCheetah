@@ -28,28 +28,61 @@ main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     QSettings *settings;
+    //this is the path within the current directory where GC will look for
+    //files to allow USB stick support
+    QString localLibraryPath="Library/GoldenCheetah";
+
+    //this is the path that used to be used for all platforms
+    //now different platforms will use their own path
+    //this path is checked first to make things easier for long-time users
+    QString oldLibraryPath=QDir::home().path()+"/Library/GoldenCheetah";
+
+    //these are the new platform-dependent library paths
+#ifdef Q_OS_LINUX
+    QString libraryPath=".goldencheetah";
+#endif
+#ifdef Q_OS_MACX
+    QString libraryPath="Library/GoldenCheetah";
+#endif
+#ifdef Q_OS_WIN
+    QString libraryPath="Application Data/Local/GoldenCheetah";
+#endif
 
     //First check to see if the Library folder exists where the executable is (for USB sticks)
     QDir home = QDir();
-    if(!home.exists("Library/GoldenCheetah"))
+    //if it does, create an ini file for settings and cd into the library
+    if(home.exists(localLibraryPath))
+    {
+         settings = new QSettings(home.absolutePath()+"/gc", QSettings::IniFormat);
+         home.cd(localLibraryPath);
+    }
+    //if it does not exist, let QSettings handle storing settings
+    //also cd to the home directory and look for libraries
+    else
     {
         settings = new QSettings(GC_SETTINGS_CO, GC_SETTINGS_APP);
         home = QDir::home();
+        //check if this users previously stored files in the old library path
+        //if they did, use the existing library
+        if (home.exists(oldLibraryPath))
+        {
+            home.cd(oldLibraryPath);
+        }
+        //otherwise use the new library path
+        else
+        {
+            //first create the path if it does not exist
+            if (!home.exists(libraryPath))
+            {
+                if (!home.mkpath(libraryPath))
+                {
+                    qDebug()<<"Failed to create library path\n";
+                    assert(false);
+                }
+            }
+            home.cd(libraryPath);
+        }
     }
-    else
-    {
-        settings = new QSettings(home.absolutePath()+"/gc", QSettings::IniFormat);
-
-    }
-
-    if (!home.exists("Library")) 
-        if (!home.mkdir("Library"))
-            assert(false);
-    home.cd("Library");
-    if (!home.exists("GoldenCheetah"))
-        if (!home.mkdir("GoldenCheetah"))
-            assert(false);
-    home.cd("GoldenCheetah");
     
     QVariant lastOpened = settings->value(GC_SETTINGS_LAST);
     QVariant unit = settings->value(GC_UNIT);
@@ -85,5 +118,3 @@ main(int argc, char *argv[])
     }
     return app.exec();
 }
-
-
