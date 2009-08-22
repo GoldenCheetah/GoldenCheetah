@@ -606,18 +606,15 @@ PowerHist::setlnY(bool value)
     // note: setAxisScaleEngine deletes the old ScaleEngine, so specifying
     // "new" in the argument list is not a leak
 
-    if (lny = value) {
-	setAxisScaleEngine(
-			   yLeft,
-			   new QwtLog10ScaleEngine
-			   );
+    lny=value;
+    if (lny)
+    {
+        setAxisScaleEngine(yLeft, new QwtLog10ScaleEngine);
 	curve->setBaseline(1e-6);
     }
-    else {
-	setAxisScaleEngine(
-			   yLeft,
-			   new QwtLinearScaleEngine
-			   );
+    else
+    {
+        setAxisScaleEngine(yLeft, new QwtLinearScaleEngine);
 	curve->setBaseline(0);
     }
     setYMax();
@@ -675,36 +672,47 @@ PowerHist::fixSelection() {
     RideFile *ride = rideItem->ride;
 
     if (ride)
-	do {
+        do
+        {
 	    if ((s == wattsShaded) || (s == wattsUnshaded))
+            {
 		if (ride->areDataPresent()->watts)
 		    setSelection(s);
 		else
 		    s = nm;
+            }
 
 	    else if (s == nm)
+            {
 		if (ride->areDataPresent()->nm)
 		    setSelection(s);
 		else
 		    s = hr;
+            }
 	
 	    else if (s == hr)
+            {
 		if (ride->areDataPresent()->hr)
 		    setSelection(s);
 		else
 		    s = kph;
+            }
 	
 	    else if (s == kph)
+            {
 		if (ride->areDataPresent()->kph)
 		    setSelection(s);
 		else
 		    s = cad;
+            }
 	
 	    else if (s == cad)
+            {
 		if (ride->areDataPresent()->cad)
 		    setSelection(s);
 		else
 		    s = wattsShaded;
+            }
 	} while (s != selected);
 }
 

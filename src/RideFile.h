@@ -96,9 +96,7 @@ class RideFile
         void setDeviceType(const QString &value) { deviceType_ = value; }
         
         void appendPoint(double secs, double cad, double hr, double km, 
-                double kph, double nm, double watts, int interval);
-        void appendPoint(double secs, double cad, double hr, double km, 
-                double kph, double nm, double watts, int interval, double bs);
+                double kph, double nm, double watts, int interval, double bs=0.0);
 
         bool writeAsXml(QFile &file, QString &err) const;
         void writeAsCsv(QFile &file, bool bIsMetric) const;
