@@ -19,10 +19,15 @@
 #ifndef _TimeUtils_h
 #define _TimeUtils_h
 
+#include <QDateTime>
 #include <QString>
 
 QString interval_to_str(double secs);  // output like 1h 2m 3s
 QString time_to_string(double secs);   // output like 1:02:03
+
+/* takes a string containing an ISO 8601 timestamp and converts it to local time
+*/
+QDateTime convertToLocalTime(QString timestamp);
 
 #endif // _TimeUtils_h
 

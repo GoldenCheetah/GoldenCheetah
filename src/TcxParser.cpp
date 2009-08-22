@@ -18,12 +18,12 @@
  */
 
 #include <QString>
-#include <assert.h>
+
 #include "TcxParser.h"
-#include <assert.h>
+#include "TimeUtils.h"
 
 TcxParser::TcxParser (RideFile* rideFile)
-   : rideFile_(rideFile)
+   : rideFile(rideFile)
 {
 }
 
@@ -32,93 +32,109 @@ TcxParser::startElement( const QString&, const QString&,
 			 const QString& qName,
 			 const QXmlAttributes& qAttributes)
 {
-    buf_.clear();
+    buffer.clear();
 
-    if (qName == "Activity") {
-	lap_ = 0;
-    } else if (qName == "Lap") {
-	// Use the time of the first lap as the time of the activity.
-	if (lap_ == 0) {
-	    start_time_ = QDateTime::fromString(qAttributes.value("StartTime"),
-						Qt::ISODate);
-	    rideFile_->setStartTime(start_time_);
-	    
-	    last_km_ = 0.0;
-	    last_time_ = start_time_;
-	}
-
-	++lap_;
-    } else if (qName == "Trackpoint") {
-	watts_ = 0.0;
-	cad_ = 0.0;
-	hr_ = 0.0;
-        km_ = -1;  // nh - we set this to -1 so we can detect if there was a distance in the trackpoint.
+    if (qName == "Activity")
+    {
+        lap = 0;
     }
-
+    else if (qName == "Lap")
+    {
+	// Use the time of the first lap as the time of the activity.
+        if (lap == 0)
+        {
+            start_time = convertToLocalTime(qAttributes.value("StartTime"));
+            rideFile->setStartTime(start_time);
+	    
+            lastDistance = 0.0;
+            last_time = start_time;
+	}
+        lap++;
+    }
+    else if (qName == "Trackpoint")
+    {
+        power = 0.0;
+        cadence = 0.0;
+        hr = 0.0;
+        distance = -1;  // nh - we set this to -1 so we can detect if there was a distance in the trackpoint.
+    }
     return TRUE;
 }
 
 bool
 TcxParser::endElement( const QString&, const QString&, const QString& qName)
 {
-    if (qName == "Time") {
-	time_ = QDateTime::fromString(buf_, Qt::ISODate);
+    if (qName == "Time")
+    {
+        time = convertToLocalTime(buffer);
     }
-    if (qName == "DistanceMeters") {
-	km_    = buf_.toDouble() / 1000;
-    } else if (qName == "Watts") {
-	watts_ = buf_.toDouble();
-    } else if (qName == "Value") {
-	hr_    = buf_.toDouble();
-    } else if (qName == "Cadence") {
-	cad_   = buf_.toDouble();
-    } else if (qName == "Trackpoint")
+    else if (qName == "DistanceMeters")
+    {
+        distance = buffer.toDouble() / 1000;
+    }
+    else if (qName == "Watts")
+    {
+        power = buffer.toDouble();
+    }
+    else if (qName == "Value")
+    {
+        hr = buffer.toDouble();
+    }
+    else if (qName == "Cadence")
+    {
+        cadence = buffer.toDouble();
+    }
+    else if (qName == "Trackpoint")
     {
         // nh - there are track points that don't have any distance info.  We need to ignore them
-        if (km_>=0)
+        if (distance>=0)
         {
             // compute the elapsed time and distance traveled since the
             // last recorded trackpoint
-            double delta_t = last_time_.secsTo(time_);
-            double delta_d = km_ - last_km_;
-            assert(delta_d>=0);
+            double delta_t = last_time.secsTo(time);
+            double delta_d = distance - lastDistance;
+            if (delta_d<0)
+            {
+                delta_d=0;
+            }
 
             // compute speed for this trackpoint by dividing the distance
             // traveled by the elapsed time. The elapsed time will be 0.0
             // for the first trackpoint -- so set speed to 0.0 instead of
             // dividing by zero.
-            double kph = ((delta_t != 0.0) ? ((delta_d / delta_t) * 3600.0) : 0.0);
-            assert(kph>=0);
+            double speed = 0.0;
+            if (delta_t > 0.0)
+            {
+                speed=delta_d / delta_t * 3600.0;
+            }
 
             // Don't know what to do about torque
-            double nm  = 0.0;
+            double torque  = 0.0;
 
             // Time from beginning of activity
-            double secs = start_time_.secsTo(time_);
+            double secs = start_time.secsTo(time);
 
             // Work around bug in 705 firmware where cadence and
             // power values repeat when stopped.
-            if (delta_d == 0.0) {
-                watts_ = 0.0;
-                cad_ = 0.0;
+            if (delta_d == 0.0)
+            {
+                power = 0.0;
+                cadence = 0.0;
             }
 
             // Record trackpoint
-            rideFile_->appendPoint(secs, cad_, hr_, km_,
-                                   kph, nm, watts_, lap_);
+            rideFile->appendPoint(secs, cadence, hr, distance,
+                                   speed, torque, power, lap);
 
-            last_km_ = km_;
+            lastDistance = distance;
         }
-        last_time_ = time_;
+        last_time = time;
     }
-	
-
     return TRUE;
 }
 
-bool
-TcxParser::characters( const QString& str )
+bool TcxParser::characters( const QString& str )
 {
-    buf_ += str;
+    buffer += str;
     return TRUE;
 }
