@@ -63,3 +63,24 @@ QString interval_to_str(double secs)
     return result;
 }
 
+QDateTime convertToLocalTime(QString timestamp)
+{
+    //check if the last character is Z designating the timezone to be UTC
+    if (timestamp[timestamp.size()-1].toLower()=='z')
+    {
+        QDateTime datetime = QDateTime::fromString(timestamp, Qt::ISODate);
+        datetime.setTimeSpec(Qt::UTC);
+        datetime=datetime.toLocalTime();
+        return datetime;
+    }
+    //otherwise assume the timestamp is already in local time and simply convert it
+    //something to add here would be a handler for explicitly set timezones
+    //ex: 2002-05-30T09:30:10+06:00
+    //see http://www.w3schools.com/Schema/schema_dtypes_date.asp
+    //for more on this date format
+    else
+    {
+        return QDateTime::fromString(timestamp);
+    }
+}
+

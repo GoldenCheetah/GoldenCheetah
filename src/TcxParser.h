@@ -38,20 +38,21 @@ public:
 
 private:
 
-    RideFile*	rideFile_;
+    RideFile*	rideFile;
 
-    QString	buf_;
+    QString	buffer;
 
-    QDateTime	start_time_;
-    QDateTime	last_time_;
-    QDateTime	time_;
-    double	last_km_;
-    double	km_;
+    QDateTime	start_time;
+    QDateTime	last_time;
+    QDateTime	time;
+    double	lastDistance;
+    double	distance;
 
-    int		lap_;
-    double	watts_;
-    double	cad_;
-    double	hr_;
+    int		lap;
+    double	power;
+    double	cadence;
+    double	hr;
+    double      lastAltitude;
 };
 
 #endif // _TcxParser_h
