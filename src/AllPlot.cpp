@@ -198,33 +198,25 @@ AllPlot::AllPlot():
     setXTitle();
 
     wattsCurve = new QwtPlotCurve("Power");
-    // wattsCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen *wattsPen  = new QPen(Qt::red);
-    wattsPen->setWidth(2);
-    wattsCurve->setPen(*wattsPen);
-    delete wattsPen;
+    QPen wattsPen = QPen(Qt::red);
+    wattsPen.setWidth(2);
+    wattsCurve->setPen(wattsPen);
 
     hrCurve = new QwtPlotCurve("Heart Rate");
-    // hrCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen *hrPen  = new QPen(Qt::blue);
-    hrPen->setWidth(2);
-    hrCurve->setPen(*hrPen);
-    delete hrPen;
+    QPen hrPen = QPen(Qt::blue);
+    hrPen.setWidth(2);
+    hrCurve->setPen(hrPen);
 
     speedCurve = new QwtPlotCurve("Speed");
-    // speedCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen *speedPen  = new QPen(QColor(0, 204, 0));
-    speedPen->setWidth(2);
-    speedCurve->setPen(*speedPen);
+    QPen speedPen = QPen(QColor(0, 204, 0));
+    speedPen.setWidth(2);
+    speedCurve->setPen(speedPen);
     speedCurve->setYAxis(yRight);
-    delete speedPen;
 
     cadCurve = new QwtPlotCurve("Cadence");
-    // cadCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen *cadPen  = new QPen(QColor(0, 204, 204));
-    cadPen->setWidth(2);
-    cadCurve->setPen(*cadPen);
-    delete cadPen;
+    QPen cadPen = QPen(QColor(0, 204, 204));
+    cadPen.setWidth(2);
+    cadCurve->setPen(cadPen);
 
     grid = new QwtPlotGrid();
     grid->enableX(false);
