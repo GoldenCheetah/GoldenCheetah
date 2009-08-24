@@ -64,6 +64,7 @@ class MainWindow : public QMainWindow
         void importCSV();
         void importSRM();
         void importTCX();
+        void importWKO();
         void importPolar();
         void findBestIntervals();
         void splitRide();

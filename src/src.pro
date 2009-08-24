@@ -38,6 +38,7 @@ HEADERS += \
         ChooseCyclistDialog.h \
         CpintPlot.h \
         CsvRideFile.h \
+        WkoRideFile.h \
         DBAccess.h \
         Device.h \
         DownloadRideDialog.h \
@@ -82,6 +83,7 @@ SOURCES += \
         ChooseCyclistDialog.cpp \
         CpintPlot.cpp \
         CsvRideFile.cpp \
+        WkoRideFile.cpp \
         DBAccess.cpp \
         Device.cpp \
         DownloadRideDialog.cpp \
