@@ -16,8 +16,11 @@ them when possible.  -- Sean
   variable, declare it "static" withing a .cpp file.
 
 - Only call C++'s operator new within the constructors and reset() functions
-  of std::auto_ptr, boost::scoped_pointer, etc.  Never call delete explicitly.
-  Do not use malloc or free unless forced to by an external C library.
+  of std::auto_ptr, boost::scoped_pointer, etc. or when passing a parent
+  pointer to a Qt class (so that the parent deletes the child).  Never call
+  delete explicitly.
+
+- Do not use malloc or free unless forced to by an external C library.
 
 - Allocate large buffers on the heap, not on the stack.
 
