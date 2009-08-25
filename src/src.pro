@@ -5,10 +5,10 @@ include( gcconfig.pri )
 TEMPLATE = app
 TARGET = GoldenCheetah
 DEPENDPATH += .
-INCLUDEPATH += $${BOOST_INSTALL}/include $${QWT_INSTALL}/include
+INCLUDEPATH += $${BOOST_INCLUDE} $${QWT_INCLUDE}
 CONFIG += static debug
 QT += xml sql
-LIBS += $${QWT_INSTALL}/lib/libqwt.a
+LIBS += $${QWT_LIB}
 LIBS += -lm -lz
 
 !win32 {
@@ -17,8 +17,8 @@ LIBS += -lm -lz
 }
 
 !isEmpty( SRMIO_INSTALL ) {
-    INCLUDEPATH += $${SRMIO_INSTALL}/include
-    LIBS += $${SRMIO_INSTALL}/lib/libsrmio.a
+    INCLUDEPATH += $${SRMIO_INCLUDE}
+    LIBS += $${SRMIO_LIB}
     HEADERS += SrmDevice.h
     SOURCES += SrmDevice.cpp
 }
