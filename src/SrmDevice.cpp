@@ -68,11 +68,11 @@ struct SrmpcConn : public boost::noncopyable
     ~SrmpcConn() { if (d) srmpc_close(d); }
 };
 
-struct SrmData : public boost::noncopyable
+struct SrmioData : public boost::noncopyable
 {
     srm_data_t d;
-    SrmData(srm_data_t d) : d(d) {}
-    ~SrmData() { if (d) srm_data_free(d); }
+    SrmioData(srm_data_t d) : d(d) {}
+    ~SrmioData() { if (d) srm_data_free(d); }
 };
 
 static bool
@@ -107,7 +107,7 @@ SrmDevice::download(CommPortPtr dev, const QDir &tmpdir,
     }
     int opt_all = 0; // XXX: what does this do?
     int opt_fixup = 1; // fix bad data like srmwin.exe does
-    SrmData srmdata(srmpc_get_data(srm.d, opt_all, opt_fixup));
+    SrmioData srmdata(srmpc_get_data(srm.d, opt_all, opt_fixup));
     if (!srmdata.d) {
         err = "srmpc_get_data failed";
         return false;
