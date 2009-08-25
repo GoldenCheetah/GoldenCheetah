@@ -1,0 +1,30 @@
+
+                    GoldenCheetah Coding Style Guidelines
+
+I don't like coding conventions, and I would prefer GoldenCheetah had as few
+of them as possible.  The ones below, however, seem prudent.  Please follow
+them when possible.  -- Sean
+
+- Use spaces instead of tabs.
+
+- Do not end lines with whitespace.  End every file with a newline.
+  Otherwise git becomes angry.
+
+- Avoid "using namespace ..." in header files.
+
+- Don't declare global variables in header files.  If you must use a global
+  variable, declare it "static" withing a .cpp file.
+
+- Only call C++'s operator new within the constructors and reset() functions
+  of std::auto_ptr, boost::scoped_pointer, etc.  Never call delete explicitly.
+  Do not use malloc or free unless forced to by an external C library.
+
+- Allocate large buffers on the heap, not on the stack.
+
+- When the C++ standard library has an appropriate function, use it.
+  Likewise for Qt and Boost.
+
+- Only use external libraries with GPL-compatible licenses.
+
+- Avoid C-style casts.
+
