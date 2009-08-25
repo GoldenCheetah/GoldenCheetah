@@ -25,7 +25,7 @@
 
 #define MILES_TO_KM 1.609344
 #define FEET_TO_METERS 0.3048
-        
+
 static int manualFileReaderRegistered = 
     RideFileFactory::instance().registerReader("man", new ManualFileReader());
  
@@ -95,7 +95,7 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors) const
 	    }
 	    // minutes,kph,watts,km,hr,bikeScore
 	    else if (lineno > unitsHeader) {
-		double minutes,kph,watts,km,hr,bs;
+		double minutes,kph,watts,km,hr,alt,bs;
 		double cad, nm;
 		int interval;
 		minutes = line.section(',', 0, 0).toDouble();
@@ -112,7 +112,7 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors) const
 		interval = 0;
 
 		rideFile->appendPoint(minutes * 60.0, cad, hr, km, 
-			kph, nm, watts, interval, bs);
+			kph, nm, watts, alt, interval, bs);
 
 		rideSec = minutes * 60.0;
 	    }

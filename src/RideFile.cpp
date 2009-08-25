@@ -90,6 +90,7 @@ RideFile::writeAsXml(QFile &file, QString &err) const
         xsamp.setAttribute("hr", QString("%1").arg(sample->hr, 0, 'f', 0));
         xsamp.setAttribute("km", QString("%1").arg(sample->km, 0, 'f', 3));
         xsamp.setAttribute("kph", QString("%1").arg(sample->kph, 0, 'f', 1));
+        xsamp.setAttribute("alt", QString("%1").arg(sample->alt, 0, 'f', 1));
         xsamp.setAttribute("watts", sample->watts);
         if (hasNm) {
             double nm = (sample->watts > 0.0) ? sample->nm : 0.0;
@@ -111,12 +112,12 @@ void RideFile::writeAsCsv(QFile &file, bool bIsMetric) const
     QTextStream out(&file);
     if (!bIsMetric)
     {
-        out << "Minutes,Torq (N-m),MPH,Watts,Miles,Cadence,Hrate,ID\n";
+        out << "Minutes,Torq (N-m),MPH,Watts,Miles,Cadence,Hrate,Altitude (feet),ID\n";
         const double MILES_PER_KM = 0.62137119;
         convertUnit = MILES_PER_KM;
     }
     else {
-        out << "Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID\n";
+        out << "Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,Altitude (feet),ID\n";
         // TODO: use KM_TO_MI from lib/pt.c instead?
         convertUnit = 1.0;
     }
@@ -139,6 +140,8 @@ void RideFile::writeAsCsv(QFile &file, bool bIsMetric) const
         out << point->cad;
         out << ",";
         out << point->hr;
+        out << ",";
+        out << point->alt;
         out << ",";
         out << point->interval;
         if (point->bs > 0.0) {
@@ -205,11 +208,11 @@ QStringList RideFileFactory::listRideFiles(const QDir &dir) const
 }
 
 void RideFile::appendPoint(double secs, double cad, double hr, double km, 
-		      double kph, double nm, double watts, int interval,
-			double bs)
+		           double kph, double nm, double watts, double alt, 
+                           int interval, double bs)
 {
     dataPoints_.append(new RideFilePoint(secs, cad, hr, km, kph, 
-		nm, watts, interval,bs));
+		nm, watts, alt, interval,bs));
     dataPresent.secs  |= (secs != 0);
     dataPresent.cad   |= (cad != 0);
     dataPresent.hr    |= (hr != 0);
@@ -217,5 +220,6 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     dataPresent.kph   |= (kph != 0);
     dataPresent.nm    |= (nm != 0);
     dataPresent.watts |= (watts != 0);
+    dataPresent.alt   |= (alt != 0);
     dataPresent.interval |= (interval != 0);
 }

@@ -56,6 +56,7 @@ TcxParser::startElement( const QString&, const QString&,
         power = 0.0;
         cadence = 0.0;
         hr = 0.0;
+	alt = 0.0;
         distance = -1;  // nh - we set this to -1 so we can detect if there was a distance in the trackpoint.
     }
     return TRUE;
@@ -83,6 +84,10 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
     else if (qName == "Cadence")
     {
         cadence = buffer.toDouble();
+    }
+    else if (qName == "Altitude")
+    {
+        alt = buffer.toDouble();
     }
     else if (qName == "Trackpoint")
     {
@@ -124,7 +129,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 
             // Record trackpoint
             rideFile->appendPoint(secs, cadence, hr, distance,
-                                   speed, torque, power, lap);
+                                   speed, torque, power, alt, lap);
 
             lastDistance = distance;
         }

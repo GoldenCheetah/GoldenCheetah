@@ -53,6 +53,7 @@ private:
     double	cadence;
     double	hr;
     double      lastAltitude;
+    double      alt;
 };
 
 #endif // _TcxParser_h

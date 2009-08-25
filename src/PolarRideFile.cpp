@@ -23,7 +23,6 @@
 #include <assert.h>
 #include "math.h"
 
-#define MILES_TO_KM 1.609344
 
 static int polarFileReaderRegistered =
     RideFileFactory::instance().registerReader("hrm", new PolarFileReader());
@@ -32,7 +31,7 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors) const
 {
     QRegExp metricUnits("(km|kph|km/h)", Qt::CaseInsensitive);
     QRegExp englishUnits("(miles|mph|mp/h)", Qt::CaseInsensitive);
-    bool metric;
+//    bool metric;
 
     QDate date;
     QString note("");
@@ -116,8 +115,15 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors) const
                     if (smode.length()>4 && smode.at(5)=='1')
                         pedaling_index = true;
 
-                    if (smode.length()>6 && smode.at(7)=='1')
-                        metric = true;
+/*
+It appears that the Polar CS600 exports its data alays in metric when downloaded from the 
+polar software even when English units are displayed on the unit..  It also never sets 
+this bit low in the .hrm file.  This will have to get changed if other software downloads 
+this differently
+*/
+
+//                    if (smode.length()>6 && smode.at(7)=='1')
+//                        metric = true;
 
                 } else if (line.contains("Interval=")) {
                     recInterval = line.remove(0,9).toInt();
@@ -159,7 +165,7 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors) const
                 }
             }
             else if (section == "[HRData]"){
-                double nm=0,kph=0,watts=0,km=0,cad=0,hr=0;
+                double nm=0,kph=0,watts=0,km=0,cad=0,hr=0,alt=0;
 
                 seconds += recInterval;
 
@@ -169,7 +175,6 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors) const
 
                 if (speed) {
                     kph = line.section('\t', i, i).toDouble()/10;
-
                     i++;
                 }
                 if (cadence) {
@@ -177,6 +182,7 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors) const
                     i++;
                 }
                 if (altitude) {
+                    alt = line.section('\t', i, i).toDouble();
                     i++;
                 }
                 if (power) {
@@ -186,11 +192,6 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors) const
                 distance = distance + kph/60/60*recInterval;
                 km = distance;
 
-                if (!metric) {
-                    km *= MILES_TO_KM;
-                    kph *= MILES_TO_KM;
-                }
-
                 if (next_interval < seconds) {
                     interval = intervals.indexOf(next_interval);
                     if (intervals.count()>interval+1){
@@ -198,8 +199,8 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors) const
                         next_interval = intervals.at(interval);
                     }
                 }
-	            rideFile->appendPoint(seconds, cad, hr, km, kph, nm, watts, interval);
-	            //fprintf(stderr, " %f, %f, %f, %f, %f, %f, %f, %d\n", seconds, cad, hr, km, kph, nm, watts, interval);
+	            rideFile->appendPoint(seconds, cad, hr, km, kph, nm, watts, alt, interval);
+	            //fprintf(stderr, " %f, %f, %f, %f, %f, %f, %f, %d\n", seconds, cad, hr, km, kph, nm, watts, alt, interval);
             }
 
         ++lineno;

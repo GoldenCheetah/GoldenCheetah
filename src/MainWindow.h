@@ -115,6 +115,7 @@ class MainWindow : public QMainWindow
 	QCheckBox *showHr;
 	QCheckBox *showSpeed;
 	QCheckBox *showCad;
+	QCheckBox *showAlt;
 	QComboBox *showPower;
         CpintPlot *cpintPlot;
         QLineEdit *cpintTimeValue;
@@ -162,6 +163,7 @@ class MainWindow : public QMainWindow
 	int histHrID;
 	int histKphID;
 	int histCadID;
+	int histAltID;
 
 	bool useMetricUnits;  // whether metric units are used (or imperial)
 

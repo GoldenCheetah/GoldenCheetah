@@ -167,6 +167,7 @@ static inline double
 max(double a, double b) { if (a > b) return a; else return b; }
 
 #define MILES_PER_KM 0.62137119
+#define FEET_PER_M 3.2808399
 
 AllPlot::AllPlot():
     settings(NULL),
@@ -174,7 +175,7 @@ AllPlot::AllPlot():
     d_mrk(NULL), rideItem(NULL),
     hrArray(NULL), wattsArray(NULL), 
     speedArray(NULL), cadArray(NULL), timeArray(NULL),
-    distanceArray(NULL), interArray(NULL), smooth(30), bydist(false),
+    distanceArray(NULL), altArray(NULL), interArray(NULL), smooth(30), bydist(false),
     shade_zones(false)
 {
     QSettings *settings;
@@ -218,6 +219,16 @@ AllPlot::AllPlot():
     cadPen.setWidth(2);
     cadCurve->setPen(cadPen);
 
+    altCurve = new QwtPlotCurve("Altitude");
+    // altCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    QPen *altPen  = new QPen(QColor(124, 91, 31));
+    altPen->setWidth(1);
+    altCurve->setPen(*altPen);
+    QColor brush_color = QColor(124, 91, 31);
+    brush_color.setAlpha(64);
+    altCurve->setBrush(brush_color);   // fill below the line
+    delete altPen;
+
     grid = new QwtPlotGrid();
     grid->enableX(false);
     QPen gridPen;
@@ -229,10 +240,10 @@ AllPlot::AllPlot():
 }
 
 struct DataPoint {
-    double time, hr, watts, speed, cad;
+    double time, hr, watts, speed, cad, alt;
     int inter;
-    DataPoint(double t, double h, double w, double s, double c, int i) : 
-        time(t), hr(h), watts(w), speed(s), cad(c), inter(i) {}
+    DataPoint(double t, double h, double w, double s, double c, double a, int i) : 
+        time(t), hr(h), watts(w), speed(s), cad(c), alt(a), inter(i) {}
 };
 
 bool AllPlot::shadeZones() const
@@ -287,6 +298,8 @@ AllPlot::recalc()
 	    speedCurve->setData(data, data);
 	if (cadArray)
 	    cadCurve->setData(data, data);
+	if (altArray)
+	    altCurve->setData(data, data);
         return;
     }
     double totalWatts = 0.0;
@@ -294,6 +307,7 @@ AllPlot::recalc()
     double totalSpeed = 0.0;
     double totalCad = 0.0;
     double totalDist = 0.0;
+    double totalAlt = 0.0;
 
     QList<DataPoint*> list;
 
@@ -303,6 +317,7 @@ AllPlot::recalc()
     double *smoothCad       = new double[rideTimeSecs + 1];
     double *smoothTime      = new double[rideTimeSecs + 1];
     double *smoothDistance  = new double[rideTimeSecs + 1];
+    double *smoothAltitude  = new double[rideTimeSecs + 1];
 
     delete [] d_mrk;
     QList<double> interList; //Just store the time that it happened.
@@ -318,6 +333,7 @@ AllPlot::recalc()
         smoothCad[secs]   = 0.0;
         smoothTime[secs]  = secs / 60.0;
         smoothDistance[secs]  = 0.0;
+        smoothAltitude[secs]  = 0.0;
     }
 
     int i = 0;
@@ -330,6 +346,7 @@ AllPlot::recalc()
 			      (wattsArray ? wattsArray[i] : 0),
                               (speedArray ? speedArray[i] : 0),
 			      (cadArray ? cadArray[i] : 0),
+			      (altArray ? altArray[i] : 0),
 			      interArray[i]
 			      );
 	    if (wattsArray)
@@ -340,6 +357,8 @@ AllPlot::recalc()
 		totalSpeed += speedArray[i];
 	    if (cadArray)
 		totalCad   += cadArray[i];
+	    if (altArray)
+		totalAlt   += altArray[i];
             totalDist   = distanceArray[i];
             list.append(dp);
             //Figure out when and if we have a new interval..
@@ -356,6 +375,7 @@ AllPlot::recalc()
             totalHr    -= dp->hr;
             totalSpeed -= dp->speed;
             totalCad   -= dp->cad;
+            totalAlt   -= dp->alt;
             delete dp;
         }
         // TODO: this is wrong.  We should do a weighted average over the
@@ -365,12 +385,14 @@ AllPlot::recalc()
             smoothHr[secs]    = 0.0;
             smoothSpeed[secs] = 0.0;
             smoothCad[secs]   = 0.0;
+            smoothAltitude[secs]   = smoothAltitude[secs - 1];
         }
         else {
             smoothWatts[secs]    = totalWatts / list.size();
             smoothHr[secs]       = totalHr / list.size();
             smoothSpeed[secs]    = totalSpeed / list.size();
             smoothCad[secs]      = totalCad / list.size();
+	    smoothAltitude[secs]      = totalAlt / list.size();
         }
         smoothDistance[secs] = totalDist;
         smoothTime[secs]  = secs / 60.0;
@@ -387,6 +409,8 @@ AllPlot::recalc()
         speedCurve->setData(xaxis, smoothSpeed, rideTimeSecs + 1);
     if (cadArray)
         cadCurve->setData(xaxis, smoothCad, rideTimeSecs + 1);
+    if (altArray)
+        altCurve->setData(xaxis, smoothAltitude, rideTimeSecs + 1);
 
     setAxisScale(xBottom, 0.0, bydist ? totalDist : smoothTime[rideTimeSecs]);
     setYMax();
@@ -429,6 +453,8 @@ AllPlot::recalc()
         delete [] smoothTime;
     if(smoothDistance != NULL)
        delete [] smoothDistance;
+    if(smoothAltitude != NULL)
+       delete [] smoothAltitude;
 }
 
 void
@@ -448,6 +474,15 @@ AllPlot::setYMax()
         ymax = max(ymax, cadCurve->maxYValue());
         ylabel += QString((ylabel == "") ? "" : " / ") + "RPM";
     }
+    if (altCurve->isVisible()) {
+        ymax = max(ymax, altCurve->maxYValue());
+	if (useMetricUnits){
+        	ylabel += QString((ylabel == "") ? "" : " / ") + "Meters";
+	} else {
+		ylabel += QString((ylabel == "") ? "" : " / ") + "Ft";
+	}
+    }
+
     setAxisScale(yLeft, 0.0, ymax * 1.1);
     setAxisTitle(yLeft, ylabel);
 
@@ -483,6 +518,8 @@ AllPlot::setData(RideItem *_rideItem)
         delete [] interArray;
     if(distanceArray != NULL)
         delete [] distanceArray;
+    if(altArray != NULL)
+        delete [] altArray;
 
     RideFile *ride = rideItem->ride;
     if (ride) {
@@ -494,6 +531,7 @@ AllPlot::setData(RideItem *_rideItem)
 	hrArray    = dataPresent->hr ? new double[npoints] : NULL;
 	speedArray = dataPresent->kph ? new double[npoints] : NULL;
 	cadArray   = dataPresent->cad ? new double[npoints] : NULL;
+	altArray   = dataPresent->alt ? new double[npoints] : NULL;
 	timeArray  = new double[npoints];
 	interArray = new int[npoints];
 	distanceArray = new double[npoints];
@@ -503,10 +541,12 @@ AllPlot::setData(RideItem *_rideItem)
 	hrCurve->detach();
 	speedCurve->detach();
 	cadCurve->detach();
+	altCurve->detach();
 	if (wattsArray) wattsCurve->attach(this);
 	if (hrArray) hrCurve->attach(this);
 	if (speedArray) speedCurve->attach(this);
 	if (cadArray) cadCurve->attach(this);
+	if (altArray) altCurve->attach(this);
 
 	arrayLength = 0;
 	QListIterator<RideFilePoint*> i(ride->dataPoints()); 
@@ -524,6 +564,11 @@ AllPlot::setData(RideItem *_rideItem)
 					       : point->kph * MILES_PER_KM));
 	    if (cadArray)
 		cadArray[arrayLength]   = max(0, point->cad);
+            if (altArray)
+                altArray[arrayLength]   = max(0,
+                                              (useMetricUnits
+                                               ? point->alt
+                                               : point->alt * FEET_PER_M));
 	    interArray[arrayLength] = point->interval;
 	    distanceArray[arrayLength] = max(0,
 					     (useMetricUnits
@@ -540,6 +585,7 @@ AllPlot::setData(RideItem *_rideItem)
 	hrCurve->detach();
 	speedCurve->detach();
 	cadCurve->detach();
+	altCurve->detach();
     }
 }
 
@@ -575,6 +621,15 @@ AllPlot::showCad(int state)
 {
     assert(state != Qt::PartiallyChecked);
     cadCurve->setVisible(state == Qt::Checked);
+    setYMax();
+    replot();
+}
+
+void
+AllPlot::showAlt(int state) 
+{
+    assert(state != Qt::PartiallyChecked);
+    altCurve->setVisible(state == Qt::Checked);
     setYMax();
     replot();
 }
