@@ -183,7 +183,7 @@ pt_read_raw(FILE *in, int compat, void *context,
             else 
                 miles = meters / 1000.0 * KM_TO_MI;
             if (data_cb) 
-                data_cb(secs, nm, mph, watts, miles, cad, alt, 
+                data_cb(secs, nm, mph, watts, miles, alt, cad, 
                         hr, interval, context);
         }
         else { 
