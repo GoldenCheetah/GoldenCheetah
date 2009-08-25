@@ -134,7 +134,7 @@ RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors) const
 unsigned char *WkoParseRawData(unsigned char *fb, RideFile *rideFile)
 {
     unsigned int WKO_xormasks[32];    // xormasks used all over
-    double cad, hr, km, kph, nm, watts, interval;
+    double cad, hr, km, kph, nm, watts, alt, interval;
 
     int isnull=0;
     unsigned long records, data;
@@ -260,10 +260,14 @@ unsigned char *WkoParseRawData(unsigned char *fb, RideFile *rideFile)
                             if (imperialflag && WKO_GRAPHS[i]=='A') val = long((double) val * MTOFT);
                             if (imperialflag && WKO_GRAPHS[i]=='W') val = long((double) val * KMTOMI);
                             sprintf(GRAPHDATA[i], "%6ld.%1ld", sval/10, val%10);
+
+                            alt = val; alt /= 10;
                         } else {
                             if (imperialflag && WKO_GRAPHS[i]=='A') val = long((double) val * MTOFT);
                             if (imperialflag && WKO_GRAPHS[i]=='W') val = long((double) val * KMTOMI);
                             sprintf(GRAPHDATA[i], "%6ld.%1ld", val/10, val%10);
+
+                            alt = val; alt /=10;
                         }
                         break;
                     case 'T' : /* Torque */
@@ -351,7 +355,7 @@ unsigned char *WkoParseRawData(unsigned char *fb, RideFile *rideFile)
 
                     // !! needs to be modified to support the new alt patch
                     rideFile->appendPoint((double)rtime/1000, cad, hr, km,
-                            kph, nm, watts, 1, 0.0);
+                            kph, nm, watts, alt, 1);
             }
 
             // increment time - even for null records (perhaps especially for null
