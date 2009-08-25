@@ -124,6 +124,7 @@ RideFile *XmlFileReader::openRideFile(QFile &file, QStringList &errors) const
                         double nm = f.attribute("nm", "0.0").toDouble();
                         double secs = f.attribute("secs", "0.0").toDouble();
                         double watts = f.attribute("watts", "0.0").toDouble();
+                        double alt = f.attribute("alt", "0.0").toDouble();
                         int interval = 0;
                         for (int i = 0; i < intervals.size(); ++i) {
                             if ((secs >= intervals[i].from_secs) 
@@ -132,7 +133,7 @@ RideFile *XmlFileReader::openRideFile(QFile &file, QStringList &errors) const
                                 break;
                             }
                         }
-                        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, interval);
+                        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, interval);
                     }
                     else {
                         errors << ("unexpected element <" + e.tagName() + ">");

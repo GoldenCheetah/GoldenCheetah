@@ -49,6 +49,7 @@ class AllPlot : public QwtPlot
         QwtPlotCurve *hrCurve;
         QwtPlotCurve *speedCurve;
         QwtPlotCurve *cadCurve;
+        QwtPlotCurve *altCurve;
         QwtPlotMarker *d_mrk;
 	QList <AllPlotZoneLabel *> zoneLabels;
 
@@ -71,6 +72,7 @@ class AllPlot : public QwtPlot
         void showHr(int state);
         void showSpeed(int state);
         void showCad(int state);
+        void showAlt(int state);
         void showGrid(int state);
         void setSmoothing(int value);
         void setByDistance(int value);
@@ -85,6 +87,7 @@ class AllPlot : public QwtPlot
         double *cadArray;
         double *timeArray;
         double *distanceArray;
+        double *altArray;
         int arrayLength;
         int *interArray;
 

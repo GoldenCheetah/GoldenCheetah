@@ -194,6 +194,10 @@ MainWindow::MainWindow(const QDir &home) :
     showCad->setCheckState(Qt::Checked);
     showLayout->addWidget(showCad);
 
+    showAlt = new QCheckBox("Altitude", window);
+    showAlt->setCheckState(Qt::Checked);
+    showLayout->addWidget(showAlt);
+
     showPower = new QComboBox();
     showPower->addItem(tr("Power + shade"));
     showPower->addItem(tr("Power - shade"));
@@ -513,6 +517,8 @@ MainWindow::MainWindow(const QDir &home) :
             allPlot, SLOT(showSpeed(int)));
     connect(showCad, SIGNAL(stateChanged(int)),
             allPlot, SLOT(showCad(int)));
+    connect(showAlt, SIGNAL(stateChanged(int)),
+            allPlot, SLOT(showAlt(int)));
     connect(showGrid, SIGNAL(stateChanged(int)),
             allPlot, SLOT(showGrid(int)));
     connect(comboDistance, SIGNAL(currentIndexChanged(int)),
@@ -1938,17 +1944,20 @@ void MainWindow::setAllPlotWidgets(RideItem *ride)
 	showHr->setEnabled(dataPresent->hr);
 	showSpeed->setEnabled(dataPresent->kph);
 	showCad->setEnabled(dataPresent->cad);
+	showAlt->setEnabled(dataPresent->alt);
 	allPlot->showPower(showPower->currentIndex());
 	allPlot->wattsCurve->setVisible(dataPresent->watts && (showPower->currentIndex() < 2));
 	allPlot->hrCurve->setVisible(dataPresent->hr && showHr->isChecked());
 	allPlot->speedCurve->setVisible(dataPresent->kph && showSpeed->isChecked());
 	allPlot->cadCurve->setVisible(dataPresent->cad && showCad->isChecked());
+	allPlot->altCurve->setVisible(dataPresent->alt && showAlt->isChecked());
     }
     else {
 	showPower->setEnabled(false);
 	showHr->setEnabled(false);
 	showSpeed->setEnabled(false);
 	showCad->setEnabled(false);
+	showAlt->setEnabled(false);
 	allPlot->showPower(false);
 	allPlot->wattsCurve->setVisible(false);
 	allPlot->hrCurve->setVisible(false);

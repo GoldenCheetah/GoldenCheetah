@@ -72,12 +72,12 @@ time_cb(struct tm *, time_t since_epoch, void *context)
     double secs = since_epoch - state->start_since_epoch;
     state->rideFile->appendPoint(secs, 0.0, 0.0, 
                                  state->last_miles * MILES_TO_KM, 0.0, 
-                                 0.0, 0.0, state->last_interval);
+                                 0.0, 0.0, 0.0, state->last_interval);
     state->last_secs = secs;
 }
 
 static void
-data_cb(double secs, double nm, double mph, double watts, double miles, 
+data_cb(double secs, double nm, double mph, double watts, double miles, double alt, 
         unsigned cad, unsigned hr, unsigned interval, void *context)
 {
     if (nm < 0.0)    nm = 0.0;
@@ -86,7 +86,7 @@ data_cb(double secs, double nm, double mph, double watts, double miles,
 
     ReadState *state = (ReadState*) context;
     state->rideFile->appendPoint(secs, cad, hr, miles * MILES_TO_KM, 
-                                 mph * MILES_TO_KM, nm, watts, interval);
+                                 mph * MILES_TO_KM, nm, watts, alt, interval);
     state->last_secs = secs;
     state->last_miles = miles;
     state->last_interval = interval;
@@ -104,9 +104,9 @@ pt_read_raw(FILE *in, int compat, void *context,
             void (*config_cb)(unsigned interval, double rec_int_secs,
                               unsigned wheel_sz_mm, void *context),
             void (*time_cb)(struct tm *time, time_t since_epoch, void *context),
-            void (*data_cb)(double secs, double nm, double mph, 
-                            double watts, double miles, unsigned cad, 
-                            unsigned hr, unsigned interval, void *context),
+            void (*data_cb)(double secs, double nm, double mph, double watts, 
+                            double miles, double alt, unsigned cad, unsigned hr,
+                            unsigned interval, void *context),
             void (*error_cb)(const char *msg, void *context))
 {
     unsigned interval = 0;
@@ -122,6 +122,7 @@ pt_read_raw(FILE *in, int compat, void *context,
     double mph;
     double nm;
     double watts;
+    double alt;
     unsigned cad;
     unsigned hr;
     struct tm time;
@@ -182,7 +183,7 @@ pt_read_raw(FILE *in, int compat, void *context,
             else 
                 miles = meters / 1000.0 * KM_TO_MI;
             if (data_cb) 
-                data_cb(secs, nm, mph, watts, miles, cad, 
+                data_cb(secs, nm, mph, watts, miles, cad, alt, 
                         hr, interval, context);
         }
         else { 

@@ -19,6 +19,7 @@
 #include "RideMetric.h"
 
 #define MILES_PER_KM 0.62137119
+#define FEET_PER_METER 3.2808399
 
 class WorkoutTime : public RideMetric {
     double seconds;
@@ -91,6 +92,44 @@ class TotalDistance : public RideMetric {
 
 static bool totalDistanceAdded =
     RideMetricFactory::instance().addMetric(TotalDistance());
+
+//////////////////////////////////////////////////////////////////////////////
+
+
+class ElevationGain : public PointwiseRideMetric {
+    double elegain;
+    double prevalt;
+
+    public:
+
+    ElevationGain() : elegain(0.0) {}
+    QString name() const { return "elevation_gain"; }
+    QString units(bool metric) const { return metric ? "meters" : "feet"; }
+    double value(bool metric) const {
+        return metric ? elegain : (elegain * FEET_PER_METER);
+    }
+    void perPoint(const RideFilePoint *point, double,
+                  const RideFile *, const Zones *, int) {
+
+	if (prevalt <= 0){
+		prevalt = point->alt;
+	} else if (prevalt <= point->alt) {
+		elegain += (point->alt-prevalt);
+		prevalt = point->alt;
+	} else {
+		prevalt = point->alt;
+	}
+
+    }
+    bool canAggregate() const { return true; }
+    void aggregateWith(RideMetric *other) {
+        elegain += other->value(true);
+    }
+    RideMetric *clone() const { return new ElevationGain(*this); }
+};
+
+static bool elevationGainAdded =
+    RideMetricFactory::instance().addMetric(ElevationGain());
 
 //////////////////////////////////////////////////////////////////////////////
 

@@ -155,6 +155,8 @@ static const char *metricsXml =
     "            precision=\"1\"/>\n"    
     "    <metric name=\"total_work\" display_name=\"Work\"\n"
     "            precision=\"0\"/>\n"
+    "    <metric name=\"elevation_gain\" display_name=\"Elevation Gain\"\n"
+    "            precision=\"1\"/>\n"
     "  </metric_group>\n"
     "  <metric_group name=\"Averages\">\n"
     "    <metric name=\"average_speed\" display_name=\"Speed\"\n"

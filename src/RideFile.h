@@ -42,24 +42,24 @@
 
 struct RideFilePoint 
 {
-    double secs, cad, hr, km, kph, nm, watts;
+    double secs, cad, hr, km, kph, nm, watts, alt;
     int interval;
     double bs; // to init in order
     RideFilePoint() : secs(0.0), cad(0.0), hr(0.0), km(0.0), kph(0.0), 
-        nm(0.0), watts(0.0), interval(0), bs(0.0) {}
+        nm(0.0), watts(0.0), alt(0.0), interval(0), bs(0.0) {}
     RideFilePoint(double secs, double cad, double hr, double km, double kph, 
-                  double nm, double watts, int interval, double bs) :
+                  double nm, double watts, double alt, int interval, double bs) :
         secs(secs), cad(cad), hr(hr), km(km), kph(kph), nm(nm), 
-        watts(watts), interval(interval), bs(bs) {}
+        watts(watts), alt(alt), interval(interval), bs(bs) {}
 };
 
 struct RideFileDataPresent
 {
-    bool secs, cad, hr, km, kph, nm, watts, interval;
+    bool secs, cad, hr, km, kph, nm, watts, alt, interval;
     // whether non-zero data of each field is present
     RideFileDataPresent():
         secs(false), cad(false), hr(false), km(false),
-	    kph(false), nm(false), watts(false), interval(false) {}
+	    kph(false), nm(false), watts(false), alt(false), interval(false) {}
 };
 
 class RideFile 
@@ -96,7 +96,7 @@ class RideFile
         void setDeviceType(const QString &value) { deviceType_ = value; }
         
         void appendPoint(double secs, double cad, double hr, double km, 
-                double kph, double nm, double watts, int interval, double bs=0.0);
+                double kph, double nm, double watts, double alt, int interval, double bs=0.0);
 
         bool writeAsXml(QFile &file, QString &err) const;
         void writeAsCsv(QFile &file, bool bIsMetric) const;
