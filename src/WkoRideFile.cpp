@@ -512,7 +512,8 @@ unsigned char *WkoParseHeaderData(unsigned char *fb, RideFile *rideFile)
     case 0x05 : rideFile->setDeviceType("Polar (via WKO)"); break;
     case 0x06 : rideFile->setDeviceType("Computrainer/Velotron (via WKO)"); break;
     case 0x11 : rideFile->setDeviceType("Ergomo (via WKO)"); break;
-    case 0x13 : rideFile->setDeviceType("Garmin (via WKO)"); break;
+    case 0x12 : rideFile->setDeviceType("Garmin Edge 205/305 (via WKO)"); break;
+    case 0x13 : rideFile->setDeviceType("Garmin Edge 705 (via WKO)"); break;
     case 0x14 : rideFile->setDeviceType("Ergomo (via WKO)"); break;
     case 0x19 : rideFile->setDeviceType("Ergomo (via WKO)"); break;
     default : rideFile->setDeviceType("Unknown Device (via WKO)"); break;
@@ -925,6 +926,7 @@ unsigned int bitsize(char g, int WKO_device)
             break;
         case 0x01:
         case 0x00:
+        case 0x12: // Garmin Edge 205/305
         case 0x13:
         case 0x14:
             return 22;
