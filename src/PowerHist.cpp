@@ -477,6 +477,7 @@ PowerHist::setData(RideItem *_rideItem)
             }
 
 	    int hrIndex = int(floor(p1->hr / hrDelta));
+        if (hrIndex < 0) hrIndex = 0; // fix for index out of bounds with hr of -1. could happen with *any* dataa types?
 	    if (hrIndex < maxSize) {
 		if (hrIndex >= hrArray->size()) {
 		    int size = hrArray->size();
