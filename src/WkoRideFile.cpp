@@ -145,6 +145,7 @@ unsigned char *WkoParseRawData(unsigned char *fb, RideFile *rideFile)
 
     int i,j;
     int bit=0;
+    int calculate_distance=0;         // if speed is available but not distance we need to calculate it
     unsigned long inc;
     unsigned long rtime=0,rdist=0;
 
@@ -169,6 +170,10 @@ unsigned char *WkoParseRawData(unsigned char *fb, RideFile *rideFile)
             return (NULL);
         }
     }
+
+    // do we need to calculate distance ?
+    if (!strchr(WKO_GRAPHS, 'D') && strchr(WKO_GRAPHS, 'S')) calculate_distance = 1;
+    else calculate_distance = 0;
 
     /* So how many records are there? */
     fb += doshort(fb, &us);
@@ -279,6 +284,27 @@ unsigned char *WkoParseRawData(unsigned char *fb, RideFile *rideFile)
                         if (imperialflag && WKO_GRAPHS[i]=='S') val = long((double)val * KMTOMI);
                         sprintf(GRAPHDATA[i], "%6ld.%1ld", val/10, val%10);
                         kph = val; kph/= 10;
+
+                        // distance is not available so we need to calculate it
+                        if (calculate_distance) {
+                            double distance;
+                            double f, xi, xf;
+
+                            // inc is in 1000ths of a second kph val is kph*10
+                            rdist += (inc * kph) / 36;
+                            distance = rdist; 
+                            distance /= 100000;
+
+                            // convert to imperial units ?
+                            if (imperialflag) distance *= KMTOMI;
+
+                            // round to max of 3 decimal places
+                            xf = modf(distance,&xi);
+                            f = floor(xf*1000+0.5)/1000.0;
+
+                            sprintf(GRAPHDATA[i], "%g", xi+f);
+                            km = xi+f;
+                        } 
                         break;
                     case 'D' : /* Distance - running total to 3 decimal places */
                         double distance;
