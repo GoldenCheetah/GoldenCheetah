@@ -23,6 +23,10 @@
 #include "MainWindow.h"
 #include "Settings.h"
 
+// BLECK - homedir passing via global becuase ridefile is pure virtual and 
+//         cannot pass with current definition -- Sean can advise!!
+extern QString WKO_HOMEDIR;
+
 int 
 main(int argc, char *argv[])
 {
@@ -83,6 +87,8 @@ main(int argc, char *argv[])
             home.cd(libraryPath);
         }
     }
+    // used by WkoRideFileReader to store notes
+    WKO_HOMEDIR = home.absolutePath();
     
     QVariant lastOpened = settings->value(GC_SETTINGS_LAST);
     QVariant unit = settings->value(GC_UNIT);

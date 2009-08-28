@@ -993,9 +993,6 @@ MainWindow::importTCX()
 }
 
 
-// BLECK - homedir passing via global becuase ridefile is pure virtual and 
-//         cannot pass with current definition -- Sean can advise!!
-extern QString WKO_HOMEDIR;
 
 void
 MainWindow::importWKO()
@@ -1012,7 +1009,6 @@ MainWindow::importWKO()
     }
     QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
     QStringListIterator i(fileNames);
-    WKO_HOMEDIR = home.absolutePath();
     while (i.hasNext()) {
         QString fileName = i.next();
         QFile file(fileName);
