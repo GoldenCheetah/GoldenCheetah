@@ -29,7 +29,7 @@ QMAKE_CXXFLAGS += -DGC_MINOR_VER=1
 RC_FILE = images/gc.icns
 
 macx {
-    LIBS += -framework Carbon
+    LIBS += -framework cocoa
 }
 
 HEADERS += \
