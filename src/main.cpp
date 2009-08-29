@@ -87,8 +87,6 @@ main(int argc, char *argv[])
             home.cd(libraryPath);
         }
     }
-    // used by WkoRideFileReader to store notes
-    WKO_HOMEDIR = home.absolutePath();
     
     QVariant lastOpened = settings->value(GC_SETTINGS_LAST);
     QVariant unit = settings->value(GC_UNIT);
@@ -104,6 +102,8 @@ main(int argc, char *argv[])
         while (i.hasNext()) {
             QString cyclist = i.next();
             if (home.cd(cyclist)) {
+                // used by WkoRideFileReader to store notes
+                WKO_HOMEDIR = home.absolutePath();
                 MainWindow *main = new MainWindow(home);
                 main->show();
                 home.cdUp();
@@ -119,6 +119,8 @@ main(int argc, char *argv[])
         home.cd(d.choice());
         if (!home.exists())
             assert(false);
+        // used by WkoRideFileReader to store notes
+        WKO_HOMEDIR = home.absolutePath();
         MainWindow *main = new MainWindow(home);
         main->show();
     }
