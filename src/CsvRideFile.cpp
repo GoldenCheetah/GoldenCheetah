@@ -170,6 +170,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                      cad	 = line.section(',', 3, 3).toDouble();
                      kph	 = line.section(',', 4, 4).toDouble();
                      hr		 = line.section(',', 5, 5).toDouble();
+                     alt	 = line.section(',', 6, 6).toDouble();
                      interval	 = line.section(',', 8, 8).toInt();
                      pause	 = line.section(',', 9, 9).toInt();
                      total_pause += pause;
