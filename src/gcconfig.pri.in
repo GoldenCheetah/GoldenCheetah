@@ -5,6 +5,7 @@
 BOOST_INSTALL = /usr/local/boost
 QWT_INSTALL = /usr/local/qwt
 SRMIO_INSTALL = /usr/local/srmio
+D2XX_INCLUDE = /usr/local/include/D2XX
 
 # Edit these paths only if you have a Boost/QWT/srmio install that uses
 # a non-standard directory layout.
