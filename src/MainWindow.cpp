@@ -44,7 +44,7 @@
 #include <qwt_data.h>
 #include <boost/scoped_ptr.hpp>
 #include "DaysScaleDraw.h"
-
+#include "RideCalendar.h"
 #include "DatePickerDialog.h"
 #include "ToolsDialog.h"
 #include "MetricAggregator.h"
@@ -136,6 +136,9 @@ MainWindow::MainWindow(const QDir &home) :
     setCentralWidget(splitter);
     splitter->setContentsMargins(10, 20, 10, 10); // attempting to follow some UI guides
 
+    calendar = new RideCalendar;
+    calendar->setFirstDayOfWeek(Qt::Monday);
+
     treeWidget = new QTreeWidget;
     treeWidget->setColumnCount(3);
     treeWidget->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -143,7 +146,7 @@ MainWindow::MainWindow(const QDir &home) :
     treeWidget->header()->resizeSection(0,70);
     treeWidget->header()->resizeSection(1,95);
     treeWidget->header()->resizeSection(2,70);
-    treeWidget->setMaximumWidth(250);
+    //treeWidget->setMaximumWidth(250);
     treeWidget->header()->hide();
     treeWidget->setAlternatingRowColors (true);
     treeWidget->setIndentation(5);
@@ -151,7 +154,19 @@ MainWindow::MainWindow(const QDir &home) :
     allRides = new QTreeWidgetItem(treeWidget, FOLDER_TYPE);
     allRides->setText(0, tr("All Rides"));
     treeWidget->expandItem(allRides);
-    splitter->addWidget(treeWidget);
+
+    leftLayout = new QSplitter;
+    leftLayout->setOrientation(Qt::Vertical);
+    leftLayout->addWidget(calendar);
+    leftLayout->setCollapsible(0, false);
+    leftLayout->addWidget(treeWidget);
+    leftLayout->setCollapsible(1, false);
+    splitter->addWidget(leftLayout);
+    splitter->setCollapsible(0, false);
+    QVariant calendarSizes = settings->value(GC_SETTINGS_CALENDAR_SIZES);
+    if (calendarSizes != QVariant()) {
+        leftLayout->restoreState(calendarSizes.toByteArray());
+    }
 
     QTreeWidgetItem *last = NULL;
     QStringListIterator i(RideFileFactory::instance().listRideFiles(home));
@@ -162,6 +177,39 @@ MainWindow::MainWindow(const QDir &home) :
             last = new RideItem(RIDE_TYPE, home.path(), 
                                 name, dt, &zones, notesFileName);
             allRides->addChild(last);
+
+            /*
+             *  We want to display these things inside the Calendar.
+             *  Pick a colour (this should really be configurable)
+             *    - red for races
+             *    - yellow for sick days
+             *    - green for rides
+             */
+            QString notesPath = home.absolutePath() + "/" + notesFileName;
+            QFile notesFile(notesPath);
+            QColor color(Qt::green);
+            QString line("Ride");
+            if (notesFile.exists()) {
+                if (notesFile.open(QFile::ReadOnly | QFile::Text)) {
+                    QTextStream in(&notesFile);
+                    line = in.readLine();
+                    notesFile.close();
+                    if (line.contains("race", Qt::CaseInsensitive)) {
+                        color = QColor(Qt::red);
+                        line = "RACE";
+                    }
+                    if (line.contains("sick", Qt::CaseInsensitive)) {
+                        color = QColor(Qt::red);
+                    }
+                    if (line.contains("swim", Qt::CaseInsensitive)) {
+                        color = QColor(Qt::blue);
+                    }
+                    if (line.contains("gym", Qt::CaseInsensitive)) {
+                        color = QColor(Qt::gray);
+                    }
+                }
+            }
+            calendar->addEvent(dt.date(), line, color);
         }
     }
 
@@ -260,6 +308,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     tabWidget->addTab(window, "Ride Plot");
     splitter->addWidget(tabWidget);
+    splitter->setCollapsible(1, false);
 
     QVariant splitterSizes = settings->value(GC_SETTINGS_SPLITTER_SIZES); 
     if (splitterSizes != QVariant())
@@ -505,6 +554,10 @@ MainWindow::MainWindow(const QDir &home) :
 
     ////////////////////////////// Signals ////////////////////////////// 
 
+    connect(calendar, SIGNAL(clicked(const QDate &)),
+            this, SLOT(dateChanged(const QDate &)));
+    connect(leftLayout, SIGNAL(splitterMoved(int,int)),
+            this, SLOT(leftLayoutMoved()));
     connect(treeWidget, SIGNAL(itemSelectionChanged()),
             this, SLOT(rideSelected()));
     connect(splitter, SIGNAL(splitterMoved(int,int)), 
@@ -1130,6 +1183,7 @@ MainWindow::rideSelected()
     }
 
     ride = (RideItem*) which;
+    calendar->setSelectedDate(ride->dateTime.date());
     rideSummary->setHtml(ride->htmlSummary());
     rideSummary->setAlignment(Qt::AlignCenter);
     if (ride) {
@@ -1186,7 +1240,7 @@ void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
 	BSdays.setValue(30); // by default look back no more than 30 days
 
     // if there are rides, find most recent ride so we count back from there:
-    if (allRides->childCount() > 0) 
+    if (allRides->childCount() > 0)
 	lastRideItem =  (RideItem*) allRides->child(allRides->childCount() - 1);
     else
 	lastRideItem = ride; // not enough rides, use current ride
@@ -1553,7 +1607,7 @@ void MainWindow::generateWeeklySummary()
 
     // Now open any notes associated with the new ride.
     rideNotes->setPlainText("");
-    QString notesPath = home.absolutePath() + "/" + ride->notesFileName;  
+    QString notesPath = home.absolutePath() + "/" + ride->notesFileName;
     QFile notesFile(notesPath);
 
     if (notesFile.exists()) {
@@ -1561,7 +1615,7 @@ void MainWindow::generateWeeklySummary()
             QTextStream in(&notesFile);
             rideNotes->setPlainText(in.readAll());
             notesFile.close();
-        } 
+        }
         else {
             QMessageBox::critical(
                 this, tr("Read Error"),
@@ -1569,7 +1623,7 @@ void MainWindow::generateWeeklySummary()
         }
     }
 
-    currentNotesFile = ride->notesFileName; 
+    currentNotesFile = ride->notesFileName;
     currentNotesChanged = false;
 }
 
@@ -1591,7 +1645,7 @@ void MainWindow::saveNotes()
                     tr("Can't rename %1 to %2")
                     .arg(tmpPath).arg(notesPath));
             }
-        } 
+        }
         else {
             QMessageBox::critical(
                 this, tr("Write Error"),
@@ -1647,7 +1701,13 @@ MainWindow::closeEvent(QCloseEvent*)
     saveNotes();
 }
 
-void 
+void
+MainWindow::leftLayoutMoved()
+{
+    settings->setValue(GC_SETTINGS_CALENDAR_SIZES, leftLayout->saveState());
+}
+
+void
 MainWindow::splitterMoved()
 {
     settings->setValue(GC_SETTINGS_SPLITTER_SIZES, splitter->saveState());
@@ -2112,3 +2172,23 @@ void MainWindow::setHistWidgets(RideItem *rideItem)
     withZerosCheckBox->setEnabled(false);
     lnYHistCheckBox->setEnabled(false);    
 }
+
+/*
+ *  This slot gets called when the user picks a new date, using the mouse,
+ *  in the calendar.  We have to adjust TreeView to match.
+ */
+void MainWindow::dateChanged(const QDate &date)
+{
+    for (int i = 0; i < allRides->childCount(); i++)
+    {
+        ride = (RideItem*) allRides->child(i);
+        if (ride->dateTime.date() == date) {
+            treeWidget->scrollToItem(allRides->child(i),
+                QAbstractItemView::EnsureVisible);
+            treeWidget->setCurrentItem(allRides->child(i));
+            i = allRides->childCount();
+        }
+    }
+}
+
+

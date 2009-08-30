@@ -28,6 +28,7 @@
 #define GC_SETTINGS_MAIN_Y          "mainwindow/y"
 #define GC_SETTINGS_MAIN_GEOM       "mainwindow/geometry"
 #define GC_SETTINGS_SPLITTER_SIZES  "mainwindow/splitterSizes"
+#define GC_SETTINGS_CALENDAR_SIZES  "mainwindow/calendarSizes"
 #define GC_DATETIME_FORMAT          "ddd MMM dd, yyyy, hh:mm AP"
 #define GC_UNIT                     "unit"
 #define GC_SETTINGS_LAST_IMPORT_PATH "mainwindow/lastImportPath"

@@ -34,6 +34,7 @@ class QwtPlotPicker;
 class QwtPlotZoomer;
 class RideFile;
 class Zones;
+class RideCalendar;
 
 class MainWindow : public QMainWindow 
 {
@@ -54,6 +55,7 @@ class MainWindow : public QMainWindow
     
     private slots:
         void rideSelected();
+        void leftLayoutMoved();
         void splitterMoved();
         void newCyclist();
         void openCyclist();
@@ -93,6 +95,7 @@ class MainWindow : public QMainWindow
 	void importRideToDB();
         void scanForMissing();
 	void generateWeeklySummary();
+	void dateChanged(const QDate &);
 
     protected: 
 
@@ -105,6 +108,7 @@ class MainWindow : public QMainWindow
 
         QSettings *settings;
 
+        RideCalendar *calendar;
         QSplitter *splitter;
         QTreeWidget *treeWidget;
         QTabWidget *tabWidget;
@@ -140,6 +144,7 @@ class MainWindow : public QMainWindow
         QwtPlotCurve *weeklyBaselineCurve;
         QwtPlotCurve *weeklyBSBaselineCurve;
         QwtPlot *weeklyBSPlot;
+        QSplitter *leftLayout;
 
         QwtPlotCurve *weeklyBSCurve;
         QwtPlotCurve *weeklyRICurve;
