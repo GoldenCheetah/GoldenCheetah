@@ -22,10 +22,8 @@
 #include "CommPort.h"
 #ifdef WIN32
     #include <windows.h>
-    #include "../ftdi/FTD2XX.H"
-#else
-    #include <D2XX/ftd2xx.h>
 #endif
+#include <ftd2xx.h>
 
 class D2XX : public CommPort
 {

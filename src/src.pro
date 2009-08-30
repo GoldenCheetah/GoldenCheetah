@@ -5,7 +5,7 @@ include( gcconfig.pri )
 TEMPLATE = app
 TARGET = GoldenCheetah
 DEPENDPATH += .
-INCLUDEPATH += $${BOOST_INCLUDE} $${QWT_INCLUDE}
+INCLUDEPATH += $${BOOST_INCLUDE} $${QWT_INCLUDE} $${D2XX_INCLUDE}
 CONFIG += static debug
 QT += xml sql
 LIBS += $${QWT_LIB}
