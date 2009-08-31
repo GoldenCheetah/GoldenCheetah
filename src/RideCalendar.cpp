@@ -8,19 +8,13 @@
 #include <QTextCharFormat>
 #include <QPen>
 
+#include "RideItem.h"
 #include "RideCalendar.h"
 
 RideCalendar::RideCalendar(QWidget *parent)
                    : QCalendarWidget(parent)
 {
 };
-
-void RideCalendar::addEvent(QDate date, QString string, QColor color)
-{
-    _text[date] = string;
-    _color[date] = color;
-    update();
-}
 
 void RideCalendar::paintCell(QPainter *painter, const QRect &rect, const QDate &date) const
 {
@@ -62,6 +56,75 @@ void RideCalendar::paintCell(QPainter *painter, const QRect &rect, const QDate &
         painter->restore();
     } else {
         QCalendarWidget::paintCell(painter, rect, date);
+    }
+}
+
+void RideCalendar::setHome(const QDir &homeDir)
+{
+    home = homeDir;
+}
+
+void RideCalendar::addRide(RideItem* ride)
+{
+    qWarning("RideCalendar::addRide() Adding a ride.");
+    /*
+     *  We want to display these things inside the Calendar.
+     *  Pick a colour (this should really be configurable)
+     *    - red for races
+     *    - yellow for sick days
+     *    - green for rides
+     */
+    QDateTime dt = ride->dateTime;
+    QString notesPath = home.absolutePath() + "/" + ride->notesFileName;
+    QFile notesFile(notesPath);
+    QColor color(Qt::green);
+    QString line("Ride");
+    QString code;
+    if (notesFile.exists()) {
+        if (notesFile.open(QFile::ReadOnly | QFile::Text)) {
+            QTextStream in(&notesFile);
+            line = in.readLine();
+            notesFile.close();
+	    foreach(code, workoutCodes.keys()) {
+                if (line.contains(code, Qt::CaseInsensitive)) {
+                    color = workoutCodes[code];
+                }
+	    }
+        }
+    }
+    addEvent(dt.date(), line, color);
+}
+
+void RideCalendar::removeRide(RideItem* ride)
+{
+    removeEvent(ride->dateTime.date());
+}
+
+void RideCalendar::addWorkoutCode(QString string, QColor color)
+{
+    workoutCodes[string] = color;
+}
+
+/*
+ * Private:
+ * Add a string, and a color, to a specific date.
+ */
+void RideCalendar::addEvent(QDate date, QString string, QColor color)
+{
+    _text[date] = string;
+    _color[date] = color;
+    update();
+}
+
+/*
+ * Private:
+ * Remove the info for a current date.
+ */
+void RideCalendar::removeEvent(QDate date)
+{
+    if (_text.contains(date)) {
+	_text.remove(date);
+	_color.remove(date);
     }
 }
 

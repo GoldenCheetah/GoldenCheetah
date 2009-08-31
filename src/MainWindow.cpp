@@ -138,6 +138,11 @@ MainWindow::MainWindow(const QDir &home) :
 
     calendar = new RideCalendar;
     calendar->setFirstDayOfWeek(Qt::Monday);
+    calendar->setHome(home);
+    calendar->addWorkoutCode(QString("race"), QColor(Qt::red));
+    calendar->addWorkoutCode(QString("sick"), QColor(Qt::yellow));
+    calendar->addWorkoutCode(QString("swim"), QColor(Qt::blue));
+    calendar->addWorkoutCode(QString("gym"), QColor(Qt::gray));
 
     treeWidget = new QTreeWidget;
     treeWidget->setColumnCount(3);
@@ -177,39 +182,7 @@ MainWindow::MainWindow(const QDir &home) :
             last = new RideItem(RIDE_TYPE, home.path(), 
                                 name, dt, &zones, notesFileName);
             allRides->addChild(last);
-
-            /*
-             *  We want to display these things inside the Calendar.
-             *  Pick a colour (this should really be configurable)
-             *    - red for races
-             *    - yellow for sick days
-             *    - green for rides
-             */
-            QString notesPath = home.absolutePath() + "/" + notesFileName;
-            QFile notesFile(notesPath);
-            QColor color(Qt::green);
-            QString line("Ride");
-            if (notesFile.exists()) {
-                if (notesFile.open(QFile::ReadOnly | QFile::Text)) {
-                    QTextStream in(&notesFile);
-                    line = in.readLine();
-                    notesFile.close();
-                    if (line.contains("race", Qt::CaseInsensitive)) {
-                        color = QColor(Qt::red);
-                        line = "RACE";
-                    }
-                    if (line.contains("sick", Qt::CaseInsensitive)) {
-                        color = QColor(Qt::red);
-                    }
-                    if (line.contains("swim", Qt::CaseInsensitive)) {
-                        color = QColor(Qt::blue);
-                    }
-                    if (line.contains("gym", Qt::CaseInsensitive)) {
-                        color = QColor(Qt::gray);
-                    }
-                }
-            }
-            calendar->addEvent(dt.date(), line, color);
+	    calendar->addRide(reinterpret_cast<RideItem*>(last));
         }
     }
 
@@ -703,6 +676,7 @@ MainWindow::addRide(QString name, bool bSelect /*=true*/)
         ++index;
     }
     allRides->insertChild(index, last);
+    calendar->addRide(last);
     cpintPlot->needToScanRides = true;
     if (bSelect)
     {
@@ -734,6 +708,7 @@ MainWindow::removeCurrentRide()
 
     QString strOldFileName = item->fileName;
     allRides->removeChild(item);
+    calendar->removeRide(item);
     delete item;
 
     QFile file(home.absolutePath() + "/" + strOldFileName);
