@@ -42,14 +42,13 @@ main(int argc, char *argv[])
     QString oldLibraryPath=QDir::home().path()+"/Library/GoldenCheetah";
 
     //these are the new platform-dependent library paths
-#ifdef Q_OS_LINUX
-    QString libraryPath=".goldencheetah";
-#endif
-#ifdef Q_OS_MACX
+#if defined(Q_OS_MACX)
     QString libraryPath="Library/GoldenCheetah";
-#endif
-#ifdef Q_OS_WIN
+#elif defined(Q_OS_WIN)
     QString libraryPath="Application Data/Local/GoldenCheetah";
+#else
+    // Q_OS_LINUX et al
+    QString libraryPath=".goldencheetah";
 #endif
 
     //First check to see if the Library folder exists where the executable is (for USB sticks)
