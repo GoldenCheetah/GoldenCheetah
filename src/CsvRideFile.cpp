@@ -48,6 +48,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
     bool ergomo = false;
     int unitsHeader = 1;
     int total_pause = 0;
+    int currentInterval = 0;
+    int prevInterval = 0;
     
     // TODO: with all these formats, should the logic change to a switch/case structure?
     // The iBike format CSV file has five lines of headers (data begins on line 6)
@@ -172,6 +174,11 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                      hr		 = line.section(',', 5, 5).toDouble();
                      alt	 = line.section(',', 6, 6).toDouble();
                      interval	 = line.section(',', 8, 8).toInt();
+                     if (interval != prevInterval) {
+                         prevInterval = interval;
+                         if (interval != 0) currentInterval++;
+                     }
+                     if (interval != 0) interval = currentInterval;
                      pause	 = line.section(',', 9, 9).toInt();
                      total_pause += pause;
                      nm		 = NULL; // torque is not provided in the Ergomo file
