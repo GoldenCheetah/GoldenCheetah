@@ -66,7 +66,6 @@ void RideCalendar::setHome(const QDir &homeDir)
 
 void RideCalendar::addRide(RideItem* ride)
 {
-    qWarning("RideCalendar::addRide() Adding a ride.");
     /*
      *  We want to display these things inside the Calendar.
      *  Pick a colour (this should really be configurable)
