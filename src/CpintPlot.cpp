@@ -19,6 +19,7 @@
 #include "Zones.h"
 #include "CpintPlot.h"
 #include <assert.h>
+#include <unistd.h>
 #include <QDebug>
 #include <qwt_data.h>
 #include <qwt_legend.h>
