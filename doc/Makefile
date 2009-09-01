@@ -28,6 +28,9 @@ contact.html: contact.content genpage.pl
 contrib.html: contrib.content genpage.pl
 	./genpage.pl "Contributors" $< > $@
 
+developers-guide.html: developers-guide.content genpage.pl
+	./genpage.pl "Developer's Guide" $< > $@
+
 download.html: download.content genpage.pl
 	./genpage.pl "Download" $< > $@
 

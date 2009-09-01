@@ -28,13 +28,22 @@ print<<EOF;
 <head>
 <title>Golden Cheetah: Cycling Performance Software for Linux, Mac OS X, and Windows</title>
  <meta name="keywords" content="powertap srm linux mac cycling performance">
+<style type='text/css'>
+li {
+    margin: .5em 0
+}
+body {
+    color: #000000;
+    background: #ffffff;
+}
+:link {
+      color: #5e431b;
+}
+:visited {
+      color: #996e2d;
+}
+</style>
 </head>
-
-<body    text="#000000" 
-         link="#5e431b" 
-        vlink="#996e2d" 
-        alink="#000000" 
-      bgcolor="#ffffff">
 
 <table width="95%" border="0" width="100%" cellspacing="10">
 <tr>
@@ -47,6 +56,7 @@ print<<EOF;
 <p>  <b><a href="index.html">Introduction</a></b>
 <br> <b><a href="screenshots.html">Screenshots</a>
 <br> <b><a href="users-guide.html">User's Guide</a>
+<br> <b><a href="developers-guide.html">Developer's Guide</a>
 <br> <b><a href="faq.html">FAQ</a>
 <br> <b><a href="wishlist.html">Wish List</a>
 <br> <b><a href="license.html">License</a></b>
