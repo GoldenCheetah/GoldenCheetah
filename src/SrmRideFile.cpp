@@ -37,7 +37,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errors) const
         SrmDataPoint *p = i.next();
         double nm = p->watts / 2.0 / PI / p->cad * 60.0;
         rideFile->appendPoint(p->secs, p->cad, p->hr, p->km, 
-                              p->kph, nm, p->watts, p->alt, p->interval);
+                              p->kph, nm, p->watts, 0.0, p->interval);
     }
     return rideFile;
 }
