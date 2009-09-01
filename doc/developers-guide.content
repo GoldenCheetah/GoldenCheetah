@@ -1,0 +1,544 @@
+<!-- $Id: users-guide.content,v 1.5 2006/05/27 16:32:46 srhea Exp $ -->
+
+<p>This guide will teach you how to download the GoldenCheetah source code,
+build it, modify it, and submit your changes to be included in the next
+release.  If you're just looking to use GoldenCheetah, please check out the
+<a href="users-guide.html">Users Guide</a> or the
+<a href="download.html">Download Page</a>.</p>
+
+<big><font face="arial,helvetica,sanserif">
+Installing dependencies
+</font></big>
+
+<p>GC requires a number of libraries.  On Mac OS X, you can get most of these
+through <a href="http://www.macports.org/">Mac Ports</a>.  On Linux and other
+Unixes, you can use whatever package manager your distribution provides.  (We
+list the package names for MacPorts and Ubuntu below.)  On Windows, you'll
+probably need to download and install everything by hand.</p>
+
+<p>You'll need the following:</p>
+<table align="center" width="500">
+<tr>
+  <td>Package</td>
+  <td>Version</td>
+  <td>MacPorts</td>
+  <td>Ubuntu</td>
+</tr>
+<tr>
+  <td><a href="http://qt.nokia.com/downloads">Qt</a></td>
+  <td>4.5.0 or later</td>
+  <td>qt4-mac-devel</td>
+  <td>libqt4-dev</td>
+</tr>
+<tr>
+  <td><a href="http://sourceforge.net/projects/qwt/">Qwt</a></td>
+  <td>5.1.0 or later</td>
+  <td>qwt</td>
+  <td>libqwt-dev</td>
+</tr>
+<tr>
+  <td><a href="http://www.boost.org/users/download/">Boost</a></td>
+  <td>1.38.0 or later</td>
+  <td>boost</td>
+  <td>libboost-dev</td>
+</tr>
+<tr>
+  <td><a href="http://git-scm.com/download">git</a></td>
+  <td>any</td>
+  <td>git-core</td>
+  <td>git</td>
+</tr>
+</table>
+
+<p>If you're going to download directly from a PowerTap, you might need to
+install the <a href="http://www.ftdichip.com/Drivers/D2XX.htm">FTDI USB
+driver</a>.  If you're going to download directly from an SRM, you need to
+download and install <a href="git://github.com/rclasen/srmio.git">libsrmio</a>.
+Neither of these libraries is required if you just want to import data you've
+already downloaded with another program.</p>
+
+<big><font face="arial,helvetica,sanserif">
+Checking out the code
+</font></big>
+
+<p>Once you've downloaded and installed the above dependencies, you need to
+check out the GC source code.  GC uses <em>git</em> for version control.  To
+checkout the code, execute this command:</p>
+
+<blockquote>
+<pre>
+git clone git://github.com/srhea/GoldenCheetah.git
+</pre>
+</blockquote>
+
+<p>That should create a new directory, <code>GoldenCheetah</code>, in your
+current working directory.  In the rest of this document, we'll reference
+paths relative to that directory.  You can find the source code in
+<code>GoldenCheetah/src</code>, for instance.  Likewise, this
+document is in <code>GoldenCheetah/doc/developers-guide.content</code>.<p>
+
+<big><font face="arial,helvetica,sanserif">
+Building an executable
+</font></big>
+
+<p>To build GC, we currently use <em>qmake</em>, which comes with the Qt
+libraries referenced above.  All local configuration is stored in the file
+<code>gcconfig.pri</code>, which you create by copying
+<code>gcconfig.pri.in</code>, both in the <code>GoldenCheetah/src</code>
+directory.  The steps you'll take are as follows:</p>
+
+<blockquote>
+<pre>
+cd GoldenCheetah/src
+cp gcconfig.pri.in gcconfig.pri
+vi gcconfig.pri # follow the directions at the top of the file
+qmake # called qmake-mac in MacPorts
+make
+</pre>
+</blockquote>
+
+<p>We're aware that a lot of people would rather use a configure-like script
+for the build process.  We would too, but none of us know
+<a href="http://www.gnu.org/software/autoconf/">autoconf</a> well
+enough to integrate it with Qt on Mac, Linux, and Windows.  If you can help
+us out with that, please email the
+<a href="cgi-bin/mailman/listinfo/golden-cheetah-users">GoldenCheetah User's
+Mailing List</a>.</p>
+
+<big><font face="arial,helvetica,sanserif">
+Making changes
+</font></big>
+
+<p>Now that you've got GC up and running, you can add whatever features you want.
+We generally frown on dogmatic coding conventions, and we're big fans of the
+"rough consensus and running code" philosophy.  That said, please do your best
+to adhere to the following style guidelines:</p>
+
+<ul>
+<li>Use spaces instead of tabs.
+
+<li>Do not end lines with whitespace.  End every file with a newline.
+Otherwise git becomes angry.  This command will 
+highlight any whitespace problems in commit <em>abcd0123</em> in red:
+
+<blockquote>
+<pre>
+git show --color abcd0123
+</pre>
+</blockquote>
+
+<li>Avoid "using namespace ..." in header files.
+
+<li>Don't declare global variables in header files.  If you must use a global
+variable, declare it <code>static</code> within a .cpp file.
+
+<li>Only call C++'s operator <code>new</code> within the constructors and
+<code>reset</code> functions of <code>std::auto_ptr</code>,
+<code>boost::scoped_pointer</code>, etc. or when passing a parent pointer to a
+Qt class (so that the parent deletes the child).  Never call
+<code>delete</code> explicitly.
+
+<li>Do not use <code>malloc</code> or <code>free</code> unless forced to by an
+external C library.
+
+<li>Allocate large buffers on the heap, not on the stack.
+
+<li>When the C++ standard library has an appropriate function, use it.
+Likewise for Qt and Boost.
+
+<li>Only use external libraries with GPL-compatible licenses.
+
+<li>Avoid C-style casts.  Learn and use C++'s <code>static_cast</code>,
+<code>reinterpret_cast</code>, etc.
+</ul>
+
+<p>Not all of the GoldenCheetah code follows these guidelines today, but we're
+working on it.  You can help out by adhering to them in new code.</p>
+
+<hr width="20%"/>
+
+<p>At some point, you'll probably decide that a change you've made is worth
+sharing with others.  You'll use <em>git</em> again to share your changes, and
+the following sections will show you how.  A warning: git is pretty hard to
+learn, but it's worth it.  Once you get used to it, you'll be surprised you
+ever put up with another revision control system.</p>
+
+<big><font face="arial,helvetica,sanserif">
+Committing changes to git
+</font></big>
+
+<p> An example will make this section more concrete.  Since my SRM doesn't
+record altitude, let's say that I get annoyed that the Ride Summary always
+shows "Elevation Gain (feet): 0.0", so I change the code not to show any ride
+metric whose value is zero.  <em>git-diff</em> shows exactly what I've
+changed:</p>
+
+<blockquote>
+<pre>
+$ cd GoldenCheetah/src
+$ git diff
+diff --git a/src/RideItem.cpp b/src/RideItem.cpp
+index 6971b9b..c368725 100644
+--- a/src/RideItem.cpp
++++ b/src/RideItem.cpp
+@@ -362,6 +362,8 @@ RideItem::htmlSummary()
+                 assert(displayName.length() &gt; 0);
+                 const RideMetric *m = metrics.value(name);
+                 assert(m);
++                if (m-&gt;value(false) == 0.0)
++                    continue;
+                 if (m-&gt;units(metricUnits) == "seconds") {
+                     QString s("&lt;tr&gt;&lt;td&gt;%1:&lt;/td&gt;&lt;td "
+                               "align=\"right\"&gt;%2&lt;/td&gt;&lt;/tr&gt;");
+</pre>
+</blockquote>
+
+<p>In order to share this change, I need to use <em>git-commit</em>:</p>
+
+<blockquote>
+<pre>
+$ git commit RideItem.cpp
+</pre>
+</blockquote>
+
+<p>git will open up an editor for me to type a commit message.  It's important
+to take the time to write good commit messages, as they form a history of who
+has changed which lines of code and for what purpose.  The first line of every
+commit message should be a short description of 40 characters or less.  The
+second line should be blank.  Subsequent lines should be less than 80
+characters long and should describe the change in detail.  Once I write the
+file and exit the editor, <em>git-log</em> will show the result:</p>
+
+<blockquote>
+<pre>
+$ git log -p -1
+commit 30303ef2d11f4bead0860b969b4b74814053b76b
+Author: Sean Rhea &lt;sean.c.rhea@gmail.com&gt;
+Date:   Wed Sep 2 21:04:33 2009 -0400
+
+    don't include zero metrics in ride summary
+
+    When a device doesn't have altitude, there's no reason to show it.  Likewise
+    with heart rate if the user wasn't wearing a heart rate monitor during a ride.
+    Maybe in the future this behavior could be enabled on a per-metric basis.
+
+diff --git a/src/RideItem.cpp b/src/RideItem.cpp
+index 6971b9b..c368725 100644
+--- a/src/RideItem.cpp
++++ b/src/RideItem.cpp
+@@ -362,6 +362,8 @@ RideItem::htmlSummary()
+                 assert(displayName.length() &gt; 0);
+                 const RideMetric *m = metrics.value(name);
+                 assert(m);
++                if (m-&gt;value(false) == 0.0)
++                    continue;
+                 if (m-&gt;units(metricUnits) == "seconds") {
+                     QString s("&lt;tr&gt;&lt;td&gt;%1:&lt;/td&gt;&lt;td "
+                               "align=\"right\"&gt;%2&lt;/td&gt;&lt;/tr&gt;");
+</pre>
+</blockquote>
+
+<big><font face="arial,helvetica,sanserif">
+Managing commits
+</font></big>
+
+<p>git works best if you commit early and often.  For example, I usually
+commit a few times as I'm writing a new feature.  Once I get my code to
+compile, I commit it again.  Then if I fix any bugs that turn up during
+runtime, I commit the bug fixes.  Then maybe I go back and clean up the new
+code, now that I understand the problem better, and I commit those changes,
+too.</p>
+
+<p>The reasoning behind all of these commits is that commits are like save
+points in a video game.  If at any point I decide I'm messing things up,
+I can just go back to the previous commit.  <em>git-diff</em> shows me my
+uncommitted changes.  Let's say that I've decided I should also change the
+text in the Ride Summary to reflect the fact that I'm only showing non-zero
+metrics now.  Here's my change:</p>
+
+<blockquote>
+<pre>
+$ git diff
+diff --git a/src/RideItem.cpp b/src/RideItem.cpp
+index c368725..2ff9c49 100644
+--- a/src/RideItem.cpp
++++ b/src/RideItem.cpp
+@@ -159,13 +159,13 @@ static const char *metricsXml =
+     "            precision=\"1\"/&gt;\n"
+     "  &lt;/metric_group&gt;\n"
+     "  &lt;metric_group name=\"Averages\"&gt;\n"
+-    "    &lt;metric name=\"average_speed\" display_name=\"Speed\"\n"
++    "    &lt;metric name=\"average_speed\" display_name=\"(Non-zero) Speed\"\n"
+     "            precision=\"1\"/&gt;\n"
+-    "    &lt;metric name=\"average_power\" display_name=\"Power\"\n"
++    "    &lt;metric name=\"average_power\" display_name=\"(Non-zero) Power\"\n"
+     "            precision=\"0\"/&gt;\n"
+-    "    &lt;metric name=\"average_hr\" display_name=\"Heart rate\"\n"
++    "    &lt;metric name=\"average_hr\" display_name=\"(Non-zero) Heart rate\"\n"
+     "            precision=\"0\"/&gt;\n"
+-    "    &lt;metric name=\"average_cad\" display_name=\"Cadence\"\n"
++    "    &lt;metric name=\"average_cad\" display_name=\"(Non-zero) Cadence\"\n"
+     "            precision=\"0\"/&gt;\n"
+     "  &lt;/metric_group&gt;\n"
+     "  &lt;metric_group name=\"BikeScore&#8482;\" note=\"BikeScore is a trademark
+</pre>
+</blockquote>
+
+<p>But now I decide I don't like that change--I'd rather do it another way.
+No problem.  <em>git-checkout</em> will restore the previous version committed:</p>
+
+<blockquote>
+<pre>
+$ git checkout src/RideItem.cpp
+</pre>
+</blockquote>
+
+<p>If I want to restore the entire directory to the state of the last commit,
+I checkout the whole directory:</p>
+
+<blockquote>
+<pre>
+$ git checkout . # note the 'dot'
+</pre>
+</blockquote>
+
+<p>Alternatively, if I had already committed this change, I can use
+<em>git-reset</em> to throw away my latest commit like this:</p>
+
+<blockquote>
+<pre>
+$ git reset --hard HEAD^
+</pre>
+</blockquote>
+
+<p>Be careful with that one, though--it's irreversible.</p>
+
+<big><font face="arial,helvetica,sanserif">
+Combining commits
+</font></big>
+
+<p>Coming back to our example, let's say I instead decide to change the ride
+summary a little differently and commit it:</p>
+
+<blockquote>
+<pre>
+$ git log -p -1
+commit 225f3093a206cbcc296ed1c8a25996ce1968bda6
+Author: Sean Rhea <sean.c.rhea@gmail.com>
+Date:   Sat Sep 5 16:21:33 2009 -0400
+
+    include "non-zero" in metric group titles
+
+diff --git a/src/RideItem.cpp b/src/RideItem.cpp
+index c368725..449e19e 100644
+--- a/src/RideItem.cpp
++++ b/src/RideItem.cpp
+@@ -146,7 +146,7 @@ double RideItem::timeInZone(int zone)
+
+ static const char *metricsXml =
+     "&lt;metrics&gt;\n"
+-    "  &lt;metric_group name=\"Totals\"&gt;\n"
++    "  &lt;metric_group name=\"Non-zero Totals\"&gt;\n"
+     "    &lt;metric name=\"workout_time\" display_name=\"Workout time\"\n"
+     "            precision=\"0\"/&gt;\n"
+     "    &lt;metric name=\"time_riding\" display_name=\"Time riding\"\n"
+@@ -158,7 +158,7 @@ static const char *metricsXml =
+     "    &lt;metric name=\"elevation_gain\" display_name=\"Elevation Gain\"\n"
+     "            precision=\"1\"/&gt;\n"
+     "  &lt;/metric_group&gt;\n"
+-    "  &lt;metric_group name=\"Averages\"&gt;\n"
++    "  &lt;metric_group name=\"Non-zero Averages\"&gt;\n"
+     "    &lt;metric name=\"average_speed\" display_name=\"Speed\"\n"
+     "            precision=\"1\"/&gt;\n"
+     "    &lt;metric name=\"average_power\" display_name=\"Power\"\n"
+</pre>
+</blockquote>
+
+<p>Now I have two commits, which I can see with <em>git-log</em>:</p>
+
+<blockquote>
+<pre>
+$ git log origin/master..devel-guide
+commit 225f3093a206cbcc296ed1c8a25996ce1968bda6
+Author: Sean Rhea &lt;sean.c.rhea@gmail.com&gt;
+Date:   Sat Sep 5 16:21:33 2009 -0400
+
+    include "non-zero" in metric group titles
+
+commit df657cd3f0dcb8484a468c2efb04da77ee0472e0
+Author: Sean Rhea &lt;sean.c.rhea@gmail.com&gt;
+Date:   Wed Sep 2 13:42:33 2009 -0400
+
+    don't include zero metrics in ride summary
+
+    When a device doesn't have altitude, there's no reason to show it.  Likewise
+    with heart rate if the user wasn't wearing a heart rate monitor during a ride.
+    Maybe in the future this behavior could be enabled on a per-metric basis.
+</pre>
+</blockquote>
+
+<p>If I'm happy with my changes, I can share them with the world just
+like they are using <em>git-format-patch</em>.  In this case, however, these
+two changes should really be combined into one: the second change was
+something I should have done along with the first, I just didn't think of it
+at the time.  I can use <em>git-rebase -i</em> to combine them:</p>
+
+<blockquote>
+<pre>
+$ git rebase -i origin/master
+</pre>
+</blockquote>
+
+<p>That will bring up an editor window with a list of my changes, like
+this:</p>
+
+<blockquote>
+<pre>
+pick df657cd don't include zero metrics in ride summary
+pick 225f309 include "non-zero" in metric group titles
+
+# Rebase df33fe2..920643f onto df33fe2
+#
+# Commands:
+#  p, pick = use commit
+#  e, edit = use commit, but stop for amending
+#  s, squash = use commit, but meld into previous commit
+#
+# If you remove a line here THAT COMMIT WILL BE LOST.
+# However, if you remove everything, the rebase will be aborted.
+#
+</pre>
+</blockquote>
+
+<p>The directions are pretty self explanatory.  You can reorder commits by
+reordering their lines in this file.  You can drop a commit by removing it
+from the file entirely.  You can also change the first word on a line from
+"pick" to "squash", and git will combine that commit with the one that comes
+before it.  That's what I want to do here.  I change line 2 of this file so
+that the first two lines are:</p>
+
+<blockquote>
+<pre>
+pick df657cd don't include zero metrics in ride summary
+squash 225f309 include "non-zero" in metric group titles
+</pre>
+</blockquote>
+
+<p>Then I write the file and quit the editor.  Git does a little work
+saying:</p>
+
+<blockquote>
+<pre>
+Rebasing (1/2)
+</pre>
+</blockquote>
+
+<p>And then it brings up another editor window that shows both of my commit
+messages.  I edit the two message to combine them into one, write the file,
+and exit the editor.  git says:</p>
+
+<blockquote>
+<pre>
+Successfully rebased and updated refs/heads/master.
+</pre>
+</blockquote>
+
+<p>And I can see the result with <code>git log -p</code>.</p>
+
+<big><font face="arial,helvetica,sanserif">
+Submitting a patch
+</font></big>
+
+<p>Okay, <em>now</em> I'm ready to share my change.  I'll use
+<em>git-format-patch</em>:
+
+<blockquote>
+<pre>
+$ git format-patch HEAD^
+0001-don-t-include-zero-metrics-in-ride-summary.patch
+</pre>
+</blockquote>
+
+<p>In the <code>GoldenCheetah/src</code> directory I'll now find a <em>patch
+file</em>, <code>0001-don-t-include-zero-metrics-in-ride-summary.patch</code>,
+that other people can use to include my change in their own local git
+repositories.</p>
+
+<p>If you have a patch you'd like to share with others, you can email it to
+the <a href="cgi-bin/mailman/listinfo/golden-cheetah-users">GoldenCheetah
+User's Mailing List</a>, and it will be considered for inclusion in the next
+release of GoldenCheetah.  In fact, if you join the mailing list, you'll see
+lots of patches like this.  You may even want to try some of them.</p>
+
+<big><font face="arial,helvetica,sanserif">
+Applying patches
+</font></big>
+
+<p>Let's say I email the patch above to the mailing list, and it sounds like a
+useful feature to you.  To test it yourself, you can download the patch file
+to your <code>GoldenCheetah/src</code> directory and apply it to your
+repository using <em>git-am</em>:</p>
+
+<blockquote>
+<pre>
+$ git am 0001-don-t-include-zero-metrics-in-ride-summary.patch
+Applying: don't include zero metrics in ride summary
+</pre>
+</blockquote>
+
+<p>If you now type, "git log", you'll see that "don't include zero metrics in
+ride summary" has been added to your repository.</p>
+
+<p>If enough people like a patch, and it doesn't introduce any new bugs, one
+of the GoldenCheetah maintainers will probably commit it to the official GC
+repository on github.</p>
+
+<big><font face="arial,helvetica,sanserif">
+Staying up to date
+</font></big>
+
+<p>In order to keep your local repository up to date with
+the official one, you use <em>git-fetch</em> followed by
+<em>git-rebase</em>:</p>
+
+<blockquote>
+<pre>
+$ git fetch origin
+$ git rebase origin/master
+First, rewinding head to replay your work on top of it...
+Fast-forwarded master to origin/master.
+</pre>
+</blockquote>
+
+<p>Note that, unlike above, we didn't supply a "-i" option to
+<em>git-rebase</em> this time.</p>
+
+<p><em>git-fetch</em> downloads a copy of all the patches at github to
+your local repository, but it doesn't apply them.  <em>git-rebase</em> undoes
+the changes that are unique to your local repository, applies any new patches
+from <code>origin/master</code>, and then re-applies your patches.</p>
+
+<p>If you have uncommitted changes, the rebase will fail:</p>
+
+<blockquote>
+<pre>
+$ git rebase origin/master
+src/RideItem.cpp: needs update
+cannot rebase: you have unstaged changes
+</pre>
+</blockquote>
+
+<p>Commit your changes with <em>git-commit</em> and then re-run the
+<em>git-rebase</em>.  It will work this time.</p>
+
+<p>For developers who are used to subversion, this need to commit changes
+before rebasing is the most annoying aspect of git.  All I can say is that you
+won't mind it much after time.  Because you can use "git rebase -i" to
+combine, reorder, and even drop commits, a commit in git is much lighter
+weight than one in subversion.  As I said above, commit early and often.</p>
+
+<p>If the changes from github conflict with yours, you'll have to merge.
+<em>git-rebase</em> will exit with an error and a list of directions on how to
+fix things.  Read them carefully.</p>
+
+
