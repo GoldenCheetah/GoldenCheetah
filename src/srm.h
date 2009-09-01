@@ -29,7 +29,7 @@
 struct SrmDataPoint 
 {
     int cad, hr, watts, interval;
-    double kph, km, secs, alt;
+    double kph, km, secs;
 };
 
 struct SrmData 
