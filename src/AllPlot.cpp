@@ -29,6 +29,7 @@
 #include <qwt_text.h>
 #include <qwt_legend.h>
 #include <qwt_data.h>
+#include <QMultiMap>
 
 
 // define a background class to handle shading of power zones
@@ -320,8 +321,9 @@ AllPlot::recalc()
     double *smoothAltitude  = new double[rideTimeSecs + 1];
 
     delete [] d_mrk;
-    QList<double> interList; //Just store the time that it happened.
-                             //Intervals are sequential.
+    QMap<double, int> interList; //Store the times and intervals
+                             // Times are unique, intervals are not always
+                             //Intervals are sequential on the PowerTap.
 
     int lastInterval = 0; //Detect if we hit a new interval
 
@@ -364,7 +366,7 @@ AllPlot::recalc()
             //Figure out when and if we have a new interval..
             if(lastInterval != interArray[i]) {
                 lastInterval = interArray[i];
-                interList.append(secs/60.0);
+                interList[secs/60.0] = lastInterval;
             }
             ++i;
         }
@@ -416,27 +418,31 @@ AllPlot::recalc()
     setYMax();
 
     refreshZoneLabels();
-    
-    QString label[interList.size()];
-    QwtText text[interList.size()];
-    d_mrk = new QwtPlotMarker[interList.size()];
 
-    for(int x = 0; x < interList.size(); x++) {
+    //QList<double> interTimes = interList.keys();
+    QString label[interList.count()];
+    QwtText text[interList.count()];
+    d_mrk = new QwtPlotMarker[interList.count()];
+
+    int x = 0;
+    double time;
+    foreach(time, interList.keys()) {
         // marker
         d_mrk[x].setValue(0,0);
         d_mrk[x].setLineStyle(QwtPlotMarker::VLine);
         d_mrk[x].setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
         d_mrk[x].setLinePen(QPen(Qt::black, 0, Qt::DashDotLine));
         d_mrk[x].attach(this);
-        label[x].setNum(x+1);
+        label[x] = QString::number(interList[time]);
         text[x] = QwtText(label[x]);
         text[x].setFont(QFont("Helvetica", 10, QFont::Bold));
         text[x].setColor(Qt::black);
         if (!bydist)
-            d_mrk[x].setValue(interList.at(x), 0.0);
+            d_mrk[x].setValue(time, 0.0);
         else
-            d_mrk[x].setValue(smoothDistance[int(ceil(60*interList.at(x)))], 0.0);
+            d_mrk[x].setValue(smoothDistance[int(ceil(60*time))], 0.0);
         d_mrk[x].setLabel(text[x]);
+	x++;
     }
 
     replot();
