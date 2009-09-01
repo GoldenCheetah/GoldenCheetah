@@ -82,17 +82,12 @@ class PowerHist : public QwtPlot
 
 	// storage for data counts
         QVector<unsigned int>
-	    *wattsArray,
-	    *nmArray,
-	    *hrArray,
-	    *kphArray,
-	    *cadArray;
+	    wattsArray,
+	    nmArray,
+	    hrArray,
+	    kphArray,
+	    cadArray;
 
-        int wattsArrayLength,
-	    nmArrayLength,
-	    hrArrayLength,
-	    kphArrayLength,
-	    cadArrayLength;
         int binw;
 
         bool withz;        // whether zeros are included in histogram

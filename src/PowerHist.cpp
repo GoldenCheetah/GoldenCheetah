@@ -201,11 +201,6 @@ public:
 PowerHist::PowerHist():
     selected(wattsShaded),
     rideItem(NULL),
-    wattsArrayLength(0),
-    nmArrayLength(0),
-    hrArrayLength(0),
-    kphArrayLength(0),
-    cadArrayLength(0),
     binw(20),
     withz(true),
     settings(NULL),
@@ -223,12 +218,6 @@ PowerHist::PowerHist():
     unit = settings->value(GC_UNIT);
     
     useMetricUnits = (unit.toString() == "Metric");
-
-    wattsArray = new QVector<unsigned int>(1024);
-    nmArray    = new QVector<unsigned int>(512);
-    hrArray    = new QVector<unsigned int>(256);
-    kphArray   = new QVector<unsigned int>(1024);
-    cadArray   = new QVector<unsigned int>(256);
 
     // create a background object for shading
     bg = new PowerHistBackground(this);
@@ -267,16 +256,6 @@ PowerHist::~PowerHist() {
     delete bg;
     delete curve;
     delete grid;
-    if (wattsArrayLength)
-	delete [] wattsArray;
-    if (nmArrayLength)
-	delete [] nmArray;
-    if (hrArrayLength)
-	delete [] hrArray;
-    if (kphArrayLength)
-	delete [] kphArray;
-    if (cadArrayLength)
-	delete [] cadArray;
 }
 
 // static const variables from PoweHist.h:
@@ -341,29 +320,29 @@ PowerHist::recalc()
     if ((selected == wattsShaded) ||
 	(selected == wattsUnshaded)
 	) {
-	array = wattsArray;
+	array = &wattsArray;
 	delta = wattsDelta;
-	arrayLength = wattsArrayLength;
+	arrayLength = wattsArray.size();
     }
     else if (selected == nm) {
-	array = nmArray;
+	array = &nmArray;
 	delta = nmDelta;
-	arrayLength = nmArrayLength;
+	arrayLength = nmArray.size();
     }
     else if (selected == hr) {
-	array = hrArray;
+	array = &hrArray;
 	delta = hrDelta;
-	arrayLength = hrArrayLength;
+	arrayLength = hrArray.size();
     }
     else if (selected == kph) {
-	array = kphArray;
+	array = &kphArray;
 	delta = kphDelta;
-	arrayLength = kphArrayLength;
+	arrayLength = kphArray.size();
     }
     else if (selected == cad) {
-	array = cadArray;
+	array = &cadArray;
 	delta = cadDelta;
-	arrayLength = cadArrayLength;
+	arrayLength = cadArray.size();
     }
 
     if (!array)
@@ -420,24 +399,13 @@ PowerHist::setData(RideItem *_rideItem)
 	// recording interval in minutes
 	dt = ride->recIntSecs() / 60.0;
 
-	for (int i = 0; i < wattsArray->size(); i++)
-	    (*wattsArray)[i] = 0;
-	for (int i = 0; i < nmArray->size(); i++)
-	    (*nmArray)[i] = 0;
-	for (int i = 0; i < hrArray->size(); i++)
-	    (*hrArray)[i] = 0;
-	for (int i = 0; i < kphArray->size(); i++)
-	    (*kphArray)[i] = 0;
-	for (int i = 0; i < cadArray->size(); i++)
-	    (*cadArray)[i] = 0;
+        wattsArray.resize(0);
+        nmArray.resize(0);
+        hrArray.resize(0);
+        kphArray.resize(0);
+        cadArray.resize(0);
 
 	QListIterator<RideFilePoint*> j(ride->dataPoints());
-
-	int maxWattsIndex = 0;
-	int maxNmIndex = 0;
-	int maxHrIndex = 0;
-	int maxKphIndex = 0;
-	int maxCadIndex = 0;
 
 	// unit conversion factor for imperial units for selected parameters
 	double torque_factor = (useMetricUnits ? 1.0 : 0.73756215);
@@ -448,85 +416,43 @@ PowerHist::setData(RideItem *_rideItem)
 
 	    int wattsIndex = int(floor(p1->watts / wattsDelta));
 	    if (wattsIndex < maxSize) {
-		if (wattsIndex >= wattsArray->size()) {
-		    int size = wattsArray->size();
-		    int newsize = min(1.5 * wattsIndex, maxSize);
-		    wattsArray->resize(newsize);
-		    for (int i = size + 1; i < newsize; i ++)
-			(*wattsArray)[i] = 0;
-		}
-		(*wattsArray)[wattsIndex] ++;
-		if (wattsIndex >= maxWattsIndex)
-		    maxWattsIndex = wattsIndex;
+		if (wattsIndex >= wattsArray.size())
+		    wattsArray.resize(wattsIndex + 1);
+		wattsArray[wattsIndex]++;
 	    }
 
             if (p1->nm > 0) {
                 int nmIndex = int(floor(p1->nm * torque_factor / nmDelta));
                 if (nmIndex < maxSize) {
-                    if (nmIndex >= nmArray->size()) {
-                        int size = nmArray->size();
-                        int newsize = min(1.5 * nmIndex, maxSize);
-                        nmArray->resize(newsize);
-                        for (int i = size + 1; i < newsize; i ++)
-                            (*nmArray)[i] = 0;
-                    }
-                    (*nmArray)[nmIndex] ++;
-                    if (nmIndex >= maxNmIndex)
-                        maxNmIndex = nmIndex;
+                    if (nmIndex >= nmArray.size())
+                        nmArray.resize(nmIndex + 1);
+                    nmArray[nmIndex]++;
                 }
             }
 
 	    int hrIndex = int(floor(p1->hr / hrDelta));
         if (hrIndex < 0) hrIndex = 0; // fix for index out of bounds with hr of -1. could happen with *any* dataa types?
 	    if (hrIndex < maxSize) {
-		if (hrIndex >= hrArray->size()) {
-		    int size = hrArray->size();
-		    int newsize = min(3 * size / 2, maxSize);
-		    hrArray->resize(newsize);
-		    for (int i = size + 1; i < newsize; i ++)
-			(*hrArray)[i] = 0;
-		}
-		(*hrArray)[hrIndex] ++;
-		if (hrIndex >= maxHrIndex)
-		    maxHrIndex = hrIndex;
-
+		if (hrIndex >= hrArray.size())
+		    hrArray.resize(hrIndex + 1);
+		hrArray[hrIndex]++;
 	    }
 
 	    int kphIndex = int(floor(p1->kph * speed_factor / kphDelta));
 	    if (kphIndex < maxSize) {
-		if (kphIndex >= kphArray->size()) {
-		    int size = kphArray->size();
-		    int newsize = min(1.5 * kphIndex, maxSize);
-		    kphArray->resize(newsize);
-		    for (int i = size + 1; i < newsize; i ++)
-			(*kphArray)[i] = 0;
-		}
-		(*kphArray)[kphIndex] ++;
-		if (kphIndex >= maxKphIndex)
-		    maxKphIndex = kphIndex;
+		if (kphIndex >= kphArray.size())
+		    kphArray.resize(kphIndex + 1);
+		kphArray[kphIndex]++;
 	    }
 
 	    int cadIndex = int(floor(p1->cad / cadDelta));
 	    if (cadIndex < maxSize) {
-		if (cadIndex >= cadArray->size()) {
-		    int size = cadArray->size();
-		    int newsize = min(1.5 * cadIndex, maxSize);
-		    cadArray->resize(newsize);
-		    for (int i = size + 1; i < newsize; i ++)
-			(*cadArray)[i] = 0;
-		}
-		(*cadArray)[cadIndex] ++;
-		if (cadIndex >= maxCadIndex)
-		    maxCadIndex = cadIndex;
+		if (cadIndex >= cadArray.size())
+		    cadArray.resize(cadIndex + 1);
+		cadArray[cadIndex]++;
 	    }
 	}
 
-	wattsArrayLength = maxWattsIndex + 1;
-	nmArrayLength    = maxNmIndex + 1;
-	hrArrayLength    = maxHrIndex + 1;
-	kphArrayLength   = maxKphIndex + 1;
-	cadArrayLength   = maxCadIndex + 1;
-    
 	recalc();
     }
     else {
