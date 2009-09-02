@@ -110,11 +110,23 @@ void DatePickerDialog::on_btnBrowse_clicked()
         lastDir = QFileInfo(fileName).absolutePath();
         settings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
 		
-		// get the creation date of the selected file
-		QFileInfo *qfi = new QFileInfo(fileName);
-		date = qfi->created();
-		// and put it into the datePicker dialog
-		dateTimeEdit->setDateTime(date);
+        // Find the datetimestamp from the filename.
+        // If we can't, use the creation time.
+        // eg. GoldenCheetah YYYY_MM_DD_HH_MM_SS.csv
+        //     Ergomo YYYYMMDD_HHMMSS_NAME_SURNAME.CSV
+        QFileInfo *qfi = new QFileInfo(fileName);
+        QString name = qfi->baseName();
+        QRegExp rxGoldenCheetah("^(19|20)\\d\\d_[01]\\d_[0123]\\d_[012]\\d_[012345]\\d_[012345]\\d$");
+        QRegExp rxErgomo("^(19|20)\\d\\d[01]\\d[0123]\\d_[012]\\d[012345]\\d[012345]\\d_[A-Z_]+$");
+        if (rxGoldenCheetah.indexIn(name) == 0) {
+            date = QDateTime::fromString(name.left(19), "yyyy_MM_dd_hh_mm_ss");
+        } else if (rxErgomo.indexIn(name) == 0) {
+            date = QDateTime::fromString(name.left(15), "yyyyMMdd_hhmmss");
+        } else {
+            date = qfi->created();
+        }
+	// and put it into the datePicker dialog
+	dateTimeEdit->setDateTime(date);
 		
     }
     txtBrowse->setText(fileName);
