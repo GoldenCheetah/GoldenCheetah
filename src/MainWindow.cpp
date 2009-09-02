@@ -374,7 +374,7 @@ MainWindow::MainWindow(const QDir &home) :
     window->setLayout(vlayout);
     window->show();
 
-    tabWidget->addTab(window, "Power Histogram");
+    tabWidget->addTab(window, "Histogram Analysis");
     
     //////////////////////// Pedal Force/Velocity Plot ////////////////////////
 
