@@ -167,7 +167,7 @@ MainWindow::MainWindow(const QDir &home) :
     leftLayout->addWidget(treeWidget);
     leftLayout->setCollapsible(1, false);
     splitter->addWidget(leftLayout);
-    splitter->setCollapsible(0, false);
+    splitter->setCollapsible(0, true);
     QVariant calendarSizes = settings->value(GC_SETTINGS_CALENDAR_SIZES);
     if (calendarSizes != QVariant()) {
         leftLayout->restoreState(calendarSizes.toByteArray());
@@ -187,6 +187,7 @@ MainWindow::MainWindow(const QDir &home) :
     }
 
     tabWidget = new QTabWidget;
+    tabWidget->setUsesScrollButtons(true);
     rideSummary = new QTextEdit;
     rideSummary->setReadOnly(true);
     tabWidget->addTab(rideSummary, tr("Ride Summary"));
@@ -281,7 +282,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     tabWidget->addTab(window, "Ride Plot");
     splitter->addWidget(tabWidget);
-    splitter->setCollapsible(1, false);
+    splitter->setCollapsible(1, true);
 
     QVariant splitterSizes = settings->value(GC_SETTINGS_SPLITTER_SIZES); 
     if (splitterSizes != QVariant())
