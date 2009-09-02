@@ -7,7 +7,6 @@ TARGET = GoldenCheetah
 DEPENDPATH += .
 !isEmpty( BOOST_INCLUDE ) { INCLUDEPATH += $${BOOST_INCLUDE} }
 !isEmpty( QWT_INCLUDE ) { INCLUDEPATH += $${QWT_INCLUDE} }
-CONFIG += static debug
 QT += xml sql
 LIBS += $${QWT_LIB}
 LIBS += -lm -lz

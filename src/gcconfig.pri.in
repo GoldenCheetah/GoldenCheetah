@@ -7,6 +7,10 @@ QWT_INSTALL = /usr/local/qwt
 SRMIO_INSTALL = /usr/local/srmio
 D2XX_INCLUDE = /usr/local/include/D2XX
 
+# We recommend a debug build for development, and a static build for releases.
+CONFIG += debug
+#CONFIG += static
+
 # Edit these paths only if you have a Boost/QWT/srmio install that uses
 # a non-standard directory layout.
 
