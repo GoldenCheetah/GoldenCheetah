@@ -483,8 +483,9 @@ CpintPlot::plot_allCurve (
 
     clear_CP_Curves();
 
+    QVector<double> time_values(n_values);
     // generate an array of time values
-    double time_values[n_values];
+    //double time_values[n_values];
     for (int t = 1; t <= n_values; t++)
 	time_values[t - 1] = t / 60.0;
 
@@ -534,7 +535,7 @@ CpintPlot::plot_allCurve (
 		    brush_color.setAlpha(64);
 		    curve->setBrush(brush_color);   // brush fills below the line
 		    curve->setData(
-				   time_values + n_zone[z],
+				   time_values.data() + n_zone[z],
 				   power_values + n_zone[z],
 				   n_zone[z - 1] - n_zone[z] + 1
 				   );
@@ -599,7 +600,7 @@ CpintPlot::plot_allCurve (
 	brush_color.setAlpha(64);
 	curve->setBrush(brush_color);   // brush fills below the line
 	curve->setData(
-		       time_values,
+		       time_values.data(),
 		       power_values,
 		       n_values
 		       );
