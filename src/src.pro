@@ -7,7 +7,6 @@ TARGET = GoldenCheetah
 DEPENDPATH += .
 !isEmpty( BOOST_INCLUDE ) { INCLUDEPATH += $${BOOST_INCLUDE} }
 !isEmpty( QWT_INCLUDE ) { INCLUDEPATH += $${QWT_INCLUDE} }
-!isEmpty( D2XX_INCLUDE ) { INCLUDEPATH += $${D2XX_INCLUDE} }
 CONFIG += static debug
 QT += xml sql
 LIBS += $${QWT_LIB}
@@ -16,6 +15,12 @@ LIBS += -lm -lz
 !win32 {
     QMAKE_CXXFLAGS += -DGC_BUILD_DATE="`date +'\"%a_%b_%d,_%Y\"'`"
     QMAKE_CXXFLAGS += -DGC_SVN_VERSION=\\\"`svnversion . | cut -f '2' -d ':'`\\\"
+}
+
+!isEmpty( D2XX_INCLUDE ) {
+  INCLUDEPATH += $${D2XX_INCLUDE}
+  HEADERS += D2XX.h
+  SOURCES += D2XX.cpp
 }
 
 !isEmpty( SRMIO_INSTALL ) {
@@ -57,7 +62,6 @@ HEADERS += \
         TcxRideFile.h \
         TimeUtils.h \
         ConfigDialog.h \
-        D2XX.h \
         DatePickerDialog.h \
         CommPort.h \
         LogTimeScaleDraw.h \
@@ -105,7 +109,6 @@ SOURCES += \
         BasicRideMetrics.cpp \
         BikeScore.cpp \
         ConfigDialog.cpp \
-        D2XX.cpp \
         DatePickerDialog.cpp \
         CommPort.cpp \
         LogTimeScaleDraw.cpp \
