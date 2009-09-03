@@ -39,7 +39,7 @@
 // global variable called WKO_HOMEDIR.
 //
 // 2. UNUSED GRAPHS
-// Altitude, Windspeed, Temperature, GPS and other data is available from WKO
+// Windspeed, Temperature, GPS and other data is available from WKO
 // data files but is discarded currently since it is not supported by RideFile
 //
 // 3. GOTO
@@ -50,11 +50,7 @@
 // Shared between a number of functions to simplify parameter passing and avoid
 // refactoring as a class.
 //
-// 5. ALTITIUDE PATCH SUPPORT
-// Needs to be added to appendPoint() call in WkoParseRawData(). Altitude is already
-// being decoded
-//
-// 6. METRIC/IMPERIAL CONVERSION
+// 5. METRIC/IMPERIAL CONVERSION
 // Code is available to support conversion from WKO standard of all metric but it is not
 // enabled -- need to understand how metric/imperial conversion is supposed to be managed
 //
@@ -68,7 +64,7 @@
 #include "math.h"
 
 // local holding varables shared between WkoParseHeaderData() and WkoParseRawData()
-static int WKO_device;                   // Device ID used for this workout
+static WKO_ULONG WKO_device;                   // Device ID used for this workout
 static char WKO_GRAPHS[32];              // GRAPHS available in this workout
 
 static int wkoFileReaderRegistered =
@@ -80,8 +76,8 @@ static int wkoFileReaderRegistered =
 //******************************************************************************
 RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors) const
 {
-    unsigned char *headerdata, *rawdata, *footerdata;
-    unsigned long version;
+    WKO_UCHAR *headerdata, *rawdata, *footerdata;
+    WKO_ULONG version;
 
     if (!file.open(QFile::ReadOnly)) {
         errors << ("Could not open ride file: \""
@@ -90,7 +86,7 @@ RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors) const
     }
 
     // read in the whole file and pass to parser routines for decoding
-    boost::scoped_array<unsigned char> entirefile(new unsigned char[file.size()]); // with a nod to c++ neophytes
+    boost::scoped_array<WKO_UCHAR> entirefile(new WKO_UCHAR[file.size()]); // with a nod to c++ neophytes
 
     // read entire raw data stream
     QDataStream *rawstream(new QDataStream(&file));
@@ -131,15 +127,15 @@ RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors) const
  * WkoParseRawData() - read through all the raw data adding record points and return
  *                     a pointer to the footer record
  **************************************************************************************/
-unsigned char *WkoParseRawData(unsigned char *fb, RideFile *rideFile)
+WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile)
 {
-    unsigned int WKO_xormasks[32];    // xormasks used all over
+    WKO_ULONG WKO_xormasks[32];    // xormasks used all over
     double cad, hr, km, kph, nm, watts, alt, interval;
 
     int isnull=0;
-    unsigned long records, data;
-    unsigned char *thelot;
-    unsigned short us;
+    WKO_ULONG records, data;
+    WKO_UCHAR *thelot;
+    WKO_USHORT us;
 
     int imperialflag=0;
 
@@ -150,7 +146,7 @@ unsigned char *WkoParseRawData(unsigned char *fb, RideFile *rideFile)
     unsigned long rtime=0,rdist=0;
 
     int WKO_graphbits[32];            // number of bits for each GRAPH
-    unsigned long WKO_nullval[32];    // null value for each graph
+    WKO_ULONG WKO_nullval[32];    // null value for each graph
     char GRAPHDATA[32][32];           // formatted values for each sample
 
     // setup decoding controls -- xormasks
@@ -214,9 +210,10 @@ unsigned char *WkoParseRawData(unsigned char *fb, RideFile *rideFile)
     while (records) {
 
         unsigned int marker;
-        long sval=0;
-        unsigned long val=0;
-
+        WKO_LONG sval=0;
+        WKO_ULONG val=0;
+	unsigned long valp; // for printf 
+	long svalp; // for printf
 
         // reset point values;
         cad= hr= km= kph= nm= watts= 0.0;
@@ -253,7 +250,8 @@ unsigned char *WkoParseRawData(unsigned char *fb, RideFile *rideFile)
                         } else {
                             sval = val;
                         }
-                        sprintf(GRAPHDATA[i], "%8ld", sval);
+			svalp = sval;
+                        sprintf(GRAPHDATA[i], "%8ld", svalp);
                         break;
                     case '^' : /* Slope */
                     case 'W' : /* Wind speed */
@@ -264,25 +262,29 @@ unsigned char *WkoParseRawData(unsigned char *fb, RideFile *rideFile)
 
                             if (imperialflag && WKO_GRAPHS[i]=='A') val = long((double) val * MTOFT);
                             if (imperialflag && WKO_GRAPHS[i]=='W') val = long((double) val * KMTOMI);
-                            sprintf(GRAPHDATA[i], "%6ld.%1ld", sval/10, val%10);
+                            svalp = sval; valp = val;
+                            sprintf(GRAPHDATA[i], "%6ld.%1ld", svalp/10, valp%10);
 
                             alt = val; alt /= 10;
                         } else {
                             if (imperialflag && WKO_GRAPHS[i]=='A') val = long((double) val * MTOFT);
                             if (imperialflag && WKO_GRAPHS[i]=='W') val = long((double) val * KMTOMI);
-                            sprintf(GRAPHDATA[i], "%6ld.%1ld", val/10, val%10);
+                            valp=val;
+                            sprintf(GRAPHDATA[i], "%6ld.%1ld", valp/10, valp%10);
 
                             alt = val; alt /=10;
                         }
                         break;
                     case 'T' : /* Torque */
                         if (imperialflag && WKO_GRAPHS[i]=='S') val = long((double)val * KMTOMI);
-                        sprintf(GRAPHDATA[i], "%6ld.%1ld", val/10, val%10);
+                        valp=val;
+                        sprintf(GRAPHDATA[i], "%6ld.%1ld", valp/10, valp%10);
                         nm = val; nm /=10;
                         break;
                     case 'S' : /* Speed */
                         if (imperialflag && WKO_GRAPHS[i]=='S') val = long((double)val * KMTOMI);
-                        sprintf(GRAPHDATA[i], "%6ld.%1ld", val/10, val%10);
+                        valp=val;
+                        sprintf(GRAPHDATA[i], "%6ld.%1ld", valp/10, valp%10);
                         kph = val; kph/= 10;
 
                         // distance is not available so we need to calculate it
@@ -354,17 +356,20 @@ unsigned char *WkoParseRawData(unsigned char *fb, RideFile *rideFile)
                         break;
                     case 'P' :
                         watts = val;
-                        sprintf(GRAPHDATA[i], "%8lu", val); // just output as numeric
+                        valp=val;
+                        sprintf(GRAPHDATA[i], "%8lu", valp); // just output as numeric
                         break;
 
                     case 'H' :
                         hr = val;
-                        sprintf(GRAPHDATA[i], "%8lu", val); // just output as numeric
+                        valp=val;
+                        sprintf(GRAPHDATA[i], "%8lu", valp); // just output as numeric
                         break;
 
                     case 'C' :
                         cad = val;
-                        sprintf(GRAPHDATA[i], "%8lu", val); // just output as numeric
+			valp = val;
+                        sprintf(GRAPHDATA[i], "%8lu", valp); // just output as numeric
                         break;
                     }
                 }
@@ -381,7 +386,7 @@ unsigned char *WkoParseRawData(unsigned char *fb, RideFile *rideFile)
 
                     // !! needs to be modified to support the new alt patch
                     rideFile->appendPoint((double)rtime/1000, cad, hr, km,
-                            kph, nm, watts, alt, 1);
+                            kph, nm, watts, alt, 0);
             }
 
             // increment time - even for null records (perhaps especially for null
@@ -423,23 +428,24 @@ unsigned char *WkoParseRawData(unsigned char *fb, RideFile *rideFile)
  * WkoParseHeadeData() - read through file and land on the raw data
  *
  *********************************************************************/
-unsigned char *WkoParseHeaderData(unsigned char *fb, RideFile *rideFile)
+WKO_UCHAR *WkoParseHeaderData(WKO_UCHAR *fb, RideFile *rideFile)
 {
     unsigned long julian, sincemidnight;
-    unsigned char *goal, *notes, *code; // save location of WKO metadata
+    WKO_UCHAR *goal, *notes, *code; // save location of WKO metadata
 
     enum configtype lastchart;
-    unsigned int num,x,z,i;
+    unsigned int x,z,i;
 
     /* utility holders */
-    unsigned long ul;
-    unsigned short us;
+    WKO_ULONG num;
+    WKO_ULONG ul;
+    WKO_USHORT us;
     double g;
 
-    boost::scoped_array<unsigned char> txtbuf(new unsigned char[1024000]);
+    boost::scoped_array<WKO_UCHAR> txtbuf(new WKO_UCHAR[1024000]);
 
     /* working through filebuf */
-    unsigned char *p = fb;
+    WKO_UCHAR *p = fb;
 
     /***************************************************
      * 0:  FILE HEADER
@@ -611,7 +617,7 @@ unsigned char *WkoParseHeaderData(unsigned char *fb, RideFile *rideFile)
 
     while (z) {     /* Until we hit first chart data */
 
-        unsigned int prev=0;
+        WKO_ULONG prev=0;
         enum configtype type=INVALID;
 
 
@@ -654,7 +660,7 @@ next:
 
             } else if (type == CMEANMAXCHARTCACHE) {
 
-                unsigned long recs, term;
+                WKO_ULONG recs, term;
 
                 p += 20;
                 //_read(fd,buf,20); /* unknown 20 bytes */
@@ -819,8 +825,8 @@ next:
 
             } else if (x == 0x0c) {     /* Read through Mean Max Chart */
 
-                unsigned long recs, term;
-                unsigned long two;
+                WKO_ULONG recs, term;
+                WKO_ULONG two;
 
                 p += donumber(p, &ul); /* 253.4: Log or Linear meanmax ? */
                 p += donumber(p, &ul); /* 253.4: Which Channel ? */
@@ -911,7 +917,7 @@ breakout:
 
     if (WKO_GRAPHS[0] == '\0') {
         fprintf(stderr, "ERROR: file contains no GRAPHS\n");
-        return (unsigned char *)NULL;
+        return (WKO_UCHAR *)NULL;
     } else {
         /* PHEW! We're on the raw data, out job here is done */
         return (p);
@@ -970,7 +976,7 @@ unsigned int bitsize(char g, int WKO_device)
     }
 }
 
-unsigned long nullvals(char g)
+WKO_ULONG nullvals(char g)
 {
     switch (g) {
 
@@ -998,10 +1004,10 @@ unsigned long nullvals(char g)
  * optpad2() - called by optpad for extended data
  ***********************************************************************/
 
-unsigned int optpad(unsigned char *p)
+unsigned int optpad(WKO_UCHAR *p)
 {
-    unsigned short int us;
-    unsigned long int ul;
+    WKO_USHORT us;
+    WKO_ULONG ul;
     unsigned int bytes = 0;
 
     /* Opening bytes are
@@ -1041,9 +1047,9 @@ unsigned int optpad(unsigned char *p)
     return (bytes);
 }
 
-unsigned int optpad2(unsigned char *p)
+unsigned int optpad2(WKO_UCHAR *p)
 {
-    unsigned short int us;
+    WKO_USHORT us;
     unsigned int bytes=0;
 
     /* Opening bytes are
@@ -1100,14 +1106,14 @@ unsigned int optpad2(unsigned char *p)
  * get_bits() - return a range of bits read right to left (high bit first)
  *
  ************************************************************************************/
-int get_bit(unsigned char *data, unsigned bitoffset) // returns the n-th bit
+int get_bit(WKO_UCHAR *data, unsigned bitoffset) // returns the n-th bit
 {
-    unsigned char c = data[bitoffset >> 3]; // X>>3 is X/8
-    unsigned char bitmask = 1 << (bitoffset %8);  // X&7 is X%8
+    WKO_UCHAR c = data[bitoffset >> 3]; // X>>3 is X/8
+    WKO_UCHAR bitmask = 1 << (bitoffset %8);  // X&7 is X%8
     return ((c & bitmask)!=0) ? 1 : 0;
 }
 
-unsigned int get_bits(unsigned char* data, unsigned bitOffset, unsigned numBits)
+unsigned int get_bits(WKO_UCHAR* data, unsigned bitOffset, unsigned numBits)
 {
     unsigned int bits = 0;
     unsigned int currentbit;
@@ -1131,27 +1137,27 @@ unsigned int get_bits(unsigned char* data, unsigned bitOffset, unsigned numBits)
  * dotext() - read a wko text (1byte len, n bytes string without terminator)
  * pbin() - print a number in binary
  ****************************************************************************/
-unsigned int dofloat(unsigned char *p, float *pnum)
+unsigned int dofloat(WKO_UCHAR *p, float *pnum)
 {
     memcpy(pnum, p, 4);
     return 4;
 }
 
-unsigned int dodouble(unsigned char *p, double *pnum)
+unsigned int dodouble(WKO_UCHAR *p, double *pnum)
 {
     memcpy(pnum, p, 8);
     return 8;
 }
 
-unsigned int donumber(unsigned char *p, unsigned long *pnum)
+unsigned int donumber(WKO_UCHAR *p, WKO_ULONG *pnum)
 {
-    memcpy(pnum, p, 4);
+    *pnum = qFromLittleEndian<quint32>(p);
     return 4;
 }
 
-void pbin(unsigned char x)
+void pbin(WKO_UCHAR x)
 {
-    static unsigned char bits[]={ 128, 64, 32, 16, 8, 4, 2, 1 };
+    static WKO_UCHAR bits[]={ 128, 64, 32, 16, 8, 4, 2, 1 };
     int i;
     for (i=0; i<8; i++)
         printf("%c", ((x&bits[i]) == bits[i]) ? '1' : '0');
@@ -1159,9 +1165,9 @@ void pbin(unsigned char x)
 }
 
 
-unsigned int dotext(unsigned char *p, unsigned char *buf)
+unsigned int dotext(WKO_UCHAR *p, WKO_UCHAR *buf)
 {
-    unsigned short us;
+    WKO_USHORT us;
 
     if (*p == 0) {
             *buf = '\0';
@@ -1179,9 +1185,9 @@ unsigned int dotext(unsigned char *p, unsigned char *buf)
     }
 }
 
-unsigned int doshort(unsigned char *p, unsigned short *pnum)
+unsigned int doshort(WKO_UCHAR *p, WKO_USHORT *pnum)
 {
-    memcpy(pnum, p, 2);
+    *pnum = qFromLittleEndian<quint16>(p);
     return 2;
 }
 
