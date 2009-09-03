@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include <QSettings>
-#include <Pages.h>
+#include "Pages.h"
 #include "MainWindow.h"
 
 class QListWidget;
