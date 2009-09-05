@@ -68,6 +68,7 @@ class MainWindow : public QMainWindow
         void importTCX();
         void importWKO();
         void importPolar();
+	void importQuarq();
         void findBestIntervals();
         void splitRide();
         void deleteRide();
