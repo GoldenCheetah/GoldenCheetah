@@ -439,7 +439,6 @@ WKO_UCHAR *WkoParseHeaderData(WKO_UCHAR *fb, RideFile *rideFile)
     /* utility holders */
     WKO_ULONG num;
     WKO_ULONG ul;
-    WKO_ULONG sport;
     WKO_USHORT us;
     double g;
 
@@ -466,7 +465,7 @@ WKO_UCHAR *WkoParseHeaderData(WKO_UCHAR *fb, RideFile *rideFile)
     p += dotext(p, &txtbuf[0]); /* 6: graphs */
     strcpy(reinterpret_cast<char *>(WKO_GRAPHS), reinterpret_cast<char *>(&txtbuf[0])); // save those graphs away
 
-    p += donumber(p, &sport); /* 7: sport */
+    p += donumber(p, &ul); /* 7: sport */
     code = p; p += dotext(p, &txtbuf[0]); /* 8: workout code */
     p += donumber(p, &ul); /* 9: duration 000s of seconds */
     p += dotext(p, &txtbuf[0]); /* 10: lastname */
@@ -498,29 +497,10 @@ WKO_UCHAR *WkoParseHeaderData(WKO_UCHAR *fb, RideFile *rideFile)
                 QTextStream out(&notesFile);
         QString scode, sgoal, snote;
 
-        // Sport type
-        switch (sport) {
-
-        case 0x01 : out << "Swim " ; break;
-        case 0x02 : out << "Bike " ; break;
-        case 0x03 : out << "Run " ; break;
-        case 0x04 : out << "Brick " ; break;
-        case 0x05 : out << "Cross Train " ; break;
-        case 0x06 : out << "Race " ; break;
-        case 0x07 : out << "Day Off " ; break;
-        case 0x08 : out << "Mountain Bike " ; break;
-        case 0x09 : out << "Strength " ; break;
-        case 0x0B : out << "XC Ski " ; break;
-        case 0x0C : out << "Rowing " ; break;
-        default   :
-        case 0x64 : out << "Other" << endl; break;
-
-        }
-
         // Workout Code
         dotext(code, &txtbuf[0]);
         scode = (const char *)&txtbuf[0];
-        out << scode << endl;
+        out << "WORKOUT CODE: " << scode << endl;
 
         dotext(goal, &txtbuf[0]);
         sgoal = (const char *)&txtbuf[0];
