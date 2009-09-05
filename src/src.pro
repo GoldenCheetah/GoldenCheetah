@@ -59,6 +59,8 @@ HEADERS += \
         SrmRideFile.h \
         TcxParser.h \
         TcxRideFile.h \
+        QuarqParser.h \
+        QuarqRideFile.h \
         TimeUtils.h \
         ConfigDialog.h \
         DatePickerDialog.h \
@@ -104,6 +106,8 @@ SOURCES += \
         SrmRideFile.cpp \
         TcxParser.cpp \
         TcxRideFile.cpp \
+        QuarqParser.cpp \
+        QuarqRideFile.cpp \
         TimeUtils.cpp \
         BasicRideMetrics.cpp \
         BikeScore.cpp \

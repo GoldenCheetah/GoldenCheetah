@@ -28,6 +28,7 @@
 #include "PowerHist.h"
 #include "RideItem.h"
 #include "RideFile.h"
+#include "QuarqRideFile.h"
 #include "RideMetric.h"
 #include "Settings.h"
 #include "TimeUtils.h"
@@ -606,6 +607,9 @@ MainWindow::MainWindow(const QDir &home) :
                         SLOT (importPolar()));
     rideMenu->addAction(tr("&Import from WKO..."), this,
                         SLOT (importWKO()));
+    if (quarqInterpreterInstalled())
+      rideMenu->addAction(tr("&Import from Quarq ANT+ log..."), this,
+			  SLOT (importQuarq()));
     rideMenu->addAction(tr("Find &best intervals..."), this,
                         SLOT(findBestIntervals()), tr ("Ctrl+B"));
     rideMenu->addAction(tr("Split &ride..."), this,
@@ -1130,6 +1134,63 @@ MainWindow::importPolar()
         if (!file.copy(home.absolutePath() + "/" + name)) {
             QMessageBox::critical(this, tr("Copy Error"),
                                   tr("Couldn't copy %1").arg(fileName));
+           return;
+        }
+
+        addRide(name);
+    }
+}
+
+void
+MainWindow::importQuarq()
+{
+    QVariant lastDirVar = settings->value(GC_SETTINGS_LAST_IMPORT_PATH);
+    QString lastDir = (lastDirVar != QVariant())
+        ? lastDirVar.toString() : QDir::homePath();
+    QStringList fileNames = QFileDialog::getOpenFileNames(
+        this, tr("Import Ant"), lastDir,
+        tr("Quarq ANT+ Format (*.qla)"));
+    if (!fileNames.isEmpty()) {
+        lastDir = QFileInfo(fileNames.front()).absolutePath();
+        settings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
+    }
+    QStringList fileNamesCopy = fileNames;
+    QStringListIterator i(fileNames);
+    while (i.hasNext()) {
+        QString fileName = i.next();
+        QFile file(fileName);
+        QStringList errors;
+
+        boost::scoped_ptr<RideFile> ride(
+            RideFileFactory::instance().openRideFile(file, errors));
+
+        if (!ride || !errors.empty()) {
+            QString all = (ride
+                           ? tr("Non-fatal problem(s) opening %1:")
+                           : tr("Fatal problem(s) opening %1:")).arg(fileName);
+            QStringListIterator i(errors);
+            while (i.hasNext())
+                all += "\n" + i.next();
+            if (ride)
+                QMessageBox::warning(this, tr("Open Warning"), all);
+            else {
+                QMessageBox::critical(this, tr("Open Error"), all);
+                return;
+            }
+        }
+
+        QChar zero = QLatin1Char('0');
+        QString name = QString("%1_%2_%3_%4_%5_%6.qla")
+            .arg(ride->startTime().date().year(), 4, 10, zero)
+            .arg(ride->startTime().date().month(), 2, 10, zero)
+            .arg(ride->startTime().date().day(), 2, 10, zero)
+            .arg(ride->startTime().time().hour(), 2, 10, zero)
+            .arg(ride->startTime().time().minute(), 2, 10, zero)
+            .arg(ride->startTime().time().second(), 2, 10, zero);
+
+        if (!file.copy(home.absolutePath() + "/" + name)) {
+	  QMessageBox::critical(this, tr("Copy Error"),
+                                  tr("Couldn't copy %1").arg(fileName+" to "+home.absolutePath()+"/"+name));
            return;
         }
 
