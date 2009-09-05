@@ -415,35 +415,38 @@ PowerHist::setData(RideItem *_rideItem)
 	    const RideFilePoint *p1 = j.next();
 
 	    int wattsIndex = int(floor(p1->watts / wattsDelta));
-	    if (wattsIndex >= 0 && wattsIndex < maxSize) {
+	    if (wattsIndex < maxSize) {
 		if (wattsIndex >= wattsArray.size())
 		    wattsArray.resize(wattsIndex + 1);
 		wattsArray[wattsIndex]++;
 	    }
 
-            int nmIndex = int(floor(p1->nm * torque_factor / nmDelta));
-            if (nmIndex >= 0 && nmIndex < maxSize) {
-                if (nmIndex >= nmArray.size())
-                    nmArray.resize(nmIndex + 1);
-                nmArray[nmIndex]++;
+            if (p1->nm > 0) {
+                int nmIndex = int(floor(p1->nm * torque_factor / nmDelta));
+                if (nmIndex < maxSize) {
+                    if (nmIndex >= nmArray.size())
+                        nmArray.resize(nmIndex + 1);
+                    nmArray[nmIndex]++;
+                }
             }
 
 	    int hrIndex = int(floor(p1->hr / hrDelta));
-	    if (hrIndex >= 0 && hrIndex < maxSize) {
+        if (hrIndex < 0) hrIndex = 0; // fix for index out of bounds with hr of -1. could happen with *any* dataa types?
+	    if (hrIndex < maxSize) {
 		if (hrIndex >= hrArray.size())
 		    hrArray.resize(hrIndex + 1);
 		hrArray[hrIndex]++;
 	    }
 
 	    int kphIndex = int(floor(p1->kph * speed_factor / kphDelta));
-	    if (kphIndex >= 0 && kphIndex < maxSize) {
+	    if (kphIndex < maxSize) {
 		if (kphIndex >= kphArray.size())
 		    kphArray.resize(kphIndex + 1);
 		kphArray[kphIndex]++;
 	    }
 
 	    int cadIndex = int(floor(p1->cad / cadDelta));
-	    if (cadIndex >= 0 && cadIndex < maxSize) {
+	    if (cadIndex < maxSize) {
 		if (cadIndex >= cadArray.size())
 		    cadArray.resize(cadIndex + 1);
 		cadArray[cadIndex]++;
