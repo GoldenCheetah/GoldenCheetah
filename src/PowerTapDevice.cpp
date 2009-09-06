@@ -122,36 +122,46 @@ PowerTapDevice::download(CommPortPtr dev, const QDir &tmpdir,
         err = "ERROR: open failed: " + err;
         return false;
     } 
-
-    if (!doWrite(dev, 0x56, false, err)) // 'V'
-        return false;
-
-    QString cbtext = "Reading version...";
-    if (!statusCallback(cbtext)) {
-        err = "download cancelled";
-        return false;
-    }
+    // make several attempts at reading the version
+    int attempts = 3;
+    QString cbtext;
+    int veridx = -1;
+    int version_len;
     char vbuf[256];
-    int version_len = readUntilNewline(dev, vbuf, sizeof(vbuf), err);
-    if (version_len < 0) {
-        err = "Error reading version: " + err;
-        return false;
-    }
-    if (PT_DEBUG) {
-        printf("read version \"%s\"\n",
-               cEscape(vbuf, version_len).toAscii().constData());
-    }
-    QByteArray version = QByteArray(vbuf, version_len);
+    QByteArray version;
 
-    // We expect the version string to be something like 
-    // "VER 02.21 PRO...", so if we see two V's, it's probably 
-    // because there's a hardware echo going on.
+    do {
+	if (!doWrite(dev, 0x56, false, err)) // 'V'
+	    return false;
 
-    int veridx = version.indexOf("VER");
+	cbtext = "Reading version...";
+	if (!statusCallback(cbtext)) {
+	    err = "download cancelled";
+	    return false;
+	}
+
+	version_len = readUntilNewline(dev, vbuf, sizeof(vbuf), err);
+	if (version_len < 0) {
+	    err = "Error reading version: " + err;
+	    return false;
+	}
+	if (PT_DEBUG) {
+	    printf("read version \"%s\"\n",
+		   cEscape(vbuf, version_len).toAscii().constData());
+	}
+	version = QByteArray(vbuf, version_len);
+
+	// We expect the version string to be something like
+	// "VER 02.21 PRO...", so if we see two V's, it's probably
+	// because there's a hardware echo going on.
+	veridx = version.indexOf("VER");
+
+    } while ((--attempts > 0) && (veridx < 0));
+
     if (veridx < 0) {
-        err = QString("Unrecognized version \"%1\"")
-                .arg(cEscape(vbuf, version_len));
-        return false;
+	err = QString("Unrecognized version \"%1\"")
+	    .arg(cEscape(vbuf, version_len));
+	return false;
     }
     bool hwecho = version.indexOf('V') < veridx;
     if (PT_DEBUG) printf("hwecho=%s\n", hwecho ? "true" : "false");
