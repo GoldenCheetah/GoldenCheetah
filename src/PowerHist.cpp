@@ -38,7 +38,10 @@ class penTooltip: public QwtPlotZoomer
          penTooltip(QwtPlotCanvas *canvas):
              QwtPlotZoomer(canvas)
          {
-                 setTrackerMode(AlwaysOn);
+                 // With some versions of Qt/Qwt, setting this to AlwaysOn
+                 // causes an infinite recursion.
+                 //setTrackerMode(AlwaysOn);
+                 setTrackerMode(AlwaysOff);
          }
     
          virtual QwtText trackerText(const QwtDoublePoint &pos) const
