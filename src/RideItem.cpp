@@ -92,13 +92,8 @@ static void summarize(QString &intervals,
     intervals = intervals.arg(watts_avg, 0, 'f', 0);
     intervals = intervals.arg(hr_avg, 0, 'f', 0);
     intervals = intervals.arg(cad_avg, 0, 'f', 0);
-    //First check to see if the Library folder exists where the executable is (for USB sticks)
-    QDir home = QDir();
-    QSettings *settings;
-    if(!home.exists("Library/GoldenCheetah"))
-        settings = new QSettings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-    else
-        settings = new QSettings(home.absolutePath()+"/gc", QSettings::IniFormat);
+
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
 
     QVariant unit = settings->value(GC_UNIT);
     if(unit.toString() == "Metric")

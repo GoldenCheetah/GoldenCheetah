@@ -192,13 +192,7 @@ QStringList RideFileFactory::listRideFiles(const QDir &dir) const
         filters << ("*." + i.key());
     }
     // This will read the user preferences and change the file list order as necessary:
-    //First check to see if the Library folder exists where the executable is (for USB sticks)
-    QDir home = QDir();
-    QSettings *settings;
-    if(!home.exists("Library/GoldenCheetah"))
-        settings = new QSettings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-    else
-        settings = new QSettings(home.absolutePath()+"/gc", QSettings::IniFormat);
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();;
 
     QVariant isAscending = settings->value(GC_ALLRIDES_ASCENDING,Qt::Checked);
     if(isAscending.toInt()>0){

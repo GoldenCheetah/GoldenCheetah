@@ -100,16 +100,8 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
 
     // how to estimate BikeScore:
     QLabel *BSEstLabel;
-    QSettings *settings;
-    
-    //First check to see if the Library folder exists where the executable is (for USB sticks)
-    
-    QDir tempHome = QDir();
-    if(!tempHome.exists("Library/GoldenCheetah"))
-        settings = new QSettings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-    else
-        settings = new QSettings(home.absolutePath()+"/gc", QSettings::IniFormat);
-    
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+        
     QVariant BSmode = settings->value(GC_BIKESCOREMODE);
 
     

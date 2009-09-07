@@ -37,5 +37,21 @@
 #define GC_BIKESCOREDAYS	    "bikeScoreDays"
 #define GC_BIKESCOREMODE	    "bikeScoreMode"
 
+#include <QSettings>
+#include <boost/shared_ptr.hpp>
+
+inline boost::shared_ptr<QSettings> GetApplicationSettings()
+{ 
+  boost::shared_ptr<QSettings> settings;
+  QDir home = QDir();
+    //First check to see if the Library folder exists where the executable is (for USB sticks)
+  if(!home.exists("Library/GoldenCheetah"))
+    settings = boost::shared_ptr<QSettings>(new QSettings(GC_SETTINGS_CO, GC_SETTINGS_APP));
+  else
+    settings = boost::shared_ptr<QSettings>(new QSettings(home.absolutePath()+"/gc", QSettings::IniFormat));
+  
+  return settings;
+}
+
 #endif // _GC_Settings_h
 

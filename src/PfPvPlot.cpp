@@ -162,13 +162,7 @@ PfPvPlot::PfPvPlot()
     curve->setRenderHint(QwtPlotItem::RenderAntialiased);
     curve->attach(this);
     
-    //First check to see if the Library folder exists where the executable is (for USB sticks)
-    QDir home = QDir();
-    QSettings *settings;
-    if(!home.exists("Library/GoldenCheetah"))
-        settings = new QSettings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-    else
-        settings = new QSettings(home.absolutePath()+"/gc", QSettings::IniFormat);
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
  
     cl_ = settings->value(GC_CRANKLENGTH).toDouble() / 1000.0;
 
@@ -360,13 +354,8 @@ PfPvPlot::setData(RideItem *_rideItem)
     }
 
     replot();
-    //First check to see if the Library folder exists where the executable is (for USB sticks)
-    QDir home = QDir();
-    QSettings *settings;
-    if(!home.exists("Library/GoldenCheetah"))
-        settings = new QSettings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-    else
-        settings = new QSettings(home.absolutePath()+"/gc", QSettings::IniFormat);
+
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
     setCL(settings->value(GC_CRANKLENGTH).toDouble() / 1000.0);
 }
 
