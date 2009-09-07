@@ -205,13 +205,8 @@ PowerHist::PowerHist():
     lny(false)
 {
     
-    QDir home = QDir();
-    QSettings *settings;
-    if(!home.exists("Library/GoldenCheetah"))
-        settings = new QSettings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-    else
-        settings = new QSettings(home.absolutePath()+"/gc", QSettings::IniFormat);
-    
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+      
     unit = settings->value(GC_UNIT);
     
     useMetricUnits = (unit.toString() == "Metric");

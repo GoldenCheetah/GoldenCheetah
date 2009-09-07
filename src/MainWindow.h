@@ -107,7 +107,7 @@ class MainWindow : public QMainWindow
 	void setHistBinWidthText();
 	void setHistTextValidator();
 
-        QSettings *settings;
+	boost::shared_ptr<QSettings> settings;
 
         RideCalendar *calendar;
         QSplitter *splitter;

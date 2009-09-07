@@ -94,18 +94,12 @@ MainWindow::parseRideFileName(const QString &name, QString *notesFileName, QDate
 }
 
 MainWindow::MainWindow(const QDir &home) : 
-    home(home), settings(NULL), 
+    home(home), 
     zones(NULL), currentNotesChanged(false),
     ride(NULL)
 {
-
-    QDir tempHome = QDir();
-    if(!tempHome.exists("Library/GoldenCheetah"))
-        settings = new QSettings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-    else
-        settings = new QSettings(tempHome.absolutePath()+"/gc", QSettings::IniFormat);
-    
-    
+    settings = GetApplicationSettings();
+      
     QVariant unit = settings->value(GC_UNIT);
     useMetricUnits = (unit.toString() == "Metric");
 
