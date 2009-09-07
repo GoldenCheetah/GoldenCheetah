@@ -2029,7 +2029,7 @@ MainWindow::aboutDialog()
             "<p><i>Build date: "
             "") + QString(GC_BUILD_DATE).replace("_", " ") + ("</i>"
             "<p><i>Version: "
-            "")+QString::number(GC_MAJOR_VER)+(".") +QString::number(GC_MINOR_VER)+(".")+QString(GC_SVN_VERSION) + ("</i>"
+            "")+QString::number(GC_MAJOR_VER)+(".") +QString::number(GC_MINOR_VER)+(".")+QString::number(GC_BUILD_VER) + ("</i>"
             "<p>GoldenCheetah is licensed under the "
             "<a href=\"http://www.gnu.org/copyleft/gpl.html\">GNU General "
             "Public License</a>."
