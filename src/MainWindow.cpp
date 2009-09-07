@@ -51,20 +51,8 @@
 #include "MetricAggregator.h"
 #include "SplitRideDialog.h"
 
-#ifdef WIN32
-    #include "temp_version.h"
-    #define GC_SVN_VERSION g_svnversion
-    #define GC_BUILD_DATE g_builddate
-
-#else
-    /* temp for the qmake/QMAKE_CXXFLAGS bug with xcode */
-    #ifndef GC_SVN_VERSION
-    #define GC_SVN_VERSION "0"
-    #endif
-    #ifndef GC_BUILD_DATE
-    #define GC_BUILD_DATE GC_SVN_VERSION
-#endif
-
+#ifndef GC_VERSION
+#define GC_VERSION "(developer build)"
 #endif
 
 #define FOLDER_TYPE 0
@@ -2024,9 +2012,8 @@ MainWindow::aboutDialog()
             "<h2>GoldenCheetah</h2>"
             "<i>Cycling Power Analysis Software for Linux, Mac, and Windows</i>"
             "<p><i>Build date: "
-            "") + QString(GC_BUILD_DATE).replace("_", " ") + ("</i>"
-            "<p><i>Version: "
-            "")+QString::number(GC_MAJOR_VER)+(".") +QString::number(GC_MINOR_VER)+(".")+QString::number(GC_BUILD_VER) + ("</i>"
+            "") + QString(__DATE__) + " " + QString(__TIME__) + "</i>"
+            "<p><i>Version: " + QString(GC_VERSION) + ("</i>"
             "<p>GoldenCheetah is licensed under the "
             "<a href=\"http://www.gnu.org/copyleft/gpl.html\">GNU General "
             "Public License</a>."

@@ -11,11 +11,6 @@ QT += xml sql
 LIBS += $${QWT_LIB}
 LIBS += -lm
 
-!win32 {
-    QMAKE_CXXFLAGS += -DGC_BUILD_DATE="`date +'\"%a_%b_%d,_%Y\"'`"
-    QMAKE_CXXFLAGS += -DGC_SVN_VERSION=\\\"`svnversion . | cut -f '2' -d ':'`\\\"
-}
-
 !isEmpty( D2XX_INCLUDE ) {
   INCLUDEPATH += $${D2XX_INCLUDE}
   HEADERS += D2XX.h
@@ -29,10 +24,6 @@ LIBS += -lm
     SOURCES += SrmDevice.cpp
 }
 
-QMAKE_CXXFLAGS += -DGC_MAJOR_VER=1
-QMAKE_CXXFLAGS += -DGC_MINOR_VER=2
-QMAKE_CXXFLAGS += -DGC_BUILD_VER=0
-
 macx {
     LIBS += -framework Carbon
 }
@@ -41,6 +32,14 @@ macx {
     RC_FILE = images/gc.icns
     HEADERS += Serial.h
     SOURCES += Serial.cpp
+}
+win32 {
+    INCLUDEPATH += ./win32
+    LIBS += -lws2_32
+    QMAKE_LFLAGS = -Wl,--enable-runtime-pseudo-reloc \
+        -Wl,--script,win32/i386pe.x-no-rdata
+    //QMAKE_CXXFLAGS += -fdata-sections
+    RC_FILE = windowsico.rc
 }
 
 HEADERS += \
@@ -135,27 +134,6 @@ SOURCES += \
         ManualRideFile.cpp \
         ManualRideDialog.cpp \
         RideCalendar.cpp
-
-win32 {
-    INCLUDEPATH += ./win32
-
-    LIBS += -lws2_32
-
-    QMAKE_LFLAGS = -Wl,--enable-runtime-pseudo-reloc \
-        -Wl,--script,win32/i386pe.x-no-rdata
-    //QMAKE_CXXFLAGS += -fdata-sections
-    RC_FILE = windowsico.rc
-
-    QMAKE_EXTRA_TARGETS += revtarget
-    PRE_TARGETDEPS      += temp_version.h
-    revtarget.target     = temp_version.h
-    revtarget.commands   = @echo "const char * const g_builddate = \"$(shell date /t)\";" \
-                                 "const char * const g_svnversion = \"$(shell svnversion .)\";" > $$revtarget.target
-
-    # this line has to be after SOURCES and HEADERS is declared or it doesn't work
-    revtarget.depends = $$SOURCES $$HEADERS $$FORMS
-}
-
 
 RESOURCES = application.qrc
 
