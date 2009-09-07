@@ -102,7 +102,7 @@ class ElevationGain : public PointwiseRideMetric {
 
     public:
 
-    ElevationGain() : elegain(0.0) {}
+    ElevationGain() : elegain(0.0), prevalt(0.0) {}
     QString name() const { return "elevation_gain"; }
     QString units(bool metric) const { return metric ? "meters" : "feet"; }
     double value(bool metric) const {
