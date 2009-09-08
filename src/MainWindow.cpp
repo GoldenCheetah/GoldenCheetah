@@ -1675,6 +1675,7 @@ void MainWindow::saveNotes()
             QTextStream out(&tmp);
             out << rideNotes->toPlainText();
             tmp.close();
+            QFile::remove(notesPath);
             if (rename(tmpPath.toAscii().constData(),
                        notesPath.toAscii().constData()) == -1) {
                 QMessageBox::critical(
