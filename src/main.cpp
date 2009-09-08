@@ -45,7 +45,7 @@ main(int argc, char *argv[])
 #if defined(Q_OS_MACX)
     QString libraryPath="Library/GoldenCheetah";
 #elif defined(Q_OS_WIN)
-    QString libraryPath="Application Data/Local/GoldenCheetah";
+    QString libraryPath=QDesktopServices::storageLocation(QDesktopServices::DataLocation) + "GoldenCheetah";
 #else
     // Q_OS_LINUX et al
     QString libraryPath=".goldencheetah";
