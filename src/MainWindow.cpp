@@ -1944,7 +1944,7 @@ void
 MainWindow::setQaCLFromLineEdit()
 {
     double value = qaClValue->text().toDouble();
-    pfPvPlot->setCL(value / 1000);
+    pfPvPlot->setCL(value);
 }
 
 void
