@@ -85,7 +85,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
     {
         cadence = buffer.toDouble();
     }
-    else if (qName == "Altitude")
+    else if (qName == "AltitudeMeters")
     {
         alt = buffer.toDouble();
     }
