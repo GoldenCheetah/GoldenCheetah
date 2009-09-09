@@ -391,7 +391,7 @@ MainWindow::MainWindow(const QDir &home) :
     QLabel *qaCadLabel = new QLabel(tr("RPM:"), window);
     qaCadValue = new QLineEdit(QString("%1").arg(pfPvPlot->getCAD()));
     qaCadValue->setValidator(new QIntValidator(0, 999, qaCadValue));
-    QLabel *qaClLabel = new QLabel(tr("Crank Length (mm):"), window);
+    QLabel *qaClLabel = new QLabel(tr("Crank Length (m):"), window);
     qaClValue = new QLineEdit(QString("%1").arg(1000 * pfPvPlot->getCL()));
     shadeZonesPfPvCheckBox = new QCheckBox;
     shadeZonesPfPvCheckBox->setText("Shade zones");
