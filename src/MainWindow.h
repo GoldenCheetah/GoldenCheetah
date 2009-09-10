@@ -24,6 +24,7 @@
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include "RideItem.h"
+#include <boost/shared_ptr.hpp>
 
 class AllPlot;
 class CpintPlot;
