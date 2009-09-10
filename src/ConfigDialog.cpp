@@ -134,20 +134,7 @@ void ConfigDialog::changePage(QListWidgetItem *current, QListWidgetItem *previou
 //   ! new mode: change the CP associated with the present mode
 void ConfigDialog::save_Clicked()
 {
-    QDir home = QDir();
-    QSettings *settings;
-    
-    if(!home.exists("Library/GoldenCheetah"))
-    {
-        settings = new QSettings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-        home = QDir::home();
-    }
-    else
-    {
-        settings = new QSettings(home.absolutePath()+"/gc", QSettings::IniFormat);
-        
-    }
-  
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();  
     settings->setValue(GC_UNIT, configPage->unitCombo->currentText());
     settings->setValue(GC_ALLRIDES_ASCENDING, configPage->allRidesAscending->checkState());
     settings->setValue(GC_CRANKLENGTH, configPage->crankLengthCombo->currentText());

@@ -179,13 +179,7 @@ AllPlot::AllPlot():
     distanceArray(NULL), altArray(NULL), interArray(NULL), smooth(30), bydist(false),
     shade_zones(false)
 {
-    QSettings *settings;
-    QDir home = QDir();
-    if(!home.exists("Library/GoldenCheetah"))
-        settings = new QSettings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-    else
-        settings = new QSettings(home.absolutePath()+"/gc", QSettings::IniFormat);
-    
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();    
     unit = settings->value(GC_UNIT);
     
     useMetricUnits = (unit.toString() == "Metric");

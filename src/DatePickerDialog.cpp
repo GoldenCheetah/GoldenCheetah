@@ -93,12 +93,7 @@ void DatePickerDialog::on_btnOK_clicked()
 void DatePickerDialog::on_btnBrowse_clicked()
 {
     //First check to see if the Library folder exists where the executable is (for USB sticks)
-    QDir home = QDir();
-    QSettings *settings;
-    if(!home.exists("Library/GoldenCheetah"))
-        settings = new QSettings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-    else
-        settings = new QSettings(home.absolutePath()+"/gc", QSettings::IniFormat);
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
     
     QVariant lastDirVar = settings->value(GC_SETTINGS_LAST_IMPORT_PATH);
     QString lastDir = (lastDirVar != QVariant()) 
