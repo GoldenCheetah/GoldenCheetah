@@ -567,6 +567,7 @@ WKO_UCHAR *WkoParseHeaderData(WKO_UCHAR *fb, RideFile *rideFile)
     case 0x12 : rideFile->setDeviceType("Garmin Edge 205/305 (via WKO)"); break;
     case 0x13 : rideFile->setDeviceType("Garmin Edge 705 (via WKO)"); break;
     case 0x14 : rideFile->setDeviceType("Ergomo (via WKO)"); break;
+    case 0x16 : rideFile->setDeviceType("Cycleops 300PT (via WKO)"); break;
     case 0x19 : rideFile->setDeviceType("Ergomo (via WKO)"); break;
     default : rideFile->setDeviceType("Unknown Device (via WKO)"); break;
     }
@@ -977,6 +978,7 @@ unsigned int bitsize(char g, int WKO_device)
             return 19;
             break;
         case 0x01:
+        case 0x16: // Cycleops PT300
         case 0x00:
         case 0x12: // Garmin Edge 205/305
         case 0x13:
