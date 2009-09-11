@@ -31,7 +31,7 @@ int
 main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    QSettings *settings;
+    
     //this is the path within the current directory where GC will look for
     //files to allow USB stick support
     QString localLibraryPath="Library/GoldenCheetah";
@@ -56,14 +56,12 @@ main(int argc, char *argv[])
     //if it does, create an ini file for settings and cd into the library
     if(home.exists(localLibraryPath))
     {
-         settings = new QSettings(home.absolutePath()+"/gc", QSettings::IniFormat);
          home.cd(localLibraryPath);
     }
     //if it does not exist, let QSettings handle storing settings
     //also cd to the home directory and look for libraries
     else
     {
-        settings = new QSettings(GC_SETTINGS_CO, GC_SETTINGS_APP);
         home = QDir::home();
         //check if this users previously stored files in the old library path
         //if they did, use the existing library
@@ -86,7 +84,8 @@ main(int argc, char *argv[])
             home.cd(libraryPath);
         }
     }
-    
+    boost::shared_ptr<QSettings> settings;
+    settings = GetApplicationSettings();
     QVariant lastOpened = settings->value(GC_SETTINGS_LAST);
     QVariant unit = settings->value(GC_UNIT);
     double crankLength = settings->value(GC_CRANKLENGTH).toDouble();
