@@ -1095,6 +1095,7 @@ unsigned int optpad2(WKO_UCHAR *p)
     case 0x8016 :
     case 0x8015 :
     case 0x8011 :
+    case 0x8012 : // new (but rare) 11.09.2009
     case 0x8010 :
 
         bytes += 16;
