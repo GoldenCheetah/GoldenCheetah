@@ -112,12 +112,12 @@ void RideFile::writeAsCsv(QFile &file, bool bIsMetric) const
     QTextStream out(&file);
     if (!bIsMetric)
     {
-        out << "Minutes,Torq (N-m),MPH,Watts,Miles,Cadence,Hrate,Altitude (feet),ID\n";
+        out << "Minutes,Torq (N-m),MPH,Watts,Miles,Cadence,Hrate,ID,Altitude (feet)\n";
         const double MILES_PER_KM = 0.62137119;
         convertUnit = MILES_PER_KM;
     }
     else {
-        out << "Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,Altitude (feet),ID\n";
+        out << "Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID,Altitude (m)\n";
         // TODO: use KM_TO_MI from lib/pt.c instead?
         convertUnit = 1.0;
     }
@@ -141,9 +141,9 @@ void RideFile::writeAsCsv(QFile &file, bool bIsMetric) const
         out << ",";
         out << point->hr;
         out << ",";
-        out << point->alt;
-        out << ",";
         out << point->interval;
+        out << ",";
+        out << point->alt;
         if (point->bs > 0.0) {
         	out << ",";
 		out << point->bs;
