@@ -199,8 +199,9 @@ RideItem::htmlSummary()
                    + dateTime.toString("dddd MMMM d, yyyy, h:mm AP") 
                    + "</h2><h3>Device Type: " + ride->deviceType() + "</h3>");
 
-	QSettings settings(GC_SETTINGS_CO, GC_SETTINGS_APP);
-	QVariant unit = settings.value(GC_UNIT);
+        
+        boost::shared_ptr<QSettings> settings = GetApplicationSettings();	
+        QVariant unit = settings->value(GC_UNIT);
 
         if (zones &&
 	    *zones &&
