@@ -1055,26 +1055,28 @@ MainWindow::importWKO()
                 QMessageBox::warning(this, tr("Open Warning"), all);
             else {
                 QMessageBox::critical(this, tr("Open Error"), all);
-                return;
             }
-        }
 
-        QChar zero = QLatin1Char('0'); 
-        QString name = QString("%1_%2_%3_%4_%5_%6.wko")
-            .arg(ride->startTime().date().year(), 4, 10, zero)
-            .arg(ride->startTime().date().month(), 2, 10, zero)
-            .arg(ride->startTime().date().day(), 2, 10, zero)
-            .arg(ride->startTime().time().hour(), 2, 10, zero)
-            .arg(ride->startTime().time().minute(), 2, 10, zero)
-            .arg(ride->startTime().time().second(), 2, 10, zero);
+        } else if (ride) {
 
-        if (!file.copy(home.absolutePath() + "/" + name)) {
-            QMessageBox::critical(this, tr("Copy Error"), 
-                                  tr("Couldn't copy %1").arg(fileName));
-            return;
-        }
+            QChar zero = QLatin1Char('0'); 
+            QString name = QString("%1_%2_%3_%4_%5_%6.wko")
+                .arg(ride->startTime().date().year(), 4, 10, zero)
+                .arg(ride->startTime().date().month(), 2, 10, zero)
+                .arg(ride->startTime().date().day(), 2, 10, zero)
+                .arg(ride->startTime().time().hour(), 2, 10, zero)
+                .arg(ride->startTime().time().minute(), 2, 10, zero)
+                .arg(ride->startTime().time().second(), 2, 10, zero);
 
-        addRide(name);
+            if (!file.copy(home.absolutePath() + "/" + name)) {
+                QMessageBox::critical(this, tr("Copy Error"), 
+                                      tr("Couldn't copy %1").arg(fileName));
+            
+            } else {
+    
+                addRide(name);
+            }
+    	}
     }
 }
 
