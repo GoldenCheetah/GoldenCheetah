@@ -16,19 +16,8 @@ driver</a> if you're using the PowerTap's new USB download cradle. The FTDI USB 
 </font>
 
 <p>
-The Golden Cheetah source code is available via 
-<a href="http://git-scm.com/">git</a>.  You need to install
-<a href="http://www.trolltech.com/products/qt">QT 4.5.x</a> and 
-<a href="http://qwt.sourceforge.net/">qwt 5.0.2</a> (as a static, not
-dynamic, library) and 
-edit <code>goldencheetah/src/src.pro</code> to point to them
-before building GoldenCheetah.
-Use this command to check out the current version of the repository:
-
-<pre>
-  git clone git://github.com/srhea/GoldenCheetah.git
-</pre>
-
+The Golden Cheetah source code is available via git.  See the
+<a href="developers-guide.html">Developer's Guide</a> for more information.
 You can also <a href="http://github.com/srhea/GoldenCheetah/tree/master/">browse
 the source on github</a>.
 
