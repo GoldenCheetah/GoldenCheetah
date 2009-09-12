@@ -58,6 +58,7 @@ static void summarize(QString &intervals,
                       double km_start, double km_end,
                       double &int_watts_sum,
                       double &int_hr_sum,
+                      QVector<double> &int_hrs,
                       double &int_cad_sum,
                       double &int_kph_sum,
                       double &int_secs_hr,
@@ -73,6 +74,8 @@ static void summarize(QString &intervals,
     double cad_avg = int_cad_sum / dur;
     double mph_avg = int_kph_sum * MILES_PER_KM / dur;
     double energy = int_watts_sum / 1000.0; // watts_avg / 1000.0 * dur;
+    std::sort(int_hrs.begin(), int_hrs.end());
+    double top5hr = int_hrs.size() > 0 ? int_hrs[int_hrs.size() * 0.95] : 0;
 
     intervals += "<tr><td align=\"center\">%1</td>";
     intervals += "<td align=\"center\">%2:%3</td>";
@@ -83,6 +86,7 @@ static void summarize(QString &intervals,
     intervals += "<td align=\"center\">%8</td>";
     intervals += "<td align=\"center\">%9</td>";
     intervals += "<td align=\"center\">%10</td>";
+    intervals += "<td align=\"center\">%11</td>";
     intervals = intervals.arg(last_interval);
     intervals = intervals.arg(minutes, 0, 'f', 0);
     intervals = intervals.arg(seconds, 2, 'f', 0, QLatin1Char('0'));
@@ -90,6 +94,7 @@ static void summarize(QString &intervals,
     intervals = intervals.arg(energy, 0, 'f', 0);
     intervals = intervals.arg(int_max_power, 0, 'f', 0);
     intervals = intervals.arg(watts_avg, 0, 'f', 0);
+    intervals = intervals.arg(top5hr, 0, 'f', 0);
     intervals = intervals.arg(hr_avg, 0, 'f', 0);
     intervals = intervals.arg(cad_avg, 0, 'f', 0);
 
@@ -106,6 +111,7 @@ static void summarize(QString &intervals,
     int_cad_sum = 0.0;
     int_kph_sum = 0.0;
     int_max_power = 0.0;
+    int_hrs.clear();
 }
 
 int RideItem::zoneRange() 
@@ -252,6 +258,7 @@ RideItem::htmlSummary()
         int last_interval = INT_MAX;
         double int_watts_sum = 0.0;
         double int_hr_sum = 0.0;
+        QVector<double> int_hrs;
         double int_cad_sum = 0.0;
         double int_kph_sum = 0.0;
         double int_secs_hr = 0.0;
@@ -270,7 +277,7 @@ RideItem::htmlSummary()
                 if (last_interval != INT_MAX) {
                     summarize(intervals, last_interval,
                               km_start, km_end, int_watts_sum, 
-                              int_hr_sum, int_cad_sum, int_kph_sum, 
+                              int_hr_sum, int_hrs, int_cad_sum, int_kph_sum,
                               int_secs_hr, int_max_power, int_dur);
                 }
                 interval_count++;
@@ -299,6 +306,8 @@ RideItem::htmlSummary()
                 int_hr_sum += point->hr * secs_delta;
                 int_secs_hr += secs_delta;
             }
+            if (point->hr >= 0)
+                int_hrs.push_back(point->hr);
             if (point->cad > 0)
                 int_cad_sum += point->cad * secs_delta;
             if (point->kph >= 0)
@@ -309,7 +318,7 @@ RideItem::htmlSummary()
         }
         summarize(intervals, last_interval,
                   km_start, km_end, int_watts_sum, 
-                  int_hr_sum, int_cad_sum, int_kph_sum, 
+                  int_hr_sum, int_hrs, int_cad_sum, int_kph_sum,
                   int_secs_hr, int_max_power, int_dur);
 
         summary += "<p>";
@@ -402,6 +411,7 @@ RideItem::htmlSummary()
             summary += "<td align=\"center\">Work</td>";
             summary += "<td align=\"center\">Max Power</td>";
             summary += "<td align=\"center\">Avg Power</td>";
+            summary += "<td align=\"center\">95% HR</td>";
             summary += "<td align=\"center\">Avg HR</td>";
             summary += "<td align=\"center\">Avg Cadence</td>";
             summary += "<td align=\"center\">Avg Speed</td>";
