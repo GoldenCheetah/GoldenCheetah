@@ -18,7 +18,8 @@ Applications, double-clicked on it, and nothing happened.  What
 gives?</i></b>
 
 <p>
-Are you running OS X Tiger?  You need to be.  If you are, and you're still
+Are you running OS X Tiger (10.4) or later?  You need to be.
+If you are, and you're still
 having this problem, open Terminal (in Applications -&gt; Utilities) and type
 this at the prompt:
 
@@ -28,52 +29,4 @@ this at the prompt:
 
 then press &lt;return&gt; and send an email to the mailing list with
 whatever it prints out.  We'll help you debug it.
-
-<p>
-<b><i>I've downloaded and unpacked the data.  Now what do I do with
-it?</i></b>
-
-<p>
-We highly recommend that you buy and read both Joe Friel's <i>The
-Cyclist's Training Bible</i> and Allen and Coggan's <i>Training and
-Racing with a Power Meter</i>.  The former is the definitive book about all
-aspects of cycling training (although we think he's off his rocker in the
-chapter about diet), and the latter is the definitive book about power-based
-training.
-
-<p>
-Also, if you buy either of these books through the links below, we'll get a
-referral fee in return, helping us to support this web site.  Thanks!
-
-<center>
-<iframe
-src="http://rcm.amazon.com/e/cm?t=goldencheetah-20&o=1&p=8&l=as1&asins=B0006JHZ7Q&fc1=000000&IS2=1&lt1=_blank&lc1=0000ff&bc1=000000&bg1=ffffff&f=ifr"
-style="width:120px;height:240px;" scrolling="no" marginwidth="0"
-marginheight="0" frameborder="0"></iframe>
-
-<iframe
-src="http://rcm.amazon.com/e/cm?t=goldencheetah-20&o=1&p=8&l=as1&asins=1931382794&fc1=000000&IS2=1&lt1=_blank&lc1=0000ff&bc1=000000&bg1=ffffff&f=ifr"
-style="width:120px;height:240px;" scrolling="no" marginwidth="0"
-marginheight="0" frameborder="0"></iframe>
-</center>
-
-<p>
-<b><i>Does the output of <code>ptunpk</code> exactly match that of the software
-included with the PowerTap?</i></b>
-
-<p>
-Almost.  If you run it in compatibility mode, using the <code>-c</code>
-option, it matches the PowerTap software's output exactly on everything but
-the time values, at least for the five sample rides we've tried it with.
-The times are a little off, but not by more than 0.1%, so we don't consider it
-a big deal.
-
-<p>
-That said, the PowerTap software does some weird things, like converting from
-kilometers to miles by multiplying by 0.62, but then reporting the miles
-values with five digits after the decimal place.  If you run
-<code>ptunpk</code> without the <code>-c</code> option, it will unpack the
-data in the way we think it should.  The results mostly match up with the
-official ones, and are almost certainly identical within the range of accuracy
-of the device.
 
