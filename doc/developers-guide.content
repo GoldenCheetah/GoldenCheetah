@@ -238,6 +238,22 @@ index 6971b9b..c368725 100644
 </pre>
 </blockquote>
 
+<p>Note that had I changed more than one file, I would have just listed them
+all when I ran <em>git-commit</em>.  For example,</p>
+
+<blockquote>
+<pre>
+$ git commit file1.cpp file2.cpp
+</pre>
+</blockquote>
+
+<p>I can also commit everything I've changed all at once via</p>
+<blockquote>
+<pre>
+$ git commit . # note the 'dot'
+</pre>
+</blockquote>
+
 <big><font face="arial,helvetica,sanserif">
 Managing commits
 </font></big>
