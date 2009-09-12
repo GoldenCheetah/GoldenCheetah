@@ -204,7 +204,7 @@ $ git commit RideItem.cpp
 <p>git will open up an editor for me to type a commit message.  It's important
 to take the time to write good commit messages, as they form a history of who
 has changed which lines of code and for what purpose.  The first line of every
-commit message should be a short description of 40 characters or less.  The
+commit message should be a short description of 50 characters or less.  The
 second line should be blank.  Subsequent lines should be less than 80
 characters long and should describe the change in detail.  Once I write the
 file and exit the editor, <em>git-log</em> will show the result:</p>
