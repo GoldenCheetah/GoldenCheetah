@@ -51,7 +51,7 @@ BestIntervalDialog::BestIntervalDialog(MainWindow *mainWindow) :
     intervalLengthLayout->addWidget(minsSpinBox);
     secsSpinBox = new QDoubleSpinBox(this);
     secsSpinBox->setDecimals(0);
-    minsSpinBox->setRange(0.0, 59.0);
+    secsSpinBox->setRange(0.0, 59.0);
     secsSpinBox->setSuffix(" secs");
     secsSpinBox->setSingleStep(1.0);
     secsSpinBox->setWrapping(true);
