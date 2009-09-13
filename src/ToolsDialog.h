@@ -25,16 +25,17 @@ class ToolsDialog : public QDialog
 
     public:
         ToolsDialog(QWidget *parent = 0);
-        QLabel *lblBest3Min;
-        QLineEdit *txtBest3Min;
-        QHBoxLayout *hboxLayout1;
-        QLabel *lblBest20Min;
+
+    private:
         QPushButton *btnCalculate;
-        QLineEdit *txtBest20Min;
         QPushButton *btnOK;
-        QLabel *lblCP;
         QLineEdit *txtCP;
-        void setupUi(QDialog*);
+        QDoubleSpinBox *shortMinsSpinBox;
+        QDoubleSpinBox *shortSecsSpinBox;
+        QDoubleSpinBox *shortWattsSpinBox;
+        QDoubleSpinBox *longMinsSpinBox;
+        QDoubleSpinBox *longSecsSpinBox;
+        QDoubleSpinBox *longWattsSpinBox;
 
     private slots:
         void on_btnOK_clicked();

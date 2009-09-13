@@ -19,68 +19,78 @@
 #include "ToolsDialog.h"
 #include <QtGui>
 
-void ToolsDialog::setupUi(QDialog *ToolsDialog)
+typedef QDoubleSpinBox* QDoubleSpinBoxPtr;
+
+static
+QHBoxLayout *setupMinsSecs(ToolsDialog *dialog,
+                           QDoubleSpinBoxPtr &minsSpinBox,
+                           QDoubleSpinBoxPtr &secsSpinBox,
+                           QDoubleSpinBoxPtr &wattsSpinBox,
+                           double maxMin, double defaultMin)
 {
+    QHBoxLayout *result = new QHBoxLayout;
+    minsSpinBox = new QDoubleSpinBox(dialog);
+    minsSpinBox->setDecimals(0);
+    minsSpinBox->setRange(0.0, maxMin);
+    minsSpinBox->setSuffix(" mins");
+    minsSpinBox->setSingleStep(1.0);
+    minsSpinBox->setWrapping(false);
+    minsSpinBox->setAlignment(Qt::AlignRight);
+    minsSpinBox->setValue(defaultMin);
+    result->addWidget(minsSpinBox);
+    secsSpinBox = new QDoubleSpinBox(dialog);
+    secsSpinBox->setDecimals(0);
+    secsSpinBox->setRange(0.0, 59.0);
+    secsSpinBox->setSuffix(" secs");
+    secsSpinBox->setSingleStep(1.0);
+    secsSpinBox->setWrapping(true);
+    secsSpinBox->setAlignment(Qt::AlignRight);
+    result->addWidget(secsSpinBox);
+    wattsSpinBox = new QDoubleSpinBox(dialog);
+    wattsSpinBox->setDecimals(0);
+    wattsSpinBox->setRange(0.0, 1000.0);
+    wattsSpinBox->setSuffix(" watts");
+    wattsSpinBox->setSingleStep(1.0);
+    wattsSpinBox->setWrapping(false);
+    wattsSpinBox->setAlignment(Qt::AlignRight);
+    result->addWidget(wattsSpinBox);
+    return result;
+}
+
+ToolsDialog::ToolsDialog(QWidget *parent) : QDialog(parent)
+{
+    setWindowTitle(tr("Critical Power Calculator"));
     setAttribute(Qt::WA_DeleteOnClose);
-    if (ToolsDialog->objectName().isEmpty())
-        ToolsDialog->setObjectName(QString::fromUtf8("ToolsDialog"));
-    ToolsDialog->setWindowModality(Qt::WindowModal);
-    ToolsDialog->setAcceptDrops(false);
-    ToolsDialog->setModal(true);
 
-    QGridLayout *mainGrid = new QGridLayout(this); // a 2 x n grid
-    lblBest3Min = new QLabel("Your Best 3 Minutes:", this);
-    lblBest3Min->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    txtBest3Min = new QLineEdit(this);
-    txtBest3Min->setInputMask("999");
-    lblBest20Min = new QLabel("Your Best 20 Minutes:", this);
-    lblBest20Min->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    txtBest20Min = new QLineEdit(this);
-    txtBest20Min->setInputMask("999");
-    lblCP = new QLabel(this);
-    lblCP->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    lblCP->setText(QString("Critical Power:"));
+    QVBoxLayout *mainVBox = new QVBoxLayout(this);
+
+    mainVBox->addWidget(new QLabel(tr("Your best short effort (3-5 min):")));
+    mainVBox->addLayout(setupMinsSecs(this, shortMinsSpinBox, shortSecsSpinBox,
+                                      shortWattsSpinBox, 5.0, 3.0));
+
+    mainVBox->addWidget(new QLabel(tr("Your best long effort (15-60 min):")));
+    mainVBox->addLayout(setupMinsSecs(this, longMinsSpinBox, longSecsSpinBox,
+                                      longWattsSpinBox, 60.0, 20.0));
+
+    QHBoxLayout *cpHBox = new QHBoxLayout;
+    cpHBox->addWidget(new QLabel(tr("Your critical power:")));
     txtCP = new QLineEdit(this);
-    txtCP->setEnabled(false);
+    txtCP->setAlignment(Qt::AlignRight);
+    txtCP->setReadOnly(true);
+    cpHBox->addWidget(txtCP);
+    mainVBox->addLayout(cpHBox);
 
-    btnOK = new QPushButton(this);
+    QHBoxLayout *buttonHBox = new QHBoxLayout;
     btnCalculate = new QPushButton(this);
-    mainGrid->addWidget(lblBest3Min, 0, 0);
-    mainGrid->addWidget(txtBest3Min, 0, 1);
-
-    mainGrid->addWidget(lblBest20Min, 1, 0);
-    mainGrid->addWidget(txtBest20Min, 1, 1);
-
-    mainGrid->addWidget(lblCP, 2, 0);
-    mainGrid->addWidget(txtCP, 2, 1);
-
-    mainGrid->addWidget(btnCalculate, 3, 0);
-    mainGrid->addWidget(btnOK, 3, 1);
-
-
-
-
-    ToolsDialog->setWindowTitle(
-        QApplication::translate("ToolsDialog", "Critical Power Calculator", 0,
-                                QApplication::UnicodeUTF8));
-
-    btnOK->setText(
-        QApplication::translate("ToolsDialog", "OK", 0,
-                                QApplication::UnicodeUTF8));
-    btnCalculate->setText(
-        QApplication::translate("ToolsDialog", "Calculate", 0,
-                                QApplication::UnicodeUTF8));
+    btnCalculate->setText(tr("Calculate CP"));
+    buttonHBox->addWidget(btnCalculate);
+    btnOK = new QPushButton(this);
+    btnOK->setText(tr("Done"));
+    buttonHBox->addWidget(btnOK);
+    mainVBox->addLayout(buttonHBox);
 
     connect(btnOK, SIGNAL(clicked()), this, SLOT(on_btnOK_clicked()));
     connect(btnCalculate, SIGNAL(clicked()), this, SLOT(on_btnCalculate_clicked()));
-
-    Q_UNUSED(ToolsDialog);
-}
-
-ToolsDialog::ToolsDialog(QWidget *parent)
-        : QDialog(parent)
-{
-    setupUi(this);
 }
 
 void ToolsDialog::on_btnOK_clicked()
@@ -90,9 +100,15 @@ void ToolsDialog::on_btnOK_clicked()
 
 void ToolsDialog::on_btnCalculate_clicked()
 {
-    int CP = (txtBest20Min->text().toInt() * 20 * 60 - (txtBest3Min->text().toInt() * 3 * 60)) / (20 * 60 - 3 * 60);
-    QString strCP;
-    txtCP->setText(strCP.setNum(CP));
-
+    double shortSecs =
+        shortMinsSpinBox->value() * 60.0 + shortSecsSpinBox->value();
+    double shortWatts = shortWattsSpinBox->value();
+    double longSecs =
+        longMinsSpinBox->value() * 60.0 + longSecsSpinBox->value();
+    double longWatts = longWattsSpinBox->value();
+    double CP =
+        (longSecs * longWatts - shortSecs * shortWatts)
+        / (longSecs - shortSecs);
+    txtCP->setText(QString("%1 watts").arg(static_cast<int>(round(CP))));
 }
 

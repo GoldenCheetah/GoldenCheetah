@@ -2050,9 +2050,9 @@ MainWindow::notesChanged()
 void MainWindow::showTools()
 {
    ToolsDialog *td = new ToolsDialog();
-   td->exec();
-
+   td->show();
 }
+
 void
 MainWindow::splitRide()
 {
