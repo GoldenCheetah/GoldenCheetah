@@ -299,13 +299,13 @@ AllPlot::recalc()
 
     QList<DataPoint*> list;
 
-    double *smoothWatts     = new double[rideTimeSecs + 1];
-    double *smoothHr        = new double[rideTimeSecs + 1];
-    double *smoothSpeed     = new double[rideTimeSecs + 1];
-    double *smoothCad       = new double[rideTimeSecs + 1];
-    double *smoothTime      = new double[rideTimeSecs + 1];
-    double *smoothDistance  = new double[rideTimeSecs + 1];
-    double *smoothAltitude  = new double[rideTimeSecs + 1];
+    QVector<double> smoothWatts(rideTimeSecs + 1);
+    QVector<double> smoothHr(rideTimeSecs + 1);
+    QVector<double> smoothSpeed(rideTimeSecs + 1);
+    QVector<double> smoothCad(rideTimeSecs + 1);
+    QVector<double> smoothTime(rideTimeSecs + 1);
+    QVector<double> smoothDistance(rideTimeSecs + 1);
+    QVector<double> smoothAltitude(rideTimeSecs + 1);
 
     QMap<double, int> interList; //Store the times and intervals
                              // Times are unique, intervals are not always
@@ -386,19 +386,19 @@ AllPlot::recalc()
         smoothTime[secs]  = secs / 60.0;
     }
 
-    double *xaxis = bydist ? smoothDistance : smoothTime;
+    QVector<double> &xaxis = bydist ? smoothDistance : smoothTime;
 
     // set curves
     if (wattsArray)
-	wattsCurve->setData(xaxis, smoothWatts, rideTimeSecs + 1);
+	wattsCurve->setData(xaxis.data(), smoothWatts.data(), rideTimeSecs + 1);
     if (hrArray)
-	hrCurve->setData(xaxis, smoothHr, rideTimeSecs + 1);
+	hrCurve->setData(xaxis.data(), smoothHr.data(), rideTimeSecs + 1);
     if (speedArray)
-        speedCurve->setData(xaxis, smoothSpeed, rideTimeSecs + 1);
+        speedCurve->setData(xaxis.data(), smoothSpeed.data(), rideTimeSecs + 1);
     if (cadArray)
-        cadCurve->setData(xaxis, smoothCad, rideTimeSecs + 1);
+        cadCurve->setData(xaxis.data(), smoothCad.data(), rideTimeSecs + 1);
     if (altArray)
-        altCurve->setData(xaxis, smoothAltitude, rideTimeSecs + 1);
+        altCurve->setData(xaxis.data(), smoothAltitude.data(), rideTimeSecs + 1);
 
     setAxisScale(xBottom, 0.0, bydist ? totalDist : smoothTime[rideTimeSecs]);
     setYMax();
@@ -429,21 +429,6 @@ AllPlot::recalc()
     }
 
     replot();
-    
-    if(smoothWatts != NULL)
-        delete [] smoothWatts;
-    if(smoothHr != NULL)
-        delete [] smoothHr;
-    if(smoothSpeed != NULL)
-        delete [] smoothSpeed;
-    if(smoothCad != NULL)
-        delete [] smoothCad;
-    if(smoothTime != NULL)
-        delete [] smoothTime;
-    if(smoothDistance != NULL)
-       delete [] smoothDistance;
-    if(smoothAltitude != NULL)
-       delete [] smoothAltitude;
 }
 
 void
