@@ -247,16 +247,10 @@ bool AllPlot::shadeZones() const
 
 void AllPlot::refreshZoneLabels()
 {
-    // delete any existing power zone labels
-    if (zoneLabels.size()) {
-	QListIterator<AllPlotZoneLabel *> i(zoneLabels); 
-	while (i.hasNext()) {
-	    AllPlotZoneLabel *label = i.next();
-	    label->detach();
-	    delete label;
-	}
+    foreach(AllPlotZoneLabel *label, zoneLabels) {
+        label->detach();
+        delete label;
     }
-
     zoneLabels.clear();
 
     if (rideItem) {
