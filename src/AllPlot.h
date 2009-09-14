@@ -50,7 +50,7 @@ class AllPlot : public QwtPlot
         QwtPlotCurve *speedCurve;
         QwtPlotCurve *cadCurve;
         QwtPlotCurve *altCurve;
-        QwtPlotMarker *d_mrk;
+        QVector<QwtPlotMarker*> d_mrk;
 	QList <AllPlotZoneLabel *> zoneLabels;
 
         AllPlot();
