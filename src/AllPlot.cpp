@@ -216,13 +216,12 @@ AllPlot::AllPlot():
 
     altCurve = new QwtPlotCurve("Altitude");
     // altCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen *altPen  = new QPen(QColor(124, 91, 31));
-    altPen->setWidth(1);
-    altCurve->setPen(*altPen);
+    QPen altPen(QColor(124, 91, 31));
+    altPen.setWidth(1);
+    altCurve->setPen(altPen);
     QColor brush_color = QColor(124, 91, 31);
     brush_color.setAlpha(64);
     altCurve->setBrush(brush_color);   // fill below the line
-    delete altPen;
 
     grid = new QwtPlotGrid();
     grid->enableX(false);
