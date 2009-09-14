@@ -173,7 +173,7 @@ max(double a, double b) { if (a > b) return a; else return b; }
 AllPlot::AllPlot():
     settings(NULL),
     unit(0),
-    d_mrk(NULL), rideItem(NULL),
+    rideItem(NULL),
     hrArray(NULL), wattsArray(NULL), 
     speedArray(NULL), cadArray(NULL), timeArray(NULL),
     distanceArray(NULL), altArray(NULL), interArray(NULL), smooth(30), bydist(false),
@@ -313,7 +313,6 @@ AllPlot::recalc()
     double *smoothDistance  = new double[rideTimeSecs + 1];
     double *smoothAltitude  = new double[rideTimeSecs + 1];
 
-    delete [] d_mrk;
     QMap<double, int> interList; //Store the times and intervals
                              // Times are unique, intervals are not always
                              //Intervals are sequential on the PowerTap.
@@ -412,30 +411,27 @@ AllPlot::recalc()
 
     refreshZoneLabels();
 
-    //QList<double> interTimes = interList.keys();
-    QString label[interList.count()];
-    QwtText text[interList.count()];
-    d_mrk = new QwtPlotMarker[interList.count()];
-
-    int x = 0;
-    double time;
-    foreach(time, interList.keys()) {
-        // marker
-        d_mrk[x].setValue(0,0);
-        d_mrk[x].setLineStyle(QwtPlotMarker::VLine);
-        d_mrk[x].setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
-        d_mrk[x].setLinePen(QPen(Qt::black, 0, Qt::DashDotLine));
-        d_mrk[x].attach(this);
-        label[x] = QString::number(interList[time]);
-        text[x] = QwtText(label[x]);
-        text[x].setFont(QFont("Helvetica", 10, QFont::Bold));
-        text[x].setColor(Qt::black);
+    foreach(QwtPlotMarker *mrk, d_mrk) {
+        mrk->detach();
+        delete mrk;
+    }
+    d_mrk.clear();
+    foreach(double time, interList.keys()) {
+        QwtPlotMarker *mrk = new QwtPlotMarker;
+        d_mrk.append(mrk);
+        mrk->attach(this);
+        mrk->setValue(0,0);
+        mrk->setLineStyle(QwtPlotMarker::VLine);
+        mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
+        mrk->setLinePen(QPen(Qt::black, 0, Qt::DashDotLine));
+        QwtText text(QString::number(interList[time]));
+        text.setFont(QFont("Helvetica", 10, QFont::Bold));
+        text.setColor(Qt::black);
         if (!bydist)
-            d_mrk[x].setValue(time, 0.0);
+            mrk->setValue(time, 0.0);
         else
-            d_mrk[x].setValue(smoothDistance[int(ceil(60*time))], 0.0);
-        d_mrk[x].setLabel(text[x]);
-	x++;
+            mrk->setValue(smoothDistance[int(ceil(60*time))], 0.0);
+        mrk->setLabel(text);
     }
 
     replot();
