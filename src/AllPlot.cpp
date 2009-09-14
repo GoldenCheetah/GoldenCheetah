@@ -295,7 +295,7 @@ AllPlot::recalc()
     double totalDist = 0.0;
     double totalAlt = 0.0;
 
-    QList<DataPoint*> list;
+    QList<DataPoint> list;
 
     QVector<double> smoothWatts(rideTimeSecs + 1);
     QVector<double> smoothHr(rideTimeSecs + 1);
@@ -325,16 +325,13 @@ AllPlot::recalc()
     int i = 0;
     for (int secs = smooth; secs <= rideTimeSecs; ++secs) {
         while ((i < arrayLength) && (timeArray[i] <= secs)) {
-            DataPoint *dp = 
-                new DataPoint(
-			      timeArray[i],
-			      (!hrArray.empty() ? hrArray[i] : 0),
-			      (!wattsArray.empty() ? wattsArray[i] : 0),
-                              (!speedArray.empty() ? speedArray[i] : 0),
-			      (!cadArray.empty() ? cadArray[i] : 0),
-			      (!altArray.empty() ? altArray[i] : 0),
-			      interArray[i]
-			      );
+            DataPoint dp(timeArray[i],
+			 (!hrArray.empty() ? hrArray[i] : 0),
+			 (!wattsArray.empty() ? wattsArray[i] : 0),
+                         (!speedArray.empty() ? speedArray[i] : 0),
+			 (!cadArray.empty() ? cadArray[i] : 0),
+			 (!altArray.empty() ? altArray[i] : 0),
+			 interArray[i]);
             if (!wattsArray.empty())
                 totalWatts += wattsArray[i];
 	    if (!hrArray.empty())
@@ -354,15 +351,14 @@ AllPlot::recalc()
             }
             ++i;
         }
-        while (!list.empty() && (list.front()->time < secs - smooth)) {
-            DataPoint *dp = list.front();
+        while (!list.empty() && (list.front().time < secs - smooth)) {
+            DataPoint &dp = list.front();
+            totalWatts -= dp.watts;
+            totalHr    -= dp.hr;
+            totalSpeed -= dp.speed;
+            totalCad   -= dp.cad;
+            totalAlt   -= dp.alt;
             list.removeFirst();
-            totalWatts -= dp->watts;
-            totalHr    -= dp->hr;
-            totalSpeed -= dp->speed;
-            totalCad   -= dp->cad;
-            totalAlt   -= dp->alt;
-            delete dp;
         }
         // TODO: this is wrong.  We should do a weighted average over the
         // seconds represented by each point...
