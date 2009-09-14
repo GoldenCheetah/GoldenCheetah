@@ -174,9 +174,7 @@ AllPlot::AllPlot():
     settings(NULL),
     unit(0),
     rideItem(NULL),
-    hrArray(NULL), wattsArray(NULL), 
-    speedArray(NULL), cadArray(NULL), timeArray(NULL),
-    distanceArray(NULL), altArray(NULL), interArray(NULL), smooth(30), bydist(false),
+    smooth(30), bydist(false),
     shade_zones(false)
 {
     boost::shared_ptr<QSettings> settings = GetApplicationSettings();    
@@ -242,7 +240,7 @@ struct DataPoint {
 
 bool AllPlot::shadeZones() const
 {
-    return (shade_zones && wattsArray);
+    return (shade_zones && !wattsArray.empty());
 }
 
 void AllPlot::refreshZoneLabels()
@@ -273,20 +271,20 @@ void AllPlot::refreshZoneLabels()
 void
 AllPlot::recalc()
 {
-    if (!timeArray)
+    if (timeArray.empty())
         return;
     int rideTimeSecs = (int) ceil(timeArray[arrayLength - 1]);
     if (rideTimeSecs > 7*24*60*60) {
         QwtArray<double> data;
-	if (wattsArray)
+	if (!wattsArray.empty())
 	    wattsCurve->setData(data, data);
-	if (hrArray)
+	if (!hrArray.empty())
 	    hrCurve->setData(data, data);
-	if (speedArray)
+	if (!speedArray.empty())
 	    speedCurve->setData(data, data);
-	if (cadArray)
+	if (!cadArray.empty())
 	    cadCurve->setData(data, data);
-	if (altArray)
+	if (!altArray.empty())
 	    altCurve->setData(data, data);
         return;
     }
@@ -330,22 +328,22 @@ AllPlot::recalc()
             DataPoint *dp = 
                 new DataPoint(
 			      timeArray[i],
-			      (hrArray ? hrArray[i] : 0),
-			      (wattsArray ? wattsArray[i] : 0),
-                              (speedArray ? speedArray[i] : 0),
-			      (cadArray ? cadArray[i] : 0),
-			      (altArray ? altArray[i] : 0),
+			      (!hrArray.empty() ? hrArray[i] : 0),
+			      (!wattsArray.empty() ? wattsArray[i] : 0),
+                              (!speedArray.empty() ? speedArray[i] : 0),
+			      (!cadArray.empty() ? cadArray[i] : 0),
+			      (!altArray.empty() ? altArray[i] : 0),
 			      interArray[i]
 			      );
-	    if (wattsArray)
-		totalWatts += wattsArray[i];
-	    if (hrArray)
+            if (!wattsArray.empty())
+                totalWatts += wattsArray[i];
+	    if (!hrArray.empty())
 		totalHr    += hrArray[i];
-	    if (speedArray)
+	    if (!speedArray.empty())
 		totalSpeed += speedArray[i];
-	    if (cadArray)
+	    if (!cadArray.empty())
 		totalCad   += cadArray[i];
-	    if (altArray)
+	    if (!altArray.empty())
 		totalAlt   += altArray[i];
             totalDist   = distanceArray[i];
             list.append(dp);
@@ -389,15 +387,15 @@ AllPlot::recalc()
     QVector<double> &xaxis = bydist ? smoothDistance : smoothTime;
 
     // set curves
-    if (wattsArray)
+    if (!wattsArray.empty())
 	wattsCurve->setData(xaxis.data(), smoothWatts.data(), rideTimeSecs + 1);
-    if (hrArray)
+    if (!hrArray.empty())
 	hrCurve->setData(xaxis.data(), smoothHr.data(), rideTimeSecs + 1);
-    if (speedArray)
+    if (!speedArray.empty())
         speedCurve->setData(xaxis.data(), smoothSpeed.data(), rideTimeSecs + 1);
-    if (cadArray)
+    if (!cadArray.empty())
         cadCurve->setData(xaxis.data(), smoothCad.data(), rideTimeSecs + 1);
-    if (altArray)
+    if (!altArray.empty())
         altCurve->setData(xaxis.data(), smoothAltitude.data(), rideTimeSecs + 1);
 
     setAxisScale(xBottom, 0.0, bydist ? totalDist : smoothTime[rideTimeSecs]);
@@ -478,22 +476,7 @@ AllPlot::setData(RideItem *_rideItem)
 {
     rideItem = _rideItem;
 
-    if(wattsArray != NULL)
-        delete [] wattsArray;
-    if(hrArray != NULL)
-        delete [] hrArray;
-    if(speedArray != NULL)
-        delete [] speedArray;
-    if(cadArray != NULL)
-        delete [] cadArray;
-    if(timeArray != NULL)
-        delete [] timeArray;
-    if(interArray != NULL)
-        delete [] interArray;
-    if(distanceArray != NULL)
-        delete [] distanceArray;
-    if(altArray != NULL)
-        delete [] altArray;
+    wattsArray.clear();
 
     RideFile *ride = rideItem->ride;
     if (ride) {
@@ -501,14 +484,14 @@ AllPlot::setData(RideItem *_rideItem)
 
 	RideFileDataPresent *dataPresent = ride->areDataPresent();
 	int npoints = ride->dataPoints().size();
-	wattsArray = dataPresent->watts ? new double[npoints] : NULL;
-	hrArray    = dataPresent->hr ? new double[npoints] : NULL;
-	speedArray = dataPresent->kph ? new double[npoints] : NULL;
-	cadArray   = dataPresent->cad ? new double[npoints] : NULL;
-	altArray   = dataPresent->alt ? new double[npoints] : NULL;
-	timeArray  = new double[npoints];
-	interArray = new int[npoints];
-	distanceArray = new double[npoints];
+	wattsArray.resize(dataPresent->watts ? npoints : 0);
+	hrArray.resize(dataPresent->hr ? npoints : 0);
+	speedArray.resize(dataPresent->kph ? npoints : 0);
+	cadArray.resize(dataPresent->cad ? npoints : 0);
+	altArray.resize(dataPresent->alt ? npoints : 0);
+	timeArray.resize(npoints);
+	interArray.resize(npoints);
+	distanceArray.resize(npoints);
 
 	// attach appropriate curves
 	wattsCurve->detach();
@@ -516,29 +499,29 @@ AllPlot::setData(RideItem *_rideItem)
 	speedCurve->detach();
 	cadCurve->detach();
 	altCurve->detach();
-	if (wattsArray) wattsCurve->attach(this);
-	if (hrArray) hrCurve->attach(this);
-	if (speedArray) speedCurve->attach(this);
-	if (cadArray) cadCurve->attach(this);
-	if (altArray) altCurve->attach(this);
+	if (!wattsArray.empty()) wattsCurve->attach(this);
+	if (!hrArray.empty()) hrCurve->attach(this);
+	if (!speedArray.empty()) speedCurve->attach(this);
+	if (!cadArray.empty()) cadCurve->attach(this);
+	if (!altArray.empty()) altCurve->attach(this);
 
 	arrayLength = 0;
 	QListIterator<RideFilePoint*> i(ride->dataPoints()); 
 	while (i.hasNext()) {
 	    RideFilePoint *point = i.next();
 	    timeArray[arrayLength]  = point->secs;
-	    if (wattsArray)
+	    if (!wattsArray.empty())
 		wattsArray[arrayLength] = max(0, point->watts);
-	    if (hrArray)
+	    if (!hrArray.empty())
 		hrArray[arrayLength]    = max(0, point->hr);
-	    if (speedArray)
+	    if (!speedArray.empty())
 		speedArray[arrayLength] = max(0, 
 					      (useMetricUnits
 					       ? point->kph
 					       : point->kph * MILES_PER_KM));
-	    if (cadArray)
+	    if (!cadArray.empty())
 		cadArray[arrayLength]   = max(0, point->cad);
-            if (altArray)
+            if (!altArray.empty())
                 altArray[arrayLength]   = max(0,
                                               (useMetricUnits
                                                ? point->alt

@@ -81,15 +81,15 @@ class AllPlot : public QwtPlot
 
         QwtPlotGrid *grid;
 
-        double *hrArray;
-        double *wattsArray;
-        double *speedArray;
-        double *cadArray;
-        double *timeArray;
-        double *distanceArray;
-        double *altArray;
+        QVector<double> hrArray;
+        QVector<double> wattsArray;
+        QVector<double> speedArray;
+        QVector<double> cadArray;
+        QVector<double> timeArray;
+        QVector<double> distanceArray;
+        QVector<double> altArray;
         int arrayLength;
-        int *interArray;
+        QVector<double> interArray;
 
         int smooth;
 
