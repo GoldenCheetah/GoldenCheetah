@@ -189,11 +189,13 @@ ManualRideDialog::estBSFromDistance()
 {
     // calculate distance-based BS estimate
     double bs =  0;
-    bs = distanceentry->text().toFloat() * distanceBS;
-    QString text = QString("%1").arg((int)bs);
+    if (distanceBS) {
+	bs = distanceentry->text().toFloat() * distanceBS;
+	QString text = QString("%1").arg((int)bs);
 	// cast to int so QLineEdit doesn't interpret "51.3" as "513"
-    BSentry->clear();
-    BSentry->insert(text);
+	BSentry->clear();
+	BSentry->insert(text);
+    }
 }
 
 
@@ -202,12 +204,14 @@ ManualRideDialog::estBSFromTime()
 {
     // calculate time-based BS estimate
     double bs =  0;
-    bs = ((hrsentry->text().toInt() ) +
-	    (minsentry->text().toInt() / 60) +
-	    (secsentry->text().toInt()/ 3600))  * timeBS;
-    QString text = QString("%1").arg((int)bs);
-    BSentry->clear();
-    BSentry->insert(text);
+    if (timeBS) {
+	bs = (hrsentry->text().toInt() * timeBS ) +
+	    ((minsentry->text().toInt() * timeBS) / 60) +
+	    ((secsentry->text().toInt() * timeBS) / 3600);
+	QString text = QString("%1").arg((int)bs);
+	BSentry->clear();
+	BSentry->insert(text);
+    }
 
 }
 
@@ -215,11 +219,13 @@ ManualRideDialog::estBSFromTime()
 void
 ManualRideDialog::bsEstChanged()
 {
-    if (estBSbyDistButton->isChecked()) {
-	estBSFromDistance();
-    }
-    else {
-	estBSFromTime();
+    if (estBSbyDistButton) {
+	if (estBSbyDistButton->isChecked()) {
+	    estBSFromDistance();
+	}
+	else {
+	    estBSFromTime();
+	}
     }
 }
 
