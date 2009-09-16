@@ -1252,6 +1252,8 @@ void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
     int rides;
     double seconds, distance, bs, convertUnit;
     RideItem * lastRideItem;
+    QProgressDialog * progress;
+    bool aborted = false;
     seconds = rides = 0;
     distance = bs = 0;
     timeBS = distanceBS = 0.0;
@@ -1265,6 +1267,11 @@ void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
 	lastRideItem =  (RideItem*) allRides->child(allRides->childCount() - 1);
     else
 	lastRideItem = ride; // not enough rides, use current ride
+
+    // set up progress bar
+    progress = new QProgressDialog(QString(tr("Computing bike score estimating factors.\n")),
+	tr("Abort"),0,BSdays.toInt(),this);
+    int endingOffset = progress->labelText().size();
     
     for (int i = 0; i < allRides->childCount(); ++i) {
 	RideItem *item = (RideItem*) allRides->child(i);
@@ -1278,6 +1285,12 @@ void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
 
 	    RideMetric *m;
 	    item->htmlSummary(); // compute metrics
+
+	    QString existing = progress->labelText();
+            existing.chop(progress->labelText().size() - endingOffset);
+            progress->setLabelText(
+               existing + QString(tr("Processing %1...")).arg(item->fileName));
+
 
 	    // only count rides with BS > 0
             if ((m = item->metrics.value("skiba_bike_score")) &&
@@ -1294,6 +1307,15 @@ void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
 
 		rides++;
 	    }
+	    // check progress
+	    QCoreApplication::processEvents();
+            if (progress->wasCanceled()) {
+		aborted = true;
+                    goto done;
+	    }
+	    // set progress from 0 to BSdays
+            progress->setValue(BSdays.toInt() - days);
+
         }
     }
     if (rides) {
@@ -1311,6 +1333,12 @@ void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
 	timeBS = (bs * 3600) / seconds;  // BS per hour
 	distanceBS = bs / distance;  // BS per mile or km
     }
+done:
+    if (aborted) {
+	timeBS = distanceBS = 0;
+    }
+
+    delete progress;
 }
 
 void MainWindow::generateWeeklySummary()
