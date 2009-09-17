@@ -59,6 +59,7 @@ HEADERS += \
         RawRideFile.h \
         RideFile.h \
         RideItem.h \
+        RideImportWizard.h \
         RideMetric.h \
         SrmRideFile.h \
         TcxParser.h \
@@ -105,6 +106,7 @@ SOURCES += \
         RawRideFile.cpp \
         RideFile.cpp \
         RideItem.cpp \
+        RideImportWizard.cpp \
         RideMetric.cpp \
         SrmRideFile.cpp \
         TcxParser.cpp \

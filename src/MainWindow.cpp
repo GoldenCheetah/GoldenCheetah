@@ -28,6 +28,7 @@
 #include "PowerHist.h"
 #include "RideItem.h"
 #include "RideFile.h"
+#include "RideImportWizard.h"
 #include "QuarqRideFile.h"
 #include "RideMetric.h"
 #include "Settings.h"
@@ -95,6 +96,7 @@ MainWindow::MainWindow(const QDir &home) :
     settings->setValue(GC_SETTINGS_LAST, home.dirName());
 
     setWindowIcon(QIcon(":images/gc.png"));
+    setAcceptDrops(true);
 
     QFile zonesFile(home.absolutePath() + "/power.zones");
     if (zonesFile.exists()) {
@@ -579,19 +581,8 @@ MainWindow::MainWindow(const QDir &home) :
                         SLOT(exportCSV()), tr("Ctrl+E")); 
     rideMenu->addAction(tr("&Export to XML..."), this, 
                         SLOT(exportXML()));
-    rideMenu->addAction(tr("&Import from SRM..."), this, 
-                        SLOT(importSRM()), tr("Ctrl+I")); 
-    rideMenu->addAction(tr("&Import from CSV..."), this,
-                        SLOT (importCSV()), tr ("Ctrl+S"));
-    rideMenu->addAction(tr("&Import from TCX..."), this,
-                        SLOT (importTCX()));
-    rideMenu->addAction(tr("&Import from Polar..."), this,
-                        SLOT (importPolar()));
-    rideMenu->addAction(tr("&Import from WKO..."), this,
-                        SLOT (importWKO()));
-    if (quarqInterpreterInstalled())
-      rideMenu->addAction(tr("&Import from Quarq ANT+ log..."), this,
-			  SLOT (importQuarq()));
+    rideMenu->addAction(tr("&Import from File..."), this,
+                        SLOT (importFile()), tr ("Ctrl+I"));
     rideMenu->addAction(tr("Find &best intervals..."), this,
                         SLOT(findBestIntervals()), tr ("Ctrl+B"));
     rideMenu->addAction(tr("Split &ride..."), this,
@@ -627,6 +618,24 @@ MainWindow::MainWindow(const QDir &home) :
             treeWidget->setCurrentItem(allRides->child(0));
         }
     }
+}
+
+void
+MainWindow::dragEnterEvent(QDragEnterEvent *event)
+{
+    event->acceptProposedAction(); // whatever you wanna drop we will try and process!
+}
+
+void
+MainWindow::dropEvent(QDropEvent *event)
+{
+    QList<QUrl> urls = event->mimeData()->urls();
+    if (urls.isEmpty()) return;
+
+    // We have something to process then
+    RideImportWizard *dialog = new RideImportWizard (&urls, home, this);
+    dialog->process(); // do it!
+    return;
 }
 
 void
@@ -839,346 +848,31 @@ MainWindow::exportCSV()
     ride->ride->writeAsCsv(file, useMetricUnits);
 }
 
-void MainWindow::importCSV()
-{
-    // Prompt the user for the ride date
-    boost::scoped_ptr<DatePickerDialog> dpd(new DatePickerDialog(this));
-
-    dpd->exec();
-
-    if(dpd->canceled == true)
-        return;
-
-    QFile file ( dpd->fileName );
-    QStringList errors;
-    boost::scoped_ptr<RideFile> ride(
-        RideFileFactory::instance().openRideFile(file, errors));
-
-    if (!ride || !errors.empty())
-    {
-        QString all = 
-            ( ride
-              ? tr ( "Non-fatal problem(s) opening %1:" )
-              : tr ( "Fatal problem(s) opening %1:" ) ).arg ( dpd->fileName );
-        QStringListIterator i ( errors );
-        while ( i.hasNext() )
-            all += "\n" + i.next();
-        if (ride)
-            QMessageBox::warning ( this, tr ( "Open Warning" ), all );
-        else {
-            QMessageBox::critical ( this, tr ( "Open Error" ), all );
-            return;
-        }
-    }
-    ride->setStartTime(dpd->date); 
-
-    QChar zero = QLatin1Char ( '0' );
-
-    QString name = QString ( "%1_%2_%3_%4_%5_%6.csv" )
-        .arg ( ride->startTime().date().year(), 4, 10, zero )
-        .arg ( ride->startTime().date().month(), 2, 10, zero )
-        .arg ( ride->startTime().date().day(), 2, 10, zero )
-        .arg ( ride->startTime().time().hour(), 2, 10, zero )
-        .arg ( ride->startTime().time().minute(), 2, 10, zero )
-        .arg ( ride->startTime().time().second(), 2, 10, zero );
-
-    if ( !file.copy ( home.absolutePath() + "/" + name ) )
-    {
-        QMessageBox::critical ( this, tr ( "Copy Error" ),
-                                tr ( "Couldn't copy %1" )
-                                .arg ( dpd->fileName ) );
-        return;
-    }
-
-    addRide ( name );
-}
-
 void
-MainWindow::importSRM()
+MainWindow::importFile()
 {
     QVariant lastDirVar = settings->value(GC_SETTINGS_LAST_IMPORT_PATH);
     QString lastDir = (lastDirVar != QVariant()) 
         ? lastDirVar.toString() : QDir::homePath();
-    QStringList fileNames = QFileDialog::getOpenFileNames(
-        this, tr("Import SRM"), lastDir,
-        tr("SRM Binary Format (*.srm)"));
+   
+    QStringList fileNames; 
+    if (quarqInterpreterInstalled()) {
+        fileNames = QFileDialog::getOpenFileNames(
+        this, tr("Import from File"), lastDir,
+        tr("Raw Powertap Files (*.raw);;Comma Separated Variable (*.csv);;SRM training files (*.srm);;Garmin Training Centre (*.tcx);;Polar Precision (*.hrm);;WKO+ Files (*.wko);;Quarq ANT+ (*.qla);;All files (*.*)"));
+    } else {
+        fileNames = QFileDialog::getOpenFileNames(
+        this, tr("Import from File"), lastDir,
+        tr("Raw Powertap Files (*.raw);;Comma Separated Variable (*.csv);;SRM training files (*.srm);;Garmin Training Centre (*.tcx);;Polar Precision (*.hrm);;WKO+ Files (*.wko);;All files (*.*)"));
+
+    }
+
     if (!fileNames.isEmpty()) {
         lastDir = QFileInfo(fileNames.front()).absolutePath();
         settings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
-    }
-    QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
-    QStringListIterator i(fileNamesCopy);
-    while (i.hasNext()) {
-        QString fileName = i.next();
-        QFile file(fileName);
-        QStringList errors;
-
-        boost::scoped_ptr<RideFile> ride(
-            RideFileFactory::instance().openRideFile(file, errors));
-
-        if (!ride || !errors.empty()) {
-            QString all = (ride 
-                           ? tr("Non-fatal problem(s) opening %1:")
-                           : tr("Fatal problem(s) opening %1:")).arg(fileName);
-            QStringListIterator i(errors);
-            while (i.hasNext())
-                all += "\n" + i.next();
-            if (ride)
-                QMessageBox::warning(this, tr("Open Warning"), all);
-            else {
-                QMessageBox::critical(this, tr("Open Error"), all);
-                return;
-            }
-        }
-
-        QChar zero = QLatin1Char('0'); 
-        QString name = QString("%1_%2_%3_%4_%5_%6.srm")
-            .arg(ride->startTime().date().year(), 4, 10, zero)
-            .arg(ride->startTime().date().month(), 2, 10, zero)
-            .arg(ride->startTime().date().day(), 2, 10, zero)
-            .arg(ride->startTime().time().hour(), 2, 10, zero)
-            .arg(ride->startTime().time().minute(), 2, 10, zero)
-            .arg(ride->startTime().time().second(), 2, 10, zero);
-
-        if (!file.copy(home.absolutePath() + "/" + name)) {
-            QMessageBox::critical(this, tr("Copy Error"), 
-                                  tr("Couldn't copy %1").arg(fileName));
-            return;
-        }
-
-        addRide(name);
-    }
-}
-
-void
-MainWindow::importTCX()
-{
-    QVariant lastDirVar = settings->value(GC_SETTINGS_LAST_IMPORT_PATH);
-    QString lastDir = (lastDirVar != QVariant()) 
-        ? lastDirVar.toString() : QDir::homePath();
-    QStringList fileNames = QFileDialog::getOpenFileNames(
-        this, tr("Import TCX"), lastDir,
-        tr("TCX Format (*.tcx)"));
-    if (!fileNames.isEmpty()) {
-        lastDir = QFileInfo(fileNames.front()).absolutePath();
-        settings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
-    }
-    QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
-    QStringListIterator i(fileNames);
-    while (i.hasNext()) {
-        QString fileName = i.next();
-        QFile file(fileName);
-        QStringList errors;
-
-        boost::scoped_ptr<RideFile> ride(
-            RideFileFactory::instance().openRideFile(file, errors));
-
-        if (!ride || !errors.empty()) {
-            QString all = (ride 
-                           ? tr("Non-fatal problem(s) opening %1:")
-                           : tr("Fatal problem(s) opening %1:")).arg(fileName);
-            QStringListIterator i(errors);
-            while (i.hasNext())
-                all += "\n" + i.next();
-            if (ride)
-                QMessageBox::warning(this, tr("Open Warning"), all);
-            else {
-                QMessageBox::critical(this, tr("Open Error"), all);
-                return;
-            }
-        }
-
-        QChar zero = QLatin1Char('0'); 
-        QString name = QString("%1_%2_%3_%4_%5_%6.tcx")
-            .arg(ride->startTime().date().year(), 4, 10, zero)
-            .arg(ride->startTime().date().month(), 2, 10, zero)
-            .arg(ride->startTime().date().day(), 2, 10, zero)
-            .arg(ride->startTime().time().hour(), 2, 10, zero)
-            .arg(ride->startTime().time().minute(), 2, 10, zero)
-            .arg(ride->startTime().time().second(), 2, 10, zero);
-
-        if (!file.copy(home.absolutePath() + "/" + name)) {
-            QMessageBox::critical(this, tr("Copy Error"), 
-                                  tr("Couldn't copy %1").arg(fileName));
-            return;
-        }
-
-        addRide(name);
-    }
-}
-
-
-
-void
-MainWindow::importWKO()
-{
-    QVariant lastDirVar = settings->value(GC_SETTINGS_LAST_IMPORT_PATH);
-    QString lastDir = (lastDirVar != QVariant()) 
-        ? lastDirVar.toString() : QDir::homePath();
-    QStringList fileNames = QFileDialog::getOpenFileNames(
-        this, tr("Import WKO"), lastDir,
-        tr("WKO Format (*.wko)"));
-    if (!fileNames.isEmpty()) {
-        lastDir = QFileInfo(fileNames.front()).absolutePath();
-        settings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
-    }
-    QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
-    QStringListIterator i(fileNames);
-    while (i.hasNext()) {
-        QString fileName = i.next();
-        QFile file(fileName);
-        QStringList errors;
-
-        boost::scoped_ptr<RideFile> ride(
-            RideFileFactory::instance().openRideFile(file, errors));
-
-        if (!ride || !errors.empty()) {
-            QString all = (ride 
-                           ? tr("Non-fatal problem(s) opening %1:")
-                           : tr("Fatal problem(s) opening %1:")).arg(fileName);
-            QStringListIterator i(errors);
-            while (i.hasNext())
-                all += "\n" + i.next();
-            if (ride)
-                QMessageBox::warning(this, tr("Open Warning"), all);
-            else {
-                QMessageBox::critical(this, tr("Open Error"), all);
-            }
-
-        } else if (ride) {
-
-            QChar zero = QLatin1Char('0'); 
-            QString name = QString("%1_%2_%3_%4_%5_%6.wko")
-                .arg(ride->startTime().date().year(), 4, 10, zero)
-                .arg(ride->startTime().date().month(), 2, 10, zero)
-                .arg(ride->startTime().date().day(), 2, 10, zero)
-                .arg(ride->startTime().time().hour(), 2, 10, zero)
-                .arg(ride->startTime().time().minute(), 2, 10, zero)
-                .arg(ride->startTime().time().second(), 2, 10, zero);
-
-            if (!file.copy(home.absolutePath() + "/" + name)) {
-                QMessageBox::critical(this, tr("Copy Error"), 
-                                      tr("Couldn't copy %1").arg(fileName));
-            
-            } else {
-    
-                addRide(name);
-            }
-    	}
-    }
-}
-
-void
-MainWindow::importPolar()
-{
-    QVariant lastDirVar = settings->value(GC_SETTINGS_LAST_IMPORT_PATH);
-    QString lastDir = (lastDirVar != QVariant())
-        ? lastDirVar.toString() : QDir::homePath();
-    QStringList fileNames = QFileDialog::getOpenFileNames(
-        this, tr("Import Polar"), lastDir,
-        tr("Polar Format (*.hrm)"));
-    if (!fileNames.isEmpty()) {
-        lastDir = QFileInfo(fileNames.front()).absolutePath();
-        settings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
-    }
-    QStringList fileNamesCopy = fileNames;
-    QStringListIterator i(fileNames);
-    while (i.hasNext()) {
-        QString fileName = i.next();
-        QFile file(fileName);
-        QStringList errors;
-
-        boost::scoped_ptr<RideFile> ride(
-            RideFileFactory::instance().openRideFile(file, errors));
-
-        if (!ride || !errors.empty()) {
-            QString all = (ride
-                           ? tr("Non-fatal problem(s) opening %1:")
-                           : tr("Fatal problem(s) opening %1:")).arg(fileName);
-            QStringListIterator i(errors);
-            while (i.hasNext())
-                all += "\n" + i.next();
-            if (ride)
-                QMessageBox::warning(this, tr("Open Warning"), all);
-            else {
-                QMessageBox::critical(this, tr("Open Error"), all);
-                return;
-            }
-        }
-
-        QChar zero = QLatin1Char('0');
-        QString name = QString("%1_%2_%3_%4_%5_%6.hrm")
-            .arg(ride->startTime().date().year(), 4, 10, zero)
-            .arg(ride->startTime().date().month(), 2, 10, zero)
-            .arg(ride->startTime().date().day(), 2, 10, zero)
-            .arg(ride->startTime().time().hour(), 2, 10, zero)
-            .arg(ride->startTime().time().minute(), 2, 10, zero)
-            .arg(ride->startTime().time().second(), 2, 10, zero);
-
-        if (!file.copy(home.absolutePath() + "/" + name)) {
-            QMessageBox::critical(this, tr("Copy Error"),
-                                  tr("Couldn't copy %1").arg(fileName));
-           return;
-        }
-
-        addRide(name);
-    }
-}
-
-void
-MainWindow::importQuarq()
-{
-    QVariant lastDirVar = settings->value(GC_SETTINGS_LAST_IMPORT_PATH);
-    QString lastDir = (lastDirVar != QVariant())
-        ? lastDirVar.toString() : QDir::homePath();
-    QStringList fileNames = QFileDialog::getOpenFileNames(
-        this, tr("Import Ant"), lastDir,
-        tr("Quarq ANT+ Format (*.qla)"));
-    if (!fileNames.isEmpty()) {
-        lastDir = QFileInfo(fileNames.front()).absolutePath();
-        settings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
-    }
-    QStringList fileNamesCopy = fileNames;
-    QStringListIterator i(fileNames);
-    while (i.hasNext()) {
-        QString fileName = i.next();
-        QFile file(fileName);
-        QStringList errors;
-
-        boost::scoped_ptr<RideFile> ride(
-            RideFileFactory::instance().openRideFile(file, errors));
-
-        if (!ride || !errors.empty()) {
-            QString all = (ride
-                           ? tr("Non-fatal problem(s) opening %1:")
-                           : tr("Fatal problem(s) opening %1:")).arg(fileName);
-            QStringListIterator i(errors);
-            while (i.hasNext())
-                all += "\n" + i.next();
-            if (ride)
-                QMessageBox::warning(this, tr("Open Warning"), all);
-            else {
-                QMessageBox::critical(this, tr("Open Error"), all);
-                return;
-            }
-        }
-
-        QChar zero = QLatin1Char('0');
-        QString name = QString("%1_%2_%3_%4_%5_%6.qla")
-            .arg(ride->startTime().date().year(), 4, 10, zero)
-            .arg(ride->startTime().date().month(), 2, 10, zero)
-            .arg(ride->startTime().date().day(), 2, 10, zero)
-            .arg(ride->startTime().time().hour(), 2, 10, zero)
-            .arg(ride->startTime().time().minute(), 2, 10, zero)
-            .arg(ride->startTime().time().second(), 2, 10, zero);
-
-        if (!file.copy(home.absolutePath() + "/" + name)) {
-	  QMessageBox::critical(this, tr("Copy Error"),
-                                  tr("Couldn't copy %1").arg(fileName+" to "+home.absolutePath()+"/"+name));
-           return;
-        }
-
-        addRide(name);
+        QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
+        RideImportWizard *import = new RideImportWizard(fileNamesCopy, home, this);
+        import->process();
     }
 }
 

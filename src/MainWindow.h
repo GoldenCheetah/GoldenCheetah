@@ -53,6 +53,8 @@ class MainWindow : public QMainWindow
         virtual void resizeEvent(QResizeEvent*);
         virtual void moveEvent(QMoveEvent*);
         virtual void closeEvent(QCloseEvent*);
+        virtual void dragEnterEvent(QDragEnterEvent *);
+        virtual void dropEvent(QDropEvent *);
     
     private slots:
         void rideSelected();
@@ -64,12 +66,7 @@ class MainWindow : public QMainWindow
         void manualRide();
         void exportCSV();
         void exportXML();
-        void importCSV();
-        void importSRM();
-        void importTCX();
-        void importWKO();
-        void importPolar();
-	void importQuarq();
+        void importFile();
         void findBestIntervals();
         void splitRide();
         void deleteRide();
