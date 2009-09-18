@@ -226,11 +226,13 @@ ManualRideDialog::bsEstChanged()
 void
 ManualRideDialog::setBsEst()
 {
-    if (estBSbyDistButton->isChecked()) {
-	estBSFromDistance();
-    }
-    else {
-	estBSFromTime();
+    if (estBSbyDistButton) {
+        if (estBSbyDistButton->isChecked()) {
+            estBSFromDistance();
+        }
+        else {
+            estBSFromTime();
+        }
     }
 }
 
