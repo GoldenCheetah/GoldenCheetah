@@ -858,7 +858,7 @@ next:
 
                 p += dodouble(p, &g);  /* 253.4: Conversion Factor 1 */
 
-                if (two) p += donumber(p, &ul);  /* 253.4: Conversion Factor 2 */
+                if (two == 2) p += donumber(p, &ul);  /* 253.4: Conversion Factor 2 */
 
                 /* How many meanmax records in first set ? */
                 p += doshort(p, &us);
