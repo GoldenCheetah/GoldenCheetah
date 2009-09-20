@@ -1,9 +1,8 @@
 # To build, copy this file to gcconfig.pri and then fill in the paths to your
-# local installs of Boost, QWT, and srmio in the copy.  If you don't want
+# local installs of Boost and srmio in the copy.  If you don't want
 # support for SRM downloads, just comment out the SRMIO_INSTALL line.
 
 BOOST_INSTALL = /usr/local/boost
-QWT_INSTALL = /usr/local/qwt
 SRMIO_INSTALL = /usr/local/srmio
 D2XX_INCLUDE = /usr/local/include/D2XX
 
@@ -11,13 +10,10 @@ D2XX_INCLUDE = /usr/local/include/D2XX
 CONFIG += debug
 #CONFIG += static
 
-# Edit these paths only if you have a Boost/QWT/srmio install that uses
+# Edit these paths only if you have a Boost/srmio install that uses
 # a non-standard directory layout.
 
 BOOST_INCLUDE = $${BOOST_INSTALL}/include
-
-QWT_INCLUDE = $${QWT_INSTALL}/include
-QWT_LIB = $${QWT_INSTALL}/lib/libqwt.a
 
 !isEmpty( SRMIO_INSTALL ) {
     SRMIO_INCLUDE = $${SRMIO_INSTALL}/include
