@@ -87,10 +87,15 @@ public:
     enum Axis 
     { 
         yLeft, 
+        yLeft1, 
+        yLeft2, 
+        yLeft3, 
         yRight, 
+        yRight1, 
+        yRight2, 
+        yRight3, 
         xBottom, 
         xTop, 
-
         axisCnt 
     };
 

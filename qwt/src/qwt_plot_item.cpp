@@ -334,8 +334,11 @@ void QwtPlotItem::setAxis(int xAxis, int yAxis)
     if (xAxis == QwtPlot::xBottom || xAxis == QwtPlot::xTop )
        d_data->xAxis = xAxis;
 
-    if (yAxis == QwtPlot::yLeft || yAxis == QwtPlot::yRight )
-       d_data->yAxis = yAxis;
+    if ( yAxis == QwtPlot::yLeft || yAxis == QwtPlot::yRight ||
+          yAxis == QwtPlot::yLeft1 || yAxis == QwtPlot::yRight1 ||
+          yAxis == QwtPlot::yLeft2 || yAxis == QwtPlot::yRight2 ||
+          yAxis == QwtPlot::yLeft3 || yAxis == QwtPlot::yRight3 )
+      d_data->yAxis = yAxis;
 
     itemChanged();    
 }
@@ -367,7 +370,10 @@ void QwtPlotItem::setXAxis(int axis)
 */
 void QwtPlotItem::setYAxis(int axis)
 {
-    if (axis == QwtPlot::yLeft || axis == QwtPlot::yRight )
+   if ( axis == QwtPlot::yLeft || axis == QwtPlot::yRight ||
+         axis == QwtPlot::yLeft1 || axis == QwtPlot::yRight1 ||
+         axis == QwtPlot::yLeft2 || axis == QwtPlot::yRight2 ||
+         axis == QwtPlot::yLeft3 || axis == QwtPlot::yRight3 )
     {
        d_data->yAxis = axis;
        itemChanged();   

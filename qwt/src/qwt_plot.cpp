@@ -313,7 +313,10 @@ QSize QwtPlot::sizeHint() const
             const QwtScaleDiv &scaleDiv = scaleWidget->scaleDraw()->scaleDiv();
             const int majCnt = scaleDiv.ticks(QwtScaleDiv::MajorTick).count();
 
-            if ( axisId == yLeft || axisId == yRight )
+            if ( axisId == yLeft || axisId == yRight ||
+               axisId == yLeft1 || axisId == yRight1 ||
+               axisId == yLeft2 || axisId == yRight2 ||
+               axisId == yLeft3 || axisId == yRight3 )
             {
                 int hDiff = (majCnt - 1) * niceDist 
                     - scaleWidget->minimumSizeHint().height();
@@ -417,8 +420,20 @@ void QwtPlot::updateLayout()
                 QRegion r(d_data->layout->scaleRect(axisId));
                 if ( axisEnabled(yLeft) )
                     r = r.subtract(QRegion(d_data->layout->scaleRect(yLeft)));
+                if ( axisEnabled(yLeft1) )
+                    r = r.subtract(QRegion(d_data->layout->scaleRect(yLeft1)));
+                if ( axisEnabled(yLeft2) )
+                    r = r.subtract(QRegion(d_data->layout->scaleRect(yLeft2)));
+                if ( axisEnabled(yLeft3) )
+                    r = r.subtract(QRegion(d_data->layout->scaleRect(yLeft3)));
                 if ( axisEnabled(yRight) )
                     r = r.subtract(QRegion(d_data->layout->scaleRect(yRight)));
+                if ( axisEnabled(yRight1) )
+                    r = r.subtract(QRegion(d_data->layout->scaleRect(yRight1)));
+                if ( axisEnabled(yRight2) )
+                    r = r.subtract(QRegion(d_data->layout->scaleRect(yRight2)));
+                if ( axisEnabled(yRight3) )
+                    r = r.subtract(QRegion(d_data->layout->scaleRect(yRight3)));
                 r.translate(-d_data->layout->scaleRect(axisId).x(), 
                     -d_data->layout->scaleRect(axisId).y());
 
@@ -603,7 +618,10 @@ QwtScaleMap QwtPlot::canvasMap(int axisId) const
     if ( axisEnabled(axisId) )
     {
         const QwtScaleWidget *s = axisWidget(axisId);
-        if ( axisId == yLeft || axisId == yRight )
+        if ( axisId == yLeft || axisId == yRight ||
+              axisId == yLeft1 || axisId == yRight1 ||
+              axisId == yLeft2 || axisId == yRight2 ||
+              axisId == yLeft3 || axisId == yRight3 )
         {
             int y = s->y() + s->startBorderDist() - d_data->canvas->y();
             int h = s->height() - s->startBorderDist() - s->endBorderDist();
@@ -621,7 +639,11 @@ QwtScaleMap QwtPlot::canvasMap(int axisId) const
         const int margin = plotLayout()->canvasMargin(axisId);
 
         const QRect &canvasRect = d_data->canvas->contentsRect();
-        if ( axisId == yLeft || axisId == yRight )
+
+        if ( axisId == yLeft || axisId == yRight ||
+              axisId == yLeft1 || axisId == yRight1 ||
+              axisId == yLeft2 || axisId == yRight2 ||
+              axisId == yLeft3 || axisId == yRight3 )
         {
             map.setPaintInterval(canvasRect.bottom() - margin, 
                 canvasRect.top() + margin);

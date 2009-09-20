@@ -41,7 +41,19 @@ void QwtPlot::initAxesData()
 
     d_axisData[yLeft]->scaleWidget = 
         new QwtScaleWidget(QwtScaleDraw::LeftScale, this);
+    d_axisData[yLeft1]->scaleWidget = 
+        new QwtScaleWidget(QwtScaleDraw::LeftScale, this);
+    d_axisData[yLeft2]->scaleWidget = 
+        new QwtScaleWidget(QwtScaleDraw::LeftScale, this);
+    d_axisData[yLeft3]->scaleWidget = 
+        new QwtScaleWidget(QwtScaleDraw::LeftScale, this);
     d_axisData[yRight]->scaleWidget = 
+        new QwtScaleWidget(QwtScaleDraw::RightScale, this);
+    d_axisData[yRight1]->scaleWidget = 
+        new QwtScaleWidget(QwtScaleDraw::RightScale, this);
+    d_axisData[yRight2]->scaleWidget = 
+        new QwtScaleWidget(QwtScaleDraw::RightScale, this);
+    d_axisData[yRight3]->scaleWidget = 
         new QwtScaleWidget(QwtScaleDraw::RightScale, this);
     d_axisData[xTop]->scaleWidget = 
         new QwtScaleWidget(QwtScaleDraw::TopScale, this);
@@ -78,7 +90,13 @@ void QwtPlot::initAxesData()
     }
 
     d_axisData[yLeft]->isEnabled = true;
+    d_axisData[yLeft1]->isEnabled = false;
+    d_axisData[yLeft2]->isEnabled = false;
+    d_axisData[yLeft3]->isEnabled = false;
     d_axisData[yRight]->isEnabled = false;
+    d_axisData[yRight1]->isEnabled = false;
+    d_axisData[yRight2]->isEnabled = false;
+    d_axisData[yRight3]->isEnabled = false;
     d_axisData[xBottom]->isEnabled = true;
     d_axisData[xTop]->isEnabled = false;
 }
