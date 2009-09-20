@@ -28,11 +28,40 @@ the source on github</a>.
 
 <p>
 <center>
-<table width="100%" cellspacing="10">
+<table width="100%" cellspacing="5">
 <tr>
-<td width="20%"><i>Version</i></td>
-<td width="30%"><i>Files</i></td>
+<td width="15%"><i>Version</i></td>
+<td width="25%"><i>Files</i></td>
 <td><i>Description</i></td>
+</tr>
+
+<tr>
+<td valign="top">1.2.0</td>
+<td valign="top">
+<a href="GoldenCheetah_1.2.0_Linux_x86.tgz">Linux x86</a><br>
+<a href="GoldenCheetah_1.2.0_Linux_x86_64.tgz">Linux x86_64</a><br>
+<a href="GoldenCheetah_1.2.0_Darwin_Universal.dmg">Mac OS X Universal</a><br>
+<a href="GoldenCheetah_1.2.0_Windows_Installer.exe">Windows 32-bit</a>
+</td>
+<td valign="top">
+<p>
+Lots of new features in this release, including:
+</p>
+<ul>
+<li>Direct download from SRM (R. Clasen and S. Rhea)
+<li>WKO+ file import (M. Liversedge)
+<li>Qollector support (M. Rages)
+<li>Altitude plotting (T. Weichmann)
+<li>Power zones shading (D. Connell)
+<li>Weekly summary histograms (R. Carlsen)
+<li>Automatic CP estimation from CP graph (D. Connell)
+<li>Support for running off a USB stick (J. Knotzke)
+<li>OS-specific directory layout (J. Simioni)
+<li>PF/PV plot improvements (B. de Schouwer)
+<li>Memory leak fixes (G. Lonnon)
+</ul>
+<p>Thanks also to Jamie Kimberely for extensive testing.
+</td>
 </tr>
 
 <tr>

@@ -4,15 +4,16 @@
 GoldenCheetah is a software package that:
 
 <ul>
-<li>Downloads ride data directly from the CycleOps PowerTap, including the
-newer Ant+Sport models.<p>
+<li>Downloads ride data directly from the CycleOps PowerTap and the SRM
+PowerControl.<p>
 
-<li>Imports ride data from SRM, Garmin TCX, Polar HRM, and CSV files,
-including those from Cycling Peaks&nbsp;(TM) and the ergomo.<p>
+<li>Imports ride data downloaded with other programs, including TrainingPeaks
+WKO+ and the manufacturers' software for the Ergomo, Garmin, Polar, and SRM
+devices.<p>
 
-<li>Provides a rich set of analysis tools, including critial power,
-BikeScore&nbsp;(TM), power histograms, a best interval finder, and pedal force
-versus pedal velocity, to name just a few.<p>
+<li>Provides a rich set of analysis tools, including a critical power graph,
+BikeScore calculation, histogram analysis, a best interval finder, and a pedal
+force versus pedal velocity chart, to name just a few.<p>
 
 <li>Works identically under Linux, Mac OS X, and Windows.<p>
 
@@ -24,3 +25,13 @@ We believe that cyclists should be able to download their power data
 to the computer of their choice, analyze it in whatever way they see fit, and
 share their methods of analysis with others.
 
+<hr width="20%"/>
+
+<small>
+<p>
+* WKO+ and TrainingPeaks are trademarks of Peaksware, LLC.
+<br/>
+** BikeScore is a trademark of Dr. Philip Friere Skiba, PhysFarm Training
+Systems LLC.
+</p>
+</small>
