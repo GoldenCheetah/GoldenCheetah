@@ -859,11 +859,11 @@ MainWindow::importFile()
     if (quarqInterpreterInstalled()) {
         fileNames = QFileDialog::getOpenFileNames(
         this, tr("Import from File"), lastDir,
-        tr("Raw Powertap Files (*.raw);;Comma Separated Variable (*.csv);;SRM training files (*.srm);;Garmin Training Centre (*.tcx);;Polar Precision (*.hrm);;WKO+ Files (*.wko);;Quarq ANT+ (*.qla);;All files (*.*)"));
+        tr("All Support Formats (*.raw *.csv *.srm *.tcx *.hrm *.wko *.qla);;Raw Powertap Files (*.raw);;Comma Separated Variable (*.csv);;SRM training files (*.srm);;Garmin Training Centre (*.tcx);;Polar Precision (*.hrm);;WKO+ Files (*.wko);;Quarq ANT+ Files (*.qla);;All files (*.*)"));
     } else {
         fileNames = QFileDialog::getOpenFileNames(
         this, tr("Import from File"), lastDir,
-        tr("Raw Powertap Files (*.raw);;Comma Separated Variable (*.csv);;SRM training files (*.srm);;Garmin Training Centre (*.tcx);;Polar Precision (*.hrm);;WKO+ Files (*.wko);;All files (*.*)"));
+        tr("All Support Formats (*.raw *.csv *.srm *.tcx *.hrm *.wko);;Raw Powertap Files (*.raw);;Comma Separated Variable (*.csv);;SRM training files (*.srm);;Garmin Training Centre (*.tcx);;Polar Precision (*.hrm);;WKO+ Files (*.wko);;All files (*.*)"));
 
     }
 
