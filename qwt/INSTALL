@@ -1,0 +1,176 @@
+Introduction
+============
+
+Qwt uses qmake to build all its components and examples. 
+qmake is part of a Qt distribution. 
+
+qmake reads project files, that contain the options and rules how to 
+build a certain project. A project file ends with the suffix "*.pro". 
+Files that end with the suffix "*.pri" are included by the project 
+files and contain definitions, that are common for several project files.
+
+qwtconfig.pri is read by all project files of the Qwt package.
+So the first step is to edit qwtconfig.pri to adjust it to your
+needs.
+
+MathML Extension
+================
+
+Qwt/Qt4 supports the MathML render engine from the Qt solutions package,
+that is only available with a commercial Qt license.
+
+You need a release of qtmmlwidget >= 2.1.
+Copy the files qtmmlwidget.[cpp|h] to textengines/mathml.
+
+Documentation
+==========================
+
+Qwt includes a class documentation, that is available in various formats:
+
+- Html files
+- PDF document 
+- Qt Compressed Help (*.qch ) for the Qt assistant. 
+- Man pages ( UNIX only )
+
+A) Unix Qt3/Qt4
+==========================
+
+qmake
+make
+make install
+
+If you have installed a shared library it's path has to be known to 
+the run-time linker of your operating system. On Linux systems read
+"man ldconfig" ( or google for it ). Another option is to use
+the LD_LIBRARY_PATH (on some systems LIBPATH is used instead, on MacOSX
+it is called DYLD_LIBRARY_PATH) environment variable.
+
+If you only want to check the Qwt examples without installing something,
+you can set the LD_LIBRARY_PATH to the lib directory 
+of your local build. 
+
+If you didn't enable autobuilding of the examples in qwtconfig.pri
+you have to build the examples this way:
+
+cd examples
+qmake 
+make
+
+
+B) Win32/MSVC Qt3/Qt4
+=====================
+
+Please read the qmake documentation how to convert 
+your *.pro files into your development environment.
+
+F.e MSVC with nmake:
+qmake qwt.pro
+nmake
+
+If you didn't enable autobuilding of the examples in qwtconfig.pri
+you have to build the examples this way:
+
+cd examples
+qmake examples.pro
+nmake
+
+admin/msvc-qmake.bat helps users of Visual Studio users to
+generate makefiles or project files (.dsp for MSVC-6.0 or vcproj for 
+MSVC.NET) for Qwt.
+
+To generate makefiles, type: "admin\msvc-qmake"
+To generate project files, type: "admin\msvc-qmake vc"
+
+When you have built a Qwt DLL you need to add the following
+define to your compiler flags: QWT_DLL.
+
+Windows doesn't like mixing of debug and release binaries. Most
+of the problems with using the Qwt designer plugin are because
+of trying to load a Qwt debug library into a designer release 
+executable.
+
+
+C) Win32/MinGW Qt4
+==================
+
+C1) Windows Shell
+
+Start a Windows Shell, where Qt4 is initialized. ( F.e. with
+"Programs->Qt by Trolltech ...->Qt 4.x.x Command Prompt" ).
+
+qmake qwt.pro
+make
+
+If you didn't enable autobuilding of the examples in qwtconfig.pri
+you have to build the examples this way:
+
+cd examples
+qmake examples.pro
+make
+make install
+
+C2) MSYS Shell Qt >= 4.3.0
+
+Support for the MSYS Shell has been improved in Qt 4.3.0. 
+Now building Qwt from the MSYS Shell works exactly like in UNIX or in the 
+Windows Shell - or at least it should:
+because of a bug in Qt 4.3.0 you always have to do a "qmake -r".
+
+C3) MSYS Shell Qt < 4.3.0
+
+For Qt < 4.3.0 you have to set the MINGW_IN_SHELL variable. 
+make will run into errors with the subdirs target, that can be 
+ignored (make -i).
+
+export MINGW_IN_SHELL=1;
+
+qmake 
+make -i
+make -i install
+
+If you didn't enable autobuilding of the examples in qwtconfig.pri
+you have to build the examples this way:
+
+cd examples
+qmake examples.pro
+make -i
+make -i install
+
+C1-C3)
+
+When you have built a Qwt DLL you need to add QWT_DLL to your compiler 
+flags. If you are using qmake for your own builds this done by adding 
+the following line to your profile: "DEFINES += QWT_DLL".
+
+Windows doesn't like mixing of debug and release binaries. Most
+of the problems with using the Qwt designer plugin are because
+of trying to load a Qwt debug library into a designer release 
+executable.
+
+D) MacOSX
+
+Well, the Mac is only another Unix system. So read the instructions in A).
+
+In the recent Qt4 releases the default target of qmake is to generate
+XCode project files instead of makefiles. So you might need to do the
+following:
+
+qmake -spec macx-g++
+...
+
+D) Qtopia Core
+
+I only tested Qwt with Qtopia Core in qvfb (Virtual Framebuffer Devivce)
+Emulator on my Linux box. To build Qwt for the emulator was as simple as 
+for a regular Unix build.
+
+qmake
+make
+
+E) Qtopia (!= Qtopia Core)
+
+I once compiled the Qwt library against Qtopia 4.2.0 successfully - but
+not more. It should be possible to build and install Qwt, but it's
+not done yet.
+
+Good luck !
