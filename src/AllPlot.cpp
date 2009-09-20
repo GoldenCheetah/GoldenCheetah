@@ -200,6 +200,7 @@ AllPlot::AllPlot():
     QPen hrPen = QPen(Qt::blue);
     hrPen.setWidth(2);
     hrCurve->setPen(hrPen);
+    hrCurve->setYAxis(yLeft2);
 
     speedCurve = new QwtPlotCurve("Speed");
     QPen speedPen = QPen(QColor(0, 204, 0));
@@ -211,6 +212,7 @@ AllPlot::AllPlot():
     QPen cadPen = QPen(QColor(0, 204, 204));
     cadPen.setWidth(2);
     cadCurve->setPen(cadPen);
+    cadCurve->setYAxis(yLeft2);
 
     altCurve = new QwtPlotCurve("Altitude");
     // altCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -220,6 +222,7 @@ AllPlot::AllPlot():
     QColor brush_color = QColor(124, 91, 31);
     brush_color.setAlpha(64);
     altCurve->setBrush(brush_color);   // fill below the line
+    altCurve->setYAxis(yRight2);
 
     grid = new QwtPlotGrid();
     grid->enableX(false);
@@ -426,36 +429,39 @@ AllPlot::recalc()
 }
 
 void
-AllPlot::setYMax() 
+AllPlot::setYMax()
 {
-    double ymax = 0;
-    QString ylabel = "";
     if (wattsCurve->isVisible()) {
-        ymax = max(ymax, wattsCurve->maxYValue());
-        ylabel += QString((ylabel == "") ? "" : " / ") + "Watts";
+        setAxisTitle(yLeft, "Watts");
+        setAxisScale(yLeft, 0.0, 1.05 * wattsCurve->maxYValue());
     }
-    if (hrCurve->isVisible()) {
-        ymax = max(ymax, hrCurve->maxYValue());
-        ylabel += QString((ylabel == "") ? "" : " / ") + "BPM";
+    if (hrCurve->isVisible() || cadCurve->isVisible()) {
+        double ymax = 0;
+        QStringList labels;
+        if (hrCurve->isVisible()) {
+            labels << "BPM";
+            ymax = hrCurve->maxYValue();
+        }
+        if (cadCurve->isVisible()) {
+            labels << "RPM";
+            ymax = qMax(ymax, cadCurve->maxYValue());
+        }
+        setAxisTitle(yLeft2, labels.join(" / "));
+        setAxisScale(yLeft2, 0.0, 1.05 * ymax);
     }
-    if (cadCurve->isVisible()) {
-        ymax = max(ymax, cadCurve->maxYValue());
-        ylabel += QString((ylabel == "") ? "" : " / ") + "RPM";
+    if (speedCurve->isVisible()) {
+        setAxisTitle(yRight, (useMetricUnits ? "KPH" : "MPH"));
+        setAxisScale(yRight, 0.0, 1.05 * speedCurve->maxYValue());
     }
     if (altCurve->isVisible()) {
-        ymax = max(ymax, altCurve->maxYValue());
-	if (useMetricUnits){
-        	ylabel += QString((ylabel == "") ? "" : " / ") + "Meters";
-	} else {
-		ylabel += QString((ylabel == "") ? "" : " / ") + "Ft";
-	}
+        setAxisTitle(yRight2, useMetricUnits ? "Meters" : "Feet");
+        setAxisScale(yRight2, 0.0, 1.05 * altCurve->maxYValue());
     }
 
-    setAxisScale(yLeft, 0.0, ymax * 1.1);
-    setAxisTitle(yLeft, ylabel);
-
+    enableAxis(yLeft, wattsCurve->isVisible());
+    enableAxis(yLeft2, hrCurve->isVisible() || cadCurve->isVisible());
     enableAxis(yRight, speedCurve->isVisible());
-    setAxisTitle(yRight, (useMetricUnits ? "KPH" : "MPH"));
+    enableAxis(yRight2, altCurve->isVisible());
 }
 
 void
