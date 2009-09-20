@@ -501,33 +501,96 @@ QSize QwtPlotLayout::minimumSizeHint(const QwtPlot *plot) const
             
     }
 
-
     for ( axis = 0; axis < QwtPlot::axisCnt; axis++ )
     {
         ScaleData &sd = scaleData[axis];
         if ( sd.w && (axis == QwtPlot::xBottom || axis == QwtPlot::xTop) )
         {
-            if ( (sd.minLeft > canvasBorder[QwtPlot::yLeft]) 
-                && scaleData[QwtPlot::yLeft].w )
+            if ( (sd.minLeft > canvasBorder[QwtPlot::yLeft3])
+                && scaleData[QwtPlot::yLeft3].w )
             {
-                int shiftLeft = sd.minLeft - canvasBorder[QwtPlot::yLeft];
-                if ( shiftLeft > scaleData[QwtPlot::yLeft].w )
-                    shiftLeft = scaleData[QwtPlot::yLeft].w;
+                int shiftLeft = sd.minLeft - canvasBorder[QwtPlot::yLeft3];
+                if ( shiftLeft > scaleData[QwtPlot::yLeft3].w )
+                    shiftLeft = scaleData[QwtPlot::yLeft3].w;
 
                 sd.w -= shiftLeft;
             }
-            if ( (sd.minRight > canvasBorder[QwtPlot::yRight]) 
+            if (  (sd.minLeft > canvasBorder[QwtPlot::yLeft3])
+                && scaleData[QwtPlot::yLeft2].w )
+            {
+                int shiftLeft = sd.minLeft - scaleData[QwtPlot::yLeft3].w - canvasBorder[QwtPlot::yLeft3];
+                if ( shiftLeft > (scaleData[QwtPlot::yLeft3].w + scaleData[QwtPlot::yLeft2].w) )
+                    shiftLeft = scaleData[QwtPlot::yLeft3].w + scaleData[QwtPlot::yLeft2].w;
+
+                sd.w -= shiftLeft;
+            }
+            if (  (sd.minLeft > canvasBorder[QwtPlot::yLeft3])
+                && scaleData[QwtPlot::yLeft1].w )
+            {
+                int shiftLeft = sd.minLeft - scaleData[QwtPlot::yLeft3].w - scaleData[QwtPlot::yLeft2].w - canvasBorder[QwtPlot::yLeft3];
+                if ( shiftLeft > (scaleData[QwtPlot::yLeft3].w + scaleData[QwtPlot::yLeft2].w + scaleData[QwtPlot::yLeft1].w) )
+                    shiftLeft = scaleData[QwtPlot::yLeft3].w + scaleData[QwtPlot::yLeft2].w + scaleData[QwtPlot::yLeft1].w;
+
+                sd.w -= shiftLeft;
+            }
+            if (  (sd.minLeft > canvasBorder[QwtPlot::yLeft3])
+                && scaleData[QwtPlot::yLeft].w )
+            {
+                int shiftLeft = sd.minLeft - scaleData[QwtPlot::yLeft3].w - scaleData[QwtPlot::yLeft2].w
+                              - scaleData[QwtPlot::yLeft1].w - canvasBorder[QwtPlot::yLeft3];
+                if ( shiftLeft > (scaleData[QwtPlot::yLeft3].w + scaleData[QwtPlot::yLeft2].w +
+                                  scaleData[QwtPlot::yLeft1].w + scaleData[QwtPlot::yLeft].w) )
+                    shiftLeft = scaleData[QwtPlot::yLeft3].w + scaleData[QwtPlot::yLeft2].w +
+                                scaleData[QwtPlot::yLeft1].w + scaleData[QwtPlot::yLeft].w;
+                sd.w -= shiftLeft;
+            }
+
+            if ( (sd.minRight > canvasBorder[QwtPlot::yRight3])
+                && scaleData[QwtPlot::yRight3].w )
+            {
+                int shiftRight = sd.minRight - canvasBorder[QwtPlot::yRight3];
+                if ( shiftRight > scaleData[QwtPlot::yRight3].w )
+                    shiftRight = scaleData[QwtPlot::yRight3].w;
+
+                sd.w -= shiftRight;
+            }
+            if ( (sd.minRight > canvasBorder[QwtPlot::yRight3])
+                && scaleData[QwtPlot::yRight2].w )
+            {
+                int shiftRight = sd.minRight - scaleData[QwtPlot::yRight3].w - canvasBorder[QwtPlot::yRight3];
+                if ( shiftRight > (scaleData[QwtPlot::yRight3].w + scaleData[QwtPlot::yRight2].w) )
+                    shiftRight = scaleData[QwtPlot::yRight3].w + scaleData[QwtPlot::yRight2].w;
+
+                sd.w -=shiftRight;
+            }
+            if ( (sd.minRight > canvasBorder[QwtPlot::yRight3])
+                && scaleData[QwtPlot::yRight1].w )
+            {
+                int shiftRight = sd.minRight - scaleData[QwtPlot::yRight3].w - scaleData[QwtPlot::yRight2].w
+                                 - canvasBorder[QwtPlot::yRight3];
+                if ( shiftRight > (scaleData[QwtPlot::yRight3].w + scaleData[QwtPlot::yRight2].w + scaleData[QwtPlot::yRight1].w) )
+                    shiftRight = scaleData[QwtPlot::yRight3].w + scaleData[QwtPlot::yRight2].w + scaleData[QwtPlot::yRight1].w;
+
+                sd.w -= shiftRight;
+            }
+            if ( (sd.minRight > canvasBorder[QwtPlot::yRight3])
                 && scaleData[QwtPlot::yRight].w )
             {
-                int shiftRight = sd.minRight - canvasBorder[QwtPlot::yRight];
-                if ( shiftRight > scaleData[QwtPlot::yRight].w )
-                    shiftRight = scaleData[QwtPlot::yRight].w;
+                int shiftRight = sd.minRight - scaleData[QwtPlot::yRight3].w - scaleData[QwtPlot::yRight2].w
+                                 - scaleData[QwtPlot::yRight1].w - canvasBorder[QwtPlot::yRight3];
+                if ( shiftRight > (scaleData[QwtPlot::yRight3].w + scaleData[QwtPlot::yRight2].w
+                                 +scaleData[QwtPlot::yRight1].w + scaleData[QwtPlot::yRight].w) )
+                    shiftRight = scaleData[QwtPlot::yRight3].w + scaleData[QwtPlot::yRight2].w
+                                +scaleData[QwtPlot::yRight1].w + scaleData[QwtPlot::yRight].w;
 
                 sd.w -= shiftRight;
             }
         }
 
-        if ( sd.h && (axis == QwtPlot::yLeft || axis == QwtPlot::yRight) )
+        if ( sd.h && (axis == QwtPlot::yLeft || axis == QwtPlot::yRight ||
+                      axis == QwtPlot::yLeft1 || axis == QwtPlot::yRight1 ||
+                      axis == QwtPlot::yLeft2 || axis == QwtPlot::yRight2 ||
+                      axis == QwtPlot::yLeft3 || axis == QwtPlot::yRight3))
         {
             if ( (sd.minLeft > canvasBorder[QwtPlot::xBottom]) &&
                 scaleData[QwtPlot::xBottom].h )
@@ -553,7 +616,10 @@ QSize QwtPlotLayout::minimumSizeHint(const QwtPlot *plot) const
     const QwtPlotCanvas *canvas = plot->canvas();
     const QSize minCanvasSize = canvas->minimumSize();
 
-    int w = scaleData[QwtPlot::yLeft].w + scaleData[QwtPlot::yRight].w;
+    int w = scaleData[QwtPlot::yLeft].w + scaleData[QwtPlot::yRight].w
+				+ scaleData[QwtPlot::yLeft1].w + scaleData[QwtPlot::yRight1].w
+				+ scaleData[QwtPlot::yLeft2].w + scaleData[QwtPlot::yRight2].w
+				+ scaleData[QwtPlot::yLeft3].w + scaleData[QwtPlot::yRight3].w;
     int cw = qwtMax(scaleData[QwtPlot::xBottom].w, scaleData[QwtPlot::xTop].w)
         + 2 * (canvas->frameWidth() + 1);
     w += qwtMax(cw, minCanvasSize.width());
@@ -683,7 +749,7 @@ QRect QwtPlotLayout::layoutLegend(int options,
             legendRect.setWidth(dim);
             break;
         case QwtPlot::RightLegend:
-            legendRect.setX(rect.right() - dim + 1);
+				legendRect.setX(rect.right() - dim + 1 );
             legendRect.setWidth(dim);
             break;
         case QwtPlot::TopLegend:
@@ -897,51 +963,59 @@ void QwtPlotLayout::alignScales(int options,
 
         if ( axis == QwtPlot::xTop || axis == QwtPlot::xBottom )
         {
-            const int leftOffset = 
-                backboneOffset[QwtPlot::yLeft] - startDist;
+           for (int leftAxis = QwtPlot::yLeft3;
+                 leftAxis <= QwtPlot::yLeft; leftAxis++)
+           {
+              const int leftOffset = 
+                 backboneOffset[leftAxis] - startDist;
 
-            if ( scaleRect[QwtPlot::yLeft].isValid() )
-            {
-                int minLeft = scaleRect[QwtPlot::yLeft].left();
-                int left = axisRect.left() + leftOffset;
-                axisRect.setLeft(qwtMax(left, minLeft));
-            }
-            else
-            {
-                if ( d_data->alignCanvasToScales && leftOffset < 0 )
-                {
+              if ( scaleRect[leftAxis].isValid() )
+              {
+                 int minLeft = scaleRect[leftAxis].left();
+                 int left = axisRect.left() + leftOffset;
+                 axisRect.setLeft(qwtMax(left, minLeft));
+              }
+              else
+              {
+                 if ( d_data->alignCanvasToScales && leftOffset < 0 )
+                 {
                     canvasRect.setLeft(qwtMax(canvasRect.left(), 
-                        axisRect.left() - leftOffset));
-                }
-                else
-                {
+                             axisRect.left() - leftOffset));
+                 }
+                 else
+                 {
                     if ( leftOffset > 0 )
-                        axisRect.setLeft(axisRect.left() + leftOffset);
-                }
-            }
+                       axisRect.setLeft(axisRect.left() + leftOffset);
+                 }
+              }
+           }
 
-            const int rightOffset = 
-                backboneOffset[QwtPlot::yRight] - endDist + 1;
+           for (int rightAxis = QwtPlot::yRight;
+                 rightAxis <= QwtPlot::yRight3; rightAxis++)
+           {
+              const int rightOffset = 
+                 backboneOffset[rightAxis] - endDist + 1;
 
-            if ( scaleRect[QwtPlot::yRight].isValid() )
-            {
-                int maxRight = scaleRect[QwtPlot::yRight].right();
-                int right = axisRect.right() - rightOffset;
-                axisRect.setRight(qwtMin(right, maxRight));
-            }
-            else
-            {
-                if ( d_data->alignCanvasToScales && rightOffset < 0 )
-                {
+              if ( scaleRect[rightAxis].isValid() )
+              {
+                 int maxRight = scaleRect[rightAxis].right();
+                 int right = axisRect.right() - rightOffset;
+                 axisRect.setRight(qwtMin(right, maxRight));
+              }
+              else
+              {
+                 if ( d_data->alignCanvasToScales && rightOffset < 0 )
+                 {
                     canvasRect.setRight( qwtMin(canvasRect.right(), 
-                        axisRect.right() + rightOffset) );
-                }
-                else
-                {
+                             axisRect.right() + rightOffset) );
+                 }
+                 else
+                 {
                     if ( rightOffset > 0 )
-                        axisRect.setRight(axisRect.right() - rightOffset);
-                }
-            }
+                       axisRect.setRight(axisRect.right() - rightOffset);
+                 }
+              }
+           }
         }
         else // QwtPlot::yLeft, QwtPlot::yRight
         {
@@ -1154,9 +1228,13 @@ void QwtPlotLayout::activate(const QwtPlot *plot,
     }
 
     d_data->canvasRect.setRect(
-        rect.x() + dimAxes[QwtPlot::yLeft],
+        rect.x() + dimAxes[QwtPlot::yLeft3] + dimAxes[QwtPlot::yLeft2] + dimAxes[QwtPlot::yLeft1] + dimAxes[QwtPlot::yLeft] + 1,
         rect.y() + dimAxes[QwtPlot::xTop],
-        rect.width() - dimAxes[QwtPlot::yRight] - dimAxes[QwtPlot::yLeft],
+        rect.width() - (
+	    dimAxes[QwtPlot::yRight] + dimAxes[QwtPlot::yRight1]
+	    + dimAxes[QwtPlot::yRight2] + dimAxes[QwtPlot::yRight3]
+		) - (dimAxes[QwtPlot::yLeft] + dimAxes[QwtPlot::yLeft1] +
+			  dimAxes[QwtPlot::yLeft2] + dimAxes[QwtPlot::yLeft3]),
         rect.height() - dimAxes[QwtPlot::xBottom] - dimAxes[QwtPlot::xTop]);
 
     for ( int axis = 0; axis < QwtPlot::axisCnt; axis++ )
@@ -1171,12 +1249,36 @@ void QwtPlotLayout::activate(const QwtPlot *plot,
             scaleRect = d_data->canvasRect;
             switch(axis)
             {
+                case QwtPlot::yLeft3:
+                    scaleRect.setX(d_data->canvasRect.left() - dim - dimAxes[QwtPlot::yLeft] - dimAxes[QwtPlot::yLeft1] - dimAxes[QwtPlot::yLeft2]);
+                    scaleRect.setWidth(dim);
+                    break;
+                case QwtPlot::yLeft2:
+                    scaleRect.setX(d_data->canvasRect.left() - dim - dimAxes[QwtPlot::yLeft] - dimAxes[QwtPlot::yLeft1]);
+                    scaleRect.setWidth(dim);
+                    break;
+                case QwtPlot::yLeft1:
+                    scaleRect.setX(d_data->canvasRect.left() - dim - dimAxes[QwtPlot::yLeft]);
+                    scaleRect.setWidth(dim);
+                    break;
                 case QwtPlot::yLeft:
                     scaleRect.setX(d_data->canvasRect.left() - dim);
                     scaleRect.setWidth(dim);
                     break;
                 case QwtPlot::yRight:
                     scaleRect.setX(d_data->canvasRect.right() + 1);
+                    scaleRect.setWidth(dim);
+                    break;
+                case QwtPlot::yRight1:
+                    scaleRect.setX(d_data->canvasRect.right() + 1 + dimAxes[QwtPlot::yRight]);	//working
+                    scaleRect.setWidth(dim);
+                    break;
+                case QwtPlot::yRight2:
+                    scaleRect.setX(d_data->canvasRect.right() + 1 + dimAxes[QwtPlot::yRight] + dimAxes[QwtPlot::yRight1]);
+                    scaleRect.setWidth(dim);
+                    break;
+                case QwtPlot::yRight3:
+                    scaleRect.setX(d_data->canvasRect.right() + 1 + dimAxes[QwtPlot::yRight] + dimAxes[QwtPlot::yRight1] + dimAxes[QwtPlot::yRight2]);
                     scaleRect.setWidth(dim);
                     break;
                 case QwtPlot::xBottom:
