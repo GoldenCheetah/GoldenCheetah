@@ -1085,10 +1085,13 @@ void MainWindow::generateWeeklySummary()
 	int day;
         if (
 	    (item->type() == RIDE_TYPE) &&
-	    (item->ride) &&
 	    ((day = wstart.daysTo(item->dateTime.date())) >= 0) && 
 	    (day < 7)
 	    ) {
+
+            item->htmlSummary(); // generates item->ride
+            if (!item->ride)
+                continue;
 
 	    RideMetric *m;
 	    item->htmlSummary(); // compute metrics
