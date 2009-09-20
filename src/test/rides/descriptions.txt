@@ -1,0 +1,8 @@
+2009_08_30_21_17_25.tcx
+    A TCX file from a Garmin 705. Includes power, altitude, and heart rate
+    data. Good general case test of TCX import
+
+2009_01_09_11_13_14.tcx
+    A TCX file from a Garmin 705. Includes altitude but no power or heart
+    rate. Time starts before 0, causing cpint crash.  Also a good test for
+    handling missing data.
