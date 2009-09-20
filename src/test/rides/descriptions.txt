@@ -6,3 +6,7 @@
     A TCX file from a Garmin 705. Includes altitude but no power or heart
     rate. Time starts before 0, causing cpint crash.  Also a good test for
     handling missing data.
+
+2008_12_28_08_13_27.tcx
+    A TCX file with altitude values below sea level. Also has missing heart
+    rate and power data.
