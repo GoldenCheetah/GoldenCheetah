@@ -131,7 +131,8 @@ update_cpi_file(const cpi_file_info *info, QProgressDialog *progress,
     while (i.hasNext()) {
 	const RideFilePoint *p = i.next();
 	double secs = round(p->secs * 1000.0) / 1000;
-	data.points.append(cpint_point(secs, (int) round(p->watts)));
+        if (secs > 0)
+            data.points.append(cpint_point(secs, (int) round(p->watts)));
     }
     delete rideFile;
 
