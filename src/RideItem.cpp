@@ -336,16 +336,18 @@ RideItem::htmlSummary()
         QString noteString = "";
         QString stars;
         QDomNodeList groups = doc.elementsByTagName("metric_group");
+        const int columns = 3;
         for (int groupNum = 0; groupNum < groups.size(); ++groupNum) {
             QDomElement group = groups.at(groupNum).toElement();
             assert(!group.isNull());
             QString groupName = group.attribute("name");
             QString groupNote = group.attribute("note");
             assert(groupName.length() > 0);
-            if (groupNum % 2 == 0)
+            if (groupNum % columns == 0)
                 summary += "<table border=0 cellspacing=10><tr>";
-            summary += "<td align=\"center\" width=\"45%\"><table>"
-                "<tr><td align=\"center\" colspan=2><h2>%1</h2></td></tr>";
+            summary += "<td align=\"center\" width=\"%1%\"><table>"
+                "<tr><td align=\"center\" colspan=2><h2>%2</h2></td></tr>";
+            summary = summary.arg(90 / columns);
             if (groupNote.length() > 0) {
                 stars += "*";
                 summary = summary.arg(groupName + stars);
@@ -384,7 +386,8 @@ RideItem::htmlSummary()
                 }
             }
             summary += "</table></td>";
-            if ((groupNum % 2 == 1) || (groupNum == groups.size() - 1))
+            if ((groupNum % columns == (columns - 1))
+                || (groupNum == groups.size() - 1))
                 summary += "</tr></table>";
         }
 	
