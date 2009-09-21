@@ -241,8 +241,20 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                                  rideTime.cap(5).toInt(),
                                  rideTime.cap(6).toInt()));
         rideFile->setStartTime(datetime);
+    } else {
+        // Could be yyyyddmm_hhmmss_NAME.csv (case insensitive)
+        rideTime.setPattern("(\\d\\d\\d\\d)(\\d\\d)(\\d\\d)_(\\d\\d)(\\d\\d)(\\d\\d)[^\\.]*\\.csv$");
+        rideTime.setCaseSensitivity(Qt::CaseInsensitive);
+        if (rideTime.indexIn(file.fileName()) >= 0) {
+            QDateTime datetime(QDate(rideTime.cap(1).toInt(),
+                                     rideTime.cap(2).toInt(),
+                                     rideTime.cap(3).toInt()),
+                               QTime(rideTime.cap(4).toInt(),
+                                     rideTime.cap(5).toInt(),
+                                     rideTime.cap(6).toInt()));
+            rideFile->setStartTime(datetime);
+        }
     }
-
     return rideFile;
 }
 
