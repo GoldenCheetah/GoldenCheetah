@@ -455,7 +455,10 @@ AllPlot::setYMax()
     }
     if (altCurve->isVisible()) {
         setAxisTitle(yRight2, useMetricUnits ? "Meters" : "Feet");
-        setAxisScale(yRight2, 0.0, 1.05 * altCurve->maxYValue());
+        double ymin = altCurve->minYValue();
+        double ymax = qMax(ymin + 100, 1.05 * altCurve->maxYValue());
+        setAxisScale(yRight2, ymin, ymax);
+        altCurve->setBaseline(ymin);
     }
 
     enableAxis(yLeft, wattsCurve->isVisible());
@@ -524,10 +527,9 @@ AllPlot::setData(RideItem *_rideItem)
 	    if (!cadArray.empty())
 		cadArray[arrayLength]   = max(0, point->cad);
             if (!altArray.empty())
-                altArray[arrayLength]   = max(0,
-                                              (useMetricUnits
-                                               ? point->alt
-                                               : point->alt * FEET_PER_M));
+                altArray[arrayLength]   = (useMetricUnits
+                                           ? point->alt
+                                           : point->alt * FEET_PER_M);
 	    interArray[arrayLength] = point->interval;
 	    distanceArray[arrayLength] = max(0,
 					     (useMetricUnits
