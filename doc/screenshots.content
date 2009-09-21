@@ -3,46 +3,47 @@
 <p>
 <center>
 
+<p>
 <big><font face="arial,helvetica,sanserif">
-The Download Dialog
+Ride Summary
 </font></big>
 <p>
-<img src="screenshot-download.png" alt="Download Dialog" align="center">
+<img src="ride-summary.png" alt="Ride Summary Screen" align="center">
 
 <p>
 <big><font face="arial,helvetica,sanserif">
-The Ride Summary
+Plotting Altitude, Cadence, Heart Rate, Power, and Speed
 </font></big>
 <p>
-<img src="screenshot-summary.png" alt="Ride Summary Screen" align="center">
+<img src="ride-plot.png" alt="Power and HR Plot" align="center">
 
 <p>
 <big><font face="arial,helvetica,sanserif">
-The Power, Heart Rate, Speed, and Cadence Plot
+Plotting Critical Power
 </font></big>
 <p>
-<img src="screenshot-plot.png" alt="Power and HR Plot" align="center">
+<img src="critical-power-plot.png" alt="The Critical Power Plot" align="center">
 
 <p>
 <big><font face="arial,helvetica,sanserif">
-The Critical Power Plot
+Histogram Analysis
 </font></big>
 <p>
-<img src="screenshot-cpint.png" alt="The Critical Power Plot" align="center">
+<img src="histogram-analysis.png" alt="The Power Histogram" align="center">
 
 <p>
 <big><font face="arial,helvetica,sanserif">
-The Power Histogram
+Plotting Pedal Force Versus Pedal Velocity
 </font></big>
 <p>
-<img src="screenshot-phist.png" alt="The Power Histogram" align="center">
+<img src="pf-pv-plot.png" alt="The Power Histogram" align="center">
 
 <p>
 <big><font face="arial,helvetica,sanserif">
 The Weekly Summary
 </font></big>
 <p>
-<img src="screenshot-weekly.png" alt="The Weekly Summary" align="center">
+<img src="weekly-summary.png" alt="The Weekly Summary" align="center">
 
 </center>
 

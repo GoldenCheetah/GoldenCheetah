@@ -3,11 +3,11 @@ CONTENT=$(wildcard *.content)
 HTML=$(subst .content,.html,$(CONTENT))
 TARBALLS=$(wildcard gc_*.tgz)
 OTHER=logo.jpg sample.gp sample.png cpint.gp cpint.png \
-	screenshot-summary.png screenshot-plot.png \
-	screenshot-cpint.png screenshot-phist.png \
-	screenshot-download.png screenshot-weekly.png \
+	critical-power-plot.png histogram-analysis.png pf-pv-plot.png \
+	ride-plot.png ride-summary.png weekly-summary.png \
 	choose-a-cyclist.png main-window.png critical-power.png \
 	power.zones
+
 
 all: $(HTML)
 .PHONY: all clean install
