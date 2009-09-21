@@ -231,6 +231,7 @@ RideImportWizard::process()
             else
                 suffixes.setPattern("^(raw|srm|csv|tcx|hrm|wko)$");
 
+            suffixes.setCaseSensitivity(Qt::CaseInsensitive);
 
             if (suffixes.exactMatch(thisfile.suffix())) {
 
