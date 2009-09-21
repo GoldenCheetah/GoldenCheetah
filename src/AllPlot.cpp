@@ -170,7 +170,8 @@ max(double a, double b) { if (a > b) return a; else return b; }
 #define MILES_PER_KM 0.62137119
 #define FEET_PER_M 3.2808399
 
-AllPlot::AllPlot():
+AllPlot::AllPlot(QWidget *parent):
+    QwtPlot(parent),
     settings(NULL),
     unit(0),
     rideItem(NULL),
