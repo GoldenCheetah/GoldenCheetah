@@ -122,7 +122,7 @@ pt_read_raw(FILE *in, int compat, void *context,
     double mph;
     double nm;
     double watts;
-    double alt;
+    double alt = 0;
     unsigned cad;
     unsigned hr;
     struct tm time;
