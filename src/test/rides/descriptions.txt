@@ -10,3 +10,16 @@
 2008_12_28_08_13_27.tcx
     A TCX file with altitude values below sea level. Also has missing heart
     rate and power data.
+
+20090806_053349_BOB_DOBILANA.CSV
+    A CSV file exported from the ergomo ergoracer software. The filename
+    is the default format for export from ergoracer. Includes distance,
+    power, cadence, speed, heart rate, altitude, temperature, and interval
+    number (all zeros in this file).
+
+20090804_062250_BOB_DOBALINA.CSV
+    A CSV file exported from the ergomo ergoracer software. The filename
+    is the default format for export from ergoracer. Includes distance
+    (all zeros in this file), power, cadence, speed (all zeros), heart
+    rate, altitude, temperature, and interval number.  Note the interval
+    numbering convention.
