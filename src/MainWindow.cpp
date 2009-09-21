@@ -232,7 +232,7 @@ MainWindow::MainWindow(const QDir &home) :
                                                    smoothSlider->maximum(), 
                                                    smoothLineEdit));
     smoothLayout->addWidget(smoothSlider);
-    allPlot = new AllPlot();
+    allPlot = new AllPlot(this);
     smoothSlider->setValue(allPlot->smoothing());
     smoothLineEdit->setText(QString("%1").arg(allPlot->smoothing()));
 
@@ -618,6 +618,8 @@ MainWindow::MainWindow(const QDir &home) :
             treeWidget->setCurrentItem(allRides->child(0));
         }
     }
+
+    setAttribute(Qt::WA_DeleteOnClose);
 }
 
 void

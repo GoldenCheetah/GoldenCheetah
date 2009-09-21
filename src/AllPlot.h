@@ -53,7 +53,7 @@ class AllPlot : public QwtPlot
         QVector<QwtPlotMarker*> d_mrk;
 	QList <AllPlotZoneLabel *> zoneLabels;
 
-        AllPlot();
+        AllPlot(QWidget *parent);
 
         int smoothing() const { return smooth; }
 
