@@ -1,3 +1,6 @@
+2009_09_19_09_22_42.tcx
+    A TCX file with "smart recording", i.e. variable recording intervals.
+
 2009_08_30_21_17_25.tcx
     A TCX file from a Garmin 705. Includes power, altitude, and heart rate
     data. Good general case test of TCX import
