@@ -49,6 +49,7 @@
 #include "ToolsDialog.h"
 #include "MetricAggregator.h"
 #include "SplitRideDialog.h"
+#include "PerformanceManagerWindow.h"
 
 #ifndef GC_VERSION
 #define GC_VERSION "(developer build)"
@@ -217,6 +218,12 @@ MainWindow::MainWindow(const QDir &home) :
     // add daily distance / duration graph:
     weeklySummaryWindow = new WeeklySummaryWindow(useMetricUnits, this);
     tabWidget->addTab(weeklySummaryWindow, tr("Weekly Summary"));
+
+    //////////////////////// Performance Manager  ////////////////////////
+
+    performanceManagerWindow = new PerformanceManagerWindow();
+    tabWidget->addTab(performanceManagerWindow, "Performance Manager");
+
 
     ////////////////////////////// Signals ////////////////////////////// 
 
@@ -869,6 +876,10 @@ MainWindow::tabChanged(int index)
                 return;
             }
         }
+    }
+    else if (index == 7) {
+	// Performance Manager
+	performanceManagerWindow->replot(home,allRides);
     }
 }
 

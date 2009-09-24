@@ -92,7 +92,10 @@ HEADERS += \
         WeeklySummaryWindow.h \
         ManualRideFile.h \
         ManualRideDialog.h \
-        RideCalendar.h
+        RideCalendar.h \
+	PerfPlot.h \
+	StressCalculator.h \
+	PerformanceManagerWindow.h
 
 SOURCES += \
         AllPlot.cpp \
@@ -145,7 +148,10 @@ SOURCES += \
         WeeklySummaryWindow.cpp \
         ManualRideFile.cpp \
         ManualRideDialog.cpp \
-        RideCalendar.cpp
+        RideCalendar.cpp \
+	PerfPlot.cpp \
+	StressCalculator.cpp \
+	PerformanceManagerWindow.cpp
 
 RESOURCES = application.qrc
 

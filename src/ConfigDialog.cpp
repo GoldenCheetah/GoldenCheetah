@@ -140,6 +140,19 @@ void ConfigDialog::save_Clicked()
     settings->setValue(GC_CRANKLENGTH, configPage->crankLengthCombo->currentText());
     settings->setValue(GC_BIKESCOREDAYS, configPage->BSdaysEdit->text());
     settings->setValue(GC_BIKESCOREMODE, configPage->bsModeCombo->currentText());
+    settings->setValue(GC_INITIAL_STS, cyclistPage->perfManStart->text());
+    settings->setValue(GC_INITIAL_LTS, cyclistPage->perfManStart->text());
+    settings->setValue(GC_STS_DAYS, cyclistPage->perfManSTSavg->text());
+    settings->setValue(GC_LTS_DAYS, cyclistPage->perfManLTSavg->text());
+
+    // set default stress names if not set:
+    settings->setValue(GC_STS_NAME, settings->value(GC_STS_NAME,tr("Short Term Stress")));
+    settings->setValue(GC_STS_ACRONYM, settings->value(GC_STS_ACRONYM,tr("STS")));
+    settings->setValue(GC_LTS_NAME, settings->value(GC_LTS_NAME,tr("Long Term Stress")));
+    settings->setValue(GC_LTS_ACRONYM, settings->value(GC_LTS_ACRONYM,tr("LTS")));
+    settings->setValue(GC_SB_NAME, settings->value(GC_SB_NAME,tr("Stress Balance")));
+    settings->setValue(GC_SB_ACRONYM, settings->value(GC_SB_ACRONYM,tr("SB")));
+
 
     // if the CP text entry reads invalid, there's nothing we can do
     int cp = cyclistPage->getCP();
