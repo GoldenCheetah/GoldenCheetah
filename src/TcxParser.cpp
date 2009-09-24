@@ -128,9 +128,53 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
             }
 
             // Record trackpoint
-            rideFile->appendPoint(secs, cadence, hr, distance,
-                                   speed, torque, power, alt, lap);
 
+	    // for smart recording, the delta_t will not be constant
+	    // average all the calculations based on the previous
+	    // point.
+	    if(rideFile->dataPoints().empty()) {
+	        // first point
+	        rideFile->appendPoint(secs, cadence, hr, distance,
+                                   speed, torque, power, alt, lap);
+	    }
+	    else {
+	      // assumption that the change in ride is linear...  :)
+	      RideFilePoint *prevPoint = rideFile->dataPoints().back();
+	      double deltaSecs = secs - prevPoint->secs;
+	      double deltaCad = cadence - prevPoint->cad;
+	      double deltaHr = hr - prevPoint->hr;
+	      double deltaDist = distance - prevPoint->km;
+	      double deltaSpeed = speed - prevPoint->kph;
+	      double deltaTorque = torque - prevPoint->nm;
+	      double deltaPower = power - prevPoint->watts;
+	      double deltaAlt = alt - prevPoint->alt;
+	      if(deltaSecs == 1) {
+		  // no smart recording, just insert the data
+		  rideFile->appendPoint(secs, cadence, hr, distance,
+                                   speed, torque, power, alt, lap);
+	      }
+	      else {
+		  for(int i = 1; i <= deltaSecs; i++) {
+		      double weight = i/ deltaSecs;
+		      double kph = prevPoint->kph + (deltaSpeed *weight);
+		      // need to make sure speed goes to zero
+		      kph = kph > 0.35 ? kph : 0;
+		      double cad = prevPoint->cad + (deltaCad * weight);
+		      cad = cad > 0.35 ? cad : 0;
+		      rideFile->appendPoint(
+					    prevPoint->secs + (deltaSecs * weight),
+					    prevPoint->cad  + (deltaCad * weight),
+					    prevPoint->hr +   (deltaHr * weight),
+					    prevPoint->km + (deltaDist * weight),
+					    kph,
+					    prevPoint->nm + (deltaTorque * weight),
+					    prevPoint->watts + (deltaPower * weight),
+					    prevPoint->alt + (deltaAlt * weight),
+					    lap);
+		  }
+		  prevPoint = rideFile->dataPoints().back();
+	      }
+	    }
             lastDistance = distance;
         }
         last_time = time;
