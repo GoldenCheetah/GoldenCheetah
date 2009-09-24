@@ -37,6 +37,7 @@ class RideFile;
 class WeeklySummaryWindow;
 class Zones;
 class RideCalendar;
+class PerformanceManagerWindow;
 
 class MainWindow : public QMainWindow 
 {
@@ -103,6 +104,10 @@ class MainWindow : public QMainWindow
         CriticalPowerWindow *criticalPowerWindow;
         QTreeWidgetItem *allRides;
         QSplitter *leftLayout;
+
+        QwtPlotCurve *weeklyBSCurve;
+        QwtPlotCurve *weeklyRICurve;
+	PerformanceManagerWindow *performanceManagerWindow;
 
         Zones *zones;
 

@@ -64,6 +64,13 @@ class CyclistPage : public QWidget
         QLabel *txtEndDate;
         QLabel *lblStartDate;
         QLabel *lblEndDate;
+	QLabel *perfManLabel;
+	QLabel *perfManStartLabel;
+	QLabel *perfManSTSLabel;
+	QLabel *perfManLTSLabel;
+	QLineEdit *perfManStart;
+	QLineEdit *perfManSTSavg;
+	QLineEdit *perfManLTSavg;
 
         int getCurrentRange();
 	bool isNewMode();
@@ -83,6 +90,10 @@ class CyclistPage : public QWidget
 	QLabel *lblThreshold;
         QLineEdit *txtThreshold;
 	QIntValidator *txtThresholdValidator;
+	QVBoxLayout *perfManLayout;
+	QHBoxLayout *perfManStartValLayout;
+	QHBoxLayout *perfManSTSavgLayout;
+	QHBoxLayout *perfManLTSavgLayout;
 	QHBoxLayout *powerLayout;
 	QHBoxLayout *rangeLayout;
 	QHBoxLayout *dateRangeLayout;
@@ -90,5 +101,8 @@ class CyclistPage : public QWidget
 	QHBoxLayout *calendarLayout;
 	QVBoxLayout *cyclistLayout;
 	QVBoxLayout *mainLayout;
+	QIntValidator *perfManStartValidator;
+	QIntValidator *perfManSTSavgValidator;
+	QIntValidator *perfManLTSavgValidator;
 };
 #endif

@@ -36,6 +36,16 @@
 #define GC_CRANKLENGTH              "crankLength"
 #define GC_BIKESCOREDAYS	    "bikeScoreDays"
 #define GC_BIKESCOREMODE	    "bikeScoreMode"
+#define GC_INITIAL_LTS		    "initialLTS"
+#define GC_INITIAL_STS		    "initialSTS"
+#define GC_LTS_DAYS		    "LTSdays"
+#define GC_STS_DAYS		    "STSdays"
+#define GC_STS_NAME			"STSname"
+#define GC_STS_ACRONYM			"STS"
+#define GC_LTS_NAME			"LTSname"
+#define GC_LTS_ACRONYM			"LTS"
+#define GC_SB_NAME			"SBname"
+#define GC_SB_ACRONYM			"SB"
 
 #include <QSettings>
 #include <boost/shared_ptr.hpp>

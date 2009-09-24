@@ -163,6 +163,10 @@ CyclistPage::~CyclistPage()
     delete lblCurRange;
     delete powerLayout;
     delete rangeLayout;
+    delete perfManLTSavgLayout;
+    delete perfManSTSavgLayout;
+    delete perfManStartValLayout;
+    delete perfManLayout;
     delete dateRangeLayout;
     delete zoneLayout;
     delete calendarLayout;
@@ -173,6 +177,8 @@ CyclistPage::~CyclistPage()
 CyclistPage::CyclistPage(Zones **_zones):
     zones(_zones)
 {
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+
     cyclistGroup = new QGroupBox(tr("Cyclist Options"));
     lblThreshold = new QLabel(tr("Critical Power:"));
     txtThreshold = new QLineEdit();
@@ -206,6 +212,28 @@ CyclistPage::CyclistPage(Zones **_zones):
     lblCurRange = new QLabel(this);
     lblCurRange->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     lblCurRange->setText(QString("Current Zone Range: %1").arg(currentRange + 1));
+
+    perfManLabel = new QLabel(tr("Performance Manager"));
+    perfManStartLabel = new QLabel(tr("Starting LTS"));
+    perfManSTSLabel = new QLabel(tr("STS average (days)"));
+    perfManLTSLabel = new QLabel(tr("LTS average (days)"));
+    perfManStartValidator = new QIntValidator(0,200,this);
+    perfManSTSavgValidator = new QIntValidator(1,21,this);
+    perfManLTSavgValidator = new QIntValidator(7,56,this);
+    QVariant perfManStartVal = settings->value(GC_INITIAL_STS);
+    QVariant perfManSTSVal = settings->value(GC_STS_DAYS);
+    if (perfManSTSVal.isNull() || perfManSTSVal.toInt() == 0)
+	perfManSTSVal = 7;
+    QVariant perfManLTSVal = settings->value(GC_LTS_DAYS);
+    if (perfManLTSVal.isNull() || perfManLTSVal.toInt() == 0)
+	perfManLTSVal = 42;
+    perfManStart = new QLineEdit(perfManStartVal.toString(),this);
+    perfManStart->setValidator(perfManStartValidator);
+    perfManSTSavg = new QLineEdit(perfManSTSVal.toString(),this);
+    perfManSTSavg->setValidator(perfManSTSavgValidator);
+    perfManLTSavg = new QLineEdit(perfManLTSVal.toString(),this);
+    perfManLTSavg->setValidator(perfManLTSavgValidator);
+
 
     QDate today = QDate::currentDate();
     calendar->setSelectedDate(today);
@@ -246,12 +274,30 @@ CyclistPage::CyclistPage(Zones **_zones):
     calendarLayout = new QHBoxLayout();
     calendarLayout->addWidget(calendar);
 
+    // performance manager
+    perfManLayout = new QVBoxLayout(); // outer
+    perfManStartValLayout = new QHBoxLayout();
+    perfManSTSavgLayout = new QHBoxLayout();
+    perfManLTSavgLayout = new QHBoxLayout();
+    perfManStartValLayout->addWidget(perfManStartLabel);
+    perfManStartValLayout->addWidget(perfManStart);
+    perfManSTSavgLayout->addWidget(perfManSTSLabel);
+    perfManSTSavgLayout->addWidget(perfManSTSavg);
+    perfManLTSavgLayout->addWidget(perfManLTSLabel);
+    perfManLTSavgLayout->addWidget(perfManLTSavg);
+    perfManLayout->addLayout(perfManStartValLayout);
+    perfManLayout->addLayout(perfManSTSavgLayout);
+    perfManLayout->addLayout(perfManLTSavgLayout);
+
+
+
     cyclistLayout = new QVBoxLayout;
     cyclistLayout->addLayout(powerLayout);
     cyclistLayout->addLayout(rangeLayout);
     cyclistLayout->addLayout(zoneLayout);
     cyclistLayout->addLayout(dateRangeLayout);
     cyclistLayout->addLayout(calendarLayout);
+    cyclistLayout->addLayout(perfManLayout);
 
     cyclistGroup->setLayout(cyclistLayout);
 
