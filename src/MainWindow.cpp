@@ -263,8 +263,6 @@ MainWindow::MainWindow(const QDir &home) :
     vlayout->addLayout(showLayout);
     vlayout->addLayout(smoothLayout);
     window->setLayout(vlayout);
-    window->show();
-
     tabWidget->addTab(window, "Ride Plot");
     splitter->addWidget(tabWidget);
     splitter->setCollapsible(1, true);
@@ -308,7 +306,6 @@ MainWindow::MainWindow(const QDir &home) :
     vlayout->addWidget(cpintPlot);
     vlayout->addLayout(cpintPickerLayout);
     window->setLayout(vlayout);
-    window->show();
     tabWidget->addTab(window, "Critical Power Plot");
 
     picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
@@ -358,8 +355,6 @@ MainWindow::MainWindow(const QDir &home) :
     vlayout->addWidget(powerHist);
     vlayout->addLayout(binWidthLayout);
     window->setLayout(vlayout);
-    window->show();
-
     tabWidget->addTab(window, "Histogram Analysis");
     
     //////////////////////// Pedal Force/Velocity Plot ////////////////////////
@@ -392,7 +387,6 @@ MainWindow::MainWindow(const QDir &home) :
     vlayout->addWidget(pfPvPlot);
     vlayout->addLayout(qaLayout);
     window->setLayout(vlayout);
-    window->show();
 
     connect(pfPvPlot, SIGNAL(changedCP(const QString&)),
             qaCPValue, SLOT(setText(const QString&)) );
@@ -508,7 +502,6 @@ MainWindow::MainWindow(const QDir &home) :
     glayout->setRowMinimumHeight(1, 120);   // minimum height of weekly plots
     
     window->setLayout(glayout);
-    window->show();
     tabWidget->addTab(window, tr("Weekly Summary"));
 
     ////////////////////////////// Signals ////////////////////////////// 
