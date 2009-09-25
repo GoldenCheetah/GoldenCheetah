@@ -43,8 +43,8 @@ struct WkoFileReader : public RideFileReader {
 
 typedef std::auto_ptr<QDataStream> QDataStreamPtr;
 
-WKO_UCHAR *WkoParseHeaderData(WKO_UCHAR *data, RideFile *rideFile) ;
-WKO_UCHAR *WkoParseRawData(WKO_UCHAR *data, RideFile *rideFile) ;
+WKO_UCHAR *WkoParseHeaderData(WKO_UCHAR *data, RideFile *rideFile, QStringList &errors) ;
+WKO_UCHAR *WkoParseRawData(WKO_UCHAR *data, RideFile *rideFile, QStringList &errors) ;
 
 // Some Globals -- try and remove them as I refactor code from the original WKO2CSV source
 QString WKO_HOMEDIR;

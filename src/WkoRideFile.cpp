@@ -110,10 +110,10 @@ RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors) const
     RideFile *rideFile = new RideFile;
 
     // read header data and store details into rideFile structure
-    rawdata = WkoParseHeaderData(headerdata, rideFile);
+    rawdata = WkoParseHeaderData(headerdata, rideFile, errors);
 
     // Parse raw data (which calls rideFile->appendPoint() with each sample
-    if (rawdata) footerdata = WkoParseRawData(rawdata, rideFile);
+    if (rawdata) footerdata = WkoParseRawData(rawdata, rideFile, errors);
     else return NULL;
 
     if (footerdata) return (RideFile *)rideFile;
@@ -127,7 +127,7 @@ RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors) const
  * WkoParseRawData() - read through all the raw data adding record points and return
  *                     a pointer to the footer record
  **************************************************************************************/
-WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile)
+WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &errors)
 {
     WKO_ULONG WKO_xormasks[32];    // xormasks used all over
     double cad, hr, km, kph, nm, watts, alt, interval;
@@ -162,7 +162,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile)
     for (i=0; WKO_GRAPHS[i] != '\0'; i++) {
         WKO_nullval[i] = nullvals(WKO_GRAPHS[i]); // setup nullvalue
         if ((WKO_graphbits[i] = bitsize(WKO_GRAPHS[i], WKO_device)) == 0) { // setup & check field size
-            fprintf(stderr, "ERROR: Unknown channel '%c' for WKO_device %x.\n", WKO_GRAPHS[i], WKO_device);
+            errors << ("Unknown channel " + WKO_GRAPHS[i]);
             return (NULL);
         }
     }
@@ -179,6 +179,10 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile)
         records = us;
     }
 
+    if (records == 0) {
+        errors << ("Workout is empty.");
+        return NULL;
+    }
     /* how much data is there? */
     fb += doshort(fb, &us);
     if (us == 0xffff) {
@@ -207,7 +211,6 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile)
      * RUN THROUGH EACH RAW DATA RECORD
      *==============================================================================*/
     rdist=rtime=0;
-    if (!records) return NULL;
     while (records) {
 
         unsigned int marker;
@@ -429,7 +432,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile)
  * WkoParseHeadeData() - read through file and land on the raw data
  *
  *********************************************************************/
-WKO_UCHAR *WkoParseHeaderData(WKO_UCHAR *fb, RideFile *rideFile)
+WKO_UCHAR *WkoParseHeaderData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &errors)
 {
     unsigned long julian, sincemidnight;
     WKO_UCHAR *goal, *notes, *code; // save location of WKO metadata
@@ -930,7 +933,7 @@ next:
             }
 
         } else {
-            fprintf(stderr, "ERROR: unrecognised segment %x at %x aborting file\n", num, p-fb);
+            errors << ("Unrecognised segment");
             return NULL;
         }
     }
@@ -938,7 +941,7 @@ next:
 breakout:
 
     if (WKO_GRAPHS[0] == '\0') {
-        fprintf(stderr, "ERROR: file contains no GRAPHS\n");
+        errors << ("File contains no GRAPHS");
         return (WKO_UCHAR *)NULL;
     } else {
         /* PHEW! We're on the raw data, out job here is done */
