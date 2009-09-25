@@ -264,7 +264,7 @@ RideImportWizard::process()
         // does the status say Queued?
         if (!tableWidget->item(i,5)->text().startsWith(tr("Error"))) {
 
-          QStringList errors;
+              QStringList errors;
               QFile thisfile(filenames[i]);
 
               tableWidget->item(i,5)->setText(tr("Parsing..."));
@@ -301,6 +301,7 @@ RideImportWizard::process()
                    tableWidget->item(i,2)->setTextAlignment(Qt::AlignRight); // put in the middle
 
                    // show duration by looking at last data point
+                   if (ride->dataPoints().last() != NULL) {
                    int secs = ride->dataPoints().last()->secs;
                    QChar zero = QLatin1Char ( '0' );
                    QString time = QString("%1:%2:%3").arg(secs/3600,2,10,zero)
@@ -315,9 +316,17 @@ RideImportWizard::process()
                    tableWidget->item(i,4)->setText(dist);
                    tableWidget->item(i,4)->setTextAlignment(Qt::AlignRight); // put in the middle
 
+                   } else {
+
+                       tableWidget->item(i,3)->setText(tr("00:00:00")); // duration
+                       tableWidget->item(i,3)->setTextAlignment(Qt::AlignHCenter); // put in the middle
+                       tableWidget->item(i,4)->setText(tr("0 km"));
+                       tableWidget->item(i,4)->setTextAlignment(Qt::AlignRight); // put in the middle
+                   }
+
                } else {
                    // nope - can't handle this file
-                   tableWidget->item(i,5)->setText(tr("Error - cannot parse"));
+                   tableWidget->item(i,5)->setText(tr("Error - ") + errors.join(tr(" ")));
                }
         }
         progressBar->setValue(progressBar->value()+1);
