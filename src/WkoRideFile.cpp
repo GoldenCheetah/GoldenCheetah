@@ -207,6 +207,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile)
      * RUN THROUGH EACH RAW DATA RECORD
      *==============================================================================*/
     rdist=rtime=0;
+    if (!records) return NULL;
     while (records) {
 
         unsigned int marker;
