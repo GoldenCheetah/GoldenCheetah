@@ -211,16 +211,16 @@ MainWindow::MainWindow(const QDir &home) :
     showPower->addItem(tr("No Power"));
     showLayout->addWidget(showPower);
 
+    QHBoxLayout *smoothLayout = new QHBoxLayout;
     QComboBox *comboDistance = new QComboBox();
     comboDistance->addItem(tr("X Axis Shows Time"));
     comboDistance->addItem(tr("X Axis Shows Distance"));
-    showLayout->addWidget(comboDistance);
+    smoothLayout->addWidget(comboDistance);
 
-    QHBoxLayout *smoothLayout = new QHBoxLayout;
     QLabel *smoothLabel = new QLabel(tr("Smoothing (secs)"), window);
     smoothLineEdit = new QLineEdit(window);
     smoothLineEdit->setFixedWidth(40);
-    
+
     smoothLayout->addWidget(smoothLabel);
     smoothLayout->addWidget(smoothLineEdit);
     smoothSlider = new QSlider(Qt::Horizontal);

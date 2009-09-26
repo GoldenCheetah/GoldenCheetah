@@ -435,6 +435,8 @@ AllPlot::setYMax()
     if (wattsCurve->isVisible()) {
         setAxisTitle(yLeft, "Watts");
         setAxisScale(yLeft, 0.0, 1.05 * wattsCurve->maxYValue());
+	setAxisLabelRotation(yLeft,270);
+	setAxisLabelAlignment(yLeft,Qt::AlignVCenter);
     }
     if (hrCurve->isVisible() || cadCurve->isVisible()) {
         double ymax = 0;
@@ -449,16 +451,22 @@ AllPlot::setYMax()
         }
         setAxisTitle(yLeft2, labels.join(" / "));
         setAxisScale(yLeft2, 0.0, 1.05 * ymax);
+	setAxisLabelRotation(yLeft2,270);
+	setAxisLabelAlignment(yLeft2,Qt::AlignVCenter);
     }
     if (speedCurve->isVisible()) {
         setAxisTitle(yRight, (useMetricUnits ? "KPH" : "MPH"));
         setAxisScale(yRight, 0.0, 1.05 * speedCurve->maxYValue());
+	setAxisLabelRotation(yRight,90);
+	setAxisLabelAlignment(yRight,Qt::AlignVCenter);
     }
     if (altCurve->isVisible()) {
         setAxisTitle(yRight2, useMetricUnits ? "Meters" : "Feet");
         double ymin = altCurve->minYValue();
         double ymax = qMax(ymin + 100, 1.05 * altCurve->maxYValue());
         setAxisScale(yRight2, ymin, ymax);
+	setAxisLabelRotation(yRight2,90);
+	setAxisLabelAlignment(yRight2,Qt::AlignVCenter);
         altCurve->setBaseline(ymin);
     }
 
