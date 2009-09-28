@@ -1788,12 +1788,11 @@ void MainWindow::setAllPlotWidgets(RideItem *ride)
 	showSpeed->setEnabled(dataPresent->kph);
 	showCad->setEnabled(dataPresent->cad);
 	showAlt->setEnabled(dataPresent->alt);
-	allPlot->showPower(showPower->currentIndex());
-	allPlot->wattsCurve->setVisible(dataPresent->watts && (showPower->currentIndex() < 2));
-	allPlot->hrCurve->setVisible(dataPresent->hr && showHr->isChecked());
-	allPlot->speedCurve->setVisible(dataPresent->kph && showSpeed->isChecked());
-	allPlot->cadCurve->setVisible(dataPresent->cad && showCad->isChecked());
-	allPlot->altCurve->setVisible(dataPresent->alt && showAlt->isChecked());
+	allPlot->showPower(dataPresent->watts ? showPower->currentIndex() : 2);
+        allPlot->showHr(dataPresent->hr ? showHr->checkState() : Qt::Unchecked);
+        allPlot->showSpeed(dataPresent->kph ? showSpeed->checkState() : Qt::Unchecked);
+        allPlot->showCad(dataPresent->cad ? showCad->checkState() : Qt::Unchecked);
+        allPlot->showAlt(dataPresent->alt ? showAlt->checkState() : Qt::Unchecked);
     }
     else {
 	showPower->setEnabled(false);
@@ -1802,10 +1801,10 @@ void MainWindow::setAllPlotWidgets(RideItem *ride)
 	showCad->setEnabled(false);
 	showAlt->setEnabled(false);
 	allPlot->showPower(false);
-	allPlot->wattsCurve->setVisible(false);
-	allPlot->hrCurve->setVisible(false);
-	allPlot->speedCurve->setVisible(false);
-	allPlot->cadCurve->setVisible(false);
+        allPlot->showHr(false);
+        allPlot->showSpeed(false);
+        allPlot->showCad(false);
+        allPlot->showAlt(false);
     }
 }
 
