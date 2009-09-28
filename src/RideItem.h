@@ -29,7 +29,7 @@ class RideItem : public QTreeWidgetItem {
 
     protected:
 
-        double *time_in_zone;
+        QVector<double> time_in_zone;
 
     public:
 
