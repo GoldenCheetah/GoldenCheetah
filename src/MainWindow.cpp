@@ -1037,15 +1037,15 @@ void MainWindow::generateWeeklySummary()
     assert(wstart.dayOfWeek() == Qt::Monday);
     QDate wend = wstart.addDays(7);
     const RideMetricFactory &factory = RideMetricFactory::instance();
-    RideMetric *weeklySeconds = factory.newMetric("time_riding");
+    QSharedPointer<RideMetric> weeklySeconds(factory.newMetric("time_riding"));
     assert(weeklySeconds);
-    RideMetric *weeklyDistance = factory.newMetric("total_distance");
+    QSharedPointer<RideMetric> weeklyDistance(factory.newMetric("total_distance"));
     assert(weeklyDistance);
-    RideMetric *weeklyWork = factory.newMetric("total_work");
+    QSharedPointer<RideMetric> weeklyWork(factory.newMetric("total_work"));
     assert(weeklyWork);
-    RideMetric *weeklyBS = factory.newMetric("skiba_bike_score");
+    QSharedPointer<RideMetric> weeklyBS(factory.newMetric("skiba_bike_score"));
     assert(weeklyBS);
-    RideMetric *weeklyRelIntensity = factory.newMetric("skiba_relative_intensity");
+    QSharedPointer<RideMetric> weeklyRelIntensity(factory.newMetric("skiba_relative_intensity"));
     assert(weeklyRelIntensity);
 
     RideMetric *dailySeconds[7];
@@ -1200,12 +1200,6 @@ void MainWindow::generateWeeklySummary()
     }
 
     summary += "</center>";
-
-    delete weeklyDistance;
-    delete weeklySeconds;
-    delete weeklyWork;
-    delete weeklyBS;
-    delete weeklyRelIntensity;
 
     // set the axis labels of the weekly plots
     QwtText textLabel = QwtText(useMetricUnits ? "km" : "miles");
