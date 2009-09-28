@@ -21,15 +21,11 @@
 
 #include <qwt_plot.h>
 #include <QtGui>
-#include <qpainter.h>
 
-class QPen;
 class QwtPlotCurve;
 class QwtPlotGrid;
 class QwtPlotMarker;
 class RideItem;
-class RideFile;
-class AllPlot;
 class AllPlotBackground;
 class AllPlotZoneLabel;
 
@@ -37,21 +33,7 @@ class AllPlot : public QwtPlot
 {
     Q_OBJECT
 
-    private:
-
-	AllPlotBackground *bg;
-        QSettings *settings;
-        QVariant unit;
-
     public:
-
-        QwtPlotCurve *wattsCurve;
-        QwtPlotCurve *hrCurve;
-        QwtPlotCurve *speedCurve;
-        QwtPlotCurve *cadCurve;
-        QwtPlotCurve *altCurve;
-        QVector<QwtPlotMarker*> d_mrk;
-	QList <AllPlotZoneLabel *> zoneLabels;
 
         AllPlot(QWidget *parent);
 
@@ -63,8 +45,6 @@ class AllPlot : public QwtPlot
 	void refreshZoneLabels();
 
         void setData(RideItem *_rideItem);
-
-	RideItem *rideItem;
 
     public slots:
 
@@ -78,6 +58,23 @@ class AllPlot : public QwtPlot
         void setByDistance(int value);
 
     protected:
+
+        friend class ::AllPlotBackground;
+        friend class ::AllPlotZoneLabel;
+
+	AllPlotBackground *bg;
+        QSettings *settings;
+        QVariant unit;
+
+        QwtPlotCurve *wattsCurve;
+        QwtPlotCurve *hrCurve;
+        QwtPlotCurve *speedCurve;
+        QwtPlotCurve *cadCurve;
+        QwtPlotCurve *altCurve;
+        QVector<QwtPlotMarker*> d_mrk;
+	QList <AllPlotZoneLabel *> zoneLabels;
+
+	RideItem *rideItem;
 
         QwtPlotGrid *grid;
 
