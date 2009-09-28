@@ -18,7 +18,7 @@ other support, including:</p>
 
 <table width="80%">
 <tr>
-<td width="33%">
+<td valign="top" width="33%">
 <ul>
 <li>Robert Carlsen</li>
 <li>Rainer Clasen</li>
@@ -26,21 +26,22 @@ other support, including:</p>
 <li>Dan Connelly</li>
 <li>Damian Grauser</li>
 <li>Ned Harding</li>
+<li>Aldy Hernandez</li>
 </ul>
 </td>
-<td width="33%">
+<td valign="top" width="33%">
 <ul>
-<li>Aldy Hernandez</li>
 <li>Jamie Kimberley</li>
 <li>Justin Knotzke</li>
 <li>Andrew Kruse</li>
 <li>Mark Liversedge</li>
 <li>Greg Lonnon</li>
+<li>Tom Montgomery</li>
 </ul>
 </td>
-<td>
+<td valign="top">
 <ul>
-<li>Tom Montgomery</li>
+<li>Eric Murray</li>
 <li>Scott Overfield</li>
 <li>Mark Rages</li>
 <li>Berend de Schouwer</li>
