@@ -1048,25 +1048,25 @@ void MainWindow::generateWeeklySummary()
     QSharedPointer<RideMetric> weeklyRelIntensity(factory.newMetric("skiba_relative_intensity"));
     assert(weeklyRelIntensity);
 
-    RideMetric *dailySeconds[7];
-    RideMetric *dailyDistance[7];
-    RideMetric *dailyBS[7];
-    RideMetric *dailyRI[7];
-    RideMetric *dailyW[7];
-    RideMetric *dailyXP[7];
+    QSharedPointer<RideMetric> dailySeconds[7];
+    QSharedPointer<RideMetric> dailyDistance[7];
+    QSharedPointer<RideMetric> dailyBS[7];
+    QSharedPointer<RideMetric> dailyRI[7];
+    QSharedPointer<RideMetric> dailyW[7];
+    QSharedPointer<RideMetric> dailyXP[7];
 
     for (int i = 0; i < 7; i++) {
-	dailySeconds[i] = factory.newMetric("time_riding");
+	dailySeconds[i] = QSharedPointer<RideMetric>(factory.newMetric("time_riding"));
 	assert(dailySeconds[i]);
-	dailyDistance[i] = factory.newMetric("total_distance");
+	dailyDistance[i] = QSharedPointer<RideMetric>(factory.newMetric("total_distance"));
 	assert(dailyDistance[i]);
-	dailyBS[i] = factory.newMetric("skiba_bike_score");
+	dailyBS[i] = QSharedPointer<RideMetric>(factory.newMetric("skiba_bike_score"));
 	assert(dailyBS[i]);
-	dailyRI[i] = factory.newMetric("skiba_relative_intensity");
+	dailyRI[i] = QSharedPointer<RideMetric>(factory.newMetric("skiba_relative_intensity"));
 	assert(dailyRI[i]);
-	dailyW[i] = factory.newMetric("total_work");
+	dailyW[i] = QSharedPointer<RideMetric>(factory.newMetric("total_work"));
 	assert(dailyW[i]);
-	dailyXP[i] = factory.newMetric("skiba_xpower");
+	dailyXP[i] = QSharedPointer<RideMetric>(factory.newMetric("skiba_xpower"));
 	assert(dailyXP[i]);
     }
     
@@ -1275,13 +1275,6 @@ void MainWindow::generateWeeklySummary()
 	ydur[i]  = 0;
 	ybsorw[i]   = 0;
 	yriorxp[i]   = 0;
-
-	delete dailyDistance[day];
-	delete dailySeconds[day];
-	delete dailyBS[day];
-	delete dailyRI[day];
-	delete dailyW[day];
-	delete dailyXP[day];
     }
 
     // sweep a baseline off the right of the plot
