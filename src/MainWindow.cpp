@@ -1071,7 +1071,7 @@ void MainWindow::generateWeeklySummary()
     }
     
     int zone_range = -1;
-    double *time_in_zone = NULL;
+    QVector<double> time_in_zone;
     int num_zones = -1;
     bool zones_ok = true;
 
@@ -1123,9 +1123,8 @@ void MainWindow::generateWeeklySummary()
 		if (zone_range == -1) {
 		    zone_range = item->zoneRange();
 		    num_zones = item->numZones();
-		    time_in_zone = new double[num_zones];
-		    for (int j = 0; j < num_zones; ++j)
-			time_in_zone[j] = 0;
+                    time_in_zone.clear();
+                    time_in_zone.resize(num_zones);
 		}
 		else if (item->zoneRange() != zone_range) {
 		    zones_ok = false;
@@ -1196,12 +1195,9 @@ void MainWindow::generateWeeklySummary()
         if (!zones_ok)
             summary += "Error: Week spans more than one zone range.";
         else {
-            summary += zones->summarize(zone_range, time_in_zone, num_zones);
+            summary += zones->summarize(zone_range, time_in_zone);
         }
     }
-
-    if (time_in_zone)
-        delete [] time_in_zone;
 
     summary += "</center>";
 

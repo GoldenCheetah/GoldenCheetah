@@ -668,11 +668,11 @@ QList <QString> Zones::getZoneNames(int rnum) {
   return return_values;
   }
 
-QString Zones::summarize(int rnum, double *time_in_zone, int num_zones) const
+QString Zones::summarize(int rnum, QVector<double> &time_in_zone) const
 {
     assert(rnum < ranges.size());
     ZoneRange *range = ranges[rnum];
-    assert(num_zones == range->zones.size());
+    assert(time_in_zone.size() == range->zones.size());
     QString summary;
     if(range->cp > 0){
         summary += "<table align=\"center\" width=\"70%\" border=\"0\">";
@@ -689,7 +689,7 @@ QString Zones::summarize(int rnum, double *time_in_zone, int num_zones) const
     summary += "<td align=\"center\">High</td>";
     summary += "<td align=\"center\">Time</td>";
     summary += "</tr>";
-    for (int zone = 0; zone < num_zones; ++zone) {
+    for (int zone = 0; zone < time_in_zone.size(); ++zone) {
         if (time_in_zone[zone] > 0.0) {
             QString name, desc;
             int lo, hi;

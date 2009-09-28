@@ -40,8 +40,6 @@ RideItem::RideItem(int type,
     setText(2, dateTime.toString("h:mm AP"));
     setTextAlignment(1, Qt::AlignRight);
     setTextAlignment(2, Qt::AlignRight);
-
-    time_in_zone = NULL;
 }
 
 RideItem::~RideItem()
@@ -215,9 +213,8 @@ RideItem::htmlSummary()
 	    ((num_zones = (*zones)->numZones(zone_range)) > 0)
 	    )
 	    {
-		time_in_zone = new double[num_zones];
-		for (int i = 0; i < num_zones; ++i)
-		    time_in_zone[i] = 0.0;
+		time_in_zone.clear();
+		time_in_zone.resize(num_zones);
 	    }
  
 	const RideMetricFactory &factory = RideMetricFactory::instance();
@@ -393,7 +390,7 @@ RideItem::htmlSummary()
 	
         if (num_zones > 0) {
             summary += "<h2>Power Zones</h2>";
-            summary += (*zones)->summarize(zone_range, time_in_zone, num_zones);
+            summary += (*zones)->summarize(zone_range, time_in_zone);
         }
 
         // TODO: Ergomo uses non-consecutive interval numbers.
