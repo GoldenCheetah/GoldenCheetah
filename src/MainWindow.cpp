@@ -17,7 +17,7 @@
  */
 
 #include "MainWindow.h"
-#include "AllPlot.h"
+#include "AllPlotWindow.h"
 #include "BestIntervalDialog.h"
 #include "ChooseCyclistDialog.h"
 #include "ConfigDialog.h"
@@ -39,9 +39,7 @@
 #include <QtGui>
 #include <QRegExp>
 #include <qwt_plot_curve.h>
-#include <qwt_plot_panner.h>
 #include <qwt_plot_picker.h>
-#include <qwt_plot_zoomer.h>
 #include <qwt_plot_grid.h>
 #include <qwt_data.h>
 #include <boost/scoped_ptr.hpp>
@@ -178,92 +176,8 @@ MainWindow::MainWindow(const QDir &home) :
     tabWidget->addTab(rideSummary, tr("Ride Summary"));
 
     /////////////////////////// Ride Plot Tab ///////////////////////////
-    QWidget *window = new QWidget;
-    QVBoxLayout *vlayout = new QVBoxLayout;
-
-    QHBoxLayout *showLayout = new QHBoxLayout;
-    QLabel *showLabel = new QLabel("Show:", window);
-    showLayout->addWidget(showLabel);
-
-    QCheckBox *showGrid = new QCheckBox("Grid", window);
-    showGrid->setCheckState(Qt::Checked);
-    showLayout->addWidget(showGrid);
-
-    showHr = new QCheckBox("Heart Rate", window);
-    showHr->setCheckState(Qt::Checked);
-    showLayout->addWidget(showHr);
-
-    showSpeed = new QCheckBox("Speed", window);
-    showSpeed->setCheckState(Qt::Checked);
-    showLayout->addWidget(showSpeed);
-
-    showCad = new QCheckBox("Cadence", window);
-    showCad->setCheckState(Qt::Checked);
-    showLayout->addWidget(showCad);
-
-    showAlt = new QCheckBox("Altitude", window);
-    showAlt->setCheckState(Qt::Checked);
-    showLayout->addWidget(showAlt);
-
-    showPower = new QComboBox();
-    showPower->addItem(tr("Power + shade"));
-    showPower->addItem(tr("Power - shade"));
-    showPower->addItem(tr("No Power"));
-    showLayout->addWidget(showPower);
-
-    QHBoxLayout *smoothLayout = new QHBoxLayout;
-    QComboBox *comboDistance = new QComboBox();
-    comboDistance->addItem(tr("X Axis Shows Time"));
-    comboDistance->addItem(tr("X Axis Shows Distance"));
-    smoothLayout->addWidget(comboDistance);
-
-    QLabel *smoothLabel = new QLabel(tr("Smoothing (secs)"), window);
-    smoothLineEdit = new QLineEdit(window);
-    smoothLineEdit->setFixedWidth(40);
-
-    smoothLayout->addWidget(smoothLabel);
-    smoothLayout->addWidget(smoothLineEdit);
-    smoothSlider = new QSlider(Qt::Horizontal);
-    smoothSlider->setTickPosition(QSlider::TicksBelow);
-    smoothSlider->setTickInterval(10);
-    smoothSlider->setMinimum(2);
-    smoothSlider->setMaximum(600);
-    smoothLineEdit->setValidator(new QIntValidator(smoothSlider->minimum(),
-                                                   smoothSlider->maximum(), 
-                                                   smoothLineEdit));
-    smoothLayout->addWidget(smoothSlider);
-    allPlot = new AllPlot(this);
-    smoothSlider->setValue(allPlot->smoothing());
-    smoothLineEdit->setText(QString("%1").arg(allPlot->smoothing()));
-
-    allZoomer = new QwtPlotZoomer(allPlot->canvas());
-    allZoomer->setRubberBand(QwtPicker::RectRubberBand);
-    allZoomer->setRubberBandPen(QColor(Qt::black));
-    allZoomer->setSelectionFlags(QwtPicker::DragSelection 
-                                 | QwtPicker::CornerToCorner);
-    allZoomer->setTrackerMode(QwtPicker::AlwaysOff);
-    allZoomer->setEnabled(true);
-    
-    // TODO: Hack for OS X one-button mouse
-    // allZoomer->initMousePattern(1);
-    
-    // RightButton: zoom out by 1
-    // Ctrl+RightButton: zoom out to full size                          
-    allZoomer->setMousePattern(QwtEventPattern::MouseSelect2,
-                               Qt::RightButton, Qt::ControlModifier);
-    allZoomer->setMousePattern(QwtEventPattern::MouseSelect3,
-                               Qt::RightButton);
-
-    allPanner = new QwtPlotPanner(allPlot->canvas());
-    allPanner->setMouseButton(Qt::MidButton);
-
-    // TODO: zoomer doesn't interact well with automatic axis resizing
-
-    vlayout->addWidget(allPlot);
-    vlayout->addLayout(showLayout);
-    vlayout->addLayout(smoothLayout);
-    window->setLayout(vlayout);
-    tabWidget->addTab(window, "Ride Plot");
+    allPlotWindow = new AllPlotWindow(&zones);
+    tabWidget->addTab(allPlotWindow, "Ride Plot");
     splitter->addWidget(tabWidget);
     splitter->setCollapsible(1, true);
 
@@ -279,8 +193,8 @@ MainWindow::MainWindow(const QDir &home) :
 
     ////////////////////// Critical Power Plot Tab //////////////////////
 
-    window = new QWidget;
-    vlayout = new QVBoxLayout;
+    QWidget *window = new QWidget;
+    QVBoxLayout *vlayout = new QVBoxLayout;
     QHBoxLayout *cpintPickerLayout = new QHBoxLayout;
     QLabel *cpintTimeLabel = new QLabel(tr("Interval Duration:"), window);
     cpintTimeValue = new QLineEdit("0 s");
@@ -514,24 +428,6 @@ MainWindow::MainWindow(const QDir &home) :
             this, SLOT(rideSelected()));
     connect(splitter, SIGNAL(splitterMoved(int,int)), 
             this, SLOT(splitterMoved()));
-    connect(showPower, SIGNAL(currentIndexChanged(int)),
-            allPlot, SLOT(showPower(int)));
-    connect(showHr, SIGNAL(stateChanged(int)),
-            allPlot, SLOT(showHr(int)));
-    connect(showSpeed, SIGNAL(stateChanged(int)),
-            allPlot, SLOT(showSpeed(int)));
-    connect(showCad, SIGNAL(stateChanged(int)),
-            allPlot, SLOT(showCad(int)));
-    connect(showAlt, SIGNAL(stateChanged(int)),
-            allPlot, SLOT(showAlt(int)));
-    connect(showGrid, SIGNAL(stateChanged(int)),
-            allPlot, SLOT(showGrid(int)));
-    connect(comboDistance, SIGNAL(currentIndexChanged(int)),
-            allPlot, SLOT(setByDistance(int)));
-    connect(smoothSlider, SIGNAL(valueChanged(int)),
-            this, SLOT(setSmoothingFromSlider()));
-    connect(smoothLineEdit, SIGNAL(editingFinished()),
-            this, SLOT(setSmoothingFromLineEdit()));
     connect(cpintSetCPButton, SIGNAL(clicked()),
 	    this, SLOT(cpintSetCPButtonClicked()));
     connect(binWidthSlider, SIGNAL(valueChanged(int)),
@@ -898,8 +794,7 @@ MainWindow::rideSelected()
     rideSummary->setAlignment(Qt::AlignCenter);
     if (ride) {
 
-	setAllPlotWidgets(ride);
-	allPlot->setData(ride);
+        allPlotWindow->setData(ride);
 
 	// set the histogram data
 	powerHist->setData(ride);
@@ -1400,8 +1295,7 @@ MainWindow::showOptions()
 	generateWeeklySummary();
 
 	// all plot
-	allPlot->refreshZoneLabels();
-	allPlot->replot();
+        allPlotWindow->zonesChanged();
 
 	// histogram
 	powerHist->refreshZoneLabels();
@@ -1436,25 +1330,6 @@ void
 MainWindow::splitterMoved()
 {
     settings->setValue(GC_SETTINGS_SPLITTER_SIZES, splitter->saveState());
-}
-
-void
-MainWindow::setSmoothingFromSlider()
-{
-    if (allPlot->smoothing() != smoothSlider->value()) {
-        allPlot->setSmoothing(smoothSlider->value());
-        smoothLineEdit->setText(QString("%1").arg(allPlot->smoothing()));
-    }
-}
-
-void
-MainWindow::setSmoothingFromLineEdit()
-{
-    int value = smoothLineEdit->text().toInt();
-    if (value != allPlot->smoothing()) {
-        allPlot->setSmoothing(value);
-        smoothSlider->setValue(value);
-    }
 }
 
 // set the rider value of CP to the value derived from the CP model extraction
@@ -1777,35 +1652,6 @@ MainWindow::deleteRide()
     msgBox.exec();
     if(msgBox.clickedButton() == deleteButton)
         removeCurrentRide();
-}
-
-void MainWindow::setAllPlotWidgets(RideItem *ride)
-{
-    if (ride->ride) {
-	RideFileDataPresent *dataPresent = ride->ride->areDataPresent();
-	showPower->setEnabled(dataPresent->watts);
-	showHr->setEnabled(dataPresent->hr);
-	showSpeed->setEnabled(dataPresent->kph);
-	showCad->setEnabled(dataPresent->cad);
-	showAlt->setEnabled(dataPresent->alt);
-	allPlot->showPower(dataPresent->watts ? showPower->currentIndex() : 2);
-        allPlot->showHr(dataPresent->hr ? showHr->checkState() : Qt::Unchecked);
-        allPlot->showSpeed(dataPresent->kph ? showSpeed->checkState() : Qt::Unchecked);
-        allPlot->showCad(dataPresent->cad ? showCad->checkState() : Qt::Unchecked);
-        allPlot->showAlt(dataPresent->alt ? showAlt->checkState() : Qt::Unchecked);
-    }
-    else {
-	showPower->setEnabled(false);
-	showHr->setEnabled(false);
-	showSpeed->setEnabled(false);
-	showCad->setEnabled(false);
-	showAlt->setEnabled(false);
-	allPlot->showPower(false);
-        allPlot->showHr(false);
-        allPlot->showSpeed(false);
-        allPlot->showCad(false);
-        allPlot->showAlt(false);
-    }
 }
 
 void MainWindow::setHistWidgets(RideItem *rideItem)

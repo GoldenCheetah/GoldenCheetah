@@ -26,7 +26,7 @@
 #include "RideItem.h"
 #include <boost/shared_ptr.hpp>
 
-class AllPlot;
+class AllPlotWindow;
 class CpintPlot;
 class PfPvPlot;
 class PowerHist;
@@ -70,10 +70,7 @@ class MainWindow : public QMainWindow
         void findBestIntervals();
         void splitRide();
         void deleteRide();
-	void setAllPlotWidgets(RideItem *rideItem);
 	void setHistWidgets(RideItem *rideItem);
-        void setSmoothingFromSlider();
-        void setSmoothingFromLineEdit();
 	void cpintSetCPButtonClicked();
         void setBinWidthFromSlider();
         void setBinWidthFromLineEdit();
@@ -113,22 +110,13 @@ class MainWindow : public QMainWindow
         QTabWidget *tabWidget;
         QTextEdit *rideSummary;
         QTextEdit *weeklySummary;
-        AllPlot *allPlot;
-        QwtPlotZoomer *allZoomer;
-        QwtPlotPanner *allPanner;
-	QCheckBox *showHr;
-	QCheckBox *showSpeed;
-	QCheckBox *showCad;
-	QCheckBox *showAlt;
-	QComboBox *showPower;
+        AllPlotWindow *allPlotWindow;
         CpintPlot *cpintPlot;
         QLineEdit *cpintTimeValue;
         QLineEdit *cpintTodayValue;
         QLineEdit *cpintAllValue;
 	QPushButton *cpintSetCPButton;
         QwtPlotPicker *picker;
-        QSlider *smoothSlider;
-        QLineEdit *smoothLineEdit;
         QSlider *binWidthSlider;
         QLineEdit *binWidthLineEdit;
         QCheckBox *lnYHistCheckBox;
