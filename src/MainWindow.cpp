@@ -1730,16 +1730,14 @@ MainWindow::aboutDialog()
 
 void MainWindow::importRideToDB()
 {
-	MetricAggregator *aggregator = new MetricAggregator();
-	aggregator->aggregateRides(home, zones);
-    delete aggregator;
+    MetricAggregator aggregator;
+    aggregator.aggregateRides(home, zones);
 }
 
 void MainWindow::scanForMissing()
 {
-    MetricAggregator *aggregator = new MetricAggregator();
-    aggregator->scanForMissing(home, zones);
-    delete aggregator;
+    MetricAggregator aggregator;
+    aggregator.scanForMissing(home, zones);
 }
 
 
