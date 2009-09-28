@@ -44,6 +44,7 @@ win32 {
 
 HEADERS += \
         AllPlot.h \
+        AllPlotWindow.h \
         BestIntervalDialog.h \
         ChooseCyclistDialog.h \
         CpintPlot.h \
@@ -91,6 +92,7 @@ HEADERS += \
 
 SOURCES += \
         AllPlot.cpp \
+        AllPlotWindow.cpp \
         BestIntervalDialog.cpp \
         ChooseCyclistDialog.cpp \
         CpintPlot.cpp \
