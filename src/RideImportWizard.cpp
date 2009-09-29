@@ -474,13 +474,10 @@ RideImportWizard::todayClicked(int index)
             tableWidget->item(i,5)->isSelected()) {
             countselected++;
 
-            // look at rides with missing date - we need to populate those
-            if (blanks[i]) {
-                QTime duration = QTime().fromString(tableWidget->item(i,3)->text(), tr("hh:mm:ss"));
-                totalduration += duration.hour() * 3600 +
-                                 duration.minute() * 60 +
-                                 duration.second();
-            }
+            QTime duration = QTime().fromString(tableWidget->item(i,3)->text(), tr("hh:mm:ss"));
+            totalduration += duration.hour() * 3600 +
+                             duration.minute() * 60 +
+                             duration.second();
         }
     }
 
@@ -522,23 +519,19 @@ RideImportWizard::todayClicked(int index)
             tableWidget->item(i,4)->isSelected() ||
             tableWidget->item(i,5)->isSelected()) {
 
-            // set the date to date selected -- only if was originally blank
-            if (blanks[i])
-                tableWidget->item(i,1)->setText(selectedDate.toString(tr("dd MMM yyyy")));
-
+            // set the date to date selected
+            tableWidget->item(i,1)->setText(selectedDate.toString(tr("dd MMM yyyy")));
             // look at rides with missing start time - we need to populate those
-            if (blanks[i]) {
 
-                // ride duration
-                QTime duration = QTime().fromString(tableWidget->item(i,3)->text(), tr("hh:mm:ss"));
+            // ride duration
+            QTime duration = QTime().fromString(tableWidget->item(i,3)->text(), tr("hh:mm:ss"));
 
-                // ride start time
-                QTime time(rstart/3600, rstart%3600/60, rstart%60);
-                tableWidget->item(i,2)->setText(time.toString(tr("hh:mm:ss a")));
-                rstart += duration.hour() * 3600 +
-                                 duration.minute() * 60 +
-                                 duration.second();
-            }
+            // ride start time
+            QTime time(rstart/3600, rstart%3600/60, rstart%60);
+            tableWidget->item(i,2)->setText(time.toString(tr("hh:mm:ss a")));
+            rstart += duration.hour() * 3600 +
+                      duration.minute() * 60 +
+                      duration.second();
         }
     }
     // phew! - repaint!
@@ -585,15 +578,15 @@ RideImportWizard::abortClicked()
         t = tableWidget->item(i,1);
         if (t->text() == "") {
             needdates++;
-            t->setFlags(t->flags() | (Qt::ItemIsEditable));
         }
+        t->setFlags(t->flags() | (Qt::ItemIsEditable));
 
         // time needed?
         t = tableWidget->item(i,2);
         if (t->text() == "") {
             needdates++;
-            t->setFlags(t->flags() | (Qt::ItemIsEditable));
         }
+        t->setFlags(t->flags() | (Qt::ItemIsEditable));
    }
 
    if (needdates) return; // no dice dude, we need those dates filled in!

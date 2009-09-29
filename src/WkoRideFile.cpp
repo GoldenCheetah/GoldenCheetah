@@ -57,6 +57,7 @@
 
 #include "WkoRideFile.h"
 #include <QRegExp>
+#include <QDebug>
 #include <QFile>
 #include <QTextStream>
 #include <algorithm> // for std::sort
@@ -78,6 +79,7 @@ RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors) const
 {
     WKO_UCHAR *headerdata, *rawdata, *footerdata;
     WKO_ULONG version;
+    QFileInfo fileinfo(file);
 
     if (!file.open(QFile::ReadOnly)) {
         errors << ("Could not open ride file: \""
@@ -110,7 +112,7 @@ RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors) const
     RideFile *rideFile = new RideFile;
 
     // read header data and store details into rideFile structure
-    rawdata = WkoParseHeaderData(headerdata, rideFile, errors);
+    rawdata = WkoParseHeaderData(fileinfo.fileName(), headerdata, rideFile, errors);
 
     // Parse raw data (which calls rideFile->appendPoint() with each sample
     if (rawdata) footerdata = WkoParseRawData(rawdata, rideFile, errors);
@@ -432,7 +434,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
  * WkoParseHeadeData() - read through file and land on the raw data
  *
  *********************************************************************/
-WKO_UCHAR *WkoParseHeaderData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &errors)
+WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, RideFile *rideFile, QStringList &errors)
 {
     unsigned long julian, sincemidnight;
     WKO_UCHAR *goal, *notes, *code; // save location of WKO metadata
@@ -479,11 +481,26 @@ WKO_UCHAR *WkoParseHeaderData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &er
     p += donumber(p, &ul); /* 12: time of day */
     sincemidnight = ul;
 
-    // Set start time
+    char rideFileRegExp[] = "^((\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)"
+                                   "_(\\d\\d)_(\\d\\d)_(\\d\\d))\\.(.+)$";
+    QRegExp rx(rideFileRegExp);
+
+    if (rx.exactMatch(fname)) {
+
+        // set the date and time from the filename
+        QDate date(rx.cap(2).toInt(), rx.cap(3).toInt(),rx.cap(4).toInt());
+        QTime time(rx.cap(5).toInt(), rx.cap(6).toInt(),rx.cap(7).toInt());
+        QDateTime datetime(date, time);
+
+        rideFile->setStartTime(datetime);
+
+    } else {
+
+        // date not available from filename use WKO metadata
         QDateTime datetime(QDate::fromJulianDay(julian),
                QTime(sincemidnight/360000, (sincemidnight%360000)/6000, (sincemidnight%6000)/100));
         rideFile->setStartTime(datetime);
-
+    }
 
     // Create a Notes file for Goal, Notes and Workout Code from original
         QChar zero = QLatin1Char('0');
