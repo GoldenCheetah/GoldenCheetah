@@ -91,7 +91,7 @@ QuarqParser::startElement( const QString&, const QString&,
     } while (0);
 
     CheckQuarqXml(Cadence, RPM, cad );
-    CheckQuarqXml(Power, Watts, watts );
+    CheckQuarqXml(Power, watts, watts );
     CheckQuarqXml(HeartRate, BPM, hr );
     // clearly bogus, equating RPM to kph.
     // Unless you have an 18 foot wheel, by chance
