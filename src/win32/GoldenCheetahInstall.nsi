@@ -56,7 +56,7 @@ Section "Golden Cheetah (required)"
   
   ; Put file there
   File "..\release\GoldenCheetah.exe"
-  File "..\release\qwt5.dll"
+  ;File "..\release\qwt5.dll"
   File "..\release\mingwm10.dll"
   File "..\release\QtCore4.dll"
   File "..\release\QtGui4.dll"
@@ -96,6 +96,9 @@ Section "Uninstall"
 
   ; Remove files and uninstaller
   Delete $INSTDIR\GoldenCheetah.exe
+
+  ; we continue to delete qwt5.dll becvause people don't always uninstall before they install
+  ;; so a subsequent uninstall still should remove it if it is there
   Delete $INSTDIR\qwt5.dll
   Delete $INSTDIR\mingwm10.dll
   Delete $INSTDIR\QtCore4.dll
