@@ -1069,6 +1069,7 @@ unsigned int optpad(WKO_UCHAR *p)
     case 0x8007 :       /* all done */
     case 0x800c :
     case 0x800b :
+    case 0x800d :       /* from Jim B 2nd Oct 2009 */
         break;
 
     case 0x0001 :       /* 4byte follows */
