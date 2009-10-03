@@ -136,6 +136,7 @@ AllPlotWindow::setData(RideItem *ride)
 {
     setAllPlotWidgets(ride);
     allPlot->setData(ride);
+    allZoomer->setZoomBase();
 }
 
 void
