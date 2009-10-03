@@ -385,18 +385,19 @@ AllPlot::recalc()
     }
 
     QVector<double> &xaxis = bydist ? smoothDistance : smoothTime;
-
+    int startingIndex = qMin(smooth, rideTimeSecs);
+    int totalPoints = rideTimeSecs + 1 - startingIndex;
     // set curves
     if (!wattsArray.empty())
-	wattsCurve->setData(xaxis.data(), smoothWatts.data(), rideTimeSecs + 1);
+	wattsCurve->setData(xaxis.data() + startingIndex, smoothWatts.data() + startingIndex, totalPoints);
     if (!hrArray.empty())
-	hrCurve->setData(xaxis.data(), smoothHr.data(), rideTimeSecs + 1);
+	hrCurve->setData(xaxis.data() + startingIndex, smoothHr.data() + startingIndex, totalPoints);
     if (!speedArray.empty())
-        speedCurve->setData(xaxis.data(), smoothSpeed.data(), rideTimeSecs + 1);
+        speedCurve->setData(xaxis.data() + startingIndex, smoothSpeed.data() + startingIndex, totalPoints);
     if (!cadArray.empty())
-        cadCurve->setData(xaxis.data(), smoothCad.data(), rideTimeSecs + 1);
+        cadCurve->setData(xaxis.data() + startingIndex, smoothCad.data() + startingIndex, totalPoints);
     if (!altArray.empty())
-        altCurve->setData(xaxis.data(), smoothAltitude.data(), rideTimeSecs + 1);
+        altCurve->setData(xaxis.data() + startingIndex, smoothAltitude.data() + startingIndex, totalPoints);
 
     setAxisScale(xBottom, 0.0, bydist ? totalDist : smoothTime[rideTimeSecs]);
     setYMax();
