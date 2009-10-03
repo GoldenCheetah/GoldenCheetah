@@ -241,7 +241,7 @@ PowerHist::PowerHist():
 
     zoneLabels = QList <PowerHistZoneLabel *>::QList();
 
-    new penTooltip(this->canvas());
+    zoomer = new penTooltip(this->canvas());
 }
 
 PowerHist::~PowerHist() {
@@ -448,7 +448,7 @@ PowerHist::setData(RideItem *_rideItem)
 	setTitle("no data");
 	replot();
     }
-
+    zoomer->setZoomBase();
 }
 
 void
