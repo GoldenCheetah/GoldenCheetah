@@ -28,6 +28,7 @@ class QwtPlotGrid;
 class RideItem;
 class PowerHistBackground;
 class PowerHistZoneLabel;
+class QwtPlotZoomer;
 
 class PowerHist : public QwtPlot
 {
@@ -95,6 +96,7 @@ class PowerHist : public QwtPlot
 
         void recalc();
         void setYMax();
+        QwtPlotZoomer *zoomer;
 
     private:
         QSettings *settings;
