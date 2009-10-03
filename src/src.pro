@@ -57,6 +57,7 @@ HEADERS += \
         PfPvPlot.h \
         PolarRideFile.h \
         PowerHist.h \
+        HistogramWindow.h \
         RawRideFile.h \
         RideFile.h \
         RideItem.h \
@@ -105,6 +106,7 @@ SOURCES += \
         PfPvPlot.cpp \
         PolarRideFile.cpp \
         PowerHist.cpp \
+        HistogramWindow.cpp \
         RawRideFile.cpp \
         RideFile.cpp \
         RideItem.cpp \
