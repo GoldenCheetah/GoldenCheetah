@@ -25,7 +25,7 @@
 #include "PfPvPlot.h"
 #include "DownloadRideDialog.h"
 #include "ManualRideDialog.h"
-#include "PowerHist.h"
+#include "HistogramWindow.h"
 #include "RideItem.h"
 #include "RideFile.h"
 #include "RideImportWizard.h"
@@ -233,43 +233,8 @@ MainWindow::MainWindow(const QDir &home) :
 
     //////////////////////// Power Histogram Tab ////////////////////////
 
-    window = new QWidget;
-    vlayout = new QVBoxLayout;
-    QHBoxLayout *binWidthLayout = new QHBoxLayout;
-    QLabel *binWidthLabel = new QLabel(tr("Bin width"), window);
-    binWidthLineEdit = new QLineEdit(window);
-    binWidthLineEdit->setFixedWidth(30);
-    
-    binWidthLayout->addWidget(binWidthLabel);
-    binWidthLayout->addWidget(binWidthLineEdit);
-    binWidthSlider = new QSlider(Qt::Horizontal);
-    binWidthSlider->setTickPosition(QSlider::TicksBelow);
-    binWidthSlider->setTickInterval(1);
-    binWidthSlider->setMinimum(1);
-    binWidthSlider->setMaximum(100);
-    binWidthLayout->addWidget(binWidthSlider);
-
-    lnYHistCheckBox = new QCheckBox;
-    lnYHistCheckBox->setText("Log y");
-    binWidthLayout->addWidget(lnYHistCheckBox);
-
-    withZerosCheckBox = new QCheckBox;
-    withZerosCheckBox->setText("With zeros");
-    binWidthLayout->addWidget(withZerosCheckBox);
-    histParameterCombo = new QComboBox();
-    binWidthLayout->addWidget(histParameterCombo);
-
-    powerHist = new PowerHist();
-    setHistTextValidator();
-
-    lnYHistCheckBox->setChecked(powerHist->islnY());
-    withZerosCheckBox->setChecked(powerHist->withZeros());
-    binWidthSlider->setValue(powerHist->binWidth());
-    setHistBinWidthText();
-    vlayout->addWidget(powerHist);
-    vlayout->addLayout(binWidthLayout);
-    window->setLayout(vlayout);
-    tabWidget->addTab(window, "Histogram Analysis");
+    histogramWindow = new HistogramWindow(this);
+    tabWidget->addTab(histogramWindow, "Histogram Analysis");
     
     //////////////////////// Pedal Force/Velocity Plot ////////////////////////
 
@@ -430,16 +395,6 @@ MainWindow::MainWindow(const QDir &home) :
             this, SLOT(splitterMoved()));
     connect(cpintSetCPButton, SIGNAL(clicked()),
 	    this, SLOT(cpintSetCPButtonClicked()));
-    connect(binWidthSlider, SIGNAL(valueChanged(int)),
-            this, SLOT(setBinWidthFromSlider()));
-    connect(binWidthLineEdit, SIGNAL(editingFinished()),
-            this, SLOT(setBinWidthFromLineEdit()));
-    connect(lnYHistCheckBox, SIGNAL(stateChanged(int)),
-            this, SLOT(setlnYHistFromCheckBox()));
-    connect(withZerosCheckBox, SIGNAL(stateChanged(int)),
-            this, SLOT(setWithZerosFromCheckBox()));
-    connect(histParameterCombo, SIGNAL(currentIndexChanged(int)),
-            this, SLOT(setHistSelection(int)));
     connect(shadeZonesPfPvCheckBox, SIGNAL(stateChanged(int)),
             this, SLOT(setShadeZonesPfPvFromCheckBox()));
     connect(qaCPValue, SIGNAL(editingFinished()),
@@ -795,14 +750,7 @@ MainWindow::rideSelected()
     if (ride) {
 
         allPlotWindow->setData(ride);
-
-	// set the histogram data
-	powerHist->setData(ride);
-	// make sure the histogram has a legal selection
-	powerHist->fixSelection();
-	// update the options in the histogram combobox
-	setHistWidgets(ride);
-
+        histogramWindow->setData(ride);
 	pfPvPlot->setData(ride);
 	// update the QLabel widget with the CP value set in PfPvPlot::setData()
 	qaCPValue->setText(QString("%1").arg(pfPvPlot->getCP()));
@@ -1298,8 +1246,7 @@ MainWindow::showOptions()
         allPlotWindow->zonesChanged();
 
 	// histogram
-	powerHist->refreshZoneLabels();
-	powerHist->replot();
+        histogramWindow->zonesChanged();
 
 	// force-versus-pedal velocity plot
 	pfPvPlot->refreshZoneItems();
@@ -1395,96 +1342,10 @@ MainWindow::cpintSetCPButtonClicked()
 }
 
 void
-MainWindow::setBinWidthFromSlider()
-{
-    if (powerHist->binWidth() != binWidthSlider->value()) {
-        powerHist->setBinWidth(binWidthSlider->value());
-	setHistBinWidthText();
-    }
-}
-
-void
-MainWindow::setlnYHistFromCheckBox()
-{
-    if (powerHist->islnY() != lnYHistCheckBox->isChecked())
-	powerHist->setlnY(! powerHist->islnY());
-}
-
-void
-MainWindow::setWithZerosFromCheckBox()
-{
-    if (powerHist->withZeros() != withZerosCheckBox->isChecked()) {
-        powerHist->setWithZeros(withZerosCheckBox->isChecked());
-    }
-}
-
-void
-MainWindow::setHistBinWidthText()
-{
-    binWidthLineEdit->setText(QString("%1").arg(powerHist->getBinWidthRealUnits(), 0, 'g', 3));
-}
-
-void
-MainWindow::setHistTextValidator()
-{
-    double delta = powerHist->getDelta();
-    int digits = powerHist->getDigits();
-    binWidthLineEdit->setValidator(
-	    (digits == 0) ?
-	    (QValidator *) (
-		new QIntValidator(binWidthSlider->minimum() * delta,
-		    binWidthSlider->maximum() * delta,
-		    binWidthLineEdit
-		    )
-		) :
-	    (QValidator *) (
-		new QDoubleValidator(binWidthSlider->minimum() * delta,
-		    binWidthSlider->maximum() * delta,
-		    digits,
-		    binWidthLineEdit
-		    )
-		)
-	    );
-
-}
-
-void
-MainWindow::setHistSelection(int id)
-{
-    if (id == histWattsShadedID)
-	powerHist->setSelection(PowerHist::wattsShaded);
-    else if (id == histWattsUnshadedID)
-	powerHist->setSelection(PowerHist::wattsUnshaded);
-    else if (id == histNmID)
-	powerHist->setSelection(PowerHist::nm);
-    else if (id == histHrID)
-	powerHist->setSelection(PowerHist::hr);
-    else if (id == histKphID)
-	powerHist->setSelection(PowerHist::kph);
-    else if (id == histCadID)
-	powerHist->setSelection(PowerHist::cad);
-    else
-	fprintf(stderr, "Illegal id encountered: %d", id);
-
-    setHistBinWidthText();
-    setHistTextValidator();
-}
-
-void
 MainWindow::setShadeZonesPfPvFromCheckBox()
 {
     if (pfPvPlot->shadeZones() != shadeZonesPfPvCheckBox->isChecked()) {
         pfPvPlot->setShadeZones(shadeZonesPfPvCheckBox->isChecked());
-    }
-}
-
-void
-MainWindow::setBinWidthFromLineEdit()
-{
-    double value = binWidthLineEdit->text().toDouble();
-    if (value != powerHist->binWidth()) {
-	binWidthSlider->setValue(powerHist->setBinWidthRealUnits(value));
-	setHistBinWidthText();
     }
 }
 
@@ -1652,92 +1513,6 @@ MainWindow::deleteRide()
     msgBox.exec();
     if(msgBox.clickedButton() == deleteButton)
         removeCurrentRide();
-}
-
-void MainWindow::setHistWidgets(RideItem *rideItem)
-{
-    int count = 0;
-    assert(rideItem);
-    RideFile *ride = rideItem->ride;
-
-    // prevent selection from changing during reconstruction of options
-    disconnect(histParameterCombo, SIGNAL(currentIndexChanged(int)),
-	       this, SLOT(setHistSelection(int)));
-
-    if (ride) {
-	// we want to retain the present selection
-	PowerHist::Selection s = powerHist->selection();
-    
-	histParameterCombo->clear();
-
-
-	histWattsShadedID =
-	    histWattsUnshadedID =
-	    histNmID =
-	    histHrID =
-	    histKphID =
-	    histCadID =
-	    -1;
-
-	if (ride->areDataPresent()->watts) {
-	    histWattsShadedID = count ++;
-	    histParameterCombo->addItem(tr("Watts(shaded)"));
-	    histWattsUnshadedID = count ++;
-	    histParameterCombo->addItem(tr("Watts(unshaded)"));
-	}
-	if (ride->areDataPresent()->nm) {
-	    histNmID = count ++;
-	    histParameterCombo->addItem(tr("Torque"));
-	}
-	if (ride->areDataPresent()->hr) {
-	    histHrID = count ++;
-	    histParameterCombo->addItem(tr("Heartrate"));
-	}
-	if (ride->areDataPresent()->kph) {
-	    histKphID = count ++;
-	    histParameterCombo->addItem(tr("Speed"));
-	}
-	if (ride->areDataPresent()->cad) {
-	    histCadID = count ++;
-	    histParameterCombo->addItem(tr("Cadence"));
-	}
-	if (count > 0) {
-	    histParameterCombo->setEnabled(true);
-	    binWidthLineEdit->setEnabled(true);
-	    binWidthSlider->setEnabled(true);
-	    withZerosCheckBox->setEnabled(true);
-	    lnYHistCheckBox->setEnabled(true);    
-
-	    // set widget to proper value
-	    if ((s == PowerHist::wattsShaded) && (histWattsShadedID >= 0))
-		histParameterCombo->setCurrentIndex(histWattsShadedID);
-	    else if ((s == PowerHist::wattsUnshaded) && (histWattsUnshadedID >= 0))
-		histParameterCombo->setCurrentIndex(histWattsUnshadedID);
-	    else if ((s == PowerHist::nm) && (histNmID >= 0))
-		histParameterCombo->setCurrentIndex(histNmID);
-	    else if ((s == PowerHist::hr) && (histHrID >= 0))
-		histParameterCombo->setCurrentIndex(histHrID);
-	    else if ((s == PowerHist::kph) && (histKphID >= 0))
-		histParameterCombo->setCurrentIndex(histKphID);
-	    else if ((s == PowerHist::cad) && (histCadID >= 0))
-		histParameterCombo->setCurrentIndex(histCadID);
-	    else
-		histParameterCombo->setCurrentIndex(0);
-
-	    // reconnect widget
-	    connect(histParameterCombo, SIGNAL(currentIndexChanged(int)),
-		    this, SLOT(setHistSelection(int)));
-
-	    return;
-	}
-    }
-
-    histParameterCombo->addItem(tr("no data"));
-    histParameterCombo->setEnabled(false);
-    binWidthLineEdit->setEnabled(false);
-    binWidthSlider->setEnabled(false);
-    withZerosCheckBox->setEnabled(false);
-    lnYHistCheckBox->setEnabled(false);    
 }
 
 /*

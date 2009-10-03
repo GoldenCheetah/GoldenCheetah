@@ -28,8 +28,8 @@
 
 class AllPlotWindow;
 class CpintPlot;
+class HistogramWindow;
 class PfPvPlot;
-class PowerHist;
 class QwtPlotPanner;
 class QwtPlotPicker;
 class QwtPlotZoomer;
@@ -70,13 +70,7 @@ class MainWindow : public QMainWindow
         void findBestIntervals();
         void splitRide();
         void deleteRide();
-	void setHistWidgets(RideItem *rideItem);
 	void cpintSetCPButtonClicked();
-        void setBinWidthFromSlider();
-        void setBinWidthFromLineEdit();
-	void setlnYHistFromCheckBox();
-        void setWithZerosFromCheckBox();
-        void setHistSelection(int id);
         void setQaCPFromLineEdit();
         void setQaCADFromLineEdit();
         void setQaCLFromLineEdit();
@@ -99,8 +93,6 @@ class MainWindow : public QMainWindow
 
     private:
 	bool parseRideFileName(const QString &name, QString *notesFileName, QDateTime *dt);
-	void setHistBinWidthText();
-	void setHistTextValidator();
 
 	boost::shared_ptr<QSettings> settings;
 
@@ -111,20 +103,15 @@ class MainWindow : public QMainWindow
         QTextEdit *rideSummary;
         QTextEdit *weeklySummary;
         AllPlotWindow *allPlotWindow;
+        HistogramWindow *histogramWindow;
         CpintPlot *cpintPlot;
         QLineEdit *cpintTimeValue;
         QLineEdit *cpintTodayValue;
         QLineEdit *cpintAllValue;
 	QPushButton *cpintSetCPButton;
         QwtPlotPicker *picker;
-        QSlider *binWidthSlider;
-        QLineEdit *binWidthLineEdit;
-        QCheckBox *lnYHistCheckBox;
-        QCheckBox *withZerosCheckBox;
-        QComboBox *histParameterCombo;
         QCheckBox *shadeZonesPfPvCheckBox;
         QTreeWidgetItem *allRides;
-        PowerHist *powerHist;
         QwtPlot *weeklyPlot;
         QwtPlotCurve *weeklyDistCurve;
         QwtPlotCurve *weeklyDurationCurve;
@@ -149,14 +136,6 @@ class MainWindow : public QMainWindow
         bool currentNotesChanged;
 
 	RideItem *ride;  // the currently selected ride
-
-	int histWattsShadedID;
-	int histWattsUnshadedID;
-	int histNmID;
-	int histHrID;
-	int histKphID;
-	int histCadID;
-	int histAltID;
 
 	bool useMetricUnits;  // whether metric units are used (or imperial)
 
