@@ -34,6 +34,7 @@ class QwtPlotPanner;
 class QwtPlotPicker;
 class QwtPlotZoomer;
 class RideFile;
+class WeeklySummaryWindow;
 class Zones;
 class RideCalendar;
 
@@ -80,7 +81,6 @@ class MainWindow : public QMainWindow
         void showTools();
 	void importRideToDB();
         void scanForMissing();
-	void generateWeeklySummary();
 	void saveAndOpenNotes();
 	void dateChanged(const QDate &);
 
@@ -98,9 +98,9 @@ class MainWindow : public QMainWindow
         QTreeWidget *treeWidget;
         QTabWidget *tabWidget;
         QTextEdit *rideSummary;
-        QTextEdit *weeklySummary;
         AllPlotWindow *allPlotWindow;
         HistogramWindow *histogramWindow;
+        WeeklySummaryWindow *weeklySummaryWindow;
         CpintPlot *cpintPlot;
         QLineEdit *cpintTimeValue;
         QLineEdit *cpintTodayValue;
@@ -108,16 +108,7 @@ class MainWindow : public QMainWindow
 	QPushButton *cpintSetCPButton;
         QwtPlotPicker *picker;
         QTreeWidgetItem *allRides;
-        QwtPlot *weeklyPlot;
-        QwtPlotCurve *weeklyDistCurve;
-        QwtPlotCurve *weeklyDurationCurve;
-        QwtPlotCurve *weeklyBaselineCurve;
-        QwtPlotCurve *weeklyBSBaselineCurve;
-        QwtPlot *weeklyBSPlot;
         QSplitter *leftLayout;
-
-        QwtPlotCurve *weeklyBSCurve;
-        QwtPlotCurve *weeklyRICurve;
 
         Zones *zones;
 

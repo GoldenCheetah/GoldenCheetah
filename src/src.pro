@@ -88,6 +88,7 @@ HEADERS += \
         DaysScaleDraw.h \
         Settings.h \
         XmlRideFile.h \
+        WeeklySummaryWindow.h \
         ManualRideFile.h \
         ManualRideDialog.h \
         RideCalendar.h
@@ -139,6 +140,7 @@ SOURCES += \
         SummaryMetrics.cpp \
         SplitRideDialog.cpp \
         XmlRideFile.cpp \
+        WeeklySummaryWindow.cpp \
         ManualRideFile.cpp \
         ManualRideDialog.cpp \
         RideCalendar.cpp
