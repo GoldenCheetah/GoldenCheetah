@@ -29,7 +29,7 @@
 class AllPlotWindow;
 class CpintPlot;
 class HistogramWindow;
-class PfPvPlot;
+class PfPvWindow;
 class QwtPlotPanner;
 class QwtPlotPicker;
 class QwtPlotZoomer;
@@ -71,10 +71,6 @@ class MainWindow : public QMainWindow
         void splitRide();
         void deleteRide();
 	void cpintSetCPButtonClicked();
-        void setQaCPFromLineEdit();
-        void setQaCADFromLineEdit();
-        void setQaCLFromLineEdit();
-        void setShadeZonesPfPvFromCheckBox();
         void tabChanged(int index);
         void pickerMoved(const QPoint &);
         void aboutDialog();
@@ -110,7 +106,6 @@ class MainWindow : public QMainWindow
         QLineEdit *cpintAllValue;
 	QPushButton *cpintSetCPButton;
         QwtPlotPicker *picker;
-        QCheckBox *shadeZonesPfPvCheckBox;
         QTreeWidgetItem *allRides;
         QwtPlot *weeklyPlot;
         QwtPlotCurve *weeklyDistCurve;
@@ -126,10 +121,7 @@ class MainWindow : public QMainWindow
         Zones *zones;
 
         // pedal force/pedal velocity scatter plot widgets
-        PfPvPlot  *pfPvPlot;
-        QLineEdit *qaCPValue;
-        QLineEdit *qaCadValue;
-        QLineEdit *qaClValue;
+        PfPvWindow  *pfPvWindow;
 
         QTextEdit *rideNotes;
         QString currentNotesFile;

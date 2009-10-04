@@ -22,7 +22,7 @@
 #include "ChooseCyclistDialog.h"
 #include "ConfigDialog.h"
 #include "CpintPlot.h"
-#include "PfPvPlot.h"
+#include "PfPvWindow.h"
 #include "DownloadRideDialog.h"
 #include "ManualRideDialog.h"
 #include "HistogramWindow.h"
@@ -238,43 +238,8 @@ MainWindow::MainWindow(const QDir &home) :
     
     //////////////////////// Pedal Force/Velocity Plot ////////////////////////
 
-    window = new QWidget;
-    vlayout = new QVBoxLayout;
-    QHBoxLayout *qaLayout = new QHBoxLayout;
-
-    pfPvPlot = new PfPvPlot();
-    QLabel *qaCPLabel = new QLabel(tr("Watts:"), window);
-    qaCPValue = new QLineEdit(QString("%1").arg(pfPvPlot->getCP()));
-    qaCPValue->setValidator(new QIntValidator(0, 9999, qaCPValue));
-    QLabel *qaCadLabel = new QLabel(tr("RPM:"), window);
-    qaCadValue = new QLineEdit(QString("%1").arg(pfPvPlot->getCAD()));
-    qaCadValue->setValidator(new QIntValidator(0, 999, qaCadValue));
-    QLabel *qaClLabel = new QLabel(tr("Crank Length (m):"), window);
-    qaClValue = new QLineEdit(QString("%1").arg(1000 * pfPvPlot->getCL()));
-    shadeZonesPfPvCheckBox = new QCheckBox;
-    shadeZonesPfPvCheckBox->setText("Shade zones");
-    shadeZonesPfPvCheckBox->setCheckState(Qt::Checked);
-
-    qaLayout->addWidget(qaCPLabel);
-    qaLayout->addWidget(qaCPValue);
-    qaLayout->addWidget(qaCadLabel);
-    qaLayout->addWidget(qaCadValue);
-    qaLayout->addWidget(qaClLabel);
-    qaLayout->addWidget(qaClValue);
-    qaLayout->addWidget(shadeZonesPfPvCheckBox);
-
-    vlayout->addWidget(pfPvPlot);
-    vlayout->addLayout(qaLayout);
-    window->setLayout(vlayout);
-
-    connect(pfPvPlot, SIGNAL(changedCP(const QString&)),
-            qaCPValue, SLOT(setText(const QString&)) );
-    connect(pfPvPlot, SIGNAL(changedCAD(const QString&)),
-            qaCadValue, SLOT(setText(const QString&)) );
-    connect(pfPvPlot, SIGNAL(changedCL(const QString&)),
-            qaClValue, SLOT(setText(const QString&)) );
-
-    tabWidget->addTab(window, tr("PF/PV Plot"));
+    pfPvWindow = new PfPvWindow(this);
+    tabWidget->addTab(pfPvWindow, tr("PF/PV Plot"));
 
 
     //////////////////////// Ride Notes ////////////////////////
@@ -395,14 +360,6 @@ MainWindow::MainWindow(const QDir &home) :
             this, SLOT(splitterMoved()));
     connect(cpintSetCPButton, SIGNAL(clicked()),
 	    this, SLOT(cpintSetCPButtonClicked()));
-    connect(shadeZonesPfPvCheckBox, SIGNAL(stateChanged(int)),
-            this, SLOT(setShadeZonesPfPvFromCheckBox()));
-    connect(qaCPValue, SIGNAL(editingFinished()),
-	    this, SLOT(setQaCPFromLineEdit()));
-    connect(qaCadValue, SIGNAL(editingFinished()),
-	    this, SLOT(setQaCADFromLineEdit()));
-    connect(qaClValue, SIGNAL(editingFinished()),
-	    this, SLOT(setQaCLFromLineEdit()));
     connect(tabWidget, SIGNAL(currentChanged(int)), 
             this, SLOT(tabChanged(int)));
     connect(rideNotes, SIGNAL(textChanged()),
@@ -751,9 +708,7 @@ MainWindow::rideSelected()
 
         allPlotWindow->setData(ride);
         histogramWindow->setData(ride);
-	pfPvPlot->setData(ride);
-	// update the QLabel widget with the CP value set in PfPvPlot::setData()
-	qaCPValue->setText(QString("%1").arg(pfPvPlot->getCP()));
+        pfPvWindow->setData(ride);
 
 	// turn off tabs that don't make sense for manual file entry
 	if (ride->ride && ride->ride->deviceType() == QString("Manual CSV")) {
@@ -1249,9 +1204,7 @@ MainWindow::showOptions()
         histogramWindow->zonesChanged();
 
 	// force-versus-pedal velocity plot
-	pfPvPlot->refreshZoneItems();
-	pfPvPlot->replot();
-        qaCPValue->setText(QString("%1").arg(pfPvPlot->getCP()));
+        pfPvWindow->zonesChanged();
     }
 }
 
@@ -1339,35 +1292,6 @@ MainWindow::cpintSetCPButtonClicked()
     generateWeeklySummary();
   }
 
-}
-
-void
-MainWindow::setShadeZonesPfPvFromCheckBox()
-{
-    if (pfPvPlot->shadeZones() != shadeZonesPfPvCheckBox->isChecked()) {
-        pfPvPlot->setShadeZones(shadeZonesPfPvCheckBox->isChecked());
-    }
-}
-
-void
-MainWindow::setQaCPFromLineEdit()
-{
-    int value = qaCPValue->text().toInt();
-    pfPvPlot->setCP(value);
-}
-
-void
-MainWindow::setQaCADFromLineEdit()
-{
-    int value = qaCadValue->text().toInt();
-    pfPvPlot->setCAD(value);
-}
-
-void
-MainWindow::setQaCLFromLineEdit()
-{
-    double value = qaClValue->text().toDouble();
-    pfPvPlot->setCL(value);
 }
 
 void
