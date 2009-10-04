@@ -730,6 +730,8 @@ MainWindow::rideSelected()
 
     // generate a weekly summary of the week associated with the current ride
     generateWeeklySummary();
+
+    saveAndOpenNotes();
 }
 
 
@@ -1123,7 +1125,11 @@ void MainWindow::generateWeeklySummary()
     
     
     weeklySummary->setHtml(summary);
+}
 
+void
+MainWindow::saveAndOpenNotes()
+{
     // First save the contents of the notes window.
     saveNotes();
 
@@ -1196,6 +1202,8 @@ MainWindow::showOptions()
 	
 	// weekly summary
 	generateWeeklySummary();
+
+        saveAndOpenNotes();
 
 	// all plot
         allPlotWindow->zonesChanged();
@@ -1290,6 +1298,8 @@ MainWindow::cpintSetCPButtonClicked()
 
     // weekly summary
     generateWeeklySummary();
+
+    saveAndOpenNotes();
   }
 
 }

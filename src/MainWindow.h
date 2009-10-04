@@ -81,6 +81,7 @@ class MainWindow : public QMainWindow
 	void importRideToDB();
         void scanForMissing();
 	void generateWeeklySummary();
+	void saveAndOpenNotes();
 	void dateChanged(const QDate &);
 
     protected: 
