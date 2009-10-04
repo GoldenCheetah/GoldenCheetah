@@ -1070,6 +1070,7 @@ unsigned int optpad(WKO_UCHAR *p)
     case 0x800c :
     case 0x800b :
     case 0x800d :       /* from Jim B 2nd Oct 2009 */
+    case 0x800e :       /* from Phil S 4th Oct 2009 */
         break;
 
     case 0x0001 :       /* 4byte follows */
@@ -1112,6 +1113,7 @@ unsigned int optpad2(WKO_UCHAR *p)
     case 0x800f :       /* data cache */
     case 0x800d :
     case 0x800e :
+    case 0x801d :       /* from Phil S 4th Oct 2009 */
     case 0x8018 :
     case 0x8017 :
     case 0x8016 :
