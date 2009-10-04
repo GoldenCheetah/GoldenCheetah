@@ -21,6 +21,7 @@
 #include "RideFile.h"
 #include "RideItem.h"
 #include <QtGui>
+#include <assert.h>
 
 HistogramWindow::HistogramWindow(QWidget *parent) : QWidget(parent)
 {
