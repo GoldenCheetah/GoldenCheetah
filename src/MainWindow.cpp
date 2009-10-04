@@ -1203,8 +1203,6 @@ MainWindow::showOptions()
 	// weekly summary
 	generateWeeklySummary();
 
-        saveAndOpenNotes();
-
 	// all plot
         allPlotWindow->zonesChanged();
 
@@ -1298,8 +1296,6 @@ MainWindow::cpintSetCPButtonClicked()
 
     // weekly summary
     generateWeeklySummary();
-
-    saveAndOpenNotes();
   }
 
 }
