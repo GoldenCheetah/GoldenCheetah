@@ -55,6 +55,7 @@ HEADERS += \
         DownloadRideDialog.h \
         MainWindow.h \
         PfPvPlot.h \
+        PfPvWindow.h \
         PolarRideFile.h \
         PowerHist.h \
         HistogramWindow.h \
@@ -104,6 +105,7 @@ SOURCES += \
         DownloadRideDialog.cpp \
         MainWindow.cpp \
         PfPvPlot.cpp \
+        PfPvWindow.cpp \
         PolarRideFile.cpp \
         PowerHist.cpp \
         HistogramWindow.cpp \
