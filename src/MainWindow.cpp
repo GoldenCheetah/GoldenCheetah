@@ -176,7 +176,7 @@ MainWindow::MainWindow(const QDir &home) :
     tabWidget->addTab(rideSummary, tr("Ride Summary"));
 
     /////////////////////////// Ride Plot Tab ///////////////////////////
-    allPlotWindow = new AllPlotWindow(&zones);
+    allPlotWindow = new AllPlotWindow(this);
     tabWidget->addTab(allPlotWindow, "Ride Plot");
     splitter->addWidget(tabWidget);
     splitter->setCollapsible(1, true);
