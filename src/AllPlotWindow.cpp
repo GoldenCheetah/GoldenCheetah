@@ -24,7 +24,7 @@
 #include <qwt_plot_panner.h>
 #include <qwt_plot_zoomer.h>
 
-AllPlotWindow::AllPlotWindow(Zones **zones) : zones(zones)
+AllPlotWindow::AllPlotWindow(QWidget *parent) : QWidget(parent)
 {
     QVBoxLayout *vlayout = new QVBoxLayout;
 

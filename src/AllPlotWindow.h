@@ -25,7 +25,6 @@ class AllPlot;
 class QwtPlotPanner;
 class QwtPlotZoomer;
 class RideItem;
-class Zones;
 
 class AllPlotWindow : public QWidget
 {
@@ -33,9 +32,8 @@ class AllPlotWindow : public QWidget
 
     public:
 
-        AllPlotWindow(Zones **zones);
+        AllPlotWindow(QWidget *parent);
         void setData(RideItem *ride);
-	void setAllPlotWidgets(RideItem *rideItem);
         void zonesChanged();
 
    public slots:
@@ -44,6 +42,8 @@ class AllPlotWindow : public QWidget
         void setSmoothingFromLineEdit();
 
     protected:
+
+	void setAllPlotWidgets(RideItem *rideItem);
 
         AllPlot *allPlot;
         QwtPlotPanner *allPanner;
@@ -55,8 +55,6 @@ class AllPlotWindow : public QWidget
 	QComboBox *showPower;
         QSlider *smoothSlider;
         QLineEdit *smoothLineEdit;
-
-        Zones **zones;
 };
 
 #endif // _GC_AllPlotWindow_h
