@@ -27,7 +27,7 @@
 #include <boost/shared_ptr.hpp>
 
 class AllPlotWindow;
-class CpintPlot;
+class CriticalPowerWindow;
 class HistogramWindow;
 class PfPvWindow;
 class QwtPlotPanner;
@@ -49,6 +49,7 @@ class MainWindow : public QMainWindow
         const RideFile *currentRide();
 	void getBSFactors(float &timeBS, float &distanceBS);
         QDir home;
+        void setCriticalPower(int cp);
 
     protected:
         virtual void resizeEvent(QResizeEvent*);
@@ -71,9 +72,7 @@ class MainWindow : public QMainWindow
         void findBestIntervals();
         void splitRide();
         void deleteRide();
-	void cpintSetCPButtonClicked();
         void tabChanged(int index);
-        void pickerMoved(const QPoint &);
         void aboutDialog();
         void notesChanged();
         void saveNotes();
@@ -101,12 +100,7 @@ class MainWindow : public QMainWindow
         AllPlotWindow *allPlotWindow;
         HistogramWindow *histogramWindow;
         WeeklySummaryWindow *weeklySummaryWindow;
-        CpintPlot *cpintPlot;
-        QLineEdit *cpintTimeValue;
-        QLineEdit *cpintTodayValue;
-        QLineEdit *cpintAllValue;
-	QPushButton *cpintSetCPButton;
-        QwtPlotPicker *picker;
+        CriticalPowerWindow *criticalPowerWindow;
         QTreeWidgetItem *allRides;
         QSplitter *leftLayout;
 

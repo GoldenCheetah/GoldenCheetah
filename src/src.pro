@@ -48,6 +48,7 @@ HEADERS += \
         BestIntervalDialog.h \
         ChooseCyclistDialog.h \
         CpintPlot.h \
+        CriticalPowerWindow.h \
         CsvRideFile.h \
         WkoRideFile.h \
         DBAccess.h \
@@ -99,6 +100,7 @@ SOURCES += \
         BestIntervalDialog.cpp \
         ChooseCyclistDialog.cpp \
         CpintPlot.cpp \
+        CriticalPowerWindow.cpp \
         CsvRideFile.cpp \
         WkoRideFile.cpp \
         DBAccess.cpp \

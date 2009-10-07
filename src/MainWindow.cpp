@@ -21,7 +21,7 @@
 #include "BestIntervalDialog.h"
 #include "ChooseCyclistDialog.h"
 #include "ConfigDialog.h"
-#include "CpintPlot.h"
+#include "CriticalPowerWindow.h"
 #include "PfPvWindow.h"
 #include "DownloadRideDialog.h"
 #include "ManualRideDialog.h"
@@ -193,43 +193,8 @@ MainWindow::MainWindow(const QDir &home) :
 
     ////////////////////// Critical Power Plot Tab //////////////////////
 
-    QWidget *window = new QWidget;
-    QVBoxLayout *vlayout = new QVBoxLayout;
-    QHBoxLayout *cpintPickerLayout = new QHBoxLayout;
-    QLabel *cpintTimeLabel = new QLabel(tr("Interval Duration:"), window);
-    cpintTimeValue = new QLineEdit("0 s");
-    QLabel *cpintTodayLabel = new QLabel(tr("Today:"), window);
-    cpintTodayValue = new QLineEdit(tr("no data"));
-    QLabel *cpintAllLabel = new QLabel(tr("All Rides:"), window);
-    cpintAllValue = new QLineEdit(tr("no data"));
-    cpintTimeValue->setReadOnly(true);
-    cpintTodayValue->setReadOnly(true);
-    cpintAllValue->setReadOnly(true);
-
-    cpintSetCPButton = new QPushButton(tr("&Save CP value"), this);
-    cpintSetCPButton->setEnabled(false);
-
-    cpintPickerLayout->addWidget(cpintTimeLabel);
-    cpintPickerLayout->addWidget(cpintTimeValue);
-    cpintPickerLayout->addWidget(cpintTodayLabel);
-    cpintPickerLayout->addWidget(cpintTodayValue);
-    cpintPickerLayout->addWidget(cpintAllLabel);
-    cpintPickerLayout->addWidget(cpintAllValue);
-    cpintPickerLayout->addWidget(cpintSetCPButton);
-    cpintPlot = new CpintPlot(home.path());
-    vlayout->addWidget(cpintPlot);
-    vlayout->addLayout(cpintPickerLayout);
-    window->setLayout(vlayout);
-    tabWidget->addTab(window, "Critical Power Plot");
-
-    picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
-                               QwtPicker::PointSelection, 
-                               QwtPicker::VLineRubberBand, 
-                               QwtPicker::AlwaysOff, cpintPlot->canvas());
-    picker->setRubberBandPen(QColor(Qt::blue));
-
-    connect(picker, SIGNAL(moved(const QPoint &)),
-            SLOT(pickerMoved(const QPoint &)));
+    criticalPowerWindow = new CriticalPowerWindow(home, this);
+    tabWidget->addTab(criticalPowerWindow, "Critical Power Plot");
 
     //////////////////////// Power Histogram Tab ////////////////////////
 
@@ -263,8 +228,6 @@ MainWindow::MainWindow(const QDir &home) :
             this, SLOT(rideSelected()));
     connect(splitter, SIGNAL(splitterMoved(int,int)), 
             this, SLOT(splitterMoved()));
-    connect(cpintSetCPButton, SIGNAL(clicked()),
-	    this, SLOT(cpintSetCPButtonClicked()));
     connect(tabWidget, SIGNAL(currentChanged(int)), 
             this, SLOT(tabChanged(int)));
     connect(rideNotes, SIGNAL(textChanged()),
@@ -381,7 +344,7 @@ MainWindow::addRide(QString name, bool bSelect /*=true*/)
     }
     allRides->insertChild(index, last);
     calendar->addRide(last);
-    cpintPlot->needToScanRides = true;
+    criticalPowerWindow->newRideAdded();
     if (bSelect)
     {
         tabWidget->setCurrentIndex(0);
@@ -432,11 +395,10 @@ MainWindow::removeCurrentRide()
     }
 
     // added djconnel: remove old cpi file, then update bests which are associated with the file
-    cpintPlot->deleteCpiFile(home.absolutePath() + "/" + ride_filename_to_cpi_filename(strOldFileName));
+    criticalPowerWindow->deleteCpiFile(strOldFileName);
 
     treeWidget->setCurrentItem(itemToSelect);
     rideSelected();
-    cpintPlot->replot();
 }
 
 void
@@ -628,10 +590,8 @@ MainWindow::rideSelected()
 	    tabWidget->setTabEnabled(4,true); // PF/PV Plot
 	}
     }
-    if (tabWidget->currentIndex() == 2) {
-        cpintPlot->calculate(ride);
-	cpintSetCPButton->setEnabled(cpintPlot->cp > 0);
-    }
+    if (tabWidget->currentIndex() == 2)
+        criticalPowerWindow->setData(ride);
 
     // generate a weekly summary of the week associated with the current ride
     weeklySummaryWindow->generateWeeklySummary(ride, allRides, zones);
@@ -848,19 +808,8 @@ MainWindow::splitterMoved()
 
 // set the rider value of CP to the value derived from the CP model extraction
 void
-MainWindow::cpintSetCPButtonClicked()
+MainWindow::setCriticalPower(int cp)
 {
-  int cp = (int) cpintPlot->cp;
-  if (cp <= 0) {
-    QMessageBox::critical(
-			  this,
-			  tr("Set CP value to extracted value"),
-			  tr("No non-zero extracted value was identified:\n") +
-			  tr("Zones were unchanged.")
-			  );
-    return;
-  }
-  
   if (zones == NULL)
     // set up new zones
     zones = new Zones();
@@ -916,68 +865,10 @@ MainWindow::tabChanged(int index)
             QTreeWidgetItem *which = treeWidget->selectedItems().first();
             if (which->type() == RIDE_TYPE) {
                 RideItem *ride = (RideItem*) which;
-                cpintPlot->calculate(ride);
-		cpintSetCPButton->setEnabled(cpintPlot->cp > 0);
+                criticalPowerWindow->setData(ride);
                 return;
             }
         }
-    }
-}
-
-static unsigned 
-curve_to_point(double x, const QwtPlotCurve *curve)
-{
-    unsigned result = 0;
-    if (curve) {
-        const QwtData &data = curve->data();
-        if (data.size() > 0) {
-            unsigned min = 0, mid = 0, max = data.size();
-            while (min < max - 1) {
-                mid = (max - min) / 2 + min;
-                if (x < data.x(mid)) {
-                    result = (unsigned) round(data.y(mid));
-                    max = mid;
-                }
-                else {
-                    min = mid;
-                }
-            }
-        }
-    }
-    return result;
-}
-
-void 
-MainWindow::pickerMoved(const QPoint &pos)
-{
-    double minutes = cpintPlot->invTransform(QwtPlot::xBottom, pos.x());
-    cpintTimeValue->setText(interval_to_str(60.0*minutes));
-
-    // current ride
-    {
-      unsigned watts = curve_to_point(minutes, cpintPlot->getThisCurve());
-      QString label;
-      if (watts > 0)
-	label = QString("%1 watts").arg(watts);
-      else
-	label = tr("no data");
-      cpintTodayValue->setText(label);
-    }
-
-    // global ride
-    {
-      QString label;
-      int index = (int) ceil(minutes * 60);
-      if (cpintPlot->getBests().count() > index) {
-	  QDate date = cpintPlot->getBestDates()[index];
-	  label =
-	      QString("%1 watts (%2)").
-	      arg(cpintPlot->getBests()[index]).
-	      arg(date.isValid() ? date.toString("MM/dd/yyyy") : "no date");
-      }
-      else
-	  label = tr("no data");
-      cpintAllValue->setText(label);
     }
 }
 
