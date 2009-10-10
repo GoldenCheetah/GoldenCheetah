@@ -19,14 +19,13 @@
 
 
 #include "CsvRideFile.h"
+#include "Units.h"
 #include <QRegExp>
 #include <QTextStream>
 #include <algorithm> // for std::sort
 #include <assert.h>
 #include "math.h"
 
-#define MILES_TO_KM 1.609344
-        
 static int csvFileReaderRegistered = 
     RideFileFactory::instance().registerReader("csv", new CsvFileReader());
  
@@ -142,8 +141,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                      interval	 = line.section(',', 7, 7).toInt();
                      alt	 = line.section(',', 8, 8).toDouble();
                     if (!metric) {
-                        km *= MILES_TO_KM;
-                        kph *= MILES_TO_KM;
+                        km *= KM_PER_MILE;
+                        kph *= KM_PER_MILE;
                     }
                 } 
                 else if (iBike) {
@@ -160,8 +159,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                      hr		 = line.section(',', 5, 5).toDouble();
                      interval	= NULL; //not provided?
                     if (!metric) {
-                        km *= MILES_TO_KM;
-                        kph *= MILES_TO_KM;
+                        km *= KM_PER_MILE;
+                        kph *= KM_PER_MILE;
                     }			 
                 }
                 else {
@@ -190,8 +189,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                      minutes = minutes/60.0;
                     
                      if (!metric) {
-                         km *= MILES_TO_KM;
-                         kph *= MILES_TO_KM;
+                         km *= KM_PER_MILE;
+                         kph *= KM_PER_MILE;
                      }
                 }
                 

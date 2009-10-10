@@ -17,6 +17,7 @@
  */
 
 #include "PowerTapUtil.h"
+#include "Units.h"
 #include <QString>
 #include <math.h>
 
@@ -114,7 +115,6 @@ my_round(double x)
 #define PI M_PI
 
 #define LBFIN_TO_NM 0.11298483
-#define KM_TO_MI 0.62137119
 
 #define BAD_LBFIN_TO_NM_1 0.112984
 #define BAD_LBFIN_TO_NM_2 0.1129824
@@ -191,7 +191,7 @@ PowerTapUtil::unpack_data(unsigned char *buf, int compat, double rec_int_secs,
             if (compat)
                 *mph = my_round(kph10) / 10.0 * BAD_KM_TO_MI;
             else
-                *mph = kph10 / 10.0 * KM_TO_MI;
+                *mph = kph10 / 10.0 * MILES_PER_KM;
 
             // from http://en.wikipedia.org/wiki/Torque#Conversion_to_other_units
             double dMetersPerMinute = (kph10 / 10.0) * 1000.0 / 60.0;

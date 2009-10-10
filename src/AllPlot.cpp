@@ -20,6 +20,7 @@
 #include "RideFile.h"
 #include "RideItem.h"
 #include "Settings.h"
+#include "Units.h"
 #include "Zones.h"
 
 #include <assert.h>
@@ -166,9 +167,6 @@ class AllPlotZoneLabel: public QwtPlotItem
 
 static inline double
 max(double a, double b) { if (a > b) return a; else return b; }
-
-#define MILES_PER_KM 0.62137119
-#define FEET_PER_M 3.2808399
 
 AllPlot::AllPlot(QWidget *parent):
     QwtPlot(parent),
@@ -539,7 +537,7 @@ AllPlot::setData(RideItem *_rideItem)
             if (!altArray.empty())
                 altArray[arrayLength]   = (useMetricUnits
                                            ? point->alt
-                                           : point->alt * FEET_PER_M);
+                                           : point->alt * FEET_PER_METER);
 	    interArray[arrayLength] = point->interval;
 	    distanceArray[arrayLength] = max(0,
 					     (useMetricUnits

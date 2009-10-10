@@ -17,9 +17,7 @@
  */
 
 #include "RideMetric.h"
-
-#define MILES_PER_KM 0.62137119
-#define FEET_PER_METER 3.2808399
+#include "Units.h"
 
 class WorkoutTime : public RideMetric {
     double seconds;

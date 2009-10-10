@@ -18,11 +18,10 @@
 
 #include "RawRideFile.h"
 #include "PowerTapUtil.h"
+#include "Units.h"
 #include <assert.h>
 #include <math.h>
 
-#define MILES_TO_KM 1.609344
-#define KM_TO_MI 0.62137119
 #define BAD_KM_TO_MI 0.62
 
 static int rawFileReaderRegistered = 
@@ -71,7 +70,7 @@ time_cb(struct tm *, time_t since_epoch, void *context)
         state->start_since_epoch = since_epoch;
     double secs = since_epoch - state->start_since_epoch;
     state->rideFile->appendPoint(secs, 0.0, 0.0, 
-                                 state->last_miles * MILES_TO_KM, 0.0, 
+                                 state->last_miles * KM_PER_MILE, 0.0, 
                                  0.0, 0.0, 0.0, state->last_interval);
     state->last_secs = secs;
 }
@@ -85,8 +84,8 @@ data_cb(double secs, double nm, double mph, double watts, double miles, double a
     if (watts < 0.0) watts = 0.0;
 
     ReadState *state = (ReadState*) context;
-    state->rideFile->appendPoint(secs, cad, hr, miles * MILES_TO_KM, 
-                                 mph * MILES_TO_KM, nm, watts, alt, interval);
+    state->rideFile->appendPoint(secs, cad, hr, miles * KM_PER_MILE, 
+                                 mph * KM_PER_MILE, nm, watts, alt, interval);
     state->last_secs = secs;
     state->last_miles = miles;
     state->last_interval = interval;
@@ -181,7 +180,7 @@ pt_read_raw(FILE *in, int compat, void *context,
             if (compat)
                 miles = round(meters) / 1000.0 * BAD_KM_TO_MI;
             else 
-                miles = meters / 1000.0 * KM_TO_MI;
+                miles = meters / 1000.0 * MILES_PER_KM;
             if (data_cb) 
                 data_cb(secs, nm, mph, watts, miles, alt, cad, 
                         hr, interval, context);

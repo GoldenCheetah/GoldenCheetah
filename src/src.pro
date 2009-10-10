@@ -91,6 +91,7 @@ HEADERS += \
         TcxRideFile.h \
         TimeUtils.h \
         ToolsDialog.h \
+        Units.h \
         WeeklySummaryWindow.h \
         WkoRideFile.h \
         XmlRideFile.h \
