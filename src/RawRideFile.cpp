@@ -22,8 +22,6 @@
 #include <assert.h>
 #include <math.h>
 
-#define BAD_KM_TO_MI 0.62
-
 static int rawFileReaderRegistered = 
     RideFileFactory::instance().registerReader("raw", new RawFileReader());
  
@@ -99,7 +97,7 @@ error_cb(const char *msg, void *context)
 }
 
 static void 
-pt_read_raw(FILE *in, int compat, void *context,
+pt_read_raw(FILE *in, void *context,
             void (*config_cb)(unsigned interval, double rec_int_secs,
                               unsigned wheel_sz_mm, void *context),
             void (*time_cb)(struct tm *time, time_t since_epoch, void *context),
@@ -175,12 +173,9 @@ pt_read_raw(FILE *in, int compat, void *context,
                 if (error_cb) error_cb(ebuf, context);
                 return;
             }
-            PowerTapUtil::unpack_data(buf, compat, rec_int_secs, wheel_sz_mm, &secs,
+            PowerTapUtil::unpack_data(buf, rec_int_secs, wheel_sz_mm, &secs,
                                       &nm, &mph, &watts, &meters, &cad, &hr, bIsVer81);
-            if (compat)
-                miles = round(meters) / 1000.0 * BAD_KM_TO_MI;
-            else 
-                miles = meters / 1000.0 * MILES_PER_KM;
+            miles = meters / 1000.0 * MILES_PER_KM;
             if (data_cb) 
                 data_cb(secs, nm, mph, watts, miles, alt, cad, 
                         hr, interval, context);
@@ -209,8 +204,7 @@ RideFile *RawFileReader::openRideFile(QFile &file, QStringList &errors) const
     FILE *f = fdopen(file.handle(), "r");
     assert(f);
     ReadState state(rideFile, errors);
-    pt_read_raw(f, 0 /* not compat */, &state, config_cb, 
-                time_cb, data_cb, error_cb);
+    pt_read_raw(f, &state, config_cb, time_cb, data_cb, error_cb);
     return rideFile;
 }
 

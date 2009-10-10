@@ -36,7 +36,7 @@ struct PowerTapUtil
                                 unsigned *wheel_sz_mm, bool bVer81);
 
     static int is_data(unsigned char *buf, bool bVer81);
-    static void unpack_data(unsigned char *buf, int compat, double rec_int_secs,
+    static void unpack_data(unsigned char *buf, double rec_int_secs,
                             unsigned wheel_sz_mm, double *time_secs,
                             double *torque_Nm, double *mph, double *watts,
                             double *dist_m, unsigned *cad, unsigned *hr, bool bVer81);
