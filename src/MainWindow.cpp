@@ -33,6 +33,7 @@
 #include "RideMetric.h"
 #include "Settings.h"
 #include "TimeUtils.h"
+#include "Units.h"
 #include "WeeklySummaryWindow.h"
 #include "Zones.h"
 #include <assert.h>
@@ -611,7 +612,7 @@ void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
 {
 
     int rides;
-    double seconds, distance, bs, convertUnit;
+    double seconds, distance, bs;
     RideItem * lastRideItem;
     QProgressDialog * progress;
     bool aborted = false;
@@ -680,17 +681,8 @@ void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
         }
     }
     if (rides) {
-	// convert distance from metric:
 	if (!useMetricUnits)
-	{
-	    const double MILES_PER_KM = 0.62137119;
-	    convertUnit = MILES_PER_KM;
-	}
-	else {
-	    convertUnit = 1.0;
-	}
-	distance *= convertUnit;
-
+            distance *= MILES_PER_KM;
 	timeBS = (bs * 3600) / seconds;  // BS per hour
 	distanceBS = bs / distance;  // BS per mile or km
     }

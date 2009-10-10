@@ -17,9 +17,10 @@
  */
 
 #include "RideFile.h"
+#include "Settings.h"
+#include "Units.h"
 #include <QtXml/QtXml>
 #include <assert.h>
-#include "Settings.h"
 
 static void
 markInterval(QDomDocument &doc, QDomNode &xride, QDomNode &xintervals,
@@ -113,12 +114,10 @@ void RideFile::writeAsCsv(QFile &file, bool bIsMetric) const
     if (!bIsMetric)
     {
         out << "Minutes,Torq (N-m),MPH,Watts,Miles,Cadence,Hrate,ID,Altitude (feet)\n";
-        const double MILES_PER_KM = 0.62137119;
         convertUnit = MILES_PER_KM;
     }
     else {
         out << "Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID,Altitude (m)\n";
-        // TODO: use KM_TO_MI from lib/pt.c instead?
         convertUnit = 1.0;
     }
 

@@ -21,13 +21,11 @@
 #include "RideFile.h"
 #include "Settings.h"
 #include "TimeUtils.h"
+#include "Units.h"
 #include "Zones.h"
-#include <iostream> // delete me
 #include <assert.h>
 #include <math.h>
 #include <QtXml/QtXml>
-
-#define MILES_PER_KM 0.62137119
 
 RideItem::RideItem(int type,
                    QString path, QString fileName, const QDateTime &dateTime, 

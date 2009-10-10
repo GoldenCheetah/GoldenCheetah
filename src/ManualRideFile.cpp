@@ -17,14 +17,12 @@
  */
 
 #include "ManualRideFile.h"
+#include "Units.h"
 #include <QRegExp>
 #include <QTextStream>
 #include <algorithm> // for std::sort
 #include <assert.h>
 #include "math.h"
-
-#define MILES_TO_KM 1.609344
-#define FEET_TO_METERS 0.3048
 
 static int manualFileReaderRegistered = 
     RideFileFactory::instance().registerReader("man", new ManualFileReader());
@@ -105,8 +103,8 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors) const
 		hr		 = line.section(',', 4, 4).toDouble();
 		bs	 = line.section(',', 5, 5).toDouble();
 		if (!metric) {
-		    km *= MILES_TO_KM;
-		    kph *= MILES_TO_KM;
+		    km *= KM_PER_MILE;
+		    kph *= KM_PER_MILE;
 		}
 		cad = nm = 0.0;
 		interval = 0;
