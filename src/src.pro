@@ -47,111 +47,111 @@ HEADERS += \
         AllPlotWindow.h \
         BestIntervalDialog.h \
         ChooseCyclistDialog.h \
+        CommPort.h \
+        ConfigDialog.h \
         CpintPlot.h \
         CriticalPowerWindow.h \
         CsvRideFile.h \
-        WkoRideFile.h \
         DBAccess.h \
+        DatePickerDialog.h \
+        DaysScaleDraw.h \
         Device.h \
         DownloadRideDialog.h \
+        HistogramWindow.h \
+        LogTimeScaleDraw.h \
+        LogTimeScaleEngine.h \
         MainWindow.h \
+        ManualRideDialog.h \
+        ManualRideFile.h \
+        MetricAggregator.h \
+        Pages.h \
+        PerfPlot.h \
+        PerformanceManagerWindow.h \
         PfPvPlot.h \
         PfPvWindow.h \
         PolarRideFile.h \
         PowerHist.h \
-        HistogramWindow.h \
-        RawRideFile.h \
-        RideFile.h \
-        RideItem.h \
-        RideImportWizard.h \
-        RideMetric.h \
-        SrmRideFile.h \
-        TcxParser.h \
-        TcxRideFile.h \
-        QuarqParser.h \
-        QuarqRideFile.h \
-        TimeUtils.h \
-        ConfigDialog.h \
-        DatePickerDialog.h \
-        CommPort.h \
-        LogTimeScaleDraw.h \
-        LogTimeScaleEngine.h \
-        Pages.h \
         PowerTapDevice.h \
         PowerTapUtil.h \
-        ToolsDialog.h \
-        Zones.h \
-        srm.h \
-        MetricAggregator.h \
-        Season.h \
-        SummaryMetrics.h \
-        SplitRideDialog.h \
-        DaysScaleDraw.h \
-        Settings.h \
-        XmlRideFile.h \
-        WeeklySummaryWindow.h \
-        ManualRideFile.h \
-        ManualRideDialog.h \
+        QuarqParser.h \
+        QuarqRideFile.h \
+        RawRideFile.h \
         RideCalendar.h \
-	PerfPlot.h \
-	StressCalculator.h \
-	PerformanceManagerWindow.h
+        RideFile.h \
+        RideImportWizard.h \
+        RideItem.h \
+        RideMetric.h \
+        Season.h \
+        Settings.h \
+        SplitRideDialog.h \
+        SrmRideFile.h \
+        StressCalculator.h \
+        SummaryMetrics.h \
+        TcxParser.h \
+        TcxRideFile.h \
+        TimeUtils.h \
+        ToolsDialog.h \
+        WeeklySummaryWindow.h \
+        WkoRideFile.h \
+        XmlRideFile.h \
+        Zones.h \
+        srm.h
 
 SOURCES += \
         AllPlot.cpp \
         AllPlotWindow.cpp \
+        BasicRideMetrics.cpp \
         BestIntervalDialog.cpp \
+        BikeScore.cpp \
         ChooseCyclistDialog.cpp \
+        CommPort.cpp \
+        ConfigDialog.cpp \
         CpintPlot.cpp \
         CriticalPowerWindow.cpp \
         CsvRideFile.cpp \
-        WkoRideFile.cpp \
         DBAccess.cpp \
+        DatePickerDialog.cpp \
         Device.cpp \
         DownloadRideDialog.cpp \
+        HistogramWindow.cpp \
+        LogTimeScaleDraw.cpp \
+        LogTimeScaleEngine.cpp \
         MainWindow.cpp \
+        ManualRideDialog.cpp \
+        ManualRideFile.cpp \
+        MetricAggregator.cpp \
+        Pages.cpp \
+        PerfPlot.cpp \
+        PerformanceManagerWindow.cpp \
         PfPvPlot.cpp \
         PfPvWindow.cpp \
         PolarRideFile.cpp \
         PowerHist.cpp \
-        HistogramWindow.cpp \
-        RawRideFile.cpp \
-        RideFile.cpp \
-        RideItem.cpp \
-        RideImportWizard.cpp \
-        RideMetric.cpp \
-        SrmRideFile.cpp \
-        TcxParser.cpp \
-        TcxRideFile.cpp \
-        QuarqParser.cpp \
-        QuarqRideFile.cpp \
-        TimeUtils.cpp \
-        BasicRideMetrics.cpp \
-        BikeScore.cpp \
-        ConfigDialog.cpp \
-        DatePickerDialog.cpp \
-        CommPort.cpp \
-        LogTimeScaleDraw.cpp \
-        LogTimeScaleEngine.cpp \
-        Pages.cpp \
         PowerTapDevice.cpp \
         PowerTapUtil.cpp \
+        QuarqParser.cpp \
+        QuarqRideFile.cpp \
+        RawRideFile.cpp \
+        RideCalendar.cpp \
+        RideFile.cpp \
+        RideImportWizard.cpp \
+        RideItem.cpp \
+        RideMetric.cpp \
+        Season.cpp \
+        SplitRideDialog.cpp \
+        SrmRideFile.cpp \
+        StressCalculator.cpp \
+        SummaryMetrics.cpp \
+        TcxParser.cpp \
+        TcxRideFile.cpp \
+        TimeUtils.cpp \
         ToolsDialog.cpp \
+        WeeklySummaryWindow.cpp \
+        WkoRideFile.cpp \
+        XmlRideFile.cpp \
         Zones.cpp \
         main.cpp \
-        srm.cpp \
-        Season.cpp \
-        MetricAggregator.cpp \
-        SummaryMetrics.cpp \
-        SplitRideDialog.cpp \
-        XmlRideFile.cpp \
-        WeeklySummaryWindow.cpp \
-        ManualRideFile.cpp \
-        ManualRideDialog.cpp \
-        RideCalendar.cpp \
-	PerfPlot.cpp \
-	StressCalculator.cpp \
-	PerformanceManagerWindow.cpp
+        srm.cpp
 
 RESOURCES = application.qrc
 
