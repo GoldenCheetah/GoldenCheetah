@@ -100,28 +100,12 @@ PowerTapUtil::is_data(unsigned char *buf, bool bVer81)
         return (buf[0] & 0x80) == 0x80;
 }
 
-static double 
-my_round(double x)
-{
-    int i = (int) x;
-    double z = x - i;
-    /* For some unknown reason, the PowerTap software rounds 196.5 down... */
-    if ((z > 0.5) || ((z == 0.5) && (i != 196)))
-        ++i;
-    return i;
-}
-
 #define MAGIC_CONSTANT 147375.0
 #define PI M_PI
-
 #define LBFIN_TO_NM 0.11298483
 
-#define BAD_LBFIN_TO_NM_1 0.112984
-#define BAD_LBFIN_TO_NM_2 0.1129824
-#define BAD_KM_TO_MI 0.62
-
 void
-PowerTapUtil::unpack_data(unsigned char *buf, int compat, double rec_int_secs,
+PowerTapUtil::unpack_data(unsigned char *buf, double rec_int_secs,
                           unsigned wheel_sz_mm, double *time_secs,
                           double *torque_Nm, double *mph, double *watts,
                           double *dist_m, unsigned *cad, unsigned *hr,
@@ -183,29 +167,16 @@ PowerTapUtil::unpack_data(unsigned char *buf, int compat, double rec_int_secs,
             *watts = -1.0;
         }
         else {
-            if (compat)
-                *torque_Nm = torque_inlbs * BAD_LBFIN_TO_NM_2;
-            else
-                *torque_Nm = torque_inlbs * LBFIN_TO_NM;
+            *torque_Nm = torque_inlbs * LBFIN_TO_NM;
             kph10 = MAGIC_CONSTANT / speed;
-            if (compat)
-                *mph = my_round(kph10) / 10.0 * BAD_KM_TO_MI;
-            else
-                *mph = kph10 / 10.0 * MILES_PER_KM;
+            *mph = kph10 / 10.0 * MILES_PER_KM;
 
             // from http://en.wikipedia.org/wiki/Torque#Conversion_to_other_units
             double dMetersPerMinute = (kph10 / 10.0) * 1000.0 / 60.0;
             double dWheelSizeMeters = wheel_sz_mm / 1000.0;
             double rpm = dMetersPerMinute/dWheelSizeMeters;
-            *watts = *torque_Nm * rpm * 2.0 * PI /60.0;
-
-            if (compat)
-                *watts = my_round(*watts);
-            else
-                *watts = round(*watts);
+            *watts = round(*torque_Nm * rpm * 2.0 * PI / 60.0);
         }
-        if (compat)
-            *torque_Nm = torque_inlbs * BAD_LBFIN_TO_NM_1;
         *dist_m += (buf[0] & 0x7f) * wheel_sz_mm / 1000.0;
         *cad = buf[4];
         if (*cad == 0xff)
