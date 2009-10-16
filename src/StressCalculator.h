@@ -26,6 +26,7 @@ class StressCalculator:public QObject {
 	int longTermDays;
 	double initialSTS;
 	double initialLTS;
+        double ste, lte;
 
 	int lastDaysIndex;
 

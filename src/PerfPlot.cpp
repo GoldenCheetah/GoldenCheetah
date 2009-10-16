@@ -59,7 +59,7 @@ void PerfPlot::plot() {
     boost::shared_ptr<QSettings> settings = GetApplicationSettings();
 
     int  num, tics;
-    tics = 27;
+    tics = 42;
 
     setAxisScale(yLeft, _sc->min(), _sc->max());
     num = xmax - xmin;
@@ -76,6 +76,8 @@ void PerfPlot::plot() {
 	tics  = 7;
     } else if (num < 141) {
 	tics  = 14;
+    } else if (num < 364) {
+	tics  = 27;
     }
     setAxisScale(xBottom, xmin, xmax,tics);
 
