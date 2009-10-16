@@ -21,6 +21,7 @@ PerformanceManagerWindow::PerformanceManagerWindow()
     QLabel *PMSTSLabel = new QLabel(settings->value(GC_STS_ACRONYM,"STS").toString() + ":", this);
     PMSTSValue = new QLineEdit("0");
     PMSTSValue->setReadOnly(true);
+    PMSTSValue->setValidator(new QDoubleValidator(0,500,1,PMSTSValue));
     PMPickerLayout->addWidget(PMSTSLabel);
     PMPickerLayout->addWidget(PMSTSValue);
 
@@ -28,6 +29,7 @@ PerformanceManagerWindow::PerformanceManagerWindow()
 
     PMLTSValue = new QLineEdit("0");
     PMLTSValue->setReadOnly(true);
+    PMLTSValue->setValidator(new QDoubleValidator(0,500,1,PMLTSValue));
     PMPickerLayout->addWidget(PMLTSLabel);
     PMPickerLayout->addWidget(PMLTSValue);
 
@@ -35,6 +37,7 @@ PerformanceManagerWindow::PerformanceManagerWindow()
 
     PMSBValue = new QLineEdit("0");
     PMSBValue->setReadOnly(true);
+    PMSBValue->setValidator(new QDoubleValidator(-500,500,1,PMSBValue));
     PMPickerLayout->addWidget(PMSBLabel);
     PMPickerLayout->addWidget(PMSBValue);
 
@@ -185,19 +188,19 @@ PerformanceManagerWindow::PMpickerMoved(const QPoint &pos)
 
     if (day >= perfplot->min() && day < perfplot->max()) {
 	// set the date string
-	PMDayValue->setText(perfplot->getStartDate().addDays(day).toString());
+	PMDayValue->setText(perfplot->getStartDate().addDays(day).toString("MMM d yyyy"));
 
 
 	sts = perfplot->getSTS(day);
-	QString STSlabel = QString("%1").arg(sts);
+	QString STSlabel = QString("%1").arg(sts,0,'f',1,0);
 	PMSTSValue->setText(STSlabel);
 
 	lts = perfplot->getLTS(day);
-	QString LTSlabel = QString("%1").arg(lts);
+	QString LTSlabel = QString("%1").arg(lts,0,'f',1,0);
 	PMLTSValue->setText(LTSlabel);
 
 	sb = perfplot->getSB(day);
-	QString SBlabel = QString("%1").arg(sb);
+	QString SBlabel = QString("%1").arg(sb,0,'f',1,0);
 	PMSBValue->setText(SBlabel);
     }
 

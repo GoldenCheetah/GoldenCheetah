@@ -27,6 +27,8 @@ StressCalculator::StressCalculator (
     xdays.resize(days+1);
     list.resize(days+1);
 
+    lte = (double)exp(-1.0/longTermDays);
+    ste = (double)exp(-1.0/shortTermDays);
 }
 
 
@@ -211,34 +213,34 @@ void StressCalculator::addRideData(double BS, QDateTime rideDate) {
     // fprintf(stderr,"addRideData (%.2f, %d)\n",BS,daysIndex);
 }
 
+
+/*
+ * calculate stress (in Bike Score units) using
+ * stress = today's BS * (1 - exp(-1/days)) + yesterday's stress * exp(-1/days)
+ * where days is the time period of concern- 7 for STS and 42 for LTS.
+ *
+ * exp(-1/days) for short and long term is calculated when the
+ * class is instantiated.
+ *
+ */
 void StressCalculator::calculate(int daysIndex) {
-    int i;
-    double sum;
+    double lastLTS, lastSTS;
+
     // LTS
-    sum = 0.0;
-    if (daysIndex < longTermDays - 1) {
-	// fake the first N days using the initial value
-	sum = initialLTS * (longTermDays - (daysIndex + 1));
-	i = 0;
-    }
-    else { i =  daysIndex - (longTermDays - 1); }
-    // sum the real values
-    for (; i <= daysIndex; i++)
-	sum += list[i];
-    ltsvalues[daysIndex] = sum / longTermDays;
+    if (daysIndex == 0)
+        lastLTS = initialLTS;
+    else
+        lastLTS = ltsvalues[daysIndex-1];
+
+    ltsvalues[daysIndex] = (list[daysIndex] * (1.0 - lte)) + (lastLTS * lte);
 
     // STS
-    sum = 0.0;
-    if (daysIndex < shortTermDays - 1) {
-	// fake the first N days using the initial value
-	sum = initialSTS * (shortTermDays - (daysIndex + 1));
-	i = 0;
-    }
-    else { i =  daysIndex - (shortTermDays - 1); }
-    // sum the real values
-    for (; i <= daysIndex; i++)
-	sum += list[i];
-    stsvalues[daysIndex] = sum / shortTermDays;
+    if (daysIndex == 0)
+        lastSTS = initialSTS;
+    else
+        lastSTS = stsvalues[daysIndex-1];
+
+    stsvalues[daysIndex] = (list[daysIndex] * (1.0 - ste)) + (lastSTS * ste);
 
     // SB (stress balance)  long term - short term
     sbvalues[daysIndex] =  ltsvalues[daysIndex] - stsvalues[daysIndex] ;
@@ -246,3 +248,4 @@ void StressCalculator::calculate(int daysIndex) {
     // xdays
     xdays[daysIndex] = daysIndex+1;
 }
+
