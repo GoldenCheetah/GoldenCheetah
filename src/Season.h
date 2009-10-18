@@ -20,26 +20,24 @@
 #define SEASON_H_
 
 #include <QString>
-#include <QDateTime>
+#include <QDate>
+#include <QFile>
 
 class Season 
-    {
+{
 	public:
 		Season();
-        QDateTime getStart();
-        QDateTime getEnd();
+        QDate getStart();
+        QDate getEnd();
         QString getName();
         
-        void setStart(QDateTime _start);
-        void setEnd(QDateTime _end);
+        void setStart(QDate _start);
+        void setEnd(QDate _end);
         void setName(QString _name);
         
 	private:
-        QDateTime start;
-        QDateTime end;
+        QDate start;
+        QDate end;
         QString name;
-        
-    };
-
-
+};
 #endif /* SEASON_H_ */

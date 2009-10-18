@@ -18,6 +18,10 @@
 
 #include "Season.h"
 #include <QString>
+#include <QFile>
+#include <QXmlInputSource>
+#include "SeasonParser.h"
+#include <QXmlSimpleReader>
 
 Season::Season()
 {
@@ -29,22 +33,22 @@ QString Season::getName() {
     return name;
 }
 
-QDateTime Season::getStart()
+QDate Season::getStart()
 {
     return start;
 }
 
-QDateTime Season::getEnd()
+QDate Season::getEnd()
 {
     return end;
 }
 
-void Season::setEnd(QDateTime _end) 
+void Season::setEnd(QDate _end)
 {
     end = _end;
 }
 
-void Season::setStart(QDateTime _start)
+void Season::setStart(QDate _start)
 {
     start = _start;
 }

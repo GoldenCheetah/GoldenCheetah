@@ -88,21 +88,6 @@ bool DBAccess::createMetricsTable()
     
 }
 
-bool DBAccess::createSeasonsTable()
-{
-    QSqlQuery query;
-    bool rc = query.exec("CREATE TABLE seasons(id integer primary key autoincrement,"
-                         "start_date date,"
-                         "end_date date,"
-                         "name varchar)");
-
-    if(!rc)
-		qDebug() << query.lastError();
-
-    return rc;
-}
-
-
 bool DBAccess::createDatabase()
 {
 
@@ -116,12 +101,7 @@ bool DBAccess::createDatabase()
     rc = createIndex();
     if(!rc)
         return rc;
-    
-    //Check to see if the table already exists..
-	QStringList tableList = db.tables(QSql::Tables);
-	if(!tableList.contains("seasons"))
-        return createSeasonsTable();
-	
+
     return true;
     
 }
@@ -230,44 +210,6 @@ QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
     }
                     
     return metrics;
-}
-
-bool DBAccess::createSeason(Season season)
-{
-    QSqlQuery query;
-	
-    query.prepare("INSERT INTO season (start_date, end_date, name) values (?,?,?)");
-	
-	
-	query.addBindValue(season.getStart());
-    query.addBindValue(season.getEnd());
-	query.addBindValue(season.getName());
-	
-    bool rc = query.exec();
-	
-	if(!rc)
-		qDebug() << query.lastError();
-
-	return rc;
-    
-}
-
-QList<Season> DBAccess::getAllSeasons()
-{
-    QSqlQuery query("SELECT start_date, end_date, name from season");
-    QList<Season> seasons;
-    
-    while(query.next())
-    {
-        Season season;
-        season.setStart(query.value(0).toDateTime());
-        season.setEnd(query.value(1).toDateTime());
-        season.setName(query.value(2).toString());
-        seasons << season;
-        
-    }
-    return seasons;
-    
 }
 
 bool DBAccess::dropMetricTable()

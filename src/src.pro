@@ -82,6 +82,7 @@ HEADERS += \
         RideItem.h \
         RideMetric.h \
         Season.h \
+        SeasonParser.h \
         Settings.h \
         SplitRideDialog.h \
         SrmRideFile.h \
@@ -139,6 +140,7 @@ SOURCES += \
         RideItem.cpp \
         RideMetric.cpp \
         Season.cpp \
+        SeasonParser.cpp \
         SplitRideDialog.cpp \
         SrmRideFile.cpp \
         StressCalculator.cpp \
