@@ -68,7 +68,7 @@ bool
 is_ride_filename(const QString filename)
 {
     QRegExp re("^([0-9][0-9][0-9][0-9])_([0-9][0-9])_([0-9][0-9])"
-	       "_([0-9][0-9])_([0-9][0-9])_([0-9][0-9])\\.(raw|srm|csv|tcx|hrm|wko)$");
+	       "_([0-9][0-9])_([0-9][0-9])_([0-9][0-9])\\.(raw|srm|csv|tcx|hrm|wko|qla)$");
     return (re.exactMatch(filename));
 }
 
