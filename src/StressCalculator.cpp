@@ -1,5 +1,5 @@
 
-#include <StressCalculator.h>
+#include "StressCalculator.h"
 #include "RideMetric.h"
 #include "RideItem.h"
 #include <stdio.h>
