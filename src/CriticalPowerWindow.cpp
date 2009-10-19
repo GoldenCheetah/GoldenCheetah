@@ -23,12 +23,19 @@
 #include "TimeUtils.h"
 #include <qwt_picker.h>
 #include <qwt_plot_picker.h>
+#include <QFile>
+#include "Season.h"
+#include "SeasonParser.h"
+#include <QXmlInputSource>
+#include <QXmlSimpleReader>
 
 CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
     QWidget(parent), home(home), mainWindow(parent)
 {
     QVBoxLayout *vlayout = new QVBoxLayout;
     QHBoxLayout *cpintPickerLayout = new QHBoxLayout;
+    QLabel *cSeasonLabel = new QLabel(tr("Season"), this);
+    cComboSeason = new QComboBox(this);
     QLabel *cpintTimeLabel = new QLabel(tr("Interval Duration:"), this);
     cpintTimeValue = new QLineEdit("0 s");
     QLabel *cpintTodayLabel = new QLabel(tr("Today:"), this);
@@ -42,6 +49,10 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
     cpintSetCPButton = new QPushButton(tr("&Save CP value"), this);
     cpintSetCPButton->setEnabled(false);
 
+    addSeasons();
+
+    cpintPickerLayout->addWidget(cSeasonLabel);
+    cpintPickerLayout->addWidget(cComboSeason);
     cpintPickerLayout->addWidget(cpintTimeLabel);
     cpintPickerLayout->addWidget(cpintTimeValue);
     cpintPickerLayout->addWidget(cpintTodayLabel);
@@ -64,6 +75,9 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
             SLOT(pickerMoved(const QPoint &)));
     connect(cpintSetCPButton, SIGNAL(clicked()),
 	    this, SLOT(cpintSetCPButtonClicked()));
+    connect(cComboSeason, SIGNAL(currentIndexChanged(int)),
+    this, SLOT(seasonSelected(int)));
+
 }
 
 void
@@ -82,6 +96,7 @@ CriticalPowerWindow::deleteCpiFile(QString rideFilename)
 void
 CriticalPowerWindow::setData(RideItem *ride)
 {
+    currentRide = ride;
     cpintPlot->calculate(ride);
     cpintSetCPButton->setEnabled(cpintPlot->cp > 0);
 }
@@ -157,4 +172,38 @@ CriticalPowerWindow::pickerMoved(const QPoint &pos)
       cpintAllValue->setText(label);
     }
 }
+
+void CriticalPowerWindow::addSeasons()
+{
+    QFile seasonFile(home.absolutePath() + "/seasons.xml");
+    QXmlInputSource source( &seasonFile );
+    QXmlSimpleReader xmlReader;
+    SeasonParser( handler );
+    xmlReader.setContentHandler(&handler);
+    xmlReader.setErrorHandler(&handler);
+    bool ok = xmlReader.parse( source );
+    if(!ok)
+        qWarning("Failed to parse seasons.xml");
+
+    seasons = handler.getSeasons();
+    Season season;
+    season.setName("All Seasons");
+    seasons.insert(0,season);
+
+    for (int i = 0; i < seasons.size(); ++i)
+    {
+        season = seasons.at(i);
+        cComboSeason->addItem(season.getName());
+    }
+}
+
+void CriticalPowerWindow::seasonSelected(int iSeason)
+{
+    Season season = seasons.at(iSeason);
+    cpintPlot->setStartDate(season.getStart());
+    cpintPlot->setEndDate(season.getEnd());
+    cpintPlot->needToScanRides = true;
+    cpintPlot->calculate(currentRide);
+}
+
 

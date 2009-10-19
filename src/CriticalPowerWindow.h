@@ -20,6 +20,7 @@
 #define _GC_CriticalPowerWindow_h 1
 
 #include <QtGui>
+#include "Season.h"
 
 class CpintPlot;
 class MainWindow;
@@ -42,6 +43,7 @@ class CriticalPowerWindow : public QWidget
 
         void cpintSetCPButtonClicked();
         void pickerMoved(const QPoint &pos);
+        void seasonSelected(int season);
 
     protected:
 
@@ -51,8 +53,12 @@ class CriticalPowerWindow : public QWidget
         QLineEdit *cpintTimeValue;
         QLineEdit *cpintTodayValue;
         QLineEdit *cpintAllValue;
+        QComboBox *cComboSeason;
 	QPushButton *cpintSetCPButton;
         QwtPlotPicker *picker;
+        void addSeasons();
+        QList<Season> seasons;
+        RideItem *currentRide;
 };
 
 #endif // _GC_CriticalPowerWindow_h

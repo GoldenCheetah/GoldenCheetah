@@ -29,6 +29,7 @@
 #include "LogTimeScaleDraw.h"
 #include "LogTimeScaleEngine.h"
 #include "RideFile.h"
+#include "Season.h"
 
 CpintPlot::CpintPlot(
 		     QString p
@@ -695,6 +696,7 @@ CpintPlot::calculate(RideItem *rideItem)
             QStringList filters;
             filters << "*.cpi";
             QStringList list = dir.entryList(filters, QDir::Files, QDir::Name);
+            list = filterForSeason(list, startDate, endDate);
             progress->setLabelText(
                 existing + tr("Aggregating over all files."));
             progress->setRange(0, list.size());
@@ -813,4 +815,40 @@ CpintPlot::showGrid(int state)
     assert(state != Qt::PartiallyChecked);
     grid->setVisible(state == Qt::Checked);
     replot();
+}
+
+QStringList
+CpintPlot::filterForSeason(QStringList cpints, QDate startDate, QDate endDate)
+{
+    QString cpi;
+    QDate cpiDate;
+    QStringListIterator cpis(cpints);
+    QStringList returnList;
+
+    //Check to see if no date was assigned.
+    QDate nilDate;
+    if(startDate == nilDate)
+        return cpints;
+
+    while (cpis.hasNext())
+    {
+        cpi = cpis.next();
+        cpiDate = cpi_filename_to_date(cpi);
+        if(cpiDate > startDate && cpiDate < endDate)
+            returnList << cpi;
+
+    }
+    return returnList;
+}
+
+void
+CpintPlot::setStartDate(QDate _startDate)
+{
+    startDate = _startDate;
+}
+
+void
+CpintPlot::setEndDate(QDate _endDate)
+{
+    endDate = _endDate;
 }

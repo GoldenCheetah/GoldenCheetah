@@ -52,7 +52,8 @@ class CpintPlot : public QwtPlot
 	double cp, tau, t0;                   // CP model parameters
 	void deriveCPParameters();            // derive the CP model parameters
 	bool deleteCpiFile(QString filename); // delete a CPI file and clean up
-
+    void setStartDate(QDate);
+    void setEndDate(QDate);
 
     public slots:
 
@@ -78,11 +79,13 @@ class CpintPlot : public QwtPlot
 	QList <QwtPlotCurve *> allCurves;
 	QList <QwtPlotMarker *> allZoneLabels;
 	void clear_CP_Curves();
-
+    QStringList filterForSeason(QStringList cpints, QDate startDate, QDate endDate);
         QwtPlotGrid *grid;
-        
+
         QVector<double> bests;
 	QVector<QDate> bestDates;
+    QDate startDate;
+    QDate endDate;
 
 	Zones **zones;                // pointer to power zones added djconnel 24Apr2009
 
