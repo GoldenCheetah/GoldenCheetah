@@ -128,9 +128,14 @@ void PerfPlot::plot() {
 
 void PerfPlot::resize(int newmin, int newmax)
 {
-    if (newmin >= 0 && newmin < _sc->n() && newmin < xmax)
+    if (newmin < 0)
+        newmin = 0;
+    if (newmax >= _sc->n())
+        newmax = _sc->n();
+
+    if (newmin >= 0 && newmin <= _sc->n() && newmin < xmax)
 	xmin = newmin;
-    if (newmax >= 0 && newmax < _sc->n() && newmax > xmin)
+    if (newmax >= 0 && newmax <= _sc->n() && newmax > xmin)
 	xmax = newmax;
 
     plot();
