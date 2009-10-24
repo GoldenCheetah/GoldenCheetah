@@ -19,6 +19,7 @@
 #include <SeasonParser.h>
 #include <QDate>
 #include <QDebug>
+#include <assert.h>
 
 bool SeasonParser::startDocument()
 {
