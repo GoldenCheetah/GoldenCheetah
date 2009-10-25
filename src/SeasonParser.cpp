@@ -80,9 +80,10 @@ QDate SeasonParser::seasonDateToDate(QString seasonDate)
                 return date;
         }
         else
-            return QDate();          // return value was 1 Jan: changed to null
+            return QDate(); // return value was 1 Jan: changed to null
 }
 bool SeasonParser::endDocument()
 {
-    seasons[seasons.size()-1].setEnd(QDate::currentDate().addYears(10)); //Go 10 years into the future (GC's version of infinity).
+    // Go 10 years into the future (GC's version of infinity)
+    seasons[seasons.size()-1].setEnd(QDate::currentDate().addYears(10));
 }
