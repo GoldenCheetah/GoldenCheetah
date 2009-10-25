@@ -29,6 +29,8 @@ StressCalculator::StressCalculator (
 
     lte = (double)exp(-1.0/longTermDays);
     ste = (double)exp(-1.0/shortTermDays);
+    
+    settings = GetApplicationSettings();
 }
 
 
@@ -95,9 +97,21 @@ void StressCalculator::calculateStress(QWidget *mw,
     }
 
     QString ridedatestring;
-    item = (RideItem*) rides->child(0);
+    
+    QVariant isAscending = settings->value(GC_ALLRIDES_ASCENDING,Qt::Checked);
+    
+    if(isAscending.toInt() > 0 ){
+        item = (RideItem*) rides->child(0);
+    } else {
+        item = (RideItem*) rides->child(rides->childCount()-1);
+    }
+
     for (int i = 0; i < rides->childCount(); ++i) {
-	item = (RideItem*) rides->child(i);
+        if(isAscending.toInt() > 0 ){
+            item = (RideItem*) rides->child(i);
+        } else {
+            item = (RideItem*) rides->child(rides->childCount()-1-i);
+        }
 
 	// calculate using rides within date range
 	if (item->dateTime.daysTo(startDate) <= 0 &&
@@ -208,6 +222,7 @@ void StressCalculator::addRideData(double BS, QDateTime rideDate) {
 	calculate(d);
     }
     // do this ride (may be more than one ride in a day)
+    if(daysIndex < 0) return;
     list[daysIndex] += BS;
     calculate(daysIndex);
     lastDaysIndex = daysIndex;
