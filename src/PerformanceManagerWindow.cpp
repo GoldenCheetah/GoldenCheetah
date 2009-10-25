@@ -104,8 +104,14 @@ void PerformanceManagerWindow::replot(QDir home,QTreeWidgetItem *allRides)
     // calculate the number of days to look at... for now
     // use first ride in allRides to today.  When Season stuff is hooked
     // up, maybe use that, or will allRides reflect only current season?
-    firstRideItem =  (RideItem*) allRides->child(0);
-
+    
+    QVariant isAscending = settings->value(GC_ALLRIDES_ASCENDING,Qt::Checked);
+    if(isAscending.toInt() > 0 ){
+        firstRideItem =  (RideItem*) allRides->child(0);
+    } else {
+        firstRideItem =  (RideItem*) allRides->child(allRides->childCount()-1);
+    }
+    
     if (firstRideItem) {
 
 	newdays = firstRideItem->dateTime.daysTo(now.currentDateTime());
