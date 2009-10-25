@@ -121,13 +121,15 @@ void StressCalculator::calculateStress(QWidget *mw,
 		bs = cache[ridedatestring];
 	    }
 	    else {
-		item->htmlSummary(); // compute metrics
+		item->computeMetrics();
 
 		if ((m = item->metrics.value("skiba_bike_score")) &&
 			m->value(true)) {
 		    bs = m->value(true);
 		}
 		cache[ridedatestring] = bs;
+
+                item->freeMemory();
 	    }
 
 	    addRideData(bs,item->dateTime);
