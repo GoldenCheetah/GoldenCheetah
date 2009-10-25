@@ -1,3 +1,13 @@
+To build
+
+  cp src/gcconfig.pri.in src/gcconfig.pri
+  cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
+
+Edit both src/gcconfig.pri and qwt/qwtconfig.pri as necessary, then
+
+  qmake
+  make
+
 To uninstall the older FTDI VCP drivers on Mac OS X, open a Terminal and type:
 
   sudo mv /System/Library/Extensions/FTDIUSBSerialDriver.kext /tmp
