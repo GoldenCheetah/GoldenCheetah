@@ -31,7 +31,7 @@ RideItem::RideItem(int type,
                    QString path, QString fileName, const QDateTime &dateTime, 
                    Zones **zones, QString notesFileName) : 
     QTreeWidgetItem(type), path(path), fileName(fileName), 
-    dateTime(dateTime), zones(zones), notesFileName(notesFileName)
+    dateTime(dateTime), ride(NULL), zones(zones), notesFileName(notesFileName)
 {
     setText(0, dateTime.toString("ddd"));
     setText(1, dateTime.toString("MMM d, yyyy"));
@@ -176,6 +176,73 @@ static const char *metricsXml =
     "  </metric_group>\n"
     "</metrics>\n";
 
+void
+RideItem::freeMemory()
+{
+    if (ride) {
+        delete ride;
+        ride = NULL;
+    }
+}
+
+void
+RideItem::computeMetrics()
+{
+    const QDateTime nilTime;
+    if ((computeMetricsTime != nilTime) &&
+	(!zones || !*zones || (computeMetricsTime >= (*zones)->modificationTime))) {
+        return;
+    }
+
+    if (!ride) {
+        QFile file(path + "/" + fileName);
+        QStringList errors;
+        ride = RideFileFactory::instance().openRideFile(file, errors);
+        if (!ride)
+            return;
+    }
+
+    computeMetricsTime = QDateTime::currentDateTime();
+
+    int zone_range = -1;
+    int num_zones = 0;
+    if (zones && *zones &&
+        ((zone_range = (*zones)->whichRange(dateTime.date())) >= 0)) {
+        num_zones = (*zones)->numZones(zone_range);
+    }
+
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    QSet<QString> todo;
+
+    // hack djconnel: do the metrics TWICE, to catch dependencies
+    // on displayed variables.  Presently if a variable depends on zones,
+    // for example, and zones change, the value may be considered still
+    // value even though it will change.  This is presently happening
+    // where bikescore depends on relative intensity.
+    // note metrics are only calculated if zones are defined
+    for (int metriciteration = 0; metriciteration < 2; metriciteration ++) {
+        for (int i = 0; i < factory.metricCount(); ++i) {
+            todo.insert(factory.metricName(i));
+
+            while (!todo.empty()) {
+                QMutableSetIterator<QString> i(todo);
+            later:
+                while (i.hasNext()) {
+                    const QString &name = i.next();
+                    const QVector<QString> &deps = factory.dependencies(name);
+                    for (int j = 0; j < deps.size(); ++j)
+                        if (!metrics.contains(deps[j]))
+                            goto later;
+                    RideMetric *metric = factory.newMetric(name);
+                    metric->compute(ride, *zones, zone_range, metrics);
+                    metrics.insert(name, metric);
+                    i.remove();
+                }
+            }
+        }
+    }
+}
+
 QString 
 RideItem::htmlSummary()
 {
@@ -201,6 +268,7 @@ RideItem::htmlSummary()
                    + dateTime.toString("dddd MMMM d, yyyy, h:mm AP") 
                    + "</h2><h3>Device Type: " + ride->deviceType() + "</h3>");
 
+        computeMetrics();
         
         boost::shared_ptr<QSettings> settings = GetApplicationSettings();	
         QVariant unit = settings->value(GC_UNIT);
@@ -214,37 +282,6 @@ RideItem::htmlSummary()
 		time_in_zone.clear();
 		time_in_zone.resize(num_zones);
 	    }
- 
-	const RideMetricFactory &factory = RideMetricFactory::instance();
-	QSet<QString> todo;
-
-	// hack djconnel: do the metrics TWICE, to catch dependencies
-	// on displayed variables.  Presently if a variable depends on zones,
-	// for example, and zones change, the value may be considered still
-	// value even though it will change.  This is presently happening
-	// where bikescore depends on relative intensity.
-	// note metrics are only calculated if zones are defined
-	for (int metriciteration = 0; metriciteration < 2; metriciteration ++) {
-	    for (int i = 0; i < factory.metricCount(); ++i) {
-		todo.insert(factory.metricName(i));
-
-		while (!todo.empty()) {
-		    QMutableSetIterator<QString> i(todo);
-		later:
-		    while (i.hasNext()) {
-			const QString &name = i.next();
-			const QVector<QString> &deps = factory.dependencies(name);
-			for (int j = 0; j < deps.size(); ++j)
-			    if (!metrics.contains(deps[j]))
-				goto later;
-			RideMetric *metric = factory.newMetric(name);
-			metric->compute(ride, *zones, zone_range, metrics);
-			metrics.insert(name, metric);
-			i.remove();
-		    }
-		}
-	    }
-	}
 
         double secs_watts = 0.0;
        
