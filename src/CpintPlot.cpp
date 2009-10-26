@@ -380,9 +380,6 @@ CpintPlot::deriveCPParameters()
 	t0 = tau / (bests[1] / cp - 1) - 1 / 60.0;
         #endif
 
-	// the following line is debugging code and can be removed
-	fprintf(stderr, "%d: tau = %.2f; cp = %.2f; t0 = %.2f\n", iteration, tau, cp, t0);
-
     } while ((fabs(tau - tau_prev) > tau_delta_max) ||
 	     (fabs(t0 - t0_prev) > t0_delta_max)
 	     );
