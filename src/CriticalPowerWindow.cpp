@@ -33,36 +33,52 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
     QWidget(parent), home(home), mainWindow(parent)
 {
     QVBoxLayout *vlayout = new QVBoxLayout;
-    QHBoxLayout *cpintPickerLayout = new QHBoxLayout;
-    QLabel *cSeasonLabel = new QLabel(tr("Season"), this);
-    cComboSeason = new QComboBox(this);
+
+    cpintPlot = new CpintPlot(home.path());
+    vlayout->addWidget(cpintPlot);
+
+    QFormLayout *cpintPickerLayout = new QFormLayout;
+    QFormLayout *cpintPickerLayout2 = new QFormLayout;
     QLabel *cpintTimeLabel = new QLabel(tr("Interval Duration:"), this);
     cpintTimeValue = new QLineEdit("0 s");
     QLabel *cpintTodayLabel = new QLabel(tr("Today:"), this);
     cpintTodayValue = new QLineEdit(tr("no data"));
-    QLabel *cpintAllLabel = new QLabel(tr("All Rides:"), this);
+    QLabel *cpintAllLabel = new QLabel(tr("Best:"), this);
     cpintAllValue = new QLineEdit(tr("no data"));
+    QLabel *cpintCPLabel = new QLabel(tr("CP Curve:"), this);
+    cpintCPValue = new QLineEdit(tr("no data"));
+
+    QFontMetrics metrics(QApplication::font());
+    int width = metrics.width("8888 watts (88/88/8888)") + 10;
+    cpintAllValue->setFixedWidth(width);
+    cpintCPValue->setFixedWidth(width); // so lines up nicely
+
     cpintTimeValue->setReadOnly(true);
     cpintTodayValue->setReadOnly(true);
     cpintAllValue->setReadOnly(true);
+    cpintCPValue->setReadOnly(true);
+    cpintPickerLayout->addRow(cpintTimeLabel, cpintTimeValue);
+    cpintPickerLayout->addRow(cpintTodayLabel, cpintTodayValue);
+    cpintPickerLayout2->addRow(cpintAllLabel, cpintAllValue);
+    cpintPickerLayout2->addRow(cpintCPLabel, cpintCPValue);
 
+    QHBoxLayout *bottomLayout = new QHBoxLayout;
+
+    bottomLayout->addLayout(cpintPickerLayout);
+    bottomLayout->addLayout(cpintPickerLayout2);
+
+    QVBoxLayout *otherLayout = new QVBoxLayout;
+    cComboSeason = new QComboBox(this);
+    addSeasons();
     cpintSetCPButton = new QPushButton(tr("&Save CP value"), this);
     cpintSetCPButton->setEnabled(false);
+    otherLayout->addWidget(cpintSetCPButton);
+    otherLayout->addWidget(cComboSeason);
 
-    addSeasons();
+    bottomLayout->addLayout(otherLayout);
 
-    cpintPickerLayout->addWidget(cSeasonLabel);
-    cpintPickerLayout->addWidget(cComboSeason);
-    cpintPickerLayout->addWidget(cpintTimeLabel);
-    cpintPickerLayout->addWidget(cpintTimeValue);
-    cpintPickerLayout->addWidget(cpintTodayLabel);
-    cpintPickerLayout->addWidget(cpintTodayValue);
-    cpintPickerLayout->addWidget(cpintAllLabel);
-    cpintPickerLayout->addWidget(cpintAllValue);
-    cpintPickerLayout->addWidget(cpintSetCPButton);
-    cpintPlot = new CpintPlot(home.path());
-    vlayout->addWidget(cpintPlot);
-    vlayout->addLayout(cpintPickerLayout);
+    vlayout->addLayout(bottomLayout);
+
     setLayout(vlayout);
 
     picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
@@ -154,6 +170,17 @@ CriticalPowerWindow::pickerMoved(const QPoint &pos)
       else
 	label = tr("no data");
       cpintTodayValue->setText(label);
+    }
+
+    // cp line
+    if (cpintPlot->getCPCurve()) {
+      unsigned watts = curve_to_point(minutes, cpintPlot->getCPCurve());
+      QString label;
+      if (watts > 0)
+       label = QString("%1 watts").arg(watts);
+      else
+       label = tr("no data");
+      cpintCPValue->setText(label);
     }
 
     // global ride
