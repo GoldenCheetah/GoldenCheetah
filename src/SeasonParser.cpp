@@ -86,4 +86,5 @@ bool SeasonParser::endDocument()
 {
     // Go 10 years into the future (GC's version of infinity)
     seasons[seasons.size()-1].setEnd(QDate::currentDate().addYears(10));
+    return TRUE;
 }
