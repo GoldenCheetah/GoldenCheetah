@@ -53,6 +53,7 @@ class CriticalPowerWindow : public QWidget
         QLineEdit *cpintTimeValue;
         QLineEdit *cpintTodayValue;
         QLineEdit *cpintAllValue;
+        QLineEdit *cpintCPValue;
         QComboBox *cComboSeason;
 	QPushButton *cpintSetCPButton;
         QwtPlotPicker *picker;

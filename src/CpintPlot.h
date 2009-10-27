@@ -46,6 +46,7 @@ class CpintPlot : public QwtPlot
         bool needToScanRides;
 
         const QwtPlotCurve *getThisCurve() const { return thisCurve; }
+        const QwtPlotCurve *getCPCurve() const { return CPCurve; }
 
 	QVector<QDate> getBestDates() { return bestDates; }
 	QVector<double> getBests() { return bests; }
