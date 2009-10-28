@@ -169,7 +169,7 @@ void
 AllPlotWindow::setAllPlotWidgets(RideItem *ride)
 {
     if (ride->ride) {
-	RideFileDataPresent *dataPresent = ride->ride->areDataPresent();
+	const RideFileDataPresent *dataPresent = ride->ride->areDataPresent();
 	showPower->setEnabled(dataPresent->watts);
 	showHr->setEnabled(dataPresent->hr);
 	showSpeed->setEnabled(dataPresent->kph);
