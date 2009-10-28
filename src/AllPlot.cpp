@@ -495,7 +495,7 @@ AllPlot::setData(RideItem *_rideItem)
     if (ride) {
 	setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
 
-	RideFileDataPresent *dataPresent = ride->areDataPresent();
+	const RideFileDataPresent *dataPresent = ride->areDataPresent();
 	int npoints = ride->dataPoints().size();
 	wattsArray.resize(dataPresent->watts ? npoints : 0);
 	hrArray.resize(dataPresent->hr ? npoints : 0);

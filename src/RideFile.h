@@ -88,7 +88,7 @@ class RideFile
         const QDateTime &startTime() const { return startTime_; }
         double recIntSecs() const { return recIntSecs_; }
         const QList<RideFilePoint*> dataPoints() const { return dataPoints_; }
-        inline RideFileDataPresent *areDataPresent() { return &dataPresent; }
+        inline const RideFileDataPresent *areDataPresent() const { return &dataPresent; }
         const QString &deviceType() const { return deviceType_; }
 
         void setStartTime(const QDateTime &value) { startTime_ = value; }
