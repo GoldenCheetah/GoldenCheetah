@@ -22,6 +22,7 @@
 #include "Units.h"
 #include <QRegExp>
 #include <QTextStream>
+#include <QVector>
 #include <algorithm> // for std::sort
 #include <assert.h>
 #include "math.h"
@@ -211,13 +212,13 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
     int n = rideFile->dataPoints().size();
     n = qMin(n, 1000);
     if (n >= 2) {
-        double *secs = new double[n-1];
+        QVector<double> secs(n-1);
         for (int i = 0; i < n-1; ++i) {
             double now = rideFile->dataPoints()[i]->secs;
             double then = rideFile->dataPoints()[i+1]->secs;
             secs[i] = then - now;
         }
-        std::sort(secs, secs + n - 1);
+        std::sort(secs.begin(), secs.end());
         int mid = n / 2 - 1;
         double recint = round(secs[mid] * 1000.0) / 1000.0;
         rideFile->setRecIntSecs(recint);
