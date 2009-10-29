@@ -48,6 +48,7 @@ HEADERS += \
         BestIntervalDialog.h \
         ChooseCyclistDialog.h \
         CommPort.h \
+        Computrainer3dpFile.h \
         ConfigDialog.h \
         CpintPlot.h \
         CriticalPowerWindow.h \
@@ -97,7 +98,7 @@ HEADERS += \
         WkoRideFile.h \
         XmlRideFile.h \
         Zones.h \
-        srm.h
+        srm.h \
 
 SOURCES += \
         AllPlot.cpp \
@@ -107,6 +108,7 @@ SOURCES += \
         BikeScore.cpp \
         ChooseCyclistDialog.cpp \
         CommPort.cpp \
+        Computrainer3dpFile.cpp \
         ConfigDialog.cpp \
         CpintPlot.cpp \
         CriticalPowerWindow.cpp \
@@ -154,7 +156,7 @@ SOURCES += \
         XmlRideFile.cpp \
         Zones.cpp \
         main.cpp \
-        srm.cpp
+        srm.cpp \
 
 RESOURCES = application.qrc
 

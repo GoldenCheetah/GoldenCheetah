@@ -227,9 +227,9 @@ RideImportWizard::process()
             // is it one we understand ?
             QRegExp suffixes;
             if (quarqInterpreterInstalled())
-                suffixes.setPattern("^(raw|srm|csv|tcx|qla|hrm|wko)$");
+                suffixes.setPattern("^(raw|srm|csv|tcx|qla|hrm|wko|3dp)$");
             else
-                suffixes.setPattern("^(raw|srm|csv|tcx|hrm|wko)$");
+                suffixes.setPattern("^(raw|srm|csv|tcx|hrm|wko|3dp)$");
 
             suffixes.setCaseSensitivity(Qt::CaseInsensitive);
 
