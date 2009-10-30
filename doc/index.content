@@ -8,8 +8,8 @@ GoldenCheetah is a software package that:
 PowerControl.<p>
 
 <li>Imports ride data downloaded with other programs, including TrainingPeaks
-WKO+ and the manufacturers' software for the Ergomo, Garmin, Polar, and SRM
-devices.<p>
+WKO+ and the manufacturers' software for the Ergomo, Garmin, Polar, PowerTap,
+and SRM devices.<p>
 
 <li>Provides a rich set of analysis tools, including a critical power graph,
 BikeScore calculation, histogram analysis, a best interval finder, and a pedal
