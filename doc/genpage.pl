@@ -63,7 +63,7 @@ body {
 <br> <b><a href="download.html">Download</a></b>
 <br> <b><a href="contrib.html">Contributors</a></b>
 <br> <b><a href="search.html">Search</a></b>
-<br> <b><a href="cgi-bin/mailman/listinfo/golden-cheetah-users">Mailing List</a></b>
+<br> <b><a href="http://groups.google.com/group/golden-cheetah-users">Mailing List</a></b>
 
 </center>
 </td>
