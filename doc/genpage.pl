@@ -107,9 +107,9 @@ while (<FILE>) {
 }
 close (FILE);
 
-if (defined $last_mod) {
-    print "<p><hr><em>Last modified $last_mod.</em>\n";
-}
+#if (defined $last_mod) {
+#    print "<p><hr><em>Last modified $last_mod.</em>\n";
+#}
 
 print<<EOF;
 
