@@ -125,6 +125,7 @@ class RideFileFactory {
         int registerReader(const QString &suffix, RideFileReader *reader);
         RideFile *openRideFile(QFile &file, QStringList &errors) const;
         QStringList listRideFiles(const QDir &dir) const;
+        QStringList suffixes() const;
 };
 
 #endif // _RideFile_h

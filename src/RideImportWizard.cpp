@@ -225,12 +225,8 @@ RideImportWizard::process()
         if (thisfile.exists() && thisfile.isFile() && thisfile.isReadable()) {
 
             // is it one we understand ?
-            QRegExp suffixes;
-            if (quarqInterpreterInstalled())
-                suffixes.setPattern("^(raw|srm|csv|tcx|qla|hrm|wko|3dp)$");
-            else
-                suffixes.setPattern("^(raw|srm|csv|tcx|hrm|wko|3dp)$");
-
+            QStringList suffixList = RideFileFactory::instance().suffixes();
+            QRegExp suffixes(QString("^(%1)$").arg(suffixList.join("|")));
             suffixes.setCaseSensitivity(Qt::CaseInsensitive);
 
             if (suffixes.exactMatch(thisfile.suffix())) {

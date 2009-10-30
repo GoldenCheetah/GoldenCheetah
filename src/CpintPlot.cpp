@@ -68,8 +68,10 @@ struct cpi_file_info {
 bool
 is_ride_filename(const QString filename)
 {
-    QRegExp re("^([0-9][0-9][0-9][0-9])_([0-9][0-9])_([0-9][0-9])"
-	       "_([0-9][0-9])_([0-9][0-9])_([0-9][0-9])\\.(raw|srm|csv|tcx|hrm|wko|qla|3dp)$");
+    QStringList suffixList = RideFileFactory::instance().suffixes();
+    QString s("^([0-9][0-9][0-9][0-9])_([0-9][0-9])_([0-9][0-9])"
+	       "_([0-9][0-9])_([0-9][0-9])_([0-9][0-9])\\.(%1)$");
+    QRegExp re(s.arg(suffixList.join("|")));
     return (re.exactMatch(filename));
 }
 

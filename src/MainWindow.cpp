@@ -533,17 +533,13 @@ MainWindow::importFile()
     QString lastDir = (lastDirVar != QVariant()) 
         ? lastDirVar.toString() : QDir::homePath();
    
+    QStringList suffixList = RideFileFactory::instance().suffixes();
+    suffixList.replaceInStrings(QRegExp("^"), "*.");
+    QString suffixes = suffixList.join(" ");
     QStringList fileNames; 
-    if (quarqInterpreterInstalled()) {
-        fileNames = QFileDialog::getOpenFileNames(
+    fileNames = QFileDialog::getOpenFileNames(
         this, tr("Import from File"), lastDir,
-        tr("All Support Formats (*.raw *.csv *.srm *.tcx *.hrm *.wko *.3dp *.qla);;Raw Powertap Files (*.raw);;Comma Separated Variable (*.csv);;SRM training files (*.srm);;Garmin Training Centre (*.tcx);;Polar Precision (*.hrm);;WKO+ Files (*.wko);;Computrainer 3dp (*.3dp);;Quarq ANT+ Files (*.qla);;All files (*.*)"));
-    } else {
-        fileNames = QFileDialog::getOpenFileNames(
-        this, tr("Import from File"), lastDir,
-        tr("All Support Formats (*.raw *.csv *.srm *.tcx *.hrm *.wko *.3dp);;Raw Powertap Files (*.raw);;Comma Separated Variable (*.csv);;SRM training files (*.srm);;Garmin Training Centre (*.tcx);;Polar Precision (*.hrm);;WKO+ Files (*.wko);;Computrainer 3dp (*.3dp);;All files (*.*)"));
-
-    }
+        tr("All Support Formats (%1);;Raw Powertap Files (*.raw);;Comma Separated Variable (*.csv);;SRM training files (*.srm);;Garmin Training Centre (*.tcx);;Polar Precision (*.hrm);;WKO+ Files (*.wko);;Computrainer 3dp (*.3dp);;Quarq ANT+ Files (*.qla);;All files (*.*)").arg(suffixes));
 
     if (!fileNames.isEmpty()) {
         lastDir = QFileInfo(fileNames.front()).absolutePath();
