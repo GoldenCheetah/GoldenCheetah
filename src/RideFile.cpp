@@ -170,6 +170,11 @@ int RideFileFactory::registerReader(const QString &suffix,
     return 1;
 }
 
+QStringList RideFileFactory::suffixes() const
+{
+    return readFuncs_.keys();
+}
+
 RideFile *RideFileFactory::openRideFile(QFile &file, 
                                            QStringList &errors) const 
 {
