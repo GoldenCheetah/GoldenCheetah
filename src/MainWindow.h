@@ -68,7 +68,6 @@ class MainWindow : public QMainWindow
         void downloadRide();
         void manualRide();
         void exportCSV();
-        void exportXML();
         void importFile();
         void findBestIntervals();
         void splitRide();
