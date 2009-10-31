@@ -100,6 +100,7 @@ HEADERS += \
         srm.h \
 
 SOURCES += \
+        AerobicDecoupling.cpp \
         AllPlot.cpp \
         AllPlotWindow.cpp \
         BasicRideMetrics.cpp \
