@@ -165,14 +165,16 @@ static const char *metricsXml =
     "    <metric name=\"average_cad\" display_name=\"Cadence\"\n"
     "            precision=\"0\"/>\n"
     "  </metric_group>\n"
-    "  <metric_group name=\"BikeScore&#8482;\" note=\"BikeScore is a trademark "
+    "  <metric_group name=\"Metrics\" note=\"BikeScore is a trademark "
     "      of Dr. Philip Friere Skiba, PhysFarm Training Systems LLC\">\n"
     "    <metric name=\"skiba_xpower\" display_name=\"xPower\"\n"
     "            precision=\"0\"/>\n"
     "    <metric name=\"skiba_relative_intensity\"\n"
     "            display_name=\"Relative Intensity\" precision=\"3\"/>\n"
-    "    <metric name=\"skiba_bike_score\" display_name=\"BikeScore\"\n"
+    "    <metric name=\"skiba_bike_score\" display_name=\"BikeScore&#8482;\"\n"
     "            precision=\"0\"/>\n"
+    "    <metric name=\"aerobic_decoupling\" display_name=\"Aerobic Decoupling\"\n"
+    "            precision=\"2\"/>\n"
     "  </metric_group>\n"
     "</metrics>\n";
 
