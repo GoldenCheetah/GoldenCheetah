@@ -65,16 +65,6 @@ struct cpi_file_info {
     QString file, inname, outname;
 };
 
-bool
-is_ride_filename(const QString filename)
-{
-    QStringList suffixList = RideFileFactory::instance().suffixes();
-    QString s("^([0-9][0-9][0-9][0-9])_([0-9][0-9])_([0-9][0-9])"
-	       "_([0-9][0-9])_([0-9][0-9])_([0-9][0-9])\\.(%1)$");
-    QRegExp re(s.arg(suffixList.join("|")));
-    return (re.exactMatch(filename));
-}
-
 QString
 ride_filename_to_cpi_filename(const QString filename)
 {
@@ -88,7 +78,7 @@ cpi_files_to_update(const QDir &dir, QList<cpi_file_info> &result)
     QListIterator<QString> i(filenames);
     while (i.hasNext()) {
         const QString &filename = i.next();
-	if (is_ride_filename(filename)) {
+	if (RideFileFactory::instance().rideFileRegExp().exactMatch(filename)) {
 	    QString inname = dir.absoluteFilePath(filename);
 	    QString outname = 
 		dir.absoluteFilePath(ride_filename_to_cpi_filename(filename));

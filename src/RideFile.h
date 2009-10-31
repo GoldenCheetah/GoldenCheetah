@@ -115,6 +115,7 @@ class RideFileFactory {
 
         static RideFileFactory *instance_;
         QMap<QString,RideFileReader*> readFuncs_;
+        QMap<QString,QString> descriptions_;
 
         RideFileFactory() {}
 
@@ -122,10 +123,15 @@ class RideFileFactory {
 
         static RideFileFactory &instance();
 
-        int registerReader(const QString &suffix, RideFileReader *reader);
+        int registerReader(const QString &suffix, const QString &description,
+                           RideFileReader *reader);
         RideFile *openRideFile(QFile &file, QStringList &errors) const;
         QStringList listRideFiles(const QDir &dir) const;
         QStringList suffixes() const;
+        QString description(const QString &suffix) const {
+            return descriptions_[suffix];
+        }
+        QRegExp rideFileRegExp() const;
 };
 
 #endif // _RideFile_h

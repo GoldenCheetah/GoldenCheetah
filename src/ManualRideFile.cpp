@@ -25,7 +25,7 @@
 #include "math.h"
 
 static int manualFileReaderRegistered = 
-    RideFileFactory::instance().registerReader("man", new ManualFileReader());
+    RideFileFactory::instance().registerReader("man", "Manual Ride File", new ManualFileReader());
  
 RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors) const 
 {

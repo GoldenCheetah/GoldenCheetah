@@ -24,7 +24,8 @@
 #include <assert.h>
 
 static int xmlFileReaderRegistered = 
-    RideFileFactory::instance().registerReader("xml", new XmlFileReader());
+    RideFileFactory::instance().registerReader(
+        "xml", "XML Ride Files", new XmlFileReader());
 
 struct Interval {
     double from_secs, thru_secs;

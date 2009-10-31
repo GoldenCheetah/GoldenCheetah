@@ -25,7 +25,8 @@
 
 
 static int polarFileReaderRegistered =
-    RideFileFactory::instance().registerReader("hrm", new PolarFileReader());
+    RideFileFactory::instance().registerReader(
+        "hrm", "Polar Precision", new PolarFileReader());
 
 RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors) const
 {

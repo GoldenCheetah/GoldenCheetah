@@ -30,13 +30,6 @@
 #include <math.h>
 #include <QtXml/QtXml>
 
-static QString rideFileRegExp()
-{
-    QStringList suffixList = RideFileFactory::instance().suffixes();
-    QString result("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.(%1)$");
-    return result.arg(suffixList.join("|"));
-}
-
 MetricAggregator::MetricAggregator()
 {
 }
@@ -47,7 +40,7 @@ void MetricAggregator::aggregateRides(QDir home, Zones *zones)
     DBAccess *dbaccess = new DBAccess(home);
     dbaccess->dropMetricTable();
     dbaccess->createDatabase();
-    QRegExp rx(rideFileRegExp());
+    QRegExp rx = RideFileFactory::instance().rideFileRegExp();
     QStringList errors;
     QStringListIterator i(RideFileFactory::instance().listRideFiles(home));
     while (i.hasNext()) {
@@ -71,7 +64,7 @@ bool MetricAggregator::importRide(QDir path, Zones *zones, RideFile *ride, QStri
     QFile file(path.absolutePath() + "/" + fileName);
     int zone_range = -1;
 
-    QRegExp rx(rideFileRegExp());
+    QRegExp rx = RideFileFactory::instance().rideFileRegExp();
     if (!rx.exactMatch(fileName)) {
         fprintf(stderr, "bad name: %s\n", fileName.toAscii().constData());
         assert(false);
@@ -147,7 +140,7 @@ void MetricAggregator::scanForMissing(QDir home, Zones *zones)
     QStringList errors;
     DBAccess *dbaccess = new DBAccess(home);
     QStringList filenames = dbaccess->getAllFileNames();
-    QRegExp rx(rideFileRegExp());
+    QRegExp rx = RideFileFactory::instance().rideFileRegExp();
     QStringListIterator i(RideFileFactory::instance().listRideFiles(home));
     while (i.hasNext()) {
         QString name = i.next();

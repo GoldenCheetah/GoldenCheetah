@@ -69,7 +69,8 @@ static WKO_ULONG WKO_device;                   // Device ID used for this workou
 static char WKO_GRAPHS[32];              // GRAPHS available in this workout
 
 static int wkoFileReaderRegistered =
-    RideFileFactory::instance().registerReader("wko", new WkoFileReader());
+    RideFileFactory::instance().registerReader(
+        "wko", "WKO+ Files", new WkoFileReader());
 
 
 //******************************************************************************

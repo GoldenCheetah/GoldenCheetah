@@ -533,14 +533,18 @@ MainWindow::importFile()
     QString lastDir = (lastDirVar != QVariant()) 
         ? lastDirVar.toString() : QDir::homePath();
    
-    QStringList suffixList = RideFileFactory::instance().suffixes();
+    const RideFileFactory &rff = RideFileFactory::instance();
+    QStringList suffixList = rff.suffixes();
     suffixList.replaceInStrings(QRegExp("^"), "*.");
-    QString suffixes = suffixList.join(" ");
     QStringList fileNames; 
+    QStringList allFormats;
+    allFormats << QString("All Support Formats (%1)").arg(suffixList.join(" "));
+    foreach(QString suffix, rff.suffixes())
+        allFormats << QString("%1 (*.%2)").arg(rff.description(suffix)).arg(suffix);
+    allFormats << "All files (*.*)";
     fileNames = QFileDialog::getOpenFileNames(
         this, tr("Import from File"), lastDir,
-        tr("All Support Formats (%1);;Raw Powertap Files (*.raw);;Comma Separated Variable (*.csv);;SRM training files (*.srm);;Garmin Training Centre (*.tcx);;Polar Precision (*.hrm);;WKO+ Files (*.wko);;Computrainer 3dp (*.3dp);;Quarq ANT+ Files (*.qla);;All files (*.*)").arg(suffixes));
-
+        allFormats.join(";;"));
     if (!fileNames.isEmpty()) {
         lastDir = QFileInfo(fileNames.front()).absolutePath();
         settings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
