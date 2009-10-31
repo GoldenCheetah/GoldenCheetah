@@ -23,7 +23,8 @@
 #include <math.h>
 
 static int rawFileReaderRegistered = 
-    RideFileFactory::instance().registerReader("raw", new RawFileReader());
+    RideFileFactory::instance().registerReader(
+        "raw", "GoldenCheetah Raw PowerTap Format", new RawFileReader());
  
 struct ReadState
 {

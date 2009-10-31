@@ -21,7 +21,8 @@
 #include "TcxParser.h"
 
 static int tcxFileReaderRegistered = 
-    RideFileFactory::instance().registerReader("tcx", new TcxFileReader());
+    RideFileFactory::instance().registerReader(
+        "tcx", "Garmin Training Centre", new TcxFileReader());
  
 RideFile *TcxFileReader::openRideFile(QFile &file, QStringList &errors) const 
 {

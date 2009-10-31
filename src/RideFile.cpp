@@ -1,5 +1,6 @@
 /* 
  * Copyright (c) 2007 Sean C. Rhea (srhea@srhea.net)
+ *               2009 Justin F. Knotzke (jknotzke@shampoo.ca)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -162,17 +163,27 @@ RideFileFactory &RideFileFactory::instance()
     return *instance_;
 }
 
-int RideFileFactory::registerReader(const QString &suffix, 
+int RideFileFactory::registerReader(const QString &suffix,
+                                    const QString &description,
                                        RideFileReader *reader) 
 {
     assert(!readFuncs_.contains(suffix));
     readFuncs_.insert(suffix, reader);
+    descriptions_.insert(suffix, description);
     return 1;
 }
 
 QStringList RideFileFactory::suffixes() const
 {
     return readFuncs_.keys();
+}
+
+QRegExp
+RideFileFactory::rideFileRegExp() const
+{
+    QStringList suffixList = RideFileFactory::instance().suffixes();
+    QString s("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.(%1)$");
+    return QRegExp(s.arg(suffixList.join("|")));
 }
 
 RideFile *RideFileFactory::openRideFile(QFile &file, 

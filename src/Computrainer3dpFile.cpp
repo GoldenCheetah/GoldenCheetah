@@ -35,6 +35,7 @@ typedef unsigned char ubyte;
 
 static int Computrainer3dpFileReaderRegistered =
     RideFileFactory::instance().registerReader("3dp",
+                                               "Computrainer 3dp",
                                                new
                                                Computrainer3dpFileReader
                                                ());

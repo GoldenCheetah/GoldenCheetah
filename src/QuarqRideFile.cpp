@@ -102,8 +102,10 @@ bool quarqInterpreterInstalled( void ) {
     return installed;
 }
 
-static int antFileReaderRegistered =
-		     quarqInterpreterInstalled() ? RideFileFactory::instance().registerReader("qla", new QuarqFileReader()) : 0;
+static int antFileReaderRegistered = quarqInterpreterInstalled()
+    ? RideFileFactory::instance().registerReader(
+        "qla", "Quarq ANT+ Files", new QuarqFileReader())
+    : 0;
 
 RideFile *QuarqFileReader::openRideFile(QFile &file, QStringList &errors) const
 {
