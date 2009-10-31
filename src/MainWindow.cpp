@@ -510,7 +510,7 @@ MainWindow::importFile()
     suffixList.replaceInStrings(QRegExp("^"), "*.");
     QStringList fileNames; 
     QStringList allFormats;
-    allFormats << QString("All Support Formats (%1)").arg(suffixList.join(" "));
+    allFormats << QString("All Supported Formats (%1)").arg(suffixList.join(" "));
     foreach(QString suffix, rff.suffixes())
         allFormats << QString("%1 (*.%2)").arg(rff.description(suffix)).arg(suffix);
     allFormats << "All files (*.*)";
