@@ -29,7 +29,7 @@
 
 static int csvFileReaderRegistered = 
     RideFileFactory::instance().registerReader(
-        "csv","Comma Separated Variable", new CsvFileReader());
+        "csv","Comma Separated Value", new CsvFileReader());
  
 RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const 
 {
