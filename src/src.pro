@@ -96,7 +96,6 @@ HEADERS += \
         Units.h \
         WeeklySummaryWindow.h \
         WkoRideFile.h \
-        XmlRideFile.h \
         Zones.h \
         srm.h \
 
@@ -153,7 +152,6 @@ SOURCES += \
         ToolsDialog.cpp \
         WeeklySummaryWindow.cpp \
         WkoRideFile.cpp \
-        XmlRideFile.cpp \
         Zones.cpp \
         main.cpp \
         srm.cpp \
