@@ -1,4 +1,4 @@
-/* 
+/*
  * $Id: RawFile.h,v 1.3 2006/08/11 19:58:07 srhea Exp $
  *
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
@@ -7,12 +7,12 @@
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -33,39 +33,39 @@
     #include <arpa/inet.h>
 #endif
 
-static quint8 readByte(QDataStream &in) 
+static quint8 readByte(QDataStream &in)
 {
     quint8 value;
     in >> value;
     return value;
 }
 
-static quint16 readShort(QDataStream &in) 
+static quint16 readShort(QDataStream &in)
 {
     quint16 value;
     in >> value;
     return htons(value); // SRM uses big endian
 }
 
-static quint32 readLong(QDataStream &in) 
+static quint32 readLong(QDataStream &in)
 {
     quint32 value;
     in >> value;
     return htonl(value); // SRM uses big endian
 }
 
-struct marker 
+struct marker
 {
     int start, end;
 };
 
-struct blockhdr 
+struct blockhdr
 {
     QDateTime dt;
     quint16 chunkcnt;
 };
 
-bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings) 
+bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
 {
     if (!file.open(QFile::ReadOnly)) {
         errorStrings << QString("can't open file %1").arg(file.fileName());
@@ -158,7 +158,7 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
         blockhdrs[i].dt = QDateTime(date);
         blockhdrs[i].dt = blockhdrs[i].dt.addMSecs(hsecsincemidn * 10);
         // printf("block %d:\n", i);
-        // printf("  start=%s\n", 
+        // printf("  start=%s\n",
         //        blockhdrs[i].dt.toString().toAscii().constData());
         // printf("  chunkcnt=%d\n", blockhdrs[i].chunkcnt);
     }
@@ -190,7 +190,7 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
             in.readRawData((char*) ps, sizeof(ps));
             quint8 cad = readByte(in);
             quint8 hr = readByte(in);
-            double kph = (((((unsigned) ps[1]) & 0xf0) << 3) 
+            double kph = (((((unsigned) ps[1]) & 0xf0) << 3)
                           | (ps[0] & 0x7f)) * 3.0 / 26.0;
             unsigned watts = (ps[1] & 0x0f) | (ps[2] << 0x4);
             point->watts = watts;
@@ -212,7 +212,7 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
 
         if (i == 0) {
             data.startTime = blockhdrs[blknum].dt;
-            // printf("startTime=%s\n", 
+            // printf("startTime=%s\n",
             //        data.startTime.toString().toAscii().constData());
         }
         if (i == markers[mrknum].end) {
@@ -231,7 +231,7 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
         point->interval = interval;
         data.dataPoints.append(point);
 
-        // printf("%5.1f %5.1f %5.1f %4d %3d %3d %2d\n", 
+        // printf("%5.1f %5.1f %5.1f %4d %3d %3d %2d\n",
         //        secs, km, kph, watts, hr, cad, interval);
 
         ++blkidx;
@@ -241,9 +241,9 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
             ++blknum;
             blkidx = 0;
             QDateTime start = blockhdrs[blknum].dt;
-            qint64 endms = 
+            qint64 endms =
                 ((qint64) end.toTime_t()) * 1000 + end.time().msec();
-            qint64 startms = 
+            qint64 startms =
                 ((qint64) start.toTime_t()) * 1000 + start.time().msec();
             double diff_secs = (startms - endms) / 1000.0;
             if (diff_secs < data.recint) {
@@ -274,7 +274,7 @@ int main(int argc, char *argv[]) {
     SrmData data;
     if (readSrmFile(file, data, errorStrings))
         return 0;
-    else 
+    else
         return -1;
 }
 */
