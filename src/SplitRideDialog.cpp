@@ -81,35 +81,43 @@ SplitRideDialog::SplitRideDialog(MainWindow *mainWindow)
     mainLayout->addWidget(labelSpacer);
     mainLayout->addLayout(buttonLayout);
 
-    double dLastSeconds = -1.0;
-    int nLastInterval = 0;
-    int nDataPoint = 0;
     const RideFile *ride = mainWindow->currentRide();
+    QMap<int,QString> splitPoints;
 
-    foreach (const RideFilePoint *point, ride->dataPoints())
-    {
-        if (dLastSeconds>=0 &&
-            ((point->secs-dLastSeconds)>=30 || nLastInterval!=point->interval))
-        {
+    QList<RideFileInterval> intervals = ride->intervals();
+    if (!intervals.empty()) {
+        intervals.removeFirst();
+        foreach (RideFileInterval interval, intervals) {
+            int nDataPoint = ride->intervalBegin(interval);
+            QString strDesc = QString("Interval %1").arg(interval.name);
+            splitPoints.insert(nDataPoint, strDesc);
+        }
+    }
 
-            QString strDesc;
-            if (nLastInterval!=point->interval)
-                strDesc.sprintf("Interval #%d", point->interval);
-            else
-                strDesc = "Time Gap: " +  MakeTimeString(point->secs-dLastSeconds);
+    for (int nDataPoint = 1; nDataPoint < ride->dataPoints().size(); ++nDataPoint) {
+        const RideFilePoint *point = ride->dataPoints()[nDataPoint];
+        double dLastSeconds = ride->dataPoints()[nDataPoint - 1]->secs;
+        if ((point->secs-dLastSeconds)>=30 && !splitPoints.contains(nDataPoint)) {
+            QString strDesc = "Time Gap: " +  MakeTimeString(point->secs-dLastSeconds);
+            splitPoints.insert(nDataPoint, strDesc);
+        }
+    }
 
-            strDesc = MakeTimeString(point->secs) + " - " + strDesc;
-            ListItem_Split *pItem = new ListItem_Split(nDataPoint, strDesc, listWidget);
+    QMapIterator<int,QString> i(splitPoints);
+    while (i.hasNext()) {
+        i.next();
+        int nDataPoint = i.key();
+        const RideFilePoint *point = ride->dataPoints()[nDataPoint];
+        QString strDesc = MakeTimeString(point->secs) + " - " + i.value();
+        ListItem_Split *pItem = new ListItem_Split(nDataPoint, strDesc, listWidget);
 
+        if (nDataPoint > 0) {
+            double dLastSeconds = ride->dataPoints()[nDataPoint - 1]->secs;
             if ((point->secs-dLastSeconds)>20*60)
                 pItem->setCheckState(Qt::Checked);
             else
                 pItem->setCheckState(Qt::Unchecked);
         }
-
-        dLastSeconds = point->secs;
-        nLastInterval = point->interval;
-        ++nDataPoint;
     }
 }
 
