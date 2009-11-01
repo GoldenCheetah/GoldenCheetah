@@ -37,24 +37,6 @@
 
 #define PI M_PI
 
-struct SrmDataPoint
-{
-    int cad, hr, watts, interval;
-    double kph, km, secs;
-};
-
-struct SrmData
-{
-    QDateTime startTime;
-    double recint;
-    QList<SrmDataPoint*> dataPoints;
-    ~SrmData() {
-        QListIterator<SrmDataPoint*> i(dataPoints);
-        while (i.hasNext())
-            delete i.next();
-    }
-};
-
 static quint8 readByte(QDataStream &in)
 {
     quint8 value;
@@ -87,13 +69,19 @@ struct blockhdr
     quint16 chunkcnt;
 };
 
-bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
+static int srmFileReaderRegistered =
+    RideFileFactory::instance().registerReader(
+        "srm", "SRM training files", new SrmFileReader());
+
+RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings) const
 {
     if (!file.open(QFile::ReadOnly)) {
         errorStrings << QString("can't open file %1").arg(file.fileName());
-        return false;
+        return NULL;
     }
     QDataStream in(&file);
+    RideFile *result = new RideFile;
+    result->setDeviceType("SRM");
 
     char magic[4];
     in.readRawData(magic, sizeof(magic));
@@ -114,8 +102,8 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
     in.readRawData(comment, sizeof(comment) - 1);
     comment[commentlen - 1] = '\0';
 
-    data.recint = ((double) recint1) / recint2;
-    unsigned recintms = (unsigned) round(data.recint * 1000.0);
+    result->setRecIntSecs(((double) recint1) / recint2);
+    unsigned recintms = (unsigned) round(result->recIntSecs() * 1000.0);
 
     QDate date(1880, 1, 1);
     date = date.addDays(dayssince1880);
@@ -176,34 +164,31 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
         mrknum = 1;
 
     for (int i = 0; i < datacnt; ++i) {
-        SrmDataPoint *point = new SrmDataPoint;
+        int cad, hr, watts;
+        double kph, alt;
         if (version == 6) {
             quint8 ps[3];
             in.readRawData((char*) ps, sizeof(ps));
-            quint8 cad = readByte(in);
-            quint8 hr = readByte(in);
-            double kph = (((((unsigned) ps[1]) & 0xf0) << 3)
-                          | (ps[0] & 0x7f)) * 3.0 / 26.0;
-            unsigned watts = (ps[1] & 0x0f) | (ps[2] << 0x4);
-            point->watts = watts;
-            point->cad = cad;
-            point->hr = hr;
-            point->kph = kph;
+            cad = readByte(in);
+            hr = readByte(in);
+            kph = (((((unsigned) ps[1]) & 0xf0) << 3)
+                   | (ps[0] & 0x7f)) * 3.0 / 26.0;
+            watts = (ps[1] & 0x0f) | (ps[2] << 0x4);
+            alt = 0.0;
         }
         else {
             assert(version == 7);
-            point->watts = readShort(in);
-            point->cad = readByte(in);
-            point->hr = readByte(in);
-            point->kph = readLong(in) * 3.6 / 1000.0;
-            quint32 ele = readLong(in);
+            watts = readShort(in);
+            cad = readByte(in);
+            hr = readByte(in);
+            kph = readLong(in) * 3.6 / 1000.0;
+            alt = readLong(in);
             double temp = 0.1 * (qint16) readShort(in);
-            (void) ele; // unused for now
             (void) temp; // unused for now
         }
 
         if (i == 0) {
-            data.startTime = blockhdrs[blknum].dt;
+            result->setStartTime(blockhdrs[blknum].dt);
         }
         if (i == markers[mrknum].end) {
             ++interval;
@@ -214,12 +199,10 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
         if ((i > 0) && (i == markers[mrknum].start - 1))
             ++interval;
 
-        km += data.recint * point->kph / 3600.0;
+        km += result->recIntSecs() * kph / 3600.0;
 
-        point->km = km;
-        point->secs = secs;
-        point->interval = interval;
-        data.dataPoints.append(point);
+        double nm = watts / 2.0 / PI / cad * 60.0;
+        result->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, interval);
 
         ++blkidx;
         if ((blkidx == blockhdrs[blknum].chunkcnt) && (blknum + 1 < blockcnt)) {
@@ -233,43 +216,22 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
             qint64 startms =
                 ((qint64) start.toTime_t()) * 1000 + start.time().msec();
             double diff_secs = (startms - endms) / 1000.0;
-            if (diff_secs < data.recint) {
+            if (diff_secs < result->recIntSecs()) {
                 errorStrings << QString("ERROR: time goes backwards by %1 s"
                                         " on trans " "to block %2"
                                         ).arg(diff_secs).arg(blknum);
-                secs += data.recint; // for lack of a better option
+                secs += result->recIntSecs(); // for lack of a better option
             }
             else {
                 secs += diff_secs;
             }
         }
         else {
-            secs += data.recint;
+            secs += result->recIntSecs();
         }
     }
 
     file.close();
-    return true;
-}
-
-static int srmFileReaderRegistered =
-    RideFileFactory::instance().registerReader(
-        "srm", "SRM training files", new SrmFileReader());
-
-RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errors) const
-{
-    SrmData srmData;
-    if (!readSrmFile(file, srmData, errors))
-        return NULL;
-    RideFile *rideFile = new RideFile(srmData.startTime, srmData.recint);
-    rideFile->setDeviceType("SRM");
-    QListIterator<SrmDataPoint*> i(srmData.dataPoints);
-    while (i.hasNext()) {
-        SrmDataPoint *p = i.next();
-        double nm = p->watts / 2.0 / PI / p->cad * 60.0;
-        rideFile->appendPoint(p->secs, p->cad, p->hr, p->km,
-                              p->kph, nm, p->watts, 0.0, p->interval);
-    }
-    return rideFile;
+    return result;
 }
 
