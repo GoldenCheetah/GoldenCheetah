@@ -154,7 +154,7 @@ RideFile *RideFileFactory::openRideFile(QFile &file,
     RideFileReader *reader = readFuncs_.value(suffix.toLower());
     assert(reader);
     RideFile *result = reader->openRideFile(file, errors);
-    if (result)
+    if (result && result->intervals().empty())
         result->fillInIntervals();
     return result;
 }
