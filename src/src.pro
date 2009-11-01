@@ -97,7 +97,6 @@ HEADERS += \
         WeeklySummaryWindow.h \
         WkoRideFile.h \
         Zones.h \
-        srm.h \
 
 SOURCES += \
         AerobicDecoupling.cpp \
@@ -155,7 +154,6 @@ SOURCES += \
         WkoRideFile.cpp \
         Zones.cpp \
         main.cpp \
-        srm.cpp \
 
 RESOURCES = application.qrc
 
