@@ -463,6 +463,7 @@ RideItem::htmlSummary()
             summary += "<td align=\"center\">(watts)</td>";
             summary += "<td align=\"center\">(watts)</td>";
             summary += "<td align=\"center\">(bpm)</td>";
+            summary += "<td align=\"center\">(bpm)</td>";
             summary += "<td align=\"center\">(rpm)</td>";
             if(unit.toString() == "Metric")
                 summary += "<td align=\"center\">(km/h)</td>";
