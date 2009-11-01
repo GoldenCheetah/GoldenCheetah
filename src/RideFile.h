@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2007 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -29,7 +29,7 @@
 //
 // RideFile, as the name suggests, represents the data stored in a ride file,
 // regardless of what type of file it is (.raw, .srm, .csv).
-// 
+//
 // RideFilePoint represents the data for a single sample in a RideFile.
 //
 // RideFileReader is an abstract base class for function-objects that take a
@@ -40,16 +40,16 @@
 // suffixes to the RideFileReader objects capable of converting those files
 // into RideFile objects.
 
-struct RideFilePoint 
+struct RideFilePoint
 {
     double secs, cad, hr, km, kph, nm, watts, alt;
     int interval;
     double bs; // to init in order
-    RideFilePoint() : secs(0.0), cad(0.0), hr(0.0), km(0.0), kph(0.0), 
+    RideFilePoint() : secs(0.0), cad(0.0), hr(0.0), km(0.0), kph(0.0),
         nm(0.0), watts(0.0), alt(0.0), interval(0), bs(0.0) {}
-    RideFilePoint(double secs, double cad, double hr, double km, double kph, 
+    RideFilePoint(double secs, double cad, double hr, double km, double kph,
                   double nm, double watts, double alt, int interval, double bs) :
-        secs(secs), cad(cad), hr(hr), km(km), kph(kph), nm(nm), 
+        secs(secs), cad(cad), hr(hr), km(km), kph(kph), nm(nm),
         watts(watts), alt(alt), interval(interval), bs(bs) {}
 };
 
@@ -59,17 +59,17 @@ struct RideFileDataPresent
     // whether non-zero data of each field is present
     RideFileDataPresent():
         secs(false), cad(false), hr(false), km(false),
-	    kph(false), nm(false), watts(false), alt(false), interval(false) {}
+        kph(false), nm(false), watts(false), alt(false), interval(false) {}
 };
 
-class RideFile 
+class RideFile
 {
     private:
 
         QDateTime startTime_;  // time of day that the ride started
         double recIntSecs_;    // recording interval in seconds
         QList<RideFilePoint*> dataPoints_;
-	RideFileDataPresent dataPresent;
+        RideFileDataPresent dataPresent;
         QString deviceType_;
 
     public:
@@ -77,11 +77,11 @@ class RideFile
         RideFile() : recIntSecs_(0.0), deviceType_("unknown") {}
         RideFile(const QDateTime &startTime, double recIntSecs) :
             startTime_(startTime), recIntSecs_(recIntSecs),
-  	    deviceType_("unknown") {}
+            deviceType_("unknown") {}
 
         virtual ~RideFile() {
             QListIterator<RideFilePoint*> i(dataPoints_);
-            while (i.hasNext()) 
+            while (i.hasNext())
                 delete i.next();
         }
 
@@ -94,13 +94,14 @@ class RideFile
         void setStartTime(const QDateTime &value) { startTime_ = value; }
         void setRecIntSecs(double value) { recIntSecs_ = value; }
         void setDeviceType(const QString &value) { deviceType_ = value; }
-        
-        void appendPoint(double secs, double cad, double hr, double km, 
-                double kph, double nm, double watts, double alt, int interval, double bs=0.0);
+
+        void appendPoint(double secs, double cad, double hr, double km,
+                         double kph, double nm, double watts, double alt,
+                         int interval, double bs=0.0);
 
         void writeAsCsv(QFile &file, bool bIsMetric) const;
 
-	void resetDataPresent();
+        void resetDataPresent();
 };
 
 struct RideFileReader {

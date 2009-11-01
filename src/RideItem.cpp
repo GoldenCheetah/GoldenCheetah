@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -28,9 +28,9 @@
 #include <QtXml/QtXml>
 
 RideItem::RideItem(int type,
-                   QString path, QString fileName, const QDateTime &dateTime, 
-                   Zones **zones, QString notesFileName) : 
-    QTreeWidgetItem(type), path(path), fileName(fileName), 
+                   QString path, QString fileName, const QDateTime &dateTime,
+                   Zones **zones, QString notesFileName) :
+    QTreeWidgetItem(type), path(path), fileName(fileName),
     dateTime(dateTime), ride(NULL), zones(zones), notesFileName(notesFileName)
 {
     setText(0, dateTime.toString("ddd"));
@@ -59,7 +59,7 @@ static void summarize(QString &intervals,
                       double &int_kph_sum,
                       double &int_secs_hr,
                       double &int_max_power,
-                      double int_dur) 
+                      double int_dur)
 {
     double dur = int_dur;
     double mile_len = (km_end - km_start) * MILES_PER_KM;
@@ -110,26 +110,26 @@ static void summarize(QString &intervals,
     int_hrs.clear();
 }
 
-int RideItem::zoneRange() 
+int RideItem::zoneRange()
 {
     return (
-	    (zones && *zones) ?
-	    (*zones)->whichRange(dateTime.date()) :
-	    -1
-	    );
+        (zones && *zones) ?
+        (*zones)->whichRange(dateTime.date()) :
+        -1
+        );
 }
 
-int RideItem::numZones() 
+int RideItem::numZones()
 {
     if (zones && *zones) {
-	int zone_range = zoneRange();
-	return ((zone_range >= 0) ?
-		(*zones)->numZones(zone_range) :
-		0
-		);
+        int zone_range = zoneRange();
+        return ((zone_range >= 0) ?
+                (*zones)->numZones(zone_range) :
+                0
+               );
     }
     else
-	return 0;
+        return 0;
 }
 
 double RideItem::timeInZone(int zone)
@@ -141,15 +141,15 @@ double RideItem::timeInZone(int zone)
     return time_in_zone[zone];
 }
 
-static const char *metricsXml =  
+static const char *metricsXml =
     "<metrics>\n"
     "  <metric_group name=\"Totals\">\n"
     "    <metric name=\"workout_time\" display_name=\"Workout time\"\n"
-    "            precision=\"0\"/>\n"    
+    "            precision=\"0\"/>\n"
     "    <metric name=\"time_riding\" display_name=\"Time riding\"\n"
-    "            precision=\"0\"/>\n"    
+    "            precision=\"0\"/>\n"
     "    <metric name=\"total_distance\" display_name=\"Distance\"\n"
-    "            precision=\"1\"/>\n"    
+    "            precision=\"1\"/>\n"
     "    <metric name=\"total_work\" display_name=\"Work\"\n"
     "            precision=\"0\"/>\n"
     "    <metric name=\"elevation_gain\" display_name=\"Elevation Gain\"\n"
@@ -192,7 +192,7 @@ RideItem::computeMetrics()
 {
     const QDateTime nilTime;
     if ((computeMetricsTime != nilTime) &&
-	(!zones || !*zones || (computeMetricsTime >= (*zones)->modificationTime))) {
+        (!zones || !*zones || (computeMetricsTime >= (*zones)->modificationTime))) {
         return;
     }
 
@@ -245,14 +245,14 @@ RideItem::computeMetrics()
     }
 }
 
-QString 
+QString
 RideItem::htmlSummary()
 {
     if (summary.isEmpty() ||
-	(zones && *zones && (summaryGenerationTime < (*zones)->modificationTime))) {
-	// set defaults for zone range and number of zones
-	int zone_range = -1;
-	int num_zones = 0;
+        (zones && *zones && (summaryGenerationTime < (*zones)->modificationTime))) {
+        // set defaults for zone range and number of zones
+        int zone_range = -1;
+        int num_zones = 0;
 
         summaryGenerationTime = QDateTime::currentDateTime();
 
@@ -266,27 +266,27 @@ RideItem::htmlSummary()
                 summary += "<br>" + i.next();
             return summary;
         }
-        summary = ("<p><center><h2>" 
-                   + dateTime.toString("dddd MMMM d, yyyy, h:mm AP") 
+        summary = ("<p><center><h2>"
+                   + dateTime.toString("dddd MMMM d, yyyy, h:mm AP")
                    + "</h2><h3>Device Type: " + ride->deviceType() + "</h3>");
 
         computeMetrics();
-        
-        boost::shared_ptr<QSettings> settings = GetApplicationSettings();	
+
+        boost::shared_ptr<QSettings> settings = GetApplicationSettings();
         QVariant unit = settings->value(GC_UNIT);
 
         if (zones &&
-	    *zones &&
-	    ((zone_range = (*zones)->whichRange(dateTime.date())) >= 0) &&
-	    ((num_zones = (*zones)->numZones(zone_range)) > 0)
-	    )
-	    {
-		time_in_zone.clear();
-		time_in_zone.resize(num_zones);
-	    }
+            *zones &&
+            ((zone_range = (*zones)->whichRange(dateTime.date())) >= 0) &&
+            ((num_zones = (*zones)->numZones(zone_range)) > 0)
+           )
+        {
+            time_in_zone.clear();
+            time_in_zone.resize(num_zones);
+        }
 
         double secs_watts = 0.0;
-       
+
         QString intervals = "";
         int interval_count = 0;
         int last_interval = INT_MAX;
@@ -310,7 +310,7 @@ RideItem::htmlSummary()
 
                 if (last_interval != INT_MAX) {
                     summarize(intervals, last_interval,
-                              km_start, km_end, int_watts_sum, 
+                              km_start, km_end, int_watts_sum,
                               int_hr_sum, int_hrs, int_cad_sum, int_kph_sum,
                               int_secs_hr, int_max_power, int_dur);
                 }
@@ -330,7 +330,7 @@ RideItem::htmlSummary()
                 int_watts_sum += point->watts * secs_delta;
                 if (point->watts > int_max_power)
                     int_max_power = point->watts;
-		if (num_zones > 0) {
+                if (num_zones > 0) {
                     int zone = (*zones)->whichZone(zone_range, point->watts);
                     if (zone >= 0)
                         time_in_zone[zone] += secs_delta;
@@ -351,7 +351,7 @@ RideItem::htmlSummary()
             time_end = point->secs + secs_delta;
         }
         summarize(intervals, last_interval,
-                  km_start, km_end, int_watts_sum, 
+                  km_start, km_end, int_watts_sum,
                   int_hr_sum, int_hrs, int_cad_sum, int_kph_sum,
                   int_secs_hr, int_max_power, int_dur);
 
@@ -427,7 +427,7 @@ RideItem::htmlSummary()
                 || (groupNum == groups.size() - 1))
                 summary += "</tr></table>";
         }
-	
+
         if (num_zones > 0) {
             summary += "<h2>Power Zones</h2>";
             summary += (*zones)->summarize(zone_range, time_in_zone);
@@ -438,7 +438,7 @@ RideItem::htmlSummary()
         // and an integer < 30 when in an interval.
         // We'll need to create a counter for the intervals
         // rather than relying on the final data point's interval number.
-        if (interval_count > 1) { 
+        if (interval_count > 1) {
             summary += "<p><h2>Intervals</h2>\n<p>\n";
             summary += "<table align=\"center\" width=\"90%\" ";
             summary += "cellspacing=0 border=0><tr>";
@@ -475,7 +475,7 @@ RideItem::htmlSummary()
 
         if (!errors.empty()) {
             summary += "<p><h2>Errors reading file:</h2><ul>";
-            QStringListIterator i(errors); 
+            QStringListIterator i(errors);
             while(i.hasNext())
                 summary += " <li>" + i.next();
             summary += "</ul>";
