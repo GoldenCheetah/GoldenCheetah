@@ -102,11 +102,8 @@ class XPower : public RideMetric {
 	*/
 	   
 	
-        QListIterator<RideFilePoint*> i(ride->dataPoints());
-
 	int count = 0;
-        while (i.hasNext()) {
-            const RideFilePoint *point = i.next();
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
 
 	    // if there are missing data then add in the contribution
 	    // from the exponentially decaying smoothed power
@@ -205,9 +202,7 @@ class BikeScore : public RideMetric {
 	    return;
 	if (ride->deviceType() == QString("Manual CSV")) {
 	    // manual entry, use BS from dataPoints
-	    QListIterator<RideFilePoint*> i(ride->dataPoints());
-	    const RideFilePoint *point = i.next();
-	    score = point->bs;
+            score = ride->dataPoints().first()->bs;
 	}
 	else {
 	    assert(deps.contains("skiba_xpower"));

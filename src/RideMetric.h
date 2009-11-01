@@ -48,11 +48,8 @@ struct RideMetric {
 struct PointwiseRideMetric : public RideMetric {
     void compute(const RideFile *ride, const Zones *zones, int zoneRange,
                  const QHash<QString,RideMetric*> &) {
-        QListIterator<RideFilePoint*> i(ride->dataPoints());
-        while (i.hasNext()) {
-            const RideFilePoint *point = i.next();
+        foreach (const RideFilePoint *point, ride->dataPoints())
             perPoint(point, ride->recIntSecs(), ride, zones, zoneRange);
-        }
     }
     virtual void perPoint(const RideFilePoint *point, double secsDelta,
                           const RideFile *ride, const Zones *zones,

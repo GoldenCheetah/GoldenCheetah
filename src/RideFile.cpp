@@ -39,9 +39,7 @@ void RideFile::writeAsCsv(QFile &file, bool bIsMetric) const
         convertUnit = 1.0;
     }
 
-    QListIterator<RideFilePoint*> i(dataPoints());
-    while (i.hasNext()) {
-        RideFilePoint *point = i.next();
+    foreach (const RideFilePoint *point, dataPoints()) {
         if (point->secs == 0.0)
             continue;
         out << point->secs/60.0;

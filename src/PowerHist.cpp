@@ -397,14 +397,11 @@ PowerHist::setData(RideItem *_rideItem)
         kphArray.resize(0);
         cadArray.resize(0);
 
-	QListIterator<RideFilePoint*> j(ride->dataPoints());
-
 	// unit conversion factor for imperial units for selected parameters
 	double torque_factor = (useMetricUnits ? 1.0 : 0.73756215);
 	double speed_factor  = (useMetricUnits ? 1.0 : 0.62137119);
 
-	while (j.hasNext()) {
-	    const RideFilePoint *p1 = j.next();
+        foreach(const RideFilePoint *p1, ride->dataPoints()) {
 
 	    int wattsIndex = int(floor(p1->watts / wattsDelta));
 	    if (wattsIndex >= 0 && wattsIndex < maxSize) {

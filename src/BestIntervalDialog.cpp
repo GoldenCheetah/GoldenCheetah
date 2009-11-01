@@ -115,9 +115,7 @@ BestIntervalDialog::findClicked()
     int expectedSamples = (int) floor(windowSizeSecs / secsDelta);
     double totalWatts = 0.0;
 
-    QListIterator<RideFilePoint*> i(ride->dataPoints());
-    while (i.hasNext()) {
-        const RideFilePoint *point = i.next();
+    foreach (const RideFilePoint *point, ride->dataPoints()) {
         while (!window.empty()
                && (point->secs >= window.first()->secs + windowSizeSecs)) {
             totalWatts -= window.first()->watts;

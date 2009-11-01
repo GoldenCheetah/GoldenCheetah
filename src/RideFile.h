@@ -24,6 +24,7 @@
 #include <QFile>
 #include <QList>
 #include <QMap>
+#include <QVector>
 
 // This file defines four classes:
 //
@@ -68,7 +69,7 @@ class RideFile
 
         QDateTime startTime_;  // time of day that the ride started
         double recIntSecs_;    // recording interval in seconds
-        QList<RideFilePoint*> dataPoints_;
+        QVector<RideFilePoint*> dataPoints_;
         RideFileDataPresent dataPresent;
         QString deviceType_;
 
@@ -80,14 +81,13 @@ class RideFile
             deviceType_("unknown") {}
 
         virtual ~RideFile() {
-            QListIterator<RideFilePoint*> i(dataPoints_);
-            while (i.hasNext())
-                delete i.next();
+            foreach(RideFilePoint *point, dataPoints_)
+                delete point;
         }
 
         const QDateTime &startTime() const { return startTime_; }
         double recIntSecs() const { return recIntSecs_; }
-        const QList<RideFilePoint*> dataPoints() const { return dataPoints_; }
+        const QVector<RideFilePoint*> dataPoints() const { return dataPoints_; }
         inline const RideFileDataPresent *areDataPresent() const { return &dataPresent; }
         const QString &deviceType() const { return deviceType_; }
 

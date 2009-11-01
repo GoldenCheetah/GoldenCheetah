@@ -301,9 +301,7 @@ PfPvPlot::setData(RideItem *_rideItem)
 	long tot_cad_points = 0;
 
 
-	QListIterator<RideFilePoint*> i(ride->dataPoints());
-	while (i.hasNext()) {
-	    const RideFilePoint *p1 = i.next();
+        foreach(const RideFilePoint *p1, ride->dataPoints()) {
 
 	    if (p1->watts != 0 && p1->cad != 0) {
 		double aepf = (p1->watts * 60.0) / (p1->cad * cl_ * 2.0 * PI);
