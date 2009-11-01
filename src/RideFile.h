@@ -98,7 +98,6 @@ class RideFile
         void appendPoint(double secs, double cad, double hr, double km, 
                 double kph, double nm, double watts, double alt, int interval, double bs=0.0);
 
-        bool writeAsXml(QFile &file, QString &err) const;
         void writeAsCsv(QFile &file, bool bIsMetric) const;
 
 	void resetDataPresent();
