@@ -394,22 +394,24 @@ AllPlot::recalc()
         delete mrk;
     }
     d_mrk.clear();
-    rideItem->ride->fillInIntervals();
-    foreach(const RideFileInterval &interval, rideItem->ride->intervals()) {
-        QwtPlotMarker *mrk = new QwtPlotMarker;
-        d_mrk.append(mrk);
-        mrk->attach(this);
-        mrk->setLineStyle(QwtPlotMarker::VLine);
-        mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
-        mrk->setLinePen(QPen(Qt::black, 0, Qt::DashDotLine));
-        QwtText text(interval.name);
-        text.setFont(QFont("Helvetica", 10, QFont::Bold));
-        text.setColor(Qt::black);
-        if (!bydist)
-            mrk->setValue(interval.start / 60.0, 0.0);
-        else
-            mrk->setValue(smoothDistance[int(ceil(interval.start))], 0.0);
-        mrk->setLabel(text);
+    if (rideItem->ride) {
+        rideItem->ride->fillInIntervals();
+        foreach(const RideFileInterval &interval, rideItem->ride->intervals()) {
+            QwtPlotMarker *mrk = new QwtPlotMarker;
+            d_mrk.append(mrk);
+            mrk->attach(this);
+            mrk->setLineStyle(QwtPlotMarker::VLine);
+            mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
+            mrk->setLinePen(QPen(Qt::black, 0, Qt::DashDotLine));
+            QwtText text(interval.name);
+            text.setFont(QFont("Helvetica", 10, QFont::Bold));
+            text.setColor(Qt::black);
+            if (!bydist)
+                mrk->setValue(interval.start / 60.0, 0.0);
+            else
+                mrk->setValue(smoothDistance[int(ceil(interval.start))], 0.0);
+            mrk->setLabel(text);
+        }
     }
 
     replot();
