@@ -120,9 +120,7 @@ update_cpi_file(const cpi_file_info *info, QProgressDialog *progress,
 	return;
     cpint_data data;
     data.rec_int_ms = (int) round(rideFile->recIntSecs() * 1000.0);
-    QListIterator<RideFilePoint*> i(rideFile->dataPoints());
-    while (i.hasNext()) {
-	const RideFilePoint *p = i.next();
+    foreach (const RideFilePoint *p, rideFile->dataPoints()) {
 	double secs = round(p->secs * 1000.0) / 1000;
         if (secs > 0)
             data.points.append(cpint_point(secs, (int) round(p->watts)));

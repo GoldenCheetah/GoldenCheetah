@@ -300,10 +300,7 @@ RideItem::htmlSummary()
 
         double time_start, time_end, km_start, km_end, int_dur;
 
-        QListIterator<RideFilePoint*> i(ride->dataPoints());
-        while (i.hasNext()) {
-            RideFilePoint *point = i.next();
-
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
             double secs_delta = ride->recIntSecs();
 
             if (point->interval != last_interval) {

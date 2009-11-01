@@ -86,9 +86,8 @@ SplitRideDialog::SplitRideDialog(MainWindow *mainWindow)
     int nDataPoint = 0;
     const RideFile *ride = mainWindow->currentRide();
 
-    for (QListIterator<RideFilePoint*> i(ride->dataPoints()); i.hasNext(); ++nDataPoint)
+    foreach (const RideFilePoint *point, ride->dataPoints())
     {
-        const RideFilePoint *point = i.next();
         if (dLastSeconds>=0 &&
             ((point->secs-dLastSeconds)>=30 || nLastInterval!=point->interval))
         {
@@ -110,6 +109,7 @@ SplitRideDialog::SplitRideDialog(MainWindow *mainWindow)
 
         dLastSeconds = point->secs;
         nLastInterval = point->interval;
+        ++nDataPoint;
     }
 }
 

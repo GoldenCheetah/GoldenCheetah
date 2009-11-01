@@ -519,9 +519,7 @@ AllPlot::setData(RideItem *_rideItem)
         if (!altArray.empty()) altCurve->attach(this);
 
         arrayLength = 0;
-        QListIterator<RideFilePoint*> i(ride->dataPoints());
-        while (i.hasNext()) {
-            RideFilePoint *point = i.next();
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
             timeArray[arrayLength]  = point->secs;
             if (!wattsArray.empty())
                 wattsArray[arrayLength] = max(0, point->watts);
