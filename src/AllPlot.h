@@ -86,7 +86,6 @@ class AllPlot : public QwtPlot
         QVector<double> distanceArray;
         QVector<double> altArray;
         int arrayLength;
-        QVector<double> interArray;
 
         int smooth;
 

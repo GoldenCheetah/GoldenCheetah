@@ -235,9 +235,8 @@ AllPlot::AllPlot(QWidget *parent):
 
 struct DataPoint {
     double time, hr, watts, speed, cad, alt;
-    int inter;
-    DataPoint(double t, double h, double w, double s, double c, double a, int i) :
-        time(t), hr(h), watts(w), speed(s), cad(c), alt(a), inter(i) {}
+    DataPoint(double t, double h, double w, double s, double c, double a) :
+        time(t), hr(h), watts(w), speed(s), cad(c), alt(a) {}
 };
 
 bool AllPlot::shadeZones() const
@@ -307,12 +306,6 @@ AllPlot::recalc()
     QVector<double> smoothDistance(rideTimeSecs + 1);
     QVector<double> smoothAltitude(rideTimeSecs + 1);
 
-    QMap<double, int> interList; //Store the times and intervals
-                             // Times are unique, intervals are not always
-                             //Intervals are sequential on the PowerTap.
-
-    int lastInterval = 0; //Detect if we hit a new interval
-
     for (int secs = 0; ((secs < smooth)
                         && (secs < rideTimeSecs)); ++secs) {
         smoothWatts[secs] = 0.0;
@@ -332,8 +325,7 @@ AllPlot::recalc()
                          (!wattsArray.empty() ? wattsArray[i] : 0),
                          (!speedArray.empty() ? speedArray[i] : 0),
                          (!cadArray.empty() ? cadArray[i] : 0),
-                         (!altArray.empty() ? altArray[i] : 0),
-                         interArray[i]);
+                         (!altArray.empty() ? altArray[i] : 0));
             if (!wattsArray.empty())
                 totalWatts += wattsArray[i];
             if (!hrArray.empty())
@@ -346,11 +338,6 @@ AllPlot::recalc()
                 totalAlt   += altArray[i];
             totalDist   = distanceArray[i];
             list.append(dp);
-            //Figure out when and if we have a new interval..
-            if(lastInterval != interArray[i]) {
-                lastInterval = interArray[i];
-                interList[secs/60.0] = lastInterval;
-            }
             ++i;
         }
         while (!list.empty() && (list.front().time < secs - smooth)) {
@@ -407,21 +394,21 @@ AllPlot::recalc()
         delete mrk;
     }
     d_mrk.clear();
-    foreach(double time, interList.keys()) {
+    rideItem->ride->fillInIntervals();
+    foreach(const RideFileInterval &interval, rideItem->ride->intervals()) {
         QwtPlotMarker *mrk = new QwtPlotMarker;
         d_mrk.append(mrk);
         mrk->attach(this);
-        mrk->setValue(0,0);
         mrk->setLineStyle(QwtPlotMarker::VLine);
         mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
         mrk->setLinePen(QPen(Qt::black, 0, Qt::DashDotLine));
-        QwtText text(QString::number(interList[time]));
+        QwtText text(interval.name);
         text.setFont(QFont("Helvetica", 10, QFont::Bold));
         text.setColor(Qt::black);
         if (!bydist)
-            mrk->setValue(time, 0.0);
+            mrk->setValue(interval.start / 60.0, 0.0);
         else
-            mrk->setValue(smoothDistance[int(ceil(60*time))], 0.0);
+            mrk->setValue(smoothDistance[int(ceil(interval.start))], 0.0);
         mrk->setLabel(text);
     }
 
@@ -503,7 +490,6 @@ AllPlot::setData(RideItem *_rideItem)
         cadArray.resize(dataPresent->cad ? npoints : 0);
         altArray.resize(dataPresent->alt ? npoints : 0);
         timeArray.resize(npoints);
-        interArray.resize(npoints);
         distanceArray.resize(npoints);
 
         // attach appropriate curves
@@ -536,7 +522,6 @@ AllPlot::setData(RideItem *_rideItem)
                 altArray[arrayLength]   = (useMetricUnits
                                            ? point->alt
                                            : point->alt * FEET_PER_METER);
-            interArray[arrayLength] = point->interval;
             distanceArray[arrayLength] = max(0,
                                              (useMetricUnits
                                               ? point->km
