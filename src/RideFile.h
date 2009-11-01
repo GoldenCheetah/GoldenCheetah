@@ -63,6 +63,15 @@ struct RideFileDataPresent
         kph(false), nm(false), watts(false), alt(false), interval(false) {}
 };
 
+struct RideFileInterval
+{
+    double start, stop;
+    QString name;
+    RideFileInterval() : start(0.0), stop(0.0) {}
+    RideFileInterval(double start, double stop, QString name) :
+        start(start), stop(stop), name(name) {}
+};
+
 class RideFile
 {
     private:
@@ -72,6 +81,7 @@ class RideFile
         QVector<RideFilePoint*> dataPoints_;
         RideFileDataPresent dataPresent;
         QString deviceType_;
+        QList<RideFileInterval> intervals_;
 
     public:
 
@@ -98,6 +108,13 @@ class RideFile
         void appendPoint(double secs, double cad, double hr, double km,
                          double kph, double nm, double watts, double alt,
                          int interval, double bs=0.0);
+
+        const QList<RideFileInterval> &intervals() const { return intervals_; }
+        void addInterval(double start, double stop, const QString &name) {
+            intervals_.append(RideFileInterval(start, stop, name));
+        }
+        void fillInIntervals();
+        int intervalBegin(const RideFileInterval &interval) const;
 
         void writeAsCsv(QFile &file, bool bIsMetric) const;
 

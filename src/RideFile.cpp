@@ -21,7 +21,50 @@
 #include "Settings.h"
 #include "Units.h"
 #include <QtXml/QtXml>
+#include <algorithm> // for std::lower_bound
 #include <assert.h>
+
+#define mark() \
+{ \
+    addInterval(start, previous->secs + recIntSecs_, \
+                QString("%1").arg(interval)); \
+    ++interval; \
+    start = point->secs; \
+}
+
+void
+RideFile::fillInIntervals()
+{
+    if (dataPoints_.empty())
+        return;
+    intervals_.clear();
+    double start = 0.0;
+    int interval = dataPoints().first()->interval;
+    const RideFilePoint *point, *previous;
+    foreach (point, dataPoints()) {
+        if (point->interval != interval)
+            mark();
+        previous = point;
+    }
+    mark();
+}
+
+struct ComparePoints {
+    bool operator()(const RideFilePoint *p1, const RideFilePoint *p2) {
+        return p1->secs < p2->secs;
+    }
+};
+
+int
+RideFile::intervalBegin(const RideFileInterval &interval) const
+{
+    RideFilePoint p;
+    p.secs = interval.start;
+    QVector<RideFilePoint*>::const_iterator i = std::lower_bound(
+        dataPoints_.begin(), dataPoints_.end(), &p, ComparePoints());
+    assert(i != dataPoints_.end());
+    return i - dataPoints_.begin();
+}
 
 void RideFile::writeAsCsv(QFile &file, bool bIsMetric) const
 {
