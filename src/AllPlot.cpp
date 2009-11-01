@@ -395,7 +395,6 @@ AllPlot::recalc()
     }
     d_mrk.clear();
     if (rideItem->ride) {
-        rideItem->ride->fillInIntervals();
         foreach(const RideFileInterval &interval, rideItem->ride->intervals()) {
             QwtPlotMarker *mrk = new QwtPlotMarker;
             d_mrk.append(mrk);

@@ -153,7 +153,10 @@ RideFile *RideFileFactory::openRideFile(QFile &file,
     suffix.remove(0, dot + 1);
     RideFileReader *reader = readFuncs_.value(suffix.toLower());
     assert(reader);
-    return reader->openRideFile(file, errors);
+    RideFile *result = reader->openRideFile(file, errors);
+    if (result)
+        result->fillInIntervals();
+    return result;
 }
 
 QStringList RideFileFactory::listRideFiles(const QDir &dir) const

@@ -281,7 +281,6 @@ RideItem::htmlSummary()
         QString intervals = "";
         double secs_delta = ride->recIntSecs();
 
-        ride->fillInIntervals();
         foreach (RideFileInterval interval, ride->intervals()) {
             int i = ride->intervalBegin(interval);
             assert(i < ride->dataPoints().size());
