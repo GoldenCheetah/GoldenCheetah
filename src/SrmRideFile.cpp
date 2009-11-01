@@ -117,19 +117,8 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
     data.recint = ((double) recint1) / recint2;
     unsigned recintms = (unsigned) round(data.recint * 1000.0);
 
-    // printf("magic=%s\n", magic);
-    // printf("wheelcirc=%d\n", wheelcirc);
-    // printf("dayssince1880=%d\n", dayssince1880);
-    // printf("recint=%f sec\n", data.recint);
-    // printf("blockcnt=%d\n", blockcnt);
-    // printf("markercnt=%d\n", markercnt);
-    // printf("commentlen=%d\n", commentlen);
-    // printf("comment=%s\n", comment);
-
     QDate date(1880, 1, 1);
     date = date.addDays(dayssince1880);
-
-    // printf("date=%s\n", date.toString().toAscii().constData());
 
     marker *markers = new marker[markercnt + 1];
     for (int i = 0; i <= markercnt; ++i) {
@@ -155,17 +144,6 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
         (void) avgspeed;
         (void) pwc150;
         (void) wheelcirc;
-
-        // printf("marker %d:\n", i);
-        // printf("  mcomment=%s\n", mcomment);
-        // printf("  active=%d\n", active);
-        // printf("  start=%d\n", start);
-        // printf("  end=%d\n", end);
-        // printf("  avgwatts=%0.1f\n", avgwatts / 8.0);
-        // printf("  avghr=%0.1f\n", avghr / 64.0);
-        // printf("  avgcad=%0.1f\n", avgcad / 32.0);
-        // printf("  avgspeed=%0.1f km/h\n", avgspeed / 2500.0 * 9.0);
-        // printf("  pwc150=%d\n", pwc150);
     }
 
     blockhdr *blockhdrs = new blockhdr[blockcnt];
@@ -179,10 +157,6 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
         blockhdrs[i].chunkcnt = readShort(in);
         blockhdrs[i].dt = QDateTime(date);
         blockhdrs[i].dt = blockhdrs[i].dt.addMSecs(hsecsincemidn * 10);
-        // printf("block %d:\n", i);
-        // printf("  start=%s\n",
-        //        blockhdrs[i].dt.toString().toAscii().constData());
-        // printf("  chunkcnt=%d\n", blockhdrs[i].chunkcnt);
     }
 
     quint16 zero = readShort(in);
@@ -192,10 +166,6 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
 
     (void) zero;
     (void) slope;
-
-    // printf("zero=%d\n", zero);
-    // printf("slope=%d\n", slope);
-    // printf("datacnt=%d\n", datacnt);
 
     assert(blockcnt > 0);
 
@@ -234,8 +204,6 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
 
         if (i == 0) {
             data.startTime = blockhdrs[blknum].dt;
-            // printf("startTime=%s\n",
-            //        data.startTime.toString().toAscii().constData());
         }
         if (i == markers[mrknum].end) {
             ++interval;
@@ -252,9 +220,6 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
         point->secs = secs;
         point->interval = interval;
         data.dataPoints.append(point);
-
-        // printf("%5.1f %5.1f %5.1f %4d %3d %3d %2d\n",
-        //        secs, km, kph, watts, hr, cad, interval);
 
         ++blkidx;
         if ((blkidx == blockhdrs[blknum].chunkcnt) && (blknum + 1 < blockcnt)) {
@@ -275,7 +240,6 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
                 secs += data.recint; // for lack of a better option
             }
             else {
-                // printf("jumping forward %lld ms\n", diff);
                 secs += diff_secs;
             }
         }
@@ -287,20 +251,6 @@ bool readSrmFile(QFile &file, SrmData &data, QStringList &errorStrings)
     file.close();
     return true;
 }
-
-/*
-int main(int argc, char *argv[]) {
-    assert(argc > 1);
-    QFile file(argv[1]);
-    QStringList errorStrings;
-    SrmData data;
-    if (readSrmFile(file, data, errorStrings))
-        return 0;
-    else
-        return -1;
-}
-*/
-
 
 static int srmFileReaderRegistered =
     RideFileFactory::instance().registerReader(
