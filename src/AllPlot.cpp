@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -44,9 +44,9 @@ class AllPlotBackground: public QwtPlotItem
     public:
         AllPlotBackground(AllPlot *_parent)
         {
-	    setZ(0.0);
-	    parent = _parent;
-	}
+            setZ(0.0);
+            parent = _parent;
+        }
 
     virtual int rtti() const
     {
@@ -54,38 +54,38 @@ class AllPlotBackground: public QwtPlotItem
     }
 
     virtual void draw(QPainter *painter,
-		      const QwtScaleMap &, const QwtScaleMap &yMap,
-		      const QRect &rect) const
+                      const QwtScaleMap &, const QwtScaleMap &yMap,
+                      const QRect &rect) const
     {
-	RideItem *rideItem = parent->rideItem;
+        RideItem *rideItem = parent->rideItem;
 
-	if (! rideItem)
-	    return;
+        if (! rideItem)
+            return;
 
-	Zones **zones      = rideItem->zones;
-	int zone_range     = rideItem->zoneRange();
+        Zones **zones      = rideItem->zones;
+        int zone_range     = rideItem->zoneRange();
 
-	if (parent->shadeZones() && zones && *zones && (zone_range >= 0)) {
-	    QList <int> zone_lows = (*zones)->getZoneLows(zone_range);
-	    int num_zones = zone_lows.size();
-	    if (num_zones > 0) {
-		for (int z = 0; z < num_zones; z ++) {
-		    QRect r = rect;
+        if (parent->shadeZones() && zones && *zones && (zone_range >= 0)) {
+            QList <int> zone_lows = (*zones)->getZoneLows(zone_range);
+            int num_zones = zone_lows.size();
+            if (num_zones > 0) {
+                for (int z = 0; z < num_zones; z ++) {
+                    QRect r = rect;
 
-		    QColor shading_color = zoneColor(z, num_zones);
-		    shading_color.setHsv(
-					 shading_color.hue(),
-					 shading_color.saturation() / 4,
-					 shading_color.value()
-					 );
-		    r.setBottom(yMap.transform(zone_lows[z]));
-		    if (z + 1 < num_zones)
-			r.setTop(yMap.transform(zone_lows[z + 1]));
-		    if (r.top() <= r.bottom())
-			painter->fillRect(r, shading_color);
-		}
-	    }
-	}
+                    QColor shading_color = zoneColor(z, num_zones);
+                    shading_color.setHsv(
+                        shading_color.hue(),
+                        shading_color.saturation() / 4,
+                        shading_color.value()
+                        );
+                    r.setBottom(yMap.transform(zone_lows[z]));
+                    if (z + 1 < num_zones)
+                        r.setTop(yMap.transform(zone_lows[z + 1]));
+                    if (r.top() <= r.bottom())
+                        painter->fillRect(r, shading_color);
+                }
+            }
+        }
     }
 };
 
@@ -102,66 +102,66 @@ class AllPlotZoneLabel: public QwtPlotItem
     public:
         AllPlotZoneLabel(AllPlot *_parent, int _zone_number)
         {
-	    parent = _parent;
-	    zone_number = _zone_number;
+            parent = _parent;
+            zone_number = _zone_number;
 
-	    RideItem *rideItem = parent->rideItem;
+            RideItem *rideItem = parent->rideItem;
 
 
-	    if (! rideItem)
-		return;
-	
+            if (! rideItem)
+                return;
 
-	    Zones **zones      = rideItem->zones;
-	    int zone_range     = rideItem->zoneRange();
 
-	    // create new zone labels if we're shading
-	    if (parent->shadeZones() && zones && *zones && (zone_range >= 0)) {
-		QList <int> zone_lows = (*zones)->getZoneLows(zone_range);
-		QList <QString> zone_names = (*zones)->getZoneNames(zone_range);
-		int num_zones = zone_lows.size();
-		assert(zone_names.size() == num_zones);
-		if (zone_number < num_zones) {
-		    watts =
-			(
-			 (zone_number + 1 < num_zones) ?
-			 0.5 * (zone_lows[zone_number] + zone_lows[zone_number + 1]) :
-			 (
-			  (zone_number > 0) ?
-			  (1.5 * zone_lows[zone_number] - 0.5 * zone_lows[zone_number - 1]) :
-			  2.0 * zone_lows[zone_number]
-			  )
-			 );
+            Zones **zones      = rideItem->zones;
+            int zone_range     = rideItem->zoneRange();
 
-		    text = QwtText(zone_names[zone_number]);
-		    text.setFont(QFont("Helvetica",24, QFont::Bold));
-		    QColor text_color = zoneColor(zone_number, num_zones);
-		    text_color.setAlpha(64);
-		    text.setColor(text_color);
-		}
-	    }
+            // create new zone labels if we're shading
+            if (parent->shadeZones() && zones && *zones && (zone_range >= 0)) {
+                QList <int> zone_lows = (*zones)->getZoneLows(zone_range);
+                QList <QString> zone_names = (*zones)->getZoneNames(zone_range);
+                int num_zones = zone_lows.size();
+                assert(zone_names.size() == num_zones);
+                if (zone_number < num_zones) {
+                    watts =
+                        (
+                            (zone_number + 1 < num_zones) ?
+                            0.5 * (zone_lows[zone_number] + zone_lows[zone_number + 1]) :
+                            (
+                                (zone_number > 0) ?
+                                (1.5 * zone_lows[zone_number] - 0.5 * zone_lows[zone_number - 1]) :
+                                2.0 * zone_lows[zone_number]
+                            )
+                        );
 
-	    setZ(1.0 + zone_number / 100.0);
-	}
-    virtual int rtti() const
-    {
-	return QwtPlotItem::Rtti_PlotUserItem;
-    }
+                    text = QwtText(zone_names[zone_number]);
+                    text.setFont(QFont("Helvetica",24, QFont::Bold));
+                    QColor text_color = zoneColor(zone_number, num_zones);
+                    text_color.setAlpha(64);
+                    text.setColor(text_color);
+                }
+            }
 
-    void draw(QPainter *painter,
-				const QwtScaleMap &, const QwtScaleMap &yMap,
-				const QRect &rect) const
-    {
-	if (parent->shadeZones()) {
-	    int x = (rect.left() + rect.right()) / 2;
-	    int y = yMap.transform(watts);
+            setZ(1.0 + zone_number / 100.0);
+        }
+        virtual int rtti() const
+        {
+            return QwtPlotItem::Rtti_PlotUserItem;
+        }
 
-	    // the following code based on source for QwtPlotMarker::draw()
-	    QRect tr(QPoint(0, 0), text.textSize(painter->font()));
-	    tr.moveCenter(QPoint(x, y));
-	    text.draw(painter, tr);
-	}
-    }
+        void draw(QPainter *painter,
+                  const QwtScaleMap &, const QwtScaleMap &yMap,
+                  const QRect &rect) const
+        {
+            if (parent->shadeZones()) {
+                int x = (rect.left() + rect.right()) / 2;
+                int y = yMap.transform(watts);
+
+                // the following code based on source for QwtPlotMarker::draw()
+                QRect tr(QPoint(0, 0), text.textSize(painter->font()));
+                tr.moveCenter(QPoint(x, y));
+                text.draw(painter, tr);
+            }
+        }
 };
 
 
@@ -176,9 +176,9 @@ AllPlot::AllPlot(QWidget *parent):
     smooth(30), bydist(false),
     shade_zones(false)
 {
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();    
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
     unit = settings->value(GC_UNIT);
-    
+
     useMetricUnits = (unit.toString() == "Metric");
 
     // create a background object for shading
@@ -236,7 +236,7 @@ AllPlot::AllPlot(QWidget *parent):
 struct DataPoint {
     double time, hr, watts, speed, cad, alt;
     int inter;
-    DataPoint(double t, double h, double w, double s, double c, double a, int i) : 
+    DataPoint(double t, double h, double w, double s, double c, double a, int i) :
         time(t), hr(h), watts(w), speed(s), cad(c), alt(a), inter(i) {}
 };
 
@@ -254,18 +254,18 @@ void AllPlot::refreshZoneLabels()
     zoneLabels.clear();
 
     if (rideItem) {
-	int zone_range = rideItem->zoneRange();
-	Zones **zones  = rideItem->zones;
+        int zone_range = rideItem->zoneRange();
+        Zones **zones  = rideItem->zones;
 
-	// generate labels for existing zones
-	if (zones && *zones && (zone_range >= 0)) {
-	int num_zones = (*zones)->numZones(zone_range);
-	for (int z = 0; z < num_zones; z ++) {
-	    AllPlotZoneLabel *label = new AllPlotZoneLabel(this, z);
-	    label->attach(this);
-	    zoneLabels.append(label);
-	}
-	}
+        // generate labels for existing zones
+        if (zones && *zones && (zone_range >= 0)) {
+            int num_zones = (*zones)->numZones(zone_range);
+            for (int z = 0; z < num_zones; z ++) {
+                AllPlotZoneLabel *label = new AllPlotZoneLabel(this, z);
+                label->attach(this);
+                zoneLabels.append(label);
+            }
+        }
     }
 }
 
@@ -278,16 +278,16 @@ AllPlot::recalc()
     int rideTimeSecs = (int) ceil(timeArray[arrayLength - 1]);
     if (rideTimeSecs > 7*24*60*60) {
         QwtArray<double> data;
-	if (!wattsArray.empty())
-	    wattsCurve->setData(data, data);
-	if (!hrArray.empty())
-	    hrCurve->setData(data, data);
-	if (!speedArray.empty())
-	    speedCurve->setData(data, data);
-	if (!cadArray.empty())
-	    cadCurve->setData(data, data);
-	if (!altArray.empty())
-	    altCurve->setData(data, data);
+        if (!wattsArray.empty())
+            wattsCurve->setData(data, data);
+        if (!hrArray.empty())
+            hrCurve->setData(data, data);
+        if (!speedArray.empty())
+            speedCurve->setData(data, data);
+        if (!cadArray.empty())
+            cadCurve->setData(data, data);
+        if (!altArray.empty())
+            altCurve->setData(data, data);
         return;
     }
     double totalWatts = 0.0;
@@ -313,7 +313,7 @@ AllPlot::recalc()
 
     int lastInterval = 0; //Detect if we hit a new interval
 
-    for (int secs = 0; ((secs < smooth) 
+    for (int secs = 0; ((secs < smooth)
                         && (secs < rideTimeSecs)); ++secs) {
         smoothWatts[secs] = 0.0;
         smoothHr[secs]    = 0.0;
@@ -328,22 +328,22 @@ AllPlot::recalc()
     for (int secs = smooth; secs <= rideTimeSecs; ++secs) {
         while ((i < arrayLength) && (timeArray[i] <= secs)) {
             DataPoint dp(timeArray[i],
-			 (!hrArray.empty() ? hrArray[i] : 0),
-			 (!wattsArray.empty() ? wattsArray[i] : 0),
+                         (!hrArray.empty() ? hrArray[i] : 0),
+                         (!wattsArray.empty() ? wattsArray[i] : 0),
                          (!speedArray.empty() ? speedArray[i] : 0),
-			 (!cadArray.empty() ? cadArray[i] : 0),
-			 (!altArray.empty() ? altArray[i] : 0),
-			 interArray[i]);
+                         (!cadArray.empty() ? cadArray[i] : 0),
+                         (!altArray.empty() ? altArray[i] : 0),
+                         interArray[i]);
             if (!wattsArray.empty())
                 totalWatts += wattsArray[i];
-	    if (!hrArray.empty())
-		totalHr    += hrArray[i];
-	    if (!speedArray.empty())
-		totalSpeed += speedArray[i];
-	    if (!cadArray.empty())
-		totalCad   += cadArray[i];
-	    if (!altArray.empty())
-		totalAlt   += altArray[i];
+            if (!hrArray.empty())
+                totalHr    += hrArray[i];
+            if (!speedArray.empty())
+                totalSpeed += speedArray[i];
+            if (!cadArray.empty())
+                totalCad   += cadArray[i];
+            if (!altArray.empty())
+                totalAlt   += altArray[i];
             totalDist   = distanceArray[i];
             list.append(dp);
             //Figure out when and if we have a new interval..
@@ -376,7 +376,7 @@ AllPlot::recalc()
             smoothHr[secs]       = totalHr / list.size();
             smoothSpeed[secs]    = totalSpeed / list.size();
             smoothCad[secs]      = totalCad / list.size();
-	    smoothAltitude[secs]      = totalAlt / list.size();
+            smoothAltitude[secs]      = totalAlt / list.size();
         }
         smoothDistance[secs] = totalDist;
         smoothTime[secs]  = secs / 60.0;
@@ -387,9 +387,9 @@ AllPlot::recalc()
     int totalPoints = rideTimeSecs + 1 - startingIndex;
     // set curves
     if (!wattsArray.empty())
-	wattsCurve->setData(xaxis.data() + startingIndex, smoothWatts.data() + startingIndex, totalPoints);
+        wattsCurve->setData(xaxis.data() + startingIndex, smoothWatts.data() + startingIndex, totalPoints);
     if (!hrArray.empty())
-	hrCurve->setData(xaxis.data() + startingIndex, smoothHr.data() + startingIndex, totalPoints);
+        hrCurve->setData(xaxis.data() + startingIndex, smoothHr.data() + startingIndex, totalPoints);
     if (!speedArray.empty())
         speedCurve->setData(xaxis.data() + startingIndex, smoothSpeed.data() + startingIndex, totalPoints);
     if (!cadArray.empty())
@@ -434,8 +434,8 @@ AllPlot::setYMax()
     if (wattsCurve->isVisible()) {
         setAxisTitle(yLeft, "Watts");
         setAxisScale(yLeft, 0.0, 1.05 * wattsCurve->maxYValue());
-	setAxisLabelRotation(yLeft,270);
-	setAxisLabelAlignment(yLeft,Qt::AlignVCenter);
+        setAxisLabelRotation(yLeft,270);
+        setAxisLabelAlignment(yLeft,Qt::AlignVCenter);
     }
     if (hrCurve->isVisible() || cadCurve->isVisible()) {
         double ymax = 0;
@@ -450,22 +450,22 @@ AllPlot::setYMax()
         }
         setAxisTitle(yLeft2, labels.join(" / "));
         setAxisScale(yLeft2, 0.0, 1.05 * ymax);
-	setAxisLabelRotation(yLeft2,270);
-	setAxisLabelAlignment(yLeft2,Qt::AlignVCenter);
+        setAxisLabelRotation(yLeft2,270);
+        setAxisLabelAlignment(yLeft2,Qt::AlignVCenter);
     }
     if (speedCurve->isVisible()) {
         setAxisTitle(yRight, (useMetricUnits ? "KPH" : "MPH"));
         setAxisScale(yRight, 0.0, 1.05 * speedCurve->maxYValue());
-	setAxisLabelRotation(yRight,90);
-	setAxisLabelAlignment(yRight,Qt::AlignVCenter);
+        setAxisLabelRotation(yRight,90);
+        setAxisLabelAlignment(yRight,Qt::AlignVCenter);
     }
     if (altCurve->isVisible()) {
         setAxisTitle(yRight2, useMetricUnits ? "Meters" : "Feet");
         double ymin = altCurve->minYValue();
         double ymax = qMax(ymin + 100, 1.05 * altCurve->maxYValue());
         setAxisScale(yRight2, ymin, ymax);
-	setAxisLabelRotation(yRight2,90);
-	setAxisLabelAlignment(yRight2,Qt::AlignVCenter);
+        setAxisLabelRotation(yRight2,90);
+        setAxisLabelAlignment(yRight2,Qt::AlignVCenter);
         altCurve->setBaseline(ymin);
     }
 
@@ -493,73 +493,73 @@ AllPlot::setData(RideItem *_rideItem)
 
     RideFile *ride = rideItem->ride;
     if (ride) {
-	setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
+        setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
 
-	const RideFileDataPresent *dataPresent = ride->areDataPresent();
-	int npoints = ride->dataPoints().size();
-	wattsArray.resize(dataPresent->watts ? npoints : 0);
-	hrArray.resize(dataPresent->hr ? npoints : 0);
-	speedArray.resize(dataPresent->kph ? npoints : 0);
-	cadArray.resize(dataPresent->cad ? npoints : 0);
-	altArray.resize(dataPresent->alt ? npoints : 0);
-	timeArray.resize(npoints);
-	interArray.resize(npoints);
-	distanceArray.resize(npoints);
+        const RideFileDataPresent *dataPresent = ride->areDataPresent();
+        int npoints = ride->dataPoints().size();
+        wattsArray.resize(dataPresent->watts ? npoints : 0);
+        hrArray.resize(dataPresent->hr ? npoints : 0);
+        speedArray.resize(dataPresent->kph ? npoints : 0);
+        cadArray.resize(dataPresent->cad ? npoints : 0);
+        altArray.resize(dataPresent->alt ? npoints : 0);
+        timeArray.resize(npoints);
+        interArray.resize(npoints);
+        distanceArray.resize(npoints);
 
-	// attach appropriate curves
-	wattsCurve->detach();
-	hrCurve->detach();
-	speedCurve->detach();
-	cadCurve->detach();
-	altCurve->detach();
-	if (!wattsArray.empty()) wattsCurve->attach(this);
-	if (!hrArray.empty()) hrCurve->attach(this);
-	if (!speedArray.empty()) speedCurve->attach(this);
-	if (!cadArray.empty()) cadCurve->attach(this);
-	if (!altArray.empty()) altCurve->attach(this);
+        // attach appropriate curves
+        wattsCurve->detach();
+        hrCurve->detach();
+        speedCurve->detach();
+        cadCurve->detach();
+        altCurve->detach();
+        if (!wattsArray.empty()) wattsCurve->attach(this);
+        if (!hrArray.empty()) hrCurve->attach(this);
+        if (!speedArray.empty()) speedCurve->attach(this);
+        if (!cadArray.empty()) cadCurve->attach(this);
+        if (!altArray.empty()) altCurve->attach(this);
 
-	arrayLength = 0;
-	QListIterator<RideFilePoint*> i(ride->dataPoints()); 
-	while (i.hasNext()) {
-	    RideFilePoint *point = i.next();
-	    timeArray[arrayLength]  = point->secs;
-	    if (!wattsArray.empty())
-		wattsArray[arrayLength] = max(0, point->watts);
-	    if (!hrArray.empty())
-		hrArray[arrayLength]    = max(0, point->hr);
-	    if (!speedArray.empty())
-		speedArray[arrayLength] = max(0, 
-					      (useMetricUnits
-					       ? point->kph
-					       : point->kph * MILES_PER_KM));
-	    if (!cadArray.empty())
-		cadArray[arrayLength]   = max(0, point->cad);
+        arrayLength = 0;
+        QListIterator<RideFilePoint*> i(ride->dataPoints());
+        while (i.hasNext()) {
+            RideFilePoint *point = i.next();
+            timeArray[arrayLength]  = point->secs;
+            if (!wattsArray.empty())
+                wattsArray[arrayLength] = max(0, point->watts);
+            if (!hrArray.empty())
+                hrArray[arrayLength]    = max(0, point->hr);
+            if (!speedArray.empty())
+                speedArray[arrayLength] = max(0,
+                                              (useMetricUnits
+                                               ? point->kph
+                                               : point->kph * MILES_PER_KM));
+            if (!cadArray.empty())
+                cadArray[arrayLength]   = max(0, point->cad);
             if (!altArray.empty())
                 altArray[arrayLength]   = (useMetricUnits
                                            ? point->alt
                                            : point->alt * FEET_PER_METER);
-	    interArray[arrayLength] = point->interval;
-	    distanceArray[arrayLength] = max(0,
-					     (useMetricUnits
-					      ? point->km
-					      : point->km * MILES_PER_KM));
-	    ++arrayLength;
-	}
+            interArray[arrayLength] = point->interval;
+            distanceArray[arrayLength] = max(0,
+                                             (useMetricUnits
+                                              ? point->km
+                                              : point->km * MILES_PER_KM));
+            ++arrayLength;
+        }
 
-	recalc();
+        recalc();
     }
     else {
-	setTitle("no data");
-	wattsCurve->detach();
-	hrCurve->detach();
-	speedCurve->detach();
-	cadCurve->detach();
-	altCurve->detach();
+        setTitle("no data");
+        wattsCurve->detach();
+        hrCurve->detach();
+        speedCurve->detach();
+        cadCurve->detach();
+        altCurve->detach();
     }
 }
 
 void
-AllPlot::showPower(int id) 
+AllPlot::showPower(int id)
 {
     wattsCurve->setVisible(id < 2);
     shade_zones = (id == 0);
@@ -568,7 +568,7 @@ AllPlot::showPower(int id)
 }
 
 void
-AllPlot::showHr(int state) 
+AllPlot::showHr(int state)
 {
     assert(state != Qt::PartiallyChecked);
     hrCurve->setVisible(state == Qt::Checked);
@@ -577,7 +577,7 @@ AllPlot::showHr(int state)
 }
 
 void
-AllPlot::showSpeed(int state) 
+AllPlot::showSpeed(int state)
 {
     assert(state != Qt::PartiallyChecked);
     speedCurve->setVisible(state == Qt::Checked);
@@ -586,7 +586,7 @@ AllPlot::showSpeed(int state)
 }
 
 void
-AllPlot::showCad(int state) 
+AllPlot::showCad(int state)
 {
     assert(state != Qt::PartiallyChecked);
     cadCurve->setVisible(state == Qt::Checked);
@@ -595,7 +595,7 @@ AllPlot::showCad(int state)
 }
 
 void
-AllPlot::showAlt(int state) 
+AllPlot::showAlt(int state)
 {
     assert(state != Qt::PartiallyChecked);
     altCurve->setVisible(state == Qt::Checked);
@@ -604,7 +604,7 @@ AllPlot::showAlt(int state)
 }
 
 void
-AllPlot::showGrid(int state) 
+AllPlot::showGrid(int state)
 {
     assert(state != Qt::PartiallyChecked);
     grid->setVisible(state == Qt::Checked);

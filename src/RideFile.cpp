@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (c) 2007 Sean C. Rhea (srhea@srhea.net)
  *               2009 Justin F. Knotzke (jknotzke@shampoo.ca)
  *
@@ -6,12 +6,12 @@
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -62,10 +62,10 @@ void RideFile::writeAsCsv(QFile &file, bool bIsMetric) const
         out << ",";
         out << point->alt;
         if (point->bs > 0.0) {
-        	out << ",";
-		out << point->bs;
-	}
-	out << "\n";
+            out << ",";
+            out << point->bs;
+        }
+        out << "\n";
     }
 
     file.close();
@@ -73,16 +73,16 @@ void RideFile::writeAsCsv(QFile &file, bool bIsMetric) const
 
 RideFileFactory *RideFileFactory::instance_;
 
-RideFileFactory &RideFileFactory::instance() 
-{ 
-    if (!instance_) 
+RideFileFactory &RideFileFactory::instance()
+{
+    if (!instance_)
         instance_ = new RideFileFactory();
     return *instance_;
 }
 
 int RideFileFactory::registerReader(const QString &suffix,
                                     const QString &description,
-                                       RideFileReader *reader) 
+                                       RideFileReader *reader)
 {
     assert(!readFuncs_.contains(suffix));
     readFuncs_.insert(suffix, reader);
@@ -103,8 +103,8 @@ RideFileFactory::rideFileRegExp() const
     return QRegExp(s.arg(suffixList.join("|")));
 }
 
-RideFile *RideFileFactory::openRideFile(QFile &file, 
-                                           QStringList &errors) const 
+RideFile *RideFileFactory::openRideFile(QFile &file,
+                                           QStringList &errors) const
 {
     QString suffix = file.fileName();
     int dot = suffix.lastIndexOf(".");
@@ -115,7 +115,7 @@ RideFile *RideFileFactory::openRideFile(QFile &file,
     return reader->openRideFile(file, errors);
 }
 
-QStringList RideFileFactory::listRideFiles(const QDir &dir) const 
+QStringList RideFileFactory::listRideFiles(const QDir &dir) const
 {
     QStringList filters;
     QMapIterator<QString,RideFileReader*> i(readFuncs_);
@@ -133,12 +133,12 @@ QStringList RideFileFactory::listRideFiles(const QDir &dir) const
     return dir.entryList(filters, QDir::Files, QDir::Name|QDir::Reversed);
 }
 
-void RideFile::appendPoint(double secs, double cad, double hr, double km, 
-		           double kph, double nm, double watts, double alt, 
+void RideFile::appendPoint(double secs, double cad, double hr, double km,
+                           double kph, double nm, double watts, double alt,
                            int interval, double bs)
 {
-    dataPoints_.append(new RideFilePoint(secs, cad, hr, km, kph, 
-		nm, watts, alt, interval,bs));
+    dataPoints_.append(new RideFilePoint(secs, cad, hr, km, kph,
+                                         nm, watts, alt, interval,bs));
     dataPresent.secs  |= (secs != 0);
     dataPresent.cad   |= (cad != 0);
     dataPresent.hr    |= (hr != 0);
