@@ -76,8 +76,11 @@ static void summarize(bool even,
 
     if (even)
         intervals += "<tr><td align=\"center\">%1</td>";
-    else
-        intervals += "<tr bgcolor='#cccccc'><td align=\"center\">%1</td>";
+    else {
+        QColor color = QApplication::palette().alternateBase().color();
+        color = QColor::fromHsv(color.hue(), color.saturation() * 2, color.value());
+        intervals += "<tr bgcolor='" + color.name() + "'><td align=\"center\">%1</td>";
+    }
     intervals += "<td align=\"center\">%2:%3</td>";
     intervals += "<td align=\"center\">%4</td>";
     intervals += "<td align=\"center\">%5</td>";

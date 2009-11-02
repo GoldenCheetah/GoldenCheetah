@@ -19,6 +19,7 @@
 #include <QMessageBox>
 #include "Zones.h"
 #include "TimeUtils.h"
+#include <QtGui>
 #include <QtAlgorithms>
 #include <qcolor.h>
 #include <assert.h>
@@ -689,12 +690,17 @@ QString Zones::summarize(int rnum, QVector<double> &time_in_zone) const
     summary += "<td align=\"center\">High</td>";
     summary += "<td align=\"center\">Time</td>";
     summary += "</tr>";
+    QColor color = QApplication::palette().alternateBase().color();
+    color = QColor::fromHsv(color.hue(), color.saturation() * 2, color.value());
     for (int zone = 0; zone < time_in_zone.size(); ++zone) {
         if (time_in_zone[zone] > 0.0) {
             QString name, desc;
             int lo, hi;
             zoneInfo(rnum, zone, name, desc, lo, hi);
-            summary += "<tr>";
+            if (zone % 2 == 0)
+                summary += "<tr bgcolor='" + color.name() + "'>";
+            else
+                summary += "<tr>";
             summary += QString("<td align=\"center\">%1</td>").arg(name);
             summary += QString("<td align=\"center\">%1</td>").arg(desc);
             summary += QString("<td align=\"center\">%1</td>").arg(lo);
