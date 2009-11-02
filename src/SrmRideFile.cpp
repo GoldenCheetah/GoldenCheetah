@@ -231,6 +231,20 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings) co
         }
     }
 
+    double last = 0.0;
+    for (int i = 1; i < markers.size(); ++i) {
+        const marker &marker = markers[i];
+        double start_secs = result->dataPoints()[marker.start]->secs;
+        double end_secs = result->dataPoints()[marker.end]->secs + result->recIntSecs();
+        result->addInterval(last, start_secs, "");
+        result->addInterval(start_secs, end_secs, QString("%1").arg(i));
+        last = end_secs;
+    }
+    if (!markers.empty() && markers.last().end < result->dataPoints().size()) {
+        double start_secs = result->dataPoints().last()->secs + result->recIntSecs();
+        result->addInterval(last, start_secs, "");
+    }
+
     file.close();
     return result;
 }
