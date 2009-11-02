@@ -49,7 +49,8 @@ RideItem::~RideItem()
     }
 }
 
-static void summarize(QString &intervals,
+static void summarize(bool even,
+                      QString &intervals,
                       const QString &name,
                       double km_start, double km_end,
                       double &int_watts_sum,
@@ -73,7 +74,10 @@ static void summarize(QString &intervals,
     std::sort(int_hrs.begin(), int_hrs.end());
     double top5hr = int_hrs.size() > 0 ? int_hrs[int_hrs.size() * 0.95] : 0;
 
-    intervals += "<tr><td align=\"center\">%1</td>";
+    if (even)
+        intervals += "<tr><td align=\"center\">%1</td>";
+    else
+        intervals += "<tr bgcolor='#cccccc'><td align=\"center\">%1</td>";
     intervals += "<td align=\"center\">%2:%3</td>";
     intervals += "<td align=\"center\">%4</td>";
     intervals += "<td align=\"center\">%5</td>";
@@ -281,6 +285,7 @@ RideItem::htmlSummary()
         QString intervals = "";
         double secs_delta = ride->recIntSecs();
 
+        bool even = false;
         foreach (RideFileInterval interval, ride->intervals()) {
             int i = ride->intervalBegin(interval);
             assert(i < ride->dataPoints().size());
@@ -322,10 +327,11 @@ RideItem::htmlSummary()
 
                 km_end = point->km;
             }
-            summarize(intervals, interval.name,
+            summarize(even, intervals, interval.name,
                       firstPoint->km, km_end, int_watts_sum,
                       int_hr_sum, int_hrs, int_cad_sum, int_kph_sum,
                       int_secs_hr, int_max_power, int_dur);
+            even = !even;
         }
 
         summary += "<p>";
