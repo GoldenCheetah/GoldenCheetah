@@ -206,11 +206,23 @@ RideItem::computeMetrics()
 
     computeMetricsTime = QDateTime::currentDateTime();
 
-    int zone_range = -1;
-    int num_zones = 0;
-    if (zones && *zones &&
-        ((zone_range = (*zones)->whichRange(dateTime.date())) >= 0)) {
+    int zone_range = zoneRange();
+    int num_zones = numZones();
+    time_in_zone.clear();
+    if (zone_range >= 0) {
         num_zones = (*zones)->numZones(zone_range);
+        time_in_zone.resize(num_zones);
+    }
+
+    double secs_delta = ride->recIntSecs();
+    foreach (const RideFilePoint *point, ride->dataPoints()) {
+        if (point->watts >= 0.0) {
+            if (num_zones > 0) {
+                int zone = (*zones)->whichZone(zone_range, point->watts);
+                if (zone >= 0)
+                    time_in_zone[zone] += secs_delta;
+            }
+        }
     }
 
     const RideMetricFactory &factory = RideMetricFactory::instance();
@@ -250,9 +262,6 @@ RideItem::htmlSummary()
 {
     if (summary.isEmpty() ||
         (zones && *zones && (summaryGenerationTime < (*zones)->modificationTime))) {
-        // set defaults for zone range and number of zones
-        int zone_range = -1;
-        int num_zones = 0;
 
         summaryGenerationTime = QDateTime::currentDateTime();
 
@@ -274,16 +283,6 @@ RideItem::htmlSummary()
 
         boost::shared_ptr<QSettings> settings = GetApplicationSettings();
         QVariant unit = settings->value(GC_UNIT);
-
-        if (zones &&
-            *zones &&
-            ((zone_range = (*zones)->whichRange(dateTime.date())) >= 0) &&
-            ((num_zones = (*zones)->numZones(zone_range)) > 0)
-           )
-        {
-            time_in_zone.clear();
-            time_in_zone.resize(num_zones);
-        }
 
         QString intervals = "";
         double secs_delta = ride->recIntSecs();
@@ -338,16 +337,6 @@ RideItem::htmlSummary()
         }
 
         summary += "<p>";
-
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
-            if (point->watts >= 0.0) {
-                if (num_zones > 0) {
-                    int zone = (*zones)->whichZone(zone_range, point->watts);
-                    if (zone >= 0)
-                        time_in_zone[zone] += secs_delta;
-                }
-            }
-        }
 
         bool metricUnits = (unit.toString() == "Metric");
 
@@ -420,9 +409,9 @@ RideItem::htmlSummary()
                 summary += "</tr></table>";
         }
 
-        if (num_zones > 0) {
+        if (!time_in_zone.empty()) {
             summary += "<h2>Power Zones</h2>";
-            summary += (*zones)->summarize(zone_range, time_in_zone);
+            summary += (*zones)->summarize(zoneRange(), time_in_zone);
         }
 
         // TODO: Ergomo uses non-consecutive interval numbers.
