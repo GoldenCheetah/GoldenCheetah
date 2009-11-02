@@ -108,7 +108,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings) co
     QDate date(1880, 1, 1);
     date = date.addDays(dayssince1880);
 
-    marker *markers = new marker[markercnt + 1];
+    QVector<marker> markers(markercnt + 1);
     for (int i = 0; i <= markercnt; ++i) {
         char mcomment[256];
         in.readRawData(mcomment, sizeof(mcomment) - 1);
@@ -190,13 +190,13 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings) co
         if (i == 0) {
             result->setStartTime(blockhdrs[blknum].dt);
         }
-        if (i == markers[mrknum].end) {
+        if (mrknum < markers.size() && i == markers[mrknum].end) {
             ++interval;
             ++mrknum;
         }
 
         // markers count from 1
-        if ((i > 0) && (i == markers[mrknum].start - 1))
+        if ((i > 0) && (mrknum < markers.size()) && (i == markers[mrknum].start - 1))
             ++interval;
 
         km += result->recIntSecs() * kph / 3600.0;
