@@ -188,12 +188,11 @@ WeeklySummaryWindow::generateWeeklySummary(const RideItem *ride,
 	    (day < 7)
 	    ) {
 
-            item->htmlSummary(); // generates item->ride
+            item->computeMetrics(); // generates item->ride
             if (!item->ride)
                 continue;
 
 	    RideMetric *m;
-	    item->htmlSummary(); // compute metrics
 	    if ((m = item->metrics.value(weeklySeconds->name()))) {
 		weeklySeconds->aggregateWith(m);
 		dailySeconds[day]->aggregateWith(m);
