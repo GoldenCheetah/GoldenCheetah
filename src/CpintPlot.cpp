@@ -408,13 +408,12 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
 
     CPCurve = new QwtPlotCurve(curve_title);
     CPCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen *pen = new QPen(Qt::red);
-    pen->setWidth(2.0);
-    pen->setStyle(Qt::DashLine);
-    CPCurve->setPen(*pen);
+    QPen pen(Qt::red);
+    pen.setWidth(2.0);
+    pen.setStyle(Qt::DashLine);
+    CPCurve->setPen(pen);
     CPCurve->setData(cp_curve_time.data(), cp_curve_power.data(), curve_points);
     CPCurve->attach(thisPlot);
-    delete pen;
 }
 
 void
@@ -497,9 +496,9 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
                     curve =
                         new QwtPlotCurve((*zones)->getDefaultZoneName(z - 1));
                     curve->setRenderHint(QwtPlotItem::RenderAntialiased);
-                    QPen *pen = new QPen(zoneColor(z - 1, n_zones));
-                    pen->setWidth(2.0);
-                    curve->setPen(*pen);
+                    QPen pen(zoneColor(z - 1, n_zones));
+                    pen.setWidth(2.0);
+                    curve->setPen(pen);
                     curve->attach(thisPlot);
                     QColor brush_color = zoneColor(z - 1, n_zones);
                     brush_color.setAlpha(64);
@@ -507,7 +506,6 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
                     curve->setData(time_values.data() + n_zone[z],
                                    power_values + n_zone[z],
                                    n_zone[z - 1] - n_zone[z] + 1);
-                    delete pen;
 
                     // add the curve to the list
                     allCurves.append(curve);
@@ -558,9 +556,9 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
         QwtPlotCurve *curve;
         curve = new QwtPlotCurve("maximal power");
         curve->setRenderHint(QwtPlotItem::RenderAntialiased);
-        QPen *pen = new QPen(Qt::red);
-        pen->setWidth(2.0);
-        curve->setPen(*pen);
+        QPen pen(Qt::red);
+        pen.setWidth(2.0);
+        curve->setPen(pen);
         QColor brush_color = Qt::red;
         brush_color.setAlpha(64);
         curve->setBrush(brush_color);   // brush fills below the line
@@ -568,7 +566,6 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
                        power_values,
                        n_values);
         curve->attach(thisPlot);
-        delete pen;
         allCurves.append(curve);
     }
 
@@ -729,8 +726,6 @@ CpintPlot::calculate(RideItem *rideItem)
                 thisCurve = new QwtPlotCurve(
                     dateTime.toString("ddd MMM d, yyyy h:mm AP"));
                 thisCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-                QPen *pen = new QPen(Qt::black);
-                pen->setWidth(2.0);
                 thisCurve->setPen(QPen(Qt::black));
                 thisCurve->attach(this);
                 thisCurve->setData(timeArray.data() + 1, bests.constData() + 1,
