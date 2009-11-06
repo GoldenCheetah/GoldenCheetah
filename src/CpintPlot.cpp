@@ -387,8 +387,8 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
     const int curve_points = 100;
     double tmin = USE_T0_IN_CP_MODEL ? 1.0/60 : tau;
     double tmax = 180.0;
-    double cp_curve_power[curve_points];
-    double cp_curve_time[curve_points];
+    QVector<double> cp_curve_power(curve_points);
+    QVector<double> cp_curve_time(curve_points);
     int i;
 
     for (i = 0; i < curve_points; i ++) {
@@ -412,7 +412,7 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
     pen->setWidth(2.0);
     pen->setStyle(Qt::DashLine);
     CPCurve->setPen(*pen);
-    CPCurve->setData(cp_curve_time, cp_curve_power, curve_points);
+    CPCurve->setData(cp_curve_time.data(), cp_curve_power.data(), curve_points);
     CPCurve->attach(thisPlot);
     delete pen;
 }
@@ -456,7 +456,6 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
 
     QVector<double> time_values(n_values);
     // generate an array of time values
-    //double time_values[n_values];
     for (int t = 1; t <= n_values; t++)
         time_values[t - 1] = t / 60.0;
 
@@ -720,7 +719,7 @@ CpintPlot::calculate(RideItem *rideItem)
         QVector<double> bests;
         QVector<QDate> bestDates;
         if ((read_cpi_file(dir, file, bests, bestDates, NULL) == 0) && bests.size()) {
-            double *timeArray = new double[bests.size()];
+            QVector<double> timeArray(bests.size());
             int maxNonZero = 0;
             for (int i = 0; i < bests.size(); ++i) {
                 timeArray[i] = i / 60.0;
@@ -734,10 +733,9 @@ CpintPlot::calculate(RideItem *rideItem)
                 pen->setWidth(2.0);
                 thisCurve->setPen(QPen(Qt::black));
                 thisCurve->attach(this);
-                thisCurve->setData(timeArray + 1, bests.constData() + 1,
+                thisCurve->setData(timeArray.data() + 1, bests.constData() + 1,
                                    maxNonZero - 1);
             }
-            delete [] timeArray;
         }
     }
 
