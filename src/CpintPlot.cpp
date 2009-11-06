@@ -73,9 +73,7 @@ static void
 cpi_files_to_update(const QDir &dir, QList<cpi_file_info> &result)
 {
     QStringList filenames = RideFileFactory::instance().listRideFiles(dir);
-    QListIterator<QString> i(filenames);
-    while (i.hasNext()) {
-        const QString &filename = i.next();
+    foreach (const QString &filename, filenames) {
         if (RideFileFactory::instance().rideFileRegExp().exactMatch(filename)) {
             QString inname = dir.absoluteFilePath(filename);
             QString outname =
@@ -375,12 +373,7 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
                          double tau,
                          double t0)
 {
-    // detach the CP curve if it exists
-    if (CPCurve) {
-        CPCurve->detach();
-        delete CPCurve;
-        CPCurve = NULL;
-    }
+    assert(!CPCurve);
 
     // if there's no cp, then there's nothing to do
     if (cp <= 0)
@@ -424,9 +417,7 @@ CpintPlot::clear_CP_Curves()
 {
     // unattach any existing shading curves and reset the list
     if (allCurves.size()) {
-        QListIterator<QwtPlotCurve *> i(allCurves);
-        while (i.hasNext()) {
-            QwtPlotCurve *curve = i.next();
+        foreach (QwtPlotCurve *curve, allCurves) {
             if (curve) {
                 curve->detach();
                 delete curve;
@@ -437,9 +428,7 @@ CpintPlot::clear_CP_Curves()
 
     // now delete any labels
     if (allZoneLabels.size()) {
-        QListIterator<QwtPlotMarker *> i(allZoneLabels);
-        while (i.hasNext()) {
-            QwtPlotMarker *label = i.next();
+        foreach (QwtPlotMarker *label, allZoneLabels) {
             if (label) {
                 label->detach();
                 delete label;
@@ -609,9 +598,7 @@ CpintPlot::calculate(RideItem *rideItem)
         cpi_files_to_update(dir, to_update);
         double progress_max = 0.0;
         if (!to_update.empty()) {
-            QListIterator<cpi_file_info> i(to_update);
-            while (i.hasNext()) {
-                const cpi_file_info &info = i.next();
+            foreach (const cpi_file_info &info, to_update) {
                 QFile file(info.inname);
                 QStringList errors;
                 RideFile *rideFile =
@@ -630,10 +617,8 @@ CpintPlot::calculate(RideItem *rideItem)
         double progress_sum = 0.0;
         int endingOffset = progress->labelText().size();
         if (!to_update.empty()) {
-            QListIterator<cpi_file_info> i(to_update);
             int count = 1;
-            while (i.hasNext()) {
-                const cpi_file_info &info = i.next();
+            foreach (const cpi_file_info &info, to_update) {
                 QString existing = progress->labelText();
                 existing.chop(progress->labelText().size() - endingOffset);
                 progress->setLabelText(
@@ -659,9 +644,7 @@ CpintPlot::calculate(RideItem *rideItem)
             progress->setRange(0, list.size());
             progress->setValue(0);
             progress->show();
-            QListIterator<QString> i(list);
-            while (i.hasNext()) {
-                const QString &filename = i.next();
+            foreach (const QString &filename, list) {
                 QString path = dir.absoluteFilePath(filename);
                 read_one(path.toAscii().constData(), bests, bestDates, &cpiDataInBests);
                 progress->setValue(progress->value() + 1);
@@ -773,20 +756,13 @@ CpintPlot::showGrid(int state)
 QStringList
 CpintPlot::filterForSeason(QStringList cpints, QDate startDate, QDate endDate)
 {
-    QString cpi;
-    QDate cpiDate;
-    QStringListIterator cpis(cpints);
-    QStringList returnList;
-
     //Check to see if no date was assigned.
     QDate nilDate;
     if(startDate == nilDate)
         return cpints;
-
-    while (cpis.hasNext())
-    {
-        cpi = cpis.next();
-        cpiDate = cpi_filename_to_date(cpi);
+    QStringList returnList;
+    foreach (const QString &cpi, cpints) {
+        QDate cpiDate = cpi_filename_to_date(cpi);
         if(cpiDate > startDate && cpiDate < endDate)
             returnList << cpi;
 
