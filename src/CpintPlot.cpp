@@ -376,8 +376,11 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
                          double t0)
 {
     // detach the CP curve if it exists
-    if (CPCurve)
+    if (CPCurve) {
         CPCurve->detach();
+        delete CPCurve;
+        CPCurve = NULL;
+    }
 
     // if there's no cp, then there's nothing to do
     if (cp <= 0)
@@ -596,6 +599,7 @@ CpintPlot::calculate(RideItem *rideItem)
         cpiDataInBests.clear();
         if (CPCurve) {
             CPCurve->detach();
+            delete CPCurve;
             CPCurve = NULL;
         }
 
