@@ -418,10 +418,8 @@ CpintPlot::clear_CP_Curves()
     // unattach any existing shading curves and reset the list
     if (allCurves.size()) {
         foreach (QwtPlotCurve *curve, allCurves) {
-            if (curve) {
-                curve->detach();
+            if (curve)
                 delete curve;
-            }
         }
         allCurves.clear();
     }
@@ -429,10 +427,8 @@ CpintPlot::clear_CP_Curves()
     // now delete any labels
     if (allZoneLabels.size()) {
         foreach (QwtPlotMarker *label, allZoneLabels) {
-            if (label) {
-                label->detach();
+            if (label)
                 delete label;
-            }
         }
         allZoneLabels.clear();
     }
@@ -587,11 +583,9 @@ CpintPlot::calculate(RideItem *rideItem)
         bestDates.clear();
         cpiDataInBests.clear();
         if (CPCurve) {
-            CPCurve->detach();
             delete CPCurve;
             CPCurve = NULL;
         }
-
         fflush(stderr);
         bool aborted = false;
         QList<cpi_file_info> to_update;
@@ -697,9 +691,10 @@ CpintPlot::calculate(RideItem *rideItem)
     }
 
     if (!needToScanRides) {
-        if (thisCurve)
+        if (thisCurve) {
             delete thisCurve;
-        thisCurve = NULL;
+            thisCurve = NULL;
+        }
         QVector<double> bests;
         QVector<QDate> bestDates;
         if ((read_cpi_file(dir, file, bests, bestDates, NULL) == 0) && bests.size()) {
