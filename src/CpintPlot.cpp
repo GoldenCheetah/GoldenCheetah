@@ -30,6 +30,7 @@
 #include "LogTimeScaleEngine.h"
 #include "RideFile.h"
 #include "Season.h"
+#include <boost/scoped_ptr.hpp>
 
 CpintPlot::CpintPlot(QString p) :
     needToScanRides(true),
@@ -93,12 +94,13 @@ struct cpint_point
 {
     double secs;
     int watts;
+    cpint_point() : secs(0.0), watts(0) {}
     cpint_point(double s, int w) : secs(s), watts(w) {}
 };
 
 struct cpint_data {
     QStringList errors;
-    QList<cpint_point> points;
+    QVector<cpint_point> points;
     int rec_int_ms;
     cpint_data() : rec_int_ms(0) {}
 };
@@ -109,8 +111,8 @@ update_cpi_file(const cpi_file_info *info, QProgressDialog *progress,
 {
     QFile file(info->inname);
     QStringList errors;
-    RideFile *rideFile =
-        RideFileFactory::instance().openRideFile(file, errors);
+    boost::scoped_ptr<RideFile> rideFile(
+        RideFileFactory::instance().openRideFile(file, errors));
     if (! rideFile)
         return;
     cpint_data data;
@@ -120,7 +122,6 @@ update_cpi_file(const cpi_file_info *info, QProgressDialog *progress,
         if (secs > 0)
             data.points.append(cpint_point(secs, (int) round(p->watts)));
     }
-    delete rideFile;
 
     FILE *out = fopen(info->outname.toAscii().constData(), "w");
     assert(out);
@@ -134,13 +135,7 @@ update_cpi_file(const cpi_file_info *info, QProgressDialog *progress,
         return;
     }
 
-
-    QVector <double> ride_bests(total_secs + 1);  // was calloc'ed array (unfreed?), changed djconnel
-
-    // initialize ride_bests
-    for (int i = 0; i < ride_bests.size(); i ++)
-        ride_bests[i] = 0.0;
-
+    QVector <double> ride_bests(total_secs + 1);
     bool canceled = false;
     int progress_count = 0;
     for (int i = 0; i < data.points.size() - 1; ++i) {
@@ -536,8 +531,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
     }
     // no zones available: just plot the curve without zones
     else {
-        QwtPlotCurve *curve;
-        curve = new QwtPlotCurve("maximal power");
+        QwtPlotCurve *curve = new QwtPlotCurve("maximal power");
         curve->setRenderHint(QwtPlotItem::RenderAntialiased);
         QPen pen(Qt::red);
         pen.setWidth(2.0);
@@ -545,9 +539,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
         QColor brush_color = Qt::red;
         brush_color.setAlpha(64);
         curve->setBrush(brush_color);   // brush fills below the line
-        curve->setData(time_values.data(),
-                       power_values,
-                       n_values);
+        curve->setData(time_values.data(), power_values, n_values);
         curve->attach(thisPlot);
         allCurves.append(curve);
     }
@@ -561,7 +553,6 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
     thisPlot->setAxisScale(thisPlot->yLeft,
                            0,
                            100 * ceil( power_values[0] / 100 ));
-
 }
 
 void
@@ -590,12 +581,11 @@ CpintPlot::calculate(RideItem *rideItem)
             foreach (const cpi_file_info &info, to_update) {
                 QFile file(info.inname);
                 QStringList errors;
-                RideFile *rideFile =
-                    RideFileFactory::instance().openRideFile(file, errors);
+                boost::scoped_ptr<RideFile> rideFile(
+                    RideFileFactory::instance().openRideFile(file, errors));
                 if (rideFile) {
                     double x = rideFile->dataPoints().size();
                     progress_max += x * (x + 1.0) / 2.0;
-                    delete rideFile;
                 }
             }
         }
