@@ -208,7 +208,8 @@ cpi_filename_to_date(const QString filename) {
 }
 
 static int
-read_one(const char *inname, QVector<double> &bests, QVector<QDate> &bestDates, QHash <QString, bool> *cpiDataInBests)
+read_one(const char *inname, QVector<double> &bests, QVector<QDate> *bestDates,
+         QHash<QString,bool> *cpiDataInBests)
 {
     FILE *in = fopen(inname, "r");
     if (!in)
@@ -231,11 +232,13 @@ read_one(const char *inname, QVector<double> &bests, QVector<QDate> &bestDates, 
         int secs = (int) round(mins * 60.0);
         if (secs >= bests.size()) {
             bests.resize(secs + 1);
-            bestDates.resize(secs + 1);
+            if (bestDates)
+                bestDates->resize(secs + 1);
         }
         if (bests[secs] < watts){
             bests[secs] = watts;
-            bestDates[secs] = cpi_filename_to_date(QString(inname));
+            if (bestDates)
+                (*bestDates)[secs] = cpi_filename_to_date(QString(inname));
 
             // mark the filename as having contributed to the bests
             // Note this contribution may subsequently be over-written, so
@@ -251,7 +254,8 @@ read_one(const char *inname, QVector<double> &bests, QVector<QDate> &bestDates, 
 }
 
 static int
-read_cpi_file(const QDir &dir, const QFileInfo &raw, QVector<double> &bests, QVector<QDate> &bestDates, QHash <QString, bool> *cpiDataInBests)
+read_cpi_file(const QDir &dir, const QFileInfo &raw, QVector<double> &bests,
+              QVector<QDate> *bestDates, QHash<QString,bool> *cpiDataInBests)
 {
     QString inname = dir.absoluteFilePath(raw.completeBaseName() + ".cpi");
     return read_one(inname.toAscii().constData(), bests, bestDates, cpiDataInBests);
@@ -587,7 +591,7 @@ CpintPlot::calculate(RideItem *rideItem)
             progress.show();
             foreach (const QString &filename, list) {
                 QString path = dir.absoluteFilePath(filename);
-                read_one(path.toAscii().constData(), bests, bestDates, &cpiDataInBests);
+                read_one(path.toAscii().constData(), bests, &bestDates, &cpiDataInBests);
                 progress.setValue(progress.value() + 1);
                 QCoreApplication::processEvents();
                 if (progress.wasCanceled()) {
@@ -641,8 +645,7 @@ CpintPlot::calculate(RideItem *rideItem)
             thisCurve = NULL;
         }
         QVector<double> bests;
-        QVector<QDate> bestDates;
-        if ((read_cpi_file(dir, file, bests, bestDates, NULL) == 0) && bests.size()) {
+        if ((read_cpi_file(dir, file, bests, NULL, NULL) == 0) && bests.size()) {
             QVector<double> timeArray(bests.size());
             int maxNonZero = 0;
             for (int i = 0; i < bests.size(); ++i) {
