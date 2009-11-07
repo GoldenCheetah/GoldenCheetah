@@ -175,11 +175,6 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
 	showSpeed->setEnabled(dataPresent->kph);
 	showCad->setEnabled(dataPresent->cad);
 	showAlt->setEnabled(dataPresent->alt);
-	allPlot->showPower(dataPresent->watts ? showPower->currentIndex() : 2);
-        allPlot->showHr(dataPresent->hr ? showHr->checkState() : Qt::Unchecked);
-        allPlot->showSpeed(dataPresent->kph ? showSpeed->checkState() : Qt::Unchecked);
-        allPlot->showCad(dataPresent->cad ? showCad->checkState() : Qt::Unchecked);
-        allPlot->showAlt(dataPresent->alt ? showAlt->checkState() : Qt::Unchecked);
     }
     else {
 	showPower->setEnabled(false);
@@ -187,11 +182,6 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
 	showSpeed->setEnabled(false);
 	showCad->setEnabled(false);
 	showAlt->setEnabled(false);
-	allPlot->showPower(false);
-        allPlot->showHr(false);
-        allPlot->showSpeed(false);
-        allPlot->showCad(false);
-        allPlot->showAlt(false);
     }
 }
 
