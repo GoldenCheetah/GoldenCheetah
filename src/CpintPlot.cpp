@@ -220,8 +220,13 @@ read_one(const char *inname, QVector<double> &bests, QVector<QDate> &bestDates, 
         double mins;
         int watts;
         if (sscanf(line, "%lf %d\n", &mins, &watts) != 2) {
-            fprintf(stderr, "Bad match on line %d: %s", lineno, line);
-            exit(1);
+            QMessageBox::warning(
+                NULL, "Warning",
+                QString("Error reading %1, line %2").arg(inname).arg(line),
+                QMessageBox::Ok,
+                QMessageBox::NoButton);
+            fclose(in);
+            return -1;
         }
         int secs = (int) round(mins * 60.0);
         if (secs >= bests.size()) {
@@ -318,7 +323,12 @@ CpintPlot::deriveCPParameters()
     int iteration = 0;
     do {
         if (iteration ++ > max_loops) {
-            fprintf(stderr, "maximum number of loops %d exceeded in cp model extraction\n", max_loops);
+            QMessageBox::warning(
+                NULL, "Warning",
+                QString("Maximum number of loops %d exceeded in cp model"
+                        "extraction").arg(max_loops),
+                QMessageBox::Ok,
+                QMessageBox::NoButton);
             break;
         }
 
@@ -525,7 +535,6 @@ CpintPlot::calculate(RideItem *rideItem)
             delete CPCurve;
             CPCurve = NULL;
         }
-        fflush(stderr);
         bool aborted = false;
         QList<cpi_file_info> to_update;
         cpi_files_to_update(dir, to_update);
