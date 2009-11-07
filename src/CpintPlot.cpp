@@ -25,6 +25,7 @@
 #include <qwt_legend.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
+#include <qwt_plot_marker.h>
 #include "RideItem.h"
 #include "LogTimeScaleDraw.h"
 #include "LogTimeScaleEngine.h"
@@ -32,12 +33,13 @@
 #include "Season.h"
 #include <boost/scoped_ptr.hpp>
 
+#define USE_T0_IN_CP_MODEL 0 // added djconnel 08Apr2009: allow 3-parameter CP model
+
 CpintPlot::CpintPlot(QString p) :
     needToScanRides(true),
     path(p),
     thisCurve(NULL),
     CPCurve(NULL),
-    grid(NULL),
     zones(NULL)
 {
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
@@ -54,9 +56,6 @@ CpintPlot::CpintPlot(QString p) :
     gridPen.setStyle(Qt::DotLine);
     grid->setPen(gridPen);
     grid->attach(this);
-
-    allCurves=     QList <QwtPlotCurve *>::QList();
-    allZoneLabels= QList <QwtPlotMarker *>::QList();
 }
 
 struct cpi_file_info {
@@ -193,14 +192,12 @@ done:
     progress_sum += progress_count;
 }
 
-QDate
+static QDate
 cpi_filename_to_date(const QString filename) {
     QRegExp rx("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_\\d\\d_\\d\\d_\\d\\d\\.cpi$");
     if (rx.exactMatch(filename)) {
         assert(rx.numCaptures() == 3);
-        QDate date = QDate(rx.cap(1).toInt(),
-                           rx.cap(2).toInt(),
-                           rx.cap(3).toInt());
+        QDate date(rx.cap(1).toInt(), rx.cap(2).toInt(), rx.cap(3).toInt());
         if (date.isValid())
             return date;
     }
@@ -702,14 +699,3 @@ CpintPlot::filterForSeason(QStringList cpints, QDate startDate, QDate endDate)
     return returnList;
 }
 
-void
-CpintPlot::setStartDate(QDate _startDate)
-{
-    startDate = _startDate;
-}
-
-void
-CpintPlot::setEndDate(QDate _endDate)
-{
-    endDate = _endDate;
-}

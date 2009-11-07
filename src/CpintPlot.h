@@ -19,21 +19,16 @@
 #ifndef _GC_CpintPlot_h
 #define _GC_CpintPlot_h 1
 
-#include "Zones.h"
 #include <qwt_plot.h>
-#include <qwt_plot_marker.h>   // added djconnel 06Apr2009
 #include <QtGui>
-#include <QHash>
 
 class QwtPlotCurve;
 class QwtPlotGrid;
+class QwtPlotMarker;
 class RideItem;
+class Zones;
 
-#define USE_T0_IN_CP_MODEL 0 // added djconnel 08Apr2009: allow 3-parameter CP model
-
-bool is_ride_filename(const QString filename);
 QString ride_filename_to_cpi_filename(const QString filename);
-QDate cpi_filename_to_date(const QString filename);
 
 class CpintPlot : public QwtPlot
 {
@@ -52,8 +47,8 @@ class CpintPlot : public QwtPlot
 	double cp, tau, t0;                   // CP model parameters
 	void deriveCPParameters();            // derive the CP model parameters
 	bool deleteCpiFile(QString filename); // delete a CPI file and clean up
-    void setStartDate(QDate);
-    void setEndDate(QDate);
+        void setStartDate(QDate date) { startDate = date; }
+        void setEndDate(QDate date) { endDate = date; }
 
     public slots:
 
