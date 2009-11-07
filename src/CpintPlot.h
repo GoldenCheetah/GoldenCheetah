@@ -42,7 +42,6 @@ class CpintPlot : public QwtPlot
     public:
 
         CpintPlot(QString path);
-        QProgressDialog *progress;
         bool needToScanRides;
 
         const QwtPlotCurve *getThisCurve() const { return thisCurve; }

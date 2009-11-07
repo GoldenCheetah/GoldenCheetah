@@ -32,7 +32,6 @@
 #include "Season.h"
 
 CpintPlot::CpintPlot(QString p) :
-    progress(NULL),
     needToScanRides(true),
     path(p),
     thisCurve(NULL),
@@ -600,46 +599,46 @@ CpintPlot::calculate(RideItem *rideItem)
                 }
             }
         }
-        progress = new QProgressDialog(
+        QProgressDialog progress(
             QString(tr("Computing critical power intervals.\n"
                        "This may take a while.\n")),
             tr("Abort"), 0, 1000, this);
         double progress_sum = 0.0;
-        int endingOffset = progress->labelText().size();
+        int endingOffset = progress.labelText().size();
         if (!to_update.empty()) {
             int count = 1;
             foreach (const cpi_file_info &info, to_update) {
-                QString existing = progress->labelText();
-                existing.chop(progress->labelText().size() - endingOffset);
-                progress->setLabelText(
+                QString existing = progress.labelText();
+                existing.chop(progress.labelText().size() - endingOffset);
+                progress.setLabelText(
                     existing + QString(tr("Processing %1...")).arg(info.file));
-                progress->setValue(count++);
-                update_cpi_file(&info, progress, progress_sum, progress_max);
+                progress.setValue(count++);
+                update_cpi_file(&info, &progress, progress_sum, progress_max);
                 QCoreApplication::processEvents();
-                if (progress->wasCanceled()) {
+                if (progress.wasCanceled()) {
                     aborted = true;
                     break;
                 }
             }
         }
         if (!aborted) {
-            QString existing = progress->labelText();
-            existing.chop(progress->labelText().size() - endingOffset);
+            QString existing = progress.labelText();
+            existing.chop(progress.labelText().size() - endingOffset);
             QStringList filters;
             filters << "*.cpi";
             QStringList list = dir.entryList(filters, QDir::Files, QDir::Name);
             list = filterForSeason(list, startDate, endDate);
-            progress->setLabelText(
+            progress.setLabelText(
                 existing + tr("Aggregating over all files."));
-            progress->setRange(0, list.size());
-            progress->setValue(0);
-            progress->show();
+            progress.setRange(0, list.size());
+            progress.setValue(0);
+            progress.show();
             foreach (const QString &filename, list) {
                 QString path = dir.absoluteFilePath(filename);
                 read_one(path.toAscii().constData(), bests, bestDates, &cpiDataInBests);
-                progress->setValue(progress->value() + 1);
+                progress.setValue(progress.value() + 1);
                 QCoreApplication::processEvents();
-                if (progress->wasCanceled()) {
+                if (progress.wasCanceled()) {
                     aborted = true;
                     break;
                 }
@@ -682,8 +681,6 @@ CpintPlot::calculate(RideItem *rideItem)
             }
             needToScanRides = false;
         }
-        delete progress;
-        progress = NULL;
     }
 
     if (!needToScanRides) {
