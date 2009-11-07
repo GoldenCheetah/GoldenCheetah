@@ -440,93 +440,46 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
     if (cp > 0) {
         QList <int> power_zone;
         int n_zones = (*zones)->lowsFromCP(&power_zone, (int) int(cp));
-
-        QList <int> n_zone;
-
-        // the lowest zone goes to zero power, so mark its start at the last data point
-        n_zone.append(n_values - 1);
-
-        // start the search at the next-to-lowest zone
-        int z = 1;
-
-        // search the maximal power curve to extract the zone times
-        for (int i = n_values; i-- > 0;) {
-            // if we reach the beginning of the curve OR if we hit a zone boundary, we're done with the present zone
-            if ((i == 0) || (power_values[i] > power_zone[z])) {
-                n_zone.append(
-                    (z == n_zones) ?
-                    0 :
-                    (
-                        (
-                            (i == n_values - 1) ||
-                            (abs(power_values[i] - power_zone[z]) < abs(power_zone[z] - power_values[i + 1]))
-                        ) ?
-                        i :
-                        i + 1
-                    )
-                    );
-
-                // draw curves for the zone we're leaving, if it spans any segments
-                if (n_zone[z - 1] > n_zone[z]) {
-                    // define the individual code segments.  Note in the old code with a single segment, it was
-                    // part of the class.  This curve is not a protected member of the class.  djconnel Apr2009
-                    QwtPlotCurve *curve;
-                    curve =
-                        new QwtPlotCurve((*zones)->getDefaultZoneName(z - 1));
-                    curve->setRenderHint(QwtPlotItem::RenderAntialiased);
-                    QPen pen(zoneColor(z - 1, n_zones));
-                    pen.setWidth(2.0);
-                    curve->setPen(pen);
-                    curve->attach(thisPlot);
-                    QColor brush_color = zoneColor(z - 1, n_zones);
-                    brush_color.setAlpha(64);
-                    curve->setBrush(brush_color);   // brush fills below the line
-                    curve->setData(time_values.data() + n_zone[z],
-                                   power_values + n_zone[z],
-                                   n_zone[z - 1] - n_zone[z] + 1);
-
-                    // add the curve to the list
-                    allCurves.append(curve);
-
-                    // render a colored label on the zone
-                    QwtText text((*zones)->getDefaultZoneName(z - 1));
-                    text.setFont(QFont("Helvetica",24, QFont::Bold));
-                    QColor text_color = zoneColor(z - 1, n_zones);
-                    text_color.setAlpha(128);
-                    text.setColor(text_color);
-                    QwtPlotMarker *label_mark;
-                    label_mark = new QwtPlotMarker();
-
-                    // place the text in the geometric mean in time, at a decent power
-                    label_mark->setValue(sqrt(time_values[n_zone[z-1]] * time_values[n_zone[z]]),
-                                         (power_values[n_zone[z-1]] + power_values[n_zone[z]]) / 5);
-                    label_mark->setLabel(text);
-                    label_mark->attach(thisPlot);
-                    allZoneLabels.append(label_mark);
-                }
-
-                if (z < n_zones)
-                    fprintf(stderr, "zone %s: %d watts, index = %d\n",
-                            (*zones)->getDefaultZoneName(z).toAscii().constData(),
-                            power_zone[z],
-                            n_zone[z]);
-
-                // if we're to the smallest time, we're done
-                if (i == 0)
-                    break;
-
-                // increment zone number
-                if (z < n_zones)
-                    z ++;
-
-                // if we're to the final zone, just jump to the beginning of the plot: we're done
-                if (z == n_zones)
-                    i = 1;
-
-                // else, we've got to recheck this point for the next zone
-                else
-                    i ++;
+        int high = n_values - 1;
+        int zone = 0;
+        while (zone < n_zones) {
+            int low = high - 1;
+            int nextZone = zone + 1;
+            if (nextZone >= power_zone.size())
+                low = 0;
+            else {
+                while ((low > 0) && (power_values[low] < power_zone[nextZone]))
+                    --low;
             }
+
+            QColor color = zoneColor(zone, n_zones);
+            QString name = (*zones)->getDefaultZoneName(zone);
+            QwtPlotCurve *curve = new QwtPlotCurve(name);
+            curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+            QPen pen(color);
+            pen.setWidth(2.0);
+            curve->setPen(pen);
+            curve->attach(thisPlot);
+            color.setAlpha(64);
+            curve->setBrush(color);  // brush fills below the line
+            curve->setData(time_values.data() + low, power_values + low, high - low + 1);
+            allCurves.append(curve);
+
+            QwtText text(name);
+            text.setFont(QFont("Helvetica", 24, QFont::Bold));
+            color.setAlpha(128);
+            text.setColor(color);
+            QwtPlotMarker *label_mark = new QwtPlotMarker();
+            // place the text in the geometric mean in time, at a decent power
+            double x = sqrt(time_values[low] * time_values[high]);
+            double y = (power_values[low] + power_values[high]) / 5;
+            label_mark->setValue(x, y);
+            label_mark->setLabel(text);
+            label_mark->attach(thisPlot);
+            allZoneLabels.append(label_mark);
+
+            high = low - 1;
+            ++zone;
         }
     }
     // no zones available: just plot the curve without zones
