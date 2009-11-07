@@ -201,7 +201,7 @@ done:
 
 QDate
 cpi_filename_to_date(const QString filename) {
-    QRegExp rx(".*(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_\\d\\d_\\d\\d_\\d\\d\\.cpi$");
+    QRegExp rx("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_\\d\\d_\\d\\d_\\d\\d\\.cpi$");
     if (rx.exactMatch(filename)) {
         assert(rx.numCaptures() == 3);
         QDate date = QDate(rx.cap(1).toInt(),
