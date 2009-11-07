@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -42,11 +42,11 @@ class CpintPlot : public QwtPlot
         const QwtPlotCurve *getThisCurve() const { return thisCurve; }
         const QwtPlotCurve *getCPCurve() const { return CPCurve; }
 
-	QVector<QDate> getBestDates() { return bestDates; }
-	QVector<double> getBests() { return bests; }
-	double cp, tau, t0;                   // CP model parameters
-	void deriveCPParameters();            // derive the CP model parameters
-	bool deleteCpiFile(QString filename); // delete a CPI file and clean up
+        QVector<QDate> getBestDates() { return bestDates; }
+        QVector<double> getBests() { return bests; }
+        double cp, tau, t0; // CP model parameters
+        void deriveCPParameters();
+        bool deleteCpiFile(QString filename);
         void setStartDate(QDate date) { startDate = date; }
         void setEndDate(QDate date) { endDate = date; }
 
@@ -54,37 +54,26 @@ class CpintPlot : public QwtPlot
 
         void showGrid(int state);
         void calculate(RideItem *rideItem);
-	void plot_CP_curve(
-			   CpintPlot *plot,
-			   double cp,
-			   double tau,
-			   double t0n
-			   );
-	void plot_allCurve(
-			   CpintPlot *plot,
-			   int n_values,
-			   const double *power_values
-			   );
+        void plot_CP_curve(CpintPlot *plot, double cp, double tau, double t0n);
+        void plot_allCurve(CpintPlot *plot, int n_values, const double *power_values);
 
     protected:
 
         QString path;
         QwtPlotCurve *thisCurve;
-	QwtPlotCurve *CPCurve;
-	QList <QwtPlotCurve *> allCurves;
-	QList <QwtPlotMarker *> allZoneLabels;
-	void clear_CP_Curves();
-    QStringList filterForSeason(QStringList cpints, QDate startDate, QDate endDate);
+        QwtPlotCurve *CPCurve;
+        QList<QwtPlotCurve*> allCurves;
+        QList<QwtPlotMarker*> allZoneLabels;
+        void clear_CP_Curves();
+        QStringList filterForSeason(QStringList cpints, QDate startDate, QDate endDate);
         QwtPlotGrid *grid;
-
         QVector<double> bests;
-	QVector<QDate> bestDates;
-    QDate startDate;
-    QDate endDate;
-
-	Zones **zones;                // pointer to power zones added djconnel 24Apr2009
-
-	QHash <QString, bool> cpiDataInBests;  // hash: keys are CPI files contributing to bests (at least originally)
+        QVector<QDate> bestDates;
+        QDate startDate;
+        QDate endDate;
+        Zones **zones;
+        // keys are CPI files contributing to bests (at least originally)
+        QHash<QString,bool> cpiDataInBests;
 };
 
 #endif // _GC_CpintPlot_h
