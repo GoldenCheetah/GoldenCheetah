@@ -413,19 +413,15 @@ CpintPlot::clear_CP_Curves()
 {
     // unattach any existing shading curves and reset the list
     if (allCurves.size()) {
-        foreach (QwtPlotCurve *curve, allCurves) {
-            if (curve)
-                delete curve;
-        }
+        foreach (QwtPlotCurve *curve, allCurves)
+            delete curve;
         allCurves.clear();
     }
 
     // now delete any labels
     if (allZoneLabels.size()) {
-        foreach (QwtPlotMarker *label, allZoneLabels) {
-            if (label)
-                delete label;
-        }
+        foreach (QwtPlotMarker *label, allZoneLabels)
+            delete label;
         allZoneLabels.clear();
     }
 }
