@@ -49,6 +49,8 @@ class CpintPlot : public QwtPlot
         bool deleteCpiFile(QString filename);
         void setStartDate(QDate date) { startDate = date; }
         void setEndDate(QDate date) { endDate = date; }
+        void setEnergyMode(bool value);
+        bool energyMode() const { return energyMode_; }
 
     public slots:
 
@@ -74,6 +76,7 @@ class CpintPlot : public QwtPlot
         Zones **zones;
         // keys are CPI files contributing to bests (at least originally)
         QHash<QString,bool> cpiDataInBests;
+        bool energyMode_;
 };
 
 #endif // _GC_CpintPlot_h

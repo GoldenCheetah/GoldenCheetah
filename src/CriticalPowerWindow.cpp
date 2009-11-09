@@ -74,6 +74,10 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
     cpintSetCPButton->setEnabled(false);
     otherLayout->addWidget(cpintSetCPButton);
     otherLayout->addWidget(cComboSeason);
+    QComboBox *yAxisCombo = new QComboBox(this);
+    yAxisCombo->addItem("Y Axis Shows Power");
+    yAxisCombo->addItem("Y Axis Shows Energy");
+    otherLayout->addWidget(yAxisCombo);
 
     bottomLayout->addLayout(otherLayout);
 
@@ -93,7 +97,8 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
 	    this, SLOT(cpintSetCPButtonClicked()));
     connect(cComboSeason, SIGNAL(currentIndexChanged(int)),
     this, SLOT(seasonSelected(int)));
-
+    connect(yAxisCombo, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(setEnergyMode(int)));
 }
 
 void
@@ -115,6 +120,13 @@ CriticalPowerWindow::setData(RideItem *ride)
     currentRide = ride;
     cpintPlot->calculate(ride);
     cpintSetCPButton->setEnabled(cpintPlot->cp > 0);
+}
+
+void
+CriticalPowerWindow::setEnergyMode(int index)
+{
+    cpintPlot->setEnergyMode(index != 0);
+    cpintPlot->calculate(currentRide);
 }
 
 void
@@ -168,7 +180,7 @@ CriticalPowerWindow::pickerMoved(const QPoint &pos)
       unsigned watts = curve_to_point(minutes, cpintPlot->getThisCurve());
       QString label;
       if (watts > 0)
-	label = QString("%1 watts").arg(watts);
+          label = QString(cpintPlot->energyMode() ? "%1 kJ" : "%1 watts").arg(watts);
       else
 	label = tr("no data");
       cpintTodayValue->setText(label);
@@ -179,7 +191,7 @@ CriticalPowerWindow::pickerMoved(const QPoint &pos)
       unsigned watts = curve_to_point(minutes, cpintPlot->getCPCurve());
       QString label;
       if (watts > 0)
-       label = QString("%1 watts").arg(watts);
+          label = QString(cpintPlot->energyMode() ? "%1 kJ" : "%1 watts").arg(watts);
       else
        label = tr("no data");
       cpintCPValue->setText(label);
@@ -191,10 +203,12 @@ CriticalPowerWindow::pickerMoved(const QPoint &pos)
       int index = (int) ceil(minutes * 60);
       if (cpintPlot->getBests().count() > index) {
 	  QDate date = cpintPlot->getBestDates()[index];
-	  label =
-	      QString("%1 watts (%2)").
-	      arg(cpintPlot->getBests()[index]).
-	      arg(date.isValid() ? date.toString("MM/dd/yyyy") : "no date");
+          unsigned watts = cpintPlot->getBests()[index];
+          if (cpintPlot->energyMode())
+              label = QString("%1 kJ (%2)").arg(watts * minutes * 60.0 / 1000.0, 0, 'f', 0);
+          else
+              label = QString("%1 watts (%2)").arg(watts);
+          label = label.arg(date.isValid() ? date.toString("MM/dd/yyyy") : "no date");
       }
       else
 	  label = tr("no data");

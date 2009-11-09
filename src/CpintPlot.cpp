@@ -26,6 +26,7 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
 #include <qwt_plot_marker.h>
+#include <qwt_scale_engine.h>
 #include "RideItem.h"
 #include "LogTimeScaleDraw.h"
 #include "LogTimeScaleEngine.h"
@@ -40,8 +41,11 @@ CpintPlot::CpintPlot(QString p) :
     path(p),
     thisCurve(NULL),
     CPCurve(NULL),
-    zones(NULL)
+    zones(NULL),
+    energyMode_(false)
 {
+    assert(!USE_T0_IN_CP_MODEL); // doesn't work with energyMode=true
+
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setCanvasBackground(Qt::white);
     setAxisTitle(yLeft, "Average Power (watts)");
@@ -251,6 +255,27 @@ read_one(const QDir& dir, const QString &filename, QVector<double> &bests,
     return 0;
 }
 
+void
+CpintPlot::setEnergyMode(bool value)
+{
+    energyMode_ = value;
+    if (energyMode_) {
+        setAxisTitle(yLeft, "Total work (kJ)");
+        setAxisScaleEngine(xBottom, new QwtLinearScaleEngine);
+        setAxisScaleDraw(xBottom, new QwtScaleDraw);
+        setAxisTitle(xBottom, "Interval Length (minutes)");
+    }
+    else {
+        setAxisTitle(yLeft, "Average Power (watts)");
+        setAxisScaleEngine(xBottom, new LogTimeScaleEngine);
+        setAxisScaleDraw(xBottom, new LogTimeScaleDraw);
+        setAxisTitle(xBottom, "Interval Length");
+    }
+    delete CPCurve;
+    CPCurve = NULL;
+    clear_CP_Curves();
+}
+
 // extract critical power parameters which match the given curve
 // model: maximal power = cp (1 + tau / [t + t0]), where t is the
 // duration of the effort, and t, cp and tau are model parameters
@@ -367,7 +392,10 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
                          double tau,
                          double t0)
 {
-    assert(!CPCurve);
+    if (CPCurve) {
+        delete CPCurve;
+        CPCurve = NULL;
+    }
 
     // if there's no cp, then there's nothing to do
     if (cp <= 0)
@@ -385,7 +413,10 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
         double x = (double) i / (curve_points - 1);
         double t = pow(tmax, x) * pow(tmin, 1-x);
         cp_curve_time[i] = t;
-        cp_curve_power[i] = cp * (1 + tau / (t + t0));
+        if (energyMode_)
+            cp_curve_power[i] = (cp * t + cp * tau) * 60.0 / 1000.0;
+        else
+            cp_curve_power[i] = cp * (1 + tau / (t + t0));
     }
 
     // generate a plot
@@ -393,7 +424,7 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
 #if USE_T0_IN_CP_MODEL
     curve_title.sprintf("CP=%.1f W; AWC/CP=%.2f m; t0=%.1f s", cp, tau, 60 * t0);
 #else
-    curve_title.sprintf("CP=%.1f W; AWC/CP=%.2f m", cp, tau);
+    curve_title.sprintf("CP=%.0f W; AWC=%.0f kJ", cp, cp * tau * 60.0 / 1000.0);
 #endif
 
     CPCurve = new QwtPlotCurve(curve_title);
@@ -431,10 +462,13 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
 {
     clear_CP_Curves();
 
+    QVector<double> energyBests(n_values);
     QVector<double> time_values(n_values);
     // generate an array of time values
-    for (int t = 1; t <= n_values; t++)
-        time_values[t - 1] = t / 60.0;
+    for (int t = 0; t < n_values; t++) {
+        time_values[t] = (t + 1) / 60.0;
+        energyBests[t] = power_values[t] * time_values[t] * 60.0 / 1000.0;
+    }
 
     // generate zones from derived CP value
     if (cp > 0) {
@@ -462,21 +496,37 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
             curve->attach(thisPlot);
             color.setAlpha(64);
             curve->setBrush(color);  // brush fills below the line
-            curve->setData(time_values.data() + low, power_values + low, high - low + 1);
+            if (energyMode_) {
+                curve->setData(time_values.data() + low,
+                               energyBests.data() + low, high - low + 1);
+            }
+            else {
+                curve->setData(time_values.data() + low,
+                               power_values + low, high - low + 1);
+            }
             allCurves.append(curve);
 
-            QwtText text(name);
-            text.setFont(QFont("Helvetica", 24, QFont::Bold));
-            color.setAlpha(128);
-            text.setColor(color);
-            QwtPlotMarker *label_mark = new QwtPlotMarker();
-            // place the text in the geometric mean in time, at a decent power
-            double x = sqrt(time_values[low] * time_values[high]);
-            double y = (power_values[low] + power_values[high]) / 5;
-            label_mark->setValue(x, y);
-            label_mark->setLabel(text);
-            label_mark->attach(thisPlot);
-            allZoneLabels.append(label_mark);
+            if (!energyMode_ || energyBests[high] > 100.0) {
+                QwtText text(name);
+                text.setFont(QFont("Helvetica", 24, QFont::Bold));
+                color.setAlpha(128);
+                text.setColor(color);
+                QwtPlotMarker *label_mark = new QwtPlotMarker();
+                // place the text in the geometric mean in time, at a decent power
+                double x, y;
+                if (energyMode_) {
+                    x = (time_values[low] + time_values[high]) / 2;
+                    y = (energyBests[low] + energyBests[high]) / 5;
+                }
+                else {
+                    x = sqrt(time_values[low] * time_values[high]);
+                    y = (power_values[low] + power_values[high]) / 5;
+                }
+                label_mark->setValue(x, y);
+                label_mark->setLabel(text);
+                label_mark->attach(thisPlot);
+                allZoneLabels.append(label_mark);
+            }
 
             high = low - 1;
             ++zone;
@@ -492,20 +542,28 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
         QColor brush_color = Qt::red;
         brush_color.setAlpha(64);
         curve->setBrush(brush_color);   // brush fills below the line
-        curve->setData(time_values.data(), power_values, n_values);
+        if (energyMode_)
+            curve->setData(time_values.data(), energyBests.data(), n_values);
+        else
+            curve->setData(time_values.data(), power_values, n_values);
         curve->attach(thisPlot);
         allCurves.append(curve);
     }
 
-    // set the x-axis to span the time of the all-time curve, starting at 1 second
-    thisPlot->setAxisScale(thisPlot->xBottom,
-                           1.0 / 60,
-                           time_values[n_values - 1]);
+    // Energy mode is really only interesting in the range where energy is
+    // linear in interval duration--up to about 1 hour.
+    double xmax = energyMode_ ? 60.0 : time_values[n_values - 1];
+    thisPlot->setAxisScale(thisPlot->xBottom, 1.0 / 60, xmax);
 
-    // set the y-axis to go from zero to the maximum power, rounded up to nearest 100 watts
-    thisPlot->setAxisScale(thisPlot->yLeft,
-                           0,
-                           100 * ceil( power_values[0] / 100 ));
+    double ymax;
+    if (energyMode_) {
+        int i = std::lower_bound(time_values.begin(), time_values.end(), 60.0) - time_values.begin();
+        ymax = 10 * ceil(energyBests[i] / 10);
+    }
+    else {
+        ymax = 100 * ceil(power_values[0] / 100);
+    }
+    thisPlot->setAxisScale(thisPlot->yLeft, 0, ymax);
 }
 
 void
@@ -521,10 +579,6 @@ CpintPlot::calculate(RideItem *rideItem)
         bests.clear();
         bestDates.clear();
         cpiDataInBests.clear();
-        if (CPCurve) {
-            delete CPCurve;
-            CPCurve = NULL;
-        }
         bool aborted = false;
         QList<cpi_file_info> to_update;
         cpi_files_to_update(dir, to_update);
@@ -587,16 +641,10 @@ CpintPlot::calculate(RideItem *rideItem)
             }
         }
         if (!aborted && bests.size()) {
-            int maxNonZero = 0;
-
             // check that total work doesn't decrease with time
             double maxwork = 0.0;
 
             for (int i = 0; i < bests.size(); ++i) {
-                // record the date associated with each point's CPI file,
-                if (bests[i] > 0)
-                    maxNonZero = i;
-
                 // note index is being used here in lieu of time, as the index
                 // is assumed to be proportional to time
                 double work = bests[i] * i;
@@ -617,15 +665,23 @@ CpintPlot::calculate(RideItem *rideItem)
 
                 // calculate CP model from all-time best data
                 deriveCPParameters();
-                plot_CP_curve(this, cp, tau, t0);
-
-                plot_allCurve(this, maxNonZero - 1, bests.constData() + 1);
             }
             needToScanRides = false;
         }
     }
 
     if (!needToScanRides) {
+        if (!CPCurve)
+            plot_CP_curve(this, cp, tau, t0);
+        if (allCurves.empty()) {
+            int maxNonZero = 0;
+            for (int i = 0; i < bests.size(); ++i) {
+                if (bests[i] > 0)
+                    maxNonZero = i;
+            }
+            plot_allCurve(this, maxNonZero - 1, bests.constData() + 1);
+        }
+
         if (thisCurve) {
             delete thisCurve;
             thisCurve = NULL;
@@ -633,10 +689,12 @@ CpintPlot::calculate(RideItem *rideItem)
         QVector<double> bests;
         QString filename = file.completeBaseName() + ".cpi";
         if ((read_one(dir, filename, bests, NULL, NULL) == 0) && bests.size()) {
+            QVector<double> energyArray(bests.size());
             QVector<double> timeArray(bests.size());
             int maxNonZero = 0;
             for (int i = 0; i < bests.size(); ++i) {
                 timeArray[i] = i / 60.0;
+                energyArray[i] = timeArray[i] * bests[i] * 60.0 / 1000.0;
                 if (bests[i] > 0) maxNonZero = i;
             }
             if (maxNonZero > 1) {
@@ -645,8 +703,16 @@ CpintPlot::calculate(RideItem *rideItem)
                 thisCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
                 thisCurve->setPen(QPen(Qt::black));
                 thisCurve->attach(this);
-                thisCurve->setData(timeArray.data() + 1, bests.constData() + 1,
-                                   maxNonZero - 1);
+                if (energyMode_) {
+                    thisCurve->setData(timeArray.data() + 1,
+                                       energyArray.constData() + 1,
+                                       maxNonZero - 1);
+                }
+                else {
+                    thisCurve->setData(timeArray.data() + 1,
+                                       bests.constData() + 1,
+                                       maxNonZero - 1);
+                }
             }
         }
     }
