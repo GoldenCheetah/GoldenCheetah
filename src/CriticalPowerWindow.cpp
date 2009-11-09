@@ -222,6 +222,12 @@ void CriticalPowerWindow::addSeasons()
         season = seasons.at(i);
         cComboSeason->addItem(season.getName());
     }
+    if (!seasons.empty()) {
+        cComboSeason->setCurrentIndex(cComboSeason->count() - 1);
+        Season season = seasons.last();
+        cpintPlot->setStartDate(season.getStart());
+        cpintPlot->setEndDate(season.getEnd());
+    }
 }
 
 void CriticalPowerWindow::seasonSelected(int iSeason)
