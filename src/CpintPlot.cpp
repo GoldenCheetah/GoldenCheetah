@@ -205,9 +205,10 @@ cpi_filename_to_date(const QString filename) {
 }
 
 static int
-read_one(const QString &inname, QVector<double> &bests, QVector<QDate> *bestDates,
-         QHash<QString,bool> *cpiDataInBests)
+read_one(const QDir& dir, const QString &filename, QVector<double> &bests,
+         QVector<QDate> *bestDates, QHash<QString,bool> *cpiDataInBests)
 {
+    QString inname = dir.absoluteFilePath(filename);
     FILE *in = fopen(inname.toAscii().constData(), "r");
     if (!in)
         return -1;
@@ -235,7 +236,7 @@ read_one(const QString &inname, QVector<double> &bests, QVector<QDate> *bestDate
         if (bests[secs] < watts){
             bests[secs] = watts;
             if (bestDates)
-                (*bestDates)[secs] = cpi_filename_to_date(inname);
+                (*bestDates)[secs] = cpi_filename_to_date(filename);
 
             // mark the filename as having contributed to the bests
             // Note this contribution may subsequently be over-written, so
@@ -576,7 +577,7 @@ CpintPlot::calculate(RideItem *rideItem)
             progress.show();
             foreach (const QString &filename, list) {
                 QString path = dir.absoluteFilePath(filename);
-                read_one(path, bests, &bestDates, &cpiDataInBests);
+                read_one(dir, filename, bests, &bestDates, &cpiDataInBests);
                 progress.setValue(progress.value() + 1);
                 QCoreApplication::processEvents();
                 if (progress.wasCanceled()) {
@@ -630,8 +631,8 @@ CpintPlot::calculate(RideItem *rideItem)
             thisCurve = NULL;
         }
         QVector<double> bests;
-        QString inname = dir.absoluteFilePath(file.completeBaseName() + ".cpi");
-        if ((read_one(inname, bests, NULL, NULL) == 0) && bests.size()) {
+        QString filename = file.completeBaseName() + ".cpi";
+        if ((read_one(dir, filename, bests, NULL, NULL) == 0) && bests.size()) {
             QVector<double> timeArray(bests.size());
             int maxNonZero = 0;
             for (int i = 0; i < bests.size(); ++i) {
