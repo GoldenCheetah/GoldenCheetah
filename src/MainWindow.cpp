@@ -270,8 +270,8 @@ MainWindow::MainWindow(const QDir &home) :
     QMenu *optionsMenu = menuBar()->addMenu(tr("&Tools"));
     optionsMenu->addAction(tr("&Options..."), this, 
                            SLOT(showOptions()), tr("Ctrl+O")); 
-    optionsMenu->addAction(tr("&Tools..."), this, 
-                           SLOT(showTools()), tr("Ctrl+T")); 
+    optionsMenu->addAction(tr("Critical Power Calculator"), this,
+                           SLOT(showTools()));
     //optionsMenu->addAction(tr("&Reset Metrics..."), this, 
     //                       SLOT(importRideToDB()), tr("Ctrl+R")); 
     //optionsMenu->addAction(tr("&Update Metrics..."), this, 
