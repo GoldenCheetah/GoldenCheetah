@@ -168,7 +168,7 @@ AllPlotWindow::setSmoothingFromLineEdit()
 void
 AllPlotWindow::setAllPlotWidgets(RideItem *ride)
 {
-    if (ride->ride) {
+    if (ride->ride && ride->ride->deviceType() != QString("Manual CSV")) {
 	const RideFileDataPresent *dataPresent = ride->ride->areDataPresent();
 	showPower->setEnabled(dataPresent->watts);
 	showHr->setEnabled(dataPresent->hr);
