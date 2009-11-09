@@ -139,6 +139,8 @@ curve_to_point(double x, const QwtPlotCurve *curve)
     if (curve) {
         const QwtData &data = curve->data();
         if (data.size() > 0) {
+            if (x < data.x(0) || x > data.x(data.size() - 1))
+                return 0;
             unsigned min = 0, mid = 0, max = data.size();
             while (min < max - 1) {
                 mid = (max - min) / 2 + min;
