@@ -559,13 +559,10 @@ MainWindow::rideSelected()
 
 	// turn off tabs that don't make sense for manual file entry
 	if (ride->ride && ride->ride->deviceType() == QString("Manual CSV")) {
-	    tabWidget->setTabEnabled(1,false); // Ride Plot
 	    tabWidget->setTabEnabled(3,false); // Power Histogram
 	    tabWidget->setTabEnabled(4,false); // PF/PV Plot
 	}
  	else {
-	    // enable
-	    tabWidget->setTabEnabled(1,true); // Ride Plot
 	    tabWidget->setTabEnabled(3,true); // Power Histogram
 	    tabWidget->setTabEnabled(4,true); // PF/PV Plot
 	}

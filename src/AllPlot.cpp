@@ -480,7 +480,7 @@ AllPlot::setData(RideItem *_rideItem)
     wattsArray.clear();
 
     RideFile *ride = rideItem->ride;
-    if (ride) {
+    if (ride && ride->deviceType() != QString("Manual CSV")) {
         setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
 
         const RideFileDataPresent *dataPresent = ride->areDataPresent();
@@ -539,6 +539,9 @@ AllPlot::setData(RideItem *_rideItem)
         speedCurve->detach();
         cadCurve->detach();
         altCurve->detach();
+        foreach(QwtPlotMarker *mrk, d_mrk)
+            delete mrk;
+        d_mrk.clear();
     }
 }
 
