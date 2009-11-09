@@ -44,6 +44,7 @@ class CriticalPowerWindow : public QWidget
         void cpintSetCPButtonClicked();
         void pickerMoved(const QPoint &pos);
         void seasonSelected(int season);
+        void setEnergyMode(int index);
 
     protected:
 
