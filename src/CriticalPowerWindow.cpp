@@ -217,11 +217,8 @@ void CriticalPowerWindow::addSeasons()
     season.setName("All Seasons");
     seasons.insert(0,season);
 
-    for (int i = 0; i < seasons.size(); ++i)
-    {
-        season = seasons.at(i);
+    foreach (Season season, seasons)
         cComboSeason->addItem(season.getName());
-    }
     if (!seasons.empty()) {
         cComboSeason->setCurrentIndex(cComboSeason->count() - 1);
         Season season = seasons.last();
