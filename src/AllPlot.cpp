@@ -174,7 +174,7 @@ AllPlot::AllPlot(QWidget *parent):
     unit(0),
     rideItem(NULL),
     smooth(30), bydist(false),
-    shade_zones(false)
+    shade_zones(true)
 {
     boost::shared_ptr<QSettings> settings = GetApplicationSettings();
     unit = settings->value(GC_UNIT);
