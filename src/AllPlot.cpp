@@ -396,6 +396,8 @@ AllPlot::recalc()
     d_mrk.clear();
     if (rideItem->ride) {
         foreach(const RideFileInterval &interval, rideItem->ride->intervals()) {
+            if (interval.start < xaxis[startingIndex])
+                continue;
             QwtPlotMarker *mrk = new QwtPlotMarker;
             d_mrk.append(mrk);
             mrk->attach(this);
