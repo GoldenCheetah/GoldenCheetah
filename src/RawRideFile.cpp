@@ -144,12 +144,22 @@ pt_read_raw(FILE *in, void *context,
             // do nothing
         }
         else if (PowerTapUtil::is_config(buf, bIsVer81)) {
+            double new_rec_int_secs = 0.0;
             if (PowerTapUtil::unpack_config(buf, &interval, &last_interval, 
-                                        &rec_int_secs, &wheel_sz_mm, bIsVer81) < 0) {
+                                        &new_rec_int_secs, &wheel_sz_mm, bIsVer81) < 0) {
                 sprintf(ebuf, "Couldn't unpack config record.");
                 if (error_cb) error_cb(ebuf, context);
                 return;
             }
+            if ((rec_int_secs != 0.0) && (rec_int_secs != new_rec_int_secs)) {
+                sprintf(ebuf, "Ride has multiple recording intervals, which "
+                        "is not yet supported.<br>(Recording interval changes "
+                        "from %0.2f to %0.2f after %0.2f minutes of ride data.)\n",
+                        rec_int_secs, new_rec_int_secs, secs / 60.0);
+                if (error_cb) error_cb(ebuf, context);
+                return;
+            }
+            rec_int_secs = new_rec_int_secs;
             if (config_cb) config_cb(interval, rec_int_secs, wheel_sz_mm, context);
         }
         else if (PowerTapUtil::is_time(buf, bIsVer81)) {
