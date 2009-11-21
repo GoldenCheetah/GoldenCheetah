@@ -60,9 +60,8 @@ static void summarize(bool even,
                       double &int_kph_sum,
                       double &int_secs_hr,
                       double &int_max_power,
-                      double int_dur)
+                      double dur)
 {
-    double dur = int_dur;
     double mile_len = (km_end - km_start) * MILES_PER_KM;
     double minutes = (int) (dur/60.0);
     double seconds = dur - (60 * minutes);
@@ -301,15 +300,12 @@ RideItem::htmlSummary()
             double int_kph_sum = 0.0;
             double int_secs_hr = 0.0;
             double int_max_power = 0.0;
-            double km_end = 0.0, int_dur = 0.0;
+            double km_end = 0.0;
 
             while (i < ride->dataPoints().size()) {
                 const RideFilePoint *point = ride->dataPoints()[i++];
                 if (point->secs >= interval.stop)
                     break;
-                if ((point->kph > 0.0) || (point->cad > 0.0)) {
-                    int_dur += secs_delta;
-                }
                 if (point->watts >= 0.0) {
                     secs_watts += secs_delta;
                     int_watts_sum += point->watts * secs_delta;
@@ -332,7 +328,8 @@ RideItem::htmlSummary()
             summarize(even, intervals, interval.name,
                       firstPoint->km, km_end, int_watts_sum,
                       int_hr_sum, int_hrs, int_cad_sum, int_kph_sum,
-                      int_secs_hr, int_max_power, int_dur);
+                      int_secs_hr, int_max_power,
+                      interval.stop - interval.start);
             even = !even;
         }
 
