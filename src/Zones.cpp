@@ -528,7 +528,7 @@ int Zones::whichRange(const QDate &date) const
             return rnum;
         ++rnum;
     }
-    return -1;
+    return 0;
 }
 
 int Zones::numZones(int rnum) const
