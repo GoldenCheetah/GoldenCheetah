@@ -20,6 +20,7 @@
 #include "Units.h"
 #include <QString>
 #include <math.h>
+#include <stdio.h>
 
 bool 
 PowerTapUtil::is_ignore_record(unsigned char *buf, bool bVer81)
