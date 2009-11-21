@@ -28,7 +28,7 @@
 { \
     addInterval(start, previous->secs + recIntSecs_, \
                 QString("%1").arg(interval)); \
-    ++interval; \
+    interval = point->interval; \
     start = point->secs; \
 }
 
