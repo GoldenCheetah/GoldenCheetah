@@ -172,6 +172,8 @@ static const char *metricsXml =
     "            display_name=\"Relative Intensity\" precision=\"3\"/>\n"
     "    <metric name=\"skiba_bike_score\" display_name=\"BikeScore&#8482;\"\n"
     "            precision=\"0\"/>\n"
+    "    <metric name=\"daniels_points\" display_name=\"Daniels Points\"\n"
+    "            precision=\"1\"/>\n"
     "    <metric name=\"aerobic_decoupling\" display_name=\"Aerobic Decoupling\"\n"
     "            precision=\"2\"/>\n"
     "  </metric_group>\n"

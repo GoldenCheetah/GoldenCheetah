@@ -120,6 +120,7 @@ SOURCES += \
         BasicRideMetrics.cpp \
         BestIntervalDialog.cpp \
         BikeScore.cpp \
+        DanielsPoints.cpp \
         ChooseCyclistDialog.cpp \
         CommPort.cpp \
         Computrainer.cpp \
