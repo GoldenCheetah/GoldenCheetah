@@ -151,6 +151,8 @@ WeeklySummaryWindow::generateWeeklySummary(const RideItem *ride,
     assert(weeklyBS);
     QSharedPointer<RideMetric> weeklyRelIntensity(factory.newMetric("skiba_relative_intensity"));
     assert(weeklyRelIntensity);
+    QSharedPointer<RideMetric> weeklyCS(factory.newMetric("daniels_points"));
+    assert(weeklyCS);
 
     QSharedPointer<RideMetric> dailySeconds[7];
     QSharedPointer<RideMetric> dailyDistance[7];
@@ -207,6 +209,9 @@ WeeklySummaryWindow::generateWeeklySummary(const RideItem *ride,
 		weeklyWork->aggregateWith(m);
 		dailyW[day]->aggregateWith(m);
 	    }
+
+            if ((m = item->metrics.value(weeklyCS->name())))
+                weeklyCS->aggregateWith(m);
 
         if ((m = item->metrics.value(weeklyBS->name()))) {
 		weeklyBS->aggregateWith(m);
@@ -284,10 +289,13 @@ WeeklySummaryWindow::generateWeeklySummary(const RideItem *ride,
 		tr(
 		   "<tr><td>Total BikeScore:</td>"
 		   "    <td align=\"right\">%1</td></tr>"
-		   "<tr><td>Net Relative Intensity:</td>"
+		   "<tr><td>Total Daniels Points:</td>"
 		   "    <td align=\"right\">%2</td></tr>"
+		   "<tr><td>Net Relative Intensity:</td>"
+		   "    <td align=\"right\">%3</td></tr>"
 		   )
 		.arg((unsigned) round(weeklyBSValue))
+                .arg(weeklyCS->value(useMetricUnits), 0, 'f', 1)
 		.arg(weeklyRelIntensity->value(useMetricUnits), 0, 'f', 3);
 
         summary +=
