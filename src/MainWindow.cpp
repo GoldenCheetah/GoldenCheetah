@@ -20,12 +20,14 @@
 #include "AllPlotWindow.h"
 #include "BestIntervalDialog.h"
 #include "ChooseCyclistDialog.h"
+#include "Computrainer.h"
 #include "ConfigDialog.h"
 #include "CriticalPowerWindow.h"
 #include "PfPvWindow.h"
 #include "DownloadRideDialog.h"
 #include "ManualRideDialog.h"
 #include "HistogramWindow.h"
+#include "RealtimeWindow.h"
 #include "RideItem.h"
 #include "RideFile.h"
 #include "RideImportWizard.h"
@@ -225,6 +227,10 @@ MainWindow::MainWindow(const QDir &home) :
     performanceManagerWindow = new PerformanceManagerWindow();
     tabWidget->addTab(performanceManagerWindow, "Performance Manager");
 
+    //////////////////////// Realtime ////////////////////////
+
+    realtimeWindow = new RealtimeWindow(this, home);
+    tabWidget->addTab(realtimeWindow, tr("Realtime"));
 
     ////////////////////////////// Signals ////////////////////////////// 
 
@@ -933,5 +939,4 @@ void MainWindow::dateChanged(const QDate &date)
         }
     }
 }
-
 

@@ -4,6 +4,7 @@
 
 #include "MainWindow.h"
 #include "ConfigDialog.h"
+#include "RealtimeWindow.h"
 #include "Pages.h"
 #include "Settings.h"
 #include "Zones.h"
@@ -43,9 +44,12 @@ ConfigDialog::ConfigDialog(QDir _home, Zones **_zones)
 
     configPage = new ConfigurationPage();
 
+    devicePage = new DevicePage(this);
+
     pagesWidget = new QStackedWidget;
     pagesWidget->addWidget(configPage);
     pagesWidget->addWidget(cyclistPage);
+    pagesWidget->addWidget(devicePage);
 
     closeButton = new QPushButton(tr("Close"));
     saveButton = new QPushButton(tr("Save"));
@@ -60,6 +64,12 @@ ConfigDialog::ConfigDialog(QDir _home, Zones **_zones)
     connect(cyclistPage->btnForward, SIGNAL(clicked()), this, SLOT(forward_Clicked()));
     connect(cyclistPage->btnDelete, SIGNAL(clicked()), this, SLOT(delete_Clicked()));
     connect(cyclistPage->calendar, SIGNAL(selectionChanged()), this, SLOT(calendarDateChanged()));
+
+    // connect the pieces...
+    connect(devicePage->typeSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(changedType(int)));
+    connect(devicePage->addButton, SIGNAL(clicked()), this, SLOT(devaddClicked()));
+    connect(devicePage->delButton, SIGNAL(clicked()), this, SLOT(devdelClicked()));
+    connect(devicePage->pairButton, SIGNAL(clicked()), this, SLOT(devpairClicked()));
 
     horizontalLayout = new QHBoxLayout;
     horizontalLayout->addWidget(contentsWidget);
@@ -85,6 +95,7 @@ ConfigDialog::~ConfigDialog()
     delete cyclistPage;
     delete contentsWidget;
     delete configPage;
+    delete devicePage;
     delete pagesWidget;
     delete closeButton;
     delete horizontalLayout;
@@ -108,6 +119,11 @@ void ConfigDialog::createIcons()
     cyclistButton->setTextAlignment(Qt::AlignHCenter);
     cyclistButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
+    QListWidgetItem *realtimeButton = new QListWidgetItem(contentsWidget);
+    realtimeButton->setIcon(QIcon(":images/arduino.png"));
+    realtimeButton->setText(tr("Devices"));
+    realtimeButton->setTextAlignment(Qt::AlignHCenter);
+    realtimeButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
     connect(contentsWidget,
             SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
@@ -186,6 +202,14 @@ void ConfigDialog::save_Clicked()
     cyclistPage->checkboxNew->setEnabled(true);
 
     (*zones)->write(home);
+
+    // Save the device configuration...
+    DeviceConfigurations all;
+    all.writeConfig(devicePage->deviceListModel->Configuration);
+
+    // update widgets to let them know config has changed
+    // only realtime sorted thus far;
+    mainwindow->realtimeWindow->configUpdate();
 }
 
 void ConfigDialog::moveCalendarToCurrentRange() {
@@ -250,4 +274,120 @@ void ConfigDialog::calendarDateChanged() {
     int range = (*zones)->whichRange(cyclistPage->selectedDate());
     assert(range >= 0);
     cyclistPage->setCurrentRange(range);
+}
+
+//
+// DEVICE CONFIG STUFF
+//
+
+void
+ConfigDialog::changedType(int)
+{
+// THIS CODE IS DISABLED FOR THIS RELEASE XXX
+//    // disable/enable default checkboxes
+//    if (devicePage->devices.at(index).download == false) {
+//        devicePage->isDefaultDownload->setEnabled(false);
+//        devicePage->isDefaultDownload->setCheckState(Qt::Unchecked);
+//    } else {
+//        devicePage->isDefaultDownload->setEnabled(true);
+//    }
+//    if (devicePage->devices.at(index).realtime == false) {
+//        devicePage->isDefaultRealtime->setEnabled(false);
+//        devicePage->isDefaultRealtime->setCheckState(Qt::Unchecked);
+//    } else {
+//        devicePage->isDefaultRealtime->setEnabled(true);
+//    }
+    devicePage->setConfigPane();
+}
+
+void
+ConfigDialog::devaddClicked()
+{
+    DeviceConfiguration add;
+    DeviceTypes Supported;
+
+    // get values from the gui elements
+    add.name = devicePage->deviceName->displayText();
+    add.type = devicePage->typeSelector->itemData(devicePage->typeSelector->currentIndex()).toInt();
+    add.portSpec = devicePage->deviceSpecifier->displayText();
+    add.deviceProfile = devicePage->deviceProfile->displayText();
+
+    // NOT IMPLEMENTED IN THIS RELEASE XXX
+    //add.isDefaultDownload = devicePage->isDefaultDownload->isChecked() ? true : false;
+    //add.isDefaultRealtime = devicePage->isDefaultDownload->isChecked() ? true : false;
+
+    // Validate the name
+    QRegExp nameSpec(".+");
+    if (nameSpec.exactMatch(add.name) == false) {
+        QMessageBox::critical(0, "Invalid Device Name",
+                QString("Device Name should be non-blank"));
+        return ;
+    }
+
+    // Validate the portSpec
+    QRegExp antSpec("[^:]*:[^:]*");         // ip:port same as TCP ... for now...
+    QRegExp tcpSpec("[^:]*:[^:]*");         // ip:port
+#ifdef WIN32
+    QRegExp serialSpec("COM[0-9]*");      // COMx for WIN32, /dev/* for others
+#else
+    QRegExp serialSpec("/dev/.*");      // COMx for WIN32, /dev/* for others
+#endif
+
+    // check the portSpec is valid, based upon the connection type
+    switch (Supported.getType(add.type).connector) {
+        case DEV_ANT :
+            if (antSpec.exactMatch(add.portSpec) == false) {
+                QMessageBox::critical(0, "Invalid Port Specification",
+                QString("For ANT devices the specifier must be ") +
+                        "hostname:portnumber");
+                return ;
+            }
+            break;
+        case DEV_SERIAL :
+            if (serialSpec.exactMatch(add.portSpec) == false) {
+                QMessageBox::critical(0, "Invalid Port Specification",
+                QString("For Serial devices the specifier must be ") +
+#ifdef WIN32
+                        "COMn"
+#else
+                        "/dev/xxxxx"
+#endif
+                );
+                return ;
+            }
+            break;
+        case DEV_TCP :
+            if (tcpSpec.exactMatch(add.portSpec) == false) {
+                QMessageBox::critical(0, "Invalid Port Specification",
+                QString("For TCP streaming devices the specifier must be ") +
+                        "hostname:portnumber");
+                return ;
+            }
+            break;
+    }
+
+    devicePage->deviceListModel->add(add);
+}
+
+void
+ConfigDialog::devdelClicked()
+{
+    devicePage->deviceListModel->del();
+}
+
+void
+ConfigDialog::devpairClicked()
+{
+    DeviceConfiguration add;
+
+    // get values from the gui elements
+    add.name = devicePage->deviceName->displayText();
+    add.type = devicePage->typeSelector->itemData(devicePage->typeSelector->currentIndex()).toInt();
+    add.portSpec = devicePage->deviceSpecifier->displayText();
+    add.deviceProfile = devicePage->deviceProfile->displayText();
+
+    QProgressDialog *progress = new QProgressDialog("Looking for Devices...", "Abort Scan", 0, 200, this);
+    progress->setWindowModality(Qt::WindowModal);
+
+    devicePage->pairClicked(&add, progress);
 }

@@ -3,7 +3,9 @@
 #include <assert.h>
 #include "Pages.h"
 #include "Settings.h"
-
+#include "DeviceTypes.h"
+#include "DeviceConfiguration.h"
+#include "ANTplusController.h"
 
 ConfigurationPage::~ConfigurationPage()
 {
@@ -387,4 +389,340 @@ int CyclistPage::getCurrentRange()
 bool CyclistPage::isNewMode()
 {
     return (checkboxNew->checkState() == Qt::Checked);
+}
+
+DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
+{
+    DeviceTypes all;
+    devices = all.getList();
+
+    nameLabel = new QLabel(tr("Device Name"),this);
+    deviceName = new QLineEdit(tr(""), this);
+
+    typeLabel = new QLabel(tr("Device Type"),this);
+    typeSelector = new QComboBox(this);
+
+    for (int i=0; i< devices.count(); i++) {
+        DeviceType cur = devices.at(i);
+
+        // WARNING: cur.type is what is stored in configuration
+        //          do not change this!!
+        typeSelector->addItem(cur.name, cur.type);
+    }
+
+    specLabel = new QLabel(tr("Device Port"),this);
+    specHint = new QLabel();
+    profHint = new QLabel();
+    deviceSpecifier= new QLineEdit(tr(""), this);
+
+    profLabel = new QLabel(tr("Device Profile"),this);
+    deviceProfile = new QLineEdit(tr(""), this);
+
+// THIS CODE IS DISABLED FOR THIS RELEASE XXX
+//    isDefaultDownload = new QCheckBox(tr("Default download device"), this);
+//    isDefaultRealtime = new QCheckBox(tr("Default realtime device"), this);
+
+    addButton = new QPushButton(tr("Add"),this);
+    delButton = new QPushButton(tr("Delete"),this);
+    pairButton = new QPushButton(tr("Pair"),this);
+
+    deviceList = new QTableView(this);
+    deviceListModel = new deviceModel(this);
+
+    // replace standard model with ours
+    QItemSelectionModel *stdmodel = deviceList->selectionModel();
+    deviceList->setModel(deviceListModel);
+    delete stdmodel;
+
+    deviceList->setSortingEnabled(false);
+    deviceList->setSelectionBehavior(QAbstractItemView::SelectRows);
+    deviceList->horizontalHeader()->setStretchLastSection(true);
+    deviceList->verticalHeader()->hide();
+    deviceList->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    deviceList->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    leftLayout = new QGridLayout();
+    rightLayout = new QVBoxLayout();
+    inLayout = new QGridLayout();
+    deviceGroup = new QGroupBox(tr("Device Configuration"), this);
+
+    leftLayout->addWidget(nameLabel, 0,0);
+    leftLayout->addWidget(deviceName, 0,2);
+    leftLayout->setRowMinimumHeight(1,10);
+    leftLayout->addWidget(typeLabel, 2,0);
+    leftLayout->addWidget(typeSelector, 2,2);
+    leftLayout->setRowMinimumHeight(3,10);
+    leftLayout->addWidget(specHint, 4,2);
+    leftLayout->addWidget(specLabel, 5,0);
+    leftLayout->addWidget(deviceSpecifier, 5,2);
+    leftLayout->setRowMinimumHeight(6,10);
+    leftLayout->addWidget(profHint, 7,2);
+    leftLayout->addWidget(profLabel, 8,0);
+    leftLayout->addWidget(deviceProfile, 8,2);
+
+    leftLayout->setColumnMinimumWidth(1,10);
+
+// THIS CODE IS DISABLED FOR THIS RELEASE XXX
+//    leftLayout->addWidget(isDefaultDownload, 6,1);
+//    leftLayout->addWidget(isDefaultRealtime, 8,1);
+
+//    leftLayout->setRowStretch(0, 2);
+//    leftLayout->setRowStretch(1, 1);
+//    leftLayout->setRowStretch(2, 2);
+//    leftLayout->setRowStretch(3, 1);
+//    leftLayout->setRowStretch(4, 2);
+//    leftLayout->setRowStretch(5, 1);
+//    leftLayout->setRowStretch(6, 2);
+//    leftLayout->setRowStretch(7, 1);
+//    leftLayout->setRowStretch(8, 2);
+
+    rightLayout->addWidget(addButton);
+    rightLayout->addSpacing(10);
+    rightLayout->addWidget(delButton);
+    rightLayout->addStretch();
+    rightLayout->addWidget(pairButton);
+
+    inLayout->addItem(leftLayout, 0,0);
+    inLayout->addItem(rightLayout, 0,1);
+    inLayout->addWidget(deviceList,1,0,1,2);
+
+    deviceGroup->setLayout(inLayout);
+
+    mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(deviceGroup);
+    mainLayout->addStretch(1);
+    setLayout(mainLayout);
+
+    // to make sure the default checkboxes have been set appropiately...
+    // THIS CODE IS DISABLED IN THIS RELEASE XXX
+    // isDefaultRealtime->setEnabled(false);
+
+    setConfigPane();
+}
+
+void
+DevicePage::setConfigPane()
+{
+    // depending upon the type of device selected
+    // the spec hint tells the user the format they should use
+    DeviceTypes Supported;
+
+    // sorry... ;-) obfuscated c++ contest winner 2009
+    switch (Supported.getType(typeSelector->itemData(typeSelector->currentIndex()).toInt()).connector) {
+
+    case DEV_ANT:
+        specHint->setText("hostname:port");
+        profHint->setText("antid 1, antid 2 ...");
+        profHint->show();
+        pairButton->show();
+        profLabel->show();
+        deviceProfile->show();
+        break;
+    case DEV_SERIAL:
+#ifdef WIN32
+        specHint->setText("COMx");
+#else
+        specHint->setText("/dev/xxxx");
+#endif
+        pairButton->hide();
+        profHint->hide();
+        profLabel->hide();
+        deviceProfile->hide();
+        break;
+    case DEV_TCP:
+        specHint->setText("hostname:port");
+        pairButton->hide();
+        profHint->hide();
+        profLabel->hide();
+        deviceProfile->hide();
+        break;
+    }
+    //specHint->setTextFormat(Qt::Italic); // mmm need to read the docos
+}
+
+
+// add a new configuration
+void
+deviceModel::add(DeviceConfiguration &newone)
+{
+    insertRows(0,1, QModelIndex());
+
+    // insert name
+    QModelIndex index = deviceModel::index(0,0, QModelIndex());
+    setData(index, newone.name, Qt::EditRole);
+
+    // insert type
+    index = deviceModel::index(0,1, QModelIndex());
+    setData(index, newone.type, Qt::EditRole);
+
+    // insert portSpec
+    index = deviceModel::index(0,2, QModelIndex());
+    setData(index, newone.portSpec, Qt::EditRole);
+
+    // insert Profile
+    index = deviceModel::index(0,3, QModelIndex());
+    setData(index, newone.deviceProfile, Qt::EditRole);
+}
+
+// delete an existing configuration
+void
+deviceModel::del()
+{
+    // which row is selected in the table?
+    DevicePage *temp = static_cast<DevicePage*>(parent);
+    QItemSelectionModel *selectionModel = temp->deviceList->selectionModel();
+
+    QModelIndexList indexes = selectionModel->selectedRows();
+    QModelIndex index;
+
+    foreach (index, indexes) {
+        //int row = this->mapToSource(index).row();
+        removeRows(index.row(), 1, QModelIndex());
+    }
+}
+
+void
+DevicePage::pairClicked(DeviceConfiguration *dc, QProgressDialog *progress)
+{
+    ANTplusController ANTplus(0, dc);
+    ANTplus.discover(dc, progress);
+    deviceProfile->setText(dc->deviceProfile);
+}
+
+DevicePage::~DevicePage()
+{
+}
+
+deviceModel::deviceModel(QObject *parent) : QAbstractTableModel(parent)
+{
+    this->parent = parent;
+
+    // get current configuration
+    DeviceConfigurations all;
+    Configuration = all.getList();
+}
+
+int
+deviceModel::rowCount(const QModelIndex &parent) const
+{
+    Q_UNUSED(parent);
+    return Configuration.size();
+}
+
+int
+deviceModel::columnCount(const QModelIndex &) const
+{
+    return 4;
+}
+
+
+// setup the headings!
+QVariant deviceModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+     if (role != Qt::DisplayRole) return QVariant(); // no display, no game!
+
+     if (orientation == Qt::Horizontal) {
+         switch (section) {
+             case 0:
+                 return tr("Device Name");
+             case 1:
+                 return tr("Device Type");
+             case 2:
+                 return tr("Port Spec");
+             case 3:
+                 return tr("Profile");
+             default:
+                 return QVariant();
+         }
+     }
+     return QVariant();
+ }
+
+// return data item for row/col specified in index
+QVariant deviceModel::data(const QModelIndex &index, int role) const
+{
+     if (!index.isValid()) return QVariant();
+     if (index.row() >= Configuration.size() || index.row() < 0) return QVariant();
+
+     if (role == Qt::DisplayRole) {
+         DeviceConfiguration Entry = Configuration.at(index.row());
+
+         switch(index.column()) {
+            case 0 : return Entry.name;
+                break;
+            case 1 :
+                {
+                DeviceTypes all;
+                DeviceType lookupType = all.getType (Entry.type);
+                return lookupType.name;
+                }
+                break;
+            case 2 :
+                return Entry.portSpec;
+                break;
+            case 3 :
+                return Entry.deviceProfile;
+         }
+     }
+
+     // how did we get here!?
+     return QVariant();
+}
+
+// update the model with new data
+bool deviceModel::insertRows(int position, int rows, const QModelIndex &index)
+{
+     Q_UNUSED(index);
+     beginInsertRows(QModelIndex(), position, position+rows-1);
+
+     for (int row=0; row < rows; row++) {
+         DeviceConfiguration emptyEntry;
+         Configuration.insert(position, emptyEntry);
+     }
+     endInsertRows();
+     return true;
+}
+
+// delete a row!
+bool deviceModel::removeRows(int position, int rows, const QModelIndex &index)
+{
+     Q_UNUSED(index);
+     beginRemoveRows(QModelIndex(), position, position+rows-1);
+
+     for (int row=0; row < rows; ++row) {
+         Configuration.removeAt(position);
+     }
+
+     endRemoveRows();
+     return true;
+}
+
+bool deviceModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+        if (index.isValid() && role == Qt::EditRole) {
+            int row = index.row();
+
+            DeviceConfiguration p = Configuration.value(row);
+
+            switch (index.column()) {
+                case 0 : //name
+                    p.name = value.toString();
+                    break;
+                case 1 : //type
+                    p.type = value.toInt();
+                    break;
+                case 2 : // spec
+                    p.portSpec = value.toString();
+                    break;
+                case 3 : // Profile
+                    p.deviceProfile = value.toString();
+                    break;
+            }
+            Configuration.replace(row,p);
+                emit(dataChanged(index, index));
+
+            return true;
+        }
+
+        return false;
 }

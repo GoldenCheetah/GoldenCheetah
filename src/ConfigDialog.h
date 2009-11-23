@@ -26,6 +26,12 @@ class ConfigDialog : public QDialog
         void delete_Clicked();
 	void calendarDateChanged();
 
+        // device config slots
+        void changedType(int);
+        void devaddClicked();
+        void devpairClicked();
+        void devdelClicked();
+
     private:
         void createIcons();
         void calculateZones();
@@ -34,6 +40,7 @@ class ConfigDialog : public QDialog
 
         ConfigurationPage *configPage;
         CyclistPage *cyclistPage;
+        DevicePage *devicePage;
         QPushButton *saveButton;
         QStackedWidget *pagesWidget;
 	QPushButton *closeButton;
@@ -45,6 +52,9 @@ class ConfigDialog : public QDialog
         QSettings *settings;
         QDir home;
         Zones **zones;
+
+        // used by device config
+    QList<QTreeWidgetItem> twiNames, twiSpecs, twiTypes, twiDefaults;
 };
 
 #endif

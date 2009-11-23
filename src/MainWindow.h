@@ -24,6 +24,7 @@
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include "RideItem.h"
+#include "QuarqdClient.h"
 #include <boost/shared_ptr.hpp>
 
 class AllPlotWindow;
@@ -33,6 +34,7 @@ class PfPvWindow;
 class QwtPlotPanner;
 class QwtPlotPicker;
 class QwtPlotZoomer;
+class RealtimeWindow;
 class RideFile;
 class WeeklySummaryWindow;
 class Zones;
@@ -51,6 +53,10 @@ class MainWindow : public QMainWindow
 	void getBSFactors(float &timeBS, float &distanceBS);
         QDir home;
         void setCriticalPower(int cp);
+
+        RealtimeWindow  *realtimeWindow; // public so config dialog can notify it of changes config
+
+        Zones *zones; // used in ErgFile to get access to power.zones without having to re-read
 
     protected:
         virtual void resizeEvent(QResizeEvent*);
@@ -108,7 +114,6 @@ class MainWindow : public QMainWindow
         QwtPlotCurve *weeklyRICurve;
 	PerformanceManagerWindow *performanceManagerWindow;
 
-        Zones *zones;
 
         // pedal force/pedal velocity scatter plot widgets
         PfPvWindow  *pfPvWindow;
@@ -123,7 +128,10 @@ class MainWindow : public QMainWindow
 
 	float timebsfactor;
 	float distancebsfactor;
+    QuarqdClient *client;
 };
+
+extern MainWindow *mainwindow;  // so ConfigDialog can update widgets when config changes
 
 #endif // _GC_MainWindow_h
 
