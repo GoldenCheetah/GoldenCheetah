@@ -26,6 +26,7 @@
 // BLECK - homedir passing via global becuase ridefile is pure virtual and 
 //         cannot pass with current definition -- Sean can advise!!
 extern QString WKO_HOMEDIR;
+MainWindow *mainwindow;
 
 int 
 main(int argc, char *argv[])
@@ -102,8 +103,8 @@ main(int argc, char *argv[])
             if (home.cd(cyclist)) {
                 // used by WkoRideFileReader to store notes
                 WKO_HOMEDIR = home.absolutePath();
-                MainWindow *main = new MainWindow(home);
-                main->show();
+                mainwindow = new MainWindow(home);
+                mainwindow->show();
                 home.cdUp();
                 anyOpened = true;
             }
@@ -119,8 +120,8 @@ main(int argc, char *argv[])
             assert(false);
         // used by WkoRideFileReader to store notes
         WKO_HOMEDIR = home.absolutePath();
-        MainWindow *main = new MainWindow(home);
-        main->show();
+        mainwindow = new MainWindow(home);
+        mainwindow->show();
     }
     return app.exec();
 }

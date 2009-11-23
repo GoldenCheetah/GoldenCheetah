@@ -2,6 +2,7 @@
  <qresource>
     <file>images/cyclist.png</file>
     <file>images/power.png</file>
+    <file>images/arduino.png</file>
     <file>images/query.png</file>
     <file>images/update.png</file>
     <file>images/gc.png</file> 

@@ -6,6 +6,9 @@
 #include <QComboBox>
 #include <QCalendarWidget>
 #include <QPushButton>
+#include <QTreeWidget>
+#include <QTableView>
+#include <QModelIndex>
 #include <QCheckBox>
 #include <QList>
 #include "Zones.h"
@@ -14,6 +17,9 @@
 #include <QCheckBox>
 #include <QValidator>
 #include <QGridLayout>
+#include <QProgressDialog>
+#include "DeviceTypes.h"
+#include "DeviceConfiguration.h"
 
 class QGroupBox;
 class QHBoxLayout;
@@ -105,4 +111,78 @@ class CyclistPage : public QWidget
 	QIntValidator *perfManSTSavgValidator;
 	QIntValidator *perfManLTSavgValidator;
 };
+
+class deviceModel : public QAbstractTableModel
+{
+
+ public:
+     deviceModel(QObject *parent=0);
+     QObject *parent;
+
+     // sets up the headers
+     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+
+     // how much data do we have?
+     int rowCount(const QModelIndex &parent) const;
+     int columnCount(const QModelIndex &parent) const;
+
+     // manipulate the data - data() gets and setData() sets (set/get might be better?)
+     QVariant data(const QModelIndex &index, int role) const;
+     bool setData(const QModelIndex &index, const QVariant &value, int role);
+
+     // insert/remove and update
+     void add(DeviceConfiguration &);   // add a new DeviceConfiguration
+     void del();                        // add a new DeviceConfiguration
+     bool insertRows(int position, int rows, const QModelIndex &index=QModelIndex());
+     bool removeRows(int position, int rows, const QModelIndex &index=QModelIndex());
+
+
+     QList<DeviceConfiguration> Configuration;  // the actual data
+ };
+
+class DevicePage : public QWidget
+{
+    public:
+        ~DevicePage();
+        DevicePage(QWidget *parent = 0);
+        void setConfigPane();
+        void pairClicked(DeviceConfiguration *, QProgressDialog *);
+
+    QList<DeviceType> devices;
+
+    // GUI Elements
+	QGroupBox *deviceGroup;
+    QLabel *nameLabel;
+    QLineEdit *deviceName;
+
+    QLabel *typeLabel;
+    QComboBox *typeSelector;
+
+    QLabel *specLabel;
+    QLabel *specHint;   // hints at the format for a port spec
+    QLabel *profHint;   // hints at the format for profile info
+    QLineEdit *deviceSpecifier;
+
+    QLabel *profLabel;
+    QLineEdit *deviceProfile;
+
+    QCheckBox *isDefaultDownload;
+    QCheckBox *isDefaultRealtime;
+
+    QTableView *deviceList;
+
+    QPushButton *addButton;
+    QPushButton *delButton;
+    QPushButton *pairButton;
+
+    QGridLayout *leftLayout;
+    QVBoxLayout *rightLayout;
+
+    QGridLayout *inLayout;
+    QVBoxLayout *mainLayout;
+
+    deviceModel *deviceListModel;
+};
+
+
 #endif

@@ -1,0 +1,20 @@
+[COURSE HEADER]
+VERSION = 2
+UNITS = ENGLISH
+DESCRIPTION = An hour at FTP
+FILE NAME = IsoL4hour.mrc
+MINUTES  PERCENT
+[END COURSE HEADER]
+
+[COURSE DATA]
+0       55
+5       55
+5       75
+15      75
+15      50
+20      50
+20      100
+80      100
+80      55
+95      55
+[END COURSE DATA]

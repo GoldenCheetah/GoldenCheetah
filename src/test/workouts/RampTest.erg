@@ -1,0 +1,24 @@
+[COURSE HEADER]
+VERSION = 2
+UNITS = ENGLISH
+DESCRIPTION = Ramp Test - 10w every 15 seconds
+FILE NAME = Ramp.erg
+MINUTES  WATTS
+[END COURSE HEADER]
+
+[COURSE DATA]
+0       100
+1       140
+2       180
+3       220
+4       260
+4       LAP
+5       300
+6       340
+6       LAP
+7       380
+8       420
+8       LAP
+9       460
+10      500
+[END COURSE DATA]

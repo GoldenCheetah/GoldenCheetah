@@ -47,6 +47,17 @@
 #define GC_SB_NAME			"SBname"
 #define GC_SB_ACRONYM			"SB"
 
+// device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended
+// to them to specify which configured device i.e. devices1 ... devicesn where
+// n is defined in GC_DEV_COUNT
+#define GC_DEV_COUNT "devices"
+#define GC_DEV_NAME  "devicename"
+#define GC_DEV_SPEC  "devicespec"
+#define GC_DEV_PROF  "deviceprof"
+#define GC_DEV_TYPE  "devicetype"
+#define GC_DEV_DEFI  "devicedefi"
+#define GC_DEV_DEFR  "devicedefr"
+
 #include <QSettings>
 #include <boost/shared_ptr.hpp>
 
