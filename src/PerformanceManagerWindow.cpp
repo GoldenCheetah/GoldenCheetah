@@ -98,6 +98,7 @@ void PerformanceManagerWindow::replot(QDir home,QTreeWidgetItem *allRides)
 
     int newdays, endIndex;
     RideItem *firstRideItem;
+    RideItem *lastRideItem;
     QDateTime now;
 
 
@@ -108,13 +109,16 @@ void PerformanceManagerWindow::replot(QDir home,QTreeWidgetItem *allRides)
     QVariant isAscending = settings->value(GC_ALLRIDES_ASCENDING,Qt::Checked);
     if(isAscending.toInt() > 0 ){
         firstRideItem =  (RideItem*) allRides->child(0);
+        lastRideItem =  (RideItem*) allRides->child(allRides->childCount()-1);
     } else {
         firstRideItem =  (RideItem*) allRides->child(allRides->childCount()-1);
+        lastRideItem =  (RideItem*) allRides->child(0);
     }
     
     if (firstRideItem) {
 
-	newdays = firstRideItem->dateTime.daysTo(now.currentDateTime());
+        QDateTime endTime = std::max(lastRideItem->dateTime, now.currentDateTime());
+        newdays = firstRideItem->dateTime.daysTo(endTime);
 
 	if (newdays != days || allRides->childCount() != count ) {
 	    // days in allRides changed, so recalculate stress
@@ -135,7 +139,7 @@ void PerformanceManagerWindow::replot(QDir home,QTreeWidgetItem *allRides)
 
 	    sc = new StressCalculator(
 		    firstRideItem->dateTime,
-		    now.currentDateTime(),
+		    endTime,
 		    (settings->value(GC_INITIAL_STS)).toInt(),
 		    (settings->value(GC_INITIAL_LTS)).toInt(),
 		    (settings->value(GC_STS_DAYS,7)).toInt(),
