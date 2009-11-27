@@ -257,6 +257,17 @@ read_one(const QDir& dir, const QString &filename, QVector<double> &bests,
 }
 
 void
+CpintPlot::changeSeason(const QDate &start, const QDate &end)
+{
+    startDate = start;
+    endDate = end;
+    needToScanRides = true;
+    delete CPCurve;
+    CPCurve = NULL;
+    clear_CP_Curves();
+}
+
+void
 CpintPlot::setEnergyMode(bool value)
 {
     energyMode_ = value;
