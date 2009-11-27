@@ -109,6 +109,9 @@ class MainWindow : public QMainWindow
         CriticalPowerWindow *criticalPowerWindow;
         QTreeWidgetItem *allRides;
         QSplitter *leftLayout;
+        QWidget *notesWidget;
+        QVBoxLayout *notesLayout;
+        QSplitter *summarySplitter;
 
         QwtPlotCurve *weeklyBSCurve;
         QwtPlotCurve *weeklyRICurve;
