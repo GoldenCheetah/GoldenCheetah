@@ -29,14 +29,8 @@ mailing list message</a>.</p>
 <tr>
   <td><a href="http://qt.nokia.com/downloads">Qt</a></td>
   <td>4.5.0 or later</td>
-  <td>qt4-mac-devel</td>
+  <td>qt4-mac</td>
   <td>libqt4-dev</td>
-</tr>
-<tr>
-  <td><a href="http://sourceforge.net/projects/qwt/">Qwt</a></td>
-  <td>5.1.0 or later</td>
-  <td>qwt</td>
-  <td>libqwt-dev</td>
 </tr>
 <tr>
   <td><a href="http://www.boost.org/users/download/">Boost</a></td>
@@ -87,14 +81,20 @@ Building an executable
 libraries referenced above.  All local configuration is stored in the file
 <code>gcconfig.pri</code>, which you create by copying
 <code>gcconfig.pri.in</code>, both in the <code>GoldenCheetah/src</code>
-directory.  The steps you'll take are as follows:</p>
+directory. Additionally, GoldenCheetah uses a patched version of <a
+href="http://sourceforge.net/projects/qwt/">Qwt</a> which is located in the
+<code>GoldenCheetah/qwt</code> directory. You'll need to copy the
+configuration file <code>qwtconfig.pri.in</code> to <code>qwtconfig.pri</code>
+and edit that file if needed. The steps you'll take are as follows:</p>
 
 <blockquote>
+In the top level GoldenCheetah directory
 <pre>
-cd GoldenCheetah/src
-cp gcconfig.pri.in gcconfig.pri
-vi gcconfig.pri # follow the directions at the top of the file
-qmake # called qmake-mac in MacPorts
+cp src/gcconfig.pri.in src/gcconfig.pri
+cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
+vi src/gcconfig.pri # Follow the directions at the top of the file.
+vi qwt/qwtconfig.pri # This may not need to be edited to successfully build.
+qmake build.pro # called qmake-mac in MacPorts
 make
 </pre>
 </blockquote>
