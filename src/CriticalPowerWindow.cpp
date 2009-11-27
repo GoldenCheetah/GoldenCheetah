@@ -238,17 +238,14 @@ void CriticalPowerWindow::addSeasons()
     if (!seasons.empty()) {
         cComboSeason->setCurrentIndex(cComboSeason->count() - 1);
         Season season = seasons.last();
-        cpintPlot->setStartDate(season.getStart());
-        cpintPlot->setEndDate(season.getEnd());
+        cpintPlot->changeSeason(season.getStart(), season.getEnd());
     }
 }
 
 void CriticalPowerWindow::seasonSelected(int iSeason)
 {
     Season season = seasons.at(iSeason);
-    cpintPlot->setStartDate(season.getStart());
-    cpintPlot->setEndDate(season.getEnd());
-    cpintPlot->needToScanRides = true;
+    cpintPlot->changeSeason(season.getStart(), season.getEnd());
     cpintPlot->calculate(currentRide);
 }
 

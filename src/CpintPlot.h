@@ -47,8 +47,7 @@ class CpintPlot : public QwtPlot
         double cp, tau, t0; // CP model parameters
         void deriveCPParameters();
         bool deleteCpiFile(QString filename);
-        void setStartDate(QDate date) { startDate = date; }
-        void setEndDate(QDate date) { endDate = date; }
+        void changeSeason(const QDate &start, const QDate &end);
         void setEnergyMode(bool value);
         bool energyMode() const { return energyMode_; }
 
