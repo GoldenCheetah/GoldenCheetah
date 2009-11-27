@@ -175,9 +175,34 @@ MainWindow::MainWindow(const QDir &home) :
 
     tabWidget = new QTabWidget;
     tabWidget->setUsesScrollButtons(true);
+
     rideSummary = new QTextEdit;
     rideSummary->setReadOnly(true);
-    tabWidget->addTab(rideSummary, tr("Ride Summary"));
+    QLabel *notesLabel = new QLabel(tr("Notes:"));
+    notesLabel->setMaximumHeight(30);
+    rideNotes = new QTextEdit;
+
+    notesWidget = new QWidget();
+    notesLayout = new QVBoxLayout(notesWidget);
+    notesLayout->addWidget(notesLabel);
+    notesLayout->addWidget(rideNotes);
+
+    summarySplitter = new QSplitter;
+    summarySplitter->setContentsMargins(0, 0, 0, 0);
+    summarySplitter->setOrientation(Qt::Vertical);
+    summarySplitter->addWidget(rideSummary);
+    summarySplitter->setCollapsible(0, false);
+    summarySplitter->addWidget(notesWidget);
+    summarySplitter->setCollapsible(1, true);
+
+    // the sizes are somewhat arbitrary,
+    // just trying to force the smallest non-hidden notes size by default
+    QList<int> summarySizes;
+    summarySizes.append(800);
+    summarySizes.append(200);
+    summarySplitter->setSizes(summarySizes);
+
+    tabWidget->addTab(summarySplitter, tr("Ride Summary"));
 
     /////////////////////////// Ride Plot Tab ///////////////////////////
     allPlotWindow = new AllPlotWindow(this);
@@ -210,12 +235,6 @@ MainWindow::MainWindow(const QDir &home) :
     pfPvWindow = new PfPvWindow(this);
     tabWidget->addTab(pfPvWindow, tr("PF/PV Plot"));
 
-
-    //////////////////////// Ride Notes ////////////////////////
-    
-    rideNotes = new QTextEdit;
-    tabWidget->addTab(rideNotes, tr("Notes"));
-    
     //////////////////////// Weekly Summary ////////////////////////
     
     // add daily distance / duration graph:
