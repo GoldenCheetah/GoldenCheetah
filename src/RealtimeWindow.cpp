@@ -621,7 +621,7 @@ void RealtimeWindow::nextDisplayMode()
 
 void RealtimeWindow::warnnoConfig()
 {
-    QMessageBox::warning(this, tr("No Devices Configured"), "Please configure a device in Preferences and then restart Golden Cheetah for the changes to take affect.");
+    QMessageBox::warning(this, tr("No Devices Configured"), "Please configure a device in Preferences.");
 }
 
 //----------------------------------------------------------------------
@@ -730,14 +730,14 @@ RealtimeWindow::SelectWorkout(int index)
                 if (mode == ERG) {
                     status |= RT_MODE_ERGO;
                     status &= ~RT_MODE_SPIN;
-                    deviceController->setMode(RT_MODE_ERGO);
+                    if (deviceController != NULL) deviceController->setMode(RT_MODE_ERGO);
                     // set the labels on the gui
                     loadLabel->setText("Load WATTS");
                     avgloadLabel->setText("Avg Load WATTS");
                 } else { // SLOPE MODE
                     status |= RT_MODE_SPIN;
                     status &= ~RT_MODE_ERGO;
-                    deviceController->setMode(RT_MODE_SPIN);
+                    if (deviceController != NULL) deviceController->setMode(RT_MODE_SPIN);
                     // set the labels on the gui
                     loadLabel->setText("Gradient PERCENT");
                     avgloadLabel->setText("Avg Gradient PERCENT");
@@ -757,7 +757,7 @@ RealtimeWindow::SelectWorkout(int index)
         status &= ~RT_MODE_ERGO;
         status &= ~RT_WORKOUT; // temp
 
-        deviceController->setMode(RT_MODE_SPIN);
+        if (deviceController != NULL) deviceController->setMode(RT_MODE_SPIN);
         loadLabel->setText("Gradient PERCENT");
         avgloadLabel->setText("Avg Gradient PERCENT");
 
@@ -767,7 +767,7 @@ RealtimeWindow::SelectWorkout(int index)
         status &= ~RT_MODE_SPIN;
         loadLabel->setText("Load WATTS");
         avgloadLabel->setText("Avg Load WATTS");
-        deviceController->setMode(RT_MODE_ERGO);
+        if (deviceController != NULL) deviceController->setMode(RT_MODE_ERGO);
         ergPlot->setVisible(false);
         status &= ~RT_WORKOUT;
     }
