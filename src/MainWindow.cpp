@@ -863,7 +863,7 @@ MainWindow::tabChanged(int index)
             }
         }
     }
-    else if (index == 7) {
+    else if (index == 6) {
 	// Performance Manager
 	performanceManagerWindow->replot(home,allRides);
     }
