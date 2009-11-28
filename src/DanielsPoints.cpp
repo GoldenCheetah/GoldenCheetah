@@ -45,6 +45,8 @@ class DanielsPoints : public RideMetric {
     double value(bool) const { return score; }
     void compute(const RideFile *ride, const Zones *zones,
                  int zoneRange, const QHash<QString,RideMetric*> &) {
+        if (!zones)
+            return;
 
         static const double EPSILON = 0.1;
         static const double NEGLIGIBLE = 0.1;
