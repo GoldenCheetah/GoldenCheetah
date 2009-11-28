@@ -48,6 +48,14 @@ class DanielsPoints : public RideMetric {
         if (!zones)
             return;
 
+        if (ride->deviceType() == QString("Manual CSV")) {
+            // Manual entry: use BS from dataPoints with a scaling factor
+            // that works about right for long, steady rides.
+            double scaling_factor = 11.0 / 58.0;
+            score = ride->dataPoints().first()->bs * scaling_factor;
+            return;
+        }
+
         static const double EPSILON = 0.1;
         static const double NEGLIGIBLE = 0.1;
 
