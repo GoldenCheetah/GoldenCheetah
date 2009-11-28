@@ -21,7 +21,6 @@
 #include <math.h>
 
 const double  bikeScoreN   = 4.0;
-const double  bikeScoreTau = 25.0;
 
 // NOTE: This code follows the description of xPower, Relative Intensity, and
 // BikeScore in "Analysis of Power Output and Training Stress in Cyclists: The
@@ -48,94 +47,42 @@ class XPower : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
 
-        double secsDelta = ride->recIntSecs();
+        static const double EPSILON = 0.1;
+        static const double NEGLIGIBLE = 0.1;
 
-	// djconnel:
-	double attenuation  = exp(-secsDelta / bikeScoreTau);
-	double sampleWeight = 1 - attenuation;
+        double secsDelta = ride->recIntSecs();
+        double sampsPerWindow = 25.0 / secsDelta;
+        double attenuation = sampsPerWindow / (sampsPerWindow + secsDelta);
+        double sampleWeight = secsDelta / (sampsPerWindow + secsDelta);
         
-        double lastSecs = 0.0;                // previous point
-	double initialSecs = 0.0;             // time associated with start of data
-        double weighted = 0.0;                // exponentially smoothed power
-	double epsilon_time = secsDelta / 100; // for comparison of times
+        double lastSecs = 0.0;
+        double weighted = 0.0;
 
         double total = 0.0;
+        int count = 0;
 
-	/* djconnel: calculate bikescore:
-	   For all values of t, smoothed power
-	   p* = integral { -infinity to t } (1/tau) exp[(t' - t) / tau] p(t') dt'
-
-	   From this we calculate an integral, xw:
-	   xw = integral {t0 to t} { p*^N dt }
-	   (in the code, p* -> "weighted"; xw -> "total")
-
-	   During any interval t0 <= t < t1, with p* = p*(t0) at the start of
-	   the interval, with power p constant during the interval:
-
-	   p*(t) = p*(t0) exp[(t0 - t) / tau] + p ( 1 - exp[(t0 - t) / tau] )
-
-	   So the contribution to xw is then:
-
-	   delta_xw = integral { t0 to t1 } [ p*(t0) exp[(t0 - t) / tau] + p ( 1 - exp[(t0 - t) / tau] ) ]^N
-
-	   Consider the simplified case p = 0, and t1 = t0 + deltat, then this is evaluated:
-
-	   delta_xw = integral { t0 to t1 } ( p*(t0) exp[(t0 - t) / tau] )^N
-	            = integral { t0 to t1 } ( p*(t0)^N exp[N (t0 - t) / tau] )
-		    = (tau / N) p*(t0)^N (1 - exp[-N deltat / tau])
-
-	   This is the component which should be added to xw during idle periods.
-
-	   More generally:
-	   delta_xw = integral { t0 to t1 } [ p*(t0) exp[(t0 - t) / tau] + p ( 1 - exp[(t0 - t) / tau] ) ]^N
-	            = integral { 0 to deltat }
-		      [
-		         p*(t0)^N exp[-N t' / tau] +
-			 N p*(t0)^(N - 1) p exp[-(N - 1) t' / tau] (1 - exp[-t' / tau]) +
-			 [N (N - 1) / 2] p*(t0)^(N - 2) p^2 exp[-(N - 2) t' / tau] (1 - exp[-2 t' / tau]) +
-			 [N (N - 1) (N - 2) / 6] p*(t0)^(N - 3) p^3 exp[-(N - 3) t' / tau] (1 - exp[-3 t' / tau]) +
-			 [N (N - 1) (N - 2) (N - 3) / 24] p*(t0)^(N - 4) p^4 exp[-(N - 4) t' / tau] (1 - exp[-4 t' / tau]) +
-			 ...
-		      ] dt'
-
-           but a linearized solution is fine as long as the sampling interval is << the smoothing time.
-	*/
-	   
-	
-	int count = 0;
-        foreach (const RideFilePoint *point, ride->dataPoints()) {
-
-	    // if there are missing data then add in the contribution
-	    // from the exponentially decaying smoothed power
-	    if (count == 0)
-		initialSecs = point->secs - secsDelta;
-	    else {
-		double dt = point->secs - lastSecs - secsDelta;
-		if (dt > epsilon_time) {
-		    double alpha = exp(-bikeScoreN * dt / bikeScoreTau);
-		    total +=
-			(bikeScoreTau / bikeScoreN) * pow(weighted, bikeScoreN) * (1 - alpha);
-		    weighted *= exp(-dt / bikeScoreTau);
-		}
-	    }
-
-	    // the existing weighted average is exponentially decayed by one sampling time,
-	    // then the contribution from the present point is added
-	    weighted = attenuation * weighted + sampleWeight * point->watts;
-            total += pow(weighted, bikeScoreN);
-
+        foreach(const RideFilePoint *point, ride->dataPoints()) {
+            while ((weighted > NEGLIGIBLE)
+                   && (point->secs > lastSecs + secsDelta + EPSILON)) {
+                weighted *= attenuation;
+                lastSecs += secsDelta;
+                total += pow(weighted, 4.0);
+                count++;
+            }
+            weighted *= attenuation;
+            weighted += sampleWeight * point->watts;
             lastSecs = point->secs;
+            total += pow(weighted, 4.0);
             count++;
         }
-
-	// after the ride is over, assume idleness (exponentially decaying smoothed power) to infinity
-	total += 
-	    (bikeScoreTau / bikeScoreN) * pow(weighted, bikeScoreN);
-
-        secs = lastSecs - initialSecs;
-	xpower = (secs > 0) ?
-	    pow(total * secsDelta / secs, 1 / bikeScoreN) :
-	    0.0;
+        while (weighted > NEGLIGIBLE) {
+            weighted *= attenuation;
+            lastSecs += secsDelta;
+            total += pow(weighted, 4.0);
+            count++;
+        }
+        xpower = pow(total / count, 0.25);
+        secs = count * secsDelta;
     }
 
     // added djconnel: allow RI to be combined across rides
