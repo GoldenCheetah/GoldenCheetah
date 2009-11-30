@@ -470,13 +470,13 @@ AllPlot::setYMax()
         setAxisLabelAlignment(yLeft2,Qt::AlignVCenter);
     }
     if (speedCurve->isVisible()) {
-        setAxisTitle(yRight, (useMetricUnits ? "KPH" : "MPH"));
+        setAxisTitle(yRight, (useMetricUnits ? tr("KPH") : tr("MPH")));
         setAxisScale(yRight, 0.0, 1.05 * speedCurve->maxYValue());
         setAxisLabelRotation(yRight,90);
         setAxisLabelAlignment(yRight,Qt::AlignVCenter);
     }
     if (altCurve->isVisible()) {
-        setAxisTitle(yRight2, useMetricUnits ? "Meters" : "Feet");
+        setAxisTitle(yRight2, useMetricUnits ? tr("Meters") : tr("Feet"));
         double ymin = altCurve->minYValue();
         double ymax = qMax(ymin + 100, 1.05 * altCurve->maxYValue());
         setAxisScale(yRight2, ymin, ymax);
@@ -495,9 +495,9 @@ void
 AllPlot::setXTitle()
 {
     if (bydist)
-        setAxisTitle(xBottom, "Distance "+QString(unit.toString() == "Metric"?"(km)":"(miles)"));
+        setAxisTitle(xBottom, tr("Distance ")+QString(unit.toString() == "Metric"?"(km)":"(miles)"));
     else
-        setAxisTitle(xBottom, "Time (minutes)");
+        setAxisTitle(xBottom, tr("Time (minutes)"));
 }
 
 void

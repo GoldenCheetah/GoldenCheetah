@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -23,16 +23,16 @@
 #include "MainWindow.h"
 #include "Settings.h"
 
-// BLECK - homedir passing via global becuase ridefile is pure virtual and 
+// BLECK - homedir passing via global becuase ridefile is pure virtual and
 //         cannot pass with current definition -- Sean can advise!!
 extern QString WKO_HOMEDIR;
 MainWindow *mainwindow;
 
-int 
+int
 main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    
+
     //this is the path within the current directory where GC will look for
     //files to allow USB stick support
     QString localLibraryPath="Library/GoldenCheetah";
@@ -87,6 +87,14 @@ main(int argc, char *argv[])
     }
     boost::shared_ptr<QSettings> settings;
     settings = GetApplicationSettings();
+
+    // Language setting
+    QVariant lang = settings->value(GC_LANG);
+    // Load specific translation
+    QTranslator gcTranslator;
+    gcTranslator.load(":translations/gc_" + lang.toString() + ".qm");
+    app.installTranslator(&gcTranslator);
+
     QVariant lastOpened = settings->value(GC_SETTINGS_LAST);
     QVariant unit = settings->value(GC_UNIT);
     double crankLength = settings->value(GC_CRANKLENGTH).toDouble();

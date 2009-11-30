@@ -75,8 +75,8 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
     otherLayout->addWidget(cpintSetCPButton);
     otherLayout->addWidget(cComboSeason);
     QComboBox *yAxisCombo = new QComboBox(this);
-    yAxisCombo->addItem("Y Axis Shows Power");
-    yAxisCombo->addItem("Y Axis Shows Energy");
+    yAxisCombo->addItem(tr("Y Axis Shows Power"));
+    yAxisCombo->addItem(tr("Y Axis Shows Energy"));
     otherLayout->addWidget(yAxisCombo);
 
     bottomLayout->addLayout(otherLayout);
@@ -223,7 +223,7 @@ CriticalPowerWindow::pickerMoved(const QPoint &pos)
               label = QString("%1 kJ (%2)").arg(watts * minutes * 60.0 / 1000.0, 0, 'f', 0);
           else
               label = QString("%1 watts (%2)").arg(watts);
-          label = label.arg(date.isValid() ? date.toString("MM/dd/yyyy") : "no date");
+          label = label.arg(date.isValid() ? date.toString("MM/dd/yyyy") : tr("no date"));
       }
       else
 	  label = tr("no data");
@@ -245,7 +245,7 @@ void CriticalPowerWindow::addSeasons()
 
     seasons = handler.getSeasons();
     Season season;
-    season.setName("All Seasons");
+    season.setName(tr("All Seasons"));
     seasons.insert(0,season);
 
     foreach (Season season, seasons)

@@ -147,8 +147,18 @@ void ConfigDialog::changePage(QListWidgetItem *current, QListWidgetItem *previou
 //   ! new mode: change the CP associated with the present mode
 void ConfigDialog::save_Clicked()
 {
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();  
-    settings->setValue(GC_UNIT, configPage->unitCombo->currentText());
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+
+    if (configPage->langCombo->currentIndex()==0)
+        settings->setValue(GC_LANG, "en");
+    else if (configPage->langCombo->currentIndex()==1)
+        settings->setValue(GC_LANG, "fr");
+
+    if (configPage->unitCombo->currentIndex()==0)
+        settings->setValue(GC_UNIT, "Metric");
+    else if (configPage->unitCombo->currentIndex()==1)
+        settings->setValue(GC_UNIT, "English");
+
     settings->setValue(GC_ALLRIDES_ASCENDING, configPage->allRidesAscending->checkState());
     settings->setValue(GC_CRANKLENGTH, configPage->crankLengthCombo->currentText());
     settings->setValue(GC_BIKESCOREDAYS, configPage->BSdaysEdit->text());
