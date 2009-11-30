@@ -49,8 +49,8 @@ CpintPlot::CpintPlot(QString p, const Zones *zones) :
 
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setCanvasBackground(Qt::white);
-    setAxisTitle(yLeft, "Average Power (watts)");
-    setAxisTitle(xBottom, "Interval Length");
+    setAxisTitle(yLeft, tr("Average Power (watts)"));
+    setAxisTitle(xBottom, tr("Interval Length"));
     setAxisScaleDraw(xBottom, new LogTimeScaleDraw);
     setAxisScaleEngine(xBottom, new LogTimeScaleEngine);
     setAxisScale(xBottom, 1.0 / 60.0, 60);
@@ -272,16 +272,16 @@ CpintPlot::setEnergyMode(bool value)
 {
     energyMode_ = value;
     if (energyMode_) {
-        setAxisTitle(yLeft, "Total work (kJ)");
+        setAxisTitle(yLeft, tr("Total work (kJ)"));
         setAxisScaleEngine(xBottom, new QwtLinearScaleEngine);
         setAxisScaleDraw(xBottom, new QwtScaleDraw);
-        setAxisTitle(xBottom, "Interval Length (minutes)");
+        setAxisTitle(xBottom, tr("Interval Length (minutes)"));
     }
     else {
-        setAxisTitle(yLeft, "Average Power (watts)");
+        setAxisTitle(yLeft, tr("Average Power (watts)"));
         setAxisScaleEngine(xBottom, new LogTimeScaleEngine);
         setAxisScaleDraw(xBottom, new LogTimeScaleDraw);
-        setAxisTitle(xBottom, "Interval Length");
+        setAxisTitle(xBottom, tr("Interval Length"));
     }
     delete CPCurve;
     CPCurve = NULL;
@@ -546,7 +546,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
     }
     // no zones available: just plot the curve without zones
     else {
-        QwtPlotCurve *curve = new QwtPlotCurve("maximal power");
+        QwtPlotCurve *curve = new QwtPlotCurve(tr("maximal power"));
         curve->setRenderHint(QwtPlotItem::RenderAntialiased);
         QPen pen(Qt::red);
         pen.setWidth(2.0);

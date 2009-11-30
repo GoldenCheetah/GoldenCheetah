@@ -7,5 +7,6 @@
     <file>images/update.png</file>
     <file>images/gc.png</file> 
     <file>images/config.png</file>
+    <file>translations/gc_fr.qm</file>
  </qresource>
 </RCC>

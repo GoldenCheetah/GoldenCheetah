@@ -10,10 +10,13 @@
 ConfigurationPage::~ConfigurationPage()
 {
     delete configGroup;
+    delete langLabel;
+    delete langCombo;
     delete unitLabel;
     delete unitCombo;
     delete allRidesAscending;
     delete warningLabel;
+    delete langLayout;
     delete unitLayout;
     delete warningLayout;
     delete configLayout;
@@ -24,13 +27,28 @@ ConfigurationPage::ConfigurationPage()
 {
     configGroup = new QGroupBox(tr("Golden Cheetah Configuration"));
 
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+
+    langLabel = new QLabel(tr("Language:"));
+
+    langCombo = new QComboBox();
+    langCombo->addItem(tr("English"));
+    langCombo->addItem(tr("French"));
+
+    QVariant lang = settings->value(GC_LANG);
+
+    if(lang.toString() == "en")
+        langCombo->setCurrentIndex(0);
+    else if(lang.toString() == "fr")
+        langCombo->setCurrentIndex(1);
+    else // default : English
+        langCombo->setCurrentIndex(0);
+
     unitLabel = new QLabel(tr("Unit of Measurement:"));
 
     unitCombo = new QComboBox();
     unitCombo->addItem(tr("Metric"));
     unitCombo->addItem(tr("English"));
-
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
 
     QVariant unit = settings->value(GC_UNIT);
 
@@ -88,6 +106,10 @@ ConfigurationPage::ConfigurationPage()
 
     warningLabel = new QLabel(tr("Requires Restart To Take Effect"));
 
+    langLayout = new QHBoxLayout;
+    langLayout->addWidget(langLabel);
+    langLayout->addWidget(langCombo);
+
     unitLayout = new QHBoxLayout;
     unitLayout->addWidget(unitLabel);
     unitLayout->addWidget(unitCombo);
@@ -131,6 +153,7 @@ ConfigurationPage::ConfigurationPage()
 
 
     configLayout = new QVBoxLayout;
+    configLayout->addLayout(langLayout);
     configLayout->addLayout(unitLayout);
     configLayout->addWidget(allRidesAscending);
     configLayout->addLayout(crankLengthLayout);
