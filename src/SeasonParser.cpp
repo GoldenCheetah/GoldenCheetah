@@ -42,7 +42,7 @@ bool SeasonParser::endElement( const QString&, const QString&, const QString &qN
     return TRUE;
 }
 
-bool SeasonParser::startElement( const QString&, const QString&, const QString &name, const QXmlAttributes &attrs )
+bool SeasonParser::startElement( const QString&, const QString&, const QString &name, const QXmlAttributes & )
 {
     buffer.clear();
     if(name == "season")
