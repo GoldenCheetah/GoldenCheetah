@@ -46,7 +46,8 @@ RideFile::fillInIntervals()
             mark();
         previous = point;
     }
-    mark();
+    if (interval > 0)
+        mark();
 }
 
 struct ComparePoints {
