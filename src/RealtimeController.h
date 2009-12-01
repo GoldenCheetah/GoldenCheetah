@@ -27,11 +27,11 @@
 
 class RealtimeController
 {
-
 public:
     RealtimeWindow *parent;                     // for push devices
 
     RealtimeController (RealtimeWindow *parent);
+    virtual ~RealtimeController() {}
 
     virtual int start();
     virtual int restart();                              // restart after paused
