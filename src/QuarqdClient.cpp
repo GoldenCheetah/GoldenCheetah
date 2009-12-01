@@ -16,7 +16,6 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-
 #include <QtNetwork>
 #include <QMessageBox>
 #include <QTime>
@@ -31,24 +30,21 @@
 QuarqdClient::QuarqdClient(QObject *parent, DeviceConfiguration *config) : QThread(parent)
 {
     Status=0;
-
     // server hostname and TCP port#
     deviceHostname = config->portSpec.section(':',0,0).toAscii(); // after the colon
     devicePort = (int)QString(config->portSpec).section(':',1,1).toInt(); // after the colon
     antIDs = config->deviceProfile.split(",");
     lastReadWatts = 0;
     lastReadRPM = 0;
-
 }
 
 QuarqdClient::~QuarqdClient()
 {
-    //free(deviceHostname);
 }
 
 void QuarqdClient::run()
 {
- //   int counter=0;
+    qDebug() << "Starting thread...";
     int status; // control commands from controller
     bool isPortOpen = false;
 
@@ -57,7 +53,6 @@ void QuarqdClient::run()
 
     openPort();
     isPortOpen = true;
-    initChannel();
     elapsedTime.start();
 
     while(1)
@@ -87,25 +82,8 @@ void QuarqdClient::run()
             quit(0);
             return;
         }
-
-        if ((status&ANT_PAUSED) && isPortOpen == true) {
-            closePort();
-            isPortOpen = false;
-
-        } else if (!(status&ANT_PAUSED) && (status&ANT_RUNNING) && isPortOpen == false) {
-            closePort();
-            if (openPort()) {
-                quit(2);
-                return; // open failed!
-            }
-            isPortOpen = true;
-            //init the channel
-            initChannel();
-
-        }
     }
-
-
+    return;
 }
 
 void
@@ -141,9 +119,12 @@ QuarqdClient::parseElement(QString &strBuf) // updates QuarqdClient::telemetry
 		    int end = str.indexOf("'", start);
 		    telemetry.setHr(str.mid(start, end - start).toDouble());
             telemetry.setTime(getTimeStamp(str));
-        } else if(str.contains("SensorDrop") || str.contains("SensorStale"))//Try and save it.
+        } else if(str.contains("SensorDrop") || str.contains("SensorStale") || str.contains("SensorLost"))//Try and save it.
         {
-            initChannel();
+		    int start = str.indexOf("id");
+		    start += 4;
+		    int end = str.indexOf("'", start);
+            reinitChannel(str.mid(start, end - start));
         }
 
         if(elapsedTime.elapsed() - lastReadRPM > 5000)
@@ -172,6 +153,7 @@ QuarqdClient::openPort()
 {
     tcpSocket = new QTcpSocket();
     tcpSocket->connectToHost(deviceHostname, devicePort);
+    connect(tcpSocket, SIGNAL(connected()), this, SLOT(initChannel()));
     return 0;
 }
 
@@ -204,6 +186,7 @@ QuarqdClient::restart()
     pvars.lock();
     status = this->Status;
     pvars.unlock();
+
     // what state are we in anyway?
     if (status&ANT_RUNNING && status&ANT_PAUSED) {
             status &= ~ANT_PAUSED;
@@ -228,7 +211,6 @@ QuarqdClient::pause()
     if (status&ANT_PAUSED) return 2; // already paused you muppet!
     else if (!(status&ANT_RUNNING)) return 4; // not running anyway, fool!
     else {
-
             // ok we're running and not paused so lets pause
             status |= ANT_PAUSED;
             pvars.lock();
@@ -249,8 +231,6 @@ QuarqdClient::stop()
     status = this->Status;
     pvars.unlock();
 
-    closePort();
-
     // what state are we in anyway?
     pvars.lock();
     Status = 0; // Terminate it!
@@ -262,7 +242,6 @@ QuarqdClient::stop()
 int
 QuarqdClient::quit(int code)
 {
-qDebug()<<"QUIT CODE" << code;
     // event code goes here!
     closePort();
     exit(code);
@@ -357,7 +336,7 @@ QuarqdClient::discover(DeviceConfiguration *config, QProgressDialog *progress)
             }
         }
     }
-    progress->setValue(40000);//We are done.
+    progress->setValue(50000);//We are done.
     //Now return a comma delimited string.
     for(int i=0; i < strList.size(); i++)
     {
@@ -375,16 +354,28 @@ QuarqdClient::getRealtimeData()
     return telemetry;
 }
 
+void QuarqdClient::reinitChannel(QString _channel)
+{
+    if(!tcpSocket->isValid())
+        return;
+    qDebug() << "Reinit: " << _channel;
+
+    QByteArray channel("X-set-channel: ");
+    channel.append(_channel);
+    tcpSocket->write(channel);
+}
+
+
 void
 QuarqdClient::initChannel()
 {
 
+    qDebug() << "Init channel..";
     if(!tcpSocket->isValid())
         return;
 
     QByteArray setChannel("X-set-channel: ");
     QByteArray channel;
-
     for(int i=0; i < antIDs.size(); i++)
     {
         if(tcpSocket->isValid())
@@ -393,21 +384,9 @@ QuarqdClient::initChannel()
             channel = setChannel;
             channel.append(antIDs.at(i));
             tcpSocket->write(channel);
+            tcpSocket->flush();
             qDebug() << channel;
             sleep(2);
-
         }
     }
-
-    QByteArray setBlanking = "X-set-timeout: blanking=1800";
-    QByteArray setDrop = "X-set-timeout: drop=3600";
-    QByteArray setLost = "X-set-timeout: lost=7200";
-
-    if(!tcpSocket->isValid())
-    {
-        tcpSocket->write(setChannel);
-        tcpSocket->write(setDrop);
-        tcpSocket->write(setLost);
-    }
-
 }
