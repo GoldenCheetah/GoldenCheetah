@@ -16,7 +16,6 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-
 #ifndef CLIENT_H
 #define CLIENT_H
 
@@ -59,7 +58,6 @@ private:
     void run();
 
     int openPort(), closePort(); // open and close socket
-    void initChannel();
 
     void parseElement(QString &str); // reads input string and updates current telemetry values
     long getTimeStamp(QString &str);
@@ -76,8 +74,11 @@ private:
     long lastReadRPM;
     QTime elapsedTime;
     bool sentDual, sentSpeed, sentHR, sentCad, sentPWR;
+    void reinitChannel(QString _channel);
+
+private slots:
+    void initChannel();
 
 };
-
 
 #endif
