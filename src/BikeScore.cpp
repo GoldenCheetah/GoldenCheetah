@@ -111,7 +111,7 @@ class RelativeIntensity : public RideMetric {
     double value(bool) const { return reli; }
     void compute(const RideFile *, const Zones *zones, int zoneRange,
                  const QHash<QString,RideMetric*> &deps) {
-        if (zones) {
+        if (zones && zoneRange >= 0) {
             assert(deps.contains("skiba_xpower"));
             XPower *xp = dynamic_cast<XPower*>(deps.value("skiba_xpower"));
             assert(xp);
@@ -145,7 +145,7 @@ class BikeScore : public RideMetric {
     double value(bool) const { return score; }
     void compute(const RideFile *ride, const Zones *zones, int zoneRange,
 	    const QHash<QString,RideMetric*> &deps) {
-	if (!zones)
+	if (!zones || zoneRange < 0)
 	    return;
 	if (ride->deviceType() == QString("Manual CSV")) {
 	    // manual entry, use BS from dataPoints

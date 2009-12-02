@@ -442,7 +442,7 @@ int Zones::whichRange(const QDate &date) const
             ((date < range.end) || (range.end.isNull())))
             return rnum;
     }
-    return 0;
+    return -1;
 }
 
 int Zones::numZones(int rnum) const

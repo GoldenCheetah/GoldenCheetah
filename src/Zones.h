@@ -59,6 +59,12 @@ class Zones : public QObject
     public:
         Zones() : defaults_from_user(false) {}
 
+        void clear() {
+            ranges.clear();
+            err = warning = "";
+            defaults_from_user = false;
+        }
+
         void addZoneRange(QDate _start, QDate _end, int _cp);
         void addZoneRange();
 

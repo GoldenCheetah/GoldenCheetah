@@ -45,7 +45,7 @@ class DanielsPoints : public RideMetric {
     double value(bool) const { return score; }
     void compute(const RideFile *ride, const Zones *zones,
                  int zoneRange, const QHash<QString,RideMetric*> &) {
-        if (!zones)
+        if (!zones || zoneRange < 0)
             return;
 
         if (ride->deviceType() == QString("Manual CSV")) {
