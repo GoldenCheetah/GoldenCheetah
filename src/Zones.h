@@ -36,17 +36,12 @@ class Zones : public QObject
         struct ZoneRange {
             QDate begin, end;
             int cp;
-            QList<ZoneInfo*> zones;
+            QList<ZoneInfo> zones;
             bool zonesSetFromCP;
             ZoneRange(const QDate &b, const QDate &e) :
 	        begin(b), end(e), cp(0), zonesSetFromCP(false) {}
   	    ZoneRange(const QDate &b, const QDate &e, int _cp) :
    	        begin(b), end(e), cp(_cp), zonesSetFromCP(false) {}
-            ~ZoneRange() {
-                QListIterator<ZoneInfo*> i(zones);
-       	        while (i.hasNext())
-    	            delete i.next();
-            }
         };
 
 
@@ -55,7 +50,7 @@ class Zones : public QObject
 
 	void setZonesFromCP(ZoneRange *range);
 
-	static bool zoneptr_lessthan(ZoneInfo *z1, ZoneInfo *z2);
+        static bool zoneptr_lessthan(const ZoneInfo &z1, const ZoneInfo &z2);
 	static bool rangeptr_lessthan(ZoneRange *r1, ZoneRange *r2);
 	static bool zone_default_index_lessthan(int i1, int i2);
 
