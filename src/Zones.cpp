@@ -43,10 +43,10 @@ bool Zones::zone_default_index_lessthan(int i1, int i2) {
 	    );
 }
 
-bool Zones::zoneptr_lessthan(ZoneInfo *z1, ZoneInfo *z2) {
+bool Zones::zoneptr_lessthan(const ZoneInfo &z1, const ZoneInfo &z2) {
     return (
-	    (z1->lo < z2->lo) ||
-	    ((z1->lo == z2->lo) && (z1->hi < z2->hi))
+	    (z1.lo < z2.lo) ||
+	    ((z1.lo == z2.lo) && (z1.hi < z2.hi))
 	    );
 }
 
@@ -330,8 +330,7 @@ bool Zones::read(QFile &file)
 		defaults_from_user = true;
 	    }
 	    else {
-		ZoneInfo *zone =
-		    new ZoneInfo(zonerx.cap(1), zonerx.cap(2), lo, hi);
+		ZoneInfo zone(zonerx.cap(1), zonerx.cap(2), lo, hi);
 		range->zones.append(zone);
 	    }
 	}
@@ -419,38 +418,38 @@ bool Zones::read(QFile &file)
 
 	if (ranges[nr]->zones.size()) {
 	    // check that the first zone starts with zero
-	    ranges[nr]->zones[0]->lo = 0;
+	    ranges[nr]->zones[0].lo = 0;
 
 	    // resolve zone end powers
 	    for (int nz = 0; nz < ranges[nr]->zones.size(); nz ++)
-		if (ranges[nr]->zones[nz]->hi == -1)
-		    ranges[nr]->zones[nz]->hi =
+		if (ranges[nr]->zones[nz].hi == -1)
+		    ranges[nr]->zones[nz].hi =
 			(nz < ranges[nr]->zones.size() - 1) ?
-			ranges[nr]->zones[nz + 1]->lo :
+			ranges[nr]->zones[nz + 1].lo :
 			INT_MAX;
 		else if ((nz < ranges[nr]->zones.size() - 1) &&
-			 (ranges[nr]->zones[nz]->hi != ranges[nr]->zones[nz + 1]->lo)
+			 (ranges[nr]->zones[nz].hi != ranges[nr]->zones[nz + 1].lo)
 			 ) {
-		    if (abs(ranges[nr]->zones[nz]->hi - ranges[nr]->zones[nz + 1]->lo) > 4)
+		    if (abs(ranges[nr]->zones[nz].hi - ranges[nr]->zones[nz + 1].lo) > 4)
 			append_to_warning(tr("Range %1: matching top of zone %2 "
 					     "(%3) to bottom of zone %4 (%5).\n").
 					  arg(nr + 1).
-					  arg(ranges[nr]->zones[nz]->name).
-					  arg(ranges[nr]->zones[nz]->hi).
-					  arg(ranges[nr]->zones[nz + 1]->name).
-					  arg(ranges[nr]->zones[nz + 1]->lo)
+					  arg(ranges[nr]->zones[nz].name).
+					  arg(ranges[nr]->zones[nz].hi).
+					  arg(ranges[nr]->zones[nz + 1].name).
+					  arg(ranges[nr]->zones[nz + 1].lo)
 					  );
-		    ranges[nr]->zones[nz]->hi = ranges[nr]->zones[nz + 1]->lo;
+		    ranges[nr]->zones[nz].hi = ranges[nr]->zones[nz + 1].lo;
 		}
 		else if ((nz == ranges[nr]->zones.size() - 1) &&
-			 (ranges[nr]->zones[nz]->hi < INT_MAX)
+			 (ranges[nr]->zones[nz].hi < INT_MAX)
 			 ) {
 		    append_to_warning(tr("Range %1: setting top of zone %2 from %3 to MAX.\n").
 				      arg(nr + 1).
-				      arg(ranges[nr]->zones[nz]->name).
-				      arg(ranges[nr]->zones[nz]->hi)
+				      arg(ranges[nr]->zones[nz].name).
+				      arg(ranges[nr]->zones[nz].hi)
 				      );
-		    ranges[nr]->zones[nz]->hi = INT_MAX;
+		    ranges[nr]->zones[nz].hi = INT_MAX;
 		}
 	}
     }
@@ -489,9 +488,9 @@ int Zones::whichZone(int rnum, double value) const
     assert(rnum < ranges.size());
     ZoneRange *range = ranges[rnum];
     for (int j = 0; j < range->zones.size(); ++j) {
-        ZoneInfo *info = range->zones[j];
+        ZoneInfo &info = range->zones[j];
 	// note: the "end" of range is actually in the next zone
-        if ((value >= info->lo) && (value < info->hi))
+        if ((value >= info.lo) && (value < info.hi))
             return j;
     }
     return -1;
@@ -504,11 +503,11 @@ void Zones::zoneInfo(int rnum, int znum,
     assert(rnum < ranges.size());
     ZoneRange *range = ranges[rnum];
     assert(znum < range->zones.size());
-    ZoneInfo *zone = range->zones[znum];
-    name = zone->name;
-    description = zone->desc;
-    low = zone->lo;
-    high = zone->hi;
+    ZoneInfo &zone = range->zones[znum];
+    name = zone.name;
+    description = zone.desc;
+    low = zone.lo;
+    high = zone.hi;
 }
 
 int Zones::getCP(int rnum) const
@@ -556,8 +555,7 @@ void Zones::setZonesFromCP(ZoneRange *range) {
     for (int i = 0; i < nzones_default; i++) {
 	int lo = zone_default_is_pct[i] ? zone_default[i] * range->cp / 100 : zone_default[i];
 	int hi = lo;
-	ZoneInfo *zone =
-	    new ZoneInfo(zone_default_name[i], zone_default_desc[i], lo, hi);
+	ZoneInfo zone(zone_default_name[i], zone_default_desc[i], lo, hi);
 	range->zones.append(zone);
     }
 
@@ -567,9 +565,9 @@ void Zones::setZonesFromCP(ZoneRange *range) {
 
     // set zone end dates
     for (int i = 0; i < range->zones.size(); i ++)
-	range->zones[i]->hi =
+	range->zones[i].hi =
 	    (i < nzones_default - 1) ?
-	    range->zones[i + 1]->lo :
+	    range->zones[i + 1].lo :
 	    INT_MAX;
 
     // mark that the zones were set from CP, so if zones are subsequently
@@ -589,7 +587,7 @@ QList <int> Zones::getZoneLows(int rnum) {
   ZoneRange *range = ranges[rnum];
   QList <int> return_values;
   for (int i = 0; i < range->zones.size(); i ++)
-      return_values.append(ranges[rnum]->zones[i]->lo);
+      return_values.append(ranges[rnum]->zones[i].lo);
   return return_values;
 }
 
@@ -600,7 +598,7 @@ QList <int> Zones::getZoneHighs(int rnum) {
   ZoneRange *range = ranges[rnum];
   QList <int> return_values;
   for (int i = 0; i < range->zones.size(); i ++)
-      return_values.append(ranges[rnum]->zones[i]->hi);
+      return_values.append(ranges[rnum]->zones[i].hi);
   return return_values;
 }
 
@@ -612,7 +610,7 @@ QList <QString> Zones::getZoneNames(int rnum) {
   ZoneRange *range = ranges[rnum];
   QList <QString> return_values;
   for (int i = 0; i < range->zones.size(); i ++)
-      return_values.append(ranges[rnum]->zones[i]->name);
+      return_values.append(ranges[rnum]->zones[i].name);
   return return_values;
   }
 
@@ -697,7 +695,7 @@ void Zones::write(QDir home)
 	// step through and print the zones if they've been explicitly set
 	if (! ranges[i]->zonesSetFromCP) {
 	    for (int j = 0; j < ranges[i]->zones.size(); j ++)
-		strzones += QString("%1,%2,%3\n").arg(ranges[i]->zones[j]->name).arg(ranges[i]->zones[j]->desc).arg(ranges[i]->zones[j]->lo);
+		strzones += QString("%1,%2,%3\n").arg(ranges[i]->zones[j].name).arg(ranges[i]->zones[j].desc).arg(ranges[i]->zones[j].lo);
 	    strzones += QString("\n");
 	}
         #else
@@ -711,10 +709,10 @@ void Zones::write(QDir home)
             strzones += QString("FROM %1 UNTIL %2, CP=%3:").arg(getStartDate(i).toString("yyyy/MM/dd")).arg(getEndDate(i).toString("yyyy/MM/dd")).arg(cp);
 	strzones += QString("\n");
 	for (int j = 0; j < ranges[i]->zones.size(); j ++)
-	    if (ranges[i]->zones[j]->hi == INT_MAX)
-		strzones += QString("%1,%2,%3,MAX\n").arg(ranges[i]->zones[j]->name).arg(ranges[i]->zones[j]->desc).arg(ranges[i]->zones[j]->lo);
+	    if (ranges[i]->zones[j].hi == INT_MAX)
+		strzones += QString("%1,%2,%3,MAX\n").arg(ranges[i]->zones[j].name).arg(ranges[i]->zones[j].desc).arg(ranges[i]->zones[j].lo);
 	    else
-		strzones += QString("%1,%2,%3,%4\n").arg(ranges[i]->zones[j]->name).arg(ranges[i]->zones[j]->desc).arg(ranges[i]->zones[j]->lo).arg(ranges[i]->zones[j]->hi);
+		strzones += QString("%1,%2,%3,%4\n").arg(ranges[i]->zones[j].name).arg(ranges[i]->zones[j].desc).arg(ranges[i]->zones[j].lo).arg(ranges[i]->zones[j].hi);
 	strzones += QString("\n");
         #endif
     }
