@@ -86,7 +86,7 @@ MainWindow::parseRideFileName(const QString &name, QString *notesFileName, QDate
 
 MainWindow::MainWindow(const QDir &home) : 
     home(home), 
-    zones(NULL), currentNotesChanged(false),
+    zones(new Zones), currentNotesChanged(false),
     ride(NULL)
 {
     settings = GetApplicationSettings();
@@ -102,12 +102,10 @@ MainWindow::MainWindow(const QDir &home) :
 
     QFile zonesFile(home.absolutePath() + "/power.zones");
     if (zonesFile.exists()) {
-        zones = new Zones();
         if (!zones->read(zonesFile)) {
             QMessageBox::critical(this, tr("Zones File Error"),
 				  zones->errorString());
-            delete zones;
-            zones = NULL;
+            zones->clear();
         }
 	else if (! zones->warningString().isEmpty())
             QMessageBox::warning(this, tr("Reading Zones File"), zones->warningString());
@@ -803,11 +801,6 @@ MainWindow::splitterMoved()
 void
 MainWindow::setCriticalPower(int cp)
 {
-  if (zones == NULL)
-    // set up new zones
-    zones = new Zones();
-
-
   // determine in which range to write the value: use the range associated with the presently selected ride
   int range;
   if (ride)
