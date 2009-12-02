@@ -52,7 +52,7 @@ class PfPvPlotZoneLabel: public QwtPlotItem
 	    zone_number = _zone_number;
 
 	    RideItem *rideItem = parent->rideItem;
-	    Zones *zones = rideItem->zones;
+	    const Zones *zones = rideItem->zones;
 	    int zone_range = rideItem->zoneRange();
 
 	    setZ(1.0 + zone_number / 100.0);
@@ -198,7 +198,7 @@ PfPvPlot::refreshZoneItems()
     if (! rideItem)
 	return;
 
-    Zones *zones = rideItem->zones;
+    const Zones *zones = rideItem->zones;
     int zone_range = rideItem->zoneRange();
     
     if (zone_range >= 0) {

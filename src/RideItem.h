@@ -39,7 +39,7 @@ class RideItem : public QTreeWidgetItem {
         QString summary;
 	QDateTime summaryGenerationTime, computeMetricsTime;
         RideFile *ride;
-        Zones *zones;
+        const Zones *zones;
         QString notesFileName;
 
         typedef QHash<QString,RideMetric*> MetricMap;
@@ -49,7 +49,7 @@ class RideItem : public QTreeWidgetItem {
 
         RideItem(int type, QString path, 
                  QString fileName, const QDateTime &dateTime,
-                 Zones *zones, QString notesFileName);
+                 const Zones *zones, QString notesFileName);
 
         ~RideItem();
 

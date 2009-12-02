@@ -90,7 +90,7 @@ public:
 	if (! rideItem)
 	    return;
 
-	Zones *zones       = rideItem->zones;
+	const Zones *zones       = rideItem->zones;
 	int zone_range     = rideItem->zoneRange();
 
 	if (parent->shadeZones() && (zone_range >= 0)) {
@@ -140,7 +140,7 @@ public:
 	if (! rideItem)
 	    return;
 
-	Zones *zones       = rideItem->zones;
+	const Zones *zones       = rideItem->zones;
 	int zone_range     = rideItem->zoneRange();
 
 	setZ(1.0 + zone_number / 100.0);
@@ -283,7 +283,7 @@ PowerHist::refreshZoneLabels()
 	return;
 
     if ((selected == wattsShaded) || (selected == wattsUnshaded)) {
-	Zones *zones = rideItem->zones;
+	const Zones *zones = rideItem->zones;
 	int zone_range = rideItem->zoneRange();
 
         // generate labels for existing zones

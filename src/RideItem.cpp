@@ -29,7 +29,7 @@
 
 RideItem::RideItem(int type,
                    QString path, QString fileName, const QDateTime &dateTime,
-                   Zones *zones, QString notesFileName) :
+                   const Zones *zones, QString notesFileName) :
     QTreeWidgetItem(type), path(path), fileName(fileName),
     dateTime(dateTime), ride(NULL), zones(zones), notesFileName(notesFileName)
 {
