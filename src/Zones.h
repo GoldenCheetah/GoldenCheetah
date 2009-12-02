@@ -45,25 +45,19 @@ class Zones : public QObject
         };
 
 
-        QList<ZoneRange*> ranges;
+        QList<ZoneRange> ranges;
         QString err, warning;
 
-	void setZonesFromCP(ZoneRange *range);
+	void setZonesFromCP(ZoneRange &range);
 
         static bool zoneptr_lessthan(const ZoneInfo &z1, const ZoneInfo &z2);
-	static bool rangeptr_lessthan(ZoneRange *r1, ZoneRange *r2);
+	static bool rangeptr_lessthan(const ZoneRange &r1, const ZoneRange &r2);
 	static bool zone_default_index_lessthan(int i1, int i2);
 
 	bool defaults_from_user;
 
     public:
         Zones() : defaults_from_user(false) {}
-
-        ~Zones() {
-            QListIterator<ZoneRange*> i(ranges);
-            while (i.hasNext())
-                delete i.next();
-        }
 
         void addZoneRange(QDate _start, QDate _end, int _cp);
         void addZoneRange(int _cp);
