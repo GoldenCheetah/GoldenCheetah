@@ -53,7 +53,7 @@ class CyclistPage : public QWidget
 {
     public:
         ~CyclistPage();
-        CyclistPage(Zones **_zones);
+        CyclistPage(const Zones *_zones);
         int thresholdPower;
         QString getText();
         int getCP();
@@ -91,7 +91,7 @@ class CyclistPage : public QWidget
 
     private:
 	QGroupBox *cyclistGroup;
-        Zones **zones;
+        const Zones *zones;
         int currentRange;
 	QLabel *lblThreshold;
         QLineEdit *txtThreshold;

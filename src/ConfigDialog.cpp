@@ -31,7 +31,7 @@ ConfigDialog::ConfigDialog(QDir _home, Zones **_zones)
 
     assert(zones);
 
-    cyclistPage = new CyclistPage(zones);
+    cyclistPage = new CyclistPage(*zones);
 
     contentsWidget = new QListWidget;
     contentsWidget->setViewMode(QListView::IconMode);

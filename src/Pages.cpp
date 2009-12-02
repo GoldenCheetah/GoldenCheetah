@@ -176,7 +176,7 @@ CyclistPage::~CyclistPage()
     delete mainLayout;
 }
 
-CyclistPage::CyclistPage(Zones **_zones):
+CyclistPage::CyclistPage(const Zones *_zones):
     zones(_zones)
 {
     boost::shared_ptr<QSettings> settings = GetApplicationSettings();
@@ -240,16 +240,16 @@ CyclistPage::CyclistPage(Zones **_zones):
     QDate today = QDate::currentDate();
     calendar->setSelectedDate(today);
 
-    if ((! *zones) || ((*zones)->getRangeSize() == 0))
-    	setCurrentRange();
+    if (zones->getRangeSize() == 0)
+        setCurrentRange();
     else
     {
-    	setCurrentRange((*zones)->whichRange(today));
+        setCurrentRange(zones->whichRange(today));
     	btnDelete->setEnabled(true);
 	checkboxNew->setCheckState(Qt::Unchecked);
     }
     
-    int cp = (*zones ? (*zones)->getCP(currentRange) : 0);
+    int cp = zones->getCP(currentRange);
     if (cp > 0)
 	setCP(cp);
 
@@ -339,11 +339,7 @@ void CyclistPage::setSelectedDate(QDate date)
 
 void CyclistPage::setCurrentRange(int range)
 {
-    int num_ranges =
-	*zones ?
-	(*zones)->getRangeSize() :
-	0;
-
+    int num_ranges = zones->getRangeSize();
     if ((num_ranges == 0) || (range < 0)) {
 	btnBack->setEnabled(false);
 	btnDelete->setEnabled(false);
@@ -372,11 +368,11 @@ void CyclistPage::setCurrentRange(int range)
     calendar->setEnabled(true);
 
     // update the CP display
-    setCP((*zones)->getCP(currentRange));
+    setCP(zones->getCP(currentRange));
 
     // update date limits
-    txtStartDate->setText((*zones)->getStartDateString(currentRange));
-    txtEndDate->setText((*zones)->getEndDateString(currentRange));
+    txtStartDate->setText(zones->getStartDateString(currentRange));
+    txtEndDate->setText(zones->getEndDateString(currentRange));
 }
 
 
