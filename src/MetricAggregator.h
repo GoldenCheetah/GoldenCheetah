@@ -33,11 +33,11 @@ class MetricAggregator
 {
 	public:
 		MetricAggregator();
-		void aggregateRides(QDir home, Zones *zones);
+		void aggregateRides(QDir home, const Zones *zones);
 	    typedef QHash<QString,RideMetric*> MetricMap;
-	bool importRide(QDir path, Zones *zones, RideFile *ride, QString fileName, DBAccess *dbaccess);
+	bool importRide(QDir path, const Zones *zones, RideFile *ride, QString fileName, DBAccess *dbaccess);
 	MetricMap metrics;
-    void scanForMissing(QDir home, Zones *zones);
+    void scanForMissing(QDir home, const Zones *zones);
     void resetMetricTable(QDir home);
 
 
