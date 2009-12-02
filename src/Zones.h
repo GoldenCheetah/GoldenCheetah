@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -32,23 +32,23 @@ class Zones : public QObject
             ZoneInfo(const QString &n, const QString &d, int l, int h) :
                 name(n), desc(d), lo(l), hi(h) {}
         };
-    
+
         struct ZoneRange {
             QDate begin, end;
             int cp;
             QList<ZoneInfo*> zones;
             bool zonesSetFromCP;
-            ZoneRange(const QDate &b, const QDate &e) : 
-	        begin(b), end(e), cp(0), zonesSetFromCP(false) { fprintf(stderr, "Generating CP=0 range\n"); }
-  	    ZoneRange(const QDate &b, const QDate &e, int _cp) : 
-   	        begin(b), end(e), cp(_cp), zonesSetFromCP(false) { fprintf(stderr, "Generating range with CP=%d\n", _cp); }
+            ZoneRange(const QDate &b, const QDate &e) :
+	        begin(b), end(e), cp(0), zonesSetFromCP(false) {}
+  	    ZoneRange(const QDate &b, const QDate &e, int _cp) :
+   	        begin(b), end(e), cp(_cp), zonesSetFromCP(false) {}
             ~ZoneRange() {
-                QListIterator<ZoneInfo*> i(zones); 
-       	        while (i.hasNext()) 
+                QListIterator<ZoneInfo*> i(zones);
+       	        while (i.hasNext())
     	            delete i.next();
             }
         };
-    
+
 
         QList<ZoneRange*> ranges;
         QString err, warning;
@@ -65,8 +65,8 @@ class Zones : public QObject
         Zones() : defaults_from_user(false) {}
 
         ~Zones() {
-            QListIterator<ZoneRange*> i(ranges); 
-            while (i.hasNext()) 
+            QListIterator<ZoneRange*> i(ranges);
+            while (i.hasNext())
                 delete i.next();
         }
 
@@ -108,7 +108,7 @@ class Zones : public QObject
 	// or to defaults using Coggan's coefficients
 	static void initializeZoneParameters();
 
-	// delete the range rnum, and adjust dates on adjacent zone; return 
+	// delete the range rnum, and adjust dates on adjacent zone; return
 	// the range number of the range extended to cover the deleted zone
 	int deleteRange(const int rnum);
 
