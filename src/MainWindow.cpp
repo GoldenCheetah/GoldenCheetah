@@ -751,7 +751,7 @@ MainWindow::resizeEvent(QResizeEvent*)
 void 
 MainWindow::showOptions()
 {
-    ConfigDialog *cd = new ConfigDialog(home, &zones);
+    ConfigDialog *cd = new ConfigDialog(home, zones);
     cd->exec();
 
     // update other items in case zones were changed

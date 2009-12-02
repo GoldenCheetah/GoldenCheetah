@@ -15,7 +15,7 @@ class ConfigDialog : public QDialog
 {
     Q_OBJECT
     public:
-        ConfigDialog(QDir home, Zones **zones);
+        ConfigDialog(QDir home, Zones *zones);
         ~ConfigDialog();
 
     public slots:
@@ -51,7 +51,7 @@ class ConfigDialog : public QDialog
 
         QSettings *settings;
         QDir home;
-        Zones **zones;
+        Zones *zones;
 
         // used by device config
     QList<QTreeWidgetItem> twiNames, twiSpecs, twiTypes, twiDefaults;
