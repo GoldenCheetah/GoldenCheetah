@@ -50,6 +50,8 @@ class MainWindow : public QMainWindow
         void addRide(QString name, bool bSelect=true);
         void removeCurrentRide();
         const RideFile *currentRide();
+        const RideItem *currentRideItem() { return ride; }
+        const QTreeWidgetItem *allRideItems() { return allRides; }
 	void getBSFactors(float &timeBS, float &distanceBS);
         QDir home;
         void setCriticalPower(int cp);
@@ -68,6 +70,10 @@ class MainWindow : public QMainWindow
         virtual void dragEnterEvent(QDragEnterEvent *);
         virtual void dropEvent(QDropEvent *);
     
+    signals:
+
+        void zonesChanged();
+
     private slots:
         void rideSelected();
         void leftLayoutMoved();

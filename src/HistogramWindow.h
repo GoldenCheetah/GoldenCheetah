@@ -21,6 +21,7 @@
 
 #include <QWidget>
 
+class MainWindow;
 class PowerHist;
 class QCheckBox;
 class QComboBox;
@@ -34,8 +35,11 @@ class HistogramWindow : public QWidget
 
     public:
 
-        HistogramWindow(QWidget *parent);
+        HistogramWindow(MainWindow *mainWindow);
         void setData(RideItem *ride);
+
+    public slots:
+
         void zonesChanged();
 
     protected slots:
