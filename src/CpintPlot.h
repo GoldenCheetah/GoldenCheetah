@@ -36,7 +36,7 @@ class CpintPlot : public QwtPlot
 
     public:
 
-        CpintPlot(QString path);
+        CpintPlot(QString path, const Zones *zones);
         bool needToScanRides;
 
         const QwtPlotCurve *getThisCurve() const { return thisCurve; }
@@ -72,7 +72,7 @@ class CpintPlot : public QwtPlot
         QVector<QDate> bestDates;
         QDate startDate;
         QDate endDate;
-        Zones *zones;
+        const Zones *zones;
         // keys are CPI files contributing to bests (at least originally)
         QHash<QString,bool> cpiDataInBests;
         bool energyMode_;
