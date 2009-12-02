@@ -62,7 +62,7 @@ class AllPlotBackground: public QwtPlotItem
         if (! rideItem)
             return;
 
-        Zones *zones       = rideItem->zones;
+        const Zones *zones       = rideItem->zones;
         int zone_range     = rideItem->zoneRange();
 
         if (parent->shadeZones() && (zone_range >= 0)) {
@@ -112,7 +112,7 @@ class AllPlotZoneLabel: public QwtPlotItem
                 return;
 
 
-            Zones *zones       = rideItem->zones;
+            const Zones *zones       = rideItem->zones;
             int zone_range     = rideItem->zoneRange();
 
             // create new zone labels if we're shading
@@ -254,7 +254,7 @@ void AllPlot::refreshZoneLabels()
 
     if (rideItem) {
         int zone_range = rideItem->zoneRange();
-        Zones *zones = rideItem->zones;
+        const Zones *zones = rideItem->zones;
 
         // generate labels for existing zones
         if (zone_range >= 0) {
