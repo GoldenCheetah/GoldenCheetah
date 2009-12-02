@@ -75,7 +75,7 @@ class MainWindow : public QMainWindow
         void zonesChanged();
 
     private slots:
-        void rideSelected();
+        void treeWidgetSelectionChanged();
         void leftLayoutMoved();
         void splitterMoved();
         void newCyclist();
