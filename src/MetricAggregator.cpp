@@ -34,7 +34,7 @@ MetricAggregator::MetricAggregator()
 {
 }
 
-void MetricAggregator::aggregateRides(QDir home, Zones *zones)
+void MetricAggregator::aggregateRides(QDir home, const Zones *zones)
 {
     qDebug() << QDateTime::currentDateTime();
     DBAccess *dbaccess = new DBAccess(home);
@@ -55,14 +55,13 @@ void MetricAggregator::aggregateRides(QDir home, Zones *zones)
 
 }
 
-bool MetricAggregator::importRide(QDir path, Zones *zones, RideFile *ride, QString fileName, DBAccess *dbaccess)
+bool MetricAggregator::importRide(QDir path, const Zones *zones, RideFile *ride, QString fileName, DBAccess *dbaccess)
 {
 
     SummaryMetrics *summaryMetric = new SummaryMetrics();
 
 
     QFile file(path.absolutePath() + "/" + fileName);
-    int zone_range = -1;
 
     QRegExp rx = RideFileFactory::instance().rideFileRegExp();
     if (!rx.exactMatch(fileName)) {
@@ -78,8 +77,7 @@ bool MetricAggregator::importRide(QDir path, Zones *zones, RideFile *ride, QStri
 
     summaryMetric->setRideDate(dateTime);
 
-    if (zones)
-        zone_range = zones->whichRange(dateTime.date());
+    int zone_range = zones->whichRange(dateTime.date());
 
     const RideMetricFactory &factory = RideMetricFactory::instance();
     QSet<QString> todo;
@@ -135,7 +133,7 @@ later:
 
 }
 
-void MetricAggregator::scanForMissing(QDir home, Zones *zones)
+void MetricAggregator::scanForMissing(QDir home, const Zones *zones)
 {
     QStringList errors;
     DBAccess *dbaccess = new DBAccess(home);
