@@ -56,9 +56,12 @@ class MainWindow : public QMainWindow
 
         RealtimeWindow  *realtimeWindow; // public so config dialog can notify it of changes config
 
-        Zones *zones; // used in ErgFile to get access to power.zones without having to re-read
+        const Zones *zones() const { return zones_; }
 
     protected:
+
+        Zones *zones_;
+
         virtual void resizeEvent(QResizeEvent*);
         virtual void moveEvent(QMoveEvent*);
         virtual void closeEvent(QCloseEvent*);

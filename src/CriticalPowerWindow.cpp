@@ -34,7 +34,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
 {
     QVBoxLayout *vlayout = new QVBoxLayout;
 
-    cpintPlot = new CpintPlot(home.path(), mainWindow->zones);
+    cpintPlot = new CpintPlot(home.path(), mainWindow->zones());
     vlayout->addWidget(cpintPlot);
 
     QFormLayout *cpintPickerLayout = new QFormLayout;
