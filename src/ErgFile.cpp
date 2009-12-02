@@ -34,11 +34,9 @@ ErgFile::ErgFile(QString filename, int &mode)
     long ralt = 200; // always start at 200 meters just to prettify the graph
 
     // Get users CP for relative watts calculations
-    if (mainwindow->zones) {
-        QDate today = QDate::currentDate();
-        int range = mainwindow->zones->whichRange(today);
-        if (range != -1) Cp = mainwindow->zones->getCP(range);
-    }
+    QDate today = QDate::currentDate();
+    int range = mainwindow->zones()->whichRange(today);
+    if (range != -1) Cp = mainwindow->zones()->getCP(range);
 
     // open the file
     if (ergFile.open(QIODevice::ReadOnly | QIODevice::Text) == false) {

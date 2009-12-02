@@ -86,7 +86,7 @@ MainWindow::parseRideFileName(const QString &name, QString *notesFileName, QDate
 
 MainWindow::MainWindow(const QDir &home) : 
     home(home), 
-    zones(new Zones), currentNotesChanged(false),
+    zones_(new Zones), currentNotesChanged(false),
     ride(NULL)
 {
     settings = GetApplicationSettings();
@@ -102,13 +102,13 @@ MainWindow::MainWindow(const QDir &home) :
 
     QFile zonesFile(home.absolutePath() + "/power.zones");
     if (zonesFile.exists()) {
-        if (!zones->read(zonesFile)) {
+        if (!zones_->read(zonesFile)) {
             QMessageBox::critical(this, tr("Zones File Error"),
-				  zones->errorString());
-            zones->clear();
+				  zones_->errorString());
+            zones_->clear();
         }
-	else if (! zones->warningString().isEmpty())
-            QMessageBox::warning(this, tr("Reading Zones File"), zones->warningString());
+	else if (! zones_->warningString().isEmpty())
+            QMessageBox::warning(this, tr("Reading Zones File"), zones_->warningString());
     }
 
     QVariant geom = settings->value(GC_SETTINGS_MAIN_GEOM);
@@ -165,7 +165,7 @@ MainWindow::MainWindow(const QDir &home) :
         QDateTime dt;
         if (parseRideFileName(name, &notesFileName, &dt)) {
             last = new RideItem(RIDE_TYPE, home.path(), 
-                                name, dt, zones, notesFileName);
+                                name, dt, zones(), notesFileName);
             allRides->addChild(last);
 	    calendar->addRide(reinterpret_cast<RideItem*>(last));
         }
@@ -348,7 +348,7 @@ MainWindow::addRide(QString name, bool bSelect /*=true*/)
         assert(false);
     }
     RideItem *last = new RideItem(RIDE_TYPE, home.path(), 
-                                  name, dt, zones, notesFileName);
+                                  name, dt, zones(), notesFileName);
 
     QVariant isAscending = settings->value(GC_ALLRIDES_ASCENDING,Qt::Checked); // default is ascending sort
     int index = 0;
@@ -594,7 +594,7 @@ MainWindow::rideSelected()
         criticalPowerWindow->setData(ride);
 
     // generate a weekly summary of the week associated with the current ride
-    weeklySummaryWindow->generateWeeklySummary(ride, allRides, zones);
+    weeklySummaryWindow->generateWeeklySummary(ride, allRides, zones());
 
     saveAndOpenNotes();
 }
@@ -751,7 +751,7 @@ MainWindow::resizeEvent(QResizeEvent*)
 void 
 MainWindow::showOptions()
 {
-    ConfigDialog *cd = new ConfigDialog(home, zones);
+    ConfigDialog *cd = new ConfigDialog(home, zones_);
     cd->exec();
 
     // update other items in case zones were changed
@@ -760,7 +760,7 @@ MainWindow::showOptions()
 	rideSummary->setHtml(ride->htmlSummary());
 	
 	// weekly summary
-        weeklySummaryWindow->generateWeeklySummary(ride, allRides, zones);
+        weeklySummaryWindow->generateWeeklySummary(ride, allRides, zones());
 
 	// all plot
         allPlotWindow->zonesChanged();
@@ -807,22 +807,22 @@ MainWindow::setCriticalPower(int cp)
       range = ride->zoneRange();
   else {
       QDate today = QDate::currentDate();
-      range = zones->whichRange(today);
+      range = zones_->whichRange(today);
   }
 
   // add a new range if we failed to find a valid one
   if (range < 0) {
     // create an infinite range
-    zones->addZoneRange();
+    zones_->addZoneRange();
     range = 0;
   }
 
-  zones->setCP(range, cp);        // update the CP value
-  zones->setZonesFromCP(range);   // update the zones based on the value of CP
-  zones->write(home);             // write the output file
+  zones_->setCP(range, cp);        // update the CP value
+  zones_->setZonesFromCP(range);   // update the zones based on the value of CP
+  zones_->write(home);             // write the output file
 
-  QDate startDate = zones->getStartDate(range);
-  QDate endDate   =  zones->getEndDate(range);
+  QDate startDate = zones_->getStartDate(range);
+  QDate endDate   =  zones_->getEndDate(range);
   QMessageBox::information(
 			   this,
 			   tr("CP saved"),
@@ -838,7 +838,7 @@ MainWindow::setCriticalPower(int cp)
     rideSummary->setHtml(ride->htmlSummary());
 
     // weekly summary
-    weeklySummaryWindow->generateWeeklySummary(ride, allRides, zones);
+    weeklySummaryWindow->generateWeeklySummary(ride, allRides, zones());
   }
 
 }
@@ -886,13 +886,13 @@ MainWindow::aboutDialog()
 void MainWindow::importRideToDB()
 {
     MetricAggregator aggregator;
-    aggregator.aggregateRides(home, zones);
+    aggregator.aggregateRides(home, zones());
 }
 
 void MainWindow::scanForMissing()
 {
     MetricAggregator aggregator;
-    aggregator.scanForMissing(home, zones);
+    aggregator.scanForMissing(home, zones());
 }
 
 
