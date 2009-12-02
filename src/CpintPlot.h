@@ -72,7 +72,7 @@ class CpintPlot : public QwtPlot
         QVector<QDate> bestDates;
         QDate startDate;
         QDate endDate;
-        Zones **zones;
+        Zones *zones;
         // keys are CPI files contributing to bests (at least originally)
         QHash<QString,bool> cpiDataInBests;
         bool energyMode_;

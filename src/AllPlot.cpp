@@ -62,11 +62,11 @@ class AllPlotBackground: public QwtPlotItem
         if (! rideItem)
             return;
 
-        Zones **zones      = rideItem->zones;
+        Zones *zones       = rideItem->zones;
         int zone_range     = rideItem->zoneRange();
 
-        if (parent->shadeZones() && zones && *zones && (zone_range >= 0)) {
-            QList <int> zone_lows = (*zones)->getZoneLows(zone_range);
+        if (parent->shadeZones() && (zone_range >= 0)) {
+            QList <int> zone_lows = zones->getZoneLows(zone_range);
             int num_zones = zone_lows.size();
             if (num_zones > 0) {
                 for (int z = 0; z < num_zones; z ++) {
@@ -112,13 +112,13 @@ class AllPlotZoneLabel: public QwtPlotItem
                 return;
 
 
-            Zones **zones      = rideItem->zones;
+            Zones *zones       = rideItem->zones;
             int zone_range     = rideItem->zoneRange();
 
             // create new zone labels if we're shading
-            if (parent->shadeZones() && zones && *zones && (zone_range >= 0)) {
-                QList <int> zone_lows = (*zones)->getZoneLows(zone_range);
-                QList <QString> zone_names = (*zones)->getZoneNames(zone_range);
+            if (parent->shadeZones() && (zone_range >= 0)) {
+                QList <int> zone_lows = zones->getZoneLows(zone_range);
+                QList <QString> zone_names = zones->getZoneNames(zone_range);
                 int num_zones = zone_lows.size();
                 assert(zone_names.size() == num_zones);
                 if (zone_number < num_zones) {
@@ -254,11 +254,11 @@ void AllPlot::refreshZoneLabels()
 
     if (rideItem) {
         int zone_range = rideItem->zoneRange();
-        Zones **zones  = rideItem->zones;
+        Zones *zones = rideItem->zones;
 
         // generate labels for existing zones
-        if (zones && *zones && (zone_range >= 0)) {
-            int num_zones = (*zones)->numZones(zone_range);
+        if (zone_range >= 0) {
+            int num_zones = zones->numZones(zone_range);
             for (int z = 0; z < num_zones; z ++) {
                 AllPlotZoneLabel *label = new AllPlotZoneLabel(this, z);
                 label->attach(this);

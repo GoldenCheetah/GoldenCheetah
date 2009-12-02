@@ -485,7 +485,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
     // generate zones from derived CP value
     if (cp > 0) {
         QList <int> power_zone;
-        int n_zones = (*zones)->lowsFromCP(&power_zone, (int) int(cp));
+        int n_zones = zones->lowsFromCP(&power_zone, (int) int(cp));
         int high = n_values - 1;
         int zone = 0;
         while (zone < n_zones) {
@@ -499,7 +499,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
             }
 
             QColor color = zoneColor(zone, n_zones);
-            QString name = (*zones)->getDefaultZoneName(zone);
+            QString name = zones->getDefaultZoneName(zone);
             QwtPlotCurve *curve = new QwtPlotCurve(name);
             curve->setRenderHint(QwtPlotItem::RenderAntialiased);
             QPen pen(color);

@@ -29,7 +29,7 @@
 
 RideItem::RideItem(int type,
                    QString path, QString fileName, const QDateTime &dateTime,
-                   Zones **zones, QString notesFileName) :
+                   Zones *zones, QString notesFileName) :
     QTreeWidgetItem(type), path(path), fileName(fileName),
     dateTime(dateTime), ride(NULL), zones(zones), notesFileName(notesFileName)
 {
@@ -111,24 +111,13 @@ static void summarize(bool even,
 
 int RideItem::zoneRange()
 {
-    return (
-        (zones && *zones) ?
-        (*zones)->whichRange(dateTime.date()) :
-        -1
-        );
+    return zones->whichRange(dateTime.date());
 }
 
 int RideItem::numZones()
 {
-    if (zones && *zones) {
-        int zone_range = zoneRange();
-        return ((zone_range >= 0) ?
-                (*zones)->numZones(zone_range) :
-                0
-               );
-    }
-    else
-        return 0;
+    int zone_range = zoneRange();
+    return (zone_range >= 0) ? zones->numZones(zone_range) : 0;
 }
 
 double RideItem::timeInZone(int zone)
@@ -193,7 +182,7 @@ RideItem::computeMetrics()
 {
     const QDateTime nilTime;
     if ((computeMetricsTime != nilTime) &&
-        (!zones || !*zones || (computeMetricsTime >= (*zones)->modificationTime))) {
+        (computeMetricsTime >= zones->modificationTime)) {
         return;
     }
 
@@ -211,7 +200,7 @@ RideItem::computeMetrics()
     int num_zones = numZones();
     time_in_zone.clear();
     if (zone_range >= 0) {
-        num_zones = (*zones)->numZones(zone_range);
+        num_zones = zones->numZones(zone_range);
         time_in_zone.resize(num_zones);
     }
 
@@ -219,7 +208,7 @@ RideItem::computeMetrics()
     foreach (const RideFilePoint *point, ride->dataPoints()) {
         if (point->watts >= 0.0) {
             if (num_zones > 0) {
-                int zone = (*zones)->whichZone(zone_range, point->watts);
+                int zone = zones->whichZone(zone_range, point->watts);
                 if (zone >= 0)
                     time_in_zone[zone] += secs_delta;
             }
@@ -249,7 +238,7 @@ RideItem::computeMetrics()
                         if (!metrics.contains(deps[j]))
                             goto later;
                     RideMetric *metric = factory.newMetric(name);
-                    metric->compute(ride, *zones, zone_range, metrics);
+                    metric->compute(ride, zones, zone_range, metrics);
                     metrics.insert(name, metric);
                     i.remove();
                 }
@@ -262,7 +251,7 @@ QString
 RideItem::htmlSummary()
 {
     if (summary.isEmpty() ||
-        (zones && *zones && (summaryGenerationTime < (*zones)->modificationTime))) {
+        (summaryGenerationTime < zones->modificationTime)) {
 
         summaryGenerationTime = QDateTime::currentDateTime();
 
@@ -410,7 +399,7 @@ RideItem::htmlSummary()
 
         if (!time_in_zone.empty()) {
             summary += "<h2>Power Zones</h2>";
-            summary += (*zones)->summarize(zoneRange(), time_in_zone);
+            summary += zones->summarize(zoneRange(), time_in_zone);
         }
 
         // TODO: Ergomo uses non-consecutive interval numbers.

@@ -52,15 +52,15 @@ class PfPvPlotZoneLabel: public QwtPlotItem
 	    zone_number = _zone_number;
 
 	    RideItem *rideItem = parent->rideItem;
-	    Zones **zones = rideItem->zones;
+	    Zones *zones = rideItem->zones;
 	    int zone_range = rideItem->zoneRange();
 
 	    setZ(1.0 + zone_number / 100.0);
 
 	    // create new zone labels if we're shading
-	    if (zones && *zones && (zone_range >= 0)) {
-		QList <int> zone_lows = (*zones)->getZoneLows(zone_range);
-		QList <QString> zone_names = (*zones)->getZoneNames(zone_range);
+	    if (zone_range >= 0) {
+		QList <int> zone_lows = zones->getZoneLows(zone_range);
+		QList <QString> zone_names = zones->getZoneNames(zone_range);
 		int num_zones = zone_lows.size();
 		assert(zone_names.size() == num_zones);
 		if (zone_number < num_zones) {
@@ -198,15 +198,15 @@ PfPvPlot::refreshZoneItems()
     if (! rideItem)
 	return;
 
-    Zones **zones = rideItem->zones;
+    Zones *zones = rideItem->zones;
     int zone_range = rideItem->zoneRange();
     
-    if (zones && *zones && (zone_range >= 0)) {
-	setCP((*zones)->getCP(zone_range));
+    if (zone_range >= 0) {
+	setCP(zones->getCP(zone_range));
 
 	// populate the zone curves
-	QList <int> zone_power = (*zones)->getZoneLows(zone_range);
-	QList <QString> zone_name = (*zones)->getZoneNames(zone_range);
+	QList <int> zone_power = zones->getZoneLows(zone_range);
+	QList <QString> zone_name = zones->getZoneNames(zone_range);
 	int num_zones = zone_power.size();
 	assert(zone_name.size() == num_zones);
 	if (num_zones > 0) {	
