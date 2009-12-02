@@ -820,7 +820,7 @@ MainWindow::setCriticalPower(int cp)
   // add a new range if we failed to find a valid one
   if (range < 0) {
     // create an infinite range
-    zones->addZoneRange(cp);
+    zones->addZoneRange();
     range = 0;
   }
 

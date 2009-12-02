@@ -744,12 +744,6 @@ void Zones::addZoneRange(QDate _start, QDate _end, int _cp)
     ranges.append(ZoneRange(_start, _end, _cp));
 }
 
-void Zones::addZoneRange(int _cp)
-{
-    (void) _cp; // TODO: _cp is unused.  Remove it?
-    ranges.append(ZoneRange(date_zero, date_infinity));
-}
-
 void Zones::addZoneRange()
 {
     ranges.append(ZoneRange(date_zero, date_infinity));
@@ -845,7 +839,7 @@ int Zones::insertRangeAtDate(QDate date, int cp) {
     int rnum;
 
     if (ranges.empty())
-	addZoneRange(cp);
+	addZoneRange();
     else {
 	rnum = whichRange(date);
 	assert(rnum >= 0);
