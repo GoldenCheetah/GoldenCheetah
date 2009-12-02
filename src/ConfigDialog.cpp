@@ -23,15 +23,12 @@
  *    deletes currently selected zone
  */
 
-ConfigDialog::ConfigDialog(QDir _home, Zones **_zones)
+ConfigDialog::ConfigDialog(QDir _home, Zones *_zones) : zones(_zones)
 {
 
     home = _home;
-    zones = _zones;
 
-    assert(zones);
-
-    cyclistPage = new CyclistPage(*zones);
+    cyclistPage = new CyclistPage(zones);
 
     contentsWidget = new QListWidget;
     contentsWidget->setViewMode(QListView::IconMode);
@@ -179,29 +176,21 @@ void ConfigDialog::save_Clicked()
     }
 
     // if for some reason we have no zones yet, then create them
-    int range;
-    assert(zones);
-    if (! *zones) {
-	*zones = new Zones();
-	range = -1;
-    }
-    else
-	// determine the current range
-	range = cyclistPage->getCurrentRange();
+    int range = cyclistPage->getCurrentRange();
 
     // if this is new mode, or if no zone ranges are yet defined, set up the new range
     if ((range == -1) || (cyclistPage->isNewMode()))
-	cyclistPage->setCurrentRange(range = (*zones)->insertRangeAtDate(cyclistPage->selectedDate(), cp));
+	cyclistPage->setCurrentRange(range = zones->insertRangeAtDate(cyclistPage->selectedDate(), cp));
     else
-	(*zones)->setCP(range, cyclistPage->getText().toInt());
+	zones->setCP(range, cyclistPage->getText().toInt());
 
-    (*zones)->setZonesFromCP(range);
+    zones->setZonesFromCP(range);
 
     // update the "new zone" checkbox to visible and unchecked
     cyclistPage->checkboxNew->setChecked(Qt::Unchecked);
     cyclistPage->checkboxNew->setEnabled(true);
 
-    (*zones)->write(home);
+    zones->write(home);
 
     // Save the device configuration...
     DeviceConfigurations all;
@@ -222,12 +211,12 @@ void ConfigDialog::moveCalendarToCurrentRange() {
 
     // put the cursor at the beginning of the selected range if it's not the first
     if (range > 0)
-        date = (*zones)->getStartDate(cyclistPage->getCurrentRange());
+        date = zones->getStartDate(cyclistPage->getCurrentRange());
     // unless the range is the first range, in which case it goes at the end of that range
     // use JulianDay to subtract one day from the end date, which is actually the first
     // day of the following range
     else
-        date = QDate::fromJulianDay((*zones)->getEndDate(cyclistPage->getCurrentRange()).toJulianDay() - 1);
+        date = QDate::fromJulianDay(zones->getEndDate(cyclistPage->getCurrentRange()).toJulianDay() - 1);
 
     cyclistPage->setSelectedDate(date);
 }
@@ -248,15 +237,15 @@ void ConfigDialog::forward_Clicked()
 
 void ConfigDialog::delete_Clicked() {
     int range = cyclistPage->getCurrentRange();
-    int num_ranges = (*zones)->getRangeSize();
+    int num_ranges = zones->getRangeSize();
     assert (num_ranges > 1);
     QMessageBox msgBox;
     msgBox.setText(
 		   tr("Are you sure you want to delete the zone range\n"
 		      "from %1 to %2?\n"
 		      "(%3 range will extend to this date range):") .
-		   arg((*zones)->getStartDateString(cyclistPage->getCurrentRange())) .
-		   arg((*zones)->getEndDateString(cyclistPage->getCurrentRange())) .
+		   arg(zones->getStartDateString(cyclistPage->getCurrentRange())) .
+		   arg(zones->getEndDateString(cyclistPage->getCurrentRange())) .
 		   arg((range > 0) ? "previous" : "next")
 		   );
     QPushButton *deleteButton = msgBox.addButton(tr("Delete"),QMessageBox::YesRole);
@@ -265,13 +254,13 @@ void ConfigDialog::delete_Clicked() {
     msgBox.setIcon(QMessageBox::Critical);
     msgBox.exec();
     if(msgBox.clickedButton() == deleteButton)
-	cyclistPage->setCurrentRange((*zones)->deleteRange(range));
+	cyclistPage->setCurrentRange(zones->deleteRange(range));
 
-    (*zones)->write(home);
+    zones->write(home);
 }
 
 void ConfigDialog::calendarDateChanged() {
-    int range = (*zones)->whichRange(cyclistPage->selectedDate());
+    int range = zones->whichRange(cyclistPage->selectedDate());
     assert(range >= 0);
     cyclistPage->setCurrentRange(range);
 }
