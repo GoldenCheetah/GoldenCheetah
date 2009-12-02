@@ -477,13 +477,11 @@ bool Zones::read(QFile &file)
 // end of range
 int Zones::whichRange(const QDate &date) const
 {
-    int rnum = 0;
-    foreach(const ZoneRange &range, ranges) {
+    for (int rnum = 0; rnum < ranges.size(); ++rnum) {
+        const ZoneRange &range = ranges[rnum];
         if (((date >= range.begin) || (range.begin.isNull())) &&
-	    ((date < range.end) || (range.end.isNull()))
-	    )
+            ((date < range.end) || (range.end.isNull())))
             return rnum;
-        ++rnum;
     }
     return 0;
 }
