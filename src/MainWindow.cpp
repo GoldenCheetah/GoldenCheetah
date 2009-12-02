@@ -256,7 +256,7 @@ MainWindow::MainWindow(const QDir &home) :
     connect(leftLayout, SIGNAL(splitterMoved(int,int)),
             this, SLOT(leftLayoutMoved()));
     connect(treeWidget, SIGNAL(itemSelectionChanged()),
-            this, SLOT(rideSelected()));
+            this, SLOT(treeWidgetSelectionChanged()));
     connect(splitter, SIGNAL(splitterMoved(int,int)), 
             this, SLOT(splitterMoved()));
     connect(tabWidget, SIGNAL(currentChanged(int)), 
@@ -427,7 +427,7 @@ MainWindow::removeCurrentRide()
     criticalPowerWindow->deleteCpiFile(strOldFileName);
 
     treeWidget->setCurrentItem(itemToSelect);
-    rideSelected();
+    treeWidgetSelectionChanged();
 }
 
 void
@@ -556,7 +556,7 @@ MainWindow::findBestIntervals()
 }
 
 void 
-MainWindow::rideSelected()
+MainWindow::treeWidgetSelectionChanged()
 {
     assert(treeWidget->selectedItems().size() <= 1);
     if (treeWidget->selectedItems().isEmpty()) {
