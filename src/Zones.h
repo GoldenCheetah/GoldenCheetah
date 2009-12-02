@@ -83,19 +83,19 @@ class Zones : public QObject
         int getCP(int rnum) const;
         void setCP(int rnum, int cp);
 	QString getDefaultZoneName(int z) const;
-	QString getDefaultZoneDesc(int z);
+	QString getDefaultZoneDesc(int z) const;
 	void setZonesFromCP(int rnum);
 	int lowsFromCP(QList <int> *lows, int CP) const;
-	QList <int> getZoneLows(int rnum);
-	QList <int> getZoneHighs(int rnum);
-	QList <QString> getZoneNames(int rnum);
-        QDate getStartDate(int rnum);
-        QDate getEndDate(int rnum);
-        QString getStartDateString(int rnum);
-        QString getEndDateString(int rnum);
+	QList <int> getZoneLows(int rnum) const;
+	QList <int> getZoneHighs(int rnum) const;
+	QList <QString> getZoneNames(int rnum) const;
+        QDate getStartDate(int rnum) const;
+        QDate getEndDate(int rnum) const;
+        QString getStartDateString(int rnum) const;
+        QString getEndDateString(int rnum) const;
         void setEndDate(int rnum, QDate date);
         void setStartDate(int rnum, QDate date);
-        int getRangeSize();
+        int getRangeSize() const;
 	QDateTime modificationTime;
 
 	// set zone parameters to either user-specified defaults

@@ -509,7 +509,7 @@ QString Zones::getDefaultZoneName(int z) const {
 }
 
 // access the zone description
-QString Zones::getDefaultZoneDesc(int z) {
+QString Zones::getDefaultZoneDesc(int z) const {
     return zone_default_desc[z];
 }
 
@@ -549,7 +549,7 @@ void Zones::setZonesFromCP(int rnum) {
 }
 
 // return the list of starting values of zones for a given range
-QList <int> Zones::getZoneLows(int rnum) {
+QList <int> Zones::getZoneLows(int rnum) const {
     if (rnum >= ranges.size())
         return QList <int>::QList();
     const ZoneRange &range = ranges[rnum];
@@ -560,7 +560,7 @@ QList <int> Zones::getZoneLows(int rnum) {
 }
 
 // return the list of ending values of zones for a given range
-QList <int> Zones::getZoneHighs(int rnum) {
+QList <int> Zones::getZoneHighs(int rnum) const {
     if (rnum >= ranges.size())
         return QList <int>::QList();
     const ZoneRange &range = ranges[rnum];
@@ -571,7 +571,7 @@ QList <int> Zones::getZoneHighs(int rnum) {
 }
 
 // return the list of zone names
-QList <QString> Zones::getZoneNames(int rnum) {
+QList <QString> Zones::getZoneNames(int rnum) const {
     if (rnum >= ranges.size())
         return QList <QString>::QList();
     const ZoneRange &range = ranges[rnum];
@@ -717,33 +717,33 @@ void Zones::setStartDate(int rnum, QDate startDate)
     modificationTime = QDateTime::currentDateTime();
 }
 
-QDate Zones::getStartDate(int rnum)
+QDate Zones::getStartDate(int rnum) const
 {
     assert(rnum >= 0);
     return ranges[rnum].begin;
 }
 
-QString Zones::getStartDateString(int rnum)
+QString Zones::getStartDateString(int rnum) const
 {
     assert(rnum >= 0);
     QDate d = ranges[rnum].begin;
     return (d.isNull() ? "BEGIN" : d.toString());
 }
 
-QDate Zones::getEndDate(int rnum)
+QDate Zones::getEndDate(int rnum) const
 {
     assert(rnum >= 0);
     return ranges[rnum].end;
 }
 
-QString Zones::getEndDateString(int rnum)
+QString Zones::getEndDateString(int rnum) const
 {
     assert(rnum >= 0);
     QDate d = ranges[rnum].end;
     return (d.isNull() ? "END" : d.toString());
 }
 
-int Zones::getRangeSize()
+int Zones::getRangeSize() const
 {
     return ranges.size();
 }
