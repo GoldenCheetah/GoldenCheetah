@@ -17,13 +17,14 @@
  */
 
 #include "HistogramWindow.h"
+#include "MainWindow.h"
 #include "PowerHist.h"
 #include "RideFile.h"
 #include "RideItem.h"
 #include <QtGui>
 #include <assert.h>
 
-HistogramWindow::HistogramWindow(QWidget *parent) : QWidget(parent)
+HistogramWindow::HistogramWindow(MainWindow *mainWindow) : QWidget(mainWindow)
 {
     QVBoxLayout *vlayout = new QVBoxLayout;
     QHBoxLayout *binWidthLayout = new QHBoxLayout;
@@ -71,6 +72,7 @@ HistogramWindow::HistogramWindow(QWidget *parent) : QWidget(parent)
             this, SLOT(setWithZerosFromCheckBox()));
     connect(histParameterCombo, SIGNAL(currentIndexChanged(int)),
             this, SLOT(setHistSelection(int)));
+    connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
 }
 
 void

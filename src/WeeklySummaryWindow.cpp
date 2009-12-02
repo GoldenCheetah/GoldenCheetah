@@ -18,6 +18,7 @@
 
 #include "WeeklySummaryWindow.h"
 #include "DaysScaleDraw.h"
+#include "MainWindow.h"
 #include "RideItem.h"
 #include "RideMetric.h"
 #include "Zones.h"
@@ -31,8 +32,10 @@
 #define FOLDER_TYPE 0
 #define RIDE_TYPE 1
 
-WeeklySummaryWindow::WeeklySummaryWindow(bool useMetricUnits, QWidget *parent) :
-    QWidget(parent), useMetricUnits(useMetricUnits)
+WeeklySummaryWindow::WeeklySummaryWindow(bool useMetricUnits,
+                                         MainWindow *mainWindow) :
+    QWidget(mainWindow), mainWindow(mainWindow),
+    useMetricUnits(useMetricUnits)
 {
     QGridLayout *glayout = new QGridLayout;
 
@@ -129,6 +132,16 @@ WeeklySummaryWindow::WeeklySummaryWindow(bool useMetricUnits, QWidget *parent) :
     glayout->setRowMinimumHeight(1, 120);   // minimum height of weekly plots
 
     setLayout(glayout);
+
+    connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
+}
+
+void
+WeeklySummaryWindow::zonesChanged()
+{
+    generateWeeklySummary(mainWindow->currentRideItem(),
+                          mainWindow->allRideItems(),
+                          mainWindow->zones());
 }
 
 void
@@ -136,6 +149,8 @@ WeeklySummaryWindow::generateWeeklySummary(const RideItem *ride,
                                            const QTreeWidgetItem *allRides,
                                            const Zones *zones)
 {
+    if (!ride)
+        return;
     QDate wstart = ride->dateTime.date();
     wstart = wstart.addDays(Qt::Monday - wstart.dayOfWeek());
     assert(wstart.dayOfWeek() == Qt::Monday);

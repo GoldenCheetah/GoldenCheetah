@@ -17,11 +17,12 @@
  */
 
 #include "PfPvWindow.h"
+#include "MainWindow.h"
 #include "PfPvPlot.h"
 #include "RideItem.h"
 #include <QtGui>
 
-PfPvWindow::PfPvWindow(QWidget *parent) : QWidget(parent)
+PfPvWindow::PfPvWindow(MainWindow *mainWindow) : QWidget(mainWindow)
 {
     QVBoxLayout *vlayout = new QVBoxLayout;
     QHBoxLayout *qaLayout = new QHBoxLayout;
@@ -65,6 +66,7 @@ PfPvWindow::PfPvWindow(QWidget *parent) : QWidget(parent)
 	    this, SLOT(setQaCLFromLineEdit()));
     connect(shadeZonesPfPvCheckBox, SIGNAL(stateChanged(int)),
             this, SLOT(setShadeZonesPfPvFromCheckBox()));
+    connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
 }
 
 void

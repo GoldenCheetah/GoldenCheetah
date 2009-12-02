@@ -21,6 +21,7 @@
 
 #include <QWidget>
 
+class MainWindow;
 class PfPvPlot;
 class QCheckBox;
 class QLineEdit;
@@ -32,8 +33,11 @@ class PfPvWindow : public QWidget
 
     public:
 
-        PfPvWindow(QWidget *parent);
+        PfPvWindow(MainWindow *mainWindow);
         void setData(RideItem *item);
+
+    public slots:
+
         void zonesChanged();
 
     protected slots:

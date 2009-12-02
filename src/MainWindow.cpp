@@ -753,24 +753,8 @@ MainWindow::showOptions()
 {
     ConfigDialog *cd = new ConfigDialog(home, zones_);
     cd->exec();
-
-    // update other items in case zones were changed
-    if (ride) {
-	// daily summary
-	rideSummary->setHtml(ride->htmlSummary());
-	
-	// weekly summary
-        weeklySummaryWindow->generateWeeklySummary(ride, allRides, zones());
-
-	// all plot
-        allPlotWindow->zonesChanged();
-
-	// histogram
-        histogramWindow->zonesChanged();
-
-	// force-versus-pedal velocity plot
-        pfPvWindow->zonesChanged();
-    }
+    if (ride) rideSummary->setHtml(ride->htmlSummary());
+    zonesChanged();
 }
 
 void 
@@ -832,15 +816,8 @@ MainWindow::setCriticalPower(int cp)
 			   arg(cp)
 			   );
 
-  // regenerate the ride and weekly summaries associated with the present ride
-  if (ride) {
-    // daily summary
-    rideSummary->setHtml(ride->htmlSummary());
-
-    // weekly summary
-    weeklySummaryWindow->generateWeeklySummary(ride, allRides, zones());
-  }
-
+  if (ride) rideSummary->setHtml(ride->htmlSummary());
+  zonesChanged();
 }
 
 void

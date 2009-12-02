@@ -21,6 +21,7 @@
 
 #include <QWidget>
 
+class MainWindow;
 class QTextEdit;
 class QTreeWidgetItem;
 class QwtPlot;
@@ -34,13 +35,18 @@ class WeeklySummaryWindow : public QWidget
 
     public:
 
-        WeeklySummaryWindow(bool useMetricUnits, QWidget *parent);
+        WeeklySummaryWindow(bool useMetricUnits, MainWindow *parent);
         void generateWeeklySummary(const RideItem *ride,
                                    const QTreeWidgetItem *allRides,
                                    const Zones *zones);
 
+    public slots:
+
+        void zonesChanged();
+
     protected:
 
+        MainWindow *mainWindow;
         bool useMetricUnits;
         QwtPlot *weeklyPlot;
         QwtPlotCurve *weeklyDistCurve;

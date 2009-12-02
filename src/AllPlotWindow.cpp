@@ -19,12 +19,13 @@
 
 #include "AllPlotWindow.h"
 #include "AllPlot.h"
+#include "MainWindow.h"
 #include "RideFile.h"
 #include "RideItem.h"
 #include <qwt_plot_panner.h>
 #include <qwt_plot_zoomer.h>
 
-AllPlotWindow::AllPlotWindow(QWidget *parent) : QWidget(parent)
+AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) : QWidget(mainWindow)
 {
     QVBoxLayout *vlayout = new QVBoxLayout;
 
@@ -129,6 +130,7 @@ AllPlotWindow::AllPlotWindow(QWidget *parent) : QWidget(parent)
             this, SLOT(setSmoothingFromSlider()));
     connect(smoothLineEdit, SIGNAL(editingFinished()),
             this, SLOT(setSmoothingFromLineEdit()));
+    connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
 }
 
 void

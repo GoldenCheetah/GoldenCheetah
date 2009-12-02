@@ -22,6 +22,7 @@
 #include <QtGui>
 
 class AllPlot;
+class MainWindow;
 class QwtPlotPanner;
 class QwtPlotZoomer;
 class RideItem;
@@ -32,14 +33,14 @@ class AllPlotWindow : public QWidget
 
     public:
 
-        AllPlotWindow(QWidget *parent);
+        AllPlotWindow(MainWindow *mainWindow);
         void setData(RideItem *ride);
-        void zonesChanged();
 
    public slots:
 
         void setSmoothingFromSlider();
         void setSmoothingFromLineEdit();
+        void zonesChanged();
 
     protected:
 
