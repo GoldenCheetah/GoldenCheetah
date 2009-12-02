@@ -37,12 +37,12 @@
 
 #define USE_T0_IN_CP_MODEL 0 // added djconnel 08Apr2009: allow 3-parameter CP model
 
-CpintPlot::CpintPlot(QString p) :
+CpintPlot::CpintPlot(QString p, const Zones *zones) :
     needToScanRides(true),
     path(p),
     thisCurve(NULL),
     CPCurve(NULL),
-    zones(NULL),
+    zones(zones),
     energyMode_(false)
 {
     assert(!USE_T0_IN_CP_MODEL); // doesn't work with energyMode=true
@@ -585,7 +585,6 @@ CpintPlot::calculate(RideItem *rideItem)
     QDateTime dateTime = rideItem->dateTime;
     QDir dir(path);
     QFileInfo file(fileName);
-    zones = rideItem->zones;
 
     if (needToScanRides) {
         bests.clear();
