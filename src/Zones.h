@@ -82,10 +82,10 @@ class Zones : public QObject
         QString summarize(int rnum, QVector<double> &time_in_zone) const;
         int getCP(int rnum) const;
         void setCP(int rnum, int cp);
-	QString getDefaultZoneName(int z);
+	QString getDefaultZoneName(int z) const;
 	QString getDefaultZoneDesc(int z);
 	void setZonesFromCP(int rnum);
-	int lowsFromCP(QList <int> *lows, int CP);
+	int lowsFromCP(QList <int> *lows, int CP) const;
 	QList <int> getZoneLows(int rnum);
 	QList <int> getZoneHighs(int rnum);
 	QList <QString> getZoneNames(int rnum);

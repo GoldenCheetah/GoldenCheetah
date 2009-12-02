@@ -491,7 +491,7 @@ void Zones::setCP(int rnum, int cp)
 }
 
 // generate a list of zones from CP
-int Zones::lowsFromCP(QList <int> *lows, int cp) {
+int Zones::lowsFromCP(QList <int> *lows, int cp) const {
     if (nzones_default == 0)
 	initializeZoneParameters();
 
@@ -504,7 +504,7 @@ int Zones::lowsFromCP(QList <int> *lows, int cp) {
 }
 
 // access the zone name
-QString Zones::getDefaultZoneName(int z) {
+QString Zones::getDefaultZoneName(int z) const {
     return zone_default_name[z];
 }
 
