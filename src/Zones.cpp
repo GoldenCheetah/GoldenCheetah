@@ -37,66 +37,36 @@ static const QDate date_infinity = QDate::QDate();
 
 // functions used for sorting zones and ranges
 bool Zones::zone_default_index_lessthan(int i1, int i2) {
-    return (
-	    zone_default[i1] * (zone_default_is_pct[i1] ? 250 : 1) <
-	    zone_default[i2] * (zone_default_is_pct[i2] ? 250 : 1)
-	    );
+    return (zone_default[i1] * (zone_default_is_pct[i1] ? 250 : 1) <
+	    zone_default[i2] * (zone_default_is_pct[i2] ? 250 : 1));
 }
 
 bool Zones::zoneptr_lessthan(const ZoneInfo &z1, const ZoneInfo &z2) {
-    return (
-	    (z1.lo < z2.lo) ||
-	    ((z1.lo == z2.lo) && (z1.hi < z2.hi))
-	    );
+    return ((z1.lo < z2.lo) ||
+	    ((z1.lo == z2.lo) && (z1.hi < z2.hi)));
 }
 
 bool Zones::rangeptr_lessthan(const ZoneRange &r1, const ZoneRange &r2) {
-    return (
-	    (
-	     (! r2.begin.isNull()) &&
-	     ( r1.begin.isNull() || r1.begin < r2.begin )
-	     )
-	    ||
+    return (((! r2.begin.isNull()) &&
+	     ( r1.begin.isNull() || r1.begin < r2.begin )) ||
 	    ((r1.begin == r2.begin) &&
 	     (! r1.end.isNull()) &&
-	     ( r2.end.isNull() || r1.end < r2.end )
-	     )
-	    );
+	     ( r2.end.isNull() || r1.end < r2.end )));
 }
 
 // initialize default static zone parameters
 void Zones::initializeZoneParameters()
 {
-    static int initial_zone_default[] =
-	{
-	    0,
-	    55,
-	    75,
-	    90,
-	    105,
-	    120,
-	    150
-	};
-    static const char *initial_zone_default_desc[] =
-	{
-	    "Active Recovery",
-	    "Endurance",
-	    "Tempo",
-	    "Threshold",
-	    "VO2Max",
-	    "Anaerobic",
-	    "Neuromuscular"
-	};
-    static const char *initial_zone_default_name[] =
-	{
-	    "Z1",
-	    "Z2",
-	    "Z3",
-	    "Z4",
-	    "Z5",
-	    "Z6",
-	    "Z7"
-	};
+    static int initial_zone_default[] = {
+        0, 55, 75, 90, 105, 120, 150
+    };
+    static const char *initial_zone_default_desc[] = {
+        "Active Recovery", "Endurance", "Tempo", "Threshold",
+        "VO2Max", "Anaerobic", "Neuromuscular"
+    };
+    static const char *initial_zone_default_name[] = {
+        "Z1", "Z2", "Z3", "Z4", "Z5", "Z6", "Z7"
+    };
 
     static int initial_nzones_default =
 	sizeof(initial_zone_default) /
@@ -117,7 +87,6 @@ void Zones::initializeZoneParameters()
 	zone_default_desc.append(QString(initial_zone_default_desc[z]));
     }
 }
-
 
 // read zone file, allowing for zones with or without end dates
 bool Zones::read(QFile &file)
@@ -151,32 +120,25 @@ bool Zones::read(QFile &file)
 
     QRegExp commentrx("\\s*#.*$");
     QRegExp blankrx("^[ \t]*$");
-    QRegExp rangerx[] =
-	{
-	    QRegExp(
-		    "^\\s*(?:from\\s+)?"                                 // optional "from"
-		    "((\\d\\d\\d\\d)[-/](\\d{1,2})[-/](\\d{1,2})|BEGIN)" // begin date
-		    "\\s*([,:]?\\s*(FTP|CP)\\s*=\\s*(\\d+))?"            // optional {CP/FTP = integer (optional %)}
-		    "\\s*:?\\s*$",                                       // optional :
-		    Qt::CaseInsensitive
-		    ),
-	    QRegExp(
-		    "^\\s*(?:from\\s+)?"                                 // optional "from"
-		    "((\\d\\d\\d\\d)[-/](\\d{1,2})[-/](\\d{1,2})|BEGIN)" // begin date
-		    "\\s+(?:until|to|-)\\s+"                             // until
-		    "((\\d\\d\\d\\d)[-/](\\d{1,2})[-/](\\d{1,2})|END)?"  // end date
-		    "\\s*:?,?\\s*((FTP|CP)\\s*=\\s*(\\d+))?"          // optional {CP/FTP = integer (optional %)}
-		    "\\s*:?\\s*$",                                       // optional :
-		    Qt::CaseInsensitive
-		    )
-	};
+    QRegExp rangerx[] = {
+        QRegExp("^\\s*(?:from\\s+)?"                                 // optional "from"
+                "((\\d\\d\\d\\d)[-/](\\d{1,2})[-/](\\d{1,2})|BEGIN)" // begin date
+                "\\s*([,:]?\\s*(FTP|CP)\\s*=\\s*(\\d+))?"            // optional {CP/FTP = integer (optional %)}
+                "\\s*:?\\s*$",                                       // optional :
+                Qt::CaseInsensitive),
+        QRegExp("^\\s*(?:from\\s+)?"                                 // optional "from"
+                "((\\d\\d\\d\\d)[-/](\\d{1,2})[-/](\\d{1,2})|BEGIN)" // begin date
+                "\\s+(?:until|to|-)\\s+"                             // until
+                "((\\d\\d\\d\\d)[-/](\\d{1,2})[-/](\\d{1,2})|END)?"  // end date
+                "\\s*:?,?\\s*((FTP|CP)\\s*=\\s*(\\d+))?"          // optional {CP/FTP = integer (optional %)}
+                "\\s*:?\\s*$",                                       // optional :
+                Qt::CaseInsensitive)
+    };
     QRegExp zonerx("^\\s*([^ ,][^,]*),\\s*([^ ,][^,]*),\\s*"
 		   "(\\d+)\\s*(%?)\\s*(?:,\\s*(\\d+|MAX)\\s*(%?)\\s*)?$",
-		   Qt::CaseInsensitive
-		   );
+		   Qt::CaseInsensitive);
     QRegExp zonedefaultsx("^\\s*(?:zone)?\\s*defaults?\\s*:?\\s*$",
-			  Qt::CaseInsensitive
-			  );
+			  Qt::CaseInsensitive);
 
     int lineno = 0;
 
@@ -214,7 +176,7 @@ bool Zones::read(QFile &file)
 		err = "Only one set of zone defaults may be specified in power.zones file";
 		return false;
 	    }
-	
+
 	    goto next_line;
 	}
 
@@ -408,8 +370,7 @@ bool Zones::read(QFile &file)
 		ranges[nr + 1].begin :
 		date_infinity;
 	else if ((nr < ranges.size() - 1) &&
-		 (ranges[nr + 1].begin != ranges[nr].end)
-		 ) {
+		 (ranges[nr + 1].begin != ranges[nr].end)) {
 
 	    append_to_warning(tr("Setting end date of range %1 "
 				 "to start date of range %2.\n").
@@ -420,12 +381,11 @@ bool Zones::read(QFile &file)
 	    ranges[nr].end = ranges[nr + 1].begin;
 	}
 	else if ((nr == ranges.size() - 1) &&
-		 (ranges[nr].end < QDate::currentDate())
-		 ) {
+		 (ranges[nr].end < QDate::currentDate())) {
 
 	    append_to_warning(tr("Extending final range %1 to infinite "
 				 "to include present date.\n").arg(nr + 1));
-	
+
 	    ranges[nr].end = date_infinity;
 	}
 
@@ -434,15 +394,14 @@ bool Zones::read(QFile &file)
 	    ranges[nr].zones[0].lo = 0;
 
 	    // resolve zone end powers
-	    for (int nz = 0; nz < ranges[nr].zones.size(); nz ++)
+	    for (int nz = 0; nz < ranges[nr].zones.size(); nz ++) {
 		if (ranges[nr].zones[nz].hi == -1)
 		    ranges[nr].zones[nz].hi =
 			(nz < ranges[nr].zones.size() - 1) ?
 			ranges[nr].zones[nz + 1].lo :
 			INT_MAX;
 		else if ((nz < ranges[nr].zones.size() - 1) &&
-			 (ranges[nr].zones[nz].hi != ranges[nr].zones[nz + 1].lo)
-			 ) {
+			 (ranges[nr].zones[nz].hi != ranges[nr].zones[nz + 1].lo)) {
 		    if (abs(ranges[nr].zones[nz].hi - ranges[nr].zones[nz + 1].lo) > 4)
 			append_to_warning(tr("Range %1: matching top of zone %2 "
 					     "(%3) to bottom of zone %4 (%5).\n").
@@ -455,8 +414,7 @@ bool Zones::read(QFile &file)
 		    ranges[nr].zones[nz].hi = ranges[nr].zones[nz + 1].lo;
 		}
 		else if ((nz == ranges[nr].zones.size() - 1) &&
-			 (ranges[nr].zones[nz].hi < INT_MAX)
-			 ) {
+			 (ranges[nr].zones[nz].hi < INT_MAX)) {
 		    append_to_warning(tr("Range %1: setting top of zone %2 from %3 to MAX.\n").
 				      arg(nr + 1).
 				      arg(ranges[nr].zones[nz].name).
@@ -464,6 +422,7 @@ bool Zones::read(QFile &file)
 				      );
 		    ranges[nr].zones[nz].hi = INT_MAX;
 		}
+            }
 	}
     }
 
@@ -591,37 +550,36 @@ void Zones::setZonesFromCP(int rnum) {
 
 // return the list of starting values of zones for a given range
 QList <int> Zones::getZoneLows(int rnum) {
-  if (rnum >= ranges.size())
-    return QList <int>::QList();
-  const ZoneRange &range = ranges[rnum];
-  QList <int> return_values;
-  for (int i = 0; i < range.zones.size(); i ++)
-      return_values.append(ranges[rnum].zones[i].lo);
-  return return_values;
+    if (rnum >= ranges.size())
+        return QList <int>::QList();
+    const ZoneRange &range = ranges[rnum];
+    QList <int> return_values;
+    for (int i = 0; i < range.zones.size(); i ++)
+        return_values.append(ranges[rnum].zones[i].lo);
+    return return_values;
 }
 
 // return the list of ending values of zones for a given range
 QList <int> Zones::getZoneHighs(int rnum) {
-  if (rnum >= ranges.size())
-    return QList <int>::QList();
-  const ZoneRange &range = ranges[rnum];
-  QList <int> return_values;
-  for (int i = 0; i < range.zones.size(); i ++)
-      return_values.append(ranges[rnum].zones[i].hi);
-  return return_values;
+    if (rnum >= ranges.size())
+        return QList <int>::QList();
+    const ZoneRange &range = ranges[rnum];
+    QList <int> return_values;
+    for (int i = 0; i < range.zones.size(); i ++)
+        return_values.append(ranges[rnum].zones[i].hi);
+    return return_values;
 }
-
 
 // return the list of zone names
 QList <QString> Zones::getZoneNames(int rnum) {
-  if (rnum >= ranges.size())
-    return QList <QString>::QList();
-  const ZoneRange &range = ranges[rnum];
-  QList <QString> return_values;
-  for (int i = 0; i < range.zones.size(); i ++)
-      return_values.append(ranges[rnum].zones[i].name);
-  return return_values;
-  }
+    if (rnum >= ranges.size())
+        return QList <QString>::QList();
+    const ZoneRange &range = ranges[rnum];
+    QList <QString> return_values;
+    for (int i = 0; i < range.zones.size(); i ++)
+        return_values.append(ranges[rnum].zones[i].name);
+    return return_values;
+}
 
 QString Zones::summarize(int rnum, QVector<double> &time_in_zone) const
 {
@@ -687,8 +645,7 @@ void Zones::write(QDir home)
 		arg(zone_default_is_pct[z]?"%":"");
 	strzones += QString("\n");
     }
-    for (int i = 0; i < ranges.size(); i++)
-    {
+    for (int i = 0; i < ranges.size(); i++) {
         int cp = getCP(i);
 
 	// print header for range
@@ -703,9 +660,10 @@ void Zones::write(QDir home)
 
 	// step through and print the zones if they've been explicitly set
 	if (! ranges[i].zonesSetFromCP) {
-	    for (int j = 0; j < ranges[i].zones.size(); j ++)
-		strzones +=
-                    QString("%1,%2,%3\n").arg(ranges[i].zones[j].name).arg(ranges[i].zones[j].desc).arg(ranges[i].zones[j].lo);
+	    for (int j = 0; j < ranges[i].zones.size(); j ++) {
+                const ZoneInfo &zi = ranges[i].zones[j];
+		strzones += QString("%1,%2,%3\n").arg(zi.name).arg(zi.desc).arg(zi.lo);
+            }
 	    strzones += QString("\n");
 	}
         #else
@@ -718,17 +676,16 @@ void Zones::write(QDir home)
         else
             strzones += QString("FROM %1 UNTIL %2, CP=%3:").arg(getStartDate(i).toString("yyyy/MM/dd")).arg(getEndDate(i).toString("yyyy/MM/dd")).arg(cp);
 	strzones += QString("\n");
-	for (int j = 0; j < ranges[i].zones.size(); j ++)
+	for (int j = 0; j < ranges[i].zones.size(); j ++) {
+            const ZoneInfo &zi = ranges[i].zones[j];
 	    if (ranges[i].zones[j].hi == INT_MAX)
-		strzones +=
-                    QString("%1,%2,%3,MAX\n").arg(ranges[i].zones[j].name).arg(ranges[i].zones[j].desc).arg(ranges[i].zones[j].lo);
+		strzones += QString("%1,%2,%3,MAX\n").arg(zi.name).arg(zi.desc).arg(zi.lo);
 	    else
-		strzones +=
-                    QString("%1,%2,%3,%4\n").arg(ranges[i].zones[j].name).arg(ranges[i].zones[j].desc).arg(ranges[i].zones[j].lo).arg(ranges[i].zones[j].hi);
+		strzones += QString("%1,%2,%3,%4\n").arg(zi.name).arg(zi.desc).arg(zi.lo).arg(zi.hi);
+        }
 	strzones += QString("\n");
         #endif
     }
-
 
     QFile file(home.absolutePath() + "/power.zones");
     if (file.open(QFile::WriteOnly))
@@ -793,15 +750,15 @@ int Zones::getRangeSize()
 
 // generate a zone color with a specific number of zones
 QColor zoneColor(int z, int num_zones) {
-  assert ((z >= 0) && (z < num_zones));
-  if (num_zones == 1)
-    return QColor(128, 128, 128);
-  QColor color;
+    assert ((z >= 0) && (z < num_zones));
+    if (num_zones == 1)
+        return QColor(128, 128, 128);
+    QColor color;
 
-  // pick a color from violet (z=0) to red (z=num_zones)
-  color.setHsv(int(300 * (num_zones - z - 1) / (num_zones - 1)), 255, 255);
+    // pick a color from violet (z=0) to red (z=num_zones)
+    color.setHsv(int(300 * (num_zones - z - 1) / (num_zones - 1)), 255, 255);
 
-  return color;
+    return color;
 }
 
 // delete a range, extend an adjacent (prior if available, otherwise next)
