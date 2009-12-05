@@ -130,6 +130,16 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
     float altitude = 100.0;  // arbitrary starting altitude of 100m
     float lastKM = 0;
 
+    // computrainer 3d software lets you start your ride partway into
+    // a course.  if you do this, then the first distance reported in
+    // the corresponding log file will be that offset, rather than
+    // zero.  so, we'll stash away the first reported distance, and
+    // use that to offset distances that we report to GC so that they
+    // are zero-based (i.e., so that the first data point is at
+    // distance zero).
+    float firstKM;
+    bool gotFirstKM = false;
+
     // computrainer doesn't have a fixed inter-sample-interval; GC
     // expects one, and estimating one by averaging causes problems
     // for some calculations that GC does.  also, computrainer samples
@@ -185,6 +195,12 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
         // 4 bytes of floating point total distance traveled, in KM
         float km;
         is >> km;
+        if (!gotFirstKM) {
+          firstKM = km;
+          gotFirstKM = true;
+        }
+        // subtract off the first KM so that distances are zero-based.
+        km -= firstKM;
 
         // calculate change in altitude over the past interval.
         // first, calculate grade measured as rise/run.
