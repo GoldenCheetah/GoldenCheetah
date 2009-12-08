@@ -83,7 +83,6 @@ void QuarqdClient::run()
             return;
         }
     }
-    return;
 }
 
 void
@@ -134,8 +133,6 @@ QuarqdClient::parseElement(QString &strBuf) // updates QuarqdClient::telemetry
            telemetry.setWatts(0);
 
     }
-
-    return;
 }
 
 long QuarqdClient::getTimeStamp(QString &str)
