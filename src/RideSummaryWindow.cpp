@@ -31,27 +31,21 @@
 #include <math.h>
 
 RideSummaryWindow::RideSummaryWindow(MainWindow *mainWindow) :
-    QWidget(mainWindow), mainWindow(mainWindow), rideItem(NULL)
+    QWidget(mainWindow), mainWindow(mainWindow)
 {
     QVBoxLayout *vlayout = new QVBoxLayout;
     rideSummary = new QTextEdit(this);
     rideSummary->setReadOnly(true);
     vlayout->addWidget(rideSummary);
+    connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(refresh()));
     connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(refresh()));
     setLayout(vlayout);
 }
 
 void
-RideSummaryWindow::setData(RideItem *ride)
-{
-    rideItem = ride;
-    refresh();
-}
-
-void
 RideSummaryWindow::refresh()
 {
-    if (!rideItem) {
+    if (!mainWindow->rideItem()) {
 	rideSummary->clear();
         return;
     }
@@ -164,6 +158,7 @@ RideSummaryWindow::htmlSummary() const
 {
     QString summary;
 
+    RideItem *rideItem = mainWindow->rideItem();
     QFile file(rideItem->path + "/" + rideItem->fileName);
     QStringList errors;
     RideFile *ride = RideFileFactory::instance().openRideFile(file, errors);

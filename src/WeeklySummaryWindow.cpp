@@ -133,24 +133,18 @@ WeeklySummaryWindow::WeeklySummaryWindow(bool useMetricUnits,
 
     setLayout(glayout);
 
-    connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
+    connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(refresh()));
+    connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(refresh()));
 }
 
 void
-WeeklySummaryWindow::zonesChanged()
+WeeklySummaryWindow::refresh()
 {
-    generateWeeklySummary(mainWindow->currentRideItem(),
-                          mainWindow->allRideItems(),
-                          mainWindow->zones());
-}
-
-void
-WeeklySummaryWindow::generateWeeklySummary(const RideItem *ride,
-                                           const QTreeWidgetItem *allRides,
-                                           const Zones *zones)
-{
+    const RideItem *ride = mainWindow->rideItem();
     if (!ride)
         return;
+    const QTreeWidgetItem *allRides = mainWindow->allRideItems();
+    const Zones *zones = mainWindow->zones();
     QDate wstart = ride->dateTime.date();
     wstart = wstart.addDays(Qt::Monday - wstart.dayOfWeek());
     assert(wstart.dayOfWeek() == Qt::Monday);

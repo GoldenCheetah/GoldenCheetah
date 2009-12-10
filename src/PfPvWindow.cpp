@@ -22,7 +22,8 @@
 #include "RideItem.h"
 #include <QtGui>
 
-PfPvWindow::PfPvWindow(MainWindow *mainWindow) : QWidget(mainWindow)
+PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
+    QWidget(mainWindow), mainWindow(mainWindow)
 {
     QVBoxLayout *vlayout = new QVBoxLayout;
     QHBoxLayout *qaLayout = new QHBoxLayout;
@@ -66,12 +67,16 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) : QWidget(mainWindow)
 	    this, SLOT(setQaCLFromLineEdit()));
     connect(shadeZonesPfPvCheckBox, SIGNAL(stateChanged(int)),
             this, SLOT(setShadeZonesPfPvFromCheckBox()));
+    connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
 }
 
 void
-PfPvWindow::setData(RideItem *ride)
+PfPvWindow::rideSelected()
 {
+    RideItem *ride = mainWindow->rideItem();
+    if (!ride)
+        return;
     pfPvPlot->setData(ride);
     // update the QLabel widget with the CP value set in PfPvPlot::setData()
     qaCPValue->setText(QString("%1").arg(pfPvPlot->getCP()));

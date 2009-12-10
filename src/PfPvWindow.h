@@ -34,10 +34,10 @@ class PfPvWindow : public QWidget
     public:
 
         PfPvWindow(MainWindow *mainWindow);
-        void setData(RideItem *item);
 
     public slots:
 
+        void rideSelected();
         void zonesChanged();
 
     protected slots:
@@ -49,6 +49,7 @@ class PfPvWindow : public QWidget
 
     protected:
 
+        MainWindow *mainWindow;
         PfPvPlot *pfPvPlot;
         QCheckBox *shadeZonesPfPvCheckBox;
         QLineEdit *qaCPValue;

@@ -25,7 +25,8 @@
 #include <qwt_plot_panner.h>
 #include <qwt_plot_zoomer.h>
 
-AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) : QWidget(mainWindow)
+AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
+    QWidget(mainWindow), mainWindow(mainWindow)
 {
     QVBoxLayout *vlayout = new QVBoxLayout;
 
@@ -130,12 +131,16 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) : QWidget(mainWindow)
             this, SLOT(setSmoothingFromSlider()));
     connect(smoothLineEdit, SIGNAL(editingFinished()),
             this, SLOT(setSmoothingFromLineEdit()));
+    connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
 }
 
 void
-AllPlotWindow::setData(RideItem *ride)
+AllPlotWindow::rideSelected()
 {
+    RideItem *ride = mainWindow->rideItem();
+    if (!ride)
+        return;
     setAllPlotWidgets(ride);
     allPlot->setData(ride);
     allZoomer->setZoomBase();

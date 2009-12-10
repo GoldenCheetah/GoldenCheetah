@@ -60,6 +60,7 @@ class MainWindow : public QMainWindow
         RealtimeWindow  *realtimeWindow; // public so config dialog can notify it of changes config
 
         const Zones *zones() const { return zones_; }
+        RideItem *rideItem() const { return ride; }
 
     protected:
 
@@ -73,6 +74,7 @@ class MainWindow : public QMainWindow
     
     signals:
 
+        void rideSelected();
         void zonesChanged();
 
     private slots:

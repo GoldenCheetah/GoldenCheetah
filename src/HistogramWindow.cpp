@@ -24,7 +24,8 @@
 #include <QtGui>
 #include <assert.h>
 
-HistogramWindow::HistogramWindow(MainWindow *mainWindow) : QWidget(mainWindow)
+HistogramWindow::HistogramWindow(MainWindow *mainWindow) :
+    QWidget(mainWindow), mainWindow(mainWindow)
 {
     QVBoxLayout *vlayout = new QVBoxLayout;
     QHBoxLayout *binWidthLayout = new QHBoxLayout;
@@ -72,12 +73,16 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow) : QWidget(mainWindow)
             this, SLOT(setWithZerosFromCheckBox()));
     connect(histParameterCombo, SIGNAL(currentIndexChanged(int)),
             this, SLOT(setHistSelection(int)));
+    connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
 }
 
 void
-HistogramWindow::setData(RideItem *ride)
+HistogramWindow::rideSelected()
 {
+    RideItem *ride = mainWindow->rideItem();
+    if (!ride)
+        return;
     // set the histogram data
     powerHist->setData(ride);
     // make sure the histogram has a legal selection
