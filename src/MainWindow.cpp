@@ -636,7 +636,7 @@ void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
 	    ) {
 
 	    RideMetric *m;
-	    item->htmlSummary(); // compute metrics
+	    item->computeMetrics();
 
 	    QString existing = progress->labelText();
             existing.chop(progress->labelText().size() - endingOffset);

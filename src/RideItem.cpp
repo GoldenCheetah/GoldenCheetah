@@ -122,7 +122,7 @@ int RideItem::numZones()
 
 double RideItem::timeInZone(int zone)
 {
-    htmlSummary();
+    computeMetrics();
     if (!ride)
         return 0.0;
     assert(zone < numZones());
