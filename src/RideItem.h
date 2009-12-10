@@ -36,8 +36,7 @@ class RideItem : public QTreeWidgetItem {
         QString path;
         QString fileName;
         QDateTime dateTime;
-        QString summary;
-	QDateTime summaryGenerationTime, computeMetricsTime;
+	QDateTime computeMetricsTime;
         RideFile *ride;
         const Zones *zones;
         QString notesFileName;
@@ -54,7 +53,6 @@ class RideItem : public QTreeWidgetItem {
         ~RideItem();
 
         void computeMetrics();
-        QString htmlSummary();
         void freeMemory();
 
         int zoneRange();

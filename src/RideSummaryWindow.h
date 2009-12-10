@@ -40,8 +40,10 @@ class RideSummaryWindow : public QWidget
 
     protected:
 
+        QString htmlSummary() const;
+
         MainWindow *mainWindow;
-        RideItem *ride;
+        RideItem *rideItem;
         QTextEdit *rideSummary;
 };
 
