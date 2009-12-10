@@ -22,7 +22,6 @@
 #include <QWidget>
 
 class MainWindow;
-class RideItem;
 class QTextEdit;
 
 class RideSummaryWindow : public QWidget
@@ -32,7 +31,6 @@ class RideSummaryWindow : public QWidget
     public:
 
         RideSummaryWindow(MainWindow *parent);
-        void setData(RideItem *ride);
 
     protected slots:
 
@@ -43,7 +41,6 @@ class RideSummaryWindow : public QWidget
         QString htmlSummary() const;
 
         MainWindow *mainWindow;
-        RideItem *rideItem;
         QTextEdit *rideSummary;
 };
 

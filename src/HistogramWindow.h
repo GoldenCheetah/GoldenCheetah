@@ -36,10 +36,10 @@ class HistogramWindow : public QWidget
     public:
 
         HistogramWindow(MainWindow *mainWindow);
-        void setData(RideItem *ride);
 
     public slots:
 
+        void rideSelected();
         void zonesChanged();
 
     protected slots:
@@ -56,6 +56,7 @@ class HistogramWindow : public QWidget
         void setHistTextValidator();
 	void setHistBinWidthText();
 
+        MainWindow *mainWindow;
         PowerHist *powerHist;
         QSlider *binWidthSlider;
         QLineEdit *binWidthLineEdit;

@@ -559,40 +559,30 @@ void
 MainWindow::treeWidgetSelectionChanged()
 {
     assert(treeWidget->selectedItems().size() <= 1);
-    if (treeWidget->selectedItems().isEmpty()) {
-        rideSummaryWindow->setData(NULL);
-	return;
+    if (treeWidget->selectedItems().isEmpty())
+        ride = NULL;
+    else {
+        QTreeWidgetItem *which = treeWidget->selectedItems().first();
+        if (which->type() != RIDE_TYPE)
+            ride = NULL;
+        else
+            ride = (RideItem*) which;
     }
+    rideSelected();
 
-    QTreeWidgetItem *which = treeWidget->selectedItems().first();
-    if (which->type() != RIDE_TYPE) {
-        rideSummaryWindow->setData(NULL);
-	return;
-    }
+    if (!ride)
+        return;
 
-    ride = (RideItem*) which;
     calendar->setSelectedDate(ride->dateTime.date());
-    if (ride) {
-        rideSummaryWindow->setData(ride);
-        allPlotWindow->setData(ride);
-        histogramWindow->setData(ride);
-        pfPvWindow->setData(ride);
-
-	// turn off tabs that don't make sense for manual file entry
-	if (ride->ride && ride->ride->deviceType() == QString("Manual CSV")) {
-	    tabWidget->setTabEnabled(3,false); // Power Histogram
-	    tabWidget->setTabEnabled(4,false); // PF/PV Plot
-	}
- 	else {
-	    tabWidget->setTabEnabled(3,true); // Power Histogram
-	    tabWidget->setTabEnabled(4,true); // PF/PV Plot
-	}
+    // turn off tabs that don't make sense for manual file entry
+    if (ride->ride && ride->ride->deviceType() == QString("Manual CSV")) {
+        tabWidget->setTabEnabled(3,false); // Power Histogram
+        tabWidget->setTabEnabled(4,false); // PF/PV Plot
     }
-    if (tabWidget->currentIndex() == 2)
-        criticalPowerWindow->setData(ride);
-
-    // generate a weekly summary of the week associated with the current ride
-    weeklySummaryWindow->generateWeeklySummary(ride, allRides, zones());
+    else {
+        tabWidget->setTabEnabled(3,true); // Power Histogram
+        tabWidget->setTabEnabled(4,true); // PF/PV Plot
+    }
 
     saveAndOpenNotes();
 }
@@ -818,17 +808,8 @@ MainWindow::setCriticalPower(int cp)
 void
 MainWindow::tabChanged(int index)
 {
-    if (index == 2) {
-        if (treeWidget->selectedItems().size() == 1) {
-            QTreeWidgetItem *which = treeWidget->selectedItems().first();
-            if (which->type() == RIDE_TYPE) {
-                RideItem *ride = (RideItem*) which;
-                criticalPowerWindow->setData(ride);
-                return;
-            }
-        }
-    }
-    else if (index == 6) {
+    criticalPowerWindow->setActive(index == 2);
+    if (index == 6) {
 	// Performance Manager
 	performanceManagerWindow->replot(home,allRides);
     }

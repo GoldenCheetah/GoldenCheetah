@@ -30,7 +30,7 @@
 #include <QXmlSimpleReader>
 
 CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
-    QWidget(parent), home(home), mainWindow(parent)
+    QWidget(parent), home(home), mainWindow(parent), active(false)
 {
     QVBoxLayout *vlayout = new QVBoxLayout;
 
@@ -99,6 +99,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
     this, SLOT(seasonSelected(int)));
     connect(yAxisCombo, SIGNAL(currentIndexChanged(int)),
             this, SLOT(setEnergyMode(int)));
+    connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
 }
 
 void
@@ -115,11 +116,25 @@ CriticalPowerWindow::deleteCpiFile(QString rideFilename)
 }
 
 void
-CriticalPowerWindow::setData(RideItem *ride)
+CriticalPowerWindow::setActive(bool new_value)
 {
-    currentRide = ride;
-    cpintPlot->calculate(ride);
-    cpintSetCPButton->setEnabled(cpintPlot->cp > 0);
+    bool was_active = active;
+    active = new_value;
+    if (active && !was_active) {
+        currentRide = mainWindow->rideItem();
+        if (currentRide)
+            cpintPlot->calculate(currentRide);
+    }
+}
+
+void
+CriticalPowerWindow::rideSelected()
+{
+    currentRide = mainWindow->rideItem();
+    if (active && currentRide) {
+        cpintPlot->calculate(currentRide);
+        cpintSetCPButton->setEnabled(cpintPlot->cp > 0);
+    }
 }
 
 void

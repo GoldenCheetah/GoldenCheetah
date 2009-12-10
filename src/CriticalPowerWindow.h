@@ -37,12 +37,13 @@ class CriticalPowerWindow : public QWidget
 
         void newRideAdded();
         void deleteCpiFile(QString filename);
-        void setData(RideItem *ride);
+        void setActive(bool value);
 
     protected slots:
 
         void cpintSetCPButtonClicked();
         void pickerMoved(const QPoint &pos);
+        void rideSelected();
         void seasonSelected(int season);
         void setEnergyMode(int index);
 
@@ -61,6 +62,7 @@ class CriticalPowerWindow : public QWidget
         void addSeasons();
         QList<Season> seasons;
         RideItem *currentRide;
+        bool active;
 };
 
 #endif // _GC_CriticalPowerWindow_h

@@ -34,18 +34,19 @@ class AllPlotWindow : public QWidget
     public:
 
         AllPlotWindow(MainWindow *mainWindow);
-        void setData(RideItem *ride);
 
    public slots:
 
         void setSmoothingFromSlider();
         void setSmoothingFromLineEdit();
+        void rideSelected();
         void zonesChanged();
 
     protected:
 
 	void setAllPlotWidgets(RideItem *rideItem);
 
+        MainWindow *mainWindow;
         AllPlot *allPlot;
         QwtPlotPanner *allPanner;
         QwtPlotZoomer *allZoomer;

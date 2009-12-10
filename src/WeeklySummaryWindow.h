@@ -36,13 +36,10 @@ class WeeklySummaryWindow : public QWidget
     public:
 
         WeeklySummaryWindow(bool useMetricUnits, MainWindow *parent);
-        void generateWeeklySummary(const RideItem *ride,
-                                   const QTreeWidgetItem *allRides,
-                                   const Zones *zones);
 
     public slots:
 
-        void zonesChanged();
+        void refresh();
 
     protected:
 
