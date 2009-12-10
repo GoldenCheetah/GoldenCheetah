@@ -30,6 +30,7 @@
 #include "RealtimeWindow.h"
 #include "RideItem.h"
 #include "RideFile.h"
+#include "RideSummaryWindow.h"
 #include "RideImportWizard.h"
 #include "QuarqRideFile.h"
 #include "RideMetric.h"
@@ -174,8 +175,7 @@ MainWindow::MainWindow(const QDir &home) :
     tabWidget = new QTabWidget;
     tabWidget->setUsesScrollButtons(true);
 
-    rideSummary = new QTextEdit;
-    rideSummary->setReadOnly(true);
+    rideSummaryWindow = new RideSummaryWindow(this);
     QLabel *notesLabel = new QLabel(tr("Notes:"));
     notesLabel->setMaximumHeight(30);
     rideNotes = new QTextEdit;
@@ -188,7 +188,7 @@ MainWindow::MainWindow(const QDir &home) :
     summarySplitter = new QSplitter;
     summarySplitter->setContentsMargins(0, 0, 0, 0);
     summarySplitter->setOrientation(Qt::Vertical);
-    summarySplitter->addWidget(rideSummary);
+    summarySplitter->addWidget(rideSummaryWindow);
     summarySplitter->setCollapsible(0, false);
     summarySplitter->addWidget(notesWidget);
     summarySplitter->setCollapsible(1, true);
@@ -560,22 +560,20 @@ MainWindow::treeWidgetSelectionChanged()
 {
     assert(treeWidget->selectedItems().size() <= 1);
     if (treeWidget->selectedItems().isEmpty()) {
-	rideSummary->clear();
+        rideSummaryWindow->setData(NULL);
 	return;
     }
 
     QTreeWidgetItem *which = treeWidget->selectedItems().first();
     if (which->type() != RIDE_TYPE) {
-	rideSummary->clear();
+        rideSummaryWindow->setData(NULL);
 	return;
     }
 
     ride = (RideItem*) which;
     calendar->setSelectedDate(ride->dateTime.date());
-    rideSummary->setHtml(ride->htmlSummary());
-    rideSummary->setAlignment(Qt::AlignCenter);
     if (ride) {
-
+        rideSummaryWindow->setData(ride);
         allPlotWindow->setData(ride);
         histogramWindow->setData(ride);
         pfPvWindow->setData(ride);
@@ -753,7 +751,6 @@ MainWindow::showOptions()
 {
     ConfigDialog *cd = new ConfigDialog(home, zones_);
     cd->exec();
-    if (ride) rideSummary->setHtml(ride->htmlSummary());
     zonesChanged();
 }
 
@@ -815,8 +812,6 @@ MainWindow::setCriticalPower(int cp)
 			   arg(endDate.isNull() ? "END" : endDate.toString()) .
 			   arg(cp)
 			   );
-
-  if (ride) rideSummary->setHtml(ride->htmlSummary());
   zonesChanged();
 }
 

@@ -40,6 +40,7 @@ class WeeklySummaryWindow;
 class Zones;
 class RideCalendar;
 class PerformanceManagerWindow;
+class RideSummaryWindow;
 
 class MainWindow : public QMainWindow 
 {
@@ -111,7 +112,7 @@ class MainWindow : public QMainWindow
         QSplitter *splitter;
         QTreeWidget *treeWidget;
         QTabWidget *tabWidget;
-        QTextEdit *rideSummary;
+        RideSummaryWindow *rideSummaryWindow;
         AllPlotWindow *allPlotWindow;
         HistogramWindow *histogramWindow;
         WeeklySummaryWindow *weeklySummaryWindow;

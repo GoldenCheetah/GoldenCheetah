@@ -94,6 +94,7 @@ HEADERS += \
         RideImportWizard.h \
         RideItem.h \
         RideMetric.h \
+        RideSummaryWindow.h \
         Season.h \
         SeasonParser.h \
         Settings.h \
@@ -167,6 +168,7 @@ SOURCES += \
         RideImportWizard.cpp \
         RideItem.cpp \
         RideMetric.cpp \
+        RideSummaryWindow.cpp \
         Season.cpp \
         SeasonParser.cpp \
         SimpleNetworkController.cpp \
