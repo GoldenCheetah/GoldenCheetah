@@ -266,7 +266,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     //////////////////////// Performance Manager  ////////////////////////
 
-    performanceManagerWindow = new PerformanceManagerWindow();
+    performanceManagerWindow = new PerformanceManagerWindow(this);
     tabWidget->addTab(performanceManagerWindow, "Performance Manager");
 
     //////////////////////// Realtime ////////////////////////
@@ -1070,10 +1070,7 @@ void
 MainWindow::tabChanged(int index)
 {
     criticalPowerWindow->setActive(index == 2);
-    if (index == 6) {
-	// Performance Manager
-	performanceManagerWindow->replot(home,allRides);
-    }
+    performanceManagerWindow->setActive(index == 6);
 }
 
 void

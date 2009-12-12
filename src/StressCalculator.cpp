@@ -58,7 +58,7 @@ double StressCalculator::min(void) {
 
 
 void StressCalculator::calculateStress(QWidget *mw,
-	QString homePath, QTreeWidgetItem * rides)
+        QString homePath, const QTreeWidgetItem * rides)
 {
     QSharedPointer<QProgressDialog> progress;
     int endingOffset = 0;
