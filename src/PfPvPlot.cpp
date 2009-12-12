@@ -18,8 +18,10 @@
  */
 
 #include "PfPvPlot.h"
+#include "MainWindow.h"
 #include "RideFile.h"
 #include "RideItem.h"
+#include "IntervalItem.h"
 #include "Settings.h"
 #include "Zones.h"
 
@@ -154,7 +156,7 @@ PfPvPlot::PfPvPlot()
     QwtSymbol sym;
     sym.setStyle(QwtSymbol::Ellipse);
     sym.setSize(6);
-    sym.setPen(QPen(Qt::red));
+    sym.setPen(QPen(Qt::black));
     sym.setBrush(QBrush(Qt::NoBrush));
     
     curve->setSymbol(sym);
@@ -269,15 +271,45 @@ PfPvPlot::refreshZoneItems()
 		zoneLabels.append(label);
 	    }
 	    // get the zones visible, even if data may take awhile
-	    replot();
+	    //replot();
 
 	}
     }
 }
 
+
+// how many intervals selected?
+static int intervalCount()
+{
+    int highlighted;
+    highlighted = 0;
+    if (mainwindow == NULL || mainwindow->allIntervalItems() == NULL) return 0; // not inited yet!
+
+    for (int i=0; i<mainwindow->allIntervalItems()->childCount(); i++) {
+        IntervalItem *current = (IntervalItem *)mainwindow->allIntervalItems()->child(i);
+        if (current != NULL) {
+            if (current->isSelected() == true) {
+                ++highlighted;
+            }
+        }
+    }
+    return highlighted;
+}
+
 void
 PfPvPlot::setData(RideItem *_rideItem)
 {
+    // clear out any interval curves which are presently defined
+    if (intervalCurves.size()) {
+       QListIterator<QwtPlotCurve *> i(intervalCurves);
+       while (i.hasNext()) {
+           QwtPlotCurve *curve = i.next();
+           curve->detach();
+           delete curve;
+       }
+    }
+    intervalCurves.clear();
+
     rideItem = _rideItem;
 
     RideFile *ride = rideItem->ride;
@@ -296,6 +328,13 @@ PfPvPlot::setData(RideItem *_rideItem)
 	// Rather than pass them all to the curve, use a set to strip
 	// out duplicates.
 	std::set<std::pair<double, double> > dataSet;
+	std::set<std::pair<double, double> > dataSetSelected;
+
+	int num_intervals=intervalCount();
+	if (mergeIntervals())
+		num_intervals = 1;
+	QVector<std::set<std::pair<double, double> > > dataSetInterval(num_intervals);
+
 
 	long tot_cad = 0;
 	long tot_cad_points = 0;
@@ -307,7 +346,11 @@ PfPvPlot::setData(RideItem *_rideItem)
 		double aepf = (p1->watts * 60.0) / (p1->cad * cl_ * 2.0 * PI);
 		double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
 
-		dataSet.insert(std::make_pair<double, double>(aepf, cpv));
+		int selection = isSelected(p1);
+		if (selection > -1) {
+			dataSetInterval[selection].insert(std::make_pair<double, double>(aepf, cpv));
+		} else
+			dataSet.insert(std::make_pair<double, double>(aepf, cpv));
             
 		tot_cad += p1->cad;
 		tot_cad_points++;
@@ -327,6 +370,10 @@ PfPvPlot::setData(RideItem *_rideItem)
 	    // QwtArrays needed to set the curve's data.
 	    QwtArray<double> aepfArray;
 	    QwtArray<double> cpvArray;
+
+	    QVector<QwtArray<double> > aepfArrayInterval(num_intervals);
+	    QVector<QwtArray<double> > cpvArrayInterval(num_intervals);
+
 	    std::set<std::pair<double, double> >::const_iterator j(dataSet.begin());
 	    while (j != dataSet.end()) {
 		const std::pair<double, double>& dataPoint = *j;
@@ -336,10 +383,61 @@ PfPvPlot::setData(RideItem *_rideItem)
 
 		++j;
 	    }
+
+	    for (int i=0;i<num_intervals;i++) {
+		    std::set<std::pair<double, double> >::const_iterator l(dataSetInterval[i].begin());
+		    while (l != dataSetInterval[i].end()) {
+			const std::pair<double, double>& dataPoint = *l;
+
+			aepfArrayInterval[i].push_back(dataPoint.first);
+			cpvArrayInterval[i].push_back(dataPoint.second);
+
+			++l;
+		    }
+	    }
 	
 	    setCAD(tot_cad / tot_cad_points);
         
 	    curve->setData(cpvArray, aepfArray);
+
+	    QwtSymbol sym;
+	    sym.setStyle(QwtSymbol::Ellipse);
+	    sym.setSize(6);
+	    sym.setBrush(QBrush(Qt::NoBrush));
+
+        // ensure same colors are used for each interval selected
+        int num_intervals_defined=0;
+        QVector<int> intervalmap;
+        if (mainwindow != NULL && mainwindow->allIntervalItems() != NULL) {
+            num_intervals_defined = mainwindow->allIntervalItems()->childCount();
+            for (int g=0; g<mainwindow->allIntervalItems()->childCount(); g++) {
+                IntervalItem *curr = (IntervalItem *)mainwindow->allIntervalItems()->child(g);
+                if (curr->isSelected()) intervalmap.append(g);
+            }
+        }
+
+        for (int z = 0; z < num_intervals; z ++) {
+            QwtPlotCurve *curve;
+            curve = new QwtPlotCurve();
+
+            QColor intervalColor;
+            if (mergeIntervals())
+                intervalColor = Qt::red;
+            else
+                intervalColor.setHsv((intervalmap.count() > 0 ? intervalmap.at(z) : 1) * 255/num_intervals_defined, 255,255);
+
+            QPen pen;
+            pen.setColor(intervalColor);
+            sym.setPen(pen);
+
+            curve->setSymbol(sym);
+            curve->setStyle(QwtPlotCurve::Dots);
+            curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+            curve->setData(cpvArrayInterval[z],aepfArrayInterval[z]);
+            curve->attach(this);
+
+            intervalCurves.append(curve);
+        }
 
 	    // now show the data (zone shading would already be visible)
 	    curve->setVisible(true);
@@ -388,7 +486,7 @@ PfPvPlot::recalc()
 	// an empty curve if no power (or zero power) is specified
 	cpCurve->setData(QwtArray <double>::QwtArray(), QwtArray <double>::QwtArray());
     
-    replot();
+    //replot();
 }
 
 int
@@ -446,3 +544,34 @@ PfPvPlot::setShadeZones(bool value)
 
     replot();
 }
+
+void
+PfPvPlot::setMergeIntervals(bool value)
+{
+    merge_intervals = value;
+
+    setData(rideItem);
+}
+
+int
+PfPvPlot::isSelected(const RideFilePoint *p) {
+    int highlighted=-1; // Return -1 for point not in interval
+    if (mainwindow!= NULL && mainwindow->allIntervalItems() != NULL) {
+        for (int i=0; i<mainwindow->allIntervalItems()->childCount(); i++) {
+            IntervalItem *current = (IntervalItem *)mainwindow->allIntervalItems()->child(i);
+            if (current != NULL) {
+                if (current->isSelected()) {
+                    ++highlighted;
+                    if (p->secs>=current->start && p->secs<=current->stop) {
+                        if (mergeIntervals())
+                            return 0;
+                        return highlighted;
+                    }
+                }
+            }
+        }
+    }
+    return -1;
+}
+
+

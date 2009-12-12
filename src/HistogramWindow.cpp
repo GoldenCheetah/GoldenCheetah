@@ -74,6 +74,7 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow) :
     connect(histParameterCombo, SIGNAL(currentIndexChanged(int)),
             this, SLOT(setHistSelection(int)));
     connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+    connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
 }
 
@@ -89,6 +90,16 @@ HistogramWindow::rideSelected()
     powerHist->fixSelection();
     // update the options in the histogram combobox
     setHistWidgets(ride);
+}
+
+void
+HistogramWindow::intervalSelected()
+{
+    RideItem *ride = mainWindow->rideItem();
+    if (!ride) return;
+
+    // set the histogram data
+    powerHist->setData(ride);
 }
 
 void

@@ -20,6 +20,7 @@
 #define _GC_AllPlot_h 1
 
 #include <qwt_plot.h>
+#include <qwt_data.h>
 #include <QtGui>
 
 class QwtPlotCurve;
@@ -28,6 +29,20 @@ class QwtPlotMarker;
 class RideItem;
 class AllPlotBackground;
 class AllPlotZoneLabel;
+class AllPlotWindow;
+class AllPlot;
+
+class IntervalPlotData : public QwtData
+{
+    public:
+    IntervalPlotData(AllPlot *p) { allPlot=p; }
+    double x(size_t i) const ;
+    double y(size_t i) const ;
+    size_t size() const ;
+    virtual QwtData *copy() const ;
+    void init() ;
+    AllPlot *allPlot;
+};
 
 class AllPlot : public QwtPlot
 {
@@ -41,8 +56,11 @@ class AllPlot : public QwtPlot
 
         bool byDistance() const { return bydist; }
 
+	bool useMetricUnits;  // whether metric units are used (or imperial)
+
 	bool shadeZones() const;
 	void refreshZoneLabels();
+	void refreshIntervalMarkers();
 
         void setData(RideItem *_rideItem);
 
@@ -61,6 +79,7 @@ class AllPlot : public QwtPlot
 
         friend class ::AllPlotBackground;
         friend class ::AllPlotZoneLabel;
+        friend class ::AllPlotWindow;
 
 	AllPlotBackground *bg;
         QSettings *settings;
@@ -71,6 +90,7 @@ class AllPlot : public QwtPlot
         QwtPlotCurve *speedCurve;
         QwtPlotCurve *cadCurve;
         QwtPlotCurve *altCurve;
+        QwtPlotCurve *intervalHighlighterCurve;  // highlight selected intervals on the Plot
         QVector<QwtPlotMarker*> d_mrk;
 	QList <AllPlotZoneLabel *> zoneLabels;
 
@@ -78,6 +98,7 @@ class AllPlot : public QwtPlot
 
         QwtPlotGrid *grid;
 
+        IntervalPlotData *intervalPlotData;
         QVector<double> hrArray;
         QVector<double> wattsArray;
         QVector<double> speedArray;
@@ -96,7 +117,6 @@ class AllPlot : public QwtPlot
         void setXTitle();
 
 	bool shade_zones;     // whether power should be shaded
-	bool useMetricUnits;  // whether metric units are used (or imperial)
 };
 
 #endif // _GC_AllPlot_h

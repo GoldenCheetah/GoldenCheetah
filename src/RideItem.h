@@ -30,6 +30,7 @@ class RideItem : public QTreeWidgetItem {
     protected:
 
         QVector<double> time_in_zone;
+        bool isdirty;
 
     public:
 
@@ -52,6 +53,9 @@ class RideItem : public QTreeWidgetItem {
 
         ~RideItem();
 
+        void setDirty(bool);
+        bool isDirty() { return isdirty; }
+        void setFileName(QString, QString);
         void computeMetrics();
         void freeMemory();
 
@@ -59,6 +63,5 @@ class RideItem : public QTreeWidgetItem {
         int numZones();
         double timeInZone(int zone);
 };
- 
 #endif // _GC_RideItem_h
 

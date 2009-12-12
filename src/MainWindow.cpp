@@ -18,17 +18,20 @@
 
 #include "MainWindow.h"
 #include "AllPlotWindow.h"
+#include "AllPlot.h"
 #include "BestIntervalDialog.h"
 #include "ChooseCyclistDialog.h"
 #include "Computrainer.h"
 #include "ConfigDialog.h"
 #include "CriticalPowerWindow.h"
+#include "GcRideFile.h"
 #include "PfPvWindow.h"
 #include "DownloadRideDialog.h"
 #include "ManualRideDialog.h"
 #include "HistogramWindow.h"
 #include "RealtimeWindow.h"
 #include "RideItem.h"
+#include "IntervalItem.h"
 #include "RideFile.h"
 #include "RideSummaryWindow.h"
 #include "RideImportWizard.h"
@@ -146,11 +149,33 @@ MainWindow::MainWindow(const QDir &home) :
     allRides->setText(0, tr("All Rides"));
     treeWidget->expandItem(allRides);
 
+    intervalWidget = new QTreeWidget;
+    intervalWidget->setColumnCount(1);
+    intervalWidget->setIndentation(5);
+    intervalWidget->setSortingEnabled(false);
+    intervalWidget->header()->hide();
+    intervalWidget->setAlternatingRowColors (true);
+    intervalWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    intervalWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    intervalWidget->setSelectionMode(QAbstractItemView::MultiSelection);
+    intervalWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    allIntervals = new QTreeWidgetItem(intervalWidget, FOLDER_TYPE);
+    allIntervals->setText(0, tr("Intervals"));
+    intervalWidget->expandItem(allIntervals);
+
+    intervalsplitter = new QSplitter(this);
+    intervalsplitter->setOrientation(Qt::Vertical);
+    intervalsplitter->addWidget(treeWidget);
+    intervalsplitter->setCollapsible(0, true);
+    intervalsplitter->addWidget(intervalWidget);
+    intervalsplitter->setCollapsible(1, true);
+
     leftLayout = new QSplitter;
     leftLayout->setOrientation(Qt::Vertical);
     leftLayout->addWidget(calendar);
-    leftLayout->setCollapsible(0, false);
-    leftLayout->addWidget(treeWidget);
+    leftLayout->setCollapsible(0, true);
+    leftLayout->addWidget(intervalsplitter);
     leftLayout->setCollapsible(1, false);
     splitter->addWidget(leftLayout);
     splitter->setCollapsible(0, true);
@@ -256,13 +281,18 @@ MainWindow::MainWindow(const QDir &home) :
     connect(leftLayout, SIGNAL(splitterMoved(int,int)),
             this, SLOT(leftLayoutMoved()));
     connect(treeWidget, SIGNAL(itemSelectionChanged()),
-            this, SLOT(treeWidgetSelectionChanged()));
+            this, SLOT(rideTreeWidgetSelectionChanged()));
     connect(splitter, SIGNAL(splitterMoved(int,int)), 
             this, SLOT(splitterMoved()));
     connect(tabWidget, SIGNAL(currentChanged(int)), 
             this, SLOT(tabChanged(int)));
     connect(rideNotes, SIGNAL(textChanged()),
             this, SLOT(notesChanged()));
+    connect(intervalWidget,SIGNAL(customContextMenuRequested(const QPoint &)),
+            this, SLOT(showContextMenuPopup(const QPoint &)));
+    connect(intervalWidget,SIGNAL(itemSelectionChanged()),
+            this, SLOT(intervalTreeWidgetSelectionChanged()));
+
 
     /////////////////////////////// Menus ///////////////////////////////
 
@@ -275,14 +305,20 @@ MainWindow::MainWindow(const QDir &home) :
                         SLOT(close()), tr("Ctrl+Q")); 
 
     QMenu *rideMenu = menuBar()->addMenu(tr("&Ride"));
+    rideMenu->addAction(tr("&Save Ride"), this,
+                        SLOT(saveRide()), tr("Ctrl+S"));
     rideMenu->addAction(tr("&Download from device..."), this, 
                         SLOT(downloadRide()), tr("Ctrl+D")); 
     rideMenu->addAction(tr("&Export to CSV..."), this, 
                         SLOT(exportCSV()), tr("Ctrl+E")); 
+    rideMenu->addAction(tr("&Export to GC..."), this,
+                        SLOT(exportGC()));
     rideMenu->addAction(tr("&Import from File..."), this,
                         SLOT (importFile()), tr ("Ctrl+I"));
     rideMenu->addAction(tr("Find &best intervals..."), this,
                         SLOT(findBestIntervals()), tr ("Ctrl+B"));
+    rideMenu->addAction(tr("Find power &peaks..."), this,
+                        SLOT(findPowerPeaks()), tr ("Ctrl+P"));
     rideMenu->addAction(tr("Split &ride..."), this,
                         SLOT(splitRide()));
     rideMenu->addAction(tr("D&elete ride..."), this,
@@ -427,7 +463,7 @@ MainWindow::removeCurrentRide()
     criticalPowerWindow->deleteCpiFile(strOldFileName);
 
     treeWidget->setCurrentItem(itemToSelect);
-    treeWidgetSelectionChanged();
+    rideTreeWidgetSelectionChanged();
 }
 
 void
@@ -482,6 +518,26 @@ MainWindow::currentRide()
         return NULL;
     }
     return ((RideItem*) treeWidget->selectedItems().first())->ride;
+}
+
+void
+MainWindow::exportGC()
+{
+    if ((treeWidget->selectedItems().size() != 1)
+        || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
+        QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
+        return;
+    }
+
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Export GC"), QDir::homePath(), tr("GC (*.gc)"));
+    if (fileName.length() == 0)
+        return;
+
+    QString err;
+    QFile file(fileName);
+    GcFileReader reader;
+    reader.writeRideFile(currentRide(), file);
 }
 
 void
@@ -552,11 +608,90 @@ MainWindow::importFile()
 void
 MainWindow::findBestIntervals()
 {
-    (new BestIntervalDialog(this))->show();
+    BestIntervalDialog *p = new BestIntervalDialog(this);
+    p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
+    p->exec();
 }
 
+void
+MainWindow::addIntervalForPowerPeaksForSecs(RideFile *ride, int windowSizeSecs, QString name)
+{
+
+    QList<const RideFilePoint*> window;
+    QMap<double,double> bests;
+
+    double secsDelta = ride->recIntSecs();
+    int expectedSamples = (int) floor(windowSizeSecs / secsDelta);
+    double totalWatts = 0.0;
+
+    foreach (const RideFilePoint *point, ride->dataPoints()) {
+        while (!window.empty()
+               && (point->secs >= window.first()->secs + windowSizeSecs)) {
+            totalWatts -= window.first()->watts;
+            window.takeFirst();
+        }
+        totalWatts += point->watts;
+        window.append(point);
+        int divisor = std::max(window.size(), expectedSamples);
+        double avg = totalWatts / divisor;
+        bests.insertMulti(avg, point->secs);
+    }
+
+    QMap<double,double> results;
+    if (!bests.empty()) {
+        QMutableMapIterator<double,double> j(bests);
+        j.toBack();
+        j.previous();
+        double secs = j.value();
+        results.insert(j.value() - windowSizeSecs, j.key());
+        j.remove();
+        while (j.hasPrevious()) {
+            j.previous();
+            if (abs(secs - j.value()) < windowSizeSecs)
+                j.remove();
+        }
+    }
+    QMapIterator<double,double> j(results);
+    if (j.hasNext()) {
+        j.next();
+        double secs = j.key();
+        double watts = j.value();
+
+        QTreeWidgetItem *peak = new IntervalItem(ride, name+tr(" (%1 watts)").arg((int) round(watts)), secs, secs+windowSizeSecs, 0, 0);
+        allIntervals->addChild(peak);
+    }
+}
+
+void
+MainWindow::findPowerPeaks()
+{
+    QTreeWidgetItem *which = treeWidget->selectedItems().first();
+    if (which->type() != RIDE_TYPE) {
+        return;
+    }
+
+    addIntervalForPowerPeaksForSecs(ride->ride, 5, "Peak 5s");
+    addIntervalForPowerPeaksForSecs(ride->ride, 10, "Peak 10s");
+    addIntervalForPowerPeaksForSecs(ride->ride, 20, "Peak 20s");
+    addIntervalForPowerPeaksForSecs(ride->ride, 30, "Peak 30s");
+    addIntervalForPowerPeaksForSecs(ride->ride, 60, "Peak 1min");
+    addIntervalForPowerPeaksForSecs(ride->ride, 120, "Peak 2min");
+    addIntervalForPowerPeaksForSecs(ride->ride, 300, "Peak 5min");
+    addIntervalForPowerPeaksForSecs(ride->ride, 600, "Peak 10min");
+    addIntervalForPowerPeaksForSecs(ride->ride, 1200, "Peak 20min");
+    addIntervalForPowerPeaksForSecs(ride->ride, 1800, "Peak 30min");
+    addIntervalForPowerPeaksForSecs(ride->ride, 3600, "Peak 60min");
+
+    // now update the RideFileIntervals
+    updateRideFileIntervals();
+}
+
+//----------------------------------------------------------------------
+// User-define Intervals and Interval manipulation on left layout
+//----------------------------------------------------------------------
+
 void 
-MainWindow::treeWidgetSelectionChanged()
+MainWindow::rideTreeWidgetSelectionChanged()
 {
     assert(treeWidget->selectedItems().size() <= 1);
     if (treeWidget->selectedItems().isEmpty())
@@ -574,19 +709,144 @@ MainWindow::treeWidgetSelectionChanged()
         return;
 
     calendar->setSelectedDate(ride->dateTime.date());
-    // turn off tabs that don't make sense for manual file entry
-    if (ride->ride && ride->ride->deviceType() == QString("Manual CSV")) {
-        tabWidget->setTabEnabled(3,false); // Power Histogram
-        tabWidget->setTabEnabled(4,false); // PF/PV Plot
-    }
-    else {
-        tabWidget->setTabEnabled(3,true); // Power Histogram
-        tabWidget->setTabEnabled(4,true); // PF/PV Plot
+
+    // refresh interval list for bottom left
+    // first lets wipe away the existing intervals
+    // we need to disconnect this signal since it gets called as the
+    // widget is destroyed causing us to reference data that has just been
+    // deleted (takeText will SEGV under certain conditions)
+    disconnect(intervalWidget, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
+               this, SLOT(itemChanged(QTreeWidgetItem *, int)));
+    intervalWidget->clear();
+    allIntervals = new QTreeWidgetItem(intervalWidget, FOLDER_TYPE);
+    allIntervals->setText(0, tr("Intervals"));
+    intervalWidget->expandItem(allIntervals);
+    // now add the intervals for the current ride
+    if (ride) { // only if we have a ride pointer
+        RideFile *selected = ride->ride;
+        if (selected) {
+            // get all the intervals in the currently selected RideFile
+            QList<RideFileInterval> intervals = selected->intervals();
+            for (int i=0; i < intervals.count(); i++) {
+                // add as a child to allIntervals
+                IntervalItem *add = new IntervalItem(selected,
+                                                        intervals.at(i).name,
+                                                        intervals.at(i).start,
+                                                        intervals.at(i).stop,
+                                                        selected->timeToDistance(intervals.at(i).start),
+                                                        selected->timeToDistance(intervals.at(i).stop));
+                allIntervals->addChild(add);
+            }
+        }
     }
 
+	// turn off tabs that don't make sense for manual file entry
+	if (ride->ride && ride->ride->deviceType() == QString("Manual CSV")) {
+	    tabWidget->setTabEnabled(3,false); // Power Histogram
+	    tabWidget->setTabEnabled(4,false); // PF/PV Plot
+	}
+   else {
+	    tabWidget->setTabEnabled(3,true); // Power Histogram
+	    tabWidget->setTabEnabled(4,true); // PF/PV Plot
+	}
     saveAndOpenNotes();
 }
 
+void
+MainWindow::showContextMenuPopup(const QPoint &pos)
+{
+    QTreeWidgetItem *trItem = intervalWidget->itemAt( pos );
+    if (trItem != NULL && trItem->text(0) != tr("Intervals")) {
+        QMenu menu(intervalWidget);
+
+        activeInterval = (IntervalItem *)trItem;
+
+        QAction *actRenameInt = new QAction(tr("Rename interval"), intervalWidget);
+        QAction *actDeleteInt = new QAction(tr("Delete interval"), intervalWidget);
+        QAction *actZoomInt = new QAction(tr("Zoom to interval"), intervalWidget);
+        connect(actRenameInt, SIGNAL(triggered(void)), this, SLOT(renameInterval(void)));
+        connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteInterval(void)));
+        connect(actZoomInt, SIGNAL(triggered(void)), this, SLOT(zoomInterval(void)));
+
+        if (tabWidget->currentIndex() == 1) // on ride plot
+            menu.addAction(actZoomInt);
+        menu.addAction(actRenameInt);
+        menu.addAction(actDeleteInt);
+        menu.exec(intervalWidget->mapToGlobal( pos ));
+    }
+}
+void
+MainWindow::updateRideFileIntervals()
+{
+    // iterate over allIntervals as they are now defined
+    // and update the RideFile->intervals
+    RideItem *which = (RideItem *)treeWidget->selectedItems().first();
+    RideFile *current = which->ride;
+    current->clearIntervals();
+    for (int i=0; i < allIntervals->childCount(); i++) {
+        // add the intervals as updated
+        IntervalItem *it = (IntervalItem *)allIntervals->child(i);
+        current->addInterval(it->start, it->stop, it->name);
+    }
+
+    // emit signal for interval data changed
+    intervalsChanged();
+
+    // regenerate the summary details
+    //rideSummary->clear();
+    //which->clearSummary();  // clear cached value
+    //rideSummary->setHtml(which->htmlSummary());
+    //rideSummary->setAlignment(Qt::AlignCenter);
+
+    // set dirty
+    which->setDirty(true);
+}
+
+void
+MainWindow::deleteInterval() {
+    int index = allIntervals->indexOfChild(activeInterval);
+    delete allIntervals->takeChild(index);
+
+    // now update the ride file to reflect this
+    updateRideFileIntervals();
+}
+
+void
+MainWindow::renameInterval() {
+    activeInterval->setFlags(activeInterval->flags() | Qt::ItemIsEditable);
+    intervalWidget->editItem(activeInterval, 0);
+    connect(intervalWidget, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
+            this, SLOT(itemChanged(QTreeWidgetItem *, int)));
+}
+
+void
+MainWindow::zoomInterval() {
+    // zoom into this interval on allPlot
+    allPlotWindow->zoomInterval(activeInterval);
+}
+
+void
+MainWindow::itemChanged(QTreeWidgetItem *item, int) // int col not used since only 1 column!
+{
+    // only for the rename action!
+    disconnect(intervalWidget, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
+               this, SLOT(itemChanged(QTreeWidgetItem *, int)));
+
+    if (item != NULL) {
+
+        IntervalItem *citem = (IntervalItem*)item;
+        citem->takeText(); // take the text just set in the gui
+
+        // now update the ride file to reflect this
+        updateRideFileIntervals();
+    }
+}
+
+void
+MainWindow::intervalTreeWidgetSelectionChanged()
+{
+    intervalSelected();
+}
 
 void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
 {
@@ -751,8 +1011,9 @@ MainWindow::moveEvent(QMoveEvent*)
 }
 
 void
-MainWindow::closeEvent(QCloseEvent*)
+MainWindow::closeEvent(QCloseEvent* event)
 {
+    if (saveRideExitDialog() == false) event->ignore();
     saveNotes();
 }
 
@@ -860,6 +1121,12 @@ void MainWindow::showTools()
 {
    ToolsDialog *td = new ToolsDialog();
    td->show();
+}
+
+void
+MainWindow::saveRide()
+{
+    saveRideSingleDialog(ride); // will update Dirty flag if saved
 }
 
 void

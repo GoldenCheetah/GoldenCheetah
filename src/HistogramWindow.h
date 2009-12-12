@@ -40,6 +40,7 @@ class HistogramWindow : public QWidget
     public slots:
 
         void rideSelected();
+        void intervalSelected();
         void zonesChanged();
 
     protected slots:

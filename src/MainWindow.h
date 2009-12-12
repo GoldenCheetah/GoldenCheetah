@@ -24,6 +24,7 @@
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include "RideItem.h"
+#include "IntervalItem.h"
 #include "QuarqdClient.h"
 #include <boost/shared_ptr.hpp>
 
@@ -53,6 +54,7 @@ class MainWindow : public QMainWindow
         const RideFile *currentRide();
         const RideItem *currentRideItem() { return ride; }
         const QTreeWidgetItem *allRideItems() { return allRides; }
+        const QTreeWidgetItem *allIntervalItems() { return allIntervals; }
 	void getBSFactors(float &timeBS, float &distanceBS);
         QDir home;
         void setCriticalPower(int cp);
@@ -60,6 +62,9 @@ class MainWindow : public QMainWindow
         RealtimeWindow  *realtimeWindow; // public so config dialog can notify it of changes config
 
         const Zones *zones() const { return zones_; }
+        void updateRideFileIntervals();
+        void saveSilent(RideItem *);
+        bool saveRideSingleDialog(RideItem *);
         RideItem *rideItem() const { return ride; }
 
     protected:
@@ -75,10 +80,13 @@ class MainWindow : public QMainWindow
     signals:
 
         void rideSelected();
+        void intervalSelected();
+        void intervalsChanged();
         void zonesChanged();
 
     private slots:
-        void treeWidgetSelectionChanged();
+        void rideTreeWidgetSelectionChanged();
+        void intervalTreeWidgetSelectionChanged();
         void leftLayoutMoved();
         void splitterMoved();
         void newCyclist();
@@ -86,13 +94,18 @@ class MainWindow : public QMainWindow
         void downloadRide();
         void manualRide();
         void exportCSV();
+        void exportGC();
         void importFile();
         void findBestIntervals();
+        void addIntervalForPowerPeaksForSecs(RideFile *ride, int windowSizeSecs, QString name);
+        void findPowerPeaks();
         void splitRide();
         void deleteRide();
         void tabChanged(int index);
         void aboutDialog();
         void notesChanged();
+        void saveRide();                        // save current ride menu item
+        bool saveRideExitDialog();              // save dirty rides on exit dialog
         void saveNotes();
         void showOptions();
         void showTools();
@@ -100,6 +113,11 @@ class MainWindow : public QMainWindow
         void scanForMissing();
 	void saveAndOpenNotes();
 	void dateChanged(const QDate &);
+        void showContextMenuPopup(const QPoint &);
+        void deleteInterval();
+        void renameInterval();
+        void zoomInterval();
+        void itemChanged(QTreeWidgetItem *, int);
 
     protected: 
 
@@ -109,10 +127,13 @@ class MainWindow : public QMainWindow
 	bool parseRideFileName(const QString &name, QString *notesFileName, QDateTime *dt);
 
 	boost::shared_ptr<QSettings> settings;
+        IntervalItem *activeInterval; // currently active for context menu popup
 
         RideCalendar *calendar;
         QSplitter *splitter;
         QTreeWidget *treeWidget;
+        QSplitter *intervalsplitter;
+        QTreeWidget *intervalWidget;
         QTabWidget *tabWidget;
         RideSummaryWindow *rideSummaryWindow;
         AllPlotWindow *allPlotWindow;
@@ -120,6 +141,7 @@ class MainWindow : public QMainWindow
         WeeklySummaryWindow *weeklySummaryWindow;
         CriticalPowerWindow *criticalPowerWindow;
         QTreeWidgetItem *allRides;
+        QTreeWidgetItem *allIntervals;
         QSplitter *leftLayout;
         QWidget *notesWidget;
         QVBoxLayout *notesLayout;
