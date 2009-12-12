@@ -1,13 +1,14 @@
 
 #include "PerformanceManagerWindow.h"
+#include "MainWindow.h"
 #include "PerfPlot.h"
 #include "StressCalculator.h"
 #include "RideItem.h"
 
 
 
-PerformanceManagerWindow::PerformanceManagerWindow()
-
+PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
+    QWidget(mainWindow), mainWindow(mainWindow)
 {
     days = count = 0;
     sc = NULL;
@@ -93,8 +94,16 @@ PerformanceManagerWindow::~PerformanceManagerWindow()
 	delete sc;
 }
 
-void PerformanceManagerWindow::replot(QDir home,QTreeWidgetItem *allRides)
+void PerformanceManagerWindow::setActive(bool value)
 {
+    if (value)
+        replot();
+}
+
+void PerformanceManagerWindow::replot()
+{
+    const QDir &home = mainWindow->home;
+    const QTreeWidgetItem *allRides = mainWindow->allRideItems();
 
     int newdays, endIndex;
     RideItem *firstRideItem;

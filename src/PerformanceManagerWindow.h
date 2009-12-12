@@ -28,6 +28,7 @@
 
 
 class AllPlot;
+class MainWindow;
 class QwtPlotPanner;
 class QwtPlotZoomer;
 class QSlider;
@@ -42,20 +43,22 @@ class PerformanceManagerWindow : public QWidget
 
     public:
 
-	PerformanceManagerWindow (void);
+	PerformanceManagerWindow (MainWindow *mainWindow);
 	~PerformanceManagerWindow (void);
-	void replot(QDir home, QTreeWidgetItem *allRides);
-
+        void setActive(bool value);
 
     public slots:
 
 	void PMpickerMoved(const QPoint &pos);
 	void setPMSizeFromSlider();
+	void replot();
 
     protected:
+
 	int days, count;
 	StressCalculator *sc;
 
+        MainWindow *mainWindow;
 	PerfPlot *perfplot;
 	QLineEdit *PMSTSValue;
 	QLineEdit *PMLTSValue;
