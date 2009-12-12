@@ -60,7 +60,6 @@ double StressCalculator::min(void) {
 void StressCalculator::calculateStress(QWidget *mw,
 	QString homePath, QTreeWidgetItem * rides)
 {
-    double bs;
     QSharedPointer<QProgressDialog> progress;
     int endingOffset = 0;
     bool aborted = false;
@@ -71,23 +70,38 @@ void StressCalculator::calculateStress(QWidget *mw,
     // set up cache file
     QString cachePath = homePath + "/" + "stress.cache";
     QFile cacheFile(cachePath);
-    QMap<QString, float> cache;
+    QMap<QString,QMap<QString,float> > cache;
+
+    const QString bs_name = "skiba_bike_score";
+    const QString dp_name = "daniels_points";
 
     if (cacheFile.exists() && cacheFile.size() > 0) {
 	if (cacheFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
 	    fprintf(stderr,"reading stress cache file\n");
 	    QTextStream in(&cacheFile);
-	    QString line, date, bs;
+            bool first = true;
+            QMap<int,QString> columnToMetric;
 	    while(! in.atEnd()) {
-		line = in.readLine();
-		date = line.section(',',0,0);
-		bs = line.section(',',1,1);
-		cache[date] = bs.toFloat();
+                QString line = in.readLine();
+                QStringList fields = line.split(",");
+                if (first) {
+                    first = false;
+                    if (fields[0] != "Date")
+                        break; // rescan to get DanielsPoints
+                    for (int i = 1; i < fields.size(); ++i)
+                        columnToMetric.insert(i, fields[i]);
+                    continue;
+                }
+                else {
+                    QString date = fields[0];
+                    for (int i = 1; i < fields.size(); ++i)
+                        cache[date][columnToMetric[i]] = fields[i].toFloat();
+                }
 	    }
 	    cacheFile.close();
 	}
     }
-    else {
+    if (cache.isEmpty()) {
 	// set up progress bar only if no cache file
 	progress = QSharedPointer<QProgressDialog>(new
 		QProgressDialog(QString(tr("Computing stress.\n")),
@@ -96,8 +110,6 @@ void StressCalculator::calculateStress(QWidget *mw,
 	showProgress = true;
     }
 
-    QString ridedatestring;
-    
     QVariant isAscending = settings->value(GC_ALLRIDES_ASCENDING,Qt::Checked);
     
     if(isAscending.toInt() > 0 ){
@@ -117,11 +129,9 @@ void StressCalculator::calculateStress(QWidget *mw,
 	if (item->dateTime.daysTo(startDate) <= 0 &&
 		item->dateTime.daysTo(endDate) >= 0) { // inclusive of end date
 
+	    QString ridedatestring = item->dateTime.toString();
 
-	    RideMetric *m;
-	    ridedatestring = item->dateTime.toString();
-
-	    bs = 0.0;
+	    double bs = 0.0, dp = 0.0;
 
 	    if (showProgress) {
 		QString existing = progress->labelText();
@@ -132,16 +142,19 @@ void StressCalculator::calculateStress(QWidget *mw,
 
 	    // get new value if not in cache
 	    if (cache.contains(ridedatestring)) {
-		bs = cache[ridedatestring];
+		bs = cache[ridedatestring][bs_name];
+		dp = cache[ridedatestring][dp_name];
 	    }
 	    else {
 		item->computeMetrics();
 
-		if ((m = item->metrics.value("skiba_bike_score")) &&
-			m->value(true)) {
+                RideMetric *m;
+                if ((m = item->metrics.value(bs_name)) && m->value(true))
 		    bs = m->value(true);
-		}
-		cache[ridedatestring] = bs;
+		if ((m = item->metrics.value(dp_name)) && m->value(true))
+		    dp = m->value(true);
+		cache[ridedatestring][bs_name] = bs;
+		cache[ridedatestring][dp_name] = dp;
 
                 item->freeMemory();
 	    }
@@ -186,9 +199,11 @@ done:
 	if (cacheFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
 	    cacheFile.resize(0); // truncate
 	    QTextStream out(&cacheFile);
-	    QMap<QString, float>::const_iterator i = cache.constBegin();
-	    while (i != cache.constEnd()) {
-		out << i.key() << "," << i.value() << endl;
+            out << "Date," << bs_name << "," << dp_name << endl;
+            QMap<QString,QMap<QString,float> >::const_iterator i = cache.constBegin();
+            while (i != cache.constEnd()) {
+                out << i.key() << "," << i.value()[bs_name]
+                    << "," << i.value()[dp_name] << endl;
 		++i;
 	    }
 	    cacheFile.close();
