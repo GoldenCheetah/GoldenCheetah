@@ -58,7 +58,8 @@ double StressCalculator::min(void) {
 
 
 void StressCalculator::calculateStress(QWidget *mw,
-        QString homePath, const QTreeWidgetItem * rides)
+        QString homePath, const QTreeWidgetItem * rides,
+        const QString &metric)
 {
     QSharedPointer<QProgressDialog> progress;
     int endingOffset = 0;
@@ -74,6 +75,7 @@ void StressCalculator::calculateStress(QWidget *mw,
 
     const QString bs_name = "skiba_bike_score";
     const QString dp_name = "daniels_points";
+    assert(metric == bs_name || metric == dp_name);
 
     if (cacheFile.exists() && cacheFile.size() > 0) {
 	if (cacheFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -159,7 +161,7 @@ void StressCalculator::calculateStress(QWidget *mw,
                 item->freeMemory();
 	    }
 
-	    addRideData(bs,item->dateTime);
+	    addRideData(metric == bs_name ? bs : dp,item->dateTime);
 
 
 	    // check progress

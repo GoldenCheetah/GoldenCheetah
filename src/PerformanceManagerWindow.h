@@ -56,6 +56,7 @@ class PerformanceManagerWindow : public QWidget
     protected:
 
 	int days, count;
+        QString metric;
 	StressCalculator *sc;
 
         MainWindow *mainWindow;
@@ -67,6 +68,7 @@ class PerformanceManagerWindow : public QWidget
 	QwtPlotPicker *PMpicker;
 	QLineEdit *PMdateRangefrom, *PMdateRangeto;
         QSlider *PMleftSlider, *PMrightSlider;
+        QComboBox *metricCombo;
 	boost::shared_ptr<QSettings> settings;
 
 	void setPMSliderDates();
