@@ -40,6 +40,9 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
     shadeZonesPfPvCheckBox = new QCheckBox;
     shadeZonesPfPvCheckBox->setText("Shade zones");
     shadeZonesPfPvCheckBox->setCheckState(Qt::Checked);
+    mergeIntervalPfPvCheckBox = new QCheckBox;
+    mergeIntervalPfPvCheckBox->setText("Merge intervals");
+    mergeIntervalPfPvCheckBox->setCheckState(Qt::Unchecked);
 
     qaLayout->addWidget(qaCPLabel);
     qaLayout->addWidget(qaCPValue);
@@ -48,6 +51,7 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
     qaLayout->addWidget(qaClLabel);
     qaLayout->addWidget(qaClValue);
     qaLayout->addWidget(shadeZonesPfPvCheckBox);
+    qaLayout->addWidget(mergeIntervalPfPvCheckBox);
 
     vlayout->addWidget(pfPvPlot);
     vlayout->addLayout(qaLayout);
@@ -67,7 +71,10 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
 	    this, SLOT(setQaCLFromLineEdit()));
     connect(shadeZonesPfPvCheckBox, SIGNAL(stateChanged(int)),
             this, SLOT(setShadeZonesPfPvFromCheckBox()));
+    connect(mergeIntervalPfPvCheckBox, SIGNAL(stateChanged(int)),
+                this, SLOT(setMergeIntervalsPfPvFromCheckBox()));
     connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+    connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
 }
 
@@ -83,6 +90,15 @@ PfPvWindow::rideSelected()
 }
 
 void
+PfPvWindow::intervalSelected()
+{
+    RideItem *ride = mainWindow->rideItem();
+    if (!ride) return;
+    pfPvPlot->setData(ride);
+
+}
+
+void
 PfPvWindow::zonesChanged()
 {
     pfPvPlot->refreshZoneItems();
@@ -95,6 +111,14 @@ PfPvWindow::setShadeZonesPfPvFromCheckBox()
 {
     if (pfPvPlot->shadeZones() != shadeZonesPfPvCheckBox->isChecked()) {
         pfPvPlot->setShadeZones(shadeZonesPfPvCheckBox->isChecked());
+    }
+}
+
+void
+PfPvWindow::setMergeIntervalsPfPvFromCheckBox()
+{
+    if (pfPvPlot->mergeIntervals() != mergeIntervalPfPvCheckBox->isChecked()) {
+        pfPvPlot->setMergeIntervals(mergeIntervalPfPvCheckBox->isChecked());
     }
 }
 

@@ -25,6 +25,7 @@
 // forward references
 class RideFile;
 class RideItem;
+class RideFilePoint;
 class QwtPlotCurve;
 class QwtPlotMarker;
 class PfPvPlotZoneLabel;
@@ -52,6 +53,9 @@ class PfPvPlot : public QwtPlot
         bool shadeZones() const { return shade_zones; }
         void setShadeZones(bool value);
 
+        bool mergeIntervals() const { return merge_intervals; }
+        void setMergeIntervals(bool value);
+
     public slots:
 signals:
         
@@ -61,6 +65,7 @@ signals:
 
     protected:
     QwtPlotCurve *curve;
+    QList <QwtPlotCurve *> intervalCurves;
 	QwtPlotCurve *cpCurve;
 	QList <QwtPlotCurve *> zoneCurves;
 	QList <PfPvPlotZoneLabel *> zoneLabels;
@@ -68,11 +73,13 @@ signals:
 	QwtPlotMarker *mY;
 
 	static QwtArray<double> contour_xvalues;   // values used in CP and contour plots: djconnel
+	int isSelected(const RideFilePoint *p);
 	
 	int cp_;
 	int cad_;
 	double cl_;
 	bool shade_zones;    // whether to shade zones, added 27Apr2009 djconnel
+	bool merge_intervals;
 };
 
 #endif // _GC_QaPlot_h

@@ -26,6 +26,7 @@
 class QwtPlotCurve;
 class QwtPlotGrid;
 class RideItem;
+class RideFilePoint;
 class PowerHistBackground;
 class PowerHistZoneLabel;
 class QwtPlotZoomer;
@@ -36,7 +37,7 @@ class PowerHist : public QwtPlot
 
     public:
 
-        QwtPlotCurve *curve;
+        QwtPlotCurve *curve, *curveSelected;
 	QList <PowerHistZoneLabel *> zoneLabels;
 
         PowerHist();
@@ -81,13 +82,21 @@ class PowerHist : public QwtPlot
 
         QwtPlotGrid *grid;
 
-	// storage for data counts
+        // storage for data counts
         QVector<unsigned int>
-	    wattsArray,
-	    nmArray,
-	    hrArray,
-	    kphArray,
-	    cadArray;
+        wattsArray,
+        nmArray,
+        hrArray,
+        kphArray,
+        cadArray;
+
+        // storage for data counts in interval selected
+        QVector<unsigned int>
+        wattsSelectedArray,
+        nmSelectedArray,
+        hrSelectedArray,
+        kphSelectedArray,
+        cadSelectedArray;
 
         int binw;
 
@@ -120,7 +129,7 @@ class PowerHist : public QwtPlot
 	static const int cadDigits   = 0;
 
 	void setParameterAxisTitle();
-
+	bool isSelected(const RideFilePoint *p);
 
 	bool useMetricUnits;  // whether metric units are used (or imperial)
 };

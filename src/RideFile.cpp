@@ -31,6 +31,11 @@
     interval = point->interval; \
     start = point->secs; \
 }
+void
+RideFile::clearIntervals()
+{
+    intervals_.clear();
+}
 
 void
 RideFile::fillInIntervals()
@@ -193,4 +198,50 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     dataPresent.watts |= (watts != 0);
     dataPresent.alt   |= (alt != 0);
     dataPresent.interval |= (interval != 0);
+}
+
+double
+RideFile::distanceToTime(double km)
+{
+    // inefficient but robust - iterate over points until
+    // you have gone past the km desired.
+    // rounded to the nearest data point - no smoothing
+    for (int i=0; i<dataPoints_.count(); i++) {
+        if (dataPoints_.at(i)->km >= km) return dataPoints_.at(i)->secs;
+    }
+    return 0;
+}
+
+double
+RideFile::timeToDistance(double secs)
+{
+    // inefficient but robust - iterate over points until
+    // you have gone past the km desired.
+    // rounded to the nearest data point - no smoothing
+    RideFilePoint *midp, *leftp, *rightp;
+
+    if (dataPoints_.count() == 0) return 0;
+
+    int left =0;
+    int right=dataPoints_.count()-1;
+    int middle;
+    while (right-left > 1) {
+        middle = left + ((right - left ) / 2);
+
+        midp = dataPoints_.at(middle);
+        leftp = dataPoints_.at(left);
+        rightp = dataPoints_.at(right);
+
+        if (leftp->secs >= secs) return leftp->km;
+        if (rightp->secs <= secs) return rightp->km;
+        if (midp->secs == secs) return midp->km;
+
+        if (midp->secs > secs) right = middle;
+        else if (midp->secs < secs) left = middle;
+    }
+
+    // just in case it is between points
+    double leftdelta = secs - leftp->secs;
+    double rightdelta = rightp->secs - secs;
+    return (leftdelta > rightdelta) ? rightp->km : leftp->km;
 }

@@ -25,7 +25,10 @@ class AllPlot;
 class MainWindow;
 class QwtPlotPanner;
 class QwtPlotZoomer;
+class QwtPlotPicker;
+class QwtPlotMarker;
 class RideItem;
+class IntervalItem;
 
 class AllPlotWindow : public QWidget
 {
@@ -34,15 +37,27 @@ class AllPlotWindow : public QWidget
     public:
 
         AllPlotWindow(MainWindow *mainWindow);
+        void setData(RideItem *ride);
+        void setStartSelection(double seconds);
+        void setEndSelection(double seconds, bool newInterval, QString name);
+        void clearSelection();
+        void hideSelection();
+        void zoomInterval(IntervalItem *); // zoom into a specified interval
 
    public slots:
 
         void setSmoothingFromSlider();
         void setSmoothingFromLineEdit();
         void rideSelected();
+        void intervalSelected();
         void zonesChanged();
+        void intervalsChanged();
 
     protected:
+
+        // whilst we refactor, lets make friend
+        friend class IntervalPlotData;
+        friend class MainWindow;
 
 	void setAllPlotWidgets(RideItem *rideItem);
 
@@ -50,6 +65,11 @@ class AllPlotWindow : public QWidget
         AllPlot *allPlot;
         QwtPlotPanner *allPanner;
         QwtPlotZoomer *allZoomer;
+        QwtPlotPicker *allPicker;
+        int selection;
+        QwtPlotMarker *allMarker1;
+        QwtPlotMarker *allMarker2;
+        QwtPlotMarker *allMarker3;
 	QCheckBox *showHr;
 	QCheckBox *showSpeed;
 	QCheckBox *showCad;
@@ -57,6 +77,13 @@ class AllPlotWindow : public QWidget
 	QComboBox *showPower;
         QSlider *smoothSlider;
         QLineEdit *smoothLineEdit;
+
+    private:
+        void showInfo(QString);
+
+    private slots:
+        void plotPickerMoved(const QPoint &);
+        void plotPickerSelected(const QPoint &);
 };
 
 #endif // _GC_AllPlotWindow_h

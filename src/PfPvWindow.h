@@ -38,6 +38,7 @@ class PfPvWindow : public QWidget
     public slots:
 
         void rideSelected();
+        void intervalSelected();
         void zonesChanged();
 
     protected slots:
@@ -46,12 +47,14 @@ class PfPvWindow : public QWidget
         void setQaCADFromLineEdit();
         void setQaCLFromLineEdit();
         void setShadeZonesPfPvFromCheckBox();
+        void setMergeIntervalsPfPvFromCheckBox();
 
     protected:
 
         MainWindow *mainWindow;
         PfPvPlot *pfPvPlot;
         QCheckBox *shadeZonesPfPvCheckBox;
+        QCheckBox *mergeIntervalPfPvCheckBox;
         QLineEdit *qaCPValue;
         QLineEdit *qaCadValue;
         QLineEdit *qaClValue;

@@ -29,6 +29,7 @@ RideItem::RideItem(int type,
     QTreeWidgetItem(type), path(path), fileName(fileName),
     dateTime(dateTime), ride(NULL), zones(zones), notesFileName(notesFileName)
 {
+    isdirty = false;
     setText(0, dateTime.toString("ddd"));
     setText(1, dateTime.toString("MMM d, yyyy"));
     setText(2, dateTime.toString("h:mm AP"));
@@ -43,6 +44,39 @@ RideItem::~RideItem()
         i.next();
         delete i.value();
     }
+}
+
+void
+RideItem::setDirty(bool val)
+{
+    isdirty = val;
+
+    if (isdirty == true) {
+
+        // show ride in bold on the list view
+        for (int i=0; i<3; i++) {
+            QFont current = font(i);
+            current.setWeight(QFont::Black);
+            setFont(i, current);
+        }
+
+    } else {
+
+        // show ride in normal on the list view
+        for (int i=0; i<3; i++) {
+            QFont current = font(i);
+            current.setWeight(QFont::Normal);
+            setFont(i, current);
+        }
+    }
+}
+
+// name gets changed when file is converted in save
+void
+RideItem::setFileName(QString path, QString fileName)
+{
+    this->path = path;
+    this->fileName = fileName;
 }
 
 int RideItem::zoneRange()
@@ -143,5 +177,4 @@ RideItem::computeMetrics()
         }
     }
 }
-
 

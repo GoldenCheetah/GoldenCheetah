@@ -113,12 +113,16 @@ class RideFile
         void addInterval(double start, double stop, const QString &name) {
             intervals_.append(RideFileInterval(start, stop, name));
         }
+        void clearIntervals();
         void fillInIntervals();
         int intervalBegin(const RideFileInterval &interval) const;
 
         void writeAsCsv(QFile &file, bool bIsMetric) const;
 
         void resetDataPresent();
+
+        double distanceToTime(double);  // get distance km at time secs
+        double timeToDistance(double);  // get time secs at distance km
 };
 
 struct RideFileReader {

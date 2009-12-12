@@ -37,8 +37,10 @@ RideSummaryWindow::RideSummaryWindow(MainWindow *mainWindow) :
     rideSummary = new QTextEdit(this);
     rideSummary->setReadOnly(true);
     vlayout->addWidget(rideSummary);
+
     connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(refresh()));
     connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(refresh()));
+    connect(mainWindow, SIGNAL(intervalsChanged()), this, SLOT(refresh()));
     setLayout(vlayout);
 }
 
@@ -161,7 +163,9 @@ RideSummaryWindow::htmlSummary() const
     RideItem *rideItem = mainWindow->rideItem();
     QFile file(rideItem->path + "/" + rideItem->fileName);
     QStringList errors;
-    RideFile *ride = RideFileFactory::instance().openRideFile(file, errors);
+    RideFile *ride = rideItem->ride;
+    if (!ride)
+        ride = RideFileFactory::instance().openRideFile(file, errors);
     if (!ride) {
         summary = "<p>Couldn't read file \"" + file.fileName() + "\":";
         QListIterator<QString> i(errors);
@@ -314,7 +318,7 @@ RideSummaryWindow::htmlSummary() const
     // and an integer < 30 when in an interval.
     // We'll need to create a counter for the intervals
     // rather than relying on the final data point's interval number.
-    if (ride->intervals().size() > 1) {
+    if (ride->intervals().size() > 0) {
         summary += "<p><h2>Intervals</h2>\n<p>\n";
         summary += "<table align=\"center\" width=\"90%\" ";
         summary += "cellspacing=0 border=0><tr>";

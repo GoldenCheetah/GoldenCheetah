@@ -64,7 +64,9 @@ HEADERS += \
         DownloadRideDialog.h \
         ErgFile.h \
         ErgFilePlot.h \
+        GcRideFile.h \
         HistogramWindow.h \
+        IntervalItem.h \
         LogTimeScaleDraw.h \
         LogTimeScaleEngine.h \
         MainWindow.h \
@@ -94,6 +96,7 @@ HEADERS += \
         RideImportWizard.h \
         RideItem.h \
         RideMetric.h \
+        SaveDialogs.h \
         RideSummaryWindow.h \
         Season.h \
         SeasonParser.h \
@@ -138,7 +141,9 @@ SOURCES += \
         DownloadRideDialog.cpp \
         ErgFile.cpp \
         ErgFilePlot.cpp \
+        GcRideFile.cpp \
         HistogramWindow.cpp \
+        IntervalItem.cpp \
         LogTimeScaleDraw.cpp \
         LogTimeScaleEngine.cpp \
         MainWindow.cpp \
@@ -168,6 +173,7 @@ SOURCES += \
         RideImportWizard.cpp \
         RideItem.cpp \
         RideMetric.cpp \
+        SaveDialogs.cpp \
         RideSummaryWindow.cpp \
         Season.cpp \
         SeasonParser.cpp \

@@ -1,23 +1,25 @@
-/* 
+/*
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 #include "PowerHist.h"
+#include "MainWindow.h"
 #include "RideItem.h"
+#include "IntervalItem.h"
 #include "RideFile.h"
 #include "Settings.h"
 #include "Zones.h"
@@ -43,14 +45,14 @@ class penTooltip: public QwtPlotZoomer
                  //setTrackerMode(AlwaysOn);
                  setTrackerMode(AlwaysOff);
          }
-    
+
          virtual QwtText trackerText(const QwtDoublePoint &pos) const
          {
                  QColor bg(Qt::white);
          #if QT_VERSION >= 0x040300
                      bg.setAlpha(200);
              #endif
-            
+
                      QwtText text = QString("%1").arg((int)pos.x());
                      text.setBackgroundBrush( QBrush( bg ));
                      return text;
@@ -204,11 +206,11 @@ PowerHist::PowerHist():
     unit(0),
     lny(false)
 {
-    
+
     boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-      
+
     unit = settings->value(GC_UNIT);
-    
+
     useMetricUnits = (unit.toString() == "Metric");
 
     // create a background object for shading
@@ -219,7 +221,7 @@ PowerHist::PowerHist():
 
     setParameterAxisTitle();
     setAxisTitle(yLeft, "Cumulative Time (minutes)");
-    
+
     curve = new QwtPlotCurve("");
     curve->setStyle(QwtPlotCurve::Steps);
     curve->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -231,6 +233,18 @@ PowerHist::PowerHist():
     curve->setBrush(brush_color);   // fill below the line
     delete pen;
     curve->attach(this);
+
+    curveSelected = new QwtPlotCurve("");
+    curveSelected->setStyle(QwtPlotCurve::Steps);
+    curveSelected->setRenderHint(QwtPlotItem::RenderAntialiased);
+    pen = new QPen(Qt::blue);
+    pen->setWidth(2.0);
+    curveSelected->setPen(*pen);
+    brush_color = Qt::blue;
+    brush_color.setAlpha(64);
+    curveSelected->setBrush(brush_color);   // fill below the line
+    delete pen;
+    curveSelected->attach(this);
 
     grid = new QwtPlotGrid();
     grid->enableX(false);
@@ -247,6 +261,7 @@ PowerHist::PowerHist():
 PowerHist::~PowerHist() {
     delete bg;
     delete curve;
+    delete curveSelected;
     delete grid;
 }
 
@@ -270,7 +285,7 @@ PowerHist::refreshZoneLabels()
 {
     // delete any existing power zone labels
     if (zoneLabels.size()) {
-	QListIterator<PowerHistZoneLabel *> i(zoneLabels); 
+	QListIterator<PowerHistZoneLabel *> i(zoneLabels);
 	while (i.hasNext()) {
 	    PowerHistZoneLabel *label = i.next();
 	    label->detach();
@@ -302,6 +317,7 @@ void
 PowerHist::recalc()
 {
     QVector<unsigned int> *array;
+    QVector<unsigned int> *selectedArray;
     int arrayLength = 0;
     double delta;
 
@@ -315,26 +331,31 @@ PowerHist::recalc()
 	array = &wattsArray;
 	delta = wattsDelta;
 	arrayLength = wattsArray.size();
+	selectedArray = &wattsSelectedArray;
     }
     else if (selected == nm) {
 	array = &nmArray;
 	delta = nmDelta;
 	arrayLength = nmArray.size();
+	selectedArray = &nmSelectedArray;
     }
     else if (selected == hr) {
 	array = &hrArray;
 	delta = hrDelta;
 	arrayLength = hrArray.size();
+	selectedArray = &hrSelectedArray;
     }
     else if (selected == kph) {
 	array = &kphArray;
 	delta = kphDelta;
 	arrayLength = kphArray.size();
+	selectedArray = &kphSelectedArray;
     }
     else if (selected == cad) {
 	array = &cadArray;
 	delta = cadDelta;
 	arrayLength = cadArray.size();
+	selectedArray = &cadSelectedArray;
     }
 
     if (!array)
@@ -345,6 +366,7 @@ PowerHist::recalc()
     // allocate space for data, plus beginning and ending point
     QVector<double> parameterValue(count+2);
     QVector<double> totalTime(count+2);
+    QVector<double> totalTimeSelected(count+2);
     int i;
     for (i = 1; i <= count; ++i) {
         int high = i * binw;
@@ -353,14 +375,19 @@ PowerHist::recalc()
             low++;
         parameterValue[i] = high * delta;
         totalTime[i]  = 1e-9;  // nonzero to accomodate log plot
-        while (low < high)
+        totalTimeSelected[i] = 1e-9;  // nonzero to accomodate log plot
+        while (low < high) {
+            if (selectedArray && (*selectedArray).size()>low)
+                totalTimeSelected[i] += dt * (*selectedArray)[low];
             totalTime[i] += dt * (*array)[low++];
+        }
     }
     totalTime[i] = 1e-9;       // nonzero to accomodate log plot
     parameterValue[i] = i * delta * binw;
     totalTime[0] = 1e-9;
     parameterValue[0] = 0;
     curve->setData(parameterValue.data(), totalTime.data(), count + 2);
+    curveSelected->setData(parameterValue.data(), totalTimeSelected.data(), count + 2);
     setAxisScale(xBottom, 0.0, parameterValue[count + 1]);
 
     refreshZoneLabels();
@@ -370,7 +397,7 @@ PowerHist::recalc()
 }
 
 void
-PowerHist::setYMax() 
+PowerHist::setYMax()
 {
     static const double tmin = 1.0/60;
     setAxisScale(yLeft, (lny ? tmin : 0.0), curve->maxYValue() * 1.1);
@@ -384,12 +411,12 @@ PowerHist::setData(RideItem *_rideItem)
     RideFile *ride = rideItem->ride;
 
     if (ride) {
-	setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
+        setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
 
-	static const int maxSize = 4096;
+        static const int maxSize = 4096;
 
-	// recording interval in minutes
-	dt = ride->recIntSecs() / 60.0;
+        // recording interval in minutes
+        dt = ride->recIntSecs() / 60.0;
 
         wattsArray.resize(0);
         nmArray.resize(0);
@@ -397,46 +424,85 @@ PowerHist::setData(RideItem *_rideItem)
         kphArray.resize(0);
         cadArray.resize(0);
 
-	// unit conversion factor for imperial units for selected parameters
-	double torque_factor = (useMetricUnits ? 1.0 : 0.73756215);
-	double speed_factor  = (useMetricUnits ? 1.0 : 0.62137119);
+        wattsSelectedArray.resize(0);
+        nmSelectedArray.resize(0);
+        hrSelectedArray.resize(0);
+        kphSelectedArray.resize(0);
+        cadSelectedArray.resize(0);
+
+        // unit conversion factor for imperial units for selected parameters
+        double torque_factor = (useMetricUnits ? 1.0 : 0.73756215);
+        double speed_factor  = (useMetricUnits ? 1.0 : 0.62137119);
 
         foreach(const RideFilePoint *p1, ride->dataPoints()) {
+            bool selected = isSelected(p1);
 
-	    int wattsIndex = int(floor(p1->watts / wattsDelta));
-	    if (wattsIndex >= 0 && wattsIndex < maxSize) {
-		if (wattsIndex >= wattsArray.size())
-		    wattsArray.resize(wattsIndex + 1);
-		wattsArray[wattsIndex]++;
-	    }
+            int wattsIndex = int(floor(p1->watts / wattsDelta));
+            if (wattsIndex >= 0 && wattsIndex < maxSize) {
+                if (wattsIndex >= wattsArray.size())
+                    wattsArray.resize(wattsIndex + 1);
+                wattsArray[wattsIndex]++;
+
+                if (selected) {
+                    if (wattsIndex >= wattsSelectedArray.size())
+                        wattsSelectedArray.resize(wattsIndex + 1);
+                    wattsSelectedArray[wattsIndex]++;
+                }
+            }
 
             int nmIndex = int(floor(p1->nm * torque_factor / nmDelta));
             if (nmIndex >= 0 && nmIndex < maxSize) {
                 if (nmIndex >= nmArray.size())
                     nmArray.resize(nmIndex + 1);
                 nmArray[nmIndex]++;
+
+                if (selected) {
+                    if (nmIndex >= nmSelectedArray.size())
+                        nmSelectedArray.resize(nmIndex + 1);
+                    nmSelectedArray[nmIndex]++;
+                }
             }
 
 	    int hrIndex = int(floor(p1->hr / hrDelta));
 	    if (hrIndex >= 0 && hrIndex < maxSize) {
-		if (hrIndex >= hrArray.size())
-		    hrArray.resize(hrIndex + 1);
-		hrArray[hrIndex]++;
+            if (hrIndex >= hrArray.size())
+               hrArray.resize(hrIndex + 1);
+            hrArray[hrIndex]++;
+
+            if (selected) {
+                if (hrIndex >= hrSelectedArray.size())
+                    hrSelectedArray.resize(hrIndex + 1);
+                hrSelectedArray[hrIndex]++;
+            }
 	    }
 
 	    int kphIndex = int(floor(p1->kph * speed_factor / kphDelta));
 	    if (kphIndex >= 0 && kphIndex < maxSize) {
-		if (kphIndex >= kphArray.size())
-		    kphArray.resize(kphIndex + 1);
-		kphArray[kphIndex]++;
+	        if (kphIndex >= kphArray.size())
+	            kphArray.resize(kphIndex + 1);
+	        kphArray[kphIndex]++;
+
+            if (selected) {
+                if (kphIndex >= kphSelectedArray.size())
+                    kphSelectedArray.resize(kphIndex + 1);
+                kphSelectedArray[kphIndex]++;
+            }
 	    }
 
 	    int cadIndex = int(floor(p1->cad / cadDelta));
 	    if (cadIndex >= 0 && cadIndex < maxSize) {
-		if (cadIndex >= cadArray.size())
-		    cadArray.resize(cadIndex + 1);
-		cadArray[cadIndex]++;
+		    if (cadIndex >= cadArray.size())
+		        cadArray.resize(cadIndex + 1);
+		    cadArray[cadIndex]++;
+
+            if (selected) {
+                if (cadIndex >= cadSelectedArray.size())
+                    cadSelectedArray.resize(cadIndex + 1);
+                cadSelectedArray[cadIndex]++;
+            }
 	    }
+
+
 	}
 
 	recalc();
@@ -602,7 +668,7 @@ PowerHist::fixSelection() {
 		else
 		    s = hr;
             }
-	
+
 	    else if (s == hr)
             {
 		if (ride->areDataPresent()->hr)
@@ -610,7 +676,7 @@ PowerHist::fixSelection() {
 		else
 		    s = kph;
             }
-	
+
 	    else if (s == kph)
             {
 		if (ride->areDataPresent()->kph)
@@ -618,7 +684,7 @@ PowerHist::fixSelection() {
 		else
 		    s = cad;
             }
-	
+
 	    else if (s == cad)
             {
 		if (ride->areDataPresent()->cad)
@@ -636,5 +702,19 @@ bool PowerHist::shadeZones() const
 	    rideItem &&
 	    rideItem->ride &&
 	    selected == wattsShaded
-	    ); 
-} 
+	    );
+}
+
+bool PowerHist::isSelected(const RideFilePoint *p) {
+    if (mainwindow!= NULL && mainwindow->allIntervalItems() != NULL) {
+        for (int i=0; i<mainwindow->allIntervalItems()->childCount(); i++) {
+            IntervalItem *current = (IntervalItem *)mainwindow->allIntervalItems()->child(i);
+            if (current != NULL) {
+                if (current->isSelected() && p->secs>=current->start && p->secs<=current->stop) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}

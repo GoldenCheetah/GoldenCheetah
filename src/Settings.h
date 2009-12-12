@@ -46,6 +46,8 @@
 #define GC_LTS_ACRONYM			"LTS"
 #define GC_SB_NAME			"SBname"
 #define GC_SB_ACRONYM			"SB"
+#define GC_WARNCONVERT      "warnconvert"
+#define GC_WARNEXIT      "warnexit"
 
 // device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended
 // to them to specify which configured device i.e. devices1 ... devicesn where

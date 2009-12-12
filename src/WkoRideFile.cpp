@@ -67,6 +67,7 @@
 // local holding varables shared between WkoParseHeaderData() and WkoParseRawData()
 static WKO_ULONG WKO_device;                   // Device ID used for this workout
 static char WKO_GRAPHS[32];              // GRAPHS available in this workout
+static QList<RideFileInterval *> references; // saved with data point references
 
 static int wkoFileReaderRegistered =
     RideFileFactory::instance().registerReader(
@@ -118,6 +119,29 @@ RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors) const
     // Parse raw data (which calls rideFile->appendPoint() with each sample
     if (rawdata) footerdata = WkoParseRawData(rawdata, rideFile, errors);
     else return NULL;
+
+    // Post process  the ride intervals to convert from point
+    // offsets to time in seconds
+    QVector<RideFilePoint*> datapoints = rideFile->dataPoints();
+    for (int i=0; i<references.count(); i++) {
+        RideFileInterval add;
+
+        // name is ok, but start stop need to be in time rather than datapoint no.
+        add.name = references.at(i)->name;
+
+        if (references.at(i)->start < datapoints.count())
+            add.start = datapoints.at(references.at(i)->start)->secs;
+        else
+            continue;   // out of bounds
+
+        if (references.at(i)->stop < datapoints.count())
+            add.stop = datapoints.at(references.at(i)->stop)->secs;
+        else
+            continue;   // out of bounds
+
+        rideFile->addInterval(add.start, add.stop, add.name);
+    }
+    references.clear();
 
     if (footerdata) return (RideFile *)rideFile;
     else return NULL;
@@ -620,8 +644,17 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, RideFile *rideFile, 
 
 
     /* Ranges */
+
+    // The ranges are stored as references to data points
+    // whilst the RideFileInterval structure uses start and stop
+    // in seconds. We cannot translate from one to the other at this
+    // point because the raw data has not been parsed yet.
+    // So intervals are created here with point references
+    // and they are post-processed after the call to
+    // WkoParseRawData in openRideFile above.
     p += doshort(p, &us); /* 237: Number of ranges XXVARIABLEXX */
     for (i=0; i<us; i++) {
+        RideFileInterval *add = new RideFileInterval();    // add new interval
 
         p += 12;
         //p += donumber(p, &ul);
@@ -629,15 +662,23 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, RideFile *rideFile, 
         //p += donumber(p, &ul);
 
         p += dotext(p, &txtbuf[0]);
+        add->name = reinterpret_cast<char *>(&txtbuf[0]);
         p += dotext(p, &txtbuf[0]);
 
-        p += 24;
+        p += donumber(p, &ul);
+        p += donumber(p, &ul);
+        add->start = ul;
+
+        p += donumber(p, &ul);
+        add->stop = ul;
+
+        p += 12;
         //p += donumber(p, &ul);
         //p += donumber(p, &ul);
         //p += donumber(p, &ul);
-        //p += donumber(p, &ul);
-        //p += donumber(p, &ul);
-        //p += donumber(p, &ul);
+
+        // add to intervals - referencing data point for interval
+        references.append(add);
     }
 
     /***************************************************
