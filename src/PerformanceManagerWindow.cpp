@@ -47,6 +47,12 @@ PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
     PMPickerLayout->addWidget(PMDayLabel);
     PMPickerLayout->addWidget(PMDayValue);
 
+    metricCombo = new QComboBox(this);
+    metricCombo->addItem(tr("Use BikeScore"), "skiba_bike_score");
+    metricCombo->addItem(tr("Use DanielsPoints"), "daniels_points");
+    metric = metricCombo->itemData(metricCombo->currentIndex()).toString();
+    PMPickerLayout->addWidget(metricCombo);
+
     // date range
     QHBoxLayout *dateRangeLayout = new QHBoxLayout;
     PMdateRangefrom = new QLineEdit("0");
@@ -85,7 +91,8 @@ PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
 
     connect(PMpicker, SIGNAL(moved(const QPoint &)),
            SLOT(PMpickerMoved(const QPoint &)));
-
+    connect(metricCombo, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(replot()));
 }
 
 PerformanceManagerWindow::~PerformanceManagerWindow()
@@ -128,8 +135,10 @@ void PerformanceManagerWindow::replot()
 
         QDateTime endTime = std::max(lastRideItem->dateTime, now.currentDateTime());
         newdays = firstRideItem->dateTime.daysTo(endTime);
+        QString newMetric = metricCombo->itemData(metricCombo->currentIndex()).toString();
 
-	if (newdays != days || allRides->childCount() != count ) {
+        if (newdays != days || allRides->childCount() != count || newMetric != metric) {
+
 	    // days in allRides changed, so recalculate stress
 	    //
 	    bool firstrun = false;
@@ -154,7 +163,7 @@ void PerformanceManagerWindow::replot()
 		    (settings->value(GC_STS_DAYS,7)).toInt(),
 		    (settings->value(GC_LTS_DAYS,42)).toInt());
 
-	    sc->calculateStress(this,home.absolutePath(),allRides);
+            sc->calculateStress(this,home.absolutePath(),allRides,newMetric);
 
 	    perfplot->setStressCalculator(sc);
 
@@ -190,7 +199,10 @@ void PerformanceManagerWindow::replot()
 
 		PMrightSlider->setValue(endIndex);
 	    }
+
+            perfplot->resize(PMleftSlider->value(),PMrightSlider->value());
 	    days = newdays;
+            metric = newMetric;
 	    count = allRides->childCount();
 	}
 	perfplot->plot();

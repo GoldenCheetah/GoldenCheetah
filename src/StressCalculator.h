@@ -51,7 +51,7 @@ class StressCalculator:public QObject {
 		int shortTermDays, int longTermDays);
 
 	void calculateStress(QWidget *mw, QString homePath,
-		const QTreeWidgetItem * rides);
+		const QTreeWidgetItem * rides, const QString &metric);
 
 	// x axes:
 	double *getSTSvalues() { return stsvalues.data(); }
