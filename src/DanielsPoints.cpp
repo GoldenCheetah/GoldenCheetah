@@ -96,7 +96,7 @@ class DanielsPoints : public RideMetric {
 };
 
 // Choose K such that 1 hour at FTP yields a score of 100.
-const double DanielsPoints::K = 33.0 / 3600.0;
+const double DanielsPoints::K = 100.0 / 3600.0;
 
 static bool added() {
     RideMetricFactory::instance().addMetric(DanielsPoints());
