@@ -27,12 +27,10 @@ class IntervalItem : public QTreeWidgetItem
 {
     public:
         const RideFile *ride;
-        QString name;
         double start, stop; // by Time
         double startKM, stopKM; // by Distance
 
         IntervalItem(const RideFile *, QString, double, double, double, double);
-        void takeText();
 };
 #endif // _GC_IntervalItem_h
 

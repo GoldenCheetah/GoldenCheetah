@@ -399,7 +399,7 @@ AllPlotWindow::setEndSelection(double xValue, bool newInterval, QString name)
             // are we adjusting an existing interval? - if so delete it and readd it
             if (count > 0) {
                 IntervalItem *bottom = (IntervalItem *) allIntervals->child(count-1);
-                if (bottom->name == name) delete allIntervals->takeChild(count-1);
+                if (bottom->text(0) == name) delete allIntervals->takeChild(count-1);
             }
 
             QTreeWidgetItem *last = new IntervalItem(ride->ride, name, duration1, duration2, distance1, distance2);
