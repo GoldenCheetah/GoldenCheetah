@@ -999,7 +999,7 @@ MainWindow::resizeEvent(QResizeEvent*)
 void 
 MainWindow::showOptions()
 {
-    ConfigDialog *cd = new ConfigDialog(home, zones_);
+    ConfigDialog *cd = new ConfigDialog(home, zones_, this);
     cd->exec();
     zonesChanged();
 }
