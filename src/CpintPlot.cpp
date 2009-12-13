@@ -488,7 +488,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
         int n_zones = zones->lowsFromCP(&power_zone, (int) int(cp));
         int high = n_values - 1;
         int zone = 0;
-        while (zone < n_zones) {
+        while (zone < n_zones && high > 0) {
             int low = high - 1;
             int nextZone = zone + 1;
             if (nextZone >= power_zone.size())
