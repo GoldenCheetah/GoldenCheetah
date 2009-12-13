@@ -324,7 +324,7 @@ AllPlotWindow::setEndSelection(double xValue, bool newInterval, QString name)
 
         RideFile tmpRide = RideFile();
 
-        QTreeWidgetItem *which = mainwindow->rideItem();
+        QTreeWidgetItem *which = mainWindow->rideItem();
         RideItem *ride = (RideItem*)which;
 
         double distance1 = -1;
@@ -393,7 +393,7 @@ AllPlotWindow::setEndSelection(double xValue, bool newInterval, QString name)
 
         if (newInterval) {
 
-            QTreeWidgetItem *allIntervals = (QTreeWidgetItem *)mainwindow->allIntervalItems();
+            QTreeWidgetItem *allIntervals = mainWindow->mutableIntervalItems();
             int count = allIntervals->childCount();
 
             // are we adjusting an existing interval? - if so delete it and readd it
@@ -406,7 +406,7 @@ AllPlotWindow::setEndSelection(double xValue, bool newInterval, QString name)
             allIntervals->addChild(last);
 
             // now update the RideFileIntervals and all the plots etc
-            mainwindow->updateRideFileIntervals();
+            mainWindow->updateRideFileIntervals();
         }
     }
 }
