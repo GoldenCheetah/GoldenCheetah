@@ -29,7 +29,6 @@
 #include <QTextStream>
 #include <QRegExp>
 #include "Zones.h"      // For zones ... see below vvvv
-#include "MainWindow.h" // gets access to mainwindow to read zones info
 
 // which section of the file are we in?
 #define NOMANSLAND  0
@@ -61,7 +60,7 @@ class ErgFileLap
 class ErgFile
 {
     public:
-        ErgFile(QString, int&);       // constructor uses filename
+        ErgFile(QString, int&, double Cp);       // constructor uses filename
         ~ErgFile();             // delete the contents
 
         bool isValid();         // is the file valid or not?
