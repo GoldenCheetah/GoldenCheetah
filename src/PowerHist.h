@@ -25,6 +25,7 @@
 
 class QwtPlotCurve;
 class QwtPlotGrid;
+class MainWindow;
 class RideItem;
 class RideFilePoint;
 class PowerHistBackground;
@@ -40,7 +41,7 @@ class PowerHist : public QwtPlot
         QwtPlotCurve *curve, *curveSelected;
 	QList <PowerHistZoneLabel *> zoneLabels;
 
-        PowerHist();
+        PowerHist(MainWindow *mainWindow);
 	~PowerHist();
 
         int binWidth() const { return binw; }
@@ -80,6 +81,7 @@ class PowerHist : public QwtPlot
 
     protected:
 
+        MainWindow *mainWindow;
         QwtPlotGrid *grid;
 
         // storage for data counts

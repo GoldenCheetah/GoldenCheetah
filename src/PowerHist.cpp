@@ -197,9 +197,10 @@ public:
     }
 };
 
-PowerHist::PowerHist():
+PowerHist::PowerHist(MainWindow *mainWindow):
     selected(wattsShaded),
     rideItem(NULL),
+    mainWindow(mainWindow),
     binw(20),
     withz(true),
     settings(NULL),
@@ -706,9 +707,9 @@ bool PowerHist::shadeZones() const
 }
 
 bool PowerHist::isSelected(const RideFilePoint *p) {
-    if (mainwindow!= NULL && mainwindow->allIntervalItems() != NULL) {
-        for (int i=0; i<mainwindow->allIntervalItems()->childCount(); i++) {
-            IntervalItem *current = (IntervalItem *)mainwindow->allIntervalItems()->child(i);
+    if (mainWindow->allIntervalItems() != NULL) {
+        for (int i=0; i<mainWindow->allIntervalItems()->childCount(); i++) {
+            IntervalItem *current = dynamic_cast<IntervalItem*>(mainWindow->allIntervalItems()->child(i));
             if (current != NULL) {
                 if (current->isSelected() && p->secs>=current->start && p->secs<=current->stop) {
                     return true;
