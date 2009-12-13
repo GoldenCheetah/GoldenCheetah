@@ -19,11 +19,10 @@
 #include "ErgFile.h"
 
 
-ErgFile::ErgFile(QString filename, int &mode)
+ErgFile::ErgFile(QString filename, int &mode, double Cp)
 {
     QFile ergFile(filename);
     int section = NOMANSLAND;            // section 0=init, 1=header data, 2=course data
-    double Cp=285;                       // default to 285 if zones are not set
     leftPoint=rightPoint=0;
     MaxWatts = Ftp = 0;
     int lapcounter = 0;
@@ -32,11 +31,6 @@ ErgFile::ErgFile(QString filename, int &mode)
     // running totals for CRS file format
     long rdist = 0; // running total for distance
     long ralt = 200; // always start at 200 meters just to prettify the graph
-
-    // Get users CP for relative watts calculations
-    QDate today = QDate::currentDate();
-    int range = mainwindow->zones()->whichRange(today);
-    if (range != -1) Cp = mainwindow->zones()->getCP(range);
 
     // open the file
     if (ergFile.open(QIODevice::ReadOnly | QIODevice::Text) == false) {

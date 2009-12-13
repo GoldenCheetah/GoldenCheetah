@@ -716,7 +716,13 @@ RealtimeWindow::SelectWorkout(int index)
             tr("Open Workout File"), home.dirName(), tr("Workout Files (*.erg *.mrc *.crs)"));
 
         if (!filename.isEmpty()) {
-            ergFile = new ErgFile(filename, mode);
+            // Get users CP for relative watts calculations
+            QDate today = QDate::currentDate();
+            double Cp=285;                       // default to 285 if zones are not set
+            int range = main->zones()->whichRange(today);
+            if (range != -1) Cp = main->zones()->getCP(range);
+
+            ergFile = new ErgFile(filename, mode, Cp);
             if (ergFile->isValid()) {
 
                 // success! we have a load file
