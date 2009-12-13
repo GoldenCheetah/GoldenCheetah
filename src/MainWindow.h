@@ -169,7 +169,5 @@ class MainWindow : public QMainWindow
     QuarqdClient *client;
 };
 
-extern MainWindow *mainwindow;  // so ConfigDialog can update widgets when config changes
-
 #endif // _GC_MainWindow_h
 
