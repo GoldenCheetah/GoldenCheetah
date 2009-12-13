@@ -109,7 +109,6 @@ clearResultsTable(QTableWidget *resultsTable)
         for (int j=0; j<resultsTable->columnCount(); j++)
             delete resultsTable->takeItem(i,j);
     }
-    return;
 }
 
 void 
@@ -295,5 +294,4 @@ BestIntervalDialog::addClicked()
         }
     }
     mainWindow->updateRideFileIntervals();
-    return;
 }
