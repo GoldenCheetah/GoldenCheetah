@@ -171,7 +171,7 @@ class AllPlotZoneLabel: public QwtPlotItem
 static inline double
 max(double a, double b) { if (a > b) return a; else return b; }
 
-AllPlot::AllPlot(QWidget *parent):
+AllPlot::AllPlot(QWidget *parent, MainWindow *mainWindow):
     QwtPlot(parent),
     settings(NULL),
     unit(0),
@@ -188,7 +188,7 @@ AllPlot::AllPlot(QWidget *parent):
     bg = new AllPlotBackground(this);
     bg->attach(this);
 
-    intervalPlotData = new IntervalPlotData(this);
+    intervalPlotData = new IntervalPlotData(this, mainWindow);
 
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setCanvasBackground(Qt::white);
@@ -655,10 +655,10 @@ AllPlot::setByDistance(int id)
 // note this is operating on the children of allIntervals and not the
 // intervalWidget (QTreeWidget) -- this is why we do not use the
 // selectedItems() member. N starts a one not zero.
-static IntervalItem *intervalNum(int n)
+IntervalItem *IntervalPlotData::intervalNum(int n) const
 {
     int highlighted=0;
-    const QTreeWidgetItem *allIntervals = mainwindow->allIntervalItems();
+    const QTreeWidgetItem *allIntervals = mainWindow->allIntervalItems();
     for (int i=0; i<allIntervals->childCount(); i++) {
         IntervalItem *current = (IntervalItem *)allIntervals->child(i);
 
@@ -673,13 +673,13 @@ static IntervalItem *intervalNum(int n)
 }
 
 // how many intervals selected?
-static int intervalCount()
+int IntervalPlotData::intervalCount() const
 {
     int highlighted;
     highlighted = 0;
-    if (mainwindow == NULL || mainwindow->allIntervalItems() == NULL) return 0; // not inited yet!
+    if (mainWindow->allIntervalItems() == NULL) return 0; // not inited yet!
 
-    const QTreeWidgetItem *allIntervals = mainwindow->allIntervalItems();
+    const QTreeWidgetItem *allIntervals = mainWindow->allIntervalItems();
     for (int i=0; i<allIntervals->childCount(); i++) {
         IntervalItem *current = (IntervalItem *)allIntervals->child(i);
         if (current != NULL) {
@@ -699,7 +699,7 @@ static int intervalCount()
  */
 
 // The interval curve data is derived from the intervals that have
-// been selected in the mainwindow leftlayout for each selected
+// been selected in the MainWindow leftlayout for each selected
 // interval we return 4 data points; bottomleft, topleft, topright
 // and bottom right.
 //
@@ -746,4 +746,6 @@ double IntervalPlotData::y(size_t i) const
 
 
 size_t IntervalPlotData::size() const { return intervalCount()*4; }
-QwtData *IntervalPlotData::copy() const { return new IntervalPlotData(allPlot); }
+QwtData *IntervalPlotData::copy() const {
+    return new IntervalPlotData(allPlot, mainWindow);
+}

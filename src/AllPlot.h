@@ -31,17 +31,23 @@ class AllPlotBackground;
 class AllPlotZoneLabel;
 class AllPlotWindow;
 class AllPlot;
+class IntervalItem;
+class MainWindow;
 
 class IntervalPlotData : public QwtData
 {
     public:
-    IntervalPlotData(AllPlot *p) { allPlot=p; }
+    IntervalPlotData(AllPlot *allPlot, MainWindow *mainWindow) :
+        allPlot(allPlot), mainWindow(mainWindow) {}
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
     virtual QwtData *copy() const ;
     void init() ;
+    IntervalItem *intervalNum(int n) const;
+    int intervalCount() const;
     AllPlot *allPlot;
+    MainWindow *mainWindow;
 };
 
 class AllPlot : public QwtPlot
@@ -50,7 +56,7 @@ class AllPlot : public QwtPlot
 
     public:
 
-        AllPlot(QWidget *parent);
+        AllPlot(QWidget *parent, MainWindow *mainWindow);
 
         int smoothing() const { return smooth; }
 
