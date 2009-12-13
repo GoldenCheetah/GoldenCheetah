@@ -52,7 +52,7 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow) :
     histParameterCombo = new QComboBox();
     binWidthLayout->addWidget(histParameterCombo);
 
-    powerHist = new PowerHist();
+    powerHist = new PowerHist(mainWindow);
     setHistTextValidator();
 
     lnYHistCheckBox->setChecked(powerHist->islnY());
