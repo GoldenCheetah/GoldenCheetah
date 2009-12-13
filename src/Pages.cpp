@@ -7,22 +7,6 @@
 #include "DeviceConfiguration.h"
 #include "ANTplusController.h"
 
-ConfigurationPage::~ConfigurationPage()
-{
-    delete configGroup;
-    delete langLabel;
-    delete langCombo;
-    delete unitLabel;
-    delete unitCombo;
-    delete allRidesAscending;
-    delete warningLabel;
-    delete langLayout;
-    delete unitLayout;
-    delete warningLayout;
-    delete configLayout;
-    delete mainLayout;
-}
-
 ConfigurationPage::ConfigurationPage()
 {
     configGroup = new QGroupBox(tr("Golden Cheetah Configuration"));
@@ -167,36 +151,6 @@ ConfigurationPage::ConfigurationPage()
     mainLayout->addWidget(configGroup);
     mainLayout->addStretch(1);
     setLayout(mainLayout);
-}
-
-
-CyclistPage::~CyclistPage()
-{
-    delete cyclistGroup;
-    delete lblThreshold;
-    delete txtThreshold;
-    delete txtThresholdValidator;
-    delete btnBack;
-    delete btnForward;
-    delete btnDelete;
-    delete checkboxNew;
-    delete txtStartDate;
-    delete txtEndDate;
-    delete lblStartDate;
-    delete lblEndDate;
-    delete calendar;
-    delete lblCurRange;
-    delete powerLayout;
-    delete rangeLayout;
-    delete perfManLTSavgLayout;
-    delete perfManSTSavgLayout;
-    delete perfManStartValLayout;
-    delete perfManLayout;
-    delete dateRangeLayout;
-    delete zoneLayout;
-    delete calendarLayout;
-    delete cyclistLayout;
-    delete mainLayout;
 }
 
 CyclistPage::CyclistPage(const Zones *_zones):
@@ -606,10 +560,6 @@ DevicePage::pairClicked(DeviceConfiguration *dc, QProgressDialog *progress)
     ANTplusController ANTplus(0, dc);
     ANTplus.discover(dc, progress);
     deviceProfile->setText(dc->deviceProfile);
-}
-
-DevicePage::~DevicePage()
-{
 }
 
 deviceModel::deviceModel(QObject *parent) : QAbstractTableModel(parent)

@@ -29,7 +29,6 @@ class ConfigurationPage : public QWidget
 {
     Q_OBJECT
     public:
-        ~ConfigurationPage();
         ConfigurationPage();
         QComboBox *langCombo;
         QComboBox *unitCombo;
@@ -57,7 +56,6 @@ class CyclistPage : public QWidget
 {
     Q_OBJECT
     public:
-        ~CyclistPage();
         CyclistPage(const Zones *_zones);
         int thresholdPower;
         QString getText();
@@ -150,7 +148,6 @@ class DevicePage : public QWidget
 {
     Q_OBJECT
     public:
-        ~DevicePage();
         DevicePage(QWidget *parent = 0);
         void setConfigPane();
         void pairClicked(DeviceConfiguration *, QProgressDialog *);

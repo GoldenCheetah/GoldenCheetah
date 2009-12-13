@@ -26,6 +26,7 @@
 ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
     mainWindow(mainWindow), zones(_zones)
 {
+    setAttribute(Qt::WA_DeleteOnClose);
 
     home = _home;
 
@@ -87,20 +88,6 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
 
     setWindowTitle(tr("Config Dialog"));
 }
-
-ConfigDialog::~ConfigDialog()
-{
-    delete cyclistPage;
-    delete contentsWidget;
-    delete configPage;
-    delete devicePage;
-    delete pagesWidget;
-    delete closeButton;
-    delete horizontalLayout;
-    delete buttonsLayout;
-    delete mainLayout;
-}
-
 
 void ConfigDialog::createIcons()
 {
