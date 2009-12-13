@@ -28,7 +28,7 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
     QVBoxLayout *vlayout = new QVBoxLayout;
     QHBoxLayout *qaLayout = new QHBoxLayout;
 
-    pfPvPlot = new PfPvPlot();
+    pfPvPlot = new PfPvPlot(mainWindow);
     QLabel *qaCPLabel = new QLabel(tr("Watts:"), this);
     qaCPValue = new QLineEdit(QString("%1").arg(pfPvPlot->getCP()));
     qaCPValue->setValidator(new QIntValidator(0, 9999, qaCPValue));
