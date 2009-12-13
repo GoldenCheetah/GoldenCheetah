@@ -159,6 +159,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                      km		 = line.section(',', 3, 3).toDouble();
                      cad	 = line.section(',', 4, 4).toDouble();
                      hr		 = line.section(',', 5, 5).toDouble();
+                     alt	 = line.section(',', 6, 6).toDouble();
                      interval	= NULL; //not provided?
                     if (!metric) {
                         km *= KM_PER_MILE;
