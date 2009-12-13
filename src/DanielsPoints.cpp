@@ -51,7 +51,7 @@ class DanielsPoints : public RideMetric {
         if (ride->deviceType() == QString("Manual CSV")) {
             // Manual entry: use BS from dataPoints with a scaling factor
             // that works about right for long, steady rides.
-            double scaling_factor = 11.0 / 58.0;
+            double scaling_factor = 0.55;
             score = ride->dataPoints().first()->bs * scaling_factor;
             return;
         }
