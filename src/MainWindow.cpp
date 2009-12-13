@@ -790,12 +790,6 @@ MainWindow::updateRideFileIntervals()
     // emit signal for interval data changed
     intervalsChanged();
 
-    // regenerate the summary details
-    //rideSummary->clear();
-    //which->clearSummary();  // clear cached value
-    //rideSummary->setHtml(which->htmlSummary());
-    //rideSummary->setAlignment(Qt::AlignCenter);
-
     // set dirty
     which->setDirty(true);
 }

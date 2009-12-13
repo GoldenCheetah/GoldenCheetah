@@ -151,12 +151,6 @@ MainWindow::saveSilent(RideItem *rideItem)
 
         // rename in memory
         rideItem->setFileName(QFileInfo(savedFile).path(), QFileInfo(savedFile).fileName());
-
-        // refresh summary to show new file type
-        //rideSummary->clear();
-        //rideItem->clearSummary();  // clear cached value
-        //rideSummary->setHtml(rideItem->htmlSummary());
-        //rideSummary->setAlignment(Qt::AlignCenter);
     }
 
     // mark clean as we have now saved the data
