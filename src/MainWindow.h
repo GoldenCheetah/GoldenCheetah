@@ -118,7 +118,7 @@ class MainWindow : public QMainWindow
         void deleteInterval();
         void renameInterval();
         void zoomInterval();
-        void itemChanged(QTreeWidgetItem *, int);
+        void intervalEdited(QTreeWidgetItem *, int);
 
     protected: 
 

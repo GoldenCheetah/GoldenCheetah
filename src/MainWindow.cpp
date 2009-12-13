@@ -294,6 +294,8 @@ MainWindow::MainWindow(const QDir &home) :
             this, SLOT(showContextMenuPopup(const QPoint &)));
     connect(intervalWidget,SIGNAL(itemSelectionChanged()),
             this, SLOT(intervalTreeWidgetSelectionChanged()));
+    connect(intervalWidget,SIGNAL(itemChanged(QTreeWidgetItem *,int)),
+            this, SLOT(intervalEdited(QTreeWidgetItem*, int)));
 
 
     /////////////////////////////// Menus ///////////////////////////////
@@ -714,15 +716,9 @@ MainWindow::rideTreeWidgetSelectionChanged()
 
     // refresh interval list for bottom left
     // first lets wipe away the existing intervals
-    // we need to disconnect this signal since it gets called as the
-    // widget is destroyed causing us to reference data that has just been
-    // deleted (takeText will SEGV under certain conditions)
-    disconnect(intervalWidget, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
-               this, SLOT(itemChanged(QTreeWidgetItem *, int)));
-    intervalWidget->clear();
-    allIntervals = new QTreeWidgetItem(intervalWidget, FOLDER_TYPE);
-    allIntervals->setText(0, tr("Intervals"));
-    intervalWidget->expandItem(allIntervals);
+    QList<QTreeWidgetItem *> intervals = allIntervals->takeChildren();
+    for (int i=0; i<intervals.count(); i++) delete intervals.at(i);
+
     // now add the intervals for the current ride
     if (ride) { // only if we have a ride pointer
         RideFile *selected = ride->ride;
@@ -788,7 +784,7 @@ MainWindow::updateRideFileIntervals()
     for (int i=0; i < allIntervals->childCount(); i++) {
         // add the intervals as updated
         IntervalItem *it = (IntervalItem *)allIntervals->child(i);
-        current->addInterval(it->start, it->stop, it->name);
+        current->addInterval(it->start, it->stop, it->text(0));
     }
 
     // emit signal for interval data changed
@@ -808,40 +804,26 @@ void
 MainWindow::deleteInterval() {
     int index = allIntervals->indexOfChild(activeInterval);
     delete allIntervals->takeChild(index);
-
-    // now update the ride file to reflect this
-    updateRideFileIntervals();
+    updateRideFileIntervals(); // will emit intervalChanged() signal
 }
 
 void
 MainWindow::renameInterval() {
+    // go edit the name
     activeInterval->setFlags(activeInterval->flags() | Qt::ItemIsEditable);
     intervalWidget->editItem(activeInterval, 0);
-    connect(intervalWidget, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
-            this, SLOT(itemChanged(QTreeWidgetItem *, int)));
+}
+
+void
+MainWindow::intervalEdited(QTreeWidgetItem *, int) {
+    // the user renamed the interval
+    updateRideFileIntervals(); // will emit intervalChanged() signal
 }
 
 void
 MainWindow::zoomInterval() {
     // zoom into this interval on allPlot
     allPlotWindow->zoomInterval(activeInterval);
-}
-
-void
-MainWindow::itemChanged(QTreeWidgetItem *item, int) // int col not used since only 1 column!
-{
-    // only for the rename action!
-    disconnect(intervalWidget, SIGNAL(itemChanged(QTreeWidgetItem *, int)),
-               this, SLOT(itemChanged(QTreeWidgetItem *, int)));
-
-    if (item != NULL) {
-
-        IntervalItem *citem = (IntervalItem*)item;
-        citem->takeText(); // take the text just set in the gui
-
-        // now update the ride file to reflect this
-        updateRideFileIntervals();
-    }
 }
 
 void
