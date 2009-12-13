@@ -231,7 +231,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     /////////////////////////// Ride Plot Tab ///////////////////////////
     allPlotWindow = new AllPlotWindow(this);
-    tabWidget->addTab(allPlotWindow, "Ride Plot");
+    tabWidget->addTab(allPlotWindow, tr("Ride Plot"));
     splitter->addWidget(tabWidget);
     splitter->setCollapsible(1, true);
 
@@ -248,7 +248,7 @@ MainWindow::MainWindow(const QDir &home) :
     ////////////////////// Critical Power Plot Tab //////////////////////
 
     criticalPowerWindow = new CriticalPowerWindow(home, this);
-    tabWidget->addTab(criticalPowerWindow, "Critical Power Plot");
+    tabWidget->addTab(criticalPowerWindow, tr("Critical Power Plot"));
 
     //////////////////////// Power Histogram Tab ////////////////////////
 

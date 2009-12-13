@@ -51,8 +51,8 @@ QSqlDatabase DBAccess::initDatabase(QDir home)
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(home.absolutePath() + "/metricDB");
     if (!db.open()) {
-        QMessageBox::critical(0, qApp->tr("Cannot open database"),
-                              qApp->tr("Unable to establish a database connection.\n"
+        QMessageBox::critical(0, qApp->translate("DBAccess","Cannot open database"),
+                       qApp->translate("DBAccess","Unable to establish a database connection.\n"
                                        "This example needs SQLite support. Please read "
                                        "the Qt SQL driver documentation for information how "
                                        "to build it.\n\n"

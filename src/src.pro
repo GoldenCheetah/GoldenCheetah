@@ -194,3 +194,5 @@ SOURCES += \
 
 RESOURCES = application.qrc
 
+TRANSLATIONS = translations/gc_fr.ts
+

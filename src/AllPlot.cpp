@@ -195,30 +195,30 @@ AllPlot::AllPlot(QWidget *parent, MainWindow *mainWindow):
 
     setXTitle();
 
-    wattsCurve = new QwtPlotCurve("Power");
+    wattsCurve = new QwtPlotCurve(tr("Power"));
     QPen wattsPen = QPen(Qt::red);
     wattsPen.setWidth(2);
     wattsCurve->setPen(wattsPen);
 
-    hrCurve = new QwtPlotCurve("Heart Rate");
+    hrCurve = new QwtPlotCurve(tr("Heart Rate"));
     QPen hrPen = QPen(Qt::blue);
     hrPen.setWidth(2);
     hrCurve->setPen(hrPen);
     hrCurve->setYAxis(yLeft2);
 
-    speedCurve = new QwtPlotCurve("Speed");
+    speedCurve = new QwtPlotCurve(tr("Speed"));
     QPen speedPen = QPen(QColor(0, 204, 0));
     speedPen.setWidth(2);
     speedCurve->setPen(speedPen);
     speedCurve->setYAxis(yRight);
 
-    cadCurve = new QwtPlotCurve("Cadence");
+    cadCurve = new QwtPlotCurve(tr("Cadence"));
     QPen cadPen = QPen(QColor(0, 204, 204));
     cadPen.setWidth(2);
     cadCurve->setPen(cadPen);
     cadCurve->setYAxis(yLeft2);
 
-    altCurve = new QwtPlotCurve("Altitude");
+    altCurve = new QwtPlotCurve(tr("Altitude"));
     // altCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     QPen altPen(QColor(124, 91, 31));
     altPen.setWidth(1);
