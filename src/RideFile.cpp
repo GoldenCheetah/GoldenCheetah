@@ -72,6 +72,21 @@ RideFile::intervalBegin(const RideFileInterval &interval) const
     return i - dataPoints_.begin();
 }
 
+double
+RideFile::timeToDistance(double secs) const
+{
+    RideFilePoint p;
+    p.secs = secs;
+
+    // Check we have some data and the secs is in bounds
+    if (dataPoints_.isEmpty()) return 0;
+    if (secs < dataPoints_.first()->secs) return dataPoints_.first()->km;
+    if (secs > dataPoints_.last()->secs) return dataPoints_.last()->km;
+
+    QVector<RideFilePoint*>::const_iterator i = std::lower_bound(dataPoints_.begin(), dataPoints_.end(), &p, ComparePoints());
+    return (*i)->km;
+}
+
 void RideFile::writeAsCsv(QFile &file, bool bIsMetric) const
 {
 
@@ -198,50 +213,4 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     dataPresent.watts |= (watts != 0);
     dataPresent.alt   |= (alt != 0);
     dataPresent.interval |= (interval != 0);
-}
-
-double
-RideFile::distanceToTime(double km) const
-{
-    // inefficient but robust - iterate over points until
-    // you have gone past the km desired.
-    // rounded to the nearest data point - no smoothing
-    for (int i=0; i<dataPoints_.count(); i++) {
-        if (dataPoints_.at(i)->km >= km) return dataPoints_.at(i)->secs;
-    }
-    return 0;
-}
-
-double
-RideFile::timeToDistance(double secs) const
-{
-    // inefficient but robust - iterate over points until
-    // you have gone past the km desired.
-    // rounded to the nearest data point - no smoothing
-    RideFilePoint *midp, *leftp, *rightp;
-
-    if (dataPoints_.count() == 0) return 0;
-
-    int left =0;
-    int right=dataPoints_.count()-1;
-    int middle;
-    while (right-left > 1) {
-        middle = left + ((right - left ) / 2);
-
-        midp = dataPoints_.at(middle);
-        leftp = dataPoints_.at(left);
-        rightp = dataPoints_.at(right);
-
-        if (leftp->secs >= secs) return leftp->km;
-        if (rightp->secs <= secs) return rightp->km;
-        if (midp->secs == secs) return midp->km;
-
-        if (midp->secs > secs) right = middle;
-        else if (midp->secs < secs) left = middle;
-    }
-
-    // just in case it is between points
-    double leftdelta = secs - leftp->secs;
-    double rightdelta = rightp->secs - secs;
-    return (leftdelta > rightdelta) ? rightp->km : leftp->km;
 }
