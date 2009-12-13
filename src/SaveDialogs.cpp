@@ -78,8 +78,8 @@ MainWindow::saveRideSingleDialog(RideItem *rideItem)
 
     // either prompt etc, or just save that file away!
     if (currentType != "GC" && warnOnConvert() == true) {
-        SaveSingleDialogWidget *dialog = new SaveSingleDialogWidget(this, rideItem);
-        dialog->exec();
+        SaveSingleDialogWidget dialog(this, rideItem);
+        dialog.exec();
         return true;
     } else {
         // go for it, the user doesn't want warnings!
@@ -106,8 +106,8 @@ MainWindow::saveRideExitDialog()
 
     // we have some files to save...
     if (dirtyList.count() > 0) {
-        SaveOnExitDialogWidget *dialog = new SaveOnExitDialogWidget(this, dirtyList);
-        int result = dialog->exec();
+        SaveOnExitDialogWidget dialog(this, dirtyList);
+        int result = dialog.exec();
         if (result == QDialog::Rejected) return false; // cancel that closeEvent!
     }
 
@@ -166,10 +166,9 @@ MainWindow::saveSilent(RideItem *rideItem)
 //----------------------------------------------------------------------
 // Save Single File Dialog Widget
 //----------------------------------------------------------------------
-SaveSingleDialogWidget::SaveSingleDialogWidget(QWidget *parent, RideItem *rideItem) : QDialog(parent, Qt::Dialog)
+SaveSingleDialogWidget::SaveSingleDialogWidget(MainWindow *mainWindow, RideItem *rideItem) :
+    QDialog(mainWindow, Qt::Dialog), mainWindow(mainWindow), rideItem(rideItem)
 {
-    this->rideItem = rideItem;
-    setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("Save and Conversion");
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
@@ -202,7 +201,7 @@ SaveSingleDialogWidget::SaveSingleDialogWidget(QWidget *parent, RideItem *rideIt
 void
 SaveSingleDialogWidget::saveClicked()
 {
-    mainwindow->saveSilent(rideItem);
+    mainWindow->saveSilent(rideItem);
     accept();
 }
 
@@ -229,10 +228,9 @@ SaveSingleDialogWidget::warnSettingClicked()
 // Save on Exit File Dialog Widget
 //----------------------------------------------------------------------
 
-SaveOnExitDialogWidget::SaveOnExitDialogWidget(QWidget *parent, QList<RideItem *>dirtyList) : QDialog(parent, Qt::Dialog)
+SaveOnExitDialogWidget::SaveOnExitDialogWidget(MainWindow *mainWindow, QList<RideItem *>dirtyList) :
+    QDialog(mainWindow, Qt::Dialog), mainWindow(mainWindow), dirtyList(dirtyList)
 {
-    this->dirtyList = dirtyList;
-    setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("Save Changes");
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
@@ -296,7 +294,7 @@ SaveOnExitDialogWidget::saveClicked()
     for (int i=0; i<dirtyList.count(); i++) {
         QCheckBox *c = (QCheckBox *)dirtyFiles->cellWidget(i,0);
         if (c->isChecked()) {
-            mainwindow->saveRideSingleDialog(dirtyList.at(i));
+            mainWindow->saveRideSingleDialog(dirtyList.at(i));
         }
     }
     accept();
