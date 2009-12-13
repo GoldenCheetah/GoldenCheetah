@@ -93,6 +93,8 @@ MainWindow::MainWindow(const QDir &home) :
     zones_(new Zones), currentNotesChanged(false),
     ride(NULL)
 {
+    setAttribute(Qt::WA_DeleteOnClose);
+
     settings = GetApplicationSettings();
       
     QVariant unit = settings->value(GC_UNIT);
