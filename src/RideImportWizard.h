@@ -63,7 +63,7 @@ private:
     QComboBox *todayButton;    // set date to today when asking for dates
     QCheckBox *overFiles;      // chance to set overwrite when asking for dates
     bool overwriteFiles; // flag to overwrite files from checkbox
-    MainWindow *mainwindow; // caller
+    MainWindow *mainWindow; // caller
 };
 
 // Item Delegate for Editing Date and Time of Ride inside the

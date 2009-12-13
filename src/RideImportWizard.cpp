@@ -110,7 +110,7 @@ RideImportWizard::init(QList<QString> files, QDir &home, MainWindow *main)
 
     // save target dir
     this->home = home;
-    mainwindow = main;
+    mainWindow = main;
 
     // Fill in the filenames and all the textItems
     for (int i=0; i < files.count(); i++) {
@@ -649,7 +649,6 @@ RideImportWizard::abortClicked()
                     if (temp.rename(fulltarget)) {
                         tableWidget->item(i,5)->setText(tr("File Overwritten"));
                         //no need to add since its already there!
-                        //mainwindow->addRide(QFileInfo(fulltarget).fileName(), true); // add to tree view
                     } else
                         tableWidget->item(i,5)->setText(tr("Error - overwrite failed"));
                 } else {
@@ -663,7 +662,7 @@ RideImportWizard::abortClicked()
                 QFile source(filenames[i]);
                 if (source.copy(fulltarget)) {
                     tableWidget->item(i,5)->setText(tr("File Saved"));
-                    mainwindow->addRide(QFileInfo(fulltarget).fileName(), true); // add to tree view
+                    mainWindow->addRide(QFileInfo(fulltarget).fileName(), true); // add to tree view
                 } else
                     tableWidget->item(i,5)->setText(tr("Error - copy failed"));
         }
