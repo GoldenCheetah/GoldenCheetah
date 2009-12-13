@@ -149,7 +149,7 @@ MainWindow::MainWindow(const QDir &home) :
     allRides->setText(0, tr("All Rides"));
     treeWidget->expandItem(allRides);
 
-    intervalWidget = new QTreeWidget;
+    intervalWidget = new QTreeWidget(this);
     intervalWidget->setColumnCount(1);
     intervalWidget->setIndentation(5);
     intervalWidget->setSortingEnabled(false);
