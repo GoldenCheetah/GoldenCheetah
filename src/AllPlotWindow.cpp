@@ -88,7 +88,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
                                                    smoothSlider->maximum(),
                                                    smoothLineEdit));
     smoothLayout->addWidget(smoothSlider);
-    allPlot = new AllPlot(this);
+    allPlot = new AllPlot(this, mainWindow);
     smoothSlider->setValue(allPlot->smoothing());
     smoothLineEdit->setText(QString("%1").arg(allPlot->smoothing()));
 
