@@ -30,8 +30,7 @@ class SaveSingleDialogWidget : public QDialog
     Q_OBJECT
 
     public:
-        SaveSingleDialogWidget(QWidget *, RideItem *);
-//        QWidget *parent;
+        SaveSingleDialogWidget(MainWindow *, RideItem *);
 
     public slots:
         void saveClicked();
@@ -41,6 +40,7 @@ class SaveSingleDialogWidget : public QDialog
 
     private:
 
+        MainWindow *mainWindow;
         RideItem   *rideItem;
         QPushButton *saveButton, *abandonButton, *cancelButton;
         QCheckBox *warnCheckBox;
@@ -52,7 +52,7 @@ class SaveOnExitDialogWidget : public QDialog
     Q_OBJECT
 
     public:
-        SaveOnExitDialogWidget(QWidget *, QList<RideItem*>);
+        SaveOnExitDialogWidget(MainWindow *, QList<RideItem*>);
 
     public slots:
         void saveClicked();
@@ -61,6 +61,7 @@ class SaveOnExitDialogWidget : public QDialog
         void warnSettingClicked();
 
     private:
+        MainWindow *mainWindow;
         QList<RideItem *>dirtyList;
         QPushButton *saveButton, *abandonButton, *cancelButton;
         QCheckBox *exitWarnCheckBox;
