@@ -9,13 +9,14 @@
 class QListWidget;
 class QListWidgetItem;
 class QStackedWidget;
+class MainWindow;
 class Zones;
 
 class ConfigDialog : public QDialog
 {
     Q_OBJECT
     public:
-        ConfigDialog(QDir home, Zones *zones);
+        ConfigDialog(QDir home, Zones *zones, MainWindow *mainWindow);
         ~ConfigDialog();
 
     public slots:
@@ -38,6 +39,7 @@ class ConfigDialog : public QDialog
 	void createNewRange();
 	void moveCalendarToCurrentRange();
 
+        MainWindow *mainWindow;
         ConfigurationPage *configPage;
         CyclistPage *cyclistPage;
         DevicePage *devicePage;

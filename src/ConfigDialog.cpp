@@ -23,7 +23,8 @@
  *    deletes currently selected zone
  */
 
-ConfigDialog::ConfigDialog(QDir _home, Zones *_zones) : zones(_zones)
+ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
+    mainWindow(mainWindow), zones(_zones)
 {
 
     home = _home;
@@ -208,7 +209,7 @@ void ConfigDialog::save_Clicked()
 
     // update widgets to let them know config has changed
     // only realtime sorted thus far;
-    mainwindow->realtimeWindow->configUpdate();
+    mainWindow->realtimeWindow->configUpdate();
 }
 
 void ConfigDialog::moveCalendarToCurrentRange() {
