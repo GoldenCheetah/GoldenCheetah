@@ -16,9 +16,9 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "AllPlot.h"
 #include "MainWindow.h"
 #include "AllPlotWindow.h"
-#include "AllPlot.h"
 #include "RideFile.h"
 #include "RideItem.h"
 #include "IntervalItem.h"
