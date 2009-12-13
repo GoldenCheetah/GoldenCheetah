@@ -34,22 +34,6 @@ class AllPlot;
 class IntervalItem;
 class MainWindow;
 
-class IntervalPlotData : public QwtData
-{
-    public:
-    IntervalPlotData(AllPlot *allPlot, MainWindow *mainWindow) :
-        allPlot(allPlot), mainWindow(mainWindow) {}
-    double x(size_t i) const ;
-    double y(size_t i) const ;
-    size_t size() const ;
-    virtual QwtData *copy() const ;
-    void init() ;
-    IntervalItem *intervalNum(int n) const;
-    int intervalCount() const;
-    AllPlot *allPlot;
-    MainWindow *mainWindow;
-};
-
 class AllPlot : public QwtPlot
 {
     Q_OBJECT
@@ -104,7 +88,6 @@ class AllPlot : public QwtPlot
 
         QwtPlotGrid *grid;
 
-        IntervalPlotData *intervalPlotData;
         QVector<double> hrArray;
         QVector<double> wattsArray;
         QVector<double> speedArray;

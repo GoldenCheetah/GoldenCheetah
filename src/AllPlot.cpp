@@ -35,6 +35,21 @@
 #include <qwt_data.h>
 #include <QMultiMap>
 
+class IntervalPlotData : public QwtData
+{
+    public:
+    IntervalPlotData(AllPlot *allPlot, MainWindow *mainWindow) :
+        allPlot(allPlot), mainWindow(mainWindow) {}
+    double x(size_t i) const ;
+    double y(size_t i) const ;
+    size_t size() const ;
+    virtual QwtData *copy() const ;
+    void init() ;
+    IntervalItem *intervalNum(int n) const;
+    int intervalCount() const;
+    AllPlot *allPlot;
+    MainWindow *mainWindow;
+};
 
 // define a background class to handle shading of power zones
 // draws power zone bands IF zones are defined and the option
@@ -188,8 +203,6 @@ AllPlot::AllPlot(QWidget *parent, MainWindow *mainWindow):
     bg = new AllPlotBackground(this);
     bg->attach(this);
 
-    intervalPlotData = new IntervalPlotData(this, mainWindow);
-
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setCanvasBackground(Qt::white);
 
@@ -236,7 +249,7 @@ AllPlot::AllPlot(QWidget *parent, MainWindow *mainWindow):
     QColor ihlbrush = QColor(Qt::blue);
     ihlbrush.setAlpha(64);
     intervalHighlighterCurve->setBrush(ihlbrush);   // fill below the line
-    intervalHighlighterCurve->setData(*intervalPlotData);
+    intervalHighlighterCurve->setData(IntervalPlotData(this, mainWindow));
     intervalHighlighterCurve->attach(this);
     this->legend()->remove(intervalHighlighterCurve); // don't show in legend
 
