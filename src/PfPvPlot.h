@@ -39,6 +39,7 @@ class PfPvPlot : public QwtPlot
         PfPvPlot();
 	void refreshZoneItems();
         void setData(RideItem *_rideItem);
+        void showIntervals(RideItem *_rideItem);
 
 	int getCP();
 	void setCP(int cp);
