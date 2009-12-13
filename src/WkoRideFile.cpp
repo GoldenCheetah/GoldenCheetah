@@ -141,6 +141,9 @@ RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors) const
 
         rideFile->addInterval(add.start, add.stop, add.name);
     }
+
+    // free up memory
+    for (int i=0; i<references.count(); i++) delete references.at(i);
     references.clear();
 
     if (footerdata) return (RideFile *)rideFile;
