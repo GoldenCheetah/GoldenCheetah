@@ -17,7 +17,6 @@ class ConfigDialog : public QDialog
     Q_OBJECT
     public:
         ConfigDialog(QDir home, Zones *zones, MainWindow *mainWindow);
-        ~ConfigDialog();
 
     public slots:
         void changePage(QListWidgetItem *current, QListWidgetItem *previous);
