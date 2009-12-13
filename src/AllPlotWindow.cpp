@@ -324,7 +324,7 @@ AllPlotWindow::setEndSelection(double xValue, bool newInterval, QString name)
 
         RideFile tmpRide = RideFile();
 
-        QTreeWidgetItem *which = mainwindow->allRideItems()->treeWidget()->selectedItems().first();
+        QTreeWidgetItem *which = mainwindow->rideItem();
         RideItem *ride = (RideItem*)which;
 
         double distance1 = -1;
