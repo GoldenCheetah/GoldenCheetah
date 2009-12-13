@@ -38,26 +38,26 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     QVBoxLayout *vlayout = new QVBoxLayout;
 
     QHBoxLayout *showLayout = new QHBoxLayout;
-    QLabel *showLabel = new QLabel("Show:", this);
+    QLabel *showLabel = new QLabel(tr("Show:"), this);
     showLayout->addWidget(showLabel);
 
-    QCheckBox *showGrid = new QCheckBox("Grid", this);
+    QCheckBox *showGrid = new QCheckBox(tr("Grid"), this);
     showGrid->setCheckState(Qt::Checked);
     showLayout->addWidget(showGrid);
 
-    showHr = new QCheckBox("Heart Rate", this);
+    showHr = new QCheckBox(tr("Heart Rate"), this);
     showHr->setCheckState(Qt::Checked);
     showLayout->addWidget(showHr);
 
-    showSpeed = new QCheckBox("Speed", this);
+    showSpeed = new QCheckBox(tr("Speed"), this);
     showSpeed->setCheckState(Qt::Checked);
     showLayout->addWidget(showSpeed);
 
-    showCad = new QCheckBox("Cadence", this);
+    showCad = new QCheckBox(tr("Cadence"), this);
     showCad->setCheckState(Qt::Checked);
     showLayout->addWidget(showCad);
 
-    showAlt = new QCheckBox("Altitude", this);
+    showAlt = new QCheckBox(tr("Altitude"), this);
     showAlt->setCheckState(Qt::Checked);
     showLayout->addWidget(showAlt);
 
