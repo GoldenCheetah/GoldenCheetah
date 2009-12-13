@@ -28,6 +28,7 @@ class RideItem;
 class RideFilePoint;
 class QwtPlotCurve;
 class QwtPlotMarker;
+class MainWindow;
 class PfPvPlotZoneLabel;
 
 class PfPvPlot : public QwtPlot
@@ -36,7 +37,7 @@ class PfPvPlot : public QwtPlot
 
     public:
 
-        PfPvPlot();
+        PfPvPlot(MainWindow *mainWindow);
 	void refreshZoneItems();
         void setData(RideItem *_rideItem);
         void showIntervals(RideItem *_rideItem);
@@ -65,6 +66,9 @@ signals:
         void changedCL( const QString& );
 
     protected:
+        int intervalCount() const;
+
+        MainWindow *mainWindow;
     QwtPlotCurve *curve;
     QList <QwtPlotCurve *> intervalCurves;
 	QwtPlotCurve *cpCurve;

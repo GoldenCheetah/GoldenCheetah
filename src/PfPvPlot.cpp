@@ -126,8 +126,9 @@ class PfPvPlotZoneLabel: public QwtPlotItem
 
 QwtArray<double> PfPvPlot::contour_xvalues;
 
-PfPvPlot::PfPvPlot()
+PfPvPlot::PfPvPlot(MainWindow *mainWindow)
     : rideItem (NULL),
+      mainWindow(mainWindow),
       cp_ (0),
       cad_ (85),
       cl_ (0.175),
@@ -279,14 +280,14 @@ PfPvPlot::refreshZoneItems()
 
 
 // how many intervals selected?
-static int intervalCount()
+int PfPvPlot::intervalCount() const
 {
     int highlighted;
     highlighted = 0;
-    if (mainwindow == NULL || mainwindow->allIntervalItems() == NULL) return 0; // not inited yet!
+    if (mainWindow->allIntervalItems() == NULL) return 0; // not inited yet!
 
-    for (int i=0; i<mainwindow->allIntervalItems()->childCount(); i++) {
-        IntervalItem *current = (IntervalItem *)mainwindow->allIntervalItems()->child(i);
+    for (int i=0; i<mainWindow->allIntervalItems()->childCount(); i++) {
+        IntervalItem *current = dynamic_cast<IntervalItem *>(mainWindow->allIntervalItems()->child(i));
         if (current != NULL) {
             if (current->isSelected() == true) {
                 ++highlighted;
@@ -467,10 +468,10 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
            // ensure same colors are used for each interval selected
            int num_intervals_defined=0;
            QVector<int> intervalmap;
-           if (mainwindow != NULL && mainwindow->allIntervalItems() != NULL) {
-                num_intervals_defined = mainwindow->allIntervalItems()->childCount();
-                for (int g=0; g<mainwindow->allIntervalItems()->childCount(); g++) {
-                    IntervalItem *curr = (IntervalItem *)mainwindow->allIntervalItems()->child(g);
+           if (mainWindow->allIntervalItems() != NULL) {
+                num_intervals_defined = mainWindow->allIntervalItems()->childCount();
+                for (int g=0; g<mainWindow->allIntervalItems()->childCount(); g++) {
+                    IntervalItem *curr = dynamic_cast<IntervalItem *>(mainWindow->allIntervalItems()->child(g));
                     if (curr->isSelected()) intervalmap.append(g);
                 }
            }
@@ -602,9 +603,9 @@ PfPvPlot::setMergeIntervals(bool value)
 int
 PfPvPlot::isSelected(const RideFilePoint *p) {
     int highlighted=-1; // Return -1 for point not in interval
-    if (mainwindow!= NULL && mainwindow->allIntervalItems() != NULL) {
-        for (int i=0; i<mainwindow->allIntervalItems()->childCount(); i++) {
-            IntervalItem *current = (IntervalItem *)mainwindow->allIntervalItems()->child(i);
+    if (mainWindow->allIntervalItems() != NULL) {
+        for (int i=0; i<mainWindow->allIntervalItems()->childCount(); i++) {
+            IntervalItem *current = dynamic_cast<IntervalItem *>(mainWindow->allIntervalItems()->child(i));
             if (current != NULL) {
                 if (current->isSelected()) {
                     ++highlighted;
