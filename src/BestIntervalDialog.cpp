@@ -281,7 +281,7 @@ BestIntervalDialog::addClicked()
             double start = resultsTable->item(i,3)->text().toDouble();
             double stop = resultsTable->item(i,4)->text().toDouble();
             QString name = resultsTable->item(i,2)->text();
-            RideFile *ride = (RideFile*)mainWindow->currentRide();
+            const RideFile *ride = mainWindow->currentRide();
 
             QTreeWidgetItem *last =
                 new IntervalItem(ride, name, start, stop,

@@ -201,7 +201,7 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
 }
 
 double
-RideFile::distanceToTime(double km)
+RideFile::distanceToTime(double km) const
 {
     // inefficient but robust - iterate over points until
     // you have gone past the km desired.
@@ -213,7 +213,7 @@ RideFile::distanceToTime(double km)
 }
 
 double
-RideFile::timeToDistance(double secs)
+RideFile::timeToDistance(double secs) const
 {
     // inefficient but robust - iterate over points until
     // you have gone past the km desired.
