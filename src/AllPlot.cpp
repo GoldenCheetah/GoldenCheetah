@@ -546,6 +546,12 @@ AllPlot::setData(RideItem *_rideItem)
         if (!cadArray.empty()) cadCurve->attach(this);
         if (!altArray.empty()) altCurve->attach(this);
 
+        wattsCurve->setVisible(dataPresent->watts);
+        hrCurve->setVisible(dataPresent->hr);
+        speedCurve->setVisible(dataPresent->kph);
+        cadCurve->setVisible(dataPresent->cad);
+        altCurve->setVisible(dataPresent->alt);
+
         arrayLength = 0;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             timeArray[arrayLength]  = point->secs;
