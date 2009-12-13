@@ -94,8 +94,7 @@ PfPvWindow::intervalSelected()
 {
     RideItem *ride = mainWindow->rideItem();
     if (!ride) return;
-    pfPvPlot->setData(ride);
-
+    pfPvPlot->showIntervals(ride);
 }
 
 void
@@ -112,6 +111,7 @@ PfPvWindow::setShadeZonesPfPvFromCheckBox()
     if (pfPvPlot->shadeZones() != shadeZonesPfPvCheckBox->isChecked()) {
         pfPvPlot->setShadeZones(shadeZonesPfPvCheckBox->isChecked());
     }
+    pfPvPlot->replot();
 }
 
 void
@@ -127,6 +127,7 @@ PfPvWindow::setQaCPFromLineEdit()
 {
     int value = qaCPValue->text().toInt();
     pfPvPlot->setCP(value);
+    pfPvPlot->replot();
 }
 
 void
@@ -134,6 +135,7 @@ PfPvWindow::setQaCADFromLineEdit()
 {
     int value = qaCadValue->text().toInt();
     pfPvPlot->setCAD(value);
+    pfPvPlot->replot();
 }
 
 void
@@ -141,6 +143,7 @@ PfPvWindow::setQaCLFromLineEdit()
 {
     double value = qaClValue->text().toDouble();
     pfPvPlot->setCL(value);
+    pfPvPlot->replot();
 }
 
 
