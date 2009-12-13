@@ -121,8 +121,8 @@ class RideFile
 
         void resetDataPresent();
 
-        double distanceToTime(double);  // get distance km at time secs
-        double timeToDistance(double);  // get time secs at distance km
+        double distanceToTime(double) const;  // get distance km at time secs
+        double timeToDistance(double) const;  // get time secs at distance km
 };
 
 struct RideFileReader {
