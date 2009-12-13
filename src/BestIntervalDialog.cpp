@@ -289,7 +289,7 @@ BestIntervalDialog::addClicked()
                                  ride->timeToDistance(stop));
 
             // add
-            QTreeWidgetItem *allIntervals = (QTreeWidgetItem *)mainwindow->allIntervalItems();
+            QTreeWidgetItem *allIntervals = mainWindow->mutableIntervalItems();
             allIntervals->addChild(last);
         }
     }
