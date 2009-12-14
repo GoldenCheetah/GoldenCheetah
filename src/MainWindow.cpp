@@ -624,6 +624,9 @@ MainWindow::addIntervalForPowerPeaksForSecs(RideFile *ride, int windowSizeSecs, 
     QList<const RideFilePoint*> window;
     QMap<double,double> bests;
 
+    // don't add for intervals that are longer than the entire ride!
+    if (ride->dataPoints().last()->secs < windowSizeSecs) return;
+
     double secsDelta = ride->recIntSecs();
     int expectedSamples = (int) floor(windowSizeSecs / secsDelta);
     double totalWatts = 0.0;
