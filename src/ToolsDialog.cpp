@@ -48,7 +48,7 @@ QHBoxLayout *setupMinsSecs(ToolsDialog *dialog,
     result->addWidget(secsSpinBox);
     wattsSpinBox = new QDoubleSpinBox(dialog);
     wattsSpinBox->setDecimals(0);
-    wattsSpinBox->setRange(0.0, 1000.0);
+    wattsSpinBox->setRange(0.0, 3000.0);
     wattsSpinBox->setSuffix(" watts");
     wattsSpinBox->setSingleStep(1.0);
     wattsSpinBox->setWrapping(false);
