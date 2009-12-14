@@ -276,7 +276,7 @@ AllPlotWindow::plotPickerSelected(const QPoint &pos)
 void
 AllPlotWindow::plotPickerMoved(const QPoint &pos)
 {
-    QString name = QString("Selection #%1").arg(selection);
+    QString name = QString("Selection #%1 ").arg(selection);
     // set end of selection in xunits (minutes assumed for now)
     setEndSelection(allPlot->invTransform(QwtPlot::xBottom, pos.x()), true, name);
 }
@@ -399,8 +399,11 @@ AllPlotWindow::setEndSelection(double xValue, bool newInterval, QString name)
             // are we adjusting an existing interval? - if so delete it and readd it
             if (count > 0) {
                 IntervalItem *bottom = (IntervalItem *) allIntervals->child(count-1);
-                if (bottom->text(0) == name) delete allIntervals->takeChild(count-1);
+                if (bottom->text(0).startsWith(name)) delete allIntervals->takeChild(count-1);
             }
+
+            // add average power to the end of the selection name
+            name += QString("(%1 watts)").arg(round((wattsTotal && arrayLength) ? wattsTotal/arrayLength : 0));
 
             QTreeWidgetItem *last = new IntervalItem(ride->ride, name, duration1, duration2, distance1, distance2);
             allIntervals->addChild(last);
