@@ -664,7 +664,8 @@ MainWindow::addIntervalForPowerPeaksForSecs(RideFile *ride, int windowSizeSecs, 
         double secs = j.key();
         double watts = j.value();
 
-        QTreeWidgetItem *peak = new IntervalItem(ride, name+tr(" (%1 watts)").arg((int) round(watts)), secs, secs+windowSizeSecs, 0, 0);
+        QTreeWidgetItem *peak = new IntervalItem(ride, name+tr(" (%1 watts)").arg((int) round(watts)),
+                                    secs, secs+windowSizeSecs, ride->timeToDistance(secs), ride->timeToDistance(secs+windowSizeSecs));
         allIntervals->addChild(peak);
     }
 }
