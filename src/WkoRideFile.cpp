@@ -39,7 +39,7 @@
 // global variable called WKO_HOMEDIR.
 //
 // 2. UNUSED GRAPHS
-// Windspeed, Temperature, GPS and other data is available from WKO
+// Windspeed, Temperature, Slope et al are available from WKO
 // data files but is discarded currently since it is not supported by RideFile
 //
 // 3. GOTO
@@ -49,10 +49,6 @@
 // 4. WKO_device and WKO_GRAPHS STATIC GLOBALS
 // Shared between a number of functions to simplify parameter passing and avoid
 // refactoring as a class.
-//
-// 5. METRIC/IMPERIAL CONVERSION
-// Code is available to support conversion from WKO standard of all metric but it is not
-// enabled -- need to understand how metric/imperial conversion is supposed to be managed
 //
 
 #include "WkoRideFile.h"
@@ -160,7 +156,7 @@ RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors) const
 WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &errors)
 {
     WKO_ULONG WKO_xormasks[32];    // xormasks used all over
-    double cad, hr, km, kph, nm, watts, alt, interval;
+    double cad=0, hr=0, km=0, kph=0, nm=0, watts=0, alt=0, lon=0, lat=0, interval=0;
 
     int isnull=0;
     WKO_ULONG records, data;
@@ -367,7 +363,6 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
                     case 'G' : /* two longs */
                         {
                             signed long llat, llon;
-                            double lat,lon;
                             char slat[20], slon[20];
 
                             // stored 2s complement
@@ -420,7 +415,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
 
                     // !! needs to be modified to support the new alt patch
                     rideFile->appendPoint((double)rtime/1000, cad, hr, km,
-                            kph, nm, watts, alt, 0);
+                            kph, nm, watts, alt, lon, lat, 0);
             }
 
             // increment time - even for null records (perhaps especially for null

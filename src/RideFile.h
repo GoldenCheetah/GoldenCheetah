@@ -43,24 +43,24 @@
 
 struct RideFilePoint
 {
-    double secs, cad, hr, km, kph, nm, watts, alt;
+    double secs, cad, hr, km, kph, nm, watts, alt, lon, lat;;
     int interval;
     double bs; // to init in order
     RideFilePoint() : secs(0.0), cad(0.0), hr(0.0), km(0.0), kph(0.0),
-        nm(0.0), watts(0.0), alt(0.0), interval(0), bs(0.0) {}
+        nm(0.0), watts(0.0), alt(0.0), lon(0.0), lat(0.0), interval(0), bs(0.0) {}
     RideFilePoint(double secs, double cad, double hr, double km, double kph,
-                  double nm, double watts, double alt, int interval, double bs) :
+                  double nm, double watts, double alt, double lon, double lat, int interval, double bs) :
         secs(secs), cad(cad), hr(hr), km(km), kph(kph), nm(nm),
-        watts(watts), alt(alt), interval(interval), bs(bs) {}
+        watts(watts), alt(alt), lon(lon), lat(lat), interval(interval), bs(bs) {}
 };
 
 struct RideFileDataPresent
 {
-    bool secs, cad, hr, km, kph, nm, watts, alt, interval;
+    bool secs, cad, hr, km, kph, nm, watts, alt, lon, lat, interval;
     // whether non-zero data of each field is present
     RideFileDataPresent():
         secs(false), cad(false), hr(false), km(false),
-        kph(false), nm(false), watts(false), alt(false), interval(false) {}
+        kph(false), nm(false), watts(false), alt(false), lon(false), lat(false), interval(false) {}
 };
 
 struct RideFileInterval
@@ -107,7 +107,7 @@ class RideFile
 
         void appendPoint(double secs, double cad, double hr, double km,
                          double kph, double nm, double watts, double alt,
-                         int interval, double bs=0.0);
+                         double lon, double lat, int interval, double bs=0.0);
 
         const QList<RideFileInterval> &intervals() const { return intervals_; }
         void addInterval(double start, double stop, const QString &name) {

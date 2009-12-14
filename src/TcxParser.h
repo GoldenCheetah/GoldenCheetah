@@ -54,6 +54,8 @@ private:
     double	hr;
     double      lastAltitude;
     double      alt;
+    double      lat;
+    double      lon;
 };
 
 #endif // _TcxParser_h
