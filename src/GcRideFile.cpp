@@ -86,7 +86,7 @@ GcFileReader::openRideFile(QFile &file, QStringList &errors) const
     bool recIntSet = false;
     for (QDomElement sample = samples.firstChildElement("sample");
          !sample.isNull(); sample = sample.nextSiblingElement("sample")) {
-        double secs, cad, hr, km, kph, nm, watts, alt;
+        double secs, cad, hr, km, kph, nm, watts, alt, lon, lat;
         secs = sample.attribute("secs", "0.0").toDouble();
         cad = sample.attribute("cad", "0.0").toDouble();
         hr = sample.attribute("hr", "0.0").toDouble();
@@ -95,9 +95,11 @@ GcFileReader::openRideFile(QFile &file, QStringList &errors) const
         nm = sample.attribute("nm", "0.0").toDouble();
         watts = sample.attribute("watts", "0.0").toDouble();
         alt = sample.attribute("alt", "0.0").toDouble();
+        lon = sample.attribute("lon", "0.0").toDouble();
+        lat = sample.attribute("lat", "0.0").toDouble();
         while ((interval < intervalStops.size()) && (secs >= intervalStops[interval]))
             ++interval;
-        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, interval);
+        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lon, lat, interval);
         if (!recIntSet) {
             rideFile->setRecIntSecs(sample.attribute("len").toDouble());
             recIntSet = true;
@@ -165,6 +167,8 @@ GcFileReader::writeRideFile(const RideFile *ride, QFile &file) const
             add_sample(nm);
             add_sample(watts);
             add_sample(alt);
+            add_sample(lon);
+            add_sample(lat);
             sample.setAttribute("len", QString("%1").arg(ride->recIntSecs()));
         }
     }

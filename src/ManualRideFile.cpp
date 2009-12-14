@@ -110,7 +110,7 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors) const
 		interval = 0;
 
 		rideFile->appendPoint(minutes * 60.0, cad, hr, km, 
-			kph, nm, watts, alt, interval, bs);
+			kph, nm, watts, alt, 0.0, 0.0, interval, bs);
 
 		rideSec = minutes * 60.0;
 	    }

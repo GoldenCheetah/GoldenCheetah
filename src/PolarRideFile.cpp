@@ -200,7 +200,7 @@ this differently
                         next_interval = intervals.at(interval);
                     }
                 }
-	            rideFile->appendPoint(seconds, cad, hr, km, kph, nm, watts, alt, interval);
+	            rideFile->appendPoint(seconds, cad, hr, km, kph, nm, watts, alt, 0.0, 0.0, interval);
 	            //fprintf(stderr, " %f, %f, %f, %f, %f, %f, %f, %d\n", seconds, cad, hr, km, kph, nm, watts, alt, interval);
             }
 

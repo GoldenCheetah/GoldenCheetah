@@ -89,6 +89,14 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
     {
         alt = buffer.toDouble();
     }
+    else if (qName == "LongitudeDegrees")
+    {
+        lon = buffer.toDouble();
+    }
+    else if (qName == "LatitudeDegrees")
+    {
+        lat = buffer.toDouble();
+    }
     else if (qName == "Trackpoint")
     {
         // nh - there are track points that don't have any distance info.  We need to ignore them
@@ -135,7 +143,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 	    if(rideFile->dataPoints().empty()) {
 	        // first point
 	        rideFile->appendPoint(secs, cadence, hr, distance,
-                                   speed, torque, power, alt, lap);
+                                   speed, torque, power, alt, lon, lat, lap);
 	    }
 	    else {
 	      // assumption that the change in ride is linear...  :)
@@ -148,10 +156,12 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 	      double deltaTorque = torque - prevPoint->nm;
 	      double deltaPower = power - prevPoint->watts;
 	      double deltaAlt = alt - prevPoint->alt;
+          double deltaLon = lon - prevPoint->lon;
+          double deltaLat = lat - prevPoint->lat;
 	      if(deltaSecs == 1) {
 		  // no smart recording, just insert the data
 		  rideFile->appendPoint(secs, cadence, hr, distance,
-                                   speed, torque, power, alt, lap);
+                                   speed, torque, power, alt, lon, lat, lap);
 	      }
 	      else {
 		  for(int i = 1; i <= deltaSecs; i++) {
@@ -161,6 +171,8 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 		      kph = kph > 0.35 ? kph : 0;
 		      double cad = prevPoint->cad + (deltaCad * weight);
 		      cad = cad > 0.35 ? cad : 0;
+              double lat = prevPoint->lat + (deltaLat * weight);
+              double lon = prevPoint->lon + (deltaLon * weight);
 		      rideFile->appendPoint(
 					    prevPoint->secs + (deltaSecs * weight),
 					    prevPoint->cad  + (deltaCad * weight),
@@ -170,6 +182,8 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 					    prevPoint->nm + (deltaTorque * weight),
 					    prevPoint->watts + (deltaPower * weight),
 					    prevPoint->alt + (deltaAlt * weight),
+                        lon, // lon
+                        lat, // lat
 					    lap);
 		  }
 		  prevPoint = rideFile->dataPoints().back();
