@@ -43,11 +43,11 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow) :
     binWidthLayout->addWidget(binWidthSlider);
 
     lnYHistCheckBox = new QCheckBox;
-    lnYHistCheckBox->setText("Log y");
+    lnYHistCheckBox->setText(tr("Log Y"));
     binWidthLayout->addWidget(lnYHistCheckBox);
 
     withZerosCheckBox = new QCheckBox;
-    withZerosCheckBox->setText("With zeros");
+    withZerosCheckBox->setText(tr("With zeros"));
     binWidthLayout->addWidget(withZerosCheckBox);
     histParameterCombo = new QComboBox();
     binWidthLayout->addWidget(histParameterCombo);

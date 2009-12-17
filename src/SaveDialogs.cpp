@@ -163,7 +163,7 @@ MainWindow::saveSilent(RideItem *rideItem)
 SaveSingleDialogWidget::SaveSingleDialogWidget(MainWindow *mainWindow, RideItem *rideItem) :
     QDialog(mainWindow, Qt::Dialog), mainWindow(mainWindow), rideItem(rideItem)
 {
-    setWindowTitle("Save and Conversion");
+    setWindowTitle(tr("Save and Conversion"));
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
     // Warning text

@@ -174,8 +174,8 @@ RideSummaryWindow::htmlSummary() const
         return summary;
     }
     summary = ("<p><center><h2>"
-               + rideItem->dateTime.toString("dddd MMMM d, yyyy, h:mm AP")
-               + "</h2><h3>Device Type: " + ride->deviceType() + "</h3>");
+               + rideItem->dateTime.toString(tr("dddd MMMM d, yyyy, h:mm AP"))
+               + "</h2><h3>" + tr("Device Type: ") + ride->deviceType() + "</h3>");
 
     rideItem->computeMetrics();
 
@@ -309,7 +309,7 @@ RideSummaryWindow::htmlSummary() const
         QVector<double> time_in_zone(rideItem->numZones());
         for (int i = 0; i < rideItem->numZones(); ++i)
             time_in_zone[i] = rideItem->timeInZone(i);
-        summary += "<h2>Power Zones</h2>";
+        summary += tr("<h2>Power Zones</h2>");
         summary += mainWindow->zones()->summarize(rideItem->zoneRange(), time_in_zone);
     }
 
@@ -324,17 +324,17 @@ RideSummaryWindow::htmlSummary() const
         summary += "cellspacing=0 border=0><tr>";
         summary += "<td align=\"center\">Interval</td>";
         summary += "<td align=\"center\"></td>";
-        summary += "<td align=\"center\">Distance</td>";
-        summary += "<td align=\"center\">Work</td>";
-        summary += "<td align=\"center\">Max Power</td>";
-        summary += "<td align=\"center\">Avg Power</td>";
-        summary += "<td align=\"center\">95% HR</td>";
-        summary += "<td align=\"center\">Avg HR</td>";
-        summary += "<td align=\"center\">Avg Cadence</td>";
-        summary += "<td align=\"center\">Avg Speed</td>";
+        summary += tr("<td align=\"center\">Distance</td>");
+        summary += tr("<td align=\"center\">Work</td>");
+        summary += tr("<td align=\"center\">Max Power</td>");
+        summary += tr("<td align=\"center\">Avg Power</td>");
+        summary += tr("<td align=\"center\">95% HR</td>");
+        summary += tr("<td align=\"center\">Avg HR</td>");
+        summary += tr("<td align=\"center\">Avg Cadence</td>");
+        summary += tr("<td align=\"center\">Avg Speed</td>");
         summary += "</tr><tr>";
-        summary += "<td align=\"center\">Number</td>";
-        summary += "<td align=\"center\">Duration</td>";
+        summary += tr("<td align=\"center\">Number</td>");
+        summary += tr("<td align=\"center\">Duration</td>");
         if(unit.toString() == "Metric")
             summary += "<td align=\"center\">(km)</td>";
         else
@@ -355,7 +355,7 @@ RideSummaryWindow::htmlSummary() const
     }
 
     if (!errors.empty()) {
-        summary += "<p><h2>Errors reading file:</h2><ul>";
+        summary += tr("<p><h2>Errors reading file:</h2><ul>");
         QStringListIterator i(errors);
         while(i.hasNext())
             summary += " <li>" + i.next();

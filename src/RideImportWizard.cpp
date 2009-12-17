@@ -709,7 +709,7 @@ RideImportWizard::abortClicked()
     }
 
     tableWidget->setSortingEnabled(true); // so you can browse through errors etc
-    QString donemessage = QString("Import Complete. %1 of %2 successful.")
+    QString donemessage = QString(tr("Import Complete. %1 of %2 successful."))
                                   .arg(completed, 1, 10, zero)
                                   .arg(filenames.count(), 1, 10, zero);
     progressBar->setValue(progressBar->maximum());
@@ -798,7 +798,7 @@ QWidget *RideDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem 
 
         // edit that date!
         QDateEdit *dateEdit = new QDateEdit(parent);
-        dateEdit->setDisplayFormat("dd MMM yyyy");
+        dateEdit->setDisplayFormat(tr("dd MMM yyyy"));
         connect(dateEdit, SIGNAL(editingFinished()), this, SLOT(commitAndCloseDateEditor()));
         return dateEdit;
     } else if (index.column() == dateColumn+1) {
@@ -835,7 +835,7 @@ void RideDelegate::setEditorData(QWidget *editor, const QModelIndex &index) cons
    // stored as text field
     if (index.column() == dateColumn) {
         QDateEdit *dateEdit = qobject_cast<QDateEdit *>(editor);
-        QDate date = QDate().fromString(index.model()->data(index, Qt::DisplayRole).toString(), "dd MMM yyyy");;
+        QDate date = QDate().fromString(index.model()->data(index, Qt::DisplayRole).toString(), tr("dd MMM yyyy"));
         dateEdit->setDate(date);
     } else if (index.column() == dateColumn+1) {
         QTimeEdit *timeEdit = qobject_cast<QTimeEdit *>(editor);
@@ -851,7 +851,7 @@ void RideDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, cons
     // stored as text field
     if (index.column() == dateColumn) {
         QDateEdit *dateEdit = qobject_cast<QDateEdit *>(editor);
-        QString value = dateEdit->date().toString("dd MMM yyyy");
+        QString value = dateEdit->date().toString(tr("dd MMM yyyy"));
         // Place in the view
         model->setData(index, value, Qt::DisplayRole);
     } else if (index.column() == dateColumn+1) {

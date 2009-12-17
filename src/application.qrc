@@ -8,5 +8,6 @@
     <file>images/gc.png</file> 
     <file>images/config.png</file>
     <file>translations/gc_fr.qm</file>
+    <file>translations/gc_ja.qm</file>
  </qresource>
 </RCC>

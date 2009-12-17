@@ -253,7 +253,7 @@ MainWindow::MainWindow(const QDir &home) :
     //////////////////////// Power Histogram Tab ////////////////////////
 
     histogramWindow = new HistogramWindow(this);
-    tabWidget->addTab(histogramWindow, "Histogram Analysis");
+    tabWidget->addTab(histogramWindow, tr("Histogram Analysis"));
     
     //////////////////////// Pedal Force/Velocity Plot ////////////////////////
 
@@ -269,7 +269,7 @@ MainWindow::MainWindow(const QDir &home) :
     //////////////////////// Performance Manager  ////////////////////////
 
     performanceManagerWindow = new PerformanceManagerWindow(this);
-    tabWidget->addTab(performanceManagerWindow, "Performance Manager");
+    tabWidget->addTab(performanceManagerWindow, tr("Performance Manager"));
 
     //////////////////////// Realtime ////////////////////////
 
@@ -557,7 +557,7 @@ MainWindow::exportCSV()
 
     // Ask the user if they prefer to export with English or metric units.
     QStringList items;
-    items << tr("Metric") << tr("English");
+    items << tr("Metric") << tr("Imperial");
     bool ok;
     QString units = QInputDialog::getItem(
         this, tr("Select Units"), tr("Units:"), items, 0, false, &ok);
