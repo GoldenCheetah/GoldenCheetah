@@ -37,6 +37,9 @@ struct RideMetric {
                          const Zones *zones, 
                          int zoneRange,
                          const QHash<QString,RideMetric*> &deps) = 0;
+    virtual void override(const QMap<QString,QString> &) {
+        assert(false);
+    }
     virtual bool canAggregate() const { return false; }
     virtual void aggregateWith(RideMetric *other) { 
         (void) other; 

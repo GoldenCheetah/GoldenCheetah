@@ -52,7 +52,14 @@ class DanielsPoints : public RideMetric {
             // Manual entry: use BS from dataPoints with a scaling factor
             // that works about right for long, steady rides.
             double scaling_factor = 0.55;
-            score = ride->dataPoints().first()->bs * scaling_factor;
+            if (ride->metricOverrides.contains("skiba_bike_score")) {
+                const QMap<QString,QString> bsm =
+                    ride->metricOverrides.value("skiba_bike_score");
+                if (bsm.contains("value")) {
+                    double bs = bsm.value("value").toDouble();
+                    score = bs * scaling_factor;
+                }
+            }
             return;
         }
 
