@@ -602,11 +602,11 @@ QString Zones::summarize(int rnum, QVector<double> &time_in_zone) const
     summary += "<table align=\"center\" width=\"70%\" ";
     summary += "border=\"0\">";
     summary += "<tr>";
-    summary += "<td align=\"center\">Zone</td>";
-    summary += "<td align=\"center\">Description</td>";
-    summary += "<td align=\"center\">Low</td>";
-    summary += "<td align=\"center\">High</td>";
-    summary += "<td align=\"center\">Time</td>";
+    summary += tr("<td align=\"center\">Zone</td>");
+    summary += tr("<td align=\"center\">Description</td>");
+    summary += tr("<td align=\"center\">Low</td>");
+    summary += tr("<td align=\"center\">High</td>");
+    summary += tr("<td align=\"center\">Time</td>");
     summary += "</tr>";
     QColor color = QApplication::palette().alternateBase().color();
     color = QColor::fromHsv(color.hue(), color.saturation() * 2, color.value());

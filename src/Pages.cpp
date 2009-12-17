@@ -18,6 +18,7 @@ ConfigurationPage::ConfigurationPage()
     langCombo = new QComboBox();
     langCombo->addItem(tr("English"));
     langCombo->addItem(tr("French"));
+    langCombo->addItem(tr("Japanese"));
 
     QVariant lang = settings->value(GC_LANG);
 
@@ -25,6 +26,8 @@ ConfigurationPage::ConfigurationPage()
         langCombo->setCurrentIndex(0);
     else if(lang.toString() == "fr")
         langCombo->setCurrentIndex(1);
+    else if(lang.toString() == "ja")
+        langCombo->setCurrentIndex(2);
     else // default : English
         langCombo->setCurrentIndex(0);
 
@@ -32,7 +35,7 @@ ConfigurationPage::ConfigurationPage()
 
     unitCombo = new QComboBox();
     unitCombo->addItem(tr("Metric"));
-    unitCombo->addItem(tr("English"));
+    unitCombo->addItem(tr("Imperial"));
 
     QVariant unit = settings->value(GC_UNIT);
 
@@ -80,7 +83,7 @@ ConfigurationPage::ConfigurationPage()
     if(crankLength.toString() == "185")
 	crankLengthCombo->setCurrentIndex(10);
 
-    allRidesAscending = new QCheckBox("Sort ride list ascending.", this);
+    allRidesAscending = new QCheckBox(tr("Sort ride list ascending."), this);
     QVariant isAscending = settings->value(GC_ALLRIDES_ASCENDING,Qt::Checked); // default is ascending sort
     if(isAscending.toInt() > 0 ){
 	allRidesAscending->setCheckState(Qt::Checked);
@@ -119,8 +122,8 @@ ConfigurationPage::ConfigurationPage()
 
     QLabel *BSModeLabel = new QLabel(tr("BikeScore estimate mode: "));
     bsModeCombo = new QComboBox();
-    bsModeCombo->addItem("time");
-    bsModeCombo->addItem("distance");
+    bsModeCombo->addItem(tr("time"));
+    bsModeCombo->addItem(tr("distance"));
     if (BSmode.toString() == "time")
 	bsModeCombo->setCurrentIndex(0);
     else

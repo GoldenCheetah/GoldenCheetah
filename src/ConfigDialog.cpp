@@ -141,11 +141,13 @@ void ConfigDialog::save_Clicked()
         settings->setValue(GC_LANG, "en");
     else if (configPage->langCombo->currentIndex()==1)
         settings->setValue(GC_LANG, "fr");
+    else if (configPage->langCombo->currentIndex()==2)
+        settings->setValue(GC_LANG, "ja");
 
     if (configPage->unitCombo->currentIndex()==0)
         settings->setValue(GC_UNIT, "Metric");
     else if (configPage->unitCombo->currentIndex()==1)
-        settings->setValue(GC_UNIT, "English");
+        settings->setValue(GC_UNIT, "Imperial");
 
     settings->setValue(GC_ALLRIDES_ASCENDING, configPage->allRidesAscending->checkState());
     settings->setValue(GC_CRANKLENGTH, configPage->crankLengthCombo->currentText());

@@ -38,10 +38,10 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
     QLabel *qaClLabel = new QLabel(tr("Crank Length (m):"), this);
     qaClValue = new QLineEdit(QString("%1").arg(1000 * pfPvPlot->getCL()));
     shadeZonesPfPvCheckBox = new QCheckBox;
-    shadeZonesPfPvCheckBox->setText("Shade zones");
+    shadeZonesPfPvCheckBox->setText(tr("Shade zones"));
     shadeZonesPfPvCheckBox->setCheckState(Qt::Checked);
     mergeIntervalPfPvCheckBox = new QCheckBox;
-    mergeIntervalPfPvCheckBox->setText("Merge intervals");
+    mergeIntervalPfPvCheckBox->setText(tr("Merge intervals"));
     mergeIntervalPfPvCheckBox->setCheckState(Qt::Unchecked);
 
     qaLayout->addWidget(qaCPLabel);

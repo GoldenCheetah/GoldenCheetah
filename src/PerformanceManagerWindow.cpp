@@ -219,7 +219,7 @@ PerformanceManagerWindow::PMpickerMoved(const QPoint &pos)
 
     if (day >= perfplot->min() && day < perfplot->max()) {
 	// set the date string
-	PMDayValue->setText(perfplot->getStartDate().addDays(day).toString("MMM d yyyy"));
+	PMDayValue->setText(perfplot->getStartDate().addDays(day).toString(tr("MMM d yyyy")));
 
 
 	sts = perfplot->getSTS(day);
@@ -249,8 +249,8 @@ void
 PerformanceManagerWindow::setPMSliderDates()
 {
     PMdateRangefrom->setText(
-	perfplot->getStartDate().addDays(PMleftSlider->value()).toString("MMM d yyyy"));
+	perfplot->getStartDate().addDays(PMleftSlider->value()).toString(tr("MMM d yyyy")));
     PMdateRangeto->setText(
-	perfplot->getEndDate().addDays(PMrightSlider->value() - perfplot->n()).toString("MMM d yyyy"));
+	perfplot->getEndDate().addDays(PMrightSlider->value() - perfplot->n()).toString(tr("MMM d yyyy")));
 }
 

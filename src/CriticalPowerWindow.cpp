@@ -223,7 +223,7 @@ CriticalPowerWindow::pickerMoved(const QPoint &pos)
               label = QString("%1 kJ (%2)").arg(watts * minutes * 60.0 / 1000.0, 0, 'f', 0);
           else
               label = QString("%1 watts (%2)").arg(watts);
-          label = label.arg(date.isValid() ? date.toString("MM/dd/yyyy") : tr("no date"));
+          label = label.arg(date.isValid() ? date.toString(tr("MM/dd/yyyy")) : tr("no date"));
       }
       else
 	  label = tr("no data");

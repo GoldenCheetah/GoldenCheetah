@@ -710,7 +710,7 @@ CpintPlot::calculate(RideItem *rideItem)
             }
             if (maxNonZero > 1) {
                 thisCurve = new QwtPlotCurve(
-                    dateTime.toString("ddd MMM d, yyyy h:mm AP"));
+                    dateTime.toString(tr("ddd MMM d, yyyy h:mm AP")));
                 thisCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
                 thisCurve->setPen(QPen(Qt::black));
                 thisCurve->attach(this);

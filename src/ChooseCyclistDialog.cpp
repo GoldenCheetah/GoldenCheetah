@@ -22,7 +22,7 @@
 ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) : 
     home(home)
 {
-    setWindowTitle("Choose a Cyclist");
+    setWindowTitle(tr("Choose a Cyclist"));
 
     listWidget = new QListWidget(this);
     listWidget->setSelectionMode(QAbstractItemView::SingleSelection);

@@ -260,8 +260,6 @@ WeeklySummaryWindow::refresh()
     int hours = minutes / 60;
     minutes %= 60;
 
-    const char *dateFormat = "MM/dd/yyyy";
-
     QString summary;
     summary =
 	tr(
@@ -279,8 +277,8 @@ WeeklySummaryWindow::refresh()
 	   "<tr><td>Daily Average work (kJ):</td>"
 	   "    <td align=\"right\">%9</td></tr>"
 	   )
-	.arg(wstart.toString(dateFormat))
-	.arg(wstart.addDays(6).toString(dateFormat))
+	.arg(wstart.toString(tr("MM/dd/yyyy")))
+	.arg(wstart.addDays(6).toString(tr("MM/dd/yyyy")))
 	.arg(hours)
 	.arg(minutes, 2, 10, QLatin1Char('0'))
 	.arg(seconds, 2, 10, QLatin1Char('0'))

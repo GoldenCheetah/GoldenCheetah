@@ -89,9 +89,9 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, const QDir &home)  : QWidget(
     streamSelector = new QComboBox(this);
     workoutSelector = new QComboBox(this);
 
-    workoutSelector->addItem("Manual Mode", 0);
-    workoutSelector->addItem("Workout Mode", 1);
-    workoutSelector->addItem("Slope Mode", 2);
+    workoutSelector->addItem(tr("Manual Mode"), 0);
+    workoutSelector->addItem(tr("Workout Mode"), 1);
+    workoutSelector->addItem(tr("Slope Mode"), 2);
 
     // get configured devices
     DeviceConfigurations all;
@@ -113,7 +113,7 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, const QDir &home)  : QWidget(
     streamSelector->setCurrentIndex(0);
 
     recordSelector = new QCheckBox(this);
-    recordSelector->setText("Save");
+    recordSelector->setText(tr("Save"));
     recordSelector->setChecked(Qt::Checked);
 
     startButton = new QPushButton(tr("Start"), this);
