@@ -35,6 +35,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
     QRegExp metricUnits("(km|kph|km/h)", Qt::CaseInsensitive);
     QRegExp englishUnits("(miles|mph|mp/h)", Qt::CaseInsensitive);
     bool metric;
+    QDateTime startTime;
 
     // TODO: a more robust regex for ergomo files
     // i don't have an example with english headers
@@ -105,6 +106,14 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                         continue;
                     }
                     rideFile->setDeviceType("PowerTap CSV");
+                }
+            }
+            if (iBike && lineno == 2) {
+                QStringList f = line.split(",");
+                if (f.size() == 6) {
+                    startTime = QDateTime(
+                        QDate(f[0].toInt(), f[1].toInt(), f[2].toInt()),
+                        QTime(f[3].toInt(), f[4].toInt(), f[5].toInt()));
                 }
             }
             if (iBike && lineno == 4) {
@@ -234,7 +243,10 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
     QRegExp rideTime("^.*/(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_"
                      "(\\d\\d)_(\\d\\d)_(\\d\\d)\\.csv$");
     rideTime.setCaseSensitivity(Qt::CaseInsensitive);
-    if (rideTime.indexIn(file.fileName()) >= 0) {
+    if (startTime != QDateTime()) {
+        rideFile->setStartTime(startTime);
+    }
+    else if (rideTime.indexIn(file.fileName()) >= 0) {
         QDateTime datetime(QDate(rideTime.cap(1).toInt(),
                                  rideTime.cap(2).toInt(),
                                  rideTime.cap(3).toInt()),
