@@ -1,1 +1,19 @@
-BEGIN: CP=340
+FROM BEGIN UNTIL 2009/12/17, CP=0:
+1,Active Recovery, 1, 0
+2,Endurance, 1, 0
+3,Tempo, 1, 0
+4,Threshold, 1, 0
+5,VO2Max, 1, 0
+6,Anaerobic, 1, 0
+7,Neuromuscular, 1,MAX
+
+FROM 2009/12/17 UNTIL END, CP=360:
+1,Active Recovery, 1, 198
+2,Endurance, 199, 270
+3,Tempo, 271, 324
+4,Threshold, 325, 378
+5,VO2Max, 379, 432
+6,Anaerobic, 433, 540
+7,Neuromuscular, 541,MAX
+
+

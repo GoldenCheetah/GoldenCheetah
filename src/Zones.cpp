@@ -303,6 +303,12 @@ bool Zones::read(QFile &file)
 		defaults_from_user = true;
 	    }
 	    else {
+                if (hi <= lo) {
+                    err = tr("High value must be greater than low value for "
+                             "zone definition on line %1 of power.zones").arg(lineno);
+                    file.close();
+                    return false;
+                }
 		ZoneInfo zone(zonerx.cap(1), zonerx.cap(2), lo, hi);
 		zoneInfos.append(zone);
 	    }
