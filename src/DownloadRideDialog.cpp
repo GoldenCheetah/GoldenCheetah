@@ -105,8 +105,17 @@ DownloadRideDialog::scanCommPorts()
         QMessageBox::warning(0, "Error Loading Device Drivers", msg, 
                              QMessageBox::Ok, QMessageBox::NoButton);
     }
-    for (int i = 0; i < devList.size(); ++i)
+    for (int i = 0; i < devList.size(); ++i) {
         portCombo->addItem(devList[i]->name());
+        // Hack: SRM PCV download cables use the PL2203 chipset.  If the
+        // first device name contains "PL2303", then, we're probably dealing
+        // with an SRM, so go ahead and select the SRM device.  Generalize?
+        if ((i == 0) && devList[i]->name().contains("PL2303")) {
+            int j = deviceCombo->findText("SRM");
+            if (j >= 0)
+                deviceCombo->setCurrentIndex(j);
+        }
+    }
     if (portCombo->count() > 0)
         downloadButton->setFocus();
     setReadyInstruct();
