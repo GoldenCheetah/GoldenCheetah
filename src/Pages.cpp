@@ -226,7 +226,7 @@ CyclistPage::CyclistPage(const Zones *_zones):
 	checkboxNew->setCheckState(Qt::Unchecked);
     }
     
-    int cp = zones->getCP(currentRange);
+    int cp = currentRange != -1 ? zones->getCP(currentRange) : 0;
     if (cp > 0)
 	setCP(cp);
 
