@@ -137,6 +137,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
             }
             else if (lineno > unitsHeader) {
                 double minutes,nm,kph,watts,km,cad,alt,hr;
+                double lat = 0.0, lon = 0.0;
                 int interval;
                 int pause;
                 if (!ergomo && !iBike) {
@@ -167,6 +168,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                      cad = line.section(',', 4, 4).toDouble();
                      hr = line.section(',', 5, 5).toDouble();
                      alt = line.section(',', 6, 6).toDouble();
+                     lat = line.section(',', 12, 12).toDouble();
+                     lon = line.section(',', 13, 13).toDouble();
                      interval = NULL; //not provided?
                     if (!metric) {
                         km *= KM_PER_MILE;
@@ -209,7 +212,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                     watts = 0;
 
                 rideFile->appendPoint(minutes * 60.0, cad, hr, km,
-                                      kph, nm, watts, alt, 0.0, 0.0, interval);
+                                      kph, nm, watts, alt, lat, lon, interval);
             }
             ++lineno;
         }
