@@ -123,10 +123,6 @@ void RideFile::writeAsCsv(QFile &file, bool bIsMetric) const
         out << point->interval;
         out << ",";
         out << point->alt;
-        if (point->bs > 0.0) {
-            out << ",";
-            out << point->bs;
-        }
         out << "\n";
     }
 
@@ -200,10 +196,10 @@ QStringList RideFileFactory::listRideFiles(const QDir &dir) const
 
 void RideFile::appendPoint(double secs, double cad, double hr, double km,
                            double kph, double nm, double watts, double alt,
-                           double lon, double lat, int interval, double bs)
+                           double lon, double lat, int interval)
 {
     dataPoints_.append(new RideFilePoint(secs, cad, hr, km, kph,
-                                         nm, watts, alt, lon, lat, interval,bs));
+                                         nm, watts, alt, lon, lat, interval));
     dataPresent.secs  |= (secs != 0);
     dataPresent.cad   |= (cad != 0);
     dataPresent.hr    |= (hr != 0);

@@ -171,7 +171,10 @@ RideItem::computeMetrics()
                         if (!metrics.contains(deps[j]))
                             goto later;
                     RideMetric *metric = factory.newMetric(name);
-                    metric->compute(ride(), zones, zone_range, metrics);
+                    if (ride()->metricOverrides.contains(name))
+                        metric->override(ride()->metricOverrides.value(name));
+                    else
+                        metric->compute(ride(), zones, zone_range, metrics);
                     metrics.insert(name, metric);
                     i.remove();
                 }

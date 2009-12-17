@@ -143,25 +143,23 @@ class BikeScore : public RideMetric {
     QString name() const { return "skiba_bike_score"; }
     QString units(bool) const { return ""; }
     double value(bool) const { return score; }
-    void compute(const RideFile *ride, const Zones *zones, int zoneRange,
+    void compute(const RideFile *, const Zones *zones, int zoneRange,
 	    const QHash<QString,RideMetric*> &deps) {
 	if (!zones || zoneRange < 0)
 	    return;
-	if (ride->deviceType() == QString("Manual CSV")) {
-	    // manual entry, use BS from dataPoints
-            score = ride->dataPoints().first()->bs;
-	}
-	else {
-	    assert(deps.contains("skiba_xpower"));
-	    assert(deps.contains("skiba_relative_intensity"));
-	    XPower *xp = dynamic_cast<XPower*>(deps.value("skiba_xpower"));
-	    RideMetric *ri = deps.value("skiba_relative_intensity");
-	    assert(ri);
-	    double normWork = xp->xpower * xp->secs;
-	    double rawBikeScore = normWork * ri->value(true);
-	    double workInAnHourAtCP = zones->getCP(zoneRange) * 3600;
-	    score = rawBikeScore / workInAnHourAtCP * 100.0;
-	}
+        assert(deps.contains("skiba_xpower"));
+        assert(deps.contains("skiba_relative_intensity"));
+        XPower *xp = dynamic_cast<XPower*>(deps.value("skiba_xpower"));
+        RideMetric *ri = deps.value("skiba_relative_intensity");
+        assert(ri);
+        double normWork = xp->xpower * xp->secs;
+        double rawBikeScore = normWork * ri->value(true);
+        double workInAnHourAtCP = zones->getCP(zoneRange) * 3600;
+        score = rawBikeScore / workInAnHourAtCP * 100.0;
+    }
+    void override(const QMap<QString,QString> &map) {
+        if (map.contains("value"))
+            score = map.value("value").toDouble();
     }
     RideMetric *clone() const { return new BikeScore(*this); }
     bool canAggregate() const { return true; }
