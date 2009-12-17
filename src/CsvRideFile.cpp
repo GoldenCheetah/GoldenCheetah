@@ -1,22 +1,21 @@
-/* 
- * Copyright (c) 2007 Sean C. Rhea (srhea@srhea.net), 
- *                    Justin F. Knotzke (jknotzke@shampoo.ca)
+/*
+ * Copyright (c) 2007-2009 Sean C. Rhea (srhea@srhea.net),
+ *                         Justin F. Knotzke (jknotzke@shampoo.ca)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
 
 #include "CsvRideFile.h"
 #include "Units.h"
@@ -27,17 +26,16 @@
 #include <assert.h>
 #include "math.h"
 
-static int csvFileReaderRegistered = 
+static int csvFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "csv","Comma-Separated Values", new CsvFileReader());
- 
-RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const 
+
+RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
 {
     QRegExp metricUnits("(km|kph|km/h)", Qt::CaseInsensitive);
     QRegExp englishUnits("(miles|mph|mp/h)", Qt::CaseInsensitive);
     bool metric;
 
-    
     // TODO: a more robust regex for ergomo files
     // i don't have an example with english headers
     // the ergomo CSV has two rows of headers. units are on the second row.
@@ -51,24 +49,24 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
     int total_pause = 0;
     int currentInterval = 0;
     int prevInterval = 0;
-    
+
     // TODO: with all these formats, should the logic change to a switch/case structure?
     // The iBike format CSV file has five lines of headers (data begins on line 6)
     // starting with:
     /*
     iBike,8,english
     2008,8,8,6,32,52
-    
+
     {Various configuration data, recording interval at line[4][4]}
     Speed (mph),Wind Speed (mph),Power (W),Distance (miles),Cadence (RPM),Heartrate (BPM),Elevation (feet),Hill slope (%),Internal,Internal,Internal,DFPM Power,Latitude,Longitude
     */
-	//  Modified the regExp string to allow for 2-digit version numbers - 23 Mar 2009, thm
+        //  Modified the regExp string to allow for 2-digit version numbers - 23 Mar 2009, thm
     QRegExp iBikeCSV("iBike,\\d\\d?,[a-z]+", Qt::CaseInsensitive);
     bool iBike = false;
     int recInterval;
-    
+
     if (!file.open(QFile::ReadOnly)) {
-        errors << ("Could not open ride file: \"" 
+        errors << ("Could not open ride file: \""
                    + file.fileName() + "\"");
         return NULL;
     }
@@ -87,7 +85,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
             lineno++;
             continue;
         }
-        for (int li = 0; li < lines.size(); ++li) { 
+        for (int li = 0; li < lines.size(); ++li) {
             QString line = lines[li];
 
             if (lineno == 1) {
@@ -114,15 +112,15 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                 // recording interval is in the [4] location (zero-based array)
                 // the trailing zeroes in the configuration area seem to be causing an error
                 // the number is in the format 5.000000
-                recInterval	  = (int)line.section(',',4,4).toDouble();
+                recInterval = (int)line.section(',',4,4).toDouble();
             }
             if (lineno == unitsHeader) {
                 if (metricUnits.indexIn(line) != -1)
                     metric = true;
-                else if (englishUnits.indexIn(line) != -1) 
+                else if (englishUnits.indexIn(line) != -1)
                     metric = false;
                 else {
-                    errors << "Can't find units in first line: \"" + line + "\" of file \"" + file.fileName() +	"\".";
+                    errors << "Can't find units in first line: \"" + line + "\" of file \"" + file.fileName() + "\".";
                     delete rideFile;
                     file.close();
                     return NULL;
@@ -133,78 +131,78 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                 int interval;
                 int pause;
                 if (!ergomo && !iBike) {
-                     minutes     = line.section(',', 0, 0).toDouble();
-                     nm		 = line.section(',', 1, 1).toDouble();
-                     kph	 = line.section(',', 2, 2).toDouble();
-                     watts	 = line.section(',', 3, 3).toDouble();
-                     km		 = line.section(',', 4, 4).toDouble();
-                     cad	 = line.section(',', 5, 5).toDouble();
-                     hr		 = line.section(',', 6, 6).toDouble();
-                     interval	 = line.section(',', 7, 7).toInt();
-                     alt	 = line.section(',', 8, 8).toDouble();
+                     minutes = line.section(',', 0, 0).toDouble();
+                     nm = line.section(',', 1, 1).toDouble();
+                     kph = line.section(',', 2, 2).toDouble();
+                     watts = line.section(',', 3, 3).toDouble();
+                     km = line.section(',', 4, 4).toDouble();
+                     cad = line.section(',', 5, 5).toDouble();
+                     hr = line.section(',', 6, 6).toDouble();
+                     interval = line.section(',', 7, 7).toInt();
+                     alt = line.section(',', 8, 8).toDouble();
                     if (!metric) {
                         km *= KM_PER_MILE;
                         kph *= KM_PER_MILE;
                     }
-                } 
+                }
                 else if (iBike) {
                     // this must be iBike
                     // can't find time as a column.
                     // will we have to extrapolate based on the recording interval?
                     // reading recording interval from config data in ibike csv file
                      minutes = (recInterval * lineno - unitsHeader)/60.0;
-                     nm		 = NULL; //no torque
-                     kph	 = line.section(',', 0, 0).toDouble();
-                     watts	 = line.section(',', 2, 2).toDouble();
-                     km		 = line.section(',', 3, 3).toDouble();
-                     cad	 = line.section(',', 4, 4).toDouble();
-                     hr		 = line.section(',', 5, 5).toDouble();
-                     alt	 = line.section(',', 6, 6).toDouble();
-                     interval	= NULL; //not provided?
+                     nm = NULL; //no torque
+                     kph = line.section(',', 0, 0).toDouble();
+                     watts = line.section(',', 2, 2).toDouble();
+                     km = line.section(',', 3, 3).toDouble();
+                     cad = line.section(',', 4, 4).toDouble();
+                     hr = line.section(',', 5, 5).toDouble();
+                     alt = line.section(',', 6, 6).toDouble();
+                     interval = NULL; //not provided?
                     if (!metric) {
                         km *= KM_PER_MILE;
                         kph *= KM_PER_MILE;
-                    }			 
+                    }
                 }
                 else {
                      // for ergomo formatted CSV files
                      minutes     = line.section(',', 0, 0).toDouble() + total_pause;
-                     km		 = line.section(',', 1, 1).toDouble();
-                     watts	 = line.section(',', 2, 2).toDouble();
-                     cad	 = line.section(',', 3, 3).toDouble();
-                     kph	 = line.section(',', 4, 4).toDouble();
-                     hr		 = line.section(',', 5, 5).toDouble();
-                     alt	 = line.section(',', 6, 6).toDouble();
-                     interval	 = line.section(',', 8, 8).toInt();
+                     km = line.section(',', 1, 1).toDouble();
+                     watts = line.section(',', 2, 2).toDouble();
+                     cad = line.section(',', 3, 3).toDouble();
+                     kph = line.section(',', 4, 4).toDouble();
+                     hr = line.section(',', 5, 5).toDouble();
+                     alt = line.section(',', 6, 6).toDouble();
+                     interval = line.section(',', 8, 8).toInt();
                      if (interval != prevInterval) {
                          prevInterval = interval;
                          if (interval != 0) currentInterval++;
                      }
                      if (interval != 0) interval = currentInterval;
-                     pause	 = line.section(',', 9, 9).toInt();
+                     pause = line.section(',', 9, 9).toInt();
                      total_pause += pause;
-                     nm		 = NULL; // torque is not provided in the Ergomo file
-                    
+                     nm = NULL; // torque is not provided in the Ergomo file
+
                      // the ergomo records the time in whole seconds
                      // RECORDING INT. 1, 2, 5, 10, 15 or 30 per sec
                      // Time is *always* perfectly sequential.  To find pauses,
                      // you need to read the PAUSE column.
                      minutes = minutes/60.0;
-                    
+
                      if (!metric) {
                          km *= KM_PER_MILE;
                          kph *= KM_PER_MILE;
                      }
                 }
-                
+
                 // PT reports no data as watts == -1.
                 if (watts == -1)
                     watts = 0;
-                
-                rideFile->appendPoint(minutes * 60.0, cad, hr, km, 
+
+                rideFile->appendPoint(minutes * 60.0, cad, hr, km,
                                       kph, nm, watts, alt, 0.0, 0.0, interval);
             }
-        ++lineno;
+            ++lineno;
         }
     }
     file.close();
@@ -227,10 +225,10 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
     }
     // less than 2 data points is not a valid ride file
     else {
-	errors << "Insufficient valid data in file \"" + file.fileName() + "\".";
-	delete rideFile;
-	file.close();
-	return NULL;
+        errors << "Insufficient valid data in file \"" + file.fileName() + "\".";
+        delete rideFile;
+        file.close();
+        return NULL;
     }
 
     QRegExp rideTime("^.*/(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_"
