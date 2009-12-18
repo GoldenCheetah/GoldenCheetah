@@ -303,12 +303,6 @@ bool Zones::read(QFile &file)
 		defaults_from_user = true;
 	    }
 	    else {
-                if (hi <= lo) {
-                    err = tr("High value must be greater than low value for "
-                             "zone definition on line %1 of power.zones").arg(lineno);
-                    file.close();
-                    return false;
-                }
 		ZoneInfo zone(zonerx.cap(1), zonerx.cap(2), lo, hi);
 		zoneInfos.append(zone);
 	    }
@@ -394,6 +388,12 @@ bool Zones::read(QFile &file)
 
 	    ranges[nr].end = date_infinity;
 	}
+
+        if (ranges[nr].cp <= 0) {
+            err = tr("CP must be greater than zero in zone "
+                     "range %1 of power.zones").arg(nr + 1);
+            return false;
+        }
 
 	if (ranges[nr].zones.size()) {
 	    // check that the first zone starts with zero
