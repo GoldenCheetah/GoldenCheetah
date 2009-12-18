@@ -313,7 +313,7 @@ PfPvPlot::setData(RideItem *_rideItem)
 
     rideItem = _rideItem;
 
-    RideFile *ride = rideItem->ride;
+    RideFile *ride = rideItem->ride();
 
     if (ride) {
 	setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
@@ -409,7 +409,7 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
 
     rideItem = _rideItem;
 
-    RideFile *ride = rideItem->ride;
+    RideFile *ride = rideItem->ride();
 
     if (ride) {
        // due to the discrete power and cadence values returned by the

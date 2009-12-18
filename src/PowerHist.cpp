@@ -409,7 +409,7 @@ PowerHist::setData(RideItem *_rideItem)
 {
     rideItem = _rideItem;
 
-    RideFile *ride = rideItem->ride;
+    RideFile *ride = rideItem->ride();
 
     if (ride) {
         setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
@@ -649,7 +649,7 @@ void
 PowerHist::fixSelection() {
 
     Selection s = selected;
-    RideFile *ride = rideItem->ride;
+    RideFile *ride = rideItem->ride();
 
     if (ride)
         do
@@ -701,7 +701,7 @@ bool PowerHist::shadeZones() const
 {
     return (
 	    rideItem &&
-	    rideItem->ride &&
+	    rideItem->ride() &&
 	    selected == wattsShaded
 	    );
 }

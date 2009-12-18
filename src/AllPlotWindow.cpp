@@ -232,8 +232,8 @@ AllPlotWindow::setSmoothingFromLineEdit()
 void
 AllPlotWindow::setAllPlotWidgets(RideItem *ride)
 {
-    if (ride->ride && ride->ride->deviceType() != QString("Manual CSV")) {
-	const RideFileDataPresent *dataPresent = ride->ride->areDataPresent();
+    if (ride->ride() && ride->ride()->deviceType() != QString("Manual CSV")) {
+	const RideFileDataPresent *dataPresent = ride->ride()->areDataPresent();
 	showPower->setEnabled(dataPresent->watts);
 	showHr->setEnabled(dataPresent->hr);
 	showSpeed->setEnabled(dataPresent->kph);
@@ -345,7 +345,7 @@ AllPlotWindow::setEndSelection(double xValue, bool newInterval, QString name)
             x2 *=  KM_PER_MILE;
         }
 
-        foreach (const RideFilePoint *point, ride->ride->dataPoints()) {
+        foreach (const RideFilePoint *point, ride->ride()->dataPoints()) {
             if ((allPlot->byDistance()==true && point->km>=x1 && point->km<x2) ||
                 (allPlot->byDistance()==false && point->secs/60>=x1 && point->secs/60<x2)) {
 
@@ -356,7 +356,7 @@ AllPlotWindow::setEndSelection(double xValue, bool newInterval, QString name)
                 duration2 = point->secs;
 
                 if (point->kph > 0.0)
-                   secsMoving += ride->ride->recIntSecs();
+                   secsMoving += ride->ride()->recIntSecs();
                 wattsTotal += point->watts;
                 bpmTotal += point->hr;
                 ++arrayLength;
@@ -405,7 +405,7 @@ AllPlotWindow::setEndSelection(double xValue, bool newInterval, QString name)
             // add average power to the end of the selection name
             name += QString("(%1 watts)").arg(round((wattsTotal && arrayLength) ? wattsTotal/arrayLength : 0));
 
-            QTreeWidgetItem *last = new IntervalItem(ride->ride, name, duration1, duration2, distance1, distance2);
+            QTreeWidgetItem *last = new IntervalItem(ride->ride(), name, duration1, duration2, distance1, distance2);
             allIntervals->addChild(last);
 
             // now update the RideFileIntervals and all the plots etc

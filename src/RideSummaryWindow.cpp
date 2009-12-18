@@ -161,18 +161,18 @@ RideSummaryWindow::htmlSummary() const
     QString summary;
 
     RideItem *rideItem = mainWindow->rideItem();
-    QFile file(rideItem->path + "/" + rideItem->fileName);
-    QStringList errors;
-    RideFile *ride = rideItem->ride;
-    if (!ride)
-        ride = RideFileFactory::instance().openRideFile(file, errors);
+    RideFile *ride = rideItem->ride();
+
+    // ridefile read errors?
     if (!ride) {
-        summary = "<p>Couldn't read file \"" + file.fileName() + "\":";
-        QListIterator<QString> i(errors);
+        summary = tr("<p>Couldn't read file \"");
+        summary += rideItem->fileName + "\":";
+        QListIterator<QString> i(mainWindow->rideItem()->errors());
         while (i.hasNext())
             summary += "<br>" + i.next();
         return summary;
     }
+
     summary = ("<p><center><h2>"
                + rideItem->dateTime.toString(tr("dddd MMMM d, yyyy, h:mm AP"))
                + "</h2><h3>" + tr("Device Type: ") + ride->deviceType() + "</h3>");
@@ -354,9 +354,9 @@ RideSummaryWindow::htmlSummary() const
         summary += "</table>";
     }
 
-    if (!errors.empty()) {
+    if (!rideItem->errors().empty()) {
         summary += tr("<p><h2>Errors reading file:</h2><ul>");
-        QStringListIterator i(errors);
+        QStringListIterator i(rideItem->errors());
         while(i.hasNext())
             summary += " <li>" + i.next();
         summary += "</ul>";

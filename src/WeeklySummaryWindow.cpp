@@ -200,7 +200,7 @@ WeeklySummaryWindow::refresh()
 	    ) {
 
             item->computeMetrics(); // generates item->ride
-            if (!item->ride)
+            if (!item->ride())
                 continue;
 
 	    RideMetric *m;

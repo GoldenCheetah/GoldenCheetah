@@ -663,6 +663,9 @@ RideImportWizard::abortClicked()
                 if (source.copy(fulltarget)) {
                     tableWidget->item(i,5)->setText(tr("File Saved"));
                     mainWindow->addRide(QFileInfo(fulltarget).fileName(), true); // add to tree view
+                    // free immediately otherwise all imported rides are cached
+                    // and with large imports this can lead to memory exhaustion
+                    mainWindow->rideItem()->freeMemory();
                 } else
                     tableWidget->item(i,5)->setText(tr("Error - copy failed"));
         }

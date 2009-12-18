@@ -141,7 +141,7 @@ MainWindow::saveSilent(RideItem *rideItem)
 
     // save in GC format
     GcFileReader reader;
-    reader.writeRideFile(rideItem->ride, savedFile);
+    reader.writeRideFile(rideItem->ride(), savedFile);
 
     // rename the file and update the rideItem list to reflect the change
     if (convert) {
