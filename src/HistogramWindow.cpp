@@ -200,7 +200,7 @@ HistogramWindow::setHistWidgets(RideItem *rideItem)
 {
     int count = 0;
     assert(rideItem);
-    RideFile *ride = rideItem->ride;
+    RideFile *ride = rideItem->ride();
 
     // prevent selection from changing during reconstruction of options
     disconnect(histParameterCombo, SIGNAL(currentIndexChanged(int)),

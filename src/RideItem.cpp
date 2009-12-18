@@ -26,10 +26,9 @@
 RideItem::RideItem(int type,
                    QString path, QString fileName, const QDateTime &dateTime,
                    const Zones *zones, QString notesFileName) :
-    QTreeWidgetItem(type), path(path), fileName(fileName),
-    dateTime(dateTime), ride(NULL), zones(zones), notesFileName(notesFileName)
+    QTreeWidgetItem(type), ride_(NULL), isdirty(false), path(path), fileName(fileName),
+    dateTime(dateTime), zones(zones), notesFileName(notesFileName)
 {
-    isdirty = false;
     setText(0, dateTime.toString("ddd"));
     setText(1, dateTime.toString("MMM d, yyyy"));
     setText(2, dateTime.toString("h:mm AP"));
@@ -46,6 +45,15 @@ RideItem::~RideItem()
     }
 }
 
+RideFile *RideItem::ride()
+{
+    if (ride_) return ride_;
+
+    // open the ride file
+    QFile file(path + "/" + fileName);
+    ride_ = RideFileFactory::instance().openRideFile(file, errors_);
+    return ride_;
+}
 void
 RideItem::setDirty(bool val)
 {
@@ -93,7 +101,7 @@ int RideItem::numZones()
 double RideItem::timeInZone(int zone)
 {
     computeMetrics();
-    if (!ride)
+    if (!ride())
         return 0.0;
     assert(zone < numZones());
     return time_in_zone[zone];
@@ -102,9 +110,9 @@ double RideItem::timeInZone(int zone)
 void
 RideItem::freeMemory()
 {
-    if (ride) {
-        delete ride;
-        ride = NULL;
+    if (ride_) {
+        delete ride_;
+        ride_ = NULL;
     }
 }
 
@@ -117,13 +125,7 @@ RideItem::computeMetrics()
         return;
     }
 
-    if (!ride) {
-        QFile file(path + "/" + fileName);
-        QStringList errors;
-        ride = RideFileFactory::instance().openRideFile(file, errors);
-        if (!ride)
-            return;
-    }
+    if (!ride()) return;
 
     computeMetricsTime = QDateTime::currentDateTime();
 
@@ -135,8 +137,8 @@ RideItem::computeMetrics()
         time_in_zone.resize(num_zones);
     }
 
-    double secs_delta = ride->recIntSecs();
-    foreach (const RideFilePoint *point, ride->dataPoints()) {
+    double secs_delta = ride()->recIntSecs();
+    foreach (const RideFilePoint *point, ride()->dataPoints()) {
         if (point->watts >= 0.0) {
             if (num_zones > 0) {
                 int zone = zones->whichZone(zone_range, point->watts);
@@ -169,7 +171,7 @@ RideItem::computeMetrics()
                         if (!metrics.contains(deps[j]))
                             goto later;
                     RideMetric *metric = factory.newMetric(name);
-                    metric->compute(ride, zones, zone_range, metrics);
+                    metric->compute(ride(), zones, zone_range, metrics);
                     metrics.insert(name, metric);
                     i.remove();
                 }

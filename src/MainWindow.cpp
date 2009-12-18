@@ -521,7 +521,7 @@ MainWindow::currentRide()
         || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
         return NULL;
     }
-    return ((RideItem*) treeWidget->selectedItems().first())->ride;
+    return ((RideItem*) treeWidget->selectedItems().first())->ride();
 }
 
 void
@@ -578,7 +578,7 @@ MainWindow::exportCSV()
         return;
     }
 
-    ride->ride->writeAsCsv(file, useMetricUnits);
+    ride->ride()->writeAsCsv(file, useMetricUnits);
 }
 
 void
@@ -678,17 +678,17 @@ MainWindow::findPowerPeaks()
         return;
     }
 
-    addIntervalForPowerPeaksForSecs(ride->ride, 5, "Peak 5s");
-    addIntervalForPowerPeaksForSecs(ride->ride, 10, "Peak 10s");
-    addIntervalForPowerPeaksForSecs(ride->ride, 20, "Peak 20s");
-    addIntervalForPowerPeaksForSecs(ride->ride, 30, "Peak 30s");
-    addIntervalForPowerPeaksForSecs(ride->ride, 60, "Peak 1min");
-    addIntervalForPowerPeaksForSecs(ride->ride, 120, "Peak 2min");
-    addIntervalForPowerPeaksForSecs(ride->ride, 300, "Peak 5min");
-    addIntervalForPowerPeaksForSecs(ride->ride, 600, "Peak 10min");
-    addIntervalForPowerPeaksForSecs(ride->ride, 1200, "Peak 20min");
-    addIntervalForPowerPeaksForSecs(ride->ride, 1800, "Peak 30min");
-    addIntervalForPowerPeaksForSecs(ride->ride, 3600, "Peak 60min");
+    addIntervalForPowerPeaksForSecs(ride->ride(), 5, "Peak 5s");
+    addIntervalForPowerPeaksForSecs(ride->ride(), 10, "Peak 10s");
+    addIntervalForPowerPeaksForSecs(ride->ride(), 20, "Peak 20s");
+    addIntervalForPowerPeaksForSecs(ride->ride(), 30, "Peak 30s");
+    addIntervalForPowerPeaksForSecs(ride->ride(), 60, "Peak 1min");
+    addIntervalForPowerPeaksForSecs(ride->ride(), 120, "Peak 2min");
+    addIntervalForPowerPeaksForSecs(ride->ride(), 300, "Peak 5min");
+    addIntervalForPowerPeaksForSecs(ride->ride(), 600, "Peak 10min");
+    addIntervalForPowerPeaksForSecs(ride->ride(), 1200, "Peak 20min");
+    addIntervalForPowerPeaksForSecs(ride->ride(), 1800, "Peak 30min");
+    addIntervalForPowerPeaksForSecs(ride->ride(), 3600, "Peak 60min");
 
     // now update the RideFileIntervals
     updateRideFileIntervals();
@@ -725,7 +725,7 @@ MainWindow::rideTreeWidgetSelectionChanged()
 
     // now add the intervals for the current ride
     if (ride) { // only if we have a ride pointer
-        RideFile *selected = ride->ride;
+        RideFile *selected = ride->ride();
         if (selected) {
             // get all the intervals in the currently selected RideFile
             QList<RideFileInterval> intervals = selected->intervals();
@@ -743,7 +743,7 @@ MainWindow::rideTreeWidgetSelectionChanged()
     }
 
 	// turn off tabs that don't make sense for manual file entry
-	if (ride->ride && ride->ride->deviceType() == QString("Manual CSV")) {
+	if (ride->ride() && ride->ride()->deviceType() == QString("Manual CSV")) {
 	    tabWidget->setTabEnabled(3,false); // Power Histogram
 	    tabWidget->setTabEnabled(4,false); // PF/PV Plot
 	}
@@ -783,7 +783,7 @@ MainWindow::updateRideFileIntervals()
     // iterate over allIntervals as they are now defined
     // and update the RideFile->intervals
     RideItem *which = (RideItem *)treeWidget->selectedItems().first();
-    RideFile *current = which->ride;
+    RideFile *current = which->ride();
     current->clearIntervals();
     for (int i=0; i < allIntervals->childCount(); i++) {
         // add the intervals as updated

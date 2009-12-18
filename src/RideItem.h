@@ -30,6 +30,8 @@ class RideItem : public QTreeWidgetItem {
     protected:
 
         QVector<double> time_in_zone;
+        RideFile *ride_;
+        QStringList errors_;
         bool isdirty;
 
     public:
@@ -38,7 +40,8 @@ class RideItem : public QTreeWidgetItem {
         QString fileName;
         QDateTime dateTime;
 	QDateTime computeMetricsTime;
-        RideFile *ride;
+        RideFile *ride();
+        const QStringList errors() { return errors_; }
         const Zones *zones;
         QString notesFileName;
 
