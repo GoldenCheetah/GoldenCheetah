@@ -842,8 +842,16 @@ int Computrainer::openPort()
 
     COMMTIMEOUTS timeouts; // timeout settings on serial ports
 
-    wchar_t deviceFilenameW[32]; // COM1 needs 4 characters, 32 should be enough?
-    MultiByteToWideChar(CP_ACP, 0, deviceFilename.toAscii(), -1, (LPWSTR)deviceFilenameW,
+    // if deviceFilename references a port above COM9
+    // then we need to open "\\.\COMX" not "COMX"
+    QString portSpec;
+    int portnum = deviceFilename.midRef(3).toString().toInt();
+    if (portnum < 10)
+	   portSpec = deviceFilename;
+    else
+	   portSpec = "\\\\.\\" + deviceFilename;
+    wchar_t deviceFilenameW[32]; // \\.\COM32 needs 9 characters, 32 should be enough?
+    MultiByteToWideChar(CP_ACP, 0, portSpec.toAscii(), -1, (LPWSTR)deviceFilenameW,
                     sizeof(deviceFilenameW));
 
     // win32 commport API
