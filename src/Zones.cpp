@@ -801,25 +801,27 @@ int Zones::insertRangeAtDate(QDate date, int cp) {
     assert(date.isValid());
     int rnum;
 
-    if (ranges.empty())
-	addZoneRange();
+    if (ranges.empty()) {
+        addZoneRange();
+        rnum = 0;
+    }
     else {
-	rnum = whichRange(date);
-	assert(rnum >= 0);
-	QDate date1 = getStartDate(rnum);
+        rnum = whichRange(date);
+        assert(rnum >= 0);
+        QDate date1 = getStartDate(rnum);
 
-	// if the old range has dates before the specified, then truncate the old range
-	// and shift up the existing ranges
-	if (date > date1) {
-	    QDate endDate = getEndDate(rnum);
-	    setEndDate(rnum, date);
-	    ranges.insert(++ rnum, ZoneRange(date, endDate));
-	}
+        // if the old range has dates before the specified, then truncate
+        // the old range and shift up the existing ranges
+        if (date > date1) {
+            QDate endDate = getEndDate(rnum);
+            setEndDate(rnum, date);
+            ranges.insert(++ rnum, ZoneRange(date, endDate));
+        }
     }
 
     if (cp > 0) {
-	setCP(rnum, cp);
-	setZonesFromCP(rnum);
+        setCP(rnum, cp);
+        setZonesFromCP(rnum);
     }
 
     return rnum;
