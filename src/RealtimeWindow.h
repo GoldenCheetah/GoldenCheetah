@@ -98,6 +98,7 @@ class RealtimeWindow : public QWidget
         MainWindow *main;
 
         QList<DeviceConfiguration> Devices;
+        bool useMetricUnits;
 
         // updated with a RealtimeData object either from
         // update() - from a push device (quarqd ANT+)
