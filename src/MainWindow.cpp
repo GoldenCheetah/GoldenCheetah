@@ -301,34 +301,37 @@ MainWindow::MainWindow(const QDir &home) :
     /////////////////////////////// Menus ///////////////////////////////
 
     QMenu *fileMenu = menuBar()->addMenu(tr("&Cyclist"));
-    fileMenu->addAction(tr("&New..."), this, 
-                        SLOT(newCyclist()), tr("Ctrl+N")); 
-    fileMenu->addAction(tr("&Open..."), this, 
-                        SLOT(openCyclist()), tr("Ctrl+O")); 
-    fileMenu->addAction(tr("&Quit"), this, 
-                        SLOT(close()), tr("Ctrl+Q")); 
+    fileMenu->addAction(tr("&New..."), this,
+                        SLOT(newCyclist()), tr("Ctrl+N"));
+    fileMenu->addAction(tr("&Open..."), this,
+                        SLOT(openCyclist()), tr("Ctrl+O"));
+    fileMenu->addAction(tr("&Quit"), this,
+                        SLOT(close()), tr("Ctrl+Q"));
 
     QMenu *rideMenu = menuBar()->addMenu(tr("&Ride"));
-    rideMenu->addAction(tr("&Save Ride"), this,
-                        SLOT(saveRide()), tr("Ctrl+S"));
-    rideMenu->addAction(tr("&Download from device..."), this, 
-                        SLOT(downloadRide()), tr("Ctrl+D")); 
-    rideMenu->addAction(tr("&Export to CSV..."), this, 
-                        SLOT(exportCSV()), tr("Ctrl+E")); 
+    rideMenu->addAction(tr("&Download from device..."), this,
+                        SLOT(downloadRide()), tr("Ctrl+D"));
+    rideMenu->addAction(tr("&Import from file..."), this,
+                        SLOT (importFile()), tr ("Ctrl+I"));
+    rideMenu->addAction(tr("&Manual ride entry..."), this,
+                        SLOT(manualRide()), tr("Ctrl+M"));
+    rideMenu->addSeparator ();
+    rideMenu->addAction(tr("&Export to CSV..."), this,
+                        SLOT(exportCSV()), tr("Ctrl+E"));
     rideMenu->addAction(tr("&Export to GC..."), this,
                         SLOT(exportGC()));
-    rideMenu->addAction(tr("&Import from File..."), this,
-                        SLOT (importFile()), tr ("Ctrl+I"));
+    rideMenu->addSeparator ();
+    rideMenu->addAction(tr("&Save ride"), this,
+                        SLOT(saveRide()), tr("Ctrl+S"));
+    rideMenu->addAction(tr("D&elete ride..."), this,
+                        SLOT(deleteRide()));
+    rideMenu->addAction(tr("Split &ride..."), this,
+                        SLOT(splitRide()));
+    rideMenu->addSeparator ();
     rideMenu->addAction(tr("Find &best intervals..."), this,
                         SLOT(findBestIntervals()), tr ("Ctrl+B"));
     rideMenu->addAction(tr("Find power &peaks..."), this,
                         SLOT(findPowerPeaks()), tr ("Ctrl+P"));
-    rideMenu->addAction(tr("Split &ride..."), this,
-                        SLOT(splitRide()));
-    rideMenu->addAction(tr("D&elete ride..."), this,
-                        SLOT(deleteRide()));
-    rideMenu->addAction(tr("&Manual ride entry..."), this,
-          SLOT(manualRide()), tr("Ctrl+M"));
 
     QMenu *optionsMenu = menuBar()->addMenu(tr("&Tools"));
     optionsMenu->addAction(tr("&Options..."), this, 
@@ -343,6 +346,7 @@ MainWindow::MainWindow(const QDir &home) :
  
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(tr("&About GoldenCheetah"), this, SLOT(aboutDialog()));
+
 
        
     QVariant isAscending = settings->value(GC_ALLRIDES_ASCENDING,Qt::Checked);
