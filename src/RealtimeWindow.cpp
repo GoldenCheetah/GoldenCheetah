@@ -21,6 +21,7 @@
 #include "RealtimeData.h"
 #include "RealtimePlot.h"
 #include "math.h" // for round()
+#include "Units.h" // for MILES_PER_KM
 
 // Three current realtime device types supported are:
 #include "ComputrainerController.h"
@@ -36,6 +37,16 @@ RealtimeWindow::configUpdate()
     // wipe out all the current entries
     deviceSelector->clear();
     streamSelector->clear();
+
+    // metric or imperial changed?
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+    QVariant unit = settings->value(GC_UNIT);
+    useMetricUnits = (unit.toString() == "Metric");
+
+    // set labels accordingly
+    distanceLabel->setText(useMetricUnits ? tr("Distance (KM)") : tr("Distance (Miles)"));
+    speedLabel->setText(useMetricUnits ? tr("KPH") : tr("MPH"));
+    avgspeedLabel->setText(useMetricUnits ? tr("Avg KPH") : tr("Avg MPH"));
 
     // get configured devices
     DeviceConfigurations all;
@@ -75,6 +86,11 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, const QDir &home)  : QWidget(
     deviceController = NULL;
     streamController = NULL;
     ergFile = NULL;
+
+    // metric or imperial?
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+    QVariant unit = settings->value(GC_UNIT);
+    useMetricUnits = (unit.toString() == "Metric");
 
     // main layout for the window
     main_layout = new QVBoxLayout(this);
@@ -159,7 +175,7 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, const QDir &home)  : QWidget(
     powerLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
     heartrateLabel = new QLabel(tr("BPM"), this);
     heartrateLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
-    speedLabel = new QLabel(tr("KPH"), this);
+    speedLabel = new QLabel(useMetricUnits ? tr("KPH") : tr("MPH"), this);
     speedLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
     cadenceLabel = new QLabel(tr("RPM"), this);
     cadenceLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
@@ -167,14 +183,14 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, const QDir &home)  : QWidget(
     lapLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
     loadLabel = new QLabel(tr("Load WATTS"), this);
     loadLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
-    distanceLabel = new QLabel(tr("Distance (KM)"), this);
+    distanceLabel = new QLabel(useMetricUnits ? tr("Distance (KM)") : tr("Distance (Miles)"), this);
     distanceLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
 
     avgpowerLabel = new QLabel(tr("Avg WATTS"), this);
     avgpowerLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
     avgheartrateLabel = new QLabel(tr("Avg BPM"), this);
     avgheartrateLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
-    avgspeedLabel = new QLabel(tr("Avg KPH"), this);
+    avgspeedLabel = new QLabel(useMetricUnits ? tr("Avg KPH") : tr("Avg MPH"), this);
     avgspeedLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
     avgcadenceLabel = new QLabel(tr("Avg RPM"), this);
     avgcadenceLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
@@ -529,7 +545,7 @@ void RealtimeWindow::guiUpdate()           // refreshes the telemetry
 
     // Cadence, HR and Power needs to be rounded to 0 decimal places
     powerLCD->display(round(displayPower));
-    speedLCD->display(round(displaySpeed*10.00)/10.00);
+    speedLCD->display(round(displaySpeed * (useMetricUnits ? 1.0 : MILES_PER_KM) * 10.00)/10.00);
     cadenceLCD->display(round(displayCadence));
     heartrateLCD->display(round(displayHeartRate));
     lapLCD->display(displayWorkoutLap+displayLap);
@@ -539,7 +555,7 @@ void RealtimeWindow::guiUpdate()           // refreshes the telemetry
     else loadLCD->display(round(displayGradient*10)/10.00);
 
     // distance
-    distanceLCD->display(round(displayDistance*10.00)/10.00);
+    distanceLCD->display(round(displayDistance*(useMetricUnits ? 1.0 : MILES_PER_KM) *10.00) /10.00);
 
     // NZ Averages.....
     if (displayPower) { //NZAP is bogus - make it configurable!!!
@@ -570,7 +586,7 @@ void RealtimeWindow::guiUpdate()           // refreshes the telemetry
     }
 
     avgpowerLCD->display((int)avgPower);
-    avgspeedLCD->display(round(avgSpeed*10.00)/10.00);
+    avgspeedLCD->display(round(avgSpeed * (useMetricUnits ? 1.0 : MILES_PER_KM) * 10.00)/10.00);
     avgcadenceLCD->display((int)avgCadence);
     avgheartrateLCD->display((int)avgHeartRate);
 
