@@ -158,7 +158,8 @@ void StressCalculator::calculateStress(QWidget *mw,
 		cache[ridedatestring][bs_name] = bs;
 		cache[ridedatestring][dp_name] = dp;
 
-                item->freeMemory();
+                // only delete if the ride is clean (i.e. no pending ave)
+                if (item->isDirty() == false) item->freeMemory();
 	    }
 
 	    addRideData(metric == bs_name ? bs : dp,item->dateTime);
