@@ -247,15 +247,16 @@ RideSummaryWindow::htmlSummary() const
             const char *symbol = metricsList[j];
             if (!symbol) break;
             const RideMetric *m = rideItem->metrics.value(symbol);
+            QString name = m->name().replace(QRegExp(tr("^Average ")), "");
             if (m->units(metricUnits) == "seconds") {
                 QString s("<tr><td>%1:</td><td "
                           "align=\"right\">%2</td></tr>");
-                s = s.arg(m->name());
+                s = s.arg(name);
                 s = s.arg(time_to_string(m->value(metricUnits)));
                 summary += s;
             }
             else {
-                QString s = "<tr><td>" + m->name();
+                QString s = "<tr><td>" + name;
                 if (m->units(metricUnits) != "")
                     s += " (" + m->units(metricUnits) + ")";
                 s += ":</td><td align=\"right\">%1</td></tr>";
