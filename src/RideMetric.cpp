@@ -20,4 +20,45 @@
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
- 
+
+QHash<QString,RideMetricPtr>
+RideMetric::computeMetrics(const RideFile *ride, const Zones *zones,
+                           int zoneRange, const QStringList &metrics)
+{
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    QStringList todo = metrics;
+    QHash<QString,RideMetric*> done;
+    while (!todo.isEmpty()) {
+        QString symbol = todo.takeFirst();
+        const QVector<QString> &deps = factory.dependencies(symbol);
+        bool ready = true;
+        foreach (QString dep, deps) {
+            if (!done.contains(dep)) {
+                ready = false;
+                if (!todo.contains(dep))
+                    todo.append(dep);
+            }
+        }
+        if (ready) {
+            RideMetric *m = factory.newMetric(symbol);
+            if (ride->metricOverrides.contains(symbol))
+                m->override(ride->metricOverrides.value(symbol));
+            else
+                m->compute(ride, zones, zoneRange, done);
+            done.insert(symbol, m);
+        }
+        else {
+            if (!todo.contains(symbol))
+                todo.append(symbol);
+        }
+    }
+    QHash<QString,RideMetricPtr> result;
+    foreach (QString symbol, metrics) {
+        result.insert(symbol, QSharedPointer<RideMetric>(done.value(symbol)));
+        done.remove(symbol);
+    }
+    foreach (QString symbol, done.keys())
+        delete done.value(symbol);
+    return result;
+}
+

@@ -22,11 +22,15 @@
 #include <QHash>
 #include <QString>
 #include <QVector>
+#include <QSharedPointer>
 #include <assert.h>
 
 #include "RideFile.h"
 
 class Zones;
+
+class RideMetric;
+typedef QSharedPointer<RideMetric> RideMetricPtr;
 
 struct RideMetric {
     virtual ~RideMetric() {}
@@ -74,6 +78,10 @@ struct RideMetric {
         assert(false); 
     }
     virtual RideMetric *clone() const = 0;
+
+    static QHash<QString,RideMetricPtr>
+    computeMetrics(const RideFile *ride, const Zones *zones,
+                   int zoneRange, const QStringList &metrics);
 };
 
 class AvgRideMetric : public RideMetric {

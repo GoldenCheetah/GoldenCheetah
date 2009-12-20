@@ -150,7 +150,7 @@ void StressCalculator::calculateStress(QWidget *mw,
 	    else {
 		item->computeMetrics();
 
-                RideMetric *m;
+                RideMetricPtr m;
                 if ((m = item->metrics.value(bs_name)) && m->value(true))
 		    bs = m->value(true);
 		if ((m = item->metrics.value(dp_name)) && m->value(true))

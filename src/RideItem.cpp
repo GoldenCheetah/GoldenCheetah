@@ -36,15 +36,6 @@ RideItem::RideItem(int type,
     setTextAlignment(2, Qt::AlignRight);
 }
 
-RideItem::~RideItem()
-{
-    MetricIter i(metrics);
-    while (i.hasNext()) {
-        i.next();
-        delete i.value();
-    }
-}
-
 RideFile *RideItem::ride()
 {
     if (ride_) return ride_;
@@ -148,38 +139,10 @@ RideItem::computeMetrics()
         }
     }
 
+    QStringList allMetrics;
     const RideMetricFactory &factory = RideMetricFactory::instance();
-    QSet<QString> todo;
-
-    // hack djconnel: do the metrics TWICE, to catch dependencies
-    // on displayed variables.  Presently if a variable depends on zones,
-    // for example, and zones change, the value may be considered still
-    // value even though it will change.  This is presently happening
-    // where bikescore depends on relative intensity.
-    // note metrics are only calculated if zones are defined
-    for (int metriciteration = 0; metriciteration < 2; metriciteration ++) {
-        for (int i = 0; i < factory.metricCount(); ++i) {
-            todo.insert(factory.metricName(i));
-
-            while (!todo.empty()) {
-                QMutableSetIterator<QString> i(todo);
-            later:
-                while (i.hasNext()) {
-                    const QString &name = i.next();
-                    const QVector<QString> &deps = factory.dependencies(name);
-                    for (int j = 0; j < deps.size(); ++j)
-                        if (!metrics.contains(deps[j]))
-                            goto later;
-                    RideMetric *metric = factory.newMetric(name);
-                    if (ride()->metricOverrides.contains(name))
-                        metric->override(ride()->metricOverrides.value(name));
-                    else
-                        metric->compute(ride(), zones, zone_range, metrics);
-                    metrics.insert(name, metric);
-                    i.remove();
-                }
-            }
-        }
-    }
+    for (int i = 0; i < factory.metricCount(); ++i)
+        allMetrics.append(factory.metricName(i));
+    metrics = RideMetric::computeMetrics(ride(), zones, zoneRange(), allMetrics);
 }
 

@@ -203,7 +203,7 @@ WeeklySummaryWindow::refresh()
             if (!item->ride())
                 continue;
 
-	    RideMetric *m;
+	    RideMetricPtr m;
 	    if ((m = item->metrics.value(weeklySeconds->symbol()))) {
 		weeklySeconds->aggregateWith(*m);
 		dailySeconds[day]->aggregateWith(*m);
