@@ -20,10 +20,10 @@
 #define _GC_RideItem_h 1
 
 #include <QtGui>
+#include "RideMetric.h"
 
 class RideFile;
 class Zones;
-class RideMetric;
 
 class RideItem : public QTreeWidgetItem {
 
@@ -45,16 +45,11 @@ class RideItem : public QTreeWidgetItem {
         const Zones *zones;
         QString notesFileName;
 
-        typedef QHash<QString,RideMetric*> MetricMap;
-        typedef QHashIterator<QString,RideMetric*> MetricIter;
-
-        MetricMap metrics;
+        QHash<QString,RideMetricPtr> metrics;
 
         RideItem(int type, QString path, 
                  QString fileName, const QDateTime &dateTime,
                  const Zones *zones, QString notesFileName);
-
-        ~RideItem();
 
         void setDirty(bool);
         bool isDirty() { return isdirty; }

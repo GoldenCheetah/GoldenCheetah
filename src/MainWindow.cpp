@@ -990,7 +990,7 @@ void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
 	    (days < BSdays.toInt())  
 	    ) {
 
-	    RideMetric *m;
+	    RideMetricPtr m;
 	    item->computeMetrics();
 
 	    QString existing = progress->labelText();

@@ -246,7 +246,7 @@ RideSummaryWindow::htmlSummary() const
         for (int j = 0;; ++j) {
             const char *symbol = metricsList[j];
             if (!symbol) break;
-            const RideMetric *m = rideItem->metrics.value(symbol);
+            RideMetricPtr m = rideItem->metrics.value(symbol);
             QString name = m->name().replace(QRegExp(tr("^Average ")), "");
             if (m->units(metricUnits) == "seconds") {
                 QString s("<tr><td>%1:</td><td "
