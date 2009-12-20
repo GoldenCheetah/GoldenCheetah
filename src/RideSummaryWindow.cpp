@@ -87,6 +87,10 @@ summarize(bool even,
         color = QColor::fromHsv(color.hue(), color.saturation() * 2, color.value());
         intervals += "<tr bgcolor='" + color.name() + "'><td align=\"center\">%1</td>";
     }
+
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+    QVariant unit = settings->value(GC_UNIT);
+
     intervals += "<td align=\"center\">%2:%3</td>";
     intervals += "<td align=\"center\">%4</td>";
     intervals += "<td align=\"center\">%5</td>";
@@ -99,7 +103,10 @@ summarize(bool even,
     intervals = intervals.arg(name);
     intervals = intervals.arg(minutes, 0, 'f', 0);
     intervals = intervals.arg(seconds, 2, 'f', 0, QLatin1Char('0'));
-    intervals = intervals.arg(mile_len, 0, 'f', 1);
+    if(unit.toString() == "Metric")
+        intervals = intervals.arg(mile_len * KM_PER_MILE, 0, 'f', 1);
+    else
+        intervals = intervals.arg(mile_len, 0, 'f', 1);
     intervals = intervals.arg(energy, 0, 'f', 0);
     intervals = intervals.arg(int_max_power, 0, 'f', 0);
     intervals = intervals.arg(watts_avg, 0, 'f', 0);
@@ -107,9 +114,7 @@ summarize(bool even,
     intervals = intervals.arg(hr_avg, 0, 'f', 0);
     intervals = intervals.arg(cad_avg, 0, 'f', 0);
 
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
 
-    QVariant unit = settings->value(GC_UNIT);
     if(unit.toString() == "Metric")
         intervals = intervals.arg(mph_avg * 1.60934, 0, 'f', 1);
     else
