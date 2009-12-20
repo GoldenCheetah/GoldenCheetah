@@ -82,8 +82,6 @@ class AerobicDecoupling : public RideMetric {
         }
     }
 
-    bool canAggregate() const { return false; }
-    void aggregateWith(RideMetric *) { assert(false); }
     RideMetric *clone() const { return new AerobicDecoupling(*this); }
 };
 

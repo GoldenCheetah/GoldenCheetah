@@ -97,10 +97,7 @@ class DanielsPoints : public RideMetric {
             count(secsDelta, weighted);
         }
     }
-    virtual void aggregateWith(RideMetric *other) {
-        DanielsPoints *cs = (DanielsPoints*) other;
-        score += cs->score;
-    }
+    void aggregateWith(const RideMetric &other) { score += other.value(true); }
     RideMetric *clone() const { return new DanielsPoints(*this); }
 };
 

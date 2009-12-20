@@ -69,7 +69,7 @@ struct RideMetric {
         assert(false);
     }
     virtual bool canAggregate() const { return false; }
-    virtual void aggregateWith(RideMetric *other) { 
+    virtual void aggregateWith(const RideMetric &other) { 
         (void) other; 
         assert(false); 
     }
@@ -90,11 +90,11 @@ class AvgRideMetric : public RideMetric {
         if (count == 0) return 0.0;
         return total / count;
     }
-    void aggregateWith(RideMetric *other) { 
-        assert(symbol() == other->symbol());
-        AvgRideMetric *as = dynamic_cast<AvgRideMetric*>(other);
-        count += as->count;
-        total += as->total;
+    void aggregateWith(const RideMetric &other) { 
+        assert(symbol() == other.symbol());
+        const AvgRideMetric &as = dynamic_cast<const AvgRideMetric&>(other);
+        count += as.count;
+        total += as.total;
     }
 };
 
