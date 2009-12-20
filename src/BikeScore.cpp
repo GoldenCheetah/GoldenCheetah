@@ -20,6 +20,8 @@
 #include "Zones.h"
 #include <math.h>
 
+#define tr(s) QObject::tr(s)
+
 const double  bikeScoreN   = 4.0;
 
 // NOTE: This code follows the description of xPower, Relative Intensity, and
@@ -42,6 +44,7 @@ class XPower : public RideMetric {
 
     XPower() : xpower(0.0), secs(0.0) {}
     QString symbol() const { return "skiba_xpower"; }
+    QString name() const { return tr("xPower"); }
     QString units(bool) const { return "watts"; }
     double value(bool) const { return xpower; }
     void compute(const RideFile *ride, const Zones *, int,
@@ -107,6 +110,7 @@ class RelativeIntensity : public RideMetric {
 
     RelativeIntensity() : reli(0.0), secs(0.0) {}
     QString symbol() const { return "skiba_relative_intensity"; }
+    QString name() const { return tr("Relative Intensity"); }
     QString units(bool) const { return ""; }
     double value(bool) const { return reli; }
     void compute(const RideFile *, const Zones *zones, int zoneRange,
@@ -141,6 +145,7 @@ class BikeScore : public RideMetric {
 
     BikeScore() : score(0.0) {}
     QString symbol() const { return "skiba_bike_score"; }
+    QString name() const { return tr("BikeScore&#8482;"); }
     QString units(bool) const { return ""; }
     double value(bool) const { return score; }
     void compute(const RideFile *, const Zones *zones, int zoneRange,
