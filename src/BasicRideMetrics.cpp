@@ -46,7 +46,7 @@ static bool workoutTimeAdded =
 
 //////////////////////////////////////////////////////////////////////////////
 
-class TimeRiding : public PointwiseRideMetric {
+class TimeRiding : public RideMetric {
     double secsMovingOrPedaling;
 
     public:
@@ -57,10 +57,12 @@ class TimeRiding : public PointwiseRideMetric {
     QString units(bool) const { return "seconds"; }
     int precision() const { return 0; }
     double value(bool) const { return secsMovingOrPedaling; }
-    void perPoint(const RideFilePoint *point, double secsDelta, 
-                  const RideFile *, const Zones *, int) {
-        if ((point->kph > 0.0) || (point->cad > 0.0))
-            secsMovingOrPedaling += secsDelta;
+    void compute(const RideFile *ride, const Zones *, int,
+                 const QHash<QString,RideMetric*> &) {
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
+            if ((point->kph > 0.0) || (point->cad > 0.0))
+                secsMovingOrPedaling += ride->recIntSecs();
+        }
     }
     bool canAggregate() const { return true; }
     void aggregateWith(RideMetric *other) {
@@ -102,7 +104,7 @@ static bool totalDistanceAdded =
 //////////////////////////////////////////////////////////////////////////////
 
 
-class ElevationGain : public PointwiseRideMetric {
+class ElevationGain : public RideMetric {
     double elegain;
     double prevalt;
 
@@ -116,18 +118,18 @@ class ElevationGain : public PointwiseRideMetric {
     double value(bool metric) const {
         return metric ? elegain : (elegain * FEET_PER_METER);
     }
-    void perPoint(const RideFilePoint *point, double,
-                  const RideFile *, const Zones *, int) {
-
-	if (prevalt <= 0){
-		prevalt = point->alt;
-	} else if (prevalt <= point->alt) {
-		elegain += (point->alt-prevalt);
-		prevalt = point->alt;
-	} else {
-		prevalt = point->alt;
-	}
-
+    void compute(const RideFile *ride, const Zones *, int,
+                 const QHash<QString,RideMetric*> &) {
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
+            if (prevalt <= 0) {
+                prevalt = point->alt;
+            } else if (prevalt <= point->alt) {
+                elegain += (point->alt-prevalt);
+                prevalt = point->alt;
+            } else {
+                prevalt = point->alt;
+            }
+        }
     }
     bool canAggregate() const { return true; }
     void aggregateWith(RideMetric *other) {
@@ -141,7 +143,7 @@ static bool elevationGainAdded =
 
 //////////////////////////////////////////////////////////////////////////////
 
-class TotalWork : public PointwiseRideMetric {
+class TotalWork : public RideMetric {
     double joules;
 
     public:
@@ -152,10 +154,12 @@ class TotalWork : public PointwiseRideMetric {
     QString units(bool) const { return "kJ"; }
     int precision() const { return 0; }
     double value(bool) const { return joules / 1000.0; }
-    void perPoint(const RideFilePoint *point, double secsDelta, 
-                  const RideFile *, const Zones *, int) {
-        if (point->watts >= 0.0)
-            joules += point->watts * secsDelta;
+    void compute(const RideFile *ride, const Zones *, int,
+                 const QHash<QString,RideMetric*> &) {
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
+            if (point->watts >= 0.0)
+                joules += point->watts * ride->recIntSecs();
+        }
     }
     bool canAggregate() const { return true; }
     void aggregateWith(RideMetric *other) { 
@@ -171,7 +175,7 @@ static bool totalWorkAdded =
 
 //////////////////////////////////////////////////////////////////////////////
 
-class AvgSpeed : public PointwiseRideMetric {
+class AvgSpeed : public RideMetric {
     double secsMoving;
     double km;
 
@@ -187,14 +191,11 @@ class AvgSpeed : public PointwiseRideMetric {
         double kph = km / secsMoving * 3600.0;
         return metric ? kph : (kph * MILES_PER_KM);
     }
-    void compute(const RideFile *ride, const Zones *zones, int zoneRange,
-                 const QHash<QString,RideMetric*> &deps) {
-        PointwiseRideMetric::compute(ride, zones, zoneRange, deps);
+    void compute(const RideFile *ride, const Zones *, int,
+                 const QHash<QString,RideMetric*> &) {
         km = ride->dataPoints().back()->km;
-    }
-    void perPoint(const RideFilePoint *point, double secsDelta, 
-                  const RideFile *, const Zones *, int) {
-        if (point->kph > 0.0) secsMoving += secsDelta;
+        foreach (const RideFilePoint *point, ride->dataPoints())
+            if (point->kph > 0.0) secsMoving += ride->recIntSecs();
     }
     bool canAggregate() const { return true; }
     void aggregateWith(RideMetric *other) { 
@@ -217,11 +218,13 @@ struct AvgPower : public AvgRideMetric {
     QString name() const { return tr("Average Power"); }
     QString units(bool) const { return "watts"; }
     int precision() const { return 0; }
-    void perPoint(const RideFilePoint *point, double, 
-                  const RideFile *, const Zones *, int) {
-        if (point->watts >= 0.0) {
-            total += point->watts;
-            ++count;
+    void compute(const RideFile *ride, const Zones *, int,
+                 const QHash<QString,RideMetric*> &) {
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
+            if (point->watts >= 0.0) {
+                total += point->watts;
+                ++count;
+            }
         }
     }
     RideMetric *clone() const { return new AvgPower(*this); }
@@ -238,11 +241,13 @@ struct AvgHeartRate : public AvgRideMetric {
     QString name() const { return tr("Average Heart Rate"); }
     QString units(bool) const { return "bpm"; }
     int precision() const { return 0; }
-    void perPoint(const RideFilePoint *point, double, 
-                  const RideFile *, const Zones *, int) {
-        if (point->hr > 0) {
-            total += point->hr;
-            ++count;
+    void compute(const RideFile *ride, const Zones *, int,
+                 const QHash<QString,RideMetric*> &) {
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
+            if (point->hr > 0) {
+                total += point->hr;
+                ++count;
+            }
         }
     }
     RideMetric *clone() const { return new AvgHeartRate(*this); }
@@ -259,11 +264,13 @@ struct AvgCadence : public AvgRideMetric {
     QString name() const { return tr("Average Cadence"); }
     QString units(bool) const { return "rpm"; }
     int precision() const { return 0; }
-    void perPoint(const RideFilePoint *point, double, 
-                  const RideFile *, const Zones *, int) {
-        if (point->cad > 0) {
-            total += point->cad;
-            ++count;
+    void compute(const RideFile *ride, const Zones *, int,
+                 const QHash<QString,RideMetric*> &) {
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
+            if (point->cad > 0) {
+                total += point->cad;
+                ++count;
+            }
         }
     }
     RideMetric *clone() const { return new AvgCadence(*this); }

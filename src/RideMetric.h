@@ -76,18 +76,7 @@ struct RideMetric {
     virtual RideMetric *clone() const = 0;
 };
 
-struct PointwiseRideMetric : public RideMetric {
-    void compute(const RideFile *ride, const Zones *zones, int zoneRange,
-                 const QHash<QString,RideMetric*> &) {
-        foreach (const RideFilePoint *point, ride->dataPoints())
-            perPoint(point, ride->recIntSecs(), ride, zones, zoneRange);
-    }
-    virtual void perPoint(const RideFilePoint *point, double secsDelta,
-                          const RideFile *ride, const Zones *zones,
-                          int zoneRange) = 0;
-};
-
-class AvgRideMetric : public PointwiseRideMetric {
+class AvgRideMetric : public RideMetric {
 
     protected:
 
