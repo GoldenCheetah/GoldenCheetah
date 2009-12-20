@@ -37,7 +37,7 @@ class WorkoutTime : public RideMetric {
         seconds = ride->dataPoints().back()->secs;
     }
     bool canAggregate() const { return true; }
-    void aggregateWith(RideMetric *other) { seconds += other->value(true); }
+    void aggregateWith(const RideMetric &other) { seconds += other.value(true); }
     RideMetric *clone() const { return new WorkoutTime(*this); }
 };
 
@@ -65,8 +65,8 @@ class TimeRiding : public RideMetric {
         }
     }
     bool canAggregate() const { return true; }
-    void aggregateWith(RideMetric *other) {
-        secsMovingOrPedaling += other->value(true);
+    void aggregateWith(const RideMetric &other) {
+        secsMovingOrPedaling += other.value(true);
     }
     RideMetric *clone() const { return new TimeRiding(*this); }
 };
@@ -94,7 +94,7 @@ class TotalDistance : public RideMetric {
         km = ride->dataPoints().back()->km;
     }
     bool canAggregate() const { return true; }
-    void aggregateWith(RideMetric *other) { km += other->value(true); }
+    void aggregateWith(const RideMetric &other) { km += other.value(true); }
     RideMetric *clone() const { return new TotalDistance(*this); }
 };
 
@@ -132,8 +132,8 @@ class ElevationGain : public RideMetric {
         }
     }
     bool canAggregate() const { return true; }
-    void aggregateWith(RideMetric *other) {
-        elegain += other->value(true);
+    void aggregateWith(const RideMetric &other) {
+        elegain += other.value(true);
     }
     RideMetric *clone() const { return new ElevationGain(*this); }
 };
@@ -162,10 +162,10 @@ class TotalWork : public RideMetric {
         }
     }
     bool canAggregate() const { return true; }
-    void aggregateWith(RideMetric *other) { 
-        assert(symbol() == other->symbol());
-        TotalWork *tw = dynamic_cast<TotalWork*>(other);
-        joules += tw->joules;
+    void aggregateWith(const RideMetric &other) {
+        assert(symbol() == other.symbol());
+        const TotalWork &tw = dynamic_cast<const TotalWork&>(other);
+        joules += tw.joules;
     }
     RideMetric *clone() const { return new TotalWork(*this); }
 };
@@ -198,11 +198,11 @@ class AvgSpeed : public RideMetric {
             if (point->kph > 0.0) secsMoving += ride->recIntSecs();
     }
     bool canAggregate() const { return true; }
-    void aggregateWith(RideMetric *other) { 
-        assert(symbol() == other->symbol());
-        AvgSpeed *as = dynamic_cast<AvgSpeed*>(other);
-        secsMoving += as->secsMoving;
-        km += as->km;
+    void aggregateWith(const RideMetric &other) { 
+        assert(symbol() == other.symbol());
+        const AvgSpeed &as = dynamic_cast<const AvgSpeed&>(other);
+        secsMoving += as.secsMoving;
+        km += as.km;
     }
     RideMetric *clone() const { return new AvgSpeed(*this); }
 };

@@ -91,11 +91,11 @@ class XPower : public RideMetric {
 
     // added djconnel: allow RI to be combined across rides
     bool canAggregate() const { return true; }
-    void aggregateWith(RideMetric *other) { 
-        assert(symbol() == other->symbol());
-	XPower *ap = dynamic_cast<XPower*>(other);
-	xpower = pow(xpower, bikeScoreN) * secs + pow(ap->xpower, bikeScoreN) * ap->secs;
-	secs += ap->secs;
+    void aggregateWith(const RideMetric &other) { 
+        assert(symbol() == other.symbol());
+	const XPower &ap = dynamic_cast<const XPower&>(other);
+	xpower = pow(xpower, bikeScoreN) * secs + pow(ap.xpower, bikeScoreN) * ap.secs;
+	secs += ap.secs;
 	xpower = pow(xpower / secs, 1 / bikeScoreN);
     }
     // end added djconnel
@@ -128,11 +128,11 @@ class RelativeIntensity : public RideMetric {
 
     // added djconnel: allow RI to be combined across rides
     bool canAggregate() const { return true; }
-    void aggregateWith(RideMetric *other) { 
-        assert(symbol() == other->symbol());
-	RelativeIntensity *ap = dynamic_cast<RelativeIntensity*>(other);
-	reli = secs * pow(reli, bikeScoreN) + ap->secs * pow(ap->reli, bikeScoreN);
-	secs += ap->secs;
+    void aggregateWith(const RideMetric &other) { 
+        assert(symbol() == other.symbol());
+	const RelativeIntensity &ap = dynamic_cast<const RelativeIntensity&>(other);
+	reli = secs * pow(reli, bikeScoreN) + ap.secs * pow(ap.reli, bikeScoreN);
+	secs += ap.secs;
 	reli = pow(reli / secs, 1.0 / bikeScoreN);
     }
     // end added djconnel
@@ -171,7 +171,7 @@ class BikeScore : public RideMetric {
     }
     RideMetric *clone() const { return new BikeScore(*this); }
     bool canAggregate() const { return true; }
-    void aggregateWith(RideMetric *other) { score += other->value(true); }
+    void aggregateWith(const RideMetric &other) { score += other.value(true); }
 };
 
 static bool addAllThree() {
