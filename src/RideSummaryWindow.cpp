@@ -121,45 +121,6 @@ summarize(bool even,
         intervals = intervals.arg(mph_avg, 0, 'f', 1);
 }
 
-static const char *metricsXml =
-    "<metrics>\n"
-    "  <metric_group name=\"Totals\">\n"
-    "    <metric name=\"workout_time\" display_name=\"Workout time\"\n"
-    "            precision=\"0\"/>\n"
-    "    <metric name=\"time_riding\" display_name=\"Time riding\"\n"
-    "            precision=\"0\"/>\n"
-    "    <metric name=\"total_distance\" display_name=\"Distance\"\n"
-    "            precision=\"1\"/>\n"
-    "    <metric name=\"total_work\" display_name=\"Work\"\n"
-    "            precision=\"0\"/>\n"
-    "    <metric name=\"elevation_gain\" display_name=\"Elevation Gain\"\n"
-    "            precision=\"1\"/>\n"
-    "  </metric_group>\n"
-    "  <metric_group name=\"Averages\">\n"
-    "    <metric name=\"average_speed\" display_name=\"Speed\"\n"
-    "            precision=\"1\"/>\n"
-    "    <metric name=\"average_power\" display_name=\"Power\"\n"
-    "            precision=\"0\"/>\n"
-    "    <metric name=\"average_hr\" display_name=\"Heart rate\"\n"
-    "            precision=\"0\"/>\n"
-    "    <metric name=\"average_cad\" display_name=\"Cadence\"\n"
-    "            precision=\"0\"/>\n"
-    "  </metric_group>\n"
-    "  <metric_group name=\"Metrics\" note=\"BikeScore is a trademark "
-    "      of Dr. Philip Friere Skiba, PhysFarm Training Systems LLC\">\n"
-    "    <metric name=\"skiba_xpower\" display_name=\"xPower\"\n"
-    "            precision=\"0\"/>\n"
-    "    <metric name=\"skiba_relative_intensity\"\n"
-    "            display_name=\"Relative Intensity\" precision=\"3\"/>\n"
-    "    <metric name=\"skiba_bike_score\" display_name=\"BikeScore&#8482;\"\n"
-    "            precision=\"0\"/>\n"
-    "    <metric name=\"daniels_points\" display_name=\"Daniels Points\"\n"
-    "            precision=\"1\"/>\n"
-    "    <metric name=\"aerobic_decoupling\" display_name=\"Aerobic Decoupling\"\n"
-    "            precision=\"2\"/>\n"
-    "  </metric_group>\n"
-    "</metrics>\n";
-
 QString
 RideSummaryWindow::htmlSummary() const
 {
@@ -241,74 +202,73 @@ RideSummaryWindow::htmlSummary() const
 
     bool metricUnits = (unit.toString() == "Metric");
 
-    QDomDocument doc;
-    {
-        QString err;
-        int errLine, errCol;
-        if (!doc.setContent(QString(metricsXml), &err, &errLine, &errCol)){
-            fprintf(stderr, "error: %s, line %d, col %d\n",
-                    err.toAscii().constData(), errLine, errCol);
-            assert(false);
-        }
-    }
-
-    QString noteString = "";
-    QString stars;
-    QDomNodeList groups = doc.elementsByTagName("metric_group");
     const int columns = 3;
-    for (int groupNum = 0; groupNum < groups.size(); ++groupNum) {
-        QDomElement group = groups.at(groupNum).toElement();
-        assert(!group.isNull());
-        QString groupName = group.attribute("name");
-        QString groupNote = group.attribute("note");
-        assert(groupName.length() > 0);
-        if (groupNum % columns == 0)
-            summary += "<table border=0 cellspacing=10><tr>";
+    const char *columnNames[] = { "Totals", "Averages", "Metrics*" };
+    const char *totalColumn[] = {
+        "workout_time",
+        "time_riding",
+        "total_distance",
+        "total_work",
+        "elevation_gain",
+        NULL
+    };
+
+    const char *averageColumn[] = {
+        "average_speed",
+        "average_power",
+        "average_hr",
+        "average_cad",
+        NULL
+    };
+
+    const char *metricColumn[] = {
+        "skiba_xpower",
+        "skiba_relative_intensity",
+        "skiba_bike_score",
+        "daniels_points",
+        "aerobic_decoupling",
+        NULL
+    };
+
+    summary += "<table border=0 cellspacing=10><tr>";
+    for (int i = 0; i < columns; ++i) {
         summary += "<td align=\"center\" width=\"%1%\"><table>"
             "<tr><td align=\"center\" colspan=2><h2>%2</h2></td></tr>";
         summary = summary.arg(90 / columns);
-        if (groupNote.length() > 0) {
-            stars += "*";
-            summary = summary.arg(groupName + stars);
-            noteString += "<br>" + stars + " " + groupNote;
+        summary = summary.arg(columnNames[i]);
+        const char **metricsList;
+        switch (i) {
+            case 0: metricsList = totalColumn; break;
+            case 1: metricsList = averageColumn; break;
+            case 2: metricsList = metricColumn; break;
+            default: assert(false);
         }
-        else {
-            summary = summary.arg(groupName);
-        }
-        QDomNodeList metricsList = group.childNodes();
-        for (int i = 0; i < metricsList.size(); ++i) {
-            QDomElement metric = metricsList.at(i).toElement();
-            QString name = metric.attribute("name");
-            QString displayName = metric.attribute("display_name");
-            int precision = metric.attribute("precision", "0").toInt();
-            assert(name.length() > 0);
-            assert(displayName.length() > 0);
-            const RideMetric *m = rideItem->metrics.value(name);
-            assert(m);
+        for (int j = 0;; ++j) {
+            const char *symbol = metricsList[j];
+            if (!symbol) break;
+            const RideMetric *m = rideItem->metrics.value(symbol);
             if (m->units(metricUnits) == "seconds") {
                 QString s("<tr><td>%1:</td><td "
                           "align=\"right\">%2</td></tr>");
-                s = s.arg(displayName);
+                s = s.arg(m->name());
                 s = s.arg(time_to_string(m->value(metricUnits)));
                 summary += s;
             }
             else {
-                QString s = "<tr><td>" + displayName;
+                QString s = "<tr><td>" + m->name();
                 if (m->units(metricUnits) != "")
                     s += " (" + m->units(metricUnits) + ")";
                 s += ":</td><td align=\"right\">%1</td></tr>";
-                if (precision == 0)
+                if (m->precision() == 0)
                     s = s.arg((unsigned) round(m->value(metricUnits)));
                 else
-                    s = s.arg(m->value(metricUnits), 0, 'f', precision);
+                    s = s.arg(m->value(metricUnits), 0, 'f', m->precision());
                 summary += s;
             }
         }
         summary += "</table></td>";
-        if ((groupNum % columns == (columns - 1))
-            || (groupNum == groups.size() - 1))
-            summary += "</tr></table>";
     }
+    summary += "</tr></table>";
 
     if (rideItem->numZones() > 0) {
         QVector<double> time_in_zone(rideItem->numZones());
@@ -366,12 +326,12 @@ RideSummaryWindow::htmlSummary() const
             summary += " <li>" + i.next();
         summary += "</ul>";
     }
-    if (noteString.length() > 0) {
-        // The extra </center><center> works around a bug in QT 4.3.1,
-        // which will otherwise put the noteString above the <hr>.
-        summary += "<br><hr width=\"80%\"></center><center>" + noteString;
-    }
-    summary += "</center>";
+    summary += "<br><hr width=\"80%\"></center>";
+
+    // The extra <center> works around a bug in QT 4.3.1,
+    // which will otherwise put the following above the <hr>.
+    summary += "<center>BikeScore is a trademark of Dr. Philip "
+        "Friere Skiba, PhysFarm Training Systems LLC</center>";
 
     return summary;
 }
