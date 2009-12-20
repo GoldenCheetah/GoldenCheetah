@@ -42,7 +42,7 @@ class AerobicDecoupling : public RideMetric {
     public:
 
     AerobicDecoupling() : percent(0.0) {}
-    QString name() const { return "aerobic_decoupling"; }
+    QString symbol() const { return "aerobic_decoupling"; }
     QString units(bool) const { return "%"; }
     double value(bool) const { return percent; }
     void compute(const RideFile *ride, const Zones *, int,

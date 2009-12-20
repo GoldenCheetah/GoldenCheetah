@@ -204,30 +204,30 @@ WeeklySummaryWindow::refresh()
                 continue;
 
 	    RideMetric *m;
-	    if ((m = item->metrics.value(weeklySeconds->name()))) {
+	    if ((m = item->metrics.value(weeklySeconds->symbol()))) {
 		weeklySeconds->aggregateWith(m);
 		dailySeconds[day]->aggregateWith(m);
 	    }
 
-	    if ((m = item->metrics.value(weeklyDistance->name()))) {
+	    if ((m = item->metrics.value(weeklyDistance->symbol()))) {
 		weeklyDistance->aggregateWith(m);
 		dailyDistance[day]->aggregateWith(m);
 	    }
 
-	    if ((m = item->metrics.value(weeklyWork->name()))) {
+	    if ((m = item->metrics.value(weeklyWork->symbol()))) {
 		weeklyWork->aggregateWith(m);
 		dailyW[day]->aggregateWith(m);
 	    }
 
-            if ((m = item->metrics.value(weeklyCS->name())))
+            if ((m = item->metrics.value(weeklyCS->symbol())))
                 weeklyCS->aggregateWith(m);
 
-        if ((m = item->metrics.value(weeklyBS->name()))) {
+        if ((m = item->metrics.value(weeklyBS->symbol()))) {
 		weeklyBS->aggregateWith(m);
 		dailyBS[day]->aggregateWith(m);
 	    }
 
-	    if ((m = item->metrics.value(weeklyRelIntensity->name()))) {
+	    if ((m = item->metrics.value(weeklyRelIntensity->symbol()))) {
 		weeklyRelIntensity->aggregateWith(m);
 		dailyRI[day]->aggregateWith(m);
 	    }

@@ -25,7 +25,7 @@ class WorkoutTime : public RideMetric {
     public:
 
     WorkoutTime() : seconds(0.0) {}
-    QString name() const { return "workout_time"; }
+    QString symbol() const { return "workout_time"; }
     QString units(bool) const { return "seconds"; }
     double value(bool) const { return seconds; }
     void compute(const RideFile *ride, const Zones *, int,
@@ -48,7 +48,7 @@ class TimeRiding : public PointwiseRideMetric {
     public:
 
     TimeRiding() : secsMovingOrPedaling(0.0) {}
-    QString name() const { return "time_riding"; }
+    QString symbol() const { return "time_riding"; }
     QString units(bool) const { return "seconds"; }
     double value(bool) const { return secsMovingOrPedaling; }
     void perPoint(const RideFilePoint *point, double secsDelta, 
@@ -74,7 +74,7 @@ class TotalDistance : public RideMetric {
     public:
 
     TotalDistance() : km(0.0) {}
-    QString name() const { return "total_distance"; }
+    QString symbol() const { return "total_distance"; }
     QString units(bool metric) const { return metric ? "km" : "miles"; }
     double value(bool metric) const {
         return metric ? km : (km * MILES_PER_KM);
@@ -101,7 +101,7 @@ class ElevationGain : public PointwiseRideMetric {
     public:
 
     ElevationGain() : elegain(0.0), prevalt(0.0) {}
-    QString name() const { return "elevation_gain"; }
+    QString symbol() const { return "elevation_gain"; }
     QString units(bool metric) const { return metric ? "meters" : "feet"; }
     double value(bool metric) const {
         return metric ? elegain : (elegain * FEET_PER_METER);
@@ -137,7 +137,7 @@ class TotalWork : public PointwiseRideMetric {
     public:
 
     TotalWork() : joules(0.0) {}
-    QString name() const { return "total_work"; }
+    QString symbol() const { return "total_work"; }
     QString units(bool) const { return "kJ"; }
     double value(bool) const { return joules / 1000.0; }
     void perPoint(const RideFilePoint *point, double secsDelta, 
@@ -147,7 +147,7 @@ class TotalWork : public PointwiseRideMetric {
     }
     bool canAggregate() const { return true; }
     void aggregateWith(RideMetric *other) { 
-        assert(name() == other->name());
+        assert(symbol() == other->symbol());
         TotalWork *tw = dynamic_cast<TotalWork*>(other);
         joules += tw->joules;
     }
@@ -166,7 +166,7 @@ class AvgSpeed : public PointwiseRideMetric {
     public:
 
     AvgSpeed() : secsMoving(0.0), km(0.0) {}
-    QString name() const { return "average_speed"; }
+    QString symbol() const { return "average_speed"; }
     QString units(bool metric) const { return metric ? "kph" : "mph"; }
     double value(bool metric) const {
         if (secsMoving == 0.0) return 0.0;
@@ -184,7 +184,7 @@ class AvgSpeed : public PointwiseRideMetric {
     }
     bool canAggregate() const { return true; }
     void aggregateWith(RideMetric *other) { 
-        assert(name() == other->name());
+        assert(symbol() == other->symbol());
         AvgSpeed *as = dynamic_cast<AvgSpeed*>(other);
         secsMoving += as->secsMoving;
         km += as->km;
@@ -199,7 +199,7 @@ static bool avgSpeedAdded =
 
 struct AvgPower : public AvgRideMetric {
 
-    QString name() const { return "average_power"; }
+    QString symbol() const { return "average_power"; }
     QString units(bool) const { return "watts"; }
     void perPoint(const RideFilePoint *point, double, 
                   const RideFile *, const Zones *, int) {
@@ -218,7 +218,7 @@ static bool avgPowerAdded =
 
 struct AvgHeartRate : public AvgRideMetric {
 
-    QString name() const { return "average_hr"; }
+    QString symbol() const { return "average_hr"; }
     QString units(bool) const { return "bpm"; }
     void perPoint(const RideFilePoint *point, double, 
                   const RideFile *, const Zones *, int) {
@@ -237,7 +237,7 @@ static bool avgHeartRateAdded =
 
 struct AvgCadence : public AvgRideMetric {
 
-    QString name() const { return "average_cad"; }
+    QString symbol() const { return "average_cad"; }
     QString units(bool) const { return "rpm"; }
     void perPoint(const RideFilePoint *point, double, 
                   const RideFile *, const Zones *, int) {

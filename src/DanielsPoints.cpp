@@ -40,7 +40,7 @@ class DanielsPoints : public RideMetric {
     public:
 
     DanielsPoints() : score(0.0), cp(0.0) {}
-    QString name() const { return "daniels_points"; }
+    QString symbol() const { return "daniels_points"; }
     QString units(bool) const { return ""; }
     double value(bool) const { return score; }
     void compute(const RideFile *ride, const Zones *zones,

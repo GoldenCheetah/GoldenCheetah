@@ -41,7 +41,7 @@ class XPower : public RideMetric {
     public:
 
     XPower() : xpower(0.0), secs(0.0) {}
-    QString name() const { return "skiba_xpower"; }
+    QString symbol() const { return "skiba_xpower"; }
     QString units(bool) const { return "watts"; }
     double value(bool) const { return xpower; }
     void compute(const RideFile *ride, const Zones *, int,
@@ -88,7 +88,7 @@ class XPower : public RideMetric {
     // added djconnel: allow RI to be combined across rides
     bool canAggregate() const { return true; }
     void aggregateWith(RideMetric *other) { 
-        assert(name() == other->name());
+        assert(symbol() == other->symbol());
 	XPower *ap = dynamic_cast<XPower*>(other);
 	xpower = pow(xpower, bikeScoreN) * secs + pow(ap->xpower, bikeScoreN) * ap->secs;
 	secs += ap->secs;
@@ -106,7 +106,7 @@ class RelativeIntensity : public RideMetric {
     public:
 
     RelativeIntensity() : reli(0.0), secs(0.0) {}
-    QString name() const { return "skiba_relative_intensity"; }
+    QString symbol() const { return "skiba_relative_intensity"; }
     QString units(bool) const { return ""; }
     double value(bool) const { return reli; }
     void compute(const RideFile *, const Zones *zones, int zoneRange,
@@ -123,7 +123,7 @@ class RelativeIntensity : public RideMetric {
     // added djconnel: allow RI to be combined across rides
     bool canAggregate() const { return true; }
     void aggregateWith(RideMetric *other) { 
-        assert(name() == other->name());
+        assert(symbol() == other->symbol());
 	RelativeIntensity *ap = dynamic_cast<RelativeIntensity*>(other);
 	reli = secs * pow(reli, bikeScoreN) + ap->secs * pow(ap->reli, bikeScoreN);
 	secs += ap->secs;
@@ -140,7 +140,7 @@ class BikeScore : public RideMetric {
     public:
 
     BikeScore() : score(0.0) {}
-    QString name() const { return "skiba_bike_score"; }
+    QString symbol() const { return "skiba_bike_score"; }
     QString units(bool) const { return ""; }
     double value(bool) const { return score; }
     void compute(const RideFile *, const Zones *zones, int zoneRange,

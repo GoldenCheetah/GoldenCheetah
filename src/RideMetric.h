@@ -30,7 +30,11 @@ class Zones;
 
 struct RideMetric {
     virtual ~RideMetric() {}
-    virtual QString name() const = 0;
+
+    // The string by which we refer to this RideMetric in the code,
+    // configuration files, and caches (like stress.cache).  It should
+    // not be translated, and it should never be shown to the user.
+    virtual QString symbol() const = 0;
     virtual QString units(bool metric) const = 0;
     virtual double value(bool metric) const = 0;
     virtual void compute(const RideFile *ride, 
@@ -74,7 +78,7 @@ class AvgRideMetric : public PointwiseRideMetric {
         return total / count;
     }
     void aggregateWith(RideMetric *other) { 
-        assert(name() == other->name());
+        assert(symbol() == other->symbol());
         AvgRideMetric *as = dynamic_cast<AvgRideMetric*>(other);
         count += as->count;
         total += as->total;
@@ -106,30 +110,30 @@ class RideMetricFactory {
 
     const QString &metricName(int i) const { return metricNames[i]; }
 
-    RideMetric *newMetric(const QString &name) const {
-        assert(metrics.contains(name));
-        return metrics.value(name)->clone();
+    RideMetric *newMetric(const QString &symbol) const {
+        assert(metrics.contains(symbol));
+        return metrics.value(symbol)->clone();
     }
 
     bool addMetric(const RideMetric &metric,
                    const QVector<QString> *deps = NULL) {
-        assert(!metrics.contains(metric.name()));
-        metrics.insert(metric.name(), metric.clone());
-        metricNames.append(metric.name());
+        assert(!metrics.contains(metric.symbol()));
+        metrics.insert(metric.symbol(), metric.clone());
+        metricNames.append(metric.symbol());
         if (deps) {
             QVector<QString> *copy = new QVector<QString>;
             for (int i = 0; i < deps->size(); ++i) {
                 assert(metrics.contains((*deps)[i]));
                 copy->append((*deps)[i]);
             }
-            dependencyMap.insert(metric.name(), copy);
+            dependencyMap.insert(metric.symbol(), copy);
         }
         return true;
     }
 
-    const QVector<QString> &dependencies(const QString &name) const {
-        assert(metrics.contains(name));
-        QVector<QString> *result = dependencyMap.value(name);
+    const QVector<QString> &dependencies(const QString &symbol) const {
+        assert(metrics.contains(symbol));
+        QVector<QString> *result = dependencyMap.value(symbol);
         return result ? *result : noDeps;
     }
 };
