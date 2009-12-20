@@ -36,16 +36,22 @@ class ConfigurationPage : public QWidget
         QCheckBox *allRidesAscending;
         QLineEdit *BSdaysEdit;
         QComboBox *bsModeCombo;
+        QLineEdit *workoutDirectory;
+        QPushButton *workoutBrowseButton;
 
+    public slots:
+        void browseWorkoutDir();
 
     private:
         QGroupBox *configGroup;
         QLabel *langLabel;
         QLabel *unitLabel;
         QLabel *warningLabel;
+        QLabel *workoutLabel;
         QHBoxLayout *langLayout;
         QHBoxLayout *unitLayout;
         QHBoxLayout *warningLayout;
+        QHBoxLayout *workoutLayout;
         QVBoxLayout *configLayout;
         QVBoxLayout *mainLayout;
         QGridLayout *bsDaysLayout;

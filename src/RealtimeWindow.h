@@ -55,14 +55,13 @@ class RealtimeWindow : public QWidget
         RealtimeController *deviceController;   // read from
         RealtimeController *streamController;   // send out to
 
-        RealtimeWindow(MainWindow *, const QDir &);
+        RealtimeWindow(MainWindow *, TrainTool *, const QDir &);
 
         void updateData(RealtimeData &);      // to update telemetry by push devices
         void newLap();                      // start new Lap!
         void nextDisplayMode();     // show next display mode
         void setDeviceController();     // based upon selected device
         void setStreamController();     // based upon selected device
-        void configUpdate();            // called when config changes
 
     public slots:
 
@@ -79,13 +78,16 @@ class RealtimeWindow : public QWidget
         void SelectDevice(int); // when combobox chooses device
         void SelectRecord();    // when checkbox chooses record mode
         void SelectStream(int);    // when remote server to stream to is selected
-        void SelectWorkout(int);    // to select a Workout to use
+        void SelectWorkout();    // to select a Workout to use
 
         // Timed actions
         void guiUpdate();           // refreshes the telemetry
         void diskUpdate();          // writes to CSV file
         void streamUpdate();        // writes to remote Peer
         void loadUpdate();          // sets Load on CT like devices
+
+        // Handle config updates
+        void configUpdate();            // called when config changes
 
         // When no config has been setup
         void warnnoConfig();
@@ -96,6 +98,7 @@ class RealtimeWindow : public QWidget
         // passed from MainWindow
         QDir home;
         MainWindow *main;
+        TrainTool *trainTool;
 
         QList<DeviceConfiguration> Devices;
         bool useMetricUnits;
@@ -152,8 +155,7 @@ class RealtimeWindow : public QWidget
         QVBoxLayout *controls_layout;
         QCheckBox   *recordSelector;
         QComboBox   *deviceSelector,
-                    *streamSelector,
-                    *workoutSelector;
+                    *streamSelector;
         QPushButton *startButton,
                     *pauseButton,
                     *stopButton;

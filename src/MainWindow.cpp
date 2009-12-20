@@ -57,6 +57,8 @@
 #include "MetricAggregator.h"
 #include "SplitRideDialog.h"
 #include "PerformanceManagerWindow.h"
+#include "TrainTabs.h"
+#include "TrainTool.h"
 
 #ifndef GC_VERSION
 #define GC_VERSION "(developer build)"
@@ -127,6 +129,7 @@ MainWindow::MainWindow(const QDir &home) :
     setCentralWidget(splitter);
     splitter->setContentsMargins(10, 20, 10, 10); // attempting to follow some UI guides
 
+    // Analysis toolbox contents
     calendar = new RideCalendar;
     calendar->setFirstDayOfWeek(Qt::Monday);
     calendar->setHome(home);
@@ -179,7 +182,16 @@ MainWindow::MainWindow(const QDir &home) :
     leftLayout->setCollapsible(0, true);
     leftLayout->addWidget(intervalsplitter);
     leftLayout->setCollapsible(1, false);
-    splitter->addWidget(leftLayout);
+
+    // Train toolbox contents
+    TrainTool *trainTool = new TrainTool(this, home);
+
+    // Setup Toolbox
+    leftToolBox = new QToolBox;
+    leftToolBox->addItem(leftLayout, tr("Ride Analysis"));
+    leftToolBox->addItem(trainTool, tr("Racing and Training"));
+
+    splitter->addWidget(leftToolBox);
     splitter->setCollapsible(0, true);
     QVariant calendarSizes = settings->value(GC_SETTINGS_CALENDAR_SIZES);
     if (calendarSizes != QVariant()) {
@@ -200,7 +212,16 @@ MainWindow::MainWindow(const QDir &home) :
     }
 
     tabWidget = new QTabWidget;
+    trainTabs = new TrainTabs(this, trainTool, home);
     tabWidget->setUsesScrollButtons(true);
+
+    rightSide = new QStackedWidget;
+    rightSide->addWidget(tabWidget);
+    rightSide->addWidget(trainTabs);
+
+    // Start with Analysis by default
+    rightSide->setCurrentIndex(0);
+    leftToolBox->setCurrentIndex(0);
 
     rideSummaryWindow = new RideSummaryWindow(this);
     QLabel *notesLabel = new QLabel(tr("Notes:"));
@@ -232,7 +253,7 @@ MainWindow::MainWindow(const QDir &home) :
     /////////////////////////// Ride Plot Tab ///////////////////////////
     allPlotWindow = new AllPlotWindow(this);
     tabWidget->addTab(allPlotWindow, tr("Ride Plot"));
-    splitter->addWidget(tabWidget);
+    splitter->addWidget(rightSide);
     splitter->setCollapsible(1, true);
 
     QVariant splitterSizes = settings->value(GC_SETTINGS_SPLITTER_SIZES); 
@@ -271,11 +292,6 @@ MainWindow::MainWindow(const QDir &home) :
     performanceManagerWindow = new PerformanceManagerWindow(this);
     tabWidget->addTab(performanceManagerWindow, tr("Performance Manager"));
 
-    //////////////////////// Realtime ////////////////////////
-
-    realtimeWindow = new RealtimeWindow(this, home);
-    tabWidget->addTab(realtimeWindow, tr("Realtime"));
-
     ////////////////////////////// Signals ////////////////////////////// 
 
     connect(calendar, SIGNAL(clicked(const QDate &)),
@@ -296,7 +312,8 @@ MainWindow::MainWindow(const QDir &home) :
             this, SLOT(intervalTreeWidgetSelectionChanged()));
     connect(intervalWidget,SIGNAL(itemChanged(QTreeWidgetItem *,int)),
             this, SLOT(intervalEdited(QTreeWidgetItem*, int)));
-
+    connect(leftToolBox, SIGNAL(currentChanged(int)),
+            this, SLOT(toolboxChanged(int)));
 
     /////////////////////////////// Menus ///////////////////////////////
 
@@ -362,6 +379,12 @@ MainWindow::MainWindow(const QDir &home) :
     }
 
     setAttribute(Qt::WA_DeleteOnClose);
+}
+
+void
+MainWindow::toolboxChanged(int index)
+{
+    rightSide->setCurrentIndex(index); // right stack has one page per toolbox
 }
 
 void
@@ -1155,3 +1178,9 @@ void MainWindow::dateChanged(const QDate &date)
     }
 }
 
+// notify children that config has changed
+void
+MainWindow::notifyConfigChanged()
+{
+    configChanged();
+}

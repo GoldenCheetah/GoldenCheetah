@@ -29,6 +29,8 @@
 #include "SimpleNetworkController.h"
 #include "ErgFile.h"
 
+#include "TrainTool.h"
+
 void
 RealtimeWindow::configUpdate()
 {
@@ -78,11 +80,13 @@ RealtimeWindow::configUpdate()
     }
 }
 
-RealtimeWindow::RealtimeWindow(MainWindow *parent, const QDir &home)  : QWidget(parent)
+RealtimeWindow::RealtimeWindow(MainWindow *parent, TrainTool *trainTool, const QDir &home)  : QWidget(parent)
 {
 
     // set home
     this->home = home;
+    this->trainTool = trainTool;
+    main = parent;
     deviceController = NULL;
     streamController = NULL;
     ergFile = NULL;
@@ -103,11 +107,6 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, const QDir &home)  : QWidget(
 
     deviceSelector = new QComboBox(this);
     streamSelector = new QComboBox(this);
-    workoutSelector = new QComboBox(this);
-
-    workoutSelector->addItem(tr("Manual Mode"), 0);
-    workoutSelector->addItem(tr("Workout Mode"), 1);
-    workoutSelector->addItem(tr("Slope Mode"), 2);
 
     // get configured devices
     DeviceConfigurations all;
@@ -152,15 +151,16 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, const QDir &home)  : QWidget(
     streamSelector->hide();
 
     option_layout->addSpacing(10);
-    option_layout->addWidget(workoutSelector);
-
     controls_layout->addItem(option_layout);
     controls_layout->addItem(button_layout);
+
+    // handle config changes
+    connect(main, SIGNAL(configChanged()), this, SLOT(configUpdate()));
 
     connect(deviceSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(SelectDevice(int)));
     connect(recordSelector, SIGNAL(clicked()), this, SLOT(SelectRecord()));
     connect(streamSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(SelectStream(int)));
-    connect(workoutSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(SelectWorkout(int)));
+    connect(trainTool, SIGNAL(workoutSelected()), this, SLOT(SelectWorkout()));
 
     if (Devices.count() > 0) {
         connect(startButton, SIGNAL(clicked()), this, SLOT(Start()));
@@ -299,7 +299,6 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, const QDir &home)  : QWidget(
     displayWorkoutDistance = displayDistance = displayPower = displayHeartRate =
     displaySpeed = displayCadence = displayGradient = displayLoad = 0;
     avgPower= avgHeartRate= avgSpeed= avgCadence= avgLoad= 0;
-    main = parent;
 
     connect(gui_timer, SIGNAL(timeout()), this, SLOT(guiUpdate()));
     connect(disk_timer, SIGNAL(timeout()), this, SLOT(diskUpdate()));
@@ -372,7 +371,6 @@ void RealtimeWindow::Start()       // when start button is pressed
         recordSelector->setEnabled(false);
         streamSelector->setEnabled(false);
         deviceSelector->setEnabled(false);
-        workoutSelector->setEnabled(false);
 
         if (status & RT_WORKOUT) {
             load_timer->start(LOADRATE);      // start recording
@@ -479,7 +477,6 @@ void RealtimeWindow::Stop()        // when stop button is pressed
     recordSelector->setEnabled(true);
     streamSelector->setEnabled(true);
     deviceSelector->setEnabled(true);
-    workoutSelector->setEnabled(true);
 
     // reset counters etc
     pwrcount = 0;
@@ -715,83 +712,72 @@ void RealtimeWindow::diskUpdate()
 //----------------------------------------------------------------------
 
 void
-RealtimeWindow::SelectWorkout(int index)
+RealtimeWindow::SelectWorkout()
 {
     int mode;
 
+    // wip away the current selected workout
     if (ergFile) {
         delete ergFile;
         ergFile = NULL;
     }
 
-    if (index == 1) {
-        status |= RT_WORKOUT;
+    // which one is selected?
+    if (trainTool->currentWorkout() == NULL || trainTool->currentWorkout()->type() != WORKOUT_TYPE) return;
 
-        // choose a file and then parse it!
-        QString filename = QFileDialog::getOpenFileName(this,
-            tr("Open Workout File"), home.dirName(), tr("Workout Files (*.erg *.mrc *.crs)"));
-
-        if (!filename.isEmpty()) {
-            // Get users CP for relative watts calculations
-            QDate today = QDate::currentDate();
-            double Cp=285;                       // default to 285 if zones are not set
-            int range = main->zones()->whichRange(today);
-            if (range != -1) Cp = main->zones()->getCP(range);
-
-            ergFile = new ErgFile(filename, mode, Cp);
-            if (ergFile->isValid()) {
-
-                // success! we have a load file
-                // setup the course profile in the
-                // display!
-                ergPlot->setData(ergFile);
-                ergPlot->setVisible(true);
-                ergPlot->replot();
-
-                // set the device to the right mode
-                if (mode == ERG) {
-                    status |= RT_MODE_ERGO;
-                    status &= ~RT_MODE_SPIN;
-                    if (deviceController != NULL) deviceController->setMode(RT_MODE_ERGO);
-                    // set the labels on the gui
-                    loadLabel->setText("Load WATTS");
-                    avgloadLabel->setText("Avg Load WATTS");
-                } else { // SLOPE MODE
-                    status |= RT_MODE_SPIN;
-                    status &= ~RT_MODE_ERGO;
-                    if (deviceController != NULL) deviceController->setMode(RT_MODE_SPIN);
-                    // set the labels on the gui
-                    loadLabel->setText("Gradient PERCENT");
-                    avgloadLabel->setText("Avg Gradient PERCENT");
-                }
-                return;
-            }
-        }
-
-        // oops didn't parse or no file selected
-        workoutSelector->setCurrentIndex(0);    // will drop back here and delet/unset!
-
-    } else if (index == 2) {
-
-        // spinscan mode
+    // is it the auto mode?
+    int index = trainTool->workoutItems()->indexOfChild((QTreeWidgetItem *)trainTool->currentWorkout());
+    if (index == 0) {
+        // ergo mode
+        mode = ERG;
+        status &= ~RT_WORKOUT;
         ergPlot->setVisible(false);
-        status |= RT_MODE_SPIN;
-        status &= ~RT_MODE_ERGO;
-        status &= ~RT_WORKOUT; // temp
-
-        if (deviceController != NULL) deviceController->setMode(RT_MODE_SPIN);
-        loadLabel->setText("Gradient PERCENT");
-        avgloadLabel->setText("Avg Gradient PERCENT");
-
+    } else if (index == 1) {
+        // slope mode
+        mode = CRS;
+        status &= ~RT_WORKOUT;
+        ergPlot->setVisible(false);
     } else {
+        // workout mode
+        boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+        QVariant workoutDir = settings->value(GC_WORKOUTDIR);
+        QString fileName = workoutDir.toString() + "/" + trainTool->currentWorkout()->text(0); // filename
 
+        // Get users CP for relative watts calculations
+        QDate today = QDate::currentDate();
+        double Cp=285;                       // default to 285 if zones are not set
+        int range = main->zones()->whichRange(today);
+        if (range != -1) Cp = main->zones()->getCP(range);
+
+        ergFile = new ErgFile(fileName, mode, Cp);
+        if (ergFile->isValid()) {
+
+            status |= RT_WORKOUT;
+
+            // success! we have a load file
+            // setup the course profile in the
+            // display!
+            ergPlot->setData(ergFile);
+            ergPlot->setVisible(true);
+            ergPlot->replot();
+        }
+    }
+
+    // set the device to the right mode
+    if (mode == ERG) {
         status |= RT_MODE_ERGO;
         status &= ~RT_MODE_SPIN;
+        if (deviceController != NULL) deviceController->setMode(RT_MODE_ERGO);
+        // set the labels on the gui
         loadLabel->setText("Load WATTS");
         avgloadLabel->setText("Avg Load WATTS");
-        if (deviceController != NULL) deviceController->setMode(RT_MODE_ERGO);
-        ergPlot->setVisible(false);
-        status &= ~RT_WORKOUT;
+    } else { // SLOPE MODE
+        status |= RT_MODE_SPIN;
+        status &= ~RT_MODE_ERGO;
+        if (deviceController != NULL) deviceController->setMode(RT_MODE_SPIN);
+        // set the labels on the gui
+        loadLabel->setText("Gradient PERCENT");
+        avgloadLabel->setText("Avg Gradient PERCENT");
     }
 }
 

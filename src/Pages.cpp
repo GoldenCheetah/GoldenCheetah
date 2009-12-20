@@ -136,7 +136,18 @@ ConfigurationPage::ConfigurationPage()
     bsModeLayout->addWidget(BSModeLabel);
     bsModeLayout->addWidget(bsModeCombo);
 
-
+    // Workout Library
+    QVariant workoutDir = settings->value(GC_WORKOUTDIR);
+    workoutLabel = new QLabel(tr("Workout Library"));
+    workoutDirectory = new QLineEdit;
+    workoutDirectory->setText(workoutDir.toString());
+    workoutBrowseButton = new QPushButton(tr("Browse"));
+    workoutLayout = new QHBoxLayout;
+    workoutLayout->addWidget(workoutLabel);
+    workoutLayout->addWidget(workoutBrowseButton);
+    workoutLayout->addWidget(workoutDirectory);
+    connect(workoutBrowseButton, SIGNAL(clicked()),
+            this, SLOT(browseWorkoutDir()));
 
 
     configLayout = new QVBoxLayout;
@@ -146,6 +157,7 @@ ConfigurationPage::ConfigurationPage()
     configLayout->addLayout(crankLengthLayout);
     configLayout->addLayout(bsDaysLayout);
     configLayout->addLayout(bsModeLayout);
+    configLayout->addLayout(workoutLayout);
     configLayout->addLayout(warningLayout);
     configGroup->setLayout(configLayout);
 
@@ -287,6 +299,14 @@ CyclistPage::CyclistPage(const Zones *_zones):
     mainLayout->addWidget(cyclistGroup);
     mainLayout->addStretch(1);
     setLayout(mainLayout);
+}
+
+void
+ConfigurationPage::browseWorkoutDir()
+{
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Select Workout Library"),
+                            "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    workoutDirectory->setText(dir); 
 }
 
 QString CyclistPage::getText()
