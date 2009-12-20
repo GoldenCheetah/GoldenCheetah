@@ -41,6 +41,10 @@ struct RideMetric {
     // using QObject::tr().
     virtual QString name() const = 0;
     virtual QString units(bool metric) const = 0;
+
+    // How many digits after the decimal we should show when displaying the
+    // value of a RideMetric.
+    virtual int precision() const = 0;
     virtual double value(bool metric) const = 0;
     virtual void compute(const RideFile *ride, 
                          const Zones *zones, 

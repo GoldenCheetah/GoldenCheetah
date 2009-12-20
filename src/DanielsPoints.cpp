@@ -43,6 +43,7 @@ class DanielsPoints : public RideMetric {
     QString symbol() const { return "daniels_points"; }
     QString name() const { return QObject::tr("Daniels Points"); }
     QString units(bool) const { return ""; }
+    int precision() const { return 0; }
     double value(bool) const { return score; }
     void compute(const RideFile *ride, const Zones *zones,
                  int zoneRange, const QHash<QString,RideMetric*> &) {

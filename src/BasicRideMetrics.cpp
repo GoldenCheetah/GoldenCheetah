@@ -30,6 +30,7 @@ class WorkoutTime : public RideMetric {
     QString symbol() const { return "workout_time"; }
     QString name() const { return tr("Duration"); }
     QString units(bool) const { return "seconds"; }
+    int precision() const { return 0; }
     double value(bool) const { return seconds; }
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
@@ -54,6 +55,7 @@ class TimeRiding : public PointwiseRideMetric {
     QString symbol() const { return "time_riding"; }
     QString name() const { return tr("Time Riding"); }
     QString units(bool) const { return "seconds"; }
+    int precision() const { return 0; }
     double value(bool) const { return secsMovingOrPedaling; }
     void perPoint(const RideFilePoint *point, double secsDelta, 
                   const RideFile *, const Zones *, int) {
@@ -81,6 +83,7 @@ class TotalDistance : public RideMetric {
     QString symbol() const { return "total_distance"; }
     QString name() const { return tr("Distance"); }
     QString units(bool metric) const { return metric ? "km" : "miles"; }
+    int precision() const { return 1; }
     double value(bool metric) const {
         return metric ? km : (km * MILES_PER_KM);
     }
@@ -109,6 +112,7 @@ class ElevationGain : public PointwiseRideMetric {
     QString symbol() const { return "elevation_gain"; }
     QString name() const { return tr("Elevation Gain"); }
     QString units(bool metric) const { return metric ? "meters" : "feet"; }
+    int precision() const { return 1; }
     double value(bool metric) const {
         return metric ? elegain : (elegain * FEET_PER_METER);
     }
@@ -146,6 +150,7 @@ class TotalWork : public PointwiseRideMetric {
     QString symbol() const { return "total_work"; }
     QString name() const { return tr("Work"); }
     QString units(bool) const { return "kJ"; }
+    int precision() const { return 0; }
     double value(bool) const { return joules / 1000.0; }
     void perPoint(const RideFilePoint *point, double secsDelta, 
                   const RideFile *, const Zones *, int) {
@@ -176,6 +181,7 @@ class AvgSpeed : public PointwiseRideMetric {
     QString symbol() const { return "average_speed"; }
     QString name() const { return tr("Average Speed"); }
     QString units(bool metric) const { return metric ? "kph" : "mph"; }
+    int precision() const { return 1; }
     double value(bool metric) const {
         if (secsMoving == 0.0) return 0.0;
         double kph = km / secsMoving * 3600.0;
@@ -210,6 +216,7 @@ struct AvgPower : public AvgRideMetric {
     QString symbol() const { return "average_power"; }
     QString name() const { return tr("Average Power"); }
     QString units(bool) const { return "watts"; }
+    int precision() const { return 0; }
     void perPoint(const RideFilePoint *point, double, 
                   const RideFile *, const Zones *, int) {
         if (point->watts >= 0.0) {
@@ -230,6 +237,7 @@ struct AvgHeartRate : public AvgRideMetric {
     QString symbol() const { return "average_hr"; }
     QString name() const { return tr("Average Heart Rate"); }
     QString units(bool) const { return "bpm"; }
+    int precision() const { return 0; }
     void perPoint(const RideFilePoint *point, double, 
                   const RideFile *, const Zones *, int) {
         if (point->hr > 0) {
@@ -250,6 +258,7 @@ struct AvgCadence : public AvgRideMetric {
     QString symbol() const { return "average_cad"; }
     QString name() const { return tr("Average Cadence"); }
     QString units(bool) const { return "rpm"; }
+    int precision() const { return 0; }
     void perPoint(const RideFilePoint *point, double, 
                   const RideFile *, const Zones *, int) {
         if (point->cad > 0) {

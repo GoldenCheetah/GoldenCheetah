@@ -45,6 +45,7 @@ class AerobicDecoupling : public RideMetric {
     QString symbol() const { return "aerobic_decoupling"; }
     QString name() const { return QObject::tr("Aerobic Decoupling"); }
     QString units(bool) const { return "%"; }
+    int precision() const { return 2; }
     double value(bool) const { return percent; }
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
