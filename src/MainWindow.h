@@ -121,6 +121,7 @@ class MainWindow : public QMainWindow
         void scanForMissing();
 	void saveAndOpenNotes();
 	void dateChanged(const QDate &);
+        void showTreeContextMenuPopup(const QPoint &);
         void showContextMenuPopup(const QPoint &);
         void deleteInterval();
         void renameInterval();
@@ -136,6 +137,7 @@ class MainWindow : public QMainWindow
 
 	boost::shared_ptr<QSettings> settings;
         IntervalItem *activeInterval; // currently active for context menu popup
+        RideItem *activeRide; // currently active for context menu popup
 
         ViewSelection *viewSelection;
         QStackedWidget *views;

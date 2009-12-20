@@ -147,6 +147,7 @@ MainWindow::MainWindow(const QDir &home) :
     treeWidget->header()->hide();
     treeWidget->setAlternatingRowColors (true);
     treeWidget->setIndentation(5);
+    treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 
     allRides = new QTreeWidgetItem(treeWidget, FOLDER_TYPE);
     allRides->setText(0, tr("All Rides"));
@@ -294,6 +295,8 @@ MainWindow::MainWindow(const QDir &home) :
             this, SLOT(dateChanged(const QDate &)));
     connect(leftLayout, SIGNAL(splitterMoved(int,int)),
             this, SLOT(leftLayoutMoved()));
+    connect(treeWidget,SIGNAL(customContextMenuRequested(const QPoint &)),
+            this, SLOT(showTreeContextMenuPopup(const QPoint &)));
     connect(treeWidget, SIGNAL(itemSelectionChanged()),
             this, SLOT(rideTreeWidgetSelectionChanged()));
     connect(splitter, SIGNAL(splitterMoved(int,int)), 
@@ -780,7 +783,45 @@ MainWindow::rideTreeWidgetSelectionChanged()
 	}
     saveAndOpenNotes();
 }
+void
+MainWindow::showTreeContextMenuPopup(const QPoint &pos)
+{
+    QTreeWidgetItem *trItem = treeWidget->itemAt( pos );
+    if (trItem != NULL && trItem->text(0) != tr("All Rides")) {
+        QMenu menu(treeWidget);
 
+        RideItem *rideItem = (RideItem *)treeWidget->selectedItems().first();
+
+        activeRide = (RideItem *)trItem;
+
+        QAction *actSaveRide = new QAction(tr("Save Changes to Ride"), treeWidget);
+        connect(actSaveRide, SIGNAL(triggered(void)), this, SLOT(saveRide()));
+
+        QAction *actDeleteRide = new QAction(tr("Delete Ride"), treeWidget);
+        connect(actDeleteRide, SIGNAL(triggered(void)), this, SLOT(deleteRide()));
+
+        QAction *actBestInt = new QAction(tr("Find Best Intervals"), treeWidget);
+        connect(actBestInt, SIGNAL(triggered(void)), this, SLOT(findBestIntervals()));
+
+        QAction *actPowerPeaks = new QAction(tr("Find Power Peaks"), treeWidget);
+        connect(actPowerPeaks, SIGNAL(triggered(void)), this, SLOT(findPowerPeaks()));
+
+        QAction *actSplitRide = new QAction(tr("Split Ride"), treeWidget);
+        connect(actSplitRide, SIGNAL(triggered(void)), this, SLOT(splitRide()));
+
+
+
+        if (rideItem->isDirty() == true)
+          menu.addAction(actSaveRide);
+
+        menu.addAction(actDeleteRide);
+	menu.addAction(actBestInt);
+	menu.addAction(actPowerPeaks);
+	menu.addAction(actSplitRide);
+
+        menu.exec(treeWidget->mapToGlobal( pos ));
+    }
+}
 void
 MainWindow::showContextMenuPopup(const QPoint &pos)
 {
