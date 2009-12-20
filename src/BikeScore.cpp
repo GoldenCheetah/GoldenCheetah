@@ -46,6 +46,7 @@ class XPower : public RideMetric {
     QString symbol() const { return "skiba_xpower"; }
     QString name() const { return tr("xPower"); }
     QString units(bool) const { return "watts"; }
+    int precision() const { return 0; }
     double value(bool) const { return xpower; }
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
@@ -112,6 +113,7 @@ class RelativeIntensity : public RideMetric {
     QString symbol() const { return "skiba_relative_intensity"; }
     QString name() const { return tr("Relative Intensity"); }
     QString units(bool) const { return ""; }
+    int precision() const { return 3; }
     double value(bool) const { return reli; }
     void compute(const RideFile *, const Zones *zones, int zoneRange,
                  const QHash<QString,RideMetric*> &deps) {
@@ -147,6 +149,7 @@ class BikeScore : public RideMetric {
     QString symbol() const { return "skiba_bike_score"; }
     QString name() const { return tr("BikeScore&#8482;"); }
     QString units(bool) const { return ""; }
+    int precision() const { return 0; }
     double value(bool) const { return score; }
     void compute(const RideFile *, const Zones *zones, int zoneRange,
 	    const QHash<QString,RideMetric*> &deps) {
