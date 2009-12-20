@@ -42,6 +42,8 @@ class Zones;
 class RideCalendar;
 class PerformanceManagerWindow;
 class RideSummaryWindow;
+class TrainTabs;
+class TrainTool;
 
 class MainWindow : public QMainWindow 
 {
@@ -60,13 +62,15 @@ class MainWindow : public QMainWindow
         QDir home;
         void setCriticalPower(int cp);
 
-        RealtimeWindow  *realtimeWindow; // public so config dialog can notify it of changes config
-
         const Zones *zones() const { return zones_; }
         void updateRideFileIntervals();
         void saveSilent(RideItem *);
         bool saveRideSingleDialog(RideItem *);
         RideItem *rideItem() const { return ride; }
+
+        void notifyConfigChanged(); // used by ConfigDialog to notify MainWindow
+                                    // when config has changed - and to get a
+                                    // signal emitted to notify its children
 
     protected:
 
@@ -84,11 +88,13 @@ class MainWindow : public QMainWindow
         void intervalSelected();
         void intervalsChanged();
         void zonesChanged();
+        void configChanged();
 
     private slots:
         void rideTreeWidgetSelectionChanged();
         void intervalTreeWidgetSelectionChanged();
         void leftLayoutMoved();
+        void toolboxChanged(int);
         void splitterMoved();
         void newCyclist();
         void openCyclist();
@@ -130,6 +136,10 @@ class MainWindow : public QMainWindow
 	boost::shared_ptr<QSettings> settings;
         IntervalItem *activeInterval; // currently active for context menu popup
 
+        QToolBox *leftToolBox;
+        QStackedWidget *rightSide;
+
+        // Analysis
         RideCalendar *calendar;
         QSplitter *splitter;
         QTreeWidget *treeWidget;
@@ -147,6 +157,10 @@ class MainWindow : public QMainWindow
         QWidget *notesWidget;
         QVBoxLayout *notesLayout;
         QSplitter *summarySplitter;
+
+        // Train
+        TrainTool   *trainTool;
+        TrainTabs   *trainTabs;
 
         QwtPlotCurve *weeklyBSCurve;
         QwtPlotCurve *weeklyRICurve;

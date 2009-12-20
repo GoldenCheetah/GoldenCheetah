@@ -49,6 +49,7 @@
 #define GC_SB_ACRONYM			"SB"
 #define GC_WARNCONVERT      "warnconvert"
 #define GC_WARNEXIT      "warnexit"
+#define GC_WORKOUTDIR      "workoutDir"
 
 // device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended
 // to them to specify which configured device i.e. devices1 ... devicesn where

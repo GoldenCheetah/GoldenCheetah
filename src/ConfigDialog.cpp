@@ -153,6 +153,7 @@ void ConfigDialog::save_Clicked()
     settings->setValue(GC_CRANKLENGTH, configPage->crankLengthCombo->currentText());
     settings->setValue(GC_BIKESCOREDAYS, configPage->BSdaysEdit->text());
     settings->setValue(GC_BIKESCOREMODE, configPage->bsModeCombo->currentText());
+    settings->setValue(GC_WORKOUTDIR, configPage->workoutDirectory->text());
     settings->setValue(GC_INITIAL_STS, cyclistPage->perfManStart->text());
     settings->setValue(GC_INITIAL_LTS, cyclistPage->perfManStart->text());
     settings->setValue(GC_STS_DAYS, cyclistPage->perfManSTSavg->text());
@@ -196,9 +197,9 @@ void ConfigDialog::save_Clicked()
     DeviceConfigurations all;
     all.writeConfig(devicePage->deviceListModel->Configuration);
 
-    // update widgets to let them know config has changed
-    // only realtime sorted thus far;
-    mainWindow->realtimeWindow->configUpdate();
+    // Tell MainWindow we changed config, so it can emit the signal
+    // configChanged() to all its children
+    mainWindow->notifyConfigChanged();
 }
 
 void ConfigDialog::moveCalendarToCurrentRange() {

@@ -111,6 +111,8 @@ HEADERS += \
         TcxRideFile.h \
         TimeUtils.h \
         ToolsDialog.h \
+        TrainTabs.h \
+        TrainTool.h \
         Units.h \
         WeeklySummaryWindow.h \
         WkoRideFile.h \
@@ -187,6 +189,8 @@ SOURCES += \
         TcxRideFile.cpp \
         TimeUtils.cpp \
         ToolsDialog.cpp \
+        TrainTabs.cpp \
+        TrainTool.cpp \
         WeeklySummaryWindow.cpp \
         WkoRideFile.cpp \
         Zones.cpp \
