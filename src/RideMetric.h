@@ -35,6 +35,11 @@ struct RideMetric {
     // configuration files, and caches (like stress.cache).  It should
     // not be translated, and it should never be shown to the user.
     virtual QString symbol() const = 0;
+
+    // A short string suitable for showing to the user in the ride
+    // summaries, configuration dialogs, etc.  It should be translated
+    // using QObject::tr().
+    virtual QString name() const = 0;
     virtual QString units(bool metric) const = 0;
     virtual double value(bool metric) const = 0;
     virtual void compute(const RideFile *ride, 
