@@ -40,16 +40,31 @@ struct RideMetric {
     // summaries, configuration dialogs, etc.  It should be translated
     // using QObject::tr().
     virtual QString name() const = 0;
+
+    // The units in which this RideMetric is expressed.  It should be
+    // translated using QObject::tr().
     virtual QString units(bool metric) const = 0;
 
     // How many digits after the decimal we should show when displaying the
     // value of a RideMetric.
     virtual int precision() const = 0;
+
+    // The actual value of this ride metric, in the units above.
     virtual double value(bool metric) const = 0;
+
+    // Compute the ride metric from a file.
     virtual void compute(const RideFile *ride, 
                          const Zones *zones, 
                          int zoneRange,
                          const QHash<QString,RideMetric*> &deps) = 0;
+
+    // Fill in the value of the ride metric using the mapping provided.  For
+    // example, average speed might be specified by the mapping
+    //
+    //   { "km" => "18.0", "seconds" => "3600" }
+    //
+    // As the name suggests, we use this function instead of compute() to
+    // override the value of a RideMetric using a value specified elsewhere.
     virtual void override(const QMap<QString,QString> &) {
         assert(false);
     }
