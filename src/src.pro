@@ -113,7 +113,9 @@ HEADERS += \
         ToolsDialog.h \
         TrainTabs.h \
         TrainTool.h \
+        TrainWindow.h \
         Units.h \
+        ViewSelection.h \
         WeeklySummaryWindow.h \
         WkoRideFile.h \
         Zones.h \
@@ -191,6 +193,8 @@ SOURCES += \
         ToolsDialog.cpp \
         TrainTabs.cpp \
         TrainTool.cpp \
+        TrainWindow.cpp \
+        ViewSelection.cpp \
         WeeklySummaryWindow.cpp \
         WkoRideFile.cpp \
         Zones.cpp \

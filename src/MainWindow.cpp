@@ -57,8 +57,7 @@
 #include "MetricAggregator.h"
 #include "SplitRideDialog.h"
 #include "PerformanceManagerWindow.h"
-#include "TrainTabs.h"
-#include "TrainTool.h"
+#include "TrainWindow.h"
 
 #ifndef GC_VERSION
 #define GC_VERSION "(developer build)"
@@ -125,8 +124,7 @@ MainWindow::MainWindow(const QDir &home) :
     else
         setGeometry(geom.toRect());
 
-    splitter = new QSplitter(this);
-    setCentralWidget(splitter);
+    splitter = new QSplitter;
     splitter->setContentsMargins(10, 20, 10, 10); // attempting to follow some UI guides
 
     // Analysis toolbox contents
@@ -177,21 +175,16 @@ MainWindow::MainWindow(const QDir &home) :
     intervalsplitter->setCollapsible(1, true);
 
     leftLayout = new QSplitter;
+    viewSelection = new ViewSelection(this, VIEW_ANALYSIS);
     leftLayout->setOrientation(Qt::Vertical);
+    leftLayout->addWidget(viewSelection);
+    leftLayout->setCollapsible(0, false);
     leftLayout->addWidget(calendar);
-    leftLayout->setCollapsible(0, true);
+    leftLayout->setCollapsible(1, true);
     leftLayout->addWidget(intervalsplitter);
-    leftLayout->setCollapsible(1, false);
+    leftLayout->setCollapsible(2, false);
 
-    // Train toolbox contents
-    TrainTool *trainTool = new TrainTool(this, home);
-
-    // Setup Toolbox
-    leftToolBox = new QToolBox;
-    leftToolBox->addItem(leftLayout, tr("Ride Analysis"));
-    leftToolBox->addItem(trainTool, tr("Racing and Training"));
-
-    splitter->addWidget(leftToolBox);
+    splitter->addWidget(leftLayout);
     splitter->setCollapsible(0, true);
     QVariant calendarSizes = settings->value(GC_SETTINGS_CALENDAR_SIZES);
     if (calendarSizes != QVariant()) {
@@ -212,16 +205,18 @@ MainWindow::MainWindow(const QDir &home) :
     }
 
     tabWidget = new QTabWidget;
-    trainTabs = new TrainTabs(this, trainTool, home);
     tabWidget->setUsesScrollButtons(true);
 
-    rightSide = new QStackedWidget;
-    rightSide->addWidget(tabWidget);
-    rightSide->addWidget(trainTabs);
+    // setup trainWindow
+    trainWindow = new TrainWindow(this, home);
 
-    // Start with Analysis by default
-    rightSide->setCurrentIndex(0);
-    leftToolBox->setCurrentIndex(0);
+    // Setup the two views
+    // add the two views; Analysis and Train
+    views = new QStackedWidget(this);
+    setCentralWidget(views);
+    views->addWidget(splitter);          // Analysis stuff
+    views->addWidget(trainWindow);      // Train Stuff
+    views->setCurrentIndex(0);          // default to Analysis
 
     rideSummaryWindow = new RideSummaryWindow(this);
     QLabel *notesLabel = new QLabel(tr("Notes:"));
@@ -241,6 +236,7 @@ MainWindow::MainWindow(const QDir &home) :
     summarySplitter->addWidget(notesWidget);
     summarySplitter->setCollapsible(1, true);
 
+
     // the sizes are somewhat arbitrary,
     // just trying to force the smallest non-hidden notes size by default
     QList<int> summarySizes;
@@ -253,7 +249,7 @@ MainWindow::MainWindow(const QDir &home) :
     /////////////////////////// Ride Plot Tab ///////////////////////////
     allPlotWindow = new AllPlotWindow(this);
     tabWidget->addTab(allPlotWindow, tr("Ride Plot"));
-    splitter->addWidget(rightSide);
+    splitter->addWidget(tabWidget);
     splitter->setCollapsible(1, true);
 
     QVariant splitterSizes = settings->value(GC_SETTINGS_SPLITTER_SIZES); 
@@ -312,8 +308,6 @@ MainWindow::MainWindow(const QDir &home) :
             this, SLOT(intervalTreeWidgetSelectionChanged()));
     connect(intervalWidget,SIGNAL(itemChanged(QTreeWidgetItem *,int)),
             this, SLOT(intervalEdited(QTreeWidgetItem*, int)));
-    connect(leftToolBox, SIGNAL(currentChanged(int)),
-            this, SLOT(toolboxChanged(int)));
 
     /////////////////////////////// Menus ///////////////////////////////
 
@@ -382,9 +376,15 @@ MainWindow::MainWindow(const QDir &home) :
 }
 
 void
-MainWindow::toolboxChanged(int index)
+MainWindow::selectView(int view)
 {
-    rightSide->setCurrentIndex(index); // right stack has one page per toolbox
+    if (view == VIEW_ANALYSIS)
+        views->setCurrentIndex(0); // set stacked widget to Analysis
+    else if (view == VIEW_TRAIN)
+        views->setCurrentIndex(1); // set stacked widget to Train
+
+    // notify with a signal
+    viewChanged(view);
 }
 
 void

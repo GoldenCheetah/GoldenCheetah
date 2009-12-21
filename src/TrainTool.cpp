@@ -18,6 +18,7 @@
 
 #include "TrainTool.h"
 #include "MainWindow.h"
+#include "ViewSelection.h"
 #include "Settings.h"
 #include "Units.h"
 #include "DeviceTypes.h"
@@ -55,6 +56,8 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : QWidget(parent), ho
     //connect(serverTree,SIGNAL(itemSelectionChanged()),
     //        this, SLOT(serverTreeWidgetSelectionChanged()));
 
+    viewSelection = new ViewSelection(main, VIEW_TRAIN);
+
     workoutTree = new QTreeWidget;
     workoutTree->setColumnCount(1);
     workoutTree->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -68,15 +71,16 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : QWidget(parent), ho
 
     configChanged(); // will reset the workout tree
 
-    //trainSplitter = new QSplitter;
-    //trainSplitter->setOrientation(Qt::Vertical);
-    //trainSplitter->addWidget(serverTree);
-    //trainSplitter->setCollapsible(0, true);
-    //trainSplitter->addWidget(workoutTree);
-    //trainSplitter->setCollapsible(0, true);
+    trainSplitter = new QSplitter;
+    trainSplitter->setOrientation(Qt::Vertical);
 
-    //mainLayout->addWidget(trainSplitter);
-    mainLayout->addWidget(workoutTree); // XXX replace above line for this release
+    mainLayout->addWidget(trainSplitter);
+    trainSplitter->addWidget(viewSelection);
+    trainSplitter->setCollapsible(0, false);
+    trainSplitter->addWidget(workoutTree);
+    trainSplitter->setCollapsible(1, true);
+    //trainSplitter->addWidget(serverTree);
+    //trainSplitter->setCollapsible(2, true);
 
     connect(workoutTree,SIGNAL(itemSelectionChanged()),
             this, SLOT(workoutTreeWidgetSelectionChanged()));

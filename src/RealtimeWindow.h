@@ -27,6 +27,9 @@
 #include "ErgFile.h"
 #include "ErgFilePlot.h"
 
+class TrainTool;
+class TrainTabs;
+
 // Status settings
 #define RT_MODE_ERGO    0x0001        // load generation modes
 #define RT_MODE_SPIN    0x0002        // spinscan like modes
