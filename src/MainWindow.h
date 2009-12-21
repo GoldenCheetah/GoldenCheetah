@@ -42,8 +42,8 @@ class Zones;
 class RideCalendar;
 class PerformanceManagerWindow;
 class RideSummaryWindow;
-class TrainTabs;
-class TrainTool;
+class ViewSelection;
+class TrainWindow;
 
 class MainWindow : public QMainWindow 
 {
@@ -71,6 +71,7 @@ class MainWindow : public QMainWindow
         void notifyConfigChanged(); // used by ConfigDialog to notify MainWindow
                                     // when config has changed - and to get a
                                     // signal emitted to notify its children
+        void selectView(int);
 
     protected:
 
@@ -89,12 +90,12 @@ class MainWindow : public QMainWindow
         void intervalsChanged();
         void zonesChanged();
         void configChanged();
+        void viewChanged(int);
 
     private slots:
         void rideTreeWidgetSelectionChanged();
         void intervalTreeWidgetSelectionChanged();
         void leftLayoutMoved();
-        void toolboxChanged(int);
         void splitterMoved();
         void newCyclist();
         void openCyclist();
@@ -136,8 +137,8 @@ class MainWindow : public QMainWindow
 	boost::shared_ptr<QSettings> settings;
         IntervalItem *activeInterval; // currently active for context menu popup
 
-        QToolBox *leftToolBox;
-        QStackedWidget *rightSide;
+        ViewSelection *viewSelection;
+        QStackedWidget *views;
 
         // Analysis
         RideCalendar *calendar;
@@ -159,8 +160,7 @@ class MainWindow : public QMainWindow
         QSplitter *summarySplitter;
 
         // Train
-        TrainTool   *trainTool;
-        TrainTabs   *trainTabs;
+        TrainWindow   *trainWindow;
 
         QwtPlotCurve *weeklyBSCurve;
         QwtPlotCurve *weeklyRICurve;

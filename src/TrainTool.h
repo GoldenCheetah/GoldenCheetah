@@ -20,6 +20,7 @@
 #define _GC_TrainTool_h 1
 
 #include "MainWindow.h"
+#include "ViewSelection.h"
 #include <QDir>
 #include <QtGui>
 
@@ -55,11 +56,13 @@ class TrainTool : public QWidget
 
         const QDir home;
         MainWindow *main;
+        ViewSelection *viewSelection;
+
         QTreeWidget *workoutTree;
         QTabWidget  *trainTabs;
         QTreeWidgetItem *allWorkouts;
         QTreeWidgetItem *workout;
-        //QSplitter   *trainSplitter;     // XXX commented out for this release
+        QSplitter   *trainSplitter;
         //QTreeWidget *serverTree;        // XXX commented out for this release
         //QTreeWidgetItem *allServers;    // XXX commented out for this release
         //QTreeWidgetItem *server;        // XXX commented out for this release
