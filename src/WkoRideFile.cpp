@@ -100,7 +100,7 @@ RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors) const
         errors << ("Version of file is too old, open and save in WKO then retry: \""
                    + file.fileName() + "\"");
         return NULL;
-    } else if (version >28) {
+    } else if (version >29) {
         errors << ("Version of file is new and not supported yet: \"" +
         file.fileName() + "\"");
     return NULL;
