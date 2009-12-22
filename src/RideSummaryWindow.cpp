@@ -55,72 +55,6 @@ RideSummaryWindow::refresh()
     rideSummary->setAlignment(Qt::AlignCenter);
 }
 
-static void
-summarize(bool even,
-          QString &intervals,
-          const QString &name,
-          double km_start, double km_end,
-          double &int_watts_sum,
-          double &int_hr_sum,
-          QVector<double> &int_hrs,
-          double &int_cad_sum,
-          double &int_kph_sum,
-          double &int_secs_hr,
-          double &int_max_power,
-          double dur)
-{
-    double mile_len = (km_end - km_start) * MILES_PER_KM;
-    double minutes = (int) (dur/60.0);
-    double seconds = dur - (60 * minutes);
-    double watts_avg = int_watts_sum / dur;
-    double hr_avg = int_secs_hr > 0.0 ? int_hr_sum / int_secs_hr : 0.0;
-    double cad_avg = int_cad_sum / dur;
-    double mph_avg = int_kph_sum * MILES_PER_KM / dur;
-    double energy = int_watts_sum / 1000.0; // watts_avg / 1000.0 * dur;
-    std::sort(int_hrs.begin(), int_hrs.end());
-    double top5hr = int_hrs.size() > 0 ? int_hrs[int_hrs.size() * 0.95] : 0;
-
-    if (even)
-        intervals += "<tr><td align=\"center\">%1</td>";
-    else {
-        QColor color = QApplication::palette().alternateBase().color();
-        color = QColor::fromHsv(color.hue(), color.saturation() * 2, color.value());
-        intervals += "<tr bgcolor='" + color.name() + "'><td align=\"center\">%1</td>";
-    }
-
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    QVariant unit = settings->value(GC_UNIT);
-
-    intervals += "<td align=\"center\">%2:%3</td>";
-    intervals += "<td align=\"center\">%4</td>";
-    intervals += "<td align=\"center\">%5</td>";
-    intervals += "<td align=\"center\">%6</td>";
-    intervals += "<td align=\"center\">%7</td>";
-    intervals += "<td align=\"center\">%8</td>";
-    intervals += "<td align=\"center\">%9</td>";
-    intervals += "<td align=\"center\">%10</td>";
-    intervals += "<td align=\"center\">%11</td>";
-    intervals = intervals.arg(name);
-    intervals = intervals.arg(minutes, 0, 'f', 0);
-    intervals = intervals.arg(seconds, 2, 'f', 0, QLatin1Char('0'));
-    if(unit.toString() == "Metric")
-        intervals = intervals.arg(mile_len * KM_PER_MILE, 0, 'f', 1);
-    else
-        intervals = intervals.arg(mile_len, 0, 'f', 1);
-    intervals = intervals.arg(energy, 0, 'f', 0);
-    intervals = intervals.arg(int_max_power, 0, 'f', 0);
-    intervals = intervals.arg(watts_avg, 0, 'f', 0);
-    intervals = intervals.arg(top5hr, 0, 'f', 0);
-    intervals = intervals.arg(hr_avg, 0, 'f', 0);
-    intervals = intervals.arg(cad_avg, 0, 'f', 0);
-
-
-    if(unit.toString() == "Metric")
-        intervals = intervals.arg(mph_avg * 1.60934, 0, 'f', 1);
-    else
-        intervals = intervals.arg(mph_avg, 0, 'f', 1);
-}
-
 QString
 RideSummaryWindow::htmlSummary() const
 {
@@ -147,56 +81,6 @@ RideSummaryWindow::htmlSummary() const
 
     boost::shared_ptr<QSettings> settings = GetApplicationSettings();
     QVariant unit = settings->value(GC_UNIT);
-
-    QString intervals = "";
-    double secs_delta = ride->recIntSecs();
-
-    bool even = false;
-    foreach (RideFileInterval interval, ride->intervals()) {
-        int i = ride->intervalBegin(interval);
-        assert(i < ride->dataPoints().size());
-        const RideFilePoint *firstPoint = ride->dataPoints()[i];
-
-        double secs_watts = 0.0;
-        double int_watts_sum = 0.0;
-        double int_hr_sum = 0.0;
-        QVector<double> int_hrs;
-        double int_cad_sum = 0.0;
-        double int_kph_sum = 0.0;
-        double int_secs_hr = 0.0;
-        double int_max_power = 0.0;
-        double km_end = 0.0;
-
-        while (i < ride->dataPoints().size()) {
-            const RideFilePoint *point = ride->dataPoints()[i++];
-            if (point->secs >= interval.stop)
-                break;
-            if (point->watts >= 0.0) {
-                secs_watts += secs_delta;
-                int_watts_sum += point->watts * secs_delta;
-                if (point->watts > int_max_power)
-                    int_max_power = point->watts;
-            }
-            if (point->hr > 0) {
-                int_hr_sum += point->hr * secs_delta;
-                int_secs_hr += secs_delta;
-            }
-            if (point->hr >= 0)
-                int_hrs.push_back(point->hr);
-            if (point->cad > 0)
-                int_cad_sum += point->cad * secs_delta;
-            if (point->kph >= 0)
-                int_kph_sum += point->kph * secs_delta;
-
-            km_end = point->km;
-        }
-        summarize(even, intervals, interval.name,
-                  firstPoint->km, km_end, int_watts_sum,
-                  int_hr_sum, int_hrs, int_cad_sum, int_kph_sum,
-                  int_secs_hr, int_max_power,
-                  interval.stop - interval.start);
-        even = !even;
-    }
 
     summary += "<p>";
 
@@ -341,48 +225,6 @@ RideSummaryWindow::htmlSummary() const
             }
             summary += "</tr>";
         }
-        summary += "</table>";
-    }
-
-
-    // TODO: Ergomo uses non-consecutive interval numbers.
-    // Seems to use 0 when not in an interval
-    // and an integer < 30 when in an interval.
-    // We'll need to create a counter for the intervals
-    // rather than relying on the final data point's interval number.
-    if (ride->intervals().size() > 0) {
-        summary += "<p><h2>Intervals</h2>\n<p>\n";
-        summary += "<table align=\"center\" width=\"90%\" ";
-        summary += "cellspacing=0 border=0><tr>";
-        summary += "<td align=\"center\">Interval</td>";
-        summary += "<td align=\"center\"></td>";
-        summary += tr("<td align=\"center\">Distance</td>");
-        summary += tr("<td align=\"center\">Work</td>");
-        summary += tr("<td align=\"center\">Max Power</td>");
-        summary += tr("<td align=\"center\">Avg Power</td>");
-        summary += tr("<td align=\"center\">95% HR</td>");
-        summary += tr("<td align=\"center\">Avg HR</td>");
-        summary += tr("<td align=\"center\">Avg Cadence</td>");
-        summary += tr("<td align=\"center\">Avg Speed</td>");
-        summary += "</tr><tr>";
-        summary += tr("<td align=\"center\">Number</td>");
-        summary += tr("<td align=\"center\">Duration</td>");
-        if(unit.toString() == "Metric")
-            summary += "<td align=\"center\">(km)</td>";
-        else
-            summary += "<td align=\"center\">(miles)</td>";
-        summary += "<td align=\"center\">(kJ)</td>";
-        summary += "<td align=\"center\">(watts)</td>";
-        summary += "<td align=\"center\">(watts)</td>";
-        summary += "<td align=\"center\">(bpm)</td>";
-        summary += "<td align=\"center\">(bpm)</td>";
-        summary += "<td align=\"center\">(rpm)</td>";
-        if(unit.toString() == "Metric")
-            summary += "<td align=\"center\">(km/h)</td>";
-        else
-            summary += "<td align=\"center\">(mph)</td>";
-        summary += "</tr>";
-        summary += intervals;
         summary += "</table>";
     }
 
