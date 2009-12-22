@@ -19,7 +19,7 @@
 #include "IntervalItem.h"
 #include "RideFile.h"
 
-IntervalItem::IntervalItem(const RideFile *ride, QString name, double start, double stop, double startKM, double stopKM) : ride(ride), start(start), stop(stop), startKM(startKM), stopKM(stopKM)
+IntervalItem::IntervalItem(const RideFile *ride, QString name, double start, double stop, double startKM, double stopKM, int displaySequence) : ride(ride), start(start), stop(stop), startKM(startKM), stopKM(stopKM), displaySequence(displaySequence)
 {
     setText(0, name);
 }

@@ -405,7 +405,8 @@ AllPlotWindow::setEndSelection(double xValue, bool newInterval, QString name)
             // add average power to the end of the selection name
             name += QString("(%1 watts)").arg(round((wattsTotal && arrayLength) ? wattsTotal/arrayLength : 0));
 
-            QTreeWidgetItem *last = new IntervalItem(ride->ride(), name, duration1, duration2, distance1, distance2);
+            QTreeWidgetItem *last = new IntervalItem(ride->ride(), name, duration1, duration2, distance1, distance2,
+                                        allIntervals->childCount()+1);
             allIntervals->addChild(last);
 
             // now update the RideFileIntervals and all the plots etc
