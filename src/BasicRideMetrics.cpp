@@ -286,3 +286,27 @@ struct AvgCadence : public AvgRideMetric {
 static bool avgCadenceAdded =
     RideMetricFactory::instance().addMetric(AvgCadence());
 
+//////////////////////////////////////////////////////////////////////////////
+
+class MaxPower : public RideMetric {
+    double max;
+    public:
+    MaxPower() : max(0.0) {}
+    QString symbol() const { return "max_power"; }
+    QString name() const { return tr("Max Power"); }
+    QString units(bool) const { return "watts"; }
+    int precision() const { return 0; }
+    double value(bool) const { return max; }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const QHash<QString,RideMetric*> &) {
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
+            if (point->watts >= max)
+                max = point->watts;
+        }
+    }
+    RideMetric *clone() const { return new MaxPower(*this); }
+};
+
+static bool maxPowerAdded =
+    RideMetricFactory::instance().addMetric(MaxPower());
+
