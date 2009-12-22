@@ -34,7 +34,8 @@ class WorkoutTime : public RideMetric {
     double value(bool) const { return seconds; }
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
-        seconds = ride->dataPoints().back()->secs;
+        seconds = ride->dataPoints().back()->secs -
+            ride->dataPoints().front()->secs + ride->recIntSecs();
     }
     bool canAggregate() const { return true; }
     void aggregateWith(const RideMetric &other) { seconds += other.value(true); }
@@ -91,7 +92,11 @@ class TotalDistance : public RideMetric {
     }
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
-        km = ride->dataPoints().back()->km;
+        // Note: The 'km' in each sample is the distance travelled by the
+        // *end* of the sampling period.  The last term in this equation
+        // accounts for the distance traveled *during* the first sample.
+        km = ride->dataPoints().back()->km - ride->dataPoints().front()->km
+            + ride->dataPoints().front()->kph / 3600.0 * ride->recIntSecs();
     }
     bool canAggregate() const { return true; }
     void aggregateWith(const RideMetric &other) { km += other.value(true); }
@@ -192,8 +197,9 @@ class AvgSpeed : public RideMetric {
         return metric ? kph : (kph * MILES_PER_KM);
     }
     void compute(const RideFile *ride, const Zones *, int,
-                 const QHash<QString,RideMetric*> &) {
-        km = ride->dataPoints().back()->km;
+                 const QHash<QString,RideMetric*> &deps) {
+        assert(deps.contains("total_distance"));
+        km = deps.value("total_distance")->value(true);
         foreach (const RideFilePoint *point, ride->dataPoints())
             if (point->kph > 0.0) secsMoving += ride->recIntSecs();
     }
@@ -208,7 +214,8 @@ class AvgSpeed : public RideMetric {
 };
 
 static bool avgSpeedAdded =
-    RideMetricFactory::instance().addMetric(AvgSpeed());
+    RideMetricFactory::instance().addMetric(
+        AvgSpeed(), &(QVector<QString>() << "total_distance"));
 
 //////////////////////////////////////////////////////////////////////////////
 
