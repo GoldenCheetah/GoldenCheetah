@@ -81,7 +81,7 @@ struct RideMetric {
 
     static QHash<QString,RideMetricPtr>
     computeMetrics(const RideFile *ride, const Zones *zones,
-                   int zoneRange, const QStringList &metrics);
+                   const QStringList &metrics);
 };
 
 class AvgRideMetric : public RideMetric {
