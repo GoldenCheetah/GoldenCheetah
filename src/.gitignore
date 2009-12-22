@@ -25,3 +25,6 @@ Makefile
 
 # ignore executables
 GoldenCheetah*
+
+#ignore ctags for vim
+tags
