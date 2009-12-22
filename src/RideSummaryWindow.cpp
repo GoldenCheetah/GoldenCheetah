@@ -279,6 +279,72 @@ RideSummaryWindow::htmlSummary() const
         summary += mainWindow->zones()->summarize(rideItem->zoneRange(), time_in_zone);
     }
 
+    if (ride->intervals().size() > 0) {
+        bool firstRow = true;
+        QStringList intervalMetrics;
+        intervalMetrics << "workout_time";
+        intervalMetrics << "total_distance";
+        intervalMetrics << "total_work";
+        intervalMetrics << "average_power";
+        intervalMetrics << "skiba_xpower";
+        intervalMetrics << "max_power";
+        intervalMetrics << "average_hr";
+        intervalMetrics << "ninety_five_percent_hr";
+        intervalMetrics << "average_cad";
+        intervalMetrics << "average_speed";
+        summary += "<p><h2>Intervals</h2>\n<p>\n";
+        summary += "<table align=\"center\" width=\"90%\" ";
+        summary += "cellspacing=0 border=0>";
+        bool even = false;
+        foreach (RideFileInterval interval, ride->intervals()) {
+            RideFile f(ride->startTime(), ride->recIntSecs());
+            for (int i = ride->intervalBegin(interval); i < ride->dataPoints().size(); ++i) {
+                const RideFilePoint *p = ride->dataPoints()[i];
+                if (p->secs >= interval.stop)
+                    break;
+                f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
+                              p->watts, p->alt, p->lon, p->lat, 0);
+            }
+            QHash<QString,RideMetricPtr> metrics =
+                RideMetric::computeMetrics(&f, mainWindow->zones(), intervalMetrics);
+            if (firstRow) {
+                summary += "<tr>";
+                summary += "<td align=\"center\" valign=\"bottom\">Interval Name</td>";
+                foreach (QString symbol, intervalMetrics) {
+                    RideMetricPtr m = metrics.value(symbol);
+                    summary += "<td align=\"center\" valign=\"bottom\">" + m->name();
+                    if (m->units(metricUnits) == "seconds")
+                        ; // don't do anything
+                    else if (m->units(metricUnits).size() > 0)
+                        summary += " (" + m->units(metricUnits) + ")";
+                    summary += "</td>";
+                }
+                summary += "</tr>";
+                firstRow = false;
+            }
+            if (even)
+                summary += "<tr>";
+            else {
+                QColor color = QApplication::palette().alternateBase().color();
+                color = QColor::fromHsv(color.hue(), color.saturation() * 2, color.value());
+                summary += "<tr bgcolor='" + color.name() + "'>";
+            }
+            even = !even;
+            summary += "<td align=\"center\">" + interval.name + "</td>";
+            foreach (QString symbol, intervalMetrics) {
+                RideMetricPtr m = metrics.value(symbol);
+                QString s("<td align=\"center\">%1</td>");
+                if (m->units(metricUnits) == "seconds")
+                    summary += s.arg(time_to_string(m->value(metricUnits)));
+                else
+                    summary += s.arg(m->value(metricUnits), 0, 'f', m->precision());
+            }
+            summary += "</tr>";
+        }
+        summary += "</table>";
+    }
+
+
     // TODO: Ergomo uses non-consecutive interval numbers.
     // Seems to use 0 when not in an interval
     // and an integer < 30 when in an interval.
