@@ -695,7 +695,10 @@ MainWindow::addIntervalForPowerPeaksForSecs(RideFile *ride, int windowSizeSecs, 
         double watts = j.value();
 
         QTreeWidgetItem *peak = new IntervalItem(ride, name+tr(" (%1 watts)").arg((int) round(watts)),
-                                    secs, secs+windowSizeSecs, ride->timeToDistance(secs), ride->timeToDistance(secs+windowSizeSecs));
+                                    secs, secs+windowSizeSecs,
+                                    ride->timeToDistance(secs),
+                                    ride->timeToDistance(secs+windowSizeSecs),
+                                    allIntervals->childCount()+1);
         allIntervals->addChild(peak);
     }
 }
@@ -766,7 +769,8 @@ MainWindow::rideTreeWidgetSelectionChanged()
                                                         intervals.at(i).start,
                                                         intervals.at(i).stop,
                                                         selected->timeToDistance(intervals.at(i).start),
-                                                        selected->timeToDistance(intervals.at(i).stop));
+                                                        selected->timeToDistance(intervals.at(i).stop),
+                                                        allIntervals->childCount()+1);
                 allIntervals->addChild(add);
             }
         }
@@ -834,14 +838,22 @@ MainWindow::showContextMenuPopup(const QPoint &pos)
         QAction *actRenameInt = new QAction(tr("Rename interval"), intervalWidget);
         QAction *actDeleteInt = new QAction(tr("Delete interval"), intervalWidget);
         QAction *actZoomInt = new QAction(tr("Zoom to interval"), intervalWidget);
+        QAction *actFrontInt = new QAction(tr("Bring to Front"), intervalWidget);
+        QAction *actBackInt = new QAction(tr("Send to back"), intervalWidget);
         connect(actRenameInt, SIGNAL(triggered(void)), this, SLOT(renameInterval(void)));
         connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteInterval(void)));
         connect(actZoomInt, SIGNAL(triggered(void)), this, SLOT(zoomInterval(void)));
+        connect(actFrontInt, SIGNAL(triggered(void)), this, SLOT(frontInterval(void)));
+        connect(actBackInt, SIGNAL(triggered(void)), this, SLOT(backInterval(void)));
 
         if (tabWidget->currentIndex() == 1) // on ride plot
             menu.addAction(actZoomInt);
         menu.addAction(actRenameInt);
         menu.addAction(actDeleteInt);
+        if (tabWidget->currentIndex() == 4 && activeInterval->isSelected()) { // on PfPv plot
+            menu.addAction(actFrontInt);
+            menu.addAction(actBackInt);
+        }
         menu.exec(intervalWidget->mapToGlobal( pos ));
     }
 }
@@ -867,7 +879,17 @@ MainWindow::updateRideFileIntervals()
 }
 
 void
-MainWindow::deleteInterval() {
+MainWindow::deleteInterval()
+{
+    // renumber remaining
+    int oindex = activeInterval->displaySequence;
+    for (int i=0; i<allIntervals->childCount(); i++) {
+        IntervalItem *it = (IntervalItem *)allIntervals->child(i);
+        int ds = it->displaySequence;
+        if (ds > oindex) it->setDisplaySequence(ds-1);
+    }
+
+    // now delete!
     int index = allIntervals->indexOfChild(activeInterval);
     delete allIntervals->takeChild(index);
     updateRideFileIntervals(); // will emit intervalChanged() signal
@@ -890,6 +912,39 @@ void
 MainWindow::zoomInterval() {
     // zoom into this interval on allPlot
     allPlotWindow->zoomInterval(activeInterval);
+}
+
+void
+MainWindow::frontInterval()
+{
+    int oindex = activeInterval->displaySequence;
+    for (int i=0; i<allIntervals->childCount(); i++) {
+        IntervalItem *it = (IntervalItem *)allIntervals->child(i);
+        int ds = it->displaySequence;
+        if (ds > oindex)
+            it->setDisplaySequence(ds-1);
+    }
+    activeInterval->setDisplaySequence(allIntervals->childCount());
+
+    // signal!
+    intervalsChanged();
+}
+
+void
+MainWindow::backInterval()
+{
+    int oindex = activeInterval->displaySequence;
+    for (int i=0; i<allIntervals->childCount(); i++) {
+        IntervalItem *it = (IntervalItem *)allIntervals->child(i);
+        int ds = it->displaySequence;
+        if (ds < oindex)
+            it->setDisplaySequence(ds+1);
+    }
+    activeInterval->setDisplaySequence(1);
+
+    // signal!
+    intervalsChanged();
+
 }
 
 void

@@ -78,7 +78,6 @@ signals:
 	QwtPlotMarker *mY;
 
 	static QwtArray<double> contour_xvalues;   // values used in CP and contour plots: djconnel
-	int isSelected(const RideFilePoint *p);
 	
 	int cp_;
 	int cad_;

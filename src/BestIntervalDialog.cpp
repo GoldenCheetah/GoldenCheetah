@@ -283,13 +283,13 @@ BestIntervalDialog::addClicked()
             QString name = resultsTable->item(i,2)->text();
             const RideFile *ride = mainWindow->currentRide();
 
+            QTreeWidgetItem *allIntervals = mainWindow->mutableIntervalItems();
             QTreeWidgetItem *last =
                 new IntervalItem(ride, name, start, stop,
                                  ride->timeToDistance(start),
-                                 ride->timeToDistance(stop));
-
+                                 ride->timeToDistance(stop),
+                                 allIntervals->childCount()+1);
             // add
-            QTreeWidgetItem *allIntervals = mainWindow->mutableIntervalItems();
             allIntervals->addChild(last);
         }
     }

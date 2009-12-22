@@ -412,14 +412,8 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
     RideFile *ride = rideItem->ride();
 
     if (ride) {
-       // due to the discrete power and cadence values returned by the
-       // power meter, there will very likely be many duplicate values.
-       // Rather than pass them all to the curve, use a set to strip
-       // out duplicates.
-       std::set<std::pair<double, double> > dataSet;
-       std::set<std::pair<double, double> > dataSetSelected;
-
        int num_intervals=intervalCount();
+
        if (mergeIntervals()) num_intervals = 1;
        QVector<std::set<std::pair<double, double> > > dataSetInterval(num_intervals);
 
@@ -432,9 +426,17 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
                 double aepf = (p1->watts * 60.0) / (p1->cad * cl_ * 2.0 * PI);
                 double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
 
-                int selection = isSelected(p1);
-                if (selection > -1) {
-                    dataSetInterval[selection].insert(std::make_pair<double, double>(aepf, cpv));
+                for (int high=-1, t=0; t<mainWindow->allIntervalItems()->childCount(); t++) {
+                    IntervalItem *current = dynamic_cast<IntervalItem *>(mainWindow->allIntervalItems()->child(t));
+                    if ((current != NULL) && current->isSelected()) {
+                        ++high;
+                        if (p1->secs>=current->start && p1->secs<=current->stop) {
+                            if (mergeIntervals())
+                                dataSetInterval[0].insert(std::make_pair<double, double>(aepf, cpv));
+                            else
+                                dataSetInterval[high].insert(std::make_pair<double, double>(aepf, cpv));
+                        }
+                    }
                 }
                 tot_cad += p1->cad;
                 tot_cad_points++;
@@ -476,7 +478,25 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
                 }
            }
 
-            for (int z = 0; z < num_intervals; z ++) {
+            // honor display sequencing
+            QMap<int, int> intervalOrder;
+            int count=0;
+
+            if (mergeIntervals()) intervalOrder.insert(1,0);
+            else {
+                for (int i=0; i<mainWindow->allIntervalItems()->childCount(); i++) {
+                    IntervalItem *current = dynamic_cast<IntervalItem *>(mainWindow->allIntervalItems()->child(i));
+                    if (current != NULL && current->isSelected() == true) {
+                            intervalOrder.insert(current->displaySequence, count++);
+                    }
+                }
+            }
+
+            QMapIterator<int, int> order(intervalOrder);
+            while (order.hasNext()) {
+                order.next();
+                int z = order.value();
+
                 QwtPlotCurve *curve;
                 curve = new QwtPlotCurve();
 
@@ -598,25 +618,4 @@ PfPvPlot::setMergeIntervals(bool value)
 {
     merge_intervals = value;
     showIntervals(rideItem);
-}
-
-int
-PfPvPlot::isSelected(const RideFilePoint *p) {
-    int highlighted=-1; // Return -1 for point not in interval
-    if (mainWindow->allIntervalItems() != NULL) {
-        for (int i=0; i<mainWindow->allIntervalItems()->childCount(); i++) {
-            IntervalItem *current = dynamic_cast<IntervalItem *>(mainWindow->allIntervalItems()->child(i));
-            if (current != NULL) {
-                if (current->isSelected()) {
-                    ++highlighted;
-                    if (p->secs>=current->start && p->secs<=current->stop) {
-                        if (mergeIntervals())
-                            return 0;
-                        return highlighted;
-                    }
-                }
-            }
-        }
-    }
-    return -1;
 }
