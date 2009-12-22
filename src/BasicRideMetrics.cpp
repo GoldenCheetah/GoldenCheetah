@@ -310,3 +310,32 @@ class MaxPower : public RideMetric {
 static bool maxPowerAdded =
     RideMetricFactory::instance().addMetric(MaxPower());
 
+//////////////////////////////////////////////////////////////////////////////
+
+class NinetyFivePercentHeartRate : public RideMetric {
+    double hr;
+    public:
+    NinetyFivePercentHeartRate() : hr(0.0) {}
+    QString symbol() const { return "ninety_five_percent_hr"; }
+    QString name() const { return tr("95% Heart Rate"); }
+    QString units(bool) const { return "bpm"; }
+    int precision() const { return 0; }
+    double value(bool) const { return hr; }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const QHash<QString,RideMetric*> &) {
+        QVector<double> hrs;
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
+            if (point->hr >= 0.0)
+                hrs.append(point->hr);
+        }
+        if (hrs.size() > 0) {
+            std::sort(hrs.begin(), hrs.end());
+            hr = hrs[hrs.size() * 0.95];
+        }
+    }
+    RideMetric *clone() const { return new NinetyFivePercentHeartRate(*this); }
+};
+
+static bool ninetyFivePercentHeartRateAdded =
+    RideMetricFactory::instance().addMetric(NinetyFivePercentHeartRate());
+
