@@ -17,14 +17,16 @@
  */
 
 #include "RideMetric.h"
+#include "Zones.h"
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
 
 QHash<QString,RideMetricPtr>
 RideMetric::computeMetrics(const RideFile *ride, const Zones *zones,
-                           int zoneRange, const QStringList &metrics)
+                           const QStringList &metrics)
 {
+    int zoneRange = zones->whichRange(ride->startTime().date());
     const RideMetricFactory &factory = RideMetricFactory::instance();
     QStringList todo = metrics;
     QHash<QString,RideMetric*> done;

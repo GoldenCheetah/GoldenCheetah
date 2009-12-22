@@ -143,6 +143,6 @@ RideItem::computeMetrics()
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i = 0; i < factory.metricCount(); ++i)
         allMetrics.append(factory.metricName(i));
-    metrics = RideMetric::computeMetrics(ride(), zones, zoneRange(), allMetrics);
+    metrics = RideMetric::computeMetrics(ride(), zones, allMetrics);
 }
 
