@@ -18,6 +18,7 @@
 
 #include "RideMetric.h"
 #include "Units.h"
+#include <algorithm>
 
 #define tr(s) QObject::tr(s)
 
