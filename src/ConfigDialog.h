@@ -42,6 +42,7 @@ class ConfigDialog : public QDialog
         ConfigurationPage *configPage;
         CyclistPage *cyclistPage;
         DevicePage *devicePage;
+        IntervalMetricsPage *intervalMetricsPage;
         QPushButton *saveButton;
         QStackedWidget *pagesWidget;
 	QPushButton *closeButton;

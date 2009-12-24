@@ -131,6 +131,10 @@ class RideMetricFactory {
 
     const QString &metricName(int i) const { return metricNames[i]; }
 
+    bool haveMetric(const QString &symbol) const {
+        return metrics.contains(symbol);
+    }
+
     RideMetric *newMetric(const QString &symbol) const {
         assert(metrics.contains(symbol));
         return metrics.value(symbol)->clone();
