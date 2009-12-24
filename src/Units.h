@@ -22,6 +22,7 @@
 #define KM_PER_MILE 1.609344
 #define MILES_PER_KM 0.62137119
 #define FEET_PER_METER 3.2808399
+#define METERS_PER_FOOT 0.3047999
 
 #endif // _GC_Units_h
 
