@@ -21,10 +21,7 @@ protected:
     void paintCell(QPainter *, const QRect &, const QDate &) const;
 
 private:
-    void addEvent(QDate, QString, QColor);
-    void removeEvent(QDate);
-    QMap<QDate, QString> _text;
-    QMap<QDate, QColor> _color;
+    QMultiMap<QDate, RideItem*> _rides;
     QMap<QString, QColor> workoutCodes;
     QDir home;
 };
