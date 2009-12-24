@@ -43,11 +43,13 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
 
     configPage = new ConfigurationPage();
 
+    intervalMetricsPage = new IntervalMetricsPage;
     devicePage = new DevicePage(this);
 
     pagesWidget = new QStackedWidget;
     pagesWidget->addWidget(configPage);
     pagesWidget->addWidget(cyclistPage);
+    pagesWidget->addWidget(intervalMetricsPage);
     pagesWidget->addWidget(devicePage);
 
     closeButton = new QPushButton(tr("Close"));
@@ -103,6 +105,12 @@ void ConfigDialog::createIcons()
     cyclistButton->setText(tr("Cyclist Info"));
     cyclistButton->setTextAlignment(Qt::AlignHCenter);
     cyclistButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+
+    QListWidgetItem *intervalMetricsButton = new QListWidgetItem(contentsWidget);
+    intervalMetricsButton->setIcon(QIcon(":images/imetrics.png"));
+    intervalMetricsButton->setText(tr("Interval Metrics"));
+    intervalMetricsButton->setTextAlignment(Qt::AlignHCenter);
+    intervalMetricsButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
     QListWidgetItem *realtimeButton = new QListWidgetItem(contentsWidget);
     realtimeButton->setIcon(QIcon(":images/arduino.png"));
@@ -192,6 +200,8 @@ void ConfigDialog::save_Clicked()
     cyclistPage->checkboxNew->setEnabled(true);
 
     zones->write(home);
+
+    intervalMetricsPage->saveClicked();
 
     // Save the device configuration...
     DeviceConfigurations all;

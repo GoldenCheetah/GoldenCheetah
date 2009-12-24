@@ -1,7 +1,7 @@
 #ifndef PAGES_H
 #define PAGES_H
 
-#include <QWidget>
+#include <QtGui>
 #include <QLineEdit>
 #include <QComboBox>
 #include <QCalendarWidget>
@@ -194,5 +194,33 @@ class DevicePage : public QWidget
         deviceModel *deviceListModel;
 };
 
+class IntervalMetricsPage : public QWidget
+{
+    Q_OBJECT
+
+    public:
+
+        IntervalMetricsPage(QWidget *parent = NULL);
+
+    public slots:
+
+        void upClicked();
+        void downClicked();
+        void leftClicked();
+        void rightClicked();
+        void availChanged();
+        void selectedChanged();
+        void saveClicked();
+
+    protected:
+
+        bool changed;
+        QListWidget *availList;
+        QListWidget *selectedList;
+        QPushButton *upButton;
+        QPushButton *downButton;
+        QPushButton *leftButton;
+        QPushButton *rightButton;
+};
 
 #endif

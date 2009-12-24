@@ -165,17 +165,13 @@ RideSummaryWindow::htmlSummary() const
 
     if (ride->intervals().size() > 0) {
         bool firstRow = true;
-        QStringList intervalMetrics;
-        intervalMetrics << "workout_time";
-        intervalMetrics << "total_distance";
-        intervalMetrics << "total_work";
-        intervalMetrics << "average_power";
-        intervalMetrics << "skiba_xpower";
-        intervalMetrics << "max_power";
-        intervalMetrics << "average_hr";
-        intervalMetrics << "ninety_five_percent_hr";
-        intervalMetrics << "average_cad";
-        intervalMetrics << "average_speed";
+        QString s;
+        boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+        if (settings->contains(GC_SETTINGS_INTERVAL_METRICS))
+            s = settings->value(GC_SETTINGS_INTERVAL_METRICS).toString();
+        else
+            s = GC_SETTINGS_INTERVAL_METRICS_DEFAULT;
+        QStringList intervalMetrics = s.split(",");
         summary += "<p><h2>Intervals</h2>\n<p>\n";
         summary += "<table align=\"center\" width=\"90%\" ";
         summary += "cellspacing=0 border=0>";
