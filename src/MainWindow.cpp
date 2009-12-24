@@ -462,27 +462,34 @@ MainWindow::addRide(QString name, bool bSelect /*=true*/)
 void
 MainWindow::removeCurrentRide()
 {
+    int x = 0;
+
     QTreeWidgetItem *_item = treeWidget->currentItem();
     if (_item->type() != RIDE_TYPE)
         return;
     RideItem *item = reinterpret_cast<RideItem*>(_item);
 
     QTreeWidgetItem *itemToSelect = NULL;
-    for (int x=0; x<allRides->childCount(); ++x)
+    for (x=0; x<allRides->childCount(); ++x)
     {
         if (item==allRides->child(x))
         {
-            if ((x+1)<allRides->childCount())
-                itemToSelect = allRides->child(x+1);
-            else if (x>0)
-                itemToSelect = allRides->child(x-1);
             break;
         }
     }
 
+    calendar->removeRide(item);
+    if (x>0) {
+        itemToSelect = allRides->child(x-1);
+        calendar->addRide(reinterpret_cast<RideItem*>(itemToSelect));
+    }
+    if ((x+1)<allRides->childCount()) {
+        itemToSelect = allRides->child(x+1);
+        calendar->addRide(reinterpret_cast<RideItem*>(itemToSelect));
+    }
+
     QString strOldFileName = item->fileName;
     allRides->removeChild(item);
-    calendar->removeRide(item);
     delete item;
 
     QFile file(home.absolutePath() + "/" + strOldFileName);
