@@ -153,6 +153,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                     if (!metric) {
                         km *= KM_PER_MILE;
                         kph *= KM_PER_MILE;
+                        alt *= METERS_PER_FOOT;
                     }
                 }
                 else if (iBike) {
@@ -174,6 +175,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                     if (!metric) {
                         km *= KM_PER_MILE;
                         kph *= KM_PER_MILE;
+                        alt *= METERS_PER_FOOT;
                     }
                 }
                 else {
@@ -204,6 +206,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                      if (!metric) {
                          km *= KM_PER_MILE;
                          kph *= KM_PER_MILE;
+                         alt *= METERS_PER_FOOT;
                      }
                 }
 
