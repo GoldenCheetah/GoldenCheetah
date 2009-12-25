@@ -126,13 +126,20 @@ class ElevationGain : public RideMetric {
     }
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
+        const double hysteresis = 3.0;
         bool first = true;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
-            if (first)
+            if (first) {
                 first = false;
-            else if (point->alt > prevalt)
+                prevalt = point->alt;
+            }
+            else if (point->alt > prevalt + hysteresis) {
                 elegain += point->alt - prevalt;
-            prevalt = point->alt;
+                prevalt = point->alt;
+            }
+            else if (point->alt < prevalt - hysteresis) {
+                prevalt = point->alt;
+            }
         }
     }
     bool canAggregate() const { return true; }
