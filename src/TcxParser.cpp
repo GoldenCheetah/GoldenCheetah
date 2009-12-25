@@ -129,7 +129,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 
             // Work around bug in 705 firmware where cadence and
             // power values repeat when stopped.
-            if (delta_d == 0.0)
+            if (delta_d == 0.0 && distance != 0.0)
             {
                 power = 0.0;
                 cadence = 0.0;
