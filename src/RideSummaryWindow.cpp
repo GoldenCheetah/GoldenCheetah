@@ -185,6 +185,11 @@ RideSummaryWindow::htmlSummary() const
                 f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
                               p->watts, p->alt, p->lon, p->lat, 0);
             }
+            if (f.dataPoints().size() == 0) {
+                // Interval empty, do not compute any metrics
+                continue;
+            }
+
             QHash<QString,RideMetricPtr> metrics =
                 RideMetric::computeMetrics(&f, mainWindow->zones(), intervalMetrics);
             if (firstRow) {
