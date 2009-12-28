@@ -22,6 +22,8 @@
 #include <QVector>
 #include <assert.h>
 
+#define DATETIME_FORMAT "yyyy/MM/dd hh:mm:ss' UTC'"
+
 static int gcFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "gc", "GoldenCheetah Native Format", new GcFileReader());
@@ -53,7 +55,7 @@ GcFileReader::openRideFile(QFile &file, QStringList &errors) const
         if (key == "Device type")
             rideFile->setDeviceType(value);
         if (key == "Start time")
-            rideFile->setStartTime(QDateTime::fromString(value)); // TODO format
+            rideFile->setStartTime(QDateTime::fromString(value, DATETIME_FORMAT).toLocalTime());
     }
 
     QVector<double> intervalStops; // used to set the interval number for each point
@@ -132,7 +134,7 @@ GcFileReader::writeRideFile(const RideFile *ride, QFile &file) const
     attributes.appendChild(attribute);
     attribute.setAttribute("key", "Start time");
     attribute.setAttribute(
-        "value", ride->startTime().toUTC().toString("yyyy/MM/dd hh:mm:ss' UTC'"));
+        "value", ride->startTime().toUTC().toString(DATETIME_FORMAT));
     attribute = doc.createElement("attribute");
     attributes.appendChild(attribute);
     attribute.setAttribute("key", "Device type");
