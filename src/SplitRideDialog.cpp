@@ -17,6 +17,7 @@
  */
 
 #include "SplitRideDialog.h"
+#include "GcRideFile.h"
 #include "MainWindow.h"
 #include "RideFile.h"
 #include <assert.h>
@@ -141,9 +142,10 @@ SplitRideDialog::CreateNewRideFile(const RideFile *ride, int nRecStart, int nRec
         newRideFile->appendPoint(pPoint->secs-pointStart->secs, pPoint->cad, pPoint->hr, pPoint->km - pointStart->km,
                  pPoint->kph, pPoint->nm, pPoint->watts, pPoint->alt, pPoint->lon, pPoint->lat, pPoint->interval-pointStart->interval);
     }
+    newRideFile->setDeviceType(ride->deviceType());
 
     QString fileName;
-    fileName.sprintf("%04d_%02d_%02d_%02d_%02d_%02d.csv",
+    fileName.sprintf("%04d_%02d_%02d_%02d_%02d_%02d.gc",
                             newStart.date().year(), newStart.date().month(),
                             newStart.date().day(), newStart.time().hour(), newStart.time().minute(),
                             newStart.time().second());
@@ -155,10 +157,10 @@ SplitRideDialog::CreateNewRideFile(const RideFile *ride, int nRecStart, int nRec
         QMessageBox::critical(this, tr("Split Ride"), tr("The file %1 already exists and will not be overwritten").arg(filePath));
         return;
     }
-    if (!file.open(QFile::WriteOnly | QFile::Truncate))
-        QMessageBox::critical(this, tr("Split Ride"), tr("The file %1 can't be opened for writing").arg(filePath));
 
     newRideFile->writeAsCsv(file, true);
+    GcFileReader f;
+    f.writeRideFile(newRideFile.get(), file);
 
     mainWindow->addRide(fileName, false);
 }
