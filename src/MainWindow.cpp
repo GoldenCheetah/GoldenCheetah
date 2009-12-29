@@ -1193,17 +1193,23 @@ MainWindow::aboutDialog()
             "<center>"
             "<h2>GoldenCheetah</h2>"
             "<i>Cycling Power Analysis Software for Linux, Mac, and Windows</i>"
-            "<p><i>Build date: "
-            "") + QString(__DATE__) + " " + QString(__TIME__) + "</i>"
-            "<p><i>Version: " + QString(GC_VERSION) + ("</i>"
+            "<p><i>Build date: %1 %2</i>"
+            "<p><i>Version: %3</i>"
             "<p>GoldenCheetah is licensed under the "
             "<a href=\"http://www.gnu.org/copyleft/gpl.html\">GNU General "
             "Public License</a>."
             "<p>Source code can be obtained from "
             "<a href=\"http://goldencheetah.org/\">"
             "http://goldencheetah.org/</a>."
+            "<p>Ride files and other data are stored in<br>"
+            "<a href=\"%4\">%5</a>"
             "</center>"
-            ));
+            )
+            .arg(__DATE__)
+            .arg(__TIME__)
+            .arg(GC_VERSION)
+            .arg(QString(QUrl::fromLocalFile(home.absolutePath()).toEncoded()))
+            .arg(home.absolutePath().replace(" ", "&nbsp;")));
 }
 
 
