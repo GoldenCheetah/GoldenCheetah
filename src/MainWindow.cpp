@@ -29,6 +29,7 @@
 #include "DownloadRideDialog.h"
 #include "ManualRideDialog.h"
 #include "HistogramWindow.h"
+#include "ModelWindow.h"
 #include "RealtimeWindow.h"
 #include "RideItem.h"
 #include "IntervalItem.h"
@@ -277,6 +278,13 @@ MainWindow::MainWindow(const QDir &home) :
 
     pfPvWindow = new PfPvWindow(this);
     tabWidget->addTab(pfPvWindow, tr("PF/PV Plot"));
+
+    //////////////////////// 3d Model Window ////////////////////////////
+
+#ifdef GC_HAVE_QWTPLOT3D
+    modelWindow = new ModelWindow(this, home);
+    tabWidget->addTab(modelWindow, tr("3D"));
+#endif
 
     //////////////////////// Weekly Summary ////////////////////////
     
@@ -1175,7 +1183,7 @@ void
 MainWindow::tabChanged(int index)
 {
     criticalPowerWindow->setActive(index == 2);
-    performanceManagerWindow->setActive(index == 6);
+    performanceManagerWindow->setActive(tabWidget->widget(index) == performanceManagerWindow);
 }
 
 void
