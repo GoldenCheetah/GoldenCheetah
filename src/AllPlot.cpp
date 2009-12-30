@@ -192,7 +192,12 @@ AllPlot::AllPlot(QWidget *parent, MainWindow *mainWindow):
     unit(0),
     rideItem(NULL),
     smooth(30), bydist(false),
-    shade_zones(true)
+    shade_zones(true),
+    showPowerState(0),
+    showHrState(Qt::Checked),
+    showSpeedState(Qt::Checked),
+    showCadState(Qt::Checked),
+    showAltState(Qt::Checked)
 {
     boost::shared_ptr<QSettings> settings = GetApplicationSettings();
     unit = settings->value(GC_UNIT);
@@ -546,11 +551,11 @@ AllPlot::setData(RideItem *_rideItem)
         if (!cadArray.empty()) cadCurve->attach(this);
         if (!altArray.empty()) altCurve->attach(this);
 
-        wattsCurve->setVisible(dataPresent->watts);
-        hrCurve->setVisible(dataPresent->hr);
-        speedCurve->setVisible(dataPresent->kph);
-        cadCurve->setVisible(dataPresent->cad);
-        altCurve->setVisible(dataPresent->alt);
+        wattsCurve->setVisible(dataPresent->watts && showPowerState < 2);
+        hrCurve->setVisible(dataPresent->hr && showHrState == Qt::Checked);
+        speedCurve->setVisible(dataPresent->kph && showSpeedState == Qt::Checked);
+        cadCurve->setVisible(dataPresent->cad && showCadState == Qt::Checked);
+        altCurve->setVisible(dataPresent->alt && showAltState == Qt::Checked);
 
         arrayLength = 0;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
@@ -595,6 +600,7 @@ AllPlot::setData(RideItem *_rideItem)
 void
 AllPlot::showPower(int id)
 {
+    showPowerState = id;
     wattsCurve->setVisible(id < 2);
     shade_zones = (id == 0);
     setYMax();
@@ -604,6 +610,7 @@ AllPlot::showPower(int id)
 void
 AllPlot::showHr(int state)
 {
+    showHrState = state;
     assert(state != Qt::PartiallyChecked);
     hrCurve->setVisible(state == Qt::Checked);
     setYMax();
@@ -613,6 +620,7 @@ AllPlot::showHr(int state)
 void
 AllPlot::showSpeed(int state)
 {
+    showSpeedState = state;
     assert(state != Qt::PartiallyChecked);
     speedCurve->setVisible(state == Qt::Checked);
     setYMax();
@@ -622,6 +630,7 @@ AllPlot::showSpeed(int state)
 void
 AllPlot::showCad(int state)
 {
+    showCadState = state;
     assert(state != Qt::PartiallyChecked);
     cadCurve->setVisible(state == Qt::Checked);
     setYMax();
@@ -631,6 +640,7 @@ AllPlot::showCad(int state)
 void
 AllPlot::showAlt(int state)
 {
+    showAltState = state;
     assert(state != Qt::PartiallyChecked);
     altCurve->setVisible(state == Qt::Checked);
     setYMax();
