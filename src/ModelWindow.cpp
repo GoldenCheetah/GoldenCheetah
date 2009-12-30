@@ -1,0 +1,331 @@
+/*
+ * Copyright (c) 2009 Mark Liversedge (liversedge@gmail.com)
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#include "ModelWindow.h"
+#include "ModelPlot.h"
+#include "MainWindow.h"
+#include "RideItem.h"
+#include "IntervalItem.h"
+#include "math.h"
+#include "Units.h" // for MILES_PER_KM
+
+#include <QtGui>
+#include <QString>
+
+void
+ModelWindow::addStandardChannels(QComboBox *box)
+{
+    box->addItem(tr("None"), MODEL_NONE);
+    box->addItem(tr("Power"), MODEL_POWER);
+    box->addItem(tr("Cadence"), MODEL_CADENCE);
+    box->addItem(tr("Heartrate"), MODEL_HEARTRATE);
+    box->addItem(tr("Speed"), MODEL_SPEED);
+    box->addItem(tr("Altitude"), MODEL_ALT);
+    box->addItem(tr("Pedal Force"), MODEL_PEDALFORCE);
+    box->addItem(tr("Time"), MODEL_TIME);
+    box->addItem(tr("Distance"), MODEL_DISTANCE);
+    //box->addItem(tr("Interval"), MODEL_INTERVAL); //XXX supported differently for now
+    //box->addItem(tr("Latitude"), MODEL_LAT); //XXX weird values make the plot ugly
+    //box->addItem(tr("Longitude"), MODEL_LONG); //XXX weird values make the plot ugly
+}
+
+ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) : QWidget(parent), home(home), main(parent)
+{
+    // Layouts
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    QHBoxLayout *topLayout = new QHBoxLayout;
+    QHBoxLayout *chartLayout = new QHBoxLayout;
+    QHBoxLayout *control1Layout = new QHBoxLayout;
+    QHBoxLayout *control2Layout = new QHBoxLayout;
+
+    // presetValues
+    presetValues = new QComboBox;
+    fillPresets(presetValues);
+    presetValues->setCurrentIndex(1);
+
+    // labels
+    presetLabel = new QLabel(tr("Analyse"), this);
+    xLabel = new QLabel(tr("X-Axis:"), this);
+    yLabel = new QLabel(tr("Y-Axis:"), this);
+    zLabel = new QLabel(tr("Z-Axis:"), this);
+    colorLabel = new QLabel(tr("Color:"), this);
+    binLabel = new QLabel(tr("Bin Width:"), this);
+
+    // selectors
+    xSelector = new QComboBox;
+    addStandardChannels(xSelector);
+    xSelector->setCurrentIndex(1); // power
+
+    ySelector = new QComboBox;
+    addStandardChannels(ySelector);
+    ySelector->setCurrentIndex(2); // cadence
+
+    zSelector = new QComboBox;
+    addStandardChannels(zSelector);
+    zSelector->addItem(tr("Time at X&Y"), MODEL_XYTIME);
+    zSelector->setCurrentIndex(9); // time at xy
+
+    colorSelector = new QComboBox;
+    addStandardChannels(colorSelector);
+    colorSelector->addItem(tr("Power Zone"), MODEL_POWERZONE);
+    colorSelector->addItem(tr("Time at X&Y"), MODEL_XYTIME);
+    colorSelector->setCurrentIndex(9); // time at xy
+
+    styleSelector = new QComboBox;
+    styleSelector->addItem(tr("Bar"));
+    styleSelector->addItem(tr("Grid"));
+    styleSelector->addItem(tr("Surface"));
+    styleSelector->setCurrentIndex(0);
+
+    ignore = new QCheckBox(tr("Ignore Zero"));
+    ignore->setChecked(true);
+    grid = new QCheckBox(tr("Show Grid"));
+    grid->setChecked(true);
+    frame = new QCheckBox(tr("Frame Intervals"));
+    frame->setChecked(true);
+    legend = new QCheckBox(tr("Legend"));
+    legend->setChecked(true);
+
+    binWidthLineEdit = new QLineEdit(this);
+    binWidthLineEdit->setFixedWidth(30);
+    binWidthLineEdit->setText("5");
+    binWidthSlider = new QSlider(Qt::Horizontal);
+    binWidthSlider->setTickPosition(QSlider::TicksBelow);
+    binWidthSlider->setTickInterval(1);
+    binWidthSlider->setMinimum(3);
+    binWidthSlider->setMaximum(100);
+    binWidthSlider->setValue(5);
+
+    resetView = new QPushButton(tr("Reset View"));
+
+    // the plot widget
+    modelPlot= new ModelPlot(main, NULL);
+    zpane = new QSlider(Qt::Vertical);
+    zpane->setTickInterval(1);
+    zpane->setMinimum(0);
+    zpane->setMaximum(100);
+    zpane->setValue(0);
+
+    chartLayout->addWidget(zpane);
+    chartLayout->addWidget(modelPlot);
+
+    // Build Layouts
+    topLayout->addWidget(presetLabel);
+    topLayout->addWidget(presetValues);
+    topLayout->insertStretch(-1);
+    topLayout->addWidget(grid);
+    topLayout->addWidget(legend);
+    topLayout->addWidget(frame);
+    topLayout->addWidget(styleSelector);
+    topLayout->setSpacing(10);
+
+    control1Layout->addWidget(xLabel);
+    control1Layout->addWidget(xSelector);
+    control1Layout->addWidget(yLabel);
+    control1Layout->addWidget(ySelector);
+    control1Layout->addWidget(zLabel);
+    control1Layout->addWidget(zSelector);
+    control1Layout->addWidget(colorLabel);
+    control1Layout->addWidget(colorSelector);
+    control1Layout->insertStretch(0);
+    control1Layout->insertStretch(-1);
+    control1Layout->setSpacing(10);
+
+    control2Layout->addWidget(binLabel);
+    control2Layout->addWidget(binWidthLineEdit);
+    control2Layout->addWidget(binWidthSlider);
+    control2Layout->addWidget(ignore);
+    control2Layout->addWidget(resetView);
+    control2Layout->setSpacing(10);
+
+    // Now layout the screen with the new widgets
+    mainLayout->addItem(topLayout);
+    mainLayout->addItem(chartLayout);
+    mainLayout->addItem(control1Layout);
+    mainLayout->addItem(control2Layout);
+    mainLayout->setContentsMargins(20, 20, 20, 20);
+    setLayout(mainLayout);
+
+    // now connect up the widgets
+    connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+    connect(main, SIGNAL(intervalSelected()), this, SLOT(rideSelected()));
+    connect(presetValues, SIGNAL(currentIndexChanged(int)), this, SLOT(applyPreset(int)));
+    connect(xSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setDirty()));
+    connect(ySelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setDirty()));
+    connect(zSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setDirty()));
+    connect(colorSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setDirty()));
+    connect(grid, SIGNAL(stateChanged(int)), this, SLOT(setGrid()));
+    connect(legend, SIGNAL(stateChanged(int)), this, SLOT(setLegend()));
+    connect(frame, SIGNAL(stateChanged(int)), this, SLOT(setFrame()));
+    connect(styleSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(styleSelected(int)));
+    connect(ignore, SIGNAL(stateChanged(int)), this, SLOT(setDirty()));
+    connect(binWidthSlider, SIGNAL(valueChanged(int)), this, SLOT(setBinWidthFromSlider()));
+    connect(binWidthLineEdit, SIGNAL(editingFinished()), this, SLOT(setBinWidthFromLineEdit()));
+    connect(resetView, SIGNAL(clicked()), this, SLOT(resetViewPoint()));
+    connect(zpane, SIGNAL(valueChanged(int)), this, SLOT(setZPane(int)));
+}
+
+void
+ModelWindow::rideSelected()
+{
+    ride = main->rideItem();
+    setData(true);
+}
+
+void
+ModelWindow::styleSelected(int index)
+{
+    modelPlot->setStyle(index); // 0 = bar, 1 = surface
+}
+
+void
+ModelWindow::setGrid()
+{
+    modelPlot->setGrid(grid->isChecked());
+}
+
+void
+ModelWindow::setLegend()
+{
+    modelPlot->setLegend(legend->isChecked(), settings.color);
+}
+
+void
+ModelWindow::setFrame()
+{
+    modelPlot->setFrame(frame->isChecked());
+}
+void
+ModelWindow::setZPane(int z)
+{
+    modelPlot->setZPane(z);
+}
+
+void
+ModelWindow::intervalSelected()
+{
+    setData(false);
+}
+
+void
+ModelWindow::setData(bool adjustPlot)
+{
+    settings.ride = ride;
+    settings.x = xSelector->itemData(xSelector->currentIndex()).toInt();
+    settings.y = ySelector->itemData(ySelector->currentIndex()).toInt();
+    settings.z = zSelector->itemData(zSelector->currentIndex()).toInt();
+    settings.color = colorSelector->itemData(colorSelector->currentIndex()).toInt();
+    settings.xbin = binWidthSlider->value(); // XXX fixed to single bin width
+    settings.ybin = binWidthSlider->value(); // XXX due to issues with bar geometry
+    settings.crop = false; // XXX not implemented
+    settings.zpane = 0;
+    settings.ignore = ignore->isChecked();
+    settings.gridlines = grid->isChecked();
+    settings.frame = frame->isChecked();
+    settings.legend = legend->isChecked();
+    settings.adjustPlot = adjustPlot;
+    zpane->setValue(0); // reset it!
+
+    // any intervals to plot?
+    settings.intervals.clear();
+    for (int i=0; i<main->allIntervalItems()->childCount(); i++) {
+        IntervalItem *current = dynamic_cast<IntervalItem *>(main->allIntervalItems()->child(i));
+        if (current != NULL && current->isSelected() == true)
+                settings.intervals.append(current);
+    }
+    modelPlot->setData(&settings);
+    setClean();
+}
+
+void
+ModelWindow::setBinWidthFromSlider()
+{
+    binWidthLineEdit->setText(QString("%1").arg(binWidthSlider->value()));
+    setDirty();
+}
+
+void
+ModelWindow::setBinWidthFromLineEdit()
+{
+    binWidthSlider->setValue(binWidthLineEdit->text().toInt());
+    setDirty();
+}
+
+void
+ModelWindow::resetViewPoint()
+{
+    // either replot or center after fiddling
+    if (dirty) setData(true);
+    else modelPlot->resetViewPoint();
+}
+
+void
+ModelWindow::setDirty()
+{
+    dirty = true;
+    resetView->setText(tr("Plot"));
+}
+
+void
+ModelWindow::setClean()
+{
+    dirty = false;
+    resetView->setText(tr("Reset View"));
+}
+
+//
+// Prepare some preset analysis
+//
+static struct preset {
+    QString name;       // QComboBox value
+    int x, y, z, color; // values for xselector, yselector and zselector and color
+    bool ignore;
+    int bin;            // value for binwidth
+} presets[] = {
+
+    { "User Defined", 0, 0, 0, 0, true, 20 },
+    { "Natural Cadence Selection", 1, 2, 9, 9, false, 5 }, // don't ignore zero for cadences!
+    { "Power Fatigue", 8, 1, 9, 9, true, 5 },
+    { "Impact of Altitude", 5, 3, 1, 9, true, 10 },
+    { "", 0, 0, 0, 0, false, 0 }
+};
+
+void
+ModelWindow::applyPreset(int index)
+{
+    if (index >=0) {
+        xSelector->setCurrentIndex(presets[index].x);
+        ySelector->setCurrentIndex(presets[index].y);
+        zSelector->setCurrentIndex(presets[index].z);
+        colorSelector->setCurrentIndex(presets[index].color);
+        ignore->setChecked(presets[index].ignore);
+        binWidthSlider->setValue(presets[index].bin);
+        binWidthLineEdit->setText(QString("%1").arg(presets[index].bin));
+
+        setDirty();
+        if (index) setData(true);
+    }
+}
+
+void
+ModelWindow::fillPresets(QComboBox *p)
+{
+    for (int i=0; presets[i].name != ""; i++) {
+        p->addItem(presets[i].name);
+    }
+}

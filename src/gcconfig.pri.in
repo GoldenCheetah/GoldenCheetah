@@ -6,6 +6,14 @@ BOOST_INSTALL = /usr/local/boost
 SRMIO_INSTALL = /usr/local/srmio
 D2XX_INCLUDE = /usr/local/include/D2XX
 
+# If you want 3D plotting, you need to install qwtplot3d
+#
+#  http://qwtplot3d.sourceforge.net/
+#
+# then set the following variable appropriately:
+
+#QWT3D_INSTALL = /usr/local/qwtplot3d
+
 # We recommend a debug build for development, and a static build for releases.
 CONFIG += debug
 #CONFIG += static

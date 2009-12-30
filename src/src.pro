@@ -24,6 +24,15 @@ LIBS += -lm
     SOURCES += SrmDevice.cpp
 }
 
+!isEmpty( QWT3D_INSTALL) {
+    INCLUDEPATH += $${QWT3D_INSTALL}/include
+    LIBS += $${QWT3D_INSTALL}/lib/libqwtplot3d.a
+    QT += opengl
+    HEADERS += ModelPlot.h ModelWindow.h
+    SOURCES += ModelPlot.cpp ModelWindow.cpp
+    DEFINES += GC_HAVE_QWTPLOT3D
+}
+
 macx {
     LIBS += -framework Carbon
 }

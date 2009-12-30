@@ -35,6 +35,7 @@ class PfPvWindow;
 class QwtPlotPanner;
 class QwtPlotPicker;
 class QwtPlotZoomer;
+class ModelWindow;
 class RealtimeWindow;
 class RideFile;
 class WeeklySummaryWindow;
@@ -156,6 +157,7 @@ class MainWindow : public QMainWindow
         HistogramWindow *histogramWindow;
         WeeklySummaryWindow *weeklySummaryWindow;
         CriticalPowerWindow *criticalPowerWindow;
+        ModelWindow *modelWindow;
         QTreeWidgetItem *allRides;
         QTreeWidgetItem *allIntervals;
         QSplitter *leftLayout;
