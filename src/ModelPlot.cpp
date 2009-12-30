@@ -280,7 +280,7 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
 {
     // if there are no settings or incomplete settings
     // create a null data plot
-    if (settings == NULL || settings->ride == NULL ||
+    if (settings == NULL || settings->ride == NULL || settings->ride->ride() == NULL ||
         settings->x == 0 || settings->y == 0 || settings->z == 0) {
         // initialise a null plot
         setDomain(0,0,0,0);
