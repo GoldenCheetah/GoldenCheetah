@@ -106,6 +106,12 @@ class AllPlot : public QwtPlot
         void setXTitle();
 
 	bool shade_zones;     // whether power should be shaded
+
+        int showPowerState;
+        int showHrState;
+        int showSpeedState;
+        int showCadState;
+        int showAltState;
 };
 
 #endif // _GC_AllPlot_h
