@@ -59,10 +59,7 @@ void RideCalendar::paintCell(QPainter *painter, const QRect &rect, const QDate &
     /*
      *  Loop over all the rides for today, and record colour and text.
      */
-    QMultiMap<QDateTime, RideItem *>::const_iterator i = ridesToday.begin();
-    while (i != ridesToday.end()) {
-        RideItem *ride = i.value();
-
+    foreach (const RideItem *ride, ridesToday.values()) {
         QString notesPath = home.absolutePath() + "/" + ride->notesFileName;
         QFile notesFile(notesPath);
         QColor color(128, 255, 128);
@@ -95,7 +92,6 @@ void RideCalendar::paintCell(QPainter *painter, const QRect &rect, const QDate &
         pen.setStyle(Qt::SolidLine);
         painter->setPen(pen);
         painter->drawRoundRect(textRect, 10, 10);
-        ++i;
         ++count;
     }
 
