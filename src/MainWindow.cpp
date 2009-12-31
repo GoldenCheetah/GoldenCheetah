@@ -130,12 +130,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     // Analysis toolbox contents
     calendar = new RideCalendar;
-    calendar->setFirstDayOfWeek(Qt::Monday);
     calendar->setHome(home);
-    calendar->addWorkoutCode(QString("race"), QColor(Qt::red));
-    calendar->addWorkoutCode(QString("sick"), QColor(Qt::yellow));
-    calendar->addWorkoutCode(QString("swim"), QColor(Qt::blue));
-    calendar->addWorkoutCode(QString("gym"), QColor(Qt::gray));
 
     treeWidget = new QTreeWidget;
     treeWidget->setColumnCount(3);
