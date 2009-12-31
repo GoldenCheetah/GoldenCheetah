@@ -14,6 +14,11 @@
 RideCalendar::RideCalendar(QWidget *parent)
                    : QCalendarWidget(parent)
 {
+    this->setFirstDayOfWeek(Qt::Monday);
+    this->addWorkoutCode(QString("race"), QColor(255,128,128));
+    this->addWorkoutCode(QString("sick"), QColor(255,255,128));
+    this->addWorkoutCode(QString("swim"), QColor(128,128,255));
+    this->addWorkoutCode(QString("gym"), QColor(Qt::lightGray));
 };
 
 void RideCalendar::paintCell(QPainter *painter, const QRect &rect, const QDate &date) const
@@ -60,7 +65,7 @@ void RideCalendar::paintCell(QPainter *painter, const QRect &rect, const QDate &
 
         QString notesPath = home.absolutePath() + "/" + ride->notesFileName;
         QFile notesFile(notesPath);
-        QColor color(Qt::green);
+        QColor color(128, 255, 128);
         QString line("Ride");
         QString code;
         if (notesFile.exists()) {
