@@ -74,6 +74,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
     int lineno = 1;
     QTextStream is(&file);
     RideFile *rideFile = new RideFile();
+    int iBikeInterval = 0;
     while (!is.atEnd()) {
         // the readLine() method doesn't handle old Macintosh CR line endings
         // this workaround will load the the entire file if it has CR endings
@@ -171,7 +172,11 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                      alt = line.section(',', 6, 6).toDouble();
                      lat = line.section(',', 12, 12).toDouble();
                      lon = line.section(',', 13, 13).toDouble();
-                     interval = NULL; //not provided?
+                     int lap = line.section(',', 9, 9).toInt();
+                     if (lap > 0) {
+                         iBikeInterval += 1;
+                         interval = iBikeInterval;
+                     }
                     if (!metric) {
                         km *= KM_PER_MILE;
                         kph *= KM_PER_MILE;
