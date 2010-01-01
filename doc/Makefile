@@ -43,6 +43,9 @@ index.html: index.content genpage.pl
 license.html: license.content genpage.pl
 	./genpage.pl "License" $< > $@
 
+mailing-list.html: mailing-list.content genpage.pl
+	./genpage.pl "Mailing Lists" $< > $@
+
 screenshots.html: screenshots.content genpage.pl
 	./genpage.pl "Screenshots" $< > $@
 
