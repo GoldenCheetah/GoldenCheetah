@@ -44,7 +44,7 @@ class ManualRideDialog : public QDialog
 	void estBSFromTime();
 
 	bool useMetricUnits;
-	double timeBS, distanceBS;
+	double timeBS, distanceBS, timeDP, distanceDP;
         MainWindow *mainWindow;
         QDir home;
         QPushButton *enterButton, *cancelButton;
@@ -54,7 +54,7 @@ class ManualRideDialog : public QDialog
 	QLineEdit *hrsentry, *minsentry, *secsentry; 
 	QLabel * distancelbl;
 	QLineEdit *distanceentry;
-	QLineEdit *HRentry, *BSentry;
+	QLineEdit *HRentry, *BSentry, *DPentry;
 	QDateTimeEdit *dateTimeEdit;
 	QRadioButton *estBSbyTimeButton, *estBSbyDistButton;
 
