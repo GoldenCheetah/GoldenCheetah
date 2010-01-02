@@ -114,6 +114,9 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors) const
                 QMap<QString,QString> bsm;
                 bsm.insert("value", QString("%1").arg(bs));
                 rideFile->metricOverrides.insert("skiba_bike_score", bsm);
+                QMap<QString,QString> trm;
+                trm.insert("value", QString("%1").arg(minutes * 60.0));
+                rideFile->metricOverrides.insert("time_riding", trm);
 
 		rideSec = minutes * 60.0;
 	    }

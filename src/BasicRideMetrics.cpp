@@ -66,6 +66,10 @@ class TimeRiding : public RideMetric {
                 secsMovingOrPedaling += ride->recIntSecs();
         }
     }
+    void override(const QMap<QString,QString> &map) {
+        if (map.contains("value"))
+            secsMovingOrPedaling = map.value("value").toDouble();
+    }
     bool canAggregate() const { return true; }
     void aggregateWith(const RideMetric &other) {
         secsMovingOrPedaling += other.value(true);
