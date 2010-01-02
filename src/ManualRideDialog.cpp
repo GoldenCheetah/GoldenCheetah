@@ -208,8 +208,8 @@ ManualRideDialog::estBSFromTime()
     // calculate time-based BS estimate
     if (timeBS) {
         double hrs = hrsentry->text().toInt()
-            + minsentry->text().toInt() / 60
-            + secsentry->text().toInt() / 3600;
+            + minsentry->text().toInt() / 60.0
+            + secsentry->text().toInt() / 3600.0;
         BSentry->clear();
         BSentry->insert(QString("%1").arg((int)(hrs * timeBS)));
         DPentry->clear();
