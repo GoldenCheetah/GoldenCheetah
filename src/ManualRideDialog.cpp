@@ -33,7 +33,7 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
     useMetricUnits = useMetric;
     int row;
 
-    mainWindow->getBSFactors(timeBS,distanceBS);
+    mainWindow->getBSFactors(timeBS,distanceBS,timeDP,distanceDP);
 
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Manually Enter Ride Data"));
@@ -122,6 +122,12 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
     BSentry->setInputMask("009");
     BSentry->clear();
 
+    // DanielsPoints
+    QLabel *ManualDPLabel = new QLabel(tr("Daniels Points: "), this);
+    DPentry = new QLineEdit(this);
+    DPentry->setInputMask("009");
+    DPentry->clear();
+
     // buttons
     enterButton = new QPushButton(tr("&OK"), this);
     cancelButton = new QPushButton(tr("&Cancel"), this);
@@ -161,6 +167,10 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
     glayout->addWidget(BSentry,row,1,1,-1);
     row++;
 
+    glayout->addWidget(ManualDPLabel,row,0);
+    glayout->addWidget(DPentry,row,1,1,-1);
+    row++;
+
     glayout->addWidget(enterButton,row,1);
     glayout->addWidget(cancelButton,row,2);
 
@@ -182,13 +192,13 @@ void
 ManualRideDialog::estBSFromDistance()
 {
     // calculate distance-based BS estimate
-    double bs =  0;
     if (distanceBS) {
-        bs = distanceentry->text().toFloat() * distanceBS;
-        QString text = QString("%1").arg((int)bs);
+        double dist = distanceentry->text().toFloat();
         // cast to int so QLineEdit doesn't interpret "51.3" as "513"
         BSentry->clear();
-        BSentry->insert(text);
+        BSentry->insert(QString("%1").arg((int) (dist * distanceBS)));
+        DPentry->clear();
+        DPentry->insert(QString("%1").arg((int) (dist * distanceDP)));
     }
 }
 
@@ -196,14 +206,14 @@ void
 ManualRideDialog::estBSFromTime()
 {
     // calculate time-based BS estimate
-    double bs =  0;
     if (timeBS) {
-        bs = (hrsentry->text().toInt() * timeBS ) +
-            ((minsentry->text().toInt() * timeBS) / 60) +
-            ((secsentry->text().toInt() * timeBS) / 3600);
-        QString text = QString("%1").arg((int)bs);
+        double hrs = hrsentry->text().toInt()
+            + minsentry->text().toInt() / 60
+            + secsentry->text().toInt() / 3600;
         BSentry->clear();
-        BSentry->insert(text);
+        BSentry->insert(QString("%1").arg((int)(hrs * timeBS)));
+        DPentry->clear();
+        DPentry->insert(QString("%1").arg((int)(hrs * timeDP)));
     }
 
 }
@@ -304,9 +314,9 @@ ManualRideDialog::enterClicked()
 
         out << "manual\n";
         if (useMetricUnits)
-            out << "minutes,kmh,watts,km,hr,bikescore\n";
+            out << "minutes,kmh,watts,km,hr,bikescore,daniels_points\n";
         else
-            out << "minutes,mph,watts,miles,hr,bikescore\n";
+            out << "minutes,mph,watts,miles,hr,bikescore,daniels_points\n";
 
         // data
         double secs = (hrsentry->text().toInt() * 3600) +
@@ -323,6 +333,8 @@ ManualRideDialog::enterClicked()
         out << HRentry->text().toInt();
         out << ",";
         out << BSentry->text().toInt();
+        out << ",";
+        out << DPentry->text().toInt();
         out << "\n";
 
         tmp.close();

@@ -963,15 +963,16 @@ MainWindow::intervalTreeWidgetSelectionChanged()
     intervalSelected();
 }
 
-void MainWindow::getBSFactors(double &timeBS, double &distanceBS)
+void MainWindow::getBSFactors(double &timeBS, double &distanceBS,
+                              double &timeDP, double &distanceDP)
 {
     int rides;
-    double seconds, distance, bs;
+    double seconds, distance, bs, dp;
     QProgressDialog * progress;
     bool aborted = false;
     seconds = rides = 0;
-    distance = bs = 0;
-    timeBS = distanceBS = 0.0;
+    distance = bs = dp = 0;
+    timeBS = distanceBS = timeDP = distanceDP = 0.0;
 
     QVariant BSdays = settings->value(GC_BIKESCOREDAYS);
     if (BSdays.isNull() || BSdays.toInt() == 0)
@@ -1017,6 +1018,10 @@ void MainWindow::getBSFactors(double &timeBS, double &distanceBS)
                     distance += m->value(true);
                 }
 
+                if ((m = item->metrics.value("daniels_points"))) {
+                    dp += m->value(true);
+                }
+
                 rides++;
             }
             // check progress
@@ -1034,10 +1039,12 @@ void MainWindow::getBSFactors(double &timeBS, double &distanceBS)
             distance *= MILES_PER_KM;
         timeBS = (bs * 3600) / seconds;  // BS per hour
         distanceBS = bs / distance;  // BS per mile or km
+        timeDP = (dp * 3600) / seconds;  // DP per hour
+        distanceDP = dp / distance;  // DP per mile or km
     }
 done:
     if (aborted) {
-        timeBS = distanceBS = 0;
+        timeBS = distanceBS = timeDP = distanceDP = 0;
     }
 
     delete progress;
