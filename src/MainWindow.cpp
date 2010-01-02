@@ -963,7 +963,7 @@ MainWindow::intervalTreeWidgetSelectionChanged()
     intervalSelected();
 }
 
-void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
+void MainWindow::getBSFactors(double &timeBS, double &distanceBS)
 {
     int rides;
     double seconds, distance, bs;

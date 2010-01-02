@@ -44,7 +44,7 @@ class ManualRideDialog : public QDialog
 	void estBSFromTime();
 
 	bool useMetricUnits;
-	float timeBS, distanceBS;
+	double timeBS, distanceBS;
         MainWindow *mainWindow;
         QDir home;
         QPushButton *enterButton, *cancelButton;
