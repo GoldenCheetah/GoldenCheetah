@@ -97,6 +97,10 @@ class DanielsPoints : public RideMetric {
             count(secsDelta, weighted);
         }
     }
+    void override(const QMap<QString,QString> &map) {
+        if (map.contains("value"))
+            score = map.value("value").toDouble();
+    }
     void aggregateWith(const RideMetric &other) { score += other.value(true); }
     RideMetric *clone() const { return new DanielsPoints(*this); }
 };
