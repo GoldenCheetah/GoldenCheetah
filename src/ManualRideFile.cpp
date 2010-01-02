@@ -17,6 +17,7 @@
  */
 
 #include "ManualRideFile.h"
+#include "RideMetric.h"
 #include "Units.h"
 #include <QRegExp>
 #include <QTextStream>
@@ -52,6 +53,7 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors) const
 	return NULL;
     }
     int lineno = 1;
+    QStringList columnNames;
     QTextStream is(&file);
     RideFile *rideFile = new RideFile();
     while (!is.atEnd()) {
@@ -88,6 +90,7 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors) const
 		    file.close();
 		    return NULL;
 		}
+                columnNames = line.split(",");
 		++lineno;
 		continue;
 	    }
@@ -107,6 +110,17 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors) const
 		    km *= KM_PER_MILE;
 		    kph *= KM_PER_MILE;
 		}
+                const RideMetricFactory &factory = RideMetricFactory::instance();
+                for (int i = 6; i < fields.size(); ++i) {
+                    if (factory.haveMetric(columnNames[i])) {
+                        QMap<QString,QString> map;
+                        map.insert("value", QString("%1").arg(fields[i]));
+                        rideFile->metricOverrides.insert(columnNames[i], map);
+                    }
+                    else {
+                        errors << QObject::tr("Unknown ride metric \"%1\".").arg(columnNames[i]);
+                    }
+                }
 		cad = nm = 0.0;
 		interval = 0;
 
