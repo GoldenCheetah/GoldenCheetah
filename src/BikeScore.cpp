@@ -79,12 +79,6 @@ class XPower : public RideMetric {
             total += pow(weighted, 4.0);
             count++;
         }
-        while (weighted > NEGLIGIBLE) {
-            weighted *= attenuation;
-            lastSecs += secsDelta;
-            total += pow(weighted, 4.0);
-            count++;
-        }
         xpower = pow(total / count, 0.25);
         secs = count * secsDelta;
     }
