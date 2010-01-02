@@ -96,12 +96,13 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors) const
 		double minutes,kph,watts,km,hr,alt,bs;
 		double cad, nm;
 		int interval;
-		minutes = line.section(',', 0, 0).toDouble();
-		kph	 = line.section(',', 1, 1).toDouble();
-		watts	 = line.section(',', 2, 2).toDouble();
-		km		 = line.section(',', 3, 3).toDouble();
-		hr		 = line.section(',', 4, 4).toDouble();
-		bs	 = line.section(',', 5, 5).toDouble();
+                QStringList fields = line.split(",");
+                minutes = fields[0].toDouble();
+                kph = fields[1].toDouble();
+                watts = fields[2].toDouble();
+                km = fields[3].toDouble();
+                hr = fields[4].toDouble();
+                bs = fields[5].toDouble();
 		if (!metric) {
 		    km *= KM_PER_MILE;
 		    kph *= KM_PER_MILE;
