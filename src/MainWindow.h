@@ -59,7 +59,7 @@ class MainWindow : public QMainWindow
         const QTreeWidgetItem *allRideItems() { return allRides; }
         const QTreeWidgetItem *allIntervalItems() { return allIntervals; }
         QTreeWidgetItem *mutableIntervalItems() { return allIntervals; }
-	void getBSFactors(float &timeBS, float &distanceBS);
+	void getBSFactors(double &timeBS, double &distanceBS);
         QDir home;
         void setCriticalPower(int cp);
 
