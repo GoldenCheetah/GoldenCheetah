@@ -993,7 +993,8 @@ void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
         int days =  item->dateTime.daysTo(lastRideItem->dateTime);
         if ((item->type() == RIDE_TYPE)
             && (days >= 0) && (days < BSdays.toInt())
-            && (item->ride())) {
+            && (item->ride())
+            && (item->ride()->deviceType() != QString("Manual CSV"))) {
 
             RideMetricPtr m;
             item->computeMetrics();
