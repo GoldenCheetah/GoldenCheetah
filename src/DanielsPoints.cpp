@@ -32,14 +32,14 @@
 class DanielsPoints : public RideMetric {
 
     static const double K;
-    double score, cp;
-    void count(double secs, double watts) {
+    double score;
+    void count(double secs, double watts, double cp) {
         score += K * secs * pow(watts / cp, 4);
     }
 
     public:
 
-    DanielsPoints() : score(0.0), cp(0.0) {}
+    DanielsPoints() : score(0.0) {}
     QString symbol() const { return "daniels_points"; }
     QString name() const { return QObject::tr("Daniels Points"); }
     QString units(bool) const { return ""; }
@@ -77,24 +77,24 @@ class DanielsPoints : public RideMetric {
         double weighted = 0.0;
 
         score = 0.0;
-        cp = zones->getCP(zoneRange);
+        double cp = zones->getCP(zoneRange);
 
         foreach(const RideFilePoint *point, ride->dataPoints()) {
             while ((weighted > NEGLIGIBLE)
                    && (point->secs > lastSecs + secsDelta + EPSILON)) {
                 weighted *= attenuation;
                 lastSecs += secsDelta;
-                count(secsDelta, weighted);
+                count(secsDelta, weighted, cp);
             }
             weighted *= attenuation;
             weighted += sampleWeight * point->watts;
             lastSecs = point->secs;
-            count(secsDelta, weighted);
+            count(secsDelta, weighted, cp);
         }
         while (weighted > NEGLIGIBLE) {
             weighted *= attenuation;
             lastSecs += secsDelta;
-            count(secsDelta, weighted);
+            count(secsDelta, weighted, cp);
         }
     }
     void override(const QMap<QString,QString> &map) {
