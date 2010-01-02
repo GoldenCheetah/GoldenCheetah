@@ -8,6 +8,9 @@ Step 1: Installing the FTDI drivers
 Depending on your operating system, you may need to install the <a
 href="http://www.ftdichip.com/Drivers/D2XX.htm">FTDI USB
 driver</a> if you're using the PowerTap's new USB download cradle. The FTDI USB drivers are an optional install if you do not plan on downloading from your device using Golden Cheetah.
+(Note: version 1.7 of the FTDI drivers for Mac seems to be buggy.  Until they
+post a patched version, you can download version 1.6
+<a href="http://bugs.goldencheetah.org/attachments/download/1/Universal_D2XX0.1.6.dmg">here</a>.)
 </p>
 
 <p>
