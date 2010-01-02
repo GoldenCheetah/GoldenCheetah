@@ -184,8 +184,6 @@ class MainWindow : public QMainWindow
 
 	bool useMetricUnits;  // whether metric units are used (or imperial)
 
-	float timebsfactor;
-	float distancebsfactor;
     QuarqdClient *client;
 };
 
