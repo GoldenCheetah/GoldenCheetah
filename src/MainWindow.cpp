@@ -991,9 +991,9 @@ void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
     for (int i = 0; i < allRides->childCount(); ++i) {
         RideItem *item = (RideItem*) allRides->child(i);
         int days =  item->dateTime.daysTo(lastRideItem->dateTime);
-        if ((item->type() == RIDE_TYPE) &&
-            // (item->ride) &&
-            (days  >= 0) && (days < BSdays.toInt())) {
+        if ((item->type() == RIDE_TYPE)
+            && (days >= 0) && (days < BSdays.toInt())
+            && (item->ride())) {
 
             RideMetricPtr m;
             item->computeMetrics();
