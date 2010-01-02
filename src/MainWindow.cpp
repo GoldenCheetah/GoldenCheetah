@@ -967,7 +967,6 @@ void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
 {
     int rides;
     double seconds, distance, bs;
-    RideItem * lastRideItem;
     QProgressDialog * progress;
     bool aborted = false;
     seconds = rides = 0;
@@ -979,10 +978,10 @@ void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
         BSdays.setValue(30); // by default look back no more than 30 days
 
     // if there are rides, find most recent ride so we count back from there:
-    if (allRides->childCount() > 0)
-        lastRideItem = (RideItem*) allRides->child(allRides->childCount() - 1);
-    else
-        lastRideItem = ride; // not enough rides, use current ride
+    if (allRides->childCount() == 0)
+        return;
+
+    RideItem *lastRideItem = (RideItem*) allRides->child(allRides->childCount() - 1);
 
     // set up progress bar
     progress = new QProgressDialog(QString(tr("Computing bike score estimating factors.\n")),
