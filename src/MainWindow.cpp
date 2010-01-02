@@ -965,7 +965,6 @@ MainWindow::intervalTreeWidgetSelectionChanged()
 
 void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
 {
-
     int rides;
     double seconds, distance, bs;
     RideItem * lastRideItem;
@@ -977,73 +976,68 @@ void MainWindow::getBSFactors(float &timeBS, float &distanceBS)
 
     QVariant BSdays = settings->value(GC_BIKESCOREDAYS);
     if (BSdays.isNull() || BSdays.toInt() == 0)
-	BSdays.setValue(30); // by default look back no more than 30 days
+        BSdays.setValue(30); // by default look back no more than 30 days
 
     // if there are rides, find most recent ride so we count back from there:
     if (allRides->childCount() > 0)
-	lastRideItem =  (RideItem*) allRides->child(allRides->childCount() - 1);
+        lastRideItem = (RideItem*) allRides->child(allRides->childCount() - 1);
     else
-	lastRideItem = ride; // not enough rides, use current ride
+        lastRideItem = ride; // not enough rides, use current ride
 
     // set up progress bar
     progress = new QProgressDialog(QString(tr("Computing bike score estimating factors.\n")),
-	tr("Abort"),0,BSdays.toInt(),this);
+                                   tr("Abort"),0,BSdays.toInt(),this);
     int endingOffset = progress->labelText().size();
-    
+
     for (int i = 0; i < allRides->childCount(); ++i) {
-	RideItem *item = (RideItem*) allRides->child(i);
-	int days =  item->dateTime.daysTo(lastRideItem->dateTime);
-        if (
-	    (item->type() == RIDE_TYPE) &&
-	    // (item->ride) &&
-	    (days  >= 0) && 
-	    (days < BSdays.toInt())  
-	    ) {
+        RideItem *item = (RideItem*) allRides->child(i);
+        int days =  item->dateTime.daysTo(lastRideItem->dateTime);
+        if ((item->type() == RIDE_TYPE) &&
+            // (item->ride) &&
+            (days  >= 0) && (days < BSdays.toInt())) {
 
-	    RideMetricPtr m;
-	    item->computeMetrics();
+            RideMetricPtr m;
+            item->computeMetrics();
 
-	    QString existing = progress->labelText();
+            QString existing = progress->labelText();
             existing.chop(progress->labelText().size() - endingOffset);
             progress->setLabelText(
-               existing + QString(tr("Processing %1...")).arg(item->fileName));
+                existing + QString(tr("Processing %1...")).arg(item->fileName));
 
-
-	    // only count rides with BS > 0
+            // only count rides with BS > 0
             if ((m = item->metrics.value("skiba_bike_score")) &&
-		    m->value(true)) {
-		bs += m->value(true);
+                m->value(true)) {
+                bs += m->value(true);
 
-		if ((m = item->metrics.value("time_riding"))) {
-		    seconds += m->value(true);
-		}
+                if ((m = item->metrics.value("time_riding"))) {
+                    seconds += m->value(true);
+                }
 
-		if ((m = item->metrics.value("total_distance"))) {
-		    distance += m->value(true);
-		}
+                if ((m = item->metrics.value("total_distance"))) {
+                    distance += m->value(true);
+                }
 
-		rides++;
-	    }
-	    // check progress
-	    QCoreApplication::processEvents();
+                rides++;
+            }
+            // check progress
+            QCoreApplication::processEvents();
             if (progress->wasCanceled()) {
-		aborted = true;
-                    goto done;
-	    }
-	    // set progress from 0 to BSdays
+                aborted = true;
+                goto done;
+            }
+            // set progress from 0 to BSdays
             progress->setValue(BSdays.toInt() - days);
-
         }
     }
     if (rides) {
-	if (!useMetricUnits)
+        if (!useMetricUnits)
             distance *= MILES_PER_KM;
-	timeBS = (bs * 3600) / seconds;  // BS per hour
-	distanceBS = bs / distance;  // BS per mile or km
+        timeBS = (bs * 3600) / seconds;  // BS per hour
+        distanceBS = bs / distance;  // BS per mile or km
     }
 done:
     if (aborted) {
-	timeBS = distanceBS = 0;
+        timeBS = distanceBS = 0;
     }
 
     delete progress;
