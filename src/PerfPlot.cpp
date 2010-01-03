@@ -91,7 +91,7 @@ void PerfPlot::plot() {
     }
     DAYcurve = new QwtPlotCurve(tr("Daily"));
     DAYcurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen daypen = QPen(Qt::lightGray);
+    QPen daypen = QPen(Qt::red);
     daypen.setWidth(1.0);
     DAYcurve->setPen(daypen);
     DAYcurve->setStyle(QwtPlotCurve::Sticks);
