@@ -57,6 +57,8 @@ class StressCalculator:public QObject {
 	double *getSTSvalues() { return stsvalues.data(); }
 	double *getLTSvalues() { return ltsvalues.data(); }
 	double *getSBvalues() { return sbvalues.data(); }
+    double *getDAYvalues() { return list.data(); }
+
 	// y axis
 	double *getDays() { return xdays.data(); }
 	int n() { return days; }

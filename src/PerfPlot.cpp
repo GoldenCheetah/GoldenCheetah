@@ -28,7 +28,7 @@
 #include "PerfPlot.h"
 #include "StressCalculator.h"
 
-PerfPlot::PerfPlot() : STScurve(NULL), LTScurve(NULL), SBcurve(NULL)
+PerfPlot::PerfPlot() : STScurve(NULL), LTScurve(NULL), SBcurve(NULL), DAYcurve(NULL)
 {
 
 
@@ -36,6 +36,8 @@ PerfPlot::PerfPlot() : STScurve(NULL), LTScurve(NULL), SBcurve(NULL)
     setCanvasBackground(Qt::white);
     setAxisTitle(yLeft, "Stress (BS/Day)");
     setAxisTitle(xBottom, "Time (days)");
+    setAxisTitle(yRight, "Stress (Daily)");
+    enableAxis(yRight, true);
 
     grid = new QwtPlotGrid();
     grid->enableX(false);
@@ -82,6 +84,20 @@ void PerfPlot::plot() {
     setAxisScale(xBottom, xmin, xmax,tics);
 
     setAxisScaleDraw(QwtPlot::xBottom, new TimeScaleDraw(startDate));
+
+    if (DAYcurve) {
+	DAYcurve->detach();
+	delete DAYcurve;
+    }
+    DAYcurve = new QwtPlotCurve(tr("Daily"));
+    DAYcurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    QPen daypen = QPen(Qt::lightGray);
+    daypen.setWidth(1.0);
+    DAYcurve->setPen(daypen);
+    DAYcurve->setStyle(QwtPlotCurve::Sticks);
+    DAYcurve->setData(_sc->getDays()+xmin,_sc->getDAYvalues()+xmin,num);
+    DAYcurve->setYAxis(yRight);
+    DAYcurve->attach(this);
 
     if (STScurve) {
 	STScurve->detach();

@@ -57,7 +57,7 @@ class PerfPlot : public QwtPlot
 
     private:
 	QwtPlotGrid *grid;
-	QwtPlotCurve *STScurve, *LTScurve, *SBcurve;
+	QwtPlotCurve *STScurve, *LTScurve, *SBcurve, *DAYcurve;
 	int days;
 	QDateTime startDate;
 	StressCalculator *_sc;
@@ -68,6 +68,7 @@ class PerfPlot : public QwtPlot
     double getSTS(int i) { return STScurve->y(i - xmin); }
     double getLTS(int i) { return LTScurve->y(i - xmin); }
     double getSB(int i) { return SBcurve->y(i - xmin); }
+    double getDAY(int i) { return DAYcurve->y(i - xmin); }
     int n(void) { return days; }
     int max(void) { return xmax; }
     int min(void) { return xmin; }
