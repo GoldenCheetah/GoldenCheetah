@@ -1,6 +1,12 @@
 <big><font face="arial,helvetica,sanserif">
 I wish GoldenCheetah would let me...
 </font></big>
+<p>If you have a new feature that you'd like to see in GoldenCheetah
+please create a new issue on our
+<a href=http://bugs.goldencheetah.org/projects/show/goldencheetah>bug/feature
+tracker</a>. Instructions for doing so are <a href="report-a-bug.html">here</a>.
+<p>
+Examples of some features are:
 <ul>
 <li>Graph ride metrics (daily hours, work, BikeScore) over the long
     term (weeks, seasons)</li>

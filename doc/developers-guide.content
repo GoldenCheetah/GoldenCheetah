@@ -208,8 +208,12 @@ to take the time to write good commit messages, as they form a history of who
 has changed which lines of code and for what purpose.  The first line of every
 commit message should be a short description of 50 characters or less.  The
 second line should be blank.  Subsequent lines should be less than 80
-characters long and should describe the change in detail.  Once I write the
-file and exit the editor, <em>git-log</em> will show the result:</p>
+characters long and should describe the change in detail. If your commit
+addresses an existing bug or feature please add a tag to the body of your
+commit message. Allowable tags are "fixes" which is used to close an
+issue and "refs" to reference an issue. For example, adding the text
+"fixes #2" will close issue #2.  Once I write the file and exit the
+editor, <em>git-log</em> will show the result:</p>
 
 <blockquote>
 <pre>

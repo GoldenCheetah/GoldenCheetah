@@ -1,0 +1,19 @@
+<p> If you think that you have found a bug in GoldenCheetah or would like
+to request a new feature please report it by filing a new issue at our <a
+href=http://bugs.goldencheetah.org/projects/show/goldencheetah>issue
+tracker</a>. To report a bug/feature request go to the above link and
+follow these steps:
+
+<ol>
+<li>Login or register for a new account.</li>
+<li>Click the "new issue" link near the top of the page.</li>
+<li>Select either "bug" or "feature" from the tracker drop-down menu.</li>
+<li>Fill out the form including as much detail as possible.<br>
+    You can upload crashreports, problem files, or screenshots if they
+    help document the issue.</li>
+<li>Click the create button to save your report.<br>
+    This will also  send a copy of your report to the Golden-Cheetah-Users
+    mailing list.</li>
+</ol>
+<p>
+Thanks for helping to improve GoldenCheetah.

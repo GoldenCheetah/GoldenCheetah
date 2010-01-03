@@ -46,6 +46,9 @@ license.html: license.content genpage.pl
 mailing-list.html: mailing-list.content genpage.pl
 	./genpage.pl "Mailing Lists" $< > $@
 
+report-a-bug.html: report-a-bug.content genpage.pl
+	./genpage.pl "Report a Bug" $< > $@
+
 screenshots.html: screenshots.content genpage.pl
 	./genpage.pl "Screenshots" $< > $@
 
