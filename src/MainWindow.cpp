@@ -157,7 +157,7 @@ MainWindow::MainWindow(const QDir &home) :
     intervalWidget->setAlternatingRowColors (true);
     intervalWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     intervalWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    intervalWidget->setSelectionMode(QAbstractItemView::MultiSelection);
+    intervalWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
     intervalWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 
     allIntervals = new QTreeWidgetItem(intervalWidget, FOLDER_TYPE);
