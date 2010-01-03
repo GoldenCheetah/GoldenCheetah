@@ -64,6 +64,7 @@ body {
 <br> <b><a href="contrib.html">Contributors</a></b>
 <br> <b><a href="search.html">Search</a></b>
 <br> <b><a href="mailing-list.html">Mailing List</a></b>
+<br> <b><a href="report-a-bug.html">Report a Bug</a></b>
 
 </center>
 </td>
