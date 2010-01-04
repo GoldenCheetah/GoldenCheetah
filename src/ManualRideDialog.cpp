@@ -43,6 +43,7 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
     dateTimeEdit = new QDateTimeEdit( QDateTime::currentDateTime(), this );
     // Wed 6/24/09 6:55 AM
     dateTimeEdit->setDisplayFormat(tr("ddd MMM d, yyyy  h:mm AP"));
+    dateTimeEdit->setCalendarPopup(true);
 
     // ride length
     QLabel *manualLengthLabel = new QLabel(tr("Ride length: "), this);
