@@ -129,7 +129,7 @@ MainWindow::MainWindow(const QDir &home) :
     splitter->setContentsMargins(10, 20, 10, 10); // attempting to follow some UI guides
 
     // Analysis toolbox contents
-    calendar = new RideCalendar;
+    calendar = new RideCalendar(this);
     calendar->setHome(home);
 
     treeWidget = new QTreeWidget;
@@ -197,7 +197,7 @@ MainWindow::MainWindow(const QDir &home) :
             last = new RideItem(RIDE_TYPE, home.path(), 
                                 name, dt, zones(), notesFileName);
             allRides->addChild(last);
-	    calendar->addRide(reinterpret_cast<RideItem*>(last));
+	    calendar->update();
         }
     }
 
@@ -445,7 +445,7 @@ MainWindow::addRide(QString name, bool bSelect /*=true*/)
         ++index;
     }
     allRides->insertChild(index, last);
-    calendar->addRide(last);
+    calendar->update();
     criticalPowerWindow->newRideAdded();
     if (bSelect)
     {
@@ -473,14 +473,11 @@ MainWindow::removeCurrentRide()
         }
     }
 
-    calendar->removeRide(item);
     if (x>0) {
         itemToSelect = allRides->child(x-1);
-        calendar->addRide(reinterpret_cast<RideItem*>(itemToSelect));
     }
     if ((x+1)<allRides->childCount()) {
         itemToSelect = allRides->child(x+1);
-        calendar->addRide(reinterpret_cast<RideItem*>(itemToSelect));
     }
 
     QString strOldFileName = item->fileName;
@@ -508,6 +505,7 @@ MainWindow::removeCurrentRide()
 
     treeWidget->setCurrentItem(itemToSelect);
     rideTreeWidgetSelectionChanged();
+    calendar->update();
 }
 
 void

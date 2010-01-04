@@ -10,9 +10,13 @@
 
 #include "RideItem.h"
 #include "RideCalendar.h"
+#include "MainWindow.h"
+#include "Settings.h"
 
-RideCalendar::RideCalendar(QWidget *parent)
-                   : QCalendarWidget(parent)
+#include <algorithm>
+
+RideCalendar::RideCalendar(MainWindow *parent) :
+    QCalendarWidget(parent), mainWindow(parent)
 {
     this->setFirstDayOfWeek(Qt::Monday);
     this->addWorkoutCode(QString("race"), QColor(255,128,128));
@@ -21,9 +25,72 @@ RideCalendar::RideCalendar(QWidget *parent)
     this->addWorkoutCode(QString("gym"), QColor(Qt::lightGray));
 };
 
+struct RideIter
+{
+    typedef std::random_access_iterator_tag iterator_category;
+    typedef const RideItem *value_type;
+    typedef int difference_type;
+    typedef value_type& reference;
+    typedef value_type* pointer;
+
+    MainWindow *mainWindow;
+    int i;
+
+    RideIter() : mainWindow(NULL), i(0) {}
+    RideIter(MainWindow *mainWindow, int i = 0) : mainWindow(mainWindow), i(i) {}
+    const RideItem *operator*() {
+        assert(mainWindow);
+        assert(i < mainWindow->allRideItems()->childCount());
+        return dynamic_cast<const RideItem*>(mainWindow->allRideItems()->child(i));
+    }
+    RideIter operator++() { /* preincrement */ ++i; return *this; }
+    RideIter operator++(int) { RideIter result(mainWindow, i); ++i; return result; }
+    const RideIter &operator+=(int j) { i += j; return *this; }
+};
+
+bool operator==(const RideIter &a, const RideIter &b) { return a.i == b.i; }
+bool operator!=(const RideIter &a, const RideIter &b) { return a.i != b.i; }
+int operator-(const RideIter &a, const RideIter &b) { return a.i - b.i; }
+
+struct RideItemDateLessThan
+{
+    bool operator()(const RideItem *a, const RideItem *b) { return a->dateTime < b->dateTime; }
+};
+
+struct RideItemDateGreaterThan
+{
+    bool operator()(const RideItem *a, const RideItem *b) { return a->dateTime > b->dateTime; }
+};
+
 void RideCalendar::paintCell(QPainter *painter, const QRect &rect, const QDate &date) const
 {
-    if (!_rides.contains(date)) {
+    QMultiMap<QDateTime, const RideItem*> ridesToday;
+    RideIter begin(mainWindow, 0);
+    RideIter end(mainWindow, mainWindow->allRideItems()->childCount());
+
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+    bool ascending = settings->value(GC_ALLRIDES_ASCENDING, Qt::Checked).toInt() > 0;
+    RideIter i;
+    if (ascending) {
+        RideItemDateLessThan comp;
+        RideItem search(0, "", "", QDateTime(date), NULL, "");
+        i = std::lower_bound(begin, end, &search, comp);
+    }
+    else {
+        RideItemDateGreaterThan comp;
+        RideItem search(0, "", "", QDateTime(date.addDays(1)), NULL, "");
+        i = std::upper_bound(begin, end, &search, comp);
+    }
+
+    while (i != end) {
+        const RideItem *ride = *i;
+        if (ride->dateTime.date() != date)
+            break;
+        ridesToday.insert(ride->dateTime, ride);
+        ++i;
+    }
+
+    if (ridesToday.isEmpty()) {
         QCalendarWidget::paintCell(painter, rect, date);
         return;
     }
@@ -33,28 +100,15 @@ void RideCalendar::paintCell(QPainter *painter, const QRect &rect, const QDate &
      * Fill in the text and color to some default
      */
     QRect textRect;
-    int number = _rides.count(date);
+    int number = ridesToday.size();
     float count = 1;
     int startY, stopY;
     QPen pen(Qt::SolidLine);
     painter->setPen(pen);
     pen.setCapStyle(Qt::SquareCap);
-    QMultiMap<QDateTime, RideItem*> ridesToday;
-    RideItem * ride;
     QFont font = painter->font();
     font.setPointSize(font.pointSize() - 2);
     painter->setFont(font);
-
-    /*
-     *  Loop over all the matching rides, and record the time.
-     *  That way, the entries are sorted earliest -> latest.
-     */
-    QMultiMap<QDate, RideItem *>::const_iterator j = _rides.find(date);
-    while (j != _rides.end() && j.key() == date) {
-        ride = j.value();
-        ridesToday.insert(ride->dateTime, ride);
-        ++j;
-    }
 
     /*
      *  Loop over all the rides for today, and record colour and text.
@@ -134,25 +188,6 @@ void RideCalendar::setHome(const QDir &homeDir)
 void RideCalendar::addWorkoutCode(QString string, QColor color)
 {
     workoutCodes[string] = color;
-}
-
-/*
- * Add a ride, to a specific date.
- */
-void RideCalendar::addRide(RideItem* ride)
-{
-    _rides.insert(ride->dateTime.date(), ride);
-    update();
-}
-
-/*
- * Remove the info for a current ride.
- */
-void RideCalendar::removeRide(RideItem* ride)
-{
-    QDate date = ride->dateTime.date();
-    _rides.erase(_rides.find(date, ride));
-    update();
 }
 
 /*
