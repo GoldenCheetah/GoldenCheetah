@@ -60,6 +60,12 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
     }
     RideFile *rideFile = new RideFile();
     QDataStream is(&file);
+
+    // Note that QT4.6 and above default to 64 bit floats.  For
+    // backwards and forwards compatibility, we'll freeze the stream
+    // version we use for parsing at 4.0, and then add in LittleEndian
+    // number format, which is what Computrainer3dp has.
+    is.setVersion(QDataStream::Qt_4_0);
     is.setByteOrder(QDataStream::LittleEndian);
 
     // start parsing the header
