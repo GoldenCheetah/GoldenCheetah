@@ -349,7 +349,7 @@ PfPvPlot::setData(RideItem *_rideItem)
 	}
 
 	if (tot_cad_points == 0) {
-	    setTitle("no cadence");
+	    setTitle(tr("no cadence"));
 	    refreshZoneItems();
 	    curve->setVisible(false);
 	}

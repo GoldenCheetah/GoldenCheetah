@@ -172,7 +172,7 @@ RideSummaryWindow::htmlSummary() const
         else
             s = GC_SETTINGS_INTERVAL_METRICS_DEFAULT;
         QStringList intervalMetrics = s.split(",");
-        summary += "<p><h2>Intervals</h2>\n<p>\n";
+        summary += "<p><h2>"+tr("Intervals")+"</h2>\n<p>\n";
         summary += "<table align=\"center\" width=\"90%\" ";
         summary += "cellspacing=0 border=0>";
         bool even = false;
