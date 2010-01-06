@@ -902,6 +902,17 @@ next:
                     p += donumber(p, &ul);
                 }
 
+                /* there is more data in there! */
+                doshort(p, &us);
+                if (us == 1) {
+                    p += 6;
+                    doshort(p, &us);
+                    if (us != 0xffff) {
+                        p += 18;
+                        p += doshort(p, &us);
+                        p += us*8;
+                    }
+                }
 
                 p += optpad(p);
 
@@ -1084,7 +1095,6 @@ WKO_ULONG nullvals(char g)
  * HANDLE OPTIONAL CHARTING DATA
  *
  * optpad() - main entry point for handling optional chart data
- * optpad2() - called by optpad for extended data
  ***********************************************************************/
 
 unsigned int optpad(WKO_UCHAR *p)
@@ -1107,16 +1117,16 @@ unsigned int optpad(WKO_UCHAR *p)
     switch (us) {
 
     case 0x8007 :       /* all done */
-    case 0x800c :
+    case 0x800a :       /* after fixup for distchart Jan 2010 */
     case 0x800b :
+    case 0x800c :       /* after fixup for distchart Jan 2010 */
     case 0x800d :       /* from Jim B 2nd Oct 2009 */
     case 0x800e :       /* from Phil S 4th Oct 2009 */
-        break;
-
-    case 0x0001 :       /* 4byte follows */
-        p += donumber(p, &ul);
-        bytes += 4;
-        bytes += optpad2(p);
+    case 0x800f :       /* after fixup for distchart Jan 2010 */
+    case 0x8010 :       /* after fixup for distchart Jan 2010 */
+    case 0x8011 :       /* after fixup for distchart Jan 2010 */
+    case 0x8012 :       /* after fixup for distchart Jan 2010 */
+    case 0x8013 :       /* after fixup for distchart Jan 2010 */
         break;
 
     case 0x0000 :
@@ -1132,60 +1142,6 @@ unsigned int optpad(WKO_UCHAR *p)
     return (bytes);
 }
 
-unsigned int optpad2(WKO_UCHAR *p)
-{
-    WKO_USHORT us;
-    unsigned int bytes=0;
-
-    /* Opening bytes are
-     * ffff - gone too far!
-     * 8007 - stop
-     * 800f - data cache
-     * 0001 - onebyte field
-     * Any other value and you've gone
-     * too far and need to rewind.
-     */
-    bytes = doshort(p, &us);
-    p += bytes;
-
-    switch (us) {
-
-    case 0x800f :       /* data cache */
-    case 0x800d :
-    case 0x800e :
-    case 0x801d :       /* from Phil S 4th Oct 2009 */
-    case 0x8018 :
-    case 0x8017 :
-    case 0x8016 :
-    case 0x8015 :
-    case 0x8011 :
-    case 0x8012 : // new (but rare) 11.09.2009
-    case 0x8010 :
-
-        bytes += 16;
-        p += 16;
-
-        bytes += doshort(p, &us);
-        p += 2;
-
-        p += ((us *8) + 2);//_read(fd,buf,(count*8)+2);
-        bytes += ((us * 8) +2);
-
-        break;
-
-    case 0x8007 :       /* all done */
-    case 0x800c :
-    case 0x800b :
-        break;
-
-    default :
-    case 0xffff :       /* too far, rewind */
-        bytes -= 2;
-        p -=2;
-        break;
-    }
-    return(bytes);
-}
 /************************************************************************************
  * BIT TWIDDLING FUNCTIONS
  *
