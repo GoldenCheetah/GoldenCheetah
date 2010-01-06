@@ -1,0 +1,97 @@
+<p>We have an issue tracker set up at
+<a href=http://bugs.goldencheetah.org/projects/show/goldencheetah>
+bugs.goldencheetah.org</a>.  Below are some guidelines for users and
+developers for working with the issue tracker.</p>
+<big><font face="arial,helvetica,sanserif">
+Report a new bug/feature
+</font></big>
+
+<p> If you think that you have found a bug in GoldenCheetah or would like
+to request a new feature please report it by filing a new issue at our <a
+href=http://bugs.goldencheetah.org/projects/show/goldencheetah>issue
+tracker</a>. To report a bug/feature request go to the above link and
+follow these steps:
+
+<ol>
+<li>Login or register for a new account.</li>
+<li>Click the "new issue" link near the top of the page.</li>
+<li>Select either "bug" or "feature" from the tracker drop-down menu.</li>
+<li>Fill out the form including as much detail as possible.<br>
+    You can upload crashreports, problem files, or screenshots if they
+    help document the issue.</li>
+<li>Click the create button to save your report.<br>
+    This will also  send a copy of your report to the Golden-Cheetah-Users
+    mailing list.</li>
+</ol>
+<p>Thanks for helping to improve GoldenCheetah.</p>
+
+<big><font face="arial,helvetica,sanserif">
+Managing issues in the tracker
+</font></big>
+
+<p>To make it easier for all of us to track the status please try to
+adhere to a few simple guidelines listed below.</p>
+
+<font face="arial,helvetica,sanserif">
+<b>Issue Status:</b>
+</font>
+<p>Depending on your account status (non-member, reporter, developer, or
+manager) you may be able to update the status of an existing issue. When
+working in the bug tracker please update the status appropriately.
+Current status options are:</p>
+
+<ul>
+<li>New: Default status.
+
+<li>Assigned: issue has been assigned to someone on the project.  If you
+    are a Developer you can assign an issue to someone, including
+    yourself.  If you are working on a fix, please change the status to
+    Assigned, and post a message stating your plan of attack etc.
+
+<li>Feedback: This could be used to alert others that you have a
+    proposed fix that you want feed back on.  Please attach patches and
+    make a note. Also remember to tag the issue in your patches.
+
+<li>Resolved: The issue has been corrected. People that have tested the
+    patch or that submitted the bug should update to this status when
+    they feel that it has been fixed. If it turns out that it was not
+    resolved, most users can change the status back to "feedback".  If
+    you do so, please leave a note.
+
+<li>Tempfix: A workaround for the issue has been posted, but we may still be
+    working on a more long term solution.
+
+<li>Closed: Those with commit access to Github are the only ones that
+    can mark an issue as closed.  That said, if you are submitting a
+    patch that fixes and issue, please include the "fixes #<issuenum>"
+    tag to your commit as this will automatically close the issue when your
+    patch is accepted and pushed to github.
+</ul>
+
+<font face="arial,helvetica,sanserif">
+<b>Tagging in messages</b>
+</font>
+<p>The tracker has a very basic tagging and markup scheme that is described in
+detail <a href="http://bugs.goldencheetah.org/help/wiki_syntax.html">here</a>.
+Perhaps the most useful feature is the ability to use tags to link issues,
+commits, etc. When commenting on an issue please use the following tags
+when appropriate to automatically create links when:</p>
+
+<table align="center" width="600">
+<tr>
+  <th>Tag</th>
+  <th>Effect</th>
+</tr>
+<tr>
+  <td>Issue #2</td>
+  <td>Creates a link to existing Issue #2</td>
+</tr>
+<tr>
+  <td>commit:e76247a</td>
+  <td>Creates a link to commit e76247a</td>
+</tr>
+<tr>
+  <td>source:src/MainWindow.cpp</td>
+  <td>Creates a link to src/Mainwindow.cpp in our git repo</td>
+</tr>
+</table>

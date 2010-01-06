@@ -19,6 +19,9 @@ install:
 	rsync -avz -e ssh $(HTML) $(TARBALLS) $(OTHER) \
 		srhea.net:wwwroot/goldencheetah.org/
 
+bug-tracker.html: bug-tracker.content genpage.pl
+	./genpage.pl "Bug Tracker" $< > $@
+
 command-line.html: command-line.content genpage.pl
 	./genpage.pl "Legacy Command-Line Tools" $< > $@
 
@@ -45,9 +48,6 @@ license.html: license.content genpage.pl
 
 mailing-list.html: mailing-list.content genpage.pl
 	./genpage.pl "Mailing Lists" $< > $@
-
-report-a-bug.html: report-a-bug.content genpage.pl
-	./genpage.pl "Report a Bug" $< > $@
 
 screenshots.html: screenshots.content genpage.pl
 	./genpage.pl "Screenshots" $< > $@
