@@ -39,8 +39,6 @@ macx {
 
 !win32 {
     RC_FILE = images/gc.icns
-    HEADERS += Serial.h
-    SOURCES += Serial.cpp
 }
 win32 {
     INCLUDEPATH += ./win32
@@ -109,6 +107,7 @@ HEADERS += \
         RideSummaryWindow.h \
         Season.h \
         SeasonParser.h \
+        Serial.h \
         Settings.h \
         SimpleNetworkController.h \
         SimpleNetworkClient.h \
@@ -190,6 +189,7 @@ SOURCES += \
         RideSummaryWindow.cpp \
         Season.cpp \
         SeasonParser.cpp \
+        Serial.cpp \
         SimpleNetworkController.cpp \
         SimpleNetworkClient.cpp \
         SplitRideDialog.cpp \
