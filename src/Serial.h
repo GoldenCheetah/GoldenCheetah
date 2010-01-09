@@ -21,13 +21,24 @@
 
 #include "CommPort.h"
 
+#ifdef Q_OS_WIN32 // for HANDLE
+#include <windows.h>
+#include <winbase.h>
+#endif
+
 class Serial : public CommPort
 {
     Serial(const Serial &);
     Serial& operator=(const Serial &);
 
     QString path;
+#ifndef Q_OS_WIN32
     int fd;
+#else
+    bool isOpen;            // don't rely on fd value to determine if
+                            // the COM port is open
+    HANDLE fd;              // file descriptor for reading from com3
+#endif
     Serial(const QString &path);
 
     public:
