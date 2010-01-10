@@ -1100,7 +1100,6 @@ WKO_ULONG nullvals(char g)
 unsigned int optpad(WKO_UCHAR *p)
 {
     WKO_USHORT us;
-    WKO_ULONG ul;
     unsigned int bytes = 0;
 
     /* Opening bytes are
