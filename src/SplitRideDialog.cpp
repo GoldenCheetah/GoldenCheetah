@@ -144,6 +144,15 @@ SplitRideDialog::CreateNewRideFile(const RideFile *ride, int nRecStart, int nRec
     }
     newRideFile->setDeviceType(ride->deviceType());
 
+    double endSecs = ride->dataPoints().at(nRecEnd - 1)->secs + ride->recIntSecs();
+    foreach (RideFileInterval interval, ride->intervals()) {
+        if ((interval.start >= pointStart->secs) && (interval.stop <= endSecs)) {
+            newRideFile->addInterval(interval.start - pointStart->secs,
+                                     interval.stop - pointStart->secs,
+                                     interval.name);
+        }
+    }
+
     QString fileName;
     fileName.sprintf("%04d_%02d_%02d_%02d_%02d_%02d.gc",
                             newStart.date().year(), newStart.date().month(),
