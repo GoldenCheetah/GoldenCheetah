@@ -19,6 +19,7 @@
 #include "ModelPlot.h"
 #include "ModelWindow.h"
 #include "MainWindow.h"
+#include "Settings.h"
 #include "Zones.h"
 #include "RideFile.h"
 #include "Units.h" // for MILES_PER_KM
@@ -194,6 +195,7 @@ class ModelDataProvider : public Function
         double pointType(const RideFilePoint *, int);
         QString describeType(int, bool);
         double maxz, minz;
+        double cranklength; // used for CPV/AEPF calculation
 };
 
 double
@@ -207,13 +209,17 @@ ModelDataProvider::pointType(const RideFilePoint *point, int type)
         case MODEL_HEARTRATE : return point->hr;
         case MODEL_SPEED : return point->kph;
         case MODEL_ALT : return point->alt;
-        case MODEL_PEDALFORCE : return point->nm;
+        case MODEL_TORQUE : return point->nm;
         case MODEL_TIME : return point->secs;
         case MODEL_DISTANCE : return point->km;
         case MODEL_INTERVAL : return point->interval;
         case MODEL_LAT : return point->lat;
         case MODEL_LONG : return point->lon;
-
+        case MODEL_AEPF :
+            if (point->watts == 0 || point->cad == 0) return 0;
+            else return ((point->watts * 60.0) / (point->cad * cranklength * 2.0 * PI));
+        case MODEL_CPV :
+            return 100 * ((point->cad * cranklength * 2.0 * PI) / 60.0);
         // these you need to do yourself cause there is some
         // logic needed and I'm just lookup table!
         case MODEL_XYTIME : return 1;
@@ -234,12 +240,14 @@ ModelDataProvider::describeType(int type, bool longer)
             case MODEL_HEARTRATE : return ("Heartrate (bpm)");
             case MODEL_SPEED : return ("Speed (kph)"); //XXX metric / imperial!
             case MODEL_ALT : return ("Altitude (meters)"); // XXX metric / imperial
-            case MODEL_PEDALFORCE : return ("Pedal Force (nm)");
+            case MODEL_TORQUE : return ("Torque (N)");
             case MODEL_TIME : return ("Elapsed Time (secs)");
             case MODEL_DISTANCE : return ("Elapsed Distance (km)"); //XXX metric/imperial
             case MODEL_INTERVAL : return ("Interval Number"); // XXX implemented differently
             case MODEL_LAT : return ("Latitude (degree offset)");
             case MODEL_LONG : return ("Longitude (degree offset)");
+            case MODEL_CPV : return ("Circumferential Pedal Velocity (cm/s)");
+            case MODEL_AEPF : return ("Average Effective Pedal Force (N)");
 
             // these you need to do yourself cause there is some
             // logic needed and I'm just lookup table!
@@ -255,7 +263,7 @@ ModelDataProvider::describeType(int type, bool longer)
             case MODEL_HEARTRATE : return ("Heartrate");
             case MODEL_SPEED : return ("Speed"); //XXX metric / imperial!
             case MODEL_ALT : return ("Altitude"); // XXX metric / imperial
-            case MODEL_PEDALFORCE : return ("Pedal Force");
+            case MODEL_TORQUE : return ("Pedal Force");
             case MODEL_TIME : return ("Time");
             case MODEL_DISTANCE : return ("Distance"); //XXX metric/imperial
             case MODEL_INTERVAL : return ("Interval"); // XXX implemented differently
@@ -263,6 +271,8 @@ ModelDataProvider::describeType(int type, bool longer)
             case MODEL_LONG : return ("Longitude");
             case MODEL_XYTIME : return ("Time at X/Y");
             case MODEL_POWERZONE : return ("Zone");
+            case MODEL_CPV : return ("CPV");
+            case MODEL_AEPF : return ("AEPF");
         }
         return ("None");; // ? unknown channel ?
     }
@@ -289,6 +299,15 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
 
         return;
     }
+
+    cranklength = 0.0;
+    boost::shared_ptr<QSettings> appsettings = GetApplicationSettings();
+    if (appsettings) {
+        cranklength = appsettings->value(GC_CRANKLENGTH).toDouble() / 1000.0;
+    }
+
+    // if its not setup or no settings exist default to 175mm cranks
+    if (cranklength == 0.0) cranklength = 0.175;
 
     // Run through the ridefile points putting the selected
     // values into the approprate bins
@@ -646,15 +665,32 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
         xscale *=factor;
     }
 
+    // general plot settings
     plot.setScale(xscale, yscale, zscale);
     plot.setTitle("");
+    plot.setTitleFont(font.family(),font.pointSize(), QFont::Bold);
     plot.setCoordinateStyle(FRAME);
     plot.setMeshLineWidth(1);
+    plot.setIsolines(10);
+    plot.setSmoothMesh(true);
+
+    // cordinates - labels, gridlines, tic markers etc
+    if (settings->gridlines == true)
+        plot.coordinates()->setGridLines(true, true, Qwt3D::BACK | Qwt3D::LEFT | Qwt3D::FLOOR);
+    else
+        plot.coordinates()->setGridLines(true, true, 0);
     plot.coordinates()->setLineWidth(1);
     plot.coordinates()->setNumberFont(font.family(),font.pointSize());
-    plot.setTitleFont(font.family(),font.pointSize(), QFont::Bold);
+    plot.coordinates()->adjustLabels(25);
+    plot.coordinates()->adjustNumbers(10);
 
+    for (unsigned int i=0; i < plot.coordinates()->axes.size(); i++) {
+        plot.coordinates()->axes[i].setMajors(7);
+        plot.coordinates()->axes[i].setMinors(5);
+        plot.coordinates()->axes[i].recalculateTics();
+    }
     plot.coordinates()->setLabelFont(font.family(), font.pointSize(), QFont::Bold);
+
     plot.coordinates()->axes[Z1].setLabelString(describeType(settings->z, true));
     plot.coordinates()->axes[Z2].setLabelString(describeType(settings->z, true));
     plot.coordinates()->axes[Z3].setLabelString(describeType(settings->z, true));
@@ -667,6 +703,38 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
     plot.coordinates()->axes[Y2].setLabelString(describeType(settings->y, true));
     plot.coordinates()->axes[Y3].setLabelString(describeType(settings->y, true));
     plot.coordinates()->axes[Y4].setLabelString(describeType(settings->y, true));
+
+    plot.coordinates()->axes[Z1].setTicLength(25.0/xscale, 10.0/xscale);
+    plot.coordinates()->axes[Z2].setTicLength(25.0/xscale, 10.0/xscale);
+    plot.coordinates()->axes[Z3].setTicLength(25.0/xscale, 10.0/xscale);
+    plot.coordinates()->axes[Z4].setTicLength(25.0/xscale, 10.0/xscale);
+    plot.coordinates()->axes[X1].setTicLength(25.0/yscale, 10.0/yscale);
+    plot.coordinates()->axes[X2].setTicLength(25.0/yscale, 10.0/yscale);
+    plot.coordinates()->axes[X3].setTicLength(25.0/yscale, 10.0/yscale);
+    plot.coordinates()->axes[X4].setTicLength(25.0/yscale, 10.0/yscale);
+    plot.coordinates()->axes[Y1].setTicLength(25.0/xscale, 10.0/xscale);
+    plot.coordinates()->axes[Y2].setTicLength(25.0/xscale, 10.0/xscale);
+    plot.coordinates()->axes[Y3].setTicLength(25.0/xscale, 10.0/xscale);
+    plot.coordinates()->axes[Y4].setTicLength(25.0/xscale, 10.0/xscale);
+
+    // reset the flippin tic orientation, really this library
+    // is a bit of a pain now!
+    plot.coordinates()->axes[X1].setTicOrientation(0, -1, 0);
+    plot.coordinates()->axes[X2].setTicOrientation(0, -1, 0);
+    plot.coordinates()->axes[X3].setTicOrientation(0,  1, 0);
+    plot.coordinates()->axes[X4].setTicOrientation(0,  1, 0);
+
+    plot.coordinates()->axes[Y1].setTicOrientation( 1, 0, 0);
+    plot.coordinates()->axes[Y2].setTicOrientation(-1, 0, 0);
+    plot.coordinates()->axes[Y3].setTicOrientation(-1, 0, 0);
+    plot.coordinates()->axes[Y4].setTicOrientation( 1, 0, 0);
+
+    plot.coordinates()->axes[Z1].setTicOrientation( 1, 0, 0);
+    plot.coordinates()->axes[Z2].setTicOrientation( 1, 0, 0);
+    plot.coordinates()->axes[Z3].setTicOrientation(-1, 0, 0);
+    plot.coordinates()->axes[Z4].setTicOrientation(-1, 0, 0);
+
+    // now, at last we can draw the axes markers. phew.
     plot.coordinates()->axes[Z1].draw();
     plot.coordinates()->axes[Z2].draw();
     plot.coordinates()->axes[Z3].draw();
@@ -676,18 +744,6 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
     plot.coordinates()->axes[Y1].draw();
     plot.coordinates()->axes[Y2].draw();
     plot.coordinates()->axes[Y3].draw();
-
-    for (unsigned int i=0; i < plot.coordinates()->axes.size(); i++) {
-        plot.coordinates()->axes[i].setMajors(7);
-        plot.coordinates()->axes[i].setMinors(5);
-    }
-    plot.setIsolines(10);
-    plot.setSmoothMesh(true);
-    plot.coordinates()->adjustLabels(diag_*2);
-    if (settings->gridlines == true)
-        plot.coordinates()->setGridLines(true, true, Qwt3D::BACK | Qwt3D::LEFT | Qwt3D::FLOOR);
-    else
-        plot.coordinates()->setGridLines(true, true, 0);
 
     // turn off zpane -- causes nasty flashing when left on between plots
     zpane = 0;
