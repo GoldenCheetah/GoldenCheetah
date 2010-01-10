@@ -35,7 +35,7 @@
 #define MODEL_HEARTRATE     3
 #define MODEL_SPEED         4
 #define MODEL_ALT           5
-#define MODEL_PEDALFORCE    6
+#define MODEL_TORQUE        6
 #define MODEL_TIME          7
 #define MODEL_DISTANCE      8
 #define MODEL_INTERVAL      9
@@ -43,6 +43,8 @@
 #define MODEL_LONG          11
 #define MODEL_XYTIME        12
 #define MODEL_POWERZONE     13
+#define MODEL_CPV           14
+#define MODEL_AEPF          15
 
 using namespace Qwt3D;
 
