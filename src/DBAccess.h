@@ -21,11 +21,11 @@
 
 
 
-#import <QDir>
-#import <QHash>
-#import <QtSql>
-#import "SummaryMetrics.h"
-#import "Season.h"
+#include <QDir>
+#include <QHash>
+#include <QtSql>
+#include "SummaryMetrics.h"
+#include "Season.h"
 
 class RideFile;
 class Zones;
