@@ -46,7 +46,7 @@ ModelWindow::addStandardChannels(QComboBox *box)
     //box->addItem(tr("Longitude"), MODEL_LONG); //XXX weird values make the plot ugly
 }
 
-ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) : QWidget(parent), home(home), main(parent)
+ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) : QWidget(parent), home(home), main(parent), active(false)
 {
     // Layouts
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -183,10 +183,16 @@ ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) : QWidget(parent)
 }
 
 void
+ModelWindow::setActive(bool active)
+{
+    this->active = active;
+    if (active) setData(true);
+}
+void
 ModelWindow::rideSelected()
 {
     ride = main->rideItem();
-    setData(true);
+    if (active) setData(true);
 }
 
 void

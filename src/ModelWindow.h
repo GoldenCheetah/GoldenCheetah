@@ -52,6 +52,7 @@ class ModelWindow : public QWidget
     public:
 
         ModelWindow(MainWindow *, const QDir &);
+        void setActive(bool);
 
     public slots:
         void rideSelected();
@@ -75,6 +76,7 @@ class ModelWindow : public QWidget
         QDir home;
         MainWindow *main;
         bool useMetricUnits;
+        bool active;
 
         bool dirty;             // settings changed but not reploted
         ModelSettings settings; // last used settings

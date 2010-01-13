@@ -196,14 +196,12 @@ class ModelDataProvider : public Function
         QString describeType(int, bool);
         double maxz, minz;
         double cranklength; // used for CPV/AEPF calculation
+        bool useMetricUnits;
 };
 
 double
 ModelDataProvider::pointType(const RideFilePoint *point, int type)
 {
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    bool metric = settings->value(GC_UNIT).toString() == "Metric";
-
     // return the point value for the given type
     switch(type) {
 
@@ -211,13 +209,13 @@ ModelDataProvider::pointType(const RideFilePoint *point, int type)
         case MODEL_CADENCE : return point->cad;
         case MODEL_HEARTRATE : return point->hr;
         case MODEL_SPEED :
-            if (metric == true){
+            if (useMetricUnits == true){
                 return point->kph;
             }else {
                 return point->kph * MILES_PER_KM;
             }
         case MODEL_ALT :
-            if (metric == true){
+            if (useMetricUnits == true){
                 return point->alt;
             }else {
                 return point->alt * FEET_PER_METER;
@@ -225,7 +223,7 @@ ModelDataProvider::pointType(const RideFilePoint *point, int type)
         case MODEL_TORQUE : return point->nm;
         case MODEL_TIME : return point->secs;
         case MODEL_DISTANCE :
-            if (metric == true){
+            if (useMetricUnits == true){
                 return point->km;
             }else {
                 return point->km * MILES_PER_KM;
@@ -249,9 +247,6 @@ ModelDataProvider::pointType(const RideFilePoint *point, int type)
 QString
 ModelDataProvider::describeType(int type, bool longer)
 {
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    bool metric = settings->value(GC_UNIT).toString() == "Metric";
-
     // return the point value for the given type
     if (longer == true) {
         switch(type) {
@@ -260,13 +255,13 @@ ModelDataProvider::describeType(int type, bool longer)
             case MODEL_CADENCE : return ("Cadence (rpm)");
             case MODEL_HEARTRATE : return ("Heartrate (bpm)");
             case MODEL_SPEED :
-                if (metric == true){
+                if (useMetricUnits == true){
                      return ("Speed (kph)");
                 }else {
                      return ("Speed (mph)");
                 }
             case MODEL_ALT :
-                  if (metric == true){
+                  if (useMetricUnits == true){
                       return ("Altitude (meters)");
                   }else {
                       return ("Altitude (feet)");
@@ -274,7 +269,7 @@ ModelDataProvider::describeType(int type, bool longer)
             case MODEL_TORQUE : return ("Torque (N)");
             case MODEL_TIME : return ("Elapsed Time (secs)");
             case MODEL_DISTANCE :
-                if (metric == true){
+                if (useMetricUnits == true){
                     return ("Elapsed Distance (km)");
                 }else {
                     return ("Elapsed Distance (mi)");
@@ -324,6 +319,15 @@ ModelDataProvider::describeType(int type, bool longer)
  *----------------------------------------------------------------------*/
 ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *settings) : Function(plot)
 {
+    // get application settings
+    cranklength = 0.0;
+    useMetricUnits = false; // the default for Non-Europeans ;-)
+    boost::shared_ptr<QSettings> appsettings = GetApplicationSettings();
+    if (appsettings) {
+        cranklength = appsettings->value(GC_CRANKLENGTH).toDouble() / 1000.0;
+        useMetricUnits = appsettings->value(GC_UNIT).toString() == "Metric";
+    }
+
     // if there are no settings or incomplete settings
     // create a null data plot
     if (settings == NULL || settings->ride == NULL || settings->ride->ride() == NULL ||
@@ -336,11 +340,6 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
         return;
     }
 
-    cranklength = 0.0;
-    boost::shared_ptr<QSettings> appsettings = GetApplicationSettings();
-    if (appsettings) {
-        cranklength = appsettings->value(GC_CRANKLENGTH).toDouble() / 1000.0;
-    }
 
     // if its not setup or no settings exist default to 175mm cranks
     if (cranklength == 0.0) cranklength = 0.175;
