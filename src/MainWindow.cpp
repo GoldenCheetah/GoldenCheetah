@@ -1185,6 +1185,9 @@ MainWindow::tabChanged(int index)
 {
     criticalPowerWindow->setActive(index == 2);
     performanceManagerWindow->setActive(tabWidget->widget(index) == performanceManagerWindow);
+#ifdef GC_HAVE_QWTPLOT3D
+    modelWindow->setActive(tabWidget->widget(index) == modelWindow);
+#endif
 }
 
 void
