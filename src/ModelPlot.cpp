@@ -201,17 +201,35 @@ class ModelDataProvider : public Function
 double
 ModelDataProvider::pointType(const RideFilePoint *point, int type)
 {
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+    bool metric = settings->value(GC_UNIT).toString() == "Metric";
+
     // return the point value for the given type
     switch(type) {
 
         case MODEL_POWER : return point->watts;
         case MODEL_CADENCE : return point->cad;
         case MODEL_HEARTRATE : return point->hr;
-        case MODEL_SPEED : return point->kph;
-        case MODEL_ALT : return point->alt;
+        case MODEL_SPEED :
+            if (metric == true){
+                return point->kph;
+            }else {
+                return point->kph * MILES_PER_KM;
+            }
+        case MODEL_ALT :
+            if (metric == true){
+                return point->alt;
+            }else {
+                return point->alt * FEET_PER_METER;
+            }
         case MODEL_TORQUE : return point->nm;
         case MODEL_TIME : return point->secs;
-        case MODEL_DISTANCE : return point->km;
+        case MODEL_DISTANCE :
+            if (metric == true){
+                return point->km;
+            }else {
+                return point->km * MILES_PER_KM;
+            }
         case MODEL_INTERVAL : return point->interval;
         case MODEL_LAT : return point->lat;
         case MODEL_LONG : return point->lon;
@@ -231,6 +249,9 @@ ModelDataProvider::pointType(const RideFilePoint *point, int type)
 QString
 ModelDataProvider::describeType(int type, bool longer)
 {
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+    bool metric = settings->value(GC_UNIT).toString() == "Metric";
+
     // return the point value for the given type
     if (longer == true) {
         switch(type) {
@@ -238,11 +259,26 @@ ModelDataProvider::describeType(int type, bool longer)
             case MODEL_POWER : return ("Power (watts)");
             case MODEL_CADENCE : return ("Cadence (rpm)");
             case MODEL_HEARTRATE : return ("Heartrate (bpm)");
-            case MODEL_SPEED : return ("Speed (kph)"); //XXX metric / imperial!
-            case MODEL_ALT : return ("Altitude (meters)"); // XXX metric / imperial
+            case MODEL_SPEED :
+                if (metric == true){
+                     return ("Speed (kph)");
+                }else {
+                     return ("Speed (mph)");
+                }
+            case MODEL_ALT :
+                  if (metric == true){
+                      return ("Altitude (meters)");
+                  }else {
+                      return ("Altitude (feet)");
+                  }
             case MODEL_TORQUE : return ("Torque (N)");
             case MODEL_TIME : return ("Elapsed Time (secs)");
-            case MODEL_DISTANCE : return ("Elapsed Distance (km)"); //XXX metric/imperial
+            case MODEL_DISTANCE :
+                if (metric == true){
+                    return ("Elapsed Distance (km)");
+                }else {
+                    return ("Elapsed Distance (mi)");
+                }
             case MODEL_INTERVAL : return ("Interval Number"); // XXX implemented differently
             case MODEL_LAT : return ("Latitude (degree offset)");
             case MODEL_LONG : return ("Longitude (degree offset)");
@@ -265,7 +301,7 @@ ModelDataProvider::describeType(int type, bool longer)
             case MODEL_ALT : return ("Altitude"); // XXX metric / imperial
             case MODEL_TORQUE : return ("Pedal Force");
             case MODEL_TIME : return ("Time");
-            case MODEL_DISTANCE : return ("Distance"); //XXX metric/imperial
+            case MODEL_DISTANCE : return ("Distance");//XXX metric/imperial
             case MODEL_INTERVAL : return ("Interval"); // XXX implemented differently
             case MODEL_LAT : return ("Latitude");
             case MODEL_LONG : return ("Longitude");
