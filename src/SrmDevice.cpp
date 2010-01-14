@@ -109,7 +109,8 @@ SrmDevice::download(CommPortPtr dev, const QDir &tmpdir,
     int opt_fixup = 1; // fix bad data like srmwin.exe does
     SrmioData srmdata(srmpc_get_data(srm.d, opt_all, opt_fixup));
     if (!srmdata.d) {
-        err = "srmpc_get_data failed";
+        err = "srmpc_get_data failed: ";
+        err += strerror(errno);
         return false;
     }
     if (srm_data_write_srm7(srmdata.d, tmpname.toAscii().constData()) < 0) {
