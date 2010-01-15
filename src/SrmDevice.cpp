@@ -113,6 +113,10 @@ SrmDevice::download(CommPortPtr dev, const QDir &tmpdir,
         err += strerror(errno);
         return false;
     }
+    if( ! srmdata.d->cused ){
+        err = "no data available";
+        return false;
+    }
     if (srm_data_write_srm7(srmdata.d, tmpname.toAscii().constData()) < 0) {
         err = "Couldn't write to file " + tmpname + ": " + strerror(errno);
         return false;
