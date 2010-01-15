@@ -105,7 +105,7 @@ SrmDevice::download(CommPortPtr dev, const QDir &tmpdir,
         err = "Couldn't open device " + path + ": " + strerror(errno);
         return false;
     }
-    int opt_all = 0; // XXX: what does this do?
+    int opt_all = 0; // only get new data
     int opt_fixup = 1; // fix bad data like srmwin.exe does
     SrmioData srmdata(srmpc_get_data(srm.d, opt_all, opt_fixup));
     if (!srmdata.d) {
@@ -121,16 +121,10 @@ SrmDevice::download(CommPortPtr dev, const QDir &tmpdir,
         err = "Couldn't write to file " + tmpname + ": " + strerror(errno);
         return false;
     }
-    // Read it back in to get the ride start time.
-    SrmFileReader reader;
-    QStringList errs;
-    QFile file(tmpname);
-    QStringList errors;
-    boost::scoped_ptr<RideFile> ride(
-        RideFileFactory::instance().openRideFile(file, errors));
-    BOOST_FOREACH(QString err, errors)
-        fprintf(stderr, "error: %s\n", err.toAscii().constData());
-    filename = ride->startTime().toString("yyyy_MM_dd_hh_mm_ss") + ".srm";
+    QDateTime startTime;
+    startTime.setTime_t( srmdata.d->chunks[0]->time / 10 );
+    filename = startTime.toString("yyyy_MM_dd_hh_mm_ss") + ".srm";
+
     return true;
 }
 
