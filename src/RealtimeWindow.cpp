@@ -499,7 +499,7 @@ void RealtimeWindow::Stop()        // when stop button is pressed
 void RealtimeWindow::updateData(RealtimeData &rtData)
 {
         displayPower = rtData.getWatts();
-        displayCadence = rtData.getRPM();
+        displayCadence = rtData.getCadence();
         displayHeartRate = rtData.getHr();
         displaySpeed = rtData.getSpeed();
         displayLoad = rtData.getLoad();
@@ -519,7 +519,7 @@ void RealtimeWindow::guiUpdate()           // refreshes the telemetry
     if (status&RT_RUNNING && deviceController->doesPull() == true) {
         deviceController->getRealtimeData(rtData);
         displayPower = rtData.getWatts();
-        displayCadence = rtData.getRPM();
+        displayCadence = rtData.getCadence();
         displayHeartRate = rtData.getHr();
         displaySpeed = rtData.getSpeed();
         displayLoad = rtData.getLoad();
@@ -659,7 +659,7 @@ RealtimeWindow::streamUpdate()
 
     // get current telemetry...
     rtData.setWatts(displayPower);
-    rtData.setRPM(displayCadence);
+    rtData.setCadence(displayCadence);
     rtData.setHr(displayHeartRate);
     rtData.setSpeed(displaySpeed);
     rtData.setLoad(displayLoad);

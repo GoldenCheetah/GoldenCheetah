@@ -21,7 +21,7 @@
 
 RealtimeData::RealtimeData()
 {
-    watts = hr = speed = rpm  = load = 0;
+    watts = hr = speed = cadence  = load = 0;
     time = 0;
 }
 
@@ -41,15 +41,14 @@ void RealtimeData::setSpeed(double speed)
 {
     this->speed = speed;
 }
-void RealtimeData::setRPM(double rpm)
+void RealtimeData::setCadence(double aCadence)
 {
-    this->rpm = rpm;
+    cadence = aCadence;
 }
 void RealtimeData::setLoad(double load)
 {
     this->load = load;
 }
-
 double RealtimeData::getWatts()
 {
     return watts;
@@ -67,9 +66,9 @@ double RealtimeData::getSpeed()
 {
     return speed;
 }
-double RealtimeData::getRPM()
+double RealtimeData::getCadence()
 {
-    return rpm;
+    return cadence;
 }
 double RealtimeData::getLoad()
 {
