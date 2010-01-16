@@ -227,13 +227,13 @@ bool SimpleNetworkClient::read_next_line(QMutexLocker &locker,
     read_into_me.setHr(hr);
     read_into_me.setTime(time);
     read_into_me.setSpeed(speed);
-    read_into_me.setRPM(rpm);
+    read_into_me.setCadence(rpm);
     read_into_me.setLoad(load);
 
     printf("Read from network: %f %f %ld %f %f %f\n",
            read_into_me.getWatts(), read_into_me.getHr(),
            read_into_me.getTime(), read_into_me.getSpeed(),
-           read_into_me.getRPM(), read_into_me.getLoad());
+           read_into_me.getCadence(), read_into_me.getLoad());
   }
   return true;
 }
@@ -246,7 +246,7 @@ bool SimpleNetworkClient::write_next_line(QMutexLocker &locker,
   snprintf(buffer, MAX_BYTES_PER_LINE-1,
            "%.2f %.2f %ld %.2f %.2f %.3f\n",
            record.getWatts(), record.getHr(), record.getTime(),
-           record.getSpeed(), record.getRPM(), record.getLoad());
+           record.getSpeed(), record.getCadence(), record.getLoad());
   locker.unlock();
   num_written = server.write(buffer, strlen(buffer));
   locker.relock();

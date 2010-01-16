@@ -32,19 +32,20 @@ public:
     void setHr(double hr);
     void setTime(long time);
     void setSpeed(double speed);
-    void setRPM(double rpm);
+    void setCadence(double aCadence);
     void setLoad(double load);
     double getWatts();
     double getHr();
     long getTime();
     double getSpeed();
-    double getRPM();
+    double getCadence();
     double getLoad();
 
 private:
-    double hr, watts, rpm, speed, load;
+    double hr, watts, speed, load;
     unsigned long time;
 
+    double cadence;      // in rpm
 };
 
 

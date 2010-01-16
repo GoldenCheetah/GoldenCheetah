@@ -71,7 +71,9 @@ private:
     int devicePort;
     QStringList antIDs;
     long lastReadWatts;
-    long lastReadRPM;
+    long lastReadCadence;
+    long lastReadWheelRpm;
+    long lastReadSpeed;
     QTime elapsedTime;
     bool sentDual, sentSpeed, sentHR, sentCad, sentPWR;
     void reinitChannel(QString _channel);

@@ -92,7 +92,7 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
     //
     rtData.setWatts(Power);
     rtData.setHr(HeartRate);
-    rtData.setRPM(Cadence);
+    rtData.setCadence(Cadence);
     rtData.setSpeed(Speed);
 
     //

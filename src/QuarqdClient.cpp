@@ -20,8 +20,23 @@
 #include <QMessageBox>
 #include <QTime>
 #include <QProgressDialog>
+#include <QtDebug>
 #include "QuarqdClient.h"
 #include "RealtimeData.h"
+
+
+// Strings as received from quarqd
+// tested with a Garmin ANT+ stick
+//
+static QString powerStr       = "<Power ";
+static QString cadenceStr     = "<Cadence ";
+static QString speedStr       = "<Speed ";
+static QString heartRateStr   = "<HeartRate ";
+
+static QString sensorStaleStr = "<SensorStale ";
+static QString sensorFoundStr = "<SensorFound ";
+static QString sensorDropStr  = "<SensorDrop ";
+static QString sensorLostStr  = "<SensorLost ";
 
 /* Control status */
 #define ANT_RUNNING  0x01
@@ -35,7 +50,8 @@ QuarqdClient::QuarqdClient(QObject *parent, DeviceConfiguration *config) : QThre
     devicePort = (int)QString(config->portSpec).section(':',1,1).toInt(); // after the colon
     antIDs = config->deviceProfile.split(",");
     lastReadWatts = 0;
-    lastReadRPM = 0;
+    lastReadCadence = 0;
+    lastReadSpeed = 0;
 }
 
 QuarqdClient::~QuarqdClient()
@@ -90,47 +106,93 @@ QuarqdClient::parseElement(QString &strBuf) // updates QuarqdClient::telemetry
 {
     QStringList qList = strBuf.split("\n");
 
+    // qDebug("%s",strBuf.toAscii().data());
+
     //Loop for all the elements.
     for(int i=0; i<qList.size(); i++)
     {
         QString str = qList.at(i);
-        if(str.contains("watts"))
-		{
-		    int start = str.indexOf("watts");
-		    start += 7;
-		    int end = str.indexOf("'", start);
-		    telemetry.setWatts(str.mid(start, end - start).toDouble());
-            telemetry.setTime(getTimeStamp(str));
-            lastReadWatts = elapsedTime.elapsed();
+        bool ok;
+        double value;
+        int start, end;
+        QString mid;
 
-		} else if(str.contains("RPM"))
-		{
-		    int start = str.indexOf("RPM");
-		    start += 5;
-		    int end = str.indexOf("'", start);
-		    telemetry.setRPM(str.mid(start, end - start).toDouble());
-            telemetry.setTime(getTimeStamp(str));
-            lastReadRPM = elapsedTime.elapsed();
-        } else if(str.contains("BPM"))
+        if(str.startsWith(powerStr))
         {
-		    int start = str.indexOf("BPM");
-		    start += 5;
-		    int end = str.indexOf("'", start);
-		    telemetry.setHr(str.mid(start, end - start).toDouble());
-            telemetry.setTime(getTimeStamp(str));
-        } else if(str.contains("SensorDrop") || str.contains("SensorStale") || str.contains("SensorLost"))//Try and save it.
+            start = str.indexOf("watts='");
+            start += 7;
+            end = str.indexOf("'", start);
+
+            mid = str.mid(start, end - start);
+            value = mid.toDouble(&ok);
+
+            if (ok && mid != "nan" && mid != "inf") {
+                telemetry.setWatts(value);
+                telemetry.setTime(getTimeStamp(str));
+                lastReadWatts = elapsedTime.elapsed();
+            }
+        } else if(str.startsWith(cadenceStr))
         {
-		    int start = str.indexOf("id");
-		    start += 4;
-		    int end = str.indexOf("'", start);
+            start = str.indexOf("RPM='");
+            start += 5;
+            end = str.indexOf("'", start);
+
+            mid = str.mid(start, end - start);
+            value = mid.toDouble(&ok);
+
+            if (ok && mid != "nan" && mid != "inf") {
+                telemetry.setCadence(value);
+                telemetry.setTime(getTimeStamp(str));
+                lastReadCadence = elapsedTime.elapsed();
+            }
+        } else if(str.startsWith(speedStr))
+        {
+            // This is not the speed it is the revolution of the wheel
+            // at least when it comes from PowerTap.
+            start = str.indexOf("RPM='");
+            start += 5;
+            end = str.indexOf("'", start);
+
+            mid = str.mid(start, end - start);
+            value = mid.toDouble(&ok);
+
+            if (ok && mid != "nan" && mid != "inf") {
+                if (value > 0) {
+                    // TODO: let wheel size be a configurable, default now to 2101 mm
+                    telemetry.setSpeed((value*2101/1000*60)/1000); // meter/minute -> meter/hour -> km/hour
+                    lastReadSpeed = elapsedTime.elapsed();
+                }
+                telemetry.setTime(getTimeStamp(str));
+            }
+        } else if(str.startsWith(heartRateStr))
+        {
+            start = str.indexOf("BPM");
+            start += 5;
+            end = str.indexOf("'", start);
+
+            mid = str.mid(start, end - start);
+            value = mid.toDouble(&ok);
+
+            if (ok && mid != "nan" && mid != "inf") {
+                telemetry.setHr(value);
+                telemetry.setTime(getTimeStamp(str));
+            }
+        } else if(str.startsWith(sensorDropStr) || str.startsWith(sensorStaleStr) || str.startsWith(sensorLostStr))//Try and save
+        {
+            int start = str.indexOf("id");
+            start += 4;
+            int end = str.indexOf("'", start);
             reinitChannel(str.mid(start, end - start));
         }
 
-        if(elapsedTime.elapsed() - lastReadRPM > 5000)
-            telemetry.setRPM(0);
+        if(elapsedTime.elapsed() - lastReadCadence > 5000)
+            telemetry.setCadence(0);
 
         if(elapsedTime.elapsed() - lastReadWatts > 5000)
-           telemetry.setWatts(0);
+            telemetry.setWatts(0);
+
+        if(elapsedTime.elapsed() - lastReadSpeed > 5000)
+            telemetry.setSpeed(0);
 
     }
 }
@@ -141,7 +203,7 @@ long QuarqdClient::getTimeStamp(QString &str)
     int start = str.indexOf("timestamp='");
     start += 11;
     int end = str.indexOf(".", start);
-    qDebug() << str.mid(start, end - start);
+    //    qDebug() << str.mid(start, end - start);
     return str.mid(start, end - start).toLong();
 }
 
@@ -277,10 +339,10 @@ QuarqdClient::discover(DeviceConfiguration *config, QProgressDialog *progress)
     while(start.elapsed() <= 50000) //Scan for 50 seconds.
     {
         if (progress->wasCanceled())
-		{
-			tcpSocket->close();
+        {
+            tcpSocket->close();
             return false;
-		}
+        }
 
         progress->setValue(start.elapsed());
 
@@ -309,7 +371,7 @@ QuarqdClient::discover(DeviceConfiguration *config, QProgressDialog *progress)
         if (tcpSocket->bytesAvailable() > 0) {
             QByteArray array = tcpSocket->readAll();
             strBuf = array;
-            qDebug() << strBuf;
+            //            qDebug() << strBuf;
             QStringList qList = strBuf.split("\n");
 
             //Loop for all the elements.
@@ -317,7 +379,7 @@ QuarqdClient::discover(DeviceConfiguration *config, QProgressDialog *progress)
             {
                 progress->setValue(start.elapsed());
                 QString str = qList.at(i);
-                qDebug() << str;
+                //                qDebug() << str;
                 if(str.contains("id"))
                 {
                     int start = str.indexOf("id");
