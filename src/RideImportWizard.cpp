@@ -562,12 +562,12 @@ RideImportWizard::abortClicked()
     // if done when labelled abort we kill off this dialog
     QString label = abortButton->text();
 
-    if (label == "Abort") {
+    if (label == tr("Abort")) {
         aborted=true; // terminated. I'll be back.
         return;
     }
 
-    if (label == "Finish") {
+    if (label == tr("Finish")) {
        // phew. our work is done.
        done(0);
        return;
