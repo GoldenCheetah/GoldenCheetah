@@ -68,7 +68,8 @@ RideFile::intervalBegin(const RideFileInterval &interval) const
     p.secs = interval.start;
     QVector<RideFilePoint*>::const_iterator i = std::lower_bound(
         dataPoints_.begin(), dataPoints_.end(), &p, ComparePoints());
-    assert(i != dataPoints_.end());
+    if (i == dataPoints_.end())
+        return dataPoints_.size();
     return i - dataPoints_.begin();
 }
 
