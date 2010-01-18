@@ -658,57 +658,17 @@ MainWindow::findBestIntervals()
 void
 MainWindow::addIntervalForPowerPeaksForSecs(RideFile *ride, int windowSizeSecs, QString name)
 {
-
-    QList<const RideFilePoint*> window;
-    QMap<double,double> bests;
-
-    // don't add for intervals that are longer than the entire ride!
-    if (ride->dataPoints().last()->secs < windowSizeSecs) return;
-
-    double secsDelta = ride->recIntSecs();
-    int expectedSamples = (int) floor(windowSizeSecs / secsDelta);
-    double totalWatts = 0.0;
-
-    foreach (const RideFilePoint *point, ride->dataPoints()) {
-        while (!window.empty()
-               && (point->secs >= window.first()->secs + windowSizeSecs)) {
-            totalWatts -= window.first()->watts;
-            window.takeFirst();
-        }
-        totalWatts += point->watts;
-        window.append(point);
-        int divisor = std::max(window.size(), expectedSamples);
-        double avg = totalWatts / divisor;
-        bests.insertMulti(avg, point->secs);
-    }
-
-    QMap<double,double> results;
-    if (!bests.empty()) {
-        QMutableMapIterator<double,double> j(bests);
-        j.toBack();
-        j.previous();
-        double secs = j.value();
-        results.insert(j.value() - windowSizeSecs, j.key());
-        j.remove();
-        while (j.hasPrevious()) {
-            j.previous();
-            if (abs(secs - j.value()) < windowSizeSecs)
-                j.remove();
-        }
-    }
-    QMapIterator<double,double> j(results);
-    if (j.hasNext()) {
-        j.next();
-        double secs = j.key();
-        double watts = j.value();
-
-        QTreeWidgetItem *peak = new IntervalItem(ride, name+tr(" (%1 watts)").arg((int) round(watts)),
-                                    secs, secs+windowSizeSecs,
-                                    ride->timeToDistance(secs),
-                                    ride->timeToDistance(secs+windowSizeSecs),
-                                    allIntervals->childCount()+1);
-        allIntervals->addChild(peak);
-    }
+    QList<BestIntervalDialog::BestInterval> results;
+    BestIntervalDialog::findBests(ride, windowSizeSecs, 1, results);
+    if (results.isEmpty()) return;
+    const BestIntervalDialog::BestInterval &i = results.first();
+    QTreeWidgetItem *peak =
+        new IntervalItem(ride, name+tr(" (%1 watts)").arg((int) round(i.avg)),
+                         i.start, i.stop,
+                         ride->timeToDistance(i.start),
+                         ride->timeToDistance(i.stop),
+                         allIntervals->childCount()+1);
+    allIntervals->addChild(peak);
 }
 
 void
