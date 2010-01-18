@@ -1,0 +1,30 @@
+<!DOCTYPE GoldenCheetah>
+<ride>
+    <attributes>
+        <attribute key="Start time" value="2010/01/13 20:17:56 UTC"/>
+        <attribute key="Device type" value="PowerTap CSV"/>
+    </attributes>
+    <intervals>
+        <interval stop="15.12" name="Peak 5s (900 watts)" start="10.12"/>
+        <interval stop="20.12" name="Peak 10s (900 watts)" start="10.12"/>
+        <interval stop="20.12" name="Peak 20s (675 watts)" start="0.12"/>
+    </intervals>
+    <samples>
+        <sample cad="50" watts="300" secs="0" len="1.26"/>
+        <sample cad="55" watts="300" secs="1.26" len="1.26"/>
+        <sample cad="60" watts="300" secs="2.52" len="1.26"/>
+        <sample cad="65" watts="300" secs="3.78" len="1.26"/>
+        <sample cad="70" watts="600" secs="5.04" len="1.26"/>
+        <sample cad="75" watts="600" secs="6.3" len="1.26"/>
+        <sample cad="80" watts="600" secs="7.56" len="1.26"/>
+        <sample cad="85" watts="600" secs="8.82" len="1.26"/>
+        <sample cad="90" watts="900" secs="10.08" len="1.26"/>
+        <sample cad="95" watts="900" secs="11.34" len="1.26"/>
+        <sample cad="100" watts="900" secs="12.6" len="1.26"/>
+        <sample cad="105" watts="900" secs="13.86" len="1.26"/>
+        <sample cad="110" watts="900" secs="15.12" len="1.26"/>
+        <sample cad="115" watts="900" secs="16.38" len="1.26"/>
+        <sample cad="120" watts="900" secs="17.64" len="1.26"/>
+        <sample cad="125" watts="900" secs="18.90" len="1.26"/>
+    </samples>
+</ride>
