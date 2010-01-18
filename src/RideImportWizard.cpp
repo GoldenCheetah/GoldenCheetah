@@ -274,10 +274,13 @@ RideImportWizard::process()
               boost::scoped_ptr<RideFile> ride(RideFileFactory::instance().openRideFile(thisfile, errors));
 
               // did it parse ok?
-              if (ride && errors.empty()) {
+              if (ride) {
 
-                   // ITS A KEEPER, LETS GET SOME METADATA ON DISPLAY
-                   tableWidget->item(i,5)->setText(tr("Validated"));
+                   // ride != NULL but !errors.isEmpty() means they're just warnings
+                   if (errors.isEmpty())
+                       tableWidget->item(i,5)->setText(tr("Validated"));
+                   else
+                       tableWidget->item(i,5)->setText(tr("Warning - ") + errors.join(tr(" ")));
 
                    // Set Date and Time
                    if (ride->startTime().isNull()) {
