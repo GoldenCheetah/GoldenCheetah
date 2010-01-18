@@ -191,7 +191,7 @@ AllPlot::AllPlot(QWidget *parent, MainWindow *mainWindow):
     settings(NULL),
     unit(0),
     rideItem(NULL),
-    smooth(30), bydist(false),
+    bydist(false),
     shade_zones(true),
     showPowerState(0),
     showHrState(Qt::Checked),
@@ -203,6 +203,10 @@ AllPlot::AllPlot(QWidget *parent, MainWindow *mainWindow):
     unit = settings->value(GC_UNIT);
 
     useMetricUnits = (unit.toString() == "Metric");
+
+    smooth = settings->value(GC_RIDE_PLOT_SMOOTHING).toInt();
+    if (smooth < 2)
+        smooth = 30;
 
     // create a background object for shading
     bg = new AllPlotBackground(this);
@@ -659,6 +663,8 @@ void
 AllPlot::setSmoothing(int value)
 {
     smooth = value;
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+    settings->setValue(GC_RIDE_PLOT_SMOOTHING, value);
     recalc();
 }
 
