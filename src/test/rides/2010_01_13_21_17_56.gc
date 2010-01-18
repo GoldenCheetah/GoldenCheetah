@@ -1,0 +1,29 @@
+<!DOCTYPE GoldenCheetah>
+<ride>
+    <attributes>
+        <attribute key="Start time" value="2010/01/13 21:17:56 UTC"/>
+        <attribute key="Device type" value="Unknown"/>
+    </attributes>
+    <samples>
+        <sample cad="50" watts="300" secs="0" len="1"/>
+        <sample cad="55" watts="300" secs="1" len="1"/>
+        <sample cad="60" watts="300" secs="2" len="1"/>
+        <sample cad="65" watts="300" secs="3" len="1"/>
+        <sample cad="70" watts="300" secs="4" len="1"/>
+        <sample cad="70" watts="600" secs="5" len="1"/>
+        <sample cad="75" watts="600" secs="6" len="1"/>
+        <sample cad="80" watts="600" secs="7" len="1"/>
+        <sample cad="85" watts="600" secs="8" len="1"/>
+        <sample cad="85" watts="600" secs="9" len="1"/>
+        <sample cad="90" watts="900" secs="10" len="1"/>
+        <sample cad="95" watts="900" secs="11" len="1"/>
+        <sample cad="100" watts="900" secs="12" len="1"/>
+        <sample cad="105" watts="900" secs="13" len="1"/>
+        <sample cad="105" watts="900" secs="14" len="1"/>
+        <sample cad="110" watts="900" secs="15" len="1"/>
+        <sample cad="115" watts="900" secs="16" len="1"/>
+        <sample cad="120" watts="900" secs="17" len="1"/>
+        <sample cad="125" watts="900" secs="18" len="1"/>
+        <sample cad="125" watts="900" secs="19" len="1"/>
+    </samples>
+</ride>
