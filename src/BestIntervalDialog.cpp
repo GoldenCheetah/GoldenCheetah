@@ -111,6 +111,40 @@ clearResultsTable(QTableWidget *resultsTable)
     }
 }
 
+static double
+intervalDuration(const RideFilePoint *start, const RideFilePoint *stop, const RideFile *ride)
+{
+    return stop->secs - start->secs + ride->recIntSecs();
+}
+
+struct BestInterval
+{
+    double start, stop, avg;
+    BestInterval(double start, double stop, double avg) :
+        start(start), stop(stop), avg(avg) {}
+};
+
+static bool
+intervalsOverlap(const BestInterval &a, const BestInterval &b)
+{
+    if ((a.start <= b.start) && (a.stop > b.start))
+        return true;
+    if ((b.start <= a.start) && (b.stop > a.start))
+        return true;
+    return false;
+}
+
+struct CompareBests {
+    // Sort by decreasing power and increasing start time.
+    bool operator()(const BestInterval &a, const BestInterval &b) const {
+        if (a.avg > b.avg)
+            return true;
+        if (b.avg < a.avg)
+            return false;
+        return a.start < b.start;
+    }
+};
+
 void
 BestIntervalDialog::findClicked()
 {
@@ -132,82 +166,82 @@ BestIntervalDialog::findClicked()
     }
 
     QList<const RideFilePoint*> window;
-    QMap<double,double> bests;
+    QList<BestInterval> bests;
 
     double secsDelta = ride->recIntSecs();
-    int expectedSamples = (int) floor(windowSizeSecs / secsDelta);
     double totalWatts = 0.0;
 
+    // We're looking for intervals with durations in [windowSizeSecs, windowSizeSecs + secsDelta).
+
     foreach (const RideFilePoint *point, ride->dataPoints()) {
-        while (!window.empty()
-               && (point->secs >= window.first()->secs + windowSizeSecs)) {
+        // Discard points until interval duration is < windowSizeSecs + secsDelta.
+        while (!window.empty() && (intervalDuration(window.first(), point, ride) >= windowSizeSecs + secsDelta)) {
             totalWatts -= window.first()->watts;
             window.takeFirst();
         }
+        // Add points until interval duration is >= windowSizeSecs.
         totalWatts += point->watts;
         window.append(point);
-        int divisor = std::max(window.size(), expectedSamples);
-        double avg = totalWatts / divisor;
-        bests.insertMulti(avg, point->secs);
+        double duration = intervalDuration(window.first(), window.last(), ride);
+        assert(duration < windowSizeSecs + secsDelta);
+        if (duration >= windowSizeSecs) {
+            double start = window.first()->secs;
+            double stop = start + duration;
+            double avg = totalWatts * secsDelta / duration;
+            bests.append(BestInterval(start, stop, avg));
+        }
     }
 
-    // clean up the results - results ordered by power not
-    //                        offset in workout
-    results.clear();
-    while (!bests.empty() && maxIntervals--) {
-        QMutableMapIterator<double,double> j(bests);
-        j.toBack();
-        j.previous();
-        double secs = j.value();
+    std::sort(bests.begin(), bests.end(), CompareBests());
 
-        if (j.value() >= windowSizeSecs)
-            results.insert(j.key(), j.value() - windowSizeSecs);
-        j.remove();
-        while (j.hasPrevious()) {
-            j.previous();
-            if (abs(secs - j.value()) < windowSizeSecs)
-                j.remove();
+    QList<BestInterval> results;
+    while (!bests.empty() && (results.size() < maxIntervals)) {
+        BestInterval candidate = bests.takeFirst();
+        bool overlaps = false;
+        foreach (const BestInterval &existing, results) {
+            if (intervalsOverlap(candidate, existing)) {
+                overlaps = true;
+                break;
+            }
         }
+        if (!overlaps)
+            results.append(candidate);
     }
 
     // clear the table
     clearResultsTable(resultsTable);
 
     // populate the table
-    resultsTable->setRowCount(results.count()); // only those we didn't skip
-    int i=0;    // count
-    QMapIterator<double,double> j(results);
-    j.toBack();
-    while (j.hasPrevious()) {
+    resultsTable->setRowCount(results.size());
+    int row = 0;
+    foreach (const BestInterval &interval, results) {
 
-        j.previous();
-
-        double secs = j.value();
-        double mins = ((int) secs) / 60;
+        double secs = interval.start;
+        double mins = floor(secs / 60);
         secs = secs - mins * 60.0;
-        double hrs = ((int) mins) / 60;
+        double hrs = floor(mins / 60);
         mins = mins - hrs * 60.0;
 
         // check box
         QCheckBox *c = new QCheckBox;
         c->setCheckState(Qt::Checked);
-        resultsTable->setCellWidget(i,0,c);
+        resultsTable->setCellWidget(row, 0, c);
 
         // start time
         QString start = "%1:%2:%3";
         start = start.arg(hrs, 0, 'f', 0);
         start = start.arg(mins, 2, 'f', 0, QLatin1Char('0'));
-        start = start.arg(secs, 2, 'f', 0, QLatin1Char('0'));
+        start = start.arg(round(secs), 2, 'f', 0, QLatin1Char('0'));
 
         QTableWidgetItem *t = new QTableWidgetItem;
         t->setText(start);
         t->setFlags(t->flags() & (~Qt::ItemIsEditable));
-        resultsTable->setItem(i,1,t);
+        resultsTable->setItem(row, 1, t);
 
         // name
         int x = windowSizeSecs; // int is more help here
         QString name = "Best %2%3 #%1 (%4w)";
-        name = name.arg(i+1);
+        name = name.arg(row + 1);
         // best n mins
         if (x < 60) {
             // whole seconds
@@ -232,26 +266,25 @@ BestIntervalDialog::findClicked()
             name = name.arg(tm);
             name = name.arg("");
         }
-        name = name.arg(round(j.key()));
+        name = name.arg(round(interval.avg));
 
         QTableWidgetItem *n = new QTableWidgetItem;
         n->setText(name);
         n->setFlags(n->flags() | (Qt::ItemIsEditable));
-        resultsTable->setItem(i,2,n);
+        resultsTable->setItem(row, 2, n);
 
         // hidden columns - start, stop
-        QString strt = QString("%1").arg((int)j.value()); // can't use secs as it gets modified
+        QString strt = QString("%1").arg((int) interval.start); // can't use secs as it gets modified
         QTableWidgetItem *st = new QTableWidgetItem;
         st->setText(strt);
-        resultsTable->setItem(i,3,st);
+        resultsTable->setItem(row, 3, st);
 
-        QString stp = QString("%1").arg((int)(j.value()+x));
+        QString stp = QString("%1").arg((int)(interval.start + x));
         QTableWidgetItem *sp = new QTableWidgetItem;
         sp->setText(stp);
-        resultsTable->setItem(i,4,sp);
+        resultsTable->setItem(row, 4, sp);
 
-        // increment counter
-        i++;
+        row++;
     }
     resultsTable->resizeColumnToContents(0);
     resultsTable->resizeColumnToContents(1);

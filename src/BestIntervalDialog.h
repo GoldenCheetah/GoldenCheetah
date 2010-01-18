@@ -37,8 +37,6 @@ class BestIntervalDialog : public QDialog
 
     private:
 
-        QMap<double,double> results;
-
         MainWindow *mainWindow;
         QPushButton *findButton, *doneButton, *addButton;
         QDoubleSpinBox *hrsSpinBox, *minsSpinBox, *secsSpinBox, *countSpinBox;
