@@ -320,13 +320,9 @@ ModelDataProvider::describeType(int type, bool longer)
 ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *settings) : Function(plot)
 {
     // get application settings
-    cranklength = 0.0;
-    useMetricUnits = false; // the default for Non-Europeans ;-)
     boost::shared_ptr<QSettings> appsettings = GetApplicationSettings();
-    if (appsettings) {
-        cranklength = appsettings->value(GC_CRANKLENGTH).toDouble() / 1000.0;
-        useMetricUnits = appsettings->value(GC_UNIT).toString() == "Metric";
-    }
+    cranklength = appsettings->value(GC_CRANKLENGTH, 0.0).toDouble() / 1000.0;
+    useMetricUnits = appsettings->value(GC_UNIT).toString() == "Metric";
 
     // if there are no settings or incomplete settings
     // create a null data plot
