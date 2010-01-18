@@ -63,7 +63,10 @@ Section "Golden Cheetah (required)"
   File "..\release\QtSql4.dll"
   File "..\release\QtXml4.dll"
   File "..\release\QtNetwork4.dll"
-  
+  File "..\release\QtOpenGL4.dll"
+  File "..\release\libgcc_s_dw2-1.dll"
+  File "..\release\qwtplot3d.dll"
+
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\GoldenCheetah "Install_Dir" "$INSTDIR"
   
@@ -107,6 +110,9 @@ Section "Uninstall"
   Delete $INSTDIR\QtSql4.dll
   Delete $INSTDIR\QtXml4.dll
   Delete $INSTDIR\QtNetwork4.dll
+  Delete $INSTDIR\QtOpenGL4.dll
+  Delete $INSTDIR\libgcc_s_dw2-1.dll
+  Delete $INSTDIR\qwtplot3d.dll
   Delete $INSTDIR\uninstall.exe
 
   ; Remove shortcuts, if any
