@@ -22,13 +22,24 @@
 #include <QtGui>
 
 class MainWindow;
+class RideFile;
 
 class BestIntervalDialog : public QDialog
 {
     Q_OBJECT
 
     public:
+
+        struct BestInterval {
+            double start, stop, avg;
+            BestInterval(double start, double stop, double avg) :
+                start(start), stop(stop), avg(avg) {}
+        };
+
         BestIntervalDialog(MainWindow *mainWindow);
+
+        static void findBests(const RideFile *ride, double windowSizeSecs,
+                              int maxIntervals, QList<BestInterval> &results);
 
     private slots:
         void findClicked();

@@ -117,15 +117,9 @@ intervalDuration(const RideFilePoint *start, const RideFilePoint *stop, const Ri
     return stop->secs - start->secs + ride->recIntSecs();
 }
 
-struct BestInterval
-{
-    double start, stop, avg;
-    BestInterval(double start, double stop, double avg) :
-        start(start), stop(stop), avg(avg) {}
-};
-
 static bool
-intervalsOverlap(const BestInterval &a, const BestInterval &b)
+intervalsOverlap(const BestIntervalDialog::BestInterval &a,
+                 const BestIntervalDialog::BestInterval &b)
 {
     if ((a.start <= b.start) && (a.stop > b.start))
         return true;
@@ -136,7 +130,8 @@ intervalsOverlap(const BestInterval &a, const BestInterval &b)
 
 struct CompareBests {
     // Sort by decreasing power and increasing start time.
-    bool operator()(const BestInterval &a, const BestInterval &b) const {
+    bool operator()(const BestIntervalDialog::BestInterval &a,
+                    const BestIntervalDialog::BestInterval &b) const {
         if (a.avg > b.avg)
             return true;
         if (b.avg < a.avg)
@@ -165,48 +160,8 @@ BestIntervalDialog::findClicked()
         return;
     }
 
-    QList<const RideFilePoint*> window;
-    QList<BestInterval> bests;
-
-    double secsDelta = ride->recIntSecs();
-    double totalWatts = 0.0;
-
-    // We're looking for intervals with durations in [windowSizeSecs, windowSizeSecs + secsDelta).
-
-    foreach (const RideFilePoint *point, ride->dataPoints()) {
-        // Discard points until interval duration is < windowSizeSecs + secsDelta.
-        while (!window.empty() && (intervalDuration(window.first(), point, ride) >= windowSizeSecs + secsDelta)) {
-            totalWatts -= window.first()->watts;
-            window.takeFirst();
-        }
-        // Add points until interval duration is >= windowSizeSecs.
-        totalWatts += point->watts;
-        window.append(point);
-        double duration = intervalDuration(window.first(), window.last(), ride);
-        assert(duration < windowSizeSecs + secsDelta);
-        if (duration >= windowSizeSecs) {
-            double start = window.first()->secs;
-            double stop = start + duration;
-            double avg = totalWatts * secsDelta / duration;
-            bests.append(BestInterval(start, stop, avg));
-        }
-    }
-
-    std::sort(bests.begin(), bests.end(), CompareBests());
-
     QList<BestInterval> results;
-    while (!bests.empty() && (results.size() < maxIntervals)) {
-        BestInterval candidate = bests.takeFirst();
-        bool overlaps = false;
-        foreach (const BestInterval &existing, results) {
-            if (intervalsOverlap(candidate, existing)) {
-                overlaps = true;
-                break;
-            }
-        }
-        if (!overlaps)
-            results.append(candidate);
-    }
+    findBests(ride, windowSizeSecs, maxIntervals, results);
 
     // clear the table
     clearResultsTable(resultsTable);
@@ -289,6 +244,53 @@ BestIntervalDialog::findClicked()
     resultsTable->resizeColumnToContents(0);
     resultsTable->resizeColumnToContents(1);
     resultsTable->setColumnWidth(2,200);
+}
+
+void
+BestIntervalDialog::findBests(const RideFile *ride, double windowSizeSecs,
+                              int maxIntervals, QList<BestInterval> &results)
+{
+    QList<BestInterval> bests;
+
+    double secsDelta = ride->recIntSecs();
+    double totalWatts = 0.0;
+    QList<const RideFilePoint*> window;
+
+    // We're looking for intervals with durations in [windowSizeSecs, windowSizeSecs + secsDelta).
+    foreach (const RideFilePoint *point, ride->dataPoints()) {
+        // Discard points until interval duration is < windowSizeSecs + secsDelta.
+        while (!window.empty() && (intervalDuration(window.first(), point, ride) >= windowSizeSecs + secsDelta)) {
+            totalWatts -= window.first()->watts;
+            window.takeFirst();
+        }
+        // Add points until interval duration is >= windowSizeSecs.
+        totalWatts += point->watts;
+        window.append(point);
+        double duration = intervalDuration(window.first(), window.last(), ride);
+        assert(duration < windowSizeSecs + secsDelta);
+        if (duration >= windowSizeSecs) {
+            double start = window.first()->secs;
+            double stop = start + duration;
+            double avg = totalWatts * secsDelta / duration;
+            bests.append(BestInterval(start, stop, avg));
+        }
+    }
+
+    std::sort(bests.begin(), bests.end(), CompareBests());
+
+    while (!bests.empty() && (results.size() < maxIntervals)) {
+        BestInterval candidate = bests.takeFirst();
+        bool overlaps = false;
+        foreach (const BestInterval &existing, results) {
+            if (intervalsOverlap(candidate, existing)) {
+                overlaps = true;
+                break;
+            }
+        }
+        if (!overlaps)
+            results.append(candidate);
+    }
+
 }
 
 void
