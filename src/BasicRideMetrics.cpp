@@ -124,7 +124,7 @@ class ElevationGain : public RideMetric {
     QString symbol() const { return "elevation_gain"; }
     QString name() const { return tr("Elevation Gain"); }
     QString units(bool metric) const { return metric ? "meters" : "feet"; }
-    int precision() const { return 1; }
+    int precision() const { return 0; }
     double value(bool metric) const {
         return metric ? elegain : (elegain * FEET_PER_METER);
     }
