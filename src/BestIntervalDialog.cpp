@@ -134,7 +134,7 @@ struct CompareBests {
                     const BestIntervalDialog::BestInterval &b) const {
         if (a.avg > b.avg)
             return true;
-        if (b.avg < a.avg)
+        if (b.avg > a.avg)
             return false;
         return a.start < b.start;
     }
