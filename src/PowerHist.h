@@ -131,7 +131,7 @@ class PowerHist : public QwtPlot
 	static const int cadDigits   = 0;
 
 	void setParameterAxisTitle();
-	bool isSelected(const RideFilePoint *p);
+	bool isSelected(const RideFilePoint *p, double);
 
 	bool useMetricUnits;  // whether metric units are used (or imperial)
 };

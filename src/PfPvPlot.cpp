@@ -430,7 +430,8 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
                     IntervalItem *current = dynamic_cast<IntervalItem *>(mainWindow->allIntervalItems()->child(t));
                     if ((current != NULL) && current->isSelected()) {
                         ++high;
-                        if (p1->secs>=current->start && p1->secs<=current->stop) {
+                        if (p1->secs+ride->recIntSecs() > current->start
+                            && p1->secs< current->stop) {
                             if (mergeIntervals())
                                 dataSetInterval[0].insert(std::make_pair<double, double>(aepf, cpv));
                             else

@@ -131,7 +131,7 @@ RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors) const
             continue;   // out of bounds
 
         if (references.at(i)->stop < datapoints.count())
-            add.stop = datapoints.at(references.at(i)->stop)->secs;
+            add.stop = datapoints.at(references.at(i)->stop)->secs + rideFile->recIntSecs()-.001;
         else
             continue;   // out of bounds
 
