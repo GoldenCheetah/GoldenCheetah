@@ -358,14 +358,14 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
     foreach(const RideFilePoint *point, settings->ride->ride()->dataPoints()) {
 
         // get x and z bin values - round to nearest bin
-        double dx  = pointType(point, settings->x)/settings->xbin;
-        int binx = settings->xbin * Qwt3D::round(dx);
+        double dx  = pointType(point, settings->x);
+        int binx = settings->xbin * floor(dx / settings->xbin);
 
-        double dy = pointType(point, settings->y)/settings->ybin;
-        int biny = settings->ybin * Qwt3D::round(dy);
+        double dy = pointType(point, settings->y);
+        int biny = settings->ybin * floor(dy / settings->ybin);
 
         // ignore zero points
-        if (settings->ignore && (binx==0 || biny==0)) continue;
+        if (settings->ignore && (dx==0 || dy==0)) continue;
 
         // get z value
         double zed=0;
@@ -431,8 +431,8 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
             // filter for interval
             for(int i=0; i<settings->intervals.count(); i++) {
                 IntervalItem *curr = settings->intervals.at(i);
-                if (point->secs >= curr->start && point->secs <= curr->stop) {
-
+                if ((point->secs + settings->ride->ride()->recIntSecs()) > curr->start
+                    && point->secs < curr->stop) {
                     // update colors
                     int colcount = settings->colorProvider->num.value(lookup,0.0);
                     double currentcol = settings->colorProvider->color.value(lookup, 0.0);
@@ -576,7 +576,8 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
         z = iz.value();
 
         if (first == true) {
-            minz = maxz = iz.value();
+            minz = 0;
+            maxz = iz.value();
         } else {
             if (z > maxz) maxz = z;
             if (z < minz) minz = z;

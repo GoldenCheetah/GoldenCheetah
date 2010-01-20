@@ -362,7 +362,9 @@ PowerHist::recalc()
     if (!array)
         return;
 
-    int count = int(ceil((arrayLength - 1) / binw));
+    // we add a bin on the end since the last "incomplete" bin
+    // will be dropped otherwise
+    int count = int(ceil((arrayLength - 1) / binw))+1;
 
     // allocate space for data, plus beginning and ending point
     QVector<double> parameterValue(count+2);
@@ -377,7 +379,7 @@ PowerHist::recalc()
         parameterValue[i] = high * delta;
         totalTime[i]  = 1e-9;  // nonzero to accomodate log plot
         totalTimeSelected[i] = 1e-9;  // nonzero to accomodate log plot
-        while (low < high) {
+        while (low < high && low<arrayLength) {
             if (selectedArray && (*selectedArray).size()>low)
                 totalTimeSelected[i] += dt * (*selectedArray)[low];
             totalTime[i] += dt * (*array)[low++];
@@ -436,7 +438,7 @@ PowerHist::setData(RideItem *_rideItem)
         double speed_factor  = (useMetricUnits ? 1.0 : 0.62137119);
 
         foreach(const RideFilePoint *p1, ride->dataPoints()) {
-            bool selected = isSelected(p1);
+            bool selected = isSelected(p1, ride->recIntSecs());
 
             int wattsIndex = int(floor(p1->watts / wattsDelta));
             if (wattsIndex >= 0 && wattsIndex < maxSize) {
@@ -706,12 +708,12 @@ bool PowerHist::shadeZones() const
 	    );
 }
 
-bool PowerHist::isSelected(const RideFilePoint *p) {
+bool PowerHist::isSelected(const RideFilePoint *p, double sample) {
     if (mainWindow->allIntervalItems() != NULL) {
         for (int i=0; i<mainWindow->allIntervalItems()->childCount(); i++) {
             IntervalItem *current = dynamic_cast<IntervalItem*>(mainWindow->allIntervalItems()->child(i));
             if (current != NULL) {
-                if (current->isSelected() && p->secs>=current->start && p->secs<=current->stop) {
+                if (current->isSelected() && p->secs+sample>current->start && p->secs<current->stop) {
                     return true;
                 }
             }

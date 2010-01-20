@@ -229,12 +229,12 @@ BestIntervalDialog::findClicked()
         resultsTable->setItem(row, 2, n);
 
         // hidden columns - start, stop
-        QString strt = QString("%1").arg((int) interval.start); // can't use secs as it gets modified
+        QString strt = QString("%1").arg(interval.start); // can't use secs as it gets modified
         QTableWidgetItem *st = new QTableWidgetItem;
         st->setText(strt);
         resultsTable->setItem(row, 3, st);
 
-        QString stp = QString("%1").arg((int)(interval.start + x));
+        QString stp = QString("%1").arg(interval.start + x);
         QTableWidgetItem *sp = new QTableWidgetItem;
         sp->setText(stp);
         resultsTable->setItem(row, 4, sp);
