@@ -6,7 +6,7 @@ OTHER=logo.jpg sample.gp sample.png cpint.gp cpint.png \
 	critical-power-plot.png histogram-analysis.png pf-pv-plot.png \
 	ride-plot.png ride-summary.png weekly-summary.png \
 	choose-a-cyclist.png main-window.png critical-power.png \
-	power.zones
+	power.zones cyclist-info.png
 
 
 all: $(HTML)
@@ -17,7 +17,7 @@ clean:
 
 install:
 	rsync -avz -e ssh $(HTML) $(TARBALLS) $(OTHER) \
-		srhea.net:wwwroot/goldencheetah.org/
+		srhea.net:/home/srhea/wwwroot/goldencheetah.org/
 
 bug-tracker.html: bug-tracker.content genpage.pl
 	./genpage.pl "Bug Tracker" $< > $@
