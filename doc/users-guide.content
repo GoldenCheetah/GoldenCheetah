@@ -157,25 +157,102 @@ maximum power you can sustain over an hour.  Some people call this your
 rose by any other name would smell as sweet.
 
 <p>
-We'll have a dialog box that will let you set up your power zones and
-critical power in a future version of GoldenCheetah, but for now you'll need
-to use a text editor.  On Linux, that probably means nano, vi, or emacs.
-On Mac, the easiest editor to use is TextEdit, which is in your Applications
-folder.  
+There are currently three ways to set up your power zones.  Each method has
+its benefits, so feel free to select the method that best suits your needs.
+
+<p><b>Method 1: Set via critical power plot.</b>
+
+<p> GoldenCheetah can determine a value for your CP value based on all
+of the data in your critical power plot.  The calculated value of CP can
+be used to create a new range in your power.zones file by clicking the
+"save CP value" button in the lower right corner of the critical power
+plot tab. The new range will use the default zone definitions (see Method 2).
+Once the new range is set, you can manually edit the file to change the zone
+definitions as in Method 3.
 
 <p>
-Start by
-downloading <a href="power.zones">this sample file</a> and saving it in 
-
-<pre>
-~/Library/GoldenCheetah/Your Name/power.zones
-</pre>
+<b>Method 2: User preferences.</b>
+<p>
+From the menu bar select GoldenCheetah->Preferences, then click on
+"cyclist info". The window should look like this:
 
 <p>
-where "~" is your home directory (e.g., <code>/Users/srhea</code> on Mac or
-<code>/home/srhea</code> on Linux) and "Your Name" is the name you chose when
-you first opened GoldenCheetah.  Open the power.zones file in a text editor
-and you'll see this:
+<center><img src="cyclist-info.png"></center>
+
+
+<p>
+Enter a value for critical power at the top of the dialog and click save
+to set your CP.  New ranges can also be set via this dialog so that you can
+adjust your CP value throughout the season as your fitness increases (or
+decreases). Once your CP is set, GoldenCheetah will set up seven power zones
+based on percentages of your CP value.  The zones are:
+<p>
+<table align="center" width="450">
+ <tr>
+   <td>Zone</td>
+   <td>Description</td>
+   <td>Low</td>
+   <td>High</td>
+ </tr>
+ <tr>
+   <td>Z1</td>
+   <td>Active Recovery</td>
+   <td>0%</td>
+   <td>55%</td>
+ </tr>
+ <tr>
+   <td>Z2</td>
+   <td>Endurance</td>
+   <td>55%</td>
+   <td>75%</td>
+ </tr>
+ <tr>
+   <td>Z3</td>
+   <td>Tempo</td>
+   <td>75%</td>
+   <td>90%</td>
+ </tr>
+ <tr>
+   <td>Z4</td>
+   <td>Threshold</td>
+   <td>90%</td>
+   <td>105%</td>
+ </tr>
+ <tr>
+   <td>Z5</td>
+   <td>VO2 Max</td>
+   <td>105%</td>
+   <td>120%</td>
+ </tr>
+ <tr>
+   <td>Z6</td>
+   <td>Anaerobic</td>
+   <td>120%</td>
+   <td>150%</td>
+ </tr>
+ <tr>
+   <td>Z1</td>
+   <td>Neuromuscular</td>
+   <td>150%</td>
+   <td>MAX</td>
+ </tr>
+</table>
+<p>
+If you want to use other zones boundaries or labels, you can manually edit
+the power.zones file as described in Method 3.
+
+<p>
+<b>Method 3: Manually edit the power.zones file.</b>
+<p>
+To edit/create the power.zones file you'll need to use a text editor.
+On Linux, that probably means nano, vi, or emacs. On Mac, the easiest
+editor to use is TextEdit, which is in your Applications folder.
+
+<p> Start by downloading <a href="power.zones">this sample file</a> and saving
+it in your rider directory, which is listed in the GoldenCheetah->About GoldenCheetah
+menu item.
+<p>
+Open the power.zones file in a text editor and you'll see this:
 
 <blockquote>
 <pre>
@@ -223,6 +300,8 @@ NOTE: By default, Mac OS's TextEdit will try and save the power.zones file
 with a <code>.txt</code> extension.  Use the menu command "Format->Make Plain
 Text" to get it to let you save the file with a <code>.zones</code> extension
 instead.
+
+<p>
 
 <p>
 <big><font face="arial,helvetica,sanserif">
