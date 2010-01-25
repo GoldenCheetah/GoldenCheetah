@@ -127,14 +127,6 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
             // Time from beginning of activity
             double secs = start_time.secsTo(time);
 
-            // Work around bug in 705 firmware where cadence and
-            // power values repeat when stopped.
-            if (delta_d == 0.0 && distance != 0.0)
-            {
-                power = 0.0;
-                cadence = 0.0;
-            }
-
             // Record trackpoint
 
 	    // for smart recording, the delta_t will not be constant
