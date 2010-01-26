@@ -31,13 +31,14 @@
 
 class DanielsPoints : public RideMetric {
 
-    static const double K;
     double score;
     void count(double secs, double watts, double cp) {
         score += K * secs * pow(watts / cp, 4);
     }
 
     public:
+
+    static const double K;
 
     DanielsPoints() : score(0.0) {}
     QString symbol() const { return "daniels_points"; }
@@ -108,8 +109,42 @@ class DanielsPoints : public RideMetric {
 // Choose K such that 1 hour at FTP yields a score of 100.
 const double DanielsPoints::K = 100.0 / 3600.0;
 
+class DanielsEquivalentPower : public RideMetric {
+    double watts;
+
+    public:
+
+    DanielsEquivalentPower() : watts(0.0) {}
+    QString symbol() const { return "daniels_equivalent_power"; }
+    QString name() const { return QObject::tr("Daniels EqP"); }
+    QString units(bool) const { return "watts"; }
+    int precision() const { return 0; }
+    double value(bool) const { return watts; }
+    void compute(const RideFile *, const Zones *zones, int zoneRange,
+	    const QHash<QString,RideMetric*> &deps) {
+	if (!zones || zoneRange < 0)
+	    return;
+        double cp = zones->getCP(zoneRange);
+        assert(deps.contains("daniels_points"));
+        assert(deps.contains("time_riding"));
+        const RideMetric *danielsPoints = deps.value("daniels_points");
+        const RideMetric *timeRiding = deps.value("time_riding");
+        assert(danielsPoints);
+        assert(timeRiding);
+        double score = danielsPoints->value(true);
+        double secs = timeRiding->value(true);
+        watts = cp * pow(score / DanielsPoints::K / secs, 0.25);
+    }
+    RideMetric *clone() const { return new DanielsEquivalentPower(*this); }
+    bool canAggregate() const { return false; }
+};
+
 static bool added() {
     RideMetricFactory::instance().addMetric(DanielsPoints());
+    QVector<QString> deps;
+    deps.append("time_riding");
+    deps.append("daniels_points");
+    RideMetricFactory::instance().addMetric(DanielsEquivalentPower(), &deps);
     return true;
 }
 

@@ -110,6 +110,7 @@ RideSummaryWindow::htmlSummary() const
         "skiba_relative_intensity",
         "skiba_bike_score",
         "daniels_points",
+        "daniels_equivalent_power",
         "aerobic_decoupling",
         NULL
     };
