@@ -197,6 +197,7 @@ RideSummaryWindow::htmlSummary() const
                 summary += "<td align=\"center\" valign=\"bottom\">Interval Name</td>";
                 foreach (QString symbol, intervalMetrics) {
                     RideMetricPtr m = metrics.value(symbol);
+                    if (!m) continue;
                     summary += "<td align=\"center\" valign=\"bottom\">" + m->name();
                     if (m->units(metricUnits) == "seconds")
                         ; // don't do anything
@@ -218,6 +219,7 @@ RideSummaryWindow::htmlSummary() const
             summary += "<td align=\"center\">" + interval.name + "</td>";
             foreach (QString symbol, intervalMetrics) {
                 RideMetricPtr m = metrics.value(symbol);
+                if (!m) continue;
                 QString s("<td align=\"center\">%1</td>");
                 if (m->units(metricUnits) == "seconds")
                     summary += s.arg(time_to_string(m->value(metricUnits)));
