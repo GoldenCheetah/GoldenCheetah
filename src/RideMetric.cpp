@@ -32,6 +32,7 @@ RideMetric::computeMetrics(const RideFile *ride, const Zones *zones,
     QHash<QString,RideMetric*> done;
     while (!todo.isEmpty()) {
         QString symbol = todo.takeFirst();
+        if (!factory.haveMetric(symbol)) continue;
         const QVector<QString> &deps = factory.dependencies(symbol);
         bool ready = true;
         foreach (QString dep, deps) {
