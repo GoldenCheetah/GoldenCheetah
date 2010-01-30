@@ -169,6 +169,9 @@ PfPvPlot::PfPvPlot(MainWindow *mainWindow)
  
     cl_ = settings->value(GC_CRANKLENGTH).toDouble() / 1000.0;
 
+    merge_intervals = false;
+    frame_intervals = true;
+
     recalc();
 }
 
@@ -415,6 +418,8 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
        int num_intervals=intervalCount();
 
        if (mergeIntervals()) num_intervals = 1;
+	   if (frameIntervals() || num_intervals==0) curve->setVisible(true);
+	   if (frameIntervals()==false && num_intervals) curve->setVisible(false);
        QVector<std::set<std::pair<double, double> > > dataSetInterval(num_intervals);
 
        long tot_cad = 0;
@@ -618,5 +623,12 @@ void
 PfPvPlot::setMergeIntervals(bool value)
 {
     merge_intervals = value;
+    showIntervals(rideItem);
+}
+
+void
+PfPvPlot::setFrameIntervals(bool value)
+{
+    frame_intervals = value;
     showIntervals(rideItem);
 }

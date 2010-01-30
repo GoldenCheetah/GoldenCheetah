@@ -57,6 +57,8 @@ class PfPvPlot : public QwtPlot
 
         bool mergeIntervals() const { return merge_intervals; }
         void setMergeIntervals(bool value);
+        bool frameIntervals() const { return frame_intervals; }
+        void setFrameIntervals(bool value);
 
     public slots:
 signals:
@@ -83,7 +85,7 @@ signals:
 	int cad_;
 	double cl_;
 	bool shade_zones;    // whether to shade zones, added 27Apr2009 djconnel
-	bool merge_intervals;
+	bool merge_intervals, frame_intervals;
 };
 
 #endif // _GC_QaPlot_h

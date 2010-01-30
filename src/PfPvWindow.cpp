@@ -43,6 +43,9 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
     mergeIntervalPfPvCheckBox = new QCheckBox;
     mergeIntervalPfPvCheckBox->setText(tr("Merge intervals"));
     mergeIntervalPfPvCheckBox->setCheckState(Qt::Unchecked);
+    frameIntervalPfPvCheckBox = new QCheckBox;
+    frameIntervalPfPvCheckBox->setText(tr("Frame intervals"));
+    frameIntervalPfPvCheckBox->setCheckState(Qt::Checked);
 
     qaLayout->addWidget(qaCPLabel);
     qaLayout->addWidget(qaCPValue);
@@ -52,6 +55,7 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
     qaLayout->addWidget(qaClValue);
     qaLayout->addWidget(shadeZonesPfPvCheckBox);
     qaLayout->addWidget(mergeIntervalPfPvCheckBox);
+    qaLayout->addWidget(frameIntervalPfPvCheckBox);
 
     vlayout->addWidget(pfPvPlot);
     vlayout->addLayout(qaLayout);
@@ -73,6 +77,8 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
             this, SLOT(setShadeZonesPfPvFromCheckBox()));
     connect(mergeIntervalPfPvCheckBox, SIGNAL(stateChanged(int)),
                 this, SLOT(setMergeIntervalsPfPvFromCheckBox()));
+    connect(frameIntervalPfPvCheckBox, SIGNAL(stateChanged(int)),
+                this, SLOT(setFrameIntervalsPfPvFromCheckBox()));
     connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(mainWindow, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
@@ -120,6 +126,14 @@ PfPvWindow::setMergeIntervalsPfPvFromCheckBox()
 {
     if (pfPvPlot->mergeIntervals() != mergeIntervalPfPvCheckBox->isChecked()) {
         pfPvPlot->setMergeIntervals(mergeIntervalPfPvCheckBox->isChecked());
+    }
+}
+
+void
+PfPvWindow::setFrameIntervalsPfPvFromCheckBox()
+{
+    if (pfPvPlot->frameIntervals() != frameIntervalPfPvCheckBox->isChecked()) {
+        pfPvPlot->setFrameIntervals(frameIntervalPfPvCheckBox->isChecked());
     }
 }
 
