@@ -48,6 +48,7 @@ class PfPvWindow : public QWidget
         void setQaCLFromLineEdit();
         void setShadeZonesPfPvFromCheckBox();
         void setMergeIntervalsPfPvFromCheckBox();
+        void setFrameIntervalsPfPvFromCheckBox();
 
     protected:
 
@@ -55,6 +56,7 @@ class PfPvWindow : public QWidget
         PfPvPlot *pfPvPlot;
         QCheckBox *shadeZonesPfPvCheckBox;
         QCheckBox *mergeIntervalPfPvCheckBox;
+        QCheckBox *frameIntervalPfPvCheckBox;
         QLineEdit *qaCPValue;
         QLineEdit *qaCadValue;
         QLineEdit *qaClValue;
