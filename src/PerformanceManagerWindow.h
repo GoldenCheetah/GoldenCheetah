@@ -52,6 +52,7 @@ class PerformanceManagerWindow : public QWidget
 	void PMpickerMoved(const QPoint &pos);
 	void setPMSizeFromSlider();
 	void replot();
+        void configChanged();
 
     protected:
 
