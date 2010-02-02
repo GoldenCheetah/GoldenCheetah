@@ -93,12 +93,20 @@ PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
            SLOT(PMpickerMoved(const QPoint &)));
     connect(metricCombo, SIGNAL(currentIndexChanged(int)),
             this, SLOT(replot()));
+    connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
 }
 
 PerformanceManagerWindow::~PerformanceManagerWindow()
 {
     if (sc)
 	delete sc;
+}
+
+void PerformanceManagerWindow::configChanged()
+{
+    mainWindow->home.remove("stress.cache");
+    days = 0; // force replot
+    replot();
 }
 
 void PerformanceManagerWindow::setActive(bool value)
