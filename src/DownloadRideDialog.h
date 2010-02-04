@@ -36,6 +36,7 @@ class DownloadRideDialog : public QDialog
 
     private slots:
         void downloadClicked();
+        void eraseClicked();
         void cancelClicked();
         void setReadyInstruct();
         void scanCommPorts();
@@ -44,7 +45,7 @@ class DownloadRideDialog : public QDialog
  
         MainWindow *mainWindow;
         QDir home;
-        QPushButton *downloadButton, *rescanButton, *cancelButton;
+        QPushButton *downloadButton, *eraseRideButton, *rescanButton, *cancelButton;
         QComboBox *portCombo, *deviceCombo;
         QLabel *label;
 
