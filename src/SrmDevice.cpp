@@ -135,8 +135,8 @@ SrmDevice::cleanup(CommPortPtr dev)
     if (!dev2path(dev, path, err))
         assert(false);
     if (QMessageBox::question(0, "Powercontrol",
-                              "Erase downloaded ride from device memory?",
-                              "&Erase", "&Save Only", "", 1, 1) == 0) {
+                              "Erase ride from device memory?",
+                              "&Erase", "&Cancel", "", 1, 1) == 0) {
         SrmpcConn srm(path);
         if(!srm.d || (srmpc_clear_chunks(srm.d) < 0)) {
             QMessageBox::warning(0, "Error",
