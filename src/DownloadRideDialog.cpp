@@ -49,15 +49,18 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     }
 
     downloadButton = new QPushButton(tr("&Download"), this);
+    eraseRideButton = new QPushButton(tr("&Erase Ride(s)"), this);
     rescanButton = new QPushButton(tr("&Rescan"), this);
     cancelButton = new QPushButton(tr("&Cancel"), this);
 
     connect(downloadButton, SIGNAL(clicked()), this, SLOT(downloadClicked()));
+    connect(eraseRideButton, SIGNAL(clicked()), this, SLOT(eraseClicked()));
     connect(rescanButton, SIGNAL(clicked()), this, SLOT(scanCommPorts()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
 
     QHBoxLayout *buttonLayout = new QHBoxLayout; 
     buttonLayout->addWidget(downloadButton); 
+    buttonLayout->addWidget(eraseRideButton);
     buttonLayout->addWidget(rescanButton); 
     buttonLayout->addWidget(cancelButton); 
 
@@ -81,6 +84,7 @@ DownloadRideDialog::setReadyInstruct()
                           "unit is plugged into the computer,\n"
                           "then click \"Rescan\" to check again."));
         downloadButton->setEnabled(false);
+        eraseRideButton->setEnabled(false);
     }
     else {
         Device &device = Device::device(deviceCombo->currentText());
@@ -90,6 +94,8 @@ DownloadRideDialog::setReadyInstruct()
         else
             label->setText(inst + ", \nthen click Download.");
         downloadButton->setEnabled(true);
+        if (deviceCombo->currentText() == "SRM") // only SRM supports erase ride for now
+            eraseRideButton->setEnabled(true);
     }
 }
 
@@ -133,6 +139,7 @@ void
 DownloadRideDialog::downloadClicked()
 {
     downloadButton->setEnabled(false);
+    eraseRideButton->setEnabled(false);
     rescanButton->setEnabled(false);
     downloadInProgress = true;
     CommPortPtr dev;
@@ -207,6 +214,27 @@ DownloadRideDialog::downloadClicked()
 
     device.cleanup(dev);
 
+    downloadInProgress = false;
+    accept();
+}
+
+void
+DownloadRideDialog::eraseClicked()
+{
+    downloadButton->setEnabled(false);
+    eraseRideButton->setEnabled(false);
+    rescanButton->setEnabled(false);
+    downloadInProgress = true;
+    CommPortPtr dev;
+    for (int i = 0; i < devList.size(); ++i) {
+        if (devList[i]->name() == portCombo->currentText()) {
+            dev = devList[i];
+            break;
+        }
+    }
+    assert(dev);
+    Device &device = Device::device(deviceCombo->currentText());
+    device.cleanup(dev);
     downloadInProgress = false;
     accept();
 }
