@@ -114,10 +114,20 @@ class RideMetricFactory {
     QVector<QString> metricNames;
     QHash<QString,RideMetric*> metrics;
     QHash<QString,QVector<QString>*> dependencyMap;
+    bool dependenciesChecked;
 
-    RideMetricFactory() {}
+    RideMetricFactory() : dependenciesChecked(false) {}
     RideMetricFactory(const RideMetricFactory &other);
     RideMetricFactory &operator=(const RideMetricFactory &other);
+
+    void checkDependencies() const {
+        if (dependenciesChecked) return;
+        foreach(const QString &dependee, dependencyMap.keys()) {
+            foreach(const QString &dependency, *dependencyMap[dependee])
+                assert(metrics.contains(dependency));
+        }
+        const_cast<RideMetricFactory*>(this)->dependenciesChecked = true;
+    }
 
     public:
 
@@ -137,6 +147,7 @@ class RideMetricFactory {
 
     RideMetric *newMetric(const QString &symbol) const {
         assert(metrics.contains(symbol));
+        checkDependencies();
         return metrics.value(symbol)->clone();
     }
 
@@ -147,11 +158,10 @@ class RideMetricFactory {
         metricNames.append(metric.symbol());
         if (deps) {
             QVector<QString> *copy = new QVector<QString>;
-            for (int i = 0; i < deps->size(); ++i) {
-                assert(metrics.contains((*deps)[i]));
+            for (int i = 0; i < deps->size(); ++i)
                 copy->append((*deps)[i]);
-            }
             dependencyMap.insert(metric.symbol(), copy);
+            dependenciesChecked = false;
         }
         return true;
     }
