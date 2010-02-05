@@ -1,0 +1,99 @@
+
+<p>
+<font face="arial,helvetica,sanserif">
+<big><strong>GoldenCheetah 1.3</strong></big>
+</font>
+
+<p>
+Realtime Mode:
+  <ul>
+  <li>Graph data as you ride (Mark Liversedge, Justin Knotzke, Steve Gribble)</li>
+  </ul>
+</p>
+
+<p>
+Charts:
+  <ul>
+  <li>Added Performance Manager (Eric Murray)</li>
+  <li>Added 3D Modeling (Mark Liversedge and Greg Steele)</li>
+  <li>Up to four y-axes on Ride Plot (Sean Rhea)</li>
+  <li>Option to show work instead of power in Critical Power Plot (Sean Rhea)</li>
+  </ul>
+</p>
+
+<p>
+Intervals:
+  <ul>
+  <li>Configurable metrics for intervals (Sean Rhea)</li>
+  <li>Find peak powers and add to intervals (Mark Liversedge)</li>
+  <li>Highlight intervals in plots (Damien Grauser)</li>
+  </ul>
+</p>
+
+<p>
+Device support:
+  <ul>
+  <li>Serial port support on Windows (Mark Liversedge)</li>
+  <li>Erase SRM memory without downloading (Sean Rhea)</li>
+  </ul>
+</p>
+
+<p>
+Imports:
+  <ul>
+  <li>New ride import wizard (Mark Liversedge, Jamie Kimberley)</li>
+  <li>Support Computrainer 3dp file format (Greg Lonnon)</li>
+  <li>Support WKO v3 file format (Mark Liversedge)</li>
+  <li>Support files with Garmin "smart recording" (Greg Lonnon)</li>
+  <li>New GoldenCheetah (.gc) file format (Sean Rhea)</li>
+  </ul>
+</p>
+
+<p>
+New/improved ride metrics:
+  <ul>
+  <li>Added Joe Friel's Aerobic Decoupling (Sean Rhea)</li>
+  <li>Added training points system by running coach Jack Daniels (Sean Rhea)</li>
+  <li>Better elevation gain estimates (Sean Rhea)</li>
+  </ul>
+</p>
+
+<p>
+Support for more languages:
+  <ul>
+  <li>French (Damien Grauser)</li>
+  <li>Japanese (Mitsukuni Sato, Keisuke Yamaguchi)</li>
+  </ul>
+</p>
+
+<p>
+Other new features:
+  <ul>
+  <li>Group rides into seasons (Justin Knotzke)</li>
+  <li>Better ride calendar (Berend De Schouwer)</li>
+  <li>Ride list pop-up menu (Thomas Weichmann)</li>
+  </ul>
+</p>
+
+<p>
+Lots of bug fixes by:
+  <ul>
+  <li>Rob Carlsen</li>
+  <li>Rainer Clasen</li>
+  <li>Chris Cleeland</li>
+  <li>Steve Gribble</li>
+  <li>Dag Gruneau</li>
+  <li>Ned Harding</li>
+  <li>Jamie Kimberley</li>
+  <li>Justin Knotzke</li>
+  <li>Mark Liversedge</li>
+  <li>Greg Lonnon</li>
+  <li>Eric Murray</li>
+  <li>Sean Rhea</li>
+  <li>Robb Romans</li>
+  <li>Berend De Schouwer</li>
+  <li>Julian Simioni</li>
+  <li>Thomas Weichmann</li>
+  </ul>
+</p>
+

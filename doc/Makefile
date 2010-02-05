@@ -37,6 +37,9 @@ developers-guide.html: developers-guide.content genpage.pl
 download.html: download.content genpage.pl
 	./genpage.pl "Download" $< > $@
 
+release-notes.html: release-notes.content genpage.pl
+	./genpage.pl "Release Notes" $< > $@
+
 faq.html: faq.content genpage.pl
 	./genpage.pl "Frequently Asked Questions" $< > $@
 
