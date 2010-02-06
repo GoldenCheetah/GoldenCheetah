@@ -398,6 +398,8 @@ Serial::myListCommPorts(QString &err)
     QVector<CommPortPtr> result;
     char *devices[MAX_DEVICES];
     int devcnt = find_devices(devices, MAX_DEVICES);
+    if (devcnt == 0)
+        err = "No serial devices found.";
     for (int i = 0; i < devcnt; ++i) {
         result.append(CommPortPtr(new Serial(devices[i])));
         free(devices[i]);
