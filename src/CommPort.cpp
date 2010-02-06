@@ -33,15 +33,18 @@ CommPort::addListFunction(ListFunction f)
 QVector<CommPortPtr>
 CommPort::listCommPorts(QString &err)
 {
-    err = "";
+    QStringList errors;
     QVector<CommPortPtr> result;
     for (int i = 0; listFunctions && i < listFunctions->size(); ++i) {
-        QVector<CommPortPtr> tmp = (*listFunctions)[i](err);
-        if (err == "")
+        QString thisError = "";
+        QVector<CommPortPtr> tmp = (*listFunctions)[i](thisError);
+        if (thisError == "")
             result << tmp;
         else
-            err += "\n";
+            errors << thisError;
     }
+    if (result.isEmpty() && !errors.isEmpty())
+        err = errors.join("\n");
     return result;
 }
 
