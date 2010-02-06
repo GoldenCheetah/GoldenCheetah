@@ -1,0 +1,299 @@
+
+<p>
+This page contains older releases of Golden Cheetah.  For the latest version,
+please see <a href="download.html">the download page</a> instead.
+</p>
+
+<p>
+<font face="arial,helvetica,sanserif">
+<big><strong>Golden Cheetah</strong></big>
+</font>
+
+<p>
+<center>
+<table width="100%" cellspacing="5">
+<tr>
+<td width="15%"><i>Version</i></td>
+<td width="25%"><i>Files</i></td>
+<td><i>Description</i></td>
+</tr>
+
+<tr>
+<td valign="top">1.2.0</td>
+<td valign="top">
+<a href="GoldenCheetah_1.2.0_Linux_x86.tgz">Linux x86</a><br>
+<a href="GoldenCheetah_1.2.0_Linux_x86_64.tgz">Linux x86_64</a><br>
+<a href="GoldenCheetah_1.2.0_Darwin_Universal.dmg">Mac OS X Universal</a><br>
+<a href="GoldenCheetah_1.2.0_Windows_Installer.exe">Windows 32-bit</a>
+</td>
+<td valign="top">
+<p>
+Lots of new features in this release, including:
+</p>
+<ul>
+<li>Direct download from SRM (R. Clasen and S. Rhea)
+<li>WKO+ file import (M. Liversedge)
+<li>Qollector support (M. Rages)
+<li>Altitude plotting (T. Weichmann)
+<li>Manual ride entry (E. Murray)
+<li>Power zones shading (D. Connell)
+<li>Weekly summary histograms (R. Carlsen)
+<li>Automatic CP estimation from CP graph (D. Connell)
+<li>Support for running off a USB stick (J. Knotzke)
+<li>OS-specific directory layout (J. Simioni)
+<li>PF/PV plot improvements (B. de Schouwer)
+<li>Memory leak fixes (G. Lonnon)
+</ul>
+<p>Thanks also to Jamie Kimberley for extensive testing.
+</td>
+</tr>
+
+<tr>
+<td valign="top">1.1.325</td>
+<td valign="top">
+<a href="GoldenCheetah_1.1.325_Linux_x86.gz">Linux x86</a><br>
+<a href="GoldenCheetah_1.1.325_Linux_x86_64.gz">Linux x86_64</a><br>
+<a href="GoldenCheetah_1.1.325_Darwin_Universal.dmg">Mac OS X Universal</a><br>
+<a href="GoldenCheetah_1.1.325_Windows_Installer.exe">Windows 32-bit</a>
+</td>
+<td valign="top">
+<p>
+First official Windows release courtesy of Ned Harding. Ned put much effort into the port to make the download reliable and created a nice installer, too (Thanks Ned!). He also provided the long-awaited Split Ride feature - break up a ride file into separate rides easily using long time gaps and intervals.
+<ul>
+<li>Ant+Sport PowerTap support. 
+<li>Split Rides by time gaps or intervals. 
+<li>Delete ride from list. 
+<li>Use distance or time for x-axis in Ride Plot (Thanks Damain). 
+<li>Numerous bug fixes (Thanks Tom, Dan).
+</p>
+</td>
+</tr>
+
+<tr>
+<td valign="top">1.0.277</td>
+<td valign="top">
+<a href="GoldenCheetah_1.0.277_Linux_x86.gz">Linux x86</a>,<br>
+<a href="GoldenCheetah_1.0.277_Linux_x86_64.tar.gz">Linux x86_64</a>,<br>
+<a href="GoldenCheetah_1.0.277_Darwin_Universal.dmg">Mac OS X Universal</a>
+</td>
+<td valign="top">
+<p>*Note: Beginning with this release we are changing to a numbered versioning system. Minor point releases will generally indicate builds with new features, while bugfix releases will increment the final number, which represents the svn revision*</p>
+<p>Several new features in this release: Critical Power calculator, find best intervals utility, Pedal Force / Pedal Velocity chart, iBike and Ergomo CSV import, GUI power zones creator, separate vertical axes for Power / HR / Cadence and Speed in the Ride plot, sorting rides with the most recent at the top of the list, and many bug fixes courtesy of JT Conklin.
+</p>
+<p>You may need to install <a href="http://www.ftdichip.com/Drivers/D2XX.htm">USB drivers</a> from FTDI.
+</p>
+<p>
+For posterity, the <a href="http://robertcarlsen.net/blog/?page_id=49">beta version</a> for Windows, based on r295. 
+</p>
+</td>
+</tr>
+
+<tr>
+<td valign="top">Mar 10, 2008</td>
+<td valign="top">
+<a href="GoldenCheetah_2008-03-10_Linux_x86.tgz">Linux x86</a>,<br>
+<a href="GoldenCheetah_2008-03-10_Darwin_Universal.dmg">Mac OS X Universal</a>
+</td>
+<td valign="top">
+This release introduces <a href="http://www.physfarm.com/Analysis%20of%20Power%20Output%20and%20Training%20Stress%20in%20Cyclists-%20BikeScore.pdf">BikeScore&#8482;</a>,
+a metric of training stress developed by Dr. Philip Skiba.  It also
+fixes several small bugs in earlier releases.
+</td>
+</tr>
+
+<tr>
+<td valign="top">Sep 23, 2007</td>
+<td valign="top">
+<a href="GoldenCheetah_2007-09-23_Linux_x86.tgz">Linux x86</a>,<br>
+<a href="GoldenCheetah_2007-09-23_Darwin_i386.dmg">Mac OS X x86</a>,<br>
+<a href="GoldenCheetah_2007-09-23_Darwin_powerpc.dmg">Mac OS X PowerPC</a>
+</td>
+<td valign="top">
+Bug fix release.  CVS imports weren't quite working in the last one.
+</td>
+</tr>
+
+<tr>
+<td valign="top">Sep 18, 2007</td>
+<td valign="top">
+<a href="GoldenCheetah_2007-09-18_Linux_x86.tgz">Linux x86</a>,<br>
+<a href="GoldenCheetah_2007-09-18_Darwin_powerpc.dmg">Mac OS X PowerPC</a>
+</td>
+<td valign="top">
+This release adds two small, but excellent features from Justin Knotzke:
+CSV file imports and visual interval markers in the ride plot.
+</td>
+</tr>
+
+<tr>
+<td valign="top">Aug 7, 2007</td>
+<td valign="top">
+<a href="GoldenCheetah_2007-08-07_Linux_x86.tgz">Linux x86</a>,<br>
+<a href="GoldenCheetah_2007-08-07_Darwin_powerpc.dmg">Mac OS X PowerPC</a>
+</td>
+<td valign="top">This release fixes a bug in the critical power
+intervals graph where you could get bad data if you started an interval
+after a long period of not moving.  It also adds really basic zooming to
+the ride plot: use the left mouse button to zoom in and the right one to
+return to the previous zoom state.  It's pretty crappy right now, but
+it's better than nothing.
+</td>
+</tr>
+
+<tr>
+<td valign="top">Apr 26, 2007</td>
+<td valign="top">
+<a href="GoldenCheetah_2007-04-26_Linux_x86.tgz">Linux x86</a>,<br>
+<a href="GoldenCheetah_2007-04-26_Darwin_powerpc.dmg">Mac OS X PowerPC</a>
+</td>
+<td valign="top">This release fixes some bugs and adds a whole bunch of
+new features:
+<ul>
+<li>Now imports .srm files (direct download from SRM hopefully coming
+soon)
+<li>New "Weekly Summary" tab shows total weekly hours, miles, and work
+<li>Power zones can now be entered into a text file, after which GC will
+display time in each zone in the ride and weekly summaries; for more
+information on the zone file format, <a href="zones.html">see this
+page</a>.
+</ul>
+</td>
+</tr>
+
+<tr>
+<td valign="top">Apr 1, 2007</td>
+<td valign="top">
+<a href="GoldenCheetah_2007-04-01_Linux_x86.tgz">Linux x86</a>,<br>
+<a href="GoldenCheetah_2007-04-01_Darwin_powerpc.dmg">Mac OS X PowerPC</a>
+</td>
+<td valign="top">This release fixes a bug that was introduced with the
+hardware echo detection code.  If you're using the CycleOps-supplied USB
+cable to download from your PowerTap unit, this release should make
+downloads more reliable.  (Those using the KeySpan USB-to-serial adaptor
+or a plain-old serial port shouldn't see any difference.)</td>
+</tr>
+
+<tr>
+<td valign="top">Feb 22, 2007</td>
+<td valign="top">
+<a href="GoldenCheetah_2007-02-22_Linux_x86.tgz">Linux x86</a>,<br>
+<a href="GoldenCheetah_2007-02-22_Darwin_powerpc.dmg">Mac OS X PowerPC</a>
+</td>
+<td valign="top">Clicking on the Critical Power Plot now displays the
+interval duration, maximum power for that ride, and maximum power for all
+rides below the plot.  Also fixes a bug for recording intervals longer than
+two seconds.</td>
+</tr>
+
+<tr>
+<td valign="top">Feb 12, 2007</td>
+<td valign="top">
+<a href="GoldenCheetah_2007-02-12_Linux_x86.tgz">Linux x86</a>,<br>
+<a href="GoldenCheetah_2007-02-12_Darwin_powerpc.dmg">Mac OS X PowerPC</a>
+</td>
+<td valign="top">Interval information now included in ride summary, rides can
+now be exported as comma-separated values for import into Excel, and better
+automatic detection of hardware echo.  Also includes a number of bux 
+fixes.</td>
+</tr>
+
+<tr>
+<td valign="top">Jan 30, 2007</td>
+<td valign="top">
+<a href="GoldenCheetah_2007-01-30_Linux_x86.tgz">Linux x86</a>,<br>
+<a href="GoldenCheetah_2007-01-30_Darwin_powerpc.dmg">Mac OS X PowerPC</a>
+</td>
+<td valign="top">Bug fix release.</td>
+</tr>
+
+<tr>
+<td valign="top">Jan 6, 2007</td>
+<td valign="top"><a href="GoldenCheetah_2007-01-06_Linux_x86.tgz">Linux 
+x86</a></td>
+<td valign="top">First release for Linux.</td>
+</tr>
+
+<tr>
+<td valign="top">Dec 25, 2006</td>
+<td valign="top"><a href="GoldenCheetah_2006-12-25_Darwin_powerpc.dmg">Mac OS
+X PowerPC</a></td>
+<td valign="top">Adds the Power Histogram, which shows how much time a rider
+spent at each particular power level during a ride.</td>
+</tr>
+
+<tr>
+<td valign="top">Sep 19, 2006</td>
+<td valign="top"><a href="GoldenCheetah_2006-09-19_Darwin_powerpc.dmg">Mac OS
+X PowerPC</a></td>
+<td valign="top">Adds the Critical Power Plot, which shows the highest average
+power you've achieved for every interval length over all your rides and the
+selected ride.  Also shows download progress in minutes of ride data
+downloaded.</td>
+</tr>
+
+<tr>
+<td valign="top">Sep 7, 2006</td>
+<td valign="top"><a href="GoldenCheetah_2006-09-07_Darwin_powerpc.dmg">Mac OS
+X PowerPC</a></td>
+<td valign="top">Adds speed and cadence to the ride plot.  Fixes a bug
+found by George Gilliland where reseting the time during a ride could cause
+the GUI to crash.</td>
+</tr>
+
+<tr>
+<td valign="top">Sep 6, 2006</td>
+<td valign="top"><a href="GoldenCheetah_2006-09-06_Darwin_powerpc.dmg">Mac OS
+X PowerPC</a></td>
+<td valign="top">The first release of the Golden Cheetah GUI.</td>
+</tr>
+
+</table>
+</center>
+
+<p>
+<hr width="50%">
+
+<p>
+<font face="arial,helvetica,sanserif">
+<big><strong>Older Stuff</strong></big>
+</font>
+
+<p>
+These are the older, source-only, command-line distributions.  I've left them
+up for historical purposes only; I don't recommend using them. 
+
+<center>
+<table width="100%" cellspacing="10">
+<tr>
+<td width="20%"><i>Date</i></td>
+<td width="30%"><i>File</i></td>
+<td><i>Description</i></td>
+</tr>
+
+<tr>
+<td valign="top">Aug 11, 2006</td>
+<td valign="top"><a href="gc_2006-08-11.tgz">gc_2006-08-11.tgz</a></td>
+<td valign="top">ptdl now works with Keyspan USB-to-serial adaptor, after
+debugging help from Rob Carlsen.
+</td>
+</tr>
+
+<tr>
+<td valign="top">May 27, 2006</td>
+<td valign="top"><a href="gc_2006-05-27.tgz">gc_2006-05-27.tgz</a></td>
+<td valign="top">Adds the <code>cpint</code> program for computing critical
+power intervals and the <code>ptpk</code> program for converting from
+PowerTuned data files (see the <a href="users-guide.html">User's
+Guide</a>).</td>
+</tr>
+
+<tr>
+<td valign="top">May 16, 2006</td>
+<td valign="top"><a href="gc_2006-05-16.tgz">gc_2006-05-16.tgz</a></td>
+<td valign="top">The first code release, containing <code>ptdl</code> and
+<code>ptunpk</code>.</td>
+</tr>
+
+</table>
+</center>
+

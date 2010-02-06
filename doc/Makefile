@@ -34,6 +34,9 @@ contrib.html: contrib.content genpage.pl
 developers-guide.html: developers-guide.content genpage.pl
 	./genpage.pl "Developer's Guide" $< > $@
 
+older-releases.html: older-releases.content genpage.pl
+	./genpage.pl "Older Releases" $< > $@
+
 download.html: download.content genpage.pl
 	./genpage.pl "Download" $< > $@
 
