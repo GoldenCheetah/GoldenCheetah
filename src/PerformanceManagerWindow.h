@@ -53,6 +53,7 @@ class PerformanceManagerWindow : public QWidget
 	void setPMSizeFromSlider();
 	void replot();
         void configChanged();
+        void metricChanged();
 
     protected:
 
