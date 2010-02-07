@@ -262,17 +262,17 @@ MainWindow::MainWindow(const QDir &home) :
     ////////////////////// Critical Power Plot Tab //////////////////////
 
     criticalPowerWindow = new CriticalPowerWindow(home, this);
-    tabWidget->addTab(criticalPowerWindow, tr("Critical Power Plot"));
+    tabWidget->addTab(criticalPowerWindow, tr("Critical Power"));
 
     //////////////////////// Power Histogram Tab ////////////////////////
 
     histogramWindow = new HistogramWindow(this);
-    tabWidget->addTab(histogramWindow, tr("Histogram Analysis"));
+    tabWidget->addTab(histogramWindow, tr("Histograms"));
     
     //////////////////////// Pedal Force/Velocity Plot ////////////////////////
 
     pfPvWindow = new PfPvWindow(this);
-    tabWidget->addTab(pfPvWindow, tr("PF/PV Plot"));
+    tabWidget->addTab(pfPvWindow, tr("PF/PV"));
 
     //////////////////////// 3d Model Window ////////////////////////////
 
