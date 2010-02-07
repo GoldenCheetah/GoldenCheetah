@@ -201,7 +201,6 @@ PowerHist::PowerHist(MainWindow *mainWindow):
     selected(wattsShaded),
     rideItem(NULL),
     mainWindow(mainWindow),
-    binw(20),
     withz(true),
     settings(NULL),
     unit(0),
@@ -213,6 +212,8 @@ PowerHist::PowerHist(MainWindow *mainWindow):
     unit = settings->value(GC_UNIT);
 
     useMetricUnits = (unit.toString() == "Metric");
+
+    binw = settings->value(GC_HIST_BIN_WIDTH, 5).toInt();
 
     // create a background object for shading
     bg = new PowerHistBackground(this);
@@ -521,6 +522,8 @@ void
 PowerHist::setBinWidth(int value)
 {
     binw = value;
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+    settings->setValue(GC_HIST_BIN_WIDTH, value);
     recalc();
 }
 
