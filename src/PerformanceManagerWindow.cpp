@@ -50,6 +50,13 @@ PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
     metricCombo = new QComboBox(this);
     metricCombo->addItem(tr("Use BikeScore"), "skiba_bike_score");
     metricCombo->addItem(tr("Use DanielsPoints"), "daniels_points");
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+    QString metricName =
+        settings->value(GC_PERF_MAN_METRIC, "skiba_bike_score").toString();
+    for (int i = 0; i < metricCombo->count(); ++i) {
+        if (metricCombo->itemData(i).toString() == metricName)
+            metricCombo->setCurrentIndex(i);
+    }
     metric = metricCombo->itemData(metricCombo->currentIndex()).toString();
     PMPickerLayout->addWidget(metricCombo);
 
@@ -92,7 +99,7 @@ PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
     connect(PMpicker, SIGNAL(moved(const QPoint &)),
            SLOT(PMpickerMoved(const QPoint &)));
     connect(metricCombo, SIGNAL(currentIndexChanged(int)),
-            this, SLOT(replot()));
+            this, SLOT(metricChanged()));
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
 }
 
@@ -106,6 +113,14 @@ void PerformanceManagerWindow::configChanged()
 {
     mainWindow->home.remove("stress.cache");
     days = 0; // force replot
+    replot();
+}
+
+void PerformanceManagerWindow::metricChanged()
+{
+    QString newMetric = metricCombo->itemData(metricCombo->currentIndex()).toString();
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+    settings->setValue(GC_PERF_MAN_METRIC, newMetric);
     replot();
 }
 
