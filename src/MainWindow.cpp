@@ -17,6 +17,8 @@
  */
 
 #include "MainWindow.h"
+#include "AerolabWindow.h"
+#include "Aerolab.h"
 #include "AllPlotWindow.h"
 #include "AllPlot.h"
 #include "BestIntervalDialog.h"
@@ -291,6 +293,13 @@ MainWindow::MainWindow(const QDir &home) :
 
     performanceManagerWindow = new PerformanceManagerWindow(this);
     tabWidget->addTab(performanceManagerWindow, tr("Performance Manager"));
+
+
+    ///////////////////////////// Aerolab //////////////////////////////////
+
+    aerolabWindow = new AerolabWindow(this);
+    tabWidget->addTab(aerolabWindow, tr("Aerolab"));
+
 
     ////////////////////////////// Signals ////////////////////////////// 
 
