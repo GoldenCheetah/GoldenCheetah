@@ -75,6 +75,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
     QTextStream is(&file);
     RideFile *rideFile = new RideFile();
     int iBikeInterval = 0;
+    bool dfpmExists   = false;
+    int iBikeVersion  = 0;
     while (!is.atEnd()) {
         // the readLine() method doesn't handle old Macintosh CR line endings
         // this workaround will load the the entire file if it has CR endings
@@ -103,6 +105,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                         iBike = true;
                         rideFile->setDeviceType("iBike CSV");
                         unitsHeader = 5;
+                        iBikeVersion = line.section( ',', 1, 1 ).toInt();
                         ++lineno;
                         continue;
                     }
@@ -137,7 +140,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                 }
             }
             else if (lineno > unitsHeader) {
-                double minutes,nm,kph,watts,km,cad,alt,hr;
+                double minutes,nm,kph,watts,km,cad,alt,hr,dfpm;
                 double lat = 0.0, lon = 0.0;
                 int interval;
                 int pause;
@@ -162,9 +165,20 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                     // can't find time as a column.
                     // will we have to extrapolate based on the recording interval?
                     // reading recording interval from config data in ibike csv file
+                    //
+                    // For iBike software version 11 or higher:
+                    // use "power" field until a the "dfpm" field becomes non-zero.
                      minutes = (recInterval * lineno - unitsHeader)/60.0;
                      nm = NULL; //no torque
                      kph = line.section(',', 0, 0).toDouble();
+                     dfpm = line.section( ',', 11, 11).toDouble();
+                     if( iBikeVersion >= 11 && ( dfpm > 0.0 || dfpmExists ) ) {
+                         dfpmExists = true;
+                         watts = dfpm;
+                     }
+                     else {
+                         watts = line.section(',', 2, 2).toDouble();
+                     }
                      watts = line.section(',', 2, 2).toDouble();
                      km = line.section(',', 3, 3).toDouble();
                      cad = line.section(',', 4, 4).toDouble();
