@@ -28,6 +28,7 @@
 #include "QuarqdClient.h"
 #include <boost/shared_ptr.hpp>
 
+class AerolabWindow;
 class AllPlotWindow;
 class CriticalPowerWindow;
 class HistogramWindow;
@@ -159,6 +160,7 @@ class MainWindow : public QMainWindow
         WeeklySummaryWindow *weeklySummaryWindow;
         CriticalPowerWindow *criticalPowerWindow;
         ModelWindow *modelWindow;
+        AerolabWindow *aerolabWindow;
         QTreeWidgetItem *allRides;
         QTreeWidgetItem *allIntervals;
         QSplitter *leftLayout;

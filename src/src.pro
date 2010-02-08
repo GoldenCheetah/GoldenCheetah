@@ -50,6 +50,8 @@ win32 {
 }
 
 HEADERS += \
+        Aerolab.h \
+        AerolabWindow.h \
         AllPlot.h \
         AllPlotWindow.h \
         ANTplusController.h \
@@ -130,6 +132,8 @@ HEADERS += \
 
 SOURCES += \
         AerobicDecoupling.cpp \
+        Aerolab.cpp \
+        AerolabWindow.cpp \
         AllPlot.cpp \
         AllPlotWindow.cpp \
         ANTplusController.cpp \
