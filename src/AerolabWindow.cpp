@@ -57,7 +57,7 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   crrSlider->setValue(aerolab->intCrr());
   crrLayout->addWidget( crrLabel );
   crrLayout->addWidget( crrQLCDNumber );
-  crrLayout->addWidget( crrSlider ); 
+  crrLayout->addWidget( crrSlider );
 
   // CdA:
   QHBoxLayout *cdaLayout = new QHBoxLayout;
@@ -77,7 +77,7 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   cdaSlider->setValue(aerolab->intCda());
   cdaLayout->addWidget( cdaLabel );
   cdaLayout->addWidget( cdaQLCDNumber );
-  cdaLayout->addWidget( cdaSlider );  
+  cdaLayout->addWidget( cdaSlider );
 
   // Eta:
   QHBoxLayout *etaLayout = new QHBoxLayout;
@@ -97,7 +97,7 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   etaSlider->setValue(aerolab->intEta());
   etaLayout->addWidget( etaLabel );
   etaLayout->addWidget( etaQLCDNumber );
-  etaLayout->addWidget( etaSlider ); 
+  etaLayout->addWidget( etaSlider );
 
   // Add to leftControls:
   leftControls->addLayout( crrLayout );
@@ -126,7 +126,7 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   mSlider->setValue(aerolab->intTotalMass());
   mLayout->addWidget( mLabel );
   mLayout->addWidget( mQLCDNumber );
-  mLayout->addWidget( mSlider ); 
+  mLayout->addWidget( mSlider );
 
   // Rho:
   QHBoxLayout *rhoLayout = new QHBoxLayout;
@@ -146,7 +146,7 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   rhoSlider->setValue(aerolab->intRho());
   rhoLayout->addWidget( rhoLabel );
   rhoLayout->addWidget( rhoQLCDNumber );
-  rhoLayout->addWidget( rhoSlider );   
+  rhoLayout->addWidget( rhoSlider );
 
   // Elevation offset:
   QHBoxLayout *eoffsetLayout = new QHBoxLayout;
@@ -166,7 +166,7 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   eoffsetSlider->setValue(aerolab->intEoffset());
   eoffsetLayout->addWidget( eoffsetLabel );
   eoffsetLayout->addWidget( eoffsetQLCDNumber );
-  eoffsetLayout->addWidget( eoffsetSlider ); 
+  eoffsetLayout->addWidget( eoffsetSlider );
 
   // Add to leftControls:
   rightControls->addLayout( mLayout );
@@ -231,7 +231,7 @@ AerolabWindow::setCdaFromSlider() {
 
   if (aerolab->intCda() != cdaSlider->value()) {
     aerolab->setIntCda(cdaSlider->value());
-     cdaQLCDNumber->display(QString("%1").arg(aerolab->getCda()));  
+    cdaQLCDNumber->display(QString("%1").arg(aerolab->getCda()));
     RideItem *ride = mainWindow->rideItem();
     aerolab->setData(ride, false);
   }
