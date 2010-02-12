@@ -43,7 +43,6 @@ min(double a, double b) { if (a < b) return a; else return b; }
 
 Aerolab::Aerolab(QWidget *parent):
   QwtPlot(parent),
-  settings(NULL),
   unit(0),
   rideItem(NULL),
   smooth(1), bydist(false) {
