@@ -49,7 +49,6 @@ class Aerolab : public QwtPlot {
 
   protected:
   friend class ::AerolabWindow;
-  QSettings *settings;
   QVariant unit;
   QwtPlotGrid *grid;
 
