@@ -62,7 +62,7 @@ Aerolab::Aerolab(QWidget *parent):
   insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
   setCanvasBackground(Qt::white);
 
-  setXTitle(); 
+  setXTitle();
   setAxisTitle(yLeft, "Elevation (m)");
   setAxisScale(yLeft, -300, 300);
   setAxisTitle(xBottom, "Distance (km)");
@@ -88,7 +88,7 @@ Aerolab::Aerolab(QWidget *parent):
 }
 
 void
-Aerolab::setData(RideItem *_rideItem, bool new_zoom) { 
+Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
 
   // HARD-CODED DATA: p1->kph
   double vfactor = 3.600;
@@ -149,13 +149,13 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
       foreach(const RideFilePoint *p1, ride->dataPoints()) {
       if ( arrayLength == 0 )
         e = eoffset;
-    
+
       timeArray[arrayLength]  = p1->secs;
       if ( have_recorded_alt_curve )
         altArray[arrayLength] = (useMetricUnits
                    ? p1->alt
                    : p1->alt * FEET_PER_METER);
-    
+
       // Unpack:
       double power = max(0, p1->watts);
       double v     = p1->kph/vfactor;
@@ -163,25 +163,25 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
       double a     = 0.0;
       d += v * dt;
       distanceArray[arrayLength] = d/1000;
-    
-    
+
+
       if( v > small_number ) {
         f  = power/v;
         a  = ( v*v - vlast*vlast ) / ( 2.0 * dt * v );
       } else {
         a = ( v - vlast ) / dt;
       }
-    
+
       f *= eta; // adjust for drivetrain efficiency if using a crank-based meter
       double s   = slope( f, a, m, crr, cda, rho, v );
       double de  = s * v * dt;
-    
+
       e += de;
       t += dt;
       veArray[arrayLength] = e;
-    
+
       vlast = v;
-    
+
       ++arrayLength;
     }
 
@@ -305,7 +305,7 @@ Aerolab::slope(
   // Small angle version of slope calculation:
   double s = f/(m*g) - crr - cda*rho*v*v/(2.0*m*g) - a/g;
 
-  return s;   
+  return s;
 }
 
 // At slider 1000, we want to get max Crr=0.1000
@@ -337,7 +337,7 @@ Aerolab::setIntTotalMass(
              int value
               ) {
 
-  totalMass = (double) value / 100.0; 
+  totalMass = (double) value / 100.0;
   recalc(false);
 }
 
@@ -359,7 +359,7 @@ Aerolab::setIntRho(
 void
 Aerolab::setIntEta(
                      int value
-                     ) { 
+                     ) {
 
   eta = (double) value / 10000.0;
   recalc(false);

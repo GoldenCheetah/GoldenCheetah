@@ -40,7 +40,7 @@ class AerolabWindow : public QWidget {
   void zoomInterval(IntervalItem *); // zoom into a specified interval
 
 
-  public slots: 
+  public slots:
   void setCrrFromSlider();
   void setCdaFromSlider();
   void setTotalMassFromSlider();
