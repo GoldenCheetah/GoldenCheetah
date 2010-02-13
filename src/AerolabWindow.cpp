@@ -53,7 +53,6 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   crrSlider->setTickInterval(1000);
   crrSlider->setMinimum(1000);
   crrSlider->setMaximum(10000);
-  crrSlider->setFixedWidth(200);
   crrSlider->setValue(aerolab->intCrr());
   crrLayout->addWidget( crrLabel );
   crrLayout->addWidget( crrQLCDNumber );
@@ -73,7 +72,6 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   cdaSlider->setTickInterval(100);
   cdaSlider->setMinimum(1500);
   cdaSlider->setMaximum(6000);
-  cdaSlider->setFixedWidth(200);
   cdaSlider->setValue(aerolab->intCda());
   cdaLayout->addWidget( cdaLabel );
   cdaLayout->addWidget( cdaQLCDNumber );
@@ -93,7 +91,6 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   etaSlider->setTickInterval(1000);
   etaSlider->setMinimum(8000);
   etaSlider->setMaximum(12000);
-  etaSlider->setFixedWidth(200);
   etaSlider->setValue(aerolab->intEta());
   etaLayout->addWidget( etaLabel );
   etaLayout->addWidget( etaQLCDNumber );
@@ -122,7 +119,6 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   mSlider->setTickInterval(1000);
   mSlider->setMinimum(3500);
   mSlider->setMaximum(15000);
-  mSlider->setFixedWidth(200);
   mSlider->setValue(aerolab->intTotalMass());
   mLayout->addWidget( mLabel );
   mLayout->addWidget( mQLCDNumber );
@@ -132,7 +128,7 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   QHBoxLayout *rhoLayout = new QHBoxLayout;
   QLabel *rhoLabel = new QLabel(tr("Rho (kg/m^3)"), this);
   rhoLabel->setFixedWidth(labelWidth2);
-  rhoQLCDNumber    = new QLCDNumber(8);
+  rhoQLCDNumber    = new QLCDNumber(7);
   rhoQLCDNumber->setMode(QLCDNumber::Dec);
   rhoQLCDNumber->setSmallDecimalPoint(false);
   rhoQLCDNumber->setSegmentStyle(QLCDNumber::Flat);
@@ -142,7 +138,6 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   rhoSlider->setTickInterval(1000);
   rhoSlider->setMinimum(9000);
   rhoSlider->setMaximum(14000);
-  rhoSlider->setFixedWidth(200);
   rhoSlider->setValue(aerolab->intRho());
   rhoLayout->addWidget( rhoLabel );
   rhoLayout->addWidget( rhoQLCDNumber );
@@ -162,7 +157,6 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   eoffsetSlider->setTickInterval(1000);
   eoffsetSlider->setMinimum(-30000);
   eoffsetSlider->setMaximum(30000);
-  eoffsetSlider->setFixedWidth(200);
   eoffsetSlider->setValue(aerolab->intEoffset());
   eoffsetLayout->addWidget( eoffsetLabel );
   eoffsetLayout->addWidget( eoffsetQLCDNumber );
