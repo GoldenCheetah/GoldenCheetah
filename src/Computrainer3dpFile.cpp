@@ -73,10 +73,16 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
     // looks like the first part is a header... ignore it.
     is.skipRawData(4);
 
-    // the next 4 bytes are the ASCII characters 'Perf'
+    // the next 4 bytes are the ASCII characters 'perf'
     char perfStr[5];
     is.readRawData(perfStr, 4);
     perfStr[4] = NULL;
+    if(strcmp(perfStr,"perf"))
+    {
+        errors << "File is encrypted.";
+        return NULL;
+    }
+
 
     // not sure what the next 8 bytes are; skip them
     is.skipRawData(0x8);
@@ -143,7 +149,7 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
     // use that to offset distances that we report to GC so that they
     // are zero-based (i.e., so that the first data point is at
     // distance zero).
-    float firstKM;
+    float firstKM = 0;
     bool gotFirstKM = false;
 
     // computrainer doesn't have a fixed inter-sample-interval; GC
