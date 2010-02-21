@@ -231,10 +231,10 @@ QStringList RideFileFactory::listRideFiles(const QDir &dir) const
 
 void RideFile::appendPoint(double secs, double cad, double hr, double km,
                            double kph, double nm, double watts, double alt,
-                           double lon, double lat, int interval)
+                           double lon, double lat, double headwind, int interval)
 {
     dataPoints_.append(new RideFilePoint(secs, cad, hr, km, kph,
-                                         nm, watts, alt, lon, lat, interval));
+                                         nm, watts, alt, lon, lat, headwind, interval));
     dataPresent.secs  |= (secs != 0);
     dataPresent.cad   |= (cad != 0);
     dataPresent.hr    |= (hr != 0);
@@ -245,5 +245,6 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     dataPresent.alt   |= (alt != 0);
     dataPresent.lon   |= (lon != 0);
     dataPresent.lat   |= (lat != 0);
+    dataPresent.headwind |= (headwind != 0);
     dataPresent.interval |= (interval != 0);
 }

@@ -158,6 +158,10 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
       // Unpack:
       double power = max(0, p1->watts);
       double v     = p1->kph/vfactor;
+      double headwind = v;
+      if( dataPresent->headwind ) {
+        headwind   = p1->headwind/vfactor;
+      }
       double f     = 0.0;
       double a     = 0.0;
       d += v * dt;
@@ -172,7 +176,7 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
       }
 
       f *= eta; // adjust for drivetrain efficiency if using a crank-based meter
-      double s   = slope( f, a, m, crr, cda, rho, v );
+      double s   = slope( f, a, m, crr, cda, rho, headwind );
       double de  = s * v * dt;
 
       e += de;

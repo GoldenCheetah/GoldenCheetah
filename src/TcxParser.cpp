@@ -132,10 +132,11 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 	    // for smart recording, the delta_t will not be constant
 	    // average all the calculations based on the previous
 	    // point.
+            headwind = 0.0;
 	    if(rideFile->dataPoints().empty()) {
 	        // first point
 	        rideFile->appendPoint(secs, cadence, hr, distance,
-                                   speed, torque, power, alt, lon, lat, lap);
+                                   speed, torque, power, alt, lon, lat, headwind, lap);
 	    }
 	    else {
 	      // assumption that the change in ride is linear...  :)
@@ -153,7 +154,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 	      if(deltaSecs == 1) {
 		  // no smart recording, just insert the data
 		  rideFile->appendPoint(secs, cadence, hr, distance,
-                                   speed, torque, power, alt, lon, lat, lap);
+                                   speed, torque, power, alt, lon, lat, headwind, lap);
 	      }
 	      else {
 		  for(int i = 1; i <= deltaSecs; i++) {
@@ -176,6 +177,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 					    prevPoint->alt + (deltaAlt * weight),
                         lon, // lon
                         lat, // lat
+                        headwind, // headwind
 					    lap);
 		  }
 		  prevPoint = rideFile->dataPoints().back();
