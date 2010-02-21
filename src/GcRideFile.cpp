@@ -89,6 +89,7 @@ GcFileReader::openRideFile(QFile &file, QStringList &errors) const
     for (QDomElement sample = samples.firstChildElement("sample");
          !sample.isNull(); sample = sample.nextSiblingElement("sample")) {
         double secs, cad, hr, km, kph, nm, watts, alt, lon, lat;
+        double headwind = 0.0;
         secs = sample.attribute("secs", "0.0").toDouble();
         cad = sample.attribute("cad", "0.0").toDouble();
         hr = sample.attribute("hr", "0.0").toDouble();
@@ -101,7 +102,7 @@ GcFileReader::openRideFile(QFile &file, QStringList &errors) const
         lat = sample.attribute("lat", "0.0").toDouble();
         while ((interval < intervalStops.size()) && (secs >= intervalStops[interval]))
             ++interval;
-        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lon, lat, interval);
+        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, interval);
         if (!recIntSet) {
             rideFile->setRecIntSecs(sample.attribute("len").toDouble());
             recIntSet = true;

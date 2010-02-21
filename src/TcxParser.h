@@ -56,6 +56,7 @@ private:
     double      alt;
     double      lat;
     double      lon;
+    double      headwind;
 };
 
 #endif // _TcxParser_h

@@ -140,7 +140,7 @@ SplitRideDialog::CreateNewRideFile(const RideFile *ride, int nRecStart, int nRec
     {
         RideFilePoint *pPoint = ride->dataPoints().at(nItem);
         newRideFile->appendPoint(pPoint->secs-pointStart->secs, pPoint->cad, pPoint->hr, pPoint->km - pointStart->km,
-                 pPoint->kph, pPoint->nm, pPoint->watts, pPoint->alt, pPoint->lon, pPoint->lat, pPoint->interval-pointStart->interval);
+                 pPoint->kph, pPoint->nm, pPoint->watts, pPoint->alt, pPoint->lon, pPoint->lat, pPoint->headwind, pPoint->interval-pointStart->interval);
     }
     newRideFile->setDeviceType(ride->deviceType());
 

@@ -414,7 +414,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
 
                     // !! needs to be modified to support the new alt patch
                     rideFile->appendPoint((double)rtime/1000, cad, hr, km,
-                            kph, nm, watts, alt, lon, lat, 0);
+                            kph, nm, watts, alt, lon, lat, 0.0, 0);
             }
 
             // increment time - even for null records (perhaps especially for null
