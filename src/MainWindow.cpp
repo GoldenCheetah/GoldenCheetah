@@ -19,6 +19,7 @@
 #include "MainWindow.h"
 #include "AerolabWindow.h"
 #include "Aerolab.h"
+#include "GoogleMapControl.h"
 #include "AllPlotWindow.h"
 #include "AllPlot.h"
 #include "BestIntervalDialog.h"
@@ -308,6 +309,9 @@ MainWindow::MainWindow(const QDir &home) :
     aerolabWindow = new AerolabWindow(this);
     tabWidget->addTab(aerolabWindow, tr("Aerolab"));
 
+    ///////////////////////////// GoogleMapsb //////////////////////////////////
+
+	googleMap = new GoogleMapControl(this,tabWidget);
 
     ////////////////////////////// Signals ////////////////////////////// 
 

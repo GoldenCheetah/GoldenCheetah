@@ -29,6 +29,7 @@
 #include <boost/shared_ptr.hpp>
 
 class AerolabWindow;
+class GoogleMapControl;
 class AllPlotWindow;
 class CriticalPowerWindow;
 class HistogramWindow;
@@ -167,6 +168,7 @@ class MainWindow : public QMainWindow
         CriticalPowerWindow *criticalPowerWindow;
         ModelWindow *modelWindow;
         AerolabWindow *aerolabWindow;
+		GoogleMapControl *googleMap;
         QTreeWidgetItem *allRides;
         QTreeWidgetItem *allIntervals;
         QSplitter *leftLayout;
