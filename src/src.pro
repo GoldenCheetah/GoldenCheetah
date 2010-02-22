@@ -33,6 +33,14 @@ LIBS += -lm
     DEFINES += GC_HAVE_QWTPLOT3D
 }
 
+!isEmpty ( MapsSupport )
+{
+   QT += webkit
+   SOURCES += GoogleMapControl.cpp
+   HEADERS += GoogleMapControl.h
+   DEFINES += GC_MAP_SUPPORT
+}
+
 macx {
     LIBS += -framework Carbon
 }
