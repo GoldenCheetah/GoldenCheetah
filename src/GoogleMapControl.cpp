@@ -142,29 +142,31 @@ GoogleMapControl::rideSelected() {
   }
 }
 
-void GoogleMapControl::setData(RideItem *_rideItem)
+void GoogleMapControl::resizeEvent(QResizeEvent * )
 {
-	ride = _rideItem;
+	// createHtml will handle resize the widget correct
+	createHtml();
 }
 
 void GoogleMapControl::createHtml()
 {
 	if(ride == NULL) return;
 
-	double minLat, minLong, maxLat, maxLong;
-	minLat = minLong = 1000;
-	maxLat = maxLong = -1000; // larger than 360
+	double minLat, minLon, maxLat, maxLon;
+	minLat = minLon = 1000;
+	maxLat = maxLon = -1000; // larger than 360
 
 	foreach(RideFilePoint *rfp, ride->ride()->dataPoints())
 	{
 		minLat = std::min(minLat,rfp->lat);
 		maxLat = std::max(maxLat,rfp->lat);
-		minLong = std::min(minLong,rfp->lon);
-		maxLong = std::max(maxLong,rfp->lon);
+		minLon = std::min(minLon,rfp->lon);
+		maxLon = std::max(maxLon,rfp->lon);
 	}
 
-	int width = view->width();
-	int height = view->height();
+	/// seems to be the magic number... to stop the scrollbars
+	int width = view->width() -16;
+	int height = view->height() -16;
 
 	double startLat = ride->ride()->dataPoints().first()->lat;
 	double startLong = ride->ride()->dataPoints().first()->lon;
@@ -195,7 +197,7 @@ void GoogleMapControl::createHtml()
 		<< "}" << endl
 		<< "}" << endl
 		<< "function animate() {"  << endl
-		<< "map.panTo(new GLatLng(" << maxLat << "," << minLong<< "));" << endl
+		<< "map.panTo(new GLatLng(" << maxLat << "," << minLon << "));" << endl
 		<< "}" << endl
 		<< "</script>" << endl
 		<< "</head>" << endl

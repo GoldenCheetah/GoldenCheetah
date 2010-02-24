@@ -59,11 +59,11 @@ Q_OBJECT
 
  protected:
 	void createHtml();
+	void resizeEvent(QResizeEvent *);
 
  public:
 	GoogleMapControl(MainWindow *,QTabWidget *);
 	virtual ~GoogleMapControl() { }
-	void setData(RideItem *file);
 };
 
 #endif
