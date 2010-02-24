@@ -111,7 +111,7 @@ GoogleMapControl::GoogleMapControl(MainWindow *mw, QTabWidget *tw)
 	setLayout(layout);
 	connect(parent, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
 	view->load(QUrl("http://google.com"));
-	tabIndex = 0;
+	tabIndex = -1;
 }
 
 void
@@ -122,18 +122,22 @@ GoogleMapControl::rideSelected() {
   if (!ride)
 	  return;
 
+  int currentTab = tabWidget->currentIndex();
+
   // Does the ride have GPS data
   if(ride->ride()->dataPoints().front()->lat == 0.0)
   {
 	  if(tabIndex > -1)
 	  {
 		  tabWidget->removeTab(tabIndex);
+          if (currentTab == tabIndex) tabWidget->setCurrentIndex(0);
 	  }
 	  tabIndex = -1;
   }
   else
   {
-	  tabIndex = tabWidget->addTab(this, tr("Map"));
+	  if (tabIndex == -1) tabIndex = tabWidget->addTab(this, tr("Map"));
+      if (currentTab != tabIndex) tabWidget->setCurrentIndex(currentTab);
 	  createHtml();
   }
 }
@@ -280,6 +284,7 @@ void GoogleMapControl::CreateSubPolyLine(const std::vector<RideFilePoint> &point
 
 	BOOST_FOREACH(RideFilePoint rfp, points)
 	{
+        if (ceil(rfp.lat) != 180 && ceil(rfp.lon) != 180)
 		oss << "new GLatLng(" << rfp.lat << "," << rfp.lon << ")," << endl;
 	}
 
