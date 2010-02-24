@@ -163,13 +163,9 @@ void GoogleMapControl::createHtml()
 		minLon = std::min(minLon,rfp->lon);
 		maxLon = std::max(maxLon,rfp->lon);
 	}
-
 	/// seems to be the magic number... to stop the scrollbars
 	int width = view->width() -16;
 	int height = view->height() -16;
-
-	double startLat = ride->ride()->dataPoints().first()->lat;
-	double startLong = ride->ride()->dataPoints().first()->lon;
 
 	std::ostringstream oss;
 	oss.precision(6);
@@ -189,10 +185,15 @@ void GoogleMapControl::createHtml()
 		<< "if (GBrowserIsCompatible()) {" << endl
 		<< "map = new GMap2(document.getElementById(\"map_canvas\")," << endl
 		<< " {size: new GSize(" << width << "," << height << ") } );" << endl
-		<< "map.setCenter(new GLatLng(" << startLat <<"," << startLong << "), 13,G_PHYSICAL_MAP);" << endl
 		<< "map.setUIToDefault()" << endl
 		<< CreatePolyLine(ride) << endl
 		<< CreateIntervalMarkers(ride) << endl
+		<< "var sw = new GLatLng(" << minLat << "," << minLon << ");" << endl
+		<< "var ne = new GLatLng(" << maxLat << "," << maxLon << ");" << endl
+		<< "var bounds = new GLatLngBounds(sw,ne);" << endl
+		<< "var zoomLevel = map.getBoundsZoomLevel(bounds);" << endl
+		<< "var center = bounds.getCenter(); " << endl
+		<< "map.setCenter(bounds.getCenter(),map.getBoundsZoomLevel(bounds),G_PHYSICAL_MAP);" << endl
 		<< "map.enableScrollWheelZoom();" << endl
 		<< "}" << endl
 		<< "}" << endl
@@ -208,6 +209,7 @@ void GoogleMapControl::createHtml()
 		<< "</body>" << endl
 		<< "</html>" << endl;
 
+#define DEBUG_GMAPS 1
 #if DEBUG_GMAPS
 	 QString htmlFile(QDir::tempPath());
 	 htmlFile.append("/maps.html");
@@ -287,7 +289,9 @@ void GoogleMapControl::CreateSubPolyLine(const std::vector<RideFilePoint> &point
 	BOOST_FOREACH(RideFilePoint rfp, points)
 	{
         if (ceil(rfp.lat) != 180 && ceil(rfp.lon) != 180)
-		oss << "new GLatLng(" << rfp.lat << "," << rfp.lon << ")," << endl;
+		{
+			oss << "new GLatLng(" << rfp.lat << "," << rfp.lon << ")," << endl;
+		}
 	}
 
 	oss << "],\"" << colorstr.toStdString() << "\",5));";
