@@ -252,8 +252,17 @@ string GoogleMapControl::CreatePolyLine(RideItem *ride)
 	std::vector<RideFilePoint> intervalPoints;
 	ostringstream oss;
 
+	int cp;
 	int intervalTime = 30;  // 30 seconds
-	int ftp = ride->zones->getCP(ride->zoneRange());
+	int zone =ride->zoneRange();
+	if(zone >= 0)
+	{
+		cp = 300;  // default cp to 300 watts
+	}
+	else
+	{
+		cp = ride->zones->getCP(zone);
+	}
 
 	foreach(RideFilePoint* rfp, ride->ride()->dataPoints())
 	{
@@ -265,7 +274,7 @@ string GoogleMapControl::CreatePolyLine(RideItem *ride)
 										 intervalPoints.end(),
 										 AvgPower());
 			// find the color
-			QColor color = GetColor(ftp,avgPower);
+			QColor color = GetColor(cp,avgPower);
 			// create the polyline
 			CreateSubPolyLine(intervalPoints,oss,color);
 			intervalPoints.clear();
