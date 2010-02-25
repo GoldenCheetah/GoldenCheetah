@@ -101,9 +101,8 @@ RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors) const
                    + file.fileName() + "\"");
         return NULL;
     } else if (version >29) {
-        errors << ("Version of file is new and not supported yet: \"" +
+        errors << ("Version of file is new and not fully supported yet: \"" +
         file.fileName() + "\"");
-    return NULL;
     }
 
     // Golden Cheetah ride file
