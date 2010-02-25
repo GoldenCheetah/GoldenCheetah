@@ -1,7 +1,10 @@
 
 #include "StressCalculator.h"
+#include "MetricAggregator.h"
 #include "RideMetric.h"
 #include "RideItem.h"
+#include "MainWindow.h"
+
 #include <stdio.h>
 
 #include <QSharedPointer>
@@ -18,19 +21,24 @@ StressCalculator::StressCalculator (
 	longTermDays(longTermDays),
 	initialSTS(initialSTS), initialLTS(initialLTS), lastDaysIndex(-1)
 {
+    // calc SB for today or tomorrow?
+    settings = GetApplicationSettings();
+    showSBToday = settings->value(GC_SB_TODAY).toInt();
+
     days = startDate.daysTo(endDate);
+
     // make vectors 1 larger in case there is a ride for today.
     // see calculateStress()
-    stsvalues.resize(days+1);
-    ltsvalues.resize(days+1);
-    sbvalues.resize(days+1);
-    xdays.resize(days+1);
-    list.resize(days+1);
+    stsvalues.resize(days+2);
+    ltsvalues.resize(days+2);
+    sbvalues.resize(days+2);
+    xdays.resize(days+2);
+    list.resize(days+2);
+    ltsramp.resize(days+2);
+    stsramp.resize(days+2);
 
     lte = (double)exp(-1.0/longTermDays);
     ste = (double)exp(-1.0/shortTermDays);
-    
-    settings = GetApplicationSettings();
 }
 
 
@@ -57,163 +65,70 @@ double StressCalculator::min(void) {
 
 
 
-void StressCalculator::calculateStress(QWidget *mw,
-        QString homePath, const QTreeWidgetItem * rides,
-        const QString &metric)
+void StressCalculator::calculateStress(MainWindow *main, QString home, const QString &metric)
 {
-    QSharedPointer<QProgressDialog> progress;
-    int endingOffset = 0;
-    bool aborted = false;
-    bool showProgress = false;
-    RideItem *item;
+    // refresh metrics
+    metricDB = new MetricAggregator(main, home, main->zones());
 
+    // get all metric data from the year 1900 - 3000
+    QList<SummaryMetrics> results;
+    results = metricDB->getAllMetricsFor(QDateTime(QDate(1900,1,1)), QDateTime(QDate(3000,1,1)));
 
-    // set up cache file
-    QString cachePath = homePath + "/" + "stress.cache";
-    QFile cacheFile(cachePath);
-    QMap<QString,QMap<QString,float> > cache;
+    // set start and enddate to maximum maximum required date range
+    // remember the date range required so we can truncate afterwards
+    QDateTime startDateNeeded = startDate;
+    QDateTime endDateNeeded   = endDate;
+    startDate = startDate < results[0].getRideDate() ? startDate : results[0].getRideDate();
+    endDate   = endDate > results[results.count()-1].getRideDate() ? endDate : results[results.count()-1].getRideDate();
 
-    const QString bs_name = "skiba_bike_score";
-    const QString dp_name = "daniels_points";
-    assert(metric == bs_name || metric == dp_name);
+    int maxarray = startDate.daysTo(endDate) +2; // from zero plus tomorrows SB!
+    stsvalues.resize(maxarray);
+    ltsvalues.resize(maxarray);
+    sbvalues.resize(maxarray);
+    xdays.resize(maxarray);
+    list.resize(maxarray);
+    ltsramp.resize(maxarray);
+    stsramp.resize(maxarray);
 
-    if (cacheFile.exists() && cacheFile.size() > 0) {
-	if (cacheFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-	    fprintf(stderr,"reading stress cache file\n");
-	    QTextStream in(&cacheFile);
-            bool first = true;
-            QMap<int,QString> columnToMetric;
-	    while(! in.atEnd()) {
-                QString line = in.readLine();
-                QStringList fields = line.split(",");
-                if (first) {
-                    first = false;
-                    if (fields[0] != "Date")
-                        break; // rescan to get DanielsPoints
-                    for (int i = 1; i < fields.size(); ++i)
-                        columnToMetric.insert(i, fields[i]);
-                    continue;
-                }
-                else {
-                    QString date = fields[0];
-                    for (int i = 1; i < fields.size(); ++i)
-                        cache[date][columnToMetric[i]] = fields[i].toFloat();
-                }
-	    }
-	    cacheFile.close();
-	}
+    for (int i=0; i<results.count(); i++)
+        addRideData(results[i].getForSymbol(metric), results[i].getRideDate());
+
+    // ensure the last day is covered ...
+    addRideData(0.0, endDate);
+
+    // now truncate the data series to the requested date range
+    int firstindex = startDate.daysTo(startDateNeeded);
+    int lastindex  = startDate.daysTo(endDateNeeded)+2; // for today and tomorrow SB
+
+    // zap the back
+    if (lastindex < maxarray) {
+        stsvalues.remove(lastindex, maxarray-lastindex);
+        ltsvalues.remove(lastindex, maxarray-lastindex);
+        sbvalues.remove(lastindex, maxarray-lastindex);
+        xdays.remove(lastindex, maxarray-lastindex);
+        list.remove(lastindex, maxarray-lastindex);
+        stsramp.remove(lastindex, maxarray-lastindex);
+        ltsramp.remove(lastindex, maxarray-lastindex);
     }
-    if (cache.isEmpty()) {
-	// set up progress bar only if no cache file
-	progress = QSharedPointer<QProgressDialog>(new
-		QProgressDialog(QString(tr("Computing stress.\n")),
-		tr("Abort"),0,days,mw));
-	endingOffset = progress->labelText().size();
-	showProgress = true;
-    }
-
-    QVariant isAscending = settings->value(GC_ALLRIDES_ASCENDING,Qt::Checked);
-    
-    if(isAscending.toInt() > 0 ){
-        item = (RideItem*) rides->child(0);
-    } else {
-        item = (RideItem*) rides->child(rides->childCount()-1);
+    // now zap the front
+    if (firstindex) {
+        stsvalues.remove(0, firstindex);
+        ltsvalues.remove(0, firstindex);
+        ltsramp.remove(0, firstindex);
+        stsramp.remove(0, firstindex);
+        sbvalues.remove(0, firstindex);
+        xdays.remove(0, firstindex);
+        list.remove(0, firstindex);
     }
 
-    for (int i = 0; i < rides->childCount(); ++i) {
-        if(isAscending.toInt() > 0 ){
-            item = (RideItem*) rides->child(i);
-        } else {
-            item = (RideItem*) rides->child(rides->childCount()-1-i);
-        }
+    // reapply the requested date range
+    startDate = startDateNeeded;
+    endDate = endDateNeeded;
 
-	// calculate using rides within date range
-	if (item->dateTime.daysTo(startDate) <= 0 &&
-		item->dateTime.daysTo(endDate) >= 0) { // inclusive of end date
+    days = startDate.daysTo(endDate) + 1; // include today
 
-	    QString ridedatestring = item->dateTime.toString();
-
-	    double bs = 0.0, dp = 0.0;
-
-	    if (showProgress) {
-		QString existing = progress->labelText();
-		existing.chop(progress->labelText().size() - endingOffset);
-		progress->setLabelText( existing +
-			QString(tr("Processing %1...")).arg(item->fileName));
-	    }
-
-	    // get new value if not in cache
-	    if (cache.contains(ridedatestring)) {
-		bs = cache[ridedatestring][bs_name];
-		dp = cache[ridedatestring][dp_name];
-	    }
-	    else {
-		item->computeMetrics();
-
-                RideMetricPtr m;
-                if ((m = item->metrics.value(bs_name)) && m->value(true))
-		    bs = m->value(true);
-		if ((m = item->metrics.value(dp_name)) && m->value(true))
-		    dp = m->value(true);
-		cache[ridedatestring][bs_name] = bs;
-		cache[ridedatestring][dp_name] = dp;
-
-                // only delete if the ride is clean (i.e. no pending ave)
-                if (item->isDirty() == false) item->freeMemory();
-	    }
-
-	    addRideData(metric == bs_name ? bs : dp,item->dateTime);
-
-
-	    // check progress
-	    if (showProgress) {
-		QCoreApplication::processEvents();
-		if (progress->wasCanceled()) {
-		    aborted = true;
-		    goto done;
-		}
-		// set progress from 0 to days
-		progress->setValue(startDate.daysTo(item->dateTime));
-	    }
-	}
-    }
-    // fill in any days from last ride up to YESTERDAY but not today.
-    // we want to show todays ride if there is a ride but don't fill in
-    // a zero for it if there is no ride
-    if (item->dateTime.daysTo(endDate) > 0)
-    {
-	/*
-	fprintf(stderr,"filling in up to date = %s\n",
-		endDate.toString().toAscii().data());
-	*/
-
-	addRideData(0.0,endDate.addDays(-1));
-    }
-    else
-    {
-	// there was a ride for today, increment the count so
-	// we will show it:
-	days++;
-    }
-
-done:
-    if (!aborted) {
-	// write cache file
-	if (cacheFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-	    cacheFile.resize(0); // truncate
-	    QTextStream out(&cacheFile);
-            out << "Date," << bs_name << "," << dp_name << endl;
-            QMap<QString,QMap<QString,float> >::const_iterator i = cache.constBegin();
-            while (i != cache.constEnd()) {
-                out << i.key() << "," << i.value()[bs_name]
-                    << "," << i.value()[dp_name] << endl;
-		++i;
-	    }
-	    cacheFile.close();
-	}
-    }
-
-
+    // will close the connection, alledgedly
+    delete metricDB;
 }
 
 /*
@@ -227,25 +142,20 @@ done:
 void StressCalculator::addRideData(double BS, QDateTime rideDate) {
     int daysIndex = startDate.daysTo(rideDate);
 
-    /*
-       fprintf(stderr,"addRideData  date = %s\n",
-       rideDate.toString().toAscii().data());
-       */
-
-
     // fill in any missing days before today
     int d;
     for (d = lastDaysIndex + 1; d < daysIndex ; d++) {
-	list[d] = 0.0; // no ride
-	calculate(d);
+        list[d] = 0.0; // no ride
+        calculate(d);
     }
-    // do this ride (may be more than one ride in a day)
+
+    // ignore stuff from before start date
     if(daysIndex < 0) return;
+
+    // today
     list[daysIndex] += BS;
     calculate(daysIndex);
     lastDaysIndex = daysIndex;
-
-    // fprintf(stderr,"addRideData (%.2f, %d)\n",BS,daysIndex);
 }
 
 
@@ -278,9 +188,16 @@ void StressCalculator::calculate(int daysIndex) {
     stsvalues[daysIndex] = (list[daysIndex] * (1.0 - ste)) + (lastSTS * ste);
 
     // SB (stress balance)  long term - short term
-    sbvalues[daysIndex] =  ltsvalues[daysIndex] - stsvalues[daysIndex] ;
+    // XXX FIXED BUG WHERE SB WAS NOT SHOWN ON THE NEXT DAY!
+    if (daysIndex == 0) sbvalues[daysIndex]=0;
+    sbvalues[daysIndex+(showSBToday ? 0 : 1)] =  ltsvalues[daysIndex] - stsvalues[daysIndex] ;
 
     // xdays
     xdays[daysIndex] = daysIndex+1;
-}
 
+    // ramp
+    if (daysIndex > 0) {
+        stsramp[daysIndex] = stsvalues[daysIndex] - stsvalues[daysIndex-1];
+        ltsramp[daysIndex] = ltsvalues[daysIndex] - ltsvalues[daysIndex-1];
+    }
+}

@@ -86,6 +86,7 @@ class CyclistPage : public QWidget
         QLineEdit *perfManStart;
         QLineEdit *perfManSTSavg;
         QLineEdit *perfManLTSavg;
+        QCheckBox *showSBToday;
 
         int getCurrentRange();
         bool isNewMode();

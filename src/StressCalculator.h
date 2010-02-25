@@ -15,6 +15,7 @@
 #include <QDateTime>
 #include <QTreeWidgetItem>
 #include "Settings.h"
+#include "MetricAggregator.h"
 
 class StressCalculator:public QObject {
 
@@ -30,10 +31,13 @@ class StressCalculator:public QObject {
         double ste, lte;
 
 	int lastDaysIndex;
+    bool showSBToday;
 
 	// graph axis arrays
 	QVector<double> stsvalues;
 	QVector<double> ltsvalues;
+    QVector<double> ltsramp;
+    QVector<double> stsramp;
 	QVector<double> sbvalues;
 	QVector<double> xdays;
 	// averaging array
@@ -50,14 +54,15 @@ class StressCalculator:public QObject {
 		double initialSTS, double initialLTS,
 		int shortTermDays, int longTermDays);
 
-	void calculateStress(QWidget *mw, QString homePath,
-		const QTreeWidgetItem * rides, const QString &metric);
+	void calculateStress(MainWindow *, QString, const QString &metric);
 
 	// x axes:
 	double *getSTSvalues() { return stsvalues.data(); }
 	double *getLTSvalues() { return ltsvalues.data(); }
 	double *getSBvalues() { return sbvalues.data(); }
     double *getDAYvalues() { return list.data(); }
+    double *getLRvalues() { return ltsramp.data(); }
+    double *getSRvalues() { return stsramp.data(); }
 
 	// y axis
 	double *getDays() { return xdays.data(); }
@@ -71,8 +76,8 @@ class StressCalculator:public QObject {
 	QDateTime getStartDate(void) { return startDate; }
 	QDateTime getEndDate(void) { return startDate.addDays(days); }
 
-
-
+    // use metricDB pre-calculated values
+    MetricAggregator *metricDB;
 };
 
 

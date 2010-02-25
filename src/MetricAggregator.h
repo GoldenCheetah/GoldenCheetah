@@ -20,30 +20,41 @@
 #ifndef METRICAGGREGATOR_H_
 #define METRICAGGREGATOR_H_
 
-
 #include <QMap>
 #include "RideFile.h"
 #include <QDir>
 #include "Zones.h"
 #include "RideMetric.h"
+#include "SummaryMetrics.h"
+#include "MainWindow.h"
 #include "DBAccess.h"
 
-
-class MetricAggregator
+class MetricAggregator : public QWidget
 {
+    Q_OBJECT
+
 	public:
-		MetricAggregator();
-		void aggregateRides(QDir home, const Zones *zones);
+        MetricAggregator(MainWindow *, QDir , const Zones *);
+		~MetricAggregator();
+
+
+		void refreshMetrics();
+        void getFirstLast(QDate &, QDate &);
+        QList<SummaryMetrics> getAllMetricsFor(QDateTime start, QDateTime end);
+
+    public slots:
+        void update() { isclean = false; }
+
+    private:
+        QWidget *parent;
+        DBAccess *dbaccess;
+        QDir home;
+        const Zones *zones;
+        static bool isclean;
+
 	    typedef QHash<QString,RideMetric*> MetricMap;
-	bool importRide(QDir path, const Zones *zones, RideFile *ride, QString fileName, DBAccess *dbaccess);
-	MetricMap metrics;
-    void scanForMissing(QDir home, const Zones *zones);
-    void resetMetricTable(QDir home);
-
-
-
+	    bool importRide(QDir path, RideFile *ride, QString fileName, bool modify);
+	    MetricMap metrics;
 };
-
-
 
 #endif /* METRICAGGREGATOR_H_ */

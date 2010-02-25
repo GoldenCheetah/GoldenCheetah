@@ -27,6 +27,7 @@
 #include "ConfigDialog.h"
 #include "CriticalPowerWindow.h"
 #include "GcRideFile.h"
+#include "LTMWindow.h"
 #include "PfPvWindow.h"
 #include "DownloadRideDialog.h"
 #include "ManualRideDialog.h"
@@ -289,10 +290,17 @@ MainWindow::MainWindow(const QDir &home) :
     weeklySummaryWindow = new WeeklySummaryWindow(useMetricUnits, this);
     tabWidget->addTab(weeklySummaryWindow, tr("Weekly Summary"));
 
+    //////////////////////// LTM ////////////////////////
+
+    // long term metrics window
+    metricDB = new MetricAggregator(this, home, zones()); // just to catch config updates!
+    ltmWindow = new LTMWindow(this, useMetricUnits, home);
+    tabWidget->addTab(ltmWindow, tr("Metrics"));
+
     //////////////////////// Performance Manager  ////////////////////////
 
     performanceManagerWindow = new PerformanceManagerWindow(this);
-    tabWidget->addTab(performanceManagerWindow, tr("Performance Manager"));
+    tabWidget->addTab(performanceManagerWindow, tr("PM"));
 
 
     ///////////////////////////// Aerolab //////////////////////////////////
@@ -461,6 +469,7 @@ MainWindow::addRide(QString name, bool bSelect /*=true*/)
         tabWidget->setCurrentIndex(0);
         treeWidget->setCurrentItem(last);
     }
+    rideAdded(last);
 }
 
 void
@@ -472,6 +481,8 @@ MainWindow::removeCurrentRide()
     if (_item->type() != RIDE_TYPE)
         return;
     RideItem *item = reinterpret_cast<RideItem*>(_item);
+
+    rideDeleted(item);
 
     QTreeWidgetItem *itemToSelect = NULL;
     for (x=0; x<allRides->childCount(); ++x)
@@ -1154,6 +1165,7 @@ MainWindow::tabChanged(int index)
 {
     criticalPowerWindow->setActive(index == 2);
     performanceManagerWindow->setActive(tabWidget->widget(index) == performanceManagerWindow);
+    ltmWindow->setActive(tabWidget->widget(index) == ltmWindow);
 #ifdef GC_HAVE_QWTPLOT3D
     modelWindow->setActive(tabWidget->widget(index) == modelWindow);
 #endif
@@ -1188,14 +1200,12 @@ MainWindow::aboutDialog()
 
 void MainWindow::importRideToDB()
 {
-    MetricAggregator aggregator;
-    aggregator.aggregateRides(home, zones());
+    metricDB->refreshMetrics();
 }
 
 void MainWindow::scanForMissing()
 {
-    MetricAggregator aggregator;
-    aggregator.scanForMissing(home, zones());
+    metricDB->refreshMetrics();
 }
 
 

@@ -78,6 +78,13 @@ HEADERS += \
         IntervalItem.h \
         LogTimeScaleDraw.h \
         LogTimeScaleEngine.h \
+        LTMCanvasPicker.h \
+        LTMChartParser.h \
+        LTMPlot.h \
+        LTMSettings.h \
+        LTMTool.h \
+        LTMTrend.h \
+        LTMWindow.h \
         MainWindow.h \
         ManualRideDialog.h \
         ManualRideFile.h \
@@ -162,11 +169,19 @@ SOURCES += \
         IntervalItem.cpp \
         LogTimeScaleDraw.cpp \
         LogTimeScaleEngine.cpp \
+        LTMCanvasPicker.cpp \
+        LTMChartParser.cpp \
+        LTMPlot.cpp \
+        LTMSettings.cpp \
+        LTMTool.cpp \
+        LTMTrend.cpp \
+        LTMWindow.cpp \
         MainWindow.cpp \
         ManualRideDialog.cpp \
         ManualRideFile.cpp \
         MetricAggregator.cpp \
         Pages.cpp \
+        PeakPower.cpp \
         PerfPlot.cpp \
         PerformanceManagerWindow.cpp \
         PfPvPlot.cpp \
@@ -199,9 +214,9 @@ SOURCES += \
         SplitRideDialog.cpp \
         SrmRideFile.cpp \
         StressCalculator.cpp \
-        SummaryMetrics.cpp \
         TcxParser.cpp \
         TcxRideFile.cpp \
+        TimeInZone.cpp \
         TimeUtils.cpp \
         ToolsDialog.cpp \
         TrainTabs.cpp \

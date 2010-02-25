@@ -8,7 +8,7 @@
 
 
 PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
-    QWidget(mainWindow), mainWindow(mainWindow)
+    QWidget(mainWindow), mainWindow(mainWindow), active(false)
 {
     days = count = 0;
     sc = NULL;
@@ -111,9 +111,10 @@ PerformanceManagerWindow::~PerformanceManagerWindow()
 
 void PerformanceManagerWindow::configChanged()
 {
-    mainWindow->home.remove("stress.cache");
-    days = 0; // force replot
-    replot();
+    if (active) {
+        days = 0; // force replot
+        replot();
+    }
 }
 
 void PerformanceManagerWindow::metricChanged()
@@ -126,8 +127,7 @@ void PerformanceManagerWindow::metricChanged()
 
 void PerformanceManagerWindow::setActive(bool value)
 {
-    if (value)
-        replot();
+    if (active=value) replot();
 }
 
 void PerformanceManagerWindow::replot()
@@ -186,7 +186,7 @@ void PerformanceManagerWindow::replot()
 		    (settings->value(GC_STS_DAYS,7)).toInt(),
 		    (settings->value(GC_LTS_DAYS,42)).toInt());
 
-            sc->calculateStress(this,home.absolutePath(),allRides,newMetric);
+            sc->calculateStress(mainWindow,home.absolutePath(),newMetric);
 
 	    perfplot->setStressCalculator(sc);
 

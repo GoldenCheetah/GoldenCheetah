@@ -34,6 +34,7 @@ PerfPlot::PerfPlot() : STScurve(NULL), LTScurve(NULL), SBcurve(NULL), DAYcurve(N
 
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setCanvasBackground(Qt::white);
+    setTitle(tr("Performance Manager"));
     setAxisTitle(yLeft, "Stress (BS/Day)");
     setAxisTitle(xBottom, "Time (days)");
     setAxisTitle(yRight, "Stress (Daily)");

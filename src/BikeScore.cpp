@@ -38,6 +38,7 @@ class XPower : public RideMetric {
     double secs;
 
     friend class RelativeIntensity;
+    friend class VariabilityIndex;
     friend class BikeScore;
 
     public:
@@ -45,8 +46,10 @@ class XPower : public RideMetric {
     XPower() : xpower(0.0), secs(0.0) {}
     QString symbol() const { return "skiba_xpower"; }
     QString name() const { return tr("xPower"); }
+    MetricType type() const { return RideMetric::Average; }
     QString units(bool) const { return "watts"; }
     int precision() const { return 0; }
+    double conversion() const { return 1.0; }
     double value(bool) const { return xpower; }
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
@@ -97,6 +100,46 @@ class XPower : public RideMetric {
     RideMetric *clone() const { return new XPower(*this); }
 };
 
+class VariabilityIndex : public RideMetric {
+    double vi;
+    double secs;
+
+    public:
+
+    VariabilityIndex() : vi(0.0), secs(0.0) {}
+    QString symbol() const { return "skiba_variability_index"; }
+    QString name() const { return tr("Skiba VI"); }
+    MetricType type() const { return RideMetric::Average; }
+    QString units(bool) const { return ""; }
+    double conversion() const { return 1.0; }
+    int precision() const { return 3; }
+    double value(bool) const { return vi; }
+    void compute(const RideFile *, const Zones *, int,
+                 const QHash<QString,RideMetric*> &deps) {
+            assert(deps.contains("skiba_xpower"));
+            assert(deps.contains("average_power"));
+            XPower *xp = dynamic_cast<XPower*>(deps.value("skiba_xpower"));
+            assert(xp);
+            RideMetric *ap = dynamic_cast<RideMetric*>(deps.value("average_power"));
+            assert(ap);
+            vi = xp->value(true) / ap->value(true);
+            secs = xp->secs;
+    }
+
+    // added djconnel: allow RI to be combined across rides
+    bool canAggregate() const { return true; }
+    void aggregateWith(const RideMetric &other) {
+        assert(symbol() == other.symbol());
+	const VariabilityIndex &ovi = dynamic_cast<const VariabilityIndex&>(other);
+	vi = secs * pow(vi, bikeScoreN) + ovi.secs * pow(ovi.vi, bikeScoreN);
+	secs += ovi.secs;
+	vi = pow(vi / secs, 1.0 / bikeScoreN);
+    }
+    // end added djconnel
+
+    RideMetric *clone() const { return new VariabilityIndex(*this); }
+};
+
 class RelativeIntensity : public RideMetric {
     double reli;
     double secs;
@@ -106,7 +149,9 @@ class RelativeIntensity : public RideMetric {
     RelativeIntensity() : reli(0.0), secs(0.0) {}
     QString symbol() const { return "skiba_relative_intensity"; }
     QString name() const { return tr("Relative Intensity"); }
+    MetricType type() const { return RideMetric::Average; }
     QString units(bool) const { return ""; }
+    double conversion() const { return 1.0; }
     int precision() const { return 3; }
     double value(bool) const { return reli; }
     void compute(const RideFile *, const Zones *zones, int zoneRange,
@@ -142,8 +187,10 @@ class BikeScore : public RideMetric {
     BikeScore() : score(0.0) {}
     QString symbol() const { return "skiba_bike_score"; }
     QString name() const { return tr("BikeScore&#8482;"); }
+    MetricType type() const { return RideMetric::Total; }
     QString units(bool) const { return ""; }
     int precision() const { return 0; }
+    double conversion() const { return 1.0; }
     double value(bool) const { return score; }
     void compute(const RideFile *, const Zones *zones, int zoneRange,
 	    const QHash<QString,RideMetric*> &deps) {
@@ -168,15 +215,19 @@ class BikeScore : public RideMetric {
     void aggregateWith(const RideMetric &other) { score += other.value(true); }
 };
 
-static bool addAllThree() {
+static bool addAllFour() {
     RideMetricFactory::instance().addMetric(XPower());
     QVector<QString> deps;
     deps.append("skiba_xpower");
     RideMetricFactory::instance().addMetric(RelativeIntensity(), &deps);
     deps.append("skiba_relative_intensity");
     RideMetricFactory::instance().addMetric(BikeScore(), &deps);
+    deps.clear();
+    deps.append("skiba_xpower");
+    deps.append("average_power");
+    RideMetricFactory::instance().addMetric(VariabilityIndex(), &deps);
     return true;
 }
 
-static bool allThreeAdded = addAllThree();
+static bool allFourAdded = addAllFour();
 

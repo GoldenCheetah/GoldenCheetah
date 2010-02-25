@@ -34,23 +34,36 @@ class DBAccess
 {
 	
 	public:
+
+    // get connection name
+    QSqlDatabase connection() { return dbconn; }
+
+    // create and drop connections
 	DBAccess(QDir home);
-	typedef QHash<QString,RideMetric*> MetricMap;
-	void importAllRides(QDir path, Zones *zones);
-	bool importRide(SummaryMetrics *summaryMetrics);
-	bool createDatabase();
-	QStringList getAllFileNames();
     void closeConnection();
+
+    // Create/Delete Records
+	bool importRide(SummaryMetrics *summaryMetrics, bool);
+    bool deleteRide(QString);
+
+    // Query Records
 	QList<QDateTime> getAllDates();
     QList<SummaryMetrics> getAllMetricsFor(QDateTime start, QDateTime end);
-    bool createMetricsTable();
     QList<Season> getAllSeasons();
-    bool dropMetricTable();
 
 	private:
-	QSqlDatabase db;
+	QSqlDatabase db, dbconn;
+	typedef QHash<QString,RideMetric*> MetricMap;
+
+	bool createDatabase();
+    bool createMetricsTable();
+    bool dropMetricTable();
 	bool createIndex();
-	QSqlDatabase initDatabase(QDir home);
+    void checkDBVersion();
+	void initDatabase(QDir home);
+
+    QString sessionid;
+    static int session;
 
 };
 #endif
