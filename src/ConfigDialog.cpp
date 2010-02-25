@@ -166,6 +166,7 @@ void ConfigDialog::save_Clicked()
     settings->setValue(GC_INITIAL_LTS, cyclistPage->perfManStart->text());
     settings->setValue(GC_STS_DAYS, cyclistPage->perfManSTSavg->text());
     settings->setValue(GC_LTS_DAYS, cyclistPage->perfManLTSavg->text());
+    settings->setValue(GC_SB_TODAY, (int) cyclistPage->showSBToday->isChecked());
 
     // set default stress names if not set:
     settings->setValue(GC_STS_NAME, settings->value(GC_STS_NAME,tr("Short Term Stress")));

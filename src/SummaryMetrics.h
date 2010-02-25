@@ -25,51 +25,22 @@
 class SummaryMetrics
 {
 	public:
-		SummaryMetrics();
-	    QString getFileName();
-		double getDistance();
-		double getSpeed();
-		double getWatts();
-		double getBikeScore();
-		double getXPower();
-		double getCadence();
-		double getHeartRate();
-		double getRideTime();
-	    double getWorkoutTime();
-	    double getTotalWork();
-	    double getRelativeIntensity();
-        QDateTime getRideDate();
-	
-	    void setDistance(double _distance);
-	    void setSpeed(double _speed);
-		void setWatts(double _watts);
-		void setBikeScore(double _bikescore);
-	    void setXPower(double _xPower);
-	    void setCadence(double _cadence);
-		void setHeartRate(double _heartRate);
-    	void setWorkoutTime(double _workoutTime);
-	    void setRideTime(double _rideTime);
-	    void setFileName(QString _filename);
-	    void setTotalWork(double _totalWork);
-		void setRelativeIntensity(double _relativeIntensity);
-        void setRideDate(QDateTime _rideDate);
+        // filename
+	    QString getFileName() { return fileName; }
+        void    setFileName(QString fileName) { this->fileName = fileName; }
 
+        // ride date
+        QDateTime getRideDate() { return rideDate; }
+        void setRideDate(QDateTime rideDate) { this->rideDate = rideDate; }
+
+        // metric values
+        void setForSymbol(QString symbol, double v) { value.insert(symbol, v); }
+        double getForSymbol(QString symbol) { return value.value(symbol, 0.0); }
 
 	private:
-		double distance;
-		double speed;
-		double watts;
-		double bikeScore;
-		double xPower;
-		double cadence;
-		double heartRate;
-		double rideTime;
 	    QString fileName;
-	    double totalWork;
-	    double workoutTime;
-	    double relativeIntensity;
         QDateTime rideDate;
-
+        QMap<QString, double> value;
 };
 
 

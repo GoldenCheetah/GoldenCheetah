@@ -16,8 +16,6 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-
-
 #include "MetricAggregator.h"
 #include "DBAccess.h"
 #include "RideFile.h"
@@ -29,45 +27,109 @@
 #include <assert.h>
 #include <math.h>
 #include <QtXml/QtXml>
+#include <QProgressDialog>
 
-MetricAggregator::MetricAggregator()
+bool MetricAggregator::isclean = false;
+
+MetricAggregator::MetricAggregator(MainWindow *parent, QDir home, const Zones *zones) : QWidget(parent), parent(parent), home(home), zones(zones)
 {
+    dbaccess = new DBAccess(home);
+    connect(parent, SIGNAL(configChanged()), this, SLOT(update()));
+    connect(parent, SIGNAL(rideAdded(RideItem*)), this, SLOT(update(void)));
+    connect(parent, SIGNAL(rideDeleted(RideItem*)), this, SLOT(update(void)));
 }
 
-void MetricAggregator::aggregateRides(QDir home, const Zones *zones)
+MetricAggregator::~MetricAggregator()
 {
-    qDebug() << QDateTime::currentDateTime();
-    DBAccess *dbaccess = new DBAccess(home);
-    dbaccess->dropMetricTable();
-    dbaccess->createDatabase();
+    // close the database connection
+    if (dbaccess != NULL) {
+        dbaccess->closeConnection();
+        delete dbaccess;
+    }
+}
+
+/*----------------------------------------------------------------------
+ * Refresh the database -- only updates metrics when they are out
+ *                         of date or missing altogether or where
+ *                         the ride file no longer exists
+ *----------------------------------------------------------------------*/
+void MetricAggregator::refreshMetrics()
+{
+    // only if we have established a connection to the database
+    if (dbaccess == NULL || isclean==true) return;
+
+    // Get a list of the ride files
     QRegExp rx = RideFileFactory::instance().rideFileRegExp();
     QStringList errors;
-    QStringListIterator i(RideFileFactory::instance().listRideFiles(home));
+    QStringList filenames = RideFileFactory::instance().listRideFiles(home);
+    QStringListIterator i(filenames);
+
+    // get a Hash map of statistic records and timestamps
+    QSqlQuery query(dbaccess->connection());
+    QHash <QString, unsigned long> dbStatus;
+    bool rc = query.exec("SELECT filename, timestamp FROM metrics ORDER BY ride_date;");
+    while (rc && query.next()) {
+        QString filename = query.value(0).toString();
+        unsigned long timestamp = query.value(1).toInt();
+        dbStatus.insert(filename, timestamp);
+    }
+
+    // Delete statistics for non-existant ride files
+    QHash<QString, unsigned long>::iterator d;
+    for (d = dbStatus.begin(); d != dbStatus.end(); ++d) {
+        if (QFile(home.absolutePath() + "/" + d.key()).exists() == false) {
+            dbaccess->deleteRide(d.key());
+        }
+    }
+
+    // get power.zones timestamp to refresh on CP changes
+    unsigned long zonesTimeStamp = 0;
+    QString zonesfile = home.absolutePath() + "/power.zones";
+    if (QFileInfo(zonesfile).exists())
+        zonesTimeStamp = QFileInfo(zonesfile).lastModified().toTime_t();
+
+    // update statistics for ride files which are out of date
+    // showing a progress bar as we go
+    QProgressDialog bar("Refreshing Metrics Database...", "Abort", 0, filenames.count(), parent);
+    bar.setWindowModality(Qt::WindowModal);
+    int processed=0;
     while (i.hasNext()) {
         QString name = i.next();
         QFile file(home.absolutePath() + "/" + name);
-        RideFile *ride = RideFileFactory::instance().openRideFile(file, errors);
-        importRide(home, zones, ride, name, dbaccess);
-    }
-    dbaccess->closeConnection();
-    delete dbaccess;
-    qDebug() << QDateTime::currentDateTime();
 
+        // if it s missing or out of date then update it!
+        unsigned long dbTimeStamp = dbStatus.value(name, 0);
+        if (dbTimeStamp < QFileInfo(file).lastModified().toTime_t() ||
+            dbTimeStamp < zonesTimeStamp) {
+
+            // read file and process it
+            RideFile *ride = RideFileFactory::instance().openRideFile(file, errors);
+            if (ride != NULL) {
+                importRide(home, ride, name, (dbTimeStamp > 0));
+                delete ride;
+            }
+        }
+        // update progress bar
+        bar.setValue(++processed);
+        QApplication::processEvents();
+
+        if (bar.wasCanceled())
+            break;
+    }
+    isclean = true;
 }
 
-bool MetricAggregator::importRide(QDir path, const Zones *zones, RideFile *ride, QString fileName, DBAccess *dbaccess)
+/*----------------------------------------------------------------------
+ * Calculate the metrics for a ride file using the metrics factory
+ *----------------------------------------------------------------------*/
+bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, bool modify)
 {
-
     SummaryMetrics *summaryMetric = new SummaryMetrics();
-
-
     QFile file(path.absolutePath() + "/" + fileName);
 
     QRegExp rx = RideFileFactory::instance().rideFileRegExp();
     if (!rx.exactMatch(fileName)) {
-        fprintf(stderr, "bad name: %s\n", fileName.toAscii().constData());
-        assert(false);
-        return false;
+        return false; // not a ridefile!
     }
     summaryMetric->setFileName(fileName);
     assert(rx.numCaptures() == 7);
@@ -77,89 +139,37 @@ bool MetricAggregator::importRide(QDir path, const Zones *zones, RideFile *ride,
 
     summaryMetric->setRideDate(dateTime);
 
-    int zone_range = zones->whichRange(dateTime.date());
-
     const RideMetricFactory &factory = RideMetricFactory::instance();
-    QSet<QString> todo;
+    QStringList metrics;
 
     for (int i = 0; i < factory.metricCount(); ++i)
-        todo.insert(factory.metricName(i));
+        metrics << factory.metricName(i);
 
+    // compute all the metrics
+    QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(ride, zones, metrics);
 
-    while (!todo.empty()) {
-        QMutableSetIterator<QString> i(todo);
-later:
-        while (i.hasNext()) {
-            const QString &name = i.next();
-            const QVector<QString> &deps = factory.dependencies(name);
-            for (int j = 0; j < deps.size(); ++j)
-                if (!metrics.contains(deps[j]))
-                    goto later;
-            RideMetric *metric = factory.newMetric(name);
-            metric->compute(ride, zones, zone_range, metrics);
-            metrics.insert(name, metric);
-            i.remove();
-            double value = metric->value(true);
-            if(name ==  "workout_time")
-                summaryMetric->setWorkoutTime(value);
-            else if(name == "average_cad")
-                summaryMetric->setCadence(value);
-            else if(name == "total_distance")
-                summaryMetric->setDistance(value);
-            else if(name == "skiba_xpower")
-                summaryMetric->setXPower(value);
-            else if(name == "average_speed")
-                summaryMetric->setSpeed(value);
-            else if(name == "total_work")
-                summaryMetric->setTotalWork(value);
-            else if(name == "average_power")
-                summaryMetric->setWatts(value);
-            else if(name == "time_riding")
-                summaryMetric->setRideTime(value);
-            else if(name == "average_hr")
-                summaryMetric->setHeartRate(value);
-            else if(name == "skiba_relative_intensity")
-                summaryMetric->setRelativeIntensity(value);
-            else if(name == "skiba_bike_score")
-                summaryMetric->setBikeScore(value);
-
-        }
+    // get metrics into summaryMetric QMap
+    for(int i = 0; i < factory.metricCount(); ++i) {
+        summaryMetric->setForSymbol(factory.metricName(i), computed.value(factory.metricName(i))->value(true));
     }
 
-    dbaccess->importRide(summaryMetric);
+    dbaccess->importRide(summaryMetric, modify);
     delete summaryMetric;
 
     return true;
-
 }
 
-void MetricAggregator::scanForMissing(QDir home, const Zones *zones)
+/*----------------------------------------------------------------------
+ * Query functions are wrappers around DBAccess functions
+ *----------------------------------------------------------------------*/
+QList<SummaryMetrics>
+MetricAggregator::getAllMetricsFor(QDateTime start, QDateTime end)
 {
-    QStringList errors;
-    DBAccess *dbaccess = new DBAccess(home);
-    QStringList filenames = dbaccess->getAllFileNames();
-    QRegExp rx = RideFileFactory::instance().rideFileRegExp();
-    QStringListIterator i(RideFileFactory::instance().listRideFiles(home));
-    while (i.hasNext()) {
-        QString name = i.next();
-        if(!filenames.contains(name))
-        {
-            qDebug() << "Found missing file: " << name;
-            QFile file(home.absolutePath() + "/" + name);
-            RideFile *ride = RideFileFactory::instance().openRideFile(file, errors);
-            importRide(home, zones, ride, name, dbaccess);
+    if (isclean == false) refreshMetrics(); // get them up-to-date
 
-        }
+    QList<SummaryMetrics> empty;
 
-    }
-    dbaccess->closeConnection();
-    delete dbaccess;
-
+    // only if we have established a connection to the database
+    if (dbaccess == NULL) return empty;
+    return dbaccess->getAllMetricsFor(start, end);
 }
-
-void MetricAggregator::resetMetricTable(QDir home)
-{
-    DBAccess dbAccess(home);
-    dbAccess.dropMetricTable();
-}
-

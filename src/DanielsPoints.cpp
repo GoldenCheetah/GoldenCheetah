@@ -43,8 +43,10 @@ class DanielsPoints : public RideMetric {
     DanielsPoints() : score(0.0) {}
     QString symbol() const { return "daniels_points"; }
     QString name() const { return QObject::tr("Daniels Points"); }
+    MetricType type() const { return RideMetric::Total; }
     QString units(bool) const { return ""; }
     int precision() const { return 0; }
+    double conversion() const { return 1.0; }
     double value(bool) const { return score; }
     void compute(const RideFile *ride, const Zones *zones,
                  int zoneRange, const QHash<QString,RideMetric*> &) {
@@ -119,7 +121,9 @@ class DanielsEquivalentPower : public RideMetric {
     QString name() const { return QObject::tr("Daniels EqP"); }
     QString units(bool) const { return "watts"; }
     int precision() const { return 0; }
+    double conversion() const { return 1.0; }
     double value(bool) const { return watts; }
+    MetricType type() const { return RideMetric::Average; }
     void compute(const RideFile *, const Zones *zones, int zoneRange,
 	    const QHash<QString,RideMetric*> &deps) {
 	if (!zones || zoneRange < 0)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 Justin F. Knotzke (jknotzke@shampoo.ca)
+ * Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,18 +16,18 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _seasonparser_h
-#define _seasonparser_h
+#ifndef _GC_LTMChartParser_h
+#define _GC_LTMChartParser_h 1
 
 #include <QXmlDefaultHandler>
-#include "Season.h"
+#include "LTMSettings.h"
+#include "LTMTool.h"
 
-class SeasonParser : public QXmlDefaultHandler
+class LTMChartParser : public QXmlDefaultHandler
 {
 
 public:
-    // marshall
-    static bool serialize(QString, QList<Season>);
+    static void serialize(QString, QList<LTMSettings>);
 
     // unmarshall
     bool startDocument();
@@ -35,13 +35,13 @@ public:
     bool endElement( const QString&, const QString&, const QString &qName );
     bool startElement( const QString&, const QString&, const QString &name, const QXmlAttributes &attrs );
     bool characters( const QString& str );
-    QList<Season> getSeasons();
+    QList<LTMSettings> getSettings();
 
 protected:
     QString buffer;
-    QDate seasonDateToDate(QString);
-    Season season;
-    QList<Season> seasons;
-
+    LTMSettings setting;
+    MetricDetail metric;
+    int red, green, blue;
+    QList<LTMSettings> settings;
 };
-#endif //SeasonParser
+#endif

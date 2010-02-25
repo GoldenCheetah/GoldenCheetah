@@ -36,6 +36,8 @@ class PfPvWindow;
 class QwtPlotPanner;
 class QwtPlotPicker;
 class QwtPlotZoomer;
+class LTMWindow;
+class MetricAggregator;
 class ModelWindow;
 class RealtimeWindow;
 class RideFile;
@@ -94,6 +96,8 @@ class MainWindow : public QMainWindow
         void zonesChanged();
         void configChanged();
         void viewChanged(int);
+        void rideAdded(RideItem *);
+        void rideDeleted(RideItem *);
 
     private slots:
         void rideTreeWidgetSelectionChanged();
@@ -158,6 +162,8 @@ class MainWindow : public QMainWindow
         AllPlotWindow *allPlotWindow;
         HistogramWindow *histogramWindow;
         WeeklySummaryWindow *weeklySummaryWindow;
+        MetricAggregator *metricDB;
+        LTMWindow *ltmWindow;
         CriticalPowerWindow *criticalPowerWindow;
         ModelWindow *modelWindow;
         AerolabWindow *aerolabWindow;

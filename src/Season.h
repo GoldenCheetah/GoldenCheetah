@@ -23,21 +23,51 @@
 #include <QDate>
 #include <QFile>
 
+#include "MainWindow.h"
+
 class Season 
 {
 	public:
+        enum SeasonType { season=0, cycle=1, adhoc=2, temporary=3 };
+        //typedef enum seasontype SeasonType;
+
 		Season();
         QDate getStart();
         QDate getEnd();
         QString getName();
-        
+        int getType();
+
+
         void setStart(QDate _start);
         void setEnd(QDate _end);
         void setName(QString _name);
+        void setType(int _type);
         
 	private:
         QDate start;
         QDate end;
         QString name;
+        int type;
+};
+
+class EditSeasonDialog : public QDialog
+{
+    Q_OBJECT
+
+    public:
+        EditSeasonDialog(MainWindow *, Season *);
+
+    public slots:
+        void applyClicked();
+        void cancelClicked();
+
+    private:
+        MainWindow *mainWindow;
+        Season *season;
+
+        QPushButton *applyButton, *cancelButton;
+        QLineEdit *nameEdit;
+        QComboBox *typeEdit;
+        QDateEdit *fromEdit, *toEdit;
 };
 #endif /* SEASON_H_ */

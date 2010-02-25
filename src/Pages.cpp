@@ -208,6 +208,9 @@ CyclistPage::CyclistPage(const Zones *_zones):
     lblCurRange->setText(QString("Current Zone Range: %1").arg(currentRange + 1));
 
     perfManLabel = new QLabel(tr("Performance Manager"));
+    showSBToday = new QCheckBox(tr("Show Stress Balance Today"), this);
+    showSBToday->setChecked(settings->value(GC_SB_TODAY).toInt());
+
     perfManStartLabel = new QLabel(tr("Starting LTS"));
     perfManSTSLabel = new QLabel(tr("STS average (days)"));
     perfManLTSLabel = new QLabel(tr("LTS average (days)"));
@@ -216,6 +219,7 @@ CyclistPage::CyclistPage(const Zones *_zones):
     perfManLTSavgValidator = new QIntValidator(7,56,this);
     QVariant perfManStartVal = settings->value(GC_INITIAL_STS);
     QVariant perfManSTSVal = settings->value(GC_STS_DAYS);
+
     if (perfManSTSVal.isNull() || perfManSTSVal.toInt() == 0)
 	perfManSTSVal = 7;
     QVariant perfManLTSVal = settings->value(GC_LTS_DAYS);
@@ -279,6 +283,7 @@ CyclistPage::CyclistPage(const Zones *_zones):
     perfManSTSavgLayout->addWidget(perfManSTSavg);
     perfManLTSavgLayout->addWidget(perfManLTSLabel);
     perfManLTSavgLayout->addWidget(perfManLTSavg);
+    perfManLayout->addWidget(showSBToday);
     perfManLayout->addLayout(perfManStartValLayout);
     perfManLayout->addLayout(perfManSTSavgLayout);
     perfManLayout->addLayout(perfManLTSavgLayout);

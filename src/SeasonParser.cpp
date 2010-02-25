@@ -33,10 +33,18 @@ bool SeasonParser::endElement( const QString&, const QString&, const QString &qN
         season.setName(buffer.trimmed());
     else if(qName == "startdate")
         season.setStart(seasonDateToDate(buffer.trimmed()));
+    else if(qName == "enddate")
+        season.setEnd(seasonDateToDate(buffer.trimmed()));
+    else if (qName == "type")
+        season.setType(buffer.trimmed().toInt());
     else if(qName == "season")
     {
-        if(seasons.size() >= 1)
-            seasons[seasons.size()-1].setEnd(season.getStart());
+        if(seasons.size() >= 1) {
+            // only set end date for previous season if
+            // it is not null
+            if (seasons[seasons.size()-1].getEnd() == QDate())
+                seasons[seasons.size()-1].setEnd(season.getStart());
+        }
         seasons.append(season);
     }
     return TRUE;
@@ -84,7 +92,47 @@ QDate SeasonParser::seasonDateToDate(QString seasonDate)
 }
 bool SeasonParser::endDocument()
 {
-    // Go 10 years into the future (GC's version of infinity)
-    seasons[seasons.size()-1].setEnd(QDate::currentDate().addYears(10));
+    // Go 10 years into the future if not defined in the file
+    if (seasons.size() > 0) {
+        if (seasons[seasons.size()-1].getEnd() == QDate())
+            seasons[seasons.size()-1].setEnd(QDate::currentDate().addYears(10));
+    }
     return TRUE;
+}
+
+bool
+SeasonParser::serialize(QString filename, QList<Season>Seasons)
+{
+    // open file - truncate contents
+    QFile file(filename);
+    file.open(QFile::WriteOnly);
+    file.resize(0);
+    QTextStream out(&file);
+
+    // begin document
+    out << "<seasons>\n";
+
+    // write out to file
+    foreach (Season season, Seasons) {
+        if (season.getType() != Season::temporary) {
+            out<<QString("\t<season>\n"
+                  "\t\t<name>%1</name>\n"
+                  "\t\t<startdate>%2</startdate>\n"
+                  "\t\t<enddate>%3</enddate>\n"
+                  "\t\t<type>%4</type>\n"
+                  "\t</season>\n")
+            .arg(season.getName())
+            .arg(season.getStart().toString("yyyy-MM-dd"))
+            .arg(season.getEnd().toString("yyyy-MM-dd"))
+            .arg(season.getType());
+        }
+    }
+
+    // end document
+    out << "</seasons>\n";
+
+    // close file
+    file.close();
+
+    return true; // success
 }

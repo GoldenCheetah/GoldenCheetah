@@ -45,6 +45,13 @@ struct RideMetric {
     // using QObject::tr().
     virtual QString name() const = 0;
 
+    // What type of metric is this?
+    // Drives the way metrics combined over a day or week in the
+    // Long term metrics charts
+    enum metrictype { Total, Average, Peak } types;
+    typedef enum metrictype MetricType;
+    virtual MetricType type() const = 0;
+
     // The units in which this RideMetric is expressed.  It should be
     // translated using QObject::tr().
     virtual QString units(bool metric) const = 0;
@@ -55,6 +62,9 @@ struct RideMetric {
 
     // The actual value of this ride metric, in the units above.
     virtual double value(bool metric) const = 0;
+
+    // Factor to multiple value to convert from metric to imperial
+    virtual double conversion() const = 0;
 
     // Compute the ride metric from a file.
     virtual void compute(const RideFile *ride, 
@@ -98,6 +108,7 @@ class AvgRideMetric : public RideMetric {
         if (count == 0) return 0.0;
         return total / count;
     }
+    int type() { return RideMetric::Average; }
     void aggregateWith(const RideMetric &other) { 
         assert(symbol() == other.symbol());
         const AvgRideMetric &as = dynamic_cast<const AvgRideMetric&>(other);
@@ -112,6 +123,7 @@ class RideMetricFactory {
     static QVector<QString> noDeps;
 
     QVector<QString> metricNames;
+    QVector<RideMetric::MetricType> metricTypes;
     QHash<QString,RideMetric*> metrics;
     QHash<QString,QVector<QString>*> dependencyMap;
     bool dependenciesChecked;
@@ -140,6 +152,8 @@ class RideMetricFactory {
     int metricCount() const { return metricNames.size(); }
 
     const QString &metricName(int i) const { return metricNames[i]; }
+    const RideMetric::MetricType &metricType(int i) const { return metricTypes[i]; }
+    const RideMetric *rideMetric(QString name) const { return metrics.value(name, NULL); }
 
     bool haveMetric(const QString &symbol) const {
         return metrics.contains(symbol);
@@ -156,6 +170,7 @@ class RideMetricFactory {
         assert(!metrics.contains(metric.symbol()));
         metrics.insert(metric.symbol(), metric.clone());
         metricNames.append(metric.symbol());
+        metricTypes.append(metric.type());
         if (deps) {
             QVector<QString> *copy = new QVector<QString>;
             for (int i = 0; i < deps->size(); ++i)

@@ -62,6 +62,8 @@ class PerformanceManagerWindow : public QWidget
 	StressCalculator *sc;
 
         MainWindow *mainWindow;
+    bool active;
+
 	PerfPlot *perfplot;
 	QLineEdit *PMSTSValue;
 	QLineEdit *PMLTSValue;
