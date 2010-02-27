@@ -39,31 +39,31 @@ class GoogleMapControl : public QWidget
 Q_OBJECT
 
  private:
-	QVBoxLayout *layout;
-	QWebView *view;
-	RideItem *ride;
-	MainWindow *parent;
-	std::string CreatePolyLine(RideItem *);
-	void CreateSubPolyLine(const std::vector<RideFilePoint> &points,
-						   std::ostringstream &oss,
-						   QColor color);
-	std::string CreateIntervalMarkers(RideItem *);
-	GoogleMapControl();
-	QColor GetColor(int cp, int watts);
-	// tabIndex tracks the index of the Maps tab, -1 means it's not showing
-	int tabIndex;
-	QTabWidget *tabWidget;
+    QVBoxLayout *layout;
+    QWebView *view;
+    RideItem *ride;
+    MainWindow *parent;
+    std::string CreatePolyLine(RideItem *);
+    void CreateSubPolyLine(const std::vector<RideFilePoint> &points,
+                           std::ostringstream &oss,
+                           QColor color);
+    std::string CreateIntervalMarkers(RideItem *);
+    GoogleMapControl();
+    QColor GetColor(int cp, int watts);
+    // tabIndex tracks the index of the Maps tab, -1 means it's not showing
+    int tabIndex;
+    QTabWidget *tabWidget;
 
  public slots:
-	void rideSelected();
+    void rideSelected();
 
  protected:
-	void createHtml();
-	void resizeEvent(QResizeEvent *);
+    void createHtml();
+    void resizeEvent(QResizeEvent *);
 
  public:
-	GoogleMapControl(MainWindow *,QTabWidget *);
-	virtual ~GoogleMapControl() { }
+    GoogleMapControl(MainWindow *,QTabWidget *);
+    virtual ~GoogleMapControl() { }
 };
 
 #endif
