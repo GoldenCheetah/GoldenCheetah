@@ -269,7 +269,7 @@ SaveOnExitDialogWidget::SaveOnExitDialogWidget(MainWindow *mainWindow, QList<Rid
     mainLayout->addLayout(buttonLayout);
 
     // Don't warn me!
-    exitWarnCheckBox = new QCheckBox(tr("Always check for unsaved chages on exit"), this);
+    exitWarnCheckBox = new QCheckBox(tr("Always check for unsaved changes on exit"), this);
     exitWarnCheckBox->setChecked(true);
     mainLayout->addWidget(exitWarnCheckBox);
 
