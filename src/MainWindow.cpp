@@ -311,7 +311,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     ///////////////////////////// GoogleMapsb //////////////////////////////////
 
-	googleMap = new GoogleMapControl(this,tabWidget);
+    googleMap = new GoogleMapControl(this,tabWidget);
 
     ////////////////////////////// Signals ////////////////////////////// 
 

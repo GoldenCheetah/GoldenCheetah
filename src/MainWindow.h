@@ -168,7 +168,7 @@ class MainWindow : public QMainWindow
         CriticalPowerWindow *criticalPowerWindow;
         ModelWindow *modelWindow;
         AerolabWindow *aerolabWindow;
-		GoogleMapControl *googleMap;
+        GoogleMapControl *googleMap;
         QTreeWidgetItem *allRides;
         QTreeWidgetItem *allIntervals;
         QSplitter *leftLayout;
