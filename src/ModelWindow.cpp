@@ -30,7 +30,6 @@
 void
 ModelWindow::addStandardChannels(QComboBox *box)
 {
-    box->addItem(tr("None"), MODEL_NONE);
     box->addItem(tr("Power"), MODEL_POWER);
     box->addItem(tr("Cadence"), MODEL_CADENCE);
     box->addItem(tr("Heartrate"), MODEL_HEARTRATE);
@@ -72,22 +71,22 @@ ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) :
     // selectors
     xSelector = new QComboBox;
     addStandardChannels(xSelector);
-    xSelector->setCurrentIndex(1); // power
+    xSelector->setCurrentIndex(0); // power
 
     ySelector = new QComboBox;
     addStandardChannels(ySelector);
-    ySelector->setCurrentIndex(2); // cadence
+    ySelector->setCurrentIndex(1); // cadence
 
     zSelector = new QComboBox;
     addStandardChannels(zSelector);
     zSelector->addItem(tr("Time at X&Y"), MODEL_XYTIME);
-    zSelector->setCurrentIndex(11); // time at xy
+    zSelector->setCurrentIndex(10); // time at xy
 
     colorSelector = new QComboBox;
     addStandardChannels(colorSelector);
     colorSelector->addItem(tr("Power Zone"), MODEL_POWERZONE);
     colorSelector->addItem(tr("Time at X&Y"), MODEL_XYTIME);
-    colorSelector->setCurrentIndex(11); // power zone
+    colorSelector->setCurrentIndex(10); // power zone
 
     styleSelector = new QComboBox;
     styleSelector->addItem(tr("Bar"));
@@ -308,9 +307,9 @@ static struct preset {
 } presets[] = {
 
     { "User Defined", 0, 0, 0, 0, true, 20 },
-    { "Natural Cadence Selection", 1, 2, 11, 11, false, 5 }, // don't ignore zero for cadences!
-    { "Power Fatigue", 10, 1, 11, 11, true, 5 },
-    { "Impact of Altitude", 5, 3, 1, 11, true, 10 },
+    { "Natural Cadence Selection", 0, 1, 10, 10, false, 5 }, // don't ignore zero for cadences!
+    { "Power Fatigue", 9, 0, 10, 10, true, 5 },
+    { "Impact of Altitude", 4, 2, 0, 10, true, 10 },
     { "", 0, 0, 0, 0, false, 0 }
 };
 
