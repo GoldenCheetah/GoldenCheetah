@@ -567,6 +567,7 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
         const RideMetricFactory &factory = RideMetricFactory::instance();
         double value;
         QString units;
+        int precision;
         QString datestr;
 
         LTMScaleDraw *lsd = new LTMScaleDraw(settings->start, groupForDate(settings->start.date(), settings->groupBy), settings->groupBy);
@@ -590,27 +591,31 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
             if (c.value() == curve) {
                 const RideMetric *metric =factory.rideMetric(c.key());
                 units = metric ? metric->units(useMetricUnits) : "";
+                precision = metric ? metric->precision() : 1;
+
                 // BikeScore, RI and Daniels Points have no units
                 if (units == "" && metric != NULL) {
                     QTextEdit processHTML(factory.rideMetric(c.key())->name());
                     units  = processHTML.toPlainText();
                 }
+                break;
             }
         }
+
+        // the point value
+        value = curve->y(index);
+
+        // convert seconds to hours for the LTM plot
         if (units == "seconds") {
             units = "hours"; // we translate from seconds to hours
             value = ceil(curve->y(index)*10.0)/10.0;
-        } else if (units.contains("Relative Intensity") ||
-                   units.endsWith("VI"))
-            value = ceil(curve->y(index)*100.00)/100.00;
-        else value = (int)curve->y(index);
+        }
 
-        // but then we use the user defined values when we
         // output the tooltip
         QString text = QString("%1\n%2\n%3 %4")
                         .arg(datestr)
                         .arg(curve->title().text())
-                        .arg(value)
+                        .arg(value, 0, 'f', precision)
                         .arg(this->axisTitle(curve->yAxis()).text());
 
         // set that text up
