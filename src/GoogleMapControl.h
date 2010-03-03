@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (c) 2009 Greg Lonnon (greg.lonnon@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
