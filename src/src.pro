@@ -7,7 +7,7 @@ TARGET = GoldenCheetah
 DEPENDPATH += .
 !isEmpty( BOOST_INCLUDE ) { INCLUDEPATH += $${BOOST_INCLUDE} }
 INCLUDEPATH += ../qwt/src
-QT += xml sql network
+QT += xml sql network webkit
 LIBS += ../qwt/lib/libqwt.a
 LIBS += -lm
 
@@ -31,14 +31,6 @@ LIBS += -lm
     HEADERS += ModelPlot.h ModelWindow.h
     SOURCES += ModelPlot.cpp ModelWindow.cpp
     DEFINES += GC_HAVE_QWTPLOT3D
-}
-
-!isEmpty ( MapsSupport )
-{
-   QT += webkit
-   SOURCES += GoogleMapControl.cpp
-   HEADERS += GoogleMapControl.h
-   DEFINES += GC_MAP_SUPPORT
 }
 
 macx {
@@ -82,6 +74,7 @@ HEADERS += \
         ErgFile.h \
         ErgFilePlot.h \
         GcRideFile.h \
+        GoogleMapControl.h \
         HistogramWindow.h \
         IntervalItem.h \
         LogTimeScaleDraw.h \
@@ -173,6 +166,7 @@ SOURCES += \
         ErgFile.cpp \
         ErgFilePlot.cpp \
         GcRideFile.cpp \
+        GoogleMapControl.cpp \
         HistogramWindow.cpp \
         IntervalItem.cpp \
         LogTimeScaleDraw.cpp \
