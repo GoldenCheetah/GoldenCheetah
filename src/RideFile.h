@@ -121,6 +121,8 @@ class RideFile
         void resetDataPresent();
 
         double timeToDistance(double) const;  // get distance in km at time in secs
+        int timeIndex(double) const;          // get index offset for time in secs
+        int distanceIndex(double) const;      // get index offset for distance in KM
 
         QMap<QString,QMap<QString,QString> > metricOverrides;
 };

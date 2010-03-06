@@ -55,7 +55,13 @@ RideFile::fillInIntervals()
         mark();
 }
 
-struct ComparePoints {
+struct ComparePointKm {
+    bool operator()(const RideFilePoint *p1, const RideFilePoint *p2) {
+        return p1->km < p2->km;
+    }
+};
+
+struct ComparePointSecs {
     bool operator()(const RideFilePoint *p1, const RideFilePoint *p2) {
         return p1->secs < p2->secs;
     }
@@ -67,7 +73,7 @@ RideFile::intervalBegin(const RideFileInterval &interval) const
     RideFilePoint p;
     p.secs = interval.start;
     QVector<RideFilePoint*>::const_iterator i = std::lower_bound(
-        dataPoints_.begin(), dataPoints_.end(), &p, ComparePoints());
+        dataPoints_.begin(), dataPoints_.end(), &p, ComparePointSecs());
     if (i == dataPoints_.end())
         return dataPoints_.size();
     return i - dataPoints_.begin();
@@ -84,8 +90,36 @@ RideFile::timeToDistance(double secs) const
     if (secs < dataPoints_.first()->secs) return dataPoints_.first()->km;
     if (secs > dataPoints_.last()->secs) return dataPoints_.last()->km;
 
-    QVector<RideFilePoint*>::const_iterator i = std::lower_bound(dataPoints_.begin(), dataPoints_.end(), &p, ComparePoints());
+    QVector<RideFilePoint*>::const_iterator i = std::lower_bound(dataPoints_.begin(), dataPoints_.end(), &p, ComparePointSecs());
     return (*i)->km;
+}
+
+int
+RideFile::timeIndex(double secs) const
+{
+    // return index offset for specified time
+    RideFilePoint p;
+    p.secs = secs;
+
+    QVector<RideFilePoint*>::const_iterator i = std::lower_bound(
+        dataPoints_.begin(), dataPoints_.end(), &p, ComparePointSecs());
+    if (i == dataPoints_.end())
+        return dataPoints_.size();
+    return i - dataPoints_.begin();
+}
+
+int
+RideFile::distanceIndex(double km) const
+{
+    // return index offset for specified distance in km
+    RideFilePoint p;
+    p.km = km;
+
+    QVector<RideFilePoint*>::const_iterator i = std::lower_bound(
+        dataPoints_.begin(), dataPoints_.end(), &p, ComparePointKm());
+    if (i == dataPoints_.end())
+        return dataPoints_.size();
+    return i - dataPoints_.begin();
 }
 
 void RideFile::writeAsCsv(QFile &file, bool bIsMetric) const
@@ -159,7 +193,7 @@ RideFileFactory::rideFileRegExp() const
 {
     QStringList suffixList = RideFileFactory::instance().suffixes();
     QString s("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.(%1)$");
-    return QRegExp(s.arg(suffixList.join("|")), Qt::CaseInsensitive);
+    return QRegExp(s.arg(suffixList.join("|")));
 }
 
 RideFile *RideFileFactory::openRideFile(QFile &file,

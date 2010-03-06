@@ -38,8 +38,8 @@ class AllPlotWindow : public QWidget
 
         AllPlotWindow(MainWindow *mainWindow);
         void setData(RideItem *ride);
-        void setStartSelection(double seconds);
-        void setEndSelection(double seconds, bool newInterval, QString name);
+        void setStartSelection(AllPlot* plot, int xPosition);
+        void setEndSelection(AllPlot* plot, int xPosition, bool newInterval, QString name);
         void clearSelection();
         void hideSelection();
         void zoomInterval(IntervalItem *); // zoom into a specified interval
@@ -53,6 +53,16 @@ class AllPlotWindow : public QWidget
         void zonesChanged();
         void intervalsChanged();
 
+        void setShowStack(int state);
+        void setShowPower(int state);
+        void setShowHr(int state);
+        void setShowSpeed(int state);
+        void setShowCad(int state);
+        void setShowAlt(int state);
+        void setShowGrid(int state);
+        void setSmoothing(int value);
+        void setByDistance(int value);
+
     protected:
 
         // whilst we refactor, lets make friend
@@ -63,13 +73,15 @@ class AllPlotWindow : public QWidget
 
         MainWindow *mainWindow;
         AllPlot *allPlot;
+        QList <AllPlot *> allPlots;
+        QList <QwtPlotPicker *> allPickers;
+
+        QScrollArea *stackFrame;
         QwtPlotPanner *allPanner;
         QwtPlotZoomer *allZoomer;
         QwtPlotPicker *allPicker;
         int selection;
-        QwtPlotMarker *allMarker1;
-        QwtPlotMarker *allMarker2;
-        QwtPlotMarker *allMarker3;
+        QCheckBox *showStack;
 	QCheckBox *showHr;
 	QCheckBox *showSpeed;
 	QCheckBox *showCad;
@@ -80,8 +92,12 @@ class AllPlotWindow : public QWidget
 
     private:
         void showInfo(QString);
+        void resetStackedDatas();
+        int stackWidth;
 
     private slots:
+        void addPickers(AllPlot *allPlot2);
+
         void plotPickerMoved(const QPoint &);
         void plotPickerSelected(const QPoint &);
 };

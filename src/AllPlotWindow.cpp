@@ -27,6 +27,7 @@
 #include "TimeUtils.h"
 #include "Settings.h"
 #include "Units.h" // for MILES_PER_KM
+#include <qwt_plot_layout.h>
 #include <qwt_plot_panner.h>
 #include <qwt_plot_zoomer.h>
 #include <qwt_plot_picker.h>
@@ -40,6 +41,12 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     QHBoxLayout *showLayout = new QHBoxLayout;
     QLabel *showLabel = new QLabel(tr("Show:"), this);
     showLayout->addWidget(showLabel);
+
+    showStack = new QCheckBox(tr("Stacked view"), this);
+    showStack->setCheckState(Qt::Unchecked);
+    showLayout->addWidget(showStack);
+
+    stackWidth = 15;
 
     QCheckBox *showGrid = new QCheckBox(tr("Grid"), this);
     showGrid->setCheckState(Qt::Checked);
@@ -135,38 +142,51 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     connect(allPicker, SIGNAL(appended(const QPoint &)),
                 SLOT(plotPickerSelected(const QPoint &)));
 
-    allMarker1 = new QwtPlotMarker();
+    QwtPlotMarker* allMarker1 = new QwtPlotMarker();
     allMarker1->setLineStyle(QwtPlotMarker::VLine);
     allMarker1->attach(allPlot);
     allMarker1->setLabelAlignment(Qt::AlignTop|Qt::AlignRight);
+    allPlot->allMarker1=allMarker1;
 
-    allMarker2 = new QwtPlotMarker();
+    QwtPlotMarker* allMarker2 = new QwtPlotMarker();
     allMarker2->setLineStyle(QwtPlotMarker::VLine);
     allMarker2->attach(allPlot);
+    allMarker2->setLabelAlignment(Qt::AlignTop|Qt::AlignRight);
+    allPlot->allMarker2=allMarker2;
 
-    allMarker3 = new QwtPlotMarker();
+    QwtPlotMarker* allMarker3 = new QwtPlotMarker();
     allMarker3->setLineStyle(QwtPlotMarker::VLine);
     allMarker3->attach(allPlot);
+    allPlot->allMarker3=allMarker3;
+
+
+    stackFrame = new QScrollArea();
+    stackFrame->hide();
 
     vlayout->addWidget(allPlot);
+    vlayout->addWidget(stackFrame);
     vlayout->addLayout(showLayout);
     vlayout->addLayout(smoothLayout);
+
+
     setLayout(vlayout);
 
     connect(showPower, SIGNAL(currentIndexChanged(int)),
-            allPlot, SLOT(showPower(int)));
+            this, SLOT(setShowPower(int)));
     connect(showHr, SIGNAL(stateChanged(int)),
-            allPlot, SLOT(showHr(int)));
+            this, SLOT(setShowHr(int)));
     connect(showSpeed, SIGNAL(stateChanged(int)),
-            allPlot, SLOT(showSpeed(int)));
+            this, SLOT(setShowSpeed(int)));
     connect(showCad, SIGNAL(stateChanged(int)),
-            allPlot, SLOT(showCad(int)));
+            this, SLOT(setShowCad(int)));
     connect(showAlt, SIGNAL(stateChanged(int)),
-            allPlot, SLOT(showAlt(int)));
+            this, SLOT(setShowAlt(int)));
     connect(showGrid, SIGNAL(stateChanged(int)),
-            allPlot, SLOT(showGrid(int)));
+            this, SLOT(setShowGrid(int)));
+    connect(showStack, SIGNAL(stateChanged(int)),
+            this, SLOT(setShowStack(int)));
     connect(comboDistance, SIGNAL(currentIndexChanged(int)),
-            allPlot, SLOT(setByDistance(int)));
+            this, SLOT(setByDistance(int)));
     connect(smoothSlider, SIGNAL(valueChanged(int)),
             this, SLOT(setSmoothingFromSlider()));
     connect(smoothLineEdit, SIGNAL(editingFinished()),
@@ -185,8 +205,13 @@ AllPlotWindow::rideSelected()
         return;
     clearSelection(); // clear any ride interval selection data
     setAllPlotWidgets(ride);
-    allPlot->setData(ride);
+    allPlot->setDataI(ride);
     allZoomer->setZoomBase();
+
+    // update stacked view if that is set
+    int showit = showStack->isChecked();
+    setShowStack(0); // zap whats there
+    setShowStack(showit);
 }
 
 void
@@ -201,20 +226,23 @@ AllPlotWindow::intervalsChanged()
 {
     allPlot->refreshIntervalMarkers();
     allPlot->replot();
+    foreach (AllPlot *plot, allPlots) {
+        plot->refreshIntervalMarkers();
+        plot->replot();
+    }
 }
 
 void
 AllPlotWindow::intervalSelected()
 {
     hideSelection();
-    allPlot->replot();
 }
 
 void
 AllPlotWindow::setSmoothingFromSlider()
 {
     if (allPlot->smoothing() != smoothSlider->value()) {
-        allPlot->setSmoothing(smoothSlider->value());
+        setSmoothing(smoothSlider->value());
         smoothLineEdit->setText(QString("%1").arg(allPlot->smoothing()));
     }
 }
@@ -224,7 +252,7 @@ AllPlotWindow::setSmoothingFromLineEdit()
 {
     int value = smoothLineEdit->text().toInt();
     if (value != allPlot->smoothing()) {
-        allPlot->setSmoothing(value);
+        setSmoothing(value);
         smoothSlider->setValue(value);
     }
 }
@@ -269,39 +297,91 @@ AllPlotWindow::zoomInterval(IntervalItem *which)
 void
 AllPlotWindow::plotPickerSelected(const QPoint &pos)
 {
+    QwtPlotPicker* pick = qobject_cast<QwtPlotPicker *>(sender());
+    AllPlot* plot = qobject_cast<AllPlot *>(pick->plot());
+
     // set start of selection in xunits (minutes assumed for now)
-    setStartSelection(allPlot->invTransform(QwtPlot::xBottom, pos.x()));
+    setStartSelection(plot, pos.x());
 }
 
 void
 AllPlotWindow::plotPickerMoved(const QPoint &pos)
 {
     QString name = QString("Selection #%1 ").arg(selection);
-    // set end of selection in xunits (minutes assumed for now)
-    setEndSelection(allPlot->invTransform(QwtPlot::xBottom, pos.x()), true, name);
+    QwtPlotPicker* pick = qobject_cast<QwtPlotPicker *>(sender());
+    AllPlot* plot = qobject_cast<AllPlot *>(pick->plot());
+
+    if (allPlots.length()>0) {
+        int posX = pos.x();
+        int posY = plot->y()+pos.y()+50;
+
+        foreach (AllPlot *_plot, allPlots) {
+            _plot->allMarker1->setValue(plot->allMarker1->value());
+
+            if (_plot->y()<=plot->y() && posY<_plot->y()){
+                if (_plot->transform(QwtPlot::xBottom, _plot->allMarker2->xValue())>0){
+                    setEndSelection(_plot, 0, false, name);
+                    _plot->allMarker2->setLabel(QString(""));
+                }
+            }
+            else if (_plot->y()>=plot->y() && posY>_plot->y()+_plot->height()){
+                if (_plot->transform(QwtPlot::xBottom, _plot->allMarker2->xValue())<plot->width()){
+                    setEndSelection(_plot, plot->width(), false, name);
+                }
+            }
+            else if (posY>_plot->y() && posY<_plot->y()+_plot->height()){
+	            if (pos.x()<6)
+	                posX = 6;
+	            else if (!_plot->byDistance() && pos.x()>_plot->transform(QwtPlot::xBottom, _plot->timeArray[_plot->timeArray.size()-1]))
+	                posX = _plot->transform(QwtPlot::xBottom, _plot->timeArray[_plot->timeArray.size()-1]);
+	            else if (plot->byDistance() && pos.x()>_plot->transform(QwtPlot::xBottom, _plot->distanceArray[_plot->distanceArray.size()-1]))
+	                posX = _plot->transform(QwtPlot::xBottom, _plot->distanceArray[_plot->distanceArray.size()-1]);
+
+                setEndSelection(_plot, posX, true, name);
+                if (plot->y()<_plot->y()) {
+                    plot->allMarker1->setLabel(_plot->allMarker1->label());
+                    plot->allMarker2->setLabel(_plot->allMarker2->label());
+                }
+            } else {//if (_plot->y()<posY+3*_plot->height() || _plot->y()<plot->y()+3*plot->height())
+                //hide plot for 3 next plots
+                _plot->allMarker1->hide();
+                _plot->allMarker2->hide();
+                _plot->allMarker3->hide();
+            }
+        }
+    }
+    else // set end of selection in xunits (minutes assumed for now)
+        setEndSelection(plot, pos.x(), true, name);
 }
 
 void
-AllPlotWindow::setStartSelection(double xValue)
+AllPlotWindow::setStartSelection(AllPlot* plot, int xPosition)
 {
+    double xValue = plot->invTransform(QwtPlot::xBottom, xPosition);
+    QwtPlotMarker* allMarker1 = plot->allMarker1;
+
     selection++;
 
     if (!allMarker1->isVisible() || allMarker1->xValue() != xValue) {
 
-        allMarker1->hide();
-        allMarker2->hide();
-        allMarker3->hide();
-        allMarker1->setValue(xValue, allPlot->byDistance() ? 0 : 100);
+        hideSelection();
+        allMarker1->setValue(xValue, plot->byDistance() ? 0 : 100);
         allMarker1->show();
     }
 }
 
 void
-AllPlotWindow::setEndSelection(double xValue, bool newInterval, QString name)
+AllPlotWindow::setEndSelection(AllPlot* plot, int xPosition, bool newInterval, QString name)
 {
-    bool useMetricUnits = allPlot->useMetricUnits;
+    double xValue = plot->invTransform(QwtPlot::xBottom, xPosition);
+
+    QwtPlotMarker* allMarker1 = plot->allMarker1;
+    QwtPlotMarker* allMarker2 = plot->allMarker2;
+    QwtPlotMarker* allMarker3 = plot->allMarker3;
+
+    bool useMetricUnits = plot->useMetricUnits;
     if (!allMarker2->isVisible() || allMarker2->xValue() != xValue) {
-        allMarker2->setValue(xValue, allPlot->byDistance() ? 0 : 100);
+        allMarker2->setValue(xValue, plot->byDistance() ? 0 : 100);
         allMarker2->show();
         double x1, x2;  // time or distance depending upon mode selected
 
@@ -313,7 +393,7 @@ AllPlotWindow::setEndSelection(double xValue, bool newInterval, QString name)
             x1 = allMarker1->xValue();
             x2 = allMarker2->xValue();
         }
-        double lwidth=allPlot->transform(QwtPlot::xBottom, x2)-allPlot->transform(QwtPlot::xBottom, x1);
+        double lwidth=plot->transform(QwtPlot::xBottom, x2)-plot->transform(QwtPlot::xBottom, x1);
 
         allMarker3->setValue((x2-x1)/2+x1, 100);
         QColor marker_color = QColor(Qt::blue);
@@ -340,14 +420,14 @@ AllPlotWindow::setEndSelection(double xValue, bool newInterval, QString name)
         // if we are in distance mode then x1 and x2 are distances
         // we need to make sure they are in KM for the rest of this
         // code.
-        if (allPlot->byDistance() && useMetricUnits == false) {
+        if (plot->byDistance() && useMetricUnits == false) {
             x1 *= KM_PER_MILE;
             x2 *=  KM_PER_MILE;
         }
 
         foreach (const RideFilePoint *point, ride->ride()->dataPoints()) {
-            if ((allPlot->byDistance()==true && point->km>=x1 && point->km<x2) ||
-                (allPlot->byDistance()==false && point->secs/60>=x1 && point->secs/60<x2)) {
+            if ((plot->byDistance()==true && point->km>=x1 && point->km<x2) ||
+                (plot->byDistance()==false && point->secs/60>=x1 && point->secs/60<x2)) {
 
                 if (distance1 == -1) distance1 = point->km;
                 distance2 = point->km;
@@ -389,7 +469,14 @@ AllPlotWindow::setEndSelection(double xValue, bool newInterval, QString name)
             s = s.arg("");
         }
 
-        allMarker1->setLabel(s);
+        if (allMarker1->xValue()<allMarker2->xValue()) {
+            allMarker1->setLabel(s);
+            allMarker2->setLabel(QString(""));
+        }
+        else {
+            allMarker2->setLabel(s);
+            allMarker1->setLabel(QString(""));
+        }
 
         if (newInterval) {
 
@@ -425,9 +512,244 @@ AllPlotWindow::clearSelection()
 void
 AllPlotWindow::hideSelection()
 {
-    allMarker1->setVisible(false);
-    allMarker2->setVisible(false);
-    allMarker3->setVisible(false);
+    allPlot->allMarker1->setVisible(false);
+    allPlot->allMarker2->setVisible(false);
+    allPlot->allMarker3->setVisible(false);
     allPlot->replot();
+
+    foreach (AllPlot *plot, allPlots) {
+        plot->allMarker1->setVisible(false);
+        plot->allMarker2->setVisible(false);
+        plot->allMarker3->setVisible(false);
+        plot->replot();
+    }
+}
+
+void
+AllPlotWindow::setShowPower(int value)
+{
+    allPlot->showPower(value);
+    if (allPlots.count()>0)
+        resetStackedDatas();
+}
+
+void
+AllPlotWindow::setShowHr(int value)
+{
+    allPlot->showHr(value);
+    foreach (AllPlot *plot, allPlots)
+        plot->showHr(value);
+}
+
+void
+AllPlotWindow::setShowSpeed(int value)
+{
+    allPlot->showSpeed(value);
+    foreach (AllPlot *plot, allPlots)
+        plot->showSpeed(value);
+}
+
+void
+AllPlotWindow::setShowCad(int value)
+{
+    allPlot->showCad(value);
+    foreach (AllPlot *plot, allPlots)
+        plot->showCad(value);
+}
+
+void
+AllPlotWindow::setShowAlt(int value)
+{
+    allPlot->showAlt(value);
+    foreach (AllPlot *plot, allPlots)
+        plot->showAlt(value);
+}
+
+void
+AllPlotWindow::setShowGrid(int value)
+{
+    allPlot->showGrid(value);
+    foreach (AllPlot *plot, allPlots)
+        plot->showGrid(value);
+}
+
+void
+AllPlotWindow::setByDistance(int value)
+{
+    allPlot->setByDistance(value);
+    if (allPlots.count()>0) {
+        setShowStack(false);
+        setShowStack(true);
+    }
+}
+
+void
+AllPlotWindow::setSmoothing(int value)
+{
+    allPlot->setSmoothing(value);
+
+    if (allPlots.count()>0)
+        resetStackedDatas();
+}
+
+void
+AllPlotWindow::resetStackedDatas()
+{
+
+    int _stackWidth = stackWidth;
+    if (allPlot->byDistance())
+        _stackWidth = stackWidth/3;
+
+    for(int i = 0 ; i < allPlots.count() ; i++)
+    {
+        AllPlot *plot = allPlots[i];
+        int startIndex, stopIndex;
+        if (plot->byDistance()) {
+            startIndex = allPlot->rideItem->ride()->distanceIndex((allPlot->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*i);
+            stopIndex  = allPlot->rideItem->ride()->distanceIndex((allPlot->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*(i+1));
+        } else {
+            startIndex = allPlot->rideItem->ride()->timeIndex(60*_stackWidth*i);
+            stopIndex  = allPlot->rideItem->ride()->timeIndex(60*_stackWidth*(i+1));
+        }
+
+        // Update AllPlot for stacked view
+        plot->setDataP(allPlot, startIndex, stopIndex);
+    }
+}
+
+void
+AllPlotWindow::setShowStack(int value)
+{
+    if (value) {
+        int _stackWidth = stackWidth;
+        if (allPlot->byDistance())
+            _stackWidth = stackWidth/3;
+
+        allPlot->hide();
+
+        QVBoxLayout *vLayout = new QVBoxLayout();
+
+        RideItem* rideItem = allPlot->rideItem;
+        double duration = rideItem->ride()->dataPoints().last()->secs;
+        double distance =  (allPlot->useMetricUnits ? 1 : MILES_PER_KM) * rideItem->ride()->dataPoints().last()->km;
+        int nbplot;
+
+        if (allPlot->byDistance())
+            nbplot = (int)floor(distance/_stackWidth)+1;
+        else
+            nbplot = (int)floor(duration/_stackWidth/60)+1;
+
+        for(int i = 0 ; i < nbplot ; i++)
+        {
+            AllPlot *_allPlot = new AllPlot(this, mainWindow);
+            allPlots.append(_allPlot);
+            addPickers(_allPlot);
+
+            int startIndex, stopIndex;
+            if (allPlot->byDistance()) {
+                startIndex = allPlot->rideItem->ride()->distanceIndex((allPlot->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*i);
+                stopIndex  = allPlot->rideItem->ride()->distanceIndex((allPlot->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*(i+1));
+            } else {
+                startIndex = allPlot->rideItem->ride()->timeIndex(60*_stackWidth*i);
+                stopIndex  = allPlot->rideItem->ride()->timeIndex(60*_stackWidth*(i+1));
+            }
+            vLayout->addWidget(_allPlot);
+
+            // Update AllPlot for stacked view
+            _allPlot->setDataP(allPlot, startIndex, stopIndex);
+            _allPlot->setAxisScale(QwtPlot::xBottom, _stackWidth*i, _stackWidth*(i+1), 1);
+
+            if (i==0){
+                // First plot view title and legend
+                _allPlot->setTitle(allPlot->title());
+                _allPlot->plotLayout()->setLegendPosition(QwtPlot::TopLegend);
+                _allPlot->setFixedHeight(200);
+            }
+            else {
+               _allPlot->setTitle("");
+               _allPlot->insertLegend(NULL);
+               _allPlot->setFixedHeight(150);
+            }
+
+            // No x axis titles
+            _allPlot->setAxisTitle(QwtPlot::xBottom,NULL);
+            // Smaller y axis Titles
+            QFont axisFont = QFont("Helvetica",10, QFont::Normal);
+            QwtText text = _allPlot->axisTitle(QwtPlot::yLeft);
+            text.setFont(axisFont);
+            _allPlot->setAxisTitle(QwtPlot::yLeft,text);
+            text = _allPlot->axisTitle(QwtPlot::yLeft2);
+            text.setFont(axisFont);
+            _allPlot->setAxisTitle(QwtPlot::yLeft2,text);
+            text = _allPlot->axisTitle(QwtPlot::yRight);
+            text.setFont(axisFont);
+            _allPlot->setAxisTitle(QwtPlot::yRight,text);
+            text = _allPlot->axisTitle(QwtPlot::yRight2);
+            text.setFont(axisFont);
+            _allPlot->setAxisTitle(QwtPlot::yRight2,text);
+        }
+
+        QWidget *stack = new QWidget();
+        stack->setLayout(vLayout);
+
+        stackFrame->setWidgetResizable(true);
+        stackFrame->setWidget(stack);
+        stackFrame->show();
+    } else {
+        stackFrame->hide();
+        allPlot->show();
+
+        if (allPlots.count()>1) {
+            foreach (AllPlot *plot, allPlots) {
+                //layout()->removeWidget(plot);
+                delete plot;
+                allPlots.removeOne(plot);
+            }
+        }
+    }
+}
+
+void
+AllPlotWindow::addPickers(AllPlot *_allPlot)
+{
+    QwtPlotMarker* allMarker1 = new QwtPlotMarker();
+    allMarker1->setLineStyle(QwtPlotMarker::VLine);
+    allMarker1->attach(_allPlot);
+    allMarker1->setLabelAlignment(Qt::AlignTop|Qt::AlignRight);
+    _allPlot->allMarker1 = allMarker1;
+
+    QwtPlotMarker* allMarker2 = new QwtPlotMarker();
+    allMarker2->setLineStyle(QwtPlotMarker::VLine);
+    allMarker2->attach(_allPlot);
+    allMarker2->setLabelAlignment(Qt::AlignTop|Qt::AlignRight);
+    _allPlot->allMarker2 = allMarker2;
+
+    QwtPlotMarker* allMarker3 = new QwtPlotMarker();
+    allMarker3->setLineStyle(QwtPlotMarker::VLine);
+    allMarker3->attach(_allPlot);
+    _allPlot->allMarker3 = allMarker3;
+
+    // Interval selection 2
+    QwtPlotPicker* allPicker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
+                                  QwtPicker::RectSelection | QwtPicker::CornerToCorner|QwtPicker::DragSelection,
+                                   QwtPicker::NoRubberBand,
+                                   QwtPicker::ActiveOnly, _allPlot->canvas());
+    allPickers.append(allPicker);
+    allPicker->setRubberBandPen(QColor(Qt::blue));
+    allPicker->setRubberBand(QwtPicker::NoRubberBand);
+    allPicker->setTrackerPen(QColor(Qt::blue));
+    // now select rectangles
+    allPicker->setSelectionFlags(QwtPicker::PointSelection | QwtPicker::RectSelection | QwtPicker::DragSelection);
+    allPicker->setMousePattern(QwtEventPattern::MouseSelect1,
+                                   Qt::LeftButton, Qt::ShiftModifier);
+
+
+
+    //void appended(const QwtPlotPicker* pick, const QwtDoublePoint &pos);
+    connect(allPicker, SIGNAL(appended(const QPoint &)),
+                SLOT(plotPickerSelected(const QPoint &)));
+    connect(allPicker, SIGNAL(moved(const QPoint &)),
+                SLOT(plotPickerMoved(const QPoint &)));
+
 }
 

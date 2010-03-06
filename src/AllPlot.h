@@ -52,7 +52,15 @@ class AllPlot : public QwtPlot
 	void refreshZoneLabels();
 	void refreshIntervalMarkers();
 
-        void setData(RideItem *_rideItem);
+        void setDataI(RideItem *_rideItem);
+        void setDataP(AllPlot *plot, int startidx, int stopidx);
+
+        int timeIndex(double) const;          // get index offset for time in secs
+        int distanceIndex(double) const;      // get index offset for distance in KM
+
+        QwtPlotMarker *allMarker1;
+        QwtPlotMarker *allMarker2;
+        QwtPlotMarker *allMarker3;
 
     public slots:
 
@@ -95,6 +103,15 @@ class AllPlot : public QwtPlot
         QVector<double> timeArray;
         QVector<double> distanceArray;
         QVector<double> altArray;
+
+        QVector<double> smoothWatts;
+        QVector<double> smoothHr;
+        QVector<double> smoothSpeed;
+        QVector<double> smoothCad;
+        QVector<double> smoothTime;
+        QVector<double> smoothDistance;
+        QVector<double> smoothAltitude;
+
         int arrayLength;
 
         int smooth;
@@ -112,6 +129,9 @@ class AllPlot : public QwtPlot
         int showSpeedState;
         int showCadState;
         int showAltState;
+
+    private:
+        AllPlot *referencePlot;
 };
 
 #endif // _GC_AllPlot_h
