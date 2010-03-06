@@ -152,7 +152,12 @@ class AllPlotZoneLabel: public QwtPlotItem
                         );
 
                     text = QwtText(zone_names[zone_number]);
-                    text.setFont(QFont("Helvetica",24, QFont::Bold));
+                    if (_parent->referencePlot == NULL) {
+                        text.setFont(QFont("Helvetica",24, QFont::Bold));
+                    } else {
+                        text.setFont(QFont("Helvetica",12, QFont::Bold));
+                    }
+
                     QColor text_color = zoneColor(zone_number, num_zones);
                     text_color.setAlpha(64);
                     text.setColor(text_color);
@@ -201,6 +206,8 @@ AllPlot::AllPlot(QWidget *parent, MainWindow *mainWindow):
 {
     boost::shared_ptr<QSettings> settings = GetApplicationSettings();
     unit = settings->value(GC_UNIT);
+
+    referencePlot = NULL;
 
     useMetricUnits = (unit.toString() == "Metric");
 
@@ -311,6 +318,10 @@ void AllPlot::refreshZoneLabels()
 void
 AllPlot::recalc()
 {
+    if (referencePlot !=NULL){
+        return;
+    }
+
     if (timeArray.empty())
         return;
     int rideTimeSecs = (int) ceil(timeArray[arrayLength - 1]);
@@ -337,13 +348,13 @@ AllPlot::recalc()
 
     QList<DataPoint> list;
 
-    QVector<double> smoothWatts(rideTimeSecs + 1);
-    QVector<double> smoothHr(rideTimeSecs + 1);
-    QVector<double> smoothSpeed(rideTimeSecs + 1);
-    QVector<double> smoothCad(rideTimeSecs + 1);
-    QVector<double> smoothTime(rideTimeSecs + 1);
-    QVector<double> smoothDistance(rideTimeSecs + 1);
-    QVector<double> smoothAltitude(rideTimeSecs + 1);
+    smoothWatts.resize(rideTimeSecs + 1); //(rideTimeSecs + 1);
+    smoothHr.resize(rideTimeSecs + 1);
+    smoothSpeed.resize(rideTimeSecs + 1);
+    smoothCad.resize(rideTimeSecs + 1);
+    smoothTime.resize(rideTimeSecs + 1);
+    smoothDistance.resize(rideTimeSecs + 1);
+    smoothAltitude.resize(rideTimeSecs + 1);
 
     for (int secs = 0; ((secs < smooth)
                         && (secs < rideTimeSecs)); ++secs) {
@@ -471,7 +482,10 @@ AllPlot::setYMax()
 {
     if (wattsCurve->isVisible()) {
         setAxisTitle(yLeft, "Watts");
-        setAxisScale(yLeft, 0.0, 1.05 * wattsCurve->maxYValue());
+        if (referencePlot == NULL)
+            setAxisScale(yLeft, 0.0, 1.05 * wattsCurve->maxYValue());
+        else
+            setAxisScale(yLeft, 0.0, 1.05 * referencePlot->wattsCurve->maxYValue());
         setAxisLabelRotation(yLeft,270);
         setAxisLabelAlignment(yLeft,Qt::AlignVCenter);
     }
@@ -480,11 +494,17 @@ AllPlot::setYMax()
         QStringList labels;
         if (hrCurve->isVisible()) {
             labels << "BPM";
-            ymax = hrCurve->maxYValue();
+            if (referencePlot == NULL)
+                ymax = hrCurve->maxYValue();
+            else
+                ymax = referencePlot->hrCurve->maxYValue();
         }
         if (cadCurve->isVisible()) {
             labels << "RPM";
-            ymax = qMax(ymax, cadCurve->maxYValue());
+            if (referencePlot == NULL)
+                ymax = qMax(ymax, cadCurve->maxYValue());
+            else
+                ymax = qMax(ymax, referencePlot->cadCurve->maxYValue());
         }
         setAxisTitle(yLeft2, labels.join(" / "));
         setAxisScale(yLeft2, 0.0, 1.05 * ymax);
@@ -493,14 +513,24 @@ AllPlot::setYMax()
     }
     if (speedCurve->isVisible()) {
         setAxisTitle(yRight, (useMetricUnits ? tr("KPH") : tr("MPH")));
-        setAxisScale(yRight, 0.0, 1.05 * speedCurve->maxYValue());
+        if (referencePlot == NULL)
+            setAxisScale(yRight, 0.0, 1.05 * speedCurve->maxYValue());
+        else
+            setAxisScale(yRight, 0.0, 1.05 * referencePlot->speedCurve->maxYValue());
         setAxisLabelRotation(yRight,90);
         setAxisLabelAlignment(yRight,Qt::AlignVCenter);
     }
     if (altCurve->isVisible()) {
         setAxisTitle(yRight2, useMetricUnits ? tr("Meters") : tr("Feet"));
-        double ymin = altCurve->minYValue();
-        double ymax = qMax(ymin + 100, 1.05 * altCurve->maxYValue());
+        double ymin,ymax;
+
+        if (referencePlot == NULL) {
+            ymin = altCurve->minYValue();
+            ymax = qMax(ymin + 100, 1.05 * altCurve->maxYValue());
+        } else {
+            ymin = referencePlot->altCurve->minYValue();
+            ymax = qMax(ymin + 100, 1.05 * referencePlot->altCurve->maxYValue());
+        }
         setAxisScale(yRight2, ymin, ymax);
         setAxisLabelRotation(yRight2,90);
         setAxisLabelAlignment(yRight2,Qt::AlignVCenter);
@@ -523,9 +553,86 @@ AllPlot::setXTitle()
 }
 
 void
-AllPlot::setData(RideItem *_rideItem)
+AllPlot::setDataP(AllPlot *plot, int startidx, int stopidx)
+{
+    if (plot == NULL) return;
+
+    referencePlot = plot;
+
+    rideItem = plot->rideItem;
+    shade_zones = plot->shade_zones;
+    bydist = plot->bydist;
+
+    arrayLength = stopidx-startidx;
+    wattsArray = plot->wattsArray.mid(startidx, stopidx-startidx);
+    hrArray = plot->hrArray.mid(startidx, stopidx-startidx);
+    speedArray = plot->speedArray.mid(startidx, stopidx-startidx);
+    cadArray = plot->cadArray.mid(startidx, stopidx-startidx);
+    altArray = plot->altArray.mid(startidx, stopidx-startidx);
+    timeArray = plot->timeArray.mid(startidx, stopidx-startidx);
+    distanceArray = plot->distanceArray.mid(startidx, stopidx-startidx);
+
+    if (bydist) {
+        startidx = plot->distanceIndex(plot->distanceArray[startidx]);
+        stopidx  = plot->distanceIndex(plot->distanceArray[(stopidx>=plot->distanceArray.size()?plot->distanceArray.size()-1:stopidx)])-1;
+    } else {
+        startidx = plot->timeIndex(plot->timeArray[startidx]/60);
+        stopidx  = plot->timeIndex(plot->timeArray[(stopidx>=plot->timeArray.size()?plot->timeArray.size()-1:stopidx)]/60)-1;
+    }
+
+    smoothWatts = plot->smoothWatts.mid(startidx, stopidx-startidx);
+    smoothHr = plot->smoothHr.mid(startidx, stopidx-startidx);
+    smoothSpeed = plot->smoothSpeed.mid(startidx, stopidx-startidx);
+    smoothCad = plot->smoothCad.mid(startidx, stopidx-startidx);
+    smoothAltitude = plot->smoothAltitude.mid(startidx, stopidx-startidx);
+    smoothTime = plot->smoothTime.mid(startidx, stopidx-startidx);
+    smoothDistance = plot->smoothDistance.mid(startidx, stopidx-startidx);
+
+    QVector<double> &xaxis = bydist ? smoothDistance : smoothTime;
+
+    // attach appropriate curves
+    wattsCurve->detach();
+    hrCurve->detach();
+    speedCurve->detach();
+    cadCurve->detach();
+    altCurve->detach();
+
+    wattsCurve->setData(xaxis, smoothWatts);
+    hrCurve->setData(xaxis, smoothHr);
+    speedCurve->setData(xaxis, smoothSpeed);
+    cadCurve->setData(xaxis, smoothCad);
+    altCurve->setData(xaxis, smoothAltitude);
+
+    setYMax();
+
+    setAxisMaxMajor(yLeft, 5);
+    setAxisMaxMajor(yLeft2, 5);
+    setAxisMaxMajor(yRight, 5);
+    setAxisMaxMajor(yRight2, 5);
+
+    wattsCurve->setVisible(plot->wattsCurve->isVisible());
+    hrCurve->setVisible(plot->hrCurve->isVisible());
+    speedCurve->setVisible(plot->speedCurve->isVisible());
+    cadCurve->setVisible(plot->cadCurve->isVisible());
+    altCurve->setVisible(plot->altCurve->isVisible());
+
+    if (!smoothWatts.empty()) wattsCurve->attach(this);
+    if (!smoothHr.empty()) hrCurve->attach(this);
+    if (!smoothSpeed.empty()) speedCurve->attach(this);
+    if (!smoothCad.empty()) cadCurve->attach(this);
+    if (!smoothAltitude.empty()) altCurve->attach(this);
+
+    refreshIntervalMarkers();
+    refreshZoneLabels();
+
+    replot();
+}
+
+void
+AllPlot::setDataI(RideItem *_rideItem)
 {
     rideItem = _rideItem;
+    if (_rideItem == NULL) return;
 
     wattsArray.clear();
 
@@ -676,6 +783,35 @@ AllPlot::setByDistance(int id)
     recalc();
 }
 
+struct ComparePoints {
+    bool operator()(const double p1, const double p2) {
+        return p1 < p2;
+    }
+};
+
+int
+AllPlot::timeIndex(double min) const
+{
+    // return index offset for specified time
+    QVector<double>::const_iterator i = std::lower_bound(
+            smoothTime.begin(), smoothTime.end(), min, ComparePoints());
+    if (i == smoothTime.end())
+        return smoothTime.size();
+    return i - smoothTime.begin();
+}
+
+
+
+int
+AllPlot::distanceIndex(double km) const
+{
+    // return index offset for specified distance in km
+	QVector<double>::const_iterator i = std::lower_bound(
+            smoothDistance.begin(), smoothDistance.end(), km, ComparePoints());
+    if (i == smoothDistance.end())
+        return smoothDistance.size();
+    return i - smoothDistance.begin();
+}
 /*----------------------------------------------------------------------
  * Interval plotting
  *--------------------------------------------------------------------*/
