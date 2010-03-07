@@ -255,7 +255,7 @@ string GoogleMapControl::CreatePolyLine(RideItem *ride)
     int cp;
     int intervalTime = 30;  // 30 seconds
     int zone =ride->zoneRange();
-    if(zone >= 0)
+    if(zone < 0)
     {
         cp = 300;  // default cp to 300 watts
     }
