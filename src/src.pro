@@ -73,6 +73,7 @@ HEADERS += \
         DownloadRideDialog.h \
         ErgFile.h \
         ErgFilePlot.h \
+        FitRideFile.h \
         GcRideFile.h \
         GoogleMapControl.h \
         HistogramWindow.h \
@@ -165,6 +166,7 @@ SOURCES += \
         DownloadRideDialog.cpp \
         ErgFile.cpp \
         ErgFilePlot.cpp \
+        FitRideFile.cpp \
         GcRideFile.cpp \
         GoogleMapControl.cpp \
         HistogramWindow.cpp \
