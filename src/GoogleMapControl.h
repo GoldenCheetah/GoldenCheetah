@@ -25,11 +25,11 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <RideFile.h>
 
 class QMouseEvent;
 class RideItem;
 class MainWindow;
-class RideFilePoint;
 class QColor;
 class QVBoxLayout;
 class QTabWidget;
@@ -41,21 +41,36 @@ Q_OBJECT
  private:
     QVBoxLayout *layout;
     QWebView *view;
-    RideItem *ride;
     MainWindow *parent;
-    std::string CreatePolyLine(RideItem *);
+    GoogleMapControl();  // default ctor
+    std::string CreatePolyLine();
     void CreateSubPolyLine(const std::vector<RideFilePoint> &points,
                            std::ostringstream &oss,
                            QColor color);
-    std::string CreateIntervalMarkers(RideItem *);
-    GoogleMapControl();
+    std::string CreateIntervalMarkers();
+    void loadRide();
+    // the web browser is loading a page, do NOT start another load
+    bool loadingPage;
+    // the ride has changed, load a new page
+    bool newRideToLoad;
+
     QColor GetColor(int cp, int watts);
-    // tabIndex tracks the index of the Maps tab, -1 means it's not showing
-    int tabIndex;
-    QTabWidget *tabWidget;
+
+    // a GPS normalized vectory of ride data points,
+    // when a GPS unit loses signal it seems to
+    // put a coordinate close to 180 into the data
+    std::vector<RideFilePoint> rideData;
+    // current ride CP
+    int rideCP;
+    // current HTML for the ride
+    std::ostringstream currentPage;
 
  public slots:
     void rideSelected();
+
+ private slots:
+    void loadStarted();
+    void loadFinished(bool);
 
  protected:
     void createHtml();

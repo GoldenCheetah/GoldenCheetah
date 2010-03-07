@@ -21,6 +21,8 @@
 #include "RideFile.h"
 #include "MainWindow.h"
 #include "Zones.h"
+#include "Settings.h"
+#include "Units.h"
 
 #include <QDebug>
 
@@ -30,6 +32,8 @@
 #include <vector>
 #include <algorithm>
 #include <boost/foreach.hpp>
+#include <boost/circular_buffer.hpp>
+
 using namespace std;
 
 namespace gm
@@ -46,21 +50,55 @@ namespace gm
         RideFilePointAlgorithm() { first = false; }
     };
 
+    // Algorithm to find the meidan of a set of data
+    template<typename T> class Median
+    {
+        boost::circular_buffer<T> buffer;
+    public:
+        Median(int size)
+        {
+            buffer.set_capacity(size);
+        }
+        // add the new data
+        void add(T a) { buffer.push_back(a); }
+        operator T()
+        {
+            if(buffer.size() == 0)
+            {
+                return 0;
+            }
+
+            T total = 0;
+            BOOST_FOREACH(T point, buffer)
+            {
+                total += point;
+            }
+            return total / buffer.size();
+        }
+    };
+
     class AltGained : private RideFilePointAlgorithm
     {
     protected:
-        RideFilePoint prevRfp;
         double gained;
+        double curAlt, prevAlt;
+        Median<double> median;
     public:
-        AltGained() { gained = 0; }
+        AltGained(): gained(0), curAlt(0), prevAlt(0), median(20) {}
 
         void operator()(RideFilePoint rfp)
         {
-            if(rfp.alt > prevRfp.alt)
+            median.add(rfp.alt);
+            curAlt = median;
+            if(prevAlt == 0)
             {
-                gained += rfp.alt - prevRfp.alt;
+                prevAlt = median;
             }
-            prevRfp = rfp;
+            if(curAlt> prevAlt)
+            {
+                gained += curAlt - prevAlt;
+            }
+            prevAlt = curAlt;
         }
         int TotalGained() { return gained; }
         operator int() { return TotalGained(); }
@@ -104,65 +142,119 @@ using namespace gm;
 GoogleMapControl::GoogleMapControl(MainWindow *mw, QTabWidget *tw)
 {
     parent = mw;
-    tabWidget = tw;
     view = new QWebView();
     layout = new QVBoxLayout();
     layout->addWidget(view);
     setLayout(layout);
     connect(parent, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
-    view->load(QUrl("http://google.com"));
-    tabIndex = -1;
+    connect(view, SIGNAL(loadStarted()), this, SLOT(loadStarted()));
+    connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
+    loadingPage = false;
+    newRideToLoad = false;
+
+    tw->addTab(this, tr("Map"));
 }
 
 void
-GoogleMapControl::rideSelected() {
-
-  ride = parent->rideItem();
+GoogleMapControl::rideSelected()
+{
+  RideItem * ride = parent->rideItem();
 
   if (!ride)
       return;
 
-  int currentTab = tabWidget->currentIndex();
-
-  // Does the ride have GPS data
-  if(ride->ride()->dataPoints().front()->lat == 0.0)
+  int zone =ride->zoneRange();
+  if(zone < 0)
   {
-      if(tabIndex > -1)
-      {
-          tabWidget->removeTab(tabIndex);
-          if (currentTab == tabIndex) tabWidget->setCurrentIndex(0);
-      }
-      tabIndex = -1;
+      rideCP = 300;  // default cp to 300 watts
   }
   else
   {
-      if (tabIndex == -1) tabIndex = tabWidget->addTab(this, tr("Map"));
-      if (currentTab != tabIndex) tabWidget->setCurrentIndex(currentTab);
-      createHtml();
+      rideCP = ride->zones->getCP(zone);
   }
+
+  rideData.clear();
+  double prevLon = 0;
+  double prevLat = 0;
+  foreach(RideFilePoint *rfp,ride->ride()->dataPoints())
+  {
+      RideFilePoint curRfp = *rfp;
+
+      if(ceil(rfp->lon) == 180 ||
+         ceil(rfp->lat) == 180)
+      {
+          curRfp.lon = prevLon;
+          curRfp.lat = prevLat;
+      }
+      // wko imports can have -320 type of values for roughly 40 degrees
+      if((curRfp.lat) < -180)
+      {
+          curRfp.lat = 360 + curRfp.lat;
+      }
+      prevLon = curRfp.lon;
+      prevLat = curRfp.lat;
+      rideData.push_back(curRfp);
+  }
+  newRideToLoad = true;
+  loadRide();
 }
 
 void GoogleMapControl::resizeEvent(QResizeEvent * )
 {
-    // createHtml will handle resize the widget correct
-    createHtml();
+    newRideToLoad = true;
+    loadRide();
+}
+
+void GoogleMapControl::loadStarted()
+{
+    loadingPage = true;
+}
+
+/// called after the load is finished
+void GoogleMapControl::loadFinished(bool)
+{
+    loadingPage = false;
+    loadRide();
+}
+
+void GoogleMapControl::loadRide()
+{
+    if(loadingPage == true)
+    {
+        view->stop();
+        loadingPage = false;
+        return;
+    }
+
+    if(newRideToLoad == true)
+    {
+        createHtml();
+        newRideToLoad = false;
+        loadingPage = true;
+        view->setHtml(QString(currentPage.str().c_str()));
+    }
 }
 
 void GoogleMapControl::createHtml()
 {
-    if(ride == NULL) return;
-
+    currentPage.str("");
     double minLat, minLon, maxLat, maxLon;
     minLat = minLon = 1000;
     maxLat = maxLon = -1000; // larger than 360
 
-    foreach(RideFilePoint *rfp, ride->ride()->dataPoints())
+    BOOST_FOREACH(RideFilePoint rfp, rideData)
     {
-        minLat = std::min(minLat,rfp->lat);
-        maxLat = std::max(maxLat,rfp->lat);
-        minLon = std::min(minLon,rfp->lon);
-        maxLon = std::max(maxLon,rfp->lon);
+        minLat = std::min(minLat,rfp.lat);
+        maxLat = std::max(maxLat,rfp.lat);
+        minLon = std::min(minLon,rfp.lon);
+        maxLon = std::max(maxLon,rfp.lon);
     }
+    if(floor(minLat) == 0)
+    {
+        currentPage << tr("No GPS Data Present").toStdString();
+        return;
+    }
+
     /// seems to be the magic number... to stop the scrollbars
     int width = view->width() -16;
     int height = view->height() -16;
@@ -186,8 +278,8 @@ void GoogleMapControl::createHtml()
         << "map = new GMap2(document.getElementById(\"map_canvas\")," << endl
         << " {size: new GSize(" << width << "," << height << ") } );" << endl
         << "map.setUIToDefault()" << endl
-        << CreatePolyLine(ride) << endl
-        << CreateIntervalMarkers(ride) << endl
+        << CreatePolyLine() << endl
+        << CreateIntervalMarkers() << endl
         << "var sw = new GLatLng(" << minLat << "," << minLon << ");" << endl
         << "var ne = new GLatLng(" << maxLat << "," << maxLon << ");" << endl
         << "var bounds = new GLatLngBounds(sw,ne);" << endl
@@ -203,13 +295,14 @@ void GoogleMapControl::createHtml()
         << "</script>" << endl
         << "</head>" << endl
         << "<body onload=\"initialize()\" onunload=\"GUnload()\">" << endl
-        << "<div id=\"map_canvas\" style=\"width: " << width <<"px; height: "<< height <<"px\"></div>" << endl
+        << "<div id=\"map_canvas\" style=\"width: " << width <<"px; height: " 
+        << height <<"px\"></div>" << endl
         << "<form action=\"#\" onsubmit=\"animate(); return false\">" << endl
         << "</form>" << endl
         << "</body>" << endl
         << "</html>" << endl;
 
-#define DEBUG_GMAPS 1
+#define DEBUG_GMAPS 0
 #if DEBUG_GMAPS
      QString htmlFile(QDir::tempPath());
      htmlFile.append("/maps.html");
@@ -219,12 +312,8 @@ void GoogleMapControl::createHtml()
      file.write(oss.str().c_str(),oss.str().length());
      file.flush();
      file.close();
-     QString filename("file:///");
-     filename.append(htmlFile);
-     QUrl url(filename);
-     view->load(url);
 #endif
-     view->setHtml(QString(oss.str().c_str()));
+     currentPage << oss.str();
 }
 
 
@@ -247,38 +336,28 @@ QColor GoogleMapControl::GetColor(int cp, int watts)
 
 
 /// create the ride line
-string GoogleMapControl::CreatePolyLine(RideItem *ride)
+string GoogleMapControl::CreatePolyLine()
 {
     std::vector<RideFilePoint> intervalPoints;
     ostringstream oss;
-
-    int cp;
     int intervalTime = 30;  // 30 seconds
-    int zone =ride->zoneRange();
-    if(zone < 0)
-    {
-        cp = 300;  // default cp to 300 watts
-    }
-    else
-    {
-        cp = ride->zones->getCP(zone);
-    }
 
-    foreach(RideFilePoint* rfp, ride->ride()->dataPoints())
+    BOOST_FOREACH(RideFilePoint rfp, rideData)
     {
-        intervalPoints.push_back(*rfp);
-        if((intervalPoints.back().secs - intervalPoints.front().secs) > intervalTime)
+        intervalPoints.push_back(rfp);
+        if((intervalPoints.back().secs - intervalPoints.front().secs) >
+           intervalTime)
         {
             // find the avg power and color code it and create a polyline...
             AvgPower avgPower = for_each(intervalPoints.begin(),
                                          intervalPoints.end(),
                                          AvgPower());
             // find the color
-            QColor color = GetColor(cp,avgPower);
+            QColor color = GetColor(rideCP,avgPower);
             // create the polyline
             CreateSubPolyLine(intervalPoints,oss,color);
             intervalPoints.clear();
-            intervalPoints.push_back(*rfp);
+            intervalPoints.push_back(rfp);
         }
 
     }
@@ -307,8 +386,11 @@ void GoogleMapControl::CreateSubPolyLine(const std::vector<RideFilePoint> &point
 }
 
 
-string GoogleMapControl::CreateIntervalMarkers(RideItem *ride)
+string GoogleMapControl::CreateIntervalMarkers()
 {
+    bool useMetricUnits = (GetApplicationSettings()->value(GC_UNIT).toString()
+                           == "Metric");
+
     ostringstream oss;
     oss.precision(6);
     oss.setf(ios::fixed,ios::floatfield);
@@ -316,18 +398,21 @@ string GoogleMapControl::CreateIntervalMarkers(RideItem *ride)
     oss << "var marker;" << endl;
     int currentInterval = 0;
     std::vector<RideFilePoint> intervalPoints;
-    foreach(RideFilePoint* rfp, ride->ride()->dataPoints())
+    BOOST_FOREACH(RideFilePoint rfp, rideData)
     {
-        intervalPoints.push_back(*rfp);
-        if(currentInterval < rfp->interval)
+        intervalPoints.push_back(rfp);
+        if(currentInterval < rfp.interval)
         {
             // want to see avg power, avg speed, alt changes, avg hr
             double distance = intervalPoints.back().km -
                                intervalPoints.front().km ;
+            distance = (useMetricUnits ? distance : distance * MILES_PER_KM);
+
             int secs = intervalPoints.back().secs -
                 intervalPoints.front().secs;
 
             double avgSpeed = (distance/((double)secs)) * 3600;
+
             QTime time;
             time = time.addSecs(secs);
 
@@ -338,28 +423,36 @@ string GoogleMapControl::CreateIntervalMarkers(RideItem *ride)
                                          intervalPoints.end(),
                                          AvgPower());
 
-            AltGained altGained =for_each(intervalPoints.begin(),
+            int altGained =ceil(for_each(intervalPoints.begin(),
                                        intervalPoints.end(),
-                                       AltGained());
+                                            AltGained()));
+            altGained = ceil((useMetricUnits ? altGained :
+                              altGained * FEET_PER_METER));
+            oss.precision(6);
             oss << "marker = new GMarker(new GLatLng( ";
-            oss<< rfp->lat << "," << rfp->lon << "));" << endl;
+            oss<< rfp.lat << "," << rfp.lon << "));" << endl;
             oss << "marker.bindInfoWindowHtml(" <<endl;
             oss << "\"<p><h3>Lap: " << currentInterval << "</h3></p>" ;
-            oss << "<p>Distance: " << distance << "</p>" ;
+            oss.precision(1);
+            oss << "<p>Distance: " << distance << " "
+                << (useMetricUnits ? "KM" : "Miles") << "</p>" ;
             oss << "<p>Time: " << time.toString().toStdString() << "</p>";
-            oss << "<p>Avg Speed</>: " << avgSpeed << "</p>";
+            oss << "<p>Avg Speed</>: " << avgSpeed << " "
+                << (useMetricUnits ? tr("KPH") : tr("MPH")).toStdString()
+                << "</p>";
             if(avgHr != 0) {
                 oss << "<p>Avg HR: " << avgHr << "</p>";
             }
             if(avgPower != 0)
             {
-                oss << "<p>Avg Power: " << avgPower << "</p>";
+                oss << "<p>Avg Power: " << avgPower << " Watts</p>";
             }
-            oss << "<p>Alt Gained: " << altGained << "</p>";
+            oss << "<p>Alt Gained: " << altGained << " "
+                << (useMetricUnits ? tr("Meters") : tr("Feet")).toStdString()
+                << "</p>";
             oss << "\");" << endl;
             oss << "map.addOverlay(marker);" << endl;
-
-            currentInterval = rfp->interval;
+            currentInterval = rfp.interval;
             intervalPoints.clear();
         }
     }
