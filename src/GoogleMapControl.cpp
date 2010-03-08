@@ -221,8 +221,6 @@ void GoogleMapControl::loadRide()
 {
     if(loadingPage == true)
     {
-        view->stop();
-        loadingPage = false;
         return;
     }
 
@@ -231,7 +229,19 @@ void GoogleMapControl::loadRide()
         createHtml();
         newRideToLoad = false;
         loadingPage = true;
-        view->setHtml(QString(currentPage.str().c_str()));
+
+        QString htmlFile(QDir::tempPath());
+        htmlFile.append("/maps.html");
+        QFile file(htmlFile);
+        file.remove();
+        file.open(QIODevice::ReadWrite);
+        file.write(currentPage.str().c_str(),currentPage.str().length());
+        file.flush();
+        file.close();
+        QString filename("file:///");
+        filename.append(htmlFile);
+        QUrl url(filename);
+        view->load(url);
     }
 }
 
@@ -302,17 +312,6 @@ void GoogleMapControl::createHtml()
         << "</body>" << endl
         << "</html>" << endl;
 
-#define DEBUG_GMAPS 0
-#if DEBUG_GMAPS
-     QString htmlFile(QDir::tempPath());
-     htmlFile.append("/maps.html");
-     QFile file(htmlFile);
-     file.remove();
-     file.open(QIODevice::ReadWrite);
-     file.write(oss.str().c_str(),oss.str().length());
-     file.flush();
-     file.close();
-#endif
      currentPage << oss.str();
 }
 
