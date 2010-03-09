@@ -29,6 +29,7 @@
 #define GC_SETTINGS_MAIN_GEOM       "mainwindow/geometry"
 #define GC_SETTINGS_SPLITTER_SIZES  "mainwindow/splitterSizes"
 #define GC_SETTINGS_CALENDAR_SIZES  "mainwindow/calendarSizes"
+#define GC_TABS_TO_HIDE             "mainwindow/tabsToHide"
 #define GC_SETTINGS_INTERVAL_METRICS "rideSummaryWindow/intervalMetrics"
 #define GC_RIDE_PLOT_SMOOTHING       "ridePlot/Smoothing"
 #define GC_PERF_MAN_METRIC           "performanceManager/metric"

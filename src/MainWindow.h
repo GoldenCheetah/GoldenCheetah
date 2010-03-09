@@ -101,6 +101,7 @@ class MainWindow : public QMainWindow
         void rideDeleted(RideItem *);
 
     private slots:
+        void tabViewTriggered(bool);
         void rideTreeWidgetSelectionChanged();
         void intervalTreeWidgetSelectionChanged();
         void leftLayoutMoved();
@@ -144,6 +145,15 @@ class MainWindow : public QMainWindow
 
     private:
 	bool parseRideFileName(const QString &name, QString *notesFileName, QDateTime *dt);
+
+        struct TabInfo {
+            QWidget *contents;
+            QString name;
+            QAction *action;
+            TabInfo(QWidget *contents, QString name) :
+                contents(contents), name(name), action(NULL) {}
+        };
+        QList<TabInfo> tabs;
 
 	boost::shared_ptr<QSettings> settings;
         IntervalItem *activeInterval; // currently active for context menu popup
