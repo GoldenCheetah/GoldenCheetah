@@ -139,7 +139,7 @@ using namespace gm;
 
 #define GOOGLE_KEY "ABQIAAAAS9Z2oFR8vUfLGYSzz40VwRQ69UCJw2HkJgivzGoninIyL8-QPBTtnR-6pM84ljHLEk3PDql0e2nJmg"
 
-GoogleMapControl::GoogleMapControl(MainWindow *mw, QTabWidget *tw)
+GoogleMapControl::GoogleMapControl(MainWindow *mw)
 {
     parent = mw;
     view = new QWebView();
@@ -151,8 +151,6 @@ GoogleMapControl::GoogleMapControl(MainWindow *mw, QTabWidget *tw)
     connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
     loadingPage = false;
     newRideToLoad = false;
-
-    tw->addTab(this, tr("Map"));
 }
 
 void

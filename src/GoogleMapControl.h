@@ -77,7 +77,7 @@ Q_OBJECT
     void resizeEvent(QResizeEvent *);
 
  public:
-    GoogleMapControl(MainWindow *,QTabWidget *);
+    GoogleMapControl(MainWindow *);
     virtual ~GoogleMapControl() { }
 };
 

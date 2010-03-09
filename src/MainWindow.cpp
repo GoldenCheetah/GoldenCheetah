@@ -245,11 +245,11 @@ MainWindow::MainWindow(const QDir &home) :
     summarySizes.append(200);
     summarySplitter->setSizes(summarySizes);
 
-    tabWidget->addTab(summarySplitter, tr("Ride Summary"));
+    tabs.append(TabInfo(summarySplitter, tr("Ride Summary")));
 
     /////////////////////////// Ride Plot Tab ///////////////////////////
     allPlotWindow = new AllPlotWindow(this);
-    tabWidget->addTab(allPlotWindow, tr("Ride Plot"));
+    tabs.append(TabInfo(allPlotWindow, tr("Ride Plot")));
     splitter->addWidget(tabWidget);
     splitter->setCollapsible(1, true);
 
@@ -266,52 +266,53 @@ MainWindow::MainWindow(const QDir &home) :
     ////////////////////// Critical Power Plot Tab //////////////////////
 
     criticalPowerWindow = new CriticalPowerWindow(home, this);
-    tabWidget->addTab(criticalPowerWindow, tr("Critical Power"));
+    tabs.append(TabInfo(criticalPowerWindow, tr("Critical Power")));
 
     //////////////////////// Power Histogram Tab ////////////////////////
 
     histogramWindow = new HistogramWindow(this);
-    tabWidget->addTab(histogramWindow, tr("Histograms"));
+    tabs.append(TabInfo(histogramWindow, tr("Histograms")));
     
     //////////////////////// Pedal Force/Velocity Plot ////////////////////////
 
     pfPvWindow = new PfPvWindow(this);
-    tabWidget->addTab(pfPvWindow, tr("PF/PV"));
+    tabs.append(TabInfo(pfPvWindow, tr("PF/PV")));
 
     //////////////////////// 3d Model Window ////////////////////////////
 
 #ifdef GC_HAVE_QWTPLOT3D
     modelWindow = new ModelWindow(this, home);
-    tabWidget->addTab(modelWindow, tr("3D"));
+    tabs.append(TabInfo(modelWindow, tr("3D")));
 #endif
 
     //////////////////////// Weekly Summary ////////////////////////
     
     // add daily distance / duration graph:
     weeklySummaryWindow = new WeeklySummaryWindow(useMetricUnits, this);
-    tabWidget->addTab(weeklySummaryWindow, tr("Weekly Summary"));
+    tabs.append(TabInfo(weeklySummaryWindow, tr("Weekly Summary")));
 
     //////////////////////// LTM ////////////////////////
 
     // long term metrics window
     metricDB = new MetricAggregator(this, home, zones()); // just to catch config updates!
     ltmWindow = new LTMWindow(this, useMetricUnits, home);
-    tabWidget->addTab(ltmWindow, tr("Metrics"));
+    tabs.append(TabInfo(ltmWindow, tr("Metrics")));
 
     //////////////////////// Performance Manager  ////////////////////////
 
     performanceManagerWindow = new PerformanceManagerWindow(this);
-    tabWidget->addTab(performanceManagerWindow, tr("PM"));
+    tabs.append(TabInfo(performanceManagerWindow, tr("PM")));
 
 
     ///////////////////////////// Aerolab //////////////////////////////////
 
     aerolabWindow = new AerolabWindow(this);
-    tabWidget->addTab(aerolabWindow, tr("Aerolab"));
+    tabs.append(TabInfo(aerolabWindow, tr("Aerolab")));
 
     ///////////////////////////// GoogleMapsb //////////////////////////////////
 
-    googleMap = new GoogleMapControl(this,tabWidget);
+    googleMap = new GoogleMapControl(this);
+    tabs.append(TabInfo(googleMap, tr("Map")));
 
     ////////////////////////////// Signals ////////////////////////////// 
 
@@ -381,6 +382,21 @@ MainWindow::MainWindow(const QDir &home) :
     //optionsMenu->addAction(tr("&Update Metrics..."), this, 
     //                       SLOT(scanForMissing()()), tr("Ctrl+U")); 
 
+    QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
+    QStringList tabsToHide = settings->value(GC_TABS_TO_HIDE, "").toString().split(",");
+    for (int i = 0; i < tabs.size(); ++i) {
+        TabInfo &tab = tabs[i]; // QListIterator only returns const references.
+        bool hide = tabsToHide.contains(tab.name);
+        if (!hide)
+            tabWidget->addTab(tab.contents, tab.name);
+        if (tab.contents == summarySplitter)
+            continue; // Always show the ride summary.
+        tab.action = new QAction(tab.name, this);
+        tab.action->setCheckable(true);
+        tab.action->setChecked(!hide);
+        connect(tab.action, SIGNAL(triggered(bool)), this, SLOT(tabViewTriggered(bool)));
+        viewMenu->addAction(tab.action);
+    }
  
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(tr("&About GoldenCheetah"), this, SLOT(aboutDialog()));
@@ -400,6 +416,29 @@ MainWindow::MainWindow(const QDir &home) :
     }
 
     setAttribute(Qt::WA_DeleteOnClose);
+}
+
+void
+MainWindow::tabViewTriggered(bool)
+{
+    disconnect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+    QWidget *currentWidget = tabWidget->currentWidget();
+    int currentIndex = tabWidget->currentIndex();
+    tabWidget->clear();
+    QStringList tabsToHide;
+    foreach (const TabInfo &tab, tabs) {
+        if (!tab.action || tab.action->isChecked())
+            tabWidget->addTab(tab.contents, tab.name);
+        else
+            tabsToHide << tab.name;
+    }
+    if (tabWidget->indexOf(currentWidget) >= 0)
+        tabWidget->setCurrentWidget(currentWidget);
+    else if (currentIndex < tabWidget->count())
+        tabWidget->setCurrentIndex(currentIndex);
+    tabChanged(tabWidget->currentIndex());
+    connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+    settings->setValue(GC_TABS_TO_HIDE, tabsToHide.join(","));
 }
 
 void
@@ -470,7 +509,7 @@ MainWindow::addRide(QString name, bool bSelect /*=true*/)
     criticalPowerWindow->newRideAdded();
     if (bSelect)
     {
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentWidget(summarySplitter);
         treeWidget->setCurrentItem(last);
     }
     rideAdded(last);
@@ -769,14 +808,13 @@ MainWindow::rideTreeWidgetSelectionChanged()
     }
 
 	// turn off tabs that don't make sense for manual file entry
-	if (ride->ride() && ride->ride()->deviceType() == QString("Manual CSV")) {
-	    tabWidget->setTabEnabled(3,false); // Power Histogram
-	    tabWidget->setTabEnabled(4,false); // PF/PV Plot
-	}
-   else {
-	    tabWidget->setTabEnabled(3,true); // Power Histogram
-	    tabWidget->setTabEnabled(4,true); // PF/PV Plot
-	}
+    int histIndex = tabWidget->indexOf(histogramWindow);
+    int pfpvIndex = tabWidget->indexOf(pfPvWindow);
+    bool enabled = !ride->ride() || ride->ride()->deviceType() != QString("Manual CSV");
+    if (histIndex >= 0)
+        tabWidget->setTabEnabled(histIndex, enabled);
+    if (pfpvIndex >= 0)
+        tabWidget->setTabEnabled(pfpvIndex, enabled);
     saveAndOpenNotes();
 }
 void
@@ -838,11 +876,11 @@ MainWindow::showContextMenuPopup(const QPoint &pos)
         connect(actFrontInt, SIGNAL(triggered(void)), this, SLOT(frontInterval(void)));
         connect(actBackInt, SIGNAL(triggered(void)), this, SLOT(backInterval(void)));
 
-        if (tabWidget->currentIndex() == 1) // on ride plot
+        if (tabWidget->currentWidget() == allPlotWindow)
             menu.addAction(actZoomInt);
         menu.addAction(actRenameInt);
         menu.addAction(actDeleteInt);
-        if (tabWidget->currentIndex() == 4 && activeInterval->isSelected()) { // on PfPv plot
+        if (tabWidget->currentWidget() == pfPvWindow && activeInterval->isSelected()) {
             menu.addAction(actFrontInt);
             menu.addAction(actBackInt);
         }
@@ -1167,7 +1205,7 @@ MainWindow::setCriticalPower(int cp)
 void
 MainWindow::tabChanged(int index)
 {
-    criticalPowerWindow->setActive(index == 2);
+    criticalPowerWindow->setActive(tabWidget->widget(index) == criticalPowerWindow);
     performanceManagerWindow->setActive(tabWidget->widget(index) == performanceManagerWindow);
     ltmWindow->setActive(tabWidget->widget(index) == ltmWindow);
 #ifdef GC_HAVE_QWTPLOT3D
