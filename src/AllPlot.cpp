@@ -603,18 +603,17 @@ AllPlot::setDataP(AllPlot *plot, int startidx, int stopidx)
     cadCurve->setData(xaxis, smoothCad);
     altCurve->setData(xaxis, smoothAltitude);
 
-    setYMax();
-
-    setAxisMaxMajor(yLeft, 5);
-    setAxisMaxMajor(yLeft2, 5);
-    setAxisMaxMajor(yRight, 5);
-    setAxisMaxMajor(yRight2, 5);
-
     wattsCurve->setVisible(plot->wattsCurve->isVisible());
     hrCurve->setVisible(plot->hrCurve->isVisible());
     speedCurve->setVisible(plot->speedCurve->isVisible());
     cadCurve->setVisible(plot->cadCurve->isVisible());
     altCurve->setVisible(plot->altCurve->isVisible());
+
+    setYMax();
+    setAxisMaxMajor(yLeft, 5);
+    setAxisMaxMajor(yLeft2, 5);
+    setAxisMaxMajor(yRight, 5);
+    setAxisMaxMajor(yRight2, 5);
 
     if (!smoothWatts.empty()) wattsCurve->attach(this);
     if (!smoothHr.empty()) hrCurve->attach(this);
