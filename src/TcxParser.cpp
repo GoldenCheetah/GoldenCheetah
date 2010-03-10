@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (c) 2008 Sean C. Rhea (srhea@srhea.net),
  *                    J.T Conklin (jtc@acorntoolworks.com)
  *
@@ -6,12 +6,12 @@
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -55,7 +55,7 @@ TcxParser::startElement( const QString&, const QString&,
         {
             start_time = convertToLocalTime(qAttributes.value("StartTime"));
             rideFile->setStartTime(start_time);
-	    
+
             lastDistance = 0.0;
             last_time = start_time;
 	}
@@ -66,7 +66,7 @@ TcxParser::startElement( const QString&, const QString&,
         power = 0.0;
         cadence = 0.0;
         hr = 0.0;
-	alt = 0.0;
+        //alt = 0.0; // TCS from FIT files have not alt point for each trackpoint
         distance = -1;  // nh - we set this to -1 so we can detect if there was a distance in the trackpoint.
     }
     return TRUE;
