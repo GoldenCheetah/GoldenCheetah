@@ -200,6 +200,9 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
 void
 AerolabWindow::rideSelected() {
 
+  if (mainWindow->activeTab() != this)
+    return;
+
   RideItem *ride = mainWindow->rideItem();
 
   if (!ride)

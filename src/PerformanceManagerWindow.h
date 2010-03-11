@@ -45,7 +45,6 @@ class PerformanceManagerWindow : public QWidget
 
 	PerformanceManagerWindow (MainWindow *mainWindow);
 	~PerformanceManagerWindow (void);
-        void setActive(bool value);
 
     public slots:
 
@@ -54,6 +53,7 @@ class PerformanceManagerWindow : public QWidget
 	void replot();
         void configChanged();
         void metricChanged();
+        void rideSelected();
 
     protected:
 

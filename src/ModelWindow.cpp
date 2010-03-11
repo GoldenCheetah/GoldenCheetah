@@ -46,7 +46,7 @@ ModelWindow::addStandardChannels(QComboBox *box)
 }
 
 ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) :
-    QWidget(parent), home(home), main(parent), active(false), ride(NULL)
+    QWidget(parent), home(home), main(parent), ride(NULL)
 {
     // Layouts
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -165,7 +165,7 @@ ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) :
 
     // now connect up the widgets
     connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
-    connect(main, SIGNAL(intervalSelected()), this, SLOT(rideSelected()));
+    connect(main, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(presetValues, SIGNAL(currentIndexChanged(int)), this, SLOT(applyPreset(int)));
     connect(xSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setDirty()));
     connect(ySelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setDirty()));
@@ -183,16 +183,12 @@ ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) :
 }
 
 void
-ModelWindow::setActive(bool active)
-{
-    this->active = active;
-    if (active) setData(true);
-}
-void
 ModelWindow::rideSelected()
 {
+    if (main->activeTab() != this)
+        return;
     ride = main->rideItem();
-    if (active) setData(true);
+    setData(true);
 }
 
 void
@@ -227,6 +223,8 @@ ModelWindow::setZPane(int z)
 void
 ModelWindow::intervalSelected()
 {
+    if (main->activeTab() != this)
+        return;
     setData(false);
 }
 

@@ -37,7 +37,6 @@ class CriticalPowerWindow : public QWidget
 
         void newRideAdded();
         void deleteCpiFile(QString filename);
-        void setActive(bool value);
 
     protected slots:
 
@@ -62,7 +61,6 @@ class CriticalPowerWindow : public QWidget
         void addSeasons();
         QList<Season> seasons;
         RideItem *currentRide;
-        bool active;
 };
 
 #endif // _GC_CriticalPowerWindow_h

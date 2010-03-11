@@ -73,6 +73,7 @@ class MainWindow : public QMainWindow
         void saveSilent(RideItem *);
         bool saveRideSingleDialog(RideItem *);
         RideItem *rideItem() const { return ride; }
+        const QWidget *activeTab() const { return tabWidget->currentWidget(); }
 
         void notifyConfigChanged(); // used by ConfigDialog to notify MainWindow
                                     // when config has changed - and to get a
