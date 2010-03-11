@@ -81,6 +81,8 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow) :
 void
 HistogramWindow::rideSelected()
 {
+    if (mainWindow->activeTab() != this)
+        return;
     RideItem *ride = mainWindow->rideItem();
     if (!ride)
         return;
@@ -95,6 +97,8 @@ HistogramWindow::rideSelected()
 void
 HistogramWindow::intervalSelected()
 {
+    if (mainWindow->activeTab() != this)
+        return;
     RideItem *ride = mainWindow->rideItem();
     if (!ride) return;
 
@@ -105,6 +109,8 @@ HistogramWindow::intervalSelected()
 void
 HistogramWindow::zonesChanged()
 {
+    if (mainWindow->activeTab() != this)
+        return;
     powerHist->refreshZoneLabels();
     powerHist->replot();
 }

@@ -74,10 +74,10 @@ class LTMWindow : public QWidget
         MainWindow *main; // used by zones shader
         LTMWindow(MainWindow *, bool, const QDir &);
         ~LTMWindow();
-        void setActive(bool);
         LTMToolTip *toolTip() { return picker; }
 
     public slots:
+        void rideSelected();
         void refreshPlot();
         void splitterMoved();
         void dateRangeSelected(const Season *);

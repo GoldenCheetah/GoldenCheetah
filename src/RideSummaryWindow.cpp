@@ -47,6 +47,8 @@ RideSummaryWindow::RideSummaryWindow(MainWindow *mainWindow) :
 void
 RideSummaryWindow::refresh()
 {
+    // XXX: activeTab is never equaly to RideSummaryWindow right now because
+    // it's wrapped in the summarySplitter in MainWindow.
     if (!mainWindow->rideItem()) {
 	rideSummary->clear();
         return;
