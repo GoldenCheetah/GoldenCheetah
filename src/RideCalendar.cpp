@@ -18,6 +18,11 @@
 RideCalendar::RideCalendar(MainWindow *parent) :
     QCalendarWidget(parent), mainWindow(parent)
 {
+    // make font 2 point sizes smaller that the default
+    QFont font;
+    font.setPointSize(font.pointSize()-2);
+    setFont(font);
+
     this->setFirstDayOfWeek(Qt::Monday);
     this->addWorkoutCode(QString("race"), QColor(255,128,128));
     this->addWorkoutCode(QString("sick"), QColor(255,255,128));
