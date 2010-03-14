@@ -54,8 +54,14 @@ GcFileReader::openRideFile(QFile &file, QStringList &errors) const
         QString value = attr.attribute("value");
         if (key == "Device type")
             rideFile->setDeviceType(value);
-        if (key == "Start time")
-            rideFile->setStartTime(QDateTime::fromString(value, DATETIME_FORMAT).toLocalTime());
+        if (key == "Start time") {
+            // by default QDateTime is localtime - the source however is UTC
+            QDateTime aslocal = QDateTime::fromString(value, DATETIME_FORMAT);
+            // construct in UTC so we can honour the conversion to localtime
+            QDateTime asUTC = QDateTime(aslocal.date(), aslocal.time(), Qt::UTC);
+            // now set in localtime
+            rideFile->setStartTime(asUTC.toLocalTime());
+        }
     }
 
     QVector<double> intervalStops; // used to set the interval number for each point
