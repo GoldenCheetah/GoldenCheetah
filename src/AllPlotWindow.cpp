@@ -32,6 +32,7 @@
 #include <qwt_plot_zoomer.h>
 #include <qwt_plot_picker.h>
 #include <qwt_plot_marker.h>
+#include <qwt_arrow_button.h>
 
 AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     QWidget(mainWindow), mainWindow(mainWindow)
@@ -43,10 +44,31 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     showLayout->addWidget(showLabel);
 
     showStack = new QCheckBox(tr("Stacked view"), this);
-    showStack->setCheckState(Qt::Unchecked);
+
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+    if (settings->value(GC_RIDE_PLOT_STACK).toInt())
+        showStack->setCheckState(Qt::Checked);
+    else
+        showStack->setCheckState(Qt::Unchecked);
     showLayout->addWidget(showStack);
 
     stackWidth = 15;
+
+    QLabel *labelspacer = new QLabel(this);
+    labelspacer->setFixedWidth(5);
+    showLayout->addWidget(labelspacer);
+
+    stackZoomUp = new QwtArrowButton(1, Qt::UpArrow,this);
+    stackZoomUp->setFixedHeight(15);
+    stackZoomUp->setFixedWidth(15);
+    stackZoomUp->setEnabled(false);
+    showLayout->addWidget(stackZoomUp);
+
+    stackZoomDown = new QwtArrowButton(1, Qt::DownArrow,this);
+    stackZoomDown->setFixedHeight(15);
+    stackZoomDown->setFixedWidth(15);
+    stackZoomDown->setEnabled(false);
+    showLayout->addWidget(stackZoomDown);
 
     QCheckBox *showGrid = new QCheckBox(tr("Grid"), this);
     showGrid->setCheckState(Qt::Checked);
@@ -185,6 +207,12 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
             this, SLOT(setShowGrid(int)));
     connect(showStack, SIGNAL(stateChanged(int)),
             this, SLOT(setShowStack(int)));
+
+    connect(stackZoomUp, SIGNAL(clicked()),
+            this, SLOT(setStackZoomUp()));
+    connect(stackZoomDown, SIGNAL(clicked()),
+            this, SLOT(setStackZoomDown()));
+
     connect(comboDistance, SIGNAL(currentIndexChanged(int)),
             this, SLOT(setByDistance(int)));
     connect(smoothSlider, SIGNAL(valueChanged(int)),
@@ -618,9 +646,40 @@ AllPlotWindow::resetStackedDatas()
 }
 
 void
+AllPlotWindow::setStackZoomUp()
+{
+    if (stackWidth<200 && stackWidth<allPlot->rideItem->ride()->dataPoints().last()->secs/60) {
+        stackWidth = ceil(stackWidth * 1.25);
+        stackZoomDown->setEnabled(true);
+        setShowStack(false);
+        setShowStack(true);
+        if (stackWidth>=200  || stackWidth>=allPlot->rideItem->ride()->dataPoints().last()->secs/60)
+            stackZoomUp->setEnabled(false);
+    }
+}
+
+void
+AllPlotWindow::setStackZoomDown()
+{
+    if (stackWidth>4) {
+        stackWidth = floor(stackWidth / 1.25);
+        stackZoomUp->setEnabled(true);
+        setShowStack(false);
+        setShowStack(true);
+        if (stackWidth<=4)
+            stackZoomDown->setEnabled(false);
+    }
+}
+
+void
 AllPlotWindow::setShowStack(int value)
 {
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+    settings->setValue(GC_RIDE_PLOT_STACK, value);
     if (value) {
+        stackZoomUp->setEnabled(true);
+        stackZoomDown->setEnabled(true);
+
         int _stackWidth = stackWidth;
         if (allPlot->byDistance())
             _stackWidth = stackWidth/3;
@@ -657,18 +716,18 @@ AllPlotWindow::setShowStack(int value)
 
             // Update AllPlot for stacked view
             _allPlot->setDataP(allPlot, startIndex, stopIndex);
-            _allPlot->setAxisScale(QwtPlot::xBottom, _stackWidth*i, _stackWidth*(i+1), 1);
+            _allPlot->setAxisScale(QwtPlot::xBottom, _stackWidth*i, _stackWidth*(i+1), 15/stackWidth);
 
             if (i==0){
                 // First plot view title and legend
                 _allPlot->setTitle(allPlot->title());
                 _allPlot->plotLayout()->setLegendPosition(QwtPlot::TopLegend);
-                _allPlot->setFixedHeight(200);
+                _allPlot->setFixedHeight(120+stackWidth*2+50);
             }
             else {
                _allPlot->setTitle("");
                _allPlot->insertLegend(NULL);
-               _allPlot->setFixedHeight(150);
+               _allPlot->setFixedHeight(120+stackWidth*2);
             }
 
             // No x axis titles
@@ -699,7 +758,7 @@ AllPlotWindow::setShowStack(int value)
         stackFrame->hide();
         allPlot->show();
 
-        if (allPlots.count()>1) {
+        if (allPlots.count()>0) {
             foreach (AllPlot *plot, allPlots) {
                 //layout()->removeWidget(plot);
                 delete plot;

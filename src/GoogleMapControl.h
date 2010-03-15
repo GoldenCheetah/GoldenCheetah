@@ -25,7 +25,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <RideFile.h>
+#include "RideFile.h"
 
 class QMouseEvent;
 class RideItem;

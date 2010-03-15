@@ -122,8 +122,10 @@ CriticalPowerWindow::setActive(bool new_value)
     active = new_value;
     if (active && !was_active) {
         currentRide = mainWindow->rideItem();
-        if (currentRide)
+        if (currentRide) {
             cpintPlot->calculate(currentRide);
+            cpintSetCPButton->setEnabled(cpintPlot->cp > 0);
+        }
     }
 }
 

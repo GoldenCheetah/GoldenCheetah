@@ -27,6 +27,7 @@ class QwtPlotPanner;
 class QwtPlotZoomer;
 class QwtPlotPicker;
 class QwtPlotMarker;
+class QwtArrowButton;
 class RideItem;
 class IntervalItem;
 
@@ -52,6 +53,9 @@ class AllPlotWindow : public QWidget
         void intervalSelected();
         void zonesChanged();
         void intervalsChanged();
+
+        void setStackZoomUp();
+        void setStackZoomDown();
 
         void setShowStack(int state);
         void setShowPower(int state);
@@ -82,6 +86,10 @@ class AllPlotWindow : public QWidget
         QwtPlotPicker *allPicker;
         int selection;
         QCheckBox *showStack;
+
+        QwtArrowButton *stackZoomDown;
+        QwtArrowButton *stackZoomUp;
+
 	QCheckBox *showHr;
 	QCheckBox *showSpeed;
 	QCheckBox *showCad;
