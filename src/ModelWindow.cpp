@@ -46,7 +46,8 @@ ModelWindow::addStandardChannels(QComboBox *box)
     //box->addItem(tr("Longitude"), MODEL_LONG); //XXX weird values make the plot ugly
 }
 
-ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) : QWidget(parent), home(home), main(parent), active(false)
+ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) :
+    QWidget(parent), home(home), main(parent), active(false), ride(NULL)
 {
     // Layouts
     QVBoxLayout *mainLayout = new QVBoxLayout;
