@@ -17,10 +17,11 @@
  */
 
 #include "FitRideFile.h"
-#include <qsharedpointer>
-#include <qmap>
-#include <qset>
+#include <QSharedPointer>
+#include <QMap>
+#include <QSet>
 #include <stdio.h>
+#include <stdint.h>
 
 static int fitFileReaderRegistered =
     RideFileFactory::instance().registerReader(
