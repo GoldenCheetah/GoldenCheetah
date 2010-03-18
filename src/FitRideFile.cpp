@@ -183,7 +183,7 @@ struct FitFileReaderState
                 case 0: lati = value; break;
                 case 1: lngi = value; break;
                 case 2: alt = (value == 0xffff) ? 0 : (value / 5.0 - 500.0); break;
-                case 3: hr = value; break;
+                case 3: hr = (value == 0xff) ? 0 : value; break;
                 case 4: cad = (value == 0xff) ? 0 : value; break;
                 case 5: km = ((uint32_t) value == 0xffffffff) ? 0 : value / 100000.0; break;
                 case 6: kph = (value == 0xffff) ? 0 : value * 3.6 / 1000.0; break;
