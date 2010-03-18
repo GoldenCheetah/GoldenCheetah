@@ -46,7 +46,8 @@ Q_OBJECT
     std::string CreatePolyLine();
     void CreateSubPolyLine(const std::vector<RideFilePoint> &points,
                            std::ostringstream &oss,
-                           QColor color);
+                           int avgPower);
+    std::string CreateMapToolTipJavaScript();
     std::string CreateIntervalMarkers();
     void loadRide();
     // the web browser is loading a page, do NOT start another load
