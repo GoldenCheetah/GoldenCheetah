@@ -66,15 +66,16 @@ struct FitFileReaderState
     QStringList &errors;
     RideFile *rideFile;
     time_t start_time;
-    unsigned last_time;
+    time_t last_time;
     QMap<int, FitDefinition> local_msg_types;
     QSet<int> unknown_record_fields, unknown_global_msg_nums;
     int interval;
     int devices;
+    bool stopped;
 
     FitFileReaderState(QFile &file, QStringList &errors) :
         file(file), errors(errors), rideFile(NULL), start_time(0),
-        last_time(0), interval(0), devices(0)
+        last_time(0), interval(0), devices(0), stopped(true)
     {
         if (global_msg_names.isEmpty()) {
             global_msg_names.insert(0,  "file_id");
@@ -144,6 +145,42 @@ struct FitFileReaderState
         }
     }
 
+    void decodeEvent(const FitDefinition &def, int, const std::vector<int> values) {
+        time_t time = 0;
+        int type = -1;
+        int i = 0;
+        foreach(const FitField &field, def.fields) {
+            int value = values[i++];
+            switch (field.num) {
+                case 253: time = value + qbase_time.toTime_t(); break;
+                case 1: type = value; break;
+                default: ; // do nothing
+            }
+        }
+        bool wasStopped = stopped;
+        switch (type) {
+            case 0: // start
+                stopped = false;
+                break;
+            case 3: // marker
+                break;
+            case 4: // stop all
+            case 9: // stop disable all
+                stopped = true;
+                break;
+            default:
+                errors << QString("unknown event type %1").arg(type);
+        }
+        if (wasStopped && !stopped) {
+            assert(time > 0);
+            if (start_time > 0) {
+                // Skip over time when we were stopped.
+                last_time = time;
+                printf("setting last_time = %d\n", (int) last_time);
+            }
+        }
+    }
+
     void decodeLap(const FitDefinition &def, int time_offset, const std::vector<int> values) {
         time_t time = 0;
         if (time_offset > 0)
@@ -169,6 +206,7 @@ struct FitFileReaderState
     }
 
     void decodeRecord(const FitDefinition &def, int time_offset, const std::vector<int> values) {
+        assert(!stopped);
         time_t time = 0;
         if (time_offset > 0)
             time = last_time + time_offset;
@@ -195,6 +233,8 @@ struct FitFileReaderState
                 default: unknown_record_fields.insert(field.num);
             }
         }
+        if (time == last_time)
+            return; // Sketchy, but some FIT files do this.
         if (lati != 0x7fffffff && lngi != 0x7fffffff) {
             lat = lati * 180.0 / 0x7fffffff;
             lng = lngi * 180.0 / 0x7fffffff;
@@ -205,12 +245,46 @@ struct FitFileReaderState
             t.setTime_t(start_time);
             rideFile->setStartTime(t);
         }
-        last_time = time;
         double secs = time - start_time;
-        double nm = 0.0; // XXX
+        double nm = 0;
         double headwind = 0.0;
-        int interval = 0; // XXX
+        int interval = 0;
+        if ((last_time != 0) && (time > last_time + 1)) {
+            // Evil smart recording.  Linearly interpolate missing points.
+            RideFilePoint *prevPoint = rideFile->dataPoints().back();
+            int deltaSecs = (int) (secs - prevPoint->secs);
+            assert(deltaSecs == secs - prevPoint->secs); // no fractional part
+            assert(deltaSecs == time - last_time);
+            double deltaCad = cad - prevPoint->cad;
+            double deltaHr = hr - prevPoint->hr;
+            double deltaDist = km - prevPoint->km;
+            double deltaSpeed = kph - prevPoint->kph;
+            double deltaTorque = nm - prevPoint->nm;
+            double deltaPower = watts - prevPoint->watts;
+            double deltaAlt = alt - prevPoint->alt;
+            double deltaLon = lng - prevPoint->lon;
+            double deltaLat = lat - prevPoint->lat;
+            double deltaHeadwind = headwind - prevPoint->headwind;
+            for (int i = 1; i < deltaSecs; i++) {
+                double weight = 1.0 * i / deltaSecs;
+                rideFile->appendPoint(
+                    prevPoint->secs + (deltaSecs * weight),
+                    prevPoint->cad + (deltaCad * weight),
+                    prevPoint->hr + (deltaHr * weight),
+                    prevPoint->km + (deltaDist * weight),
+                    prevPoint->kph + (deltaSpeed * weight),
+                    prevPoint->nm + (deltaTorque * weight),
+                    prevPoint->watts + (deltaPower * weight),
+                    prevPoint->alt + (deltaAlt * weight),
+                    prevPoint->lon + (deltaLon * weight),
+                    prevPoint->lat + (deltaLat * weight),
+                    prevPoint->headwind + (deltaHeadwind * weight),
+                    interval);
+            }
+            prevPoint = rideFile->dataPoints().back();
+        }
         rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, interval);
+        last_time = time;
     }
 
     int read_record(bool &stop, QStringList &errors) {
@@ -302,9 +376,9 @@ struct FitFileReaderState
                 case 0:  decodeFileId(def, time_offset, values); break;
                 case 19: decodeLap(def, time_offset, values); break;
                 case 20: decodeRecord(def, time_offset, values); break;
+                case 21: decodeEvent(def, time_offset, values); break;
                 case 23: /* device info */
                 case 18: /* session */
-                case 21: /* event */
                 case 22: /* undocumented */
                 case 34: /* activity */
                 case 49: /* file creator */
