@@ -99,7 +99,7 @@ ErgFile::ErgFile(QString filename, int &mode, double Cp)
                 mode = format = ERG;
             } else if (mrcformat.exactMatch(line)) {
                 // save away the format
-                mode = format = ERG;
+                mode = format = MRC;
             } else if (crsformat.exactMatch(line)) {
                 // save away the format
                 mode = format = CRS;

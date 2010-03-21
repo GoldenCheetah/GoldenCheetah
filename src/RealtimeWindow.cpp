@@ -764,7 +764,7 @@ RealtimeWindow::SelectWorkout()
     }
 
     // set the device to the right mode
-    if (mode == ERG) {
+    if (mode == ERG || mode == MRC) {
         status |= RT_MODE_ERGO;
         status &= ~RT_MODE_SPIN;
         if (deviceController != NULL) deviceController->setMode(RT_MODE_ERGO);
