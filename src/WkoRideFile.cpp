@@ -155,7 +155,7 @@ RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors) const
 WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &errors)
 {
     WKO_ULONG WKO_xormasks[32];    // xormasks used all over
-    double cad=0, hr=0, km=0, kph=0, nm=0, watts=0, alt=0, lon=0, lat=0, interval=0;
+    double cad=0, hr=0, km=0, kph=0, nm=0, watts=0, alt=0, lon=0, lat=0, wind=0, interval=0;
 
     int isnull=0;
     WKO_ULONG records, data;
@@ -245,7 +245,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
 	long svalp; // for printf
 
         // reset point values;
-        cad= hr= km= kph= nm= watts= 0.0;
+        alt = wind = cad= hr= km= kph= nm= watts= 0.0;
 
         marker = get_bits(thelot, bit++, 1);
 
@@ -303,6 +303,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
 
                             alt = val; alt /=10;
                         }
+                        if (WKO_GRAPHS[i] == 'W') wind = alt;
                         break;
                     case 'T' : /* Torque */
                         if (imperialflag && WKO_GRAPHS[i]=='S') val = long((double)val * KMTOMI);
@@ -414,7 +415,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
 
                     // !! needs to be modified to support the new alt patch
                     rideFile->appendPoint((double)rtime/1000, cad, hr, km,
-                            kph, nm, watts, alt, lon, lat, 0.0, 0);
+                            kph, nm, watts, alt, lon, lat, wind, 0);
             }
 
             // increment time - even for null records (perhaps especially for null
