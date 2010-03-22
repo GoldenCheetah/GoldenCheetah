@@ -199,7 +199,7 @@ MainWindow::MainWindow(const QDir &home) :
         QDateTime dt;
         if (parseRideFileName(name, &notesFileName, &dt)) {
             last = new RideItem(RIDE_TYPE, home.path(), 
-                                name, dt, zones(), notesFileName);
+                                name, dt, zones(), notesFileName, this);
             allRides->addChild(last);
 	    calendar->update();
         }
@@ -481,7 +481,7 @@ MainWindow::addRide(QString name, bool bSelect /*=true*/)
         assert(false);
     }
     RideItem *last = new RideItem(RIDE_TYPE, home.path(), 
-                                  name, dt, zones(), notesFileName);
+                                  name, dt, zones(), notesFileName, this);
 
     QVariant isAscending = settings->value(GC_ALLRIDES_ASCENDING,Qt::Checked); // default is ascending sort
     int index = 0;
@@ -1313,4 +1313,12 @@ void
 MainWindow::notifyConfigChanged()
 {
     configChanged();
+}
+
+// notify children that rideSelected
+// called by RideItem when its date/time changes
+void
+MainWindow::notifyRideSelected()
+{
+    rideSelected();
 }

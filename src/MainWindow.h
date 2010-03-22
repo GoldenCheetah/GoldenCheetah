@@ -78,6 +78,8 @@ class MainWindow : public QMainWindow
         void notifyConfigChanged(); // used by ConfigDialog to notify MainWindow
                                     // when config has changed - and to get a
                                     // signal emitted to notify its children
+        void notifyRideSelected();  // used by RideItem to notify when
+                                    // rideItem date/time changes
         void selectView(int);
 
     protected:

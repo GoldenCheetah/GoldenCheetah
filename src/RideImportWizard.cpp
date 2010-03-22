@@ -26,6 +26,7 @@
 #include <QWaitCondition>
 #include "Settings.h"
 #include "Units.h"
+#include "GcRideFile.h"
 
 
 // drag and drop passes urls ... convert to a list of files and call main constructor
@@ -354,8 +355,8 @@ RideImportWizard::process()
         if (t->text().startsWith(tr("Error"))) continue;
 
        // date needed?
-        if (blanks[i]) {
-            needdates++;
+        if (blanks[i] || filenames[i].endsWith(".gc", Qt::CaseInsensitive)) { // but we can override gc ride files
+            if (blanks[i]) needdates++; // count the blanks tho
             t = tableWidget->item(i,1);
             t->setFlags(t->flags() | (Qt::ItemIsEditable)); // make editable ONLY if not present -
                                                             // we cannot override the RideFileReader
@@ -642,43 +643,83 @@ RideImportWizard::abortClicked()
                                .arg ( targetnosuffix )
                                .arg ( suffix );
         QString fulltarget = home.absolutePath() + "/" + target;
-        // so now we have sourcefile in 'filenames[i]' and target file name in 'target'
-        if (!fulltarget.compare(filenames[i])) { // they are the same file! so skip copy
-            tableWidget->item(i,5)->setText(tr("Error - Source is Target"));
-        } else if (QFileInfo(fulltarget).exists()) {
-            if (overwriteFiles) {
-                tableWidget->item(i,5)->setText(tr("Overwriting file..."));
-                QFile source(filenames[i]);
-                QString fulltargettmp(home.absolutePath() + tr("/") + targetnosuffix + tr(".tmp"));
 
-                if (source.copy(fulltargettmp)) {
-                    // tmp version saved now zap original
-                    QFile original(fulltarget);
-                    original.remove(); // zap!
-                    // mv tmp to target
-                    QFile temp(fulltargettmp);
-                    if (temp.rename(fulltarget)) {
-                        tableWidget->item(i,5)->setText(tr("File Overwritten"));
-                        //no need to add since its already there!
-                    } else
-                        tableWidget->item(i,5)->setText(tr("Error - overwrite failed"));
+        // if its a gc file we need to parse and serialize
+        // using the ridedatetime and target filename
+        if (filenames[i].endsWith(".gc", Qt::CaseInsensitive)) {
+
+            bool existed;
+            if ((existed=QFileInfo(fulltarget).exists()) && !overwriteFiles) {
+                tableWidget->item(i,5)->setText(tr("Error - File exists"));
+            } else {
+
+                // read the file (again)
+                QStringList errors;
+                QFile thisfile(filenames[i]);
+                RideFile *ride(RideFileFactory::instance().openRideFile(thisfile, errors));
+
+                // update ridedatetime
+                ride->setStartTime(ridedatetime);
+
+                // serialize
+                GcFileReader reader;
+                QFile target(fulltarget);
+                reader.writeRideFile(ride, target);
+
+                // clear
+                delete ride;
+
+                if (existed) {
+                    tableWidget->item(i,5)->setText(tr("File Overwritten"));
                 } else {
-                    tableWidget->item(i,5)->setText(tr("Error - overwrite failed"));
+                    tableWidget->item(i,5)->setText(tr("File Saved"));
+                    mainWindow->addRide(QFileInfo(fulltarget).fileName(), true);
+                }
+            }
+
+        } else {
+
+            // for native file formats the filename IS the ride date time so
+            // no need to write -- we just copy
+
+            // so now we have sourcefile in 'filenames[i]' and target file name in 'target'
+            if (!fulltarget.compare(filenames[i])) { // they are the same file! so skip copy
+                tableWidget->item(i,5)->setText(tr("Error - Source is Target"));
+            } else if (QFileInfo(fulltarget).exists()) {
+                if (overwriteFiles) {
+                    tableWidget->item(i,5)->setText(tr("Overwriting file..."));
+                    QFile source(filenames[i]);
+                    QString fulltargettmp(home.absolutePath() + tr("/") + targetnosuffix + tr(".tmp"));
+
+                    if (source.copy(fulltargettmp)) {
+                        // tmp version saved now zap original
+                        QFile original(fulltarget);
+                        original.remove(); // zap!
+                        // mv tmp to target
+                        QFile temp(fulltargettmp);
+                        if (temp.rename(fulltarget)) {
+                            tableWidget->item(i,5)->setText(tr("File Overwritten"));
+                            //no need to add since its already there!
+                        } else
+                            tableWidget->item(i,5)->setText(tr("Error - overwrite failed"));
+                    } else {
+                        tableWidget->item(i,5)->setText(tr("Error - overwrite failed"));
+                    }
+                } else {
+                    tableWidget->item(i,5)->setText(tr("Error - File exists"));
                 }
             } else {
-                tableWidget->item(i,5)->setText(tr("Error - File exists"));
+                    tableWidget->item(i,5)->setText(tr("Saving file..."));
+                    QFile source(filenames[i]);
+                    if (source.copy(fulltarget)) {
+                        tableWidget->item(i,5)->setText(tr("File Saved"));
+                        mainWindow->addRide(QFileInfo(fulltarget).fileName(), true); // add to tree view
+                        // free immediately otherwise all imported rides are cached
+                        // and with large imports this can lead to memory exhaustion
+                        mainWindow->rideItem()->freeMemory();
+                    } else
+                        tableWidget->item(i,5)->setText(tr("Error - copy failed"));
             }
-        } else {
-                tableWidget->item(i,5)->setText(tr("Saving file..."));
-                QFile source(filenames[i]);
-                if (source.copy(fulltarget)) {
-                    tableWidget->item(i,5)->setText(tr("File Saved"));
-                    mainWindow->addRide(QFileInfo(fulltarget).fileName(), true); // add to tree view
-                    // free immediately otherwise all imported rides are cached
-                    // and with large imports this can lead to memory exhaustion
-                    mainWindow->rideItem()->freeMemory();
-                } else
-                    tableWidget->item(i,5)->setText(tr("Error - copy failed"));
         }
         QApplication::processEvents();
         if (aborted) { done(0); }

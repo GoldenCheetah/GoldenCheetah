@@ -78,12 +78,12 @@ void RideCalendar::paintCell(QPainter *painter, const QRect &rect, const QDate &
     RideIter i;
     if (ascending) {
         RideItemDateLessThan comp;
-        RideItem search(0, "", "", QDateTime(date), NULL, "");
+        RideItem search(0, "", "", QDateTime(date), NULL, "", NULL);
         i = std::lower_bound(begin, end, &search, comp);
     }
     else {
         RideItemDateGreaterThan comp;
-        RideItem search(0, "", "", QDateTime(date.addDays(1)), NULL, "");
+        RideItem search(0, "", "", QDateTime(date.addDays(1)), NULL, "", NULL);
         i = std::upper_bound(begin, end, &search, comp);
     }
 
