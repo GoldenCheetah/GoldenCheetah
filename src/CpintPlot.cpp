@@ -117,7 +117,7 @@ update_cpi_file(const cpi_file_info *info, QProgressDialog *progress,
     QStringList errors;
     boost::scoped_ptr<RideFile> rideFile(
         RideFileFactory::instance().openRideFile(file, errors));
-    if (! rideFile)
+    if (!rideFile || rideFile->dataPoints().isEmpty())
         return;
     cpint_data data;
     data.rec_int_ms = (int) round(rideFile->recIntSecs() * 1000.0);
