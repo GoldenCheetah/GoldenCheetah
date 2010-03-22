@@ -37,20 +37,17 @@ class XPower : public RideMetric {
     double xpower;
     double secs;
 
-    friend class RelativeIntensity;
-    friend class VariabilityIndex;
-    friend class BikeScore;
-
     public:
 
-    XPower() : xpower(0.0), secs(0.0) {}
-    QString symbol() const { return "skiba_xpower"; }
-    QString name() const { return tr("xPower"); }
-    MetricType type() const { return RideMetric::Average; }
-    QString units(bool) const { return "watts"; }
-    int precision() const { return 0; }
-    double conversion() const { return 1.0; }
-    double value(bool) const { return xpower; }
+    XPower() : xpower(0.0), secs(0.0)
+    {
+        setSymbol("skiba_xpower");
+        setName(tr("xPower"));
+        setType(RideMetric::Average);
+        setMetricUnits(tr("watts"));
+        setImperialUnits(tr("watts"));
+    }
+
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
 
@@ -84,19 +81,10 @@ class XPower : public RideMetric {
         }
         xpower = pow(total / count, 0.25);
         secs = count * secsDelta;
-    }
 
-    // added djconnel: allow RI to be combined across rides
-    bool canAggregate() const { return true; }
-    void aggregateWith(const RideMetric &other) { 
-        assert(symbol() == other.symbol());
-	const XPower &ap = dynamic_cast<const XPower&>(other);
-	xpower = pow(xpower, bikeScoreN) * secs + pow(ap.xpower, bikeScoreN) * ap.secs;
-	secs += ap.secs;
-	xpower = pow(xpower / secs, 1 / bikeScoreN);
+        setValue(xpower);
+        setCount(secs);
     }
-    // end added djconnel
-
     RideMetric *clone() const { return new XPower(*this); }
 };
 
@@ -106,37 +94,29 @@ class VariabilityIndex : public RideMetric {
 
     public:
 
-    VariabilityIndex() : vi(0.0), secs(0.0) {}
-    QString symbol() const { return "skiba_variability_index"; }
-    QString name() const { return tr("Skiba VI"); }
-    MetricType type() const { return RideMetric::Average; }
-    QString units(bool) const { return ""; }
-    double conversion() const { return 1.0; }
-    int precision() const { return 3; }
-    double value(bool) const { return vi; }
+    VariabilityIndex() : vi(0.0), secs(0.0)
+    {
+        setSymbol("skiba_variability_index");
+        setName(tr("Skiba VI"));
+        setType(RideMetric::Average);
+        setMetricUnits(tr(""));
+        setImperialUnits(tr(""));
+        setPrecision(3);
+    }
+
     void compute(const RideFile *, const Zones *, int,
                  const QHash<QString,RideMetric*> &deps) {
-            assert(deps.contains("skiba_xpower"));
-            assert(deps.contains("average_power"));
-            XPower *xp = dynamic_cast<XPower*>(deps.value("skiba_xpower"));
-            assert(xp);
-            RideMetric *ap = dynamic_cast<RideMetric*>(deps.value("average_power"));
-            assert(ap);
-            vi = xp->value(true) / ap->value(true);
-            secs = xp->secs;
-    }
+        assert(deps.contains("skiba_xpower"));
+        assert(deps.contains("average_power"));
+        XPower *xp = dynamic_cast<XPower*>(deps.value("skiba_xpower"));
+        assert(xp);
+        RideMetric *ap = dynamic_cast<RideMetric*>(deps.value("average_power"));
+        assert(ap);
+        vi = xp->value(true) / ap->value(true);
+        secs = xp->count();
 
-    // added djconnel: allow RI to be combined across rides
-    bool canAggregate() const { return true; }
-    void aggregateWith(const RideMetric &other) {
-        assert(symbol() == other.symbol());
-	const VariabilityIndex &ovi = dynamic_cast<const VariabilityIndex&>(other);
-	vi = secs * pow(vi, bikeScoreN) + ovi.secs * pow(ovi.vi, bikeScoreN);
-	secs += ovi.secs;
-	vi = pow(vi / secs, 1.0 / bikeScoreN);
+        setValue(vi);
     }
-    // end added djconnel
-
     RideMetric *clone() const { return new VariabilityIndex(*this); }
 };
 
@@ -146,33 +126,37 @@ class RelativeIntensity : public RideMetric {
 
     public:
 
-    RelativeIntensity() : reli(0.0), secs(0.0) {}
-    QString symbol() const { return "skiba_relative_intensity"; }
-    QString name() const { return tr("Relative Intensity"); }
-    MetricType type() const { return RideMetric::Average; }
-    QString units(bool) const { return ""; }
-    double conversion() const { return 1.0; }
-    int precision() const { return 3; }
-    double value(bool) const { return reli; }
+    RelativeIntensity() : reli(0.0), secs(0.0)
+    {
+        setSymbol("skiba_relative_intensity");
+        setName(tr("Relative Intensity"));
+        setType(RideMetric::Average);
+        setMetricUnits(tr(""));
+        setImperialUnits(tr(""));
+        setPrecision(3);
+    }
     void compute(const RideFile *, const Zones *zones, int zoneRange,
                  const QHash<QString,RideMetric*> &deps) {
         if (zones && zoneRange >= 0) {
             assert(deps.contains("skiba_xpower"));
             XPower *xp = dynamic_cast<XPower*>(deps.value("skiba_xpower"));
             assert(xp);
-            reli = xp->xpower / zones->getCP(zoneRange);
-            secs = xp->secs;
+            reli = xp->value(true) / zones->getCP(zoneRange);
+            secs = xp->count();
         }
+        setValue(reli);
+        setCount(secs);
     }
 
     // added djconnel: allow RI to be combined across rides
     bool canAggregate() const { return true; }
     void aggregateWith(const RideMetric &other) { 
         assert(symbol() == other.symbol());
-	const RelativeIntensity &ap = dynamic_cast<const RelativeIntensity&>(other);
-	reli = secs * pow(reli, bikeScoreN) + ap.secs * pow(ap.reli, bikeScoreN);
-	secs += ap.secs;
-	reli = pow(reli / secs, 1.0 / bikeScoreN);
+	    const RelativeIntensity &ap = dynamic_cast<const RelativeIntensity&>(other);
+	    reli = secs * pow(reli, bikeScoreN) + ap.count() * pow(ap.value(true), bikeScoreN);
+	    secs += ap.count();
+	    reli = pow(reli / secs, 1.0 / bikeScoreN);
+        setValue(reli);
     }
     // end added djconnel
 
@@ -184,35 +168,33 @@ class BikeScore : public RideMetric {
 
     public:
 
-    BikeScore() : score(0.0) {}
-    QString symbol() const { return "skiba_bike_score"; }
-    QString name() const { return tr("BikeScore&#8482;"); }
-    MetricType type() const { return RideMetric::Total; }
-    QString units(bool) const { return ""; }
-    int precision() const { return 0; }
-    double conversion() const { return 1.0; }
-    double value(bool) const { return score; }
+    BikeScore() : score(0.0)
+    {
+        setSymbol("skiba_bike_score");
+        setName(tr("BikeScore&#8482;"));
+        setMetricUnits("");
+        setImperialUnits("");
+    }
+
     void compute(const RideFile *, const Zones *zones, int zoneRange,
 	    const QHash<QString,RideMetric*> &deps) {
-	if (!zones || zoneRange < 0)
-	    return;
+	    if (!zones || zoneRange < 0)
+	        return;
+
         assert(deps.contains("skiba_xpower"));
         assert(deps.contains("skiba_relative_intensity"));
         XPower *xp = dynamic_cast<XPower*>(deps.value("skiba_xpower"));
         RideMetric *ri = deps.value("skiba_relative_intensity");
         assert(ri);
-        double normWork = xp->xpower * xp->secs;
+        double normWork = xp->value(true) * xp->count();
         double rawBikeScore = normWork * ri->value(true);
         double workInAnHourAtCP = zones->getCP(zoneRange) * 3600;
         score = rawBikeScore / workInAnHourAtCP * 100.0;
+
+        setValue(score);
     }
-    void override(const QMap<QString,QString> &map) {
-        if (map.contains("value"))
-            score = map.value("value").toDouble();
-    }
+
     RideMetric *clone() const { return new BikeScore(*this); }
-    bool canAggregate() const { return true; }
-    void aggregateWith(const RideMetric &other) { score += other.value(true); }
 };
 
 static bool addAllFour() {

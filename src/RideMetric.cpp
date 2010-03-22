@@ -44,10 +44,10 @@ RideMetric::computeMetrics(const RideFile *ride, const Zones *zones,
         }
         if (ready) {
             RideMetric *m = factory.newMetric(symbol);
+            if (!ride->dataPoints().isEmpty())
+                m->compute(ride, zones, zoneRange, done);
             if (ride->metricOverrides.contains(symbol))
                 m->override(ride->metricOverrides.value(symbol));
-            else
-                m->compute(ride, zones, zoneRange, done);
             done.insert(symbol, m);
         }
         else {
