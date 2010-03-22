@@ -131,6 +131,42 @@ MainWindow::saveSilent(RideItem *rideItem)
     if (currentType != "GC") convert = true;
     else convert = false;
 
+    // Has the date/time changed?
+    QDateTime ridedatetime = rideItem->ride()->startTime();
+    QChar zero = QLatin1Char ( '0' );
+    QString targetnosuffix = QString ( "%1_%2_%3_%4_%5_%6" )
+                               .arg ( ridedatetime.date().year(), 4, 10, zero )
+                               .arg ( ridedatetime.date().month(), 2, 10, zero )
+                               .arg ( ridedatetime.date().day(), 2, 10, zero )
+                               .arg ( ridedatetime.time().hour(), 2, 10, zero )
+                               .arg ( ridedatetime.time().minute(), 2, 10, zero )
+                               .arg ( ridedatetime.time().second(), 2, 10, zero );
+
+    // When datetime changes we need to update
+    // the filename & rename/delete old file
+    // we also need to preserve the notes file
+    if (currentFI.baseName() != targetnosuffix) {
+
+        // if there is a notes file we need to rename it (cpi we will ignore)
+        QFile notesFile(currentFI.path() + QDir::separator() + currentFI.baseName() + ".notes");
+
+        if (notesFile.exists())
+            notesFile.rename(notesFile.fileName(),
+                             rideItem->path + QDir::separator() + targetnosuffix + ".notes");
+
+        // we also need to update the path to the notes filename
+        ride->notesFileName = targetnosuffix + ".notes";
+
+        // rename as backup current if converting, or just delete it if its already .gc
+        if (convert) currentFile.rename(currentFile.fileName(), currentFile.fileName() + ".sav");
+        else currentFile.remove();
+        convert = false; // we just did it already!
+
+        // set the new filename & Start time everywhere
+        currentFile.setFileName(rideItem->path + QDir::separator() + targetnosuffix + ".gc");
+        rideItem->setFileName(QFileInfo(currentFile).path(), QFileInfo(currentFile).fileName());
+    }
+
     // set target filename
     if (convert) {
         // rename the source
