@@ -73,10 +73,12 @@ struct FitFileReaderState
     int interval;
     int devices;
     bool stopped;
+    int last_event_type;
 
     FitFileReaderState(QFile &file, QStringList &errors) :
         file(file), errors(errors), rideFile(NULL), start_time(0),
-        last_time(0), interval(0), devices(0), stopped(true)
+        last_time(0), interval(0), devices(0), stopped(true),
+        last_event_type(-1)
     {
         if (global_msg_names.isEmpty()) {
             global_msg_names.insert(0,  "file_id");
@@ -172,12 +174,12 @@ struct FitFileReaderState
             default:
                 errors << QString("unknown event type %1").arg(type);
         }
+        last_event_type = type;
         if (wasStopped && !stopped) {
             assert(time > 0);
             if (start_time > 0) {
                 // Skip over time when we were stopped.
                 last_time = time;
-                printf("setting last_time = %d\n", (int) last_time);
             }
         }
     }
@@ -207,7 +209,6 @@ struct FitFileReaderState
     }
 
     void decodeRecord(const FitDefinition &def, int time_offset, const std::vector<int> values) {
-        assert(!stopped);
         time_t time = 0;
         if (time_offset > 0)
             time = last_time + time_offset;
@@ -236,6 +237,12 @@ struct FitFileReaderState
         }
         if (time == last_time)
             return; // Sketchy, but some FIT files do this.
+        if (stopped) {
+            errors << QString("At %1 seconds, time is stopped, but got record "
+                              "anyway.  Ignoring it.  Last event type was "
+                              "%2.").arg(time-start_time).arg(last_event_type);
+            return;
+        }
         if (lati != 0x7fffffff && lngi != 0x7fffffff) {
             lat = lati * 180.0 / 0x7fffffff;
             lng = lngi * 180.0 / 0x7fffffff;
@@ -373,6 +380,7 @@ struct FitFileReaderState
             // other one that might be useful is DeviceInfo, but it doesn't
             // seem to be filled in properly.  Sean's Cinqo, for example,
             // shows up as manufacturer #65535, even though it should be #7.
+            // printf("msg: %s\n", global_msg_names[def.global_msg_num].toAscii().constData());
             switch (def.global_msg_num) {
                 case 0:  decodeFileId(def, time_offset, values); break;
                 case 19: decodeLap(def, time_offset, values); break;
