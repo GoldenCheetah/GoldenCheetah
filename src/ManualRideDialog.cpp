@@ -25,6 +25,7 @@
 #include <QtGui>
 #include <math.h>
 #include <boost/bind.hpp>
+#include "Units.h"
 
 ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
                                    const QDir &home, bool useMetric) :
@@ -253,13 +254,14 @@ ManualRideDialog::enterClicked()
 {
     // write data to manual entry file
 
+    // use user's time for file:
+    QDateTime lt = dateTimeEdit->dateTime().toLocalTime();
+
     if (filename == "") {
         char tmp[32];
 
-        // use user's time for file:
-        QDateTime lt = dateTimeEdit->dateTime().toLocalTime();
 
-        sprintf(tmp, "%04d_%02d_%02d_%02d_%02d_%02d.man",
+        sprintf(tmp, "%04d_%02d_%02d_%02d_%02d_%02d.gc",
                 lt.date().year(), lt.date().month(),
                 lt.date().day(), lt.time().hour(),
                 lt.time().minute(),
@@ -308,35 +310,60 @@ ManualRideDialog::enterClicked()
 
         /*
          *  File format:
-         *  "manual"
-         *  "minutes,mph,watts,miles,hr,bikescore"  # header (metric or imperial)
-         *  minutes,mph,watts,miles,hr,bikeScore    # data
+         * <!DOCTYPE GoldenCheetah>
+         * <ride>
+         *     <attributes>
+         *         <attribute key="Start time" value="2010/03/18 21:29:43 UTC"/>
+         *         <attribute key="Device type" value="Manual CSV"/>
+         *     </attributes>
+         *     <override>
+         *         <metric value="14" name="daniels_points"/>
+         *         <metric value="39" name="skiba_bike_score"/>
+         *         <metric value="3600" name="time_riding"/>
+         *         <metric value="200" name="total_distance"/>
+         *         <metric value="145" name="average_heartrate"/>
+         *     </override>
+         * </ride>
+
          */
 
-        out << "manual\n";
-        if (useMetricUnits)
-            out << "minutes,kmh,watts,km,hr,bikescore,daniels_points\n";
-        else
-            out << "minutes,mph,watts,miles,hr,bikescore,daniels_points\n";
-
-        // data
+#define DATETIME_FORMAT "yyyy/MM/dd hh:mm:ss' UTC'"
         double secs = (hrsentry->text().toInt() * 3600) +
             (minsentry->text().toInt() * 60) +
             (secsentry->text().toInt());
-        out << secs/60.0;
-        out << ",";
-        out << distanceentry->text().toFloat() / (secs / 3600.0);
-        out << ",";
-        out << 0.0; // watts
-        out << ",";
-        out << distanceentry->text().toFloat();
-        out << ",";
-        out << HRentry->text().toInt();
-        out << ",";
-        out << BSentry->text().toInt();
-        out << ",";
-        out << DPentry->text().toInt();
-        out << "\n";
+
+        out << "<!DOCTYPE GoldenCheetah>\n"
+            << "<ride>\n"
+            << "\t<attributes>\n"
+            << "\t\t<attribute key=\"Start time\" value=\""
+            << lt.toUTC().toString(DATETIME_FORMAT) <<"\"/>\n"
+            << "\t\t<attribute key=\"Device type\" value=\"Manual CSV\"/>\n"
+            << "\t</attributes>\n"
+            << "\t<override>\n"
+
+            << "\t\t<metric value=\"" << QString("%1").arg(DPentry->text().toInt())
+            << "\" name=\"daniels_points\"/>\n"
+
+            << "\t\t<metric value=\"" << QString("%1").arg(BSentry->text().toInt())
+            << "\" name=\"skiba_bike_score\"/>\n"
+
+            << "\t\t<metric value=\"" << QString("%1").arg(secs)
+            << "\" name=\"workout_time\"/>\n"
+
+            << "\t\t<metric value=\"" << QString("%1").arg(secs)
+            << "\" name=\"time_riding\"/>\n"
+
+            << "\t\t<metric value=\"" << QString("%1").arg(useMetricUnits ?
+                                               distanceentry->text().toFloat() :
+                                               (1.00/MILES_PER_KM) * distanceentry->text().toFloat())
+            << "\" name=\"total_distance\"/>\n"
+
+            << "\t\t<metric value=\"" << QString("%1").arg(HRentry->text().toInt())
+            << "\" name=\"average_hr\"/>\n"
+
+            << "\t</override>\n"
+            << "</ride>\n"
+            ;
 
         tmp.close();
 
