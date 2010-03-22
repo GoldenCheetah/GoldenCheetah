@@ -23,6 +23,7 @@
 #include "RideFile.h"
 #include "Settings.h"
 #include "Zones.h"
+#include "Colors.h"
 
 #include <assert.h>
 #include <qpainter.h>
@@ -227,37 +228,75 @@ PowerHist::PowerHist(MainWindow *mainWindow):
     curve = new QwtPlotCurve("");
     curve->setStyle(QwtPlotCurve::Steps);
     curve->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen *pen = new QPen(Qt::black);
-    pen->setWidth(2.0);
-    curve->setPen(*pen);
-    QColor brush_color = Qt::black;
-    brush_color.setAlpha(64);
-    curve->setBrush(brush_color);   // fill below the line
-    delete pen;
     curve->attach(this);
 
     curveSelected = new QwtPlotCurve("");
     curveSelected->setStyle(QwtPlotCurve::Steps);
     curveSelected->setRenderHint(QwtPlotItem::RenderAntialiased);
-    pen = new QPen(Qt::blue);
-    pen->setWidth(2.0);
-    curveSelected->setPen(*pen);
-    brush_color = Qt::blue;
-    brush_color.setAlpha(64);
-    curveSelected->setBrush(brush_color);   // fill below the line
-    delete pen;
     curveSelected->attach(this);
 
     grid = new QwtPlotGrid();
     grid->enableX(false);
-    QPen gridPen;
-    gridPen.setStyle(Qt::DotLine);
-    grid->setPen(gridPen);
     grid->attach(this);
 
     zoneLabels = QList <PowerHistZoneLabel *>::QList();
 
     zoomer = new penTooltip(this->canvas());
+
+    configChanged();
+}
+
+void
+PowerHist::configChanged()
+{
+    // plot background
+    setCanvasBackground(GColor(CPLOTBACKGROUND));
+
+    // curve
+    QPen pen;
+    QColor brush_color;
+
+    switch (selected) {
+	case wattsShaded:
+	case wattsUnshaded:
+        pen.setColor(GColor(CPOWER));
+        brush_color = GColor(CPOWER);
+        break;
+	case nm:
+        pen.setColor(GColor(CTORQUE));
+        brush_color = GColor(CTORQUE);
+        break;
+	case hr:
+        pen.setColor(GColor(CHEARTRATE));
+        brush_color = GColor(CHEARTRATE);
+        break;
+	case kph:
+        pen.setColor(GColor(CSPEED));
+        brush_color = GColor(CSPEED);
+        break;
+	case cad:
+        pen.setColor(GColor(CCADENCE));
+        brush_color = GColor(CCADENCE);
+        break;
+    }
+
+    pen.setWidth(2.0);
+    curve->setPen(pen);
+    brush_color.setAlpha(64);
+    curve->setBrush(brush_color);   // fill below the line
+
+    // intervalselection
+    QPen ivl(GColor(CINTERVALHIGHLIGHTER));
+    ivl.setWidth(2.0);
+    curveSelected->setPen(ivl);
+    QColor ivlbrush = GColor(CINTERVALHIGHLIGHTER);
+    ivlbrush.setAlpha(64);
+    curveSelected->setBrush(ivlbrush);   // fill below the line
+
+    // grid
+    QPen gridPen(GColor(CPLOTGRID));
+    gridPen.setStyle(Qt::DotLine);
+    grid->setPen(gridPen);
 }
 
 PowerHist::~PowerHist() {
@@ -645,6 +684,7 @@ PowerHist::setSelection(Selection selection) {
 	return;
 
     selected = selection;
+    configChanged(); // set colors
     setParameterAxisTitle();
     recalc();
 }

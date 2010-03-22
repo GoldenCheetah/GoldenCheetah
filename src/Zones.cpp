@@ -18,6 +18,7 @@
 
 #include <QMessageBox>
 #include "Zones.h"
+#include "Colors.h"
 #include "TimeUtils.h"
 #include <QtGui>
 #include <QtAlgorithms>
@@ -756,16 +757,21 @@ int Zones::getRangeSize() const
 }
 
 // generate a zone color with a specific number of zones
-QColor zoneColor(int z, int num_zones) {
-    assert ((z >= 0) && (z < num_zones));
-    if (num_zones == 1)
-        return QColor(128, 128, 128);
-    QColor color;
+QColor zoneColor(int z, int) {
+    switch(z) {
 
-    // pick a color from violet (z=0) to red (z=num_zones)
-    color.setHsv(int(300 * (num_zones - z - 1) / (num_zones - 1)), 255, 255);
-
-    return color;
+    case 0  : return GColor(CZONE1); break;
+    case 1  : return GColor(CZONE2); break;
+    case 2  : return GColor(CZONE3); break;
+    case 3  : return GColor(CZONE4); break;
+    case 4  : return GColor(CZONE5); break;
+    case 5  : return GColor(CZONE6); break;
+    case 6  : return GColor(CZONE7); break;
+    case 7  : return GColor(CZONE8); break;
+    case 8  : return GColor(CZONE9); break;
+    case 9  : return GColor(CZONE10); break;
+    default: return QColor(128,128,128); break;
+    }
 }
 
 // delete a range, extend an adjacent (prior if available, otherwise next)

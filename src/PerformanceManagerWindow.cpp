@@ -2,6 +2,7 @@
 #include "PerformanceManagerWindow.h"
 #include "MainWindow.h"
 #include "PerfPlot.h"
+#include "Colors.h"
 #include "StressCalculator.h"
 #include "RideItem.h"
 
@@ -94,13 +95,14 @@ PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
                                QwtPicker::PointSelection,
                                QwtPicker::VLineRubberBand,
                                QwtPicker::AlwaysOff, perfplot->canvas());
-    PMpicker->setRubberBandPen(QColor(Qt::blue));
+    PMpicker->setRubberBandPen(GColor(CPLOTSELECT));
 
     connect(PMpicker, SIGNAL(moved(const QPoint &)),
            SLOT(PMpickerMoved(const QPoint &)));
     connect(metricCombo, SIGNAL(currentIndexChanged(int)),
             this, SLOT(metricChanged()));
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(mainWindow, SIGNAL(configChanged()), perfplot, SLOT(configUpdate()));
     connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
 }
 
@@ -116,6 +118,7 @@ void PerformanceManagerWindow::configChanged()
         days = 0; // force replot
         replot();
     }
+    PMpicker->setRubberBandPen(GColor(CPLOTSELECT));
 }
 
 void PerformanceManagerWindow::metricChanged()

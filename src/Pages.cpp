@@ -3,6 +3,7 @@
 #include <assert.h>
 #include "Pages.h"
 #include "Settings.h"
+#include "Colors.h"
 #include "DeviceTypes.h"
 #include "DeviceConfiguration.h"
 #include "ANTplusController.h"
@@ -14,10 +15,12 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
     QTabWidget *tabs = new QTabWidget(this);
     QWidget *config = new QWidget(this);
     QVBoxLayout *configLayout = new QVBoxLayout(config);
+    colorsPage = new ColorsPage(main);
     intervalMetrics = new IntervalMetricsPage;
     metadataPage = new MetadataPage(main);
 
     tabs->addTab(config, tr("Basic Settings"));
+    tabs->addTab(colorsPage, tr("Colors"));
     tabs->addTab(intervalMetrics, tr("Interval Metrics"));
     tabs->addTab(metadataPage, tr("Ride Data"));
 
@@ -177,6 +180,7 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
 void
 ConfigurationPage::saveClicked()
 {
+    colorsPage->saveClicked();
     intervalMetrics->saveClicked();
     metadataPage->saveClicked();
 }
@@ -753,6 +757,50 @@ bool deviceModel::setData(const QModelIndex &index, const QVariant &value, int r
         }
 
         return false;
+}
+
+ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
+{
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+
+    colors = new QTreeWidget;
+    colors->headerItem()->setText(0, "Color");
+    colors->headerItem()->setText(1, "Select");
+    colors->setColumnCount(2);
+    colors->setSelectionMode(QAbstractItemView::NoSelection);
+    //colors->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    colors->setUniformRowHeights(true);
+    colors->setIndentation(0);
+    colors->header()->resizeSection(0,300);
+
+    mainLayout->addWidget(colors);
+
+    colorSet = GCColor::colorSet();
+    for (int i=0; colorSet[i].name != ""; i++) {
+
+        QTreeWidgetItem *add;
+        ColorButton *colorButton = new ColorButton(this, colorSet[i].name, colorSet[i].color);
+        add = new QTreeWidgetItem(colors->invisibleRootItem());
+        add->setText(0, colorSet[i].name);
+        colors->setItemWidget(add, 1, colorButton);
+
+    }
+}
+
+void
+ColorsPage::saveClicked()
+{
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+
+    // run down and get the current colors and save
+    for (int i=0; colorSet[i].name != ""; i++) {
+        QTreeWidgetItem *current = colors->invisibleRootItem()->child(i);
+        QColor newColor = ((ColorButton*)colors->itemWidget(current, 1))->getColor();
+        QString colorstring = QString("%1:%2:%3").arg(newColor.red())
+                                                 .arg(newColor.green())
+                                                 .arg(newColor.blue());
+        settings->setValue(colorSet[i].setting, colorstring);
+    }
 }
 
 IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :

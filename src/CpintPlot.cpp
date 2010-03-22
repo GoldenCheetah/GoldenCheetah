@@ -17,6 +17,7 @@
  */
 
 #include "Zones.h"
+#include "Colors.h"
 #include "CpintPlot.h"
 #include <assert.h>
 #include <unistd.h>
@@ -48,7 +49,6 @@ CpintPlot::CpintPlot(QString p, const Zones *zones) :
     assert(!USE_T0_IN_CP_MODEL); // doesn't work with energyMode=true
 
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
-    setCanvasBackground(Qt::white);
     setAxisTitle(yLeft, tr("Average Power (watts)"));
     setAxisTitle(xBottom, tr("Interval Length"));
     setAxisScaleDraw(xBottom, new LogTimeScaleDraw);
@@ -57,10 +57,18 @@ CpintPlot::CpintPlot(QString p, const Zones *zones) :
 
     grid = new QwtPlotGrid();
     grid->enableX(false);
-    QPen gridPen;
+    grid->attach(this);
+
+    configChanged(); // apply colors
+}
+
+void
+CpintPlot::configChanged()
+{
+    setCanvasBackground(GColor(CPLOTBACKGROUND));
+    QPen gridPen(GColor(CPLOTGRID));
     gridPen.setStyle(Qt::DotLine);
     grid->setPen(gridPen);
-    grid->attach(this);
 }
 
 struct cpi_file_info {
@@ -441,7 +449,7 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
 
     CPCurve = new QwtPlotCurve(curve_title);
     CPCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen pen(Qt::red);
+    QPen pen(GColor(CCP));
     pen.setWidth(2.0);
     pen.setStyle(Qt::DashLine);
     CPCurve->setPen(pen);
@@ -548,10 +556,10 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
     else {
         QwtPlotCurve *curve = new QwtPlotCurve(tr("maximal power"));
         curve->setRenderHint(QwtPlotItem::RenderAntialiased);
-        QPen pen(Qt::red);
+        QPen pen(GColor(CCP));
         pen.setWidth(2.0);
         curve->setPen(pen);
-        QColor brush_color = Qt::red;
+        QColor brush_color = GColor(CCP);
         brush_color.setAlpha(64);
         curve->setBrush(brush_color);   // brush fills below the line
         if (energyMode_)
@@ -684,6 +692,13 @@ CpintPlot::calculate(RideItem *rideItem)
     if (!needToScanRides) {
         if (!CPCurve)
             plot_CP_curve(this, cp, tau, t0);
+        else {
+            // make sure color reflects latest config
+            QPen pen(GColor(CCP));
+            pen.setWidth(2.0);
+            pen.setStyle(Qt::DashLine);
+            CPCurve->setPen(pen);
+        }
         if (allCurves.empty()) {
             int maxNonZero = 0;
             for (int i = 0; i < bests.size(); ++i) {

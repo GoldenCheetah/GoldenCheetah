@@ -26,6 +26,7 @@
 #include <QFile>
 #include "Season.h"
 #include "SeasonParser.h"
+#include "Colors.h"
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
 
@@ -89,7 +90,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
                                QwtPicker::PointSelection,
                                QwtPicker::VLineRubberBand,
                                QwtPicker::AlwaysOff, cpintPlot->canvas());
-    picker->setRubberBandPen(QColor(Qt::blue));
+    picker->setRubberBandPen(GColor(CPLOTTRACKER));
 
     connect(picker, SIGNAL(moved(const QPoint &)),
             SLOT(pickerMoved(const QPoint &)));
@@ -100,6 +101,10 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
     connect(yAxisCombo, SIGNAL(currentIndexChanged(int)),
             this, SLOT(setEnergyMode(int)));
     connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+    connect(mainWindow, SIGNAL(configChanged()), cpintPlot, SLOT(configChanged()));
+
+    // redraw on config change -- this seems the simplest approach
+    connect(mainWindow, SIGNAL(configChanged()), this, SLOT(rideSelected()));
 }
 
 void
@@ -123,6 +128,9 @@ CriticalPowerWindow::rideSelected()
     currentRide = mainWindow->rideItem();
     if (currentRide) {
         cpintPlot->calculate(currentRide);
+
+        // apply latest colors
+        picker->setRubberBandPen(GColor(CPLOTTRACKER));
         cpintSetCPButton->setEnabled(cpintPlot->cp > 0);
     }
 }
