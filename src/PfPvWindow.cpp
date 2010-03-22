@@ -83,6 +83,7 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
     connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(mainWindow, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
     connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
+    connect(mainWindow, SIGNAL(configChanged()), pfPvPlot, SLOT(configChanged()));
 }
 
 void

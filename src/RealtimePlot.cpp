@@ -24,6 +24,7 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
 #include "RealtimePlot.h"
+#include "Colors.h"
 
 // infuriating qwtdata api...
 // power stores last 30 seconds for 30 second rolling avg, all else
@@ -86,7 +87,6 @@ void RealtimeHrData::addData(double v) { hrData[hrCur++] = v; if (hrCur==50) hrC
 RealtimePlot::RealtimePlot() : pwrCurve(NULL)
 {
     //insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
-    setCanvasBackground(Qt::white);
     pwrData.init();
     cadData.init();
     spdData.init();
@@ -113,18 +113,12 @@ RealtimePlot::RealtimePlot() : pwrCurve(NULL)
     // 30s Power curve
     pwr30Curve = new QwtPlotCurve("30s Power");
     pwr30Curve->setRenderHint(QwtPlotItem::RenderAntialiased); // too cpu intensive
-    QPen pwr30pen = QPen(Qt::red, 2.0, Qt::DashLine);
-    pwr30Curve->setPen(pwr30pen);
-    pwr30Curve->setData(pwr30Data);
     pwr30Curve->attach(this);
     pwr30Curve->setYAxis(QwtPlot::yLeft);
 
     // Power curve
     pwrCurve = new QwtPlotCurve("Power");
     //pwrCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen pwrpen = QPen(Qt::red);
-    pwrpen.setWidth(2.0);
-    pwrCurve->setPen(pwrpen);
     pwrCurve->setData(pwrData);
     pwrCurve->attach(this);
     pwr30Curve->setYAxis(QwtPlot::yLeft);
@@ -132,9 +126,6 @@ RealtimePlot::RealtimePlot() : pwrCurve(NULL)
     // HR
     hrCurve = new QwtPlotCurve("HeartRate");
     //hrCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen hrpen = QPen(Qt::blue);
-    hrpen.setWidth(2.0);
-    hrCurve->setPen(hrpen);
     hrCurve->setData(hrData);
     hrCurve->attach(this);
     hrCurve->setYAxis(QwtPlot::yRight);
@@ -142,9 +133,6 @@ RealtimePlot::RealtimePlot() : pwrCurve(NULL)
     // Cadence
     cadCurve = new QwtPlotCurve("Cadence");
     //cadCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen cadpen = QPen(QColor(0,204,204));
-    cadpen.setWidth(2.0);
-    cadCurve->setPen(cadpen);
     cadCurve->setData(cadData);
     cadCurve->attach(this);
     cadCurve->setYAxis(QwtPlot::yRight);
@@ -152,9 +140,6 @@ RealtimePlot::RealtimePlot() : pwrCurve(NULL)
     // Speed
     spdCurve = new QwtPlotCurve("Speed");
     //spdCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen spdpen = QPen(QColor(0,204,0));
-    spdpen.setWidth(2.0);
-    spdCurve->setPen(spdpen);
     spdCurve->setData(spdData);
     spdCurve->attach(this);
     spdCurve->setYAxis(QwtPlot::yRight2);
@@ -171,4 +156,30 @@ RealtimePlot::RealtimePlot() : pwrCurve(NULL)
 //    lodCurve->setData(lodData);
 //    lodCurve->attach(this);
 //    lodCurve->setYAxis(QwtPlot::yLeft);
+    configChanged(); // set colors
+}
+
+void
+RealtimePlot::configChanged()
+{
+    setCanvasBackground(GColor(CPLOTBACKGROUND));
+    QPen pwr30pen = QPen(GColor(CPOWER), 2.0, Qt::DashLine);
+    pwr30Curve->setPen(pwr30pen);
+    pwr30Curve->setData(pwr30Data);
+
+    QPen pwrpen = QPen(GColor(CPOWER));
+    pwrpen.setWidth(2.0);
+    pwrCurve->setPen(pwrpen);
+
+    QPen hrpen = QPen(GColor(CHEARTRATE));
+    hrpen.setWidth(2.0);
+    hrCurve->setPen(hrpen);
+
+    QPen cadpen = QPen(GColor(CCADENCE));
+    cadpen.setWidth(2.0);
+    cadCurve->setPen(cadpen);
+
+    QPen spdpen = QPen(GColor(CSPEED));
+    spdpen.setWidth(2.0);
+    spdCurve->setPen(spdpen);
 }

@@ -260,6 +260,7 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, TrainTool *trainTool, const Q
 
     // REALTIME PLOT
     rtPlot = new RealtimePlot();
+    connect(main, SIGNAL(configChanged()), rtPlot, SLOT(configChanged()));
 
     // COURSE PLOT
     ergPlot = new ErgFilePlot(0);

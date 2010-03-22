@@ -53,6 +53,7 @@ class AllPlotWindow : public QWidget
         void intervalSelected();
         void zonesChanged();
         void intervalsChanged();
+        void configChanged();
 
         void setStackZoomUp();
         void setStackZoomDown();

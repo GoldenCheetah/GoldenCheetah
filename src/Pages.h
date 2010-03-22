@@ -25,10 +25,12 @@
 class QGroupBox;
 class QHBoxLayout;
 class QVBoxLayout;
+class ColorsPage;
 class IntervalMetricsPage;
 class MetadataPage;
 class KeywordsPage;
 class FieldsPage;
+class Colors;
 
 class ConfigurationPage : public QWidget
 {
@@ -50,6 +52,7 @@ class ConfigurationPage : public QWidget
 
     private:
         MainWindow *main;
+        ColorsPage *colorsPage;
         IntervalMetricsPage *intervalMetrics;
         MetadataPage *metadataPage;
 
@@ -254,6 +257,21 @@ class KeywordsPage : public QWidget
         QTreeWidget *keywords;
 
         QPushButton *upButton, *downButton, *addButton, *renameButton, *deleteButton;
+};
+
+class ColorsPage : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        ColorsPage(QWidget *parent);
+        void saveClicked();
+
+    public slots:
+
+    private:
+        QTreeWidget *colors;
+        const Colors *colorSet;
 };
 
 class FieldsPage : public QWidget

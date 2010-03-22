@@ -57,6 +57,7 @@ HEADERS += \
         ANTplusController.h \
         BestIntervalDialog.h \
         ChooseCyclistDialog.h \
+        Colors.h \
         ColorButton.h \
         CommPort.h \
         Computrainer.h \
@@ -154,6 +155,7 @@ SOURCES += \
         BikeScore.cpp \
         DanielsPoints.cpp \
         ChooseCyclistDialog.cpp \
+        Colors.cpp \
         ColorButton.cpp \
         CommPort.cpp \
         Computrainer.cpp \

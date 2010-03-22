@@ -121,6 +121,9 @@ class RealtimePlot : public QwtPlot
 
     RealtimePlot();
 
+    public slots:
+    void configChanged();
+
 };
 
 

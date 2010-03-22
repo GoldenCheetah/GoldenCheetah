@@ -24,6 +24,7 @@
 #include "AllPlot.h"
 #include "BestIntervalDialog.h"
 #include "ChooseCyclistDialog.h"
+#include "Colors.h"
 #include "Computrainer.h"
 #include "ConfigDialog.h"
 #include "CriticalPowerWindow.h"
@@ -103,7 +104,10 @@ MainWindow::MainWindow(const QDir &home) :
     setAttribute(Qt::WA_DeleteOnClose);
 
     settings = GetApplicationSettings();
-      
+
+    GCColor *GCColorSet = new GCColor(this); // get/keep colorset
+    GCColorSet->colorSet(); // shut up the compiler
+
     QVariant unit = settings->value(GC_UNIT);
     useMetricUnits = (unit.toString() == "Metric");
 

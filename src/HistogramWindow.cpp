@@ -76,6 +76,7 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow) :
     connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
+    connect(mainWindow, SIGNAL(configChanged()), powerHist, SLOT(configChanged()));
 }
 
 void
