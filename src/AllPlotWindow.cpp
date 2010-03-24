@@ -228,6 +228,8 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
 void
 AllPlotWindow::rideSelected()
 {
+    if (mainWindow->activeTab() != this)
+        return;
     RideItem *ride = mainWindow->rideItem();
     if (!ride)
         return;
@@ -245,6 +247,8 @@ AllPlotWindow::rideSelected()
 void
 AllPlotWindow::zonesChanged()
 {
+    if (mainWindow->activeTab() != this)
+        return;
     allPlot->refreshZoneLabels();
     allPlot->replot();
 }
@@ -252,6 +256,8 @@ AllPlotWindow::zonesChanged()
 void
 AllPlotWindow::intervalsChanged()
 {
+    if (mainWindow->activeTab() != this)
+        return;
     allPlot->refreshIntervalMarkers();
     allPlot->replot();
     foreach (AllPlot *plot, allPlots) {
@@ -263,6 +269,8 @@ AllPlotWindow::intervalsChanged()
 void
 AllPlotWindow::intervalSelected()
 {
+    if (mainWindow->activeTab() != this)
+        return;
     hideSelection();
 }
 

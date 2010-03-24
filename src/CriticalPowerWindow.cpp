@@ -30,7 +30,7 @@
 #include <QXmlSimpleReader>
 
 CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
-    QWidget(parent), home(home), mainWindow(parent), active(false)
+    QWidget(parent), home(home), mainWindow(parent), currentRide(NULL)
 {
     QVBoxLayout *vlayout = new QVBoxLayout;
 
@@ -116,24 +116,12 @@ CriticalPowerWindow::deleteCpiFile(QString rideFilename)
 }
 
 void
-CriticalPowerWindow::setActive(bool new_value)
-{
-    bool was_active = active;
-    active = new_value;
-    if (active && !was_active) {
-        currentRide = mainWindow->rideItem();
-        if (currentRide) {
-            cpintPlot->calculate(currentRide);
-            cpintSetCPButton->setEnabled(cpintPlot->cp > 0);
-        }
-    }
-}
-
-void
 CriticalPowerWindow::rideSelected()
 {
+    if (mainWindow->activeTab() != this)
+        return;
     currentRide = mainWindow->rideItem();
-    if (active && currentRide) {
+    if (currentRide) {
         cpintPlot->calculate(currentRide);
         cpintSetCPButton->setEnabled(cpintPlot->cp > 0);
     }

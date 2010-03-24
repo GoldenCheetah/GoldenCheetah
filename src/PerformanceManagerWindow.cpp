@@ -101,6 +101,7 @@ PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
     connect(metricCombo, SIGNAL(currentIndexChanged(int)),
             this, SLOT(metricChanged()));
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
 }
 
 PerformanceManagerWindow::~PerformanceManagerWindow()
@@ -125,9 +126,12 @@ void PerformanceManagerWindow::metricChanged()
     replot();
 }
 
-void PerformanceManagerWindow::setActive(bool value)
+void PerformanceManagerWindow::rideSelected()
 {
-    if (active=value) replot();
+    bool wasActive = active;
+    active = (mainWindow->activeTab() == this);
+    if (!wasActive && active)
+        replot();
 }
 
 void PerformanceManagerWindow::replot()

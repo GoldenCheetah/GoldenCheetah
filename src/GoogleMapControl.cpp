@@ -156,6 +156,8 @@ GoogleMapControl::GoogleMapControl(MainWindow *mw)
 void
 GoogleMapControl::rideSelected()
 {
+  if (parent->activeTab() != this)
+      return;
   RideItem * ride = parent->rideItem();
 
   if (!ride)

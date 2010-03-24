@@ -1203,14 +1203,9 @@ MainWindow::setCriticalPower(int cp)
 }
 
 void
-MainWindow::tabChanged(int index)
+MainWindow::tabChanged(int)
 {
-    criticalPowerWindow->setActive(tabWidget->widget(index) == criticalPowerWindow);
-    performanceManagerWindow->setActive(tabWidget->widget(index) == performanceManagerWindow);
-    ltmWindow->setActive(tabWidget->widget(index) == ltmWindow);
-#ifdef GC_HAVE_QWTPLOT3D
-    modelWindow->setActive(tabWidget->widget(index) == modelWindow);
-#endif
+    rideSelected();
 }
 
 void
