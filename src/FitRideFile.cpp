@@ -233,10 +233,14 @@ struct FitFileReaderState
         if (time == last_time)
             return; // Sketchy, but some FIT files do this.
         if (stopped) {
+            // As it turns out, this happens all the time in some FIT files.
+            // Since we don't really understand the meaning, don't make noise.
+            /*
             errors << QString("At %1 seconds, time is stopped, but got record "
                               "anyway.  Ignoring it.  Last event type was "
                               "%2.").arg(time-start_time).arg(last_event_type);
             return;
+            */
         }
         if (lati != 0x7fffffff && lngi != 0x7fffffff) {
             lat = lati * 180.0 / 0x7fffffff;
