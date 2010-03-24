@@ -140,6 +140,8 @@ WeeklySummaryWindow::WeeklySummaryWindow(bool useMetricUnits,
 void
 WeeklySummaryWindow::refresh()
 {
+    if (mainWindow->activeTab() != this)
+        return;
     const RideItem *ride = mainWindow->rideItem();
     if (!ride)
         return;

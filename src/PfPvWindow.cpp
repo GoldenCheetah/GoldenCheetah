@@ -88,6 +88,8 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
 void
 PfPvWindow::rideSelected()
 {
+    if (mainWindow->activeTab() != this)
+        return;
     RideItem *ride = mainWindow->rideItem();
     if (!ride)
         return;

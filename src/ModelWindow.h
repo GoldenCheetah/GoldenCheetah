@@ -52,7 +52,6 @@ class ModelWindow : public QWidget
     public:
 
         ModelWindow(MainWindow *, const QDir &);
-        void setActive(bool);
 
     public slots:
         void rideSelected();

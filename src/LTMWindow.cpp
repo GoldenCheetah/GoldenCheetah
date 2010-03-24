@@ -149,6 +149,7 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
     connect(picker, SIGNAL(appended(const QPoint &)), ltmPlot, SLOT(pickerAppended(const QPoint &)));
 
     // config changes or ride file activities cause a redraw/refresh (but only if active)
+    connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected(void)));
     connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
     connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
     connect(main, SIGNAL(configChanged()), this, SLOT(refresh()));
@@ -160,9 +161,9 @@ LTMWindow::~LTMWindow()
 }
 
 void
-LTMWindow::setActive(bool me)
+LTMWindow::rideSelected()
 {
-    active = me;
+    active = (main->activeTab() == this);
 
     if (active == true && metricDB == NULL) {
         metricDB = new MetricAggregator(main, home, main->zones());
@@ -189,12 +190,12 @@ LTMWindow::refreshPlot()
 void
 LTMWindow::refresh()
 {
-    // if config has changed get new useMetricUnits
-    boost::shared_ptr<QSettings> appsettings = GetApplicationSettings();
-    useMetricUnits = appsettings->value(GC_UNIT).toString() == "Metric";
-
     // refresh for changes to ridefiles / zones
     if (active == true && metricDB != NULL) {
+        // if config has changed get new useMetricUnits
+        boost::shared_ptr<QSettings> appsettings = GetApplicationSettings();
+        useMetricUnits = appsettings->value(GC_UNIT).toString() == "Metric";
+
         results.clear(); // clear any old data
         results = metricDB->getAllMetricsFor(settings.start, settings.end);
         refreshPlot();
