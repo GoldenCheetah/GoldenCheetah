@@ -24,6 +24,8 @@
 #include <QVector>
 #include <QSharedPointer>
 #include <assert.h>
+#include <math.h>
+#include <QDebug>
 
 #include "RideFile.h"
 
@@ -33,38 +35,52 @@ class RideMetric;
 typedef QSharedPointer<RideMetric> RideMetricPtr;
 
 struct RideMetric {
+
+    enum metrictype { Total, Average, Peak } types;
+    typedef enum metrictype MetricType;
+
+    RideMetric() {
+        // some sensible defaults
+        aggregate_ = true;
+        conversion_ = 1.0;
+        precision_ = 0;
+        type_ = Total;
+        count_ = 1;
+        value_ = 0.0;
+    }
     virtual ~RideMetric() {}
 
     // The string by which we refer to this RideMetric in the code,
     // configuration files, and caches (like stress.cache).  It should
     // not be translated, and it should never be shown to the user.
-    virtual QString symbol() const = 0;
+    virtual QString symbol() const { return symbol_; }
 
     // A short string suitable for showing to the user in the ride
     // summaries, configuration dialogs, etc.  It should be translated
     // using QObject::tr().
-    virtual QString name() const = 0;
+    virtual QString name() const { return name_; }
 
     // What type of metric is this?
     // Drives the way metrics combined over a day or week in the
     // Long term metrics charts
-    enum metrictype { Total, Average, Peak } types;
-    typedef enum metrictype MetricType;
-    virtual MetricType type() const = 0;
+    virtual MetricType type() const { return type_; }
 
     // The units in which this RideMetric is expressed.  It should be
     // translated using QObject::tr().
-    virtual QString units(bool metric) const = 0;
+    virtual QString units(bool metric) const { return metric ? metricUnits_ : imperialUnits_; }
 
     // How many digits after the decimal we should show when displaying the
     // value of a RideMetric.
-    virtual int precision() const = 0;
+    virtual int precision() const { return precision_; }
 
     // The actual value of this ride metric, in the units above.
-    virtual double value(bool metric) const = 0;
+    virtual double value(bool metric) const { return metric ? value_ : (value_ * conversion_); }
+
+    // for averages the count of items included in the average
+    virtual double count() const { return count_; }
 
     // Factor to multiple value to convert from metric to imperial
-    virtual double conversion() const = 0;
+    virtual double conversion() const { return conversion_; }
 
     // Compute the ride metric from a file.
     virtual void compute(const RideFile *ride, 
@@ -79,42 +95,57 @@ struct RideMetric {
     //
     // As the name suggests, we use this function instead of compute() to
     // override the value of a RideMetric using a value specified elsewhere.
-    virtual void override(const QMap<QString,QString> &) {
-        assert(false);
+    void override(const QMap<QString,QString> &map) {
+        if (map.contains("value")) value_ = map.value("value").toDouble();
     }
-    virtual bool canAggregate() const { return false; }
-    virtual void aggregateWith(const RideMetric &other) { 
-        (void) other; 
-        assert(false); 
+
+    // Base implementation of aggregate just sums, derived classes
+    // can override this for other purposes
+    virtual void aggregateWith(const RideMetric &other) {
+        switch (type_) {
+        default:
+        case Total:
+            setValue(value(true) + other.value(true));
+            break;
+        case Peak:
+            setValue(value(true) > other.value(true) ? value(true) : other.value(true));
+            break;
+        case Average:
+            setValue(((value(true) * count()) + (other.value(true) * other.count()))
+                                / (count()+other.count()));
+            break;
+        }
     }
+    virtual bool canAggregate() { return aggregate_; }
+
     virtual RideMetric *clone() const = 0;
 
     static QHash<QString,RideMetricPtr>
     computeMetrics(const RideFile *ride, const Zones *zones,
                    const QStringList &metrics);
-};
 
-class AvgRideMetric : public RideMetric {
+    // Initialisers for derived classes to setup basic data
+    void setValue(double x) { value_ = x; }
+    void setCount(double x) { count_ = x; }
+    void setConversion(double x) { conversion_ = x; }
+    void setPrecision(int x) { precision_ = x; }
+    void setMetricUnits(QString x) { metricUnits_ = x; }
+    void setImperialUnits(QString x) { imperialUnits_ = x; }
+    void setName(QString x) { name_ = x; }
+    void setSymbol(QString x) { symbol_ = x; }
+    void setType(MetricType x) { type_ = x; }
+    void setAggregate(bool x) { aggregate_ = x; }
 
-    protected:
+    private:
+        bool    aggregate_;
+        double  value_,
+                count_, // used when averaging
+                conversion_,
+                precision_;
 
-    int count;
-    double total;
-
-    public:
-
-    AvgRideMetric() : count(0), total(0.0) {}
-    double value(bool) const {
-        if (count == 0) return 0.0;
-        return total / count;
-    }
-    int type() { return RideMetric::Average; }
-    void aggregateWith(const RideMetric &other) { 
-        assert(symbol() == other.symbol());
-        const AvgRideMetric &as = dynamic_cast<const AvgRideMetric&>(other);
-        count += as.count;
-        total += as.total;
-    }
+        QString metricUnits_, imperialUnits_;
+        QString name_, symbol_;
+        MetricType type_;
 };
 
 class RideMetricFactory {

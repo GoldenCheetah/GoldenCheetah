@@ -17,6 +17,9 @@
  */
 
 #include "RideMetric.h"
+#include <QObject>
+
+#define tr(s) QObject::tr(s)
 
 // This metric computes aerobic decoupling percentage as described
 // by Joe Friel:
@@ -41,14 +44,15 @@ class AerobicDecoupling : public RideMetric {
 
     public:
 
-    AerobicDecoupling() : percent(0.0) {}
-    QString symbol() const { return "aerobic_decoupling"; }
-    QString name() const { return QObject::tr("Aerobic Decoupling"); }
-    MetricType type() const { return RideMetric::Average; }
-    QString units(bool) const { return "%"; }
-    int precision() const { return 2; }
-    double conversion() const { return 1.0; }
-    double value(bool) const { return percent; }
+    AerobicDecoupling() : percent(0.0)
+    {
+        setSymbol("aerobic_decoupling");
+        setName(tr("Aerobic Decoupling"));
+        setType(RideMetric::Average);
+        setMetricUnits(tr("%"));
+        setImperialUnits(tr("%"));
+        setPrecision(2);
+    }
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
         double firstHalfPower = 0.0, secondHalfPower = 0.0;
@@ -57,6 +61,7 @@ class AerobicDecoupling : public RideMetric {
         int count = 0;
         int firstHalfCount = 0;
         int secondHalfCount = 0;
+        percent = 0;
         foreach(const RideFilePoint *point, ride->dataPoints()) {
             if (count++ < halfway) {
                 if (point->hr > 0) {
@@ -82,6 +87,7 @@ class AerobicDecoupling : public RideMetric {
             double secondHalfRatio = secondHalfHR / secondHalfPower;
             percent = 100.0 * (secondHalfRatio - firstHalfRatio) / firstHalfRatio;
         }
+        setValue(percent);
     }
 
     RideMetric *clone() const { return new AerobicDecoupling(*this); }

@@ -91,8 +91,9 @@ PfPvWindow::rideSelected()
     if (mainWindow->activeTab() != this)
         return;
     RideItem *ride = mainWindow->rideItem();
-    if (!ride)
+    if (!ride || !ride->ride())
         return;
+
     pfPvPlot->setData(ride);
     // update the QLabel widget with the CP value set in PfPvPlot::setData()
     qaCPValue->setText(QString("%1").arg(pfPvPlot->getCP()));

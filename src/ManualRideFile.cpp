@@ -142,7 +142,7 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors) const
     rideFile->setRecIntSecs(rideSec);
 
     QRegExp rideTime("^.*/(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_"
-	    "(\\d\\d)_(\\d\\d)_(\\d\\d)\\.csv$");
+	    "(\\d\\d)_(\\d\\d)_(\\d\\d)\\.man$");
     if (rideTime.indexIn(file.fileName()) >= 0) {
 	QDateTime datetime(QDate(rideTime.cap(1).toInt(),
 		    rideTime.cap(2).toInt(),

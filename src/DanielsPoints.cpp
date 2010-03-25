@@ -18,7 +18,10 @@
 
 #include "RideMetric.h"
 #include "Zones.h"
+#include <QObject>
 #include <math.h>
+
+#define tr(s) QObject::tr(s)
 
 // The idea: Fit a curve to the points system in Table 2.2 of "Daniel's Running
 // Formula", Second Edition, assume that power at VO2Max is 1.2 * FTP, further
@@ -32,7 +35,7 @@
 class DanielsPoints : public RideMetric {
 
     double score;
-    void count(double secs, double watts, double cp) {
+    void inc(double secs, double watts, double cp) {
         score += K * secs * pow(watts / cp, 4);
     }
 
@@ -40,31 +43,18 @@ class DanielsPoints : public RideMetric {
 
     static const double K;
 
-    DanielsPoints() : score(0.0) {}
-    QString symbol() const { return "daniels_points"; }
-    QString name() const { return QObject::tr("Daniels Points"); }
-    MetricType type() const { return RideMetric::Total; }
-    QString units(bool) const { return ""; }
-    int precision() const { return 0; }
-    double conversion() const { return 1.0; }
-    double value(bool) const { return score; }
+    DanielsPoints() : score(0.0)
+    {
+        setSymbol("daniels_points");
+        setName(tr("Daniels Points"));
+        setMetricUnits("");
+        setImperialUnits("");
+        setType(RideMetric::Total);
+    }
     void compute(const RideFile *ride, const Zones *zones,
                  int zoneRange, const QHash<QString,RideMetric*> &) {
-        if (!zones || zoneRange < 0)
-            return;
-
-        if (ride->deviceType() == QString("Manual CSV")) {
-            // Manual entry: use BS from dataPoints with a scaling factor
-            // that works about right for long, steady rides.
-            double scaling_factor = 0.55;
-            if (ride->metricOverrides.contains("skiba_bike_score")) {
-                const QMap<QString,QString> bsm =
-                    ride->metricOverrides.value("skiba_bike_score");
-                if (bsm.contains("value")) {
-                    double bs = bsm.value("value").toDouble();
-                    score = bs * scaling_factor;
-                }
-            }
+        if (!zones || zoneRange < 0) {
+            setValue(0);
             return;
         }
 
@@ -87,24 +77,20 @@ class DanielsPoints : public RideMetric {
                    && (point->secs > lastSecs + secsDelta + EPSILON)) {
                 weighted *= attenuation;
                 lastSecs += secsDelta;
-                count(secsDelta, weighted, cp);
+                inc(secsDelta, weighted, cp);
             }
             weighted *= attenuation;
             weighted += sampleWeight * point->watts;
             lastSecs = point->secs;
-            count(secsDelta, weighted, cp);
+            inc(secsDelta, weighted, cp);
         }
         while (weighted > NEGLIGIBLE) {
             weighted *= attenuation;
             lastSecs += secsDelta;
-            count(secsDelta, weighted, cp);
+            inc(secsDelta, weighted, cp);
         }
+        setValue(score);
     }
-    void override(const QMap<QString,QString> &map) {
-        if (map.contains("value"))
-            score = map.value("value").toDouble();
-    }
-    void aggregateWith(const RideMetric &other) { score += other.value(true); }
     RideMetric *clone() const { return new DanielsPoints(*this); }
 };
 
@@ -116,18 +102,22 @@ class DanielsEquivalentPower : public RideMetric {
 
     public:
 
-    DanielsEquivalentPower() : watts(0.0) {}
-    QString symbol() const { return "daniels_equivalent_power"; }
-    QString name() const { return QObject::tr("Daniels EqP"); }
-    QString units(bool) const { return "watts"; }
-    int precision() const { return 0; }
-    double conversion() const { return 1.0; }
-    double value(bool) const { return watts; }
-    MetricType type() const { return RideMetric::Average; }
+    DanielsEquivalentPower() : watts(0.0)
+    {
+        setSymbol("daniels_equivalent_power");
+        setName(tr("Daniels EqP"));
+        setMetricUnits(tr("watts"));
+        setImperialUnits(tr("watts"));
+        setType(RideMetric::Average);
+    }
+
     void compute(const RideFile *, const Zones *zones, int zoneRange,
 	    const QHash<QString,RideMetric*> &deps) {
-	if (!zones || zoneRange < 0)
-	    return;
+	    if (!zones || zoneRange < 0) {
+            setValue(0);
+	        return;
+        }
+
         double cp = zones->getCP(zoneRange);
         assert(deps.contains("daniels_points"));
         assert(deps.contains("time_riding"));
@@ -138,9 +128,10 @@ class DanielsEquivalentPower : public RideMetric {
         double score = danielsPoints->value(true);
         double secs = timeRiding->value(true);
         watts = cp * pow(score / DanielsPoints::K / secs, 0.25);
+
+        setValue(watts);
     }
     RideMetric *clone() const { return new DanielsEquivalentPower(*this); }
-    bool canAggregate() const { return false; }
 };
 
 static bool added() {
@@ -153,4 +144,3 @@ static bool added() {
 }
 
 static bool added_ = added();
-
