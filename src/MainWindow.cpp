@@ -199,7 +199,7 @@ MainWindow::MainWindow(const QDir &home) :
         QDateTime dt;
         if (parseRideFileName(name, &notesFileName, &dt)) {
             last = new RideItem(RIDE_TYPE, home.path(), 
-                                name, dt, zones(), notesFileName);
+                                name, dt, zones(), notesFileName, this);
             allRides->addChild(last);
 	    calendar->update();
         }
@@ -481,7 +481,7 @@ MainWindow::addRide(QString name, bool bSelect /*=true*/)
         assert(false);
     }
     RideItem *last = new RideItem(RIDE_TYPE, home.path(), 
-                                  name, dt, zones(), notesFileName);
+                                  name, dt, zones(), notesFileName, this);
 
     QVariant isAscending = settings->value(GC_ALLRIDES_ASCENDING,Qt::Checked); // default is ascending sort
     int index = 0;
@@ -810,11 +810,18 @@ MainWindow::rideTreeWidgetSelectionChanged()
 	// turn off tabs that don't make sense for manual file entry
     int histIndex = tabWidget->indexOf(histogramWindow);
     int pfpvIndex = tabWidget->indexOf(pfPvWindow);
-    bool enabled = !ride->ride() || ride->ride()->deviceType() != QString("Manual CSV");
-    if (histIndex >= 0)
-        tabWidget->setTabEnabled(histIndex, enabled);
-    if (pfpvIndex >= 0)
-        tabWidget->setTabEnabled(pfpvIndex, enabled);
+    int plotIndex = tabWidget->indexOf(allPlotWindow);
+    int modelIndex = tabWidget->indexOf(modelWindow);
+    int mapIndex   = tabWidget->indexOf(googleMap);
+    bool enabled = (!ride->ride() || ride->ride()->deviceType() != QString("Manual CSV"))
+                    &&
+                   (!ride->ride() ||!ride->ride()->dataPoints().isEmpty());
+
+    if (histIndex >= 0) tabWidget->setTabEnabled(histIndex, enabled);
+    if (pfpvIndex >= 0) tabWidget->setTabEnabled(pfpvIndex, enabled);
+    if (plotIndex >= 0) tabWidget->setTabEnabled(plotIndex, enabled);
+    if (modelIndex >= 0) tabWidget->setTabEnabled(modelIndex, enabled);
+    if (mapIndex >= 0) tabWidget->setTabEnabled(mapIndex, enabled);
     saveAndOpenNotes();
 }
 void
@@ -1313,4 +1320,12 @@ void
 MainWindow::notifyConfigChanged()
 {
     configChanged();
+}
+
+// notify children that rideSelected
+// called by RideItem when its date/time changes
+void
+MainWindow::notifyRideSelected()
+{
+    rideSelected();
 }

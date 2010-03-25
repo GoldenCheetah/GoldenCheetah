@@ -19,14 +19,15 @@
 #include "RideItem.h"
 #include "RideMetric.h"
 #include "RideFile.h"
+#include "MainWindow.h"
 #include "Zones.h"
 #include <assert.h>
 #include <math.h>
 
 RideItem::RideItem(int type,
                    QString path, QString fileName, const QDateTime &dateTime,
-                   const Zones *zones, QString notesFileName) :
-    QTreeWidgetItem(type), ride_(NULL), isdirty(false), path(path), fileName(fileName),
+                   const Zones *zones, QString notesFileName, MainWindow *main) :
+    QTreeWidgetItem(type), ride_(NULL), main(main), isdirty(false), path(path), fileName(fileName),
     dateTime(dateTime), zones(zones), notesFileName(notesFileName)
 {
     setText(0, dateTime.toString("ddd"));
@@ -146,3 +147,14 @@ RideItem::computeMetrics()
     metrics = RideMetric::computeMetrics(ride(), zones, allMetrics);
 }
 
+void
+RideItem::setStartTime(QDateTime newDateTime)
+{
+    dateTime = newDateTime;
+    setText(0, dateTime.toString("ddd"));
+    setText(1, dateTime.toString("MMM d, yyyy"));
+    setText(2, dateTime.toString("h:mm AP"));
+
+    ride()->setStartTime(newDateTime);
+    main->notifyRideSelected();
+}

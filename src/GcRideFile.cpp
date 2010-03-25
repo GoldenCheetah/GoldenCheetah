@@ -86,10 +86,7 @@ GcFileReader::openRideFile(QFile &file, QStringList &errors) const
     int interval = 0;
 
     QDomElement samples = root.firstChildElement("samples");
-    if (samples.isNull()) {
-        errors << "no sample section in ride file";
-        return NULL;
-    }
+    if (samples.isNull()) return rideFile; // manual file will have no samples
 
     bool recIntSet = false;
     for (QDomElement sample = samples.firstChildElement("sample");

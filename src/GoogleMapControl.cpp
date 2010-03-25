@@ -176,6 +176,9 @@ GoogleMapControl::rideSelected()
   rideData.clear();
   double prevLon = 0;
   double prevLat = 0;
+
+  if (ride == NULL || ride->ride() == NULL) return;
+
   foreach(RideFilePoint *rfp,ride->ride()->dataPoints())
   {
       RideFilePoint curRfp = *rfp;

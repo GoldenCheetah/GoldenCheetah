@@ -27,21 +27,20 @@ class WorkoutTime : public RideMetric {
 
     public:
 
-    WorkoutTime() : seconds(0.0) {}
-    QString symbol() const { return "workout_time"; }
-    QString name() const { return tr("Duration"); }
-    MetricType type() const { return RideMetric::Total; }
-    QString units(bool) const { return "seconds"; }
-    int precision() const { return 0; }
-    double value(bool) const { return seconds; }
-    double conversion() const { return 1.0; }
+    WorkoutTime() : seconds(0.0)
+    {
+        setSymbol("workout_time");
+        setName(tr("Duration"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
+    }
+
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
         seconds = ride->dataPoints().back()->secs -
-            ride->dataPoints().front()->secs + ride->recIntSecs();
+                  ride->dataPoints().front()->secs + ride->recIntSecs();
+        setValue(seconds);
     }
-    bool canAggregate() const { return true; }
-    void aggregateWith(const RideMetric &other) { seconds += other.value(true); }
     RideMetric *clone() const { return new WorkoutTime(*this); }
 };
 
@@ -55,28 +54,25 @@ class TimeRiding : public RideMetric {
 
     public:
 
-    TimeRiding() : secsMovingOrPedaling(0.0) {}
-    QString symbol() const { return "time_riding"; }
-    QString name() const { return tr("Time Riding"); }
-    MetricType type() const { return RideMetric::Total; }
-    QString units(bool) const { return "seconds"; }
-    int precision() const { return 0; }
-    double value(bool) const { return secsMovingOrPedaling; }
-    double conversion() const { return 1.0; }
+    TimeRiding() : secsMovingOrPedaling(0.0)
+    {
+        setSymbol("time_riding");
+        setName(tr("Time Riding"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
+    }
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
+        secsMovingOrPedaling = 0;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             if ((point->kph > 0.0) || (point->cad > 0.0))
                 secsMovingOrPedaling += ride->recIntSecs();
         }
+        setValue(secsMovingOrPedaling);
     }
     void override(const QMap<QString,QString> &map) {
         if (map.contains("value"))
             secsMovingOrPedaling = map.value("value").toDouble();
-    }
-    bool canAggregate() const { return true; }
-    void aggregateWith(const RideMetric &other) {
-        secsMovingOrPedaling += other.value(true);
     }
     RideMetric *clone() const { return new TimeRiding(*this); }
 };
@@ -91,15 +87,15 @@ class TotalDistance : public RideMetric {
 
     public:
 
-    TotalDistance() : km(0.0) {}
-    QString symbol() const { return "total_distance"; }
-    QString name() const { return tr("Distance"); }
-    MetricType type() const { return RideMetric::Total; }
-    QString units(bool metric) const { return metric ? "km" : "miles"; }
-    int precision() const { return 1; }
-    double conversion() const { return MILES_PER_KM; }
-    double value(bool metric) const {
-        return metric ? km : (km * MILES_PER_KM);
+    TotalDistance() : km(0.0)
+    {
+        setSymbol("total_distance");
+        setName(tr("Distance"));
+        setType(RideMetric::Total);
+        setMetricUnits(tr("km"));
+        setImperialUnits(tr("miles"));
+        setPrecision(1);
+        setConversion(MILES_PER_KM);
     }
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
@@ -108,9 +104,9 @@ class TotalDistance : public RideMetric {
         // accounts for the distance traveled *during* the first sample.
         km = ride->dataPoints().back()->km - ride->dataPoints().front()->km
             + ride->dataPoints().front()->kph / 3600.0 * ride->recIntSecs();
+        setValue(km);
     }
-    bool canAggregate() const { return true; }
-    void aggregateWith(const RideMetric &other) { km += other.value(true); }
+
     RideMetric *clone() const { return new TotalDistance(*this); }
 };
 
@@ -126,15 +122,14 @@ class ElevationGain : public RideMetric {
 
     public:
 
-    ElevationGain() : elegain(0.0), prevalt(0.0) {}
-    QString symbol() const { return "elevation_gain"; }
-    QString name() const { return tr("Elevation Gain"); }
-    MetricType type() const { return RideMetric::Total; }
-    QString units(bool metric) const { return metric ? "meters" : "feet"; }
-    int precision() const { return 0; }
-    double conversion() const { return FEET_PER_METER; }
-    double value(bool metric) const {
-        return metric ? elegain : (elegain * FEET_PER_METER);
+    ElevationGain() : elegain(0.0), prevalt(0.0)
+    {
+        setSymbol("elevation_gain");
+        setName(tr("Elevation Gain"));
+        setType(RideMetric::Total);
+        setMetricUnits(tr("meters"));
+        setImperialUnits(tr("feet"));
+        setConversion(FEET_PER_METER);
     }
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
@@ -153,10 +148,7 @@ class ElevationGain : public RideMetric {
                 prevalt = point->alt;
             }
         }
-    }
-    bool canAggregate() const { return true; }
-    void aggregateWith(const RideMetric &other) {
-        elegain += other.value(true);
+        setValue(elegain);
     }
     RideMetric *clone() const { return new ElevationGain(*this); }
 };
@@ -171,26 +163,20 @@ class TotalWork : public RideMetric {
 
     public:
 
-    TotalWork() : joules(0.0) {}
-    QString symbol() const { return "total_work"; }
-    QString name() const { return tr("Work"); }
-    MetricType type() const { return RideMetric::Total; }
-    QString units(bool) const { return "kJ"; }
-    int precision() const { return 0; }
-    double conversion() const { return 1.0; }
-    double value(bool) const { return joules / 1000.0; }
+    TotalWork() : joules(0.0)
+    {
+        setSymbol("total_work");
+        setName(tr("Work"));
+        setMetricUnits(tr("kJ"));
+        setImperialUnits(tr("kJ"));
+    }
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             if (point->watts >= 0.0)
                 joules += point->watts * ride->recIntSecs();
         }
-    }
-    bool canAggregate() const { return true; }
-    void aggregateWith(const RideMetric &other) {
-        assert(symbol() == other.symbol());
-        const TotalWork &tw = dynamic_cast<const TotalWork&>(other);
-        joules += tw.joules;
+        setValue(joules/1000);
     }
     RideMetric *clone() const { return new TotalWork(*this); }
 };
@@ -206,31 +192,34 @@ class AvgSpeed : public RideMetric {
 
     public:
 
-    AvgSpeed() : secsMoving(0.0), km(0.0) {}
-    QString symbol() const { return "average_speed"; }
-    QString name() const { return tr("Average Speed"); }
-    MetricType type() const { return RideMetric::Average; }
-    QString units(bool metric) const { return metric ? "kph" : "mph"; }
-    int precision() const { return 1; }
-    double conversion() const { return MILES_PER_KM; }
-    double value(bool metric) const {
-        if (secsMoving == 0.0) return 0.0;
-        double kph = km / secsMoving * 3600.0;
-        return metric ? kph : (kph * MILES_PER_KM);
+    AvgSpeed() : secsMoving(0.0), km(0.0)
+    {
+        setSymbol("average_speed");
+        setName(tr("Average Speed"));
+        setMetricUnits(tr("kph"));
+        setImperialUnits(tr("mph"));
+        setType(RideMetric::Average);
+        setPrecision(1);
+        setConversion(MILES_PER_KM);
     }
+
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &deps) {
         assert(deps.contains("total_distance"));
         km = deps.value("total_distance")->value(true);
         foreach (const RideFilePoint *point, ride->dataPoints())
             if (point->kph > 0.0) secsMoving += ride->recIntSecs();
+
+        setValue(secsMoving ? km / secsMoving * 3600.0 : 0.0);
     }
-    bool canAggregate() const { return true; }
+
     void aggregateWith(const RideMetric &other) { 
         assert(symbol() == other.symbol());
         const AvgSpeed &as = dynamic_cast<const AvgSpeed&>(other);
         secsMoving += as.secsMoving;
         km += as.km;
+
+        setValue(secsMoving ? km / secsMoving * 3600.0 : 0.0);
     }
     RideMetric *clone() const { return new AvgSpeed(*this); }
 };
@@ -241,22 +230,29 @@ static bool avgSpeedAdded =
 
 //////////////////////////////////////////////////////////////////////////////
 
-struct AvgPower : public AvgRideMetric {
+struct AvgPower : public RideMetric {
 
-    QString symbol() const { return "average_power"; }
-    QString name() const { return tr("Average Power"); }
-    MetricType type() const { return RideMetric::Average; }
-    QString units(bool) const { return "watts"; }
-    double conversion() const { return 1.0; }
-    int precision() const { return 0; }
+    double count, total;
+
+    AvgPower()
+    {
+        setSymbol("average_power");
+        setName(tr("Average Power"));
+        setMetricUnits(tr("watts"));
+        setImperialUnits(tr("watts"));
+        setType(RideMetric::Average);
+    }
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
+        total = count = 0;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             if (point->watts >= 0.0) {
                 total += point->watts;
                 ++count;
             }
         }
+        setValue(total / count);
+        setCount(count);
     }
     RideMetric *clone() const { return new AvgPower(*this); }
 };
@@ -266,22 +262,29 @@ static bool avgPowerAdded =
 
 //////////////////////////////////////////////////////////////////////////////
 
-struct AvgHeartRate : public AvgRideMetric {
+struct AvgHeartRate : public RideMetric {
 
-    QString symbol() const { return "average_hr"; }
-    QString name() const { return tr("Average Heart Rate"); }
-    MetricType type() const { return RideMetric::Average; }
-    QString units(bool) const { return "bpm"; }
-    double conversion() const { return 1.0; }
-    int precision() const { return 0; }
+    double total, count;
+
+    AvgHeartRate()
+    {
+        setSymbol("average_hr");
+        setName(tr("Average Heart Rate"));
+        setMetricUnits(tr("bpm"));
+        setImperialUnits(tr("bpm"));
+        setType(RideMetric::Average);
+    }
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
+        total = count = 0;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             if (point->hr > 0) {
                 total += point->hr;
                 ++count;
             }
         }
+        setValue(total / count);
+        setCount(count);
     }
     RideMetric *clone() const { return new AvgHeartRate(*this); }
 };
@@ -291,22 +294,29 @@ static bool avgHeartRateAdded =
 
 //////////////////////////////////////////////////////////////////////////////
 
-struct AvgCadence : public AvgRideMetric {
+struct AvgCadence : public RideMetric {
 
-    QString symbol() const { return "average_cad"; }
-    QString name() const { return tr("Average Cadence"); }
-    MetricType type() const { return RideMetric::Average; }
-    QString units(bool) const { return "rpm"; }
-    int precision() const { return 0; }
-    double conversion() const { return 1.0; }
+    double total, count;
+
+    AvgCadence()
+    {
+        setSymbol("average_cad");
+        setName(tr("Average Cadence"));
+        setMetricUnits(tr("rpm"));
+        setImperialUnits(tr("rpm"));
+        setType(RideMetric::Average);
+    }
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
+        total = count = 0;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             if (point->cad > 0) {
                 total += point->cad;
                 ++count;
             }
         }
+        setValue(total / count);
+        setCount(count);
     }
     RideMetric *clone() const { return new AvgCadence(*this); }
 };
@@ -319,20 +329,21 @@ static bool avgCadenceAdded =
 class MaxPower : public RideMetric {
     double max;
     public:
-    MaxPower() : max(0.0) {}
-    QString symbol() const { return "max_power"; }
-    QString name() const { return tr("Max Power"); }
-    MetricType type() const { return RideMetric::Peak; }
-    QString units(bool) const { return "watts"; }
-    int precision() const { return 0; }
-    double conversion() const { return 1.0; }
-    double value(bool) const { return max; }
+    MaxPower() : max(0.0)
+    {
+        setSymbol("max_power");
+        setName(tr("Max Power"));
+        setMetricUnits(tr("watts"));
+        setImperialUnits(tr("watts"));
+        setType(RideMetric::Peak);
+    }
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             if (point->watts >= max)
                 max = point->watts;
         }
+        setValue(max);
     }
     RideMetric *clone() const { return new MaxPower(*this); }
 };
@@ -345,20 +356,21 @@ static bool maxPowerAdded =
 class MaxHr : public RideMetric {
     double max;
     public:
-    MaxHr() : max(0.0) {}
-    QString symbol() const { return "max_heartrate"; }
-    QString name() const { return tr("Max Heartrate"); }
-    MetricType type() const { return RideMetric::Peak; }
-    QString units(bool) const { return "bpm"; }
-    int precision() const { return 0; }
-    double conversion() const { return 1.0; }
-    double value(bool) const { return max; }
+    MaxHr() : max(0.0)
+    {
+        setSymbol("max_heartrate");
+        setName(tr("Max Heartrate"));
+        setMetricUnits(tr("bpm"));
+        setImperialUnits(tr("bpm"));
+        setType(RideMetric::Peak);
+    }
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             if (point->hr >= max)
                 max = point->hr;
         }
+        setValue(max);
     }
     RideMetric *clone() const { return new MaxHr(*this); }
 };
@@ -371,14 +383,14 @@ static bool maxHrAdded =
 class NinetyFivePercentHeartRate : public RideMetric {
     double hr;
     public:
-    NinetyFivePercentHeartRate() : hr(0.0) {}
-    QString symbol() const { return "ninety_five_percent_hr"; }
-    QString name() const { return tr("95% Heart Rate"); }
-    MetricType type() const { return RideMetric::Average; }
-    QString units(bool) const { return "bpm"; }
-    double conversion() const { return 1.0; }
-    int precision() const { return 0; }
-    double value(bool) const { return hr; }
+    NinetyFivePercentHeartRate() : hr(0.0)
+    {
+        setSymbol("ninety_five_percent_hr");
+        setName(tr("95% Heartrate"));
+        setMetricUnits(tr("bpm"));
+        setImperialUnits(tr("bpm"));
+        setType(RideMetric::Average);
+    }
     void compute(const RideFile *ride, const Zones *, int,
                  const QHash<QString,RideMetric*> &) {
         QVector<double> hrs;
@@ -390,6 +402,7 @@ class NinetyFivePercentHeartRate : public RideMetric {
             std::sort(hrs.begin(), hrs.end());
             hr = hrs[hrs.size() * 0.95];
         }
+        setValue(hr);
     }
     RideMetric *clone() const { return new NinetyFivePercentHeartRate(*this); }
 };

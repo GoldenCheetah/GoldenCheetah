@@ -33,18 +33,19 @@ class ZoneTime : public RideMetric {
 
     public:
 
-    ZoneTime() : level(0), seconds(0.0) {}
-    QString symbol() const { return "time_in_zone"; }
-    QString name() const { return tr("Time In Zone"); }
-    MetricType type() const { return RideMetric::Total; }
-    QString units(bool) const { return "seconds"; }
-    int precision() const { return 0; }
+    ZoneTime() : level(0), seconds(0.0)
+    {
+        setType(RideMetric::Total);
+        setMetricUnits("seconds");
+        setImperialUnits("seconds");
+        setPrecision(0);
+        setConversion(1.0);
+    }
     void setLevel(int level) { this->level=level-1; } // zones start from zero not 1
-    double conversion() const { return 1.0; }
-    double value(bool) const { return seconds; }
     void compute(const RideFile *ride, const Zones *zone, int zoneRange,
                  const QHash<QString,RideMetric*> &)
     {
+        seconds = 0;
         // get zone ranges
         if (zone && zoneRange >= 0) {
             // iterate and compute
@@ -53,6 +54,7 @@ class ZoneTime : public RideMetric {
                     seconds += ride->recIntSecs();
             }
         }
+        setValue(seconds);
     }
 
     bool canAggregate() const { return false; }
@@ -61,60 +63,89 @@ class ZoneTime : public RideMetric {
 };
 
 class ZoneTime1 : public ZoneTime {
+
     public:
-        ZoneTime1() { setLevel(1); }
-        QString symbol() const { return "time_in_zone_L1"; }
-        QString name() const { return tr("L1 Time in Zone"); }
+        ZoneTime1()
+        {
+            setLevel(1);
+            setSymbol("time_in_zone_L1");
+            setName(tr("L1 Time in Zone"));
+        }
         RideMetric *clone() const { return new ZoneTime1(*this); }
 };
 
 class ZoneTime2 : public ZoneTime {
+
     public:
-        ZoneTime2() { setLevel(2); }
-        QString symbol() const { return "time_in_zone_L2"; }
-        QString name() const { return tr("L2 Time in Zone"); }
+        ZoneTime2()
+        {
+            setLevel(2);
+            setSymbol("time_in_zone_L2");
+            setName(tr("L2 Time in Zone"));
+        }
         RideMetric *clone() const { return new ZoneTime2(*this); }
 };
 
 class ZoneTime3 : public ZoneTime {
+
     public:
-        ZoneTime3() { setLevel(3); }
-        QString symbol() const { return "time_in_zone_L3"; }
-        QString name() const { return tr("L3 Time in Zone"); }
+        ZoneTime3()
+        {
+            setLevel(3);
+            setSymbol("time_in_zone_L3");
+            setName(tr("L3 Time in Zone"));
+        }
         RideMetric *clone() const { return new ZoneTime3(*this); }
 };
 
 class ZoneTime4 : public ZoneTime {
+
     public:
-        ZoneTime4() { setLevel(4); }
-        QString symbol() const { return "time_in_zone_L4"; }
-        QString name() const { return tr("L4 Time in Zone"); }
+        ZoneTime4()
+        {
+            setLevel(4);
+            setSymbol("time_in_zone_L4");
+            setName(tr("L4 Time in Zone"));
+        }
         RideMetric *clone() const { return new ZoneTime4(*this); }
 };
 
 class ZoneTime5 : public ZoneTime {
+
     public:
-        ZoneTime5() { setLevel(5); }
-        QString symbol() const { return "time_in_zone_L5"; }
-        QString name() const { return tr("L5 Time in Zone"); }
+        ZoneTime5()
+        {
+            setLevel(5);
+            setSymbol("time_in_zone_L5");
+            setName(tr("L5 Time in Zone"));
+        }
         RideMetric *clone() const { return new ZoneTime5(*this); }
 };
 
 class ZoneTime6 : public ZoneTime {
+
     public:
-        ZoneTime6() { setLevel(6); }
-        QString symbol() const { return "time_in_zone_L6"; }
-        QString name() const { return tr("L6 Time in Zone"); }
+        ZoneTime6()
+        {
+            setLevel(6);
+            setSymbol("time_in_zone_L6");
+            setName(tr("L6 Time in Zone"));
+        }
         RideMetric *clone() const { return new ZoneTime6(*this); }
 };
 
 class ZoneTime7 : public ZoneTime {
+
     public:
-        ZoneTime7() { setLevel(7); }
-        QString symbol() const { return "time_in_zone_L7"; }
-        QString name() const { return tr("L7 Time in Zone"); }
+        ZoneTime7()
+        {
+            setLevel(7);
+            setSymbol("time_in_zone_L7");
+            setName(tr("L7 Time in Zone"));
+        }
         RideMetric *clone() const { return new ZoneTime7(*this); }
 };
+
 
 
 static bool addAllZones() {

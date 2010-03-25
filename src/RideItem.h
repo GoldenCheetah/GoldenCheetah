@@ -23,6 +23,7 @@
 #include "RideMetric.h"
 
 class RideFile;
+class MainWindow;
 class Zones;
 
 class RideItem : public QTreeWidgetItem {
@@ -32,6 +33,7 @@ class RideItem : public QTreeWidgetItem {
         QVector<double> time_in_zone;
         RideFile *ride_;
         QStringList errors_;
+        MainWindow *main; // to notify widgets when date/time changes
         bool isdirty;
 
     public:
@@ -49,11 +51,12 @@ class RideItem : public QTreeWidgetItem {
 
         RideItem(int type, QString path, 
                  QString fileName, const QDateTime &dateTime,
-                 const Zones *zones, QString notesFileName);
+                 const Zones *zones, QString notesFileName, MainWindow *main);
 
         void setDirty(bool);
         bool isDirty() { return isdirty; }
         void setFileName(QString, QString);
+        void setStartTime(QDateTime);
         void computeMetrics();
         void freeMemory();
 
