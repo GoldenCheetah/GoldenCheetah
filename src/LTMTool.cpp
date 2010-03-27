@@ -30,6 +30,10 @@
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
 
+// metadata support
+#include "RideMetadata.h"
+#include "SpecialFields.h"
+
 LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(home), main(parent)
 {
     // get application settings
@@ -236,6 +240,26 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
     danielsLTR.uname = danielsLTR.name = "Daniels LTS Ramp";
     danielsLTR.uunits = "Ramp";
     metrics.append(danielsLTR);
+
+    SpecialFields sp;
+    foreach (FieldDefinition field, main->rideMetadata()->getFields()) {
+        if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
+            MetricDetail metametric;
+            metametric.type = METRIC_META;
+            QString underscored = field.name;
+            metametric.symbol = underscored.replace(" ", "_"); //XXX other special chars!!!
+            metametric.metric = NULL; // not a factory metric
+            metametric.penColor = QColor(Qt::blue);
+            metametric.curveStyle = QwtPlotCurve::Lines;
+            metametric.symbolStyle = QwtSymbol::NoSymbol;
+            metametric.smooth = false;
+            metametric.trend = false;
+            metametric.topN = 5;
+            metametric.uname = metametric.name = field.name;
+            metametric.uunits = "";
+            metrics.append(metametric);
+        }
+    }
 
     // sort the list
     qSort(metrics);

@@ -158,7 +158,7 @@ MainWindow::saveSilent(RideItem *rideItem)
         ride->notesFileName = targetnosuffix + ".notes";
 
         // rename as backup current if converting, or just delete it if its already .gc
-        if (convert) currentFile.rename(currentFile.fileName(), currentFile.fileName() + ".sav");
+        if (convert) currentFile.rename(currentFile.fileName(), currentFile.fileName() + ".bak");
         else currentFile.remove();
         convert = false; // we just did it already!
 
@@ -183,7 +183,7 @@ MainWindow::saveSilent(RideItem *rideItem)
     if (convert) {
 
         // rename on disk
-        currentFile.rename(currentFile.fileName(), currentFile.fileName() + ".sav");
+        currentFile.rename(currentFile.fileName(), currentFile.fileName() + ".bak");
 
         // rename in memory
         rideItem->setFileName(QFileInfo(savedFile).path(), QFileInfo(savedFile).fileName());

@@ -20,16 +20,22 @@
 #include <QProgressDialog>
 #include "DeviceTypes.h"
 #include "DeviceConfiguration.h"
+#include "RideMetadata.h"
 
 class QGroupBox;
 class QHBoxLayout;
 class QVBoxLayout;
+class IntervalMetricsPage;
+class MetadataPage;
+class KeywordsPage;
+class FieldsPage;
 
 class ConfigurationPage : public QWidget
 {
     Q_OBJECT
     public:
-        ConfigurationPage();
+        ConfigurationPage(MainWindow *main);
+        void saveClicked();
         QComboBox *langCombo;
         QComboBox *unitCombo;
         QComboBox *crankLengthCombo;
@@ -43,6 +49,10 @@ class ConfigurationPage : public QWidget
         void browseWorkoutDir();
 
     private:
+        MainWindow *main;
+        IntervalMetricsPage *intervalMetrics;
+        MetadataPage *metadataPage;
+
         QGroupBox *configGroup;
         QLabel *langLabel;
         QLabel *unitLabel;
@@ -222,6 +232,76 @@ class IntervalMetricsPage : public QWidget
         QPushButton *downButton;
         QPushButton *leftButton;
         QPushButton *rightButton;
+};
+
+class KeywordsPage : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        KeywordsPage(QWidget *parent, QList<KeywordDefinition>);
+        void getDefinitions(QList<KeywordDefinition>&);
+
+    public slots:
+        void addClicked();
+        void upClicked();
+        void downClicked();
+        void renameClicked();
+        void deleteClicked();
+
+    private:
+
+        QTreeWidget *keywords;
+
+        QPushButton *upButton, *downButton, *addButton, *renameButton, *deleteButton;
+};
+
+class FieldsPage : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        FieldsPage(QWidget *parent, QList<FieldDefinition>);
+        void getDefinitions(QList<FieldDefinition>&);
+
+    public slots:
+        void addClicked();
+        void upClicked();
+        void downClicked();
+        void renameClicked();
+        void deleteClicked();
+
+    private:
+
+        QTreeWidget *fields;
+
+        QPushButton *upButton, *downButton, *addButton, *renameButton, *deleteButton;
+};
+
+class MetadataPage : public QWidget
+{
+    Q_OBJECT
+
+    public:
+
+        MetadataPage(MainWindow *);
+        void saveClicked();
+
+    public slots:
+
+
+    protected:
+
+        MainWindow *main;
+        bool changed;
+
+        QTabWidget *tabs;
+        KeywordsPage *keywordsPage;
+        FieldsPage *fieldsPage;
+
+        // local versions for modification
+        QList<KeywordDefinition> keywordDefinitions;
+        QList<FieldDefinition>   fieldDefinitions;
 };
 
 #endif

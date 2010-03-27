@@ -25,7 +25,9 @@
 #include <QHash>
 #include <QtSql>
 #include "SummaryMetrics.h"
+#include "MainWindow.h"
 #include "Season.h"
+#include "RideFile.h"
 
 class RideFile;
 class Zones;
@@ -38,12 +40,15 @@ class DBAccess
     // get connection name
     QSqlDatabase connection() { return dbconn; }
 
+    // check the db structure is up to date
+    void checkDBVersion();
+
     // create and drop connections
-	DBAccess(QDir home);
-    void closeConnection();
+	DBAccess(MainWindow *main, QDir home);
+    ~DBAccess();
 
     // Create/Delete Records
-	bool importRide(SummaryMetrics *summaryMetrics, bool);
+	bool importRide(SummaryMetrics *summaryMetrics, RideFile *ride, unsigned long, bool);
     bool deleteRide(QString);
 
     // Query Records
@@ -52,18 +57,20 @@ class DBAccess
     QList<Season> getAllSeasons();
 
 	private:
-	QSqlDatabase db, dbconn;
+    MainWindow *main;
+    QDir home;
+    QSqlDatabase dbconn;
+    QString sessionid;
+
 	typedef QHash<QString,RideMetric*> MetricMap;
 
 	bool createDatabase();
+    void closeConnection();
     bool createMetricsTable();
     bool dropMetricTable();
 	bool createIndex();
-    void checkDBVersion();
 	void initDatabase(QDir home);
 
-    QString sessionid;
-    static int session;
 
 };
 #endif

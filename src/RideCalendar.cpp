@@ -9,6 +9,7 @@
 #include <QPen>
 
 #include "RideItem.h"
+#include "RideMetadata.h"
 #include "RideCalendar.h"
 #include "MainWindow.h"
 #include "Settings.h"
@@ -18,17 +19,42 @@
 RideCalendar::RideCalendar(MainWindow *parent) :
     QCalendarWidget(parent), mainWindow(parent)
 {
+    defaultColor = Qt::white;
     // make font 2 point sizes smaller that the default
     QFont font;
     font.setPointSize(font.pointSize()-2);
     setFont(font);
-
     this->setFirstDayOfWeek(Qt::Monday);
-    this->addWorkoutCode(QString("race"), QColor(255,128,128));
-    this->addWorkoutCode(QString("sick"), QColor(255,255,128));
-    this->addWorkoutCode(QString("swim"), QColor(128,128,255));
-    this->addWorkoutCode(QString("gym"), QColor(Qt::lightGray));
+
+    // setup workout codes
+    configUpdate();
+
+    connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configUpdate()));
 };
+
+void
+RideCalendar::configUpdate()
+{
+    // clear existing
+    workoutCodes.clear();
+
+    // setup the keyword/color combinations from config settings
+    foreach (KeywordDefinition keyword, mainWindow->rideMetadata()->getKeywords()) {
+        if (keyword.name == "Default")
+            defaultColor = keyword.color;
+        else {
+            addWorkoutCode(keyword.name, keyword.color);
+
+            // alternative texts in notes
+            foreach (QString token, keyword.tokens) {
+                addWorkoutCode(token, keyword.color);
+            }
+        }
+    }
+
+    // force a repaint
+    setSelectedDate(selectedDate());
+}
 
 struct RideIter
 {
@@ -121,7 +147,7 @@ void RideCalendar::paintCell(QPainter *painter, const QRect &rect, const QDate &
     foreach (const RideItem *ride, ridesToday.values()) {
         QString notesPath = home.absolutePath() + "/" + ride->notesFileName;
         QFile notesFile(notesPath);
-        QColor color(128, 255, 128);
+        QColor color = defaultColor;
         QString line("Ride");
         QString code;
         if (notesFile.exists()) {

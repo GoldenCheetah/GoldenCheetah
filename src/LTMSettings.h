@@ -40,9 +40,10 @@ class RideMetric;
 #define LTM_YEAR    4
 
 // type of metric
-// is it from the ridemetric factory or PMC stresscalculator
-#define METRIC_DB   1
-#define METRIC_PM   2
+// is it from the ridemetric factory or PMC stresscalculator or metadata
+#define METRIC_DB     1
+#define METRIC_PM     2
+#define METRIC_META   3
 
 // We catalogue each metric and the curve settings etc here
 class MetricDetail {

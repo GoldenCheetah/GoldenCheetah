@@ -24,6 +24,7 @@
 #include <qcolor.h>
 #include <assert.h>
 #include <math.h>
+#include <boost/crc.hpp>
 
 static QList <int> zone_default;
 static QList <bool> zone_default_is_pct;
@@ -825,4 +826,25 @@ int Zones::insertRangeAtDate(QDate date, int cp) {
     }
 
     return rnum;
+}
+
+unsigned long
+Zones::getFingerprint() const
+{
+    boost::crc_optimal<16, 0x1021, 0xFFFF, 0, false, false> CRC;
+    for (int i=0; i<ranges.size(); i++) {
+
+        // from
+        int x = ranges[i].begin.toJulianDay();
+        CRC.process_bytes(&x, sizeof(int));
+
+        // to
+        x = ranges[i].end.toJulianDay();
+        CRC.process_bytes(&x, sizeof(int));
+
+        // CP
+        x = ranges[i].cp;
+        CRC.process_bytes(&x, sizeof(int));
+    }
+    return CRC.checksum();
 }

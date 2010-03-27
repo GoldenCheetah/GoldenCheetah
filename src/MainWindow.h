@@ -20,6 +20,7 @@
 #define _GC_MainWindow_h 1
 
 #include <QDir>
+#include <QSqlDatabase>
 #include <QtGui>
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
@@ -42,6 +43,7 @@ class MetricAggregator;
 class ModelWindow;
 class RealtimeWindow;
 class RideFile;
+class RideMetadata;
 class WeeklySummaryWindow;
 class Zones;
 class RideCalendar;
@@ -74,6 +76,8 @@ class MainWindow : public QMainWindow
         bool saveRideSingleDialog(RideItem *);
         RideItem *rideItem() const { return ride; }
         const QWidget *activeTab() const { return tabWidget->currentWidget(); }
+        QTextEdit *rideNotesWidget() { return rideNotes; }
+        RideMetadata *rideMetadata() { return _rideMetadata; }
 
         void notifyConfigChanged(); // used by ConfigDialog to notify MainWindow
                                     // when config has changed - and to get a
@@ -81,6 +85,11 @@ class MainWindow : public QMainWindow
         void notifyRideSelected();  // used by RideItem to notify when
                                     // rideItem date/time changes
         void selectView(int);
+
+        // db connections to cyclistdir/metricDB - one per active MainWindow
+        QSqlDatabase db;
+        int session;
+        bool isclean;
 
     protected:
 
@@ -109,6 +118,7 @@ class MainWindow : public QMainWindow
         void intervalTreeWidgetSelectionChanged();
         void leftLayoutMoved();
         void splitterMoved();
+        void summarySplitterMoved();
         void newCyclist();
         void openCyclist();
         void downloadRide();
@@ -185,8 +195,7 @@ class MainWindow : public QMainWindow
         QTreeWidgetItem *allRides;
         QTreeWidgetItem *allIntervals;
         QSplitter *leftLayout;
-        QWidget *notesWidget;
-        QVBoxLayout *notesLayout;
+        RideMetadata *_rideMetadata;
         QSplitter *summarySplitter;
 
         // Train
