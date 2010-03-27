@@ -16,12 +16,16 @@ public:
     void setHome(const QDir&);
     void addWorkoutCode(QString, QColor);
 
+public slots:
+    void configUpdate();
+
 protected:
     void paintCell(QPainter *, const QRect &, const QDate &) const;
 
 private:
     QMap<QString, QColor> workoutCodes;
     QDir home;
+    QColor defaultColor;
     MainWindow *mainWindow;
 };
 

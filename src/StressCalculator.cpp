@@ -67,12 +67,13 @@ double StressCalculator::min(void) {
 
 void StressCalculator::calculateStress(MainWindow *main, QString home, const QString &metric)
 {
-    // refresh metrics
-    metricDB = new MetricAggregator(main, home, main->zones());
-
     // get all metric data from the year 1900 - 3000
     QList<SummaryMetrics> results;
+
+    // refresh metrics
+    metricDB = new MetricAggregator(main, home, main->zones());
     results = metricDB->getAllMetricsFor(QDateTime(QDate(1900,1,1)), QDateTime(QDate(3000,1,1)));
+    delete metricDB;
 
     // set start and enddate to maximum maximum required date range
     // remember the date range required so we can truncate afterwards
@@ -127,8 +128,6 @@ void StressCalculator::calculateStress(MainWindow *main, QString home, const QSt
 
     days = startDate.daysTo(endDate) + 1; // include today
 
-    // will close the connection, alledgedly
-    delete metricDB;
 }
 
 /*

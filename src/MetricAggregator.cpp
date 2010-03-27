@@ -29,23 +29,17 @@
 #include <QtXml/QtXml>
 #include <QProgressDialog>
 
-bool MetricAggregator::isclean = false;
-
-MetricAggregator::MetricAggregator(MainWindow *parent, QDir home, const Zones *zones) : QWidget(parent), parent(parent), home(home), zones(zones)
+MetricAggregator::MetricAggregator(MainWindow *main, QDir home, const Zones *zones) : QWidget(main), main(main), home(home), zones(zones)
 {
-    dbaccess = new DBAccess(home);
-    connect(parent, SIGNAL(configChanged()), this, SLOT(update()));
-    connect(parent, SIGNAL(rideAdded(RideItem*)), this, SLOT(update(void)));
-    connect(parent, SIGNAL(rideDeleted(RideItem*)), this, SLOT(update(void)));
+    dbaccess = new DBAccess(main, home);
+    connect(main, SIGNAL(configChanged()), this, SLOT(update()));
+    connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(update(void)));
+    connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(update(void)));
 }
 
 MetricAggregator::~MetricAggregator()
 {
-    // close the database connection
-    if (dbaccess != NULL) {
-        dbaccess->closeConnection();
-        delete dbaccess;
-    }
+    delete dbaccess;
 }
 
 /*----------------------------------------------------------------------
@@ -53,10 +47,18 @@ MetricAggregator::~MetricAggregator()
  *                         of date or missing altogether or where
  *                         the ride file no longer exists
  *----------------------------------------------------------------------*/
+
+// used to store timestamp and fingerprint used in database
+struct status { unsigned long timestamp, fingerprint; };
+
 void MetricAggregator::refreshMetrics()
 {
     // only if we have established a connection to the database
-    if (dbaccess == NULL || isclean==true) return;
+    if (dbaccess == NULL || main->isclean==true) return;
+
+    // first check db structure is still up to date
+    // this is because metadata.xml may add new fields
+    dbaccess->checkDBVersion();
 
     // Get a list of the ride files
     QRegExp rx = RideFileFactory::instance().rideFileRegExp();
@@ -66,31 +68,29 @@ void MetricAggregator::refreshMetrics()
 
     // get a Hash map of statistic records and timestamps
     QSqlQuery query(dbaccess->connection());
-    QHash <QString, unsigned long> dbStatus;
-    bool rc = query.exec("SELECT filename, timestamp FROM metrics ORDER BY ride_date;");
+    QHash <QString, status> dbStatus;
+    bool rc = query.exec("SELECT filename, timestamp, fingerprint FROM metrics ORDER BY ride_date;");
     while (rc && query.next()) {
+        status add;
         QString filename = query.value(0).toString();
-        unsigned long timestamp = query.value(1).toInt();
-        dbStatus.insert(filename, timestamp);
+        add.timestamp = query.value(1).toInt();
+        add.fingerprint = query.value(2).toInt();
+        dbStatus.insert(filename, add);
     }
 
     // Delete statistics for non-existant ride files
-    QHash<QString, unsigned long>::iterator d;
+    QHash<QString, status>::iterator d;
     for (d = dbStatus.begin(); d != dbStatus.end(); ++d) {
         if (QFile(home.absolutePath() + "/" + d.key()).exists() == false) {
             dbaccess->deleteRide(d.key());
         }
     }
 
-    // get power.zones timestamp to refresh on CP changes
-    unsigned long zonesTimeStamp = 0;
-    QString zonesfile = home.absolutePath() + "/power.zones";
-    if (QFileInfo(zonesfile).exists())
-        zonesTimeStamp = QFileInfo(zonesfile).lastModified().toTime_t();
+    unsigned long zoneFingerPrint = zones->getFingerprint(); // crc of zone data
 
     // update statistics for ride files which are out of date
     // showing a progress bar as we go
-    QProgressDialog bar("Refreshing Metrics Database...", "Abort", 0, filenames.count(), parent);
+    QProgressDialog bar("Refreshing Metrics Database...", "Abort", 0, filenames.count(), main);
     bar.setWindowModality(Qt::WindowModal);
     int processed=0;
     while (i.hasNext()) {
@@ -98,14 +98,16 @@ void MetricAggregator::refreshMetrics()
         QFile file(home.absolutePath() + "/" + name);
 
         // if it s missing or out of date then update it!
-        unsigned long dbTimeStamp = dbStatus.value(name, 0);
+        status current = dbStatus.value(name);
+        unsigned long dbTimeStamp = current.timestamp;
+        unsigned long fingerprint = current.fingerprint;
         if (dbTimeStamp < QFileInfo(file).lastModified().toTime_t() ||
-            dbTimeStamp < zonesTimeStamp) {
+            zoneFingerPrint != fingerprint) {
 
             // read file and process it
             RideFile *ride = RideFileFactory::instance().openRideFile(file, errors);
             if (ride != NULL) {
-                importRide(home, ride, name, (dbTimeStamp > 0));
+                importRide(home, ride, name, zoneFingerPrint, (dbTimeStamp > 0));
                 delete ride;
             }
         }
@@ -116,13 +118,13 @@ void MetricAggregator::refreshMetrics()
         if (bar.wasCanceled())
             break;
     }
-    isclean = true;
+    main->isclean = true;
 }
 
 /*----------------------------------------------------------------------
  * Calculate the metrics for a ride file using the metrics factory
  *----------------------------------------------------------------------*/
-bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, bool modify)
+bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, unsigned long fingerprint, bool modify)
 {
     SummaryMetrics *summaryMetric = new SummaryMetrics();
     QFile file(path.absolutePath() + "/" + fileName);
@@ -150,10 +152,11 @@ bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, b
 
     // get metrics into summaryMetric QMap
     for(int i = 0; i < factory.metricCount(); ++i) {
+        // check for override
         summaryMetric->setForSymbol(factory.metricName(i), computed.value(factory.metricName(i))->value(true));
     }
 
-    dbaccess->importRide(summaryMetric, modify);
+    dbaccess->importRide(summaryMetric, ride, fingerprint, modify);
     delete summaryMetric;
 
     return true;
@@ -165,11 +168,14 @@ bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, b
 QList<SummaryMetrics>
 MetricAggregator::getAllMetricsFor(QDateTime start, QDateTime end)
 {
-    if (isclean == false) refreshMetrics(); // get them up-to-date
+    if (main->isclean == false) refreshMetrics(); // get them up-to-date
 
     QList<SummaryMetrics> empty;
 
     // only if we have established a connection to the database
-    if (dbaccess == NULL) return empty;
+    if (dbaccess == NULL) {
+        qDebug()<<"lost db connection?";
+        return empty;
+    }
     return dbaccess->getAllMetricsFor(start, end);
 }

@@ -28,6 +28,7 @@
 #define GC_SETTINGS_MAIN_Y          "mainwindow/y"
 #define GC_SETTINGS_MAIN_GEOM       "mainwindow/geometry"
 #define GC_SETTINGS_SPLITTER_SIZES  "mainwindow/splitterSizes"
+#define GC_SETTINGS_SUMMARYSPLITTER_SIZES "mainwindow/summarysplittersizes"
 #define GC_SETTINGS_CALENDAR_SIZES  "mainwindow/calendarSizes"
 #define GC_TABS_TO_HIDE             "mainwindow/tabsToHide"
 #define GC_SETTINGS_INTERVAL_METRICS "rideSummaryWindow/intervalMetrics"

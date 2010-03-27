@@ -28,15 +28,21 @@
 #include <assert.h>
 #include <math.h>
 #include <QtXml/QtXml>
+#include <QFile>
+#include <QFileInfo>
 #include "SummaryMetrics.h"
+#include "RideMetadata.h"
+#include "SpecialFields.h"
+
+#include <boost/scoped_array.hpp>
+#include <boost/crc.hpp>
 
 // DB Schema Version - YOU MUST UPDATE THIS IF THE SCHEMA VERSION CHANGES!!!
-static int DBSchemaVersion = 10;
+// Schema version will change if a) the default metadata.xml is updated
+//                            or b) new metrics are added / old changed
+static int DBSchemaVersion = 13;
 
-// each DB connection gets a unique session id based upon this number:
-int DBAccess::session=0;
-
-DBAccess::DBAccess(QDir home)
+DBAccess::DBAccess(MainWindow* main, QDir home) : main(main), home(home)
 {
 	initDatabase(home);
 }
@@ -46,6 +52,11 @@ void DBAccess::closeConnection()
     dbconn.close();
 }
 
+DBAccess::~DBAccess()
+{
+    closeConnection();
+}
+
 void
 DBAccess::initDatabase(QDir home)
 {
@@ -53,12 +64,20 @@ DBAccess::initDatabase(QDir home)
     
     if(dbconn.isOpen()) return;
 
-    sessionid = QString("session%1").arg(session++);
+    QString cyclist = QFileInfo(home.path()).baseName();
+    sessionid = QString("%1%2").arg(cyclist).arg(main->session++);
 
-    db = QSqlDatabase::addDatabase("QSQLITE", sessionid);
-    db.setDatabaseName(home.absolutePath() + "/metricDB");
-
-    dbconn = db.database(sessionid);
+    if (main->session == 1) {
+        // first
+        main->db = QSqlDatabase::addDatabase("QSQLITE", sessionid);
+        main->db.setDatabaseName(home.absolutePath() + "/metricDB");
+        //dbconn = db.database(QString("GC"));
+        dbconn = main->db.database(sessionid);
+    } else {
+        // clone the first one!
+        dbconn = QSqlDatabase::cloneDatabase(main->db, sessionid);
+        dbconn.open();
+    }
 
     if (!dbconn.isOpen()) {
         QMessageBox::critical(0, qApp->translate("DBAccess","Cannot open database"),
@@ -76,6 +95,7 @@ DBAccess::initDatabase(QDir home)
 
 bool DBAccess::createMetricsTable()
 {
+    SpecialFields sp;
     QSqlQuery query(dbconn);
     bool rc;
     bool createTables = true;
@@ -96,12 +116,20 @@ bool DBAccess::createMetricsTable()
     if (rc && createTables) {
         QString createMetricTable = "create table metrics (filename varchar primary key,"
                                     "timestamp integer,"
-                                    "ride_date date";
+                                    "ride_date date,"
+                                    "fingerprint integer";
 
-        // Add columns for all the metrics
+        // Add columns for all the metric factory metrics
         const RideMetricFactory &factory = RideMetricFactory::instance();
         for (int i=0; i<factory.metricCount(); i++)
             createMetricTable += QString(", X%1 double").arg(factory.metricName(i));
+
+        // And all the metadata metrics
+        foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+            if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
+                createMetricTable += QString(", Z%1 double").arg(sp.makeTechName(field.name));
+            }
+        }
         createMetricTable += " )";
 
         rc = query.exec(createMetricTable);
@@ -132,18 +160,54 @@ bool DBAccess::createDatabase()
     return true;
 }
 
+static int
+computeFileCRC(QString filename)
+{
+    QFile file(filename);
+    QFileInfo fileinfo(file);
+
+    // open file
+    if (!file.open(QFile::ReadOnly)) return 0;
+
+    // allocate space
+    boost::scoped_array<char> data(new char[file.size()]);
+
+    // read entire file into memory
+    QDataStream *rawstream(new QDataStream(&file));
+    rawstream->readRawData(&data[0], file.size());
+    file.close();
+
+    // calculate the CRC
+    boost::crc_optimal<16, 0x1021, 0xFFFF, 0, false, false> CRC;
+    CRC.process_bytes(&data[0], file.size());
+
+    return CRC.checksum();
+}
+
 void DBAccess::checkDBVersion()
 {
     int currentversion = 0;
+    int metadatacrc;    // crc for metadata.xml when last refreshed
+    int metadatacrcnow; // current value for metadata.xml crc
+    int creationdate;
+
+    // get a CRC for metadata.xml
+    QString metadataXML =  QString(home.absolutePath()) + "/metadata.xml";
+    metadatacrcnow = computeFileCRC(metadataXML);
 
     // can we get a version number?
-    QSqlQuery query("SELECT schema_version from version;", dbconn);
+    QSqlQuery query("SELECT schema_version, creation_date, metadata_crc from version;", dbconn);
 
     bool rc = query.exec();
-    while(rc && query.next()) currentversion = query.value(0).toInt();
+    while (rc && query.next()) {
+        currentversion = query.value(0).toInt();
+        creationdate = query.value(1).toInt();
+        metadatacrc = query.value(2).toInt();
+    }
 
     // if its not up-to-date
-    if (!rc || currentversion != DBSchemaVersion) {
+    if (!rc || currentversion != DBSchemaVersion || metadatacrc != metadatacrcnow) {
+
         // drop tables
         QSqlQuery dropV("DROP TABLE version", dbconn);
         dropV.exec();
@@ -151,21 +215,27 @@ void DBAccess::checkDBVersion()
         dropM.exec();
 
         // recreate version table and add one entry
-        QSqlQuery version("CREATE TABLE version ( schema_version integer primary key);", dbconn);
+        QSqlQuery version("CREATE TABLE version ( schema_version integer primary key, creation_date date, metadata_crc integer );", dbconn);
         version.exec();
 
         // insert current version number
-        QSqlQuery insert("INSERT INTO version ( schema_version ) values (?)", dbconn);
+        QDateTime timestamp = QDateTime::currentDateTime();
+        QSqlQuery insert("INSERT INTO version ( schema_version, creation_date, metadata_crc ) values (?,?,?)", dbconn);
 	    insert.addBindValue(DBSchemaVersion);
+	    insert.addBindValue(timestamp.toTime_t());
+	    insert.addBindValue(metadatacrcnow);
         insert.exec();
+
+        createMetricsTable();
     }
 }
 
 /*----------------------------------------------------------------------
  * CRUD routines for Metrics table
  *----------------------------------------------------------------------*/
-bool DBAccess::importRide(SummaryMetrics *summaryMetrics, bool modify)
+bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, unsigned long fingerprint, bool modify)
 {
+    SpecialFields sp;
 	QSqlQuery query(dbconn);
     QDateTime timestamp = QDateTime::currentDateTime();
 
@@ -177,13 +247,26 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, bool modify)
     }
 
     // construct an insert statement
-    QString insertStatement = "insert into metrics ( filename, timestamp, ride_date";
+    QString insertStatement = "insert into metrics ( filename, timestamp, ride_date, fingerprint ";
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i=0; i<factory.metricCount(); i++)
         insertStatement += QString(", X%1 ").arg(factory.metricName(i));
-    insertStatement += " ) values (?,?,?"; // filename, timestamp, ride_date
+
+    // And all the metadata metrics
+    foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+        if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
+            insertStatement += QString(", Z%1 ").arg(sp.makeTechName(field.name));
+        }
+    }
+
+    insertStatement += " ) values (?,?,?,?"; // filename, timestamp, ride_date
     for (int i=0; i<factory.metricCount(); i++)
         insertStatement += ",?";
+    foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+        if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
+            insertStatement += ",?";
+        }
+    }
     insertStatement += ")";
 
 	query.prepare(insertStatement);
@@ -192,10 +275,22 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, bool modify)
 	query.addBindValue(summaryMetrics->getFileName());
 	query.addBindValue(timestamp.toTime_t());
     query.addBindValue(summaryMetrics->getRideDate());
+    query.addBindValue((int)fingerprint);
 
     // values
     for (int i=0; i<factory.metricCount(); i++) {
 	    query.addBindValue(summaryMetrics->getForSymbol(factory.metricName(i)));
+    }
+
+    // And all the metadata metrics
+    foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+
+        if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
+            query.addBindValue(ride->getTag(field.name, "0.0").toDouble());
+        } else if (!sp.isMetric(field.name)) {
+            if (field.name == "Recording Interval")  // XXX Special - need a better way...
+                query.addBindValue(ride->recIntSecs());
+        }
     }
 
     // go do it!
@@ -233,6 +328,7 @@ QList<QDateTime> DBAccess::getAllDates()
 
 QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
 {
+    SpecialFields sp;
     QList<SummaryMetrics> metrics;
 
     // null date range fetches all, but not currently used by application code
@@ -245,6 +341,11 @@ QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i=0; i<factory.metricCount(); i++)
         selectStatement += QString(", X%1 ").arg(factory.metricName(i));
+    foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+        if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
+            selectStatement += QString(", Z%1 ").arg(sp.makeTechName(field.name));
+        }
+    }
     selectStatement += " FROM metrics where DATE(ride_date) >=DATE(:start) AND DATE(ride_date) <=DATE(:end) "
                        " ORDER BY ride_date;";
 
@@ -261,9 +362,16 @@ QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
         summaryMetrics.setFileName(query.value(0).toString());
         summaryMetrics.setRideDate(query.value(1).toDateTime());
         // the values
-        for (int i=0; i<factory.metricCount(); i++)
+        int i=0;
+        for (; i<factory.metricCount(); i++)
             summaryMetrics.setForSymbol(factory.metricName(i), query.value(i+2).toDouble());
-
+        foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+            if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
+                QString underscored = field.name;
+                summaryMetrics.setForSymbol(underscored.replace(" ","_"), query.value(i+2).toDouble());
+                i++;
+            }
+        }
         metrics << summaryMetrics;
     }
     return metrics;

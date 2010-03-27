@@ -43,17 +43,16 @@ class MetricAggregator : public QWidget
         QList<SummaryMetrics> getAllMetricsFor(QDateTime start, QDateTime end);
 
     public slots:
-        void update() { isclean = false; }
+        void update() { main->isclean = false; }
 
     private:
-        QWidget *parent;
+        MainWindow *main;
         DBAccess *dbaccess;
         QDir home;
         const Zones *zones;
-        static bool isclean;
 
 	    typedef QHash<QString,RideMetric*> MetricMap;
-	    bool importRide(QDir path, RideFile *ride, QString fileName, bool modify);
+	    bool importRide(QDir path, RideFile *ride, QString fileName, unsigned long, bool modify);
 	    MetricMap metrics;
 };
 
