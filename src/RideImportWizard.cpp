@@ -306,32 +306,33 @@ RideImportWizard::process()
                    QVariant unit = settings->value(GC_UNIT);
                    bool metric = unit.toString() == "Metric";
 
+                   // time and distance from tags (.gc files)
+                   QMap<QString,QString> lookup;
+                   lookup = ride->metricOverrides.value("total_distance");
+                   double km = lookup.value("value", "0.0").toDouble();
+
+                   lookup = ride->metricOverrides.value("workout_time");
+                   int secs = lookup.value("value", "0.0").toDouble();
+
                    // show duration by looking at last data point
-                   if (ride->dataPoints().last() != NULL) {
-                       int secs = ride->dataPoints().last()->secs;
-                       QChar zero = QLatin1Char ( '0' );
-                       QString time = QString("%1:%2:%3").arg(secs/3600,2,10,zero)
-                           .arg(secs%3600/60,2,10,zero)
-                           .arg(secs%60,2,10,zero);
-                       tableWidget->item(i,3)->setText(time);
-                       tableWidget->item(i,3)->setTextAlignment(Qt::AlignHCenter); // put in the middle
-
-                       // show distance by looking at last data point
-                       double km = ride->dataPoints().last()->km;
-                       QString dist = metric
-                           ? QString ("%1 km").arg(km, 0, 'f', 1)
-                           : QString ("%1 mi").arg(km * MILES_PER_KM, 0, 'f', 1);
-                       tableWidget->item(i,4)->setText(dist);
-                       tableWidget->item(i,4)->setTextAlignment(Qt::AlignRight); // put in the middle
-
-                   } else {
-
-                       tableWidget->item(i,3)->setText(tr("00:00:00")); // duration
-                       tableWidget->item(i,3)->setTextAlignment(Qt::AlignHCenter); // put in the middle
-                       tableWidget->item(i,4)->setText(tr(metric ? "0 km" : "0 mi"));
-                       tableWidget->item(i,4)->setTextAlignment(Qt::AlignRight); // put in the middle
+                   if (!ride->dataPoints().isEmpty() && ride->dataPoints().last() != NULL) {
+                       if (!secs) secs = ride->dataPoints().last()->secs;
+                       if (!km) km = ride->dataPoints().last()->km;
                    }
 
+                   QChar zero = QLatin1Char ( '0' );
+                   QString time = QString("%1:%2:%3").arg(secs/3600,2,10,zero)
+                       .arg(secs%3600/60,2,10,zero)
+                       .arg(secs%60,2,10,zero);
+                   tableWidget->item(i,3)->setText(time);
+                   tableWidget->item(i,3)->setTextAlignment(Qt::AlignHCenter); // put in the middle
+
+                   // show distance by looking at last data point
+                   QString dist = metric
+                       ? QString ("%1 km").arg(km, 0, 'f', 1)
+                       : QString ("%1 mi").arg(km * MILES_PER_KM, 0, 'f', 1);
+                   tableWidget->item(i,4)->setText(dist);
+                   tableWidget->item(i,4)->setTextAlignment(Qt::AlignRight); // put in the middle
                } else {
                    // nope - can't handle this file
                    tableWidget->item(i,5)->setText(tr("Error - ") + errors.join(tr(" ")));
