@@ -78,7 +78,7 @@ class AerobicDecoupling : public RideMetric {
                 }
             }
         }
-        if ((firstHalfCount > 0) && (secondHalfCount > 0)) {
+        if ((firstHalfPower > 0) && (secondHalfPower > 0)) {
             firstHalfPower /= firstHalfCount;
             secondHalfPower /= secondHalfCount;
             firstHalfHR /= firstHalfCount;
