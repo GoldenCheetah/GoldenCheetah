@@ -44,6 +44,7 @@ class Aerolab : public QwtPlot {
 
   public slots:
   void setByDistance();
+  void configChanged();
 
   signals:
 

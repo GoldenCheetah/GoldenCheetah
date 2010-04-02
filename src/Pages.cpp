@@ -3,13 +3,26 @@
 #include <assert.h>
 #include "Pages.h"
 #include "Settings.h"
+#include "Colors.h"
 #include "DeviceTypes.h"
 #include "DeviceConfiguration.h"
 #include "ANTplusController.h"
+#include "ColorButton.h"
+#include "SpecialFields.h"
 
-ConfigurationPage::ConfigurationPage()
+ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
 {
-    configGroup = new QGroupBox(tr("Golden Cheetah Configuration"));
+    QTabWidget *tabs = new QTabWidget(this);
+    QWidget *config = new QWidget(this);
+    QVBoxLayout *configLayout = new QVBoxLayout(config);
+    colorsPage = new ColorsPage(main);
+    intervalMetrics = new IntervalMetricsPage;
+    metadataPage = new MetadataPage(main);
+
+    tabs->addTab(config, tr("Basic Settings"));
+    tabs->addTab(colorsPage, tr("Colors"));
+    tabs->addTab(intervalMetrics, tr("Interval Metrics"));
+    tabs->addTab(metadataPage, tr("Ride Data"));
 
     boost::shared_ptr<QSettings> settings = GetApplicationSettings();
 
@@ -150,7 +163,6 @@ ConfigurationPage::ConfigurationPage()
             this, SLOT(browseWorkoutDir()));
 
 
-    configLayout = new QVBoxLayout;
     configLayout->addLayout(langLayout);
     configLayout->addLayout(unitLayout);
     configLayout->addWidget(allRidesAscending);
@@ -159,13 +171,18 @@ ConfigurationPage::ConfigurationPage()
     configLayout->addLayout(bsModeLayout);
     configLayout->addLayout(workoutLayout);
     configLayout->addLayout(warningLayout);
-    configGroup->setLayout(configLayout);
 
-
-    mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(configGroup);
-    mainLayout->addStretch(1);
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(tabs);
     setLayout(mainLayout);
+}
+
+void
+ConfigurationPage::saveClicked()
+{
+    colorsPage->saveClicked();
+    intervalMetrics->saveClicked();
+    metadataPage->saveClicked();
 }
 
 CyclistPage::CyclistPage(const Zones *_zones):
@@ -173,7 +190,14 @@ CyclistPage::CyclistPage(const Zones *_zones):
 {
     boost::shared_ptr<QSettings> settings = GetApplicationSettings();
 
-    cyclistGroup = new QGroupBox(tr("Cyclist Options"));
+    QTabWidget *tabs = new QTabWidget(this);
+    QWidget *cpTab = new QWidget(this);
+    QWidget *pmTab = new QWidget(this);
+    tabs->addTab(cpTab, tr("Power Zones"));
+    tabs->addTab(pmTab, tr("Performance Manager"));
+    QVBoxLayout *cpLayout = new QVBoxLayout(cpTab);
+    QVBoxLayout *pmLayout = new QVBoxLayout(pmTab);
+
     lblThreshold = new QLabel(tr("Critical Power:"));
     txtThreshold = new QLineEdit();
 
@@ -287,6 +311,7 @@ CyclistPage::CyclistPage(const Zones *_zones):
     perfManLayout->addLayout(perfManStartValLayout);
     perfManLayout->addLayout(perfManSTSavgLayout);
     perfManLayout->addLayout(perfManLTSavgLayout);
+    perfManLayout->addStretch();
 
 
 
@@ -296,13 +321,13 @@ CyclistPage::CyclistPage(const Zones *_zones):
     cyclistLayout->addLayout(zoneLayout);
     cyclistLayout->addLayout(dateRangeLayout);
     cyclistLayout->addLayout(calendarLayout);
-    cyclistLayout->addLayout(perfManLayout);
+    cyclistLayout->addStretch();
 
-    cyclistGroup->setLayout(cyclistLayout);
+    cpLayout->addLayout(cyclistLayout);
+    pmLayout->addLayout(perfManLayout);
 
     mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(cyclistGroup);
-    mainLayout->addStretch(1);
+    mainLayout->addWidget(tabs);
     setLayout(mainLayout);
 }
 
@@ -394,6 +419,13 @@ bool CyclistPage::isNewMode()
 
 DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
 {
+    QTabWidget *tabs = new QTabWidget(this);
+    QWidget *devs = new QWidget(this);
+    tabs->addTab(devs, tr("Devices"));
+    QVBoxLayout *devLayout = new QVBoxLayout(devs);
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->addWidget(tabs);
+
     DeviceTypes all;
     devices = all.getList();
 
@@ -402,6 +434,7 @@ DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
 
     typeLabel = new QLabel(tr("Device Type"),this);
     typeSelector = new QComboBox(this);
+    typeSelector->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLength);
 
     for (int i=0; i< devices.count(); i++) {
         DeviceType cur = devices.at(i);
@@ -428,6 +461,7 @@ DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
     pairButton = new QPushButton(tr("Pair"),this);
 
     deviceList = new QTableView(this);
+
     deviceListModel = new deviceModel(this);
 
     // replace standard model with ours
@@ -441,26 +475,30 @@ DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
     deviceList->verticalHeader()->hide();
     deviceList->setEditTriggers(QAbstractItemView::NoEditTriggers);
     deviceList->setSelectionMode(QAbstractItemView::SingleSelection);
+    deviceList->setColumnWidth(0,130);
+    deviceList->setColumnWidth(1,130);
+    deviceList->setColumnWidth(2,130);
 
     leftLayout = new QGridLayout();
     rightLayout = new QVBoxLayout();
     inLayout = new QGridLayout();
-    deviceGroup = new QGroupBox(tr("Device Configuration"), this);
 
     leftLayout->addWidget(nameLabel, 0,0);
     leftLayout->addWidget(deviceName, 0,2);
-    leftLayout->setRowMinimumHeight(1,10);
-    leftLayout->addWidget(typeLabel, 2,0);
-    leftLayout->addWidget(typeSelector, 2,2);
-    leftLayout->setRowMinimumHeight(3,10);
-    leftLayout->addWidget(specHint, 4,2);
-    leftLayout->addWidget(specLabel, 5,0);
-    leftLayout->addWidget(deviceSpecifier, 5,2);
-    leftLayout->setRowMinimumHeight(6,10);
-    leftLayout->addWidget(profHint, 7,2);
-    leftLayout->addWidget(profLabel, 8,0);
-    leftLayout->addWidget(deviceProfile, 8,2);
-
+    //leftLayout->setRowMinimumHeight(1,10);
+    leftLayout->addWidget(typeLabel, 1,0);
+    leftLayout->addWidget(typeSelector, 1,2);
+    QHBoxLayout *squeeze = new QHBoxLayout;
+    squeeze->addStretch();
+    leftLayout->addLayout(squeeze, 1,3);
+    //leftLayout->setRowMinimumHeight(3,10);
+    leftLayout->addWidget(specHint, 2,2);
+    leftLayout->addWidget(specLabel, 3,0);
+    leftLayout->addWidget(deviceSpecifier, 3,2);
+    //leftLayout->setRowMinimumHeight(6,10);
+    leftLayout->addWidget(profHint, 4,2);
+    leftLayout->addWidget(profLabel, 5,0);
+    leftLayout->addWidget(deviceProfile, 5,2);
     leftLayout->setColumnMinimumWidth(1,10);
 
 // THIS CODE IS DISABLED FOR THIS RELEASE XXX
@@ -485,14 +523,11 @@ DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
 
     inLayout->addItem(leftLayout, 0,0);
     inLayout->addItem(rightLayout, 0,1);
-    inLayout->addWidget(deviceList,1,0,1,2);
 
-    deviceGroup->setLayout(inLayout);
-
-    mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(deviceGroup);
-    mainLayout->addStretch(1);
-    setLayout(mainLayout);
+    devLayout->addLayout(inLayout);
+    devLayout->addWidget(deviceList);
+    devLayout->setStretch(0,0);
+    devLayout->setStretch(1,99);
 
     // to make sure the default checkboxes have been set appropiately...
     // THIS CODE IS DISABLED IN THIS RELEASE XXX
@@ -724,6 +759,50 @@ bool deviceModel::setData(const QModelIndex &index, const QVariant &value, int r
         return false;
 }
 
+ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
+{
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+
+    colors = new QTreeWidget;
+    colors->headerItem()->setText(0, "Color");
+    colors->headerItem()->setText(1, "Select");
+    colors->setColumnCount(2);
+    colors->setSelectionMode(QAbstractItemView::NoSelection);
+    //colors->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    colors->setUniformRowHeights(true);
+    colors->setIndentation(0);
+    colors->header()->resizeSection(0,300);
+
+    mainLayout->addWidget(colors);
+
+    colorSet = GCColor::colorSet();
+    for (int i=0; colorSet[i].name != ""; i++) {
+
+        QTreeWidgetItem *add;
+        ColorButton *colorButton = new ColorButton(this, colorSet[i].name, colorSet[i].color);
+        add = new QTreeWidgetItem(colors->invisibleRootItem());
+        add->setText(0, colorSet[i].name);
+        colors->setItemWidget(add, 1, colorButton);
+
+    }
+}
+
+void
+ColorsPage::saveClicked()
+{
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+
+    // run down and get the current colors and save
+    for (int i=0; colorSet[i].name != ""; i++) {
+        QTreeWidgetItem *current = colors->invisibleRootItem()->child(i);
+        QColor newColor = ((ColorButton*)colors->itemWidget(current, 1))->getColor();
+        QString colorstring = QString("%1:%2:%3").arg(newColor.red())
+                                                 .arg(newColor.green())
+                                                 .arg(newColor.blue());
+        settings->setValue(colorSet[i].setting, colorstring);
+    }
+}
+
 IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
     QWidget(parent), changed(false)
 {
@@ -742,11 +821,30 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
     downButton = new QPushButton("Move down");
     leftButton = new QPushButton("Exclude");
     rightButton = new QPushButton("Include");
-    QGridLayout *buttonGrid = new QGridLayout;
-    buttonGrid->addWidget(upButton, 0, 1);
-    buttonGrid->addWidget(downButton, 2, 1);
-    buttonGrid->addWidget(leftButton, 1, 0);
-    buttonGrid->addWidget(rightButton, 1, 2);
+    QVBoxLayout *buttonGrid = new QVBoxLayout;
+    QHBoxLayout *upLayout = new QHBoxLayout;
+    QHBoxLayout *inexcLayout = new QHBoxLayout;
+    QHBoxLayout *downLayout = new QHBoxLayout;
+
+    upLayout->addStretch();
+    upLayout->addWidget(upButton);
+    upLayout->addStretch();
+
+    inexcLayout->addStretch();
+    inexcLayout->addWidget(leftButton);
+    inexcLayout->addWidget(rightButton);
+    inexcLayout->addStretch();
+
+    downLayout->addStretch();
+    downLayout->addWidget(downButton);
+    downLayout->addStretch();
+
+    buttonGrid->addStretch();
+    buttonGrid->addLayout(upLayout);
+    buttonGrid->addLayout(inexcLayout);
+    buttonGrid->addLayout(downLayout);
+    buttonGrid->addStretch();
+
     QHBoxLayout *hlayout = new QHBoxLayout;
     hlayout->addLayout(availLayout);
     hlayout->addLayout(buttonGrid);
@@ -885,3 +983,389 @@ IntervalMetricsPage::saveClicked()
     settings->setValue(GC_SETTINGS_INTERVAL_METRICS, metrics.join(","));
 }
 
+MetadataPage::MetadataPage(MainWindow *main) : main(main)
+{
+    QVBoxLayout *layout = new QVBoxLayout(this);
+
+    // get current config using default file
+    keywordDefinitions = main->rideMetadata()->getKeywords();
+    fieldDefinitions = main->rideMetadata()->getFields();
+
+    // setup maintenance pages using current config
+    fieldsPage = new FieldsPage(this, fieldDefinitions);
+    keywordsPage = new KeywordsPage(this, keywordDefinitions);
+
+    tabs = new QTabWidget(this);
+    tabs->addTab(fieldsPage, tr("Fields"));
+    tabs->addTab(keywordsPage, tr("Notes Keywords"));
+
+    layout->addWidget(tabs);
+}
+
+void
+MetadataPage::saveClicked()
+{
+    // get current state
+    fieldsPage->getDefinitions(fieldDefinitions);
+    keywordsPage->getDefinitions(keywordDefinitions);
+
+    // write to metadata.xml
+    RideMetadata::serialize(main->home.absolutePath() + "/metadata.xml", keywordDefinitions, fieldDefinitions);
+}
+
+// little helper since we create/recreate combos
+// for field types all over the place (init, move up, move down)
+static void addFieldTypes(QComboBox *p)
+{
+    p->addItem("Text");
+    p->addItem("Textbox");
+    p->addItem("ShortText");
+    p->addItem("Integer");
+    p->addItem("Double");
+    p->addItem("Date");
+    p->addItem("Time");
+}
+
+KeywordsPage::KeywordsPage(QWidget *parent, QList<KeywordDefinition>keywordDefinitions) : QWidget(parent)
+{
+    QGridLayout *mainLayout = new QGridLayout(this);
+
+    upButton = new QPushButton(tr("Move up"));
+    downButton = new QPushButton(tr("Move down"));
+    addButton = new QPushButton(tr("Insert"));
+    renameButton = new QPushButton(tr("Rename"));
+    deleteButton = new QPushButton(tr("Delete"));
+
+    QVBoxLayout *actionButtons = new QVBoxLayout;
+    actionButtons->addWidget(addButton);
+    actionButtons->addWidget(renameButton);
+    actionButtons->addWidget(deleteButton);
+    actionButtons->addWidget(upButton);
+    actionButtons->addWidget(downButton);
+    actionButtons->addStretch();
+
+    keywords = new QTreeWidget;
+    keywords->headerItem()->setText(0, "Keyword");
+    keywords->headerItem()->setText(1, "Color");
+    keywords->headerItem()->setText(2, "Related Notes Words");
+    keywords->setColumnCount(3);
+    keywords->setSelectionMode(QAbstractItemView::SingleSelection);
+    keywords->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    keywords->setUniformRowHeights(true);
+    keywords->setIndentation(0);
+    keywords->header()->resizeSection(0,100);
+    keywords->header()->resizeSection(1,45);
+
+    foreach(KeywordDefinition keyword, keywordDefinitions) {
+        QTreeWidgetItem *add;
+        ColorButton *colorButton = new ColorButton(this, keyword.name, keyword.color);
+        add = new QTreeWidgetItem(keywords->invisibleRootItem());
+        add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+        // keyword
+        add->setText(0, keyword.name);
+
+        // color button
+        add->setTextAlignment(1, Qt::AlignHCenter);
+        keywords->setItemWidget(add, 1, colorButton);
+
+        QString text;
+        for (int i=0; i< keyword.tokens.count(); i++) {
+            if (i != keyword.tokens.count()-1)
+                text += keyword.tokens[i] + ",";
+            else
+                text += keyword.tokens[i];
+        }
+
+        // notes texts
+        add->setText(2, text);
+    }
+    keywords->setCurrentItem(keywords->invisibleRootItem()->child(0));
+
+    mainLayout->addWidget(keywords, 0,0);
+    mainLayout->addLayout(actionButtons, 0,1);
+
+    // connect up slots
+    connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
+    connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
+    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
+    connect(renameButton, SIGNAL(clicked()), this, SLOT(renameClicked()));
+    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+}
+
+void
+KeywordsPage::upClicked()
+{
+    if (keywords->currentItem()) {
+        int index = keywords->invisibleRootItem()->indexOfChild(keywords->currentItem());
+        if (index == 0) return; // its at the top already
+
+        // movin on up!
+        QWidget *button = keywords->itemWidget(keywords->currentItem(),1);
+        ColorButton *colorButton = new ColorButton(this, ((ColorButton*)button)->getName(), ((ColorButton*)button)->getColor());
+        QTreeWidgetItem* moved = keywords->invisibleRootItem()->takeChild(index);
+        keywords->invisibleRootItem()->insertChild(index-1, moved);
+        keywords->setItemWidget(moved, 1, colorButton);
+        keywords->setCurrentItem(moved);
+        //LTMSettings save = (*presets)[index];
+        //presets->removeAt(index);
+        //presets->insert(index-1, save);
+    }
+}
+
+void
+KeywordsPage::downClicked()
+{
+    if (keywords->currentItem()) {
+        int index = keywords->invisibleRootItem()->indexOfChild(keywords->currentItem());
+        if (index == (keywords->invisibleRootItem()->childCount()-1)) return; // its at the bottom already
+
+        // movin on up!
+        QWidget *button = keywords->itemWidget(keywords->currentItem(),1);
+        ColorButton *colorButton = new ColorButton(this, ((ColorButton*)button)->getName(), ((ColorButton*)button)->getColor());
+        QTreeWidgetItem* moved = keywords->invisibleRootItem()->takeChild(index);
+        keywords->invisibleRootItem()->insertChild(index+1, moved);
+        keywords->setItemWidget(moved, 1, colorButton);
+        keywords->setCurrentItem(moved);
+    }
+}
+
+void
+KeywordsPage::renameClicked()
+{
+    // which one is selected?
+    if (keywords->currentItem()) keywords->editItem(keywords->currentItem(), 0);
+}
+
+void
+KeywordsPage::addClicked()
+{
+    int index = keywords->invisibleRootItem()->indexOfChild(keywords->currentItem());
+    if (index < 0) index = 0;
+    QTreeWidgetItem *add;
+    ColorButton *colorButton = new ColorButton(this, "New", QColor(Qt::blue));
+    add = new QTreeWidgetItem;
+    keywords->invisibleRootItem()->insertChild(index, add);
+    add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+    // keyword
+    QString text = "New";
+    for (int i=0; keywords->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
+        text = QString("New (%1)").arg(i+1);
+    }
+    add->setText(0, text);
+
+    // color button
+    add->setTextAlignment(1, Qt::AlignHCenter);
+    keywords->setItemWidget(add, 1, colorButton);
+
+    // notes texts
+    add->setText(2, "");
+}
+
+void
+KeywordsPage::deleteClicked()
+{
+    if (keywords->currentItem()) {
+        int index = keywords->invisibleRootItem()->indexOfChild(keywords->currentItem());
+
+        // zap!
+        delete keywords->invisibleRootItem()->takeChild(index);
+    }
+}
+
+void
+KeywordsPage::getDefinitions(QList<KeywordDefinition> &keywordList)
+{
+    // clear current just in case
+    keywordList.clear();
+
+    for (int idx =0; idx < keywords->invisibleRootItem()->childCount(); idx++) {
+        KeywordDefinition add;
+        QTreeWidgetItem *item = keywords->invisibleRootItem()->child(idx);
+
+        add.name = item->text(0);
+        add.color = ((ColorButton*)keywords->itemWidget(item, 1))->getColor();
+        add.tokens = item->text(2).split(",", QString::SkipEmptyParts);
+
+        keywordList.append(add);
+    }
+}
+
+FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) : QWidget(parent)
+{
+    QGridLayout *mainLayout = new QGridLayout(this);
+
+    upButton = new QPushButton(tr("Move up"));
+    downButton = new QPushButton(tr("Move down"));
+    addButton = new QPushButton(tr("Insert"));
+    renameButton = new QPushButton(tr("Rename"));
+    deleteButton = new QPushButton(tr("Delete"));
+
+    QVBoxLayout *actionButtons = new QVBoxLayout;
+    actionButtons->addWidget(addButton);
+    actionButtons->addWidget(renameButton);
+    actionButtons->addWidget(deleteButton);
+    actionButtons->addWidget(upButton);
+    actionButtons->addWidget(downButton);
+    actionButtons->addStretch();
+
+    fields = new QTreeWidget;
+    fields->headerItem()->setText(0, "Screen Tab");
+    fields->headerItem()->setText(1, "Field");
+    fields->headerItem()->setText(2, "Type");
+    fields->setColumnCount(3);
+    fields->setSelectionMode(QAbstractItemView::SingleSelection);
+    fields->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    fields->setUniformRowHeights(true);
+    fields->setIndentation(0);
+    fields->header()->resizeSection(0,130);
+    fields->header()->resizeSection(1,140);
+
+    SpecialFields specials;
+    foreach(FieldDefinition field, fieldDefinitions) {
+        QTreeWidgetItem *add;
+        QComboBox *comboButton = new QComboBox(this);
+        //QLineEdit *linedit = new QLineEdit(this); //XXX need a custom delegate for this
+        //QCompleter *completer = new QCompleter(linedit);
+        //completer->setModel(specials.model());
+        //completer->setCaseSensitivity(Qt::CaseInsensitive);
+        //linedit->setCompleter(completer);
+
+        addFieldTypes(comboButton);
+        comboButton->setCurrentIndex(field.type);
+
+        add = new QTreeWidgetItem(fields->invisibleRootItem());
+        add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+        // tab name
+        add->setText(0, field.tab);
+        // field name
+        add->setText(1, field.name);
+
+        // type button
+        add->setTextAlignment(2, Qt::AlignHCenter);
+        fields->setItemWidget(add, 2, comboButton);
+    }
+    fields->setCurrentItem(fields->invisibleRootItem()->child(0));
+
+    mainLayout->addWidget(fields, 0,0);
+    mainLayout->addLayout(actionButtons, 0,1);
+
+    // connect up slots
+    connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
+    connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
+    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
+    connect(renameButton, SIGNAL(clicked()), this, SLOT(renameClicked()));
+    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+}
+
+void
+FieldsPage::upClicked()
+{
+    if (fields->currentItem()) {
+        int index = fields->invisibleRootItem()->indexOfChild(fields->currentItem());
+        if (index == 0) return; // its at the top already
+
+        // movin on up!
+        QWidget *button = fields->itemWidget(fields->currentItem(),2);
+        QComboBox *comboButton = new QComboBox(this);
+        addFieldTypes(comboButton);
+        comboButton->setCurrentIndex(((QComboBox*)button)->currentIndex());
+        QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
+        fields->invisibleRootItem()->insertChild(index-1, moved);
+        fields->setItemWidget(moved, 2, comboButton);
+        fields->setCurrentItem(moved);
+    }
+}
+
+void
+FieldsPage::downClicked()
+{
+    if (fields->currentItem()) {
+        int index = fields->invisibleRootItem()->indexOfChild(fields->currentItem());
+        if (index == (fields->invisibleRootItem()->childCount()-1)) return; // its at the bottom already
+
+        QWidget *button = fields->itemWidget(fields->currentItem(),2);
+        QComboBox *comboButton = new QComboBox(this);
+        addFieldTypes(comboButton);
+        comboButton->setCurrentIndex(((QComboBox*)button)->currentIndex());
+        QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
+        fields->invisibleRootItem()->insertChild(index+1, moved);
+        fields->setItemWidget(moved, 2, comboButton);
+        fields->setCurrentItem(moved);
+    }
+}
+
+void
+FieldsPage::renameClicked()
+{
+    // which one is selected?
+    if (fields->currentItem()) fields->editItem(fields->currentItem(), 0);
+}
+
+void
+FieldsPage::addClicked()
+{
+    int index = fields->invisibleRootItem()->indexOfChild(fields->currentItem());
+    if (index < 0) index = 0;
+    QTreeWidgetItem *add;
+    QComboBox *comboButton = new QComboBox(this);
+    addFieldTypes(comboButton);
+
+    add = new QTreeWidgetItem;
+    fields->invisibleRootItem()->insertChild(index, add);
+    add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+    // field
+    QString text = "New";
+    for (int i=0; fields->findItems(text, Qt::MatchExactly, 1).count() > 0; i++) {
+        text = QString("New (%1)").arg(i+1);
+    }
+    add->setText(1, text);
+
+    // type button
+    add->setTextAlignment(2, Qt::AlignHCenter);
+    fields->setItemWidget(add, 2, comboButton);
+}
+
+void
+FieldsPage::deleteClicked()
+{
+    if (fields->currentItem()) {
+        int index = fields->invisibleRootItem()->indexOfChild(fields->currentItem());
+
+        // zap!
+        delete fields->invisibleRootItem()->takeChild(index);
+    }
+}
+
+void
+FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
+{
+    SpecialFields sp;
+    QStringList checkdups;
+
+    // clear current just in case
+    fieldList.clear();
+
+    for (int idx =0; idx < fields->invisibleRootItem()->childCount(); idx++) {
+
+        FieldDefinition add;
+        QTreeWidgetItem *item = fields->invisibleRootItem()->child(idx);
+
+        // silently ignore duplicates
+        if (checkdups.contains(item->text(1))) continue;
+        else checkdups << item->text(1);
+
+        add.tab = item->text(0);
+        add.name = item->text(1);
+
+        if (sp.isMetric(add.name))
+            add.type = 4;
+        else
+            add.type = ((QComboBox*)fields->itemWidget(item, 2))->currentIndex();
+
+        fieldList.append(add);
+    }
+}

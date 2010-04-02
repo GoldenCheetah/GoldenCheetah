@@ -1,0 +1,204 @@
+<metadata>
+	<keywords>
+		<keyword>
+			<keywordname>"Race"</keywordname>
+			<keywordcolor red="170" green="0" blue="0"></keywordcolor>
+			<keywordtoken>"Won"</keywordtoken>
+			<keywordtoken>"Criterium"</keywordtoken>
+			<keywordtoken>"TT"</keywordtoken>
+			<keywordtoken>"TTT"</keywordtoken>
+			<keywordtoken>"DNF"</keywordtoken>
+			<keywordtoken>"DNP"</keywordtoken>
+		</keyword>
+		<keyword>
+			<keywordname>"Test"</keywordname>
+			<keywordcolor red="80" green="40" blue="120"></keywordcolor>
+			<keywordtoken>"FTP"</keywordtoken>
+			<keywordtoken>"Monod"</keywordtoken>
+		</keyword>
+		<keyword>
+			<keywordname>"Threshold"</keywordname>
+			<keywordcolor red="170" green="0" blue="0"></keywordcolor>
+			<keywordtoken>"L4"</keywordtoken>
+		</keyword>
+		<keyword>
+			<keywordname>"Tempo"</keywordname>
+			<keywordcolor red="255" green="248" blue="193"></keywordcolor>
+			<keywordtoken>"L3"</keywordtoken>
+		</keyword>
+		<keyword>
+			<keywordname>"Endurance"</keywordname>
+			<keywordcolor red="222" green="255" blue="233"></keywordcolor>
+			<keywordtoken>"L2"</keywordtoken>
+		</keyword>
+		<keyword>
+			<keywordname>"Recovery"</keywordname>
+			<keywordcolor red="254" green="246" blue="237"></keywordcolor>
+		</keyword>
+		<keyword>
+			<keywordname>"Hills"</keywordname>
+			<keywordcolor red="227" green="202" blue="255"></keywordcolor>
+			<keywordtoken>"2HILLS"</keywordtoken>
+			<keywordtoken>"3HILLS"</keywordtoken>
+			<keywordtoken>"4HILLS"</keywordtoken>
+			<keywordtoken>"5HILLS"</keywordtoken>
+			<keywordtoken>"6HILLS"</keywordtoken>
+			<keywordtoken>"ToSH"</keywordtoken>
+		</keyword>
+		<keyword>
+			<keywordname>"Indoor"</keywordname>
+			<keywordcolor red="255" green="255" blue="255"></keywordcolor>
+			<keywordtoken>"Computrainer"</keywordtoken>
+			<keywordtoken>"Turbo"</keywordtoken>
+		</keyword>
+		<keyword>
+			<keywordname>"Bike"</keywordname>
+			<keywordcolor red="238" green="255" blue="239"></keywordcolor>
+			<keywordtoken>"Bike"</keywordtoken>
+		</keyword>
+		<keyword>
+			<keywordname>"Swim"</keywordname>
+			<keywordcolor red="170" green="196" blue="255"></keywordcolor>
+		</keyword>
+		<keyword>
+			<keywordname>"Run"</keywordname>
+			<keywordcolor red="170" green="170" blue="127"></keywordcolor>
+		</keyword>
+		<keyword>
+			<keywordname>"Solo"</keywordname>
+			<keywordcolor red="255" green="255" blue="255"></keywordcolor>
+			<keywordtoken>"Alone"</keywordtoken>
+		</keyword>
+		<keyword>
+			<keywordname>"Sick"</keywordname>
+			<keywordcolor red="255" green="255" blue="255"></keywordcolor>
+			<keywordtoken>"Crash"</keywordtoken>
+		</keyword>
+		<keyword>
+			<keywordname>"Default"</keywordname>
+			<keywordcolor red="229" green="229" blue="229"></keywordcolor>
+		</keyword>
+	</keywords>
+	<fields>
+		<field>
+			<fieldtab>"Workout"</fieldtab>
+			<fieldname>"Start Date"</fieldname>
+			<fieldtype>5</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Workout"</fieldtab>
+			<fieldname>"Start Time"</fieldname>
+			<fieldtype>6</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Workout"</fieldtab>
+			<fieldname>"Workout Code"</fieldname>
+			<fieldtype>2</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Workout"</fieldtab>
+			<fieldname>"Sport"</fieldname>
+			<fieldtype>2</fieldtype>
+		</field>
+		<field>
+			<fieldtab>""</fieldtab>
+			<fieldname>"Keywords"</fieldname>
+			<fieldtype>2</fieldtype>
+		</field>
+		<field>
+			<fieldtab>""</fieldtab>
+			<fieldname>"Objective"</fieldname>
+			<fieldtype>1</fieldtype>
+		</field>
+		<field>
+			<fieldtab>""</fieldtab>
+			<fieldname>"Weight"</fieldname>
+			<fieldtype>4</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Notes"</fieldtab>
+			<fieldname>"Notes"</fieldname>
+			<fieldtype>1</fieldtype>
+		</field>
+		<field>
+			<fieldtab>""</fieldtab>
+			<fieldname>"Device"</fieldname>
+			<fieldtype>2</fieldtype>
+		</field>
+		<field>
+			<fieldtab>""</fieldtab>
+			<fieldname>"Recording Interval"</fieldname>
+			<fieldtype>4</fieldtype>
+		</field>
+		<field>
+			<fieldtab>""</fieldtab>
+			<fieldname>"Device Info"</fieldname>
+			<fieldtype>1</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"Duration"</fieldname>
+			<fieldtype>4</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"Time Riding"</fieldname>
+			<fieldtype>4</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"Distance"</fieldname>
+			<fieldtype>4</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"Work"</fieldname>
+			<fieldtype>4</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"Elevation Gain"</fieldname>
+			<fieldtype>4</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"Average Speed"</fieldname>
+			<fieldtype>4</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"Average Power"</fieldname>
+			<fieldtype>4</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"Average Heart Rate"</fieldname>
+			<fieldtype>4</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"Average Cadence"</fieldname>
+			<fieldtype>4</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"BikeScore&amp;#8482;"</fieldname>
+			<fieldtype>4</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"xPower"</fieldname>
+			<fieldtype>4</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"Daniels Points"</fieldname>
+			<fieldtype>4</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"Daniels EqP"</fieldname>
+			<fieldtype>4</fieldtype>
+		</field>
+	</fields>
+</metadata>

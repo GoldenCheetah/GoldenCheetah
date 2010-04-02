@@ -21,6 +21,7 @@
 #include "AerolabWindow.h"
 #include "Aerolab.h"
 #include "RideItem.h"
+#include "Colors.h"
 #include <QtGui>
 #include <qwt_plot_zoomer.h>
 
@@ -175,7 +176,6 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   // Zoomer:
   allZoomer = new QwtPlotZoomer(aerolab->canvas());
   allZoomer->setRubberBand(QwtPicker::RectRubberBand);
-  allZoomer->setRubberBandPen(QColor(Qt::black));
   allZoomer->setSelectionFlags(QwtPicker::DragSelection
                             | QwtPicker::CornerToCorner);
   allZoomer->setTrackerMode(QwtPicker::AlwaysOff);
@@ -189,12 +189,21 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   connect(rhoSlider, SIGNAL(valueChanged(int)), this, SLOT(setRhoFromSlider()));
   connect(etaSlider, SIGNAL(valueChanged(int)), this, SLOT(setEtaFromSlider()));
   connect(eoffsetSlider, SIGNAL(valueChanged(int)), this, SLOT(setEoffsetFromSlider()));
+  connect(mainWindow, SIGNAL(configChanged()), aerolab, SLOT(configChanged()));
+  connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
 
   // Build the tab layout:
   vLayout->addWidget(aerolab);
   vLayout->addLayout(cLayout);
   setLayout(vLayout);
 
+  configChanged(); // pickup colors etc
+}
+
+void
+AerolabWindow::configChanged()
+{
+  allZoomer->setRubberBandPen(GColor(CPLOTSELECT));
 }
 
 void

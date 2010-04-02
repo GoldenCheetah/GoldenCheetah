@@ -61,8 +61,9 @@ class PfPvPlot : public QwtPlot
         void setFrameIntervals(bool value);
 
     public slots:
-signals:
-        
+        void configChanged();
+
+    signals:
         void changedCP( const QString& );
         void changedCAD( const QString& );
         void changedCL( const QString& );

@@ -63,6 +63,9 @@ class PerfPlot : public QwtPlot
 	StressCalculator *_sc;
 	int xmin, xmax;
 
+    public slots:
+    void configUpdate();
+
     public:
 
     double getSTS(int i) { return STScurve->y(i - xmin); }

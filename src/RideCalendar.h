@@ -19,9 +19,13 @@ public:
 protected:
     void paintCell(QPainter *, const QRect &, const QDate &) const;
 
+public slots:
+    void configUpdate();
+
 private:
     QMap<QString, QColor> workoutCodes;
     QDir home;
+    QColor defaultColor;
     MainWindow *mainWindow;
 };
 

@@ -57,6 +57,7 @@ class CpintPlot : public QwtPlot
         void calculate(RideItem *rideItem);
         void plot_CP_curve(CpintPlot *plot, double cp, double tau, double t0n);
         void plot_allCurve(CpintPlot *plot, int n_values, const double *power_values);
+        void configChanged();
 
     protected:
 

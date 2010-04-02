@@ -24,6 +24,7 @@
 #include "SummaryMetrics.h"
 #include "RideMetric.h"
 #include "Settings.h"
+#include "Colors.h"
 
 #include "StressCalculator.h" // for LTS/STS calculation
 
@@ -49,7 +50,6 @@ LTMPlot::LTMPlot(LTMWindow *parent, MainWindow *main, QDir home) : bg(NULL), par
     useMetricUnits = appsettings->value(GC_UNIT).toString() == "Metric";
 
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
-    setCanvasBackground(Qt::white);
     setAxisTitle(yLeft, tr(""));
     setAxisTitle(xBottom, "Date");
     setAxisMaxMinor(QwtPlot::xBottom,-1);
@@ -57,12 +57,11 @@ LTMPlot::LTMPlot(LTMWindow *parent, MainWindow *main, QDir home) : bg(NULL), par
 
     grid = new QwtPlotGrid();
     grid->enableX(false);
-    QPen gridPen;
-    gridPen.setStyle(Qt::DotLine);
-    grid->setPen(gridPen);
     grid->attach(this);
 
     settings = NULL;
+
+    configUpdate(); // set basic colors
 
     connect(main, SIGNAL(configChanged()), this, SLOT(configUpdate()));
 }
@@ -77,6 +76,12 @@ LTMPlot::configUpdate()
     // get application settings
     boost::shared_ptr<QSettings> appsettings = GetApplicationSettings();
     useMetricUnits = appsettings->value(GC_UNIT).toString() == "Metric";
+
+    // set basic plot colors
+    setCanvasBackground(GColor(CPLOTBACKGROUND));
+    QPen gridPen(GColor(CPLOTGRID));
+    gridPen.setStyle(Qt::DotLine);
+    grid->setPen(gridPen);
 }
 
 void
@@ -393,7 +398,7 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
     // Get metric data, either from metricDB for RideFile metrics
     // or from StressCalculator for PM type metrics
     QList<SummaryMetrics> PMCdata;
-    if (metricDetail.type == METRIC_DB) {
+    if (metricDetail.type == METRIC_DB || metricDetail.type == METRIC_META) {
         data = settings->data;
     } else if (metricDetail.type == METRIC_PM) {
         createPMCCurveData(settings, metricDetail, PMCdata);
@@ -667,7 +672,7 @@ LTMPlot::pickerAppended(QPoint pos)
     curveDataY[3]=curveDataY[3];
 
     // color
-    QColor ccol(Qt::blue);
+    QColor ccol(GColor(CINTERVALHIGHLIGHTER));
     ccol.setAlpha(64);
     QPen cpen = QPen(ccol);
     cpen.setWidth(1.0);

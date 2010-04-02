@@ -124,7 +124,12 @@ class RideFile
         int timeIndex(double) const;          // get index offset for time in secs
         int distanceIndex(double) const;      // get index offset for distance in KM
 
+        const QMap<QString,QString>& tags() const { return tags_; }
+        QString getTag(QString name, QString fallback) { return tags_.value(name, fallback); }
+        void setTag(QString name, QString value) { tags_.insert(name, value); }
+
         QMap<QString,QMap<QString,QString> > metricOverrides;
+        QMap<QString,QString> tags_;
 };
 
 struct RideFileReader {

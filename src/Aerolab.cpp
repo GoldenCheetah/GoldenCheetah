@@ -22,6 +22,7 @@
 #include "RideItem.h"
 #include "Settings.h"
 #include "Units.h"
+#include "Colors.h"
 
 #include <math.h>
 #include <assert.h>
@@ -68,22 +69,30 @@ Aerolab::Aerolab(QWidget *parent):
   setAxisScale(xBottom, 0, 60);
 
   veCurve = new QwtPlotCurve(tr("V-Elevation"));
-  QPen vePen = QPen(Qt::blue);
-  vePen.setWidth(1);
-  veCurve->setPen(vePen);
 
   altCurve = new QwtPlotCurve(tr("Elevation"));
-  QPen altPen = QPen(Qt::green);
-  altPen.setWidth(1);
-  altCurve->setPen(altPen);
 
   grid = new QwtPlotGrid();
   grid->enableX(false);
-  QPen gridPen;
-  gridPen.setStyle(Qt::DotLine);
-  grid->setPen(gridPen);
   grid->attach(this);
 
+  configChanged();
+}
+
+void
+Aerolab::configChanged()
+{
+  // set colors
+  setCanvasBackground(GColor(CPLOTBACKGROUND));
+  QPen vePen = QPen(GColor(CAEROVE));
+  vePen.setWidth(1);
+  veCurve->setPen(vePen);
+  QPen altPen = QPen(GColor(CAEROEL));
+  altPen.setWidth(1);
+  altCurve->setPen(altPen);
+  QPen gridPen(GColor(CPLOTGRID));
+  gridPen.setStyle(Qt::DotLine);
+  grid->setPen(gridPen);
 }
 
 void

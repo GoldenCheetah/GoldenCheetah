@@ -490,13 +490,32 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, RideFile *rideFile, 
     julian = ul + 2415386; // 1/1/1901 is day 2415386 in julian days god bless google.
 
     goal = p; p += dotext(p, &txtbuf[0]); /* 4: goal */
+    rideFile->setTag("Objective", (const char*)&txtbuf[0]);
     notes = p; p += dotext(p, &txtbuf[0]); /* 5: notes */
 
     p += dotext(p, &txtbuf[0]); /* 6: graphs */
     strcpy(reinterpret_cast<char *>(WKO_GRAPHS), reinterpret_cast<char *>(&txtbuf[0])); // save those graphs away
 
     p += donumber(p, &sport); /* 7: sport */
+    switch (sport) {
+        case 0x01 : rideFile->setTag("Sport", "Swim") ; break;
+        case 0x02 : rideFile->setTag("Sport", "Bike") ; break;
+        case 0x03 : rideFile->setTag("Sport", "Run") ; break;
+        case 0x04 : rideFile->setTag("Sport", "Brick") ; break;
+        case 0x05 : rideFile->setTag("Sport", "Cross Train") ; break;
+        case 0x06 : rideFile->setTag("Sport", "Race ") ; break;
+        case 0x07 : rideFile->setTag("Sport", "Day Off") ; break;
+        case 0x08 : rideFile->setTag("Sport", "Mountain Bike") ; break;
+        case 0x09 : rideFile->setTag("Sport", "Strength") ; break;
+        case 0x0B : rideFile->setTag("Sport", "XC Ski") ; break;
+        case 0x0C : rideFile->setTag("Sport", "Rowing") ; break;
+        default   :
+        case 0x64 : rideFile->setTag("Sport", "Other"); break;
+
+    }
     code = p; p += dotext(p, &txtbuf[0]); /* 8: workout code */
+    rideFile->setTag("Workout Code", (const char*)&txtbuf[0]);
+
     p += donumber(p, &ul); /* 9: duration 000s of seconds */
     p += dotext(p, &txtbuf[0]); /* 10: lastname */
     p += dotext(p, &txtbuf[0]); /* 11: firstname */
@@ -584,6 +603,7 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, RideFile *rideFile, 
     p += donumber(p, &ul); /* 17: athlete threshold power */
     p += dodouble(p, &g);  /* 18: athlete threshold pace */
     p += donumber(p, &ul); /* 19: weight in grams/10 */
+    rideFile->setTag("Weight", QString("%1").arg((double)ul/100.00));
 
     p += 28;
     //p += donumber(p, &ul); /* 20: unknown */
@@ -601,23 +621,19 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, RideFile *rideFile, 
     p += donumber(p, &ul); /* 28: WKO_device type */
     WKO_device = ul; // save WKO_device
 
-#if 0
     switch (WKO_device) {
-    case 0x01 : rideFile->setDeviceType("Powertap (via WKO)"); break;
-    case 0x04 : rideFile->setDeviceType("SRM (via WKO)"); break;
-    case 0x05 : rideFile->setDeviceType("Polar (via WKO)"); break;
-    case 0x06 : rideFile->setDeviceType("Computrainer/Velotron (via WKO)"); break;
-    case 0x11 : rideFile->setDeviceType("Ergomo (via WKO)"); break;
-    case 0x12 : rideFile->setDeviceType("Garmin Edge 205/305 (via WKO)"); break;
-    case 0x13 : rideFile->setDeviceType("Garmin Edge 705 (via WKO)"); break;
-    case 0x14 : rideFile->setDeviceType("Ergomo (via WKO)"); break;
-    case 0x16 : rideFile->setDeviceType("Cycleops 300PT (via WKO)"); break;
-    case 0x19 : rideFile->setDeviceType("Ergomo (via WKO)"); break;
-    default : rideFile->setDeviceType("Unknown Device (via WKO)"); break;
+    case 0x01 : rideFile->setDeviceType("Powertap"); break;
+    case 0x04 : rideFile->setDeviceType("SRM"); break;
+    case 0x05 : rideFile->setDeviceType("Polar"); break;
+    case 0x06 : rideFile->setDeviceType("Computrainer/Velotron"); break;
+    case 0x11 : rideFile->setDeviceType("Ergomo"); break;
+    case 0x12 : rideFile->setDeviceType("Garmin Edge 205/305"); break;
+    case 0x13 : rideFile->setDeviceType("Garmin Edge 705"); break;
+    case 0x14 : rideFile->setDeviceType("Ergomo"); break;
+    case 0x16 : rideFile->setDeviceType("Cycleops 300PT"); break;
+    case 0x19 : rideFile->setDeviceType("Ergomo"); break;
+    default : rideFile->setDeviceType("WKO"); break;
     }
-#else
-    rideFile->setDeviceType("WKO");
-#endif
 
     p += donumber(p, &ul); /* 29: unknown */
 
@@ -682,11 +698,15 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, RideFile *rideFile, 
     /***************************************************
      * 3: DEVICE SPECIFIC DATA
      ***************************************************/
+    QString deviceInfo;
     p += doshort(p, &us); /* 249: Device/Token pairs XXVARIABLEXX */
     for (i=0; i<us; i++) {
         p += dotext(p, &txtbuf[0]);
+        deviceInfo += QString("%1 = ").arg((char*)&txtbuf[0]);
         p += dotext(p, &txtbuf[0]);
+        deviceInfo += QString("%1\n").arg((char*)&txtbuf[0]);
     }
+    rideFile->setTag("Device Info", deviceInfo);
 
     /***************************************************
      * 4: PERSPECTIVE CHARTS & CACHES

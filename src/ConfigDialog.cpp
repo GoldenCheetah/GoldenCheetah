@@ -36,20 +36,19 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
     contentsWidget->setViewMode(QListView::IconMode);
     contentsWidget->setIconSize(QSize(96, 84));
     contentsWidget->setMovement(QListView::Static);
-    contentsWidget->setMinimumWidth(128);
-    contentsWidget->setMaximumWidth(128);
-    contentsWidget->setMinimumHeight(128);
+    contentsWidget->setMinimumWidth(112);
+    contentsWidget->setMaximumWidth(112);
+    //contentsWidget->setMinimumHeight(200);
     contentsWidget->setSpacing(12);
+    contentsWidget->setUniformItemSizes(true);
 
-    configPage = new ConfigurationPage();
+    configPage = new ConfigurationPage(mainWindow);
 
-    intervalMetricsPage = new IntervalMetricsPage;
     devicePage = new DevicePage(this);
 
     pagesWidget = new QStackedWidget;
     pagesWidget->addWidget(configPage);
     pagesWidget->addWidget(cyclistPage);
-    pagesWidget->addWidget(intervalMetricsPage);
     pagesWidget->addWidget(devicePage);
 
     closeButton = new QPushButton(tr("Close"));
@@ -83,34 +82,36 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
 
     mainLayout = new QVBoxLayout;
     mainLayout->addLayout(horizontalLayout);
-    mainLayout->addStretch(1);
-    mainLayout->addSpacing(12);
+    //mainLayout->addStretch(1);
+    //mainLayout->addSpacing(12);
     mainLayout->addLayout(buttonsLayout);
     setLayout(mainLayout);
 
-    setWindowTitle(tr("Config Dialog"));
+    // We go fixed width to ensure a consistent layout for
+    // tabs, sub-tabs and internal widgets and lists
+#ifdef Q_OS_MACX
+    setWindowTitle(tr("Preferences"));
+    setFixedSize(QSize(800, 600)); // account for mac os x contents margins
+#else
+    setWindowTitle(tr("Options"));
+    setFixedSize(QSize(700, 500));
+#endif
 }
 
 void ConfigDialog::createIcons()
 {
     QListWidgetItem *configButton = new QListWidgetItem(contentsWidget);
     configButton->setIcon(QIcon(":/images/config.png"));
-    configButton->setText(tr("Configuration"));
+    configButton->setText(tr("Settings"));
     configButton->setTextAlignment(Qt::AlignHCenter);
     configButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
 
     QListWidgetItem *cyclistButton = new QListWidgetItem(contentsWidget);
     cyclistButton->setIcon(QIcon(":images/cyclist.png"));
-    cyclistButton->setText(tr("Cyclist Info"));
+    cyclistButton->setText(tr("Athlete"));
     cyclistButton->setTextAlignment(Qt::AlignHCenter);
     cyclistButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-
-    QListWidgetItem *intervalMetricsButton = new QListWidgetItem(contentsWidget);
-    intervalMetricsButton->setIcon(QIcon(":images/imetrics.png"));
-    intervalMetricsButton->setText(tr("Interval Metrics"));
-    intervalMetricsButton->setTextAlignment(Qt::AlignHCenter);
-    intervalMetricsButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
     QListWidgetItem *realtimeButton = new QListWidgetItem(contentsWidget);
     realtimeButton->setIcon(QIcon(":images/arduino.png"));
@@ -202,7 +203,8 @@ void ConfigDialog::save_Clicked()
 
     zones->write(home);
 
-    intervalMetricsPage->saveClicked();
+    // save interval metrics and ride data pages
+    configPage->saveClicked();
 
     // Save the device configuration...
     DeviceConfigurations all;
