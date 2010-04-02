@@ -251,7 +251,7 @@ struct AvgPower : public RideMetric {
                 ++count;
             }
         }
-        setValue(total / count);
+        setValue(count > 0 ? total / count : 0);
         setCount(count);
     }
     RideMetric *clone() const { return new AvgPower(*this); }
@@ -283,7 +283,7 @@ struct AvgHeartRate : public RideMetric {
                 ++count;
             }
         }
-        setValue(total / count);
+        setValue(count > 0 ? total / count : 0);
         setCount(count);
     }
     RideMetric *clone() const { return new AvgHeartRate(*this); }
@@ -315,7 +315,7 @@ struct AvgCadence : public RideMetric {
                 ++count;
             }
         }
-        setValue(total / count);
+        setValue(count > 0 ? total / count : count);
         setCount(count);
     }
     RideMetric *clone() const { return new AvgCadence(*this); }
