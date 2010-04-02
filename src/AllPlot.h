@@ -72,6 +72,7 @@ class AllPlot : public QwtPlot
         void showGrid(int state);
         void setSmoothing(int value);
         void setByDistance(int value);
+        void configChanged();
 
     protected:
 

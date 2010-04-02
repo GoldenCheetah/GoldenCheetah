@@ -24,6 +24,7 @@
 #include "AllPlot.h"
 #include "BestIntervalDialog.h"
 #include "ChooseCyclistDialog.h"
+#include "Colors.h"
 #include "Computrainer.h"
 #include "ConfigDialog.h"
 #include "CriticalPowerWindow.h"
@@ -41,6 +42,7 @@
 #include "RideSummaryWindow.h"
 #include "RideImportWizard.h"
 #include "QuarqRideFile.h"
+#include "RideMetadata.h"
 #include "RideMetric.h"
 #include "Settings.h"
 #include "TimeUtils.h"
@@ -95,14 +97,17 @@ MainWindow::parseRideFileName(const QString &name, QString *notesFileName, QDate
 }
 
 MainWindow::MainWindow(const QDir &home) : 
-    home(home), 
+    home(home), session(0), isclean(false),
     zones_(new Zones), currentNotesChanged(false),
     ride(NULL)
 {
     setAttribute(Qt::WA_DeleteOnClose);
 
     settings = GetApplicationSettings();
-      
+
+    GCColor *GCColorSet = new GCColor(this); // get/keep colorset
+    GCColorSet->colorSet(); // shut up the compiler
+
     QVariant unit = settings->value(GC_UNIT);
     useMetricUnits = (unit.toString() == "Metric");
 
@@ -131,6 +136,12 @@ MainWindow::MainWindow(const QDir &home) :
 
     splitter = new QSplitter;
     splitter->setContentsMargins(10, 20, 10, 10); // attempting to follow some UI guides
+
+    // need to get rideNotes before metadata!
+    rideNotes = new QTextEdit;
+
+    // need to get metadata in before calendar!
+    _rideMetadata = new RideMetadata(this);
 
     // Analysis toolbox contents
     calendar = new RideCalendar(this);
@@ -220,30 +231,28 @@ MainWindow::MainWindow(const QDir &home) :
     views->setCurrentIndex(0);          // default to Analysis
 
     rideSummaryWindow = new RideSummaryWindow(this);
-    QLabel *notesLabel = new QLabel(tr("Notes:"));
+    QLabel *notesLabel = new QLabel(tr("Notes"));
     notesLabel->setMaximumHeight(30);
-    rideNotes = new QTextEdit;
-
-    notesWidget = new QWidget();
-    notesLayout = new QVBoxLayout(notesWidget);
-    notesLayout->addWidget(notesLabel);
-    notesLayout->addWidget(rideNotes);
 
     summarySplitter = new QSplitter;
     summarySplitter->setContentsMargins(0, 0, 0, 0);
     summarySplitter->setOrientation(Qt::Vertical);
     summarySplitter->addWidget(rideSummaryWindow);
-    summarySplitter->setCollapsible(0, false);
-    summarySplitter->addWidget(notesWidget);
+    summarySplitter->setCollapsible(0, true);
+    summarySplitter->addWidget(_rideMetadata);
     summarySplitter->setCollapsible(1, true);
 
 
-    // the sizes are somewhat arbitrary,
-    // just trying to force the smallest non-hidden notes size by default
-    QList<int> summarySizes;
-    summarySizes.append(800);
-    summarySizes.append(200);
-    summarySplitter->setSizes(summarySizes);
+    // Use last remembered size or set to a sensible default
+    QVariant summarySizes = settings->value(GC_SETTINGS_SUMMARYSPLITTER_SIZES);
+    if (summarySizes != QVariant())
+        summarySplitter->restoreState(summarySizes.toByteArray());
+    else {
+        QList<int> sizes;
+        sizes.append(650);
+        sizes.append(350);
+        summarySplitter->setSizes(sizes);
+    }
 
     tabs.append(TabInfo(summarySplitter, tr("Ride Summary")));
 
@@ -326,6 +335,8 @@ MainWindow::MainWindow(const QDir &home) :
             this, SLOT(rideTreeWidgetSelectionChanged()));
     connect(splitter, SIGNAL(splitterMoved(int,int)), 
             this, SLOT(splitterMoved()));
+    connect(summarySplitter, SIGNAL(splitterMoved(int,int)),
+            this, SLOT(summarySplitterMoved()));
     connect(tabWidget, SIGNAL(currentChanged(int)), 
             this, SLOT(tabChanged(int)));
     connect(rideNotes, SIGNAL(textChanged()),
@@ -1172,6 +1183,11 @@ MainWindow::splitterMoved()
     settings->setValue(GC_SETTINGS_SPLITTER_SIZES, splitter->saveState());
 }
 
+void
+MainWindow::summarySplitterMoved()
+{
+    settings->setValue(GC_SETTINGS_SUMMARYSPLITTER_SIZES, summarySplitter->saveState());
+}
 // set the rider value of CP to the value derived from the CP model extraction
 void
 MainWindow::setCriticalPower(int cp)

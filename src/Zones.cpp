@@ -18,12 +18,14 @@
 
 #include <QMessageBox>
 #include "Zones.h"
+#include "Colors.h"
 #include "TimeUtils.h"
 #include <QtGui>
 #include <QtAlgorithms>
 #include <qcolor.h>
 #include <assert.h>
 #include <math.h>
+#include <boost/crc.hpp>
 
 static QList <int> zone_default;
 static QList <bool> zone_default_is_pct;
@@ -755,16 +757,21 @@ int Zones::getRangeSize() const
 }
 
 // generate a zone color with a specific number of zones
-QColor zoneColor(int z, int num_zones) {
-    assert ((z >= 0) && (z < num_zones));
-    if (num_zones == 1)
-        return QColor(128, 128, 128);
-    QColor color;
+QColor zoneColor(int z, int) {
+    switch(z) {
 
-    // pick a color from violet (z=0) to red (z=num_zones)
-    color.setHsv(int(300 * (num_zones - z - 1) / (num_zones - 1)), 255, 255);
-
-    return color;
+    case 0  : return GColor(CZONE1); break;
+    case 1  : return GColor(CZONE2); break;
+    case 2  : return GColor(CZONE3); break;
+    case 3  : return GColor(CZONE4); break;
+    case 4  : return GColor(CZONE5); break;
+    case 5  : return GColor(CZONE6); break;
+    case 6  : return GColor(CZONE7); break;
+    case 7  : return GColor(CZONE8); break;
+    case 8  : return GColor(CZONE9); break;
+    case 9  : return GColor(CZONE10); break;
+    default: return QColor(128,128,128); break;
+    }
 }
 
 // delete a range, extend an adjacent (prior if available, otherwise next)
@@ -825,4 +832,25 @@ int Zones::insertRangeAtDate(QDate date, int cp) {
     }
 
     return rnum;
+}
+
+unsigned long
+Zones::getFingerprint() const
+{
+    boost::crc_optimal<16, 0x1021, 0xFFFF, 0, false, false> CRC;
+    for (int i=0; i<ranges.size(); i++) {
+
+        // from
+        int x = ranges[i].begin.toJulianDay();
+        CRC.process_bytes(&x, sizeof(int));
+
+        // to
+        x = ranges[i].end.toJulianDay();
+        CRC.process_bytes(&x, sizeof(int));
+
+        // CP
+        x = ranges[i].cp;
+        CRC.process_bytes(&x, sizeof(int));
+    }
+    return CRC.checksum();
 }

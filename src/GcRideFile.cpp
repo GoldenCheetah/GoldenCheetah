@@ -22,6 +22,8 @@
 #include <QVector>
 #include <assert.h>
 
+#include <QDebug>
+
 #define DATETIME_FORMAT "yyyy/MM/dd hh:mm:ss' UTC'"
 
 static int gcFileReaderRegistered =
@@ -61,6 +63,42 @@ GcFileReader::openRideFile(QFile &file, QStringList &errors) const
             QDateTime asUTC = QDateTime(aslocal.date(), aslocal.time(), Qt::UTC);
             // now set in localtime
             rideFile->setStartTime(asUTC.toLocalTime());
+        }
+    }
+
+    // read in metric overrides:
+    //  <override>
+    //    <metric name="skiba_bike_score" value="100"/>
+    //    <metric name="average_speed" secs="3600" km="30"/>
+    //  </override>
+
+    QDomNode overrides = root.firstChildElement("override");
+    if (!overrides.isNull()) {
+
+        for (QDomElement override = overrides.firstChildElement("metric");
+            !override.isNull();
+            override = override.nextSiblingElement("metric")) {
+
+            // setup the metric overrides QMap
+            QMap<QString, QString> bsm;
+
+            // for now only value is known to be maintained
+            bsm.insert("value", override.attribute("value"));
+
+            // insert into the rideFile overrides
+            rideFile->metricOverrides.insert(override.attribute("name"), bsm);
+        }
+    }
+
+    // read in the name/value metadata pairs
+    QDomNode tags = root.firstChildElement("tags");
+    if (!tags.isNull()) {
+
+        for (QDomElement tag = tags.firstChildElement("tag");
+             !tag.isNull();
+             tag = tag.nextSiblingElement("tag")) {
+
+            rideFile->setTag(tag.attribute("name"), tag.attribute("value"));
         }
     }
 
@@ -143,6 +181,45 @@ GcFileReader::writeRideFile(const RideFile *ride, QFile &file) const
     attributes.appendChild(attribute);
     attribute.setAttribute("key", "Device type");
     attribute.setAttribute("value", ride->deviceType());
+
+    // write out in metric overrides:
+    //  <override>
+    //    <metric name="skiba_bike_score" value="100"/>
+    //    <metric name="average_speed" secs="3600" km="30"/>
+    //  </override>
+    // write out the QMap tag/value pairs
+    QDomElement overrides = doc.createElement("override");
+    root.appendChild(overrides);
+    QMap<QString,QMap<QString, QString> >::const_iterator k;
+    for (k=ride->metricOverrides.constBegin(); k != ride->metricOverrides.constEnd(); k++) {
+
+        // may not contain anything
+        if (k.value().isEmpty()) continue;
+
+        QDomElement override = doc.createElement("metric");
+        overrides.appendChild(override);
+
+        // metric name
+        override.setAttribute("name", k.key());
+
+        // key/value pairs
+        QMap<QString, QString>::const_iterator j;
+        for (j=k.value().constBegin(); j != k.value().constEnd(); j++) {
+            override.setAttribute(j.key(), j.value());
+        }
+    }
+
+    // write out the QMap tag/value pairs
+    QDomElement tags = doc.createElement("tags");
+    root.appendChild(tags);
+    QMap<QString,QString>::const_iterator i;
+    for (i=ride->tags().constBegin(); i != ride->tags().constEnd(); i++) {
+            QDomElement tag = doc.createElement("tag");
+            tags.appendChild(tag);
+
+            tag.setAttribute("name", i.key());
+            tag.setAttribute("value", i.value());
+    }
 
     if (!ride->intervals().empty()) {
         QDomElement intervals = doc.createElement("intervals");

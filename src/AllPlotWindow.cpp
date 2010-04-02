@@ -27,6 +27,7 @@
 #include "TimeUtils.h"
 #include "Settings.h"
 #include "Units.h" // for MILES_PER_KM
+#include "Colors.h" // for MILES_PER_KM
 #include <qwt_plot_layout.h>
 #include <qwt_plot_panner.h>
 #include <qwt_plot_zoomer.h>
@@ -150,9 +151,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
                                   QwtPicker::RectSelection | QwtPicker::CornerToCorner|QwtPicker::DragSelection,
                                    QwtPicker::VLineRubberBand,
                                    QwtPicker::ActiveOnly, allPlot->canvas());
-    allPicker->setRubberBandPen(QColor(Qt::blue));
     allPicker->setRubberBand(QwtPicker::CrossRubberBand);
-    allPicker->setTrackerPen(QColor(Qt::blue));
     // now select rectangles
     allPicker->setSelectionFlags(QwtPicker::PointSelection | QwtPicker::RectSelection | QwtPicker::DragSelection);
     allPicker->setRubberBand(QwtPicker::VLineRubberBand);
@@ -223,6 +222,15 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
     connect(mainWindow, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
     connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
+    connect(mainWindow, SIGNAL(configChanged()), allPlot, SLOT(configChanged()));
+    connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
+}
+
+void
+AllPlotWindow::configChanged()
+{
+    allPicker->setRubberBandPen(GColor(CPLOTSELECT));
+    allPicker->setTrackerPen(GColor(CPLOTTRACKER));
 }
 
 void
@@ -432,9 +440,9 @@ AllPlotWindow::setEndSelection(AllPlot* plot, int xPosition, bool newInterval, Q
         double lwidth=plot->transform(QwtPlot::xBottom, x2)-plot->transform(QwtPlot::xBottom, x1);
 
         allMarker3->setValue((x2-x1)/2+x1, 100);
-        QColor marker_color = QColor(Qt::blue);
+        QColor marker_color = QColor(GColor(CINTERVALHIGHLIGHTER));
         marker_color.setAlpha(64);
-        allMarker3->setLinePen(QPen(QBrush(marker_color), lwidth, Qt::SolidLine)) ;
+        allMarker3->setLinePen(QPen(marker_color, lwidth, Qt::SolidLine)) ;
         //allMarker3->setZ(-1000.0);
         allMarker3->show();
 
@@ -802,15 +810,15 @@ AllPlotWindow::addPickers(AllPlot *_allPlot)
                                    QwtPicker::NoRubberBand,
                                    QwtPicker::ActiveOnly, _allPlot->canvas());
     allPickers.append(allPicker);
-    allPicker->setRubberBandPen(QColor(Qt::blue));
     allPicker->setRubberBand(QwtPicker::NoRubberBand);
-    allPicker->setTrackerPen(QColor(Qt::blue));
     // now select rectangles
     allPicker->setSelectionFlags(QwtPicker::PointSelection | QwtPicker::RectSelection | QwtPicker::DragSelection);
     allPicker->setMousePattern(QwtEventPattern::MouseSelect1,
                                    Qt::LeftButton, Qt::ShiftModifier);
 
 
+    allPicker->setRubberBandPen(GColor(CPLOTSELECT));
+    allPicker->setTrackerPen(GColor(CPLOTTRACKER));
 
     //void appended(const QwtPlotPicker* pick, const QwtDoublePoint &pos);
     connect(allPicker, SIGNAL(appended(const QPoint &)),

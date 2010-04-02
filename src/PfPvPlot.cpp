@@ -24,6 +24,7 @@
 #include "IntervalItem.h"
 #include "Settings.h"
 #include "Zones.h"
+#include "Colors.h"
 
 #include <math.h>
 #include <assert.h>
@@ -154,15 +155,6 @@ PfPvPlot::PfPvPlot(MainWindow *mainWindow)
     cpCurve->attach(this);
 
     curve = new QwtPlotCurve();
-    QwtSymbol sym;
-    sym.setStyle(QwtSymbol::Ellipse);
-    sym.setSize(6);
-    sym.setPen(QPen(Qt::black));
-    sym.setBrush(QBrush(Qt::NoBrush));
-    
-    curve->setSymbol(sym);
-    curve->setStyle(QwtPlotCurve::Dots);
-    curve->setRenderHint(QwtPlotItem::RenderAntialiased);
     curve->attach(this);
     
     boost::shared_ptr<QSettings> settings = GetApplicationSettings();
@@ -172,7 +164,32 @@ PfPvPlot::PfPvPlot(MainWindow *mainWindow)
     merge_intervals = false;
     frame_intervals = true;
 
+    configChanged();
+
     recalc();
+}
+
+void
+PfPvPlot::configChanged()
+{
+    setCanvasBackground(GColor(CPLOTBACKGROUND));
+
+    // frame with inverse of background
+    QwtSymbol sym;
+    sym.setStyle(QwtSymbol::Ellipse);
+    sym.setSize(6);
+    sym.setPen(GCColor::invert(GColor(CPLOTBACKGROUND)));
+    sym.setBrush(QBrush(Qt::NoBrush));
+    curve->setSymbol(sym);
+    curve->setStyle(QwtPlotCurve::Dots);
+    curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+
+    // use grid line color for mX, mY and CPcurve
+    QPen marker = GColor(CPLOTMARKER);
+    QPen cp = GColor(CCP);
+    mX->setLinePen(marker);
+    mY->setLinePen(marker);
+    cpCurve->setPen(cp);
 }
 
 void

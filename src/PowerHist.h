@@ -78,6 +78,7 @@ class PowerHist : public QwtPlot
 
         void setlnY(bool value);
         void setWithZeros(bool value);
+        void configChanged();
 
     protected:
 

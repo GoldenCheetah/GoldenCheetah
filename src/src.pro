@@ -57,6 +57,8 @@ HEADERS += \
         ANTplusController.h \
         BestIntervalDialog.h \
         ChooseCyclistDialog.h \
+        Colors.h \
+        ColorButton.h \
         CommPort.h \
         Computrainer.h \
         Computrainer3dpFile.h \
@@ -113,6 +115,7 @@ HEADERS += \
         RideFile.h \
         RideImportWizard.h \
         RideItem.h \
+        RideMetadata.h \
         RideMetric.h \
         SaveDialogs.h \
         RideSummaryWindow.h \
@@ -122,6 +125,7 @@ HEADERS += \
         Settings.h \
         SimpleNetworkController.h \
         SimpleNetworkClient.h \
+        SpecialFields.h \
         SplitRideDialog.h \
         SrmRideFile.h \
         StressCalculator.h \
@@ -151,6 +155,8 @@ SOURCES += \
         BikeScore.cpp \
         DanielsPoints.cpp \
         ChooseCyclistDialog.cpp \
+        Colors.cpp \
+        ColorButton.cpp \
         CommPort.cpp \
         Computrainer.cpp \
         Computrainer3dpFile.cpp \
@@ -207,6 +213,7 @@ SOURCES += \
         RideFile.cpp \
         RideImportWizard.cpp \
         RideItem.cpp \
+        RideMetadata.cpp \
         RideMetric.cpp \
         SaveDialogs.cpp \
         RideSummaryWindow.cpp \
@@ -215,6 +222,7 @@ SOURCES += \
         Serial.cpp \
         SimpleNetworkController.cpp \
         SimpleNetworkClient.cpp \
+        SpecialFields.cpp \
         SplitRideDialog.cpp \
         SrmRideFile.cpp \
         StressCalculator.cpp \

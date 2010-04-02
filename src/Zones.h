@@ -109,6 +109,11 @@ class Zones : public QObject
 	// insert a range from the given date to the end date of the range
 	// presently including the date
 	int insertRangeAtDate(QDate date, int cp = 0);
+
+    // calculate a CRC for the zones data - used to see if zones
+    // data is changed since last referenced in Metric code
+    // could also be used in Configuration pages (later)
+    unsigned long getFingerprint() const;
 };
 
 QColor zoneColor(int zone, int num_zones);

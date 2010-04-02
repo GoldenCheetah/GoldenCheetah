@@ -48,6 +48,7 @@ class AerolabWindow : public QWidget {
   void setEtaFromSlider();
   void setEoffsetFromSlider();
   void rideSelected();
+  void configChanged();
 
 
   protected slots:

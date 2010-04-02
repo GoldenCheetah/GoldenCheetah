@@ -63,6 +63,8 @@ class Water;
 // the core surface plot
 class BasicModelPlot : public SurfacePlot
 {
+    Q_OBJECT
+
     public:
         BasicModelPlot(MainWindow *, ModelSettings *);
         void setData(ModelSettings *);
@@ -76,6 +78,7 @@ class BasicModelPlot : public SurfacePlot
         ModelDataProvider *modelDataProvider; // used by enrichment
 
     public slots:
+        void configChanged();
 
     protected:
 

@@ -21,6 +21,7 @@
 #include "MainWindow.h"
 #include "Settings.h"
 #include "Zones.h"
+#include "Colors.h"
 #include "RideFile.h"
 #include "Units.h" // for MILES_PER_KM
 
@@ -824,8 +825,6 @@ BasicModelPlot::BasicModelPlot(MainWindow *parent, ModelSettings *settings) : ma
         coordinates()->axes[i].setMinors(5);
     }
     setMeshLineWidth(1);
-    coordinates()->setGridLinesColor(RGBA(0,0,0.5));
-    coordinates()->setLineWidth(1);
 
     // put some space between the axes tic labels and the plot
     // to make it easier to read
@@ -841,8 +840,32 @@ BasicModelPlot::BasicModelPlot(MainWindow *parent, ModelSettings *settings) : ma
     // set shift zoom etc
     resetViewPoint();
 
+    // set colors
+    configChanged();
+
     updateData();
     updateGL();
+}
+
+void
+BasicModelPlot::configChanged()
+{
+    // setColors bg
+    QColor rgba = GColor(CPLOTBACKGROUND);
+    RGBA bg(rgba.red()/255.0, rgba.green()/255.0, rgba.blue()/255.0, 0);
+    setBackgroundColor(bg);
+
+    // labels
+    QColor irgba = GCColor::invert(GColor(CPLOTBACKGROUND));
+    RGBA fg(irgba.red()/255.0, irgba.green()/255.0, irgba.blue()/255.0, 0);
+    coordinates()->setLabelColor(fg);
+    coordinates()->setNumberColor(fg);
+
+    // set grid lines
+    QColor grid = GColor(CPLOTGRID);
+    RGBA gr(grid.red()/255.0, grid.green()/255.0, grid.blue()/255.0, 0.5);
+    coordinates()->setGridLinesColor(gr);
+    coordinates()->setLineWidth(1);
 }
 
 void
@@ -968,6 +991,8 @@ ModelPlot::ModelPlot(MainWindow *parent, ModelSettings *settings) : QFrame(paren
     layout->addWidget(basicModelPlot);
     layout->setContentsMargins(2,2,2,2);
     setLayout(layout);
+
+    connect(main, SIGNAL(configChanged()), basicModelPlot, SLOT(configChanged()));
 }
 
 void
@@ -1245,8 +1270,11 @@ void Bar::draw(Qwt3D::Triple const& pos)
         rgbab = (*plot->dataColor())(pos.x, pos.y, gminz);
     } else {
         // first bars use max and are see-through
-        rgbat = RGBA(255,255,255,1);
-        rgbab = RGBA(255,255,255);
+        QColor irgba = GCColor::invert(GColor(CPLOTBACKGROUND));
+        RGBA t(irgba.red()/255.0, irgba.green()/255.0, irgba.blue()/255.0, 1);
+        RGBA b(irgba.red()/255.0, irgba.green()/255.0, irgba.blue()/255.0, 0);
+        rgbat = t;
+        rgbab = b;
     }
 
     if (intervals_ == 0) {
@@ -1298,7 +1326,8 @@ void Bar::draw(Qwt3D::Triple const& pos)
     }
 
     if (intervals_ == 0 || intervals_&SHOW_FRAME) {
-        glColor3d(0,0,0);
+        QColor irgba = GCColor::invert(GColor(CPLOTBACKGROUND));
+        glColor3d(irgba.red()/255.0, irgba.green()/255.0,irgba.blue()/255);
         glBegin(GL_LINES);
         glVertex3d(pos.x-diag_,pos.y-diag_,gminz); glVertex3d(pos.x+diag_,pos.y-diag_,gminz);
         glVertex3d(pos.x-diag_,pos.y-diag_,pos.z); glVertex3d(pos.x+diag_,pos.y-diag_,pos.z);

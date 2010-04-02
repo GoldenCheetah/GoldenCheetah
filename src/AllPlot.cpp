@@ -25,6 +25,7 @@
 #include "Settings.h"
 #include "Units.h"
 #include "Zones.h"
+#include "Colors.h"
 
 #include <assert.h>
 #include <qwt_plot_curve.h>
@@ -215,68 +216,78 @@ AllPlot::AllPlot(QWidget *parent, MainWindow *mainWindow):
     if (smooth < 2)
         smooth = 30;
 
+
     // create a background object for shading
     bg = new AllPlotBackground(this);
     bg->attach(this);
 
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
-    setCanvasBackground(Qt::white);
+    setCanvasBackground(GColor(CPLOTBACKGROUND));
 
     setXTitle();
 
     wattsCurve = new QwtPlotCurve(tr("Power"));
-    QPen wattsPen = QPen(Qt::red);
-    wattsPen.setWidth(2);
-    wattsCurve->setPen(wattsPen);
 
     hrCurve = new QwtPlotCurve(tr("Heart Rate"));
-    QPen hrPen = QPen(Qt::blue);
-    hrPen.setWidth(2);
-    hrCurve->setPen(hrPen);
     hrCurve->setYAxis(yLeft2);
 
     speedCurve = new QwtPlotCurve(tr("Speed"));
-    QPen speedPen = QPen(QColor(0, 204, 0));
-    speedPen.setWidth(2);
-    speedCurve->setPen(speedPen);
     speedCurve->setYAxis(yRight);
 
     cadCurve = new QwtPlotCurve(tr("Cadence"));
-    QPen cadPen = QPen(QColor(0, 204, 204));
-    cadPen.setWidth(2);
-    cadCurve->setPen(cadPen);
     cadCurve->setYAxis(yLeft2);
 
     altCurve = new QwtPlotCurve(tr("Altitude"));
     // altCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen altPen(QColor(124, 91, 31));
-    altPen.setWidth(1);
-    altCurve->setPen(altPen);
-    QColor brush_color = QColor(124, 91, 31);
-    brush_color.setAlpha(64);
-    altCurve->setBrush(brush_color);   // fill below the line
     altCurve->setYAxis(yRight2);
 
     intervalHighlighterCurve = new QwtPlotCurve();
-    QPen ihlPen = QPen(Qt::blue);
-    ihlPen.setWidth(2);
-    intervalHighlighterCurve->setPen(ihlPen);
     intervalHighlighterCurve->setYAxis(yLeft);
-    QColor ihlbrush = QColor(Qt::blue);
-    ihlbrush.setAlpha(64);
-    intervalHighlighterCurve->setBrush(ihlbrush);   // fill below the line
     intervalHighlighterCurve->setData(IntervalPlotData(this, mainWindow));
     intervalHighlighterCurve->attach(this);
     this->legend()->remove(intervalHighlighterCurve); // don't show in legend
 
     grid = new QwtPlotGrid();
     grid->enableX(false);
-    QPen gridPen;
-    gridPen.setStyle(Qt::DotLine);
-    grid->setPen(gridPen);
     grid->attach(this);
 
+    configChanged(); // set colors
+
     zoneLabels = QList <AllPlotZoneLabel *>::QList();
+}
+
+void
+AllPlot::configChanged()
+{
+    setCanvasBackground(GColor(CPLOTBACKGROUND));
+    QPen wattsPen = QPen(GColor(CPOWER));
+    wattsPen.setWidth(2);
+    wattsCurve->setPen(wattsPen);
+    QPen hrPen = QPen(GColor(CHEARTRATE));
+    hrPen.setWidth(2);
+    hrCurve->setPen(hrPen);
+    QPen speedPen = QPen(GColor(CSPEED));
+    speedPen.setWidth(2);
+    speedCurve->setPen(speedPen);
+    QPen cadPen = QPen(GColor(CCADENCE));
+    cadPen.setWidth(2);
+    cadCurve->setPen(cadPen);
+    QPen altPen(GColor(CALTITUDE));
+    altPen.setWidth(1);
+    altCurve->setPen(altPen);
+    QColor brush_color = GColor(CALTITUDEBRUSH);
+    brush_color.setAlpha(64);
+    altCurve->setBrush(brush_color);   // fill below the line
+    QPen ihlPen = QPen(GColor(CINTERVALHIGHLIGHTER));
+    ihlPen.setWidth(2);
+    intervalHighlighterCurve->setPen(ihlPen);
+    QColor ihlbrush = QColor(GColor(CINTERVALHIGHLIGHTER));
+    ihlbrush.setAlpha(64);
+    intervalHighlighterCurve->setBrush(ihlbrush);   // fill below the line
+    this->legend()->remove(intervalHighlighterCurve); // don't show in legend
+    QPen gridPen(GColor(CPLOTGRID));
+    gridPen.setStyle(Qt::DotLine);
+    grid->setPen(gridPen);
 }
 
 struct DataPoint {
@@ -461,10 +472,10 @@ AllPlot::refreshIntervalMarkers()
             mrk->attach(this);
             mrk->setLineStyle(QwtPlotMarker::VLine);
             mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
-            mrk->setLinePen(QPen(Qt::black, 0, Qt::DashDotLine));
+            mrk->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
             QwtText text(interval.name);
             text.setFont(QFont("Helvetica", 10, QFont::Bold));
-            text.setColor(Qt::black);
+            text.setColor(GColor(CPLOTMARKER));
             if (!bydist)
                 mrk->setValue(interval.start / 60.0, 0.0);
             else
