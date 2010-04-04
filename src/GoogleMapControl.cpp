@@ -156,12 +156,13 @@ GoogleMapControl::GoogleMapControl(MainWindow *mw)
 void
 GoogleMapControl::rideSelected()
 {
-  if (parent->activeTab() != this)
-      return;
-  RideItem * ride = parent->rideItem();
+  if (parent->activeTab() != this) return;
 
-  if (!ride)
+  RideItem * ride = parent->rideItem();
+  if (ride == current || !ride || !ride->ride())
       return;
+  else
+      current = ride;
 
   int zone =ride->zoneRange();
   if(zone < 0)
@@ -176,8 +177,6 @@ GoogleMapControl::rideSelected()
   rideData.clear();
   double prevLon = 0;
   double prevLat = 0;
-
-  if (ride == NULL || ride->ride() == NULL) return;
 
   foreach(RideFilePoint *rfp,ride->ride()->dataPoints())
   {
@@ -204,8 +203,15 @@ GoogleMapControl::rideSelected()
 
 void GoogleMapControl::resizeEvent(QResizeEvent * )
 {
-    newRideToLoad = true;
-    loadRide();
+    static bool first = true;
+    if (parent->activeTab() != this) return;
+
+    if (first == true) {
+        first = false;
+    } else {
+        newRideToLoad = true;
+        loadRide();
+    }
 }
 
 void GoogleMapControl::loadStarted()

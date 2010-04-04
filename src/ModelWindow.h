@@ -115,6 +115,8 @@ class ModelWindow : public QWidget
         // z pane slider
         QSlider *zpane;
 
+        RideItem *current;
+
     private:
 
         void addStandardChannels(QComboBox *);

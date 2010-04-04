@@ -92,6 +92,7 @@ ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) :
     styleSelector->addItem(tr("Bar"));
     styleSelector->addItem(tr("Grid"));
     styleSelector->addItem(tr("Surface"));
+    styleSelector->addItem(tr("Dots"));
     styleSelector->setCurrentIndex(0);
 
     ignore = new QCheckBox(tr("Ignore Zero"));
@@ -188,6 +189,10 @@ ModelWindow::rideSelected()
     if (main->activeTab() != this)
         return;
     ride = main->rideItem();
+
+    if (!ride || !ride->ride() || ride == current)
+
+    current = ride;
     setData(true);
 }
 
