@@ -64,6 +64,7 @@ Q_OBJECT
     int rideCP;
     // current HTML for the ride
     std::ostringstream currentPage;
+    RideItem *current;
 
  public slots:
     void rideSelected();

@@ -99,6 +99,8 @@ class AllPlotWindow : public QWidget
         QSlider *smoothSlider;
         QLineEdit *smoothLineEdit;
 
+    RideItem *current;
+
     private:
         void showInfo(QString);
         void resetStackedDatas();
