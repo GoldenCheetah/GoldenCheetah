@@ -24,13 +24,21 @@ LIBS += -lm
     SOURCES += SrmDevice.cpp
 }
 
-!isEmpty( QWT3D_INSTALL) {
-    INCLUDEPATH += $${QWT3D_INSTALL}/include
-    LIBS += $${QWT3D_INSTALL}/lib/libqwtplot3d.a
-    QT += opengl
-    HEADERS += ModelPlot.h ModelWindow.h
-    SOURCES += ModelPlot.cpp ModelWindow.cpp
-    DEFINES += GC_HAVE_QWTPLOT3D
+!isEmpty( QWT3D_INSTALL ) {
+  INCLUDEPATH += $${QWT3D_INSTALL}/include
+  LIBS += $${QWT3D_INSTALL}/lib/libqwtplot3d.a
+  CONFIG += qwt3d
+}
+isEmpty( QWT3D_INSTALL ):linux-g++:exists( /usr/include/qwtplot3d-qt4 ):exists( /usr/lib/libqwtplot3d-qt4.so ) {
+  INCLUDEPATH += /usr/include/qwtplot3d-qt4
+  LIBS += /usr/lib/libqwtplot3d-qt4.so
+  CONFIG += qwt3d
+}
+qwt3d {
+  QT += opengl
+  HEADERS += ModelPlot.h ModelWindow.h
+  SOURCES += ModelPlot.cpp ModelWindow.cpp
+  DEFINES += GC_HAVE_QWTPLOT3D
 }
 
 macx {
