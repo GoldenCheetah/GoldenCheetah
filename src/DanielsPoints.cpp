@@ -112,10 +112,11 @@ class DanielsEquivalentPower : public RideMetric {
     }
 
     void compute(const RideFile *, const Zones *zones, int zoneRange,
-	    const QHash<QString,RideMetric*> &deps) {
-	    if (!zones || zoneRange < 0) {
+                 const QHash<QString,RideMetric*> &deps)
+    {
+        if (!zones || zoneRange < 0) {
             setValue(0);
-	        return;
+            return;
         }
 
         double cp = zones->getCP(zoneRange);
