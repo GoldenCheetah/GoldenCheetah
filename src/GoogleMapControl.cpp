@@ -139,7 +139,7 @@ using namespace gm;
 
 #define GOOGLE_KEY "ABQIAAAAS9Z2oFR8vUfLGYSzz40VwRQ69UCJw2HkJgivzGoninIyL8-QPBTtnR-6pM84ljHLEk3PDql0e2nJmg"
 
-GoogleMapControl::GoogleMapControl(MainWindow *mw)
+GoogleMapControl::GoogleMapControl(MainWindow *mw) : current(NULL)
 {
     parent = mw;
     view = new QWebView();
@@ -156,12 +156,13 @@ GoogleMapControl::GoogleMapControl(MainWindow *mw)
 void
 GoogleMapControl::rideSelected()
 {
-  if (parent->activeTab() != this)
-      return;
-  RideItem * ride = parent->rideItem();
+  if (parent->activeTab() != this) return;
 
-  if (!ride)
+  RideItem * ride = parent->rideItem();
+  if (ride == current || !ride || !ride->ride())
       return;
+  else
+      current = ride;
 
   int zone =ride->zoneRange();
   if(zone < 0)
@@ -176,8 +177,6 @@ GoogleMapControl::rideSelected()
   rideData.clear();
   double prevLon = 0;
   double prevLat = 0;
-
-  if (ride == NULL || ride->ride() == NULL) return;
 
   foreach(RideFilePoint *rfp,ride->ride()->dataPoints())
   {
@@ -204,8 +203,15 @@ GoogleMapControl::rideSelected()
 
 void GoogleMapControl::resizeEvent(QResizeEvent * )
 {
-    newRideToLoad = true;
-    loadRide();
+    static bool first = true;
+    if (parent->activeTab() != this) return;
+
+    if (first == true) {
+        first = false;
+    } else {
+        newRideToLoad = true;
+        loadRide();
+    }
 }
 
 void GoogleMapControl::loadStarted()
@@ -284,6 +290,7 @@ void GoogleMapControl::createHtml()
         << "<title>GoldenCheetah</title>" << endl
         << "<script src=\"http://maps.google.com/maps?file=api&amp;v=2&amp;key=" << GOOGLE_KEY <<"\"" << endl
         << "type=\"text/javascript\"></script>" << endl
+        << CreateMapToolTipJavaScript() << endl
         << "<script type=\"text/javascript\">"<< endl
         << "var map;" << endl
         << "function initialize() {" << endl
@@ -308,14 +315,14 @@ void GoogleMapControl::createHtml()
         << "</script>" << endl
         << "</head>" << endl
         << "<body onload=\"initialize()\" onunload=\"GUnload()\">" << endl
-        << "<div id=\"map_canvas\" style=\"width: " << width <<"px; height: " 
+        << "<div id=\"map_canvas\" style=\"width: " << width <<"px; height: "
         << height <<"px\"></div>" << endl
         << "<form action=\"#\" onsubmit=\"animate(); return false\">" << endl
         << "</form>" << endl
         << "</body>" << endl
         << "</html>" << endl;
 
-     currentPage << oss.str();
+    currentPage << oss.str();
 }
 
 
@@ -355,11 +362,12 @@ string GoogleMapControl::CreatePolyLine()
                                          intervalPoints.end(),
                                          AvgPower());
             // find the color
-            QColor color = GetColor(rideCP,avgPower);
+
             // create the polyline
-            CreateSubPolyLine(intervalPoints,oss,color);
+            CreateSubPolyLine(intervalPoints,oss,avgPower);
             intervalPoints.clear();
             intervalPoints.push_back(rfp);
+
         }
 
     }
@@ -369,12 +377,13 @@ string GoogleMapControl::CreatePolyLine()
 
 void GoogleMapControl::CreateSubPolyLine(const std::vector<RideFilePoint> &points,
                                          std::ostringstream &oss,
-                                         QColor color)
+                                         int avgPower)
 {
     oss.precision(6);
+    QColor color = GetColor(rideCP,avgPower);
     QString colorstr = color.name();
     oss.setf(ios::fixed,ios::floatfield);
-    oss << "map.addOverlay (new GPolyline([";
+    oss << "var polyline = new GPolyline([";
 
     BOOST_FOREACH(RideFilePoint rfp, points)
     {
@@ -383,8 +392,21 @@ void GoogleMapControl::CreateSubPolyLine(const std::vector<RideFilePoint> &point
             oss << "new GLatLng(" << rfp.lat << "," << rfp.lon << ")," << endl;
         }
     }
+    oss << "],\"" << colorstr.toStdString() << "\",4);" << endl;
 
-    oss << "],\"" << colorstr.toStdString() << "\",5));";
+    oss << "GEvent.addListener(polyline, 'mouseover', function() {" << endl
+        << "var tooltip_text = '30s Power: " << avgPower << "';" << endl
+        << "var ss={'weight':8};" << endl
+        << "this.setStrokeStyle(ss);" << endl
+        << "this.overlay = new MapTooltip(this,tooltip_text);" << endl
+        << "map.addOverlay(this.overlay);" << endl
+        << "});" << endl
+        << "GEvent.addListener(polyline, 'mouseout', function() {" << endl
+        << "map.removeOverlay(this.overlay);" << endl
+        << "var ss={'weight':5};" << endl
+        << "this.setStrokeStyle(ss);" << endl
+        << "});" << endl;
+    oss << "map.addOverlay (polyline);" << endl;
 }
 
 
@@ -458,5 +480,69 @@ string GoogleMapControl::CreateIntervalMarkers()
             intervalPoints.clear();
         }
     }
+    return oss.str();
+}
+
+string GoogleMapControl::CreateMapToolTipJavaScript()
+{
+    ostringstream oss;
+    oss << "<script type=\"text/javascript\">" << endl
+        << "var MapTooltip = function(obj, html, options) {"<< endl
+        << "this.obj = obj;"<< endl
+        << "this.html = html;"<< endl
+        << "this.options = options || {};"<< endl
+        << "}"<< endl
+        << "MapTooltip.prototype = new GOverlay();"<< endl
+        << "MapTooltip.prototype.initialize = function(map) {"<< endl
+        << "var div = document.getElementById('MapTooltipContainer');"<< endl
+        << "var that = this;"<< endl
+        << "if (!div) {"<< endl
+        << "var div = document.createElement('div');"<< endl
+        << "div.setAttribute('id', 'MapTooltipContainer');"<< endl
+        << "}"<< endl
+        << "if (this.options.maxWidth || this.options.minWidth) {"<< endl
+        << "div.style.maxWidth = this.options.maxWidth || '150px';"<< endl
+        << "div.style.minWidth = this.options.minWidth || '150px';"<< endl
+        << "} else {"<< endl
+        << "div.style.width = this.options.width || '150px';"<< endl
+        << "}"<< endl
+        << "div.style.padding = this.options.padding || '5px';"<< endl
+        << "div.style.backgroundColor = this.options.backgroundColor || '#ffffff';"<< endl
+        << "div.style.border = this.options.border || '1px solid #000000';"<< endl
+        << "div.style.fontSize = this.options.fontSize || '80%';"<< endl
+        << "div.style.color = this.options.color || '#000';"<< endl
+        << "div.innerHTML = this.html;"<< endl
+        << "div.style.position = 'absolute';"<< endl
+        << "div.style.zIndex = '1000';"<< endl
+        << "var offsetX = this.options.offsetX || 10;"<< endl
+        << "var offsetY = this.options.offsetY || 0;"<< endl
+        << "var bounds = map.getBounds();"<< endl
+        << "rightEdge = map.fromLatLngToDivPixel(bounds.getNorthEast()).x;"<< endl
+        << "bottomEdge = map.fromLatLngToDivPixel(bounds.getSouthWest()).y;"<< endl
+        << "var mapev = GEvent.addListener(map, 'mousemove', function(latlng) {"<< endl
+        << "GEvent.removeListener(mapev);"<< endl
+        << "var pixelPosX = (map.fromLatLngToDivPixel(latlng)).x + offsetX;"<< endl
+        << "var pixelPosY = (map.fromLatLngToDivPixel(latlng)).y - offsetY;"<< endl
+        << "div.style.left = pixelPosX + 'px';"<< endl
+        << "div.style.top = pixelPosY + 'px';"<< endl
+        << "map.getPane(G_MAP_FLOAT_PANE).appendChild(div);"<< endl
+        << "if ( (pixelPosX + div.offsetWidth) > rightEdge ) {"<< endl
+        << "div.style.left = (rightEdge - div.offsetWidth - 10) + 'px';"<< endl
+        << "}"<< endl
+        << "if ( (pixelPosY + div.offsetHeight) > bottomEdge ) {"<< endl
+        << "div.style.top = (bottomEdge - div.offsetHeight - 10) + 'px';"<< endl
+        << "}"<< endl
+        << "});"<< endl
+        << "this._map = map;"<< endl
+        << "this._div = div;"<< endl
+        << "}"<< endl
+        << "MapTooltip.prototype.remove = function() {"<< endl
+        << "if(this._div != null) {"<< endl
+        << "this._div.parentNode.removeChild(this._div);"<< endl
+        << "}"<< endl
+        << "}"<< endl
+        << "MapTooltip.prototype.redraw = function(force) {"<< endl
+        << "}"<< endl
+        << "</script> "<< endl;
     return oss.str();
 }

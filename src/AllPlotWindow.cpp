@@ -36,7 +36,7 @@
 #include <qwt_arrow_button.h>
 
 AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
-    QWidget(mainWindow), mainWindow(mainWindow)
+    QWidget(mainWindow), mainWindow(mainWindow), current(NULL)
 {
     QVBoxLayout *vlayout = new QVBoxLayout;
 
@@ -239,15 +239,22 @@ AllPlotWindow::rideSelected()
     if (mainWindow->activeTab() != this)
         return;
     RideItem *ride = mainWindow->rideItem();
-    if (!ride)
+    if (!ride || ride == current)
         return;
+    current = ride;
+
+    int showit = showStack->isChecked();
+    if (showit) allPlot->hide();
+    else allPlot->show();
+
+    // set it up anyway since the stack plots
+    // reuse the arrays
     clearSelection(); // clear any ride interval selection data
     setAllPlotWidgets(ride);
     allPlot->setDataI(ride);
     allZoomer->setZoomBase();
 
     // update stacked view if that is set
-    int showit = showStack->isChecked();
     setShowStack(0); // zap whats there
     setShowStack(showit);
 }
