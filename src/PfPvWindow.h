@@ -60,6 +60,7 @@ class PfPvWindow : public QWidget
         QLineEdit *qaCPValue;
         QLineEdit *qaCadValue;
         QLineEdit *qaClValue;
+        RideItem *current;
 };
 
 #endif // _GC_PfPvWindow_h

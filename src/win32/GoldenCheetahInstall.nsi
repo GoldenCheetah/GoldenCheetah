@@ -62,10 +62,19 @@ Section "Golden Cheetah (required)"
   File "..\release\QtGui4.dll"
   File "..\release\QtSql4.dll"
   File "..\release\QtXml4.dll"
+  File "..\release\QtWebKit4.dll"
+  File "..\release\QtXmlPatterns4.dll"
+  File "..\release\phonon4.dll"
   File "..\release\QtNetwork4.dll"
   File "..\release\QtOpenGL4.dll"
   File "..\release\libgcc_s_dw2-1.dll"
   File "..\release\qwtplot3d.dll"
+
+  SetOutPath $INSTDIR\sqldrivers
+  File "..\release\qsqlite4.dll"
+
+  SetOutPath $INSTDIR\imageformats
+  File "..\release\qjpeg4.dll"
 
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\GoldenCheetah "Install_Dir" "$INSTDIR"
@@ -109,11 +118,16 @@ Section "Uninstall"
   Delete $INSTDIR\QtGui4.dll
   Delete $INSTDIR\QtSql4.dll
   Delete $INSTDIR\QtXml4.dll
+  Delete $INSTDIR\QtWebKit4.dll
+  Delete $INSTDIR\QtXmlPatterns4.dll
+  Delete $INSTDIR\phonon4.dll
   Delete $INSTDIR\QtNetwork4.dll
   Delete $INSTDIR\QtOpenGL4.dll
   Delete $INSTDIR\libgcc_s_dw2-1.dll
   Delete $INSTDIR\qwtplot3d.dll
   Delete $INSTDIR\uninstall.exe
+  Delete $INSTDIR\sqldrivers\qsqlite4.dll
+  Delete $INSTDIR\imageformats\qjpeg4.dll
 
   ; Remove shortcuts, if any
   Delete "$SMPROGRAMS\GoldenCheetah\*.*"

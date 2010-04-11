@@ -23,7 +23,7 @@
 #include <QtGui>
 
 PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
-    QWidget(mainWindow), mainWindow(mainWindow)
+    QWidget(mainWindow), mainWindow(mainWindow), current(NULL)
 {
     QVBoxLayout *vlayout = new QVBoxLayout;
     QHBoxLayout *qaLayout = new QHBoxLayout;
@@ -91,11 +91,16 @@ PfPvWindow::rideSelected()
 {
     if (mainWindow->activeTab() != this)
         return;
+
+
     RideItem *ride = mainWindow->rideItem();
-    if (!ride || !ride->ride())
+    if (ride == current || !ride || !ride->ride())
         return;
 
     pfPvPlot->setData(ride);
+
+    current = ride;
+
     // update the QLabel widget with the CP value set in PfPvPlot::setData()
     qaCPValue->setText(QString("%1").arg(pfPvPlot->getCP()));
 }
