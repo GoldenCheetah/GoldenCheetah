@@ -23,7 +23,7 @@
 #include <QtGui>
 
 PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
-    QWidget(mainWindow), mainWindow(mainWindow)
+    QWidget(mainWindow), mainWindow(mainWindow), current(NULL)
 {
     QVBoxLayout *vlayout = new QVBoxLayout;
     QHBoxLayout *qaLayout = new QHBoxLayout;

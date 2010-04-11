@@ -46,7 +46,7 @@ ModelWindow::addStandardChannels(QComboBox *box)
 }
 
 ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) :
-    QWidget(parent), home(home), main(parent), ride(NULL)
+    QWidget(parent), home(home), main(parent), ride(NULL), current(NULL)
 {
     // Layouts
     QVBoxLayout *mainLayout = new QVBoxLayout;
