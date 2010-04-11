@@ -99,7 +99,7 @@ class AllPlotWindow : public QWidget
         QSlider *smoothSlider;
         QLineEdit *smoothLineEdit;
 
-    RideItem *current;
+        RideItem *current;
 
     private:
         void showInfo(QString);

@@ -36,7 +36,7 @@
 #include <qwt_arrow_button.h>
 
 AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
-    QWidget(mainWindow), mainWindow(mainWindow)
+    QWidget(mainWindow), mainWindow(mainWindow), current(NULL)
 {
     QVBoxLayout *vlayout = new QVBoxLayout;
 
