@@ -83,6 +83,7 @@ ANTplusController::getRealtimeData(RealtimeData &rtData)
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
         parent->Stop();
+        return;
     }
     // get latest telemetry
     rtData = myANTplus->getRealtimeData();
