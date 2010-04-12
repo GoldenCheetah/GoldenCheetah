@@ -82,6 +82,7 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
         parent->Stop();
+        return;
     }
     // get latest telemetry
     myComputrainer->getTelemetry(Power, HeartRate, Cadence, Speed,
