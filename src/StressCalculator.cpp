@@ -75,6 +75,8 @@ void StressCalculator::calculateStress(MainWindow *main, QString home, const QSt
     results = metricDB->getAllMetricsFor(QDateTime(QDate(1900,1,1)), QDateTime(QDate(3000,1,1)));
     delete metricDB;
 
+    if (results.count() == 0) return; // no ride files found
+
     // set start and enddate to maximum maximum required date range
     // remember the date range required so we can truncate afterwards
     QDateTime startDateNeeded = startDate;
