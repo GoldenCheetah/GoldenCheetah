@@ -100,10 +100,10 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
     // controls
     QHBoxLayout *controls = new QHBoxLayout;
 
-    saveButton = new QPushButton("Add");
-    manageButton = new QPushButton("Manage");
+    saveButton = new QPushButton(tr("Add"));
+    manageButton = new QPushButton(tr("Manage"));
 
-    QLabel *presetLabel = new QLabel("Chart");
+    QLabel *presetLabel = new QLabel(tr("Chart"));
     presetPicker = new QComboBox;
     presetPicker->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
@@ -114,13 +114,13 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
         presetPicker->addItem(presets[i].name, i);
 
     groupBy = new QComboBox;
-    groupBy->addItem("Days", LTM_DAY);
-    groupBy->addItem("Weeks", LTM_WEEK);
-    groupBy->addItem("Months", LTM_MONTH);
-    groupBy->addItem("Years", LTM_YEAR);
+    groupBy->addItem(tr("Days"), LTM_DAY);
+    groupBy->addItem(tr("Weeks"), LTM_WEEK);
+    groupBy->addItem(tr("Months"), LTM_MONTH);
+    groupBy->addItem(tr("Years"), LTM_YEAR);
     groupBy->setCurrentIndex(0);
 
-    shadeZones = new QCheckBox("Shade Zones");
+    shadeZones = new QCheckBox(tr("Shade Zones"));
     shadeZones->setChecked(true);
 
     controls->addWidget(saveButton);

@@ -1211,9 +1211,9 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     actionButtons->addStretch();
 
     fields = new QTreeWidget;
-    fields->headerItem()->setText(0, "Screen Tab");
-    fields->headerItem()->setText(1, "Field");
-    fields->headerItem()->setText(2, "Type");
+    fields->headerItem()->setText(0, tr("Screen Tab"));
+    fields->headerItem()->setText(1, tr("Field"));
+    fields->headerItem()->setText(2, tr("Type"));
     fields->setColumnCount(3);
     fields->setSelectionMode(QAbstractItemView::SingleSelection);
     fields->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
