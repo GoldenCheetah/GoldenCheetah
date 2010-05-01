@@ -90,7 +90,7 @@ void MetricAggregator::refreshMetrics()
 
     // update statistics for ride files which are out of date
     // showing a progress bar as we go
-    QProgressDialog bar("Refreshing Metrics Database...", "Abort", 0, filenames.count(), main);
+    QProgressDialog bar(tr("Refreshing Metrics Database..."), tr("Abort"), 0, filenames.count(), main);
     bar.setWindowModality(Qt::WindowModal);
     int processed=0;
     while (i.hasNext()) {

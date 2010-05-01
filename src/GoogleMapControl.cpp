@@ -139,7 +139,7 @@ using namespace gm;
 
 #define GOOGLE_KEY "ABQIAAAAS9Z2oFR8vUfLGYSzz40VwRQ69UCJw2HkJgivzGoninIyL8-QPBTtnR-6pM84ljHLEk3PDql0e2nJmg"
 
-GoogleMapControl::GoogleMapControl(MainWindow *mw) : current(NULL)
+GoogleMapControl::GoogleMapControl(MainWindow *mw) : main(mw), range(-1), current(NULL)
 {
     parent = mw;
     view = new QWebView();
@@ -164,14 +164,14 @@ GoogleMapControl::rideSelected()
   else
       current = ride;
 
-  int zone =ride->zoneRange();
-  if(zone < 0)
+  range =ride->zoneRange();
+  if(range < 0)
   {
       rideCP = 300;  // default cp to 300 watts
   }
   else
   {
-      rideCP = ride->zones->getCP(zone);
+      rideCP = ride->zones->getCP(range);
   }
 
   rideData.clear();
@@ -326,21 +326,10 @@ void GoogleMapControl::createHtml()
 }
 
 
-QColor GoogleMapControl::GetColor(int cp, int watts)
+QColor GoogleMapControl::GetColor(int watts)
 {
-    double effort = watts/ (double) cp /1.25;
-
-    if(effort < 0.25)
-    {
-        effort = 0;
-    }
-    if(effort > 1.0)
-    {
-        effort = 1;
-    }
-    QColor color;
-    color.setHsv(int(360 - (360 * effort)), 255, 255);
-    return color;
+    if (range < 0) return Qt::red;
+    else return zoneColor(main->zones()->whichZone(range, watts), 7);
 }
 
 
@@ -380,7 +369,7 @@ void GoogleMapControl::CreateSubPolyLine(const std::vector<RideFilePoint> &point
                                          int avgPower)
 {
     oss.precision(6);
-    QColor color = GetColor(rideCP,avgPower);
+    QColor color = GetColor(avgPower);
     QString colorstr = color.name();
     oss.setf(ios::fixed,ios::floatfield);
     oss << "var polyline = new GPolyline([";

@@ -770,15 +770,15 @@ RealtimeWindow::SelectWorkout()
         status &= ~RT_MODE_SPIN;
         if (deviceController != NULL) deviceController->setMode(RT_MODE_ERGO);
         // set the labels on the gui
-        loadLabel->setText("Load WATTS");
-        avgloadLabel->setText("Avg Load WATTS");
+        loadLabel->setText(tr("Load WATTS"));
+        avgloadLabel->setText(tr("Avg Load WATTS"));
     } else { // SLOPE MODE
         status |= RT_MODE_SPIN;
         status &= ~RT_MODE_ERGO;
         if (deviceController != NULL) deviceController->setMode(RT_MODE_SPIN);
         // set the labels on the gui
-        loadLabel->setText("Gradient PERCENT");
-        avgloadLabel->setText("Avg Gradient PERCENT");
+        loadLabel->setText(tr("Gradient PERCENT"));
+        avgloadLabel->setText(tr("Avg Gradient PERCENT"));
     }
 }
 

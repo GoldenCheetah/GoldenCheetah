@@ -26,3 +26,13 @@
     (all zeros in this file), power, cadence, speed (all zeros), heart
     rate, altitude, temperature, and interval number.  Note the interval
     numbering convention.
+
+20090506T164017.05256.srd
+    A polar srd file which includes altitude, speed and heartrate. It
+    does not contain interval or power data, although there is a single
+    interval at the end of the workout which is 0 seconds long.
+
+20090512T163932.03592.srd
+    A polar srd file which includes altitude, speed and heartrate. It
+    does not contain interval or power data, although there is a single
+    interval at the end of the workout which is 0 seconds long.

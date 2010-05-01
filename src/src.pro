@@ -135,6 +135,7 @@ HEADERS += \
         SimpleNetworkClient.h \
         SpecialFields.h \
         SplitRideDialog.h \
+        SrdRideFile.h \
         SrmRideFile.h \
         StressCalculator.h \
         SummaryMetrics.h \
@@ -232,6 +233,7 @@ SOURCES += \
         SimpleNetworkClient.cpp \
         SpecialFields.cpp \
         SplitRideDialog.cpp \
+        SrdRideFile.cpp \
         SrmRideFile.cpp \
         StressCalculator.cpp \
         TcxParser.cpp \
