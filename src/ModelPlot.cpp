@@ -230,8 +230,22 @@ ModelDataProvider::pointType(const RideFilePoint *point, int type)
                 return point->km * MILES_PER_KM;
             }
         case MODEL_INTERVAL : return point->interval;
-        case MODEL_LAT : return point->lat;
-        case MODEL_LONG : return point->lon;
+        case MODEL_LAT :
+            {
+                if (ceil(point->lat) > 90 || floor(ceil(point->lat)) < -90)
+                    return 0;
+                else
+                    return point->lat *1000;
+            }
+            break;
+        case MODEL_LONG :
+            {
+                if (ceil(point->lon) > 180 || floor(point->lon) < -180)
+                    return 0;
+                else
+                    return point->lon *1000;
+            }
+            break;
         case MODEL_AEPF :
             if (point->watts == 0 || point->cad == 0) return 0;
             else return ((point->watts * 60.0) / (point->cad * cranklength * 2.0 * PI));
@@ -276,8 +290,8 @@ ModelDataProvider::describeType(int type, bool longer)
                     return ("Elapsed Distance (mi)");
                 }
             case MODEL_INTERVAL : return ("Interval Number"); // XXX implemented differently
-            case MODEL_LAT : return ("Latitude (degree offset)");
-            case MODEL_LONG : return ("Longitude (degree offset)");
+            case MODEL_LAT : return ("Latitude (degree x 1000)");
+            case MODEL_LONG : return ("Longitude (degree x 1000)");
             case MODEL_CPV : return ("Circumferential Pedal Velocity (cm/s)");
             case MODEL_AEPF : return ("Average Effective Pedal Force (N)");
 
@@ -349,9 +363,9 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
 
     //plot.makeCurrent();
 
-    double maxbinx =0, maxbiny =0;
+    double maxbinx =-65535, maxbiny =-65535;
     double minbinx =65535, minbiny =65535;
-    double mincol =65535, maxcol =0;
+    double mincol =65535, maxcol =-65535;
 
     //
     // Create Plot dataset, filter on values and calculate averages etc
@@ -367,6 +381,10 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
 
         // ignore zero points
         if (settings->ignore && (dx==0 || dy==0)) continue;
+
+        // even further ignore 0 for lat/lon
+        if ((settings->y == MODEL_LAT || settings->y == MODEL_LONG) && dy == 0) continue;
+        if ((settings->x == MODEL_LAT || settings->x == MODEL_LONG) && dx == 0) continue;
 
         // get z value
         double zed=0;

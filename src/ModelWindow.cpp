@@ -40,9 +40,8 @@ ModelWindow::addStandardChannels(QComboBox *box)
     box->addItem(tr("CPV"), MODEL_CPV);
     box->addItem(tr("Time"), MODEL_TIME);
     box->addItem(tr("Distance"), MODEL_DISTANCE);
-    //box->addItem(tr("Interval"), MODEL_INTERVAL); //XXX supported differently for now
-    //box->addItem(tr("Latitude"), MODEL_LAT); //XXX weird values make the plot ugly
-    //box->addItem(tr("Longitude"), MODEL_LONG); //XXX weird values make the plot ugly
+    box->addItem(tr("Latitude"), MODEL_LAT);
+    box->addItem(tr("Longitude"), MODEL_LONG);
 }
 
 ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) :
@@ -80,13 +79,13 @@ ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) :
     zSelector = new QComboBox;
     addStandardChannels(zSelector);
     zSelector->addItem(tr("Time at X&Y"), MODEL_XYTIME);
-    zSelector->setCurrentIndex(10); // time at xy
+    zSelector->setCurrentIndex(12); // time at xy
 
     colorSelector = new QComboBox;
     addStandardChannels(colorSelector);
     colorSelector->addItem(tr("Power Zone"), MODEL_POWERZONE);
     colorSelector->addItem(tr("Time at X&Y"), MODEL_XYTIME);
-    colorSelector->setCurrentIndex(10); // power zone
+    colorSelector->setCurrentIndex(12); // power zone
 
     styleSelector = new QComboBox;
     styleSelector->addItem(tr("Bar"));
@@ -310,9 +309,10 @@ static struct preset {
 } presets[] = {
 
     { "User Defined", 0, 0, 0, 0, true, 20 },
-    { "Natural Cadence Selection", 0, 1, 10, 10, false, 5 }, // don't ignore zero for cadences!
-    { "Power Fatigue", 9, 0, 10, 10, true, 5 },
-    { "Impact of Altitude", 4, 2, 0, 10, true, 10 },
+    { "Natural Cadence Selection", 0, 1, 12, 12, false, 5 }, // don't ignore zero for cadences!
+    { "Route Visualisation", 11, 10, 4, 4, false, 5 }, // don't ignore zero for cadences!
+    { "Power Fatigue", 9, 0, 12, 12, true, 5 },
+    { "Impact of Altitude", 4, 2, 0, 12, true, 10 },
     { "", 0, 0, 0, 0, false, 0 }
 };
 

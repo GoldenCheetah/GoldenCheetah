@@ -824,9 +824,9 @@ MainWindow::rideTreeWidgetSelectionChanged()
     int plotIndex = tabWidget->indexOf(allPlotWindow);
     int modelIndex = tabWidget->indexOf(modelWindow);
     int mapIndex   = tabWidget->indexOf(googleMap);
-    bool enabled = (!ride->ride() || ride->ride()->deviceType() != QString("Manual CSV"))
-                    &&
-                   (!ride->ride() ||!ride->ride()->dataPoints().isEmpty());
+
+    bool enabled = (ride->ride() && ride->ride()->deviceType() != QString("Manual CSV") &&
+                     !ride->ride()->dataPoints().isEmpty());
 
     if (histIndex >= 0) tabWidget->setTabEnabled(histIndex, enabled);
     if (pfpvIndex >= 0) tabWidget->setTabEnabled(pfpvIndex, enabled);
