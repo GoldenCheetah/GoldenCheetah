@@ -274,6 +274,10 @@ HEADERS += \
         SimpleNetworkClient.h \
         SpecialFields.h \
         SplitRideDialog.h \
+        SlfParser.h \
+        SlfRideFile.h \
+        SmfParser.h \
+        SmfRideFile.h \
         SrdRideFile.h \
         SrmRideFile.h \
         StressCalculator.h \
@@ -433,6 +437,10 @@ SOURCES += \
         SmallPlot.cpp \
         SpecialFields.cpp \
         SplitRideDialog.cpp \
+        SlfParser.cpp \
+        SlfRideFile.cpp \
+        SmfParser.cpp \
+        SmfRideFile.cpp \
         SrdRideFile.cpp \
         SrmRideFile.cpp \
         StressCalculator.cpp \
