@@ -73,7 +73,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
     {
         distance = buffer.toDouble() / 1000;
     }
-    else if (qName == "Watts")
+    else if (qName == "Watts" || qName == "ns3:Watts")
     {
         power = buffer.toDouble();
     }
