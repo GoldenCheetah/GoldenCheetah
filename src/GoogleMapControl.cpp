@@ -175,23 +175,26 @@ GoogleMapControl::rideSelected()
   }
 
   rideData.clear();
-  double prevLon = 0;
-  double prevLat = 0;
+  double prevLon = 1000;
+  double prevLat = 1000;
 
   foreach(RideFilePoint *rfp,ride->ride()->dataPoints())
   {
       RideFilePoint curRfp = *rfp;
 
-      if(ceil(rfp->lon) == 180 ||
-         ceil(rfp->lat) == 180)
-      {
-          curRfp.lon = prevLon;
-          curRfp.lat = prevLat;
-      }
       // wko imports can have -320 type of values for roughly 40 degrees
-      if((curRfp.lat) < -180)
+      // This if range is a guess that we only have these -ve type numbers for actual 0 to 90 deg of Latitude
+      if(curRfp.lat <= -270 && curRfp.lat >= -360)
       {
           curRfp.lat = 360 + curRfp.lat;
+      }
+      // Longitude = -180 to 180 degrees, Latitude = -90 to 90 degrees - anything else is invalid.
+      if((curRfp.lon < -180 || curRfp.lon > 180 || curRfp.lat < -90 || curRfp.lat > 90)
+      // Garmin FIT records a missed GPS signal as 0/0.
+      || ((curRfp.lon == 0) && (curRfp.lat == 0)))
+      {
+          curRfp.lon = 999;
+          curRfp.lat = 999;
       }
       prevLon = curRfp.lon;
       prevLat = curRfp.lat;
@@ -263,12 +266,15 @@ void GoogleMapControl::createHtml()
 
     BOOST_FOREACH(RideFilePoint rfp, rideData)
     {
-        minLat = std::min(minLat,rfp.lat);
-        maxLat = std::max(maxLat,rfp.lat);
-        minLon = std::min(minLon,rfp.lon);
-        maxLon = std::max(maxLon,rfp.lon);
+        if (rfp.lat != 999 && rfp.lon != 999)
+        {
+            minLat = std::min(minLat,rfp.lat);
+            maxLat = std::max(maxLat,rfp.lat);
+            minLon = std::min(minLon,rfp.lon);
+            maxLon = std::max(maxLon,rfp.lon);
+        }
     }
-    if(floor(minLat) == 0)
+    if(minLon == 1000)
     {
         currentPage << tr("No GPS Data Present").toStdString();
         return;
@@ -376,7 +382,7 @@ void GoogleMapControl::CreateSubPolyLine(const std::vector<RideFilePoint> &point
 
     BOOST_FOREACH(RideFilePoint rfp, points)
     {
-        if (ceil(rfp.lat) != 180 && ceil(rfp.lon) != 180)
+        if (!(rfp.lat == 999 && rfp.lon == 999))
         {
             oss << "new GLatLng(" << rfp.lat << "," << rfp.lon << ")," << endl;
         }
