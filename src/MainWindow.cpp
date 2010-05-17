@@ -122,7 +122,6 @@ MainWindow::MainWindow(const QDir &home) :
         if (!zones_->read(zonesFile)) {
             QMessageBox::critical(this, tr("Zones File Error"),
 				  zones_->errorString());
-            zones_->clear();
         }
 	else if (! zones_->warningString().isEmpty())
             QMessageBox::warning(this, tr("Reading Zones File"), zones_->warningString());
@@ -1335,6 +1334,18 @@ void MainWindow::dateChanged(const QDate &date)
 void
 MainWindow::notifyConfigChanged()
 {
+    // re-read Zones in case it changed
+    QFile zonesFile(home.absolutePath() + "/power.zones");
+    if (zonesFile.exists()) {
+        if (!zones_->read(zonesFile)) {
+            QMessageBox::critical(this, tr("Zones File Error"),
+                                 zones_->errorString());
+        }
+       else if (! zones_->warningString().isEmpty())
+            QMessageBox::warning(this, tr("Reading Zones File"), zones_->warningString());
+    }
+
+    // now tell everyone else
     configChanged();
 }
 

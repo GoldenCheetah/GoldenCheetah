@@ -31,6 +31,7 @@ class MetadataPage;
 class KeywordsPage;
 class FieldsPage;
 class Colors;
+class ZonePage;
 
 class ConfigurationPage : public QWidget
 {
@@ -75,23 +76,9 @@ class CyclistPage : public QWidget
 {
     Q_OBJECT
     public:
-        CyclistPage(const Zones *_zones);
-        int thresholdPower;
-        QString getText();
-        int getCP();
-	void setCP(int cp);
-	void setSelectedDate(QDate date);
-        void setCurrentRange(int range = -1);
-        QPushButton *btnBack;
-        QPushButton *btnForward;
-        QPushButton *btnDelete;
-        QCheckBox *checkboxNew;
-        QCalendarWidget *calendar;
-        QLabel *lblCurRange;
-        QLabel *txtStartDate;
-        QLabel *txtEndDate;
-        QLabel *lblStartDate;
-        QLabel *lblEndDate;
+        CyclistPage(MainWindow *mainWindow);
+        void saveClicked();
+
         QLabel *perfManLabel;
         QLabel *perfManStartLabel;
         QLabel *perfManSTSLabel;
@@ -101,33 +88,15 @@ class CyclistPage : public QWidget
         QLineEdit *perfManLTSavg;
         QCheckBox *showSBToday;
 
-        int getCurrentRange();
-        bool isNewMode();
-
-        inline void setCPFocus() {
-            txtThreshold->setFocus();
-        }
-
-        inline QDate selectedDate() {
-            return calendar->selectedDate();
-        }
-
     private:
+        ZonePage *zonePage;
+        MainWindow *main;
+
         QGroupBox *cyclistGroup;
-        const Zones *zones;
-        int currentRange;
-        QLabel *lblThreshold;
-        QLineEdit *txtThreshold;
-        QIntValidator *txtThresholdValidator;
         QVBoxLayout *perfManLayout;
         QHBoxLayout *perfManStartValLayout;
         QHBoxLayout *perfManSTSavgLayout;
         QHBoxLayout *perfManLTSavgLayout;
-        QHBoxLayout *powerLayout;
-        QHBoxLayout *rangeLayout;
-        QHBoxLayout *dateRangeLayout;
-        QHBoxLayout *zoneLayout;
-        QHBoxLayout *calendarLayout;
         QVBoxLayout *cyclistLayout;
         QVBoxLayout *mainLayout;
         QIntValidator *perfManStartValidator;
@@ -320,6 +289,84 @@ class MetadataPage : public QWidget
         // local versions for modification
         QList<KeywordDefinition> keywordDefinitions;
         QList<FieldDefinition>   fieldDefinitions;
+};
+
+class SchemePage : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        SchemePage(ZonePage *parent);
+        ZoneScheme getScheme();
+        void saveClicked();
+
+    public slots:
+        void addClicked();
+        void deleteClicked();
+        void renameClicked();
+
+    private:
+        ZonePage *zonePage;
+        QTreeWidget *scheme;
+        QPushButton *addButton, *renameButton, *deleteButton;
+};
+
+class CPPage : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        CPPage(ZonePage *parent);
+
+    public slots:
+        void addClicked();
+        void deleteClicked();
+        void defaultClicked();
+        void rangeSelectionChanged();
+        void addZoneClicked();
+        void deleteZoneClicked();
+        void zonesChanged();
+
+    private:
+        bool active;
+
+        QDateEdit *dateEdit;
+        QDoubleSpinBox *cpEdit;
+
+        ZonePage *zonePage;
+        QTreeWidget *ranges;
+        QTreeWidget *zones;
+        QPushButton *addButton, *deleteButton, *defaultButton;
+        QPushButton *addZoneButton, *deleteZoneButton;
+};
+
+class ZonePage : public QWidget
+{
+    Q_OBJECT
+
+    public:
+
+        ZonePage(MainWindow *);
+        void saveClicked();
+
+        //ZoneScheme scheme;
+        Zones zones;
+
+        // Children talk to each other
+        SchemePage *schemePage;
+        CPPage *cpPage;
+
+    public slots:
+
+
+    protected:
+
+        MainWindow *main;
+        bool changed;
+
+        QTabWidget *tabs;
+
+        // local versions for modification
 };
 
 #endif

@@ -21,10 +21,6 @@ class ConfigDialog : public QDialog
     public slots:
         void changePage(QListWidgetItem *current, QListWidgetItem *previous);
         void save_Clicked();
-        void back_Clicked();
-        void forward_Clicked();
-        void delete_Clicked();
-	void calendarDateChanged();
 
         // device config slots
         void changedType(int);
