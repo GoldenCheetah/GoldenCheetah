@@ -18,9 +18,13 @@
  */
 
 #include <QString>
+#include <QDebug>
 
 #include "TcxParser.h"
 #include "TimeUtils.h"
+
+// use stc strtod to bypass Qt toDouble() issues
+#include <stdlib.h>
 
 TcxParser::TcxParser (RideFile* rideFile)
    : rideFile(rideFile)
@@ -91,11 +95,13 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
     }
     else if (qName == "LongitudeDegrees")
     {
-        lon = buffer.toDouble();
+        char *p;
+        lon = strtod(buffer.toLatin1(), &p);
     }
     else if (qName == "LatitudeDegrees")
     {
-        lat = buffer.toDouble();
+        char *p;
+        lat = strtod(buffer.toLatin1(), &p);
     }
     else if (qName == "Trackpoint")
     {
