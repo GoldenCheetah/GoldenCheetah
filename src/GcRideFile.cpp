@@ -158,10 +158,15 @@ GcFileReader::openRideFile(QFile &file, QStringList &errors) const
     return rideFile;
 }
 
+// normal precision (Qt defaults)
 #define add_sample(name) \
     if (present->name) \
         sample.setAttribute(#name, QString("%1").arg(point->name));
 
+// high precision (6 decimals)
+#define add_sample_hp(name) \
+    if (present->name) \
+        sample.setAttribute(#name, QString("%1").arg(point->name, 0, 'g', 11));
 void
 GcFileReader::writeRideFile(const RideFile *ride, QFile &file) const
 {
@@ -242,7 +247,7 @@ GcFileReader::writeRideFile(const RideFile *ride, QFile &file) const
             QDomElement sample = doc.createElement("sample");
             samples.appendChild(sample);
             assert(present->secs);
-            add_sample(secs);
+            add_sample_hp(secs);
             add_sample(cad);
             add_sample(hr);
             add_sample(km);
@@ -250,8 +255,8 @@ GcFileReader::writeRideFile(const RideFile *ride, QFile &file) const
             add_sample(nm);
             add_sample(watts);
             add_sample(alt);
-            add_sample(lon);
-            add_sample(lat);
+            add_sample_hp(lon);
+            add_sample_hp(lat);
             sample.setAttribute("len", QString("%1").arg(ride->recIntSecs()));
         }
     }
