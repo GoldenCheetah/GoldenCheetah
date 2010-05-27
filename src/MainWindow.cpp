@@ -466,7 +466,15 @@ MainWindow::selectView(int view)
 void
 MainWindow::dragEnterEvent(QDragEnterEvent *event)
 {
-    event->acceptProposedAction(); // whatever you wanna drop we will try and process!
+    bool accept = true;
+
+    // we reject http, since we want a file!
+    foreach (QUrl url, event->mimeData()->urls())
+        if (url.toString().startsWith("http"))
+            accept = false;
+
+    if (accept) event->acceptProposedAction(); // whatever you wanna drop we will try and process!
+    else event->ignore();
 }
 
 void
