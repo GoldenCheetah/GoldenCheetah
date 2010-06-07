@@ -122,7 +122,6 @@ MainWindow::MainWindow(const QDir &home) :
         if (!zones_->read(zonesFile)) {
             QMessageBox::critical(this, tr("Zones File Error"),
 				  zones_->errorString());
-            zones_->clear();
         }
 	else if (! zones_->warningString().isEmpty())
             QMessageBox::warning(this, tr("Reading Zones File"), zones_->warningString());
@@ -467,7 +466,15 @@ MainWindow::selectView(int view)
 void
 MainWindow::dragEnterEvent(QDragEnterEvent *event)
 {
-    event->acceptProposedAction(); // whatever you wanna drop we will try and process!
+    bool accept = true;
+
+    // we reject http, since we want a file!
+    foreach (QUrl url, event->mimeData()->urls())
+        if (url.toString().startsWith("http"))
+            accept = false;
+
+    if (accept) event->acceptProposedAction(); // whatever you wanna drop we will try and process!
+    else event->ignore();
 }
 
 void
@@ -1335,6 +1342,18 @@ void MainWindow::dateChanged(const QDate &date)
 void
 MainWindow::notifyConfigChanged()
 {
+    // re-read Zones in case it changed
+    QFile zonesFile(home.absolutePath() + "/power.zones");
+    if (zonesFile.exists()) {
+        if (!zones_->read(zonesFile)) {
+            QMessageBox::critical(this, tr("Zones File Error"),
+                                 zones_->errorString());
+        }
+       else if (! zones_->warningString().isEmpty())
+            QMessageBox::warning(this, tr("Reading Zones File"), zones_->warningString());
+    }
+
+    // now tell everyone else
     configChanged();
 }
 

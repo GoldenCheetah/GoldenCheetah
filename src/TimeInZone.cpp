@@ -146,6 +146,42 @@ class ZoneTime7 : public ZoneTime {
         RideMetric *clone() const { return new ZoneTime7(*this); }
 };
 
+class ZoneTime8 : public ZoneTime {
+
+    public:
+        ZoneTime8()
+        {
+            setLevel(8);
+            setSymbol("time_in_zone_L8");
+            setName(tr("L8 Time in Zone"));
+        }
+        RideMetric *clone() const { return new ZoneTime8(*this); }
+};
+
+class ZoneTime9 : public ZoneTime {
+
+    public:
+        ZoneTime9()
+        {
+            setLevel(9);
+            setSymbol("time_in_zone_L9");
+            setName(tr("L9 Time in Zone"));
+        }
+        RideMetric *clone() const { return new ZoneTime9(*this); }
+};
+
+class ZoneTime10 : public ZoneTime {
+
+    public:
+        ZoneTime10()
+        {
+            setLevel(10);
+            setSymbol("time_in_zone_L10");
+            setName(tr("L10 Time in Zone"));
+        }
+        RideMetric *clone() const { return new ZoneTime10(*this); }
+};
+
 
 
 static bool addAllZones() {
@@ -156,6 +192,9 @@ static bool addAllZones() {
     RideMetricFactory::instance().addMetric(ZoneTime5());
     RideMetricFactory::instance().addMetric(ZoneTime6());
     RideMetricFactory::instance().addMetric(ZoneTime7());
+    RideMetricFactory::instance().addMetric(ZoneTime8());
+    RideMetricFactory::instance().addMetric(ZoneTime9());
+    RideMetricFactory::instance().addMetric(ZoneTime10());
     return true;
 }
 

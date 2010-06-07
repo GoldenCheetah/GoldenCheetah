@@ -40,7 +40,7 @@
 // DB Schema Version - YOU MUST UPDATE THIS IF THE SCHEMA VERSION CHANGES!!!
 // Schema version will change if a) the default metadata.xml is updated
 //                            or b) new metrics are added / old changed
-static int DBSchemaVersion = 13;
+static int DBSchemaVersion = 14;
 
 DBAccess::DBAccess(MainWindow* main, QDir home) : main(main), home(home)
 {

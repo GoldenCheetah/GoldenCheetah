@@ -27,34 +27,11 @@
 #include <math.h>
 #include <boost/crc.hpp>
 
-static QList <int> zone_default;
-static QList <bool> zone_default_is_pct;
-static QList <QString> zone_default_name;
-static QList <QString> zone_default_desc;
-static int nzones_default = 0;
 
-// the infinity endpoints are indicated with empty dates
-static const QDate date_zero     = QDate::QDate();
-static const QDate date_infinity = QDate::QDate();
-
-// functions used for sorting zones and ranges
-bool Zones::zone_default_index_lessthan(int i1, int i2) {
-    return (zone_default[i1] * (zone_default_is_pct[i1] ? 250 : 1) <
-	    zone_default[i2] * (zone_default_is_pct[i2] ? 250 : 1));
-}
-
-bool Zones::zoneptr_lessthan(const ZoneInfo &z1, const ZoneInfo &z2) {
-    return ((z1.lo < z2.lo) ||
-	    ((z1.lo == z2.lo) && (z1.hi < z2.hi)));
-}
-
-bool Zones::rangeptr_lessthan(const ZoneRange &r1, const ZoneRange &r2) {
-    return (((! r2.begin.isNull()) &&
-	     ( r1.begin.isNull() || r1.begin < r2.begin )) ||
-	    ((r1.begin == r2.begin) &&
-	     (! r1.end.isNull()) &&
-	     ( r2.end.isNull() || r1.end < r2.end )));
-}
+// the infinity endpoints are indicated with extreme date ranges
+// but not zero dates so we can edit and compare them
+static const QDate date_zero(1900, 01, 01);
+static const QDate date_infinity(9999,12,31);
 
 // initialize default static zone parameters
 void Zones::initializeZoneParameters()
@@ -74,19 +51,19 @@ void Zones::initializeZoneParameters()
 	sizeof(initial_zone_default) /
 	sizeof(initial_zone_default[0]);
 
-    zone_default.clear();
-    zone_default_is_pct.clear();
-    zone_default_desc.clear();
-    zone_default_name.clear();
-    nzones_default = 0;
+    scheme.zone_default.clear();
+    scheme.zone_default_is_pct.clear();
+    scheme.zone_default_desc.clear();
+    scheme.zone_default_name.clear();
+    scheme.nzones_default = 0;
 
-    nzones_default = initial_nzones_default;
+    scheme.nzones_default = initial_nzones_default;
 
-    for (int z = 0; z < nzones_default; z ++) {
-	zone_default.append(initial_zone_default[z]);
-	zone_default_is_pct.append(true);
-	zone_default_name.append(QString(initial_zone_default_name[z]));
-	zone_default_desc.append(QString(initial_zone_default_desc[z]));
+    for (int z = 0; z < scheme.nzones_default; z ++) {
+	    scheme.zone_default.append(initial_zone_default[z]);
+	    scheme.zone_default_is_pct.append(true);
+	    scheme.zone_default_name.append(QString(initial_zone_default_name[z]));
+	    scheme.zone_default_desc.append(QString(initial_zone_default_desc[z]));
     }
 }
 
@@ -94,11 +71,12 @@ void Zones::initializeZoneParameters()
 bool Zones::read(QFile &file)
 {
     defaults_from_user = false;
-    zone_default.clear();
-    zone_default_is_pct.clear();
-    zone_default_name.clear();
-    zone_default_desc.clear();
-    nzones_default = 0;
+    scheme.zone_default.clear();
+    scheme.zone_default_is_pct.clear();
+    scheme.zone_default_name.clear();
+    scheme.zone_default_desc.clear();
+    scheme.nzones_default = 0;
+    ranges.clear();
 
     // set up possible warning dialog
     warning = QString();
@@ -147,7 +125,7 @@ bool Zones::read(QFile &file)
     // the current range in the file
     // ZoneRange *range = NULL;
     bool in_range = false;
-    QDate begin, end;
+    QDate begin = date_zero, end = date_infinity;
     int cp;
     QList<ZoneInfo> zoneInfos;
 
@@ -174,7 +152,7 @@ bool Zones::read(QFile &file)
 	    }
 
 	    // only one set of defaults is allowed
-	    if (nzones_default) {
+	    if (scheme.nzones_default) {
 		err = "Only one set of zone defaults may be specified in power.zones file";
 		return false;
 	    }
@@ -183,70 +161,65 @@ bool Zones::read(QFile &file)
 	}
 
 	// check for range specification (may be followed by zone definitions)
-	for (int r = 0; r < 2; r++) {
-	    if (rangerx[r].indexIn(line, 0) != -1) {
+        for (int r=0; r<2; r++) {
+                if (rangerx[r].indexIn(line, 0) != -1) {
 
-		if (in_range) {
-		    // if zones are empty, then generate them
-                    ZoneRange range(begin, end, cp);
-                    range.zones = zoneInfos;
-		    if (range.zones.empty()) {
-			if (range.cp > 0)
-			    setZonesFromCP(range);
-			else {
-			    err = tr("line %1: read new range without reading "
-				     "any zones for previous one").arg(lineno);
-			    file.close();
-			    return false;
-			}
-		    }
-		    // else sort them
-		    else {
-			qSort(range.zones.begin(), range.zones.end(), zoneptr_lessthan);
-		    }
+                        if (in_range) {
 
-		    ranges.append(range);
-		}
+                                // if zones are empty, then generate them
+                                ZoneRange range(begin, end, cp);
+                                range.zones = zoneInfos;
 
-                in_range = true;
-		zones_are_defaults = false;
-                zoneInfos.clear();
+                                if (range.zones.empty()) {
+                                        if (range.cp > 0) setZonesFromCP(range);
+                                        else {
+                                                err = tr("line %1: read new range without reading "
+                                                "any zones for previous one").arg(lineno);
+                                                file.close();
+                                                return false;
+                                        }
+                                } else {
+                                        qSort(range.zones);
+                                }
+                                ranges.append(range);
+                        }
 
-		// QDate begin, end;
+                        in_range = true;
+                        zones_are_defaults = false;
+                        zoneInfos.clear();
 
-		// process the beginning date
-		if (rangerx[r].cap(1) == "BEGIN")
-		    begin = date_zero;
-		else {
-		    begin = QDate(rangerx[r].cap(2).toInt(),
-				  rangerx[r].cap(3).toInt(),
-				  rangerx[r].cap(4).toInt()
-				  );
-		}
+                        // process the beginning date
+                        if (rangerx[r].cap(1) == "BEGIN")
+                                begin = date_zero;
+                        else {
+                                begin = QDate(rangerx[r].cap(2).toInt(),
+                                rangerx[r].cap(3).toInt(),
+                                rangerx[r].cap(4).toInt());
+                        }
 
-		// process an end date, if any, else it is null
-		if (rangerx[r].cap(5) == "END")
-		    end = date_infinity;
-		else if (rangerx[r].cap(6).toInt() || rangerx[r].cap(7).toInt() || rangerx[r].cap(8).toInt()) {
-		    end = QDate(rangerx[r].cap(6).toInt(),
-				rangerx[r].cap(7).toInt(),
-				rangerx[r].cap(8).toInt()
-				);
-		}
-		else {
-		    end = QDate();
-		}
+                        // process an end date, if any, else it is null
+                        if (rangerx[r].cap(5) == "END") end = date_infinity;
+                        else if (rangerx[r].cap(6).toInt() || rangerx[r].cap(7).toInt() ||
+                                 rangerx[r].cap(8).toInt()) {
 
-		// set up the range, capturing CP if it's specified
-		// range = new ZoneRange(begin, end);
-		int nCP = (r ? 11 : 7);
-		if (rangerx[r].numCaptures() == (nCP))
-		    cp = rangerx[r].cap(nCP).toInt();
-                else
-                    cp = 0;
-		goto next_line;
-	    }
-	}
+                                end = QDate(rangerx[r].cap(6).toInt(),
+                                rangerx[r].cap(7).toInt(),
+                                rangerx[r].cap(8).toInt());
+
+                        } else {
+                                end = QDate();
+                        }
+
+                        // set up the range, capturing CP if it's specified
+                        // range = new ZoneRange(begin, end);
+                        int nCP = (r ? 11 : 7);
+                        if (rangerx[r].numCaptures() == (nCP)) cp = rangerx[r].cap(nCP).toInt();
+                        else cp = 0;
+
+                        // bleck
+                        goto next_line;
+                }
+        }
 
 	// check for zone definition
         if (zonerx.indexIn(line, 0) != -1) {
@@ -261,11 +234,9 @@ bool Zones::read(QFile &file)
 
 	    // allow for zone specified as % of CP
 	    bool lo_is_pct = false;
-	    if (zonerx.cap(4) == "%")
-		if (zones_are_defaults)
-		    lo_is_pct = true;
-		else if (cp > 0)
-		    lo = int(lo * cp / 100);
+	    if (zonerx.cap(4) == "%") {
+		if (zones_are_defaults) lo_is_pct = true;
+		else if (cp > 0) lo = int(lo * cp / 100);
 		else {
 		    err = tr("attempt to set zone based on % of "
 			     "CP without setting CP in line number %1.\n").
@@ -273,6 +244,7 @@ bool Zones::read(QFile &file)
 		    file.close();
 		    return false;
 		}
+            }
 
 	    int hi;
 	    // if this is not a zone defaults specification, process possible hi end of zones
@@ -284,24 +256,25 @@ bool Zones::read(QFile &file)
 		hi = zonerx.cap(5).toInt();
 
 		// allow for zone specified as % of CP
-		if (zonerx.cap(5) == "%")
+		if (zonerx.cap(5) == "%") {
 		    if (cp > 0)
 			hi = int(hi * cp / 100);
 		    else {
-			err = tr("attempt to set zone based on % of CP "
-				 "without setting CP in line number %1.\n").
-			    arg(lineno);
-			file.close();
-			return false;
+			    err = tr("attempt to set zone based on % of CP "
+				    "without setting CP in line number %1.\n").
+			        arg(lineno);
+			    file.close();
+			    return false;
 		    }
+                }
 	    }
 
 	    if (zones_are_defaults) {
-		nzones_default ++;
-		zone_default_is_pct.append(lo_is_pct);
-		zone_default.append(lo);
-		zone_default_name.append(zonerx.cap(1));
-		zone_default_desc.append(zonerx.cap(2));
+		scheme.nzones_default ++;
+		scheme.zone_default_is_pct.append(lo_is_pct);
+		scheme.zone_default.append(lo);
+		scheme.zone_default_name.append(zonerx.cap(1));
+		scheme.zone_default_desc.append(zonerx.cap(2));
 		defaults_from_user = true;
 	    }
 	    else {
@@ -325,7 +298,7 @@ bool Zones::read(QFile &file)
 	    }
         }
 	else {
-	    qSort(range.zones.begin(), range.zones.end(), zoneptr_lessthan);
+	    qSort(range.zones);
 	}
 
         ranges.append(range);
@@ -333,34 +306,27 @@ bool Zones::read(QFile &file)
     file.close();
 
     // sort the ranges
-    qSort(ranges.begin(), ranges.end(), rangeptr_lessthan);
+    qSort(ranges);
 
-    // sort the zone defaults, as best we can (may not be right if there's
-    // a mix of % and absolute ranges)
-    if (nzones_default)  {
-	QVector <int> zone_default_index(nzones_default);
-	for (int i = 0; i < nzones_default; i++)
-	    zone_default_index[i] = i;
-	qSort(zone_default_index.begin(), zone_default_index.end(), zone_default_index_lessthan);
+    // set the default zones if not in file
+    if (!scheme.nzones_default)  {
 
-	QVector <int> zone_default_new(nzones_default);
-	QVector <bool> zone_default_is_pct_new(nzones_default);
-	QVector <QString> zone_default_name_new(nzones_default);
-	QVector <QString> zone_default_desc_new(nzones_default);
+        // do we have a zone which is explicitly set?
+        for (int i=0; i<ranges.count(); i++) {
+                if (ranges[i].zonesSetFromCP == false) {
+                        // set the defaults using this one!
+                        scheme.nzones_default = ranges[i].zones.count();
+                        for (int j=0; j<scheme.nzones_default; j++) {
+                                scheme.zone_default.append(((double)ranges[i].zones[j].lo / (double)ranges[i].cp) * 100.00);
+                                scheme.zone_default_is_pct.append(true);
+                                scheme.zone_default_name.append(ranges[i].zones[j].name);
+                                scheme.zone_default_desc.append(ranges[i].zones[j].desc);
+                        }
+                }
+        }
 
-	for (int i = 0; i < nzones_default; i++) {
-	    zone_default_new[i]        = zone_default[zone_default_index[i]];
-	    zone_default_is_pct_new[i] = zone_default_is_pct[zone_default_index[i]];
-	    zone_default_name_new[i]   = zone_default_name[zone_default_index[i]];
-	    zone_default_desc_new[i]   = zone_default_desc[zone_default_index[i]];
-	}
-
-	for (int i = 0; i < nzones_default; i++) {
-	    zone_default[i]            = zone_default_new[i];
-	    zone_default_is_pct[i]     = zone_default_is_pct_new[i];
-	    zone_default_name[i]       = zone_default_name_new[i];
-	    zone_default_desc[i]       = zone_default_desc_new[i];
-	}
+        // still not set then reset to defaults as usual
+        if (!scheme.nzones_default) initializeZoneParameters();
     }
 
     // resolve undefined endpoints in ranges and zones
@@ -410,7 +376,7 @@ bool Zones::read(QFile &file)
 			INT_MAX;
 		else if ((nz < ranges[nr].zones.size() - 1) &&
 			 (ranges[nr].zones[nz].hi != ranges[nr].zones[nz + 1].lo)) {
-		    if (abs(ranges[nr].zones[nz].hi - ranges[nr].zones[nz + 1].lo) > 4)
+		    if (abs(ranges[nr].zones[nz].hi - ranges[nr].zones[nz + 1].lo) > 4) {
 			append_to_warning(tr("Range %1: matching top of zone %2 "
 					     "(%3) to bottom of zone %4 (%5).\n").
 					  arg(nr + 1).
@@ -419,10 +385,12 @@ bool Zones::read(QFile &file)
 					  arg(ranges[nr].zones[nz + 1].name).
 					  arg(ranges[nr].zones[nz + 1].lo)
 					  );
+                    }
 		    ranges[nr].zones[nz].hi = ranges[nr].zones[nz + 1].lo;
-		}
-		else if ((nz == ranges[nr].zones.size() - 1) &&
+
+		} else if ((nz == ranges[nr].zones.size() - 1) &&
 			 (ranges[nr].zones[nz].hi < INT_MAX)) {
+
 		    append_to_warning(tr("Range %1: setting top of zone %2 from %3 to MAX.\n").
 				      arg(nr + 1).
 				      arg(ranges[nr].zones[nz].name).
@@ -500,49 +468,48 @@ void Zones::setCP(int rnum, int cp)
 
 // generate a list of zones from CP
 int Zones::lowsFromCP(QList <int> *lows, int cp) const {
-    if (nzones_default == 0)
-	initializeZoneParameters();
 
     lows->clear();
 
-    for (int z = 0; z < nzones_default; z++)
-	lows->append(zone_default_is_pct[z] ? zone_default[z] * cp / 100 : zone_default[z]);
+    for (int z = 0; z < scheme.nzones_default; z++)
+	lows->append(scheme.zone_default_is_pct[z] ?
+                scheme.zone_default[z] * cp / 100 : scheme.zone_default[z]);
 
-    return nzones_default;
+    return scheme.nzones_default;
 }
 
 // access the zone name
 QString Zones::getDefaultZoneName(int z) const {
-    return zone_default_name[z];
+    return scheme.zone_default_name[z];
 }
 
 // access the zone description
 QString Zones::getDefaultZoneDesc(int z) const {
-    return zone_default_desc[z];
+    return scheme.zone_default_desc[z];
 }
 
 // set the zones from the CP value (the cp variable)
 void Zones::setZonesFromCP(ZoneRange &range) {
     range.zones.clear();
 
-    if (nzones_default == 0)
+    if (scheme.nzones_default == 0)
 	initializeZoneParameters();
 
-    for (int i = 0; i < nzones_default; i++) {
-	int lo = zone_default_is_pct[i] ? zone_default[i] * range.cp / 100 : zone_default[i];
+    for (int i = 0; i < scheme.nzones_default; i++) {
+	int lo = scheme.zone_default_is_pct[i] ? scheme.zone_default[i] * range.cp / 100 : scheme.zone_default[i];
 	int hi = lo;
-	ZoneInfo zone(zone_default_name[i], zone_default_desc[i], lo, hi);
+	ZoneInfo zone(scheme.zone_default_name[i], scheme.zone_default_desc[i], lo, hi);
 	range.zones.append(zone);
     }
 
     // sort the zones (some may be pct, others absolute, so zones need to be sorted,
     // rather than the defaults
-    qSort(range.zones.begin(), range.zones.end(), zoneptr_lessthan);
+    qSort(range.zones);
 
     // set zone end dates
     for (int i = 0; i < range.zones.size(); i ++)
 	range.zones[i].hi =
-	    (i < nzones_default - 1) ?
+	    (i < scheme.nzones_default - 1) ?
 	    range.zones[i + 1].lo :
 	    INT_MAX;
 
@@ -642,17 +609,16 @@ void Zones::write(QDir home)
 {
     QString strzones;
 
-    // write the defaults if they were specified by the user
-    if (defaults_from_user) {
-	strzones += QString("DEFAULTS:\n");
-	for (int z = 0 ; z < nzones_default; z ++)
-	    strzones += QString("%1,%2,%3%4\n").
-		arg(zone_default_name[z]).
-		arg(zone_default_desc[z]).
-		arg(zone_default[z]).
-		arg(zone_default_is_pct[z]?"%":"");
-	strzones += QString("\n");
-    }
+    // always write the defaults (config pane can adjust)
+    strzones += QString("DEFAULTS:\n");
+    for (int z = 0 ; z < scheme.nzones_default; z ++)
+        strzones += QString("%1,%2,%3%4\n").
+        arg(scheme.zone_default_name[z]).
+        arg(scheme.zone_default_desc[z]).
+        arg(scheme.zone_default[z]).
+        arg(scheme.zone_default_is_pct[z]?"%":"");
+    strzones += QString("\n");
+
     for (int i = 0; i < ranges.size(); i++) {
         int cp = getCP(i);
 
@@ -660,10 +626,9 @@ void Zones::write(QDir home)
 	// note this explicitly sets the first and last ranges such that all time is spanned
 
         #if USE_SHORT_POWER_ZONES_FORMAT
-        if (i == 0)
-            strzones += QString("BEGIN: CP=%1").arg(cp);
-	else
-            strzones += QString("%1: CP=%2").arg(getStartDate(i).toString("yyyy/MM/dd")).arg(cp);
+        // note: BEGIN is not needed anymore
+        //       since it becomes Jan 01 1900
+        strzones += QString("%1: CP=%2").arg(getStartDate(i).toString("yyyy/MM/dd")).arg(cp);
 	strzones += QString("\n");
 
 	// step through and print the zones if they've been explicitly set
@@ -707,6 +672,31 @@ void Zones::write(QDir home)
 void Zones::addZoneRange(QDate _start, QDate _end, int _cp)
 {
     ranges.append(ZoneRange(_start, _end, _cp));
+}
+
+// insert a new zone range using the current scheme
+// return the range number
+int Zones::addZoneRange(QDate _start, int _cp)
+{
+    int rnum;
+
+    // where to add this range?
+    for(rnum=0; rnum < ranges.count(); rnum++) if (ranges[rnum].begin > _start) break;
+
+    // at the end ?
+    if (rnum == ranges.count()) ranges.append(ZoneRange(_start, date_infinity, _cp));
+    else ranges.insert(rnum, ZoneRange(_start, ranges[rnum].begin, _cp));
+
+    // modify previous end date
+    if (rnum) ranges[rnum-1].end = _start;
+
+    // set zones from CP
+    if (_cp > 0) {
+        setCP(rnum, _cp);
+        setZonesFromCP(rnum);
+    }
+
+    return rnum;
 }
 
 void Zones::addZoneRange()
@@ -776,29 +766,20 @@ QColor zoneColor(int z, int) {
 
 // delete a range, extend an adjacent (prior if available, otherwise next)
 // range to cover the same time period, then return the number of the new range
-// covering the date range of the deleted range
+// covering the date range of the deleted range or -1 if none left
 int Zones::deleteRange(int rnum) {
-    assert((ranges.size() > 1) && (rnum >= 0) && (rnum < ranges.size()));
-    int return_rnum;
 
-    // extend an adjacent range
-    if (rnum == 0) {
-	return_rnum = 0;
-	setStartDate(rnum + 1, getStartDate(rnum));
-    }
-    else {
-	return_rnum = rnum - 1;
-	setEndDate(return_rnum, getEndDate(rnum));
-    }
+    // check bounds - silently fail, don't assert
+    assert (rnum < ranges.count() && rnum >= 0);
 
-    // drop higher ranges down one slot
-    for (int r = rnum; r < ranges.size() - 1; r ++)
-	ranges[r] = ranges[r + 1];
+    // extend the previous range to the end of this range
+    // but only if we have a previous range
+    if (rnum > 0) setEndDate(rnum-1, getEndDate(rnum));
 
-    // reduce the number of ranges by one
-    ranges.removeLast();
+    // delete this range then
+    ranges.removeAt(rnum);
 
-    return return_rnum;
+    return rnum-1;
 }
 
 // insert a new range starting at the given date extending to the end of the zone currently
@@ -851,6 +832,12 @@ Zones::getFingerprint() const
         // CP
         x = ranges[i].cp;
         CRC.process_bytes(&x, sizeof(int));
+
+        // each zone definition (manual edit/default changed)
+        for (int j=0; j<ranges[i].zones.count(); j++) {
+            x = ranges[i].zones[j].lo;
+            CRC.process_bytes(&x, sizeof(int));
+        }
     }
     return CRC.checksum();
 }

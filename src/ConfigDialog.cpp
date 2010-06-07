@@ -30,7 +30,7 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
 
     home = _home;
 
-    cyclistPage = new CyclistPage(zones);
+    cyclistPage = new CyclistPage(mainWindow);
 
     contentsWidget = new QListWidget;
     contentsWidget->setViewMode(QListView::IconMode);
@@ -43,7 +43,6 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
     contentsWidget->setUniformItemSizes(true);
 
     configPage = new ConfigurationPage(mainWindow);
-
     devicePage = new DevicePage(this);
 
     pagesWidget = new QStackedWidget;
@@ -60,10 +59,6 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
     // connect(closeButton, SIGNAL(clicked()), this, SLOT(reject()));
     // connect(saveButton, SIGNAL(clicked()), this, SLOT(accept()));
     connect(closeButton, SIGNAL(clicked()), this, SLOT(accept()));
-    connect(cyclistPage->btnBack, SIGNAL(clicked()), this, SLOT(back_Clicked()));
-    connect(cyclistPage->btnForward, SIGNAL(clicked()), this, SLOT(forward_Clicked()));
-    connect(cyclistPage->btnDelete, SIGNAL(clicked()), this, SLOT(delete_Clicked()));
-    connect(cyclistPage->calendar, SIGNAL(selectionChanged()), this, SLOT(calendarDateChanged()));
 
     // connect the pieces...
     connect(devicePage->typeSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(changedType(int)));
@@ -127,10 +122,6 @@ void ConfigDialog::createIcons()
 }
 
 
-void ConfigDialog::createNewRange()
-{
-}
-
 void ConfigDialog::changePage(QListWidgetItem *current, QListWidgetItem *previous)
 {
     if (!current)
@@ -177,31 +168,8 @@ void ConfigDialog::save_Clicked()
     settings->setValue(GC_SB_NAME, settings->value(GC_SB_NAME,tr("Stress Balance")));
     settings->setValue(GC_SB_ACRONYM, settings->value(GC_SB_ACRONYM,tr("SB")));
 
-
-    // if the CP text entry reads invalid, there's nothing we can do
-    int cp = cyclistPage->getCP();
-    if (cp == 0) {
-	QMessageBox::warning(this, tr("Invalid CP"), "Please enter valid CP and try again.");
-	cyclistPage->setCPFocus();
-	return;
-    }
-
-    // if for some reason we have no zones yet, then create them
-    int range = cyclistPage->getCurrentRange();
-
-    // if this is new mode, or if no zone ranges are yet defined, set up the new range
-    if ((range == -1) || (cyclistPage->isNewMode()))
-	cyclistPage->setCurrentRange(range = zones->insertRangeAtDate(cyclistPage->selectedDate(), cp));
-    else
-	zones->setCP(range, cyclistPage->getText().toInt());
-
-    zones->setZonesFromCP(range);
-
-    // update the "new zone" checkbox to visible and unchecked
-    cyclistPage->checkboxNew->setChecked(Qt::Unchecked);
-    cyclistPage->checkboxNew->setEnabled(true);
-
-    zones->write(home);
+    // Save Cyclist page stuff
+    cyclistPage->saveClicked();
 
     // save interval metrics and ride data pages
     configPage->saveClicked();
@@ -213,70 +181,9 @@ void ConfigDialog::save_Clicked()
     // Tell MainWindow we changed config, so it can emit the signal
     // configChanged() to all its children
     mainWindow->notifyConfigChanged();
-}
 
-void ConfigDialog::moveCalendarToCurrentRange() {
-    int range = cyclistPage->getCurrentRange();
-
-    if (range < 0)
-	return;
-
-    QDate date;
-
-    // put the cursor at the beginning of the selected range if it's not the first
-    if (range > 0)
-        date = zones->getStartDate(cyclistPage->getCurrentRange());
-    // unless the range is the first range, in which case it goes at the end of that range
-    // use JulianDay to subtract one day from the end date, which is actually the first
-    // day of the following range
-    else
-        date = QDate::fromJulianDay(zones->getEndDate(cyclistPage->getCurrentRange()).toJulianDay() - 1);
-
-    cyclistPage->setSelectedDate(date);
-}
-
-void ConfigDialog::back_Clicked()
-{
-    QDate date;
-    cyclistPage->setCurrentRange(cyclistPage->getCurrentRange() - 1);
-    moveCalendarToCurrentRange();
-}
-
-void ConfigDialog::forward_Clicked()
-{
-    QDate date;
-    cyclistPage->setCurrentRange(cyclistPage->getCurrentRange() + 1);
-    moveCalendarToCurrentRange();
-}
-
-void ConfigDialog::delete_Clicked() {
-    int range = cyclistPage->getCurrentRange();
-    int num_ranges = zones->getRangeSize();
-    assert (num_ranges > 1);
-    QMessageBox msgBox;
-    msgBox.setText(
-		   tr("Are you sure you want to delete the zone range\n"
-		      "from %1 to %2?\n"
-		      "(%3 range will extend to this date range):") .
-		   arg(zones->getStartDateString(cyclistPage->getCurrentRange())) .
-		   arg(zones->getEndDateString(cyclistPage->getCurrentRange())) .
-		   arg((range > 0) ? "previous" : "next")
-		   );
-    QPushButton *deleteButton = msgBox.addButton(tr("Delete"),QMessageBox::YesRole);
-    msgBox.setStandardButtons(QMessageBox::Cancel);
-    msgBox.setDefaultButton(QMessageBox::Cancel);
-    msgBox.setIcon(QMessageBox::Critical);
-    msgBox.exec();
-    if(msgBox.clickedButton() == deleteButton)
-	cyclistPage->setCurrentRange(zones->deleteRange(range));
-
-    zones->write(home);
-}
-
-void ConfigDialog::calendarDateChanged() {
-    int range = zones->whichRange(cyclistPage->selectedDate());
-    assert(range >= 0);
-    cyclistPage->setCurrentRange(range);
+    // close
+    accept();
 }
 
 //
