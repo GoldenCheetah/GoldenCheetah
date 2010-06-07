@@ -185,8 +185,8 @@ ConfigurationPage::saveClicked()
     metadataPage->saveClicked();
 }
 
-CyclistPage::CyclistPage(const Zones *_zones):
-    zones(_zones)
+CyclistPage::CyclistPage(MainWindow *main) :
+    main(main)
 {
     boost::shared_ptr<QSettings> settings = GetApplicationSettings();
 
@@ -198,38 +198,8 @@ CyclistPage::CyclistPage(const Zones *_zones):
     QVBoxLayout *cpLayout = new QVBoxLayout(cpTab);
     QVBoxLayout *pmLayout = new QVBoxLayout(pmTab);
 
-    lblThreshold = new QLabel(tr("Critical Power:"));
-    txtThreshold = new QLineEdit();
-
-    // the validator will prevent numbers above the upper limit
-    // from being entered, but will not prevent non-negative numbers
-    // below the lower limit (since it is still plausible a valid
-    // entry will result)
-    txtThresholdValidator = new QIntValidator(20,999,this);
-    txtThreshold->setValidator(txtThresholdValidator);
-
-    btnBack = new QPushButton(this);
-    btnBack->setText(tr("Back"));
-    btnForward = new QPushButton(this);
-    btnForward->setText(tr("Forward"));
-    btnDelete = new QPushButton(this);
-    btnDelete->setText(tr("Delete Range"));
-    checkboxNew = new QCheckBox(this);
-    checkboxNew->setText(tr("New Range from Date"));
-    btnForward->setEnabled(false);
-    txtStartDate = new QLabel("BEGIN");
-    txtEndDate = new QLabel("END");
-    lblStartDate = new QLabel("Start: ");
-    lblStartDate->setAlignment(Qt::AlignRight);
-    lblEndDate = new QLabel("End: ");
-    lblEndDate->setAlignment(Qt::AlignRight);
-
-
-    calendar = new QCalendarWidget(this);
-
-    lblCurRange = new QLabel(this);
-    lblCurRange->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    lblCurRange->setText(QString("Current Zone Range: %1").arg(currentRange + 1));
+    zonePage = new ZonePage(main);
+    cpLayout->addWidget(zonePage);
 
     perfManLabel = new QLabel(tr("Performance Manager"));
     showSBToday = new QCheckBox(tr("Show Stress Balance Today"), this);
@@ -256,46 +226,6 @@ CyclistPage::CyclistPage(const Zones *_zones):
     perfManLTSavg = new QLineEdit(perfManLTSVal.toString(),this);
     perfManLTSavg->setValidator(perfManLTSavgValidator);
 
-
-    QDate today = QDate::currentDate();
-    calendar->setSelectedDate(today);
-
-    if (zones->getRangeSize() == 0)
-        setCurrentRange();
-    else
-    {
-        setCurrentRange(zones->whichRange(today));
-    	btnDelete->setEnabled(true);
-	checkboxNew->setCheckState(Qt::Unchecked);
-    }
-    
-    int cp = currentRange != -1 ? zones->getCP(currentRange) : 0;
-    if (cp > 0)
-	setCP(cp);
-
-    //Layout
-    powerLayout = new QHBoxLayout();
-    powerLayout->addWidget(lblThreshold);
-    powerLayout->addWidget(txtThreshold);
-
-    rangeLayout = new QHBoxLayout();
-    rangeLayout->addWidget(lblCurRange);
-    
-    dateRangeLayout = new QHBoxLayout();
-    dateRangeLayout->addWidget(lblStartDate);
-    dateRangeLayout->addWidget(txtStartDate);
-    dateRangeLayout->addWidget(lblEndDate);
-    dateRangeLayout->addWidget(txtEndDate);
-
-    zoneLayout = new QHBoxLayout();
-    zoneLayout->addWidget(btnBack);
-    zoneLayout->addWidget(btnForward);
-    zoneLayout->addWidget(btnDelete);
-    zoneLayout->addWidget(checkboxNew);
-
-    calendarLayout = new QHBoxLayout();
-    calendarLayout->addWidget(calendar);
-
     // performance manager
     perfManLayout = new QVBoxLayout(); // outer
     perfManStartValLayout = new QHBoxLayout();
@@ -313,17 +243,7 @@ CyclistPage::CyclistPage(const Zones *_zones):
     perfManLayout->addLayout(perfManLTSavgLayout);
     perfManLayout->addStretch();
 
-
-
-    cyclistLayout = new QVBoxLayout;
-    cyclistLayout->addLayout(powerLayout);
-    cyclistLayout->addLayout(rangeLayout);
-    cyclistLayout->addLayout(zoneLayout);
-    cyclistLayout->addLayout(dateRangeLayout);
-    cyclistLayout->addLayout(calendarLayout);
-    cyclistLayout->addStretch();
-
-    cpLayout->addLayout(cyclistLayout);
+    //cpLayout->addLayout(cyclistLayout);
     pmLayout->addLayout(perfManLayout);
 
     mainLayout = new QVBoxLayout;
@@ -332,89 +252,18 @@ CyclistPage::CyclistPage(const Zones *_zones):
 }
 
 void
+CyclistPage::saveClicked()
+{
+    // save zone config (other stuff is saved by configdialog)
+    zonePage->saveClicked();
+}
+
+void
 ConfigurationPage::browseWorkoutDir()
 {
     QString dir = QFileDialog::getExistingDirectory(this, tr("Select Workout Library"),
                             "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     workoutDirectory->setText(dir); 
-}
-
-QString CyclistPage::getText()
-{
-    return txtThreshold->text();
-}
-
-int CyclistPage::getCP()
-{
-    int cp = txtThreshold->text().toInt();
-    return (
-	    (
-	     (cp >= txtThresholdValidator->bottom()) &&
-	     (cp <= txtThresholdValidator->top())
-	     ) ?
-	    cp :
-	    0
-	    );
-}
-
-void CyclistPage::setCP(int cp)
-{
-    txtThreshold->setText(QString("%1").arg(cp));
-}
-
-void CyclistPage::setSelectedDate(QDate date)
-{
-    calendar->setSelectedDate(date);
-}
-
-void CyclistPage::setCurrentRange(int range)
-{
-    int num_ranges = zones->getRangeSize();
-    if ((num_ranges == 0) || (range < 0)) {
-	btnBack->setEnabled(false);
-	btnDelete->setEnabled(false);
-	btnForward->setEnabled(false);
-	calendar->setEnabled(false);
-	checkboxNew->setCheckState(Qt::Checked);
-	checkboxNew->setEnabled(false);
-	currentRange = -1;
-	lblCurRange->setText("no Current Zone Range");
-	txtEndDate->setText("undefined");
-	txtStartDate->setText("undefined");
-	return;
-    }
-
-    assert ((range >= 0) && (range < num_ranges));
-    currentRange = range;
-
-    // update the labels
-    lblCurRange->setText(QString("Current Zone Range: %1").arg(currentRange + 1));
-
-    // update the visibility of the range select buttons
-    btnForward->setEnabled(currentRange < num_ranges - 1);
-    btnBack->setEnabled(currentRange > 0);
-
-    // if we have ranges to set to, then the calendar must be on
-    calendar->setEnabled(true);
-
-    // update the CP display
-    setCP(zones->getCP(currentRange));
-
-    // update date limits
-    txtStartDate->setText(zones->getStartDateString(currentRange));
-    txtEndDate->setText(zones->getEndDateString(currentRange));
-}
-
-
-int CyclistPage::getCurrentRange()
-{
-    return currentRange;
-}
-
-
-bool CyclistPage::isNewMode()
-{
-    return (checkboxNew->checkState() == Qt::Checked);
 }
 
 DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
@@ -1367,5 +1216,526 @@ FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
             add.type = ((QComboBox*)fields->itemWidget(item, 2))->currentIndex();
 
         fieldList.append(add);
+    }
+}
+
+//
+// Zone Config page
+//
+ZonePage::ZonePage(MainWindow *main) : main(main)
+{
+    QVBoxLayout *layout = new QVBoxLayout(this);
+
+    // get current config by reading it in (leave mainwindow zones alone)
+    QFile zonesFile(main->home.absolutePath() + "/power.zones");
+    if (zonesFile.exists()) {
+        zones.read(zonesFile);
+        zonesFile.close();
+    }
+
+    // setup maintenance pages using current config
+    schemePage = new SchemePage(this);
+    cpPage = new CPPage(this);
+
+    tabs = new QTabWidget(this);
+    tabs->addTab(cpPage, tr("Critical Power History"));
+    tabs->addTab(schemePage, tr("Default Zones"));
+
+    layout->addWidget(tabs);
+}
+
+void
+ZonePage::saveClicked()
+{
+    zones.setScheme(schemePage->getScheme());
+    zones.write(main->home);
+}
+
+SchemePage::SchemePage(ZonePage* zonePage) : zonePage(zonePage)
+{
+    QGridLayout *mainLayout = new QGridLayout(this);
+
+    addButton = new QPushButton(tr("Add"));
+    renameButton = new QPushButton(tr("Rename"));
+    deleteButton = new QPushButton(tr("Delete"));
+
+    QVBoxLayout *actionButtons = new QVBoxLayout;
+    actionButtons->addWidget(addButton);
+    actionButtons->addWidget(renameButton);
+    actionButtons->addWidget(deleteButton);
+    actionButtons->addStretch();
+
+    scheme = new QTreeWidget;
+    scheme->headerItem()->setText(0, tr("Short"));
+    scheme->headerItem()->setText(1, tr("Long"));
+    scheme->headerItem()->setText(2, tr("Percent of CP"));
+    scheme->setColumnCount(3);
+    scheme->setSelectionMode(QAbstractItemView::SingleSelection);
+    scheme->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    scheme->setUniformRowHeights(true);
+    scheme->setIndentation(0);
+    scheme->header()->resizeSection(0,90);
+    scheme->header()->resizeSection(1,200);
+    scheme->header()->resizeSection(2,80);
+
+    // setup list
+    for (int i=0; i< zonePage->zones.getScheme().nzones_default; i++) {
+
+        QTreeWidgetItem *add = new QTreeWidgetItem(scheme->invisibleRootItem());
+        add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+        // tab name
+        add->setText(0, zonePage->zones.getScheme().zone_default_name[i]);
+        // field name
+        add->setText(1, zonePage->zones.getScheme().zone_default_desc[i]);
+
+        // low
+        QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
+        loedit->setMinimum(0);
+        loedit->setMaximum(1000);
+        loedit->setSingleStep(1.0);
+        loedit->setDecimals(0);
+        loedit->setValue(zonePage->zones.getScheme().zone_default[i]);
+        scheme->setItemWidget(add, 2, loedit);
+    }
+
+    mainLayout->addWidget(scheme, 0,0);
+    mainLayout->addLayout(actionButtons, 0,1);
+
+    // button connect
+    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
+    connect(renameButton, SIGNAL(clicked()), this, SLOT(renameClicked()));
+    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+}
+
+void
+SchemePage::addClicked()
+{
+    // are we at maximum already?
+    if (scheme->invisibleRootItem()->childCount() == 10) {
+        QMessageBox err;
+        err.setText("Maximum of 10 zones reached.");
+        err.setIcon(QMessageBox::Warning);
+        err.exec();
+        return;
+    }
+
+    int index = scheme->invisibleRootItem()->childCount();
+
+    // new item
+    QTreeWidgetItem *add = new QTreeWidgetItem;
+    add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+    QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
+    loedit->setMinimum(0);
+    loedit->setMaximum(1000);
+    loedit->setSingleStep(1.0);
+    loedit->setDecimals(0);
+    loedit->setValue(100);
+
+    scheme->invisibleRootItem()->insertChild(index, add);
+    scheme->setItemWidget(add, 2, loedit);
+
+    // Short
+    QString text = "New";
+    for (int i=0; scheme->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
+        text = QString("New (%1)").arg(i+1);
+    }
+    add->setText(0, text);
+
+    // long
+    text = "New";
+    for (int i=0; scheme->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
+        text = QString("New (%1)").arg(i+1);
+    }
+    add->setText(1, text);
+}
+
+void
+SchemePage::renameClicked()
+{
+    // which one is selected?
+    if (scheme->currentItem()) scheme->editItem(scheme->currentItem(), 0);
+}
+
+void
+SchemePage::deleteClicked()
+{
+    if (scheme->currentItem()) {
+        int index = scheme->invisibleRootItem()->indexOfChild(scheme->currentItem());
+        delete scheme->invisibleRootItem()->takeChild(index);
+    }
+}
+
+// just for qSorting
+struct schemeitem {
+    QString name, desc;
+    int lo;
+    bool operator<(schemeitem right) const { return lo < right.lo; }
+};
+
+ZoneScheme
+SchemePage::getScheme()
+{
+    // read the scheme widget and return a scheme object
+    QList<schemeitem> table;
+    ZoneScheme results;
+
+    // read back the details from the table
+    for (int i=0; i<scheme->invisibleRootItem()->childCount(); i++) {
+
+        schemeitem add;
+        add.name = scheme->invisibleRootItem()->child(i)->text(0);
+        add.desc = scheme->invisibleRootItem()->child(i)->text(1);
+        add.lo = ((QDoubleSpinBox *)(scheme->itemWidget(scheme->invisibleRootItem()->child(i), 2)))->value();
+        table.append(add);
+    }
+
+    // sort the list into ascending order
+    qSort(table);
+
+    // now update the results
+    results.nzones_default = 0;
+    foreach(schemeitem zone, table) {
+        results.nzones_default++;
+        results.zone_default.append(zone.lo);
+        results.zone_default_is_pct.append(true);
+        results.zone_default_name.append(zone.name);
+        results.zone_default_desc.append(zone.desc);
+    }
+
+    return results;
+}
+
+
+CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
+{
+    active = false;
+
+    QGridLayout *mainLayout = new QGridLayout(this);
+
+    addButton = new QPushButton(tr("Add CP"));
+    deleteButton = new QPushButton(tr("Delete CP"));
+    defaultButton = new QPushButton(tr("Default"));
+    defaultButton->hide();
+
+    addZoneButton = new QPushButton(tr("Add Zone"));
+    deleteZoneButton = new QPushButton(tr("Delete Zone"));
+
+    QVBoxLayout *actionButtons = new QVBoxLayout;
+    actionButtons->addWidget(addButton);
+    actionButtons->addWidget(deleteButton);
+    actionButtons->addWidget(defaultButton);
+    actionButtons->addStretch();
+
+    QVBoxLayout *zoneButtons = new QVBoxLayout;
+    zoneButtons->addWidget(addZoneButton);
+    zoneButtons->addWidget(deleteZoneButton);
+    zoneButtons->addStretch();
+
+    QHBoxLayout *addLayout = new QHBoxLayout;
+    QLabel *dateLabel = new QLabel(tr("From Date"));
+    QLabel *cpLabel = new QLabel(tr("Critical Power"));
+    dateEdit = new QDateEdit;
+    dateEdit->setDate(QDate::currentDate());
+
+    cpEdit = new QDoubleSpinBox;
+    cpEdit->setMinimum(0);
+    cpEdit->setMaximum(1000);
+    cpEdit->setSingleStep(1.0);
+    cpEdit->setDecimals(0);
+
+    addLayout->addWidget(dateLabel);
+    addLayout->addWidget(dateEdit);
+    addLayout->addWidget(cpLabel);
+    addLayout->addWidget(cpEdit);
+    addLayout->addStretch();
+
+    ranges = new QTreeWidget;
+    ranges->headerItem()->setText(0, tr("From Date"));
+    ranges->headerItem()->setText(1, tr("Critical Power"));
+    ranges->setColumnCount(2);
+    ranges->setSelectionMode(QAbstractItemView::SingleSelection);
+    //ranges->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    ranges->setUniformRowHeights(true);
+    ranges->setIndentation(0);
+    ranges->header()->resizeSection(0,180);
+
+    // setup list of ranges
+    for (int i=0; i< zonePage->zones.getRangeSize(); i++) {
+
+        QTreeWidgetItem *add = new QTreeWidgetItem(ranges->invisibleRootItem());
+        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
+
+        // Embolden ranges with manually configured zones
+        QFont font;
+        font.setWeight(zonePage->zones.getZoneRange(i).zonesSetFromCP ?
+                                        QFont::Normal : QFont::Black);
+
+        // date
+        add->setText(0, zonePage->zones.getStartDate(i).toString("MMM d, yyyy"));
+        add->setFont(0, font);
+
+        // CP
+        add->setText(1, QString("%1").arg(zonePage->zones.getCP(i)));
+        add->setFont(1, font);
+    }
+
+    zones = new QTreeWidget;
+    zones->headerItem()->setText(0, tr("Short"));
+    zones->headerItem()->setText(1, tr("Long"));
+    zones->headerItem()->setText(2, tr("From Watts"));
+    zones->setColumnCount(3);
+    zones->setSelectionMode(QAbstractItemView::SingleSelection);
+    zones->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    zones->setUniformRowHeights(true);
+    zones->setIndentation(0);
+    zones->header()->resizeSection(0,80);
+    zones->header()->resizeSection(1,150);
+
+    mainLayout->addLayout(addLayout, 0,0);
+    mainLayout->addWidget(ranges, 2,0);
+    mainLayout->addWidget(zones, 4,0);
+    mainLayout->addLayout(actionButtons, 0,1,0,3);
+    mainLayout->addLayout(zoneButtons, 4,1);
+
+    // button connect
+    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
+    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+    connect(defaultButton, SIGNAL(clicked()), this, SLOT(defaultClicked()));
+    connect(addZoneButton, SIGNAL(clicked()), this, SLOT(addZoneClicked()));
+    connect(deleteZoneButton, SIGNAL(clicked()), this, SLOT(deleteZoneClicked()));
+    connect(ranges, SIGNAL(itemSelectionChanged()), this, SLOT(rangeSelectionChanged()));
+    connect(zones, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(zonesChanged()));
+}
+
+void
+CPPage::addClicked()
+{
+    // get current scheme
+    zonePage->zones.setScheme(zonePage->schemePage->getScheme());
+
+    //int index = ranges->invisibleRootItem()->childCount();
+    int index = zonePage->zones.addZoneRange(dateEdit->date(), cpEdit->value());
+
+    // new item
+    QTreeWidgetItem *add = new QTreeWidgetItem;
+    add->setFlags(add->flags() & ~Qt::ItemIsEditable);
+    ranges->invisibleRootItem()->insertChild(index, add);
+
+    // date
+    add->setText(0, dateEdit->date().toString("MMM d, yyyy"));
+
+    // CP
+    add->setText(1, QString("%1").arg(cpEdit->value()));
+}
+
+void
+CPPage::deleteClicked()
+{
+    if (ranges->currentItem()) {
+        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
+        delete ranges->invisibleRootItem()->takeChild(index);
+        zonePage->zones.deleteRange(index);
+    }
+}
+
+void
+CPPage::defaultClicked()
+{
+    if (ranges->currentItem()) {
+
+        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
+        ZoneRange current = zonePage->zones.getZoneRange(index);
+
+        // unbold
+        QFont font;
+        font.setWeight(QFont::Normal);
+        ranges->currentItem()->setFont(0, font);
+        ranges->currentItem()->setFont(1, font);
+
+        // set the range to use defaults on the scheme page
+        zonePage->zones.setScheme(zonePage->schemePage->getScheme());
+        zonePage->zones.setZonesFromCP(index);
+
+        // hide the default button since we are now using defaults
+        defaultButton->hide();
+
+        // update the zones display
+        rangeSelectionChanged();
+    }
+}
+
+void
+CPPage::rangeSelectionChanged()
+{
+    active = true;
+
+    // wipe away current contents of zones
+    foreach (QTreeWidgetItem *item, zones->invisibleRootItem()->takeChildren()) {
+        delete zones->itemWidget(item, 2);
+        delete item;
+    }
+
+    // fill with current details
+    if (ranges->currentItem()) {
+
+        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
+        ZoneRange current = zonePage->zones.getZoneRange(index);
+
+        if (current.zonesSetFromCP) {
+
+            // reapply the scheme in case it has been changed
+            zonePage->zones.setScheme(zonePage->schemePage->getScheme());
+            zonePage->zones.setZonesFromCP(index);
+            current = zonePage->zones.getZoneRange(index);
+
+            defaultButton->hide();
+
+        } else defaultButton->show();
+
+        for (int i=0; i< current.zones.count(); i++) {
+
+            QTreeWidgetItem *add = new QTreeWidgetItem(zones->invisibleRootItem());
+            add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+            // tab name
+            add->setText(0, current.zones[i].name);
+            // field name
+            add->setText(1, current.zones[i].desc);
+
+            // low
+            QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
+            loedit->setMinimum(0);
+            loedit->setMaximum(1000);
+            loedit->setSingleStep(1.0);
+            loedit->setDecimals(0);
+            loedit->setValue(current.zones[i].lo);
+            zones->setItemWidget(add, 2, loedit);
+            connect(loedit, SIGNAL(editingFinished()), this, SLOT(zonesChanged()));
+        }
+    }
+
+    active = false;
+}
+
+void
+CPPage::addZoneClicked()
+{
+    // no range selected
+    if (!ranges->currentItem()) return;
+
+    // are we at maximum already?
+    if (zones->invisibleRootItem()->childCount() == 10) {
+        QMessageBox err;
+        err.setText("Maximum of 10 zones reached.");
+        err.setIcon(QMessageBox::Warning);
+        err.exec();
+        return;
+    }
+
+    active = true;
+    int index = zones->invisibleRootItem()->childCount();
+
+    // new item
+    QTreeWidgetItem *add = new QTreeWidgetItem;
+    add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+    QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
+    loedit->setMinimum(0);
+    loedit->setMaximum(1000);
+    loedit->setSingleStep(1.0);
+    loedit->setDecimals(0);
+    loedit->setValue(100);
+
+    zones->invisibleRootItem()->insertChild(index, add);
+    zones->setItemWidget(add, 2, loedit);
+    connect(loedit, SIGNAL(editingFinished()), this, SLOT(zonesChanged()));
+
+    // Short
+    QString text = "New";
+    for (int i=0; zones->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
+        text = QString("New (%1)").arg(i+1);
+    }
+    add->setText(0, text);
+
+    // long
+    text = "New";
+    for (int i=0; zones->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
+        text = QString("New (%1)").arg(i+1);
+    }
+    add->setText(1, text);
+    active = false;
+
+    zonesChanged();
+}
+
+void
+CPPage::deleteZoneClicked()
+{
+    // no range selected
+    if (ranges->invisibleRootItem()->indexOfChild(ranges->currentItem()) == -1)
+        return;
+
+    active = true;
+    if (zones->currentItem()) {
+        int index = zones->invisibleRootItem()->indexOfChild(zones->currentItem());
+        delete zones->invisibleRootItem()->takeChild(index);
+    }
+    active = false;
+
+    zonesChanged();
+}
+
+void
+CPPage::zonesChanged()
+{
+    // only take changes when they are not done programmatically
+    // the active flag is set when the tree is being modified
+    // programmatically, but not when users interact with the widgets
+    if (active == false) {
+        // get the current zone range
+        if (ranges->currentItem()) {
+
+            int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
+            ZoneRange current = zonePage->zones.getZoneRange(index);
+
+            // embolden that range on the list to show it has been edited
+            QFont font;
+            font.setWeight(QFont::Black);
+            ranges->currentItem()->setFont(0, font);
+            ranges->currentItem()->setFont(1, font);
+
+            // show the default button to undo
+            defaultButton->show();
+
+            // we manually edited so save in full
+            current.zonesSetFromCP = false;
+
+            // create the new zoneinfos for this range
+            QList<ZoneInfo> zoneinfos;
+            for (int i=0; i< zones->invisibleRootItem()->childCount(); i++) {
+                QTreeWidgetItem *item = zones->invisibleRootItem()->child(i);
+                zoneinfos << ZoneInfo(item->text(0),
+                                      item->text(1),
+                                      ((QDoubleSpinBox*)zones->itemWidget(item, 2))->value(),
+                                      0);
+            }
+
+            // now sort the list
+            qSort(zoneinfos);
+
+            // now fill the highs
+            for(int i=0; i<zoneinfos.count(); i++) {
+                if (i+1 <zoneinfos.count())
+                    zoneinfos[i].hi = zoneinfos[i+1].lo;
+                else
+                    zoneinfos[i].hi = INT_MAX;
+            }
+            current.zones = zoneinfos;
+
+            // now replace the current range struct
+            zonePage->zones.setZoneRange(index, current);
+        }
     }
 }

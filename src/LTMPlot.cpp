@@ -614,6 +614,7 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
         if (units == "seconds") {
             units = "hours"; // we translate from seconds to hours
             value = ceil(curve->y(index)*10.0)/10.0;
+            precision = 1; // new more precision since converting to hours
         }
 
         // output the tooltip
