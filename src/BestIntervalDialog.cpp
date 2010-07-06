@@ -267,7 +267,6 @@ BestIntervalDialog::findBests(const RideFile *ride, double windowSizeSecs,
         totalWatts += point->watts;
         window.append(point);
         double duration = intervalDuration(window.first(), window.last(), ride);
-        assert(duration < windowSizeSecs + secsDelta);
         if (duration >= windowSizeSecs) {
             double start = window.first()->secs;
             double stop = start + duration;
