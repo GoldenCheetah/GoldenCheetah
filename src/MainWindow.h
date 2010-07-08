@@ -158,6 +158,7 @@ class MainWindow : public QMainWindow
         void frontInterval();
         void backInterval();
         void intervalEdited(QTreeWidgetItem *, int);
+        void tweetRide();
 
     protected: 
 

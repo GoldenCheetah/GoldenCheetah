@@ -1819,3 +1819,29 @@ CPPage::zonesChanged()
         }
     }
 }
+//
+// Twitter Config page
+//
+TwitterPage::TwitterPage(QWidget *parent) : QWidget(parent)
+{
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+    QTabWidget *tabs = new QTabWidget(this);
+    QWidget *twitter = new QWidget(this);
+    tabs->addTab(twitter, tr("Twitter Config"));
+    QHBoxLayout *twitterlayout = new QHBoxLayout(twitter);
+
+    accountLabel = new QLabel(tr("Twitter User Name"),this);
+    accountName = new QLineEdit(tr(""), this);
+
+    passwordLabel = new QLabel(tr("Password"),this);
+    passwordEdit = new QLineEdit(tr(""), this);
+    passwordEdit->setEchoMode(QLineEdit::Password);
+
+    twitterlayout->addWidget(accountLabel);
+    twitterlayout->addWidget(accountName);
+    twitterlayout->addWidget(passwordLabel);
+    twitterlayout->addWidget(passwordEdit);
+
+    accountName->setText(settings->value(GC_TWITTER_USERNAME).toString());
+    passwordEdit->setText(settings->value(GC_TWITTER_PASSWORD).toString());
+}

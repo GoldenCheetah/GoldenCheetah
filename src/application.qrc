@@ -1,5 +1,6 @@
 <!DOCTYPE RCC><RCC version="1.0">
  <qresource>
+    <file>images/twitter.png</file>
     <file>images/cyclist.png</file>
     <file>images/imetrics.png</file>
     <file>images/power.png</file>
