@@ -16,6 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <QTreeWidgetItem>
 #include "RideItem.h"
 #include "RideMetric.h"
 #include "RideFile.h"
@@ -27,7 +28,7 @@
 RideItem::RideItem(int type,
                    QString path, QString fileName, const QDateTime &dateTime,
                    const Zones *zones, QString notesFileName, MainWindow *main) :
-    QTreeWidgetItem(type), ride_(NULL), main(main), isdirty(false), path(path), fileName(fileName),
+    QTreeWidgetItem(type), ride_(NULL), main(main), isdirty(false), isedit(false), path(path), fileName(fileName),
     dateTime(dateTime), zones(zones), notesFileName(notesFileName)
 {
     setText(0, dateTime.toString("ddd"));
@@ -44,11 +45,43 @@ RideFile *RideItem::ride()
     // open the ride file
     QFile file(path + "/" + fileName);
     ride_ = RideFileFactory::instance().openRideFile(file, errors_);
+    setDirty(false); // we're gonna use on-disk so by
+                     // definition it is clean - but do it *after*
+                     // we read the file since it will almost
+                     // certainly be referenced by consuming widgets
+
+    // stay aware of state changes to our ride
+    // MainWindow saves and RideFileCommand modifies
+    connect(ride_, SIGNAL(modified()), this, SLOT(modified()));
+    connect(ride_, SIGNAL(saved()), this, SLOT(saved()));
+    connect(ride_, SIGNAL(reverted()), this, SLOT(reverted()));
+
     return ride_;
 }
+
+void
+RideItem::modified()
+{
+    setDirty(true);
+}
+
+void
+RideItem::saved()
+{
+    setDirty(false);
+}
+
+void
+RideItem::reverted()
+{
+    setDirty(false);
+}
+
 void
 RideItem::setDirty(bool val)
 {
+    if (isdirty == val) return; // np change
+
     isdirty = val;
 
     if (isdirty == true) {
@@ -60,6 +93,8 @@ RideItem::setDirty(bool val)
             setFont(i, current);
         }
 
+        main->notifyRideDirty();
+
     } else {
 
         // show ride in normal on the list view
@@ -68,6 +103,8 @@ RideItem::setDirty(bool val)
             current.setWeight(QFont::Normal);
             setFont(i, current);
         }
+
+        main->notifyRideClean();
     }
 }
 

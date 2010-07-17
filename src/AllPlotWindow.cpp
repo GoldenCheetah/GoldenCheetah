@@ -453,8 +453,6 @@ AllPlotWindow::setEndSelection(AllPlot* plot, int xPosition, bool newInterval, Q
         //allMarker3->setZ(-1000.0);
         allMarker3->show();
 
-        RideFile tmpRide = RideFile();
-
         QTreeWidgetItem *which = mainWindow->rideItem();
         RideItem *ride = (RideItem*)which;
 

@@ -21,6 +21,7 @@
 #include "DeviceTypes.h"
 #include "DeviceConfiguration.h"
 #include "RideMetadata.h"
+#include "DataProcessor.h"
 
 class QGroupBox;
 class QHBoxLayout;
@@ -265,6 +266,30 @@ class FieldsPage : public QWidget
         QPushButton *upButton, *downButton, *addButton, *renameButton, *deleteButton;
 };
 
+class ProcessorPage : public QWidget
+{
+    Q_OBJECT
+
+    public:
+
+        ProcessorPage(MainWindow *main);
+        void saveClicked();
+
+    public slots:
+
+        //void upClicked();
+        //void downClicked();
+
+    protected:
+
+        MainWindow *main;
+        QMap<QString, DataProcessor*> processors;
+
+        QTreeWidget *processorTree;
+        //QPushButton *upButton, *downButton;
+
+};
+
 class MetadataPage : public QWidget
 {
     Q_OBJECT
@@ -285,6 +310,7 @@ class MetadataPage : public QWidget
         QTabWidget *tabs;
         KeywordsPage *keywordsPage;
         FieldsPage *fieldsPage;
+        ProcessorPage *processorPage;
 
         // local versions for modification
         QList<KeywordDefinition> keywordDefinitions;

@@ -73,6 +73,13 @@
 #define GC_DEV_DEFI  "devicedefi"
 #define GC_DEV_DEFR  "devicedefr"
 
+// data processor config
+#define GC_DPFG_TOLERANCE "dataprocess/fixgaps/tolerance"
+#define GC_DPFG_STOP      "dataprocess/fixgaps/stop"
+#define GC_DPFS_MAX       "dataprocess/fixspikes/max"
+#define GC_DPFS_VARIANCE  "dataprocess/fixspikes/variance"
+#define GC_DPTA           "dataprocess/torqueadjust/adjustment"
+
 #include <QSettings>
 #include <boost/shared_ptr.hpp>
 
