@@ -34,6 +34,13 @@ SpecialFields::SpecialFields()
             << "Weight"       // in WKO and possibly others
             << "Device"       // RideFile::devicetype
             << "Device Info"  // in WKO and TCX and possibly others
+            << "Dropouts"     // calculated from source data by FixGaps
+            << "Dropout Time" // calculated from source data vy FixGaps
+            << "Spikes"       // calculated from source data by FixSpikes
+            << "Spike Time"   // calculated from source data by FixSpikes
+            << "Torque Adjust" // the last torque adjust applied
+            << "Filename"      // set by the rideFile reader
+            << "Change History" // set by RideFileCommand
             ;
 
     // now add all the metric fields (for metric overrides)

@@ -28,10 +28,6 @@
 #include <qwt_plot_grid.h>
 #include <assert.h>
 
-// XXX: these are also defined in MainWindow.cpp.  Fugly.
-#define FOLDER_TYPE 0
-#define RIDE_TYPE 1
-
 WeeklySummaryWindow::WeeklySummaryWindow(bool useMetricUnits,
                                          MainWindow *mainWindow) :
     QWidget(mainWindow), mainWindow(mainWindow),

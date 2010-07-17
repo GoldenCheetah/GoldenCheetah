@@ -843,10 +843,12 @@ MetadataPage::MetadataPage(MainWindow *main) : main(main)
     // setup maintenance pages using current config
     fieldsPage = new FieldsPage(this, fieldDefinitions);
     keywordsPage = new KeywordsPage(this, keywordDefinitions);
+    processorPage = new ProcessorPage(main);
 
     tabs = new QTabWidget(this);
     tabs->addTab(fieldsPage, tr("Fields"));
     tabs->addTab(keywordsPage, tr("Notes Keywords"));
+    tabs->addTab(processorPage, tr("Processing"));
 
     layout->addWidget(tabs);
 }
@@ -860,6 +862,9 @@ MetadataPage::saveClicked()
 
     // write to metadata.xml
     RideMetadata::serialize(main->home.absolutePath() + "/metadata.xml", keywordDefinitions, fieldDefinitions);
+
+    // save processors config
+    processorPage->saveClicked();
 }
 
 // little helper since we create/recreate combos
@@ -1216,6 +1221,81 @@ FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
             add.type = ((QComboBox*)fields->itemWidget(item, 2))->currentIndex();
 
         fieldList.append(add);
+    }
+}
+
+//
+// Data processors config page
+//
+ProcessorPage::ProcessorPage(MainWindow *main) : main(main)
+{
+    // get the available processors
+    const DataProcessorFactory &factory = DataProcessorFactory::instance();
+    processors = factory.getProcessors();
+
+    QGridLayout *mainLayout = new QGridLayout(this);
+
+    processorTree = new QTreeWidget;
+    processorTree->headerItem()->setText(0, tr("Processor"));
+    processorTree->headerItem()->setText(1, tr("Apply"));
+    processorTree->headerItem()->setText(2, tr("Settings"));
+    processorTree->setColumnCount(3);
+    processorTree->setSelectionMode(QAbstractItemView::NoSelection);
+    processorTree->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    processorTree->setUniformRowHeights(true);
+    processorTree->setIndentation(0);
+    processorTree->header()->resizeSection(0,150);
+
+    // iterate over all the processors and add an entry to the
+    QMapIterator<QString, DataProcessor*> i(processors);
+    i.toFront();
+    while (i.hasNext()) {
+        i.next();
+
+        QTreeWidgetItem *add;
+
+        add = new QTreeWidgetItem(processorTree->invisibleRootItem());
+        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
+
+        // Processor Name
+        add->setText(0, i.key());
+
+        // Auto or Manual run?
+        QComboBox *comboButton = new QComboBox(this);
+        comboButton->addItem(tr("Manual"));
+        comboButton->addItem(tr("Auto"));
+        processorTree->setItemWidget(add, 1, comboButton);
+
+        QString configsetting = QString("dp/%1/apply").arg(i.key());
+        boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+        if (settings->value(configsetting, "Manual").toString() == "Manual")
+            comboButton->setCurrentIndex(0);
+        else
+            comboButton->setCurrentIndex(1);
+
+        // Get and Set the Config Widget
+        DataProcessorConfig *config = i.value()->processorConfig(this);
+        config->readConfig();
+
+        processorTree->setItemWidget(add, 2, config);
+    }
+
+    mainLayout->addWidget(processorTree, 0,0);
+}
+
+void
+ProcessorPage::saveClicked()
+{
+    // call each processor config widget's saveConfig() to
+    // write away separately
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+    for (int i=0; i<processorTree->invisibleRootItem()->childCount(); i++) {
+        // auto or manual?
+        QString configsetting = QString("dp/%1/apply").arg(processorTree->invisibleRootItem()->child(i)->text(0));
+        QString apply = ((QComboBox*)(processorTree->itemWidget(processorTree->invisibleRootItem()->child(i), 1)))->currentIndex() ?
+                        "Auto" : "Manual";
+        settings->setValue(configsetting, apply);
+        ((DataProcessorConfig*)(processorTree->itemWidget(processorTree->invisibleRootItem()->child(i), 2)))->saveConfig();
     }
 }
 
