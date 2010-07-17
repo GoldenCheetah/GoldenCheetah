@@ -19,6 +19,7 @@
 #include "GcRideFile.h"
 #include "RideItem.h"
 #include "RideFile.h"
+#include "RideFileCommand.h"
 #include "Settings.h"
 #include "SaveDialogs.h"
 
@@ -175,6 +176,13 @@ MainWindow::saveSilent(RideItem *rideItem)
         savedFile.setFileName(currentFile.fileName());
     }
 
+    // update the change history
+    QString log = rideItem->ride()->getTag("Change History", "");
+    log +=  tr("Changes on ");
+    log +=  QDateTime::currentDateTime().toString() + ":";
+    log += '\n' + rideItem->ride()->command->changeLog();
+    rideItem->ride()->setTag("Change History", log);
+
     // save in GC format
     GcFileReader reader;
     reader.writeRideFile(rideItem->ride(), savedFile);
@@ -190,7 +198,7 @@ MainWindow::saveSilent(RideItem *rideItem)
     }
 
     // mark clean as we have now saved the data
-    rideItem->setDirty(false);
+    rideItem->ride()->emitSaved();
 }
 
 //----------------------------------------------------------------------

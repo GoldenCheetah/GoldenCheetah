@@ -20,13 +20,24 @@
 #define _GC_RideItem_h 1
 
 #include <QtGui>
+#include <QTreeWidgetItem>
 #include "RideMetric.h"
 
 class RideFile;
+class RideEditor;
 class MainWindow;
 class Zones;
 
-class RideItem : public QTreeWidgetItem {
+// Because we have subclassed QTreeWidgetItem we
+// need to use our own type, this MUST be greater than
+// QTreeWidgetItem::UserType according to the docs
+#define FOLDER_TYPE 0
+#define RIDE_TYPE (QTreeWidgetItem::UserType+1)
+
+class RideItem : public QObject, public QTreeWidgetItem //<< for signals/slots
+{
+
+    Q_OBJECT
 
     protected:
 
@@ -36,12 +47,19 @@ class RideItem : public QTreeWidgetItem {
         MainWindow *main; // to notify widgets when date/time changes
         bool isdirty;
 
+    public slots:
+        void modified();
+        void reverted();
+        void saved();
+
     public:
+
+        bool isedit; // is being edited at the moment
 
         QString path;
         QString fileName;
         QDateTime dateTime;
-	QDateTime computeMetricsTime;
+	    QDateTime computeMetricsTime;
         RideFile *ride();
         const QStringList errors() { return errors_; }
         const Zones *zones;
@@ -65,4 +83,3 @@ class RideItem : public QTreeWidgetItem {
         double timeInZone(int zone);
 };
 #endif // _GC_RideItem_h
-

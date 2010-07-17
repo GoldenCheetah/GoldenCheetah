@@ -221,7 +221,13 @@ FormField::FormField(FieldDefinition field, MainWindow *main) : definition(field
             widget = main->rideNotesWidget();
         } else {
             widget = new QTextEdit(this);
-            connect (widget, SIGNAL(textChanged()), this, SLOT(editFinished()));
+            if (field.name == "Change History") {
+                dynamic_cast<QTextEdit*>(widget)->setReadOnly(true);
+                // pick up when ride saved - since it gets updated then
+                connect (main, SIGNAL(rideClean()), this, SLOT(rideSelected()));
+            } else {
+                connect (widget, SIGNAL(textChanged()), this, SLOT(editFinished()));
+            }
         }
         break;
 

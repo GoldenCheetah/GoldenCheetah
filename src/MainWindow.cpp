@@ -38,6 +38,7 @@
 #include "RealtimeWindow.h"
 #include "RideItem.h"
 #include "IntervalItem.h"
+#include "RideEditor.h"
 #include "RideFile.h"
 #include "RideSummaryWindow.h"
 #include "RideImportWizard.h"
@@ -69,9 +70,6 @@
 #ifndef GC_VERSION
 #define GC_VERSION "(developer build)"
 #endif
-
-#define FOLDER_TYPE 0
-#define RIDE_TYPE 1
 
 bool
 MainWindow::parseRideFileName(const QString &name, QString *notesFileName, QDateTime *dt)
@@ -322,6 +320,11 @@ MainWindow::MainWindow(const QDir &home) :
     googleMap = new GoogleMapControl(this);
     tabs.append(TabInfo(googleMap, tr("Map")));
 
+    ///////////////////////////// Editor  //////////////////////////////////
+
+    rideEdit = new RideEditor(this);
+    tabs.append(TabInfo(rideEdit, tr("Editor")));
+
     ////////////////////////////// Signals ////////////////////////////// 
 
     connect(calendar, SIGNAL(clicked(const QDate &)),
@@ -391,6 +394,29 @@ MainWindow::MainWindow(const QDir &home) :
     //                       SLOT(importRideToDB()), tr("Ctrl+R")); 
     //optionsMenu->addAction(tr("&Update Metrics..."), this, 
     //                       SLOT(scanForMissing()()), tr("Ctrl+U")); 
+
+    // get the available processors
+    const DataProcessorFactory &factory = DataProcessorFactory::instance();
+    QMap<QString, DataProcessor*> processors = factory.getProcessors();
+
+    if (processors.count()) {
+
+        optionsMenu->addSeparator();
+        toolMapper = new QSignalMapper(this); // maps each option
+        QMapIterator<QString, DataProcessor*> i(processors);
+        connect(toolMapper, SIGNAL(mapped(const QString &)), this, SLOT(manualProcess(const QString &)));
+
+        i.toFront();
+        while (i.hasNext()) {
+            i.next();
+            QAction *action = new QAction(QString("%1...").arg(i.key()), this);
+            optionsMenu->addAction(action);
+            connect(action, SIGNAL(triggered()), toolMapper, SLOT(map()));
+            toolMapper->setMapping(action, i.key());
+        }
+    }
+
+
 
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
     QStringList tabsToHide = settings->value(GC_TABS_TO_HIDE, "").toString().split(",");
@@ -507,7 +533,7 @@ MainWindow::addRide(QString name, bool bSelect /*=true*/)
         QTreeWidgetItem *item = allRides->child(index);
         if (item->type() != RIDE_TYPE)
             continue;
-        RideItem *other = reinterpret_cast<RideItem*>(item);
+        RideItem *other = static_cast<RideItem*>(item);
         
         if(isAscending.toInt() > 0 ){
             if (other->dateTime > dt)
@@ -541,7 +567,7 @@ MainWindow::removeCurrentRide()
     QTreeWidgetItem *_item = treeWidget->currentItem();
     if (_item->type() != RIDE_TYPE)
         return;
-    RideItem *item = reinterpret_cast<RideItem*>(_item);
+    RideItem *item = static_cast<RideItem*>(_item);
 
     rideDeleted(item);
 
@@ -856,6 +882,9 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
         QAction *actSaveRide = new QAction(tr("Save Changes to Ride"), treeWidget);
         connect(actSaveRide, SIGNAL(triggered(void)), this, SLOT(saveRide()));
 
+        QAction *revertRide = new QAction(tr("Revert to Saved Ride"), treeWidget);
+        connect(revertRide, SIGNAL(triggered(void)), this, SLOT(revertRide()));
+
         QAction *actDeleteRide = new QAction(tr("Delete Ride"), treeWidget);
         connect(actDeleteRide, SIGNAL(triggered(void)), this, SLOT(deleteRide()));
 
@@ -870,8 +899,10 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
 
 
 
-        if (rideItem->isDirty() == true)
+        if (rideItem->isDirty() == true) {
           menu.addAction(actSaveRide);
+          menu.addAction(revertRide);
+        }
 
         menu.addAction(actDeleteRide);
 	menu.addAction(actBestInt);
@@ -1175,7 +1206,10 @@ void
 MainWindow::closeEvent(QCloseEvent* event)
 {
     if (saveRideExitDialog() == false) event->ignore();
-    saveNotes();
+    else {
+        saveNotes();
+        QApplication::clipboard()->setText("");
+    }
 }
 
 void
@@ -1296,6 +1330,17 @@ MainWindow::saveRide()
 }
 
 void
+MainWindow::revertRide()
+{
+    ride->freeMemory();
+    ride->ride(); // force re-load
+
+    // in case reverted ride has different starttime
+    ride->setStartTime(ride->ride()->startTime()); // Note: this will also signal rideSelected()
+    ride->ride()->emitReverted();
+}
+
+void
 MainWindow::splitRide()
 {
     (new SplitRideDialog(this))->exec();
@@ -1307,7 +1352,7 @@ MainWindow::deleteRide()
     QTreeWidgetItem *_item = treeWidget->currentItem();
     if (_item==NULL || _item->type() != RIDE_TYPE)
         return;
-    RideItem *item = reinterpret_cast<RideItem*>(_item);
+    RideItem *item = static_cast<RideItem*>(_item);
     QMessageBox msgBox;
     msgBox.setText(tr("Are you sure you want to delete the ride:"));
     msgBox.setInformativeText(item->fileName);
@@ -1363,4 +1408,20 @@ void
 MainWindow::notifyRideSelected()
 {
     rideSelected();
+}
+
+void
+MainWindow::manualProcess(QString name)
+{
+    // open a dialog box and let the users
+    // configure the options to use
+    // and also show the explanation
+    // of what this function does
+    // then call it!
+    RideItem *rideitem = (RideItem*)currentRideItem();
+    if (rideitem) {
+        ManualDataProcessorDialog *p = new ManualDataProcessorDialog(this, name, rideitem);
+        p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
+        p->exec();
+    }
 }
