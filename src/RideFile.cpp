@@ -18,6 +18,7 @@
  */
 
 #include "RideFile.h"
+#include "DataProcessor.h"
 #include "Settings.h"
 #include "Units.h"
 #include <QtXml/QtXml>
@@ -31,6 +32,49 @@
     interval = point->interval; \
     start = point->secs; \
 }
+
+#define tr(s) QObject::tr(s)
+
+RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
+            startTime_(startTime), recIntSecs_(recIntSecs),
+            deviceType_("unknown"), data(NULL)
+{
+    command = new RideFileCommand(this);
+}
+
+RideFile::RideFile() : recIntSecs_(0.0), deviceType_("unknown"), data(NULL)
+{
+    command = new RideFileCommand(this);
+}
+
+RideFile::~RideFile()
+{
+    foreach(RideFilePoint *point, dataPoints_)
+        delete point;
+    delete command;
+}
+
+QString
+RideFile::seriesName(SeriesType series)
+{
+    switch (series) {
+    case RideFile::secs: return QString(tr("Time"));
+    case RideFile::cad: return QString(tr("Cadence"));
+    case RideFile::hr: return QString(tr("Heartrate"));
+    case RideFile::km: return QString(tr("Distance"));
+    case RideFile::kph: return QString(tr("Speed"));
+    case RideFile::nm: return QString(tr("Torque"));
+    case RideFile::watts: return QString(tr("Power"));
+    case RideFile::alt: return QString(tr("Altitude"));
+    case RideFile::lon: return QString(tr("Longitude"));
+    case RideFile::lat: return QString(tr("Latitude"));
+    case RideFile::headwind: return QString(tr("Headwind"));
+    case RideFile::interval: return QString(tr("Interval"));
+    default: return QString(tr("Unknown"));
+    }
+}
+
+
 void
 RideFile::clearIntervals()
 {
@@ -206,8 +250,12 @@ RideFile *RideFileFactory::openRideFile(QFile &file,
     RideFileReader *reader = readFuncs_.value(suffix.toLower());
     assert(reader);
     RideFile *result = reader->openRideFile(file, errors);
-    if (result && result->intervals().empty())
-        result->fillInIntervals();
+
+    if (result->intervals().empty()) result->fillInIntervals();
+
+    result->setTag("Filename", file.fileName());
+    DataProcessorFactory::instance().autoProcess(result);
+
     return result;
 }
 
@@ -220,8 +268,7 @@ QStringList RideFileFactory::listRideFiles(const QDir &dir) const
         filters << ("*." + i.key());
     }
     // This will read the user preferences and change the file list order as necessary:
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();;
-
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
     QVariant isAscending = settings->value(GC_ALLRIDES_ASCENDING,Qt::Checked);
     if(isAscending.toInt()>0){
         return dir.entryList(filters, QDir::Files, QDir::Name);
@@ -247,4 +294,192 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     dataPresent.lat   |= (lat != 0);
     dataPresent.headwind |= (headwind != 0);
     dataPresent.interval |= (interval != 0);
+}
+
+void
+RideFile::setDataPresent(SeriesType series, bool value)
+{
+    switch (series) {
+        case secs : dataPresent.secs = value; break;
+        case cad : dataPresent.cad = value; break;
+        case hr : dataPresent.hr = value; break;
+        case km : dataPresent.km = value; break;
+        case kph : dataPresent.kph = value; break;
+        case nm : dataPresent.nm = value; break;
+        case watts : dataPresent.watts = value; break;
+        case alt : dataPresent.alt = value; break;
+        case lon : dataPresent.lon = value; break;
+        case lat : dataPresent.lat = value; break;
+        case headwind : dataPresent.headwind = value; break;
+        case interval : dataPresent.interval = value; break;
+        case none : break;
+    }
+}
+
+bool
+RideFile::isDataPresent(SeriesType series)
+{
+    switch (series) {
+        case secs : return dataPresent.secs; break;
+        case cad : return dataPresent.cad; break;
+        case hr : return dataPresent.hr; break;
+        case km : return dataPresent.km; break;
+        case kph : return dataPresent.kph; break;
+        case nm : return dataPresent.nm; break;
+        case watts : return dataPresent.watts; break;
+        case alt : return dataPresent.alt; break;
+        case lon : return dataPresent.lon; break;
+        case lat : return dataPresent.lat; break;
+        case headwind : return dataPresent.headwind; break;
+        case interval : return dataPresent.interval; break;
+        case none : break;
+    }
+    return false;
+}
+void
+RideFile::setPointValue(int index, SeriesType series, double value)
+{
+    switch (series) {
+        case secs : dataPoints_[index]->secs = value; break;
+        case cad : dataPoints_[index]->cad = value; break;
+        case hr : dataPoints_[index]->hr = value; break;
+        case km : dataPoints_[index]->km = value; break;
+        case kph : dataPoints_[index]->kph = value; break;
+        case nm : dataPoints_[index]->nm = value; break;
+        case watts : dataPoints_[index]->watts = value; break;
+        case alt : dataPoints_[index]->alt = value; break;
+        case lon : dataPoints_[index]->lon = value; break;
+        case lat : dataPoints_[index]->lat = value; break;
+        case headwind : dataPoints_[index]->headwind = value; break;
+        case interval : dataPoints_[index]->interval = value; break;
+        case none : break;
+    }
+}
+
+double
+RideFile::getPointValue(int index, SeriesType series)
+{
+    switch (series) {
+        case secs : return dataPoints_[index]->secs; break;
+        case cad : return dataPoints_[index]->cad; break;
+        case hr : return dataPoints_[index]->hr; break;
+        case km : return dataPoints_[index]->km; break;
+        case kph : return dataPoints_[index]->kph; break;
+        case nm : return dataPoints_[index]->nm; break;
+        case watts : return dataPoints_[index]->watts; break;
+        case alt : return dataPoints_[index]->alt; break;
+        case lon : return dataPoints_[index]->lon; break;
+        case lat : return dataPoints_[index]->lat; break;
+        case headwind : return dataPoints_[index]->headwind; break;
+        case interval : return dataPoints_[index]->interval; break;
+        case none : break;
+    }
+    return 0.0; // shutup the compiler
+}
+
+int
+RideFile::decimalsFor(SeriesType series)
+{
+    switch (series) {
+        case secs : return 3; break;
+        case cad : return 0; break;
+        case hr : return 0; break;
+        case km : return 6; break;
+        case kph : return 4; break;
+        case nm : return 2; break;
+        case watts : return 0; break;
+        case alt : return 3; break;
+        case lon : return 6; break;
+        case lat : return 6; break;
+        case headwind : return 4; break;
+        case interval : return 0; break;
+        case none : break;
+    }
+    return 2; // default
+}
+
+double
+RideFile::maximumFor(SeriesType series)
+{
+    switch (series) {
+        case secs : return 999999; break;
+        case cad : return 300; break;
+        case hr : return 300; break;
+        case km : return 999999; break;
+        case kph : return 999; break;
+        case nm : return 999; break;
+        case watts : return 4000; break;
+        case alt : return 8850; break; // mt everest is highest point above sea level
+        case lon : return 180; break;
+        case lat : return 90; break;
+        case headwind : return 999; break;
+        case interval : return 999; break;
+        case none : break;
+    }
+    return 9999; // default
+}
+
+double
+RideFile::minimumFor(SeriesType series)
+{
+    switch (series) {
+        case secs : return 0; break;
+        case cad : return 0; break;
+        case hr : return 0; break;
+        case km : return 0; break;
+        case kph : return 0; break;
+        case nm : return 0; break;
+        case watts : return 0; break;
+        case alt : return -413; break; // the Red Sea is lowest land point on earth
+        case lon : return -180; break;
+        case lat : return -90; break;
+        case headwind : return -999; break;
+        case interval : return 0; break;
+        case none : break;
+    }
+    return 0; // default
+}
+
+void
+RideFile::deletePoint(int index)
+{
+    delete dataPoints_[index];
+    dataPoints_.remove(index);
+}
+
+void
+RideFile::deletePoints(int index, int count)
+{
+    for(int i=index; i<(index+count); i++) delete dataPoints_[i];
+    dataPoints_.remove(index, count);
+}
+
+void
+RideFile::insertPoint(int index, RideFilePoint *point)
+{
+    dataPoints_.insert(index, point);
+}
+
+void
+RideFile::appendPoints(QVector <struct RideFilePoint *> newRows)
+{
+    dataPoints_ += newRows;
+}
+
+void
+RideFile::emitSaved()
+{
+    emit saved();
+}
+
+void
+RideFile::emitReverted()
+{
+    emit reverted();
+}
+
+void
+RideFile::emitModified()
+{
+    emit modified();
 }

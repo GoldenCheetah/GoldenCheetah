@@ -77,6 +77,7 @@ HEADERS += \
         DBAccess.h \
         DatePickerDialog.h \
         DaysScaleDraw.h \
+        DataProcessor.h \
         Device.h \
         DeviceTypes.h \
         DeviceConfiguration.h \
@@ -92,6 +93,7 @@ HEADERS += \
         LogTimeScaleEngine.h \
         LTMCanvasPicker.h \
         LTMChartParser.h \
+        LTMOutliers.h \
         LTMPlot.h \
         LTMSettings.h \
         LTMTool.h \
@@ -120,7 +122,10 @@ HEADERS += \
         ComputrainerController.h \
         RealtimePlot.h \
         RideCalendar.h \
+        RideEditor.h \
         RideFile.h \
+        RideFileCommand.h \
+        RideFileTableModel.h \
         RideImportWizard.h \
         RideItem.h \
         RideMetadata.h \
@@ -174,6 +179,7 @@ SOURCES += \
         CriticalPowerWindow.cpp \
         CsvRideFile.cpp \
         DBAccess.cpp \
+        DataProcessor.cpp \
         DatePickerDialog.cpp \
         Device.cpp \
         DeviceTypes.cpp \
@@ -182,6 +188,10 @@ SOURCES += \
         ErgFile.cpp \
         ErgFilePlot.cpp \
         FitRideFile.cpp \
+        FixGaps.cpp \
+        FixGPS.cpp \
+        FixSpikes.cpp \
+        FixTorque.cpp \
         GcRideFile.cpp \
         GoogleMapControl.cpp \
         HistogramWindow.cpp \
@@ -190,6 +200,7 @@ SOURCES += \
         LogTimeScaleEngine.cpp \
         LTMCanvasPicker.cpp \
         LTMChartParser.cpp \
+        LTMOutliers.cpp \
         LTMPlot.cpp \
         LTMSettings.cpp \
         LTMTool.cpp \
@@ -219,7 +230,10 @@ SOURCES += \
         RealtimeWindow.cpp \
         RealtimePlot.cpp \
         RideCalendar.cpp \
+        RideEditor.cpp \
         RideFile.cpp \
+        RideFileCommand.cpp \
+        RideFileTableModel.cpp \
         RideImportWizard.cpp \
         RideItem.cpp \
         RideMetadata.cpp \

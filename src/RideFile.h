@@ -25,6 +25,11 @@
 #include <QList>
 #include <QMap>
 #include <QVector>
+#include <QObject>
+
+class RideItem;
+class EditorData;      // attached to a RideFile
+class RideFileCommand; // for manipulating ride data
 
 // This file defines four classes:
 //
@@ -71,43 +76,50 @@ struct RideFileInterval
         start(start), stop(stop), name(name) {}
 };
 
-class RideFile
+class RideFile : public QObject // QObject to emit signals
 {
-    private:
-
-        QDateTime startTime_;  // time of day that the ride started
-        double recIntSecs_;    // recording interval in seconds
-        QVector<RideFilePoint*> dataPoints_;
-        RideFileDataPresent dataPresent;
-        QString deviceType_;
-        QList<RideFileInterval> intervals_;
+    Q_OBJECT
 
     public:
 
-        RideFile() : recIntSecs_(0.0), deviceType_("unknown") {}
-        RideFile(const QDateTime &startTime, double recIntSecs) :
-            startTime_(startTime), recIntSecs_(recIntSecs),
-            deviceType_("unknown") {}
+        friend class RideFileCommand; // tells us we were modified
+        friend class MainWindow; // tells us we were saved
 
-        virtual ~RideFile() {
-            foreach(RideFilePoint *point, dataPoints_)
-                delete point;
-        }
+        // Constructor / Destructor
+        RideFile();
+        RideFile(const QDateTime &startTime, double recIntSecs);
+        virtual ~RideFile();
 
-        const QDateTime &startTime() const { return startTime_; }
-        double recIntSecs() const { return recIntSecs_; }
-        const QVector<RideFilePoint*> dataPoints() const { return dataPoints_; }
-        inline const RideFileDataPresent *areDataPresent() const { return &dataPresent; }
-        const QString &deviceType() const { return deviceType_; }
+        // Working with DATASERIES
+        enum seriestype { secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, interval, none };
+        typedef enum seriestype SeriesType;
+        static QString seriesName(SeriesType);
+        static int decimalsFor(SeriesType series);
+        static double maximumFor(SeriesType series);
+        static double minimumFor(SeriesType series);
 
-        void setStartTime(const QDateTime &value) { startTime_ = value; }
-        void setRecIntSecs(double value) { recIntSecs_ = value; }
-        void setDeviceType(const QString &value) { deviceType_ = value; }
-
+        // Working with DATAPOINTS -- ***use command to modify***
+        RideFileCommand *command;
+        double getPointValue(int index, SeriesType series);
         void appendPoint(double secs, double cad, double hr, double km,
                          double kph, double nm, double watts, double alt,
                          double lon, double lat, double headwind, int interval);
+        const QVector<RideFilePoint*> &dataPoints() const { return dataPoints_; }
 
+        // Working with DATAPRESENT flags
+        inline const RideFileDataPresent *areDataPresent() const { return &dataPresent; }
+        void resetDataPresent();
+        bool isDataPresent(SeriesType series);
+
+        // Working with FIRST CLASS variables
+        const QDateTime &startTime() const { return startTime_; }
+        void setStartTime(const QDateTime &value) { startTime_ = value; }
+        double recIntSecs() const { return recIntSecs_; }
+        void setRecIntSecs(double value) { recIntSecs_ = value; }
+        const QString &deviceType() const { return deviceType_; }
+        void setDeviceType(const QString &value) { deviceType_ = value; }
+
+        // Working with INTERVALS
         const QList<RideFileInterval> &intervals() const { return intervals_; }
         void addInterval(double start, double stop, const QString &name) {
             intervals_.append(RideFileInterval(start, stop, name));
@@ -118,18 +130,60 @@ class RideFile
 
         void writeAsCsv(QFile &file, bool bIsMetric) const;
 
-        void resetDataPresent();
-
+        // Index offset calculations
         double timeToDistance(double) const;  // get distance in km at time in secs
         int timeIndex(double) const;          // get index offset for time in secs
         int distanceIndex(double) const;      // get index offset for distance in KM
 
+        // Working with the METADATA TAGS
         const QMap<QString,QString>& tags() const { return tags_; }
-        QString getTag(QString name, QString fallback) { return tags_.value(name, fallback); }
+        QString getTag(QString name, QString fallback) const { return tags_.value(name, fallback); }
         void setTag(QString name, QString value) { tags_.insert(name, value); }
 
+        // METRIC OVERRIDES
         QMap<QString,QMap<QString,QString> > metricOverrides;
+
+        // editor data is held here and updated
+        // as rows/columns are added/removed
+        // this is a workaround to avoid holding
+        // state data within each RideFilePoint structure
+        // and avoiding impact on existing code
+        EditorData *editorData() { return data; }
+        void setEditorData(EditorData *x) { data = x; }
+
+        // ************************ WARNING ***************************
+        // you shouldn't use these routines directly
+        // rather use the RideFileCommand *command
+        // to manipulate the ride data
+        void setPointValue(int index, SeriesType series, double value);
+        void deletePoint(int index);
+        void deletePoints(int index, int count);
+        void insertPoint(int index, RideFilePoint *point);
+        void appendPoints(QVector <struct RideFilePoint *> newRows);
+        void setDataPresent(SeriesType, bool);
+        // ************************************************************
+
+    signals:
+        void saved();
+        void reverted();
+        void modified();
+
+    protected:
+        void emitSaved();
+        void emitReverted();
+        void emitModified();
+
+    private:
+
+        QDateTime startTime_;  // time of day that the ride started
+        double recIntSecs_;    // recording interval in seconds
+        QVector<RideFilePoint*> dataPoints_;
+        RideFileDataPresent dataPresent;
+        QString deviceType_;
+        QList<RideFileInterval> intervals_;
         QMap<QString,QString> tags_;
+        EditorData *data;
+
 };
 
 struct RideFileReader {
@@ -163,4 +217,3 @@ class RideFileFactory {
 };
 
 #endif // _RideFile_h
-
