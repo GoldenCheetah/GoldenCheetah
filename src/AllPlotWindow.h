@@ -140,6 +140,9 @@ class AllPlotWindow : public QWidget
     private slots:
 
         void addPickers(AllPlot *allPlot2);
+        bool stackZoomUpShouldEnable(int sw);
+        bool stackZoomDownShouldEnable(int sw);
+
         void plotPickerMoved(const QPoint &);
         void plotPickerSelected(const QPoint &);
 };
