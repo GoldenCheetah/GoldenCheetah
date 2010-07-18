@@ -51,7 +51,7 @@ static void secsMsecs(double value, int &secs, int &msecs)
     msecs = round((value - secs) * 100) * 10;
 }
 
-RideEditor::RideEditor(MainWindow *main) : QWidget(main), data(NULL), ride(NULL), main(main), inLUW(false)
+RideEditor::RideEditor(MainWindow *main) : QWidget(main), data(NULL), ride(NULL), main(main), inLUW(false), colMapper(NULL)
 {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
