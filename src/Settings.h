@@ -61,6 +61,8 @@
 #define GC_WORKOUTDIR      "workoutDir"
 #define GC_TRAIN_SPLITTER_SIZES  "trainwindow/splitterSizes"
 #define GC_LTM_SPLITTER_SIZES  "ltmwindow/splitterSizes"
+#define GC_TWITTER_USERNAME "TwitterUser"
+#define GC_TWITTER_PASSWORD "TwitterPass"
 
 // device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended
 // to them to specify which configured device i.e. devices1 ... devicesn where

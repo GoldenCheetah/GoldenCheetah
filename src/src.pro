@@ -151,6 +151,7 @@ HEADERS += \
         TrainTabs.h \
         TrainTool.h \
         TrainWindow.h \
+        TwitterDialog.h \
         Units.h \
         ViewSelection.h \
         WeeklySummaryWindow.h \
@@ -258,6 +259,7 @@ SOURCES += \
         TrainTabs.cpp \
         TrainTool.cpp \
         TrainWindow.cpp \
+        TwitterDialog.cpp \
         ViewSelection.cpp \
         WeeklySummaryWindow.cpp \
         WkoRideFile.cpp \

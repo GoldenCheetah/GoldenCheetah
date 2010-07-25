@@ -66,6 +66,7 @@
 #include "SplitRideDialog.h"
 #include "PerformanceManagerWindow.h"
 #include "TrainWindow.h"
+#include "TwitterDialog.h"
 
 #ifndef GC_VERSION
 #define GC_VERSION "(developer build)"
@@ -897,6 +898,8 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
         QAction *actSplitRide = new QAction(tr("Split Ride"), treeWidget);
         connect(actSplitRide, SIGNAL(triggered(void)), this, SLOT(splitRide()));
 
+        QAction *actTweetRide = new QAction(tr("Tweet Ride"), treeWidget);
+        connect(actTweetRide, SIGNAL(triggered(void)), this, SLOT(tweetRide()));
 
 
         if (rideItem->isDirty() == true) {
@@ -908,6 +911,7 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
 	menu.addAction(actBestInt);
 	menu.addAction(actPowerPeaks);
 	menu.addAction(actSplitRide);
+	menu.addAction(actTweetRide);
 
         menu.exec(treeWidget->mapToGlobal( pos ));
     }
@@ -1425,3 +1429,19 @@ MainWindow::manualProcess(QString name)
         p->exec();
     }
 }
+
+void
+MainWindow::tweetRide()
+{
+    QTreeWidgetItem *_item = treeWidget->currentItem();
+    if (_item==NULL || _item->type() != RIDE_TYPE)
+        return;
+
+    RideItem *item = dynamic_cast<RideItem*>(_item);
+    item->computeMetrics();
+
+    TwitterDialog *twitterDialog = new TwitterDialog(this, item);
+    twitterDialog->setWindowModality(Qt::ApplicationModal);
+    twitterDialog->exec();
+}
+

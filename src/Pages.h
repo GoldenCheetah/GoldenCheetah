@@ -395,4 +395,35 @@ class ZonePage : public QWidget
         // local versions for modification
 };
 
+class TwitterPage : public QWidget
+{
+    Q_OBJECT
+
+    public:
+
+        TwitterPage(QWidget *parent = 0);
+        void saveClicked();
+
+        // Children talk to each other
+        SchemePage *schemePage;
+        CPPage *cpPage;
+        QLineEdit *accountName;
+        QLineEdit *passwordEdit;
+
+    public slots:
+
+
+    protected:
+
+        MainWindow *main;
+        bool changed;
+
+        QTabWidget *tabs;
+
+        // local versions for modification
+    private:
+        QLabel *accountLabel;
+        QLabel *passwordLabel;
+};
+
 #endif
