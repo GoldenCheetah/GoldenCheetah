@@ -38,6 +38,7 @@ class ConfigDialog : public QDialog
         ConfigurationPage *configPage;
         CyclistPage *cyclistPage;
         DevicePage *devicePage;
+        TwitterPage *twitterPage;
         QPushButton *saveButton;
         QStackedWidget *pagesWidget;
 	QPushButton *closeButton;

@@ -45,10 +45,13 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
     configPage = new ConfigurationPage(mainWindow);
     devicePage = new DevicePage(this);
 
+    twitterPage = new TwitterPage(this);
+
     pagesWidget = new QStackedWidget;
     pagesWidget->addWidget(configPage);
     pagesWidget->addWidget(cyclistPage);
     pagesWidget->addWidget(devicePage);
+    pagesWidget->addWidget(twitterPage);
 
     closeButton = new QPushButton(tr("Close"));
     saveButton = new QPushButton(tr("Save"));
@@ -114,6 +117,12 @@ void ConfigDialog::createIcons()
     realtimeButton->setTextAlignment(Qt::AlignHCenter);
     realtimeButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 
+    QListWidgetItem *twitterButton = new QListWidgetItem(contentsWidget);
+    twitterButton->setIcon(QIcon(":images/twitter.png"));
+    twitterButton->setText(tr("Twitter"));
+    twitterButton->setTextAlignment(Qt::AlignHCenter);
+    twitterButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+
     connect(contentsWidget,
             SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
             this, SLOT(changePage(QListWidgetItem *, QListWidgetItem*)));
@@ -159,6 +168,11 @@ void ConfigDialog::save_Clicked()
     settings->setValue(GC_STS_DAYS, cyclistPage->perfManSTSavg->text());
     settings->setValue(GC_LTS_DAYS, cyclistPage->perfManLTSavg->text());
     settings->setValue(GC_SB_TODAY, (int) cyclistPage->showSBToday->isChecked());
+
+    //Save Twitter - Info PASSWORD IS IN CLEAR
+    settings->setValue(GC_TWITTER_USERNAME, twitterPage->accountName->text());
+    settings->setValue(GC_TWITTER_PASSWORD, twitterPage->passwordEdit->text());
+
 
     // set default stress names if not set:
     settings->setValue(GC_STS_NAME, settings->value(GC_STS_NAME,tr("Short Term Stress")));
