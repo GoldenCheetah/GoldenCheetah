@@ -1,6 +1,6 @@
 #include "TwitterDialog.h"
 #include "Settings.h"
-#include <Qhttp>
+#include <QHttp>
 #include <QUrl>
 #include "TimeUtils.h"
 
