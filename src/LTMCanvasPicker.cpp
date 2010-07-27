@@ -76,9 +76,9 @@ void LTMCanvasPicker::select(const QPoint &pos, bool clicked)
         {
             QwtPlotCurve *c = (QwtPlotCurve*)(*it);
 
-            double d;
+            double d = -1;
             int idx = c->closestPoint(pos, &d);
-            if ( d < dist )
+            if ( d != -1 && d < dist )
             {
                 curve = c;
                 index = idx;

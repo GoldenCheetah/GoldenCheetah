@@ -6,7 +6,7 @@ TEMPLATE = app
 TARGET = GoldenCheetah
 DEPENDPATH += .
 !isEmpty( BOOST_INCLUDE ) { INCLUDEPATH += $${BOOST_INCLUDE} }
-INCLUDEPATH += ../qwt/src
+INCLUDEPATH += ../qwt/src ../qxt/src
 QT += xml sql network webkit
 LIBS += ../qwt/lib/libqwt.a
 LIBS += -lm
@@ -56,6 +56,11 @@ win32 {
     //QMAKE_CXXFLAGS += -fdata-sections
     RC_FILE = windowsico.rc
 }
+
+# local qxt widgets - rather than add another dependency on libqxt
+DEFINES += QXT_STATIC
+SOURCES += ../qxt/src/qxtspanslider.cpp
+HEADERS += ../qxt/src/qxtspanslider.h ../qxt/src/qxtspanslider_p.h
 
 HEADERS += \
         Aerolab.h \

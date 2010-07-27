@@ -30,6 +30,10 @@ class QwtPlotMarker;
 class QwtArrowButton;
 class RideItem;
 class IntervalItem;
+class QxtSpanSlider;
+class QxtGroupBox;
+
+#include "LTMWindow.h" // for tooltip/canvaspicker
 
 class AllPlotWindow : public QWidget
 {
@@ -39,26 +43,34 @@ class AllPlotWindow : public QWidget
 
         AllPlotWindow(MainWindow *mainWindow);
         void setData(RideItem *ride);
-        void setStartSelection(AllPlot* plot, int xPosition);
-        void setEndSelection(AllPlot* plot, int xPosition, bool newInterval, QString name);
+
+        // highlight a selection on the plots
+        void setStartSelection(AllPlot* plot, double xValue);
+        void setEndSelection(AllPlot* plot, double xValue, bool newInterval, QString name);
         void clearSelection();
         void hideSelection();
-        void zoomInterval(IntervalItem *); // zoom into a specified interval
+
+        // zoom to interval range (via span-slider)
+        void zoomInterval(IntervalItem *);
 
    public slots:
 
-        void setSmoothingFromSlider();
-        void setSmoothingFromLineEdit();
+        // trap GC signals
         void rideSelected();
         void intervalSelected();
         void zonesChanged();
         void intervalsChanged();
         void configChanged();
 
+        // trap child widget signals
+        void setSmoothingFromSlider();
+        void setSmoothingFromLineEdit();
         void setStackZoomUp();
         void setStackZoomDown();
-
-        void setShowStack(int state);
+        void zoomChanged();
+        void moveLeft();
+        void moveRight();
+        void showStackChanged(int state);
         void setShowPower(int state);
         void setShowHr(int state);
         void setShowSpeed(int state);
@@ -74,41 +86,60 @@ class AllPlotWindow : public QWidget
         friend class IntervalPlotData;
         friend class MainWindow;
 
-	void setAllPlotWidgets(RideItem *rideItem);
+        void setAllPlotWidgets(RideItem *rideItem);
 
+        // cached state
+        RideItem *current;
+        int selection;
         MainWindow *mainWindow;
-        AllPlot *allPlot;
-        QList <AllPlot *> allPlots;
-        QList <QwtPlotPicker *> allPickers;
 
-        QScrollArea *stackFrame;
+        // All the plot widgets
+        AllPlot *allPlot;
+        AllPlot *fullPlot;
+        QList <AllPlot *> allPlots;
         QwtPlotPanner *allPanner;
         QwtPlotZoomer *allZoomer;
-        QwtPlotPicker *allPicker;
-        int selection;
-        QCheckBox *showStack;
 
+        // Stacked view
+        QScrollArea *stackFrame;
+        QVBoxLayout *stackPlotLayout;
+        QWidget *stackWidget;
         QwtArrowButton *stackZoomDown;
         QwtArrowButton *stackZoomUp;
 
-	QCheckBox *showHr;
-	QCheckBox *showSpeed;
-	QCheckBox *showCad;
-	QCheckBox *showAlt;
-	QComboBox *showPower;
+        // Normal view
+        QScrollArea *allPlotFrame;
+        QPushButton *scrollLeft, *scrollRight;
+
+        // Common controls
+        QGridLayout *controlsLayout;
+        QCheckBox *showStack;
+        QCheckBox *showHr;
+        QCheckBox *showSpeed;
+        QCheckBox *showCad;
+        QCheckBox *showAlt;
+        QComboBox *showPower;
         QSlider *smoothSlider;
         QLineEdit *smoothLineEdit;
-
-        RideItem *current;
+        QxtSpanSlider *spanSlider;
 
     private:
+        // reset/redraw all the plots
+        void setupStackPlots();
+        void redrawAllPlot();
+        void redrawFullPlot();
+        void redrawStackPlot();
+
         void showInfo(QString);
         void resetStackedDatas();
         int stackWidth;
 
-    private slots:
-        void addPickers(AllPlot *allPlot2);
+        bool active;
+        bool stale;
 
+    private slots:
+
+        void addPickers(AllPlot *allPlot2);
         void plotPickerMoved(const QPoint &);
         void plotPickerSelected(const QPoint &);
 };

@@ -83,7 +83,6 @@ class AllPlotBackground: public QwtPlotItem
 
         const Zones *zones       = rideItem->zones;
         int zone_range     = rideItem->zoneRange();
-
         if (parent->shadeZones() && (zone_range >= 0)) {
             QList <int> zone_lows = zones->getZoneLows(zone_range);
             int num_zones = zone_lows.size();
@@ -104,6 +103,7 @@ class AllPlotBackground: public QwtPlotItem
                         painter->fillRect(r, shading_color);
                 }
             }
+        } else {
         }
     }
 };
@@ -192,18 +192,18 @@ class AllPlotZoneLabel: public QwtPlotItem
 static inline double
 max(double a, double b) { if (a > b) return a; else return b; }
 
-AllPlot::AllPlot(QWidget *parent, MainWindow *mainWindow):
+AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     QwtPlot(parent),
-    settings(NULL),
-    unit(0),
     rideItem(NULL),
-    bydist(false),
+    unit(0),
     shade_zones(true),
-    showPowerState(0),
+    showPowerState(3),
     showHrState(Qt::Checked),
     showSpeedState(Qt::Checked),
     showCadState(Qt::Checked),
-    showAltState(Qt::Checked)
+    showAltState(Qt::Checked),
+    bydist(false),
+    parent(parent)
 {
     boost::shared_ptr<QSettings> settings = GetApplicationSettings();
     unit = settings->value(GC_UNIT);
@@ -212,10 +212,16 @@ AllPlot::AllPlot(QWidget *parent, MainWindow *mainWindow):
 
     useMetricUnits = (unit.toString() == "Metric");
 
+    // options for turning off/on shading on all plot
+    // will come in with a future patch, for now we
+    // enable zone shading by default, since this is
+    // the current default behaviour
+    if (false) shade_zones = false;
+    else shade_zones = true;
+
     smooth = settings->value(GC_RIDE_PLOT_SMOOTHING).toInt();
     if (smooth < 2)
         smooth = 30;
-
 
     // create a background object for shading
     bg = new AllPlotBackground(this);
@@ -252,34 +258,48 @@ AllPlot::AllPlot(QWidget *parent, MainWindow *mainWindow):
     grid->attach(this);
 
     configChanged(); // set colors
-
-    zoneLabels = QList <AllPlotZoneLabel *>::QList();
 }
 
 void
 AllPlot::configChanged()
 {
+
+    double width = 1.0;
+
+    // placeholder for setting antialiasing, will come
+    // in with a future patch. For now antialiasing is
+    // not enabled since it can slow down plotting on
+    // windows and linux platforms.
+    if (false) {
+        wattsCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        hrCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        speedCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        cadCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        altCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        intervalHighlighterCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    }
+
     setCanvasBackground(GColor(CPLOTBACKGROUND));
     QPen wattsPen = QPen(GColor(CPOWER));
-    wattsPen.setWidth(2);
+    wattsPen.setWidth(width);
     wattsCurve->setPen(wattsPen);
     QPen hrPen = QPen(GColor(CHEARTRATE));
-    hrPen.setWidth(2);
+    hrPen.setWidth(width);
     hrCurve->setPen(hrPen);
     QPen speedPen = QPen(GColor(CSPEED));
-    speedPen.setWidth(2);
+    speedPen.setWidth(width);
     speedCurve->setPen(speedPen);
     QPen cadPen = QPen(GColor(CCADENCE));
-    cadPen.setWidth(2);
+    cadPen.setWidth(width);
     cadCurve->setPen(cadPen);
     QPen altPen(GColor(CALTITUDE));
-    altPen.setWidth(1);
+    altPen.setWidth(width);
     altCurve->setPen(altPen);
     QColor brush_color = GColor(CALTITUDEBRUSH);
-    brush_color.setAlpha(64);
+    brush_color.setAlpha(200);
     altCurve->setBrush(brush_color);   // fill below the line
     QPen ihlPen = QPen(GColor(CINTERVALHIGHLIGHTER));
-    ihlPen.setWidth(2);
+    ihlPen.setWidth(width);
     intervalHighlighterCurve->setPen(ihlPen);
     QColor ihlbrush = QColor(GColor(CINTERVALHIGHLIGHTER));
     ihlbrush.setAlpha(64);
@@ -298,7 +318,7 @@ struct DataPoint {
 
 bool AllPlot::shadeZones() const
 {
-    return (shade_zones && !wattsArray.empty());
+    return shade_zones;
 }
 
 void AllPlot::refreshZoneLabels()
@@ -335,6 +355,7 @@ AllPlot::recalc()
 
     if (timeArray.empty())
         return;
+
     int rideTimeSecs = (int) ceil(timeArray[arrayLength - 1]);
     if (rideTimeSecs > 7*24*60*60) {
         QwtArray<double> data;
@@ -445,12 +466,11 @@ AllPlot::recalc()
     if (!altArray.empty())
         altCurve->setData(xaxis.data() + startingIndex, smoothAltitude.data() + startingIndex, totalPoints);
 
-    setAxisScale(xBottom, 0.0, bydist ? totalDist : smoothTime[rideTimeSecs]);
     setYMax();
     refreshIntervalMarkers();
     refreshZoneLabels();
 
-    replot();
+    //replot();
 }
 
 void
@@ -484,8 +504,6 @@ AllPlot::refreshIntervalMarkers()
             mrk->setLabel(text);
         }
     }
-
-
 }
 
 void
@@ -564,24 +582,20 @@ AllPlot::setXTitle()
 }
 
 void
-AllPlot::setDataP(AllPlot *plot, int startidx, int stopidx)
+AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 {
     if (plot == NULL) return;
 
     referencePlot = plot;
 
+    setTitle(plot->rideItem->ride()->startTime().toString(GC_DATETIME_FORMAT));
+
+
+    // reference the plot for data and state
     rideItem = plot->rideItem;
-    shade_zones = plot->shade_zones;
     bydist = plot->bydist;
 
     arrayLength = stopidx-startidx;
-    wattsArray = plot->wattsArray.mid(startidx, stopidx-startidx);
-    hrArray = plot->hrArray.mid(startidx, stopidx-startidx);
-    speedArray = plot->speedArray.mid(startidx, stopidx-startidx);
-    cadArray = plot->cadArray.mid(startidx, stopidx-startidx);
-    altArray = plot->altArray.mid(startidx, stopidx-startidx);
-    timeArray = plot->timeArray.mid(startidx, stopidx-startidx);
-    distanceArray = plot->distanceArray.mid(startidx, stopidx-startidx);
 
     if (bydist) {
         startidx = plot->distanceIndex(plot->distanceArray[startidx]);
@@ -591,34 +605,30 @@ AllPlot::setDataP(AllPlot *plot, int startidx, int stopidx)
         stopidx  = plot->timeIndex(plot->timeArray[(stopidx>=plot->timeArray.size()?plot->timeArray.size()-1:stopidx)]/60)-1;
     }
 
-    smoothWatts = plot->smoothWatts.mid(startidx, stopidx-startidx);
-    smoothHr = plot->smoothHr.mid(startidx, stopidx-startidx);
-    smoothSpeed = plot->smoothSpeed.mid(startidx, stopidx-startidx);
-    smoothCad = plot->smoothCad.mid(startidx, stopidx-startidx);
-    smoothAltitude = plot->smoothAltitude.mid(startidx, stopidx-startidx);
-    smoothTime = plot->smoothTime.mid(startidx, stopidx-startidx);
-    smoothDistance = plot->smoothDistance.mid(startidx, stopidx-startidx);
+    double *smoothW = &plot->smoothWatts[startidx];
+    double *smoothT = &plot->smoothTime[startidx];
+    double *smoothHR = &plot->smoothHr[startidx];
+    double *smoothS = &plot->smoothSpeed[startidx];
+    double *smoothC = &plot->smoothCad[startidx];
+    double *smoothA = &plot->smoothAltitude[startidx];
+    double *smoothD = &plot->smoothDistance[startidx];
 
-    QVector<double> &xaxis = bydist ? smoothDistance : smoothTime;
+    double *xaxis = bydist ? smoothD : smoothT;
 
     // attach appropriate curves
+    if (this->legend()) this->legend()->hide();
+
     wattsCurve->detach();
     hrCurve->detach();
     speedCurve->detach();
     cadCurve->detach();
     altCurve->detach();
 
-    wattsCurve->setData(xaxis, smoothWatts);
-    hrCurve->setData(xaxis, smoothHr);
-    speedCurve->setData(xaxis, smoothSpeed);
-    cadCurve->setData(xaxis, smoothCad);
-    altCurve->setData(xaxis, smoothAltitude);
-
-    wattsCurve->setVisible(plot->wattsCurve->isVisible());
-    hrCurve->setVisible(plot->hrCurve->isVisible());
-    speedCurve->setVisible(plot->speedCurve->isVisible());
-    cadCurve->setVisible(plot->cadCurve->isVisible());
-    altCurve->setVisible(plot->altCurve->isVisible());
+    wattsCurve->setData(xaxis,smoothW,stopidx-startidx);
+    hrCurve->setData(xaxis, smoothHR,stopidx-startidx);
+    speedCurve->setData(xaxis, smoothS, stopidx-startidx);
+    cadCurve->setData(xaxis, smoothC, stopidx-startidx);
+    altCurve->setData(xaxis, smoothA, stopidx-startidx);
 
     setYMax();
     setAxisMaxMajor(yLeft, 5);
@@ -626,20 +636,23 @@ AllPlot::setDataP(AllPlot *plot, int startidx, int stopidx)
     setAxisMaxMajor(yRight, 5);
     setAxisMaxMajor(yRight2, 5);
 
-    if (!smoothWatts.empty()) wattsCurve->attach(this);
-    if (!smoothHr.empty()) hrCurve->attach(this);
-    if (!smoothSpeed.empty()) speedCurve->attach(this);
-    if (!smoothCad.empty()) cadCurve->attach(this);
-    if (!smoothAltitude.empty()) altCurve->attach(this);
+    setAxisScale(xBottom, xaxis[0], xaxis[stopidx-startidx-1]);
+
+    if (!plot->smoothAltitude.empty()) altCurve->attach(this);
+    if (!plot->smoothWatts.empty()) wattsCurve->attach(this);
+    if (!plot->smoothHr.empty()) hrCurve->attach(this);
+    if (!plot->smoothSpeed.empty()) speedCurve->attach(this);
+    if (!plot->smoothCad.empty()) cadCurve->attach(this);
 
     refreshIntervalMarkers();
     refreshZoneLabels();
 
-    replot();
+    if (this->legend()) this->legend()->show();
+    //replot();
 }
 
 void
-AllPlot::setDataI(RideItem *_rideItem)
+AllPlot::setDataFromRide(RideItem *_rideItem)
 {
     rideItem = _rideItem;
     if (_rideItem == NULL) return;
@@ -648,7 +661,6 @@ AllPlot::setDataI(RideItem *_rideItem)
 
     RideFile *ride = rideItem->ride();
     if (ride && ride->deviceType() != QString("Manual CSV")) {
-        setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
 
         const RideFileDataPresent *dataPresent = ride->areDataPresent();
         int npoints = ride->dataPoints().size();
@@ -666,11 +678,11 @@ AllPlot::setDataI(RideItem *_rideItem)
         speedCurve->detach();
         cadCurve->detach();
         altCurve->detach();
+        if (!altArray.empty()) altCurve->attach(this);
         if (!wattsArray.empty()) wattsCurve->attach(this);
         if (!hrArray.empty()) hrCurve->attach(this);
         if (!speedArray.empty()) speedCurve->attach(this);
         if (!cadArray.empty()) cadCurve->attach(this);
-        if (!altArray.empty()) altCurve->attach(this);
 
         wattsCurve->setVisible(dataPresent->watts && showPowerState < 2);
         hrCurve->setVisible(dataPresent->hr && showHrState == Qt::Checked);
@@ -702,11 +714,11 @@ AllPlot::setDataI(RideItem *_rideItem)
                                               : point->km * MILES_PER_KM));
             ++arrayLength;
         }
-
         recalc();
     }
     else {
         setTitle("no data");
+
         wattsCurve->detach();
         hrCurve->detach();
         speedCurve->detach();
@@ -721,11 +733,17 @@ AllPlot::setDataI(RideItem *_rideItem)
 void
 AllPlot::showPower(int id)
 {
+    if (showPowerState == id) return;
+
     showPowerState = id;
     wattsCurve->setVisible(id < 2);
     shade_zones = (id == 0);
     setYMax();
-    recalc();
+    if (shade_zones) {
+        bg->attach(this);
+        refreshZoneLabels();
+    } else
+        bg->detach();
 }
 
 void
@@ -904,10 +922,10 @@ double IntervalPlotData::x(size_t i) const
 
     // which point are we returning?
     switch (i%4) {
-    case 0 : return allPlot->byDistance() ? multiplier * current->startKM : current->start/60; // bottom left
-    case 1 : return allPlot->byDistance() ? multiplier * current->startKM : current->start/60; // top left
-    case 2 : return allPlot->byDistance() ? multiplier * current->stopKM : current->stop/60; // bottom right
-    case 3 : return allPlot->byDistance() ? multiplier * current->stopKM : current->stop/60; // bottom right
+    case 0 : return allPlot->bydist ? multiplier * current->startKM : current->start/60; // bottom left
+    case 1 : return allPlot->bydist ? multiplier * current->startKM : current->start/60; // top left
+    case 2 : return allPlot->bydist ? multiplier * current->stopKM : current->stop/60; // bottom right
+    case 3 : return allPlot->bydist ? multiplier * current->stopKM : current->stop/60; // bottom right
     }
     return 0; // shouldn't get here, but keeps compiler happy
 }
@@ -929,4 +947,26 @@ double IntervalPlotData::y(size_t i) const
 size_t IntervalPlotData::size() const { return intervalCount()*4; }
 QwtData *IntervalPlotData::copy() const {
     return new IntervalPlotData(allPlot, mainWindow);
+}
+
+void
+AllPlot::pointHover(QwtPlotCurve *curve, int index)
+{
+    if (index >= 0 && curve != intervalHighlighterCurve) {
+
+        double value = curve->y(index);
+
+        // output the tooltip
+        QString text = QString("%1 %2")
+                        .arg(value, 0, 'f', 0)
+                        .arg(this->axisTitle(curve->yAxis()).text());
+
+        // set that text up
+        tooltip->setText(text);
+
+    } else {
+
+        // no point
+        tooltip->setText("");
+    }
 }
