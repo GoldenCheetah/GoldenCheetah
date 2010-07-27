@@ -65,6 +65,7 @@ class MainWindow : public QMainWindow
         const RideItem *currentRideItem() { return ride; }
         const QTreeWidgetItem *allRideItems() { return allRides; }
         const QTreeWidgetItem *allIntervalItems() { return allIntervals; }
+        QTreeWidget *intervalTreeWidget() { return intervalWidget; }
         QTreeWidgetItem *mutableIntervalItems() { return allIntervals; }
 	void getBSFactors(double &timeBS, double &distanceBS,
                           double &timeDP, double &distanceDP);

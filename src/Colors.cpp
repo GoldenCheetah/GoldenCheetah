@@ -22,8 +22,9 @@
 #include <QDir>
 #include "Settings.h"
 
-static Colors ColorList[34] = {
+static Colors ColorList[35] = {
     { "Plot Background", "COLORPLOTBACKGROUND", Qt::white },
+    { "Plot Thumbnail Background", "COLORPLOTTHUMBNAIL", Qt::gray },
     { "Plot Title", "COLORPLOTTITLE", Qt::black },
     { "Plot Selection Pen", "COLORPLOTSELECT", Qt::blue },
     { "Plot TrackerPen", "COLORPLOTTRACKER", Qt::blue },
@@ -80,10 +81,10 @@ GCColor::invert(QColor color)
 void
 GCColor::readConfig()
 {
-    boost::shared_ptr<QSettings> appsettings = GetApplicationSettings();
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
     // read in config settings and populate the color table
     for (unsigned int i=0; ColorList[i].name != ""; i++) {
-        QString colortext = appsettings->value(ColorList[i].setting).toString();
+        QString colortext = settings->value(ColorList[i].setting, "").toString();
         if (colortext != "") {
             // color definitions are stored as "r:g:b"
             QStringList rgb = colortext.split(":");

@@ -32,7 +32,10 @@ class AllPlotZoneLabel;
 class AllPlotWindow;
 class AllPlot;
 class IntervalItem;
+class IntervalPlotData;
 class MainWindow;
+class LTMToolTip;
+class LTMCanvasPicker;
 
 class AllPlot : public QwtPlot
 {
@@ -40,27 +43,25 @@ class AllPlot : public QwtPlot
 
     public:
 
-        AllPlot(QWidget *parent, MainWindow *mainWindow);
+        AllPlot(AllPlotWindow *parent, MainWindow *mainWindow);
 
-        int smoothing() const { return smooth; }
+        // set the curve data e.g. when a ride is selected
+        void setDataFromRide(RideItem *_rideItem);
+        void setDataFromPlot(AllPlot *plot, int startidx, int stopidx);
 
-        bool byDistance() const { return bydist; }
+        // convert from time/distance to index in *smoothed* datapoints
+        int timeIndex(double) const;
+        int distanceIndex(double) const;
 
-	bool useMetricUnits;  // whether metric units are used (or imperial)
+        // plot redraw functions
+        bool shadeZones() const;
+        void refreshZoneLabels();
+        void refreshIntervalMarkers();
 
-	bool shadeZones() const;
-	void refreshZoneLabels();
-	void refreshIntervalMarkers();
-
-        void setDataI(RideItem *_rideItem);
-        void setDataP(AllPlot *plot, int startidx, int stopidx);
-
-        int timeIndex(double) const;          // get index offset for time in secs
-        int distanceIndex(double) const;      // get index offset for distance in KM
-
-        QwtPlotMarker *allMarker1;
-        QwtPlotMarker *allMarker2;
-        QwtPlotMarker *allMarker3;
+        // refresh data / plot parameters
+        void recalc();
+        void setYMax();
+        void setXTitle();
 
     public slots:
 
@@ -70,33 +71,48 @@ class AllPlot : public QwtPlot
         void showCad(int state);
         void showAlt(int state);
         void showGrid(int state);
+        void setShadeZones(bool x) { shade_zones=x; }
         void setSmoothing(int value);
         void setByDistance(int value);
         void configChanged();
+        void pointHover(QwtPlotCurve*, int);
 
     protected:
 
         friend class ::AllPlotBackground;
         friend class ::AllPlotZoneLabel;
         friend class ::AllPlotWindow;
+        friend class ::IntervalPlotData;
 
-	AllPlotBackground *bg;
+        // cached state
+        RideItem *rideItem;
+        AllPlotBackground *bg;
         QSettings *settings;
         QVariant unit;
+        bool useMetricUnits;
 
+        // controls
+        bool shade_zones;
+        int showPowerState;
+        int showHrState;
+        int showSpeedState;
+        int showCadState;
+        int showAltState;
+
+        // plot objects
+        QwtPlotGrid *grid;
+        QVector<QwtPlotMarker*> d_mrk;
+        QwtPlotMarker *allMarker1;
+        QwtPlotMarker *allMarker2;
         QwtPlotCurve *wattsCurve;
         QwtPlotCurve *hrCurve;
         QwtPlotCurve *speedCurve;
         QwtPlotCurve *cadCurve;
         QwtPlotCurve *altCurve;
         QwtPlotCurve *intervalHighlighterCurve;  // highlight selected intervals on the Plot
-        QVector<QwtPlotMarker*> d_mrk;
-	QList <AllPlotZoneLabel *> zoneLabels;
+        QList <AllPlotZoneLabel *> zoneLabels;
 
-	RideItem *rideItem;
-
-        QwtPlotGrid *grid;
-
+        // source data
         QVector<double> hrArray;
         QVector<double> wattsArray;
         QVector<double> speedArray;
@@ -105,6 +121,7 @@ class AllPlot : public QwtPlot
         QVector<double> distanceArray;
         QVector<double> altArray;
 
+        // smoothed data
         QVector<double> smoothWatts;
         QVector<double> smoothHr;
         QVector<double> smoothSpeed;
@@ -113,26 +130,16 @@ class AllPlot : public QwtPlot
         QVector<double> smoothDistance;
         QVector<double> smoothAltitude;
 
+        // array / smooth state
         int arrayLength;
-
         int smooth;
-
         bool bydist;
-
-        void recalc();
-        void setYMax();
-        void setXTitle();
-
-	bool shade_zones;     // whether power should be shaded
-
-        int showPowerState;
-        int showHrState;
-        int showSpeedState;
-        int showCadState;
-        int showAltState;
 
     private:
         AllPlot *referencePlot;
+        AllPlotWindow *parent;
+        LTMToolTip *tooltip;
+        LTMCanvasPicker *_canvasPicker; // allow point selection/hover
 };
 
 #endif // _GC_AllPlot_h
