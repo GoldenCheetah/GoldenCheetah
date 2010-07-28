@@ -395,8 +395,9 @@ AllPlotWindow::redrawFullPlot()
     //fullPlot->setTitle("");
 
     if (fullPlot->bydist)
-        fullPlot->setAxisScale(QwtPlot::xBottom, ride->ride()->dataPoints().first()->km,
-                                                 ride->ride()->dataPoints().last()->km);
+        fullPlot->setAxisScale(QwtPlot::xBottom, 
+        ride->ride()->dataPoints().first()->km * (fullPlot->useMetricUnits ? 1 : MILES_PER_KM),
+        ride->ride()->dataPoints().last()->km * (fullPlot->useMetricUnits ? 1 : MILES_PER_KM));
     else
         fullPlot->setAxisScale(QwtPlot::xBottom, ride->ride()->dataPoints().first()->secs/60,
                                                  ride->ride()->dataPoints().last()->secs/60);
