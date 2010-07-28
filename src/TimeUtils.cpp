@@ -18,11 +18,12 @@
 
 #include "TimeUtils.h"
 #include <math.h>
+#include <QRegExpValidator>
 
 QString time_to_string(double secs) 
 {
     QString result;
-    unsigned rounded = (unsigned) round(secs);
+    unsigned rounded = static_cast<unsigned>(round(secs));
     bool needs_colon = false;
     if (rounded >= 3600) {
         result += QString("%1").arg(rounded / 3600);
@@ -38,12 +39,24 @@ QString time_to_string(double secs)
     return result;
 }
 
+double str_to_interval(QString s)
+{
+    QRegExp rx("(\\d+\\s*h)?\\s*(\\d{1,2}\\s*m)?\\s*(\\d{1,2})(\\.\\d+)?\\s*s");
+    rx.indexIn(s);
+    QString hour = rx.cap(1);
+    QString min = rx.cap(2);
+    QString sec = rx.cap(3) + rx.cap(4);
+    hour.chop(1);
+    min.chop(1);
+    return 3600.0 * hour.toUInt() + 60.0 * min.toUInt() + sec.toDouble();
+}
+
 QString interval_to_str(double secs) 
 {
     if (secs < 60.0)
         return QString("%1s").arg(secs, 0, 'f', 2, QLatin1Char('0'));
     QString result;
-    unsigned rounded = (unsigned) round(secs);
+    unsigned rounded = static_cast<unsigned>(round(secs));
     bool needs_colon = false;
     if (rounded >= 3600) {
         result += QString("%1h").arg(rounded / 3600);
