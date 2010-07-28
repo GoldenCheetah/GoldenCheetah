@@ -266,6 +266,9 @@ AllPlot::configChanged()
 
     double width = 1.0;
 
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+    useMetricUnits = (settings->value(GC_UNIT).toString() == "Metric");
+
     // placeholder for setting antialiasing, will come
     // in with a future patch. For now antialiasing is
     // not enabled since it can slow down plotting on
