@@ -39,12 +39,15 @@ class CriticalPowerWindow : public QWidget
         void deleteCpiFile(QString filename);
 
     protected slots:
-
+        void cpintTimeValueEntered();
         void cpintSetCPButtonClicked();
         void pickerMoved(const QPoint &pos);
         void rideSelected();
         void seasonSelected(int season);
         void setEnergyMode(int index);
+
+    private:
+        void updateCpint(double minutes);
 
     protected:
 
@@ -56,7 +59,7 @@ class CriticalPowerWindow : public QWidget
         QLineEdit *cpintAllValue;
         QLineEdit *cpintCPValue;
         QComboBox *cComboSeason;
-	QPushButton *cpintSetCPButton;
+        QPushButton *cpintSetCPButton;
         QwtPlotPicker *picker;
         void addSeasons();
         QList<Season> seasons;
