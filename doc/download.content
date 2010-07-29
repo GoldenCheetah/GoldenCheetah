@@ -39,6 +39,16 @@ or <a href="older-releases.html">download older releases</a> of Golden Cheetah.
 
 <p>
 <font face="arial,helvetica,sanserif">
+<big><strong>Development Releases</strong></big>
+</font>
+
+<p>Gareth Coco has also made
+<a href="http://goldencheetah.stand2surf.net/">nightly development builds</a>
+available.  These binaries are based on the latest code, so they have more
+features and (sometimes) more bugs than the 1.3.0 release above.
+
+<p>
+<font face="arial,helvetica,sanserif">
 <big><strong>Source Code</strong></big>
 </font>
 
