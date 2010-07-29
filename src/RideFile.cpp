@@ -251,10 +251,12 @@ RideFile *RideFileFactory::openRideFile(QFile &file,
     assert(reader);
     RideFile *result = reader->openRideFile(file, errors);
 
-    if (result->intervals().empty()) result->fillInIntervals();
-
-    result->setTag("Filename", file.fileName());
-    DataProcessorFactory::instance().autoProcess(result);
+    // NULL returned to indicate openRide failed
+    if (result) {
+        if (result->intervals().empty()) result->fillInIntervals();
+        result->setTag("Filename", file.fileName());
+        DataProcessorFactory::instance().autoProcess(result);
+    }
 
     return result;
 }
