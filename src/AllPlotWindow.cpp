@@ -352,8 +352,8 @@ AllPlotWindow::configChanged()
 void
 AllPlotWindow::redrawAllPlot()
 {
-    if (!showStack->isChecked()) {
-        RideItem *ride = mainWindow->rideItem();
+    if (!showStack->isChecked() && current) {
+        RideItem *ride = current;
 
         int startidx, stopidx;
         if (fullPlot->bydist == true) {
@@ -380,7 +380,10 @@ AllPlotWindow::redrawFullPlot()
 {
     // always peformed sincethe data is used
     // by both the stack plots and the allplot
-    RideItem *ride = mainWindow->rideItem();
+    RideItem *ride = current;
+
+    // null rides are possible on new cyclist
+    if (!ride) return;
 
     // hide the usual plot decorations etc
     fullPlot->showPower(1);
@@ -408,7 +411,7 @@ AllPlotWindow::redrawFullPlot()
 void
 AllPlotWindow::redrawStackPlot()
 {
-    if (showStack->isChecked()) {
+    if (showStack->isChecked() && current) {
 
         // turn off display updates whilst we
         // do this, it takes a while and is prone
@@ -499,11 +502,6 @@ AllPlotWindow::rideSelected()
     redrawFullPlot();
     redrawAllPlot();
     setupStackPlots();
-
-    if(showStack->isChecked()) {
-        stackZoomUp->setEnabled(stackZoomUpShouldEnable(stackWidth));
-        stackZoomDown->setEnabled(stackZoomDownShouldEnable(stackWidth));
-    }
 
     stale = false;
 }
@@ -662,6 +660,9 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
         scrollLeft->hide();
         scrollRight->hide();
 
+        stackZoomUp->setEnabled(stackZoomUpShouldEnable(stackWidth));
+        stackZoomDown->setEnabled(stackZoomDownShouldEnable(stackWidth));
+
         // show stacked view
         stackFrame->show();
 
@@ -681,6 +682,9 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
         spanSlider->show();
         scrollLeft->show();
         scrollRight->show();
+
+        stackZoomUp->setEnabled(false);
+        stackZoomDown->setEnabled(false);
     }
 }
 
@@ -820,8 +824,7 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
             x2 = allMarker2->xValue();
         }
 
-        QTreeWidgetItem *which = mainWindow->rideItem();
-        RideItem *ride = (RideItem*)which;
+        RideItem *ride = current;
 
         double distance1 = -1;
         double distance2 = -1;
@@ -1080,7 +1083,9 @@ AllPlotWindow::resetStackedDatas()
 bool
 AllPlotWindow::stackZoomUpShouldEnable(int sw)
 {
-    if (sw >= 200  || sw >= allPlot->rideItem->ride()->dataPoints().last()->secs/60) {
+    if (!current) return false;
+
+    if (sw >= 200  || sw >= current->ride()->dataPoints().last()->secs/60) {
         return false;
     }
     else {
@@ -1102,11 +1107,14 @@ AllPlotWindow::stackZoomDownShouldEnable(int sw)
 void
 AllPlotWindow::setStackZoomUp()
 {
-    if (stackWidth<200 && stackWidth<allPlot->rideItem->ride()->dataPoints().last()->secs/60) {
+    if (!current) return;
+
+    if (stackWidth<200 && stackWidth<current->ride()->dataPoints().last()->secs/60) {
 
         stackWidth = ceil(stackWidth * 1.25);
         setupStackPlots();
         stackZoomUp->setEnabled(stackZoomUpShouldEnable(stackWidth));
+        stackZoomDown->setEnabled(stackZoomDownShouldEnable(stackWidth));
     }
 }
 
@@ -1117,6 +1125,7 @@ AllPlotWindow::setStackZoomDown()
 
         stackWidth = floor(stackWidth / 1.25);
         setupStackPlots();
+        stackZoomUp->setEnabled(stackZoomUpShouldEnable(stackWidth));
         stackZoomDown->setEnabled(stackZoomDownShouldEnable(stackWidth));
     }
 }
@@ -1124,6 +1133,8 @@ AllPlotWindow::setStackZoomDown()
 void
 AllPlotWindow::showStackChanged(int value)
 {
+    if (!current) return;
+
     // when we swap from normal to
     // stacked view, save the mode so
     // we can startup with the 'preferred'
@@ -1142,18 +1153,14 @@ AllPlotWindow::showStackChanged(int value)
         // now they are all set, lets replot them
         foreach(AllPlot *plot, allPlots) plot->replot();
 
-        stackZoomUp->setEnabled(stackZoomUpShouldEnable(stackWidth));
-        stackZoomDown->setEnabled(stackZoomDownShouldEnable(stackWidth));
     } else {
         // refresh plots
         redrawAllPlot();
 
-        stackZoomUp->setEnabled(false);
-        stackZoomDown->setEnabled(false);
     }
 
     // reset the view
-    setAllPlotWidgets(mainWindow->rideItem());
+    setAllPlotWidgets(current);
 }
 
 void
@@ -1181,7 +1188,7 @@ AllPlotWindow::setupStackPlots()
     int _stackWidth = stackWidth;
     if (fullPlot->bydist) _stackWidth = stackWidth/3;
 
-    RideItem* rideItem = fullPlot->rideItem;
+    RideItem* rideItem = current;
 
     // don't try and plot for null files
     if (!rideItem || !rideItem->ride() || rideItem->ride()->dataPoints().isEmpty()) return;
