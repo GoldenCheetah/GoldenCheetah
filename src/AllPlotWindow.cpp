@@ -371,6 +371,7 @@ AllPlotWindow::redrawAllPlot()
             //allPlot->setTitle("");
             allPlot->replot();
         }
+
     }
 }
 
@@ -498,6 +499,11 @@ AllPlotWindow::rideSelected()
     redrawFullPlot();
     redrawAllPlot();
     setupStackPlots();
+
+    if(showStack->isChecked()) {
+        stackZoomUp->setEnabled(stackZoomUpShouldEnable(stackWidth));
+        stackZoomDown->setEnabled(stackZoomDownShouldEnable(stackWidth));
+    }
 
     stale = false;
 }
@@ -1100,7 +1106,7 @@ AllPlotWindow::setStackZoomUp()
 
         stackWidth = ceil(stackWidth * 1.25);
         setupStackPlots();
-
+        stackZoomUp->setEnabled(stackZoomUpShouldEnable(stackWidth));
     }
 }
 
@@ -1111,7 +1117,7 @@ AllPlotWindow::setStackZoomDown()
 
         stackWidth = floor(stackWidth / 1.25);
         setupStackPlots();
-
+        stackZoomDown->setEnabled(stackZoomDownShouldEnable(stackWidth));
     }
 }
 
@@ -1132,15 +1138,18 @@ AllPlotWindow::showStackChanged(int value)
     if (value) {
         // refresh plots
         resetStackedDatas();
-        stackZoomUp->setEnabled(stackZoomUpShouldEnable(stackWidth));
-        stackZoomDown->setEnabled(stackZoomDownShouldEnable(stackWidth));
 
         // now they are all set, lets replot them
         foreach(AllPlot *plot, allPlots) plot->replot();
 
+        stackZoomUp->setEnabled(stackZoomUpShouldEnable(stackWidth));
+        stackZoomDown->setEnabled(stackZoomDownShouldEnable(stackWidth));
     } else {
         // refresh plots
         redrawAllPlot();
+
+        stackZoomUp->setEnabled(false);
+        stackZoomDown->setEnabled(false);
     }
 
     // reset the view
@@ -1272,8 +1281,6 @@ AllPlotWindow::setupStackPlots()
     // we are now happy for a screen refresh to take place
     stackFrame->setUpdatesEnabled(true);
 
-    stackZoomUp->setEnabled(stackZoomUpShouldEnable(stackWidth));
-    stackZoomDown->setEnabled(stackZoomDownShouldEnable(stackWidth));
 }
 
 void
