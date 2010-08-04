@@ -608,6 +608,9 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
         stopidx  = plot->timeIndex(plot->timeArray[(stopidx>=plot->timeArray.size()?plot->timeArray.size()-1:stopidx)]/60)-1;
     }
 
+    // make sure indexes are still valid
+    if (startidx > stopidx || startidx < 0 || stopidx < 0) return;
+
     double *smoothW = &plot->smoothWatts[startidx];
     double *smoothT = &plot->smoothTime[startidx];
     double *smoothHR = &plot->smoothHr[startidx];
