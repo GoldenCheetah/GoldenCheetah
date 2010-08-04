@@ -575,7 +575,7 @@ PfPvPlot::recalc()
     }
     else
 	// an empty curve if no power (or zero power) is specified
-	cpCurve->setData(QwtArray <double>::QwtArray(), QwtArray <double>::QwtArray());
+	cpCurve->setData(QwtArray <double>(), QwtArray <double>());
     
     //replot();
 }

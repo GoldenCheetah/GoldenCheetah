@@ -380,7 +380,7 @@ void LTMTool::readSeasons()
     }
     Season season;
     QDate today = QDate::currentDate();
-    QDate eom = QDate::QDate(today.year(), today.month(), today.daysInMonth());
+    QDate eom = QDate(today.year(), today.month(), today.daysInMonth());
 
     // add Default Date Ranges
     season.setName(tr("All Dates"));
@@ -391,13 +391,13 @@ void LTMTool::readSeasons()
 
     season.setName(tr("This Year"));
     season.setType(Season::temporary);
-    season.setStart(QDate::QDate(today.year(), 1,1));
-    season.setEnd(QDate::QDate(today.year(), 12, 31));
+    season.setStart(QDate(today.year(), 1,1));
+    season.setEnd(QDate(today.year(), 12, 31));
     seasons.append(season);
 
     season.setName(tr("This Month"));
     season.setType(Season::temporary);
-    season.setStart(QDate::QDate(today.year(), today.month(),1));
+    season.setStart(QDate(today.year(), today.month(),1));
     season.setEnd(eom);
     seasons.append(season);
 
