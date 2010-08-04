@@ -239,7 +239,7 @@ PowerHist::PowerHist(MainWindow *mainWindow):
     grid->enableX(false);
     grid->attach(this);
 
-    zoneLabels = QList <PowerHistZoneLabel *>::QList();
+    zoneLabels = QList <PowerHistZoneLabel *>();
 
     zoomer = new penTooltip(this->canvas());
 
