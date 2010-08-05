@@ -181,7 +181,6 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                      else {
                          watts = line.section(',', 2, 2).toDouble();
                      }
-                     watts = line.section(',', 2, 2).toDouble();
                      km = line.section(',', 3, 3).toDouble();
                      cad = line.section(',', 4, 4).toDouble();
                      hr = line.section(',', 5, 5).toDouble();
