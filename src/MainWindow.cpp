@@ -29,6 +29,7 @@
 #include "ConfigDialog.h"
 #include "CriticalPowerWindow.h"
 #include "GcRideFile.h"
+#include "PwxRideFile.h"
 #include "LTMWindow.h"
 #include "PfPvWindow.h"
 #include "DownloadRideDialog.h"
@@ -371,8 +372,10 @@ MainWindow::MainWindow(const QDir &home) :
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Export to CSV..."), this,
                         SLOT(exportCSV()), tr("Ctrl+E"));
-    rideMenu->addAction(tr("&Export to GC..."), this,
+    rideMenu->addAction(tr("Export to GC..."), this,
                         SLOT(exportGC()));
+    rideMenu->addAction(tr("Export to PWX..."), this,
+                        SLOT(exportPWX()));
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Save ride"), this,
                         SLOT(saveRide()), tr("Ctrl+S"));
@@ -668,6 +671,26 @@ MainWindow::currentRide()
         return NULL;
     }
     return ((RideItem*) treeWidget->selectedItems().first())->ride();
+}
+
+void
+MainWindow::exportPWX()
+{
+    if ((treeWidget->selectedItems().size() != 1)
+        || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
+        QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
+        return;
+    }
+
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Export PWX"), QDir::homePath(), tr("PWX (*.pwx)"));
+    if (fileName.length() == 0)
+        return;
+
+    QString err;
+    QFile file(fileName);
+    PwxFileReader reader;
+    reader.writeRideFile(home.dirName() /* cyclist name */, currentRide(), file);
 }
 
 void
