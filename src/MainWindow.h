@@ -129,6 +129,7 @@ class MainWindow : public QMainWindow
         void openCyclist();
         void downloadRide();
         void manualRide();
+        void exportPWX();
         void exportCSV();
         void exportGC();
         void manualProcess(QString);

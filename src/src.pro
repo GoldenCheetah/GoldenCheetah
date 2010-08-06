@@ -117,6 +117,7 @@ HEADERS += \
         PowerHist.h \
         PowerTapDevice.h \
         PowerTapUtil.h \
+        PwxRideFile.h \
         QuarqdClient.h \
         QuarqParser.h \
         QuarqRideFile.h \
@@ -226,6 +227,7 @@ SOURCES += \
         PowerHist.cpp \
         PowerTapDevice.cpp \
         PowerTapUtil.cpp \
+        PwxRideFile.cpp \
         QuarqdClient.cpp \
         QuarqParser.cpp \
         QuarqRideFile.cpp \
