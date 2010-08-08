@@ -11,6 +11,17 @@ QT += xml sql network webkit
 LIBS += ../qwt/lib/libqwt.a
 LIBS += -lm
 
+!isEmpty( LIBOAUTH_INSTALL ) {
+INCLUDEPATH += $${LIBOAUTH_INSTALL}/include
+LIBS += $${LIBCRYPTO_INSTALL}
+LIBS +=  $${LIBOAUTH_INSTALL}/lib/liboauth.a
+LIBS += $${LIBZ_INSTALL}
+LIBS += $${LIBCURL_INSTALL}
+DEFINES += GC_HAVE_LIBOAUTH
+SOURCES += TwitterDialog.cpp
+HEADERS += TwitterDialog.h
+}
+
 !isEmpty( D2XX_INCLUDE ) {
   INCLUDEPATH += $${D2XX_INCLUDE}
   HEADERS += D2XX.h
@@ -171,7 +182,6 @@ HEADERS += \
         TrainTabs.h \
         TrainTool.h \
         TrainWindow.h \
-        TwitterDialog.h \
         Units.h \
         ViewSelection.h \
         WeeklySummaryWindow.h \
@@ -281,7 +291,6 @@ SOURCES += \
         TrainTabs.cpp \
         TrainTool.cpp \
         TrainWindow.cpp \
-        TwitterDialog.cpp \
         ViewSelection.cpp \
         WeeklySummaryWindow.cpp \
         WkoRideFile.cpp \

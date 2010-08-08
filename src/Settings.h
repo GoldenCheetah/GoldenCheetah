@@ -61,8 +61,6 @@
 #define GC_WORKOUTDIR      "workoutDir"
 #define GC_TRAIN_SPLITTER_SIZES  "trainwindow/splitterSizes"
 #define GC_LTM_SPLITTER_SIZES  "ltmwindow/splitterSizes"
-#define GC_TWITTER_USERNAME "TwitterUser"
-#define GC_TWITTER_PASSWORD "TwitterPass"
 
 // device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended
 // to them to specify which configured device i.e. devices1 ... devicesn where
@@ -81,6 +79,12 @@
 #define GC_DPFS_MAX       "dataprocess/fixspikes/max"
 #define GC_DPFS_VARIANCE  "dataprocess/fixspikes/variance"
 #define GC_DPTA           "dataprocess/torqueadjust/adjustment"
+
+//Twitter oauth keys
+#define GC_TWITTER_CONSUMER_KEY    "qbbmhDt8bG8ZBcT3r9nYw" //< consumer key
+#define GC_TWITTER_CONSUMER_SECRET "IWXu2G6mQC5xvhM8V0ohA0mPTUOqAFutiuKIva3LQg"
+#define GC_TWITTER_TOKEN "twitter_token"
+#define GC_TWITTER_SECRET "twitter_secret"
 
 #include <QSettings>
 #include <boost/shared_ptr.hpp>

@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2009 Justin F. Knotzke (jknotzke@shampoo.ca)
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #include "TwitterDialog.h"
 #include "Settings.h"
 #include <QHttp>
@@ -19,7 +37,7 @@ TwitterDialog::TwitterDialog(MainWindow *mainWindow, RideItem *item) :
     timeRidingChk = new QCheckBox(tr("Time Riding"));
     totalDistanceChk = new QCheckBox(tr("Total Distance"));
     elevationGainChk = new QCheckBox(tr("Elevation Gain"));
-    totalWorkChk = new QCheckBox(tr("Total Work (kj)"));
+    totalWorkChk = new QCheckBox(tr("Total Work (kJ)"));
     averageSpeedChk = new QCheckBox(tr("Average Speed"));
     averagePowerChk = new QCheckBox(tr("Average Power"));
     averageHRMChk = new QCheckBox(tr("Average Heart Rate"));
@@ -78,26 +96,26 @@ TwitterDialog::TwitterDialog(MainWindow *mainWindow, RideItem *item) :
 void
 TwitterDialog::tweetCurrentRide()
 {
-    setEnabled(false);
-    QString twitterMsg = getTwitterMessage();
-    QString post = "/statuses/update.xml?status=";
-    QString strUrl = QUrl::toPercentEncoding(twitterMsg + " #goldencheetah");
-    qDebug() << post << strUrl;
-    QHttp *twitter_http_updater = new QHttp();
-    twitter_http_updater->setHost("www.twitter.com");
-    twitter_http_updater->setUser(settings->value(GC_TWITTER_USERNAME).toString(), settings->value(GC_TWITTER_PASSWORD).toString());
-    twitter_http_updater->post(post+strUrl, QByteArray());
-    connect(twitter_http_updater, SIGNAL(done(bool)), this, SLOT(updateTwitterStatusFinish(bool)));
-}
 
-void TwitterDialog::updateTwitterStatusFinish(bool error)
-{
-    if(error == true)
-        QMessageBox::warning(this, tr("Tweeted Ride"), tr("Tweet Not Sent"));
-    else
-        QMessageBox::information(this, tr("Tweeted Ride"), tr("Tweet Sent"));
+    QString strToken = settings->value(GC_TWITTER_TOKEN).toString();
+    QString strSecret = settings->value(GC_TWITTER_SECRET).toString();
+
+    QString s_token = QString(strToken);
+    QString s_secret = QString(strSecret);
+
+    char *postarg = NULL;
+    QString qurl = "http://api.twitter.com/1/statuses/update.json?status=";
+
+    QString twitterMsg = getTwitterMessage();
+    const QString strUrl = QUrl::toPercentEncoding(twitterMsg + " #goldencheetah");
+    qurl.append(strUrl);
+    const char *req_url = oauth_sign_url2(qurl.toLatin1(), &postarg, OA_HMAC, NULL, GC_TWITTER_CONSUMER_KEY, GC_TWITTER_CONSUMER_SECRET, s_token.toLatin1(), s_secret.toLatin1());
+    oauth_http_post(req_url,postarg);
+
+    if(postarg) free(postarg);
 
     accept();
+
 }
 
 QString TwitterDialog::getTwitterMessage()
@@ -127,9 +145,7 @@ QString TwitterDialog::getTwitterMessage()
     if(totalDistanceChk->isChecked())
     {
         m = ride->metrics.value("total_distance");
-        tmp = round(m->value(useMetricUnits));
-        QString msg = QString("Total Distance: %1 " + (useMetricUnits ? tr("KM") : tr("Miles"))).arg(tmp);
-        qDebug() << msg;
+        QString msg = QString("Total Distance: %1" + (useMetricUnits ? tr("km") : tr("mi"))).arg(m->value(useMetricUnits),1,'f',1);
         twitterMsg.append(msg + " ");
     }
 
@@ -137,7 +153,7 @@ QString TwitterDialog::getTwitterMessage()
     {
         m = ride->metrics.value("elevation_gain");
         tmp = round(m->value(useMetricUnits));
-        QString msg = QString("Elevation Gained: %1"+ (useMetricUnits ? tr("Meters") : tr("Feet"))).arg(tmp);
+        QString msg = QString("Elevation Gained: %1"+ (useMetricUnits ? tr("m") : tr("ft"))).arg(tmp);
         twitterMsg.append(msg + " ");
     }
 
@@ -145,15 +161,14 @@ QString TwitterDialog::getTwitterMessage()
     {
         m = ride->metrics.value("total_work");
         tmp = round(m->value(true));
-        QString msg = QString("Total Work (kj): %1").arg(tmp);
+        QString msg = QString("Total Work: %1"+ tr("kJ")).arg(tmp);
         twitterMsg.append(msg + " ");
     }
 
     if(averageSpeedChk->isChecked())
     {
         m = ride->metrics.value("average_speed");
-        tmp = round(m->value(useMetricUnits));
-        QString msg = QString("Average Speed: %1"+ (useMetricUnits ? tr("KM/H") : tr("MPH"))).arg(tmp);
+        QString msg = QString("Average Speed: %1"+ (useMetricUnits ? tr("km/h") : tr("mph"))).arg(m->value(useMetricUnits),1,'f',1);
         twitterMsg.append(msg + " ");
     }
 
@@ -161,7 +176,7 @@ QString TwitterDialog::getTwitterMessage()
     {
         m = ride->metrics.value("average_power");
         tmp = round(m->value(true));
-        QString msg = QString("Average Power: %1 watts").arg(tmp);
+        QString msg = QString("Average Power: %1 "+ tr("watts")).arg(tmp);
         twitterMsg.append(msg + " ");
     }
 
@@ -169,7 +184,7 @@ QString TwitterDialog::getTwitterMessage()
     {
         m = ride->metrics.value("average_hr");
         tmp = round(m->value(true));
-        QString msg = QString("Average Heart Rate: %1").arg(tmp);
+        QString msg = QString("Average Heart Rate: %1"+ tr("bpm")).arg(tmp);
         twitterMsg.append(msg + " ");
     }
 
@@ -177,7 +192,7 @@ QString TwitterDialog::getTwitterMessage()
     {
         m = ride->metrics.value("average_cad");
         tmp = round(m->value(true));
-        QString msg = QString("Average Cadence: %1").arg(tmp);
+        QString msg = QString("Average Cadence: %1"+ tr("rpm")).arg(tmp);
         twitterMsg.append(msg + " ");
     }
 
@@ -185,7 +200,7 @@ QString TwitterDialog::getTwitterMessage()
     {
         m = ride->metrics.value("max_power");
         tmp = round(m->value(true));
-        QString msg = QString("Max Power: %1 watts").arg(tmp);
+        QString msg = QString("Max Power: %1 "+ tr("watts")).arg(tmp);
         twitterMsg.append(msg + " ");
     }
 
@@ -193,7 +208,7 @@ QString TwitterDialog::getTwitterMessage()
     {
         m = ride->metrics.value("max_heartrate");
         tmp = round(m->value(true));
-        QString msg = QString("Max Heart Rate: %1").arg(tmp);
+        QString msg = QString("Max Heart Rate: %1"+ tr("bpm")).arg(tmp);
         twitterMsg.append(msg + " ");
     }
 

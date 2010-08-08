@@ -6,6 +6,16 @@ BOOST_INSTALL = /usr/local/boost
 SRMIO_INSTALL = /usr/local/srmio
 D2XX_INCLUDE = /usr/local/include/D2XX
 
+# If you want Twitter support you must install liboauth
+# http://liboauth.sourceforge.net/
+# Set the path to where liboauth.a was installed
+# By default it will have been installed like this:
+#
+#LIBOAUTH_INSTALL = /usr/local
+#LIBCRYPTO_INSTALL = -lcrypto
+#LIBCURL_INSTALL=-lcurl
+#LIBZ_INSTALL=-lz
+
 # If you want 3D plotting, you need to install qwtplot3d
 #
 #  http://qwtplot3d.sourceforge.net/

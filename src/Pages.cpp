@@ -10,6 +10,8 @@
 #include "ColorButton.h"
 #include "SpecialFields.h"
 
+#include <QDebug>
+
 ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
 {
     QTabWidget *tabs = new QTabWidget(this);
@@ -1819,29 +1821,94 @@ CPPage::zonesChanged()
         }
     }
 }
+
+#ifdef GC_HAVE_LIBOAUTH
 //
 // Twitter Config page
 //
 TwitterPage::TwitterPage(QWidget *parent) : QWidget(parent)
 {
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+    settings = GetApplicationSettings();
     QTabWidget *tabs = new QTabWidget(this);
     QWidget *twitter = new QWidget(this);
     tabs->addTab(twitter, tr("Twitter Config"));
     QHBoxLayout *twitterlayout = new QHBoxLayout(twitter);
+    authorizeButton = new QPushButton(tr("Authorize"));
 
-    accountLabel = new QLabel(tr("Twitter User Name"),this);
-    accountName = new QLineEdit(tr(""), this);
+    QTextEdit *twitterInstructionsEdit = new QTextEdit(this);
+    twitterInstructionsEdit->setReadOnly(true);
+    twitterInstructionsEdit->setEnabled(false);
+    twitterInstructionsEdit->setPlainText(tr("Click the Authorize button. Your default browser will open to Twitter. "
+                                              "Once you have authorized Golden Cheetah access your Twitter account, "
+                                               "Copy/Paste PIN number from Twitter into PIN field. Click Save"));
+    twitterPinLabel = new QLabel(tr("Enter PIN: "),this);
+    twitterPIN = new QLineEdit(tr(""), this);
 
-    passwordLabel = new QLabel(tr("Password"),this);
-    passwordEdit = new QLineEdit(tr(""), this);
-    passwordEdit->setEchoMode(QLineEdit::Password);
-
-    twitterlayout->addWidget(accountLabel);
-    twitterlayout->addWidget(accountName);
-    twitterlayout->addWidget(passwordLabel);
-    twitterlayout->addWidget(passwordEdit);
-
-    accountName->setText(settings->value(GC_TWITTER_USERNAME).toString());
-    passwordEdit->setText(settings->value(GC_TWITTER_PASSWORD).toString());
+    twitterlayout->addWidget(twitterInstructionsEdit);
+    twitterlayout->addWidget(authorizeButton);
+    twitterlayout->addWidget(twitterPinLabel);
+    twitterlayout->addWidget(twitterPIN);
+    connect(authorizeButton, SIGNAL(clicked()), this, SLOT(authorizeClicked()));
 }
+
+void TwitterPage::authorizeClicked()
+{
+    int rc;
+    char **rv = NULL;
+    QString token;
+    QString url = QString();
+    t_key = NULL;
+    t_secret = NULL;
+
+    const char *request_token_uri = "http://api.twitter.com/oauth/request_token";
+
+    char *req_url = NULL;
+    char *postarg = NULL;
+    char *reply   = NULL;
+    req_url = oauth_sign_url2(request_token_uri, NULL, OA_HMAC, NULL, GC_TWITTER_CONSUMER_KEY, GC_TWITTER_CONSUMER_SECRET, NULL, NULL);
+    reply = oauth_http_get(req_url,postarg);
+
+    rc = oauth_split_url_parameters(reply, &rv);
+    qsort(rv, rc, sizeof(char *), oauth_cmpstringp);
+    token = QString(rv[1]);
+    t_key  =strdup(&(rv[1][12]));
+    t_secret =strdup(&(rv[2][19]));
+    url = QString("http://api.twitter.com/oauth/authorize?");
+    url.append(token);
+    QDesktopServices::openUrl(QUrl(url));
+    if(rv) free(rv);
+}
+
+void TwitterPage::saveClicked()
+{
+    char *reply;
+    char *req_url;
+    char **rv = NULL;
+    char *postarg = NULL;
+    QString url = QString("http://api.twitter.com/oauth/access_token?a=b&oauth_verifier=");
+
+    QString strPin = twitterPIN->text();
+    if(strPin.size() == 0)
+        return;
+
+    url.append(strPin);
+
+    req_url = oauth_sign_url2(url.toLatin1(), NULL, OA_HMAC, NULL, GC_TWITTER_CONSUMER_KEY, GC_TWITTER_CONSUMER_SECRET, t_key, t_secret);
+    reply = oauth_http_get(req_url,postarg);
+
+    int rc = oauth_split_url_parameters(reply, &rv);
+
+    if(rc ==4)
+    {
+        qsort(rv, rc, sizeof(char *), oauth_cmpstringp);
+
+        const char *oauth_token = strdup(&(rv[0][12]));
+        const char *oauth_secret = strdup(&(rv[1][19]));
+
+        //Save Twitter oauth_token and oauth_secret;
+        settings->setValue(GC_TWITTER_TOKEN, oauth_token);
+        settings->setValue(GC_TWITTER_SECRET, oauth_secret);
+    }
+}
+#endif
+
