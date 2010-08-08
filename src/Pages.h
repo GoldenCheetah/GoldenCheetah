@@ -23,6 +23,10 @@
 #include "RideMetadata.h"
 #include "DataProcessor.h"
 
+extern "C" {
+#include <oauth.h>
+}
+
 class QGroupBox;
 class QHBoxLayout;
 class QVBoxLayout;
@@ -402,16 +406,17 @@ class TwitterPage : public QWidget
     public:
 
         TwitterPage(QWidget *parent = 0);
-        void saveClicked();
 
         // Children talk to each other
         SchemePage *schemePage;
         CPPage *cpPage;
-        QLineEdit *accountName;
-        QLineEdit *passwordEdit;
-
+        QLineEdit *twitterPIN;
+        void saveClicked();
     public slots:
 
+#ifdef GC_HAVE_LIBOAUTH
+        void authorizeClicked();
+#endif
 
     protected:
 
@@ -422,8 +427,12 @@ class TwitterPage : public QWidget
 
         // local versions for modification
     private:
-        QLabel *accountLabel;
-        QLabel *passwordLabel;
+        QLabel *twitterPinLabel;
+        QPushButton *authorizeButton;
+        char *t_key;
+        char *t_secret;
+        boost::shared_ptr<QSettings> settings;
+
 };
 
 #endif

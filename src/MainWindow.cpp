@@ -950,10 +950,6 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
         QAction *actSplitRide = new QAction(tr("Split Ride"), treeWidget);
         connect(actSplitRide, SIGNAL(triggered(void)), this, SLOT(splitRide()));
 
-        QAction *actTweetRide = new QAction(tr("Tweet Ride"), treeWidget);
-        connect(actTweetRide, SIGNAL(triggered(void)), this, SLOT(tweetRide()));
-
-
         if (rideItem->isDirty() == true) {
           menu.addAction(actSaveRide);
           menu.addAction(revertRide);
@@ -963,7 +959,12 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
 	menu.addAction(actBestInt);
 	menu.addAction(actPowerPeaks);
 	menu.addAction(actSplitRide);
-	menu.addAction(actTweetRide);
+
+#ifdef GC_HAVE_LIBOAUTH
+        QAction *actTweetRide = new QAction(tr("Tweet Ride"), treeWidget);
+        connect(actTweetRide, SIGNAL(triggered(void)), this, SLOT(tweetRide()));
+        menu.addAction(actTweetRide);
+#endif
 
         menu.exec(treeWidget->mapToGlobal( pos ));
     }
@@ -1482,6 +1483,7 @@ MainWindow::manualProcess(QString name)
     }
 }
 
+#ifdef GC_HAVE_LIBOAUTH
 void
 MainWindow::tweetRide()
 {
@@ -1496,4 +1498,5 @@ MainWindow::tweetRide()
     twitterDialog->setWindowModality(Qt::ApplicationModal);
     twitterDialog->exec();
 }
+#endif
 
