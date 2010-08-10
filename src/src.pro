@@ -69,6 +69,7 @@ HEADERS += \
         AllPlotWindow.h \
         ANTplusController.h \
         BestIntervalDialog.h \
+        BinRideFile.h \
         ChooseCyclistDialog.h \
         Colors.h \
         ColorButton.h \
@@ -174,6 +175,7 @@ SOURCES += \
         BasicRideMetrics.cpp \
         BestIntervalDialog.cpp \
         BikeScore.cpp \
+        BinRideFile.cpp \
         DanielsPoints.cpp \
         ChooseCyclistDialog.cpp \
         Colors.cpp \
