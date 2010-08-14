@@ -30,6 +30,7 @@
 #include <assert.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
+#include <qwt_plot_layout.h>
 #include <qwt_plot_marker.h>
 #include <qwt_text.h>
 #include <qwt_legend.h>
@@ -256,6 +257,9 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     grid = new QwtPlotGrid();
     grid->enableX(false);
     grid->attach(this);
+
+    // get rid of nasty blank space on right of the plot
+    plotLayout()->setAlignCanvasToScales(true);
 
     configChanged(); // set colors
 }
