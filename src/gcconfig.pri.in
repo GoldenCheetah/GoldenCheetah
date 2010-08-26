@@ -14,6 +14,18 @@ D2XX_INCLUDE = /usr/local/include/D2XX
 
 #QWT3D_INSTALL = /usr/local/qwtplot3d
 
+# If you want support for Google Earth .kml files then you need
+# to install the Google libkml library
+#
+# http://code.google.com/p/libkml/
+# or on Linux sudo apt-get install libkml-dev
+#
+# then set the following variable appropriately
+# to the root of the libs/includ path
+
+#KML_INSTALL = /usr/local
+
+
 # We recommend a debug build for development, and a static build for releases.
 CONFIG += debug
 #CONFIG += static

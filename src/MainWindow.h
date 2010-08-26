@@ -132,6 +132,9 @@ class MainWindow : public QMainWindow
         void exportPWX();
         void exportCSV();
         void exportGC();
+#ifdef GC_HAVE_KML
+        void exportKML();
+#endif
         void manualProcess(QString);
         void importFile();
         void findBestIntervals();

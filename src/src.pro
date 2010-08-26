@@ -41,6 +41,19 @@ qwt3d {
   DEFINES += GC_HAVE_QWTPLOT3D
 }
 
+!isEmpty( KML_INSTALL) {
+    KML_INCLUDE = $${KML_INSTALL}/include/kml
+    KML_LIBS = $${KML_INSTALL}/lib/libkmldom.a \
+               $${KML_INSTALL}/lib/libkmlconvenience.a \
+               $${KML_INSTALL}/lib/libkmlengine.a \
+               $${KML_INSTALL}/lib/libkmlbase.a \
+
+    LIBS += $${KML_LIBS} $${KML_LIBS}
+    DEFINES += GC_HAVE_KML
+    SOURCES += KmlRideFile.cpp
+    HEADERS += KmlRideFile.h
+}
+
 macx {
     LIBS += -framework Carbon
 }
