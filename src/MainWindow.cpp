@@ -29,6 +29,9 @@
 #include "ConfigDialog.h"
 #include "CriticalPowerWindow.h"
 #include "GcRideFile.h"
+#ifdef GC_HAVE_KML
+#include "KmlRideFile.h"
+#endif
 #include "PwxRideFile.h"
 #include "LTMWindow.h"
 #include "PfPvWindow.h"
@@ -374,6 +377,10 @@ MainWindow::MainWindow(const QDir &home) :
                         SLOT(exportCSV()), tr("Ctrl+E"));
     rideMenu->addAction(tr("Export to GC..."), this,
                         SLOT(exportGC()));
+#ifdef GC_HAVE_KML
+    rideMenu->addAction(tr("&Export to KML..."), this,
+                        SLOT(exportKML()));
+#endif
     rideMenu->addAction(tr("Export to PWX..."), this,
                         SLOT(exportPWX()));
     rideMenu->addSeparator ();
@@ -712,6 +719,28 @@ MainWindow::exportGC()
     GcFileReader reader;
     reader.writeRideFile(currentRide(), file);
 }
+
+#ifdef GC_HAVE_KML
+void
+MainWindow::exportKML()
+{
+    if ((treeWidget->selectedItems().size() != 1)
+        || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
+        QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
+        return;
+    }
+
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Export KML"), QDir::homePath(), tr("Google Earth KML (*.kml)"));
+    if (fileName.length() == 0)
+        return;
+
+    QString err;
+    QFile file(fileName);
+    KmlFileReader reader;
+    reader.writeRideFile(currentRide(), file);
+}
+#endif
 
 void
 MainWindow::exportCSV()
