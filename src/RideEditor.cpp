@@ -807,7 +807,9 @@ RideEditor::getPaste(QVector<QVector<double> >&cells, QStringList &seps, QString
     regexpStr += "]";
     QRegExp sep(regexpStr); // RegExp for seperators
 
-    foreach(QString line, text.split("\n")) {
+    QRegExp ELine(("\n|\r|\r\n")); //RegExp for line endings
+
+    foreach(QString line, text.split(ELine)) {
         if (line == "") continue;
 
         if (hasHeader && first == true) {
