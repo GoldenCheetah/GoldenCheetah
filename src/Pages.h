@@ -23,9 +23,11 @@
 #include "RideMetadata.h"
 #include "DataProcessor.h"
 
+#ifdef GC_HAVE_LIBOAUTH
 extern "C" {
 #include <oauth.h>
 }
+#endif
 
 class QGroupBox;
 class QHBoxLayout;
