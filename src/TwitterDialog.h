@@ -23,9 +23,12 @@
 #include <QtGui>
 #include "MainWindow.h"
 #include "RideItem.h"
+
+#ifdef GC_HAVE_LIBOAUTH
 extern "C" {
 #include <oauth.h>
 }
+#endif
 
 class TwitterDialog : public QDialog
 {
