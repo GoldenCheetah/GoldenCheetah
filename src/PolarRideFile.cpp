@@ -17,6 +17,7 @@
  */
 
 #include "PolarRideFile.h"
+#include "Units.h"
 #include <QRegExp>
 #include <QTextStream>
 #include <algorithm> // for std::sort
@@ -30,9 +31,12 @@ static int polarFileReaderRegistered =
 
 RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors) const
 {
+/*
+* Polar HRM file format documented at www.polar.fi/files/Polar_HRM_file%20format.pdf
+*/
     QRegExp metricUnits("(km|kph|km/h)", Qt::CaseInsensitive);
     QRegExp englishUnits("(miles|mph|mp/h)", Qt::CaseInsensitive);
-//    bool metric;
+    bool metric = true;
 
     QDate date;
     QString note("");
@@ -123,8 +127,8 @@ this bit low in the .hrm file.  This will have to get changed if other software 
 this differently
 */
 
-//                    if (smode.length()>6 && smode.at(7)=='1')
-//                        metric = true;
+                    if (smode.length()>6 && smode.at(7)=='1')
+                        metric = false;
 
                 } else if (line.contains("Interval=")) {
                     recInterval = line.remove(0,9).toInt();
@@ -200,6 +204,13 @@ this differently
                         next_interval = intervals.at(interval);
                     }
                 }
+
+                if (!metric) {
+                    km *= KM_PER_MILE;
+                    kph *= KM_PER_MILE;
+                    alt *= METERS_PER_FOOT;
+                }
+
 	            rideFile->appendPoint(seconds, cad, hr, km, kph, nm, watts, alt, 0.0, 0.0, 0.0, interval);
 	            //fprintf(stderr, " %f, %f, %f, %f, %f, %f, %f, %d\n", seconds, cad, hr, km, kph, nm, watts, alt, interval);
             }
