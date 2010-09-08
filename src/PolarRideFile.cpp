@@ -94,8 +94,13 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors) const
             else if (line.startsWith("[")) {
                 //fprintf(stderr, "section : %s\n", line.toAscii().constData());
                 section=line;
-                if (section == "[HRData]")
+                if (section == "[HRData]") {
+                    // Some systems, like the Tacx HRM exporter, do not add an [IntTimes] section, so we need to
+                    // specify that the whole ride is one big interval.
+                    if (intervals.isEmpty())
+                        intervals.append(seconds);
                    next_interval = intervals.at(0);
+               }
             }
             else if (section == "[Params]"){
                 if (line.contains("Version=")) {
