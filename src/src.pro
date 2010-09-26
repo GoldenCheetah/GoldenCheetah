@@ -284,6 +284,7 @@ SOURCES += \
         SrdRideFile.cpp \
         SrmRideFile.cpp \
         StressCalculator.cpp \
+	TacxCafRideFile.cpp \
         TcxParser.cpp \
         TcxRideFile.cpp \
         TxtRideFile.cpp \
