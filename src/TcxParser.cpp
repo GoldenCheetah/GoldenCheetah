@@ -29,6 +29,12 @@
 TcxParser::TcxParser (RideFile* rideFile)
    : rideFile(rideFile)
 {
+  boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+  isGarminSmartRecording = settings->value(GC_GARMIN_SMARTRECORD,Qt::Checked);
+  GarminHWM = settings->value(GC_GARMIN_HWMARK);
+  if (GarminHWM.isNull() || GarminHWM.toInt() == 0)
+      GarminHWM.setValue(25); // default to 25 seconds.
+
 }
 
 bool
@@ -157,12 +163,15 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 	      double deltaAlt = alt - prevPoint->alt;
           double deltaLon = lon - prevPoint->lon;
           double deltaLat = lat - prevPoint->lat;
-	      if(deltaSecs == 1) {
-		  // no smart recording, just insert the data
+
+	  // Smart Recording High Water Mark.
+	  if ((isGarminSmartRecording.toInt() == 0) || (deltaSecs == 1) || (deltaSecs >= GarminHWM.toInt())) {
+		  // no smart recording, or delta exceeds HW treshold, just insert the data
 		  rideFile->appendPoint(secs, cadence, hr, distance,
                                    speed, torque, power, alt, lon, lat, headwind, lap);
 	      }
 	      else {
+		// smart recording is on and delta is less than GarminHWM seconds.
 		  for(int i = 1; i <= deltaSecs; i++) {
 		      double weight = i/ deltaSecs;
 		      double kph = prevPoint->kph + (deltaSpeed *weight);

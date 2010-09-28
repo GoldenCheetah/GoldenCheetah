@@ -86,6 +86,10 @@
 #define GC_TWITTER_TOKEN "twitter_token"
 #define GC_TWITTER_SECRET "twitter_secret"
 
+// Tcx Smart recording
+#define GC_GARMIN_SMARTRECORD "garminSmartRecord"
+#define GC_GARMIN_HWMARK "garminHWMark"
+
 #include <QSettings>
 #include <boost/shared_ptr.hpp>
 

@@ -36,3 +36,7 @@
     A polar srd file which includes altitude, speed and heartrate. It
     does not contain interval or power data, although there is a single
     interval at the end of the workout which is 0 seconds long.
+
+2010-04-05-21-45-04.tcx
+    A Garmin Training Centre ride with short stops to test handling of
+    smart recording in Tcx RideFile. 
