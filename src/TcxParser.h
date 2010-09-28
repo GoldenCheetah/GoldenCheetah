@@ -24,6 +24,7 @@
 #include <QString>
 #include <QDateTime>
 #include <QXmlDefaultHandler>
+#include "Settings.h"
 
 class TcxParser : public QXmlDefaultHandler
 {
@@ -41,6 +42,8 @@ private:
     RideFile*	rideFile;
 
     QString	buffer;
+    QVariant    isGarminSmartRecording;
+    QVariant    GarminHWM;
 
     QDateTime	start_time;
     QDateTime	last_time;

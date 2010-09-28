@@ -106,6 +106,28 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
 	allRidesAscending->setCheckState(Qt::Unchecked);
     }
 
+    // garmin Smart Recording options
+    QVariant garminHWMark = settings->value(GC_GARMIN_HWMARK);
+    if (garminHWMark.isNull() || garminHWMark.toInt() == 0)
+      garminHWMark.setValue(25); // by default, set the threshold to 25 seconds
+    QGridLayout *garminLayout = new QGridLayout;
+    garminSmartRecord = new QCheckBox(tr("Use Garmin Smart Recording."), this);
+    QVariant isGarminSmartRecording = settings->value(GC_GARMIN_SMARTRECORD, Qt::Checked);
+    if (isGarminSmartRecording.toInt() > 0){
+      garminSmartRecord->setCheckState(Qt::Checked);
+    } else {
+      garminSmartRecord->setCheckState(Qt::Unchecked);
+    }
+    QLabel *garminHWLabel1 = new QLabel(tr("Smart Recording Threshold "));
+    QLabel *garminHWLabel2 = new QLabel(tr(" secs."));
+    garminHWMarkedit = new QLineEdit(garminHWMark.toString(),this);
+    garminHWMarkedit->setInputMask("009");
+    garminLayout->addWidget(garminSmartRecord);
+    garminLayout->addWidget(garminHWLabel1,1,0);
+    garminLayout->addWidget(garminHWMarkedit,1,1);
+    garminLayout->addWidget(garminHWLabel2,1,2);
+
+
     warningLabel = new QLabel(tr("Requires Restart To Take Effect"));
 
     langLayout = new QHBoxLayout;
@@ -168,6 +190,8 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
     configLayout->addLayout(langLayout);
     configLayout->addLayout(unitLayout);
     configLayout->addWidget(allRidesAscending);
+    configLayout->addLayout(garminLayout);
+    //SmartRecord);
     configLayout->addLayout(crankLengthLayout);
     configLayout->addLayout(bsDaysLayout);
     configLayout->addLayout(bsModeLayout);
@@ -259,6 +283,7 @@ CyclistPage::saveClicked()
     // save zone config (other stuff is saved by configdialog)
     zonePage->saveClicked();
 }
+
 
 void
 ConfigurationPage::browseWorkoutDir()
