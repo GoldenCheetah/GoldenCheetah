@@ -75,6 +75,9 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
     manualLengthLayout->addWidget(secslbl);
     manualLengthLayout->addWidget(secsentry);
 
+    QLabel *manualLengthHint = new QLabel(tr("(1 sec to 99:59:59) "), this);
+    manualLengthLayout->addWidget(manualLengthHint);
+
     // ride distance
     QString *DistanceString = new QString(tr("Distance "));
     if (useMetricUnits)
@@ -89,12 +92,24 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
     distanceentry->setValidator(distanceValidator);
 	distanceentry->setMaxLength(6);
 
+    QLabel *manualDistanceHint = new QLabel(tr("(0-9999) "), this);
+    QHBoxLayout *distanceLayout = new QHBoxLayout;
+	distanceLayout->addWidget(distanceentry);
+	distanceLayout->addWidget(manualDistanceHint);
+
+
+
     // AvgHR
     QLabel *HRLabel = new QLabel(tr("Average HR: "), this);
     HRentry = new QLineEdit(this);
     QIntValidator *hrValidator =  new QIntValidator(30,200,this);
     //HRentry->setInputMask("099");
     HRentry->setValidator(hrValidator);
+
+    QLabel *manualHRHint = new QLabel(tr("(30-199) "), this);
+    QHBoxLayout *hrLayout = new QHBoxLayout;
+	hrLayout->addWidget(HRentry);
+	hrLayout->addWidget(manualHRHint);
 
     // how to estimate BikeScore:
     QLabel *BSEstLabel = NULL;
@@ -127,6 +142,11 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
 	BSentry->setMaxLength(6);
     BSentry->clear();
 
+    QLabel *manualBSHint = new QLabel(tr("(0-9999) "), this);
+    QHBoxLayout *bsLayout = new QHBoxLayout;
+	bsLayout->addWidget(BSentry);
+	bsLayout->addWidget(manualBSHint);
+
     // DanielsPoints
     QLabel *ManualDPLabel = new QLabel(tr("Daniels Points: "), this);
     QDoubleValidator * dpValidator = new QDoubleValidator(0,9999,2,this);
@@ -134,6 +154,10 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
     DPentry->setValidator(dpValidator);
 	DPentry->setMaxLength(6);
     DPentry->clear();
+    QLabel *manualDPHint = new QLabel(tr("(0-9999) "), this);
+    QHBoxLayout *dpLayout = new QHBoxLayout;
+	dpLayout->addWidget(DPentry);
+	dpLayout->addWidget(manualDPHint);
 
     // buttons
     enterButton = new QPushButton(tr("&OK"), this);
@@ -154,11 +178,11 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
     row++;
 
     glayout->addWidget(DistanceLabel,row,0);
-    glayout->addWidget(distanceentry,row,1,1,-1);
+    glayout->addLayout(distanceLayout,row,1,1,-1);
     row++;
 
     glayout->addWidget(HRLabel,row,0);
-    glayout->addWidget(HRentry,row,1,1,-1);
+    glayout->addLayout(hrLayout,row,1,1,-1);
     row++;
 
     if (timeBS || distanceBS) {
@@ -171,11 +195,11 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
     }
 
     glayout->addWidget(ManualBSLabel,row,0);
-    glayout->addWidget(BSentry,row,1,1,-1);
+    glayout->addLayout(bsLayout,row,1,1,-1);
     row++;
 
     glayout->addWidget(ManualDPLabel,row,0);
-    glayout->addWidget(DPentry,row,1,1,-1);
+    glayout->addLayout(dpLayout,row,1,1,-1);
     row++;
 
     glayout->addWidget(enterButton,row,1);
@@ -258,13 +282,18 @@ void
 ManualRideDialog::enterClicked()
 {
 
-    if (!(BSentry->hasAcceptableInput() && DPentry->hasAcceptableInput() && distanceentry->hasAcceptableInput() ) ) {
+  if (!( ( BSentry->text().isEmpty() || BSentry->hasAcceptableInput() ) &&
+		 ( DPentry->text().isEmpty() || DPentry->hasAcceptableInput() ) &&
+		 ( distanceentry->text().isEmpty() || distanceentry->hasAcceptableInput() ) ) ) {
         QMessageBox::warning( this,
             tr("Values out of range"),
             tr("The values you've entered in:\n ")
-            +(!BSentry->hasAcceptableInput() ? "\t BikeScore\n " : "")
-            +(!DPentry->hasAcceptableInput() ? "\t Daniels Points\n " : "")
-            +(!distanceentry->hasAcceptableInput() ? "\t Distance\n " : "")
+			+((!distanceentry->hasAcceptableInput() && !distanceentry->text().isEmpty() )
+			  ? "  Distance (max 9999)\n " : "")
+			+((!BSentry->hasAcceptableInput() && !BSentry->text().isEmpty() )
+			  ? "  BikeScore (max 9999)\n " : "")
+			+((!DPentry->hasAcceptableInput() && !DPentry->text().isEmpty() )
+              ? "  Daniels Points (max 9999)\n " : "")
             + tr("are invalid, please fix.")
         );
         return;
