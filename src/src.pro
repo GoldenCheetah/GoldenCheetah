@@ -177,6 +177,7 @@ HEADERS += \
         SummaryMetrics.h \
         TcxParser.h \
         TcxRideFile.h \
+        TxtRideFile.h \
         TimeUtils.h \
         ToolsDialog.h \
         TrainTabs.h \
@@ -285,6 +286,7 @@ SOURCES += \
         StressCalculator.cpp \
         TcxParser.cpp \
         TcxRideFile.cpp \
+        TxtRideFile.cpp \
         TimeInZone.cpp \
         TimeUtils.cpp \
         ToolsDialog.cpp \
