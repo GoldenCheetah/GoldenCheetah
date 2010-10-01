@@ -83,20 +83,21 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
         DistanceString->append("(" + tr("miles") + "):");
 
     QLabel *DistanceLabel = new QLabel(*DistanceString, this);
-    QDoubleValidator * distanceValidator = new QDoubleValidator(0,1000,2,this);
+    QDoubleValidator * distanceValidator = new QDoubleValidator(0,9999,2,this);
     distanceentry = new QLineEdit(this);
     //distanceentry->setInputMask("009.00");
     distanceentry->setValidator(distanceValidator);
+	distanceentry->setMaxLength(6);
 
     // AvgHR
     QLabel *HRLabel = new QLabel(tr("Average HR: "), this);
     HRentry = new QLineEdit(this);
-    QIntValidator *hrValidator =  new QIntValidator(0,200,this);
+    QIntValidator *hrValidator =  new QIntValidator(30,200,this);
     //HRentry->setInputMask("099");
     HRentry->setValidator(hrValidator);
 
     // how to estimate BikeScore:
-    QLabel *BSEstLabel;
+    QLabel *BSEstLabel = NULL;
     boost::shared_ptr<QSettings> settings = GetApplicationSettings();
 
     QVariant BSmode = settings->value(GC_BIKESCOREMODE);
@@ -120,14 +121,18 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
 
     // BikeScore
     QLabel *ManualBSLabel = new QLabel(tr("BikeScore: "), this);
+    QDoubleValidator * bsValidator = new QDoubleValidator(0,9999,2,this);
     BSentry = new QLineEdit(this);
-    BSentry->setInputMask("009");
+    BSentry->setValidator(bsValidator);
+	BSentry->setMaxLength(6);
     BSentry->clear();
 
     // DanielsPoints
     QLabel *ManualDPLabel = new QLabel(tr("Daniels Points: "), this);
+    QDoubleValidator * dpValidator = new QDoubleValidator(0,9999,2,this);
     DPentry = new QLineEdit(this);
-    DPentry->setInputMask("009");
+    DPentry->setValidator(dpValidator);
+	DPentry->setMaxLength(6);
     DPentry->clear();
 
     // buttons
@@ -252,6 +257,19 @@ ManualRideDialog::cancelClicked()
 void
 ManualRideDialog::enterClicked()
 {
+
+    if (!(BSentry->hasAcceptableInput() && DPentry->hasAcceptableInput() && distanceentry->hasAcceptableInput() ) ) {
+        QMessageBox::warning( this,
+            tr("Values out of range"),
+            tr("The values you've entered in:\n ")
+            +(!BSentry->hasAcceptableInput() ? "\t BikeScore\n " : "")
+            +(!DPentry->hasAcceptableInput() ? "\t Daniels Points\n " : "")
+            +(!distanceentry->hasAcceptableInput() ? "\t Distance\n " : "")
+            + tr("are invalid, please fix.")
+        );
+        return;
+    }
+
     // write data to manual entry file
 
     // use user's time for file:
