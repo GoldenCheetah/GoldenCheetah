@@ -43,14 +43,14 @@ typedef struct header {
 
 /**
   Read header block, containing general information about file, among which the
-  fingerprint of the file
+  fingerprint of the file. Return the version of the file, 100 or 110.
   */
-static bool readHeaderBlock(const QByteArray& block, QStringList& errors);
+static qint16 readHeaderBlock(const QByteArray& block, QStringList& errors);
 
 /**
   Read all data blocks and return a RideFile.
   */
-static RideFile* readBlocks(const QByteArray& blocks, QStringList& errors);
+static RideFile* readBlocks(const QByteArray& blocks, qint16 version, QStringList& errors);
 
 /**
   read the header of one block
@@ -65,7 +65,7 @@ static bool readRideInformationBlock(RideFile* rideFile, const QByteArray& block
 /**
   Read the actual data points
   */
-static bool readRideData(RideFile *rideFile, const QByteArray& block, const int nrOfRecords);
+static bool readRideData(RideFile *rideFile, const QByteArray& block, const int nrOfRecords, const qint16 version);
 
 static qint8 readByteFromByteArray(const QByteArray& block);
 static qint16 readShortFromByteArray(const QByteArray& block);
@@ -94,26 +94,28 @@ RideFile *TacxCafFileReader::openRideFile(QFile &file, QStringList &errors) cons
     QByteArray bytes = file.readAll();
     file.close();
 
-    if (!readHeaderBlock(bytes.left(TACX_HEADER_BLOCK_SIZE), errors))
+    qint16 version = readHeaderBlock(bytes.left(TACX_HEADER_BLOCK_SIZE), errors);
+    if (version == 0)
         return NULL;
 
-    return readBlocks(bytes.mid(TACX_HEADER_BLOCK_SIZE), errors);
+    return readBlocks(bytes.mid(TACX_HEADER_BLOCK_SIZE), version, errors);
 }
 
-bool readHeaderBlock(const QByteArray& block, QStringList& errors) {
+qint16 readHeaderBlock(const QByteArray& block, QStringList& errors) {
     assert(block.size() == 8);
 
-    short fingerprint = readShortFromByteArray(block);
+    qint16 fingerprint = readShortFromByteArray(block);
 
     if (fingerprint != TACX_CAF_FILE_FINGERPRINT) {
         errors << ("This is not a Tacx run file");
-        return false;
+        return 0;
     }
-    return true;
+    qint16 version = readShortFromByteArray(block.mid(2));
+    return version;
 }
 
 
-RideFile* readBlocks(const QByteArray& blocks, QStringList& /*errors*/) {
+RideFile* readBlocks(const QByteArray& blocks, const qint16 version, QStringList& /*errors*/) {
     RideFile* rideFile = new RideFile();
 
     rideFile->setDeviceType(TACX_FORTIUS_DEVICE_TYPE);
@@ -128,7 +130,7 @@ RideFile* readBlocks(const QByteArray& blocks, QStringList& /*errors*/) {
             readRideInformationBlock(rideFile, remainingBytes.mid(12));
             break;
         case TACX_RIDE_DATA_BLOCK:
-            readRideData(rideFile, remainingBytes.mid(12), blockHeader.recordCount);
+            readRideData(rideFile, remainingBytes.mid(12), blockHeader.recordCount, version);
             break;
         }
 
@@ -165,11 +167,13 @@ bool readRideInformationBlock(RideFile* rideFile, const QByteArray& block) {
     return true;
 }
 
-bool readRideData(RideFile *rideFile, const QByteArray& block, const int nrOfRecords) {
+bool readRideData(RideFile *rideFile, const QByteArray& block, const int nrOfRecords, const qint16 version) {
+    const int dataRecordSize = (version == 100) ? TACX_RIDE_DATA_BLOCK_SIZE : TACX_RIDE_DATA_BLOCK_SIZE + 8;
+
     double seconds = rideFile->recIntSecs();
     float lastDistance = 0.0f;
     for(int i = 0; i < nrOfRecords; i++, seconds += rideFile->recIntSecs()) {
-        const QByteArray& record = block.mid(i * TACX_RIDE_DATA_BLOCK_SIZE);
+        const QByteArray& record = block.mid(i * dataRecordSize);
 
         float distance = readFloatFromByteArray(record);
         quint8 heartRate = readByteFromByteArray(record.mid(4));
