@@ -103,14 +103,42 @@ TwitterDialog::tweetCurrentRide()
     QString s_token = QString(strToken);
     QString s_secret = QString(strSecret);
 
+    if(s_token.isEmpty() || s_secret.isEmpty()) {
+      #ifdef Q_OS_MACX
+      #define GC_PREF tr("Golden Cheetah->Preferences")
+      #else
+      #define GC_PREF tr("Tools->Options")
+      #endif
+      QString advise = QString(tr("Error fetching OAuth credentials.  Please make sure to complete the twitter authorization procedure found under %1.")).arg(GC_PREF);
+      QMessageBox oautherr(QMessageBox::Critical, tr("OAuth Error"), advise);
+      oautherr.exec();
+      return;
+    }
+
     char *postarg = NULL;
     QString qurl = "http://api.twitter.com/1/statuses/update.json?status=";
 
     QString twitterMsg = getTwitterMessage();
-    const QString strUrl = QUrl::toPercentEncoding(twitterMsg + " #goldencheetah");
+
+    if(twitterMsg.length() > 140) {
+      QMessageBox tweetlengtherr(QMessageBox::Critical, tr("Tweet Length Error"), tr("Tweet must be 140 characters or fewer."));
+      tweetlengtherr.exec();
+      return;
+    }
+
+    const QString strUrl = QUrl::toPercentEncoding(twitterMsg);
     qurl.append(strUrl);
     const char *req_url = oauth_sign_url2(qurl.toLatin1(), &postarg, OA_HMAC, NULL, GC_TWITTER_CONSUMER_KEY, GC_TWITTER_CONSUMER_SECRET, s_token.toLatin1(), s_secret.toLatin1());
-    oauth_http_post(req_url,postarg);
+    const char *strreply = oauth_http_post(req_url,postarg);
+
+    QString post_reply = QString(strreply);
+
+    if(!post_reply.contains("created_at", Qt::CaseInsensitive)) {
+      QMessageBox oautherr(QMessageBox::Critical, tr("Error Posting Tweet"), tr("There was an error connecting to Twitter.  Check your network connection and try again."));
+      oautherr.setDetailedText(post_reply);
+      oautherr.exec();
+      return;
+    }
 
     if(postarg) free(postarg);
 
@@ -216,7 +244,7 @@ QString TwitterDialog::getTwitterMessage()
     if(!msg.endsWith(" "))
         msg.append(" ");
 
-    QString entireTweet = QString(msg + twitterMsg);
+    QString entireTweet = QString(msg + twitterMsg + "#goldencheetah");
 
     return entireTweet;
 
@@ -226,7 +254,6 @@ void TwitterDialog::onCheck(int state)
 {
     QString twitterMessage = getTwitterMessage();
     int tweetLength = twitterMessage.length();
-    tweetLength += 15; //For the hashtag
     QString tweetMsgLength = QString(tr("Message Length: %1")).arg(tweetLength);
     twitterLengthLabel->setText(tweetMsgLength);
 }
@@ -235,7 +262,6 @@ void TwitterDialog::tweetMsgChange(QString)
 {
     QString twitterMessage = getTwitterMessage();
     int tweetLength = twitterMessage.length();
-    tweetLength += 15; //For the hashtag
     QString tweetMsgLength = QString(tr("Message Length: %1")).arg(tweetLength);
     twitterLengthLabel->setText(tweetMsgLength);
 }
