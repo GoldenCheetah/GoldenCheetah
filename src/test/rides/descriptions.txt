@@ -1,3 +1,21 @@
+04010301.hrm
+    A polar hrm file. Version=106 S-series polar unit (s610). English
+    units. This file only includes heart rate data.
+
+06021201.hrm
+    A polar hrm file. Version=106 S-series polar unit (s625x/s725x). English
+    units. This file includes heart rate and altitude data.
+
+09052101.hrm
+    A polar hrm file. Version=106 S-series polar unit (s625x/s725x). English
+    units. This file includes speed, cadence, heart rate and altitude data.
+
+10091901.hrm
+    A polar hrm file. Version=106 S-series polar unit (cs400). Metric
+    units. This file includes speed, cadence, heart rate and altitude data.
+
+10092501.hrm
+
 2009_09_19_09_22_42.tcx
     A TCX file with "smart recording", i.e. variable recording intervals.
 
