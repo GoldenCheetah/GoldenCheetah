@@ -122,8 +122,20 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings) co
         quint16 avgcad = readShort(in);
         quint16 avgspeed = readShort(in);
         quint16 pwc150 = readShort(in);
-        markers[i].start = start;
-        markers[i].end = end;
+
+	// data fixup: Although the data chunk index in srm files starts
+	// with 1, some srmwin wrote files referencing index 0.
+	if( end < 1 ) end = 1;
+	if( start < 1 ) start = 1;
+
+	// data fixup: some srmwin versions wrote markers with start > end
+	if( end > start ){
+		markers[i].start = end;
+		markers[i].end = start;
+	} else {
+		markers[i].start = start;
+		markers[i].end = end;
+	}
 
         (void) active;
         (void) avgwatts;
@@ -234,7 +246,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings) co
     double last = 0.0;
     for (int i = 1; i < markers.size(); ++i) {
         const marker &marker = markers[i];
-        int start = qMax(0, marker.start - 1);
+        int start = marker.start - 1;
         double start_secs = result->dataPoints()[start]->secs;
         int end = qMin(marker.end - 1, result->dataPoints().size() - 1);
         double end_secs = result->dataPoints()[end]->secs + result->recIntSecs();
