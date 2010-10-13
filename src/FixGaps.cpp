@@ -225,7 +225,7 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                                                            0,
                                                            0,
                                                            0,
-                                                           0,
+                                                           last->alt,
                                                            0,
                                                            0,
                                                            0,
