@@ -237,7 +237,7 @@ RideFileFactory::rideFileRegExp() const
 {
     QStringList suffixList = RideFileFactory::instance().suffixes();
     QString s("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.(%1)$");
-    return QRegExp(s.arg(suffixList.join("|")));
+    return QRegExp(s.arg(suffixList.join("|")), Qt::CaseInsensitive);
 }
 
 RideFile *RideFileFactory::openRideFile(QFile &file,
