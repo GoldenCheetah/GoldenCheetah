@@ -1065,7 +1065,6 @@ unsigned int bitsize(char g, int WKO_device)
         case 0x06:
         case 0x11:
         case 0x19:
-        case 0x1a:
         default:
             return 19;
             break;
@@ -1075,6 +1074,9 @@ unsigned int bitsize(char g, int WKO_device)
         case 0x12: // Garmin Edge 205/305
         case 0x13:
         case 0x14:
+        case 0x1a: // SRM Powercontrol VI - moved to support files
+                   // supplied by Alex Simmons Oct 2010, was
+                   // previously set as 19 bits above.
             return 22;
             break;
         }
