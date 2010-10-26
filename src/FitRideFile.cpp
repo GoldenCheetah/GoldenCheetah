@@ -207,7 +207,7 @@ struct FitFileReaderState
         time_t time = 0;
         if (time_offset > 0)
             time = last_time + time_offset;
-        double alt = 0, cad = 0, km = 0, grade = 0, hr = 0, lat = 0, lng = 0;
+        double alt = 0, cad = 0, km = 0, grade = 0, hr = 0, lat = 0, lng = 0, badgps = 0;
         double resistance = 0, kph = 0, temperature = 0, time_from_course = 0, watts = 0;
         int lati = 0x7fffffff, lngi = 0x7fffffff;
         int i = 0;
@@ -245,6 +245,12 @@ struct FitFileReaderState
         if (lati != 0x7fffffff && lngi != 0x7fffffff) {
             lat = lati * 180.0 / 0x7fffffff;
             lng = lngi * 180.0 / 0x7fffffff;
+        } else
+        {
+            // If lat/lng are missng, set to 0/0 and fill point from last point as 0/0)
+            lat = 0;
+            lng = 0;
+            badgps = 1;
         }
         if (start_time == 0) {
             start_time = time - 1; // XXX: recording interval?
@@ -263,6 +269,10 @@ struct FitFileReaderState
             assert(deltaSecs == secs - prevPoint->secs); // no fractional part
             // This is only true if the previous record was of type record:
             assert(deltaSecs == time - last_time);
+            // If the last lat/lng was missing (0/0) then all points up to lat/lng are marked as 0/0.
+            if (prevPoint->lat == 0 && prevPoint->lon == 0 ) {
+                badgps = 1;
+            }
             double deltaCad = cad - prevPoint->cad;
             double deltaHr = hr - prevPoint->hr;
             double deltaDist = km - prevPoint->km;
@@ -284,8 +294,8 @@ struct FitFileReaderState
                     prevPoint->nm + (deltaTorque * weight),
                     prevPoint->watts + (deltaPower * weight),
                     prevPoint->alt + (deltaAlt * weight),
-                    prevPoint->lon + (deltaLon * weight),
-                    prevPoint->lat + (deltaLat * weight),
+                    (badgps == 1) ? 0 : prevPoint->lon + (deltaLon * weight),
+                    (badgps == 1) ? 0 : prevPoint->lat + (deltaLat * weight),
                     prevPoint->headwind + (deltaHeadwind * weight),
                     interval);
             }
