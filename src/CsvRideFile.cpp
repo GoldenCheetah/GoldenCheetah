@@ -236,7 +236,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                     watts = 0;
 
                 rideFile->appendPoint(minutes * 60.0, cad, hr, km,
-                                      kph, nm, watts, alt, lat, lon, headwind, interval);
+                                      kph, nm, watts, alt, lon, lat, headwind, interval);
             }
             ++lineno;
         }
