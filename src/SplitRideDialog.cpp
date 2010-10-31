@@ -167,7 +167,6 @@ SplitRideDialog::CreateNewRideFile(const RideFile *ride, int nRecStart, int nRec
         return;
     }
 
-    newRideFile->writeAsCsv(file, true);
     GcFileReader f;
     f.writeRideFile(newRideFile.get(), file);
 
