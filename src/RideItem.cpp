@@ -22,14 +22,15 @@
 #include "RideFile.h"
 #include "MainWindow.h"
 #include "Zones.h"
+#include "HrZones.h"
 #include <assert.h>
 #include <math.h>
 
 RideItem::RideItem(int type,
                    QString path, QString fileName, const QDateTime &dateTime,
-                   const Zones *zones, QString notesFileName, MainWindow *main) :
+                   const Zones *zones, const HrZones *hrZones, QString notesFileName, MainWindow *main) :
     QTreeWidgetItem(type), ride_(NULL), main(main), isdirty(false), isedit(false), path(path), fileName(fileName),
-    dateTime(dateTime), zones(zones), notesFileName(notesFileName)
+    dateTime(dateTime), zones(zones), hrZones(hrZones), notesFileName(notesFileName)
 {
     setText(0, dateTime.toString("ddd"));
     setText(1, dateTime.toString("MMM d, yyyy"));
@@ -121,10 +122,21 @@ int RideItem::zoneRange()
     return zones->whichRange(dateTime.date());
 }
 
+int RideItem::hrZoneRange()
+{
+    return hrZones->whichRange(dateTime.date());
+}
+
 int RideItem::numZones()
 {
     int zone_range = zoneRange();
     return (zone_range >= 0) ? zones->numZones(zone_range) : 0;
+}
+
+int RideItem::numHrZones()
+{
+    int hr_zone_range = hrZoneRange();
+    return (hr_zone_range >= 0) ? hrZones->numZones(hr_zone_range) : 0;
 }
 
 double RideItem::timeInZone(int zone)
@@ -134,6 +146,15 @@ double RideItem::timeInZone(int zone)
         return 0.0;
     assert(zone < numZones());
     return time_in_zone[zone];
+}
+
+double RideItem::timeInHrZone(int zone)
+{
+    computeMetrics();
+    if (!ride())
+        return 0.0;
+    assert(zone < numHrZones());
+    return time_in_hr_zone[zone];
 }
 
 void
@@ -165,6 +186,13 @@ RideItem::computeMetrics()
         num_zones = zones->numZones(zone_range);
         time_in_zone.resize(num_zones);
     }
+    int hr_zone_range = hrZoneRange();
+    int num_hr_zones = numHrZones();
+    time_in_hr_zone.clear();
+    if (hr_zone_range >= 0) {
+        num_hr_zones = hrZones->numZones(hr_zone_range);
+        time_in_hr_zone.resize(num_hr_zones);
+    }
 
     double secs_delta = ride()->recIntSecs();
     foreach (const RideFilePoint *point, ride()->dataPoints()) {
@@ -175,13 +203,20 @@ RideItem::computeMetrics()
                     time_in_zone[zone] += secs_delta;
             }
         }
+        if (point->hr >= 0.0) {
+            if (num_hr_zones > 0) {
+                int hrZone = hrZones->whichZone(hr_zone_range, point->hr);
+                if (hrZone >= 0)
+                    time_in_hr_zone[hrZone] += secs_delta;
+            }
+        }
     }
 
     QStringList allMetrics;
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i = 0; i < factory.metricCount(); ++i)
         allMetrics.append(factory.metricName(i));
-    metrics = RideMetric::computeMetrics(ride(), zones, allMetrics);
+    metrics = RideMetric::computeMetrics(ride(), zones, hrZones, allMetrics);
 }
 
 void

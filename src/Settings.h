@@ -40,6 +40,12 @@
 #define GC_DATETIME_FORMAT          "ddd MMM dd, yyyy, hh:mm AP"
 #define GC_UNIT                     "unit"
 #define GC_LANG                     "lang"
+#define GC_NICKNAME                 "nickname"
+#define GC_DOB                      "dob"
+#define GC_WEIGHT                   "weight"
+#define GC_SEX                      "sex"
+#define GC_BIO                      "bio"
+#define GC_AVATAR                   "avatar"
 #define GC_SETTINGS_LAST_IMPORT_PATH "mainwindow/lastImportPath"
 #define GC_ALLRIDES_ASCENDING       "allRidesAscending"
 #define GC_CRANKLENGTH              "crankLength"
@@ -61,6 +67,7 @@
 #define GC_WORKOUTDIR      "workoutDir"
 #define GC_TRAIN_SPLITTER_SIZES  "trainwindow/splitterSizes"
 #define GC_LTM_SPLITTER_SIZES  "ltmwindow/splitterSizes"
+
 
 // device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended
 // to them to specify which configured device i.e. devices1 ... devicesn where
@@ -107,4 +114,3 @@ inline boost::shared_ptr<QSettings> GetApplicationSettings()
 }
 
 #endif // _GC_Settings_h
-

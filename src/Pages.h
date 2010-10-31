@@ -12,6 +12,7 @@
 #include <QCheckBox>
 #include <QList>
 #include "Zones.h"
+#include "HrZones.h"
 #include <QLabel>
 #include <QDateEdit>
 #include <QCheckBox>
@@ -39,6 +40,8 @@ class KeywordsPage;
 class FieldsPage;
 class Colors;
 class ZonePage;
+class HrZonePage;
+class RiderPage;
 
 class ConfigurationPage : public QWidget
 {
@@ -100,6 +103,8 @@ class CyclistPage : public QWidget
 
     private:
         ZonePage *zonePage;
+        HrZonePage *hrZonePage;
+        RiderPage *riderPage;
         MainWindow *main;
 
         QGroupBox *cyclistGroup;
@@ -402,6 +407,111 @@ class ZonePage : public QWidget
         QTabWidget *tabs;
 
         // local versions for modification
+};
+
+class HrSchemePage : public QWidget
+{
+    Q_OBJECT
+
+public:
+    HrSchemePage(HrZonePage *parent);
+    HrZoneScheme getScheme();
+    void saveClicked();
+
+    public slots:
+    void addClicked();
+    void deleteClicked();
+    void renameClicked();
+
+private:
+    HrZonePage *zonePage;
+    QTreeWidget *scheme;
+    QPushButton *addButton, *renameButton, *deleteButton;
+};
+
+
+class LTPage : public QWidget
+{
+    Q_OBJECT
+
+public:
+    LTPage(HrZonePage *parent);
+
+    public slots:
+    void addClicked();
+    void deleteClicked();
+    void defaultClicked();
+    void rangeSelectionChanged();
+    void addZoneClicked();
+    void deleteZoneClicked();
+    void zonesChanged();
+
+private:
+    bool active;
+
+    QDateEdit *dateEdit;
+    QDoubleSpinBox *ltEdit;
+    QDoubleSpinBox *restHrEdit;
+    QDoubleSpinBox *maxHrEdit;
+
+    HrZonePage  *zonePage;
+    QTreeWidget *ranges;
+    QTreeWidget *zones;
+    QPushButton *addButton, *deleteButton, *defaultButton;
+    QPushButton *addZoneButton, *deleteZoneButton;
+};
+
+class HrZonePage : public QWidget
+{
+    Q_OBJECT
+
+public:
+
+    HrZonePage(MainWindow *);
+    void saveClicked();
+
+    //ZoneScheme scheme;
+    HrZones zones;
+
+    // Children talk to each other
+    HrSchemePage *schemePage;
+    LTPage *ltPage;
+
+    public slots:
+
+
+protected:
+
+    MainWindow *main;
+    bool changed;
+
+    QTabWidget *tabs;
+
+    // local versions for modification
+};
+
+class RiderPage : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        RiderPage(QWidget *parent, MainWindow *mainWindow);
+        void saveClicked();
+
+    public slots:
+        void chooseAvatar();
+
+    private:
+        MainWindow *mainWindow;
+        bool useMetricUnits;
+        QLineEdit *nickname;
+        QDateEdit *dob;
+        QComboBox *sex;
+        QDoubleSpinBox *weight;
+        QTextEdit  *bio;
+        QPushButton *avatarButton;
+        QPixmap     avatar;
+        QString cyclist;
 };
 
 class TwitterPage : public QWidget

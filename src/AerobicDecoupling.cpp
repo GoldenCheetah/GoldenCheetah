@@ -53,7 +53,7 @@ class AerobicDecoupling : public RideMetric {
         setImperialUnits(tr("%"));
         setPrecision(2);
     }
-    void compute(const RideFile *ride, const Zones *, int,
+    void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
                  const QHash<QString,RideMetric*> &) {
         double firstHalfPower = 0.0, secondHalfPower = 0.0;
         double firstHalfHR = 0.0, secondHalfHR = 0.0;

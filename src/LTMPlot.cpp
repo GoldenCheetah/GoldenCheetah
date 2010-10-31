@@ -487,6 +487,8 @@ LTMPlot::createPMCCurveData(LTMSettings *settings, MetricDetail metricDetail,
         scoreType = "skiba_bike_score";
     } else if (metricDetail.name.startsWith("Daniels")) {
         scoreType = "daniels_points";
+    } else if (metricDetail.name.startsWith("TRIMP")) {
+        scoreType = "trimp_points";
     }
 
     // create the Stress Calculation List
@@ -519,6 +521,12 @@ LTMPlot::createPMCCurveData(LTMSettings *settings, MetricDetail metricDetail,
             add.setForSymbol("daniels_sb",  sc->getSBvalues()[i]);
             add.setForSymbol("daniels_sr", sc->getSRvalues()[i]);
             add.setForSymbol("daniels_lr", sc->getLRvalues()[i]);
+        } else if (scoreType == "trimp_points") {
+            add.setForSymbol("trimp_lts", sc->getLTSvalues()[i]);
+            add.setForSymbol("trimp_sts", sc->getSTSvalues()[i]);
+            add.setForSymbol("trimp_sb",  sc->getSBvalues()[i]);
+            add.setForSymbol("trimp_sr", sc->getSRvalues()[i]);
+            add.setForSymbol("trimp_lr", sc->getLRvalues()[i]);
         }
         add.setForSymbol("workout_time", 1.0); // averaging is per day
         customData << add;

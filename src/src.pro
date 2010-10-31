@@ -118,6 +118,7 @@ HEADERS += \
         GcRideFile.h \
         GoogleMapControl.h \
         HistogramWindow.h \
+        HrZones.h \
         IntervalItem.h \
         LogTimeScaleDraw.h \
         LogTimeScaleEngine.h \
@@ -188,6 +189,7 @@ HEADERS += \
         WeeklySummaryWindow.h \
         WkoRideFile.h \
         Zones.h \
+        ZoneScaleDraw.h
 
 SOURCES += \
         AerobicDecoupling.cpp \
@@ -228,6 +230,8 @@ SOURCES += \
         GcRideFile.cpp \
         GoogleMapControl.cpp \
         HistogramWindow.cpp \
+        HrTimeInZone.cpp \
+        HrZones.cpp \
         IntervalItem.cpp \
         LogTimeScaleDraw.cpp \
         LogTimeScaleEngine.cpp \
@@ -294,6 +298,7 @@ SOURCES += \
         TrainTabs.cpp \
         TrainTool.cpp \
         TrainWindow.cpp \
+        TRIMPPoints.cpp \
         ViewSelection.cpp \
         WeeklySummaryWindow.cpp \
         WkoRideFile.cpp \

@@ -101,7 +101,7 @@ MainWindow::parseRideFileName(const QString &name, QString *notesFileName, QDate
 
 MainWindow::MainWindow(const QDir &home) : 
     home(home), session(0), isclean(false),
-    zones_(new Zones), currentNotesChanged(false),
+    zones_(new Zones), hrZones_(new HrZones), currentNotesChanged(false),
     ride(NULL)
 {
     setAttribute(Qt::WA_DeleteOnClose);
@@ -128,6 +128,16 @@ MainWindow::MainWindow(const QDir &home) :
         }
 	else if (! zones_->warningString().isEmpty())
             QMessageBox::warning(this, tr("Reading Zones File"), zones_->warningString());
+    }
+
+    QFile hrZonesFile(home.absolutePath() + "/hr.zones");
+    if (hrZonesFile.exists()) {
+        if (!hrZones_->read(hrZonesFile)) {
+            QMessageBox::critical(this, tr("Hr Zones File Error"),
+                                  hrZones_->errorString());
+        }
+        else if (! hrZones_->warningString().isEmpty())
+            QMessageBox::warning(this, tr("Reading Hr Zones File"), hrZones_->warningString());
     }
 
     QVariant geom = settings->value(GC_SETTINGS_MAIN_GEOM);
@@ -212,7 +222,7 @@ MainWindow::MainWindow(const QDir &home) :
         QDateTime dt;
         if (parseRideFileName(name, &notesFileName, &dt)) {
             last = new RideItem(RIDE_TYPE, home.path(), 
-                                name, dt, zones(), notesFileName, this);
+                                name, dt, zones(), hrZones(), notesFileName, this);
             allRides->addChild(last);
 	    calendar->update();
         }
@@ -284,7 +294,7 @@ MainWindow::MainWindow(const QDir &home) :
     histogramWindow = new HistogramWindow(this);
     tabs.append(TabInfo(histogramWindow, tr("Histograms")));
     
-    //////////////////////// Pedal Force/Velocity Plot ////////////////////////
+    //////////////////////// Pedal Force/zones_Velocity Plot ////////////////////////
 
     pfPvWindow = new PfPvWindow(this);
     tabs.append(TabInfo(pfPvWindow, tr("PF/PV")));
@@ -305,7 +315,7 @@ MainWindow::MainWindow(const QDir &home) :
     //////////////////////// LTM ////////////////////////
 
     // long term metrics window
-    metricDB = new MetricAggregator(this, home, zones()); // just to catch config updates!
+    metricDB = new MetricAggregator(this, home, zones(), hrZones()); // just to catch config updates!
     ltmWindow = new LTMWindow(this, useMetricUnits, home);
     tabs.append(TabInfo(ltmWindow, tr("Metrics")));
 
@@ -536,7 +546,7 @@ MainWindow::addRide(QString name, bool bSelect /*=true*/)
         assert(false);
     }
     RideItem *last = new RideItem(RIDE_TYPE, home.path(), 
-                                  name, dt, zones(), notesFileName, this);
+                                  name, dt, zones(), hrZones(), notesFileName, this);
 
     QVariant isAscending = settings->value(GC_ALLRIDES_ASCENDING,Qt::Checked); // default is ascending sort
     int index = 0;
@@ -1453,6 +1463,17 @@ MainWindow::notifyConfigChanged()
         }
        else if (! zones_->warningString().isEmpty())
             QMessageBox::warning(this, tr("Reading Zones File"), zones_->warningString());
+    }
+
+    // re-read Hr Zones in case it changed
+    QFile hrZonesFile(home.absolutePath() + "/hr.zones");
+    if (hrZonesFile.exists()) {
+        if (!hrZones_->read(hrZonesFile)) {
+            QMessageBox::critical(this, tr("Hr Zones File Error"),
+                                  hrZones_->errorString());
+        }
+        else if (! hrZones_->warningString().isEmpty())
+            QMessageBox::warning(this, tr("Reading Hr Zones File"), hrZones_->warningString());
     }
 
     // now tell everyone else

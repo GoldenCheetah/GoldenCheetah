@@ -42,7 +42,7 @@ class ZoneTime : public RideMetric {
         setConversion(1.0);
     }
     void setLevel(int level) { this->level=level-1; } // zones start from zero not 1
-    void compute(const RideFile *ride, const Zones *zone, int zoneRange,
+    void compute(const RideFile *ride, const Zones *zone, int zoneRange, const HrZones *, int,
                  const QHash<QString,RideMetric*> &)
     {
         seconds = 0;

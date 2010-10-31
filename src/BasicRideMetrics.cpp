@@ -35,7 +35,7 @@ class WorkoutTime : public RideMetric {
         setImperialUnits(tr("seconds"));
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
+    void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
                  const QHash<QString,RideMetric*> &) {
         seconds = ride->dataPoints().back()->secs -
                   ride->dataPoints().front()->secs + ride->recIntSecs();
@@ -61,7 +61,7 @@ class TimeRiding : public RideMetric {
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
     }
-    void compute(const RideFile *ride, const Zones *, int,
+    void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
                  const QHash<QString,RideMetric*> &) {
         secsMovingOrPedaling = 0;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
@@ -97,7 +97,7 @@ class TotalDistance : public RideMetric {
         setPrecision(1);
         setConversion(MILES_PER_KM);
     }
-    void compute(const RideFile *ride, const Zones *, int,
+    void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
                  const QHash<QString,RideMetric*> &) {
         // Note: The 'km' in each sample is the distance travelled by the
         // *end* of the sampling period.  The last term in this equation
@@ -131,7 +131,7 @@ class ElevationGain : public RideMetric {
         setImperialUnits(tr("feet"));
         setConversion(FEET_PER_METER);
     }
-    void compute(const RideFile *ride, const Zones *, int,
+    void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
                  const QHash<QString,RideMetric*> &) {
         const double hysteresis = 3.0;
         bool first = true;
@@ -170,7 +170,7 @@ class TotalWork : public RideMetric {
         setMetricUnits(tr("kJ"));
         setImperialUnits(tr("kJ"));
     }
-    void compute(const RideFile *ride, const Zones *, int,
+    void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
                  const QHash<QString,RideMetric*> &) {
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             if (point->watts >= 0.0)
@@ -203,7 +203,7 @@ class AvgSpeed : public RideMetric {
         setConversion(MILES_PER_KM);
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
+    void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps) {
         assert(deps.contains("total_distance"));
         km = deps.value("total_distance")->value(true);
@@ -242,7 +242,7 @@ struct AvgPower : public RideMetric {
         setImperialUnits(tr("watts"));
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *ride, const Zones *, int,
+    void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
                  const QHash<QString,RideMetric*> &) {
         total = count = 0;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
@@ -274,7 +274,7 @@ struct AvgHeartRate : public RideMetric {
         setImperialUnits(tr("bpm"));
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *ride, const Zones *, int,
+    void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
                  const QHash<QString,RideMetric*> &) {
         total = count = 0;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
@@ -306,7 +306,7 @@ struct AvgCadence : public RideMetric {
         setImperialUnits(tr("rpm"));
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *ride, const Zones *, int,
+    void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
                  const QHash<QString,RideMetric*> &) {
         total = count = 0;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
@@ -337,7 +337,7 @@ class MaxPower : public RideMetric {
         setImperialUnits(tr("watts"));
         setType(RideMetric::Peak);
     }
-    void compute(const RideFile *ride, const Zones *, int,
+    void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
                  const QHash<QString,RideMetric*> &) {
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             if (point->watts >= max)
@@ -364,7 +364,7 @@ class MaxHr : public RideMetric {
         setImperialUnits(tr("bpm"));
         setType(RideMetric::Peak);
     }
-    void compute(const RideFile *ride, const Zones *, int,
+    void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
                  const QHash<QString,RideMetric*> &) {
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             if (point->hr >= max)
@@ -391,7 +391,7 @@ class NinetyFivePercentHeartRate : public RideMetric {
         setImperialUnits(tr("bpm"));
         setType(RideMetric::Average);
     }
-    void compute(const RideFile *ride, const Zones *, int,
+    void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
                  const QHash<QString,RideMetric*> &) {
         QVector<double> hrs;
         foreach (const RideFilePoint *point, ride->dataPoints()) {

@@ -51,6 +51,7 @@ class HistogramWindow : public QWidget
 	void setlnYHistFromCheckBox();
         void setWithZerosFromCheckBox();
         void setHistSelection(int id);
+        void setSumY(int);
 
     protected:
 
@@ -63,15 +64,20 @@ class HistogramWindow : public QWidget
         QLineEdit *binWidthLineEdit;
         QCheckBox *lnYHistCheckBox;
         QCheckBox *withZerosCheckBox;
+        QCheckBox *histShadeZones;
         QComboBox *histParameterCombo;
+        QComboBox *histSumY;
 
-	int histWattsShadedID;
-	int histWattsUnshadedID;
+	int histWattsID;
+	int histWattsZoneID;
 	int histNmID;
 	int histHrID;
+	int histHrZoneID;
 	int histKphID;
 	int histCadID;
 	int histAltID;
+
+    int powerRange, hrRange;
 };
 
 #endif // _GC_HistogramWindow_h
