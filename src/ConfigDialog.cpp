@@ -89,11 +89,10 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
     // tabs, sub-tabs and internal widgets and lists
 #ifdef Q_OS_MACX
     setWindowTitle(tr("Preferences"));
-    setFixedSize(QSize(800, 600)); // account for mac os x contents margins
 #else
     setWindowTitle(tr("Options"));
-    setFixedSize(QSize(700, 500));
 #endif
+    setFixedSize(QSize(800, 600));
 }
 
 void ConfigDialog::createIcons()
