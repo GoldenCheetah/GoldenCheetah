@@ -155,7 +155,7 @@ RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors) const
 WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &errors)
 {
     WKO_ULONG WKO_xormasks[32];    // xormasks used all over
-    double cad=0, hr=0, km=0, kph=0, nm=0, watts=0, alt=0, lon=0, lat=0, wind=0, interval=0;
+    double cad=0, hr=0, km=0, kph=0, nm=0, watts=0, alt=0, lon=0, lat=0, slope=0, wind=0, interval=0;
 
     int isnull=0;
     WKO_ULONG records, data;
@@ -245,7 +245,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
 	long svalp; // for printf
 
         // reset point values;
-        alt = wind = cad= hr= km= kph= nm= watts= 0.0;
+        alt = slope = wind = cad= hr= km= kph= nm= watts= 0.0;
 
         marker = get_bits(thelot, bit++, 1);
 
@@ -283,27 +283,28 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
                         sprintf(GRAPHDATA[i], "%8ld", svalp);
                         break;
                     case '^' : /* Slope */
+                        if (get_bit(thelot, bit-1)) { /* is negative */
+                            val ^= WKO_xormasks[WKO_graphbits[i]];
+                            sval = val * -1;
+                        } else sval = val;
+                        slope = sval;
+                        slope /= 10;
+                        break;
                     case 'W' : /* Wind speed */
+                        if (get_bit(thelot, bit-1)) { /* is negative */
+                            val ^= WKO_xormasks[WKO_graphbits[i]];
+                            sval = val * -1;
+                        } else sval = val;
+                        wind = sval;
+                        wind /= 10;
+                        break;
                     case 'A' : /* Altitude */
                         if (get_bit(thelot, bit-1)) { /* is negative */
                             val ^= WKO_xormasks[WKO_graphbits[i]];
                             sval = val * -1;
-
-                            if (imperialflag && WKO_GRAPHS[i]=='A') val = long((double) val * MTOFT);
-                            if (imperialflag && WKO_GRAPHS[i]=='W') val = long((double) val * KMTOMI);
-                            svalp = sval; valp = val;
-                            sprintf(GRAPHDATA[i], "%6ld.%1ld", svalp/10, valp%10);
-
-                            alt = val; alt /= 10;
-                        } else {
-                            if (imperialflag && WKO_GRAPHS[i]=='A') val = long((double) val * MTOFT);
-                            if (imperialflag && WKO_GRAPHS[i]=='W') val = long((double) val * KMTOMI);
-                            valp=val;
-                            sprintf(GRAPHDATA[i], "%6ld.%1ld", valp/10, valp%10);
-
-                            alt = val; alt /=10;
-                        }
-                        if (WKO_GRAPHS[i] == 'W') wind = alt;
+                        } else sval = val;
+                        alt = sval;
+                        alt /= 10;
                         break;
                     case 'T' : /* Torque */
                         if (imperialflag && WKO_GRAPHS[i]=='S') val = long((double)val * KMTOMI);
@@ -629,7 +630,7 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, RideFile *rideFile, 
     case 0x11 : rideFile->setDeviceType("Ergomo"); break;
     case 0x12 : rideFile->setDeviceType("Garmin Edge 205/305"); break;
     case 0x13 : rideFile->setDeviceType("Garmin Edge 705"); break;
-    case 0x14 : rideFile->setDeviceType("Ergomo"); break;
+    case 0x14 : rideFile->setDeviceType("iBike"); break;
     case 0x16 : rideFile->setDeviceType("Cycleops 300PT"); break;
     case 0x19 : rideFile->setDeviceType("Ergomo"); break;
     default : rideFile->setDeviceType("WKO"); break;
