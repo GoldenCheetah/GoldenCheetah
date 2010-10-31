@@ -188,7 +188,12 @@ public:
                  const HrZones *hrZones, int hrZoneRange,
                  const QHash<QString,RideMetric*> &deps)
     {
-        if (hrZoneRange == -1) {
+        assert(deps.contains("average_hr"));
+        const RideMetric *averageHrMetric = deps.value("average_hr");
+        assert(averageHrMetric);
+        double hr = averageHrMetric->value(true);
+
+        if (hrZoneRange == -1 || hr == 0) {
             setValue(0);
             return;
         }
@@ -280,10 +285,13 @@ static bool added() {
     deps.append("average_hr");
     RideMetricFactory::instance().addMetric(TRIMPPoints(), &deps);
 
+    deps.clear();
     deps.append("time_riding");
     deps.append("trimp_points");
     RideMetricFactory::instance().addMetric(TRIMP100Points(), &deps);
 
+    deps.clear();
+    deps.append("average_hr");
     deps.append("time_in_zone_H1");
     deps.append("time_in_zone_H2");
     deps.append("time_in_zone_H3");
