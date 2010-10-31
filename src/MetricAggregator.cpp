@@ -20,6 +20,7 @@
 #include "DBAccess.h"
 #include "RideFile.h"
 #include "Zones.h"
+#include "HrZones.h"
 #include "Settings.h"
 #include "RideItem.h"
 #include "RideMetric.h"
@@ -29,7 +30,7 @@
 #include <QtXml/QtXml>
 #include <QProgressDialog>
 
-MetricAggregator::MetricAggregator(MainWindow *main, QDir home, const Zones *zones) : QWidget(main), main(main), home(home), zones(zones)
+MetricAggregator::MetricAggregator(MainWindow *main, QDir home, const Zones *zones, const HrZones *hrZones) : QWidget(main), main(main), home(home), zones(zones), hrZones(hrZones)
 {
     dbaccess = new DBAccess(main, home);
     connect(main, SIGNAL(configChanged()), this, SLOT(update()));
@@ -86,7 +87,7 @@ void MetricAggregator::refreshMetrics()
         }
     }
 
-    unsigned long zoneFingerPrint = zones->getFingerprint(); // crc of zone data
+    unsigned long zoneFingerPrint = zones->getFingerprint() + hrZones->getFingerprint(); // crc of *all* zone data (HR and Power)
 
     // update statistics for ride files which are out of date
     // showing a progress bar as we go
@@ -148,7 +149,7 @@ bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, u
         metrics << factory.metricName(i);
 
     // compute all the metrics
-    QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(ride, zones, metrics);
+    QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(ride, zones, hrZones, metrics);
 
     // get metrics into summaryMetric QMap
     for(int i = 0; i < factory.metricCount(); ++i) {

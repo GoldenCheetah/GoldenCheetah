@@ -23,7 +23,10 @@
 #include "RideFile.h"
 #include "Settings.h"
 #include "Zones.h"
+#include "HrZones.h"
 #include "Colors.h"
+
+#include "ZoneScaleDraw.h"
 
 #include <assert.h>
 #include <qpainter.h>
@@ -35,33 +38,7 @@
 #include <qwt_legend.h>
 #include <qwt_data.h>
 
-class penTooltip: public QwtPlotZoomer
-{
-    public:
-         penTooltip(QwtPlotCanvas *canvas):
-             QwtPlotZoomer(canvas)
-         {
-                 // With some versions of Qt/Qwt, setting this to AlwaysOn
-                 // causes an infinite recursion.
-                 //setTrackerMode(AlwaysOn);
-                 setTrackerMode(AlwaysOff);
-         }
-
-         virtual QwtText trackerText(const QwtDoublePoint &pos) const
-         {
-                 QColor bg(Qt::white);
-         #if QT_VERSION >= 0x040300
-                     bg.setAlpha(200);
-             #endif
-
-                     QwtText text = QString("%1").arg((int)pos.x());
-                     text.setBackgroundBrush( QBrush( bg ));
-                     return text;
-         }
- };
-
-
-
+#include "LTMCanvasPicker.h" // for tooltip
 
 
 // define a background class to handle shading of power zones
@@ -199,22 +176,23 @@ public:
 };
 
 PowerHist::PowerHist(MainWindow *mainWindow):
-    selected(wattsShaded),
+    selected(watts),
+    shade(false),
     rideItem(NULL),
     mainWindow(mainWindow),
     withz(true),
-    settings(NULL),
     unit(0),
-    lny(false)
+    lny(false),
+    absolutetime(true)
 {
 
     boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-
     unit = settings->value(GC_UNIT);
 
     useMetricUnits = (unit.toString() == "Metric");
 
     binw = settings->value(GC_HIST_BIN_WIDTH, 5).toInt();
+    shade = true;
 
     // create a background object for shading
     bg = new PowerHistBackground(this);
@@ -223,7 +201,7 @@ PowerHist::PowerHist(MainWindow *mainWindow):
     setCanvasBackground(Qt::white);
 
     setParameterAxisTitle();
-    setAxisTitle(yLeft, "Cumulative Time (minutes)");
+    setAxisTitle(yLeft, absolutetime ? tr("Time (minutes)") : tr("Time (percent)"));
 
     curve = new QwtPlotCurve("");
     curve->setStyle(QwtPlotCurve::Steps);
@@ -239,9 +217,11 @@ PowerHist::PowerHist(MainWindow *mainWindow):
     grid->enableX(false);
     grid->attach(this);
 
-    zoneLabels = QList <PowerHistZoneLabel *>();
+    zoneLabels = QList<PowerHistZoneLabel *>();
 
     zoomer = new penTooltip(this->canvas());
+    canvasPicker = new LTMCanvasPicker(this);
+    connect(canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), this, SLOT(pointHover(QwtPlotCurve*, int)));
 
     configChanged();
 }
@@ -257,37 +237,41 @@ PowerHist::configChanged()
     QColor brush_color;
 
     switch (selected) {
-	case wattsShaded:
-	case wattsUnshaded:
-        pen.setColor(GColor(CPOWER));
+	case watts:
+	case wattsZone:
+        pen.setColor(GColor(CPOWER).darker(200));
         brush_color = GColor(CPOWER);
         break;
 	case nm:
-        pen.setColor(GColor(CTORQUE));
+        pen.setColor(GColor(CTORQUE).darker(200));
         brush_color = GColor(CTORQUE);
         break;
 	case hr:
-        pen.setColor(GColor(CHEARTRATE));
+	case hrZone:
+        pen.setColor(GColor(CHEARTRATE).darker(200));
         brush_color = GColor(CHEARTRATE);
         break;
 	case kph:
-        pen.setColor(GColor(CSPEED));
+        pen.setColor(GColor(CSPEED).darker(200));
         brush_color = GColor(CSPEED);
         break;
 	case cad:
-        pen.setColor(GColor(CCADENCE));
+        pen.setColor(GColor(CCADENCE).darker(200));
         brush_color = GColor(CCADENCE);
         break;
     }
 
-    pen.setWidth(2.0);
+    double width = 2.0;
+    curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    curveSelected->setRenderHint(QwtPlotItem::RenderAntialiased);
+    pen.setWidth(width);
     curve->setPen(pen);
     brush_color.setAlpha(64);
     curve->setBrush(brush_color);   // fill below the line
 
     // intervalselection
-    QPen ivl(GColor(CINTERVALHIGHLIGHTER));
-    ivl.setWidth(2.0);
+    QPen ivl(GColor(CINTERVALHIGHLIGHTER).darker(200));
+    ivl.setWidth(width);
     curveSelected->setPen(ivl);
     QColor ivlbrush = GColor(CINTERVALHIGHLIGHTER);
     ivlbrush.setAlpha(64);
@@ -338,7 +322,7 @@ PowerHist::refreshZoneLabels()
     if (! rideItem)
 	return;
 
-    if ((selected == wattsShaded) || (selected == wattsUnshaded)) {
+    if (selected == watts) {
 	const Zones *zones = rideItem->zones;
 	int zone_range = rideItem->zoneRange();
 
@@ -366,13 +350,17 @@ PowerHist::recalc()
     if (dt <= 0)
 	return;
 
-    if ((selected == wattsShaded) ||
-	(selected == wattsUnshaded)
-	) {
+    if (selected == watts) {
 	array = &wattsArray;
 	delta = wattsDelta;
 	arrayLength = wattsArray.size();
 	selectedArray = &wattsSelectedArray;
+    }
+    else if (selected == wattsZone) {
+	array = &wattsZoneArray;
+	delta = 1;
+	arrayLength = wattsZoneArray.size();
+	selectedArray = &wattsZoneSelectedArray;
     }
     else if (selected == nm) {
 	array = &nmArray;
@@ -385,6 +373,12 @@ PowerHist::recalc()
 	delta = hrDelta;
 	arrayLength = hrArray.size();
 	selectedArray = &hrSelectedArray;
+    }
+    else if (selected == hrZone) {
+	array = &hrZoneArray;
+	delta = 1;
+	arrayLength = hrZoneArray.size();
+	selectedArray = &hrZoneSelectedArray;
     }
     else if (selected == kph) {
 	array = &kphArray;
@@ -402,38 +396,140 @@ PowerHist::recalc()
     if (!array)
         return;
 
-    // we add a bin on the end since the last "incomplete" bin
-    // will be dropped otherwise
-    int count = int(ceil((arrayLength - 1) / binw))+1;
+    // binning of data when not zoned
+    if (selected != wattsZone && selected != hrZone) {
 
-    // allocate space for data, plus beginning and ending point
-    QVector<double> parameterValue(count+2);
-    QVector<double> totalTime(count+2);
-    QVector<double> totalTimeSelected(count+2);
-    int i;
-    for (i = 1; i <= count; ++i) {
-        int high = i * binw;
-        int low = high - binw;
-        if (low==0 && !withz)
-            low++;
-        parameterValue[i] = high * delta;
-        totalTime[i]  = 1e-9;  // nonzero to accomodate log plot
-        totalTimeSelected[i] = 1e-9;  // nonzero to accomodate log plot
-        while (low < high && low<arrayLength) {
-            if (selectedArray && (*selectedArray).size()>low)
-                totalTimeSelected[i] += dt * (*selectedArray)[low];
-            totalTime[i] += dt * (*array)[low++];
+        // we add a bin on the end since the last "incomplete" bin
+        // will be dropped otherwise
+        int count = int(ceil((arrayLength - 1) / binw))+1;
+
+        // allocate space for data, plus beginning and ending point
+        QVector<double> parameterValue(count+2, 0.0);
+        QVector<double> totalTime(count+2, 0.0);
+        QVector<double> totalTimeSelected(count+2, 0.0);
+        int i;
+        for (i = 1; i <= count; ++i) {
+            int high = i * binw;
+            int low = high - binw;
+            if (low==0 && !withz)
+                low++;
+            parameterValue[i] = high * delta;
+            totalTime[i]  = 1e-9;  // nonzero to accomodate log plot
+            totalTimeSelected[i] = 1e-9;  // nonzero to accomodate log plot
+            while (low < high && low<arrayLength) {
+                if (selectedArray && (*selectedArray).size()>low)
+                    totalTimeSelected[i] += dt * (*selectedArray)[low];
+                totalTime[i] += dt * (*array)[low++];
+            }
         }
-    }
-    totalTime[i] = 1e-9;       // nonzero to accomodate log plot
-    parameterValue[i] = i * delta * binw;
-    totalTime[0] = 1e-9;
-    parameterValue[0] = 0;
-    curve->setData(parameterValue.data(), totalTime.data(), count + 2);
-    curveSelected->setData(parameterValue.data(), totalTimeSelected.data(), count + 2);
-    setAxisScale(xBottom, 0.0, parameterValue[count + 1]);
+        totalTime[i] = 1e-9;       // nonzero to accomodate log plot
+        parameterValue[i] = i * delta * binw;
+        totalTime[0] = 1e-9;
+        parameterValue[0] = 0;
 
-    refreshZoneLabels();
+        // convert vectors from absolute time to percentage
+        // if the user has selected that
+        if (!absolutetime) {
+            percentify(totalTime, 1);
+            percentify(totalTimeSelected, 1);
+        }
+
+        curve->setData(parameterValue.data(), totalTime.data(), count + 2);
+        curveSelected->setData(parameterValue.data(), totalTimeSelected.data(), count + 2);
+
+        // make see through if we're shading zones
+        QBrush brush = curve->brush();
+        QColor bcol = brush.color();
+        bcol.setAlpha(shadeZones() ? 165 : 200);
+        brush.setColor(bcol);
+        curve->setBrush(brush);
+
+        setAxisScaleDraw(QwtPlot::xBottom, new QwtScaleDraw);
+        setAxisScale(xBottom, 0.0, parameterValue[count + 1]);
+
+        // we only do zone labels when using absolute values
+        refreshZoneLabels();
+
+    } else {
+
+        // we're not binning instead we are prettyfing the columnar
+        // display in much the same way as the weekly summary workds
+        // Each zone column will have 4 points
+        QVector<double> xaxis (array->size() * 4);
+        QVector<double> yaxis (array->size() * 4);
+        QVector<double> selectedxaxis (selectedArray->size() * 4);
+        QVector<double> selectedyaxis (selectedArray->size() * 4);
+
+        // samples to time
+        for (int i=0, offset=0; i<array->size(); i++) {
+
+            double x = (double) i - 0.5;
+            double y = dt * (double)(*array)[i];
+
+            xaxis[offset] = x +0.05;
+            yaxis[offset] = 0;
+            offset++;
+            xaxis[offset] = x+0.05;
+            yaxis[offset] = y;
+            offset++;
+            xaxis[offset] = x+0.95;
+            yaxis[offset] = y;
+            offset++;
+            xaxis[offset] = x +0.95;
+            yaxis[offset] = 0;
+            offset++;
+        }
+
+        for (int i=0, offset=0; i<selectedArray->size(); i++) {
+            double x = (double)i - 0.5;
+            double y = dt * (double)(*selectedArray)[i];
+
+            selectedxaxis[offset] = x +0.05;
+            selectedyaxis[offset] = 0;
+            offset++;
+            selectedxaxis[offset] = x+0.05;
+            selectedyaxis[offset] = y;
+            offset++;
+            selectedxaxis[offset] = x+0.95;
+            selectedyaxis[offset] = y;
+            offset++;
+            selectedxaxis[offset] = x +0.95;
+            selectedyaxis[offset] = 0;
+            offset++;
+        }
+
+        if (!absolutetime) {
+            percentify(yaxis, 2);
+            percentify(selectedyaxis, 2);
+        }
+        // set those curves
+        curve->setData(xaxis.data(), yaxis.data(), xaxis.size());
+
+        // Opaque - we don't need to show zone shading
+        QBrush brush = curve->brush();
+        QColor bcol = brush.color();
+        bcol.setAlpha(200);
+        brush.setColor(bcol);
+        curve->setBrush(brush);
+
+        curveSelected->setData(selectedxaxis.data(), selectedyaxis.data(), selectedxaxis.size());
+
+        // zone scale draw
+        if (selected == wattsZone && rideItem && rideItem->zones) {
+            setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(rideItem->zones, rideItem->zoneRange()));
+            setAxisScale(QwtPlot::xBottom, -0.99, rideItem->zones->numZones(rideItem->zoneRange()), 1);
+        }
+
+        // hr scale draw
+        int hrRange;
+        if (selected == hrZone && rideItem && mainWindow->hrZones() &&
+            (hrRange=mainWindow->hrZones()->whichRange(rideItem->dateTime.date())) != -1) {
+            setAxisScaleDraw(QwtPlot::xBottom, new HrZoneScaleDraw(mainWindow->hrZones(), hrRange));
+            setAxisScale(QwtPlot::xBottom, -0.99, mainWindow->hrZones()->numZones(hrRange), 1);
+        }
+
+        setAxisMaxMinor(QwtPlot::xBottom, 0);
+    }
 
     setYMax();
     replot();
@@ -442,8 +538,10 @@ PowerHist::recalc()
 void
 PowerHist::setYMax()
 {
+    double MaxY = curve->maxYValue();
+    if (MaxY < curveSelected->maxYValue()) MaxY = curveSelected->maxYValue();
     static const double tmin = 1.0/60;
-    setAxisScale(yLeft, (lny ? tmin : 0.0), curve->maxYValue() * 1.1);
+    setAxisScale(yLeft, (lny ? tmin : 0.0), MaxY * 1.1);
 }
 
 void
@@ -462,14 +560,18 @@ PowerHist::setData(RideItem *_rideItem)
         dt = ride->recIntSecs() / 60.0;
 
         wattsArray.resize(0);
+        wattsZoneArray.resize(0);
         nmArray.resize(0);
         hrArray.resize(0);
+        hrZoneArray.resize(0);
         kphArray.resize(0);
         cadArray.resize(0);
 
         wattsSelectedArray.resize(0);
+        wattsZoneSelectedArray.resize(0);
         nmSelectedArray.resize(0);
         hrSelectedArray.resize(0);
+        hrZoneSelectedArray.resize(0);
         kphSelectedArray.resize(0);
         cadSelectedArray.resize(0);
 
@@ -480,6 +582,7 @@ PowerHist::setData(RideItem *_rideItem)
         foreach(const RideFilePoint *p1, ride->dataPoints()) {
             bool selected = isSelected(p1, ride->recIntSecs());
 
+            // watts array
             int wattsIndex = int(floor(p1->watts / wattsDelta));
             if (wattsIndex >= 0 && wattsIndex < maxSize) {
                 if (wattsIndex >= wattsArray.size())
@@ -490,6 +593,27 @@ PowerHist::setData(RideItem *_rideItem)
                     if (wattsIndex >= wattsSelectedArray.size())
                         wattsSelectedArray.resize(wattsIndex + 1);
                     wattsSelectedArray[wattsIndex]++;
+                }
+            }
+
+            // watts zoned array
+            const Zones *zones = rideItem->zones;
+            int zoneRange = zones ? zones->whichRange(ride->startTime().date()) : -1;
+
+            // Only calculate zones if we have a valid range and check zeroes
+            if (zoneRange > -1 && (withz || (!withz && p1->watts))) {
+                wattsIndex = zones->whichZone(zoneRange, p1->watts);
+
+                if (wattsIndex >= 0 && wattsIndex < maxSize) {
+                    if (wattsIndex >= wattsZoneArray.size())
+                        wattsZoneArray.resize(wattsIndex + 1);
+                    wattsZoneArray[wattsIndex]++;
+
+                    if (selected) {
+                        if (wattsIndex >= wattsZoneSelectedArray.size())
+                            wattsZoneSelectedArray.resize(wattsIndex + 1);
+                        wattsZoneSelectedArray[wattsIndex]++;
+                    }
                 }
             }
 
@@ -518,6 +642,26 @@ PowerHist::setData(RideItem *_rideItem)
                 hrSelectedArray[hrIndex]++;
             }
 	    }
+
+        // hr zoned array
+        int hrZoneRange = mainWindow->hrZones() ? mainWindow->hrZones()->whichRange(ride->startTime().date()) : -1;
+
+        // Only calculate zones if we have a valid range
+        if (hrZoneRange > -1 && (withz || (!withz && p1-hr))) {
+            hrIndex = mainWindow->hrZones()->whichZone(hrZoneRange, p1->hr);
+
+            if (hrIndex >= 0 && hrIndex < maxSize) {
+                if (hrIndex >= hrZoneArray.size())
+                    hrZoneArray.resize(hrIndex + 1);
+                hrZoneArray[hrIndex]++;
+
+                if (selected) {
+                    if (hrIndex >= hrZoneSelectedArray.size())
+                        hrZoneSelectedArray.resize(hrIndex + 1);
+                    hrZoneSelectedArray[hrIndex]++;
+                }
+            }
+        }
 
 	    int kphIndex = int(floor(p1->kph * speed_factor / kphDelta));
 	    if (kphIndex >= 0 && kphIndex < maxSize) {
@@ -570,12 +714,13 @@ double
 PowerHist::getDelta()
 {
     switch (selected) {
-    case wattsShaded:
-    case wattsUnshaded:
+    case watts:
+    case wattsZone:
 	return wattsDelta;
     case nm:
 	return nmDelta;
     case hr:
+    case hrZone:
 	return hrDelta;
     case kph:
 	return kphDelta;
@@ -589,12 +734,13 @@ int
 PowerHist::getDigits()
 {
     switch (selected) {
-    case wattsShaded:
-    case wattsUnshaded:
+    case watts:
+    case wattsZone:
 	return wattsDigits;
     case nm:
 	return nmDigits;
     case hr:
+    case hrZone:
 	return hrDigits;
     case kph:
 	return kphDigits;
@@ -621,6 +767,7 @@ void
 PowerHist::setWithZeros(bool value)
 {
     withz = value;
+    setData(rideItem); // for zone recalculating with/without zero
     recalc();
 }
 
@@ -631,7 +778,7 @@ PowerHist::setlnY(bool value)
     // "new" in the argument list is not a leak
 
     lny=value;
-    if (lny)
+    if (lny && selected != wattsZone && selected != hrZone)
     {
         setAxisScaleEngine(yLeft, new QwtLog10ScaleEngine);
 	curve->setBaseline(1e-6);
@@ -646,44 +793,49 @@ PowerHist::setlnY(bool value)
 }
 
 void
+PowerHist::setSumY(bool value)
+{
+    absolutetime = value;
+    setParameterAxisTitle();
+    setData(rideItem); // for zone recalculating with/without zero
+    recalc();
+}
+
+void
 PowerHist::setParameterAxisTitle()
 {
-    setAxisTitle(
-		 xBottom,
-		 ((selected == wattsShaded) ||
-		  (selected == wattsUnshaded)
-		  ) ?
-		 "watts" :
-		 ((selected == hr) ?
-		  "beats/minute" :
-		  ((selected == cad) ?
-		   "revolutions/min" :
-		   useMetricUnits ?
-		   ((selected == nm) ?
-		    "newton-meters" :
-		    ((selected == kph) ?
-		     "km/hr" :
-		     "undefined"
-		     )
-		    ) :
-		   ((selected == nm) ?
-		    "ft-lb" :
-		    ((selected == kph) ?
-		     "miles/hr" :
-		     "undefined"
-		     )
-		    )
-		   )
-		  )
-		 );
+    QString axislabel;
+    switch (selected) {
+        case watts:
+            axislabel = tr("Power (watts)");
+            break;
+        case wattsZone:
+            axislabel = tr("Power zone");
+            break;
+        case hr:
+            axislabel = tr("Heartrate (bpm)");
+            break;
+        case hrZone:
+            axislabel = tr("Heartrate zone");
+            break;
+        case cad:
+            axislabel = tr("Cadence (rpm)");
+            break;
+        case kph:
+            axislabel = QString(tr("Speed (%1)")).arg(useMetricUnits ? tr("kph") : tr("mph"));
+            break;
+        case nm:
+            axislabel = QString(tr("Torque (%1)")).arg(useMetricUnits ? tr("N-m") : tr("ft-lbf"));
+            break;
+    }
+    setAxisTitle(xBottom, axislabel);
+    setAxisTitle(yLeft, absolutetime ? tr("Time (minutes)") : tr("Time (percent)"));
 }
 
 void
 PowerHist::setSelection(Selection selection) {
-    if (selected == selection)
-	return;
-
     selected = selection;
+    if (selected == wattsZone || selected == hrZone) setlnY(false);
     configChanged(); // set colors
     setParameterAxisTitle();
     recalc();
@@ -696,48 +848,40 @@ PowerHist::fixSelection() {
     Selection s = selected;
     RideFile *ride = rideItem->ride();
 
-    if (ride)
-        do
-        {
-	    if ((s == wattsShaded) || (s == wattsUnshaded))
-            {
-		if (ride->areDataPresent()->watts)
-		    setSelection(s);
-		else
-		    s = nm;
-            }
+    int powerRange = mainWindow->zones()->whichRange(rideItem->dateTime.date());
+    int hrRange = mainWindow->hrZones()->whichRange(rideItem->dateTime.date());
 
-	    else if (s == nm)
-            {
-		if (ride->areDataPresent()->nm)
-		    setSelection(s);
-		else
-		    s = hr;
-            }
+    if (ride) do {
 
-	    else if (s == hr)
-            {
-		if (ride->areDataPresent()->hr)
-		    setSelection(s);
-		else
-		    s = kph;
-            }
+	    if (s == watts) {
+		    if (ride->areDataPresent()->watts) setSelection(s);
+		    else s = nm;
 
-	    else if (s == kph)
-            {
-		if (ride->areDataPresent()->kph)
-		    setSelection(s);
-		else
-		    s = cad;
-            }
+        } else if (s == wattsZone) {
+		    if (ride->areDataPresent()->watts && powerRange != -1) setSelection(s);
+		    else s = nm;
 
-	    else if (s == cad)
-            {
-		if (ride->areDataPresent()->cad)
-		    setSelection(s);
-		else
-		    s = wattsShaded;
-            }
+        } else if (s == nm) {
+		    if (ride->areDataPresent()->nm) setSelection(s);
+		    else s = hr;
+
+        } else if (s == hr) {
+		    if (ride->areDataPresent()->hr) setSelection(s);
+		    else s = kph;
+
+        } else if (s == hrZone) {
+		    if (ride->areDataPresent()->hr && hrRange != -1) setSelection(s);
+		    else s = kph;
+
+        } else if (s == kph) {
+		    if (ride->areDataPresent()->kph) setSelection(s);
+		    else s = cad;
+
+        } else if (s == cad) {
+		    if (ride->areDataPresent()->cad) setSelection(s);
+		    else s = watts;
+        }
+
 	} while (s != selected);
 }
 
@@ -747,7 +891,8 @@ bool PowerHist::shadeZones() const
     return (
 	    rideItem &&
 	    rideItem->ride() &&
-	    selected == wattsShaded
+	    selected == watts &&
+        shaded() == true
 	    );
 }
 
@@ -763,4 +908,55 @@ bool PowerHist::isSelected(const RideFilePoint *p, double sample) {
         }
     }
     return false;
+}
+
+void
+PowerHist::pointHover(QwtPlotCurve *curve, int index)
+{
+    if (index >= 0) {
+
+        double xvalue = curve->x(index);
+        double yvalue = curve->y(index);
+        QString text;
+
+        if ((selected == hrZone || selected == wattsZone) && yvalue > 0) {
+            // output the tooltip
+            text = QString("%1 %2").arg(yvalue, 0, 'f', 1).arg(absolutetime ? tr("minutes") : tr("%"));
+
+            // set that text up
+            zoomer->setText(text);
+            return;
+
+        } else if (yvalue > 0) {
+
+            // output the tooltip
+            text = QString("%1 %2\n%3 %4")
+                        .arg(xvalue, 0, 'f', getDigits())
+                        .arg(this->axisTitle(curve->xAxis()).text())
+                        .arg(yvalue, 0, 'f', 1)
+                        .arg(absolutetime ? tr("minutes") : tr("%"));
+
+            // set that text up
+            zoomer->setText(text);
+            return;
+        }
+    }
+    // no point
+    zoomer->setText("");
+}
+
+// because we need to effectively draw bars when showing
+// time in zone (i.e. for every zone there are 2 points for each
+// zone - top left and top right) we need to multiply the percentage
+// values by 2 to take this into account
+void
+PowerHist::percentify(QVector<double> &array, double factor)
+{
+    double total=0;
+    foreach (double current, array) total += current;
+
+    if (total > 0)
+        for (int i=0; i< array.size(); i++)
+            if (array[i] > 0.01) // greater than 0.8s (i.e. not a double storage issue)
+                array[i] = factor * (array[i] / total) * (double)100.00;
 }

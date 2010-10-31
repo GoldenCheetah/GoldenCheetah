@@ -255,6 +255,7 @@ RideFile *RideFileFactory::openRideFile(QFile &file,
     if (result) {
         if (result->intervals().empty()) result->fillInIntervals();
         result->setTag("Filename", file.fileName());
+        result->setTag("Athlete", QFileInfo(file).dir().dirName());
         DataProcessorFactory::instance().autoProcess(result);
     }
 

@@ -24,6 +24,7 @@
 #include "RideFile.h"
 #include <QDir>
 #include "Zones.h"
+#include "HrZones.h"
 #include "RideMetric.h"
 #include "SummaryMetrics.h"
 #include "MainWindow.h"
@@ -34,7 +35,7 @@ class MetricAggregator : public QWidget
     Q_OBJECT
 
 	public:
-        MetricAggregator(MainWindow *, QDir , const Zones *);
+        MetricAggregator(MainWindow *, QDir , const Zones *, const HrZones *);
 		~MetricAggregator();
 
 
@@ -50,6 +51,7 @@ class MetricAggregator : public QWidget
         DBAccess *dbaccess;
         QDir home;
         const Zones *zones;
+        const HrZones *hrZones;
 
 	    typedef QHash<QString,RideMetric*> MetricMap;
 	    bool importRide(QDir path, RideFile *ride, QString fileName, unsigned long, bool modify);

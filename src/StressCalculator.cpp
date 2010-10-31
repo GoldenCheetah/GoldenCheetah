@@ -71,7 +71,7 @@ void StressCalculator::calculateStress(MainWindow *main, QString home, const QSt
     QList<SummaryMetrics> results;
 
     // refresh metrics
-    metricDB = new MetricAggregator(main, home, main->zones());
+    metricDB = new MetricAggregator(main, home, main->zones(), main->hrZones());
     results = metricDB->getAllMetricsFor(QDateTime(QDate(1900,1,1)), QDateTime(QDate(3000,1,1)));
     delete metricDB;
 

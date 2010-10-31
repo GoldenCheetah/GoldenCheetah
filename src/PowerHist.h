@@ -20,8 +20,10 @@
 #define _GC_PowerHist_h 1
 
 #include <qwt_plot.h>
+#include <qwt_plot_zoomer.h>
 #include <qsettings.h>
 #include <qvariant.h>
+
 
 class QwtPlotCurve;
 class QwtPlotGrid;
@@ -30,7 +32,44 @@ class RideItem;
 class RideFilePoint;
 class PowerHistBackground;
 class PowerHistZoneLabel;
-class QwtPlotZoomer;
+class LTMCanvasPicker;
+class ZoneScaleDraw;
+
+class penTooltip: public QwtPlotZoomer
+{
+    public:
+         penTooltip(QwtPlotCanvas *canvas):
+             QwtPlotZoomer(canvas), tip("")
+         {
+                 // With some versions of Qt/Qwt, setting this to AlwaysOn
+                 // causes an infinite recursion.
+                 //setTrackerMode(AlwaysOn);
+                 setTrackerMode(AlwaysOn);
+         }
+
+    virtual QwtText trackerText(const QwtDoublePoint &/*pos*/) const
+    {
+        QColor bg = QColor(255,255, 170); // toolyip yellow
+#if QT_VERSION >= 0x040300
+        bg.setAlpha(200);
+#endif
+        QwtText text;
+        QFont def;
+        //def.setPointSize(8); // too small on low res displays (Mac)
+        //double val = ceil(pos.y()*100) / 100; // round to 2 decimal place
+        //text.setText(QString("%1 %2").arg(val).arg(format), QwtText::PlainText);
+        text.setText(tip);
+        text.setFont(def);
+        text.setBackgroundBrush( QBrush( bg ));
+        text.setRenderFlags(Qt::AlignLeft | Qt::AlignTop);
+        return text;
+    }
+    void setFormat(QString fmt) { format = fmt; }
+    void setText(QString txt) { tip = txt; }
+    private:
+    QString format;
+    QString tip;
+ };
 
 class PowerHist : public QwtPlot
 {
@@ -50,19 +89,26 @@ class PowerHist : public QwtPlot
         bool shadeZones() const;
 
 	enum Selection {
-	    wattsShaded,
-	    wattsUnshaded,
+	    watts,
+	    wattsZone,
 	    nm,
 	    hr,
+        hrZone,
 	    kph,
 	    cad
 	} selected;
 	inline Selection selection() { return selected; }
 
+    bool shade;
+    inline bool shaded() const { return shade; }
+
+
         void setData(RideItem *_rideItem);
 
 	void setSelection(Selection selection);
 	void fixSelection();
+
+    void setShading(bool x) { shade=x; }
 
         void setBinWidth(int value);
 	double getDelta();
@@ -78,6 +124,8 @@ class PowerHist : public QwtPlot
 
         void setlnY(bool value);
         void setWithZeros(bool value);
+        void setSumY(bool value);
+        void pointHover(QwtPlotCurve *curve, int index);
         void configChanged();
 
     protected:
@@ -88,16 +136,20 @@ class PowerHist : public QwtPlot
         // storage for data counts
         QVector<unsigned int>
         wattsArray,
+        wattsZoneArray,
         nmArray,
         hrArray,
+        hrZoneArray,
         kphArray,
         cadArray;
 
         // storage for data counts in interval selected
         QVector<unsigned int>
         wattsSelectedArray,
+        wattsZoneSelectedArray,
         nmSelectedArray,
         hrSelectedArray,
+        hrZoneSelectedArray,
         kphSelectedArray,
         cadSelectedArray;
 
@@ -108,10 +160,9 @@ class PowerHist : public QwtPlot
 
         void recalc();
         void setYMax();
-        QwtPlotZoomer *zoomer;
+        penTooltip *zoomer;
 
     private:
-        QSettings *settings;
         QVariant unit;
 
 	PowerHistBackground *bg;
@@ -135,6 +186,11 @@ class PowerHist : public QwtPlot
 	bool isSelected(const RideFilePoint *p, double);
 
 	bool useMetricUnits;  // whether metric units are used (or imperial)
+
+    bool absolutetime; // do we sum absolute or percentage?
+    void percentify(QVector<double> &, double factor); // and a function to convert
+
+    LTMCanvasPicker *canvasPicker;
 };
 
 #endif // _GC_PowerHist_h

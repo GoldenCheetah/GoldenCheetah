@@ -166,7 +166,7 @@ LTMWindow::rideSelected()
     active = (main->activeTab() == this);
 
     if (active == true && metricDB == NULL) {
-        metricDB = new MetricAggregator(main, home, main->zones());
+        metricDB = new MetricAggregator(main, home, main->zones(), main->hrZones());
 
         // mimic user first selection now that
         // we are active - choose a chart and

@@ -51,6 +51,7 @@ PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
     metricCombo = new QComboBox(this);
     metricCombo->addItem(tr("Use BikeScore"), "skiba_bike_score");
     metricCombo->addItem(tr("Use DanielsPoints"), "daniels_points");
+    metricCombo->addItem(tr("Use TRIMP"), "trimp_points");
     boost::shared_ptr<QSettings> settings = GetApplicationSettings();
     QString metricName =
         settings->value(GC_PERF_MAN_METRIC, "skiba_bike_score").toString();

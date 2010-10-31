@@ -27,6 +27,7 @@ class RideFile;
 class RideEditor;
 class MainWindow;
 class Zones;
+class HrZones;
 
 // Because we have subclassed QTreeWidgetItem we
 // need to use our own type, this MUST be greater than
@@ -42,6 +43,7 @@ class RideItem : public QObject, public QTreeWidgetItem //<< for signals/slots
     protected:
 
         QVector<double> time_in_zone;
+        QVector<double> time_in_hr_zone;
         RideFile *ride_;
         QStringList errors_;
         MainWindow *main; // to notify widgets when date/time changes
@@ -63,13 +65,14 @@ class RideItem : public QObject, public QTreeWidgetItem //<< for signals/slots
         RideFile *ride();
         const QStringList errors() { return errors_; }
         const Zones *zones;
+        const HrZones *hrZones;
         QString notesFileName;
 
         QHash<QString,RideMetricPtr> metrics;
 
         RideItem(int type, QString path, 
                  QString fileName, const QDateTime &dateTime,
-                 const Zones *zones, QString notesFileName, MainWindow *main);
+                 const Zones *zones, const HrZones *hrZones, QString notesFileName, MainWindow *main);
 
         void setDirty(bool);
         bool isDirty() { return isdirty; }
@@ -79,7 +82,10 @@ class RideItem : public QObject, public QTreeWidgetItem //<< for signals/slots
         void freeMemory();
 
         int zoneRange();
+        int hrZoneRange();
         int numZones();
+        int numHrZones();
         double timeInZone(int zone);
+        double timeInHrZone(int zone);
 };
 #endif // _GC_RideItem_h

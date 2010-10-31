@@ -3,6 +3,7 @@
 #include <assert.h>
 #include "Pages.h"
 #include "Settings.h"
+#include "Units.h"
 #include "Colors.h"
 #include "DeviceTypes.h"
 #include "DeviceConfiguration.h"
@@ -217,15 +218,27 @@ CyclistPage::CyclistPage(MainWindow *main) :
     boost::shared_ptr<QSettings> settings = GetApplicationSettings();
 
     QTabWidget *tabs = new QTabWidget(this);
+    QWidget *rdTab = new QWidget(this);
     QWidget *cpTab = new QWidget(this);
+    QWidget *hrTab = new QWidget(this);
     QWidget *pmTab = new QWidget(this);
+    tabs->addTab(rdTab, tr("Rider"));
     tabs->addTab(cpTab, tr("Power Zones"));
+    tabs->addTab(hrTab, tr("HR Zones"));
     tabs->addTab(pmTab, tr("Performance Manager"));
+    QVBoxLayout *rdLayout = new QVBoxLayout(rdTab);
     QVBoxLayout *cpLayout = new QVBoxLayout(cpTab);
+    QVBoxLayout *hrLayout = new QVBoxLayout(hrTab);
     QVBoxLayout *pmLayout = new QVBoxLayout(pmTab);
+
+    riderPage = new RiderPage(this, main);
+    rdLayout->addWidget(riderPage);
 
     zonePage = new ZonePage(main);
     cpLayout->addWidget(zonePage);
+
+    hrZonePage = new HrZonePage(main);
+    hrLayout->addWidget(hrZonePage);
 
     perfManLabel = new QLabel(tr("Performance Manager"));
     showSBToday = new QCheckBox(tr("Show Stress Balance Today"), this);
@@ -282,6 +295,8 @@ CyclistPage::saveClicked()
 {
     // save zone config (other stuff is saved by configdialog)
     zonePage->saveClicked();
+    hrZonePage->saveClicked();
+    riderPage->saveClicked();
 }
 
 
@@ -1478,6 +1493,7 @@ SchemePage::deleteClicked()
 struct schemeitem {
     QString name, desc;
     int lo;
+    double trimp;
     bool operator<(schemeitem right) const { return lo < right.lo; }
 };
 
@@ -1845,6 +1861,700 @@ CPPage::zonesChanged()
             zonePage->zones.setZoneRange(index, current);
         }
     }
+}
+
+//
+// Zone Config page
+//
+HrZonePage::HrZonePage(MainWindow *main) : main(main)
+{
+    QVBoxLayout *layout = new QVBoxLayout(this);
+
+    // get current config by reading it in (leave mainwindow zones alone)
+    QFile zonesFile(main->home.absolutePath() + "/hr.zones");
+    if (zonesFile.exists()) {
+        zones.read(zonesFile);
+        zonesFile.close();
+    }
+
+    // setup maintenance pages using current config
+    schemePage = new HrSchemePage(this);
+    ltPage = new LTPage(this);
+
+    tabs = new QTabWidget(this);
+    tabs->addTab(ltPage, tr("Lactic Threshold History"));
+    tabs->addTab(schemePage, tr("Default Zones"));
+
+    layout->addWidget(tabs);
+}
+
+void
+HrZonePage::saveClicked()
+{
+    zones.setScheme(schemePage->getScheme());
+    zones.write(main->home);
+}
+
+HrSchemePage::HrSchemePage(HrZonePage* zonePage) : zonePage(zonePage)
+{
+    QGridLayout *mainLayout = new QGridLayout(this);
+
+    addButton = new QPushButton(tr("Add"));
+    renameButton = new QPushButton(tr("Rename"));
+    deleteButton = new QPushButton(tr("Delete"));
+
+    QVBoxLayout *actionButtons = new QVBoxLayout;
+    actionButtons->addWidget(addButton);
+    actionButtons->addWidget(renameButton);
+    actionButtons->addWidget(deleteButton);
+    actionButtons->addStretch();
+
+    scheme = new QTreeWidget;
+    scheme->headerItem()->setText(0, tr("Short"));
+    scheme->headerItem()->setText(1, tr("Long"));
+    scheme->headerItem()->setText(2, tr("Percent of LT"));
+    scheme->headerItem()->setText(3, tr("Trimp k"));
+    scheme->setColumnCount(4);
+    scheme->setSelectionMode(QAbstractItemView::SingleSelection);
+    scheme->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    scheme->setUniformRowHeights(true);
+    scheme->setIndentation(0);
+    scheme->header()->resizeSection(0,60);
+    scheme->header()->resizeSection(1,180);
+    scheme->header()->resizeSection(2,65);
+    scheme->header()->resizeSection(3,65);
+
+    // setup list
+    for (int i=0; i< zonePage->zones.getScheme().nzones_default; i++) {
+
+        QTreeWidgetItem *add = new QTreeWidgetItem(scheme->invisibleRootItem());
+        add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+        // tab name
+        add->setText(0, zonePage->zones.getScheme().zone_default_name[i]);
+        // field name
+        add->setText(1, zonePage->zones.getScheme().zone_default_desc[i]);
+
+        // low
+        QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
+        loedit->setMinimum(0);
+        loedit->setMaximum(1000);
+        loedit->setSingleStep(1.0);
+        loedit->setDecimals(0);
+        loedit->setValue(zonePage->zones.getScheme().zone_default[i]);
+        scheme->setItemWidget(add, 2, loedit);
+
+        // trimp
+        QDoubleSpinBox *trimpedit = new QDoubleSpinBox(this);
+        trimpedit->setMinimum(0);
+        trimpedit->setMaximum(10);
+        trimpedit->setSingleStep(0.1);
+        trimpedit->setDecimals(2);
+        trimpedit->setValue(zonePage->zones.getScheme().zone_default_trimp[i]);
+        scheme->setItemWidget(add, 3, trimpedit);
+    }
+
+    mainLayout->addWidget(scheme, 0,0);
+    mainLayout->addLayout(actionButtons, 0,1);
+
+    // button connect
+    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
+    connect(renameButton, SIGNAL(clicked()), this, SLOT(renameClicked()));
+    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+}
+
+void
+HrSchemePage::addClicked()
+{
+    // are we at maximum already?
+    if (scheme->invisibleRootItem()->childCount() == 10) {
+        QMessageBox err;
+        err.setText("Maximum of 10 zones reached.");
+        err.setIcon(QMessageBox::Warning);
+        err.exec();
+        return;
+    }
+
+    int index = scheme->invisibleRootItem()->childCount();
+
+    // new item
+    QTreeWidgetItem *add = new QTreeWidgetItem;
+    add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+    QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
+    loedit->setMinimum(0);
+    loedit->setMaximum(1000);
+    loedit->setSingleStep(1.0);
+    loedit->setDecimals(0);
+    loedit->setValue(100);
+
+    scheme->invisibleRootItem()->insertChild(index, add);
+    scheme->setItemWidget(add, 2, loedit);
+
+    // Short
+    QString text = "New";
+    for (int i=0; scheme->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
+        text = QString("New (%1)").arg(i+1);
+    }
+    add->setText(0, text);
+
+    // long
+    text = "New";
+    for (int i=0; scheme->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
+        text = QString("New (%1)").arg(i+1);
+    }
+    add->setText(1, text);
+}
+
+void
+HrSchemePage::renameClicked()
+{
+    // which one is selected?
+    if (scheme->currentItem()) scheme->editItem(scheme->currentItem(), 0);
+}
+
+void
+HrSchemePage::deleteClicked()
+{
+    if (scheme->currentItem()) {
+        int index = scheme->invisibleRootItem()->indexOfChild(scheme->currentItem());
+        delete scheme->invisibleRootItem()->takeChild(index);
+    }
+}
+
+HrZoneScheme
+HrSchemePage::getScheme()
+{
+    // read the scheme widget and return a scheme object
+    QList<schemeitem> table;
+    HrZoneScheme results;
+
+    // read back the details from the table
+    for (int i=0; i<scheme->invisibleRootItem()->childCount(); i++) {
+
+        schemeitem add;
+        add.name = scheme->invisibleRootItem()->child(i)->text(0);
+        add.desc = scheme->invisibleRootItem()->child(i)->text(1);
+        add.lo = ((QDoubleSpinBox *)(scheme->itemWidget(scheme->invisibleRootItem()->child(i), 2)))->value();
+        add.trimp = ((QDoubleSpinBox *)(scheme->itemWidget(scheme->invisibleRootItem()->child(i), 3)))->value();
+        table.append(add);
+    }
+
+    // sort the list into ascending order
+    qSort(table);
+
+    // now update the results
+    results.nzones_default = 0;
+    foreach(schemeitem zone, table) {
+        results.nzones_default++;
+        results.zone_default.append(zone.lo);
+        results.zone_default_is_pct.append(true);
+        results.zone_default_name.append(zone.name);
+        results.zone_default_desc.append(zone.desc);
+        results.zone_default_trimp.append(zone.trimp);
+    }
+
+    return results;
+}
+
+
+LTPage::LTPage(HrZonePage* zonePage) : zonePage(zonePage)
+{
+    active = false;
+
+    QGridLayout *mainLayout = new QGridLayout(this);
+
+    addButton = new QPushButton(tr("Add LT"));
+    deleteButton = new QPushButton(tr("Delete LT"));
+    defaultButton = new QPushButton(tr("Default"));
+    defaultButton->hide();
+
+    addZoneButton = new QPushButton(tr("Add Zone"));
+    deleteZoneButton = new QPushButton(tr("Delete Zone"));
+
+    QVBoxLayout *actionButtons = new QVBoxLayout;
+    actionButtons->addWidget(addButton);
+    actionButtons->addWidget(deleteButton);
+    actionButtons->addWidget(defaultButton);
+    actionButtons->addStretch();
+
+    QVBoxLayout *zoneButtons = new QVBoxLayout;
+    zoneButtons->addWidget(addZoneButton);
+    zoneButtons->addWidget(deleteZoneButton);
+    zoneButtons->addStretch();
+
+    QHBoxLayout *addLayout = new QHBoxLayout;
+    QLabel *dateLabel = new QLabel(tr("From Date"));
+    QLabel *ltLabel = new QLabel(tr("Lactic Threshold"));
+    dateEdit = new QDateEdit;
+    dateEdit->setDate(QDate::currentDate());
+
+    ltEdit = new QDoubleSpinBox;
+    ltEdit->setMinimum(0);
+    ltEdit->setMaximum(240);
+    ltEdit->setSingleStep(1.0);
+    ltEdit->setDecimals(0);
+
+    addLayout->addWidget(dateLabel);
+    addLayout->addWidget(dateEdit);
+    addLayout->addWidget(ltLabel);
+    addLayout->addWidget(ltEdit);
+    addLayout->addStretch();
+
+    QHBoxLayout *addLayout2 = new QHBoxLayout;
+    QLabel *restHrLabel = new QLabel(tr("Rest HR"));
+    QLabel *maxHrLabel = new QLabel(tr("Max HR"));
+
+    restHrEdit = new QDoubleSpinBox;
+    restHrEdit->setMinimum(0);
+    restHrEdit->setMaximum(240);
+    restHrEdit->setSingleStep(1.0);
+    restHrEdit->setDecimals(0);
+
+    maxHrEdit = new QDoubleSpinBox;
+    maxHrEdit->setMinimum(0);
+    maxHrEdit->setMaximum(240);
+    maxHrEdit->setSingleStep(1.0);
+    maxHrEdit->setDecimals(0);
+
+    addLayout2->addWidget(restHrLabel);
+    addLayout2->addWidget(restHrEdit);
+    addLayout2->addWidget(maxHrLabel);
+    addLayout2->addWidget(maxHrEdit);
+    addLayout2->addStretch();
+
+    ranges = new QTreeWidget;
+    ranges->headerItem()->setText(0, tr("From Date"));
+    ranges->headerItem()->setText(1, tr("Lactic Threshold"));
+    ranges->headerItem()->setText(2, tr("Rest HR"));
+    ranges->headerItem()->setText(3, tr("Max HR"));
+    ranges->setColumnCount(4);
+    ranges->setSelectionMode(QAbstractItemView::SingleSelection);
+    //ranges->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    ranges->setUniformRowHeights(true);
+    ranges->setIndentation(0);
+    ranges->header()->resizeSection(0,180);
+
+    // setup list of ranges
+    for (int i=0; i< zonePage->zones.getRangeSize(); i++) {
+
+        QTreeWidgetItem *add = new QTreeWidgetItem(ranges->invisibleRootItem());
+        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
+
+        // Embolden ranges with manually configured zones
+        QFont font;
+        font.setWeight(zonePage->zones.getHrZoneRange(i).hrZonesSetFromLT ?
+                       QFont::Normal : QFont::Black);
+
+        // date
+        add->setText(0, zonePage->zones.getStartDate(i).toString("MMM d, yyyy"));
+        add->setFont(0, font);
+
+        // LT
+        add->setText(1, QString("%1").arg(zonePage->zones.getLT(i)));
+        add->setFont(1, font);
+
+        // Rest HR
+        add->setText(2, QString("%1").arg(zonePage->zones.getRestHr(i)));
+        add->setFont(2, font);
+
+        // Max HR
+        add->setText(3, QString("%1").arg(zonePage->zones.getMaxHr(i)));
+        add->setFont(3, font);
+    }
+
+    zones = new QTreeWidget;
+    zones->headerItem()->setText(0, tr("Short"));
+    zones->headerItem()->setText(1, tr("Long"));
+    zones->headerItem()->setText(2, tr("From BPM"));
+    zones->headerItem()->setText(3, tr("Trimp k"));
+    zones->setColumnCount(4);
+    zones->setSelectionMode(QAbstractItemView::SingleSelection);
+    zones->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    zones->setUniformRowHeights(true);
+    zones->setIndentation(0);
+    zones->header()->resizeSection(0,50);
+    zones->header()->resizeSection(1,150);
+    zones->header()->resizeSection(2,65);
+    zones->header()->resizeSection(3,65);
+
+    mainLayout->addLayout(addLayout, 0,0);
+    mainLayout->addLayout(addLayout2, 1,0);
+    mainLayout->addWidget(ranges, 2,0);
+    mainLayout->addWidget(zones, 4,0);
+    mainLayout->addLayout(actionButtons, 0,1,0,3);
+    mainLayout->addLayout(zoneButtons, 4,1);
+
+    // button connect
+    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
+    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+    connect(defaultButton, SIGNAL(clicked()), this, SLOT(defaultClicked()));
+    connect(addZoneButton, SIGNAL(clicked()), this, SLOT(addZoneClicked()));
+    connect(deleteZoneButton, SIGNAL(clicked()), this, SLOT(deleteZoneClicked()));
+    connect(ranges, SIGNAL(itemSelectionChanged()), this, SLOT(rangeSelectionChanged()));
+    connect(zones, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(zonesChanged()));
+}
+
+void
+LTPage::addClicked()
+{
+    // get current scheme
+    zonePage->zones.setScheme(zonePage->schemePage->getScheme());
+
+    //int index = ranges->invisibleRootItem()->childCount();
+    int index = zonePage->zones.addHrZoneRange(dateEdit->date(), ltEdit->value(), restHrEdit->value(), maxHrEdit->value());
+
+    // new item
+    QTreeWidgetItem *add = new QTreeWidgetItem;
+    add->setFlags(add->flags() & ~Qt::ItemIsEditable);
+    ranges->invisibleRootItem()->insertChild(index, add);
+
+    // date
+    add->setText(0, dateEdit->date().toString("MMM d, yyyy"));
+
+    // LT
+    add->setText(1, QString("%1").arg(ltEdit->value()));
+    // Rest HR
+    add->setText(2, QString("%1").arg(restHrEdit->value()));
+    // Max HR
+    add->setText(3, QString("%1").arg(maxHrEdit->value()));
+}
+
+void
+LTPage::deleteClicked()
+{
+    if (ranges->currentItem()) {
+        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
+        delete ranges->invisibleRootItem()->takeChild(index);
+        zonePage->zones.deleteRange(index);
+    }
+}
+
+void
+LTPage::defaultClicked()
+{
+    if (ranges->currentItem()) {
+
+        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
+        HrZoneRange current = zonePage->zones.getHrZoneRange(index);
+
+        // unbold
+        QFont font;
+        font.setWeight(QFont::Normal);
+        ranges->currentItem()->setFont(0, font);
+        ranges->currentItem()->setFont(1, font);
+
+        // set the range to use defaults on the scheme page
+        zonePage->zones.setScheme(zonePage->schemePage->getScheme());
+        zonePage->zones.setHrZonesFromLT(index);
+
+        // hide the default button since we are now using defaults
+        defaultButton->hide();
+
+        // update the zones display
+        rangeSelectionChanged();
+    }
+}
+
+void
+LTPage::rangeSelectionChanged()
+{
+    active = true;
+
+    // wipe away current contents of zones
+    foreach (QTreeWidgetItem *item, zones->invisibleRootItem()->takeChildren()) {
+        delete zones->itemWidget(item, 2);
+        delete item;
+    }
+
+    // fill with current details
+    if (ranges->currentItem()) {
+
+        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
+        HrZoneRange current = zonePage->zones.getHrZoneRange(index);
+
+        if (current.hrZonesSetFromLT) {
+
+            // reapply the scheme in case it has been changed
+            zonePage->zones.setScheme(zonePage->schemePage->getScheme());
+            zonePage->zones.setHrZonesFromLT(index);
+            current = zonePage->zones.getHrZoneRange(index);
+
+            defaultButton->hide();
+
+        } else defaultButton->show();
+
+        for (int i=0; i< current.zones.count(); i++) {
+
+            QTreeWidgetItem *add = new QTreeWidgetItem(zones->invisibleRootItem());
+            add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+            // tab name
+            add->setText(0, current.zones[i].name);
+            // field name
+            add->setText(1, current.zones[i].desc);
+
+            // low
+            QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
+            loedit->setMinimum(0);
+            loedit->setMaximum(1000);
+            loedit->setSingleStep(1.0);
+            loedit->setDecimals(0);
+            loedit->setValue(current.zones[i].lo);
+            zones->setItemWidget(add, 2, loedit);
+            connect(loedit, SIGNAL(editingFinished()), this, SLOT(zonesChanged()));
+
+            //trimp
+            QDoubleSpinBox *trimpedit = new QDoubleSpinBox(this);
+            trimpedit->setMinimum(0);
+            trimpedit->setMaximum(10);
+            trimpedit->setSingleStep(0.1);
+            trimpedit->setDecimals(2);
+            trimpedit->setValue(current.zones[i].trimp);
+            zones->setItemWidget(add, 3, trimpedit);
+            connect(trimpedit, SIGNAL(editingFinished()), this, SLOT(zonesChanged()));
+
+        }
+    }
+
+    active = false;
+}
+
+void
+LTPage::addZoneClicked()
+{
+    // no range selected
+    if (!ranges->currentItem()) return;
+
+    // are we at maximum already?
+    if (zones->invisibleRootItem()->childCount() == 10) {
+        QMessageBox err;
+        err.setText("Maximum of 10 zones reached.");
+        err.setIcon(QMessageBox::Warning);
+        err.exec();
+        return;
+    }
+
+    active = true;
+    int index = zones->invisibleRootItem()->childCount();
+
+    // new item
+    QTreeWidgetItem *add = new QTreeWidgetItem;
+    add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+    QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
+    loedit->setMinimum(0);
+    loedit->setMaximum(1000);
+    loedit->setSingleStep(1.0);
+    loedit->setDecimals(0);
+    loedit->setValue(100);
+
+    zones->invisibleRootItem()->insertChild(index, add);
+    zones->setItemWidget(add, 2, loedit);
+    connect(loedit, SIGNAL(editingFinished()), this, SLOT(zonesChanged()));
+
+    // Short
+    QString text = "New";
+    for (int i=0; zones->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
+        text = QString("New (%1)").arg(i+1);
+    }
+    add->setText(0, text);
+
+    // long
+    text = "New";
+    for (int i=0; zones->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
+        text = QString("New (%1)").arg(i+1);
+    }
+    add->setText(1, text);
+    active = false;
+
+    zonesChanged();
+}
+
+void
+LTPage::deleteZoneClicked()
+{
+    // no range selected
+    if (ranges->invisibleRootItem()->indexOfChild(ranges->currentItem()) == -1)
+        return;
+
+    active = true;
+    if (zones->currentItem()) {
+        int index = zones->invisibleRootItem()->indexOfChild(zones->currentItem());
+        delete zones->invisibleRootItem()->takeChild(index);
+    }
+    active = false;
+
+    zonesChanged();
+}
+
+void
+LTPage::zonesChanged()
+{
+    // only take changes when they are not done programmatically
+    // the active flag is set when the tree is being modified
+    // programmatically, but not when users interact with the widgets
+    if (active == false) {
+        // get the current zone range
+        if (ranges->currentItem()) {
+
+            int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
+            HrZoneRange current = zonePage->zones.getHrZoneRange(index);
+
+            // embolden that range on the list to show it has been edited
+            QFont font;
+            font.setWeight(QFont::Black);
+            ranges->currentItem()->setFont(0, font);
+            ranges->currentItem()->setFont(1, font);
+
+            // show the default button to undo
+            defaultButton->show();
+
+            // we manually edited so save in full
+            current.hrZonesSetFromLT = false;
+
+            // create the new zoneinfos for this range
+            QList<HrZoneInfo> zoneinfos;
+            for (int i=0; i< zones->invisibleRootItem()->childCount(); i++) {
+                QTreeWidgetItem *item = zones->invisibleRootItem()->child(i);
+                zoneinfos << HrZoneInfo(item->text(0),
+                                        item->text(1),
+                                        ((QDoubleSpinBox*)zones->itemWidget(item, 2))->value(),
+                                        0, ((QDoubleSpinBox*)zones->itemWidget(item, 3))->value());
+            }
+
+            // now sort the list
+            qSort(zoneinfos);
+
+            // now fill the highs
+            for(int i=0; i<zoneinfos.count(); i++) {
+                if (i+1 <zoneinfos.count())
+                    zoneinfos[i].hi = zoneinfos[i+1].lo;
+                else
+                    zoneinfos[i].hi = INT_MAX;
+            }
+            current.zones = zoneinfos;
+
+            // now replace the current range struct
+            zonePage->zones.setHrZoneRange(index, current);
+        }
+    }
+}
+
+static QVariant getCValue(QString name, QString parameter)
+{
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+    QString key = QString("%1/%2").arg(name).arg(parameter);
+    return settings->value(key, "");
+}
+
+static void setCValue(QString name, QString parameter, QVariant value)
+{
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+    QString key = QString("%1/%2").arg(name).arg(parameter);
+    return settings->setValue(key, value);
+}
+
+//
+// About me
+//
+RiderPage::RiderPage(QWidget *parent, MainWindow *mainWindow) : QWidget(parent), mainWindow(mainWindow)
+{
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+    useMetricUnits = (settings->value(GC_UNIT).toString() == "Metric");
+
+    cyclist = mainWindow->home.dirName();
+
+    QVBoxLayout *all = new QVBoxLayout(this);
+    QGridLayout *grid = new QGridLayout;
+
+    QLabel *nicklabel = new QLabel(tr("Nickname"));
+    QLabel *doblabel = new QLabel(tr("Date of Birth"));
+    QLabel *sexlabel = new QLabel(tr("Gender"));
+    QLabel *biolabel = new QLabel(tr("Bio"));
+
+    QString weighttext = QString(tr("Weight (%1)")).arg(useMetricUnits ? tr("kg") : tr("lb"));
+    QLabel *weightlabel = new QLabel(weighttext);
+
+    nickname = new QLineEdit(this);
+    nickname->setText(getCValue(cyclist, GC_NICKNAME).toString());
+
+    dob = new QDateEdit(this);
+    dob->setDate(getCValue(cyclist, GC_DOB).toDate());
+
+    sex = new QComboBox(this);
+    sex->addItem(tr("Male"));
+    sex->addItem(tr("Female"));
+
+    // we set to 0 or 1 for male or female since this
+    // is language independent (and for once the code is easier!)
+    sex->setCurrentIndex(getCValue(cyclist, GC_SEX).toInt());
+
+    weight = new QDoubleSpinBox(this);
+    weight->setMaximum(999.9);
+    weight->setMinimum(0.0);
+    weight->setDecimals(1);
+    weight->setValue(getCValue(cyclist, GC_WEIGHT).toDouble() * (useMetricUnits ? 1.0 : LB_PER_KG));
+
+    bio = new QTextEdit(this);
+    bio->setText(getCValue(cyclist, GC_BIO).toString());
+
+    if (QFileInfo(mainWindow->home.absolutePath() + "/" + "avatar.png").exists())
+        avatar = QPixmap(mainWindow->home.absolutePath() + "/" + "avatar.png");
+    else
+        avatar = QPixmap(":/images/noavatar.png");
+
+    avatarButton = new QPushButton(this);
+    avatarButton->setContentsMargins(0,0,0,0);
+    avatarButton->setFlat(true);
+    avatarButton->setIcon(avatar.scaled(140,140));
+    avatarButton->setIconSize(QSize(140,140));
+    avatarButton->setFixedHeight(140);
+    avatarButton->setFixedWidth(140);
+
+    Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
+
+    grid->addWidget(nicklabel, 0, 0, alignment);
+    grid->addWidget(doblabel, 1, 0, alignment);
+    grid->addWidget(sexlabel, 2, 0, alignment);
+    grid->addWidget(weightlabel, 3, 0, alignment);
+    grid->addWidget(biolabel, 4, 0, alignment);
+
+    grid->addWidget(nickname, 0, 1, alignment);
+    grid->addWidget(dob, 1, 1, alignment);
+    grid->addWidget(sex, 2, 1, alignment);
+    grid->addWidget(weight, 3, 1, alignment);
+    grid->addWidget(bio, 5, 0, 1, 4);
+
+    grid->addWidget(avatarButton, 0, 2, 4, 2, Qt::AlignRight|Qt::AlignVCenter);
+    all->addLayout(grid);
+    all->addStretch();
+
+    connect (avatarButton, SIGNAL(clicked()), this, SLOT(chooseAvatar()));
+}
+
+void
+RiderPage::chooseAvatar()
+{
+    QString filename = QFileDialog::getOpenFileName(this, tr("Choose Picture"),
+                            "", tr("Images (*.png *.jpg *.bmp"));
+    if (filename != "") {
+
+        avatar = QPixmap(filename);
+        avatarButton->setIcon(avatar.scaled(140,140));
+        avatarButton->setIconSize(QSize(140,140));
+    }
+}
+
+void
+RiderPage::saveClicked()
+{
+    setCValue(cyclist, GC_NICKNAME, nickname->text());
+    setCValue(cyclist, GC_DOB, dob->date());
+    setCValue(cyclist, GC_WEIGHT, weight->value() * (useMetricUnits ? 1.0 : KG_PER_LB));
+    setCValue(cyclist, GC_SEX, sex->currentIndex());
+    setCValue(cyclist, GC_BIO, bio->toPlainText());
+    avatar.save(mainWindow->home.absolutePath() + "/" + "avatar.png", "PNG");
 }
 
 #ifdef GC_HAVE_LIBOAUTH

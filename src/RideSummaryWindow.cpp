@@ -25,6 +25,7 @@
 #include "TimeUtils.h"
 #include "Units.h"
 #include "Zones.h"
+#include "HrZones.h"
 #include <QtGui>
 #include <QtXml/QtXml>
 #include <assert.h>
@@ -113,6 +114,9 @@ RideSummaryWindow::htmlSummary() const
         "skiba_bike_score",
         "daniels_points",
         "daniels_equivalent_power",
+        "trimp_points",
+        "trimp_100_points",
+        "trimp_zonal_points",
         "aerobic_decoupling",
         NULL
     };
@@ -166,6 +170,14 @@ RideSummaryWindow::htmlSummary() const
         summary += mainWindow->zones()->summarize(rideItem->zoneRange(), time_in_zone);
     }
 
+    if (rideItem->numHrZones() > 0) {
+        QVector<double> time_in_hr_zone(rideItem->numHrZones());
+        for (int i = 0; i < rideItem->numHrZones(); ++i)
+            time_in_hr_zone[i] = rideItem->timeInHrZone(i);
+        summary += tr("<h2>Hr Zones</h2>");
+        summary += mainWindow->hrZones()->summarize(rideItem->hrZoneRange(), time_in_hr_zone);
+    }
+
     if (ride->intervals().size() > 0) {
         bool firstRow = true;
         QString s;
@@ -194,7 +206,7 @@ RideSummaryWindow::htmlSummary() const
             }
 
             QHash<QString,RideMetricPtr> metrics =
-                RideMetric::computeMetrics(&f, mainWindow->zones(), intervalMetrics);
+                RideMetric::computeMetrics(&f, mainWindow->zones(), mainWindow->hrZones(), intervalMetrics);
             if (firstRow) {
                 summary += "<tr>";
                 summary += "<td align=\"center\" valign=\"bottom\">Interval Name</td>";

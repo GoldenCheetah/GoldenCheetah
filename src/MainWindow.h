@@ -73,6 +73,8 @@ class MainWindow : public QMainWindow
         void setCriticalPower(int cp);
 
         const Zones *zones() const { return zones_; }
+        const HrZones *hrZones() const { return hrZones_; }
+
         void updateRideFileIntervals();
         void saveSilent(RideItem *);
         bool saveRideSingleDialog(RideItem *);
@@ -98,6 +100,7 @@ class MainWindow : public QMainWindow
     protected:
 
         Zones *zones_;
+        HrZones *hrZones_;
 
         virtual void resizeEvent(QResizeEvent*);
         virtual void moveEvent(QMoveEvent*);

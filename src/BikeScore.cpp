@@ -48,7 +48,7 @@ class XPower : public RideMetric {
         setImperialUnits(tr("watts"));
     }
 
-    void compute(const RideFile *ride, const Zones *, int,
+    void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
                  const QHash<QString,RideMetric*> &) {
 
         static const double EPSILON = 0.1;
@@ -104,7 +104,7 @@ class VariabilityIndex : public RideMetric {
         setPrecision(3);
     }
 
-    void compute(const RideFile *, const Zones *, int,
+    void compute(const RideFile *, const Zones *, int, const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps) {
         assert(deps.contains("skiba_xpower"));
         assert(deps.contains("average_power"));
@@ -135,7 +135,7 @@ class RelativeIntensity : public RideMetric {
         setImperialUnits(tr(""));
         setPrecision(3);
     }
-    void compute(const RideFile *, const Zones *zones, int zoneRange,
+    void compute(const RideFile *, const Zones *zones, int zoneRange, const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps) {
         if (zones && zoneRange >= 0) {
             assert(deps.contains("skiba_xpower"));
@@ -176,7 +176,7 @@ class BikeScore : public RideMetric {
         setImperialUnits("");
     }
 
-    void compute(const RideFile *, const Zones *zones, int zoneRange,
+    void compute(const RideFile *, const Zones *zones, int zoneRange,const HrZones *, int,
 	    const QHash<QString,RideMetric*> &deps) {
 	    if (!zones || zoneRange < 0)
 	        return;

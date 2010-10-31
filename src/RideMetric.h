@@ -30,6 +30,7 @@
 #include "RideFile.h"
 
 class Zones;
+class HrZones;
 
 class RideMetric;
 typedef QSharedPointer<RideMetric> RideMetricPtr;
@@ -82,10 +83,10 @@ struct RideMetric {
     // Factor to multiple value to convert from metric to imperial
     virtual double conversion() const { return conversion_; }
 
-    // Compute the ride metric from a file.
-    virtual void compute(const RideFile *ride, 
-                         const Zones *zones, 
-                         int zoneRange,
+    // Compute the ride metric from a file (Hr Zone Version).
+    virtual void compute(const RideFile *ride,
+                         const Zones *zones, int zoneRange,
+                         const HrZones *hrZones, int hrZoneRange,
                          const QHash<QString,RideMetric*> &deps) = 0;
 
     // Fill in the value of the ride metric using the mapping provided.  For
@@ -121,7 +122,7 @@ struct RideMetric {
     virtual RideMetric *clone() const = 0;
 
     static QHash<QString,RideMetricPtr>
-    computeMetrics(const RideFile *ride, const Zones *zones,
+    computeMetrics(const RideFile *ride, const Zones *zones, const HrZones *hrZones,
                    const QStringList &metrics);
 
     // Initialisers for derived classes to setup basic data

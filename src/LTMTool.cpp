@@ -241,6 +241,78 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
     danielsLTR.uunits = "Ramp";
     metrics.append(danielsLTR);
 
+    // TRIMP LTS
+    MetricDetail trimpLTS;
+    trimpLTS.type = METRIC_PM;
+    trimpLTS.symbol = "trimp_lts";
+    trimpLTS.metric = NULL; // not a factory metric
+    trimpLTS.penColor = QColor(Qt::blue);
+    trimpLTS.curveStyle = QwtPlotCurve::Lines;
+    trimpLTS.symbolStyle = QwtSymbol::NoSymbol;
+    trimpLTS.smooth = false;
+    trimpLTS.trend = false;
+    trimpLTS.topN = 5;
+    trimpLTS.uname = trimpLTS.name = "TRIMP Long Term Stress";
+    trimpLTS.uunits = "Stress";
+    metrics.append(trimpLTS);
+
+    MetricDetail trimpSTS;
+    trimpSTS.type = METRIC_PM;
+    trimpSTS.symbol = "trimp_sts";
+    trimpSTS.metric = NULL; // not a factory metric
+    trimpSTS.penColor = QColor(Qt::magenta);
+    trimpSTS.curveStyle = QwtPlotCurve::Lines;
+    trimpSTS.symbolStyle = QwtSymbol::NoSymbol;
+    trimpSTS.smooth = false;
+    trimpSTS.trend = false;
+    trimpSTS.topN = 5;
+    trimpSTS.uname = trimpSTS.name = "TRIMP Short Term Stress";
+    trimpSTS.uunits = "Stress";
+    metrics.append(trimpSTS);
+
+    MetricDetail trimpSB;
+    trimpSB.type = METRIC_PM;
+    trimpSB.symbol = "trimp_sb";
+    trimpSB.metric = NULL; // not a factory metric
+    trimpSB.penColor = QColor(Qt::yellow);
+    trimpSB.curveStyle = QwtPlotCurve::Steps;
+    trimpSB.symbolStyle = QwtSymbol::NoSymbol;
+    trimpSB.smooth = false;
+    trimpSB.trend = false;
+    trimpSB.topN = 1;
+    trimpSB.uname = trimpSB.name = "TRIMP Stress Balance";
+    trimpSB.uunits = "Stress Balance";
+    metrics.append(trimpSB);
+
+    MetricDetail trimpSTR;
+    trimpSTR.type = METRIC_PM;
+    trimpSTR.symbol = "trimp_sr";
+    trimpSTR.metric = NULL; // not a factory metric
+    trimpSTR.penColor = QColor(Qt::darkGreen);
+    trimpSTR.curveStyle = QwtPlotCurve::Steps;
+    trimpSTR.symbolStyle = QwtSymbol::NoSymbol;
+    trimpSTR.smooth = false;
+    trimpSTR.trend = false;
+    trimpSTR.topN = 1;
+    trimpSTR.uname = trimpSTR.name = "TRIMP STS Ramp";
+    trimpSTR.uunits = "Ramp";
+    metrics.append(trimpSTR);
+
+    MetricDetail trimpLTR;
+    trimpLTR.type = METRIC_PM;
+    trimpLTR.symbol = "trimp_lr";
+    trimpLTR.metric = NULL; // not a factory metric
+    trimpLTR.penColor = QColor(Qt::darkBlue);
+    trimpLTR.curveStyle = QwtPlotCurve::Steps;
+    trimpLTR.symbolStyle = QwtSymbol::NoSymbol;
+    trimpLTR.smooth = false;
+    trimpLTR.trend = false;
+    trimpLTR.topN = 1;
+    trimpLTR.uname = trimpLTR.name = "TRIMP LTS Ramp";
+    trimpLTR.uunits = "Ramp";
+    metrics.append(trimpLTR);
+
+
     SpecialFields sp;
     foreach (FieldDefinition field, main->rideMetadata()->getFields()) {
         if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
