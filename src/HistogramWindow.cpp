@@ -108,8 +108,8 @@ HistogramWindow::rideSelected()
         return;
 
     // get range that applies to this ride
-    powerRange = mainWindow->hrZones()->whichRange(ride->dateTime.date());
-    hrRange = mainWindow->zones()->whichRange(ride->dateTime.date());
+    powerRange = mainWindow->zones()->whichRange(ride->dateTime.date());
+    hrRange = mainWindow->hrZones()->whichRange(ride->dateTime.date());
 
     // set the histogram data
     powerHist->setData(ride);
