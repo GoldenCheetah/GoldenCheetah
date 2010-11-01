@@ -81,7 +81,17 @@ class GCColor : public QObject
 #define CZONE8                29
 #define CZONE9                30
 #define CZONE10               31
-#define CAEROVE               32
-#define CAEROEL               33
+#define CHZONE1               32
+#define CHZONE2               33
+#define CHZONE3               34
+#define CHZONE4               35
+#define CHZONE5               36
+#define CHZONE6               37
+#define CHZONE7               38
+#define CHZONE8               39
+#define CHZONE9               40
+#define CHZONE10              41
+#define CAEROVE               42
+#define CAEROEL               43
 
 #endif
