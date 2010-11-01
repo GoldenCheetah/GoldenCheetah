@@ -20,7 +20,11 @@ D2XX_INCLUDE = /usr/local/include/D2XX
 #
 #  http://qwtplot3d.sourceforge.net/
 #
-# then set the following variable appropriately:
+#  If you are running Linux and have font problems, download
+#  the Tar ball from http://qwtplot3d.svn.sourceforge.net/viewvc/qwtplot3d/
+#  Follow Branches -> Maintain_0_2_x -> qwtplot3d
+#
+## then set the following variable appropriately:
 
 #QWT3D_INSTALL = /usr/local/qwtplot3d
 
