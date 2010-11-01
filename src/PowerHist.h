@@ -32,6 +32,8 @@ class RideItem;
 class RideFilePoint;
 class PowerHistBackground;
 class PowerHistZoneLabel;
+class HrHistBackground;
+class HrHistZoneLabel;
 class LTMCanvasPicker;
 class ZoneScaleDraw;
 
@@ -79,6 +81,7 @@ class PowerHist : public QwtPlot
 
         QwtPlotCurve *curve, *curveSelected;
 	QList <PowerHistZoneLabel *> zoneLabels;
+	QList <HrHistZoneLabel *> hrzoneLabels;
 
         PowerHist(MainWindow *mainWindow);
 	~PowerHist();
@@ -87,6 +90,7 @@ class PowerHist : public QwtPlot
         inline bool islnY() const { return lny; }
         inline bool withZeros() const { return withz; }
         bool shadeZones() const;
+        bool shadeHRZones() const;
 
 	enum Selection {
 	    watts,
@@ -117,8 +121,10 @@ class PowerHist : public QwtPlot
         int setBinWidthRealUnits(double value);
 
 	void refreshZoneLabels();
+	void refreshHRZoneLabels();
 
 	RideItem *rideItem;
+    MainWindow *mainWindow;
 
     public slots:
 
@@ -128,9 +134,9 @@ class PowerHist : public QwtPlot
         void pointHover(QwtPlotCurve *curve, int index);
         void configChanged();
 
+
     protected:
 
-        MainWindow *mainWindow;
         QwtPlotGrid *grid;
 
         // storage for data counts
@@ -166,6 +172,7 @@ class PowerHist : public QwtPlot
         QVariant unit;
 
 	PowerHistBackground *bg;
+	HrHistBackground *hrbg;
 	bool lny;
 
 	// discritized unit for smoothing
