@@ -129,7 +129,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings) co
 	if( start < 1 ) start = 1;
 
 	// data fixup: some srmwin versions wrote markers with start > end
-	if( end > start ){
+	if( end < start ){
 		markers[i].start = end;
 		markers[i].end = start;
 	} else {
