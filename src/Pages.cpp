@@ -1991,6 +1991,16 @@ HrSchemePage::addClicked()
     scheme->invisibleRootItem()->insertChild(index, add);
     scheme->setItemWidget(add, 2, loedit);
 
+    //trimp
+    QDoubleSpinBox *trimpedit = new QDoubleSpinBox(this);
+    trimpedit->setMinimum(0);
+    trimpedit->setMaximum(10);
+    trimpedit->setSingleStep(0.1);
+    trimpedit->setDecimals(2);
+    trimpedit->setValue(1);
+
+    scheme->setItemWidget(add, 3, trimpedit);
+
     // Short
     QString text = "New";
     for (int i=0; scheme->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
@@ -2352,6 +2362,16 @@ LTPage::addZoneClicked()
     zones->invisibleRootItem()->insertChild(index, add);
     zones->setItemWidget(add, 2, loedit);
     connect(loedit, SIGNAL(editingFinished()), this, SLOT(zonesChanged()));
+
+    //trimp
+    QDoubleSpinBox *trimpedit = new QDoubleSpinBox(this);
+    trimpedit->setMinimum(0);
+    trimpedit->setMaximum(10);
+    trimpedit->setSingleStep(0.1);
+    trimpedit->setDecimals(2);
+    trimpedit->setValue(1);
+    zones->setItemWidget(add, 3, trimpedit);
+    connect(trimpedit, SIGNAL(editingFinished()), this, SLOT(zonesChanged()));
 
     // Short
     QString text = "New";
