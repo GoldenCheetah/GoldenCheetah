@@ -273,10 +273,14 @@ QStringList RideFileFactory::listRideFiles(const QDir &dir) const
     // This will read the user preferences and change the file list order as necessary:
     boost::shared_ptr<QSettings> settings = GetApplicationSettings();
     QVariant isAscending = settings->value(GC_ALLRIDES_ASCENDING,Qt::Checked);
+    QFlags<QDir::Filter> spec = QDir::Files;
+#ifdef Q_OS_WIN32
+    spec |= QDir::Hidden;
+#endif
     if(isAscending.toInt()>0){
-        return dir.entryList(filters, QDir::Files, QDir::Name);
+        return dir.entryList(filters, spec, QDir::Name);
     }
-    return dir.entryList(filters, QDir::Files, QDir::Name|QDir::Reversed);
+    return dir.entryList(filters, spec, QDir::Name|QDir::Reversed);
 }
 
 void RideFile::appendPoint(double secs, double cad, double hr, double km,
