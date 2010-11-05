@@ -90,7 +90,7 @@ class TRIMPPoints : public RideMetric {
 
         // ok lets work the score out
         score = (secs == 0.0 || hr<restHr) ? 0.0 :  secs/60 *
-                (hr-restHr)/(maxHr-restHr)*0.64*exp(ksex*(hr-restHr)/(hr-restHr)/(maxHr-restHr));
+                (hr-restHr)/(maxHr-restHr)*0.64*exp(ksex*(hr-restHr)/(maxHr-restHr));
         setValue(score);
     }
 
@@ -153,7 +153,7 @@ public:
         }
 
         score = trimp == 0.0 ? 0.0 :  100 * trimp /
-                (60 * (ltHr-restHr)/(maxHr-restHr)*0.64*exp(ksex*(ltHr-restHr)/(ltHr-restHr)/(maxHr-restHr)));
+                (60 * (ltHr-restHr)/(maxHr-restHr)*0.64*exp(ksex*(ltHr-restHr)/(maxHr-restHr)));
 
         setValue(score);
     }
