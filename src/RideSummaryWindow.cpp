@@ -115,8 +115,6 @@ RideSummaryWindow::htmlSummary() const
         "daniels_points",
         "daniels_equivalent_power",
         "trimp_points",
-        "trimp_100_points",
-        "trimp_zonal_points",
         "aerobic_decoupling",
         NULL
     };
