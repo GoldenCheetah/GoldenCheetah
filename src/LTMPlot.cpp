@@ -172,85 +172,9 @@ LTMPlot::setData(LTMSettings *set)
         QwtSymbol sym;
         sym.setStyle(metricDetail.symbolStyle);
 
-        if (metricDetail.curveStyle == QwtPlotCurve::Steps) {
-
-            // fill the bars
-            QColor brushColor = metricDetail.penColor;
-            brushColor.setAlpha(100);
-            QBrush brush = QBrush(brushColor);
-            current->setBrush(brush);
-            current->setPen(cpen);
-            current->setCurveAttribute(QwtPlotCurve::Inverted, true);
-
-            // XXX Symbol for steps looks horrible
-            sym.setStyle(QwtSymbol::Ellipse);
-            if (settings->groupBy == LTM_DAY)
-                sym.setSize(3);
-            else
-                sym.setSize(6);
-            sym.setPen(QPen(metricDetail.penColor));
-            sym.setBrush(QBrush(metricDetail.penColor));
-            current->setSymbol(sym);
-
-            // XXX FUDGE QWT's LACK OF A BAR CHART
-            // add a zero point at the head and tail so the
-            // histogram columns look nice.
-            // and shift all the x-values left by 0.5 so that
-            // they centre over x-axis labels
-            int i=0;
-            for (i=0; i<=count; i++) xdata[i] -= 0.5;
-            // now add a final 0 value to get the last
-            // column drawn - no resize neccessary
-            // since it is always sized for 1 + maxnumber of entries
-            xdata[i] = xdata[i-1] + 1;
-            ydata[i] = 0;
-            count++;
-            // END OF FUDGE
-
-        } else if (metricDetail.curveStyle == QwtPlotCurve::Lines) {
-
-            QPen cpen = QPen(metricDetail.penColor);
-            cpen.setWidth(2.0);
-            sym.setSize(6);
-            sym.setPen(QPen(metricDetail.penColor));
-            sym.setBrush(QBrush(metricDetail.penColor));
-            current->setSymbol(sym);
-            current->setPen(cpen);
-
-
-        } else if (metricDetail.curveStyle == QwtPlotCurve::Dots) {
-            sym.setSize(6);
-            sym.setPen(QPen(metricDetail.penColor));
-            sym.setBrush(QBrush(metricDetail.penColor));
-            current->setSymbol(sym);
-
-        } else if (metricDetail.curveStyle == QwtPlotCurve::Sticks) {
-
-            sym.setSize(4);
-            sym.setPen(QPen(metricDetail.penColor));
-            sym.setBrush(QBrush(Qt::white));
-            current->setSymbol(sym);
-
-        }
-
-        // smoothing
-        if (metricDetail.smooth == true) {
-            current->setCurveAttribute(QwtPlotCurve::Fitted, true);
-        }
-
-        // set the data series
-        current->setData(xdata.data(),ydata.data(), count+1);
-        current->setBaseline(metricDetail.baseline);
-
         // choose the axis
         int axisid = chooseYAxis(metricDetail.uunits);
         current->setYAxis(axisid);
-
-        // update min/max Y values for the chosen axis
-        if (current->maxYValue() > maxY[axisid]) maxY[axisid] = current->maxYValue();
-        if (current->minYValue() < minY[axisid]) minY[axisid] = current->minYValue();
-
-        current->attach(this);
 
         // trend - clone the data for the curve and add a curvefitted
         //         curve with no symbols and use a dashed pen
@@ -344,6 +268,105 @@ LTMPlot::setData(LTMSettings *set)
             top->setYAxis(axisid);
             top->attach(this);
         }
+
+        if (metricDetail.curveStyle == QwtPlotCurve::Steps) {
+
+            // fill the bars
+            QColor brushColor = metricDetail.penColor;
+            brushColor.setAlpha(100);
+            QBrush brush = QBrush(brushColor);
+            current->setBrush(brush);
+            current->setPen(cpen);
+            current->setCurveAttribute(QwtPlotCurve::Inverted, true);
+
+            // XXX Symbol for steps looks horrible
+            sym.setStyle(QwtSymbol::NoSymbol);
+            sym.setPen(QPen(metricDetail.penColor));
+            sym.setBrush(QBrush(metricDetail.penColor));
+            current->setSymbol(sym);
+
+            // XXX FUDGE QWT's LACK OF A BAR CHART
+            // add a zero point at the head and tail so the
+            // histogram columns look nice.
+            // and shift all the x-values left by 0.5 so that
+            // they centre over x-axis labels
+            int i=0;
+            for (i=0; i<=count; i++) xdata[i] -= 0.5;
+            // now add a final 0 value to get the last
+            // column drawn - no resize neccessary
+            // since it is always sized for 1 + maxnumber of entries
+            xdata[i] = xdata[i-1] + 1;
+            ydata[i] = 0;
+            count++;
+
+            QVector<double> xaxis (xdata.size() * 4);
+            QVector<double> yaxis (ydata.size() * 4);
+
+            // samples to time
+            for (int i=0, offset=0; i<xdata.size(); i++) {
+
+                double x = (double) xdata[i];
+                double y = (double) ydata[i];
+
+                xaxis[offset] = x +0.05;
+                yaxis[offset] = 0;
+                offset++;
+                xaxis[offset] = x+0.05;
+                yaxis[offset] = y;
+                offset++;
+                xaxis[offset] = x+0.95;
+                yaxis[offset] = y;
+                offset++;
+                xaxis[offset] = x +0.95;
+                yaxis[offset] = 0;
+                offset++;
+            }
+            xdata = xaxis;
+            ydata = yaxis;
+            count *= 4;
+            // END OF FUDGE
+
+        } else if (metricDetail.curveStyle == QwtPlotCurve::Lines) {
+
+            QPen cpen = QPen(metricDetail.penColor);
+            cpen.setWidth(2.0);
+            sym.setSize(6);
+            sym.setPen(QPen(metricDetail.penColor));
+            sym.setBrush(QBrush(metricDetail.penColor));
+            current->setSymbol(sym);
+            current->setPen(cpen);
+
+
+        } else if (metricDetail.curveStyle == QwtPlotCurve::Dots) {
+            sym.setSize(6);
+            sym.setPen(QPen(metricDetail.penColor));
+            sym.setBrush(QBrush(metricDetail.penColor));
+            current->setSymbol(sym);
+
+        } else if (metricDetail.curveStyle == QwtPlotCurve::Sticks) {
+
+            sym.setSize(4);
+            sym.setPen(QPen(metricDetail.penColor));
+            sym.setBrush(QBrush(Qt::white));
+            current->setSymbol(sym);
+
+        }
+
+        // smoothing
+        if (metricDetail.smooth == true) {
+            current->setCurveAttribute(QwtPlotCurve::Fitted, true);
+        }
+
+        // set the data series
+        current->setData(xdata.data(),ydata.data(), count+1);
+        current->setBaseline(metricDetail.baseline);
+
+        // update min/max Y values for the chosen axis
+        if (current->maxYValue() > maxY[axisid]) maxY[axisid] = current->maxYValue();
+        if (current->minYValue() < minY[axisid]) minY[axisid] = current->minYValue();
+
+        current->attach(this);
+
 
     }
 
