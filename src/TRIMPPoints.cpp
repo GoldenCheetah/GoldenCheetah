@@ -65,14 +65,14 @@ class TRIMPPoints : public RideMetric {
         double restHr = hrZones->getRestHr(hrZoneRange);
         restHr = rideFile->getTag("Rest HR", QString("%1").arg(restHr)).toDouble();
 
-        assert(deps.contains("time_riding"));
+        assert(deps.contains("workout_time"));
         assert(deps.contains("average_hr"));
-        const RideMetric *timeRidingMetric = deps.value("time_riding");
+        const RideMetric *workoutTimeMetric = deps.value("workout_time");
         const RideMetric *averageHrMetric = deps.value("average_hr");
-        assert(timeRidingMetric);
+        assert(workoutTimeMetric);
         assert(averageHrMetric);
 
-        double secs = timeRidingMetric->value(true);
+        double secs = workoutTimeMetric->value(true);
         double hr = averageHrMetric->value(true);
 
         //TRIMP: = t x %HRR x 0.64e1,92(%HRR)
@@ -281,12 +281,12 @@ public:
 
 static bool added() {
     QVector<QString> deps;
-    deps.append("time_riding");
+    deps.append("workout_time");
     deps.append("average_hr");
     RideMetricFactory::instance().addMetric(TRIMPPoints(), &deps);
 
     deps.clear();
-    deps.append("time_riding");
+    deps.append("workout_time");
     deps.append("trimp_points");
     RideMetricFactory::instance().addMetric(TRIMP100Points(), &deps);
 
