@@ -76,7 +76,7 @@ RealtimeWindow::configUpdate()
         disconnect(stopButton, SIGNAL(clicked()), this, SLOT(warnnoConfig()));
         connect(startButton, SIGNAL(clicked()), this, SLOT(Start()));
         connect(pauseButton, SIGNAL(clicked()), this, SLOT(Pause()));
-        connect(stopButton, SIGNAL(clicked()), this, SLOT(Stop()));
+        connect(stopButton, SIGNAL(clicked()), this, SLOT(Stop(DEVICE_OK)));
     }
 }
 
@@ -165,7 +165,7 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, TrainTool *trainTool, const Q
     if (Devices.count() > 0) {
         connect(startButton, SIGNAL(clicked()), this, SLOT(Start()));
         connect(pauseButton, SIGNAL(clicked()), this, SLOT(Pause()));
-        connect(stopButton, SIGNAL(clicked()), this, SLOT(Stop()));
+        connect(stopButton, SIGNAL(clicked()), this, SLOT(Stop(DEVICE_OK)));
     } else {
         connect(startButton, SIGNAL(clicked()), this, SLOT(warnnoConfig()));
         connect(pauseButton, SIGNAL(clicked()), this, SLOT(warnnoConfig()));
@@ -441,7 +441,7 @@ void RealtimeWindow::Pause()        // pause capture to recalibrate
     }
 }
 
-void RealtimeWindow::Stop()        // when stop button is pressed
+void RealtimeWindow::Stop(int deviceStatus)        // when stop button is pressed
 {
     if ((status&RT_RUNNING) == 0) return;
 
@@ -456,10 +456,16 @@ void RealtimeWindow::Stop()        // when stop button is pressed
         // close and reset File
         recordFile->close();
 
-        // add to the view - using basename ONLY
-        QString name;
-        name = recordFile->fileName();
-        main->addRide(QFileInfo(name).fileName(), true);
+        if(deviceStatus == DEVICE_ERROR)
+        {
+            recordFile->remove();
+        }
+        else {
+            // add to the view - using basename ONLY
+            QString name;
+            name = recordFile->fileName();
+            main->addRide(QFileInfo(name).fileName(), true);
+        }
     }
 
     if (status & RT_STREAMING) {
@@ -793,7 +799,7 @@ void RealtimeWindow::loadUpdate()
 
         // we got to the end!
         if (load == -100) {
-            Stop();
+            Stop(DEVICE_OK);
         } else {
             displayLoad = load;
             deviceController->setLoad(displayLoad);
@@ -804,7 +810,7 @@ void RealtimeWindow::loadUpdate()
 
         // we got to the end!
         if (gradient == -100) {
-            Stop();
+            Stop(DEVICE_OK);
         } else {
             displayGradient = gradient;
             deviceController->setGradient(displayGradient);
