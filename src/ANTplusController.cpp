@@ -82,7 +82,7 @@ ANTplusController::getRealtimeData(RealtimeData &rtData)
         msgBox.setText("Cannot Connect to Quarqd");
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
-        parent->Stop();
+        parent->Stop(1);
         return;
     }
     // get latest telemetry

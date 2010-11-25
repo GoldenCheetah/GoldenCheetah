@@ -81,7 +81,7 @@ void SimpleNetworkController::getRealtimeData(RealtimeData &rtData) {
         msgBox.setText("Cannot Connect to peer");
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
-        parent->Stop();
+        parent->Stop(DEVICE_OK);
     }
 
     if (!client.getRealtimeData(data_cache)) {

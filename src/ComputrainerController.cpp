@@ -81,7 +81,7 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
         msgBox.setText("Cannot Connect to Computrainer");
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
-        parent->Stop();
+        parent->Stop(1);
         return;
     }
     // get latest telemetry
@@ -129,7 +129,7 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
 
     // if Buttons == 0 we just pressed stop!
     if (Buttons&CT_RESET) {
-        parent->Stop();
+        parent->Stop(0);
     }
 
     // displaymode

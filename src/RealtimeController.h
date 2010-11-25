@@ -24,6 +24,8 @@
 #ifndef _GC_RealtimeController_h
 #define _GC_RealtimeController_h 1
 
+#define DEVICE_ERROR 1
+#define DEVICE_OK 0
 
 class RealtimeController
 {
