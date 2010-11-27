@@ -1082,7 +1082,7 @@ void
 RideEditor::rideSelected()
 {
     RideItem *current = main->rideItem();
-    if (!current) return;
+    if (!current || !current->ride()) return;
 
     ride = current;
 

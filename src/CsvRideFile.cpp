@@ -296,6 +296,13 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
             qWarning("Failed to set start time");
         }
     }
-    return rideFile;
-}
 
+    // did we actually read any samples?
+    if (rideFile->dataPoints().count() > 0) {
+        return rideFile;
+    } else {
+        errors << "No samples present.";
+        delete rideFile;
+        return NULL;
+    }
+}
