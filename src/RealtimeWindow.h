@@ -70,7 +70,7 @@ class RealtimeWindow : public QWidget
 
         void Start();       // when start button is pressed
         void Pause();       // when Paude is pressed
-        void Stop(int status);        // when stop button is pressed
+        void Stop(int status=0);        // when stop button is pressed
 
         void FFwd();        // jump forward when in a workout
         void Rewind();      // jump backwards when in a workout

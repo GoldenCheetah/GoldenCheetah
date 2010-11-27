@@ -76,7 +76,7 @@ RealtimeWindow::configUpdate()
         disconnect(stopButton, SIGNAL(clicked()), this, SLOT(warnnoConfig()));
         connect(startButton, SIGNAL(clicked()), this, SLOT(Start()));
         connect(pauseButton, SIGNAL(clicked()), this, SLOT(Pause()));
-        connect(stopButton, SIGNAL(clicked()), this, SLOT(Stop(DEVICE_OK)));
+        connect(stopButton, SIGNAL(clicked()), this, SLOT(Stop()));
     }
 }
 
@@ -165,7 +165,7 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, TrainTool *trainTool, const Q
     if (Devices.count() > 0) {
         connect(startButton, SIGNAL(clicked()), this, SLOT(Start()));
         connect(pauseButton, SIGNAL(clicked()), this, SLOT(Pause()));
-        connect(stopButton, SIGNAL(clicked()), this, SLOT(Stop(DEVICE_OK)));
+        connect(stopButton, SIGNAL(clicked()), this, SLOT(Stop()));
     } else {
         connect(startButton, SIGNAL(clicked()), this, SLOT(warnnoConfig()));
         connect(pauseButton, SIGNAL(clicked()), this, SLOT(warnnoConfig()));
