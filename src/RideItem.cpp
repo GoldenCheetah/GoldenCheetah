@@ -46,6 +46,8 @@ RideFile *RideItem::ride()
     // open the ride file
     QFile file(path + "/" + fileName);
     ride_ = RideFileFactory::instance().openRideFile(file, errors_);
+    if (ride_ == NULL) return NULL; // failed to read ride
+
     setDirty(false); // we're gonna use on-disk so by
                      // definition it is clean - but do it *after*
                      // we read the file since it will almost
