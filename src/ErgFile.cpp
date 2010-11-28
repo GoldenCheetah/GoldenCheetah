@@ -37,6 +37,32 @@ ErgFile::ErgFile(QString filename, int &mode, double Cp)
         valid = false;
         return;
     }
+    // Section markers
+    QRegExp startHeader("^.*\\[COURSE HEADER\\].*$", Qt::CaseInsensitive);
+    QRegExp endHeader("^.*\\[END COURSE HEADER\\].*$", Qt::CaseInsensitive);
+    QRegExp startData("^.*\\[COURSE DATA\\].*$", Qt::CaseInsensitive);
+    QRegExp endData("^.*\\[END COURSE DATA\\].*$", Qt::CaseInsensitive);
+    // ignore whitespace and support for ';' comments (a GC extension)
+    QRegExp ignore("^(;.*|[ \\t\\n]*)$", Qt::CaseInsensitive);
+    // workout settings
+    QRegExp settings("^([^=]*)=[ \\t]*([^=\\n\\r\\t]*).*$", Qt::CaseInsensitive);
+
+    // format setting for ergformat
+    QRegExp ergformat("^[;]*(MINUTES[ \\t]+WATTS).*$", Qt::CaseInsensitive);
+    QRegExp mrcformat("^[;]*(MINUTES[ \\t]+PERCENT).*$", Qt::CaseInsensitive);
+    QRegExp crsformat("^[;]*(DISTANCE[ \\t]+GRADE[ \\t]+WIND).*$", Qt::CaseInsensitive);
+
+    // time watts records
+    QRegExp absoluteWatts("^[ \\t]*([0-9\\.]+)[ \\t]*([0-9\\.]+)[ \\t\\n]*$", Qt::CaseInsensitive);
+    QRegExp relativeWatts("^[ \\t]*([0-9\\.]+)[ \\t]*([0-9\\.]+)%[ \\t\\n]*$", Qt::CaseInsensitive);
+
+    // distance slope wind records
+    QRegExp absoluteSlope("^[ \\t]*([0-9\\.]+)[ \\t]*([-0-9\\.]+)[ \\t\\n]([-0-9\\.]+)[ \\t\\n]*$",
+                           Qt::CaseInsensitive);
+
+    // Lap marker in an ERG/MRC file
+    QRegExp lapmarker("^[ \\t]*([0-9\\.]+)[ \\t]*LAP[ \\t\\n]*$", Qt::CaseInsensitive);
+    QRegExp crslapmarker("^[ \\t]*LAP[ \\t\\n]*$", Qt::CaseInsensitive);
 
     // ok. opened ok lets parse.
     QTextStream inputStream(&ergFile);
@@ -57,33 +83,6 @@ ErgFile::ErgFile(QString filename, int &mode, double Cp)
 
         for (int li = 0; li < lines.size(); ++li) {
             QString line = lines[li];
-
-            // Section markers
-            QRegExp startHeader("^.*\\[COURSE HEADER\\].*$", Qt::CaseInsensitive);
-            QRegExp endHeader("^.*\\[END COURSE HEADER\\].*$", Qt::CaseInsensitive);
-            QRegExp startData("^.*\\[COURSE DATA\\].*$", Qt::CaseInsensitive);
-            QRegExp endData("^.*\\[END COURSE DATA\\].*$", Qt::CaseInsensitive);
-            // ignore whitespace and support for ';' comments (a GC extension)
-            QRegExp ignore("^(;.*|[ \\t\\n]*)$", Qt::CaseInsensitive);
-            // workout settings
-            QRegExp settings("^([^=]*)=[ \\t]*([^=\\n\\r\\t]*).*$", Qt::CaseInsensitive);
-
-            // format setting for ergformat
-            QRegExp ergformat("^[;]*(MINUTES[ \\t]+WATTS).*$", Qt::CaseInsensitive);
-            QRegExp mrcformat("^[;]*(MINUTES[ \\t]+PERCENT).*$", Qt::CaseInsensitive);
-            QRegExp crsformat("^[;]*(DISTANCE[ \\t]+GRADE[ \\t]+WIND).*$", Qt::CaseInsensitive);
-
-            // time watts records
-            QRegExp absoluteWatts("^[ \\t]*([0-9\\.]+)[ \\t]*([0-9\\.]+)[ \\t\\n]*$", Qt::CaseInsensitive);
-            QRegExp relativeWatts("^[ \\t]*([0-9\\.]+)[ \\t]*([0-9\\.]+)%[ \\t\\n]*$", Qt::CaseInsensitive);
-
-            // distance slope wind records
-            QRegExp absoluteSlope("^[ \\t]*([0-9\\.]+)[ \\t]*([-0-9\\.]+)[ \\t\\n]([-0-9\\.]+)[ \\t\\n]*$",
-                                   Qt::CaseInsensitive);
-
-            // Lap marker in an ERG/MRC file
-            QRegExp lapmarker("^[ \\t]*([0-9\\.]+)[ \\t]*LAP[ \\t\\n]*$", Qt::CaseInsensitive);
-            QRegExp crslapmarker("^[ \\t]*LAP[ \\t\\n]*$", Qt::CaseInsensitive);
 
             // so what we go then?
             if (startHeader.exactMatch(line)) {
@@ -145,7 +144,7 @@ ErgFile::ErgFile(QString filename, int &mode, double Cp)
                 ErgFilePoint add;
 
                 add.x = absoluteWatts.cap(1).toDouble() * 60000; // from mins to 1000ths of a second
-                add.val = add.y = absoluteWatts.cap(2).toInt();              // plain watts
+                add.val = add.y = round(absoluteWatts.cap(2).toDouble());             // plain watts
 
                 switch (format) {
 
