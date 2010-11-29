@@ -2,12 +2,11 @@
 CONTENT=$(wildcard *.content)
 HTML=$(subst .content,.html,$(CONTENT))
 TARBALLS=$(wildcard gc_*.tgz)
-OTHER=logo.jpg sample.gp sample.png cpint.gp cpint.png \
-	critical-power-plot.png histogram-analysis.png pf-pv-plot.png \
-	ride-plot.png ride-summary.png weekly-summary.png \
-	choose-a-cyclist.png main-window.png critical-power.png \
-	power.zones cyclist-info.png
-
+OTHER= 3d.png choose-a-cyclist.png cpint.gp cpint.png critical-power-plot.png critical-power.png \
+       cyclist-info.png editor.png gui-preview.png histogram-analysis.png logo.jpg logo.png \
+       main-window.png map.png metrics-power.png metrics-timedist.png metrics-tiz.png pf-pv-plot.png \
+       pm.png power.zones realtime.png ride-plot.png ride-plot2.png ride-summary.png sample.gp \
+       sample.png weekly-summary.png google-earth.png aerolab.png
 
 all: $(HTML)
 .PHONY: all clean install
