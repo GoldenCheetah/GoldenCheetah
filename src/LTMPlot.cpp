@@ -189,10 +189,10 @@ LTMPlot::setData(LTMSettings *set)
         double right = 0;
         double middle = 0;
         if (metricDetail.curveStyle == QwtPlotCurve::Steps) {
-            double space = double(1) / bars;
+            double space = double(0.8) / bars;
             double gap = space * 0.10;
             double width = space * 0.90;
-            left = (space * barnum) + (gap / 2);
+            left = (space * barnum) + (gap / 2) + 0.1;
             right = left + width;
             middle = ((left+right) / double(2)) - 0.5;
             barnum++;
