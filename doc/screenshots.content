@@ -19,6 +19,13 @@ Plotting Altitude, Cadence, Heart Rate, Power, and Speed
 
 <p>
 <big><font face="arial,helvetica,sanserif">
+Plotting in a Stacked View
+</font></big>
+<p>
+<img src="ride-plot2.png" alt="Stacked Power and HR Plot" align="center">
+
+<p>
+<big><font face="arial,helvetica,sanserif">
 Plotting Critical Power
 </font></big>
 <p>
@@ -45,6 +52,66 @@ The Weekly Summary
 <p>
 <img src="weekly-summary.png" alt="The Weekly Summary" align="center">
 
+<p>
+<big><font face="arial,helvetica,sanserif">
+Plot from a selection of over 30 metrics
+</font></big>
+<p>
+<img src="metrics-power.png" alt="The Power Metrics" align="center">
+<p>
+<big><font face="arial,helvetica,sanserif">
+Including Time and Distance
+</font></big>
+<p>
+<img src="metrics-timedist.png" alt="The Time and Distance" align="center">
+<p>
+<big><font face="arial,helvetica,sanserif">
+Time In Zone
+</font></big>
+<p>
+<img src="metrics-tiz.png" alt="The Time In Zone" align="center">
+<p>
+<big><font face="arial,helvetica,sanserif">
+Plot with Google Maps
+</font></big>
+<p>
+<img src="map.png" alt="Google Maps" align="center">
+<p>
+<big><font face="arial,helvetica,sanserif">
+Plot in 3 Dimensions
+</font></big>
+<p>
+<img src="3d.png" alt="The 3d plot" align="center">
+<p>
+<big><font face="arial,helvetica,sanserif">
+Edit and Correct Ride Data
+</font></big>
+<p>
+<img src="editor.png" alt="The Ride Editor" align="center">
+<p>
+<big><font face="arial,helvetica,sanserif">
+The Performance Manager
+</font></big>
+<p>
+<img src="pm.png" alt="The Performance Manager" align="center">
+<p>
+<big><font face="arial,helvetica,sanserif">
+Train with a Computrainer or ANT+ Device
+</font></big>
+<p>
+<img src="realtime.png" alt="The Realtime Window" align="center">
+<p>
+<big><font face="arial,helvetica,sanserif">
+Export to Google Earth 5.2
+</font></big>
+<p>
+<img src="google-earth.png" alt="Google Earth 5.2" align="center">
+<p>
+<big><font face="arial,helvetica,sanserif">
+The Aerolab
+</font></big>
+<p>
+<img src="aerolab.png" alt="Aerolab" align="center">
 </center>
 
 
