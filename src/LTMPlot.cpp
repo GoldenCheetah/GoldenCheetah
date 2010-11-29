@@ -153,6 +153,14 @@ LTMPlot::setData(LTMSettings *set)
         return;
     }
 
+    // count the bars since we format them side by side and need
+    // to now how to offset them from each other
+    int barnum=0;
+    int bars = 0;
+    foreach(MetricDetail metricDetail, settings->metrics)
+        if (metricDetail.curveStyle == QwtPlotCurve::Steps)
+            bars++;
+
     // setup the curves
     int count;
     foreach (MetricDetail metricDetail, settings->metrics) {
@@ -175,6 +183,20 @@ LTMPlot::setData(LTMSettings *set)
         // choose the axis
         int axisid = chooseYAxis(metricDetail.uunits);
         current->setYAxis(axisid);
+
+        // left and right offset for bars
+        double left = 0;
+        double right = 0;
+        double middle = 0;
+        if (metricDetail.curveStyle == QwtPlotCurve::Steps) {
+            double space = double(1) / bars;
+            double gap = space * 0.10;
+            double width = space * 0.90;
+            left = (space * barnum) + (gap / 2);
+            right = left + width;
+            middle = ((left+right) / double(2)) - 0.5;
+            barnum++;
+        }
 
         // trend - clone the data for the curve and add a curvefitted
         //         curve with no symbols and use a dashed pen
@@ -230,7 +252,7 @@ LTMPlot::setData(LTMSettings *set)
             while (i.hasPrevious() && counter < metricDetail.topN) {
                 i.previous();
                 if (ydata[i.value()]) {
-                    hxdata[counter] = xdata[i.value()];
+                    hxdata[counter] = xdata[i.value()] + middle;
                     hydata[counter] = ydata[i.value()];
                     counter++;
                 }
@@ -273,7 +295,7 @@ LTMPlot::setData(LTMSettings *set)
 
             // fill the bars
             QColor brushColor = metricDetail.penColor;
-            brushColor.setAlpha(100);
+            brushColor.setAlpha(200); // now side by side, less transparency required
             QBrush brush = QBrush(brushColor);
             current->setBrush(brush);
             current->setPen(cpen);
@@ -308,16 +330,16 @@ LTMPlot::setData(LTMSettings *set)
                 double x = (double) xdata[i];
                 double y = (double) ydata[i];
 
-                xaxis[offset] = x +0.05;
+                xaxis[offset] = x +left;
                 yaxis[offset] = 0;
                 offset++;
-                xaxis[offset] = x+0.05;
+                xaxis[offset] = x+left;
                 yaxis[offset] = y;
                 offset++;
-                xaxis[offset] = x+0.95;
+                xaxis[offset] = x+right;
                 yaxis[offset] = y;
                 offset++;
-                xaxis[offset] = x +0.95;
+                xaxis[offset] = x +right;
                 yaxis[offset] = 0;
                 offset++;
             }
