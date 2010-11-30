@@ -8,7 +8,7 @@ It is also available as source code.
 
 <p>
 Golden Cheetah downloads data from all versions of the PowerTap
-computer except the Joule.  If you're using the PowerTap USB cradle
+computer including the new Joule.  If you're using the PowerTap USB cradle
 (as opposed to the older, serial cable), you may need to install the
 <a href="http://www.ftdichip.com/Drivers/D2XX.htm">FTDI USB driver</a>
 before downloading.
