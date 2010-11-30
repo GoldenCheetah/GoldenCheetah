@@ -21,7 +21,7 @@ clean:
 
 install:
 	rsync -avz -e ssh $(HTML) $(TARBALLS) $(OTHER) \
-		srhea.net:/home/srhea/wwwroot/goldencheetah.org/
+		liversedge@srhea.net:/home/srhea/wwwroot/goldencheetah.org/
 
 install-bin:
 	rsync -avz -e ssh $(BIN) \
