@@ -1,99 +1,81 @@
-
 <p>
 <font face="arial,helvetica,sanserif">
-<big><strong>GoldenCheetah 1.3</strong></big>
+<big><strong>GoldenCheetah 2.0</strong></big>
 </font>
+</p>
 
 <p>
-Realtime Mode:
+New Features
   <ul>
-  <li>Graph data as you ride (Mark Liversedge, Justin Knotzke, Steve Gribble)</li>
+  <li>Aerolab (Andy Froncioni)</li>
+  <li>View ride in Google Maps (Greg Lonnon)</li>
+  <li>Long Term Metrics (Mark Liversedge)</li>
+  <li>User configurable ride metadata (Mark Liversedge)</li>
+  <li>Ride editor and tools (Mark Liversedge)</li>
+  <li>HR Zones and TRIMP Metrics (Damien Grauser)</li>
+  <li>Twitter support (Justin Knotzke)</li>
   </ul>
 </p>
 
 <p>
-Charts:
+Internationalisation
   <ul>
-  <li>Added Performance Manager (Eric Murray)</li>
-  <li>Added 3D Modeling (Mark Liversedge and Greg Steele)</li>
-  <li>Up to four y-axes on Ride Plot (Sean Rhea)</li>
-  <li>Option to show work instead of power in Critical Power Plot (Sean Rhea)</li>
+  <li>Updates to French translation (Damien Grauser)</li>
+  <li>Japanese translation (Mitsukuni Sato)</li>
   </ul>
 </p>
 
 <p>
-Intervals:
+New Logo and Icons
   <ul>
-  <li>Configurable metrics for intervals (Sean Rhea)</li>
-  <li>Find peak powers and add to intervals (Mark Liversedge)</li>
-  <li>Highlight intervals in plots (Damien Grauser)</li>
+  <li>Golden Cheetah Logo(Dan Schmalz)</li>
   </ul>
 </p>
 
 <p>
-Device support:
+Enhanced Ride Plot
   <ul>
-  <li>Serial port support on Windows (Mark Liversedge)</li>
-  <li>Erase SRM memory without downloading (Sean Rhea)</li>
+  <li>Ride plot stacked view (Damien Grauser)</li>
+  <li>Scrolling Ride Plot (Mark Liversedge)</li>
   </ul>
 </p>
 
 <p>
-Imports:
+New Devices and File Formats Supported
   <ul>
-  <li>New ride import wizard (Mark Liversedge, Jamie Kimberley)</li>
-  <li>Support Computrainer 3dp file format (Greg Lonnon)</li>
-  <li>Support WKO v3 file format (Mark Liversedge)</li>
-  <li>Support files with Garmin "smart recording" (Greg Lonnon)</li>
-  <li>New GoldenCheetah (.gc) file format (Sean Rhea)</li>
+  <li>Support for Joule BIN File Format (Damien Grauser)</li>
+  <li>Tacx CAF Ride File Format Support (Ilja Booij)</li>
+  <li>Garmin FIT ride file support (Sean Rhea)</li>
+  <li>Export to Google Earth 5.2 KML (Mark Liversedge)</li>
+  <li>Training Peaks PWX ride file support (Mark Liversedge)</li>
+  <li>Polar SRD ride file support (Mark Liversedge)</li>
+  <li>Racermate CompCS/Ergvideo .TXT ride file support (Mark Liversedge)</li>
   </ul>
-</p>
+<p>
 
 <p>
-New/improved ride metrics:
+Numerous enhancements and bug fixes from
   <ul>
-  <li>Added Joe Friel's Aerobic Decoupling (Sean Rhea)</li>
-  <li>Added training points system by running coach Jack Daniels (Sean Rhea)</li>
-  <li>Better elevation gain estimates (Sean Rhea)</li>
-  </ul>
-</p>
-
-<p>
-Support for more languages:
-  <ul>
-  <li>French (Damien Grauser)</li>
-  <li>Japanese (Mitsukuni Sato, Keisuke Yamaguchi)</li>
-  </ul>
-</p>
-
-<p>
-Other new features:
-  <ul>
-  <li>Group rides into seasons (Justin Knotzke)</li>
-  <li>Better ride calendar (Berend De Schouwer)</li>
-  <li>Ride list pop-up menu (Thomas Weichmann)</li>
-  </ul>
-</p>
-
-<p>
-Lots of bug fixes by:
-  <ul>
-  <li>Rob Carlsen</li>
+  <li>Julian Baumgartner</li>
+  <li>Robert Carlsen</li>
   <li>Rainer Clasen</li>
-  <li>Chris Cleeland</li>
-  <li>Steve Gribble</li>
+  <li>Gareth Coco</li>
   <li>Dag Gruneau</li>
-  <li>Ned Harding</li>
   <li>Jamie Kimberley</li>
-  <li>Justin Knotzke</li>
-  <li>Mark Liversedge</li>
-  <li>Greg Lonnon</li>
-  <li>Eric Murray</li>
-  <li>Sean Rhea</li>
-  <li>Robb Romans</li>
-  <li>Berend De Schouwer</li>
-  <li>Julian Simioni</li>
+  <li>Jim Ley</li>
+  <li>Patrick J. McNerthney</li>
+  <li>Austin Roach</li>
+  <li>Ken Sallot</li>
   <li>Thomas Weichmann</li>
   </ul>
 </p>
 
+<p>
+Builds, testing and support
+  <ul>
+  <li>Robert Carlsen</li>
+  <li>Gareth Coco</li>
+  <li>Jamie Kimberley</li>
+  <li>Justin Knotzke</li>
+  </ul>
+</p>
