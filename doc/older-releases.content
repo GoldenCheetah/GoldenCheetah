@@ -19,6 +19,106 @@ please see <a href="download.html">the download page</a> instead.
 </tr>
 
 <tr>
+<td valign="top">1.3.0</td>
+<td valign="top">
+<a href="GoldenCheetah_1.3.0_Linux_x86.gz">Linux x86</a><br>
+<a href="GoldenCheetah_1.3.0_Linux_x86_64.gz">Linux x86_64</a><br>
+<a href="GoldenCheetah_1.3.0_Mac_Universal.zip">Mac OS X Universal</a><br>
+<a href="GoldenCheetah_1.3.0_Windows_Installer.exe">Windows 32-bit</a>
+</td>
+<td valign="top">
+<p>
+Lots of new features:
+<p>
+Realtime Mode:
+  <ul>
+  <li>Graph data as you ride (Mark Liversedge, Justin Knotzke, Steve Gribble)</li>
+  </ul>
+</p>
+
+<p>
+Charts:
+  <ul>
+  <li>Added Performance Manager (Eric Murray)</li>
+  <li>Added 3D Modeling (Mark Liversedge and Greg Steele)</li>
+  <li>Up to four y-axes on Ride Plot (Sean Rhea)</li>
+  <li>Option to show work instead of power in Critical Power Plot (Sean Rhea)</li>
+  </ul>
+</p>
+
+<p>
+Intervals:
+  <ul>
+  <li>Configurable metrics for intervals (Sean Rhea)</li>
+  <li>Find peak powers and add to intervals (Mark Liversedge)</li>
+  <li>Highlight intervals in plots (Damien Grauser)</li>
+  </ul>
+</p>
+
+<p>
+Device support:
+  <ul>
+  <li>Serial port support on Windows (Mark Liversedge)</li>
+  <li>Erase SRM memory without downloading (Sean Rhea)</li>
+  </ul>
+</p>
+
+<p>
+Imports:
+  <ul>
+  <li>New ride import wizard (Mark Liversedge, Jamie Kimberley)</li>
+  <li>Support Computrainer 3dp file format (Greg Lonnon)</li>
+  <li>Support WKO v3 file format (Mark Liversedge)</li>
+  <li>Support files with Garmin "smart recording" (Greg Lonnon)</li>
+  <li>New GoldenCheetah (.gc) file format (Sean Rhea)</li>
+  </ul>
+</p>
+
+<p>
+New/improved ride metrics:
+  <ul>
+  <li>Added Joe Friel's Aerobic Decoupling (Sean Rhea)</li>
+  <li>Added training points system by running coach Jack Daniels (Sean Rhea)</li>
+  <li>Better elevation gain estimates (Sean Rhea)</li>
+  </ul>
+</p>
+
+<p>
+Support for more languages:
+  <ul>
+  <li>French (Damien Grauser)</li>
+  <li>Japanese (Mitsukuni Sato, Keisuke Yamaguchi)</li>
+  </ul>
+</p>
+
+<p>
+Other new features:
+  <ul>
+  <li>Group rides into seasons (Justin Knotzke)</li>
+  <li>Better ride calendar (Berend De Schouwer)</li>
+  <li>Ride list pop-up menu (Thomas Weichmann)</li>
+  </ul>
+</p>
+
+</p>
+<ul>
+<li>Direct download from SRM (R. Clasen and S. Rhea)
+<li>WKO+ file import (M. Liversedge)
+<li>Qollector support (M. Rages)
+<li>Altitude plotting (T. Weichmann)
+<li>Manual ride entry (E. Murray)
+<li>Power zones shading (D. Connell)
+<li>Weekly summary histograms (R. Carlsen)
+<li>Automatic CP estimation from CP graph (D. Connell)
+<li>Support for running off a USB stick (J. Knotzke)
+<li>OS-specific directory layout (J. Simioni)
+<li>PF/PV plot improvements (B. de Schouwer)
+<li>Memory leak fixes (G. Lonnon)
+</ul>
+<p>Thanks also to Jamie Kimberley for extensive testing.
+</td>
+</tr>
+<tr>
 <td valign="top">1.2.0</td>
 <td valign="top">
 <a href="GoldenCheetah_1.2.0_Linux_x86.tgz">Linux x86</a><br>
