@@ -55,6 +55,7 @@ body {
 
 <p>  <b><a href="index.html">Introduction</a></b>
 <br> <b><a href="screenshots.html">Screenshots</a>
+<br> <b><a href="http://bugs.goldencheetah.org/projects/goldencheetah/wiki">Wiki</a>
 <br> <b><a href="users-guide.html">User's Guide</a>
 <br> <b><a href="developers-guide.html">Developer's Guide</a>
 <br> <b><a href="faq.html">FAQ</a>
