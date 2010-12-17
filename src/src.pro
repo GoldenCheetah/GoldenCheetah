@@ -116,6 +116,8 @@ HEADERS += \
         ErgFilePlot.h \
         FitRideFile.h \
         GcRideFile.h \
+        GpxParser.h \
+        GpxRideFile.h \
         GoogleMapControl.h \
         HistogramWindow.h \
         HrZones.h \
@@ -228,6 +230,8 @@ SOURCES += \
         FixSpikes.cpp \
         FixTorque.cpp \
         GcRideFile.cpp \
+        GpxParser.cpp \
+        GpxRideFile.cpp \
         GoogleMapControl.cpp \
         HistogramWindow.cpp \
         HrTimeInZone.cpp \
