@@ -117,6 +117,8 @@ HEADERS += \
         FitRideFile.h \
         GcRideFile.h \
         GoogleMapControl.h \
+        GpxParser.h \
+        GpxRideFile.h \
         HistogramWindow.h \
         HrZones.h \
         IntervalItem.h \
@@ -229,6 +231,8 @@ SOURCES += \
         FixTorque.cpp \
         GcRideFile.cpp \
         GoogleMapControl.cpp \
+        GpxParser.cpp \
+        GpxRideFile.cpp \
         HistogramWindow.cpp \
         HrTimeInZone.cpp \
         HrZones.cpp \
