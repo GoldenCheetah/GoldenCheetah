@@ -311,5 +311,7 @@ SOURCES += \
 
 RESOURCES = application.qrc
 
-TRANSLATIONS = translations/gc_fr.ts translations/gc_ja.ts
+TRANSLATIONS = translations/gc_fr.ts \
+               translations/gc_ja.ts \
+               translations/gc_pt-br.ts
 
