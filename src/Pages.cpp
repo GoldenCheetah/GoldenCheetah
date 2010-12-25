@@ -37,6 +37,7 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
     langCombo->addItem(tr("Japanese"));
     langCombo->addItem(tr("Portugese (Brazil)"));
     langCombo->addItem(tr("Italian"));
+    langCombo->addItem(tr("German"));
 
     QVariant lang = settings->value(GC_LANG);
 
@@ -50,6 +51,8 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
         langCombo->setCurrentIndex(3);
     else if(lang.toString() == "it")
         langCombo->setCurrentIndex(4);
+    else if(lang.toString() == "de")
+        langCombo->setCurrentIndex(5);
     else // default : English
         langCombo->setCurrentIndex(0);
 

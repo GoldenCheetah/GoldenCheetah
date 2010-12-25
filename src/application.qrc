@@ -14,6 +14,7 @@
     <file>translations/gc_ja.qm</file>
     <file>translations/gc_it.qm</file>
     <file>translations/gc_pt-br.qm</file>
+    <file>translations/gc_de.qm</file>
     <file>xml/charts.xml</file>
     <file>xml/metadata.xml</file>
     <file>images/toolbar/close-icon.png</file>
