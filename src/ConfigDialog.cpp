@@ -157,6 +157,8 @@ void ConfigDialog::save_Clicked()
         settings->setValue(GC_LANG, "pt-br");
     else if (configPage->langCombo->currentIndex()==4)
         settings->setValue(GC_LANG, "it");
+    else if (configPage->langCombo->currentIndex()==5)
+        settings->setValue(GC_LANG, "de");
 
     if (configPage->unitCombo->currentIndex()==0)
         settings->setValue(GC_UNIT, "Metric");
