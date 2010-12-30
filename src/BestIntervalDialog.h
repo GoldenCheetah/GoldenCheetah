@@ -18,6 +18,7 @@
 
 #ifndef _GC_BestIntervalDialog_h
 #define _GC_BestIntervalDialog_h 1
+#include "GoldenCheetah.h"
 
 #include <QtGui>
 
@@ -27,6 +28,8 @@ class RideFile;
 class BestIntervalDialog : public QDialog
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
 

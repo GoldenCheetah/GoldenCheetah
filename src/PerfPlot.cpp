@@ -31,6 +31,8 @@
 
 PerfPlot::PerfPlot() : STScurve(NULL), LTScurve(NULL), SBcurve(NULL), DAYcurve(NULL)
 {
+    setInstanceName("PM Plot");
+
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setTitle(tr("Performance Manager"));
     setAxisTitle(yLeft, "Exponentially Weighted Average Stress");
@@ -65,8 +67,6 @@ void PerfPlot::setStressCalculator(StressCalculator *sc) {
 
 void PerfPlot::plot() {
 
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-
     int  num, tics;
     tics = 42;
 
@@ -92,18 +92,21 @@ void PerfPlot::plot() {
 
     setAxisScaleDraw(QwtPlot::xBottom, new TimeScaleDraw(startDate));
 
+    double width = appsettings->value(this, GC_LINEWIDTH, 20.0).toDouble();
+
     if (DAYcurve) {
 	DAYcurve->detach();
 	delete DAYcurve;
     }
     DAYcurve = new QwtPlotCurve(tr("Daily"));
-    DAYcurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    if (appsettings->value(this, GC_ANTIALIAS, false).toBool()==true)
+        DAYcurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     QPen daypen = QPen(GColor(CDAILYSTRESS));
-    daypen.setWidth(1.0);
+    daypen.setWidth(width);
     DAYcurve->setPen(daypen);
     DAYcurve->setStyle(QwtPlotCurve::Sticks);
 
-    // XXX Note: the days are offset by 1 without the -1 in the 
+    // XXX Note: the days are offset by 1 without the -1 in the
     //           line below  --------------+
     //                                     |
     //                                     V
@@ -115,10 +118,11 @@ void PerfPlot::plot() {
 	STScurve->detach();
 	delete STScurve;
     }
-    STScurve = new QwtPlotCurve(settings->value(GC_STS_NAME,tr("Short Term Stress")).toString());
-    STScurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    STScurve = new QwtPlotCurve(appsettings->value(this, GC_STS_NAME,tr("Short Term Stress")).toString());
+    if (appsettings->value(this, GC_ANTIALIAS, false).toBool()==true)
+        STScurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     QPen stspen = QPen(GColor(CSTS));
-    stspen.setWidth(2.0);
+    stspen.setWidth(width);
     STScurve->setPen(stspen);
     STScurve->setData(_sc->getDays()+xmin,_sc->getSTSvalues()+xmin,num);
     STScurve->attach(this);
@@ -128,10 +132,11 @@ void PerfPlot::plot() {
 	LTScurve->detach();
 	delete LTScurve;
     }
-    LTScurve = new QwtPlotCurve(settings->value(GC_LTS_NAME,tr("Long Term Stress")).toString());
-    LTScurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    LTScurve = new QwtPlotCurve(appsettings->value(this, GC_LTS_NAME,tr("Long Term Stress")).toString());
+    if (appsettings->value(this, GC_ANTIALIAS, false).toBool()==true)
+        LTScurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     QPen ltspen = QPen(GColor(CLTS));
-    ltspen.setWidth(2.0);
+    ltspen.setWidth(width);
     LTScurve->setPen(ltspen);
     LTScurve->setData(_sc->getDays()+xmin,_sc->getLTSvalues()+xmin,num);
     LTScurve->attach(this);
@@ -141,10 +146,11 @@ void PerfPlot::plot() {
 	SBcurve->detach();
 	delete SBcurve;
     }
-    SBcurve = new QwtPlotCurve(settings->value(GC_SB_NAME,tr("Stress Balance")).toString());
-    SBcurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    SBcurve = new QwtPlotCurve(appsettings->value(this, GC_SB_NAME,tr("Stress Balance")).toString());
+    if (appsettings->value(this, GC_ANTIALIAS, false).toBool()==true)
+        SBcurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     QPen sbpen = QPen(GColor(CSB));
-    sbpen.setWidth(2.0);
+    sbpen.setWidth(width);
     SBcurve->setPen(sbpen);
     SBcurve->setData(_sc->getDays()+xmin,_sc->getSBvalues()+xmin,num);
     SBcurve->attach(this);

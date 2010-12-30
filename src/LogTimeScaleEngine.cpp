@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -18,7 +18,7 @@
  * Qwt Widget Library
  * Copyright (C) 1997   Josef Wilgen
  * Copyright (C) 2002   Uwe Rathmann
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the Qwt License, Version 1.0
  */
@@ -47,19 +47,19 @@ QwtScaleTransformation *LogTimeScaleEngine::transformation() const
 
    \sa QwtScaleEngine::setAttribute
 */
-void LogTimeScaleEngine::autoScale(int maxNumSteps, 
+void LogTimeScaleEngine::autoScale(int maxNumSteps,
     double &x1, double &x2, double &stepSize) const
 {
     if ( x1 > x2 )
         qSwap(x1, x2);
 
     QwtDoubleInterval interval(
-                               
+
      #if (QWT_VERSION >= 0x050200)
-            x1 / pow(10.0, lowerMargin()), 
+            x1 / pow(10.0, lowerMargin()),
             x2 * pow(10.0, upperMargin())
      #else
-            x1 / pow(10.0, loMargin()), 
+            x1 / pow(10.0, loMargin()),
             x2 * pow(10.0, hiMargin())
     #endif
     );
@@ -70,7 +70,7 @@ void LogTimeScaleEngine::autoScale(int maxNumSteps,
 
     if (testAttribute(QwtScaleEngine::Symmetric))
     {
-        const double delta = qwtMax(interval.maxValue() / logRef,  
+        const double delta = qwtMax(interval.maxValue() / logRef,
             logRef / interval.minValue());
         interval.setInterval(logRef / delta, logRef * delta);
     }
@@ -103,8 +103,8 @@ void LogTimeScaleEngine::autoScale(int maxNumSteps,
 /*!
    \brief Calculate a scale division
 
-   \param x1 First interval limit 
-   \param x2 Second interval limit 
+   \param x1 First interval limit
+   \param x2 Second interval limit
    \param maxMajSteps Maximum for the number of major steps
    \param maxMinSteps Maximum number of minor steps
    \param stepSize Step size. If stepSize == 0, the scaleEngine
@@ -124,7 +124,7 @@ QwtScaleDiv LogTimeScaleEngine::divideScale(double x1, double x2,
     if (interval.maxValue() / interval.minValue() < 10.0)
     {
         // scale width is less than one decade -> build linear scale
-    
+
         QwtLinearScaleEngine linearScaler;
         linearScaler.setAttributes(attributes());
         linearScaler.setReference(reference());
@@ -136,7 +136,7 @@ QwtScaleDiv LogTimeScaleEngine::divideScale(double x1, double x2,
 				#endif
 				);
 
-        return linearScaler.divideScale(x1, x2, 
+        return linearScaler.divideScale(x1, x2,
             maxMajSteps, maxMinSteps, stepSize);
     }
 
@@ -172,8 +172,8 @@ void LogTimeScaleEngine::buildTicks(
 {
     const QwtDoubleInterval boundingInterval =
         align(interval, stepSize);
-    
-    ticks[QwtScaleDiv::MajorTick] = 
+
+    ticks[QwtScaleDiv::MajorTick] =
         buildMajorTicks(boundingInterval, stepSize);
 
     if ( maxMinSteps > 0 )
@@ -181,7 +181,7 @@ void LogTimeScaleEngine::buildTicks(
         ticks[QwtScaleDiv::MinorTick] = buildMinorTicks(
             ticks[QwtScaleDiv::MajorTick], maxMinSteps, stepSize);
     }
-    
+
     for ( int i = 0; i < QwtScaleDiv::NTickTypes; i++ )
         ticks[i] = strip(ticks[i], interval);
 }
@@ -225,9 +225,9 @@ QwtValueList LogTimeScaleEngine::buildMajorTicks(
 }
 
 QwtValueList LogTimeScaleEngine::buildMinorTicks(
-    const QwtValueList &majorTicks, 
+    const QwtValueList &majorTicks,
     int maxMinSteps, double stepSize) const
-{   
+{
     (void) majorTicks;
     (void) maxMinSteps;
     (void) stepSize;

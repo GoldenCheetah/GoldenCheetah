@@ -18,6 +18,7 @@
  */
 
 #include "SimpleNetworkClient.h"
+#include "RaceDispatcher.h"
 #include "DeviceTypes.h"
 #include "DeviceConfiguration.h"
 
@@ -32,7 +33,6 @@ SimpleNetworkClient::SimpleNetworkClient(QObject *parent,
 {
     server_hostname = dc->portSpec.section(':',0,0).toAscii(); // after the colon
     server_port = dc->portSpec.section(':',1,1).toInt(); // after the colon
-qDebug()<<"client constructed for" << server_hostname << server_port;
 }
 
 SimpleNetworkClient::~SimpleNetworkClient() {
@@ -87,11 +87,9 @@ bool SimpleNetworkClient::pushRealtimeData(RealtimeData &rtData) {
   QMutexLocker locker(&client_lock);
 
   if (!connected) {
-qDebug() << "SimpleNetworkClient Not connected!";
     return false;
   }
 
-qDebug() << "SimpleNetworkClient is about to push...";
 
   // need second pair of eyes here: can somebody confirm this pushes a
   // copy of rtData into the queue, not the reference?  (I think
@@ -99,8 +97,11 @@ qDebug() << "SimpleNetworkClient is about to push...";
   // queue<RealtimeData>,  not queue<RealtimeData&>.    )
 
   // push the realtime data into a queue to be written by the child
+// New outbound  telemtry
   write_queue.enqueue(rtData);
 
+rtData.setName((char *)"Me");
+DISPATCHER->dispatch(&rtData);
   return true;
 }
 
@@ -217,18 +218,23 @@ bool SimpleNetworkClient::read_next_line(QMutexLocker &locker,
   {
     float watts, hr, speed, rpm, load;
     long time;
-
-    if (sscanf(next_line, "%f %f %ld %f %f %f\n",
-               &watts, &hr, &time, &speed, &rpm, &load) != 6) {
+    char namechar[256];
+    strcpy(namechar, "empty");
+    if (sscanf(next_line, "%s %f %f %ld %f %f %f\n",
+               &namechar[0], &watts, &hr, &time, &speed, &rpm, &load) != 7) {
       // couldn't parse, so quit.
       return false;
     }
+    read_into_me.setName(namechar);
     read_into_me.setWatts(watts);
     read_into_me.setHr(hr);
     read_into_me.setTime(time);
     read_into_me.setSpeed(speed);
     read_into_me.setCadence(rpm);
     read_into_me.setLoad(load);
+
+// New inbound telemtry
+DISPATCHER->dispatch(&read_into_me);
 
     printf("Read from network: %f %f %ld %f %f %f\n",
            read_into_me.getWatts(), read_into_me.getHr(),

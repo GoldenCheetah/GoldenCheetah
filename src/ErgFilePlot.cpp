@@ -40,6 +40,8 @@ QwtData *NowData::copy() const { return new NowData(); }
 
 ErgFilePlot::ErgFilePlot(QList<ErgFilePoint> *data)
 {
+    setInstanceName("ErgFile Plot");
+
     //insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setCanvasBackground(Qt::white);
     courseData = data;                      // what we plot

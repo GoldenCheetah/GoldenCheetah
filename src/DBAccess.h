@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2009 Justin F. Knotzke (jknotzke@shampoo.ca)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -19,6 +19,7 @@
 #ifndef _GC_DBAccess_h
 #define _GC_DBAccess_h 1
 
+#include "GoldenCheetah.h"
 
 
 #include <QDir>
@@ -28,13 +29,15 @@
 #include "MainWindow.h"
 #include "Season.h"
 #include "RideFile.h"
+#include "SpecialFields.h"
+#include "RideMetadata.h"
 
 class RideFile;
 class Zones;
 class RideMetric;
 class DBAccess
 {
-	
+
 	public:
 
     // get connection name
@@ -47,13 +50,20 @@ class DBAccess
 	DBAccess(MainWindow *main, QDir home);
     ~DBAccess();
 
-    // Create/Delete Records
+    // Create/Delete Metrics
 	bool importRide(SummaryMetrics *summaryMetrics, RideFile *ride, unsigned long, bool);
     bool deleteRide(QString);
 
+    // Create/Delete Measures
+    bool importMeasure(SummaryMetrics *summaryMetrics);
+
     // Query Records
-	QList<QDateTime> getAllDates();
     QList<SummaryMetrics> getAllMetricsFor(QDateTime start, QDateTime end);
+    QList<SummaryMetrics> getAllMeasuresFor(QDateTime start, QDateTime end);
+
+    SummaryMetrics getRideMetrics(QString filename); // for a filename
+
+	QList<QDateTime> getAllDates();
     QList<Season> getAllSeasons();
 
 	private:
@@ -62,15 +72,18 @@ class DBAccess
     QSqlDatabase dbconn;
     QString sessionid;
 
+    SpecialFields msp;
+    QList<FieldDefinition> mfieldDefinitions;
+    QList<KeywordDefinition> mkeywordDefinitions; //NOTE: not used in measures.xml
+
 	typedef QHash<QString,RideMetric*> MetricMap;
 
 	bool createDatabase();
     void closeConnection();
     bool createMetricsTable();
     bool dropMetricTable();
-	bool createIndex();
+    bool createMeasuresTable();
+    bool dropMeasuresTable();
 	void initDatabase(QDir home);
-
-
 };
 #endif

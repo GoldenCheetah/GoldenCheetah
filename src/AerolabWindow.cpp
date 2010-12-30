@@ -26,7 +26,9 @@
 #include <qwt_plot_zoomer.h>
 
 AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
-  QWidget(mainWindow), mainWindow(mainWindow) {
+  GcWindow(mainWindow), mainWindow(mainWindow) {
+    setInstanceName("Aerolab Window");
+    setControls(NULL);
 
   // Aerolab tab layout:
   QVBoxLayout *vLayout      = new QVBoxLayout;
@@ -182,7 +184,8 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   allZoomer->setEnabled(true);
 
   // SIGNALs to SLOTs:
-  connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+  //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+  connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
   connect(crrSlider, SIGNAL(valueChanged(int)),this, SLOT(setCrrFromSlider()));
   connect(cdaSlider, SIGNAL(valueChanged(int)), this, SLOT(setCdaFromSlider()));
   connect(mSlider, SIGNAL(valueChanged(int)),this, SLOT(setTotalMassFromSlider()));
@@ -209,10 +212,9 @@ AerolabWindow::configChanged()
 void
 AerolabWindow::rideSelected() {
 
-  if (mainWindow->activeTab() != this)
-    return;
+  if (!amVisible()) return;
 
-  RideItem *ride = mainWindow->rideItem();
+  RideItem *ride = myRideItem;
 
   if (!ride)
     return;
@@ -227,7 +229,7 @@ AerolabWindow::setCrrFromSlider() {
   if (aerolab->intCrr() != crrSlider->value()) {
     aerolab->setIntCrr(crrSlider->value());
     crrQLCDNumber->display(QString("%1").arg(aerolab->getCrr()));
-    RideItem *ride = mainWindow->rideItem();
+    RideItem *ride = myRideItem;
     aerolab->setData(ride, false);
   }
 }
@@ -238,7 +240,7 @@ AerolabWindow::setCdaFromSlider() {
   if (aerolab->intCda() != cdaSlider->value()) {
     aerolab->setIntCda(cdaSlider->value());
     cdaQLCDNumber->display(QString("%1").arg(aerolab->getCda()));
-    RideItem *ride = mainWindow->rideItem();
+    RideItem *ride = myRideItem;
     aerolab->setData(ride, false);
   }
 }
@@ -249,7 +251,7 @@ AerolabWindow::setTotalMassFromSlider() {
   if (aerolab->intTotalMass() != mSlider->value()) {
     aerolab->setIntTotalMass(mSlider->value());
     mQLCDNumber->display(QString("%1").arg(aerolab->getTotalMass()));
-    RideItem *ride = mainWindow->rideItem();
+    RideItem *ride = myRideItem;
     aerolab->setData(ride, false);
   }
 }
@@ -260,7 +262,7 @@ AerolabWindow::setRhoFromSlider() {
   if (aerolab->intRho() != rhoSlider->value()) {
     aerolab->setIntRho(rhoSlider->value());
     rhoQLCDNumber->display(QString("%1").arg(aerolab->getRho()));
-    RideItem *ride = mainWindow->rideItem();
+    RideItem *ride = myRideItem;
     aerolab->setData(ride, false);
   }
 }
@@ -271,7 +273,7 @@ AerolabWindow::setEtaFromSlider() {
   if (aerolab->intEta() != etaSlider->value()) {
     aerolab->setIntEta(etaSlider->value());
     etaQLCDNumber->display(QString("%1").arg(aerolab->getEta()));
-    RideItem *ride = mainWindow->rideItem();
+    RideItem *ride = myRideItem;
     aerolab->setData(ride, false);
   }
 }
@@ -282,7 +284,7 @@ AerolabWindow::setEoffsetFromSlider() {
   if (aerolab->intEoffset() != eoffsetSlider->value()) {
     aerolab->setIntEoffset(eoffsetSlider->value());
     eoffsetQLCDNumber->display(QString("%1").arg(aerolab->getEoffset()));
-    RideItem *ride = mainWindow->rideItem();
+    RideItem *ride = myRideItem;
     aerolab->setData(ride, false);
   }
 }

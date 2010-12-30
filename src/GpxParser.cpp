@@ -33,9 +33,8 @@
 GpxParser::GpxParser (RideFile* rideFile)
     : rideFile(rideFile)
 {
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    isGarminSmartRecording = settings->value(GC_GARMIN_SMARTRECORD,Qt::Checked);
-    GarminHWM = settings->value(GC_GARMIN_HWMARK);
+    isGarminSmartRecording = appsettings->value(NULL, GC_GARMIN_SMARTRECORD,Qt::Checked);
+    GarminHWM = appsettings->value(NULL, GC_GARMIN_HWMARK);
     if (GarminHWM.isNull() || GarminHWM.toInt() == 0)
         GarminHWM.setValue(25); // default to 25 seconds.
 

@@ -113,9 +113,8 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
 
     // how to estimate BikeScore:
     QLabel *BSEstLabel = NULL;
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
 
-    QVariant BSmode = settings->value(GC_BIKESCOREMODE);
+    QVariant BSmode = appsettings->value(this, GC_BIKESCOREMODE);
 
     estBSbyTimeButton = NULL;
     estBSbyDistButton = NULL;

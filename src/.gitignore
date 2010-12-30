@@ -24,7 +24,9 @@ qrc_application.cpp
 Makefile
 
 # ignore executables
-GoldenCheetah*
+GoldenCheetah
+GoldenCheetah.exe
+GoldenCheetah.app
 
 #ignore ctags for vim
 tags

@@ -90,17 +90,15 @@ class FixSpikesConfig : public DataProcessorConfig
         }
 
         void readConfig() {
-            boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-            double tol = settings->value(GC_DPFS_MAX, "1500").toDouble();
-            double stop = settings->value(GC_DPFS_VARIANCE, "1000").toDouble();
+            double tol = appsettings->value(NULL, GC_DPFS_MAX, "1500").toDouble();
+            double stop = appsettings->value(NULL, GC_DPFS_VARIANCE, "1000").toDouble();
             max->setValue(tol);
             variance->setValue(stop);
         }
 
         void saveConfig() {
-            boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-            settings->setValue(GC_DPFS_MAX, max->value());
-            settings->setValue(GC_DPFS_VARIANCE, variance->value());
+            appsettings->setValue(GC_DPFS_MAX, max->value());
+            appsettings->setValue(GC_DPFS_VARIANCE, variance->value());
         }
 };
 
@@ -135,9 +133,8 @@ FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0)
     // get settings
     double variance, max;
     if (config == NULL) { // being called automatically
-        boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-        max = settings->value(GC_DPFS_MAX, "1500").toDouble();
-        variance = settings->value(GC_DPFS_VARIANCE, "1000").toDouble();
+        max = appsettings->value(NULL, GC_DPFS_MAX, "1500").toDouble();
+        variance = appsettings->value(NULL, GC_DPFS_VARIANCE, "1000").toDouble();
     } else { // being called manually
         max = ((FixSpikesConfig*)(config))->max->value();
         variance = ((FixSpikesConfig*)(config))->variance->value();

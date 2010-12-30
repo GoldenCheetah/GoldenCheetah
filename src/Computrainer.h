@@ -31,6 +31,7 @@
 
 #ifndef _GC_Computrainer_h
 #define _GC_Computrainer_h 1
+#include "GoldenCheetah.h"
 
 #include <QString>
 #include <QDebug>

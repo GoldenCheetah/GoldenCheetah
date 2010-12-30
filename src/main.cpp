@@ -31,6 +31,12 @@ int
 main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+    //app.setApplicationName("Golden Cheetah"); //XXX affect location of home on Win32
+
+    QFont font;
+    font.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, QFont().toString()).toString());
+    font.setPointSize(appsettings->value(NULL, GC_FONT_DEFAULT_SIZE, 12).toInt());
+    app.setFont(font); // set default font
 
     //this is the path within the current directory where GC will look for
     //files to allow USB stick support
@@ -84,21 +90,18 @@ main(int argc, char *argv[])
             home.cd(libraryPath);
         }
     }
-    boost::shared_ptr<QSettings> settings;
-    settings = GetApplicationSettings();
-
     // Language setting
-    QVariant lang = settings->value(GC_LANG);
+    QVariant lang = appsettings->value(NULL, GC_LANG);
     // Load specific translation
     QTranslator gcTranslator;
     gcTranslator.load(":translations/gc_" + lang.toString() + ".qm");
     app.installTranslator(&gcTranslator);
 
-    QVariant lastOpened = settings->value(GC_SETTINGS_LAST);
-    QVariant unit = settings->value(GC_UNIT);
-    double crankLength = settings->value(GC_CRANKLENGTH).toDouble();
+    QVariant lastOpened = appsettings->value(NULL, GC_SETTINGS_LAST);
+    QVariant unit = appsettings->value(NULL, GC_UNIT);
+    double crankLength = appsettings->value(NULL, GC_CRANKLENGTH).toDouble();
     if(crankLength<=0) {
-       settings->setValue(GC_CRANKLENGTH,172.5);
+       appsettings->setValue(GC_CRANKLENGTH,172.5);
     }
 
     bool anyOpened = false;

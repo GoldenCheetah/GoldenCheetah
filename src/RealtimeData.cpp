@@ -21,10 +21,15 @@
 
 RealtimeData::RealtimeData()
 {
+    name[0] = '\0';
     watts = hr = speed = cadence  = load = 0;
     time = 0;
 }
 
+void RealtimeData::setName(char *name)
+{
+    strcpy(this->name, name);
+}
 void RealtimeData::setWatts(double watts)
 {
     this->watts = watts;
@@ -48,6 +53,11 @@ void RealtimeData::setCadence(double aCadence)
 void RealtimeData::setLoad(double load)
 {
     this->load = load;
+}
+char *
+RealtimeData::getName()
+{
+    return name;
 }
 double RealtimeData::getWatts()
 {

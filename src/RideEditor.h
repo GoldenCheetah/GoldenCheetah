@@ -18,6 +18,7 @@
 
 #ifndef _GC_RideEditor_h
 #define _GC_RideEditor_h 1
+#include "GoldenCheetah.h"
 
 #include "MainWindow.h"
 #include "RideItem.h"
@@ -32,9 +33,11 @@ class RideModel;
 class FindDialog;
 class PasteSpecialDialog;
 
-class RideEditor : public QWidget
+class RideEditor : public GcWindow
 {
     Q_OBJECT
+    G_OBJECT
+
 
     friend class ::FindDialog;
     friend class ::PasteSpecialDialog;
@@ -112,14 +115,13 @@ class RideEditor : public QWidget
         RideItem *ride;
         RideFileTableModel *model;
         QStringList copyHeadings;
+        FindDialog *findTool;
 
     private:
         MainWindow *main;
 
         bool inLUW;
         QList<QModelIndex> itemselection;
-
-        double DPFSmax, DPFSvariance;
 
         QList<QString> whatColumns();
         QSignalMapper *colMapper;
@@ -155,6 +157,8 @@ class RideModel : public QStandardItemModel
 class CellDelegate : public QItemDelegate
 {
     Q_OBJECT
+    G_OBJECT
+
 
 public:
     CellDelegate(RideEditor *, QObject *parent = 0);
@@ -187,21 +191,26 @@ private:
 //
 // Dialog for finding values across the ride
 //
-class FindDialog : public QDialog
+class FindDialog : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
 
-        FindDialog(RideEditor *, QWidget *parent=0);
+        FindDialog(RideEditor *);
         ~FindDialog();
 
     private slots:
         void find();
-        void close();
+        void clear();
         void selection();
         void typeChanged(int);
         void dataChanged();
+
+    public slots:
+        void rideSelected();
 
     private:
         RideEditor *rideEditor;
@@ -209,9 +218,9 @@ class FindDialog : public QDialog
         QComboBox *type;
         QDoubleSpinBox *from, *to;
         QLabel *andLabel;
-
+        QGridLayout *chans;
         QList<QCheckBox*> channels;
-        QPushButton *findButton, *closeButton;
+        QPushButton *findButton, *clearButton;
         QTableWidget *resultsTable;
 
         void clearResultsTable();
@@ -223,6 +232,8 @@ class FindDialog : public QDialog
 class PasteSpecialDialog : public QDialog
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
 

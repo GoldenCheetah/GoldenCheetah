@@ -32,6 +32,8 @@
 #include <qwt_plot_grid.h>
 #include <qwt_plot_layout.h>
 #include <qwt_plot_marker.h>
+#include <qwt_scale_div.h>
+#include <qwt_valuelist.h>
 #include <qwt_text.h>
 #include <qwt_legend.h>
 #include <qwt_data.h>
@@ -206,30 +208,24 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     bydist(false),
     parent(parent)
 {
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    unit = settings->value(GC_UNIT);
+    setInstanceName("AllPlot");
+    unit = appsettings->value(this, GC_UNIT);
 
     referencePlot = NULL;
 
     useMetricUnits = (unit.toString() == "Metric");
+    if (appsettings->value(this, GC_SHADEZONES, true).toBool()==false)
+        shade_zones = false;
 
-    // options for turning off/on shading on all plot
-    // will come in with a future patch, for now we
-    // enable zone shading by default, since this is
-    // the current default behaviour
-    if (false) shade_zones = false;
-    else shade_zones = true;
-
-    smooth = settings->value(GC_RIDE_PLOT_SMOOTHING).toInt();
-    if (smooth < 2)
-        smooth = 30;
+    smooth = appsettings->value(this, GC_RIDE_PLOT_SMOOTHING).toInt();
+    if (smooth < 1) smooth = 1;
 
     // create a background object for shading
     bg = new AllPlotBackground(this);
     bg->attach(this);
 
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
-    setCanvasBackground(GColor(CPLOTBACKGROUND));
+    setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
 
     setXTitle();
 
@@ -254,8 +250,11 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     intervalHighlighterCurve->attach(this);
     this->legend()->remove(intervalHighlighterCurve); // don't show in legend
 
+
+    // setup that grid
     grid = new QwtPlotGrid();
-    grid->enableX(false);
+    grid->enableX(true);
+    grid->enableY(true);
     grid->attach(this);
 
     // get rid of nasty blank space on right of the plot
@@ -268,16 +267,9 @@ void
 AllPlot::configChanged()
 {
 
-    double width = 1.0;
+    double width = appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble();
 
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    useMetricUnits = (settings->value(GC_UNIT).toString() == "Metric");
-
-    // placeholder for setting antialiasing, will come
-    // in with a future patch. For now antialiasing is
-    // not enabled since it can slow down plotting on
-    // windows and linux platforms.
-    if (false) {
+    if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true) {
         wattsCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         hrCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         speedCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -286,7 +278,7 @@ AllPlot::configChanged()
         intervalHighlighterCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     }
 
-    setCanvasBackground(GColor(CPLOTBACKGROUND));
+    setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     QPen wattsPen = QPen(GColor(CPOWER));
     wattsPen.setWidth(width);
     wattsCurve->setPen(wattsPen);
@@ -326,6 +318,20 @@ struct DataPoint {
 bool AllPlot::shadeZones() const
 {
     return shade_zones;
+}
+
+void
+AllPlot::setAxisTitle(int axis, QString label)
+{
+    // setup the default fonts
+    QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
+    stGiles.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+    stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+
+    QwtText title(label);
+    title.setFont(stGiles);
+    QwtPlot::setAxisFont(axis, stGiles);
+    QwtPlot::setAxisTitle(axis, title);
 }
 
 void AllPlot::refreshZoneLabels()
@@ -517,11 +523,18 @@ void
 AllPlot::setYMax()
 {
     if (wattsCurve->isVisible()) {
+        double maxY = (referencePlot == NULL) ? (1.05 * wattsCurve->maxYValue()) :
+                                             (1.05 * referencePlot->wattsCurve->maxYValue());
+        // grid lines for 100 or 25
+        QwtValueList xytick[QwtScaleDiv::NTickTypes];
+        for (int i=0;i<maxY;i+=100)
+            xytick[QwtScaleDiv::MajorTick]<<i;
+        for (int i=0;i<maxY;i+=25)
+            xytick[QwtScaleDiv::MinorTick]<<i;
+
         setAxisTitle(yLeft, "Watts");
-        if (referencePlot == NULL)
-            setAxisScale(yLeft, 0.0, 1.05 * wattsCurve->maxYValue());
-        else
-            setAxisScale(yLeft, 0.0, 1.05 * referencePlot->wattsCurve->maxYValue());
+        //setAxisScale(yLeft, 0.0, maxY);
+        setAxisScaleDiv(QwtPlot::yLeft,QwtScaleDiv(0.0,maxY,xytick));
         setAxisLabelRotation(yLeft,270);
         setAxisLabelAlignment(yLeft,Qt::AlignVCenter);
     }
@@ -595,7 +608,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
     referencePlot = plot;
 
-    setTitle(plot->rideItem->ride()->startTime().toString(GC_DATETIME_FORMAT));
+    //setTitle(plot->rideItem->ride()->startTime().toString(GC_DATETIME_FORMAT));
 
 
     // reference the plot for data and state
@@ -639,6 +652,21 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     speedCurve->setData(xaxis, smoothS, stopidx-startidx);
     cadCurve->setData(xaxis, smoothC, stopidx-startidx);
     altCurve->setData(xaxis, smoothA, stopidx-startidx);
+
+    QwtSymbol sym;
+    sym.setPen(QPen(GColor(CPLOTMARKER)));
+    if (stopidx-startidx < 150) {
+        sym.setStyle(QwtSymbol::Ellipse);
+        sym.setSize(3);
+    } else {
+        sym.setStyle(QwtSymbol::NoSymbol);
+        sym.setSize(0);
+    }
+    wattsCurve->setSymbol(sym);
+    hrCurve->setSymbol(sym);
+    speedCurve->setSymbol(sym);
+    cadCurve->setSymbol(sym);
+    altCurve->setSymbol(sym);
 
     setYMax();
     setAxisMaxMajor(yLeft, 5);
@@ -727,7 +755,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         recalc();
     }
     else {
-        setTitle("no data");
+        //setTitle("no data");
 
         wattsCurve->detach();
         hrCurve->detach();
@@ -808,8 +836,7 @@ void
 AllPlot::setSmoothing(int value)
 {
     smooth = value;
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    settings->setValue(GC_RIDE_PLOT_SMOOTHING, value);
+    appsettings->setValue(GC_RIDE_PLOT_SMOOTHING, value);
     recalc();
 }
 
@@ -964,12 +991,15 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
 {
     if (index >= 0 && curve != intervalHighlighterCurve) {
 
-        double value = curve->y(index);
+        double yvalue = curve->y(index);
+        double xvalue = curve->x(index);
 
         // output the tooltip
-        QString text = QString("%1 %2")
-                        .arg(value, 0, 'f', 0)
-                        .arg(this->axisTitle(curve->yAxis()).text());
+        QString text = QString("%1 %2\n%3 %4")
+                        .arg(yvalue, 0, 'f', 0)
+                        .arg(this->axisTitle(curve->yAxis()).text())
+                        .arg(xvalue, 0, 'f', 2)
+                        .arg(this->axisTitle(curve->xAxis()).text());
 
         // set that text up
         tooltip->setText(text);

@@ -18,6 +18,7 @@
 
 #ifndef _GC_PerfPlot_h
 #define _GC_PerfPlot_h 1
+#include "GoldenCheetah.h"
 
 #include "StressCalculator.h"
 #include <QtGui>
@@ -54,6 +55,8 @@ class TimeScaleDraw: public QwtScaleDraw
 class PerfPlot : public QwtPlot
 {
     Q_OBJECT
+    G_OBJECT
+
 
     private:
 	QwtPlotGrid *grid;

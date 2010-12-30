@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -19,6 +19,7 @@
 #include "MainWindow.h"
 #include "AerolabWindow.h"
 #include "Aerolab.h"
+#include "AthleteTool.h"
 #include "GoogleMapControl.h"
 #include "AllPlotWindow.h"
 #include "AllPlot.h"
@@ -29,10 +30,12 @@
 #include "ConfigDialog.h"
 #include "CriticalPowerWindow.h"
 #include "GcRideFile.h"
+#include "GcPane.h"
+#include "JsonRideFile.h"
+#include "PwxRideFile.h"
 #ifdef GC_HAVE_KML
 #include "KmlRideFile.h"
 #endif
-#include "PwxRideFile.h"
 #include "LTMWindow.h"
 #include "PfPvWindow.h"
 #include "DownloadRideDialog.h"
@@ -43,12 +46,15 @@
 #include "RideItem.h"
 #include "IntervalItem.h"
 #include "RideEditor.h"
+#include "DiaryWindow.h"
+#include "RideNavigator.h"
 #include "RideFile.h"
-#include "RideSummaryWindow.h"
+#include "SummaryWindow.h"
 #include "RideImportWizard.h"
 #include "QuarqRideFile.h"
 #include "RideMetadata.h"
 #include "RideMetric.h"
+#include "ScatterWindow.h"
 #include "Settings.h"
 #include "TimeUtils.h"
 #include "Units.h"
@@ -70,11 +76,25 @@
 #include "SplitRideDialog.h"
 #include "PerformanceManagerWindow.h"
 #include "TrainWindow.h"
+#include "TreeMapWindow.h"
 #include "TwitterDialog.h"
+#include "WithingsDownload.h"
+#include "CalendarDownload.h"
+#include "GcWindowTool.h"
+#ifdef GC_HAVE_SOAP
+#include "TPUploadDialog.h"
+#include "TPDownloadDialog.h"
+#endif
+#ifdef GC_HAVE_ICAL
+#include "ICalendar.h"
+#endif
+#include "HelpWindow.h"
+#include "HomeWindow.h"
 
 #ifndef GC_VERSION
 #define GC_VERSION "(developer build)"
 #endif
+
 
 bool
 MainWindow::parseRideFileName(const QString &name, QString *notesFileName, QDateTime *dt)
@@ -83,10 +103,10 @@ MainWindow::parseRideFileName(const QString &name, QString *notesFileName, QDate
                                    "_(\\d\\d)_(\\d\\d)_(\\d\\d))\\.(.+)$";
     QRegExp rx(rideFileRegExp);
     if (!rx.exactMatch(name))
-        return false;
+            return false;
     assert(rx.numCaptures() == 8);
-    QDate date(rx.cap(2).toInt(), rx.cap(3).toInt(),rx.cap(4).toInt()); 
-    QTime time(rx.cap(5).toInt(), rx.cap(6).toInt(),rx.cap(7).toInt()); 
+    QDate date(rx.cap(2).toInt(), rx.cap(3).toInt(),rx.cap(4).toInt());
+    QTime time(rx.cap(5).toInt(), rx.cap(6).toInt(),rx.cap(7).toInt());
     if ((! date.isValid()) || (! time.isValid())) {
 	QMessageBox::warning(this,
 			     tr("Invalid Ride File Name"),
@@ -99,27 +119,38 @@ MainWindow::parseRideFileName(const QString &name, QString *notesFileName, QDate
     return true;
 }
 
-MainWindow::MainWindow(const QDir &home) : 
+MainWindow::MainWindow(const QDir &home) :
     home(home), session(0), isclean(false),
-    zones_(new Zones), hrZones_(new HrZones), currentNotesChanged(false),
+    zones_(new Zones), hrzones_(new HrZones), calendar(NULL),
     ride(NULL)
 {
     setAttribute(Qt::WA_DeleteOnClose);
+    //setAttribute(Qt::WA_TranslucentBackground); // see through - mucking about...
+    //setAttribute(Qt::WA_MacBrushedMetal); // yuck - for mac lovers only
 
-    settings = GetApplicationSettings();
+    cyclist = home.dirName();
+    setInstanceName(cyclist);
 
     GCColor *GCColorSet = new GCColor(this); // get/keep colorset
     GCColorSet->colorSet(); // shut up the compiler
 
-    QVariant unit = settings->value(GC_UNIT);
+    setStyleSheet("QFrame { FrameStyle = QFrame::NoFrame };"
+                  "QWidget { background = Qt::white; border:0 px; margin: 2px; };"
+                  "QTabWidget { background = Qt::white; };"
+                  "::pane { FrameStyle = QFrame::NoFrame; border: 0px; };");
+
+    setContentsMargins(10,10,10,10);
+
+    QVariant unit = appsettings->value(this, GC_UNIT);
     useMetricUnits = (unit.toString() == "Metric");
 
     setWindowTitle(home.dirName());
-    settings->setValue(GC_SETTINGS_LAST, home.dirName());
+    appsettings->setValue(GC_SETTINGS_LAST, home.dirName());
 
     setWindowIcon(QIcon(":images/gc.png"));
     setAcceptDrops(true);
 
+    // read power zones...
     QFile zonesFile(home.absolutePath() + "/power.zones");
     if (zonesFile.exists()) {
         if (!zones_->read(zonesFile)) {
@@ -129,44 +160,130 @@ MainWindow::MainWindow(const QDir &home) :
 	else if (! zones_->warningString().isEmpty())
             QMessageBox::warning(this, tr("Reading Zones File"), zones_->warningString());
     }
-
-    QFile hrZonesFile(home.absolutePath() + "/hr.zones");
-    if (hrZonesFile.exists()) {
-        if (!hrZones_->read(hrZonesFile)) {
-            QMessageBox::critical(this, tr("Hr Zones File Error"),
-                                  hrZones_->errorString());
+    // read hr zones...
+    QFile hrzonesFile(home.absolutePath() + "/hr.zones");
+    if (hrzonesFile.exists()) {
+        if (!hrzones_->read(hrzonesFile)) {
+            QMessageBox::critical(this, tr("HR Zones File Error"),
+				  hrzones_->errorString());
         }
-        else if (! hrZones_->warningString().isEmpty())
-            QMessageBox::warning(this, tr("Reading Hr Zones File"), hrZones_->warningString());
+	else if (! hrzones_->warningString().isEmpty())
+            QMessageBox::warning(this, tr("Reading HR Zones File"), hrzones_->warningString());
     }
 
-    QVariant geom = settings->value(GC_SETTINGS_MAIN_GEOM);
+    QVariant geom = appsettings->value(this, GC_SETTINGS_MAIN_GEOM);
     if (geom == QVariant())
         resize(640, 480);
     else
         setGeometry(geom.toRect());
 
-    splitter = new QSplitter;
-    splitter->setContentsMargins(10, 20, 10, 10); // attempting to follow some UI guides
+    toolbar = new QToolBar(this);
+    toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    toolbar->setFloatable(false);
+    toolbar->setIconSize(QSize(32,32));
+#ifndef Q_OS_MAC
+    toolbar->setAutoFillBackground(false);
+    toolbar->setStyleSheet("background-color: QColor(231,231,231,0); border: 0px;");
+    toolbar->setContentsMargins(0,0,0,0);
+#else
+    QIcon tickIcon(":images/toolbar/main/tick.png");
+    QPushButton *showControls = new QPushButton(tickIcon, "", this);
+    showControls->setFixedWidth(10);
+    showControls->setFixedHeight(10);
+    showControls->setContentsMargins(0,0,0,0);
+    showControls->setStyleSheet("background-color: QColor(231,231,231,0); border: none;");
+    //showControls->setAutoFillBackground(false);
+    toolbar->addWidget(showControls);
+    connect(showControls, SIGNAL(clicked()), this, SLOT(showDock()));
+#endif
+    addToolBar(toolbar);
 
-    // need to get rideNotes before metadata!
-    rideNotes = new QTextEdit;
+    // home
+    QIcon homeIcon(":images/toolbar/main/home.png");
+    homeAct = new QAction(homeIcon, tr("Home"), this);
+    connect(homeAct, SIGNAL(triggered()), this, SLOT(selectHome()));
+    toolbar->addAction(homeAct);
+
+    // diary
+    QIcon diaryIcon(":images/toolbar/main/diary.png");
+    diaryAct = new QAction(diaryIcon, tr("Diary"), this);
+    connect(diaryAct, SIGNAL(triggered()), this, SLOT(selectDiary()));
+    toolbar->addAction(diaryAct);
+
+    // analyse
+    QIcon analysisIcon(":images/toolbar/main/analysis.png");
+    analysisAct = new QAction(analysisIcon, tr("Analysis"), this);
+    connect(analysisAct, SIGNAL(triggered()), this, SLOT(selectAnalysis()));
+    toolbar->addAction(analysisAct);
+
+    // measures
+    QIcon measuresIcon(":images/toolbar/main/measures.png");
+    measuresAct = new QAction(measuresIcon, tr("Measures"), this);
+    //connect(measuresAct, SIGNAL(triggered()), this, SLOT(selectMeasures()));
+    toolbar->addAction(measuresAct);
+
+    // train
+    QIcon trainIcon(":images/toolbar/main/train.png");
+    trainAct = new QAction(trainIcon, tr("Train"), this);
+    connect(trainAct, SIGNAL(triggered()), this, SLOT(selectTrain()));
+    toolbar->addAction(trainAct);
+
+    // athletes
+    QIcon athleteIcon(":images/toolbar/main/athlete.png");
+    athleteAct = new QAction(athleteIcon, tr("Athletes"), this);
+    //connect(athleteAct, SIGNAL(triggered()), this, SLOT(athleteView()));
+    toolbar->addAction(athleteAct);
+
+    // right align with a spacer
+    QWidget* spacer = new QWidget();
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    toolbar->addWidget(spacer);
+
+    // config
+    QIcon configIcon(":images/toolbar/main/config.png");
+    configAct = new QAction(configIcon, tr("Settings"), this);
+    connect(configAct, SIGNAL(triggered()), this, SLOT(showOptions()));
+    toolbar->addAction(configAct);
+
+    // help
+    QIcon helpIcon(":images/toolbar/main/help.png");
+    helpAct = new QAction(helpIcon, tr("Help"), this);
+    connect(helpAct, SIGNAL(triggered()), this, SLOT(helpView()));
+    toolbar->addAction(helpAct);
+
+    QWidget *central = new QWidget(this);
+    central->setContentsMargins(0,0,0,0);
+    QHBoxLayout *centralLayout = new QHBoxLayout(central);
+    centralLayout->setSpacing(0);
+    centralLayout->setContentsMargins(0,0,0,0);
+    //centralLayout->addWidget(toolbar);
 
     // need to get metadata in before calendar!
     _rideMetadata = new RideMetadata(this);
+    metricDB = new MetricAggregator(this, home, zones(), hrZones()); // just to catch config updates!
+    metricDB->refreshMetrics();
+
+
+    // setup our downloaders
+    withingsDownload = new WithingsDownload(this);
+    calendarDownload = new CalendarDownload(this);
+
 
     // Analysis toolbox contents
     calendar = new RideCalendar(this);
     calendar->setHome(home);
+    calendar->setFixedHeight(250);
+    calendar->hide();
+
+    chartTool = new GcWindowTool(this);
 
     treeWidget = new QTreeWidget;
     treeWidget->setColumnCount(3);
     treeWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     // TODO: Test this on various systems with differing font settings (looks good on Leopard :)
-    treeWidget->header()->resizeSection(0,70);
-    treeWidget->header()->resizeSection(1,95);
+    treeWidget->header()->resizeSection(0,60);
+    treeWidget->header()->resizeSection(1,100);
     treeWidget->header()->resizeSection(2,70);
-    //treeWidget->setMaximumWidth(250);
     treeWidget->header()->hide();
     treeWidget->setAlternatingRowColors (true);
     treeWidget->setIndentation(5);
@@ -175,6 +292,7 @@ MainWindow::MainWindow(const QDir &home) :
     allRides = new QTreeWidgetItem(treeWidget, FOLDER_TYPE);
     allRides->setText(0, tr("All Rides"));
     treeWidget->expandItem(allRides);
+    treeWidget->setFirstItemColumnSpanned (allRides, true);
 
     intervalWidget = new QTreeWidget(this);
     intervalWidget->setColumnCount(1);
@@ -191,29 +309,11 @@ MainWindow::MainWindow(const QDir &home) :
     allIntervals->setText(0, tr("Intervals"));
     intervalWidget->expandItem(allIntervals);
 
-    intervalsplitter = new QSplitter(this);
-    intervalsplitter->setOrientation(Qt::Vertical);
-    intervalsplitter->addWidget(treeWidget);
-    intervalsplitter->setCollapsible(0, true);
-    intervalsplitter->addWidget(intervalWidget);
-    intervalsplitter->setCollapsible(1, true);
 
-    leftLayout = new QSplitter;
-    viewSelection = new ViewSelection(this, VIEW_ANALYSIS);
-    leftLayout->setOrientation(Qt::Vertical);
-    leftLayout->addWidget(viewSelection);
-    leftLayout->setCollapsible(0, false);
-    leftLayout->addWidget(calendar);
-    leftLayout->setCollapsible(1, true);
-    leftLayout->addWidget(intervalsplitter);
-    leftLayout->setCollapsible(2, false);
 
-    splitter->addWidget(leftLayout);
-    splitter->setCollapsible(0, true);
-    QVariant calendarSizes = settings->value(GC_SETTINGS_CALENDAR_SIZES);
-    if (calendarSizes != QVariant()) {
-        leftLayout->restoreState(calendarSizes.toByteArray());
-    }
+#ifdef GC_HAVE_ICAL
+    rideCalendar = new ICalendar(this); // my local/remote calendar entries
+#endif
 
     QTreeWidgetItem *last = NULL;
     QStringListIterator i(RideFileFactory::instance().listRideFiles(home));
@@ -221,60 +321,82 @@ MainWindow::MainWindow(const QDir &home) :
         QString name = i.next(), notesFileName;
         QDateTime dt;
         if (parseRideFileName(name, &notesFileName, &dt)) {
-            last = new RideItem(RIDE_TYPE, home.path(), 
+            last = new RideItem(RIDE_TYPE, home.path(),
                                 name, dt, zones(), hrZones(), notesFileName, this);
             allRides->addChild(last);
 	    calendar->update();
         }
     }
 
+    splitter = new QSplitter;
+    splitter->setContentsMargins(0, 0, 0, 0); // attempting to follow some UI guides
+
     tabWidget = new QTabWidget;
     tabWidget->setUsesScrollButtons(true);
+    tabWidget->setTabPosition(QTabWidget::North);
+    tabWidget->setContentsMargins(0,0,0,0);
 
+    // setup the stacks for all the view controls
+    // a stacked widget for each toolbar option
+    masterControls = new QStackedWidget(this);
+    masterControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
+    masterControls->setCurrentIndex(0);          // default to Analysis
+    masterControls->setContentsMargins(0,0,0,0);
+
+    //QVBoxLayout *cl = new QVBoxLayout(dock);
+    analysisControls = new QStackedWidget(this);
+    analysisControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
+    analysisControls->setCurrentIndex(0);          // default to Analysis
+    analysisControls->setContentsMargins(0,0,0,0);
+    masterControls->addWidget(analysisControls);
+
+    // training
+    trainControls = new QStackedWidget(this);
+    trainControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
+    trainControls->setCurrentIndex(0);          // default to Analysis
+    trainControls->setContentsMargins(0,0,0,0);
+    masterControls->addWidget(trainControls);
+
+    // diary
+    diaryControls = new QStackedWidget(this);
+    diaryControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
+    diaryControls->setCurrentIndex(0);          // default to Analysis
+    diaryControls->setContentsMargins(0,0,0,0);
+    masterControls->addWidget(diaryControls);
+
+    // home
+    homeControls = new QStackedWidget(this);
+    homeControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
+    homeControls->setContentsMargins(0,0,0,0);
+    masterControls->addWidget(homeControls);
+
+    homeWindow = new HomeWindow(this);
+    homeControls->addWidget(homeWindow->controls());
+    homeControls->setCurrentIndex(0);
     // setup trainWindow
     trainWindow = new TrainWindow(this, home);
+    trainControls->addWidget(trainWindow->controls());
 
-    // Setup the two views
-    // add the two views; Analysis and Train
-    views = new QStackedWidget(this);
-    setCentralWidget(views);
-    views->addWidget(splitter);          // Analysis stuff
-    views->addWidget(trainWindow);      // Train Stuff
-    views->setCurrentIndex(0);          // default to Analysis
+    // ToolBox has one thing at the mo... will change soon
+    toolBox = new QToolBox(this);
+    toolBox->setStyleSheet(" QToolBox::tab:selected { font: bold; }");
 
-    rideSummaryWindow = new RideSummaryWindow(this);
-    QLabel *notesLabel = new QLabel(tr("Notes"));
-    notesLabel->setMaximumHeight(30);
+    //toolBox->addItem(calendar, "Calendar"); //XXX some folks will complain, I HATE IT with a PASSION!
+#ifdef Q_OS_MAC // on a mac the controls go into a dock drawer widget
+    // setup analysis window controls stack
+    dock = new QDockWidget("Tools", this, Qt::Drawer);
+    dock->hide();
+    dock->setAllowedAreas(Qt::LeftDockWidgetArea);
+    dock->setWidget(toolBox);
+#endif
+    toolBox->addItem(treeWidget, "Rides");
+    toolBox->addItem(intervalWidget, "Intervals");
+    toolBox->addItem(masterControls, "Controls");
+    toolBox->addItem(new AthleteTool(QFileInfo(home.path()).path(), this), "Athletes");
+    toolBox->addItem(chartTool, "Charts");
 
-    summarySplitter = new QSplitter;
-    summarySplitter->setContentsMargins(0, 0, 0, 0);
-    summarySplitter->setOrientation(Qt::Vertical);
-    summarySplitter->addWidget(rideSummaryWindow);
-    summarySplitter->setCollapsible(0, true);
-    summarySplitter->addWidget(_rideMetadata);
-    summarySplitter->setCollapsible(1, true);
-
-
-    // Use last remembered size or set to a sensible default
-    QVariant summarySizes = settings->value(GC_SETTINGS_SUMMARYSPLITTER_SIZES);
-    if (summarySizes != QVariant())
-        summarySplitter->restoreState(summarySizes.toByteArray());
-    else {
-        QList<int> sizes;
-        sizes.append(650);
-        sizes.append(350);
-        summarySplitter->setSizes(sizes);
-    }
-
-    tabs.append(TabInfo(summarySplitter, tr("Ride Summary")));
-
-    /////////////////////////// Ride Plot Tab ///////////////////////////
-    allPlotWindow = new AllPlotWindow(this);
-    tabs.append(TabInfo(allPlotWindow, tr("Ride Plot")));
-    splitter->addWidget(tabWidget);
-    splitter->setCollapsible(1, true);
-
-    QVariant splitterSizes = settings->value(GC_SETTINGS_SPLITTER_SIZES); 
+    // resize the splitter to previous values
+    QVariant splitterSizes = appsettings->value(this, GC_SETTINGS_SPLITTER_SIZES);
     if (splitterSizes != QVariant())
         splitter->restoreState(splitterSizes.toByteArray());
     else {
@@ -283,6 +405,21 @@ MainWindow::MainWindow(const QDir &home) :
         sizes.append(390);
         splitter->setSizes(sizes);
     }
+
+    /////////////////////////// Summary /////////////////////////
+
+    summaryWindow = new SummaryWindow(this);
+    tabs.append(TabInfo(summaryWindow, tr("Summary")));
+
+    /////////////////////////// Diary ///////////////////////////
+
+    diaryWindow = new DiaryWindow(this);
+    diaryWindow->setControls(_rideMetadata);
+    diaryControls->addWidget(diaryWindow->controls());
+
+    /////////////////////////// Ride Plot Tab ///////////////////////////
+    allPlotWindow = new AllPlotWindow(this);
+    tabs.append(TabInfo(allPlotWindow, tr("Ride Plot")));
 
     ////////////////////// Critical Power Plot Tab //////////////////////
 
@@ -293,11 +430,16 @@ MainWindow::MainWindow(const QDir &home) :
 
     histogramWindow = new HistogramWindow(this);
     tabs.append(TabInfo(histogramWindow, tr("Histograms")));
-    
+
     //////////////////////// Pedal Force/zones_Velocity Plot ////////////////////////
 
     pfPvWindow = new PfPvWindow(this);
     tabs.append(TabInfo(pfPvWindow, tr("PF/PV")));
+
+    //////////////////////// Scatter Plot ////////////////////////
+
+    scatterWindow = new ScatterWindow(this, home);
+    tabs.append(TabInfo(scatterWindow, tr("2D")));
 
     //////////////////////// 3d Model Window ////////////////////////////
 
@@ -307,7 +449,7 @@ MainWindow::MainWindow(const QDir &home) :
 #endif
 
     //////////////////////// Weekly Summary ////////////////////////
-    
+
     // add daily distance / duration graph:
     weeklySummaryWindow = new WeeklySummaryWindow(useMetricUnits, this);
     tabs.append(TabInfo(weeklySummaryWindow, tr("Weekly Summary")));
@@ -315,9 +457,16 @@ MainWindow::MainWindow(const QDir &home) :
     //////////////////////// LTM ////////////////////////
 
     // long term metrics window
-    metricDB = new MetricAggregator(this, home, zones(), hrZones()); // just to catch config updates!
     ltmWindow = new LTMWindow(this, useMetricUnits, home);
+    ltmWindow->setChart(0); // XXX mimic old style, before properties managed by layout manager
+    ltmWindow->setDateRange("All Dates"); // XXX this is going soon anyway
     tabs.append(TabInfo(ltmWindow, tr("Metrics")));
+
+    //////////////////////// Treemap ////////////////////////
+
+    // treemap window
+    treemapWindow = new TreeMapWindow(this, useMetricUnits, home);
+    tabs.append(TabInfo(treemapWindow, tr("Treemap")));
 
     //////////////////////// Performance Manager  ////////////////////////
 
@@ -330,7 +479,7 @@ MainWindow::MainWindow(const QDir &home) :
     aerolabWindow = new AerolabWindow(this);
     tabs.append(TabInfo(aerolabWindow, tr("Aerolab")));
 
-    ///////////////////////////// GoogleMapsb //////////////////////////////////
+    ///////////////////////////// GoogleMaps //////////////////////////////////
 
     googleMap = new GoogleMapControl(this);
     tabs.append(TabInfo(googleMap, tr("Map")));
@@ -340,30 +489,29 @@ MainWindow::MainWindow(const QDir &home) :
     rideEdit = new RideEditor(this);
     tabs.append(TabInfo(rideEdit, tr("Editor")));
 
-    ////////////////////////////// Signals ////////////////////////////// 
+    /////////////////////////// Views //////////////////////////////////////
 
-    connect(calendar, SIGNAL(clicked(const QDate &)),
-            this, SLOT(dateChanged(const QDate &)));
-    connect(leftLayout, SIGNAL(splitterMoved(int,int)),
-            this, SLOT(leftLayoutMoved()));
-    connect(treeWidget,SIGNAL(customContextMenuRequested(const QPoint &)),
-            this, SLOT(showTreeContextMenuPopup(const QPoint &)));
-    connect(treeWidget, SIGNAL(itemSelectionChanged()),
-            this, SLOT(rideTreeWidgetSelectionChanged()));
-    connect(splitter, SIGNAL(splitterMoved(int,int)), 
-            this, SLOT(splitterMoved()));
-    connect(summarySplitter, SIGNAL(splitterMoved(int,int)),
-            this, SLOT(summarySplitterMoved()));
-    connect(tabWidget, SIGNAL(currentChanged(int)), 
-            this, SLOT(tabChanged(int)));
-    connect(rideNotes, SIGNAL(textChanged()),
-            this, SLOT(notesChanged()));
-    connect(intervalWidget,SIGNAL(customContextMenuRequested(const QPoint &)),
-            this, SLOT(showContextMenuPopup(const QPoint &)));
-    connect(intervalWidget,SIGNAL(itemSelectionChanged()),
-            this, SLOT(intervalTreeWidgetSelectionChanged()));
-    connect(intervalWidget,SIGNAL(itemChanged(QTreeWidgetItem *,int)),
-            this, SLOT(intervalEdited(QTreeWidgetItem*, int)));
+    // Setup the two views
+    views = new QStackedWidget(this);
+    views->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
+    views->addWidget(tabWidget);          // Analysis stuff
+    views->addWidget(trainWindow);      // Train Stuff
+    views->addWidget(diaryWindow);
+    views->addWidget(homeWindow);
+    views->setCurrentIndex(0);          // default to Analysis
+    views->setContentsMargins(0,0,0,0);
+
+    centralLayout->addWidget(views);
+
+    // now make the splitter the main widget
+    // on a mac it has only one widget since the
+    // toolBox is in a drawer, on other platforms
+    // it has the views and the toolBox
+    splitter->addWidget(views);
+#ifndef Q_OS_MAC
+   splitter->addWidget(toolBox);
+#endif
+    setCentralWidget(splitter);
 
     /////////////////////////////// Menus ///////////////////////////////
 
@@ -383,16 +531,27 @@ MainWindow::MainWindow(const QDir &home) :
     rideMenu->addAction(tr("&Manual ride entry..."), this,
                         SLOT(manualRide()), tr("Ctrl+M"));
     rideMenu->addSeparator ();
+    rideMenu->addAction(tr("&Export ALL files to GC..."), this,
+                        SLOT(exportALL()), tr(""));
     rideMenu->addAction(tr("&Export to CSV..."), this,
                         SLOT(exportCSV()), tr("Ctrl+E"));
     rideMenu->addAction(tr("Export to GC..."), this,
                         SLOT(exportGC()));
+    rideMenu->addAction(tr("&Export to Json..."), this,
+                        SLOT(exportJson()));
 #ifdef GC_HAVE_KML
     rideMenu->addAction(tr("&Export to KML..."), this,
                         SLOT(exportKML()));
 #endif
     rideMenu->addAction(tr("Export to PWX..."), this,
                         SLOT(exportPWX()));
+#ifdef GC_HAVE_SOAP
+    rideMenu->addSeparator ();
+    rideMenu->addAction(tr("&Upload to Training Peaks"), this,
+                        SLOT(uploadTP()), tr("Ctrl+U"));
+    rideMenu->addAction(tr("Down&load from Training Peaks..."), this,
+                        SLOT(downloadTP()), tr("Ctrl+L"));
+#endif
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Save ride"), this,
                         SLOT(saveRide()), tr("Ctrl+S"));
@@ -401,20 +560,44 @@ MainWindow::MainWindow(const QDir &home) :
     rideMenu->addAction(tr("Split &ride..."), this,
                         SLOT(splitRide()));
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("Find &best intervals..."), this,
-                        SLOT(findBestIntervals()), tr ("Ctrl+B"));
-    rideMenu->addAction(tr("Find power &peaks..."), this,
-                        SLOT(findPowerPeaks()), tr ("Ctrl+P"));
+
+#if 0
+    QMenu *measureMenu = menuBar()->addMenu(tr("&Measure"));
+    measureMenu->addAction(tr("&Record Measures..."), this,
+                        SLOT(recordMeasure()), tr("Ctrl+R"));
+    measureMenu->addSeparator();
+    measureMenu->addAction(tr("&Export Measures..."), this,
+                        SLOT(exportMeasures()), tr("Ctrl+E"));
+    measureMenu->addAction(tr("&Import Measures..."), this,
+                        SLOT(importMeasures()), tr("Ctrl+I"));
+    measureMenu->addSeparator();
+    measureMenu->addAction(tr("Get &Withings Data..."), this,
+                        SLOT (downloadMeasures()), tr ("Ctrl+W"));
+#endif
 
     QMenu *optionsMenu = menuBar()->addMenu(tr("&Tools"));
-    optionsMenu->addAction(tr("&Options..."), this, 
-                           SLOT(showOptions()), tr("Ctrl+O")); 
-    optionsMenu->addAction(tr("Critical Power Calculator"), this,
+    optionsMenu->addAction(tr("&Options..."), this,
+                           SLOT(showOptions()), tr("Ctrl+O"));
+    optionsMenu->addAction(tr("Critical Power Calculator..."), this,
                            SLOT(showTools()));
-    //optionsMenu->addAction(tr("&Reset Metrics..."), this, 
-    //                       SLOT(importRideToDB()), tr("Ctrl+R")); 
-    //optionsMenu->addAction(tr("&Update Metrics..."), this, 
-    //                       SLOT(scanForMissing()()), tr("Ctrl+U")); 
+#ifdef GC_HAVE_ICAL
+    optionsMenu->addSeparator();
+    optionsMenu->addAction(tr("Import Calendar..."), this,
+                        SLOT(importCalendar()), tr (""));
+    optionsMenu->addAction(tr("Export Calendar..."), this,
+                        SLOT(exportCalendar()), tr (""));
+    optionsMenu->addAction(tr("Refresh Calendar"), this,
+                        SLOT(refreshCalendar()), tr (""));
+#endif
+    optionsMenu->addSeparator();
+    optionsMenu->addAction(tr("Find &best intervals..."), this,
+                        SLOT(findBestIntervals()), tr ("Ctrl+B"));
+    optionsMenu->addAction(tr("Find power &peaks..."), this,
+                        SLOT(findPowerPeaks()), tr ("Ctrl+P"));
+    //optionsMenu->addAction(tr("&Reset Metrics..."), this,
+    //                       SLOT(importRideToDB()), tr("Ctrl+R"));
+    //optionsMenu->addAction(tr("&Update Metrics..."), this,
+    //                       SLOT(scanForMissing()()), tr("Ctrl+U"));
 
     // get the available processors
     const DataProcessorFactory &factory = DataProcessorFactory::instance();
@@ -437,30 +620,44 @@ MainWindow::MainWindow(const QDir &home) :
         }
     }
 
-
-
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
-    QStringList tabsToHide = settings->value(GC_TABS_TO_HIDE, "").toString().split(",");
+
+#ifndef Q_OS_MAC
+    // add option to show hide sidebar
+    sideView = new QAction("Show Sidebar", this);
+    sideView->setCheckable(true);
+    sideView->setChecked(true);
+    connect(sideView, SIGNAL(triggered(bool)), this, SLOT(tabViewTriggered(bool)));
+    viewMenu->addAction(sideView);
+#endif
+
+    // Remembered list of tabs to hide
+    QStringList tabsToHide = appsettings->value(this, GC_TABS_TO_HIDE, "").toString().split(",");
+
+    // add all the tabs and controls to the stacked widget
     for (int i = 0; i < tabs.size(); ++i) {
         TabInfo &tab = tabs[i]; // QListIterator only returns const references.
-        bool hide = tabsToHide.contains(tab.name);
-        if (!hide)
-            tabWidget->addTab(tab.contents, tab.name);
-        if (tab.contents == summarySplitter)
-            continue; // Always show the ride summary.
+        tabWidget->addTab(tab.contents, tab.name);
+
+        // does this window have anny controls?
+        QWidget *x = dynamic_cast<GcWindow*>(tab.contents)->controls();
+        QWidget *c = (x != NULL) ? x : new QWidget(this);
+        analysisControls->addWidget(c);
+        tab.contents->show();
+
+        // hide / show menu item
         tab.action = new QAction(tab.name, this);
         tab.action->setCheckable(true);
-        tab.action->setChecked(!hide);
+        tab.action->setChecked(!tabsToHide.contains(tab.name));
         connect(tab.action, SIGNAL(triggered(bool)), this, SLOT(tabViewTriggered(bool)));
         viewMenu->addAction(tab.action);
     }
- 
+    tabViewTriggered(true);
+
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(tr("&About GoldenCheetah"), this, SLOT(aboutDialog()));
 
-
-       
-    QVariant isAscending = settings->value(GC_ALLRIDES_ASCENDING,Qt::Checked);
+    QVariant isAscending = appsettings->value(this, GC_ALLRIDES_ASCENDING,Qt::Checked);
     if(isAscending.toInt()>0){
             if (last != NULL)
                 treeWidget->setCurrentItem(last);
@@ -473,11 +670,45 @@ MainWindow::MainWindow(const QDir &home) :
     }
 
     setAttribute(Qt::WA_DeleteOnClose);
+    setUnifiedTitleAndToolBarOnMac(true);
+
+    // now we're up and runnning lets connect the signals
+    connect(calendar, SIGNAL(clicked(const QDate &)),
+            this, SLOT(dateChanged(const QDate &)));
+    connect(treeWidget,SIGNAL(customContextMenuRequested(const QPoint &)),
+            this, SLOT(showTreeContextMenuPopup(const QPoint &)));
+    connect(treeWidget, SIGNAL(itemSelectionChanged()),
+            this, SLOT(rideTreeWidgetSelectionChanged()));
+    connect(splitter, SIGNAL(splitterMoved(int,int)),
+            this, SLOT(splitterMoved()));
+    connect(tabWidget, SIGNAL(currentChanged(int)),
+            this, SLOT(tabChanged(int)));
+    connect(intervalWidget,SIGNAL(customContextMenuRequested(const QPoint &)),
+            this, SLOT(showContextMenuPopup(const QPoint &)));
+    connect(intervalWidget,SIGNAL(itemSelectionChanged()),
+            this, SLOT(intervalTreeWidgetSelectionChanged()));
+    connect(intervalWidget,SIGNAL(itemChanged(QTreeWidgetItem *,int)),
+            this, SLOT(intervalEdited(QTreeWidgetItem*, int)));
+
+    // Kick off
+    rideTreeWidgetSelectionChanged();
+}
+
+void
+MainWindow::showDock()
+{
+    dock->toggleViewAction()->activate(QAction::Trigger);
 }
 
 void
 MainWindow::tabViewTriggered(bool)
 {
+#ifndef Q_OS_MAC
+    // lets show/hide
+    if (sideView->isChecked()) toolBox->show();
+    else toolBox->hide();
+#endif
+
     disconnect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     QWidget *currentWidget = tabWidget->currentWidget();
     int currentIndex = tabWidget->currentIndex();
@@ -495,7 +726,7 @@ MainWindow::tabViewTriggered(bool)
         tabWidget->setCurrentIndex(currentIndex);
     tabChanged(tabWidget->currentIndex());
     connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
-    settings->setValue(GC_TABS_TO_HIDE, tabsToHide.join(","));
+    appsettings->setValue(GC_TABS_TO_HIDE, tabsToHide.join(","));
 }
 
 void
@@ -545,23 +776,23 @@ MainWindow::addRide(QString name, bool bSelect /*=true*/)
         fprintf(stderr, "bad name: %s\n", name.toAscii().constData());
         assert(false);
     }
-    RideItem *last = new RideItem(RIDE_TYPE, home.path(), 
+    RideItem *last = new RideItem(RIDE_TYPE, home.path(),
                                   name, dt, zones(), hrZones(), notesFileName, this);
 
-    QVariant isAscending = settings->value(GC_ALLRIDES_ASCENDING,Qt::Checked); // default is ascending sort
+    QVariant isAscending = appsettings->value(this, GC_ALLRIDES_ASCENDING,Qt::Checked); // default is ascending sort
     int index = 0;
     while (index < allRides->childCount()) {
         QTreeWidgetItem *item = allRides->child(index);
         if (item->type() != RIDE_TYPE)
             continue;
         RideItem *other = static_cast<RideItem*>(item);
-        
+
         if(isAscending.toInt() > 0 ){
             if (other->dateTime > dt)
                 break;
         } else {
             if (other->dateTime < dt)
-                break; 
+                break;
         }
         if (other->fileName == name) {
             delete allRides->takeChild(index);
@@ -569,15 +800,15 @@ MainWindow::addRide(QString name, bool bSelect /*=true*/)
         }
         ++index;
     }
+    rideAdded(last); // here so emitted BEFORE rideSelected is emitted!
     allRides->insertChild(index, last);
     calendar->update();
     criticalPowerWindow->newRideAdded();
     if (bSelect)
     {
-        tabWidget->setCurrentWidget(summarySplitter);
+        tabWidget->setCurrentWidget(summaryWindow);
         treeWidget->setCurrentItem(last);
     }
-    rideAdded(last);
 }
 
 void
@@ -590,7 +821,6 @@ MainWindow::removeCurrentRide()
         return;
     RideItem *item = static_cast<RideItem*>(_item);
 
-    rideDeleted(item);
 
     QTreeWidgetItem *itemToSelect = NULL;
     for (x=0; x<allRides->childCount(); ++x)
@@ -610,7 +840,7 @@ MainWindow::removeCurrentRide()
 
     QString strOldFileName = item->fileName;
     allRides->removeChild(item);
-    delete item;
+
 
     QFile file(home.absolutePath() + "/" + strOldFileName);
     // purposefully don't remove the old ext so the user wouldn't have to figure out what the old file type was
@@ -627,6 +857,10 @@ MainWindow::removeCurrentRide()
             tr("Can't rename %1 to %2")
             .arg(strOldFileName).arg(strNewName));
     }
+
+    // notify AFTER deleted!
+    rideDeleted(item);
+    delete item;
 
     // added djconnel: remove old cpi file, then update bests which are associated with the file
     criticalPowerWindow->deleteCpiFile(strOldFileName);
@@ -691,6 +925,75 @@ MainWindow::currentRide()
 }
 
 void
+MainWindow::exportGC()
+{
+    if ((treeWidget->selectedItems().size() != 1)
+        || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
+        QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
+        return;
+    }
+
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Export GC"), QDir::homePath(), tr("GC XML Format (*.gc)"));
+    if (fileName.length() == 0)
+        return;
+
+    QString err;
+    QFile file(fileName);
+    GcFileReader reader;
+    reader.writeRideFile(currentRide(), file);
+}
+
+void
+MainWindow::exportALL()
+{
+    // get a list of rides to export
+    QStringList filenames = RideFileFactory::instance().listRideFiles(home);
+
+    QProgressBar *progress = new QProgressBar();
+    progress->setMinimum(0);
+    progress->setMaximum(filenames.count());
+    progress->show();
+
+    foreach (const QString &filename, filenames) {
+        progress->setValue(progress->value() + 1);
+        QStringList errors;
+
+        QString inFileName = home.absolutePath() + '/' + filename;
+        QFile inFile(inFileName);
+        RideFile *p = RideFileFactory::instance().openRideFile(this, inFile, errors);
+
+        if (p) {
+            QString outName = "/home/markl/Desktop/Daniel/" + QFileInfo(filename).baseName() + ".gc";
+            QFile outFile(outName);
+            GcFileReader reader;
+            reader.writeRideFile(p, outFile);
+        }
+    }
+    delete progress;
+}
+
+void
+MainWindow::exportJson()
+{
+    if ((treeWidget->selectedItems().size() != 1)
+        || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
+        QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
+        return;
+    }
+
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Export Json"), QDir::homePath(), tr("GC Json Format (*.json)"));
+    if (fileName.length() == 0)
+        return;
+
+    QString err;
+    QFile file(fileName);
+    JsonFileReader reader;
+    reader.writeRideFile(currentRide(), file);
+}
+
+void
 MainWindow::exportPWX()
 {
     if ((treeWidget->selectedItems().size() != 1)
@@ -707,27 +1010,7 @@ MainWindow::exportPWX()
     QString err;
     QFile file(fileName);
     PwxFileReader reader;
-    reader.writeRideFile(home.dirName() /* cyclist name */, currentRide(), file);
-}
-
-void
-MainWindow::exportGC()
-{
-    if ((treeWidget->selectedItems().size() != 1)
-        || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
-        QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
-        return;
-    }
-
-    QString fileName = QFileDialog::getSaveFileName(
-        this, tr("Export GC"), QDir::homePath(), tr("GC (*.gc)"));
-    if (fileName.length() == 0)
-        return;
-
-    QString err;
-    QFile file(fileName);
-    GcFileReader reader;
-    reader.writeRideFile(currentRide(), file);
+    reader.writeRideFile(cyclist, currentRide(), file);
 }
 
 #ifdef GC_HAVE_KML
@@ -752,6 +1035,22 @@ MainWindow::exportKML()
 }
 #endif
 
+#ifdef GC_HAVE_SOAP
+void
+MainWindow::uploadTP()
+{
+    TPUploadDialog uploader(cyclist, currentRide(), this);
+    uploader.exec();
+}
+
+void
+MainWindow::downloadTP()
+{
+    TPDownloadDialog downloader(this);
+    downloader.exec();
+}
+#endif
+
 void
 MainWindow::exportCSV()
 {
@@ -769,7 +1068,7 @@ MainWindow::exportCSV()
     bool ok;
     QString units = QInputDialog::getItem(
         this, tr("Select Units"), tr("Units:"), items, 0, false, &ok);
-    if(!ok) 
+    if(!ok)
         return;
     bool useMetricUnits = (units == items[0]);
 
@@ -792,14 +1091,14 @@ MainWindow::exportCSV()
 void
 MainWindow::importFile()
 {
-    QVariant lastDirVar = settings->value(GC_SETTINGS_LAST_IMPORT_PATH);
-    QString lastDir = (lastDirVar != QVariant()) 
+    QVariant lastDirVar = appsettings->value(this, GC_SETTINGS_LAST_IMPORT_PATH);
+    QString lastDir = (lastDirVar != QVariant())
         ? lastDirVar.toString() : QDir::homePath();
-   
+
     const RideFileFactory &rff = RideFileFactory::instance();
     QStringList suffixList = rff.suffixes();
     suffixList.replaceInStrings(QRegExp("^"), "*.");
-    QStringList fileNames; 
+    QStringList fileNames;
     QStringList allFormats;
     allFormats << QString("All Supported Formats (%1)").arg(suffixList.join(" "));
     foreach(QString suffix, rff.suffixes())
@@ -810,7 +1109,7 @@ MainWindow::importFile()
         allFormats.join(";;"));
     if (!fileNames.isEmpty()) {
         lastDir = QFileInfo(fileNames.front()).absolutePath();
-        settings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
+        appsettings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
         QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
         RideImportWizard *import = new RideImportWizard(fileNamesCopy, home, this);
         import->process();
@@ -869,7 +1168,7 @@ MainWindow::findPowerPeaks()
 // User-define Intervals and Interval manipulation on left layout
 //----------------------------------------------------------------------
 
-void 
+void
 MainWindow::rideTreeWidgetSelectionChanged()
 {
     assert(treeWidget->selectedItems().size() <= 1);
@@ -882,7 +1181,19 @@ MainWindow::rideTreeWidgetSelectionChanged()
         else
             ride = (RideItem*) which;
     }
-    rideSelected();
+
+    //rideSelected();
+    // update the ride property on all widgets
+    // to let them know they need to replot new
+    // selected ride
+    foreach (TabInfo tab, tabs) {
+        tab.contents->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
+    }
+    _rideMetadata->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
+
+    homeWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
+    diaryWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
+    trainWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
 
     if (!ride)
         return;
@@ -931,7 +1242,6 @@ MainWindow::rideTreeWidgetSelectionChanged()
     if (modelIndex >= 0) tabWidget->setTabEnabled(modelIndex, enabled);
     if (mapIndex >= 0) tabWidget->setTabEnabled(mapIndex, enabled);
     if (editorIndex >= 0) tabWidget->setTabEnabled(editorIndex, enabled);
-    saveAndOpenNotes();
 }
 void
 MainWindow::showTreeContextMenuPopup(const QPoint &pos)
@@ -968,16 +1278,14 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
         }
 
         menu.addAction(actDeleteRide);
-	menu.addAction(actBestInt);
-	menu.addAction(actPowerPeaks);
-	menu.addAction(actSplitRide);
-
+        menu.addAction(actBestInt);
+        menu.addAction(actPowerPeaks);
+        menu.addAction(actSplitRide);
 #ifdef GC_HAVE_LIBOAUTH
         QAction *actTweetRide = new QAction(tr("Tweet Ride"), treeWidget);
         connect(actTweetRide, SIGNAL(triggered(void)), this, SLOT(tweetRide()));
         menu.addAction(actTweetRide);
 #endif
-
         menu.exec(treeWidget->mapToGlobal( pos ));
     }
 }
@@ -1005,7 +1313,8 @@ MainWindow::showContextMenuPopup(const QPoint &pos)
             menu.addAction(actZoomInt);
         menu.addAction(actRenameInt);
         menu.addAction(actDeleteInt);
-        if (tabWidget->currentWidget() == pfPvWindow && activeInterval->isSelected()) {
+        if ((tabWidget->currentWidget() == pfPvWindow || tabWidget->currentWidget() == scatterWindow)
+             && activeInterval->isSelected()) {
             menu.addAction(actFrontInt);
             menu.addAction(actBackInt);
         }
@@ -1113,13 +1422,11 @@ void MainWindow::getBSFactors(double &timeBS, double &distanceBS,
 {
     int rides;
     double seconds, distance, bs, dp;
-    QProgressDialog * progress;
-    bool aborted = false;
     seconds = rides = 0;
     distance = bs = dp = 0;
     timeBS = distanceBS = timeDP = distanceDP = 0.0;
 
-    QVariant BSdays = settings->value(GC_BIKESCOREDAYS);
+    QVariant BSdays = appsettings->value(this, GC_BIKESCOREDAYS);
     if (BSdays.isNull() || BSdays.toInt() == 0)
         BSdays.setValue(30); // by default look back no more than 30 days
 
@@ -1129,56 +1436,22 @@ void MainWindow::getBSFactors(double &timeBS, double &distanceBS,
 
     RideItem *lastRideItem = (RideItem*) allRides->child(allRides->childCount() - 1);
 
-    // set up progress bar
-    progress = new QProgressDialog(QString(tr("Computing bike score estimating factors.\n")),
-                                   tr("Abort"),0,BSdays.toInt(),this);
-    int endingOffset = progress->labelText().size();
+    // just use the metricDB versions, nice 'n fast
+    foreach (SummaryMetrics metric, metricDB->getAllMetricsFor(QDateTime() , QDateTime())) {
 
-    for (int i = 0; i < allRides->childCount(); ++i) {
-        RideItem *item = (RideItem*) allRides->child(i);
-        int days =  item->dateTime.daysTo(lastRideItem->dateTime);
-        if ((item->type() == RIDE_TYPE)
-            && (days >= 0) && (days < BSdays.toInt())
-            && (item->ride())
-            && (item->ride()->deviceType() != QString("Manual CSV"))) {
+        int days =  metric.getRideDate().daysTo(lastRideItem->dateTime);
+        if (days >= 0 && days < BSdays.toInt()) {
 
-            RideMetricPtr m;
-            item->computeMetrics();
+            bs += metric.getForSymbol("skiba_bike_score");
+            seconds += metric.getForSymbol("time_riding");
+            distance += metric.getForSymbol("total_distance");
+            dp += metric.getForSymbol("daniels_points");
 
-            QString existing = progress->labelText();
-            existing.chop(progress->labelText().size() - endingOffset);
-            progress->setLabelText(
-                existing + QString(tr("Processing %1...")).arg(item->fileName));
-
-            // only count rides with BS > 0
-            if ((m = item->metrics.value("skiba_bike_score")) &&
-                m->value(true)) {
-                bs += m->value(true);
-
-                if ((m = item->metrics.value("time_riding"))) {
-                    seconds += m->value(true);
-                }
-
-                if ((m = item->metrics.value("total_distance"))) {
-                    distance += m->value(true);
-                }
-
-                if ((m = item->metrics.value("daniels_points"))) {
-                    dp += m->value(true);
-                }
-
-                rides++;
-            }
-            // check progress
-            QCoreApplication::processEvents();
-            if (progress->wasCanceled()) {
-                aborted = true;
-                goto done;
-            }
-            // set progress from 0 to BSdays
-            progress->setValue(BSdays.toInt() - days);
+            rides++;
         }
     }
+
+    // if we got any...
     if (rides) {
         if (!useMetricUnits)
             distance *= MILES_PER_KM;
@@ -1187,77 +1460,15 @@ void MainWindow::getBSFactors(double &timeBS, double &distanceBS,
         timeDP = (dp * 3600) / seconds;  // DP per hour
         distanceDP = dp / distance;  // DP per mile or km
     }
-done:
-    if (aborted) {
-        timeBS = distanceBS = timeDP = distanceDP = 0;
-    }
-
-    delete progress;
 }
 
 void
-MainWindow::saveAndOpenNotes()
-{
-    // First save the contents of the notes window.
-    saveNotes();
-
-    // Now open any notes associated with the new ride.
-    rideNotes->setPlainText("");
-    QString notesPath = home.absolutePath() + "/" + ride->notesFileName;
-    QFile notesFile(notesPath);
-
-    if (notesFile.exists()) {
-        if (notesFile.open(QFile::ReadOnly | QFile::Text)) {
-            QTextStream in(&notesFile);
-            rideNotes->setPlainText(in.readAll());
-            notesFile.close();
-        }
-        else {
-            QMessageBox::critical(
-                this, tr("Read Error"),
-                tr("Can't read notes file %1").arg(notesPath));
-        }
-    }
-
-    currentNotesFile = ride->notesFileName;
-    currentNotesChanged = false;
-}
-
-void MainWindow::saveNotes() 
-{
-    if ((currentNotesFile != "") && currentNotesChanged) {
-        QString notesPath = 
-            home.absolutePath() + "/" + currentNotesFile;
-        QString tmpPath = notesPath + ".tmp";
-        QFile tmp(tmpPath);
-        if (tmp.open(QFile::WriteOnly | QFile::Truncate)) {
-            QTextStream out(&tmp);
-            out << rideNotes->toPlainText();
-            tmp.close();
-            QFile::remove(notesPath);
-            if (rename(tmpPath.toAscii().constData(),
-                       notesPath.toAscii().constData()) == -1) {
-                QMessageBox::critical(
-                    this, tr("Write Error"),
-                    tr("Can't rename %1 to %2")
-                    .arg(tmpPath).arg(notesPath));
-            }
-        }
-        else {
-            QMessageBox::critical(
-                this, tr("Write Error"),
-                tr("Can't write notes file %1").arg(tmpPath));
-        }
-    }
-}
-
-void 
 MainWindow::resizeEvent(QResizeEvent*)
 {
-    settings->setValue(GC_SETTINGS_MAIN_GEOM, geometry());
+    appsettings->setValue(GC_SETTINGS_MAIN_GEOM, geometry());
 }
 
-void 
+void
 MainWindow::showOptions()
 {
     ConfigDialog *cd = new ConfigDialog(home, zones_, this);
@@ -1265,10 +1476,10 @@ MainWindow::showOptions()
     zonesChanged();
 }
 
-void 
+void
 MainWindow::moveEvent(QMoveEvent*)
 {
-    settings->setValue(GC_SETTINGS_MAIN_GEOM, geometry());
+    appsettings->setValue(GC_SETTINGS_MAIN_GEOM, geometry());
 }
 
 void
@@ -1276,7 +1487,11 @@ MainWindow::closeEvent(QCloseEvent* event)
 {
     if (saveRideExitDialog() == false) event->ignore();
     else {
-        saveNotes();
+
+        // save the state of all the pages
+        homeWindow->saveState();
+
+        // clear the clipboard if neccessary
         QApplication::clipboard()->setText("");
     }
 }
@@ -1284,19 +1499,19 @@ MainWindow::closeEvent(QCloseEvent* event)
 void
 MainWindow::leftLayoutMoved()
 {
-    settings->setValue(GC_SETTINGS_CALENDAR_SIZES, leftLayout->saveState());
+    appsettings->setValue(GC_SETTINGS_CALENDAR_SIZES, leftLayout->saveState());
 }
 
 void
 MainWindow::splitterMoved()
 {
-    settings->setValue(GC_SETTINGS_SPLITTER_SIZES, splitter->saveState());
+    appsettings->setValue(GC_SETTINGS_SPLITTER_SIZES, splitter->saveState());
 }
 
 void
 MainWindow::summarySplitterMoved()
 {
-    settings->setValue(GC_SETTINGS_SUMMARYSPLITTER_SIZES, summarySplitter->saveState());
+    appsettings->setValue(GC_SETTINGS_SUMMARYSPLITTER_SIZES, metaSplitter->saveState());
 }
 // set the rider value of CP to the value derived from the CP model extraction
 void
@@ -1336,9 +1551,22 @@ MainWindow::setCriticalPower(int cp)
 }
 
 void
-MainWindow::tabChanged(int)
+MainWindow::tabChanged(int id)
 {
-    rideSelected();
+    // id is the tab number and not the offset
+    // into the full list, so lets find the tab
+    // we just changed to and set the controls
+    // to the one selected
+    if (ride == NULL) return;
+
+    GcWindow *selected = static_cast<GcWindow*>(tabWidget->widget(id));
+    for(int i=0; i< tabs.count(); i++) {
+        if (tabs[i].contents == selected) {
+            analysisControls->setCurrentIndex(i);
+            tabs[i].contents->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
+            break;
+        }
+    }
 }
 
 void
@@ -1358,6 +1586,11 @@ MainWindow::aboutDialog()
             "http://goldencheetah.org/</a>."
             "<p>Ride files and other data are stored in<br>"
             "<a href=\"%4\">%5</a>"
+            "<p>Trademarks used with permission<br>"
+            "TSS, NP, IF courtesy of <a href=\"http://www.peaksware.com\">"
+            "Peaksware LLC</a>.<br>"
+            "BikeScore, xPower courtesy of <a href=\"http://www.physfarm.com\">"
+            "Physfarm Training Systems</a>."
             "</center>"
             )
             .arg(__DATE__)
@@ -1379,13 +1612,6 @@ void MainWindow::scanForMissing()
 }
 
 
-
-void
-MainWindow::notesChanged()
-{
-    currentNotesChanged = true;
-}
-
 void MainWindow::showTools()
 {
    ToolsDialog *td = new ToolsDialog();
@@ -1395,7 +1621,7 @@ void MainWindow::showTools()
 void
 MainWindow::saveRide()
 {
-    saveRideSingleDialog(ride); // will update Dirty flag if saved
+    saveRideSingleDialog(ride); // will signal save to everyone
 }
 
 void
@@ -1452,6 +1678,20 @@ void MainWindow::dateChanged(const QDate &date)
     }
 }
 
+void MainWindow::selectRideFile(QString fileName)
+{
+    for (int i = 0; i < allRides->childCount(); i++)
+    {
+        ride = (RideItem*) allRides->child(i);
+        if (ride->fileName == fileName) {
+            treeWidget->scrollToItem(allRides->child(i),
+                QAbstractItemView::EnsureVisible);
+            treeWidget->setCurrentItem(allRides->child(i));
+            i = allRides->childCount();
+        }
+    }
+}
+
 // notify children that config has changed
 void
 MainWindow::notifyConfigChanged()
@@ -1467,15 +1707,15 @@ MainWindow::notifyConfigChanged()
             QMessageBox::warning(this, tr("Reading Zones File"), zones_->warningString());
     }
 
-    // re-read Hr Zones in case it changed
-    QFile hrZonesFile(home.absolutePath() + "/hr.zones");
-    if (hrZonesFile.exists()) {
-        if (!hrZones_->read(hrZonesFile)) {
-            QMessageBox::critical(this, tr("Hr Zones File Error"),
-                                  hrZones_->errorString());
+    // reread HR zones
+    QFile hrzonesFile(home.absolutePath() + "/hr.zones");
+    if (hrzonesFile.exists()) {
+        if (!hrzones_->read(hrzonesFile)) {
+            QMessageBox::critical(this, tr("HR Zones File Error"),
+                                 hrzones_->errorString());
         }
-        else if (! hrZones_->warningString().isEmpty())
-            QMessageBox::warning(this, tr("Reading Hr Zones File"), hrZones_->warningString());
+       else if (! hrzones_->warningString().isEmpty())
+            QMessageBox::warning(this, tr("Reading HR Zones File"), hrzones_->warningString());
     }
 
     // now tell everyone else
@@ -1487,7 +1727,8 @@ MainWindow::notifyConfigChanged()
 void
 MainWindow::notifyRideSelected()
 {
-    rideSelected();
+    //rideSelected();
+    if (calendar) calendar->configUpdate(); //XXX << nasty hack fix to refresh calendar when ride start changes
 }
 
 void
@@ -1515,11 +1756,104 @@ MainWindow::tweetRide()
         return;
 
     RideItem *item = dynamic_cast<RideItem*>(_item);
-    item->computeMetrics();
-
     TwitterDialog *twitterDialog = new TwitterDialog(this, item);
     twitterDialog->setWindowModality(Qt::ApplicationModal);
     twitterDialog->exec();
 }
 #endif
 
+void
+MainWindow::recordMeasure()
+{
+qDebug()<<"manually record measurements...";
+}
+
+void
+MainWindow::downloadMeasures()
+{
+    withingsDownload->download();
+}
+
+/* export the measures definition and contents */
+void
+MainWindow::exportMeasures()
+{
+    QDateTime start, end;
+    end = QDateTime::currentDateTime();
+    start.fromTime_t(0);
+
+    foreach (SummaryMetrics x, metricDB->db()->getAllMeasuresFor(start, end)) {
+qDebug()<<x.getDateTime();
+qDebug()<<x.getText("Weight", "0.0").toDouble();
+qDebug()<<x.getText("Lean Mass", "0.0").toDouble();
+qDebug()<<x.getText("Fat Mass", "0.0").toDouble();
+qDebug()<<x.getText("Fat Ratio", "0.0").toDouble();
+    }
+}
+
+/* import the measures definitions and contents */
+void
+MainWindow::importMeasures()
+{
+}
+
+void
+MainWindow::refreshCalendar()
+{
+    calendarDownload->download();
+}
+
+void
+MainWindow::importCalendar()
+{
+    // read an iCalendar format file
+}
+
+void
+MainWindow::exportCalendar()
+{
+    // write and iCalendar format file
+    // need options to decide wether to
+    // include past dates, workout plans only
+    // or also workouts themselves
+}
+
+void
+MainWindow::helpView()
+{
+    HelpWindow *help = new HelpWindow(this);
+    help->show();
+}
+
+void
+MainWindow::selectAnalysis()
+{
+    masterControls->setCurrentIndex(0);
+    views->setCurrentIndex(0);
+}
+
+void
+MainWindow::selectTrain()
+{
+    masterControls->setCurrentIndex(1);
+    views->setCurrentIndex(1);
+}
+
+void
+MainWindow::selectDiary()
+{
+    masterControls->setCurrentIndex(2);
+    views->setCurrentIndex(2);
+}
+
+void
+MainWindow::selectHome()
+{
+    masterControls->setCurrentIndex(3);
+    views->setCurrentIndex(3);
+    homeWindow->selected(); // tell it!
+}
+void
+MainWindow::selectAthlete()
+{
+}

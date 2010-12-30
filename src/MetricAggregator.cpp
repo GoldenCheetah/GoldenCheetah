@@ -30,12 +30,13 @@
 #include <QtXml/QtXml>
 #include <QProgressDialog>
 
-MetricAggregator::MetricAggregator(MainWindow *main, QDir home, const Zones *zones, const HrZones *hrZones) : QWidget(main), main(main), home(home), zones(zones), hrZones(hrZones)
+MetricAggregator::MetricAggregator(MainWindow *main, QDir home, const Zones *zones, const HrZones *hrzones) : QWidget(main), main(main), home(home), zones(zones), hrzones(hrzones)
 {
     dbaccess = new DBAccess(main, home);
     connect(main, SIGNAL(configChanged()), this, SLOT(update()));
-    connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(update(void)));
+    connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(addRide(RideItem*)));
     connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(update(void)));
+    connect(main, SIGNAL(rideClean()), this, SLOT(update(void)));
 }
 
 MetricAggregator::~MetricAggregator()
@@ -87,13 +88,21 @@ void MetricAggregator::refreshMetrics()
         }
     }
 
-    unsigned long zoneFingerPrint = zones->getFingerprint() + hrZones->getFingerprint(); // crc of *all* zone data (HR and Power)
+    unsigned long zoneFingerPrint = zones->getFingerprint() + hrzones->getFingerprint(); // crc of *all* zone data (HR and Power)
 
     // update statistics for ride files which are out of date
     // showing a progress bar as we go
     QProgressDialog bar(tr("Refreshing Metrics Database..."), tr("Abort"), 0, filenames.count(), main);
     bar.setWindowModality(Qt::WindowModal);
     int processed=0;
+
+    // log of progress
+    QFile log(home.absolutePath() + "/" + "metric.log");
+    log.open(QIODevice::WriteOnly);
+    log.resize(0);
+    QTextStream out(&log);
+    out << "METRIC REFRESH STARTS: " << QDateTime::currentDateTime().toString() + "\r\n";
+
     while (i.hasNext()) {
         QString name = i.next();
         QFile file(home.absolutePath() + "/" + name);
@@ -105,9 +114,17 @@ void MetricAggregator::refreshMetrics()
         if (dbTimeStamp < QFileInfo(file).lastModified().toTime_t() ||
             zoneFingerPrint != fingerprint) {
 
+            // log
+            out << "Opening ride: " << name << "\r\n";
+
             // read file and process it
-            RideFile *ride = RideFileFactory::instance().openRideFile(file, errors);
+            RideFile *ride = RideFileFactory::instance().openRideFile(main, file, errors);
+
+            out << "File open completed: " << name << "\r\n";
+
             if (ride != NULL) {
+
+                out << "Updating statistics: " << name << "\r\n";
                 importRide(home, ride, name, zoneFingerPrint, (dbTimeStamp > 0));
                 delete ride;
             }
@@ -116,15 +133,32 @@ void MetricAggregator::refreshMetrics()
         bar.setValue(++processed);
         QApplication::processEvents();
 
-        if (bar.wasCanceled())
+        if (bar.wasCanceled()) {
+            out << "METRIC REFRESH CANCELLED\r\n";
             break;
+        }
     }
+
+    // stop logging
+    out << "METRIC REFRESH ENDS: " << QDateTime::currentDateTime().toString() + "\r\n";
+    log.close();
+
     main->isclean = true;
+
+    dataChanged(); // notify models/views
 }
 
 /*----------------------------------------------------------------------
  * Calculate the metrics for a ride file using the metrics factory
  *----------------------------------------------------------------------*/
+
+// add a ride (after import / download)
+void MetricAggregator::addRide(RideItem*ride)
+{
+    importRide(main->home, ride->ride(), ride->fileName, main->zones()->getFingerprint(), true);
+    dataChanged(); // notify models/views
+}
+
 bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, unsigned long fingerprint, bool modify)
 {
     SummaryMetrics *summaryMetric = new SummaryMetrics();
@@ -149,7 +183,7 @@ bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, u
         metrics << factory.metricName(i);
 
     // compute all the metrics
-    QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(ride, zones, hrZones, metrics);
+    QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(main, ride, zones, hrzones, metrics);
 
     // get metrics into summaryMetric QMap
     for(int i = 0; i < factory.metricCount(); ++i) {
@@ -161,6 +195,12 @@ bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, u
     delete summaryMetric;
 
     return true;
+}
+
+void
+MetricAggregator::importMeasure(SummaryMetrics *sm)
+{
+    dbaccess->importMeasure(sm);
 }
 
 /*----------------------------------------------------------------------
@@ -179,4 +219,32 @@ MetricAggregator::getAllMetricsFor(QDateTime start, QDateTime end)
         return empty;
     }
     return dbaccess->getAllMetricsFor(start, end);
+}
+
+QList<SummaryMetrics>
+MetricAggregator::getAllMeasuresFor(QDateTime start, QDateTime end)
+{
+    QList<SummaryMetrics> empty;
+
+    // only if we have established a connection to the database
+    if (dbaccess == NULL) {
+        qDebug()<<"lost db connection?";
+        return empty;
+    }
+    return dbaccess->getAllMeasuresFor(start, end);
+}
+
+SummaryMetrics
+MetricAggregator::getRideMetrics(QString filename)
+{
+    if (main->isclean == false) refreshMetrics(); // get them up-to-date
+
+    SummaryMetrics empty;
+
+    // only if we have established a connection to the database
+    if (dbaccess == NULL) {
+        qDebug()<<"lost db connection?";
+        return empty;
+    }
+    return dbaccess->getRideMetrics(filename);
 }

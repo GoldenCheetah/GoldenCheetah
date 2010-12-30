@@ -19,6 +19,7 @@
 
 #ifndef _GC_PerformanceManagerWindow_h
 #define _GC_PerformanceManagerWindow_h 1
+#include "GoldenCheetah.h"
 
 #include <QtGui>
 #include <QSlider>
@@ -37,14 +38,20 @@ class PerfPlot;
 class StressCalculator;
 
 
-class PerformanceManagerWindow : public QWidget
+class PerformanceManagerWindow : public GcWindow
 {
     Q_OBJECT
+    G_OBJECT
+
+    Q_PROPERTY(int scheme READ scheme WRITE setScheme USER true)
 
     public:
 
 	PerformanceManagerWindow (MainWindow *mainWindow);
 	~PerformanceManagerWindow (void);
+
+    int scheme() const { return metricCombo->currentIndex(); }
+    void setScheme(int x) const { metricCombo->setCurrentIndex(x); }
 
     public slots:
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007 Sean C. Rhea (srhea@srhea.net)
+ * Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -18,6 +18,7 @@
 
 #ifndef _WkoRideFile_h
 #define _WkoRideFile_h
+#include "GoldenCheetah.h"
 
 #include <stdint.h>
 #include "RideFile.h"
@@ -43,8 +44,8 @@ struct WkoFileReader : public RideFileReader {
 
 typedef std::auto_ptr<QDataStream> QDataStreamPtr;
 
-WKO_UCHAR *WkoParseHeaderData(QString filename, WKO_UCHAR *data, RideFile *rideFile, QStringList &errors) ;
-WKO_UCHAR *WkoParseRawData(WKO_UCHAR *data, RideFile *rideFile, QStringList &errors) ;
+WKO_UCHAR *WkoParseHeaderData(QString filename, WKO_UCHAR *data, WKO_ULONG version, RideFile *rideFile, QStringList &errors) ;
+WKO_UCHAR *WkoParseRawData(WKO_UCHAR *data, WKO_ULONG version, RideFile *rideFile, QStringList &errors) ;
 
 // Some Globals -- try and remove them as I refactor code from the original WKO2CSV source
 QString WKO_HOMEDIR;
@@ -65,9 +66,9 @@ unsigned int get_bits(WKO_UCHAR* data, unsigned bitOffset, unsigned numBits); //
 
 // Decoding setup
 void setxormasks();
-WKO_ULONG nullvals(char graph);
+WKO_ULONG nullvals(char graph, WKO_ULONG version);
 unsigned long bitget(char *thelot, int offset, int count);
-unsigned int bitsize(char graph, int device);
+unsigned int bitsize(char graph, int device, WKO_ULONG version);
 
 // different Chart segment types
 enum configtype {

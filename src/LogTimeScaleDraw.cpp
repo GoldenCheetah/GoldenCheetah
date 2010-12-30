@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -18,7 +18,7 @@
  * Qwt Widget Library
  * Copyright (C) 1997   Josef Wilgen
  * Copyright (C) 2002   Uwe Rathmann
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the Qwt License, Version 1.0
  */
@@ -50,19 +50,19 @@ struct tick_info_t {
 
 extern tick_info_t tick_info[];
 
-void 
-LogTimeScaleDraw::drawLabel(QPainter *painter, double value) const 
+void
+LogTimeScaleDraw::drawLabel(QPainter *painter, double value) const
 {
     QwtText lbl = tickLabel(painter->font(), value);
     if ( lbl.isEmpty() )
-        return; 
+        return;
 
     const QPoint pos = labelPosition(value);
 
     QSize labelSize = lbl.textSize(painter->font());
     if ( labelSize.height() % 2 )
         labelSize.setHeight(labelSize.height() + 1);
-    
+
     const QwtMatrix m = labelMatrix( pos, labelSize);
 
     painter->save();

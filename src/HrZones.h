@@ -18,6 +18,7 @@
 
 #ifndef _HrZones_h
 #define _HrZones_h
+#include "GoldenCheetah.h"
 
 #include <QtCore>
 
@@ -82,6 +83,8 @@ struct HrZoneRange {
 class HrZones : public QObject
 {
     Q_OBJECT
+    G_OBJECT
+
 
     private:
 

@@ -18,6 +18,7 @@
 
 #ifndef _GcRideFile_h
 #define _GcRideFile_h
+#include "GoldenCheetah.h"
 
 #include "RideFile.h"
 

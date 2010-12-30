@@ -18,6 +18,7 @@
 
 #ifndef _GC_LTMOutliers_h
 #define _GC_LTMOutliers_h 1
+#include "GoldenCheetah.h"
 
 #include <QVector>
 #include <QMap>

@@ -18,6 +18,7 @@
 
 #ifndef _TxtRideFile_h
 #define _TxtRideFile_h
+#include "GoldenCheetah.h"
 
 #include "RideFile.h"
 
@@ -26,4 +27,3 @@ struct TxtFileReader : public RideFileReader {
 };
 
 #endif // _TxtRideFile_h
-

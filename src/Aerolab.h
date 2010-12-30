@@ -18,6 +18,7 @@
 
 #ifndef _GC_Aerolab_h
 #define _GC_Aerolab_h 1
+#include "GoldenCheetah.h"
 
 #include <qwt_plot.h>
 #include <qwt_data.h>
@@ -35,12 +36,15 @@ class MainWindow;
 class Aerolab : public QwtPlot {
 
   Q_OBJECT
+  G_OBJECT
+
 
   public:
   Aerolab(QWidget *parent);
   bool byDistance() const { return bydist; }
   bool useMetricUnits;  // whether metric units are used (or imperial)
   void setData(RideItem *_rideItem, bool new_zoom);
+  void setAxisTitle(int axis, QString label);
 
   public slots:
   void setByDistance();

@@ -18,6 +18,7 @@
 
 #ifndef SEASON_H_
 #define SEASON_H_
+#include "GoldenCheetah.h"
 
 #include <QString>
 #include <QDate>
@@ -25,7 +26,7 @@
 
 #include "MainWindow.h"
 
-class Season 
+class Season
 {
 	public:
         enum SeasonType { season=0, cycle=1, adhoc=2, temporary=3 };
@@ -42,7 +43,7 @@ class Season
         void setEnd(QDate _end);
         void setName(QString _name);
         void setType(int _type);
-        
+
 	private:
         QDate start;
         QDate end;
@@ -53,6 +54,8 @@ class Season
 class EditSeasonDialog : public QDialog
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
         EditSeasonDialog(MainWindow *, Season *);

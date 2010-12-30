@@ -18,6 +18,7 @@
 
 #ifndef _GC_RideFileTableModel_h
 #define _GC_RideFileTableModel_h 1
+#include "GoldenCheetah.h"
 
 #include "RideFile.h"
 #include "RideFileCommand.h"
@@ -34,6 +35,8 @@
 class RideFileTableModel : public QAbstractTableModel
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
 

@@ -29,9 +29,21 @@
 #include "HrZones.h"
 
 HistogramWindow::HistogramWindow(MainWindow *mainWindow) :
-    QWidget(mainWindow), mainWindow(mainWindow)
+    GcWindow(mainWindow), mainWindow(mainWindow)
 {
+    setInstanceName("Histogram Window");
+
+    QWidget *c = new QWidget;
+    QVBoxLayout *cl = new QVBoxLayout(c);
+    setControls(c);
+
+    // plot
     QVBoxLayout *vlayout = new QVBoxLayout;
+    powerHist = new PowerHist(mainWindow);
+    vlayout->addWidget(powerHist);
+    setLayout(vlayout);
+
+    // bin width
     QHBoxLayout *binWidthLayout = new QHBoxLayout;
     QLabel *binWidthLabel = new QLabel(tr("Bin width"), this);
     binWidthLineEdit = new QLineEdit(this);
@@ -45,38 +57,43 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow) :
     binWidthSlider->setMinimum(1);
     binWidthSlider->setMaximum(100);
     binWidthLayout->addWidget(binWidthSlider);
+    cl->addLayout(binWidthLayout);
 
     lnYHistCheckBox = new QCheckBox;
     lnYHistCheckBox->setText(tr("Log Y"));
-    binWidthLayout->addWidget(lnYHistCheckBox);
+    cl->addWidget(lnYHistCheckBox);
 
     withZerosCheckBox = new QCheckBox;
     withZerosCheckBox->setText(tr("With zeros"));
-    binWidthLayout->addWidget(withZerosCheckBox);
+    cl->addWidget(withZerosCheckBox);
 
     histShadeZones = new QCheckBox;
     histShadeZones->setText(tr("Shade zones"));
-    histShadeZones->setChecked(true);
-    binWidthLayout->addWidget(histShadeZones);
+    cl->addWidget(histShadeZones);
 
     histParameterCombo = new QComboBox();
-    binWidthLayout->addWidget(histParameterCombo);
+    histParameterCombo->addItem(tr("Watts"));
+    histParameterCombo->addItem(tr("Watts (by Zone)"));
+    histParameterCombo->addItem(tr("Torque"));
+    histParameterCombo->addItem(tr("Heartrate"));
+    histParameterCombo->addItem(tr("Heartrate (by Zone)"));
+    histParameterCombo->addItem(tr("Speed"));
+    histParameterCombo->addItem(tr("Cadence"));
+    histParameterCombo->setCurrentIndex(0);
+    cl->addWidget(histParameterCombo);
 
     histSumY = new QComboBox();
     histSumY->addItem(tr("Absolute Time"));
     histSumY->addItem(tr("Percentage Time"));
-    binWidthLayout->addWidget(histSumY);
+    cl->addWidget(histSumY);
+    cl->addStretch();
 
-    powerHist = new PowerHist(mainWindow);
+    // sort out default values
     setHistTextValidator();
-
     lnYHistCheckBox->setChecked(powerHist->islnY());
     withZerosCheckBox->setChecked(powerHist->withZeros());
     binWidthSlider->setValue(powerHist->binWidth());
     setHistBinWidthText();
-    vlayout->addWidget(powerHist);
-    vlayout->addLayout(binWidthLayout);
-    setLayout(vlayout);
 
     connect(binWidthSlider, SIGNAL(valueChanged(int)),
             this, SLOT(setBinWidthFromSlider()));
@@ -92,7 +109,8 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow) :
             this, SLOT(setHistSelection(int)));
     connect(histSumY, SIGNAL(currentIndexChanged(int)),
             this, SLOT(setSumY(int)));
-    connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+    //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+    connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
     connect(mainWindow, SIGNAL(configChanged()), powerHist, SLOT(configChanged()));
@@ -101,9 +119,9 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow) :
 void
 HistogramWindow::rideSelected()
 {
-    if (mainWindow->activeTab() != this)
+    if (!amVisible())
         return;
-    RideItem *ride = mainWindow->rideItem();
+    RideItem *ride = myRideItem;
     if (!ride)
         return;
 
@@ -113,18 +131,14 @@ HistogramWindow::rideSelected()
 
     // set the histogram data
     powerHist->setData(ride);
-    // make sure the histogram has a legal selection
-    powerHist->fixSelection();
-    // update the options in the histogram combobox
-    setHistWidgets(ride);
 }
 
 void
 HistogramWindow::intervalSelected()
 {
-    if (mainWindow->activeTab() != this)
+    if (!amVisible())
         return;
-    RideItem *ride = mainWindow->rideItem();
+    RideItem *ride = myRideItem;
     if (!ride) return;
 
     // set the histogram data
@@ -134,7 +148,7 @@ HistogramWindow::intervalSelected()
 void
 HistogramWindow::zonesChanged()
 {
-    if (mainWindow->activeTab() != this)
+    if (!amVisible())
         return;
     powerHist->refreshZoneLabels();
     powerHist->replot();
@@ -212,31 +226,35 @@ HistogramWindow::setHistSelection(int /*id*/)
     if (histShadeZones->isChecked()) powerHist->setShading(true);
     else powerHist->setShading(false);
 
-    // lets get the selection since we are called from
-    // the checkbox and combobox signal
-    int id = histParameterCombo->currentIndex();
-
     // Which data series are we plotting?
-    if (id == histWattsID)
+    switch (histParameterCombo->currentIndex()) {
+    default:
+    case 0 :
 	    powerHist->setSelection(PowerHist::watts);
-    else if (id == histWattsZoneID) // we can zone power!
+        break;
+
+    case 1 :
 	    powerHist->setSelection(PowerHist::wattsZone);
-    else if (id == histNmID)
+        break;
+
+    case 2 :
 	    powerHist->setSelection(PowerHist::nm);
-    else if (id == histHrID)
+        break;
+
+    case 3 :
 	    powerHist->setSelection(PowerHist::hr);
-    else if (id == histHrZoneID) // we can zone HR!
+        break;
+
+    case 4 :
 	    powerHist->setSelection(PowerHist::hrZone);
-    else if (id == histKphID)
+        break;
+    case 5 :
 	    powerHist->setSelection(PowerHist::kph);
-    else if (id == histCadID)
+        break;
+
+    case 6 :
 	    powerHist->setSelection(PowerHist::cad);
-    else
-        powerHist->setSelection(PowerHist::watts);
-
-    // just in case it gets switch off...
-    if (!powerHist->islnY()) lnYHistCheckBox->setChecked(false);
-
+    }
     setHistBinWidthText();
     setHistTextValidator();
 }
@@ -250,95 +268,3 @@ HistogramWindow::setBinWidthFromLineEdit()
 	setHistBinWidthText();
     }
 }
-
-void
-HistogramWindow::setHistWidgets(RideItem *rideItem)
-{
-    int count = 0;
-    assert(rideItem);
-    RideFile *ride = rideItem->ride();
-
-    // prevent selection from changing during reconstruction of options
-    disconnect(histParameterCombo, SIGNAL(currentIndexChanged(int)),
-	       this, SLOT(setHistSelection(int)));
-
-    if (ride) {
-	// we want to retain the present selection
-    PowerHist::Selection s = powerHist->selection();
-
-	histParameterCombo->clear();
-
-	histWattsID = histWattsZoneID =
-    histNmID = histHrID = histHrZoneID =
-    histKphID = histCadID = -1;
-
-	if (ride->areDataPresent()->watts) {
-        histWattsID = count ++;
-        histParameterCombo->addItem(tr("Watts"));
-
-        if (powerRange != -1) {
-            histWattsZoneID = count ++;
-            histParameterCombo->addItem(tr("Watts (by Zone)"));
-        }
-	}
-	if (ride->areDataPresent()->nm) {
-	    histNmID = count ++;
-	    histParameterCombo->addItem(tr("Torque"));
-	}
-	if (ride->areDataPresent()->hr) {
-	    histHrID = count ++;
-	    histParameterCombo->addItem(tr("Heartrate"));
-        if (hrRange != -1) {
-	        histHrZoneID = count ++;
-	        histParameterCombo->addItem(tr("Heartrate (by Zone)"));
-        }
-	}
-	if (ride->areDataPresent()->kph) {
-	    histKphID = count ++;
-	    histParameterCombo->addItem(tr("Speed"));
-	}
-	if (ride->areDataPresent()->cad) {
-	    histCadID = count ++;
-	    histParameterCombo->addItem(tr("Cadence"));
-	}
-	if (count > 0) {
-	    histParameterCombo->setEnabled(true);
-	    binWidthLineEdit->setEnabled(true);
-	    binWidthSlider->setEnabled(true);
-	    withZerosCheckBox->setEnabled(true);
-	    lnYHistCheckBox->setEnabled(true);
-
-	    // set widget to proper value
-	    if ((s == PowerHist::watts) && (histWattsID >= 0))
-		histParameterCombo->setCurrentIndex(histWattsID);
-	    else if ((s == PowerHist::wattsZone) && (histWattsZoneID >= 0))
-		histParameterCombo->setCurrentIndex(histWattsZoneID);
-	    else if ((s == PowerHist::nm) && (histNmID >= 0))
-		histParameterCombo->setCurrentIndex(histNmID);
-	    else if ((s == PowerHist::hr) && (histHrID >= 0))
-		histParameterCombo->setCurrentIndex(histHrID);
-	    else if ((s == PowerHist::hrZone) && (histHrZoneID >= 0))
-		histParameterCombo->setCurrentIndex(histHrZoneID);
-	    else if ((s == PowerHist::kph) && (histKphID >= 0))
-		histParameterCombo->setCurrentIndex(histKphID);
-	    else if ((s == PowerHist::cad) && (histCadID >= 0))
-		histParameterCombo->setCurrentIndex(histCadID);
-	    else
-		histParameterCombo->setCurrentIndex(0);
-
-	    // reconnect widget
-	    connect(histParameterCombo, SIGNAL(currentIndexChanged(int)),
-		    this, SLOT(setHistSelection(int)));
-
-	    return;
-	}
-    }
-
-    histParameterCombo->addItem(tr("no data"));
-    histParameterCombo->setEnabled(false);
-    binWidthLineEdit->setEnabled(false);
-    binWidthSlider->setEnabled(false);
-    withZerosCheckBox->setEnabled(false);
-    lnYHistCheckBox->setEnabled(false);
-}
-

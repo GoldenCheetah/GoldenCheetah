@@ -18,22 +18,43 @@
 
 #ifndef _GC_PfPvWindow_h
 #define _GC_PfPvWindow_h 1
+#include "GoldenCheetah.h"
 
-#include <QWidget>
+#include <QtGui>
 
 class MainWindow;
 class PfPvPlot;
-class QCheckBox;
-class QLineEdit;
 class RideItem;
 
-class PfPvWindow : public QWidget
+class PfPvWindow : public GcWindow
 {
     Q_OBJECT
+    G_OBJECT
+
+    Q_PROPERTY(QString watts READ watts WRITE setWatts USER true)
+    Q_PROPERTY(QString rpm READ rpm WRITE setRpm USER true)
+    Q_PROPERTY(QString crank READ crank WRITE setCrank USER true)
+    Q_PROPERTY(bool shade READ shade WRITE setShade USER true)
+    Q_PROPERTY(bool merge READ merge WRITE setMerge USER true)
+    Q_PROPERTY(bool frame READ frame WRITE setFrame USER true)
 
     public:
 
         PfPvWindow(MainWindow *mainWindow);
+
+        // get/set properties
+        QString watts() const { return qaCPValue->text(); }
+        void setWatts(QString x) { qaCPValue->setText(x); }
+        QString rpm() const { return qaCadValue->text(); }
+        void setRpm(QString x) { qaCadValue->setText(x); }
+        QString crank() const { return qaClValue->text(); }
+        void setCrank(QString x) { qaClValue->setText(x); }
+        bool shade() const { return shadeZonesPfPvCheckBox->isChecked(); }
+        void setShade(bool x) { shadeZonesPfPvCheckBox->setChecked(x); }
+        bool merge() const { return mergeIntervalPfPvCheckBox->isChecked(); }
+        void setMerge(bool x) { mergeIntervalPfPvCheckBox->setChecked(x); }
+        bool frame() const { return frameIntervalPfPvCheckBox->isChecked(); }
+        void setFrame(bool x) { frameIntervalPfPvCheckBox->setChecked(x); }
 
     public slots:
 

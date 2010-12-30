@@ -36,8 +36,10 @@ class PeakPower : public RideMetric {
         setImperialUnits(tr("watts"));
     }
     void setSecs(double secs) { this->secs=secs; }
-    void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
-                 const QHash<QString,RideMetric*> &) {
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const MainWindow *) {
         QList<BestIntervalDialog::BestInterval> results;
         BestIntervalDialog::findBests(ride, secs, 1, results);
         if (results.count() > 0 && results.first().avg < 3000) watts = results.first().avg;

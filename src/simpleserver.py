@@ -27,19 +27,31 @@ import threading
 import SocketServer
 import sys
 
-# this class keeps track of the state of a connected peer, including
-# the socket used to talk to it, it's name, and a queue of records waiting
-# to be written into it.
-class PeerTracker():
-    def __init__(self):
-        self.writequeue = [ ]   # list of records to be sent TO peer
+MAXPEERS = 4096
 
-# The main "threaded web server" class.  Has a condition variable and
-# a list of connected peers.
+# this class keeps track of the state of a peer, including the socket
+# used to talk to it, it's name, and a queue of records waiting to be
+# written into it.
+class PeerTracker():
+    def __init__(self, name):
+        self.writequeue = [ ]   # list of records to be sent TO peer
+        self.connected = False
+        self.peername = name
+
+    # scrub my state when the peer disconnects
+    def clean(self):
+        self.writequeue = [ ]
+        self.connected = False
+        self.socket = None
+
+# The main "threaded server" class.  Has a condition variable and a
+# dict of connected peers.
 class CheetahServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
-    def init_cheetah(self):
+    def init_cheetah(self, maxpeers):
         self.cond = threading.Condition()   # used to coordinate client lists
-        self.peers = [ ]  # a list of connected peers
+        self.peers = { }  # a dict of peers
+        for i in range(0, maxpeers):
+            self.peers[i] = PeerTracker("Peer " + str(i))
 
 # A new ThreadedCheetahHandler is instantiated for each incoming connection,
 # and a new thread is dispatched to handle() to service that connection.
@@ -50,7 +62,7 @@ class ThreadedCheetahHandler(SocketServer.BaseRequestHandler):
         self.server.cond.acquire()
         print "(" + self.me_peer.peername + ")", \
             "bogus or broken input, dropping.\n"
-        self.server.peers.remove(self.me_peer)
+        self.me_peer.clean()
         self.server.cond.release()
 
     # a line of data was received; this method is invoked to parse it
@@ -58,40 +70,40 @@ class ThreadedCheetahHandler(SocketServer.BaseRequestHandler):
     # peer is killed off.  if parsing succeeds but only one peer is
     # connected, the record is dropped but the peer stays up.
     def processinput(self, data):
-        # make sure data has 6 fields. if not, drop peer.
+        # make sure data has 7 fields. if not, drop peer.
         components = data.split()
-        if (len(components) != 6):
+        if (len(components) != 7):
             self.removepeer()
             return True
         # try to parse the fields.  if fail, drop peer.
         try:
             valdict = { }
-            valdict['watts'] = float(components[0])
-            valdict['hr'] = float(components[1])
-            valdict['time'] = int(components[2])
-            valdict['speed'] = float(components[3])
-            valdict['rpm'] = float(components[4])
-            valdict['load'] = float(components[5])
+            valdict['peername'] = components[0]
+            valdict['watts'] = float(components[1])
+            valdict['hr'] = float(components[2])
+            valdict['time'] = int(components[3])
+            valdict['speed'] = float(components[4])
+            valdict['rpm'] = float(components[5])
+            valdict['load'] = float(components[6])
 
             # parse succeeded, so add to peer's input queue
             print "(" + self.me_peer.peername + ")", \
                 "well-formed record arrived..."
-            print "  ... watts:%.2f hr:%.2f time:%ld speed:%.2f rpm:%.2f load:%.3f" % \
-                (valdict['watts'], valdict['hr'], valdict['time'], \
+            print "  ... name:%s watts:%.2f hr:%.2f time:%ld speed:%.2f rpm:%.2f load:%.3f" % \
+                (valdict['peername'], valdict['watts'], valdict['hr'], valdict['time'], \
                      valdict['speed'], valdict['rpm'], valdict['load'])
             self.server.cond.acquire()
-            if (len(self.server.peers) == 2):
-                if (self.server.peers[0] == self.me_peer):
-                    otherpeer = self.server.peers[1]
-                else:
-                    otherpeer = self.server.peers[0]
-                otherpeer.writequeue.append(valdict)
-
+            numqueued = 0
+            for i in range(0, len(self.server.peers)):
+                if (not (self.server.peers[i] == self.me_peer)) and (self.server.peers[i].connected):
+                    self.server.peers[i].writequeue.append(valdict)
+                    print "  ...queued for", self.server.peers[i].peername + "\n"
+                    numqueued = numqueued + 1
+            if numqueued > 0:
                 # notify writing thread that there is work to do
                 self.server.cond.notify()
-                print "  ...queued for", otherpeer.peername + "\n"
             else:
-                print "  ...but other peer not connected,", \
+                print "  ...but no other peers are connected,", \
                     "so dropped it.\n"
             self.server.cond.release()
         except ValueError:
@@ -112,23 +124,19 @@ class ThreadedCheetahHandler(SocketServer.BaseRequestHandler):
         print "(server) new incoming connection..."
         self.server.cond.acquire()
         # If the server is full, bonk out, else add.
-        if (len(self.server.peers) < 2):
-            # We have room.  Create record for new peer.
-            self.me_peer = PeerTracker()
-            self.me_peer.socket = self.request
-            if (len(self.server.peers) == 0):
-                self.me_peer.peername = "Peer A"
-            elif (self.server.peers[0].peername == "Peer A"):
-                self.me_peer.peername = "Peer B"
-            else:
-                self.me_peer.peername = "Peer A"
-            self.server.peers.append(self.me_peer)
-            print "  ...added peer #", str(len(self.server.peers)), \
-                "named \"" + self.me_peer.peername + "\"\n"
-            done = False
-        else:
+        addedpeer = False
+        for i in range(0, len(self.server.peers)):
+            if (not addedpeer) and (self.server.peers[i].connected == False):
+                # We have room.  Create record for new peer in slot i
+                self.me_peer = self.server.peers[i]
+                self.me_peer.connected = True
+                self.me_peer.socket = self.request
+                print "  ...connected " + self.me_peer.peername + "\n"
+                addedpeer = True
+                done = False
+        if addedpeer == False:
             # Server is full, so bonk out.
-            print "  ...but server already has 2 peers, so dropping.\n"
+            print "  ...but server already has max peers, so dropping.\n"
             done = True
         self.server.cond.release()
 
@@ -137,6 +145,7 @@ class ThreadedCheetahHandler(SocketServer.BaseRequestHandler):
         while not done:
             try:
                 data = socketfile.readline()
+                print '[debug][' + self.me_peer.peername + '] got: \"' + data + '\"\n'
                 done = self.processinput(data)
             except socket.error, msg:
                 self.removepeer()
@@ -146,8 +155,8 @@ class ThreadedCheetahHandler(SocketServer.BaseRequestHandler):
 # record into a peer's socket.  if the write fails, we ignore for now,
 # and rely on the read on the socket to fail and clean up later.
 def write_to_peer(item, peer):
-    s = "%.2f %.2f %d %.2f %.2f %.3f\n" % \
-        (item['watts'], item['hr'], item['time'], \
+    s = "%s %.2f %.2f %d %.2f %.2f %.3f\n" % \
+        (item['peername'], item['watts'], item['hr'], item['time'], \
              item['speed'], item['rpm'], item['load'])
     try:
         peer.socket.sendall(s)
@@ -168,21 +177,21 @@ def thread_write(server):
     while True:
         server.cond.wait()
         # see if the first peer has some work
-        for peer in server.peers:
+        for peer in server.peers.itervalues():
             while len(peer.writequeue) > 0:
                 next = peer.writequeue.pop(0)
                 write_to_peer(next, peer)
     server.cond.release()
 
-# main() invokes this to spawn the web server and the writer thread.
-def run_server(port):
-    # initialize the web server
+# main() invokes this to spawn the server and the writer thread.
+def run_server(port, maxpeers):
+    # initialize the server
     server = CheetahServer(("", port), ThreadedCheetahHandler)
     server.allow_reuse_address = True
     ip, port = server.server_address
     print "(server) running in thread:", \
         threading.currentThread().getName() + "\n"
-    server.init_cheetah()
+    server.init_cheetah(maxpeers)
 
     # fire up the writer thread
     writer_thread = threading.Thread(target=thread_write, args=(server,))
@@ -198,22 +207,24 @@ def run_server(port):
 ###############################
 
 def usage():
-    print "usage: ./simpleserver.py listen_port"
+    print "usage: ./simpleserver.py listen_port max_num_peers"
+    print "   where 2 <= maxpeers < " + str(MAXPEERS) + "\n"
     sys.exit(1)   # failure
 
 def main(argv):
     # validate arguments
-    if (len(argv) != 1):
+    if (len(argv) != 2):
         usage()
     try:
         port = int(argv[0])
+        maxpeers = int(argv[1])
     except ValueError:
         usage()
-    if ((port < 1) or (port > 65535)):
+    if ((port < 1) or (port > 65535) or (maxpeers < 2) or (maxpeers > MAXPEERS)):
         usage()
 
     # great!
-    run_server(port)
+    run_server(port, maxpeers)
 
 if __name__ == "__main__":
     main(sys.argv[1:])

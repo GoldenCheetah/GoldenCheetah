@@ -1,4 +1,4 @@
-/* 
+/*
  * $Id: DownloadRideDialog.cpp,v 1.4 2006/08/11 20:02:13 srhea Exp $
  *
  * Copyright (c) 2006-2008 Sean C. Rhea (srhea@srhea.net)
@@ -7,12 +7,12 @@
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -28,7 +28,7 @@
 #include <boost/foreach.hpp>
 
 DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
-                                       const QDir &home) : 
+                                       const QDir &home) :
     mainWindow(mainWindow), home(home), cancelled(false),
     downloadInProgress(false)
 {
@@ -58,11 +58,11 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     connect(rescanButton, SIGNAL(clicked()), this, SLOT(scanCommPorts()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
 
-    QHBoxLayout *buttonLayout = new QHBoxLayout; 
-    buttonLayout->addWidget(downloadButton); 
+    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    buttonLayout->addWidget(downloadButton);
     buttonLayout->addWidget(eraseRideButton);
-    buttonLayout->addWidget(rescanButton); 
-    buttonLayout->addWidget(cancelButton); 
+    buttonLayout->addWidget(rescanButton);
+    buttonLayout->addWidget(cancelButton);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(new QLabel(tr("Select port:"), this));
@@ -76,7 +76,7 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     scanCommPorts();
 }
 
-void 
+void
 DownloadRideDialog::setReadyInstruct()
 {
     if (portCombo->count() == 0) {
@@ -108,7 +108,7 @@ DownloadRideDialog::scanCommPorts()
     if (err != "") {
         QString msg = "Warning(s):\n\n" + err + "\n\nYou may need to (re)install "
             "the FTDI or PL2303 drivers before downloading.";
-        QMessageBox::warning(0, "Error Loading Device Drivers", msg, 
+        QMessageBox::warning(0, "Error Loading Device Drivers", msg,
                              QMessageBox::Ok, QMessageBox::NoButton);
     }
     for (int i = 0; i < devList.size(); ++i) {
@@ -135,7 +135,7 @@ DownloadRideDialog::statusCallback(const QString &statusText)
     return !cancelled;
 }
 
-void 
+void
 DownloadRideDialog::downloadClicked()
 {
     downloadButton->setEnabled(false);
@@ -178,7 +178,7 @@ DownloadRideDialog::downloadClicked()
                 tr("This ride appears to have already ")
                 + tr("been downloaded.  Do you want to ")
                 + tr("overwrite the previous download?"),
-                tr("&Overwrite"), tr("&Cancel"), 
+                tr("&Overwrite"), tr("&Cancel"),
                 QString(), 1, 1) == 1) {
             reject();
             return;
@@ -190,9 +190,9 @@ DownloadRideDialog::downloadClicked()
     if (QFile::exists(filepath)) {
         QFile old(filepath);
         if (!old.remove()) {
-            QMessageBox::critical(this, tr("Error"), 
-                                  tr("Failed to remove existing file ") 
-                                  + filepath + ": " + old.error()); 
+            QMessageBox::critical(this, tr("Error"),
+                                  tr("Failed to remove existing file ")
+                                  + filepath + ": " + old.error());
             QFile::remove(tmpname);
             reject();
         }
@@ -201,7 +201,7 @@ DownloadRideDialog::downloadClicked()
 
     // Use ::rename() instead of QFile::rename() to get forced overwrite.
     if (rename(QFile::encodeName(tmpname), QFile::encodeName(filepath)) < 0) {
-        QMessageBox::critical(this, tr("Error"), 
+        QMessageBox::critical(this, tr("Error"),
                               tr("Failed to rename ") + tmpname + tr(" to ")
                               + filepath + ": " + strerror(errno));
         QFile::remove(tmpname);
@@ -239,7 +239,7 @@ DownloadRideDialog::eraseClicked()
     accept();
 }
 
-void 
+void
 DownloadRideDialog::cancelClicked()
 {
     if (!downloadInProgress)

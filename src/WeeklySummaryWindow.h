@@ -18,6 +18,7 @@
 
 #ifndef _GC_WeeklySummaryWindow_h
 #define _GC_WeeklySummaryWindow_h 1
+#include "GoldenCheetah.h"
 
 #include <QWidget>
 
@@ -29,9 +30,11 @@ class QwtPlotCurve;
 class RideItem;
 class Zones;
 
-class WeeklySummaryWindow : public QWidget
+class WeeklySummaryWindow : public GcWindow
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
 

@@ -139,8 +139,10 @@ bool LTMChartParser::endElement( const QString&, const QString&, const QString &
     else if(qName == "metricsmooth") metric.smooth = buffer.trimmed().toInt();
     else if(qName == "metrictrend") metric.trend = buffer.trimmed().toInt();
     else if(qName == "metrictopn") metric.topN = buffer.trimmed().toInt();
+    else if(qName == "metricoutn") metric.topOut = buffer.trimmed().toInt();
     else if(qName == "metriccurve") metric.curveStyle = intToCurve(buffer.trimmed().toInt());
     else if(qName == "metricsymbol") metric.symbolStyle = intToSymbol(buffer.trimmed().toInt());
+    else if(qName == "metricstack") metric.stack = intToSymbol(buffer.trimmed().toInt());
     else if(qName == "metricpencolor") {
             // the r,g,b values are in red="xx",green="xx" and blue="xx" attributes
             // of this element and captured in startelement below
@@ -258,11 +260,13 @@ LTMChartParser::serialize(QString filename, QList<LTMSettings> charts)
             out<<QString("\t\t\t<metricsmooth>%1</metricsmooth>\n").arg(metric.smooth);
             out<<QString("\t\t\t<metrictrend>%1</metrictrend>\n").arg(metric.trend);
             out<<QString("\t\t\t<metrictopn>%1</metrictopn>\n").arg(metric.topN);
+            out<<QString("\t\t\t<metricoutn>%1</metricoutn>\n").arg(metric.topOut);
             out<<QString("\t\t\t<metricbaseline>%1</metricbaseline>\n").arg(metric.baseline);
 
             // CURVE, SYMBOL
             out<<QString("\t\t\t<metriccurve>%1</metriccurve>\n").arg(curveToInt(metric.curveStyle));
             out<<QString("\t\t\t<metricsymbol>%1</metricsymbol>\n").arg(symbolToInt(metric.symbolStyle));
+            out<<QString("\t\t\t<metricstack>%1</metricstack>\n").arg(metric.stack ? 1 : 0);
 
             // PEN
             out<<QString("\t\t\t<metricpencolor red=\"%1\" green=\"%3\" blue=\"%4\"></metricpencolor>\n")

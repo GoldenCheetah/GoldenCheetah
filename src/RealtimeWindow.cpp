@@ -23,26 +23,29 @@
 #include "math.h" // for round()
 #include "Units.h" // for MILES_PER_KM
 
+// user selections for device/server/workout here
+#include "TrainTool.h"
+
 // Three current realtime device types supported are:
 #include "ComputrainerController.h"
 #include "ANTplusController.h"
-#include "SimpleNetworkController.h"
+#include "NullController.h"
 #include "ErgFile.h"
 
-#include "TrainTool.h"
+// And connect to server is via a GoldenServer object
+#include "GoldenClient.h"
+
 
 void
 RealtimeWindow::configUpdate()
 {
 
-    // config has been updated! so re-read
-    // wipe out all the current entries
-    deviceSelector->clear();
-    streamSelector->clear();
+    FTP=285; // default to 285 if zones are not set
+    int range = main->zones()->whichRange(QDate::currentDate());
+    if (range != -1) FTP = main->zones()->getCP(range);
 
     // metric or imperial changed?
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    QVariant unit = settings->value(GC_UNIT);
+    QVariant unit = appsettings->value(this, GC_UNIT);
     useMetricUnits = (unit.toString() == "Metric");
 
     // set labels accordingly
@@ -50,38 +53,17 @@ RealtimeWindow::configUpdate()
     speedLabel->setText(useMetricUnits ? tr("KPH") : tr("MPH"));
     avgspeedLabel->setText(useMetricUnits ? tr("Avg KPH") : tr("Avg MPH"));
 
-    // get configured devices
+    // devices
     DeviceConfigurations all;
-
     Devices.clear();
     Devices = all.getList();
-
-    streamSelector->addItem("No streaming", -1);
-    for (int i=0; i<Devices.count(); i++) {
-        // add streamers
-        if (Devices.at(i).type == DEV_GSERVER)
-            streamSelector->addItem(Devices.at(i).name, i);
-
-        // add data sources
-        deviceSelector->addItem(Devices.at(i).name, i);
-    }
-
-    deviceSelector->setCurrentIndex(0);
-    streamSelector->setCurrentIndex(0);
-
-    // reconnect - otherwise after no config they still get an error
-    if (Devices.count() > 0) {
-        disconnect(startButton, SIGNAL(clicked()), this, SLOT(warnnoConfig()));
-        disconnect(pauseButton, SIGNAL(clicked()), this, SLOT(warnnoConfig()));
-        disconnect(stopButton, SIGNAL(clicked()), this, SLOT(warnnoConfig()));
-        connect(startButton, SIGNAL(clicked()), this, SLOT(Start()));
-        connect(pauseButton, SIGNAL(clicked()), this, SLOT(Pause()));
-        connect(stopButton, SIGNAL(clicked()), this, SLOT(Stop()));
-    }
 }
 
-RealtimeWindow::RealtimeWindow(MainWindow *parent, TrainTool *trainTool, const QDir &home)  : QWidget(parent)
+RealtimeWindow::RealtimeWindow(MainWindow *parent, TrainTool *trainTool, const QDir &home)  : GcWindow(parent)
 {
+
+    setInstanceName("Solo Ride Window");
+    setControls(NULL);
 
     // set home
     this->home = home;
@@ -92,8 +74,7 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, TrainTool *trainTool, const Q
     ergFile = NULL;
 
     // metric or imperial?
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    QVariant unit = settings->value(GC_UNIT);
+    QVariant unit = appsettings->value(this, GC_UNIT);
     useMetricUnits = (unit.toString() == "Metric");
 
     // main layout for the window
@@ -105,72 +86,16 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, TrainTool *trainTool, const Q
     option_layout = new QHBoxLayout();
     controls_layout = new QVBoxLayout();
 
-    deviceSelector = new QComboBox(this);
-    streamSelector = new QComboBox(this);
-
-    // get configured devices
-    DeviceConfigurations all;
-    Devices = all.getList();
-
-    streamSelector->addItem("No streaming", -1);
-    for (int i=0; i<Devices.count(); i++) {
-
-        // add streamers
-        if ( Devices.at(i).type == DEV_GSERVER ||
-             Devices.at(i).type == DEV_GCLIENT )
-            streamSelector->addItem(Devices.at(i).name, i);
-
-        // add data sources
-        deviceSelector->addItem(Devices.at(i).name, i);
-    }
-
-    deviceSelector->setCurrentIndex(0);
-    streamSelector->setCurrentIndex(0);
-
-    recordSelector = new QCheckBox(this);
-    recordSelector->setText(tr("Save"));
-    recordSelector->setChecked(Qt::Checked);
-
-    startButton = new QPushButton(tr("Start"), this);
-    startButton->setMaximumHeight(100);
-    pauseButton = new QPushButton(tr("Pause"), this);
-    pauseButton->setMaximumHeight(100);
-    stopButton = new QPushButton(tr("Stop"), this);
-    stopButton->setMaximumHeight(100);
-
-    button_layout->addWidget(startButton);
-    button_layout->addWidget(pauseButton);
-    button_layout->addWidget(stopButton);
-    option_layout->addWidget(deviceSelector);
-    option_layout->addSpacing(10);
-    option_layout->addWidget(recordSelector);
-    option_layout->addSpacing(10);
-    option_layout->addWidget(streamSelector);
-
-    // XXX NETWORK STREAMING DISABLED IN THIS RELEASE SO HIDE THE COMBO
-    streamSelector->hide();
-
-    option_layout->addSpacing(10);
-    controls_layout->addItem(option_layout);
-    controls_layout->addItem(button_layout);
-
     // handle config changes
     connect(main, SIGNAL(configChanged()), this, SLOT(configUpdate()));
 
-    connect(deviceSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(SelectDevice(int)));
-    connect(recordSelector, SIGNAL(clicked()), this, SLOT(SelectRecord()));
-    connect(streamSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(SelectStream(int)));
     connect(trainTool, SIGNAL(workoutSelected()), this, SLOT(SelectWorkout()));
 
-    if (Devices.count() > 0) {
-        connect(startButton, SIGNAL(clicked()), this, SLOT(Start()));
-        connect(pauseButton, SIGNAL(clicked()), this, SLOT(Pause()));
-        connect(stopButton, SIGNAL(clicked()), this, SLOT(Stop()));
-    } else {
-        connect(startButton, SIGNAL(clicked()), this, SLOT(warnnoConfig()));
-        connect(pauseButton, SIGNAL(clicked()), this, SLOT(warnnoConfig()));
-        connect(stopButton, SIGNAL(clicked()), this, SLOT(warnnoConfig()));
-    }
+    // connect train tool buttons!
+    connect(trainTool, SIGNAL(start()), this, SLOT(Start()));
+    connect(trainTool, SIGNAL(pause()), this, SLOT(Pause()));
+    connect(trainTool, SIGNAL(stop()), this, SLOT(Stop()));
+
     powerLabel = new QLabel(tr("WATTS"), this);
     powerLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
     heartrateLabel = new QLabel(tr("BPM"), this);
@@ -194,8 +119,8 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, TrainTool *trainTool, const Q
     avgspeedLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
     avgcadenceLabel = new QLabel(tr("Avg RPM"), this);
     avgcadenceLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
-    avgloadLabel = new QLabel(tr("Avg Load WATTS"), this);
-    avgloadLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
+//    avgloadLabel = new QLabel(tr("Avg Load WATTS"), this);
+//    avgloadLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
 
     laptimeLabel = new QLabel(tr("LAP TIME"), this);
     laptimeLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
@@ -209,12 +134,13 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, TrainTool *trainTool, const Q
     lapLCD = new QLCDNumber(this); lapLCD->setSegmentStyle(QLCDNumber::Filled);
     loadLCD = new QLCDNumber(this); loadLCD->setSegmentStyle(QLCDNumber::Filled);
     distanceLCD = new QLCDNumber(this); distanceLCD->setSegmentStyle(QLCDNumber::Filled);
+    distanceLCD->setNumDigits(9); // just to be same size as timers!
 
     avgpowerLCD = new QLCDNumber(this); avgpowerLCD->setSegmentStyle(QLCDNumber::Filled);
     avgheartrateLCD = new QLCDNumber(this); avgheartrateLCD->setSegmentStyle(QLCDNumber::Filled);
     avgspeedLCD = new QLCDNumber(this); avgspeedLCD->setSegmentStyle(QLCDNumber::Filled);
     avgcadenceLCD = new QLCDNumber(this); avgcadenceLCD->setSegmentStyle(QLCDNumber::Filled);
-    avgloadLCD = new QLCDNumber(this); avgloadLCD->setSegmentStyle(QLCDNumber::Filled);
+//    avgloadLCD = new QLCDNumber(this); avgloadLCD->setSegmentStyle(QLCDNumber::Filled);
 
     laptimeLCD = new QLCDNumber(this); laptimeLCD->setSegmentStyle(QLCDNumber::Filled);
     laptimeLCD->setNumDigits(9);
@@ -226,35 +152,34 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, TrainTool *trainTool, const Q
     gridLayout->addWidget(cadenceLabel, 1, 1);
     gridLayout->addWidget(heartrateLabel, 1, 2);
     gridLayout->addWidget(speedLabel, 1, 3);
-    gridLayout->addWidget(distanceLabel, 1, 4);
-    gridLayout->addWidget(lapLabel, 1, 5);
+    gridLayout->addWidget(lapLabel, 1, 4);
     gridLayout->addWidget(powerLCD, 2, 0);
     gridLayout->addWidget(cadenceLCD, 2, 1);
     gridLayout->addWidget(heartrateLCD, 2, 2);
     gridLayout->addWidget(speedLCD, 2, 3);
-    gridLayout->addWidget(distanceLCD, 2, 4);
-    gridLayout->addWidget(lapLCD, 2, 5);
+    gridLayout->addWidget(lapLCD, 2, 4);
     gridLayout->addWidget(avgpowerLabel, 3, 0);
     gridLayout->addWidget(avgcadenceLabel, 3, 1);
     gridLayout->addWidget(avgheartrateLabel, 3, 2);
     gridLayout->addWidget(avgspeedLabel, 3, 3);
-    gridLayout->addWidget(avgloadLabel, 3, 4);
-    gridLayout->addWidget(loadLabel, 3, 5);
-    gridLayout->addWidget(loadLCD, 4, 5);
+//  gridLayout->addWidget(avgloadLabel, 3, 4);
+    gridLayout->addWidget(loadLabel, 3, 4);
+    gridLayout->addWidget(loadLCD, 4, 4);
     gridLayout->addWidget(avgpowerLCD, 4, 0);
     gridLayout->addWidget(avgcadenceLCD, 4, 1);
     gridLayout->addWidget(avgheartrateLCD, 4, 2);
     gridLayout->addWidget(avgspeedLCD, 4, 3);
-    gridLayout->addWidget(avgloadLCD, 4, 4);
+//  gridLayout->addWidget(avgloadLCD, 4, 4);
     gridLayout->setRowStretch(2, 4);
     gridLayout->setRowStretch(4, 3);
 
     // timers etc
     timer_layout->addWidget(timeLabel, 0, 0);
-    timer_layout->addWidget(laptimeLabel, 0, 3);
+    timer_layout->addWidget(distanceLabel, 0, 1);
+    timer_layout->addWidget(laptimeLabel, 0, 2);
     timer_layout->addWidget(timeLCD, 1, 0);
-    timer_layout->addItem(controls_layout, 1,1);
-    timer_layout->addWidget(laptimeLCD, 1, 3);
+    timer_layout->addWidget(distanceLCD, 1, 1);
+    timer_layout->addWidget(laptimeLCD, 1, 2);
     timer_layout->setRowStretch(0, 1);
     timer_layout->setRowStretch(1, 4);
 
@@ -288,7 +213,6 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, TrainTool *trainTool, const Q
 
     recordFile = NULL;
     status = 0;
-    status |= RT_RECORDING;         // recording is on by default! - add others here
     status |= RT_MODE_ERGO;         // ergo mode by default
     displayWorkoutLap = displayLap = 0;
     pwrcount = 0;
@@ -306,14 +230,17 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, TrainTool *trainTool, const Q
     connect(stream_timer, SIGNAL(timeout()), this, SLOT(streamUpdate()));
     connect(load_timer, SIGNAL(timeout()), this, SLOT(loadUpdate()));
 
-    // setup the controller based upon currently selected device
-    setDeviceController();
+    configUpdate(); // apply current config
+
     rtPlot->replot();
 }
 
 void RealtimeWindow::setDeviceController()
 {
-    int deviceno = this->deviceSelector->currentIndex();
+    int deviceno = trainTool->selectedDeviceNumber();
+
+    if (deviceno == -1) // not selected, maybe they are spectating
+        return;
 
     // zap the current one
     if (deviceController != NULL) {
@@ -321,21 +248,25 @@ void RealtimeWindow::setDeviceController()
         deviceController = NULL;
     }
 
+
     if (Devices.count() > 0) {
         DeviceConfiguration temp = Devices.at(deviceno);
         if (Devices.at(deviceno).type == DEV_ANTPLUS) {
             deviceController = new ANTplusController(this, &temp);
         } else if (Devices.at(deviceno).type == DEV_CT) {
             deviceController = new ComputrainerController(this, &temp);
-        } else if (Devices.at(deviceno).type == DEV_GSERVER) {
-            deviceController = new SimpleNetworkController(this, &temp);
+        } else if (Devices.at(deviceno).type == DEV_NULL) {
+            deviceController = new NullController(this, &temp);
         }
     }
 }
 
+// open a connection to the GoldenServer via a GoldenClient
 void RealtimeWindow::setStreamController()
 {
-    int deviceno = streamSelector->itemData(streamSelector->currentIndex()).toInt();
+    int deviceno = trainTool->selectedServerNumber();
+
+    if (deviceno == -1) return;
 
     // zap the current one
     if (streamController != NULL) {
@@ -344,39 +275,58 @@ void RealtimeWindow::setStreamController()
     }
 
     if (Devices.count() > 0) {
-        DeviceConfiguration temp = Devices.at(deviceno);
-        if (Devices.at(deviceno).type == DEV_ANTPLUS) {
-            streamController = new ANTplusController(this, &temp);
-        } else if (Devices.at(deviceno).type == DEV_CT) {
-            streamController = new ComputrainerController(this, &temp);
-        } else if (Devices.at(deviceno).type == DEV_GSERVER) {
-            streamController = new SimpleNetworkController(this, &temp);
+        DeviceConfiguration config = Devices.at(deviceno);
+        streamController = new GoldenClient;
+
+        // connect
+        QStringList speclist = config.portSpec.split(":", QString::SkipEmptyParts);
+        bool rc = streamController->connect(speclist[0], // host
+                                  speclist[1].toInt(),   // port
+                                  "9cf638294030cea7b1590a4ca32e7f58", // raceid
+                                  appsettings->cvalue(main->cyclist, GC_NICKNAME).toString(), // name
+                                  FTP, // CP60
+                                  appsettings->cvalue(main->cyclist, GC_WEIGHT).toDouble()); // weight
+
+        // no connection
+        if (rc == false) {
+            streamController->closeAndExit();
+            streamController = NULL;
+            status &= ~RT_STREAMING;
+            QMessageBox msgBox;
+            msgBox.setText(QString(tr("Cannot Connect to Server %1 on port %2").arg(speclist[0]).arg(speclist[1])));
+            msgBox.setIcon(QMessageBox::Critical);
+            msgBox.exec();
         }
     }
 }
 
-void RealtimeWindow::SelectDevice(int index)
-{
-    if (index != -1)
-        setDeviceController();
-}
-
 void RealtimeWindow::Start()       // when start button is pressed
 {
+
     if (status&RT_RUNNING) {
         newLap();
     } else {
+
+        // open the controller if it is selected
+        setDeviceController();
+        if (deviceController == NULL) return;
+        else deviceController->start();          // start device
+
+        // we're away!
         status |=RT_RUNNING;
-        deviceController->start();          // start device
-        startButton->setText(tr("Lap/Interval"));
-        recordSelector->setEnabled(false);
-        streamSelector->setEnabled(false);
-        deviceSelector->setEnabled(false);
+
+        // should we be streaming too?
+        setStreamController();
+        if (streamController != NULL) status |= RT_STREAMING;
+
+        trainTool->setStartText(tr("Lap/Interval"));
+        //recordSelector->setEnabled(false);
 
         if (status & RT_WORKOUT) {
             load_timer->start(LOADRATE);      // start recording
         }
-        if (status & RT_RECORDING) {
+        if (trainTool->recordSelector->isChecked()) {
+            status |= RT_RECORDING;
 
             // setup file
             QDate date = QDate().currentDate();
@@ -404,11 +354,12 @@ void RealtimeWindow::Start()       // when start button is pressed
                 recordFileStream << "Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID,Altitude (m)\n";
                 disk_timer->start(SAMPLERATE);  // start screen
             }
+        } else {
+            status &= ~RT_RECORDING;
         }
 
         // stream
         if (status & RT_STREAMING) {
-            streamController->start();
             stream_timer->start(STREAMRATE);
         }
 
@@ -419,20 +370,22 @@ void RealtimeWindow::Start()       // when start button is pressed
 
 void RealtimeWindow::Pause()        // pause capture to recalibrate
 {
+    if (deviceController == NULL) return;
+
     // we're not running fool!
     if ((status&RT_RUNNING) == 0) return;
 
     if (status&RT_PAUSED) {
         status &=~RT_PAUSED;
         deviceController->restart();
-        pauseButton->setText(tr("Pause"));
+        trainTool->setPauseText(tr("Pause"));
         gui_timer->start(REFRESHRATE);
         if (status & RT_STREAMING) stream_timer->start(STREAMRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         if (status & RT_WORKOUT) load_timer->start(LOADRATE);
     } else {
         deviceController->pause();
-        pauseButton->setText(tr("Un-Pause"));
+        trainTool->setPauseText(tr("Un-Pause"));
         status |=RT_PAUSED;
         gui_timer->stop();
         if (status & RT_STREAMING) stream_timer->stop();
@@ -443,11 +396,18 @@ void RealtimeWindow::Pause()        // pause capture to recalibrate
 
 void RealtimeWindow::Stop(int deviceStatus)        // when stop button is pressed
 {
+    if (deviceController == NULL) return;
+
     if ((status&RT_RUNNING) == 0) return;
 
     status &= ~RT_RUNNING;
-    startButton->setText(tr("Start"));
+    trainTool->setStartText(tr("Start"));
+
+    // wipe connection
     deviceController->stop();
+    delete deviceController;
+    deviceController = NULL;
+
     gui_timer->stop();
 
     if (status & RT_RECORDING) {
@@ -470,7 +430,9 @@ void RealtimeWindow::Stop(int deviceStatus)        // when stop button is presse
 
     if (status & RT_STREAMING) {
         stream_timer->stop();
-        streamController->stop();
+        streamController->closeAndExit();
+        delete streamController;
+        streamController = NULL;
     }
 
     if (status & RT_WORKOUT) {
@@ -481,9 +443,7 @@ void RealtimeWindow::Stop(int deviceStatus)        // when stop button is presse
     }
 
     // Re-enable gui elements
-    recordSelector->setEnabled(true);
-    streamSelector->setEnabled(true);
-    deviceSelector->setEnabled(true);
+    //recordSelector->setEnabled(true);
 
     // reset counters etc
     pwrcount = 0;
@@ -521,6 +481,8 @@ void RealtimeWindow::updateData(RealtimeData &rtData)
 void RealtimeWindow::guiUpdate()           // refreshes the telemetry
 {
     RealtimeData rtData;
+
+    if (deviceController == NULL) return;
 
     // get latest telemetry from device (if it is a pull device e.g. Computrainer //
     if (status&RT_RUNNING && deviceController->doesPull() == true) {
@@ -578,15 +540,17 @@ void RealtimeWindow::guiUpdate()           // refreshes the telemetry
         spdcount++; if (spdcount ==1) avgSpeed = displaySpeed;
         avgSpeed = ((avgSpeed * (double)spdcount) + displaySpeed) /(double) (spdcount+1);
     }
+#if 0
     if (displayLoad && status&RT_MODE_ERGO) {
         lodcount++; if (lodcount ==1) avgLoad = displayLoad;
         avgLoad = ((avgLoad * (double)lodcount) + displayLoad) /(double) (lodcount+1);
         avgloadLCD->display((int)avgLoad);
     }
+#endif
     if (status&RT_MODE_SPIN) {
         grdcount++; if (grdcount ==1) avgGradient = displayGradient;
         avgGradient = ((avgGradient * (double)grdcount) + displayGradient) /(double) (grdcount+1);
-        avgloadLCD->display((int)avgGradient);
+        //avgloadLCD->display((int)avgGradient);
     }
 
     avgpowerLCD->display((int)avgPower);
@@ -647,7 +611,7 @@ void RealtimeWindow::warnnoConfig()
 //----------------------------------------------------------------------
 // STREAMING FUNCTION
 //----------------------------------------------------------------------
-void
+#if 0
 RealtimeWindow::SelectStream(int index)
 {
 
@@ -658,37 +622,41 @@ RealtimeWindow::SelectStream(int index)
         status &= ~RT_STREAMING;
     }
 }
+#endif
 
 void
 RealtimeWindow::streamUpdate()
 {
-    RealtimeData rtData;
-
-    // get current telemetry...
-    rtData.setWatts(displayPower);
-    rtData.setCadence(displayCadence);
-    rtData.setHr(displayHeartRate);
-    rtData.setSpeed(displaySpeed);
-    rtData.setLoad(displayLoad);
-    rtData.setTime(0);
-
     // send over the wire...
-    streamController->pushRealtimeData(rtData);
+    if (streamController) {
+
+        // send my data
+        streamController->sendTelemetry(displayPower,
+                                        displayCadence,
+                                        displayDistance,
+                                        displayHeartRate,
+                                        displaySpeed);
+
+        // get standings for everyone else
+        RaceStatus current = streamController->getStandings();
+
+        // send out to all the widgets...
+        trainTool->notifyRaceStandings(current);
+
+        // has the race finished?
+        if (current.race_finished == true) {
+            Stop(); // all over dude
+            QMessageBox msgBox;
+            msgBox.setText(tr("Race Over!"));
+            msgBox.setIcon(QMessageBox::Information);
+            msgBox.exec();
+        }
+    }
 }
 
 //----------------------------------------------------------------------
 // DISK UPDATE FUNCTIONS
 //----------------------------------------------------------------------
-void
-RealtimeWindow::SelectRecord()
-{
-    if (recordSelector->isChecked()) {
-        status |= RT_RECORDING;
-    } else {
-        status &= ~RT_RECORDING;
-    }
-}
-
 void RealtimeWindow::diskUpdate()
 {
     double  Minutes;
@@ -746,17 +714,13 @@ RealtimeWindow::SelectWorkout()
         ergPlot->setVisible(false);
     } else {
         // workout mode
-        boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-        QVariant workoutDir = settings->value(GC_WORKOUTDIR);
+        QVariant workoutDir = appsettings->value(this, GC_WORKOUTDIR);
         QString fileName = workoutDir.toString() + "/" + trainTool->currentWorkout()->text(0); // filename
 
         // Get users CP for relative watts calculations
         QDate today = QDate::currentDate();
-        double Cp=285;                       // default to 285 if zones are not set
-        int range = main->zones()->whichRange(today);
-        if (range != -1) Cp = main->zones()->getCP(range);
 
-        ergFile = new ErgFile(fileName, mode, Cp);
+        ergFile = new ErgFile(fileName, mode, FTP);
         if (ergFile->isValid()) {
 
             status |= RT_WORKOUT;
@@ -776,15 +740,15 @@ RealtimeWindow::SelectWorkout()
         status &= ~RT_MODE_SPIN;
         if (deviceController != NULL) deviceController->setMode(RT_MODE_ERGO);
         // set the labels on the gui
-        loadLabel->setText(tr("Load WATTS"));
-        avgloadLabel->setText(tr("Avg Load WATTS"));
+        loadLabel->setText("Load WATTS");
+        //avgloadLabel->setText("Avg Load WATTS");
     } else { // SLOPE MODE
         status |= RT_MODE_SPIN;
         status &= ~RT_MODE_ERGO;
         if (deviceController != NULL) deviceController->setMode(RT_MODE_SPIN);
         // set the labels on the gui
-        loadLabel->setText(tr("Gradient PERCENT"));
-        avgloadLabel->setText(tr("Avg Gradient PERCENT"));
+        loadLabel->setText("Gradient PERCENT");
+        //avgloadLabel->setText("Avg Gradient PERCENT");
     }
 }
 
@@ -793,6 +757,8 @@ void RealtimeWindow::loadUpdate()
     long load;
     double gradient;
     load_msecs += LOADRATE;
+
+    if (deviceController == NULL) return;
 
     if (status&RT_MODE_ERGO) {
         load = ergFile->wattsAt(load_msecs, displayWorkoutLap);
@@ -854,6 +820,8 @@ void RealtimeWindow::FFwdLap()
 // higher load/gradient
 void RealtimeWindow::Higher()
 {
+    if (deviceController == NULL) return;
+
     if (status&RT_MODE_ERGO) displayLoad += 5;
     else displayGradient += 0.1;
 
@@ -867,6 +835,8 @@ void RealtimeWindow::Higher()
 // higher load/gradient
 void RealtimeWindow::Lower()
 {
+    if (deviceController == NULL) return;
+
     if (status&RT_MODE_ERGO) displayLoad -= 5;
     else displayGradient -= 0.1;
 

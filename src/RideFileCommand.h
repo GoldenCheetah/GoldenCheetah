@@ -18,6 +18,7 @@
 
 #ifndef _RideFileCommand_h
 #define _RideFileCommand_h
+#include "GoldenCheetah.h"
 
 #include <QObject>
 #include <QDate>
@@ -37,6 +38,8 @@ class LUWCommand;
 class RideFileCommand : public QObject
 {
     Q_OBJECT
+    G_OBJECT
+
 
     friend class LUWCommand;
 

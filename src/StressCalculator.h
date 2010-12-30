@@ -2,6 +2,7 @@
 
 #ifndef _GC_StressCalculator_h
 #define _GC_StressCalculator_h 1
+#include "GoldenCheetah.h"
 
 
 /* STS = Short Term Stress.. default 7 days
@@ -20,6 +21,8 @@
 class StressCalculator:public QObject {
 
     Q_OBJECT
+    G_OBJECT
+
 
     private:
 	int days; // number of days to calculate stress for
@@ -50,7 +53,7 @@ class StressCalculator:public QObject {
 
     public:
 
-	StressCalculator(QDateTime startDate, QDateTime endDate,
+	StressCalculator(QString cyclist, QDateTime startDate, QDateTime endDate,
 		double initialSTS, double initialLTS,
 		int shortTermDays, int longTermDays);
 

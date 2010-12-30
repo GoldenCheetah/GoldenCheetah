@@ -18,6 +18,7 @@
 
 #ifndef _GC_COMPUTRAINER3DP_H
 #define _GC_COMPUTRAINER3DP_H
+#include "GoldenCheetah.h"
 
 #include "RideFile.h"
 

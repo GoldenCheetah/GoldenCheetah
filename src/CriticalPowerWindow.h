@@ -18,6 +18,7 @@
 
 #ifndef _GC_CriticalPowerWindow_h
 #define _GC_CriticalPowerWindow_h 1
+#include "GoldenCheetah.h"
 
 #include <QtGui>
 #include "Season.h"
@@ -27,9 +28,14 @@ class MainWindow;
 class RideItem;
 class QwtPlotPicker;
 
-class CriticalPowerWindow : public QWidget
+class CriticalPowerWindow : public GcWindow
 {
     Q_OBJECT
+    G_OBJECT
+
+    // properties can be saved/restored/set by the layout manager
+    Q_PROPERTY(int season READ season WRITE setSeason USER true)
+    Q_PROPERTY(int mode READ mode WRITE setMode USER true)
 
     public:
 
@@ -37,6 +43,12 @@ class CriticalPowerWindow : public QWidget
 
         void newRideAdded();
         void deleteCpiFile(QString filename);
+
+        // set/get properties
+        int season() const { return cComboSeason->currentIndex(); }
+        void setSeason(int x) { cComboSeason->setCurrentIndex(x); }
+        int mode() const { return yAxisCombo->currentIndex(); }
+        void setMode(int x) { yAxisCombo->setCurrentIndex(x); }
 
     protected slots:
 
@@ -56,7 +68,8 @@ class CriticalPowerWindow : public QWidget
         QLineEdit *cpintAllValue;
         QLineEdit *cpintCPValue;
         QComboBox *cComboSeason;
-	QPushButton *cpintSetCPButton;
+        QComboBox *yAxisCombo;
+        QPushButton *cpintSetCPButton;
         QwtPlotPicker *picker;
         void addSeasons();
         QList<Season> seasons;

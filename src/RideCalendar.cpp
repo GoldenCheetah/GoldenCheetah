@@ -52,8 +52,10 @@ RideCalendar::configUpdate()
         }
     }
 
-    // force a repaint
-    setSelectedDate(selectedDate());
+    // force a repaint -- NASTY HACK TO WORKAROUND BUG
+    QAbstractItemView *view = qFindChild<QAbstractItemView*>(this);
+    if (view) view->viewport()->update();
+    else update(); // fallback
 }
 
 struct RideIter
@@ -99,8 +101,7 @@ void RideCalendar::paintCell(QPainter *painter, const QRect &rect, const QDate &
     RideIter begin(mainWindow, 0);
     RideIter end(mainWindow, mainWindow->allRideItems()->childCount());
 
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    bool ascending = settings->value(GC_ALLRIDES_ASCENDING, Qt::Checked).toInt() > 0;
+    bool ascending = appsettings->value(this, GC_ALLRIDES_ASCENDING, Qt::Checked).toInt() > 0;
     RideIter i;
     if (ascending) {
         RideItemDateLessThan comp;

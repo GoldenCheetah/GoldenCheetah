@@ -21,7 +21,10 @@
 #include "MainWindow.h"
 #include "RideItem.h"
 #include "RideMetric.h"
+#include "SummaryMetrics.h"
+#include "MetricAggregator.h"
 #include "Zones.h"
+#include "Units.h" // for MILES_PER_KM
 #include <QtGui>
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
@@ -30,9 +33,12 @@
 
 WeeklySummaryWindow::WeeklySummaryWindow(bool useMetricUnits,
                                          MainWindow *mainWindow) :
-    QWidget(mainWindow), mainWindow(mainWindow),
+    GcWindow(mainWindow), mainWindow(mainWindow),
     useMetricUnits(useMetricUnits)
 {
+    setInstanceName("Weekly Summary Window");
+    setControls(NULL);
+
     QGridLayout *glayout = new QGridLayout;
 
     // set up the weekly distance / duration plot:
@@ -129,138 +135,129 @@ WeeklySummaryWindow::WeeklySummaryWindow(bool useMetricUnits,
 
     setLayout(glayout);
 
-    connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(refresh()));
+    //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(refresh()));
+    connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(refresh()));
     connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(refresh()));
 }
 
 void
 WeeklySummaryWindow::refresh()
 {
-    if (mainWindow->activeTab() != this)
-        return;
-    const RideItem *ride = mainWindow->rideItem();
-    if (!ride)
-        return;
+    // not active, or null ride item then do nothing
+    if (!amVisible()) return;
+    const RideItem *ride = myRideItem;
+    if (!ride) return;
+
+    // work through the rides
     const QTreeWidgetItem *allRides = mainWindow->allRideItems();
-    const Zones *zones = mainWindow->zones();
+
+    // start / end of week
     QDate wstart = ride->dateTime.date();
     wstart = wstart.addDays(Qt::Monday - wstart.dayOfWeek());
     assert(wstart.dayOfWeek() == Qt::Monday);
     QDate wend = wstart.addDays(7);
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-    QSharedPointer<RideMetric> weeklySeconds(factory.newMetric("time_riding"));
-    assert(weeklySeconds);
-    QSharedPointer<RideMetric> weeklyDistance(factory.newMetric("total_distance"));
-    assert(weeklyDistance);
-    QSharedPointer<RideMetric> weeklyWork(factory.newMetric("total_work"));
-    assert(weeklyWork);
-    QSharedPointer<RideMetric> weeklyBS(factory.newMetric("skiba_bike_score"));
-    assert(weeklyBS);
-    QSharedPointer<RideMetric> weeklyRelIntensity(factory.newMetric("skiba_relative_intensity"));
-    assert(weeklyRelIntensity);
-    QSharedPointer<RideMetric> weeklyCS(factory.newMetric("daniels_points"));
-    assert(weeklyCS);
 
-    QSharedPointer<RideMetric> dailySeconds[7];
-    QSharedPointer<RideMetric> dailyDistance[7];
-    QSharedPointer<RideMetric> dailyBS[7];
-    QSharedPointer<RideMetric> dailyRI[7];
-    QSharedPointer<RideMetric> dailyW[7];
-    QSharedPointer<RideMetric> dailyXP[7];
+    // weekly values
+    QVector<double> time_in_zone; // max 10 zones supported
 
-    for (int i = 0; i < 7; i++) {
-	dailySeconds[i] = QSharedPointer<RideMetric>(factory.newMetric("time_riding"));
-	assert(dailySeconds[i]);
-	dailyDistance[i] = QSharedPointer<RideMetric>(factory.newMetric("total_distance"));
-	assert(dailyDistance[i]);
-	dailyBS[i] = QSharedPointer<RideMetric>(factory.newMetric("skiba_bike_score"));
-	assert(dailyBS[i]);
-	dailyRI[i] = QSharedPointer<RideMetric>(factory.newMetric("skiba_relative_intensity"));
-	assert(dailyRI[i]);
-	dailyW[i] = QSharedPointer<RideMetric>(factory.newMetric("total_work"));
-	assert(dailyW[i]);
-	dailyXP[i] = QSharedPointer<RideMetric>(factory.newMetric("skiba_xpower"));
-	assert(dailyXP[i]);
-    }
+    double weeklyRides=0;
+    double weeklySeconds=0;
+    double weeklyDistance=0;
+    double weeklyW=0;
+    double weeklyBS=0;
+    double weeklyCS=0;
+    double weeklyRI=0;
 
-    int zone_range = -1;
-    QVector<double> time_in_zone;
+    // daily values
+    double dailyRides[7];
+    double dailySeconds[7];
+    double dailyDistance[7];
+    double dailyW[7];
+    double dailyBS[7];
+    double dailyXP[7];
+    double dailyRI[7];
+
+    // init daily values to zero
+    for(int i=0; i<7; i++)
+        dailyRides[i] =
+        dailySeconds[i] =
+        dailyDistance[i] =
+        dailyW[i] =
+        dailyBS[i] =
+        dailyXP[i] =
+        dailyRI[i] = 0;
+
+    // how many zones did we see?
     int num_zones = -1;
-    bool zones_ok = true;
+    int zone_range = -1;
 
     for (int i = 0; i < allRides->childCount(); ++i) {
-	RideItem *item = (RideItem*) allRides->child(i);
+
+	QTreeWidgetItem *twi = allRides->child(i);
+        RideItem *item = static_cast<RideItem*>(twi);
+
 	int day;
-        if (
-	    (item->type() == RIDE_TYPE) &&
-	    ((day = wstart.daysTo(item->dateTime.date())) >= 0) &&
-	    (day < 7)
-	    ) {
 
-            item->computeMetrics(); // generates item->ride
-            if (!item->ride())
-                continue;
+        if (((day = wstart.daysTo(item->dateTime.date())) >= 0) && (day < 7)) {
 
-	    RideMetricPtr m;
-	    if ((m = item->metrics.value(weeklySeconds->symbol()))) {
-		weeklySeconds->aggregateWith(*m);
-		dailySeconds[day]->aggregateWith(*m);
-	    }
+            // one more ride for this day
+            dailyRides[day]++;
+            weeklyRides++;
 
-	    if ((m = item->metrics.value(weeklyDistance->symbol()))) {
-		weeklyDistance->aggregateWith(*m);
-		dailyDistance[day]->aggregateWith(*m);
-	    }
+            // get metrics from metricDB (always in metric units)
+            SummaryMetrics metrics = mainWindow->metricDB->getRideMetrics(item->fileName);
 
-	    if ((m = item->metrics.value(weeklyWork->symbol()))) {
-		weeklyWork->aggregateWith(*m);
-		dailyW[day]->aggregateWith(*m);
-	    }
+            // increment daily values
+            dailySeconds[day] += metrics.getForSymbol("time_riding");
+            dailyDistance[day] += metrics.getForSymbol("total_distance") * (useMetricUnits ? 1 : MILES_PER_KM);
+            dailyW[day] += metrics.getForSymbol("total_work");
+            dailyBS[day] += metrics.getForSymbol("skiba_bike_score");
+            dailyXP[day] += metrics.getForSymbol("skiba_power");
 
-            if ((m = item->metrics.value(weeklyCS->symbol())))
-                weeklyCS->aggregateWith(*m);
+            // average RI for the day
+            if (dailyRides[day] > 1)
+                dailyRI[day] = ((dailyRI[day] * (dailyRides[i]-1))
+                                + metrics.getForSymbol("skiba_relative_intensity")) / dailyRides[day];
+            else
+                dailyRI[day] = metrics.getForSymbol("skiba_relative_intensity");
 
-        if ((m = item->metrics.value(weeklyBS->symbol()))) {
-		weeklyBS->aggregateWith(*m);
-		dailyBS[day]->aggregateWith(*m);
-	    }
+            // increment weekly values
+            weeklySeconds += metrics.getForSymbol("time_riding");
+            weeklyDistance += metrics.getForSymbol("total_distance") * (useMetricUnits ? 1 : MILES_PER_KM);
+            weeklyCS += metrics.getForSymbol("daniels_points");
+            weeklyW += metrics.getForSymbol("total_work");
+            weeklyBS += metrics.getForSymbol("skiba_bike_score");
 
-	    if ((m = item->metrics.value(weeklyRelIntensity->symbol()))) {
-		weeklyRelIntensity->aggregateWith(*m);
-		dailyRI[day]->aggregateWith(*m);
-	    }
+            // average RI for the week
+            if (weeklyRides > 1)
+                weeklyRI = ((weeklyRI * (weeklyRides-1))
+                                + metrics.getForSymbol("skiba_relative_intensity")) / weeklyRides;
+            else
+                weeklyRI = metrics.getForSymbol("skiba_relative_intensity");
 
-	    if ((m = item->metrics.value("skiba_xpower")))
-		dailyXP[day]->aggregateWith(*m);
+            // compute time in zones
+            if (num_zones < item->numZones()) {
+                num_zones = item->numZones();
+                time_in_zone.resize(num_zones);
+            }
+            zone_range = item->zoneRange();
 
-	    // compute time in zones
-	    if (zones) {
-		if (zone_range == -1) {
-		    zone_range = item->zoneRange();
-		    num_zones = item->numZones();
-                    time_in_zone.clear();
-                    time_in_zone.resize(num_zones);
-		}
-		else if (item->zoneRange() != zone_range) {
-		    zones_ok = false;
-		}
-		if (zone_range != -1) {
-		    for (int j = 0; j < num_zones; ++j)
-			time_in_zone[j] += item->timeInZone(j);
-		}
+            for (int j=0; j<item->numZones(); j++) {
+                QString symbol = QString("time_in_zone_L%1").arg(j+1);
+                time_in_zone[j] += metrics.getForSymbol(symbol);
 	    }
         }
     }
 
-    int seconds = ((int) round(weeklySeconds->value(true)));
+    // break duration into hours, mins and seconds
+    int seconds = round(weeklySeconds);
     int minutes = seconds / 60;
     seconds %= 60;
     int hours = minutes / 60;
     minutes %= 60;
 
     QString summary;
-    summary =
-	tr(
+    summary = tr(
 	   "<center>"
 	   "<h2>Week of %1 through %2</h2>"
 	   "<h2>Summary</h2>"
@@ -273,46 +270,33 @@ WeeklySummaryWindow::refresh()
 	   "<tr><td>Total work (kJ):</td>"
 	   "    <td align=\"right\">%8</td></tr>"
 	   "<tr><td>Daily Average work (kJ):</td>"
-	   "    <td align=\"right\">%9</td></tr>"
-	   )
+	   "    <td align=\"right\">%9</td></tr>")
 	.arg(wstart.toString(tr("MM/dd/yyyy")))
 	.arg(wstart.addDays(6).toString(tr("MM/dd/yyyy")))
 	.arg(hours)
 	.arg(minutes, 2, 10, QLatin1Char('0'))
 	.arg(seconds, 2, 10, QLatin1Char('0'))
 	.arg(useMetricUnits ? "km" : "miles")
-	.arg(weeklyDistance->value(useMetricUnits), 0, 'f', 1)
-	.arg((unsigned) round(weeklyWork->value(useMetricUnits)))
-	.arg((unsigned) round(weeklyWork->value(useMetricUnits) / 7));
+	.arg(weeklyDistance, 0, 'f', 1)
+	.arg((unsigned) round(weeklyW))
+	.arg((unsigned) round(weeklyW/ 7));
 
-    double weeklyBSValue = weeklyBS->value(useMetricUnits);
-    bool useBikeScore = (zone_range != -1) && (weeklyBSValue > 0);
+    bool useBikeScore = (weeklyBS > 0);
 
-    if (zone_range != -1) {
+    if (num_zones != -1) {
 	if (useBikeScore)
-	    summary +=
-		tr(
-		   "<tr><td>Total BikeScore:</td>"
+	    summary += tr("<tr><td>Total BikeScore:</td>"
 		   "    <td align=\"right\">%1</td></tr>"
 		   "<tr><td>Total Daniels Points:</td>"
 		   "    <td align=\"right\">%2</td></tr>"
 		   "<tr><td>Net Relative Intensity:</td>"
-		   "    <td align=\"right\">%3</td></tr>"
-		   )
-		.arg((unsigned) round(weeklyBSValue))
-                .arg(weeklyCS->value(useMetricUnits), 0, 'f', 1)
-		.arg(weeklyRelIntensity->value(useMetricUnits), 0, 'f', 3);
+		   "    <td align=\"right\">%3</td></tr>")
+		.arg((unsigned) round(weeklyBS))
+                .arg(weeklyCS, 0, 'f', 1)
+		.arg(weeklyRI, 0, 'f', 3);
 
-        summary +=
-	    tr(
-	       "</table>"
-	       "<h2>Power Zones</h2>"
-	       );
-        if (!zones_ok)
-            summary += "Error: Week spans more than one zone range.";
-        else {
-            summary += zones->summarize(zone_range, time_in_zone);
-        }
+        summary += tr( "</table>" "<h2>Power Zones</h2>");
+        summary += mainWindow->zones()->summarize(zone_range, time_in_zone);
     }
 
     summary += "</center>";
@@ -381,10 +365,10 @@ WeeklySummaryWindow::refresh()
         xriorxp[i]       = x;
 	xriorxp[i + 1]   = x += bar_width;
 
-	ydist[i]         = dailyDistance[day]->value(useMetricUnits);
-	ydur[i]          = dailySeconds[day]->value(useMetricUnits) / 60;
-	ybsorw[i]        = useBikeScore ? dailyBS[day]->value(useMetricUnits) : dailyW[day]->value(useMetricUnits) / 1000;
-	yriorxp[i]       = useBikeScore ? dailyRI[day]->value(useMetricUnits) : dailyXP[day]->value(useMetricUnits);
+	ydist[i]         = dailyDistance[day];
+	ydur[i]          = dailySeconds[day] / 60;
+	ybsorw[i]        = useBikeScore ? dailyBS[day] : dailyW[day] / 1000;
+	yriorxp[i]       = useBikeScore ? dailyRI[day] : dailyXP[day];
 
 	i++;
 	ydist[i] = 0;
@@ -441,4 +425,3 @@ WeeklySummaryWindow::refresh()
 
     weeklySummary->setHtml(summary);
 }
-

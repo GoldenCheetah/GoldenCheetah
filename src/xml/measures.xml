@@ -1,0 +1,36 @@
+<metadata>
+	<keywords>
+	</keywords>
+	<fields>
+		<field>
+			<fieldtab>"Athlete"</fieldtab>
+			<fieldname>"Weight"</fieldname>
+			<fieldtype>4</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Athlete"</fieldtab>
+			<fieldname>"Lean Mass"</fieldname>
+			<fieldtype>4</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Athlete"</fieldtab>
+			<fieldname>"Fat Mass"</fieldname>
+			<fieldtype>4</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Athlete"</fieldtab>
+			<fieldname>"Fat Ratio"</fieldname>
+			<fieldtype>4</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Athlete"</fieldtab>
+			<fieldname>"Height"</fieldname>
+			<fieldtype>4</fieldtype>
+		</field>
+		<field>
+			<fieldtab>"Athlete"</fieldtab>
+			<fieldname>"BMI"</fieldname>
+			<fieldtype>4</fieldtype>
+		</field>
+	</fields>
+</metadata>

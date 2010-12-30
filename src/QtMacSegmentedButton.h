@@ -1,0 +1,75 @@
+/*
+ * Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#include <QMacCocoaViewContainer>
+
+//----------------------------------------------------------------------
+// Cocoa / OBJC helpers etc
+//
+// this is a utility -- since this source file
+// is included in C++ and Objective-C code the
+// declaration of native components is referenced
+// directly or just as a void *
+//----------------------------------------------------------------------
+
+class CocoaInitializer
+{
+    public:
+        CocoaInitializer();
+        ~CocoaInitializer();
+
+    private:
+        class Private;
+        Private* d;
+};
+
+#ifdef __OBJC__
+# define ADD_COCOA_NATIVE_REF(CocoaClass) \
+    @class CocoaClass; \
+    typedef CocoaClass *Native##CocoaClass##Ref
+#else /* __OBJC__ */
+# define ADD_COCOA_NATIVE_REF(CocoaClass) typedef void *Native##CocoaClass##Ref
+#endif /* __OBJC__ */
+
+// The above is merely to do the following, but
+// we may add more native widgets in the future
+ADD_COCOA_NATIVE_REF (NSSegmentedControl);
+
+// The native Cocoa segmented button is held within
+// a QMacCocoaView container.
+class QtMacSegmentedButton : public QMacCocoaViewContainer
+{
+    Q_OBJECT;
+
+public:
+    QtMacSegmentedButton (int aCount, QWidget *aParent = 0);
+    QSize sizeHint() const;
+
+    void setTitle (int aSegment, const QString &aTitle);
+    void setToolTip (int aSegment, const QString &aTip);
+    void setEnabled (int aSegment, bool fEnabled);
+    void animateClick (int aSegment);
+    void onClicked (int aSegment);
+
+signals:
+    void clicked (int aSegment, bool aChecked = false);
+
+private:
+    /* Private member vars */
+    NativeNSSegmentedControlRef mNativeRef;
+};

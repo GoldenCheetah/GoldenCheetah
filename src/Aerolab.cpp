@@ -55,8 +55,7 @@ Aerolab::Aerolab(QWidget *parent):
   eta       = 1.0;
   eoffset   = 0.0;
 
-  boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-  unit = settings->value(GC_UNIT);
+  unit = appsettings->value(this, GC_UNIT);
   useMetricUnits = true;
 
   insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
@@ -85,10 +84,10 @@ Aerolab::configChanged()
   // set colors
   setCanvasBackground(GColor(CPLOTBACKGROUND));
   QPen vePen = QPen(GColor(CAEROVE));
-  vePen.setWidth(1);
+  vePen.setWidth(appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble());
   veCurve->setPen(vePen);
   QPen altPen = QPen(GColor(CAEROEL));
-  altPen.setWidth(1);
+  altPen.setWidth(appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble());
   altCurve->setPen(altPen);
   QPen gridPen(GColor(CPLOTGRID));
   gridPen.setStyle(Qt::DotLine);
@@ -207,6 +206,20 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
     setTitle("no data");
 
   }
+}
+
+void
+Aerolab::setAxisTitle(int axis, QString label)
+{
+    // setup the default fonts
+    QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
+    stGiles.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+    stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+
+    QwtText title(label);
+    title.setFont(stGiles);
+    QwtPlot::setAxisFont(axis, stGiles);
+    QwtPlot::setAxisTitle(axis, title);
 }
 
 struct DataPoint {

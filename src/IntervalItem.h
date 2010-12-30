@@ -18,6 +18,7 @@
 
 #ifndef _GC_IntervalItem_h
 #define _GC_IntervalItem_h 1
+#include "GoldenCheetah.h"
 
 #include <QtGui>
 

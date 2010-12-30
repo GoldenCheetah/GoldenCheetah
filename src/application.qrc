@@ -1,5 +1,14 @@
 <!DOCTYPE RCC><RCC version="1.0">
  <qresource>
+    <file>images/toolbar/main/tick.png</file>
+    <file>images/toolbar/main/analysis.png</file>
+    <file>images/toolbar/main/athlete.png</file>
+    <file>images/toolbar/main/config.png</file>
+    <file>images/toolbar/main/diary.png</file>
+    <file>images/toolbar/main/help.png</file>
+    <file>images/toolbar/main/home.png</file>
+    <file>images/toolbar/main/measures.png</file>
+    <file>images/toolbar/main/train.png</file>
     <file>images/twitter.png</file>
     <file>images/cyclist.png</file>
     <file>images/imetrics.png</file>
@@ -7,8 +16,9 @@
     <file>images/arduino.png</file>
     <file>images/query.png</file>
     <file>images/update.png</file>
-    <file>images/gc.png</file> 
+    <file>images/gc.png</file>
     <file>images/config.png</file>
+    <file>images/cheetah.png</file>
     <file>images/noavatar.png</file>
     <file>translations/gc_fr.qm</file>
     <file>translations/gc_ja.qm</file>
@@ -17,6 +27,8 @@
     <file>translations/gc_de.qm</file>
     <file>xml/charts.xml</file>
     <file>xml/metadata.xml</file>
+    <file>xml/measures.xml</file>
+    <file>html/ltm-summary.html</file>
     <file>images/toolbar/close-icon.png</file>
     <file>images/toolbar/save.png</file>
     <file>images/toolbar/search.png</file>
@@ -26,5 +38,10 @@
     <file>images/toolbar/paste.png</file>
     <file>images/toolbar/undo.png</file>
     <file>images/toolbar/redo.png</file>
+    <file>images/toolbar/back_alt.png</file>
+    <file>images/toolbar/forward_alt.png</file>
+    <file>images/toolbar/popbutton.png</file>
+    <file>images/toolbar/flipbutton.png</file>
+    <file>images/splashscreen.png</file>
  </qresource>
 </RCC>

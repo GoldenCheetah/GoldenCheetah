@@ -187,7 +187,7 @@ public:
     HrHistBackground(PowerHist *_parent)
     {
         setZ(0.0);
-    parent = _parent;
+	parent = _parent;
     }
 
     virtual int rtti() const
@@ -196,39 +196,39 @@ public:
     }
 
     virtual void draw(QPainter *painter,
-              const QwtScaleMap &xMap, const QwtScaleMap &,
-              const QRect &rect) const
+		      const QwtScaleMap &xMap, const QwtScaleMap &,
+		      const QRect &rect) const
     {
-    RideItem *rideItem = parent->rideItem;
+	RideItem *rideItem = parent->rideItem;
 
-    if (! rideItem)
-        return;
+	if (! rideItem)
+	    return;
 
-    const HrZones *zones       = parent->mainWindow->hrZones();
-    int zone_range     = rideItem->hrZoneRange();
+	const HrZones *zones       = parent->mainWindow->hrZones();
+	int zone_range     = rideItem->hrZoneRange();
 
-    if (parent->shadeHRZones() && (zone_range >= 0)) {
-        QList <int> zone_lows = zones->getZoneLows(zone_range);
-        int num_zones = zone_lows.size();
-        if (num_zones > 0) {
-        for (int z = 0; z < num_zones; z ++) {
-            QRect r = rect;
+	if (parent->shadeHRZones() && (zone_range >= 0)) {
+	    QList <int> zone_lows = zones->getZoneLows(zone_range);
+	    int num_zones = zone_lows.size();
+	    if (num_zones > 0) {
+		for (int z = 0; z < num_zones; z ++) {
+		    QRect r = rect;
 
-            QColor shading_color =
-            hrZoneColor(z, num_zones);
-            shading_color.setHsv(
-                     shading_color.hue(),
-                     shading_color.saturation() / 4,
-                     shading_color.value()
-                     );
-            r.setLeft(xMap.transform(zone_lows[z]));
-            if (z + 1 < num_zones)
-            r.setRight(xMap.transform(zone_lows[z + 1]));
-            if (r.right() >= r.left())
-            painter->fillRect(r, shading_color);
-        }
-        }
-    }
+		    QColor shading_color =
+			hrZoneColor(z, num_zones);
+		    shading_color.setHsv(
+					 shading_color.hue(),
+					 shading_color.saturation() / 4,
+					 shading_color.value()
+					 );
+		    r.setLeft(xMap.transform(zone_lows[z]));
+		    if (z + 1 < num_zones)
+			r.setRight(xMap.transform(zone_lows[z + 1]));
+		    if (r.right() >= r.left())
+			painter->fillRect(r, shading_color);
+		}
+	    }
+	}
     }
 };
 
@@ -246,44 +246,44 @@ private:
 public:
     HrHistZoneLabel(PowerHist *_parent, int _zone_number)
     {
-    parent = _parent;
-    zone_number = _zone_number;
+	parent = _parent;
+	zone_number = _zone_number;
 
-    RideItem *rideItem = parent->rideItem;
+	RideItem *rideItem = parent->rideItem;
 
-    if (! rideItem)
-        return;
+	if (! rideItem)
+	    return;
 
-    const HrZones *zones       = parent->mainWindow->hrZones();
-    int zone_range     = rideItem->hrZoneRange();
+	const HrZones *zones       = parent->mainWindow->hrZones();
+	int zone_range     = rideItem->hrZoneRange();
 
-    setZ(1.0 + zone_number / 100.0);
+	setZ(1.0 + zone_number / 100.0);
 
-    // create new zone labels if we're shading
-    if (parent->shadeHRZones() && (zone_range >= 0)) {
-        QList <int> zone_lows = zones->getZoneLows(zone_range);
-        QList <QString> zone_names = zones->getZoneNames(zone_range);
-        int num_zones = zone_lows.size();
-        assert(zone_names.size() == num_zones);
-        if (zone_number < num_zones) {
-        watts =
-            (
-             (zone_number + 1 < num_zones) ?
-             0.5 * (zone_lows[zone_number] + zone_lows[zone_number + 1]) :
-             (
-              (zone_number > 0) ?
-              (1.5 * zone_lows[zone_number] - 0.5 * zone_lows[zone_number - 1]) :
-              2.0 * zone_lows[zone_number]
-              )
-             );
+	// create new zone labels if we're shading
+	if (parent->shadeHRZones() && (zone_range >= 0)) {
+	    QList <int> zone_lows = zones->getZoneLows(zone_range);
+	    QList <QString> zone_names = zones->getZoneNames(zone_range);
+	    int num_zones = zone_lows.size();
+	    assert(zone_names.size() == num_zones);
+	    if (zone_number < num_zones) {
+		watts =
+		    (
+		     (zone_number + 1 < num_zones) ?
+		     0.5 * (zone_lows[zone_number] + zone_lows[zone_number + 1]) :
+		     (
+		      (zone_number > 0) ?
+		      (1.5 * zone_lows[zone_number] - 0.5 * zone_lows[zone_number - 1]) :
+		      2.0 * zone_lows[zone_number]
+		      )
+		     );
 
-        text = QwtText(zone_names[zone_number]);
-        text.setFont(QFont("Helvetica",24, QFont::Bold));
-        QColor text_color = hrZoneColor(zone_number, num_zones);
-        text_color.setAlpha(64);
-        text.setColor(text_color);
-        }
-    }
+		text = QwtText(zone_names[zone_number]);
+		text.setFont(QFont("Helvetica",24, QFont::Bold));
+		QColor text_color = hrZoneColor(zone_number, num_zones);
+		text_color.setAlpha(64);
+		text.setColor(text_color);
+	    }
+	}
 
     }
 
@@ -293,19 +293,19 @@ public:
     }
 
     void draw(QPainter *painter,
-          const QwtScaleMap &xMap, const QwtScaleMap &,
-          const QRect &rect) const
+	      const QwtScaleMap &xMap, const QwtScaleMap &,
+	      const QRect &rect) const
     {
-    if (parent->shadeHRZones()) {
-        int x = xMap.transform(watts);
-        int y = (rect.bottom() + rect.top()) / 2;
+	if (parent->shadeHRZones()) {
+	    int x = xMap.transform(watts);
+	    int y = (rect.bottom() + rect.top()) / 2;
 
-        // the following code based on source for QwtPlotMarker::draw()
-        QRect tr(QPoint(0, 0), text.textSize(painter->font()));
-        tr.moveCenter(QPoint(y, -x));
-        painter->rotate(90);             // rotate text to avoid overlap: this needs to be fixed
-        text.draw(painter, tr);
-    }
+	    // the following code based on source for QwtPlotMarker::draw()
+	    QRect tr(QPoint(0, 0), text.textSize(painter->font()));
+	    tr.moveCenter(QPoint(y, -x));
+	    painter->rotate(90);             // rotate text to avoid overlap: this needs to be fixed
+	    text.draw(painter, tr);
+	}
     }
 };
 
@@ -320,17 +320,20 @@ PowerHist::PowerHist(MainWindow *mainWindow):
     absolutetime(true)
 {
 
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    unit = settings->value(GC_UNIT);
+    unit = appsettings->value(this, GC_UNIT);
 
     useMetricUnits = (unit.toString() == "Metric");
 
-    binw = settings->value(GC_HIST_BIN_WIDTH, 5).toInt();
-    shade = true;
+    binw = appsettings->value(this, GC_HIST_BIN_WIDTH, 5).toInt();
+    if (appsettings->value(this, GC_SHADEZONES, true).toBool() == true)
+        shade = true;
+    else
+        shade = false;
 
     // create a background object for shading
     bg = new PowerHistBackground(this);
     bg->attach(this);
+
     hrbg = new HrHistBackground(this);
     hrbg->attach(this);
 
@@ -398,9 +401,11 @@ PowerHist::configChanged()
         break;
     }
 
-    double width = 2.0;
-    curve->setRenderHint(QwtPlotItem::RenderAntialiased);
-    curveSelected->setRenderHint(QwtPlotItem::RenderAntialiased);
+    double width = appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble();
+    if (appsettings->value(this, GC_ANTIALIAS, false).toBool()==true) {
+        curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        curveSelected->setRenderHint(QwtPlotItem::RenderAntialiased);
+    }
     pen.setWidth(width);
     curve->setPen(pen);
     brush_color.setAlpha(64);
@@ -481,31 +486,31 @@ PowerHist::refreshHRZoneLabels()
 {
     // delete any existing power zone labels
     if (hrzoneLabels.size()) {
-    QListIterator<HrHistZoneLabel *> i(hrzoneLabels);
-    while (i.hasNext()) {
-        HrHistZoneLabel *label = i.next();
-        label->detach();
-        delete label;
-    }
+	QListIterator<HrHistZoneLabel *> i(hrzoneLabels);
+	while (i.hasNext()) {
+	    HrHistZoneLabel *label = i.next();
+	    label->detach();
+	    delete label;
+	}
     }
     hrzoneLabels.clear();
 
     if (! rideItem)
-    return;
+	return;
 
     if (selected == hr) {
-    const HrZones *zones       = mainWindow->hrZones();
-    int zone_range     = rideItem->hrZoneRange();
+	const HrZones *zones       = mainWindow->hrZones();
+	int zone_range     = rideItem->hrZoneRange();
 
         // generate labels for existing zones
-    if (zone_range >= 0) {
-        int num_zones = zones->numZones(zone_range);
-        for (int z = 0; z < num_zones; z ++) {
-        HrHistZoneLabel *label = new HrHistZoneLabel(this, z);
-        label->attach(this);
-        hrzoneLabels.append(label);
-        }
-    }
+	if (zone_range >= 0) {
+	    int num_zones = zones->numZones(zone_range);
+	    for (int z = 0; z < num_zones; z ++) {
+		HrHistZoneLabel *label = new HrHistZoneLabel(this, z);
+		label->attach(this);
+		hrzoneLabels.append(label);
+	    }
+	}
     }
 }
 
@@ -517,9 +522,26 @@ PowerHist::recalc()
     int arrayLength = 0;
     double delta;
 
+    if (!rideItem) return;
+
     // make sure the interval length is set
-    if (dt <= 0)
-	return;
+    if (dt <= 0) return;
+
+    // if there is no data empty curve
+    if (((selected == watts && rideItem->ride()->areDataPresent()->watts) ||
+                   (selected == nm && rideItem->ride()->areDataPresent()->nm) ||
+                   (selected == kph && rideItem->ride()->areDataPresent()->kph) ||
+                   (selected == cad && rideItem->ride()->areDataPresent()->cad) ||
+                   (selected == hr && rideItem->ride()->areDataPresent()->hr) ||
+                   (selected == wattsZone && rideItem->ride()->areDataPresent()->watts) ||
+                   (selected == hrZone && rideItem->ride()->areDataPresent()->hr)) == false) {
+
+        const double zero = 0;
+        curve->setData(&zero, &zero, 0);
+        curveSelected->setData(&zero, &zero, 0);
+        replot();
+        return;
+    }
 
     if (selected == watts) {
 	array = &wattsArray;
@@ -611,6 +633,7 @@ PowerHist::recalc()
         // make see through if we're shading zones
         QBrush brush = curve->brush();
         QColor bcol = brush.color();
+
         bool zoning = (selected == watts && shadeZones()) || (selected == hr && shadeHRZones());
         bcol.setAlpha(zoning ? 165 : 200);
         brush.setColor(bcol);
@@ -630,11 +653,9 @@ PowerHist::recalc()
                 }
             }
             setAxisScale(xBottom, MinX, parameterValue[count + 1]);
-
-        } else {
-
+         } else {
             setAxisScale(xBottom, 0.0, parameterValue[count + 1]);
-        }
+         }
 
         // we only do zone labels when using absolute values
         refreshZoneLabels();
@@ -739,10 +760,20 @@ PowerHist::setData(RideItem *_rideItem)
 {
     rideItem = _rideItem;
 
+    if (!rideItem) return;
+
     RideFile *ride = rideItem->ride();
 
-    if (ride) {
-        setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
+    bool hasData = (selected == watts && ride->areDataPresent()->watts) ||
+                   (selected == nm && ride->areDataPresent()->nm) ||
+                   (selected == kph && ride->areDataPresent()->kph) ||
+                   (selected == cad && ride->areDataPresent()->cad) ||
+                   (selected == hr && ride->areDataPresent()->hr) ||
+                   (selected == wattsZone && ride->areDataPresent()->watts) ||
+                   (selected == hrZone && ride->areDataPresent()->hr);
+
+    if (ride && hasData) {
+        //setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
 
         static const int maxSize = 4096;
 
@@ -883,10 +914,15 @@ PowerHist::setData(RideItem *_rideItem)
 	}
 
 	recalc();
-    }
-    else {
-	setTitle("no data");
-	replot();
+
+    } else {
+
+        // create empty curves when no data
+        const double zero = 0;
+        curve->setData(&zero, &zero, 0);
+        curveSelected->setData(&zero, &zero, 0);
+        replot();
+        replot();
     }
     zoomer->setZoomBase();
 }
@@ -895,8 +931,7 @@ void
 PowerHist::setBinWidth(int value)
 {
     binw = value;
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    settings->setValue(GC_HIST_BIN_WIDTH, value);
+    appsettings->setValue(GC_HIST_BIN_WIDTH, value);
     recalc();
 }
 
@@ -1023,6 +1058,20 @@ PowerHist::setParameterAxisTitle()
 }
 
 void
+PowerHist::setAxisTitle(int axis, QString label)
+{
+    // setup the default fonts
+    QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
+    stGiles.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+    stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+
+    QwtText title(label);
+    title.setFont(stGiles);
+    QwtPlot::setAxisFont(axis, stGiles);
+    QwtPlot::setAxisTitle(axis, title);
+}
+
+void
 PowerHist::setSelection(Selection selection) {
     selected = selection;
     if (selected == wattsZone || selected == hrZone) setlnY(false);
@@ -1089,11 +1138,11 @@ bool PowerHist::shadeZones() const
 bool PowerHist::shadeHRZones() const
 {
     return (
-        rideItem &&
-        rideItem->ride() &&
-        selected == hr &&
+	    rideItem &&
+	    rideItem->ride() &&
+	    selected == hr &&
         shaded() == true
-        );
+	    );
 }
 
 bool PowerHist::isSelected(const RideFilePoint *p, double sample) {

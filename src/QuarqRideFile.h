@@ -18,6 +18,7 @@
 
 #ifndef _QuarqRideFile_h
 #define _QuarqRideFile_h
+#include "GoldenCheetah.h"
 
 #include "RideFile.h"
 #include <QProcess>

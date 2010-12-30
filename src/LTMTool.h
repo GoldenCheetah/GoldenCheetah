@@ -18,6 +18,7 @@
 
 #ifndef _GC_LTMTool_h
 #define _GC_LTMTool_h 1
+#include "GoldenCheetah.h"
 
 #include "MainWindow.h"
 #include "Season.h"
@@ -39,10 +40,12 @@
 class LTMTool : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
 
-        LTMTool(MainWindow *parent, const QDir &home);
+        LTMTool(MainWindow *parent, const QDir &home, bool Multi = true);
 
         const Season *currentDateRange() { return dateRange; }
         void selectDateRange(int);
@@ -51,6 +54,7 @@ class LTMTool : public QWidget
         QString metricName(QTreeWidgetItem *);
         QString metricSymbol(QTreeWidgetItem *);
         MetricDetail metricDetails(QTreeWidgetItem *);
+        void selectMetric(QString symbol);
 
         // allow others to create and update season structures
         int newSeason(QString, QDate, QDate, int);
@@ -58,6 +62,10 @@ class LTMTool : public QWidget
 
         // apply settings to the metric selector
         void applySettings(LTMSettings *);
+
+        // get/set the date range
+        void setDateRange(QString);
+        QString _dateRange() const;
 
     signals:
 
@@ -106,6 +114,8 @@ class LTMTool : public QWidget
 class EditMetricDetailDialog : public QDialog
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
         EditMetricDetailDialog(MainWindow *, MetricDetail *);
@@ -124,11 +134,18 @@ class EditMetricDetailDialog : public QDialog
 
         QComboBox *curveStyle,
                   *curveSymbol;
+        QCheckBox *stack;
         QPushButton *curveColor;
         QDoubleSpinBox *showBest,
+                       *showOut,
                        *baseLine;
         QCheckBox *curveSmooth,
                   *curveTrend;
+
+        // filtering rides
+        QComboBox *filter;         // no filter / include / exclude
+        QDoubleSpinBox *from, *to; // value range
+        QCheckBox *showOnPlot;     // show me on the plot? (or just a criteria)
 
         QPushButton *applyButton, *cancelButton;
 

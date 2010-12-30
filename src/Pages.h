@@ -1,5 +1,6 @@
 #ifndef PAGES_H
 #define PAGES_H
+#include "GoldenCheetah.h"
 
 #include <QtGui>
 #include <QLineEdit>
@@ -35,17 +36,21 @@ class QHBoxLayout;
 class QVBoxLayout;
 class ColorsPage;
 class IntervalMetricsPage;
-class MetadataPage;
-class KeywordsPage;
-class FieldsPage;
-class Colors;
 class ZonePage;
 class HrZonePage;
+class MetadataPage;
+class KeywordsPage;
+class ProxyPage;
+class FieldsPage;
+class MeasuresPage;
+class Colors;
 class RiderPage;
 
 class ConfigurationPage : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+
     public:
         ConfigurationPage(MainWindow *main);
         void saveClicked();
@@ -68,6 +73,8 @@ class ConfigurationPage : public QWidget
         ColorsPage *colorsPage;
         IntervalMetricsPage *intervalMetrics;
         MetadataPage *metadataPage;
+        ProxyPage *proxyPage;
+        MeasuresPage *measuresPage;
 
         QGroupBox *configGroup;
         QLabel *langLabel;
@@ -85,9 +92,97 @@ class ConfigurationPage : public QWidget
         QGridLayout *garminLayout;
 };
 
+class RiderPage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+
+    public:
+        RiderPage(QWidget *parent, MainWindow *mainWindow);
+        void saveClicked();
+
+    public slots:
+        void chooseAvatar();
+
+    private:
+        MainWindow *mainWindow;
+        bool useMetricUnits;
+        QLineEdit *nickname;
+        QDateEdit *dob;
+        QComboBox *sex;
+        QDoubleSpinBox *weight;
+        QTextEdit  *bio;
+        QPushButton *avatarButton;
+        QPixmap     avatar;
+};
+
+class CredentialsPage : public QScrollArea
+{
+    Q_OBJECT
+    G_OBJECT
+
+
+    public:
+        CredentialsPage(QWidget *parent, MainWindow *mainWindow);
+        void saveClicked();
+        void saveTwitter();
+
+    public slots:
+        void authoriseTwitter();
+
+    private:
+        MainWindow *mainWindow;
+
+        QLineEdit *tpURL; // url for training peaks.com ... http://www.trainingpeaks.com
+        QLineEdit *tpUser;
+        QLineEdit *tpPass;
+        QComboBox *tpType;
+        QPushButton *tpTest;
+
+        QLineEdit *gcURL; // url for gc racing (not available yet)
+        QLineEdit *gcUser;
+        QLineEdit *gcPass;
+
+        QLineEdit *twitterURL; // url for twitter.com
+        QPushButton *twitterAuthorise;
+        QLineEdit *twitterPIN;
+        char *t_key, *t_secret;
+
+        QLineEdit *wiURL; // url for withings
+        QLineEdit *wiUser;
+        QLineEdit *wiPass;
+
+        QLineEdit *webcalURL; // url for iCal file (e.g. TP.com, Google Calendar)
+};
+
+class ProxyPage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+
+    public:
+        ProxyPage(QWidget *parent, MainWindow *mainWindow);
+        void saveClicked();
+
+    public slots:
+        void typeSelected();
+
+    private:
+        MainWindow *mainWindow;
+        QComboBox *pxType; // direct, unauth, authenticated
+        QLineEdit *pxHost; // proxy host
+        QSpinBox  *pxPort; // proxy Port
+        QLineEdit *pxUser; // user for proxy auth
+        QLineEdit *pxPass; // pass for proxy auth
+};
+
 class CyclistPage : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+
     public:
         CyclistPage(MainWindow *mainWindow);
         void saveClicked();
@@ -101,13 +196,12 @@ class CyclistPage : public QWidget
         QLineEdit *perfManLTSavg;
         QCheckBox *showSBToday;
 
-    private:
+        RiderPage *riderPage;
+        CredentialsPage *passPage;
         ZonePage *zonePage;
         HrZonePage *hrZonePage;
-        RiderPage *riderPage;
-        MainWindow *main;
 
-        QGroupBox *cyclistGroup;
+    private:
         QVBoxLayout *perfManLayout;
         QHBoxLayout *perfManStartValLayout;
         QHBoxLayout *perfManSTSavgLayout;
@@ -117,11 +211,14 @@ class CyclistPage : public QWidget
         QIntValidator *perfManStartValidator;
         QIntValidator *perfManSTSavgValidator;
         QIntValidator *perfManLTSavgValidator;
+        MainWindow *mainWindow;
 };
 
 class deviceModel : public QAbstractTableModel
 {
     Q_OBJECT
+    G_OBJECT
+
 
      public:
         deviceModel(QObject *parent=0);
@@ -151,6 +248,8 @@ class deviceModel : public QAbstractTableModel
 class DevicePage : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+
     public:
         DevicePage(QWidget *parent = 0);
         void setConfigPane();
@@ -195,6 +294,8 @@ class DevicePage : public QWidget
 class IntervalMetricsPage : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
 
@@ -224,6 +325,8 @@ class IntervalMetricsPage : public QWidget
 class KeywordsPage : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
         KeywordsPage(QWidget *parent, QList<KeywordDefinition>);
@@ -246,6 +349,8 @@ class KeywordsPage : public QWidget
 class ColorsPage : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
         ColorsPage(QWidget *parent);
@@ -254,6 +359,28 @@ class ColorsPage : public QWidget
     public slots:
 
     private:
+
+        // General stuff
+        QCheckBox *antiAliased;
+        QCheckBox *shadeZones;
+        QDoubleSpinBox *lineWidth;
+
+        // Fonts
+        QFontComboBox *def,
+                      *titles,
+                      *chartmarkers,
+                      *chartlabels,
+                      *calendar,
+                      *popup;
+
+        QComboBox *defaultSize,
+                  *titlesSize,
+                  *chartmarkersSize,
+                  *chartlabelsSize,
+                  *calendarSize,
+                  *popupSize;
+
+        // Colors
         QTreeWidget *colors;
         const Colors *colorSet;
 };
@@ -261,6 +388,8 @@ class ColorsPage : public QWidget
 class FieldsPage : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
         FieldsPage(QWidget *parent, QList<FieldDefinition>);
@@ -283,6 +412,8 @@ class FieldsPage : public QWidget
 class ProcessorPage : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
 
@@ -307,6 +438,8 @@ class ProcessorPage : public QWidget
 class MetadataPage : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
 
@@ -334,6 +467,8 @@ class MetadataPage : public QWidget
 class SchemePage : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
         SchemePage(ZonePage *parent);
@@ -354,6 +489,8 @@ class SchemePage : public QWidget
 class CPPage : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
         CPPage(ZonePage *parent);
@@ -383,6 +520,8 @@ class CPPage : public QWidget
 class ZonePage : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
 
@@ -412,6 +551,8 @@ class ZonePage : public QWidget
 class HrSchemePage : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+
 
 public:
     HrSchemePage(HrZonePage *parent);
@@ -433,6 +574,8 @@ private:
 class LTPage : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+
 
 public:
     LTPage(HrZonePage *parent);
@@ -464,6 +607,8 @@ private:
 class HrZonePage : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+
 
 public:
 
@@ -490,64 +635,118 @@ protected:
     // local versions for modification
 };
 
-class RiderPage : public QWidget
+class MeasuresPage : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
-        RiderPage(QWidget *parent, MainWindow *mainWindow);
-        void saveClicked();
+        MeasuresPage(MainWindow *main);
+        void getDefinitions(QList<FieldDefinition>&);
 
     public slots:
-        void chooseAvatar();
+        void addClicked();
+        void upClicked();
+        void downClicked();
+        void renameClicked();
+        void deleteClicked();
+        void saveClicked();
 
     private:
-        MainWindow *mainWindow;
-        bool useMetricUnits;
-        QLineEdit *nickname;
-        QDateEdit *dob;
-        QComboBox *sex;
-        QDoubleSpinBox *weight;
-        QTextEdit  *bio;
-        QPushButton *avatarButton;
-        QPixmap     avatar;
-        QString cyclist;
-};
-
-class TwitterPage : public QWidget
-{
-    Q_OBJECT
-
-    public:
-
-        TwitterPage(QWidget *parent = 0);
-
-        // Children talk to each other
-        SchemePage *schemePage;
-        CPPage *cpPage;
-        QLineEdit *twitterPIN;
-        void saveClicked();
-    public slots:
-
-#ifdef GC_HAVE_LIBOAUTH
-        void authorizeClicked();
-#endif
-
-    protected:
 
         MainWindow *main;
-        bool changed;
-
-        QTabWidget *tabs;
-
-        // local versions for modification
-    private:
-        QLabel *twitterPinLabel;
-        QPushButton *authorizeButton;
-        char *t_key;
-        char *t_secret;
-        boost::shared_ptr<QSettings> settings;
-
+        QTreeWidget *fields;
+        QPushButton *upButton, *downButton, *addButton, *renameButton, *deleteButton;
 };
+
+#if 0
+class HrSchemePage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+
+public:
+    HrSchemePage(HrZonePage *parent);
+    HrZoneScheme getScheme();
+    void saveClicked();
+
+    public slots:
+    void addClicked();
+    void deleteClicked();
+    void renameClicked();
+
+private:
+    HrZonePage *zonePage;
+    QTreeWidget *scheme;
+    QPushButton *addButton, *renameButton, *deleteButton;
+};
+
+
+class LTPage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+
+public:
+    LTPage(HrZonePage *parent);
+
+    public slots:
+    void addClicked();
+    void deleteClicked();
+    void defaultClicked();
+    void rangeSelectionChanged();
+    void addZoneClicked();
+    void deleteZoneClicked();
+    void zonesChanged();
+
+private:
+    bool active;
+
+    QDateEdit *dateEdit;
+    QDoubleSpinBox *ltEdit;
+    QDoubleSpinBox *restHrEdit;
+    QDoubleSpinBox *maxHrEdit;
+
+    HrZonePage  *zonePage;
+    QTreeWidget *ranges;
+    QTreeWidget *zones;
+    QPushButton *addButton, *deleteButton, *defaultButton;
+    QPushButton *addZoneButton, *deleteZoneButton;
+};
+
+class HrZonePage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+
+public:
+
+    HrZonePage(MainWindow *);
+    void saveClicked();
+
+    //ZoneScheme scheme;
+    HrZones zones;
+
+    // Children talk to each other
+    HrSchemePage *schemePage;
+    LTPage *ltPage;
+
+    public slots:
+
+
+protected:
+
+    MainWindow *main;
+    bool changed;
+
+    QTabWidget *tabs;
+
+    // local versions for modification
+};
+#endif
 
 #endif

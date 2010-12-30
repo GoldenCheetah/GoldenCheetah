@@ -18,8 +18,10 @@
 
 #ifndef _GC_AllPlotWindow_h
 #define _GC_AllPlotWindow_h 1
+#include "GoldenCheetah.h"
 
 #include <QtGui>
+#include <QObject> // for Q_PROPERTY
 
 class AllPlot;
 class MainWindow;
@@ -35,9 +37,26 @@ class QxtGroupBox;
 
 #include "LTMWindow.h" // for tooltip/canvaspicker
 
-class AllPlotWindow : public QWidget
+class AllPlotWindow : public GcWindow
 {
     Q_OBJECT
+    G_OBJECT
+
+    // the plot properties are used by the layout manager
+    // to save and restore the plot parameters, this is so
+    // we can have multiple windows open at once with different
+    // settings managed by the user.
+    // in this example we might show a stacked plot and a ride
+    // plot at the same time.
+    Q_PROPERTY(bool stacked READ isStacked WRITE setStacked USER true)
+    Q_PROPERTY(int showGrid READ isShowGrid WRITE setShowGrid USER true)
+    Q_PROPERTY(int showHr READ isShowHr WRITE setShowHr USER true)
+    Q_PROPERTY(int showSpeed READ isShowSpeed WRITE setShowSpeed USER true)
+    Q_PROPERTY(int showCad READ isShowCad WRITE setShowCad USER true)
+    Q_PROPERTY(int showAlt READ isShowAlt WRITE setShowAlt USER true)
+    Q_PROPERTY(int showPower READ isShowPower WRITE setShowPower USER true)
+    Q_PROPERTY(int byDistance READ isByDistance WRITE setByDistance USER true)
+    Q_PROPERTY(int smoothing READ smoothing WRITE setSmoothing USER true)
 
     public:
 
@@ -53,6 +72,17 @@ class AllPlotWindow : public QWidget
         // zoom to interval range (via span-slider)
         void zoomInterval(IntervalItem *);
 
+        // get properties - the setters are below
+        bool isStacked() const { return showStack->isChecked(); }
+        int isShowGrid() const { return showGrid->checkState(); }
+        int isShowHr() const { return showHr->checkState(); }
+        int isShowSpeed() const { return showSpeed->checkState(); }
+        int isShowCad() const { return showCad->checkState(); }
+        int isShowAlt() const { return showAlt->checkState(); }
+        int isShowPower() const { return showPower->currentIndex(); }
+        int isByDistance() const { return comboDistance->currentIndex(); }
+        int smoothing() const { return smoothSlider->value(); }
+
    public slots:
 
         // trap GC signals
@@ -62,15 +92,11 @@ class AllPlotWindow : public QWidget
         void intervalsChanged();
         void configChanged();
 
-        // trap child widget signals
+        // set properties
         void setSmoothingFromSlider();
         void setSmoothingFromLineEdit();
         void setStackZoomUp();
         void setStackZoomDown();
-        void zoomChanged();
-        void moveLeft();
-        void moveRight();
-        void showStackChanged(int state);
         void setShowPower(int state);
         void setShowHr(int state);
         void setShowSpeed(int state);
@@ -79,6 +105,13 @@ class AllPlotWindow : public QWidget
         void setShowGrid(int state);
         void setSmoothing(int value);
         void setByDistance(int value);
+        void setStacked(int value);
+
+        // trap widget signals
+        void zoomChanged();
+        void moveLeft();
+        void moveRight();
+        void showStackChanged(int state);
 
     protected:
 
@@ -114,11 +147,13 @@ class AllPlotWindow : public QWidget
         // Common controls
         QGridLayout *controlsLayout;
         QCheckBox *showStack;
+        QCheckBox *showGrid;
         QCheckBox *showHr;
         QCheckBox *showSpeed;
         QCheckBox *showCad;
         QCheckBox *showAlt;
         QComboBox *showPower;
+        QComboBox *comboDistance;
         QSlider *smoothSlider;
         QLineEdit *smoothLineEdit;
         QxtSpanSlider *spanSlider;
@@ -148,4 +183,3 @@ class AllPlotWindow : public QWidget
 };
 
 #endif // _GC_AllPlotWindow_h
-

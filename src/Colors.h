@@ -18,6 +18,7 @@
 
 #ifndef _GC_Colors_h
 #define _GC_Colors_h 1
+#include "GoldenCheetah.h"
 
 #include <QObject>
 #include <QString>
@@ -35,6 +36,8 @@ struct Colors
 class GCColor : public QObject
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
         GCColor(MainWindow*);
@@ -50,48 +53,59 @@ class GCColor : public QObject
 #define GColor(x) GCColor::getColor(x)
 
 #define CPLOTBACKGROUND       0
-#define CPLOTTHUMBNAIL        1
-#define CPLOTTITLE            2
-#define CPLOTSELECT           3
-#define CPLOTTRACKER          4
-#define CPLOTMARKER           5
-#define CPLOTGRID             6
-#define CINTERVALHIGHLIGHTER  7
-#define CHEARTRATE            8
-#define CSPEED                9
-#define CPOWER                10
-#define CCP                   11
-#define CCADENCE              12
-#define CALTITUDE             13
-#define CALTITUDEBRUSH        14
-#define CWINDSPEED            15
-#define CTORQUE               16
-#define CSTS                  17
-#define CLTS                  18
-#define CSB                   19
-#define CDAILYSTRESS          20
-#define CCALENDARTEXT         21
-#define CZONE1                22
-#define CZONE2                23
-#define CZONE3                24
-#define CZONE4                25
-#define CZONE5                26
-#define CZONE6                27
-#define CZONE7                28
-#define CZONE8                29
-#define CZONE9                30
-#define CZONE10               31
-#define CHZONE1               32
-#define CHZONE2               33
-#define CHZONE3               34
-#define CHZONE4               35
-#define CHZONE5               36
-#define CHZONE6               37
-#define CHZONE7               38
-#define CHZONE8               39
-#define CHZONE9               40
-#define CHZONE10              41
-#define CAEROVE               42
-#define CAEROEL               43
+#define CRIDEPLOTBACKGROUND   1
+#define CPLOTTHUMBNAIL        2
+#define CPLOTTITLE            3
+#define CPLOTSELECT           4
+#define CPLOTTRACKER          5
+#define CPLOTMARKER           6
+#define CPLOTGRID             7
+#define CINTERVALHIGHLIGHTER  8
+#define CHEARTRATE            9
+#define CSPEED                10
+#define CPOWER                11
+#define CCP                   12
+#define CCADENCE              13
+#define CALTITUDE             14
+#define CALTITUDEBRUSH        15
+#define CWINDSPEED            16
+#define CTORQUE               17
+#define CSTS                  18
+#define CLTS                  19
+#define CSB                   20
+#define CDAILYSTRESS          21
+#define CCALENDARTEXT         22
+#define CZONE1                23
+#define CZONE2                24
+#define CZONE3                25
+#define CZONE4                26
+#define CZONE5                27
+#define CZONE6                28
+#define CZONE7                29
+#define CZONE8                30
+#define CZONE9                31
+#define CZONE10               32
+#define CHZONE1               33
+#define CHZONE2               34
+#define CHZONE3               35
+#define CHZONE4               36
+#define CHZONE5               37
+#define CHZONE6               38
+#define CHZONE7               39
+#define CHZONE8               40
+#define CHZONE9               41
+#define CHZONE10              42
+#define CAEROVE               43
+#define CAEROEL               44
+#define CCALCELL              45
+#define CCALHEAD              46
+#define CCALCURRENT           47
+#define CCALACTUAL            48
+#define CCALPLANNED           49
+#define CCALTODAY             50
+#define CPOPUP                51
+#define CPOPUPTEXT            52
+#define CTILEBAR              53
+#define CTILEBARSELECT        54
 
 #endif

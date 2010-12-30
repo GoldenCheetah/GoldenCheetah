@@ -18,6 +18,7 @@
 
 #ifndef _seasonparser_h
 #define _seasonparser_h
+#include "GoldenCheetah.h"
 
 #include <QXmlDefaultHandler>
 #include "Season.h"

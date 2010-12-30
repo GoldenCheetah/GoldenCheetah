@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2008 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -143,7 +143,7 @@ void
 D2XX::close()
 {
     assert(isOpen);
-    lib->close(ftHandle); 
+    lib->close(ftHandle);
     isOpen = false;
 }
 
@@ -202,15 +202,15 @@ D2XX::myListCommPorts(QString &err)
         }
     }
     DWORD numDevs;
-    FT_STATUS ftStatus = lib->create_device_info_list(&numDevs); 
+    FT_STATUS ftStatus = lib->create_device_info_list(&numDevs);
     if(ftStatus != FT_OK) {
-        err = QString("FT_CreateDeviceInfoList: %1").arg(ftStatus); 
+        err = QString("FT_CreateDeviceInfoList: %1").arg(ftStatus);
         return result;
     }
     FT_DEVICE_LIST_INFO_NODE *devInfo = new FT_DEVICE_LIST_INFO_NODE[numDevs];
-    ftStatus = lib->get_device_info_list(devInfo, &numDevs); 
+    ftStatus = lib->get_device_info_list(devInfo, &numDevs);
     if (ftStatus != FT_OK)
-        err = QString("FT_GetDeviceInfoList: %1").arg(ftStatus); 
+        err = QString("FT_GetDeviceInfoList: %1").arg(ftStatus);
     else {
         for (DWORD i = 0; i < numDevs; i++)
             result.append(CommPortPtr(new D2XX(devInfo[i])));

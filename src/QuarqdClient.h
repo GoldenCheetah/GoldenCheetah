@@ -18,6 +18,7 @@
 
 #ifndef CLIENT_H
 #define CLIENT_H
+#include "GoldenCheetah.h"
 
 #include <QTcpSocket>
 #include <QThread>
@@ -33,6 +34,8 @@ class QuarqdClient : public QThread
 {
 
    Q_OBJECT
+   G_OBJECT
+
 
 public:
     QuarqdClient(QObject *parent = 0, DeviceConfiguration *dc=0);

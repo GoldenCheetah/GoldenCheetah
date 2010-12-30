@@ -18,12 +18,22 @@
 
 #ifndef _GC_ModelPlot_h
 #define _GC_ModelPlot_h 1
+#include "GoldenCheetah.h"
 
 #include <QtGui>
 #include <QTimer>
 #include "MainWindow.h"
 
+#include <qwt3d_global.h>
+
+// qwtplot3d api changes between 0.2.x and 0.3.x
+#if QWT3D_MINOR_VERSION > 2
+#include <qwt3d_gridplot.h>
+#include <qwt3d_plot3d.h>
+#else
 #include <qwt3d_surfaceplot.h>
+#endif
+
 #include <qwt3d_function.h>
 #include <qwt3d_color.h>
 #include <qwt3d_colorlegend.h>
@@ -60,10 +70,20 @@ class Water;
 #define STYLE_SURFACE 3
 #define STYLE_DOTS    4
 
+#define SHOW_INTERVALS 1
+#define SHOW_FRAME       2
+
 // the core surface plot
+// qwtplot3d api changes between 0.2.x and 0.3.x
+#if QWT3D_MINOR_VERSION > 2
+class BasicModelPlot : public GridPlot
+#else
 class BasicModelPlot : public SurfacePlot
+#endif
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
         BasicModelPlot(MainWindow *, ModelSettings *);
@@ -76,6 +96,13 @@ class BasicModelPlot : public SurfacePlot
         void setZPane(int);
 
         ModelDataProvider *modelDataProvider; // used by enrichment
+
+        // used by the Bar Enrichment
+        double diag_;
+        int   intervals_;                // SHOW_INTERVALS | SHOW_MAX
+        double zpane;
+        QHash<QString, double> iz;         // for selected intervals
+        QHash<QString, double> inum;      // for selected intervals
 
     public slots:
         void configChanged();
@@ -91,6 +118,8 @@ class BasicModelPlot : public SurfacePlot
         Qwt3D::PLOTSTYLE surface;
 
         int currentStyle;
+
+
 };
 
 
@@ -99,6 +128,7 @@ class Bar : public Qwt3D::VertexEnrichment
 {
 public:
     Bar();
+    Bar(BasicModelPlot *);
 
     Qwt3D::Enrichment* clone() const {return new Bar(*this);}
 
@@ -108,6 +138,7 @@ public:
 
 private:
     double level_;
+    BasicModelPlot *model;
     //double diag_;
 };
 
@@ -116,17 +147,21 @@ class Water : public Qwt3D::VertexEnrichment
 {
     public:
         Water();
+        Water(BasicModelPlot *);
         Qwt3D::Enrichment* clone() const {return new Water(*this);}
 
         void drawBegin();
         void drawEnd();
         void draw(Qwt3D::Triple const&);
+        BasicModelPlot *model;
 };
 
 // just a frame containing the raw 3d plot (for now)
 class ModelPlot : public QFrame
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
 

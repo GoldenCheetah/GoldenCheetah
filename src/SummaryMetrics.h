@@ -18,8 +18,10 @@
 
 #ifndef SUMMARYMETRICS_H_
 #define SUMMARYMETRICS_H_
+#include "GoldenCheetah.h"
 
 #include <QString>
+#include <QMap>
 #include <QDateTime>
 
 class SummaryMetrics
@@ -33,14 +35,33 @@ class SummaryMetrics
         QDateTime getRideDate() { return rideDate; }
         void setRideDate(QDateTime rideDate) { this->rideDate = rideDate; }
 
+        // for non-rides, ie. measures use same field but overload
+        QDateTime getDateTime() { return rideDate; }
+        void setDateTime(QDateTime dateTime) { this->rideDate = dateTime; }
+
         // metric values
         void setForSymbol(QString symbol, double v) { value.insert(symbol, v); }
-        double getForSymbol(QString symbol) { return value.value(symbol, 0.0); }
+        double getForSymbol(QString symbol) const { return value.value(symbol, 0.0); }
+
+        void setText(QString name, QString v) { texts.insert(name, v); }
+        QString getText(QString name, QString fallback) { return texts.value(name, fallback); }
+
+        // convert to string, using format supplied
+        // replaces ${...:units} or ${...} with unit string
+        // or value respectively
+        QString toString(QString, bool units) const;
+
+        // get a metric formatted properly and apply metric/imperial conversion
+        QString getStringForSymbol(QString symbol, bool UseMetric) const;
+
+        // get unit string to use for this symbol
+        QString getUnitsForSymbol(QString symbol, bool UseMetric) const;
 
 	private:
 	    QString fileName;
         QDateTime rideDate;
         QMap<QString, double> value;
+        QMap<QString, QString> texts;
 };
 
 

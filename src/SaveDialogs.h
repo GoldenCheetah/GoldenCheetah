@@ -18,6 +18,7 @@
 
 #ifndef _GC_SaveDialogs_h
 #define _GC_SaveDialogs_h 1
+#include "GoldenCheetah.h"
 
 #include <QtGui>
 #include <QDialog>
@@ -28,6 +29,8 @@ class MainWindow;
 class SaveSingleDialogWidget : public QDialog
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
         SaveSingleDialogWidget(MainWindow *, RideItem *);
@@ -50,6 +53,8 @@ class SaveSingleDialogWidget : public QDialog
 class SaveOnExitDialogWidget : public QDialog
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
         SaveOnExitDialogWidget(MainWindow *, QList<RideItem*>);

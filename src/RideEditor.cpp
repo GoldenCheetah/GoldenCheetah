@@ -16,7 +16,6 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-
 #include "RideEditor.h"
 #include "LTMOutliers.h"
 #include "MainWindow.h"
@@ -51,9 +50,13 @@ static void secsMsecs(double value, int &secs, int &msecs)
     msecs = round((value - secs) * 100) * 10;
 }
 
-RideEditor::RideEditor(MainWindow *main) : QWidget(main), data(NULL), ride(NULL), main(main), inLUW(false), colMapper(NULL)
+RideEditor::RideEditor(MainWindow *main) : GcWindow(main), data(NULL), ride(NULL), main(main), inLUW(false), colMapper(NULL)
 {
+    setInstanceName("Ride Editor");
+
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->setSpacing(0);
+    mainLayout->setContentsMargins(0,0,0,0);
 
     //Left in the code to display a title, but
     //its a waste of screen estate, maybe uncomment
@@ -75,10 +78,10 @@ RideEditor::RideEditor(MainWindow *main) : QWidget(main), data(NULL), ride(NULL)
     connect(saveAct, SIGNAL(triggered()), this, SLOT(saveFile()));
     toolbar->addAction(saveAct);
 
-    QIcon findIcon(":images/toolbar/search.png");
-    searchAct = new QAction(findIcon, tr("Find"), this);
-    connect(searchAct, SIGNAL(triggered()), this, SLOT(find()));
-    toolbar->addAction(searchAct);
+    //QIcon findIcon(":images/toolbar/search.png");
+    //searchAct = new QAction(findIcon, tr("Find"), this);
+    //connect(searchAct, SIGNAL(triggered()), this, SLOT(find()));
+    //toolbar->addAction(searchAct);
 
     // *****************************************************
     // REMOVED MANUALLY RUNNING A CHECK SINCE IT IS NOW
@@ -128,32 +131,24 @@ RideEditor::RideEditor(MainWindow *main) : QWidget(main), data(NULL), ride(NULL)
     mainLayout->addWidget(toolbar);
     mainLayout->addWidget(table);
 
-    // get latest config
-    configChanged();
-
     // trap GC signals
-    connect(main, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(main, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
-    connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+    //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+    connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(main, SIGNAL(rideDirty()), this, SLOT(rideDirty()));
     connect(main, SIGNAL(rideClean()), this, SLOT(rideClean()));
+
+    // our tool is the search dialog
+    findTool = new FindDialog(this);
+    setControls(findTool);
 }
 
 void
-RideEditor::configChanged()
-{
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-
-    // get spike config
-    DPFSmax = settings->value(GC_DPFS_MAX, "1500").toDouble();
-    DPFSvariance = settings->value(GC_DPFS_VARIANCE, "1000").toDouble();
-}
-
+RideEditor::configChanged() {}
 
 //----------------------------------------------------------------------
 // RideEditor table/model/rideFile utility functions
 //----------------------------------------------------------------------
-
 
 // what are the available columns? (used by insert column context menu)
 QList<QString>
@@ -286,8 +281,8 @@ RideEditor::find()
     //finder.exec();
     FindDialog *finder = new FindDialog(this);
 
-    // close when a new ride is selected
-    connect(main, SIGNAL(rideSelected()), finder, SLOT(close()));
+    // clear when a new ride is selected
+    connect(main, SIGNAL(rideSelected()), finder, SLOT(clear()));
     finder->show();
 }
 
@@ -358,6 +353,9 @@ RideEditor::check()
     int column = model->headings().indexOf(tr("Power"));
     if (column >= 0 && ride->ride()->dataPoints().count() >= 30) {
 
+        // get spike config
+        double max = appsettings->value(this, GC_DPFS_MAX, "1500").toDouble();
+        double variance = appsettings->value(this, GC_DPFS_VARIANCE, "1000").toDouble();
 
         LTMOutliers *outliers = new LTMOutliers(secs.data(), power.data(), power.count(), 30, false);
 
@@ -365,11 +363,11 @@ RideEditor::check()
         for (int i=0; i<secs.count(); i++) {
 
             // is this over variance threshold?
-            if (outliers->getDeviationForRank(i) < DPFSvariance) break;
+            if (outliers->getDeviationForRank(i) < variance) break;
 
             // ok, so its highly variant but is it over
             // the max value we are willing to accept?
-            if (outliers->getYForRank(i) < DPFSmax) continue;
+            if (outliers->getYForRank(i) < max) continue;
 
             // which one is it
             data->anomalies.insert(xsstring(outliers->getIndexForRank(i), RideFile::watts), tr("Data spike candidate"));
@@ -1081,7 +1079,7 @@ RideEditor::intervalSelected()
 void
 RideEditor::rideSelected()
 {
-    RideItem *current = main->rideItem();
+    RideItem *current = myRideItem;
     if (!current || !current->ride()) return;
 
     ride = current;
@@ -1120,6 +1118,9 @@ RideEditor::rideSelected()
 
     // look for anomalies
     check();
+
+    // update finder pane to show available channels
+    findTool->rideSelected();
 }
 
 // We update the current selection on the table view
@@ -1489,13 +1490,12 @@ EditorData::insertRows(int row, int count)
 //
 // Find Dialog
 //
-FindDialog::FindDialog(RideEditor *rideEditor, QWidget *parent) : QDialog(parent), rideEditor(rideEditor)
+FindDialog::FindDialog(RideEditor *rideEditor) : rideEditor(rideEditor)
 {
     // setup the basic window settings; nonmodal, ontop and delete on close
-    setWindowTitle("Search");
-    setAttribute(Qt::WA_DeleteOnClose);
-    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
-
+    //setWindowTitle("Search");
+    //setAttribute(Qt::WA_DeleteOnClose);
+    //setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
 
     // create UI components
     QLabel *look = new QLabel(tr("Find values"), this);
@@ -1520,19 +1520,10 @@ FindDialog::FindDialog(RideEditor *rideEditor, QWidget *parent) : QDialog(parent
     to->setDecimals(5);
     to->setSingleStep(0.00001);
 
-    // which columns?
-    foreach (QString heading, rideEditor->model->headings()) {
-        QCheckBox *add = new QCheckBox(heading);
-        if (heading == tr("Power"))
-            add->setChecked(true);
-        else
-            add->setChecked(false);
-        channels << add;
-    }
 
     // buttons
     findButton = new QPushButton(tr("Find"));
-    closeButton = new QPushButton(tr("Close"));
+    clearButton = new QPushButton(tr("Clear"));
 
     // results
     resultsTable = new QTableWidget(this);
@@ -1560,15 +1551,9 @@ FindDialog::FindDialog(RideEditor *rideEditor, QWidget *parent) : QDialog(parent
     criteria->addWidget(to, 2,1, Qt::AlignLeft|Qt::AlignTop);
     mainLayout->addLayout(criteria);
 
-    QGridLayout *chans = new QGridLayout;
+    chans = new QGridLayout;
     mainLayout->addLayout(chans);
 
-    int row =0;
-    int col =0;
-    foreach (QCheckBox *check, channels) {
-        chans->addWidget(check, row,col);
-        if (++col > 2) { col =0; row++; }
-    }
 
     QHBoxLayout *execute = new QHBoxLayout;
     execute->addStretch();
@@ -1579,25 +1564,24 @@ FindDialog::FindDialog(RideEditor *rideEditor, QWidget *parent) : QDialog(parent
 
     QHBoxLayout *closer = new QHBoxLayout;
     closer->addStretch();
-    closer->addWidget(closeButton);
+    closer->addWidget(clearButton);
     mainLayout->addLayout(closer);
 
     setLayout(mainLayout);
 
     connect(type, SIGNAL(currentIndexChanged(int)), this, SLOT(typeChanged(int)));
     connect(findButton, SIGNAL(clicked()), this, SLOT(find()));
-    connect(closeButton, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(clearButton, SIGNAL(clicked()), this, SLOT(clear()));
     connect(resultsTable, SIGNAL(itemSelectionChanged()), this, SLOT(selection()));
 
     // refresh when data changes...
+    if (rideEditor->ride && rideEditor->ride->ride())
     connect(rideEditor->ride->ride()->command, SIGNAL(endCommand(bool,RideCommand*)), this, SLOT(dataChanged()));
+
 }
 
 FindDialog::~FindDialog()
 {
-    rideEditor->data->found.clear();
-    clearResultsTable();
-    rideEditor->model->forceRedraw();
 }
 
 void
@@ -1756,9 +1740,44 @@ FindDialog::dataChanged()
 }
 
 void
-FindDialog::close()
+FindDialog::clear()
 {
-    accept();
+    rideEditor->data->found.clear();
+    clearResultsTable();
+    rideEditor->model->forceRedraw();
+
+}
+
+void
+FindDialog::rideSelected()
+{
+    // Update the channels we can search
+    // wipe old ones
+    foreach(QWidget *x, channels) {
+        chans->removeWidget(x);
+        delete x;
+    }
+    channels.clear();
+
+    // add new ones
+    foreach (QString heading, rideEditor->model->headings()) {
+        QCheckBox *add = new QCheckBox(heading);
+        if (heading == tr("Power"))
+            add->setChecked(true);
+        else
+            add->setChecked(false);
+        channels << add;
+    }
+
+    int row =0;
+    int col =0;
+    foreach (QCheckBox *check, channels) {
+        chans->addWidget(check, row,col);
+        if (++col > 2) { col =0; row++; }
+    }
+
+    // clear old search results etc
+    clear();
 }
 
 void
@@ -1919,8 +1938,6 @@ PasteSpecialDialog::clearResultsTable()
 void
 PasteSpecialDialog::setResultsTable()
 {
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-
     model->clear();
     headings.clear();
 
@@ -1932,7 +1949,7 @@ PasteSpecialDialog::setResultsTable()
             if (hasHeader->isChecked() == true) {
                 // have we mapped this before?
                 QString lookup = "colmap/" + sourceHeadings[i];
-                QString mapto = settings->value(lookup, "Ignore").toString();
+                QString mapto = appsettings->value(this, lookup, "Ignore").toString();
                 // is this an available heading tho?
                 if (columnSelect->findText(mapto) != -1) {
                     headings << mapto;
@@ -2236,8 +2253,7 @@ PasteSpecialDialog::columnChanged()
 
     // lets remember this mapping if its to a source header
     if (hasHeader->isChecked() && headings[column] != "Ignore") {
-        boost::shared_ptr<QSettings> settings = GetApplicationSettings();
         QString lookup = "colmap/" + sourceHeadings[column];
-        settings->setValue(lookup, headings[column]);
+        appsettings->setValue(lookup, headings[column]);
     }
 }

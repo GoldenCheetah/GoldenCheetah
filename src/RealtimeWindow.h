@@ -18,6 +18,7 @@
 
 #ifndef _GC_RealtimeWindow_h
 #define _GC_RealtimeWindow_h 1
+#include "GoldenCheetah.h"
 
 #include <QtGui>
 #include <QTimer>
@@ -26,6 +27,7 @@
 #include "DeviceTypes.h"
 #include "ErgFile.h"
 #include "ErgFilePlot.h"
+#include "GoldenClient.h"
 
 class TrainTool;
 class TrainTabs;
@@ -49,14 +51,16 @@ class RealtimeController;
 class RealtimePlot;
 class RealtimeData;
 
-class RealtimeWindow : public QWidget
+class RealtimeWindow : public GcWindow
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
 
         RealtimeController *deviceController;   // read from
-        RealtimeController *streamController;   // send out to
+        GoldenClient       *streamController;   // send out to
 
         RealtimeWindow(MainWindow *, TrainTool *, const QDir &);
 
@@ -78,10 +82,7 @@ class RealtimeWindow : public QWidget
         void Higher();      // set load/gradient higher
         void Lower();       // set load/gradient higher
 
-        void SelectDevice(int); // when combobox chooses device
-        void SelectRecord();    // when checkbox chooses record mode
-        void SelectStream(int);    // when remote server to stream to is selected
-        void SelectWorkout();    // to select a Workout to use
+        void SelectWorkout();
 
         // Timed actions
         void guiUpdate();           // refreshes the telemetry
@@ -102,6 +103,7 @@ class RealtimeWindow : public QWidget
         QDir home;
         MainWindow *main;
         TrainTool *trainTool;
+        int FTP; // current FTP
 
         QList<DeviceConfiguration> Devices;
         bool useMetricUnits;
@@ -156,12 +158,6 @@ class RealtimeWindow : public QWidget
                     *option_layout;
         QGridLayout *timer_layout;
         QVBoxLayout *controls_layout;
-        QCheckBox   *recordSelector;
-        QComboBox   *deviceSelector,
-                    *streamSelector;
-        QPushButton *startButton,
-                    *pauseButton,
-                    *stopButton;
 
         QGridLayout *gridLayout;
 

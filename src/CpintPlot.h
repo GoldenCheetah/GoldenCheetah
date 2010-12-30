@@ -18,6 +18,7 @@
 
 #ifndef _GC_CpintPlot_h
 #define _GC_CpintPlot_h 1
+#include "GoldenCheetah.h"
 
 #include <qwt_plot.h>
 #include <QtGui>
@@ -27,16 +28,19 @@ class QwtPlotGrid;
 class QwtPlotMarker;
 class RideItem;
 class Zones;
+class MainWindow;
 
 QString ride_filename_to_cpi_filename(const QString filename);
 
 class CpintPlot : public QwtPlot
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
 
-        CpintPlot(QString path, const Zones *zones);
+        CpintPlot(MainWindow *, QString path, const Zones *zones);
         bool needToScanRides;
 
         const QwtPlotCurve *getThisCurve() const { return thisCurve; }
@@ -50,6 +54,7 @@ class CpintPlot : public QwtPlot
         void changeSeason(const QDate &start, const QDate &end);
         void setEnergyMode(bool value);
         bool energyMode() const { return energyMode_; }
+        void setAxisTitle(int axis, QString label);
 
     public slots:
 
@@ -77,6 +82,7 @@ class CpintPlot : public QwtPlot
         // keys are CPI files contributing to bests (at least originally)
         QHash<QString,bool> cpiDataInBests;
         bool energyMode_;
+        MainWindow *mainWindow;
 };
 
 #endif // _GC_CpintPlot_h

@@ -18,6 +18,7 @@
 
 #ifndef _GC_ColorButton_h
 #define _GC_ColorButton_h 1
+#include "GoldenCheetah.h"
 
 #include <QPushButton>
 #include <QColor>
@@ -25,6 +26,8 @@
 class ColorButton : public QPushButton
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
         ColorButton(QWidget *parent, QString, QColor);

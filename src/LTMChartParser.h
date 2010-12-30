@@ -18,6 +18,7 @@
 
 #ifndef _GC_LTMChartParser_h
 #define _GC_LTMChartParser_h 1
+#include "GoldenCheetah.h"
 
 #include <QXmlDefaultHandler>
 #include "LTMSettings.h"

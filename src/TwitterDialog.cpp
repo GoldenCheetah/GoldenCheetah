@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 Justin F. Knotzke (jknotzke@shampoo.ca)
+ * Copyright (c) 2010 Justin Knotzke (jknotzke@shampoo.ca)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -22,11 +22,15 @@
 #include <QUrl>
 #include "TimeUtils.h"
 
+// acccess to metrics
+#include "MetricAggregator.h"
+#include "RideMetric.h"
+#include "DBAccess.h"
+
 TwitterDialog::TwitterDialog(MainWindow *mainWindow, RideItem *item) :
     mainWindow(mainWindow)
 {
     ride = item;
-    settings = GetApplicationSettings();
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("Tweet Your Ride");
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -97,8 +101,8 @@ void
 TwitterDialog::tweetCurrentRide()
 {
 
-    QString strToken = settings->value(GC_TWITTER_TOKEN).toString();
-    QString strSecret = settings->value(GC_TWITTER_SECRET).toString();
+    QString strToken = appsettings->value(this, GC_TWITTER_TOKEN).toString();
+    QString strSecret = appsettings->value(this, GC_TWITTER_SECRET).toString();
 
     QString s_token = QString(strToken);
     QString s_secret = QString(strSecret);
@@ -146,111 +150,91 @@ TwitterDialog::tweetCurrentRide()
 
 }
 
+static QString metricToString(const RideMetric *m, SummaryMetrics &metrics)
+{
+    bool metricUnits = (appsettings->value(NULL, GC_UNIT).toString() == "Metric");
+    QString s = "%1%2";
+    if (m->units(metricUnits) == "seconds") {
+        s = s.arg(time_to_string(metrics.getForSymbol(m->symbol())));
+        s = s.arg(""); // no units
+    } else {
+        s = s.arg(metrics.getForSymbol(m->symbol()) * (metricUnits ? 1 : m->conversion()), 0, 'f', m->precision());
+        s = s.arg(m->units(metricUnits));
+    }
+    return s;
+}
+
 QString TwitterDialog::getTwitterMessage()
 {
-    RideMetricPtr m;
-    double tmp;
-    QString twitterMsg;
-    QVariant unit = settings->value(GC_UNIT);
-    bool useMetricUnits = (unit.toString() == "Metric");
+    RideMetricFactory &factory = RideMetricFactory::instance();
+    QString twitterMesg;
 
+    SummaryMetrics metrics = mainWindow->metricDB->getRideMetrics(mainWindow->rideItem()->fileName);
     if(workoutTimeChk->isChecked())
     {
-        m = ride->metrics.value("workout_time");
-        tmp = round(m->value(true));
-        QString msg = QString("Workout Time: %1").arg(time_to_string(tmp));
-        twitterMsg.append(msg + " ");
+        twitterMesg.append(QString("Duration: %1 ").arg(metricToString(factory.rideMetric("workout_time"), metrics)));
     }
 
     if(timeRidingChk->isChecked())
     {
-        m = ride->metrics.value("time_riding");
-        tmp = round(m->value(true));
-        QString msg = QString("Time Riding: %1").arg(time_to_string(tmp));
-        twitterMsg.append(msg + " ");
+        twitterMesg.append(QString("Time Riding: %1 ").arg(metricToString(factory.rideMetric("time_riding"), metrics)));
     }
 
     if(totalDistanceChk->isChecked())
     {
-        m = ride->metrics.value("total_distance");
-        QString msg = QString("Total Distance: %1" + (useMetricUnits ? tr("km") : tr("mi"))).arg(m->value(useMetricUnits),1,'f',1);
-        twitterMsg.append(msg + " ");
+        twitterMesg.append(QString("Distance: %1 ").arg(metricToString(factory.rideMetric("total_distance"), metrics)));
     }
 
     if(elevationGainChk->isChecked())
     {
-        m = ride->metrics.value("elevation_gain");
-        tmp = round(m->value(useMetricUnits));
-        QString msg = QString("Elevation Gained: %1"+ (useMetricUnits ? tr("m") : tr("ft"))).arg(tmp);
-        twitterMsg.append(msg + " ");
+        twitterMesg.append(QString("Climbing: %1 ").arg(metricToString(factory.rideMetric("elevation_gain"), metrics)));
     }
 
     if(totalWorkChk->isChecked())
     {
-        m = ride->metrics.value("total_work");
-        tmp = round(m->value(true));
-        QString msg = QString("Total Work: %1"+ tr("kJ")).arg(tmp);
-        twitterMsg.append(msg + " ");
+        twitterMesg.append(QString("Work: %1 ").arg(metricToString(factory.rideMetric("total_work"), metrics)));
     }
 
     if(averageSpeedChk->isChecked())
     {
-        m = ride->metrics.value("average_speed");
-        QString msg = QString("Average Speed: %1"+ (useMetricUnits ? tr("km/h") : tr("mph"))).arg(m->value(useMetricUnits),1,'f',1);
-        twitterMsg.append(msg + " ");
+        twitterMesg.append(QString("Avg Speed: %1 ").arg(metricToString(factory.rideMetric("average_speed"), metrics)));
     }
 
     if(averagePowerChk->isChecked())
     {
-        m = ride->metrics.value("average_power");
-        tmp = round(m->value(true));
-        QString msg = QString("Average Power: %1 "+ tr("watts")).arg(tmp);
-        twitterMsg.append(msg + " ");
+        twitterMesg.append(QString("Avg Power: %1 ").arg(metricToString(factory.rideMetric("average_power"), metrics)));
     }
 
     if(averageHRMChk->isChecked())
     {
-        m = ride->metrics.value("average_hr");
-        tmp = round(m->value(true));
-        QString msg = QString("Average Heart Rate: %1"+ tr("bpm")).arg(tmp);
-        twitterMsg.append(msg + " ");
+        twitterMesg.append(QString("Avg HR: %1 ").arg(metricToString(factory.rideMetric("average_hr"), metrics)));
     }
 
     if(averageCadenceChk->isChecked())
     {
-        m = ride->metrics.value("average_cad");
-        tmp = round(m->value(true));
-        QString msg = QString("Average Cadence: %1"+ tr("rpm")).arg(tmp);
-        twitterMsg.append(msg + " ");
+        twitterMesg.append(QString("Avg Cadence: %1 ").arg(metricToString(factory.rideMetric("average_cad"), metrics)));
     }
 
     if(maxPowerChk->isChecked())
     {
-        m = ride->metrics.value("max_power");
-        tmp = round(m->value(true));
-        QString msg = QString("Max Power: %1 "+ tr("watts")).arg(tmp);
-        twitterMsg.append(msg + " ");
+        twitterMesg.append(QString("Max Power: %1 ").arg(metricToString(factory.rideMetric("max_power"), metrics)));
     }
 
     if(maxHRMChk->isChecked())
     {
-        m = ride->metrics.value("max_heartrate");
-        tmp = round(m->value(true));
-        QString msg = QString("Max Heart Rate: %1"+ tr("bpm")).arg(tmp);
-        twitterMsg.append(msg + " ");
+        twitterMesg.append(QString("Max HR: %1 ").arg(metricToString(factory.rideMetric("max_heartrate"), metrics)));
     }
 
     QString msg = twitterMessageEdit->text();
-    if(!msg.endsWith(" "))
-        msg.append(" ");
+    if(!msg.endsWith(" ")) msg.append(" ");
 
-    QString entireTweet = QString(msg + twitterMsg + "#goldencheetah");
+    QString entireTweet = QString(msg + twitterMesg + "#goldencheetah");
 
     return entireTweet;
 
 }
 
-void TwitterDialog::onCheck(int state)
+void TwitterDialog::onCheck(int /*state*/)
 {
     QString twitterMessage = getTwitterMessage();
     int tweetLength = twitterMessage.length();

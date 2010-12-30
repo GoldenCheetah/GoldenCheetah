@@ -29,7 +29,7 @@ Season::Season()
 }
 
 QString Season::getName() {
-    
+
     return name;
 }
 

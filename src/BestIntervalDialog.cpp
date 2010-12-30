@@ -256,6 +256,9 @@ BestIntervalDialog::findBests(const RideFile *ride, double windowSizeSecs,
     double totalWatts = 0.0;
     QList<const RideFilePoint*> window;
 
+    // ride is shorter than the window size!
+    if (windowSizeSecs > ride->dataPoints().last()->secs + secsDelta) return;
+
     // We're looking for intervals with durations in [windowSizeSecs, windowSizeSecs + secsDelta).
     foreach (const RideFilePoint *point, ride->dataPoints()) {
         // Discard points until interval duration is < windowSizeSecs + secsDelta.

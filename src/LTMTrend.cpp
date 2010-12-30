@@ -26,31 +26,21 @@ LTMTrend::LTMTrend(double *xdata, double *ydata, int count) :
           points(0.0), sumX(0.0), sumY(0.0), sumXsquared(0.0),
           sumYsquared(0.0), sumXY(0.0), a(0.0), b(0.0)
 {
-    if (count == 0) return;
+    if (count <= 2) return;
 
-    for (int i = 0; i < count; i++) addXY(xdata[i], ydata[i]);
-}
+    for (int i = 0; i < count; i++) {
+        points++;
+        sumX += xdata[i];
+        sumY += ydata[i];
+        sumXsquared += xdata[i] * xdata[i];
+        sumYsquared += ydata[i] * ydata[i];
+        sumXY += xdata[i] * ydata[i];
+    }
 
-void
-LTMTrend::addXY(double& x, double& y)
-{
-    points++;
-    sumX += x;
-    sumY += y;
-    sumXsquared += x * x;
-    sumYsquared += y * y;
-    sumXY += x * y;
-    calc();
-}
-
-void
-LTMTrend::calc()
-{
-    if (points > 2) {
-        if (fabs( double(points) * sumXsquared - sumX * sumX) > DBL_EPSILON) {
-            b = ( double(points) * sumXY - sumY * sumX) /
-                ( double(points) * sumXsquared - sumX * sumX);
-            a = (sumY - b * sumX) / double(points);
-        }
+    if (fabs( double(points) * sumXsquared - sumX * sumX) > DBL_EPSILON) {
+        b = ( double(points) * sumXY - sumY * sumX) /
+            ( double(points) * sumXsquared - sumX * sumX);
+        a = (sumY - b * sumX) / double(points);
     }
 }
+

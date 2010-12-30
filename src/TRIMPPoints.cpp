@@ -22,6 +22,7 @@
 #include "HrZones.h"
 #include <QObject>
 #include <math.h>
+#include "MainWindow.h"
 
 #define tr(s) QObject::tr(s)
 
@@ -50,9 +51,10 @@ class TRIMPPoints : public RideMetric {
     }
 
     void compute(const RideFile *rideFile,
-                 const Zones *, int ,
+                 const Zones *, int,
                  const HrZones *hrZones, int hrZoneRange,
-                 const QHash<QString,RideMetric*> &deps)
+                 const QHash<QString,RideMetric*> &deps,
+                 const MainWindow *main)
     {
         if (!hrZones || hrZoneRange < 0) {
             setValue(0);
@@ -82,9 +84,7 @@ class TRIMPPoints : public RideMetric {
         QString athlete;
         double ksex = 1.92;
         if ((athlete = rideFile->getTag("Athlete", "unknown")) != "unknown") {
-            boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-            QString key = QString("%1/%2").arg(athlete).arg(GC_SEX);
-            if (settings->value(key).toInt() == 1) ksex = 1.67; // Female
+            if (appsettings->cvalue(main->cyclist, GC_SEX).toInt() == 1) ksex = 1.67; // Female
             else ksex = 1.92; // Male
         }
 
@@ -119,7 +119,8 @@ public:
     void compute(const RideFile *rideFile,
                  const Zones *, int,
                  const HrZones *hrZones, int hrZoneRange,
-                 const QHash<QString,RideMetric*> &deps)
+                 const QHash<QString,RideMetric*> &deps,
+                 const MainWindow *main)
     {
         if (!hrZones || hrZoneRange < 0) {
             setValue(0);
@@ -146,9 +147,7 @@ public:
         QString athlete;
         double ksex = 1.92;
         if ((athlete = rideFile->getTag("Athlete", "unknown")) != "unknown") {
-            boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-            QString key = QString("%1/%2").arg(athlete).arg(GC_SEX);
-            if (settings->value(key).toInt() == 1) ksex = 1.67; // Female
+            if (appsettings->cvalue(main->cyclist, GC_SEX).toInt() == 1) ksex = 1.67; // Female
             else ksex = 1.92; // Male
         }
 
@@ -186,7 +185,8 @@ public:
     void compute(const RideFile *,
                  const Zones *, int,
                  const HrZones *hrZones, int hrZoneRange,
-                 const QHash<QString,RideMetric*> &deps)
+                 const QHash<QString,RideMetric*> &deps,
+                 const MainWindow *)
     {
         assert(deps.contains("average_hr"));
         const RideMetric *averageHrMetric = deps.value("average_hr");
