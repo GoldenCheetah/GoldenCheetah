@@ -20,46 +20,60 @@
 #include "MainWindow.h"
 #include "PfPvPlot.h"
 #include "RideItem.h"
+#include "Settings.h"
 #include <QtGui>
 
 PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
-    QWidget(mainWindow), mainWindow(mainWindow), current(NULL)
+    GcWindow(mainWindow), mainWindow(mainWindow), current(NULL)
 {
-    QVBoxLayout *vlayout = new QVBoxLayout;
-    QHBoxLayout *qaLayout = new QHBoxLayout;
+    setInstanceName("Pf/Pv Window");
 
+    QWidget *c = new QWidget;
+    QVBoxLayout *cl = new QVBoxLayout(c);
+    setControls(c);
+
+    // the plot
+    QVBoxLayout *vlayout = new QVBoxLayout;
     pfPvPlot = new PfPvPlot(mainWindow);
+    vlayout->addWidget(pfPvPlot);
+    setLayout(vlayout);
+
+    // the controls
+    QFormLayout *f = new QFormLayout;
+    cl->addLayout(f);
+
     QLabel *qaCPLabel = new QLabel(tr("Watts:"), this);
     qaCPValue = new QLineEdit(QString("%1").arg(pfPvPlot->getCP()));
     qaCPValue->setValidator(new QIntValidator(0, 9999, qaCPValue));
+    f->addRow(qaCPLabel, qaCPValue);
+
     QLabel *qaCadLabel = new QLabel(tr("RPM:"), this);
     qaCadValue = new QLineEdit(QString("%1").arg(pfPvPlot->getCAD()));
     qaCadValue->setValidator(new QIntValidator(0, 999, qaCadValue));
+    f->addRow(qaCadLabel, qaCadValue);
+
     QLabel *qaClLabel = new QLabel(tr("Crank Length (m):"), this);
     qaClValue = new QLineEdit(QString("%1").arg(1000 * pfPvPlot->getCL()));
+    f->addRow(qaClLabel, qaClValue);
+
     shadeZonesPfPvCheckBox = new QCheckBox;
     shadeZonesPfPvCheckBox->setText(tr("Shade zones"));
-    shadeZonesPfPvCheckBox->setCheckState(Qt::Checked);
+    if (appsettings->value(this, GC_SHADEZONES, true).toBool() == true)
+        shadeZonesPfPvCheckBox->setCheckState(Qt::Checked);
+    else
+        shadeZonesPfPvCheckBox->setCheckState(Qt::Unchecked);
+    cl->addWidget(shadeZonesPfPvCheckBox);
+
     mergeIntervalPfPvCheckBox = new QCheckBox;
     mergeIntervalPfPvCheckBox->setText(tr("Merge intervals"));
     mergeIntervalPfPvCheckBox->setCheckState(Qt::Unchecked);
+    cl->addWidget(mergeIntervalPfPvCheckBox);
+
     frameIntervalPfPvCheckBox = new QCheckBox;
     frameIntervalPfPvCheckBox->setText(tr("Frame intervals"));
     frameIntervalPfPvCheckBox->setCheckState(Qt::Checked);
-
-    qaLayout->addWidget(qaCPLabel);
-    qaLayout->addWidget(qaCPValue);
-    qaLayout->addWidget(qaCadLabel);
-    qaLayout->addWidget(qaCadValue);
-    qaLayout->addWidget(qaClLabel);
-    qaLayout->addWidget(qaClValue);
-    qaLayout->addWidget(shadeZonesPfPvCheckBox);
-    qaLayout->addWidget(mergeIntervalPfPvCheckBox);
-    qaLayout->addWidget(frameIntervalPfPvCheckBox);
-
-    vlayout->addWidget(pfPvPlot);
-    vlayout->addLayout(qaLayout);
-    setLayout(vlayout);
+    cl->addWidget(frameIntervalPfPvCheckBox);
+    cl->addStretch();
 
     connect(pfPvPlot, SIGNAL(changedCP(const QString&)),
             qaCPValue, SLOT(setText(const QString&)) );
@@ -79,7 +93,8 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
                 this, SLOT(setMergeIntervalsPfPvFromCheckBox()));
     connect(frameIntervalPfPvCheckBox, SIGNAL(stateChanged(int)),
                 this, SLOT(setFrameIntervalsPfPvFromCheckBox()));
-    connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+    //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+    connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(mainWindow, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
     connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
@@ -89,11 +104,11 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
 void
 PfPvWindow::rideSelected()
 {
-    if (mainWindow->activeTab() != this)
+    if (!amVisible())
         return;
 
 
-    RideItem *ride = mainWindow->rideItem();
+    RideItem *ride = myRideItem;
     if (ride == current || !ride || !ride->ride())
         return;
 
@@ -108,7 +123,7 @@ PfPvWindow::rideSelected()
 void
 PfPvWindow::intervalSelected()
 {
-    RideItem *ride = mainWindow->rideItem();
+    RideItem *ride = myRideItem;
     if (!ride) return;
     pfPvPlot->showIntervals(ride);
 }

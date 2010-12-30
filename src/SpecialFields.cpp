@@ -28,6 +28,7 @@ SpecialFields::SpecialFields()
             << "Workout Code" // in WKO and possibly others
             << "Sport"        // in WKO and possible others
             << "Objective"    // in WKO as "goal" nad possibly others
+            << "Summary"      // embeds the RideSummary widget
             << "Notes"        // linked to MainWindow::rideNotes
             << "Keywords"     // extracted from Notes / used for highlighting calendar
             << "Recording Interval" // linked to RideFile::recIntSecs
@@ -40,7 +41,9 @@ SpecialFields::SpecialFields()
             << "Spike Time"   // calculated from source data by FixSpikes
             << "Torque Adjust" // the last torque adjust applied
             << "Filename"      // set by the rideFile reader
+            << "Year"          // set by the rideFile reader
             << "Change History" // set by RideFileCommand
+            << "Calendar Text" // set by openRideFile and rideMetadata
             ;
 
     // now add all the metric fields (for metric overrides)

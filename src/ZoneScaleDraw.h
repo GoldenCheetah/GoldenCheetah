@@ -19,6 +19,7 @@
 
 #ifndef _GC_ZoneScaleDraw_h
 #define _GC_ZoneScaleDraw_h 1
+#include "GoldenCheetah.h"
 
 #include <qwt_scale_draw.h>
 #include "Zones.h"

@@ -18,6 +18,7 @@
 
 #ifndef _DataProcessor_h
 #define _DataProcessor_h
+#include "GoldenCheetah.h"
 
 #include "RideFile.h"
 #include "RideFileCommand.h"
@@ -53,6 +54,8 @@
 class DataProcessorConfig : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
         DataProcessorConfig(QWidget *parent=0) : QWidget(parent) {}
@@ -84,7 +87,6 @@ class DataProcessorFactory {
     public:
 
         static DataProcessorFactory &instance();
-
         bool registerProcessor(QString name, DataProcessor *processor);
         QMap<QString,DataProcessor*> getProcessors() const { return processors; }
         bool autoProcess(RideFile *); // run auto processes (after open rideFile)
@@ -94,6 +96,8 @@ class MainWindow;
 class ManualDataProcessorDialog : public QDialog
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
         ManualDataProcessorDialog(MainWindow *, QString, RideItem *);

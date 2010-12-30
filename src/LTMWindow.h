@@ -18,6 +18,7 @@
 
 #ifndef _GC_LTMWindow_h
 #define _GC_LTMWindow_h 1
+#include "GoldenCheetah.h"
 
 #include <QtGui>
 #include <QTimer>
@@ -25,9 +26,12 @@
 #include "MetricAggregator.h"
 #include "Season.h"
 #include "LTMPlot.h"
+#include "LTMPopup.h"
 #include "LTMTool.h"
 #include "LTMSettings.h"
 #include "LTMCanvasPicker.h"
+#include "GcPane.h"
+
 #include <math.h>
 
 #include <qwt_plot_picker.h>
@@ -65,9 +69,18 @@ class LTMToolTip : public QwtPlotPicker
     QString tip;
 };
 
-class LTMWindow : public QWidget
+Q_DECLARE_METATYPE(LTMSettings);
+
+class LTMWindow : public GcWindow
 {
     Q_OBJECT
+    G_OBJECT
+
+    Q_PROPERTY(int chart READ chart WRITE setChart USER true) //XXX hack for now (chart list can change!)
+    Q_PROPERTY(int bin READ bin WRITE setBin USER true)
+    Q_PROPERTY(bool shade READ shade WRITE setShade USER true)
+    Q_PROPERTY(bool legend READ legend WRITE setLegend USER true)
+    Q_PROPERTY(QString dateRange READ dateRange WRITE setDateRange USER true)
 
     public:
 
@@ -76,18 +89,37 @@ class LTMWindow : public QWidget
         ~LTMWindow();
         LTMToolTip *toolTip() { return picker; }
 
+        // get/set properties
+        int chart() const { return presetPicker->currentIndex(); }
+        void setChart(int x) { presetPicker->setCurrentIndex(x); }
+        int bin() const { return groupBy->currentIndex(); }
+        void setBin(int x) { groupBy->setCurrentIndex(x); }
+        bool shade() const { return shadeZones->isChecked(); }
+        void setShade(bool x) { shadeZones->setChecked(x); }
+        bool legend() const { return showLegend->isChecked(); }
+        void setLegend(bool x) { showLegend->setChecked(x); }
+
+        // date ranges set/get the string from the treeWidget
+        QString dateRange() const;
+        void setDateRange(QString x);
+
+        LTMSettings getSettings() const { return settings; }
+        void applySettings(LTMSettings x) { ltmTool->applySettings(&x); }
+
     public slots:
         void rideSelected();
         void refreshPlot();
-        void splitterMoved();
         void dateRangeSelected(const Season *);
         void metricSelected();
         void groupBySelected(int);
         void shadeZonesClicked(int);
+        void showLegendClicked(int);
         void chartSelected(int);
         void saveClicked();
         void manageClicked();
         void refresh();
+        void pointClicked(QwtPlotCurve*, int);
+        int groupForDate(QDate, int);
 
     private:
         // passed from MainWindow
@@ -98,6 +130,11 @@ class LTMWindow : public QWidget
         LTMToolTip *picker;
         LTMCanvasPicker *_canvasPicker; // allow point selection/hover
 
+        // popup - the GcPane to display within
+        //         and the LTMPopup contents widdget
+        GcPane *popup;
+        LTMPopup *ltmPopup;
+
         // preset charts
         QList<LTMSettings> presets;
 
@@ -106,6 +143,7 @@ class LTMWindow : public QWidget
         bool dirty;
         LTMSettings settings; // all the plot settings
         QList<SummaryMetrics> results;
+        QList<SummaryMetrics> measures;
 
         // Widgets
         QSplitter *ltmSplitter;
@@ -115,9 +153,9 @@ class LTMWindow : public QWidget
         QComboBox *presetPicker;
         QComboBox *groupBy;
         QCheckBox *shadeZones;
+        QCheckBox *showLegend;
         QPushButton *saveButton;
         QPushButton *manageButton;
-        MetricAggregator *metricDB;
 };
 
 #endif // _GC_LTMWindow_h

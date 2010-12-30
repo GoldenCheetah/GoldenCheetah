@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -18,6 +18,7 @@
 
 #ifndef _GC_AllPlot_h
 #define _GC_AllPlot_h 1
+#include "GoldenCheetah.h"
 
 #include <qwt_plot.h>
 #include <qwt_data.h>
@@ -40,6 +41,8 @@ class LTMCanvasPicker;
 class AllPlot : public QwtPlot
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
 
@@ -57,6 +60,7 @@ class AllPlot : public QwtPlot
         bool shadeZones() const;
         void refreshZoneLabels();
         void refreshIntervalMarkers();
+        void setAxisTitle(int axis, QString label);
 
         // refresh data / plot parameters
         void recalc();
@@ -75,6 +79,8 @@ class AllPlot : public QwtPlot
         void setSmoothing(int value);
         void setByDistance(int value);
         void configChanged();
+
+        // for tooltip
         void pointHover(QwtPlotCurve*, int);
 
     protected:

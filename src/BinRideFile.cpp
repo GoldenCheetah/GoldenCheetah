@@ -199,7 +199,7 @@ struct BinFileReaderState
             *sum += (0xff & c1) + (0xff & c2);
         if (count)
             *count += 2;
-        
+
         return  256*(0xff & c1) + (0xff & c2);
     }
 
@@ -254,7 +254,7 @@ struct BinFileReaderState
         int i = 0;
         QString deviceInfo = "";
         QDateTime t;
-        
+
         foreach(const BinField &field, def.fields) {
             if (!global_format_identifiers.contains(field.id)) {
                 unknown_format_identifiers.insert(field.id);
@@ -424,7 +424,7 @@ struct BinFileReaderState
         int i = 0;
         int temperature_count = 0;
         double temperature = 0.0;
-        
+
         foreach(const BinField &field, def.fields) {
             if (!global_format_identifiers.contains(field.id)) {
                 unknown_format_identifiers.insert(field.id);
@@ -484,7 +484,6 @@ struct BinFileReaderState
                 unknown_format_identifiers.insert(field.id);
             } else {
                 int value = values[i++];
-           
                 bool b0 = (value % 2);
                 bool b1 = (value / 2>1);
                 bool b2 = (value / 4>1);
@@ -493,12 +492,12 @@ struct BinFileReaderState
                 bool b5 = (value / 32>1);
                 bool b6 = (value / 64>1);
                 bool b7 = (value / 128>1);
-                
+
                 QString b = QString("DataError : %1 %2 %3 %4 %5 %6 %7 %8").arg(b0?"0":"").arg(b1?"1":"").arg(b2?"2":"").arg(b3?"3":"").arg(b4?"4":"").arg(b5?"5":"").arg(b6?"6":"").arg(b7?"7":"");
-                
+
                 switch (field.id) {
                     case FORMAT_ID__DROPOUT_FLAGS :
-                        
+
                         //errors << QString("DataError field.id %1 value %2").arg(field.id).arg(b);
                         unused_format_identifiers_for_record_types[def.format_identifier].insert(field.id);
                         break;

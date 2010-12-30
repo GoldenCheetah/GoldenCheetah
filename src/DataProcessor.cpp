@@ -24,7 +24,6 @@
 #include <assert.h>
 
 DataProcessorFactory *DataProcessorFactory::instance_;
-
 DataProcessorFactory &DataProcessorFactory::instance()
 {
     if (!instance_) instance_ = new DataProcessorFactory();
@@ -42,7 +41,6 @@ DataProcessorFactory::registerProcessor(QString name, DataProcessor *processor)
 bool
 DataProcessorFactory::autoProcess(RideFile *ride)
 {
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
     bool changed = false;
 
     // run through the processors and execute them!
@@ -51,7 +49,7 @@ DataProcessorFactory::autoProcess(RideFile *ride)
     while (i.hasNext()) {
         i.next();
         QString configsetting = QString("dp/%1/apply").arg(i.key());
-        if (settings->value(configsetting, "Manual").toString() == "Auto")
+        if (appsettings->value(NULL, configsetting, "Manual").toString() == "Auto")
             i.value()->postProcess(ride);
     }
 

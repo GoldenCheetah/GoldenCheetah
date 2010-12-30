@@ -6,6 +6,11 @@ BOOST_INSTALL = /usr/local/boost
 SRMIO_INSTALL = /usr/local/srmio
 D2XX_INCLUDE = /usr/local/include/D2XX
 
+#if you have PHONON compiled in and working
+#uncomment the below, for video playback support
+#in the training and racing view
+#GC_HAVE_PHONON = true
+
 # If you want Twitter support you must install liboauth
 # http://liboauth.sourceforge.net/
 # Set the path to where liboauth.a was installed
@@ -28,6 +33,14 @@ D2XX_INCLUDE = /usr/local/include/D2XX
 
 #QWT3D_INSTALL = /usr/local/qwtplot3d
 
+# If you want TrainingPeaks.com upload/download you need
+# to install the Qt Soap add-on
+#
+#  http://qt.nokia.com/products/appdev/add-on-products/catalog/4/Utilities/qtsoap
+#
+# then set the following variable appropriately:
+#QTSOAP_INSTALL = /usr/local/qtsoap-2.7_1-opensource/
+
 # If you want support for Google Earth .kml files then you need
 # to install the Google libkml library
 #
@@ -36,9 +49,20 @@ D2XX_INCLUDE = /usr/local/include/D2XX
 #
 # then set the following variable appropriately
 # to the root of the libs/includ path
-
 #KML_INSTALL = /usr/local
 
+# If you want support for Downloading iCal calendars
+# you will need to install libical
+#
+# http://sourceforge.net/projects/freeassociation/
+#
+# then set the following variable appropriately
+# to the root of the libs/includ path
+#ICAL_INSTALL = /usr/local/libical
+
+# let us know where flex/bison are:
+#QMAKE_LEX = flex
+#QMAKE_YACC = bison
 
 # We recommend a debug build for development, and a static build for releases.
 CONFIG += debug

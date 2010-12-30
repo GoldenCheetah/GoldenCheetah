@@ -3,6 +3,7 @@
 
 #ifndef GC_LTMCanvasPicker_H
 #define GC_LTMCanvasPicker_H 1
+#include "GoldenCheetah.h"
 
 #include <qobject.h>
 
@@ -14,6 +15,8 @@ class QwtPlotCurve;
 class LTMCanvasPicker: public QObject
 {
     Q_OBJECT
+    G_OBJECT
+
 public:
     LTMCanvasPicker(QwtPlot *plot);
     virtual bool eventFilter(QObject *, QEvent *);

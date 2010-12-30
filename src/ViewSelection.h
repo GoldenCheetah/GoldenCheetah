@@ -18,6 +18,7 @@
 
 #ifndef _GC_ViewSelection_h
 #define _GC_ViewSelection_h 1
+#include "GoldenCheetah.h"
 
 #include <QDir>
 #include <QtGui>
@@ -32,6 +33,8 @@
 class ViewSelection : public QComboBox
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
         ViewSelection(const MainWindow *parent, const int homeView);

@@ -31,15 +31,23 @@
 #include <QXmlSimpleReader>
 
 CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
-    QWidget(parent), home(home), mainWindow(parent), currentRide(NULL)
+    GcWindow(parent), home(home), mainWindow(parent), currentRide(NULL)
 {
+    setInstanceName("Critical Power Window");
+
+    // main plot area
     QVBoxLayout *vlayout = new QVBoxLayout;
-
-    cpintPlot = new CpintPlot(home.path(), mainWindow->zones());
+    cpintPlot = new CpintPlot(mainWindow, home.path(), mainWindow->zones());
     vlayout->addWidget(cpintPlot);
+    setLayout(vlayout);
 
+    // controls
+    QWidget *c = new QWidget;
+    QVBoxLayout *cl = new QVBoxLayout(c);
+    setControls(c);
+
+    // picker details
     QFormLayout *cpintPickerLayout = new QFormLayout;
-    QFormLayout *cpintPickerLayout2 = new QFormLayout;
     QLabel *cpintTimeLabel = new QLabel(tr("Interval Duration:"), this);
     cpintTimeValue = new QLineEdit("0 s");
     QLabel *cpintTodayLabel = new QLabel(tr("Today:"), this);
@@ -50,9 +58,9 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
     cpintCPValue = new QLineEdit(tr("no data"));
 
     QFontMetrics metrics(QApplication::font());
-    int width = metrics.width("8888 watts (88/88/8888)") + 10;
-    cpintAllValue->setFixedWidth(width);
-    cpintCPValue->setFixedWidth(width); // so lines up nicely
+    //int width = metrics.width("8888 watts (88/88/8888)") + 10;
+    //cpintAllValue->setFixedWidth(width);
+    //cpintCPValue->setFixedWidth(width); // so lines up nicely
 
     cpintTimeValue->setReadOnly(true);
     cpintTodayValue->setReadOnly(true);
@@ -60,31 +68,22 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
     cpintCPValue->setReadOnly(true);
     cpintPickerLayout->addRow(cpintTimeLabel, cpintTimeValue);
     cpintPickerLayout->addRow(cpintTodayLabel, cpintTodayValue);
-    cpintPickerLayout2->addRow(cpintAllLabel, cpintAllValue);
-    cpintPickerLayout2->addRow(cpintCPLabel, cpintCPValue);
+    cpintPickerLayout->addRow(cpintAllLabel, cpintAllValue);
+    cpintPickerLayout->addRow(cpintCPLabel, cpintCPValue);
+    cl->addLayout(cpintPickerLayout);
 
-    QHBoxLayout *bottomLayout = new QHBoxLayout;
-
-    bottomLayout->addLayout(cpintPickerLayout);
-    bottomLayout->addLayout(cpintPickerLayout2);
-
-    QVBoxLayout *otherLayout = new QVBoxLayout;
+    // tools /properties
     cComboSeason = new QComboBox(this);
     addSeasons();
     cpintSetCPButton = new QPushButton(tr("&Save CP value"), this);
     cpintSetCPButton->setEnabled(false);
-    otherLayout->addWidget(cpintSetCPButton);
-    otherLayout->addWidget(cComboSeason);
-    QComboBox *yAxisCombo = new QComboBox(this);
+    cl->addWidget(cpintSetCPButton);
+    cl->addWidget(cComboSeason);
+    yAxisCombo = new QComboBox(this);
     yAxisCombo->addItem(tr("Y Axis Shows Power"));
     yAxisCombo->addItem(tr("Y Axis Shows Energy"));
-    otherLayout->addWidget(yAxisCombo);
-
-    bottomLayout->addLayout(otherLayout);
-
-    vlayout->addLayout(bottomLayout);
-
-    setLayout(vlayout);
+    cl->addWidget(yAxisCombo);
+    cl->addStretch();
 
     picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
                                QwtPicker::PointSelection,
@@ -100,7 +99,8 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
     this, SLOT(seasonSelected(int)));
     connect(yAxisCombo, SIGNAL(currentIndexChanged(int)),
             this, SLOT(setEnergyMode(int)));
-    connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+    //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+    connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(configChanged()), cpintPlot, SLOT(configChanged()));
 
     // redraw on config change -- this seems the simplest approach
@@ -123,9 +123,9 @@ CriticalPowerWindow::deleteCpiFile(QString rideFilename)
 void
 CriticalPowerWindow::rideSelected()
 {
-    if (mainWindow->activeTab() != this)
+    if (!amVisible())
         return;
-    currentRide = mainWindow->rideItem();
+    currentRide = myRideItem;
     if (currentRide) {
         cpintPlot->calculate(currentRide);
 

@@ -18,6 +18,7 @@
 
 #ifndef _KmlRideFile_h
 #define _KmlRideFile_h
+#include "GoldenCheetah.h"
 
 #include "RideFile.h"
 

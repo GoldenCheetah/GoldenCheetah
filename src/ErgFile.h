@@ -18,6 +18,7 @@
 
 #ifndef _ErgFile_h
 #define _ErgFile_h
+#include "GoldenCheetah.h"
 
 #include <QtGui>
 #include <QObject>

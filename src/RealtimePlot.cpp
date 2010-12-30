@@ -86,6 +86,8 @@ void RealtimeHrData::addData(double v) { hrData[hrCur++] = v; if (hrCur==50) hrC
 
 RealtimePlot::RealtimePlot() : pwrCurve(NULL)
 {
+    setInstanceName("Realtime Plot");
+
     //insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     pwrData.init();
     cadData.init();

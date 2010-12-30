@@ -18,6 +18,8 @@
 
 #ifndef _GC_Settings_h
 #define _GC_Settings_h 1
+#include "GoldenCheetah.h"
+#include <QDebug>
 
 #define GC_SETTINGS_CO              "goldencheetah.org"
 #define GC_SETTINGS_APP             "GoldenCheetah"
@@ -67,6 +69,27 @@
 #define GC_WORKOUTDIR      "workoutDir"
 #define GC_TRAIN_SPLITTER_SIZES  "trainwindow/splitterSizes"
 #define GC_LTM_SPLITTER_SIZES  "ltmwindow/splitterSizes"
+#define GC_LINEWIDTH      "linewidth"
+#define GC_ANTIALIAS      "antialias"
+#define GC_SHADEZONES     "shadezones"
+#define GC_PROXYTYPE      "proxy/type"
+#define GC_PROXYHOST      "proxy/host"
+#define GC_PROXYPORT      "proxy/port"
+#define GC_PROXYUSER      "proxy/user"
+#define GC_PROXYPASS      "proxy/pass"
+#define GC_GCURL          "gc/url"
+#define GC_GCUSER         "gc/user"
+#define GC_GCPASS         "gc/pass"
+#define GC_TPURL          "tp/url"
+#define GC_TPUSER         "tp/user"
+#define GC_TPPASS         "tp/pass"
+#define GC_TPTYPE         "tp/type"
+#define GC_TWURL          "tw/url"
+#define GC_TWUSER         "tw/user"
+#define GC_TWPASS         "tw/pass"
+#define GC_WIURL          "wi/url"
+#define GC_WIUSER         "wi/user"
+#define GC_WIKEY         "wi/key"
 
 
 // device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended
@@ -87,6 +110,11 @@
 #define GC_DPFS_VARIANCE  "dataprocess/fixspikes/variance"
 #define GC_DPTA           "dataprocess/torqueadjust/adjustment"
 
+// ride navigator
+#define GC_NAVHEADINGS    "navigator/headings"
+#define GC_NAVHEADINGWIDTHS "bavigator/headingwidths"
+#define GC_NAVGROUPBY       "navigator/groupby"
+
 //Twitter oauth keys
 #define GC_TWITTER_CONSUMER_KEY    "qbbmhDt8bG8ZBcT3r9nYw" //< consumer key
 #define GC_TWITTER_CONSUMER_SECRET "IWXu2G6mQC5xvhM8V0ohA0mPTUOqAFutiuKIva3LQg"
@@ -97,20 +125,58 @@
 #define GC_GARMIN_SMARTRECORD "garminSmartRecord"
 #define GC_GARMIN_HWMARK "garminHWMark"
 
+// Calendar sync
+#define GC_WEBCAL_URL "webcal_url"
+
+// Default view on Diary
+#define GC_DIARY_VIEW "diaryview"
+
+// Fonts
+#define GC_FONT_DEFAULT           "font/default"
+#define GC_FONT_TITLES            "font/titles"
+#define GC_FONT_CHARTMARKERS      "font/chartmarkers"
+#define GC_FONT_CHARTLABELS       "font/chartlabels"
+#define GC_FONT_CALENDAR          "font/calendar"
+#define GC_FONT_POPUP             "font/popup"
+#define GC_FONT_DEFAULT_SIZE      "font/defaultsize"
+#define GC_FONT_TITLES_SIZE       "font/titlessize"
+#define GC_FONT_CHARTMARKERS_SIZE "font/chartmarkerssize"
+#define GC_FONT_CHARTLABELS_SIZE  "font/chartlabelssize"
+#define GC_FONT_CALENDAR_SIZE     "font/calendarsize"
+#define GC_FONT_POPUP_SIZE        "font/popup"
+
+// TreeMap selection
+#define GC_TM_FIRST               "tm/first"
+#define GC_TM_SECOND              "tm/second"
+#define GC_TM_METRIC              "tm/metric"
+
 #include <QSettings>
+#include <QFileInfo>
 #include <boost/shared_ptr.hpp>
 
-inline boost::shared_ptr<QSettings> GetApplicationSettings()
+// wrap the standard QSettings so we can offer members
+// to get global or cyclist specific settings
+// via value() and cvalue()
+class GSettings : public QSettings
 {
-  boost::shared_ptr<QSettings> settings;
-  QDir home = QDir();
-    //First check to see if the Library folder exists where the executable is (for USB sticks)
-  if(!home.exists("Library/GoldenCheetah"))
-    settings = boost::shared_ptr<QSettings>(new QSettings(GC_SETTINGS_CO, GC_SETTINGS_APP));
-  else
-    settings = boost::shared_ptr<QSettings>(new QSettings(home.absolutePath()+"/gc", QSettings::IniFormat));
+    public:
+    GSettings(QString org, QString scope) : QSettings(org,scope) { }
+    GSettings(QString file, Format format) : QSettings(file,format) { }
 
-  return settings;
-}
+    // standard access to global config
+    QVariant value(const QObject *me, const QString key, const QVariant def = 0) const ;
+    void setValue(QString key, QVariant value) {
+        QSettings::setValue(key,value);
+    }
 
+    // access to cyclist specific config
+    QVariant cvalue(QString cyclist, QString key, QVariant def = 0) {
+        return QSettings::value(cyclist+"/"+key, def);
+    }
+    void setCValue(QString cyclist, QString key, QVariant value) {
+        QSettings::setValue(cyclist + "/" + key,value);
+    }
+};
+
+extern GSettings *appsettings;
 #endif // _GC_Settings_h

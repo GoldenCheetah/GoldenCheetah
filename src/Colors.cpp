@@ -22,8 +22,9 @@
 #include <QDir>
 #include "Settings.h"
 
-static Colors ColorList[45] = {
+static Colors ColorList[56] = {
     { "Plot Background", "COLORPLOTBACKGROUND", Qt::white },
+    { "Ride Plot Background", "COLORRIDEPLOTBACKGROUND", Qt::black },
     { "Plot Thumbnail Background", "COLORPLOTTHUMBNAIL", Qt::gray },
     { "Plot Title", "COLORPLOTTITLE", Qt::black },
     { "Plot Selection Pen", "COLORPLOTSELECT", Qt::blue },
@@ -55,18 +56,28 @@ static Colors ColorList[45] = {
     { "Power Zone 8 Shading", "COLORZONE8", Qt::gray },
     { "Power Zone 9 Shading", "COLORZONE9", Qt::gray },
     { "Power Zone 10 Shading", "COLORZONE10", Qt::gray },
-    { "Heartrate Zone 1 Shading", "COLORHRZONE1", QColor(255,0,255) },
-    { "Heartrate Zone 2 Shading", "COLORHRZONE2", QColor(42,0,255) },
-    { "Heartrate Zone 3 Shading", "COLORHRZONE3", QColor(0,170,255) },
-    { "Heartrate Zone 4 Shading", "COLORHRZONE4", QColor(0,255,128) },
-    { "Heartrate Zone 5 Shading", "COLORHRZONE5", QColor(85,255,0) },
-    { "Heartrate Zone 6 Shading", "COLORHRZONE6", QColor(255,213,0) },
-    { "Heartrate Zone 7 Shading", "COLORHRZONE7", QColor(255,0,0) },
-    { "Heartrate Zone 8 Shading", "COLORHRZONE8", Qt::gray },
-    { "Heartrate Zone 9 Shading", "COLORHRZONE9", Qt::gray },
-    { "Heartrate Zone 10 Shading", "COLORHRZONE10", Qt::gray },
+    { "HR Zone 1 Shading", "HRCOLORZONE1", QColor(255,0,255) },
+    { "HR Zone 2 Shading", "HRCOLORZONE2", QColor(42,0,255) },
+    { "HR Zone 3 Shading", "HRCOLORZONE3", QColor(0,170,255) },
+    { "HR Zone 4 Shading", "HRCOLORZONE4", QColor(0,255,128) },
+    { "HR Zone 5 Shading", "HRCOLORZONE5", QColor(85,255,0) },
+    { "HR Zone 6 Shading", "HRCOLORZONE6", QColor(255,213,0) },
+    { "HR Zone 7 Shading", "HRCOLORZONE7", QColor(255,0,0) },
+    { "HR Zone 8 Shading", "HRCOLORZONE8", Qt::gray },
+    { "HR Zone 9 Shading", "HRCOLORZONE9", Qt::gray },
+    { "HR Zone 10 Shading", "HRCOLORZONE10", Qt::gray },
     { "Aerolab VE", "COLORAEROVE", Qt::blue },
     { "Aerolab Elevation", "COLORAEROEL", Qt::green },
+    { "Calendar background", "CCALCELL", Qt::white },
+    { "Calendar heading", "CCALHEAD", QColor(230,230,230) },
+    { "Calendar Current Selection", "CCALCURRENT", Qt::darkBlue },
+    { "Calendar Actual Workout", "CCALACTUAL", Qt::green },
+    { "Calendar Planned Workout", "CCALPLANNED", Qt::yellow },
+    { "Calendar Today", "CCALTODAY", Qt::cyan },
+    { "Pop Up Windows Background", "CPOPUP", Qt::lightGray },
+    { "Pop Up Windows Foreground", "CPOPUPTEXT", Qt::white },
+    { "Chart Bar Unselected", "CTILEBAR", Qt::gray },
+    { "Chart Bar Selected", "CTILEBARSELECT", Qt::yellow },
     { "", "", QColor(0,0,0) },
 };
 
@@ -91,10 +102,9 @@ GCColor::invert(QColor color)
 void
 GCColor::readConfig()
 {
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
     // read in config settings and populate the color table
     for (unsigned int i=0; ColorList[i].name != ""; i++) {
-        QString colortext = settings->value(ColorList[i].setting, "").toString();
+        QString colortext = appsettings->value(this, ColorList[i].setting, "").toString();
         if (colortext != "") {
             // color definitions are stored as "r:g:b"
             QStringList rgb = colortext.split(":");

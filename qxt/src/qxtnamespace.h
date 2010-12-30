@@ -88,7 +88,8 @@ namespace Qxt
     {
         ItemStartTimeRole  = Qt::UserRole + 1,
         ItemDurationRole   = ItemStartTimeRole + 1,
-        UserRole           = ItemDurationRole + 23
+        OutlineRole        = ItemDurationRole + 1,
+        UserRole           = OutlineRole + 23
     };
 
     enum Timeunit

@@ -18,6 +18,7 @@
 
 #ifndef _GC_ErgFilePlot_h
 #define _GC_ErgFilePlot_h 1
+#include "GoldenCheetah.h"
 
 #include <QDebug>
 #include <QtGui>
@@ -54,6 +55,8 @@ class NowData : public QwtData
 class ErgFilePlot : public QwtPlot
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
 

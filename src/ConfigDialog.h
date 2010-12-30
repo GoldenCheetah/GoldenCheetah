@@ -1,5 +1,6 @@
 #ifndef CONFIGDIALOG_H
 #define CONFIGDIALOG_H
+#include "GoldenCheetah.h"
 
 #include <QDialog>
 #include <QSettings>
@@ -15,6 +16,8 @@ class Zones;
 class ConfigDialog : public QDialog
 {
     Q_OBJECT
+    G_OBJECT
+
     public:
         ConfigDialog(QDir home, Zones *zones, MainWindow *mainWindow);
 
@@ -38,7 +41,6 @@ class ConfigDialog : public QDialog
         ConfigurationPage *configPage;
         CyclistPage *cyclistPage;
         DevicePage *devicePage;
-        TwitterPage *twitterPage;
         QPushButton *saveButton;
         QStackedWidget *pagesWidget;
 	QPushButton *closeButton;

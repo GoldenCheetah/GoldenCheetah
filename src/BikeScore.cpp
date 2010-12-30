@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2008 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -48,8 +48,10 @@ class XPower : public RideMetric {
         setImperialUnits(tr("watts"));
     }
 
-    void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
-                 const QHash<QString,RideMetric*> &) {
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const MainWindow *) {
 
         static const double EPSILON = 0.1;
         static const double NEGLIGIBLE = 0.1;
@@ -58,7 +60,7 @@ class XPower : public RideMetric {
         double sampsPerWindow = 25.0 / secsDelta;
         double attenuation = sampsPerWindow / (sampsPerWindow + secsDelta);
         double sampleWeight = secsDelta / (sampsPerWindow + secsDelta);
-        
+
         double lastSecs = 0.0;
         double weighted = 0.0;
 
@@ -104,8 +106,10 @@ class VariabilityIndex : public RideMetric {
         setPrecision(3);
     }
 
-    void compute(const RideFile *, const Zones *, int, const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps) {
+    void compute(const RideFile *, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &deps,
+                 const MainWindow *) {
         assert(deps.contains("skiba_xpower"));
         assert(deps.contains("average_power"));
         XPower *xp = dynamic_cast<XPower*>(deps.value("skiba_xpower"));
@@ -135,8 +139,10 @@ class RelativeIntensity : public RideMetric {
         setImperialUnits(tr(""));
         setPrecision(3);
     }
-    void compute(const RideFile *, const Zones *zones, int zoneRange, const HrZones *, int,
-                 const QHash<QString,RideMetric*> &deps) {
+    void compute(const RideFile *, const Zones *zones, int zoneRange,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &deps,
+                 const MainWindow *) {
         if (zones && zoneRange >= 0) {
             assert(deps.contains("skiba_xpower"));
             XPower *xp = dynamic_cast<XPower*>(deps.value("skiba_xpower"));
@@ -150,7 +156,7 @@ class RelativeIntensity : public RideMetric {
 
     // added djconnel: allow RI to be combined across rides
     bool canAggregate() const { return true; }
-    void aggregateWith(const RideMetric &other) { 
+    void aggregateWith(const RideMetric &other) {
         assert(symbol() == other.symbol());
 	    const RelativeIntensity &ap = dynamic_cast<const RelativeIntensity&>(other);
 	    reli = secs * pow(reli, bikeScoreN) + ap.count() * pow(ap.value(true), bikeScoreN);
@@ -176,8 +182,10 @@ class BikeScore : public RideMetric {
         setImperialUnits("");
     }
 
-    void compute(const RideFile *, const Zones *zones, int zoneRange,const HrZones *, int,
-	    const QHash<QString,RideMetric*> &deps) {
+    void compute(const RideFile *, const Zones *zones, int zoneRange,
+                 const HrZones *, int,
+	    const QHash<QString,RideMetric*> &deps,
+                 const MainWindow *) {
 	    if (!zones || zoneRange < 0)
 	        return;
 

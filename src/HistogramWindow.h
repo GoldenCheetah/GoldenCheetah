@@ -18,24 +18,43 @@
 
 #ifndef _GC_HistogramWindow_h
 #define _GC_HistogramWindow_h 1
+#include "GoldenCheetah.h"
 
-#include <QWidget>
+#include <QtGui>
 
 class MainWindow;
 class PowerHist;
-class QCheckBox;
-class QComboBox;
-class QLineEdit;
-class QSlider;
 class RideItem;
 
-class HistogramWindow : public QWidget
+class HistogramWindow : public GcWindow
 {
     Q_OBJECT
+    G_OBJECT
+
+    Q_PROPERTY(int series READ series WRITE setSeries USER true)
+    Q_PROPERTY(int percent READ percent WRITE setPercent USER true)
+    Q_PROPERTY(double bin READ bin WRITE setBin USER true)
+    Q_PROPERTY(bool logY READ logY WRITE setLogY USER true)
+    Q_PROPERTY(bool zeroes READ zeroes WRITE setZeroes USER true)
+    Q_PROPERTY(bool shade READ shade WRITE setShade USER true)
 
     public:
 
         HistogramWindow(MainWindow *mainWindow);
+
+        // get/set properties
+        int series() const { return histParameterCombo->currentIndex(); }
+        void setSeries(int x) { histParameterCombo->setCurrentIndex(x); }
+        int percent() const { return histSumY->currentIndex(); }
+        void setPercent(int x) { histSumY->setCurrentIndex(x); }
+        double bin() const { return binWidthSlider->value(); }
+        void setBin(double x) { binWidthSlider->setValue(x); }
+        bool logY() const { return lnYHistCheckBox->isChecked(); }
+        void setLogY(bool x) { lnYHistCheckBox->setChecked(x); }
+        bool zeroes() const { return withZerosCheckBox->isChecked(); }
+        void setZeroes(bool x) { withZerosCheckBox->setChecked(x); }
+        bool shade() const { return histShadeZones->isChecked(); }
+        void setShade(bool x) { histShadeZones->setChecked(x); }
 
     public slots:
 
@@ -45,10 +64,9 @@ class HistogramWindow : public QWidget
 
     protected slots:
 
-	void setHistWidgets(RideItem *rideItem);
         void setBinWidthFromSlider();
         void setBinWidthFromLineEdit();
-	void setlnYHistFromCheckBox();
+        void setlnYHistFromCheckBox();
         void setWithZerosFromCheckBox();
         void setHistSelection(int id);
         void setSumY(int);
@@ -56,7 +74,7 @@ class HistogramWindow : public QWidget
     protected:
 
         void setHistTextValidator();
-	void setHistBinWidthText();
+        void setHistBinWidthText();
 
         MainWindow *mainWindow;
         PowerHist *powerHist;
@@ -68,17 +86,7 @@ class HistogramWindow : public QWidget
         QComboBox *histParameterCombo;
         QComboBox *histSumY;
 
-	int histWattsID;
-	int histWattsZoneID;
-	int histNmID;
-	int histHrID;
-	int histHrZoneID;
-	int histKphID;
-	int histCadID;
-	int histAltID;
-
-    int powerRange, hrRange;
+        int powerRange, hrRange;
 };
 
 #endif // _GC_HistogramWindow_h
-

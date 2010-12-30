@@ -18,6 +18,7 @@
 
 #ifndef _BinRideFile_h
 #define _BinRideFile_h
+#include "GoldenCheetah.h"
 
 #include "RideFile.h"
 

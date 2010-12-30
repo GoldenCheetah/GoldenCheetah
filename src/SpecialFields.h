@@ -18,6 +18,7 @@
 
 #ifndef _GC_SpecialFields_h
 #define _GC_SpecialFields_h
+#include "GoldenCheetah.h"
 
 #include <QStringList>
 #include <QStringListModel>

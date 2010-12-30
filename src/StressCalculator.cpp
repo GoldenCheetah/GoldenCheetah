@@ -11,6 +11,7 @@
 #include <QProgressDialog>
 
 StressCalculator::StressCalculator (
+    QString cyclist,
 	QDateTime startDate,
 	QDateTime endDate,
         double initialSTS = 0,
@@ -22,8 +23,7 @@ StressCalculator::StressCalculator (
 	initialSTS(initialSTS), initialLTS(initialLTS), lastDaysIndex(-1)
 {
     // calc SB for today or tomorrow?
-    settings = GetApplicationSettings();
-    showSBToday = settings->value(GC_SB_TODAY).toInt();
+    showSBToday = appsettings->cvalue(cyclist, GC_SB_TODAY).toInt();
 
     days = startDate.daysTo(endDate);
 

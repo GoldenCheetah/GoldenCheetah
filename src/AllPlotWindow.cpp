@@ -48,36 +48,35 @@
 #include "LTMWindow.h"
 
 AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
-    QWidget(mainWindow), current(NULL), mainWindow(mainWindow), active(false), stale(true)
+    GcWindow(mainWindow), current(NULL), mainWindow(mainWindow), active(false), stale(true)
 {
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    QVBoxLayout *vlayout = new QVBoxLayout;
+    setInstanceName("Ride Plot Window");
 
-    QHBoxLayout *showLayout = new QHBoxLayout;
-    QLabel *showLabel = new QLabel(tr("Show:"), this);
-    showLayout->addWidget(showLabel);
+    QWidget *c = new QWidget;
+    QVBoxLayout *cl = new QVBoxLayout(c);
+    setControls(c);
+
+    setContentsMargins(0,0,0,0);
+
+    // setup the controls
+    QLabel *showLabel = new QLabel(tr("Show"), c);
+    cl->addWidget(showLabel);
 
     showStack = new QCheckBox(tr("Stacked view"), this);
-
-    if (settings->value(GC_RIDE_PLOT_STACK).toInt())
+    if (appsettings->value(this, GC_RIDE_PLOT_STACK).toInt())
         showStack->setCheckState(Qt::Checked);
     else
         showStack->setCheckState(Qt::Unchecked);
-    showLayout->addWidget(showStack);
+    cl->addWidget(showStack);
 
     stackWidth = 15;
-
-    QLabel *labelspacer = new QLabel(this);
-    labelspacer->setFixedWidth(5);
-    showLayout->addWidget(labelspacer);
-
     stackZoomUp = new QwtArrowButton(1, Qt::UpArrow,this);
     stackZoomUp->setFixedHeight(15);
     stackZoomUp->setFixedWidth(15);
     stackZoomUp->setEnabled(false);
     stackZoomUp->setContentsMargins(0,0,0,0);
     stackZoomUp->setFlat(true);
-    showLayout->addWidget(stackZoomUp);
+    cl->addWidget(stackZoomUp);
 
     stackZoomDown = new QwtArrowButton(1, Qt::DownArrow,this);
     stackZoomDown->setFixedHeight(15);
@@ -85,52 +84,49 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     stackZoomDown->setEnabled(false);
     stackZoomDown->setContentsMargins(0,0,0,0);
     stackZoomDown->setFlat(true);
-    showLayout->addWidget(stackZoomDown);
+    cl->addWidget(stackZoomDown);
 
-    QCheckBox *showGrid = new QCheckBox(tr("Grid"), this);
+    showGrid = new QCheckBox(tr("Grid"), this);
     showGrid->setCheckState(Qt::Checked);
-    showLayout->addWidget(showGrid);
+    cl->addWidget(showGrid);
 
     showHr = new QCheckBox(tr("Heart Rate"), this);
     showHr->setCheckState(Qt::Checked);
-    showLayout->addWidget(showHr);
+    cl->addWidget(showHr);
 
     showSpeed = new QCheckBox(tr("Speed"), this);
     showSpeed->setCheckState(Qt::Checked);
-    showLayout->addWidget(showSpeed);
+    cl->addWidget(showSpeed);
 
     showCad = new QCheckBox(tr("Cadence"), this);
     showCad->setCheckState(Qt::Checked);
-    showLayout->addWidget(showCad);
+    cl->addWidget(showCad);
 
     showAlt = new QCheckBox(tr("Altitude"), this);
     showAlt->setCheckState(Qt::Checked);
-    showLayout->addWidget(showAlt);
+    cl->addWidget(showAlt);
 
     showPower = new QComboBox();
     showPower->addItem(tr("Power + shade"));
     showPower->addItem(tr("Power - shade"));
     showPower->addItem(tr("No Power"));
-    showLayout->addWidget(showPower);
+    cl->addWidget(showPower);
+    if (appsettings->value(this, GC_SHADEZONES, true).toBool() == true)
+        showPower->setCurrentIndex(0);
+    else
+        showPower->setCurrentIndex(1);
 
-    // shade zones defaults will come in with a
-    // future patch. For now we have place holder
-    // to update when new config arrives
-    if (true) showPower->setCurrentIndex(0);
-    else showPower->setCurrentIndex(1);
-
-    QHBoxLayout *smoothLayout = new QHBoxLayout;
-    QComboBox *comboDistance = new QComboBox();
+    comboDistance = new QComboBox();
     comboDistance->addItem(tr("X Axis Shows Time"));
     comboDistance->addItem(tr("X Axis Shows Distance"));
-    smoothLayout->addWidget(comboDistance);
+    cl->addWidget(comboDistance);
 
     QLabel *smoothLabel = new QLabel(tr("Smoothing (secs)"), this);
     smoothLineEdit = new QLineEdit(this);
     smoothLineEdit->setFixedWidth(40);
 
-    smoothLayout->addWidget(smoothLabel);
-    smoothLayout->addWidget(smoothLineEdit);
+    cl->addWidget(smoothLabel);
+    cl->addWidget(smoothLineEdit);
     smoothSlider = new QSlider(Qt::Horizontal);
     smoothSlider->setTickPosition(QSlider::TicksBelow);
     smoothSlider->setTickInterval(10);
@@ -139,9 +135,13 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     smoothLineEdit->setValidator(new QIntValidator(smoothSlider->minimum(),
                                                    smoothSlider->maximum(),
                                                    smoothLineEdit));
-    smoothLayout->addWidget(smoothSlider);
+    cl->addWidget(smoothSlider);
+    cl->addStretch();
 
     allPlot = new AllPlot(this, mainWindow);
+    allPlot->setInstanceName("allPlot");
+    allPlot->setContentsMargins(0,0,0,0);
+
     smoothSlider->setValue(allPlot->smooth);
     smoothLineEdit->setText(QString("%1").arg(allPlot->smooth));
 
@@ -201,22 +201,44 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     allMarker2->setLabelAlignment(Qt::AlignTop|Qt::AlignRight);
     allPlot->allMarker2=allMarker2;
 
+    // Container widgets should not paint
+    // since they tend to use naff defaults and
+    // 'complicate' or 'make busy' the general
+    // look and feel
+    QPalette palette;
+    palette.setBrush(QPalette::Background, Qt::NoBrush);
+
     //
     // stack view
     //
+    stackPlotLayout = new QVBoxLayout();
+    stackPlotLayout->setSpacing(0);
+    stackPlotLayout->setContentsMargins(0,0,0,0);
+    stackWidget = new QWidget();
+    stackWidget->setAutoFillBackground(false);
+    stackWidget->setPalette(palette);
+    stackWidget->setLayout(stackPlotLayout);
+
     stackFrame = new QScrollArea();
     stackFrame->hide();
-    stackPlotLayout = new QVBoxLayout();
-    stackWidget = new QWidget();
-    stackWidget->setLayout(stackPlotLayout);
+    stackFrame->setPalette(palette);
+    stackFrame->setAutoFillBackground(false);
     stackFrame->setWidgetResizable(true);
     stackFrame->setWidget(stackWidget);
+    stackFrame->setFrameStyle(QFrame::NoFrame);
+    stackFrame->setContentsMargins(0,0,0,0);
 
     //
     // allPlot view
     //
     QVBoxLayout *allPlotLayout = new QVBoxLayout;
+    allPlotLayout->setSpacing(0);
+    allPlotLayout->setContentsMargins(0,0,0,0);
     allPlotFrame = new QScrollArea();
+    allPlotFrame->setFrameStyle(QFrame::NoFrame);
+    allPlotFrame->setAutoFillBackground(false);
+    allPlotFrame->setPalette(palette);
+    allPlotFrame->setContentsMargins(0,0,0,0);
 
     spanSlider = new QxtSpanSlider(Qt::Horizontal);
     spanSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
@@ -251,6 +273,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
 #endif
 
     fullPlot = new AllPlot(this, mainWindow);
+    fullPlot->setInstanceName("fullPlot");
     fullPlot->grid->enableY(false);
     fullPlot->setCanvasBackground(GColor(CPLOTTHUMBNAIL));
     fullPlot->setCanvasLineWidth(0);
@@ -268,6 +291,8 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
 
     // controls...
     controlsLayout = new QGridLayout;
+    controlsLayout->setSpacing(0);
+    controlsLayout->setContentsMargins(5,5,5,5);
     controlsLayout->addWidget(fullPlot, 0,1);
     controlsLayout->addWidget(spanSlider, 1,1);
     controlsLayout->addWidget(scrollLeft,1,0);
@@ -281,19 +306,19 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
 #else
     controlsLayout->setSpacing(0);
 #endif
+    allPlotLayout->addLayout(controlsLayout);
+    allPlotLayout->setStretch(0,100);
+    allPlotLayout->setStretch(1,20);
 
+    QVBoxLayout *vlayout = new QVBoxLayout(this);
+    vlayout->setContentsMargins(10,10,10,10);
+    vlayout->setSpacing(0);
     vlayout->addWidget(allPlotFrame);
     vlayout->addWidget(stackFrame);
-    vlayout->addLayout(controlsLayout);
-    vlayout->addLayout(showLayout);
-    vlayout->addLayout(smoothLayout);
-    vlayout->setStretch(0,100);
-    vlayout->setStretch(1,100);
-    vlayout->setStretch(2,15);
-    vlayout->setStretch(3,1);
-    vlayout->setStretch(4,1);
     vlayout->setSpacing(1);
     setLayout(vlayout);
+
+    setContentsMargins(0,0,0,0);
 
     // common controls
     connect(showPower, SIGNAL(currentIndexChanged(int)), this, SLOT(setShowPower(int)));
@@ -318,7 +343,8 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     connect(scrollRight, SIGNAL(clicked()), this, SLOT(moveRight()));
 
     // GC signals
-    connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+    //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+    connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(rideDirty()), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
     connect(mainWindow, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
@@ -334,8 +360,8 @@ AllPlotWindow::configChanged()
 
     // we're going to replot, but only if we're active
     // and all the other guff
-    RideItem *ride = mainWindow->rideItem();
-    if (mainWindow->activeTab() != this) {
+    RideItem *ride = myRideItem;
+    if (!amVisible()) {
         stale = true;
         return;
     }
@@ -399,7 +425,7 @@ AllPlotWindow::redrawFullPlot()
     //fullPlot->setTitle("");
 
     if (fullPlot->bydist)
-        fullPlot->setAxisScale(QwtPlot::xBottom, 
+        fullPlot->setAxisScale(QwtPlot::xBottom,
         ride->ride()->dataPoints().first()->km * (fullPlot->useMetricUnits ? 1 : MILES_PER_KM),
         ride->ride()->dataPoints().last()->km * (fullPlot->useMetricUnits ? 1 : MILES_PER_KM));
     else
@@ -466,10 +492,10 @@ AllPlotWindow::moveRight()
 void
 AllPlotWindow::rideSelected()
 {
-    RideItem *ride = mainWindow->rideItem();
+    RideItem *ride = myRideItem;
 
     // ignore if not active
-    if (mainWindow->activeTab() != this) {
+    if (!amVisible()) {
         stale = true;
         return;
     }
@@ -509,7 +535,7 @@ AllPlotWindow::rideSelected()
 void
 AllPlotWindow::zonesChanged()
 {
-    if (mainWindow->activeTab() != this) {
+    if (!amVisible()) {
         stale = true;
         return;
     }
@@ -521,7 +547,7 @@ AllPlotWindow::zonesChanged()
 void
 AllPlotWindow::intervalsChanged()
 {
-    if (mainWindow->activeTab() != this) {
+    if (!amVisible()) {
         stale = true;
         return;
     }
@@ -544,7 +570,7 @@ AllPlotWindow::intervalsChanged()
 void
 AllPlotWindow::intervalSelected()
 {
-    if (mainWindow->activeTab() != this) {
+    if (!amVisible()) {
         stale = true;
         return;
     }
@@ -563,6 +589,12 @@ AllPlotWindow::intervalSelected()
         fullPlot->replot();
         allPlot->replot();
     }
+}
+
+void
+AllPlotWindow::setStacked(int value)
+{
+    showStack->setChecked(value);
 }
 
 void
@@ -606,6 +638,7 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
     // ride. It also hides/shows widgets depending
     // upon wether we are in 'normal' mode or
     // stacked plot mode
+    if (!ride) return;
 
     // checkboxes to show/hide specific data series...
 	const RideFileDataPresent *dataPresent = ride->ride()->areDataPresent();
@@ -682,7 +715,6 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
         spanSlider->show();
         scrollLeft->show();
         scrollRight->show();
-
         stackZoomUp->setEnabled(false);
         stackZoomDown->setEnabled(false);
     }
@@ -1102,6 +1134,7 @@ AllPlotWindow::stackZoomDownShouldEnable(int sw)
     else {
         return true;
     }
+
 }
 
 void
@@ -1143,8 +1176,7 @@ AllPlotWindow::showStackChanged(int value)
     // out of date. Then call setAllPlotWidgets
     // to make sure all the controls are setup
     // and the right widgets are hidden/shown.
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    settings->setValue(GC_RIDE_PLOT_STACK, value);
+    appsettings->setValue(GC_RIDE_PLOT_STACK, value);
 
     if (value) {
         // refresh plots
@@ -1156,7 +1188,6 @@ AllPlotWindow::showStackChanged(int value)
     } else {
         // refresh plots
         redrawAllPlot();
-
     }
 
     // reset the view
@@ -1202,6 +1233,9 @@ AllPlotWindow::setupStackPlots()
     else
         nbplot = (int)floor(duration/_stackWidth/60)+1;
 
+    QPalette palette;
+    palette.setBrush(QPalette::Background, Qt::NoBrush);
+
     for(int i = 0 ; i < nbplot ; i++) {
 
         // calculate the segment of ride this stack plot contains
@@ -1221,6 +1255,9 @@ AllPlotWindow::setupStackPlots()
 
         // create that plot
         AllPlot *_allPlot = new AllPlot(this, mainWindow);
+        _allPlot->setInstanceName("stackPlot");
+        _allPlot->setAutoFillBackground(false);
+        _allPlot->setPalette(palette);
 
         // add to the list
         allPlots.append(_allPlot);
@@ -1233,7 +1270,7 @@ AllPlotWindow::setupStackPlots()
 
         if (i==0){
             // First plot view title and legend
-            _allPlot->setTitle(allPlot->title());
+            //_allPlot->setTitle(allPlot->title());
             _allPlot->plotLayout()->setLegendPosition(QwtPlot::TopLegend);
             _allPlot->setFixedHeight(120+stackWidth*2+50);
         }
@@ -1245,6 +1282,7 @@ AllPlotWindow::setupStackPlots()
 
         // No x axis titles
         _allPlot->setAxisTitle(QwtPlot::xBottom,NULL);
+#if 0
         // Smaller y axis Titles
         QFont axisFont = QFont("Helvetica",10, QFont::Normal);
         QwtText text = _allPlot->axisTitle(QwtPlot::yLeft);
@@ -1259,7 +1297,7 @@ AllPlotWindow::setupStackPlots()
         text = _allPlot->axisTitle(QwtPlot::yRight2);
         text.setFont(axisFont);
         _allPlot->setAxisTitle(QwtPlot::yRight2,text);
-
+#endif
         _allPlot->setShadeZones(showPower->currentIndex() == 0);
         // XXX todo - set the showHR, showCad stuff too...
 
@@ -1275,6 +1313,8 @@ AllPlotWindow::setupStackPlots()
 
     // set new widgets
     QWidget *stackWidget = new QWidget;
+    stackWidget->setPalette(palette);
+    stackWidget->setAutoFillBackground(false);
     stackWidget->setLayout(newLayout);
     stackFrame->setWidget(stackWidget);
 

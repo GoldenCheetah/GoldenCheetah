@@ -26,6 +26,7 @@
 #include <qwt_legend.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
+#include <qwt_plot_layout.h>
 #include <qwt_plot_marker.h>
 #include <qwt_scale_engine.h>
 #include "RideItem.h"
@@ -33,30 +34,34 @@
 #include "LogTimeScaleEngine.h"
 #include "RideFile.h"
 #include "Season.h"
+#include "Settings.h"
 #include <boost/scoped_ptr.hpp>
 #include <algorithm> // for std::lower_bound
 
 #define USE_T0_IN_CP_MODEL 0 // added djconnel 08Apr2009: allow 3-parameter CP model
 
-CpintPlot::CpintPlot(QString p, const Zones *zones) :
+CpintPlot::CpintPlot(MainWindow *main, QString p, const Zones *zones) :
     needToScanRides(true),
     path(p),
     thisCurve(NULL),
     CPCurve(NULL),
     zones(zones),
+    mainWindow(main),
     energyMode_(false)
 {
+    setInstanceName("CP Plot");
     assert(!USE_T0_IN_CP_MODEL); // doesn't work with energyMode=true
 
-    insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
+    //insertLegend(new QwtLegend(), QwtPlot::BottomLegend); //XXX ugly in small, needs fixing
     setAxisTitle(yLeft, tr("Average Power (watts)"));
     setAxisTitle(xBottom, tr("Interval Length"));
     setAxisScaleDraw(xBottom, new LogTimeScaleDraw);
     setAxisScaleEngine(xBottom, new LogTimeScaleEngine);
-    setAxisScale(xBottom, 1.0 / 60.0, 60);
+    setAxisScale(xBottom, (double)0.017, (double)60);
+    plotLayout()->setAlignCanvasToScales(true);
 
     grid = new QwtPlotGrid();
-    grid->enableX(false);
+    grid->enableX(true);
     grid->attach(this);
 
     configChanged(); // apply colors
@@ -69,6 +74,20 @@ CpintPlot::configChanged()
     QPen gridPen(GColor(CPLOTGRID));
     gridPen.setStyle(Qt::DotLine);
     grid->setPen(gridPen);
+}
+
+void
+CpintPlot::setAxisTitle(int axis, QString label)
+{
+    // setup the default fonts
+    QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
+    stGiles.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+    stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+
+    QwtText title(label);
+    title.setFont(stGiles);
+    QwtPlot::setAxisFont(axis, stGiles);
+    QwtPlot::setAxisTitle(axis, title);
 }
 
 struct cpi_file_info {
@@ -118,13 +137,13 @@ struct cpint_data {
 };
 
 static void
-update_cpi_file(const cpi_file_info *info, QProgressDialog *progress,
+update_cpi_file(MainWindow *mainWindow, const cpi_file_info *info, QProgressDialog *progress,
                 double &progress_sum, double progress_max)
 {
     QFile file(info->inname);
     QStringList errors;
     boost::scoped_ptr<RideFile> rideFile(
-        RideFileFactory::instance().openRideFile(file, errors));
+        RideFileFactory::instance().openRideFile(mainWindow, file, errors));
     if (!rideFile || rideFile->dataPoints().isEmpty())
         return;
     cpint_data data;
@@ -448,9 +467,10 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
 #endif
 
     CPCurve = new QwtPlotCurve(curve_title);
-    CPCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+        CPCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     QPen pen(GColor(CCP));
-    pen.setWidth(2.0);
+    pen.setWidth(appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble());
     pen.setStyle(Qt::DashLine);
     CPCurve->setPen(pen);
     CPCurve->setData(cp_curve_time.data(), cp_curve_power.data(), curve_points);
@@ -509,9 +529,10 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
             QColor color = zoneColor(zone, n_zones);
             QString name = zones->getDefaultZoneName(zone);
             QwtPlotCurve *curve = new QwtPlotCurve(name);
-            curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+            if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+                curve->setRenderHint(QwtPlotItem::RenderAntialiased);
             QPen pen(color);
-            pen.setWidth(2.0);
+            pen.setWidth(appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble());
             curve->setPen(pen);
             curve->attach(thisPlot);
             color.setAlpha(64);
@@ -528,8 +549,8 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
 
             if (!energyMode_ || energyBests[high] > 100.0) {
                 QwtText text(name);
-                text.setFont(QFont("Helvetica", 24, QFont::Bold));
-                color.setAlpha(128);
+                text.setFont(QFont("Helvetica", 20, QFont::Bold));
+                color.setAlpha(255);
                 text.setColor(color);
                 QwtPlotMarker *label_mark = new QwtPlotMarker();
                 // place the text in the geometric mean in time, at a decent power
@@ -555,12 +576,13 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
     // no zones available: just plot the curve without zones
     else {
         QwtPlotCurve *curve = new QwtPlotCurve(tr("maximal power"));
-        curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+            curve->setRenderHint(QwtPlotItem::RenderAntialiased);
         QPen pen(GColor(CCP));
-        pen.setWidth(2.0);
+        pen.setWidth(appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble());
         curve->setPen(pen);
         QColor brush_color = GColor(CCP);
-        brush_color.setAlpha(64);
+        brush_color.setAlpha(200);
         curve->setBrush(brush_color);   // brush fills below the line
         if (energyMode_)
             curve->setData(time_values.data(), energyBests.data(), n_values);
@@ -573,7 +595,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
     // Energy mode is really only interesting in the range where energy is
     // linear in interval duration--up to about 1 hour.
     double xmax = energyMode_ ? 60.0 : time_values[n_values - 1];
-    thisPlot->setAxisScale(thisPlot->xBottom, 1.0 / 60, xmax);
+    thisPlot->setAxisScale(thisPlot->xBottom, (double) 0.017, (double)xmax);
 
     double ymax;
     if (energyMode_) {
@@ -589,6 +611,8 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
 void
 CpintPlot::calculate(RideItem *rideItem)
 {
+    if (!rideItem) return;
+
     QString fileName = rideItem->fileName;
     QDateTime dateTime = rideItem->dateTime;
     QDir dir(path);
@@ -607,7 +631,7 @@ CpintPlot::calculate(RideItem *rideItem)
                 QFile file(info.inname);
                 QStringList errors;
                 boost::scoped_ptr<RideFile> rideFile(
-                    RideFileFactory::instance().openRideFile(file, errors));
+                    RideFileFactory::instance().openRideFile(mainWindow, file, errors));
                 if (rideFile) {
                     double x = rideFile->dataPoints().size();
                     progress_max += x * (x + 1.0) / 2.0;
@@ -628,7 +652,7 @@ CpintPlot::calculate(RideItem *rideItem)
                 progress.setLabelText(
                     existing + QString(tr("Processing %1...")).arg(info.file));
                 progress.setValue(count++);
-                update_cpi_file(&info, &progress, progress_sum, progress_max);
+                update_cpi_file(mainWindow, &info, &progress, progress_sum, progress_max);
                 QCoreApplication::processEvents();
                 if (progress.wasCanceled()) {
                     aborted = true;

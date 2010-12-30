@@ -20,6 +20,7 @@
 
 #ifndef _GC_SimpleNetworkClient_h
 #define _GC_SimpleNetworkClient_h 1
+#include "GoldenCheetah.h"
 
 #include <QString>
 #include <QDebug>

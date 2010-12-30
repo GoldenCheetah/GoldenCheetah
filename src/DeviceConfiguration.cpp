@@ -59,10 +59,8 @@ DeviceConfigurations::readConfig()
 {
     int count;
 
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-
     // get count of devices
-    QVariant configVal = settings->value(GC_DEV_COUNT);
+    QVariant configVal = appsettings->value(NULL, GC_DEV_COUNT);
     if (configVal.isNull()) {
         count=0;
     } else {
@@ -75,27 +73,27 @@ DeviceConfigurations::readConfig()
             DeviceConfiguration Entry;
 
             QString configStr = QString("%1%2").arg(GC_DEV_NAME).arg(i+1);
-            configVal = settings->value(configStr);
+            configVal = appsettings->value(NULL, configStr);
             Entry.name = configVal.toString();
 
             configStr = QString("%1%2").arg(GC_DEV_SPEC).arg(i+1);
-            configVal = settings->value(configStr);
+            configVal = appsettings->value(NULL, configStr);
             Entry.portSpec = configVal.toString();
 
             configStr = QString("%1%2").arg(GC_DEV_TYPE).arg(i+1);
-            configVal = settings->value(configStr);
+            configVal = appsettings->value(NULL, configStr);
             Entry.type = configVal.toInt();
 
             configStr = QString("%1%2").arg(GC_DEV_PROF).arg(i+1);
-            configVal = settings->value(configStr);
+            configVal = appsettings->value(NULL, configStr);
             Entry.deviceProfile = configVal.toString();
 
             configStr = QString("%1%2").arg(GC_DEV_DEFI).arg(i+1);
-            configVal = settings->value(configStr);
+            configVal = appsettings->value(NULL, configStr);
             Entry.isDefaultDownload = configVal.toInt();
 
             configStr = QString("%1%2").arg(GC_DEV_DEFR).arg(i+1);
-            configVal = settings->value(configStr);
+            configVal = appsettings->value(NULL, configStr);
             Entry.isDefaultRealtime = configVal.toInt();
 
             Entries.append(Entry);
@@ -110,34 +108,32 @@ DeviceConfigurations::writeConfig(QList<DeviceConfiguration> Configuration)
     // writing to the GC settings
 
     int i=0;
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-
-    settings->setValue(GC_DEV_COUNT, Configuration.count());
+    appsettings->setValue(GC_DEV_COUNT, Configuration.count());
     for (i=0; i < Configuration.count(); i++) {
 
         // name
         QString configStr = QString("%1%2").arg(GC_DEV_NAME).arg(i+1);
-        settings->setValue(configStr, Configuration.at(i).name);
+        appsettings->setValue(configStr, Configuration.at(i).name);
 
         // type
         configStr = QString("%1%2").arg(GC_DEV_TYPE).arg(i+1);
-        settings->setValue(configStr, Configuration.at(i).type);
+        appsettings->setValue(configStr, Configuration.at(i).type);
 
         // portSpec
         configStr = QString("%1%2").arg(GC_DEV_SPEC).arg(i+1);
-        settings->setValue(configStr, Configuration.at(i).portSpec);
+        appsettings->setValue(configStr, Configuration.at(i).portSpec);
 
         // deviceProfile
         configStr = QString("%1%2").arg(GC_DEV_PROF).arg(i+1);
-        settings->setValue(configStr, Configuration.at(i).deviceProfile);
+        appsettings->setValue(configStr, Configuration.at(i).deviceProfile);
 
         // isDefaultDownload
         configStr = QString("%1%2").arg(GC_DEV_DEFI).arg(i+1);
-        settings->setValue(configStr, Configuration.at(i).isDefaultDownload);
+        appsettings->setValue(configStr, Configuration.at(i).isDefaultDownload);
 
         // isDefaultRealtime
         configStr = QString("%1%2").arg(GC_DEV_DEFR).arg(i+1);
-        settings->setValue(configStr, Configuration.at(i).isDefaultRealtime);
+        appsettings->setValue(configStr, Configuration.at(i).isDefaultRealtime);
     }
 
 }

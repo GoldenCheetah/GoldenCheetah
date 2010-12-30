@@ -18,6 +18,7 @@
 
 #ifndef TWITTERDIALOG_H
 #define TWITTERDIALOG_H
+#include "GoldenCheetah.h"
 
 #include <QObject>
 #include <QtGui>
@@ -33,6 +34,8 @@ extern "C" {
 class TwitterDialog : public QDialog
 {
     Q_OBJECT
+    G_OBJECT
+
 public:
      TwitterDialog(MainWindow *mainWindow, RideItem *item);
 
@@ -63,8 +66,6 @@ private:
 
      RideItem *ride;
      QString getTwitterMessage();
-     boost::shared_ptr<QSettings> settings;
-
 };
 
 #endif // TWITTERDIALOG_H

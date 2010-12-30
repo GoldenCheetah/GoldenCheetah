@@ -18,6 +18,7 @@
 
 #ifndef SPLITRIDEDIALOG_H
 #define SPLITRIDEDIALOG_H
+#include "GoldenCheetah.h"
 
 #include <QtGui>
 class MainWindow;
@@ -26,6 +27,8 @@ class RideFile;
 class SplitRideDialog : public QDialog
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
         SplitRideDialog(MainWindow *mainWindow);

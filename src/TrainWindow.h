@@ -18,6 +18,7 @@
 
 #ifndef _GC_TrainWindow_h
 #define _GC_TrainWindow_h 1
+#include "GoldenCheetah.h"
 
 #include <QDir>
 #include <QtGui>
@@ -25,26 +26,27 @@
 #include "MainWindow.h"
 #include "TrainTool.h"
 #include "TrainTabs.h"
+#include "RaceDispatcher.h"
 
 #include "RealtimeWindow.h"
 
-class TrainWindow : public QWidget
+class TrainWindow : public GcWindow
 {
     Q_OBJECT
+    G_OBJECT
 
     public:
         TrainWindow(MainWindow *parent, const QDir &home);
 
     public slots:
-        void splitterMoved();
 
     private:
         const QDir home;
         const MainWindow *main;
 
-        QSplitter *splitter;
         TrainTool *trainTool;
         TrainTabs *trainTabs;
+        RaceDispatcher *dispatcher;
 };
 
 #endif // _GC_TrainWindow_h

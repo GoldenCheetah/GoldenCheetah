@@ -18,6 +18,7 @@
 
 #ifndef _RideFile_h
 #define _RideFile_h
+#include "GoldenCheetah.h"
 
 #include <QDate>
 #include <QDir>
@@ -30,6 +31,7 @@
 class RideItem;
 class EditorData;      // attached to a RideFile
 class RideFileCommand; // for manipulating ride data
+class MainWindow;      // for context; cyclist, homedir
 
 // This file defines four classes:
 //
@@ -48,7 +50,7 @@ class RideFileCommand; // for manipulating ride data
 
 struct RideFilePoint
 {
-    double secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind;;
+    double secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind;
     int interval;
     RideFilePoint() : secs(0.0), cad(0.0), hr(0.0), km(0.0), kph(0.0),
         nm(0.0), watts(0.0), alt(0.0), lon(0.0), lat(0.0), headwind(0.0), interval(0) {}
@@ -79,6 +81,8 @@ struct RideFileInterval
 class RideFile : public QObject // QObject to emit signals
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
 
@@ -207,7 +211,7 @@ class RideFileFactory {
 
         int registerReader(const QString &suffix, const QString &description,
                            RideFileReader *reader);
-        RideFile *openRideFile(QFile &file, QStringList &errors) const;
+        RideFile *openRideFile(MainWindow *main, QFile &file, QStringList &errors) const;
         QStringList listRideFiles(const QDir &dir) const;
         QStringList suffixes() const;
         QString description(const QString &suffix) const {

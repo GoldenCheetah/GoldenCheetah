@@ -19,6 +19,9 @@
 
 #ifndef _GC_RealtimeData_h
 #define _GC_RealtimeData_h 1
+#include "GoldenCheetah.h"
+
+#include <QString>
 
 class RealtimeData
 {
@@ -28,12 +31,14 @@ public:
 
     RealtimeData();
     void reset(); // set all values to zero
+    void setName(char *name);
     void setWatts(double watts);
     void setHr(double hr);
     void setTime(long time);
     void setSpeed(double speed);
     void setCadence(double aCadence);
     void setLoad(double load);
+    char *getName();
     double getWatts();
     double getHr();
     long getTime();
@@ -42,6 +47,7 @@ public:
     double getLoad();
 
 private:
+    char name[64];
     double hr, watts, speed, load;
     unsigned long time;
 

@@ -1,5 +1,6 @@
 #ifndef EVENT_CALENDAR_WIDGET_H
 #define EVENT_CALENDAR_WIDGET_H
+#include "GoldenCheetah.h"
 
 #include <QCalendarWidget>
 #include <QMultiMap>
@@ -9,6 +10,8 @@ class MainWindow;
 class RideCalendar : public QCalendarWidget
 {
     Q_OBJECT
+    G_OBJECT
+
 
 public:
     RideCalendar(MainWindow *parent);

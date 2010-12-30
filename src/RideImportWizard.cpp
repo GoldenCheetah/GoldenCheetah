@@ -27,25 +27,27 @@
 #include "Settings.h"
 #include "Units.h"
 #include "GcRideFile.h"
+#include "JsonRideFile.h"
 
 
 // drag and drop passes urls ... convert to a list of files and call main constructor
-RideImportWizard::RideImportWizard(QList<QUrl> *urls, QDir &home, MainWindow *main, QWidget *parent) : QDialog(parent)
+RideImportWizard::RideImportWizard(QList<QUrl> *urls, QDir &home, MainWindow *main, QWidget *parent) : QDialog(parent), mainWindow(main)
 {
+    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     QList<QString> filenames;
     for (int i=0; i<urls->count(); i++)
         filenames.append(QFileInfo(urls->value(i).toLocalFile()).absoluteFilePath());
-    init(filenames, home, main);
+    init(filenames, home, mainWindow);
     filenames.clear();
 }
 
-RideImportWizard::RideImportWizard(QList<QString> files, QDir &home, MainWindow *main, QWidget *parent) : QDialog(parent)
+RideImportWizard::RideImportWizard(QList<QString> files, QDir &home, MainWindow *main, QWidget *parent) : QDialog(parent), mainWindow(main)
 {
-    init(files, home, main);
+    init(files, home, mainWindow);
 }
 
 void
-RideImportWizard::init(QList<QString> files, QDir &home, MainWindow *main)
+RideImportWizard::init(QList<QString> files, QDir &home, MainWindow *mainWindow)
 {
 
     // initialise dialog box
@@ -113,7 +115,6 @@ RideImportWizard::init(QList<QString> files, QDir &home, MainWindow *main)
 
     // save target dir
     this->home = home;
-    mainWindow = main;
 
     // Fill in the filenames and all the textItems
     for (int i=0; i < files.count(); i++) {
@@ -272,7 +273,7 @@ RideImportWizard::process()
               if (aborted) { done(0); }
               this->repaint();
 
-              boost::scoped_ptr<RideFile> ride(RideFileFactory::instance().openRideFile(thisfile, errors));
+              boost::scoped_ptr<RideFile> ride(RideFileFactory::instance().openRideFile(mainWindow, thisfile, errors));
 
               // did it parse ok?
               if (ride) {
@@ -302,8 +303,7 @@ RideImportWizard::process()
                    tableWidget->item(i,1)->setTextAlignment(Qt::AlignRight); // put in the middle
                    tableWidget->item(i,2)->setTextAlignment(Qt::AlignRight); // put in the middle
 
-                   boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-                   QVariant unit = settings->value(GC_UNIT);
+                   QVariant unit = appsettings->value(this, GC_UNIT);
                    bool metric = unit.toString() == "Metric";
 
                    // time and distance from tags (.gc files)
@@ -356,7 +356,8 @@ RideImportWizard::process()
         if (t->text().startsWith(tr("Error"))) continue;
 
        // date needed?
-        if (blanks[i] || filenames[i].endsWith(".gc", Qt::CaseInsensitive)) { // but we can override gc ride files
+        if (blanks[i] || filenames[i].endsWith(".gc", Qt::CaseInsensitive) ||
+                         filenames[i].endsWith(".json", Qt::CaseInsensitive)) { // but we can override gc ride files
             if (blanks[i]) needdates++; // count the blanks tho
             t = tableWidget->item(i,1);
             t->setFlags(t->flags() | (Qt::ItemIsEditable)); // make editable ONLY if not present -
@@ -647,7 +648,8 @@ RideImportWizard::abortClicked()
 
         // if its a gc file we need to parse and serialize
         // using the ridedatetime and target filename
-        if (filenames[i].endsWith(".gc", Qt::CaseInsensitive)) {
+        if (filenames[i].endsWith(".gc", Qt::CaseInsensitive) ||
+            filenames[i].endsWith(",json", Qt::CaseInsensitive)) {
 
             bool existed;
             if ((existed=QFileInfo(fulltarget).exists()) && !overwriteFiles) {
@@ -657,15 +659,21 @@ RideImportWizard::abortClicked()
                 // read the file (again)
                 QStringList errors;
                 QFile thisfile(filenames[i]);
-                RideFile *ride(RideFileFactory::instance().openRideFile(thisfile, errors));
+                RideFile *ride(RideFileFactory::instance().openRideFile(mainWindow, thisfile, errors));
 
                 // update ridedatetime
                 ride->setStartTime(ridedatetime);
 
                 // serialize
-                GcFileReader reader;
-                QFile target(fulltarget);
-                reader.writeRideFile(ride, target);
+                if (filenames[i].endsWith(".gc")) {
+                    GcFileReader reader;
+                    QFile target(fulltarget);
+                    reader.writeRideFile(ride, target);
+                } else {
+                    JsonFileReader reader;
+                    QFile target(fulltarget);
+                    reader.writeRideFile(ride, target);
+                }
 
                 // clear
                 delete ride;

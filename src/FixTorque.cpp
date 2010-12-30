@@ -67,13 +67,11 @@ class FixTorqueConfig : public DataProcessorConfig
         }
 
         void readConfig() {
-            boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-            ta->setText(settings->value(GC_DPTA, "0 nm").toString());
+            ta->setText(appsettings->value(NULL, GC_DPTA, "0 nm").toString());
         }
 
         void saveConfig() {
-            boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-            settings->setValue(GC_DPTA, ta->text());
+            appsettings->setValue(GC_DPTA, ta->text());
         }
 };
 
@@ -110,8 +108,7 @@ FixTorque::postProcess(RideFile *ride, DataProcessorConfig *config=0)
     double nmAdjust;
 
     if (config == NULL) { // being called automatically
-        boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-        ta = settings->value(GC_DPTA, "0 nm").toString();
+        ta = appsettings->value(NULL, GC_DPTA, "0 nm").toString();
     } else { // being called manually
         ta = ((FixTorqueConfig*)(config))->ta->text();
     }

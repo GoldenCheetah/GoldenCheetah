@@ -18,6 +18,7 @@
 
 #ifndef _Zones_h
 #define _Zones_h
+#include "GoldenCheetah.h"
 
 #include <QtCore>
 
@@ -77,6 +78,8 @@ struct ZoneRange {
 class Zones : public QObject
 {
     Q_OBJECT
+    G_OBJECT
+
 
     private:
 

@@ -17,6 +17,7 @@
  */
 #include "MainWindow.h"
 #include "GcRideFile.h"
+#include "JsonRideFile.h"
 #include "RideItem.h"
 #include "RideFile.h"
 #include "RideFileCommand.h"
@@ -31,8 +32,7 @@ warnOnConvert()
 {
     bool setting;
 
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    QVariant warnsetting = settings->value(GC_WARNCONVERT);
+    QVariant warnsetting = appsettings->value(NULL, GC_WARNCONVERT);
     if (warnsetting.isNull()) setting = true;
     else setting = warnsetting.toBool();
     return setting;
@@ -41,8 +41,7 @@ warnOnConvert()
 void
 setWarnOnConvert(bool setting)
 {
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    settings->setValue(GC_WARNCONVERT, setting);
+    appsettings->setValue(GC_WARNCONVERT, setting);
 }
 
 static bool
@@ -50,8 +49,7 @@ warnExit()
 {
     bool setting;
 
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    QVariant warnsetting = settings->value(GC_WARNEXIT);
+    QVariant warnsetting = appsettings->value(NULL, GC_WARNEXIT);
     if (warnsetting.isNull()) setting = true;
     else setting = warnsetting.toBool();
     return setting;
@@ -60,8 +58,7 @@ warnExit()
 void
 setWarnExit(bool setting)
 {
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    settings->setValue(GC_WARNEXIT, setting);
+    appsettings->setValue(GC_WARNEXIT, setting);
 }
 
 //----------------------------------------------------------------------
@@ -129,7 +126,7 @@ MainWindow::saveSilent(RideItem *rideItem)
     bool    convert;
 
     // Do we need to convert the file type?
-    if (currentType != "GC") convert = true;
+    if (currentType != "JSON") convert = true;
     else convert = false;
 
     // Has the date/time changed?
@@ -143,20 +140,14 @@ MainWindow::saveSilent(RideItem *rideItem)
                                .arg ( ridedatetime.time().minute(), 2, 10, zero )
                                .arg ( ridedatetime.time().second(), 2, 10, zero );
 
+    // if there is a notes file we need to rename it (cpi we will ignore)
+    QFile notesFile(currentFI.path() + QDir::separator() + currentFI.baseName() + ".notes");
+    if (notesFile.exists()) notesFile.remove();
+
     // When datetime changes we need to update
     // the filename & rename/delete old file
     // we also need to preserve the notes file
     if (currentFI.baseName() != targetnosuffix) {
-
-        // if there is a notes file we need to rename it (cpi we will ignore)
-        QFile notesFile(currentFI.path() + QDir::separator() + currentFI.baseName() + ".notes");
-
-        if (notesFile.exists())
-            notesFile.rename(notesFile.fileName(),
-                             rideItem->path + QDir::separator() + targetnosuffix + ".notes");
-
-        // we also need to update the path to the notes filename
-        ride->notesFileName = targetnosuffix + ".notes";
 
         // rename as backup current if converting, or just delete it if its already .gc
         if (convert) currentFile.rename(currentFile.fileName(), currentFile.fileName() + ".bak");
@@ -164,14 +155,14 @@ MainWindow::saveSilent(RideItem *rideItem)
         convert = false; // we just did it already!
 
         // set the new filename & Start time everywhere
-        currentFile.setFileName(rideItem->path + QDir::separator() + targetnosuffix + ".gc");
+        currentFile.setFileName(rideItem->path + QDir::separator() + targetnosuffix + ".json");
         rideItem->setFileName(QFileInfo(currentFile).path(), QFileInfo(currentFile).fileName());
     }
 
     // set target filename
     if (convert) {
         // rename the source
-        savedFile.setFileName(currentFI.path() + QDir::separator() + currentFI.baseName() + ".gc");
+        savedFile.setFileName(currentFI.path() + QDir::separator() + currentFI.baseName() + ".json");
     } else {
         savedFile.setFileName(currentFile.fileName());
     }
@@ -184,7 +175,7 @@ MainWindow::saveSilent(RideItem *rideItem)
     rideItem->ride()->setTag("Change History", log);
 
     // save in GC format
-    GcFileReader reader;
+    JsonFileReader reader;
     reader.writeRideFile(rideItem->ride(), savedFile);
 
     // rename the file and update the rideItem list to reflect the change
@@ -196,6 +187,7 @@ MainWindow::saveSilent(RideItem *rideItem)
         // rename in memory
         rideItem->setFileName(QFileInfo(savedFile).path(), QFileInfo(savedFile).fileName());
     }
+
 
     // mark clean as we have now saved the data
     rideItem->ride()->emitSaved();

@@ -18,6 +18,7 @@
 
 #ifndef _GC_ModelWindow_h
 #define _GC_ModelWindow_h 1
+#include "GoldenCheetah.h"
 
 #include <QtGui>
 #include <QTimer>
@@ -45,13 +46,50 @@ class ModelSettings
 };
 
 
-class ModelWindow : public QWidget
+class ModelWindow : public GcWindow
 {
     Q_OBJECT
+    G_OBJECT
+
+    Q_PROPERTY(int style READ style WRITE setStyle USER true)
+    Q_PROPERTY(bool grid READ isGrid WRITE setGrid USER true)
+    Q_PROPERTY(bool legend READ isLegend WRITE setLegend USER true)
+    Q_PROPERTY(bool frame READ isFrame WRITE setFrame USER true)
+    Q_PROPERTY(bool ignore READ isIgnore WRITE setIgnore USER true)
+    Q_PROPERTY(int preset READ preset WRITE setPreset USER true)
+    Q_PROPERTY(int xseries READ xseries WRITE setXSeries USER true)
+    Q_PROPERTY(int yseries READ yseries WRITE setYSeries USER true)
+    Q_PROPERTY(int zseries READ zseries WRITE setZSeries USER true)
+    Q_PROPERTY(int cseries READ cseries WRITE setCSeries USER true)
+    Q_PROPERTY(QString bin READ bin WRITE setBin USER true)
 
     public:
 
         ModelWindow(MainWindow *, const QDir &);
+
+        // set/get properties
+        int preset() const { return presetValues->currentIndex(); }
+        void setPreset(int x) { presetValues->setCurrentIndex(x); }
+        int xseries() const { return xSelector->currentIndex(); }
+        void setXSeries(int x) { xSelector->setCurrentIndex(x); }
+        int yseries() const { return ySelector->currentIndex(); }
+        void setYSeries(int x) { ySelector->setCurrentIndex(x); }
+        int zseries() const { return zSelector->currentIndex(); }
+        void setZSeries(int x) { zSelector->setCurrentIndex(x); }
+        int cseries() const { return colorSelector->currentIndex(); }
+        void setCSeries(int x) { colorSelector->setCurrentIndex(x); }
+        int style() const { return styleSelector->currentIndex(); }
+        void setStyle(int x) { styleSelector->setCurrentIndex(x); }
+        bool isIgnore() const { return ignore->isChecked(); }
+        void setIgnore(bool x) { ignore->setChecked(x); }
+        bool isGrid() const { return grid->isChecked(); }
+        void setGrid(bool x) { grid->setChecked(x); }
+        bool isFrame() const { return frame->isChecked(); }
+        void setFrame(bool x) { frame->setChecked(x); }
+        bool isLegend() const { return legend->isChecked(); }
+        void setLegend(bool x) { legend->setChecked(x); }
+        QString bin() const { return binWidthLineEdit->text(); }
+        void setBin(QString x) { binWidthLineEdit->setText(x); }
 
     public slots:
         void rideSelected();

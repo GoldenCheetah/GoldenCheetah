@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (c) 2008 Sean C. Rhea (srhea@srhea.net),
  *                    J.T Conklin (jtc@acorntoolworks.com)
  *
@@ -6,12 +6,12 @@
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -19,6 +19,7 @@
 
 #ifndef _GC_QaPlot_h
 #define _GC_QaPlot_h 1
+#include "GoldenCheetah.h"
 
 #include <qwt_plot.h>
 
@@ -34,6 +35,8 @@ class PfPvPlotZoneLabel;
 class PfPvPlot : public QwtPlot
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
 
@@ -59,6 +62,7 @@ class PfPvPlot : public QwtPlot
         void setMergeIntervals(bool value);
         bool frameIntervals() const { return frame_intervals; }
         void setFrameIntervals(bool value);
+        void setAxisTitle(int axis, QString label);
 
     public slots:
         void configChanged();
@@ -81,12 +85,15 @@ class PfPvPlot : public QwtPlot
 	QwtPlotMarker *mY;
 
 	static QwtArray<double> contour_xvalues;   // values used in CP and contour plots: djconnel
-	
+
 	int cp_;
 	int cad_;
 	double cl_;
 	bool shade_zones;    // whether to shade zones, added 27Apr2009 djconnel
 	bool merge_intervals, frame_intervals;
+
+    double timeInQuadrant[4]; // time in seconds spent in each quadrant
+    QwtPlotMarker *tiqMarker[4]; // time in seconds spent in each quadrant
 };
 
 #endif // _GC_QaPlot_h

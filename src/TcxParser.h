@@ -19,6 +19,7 @@
 
 #ifndef _TcxParser_h
 #define _TcxParser_h
+#include "GoldenCheetah.h"
 
 #include "RideFile.h"
 #include <QString>

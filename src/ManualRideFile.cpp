@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2009 Eric Murray (ericm@lne.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -25,10 +25,10 @@
 #include <assert.h>
 #include "math.h"
 
-static int manualFileReaderRegistered = 
+static int manualFileReaderRegistered =
     RideFileFactory::instance().registerReader("man", "Manual Ride File", new ManualFileReader());
- 
-RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors) const 
+
+RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors) const
 {
     QRegExp metricUnits("(km|kph|km/h)", Qt::CaseInsensitive);
     QRegExp englishUnits("(miles|mph|mp/h)", Qt::CaseInsensitive);
@@ -48,7 +48,7 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors) const
     double rideSec;
 
     if (!file.open(QFile::ReadOnly)) {
-	errors << ("Could not open ride file: \"" 
+	errors << ("Could not open ride file: \""
 		+ file.fileName() + "\"");
 	return NULL;
     }
@@ -68,7 +68,7 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors) const
 	    lineno++;
 	    continue;
 	}
-	for (int li = 0; li < lines.size(); ++li) { 
+	for (int li = 0; li < lines.size(); ++li) {
 	    QString line = lines[li];
 
 	    if (lineno == 1) {
@@ -82,7 +82,7 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors) const
 	    else if (lineno == unitsHeader) {
 		if (metricUnits.indexIn(line) != -1)
 		    metric = true;
-		else if (englishUnits.indexIn(line) != -1) 
+		else if (englishUnits.indexIn(line) != -1)
 		    metric = false;
 		else {
 		    errors << ("Can't find units in first line: \"" + line + "\"");

@@ -18,6 +18,7 @@
 
 #ifndef _GC_LTMPlot_h
 #define _GC_LTMPlot_h 1
+#include "GoldenCheetah.h"
 
 #include <QtGui>
 #include <qwt_plot.h>
@@ -40,14 +41,18 @@ class LTMScaleDraw;
 class LTMPlot : public QwtPlot
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
         LTMPlot(LTMWindow *, MainWindow *main, QDir home);
         ~LTMPlot();
         void setData(LTMSettings *);
+        void setAxisTitle(int axis, QString label);
 
     public slots:
         void pointHover(QwtPlotCurve*, int);
+        void pointClicked(QwtPlotCurve*, int);
         void pickerMoved(QPoint);
         void pickerAppended(QPoint);
         void configUpdate();
@@ -81,10 +86,17 @@ class LTMPlot : public QwtPlot
         QDate firstDate,
               lastDate;
 
+        QHash< QwtPlotCurve *, int> stacks; // map curve to stack #
+        QVector< QVector<double>* > stackX;
+        QVector< QVector<double>* > stackY;
+
         int groupForDate(QDate , int);
         void createCurveData(LTMSettings *, MetricDetail,
                              QVector<double>&, QVector<double>&, int&);
+        void createTODCurveData(LTMSettings *, MetricDetail,
+                             QVector<double>&, QVector<double>&, int&);
         void createPMCCurveData(LTMSettings *, MetricDetail, QList<SummaryMetrics> &);
+        void aggregateCurves(QVector<double> &a, QVector<double>&w); // aggregate a with w, updates a
         int chooseYAxis(QString);
         void refreshZoneLabels(int);
 };
@@ -95,6 +107,44 @@ class LTMScaleDraw: public QwtScaleDraw
     public:
     LTMScaleDraw(const QDateTime &base, int startGroup, int groupBy) :
         baseTime(base), groupBy(groupBy), startGroup(startGroup) {
+    }
+
+    // used by LTMPopup
+    void dateRange(double v, QDate &start, QDate &end) {
+        int group = startGroup + (int) v;
+
+        switch (groupBy) {
+        case LTM_DAY:
+            end = baseTime.addDays((int)v).date();
+            start = baseTime.addDays((int)v).date();
+            break;
+
+        case LTM_WEEK:
+            {
+            QDate week = baseTime.date().addDays((int)v*7);
+            start = week;
+            end = week.addDays(6); // 0-6
+            }
+            break;
+
+        case LTM_MONTH:
+            { // month is count of months since year 0 starting from month 0
+                int year=group/12;
+                int month=group%12;
+                if (!month) { year--; month=12; }
+                start = QDate(year, month, 1);
+                end = start.addMonths(1).addDays(-1);
+            }
+            break;
+
+        case LTM_YEAR:
+            start = QDate(group, 1, 1);
+            end = QDate(group, 12, 31);
+            break;
+
+        case LTM_TOD:
+            break;
+        }
     }
 
     virtual QwtText label(double v) const {
@@ -127,6 +177,10 @@ class LTMScaleDraw: public QwtScaleDraw
         case LTM_YEAR:
             label = QString("%1").arg(group);
             break;
+
+        case LTM_TOD:
+            label = QString("%1:00").arg((int)v);
+            break;
         }
         return label;
     }
@@ -155,6 +209,10 @@ class LTMScaleDraw: public QwtScaleDraw
         }
         case LTM_YEAR:
             return QDate(group, 1, 1);
+            break;
+
+        case LTM_TOD:
+            return QDate::currentDate();
             break;
         }
     }

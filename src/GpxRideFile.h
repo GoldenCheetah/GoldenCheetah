@@ -21,6 +21,7 @@
 
 #ifndef _GpxRideFile_h
 #define _GpxRideFile_h
+#include "GoldenCheetah.h"
 
 #include "RideFile.h"
 

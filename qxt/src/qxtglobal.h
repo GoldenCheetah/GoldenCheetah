@@ -60,7 +60,7 @@
 #else
 #    define QXT_GUI_EXPORT
 #endif // BUILD_QXT_GUI
-
+ 
 #if !defined(QXT_STATIC)
 #    if defined(BUILD_QXT_NETWORK)
 #        define QXT_NETWORK_EXPORT Q_DECL_EXPORT

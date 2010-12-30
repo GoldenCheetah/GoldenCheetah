@@ -9,25 +9,26 @@
 
 
 PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
-    QWidget(mainWindow), mainWindow(mainWindow), active(false)
+    GcWindow(mainWindow), mainWindow(mainWindow), active(false)
 {
+    setInstanceName("PM Window");
+    setControls(NULL);
+
     days = count = 0;
     sc = NULL;
-
-    settings = GetApplicationSettings();
 
     QVBoxLayout *vlayout = new QVBoxLayout;
 
     QHBoxLayout *PMPickerLayout = new QHBoxLayout;
 
-    QLabel *PMSTSLabel = new QLabel(settings->value(GC_STS_ACRONYM,"STS").toString() + ":", this);
+    QLabel *PMSTSLabel = new QLabel(appsettings->value(this, GC_STS_ACRONYM,"STS").toString() + ":", this);
     PMSTSValue = new QLineEdit("0");
     PMSTSValue->setReadOnly(true);
     PMSTSValue->setValidator(new QDoubleValidator(0,500,1,PMSTSValue));
     PMPickerLayout->addWidget(PMSTSLabel);
     PMPickerLayout->addWidget(PMSTSValue);
 
-    QLabel *PMLTSLabel = new QLabel(settings->value(GC_LTS_ACRONYM,"LTS").toString() + ":", this);
+    QLabel *PMLTSLabel = new QLabel(appsettings->value(this, GC_LTS_ACRONYM,"LTS").toString() + ":", this);
 
     PMLTSValue = new QLineEdit("0");
     PMLTSValue->setReadOnly(true);
@@ -35,7 +36,7 @@ PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
     PMPickerLayout->addWidget(PMLTSLabel);
     PMPickerLayout->addWidget(PMLTSValue);
 
-    QLabel *PMSBLabel = new QLabel(settings->value(GC_SB_ACRONYM,"SB").toString() + ":", this);
+    QLabel *PMSBLabel = new QLabel(appsettings->value(this, GC_SB_ACRONYM,"SB").toString() + ":", this);
 
     PMSBValue = new QLineEdit("0");
     PMSBValue->setReadOnly(true);
@@ -49,12 +50,12 @@ PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
     PMPickerLayout->addWidget(PMDayValue);
 
     metricCombo = new QComboBox(this);
+    metricCombo->addItem(tr("Use TSS"), "coggan_tss");
     metricCombo->addItem(tr("Use BikeScore"), "skiba_bike_score");
     metricCombo->addItem(tr("Use DanielsPoints"), "daniels_points");
     metricCombo->addItem(tr("Use TRIMP"), "trimp_points");
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
     QString metricName =
-        settings->value(GC_PERF_MAN_METRIC, "skiba_bike_score").toString();
+        appsettings->value(this, GC_PERF_MAN_METRIC, "skiba_bike_score").toString();
     for (int i = 0; i < metricCombo->count(); ++i) {
         if (metricCombo->itemData(i).toString() == metricName)
             metricCombo->setCurrentIndex(i);
@@ -104,7 +105,8 @@ PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
             this, SLOT(metricChanged()));
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(mainWindow, SIGNAL(configChanged()), perfplot, SLOT(configUpdate()));
-    connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+    //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+    connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
 }
 
 PerformanceManagerWindow::~PerformanceManagerWindow()
@@ -125,15 +127,14 @@ void PerformanceManagerWindow::configChanged()
 void PerformanceManagerWindow::metricChanged()
 {
     QString newMetric = metricCombo->itemData(metricCombo->currentIndex()).toString();
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    settings->setValue(GC_PERF_MAN_METRIC, newMetric);
+    appsettings->setValue(GC_PERF_MAN_METRIC, newMetric);
     replot();
 }
 
 void PerformanceManagerWindow::rideSelected()
 {
     bool wasActive = active;
-    active = (mainWindow->activeTab() == this);
+    active = amVisible();
     if (!wasActive && active)
         replot();
 }
@@ -152,8 +153,7 @@ void PerformanceManagerWindow::replot()
     // calculate the number of days to look at... for now
     // use first ride in allRides to today.  When Season stuff is hooked
     // up, maybe use that, or will allRides reflect only current season?
-    
-    QVariant isAscending = settings->value(GC_ALLRIDES_ASCENDING,Qt::Checked);
+    QVariant isAscending = appsettings->value(this, GC_ALLRIDES_ASCENDING,Qt::Checked);
     if(isAscending.toInt() > 0 ){
         firstRideItem =  (RideItem*) allRides->child(0);
         lastRideItem =  (RideItem*) allRides->child(allRides->childCount()-1);
@@ -161,7 +161,7 @@ void PerformanceManagerWindow::replot()
         firstRideItem =  (RideItem*) allRides->child(allRides->childCount()-1);
         lastRideItem =  (RideItem*) allRides->child(0);
     }
-    
+
     if (firstRideItem) {
 
         QDateTime endTime = std::max(lastRideItem->dateTime, now.currentDateTime());
@@ -187,12 +187,13 @@ void PerformanceManagerWindow::replot()
 	    if (sc) delete sc;
 
 	    sc = new StressCalculator(
+            mainWindow->cyclist,
 		    firstRideItem->dateTime,
 		    endTime,
-		    (settings->value(GC_INITIAL_STS)).toInt(),
-		    (settings->value(GC_INITIAL_LTS)).toInt(),
-		    (settings->value(GC_STS_DAYS,7)).toInt(),
-		    (settings->value(GC_LTS_DAYS,42)).toInt());
+		    (appsettings->cvalue(mainWindow->cyclist, GC_INITIAL_STS)).toInt(),
+		    (appsettings->cvalue(mainWindow->cyclist, GC_INITIAL_LTS)).toInt(),
+		    (appsettings->cvalue(mainWindow->cyclist, GC_STS_DAYS,7)).toInt(),
+		    (appsettings->cvalue(mainWindow->cyclist, GC_LTS_DAYS,42)).toInt());
 
             sc->calculateStress(mainWindow,home.absolutePath(),newMetric);
 

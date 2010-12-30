@@ -18,6 +18,7 @@
 
 #ifndef _RideImportWizard_h
 #define _RideImportWizard_h
+#include "GoldenCheetah.h"
 
 #include <QtGui>
 #include <QTableWidget>
@@ -33,6 +34,8 @@
 class RideImportWizard : public QDialog
 {
     Q_OBJECT
+    G_OBJECT
+
 
 public:
     RideImportWizard(QList<QUrl> *urls, QDir &home, MainWindow *main, QWidget *parent = 0);
@@ -72,6 +75,8 @@ private:
 class RideDelegate : public QItemDelegate
 {
     Q_OBJECT
+    G_OBJECT
+
 
 public:
     RideDelegate(int dateColumn, QObject *parent = 0);

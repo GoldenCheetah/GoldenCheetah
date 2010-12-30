@@ -20,53 +20,26 @@
 #include "TrainTool.h"
 #include "TrainTabs.h"
 #include "ViewSelection.h"
+#include "RaceDispatcher.h"
 #include "MainWindow.h"
 #include "Settings.h"
 #include "Units.h"
 #include <QApplication>
 #include <QtGui>
 
-TrainWindow::TrainWindow(MainWindow *parent, const QDir &home) : QWidget(parent), home(home), main(parent)
+TrainWindow::TrainWindow(MainWindow *parent, const QDir &home) : GcWindow(parent), home(home), main(parent)
 {
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
     QVBoxLayout *mainLayout = new QVBoxLayout;
     setLayout(mainLayout);
 
+    // RaceDispatcher first -- could be connected by lots of different widgets
+    dispatcher = new RaceDispatcher(this);
+
     // LeftSide
     trainTool = new TrainTool(parent, home);
+    setControls(trainTool);
 
     // Right side
     trainTabs = new TrainTabs(parent, trainTool, home);
-
-    // setup splitter
-    splitter = new QSplitter;
-    splitter->addWidget(trainTool);
-    splitter->setCollapsible(0, true);
-    splitter->addWidget(trainTabs);
-    splitter->setCollapsible(1, true);
-
-    // splitter sizing
-    QVariant splitterSizes = settings->value(GC_TRAIN_SPLITTER_SIZES);
-    if (splitterSizes != QVariant())
-        splitter->restoreState(splitterSizes.toByteArray());
-    else {
-        QList<int> sizes;
-        sizes.append(250);
-        sizes.append(390);
-        splitter->setSizes(sizes);
-    }
-
-    // add to the layout
-    mainLayout->addWidget(splitter);
-
-    // watch resize of splitter and save away
-    connect(splitter, SIGNAL(splitterMoved(int,int)),
-            this, SLOT(splitterMoved()));
-}
-
-void
-TrainWindow::splitterMoved()
-{
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    settings->setValue(GC_TRAIN_SPLITTER_SIZES, splitter->saveState());
+    mainLayout->addWidget(trainTabs);
 }

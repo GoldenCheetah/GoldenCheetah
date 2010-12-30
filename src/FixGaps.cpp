@@ -89,17 +89,15 @@ class FixGapsConfig : public DataProcessorConfig
         }
 
         void readConfig() {
-            boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-            double tol = settings->value(GC_DPFG_TOLERANCE, "1.0").toDouble();
-            double stop = settings->value(GC_DPFG_STOP, "1.0").toDouble();
+            double tol = appsettings->value(NULL, GC_DPFG_TOLERANCE, "1.0").toDouble();
+            double stop = appsettings->value(NULL, GC_DPFG_STOP, "1.0").toDouble();
             tolerance->setValue(tol);
             beerandburrito->setValue(stop);
         }
 
         void saveConfig() {
-            boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-            settings->setValue(GC_DPFG_TOLERANCE, tolerance->value());
-            settings->setValue(GC_DPFG_STOP, beerandburrito->value());
+            appsettings->setValue(GC_DPFG_TOLERANCE, tolerance->value());
+            appsettings->setValue(GC_DPFG_STOP, beerandburrito->value());
         }
 };
 
@@ -131,9 +129,8 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
     // get settings
     double tolerance, stop;
     if (config == NULL) { // being called automatically
-        boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-        tolerance = settings->value(GC_DPFG_TOLERANCE, "1.0").toDouble();
-        stop = settings->value(GC_DPFG_STOP, "1.0").toDouble();
+        tolerance = appsettings->value(NULL, GC_DPFG_TOLERANCE, "1.0").toDouble();
+        stop = appsettings->value(NULL, GC_DPFG_STOP, "1.0").toDouble();
     } else { // being called manually
         tolerance = ((FixGapsConfig*)(config))->tolerance->value();
         stop = ((FixGapsConfig*)(config))->beerandburrito->value();

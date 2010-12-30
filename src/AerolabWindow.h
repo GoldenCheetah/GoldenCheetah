@@ -18,6 +18,7 @@
 
 #ifndef _GC_AerolabWindow_h
 #define _GC_AerolabWindow_h 1
+#include "GoldenCheetah.h"
 
 #include <QtGui>
 
@@ -31,8 +32,10 @@ class QLCDNumber;
 class RideItem;
 class IntervalItem;
 
-class AerolabWindow : public QWidget {
+class AerolabWindow : public GcWindow {
   Q_OBJECT
+  G_OBJECT
+
 
   public:
   AerolabWindow(MainWindow *mainWindow);

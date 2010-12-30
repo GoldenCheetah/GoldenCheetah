@@ -597,8 +597,6 @@ QList <double> HrZones::getZoneTrimps(int rnum) const {
     return return_values;
 }
 
-
-
 QString HrZones::summarize(int rnum, QVector<double> &time_in_zone) const
 {
     assert(rnum < ranges.size());

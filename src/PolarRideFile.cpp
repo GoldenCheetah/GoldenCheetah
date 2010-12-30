@@ -126,9 +126,9 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors) const
                         pedaling_index = true;
 
 /*
-It appears that the Polar CS600 exports its data alays in metric when downloaded from the 
-polar software even when English units are displayed on the unit..  It also never sets 
-this bit low in the .hrm file.  This will have to get changed if other software downloads 
+It appears that the Polar CS600 exports its data alays in metric when downloaded from the
+polar software even when English units are displayed on the unit..  It also never sets
+this bit low in the .hrm file.  This will have to get changed if other software downloads
 this differently
 */
 

@@ -28,7 +28,7 @@
 
 static int gcFileReaderRegistered =
     RideFileFactory::instance().registerReader(
-        "gc", "GoldenCheetah Native Format", new GcFileReader());
+        "gc", "GoldenCheetah XML Format", new GcFileReader());
 
 RideFile *
 GcFileReader::openRideFile(QFile &file, QStringList &errors) const

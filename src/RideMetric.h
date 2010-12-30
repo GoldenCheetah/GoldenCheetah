@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2008 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -18,6 +18,7 @@
 
 #ifndef _GC_RideMetric_h
 #define _GC_RideMetric_h 1
+#include "GoldenCheetah.h"
 
 #include <QHash>
 #include <QString>
@@ -31,6 +32,7 @@
 
 class Zones;
 class HrZones;
+class MainWindow;
 
 class RideMetric;
 typedef QSharedPointer<RideMetric> RideMetricPtr;
@@ -83,11 +85,12 @@ struct RideMetric {
     // Factor to multiple value to convert from metric to imperial
     virtual double conversion() const { return conversion_; }
 
-    // Compute the ride metric from a file (Hr Zone Version).
+    // Compute the ride metric from a file.
     virtual void compute(const RideFile *ride,
                          const Zones *zones, int zoneRange,
-                         const HrZones *hrZones, int hrZoneRange,
-                         const QHash<QString,RideMetric*> &deps) = 0;
+                         const HrZones *hrzones, int hrzoneRange,
+                         const QHash<QString,RideMetric*> &deps,
+                         const MainWindow *main = 0) = 0;
 
     // Fill in the value of the ride metric using the mapping provided.  For
     // example, average speed might be specified by the mapping
@@ -122,7 +125,7 @@ struct RideMetric {
     virtual RideMetric *clone() const = 0;
 
     static QHash<QString,RideMetricPtr>
-    computeMetrics(const RideFile *ride, const Zones *zones, const HrZones *hrZones,
+    computeMetrics(const MainWindow *main, const RideFile *ride, const Zones *zones, const HrZones *hrZones,
                    const QStringList &metrics);
 
     // Initialisers for derived classes to setup basic data

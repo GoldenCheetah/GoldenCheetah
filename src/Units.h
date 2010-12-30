@@ -18,6 +18,7 @@
 
 #ifndef _GC_Units_h
 #define _GC_Units_h 1
+#include "GoldenCheetah.h"
 
 #define KM_PER_MILE 1.609344
 #define MILES_PER_KM 0.62137119

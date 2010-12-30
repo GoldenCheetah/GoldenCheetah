@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2007 Sean C. Rhea (srhea@srhea.net),
- *                    Justin F. Knotzke (jknotzke@shampoo.ca)
+ * Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -96,10 +95,11 @@ RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors) const
 
     // check it is version 28 of the format (the only version supported right now)
     donumber(headerdata+4, &version);
-    if (version < 28) {
-        errors << ("Version of file is too old, open and save in WKO then retry: \""
-                   + file.fileName() + "\"");
+    if (version < 28 && version != 1 && version != 12 && version != 7) {
+        errors << (QString("Version of file (%1) is too old, open and save in WKO then retry: \"").arg(version) + file.fileName() + "\"");
         return NULL;
+    } else if (version == 1 || version == 12 || version == 7) {
+        errors <<QString("Beta support for v%1 files, please report errors!").arg(version);
     } else if (version >29) {
         errors << ("Version of file is new and not fully supported yet: \"" +
         file.fileName() + "\"");
@@ -109,10 +109,10 @@ RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors) const
     RideFile *rideFile = new RideFile;
 
     // read header data and store details into rideFile structure
-    rawdata = WkoParseHeaderData(fileinfo.fileName(), headerdata, rideFile, errors);
+    rawdata = WkoParseHeaderData(fileinfo.fileName(), headerdata, version, rideFile, errors);
 
     // Parse raw data (which calls rideFile->appendPoint() with each sample
-    if (rawdata) footerdata = WkoParseRawData(rawdata, rideFile, errors);
+    if (rawdata) footerdata = WkoParseRawData(rawdata, version, rideFile, errors);
     else return NULL;
 
     // Post process  the ride intervals to convert from point
@@ -152,10 +152,10 @@ RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors) const
  * WkoParseRawData() - read through all the raw data adding record points and return
  *                     a pointer to the footer record
  **************************************************************************************/
-WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &errors)
+WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, WKO_ULONG version, RideFile *rideFile, QStringList &errors)
 {
     WKO_ULONG WKO_xormasks[32];    // xormasks used all over
-    double cad=0, hr=0, km=0, kph=0, nm=0, watts=0, alt=0, lon=0, lat=0, slope=0, wind=0, interval=0;
+    double cad=0, hr=0, km=0, kph=0, nm=0, watts=0, slope=0, alt=0, lon=0, lat=0, wind=0, interval=0;
 
     int isnull=0;
     WKO_ULONG records, data;
@@ -185,8 +185,8 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
 
     // setup decoding controls -- bit sizes and null values
     for (i=0; WKO_GRAPHS[i] != '\0'; i++) {
-        WKO_nullval[i] = nullvals(WKO_GRAPHS[i]); // setup nullvalue
-        if ((WKO_graphbits[i] = bitsize(WKO_GRAPHS[i], WKO_device)) == 0) { // setup & check field size
+        WKO_nullval[i] = nullvals(WKO_GRAPHS[i], version); // setup nullvalue
+        if ((WKO_graphbits[i] = bitsize(WKO_GRAPHS[i], WKO_device, version)) == 0) { // setup & check field size
             errors << ("Unknown channel " + WKO_GRAPHS[i]);
             return (NULL);
         }
@@ -203,7 +203,6 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
     } else {
         records = us;
     }
-
     if (records == 0) {
         errors << ("Workout is empty.");
         return NULL;
@@ -215,8 +214,16 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
     } else {
         data = us;
     }
-
     thelot = fb;
+
+#if 0
+// used when debugging
+    qDebug()<<version<<WKO_GRAPHS<<"records="<<records;
+    for (int xbit=0; xbit < 300; xbit++)
+    if (get_bits(thelot, xbit, 1)) fprintf(stderr, "1");
+        else fprintf(stderr, "0");
+    qDebug()<<"";
+#endif
 
     /* does data stream at offset 0 ? */
     if (get_bit(thelot, 0)){
@@ -224,7 +231,8 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
         inc = 1000;
     } else {
         inc = get_bits(thelot, 1, 15); // record interval
-        bit = 43;
+        if (version == 1) bit = 32;
+        else bit = 43;
     }
     interval = inc;
     interval /= 1000;
@@ -241,7 +249,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
         unsigned int marker;
         WKO_LONG sval=0;
         WKO_ULONG val=0;
-	unsigned long valp; // for printf 
+	unsigned long valp; // for printf
 	long svalp; // for printf
 
         // reset point values;
@@ -288,7 +296,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
                             sval = val * -1;
                         } else sval = val;
                         slope = sval;
-                        slope /= 10;
+                        slope /=10;
                         break;
                     case 'W' : /* Wind speed */
                         if (get_bit(thelot, bit-1)) { /* is negative */
@@ -296,7 +304,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
                             sval = val * -1;
                         } else sval = val;
                         wind = sval;
-                        wind /= 10;
+                        wind /=10;
                         break;
                     case 'A' : /* Altitude */
                         if (get_bit(thelot, bit-1)) { /* is negative */
@@ -304,7 +312,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
                             sval = val * -1;
                         } else sval = val;
                         alt = sval;
-                        alt /= 10;
+                        alt /=10;
                         break;
                     case 'T' : /* Torque */
                         if (imperialflag && WKO_GRAPHS[i]=='S') val = long((double)val * KMTOMI);
@@ -325,7 +333,8 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
 
                             // inc is in 1000ths of a second kph val is kph*10
                             rdist += (inc * kph) / 36;
-                            distance = rdist; 
+                            distance = rdist;
+
                             distance /= 100000;
 
                             // convert to imperial units ?
@@ -337,7 +346,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
 
                             sprintf(GRAPHDATA[i], "%g", xi+f);
                             km = xi+f;
-                        } 
+                        }
                         break;
                     case 'D' : /* Distance - running total to 3 decimal places */
                         double distance;
@@ -349,7 +358,9 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
 
                         // conversion may be required
                         distance = rdist;
-                        distance /= 100000;
+                        if (version == 1 || version == 7) distance /= 1000;
+                        else distance /= 100000;
+
                         if (imperialflag) distance *= KMTOMI;
 
                         // to max of 3 decimal places
@@ -413,7 +424,6 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
 
             // Now output this sample if it is not a null record
             if (!isnull) {
-
                     // !! needs to be modified to support the new alt patch
                     rideFile->appendPoint((double)rtime/1000, cad, hr, km,
                             kph, nm, watts, alt, lon, lat, wind, 0);
@@ -424,7 +434,6 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
             rtime += inc;
 
         } else {
-
             // pause record increments time
 
             /* set the increment */
@@ -434,15 +443,26 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
             if (WKO_device != 0x14) pausesize=42;
             else pausesize=39;
 
-            pausetime = get_bits(thelot, bit, 32);
+            if (version == 1) pausesize=31;
 
             /* set increment value -> if followed by a null record
                it is to show a pause in recording -- velotrons seem to cause
                lots and lots of these
             */
-            inc = pausetime;
+            pausetime = get_bits(thelot, bit, 32);
+            if (version !=  1) inc = pausetime;
+#if 0
+            else {
+                //XXX Version 1 pause records debug!
+                fprintf(stderr, "v1 pausetime: ");
+                for (int i=0; i<pausesize; i++) {
+                    int x = get_bits(thelot, bit+i, 1);
+                    fputc(x ? '1' : '0', stderr);
+                }
+                fputc('\n', stderr);
+            }
+#endif
             bit += pausesize;
-
         }
     }
 
@@ -458,7 +478,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
  * WkoParseHeadeData() - read through file and land on the raw data
  *
  *********************************************************************/
-WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, RideFile *rideFile, QStringList &errors)
+WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, WKO_ULONG version, RideFile *rideFile, QStringList &errors)
 {
     unsigned long julian, sincemidnight;
     WKO_UCHAR *goal, *notes, *code; // save location of WKO metadata
@@ -497,7 +517,12 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, RideFile *rideFile, 
     p += dotext(p, &txtbuf[0]); /* 6: graphs */
     strcpy(reinterpret_cast<char *>(WKO_GRAPHS), reinterpret_cast<char *>(&txtbuf[0])); // save those graphs away
 
-    p += donumber(p, &sport); /* 7: sport */
+    if (version != 1) { //!!! Version 1 beta support
+        p += donumber(p, &sport); /* 7: sport */
+    } else {
+        sport = 0x02; // only bike was supported in files this old
+    }
+
     switch (sport) {
         case 0x01 : rideFile->setTag("Sport", "Swim") ; break;
         case 0x02 : rideFile->setTag("Sport", "Bike") ; break;
@@ -514,10 +539,15 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, RideFile *rideFile, 
         case 0x64 : rideFile->setTag("Sport", "Other"); break;
 
     }
-    code = p; p += dotext(p, &txtbuf[0]); /* 8: workout code */
-    rideFile->setTag("Workout Code", (const char*)&txtbuf[0]);
 
-    p += donumber(p, &ul); /* 9: duration 000s of seconds */
+    if (version != 1) { //!!! Version 1 beta support
+
+        // workout code and duration not in v1 files
+        code = p; p += dotext(p, &txtbuf[0]); /* 8: workout code */
+        rideFile->setTag("Workout Code", (const char*)&txtbuf[0]);
+        p += donumber(p, &ul); /* 9: duration 000s of seconds */
+    }
+
     p += dotext(p, &txtbuf[0]); /* 10: lastname */
     p += dotext(p, &txtbuf[0]); /* 11: firstname */
 
@@ -541,22 +571,22 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, RideFile *rideFile, 
 
         // date not available from filename use WKO metadata
         QDateTime datetime(QDate::fromJulianDay(julian),
-               QTime(sincemidnight/360000, (sincemidnight%360000)/6000, (sincemidnight%6000)/100));
+            QTime(sincemidnight/360000, (sincemidnight%360000)/6000, (sincemidnight%6000)/100));
         rideFile->setStartTime(datetime);
     }
 
     // Create a Notes file for Goal, Notes and Workout Code from original
-        QChar zero = QLatin1Char('0');
-        QString notesFileName = QString("%1_%2_%3_%4_%5_%6.notes")
-            .arg(rideFile->startTime().date().year(), 4, 10, zero)
-            .arg(rideFile->startTime().date().month(), 2, 10, zero)
-            .arg(rideFile->startTime().date().day(), 2, 10, zero)
-            .arg(rideFile->startTime().time().hour(), 2, 10, zero)
-            .arg(rideFile->startTime().time().minute(), 2, 10, zero)
-            .arg(rideFile->startTime().time().second(), 2, 10, zero);
+    QChar zero = QLatin1Char('0');
+    QString notesFileName = QString("%1_%2_%3_%4_%5_%6.notes")
+        .arg(rideFile->startTime().date().year(), 4, 10, zero)
+        .arg(rideFile->startTime().date().month(), 2, 10, zero)
+        .arg(rideFile->startTime().date().day(), 2, 10, zero)
+        .arg(rideFile->startTime().time().hour(), 2, 10, zero)
+        .arg(rideFile->startTime().time().minute(), 2, 10, zero)
+        .arg(rideFile->startTime().time().second(), 2, 10, zero);
 
-        // Create the Notes file ONLY IF IT DOES NOT ALREADY EXIST
-        QFile notesFile(WKO_HOMEDIR + "/" + notesFileName);
+    // Create the Notes file ONLY IF IT DOES NOT ALREADY EXIST
+    QFile notesFile(WKO_HOMEDIR + "/" + notesFileName);
     if (!notesFile.exists()) {
         notesFile.open(QFile::WriteOnly);
                 QTextStream out(&notesFile);
@@ -581,39 +611,49 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, RideFile *rideFile, 
 
         }
 
-        // Workout Code
-        dotext(code, &txtbuf[0]);
-        scode = (const char *)&txtbuf[0];
-        out << scode << endl;
+        if (version != 1) {
+            // Workout Code
+            dotext(code, &txtbuf[0]);
+            scode = (const char *)&txtbuf[0];
+            out << scode << endl;
 
-        dotext(goal, &txtbuf[0]);
-        sgoal = (const char *)&txtbuf[0];
-        out << "WORKOUT GOAL" << endl << sgoal << endl;
+            dotext(goal, &txtbuf[0]);
+            sgoal = (const char *)&txtbuf[0];
+            out << "WORKOUT GOAL" << endl << sgoal << endl;
 
-        dotext(notes, &txtbuf[0]);
-        snote = (const char *)&txtbuf[0];
-        out << endl << "WORKOUT NOTES" << endl << snote << endl;
-
-        notesFile.close();
+            dotext(notes, &txtbuf[0]);
+            snote = (const char *)&txtbuf[0];
+            out << endl << "WORKOUT NOTES" << endl << snote << endl;
+        } else {
+            out << snote << endl;
         }
+        notesFile.close();
+    }
 
-    p += donumber(p, &ul); /* 13: distance travelled in meters */
-    p += donumber(p, &ul); /* 14: device recording interval */
-    p += donumber(p, &ul); /* 15: athlete max heartrate */
-    p += donumber(p, &ul); /* 16: athlete threshold heart rate */
-    p += donumber(p, &ul); /* 17: athlete threshold power */
-    p += dodouble(p, &g);  /* 18: athlete threshold pace */
-    p += donumber(p, &ul); /* 19: weight in grams/10 */
-    rideFile->setTag("Weight", QString("%1").arg((double)ul/100.00));
+    if (version != 1) {
+        p += donumber(p, &ul); /* 13: distance travelled in meters */
+        p += donumber(p, &ul); /* 14: device recording interval */
+        p += donumber(p, &ul); /* 15: athlete max heartrate */
+        p += donumber(p, &ul); /* 16: athlete threshold heart rate */
+        p += donumber(p, &ul); /* 17: athlete threshold power */
+        if (version != 12 && version != 7)
+            p += dodouble(p, &g);  /* 18: athlete threshold pace */
+        p += donumber(p, &ul); /* 19: weight in grams/10 */
+        rideFile->setTag("Weight", QString("%1").arg((double)ul/100.00));
 
-    p += 28;
-    //p += donumber(p, &ul); /* 20: unknown */
-    //p += donumber(p, &ul); /* 21: unknown */
-    //p += donumber(p, &ul); /* 22: unknown */
-    //p += donumber(p, &ul); /* 23: unknown */
-    //p += donumber(p, &ul); /* 24: unknown */
-    //p += donumber(p, &ul); /* 25: unknown */
-    //p += donumber(p, &ul); /* 26: unknown */
+        if (version != 12) p += 28;
+        else p += 36;
+        //p += donumber(p, &ul); /* 20: unknown */
+        //p += donumber(p, &ul); /* 21: unknown */
+        //p += donumber(p, &ul); /* 22: unknown */
+        //p += donumber(p, &ul); /* 23: unknown */
+        //p += donumber(p, &ul); /* 24: unknown */
+        //p += donumber(p, &ul); /* 25: unknown */
+        //p += donumber(p, &ul); /* 26: unknown */
+
+    } else { //!!! Version 1 Beta Support
+        p += 52; // not decoded at present
+    }
 
     /***************************************************
      * 2:  GRAPH TAB - MAX OF 16 CHARTING GRAPHS
@@ -621,7 +661,6 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, RideFile *rideFile, 
     p += donumber(p, &ul); /* 27: graph view */
     p += donumber(p, &ul); /* 28: WKO_device type */
     WKO_device = ul; // save WKO_device
-
     switch (WKO_device) {
     case 0x01 : rideFile->setDeviceType("Powertap"); break;
     case 0x04 : rideFile->setDeviceType("SRM"); break;
@@ -636,25 +675,33 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, RideFile *rideFile, 
     default : rideFile->setDeviceType("WKO"); break;
     }
 
-    p += donumber(p, &ul); /* 29: unknown */
+    if (version != 12) p += donumber(p, &ul); /* 29: unknown */
 
-    for (i=0; i< 16; i++) { // 16 types of chart data
+    if (version != 1 && version !=7) { //!!! Version 1 beta support
+        for (i=0; i< 16; i++) { // 16 types of chart data
 
-        p += 44;
-        //p += dofloat(p, &f) /* 30: unknown */
-        //p += dofloat(p, &f) /* 31: unknown */
-        //p += dofloat(p, &f) /* 32: unknown */
-        //p += dofloat(p, &f) /* 33: unknown */
-        //p += dofloat(p, &f) /* 34: unknown */
-        //p += dofloat(p, &f) /* 35: unknown */
-        //p += dofloat(p, &f) /* 36: unknown */
-        //p += donumber(p, &ul); /* 37: x-axis maximum */
-        //p += donumber(p, &ul); /* 38: show chart? */
-        //p += donumber(p, &ul); /* 39: autoscale? */
-        //p += donumber(p, &ul); /* 40: autogridlines? */
+            if (version != 12) {
+                p += 44;
+                //p += dofloat(p, &f) /* 30: unknown */
+                //p += dofloat(p, &f) /* 31: unknown */
+                //p += dofloat(p, &f) /* 32: unknown */
+                //p += dofloat(p, &f) /* 33: unknown */
+                //p += dofloat(p, &f) /* 34: unknown */
+                //p += dofloat(p, &f) /* 35: unknown */
+                //p += dofloat(p, &f) /* 36: unknown */
+                //p += donumber(p, &ul); /* 37: x-axis maximum */
+                //p += donumber(p, &ul); /* 38: show chart? */
+                //p += donumber(p, &ul); /* 39: autoscale? */
+                //p += donumber(p, &ul); /* 40: autogridlines? */
 
-        p += doshort(p, &us); /* 41: number of gridlines XXVARIABLEXX */
-        p += (us * 8); // 2 longs x number of gridlines
+                p += doshort(p, &us); /* 41: number of gridlines XXVARIABLEXX */
+                p += (us * 8); // 2 longs x number of gridlines
+            } else {
+                p += 40;
+            }
+        }
+    } else {
+        p += 0x170; // possibly too invariant!
     }
 
 
@@ -687,7 +734,11 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, RideFile *rideFile, 
         p += donumber(p, &ul);
         add->stop = ul;
 
-        p += 12;
+        if (version != 1) { //!!! Version 1 Beta Support
+            p += 12;
+        } else {
+            p += 8;
+        }
         //p += donumber(p, &ul);
         //p += donumber(p, &ul);
         //p += donumber(p, &ul);
@@ -701,6 +752,7 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, RideFile *rideFile, 
      ***************************************************/
     QString deviceInfo;
     p += doshort(p, &us); /* 249: Device/Token pairs XXVARIABLEXX */
+
     for (i=0; i<us; i++) {
         p += dotext(p, &txtbuf[0]);
         deviceInfo += QString("%1 = ").arg((char*)&txtbuf[0]);
@@ -723,7 +775,6 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, RideFile *rideFile, 
         WKO_ULONG prev=0;
         enum configtype type=INVALID;
 
-
 next:
         prev=num;
         p += donumber(p, &ul);
@@ -731,14 +782,12 @@ next:
         lastchart = OTHER;
 
         if (num==131071) {
-
             char buf[32];
 
             /* Config */
             p += doshort(p, &us); // got here...
             strncpy (reinterpret_cast<char *>(buf), reinterpret_cast<char *>(p), us); buf[us]=0;
             p += us;
-
 
             /* What type? */
             if (!strcmp(buf, "CRideSettingsConfig")) lastchart=type=CRIDESETTINGSCONFIG;
@@ -749,7 +798,6 @@ next:
             if (!strcmp(buf, "CMeanMaxChartConfig"))lastchart=type=CMEANMAXCHARTCONFIG;
             if (!strcmp(buf, "CMeanMaxChartCache")) lastchart=type=CMEANMAXCHARTCACHE;
             if (!strcmp(buf, "CDistributionChartCache")) lastchart=type=CDISTRIBUTIONCHARTCACHE;
-
 
             if (type == CDISTRIBUTIONCHARTCACHE) {
 
@@ -834,41 +882,118 @@ next:
                     }
                 }
 
-
                 /* as long as it didn't get terminated we need to read the end of the data */
-                if (term) p +=24; //_read(fd, buf, 24);
+                if (term) p += 24;
 
                 /* might still be padding ? */
                 p += optpad(p);
 
             } else {
 
-                p += donumber(p, &ul); /* always 2 */
-                p += dotext(p, &txtbuf[0]); /* perspective */
+                if (version != 1 && version != 7 && version != 12) {//!!! Version 1 beta support
+                    p += donumber(p, &ul); /* always 2 */
+                    p += dotext(p, &txtbuf[0]); /* perspective */
+                } else {
+                    p += 8;
+                }
 
                 switch (type) {
 
                 case CRIDESUMMARYCONFIG:
-                    p += donumber(p, &ul);
-                    p += donumber(p, &ul);
-                    z--;
-                    /* might still be padding ? */
-                    p += optpad(p);
+                    if (version == 1) {
+                        p += 14;
+                        goto meanmaxconfig;
+                    } else if (version == 12 || version == 7) {
+                        p += 4;
+                        z--;
+                    } else {
+                        p += donumber(p, &ul);
+                        p += donumber(p, &ul);
+                        z--;
+                        /* might still be padding ? */
+                        p += optpad(p);
+                    }
                     break;
-
                 case CRIDENOTESCONFIG:
                 case CRIDEGOALCONFIG:
                     p += donumber(p, &ul);
                 case CRIDESETTINGSCONFIG:
-                    p += donumber(p, &ul);
+                    if (version != 1 && version != 12 && version != 7) { //!!! Version 1 beta support
+                        p += donumber(p, &ul);
+                    }
                     z--;
+                    break;
                 case CDISTRIBUTIONCHARTCONFIG:
+                    if (version == 1 || version == 7 || version == 12) { //!!! Version 1 beta support
+
+                        // version 1 did not have a CDISTRIBUTIONCHARTCACHE
+                        // type. Instead they appear one after each other
+                        // following a distribution chart. The format is
+                        // largely the same as a DISTRIBUTIONCHARTCACHE with
+                        // each CACHE terminated with our old friend 0x8007
+                        // so lets read them all, until we don't have a 0x8007
+                        // terminator (i.e we got to the end
+                        do {
+
+                            z--;
+
+                            p += dotext(p, &txtbuf[0]); // cache type
+                            p += 24;                    // config et al
+                            p += donumber(p, &ul);
+                            p += 64;
+
+                            if (version == 12 || version == 7) p += 8;
+
+                            /* number of labels */
+                            p += doshort(p, &us);
+
+                            for (i=0; i<us; i++) {
+                                p += donumber(p, &ul);
+                                p += dotext(p, &txtbuf[0]);
+                                p += dotext(p, &txtbuf[0]);
+                                p += donumber(p, &ul);
+                                p += donumber(p, &ul);
+                            }
+
+                            /* there is more data in there! */
+                            doshort(p, &us);
+                            num=us;
+                            if (us == 1) {
+                                p += 6;
+                                doshort(p, &us);
+                                if (us != 0xffff) {
+                                    p += 18;
+                                    p += doshort(p, &us);
+                                    p += us*8;
+                                }
+                            }
+
+                            p += optpad(p);
+
+                            if (num==0x8007) p+= 8;
+                            else {
+                                if (version != 12 && version != 7) z--;
+                            }
+
+                        } while (num == 0x8007);
+                    }
+                    break;
                 case CMEANMAXCHARTCONFIG:
-                    /* already handled in previous if clause */
+
+                    if (version == 1 || version == 7 || version == 12) { //!!! Version 1 beta support
+meanmaxconfig:
+                        // version 1 did not have a CMEANMAXCHARTCACHE
+                        // type. Instead it follows a CMEANMAXCHARTCONFIG.
+                        p += dotext(p, &txtbuf[0]); // cache type
+                        p += 24;                    // config et al
+                        p += donumber(p, &ul);
+                        z--;
+                        goto meanmax;               // exactly the same as later versions
+                    }
+                    break;
                 default:
                     break;
                 }
-
             }
 
         } else if (num==2) {
@@ -879,10 +1004,8 @@ next:
         } else if (num==3) {
 
             z--;
-
             /* Chart */
             p += dotext(p, &txtbuf[0]);
-
             /* now lets skip the config and labels etc */
             p += 32; //for (i=0; i<16; i++) doshort(fd,buf,0);
 
@@ -891,7 +1014,6 @@ next:
             x = ul;
 
             if (x == 0x02) {        /* Read through Distribution Chart */
-
                 p += 64;
                 // /* distribution chart */
                 //p += donumber(p, &ul); /* chart type bin/pie1 */
@@ -938,10 +1060,11 @@ next:
                 p += optpad(p);
 
             } else if (x == 0x0c) {     /* Read through Mean Max Chart */
-
+meanmax:
                 WKO_ULONG recs, term;
                 WKO_ULONG two;
 
+                if (version == 12 || version == 7) p += 8;
                 p += donumber(p, &ul); /* 253.4: Log or Linear meanmax ? */
                 p += donumber(p, &ul); /* 253.4: Which Channel ? */
                 p += donumber(p, &ul); /* 253.4: UNKNOWN */
@@ -952,6 +1075,7 @@ next:
                 p += dodouble(p, &g);  /* 253.4: Conversion Factor 1 */
 
                 if (two == 2) p += donumber(p, &ul);  /* 253.4: Conversion Factor 2 */
+
 
                 /* How many meanmax records in first set ? */
                 p += doshort(p, &us);
@@ -1009,10 +1133,11 @@ next:
 
 
                 /* as long as it didn't get terminated we need to read the end of the data */
-                if (term) p += 24; //_read(fd, buf, 24);
-
+                if (term) {
+                    if (version != 1) p += 24; //_read(fd, buf, 24);
+                    else p += 10;
                 }
-
+                }
                 /* might still be padding ? */
                 p += optpad(p);
 
@@ -1022,7 +1147,8 @@ next:
             }
 
         } else {
-            errors << ("Unrecognised segment");
+
+            errors << ("Could not parse chart data");
             return NULL;
         }
     }
@@ -1030,7 +1156,7 @@ next:
 breakout:
 
     if (WKO_GRAPHS[0] == '\0') {
-        errors << ("File contains no GRAPHS");
+        errors << ("Manual files not supported");
         return (WKO_UCHAR *)NULL;
     } else {
         /* PHEW! We're on the raw data, out job here is done */
@@ -1048,60 +1174,108 @@ breakout:
  * bitsize() - return size in bits of a given graph for a specific WKO_device
  * nullvals() - return nullvalue for this GRAPH on this WKO_device
  **********************************************************************************/
-unsigned int bitsize(char g, int WKO_device)
+unsigned int bitsize(char g, int WKO_device, WKO_ULONG version)
 {
-    switch (g) {
+    if (version != 1 && version != 7) {
+        switch (g) {
 
-    case 'P' : return (12); break;
-    case 'H' : return (8); break;
-    case 'C' : return (8); break;
-    case 'S' : return (11); break;
-    case 'A' : return (20); break;
-    case 'T' : return (11); break;
-    case 'D' :
-        /* distance */
-        switch (WKO_device) {
-        case 0x04:
-        case 0x05:
-        case 0x06:
-        case 0x11:
-        case 0x19:
+        case 'P' : return (12); break;
+        case 'H' : return (8); break;
+        case 'C' : return (8); break;
+        case 'S' : return (11); break;
+        case 'A' : return (20); break;
+        case 'T' : return (11); break;
+        case 'D' :
+            /* distance */
+            switch (WKO_device) {
+            case 0x04:
+            case 0x05:
+            case 0x06:
+            case 0x11:
+            case 0x19:
+            default:
+                return 19;
+                break;
+            case 0x01:
+            case 0x16: // Cycleops PT300
+            case 0x00:
+            case 0x12: // Garmin Edge 205/305
+            case 0x13:
+            case 0x14:
+            case 0x1a: // SRM Powercontrol VI
+                       // Alex Simmons files Oct 2010
+                return 22;
+                break;
+            }
+            break;
+
+        case 'G' : return (64); break;
+        case 'W' : return (11); break;
+        case '+' : return (8); break;
+        case '^' : return (20); break;
+        case 'm' : return (1); break;
         default:
-            return 19;
-            break;
-        case 0x01:
-        case 0x16: // Cycleops PT300
-        case 0x00:
-        case 0x12: // Garmin Edge 205/305
-        case 0x13:
-        case 0x14:
-        case 0x1a: // SRM Powercontrol VI - moved to support files
-                   // supplied by Alex Simmons Oct 2010, was
-                   // previously set as 19 bits above.
-            return 22;
-            break;
+            return (0);
         }
-        break;
+    } else { //!!! version 1
 
-    case 'G' : return (64); break;
-    case 'W' : return (11); break;
-    case '+' : return (8); break;
-    case '^' : return (20); break;
-    case 'm' : return (1); break;
-    default:
-        return (0);
+        switch (g) {
+        case 'P' : if (version == 1) return 11;
+                   else if (version == 7) return 12;
+                   break;
+        case 'H' : return (8); break;
+        case 'C' : return (8); break;
+        case 'S' : return (11); break;
+        case 'A' : return (16); break;
+        case 'T' : return (11); break;
+        case 'D' :
+            /* distance */
+            switch (WKO_device) {
+            case 0x04:
+            case 0x05:
+            case 0x06:
+            case 0x11:
+            case 0x19:
+            case 0x1a:
+            default:
+                return 11;
+                break;
+            case 0x01:
+            case 0x16: // Cycleops PT300
+            case 0x00:
+            case 0x12: // Garmin Edge 205/305
+            case 0x13:
+            case 0x14:
+                return 11;
+                break;
+            }
+            break;
+
+        case 'G' : return (64); break;
+        case 'W' : return (11); break;
+        case '+' : return (8); break;
+        case '^' : return (20); break;
+        case 'm' : return (1); break;
+        default:
+            return (0);
+        }
     }
+    return 0; // impossible (in theory) but keeps compiler happy
 }
 
-WKO_ULONG nullvals(char g)
+WKO_ULONG nullvals(char g, WKO_ULONG version)
 {
     switch (g) {
 
-    case 'P' : return (4095L); break;
+    case 'P' : if (version != 1) return (4095L);
+               else return (2047L);
+               break;
     case 'H' : return (255L); break;
     case 'C' : return (255L); break;
     case 'S' : return (2047L); break;
-    case 'A' : return (524287L); break; // max is for 19 bits, sign bit 0 for null values
+    case 'A' : if (version > 7) return (524287L); // max is for 19 bits, sign bit 0 for null values
+               else return (32767L);              // max is for 15 bits, sign bit 0 for null values
+               break;
     case 'T' : return (2047L); break;
     case 'D' : return (0L); break; // distance is ignored for null purposes
     case 'G' : return (0L); break; // GPS is ignored for null purposes

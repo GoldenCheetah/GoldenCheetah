@@ -18,6 +18,7 @@
 
 #ifndef _PwxRideFile_h
 #define _PwxRideFile_h
+#include "GoldenCheetah.h"
 
 #include "RideFile.h"
 #include <QDomDocument>

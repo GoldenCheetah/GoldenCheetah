@@ -61,7 +61,13 @@ static void unxystring(QString val, double &x, double &y)
 class ModelDataColor : public Color
 {
         // return RGBA color for x,y,z
+
+// qwtplot3d api changes between 0.2.x and 0.3.x
+#if QWT3D_MINOR_VERSION > 2
+        Qwt3D::RGBA rgba (double x, double y, double) const
+#else
         Qwt3D::RGBA operator () (double x, double y, double) const
+#endif
         {
             QColor cHSV, cRGB;
             double val = color.value(xystring(x,y), 0.0);
@@ -80,6 +86,11 @@ class ModelDataColor : public Color
             colour.a = 1.0;
             return colour;
         }
+
+// qwtplot3d api changes between 0.2.x and 0.3.x
+#if QWT3D_MINOR_VERSION > 2
+        Color *clone() const { ModelDataColor *x = new ModelDataColor; *x = *this; return x; }
+#endif
 
         Qwt3D::ColorVector &createVector(Qwt3D::ColorVector &vec)
         {
@@ -132,32 +143,6 @@ class ModelDataColor : public Color
 };
 
 
-// Sorry Sean et al. These local statics are a nasty'ism I'll
-// look to tidy later. I cannot reference a class for these
-// since qwtplot3d manages its data providers internally with clones
-// and when it calls an enricher the data provider is not made
-// available.
-//
-// Ideally they would be held within BasicModelPlot::dataModelProvider
-// and were until I needed to implement a custom enrichment to
-// support interval selection/display
-//
-// As a result I use these to allow the DataModelProvider to
-// share data with the Bar enrichment. I also tried to use a ref
-// to the dataModelProvider but it caused a nasty SEGV
-//
-// Lets just turn a blind eye ;-)
-//
-
-#define SHOW_INTERVALS 1
-#define SHOW_FRAME       2
-
-static double diag_;
-static int   intervals_;                // SHOW_INTERVALS | SHOW_MAX
-static double zpane=0;
-static QHash<QString, double> iz;         // for selected intervals
-static QHash<QString, double> inum;      // for selected intervals
-
 class ModelDataProvider : public Function
 {
 
@@ -174,7 +159,7 @@ class ModelDataProvider : public Function
         }
         double intervals (double x, double y) // return value for selected intervals
         {
-            return iz.value(xystring(x,y), 0.0)-minz;
+            return plot.iz.value(xystring(x,y), 0.0)-minz;
         }
         double getMinz() { return minz; }
         double getMaxz() { return maxz; }
@@ -183,8 +168,8 @@ class ModelDataProvider : public Function
         {
             mz.clear();
             mnum.clear();
-            iz.clear();
-            inum.clear();
+            plot.iz.clear();
+            plot.inum.clear();
         }
 
     private:
@@ -198,6 +183,7 @@ class ModelDataProvider : public Function
         double maxz, minz;
         double cranklength; // used for CPV/AEPF calculation
         bool useMetricUnits;
+        BasicModelPlot &plot;
 };
 
 double
@@ -332,12 +318,11 @@ ModelDataProvider::describeType(int type, bool longer)
  * Edit it with caution, there be dragons here.
  *
  *----------------------------------------------------------------------*/
-ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *settings) : Function(plot)
+ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *settings) : Function(plot), plot(plot)
 {
     // get application settings
-    boost::shared_ptr<QSettings> appsettings = GetApplicationSettings();
-    cranklength = appsettings->value(GC_CRANKLENGTH, 0.0).toDouble() / 1000.0;
-    useMetricUnits = appsettings->value(GC_UNIT).toString() == "Metric";
+    cranklength = appsettings->value(NULL, GC_CRANKLENGTH, 0.0).toDouble() / 1000.0;
+    useMetricUnits = appsettings->value(NULL, GC_UNIT).toString() == "Metric";
 
     // if there are no settings or incomplete settings
     // create a null data plot
@@ -423,7 +408,7 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
 
         // NO INTERVALS COLOR IS FOR ALL SAMPLES
         if (settings->intervals.count() == 0 ) {
-            intervals_ = 0;
+            plot.intervals_ = 0;
 
             int colcount = settings->colorProvider->num.value(lookup, 0.0);
             double currentcol = settings->colorProvider->color.value(lookup,0.0);
@@ -442,8 +427,8 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
         // DIFFERENTLY NOW - COLOR IS FOR SELECTED INTERVALS AND WE MAINTAIN
         // A SECOND SET OF Z VALUES SO WE HAVE MAX + INTERVALS
         if (settings->intervals.count() > 0) {
-            intervals_ = SHOW_INTERVALS;
-            if (settings->frame == true) intervals_ |= SHOW_FRAME;
+            plot.intervals_ = SHOW_INTERVALS;
+            if (settings->frame == true) plot.intervals_ |= SHOW_FRAME;
 
             QString lookup = xystring(binx, biny); // XXX SEGV on QString in multiple hashes!!!! XXX
 
@@ -469,8 +454,8 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
                     if (settings->z == MODEL_XYTIME) ized = settings->ride->ride()->recIntSecs(); // time at
                     else ized = pointType(point, settings->z); // raw data
                     // update interval values
-                    int count = inum.value(lookup, 0.0);
-                    double currentz = iz.value(lookup, 0.0);
+                    int count = plot.inum.value(lookup, 0.0);
+                    double currentz = plot.iz.value(lookup, 0.0);
 
                     if (settings->z == MODEL_XYTIME) {
                         count++;
@@ -479,8 +464,8 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
                        if (count) ized = ((currentz*count)+ized)/(count+1); // average
                     }
 
-                    iz.insert(lookup, ized);
-                    inum.insert(lookup, count);
+                    plot.iz.insert(lookup, ized);
+                    plot.inum.insert(lookup, count);
                     break;
                 }
             }
@@ -562,11 +547,11 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
     // Intervals
     if (settings->z == MODEL_XYTIME) {
         // time on Z axis
-        QHashIterator<QString, double> ii(iz);
+        QHashIterator<QString, double> ii(plot.iz);
         while (duration && settings->z == MODEL_XYTIME && ii.hasNext()) {
             ii.next();
             double timePercent = (ii.value()/duration) * 100;
-            iz.insert(ii.key(), timePercent);
+            plot.iz.insert(ii.key(), timePercent);
         }
     }
 
@@ -614,6 +599,11 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
     setMaxZ(maxz);
 
     QFont font; // has all the defaults in it
+
+// qwtplot3d api changes between 0.2.x and 0.3.x
+#if QWT3D_MINOR_VERSION > 2
+    plot.setDataColor(*settings->colorProvider);
+#endif
 
     //
     // Setup the color legend
@@ -672,13 +662,12 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
     double xr = 0.8 * (((double)settings->xbin/((double)(maxbinx-minbinx)+(settings->xbin))) / 2.0);
     double yr = 0.8 * (((double)settings->ybin/((double)(maxbiny-minbiny)+(settings->ybin))) / 2.0);
 
-    diag_ = xr < yr ? (xr*(maxbinx-minbinx)) : (yr*(maxbiny-minbiny));
+    plot.diag_ = xr < yr ? (xr*(maxbinx-minbinx)) : (yr*(maxbiny-minbiny));
 
     // now update the model - before the chart axis/legends
     create();
 
     double xscale, yscale, zscale;
-
     if ((maxbinx-minbinx) >= (maxbiny-minbiny) && (maxbinx-minbinx) >= (maxz-minz)) {
         // scale is set off the x-axis
         xscale = 1;
@@ -723,6 +712,7 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
     plot.setCoordinateStyle(FRAME);
     plot.setMeshLineWidth(1);
     plot.setIsolines(10);
+    plot.setOrtho(false);
     plot.setSmoothMesh(true);
 
     // cordinates - labels, gridlines, tic markers etc
@@ -797,7 +787,7 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
     plot.coordinates()->axes[Y3].draw();
 
     // turn off zpane -- causes nasty flashing when left on between plots
-    zpane = 0;
+    plot.zpane = 0;
 
 }
 
@@ -822,13 +812,17 @@ BasicModelPlot::BasicModelPlot(MainWindow *parent, ModelSettings *settings) : ma
 
     // the data provider returns a z for an x,y
     modelDataProvider = new ModelDataProvider(*this, settings);
+
+// qwtplot3d api changes between 0.2.x and 0.3.x
+#if QWT3D_MINOR_VERSION < 3
     setDataColor(modelDataColor);
+#endif
 
     // box style x/y/z
     setCoordinateStyle(FRAME);
 
     // start with bar chart
-    bar = (Bar *) this->setPlotStyle(Bar());
+    bar = (Bar *) this->setPlotStyle(Bar(this));
 
     //coordinates()->setAutoScale(true);
 
@@ -853,7 +847,7 @@ BasicModelPlot::BasicModelPlot(MainWindow *parent, ModelSettings *settings) : ma
 
     // no lighting it makes it tricky to read
     // when there are LOTS of bars
-    blowout();
+    //blowout();
 
     // set shift zoom etc
     resetViewPoint();
@@ -895,29 +889,29 @@ BasicModelPlot::setStyle(int index)
     switch (index) {
 
     case 0 : // BAR
-        bar = (Bar*)this->setPlotStyle(Bar());
+        bar = (Bar*)this->setPlotStyle(Bar(this));
         showNormals(false);
         updateNormals();
         currentStyle = STYLE_BAR;
         break;
     case 1 : // SURFACE GRID
         setPlotStyle(FILLEDMESH);
-        water = (Water *)addEnrichment(Water());
+        water = (Water *)addEnrichment(Water(this));
         showNormals(false);
         updateNormals();
         currentStyle = STYLE_GRID;
         break;
     case 2 : // SURFACE SMOOTH
         setPlotStyle(FILLED);
-        water = (Water *)addEnrichment(Water());
+        water = (Water *)addEnrichment(Water(this));
         showNormals(false);
         updateNormals();
         currentStyle = STYLE_SURFACE;
         break;
     case 3 : // DOTS
-        setPlotStyle(Qwt3D::POINTS);
-        water = (Water *)addEnrichment(Water());
-        showNormals(true);
+        setPlotStyle(Dot(10,10));
+        water = (Water *)addEnrichment(Water(this));
+        showNormals(false);
         updateNormals();
         currentStyle = STYLE_DOTS;
         break;
@@ -1001,6 +995,8 @@ ModelPlot::ModelPlot(MainWindow *parent, ModelSettings *settings) : QFrame(paren
     // the distinction between a model plot and a basic model plot
     // is only to provide a frame for the qwt3d plot (it looks odd
     // when compared to the other plots without one)
+    setInstanceName("3D Plot");
+
     layout = new QVBoxLayout;
     setLineWidth(1);
     setFrameStyle(QFrame::Box | QFrame::Raised);
@@ -1077,6 +1073,8 @@ Water::Water()
 {
 }
 
+Water::Water(BasicModelPlot *model) : model(model) {}
+
 void Water::drawBegin()
 {
   // diag has been moved to a global variable set by the data model
@@ -1095,14 +1093,24 @@ void Water::drawEnd()
     // plot all the nonsense now -- could shade if
     // power zones selected on plot (?)
 
-    if (zpane) {
+        if (model->zpane) {
 
+// qwtplot3d api changes between 0.2.x and 0.3.x
+#if QWT3D_MINOR_VERSION > 2
+        double minx = plot_p->hull().minVertex.x;
+        double miny = plot_p->hull().minVertex.y;
+        double maxx = plot_p->hull().maxVertex.x;
+        double maxy = plot_p->hull().maxVertex.y;
+        double minz = plot_p->hull().minVertex.z;
+#else
         double minx = plot->hull().minVertex.x;
         double miny = plot->hull().minVertex.y;
         double maxx = plot->hull().maxVertex.x;
         double maxy = plot->hull().maxVertex.y;
         double minz = plot->hull().minVertex.z;
-        double z = zpane + minz;
+#endif
+
+        double z = model->zpane + minz;
 
         // ZPANE SHADING
         glColor4f(0.7,0,0,0.4);
@@ -1181,6 +1189,8 @@ Bar::Bar()
 {
 }
 
+Bar::Bar(BasicModelPlot *model) : model(model) {}
+
 void Bar::drawBegin()
 {
   // diag has been moved to a global variable set by the data model
@@ -1198,14 +1208,24 @@ void Bar::drawEnd()
 {
     // plot all the nonsense now -- could shade if
     // power zones selected on plot (?)
-    if (zpane) {
+    if (model->zpane) {
 
+
+// qwtplot3d api changes between 0.2.x and 0.3.x
+#if QWT3D_MINOR_VERSION > 2
+        double minx = plot_p->hull().minVertex.x;
+        double miny = plot_p->hull().minVertex.y;
+        double maxx = plot_p->hull().maxVertex.x;
+        double maxy = plot_p->hull().maxVertex.y;
+        double minz = plot_p->hull().minVertex.z;
+#else
         double minx = plot->hull().minVertex.x;
         double miny = plot->hull().minVertex.y;
         double maxx = plot->hull().maxVertex.x;
         double maxy = plot->hull().maxVertex.y;
         double minz = plot->hull().minVertex.z;
-        double z = zpane + minz;
+#endif
+        double z = model->zpane + minz;
 
         // ZPANE SHADING
         glColor3d(0.7,0,0);
@@ -1271,21 +1291,36 @@ void Bar::draw(Qwt3D::Triple const& pos)
     //  GLStateBewarer sb(GL_LINE_SMOOTH, true);
     //  sb.turnOn();
 
+// qwtplot3d api changes between 0.2.x and 0.3.x
+#if QWT3D_MINOR_VERSION > 2
+    double interval = plot_p->hull().maxVertex.z-plot_p->hull().minVertex.z;
+    double numlevel = plot_p->hull().minVertex.z + 1 * interval;
+    GLdouble gminz = plot_p->hull().minVertex.z;
+#else
     double interval = plot->hull().maxVertex.z-plot->hull().minVertex.z;
     double numlevel = plot->hull().minVertex.z + 1 * interval;
-    interval /=100;
-
     GLdouble gminz = plot->hull().minVertex.z;
+#endif
+
+    interval /=100;
 
     // get the colour for this bar from the plot colour provider (defined above)
     RGBA rgbat, rgbab;
 
     // don't plot a thing if it don't mean a thing
     if (pos.z == gminz) return;
-    if (intervals_ == 0) {
+    if (model->intervals_ == 0) {
         // just plot using normal colours (one set of bars per x/y)
+
+// qwtplot3d api changes between 0.2.x and 0.3.x
+#if QWT3D_MINOR_VERSION > 2
+        rgbat = (plot_p->dataColor())->rgba(pos);
+        rgbab = (plot_p->dataColor())->rgba(pos.x, pos.y, gminz);
+#else
         rgbat = (*plot->dataColor())(pos);
         rgbab = (*plot->dataColor())(pos.x, pos.y, gminz);
+#endif
+
     } else {
         // first bars use max and are see-through
         QColor irgba = GCColor::invert(GColor(CPLOTBACKGROUND));
@@ -1295,150 +1330,157 @@ void Bar::draw(Qwt3D::Triple const& pos)
         rgbab = b;
     }
 
-    if (intervals_ == 0) {
+    if (model->intervals_ == 0) {
         // shade the max bars if not doing intervals
         glBegin(GL_QUADS);
         glColor4d(rgbab.r,rgbab.g,rgbab.b,rgbab.a);
-        glVertex3d(pos.x-diag_,pos.y-diag_,gminz);
-        glVertex3d(pos.x+diag_,pos.y-diag_,gminz);
-        glVertex3d(pos.x+diag_,pos.y+diag_,gminz);
-        glVertex3d(pos.x-diag_,pos.y+diag_,gminz);
+        glVertex3d(pos.x-model->diag_,pos.y-model->diag_,gminz);
+        glVertex3d(pos.x+model->diag_,pos.y-model->diag_,gminz);
+        glVertex3d(pos.x+model->diag_,pos.y+model->diag_,gminz);
+        glVertex3d(pos.x-model->diag_,pos.y+model->diag_,gminz);
 
         if (pos.z > numlevel - interval && pos.z < numlevel + interval )
           glColor3d(0.7,0,0);
         else
           glColor4d(rgbat.r,rgbat.g,rgbat.b,rgbat.a);
-        glVertex3d(pos.x-diag_,pos.y-diag_,pos.z);
-        glVertex3d(pos.x+diag_,pos.y-diag_,pos.z);
-        glVertex3d(pos.x+diag_,pos.y+diag_,pos.z);
-        glVertex3d(pos.x-diag_,pos.y+diag_,pos.z);
+        glVertex3d(pos.x-model->diag_,pos.y-model->diag_,pos.z);
+        glVertex3d(pos.x+model->diag_,pos.y-model->diag_,pos.z);
+        glVertex3d(pos.x+model->diag_,pos.y+model->diag_,pos.z);
+        glVertex3d(pos.x-model->diag_,pos.y+model->diag_,pos.z);
 
         glColor4d(rgbab.r,rgbab.g,rgbat.b,rgbab.a);
-        glVertex3d(pos.x-diag_,pos.y-diag_,gminz);
-        glVertex3d(pos.x+diag_,pos.y-diag_,gminz);
+        glVertex3d(pos.x-model->diag_,pos.y-model->diag_,gminz);
+        glVertex3d(pos.x+model->diag_,pos.y-model->diag_,gminz);
         glColor4d(rgbat.r,rgbat.g,rgbat.b,rgbat.a);
-        glVertex3d(pos.x+diag_,pos.y-diag_,pos.z);
-        glVertex3d(pos.x-diag_,pos.y-diag_,pos.z);
+        glVertex3d(pos.x+model->diag_,pos.y-model->diag_,pos.z);
+        glVertex3d(pos.x-model->diag_,pos.y-model->diag_,pos.z);
 
         glColor4d(rgbab.r,rgbab.g,rgbat.b,rgbab.a);
-        glVertex3d(pos.x-diag_,pos.y+diag_,gminz);
-        glVertex3d(pos.x+diag_,pos.y+diag_,gminz);
+        glVertex3d(pos.x-model->diag_,pos.y+model->diag_,gminz);
+        glVertex3d(pos.x+model->diag_,pos.y+model->diag_,gminz);
         glColor4d(rgbat.r,rgbat.g,rgbat.b,rgbat.a);
-        glVertex3d(pos.x+diag_,pos.y+diag_,pos.z);
-        glVertex3d(pos.x-diag_,pos.y+diag_,pos.z);
+        glVertex3d(pos.x+model->diag_,pos.y+model->diag_,pos.z);
+        glVertex3d(pos.x-model->diag_,pos.y+model->diag_,pos.z);
 
         glColor4d(rgbab.r,rgbab.g,rgbat.b,rgbab.a);
-        glVertex3d(pos.x-diag_,pos.y-diag_,gminz);
-        glVertex3d(pos.x-diag_,pos.y+diag_,gminz);
+        glVertex3d(pos.x-model->diag_,pos.y-model->diag_,gminz);
+        glVertex3d(pos.x-model->diag_,pos.y+model->diag_,gminz);
         glColor4d(rgbat.r,rgbat.g,rgbat.b,rgbat.a);
-        glVertex3d(pos.x-diag_,pos.y+diag_,pos.z);
-        glVertex3d(pos.x-diag_,pos.y-diag_,pos.z);
+        glVertex3d(pos.x-model->diag_,pos.y+model->diag_,pos.z);
+        glVertex3d(pos.x-model->diag_,pos.y-model->diag_,pos.z);
 
         glColor4d(rgbab.r,rgbab.g,rgbat.b,rgbab.a);
-        glVertex3d(pos.x+diag_,pos.y-diag_,gminz);
-        glVertex3d(pos.x+diag_,pos.y+diag_,gminz);
+        glVertex3d(pos.x+model->diag_,pos.y-model->diag_,gminz);
+        glVertex3d(pos.x+model->diag_,pos.y+model->diag_,gminz);
         glColor4d(rgbat.r,rgbat.g,rgbat.b,rgbat.a);
-        glVertex3d(pos.x+diag_,pos.y+diag_,pos.z);
-        glVertex3d(pos.x+diag_,pos.y-diag_,pos.z);
+        glVertex3d(pos.x+model->diag_,pos.y+model->diag_,pos.z);
+        glVertex3d(pos.x+model->diag_,pos.y-model->diag_,pos.z);
         glEnd();
     }
 
-    if (intervals_ == 0 || intervals_&SHOW_FRAME) {
+    if (model->intervals_ == 0 || model->intervals_&SHOW_FRAME) {
         QColor irgba = GCColor::invert(GColor(CPLOTBACKGROUND));
         glColor3d(irgba.red()/255.0, irgba.green()/255.0,irgba.blue()/255);
         glBegin(GL_LINES);
-        glVertex3d(pos.x-diag_,pos.y-diag_,gminz); glVertex3d(pos.x+diag_,pos.y-diag_,gminz);
-        glVertex3d(pos.x-diag_,pos.y-diag_,pos.z); glVertex3d(pos.x+diag_,pos.y-diag_,pos.z);
-        glVertex3d(pos.x-diag_,pos.y+diag_,pos.z); glVertex3d(pos.x+diag_,pos.y+diag_,pos.z);
-        glVertex3d(pos.x-diag_,pos.y+diag_,gminz); glVertex3d(pos.x+diag_,pos.y+diag_,gminz);
+        glVertex3d(pos.x-model->diag_,pos.y-model->diag_,gminz); glVertex3d(pos.x+model->diag_,pos.y-model->diag_,gminz);
+        glVertex3d(pos.x-model->diag_,pos.y-model->diag_,pos.z); glVertex3d(pos.x+model->diag_,pos.y-model->diag_,pos.z);
+        glVertex3d(pos.x-model->diag_,pos.y+model->diag_,pos.z); glVertex3d(pos.x+model->diag_,pos.y+model->diag_,pos.z);
+        glVertex3d(pos.x-model->diag_,pos.y+model->diag_,gminz); glVertex3d(pos.x+model->diag_,pos.y+model->diag_,gminz);
 
-        glVertex3d(pos.x-diag_,pos.y-diag_,gminz); glVertex3d(pos.x-diag_,pos.y+diag_,gminz);
-        glVertex3d(pos.x+diag_,pos.y-diag_,gminz); glVertex3d(pos.x+diag_,pos.y+diag_,gminz);
-        glVertex3d(pos.x+diag_,pos.y-diag_,pos.z); glVertex3d(pos.x+diag_,pos.y+diag_,pos.z);
-        glVertex3d(pos.x-diag_,pos.y-diag_,pos.z); glVertex3d(pos.x-diag_,pos.y+diag_,pos.z);
+        glVertex3d(pos.x-model->diag_,pos.y-model->diag_,gminz); glVertex3d(pos.x-model->diag_,pos.y+model->diag_,gminz);
+        glVertex3d(pos.x+model->diag_,pos.y-model->diag_,gminz); glVertex3d(pos.x+model->diag_,pos.y+model->diag_,gminz);
+        glVertex3d(pos.x+model->diag_,pos.y-model->diag_,pos.z); glVertex3d(pos.x+model->diag_,pos.y+model->diag_,pos.z);
+        glVertex3d(pos.x-model->diag_,pos.y-model->diag_,pos.z); glVertex3d(pos.x-model->diag_,pos.y+model->diag_,pos.z);
 
-        glVertex3d(pos.x-diag_,pos.y-diag_,gminz); glVertex3d(pos.x-diag_,pos.y-diag_,pos.z);
-        glVertex3d(pos.x+diag_,pos.y-diag_,gminz); glVertex3d(pos.x+diag_,pos.y-diag_,pos.z);
-        glVertex3d(pos.x+diag_,pos.y+diag_,gminz); glVertex3d(pos.x+diag_,pos.y+diag_,pos.z);
-        glVertex3d(pos.x-diag_,pos.y+diag_,gminz); glVertex3d(pos.x-diag_,pos.y+diag_,pos.z);
+        glVertex3d(pos.x-model->diag_,pos.y-model->diag_,gminz); glVertex3d(pos.x-model->diag_,pos.y-model->diag_,pos.z);
+        glVertex3d(pos.x+model->diag_,pos.y-model->diag_,gminz); glVertex3d(pos.x+model->diag_,pos.y-model->diag_,pos.z);
+        glVertex3d(pos.x+model->diag_,pos.y+model->diag_,gminz); glVertex3d(pos.x+model->diag_,pos.y+model->diag_,pos.z);
+        glVertex3d(pos.x-model->diag_,pos.y+model->diag_,gminz); glVertex3d(pos.x-model->diag_,pos.y+model->diag_,pos.z);
         glEnd();
     }
 
     // if we have don't have intervals we're done
-    if (intervals_ == 0) return;
+    if (model->intervals_ == 0) return;
 
     // get the intervals drawn
     // just plot using normal colours (one set of bars per x/y)
+
+// qwtplot3d api changes between 0.2.x and 0.3.x
+#if QWT3D_MINOR_VERSION > 2
+    rgbat = (plot_p->dataColor())->rgba(pos);
+    rgbab = (plot_p->dataColor())->rgba(pos.x, pos.y, gminz);
+#else
     rgbat = (*plot->dataColor())(pos);
     rgbab = (*plot->dataColor())(pos.x, pos.y, gminz);
+#endif
 
     // get pos for the interval data
     // call the current data provider
     // which is a global
-    double z =  iz.value(xystring(pos.x,pos.y));
+    double z =  model->iz.value(xystring(pos.x,pos.y));
     if (z == 0) return;
 
     // do the max bars
     glBegin(GL_QUADS);
     glColor4d(rgbab.r,rgbab.g,rgbab.b,rgbab.a);
-    glVertex3d(pos.x-diag_,pos.y-diag_,gminz);
-    glVertex3d(pos.x+diag_,pos.y-diag_,gminz);
-    glVertex3d(pos.x+diag_,pos.y+diag_,gminz);
-    glVertex3d(pos.x-diag_,pos.y+diag_,gminz);
+    glVertex3d(pos.x-model->diag_,pos.y-model->diag_,gminz);
+    glVertex3d(pos.x+model->diag_,pos.y-model->diag_,gminz);
+    glVertex3d(pos.x+model->diag_,pos.y+model->diag_,gminz);
+    glVertex3d(pos.x-model->diag_,pos.y+model->diag_,gminz);
 
     if (z > numlevel - interval && z < numlevel + interval )
       glColor3d(0.7,0,0);
     else
       glColor4d(rgbat.r,rgbat.g,rgbat.b,rgbat.a);
-    glVertex3d(pos.x-diag_,pos.y-diag_,z);
-    glVertex3d(pos.x+diag_,pos.y-diag_,z);
-    glVertex3d(pos.x+diag_,pos.y+diag_,z);
-    glVertex3d(pos.x-diag_,pos.y+diag_,z);
+    glVertex3d(pos.x-model->diag_,pos.y-model->diag_,z);
+    glVertex3d(pos.x+model->diag_,pos.y-model->diag_,z);
+    glVertex3d(pos.x+model->diag_,pos.y+model->diag_,z);
+    glVertex3d(pos.x-model->diag_,pos.y+model->diag_,z);
 
     glColor4d(rgbab.r,rgbab.g,rgbat.b,rgbab.a);
-    glVertex3d(pos.x-diag_,pos.y-diag_,gminz);
-    glVertex3d(pos.x+diag_,pos.y-diag_,gminz);
+    glVertex3d(pos.x-model->diag_,pos.y-model->diag_,gminz);
+    glVertex3d(pos.x+model->diag_,pos.y-model->diag_,gminz);
     glColor4d(rgbat.r,rgbat.g,rgbat.b,rgbat.a);
-    glVertex3d(pos.x+diag_,pos.y-diag_,z);
-    glVertex3d(pos.x-diag_,pos.y-diag_,z);
+    glVertex3d(pos.x+model->diag_,pos.y-model->diag_,z);
+    glVertex3d(pos.x-model->diag_,pos.y-model->diag_,z);
 
     glColor4d(rgbab.r,rgbab.g,rgbat.b,rgbab.a);
-    glVertex3d(pos.x-diag_,pos.y+diag_,gminz);
-    glVertex3d(pos.x+diag_,pos.y+diag_,gminz);
+    glVertex3d(pos.x-model->diag_,pos.y+model->diag_,gminz);
+    glVertex3d(pos.x+model->diag_,pos.y+model->diag_,gminz);
     glColor4d(rgbat.r,rgbat.g,rgbat.b,rgbat.a);
-    glVertex3d(pos.x+diag_,pos.y+diag_,z);
-    glVertex3d(pos.x-diag_,pos.y+diag_,z);
+    glVertex3d(pos.x+model->diag_,pos.y+model->diag_,z);
+    glVertex3d(pos.x-model->diag_,pos.y+model->diag_,z);
 
     glColor4d(rgbab.r,rgbab.g,rgbat.b,rgbab.a);
-    glVertex3d(pos.x-diag_,pos.y-diag_,gminz);
-    glVertex3d(pos.x-diag_,pos.y+diag_,gminz);
+    glVertex3d(pos.x-model->diag_,pos.y-model->diag_,gminz);
+    glVertex3d(pos.x-model->diag_,pos.y+model->diag_,gminz);
     glColor4d(rgbat.r,rgbat.g,rgbat.b,rgbat.a);
-    glVertex3d(pos.x-diag_,pos.y+diag_,z);
-    glVertex3d(pos.x-diag_,pos.y-diag_,z);
+    glVertex3d(pos.x-model->diag_,pos.y+model->diag_,z);
+    glVertex3d(pos.x-model->diag_,pos.y-model->diag_,z);
 
     glColor4d(rgbab.r,rgbab.g,rgbat.b,rgbab.a);
-    glVertex3d(pos.x+diag_,pos.y-diag_,gminz);
-    glVertex3d(pos.x+diag_,pos.y+diag_,gminz);
+    glVertex3d(pos.x+model->diag_,pos.y-model->diag_,gminz);
+    glVertex3d(pos.x+model->diag_,pos.y+model->diag_,gminz);
     glColor4d(rgbat.r,rgbat.g,rgbat.b,rgbat.a);
-    glVertex3d(pos.x+diag_,pos.y+diag_,z);
-    glVertex3d(pos.x+diag_,pos.y-diag_,z);
+    glVertex3d(pos.x+model->diag_,pos.y+model->diag_,z);
+    glVertex3d(pos.x+model->diag_,pos.y-model->diag_,z);
     glEnd();
 
     glColor3d(0,0,0);
     glBegin(GL_LINES);
-    glVertex3d(pos.x-diag_,pos.y-diag_,gminz); glVertex3d(pos.x+diag_,pos.y-diag_,gminz);
-    glVertex3d(pos.x-diag_,pos.y-diag_,z); glVertex3d(pos.x+diag_,pos.y-diag_,z);
-    glVertex3d(pos.x-diag_,pos.y+diag_,z); glVertex3d(pos.x+diag_,pos.y+diag_,z);
-    glVertex3d(pos.x-diag_,pos.y+diag_,gminz); glVertex3d(pos.x+diag_,pos.y+diag_,gminz);
+    glVertex3d(pos.x-model->diag_,pos.y-model->diag_,gminz); glVertex3d(pos.x+model->diag_,pos.y-model->diag_,gminz);
+    glVertex3d(pos.x-model->diag_,pos.y-model->diag_,z); glVertex3d(pos.x+model->diag_,pos.y-model->diag_,z);
+    glVertex3d(pos.x-model->diag_,pos.y+model->diag_,z); glVertex3d(pos.x+model->diag_,pos.y+model->diag_,z);
+    glVertex3d(pos.x-model->diag_,pos.y+model->diag_,gminz); glVertex3d(pos.x+model->diag_,pos.y+model->diag_,gminz);
 
-    glVertex3d(pos.x-diag_,pos.y-diag_,gminz); glVertex3d(pos.x-diag_,pos.y+diag_,gminz);
-    glVertex3d(pos.x+diag_,pos.y-diag_,gminz); glVertex3d(pos.x+diag_,pos.y+diag_,gminz);
-    glVertex3d(pos.x+diag_,pos.y-diag_,z); glVertex3d(pos.x+diag_,pos.y+diag_,z);
-    glVertex3d(pos.x-diag_,pos.y-diag_,z); glVertex3d(pos.x-diag_,pos.y+diag_,z);
+    glVertex3d(pos.x-model->diag_,pos.y-model->diag_,gminz); glVertex3d(pos.x-model->diag_,pos.y+model->diag_,gminz);
+    glVertex3d(pos.x+model->diag_,pos.y-model->diag_,gminz); glVertex3d(pos.x+model->diag_,pos.y+model->diag_,gminz);
+    glVertex3d(pos.x+model->diag_,pos.y-model->diag_,z); glVertex3d(pos.x+model->diag_,pos.y+model->diag_,z);
+    glVertex3d(pos.x-model->diag_,pos.y-model->diag_,z); glVertex3d(pos.x-model->diag_,pos.y+model->diag_,z);
 
-    glVertex3d(pos.x-diag_,pos.y-diag_,gminz); glVertex3d(pos.x-diag_,pos.y-diag_,z);
-    glVertex3d(pos.x+diag_,pos.y-diag_,gminz); glVertex3d(pos.x+diag_,pos.y-diag_,z);
-    glVertex3d(pos.x+diag_,pos.y+diag_,gminz); glVertex3d(pos.x+diag_,pos.y+diag_,z);
-    glVertex3d(pos.x-diag_,pos.y+diag_,gminz); glVertex3d(pos.x-diag_,pos.y+diag_,z);
+    glVertex3d(pos.x-model->diag_,pos.y-model->diag_,gminz); glVertex3d(pos.x-model->diag_,pos.y-model->diag_,z);
+    glVertex3d(pos.x+model->diag_,pos.y-model->diag_,gminz); glVertex3d(pos.x+model->diag_,pos.y-model->diag_,z);
+    glVertex3d(pos.x+model->diag_,pos.y+model->diag_,gminz); glVertex3d(pos.x+model->diag_,pos.y+model->diag_,z);
+    glVertex3d(pos.x-model->diag_,pos.y+model->diag_,gminz); glVertex3d(pos.x-model->diag_,pos.y+model->diag_,z);
     glEnd();
 }

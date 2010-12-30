@@ -18,6 +18,7 @@
 
 #ifndef _GC_LTMSettings_h
 #define _GC_LTMSettings_h 1
+#include "GoldenCheetah.h"
 
 #include <QtGui>
 #include <QList>
@@ -38,25 +39,27 @@ class RideMetric;
 #define LTM_WEEK    2
 #define LTM_MONTH   3
 #define LTM_YEAR    4
+#define LTM_TOD     5
 
 // type of metric
-// is it from the ridemetric factory or PMC stresscalculator or metadata
-#define METRIC_DB     1
-#define METRIC_PM     2
-#define METRIC_META   3
+#define METRIC_DB        1
+#define METRIC_PM        2
+#define METRIC_META      3
+#define METRIC_MEASURE   4
 
 // We catalogue each metric and the curve settings etc here
 class MetricDetail {
     public:
 
-    MetricDetail() : type(METRIC_DB), name(""), metric(NULL), smooth(false), trend(false), topN(0),
-                     baseline(0.0), curveStyle(QwtPlotCurve::Lines), symbolStyle(QwtSymbol::NoSymbol),
+    MetricDetail() : type(METRIC_DB), stack(false), name(""), metric(NULL), smooth(false), trend(false), topN(0),
+                     topOut(0), baseline(0.0), curveStyle(QwtPlotCurve::Lines), symbolStyle(QwtSymbol::NoSymbol),
                      penColor(Qt::black), penAlpha(0), penWidth(1.0), penStyle(0),
                      brushColor(Qt::black), brushAlpha(0) {}
 
     bool operator< (MetricDetail right) const { return name < right.name; }
 
     int type;
+    bool stack; // should this be stacked?
 
     QString symbol, name;
     const RideMetric *metric;
@@ -67,7 +70,13 @@ class MetricDetail {
     bool smooth,         // smooth the curve
          trend;          // add a trend line
     int topN;            // highlight top N points
+    int topOut;          // highlight N ranked outlier points
     double baseline;     // baseline for chart
+
+    // filter
+    bool showOnPlot;
+    int filter;         // 0 no filter, 1 = include, 2 = exclude
+    double from, to;
 
     // curve type and symbol
     QwtPlotCurve::CurveStyle curveStyle;      // how should this metric be plotted?
@@ -98,14 +107,19 @@ class LTMSettings {
         QDateTime end;
         int groupBy;
         bool shadeZones;
+        bool legend;
         QList<MetricDetail> metrics;
         QList<SummaryMetrics> *data;
+        QList<SummaryMetrics> *measures;
         LTMTool *ltmTool;
+        QString field1, field2;
 };
 
 class EditChartDialog : public QDialog
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
         EditChartDialog(MainWindow *, LTMSettings *, QList<LTMSettings>);
@@ -126,6 +140,8 @@ class EditChartDialog : public QDialog
 class ChartManagerDialog : public QDialog
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
         ChartManagerDialog(MainWindow *, QList<LTMSettings> *);

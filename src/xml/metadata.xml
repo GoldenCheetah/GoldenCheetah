@@ -81,6 +81,11 @@
 	</keywords>
 	<fields>
 		<field>
+			<fieldtab>"Summary"</fieldtab>
+			<fieldname>"Summary"</fieldname>
+			<fieldtype>1</fieldtype>
+		</field>
+		<field>
 			<fieldtab>"Workout"</fieldtab>
 			<fieldname>"Start Date"</fieldname>
 			<fieldtype>5</fieldtype>

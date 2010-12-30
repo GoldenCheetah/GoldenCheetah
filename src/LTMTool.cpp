@@ -34,11 +34,10 @@
 #include "RideMetadata.h"
 #include "SpecialFields.h"
 
-LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(home), main(parent)
+LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(parent), home(home), main(parent)
 {
     // get application settings
-    boost::shared_ptr<QSettings> appsettings = GetApplicationSettings();
-    useMetricUnits = appsettings->value(GC_UNIT).toString() == "Metric";
+    useMetricUnits = appsettings->value(this, GC_UNIT).toString() == "Metric";
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0,0,0,0);
@@ -57,7 +56,10 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
 
     metricTree = new QTreeWidget;
     metricTree->setColumnCount(1);
-    metricTree->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    if (multi)
+        metricTree->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    else
+        metricTree->setSelectionMode(QAbstractItemView::SingleSelection);
     metricTree->header()->hide();
     metricTree->setAlternatingRowColors (true);
     metricTree->setIndentation(5);
@@ -241,6 +243,77 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
     danielsLTR.uunits = "Ramp";
     metrics.append(danielsLTR);
 
+    // COGGAN LTS
+    MetricDetail cogganCTL;
+    cogganCTL.type = METRIC_PM;
+    cogganCTL.symbol = "coggan_ctl";
+    cogganCTL.metric = NULL; // not a factory metric
+    cogganCTL.penColor = QColor(Qt::blue);
+    cogganCTL.curveStyle = QwtPlotCurve::Lines;
+    cogganCTL.symbolStyle = QwtSymbol::NoSymbol;
+    cogganCTL.smooth = false;
+    cogganCTL.trend = false;
+    cogganCTL.topN = 5;
+    cogganCTL.uname = cogganCTL.name = "Coggan Chronic Training Load";
+    cogganCTL.uunits = "CTL";
+    metrics.append(cogganCTL);
+
+    MetricDetail cogganATL;
+    cogganATL.type = METRIC_PM;
+    cogganATL.symbol = "coggan_atl";
+    cogganATL.metric = NULL; // not a factory metric
+    cogganATL.penColor = QColor(Qt::magenta);
+    cogganATL.curveStyle = QwtPlotCurve::Lines;
+    cogganATL.symbolStyle = QwtSymbol::NoSymbol;
+    cogganATL.smooth = false;
+    cogganATL.trend = false;
+    cogganATL.topN = 5;
+    cogganATL.uname = cogganATL.name = "Coggan Acute Training Load";
+    cogganATL.uunits = "ATL";
+    metrics.append(cogganATL);
+
+    MetricDetail cogganTSB;
+    cogganTSB.type = METRIC_PM;
+    cogganTSB.symbol = "coggan_tsb";
+    cogganTSB.metric = NULL; // not a factory metric
+    cogganTSB.penColor = QColor(Qt::yellow);
+    cogganTSB.curveStyle = QwtPlotCurve::Steps;
+    cogganTSB.symbolStyle = QwtSymbol::NoSymbol;
+    cogganTSB.smooth = false;
+    cogganTSB.trend = false;
+    cogganTSB.topN = 1;
+    cogganTSB.uname = cogganTSB.name = "Coggan Training Stress Balance";
+    cogganTSB.uunits = "TSB";
+    metrics.append(cogganTSB);
+
+    MetricDetail cogganSTR;
+    cogganSTR.type = METRIC_PM;
+    cogganSTR.symbol = "coggan_sr";
+    cogganSTR.metric = NULL; // not a factory metric
+    cogganSTR.penColor = QColor(Qt::darkGreen);
+    cogganSTR.curveStyle = QwtPlotCurve::Steps;
+    cogganSTR.symbolStyle = QwtSymbol::NoSymbol;
+    cogganSTR.smooth = false;
+    cogganSTR.trend = false;
+    cogganSTR.topN = 1;
+    cogganSTR.uname = cogganSTR.name = "Coggan STS Ramp";
+    cogganSTR.uunits = "Ramp";
+    metrics.append(cogganSTR);
+
+    MetricDetail cogganLTR;
+    cogganLTR.type = METRIC_PM;
+    cogganLTR.symbol = "coggan_lr";
+    cogganLTR.metric = NULL; // not a factory metric
+    cogganLTR.penColor = QColor(Qt::darkBlue);
+    cogganLTR.curveStyle = QwtPlotCurve::Steps;
+    cogganLTR.symbolStyle = QwtSymbol::NoSymbol;
+    cogganLTR.smooth = false;
+    cogganLTR.trend = false;
+    cogganLTR.topN = 1;
+    cogganLTR.uname = cogganLTR.name = "Coggan LTS Ramp";
+    cogganLTR.uunits = "Ramp";
+    metrics.append(cogganLTR);
+
     // TRIMP LTS
     MetricDetail trimpLTS;
     trimpLTS.type = METRIC_PM;
@@ -312,7 +385,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
     trimpLTR.uunits = "Ramp";
     metrics.append(trimpLTR);
 
-
+    // metadata metrics
     SpecialFields sp;
     foreach (FieldDefinition field, main->rideMetadata()->getFields()) {
         if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
@@ -330,6 +403,32 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
             metametric.uname = metametric.name = field.name;
             metametric.uunits = "";
             metrics.append(metametric);
+        }
+    }
+
+    // measures
+    QList<FieldDefinition> measureDefinitions;
+    QList<KeywordDefinition> keywordDefinitions; //NOTE: not used in measures.xml
+    QString filename = main->home.absolutePath()+"/measures.xml";
+    if (!QFile(filename).exists()) filename = ":/xml/measures.xml";
+    RideMetadata::readXML(filename, keywordDefinitions, measureDefinitions);
+
+    foreach (FieldDefinition field, measureDefinitions) {
+        if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
+            MetricDetail measure;
+            measure.type = METRIC_MEASURE;
+            QString underscored = field.name;
+            measure.symbol = field.name; // we don't bother with '_' for measures
+            measure.metric = NULL; // not a factory metric
+            measure.penColor = QColor(Qt::blue);
+            measure.curveStyle = QwtPlotCurve::Lines;
+            measure.symbolStyle = QwtSymbol::NoSymbol;
+            measure.smooth = false;
+            measure.trend = false;
+            measure.topN = 5;
+            measure.uname = measure.name = field.name;
+            measure.uunits = "";
+            metrics.append(measure);
         }
     }
 
@@ -403,6 +502,31 @@ LTMTool::symbolStyle(RideMetric::MetricType type)
 void
 LTMTool::configChanged()
 {
+}
+
+// get/set date range
+QString
+LTMTool::_dateRange() const
+{
+    if (dateRangeTree->selectedItems().isEmpty()) return QString("");
+    else {
+        QTreeWidgetItem *which = dateRangeTree->selectedItems().first();
+        return which->text(0);
+    }
+}
+
+void
+LTMTool::setDateRange(QString s)
+{
+    // clear current selection
+    dateRangeTree->clearSelection();
+
+    for(int i=0; i<allDateRanges->childCount(); i++) {
+        if (allDateRanges->child(i)->text(0) == s) {
+            allDateRanges->child(i)->setSelected(true);
+            return;
+        }
+    }
 }
 
 /*----------------------------------------------------------------------
@@ -730,6 +854,16 @@ LTMTool::colorPicker()
 }
 
 void
+LTMTool::selectMetric(QString symbol)
+{
+    for (int i=0; i<metrics.count(); i++) {
+        if (metrics[i].symbol == symbol) {
+            allMetrics->child(i)->setSelected(true);
+        }
+    }
+}
+
+void
 LTMTool::applySettings(LTMSettings *settings)
 {
     disconnect(metricTree,SIGNAL(itemSelectionChanged()), this, SLOT(metricTreeWidgetSelectionChanged()));
@@ -796,6 +930,24 @@ EditMetricDetailDialog::EditMetricDetailDialog(MainWindow *mainWindow, MetricDet
     userUnits = new QLineEdit(this);
     userUnits->setText(metricDetail->uunits);
 
+    QLabel *filterlabel = new QLabel(tr("Filter"));
+    filter = new QComboBox(this);         // no filter / include / exclude
+    filter->addItem(tr("No filter"));
+    filter->addItem(tr("Include"));
+    filter->addItem(tr("Exclude"));
+
+    QLabel *fromlabel = new QLabel(tr("From"));
+    from = new QDoubleSpinBox(this);
+    from->setMinimum(-9999999.99);
+    from->setMaximum(9999999.99);
+
+    QLabel *tolabel = new QLabel(tr("To"));
+    to = new QDoubleSpinBox(this);
+    to->setMinimum(-9999999.99);
+    to->setMaximum(9999999.99);
+
+    showOnPlot = new QCheckBox(tr("Show on plot"), this);
+
     QLabel *style = new QLabel("Curve");
     curveStyle = new QComboBox(this);
     curveStyle->addItem("Bar", QwtPlotCurve::Steps);
@@ -803,6 +955,10 @@ EditMetricDetailDialog::EditMetricDetailDialog(MainWindow *mainWindow, MetricDet
     curveStyle->addItem("Sticks", QwtPlotCurve::Sticks);
     curveStyle->addItem("Dots", QwtPlotCurve::Dots);
     curveStyle->setCurrentIndex(curveStyle->findData(metricDetail->curveStyle));
+
+    QLabel *stackLabel = new QLabel("Stack");
+    stack = new QCheckBox("", this);
+    stack->setChecked(metricDetail->stack);
 
 
     QLabel *symbol = new QLabel("Symbol");
@@ -832,6 +988,14 @@ EditMetricDetailDialog::EditMetricDetailDialog(MainWindow *mainWindow, MetricDet
     showBest->setSingleStep(1.0);
     showBest->setValue(metricDetail->topN);
 
+    QLabel *outN = new QLabel("Highlight Outliers");
+    showOut = new QDoubleSpinBox(this);
+    showOut->setDecimals(0);
+    showOut->setMinimum(0);
+    showOut->setMaximum(999);
+    showOut->setSingleStep(1.0);
+    showOut->setValue(metricDetail->topOut);
+
     QLabel *baseline = new QLabel("Baseline");
     baseLine = new QDoubleSpinBox(this);
     baseLine->setDecimals(0);
@@ -851,18 +1015,32 @@ EditMetricDetailDialog::EditMetricDetailDialog(MainWindow *mainWindow, MetricDet
     grid->addWidget(userName, 0,1);
     grid->addWidget(units, 1,0);
     grid->addWidget(userUnits, 1,1);
-    grid->addWidget(style, 2,0);
-    grid->addWidget(curveStyle, 2,1);
-    grid->addWidget(symbol, 3,0);
-    grid->addWidget(curveSymbol, 3,1);
-    grid->addWidget(color, 4,0);
-    grid->addWidget(curveColor, 4,1);
-    grid->addWidget(topN, 5,0);
-    grid->addWidget(showBest, 5,1);
-    grid->addWidget(baseline, 6, 0);
-    grid->addWidget(baseLine, 6,1);
-    grid->addWidget(curveSmooth, 7,1);
-    grid->addWidget(curveTrend, 8,1);
+
+
+    grid->addWidget(filterlabel, 2,0);
+    grid->addWidget(filter, 2,1);
+    grid->addWidget(fromlabel, 3,0);
+    grid->addWidget(from, 3,1);
+    grid->addWidget(tolabel, 4,0);
+    grid->addWidget(to, 4,1);
+    grid->addWidget(showOnPlot, 5,1);
+
+    grid->addWidget(style, 6,0);
+    grid->addWidget(curveStyle, 6,1);
+    grid->addWidget(symbol, 7,0);
+    grid->addWidget(curveSymbol, 7,1);
+    grid->addWidget(stackLabel, 8, 0);
+    grid->addWidget(stack, 8, 1);
+    grid->addWidget(color, 9,0);
+    grid->addWidget(curveColor, 9,1);
+    grid->addWidget(topN, 10,0);
+    grid->addWidget(showBest, 10,1);
+    grid->addWidget(outN, 11,0);
+    grid->addWidget(showOut, 11,1);
+    grid->addWidget(baseline, 12, 0);
+    grid->addWidget(baseLine, 12,1);
+    grid->addWidget(curveSmooth, 13,1);
+    grid->addWidget(curveTrend, 14,1);
 
     mainLayout->addLayout(grid);
     mainLayout->addStretch();
@@ -898,12 +1076,14 @@ EditMetricDetailDialog::applyClicked()
     metricDetail->smooth = curveSmooth->isChecked();
     metricDetail->trend = curveTrend->isChecked();
     metricDetail->topN = showBest->value();
+    metricDetail->topOut = showOut->value();
     metricDetail->baseline = baseLine->value();
     metricDetail->curveStyle = styleMap[curveStyle->currentIndex()];
     metricDetail->symbolStyle = symbolMap[curveSymbol->currentIndex()];
     metricDetail->penColor = penColor;
     metricDetail->uname = userName->text();
     metricDetail->uunits = userUnits->text();
+    metricDetail->stack = stack->isChecked();
     accept();
 }
 void

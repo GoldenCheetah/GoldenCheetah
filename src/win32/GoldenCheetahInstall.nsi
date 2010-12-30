@@ -68,7 +68,10 @@ Section "Golden Cheetah (required)"
   File "..\release\QtNetwork4.dll"
   File "..\release\QtOpenGL4.dll"
   File "..\release\libgcc_s_dw2-1.dll"
+  File "..\release\libstdc++-6.dll"
   File "..\release\qwtplot3d.dll"
+  File "..\release\QxtCore.dll"
+  File "..\release\QxtGui.dll"
 
   SetOutPath $INSTDIR\sqldrivers
   File "..\release\qsqlite4.dll"
@@ -123,7 +126,10 @@ Section "Uninstall"
   Delete $INSTDIR\phonon4.dll
   Delete $INSTDIR\QtNetwork4.dll
   Delete $INSTDIR\QtOpenGL4.dll
+  Delete $INSTDIR\QxtCore.dll
+  Delete $INSTDIR\QxtGui.dll
   Delete $INSTDIR\libgcc_s_dw2-1.dll
+  Delete $INSTDIR\libstdc++-6.dll
   Delete $INSTDIR\qwtplot3d.dll
   Delete $INSTDIR\uninstall.exe
   Delete $INSTDIR\sqldrivers\qsqlite4.dll

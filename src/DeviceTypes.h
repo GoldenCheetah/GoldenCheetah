@@ -21,6 +21,7 @@
 
 #ifndef _GC_DeviceTypes_h
 #define _GC_DeviceTypes_h 1
+#include "GoldenCheetah.h"
 
 #include <QList>
 
@@ -28,6 +29,7 @@
 #define DEV_SRM        0x0002
 #define DEV_CT         0x0010
 #define DEV_ANTPLUS    0x0020
+#define DEV_NULL       0x0040
 #define DEV_GSERVER    0x0100   // NOT IMPLEMENTED IN THIS RELEASE XXX
 #define DEV_GCLIENT    0x0200   // NOT IMPLEMENTED IN THIS RELEASE XXX
 

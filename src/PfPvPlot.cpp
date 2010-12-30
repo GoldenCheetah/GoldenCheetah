@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (c) 2008 Sean C. Rhea (srhea@srhea.net),
  *                    J.T Conklin (jtc@acorntoolworks.com)
  *
@@ -6,12 +6,12 @@
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -135,6 +135,8 @@ PfPvPlot::PfPvPlot(MainWindow *mainWindow)
       cl_ (0.175),
       shade_zones(true)
 {
+    setInstanceName("PfPv Plot");
+
     setCanvasBackground(Qt::white);
 
     setAxisTitle(yLeft, "Average Effective Pedal Force (N)");
@@ -156,13 +158,32 @@ PfPvPlot::PfPvPlot(MainWindow *mainWindow)
 
     curve = new QwtPlotCurve();
     curve->attach(this);
-    
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
- 
-    cl_ = settings->value(GC_CRANKLENGTH).toDouble() / 1000.0;
+
+    cl_ = appsettings->value(this, GC_CRANKLENGTH).toDouble() / 1000.0;
+
+    // markup timeInQuadrant
+    tiqMarker[0] = new QwtPlotMarker(); tiqMarker[0]->attach(this);
+    tiqMarker[0]->setXValue(2.9);
+    tiqMarker[0]->setYValue(580);
+
+    tiqMarker[1] = new QwtPlotMarker(); tiqMarker[1]->attach(this);
+    tiqMarker[1]->setXValue(0.1);
+    tiqMarker[1]->setYValue(580);
+
+    tiqMarker[2] = new QwtPlotMarker(); tiqMarker[2]->attach(this);
+    tiqMarker[2]->setXValue(0.1);
+    tiqMarker[2]->setYValue(10);
+
+    tiqMarker[3] = new QwtPlotMarker(); tiqMarker[3]->attach(this);
+    tiqMarker[3]->setXValue(2.9);
+    tiqMarker[3]->setYValue(10);
 
     merge_intervals = false;
     frame_intervals = true;
+
+    // only default on first time through, after this the user may have adjusted
+    if (appsettings->value(this, GC_SHADEZONES, true).toBool()==false) shade_zones = false;
+    else shade_zones = true;
 
     configChanged();
 
@@ -190,6 +211,21 @@ PfPvPlot::configChanged()
     mX->setLinePen(marker);
     mY->setLinePen(marker);
     cpCurve->setPen(cp);
+
+}
+
+void
+PfPvPlot::setAxisTitle(int axis, QString label)
+{
+    // setup the default fonts
+    QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
+    stGiles.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+    stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+
+    QwtText title(label);
+    title.setFont(stGiles);
+    QwtPlot::setAxisFont(axis, stGiles);
+    QwtPlot::setAxisTitle(axis, title);
 }
 
 void
@@ -197,7 +233,7 @@ PfPvPlot::refreshZoneItems()
 {
     // clear out any zone curves which are presently defined
     if (zoneCurves.size()) {
-	QListIterator<QwtPlotCurve *> i(zoneCurves); 
+	QListIterator<QwtPlotCurve *> i(zoneCurves);
 	while (i.hasNext()) {
 	    QwtPlotCurve *curve = i.next();
 	    curve->detach();
@@ -206,10 +242,10 @@ PfPvPlot::refreshZoneItems()
     }
     zoneCurves.clear();
 
-    
+
     // delete any existing power zone labels
     if (zoneLabels.size()) {
-	QListIterator<PfPvPlotZoneLabel *> i(zoneLabels); 
+	QListIterator<PfPvPlotZoneLabel *> i(zoneLabels);
 	while (i.hasNext()) {
 	    PfPvPlotZoneLabel *label = i.next();
 	    label->detach();
@@ -223,7 +259,7 @@ PfPvPlot::refreshZoneItems()
 
     const Zones *zones = rideItem->zones;
     int zone_range = rideItem->zoneRange();
-    
+
     if (zone_range >= 0) {
 	setCP(zones->getCP(zone_range));
 
@@ -232,11 +268,11 @@ PfPvPlot::refreshZoneItems()
 	QList <QString> zone_name = zones->getZoneNames(zone_range);
 	int num_zones = zone_power.size();
 	assert(zone_name.size() == num_zones);
-	if (num_zones > 0) {	
+	if (num_zones > 0) {
 	    QPen *pen = new QPen();
 	    pen->setStyle(Qt::NoPen);
 
-	
+
 	    QwtArray<double> yvalues;
 
 	    // generate x values
@@ -280,7 +316,7 @@ PfPvPlot::refreshZoneItems()
 		curve->attach(this);
 		zoneCurves.append(curve);
 	    }
-	    
+
 	    delete pen;
 
 
@@ -336,86 +372,86 @@ PfPvPlot::setData(RideItem *_rideItem)
     RideFile *ride = rideItem->ride();
 
     if (ride) {
-	setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
+	    //setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
 
-	// quickly erase old data
-	curve->setVisible(false);
+	    // quickly erase old data
+	    curve->setVisible(false);
 
-	// handle zone stuff
-	refreshZoneItems();
+	    // handle zone stuff
+	    refreshZoneItems();
 
-	// due to the discrete power and cadence values returned by the
-	// power meter, there will very likely be many duplicate values.
-	// Rather than pass them all to the curve, use a set to strip
-	// out duplicates.
-	std::set<std::pair<double, double> > dataSet;
-	std::set<std::pair<double, double> > dataSetSelected;
+	    // due to the discrete power and cadence values returned by the
+	    // power meter, there will very likely be many duplicate values.
+	    // Rather than pass them all to the curve, use a set to strip
+	    // out duplicates.
+	    std::set<std::pair<double, double> > dataSet;
+	    std::set<std::pair<double, double> > dataSetSelected;
 
-	long tot_cad = 0;
-	long tot_cad_points = 0;
-
+	    long tot_cad = 0;
+	    long tot_cad_points = 0;
 
         foreach(const RideFilePoint *p1, ride->dataPoints()) {
 
-	    if (p1->watts != 0 && p1->cad != 0) {
-		double aepf = (p1->watts * 60.0) / (p1->cad * cl_ * 2.0 * PI);
-		double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
+	        if (p1->watts != 0 && p1->cad != 0) {
 
-       dataSet.insert(std::make_pair<double, double>(aepf, cpv));
-		tot_cad += p1->cad;
-		tot_cad_points++;
-        
-	    }
-	}
+		        double aepf = (p1->watts * 60.0) / (p1->cad * cl_ * 2.0 * PI);
+		        double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
 
-	if (tot_cad_points == 0) {
-	    setTitle(tr("no cadence"));
-	    refreshZoneItems();
-	    curve->setVisible(false);
-	}
-	    
-	else {
-	    // Now that we have the set of points, transform them into the
-	    // QwtArrays needed to set the curve's data.
-	    QwtArray<double> aepfArray;
-	    QwtArray<double> cpvArray;
+                dataSet.insert(std::make_pair<double, double>(aepf, cpv));
+		        tot_cad += p1->cad;
+		        tot_cad_points++;
+	        }
+        }
 
-	    std::set<std::pair<double, double> >::const_iterator j(dataSet.begin());
-	    while (j != dataSet.end()) {
-		const std::pair<double, double>& dataPoint = *j;
+        setCAD(tot_cad_points ? tot_cad / tot_cad_points : 0);
 
-		aepfArray.push_back(dataPoint.first);
-		cpvArray.push_back(dataPoint.second);
+	    if (tot_cad_points == 0) {
+	        //setTitle(tr("no cadence"));
+	        refreshZoneItems();
+	        curve->setVisible(false);
 
-		++j;
-	    }
+	    } else {
+	        // Now that we have the set of points, transform them into the
+	        // QwtArrays needed to set the curve's data.
+	        QwtArray<double> aepfArray;
+	        QwtArray<double> cpvArray;
 
-	    setCAD(tot_cad / tot_cad_points);
-	    curve->setData(cpvArray, aepfArray);
-	    QwtSymbol sym;
-	    sym.setStyle(QwtSymbol::Ellipse);
-	    sym.setSize(6);
-	    sym.setBrush(QBrush(Qt::NoBrush));
+	        std::set<std::pair<double, double> >::const_iterator j(dataSet.begin());
+	        while (j != dataSet.end()) {
+                const std::pair<double, double>& dataPoint = *j;
 
-	    // now show the data (zone shading would already be visible)
-	    curve->setVisible(true);
-	}
-    }
-    else {
-	setTitle("no data");
-	refreshZoneItems();
-	curve->setVisible(false);
+                aepfArray.push_back(dataPoint.first);
+                cpvArray.push_back(dataPoint.second);
+
+                ++j;
+            }
+
+            curve->setData(cpvArray, aepfArray);
+            QwtSymbol sym;
+            sym.setStyle(QwtSymbol::Ellipse);
+            sym.setSize(6);
+            sym.setBrush(QBrush(Qt::NoBrush));
+
+            // now show the data (zone shading would already be visible)
+            curve->setVisible(true);
+        }
+    } else {
+
+        //setTitle("no data");
+        refreshZoneItems();
+        curve->setVisible(false);
     }
 
     replot();
 
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    setCL(settings->value(GC_CRANKLENGTH).toDouble() / 1000.0);
+    setCL(appsettings->value(this, GC_CRANKLENGTH).toDouble() / 1000.0);
 }
 
 void
 PfPvPlot::showIntervals(RideItem *_rideItem)
 {
+    if (!rideItem) return;
+
     // clear out any interval curves which are presently defined
     if (intervalCurves.size()) {
        QListIterator<QwtPlotCurve *> i(intervalCurves);
@@ -558,10 +594,53 @@ PfPvPlot::recalc()
 
     double cpv = (cad_ * cl_ * 2.0 * PI) / 60.0;
     mX->setXValue(cpv);
-    
+
     double aepf = (cp_ * 60.0) / (cad_ * cl_ * 2.0 * PI);
     mY->setYValue(aepf);
-    
+
+    // watch out for null rides
+    RideFile *ride;
+    if (rideItem && (ride=rideItem->ride())) {
+
+        timeInQuadrant[0]=
+        timeInQuadrant[1]=
+        timeInQuadrant[2]=
+        timeInQuadrant[3]= 0.0;
+
+        foreach(const RideFilePoint *p1, ride->dataPoints()) {
+            if (p1->watts != 0 && p1->cad != 0) {
+
+                double aepf_ = (p1->watts * 60.0) / (p1->cad * cl_ * 2.0 * PI);
+                double cpv_ = (p1->cad * cl_ * 2.0 * PI) / 60.0;
+
+                // classic QA quadrants I II III and IV
+                if (aepf_ > aepf && cpv_ > cpv) timeInQuadrant[0] += ride->recIntSecs();
+                else if (aepf_ > aepf && cpv_ <= cpv) timeInQuadrant[1] += ride->recIntSecs();
+                else if (aepf_ <= aepf && cpv_ <= cpv) timeInQuadrant[2] += ride->recIntSecs();
+                else if (aepf_ <= aepf && cpv_ > cpv) timeInQuadrant[3] += ride->recIntSecs();
+
+            }
+        }
+        double totaltime = timeInQuadrant[0] + timeInQuadrant[1] + timeInQuadrant[2] + timeInQuadrant[3] ;
+
+        if (totaltime) {
+            tiqMarker[0]->setLabel(QwtText(QString("%1%").arg(timeInQuadrant[0] / totaltime * 100, 0, 'f', 1),QwtText::PlainText));
+            tiqMarker[1]->setLabel(QwtText(QString("%1%").arg(timeInQuadrant[1] / totaltime * 100, 0, 'f', 1),QwtText::PlainText));
+            tiqMarker[2]->setLabel(QwtText(QString("%1%").arg(timeInQuadrant[2] / totaltime * 100, 0, 'f', 1),QwtText::PlainText));
+            tiqMarker[3]->setLabel(QwtText(QString("%1%").arg(timeInQuadrant[3] / totaltime * 100, 0, 'f', 1),QwtText::PlainText));
+        } else {
+            tiqMarker[0]->setLabel(QwtText("",QwtText::PlainText));
+            tiqMarker[1]->setLabel(QwtText("",QwtText::PlainText));
+            tiqMarker[2]->setLabel(QwtText("",QwtText::PlainText));
+            tiqMarker[3]->setLabel(QwtText("",QwtText::PlainText));
+        }
+    } else {
+        tiqMarker[0]->setLabel(QwtText("",QwtText::PlainText));
+        tiqMarker[1]->setLabel(QwtText("",QwtText::PlainText));
+        tiqMarker[2]->setLabel(QwtText("",QwtText::PlainText));
+        tiqMarker[3]->setLabel(QwtText("",QwtText::PlainText));
+    }
+
     QwtArray<double> yvalues(contour_xvalues.size());
     if (cp_) {
 	for (int i = 0; i < contour_xvalues.size(); i ++)
@@ -575,8 +654,8 @@ PfPvPlot::recalc()
     }
     else
 	// an empty curve if no power (or zero power) is specified
-	cpCurve->setData(QwtArray <double>(), QwtArray <double>());
-    
+	cpCurve->setData(QwtArray<double>(), QwtArray<double>());
+
     //replot();
 }
 

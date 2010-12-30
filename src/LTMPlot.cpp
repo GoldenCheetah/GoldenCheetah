@@ -19,6 +19,7 @@
 #include "LTMPlot.h"
 #include "LTMTool.h"
 #include "LTMTrend.h"
+#include "LTMOutliers.h"
 #include "LTMWindow.h"
 #include "MetricAggregator.h"
 #include "SummaryMetrics.h"
@@ -45,9 +46,10 @@ static int supported_axes[] = { QwtPlot::yLeft, QwtPlot::yRight, QwtPlot::yLeft1
 LTMPlot::LTMPlot(LTMWindow *parent, MainWindow *main, QDir home) : bg(NULL), parent(parent), main(main),
                                                                    home(home), highlighter(NULL)
 {
+    setInstanceName("Metric Plot");
+
     // get application settings
-    boost::shared_ptr<QSettings> appsettings = GetApplicationSettings();
-    useMetricUnits = appsettings->value(GC_UNIT).toString() == "Metric";
+    useMetricUnits = appsettings->value(this, GC_UNIT).toString() == "Metric";
 
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setAxisTitle(yLeft, tr(""));
@@ -74,14 +76,27 @@ void
 LTMPlot::configUpdate()
 {
     // get application settings
-    boost::shared_ptr<QSettings> appsettings = GetApplicationSettings();
-    useMetricUnits = appsettings->value(GC_UNIT).toString() == "Metric";
+    useMetricUnits = appsettings->value(this, GC_UNIT).toString() == "Metric";
 
     // set basic plot colors
     setCanvasBackground(GColor(CPLOTBACKGROUND));
     QPen gridPen(GColor(CPLOTGRID));
     gridPen.setStyle(Qt::DotLine);
     grid->setPen(gridPen);
+}
+
+void
+LTMPlot::setAxisTitle(int axis, QString label)
+{
+    // setup the default fonts
+    QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
+    stGiles.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+    stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+
+    QwtText title(label);
+    title.setFont(stGiles);
+    QwtPlot::setAxisFont(axis, stGiles);
+    QwtPlot::setAxisTitle(axis, title);
 }
 
 void
@@ -110,7 +125,11 @@ LTMPlot::setData(LTMSettings *set)
         }
     }
 
-    setTitle(settings->title);
+    //setTitle(settings->title);
+    if (settings->groupBy != LTM_TOD)
+        setAxisTitle(xBottom, "Date");
+    else
+        setAxisTitle(xBottom, "Time of Day");
 
     // wipe existing curves/axes details
     QHashIterator<QString, QwtPlotCurve*> c(curves);
@@ -155,25 +174,94 @@ LTMPlot::setData(LTMSettings *set)
 
     // count the bars since we format them side by side and need
     // to now how to offset them from each other
+    // unset stacking if not a bar chart too since we don't support
+    // that yet, but would be good to add in the future (stacked
+    // area plot).
     int barnum=0;
     int bars = 0;
-    foreach(MetricDetail metricDetail, settings->metrics)
-        if (metricDetail.curveStyle == QwtPlotCurve::Steps)
-            bars++;
+    int stacknum = -1;
+    // index through rather than foreach so we can modify
+    for (int v=0; v<settings->metrics.count(); v++) {
+        if (settings->metrics[v].curveStyle == QwtPlotCurve::Steps) {
+            if (settings->metrics[v].stack && stacknum < 0) stacknum = bars++; // starts from 1 not zero
+            else if (settings->metrics[v].stack == false) bars++;
+        } else if (settings->metrics[v].stack == true)
+            settings->metrics[v].stack = false; // we only support stack on bar charts
+    }
+
+    // aggregate the stack curves - backwards since
+    // we plot forwards overlaying to create the illusion
+    // of a stack, when in fact its just bars of descending
+    // order (with values aggregated)
+
+    // stack - first just get all curve data
+    stackX.clear();//XXX mem leak - need to delete the xdata and ydata
+    stackY.clear();//XXX mem leak - need to delete the xdata and ydata
+    stacks.clear();
+    int r=0;
+    foreach (MetricDetail metricDetail, settings->metrics) {
+        if (metricDetail.stack == true) {
+
+            // register this data
+            QVector<double> *xdata = new QVector<double>();
+            QVector<double> *ydata = new QVector<double>();
+            stackX.append(xdata);
+            stackY.append(ydata);
+
+            int count;
+            if (settings->groupBy != LTM_TOD)
+                createCurveData(settings, metricDetail, *xdata, *ydata, count);
+            else
+                createTODCurveData(settings, metricDetail, *xdata, *ydata, count);
+
+            // we add in the last curve for X axis values
+            if (r) {
+                aggregateCurves(*stackY[r], *stackY[r-1]);
+            }
+            r++;
+        }
+    }
 
     // setup the curves
     int count;
-    foreach (MetricDetail metricDetail, settings->metrics) {
+    double width = appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble();
+    bool donestack = false;
+
+    // now we iterate over the metric details AGAIN
+    // but this time in reverse and only plot the
+    // stacked values. This is because we overcome the
+    // lack of a stacked plot in QWT by painting decreasing
+    // bars, with the values aggregated previously
+    // so if we plot L1 time in zone 1hr and L2 time in zone 1hr
+    // it plots as L2 time in zone 2hr and then paints over that
+    // with a L1 time in zone of 1hr.
+    //
+    // The tooltip has to unpick the aggregation to ensure
+    // that it subtracts other data series in the stack from
+    // the value plotted... all nasty but heck, it works
+    int stackcounter = stackX.size()-1;
+    for (int m=settings->metrics.count()-1; m>=0; m--) {
+
+        MetricDetail metricDetail = settings->metrics[m];
+
+        if (metricDetail.stack == false) continue;
 
         QVector<double> xdata, ydata;
-        createCurveData(settings, metricDetail, xdata, ydata, count);
+
+        // use the aggregated values
+        xdata = *stackX[stackcounter];
+        ydata = *stackY[stackcounter];
+        stackcounter--;
+        count = xdata.size()-2;
 
         // Create a curve
         QwtPlotCurve *current = new QwtPlotCurve(metricDetail.uname);
         curves.insert(metricDetail.symbol, current);
-        current->setRenderHint(QwtPlotItem::RenderAntialiased);
+        stacks.insert(current, stackcounter+1);
+        if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+            current->setRenderHint(QwtPlotItem::RenderAntialiased);
         QPen cpen = QPen(metricDetail.penColor);
-        cpen.setWidth(1.0);
+        cpen.setWidth(width);
         current->setPen(cpen);
         current->setStyle(metricDetail.curveStyle);
 
@@ -189,13 +277,154 @@ LTMPlot::setData(LTMSettings *set)
         double right = 0;
         double middle = 0;
         if (metricDetail.curveStyle == QwtPlotCurve::Steps) {
+
+            int barn = metricDetail.stack ? stacknum : barnum;
+
             double space = double(0.8) / bars;
             double gap = space * 0.10;
             double width = space * 0.90;
-            left = (space * barnum) + (gap / 2) + 0.1;
+            left = (space * barn) + (gap / 2) + 0.1;
             right = left + width;
             middle = ((left+right) / double(2)) - 0.5;
-            barnum++;
+            if (metricDetail.stack && donestack == false) {
+                barnum++;
+                donestack = true;
+            } else if (metricDetail.stack == false) barnum++;
+        }
+
+        if (metricDetail.curveStyle == QwtPlotCurve::Steps) {
+
+            // fill the bars
+            QColor brushColor = metricDetail.penColor;
+            if (metricDetail.stack == true)
+                brushColor.setAlpha(255);
+            else
+                brushColor.setAlpha(200); // now side by side, less transparency required
+            QBrush brush = QBrush(brushColor);
+            current->setBrush(brush);
+            current->setPen(cpen);
+            current->setCurveAttribute(QwtPlotCurve::Inverted, true);
+
+            sym.setStyle(QwtSymbol::NoSymbol);
+            current->setSymbol(sym);
+
+            // fudge for date ranges, not for time of day graph
+            // XXX FUDGE QWT's LACK OF A BAR CHART
+            // add a zero point at the head and tail so the
+            // histogram columns look nice.
+            // and shift all the x-values left by 0.5 so that
+            // they centre over x-axis labels
+            int i=0;
+            for (i=0; i<=count; i++) xdata[i] -= 0.5;
+            // now add a final 0 value to get the last
+            // column drawn - no resize neccessary
+            // since it is always sized for 1 + maxnumber of entries
+            xdata[i] = xdata[i-1] + 1;
+            ydata[i] = 0;
+            count++;
+
+            QVector<double> xaxis (xdata.size() * 4);
+            QVector<double> yaxis (ydata.size() * 4);
+
+            // samples to time
+            for (int i=0, offset=0; i<xdata.size(); i++) {
+
+                double x = (double) xdata[i];
+                double y = (double) ydata[i];
+
+                xaxis[offset] = x +left;
+                yaxis[offset] = 0;
+                offset++;
+                xaxis[offset] = x+left;
+                yaxis[offset] = y;
+                offset++;
+                xaxis[offset] = x+right;
+                yaxis[offset] = y;
+                offset++;
+                xaxis[offset] = x +right;
+                yaxis[offset] = 0;
+                offset++;
+            }
+            xdata = xaxis;
+            ydata = yaxis;
+            count *= 4;
+            // END OF FUDGE
+
+        }
+
+        // set the data series
+        current->setData(xdata.data(),ydata.data(), count + 1);
+        current->setBaseline(metricDetail.baseline);
+
+        // update stack data so we can index off them
+        // in tooltip
+        *stackX[stackcounter+1] = xdata;
+        *stackY[stackcounter+1] = ydata;
+
+        // update min/max Y values for the chosen axis
+        if (current->maxYValue() > maxY[axisid]) maxY[axisid] = current->maxYValue();
+        if (current->minYValue() < minY[axisid]) minY[axisid] = current->minYValue();
+
+        current->attach(this);
+
+    } // end of reverse for stacked plots
+
+
+    // do all curves excepts stacks in order
+    // we skip stacked entries because they
+    // are painted in reverse order in a
+    // loop before this one.
+    stackcounter= 0;
+    foreach (MetricDetail metricDetail, settings->metrics) {
+
+        if (metricDetail.stack == true) continue;
+
+        QVector<double> xdata, ydata;
+
+        if (settings->groupBy != LTM_TOD)
+            createCurveData(settings, metricDetail, xdata, ydata, count);
+        else
+            createTODCurveData(settings, metricDetail, xdata, ydata, count);
+
+        // Create a curve
+        QwtPlotCurve *current = new QwtPlotCurve(metricDetail.uname);
+        curves.insert(metricDetail.symbol, current);
+        if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
+            current->setRenderHint(QwtPlotItem::RenderAntialiased);
+        QPen cpen = QPen(metricDetail.penColor);
+        cpen.setWidth(width);
+        current->setPen(cpen);
+        current->setStyle(metricDetail.curveStyle);
+
+        QwtSymbol sym;
+        sym.setStyle(metricDetail.symbolStyle);
+
+        // choose the axis
+        int axisid = chooseYAxis(metricDetail.uunits);
+        current->setYAxis(axisid);
+
+        // left and right offset for bars
+        double left = 0;
+        double right = 0;
+        double middle = 0;
+        if (metricDetail.curveStyle == QwtPlotCurve::Steps) {
+
+            // we still worry about stacked bars, since we
+            // need to take into account the space it will
+            // consume when plotted in the second iteration
+            // below this one
+            int barn = metricDetail.stack ? stacknum : barnum;
+
+            double space = double(0.8) / bars;
+            double gap = space * 0.10;
+            double width = space * 0.90;
+            left = (space * barn) + (gap / 2) + 0.1;
+            right = left + width;
+            middle = ((left+right) / double(2)) - 0.5;
+            if (metricDetail.stack && donestack == false) {
+                barnum++;
+                donestack = true;
+            } else if (metricDetail.stack == false) barnum++;
         }
 
         // trend - clone the data for the curve and add a curvefitted
@@ -209,10 +438,11 @@ LTMPlot::setData(LTMSettings *set)
 
             // cosmetics
             QPen cpen = QPen(metricDetail.penColor.darker(200));
-            cpen.setWidth(4.0);
+            cpen.setWidth(width*2); // double thickness for trend lines
             cpen.setStyle(Qt::DotLine);
             trend->setPen(cpen);
-            trend->setRenderHint(QwtPlotItem::RenderAntialiased);
+            if (appsettings->value(this, GC_ANTIALIAS, false).toBool()==true)
+                trend->setRenderHint(QwtPlotItem::RenderAntialiased);
             trend->setBaseline(0);
             trend->setYAxis(axisid);
             trend->setStyle(QwtPlotCurve::Lines);
@@ -222,12 +452,64 @@ LTMPlot::setData(LTMSettings *set)
             double xtrend[2], ytrend[2];
             xtrend[0] = 0.0;
             ytrend[0] = regress.getYforX(0.0);
-            xtrend[1] = xdata[count];
-            ytrend[1] = regress.getYforX(xdata[count]);
+            // point 2 is at far right of chart, not the last point
+            // since we may be forecasting...
+            xtrend[1] = maxX;
+            ytrend[1] = regress.getYforX(maxX);
             trend->setData(xtrend,ytrend, 2);
 
             trend->attach(this);
             curves.insert(trendSymbol, trend);
+        }
+
+        // highlight outliers
+        if (metricDetail.topOut > 0 && metricDetail.topOut < count && count > 10) {
+
+            LTMOutliers outliers(xdata.data(), ydata.data(), count, 10);
+
+            // the top 5 outliers
+            QVector<double> hxdata, hydata;
+            hxdata.resize(metricDetail.topOut);
+            hydata.resize(metricDetail.topOut);
+
+            // QMap orders the list so start at the top and work
+            // backwards
+            for (int i=0; i<metricDetail.topOut; i++) {
+                hxdata[i] = outliers.getXForRank(i) + middle;
+                hydata[i] = outliers.getYForRank(i);
+            }
+
+            // lets setup a curve with this data then!
+            QString outName;
+            if (metricDetail.topOut > 1)
+                outName = QString("%1 Top %2 Outliers")
+                          .arg(metricDetail.uname)
+                          .arg(metricDetail.topOut);
+            else
+                outName = QString("%1 Outlier").arg(metricDetail.uname);
+
+            QString outSymbol = QString("%1_outlier").arg(metricDetail.symbol);
+            QwtPlotCurve *out = new QwtPlotCurve(outName);
+            curves.insert(outSymbol, out);
+
+            out->setRenderHint(QwtPlotItem::RenderAntialiased);
+            out->setStyle(QwtPlotCurve::Dots);
+
+            // we might have hidden the symbols for this curve
+            // if its set to none then default to a rectangle
+            if (metricDetail.symbolStyle == QwtSymbol::NoSymbol)
+                sym.setStyle(QwtSymbol::Rect);
+            sym.setSize(20);
+            QColor lighter = metricDetail.penColor;
+            lighter.setAlpha(50);
+            sym.setPen(metricDetail.penColor);
+            sym.setBrush(lighter);
+
+            out->setSymbol(sym);
+            out->setData(hxdata.data(),hydata.data(), metricDetail.topOut);
+            out->setBaseline(0);
+            out->setYAxis(axisid);
+            out->attach(this);
         }
 
         // highlight top N values
@@ -280,7 +562,7 @@ LTMPlot::setData(LTMSettings *set)
                 sym.setStyle(QwtSymbol::Rect);
             sym.setSize(12);
             QColor lighter = metricDetail.penColor;
-            lighter.setAlpha(50);
+            lighter.setAlpha(200);
             sym.setPen(metricDetail.penColor);
             sym.setBrush(lighter);
 
@@ -290,8 +572,8 @@ LTMPlot::setData(LTMSettings *set)
             top->setYAxis(axisid);
             top->attach(this);
         }
-
         if (metricDetail.curveStyle == QwtPlotCurve::Steps) {
+
 
             // fill the bars
             QColor brushColor = metricDetail.penColor;
@@ -301,12 +583,10 @@ LTMPlot::setData(LTMSettings *set)
             current->setPen(cpen);
             current->setCurveAttribute(QwtPlotCurve::Inverted, true);
 
-            // XXX Symbol for steps looks horrible
             sym.setStyle(QwtSymbol::NoSymbol);
-            sym.setPen(QPen(metricDetail.penColor));
-            sym.setBrush(QBrush(metricDetail.penColor));
             current->setSymbol(sym);
 
+            // fudge for date ranges, not for time of day graph
             // XXX FUDGE QWT's LACK OF A BAR CHART
             // add a zero point at the head and tail so the
             // histogram columns look nice.
@@ -351,8 +631,9 @@ LTMPlot::setData(LTMSettings *set)
         } else if (metricDetail.curveStyle == QwtPlotCurve::Lines) {
 
             QPen cpen = QPen(metricDetail.penColor);
-            cpen.setWidth(2.0);
+            cpen.setWidth(width);
             sym.setSize(6);
+            sym.setStyle(metricDetail.symbolStyle);
             sym.setPen(QPen(metricDetail.penColor));
             sym.setBrush(QBrush(metricDetail.penColor));
             current->setSymbol(sym);
@@ -361,6 +642,7 @@ LTMPlot::setData(LTMSettings *set)
 
         } else if (metricDetail.curveStyle == QwtPlotCurve::Dots) {
             sym.setSize(6);
+            sym.setStyle(metricDetail.symbolStyle);
             sym.setPen(QPen(metricDetail.penColor));
             sym.setBrush(QBrush(metricDetail.penColor));
             current->setSymbol(sym);
@@ -368,6 +650,7 @@ LTMPlot::setData(LTMSettings *set)
         } else if (metricDetail.curveStyle == QwtPlotCurve::Sticks) {
 
             sym.setSize(4);
+            sym.setStyle(metricDetail.symbolStyle);
             sym.setPen(QPen(metricDetail.penColor));
             sym.setBrush(QBrush(Qt::white));
             current->setSymbol(sym);
@@ -380,7 +663,7 @@ LTMPlot::setData(LTMSettings *set)
         }
 
         // set the data series
-        current->setData(xdata.data(),ydata.data(), count+1);
+        current->setData(xdata.data(),ydata.data(), count + 1);
         current->setBaseline(metricDetail.baseline);
 
         // update min/max Y values for the chosen axis
@@ -389,21 +672,27 @@ LTMPlot::setData(LTMSettings *set)
 
         current->attach(this);
 
-
     }
 
-    // setup the xaxis at the bottom
-    int tics;
-    maxX = 0.5 + groupForDate(settings->end.date(), settings->groupBy) -
-            groupForDate(settings->start.date(), settings->groupBy);
-    if (maxX < 14) {
-        tics = 1;
+    if (settings->groupBy != LTM_TOD) {
+        // setup the xaxis at the bottom
+        int tics;
+        maxX = 0.5 + groupForDate(settings->end.date(), settings->groupBy) -
+                groupForDate(settings->start.date(), settings->groupBy);
+        if (maxX < 14) {
+            tics = 1;
+        } else {
+            tics = 1 + maxX/10;
+        }
+        setAxisScale(xBottom, -0.5, maxX, tics);
+        setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(settings->start,
+                    groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
+
     } else {
-        tics = 1 + maxX/10;
+        setAxisScale(xBottom, 0, 24, 2);
+        setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(settings->start,
+                    groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
     }
-    setAxisScale(xBottom, -0.5, maxX, tics);
-    setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(settings->start,
-                groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
 
     // run through the Y axis
     for (int i=0; i<10; i++) {
@@ -425,8 +714,63 @@ LTMPlot::setData(LTMSettings *set)
     else
         refreshZoneLabels(-1); // turn em off
 
+    // show legend?
+    if (settings->legend == false) this->legend()->clear();
+
     // plot
     replot();
+}
+
+void
+LTMPlot::createTODCurveData(LTMSettings *settings, MetricDetail metricDetail, QVector<double>&x,QVector<double>&y,int&n)
+{
+    y.clear();
+    x.clear();
+
+    x.resize((24+3));
+    y.resize((24+3));
+    n = (24);
+
+    for (int i=0; i<(24); i++) x[i]=i;
+
+    foreach (SummaryMetrics rideMetrics, *(settings->data)) {
+
+        double value = rideMetrics.getForSymbol(metricDetail.symbol);
+
+        // check values are bounded to stop QWT going berserk
+        if (isnan(value) || isinf(value)) value = 0;
+
+        // Special computed metrics (LTS/STS) have a null metric pointer
+        if (metricDetail.metric) {
+            // convert from stored metric value to imperial
+            if (useMetricUnits == false) value *= metricDetail.metric->conversion();
+
+            // convert seconds to hours
+            if (metricDetail.metric->units(true) == "seconds") value /= 3600;
+        }
+
+        int array = rideMetrics.getRideDate().time().hour();
+        int type = metricDetail.metric ? metricDetail.metric->type() : RideMetric::Average;
+
+        if (metricDetail.uunits == "Ramp") type = RideMetric::Total;
+
+        switch (type) {
+        case RideMetric::Total:
+            y[array] += value;
+            break;
+        case RideMetric::Average:
+            {
+            // average should be calculated taking into account
+            // the duration of the ride, otherwise high value but
+            // short rides will skew the overall average
+            y[array] = value; //XXX average is broken
+            break;
+            }
+        case RideMetric::Peak:
+            if (value > y[array]) y[array] = value;
+            break;
+        }
+    }
 }
 
 void
@@ -445,6 +789,8 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
     QList<SummaryMetrics> PMCdata;
     if (metricDetail.type == METRIC_DB || metricDetail.type == METRIC_META) {
         data = settings->data;
+    } else if (metricDetail.type == METRIC_MEASURE) {
+        data = settings->measures;
     } else if (metricDetail.type == METRIC_PM) {
         createPMCCurveData(settings, metricDetail, PMCdata);
         data = &PMCdata;
@@ -459,8 +805,12 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
         // day we are on
         int currentDay = groupForDate(rideMetrics.getRideDate().date(), settings->groupBy);
 
-        // value for day
-        double value = rideMetrics.getForSymbol(metricDetail.symbol);
+        // value for day -- measures are stored differently
+        double value;
+        if (metricDetail.type == METRIC_MEASURE)
+            value = rideMetrics.getText(metricDetail.symbol, "0.0").toDouble();
+        else
+            value = rideMetrics.getForSymbol(metricDetail.symbol);
 
         // check values are bounded to stop QWT going berserk
         if (isnan(value) || isinf(value)) value = 0;
@@ -476,6 +826,7 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
 
         if (value || wantZero) {
             unsigned long seconds = rideMetrics.getForSymbol("workout_time");
+            if (metricDetail.type == METRIC_MEASURE) seconds = 1;
             if (currentDay > lastDay) {
                 if (lastDay && wantZero) {
                     while (lastDay<currentDay) {
@@ -524,12 +875,13 @@ LTMPlot::createPMCCurveData(LTMSettings *settings, MetricDetail metricDetail,
                             QList<SummaryMetrics> &customData)
 {
     QDate earliest, latest; // rides
-    boost::shared_ptr<QSettings> appsettings = GetApplicationSettings();
     QString scoreType;
 
     // create a custom set of summary metric data!
     if (metricDetail.name.startsWith("Skiba")) {
         scoreType = "skiba_bike_score";
+    } else if (metricDetail.name.startsWith("Coggan")) {
+        scoreType = "coggan_tss";
     } else if (metricDetail.name.startsWith("Daniels")) {
         scoreType = "daniels_points";
     } else if (metricDetail.name.startsWith("TRIMP")) {
@@ -539,12 +891,13 @@ LTMPlot::createPMCCurveData(LTMSettings *settings, MetricDetail metricDetail,
     // create the Stress Calculation List
     // FOR ALL RIDE FILES
 	StressCalculator *sc = new StressCalculator(
+            main->cyclist,
 		    settings->start,
 		    settings->end,
-		    (appsettings->value(GC_INITIAL_STS)).toInt(),
-		    (appsettings->value(GC_INITIAL_LTS)).toInt(),
-		    (appsettings->value(GC_STS_DAYS,7)).toInt(),
-		    (appsettings->value(GC_LTS_DAYS,42)).toInt());
+		    (appsettings->value(this, GC_INITIAL_STS)).toInt(),
+		    (appsettings->value(this, GC_INITIAL_LTS)).toInt(),
+		    (appsettings->value(this, GC_STS_DAYS,7)).toInt(),
+		    (appsettings->value(this, GC_LTS_DAYS,42)).toInt());
 
     sc->calculateStress(main, home.absolutePath(), scoreType);
 
@@ -560,6 +913,12 @@ LTMPlot::createPMCCurveData(LTMSettings *settings, MetricDetail metricDetail,
             add.setForSymbol("skiba_sb",  sc->getSBvalues()[i]);
             add.setForSymbol("skiba_sr", sc->getSRvalues()[i]);
             add.setForSymbol("skiba_lr", sc->getLRvalues()[i]);
+        } else if (scoreType == "coggan_tss") {
+            add.setForSymbol("coggan_ctl", sc->getLTSvalues()[i]);
+            add.setForSymbol("coggan_atl", sc->getSTSvalues()[i]);
+            add.setForSymbol("coggan_tsb",  sc->getSBvalues()[i]);
+            add.setForSymbol("coggan_sr", sc->getSRvalues()[i]);
+            add.setForSymbol("coggan_lr", sc->getLRvalues()[i]);
         } else if (scoreType == "daniels_points") {
             add.setForSymbol("daniels_lts", sc->getLTSvalues()[i]);
             add.setForSymbol("daniels_sts", sc->getSTSvalues()[i]);
@@ -622,6 +981,9 @@ void
 LTMPlot::pointHover(QwtPlotCurve *curve, int index)
 {
     if (index >= 0 && curve != highlighter) {
+
+        int stacknum = stacks.value(curve, -1);
+
         const RideMetricFactory &factory = RideMetricFactory::instance();
         double value;
         QString units;
@@ -663,11 +1025,16 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
         // the point value
         value = curve->y(index);
 
+        // de-aggregate stacked values
+        if (stacknum > 0) {
+            value = stackY[stacknum]->at(index) - stackY[stacknum-1]->at(index); // de-aggregate
+        }
+
         // convert seconds to hours for the LTM plot
         if (units == "seconds") {
             units = "hours"; // we translate from seconds to hours
-            value = ceil(curve->y(index)*10.0)/10.0;
-            precision = 1; // new more precision since converting to hours
+            value = ceil(value*10.0)/10.0;
+            precision = 1; // need more precision now
         }
 
         // output the tooltip
@@ -685,12 +1052,21 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
     }
 }
 
+void
+LTMPlot::pointClicked(QwtPlotCurve *curve, int index)
+{
+    if (index >= 0 && curve != highlighter) {
+        // setup the popup
+        parent->pointClicked(curve, index);
+    }
+}
+
 // start of date range selection
 void
 LTMPlot::pickerAppended(QPoint pos)
 {
     // ony work once we have a chart to do it on
-    if (settings == NULL) return;
+    if (settings == NULL || settings->groupBy == LTM_TOD) return;
 
     // allow user to select a date range across the plot
     if (highlighter) {
@@ -759,7 +1135,7 @@ LTMPlot::pickerAppended(QPoint pos)
 void
 LTMPlot::pickerMoved(QPoint pos)
 {
-    if (settings == NULL) return;
+    if (settings == NULL || settings->groupBy == LTM_TOD) return;
 
     // allow user to select a date range across the plot
     double curveDataX[4]; // simple 4 point line
@@ -793,6 +1169,17 @@ LTMPlot::pickerMoved(QPoint pos)
     replot();
 }
 
+// aggregate curve data, adds w to a and
+// updates a directly. arrays MUST be of
+// equal dimensions
+void
+LTMPlot::aggregateCurves(QVector<double> &a, QVector<double>&w)
+{
+    if (a.size() != w.size()) return; // ignore silently
+
+    // add them in!
+    for(int i=0; i<a.size(); i++) a[i] += w[i];
+}
 
 /*----------------------------------------------------------------------
  * Draw Power Zone Shading on Background (here to end of source file)
@@ -913,7 +1300,7 @@ class LTMPlotZoneLabel: public QwtPlotItem
                             )
                         );
                     text = QwtText(zone_names[zone_number]);
-                    text.setFont(QFont("Helvetica",24, QFont::Bold));
+                    text.setFont(QFont("Helvetica",20, QFont::Bold));
                     QColor text_color = zoneColor(zone_number, num_zones);
                     text_color.setAlpha(64);
                     text.setColor(text_color);

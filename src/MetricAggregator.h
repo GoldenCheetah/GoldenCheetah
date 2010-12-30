@@ -19,6 +19,7 @@
 
 #ifndef METRICAGGREGATOR_H_
 #define METRICAGGREGATOR_H_
+#include "GoldenCheetah.h"
 
 #include <QMap>
 #include "RideFile.h"
@@ -33,6 +34,8 @@
 class MetricAggregator : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+
 
 	public:
         MetricAggregator(MainWindow *, QDir , const Zones *, const HrZones *);
@@ -41,17 +44,25 @@ class MetricAggregator : public QWidget
 
 		void refreshMetrics();
         void getFirstLast(QDate &, QDate &);
+        DBAccess *db() { return dbaccess; }
         QList<SummaryMetrics> getAllMetricsFor(QDateTime start, QDateTime end);
+        QList<SummaryMetrics> getAllMeasuresFor(QDateTime start, QDateTime end);
+        SummaryMetrics getRideMetrics(QString filename);
+
+    signals:
+        void dataChanged(); // when metricDB table changed
 
     public slots:
         void update() { main->isclean = false; }
+        void addRide(RideItem*);
+        void importMeasure(SummaryMetrics *sm);
 
     private:
         MainWindow *main;
         DBAccess *dbaccess;
         QDir home;
         const Zones *zones;
-        const HrZones *hrZones;
+        const HrZones *hrzones;
 
 	    typedef QHash<QString,RideMetric*> MetricMap;
 	    bool importRide(QDir path, RideFile *ride, QString fileName, unsigned long, bool modify);

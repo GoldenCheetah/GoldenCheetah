@@ -45,7 +45,7 @@ RideFile *RideItem::ride()
 
     // open the ride file
     QFile file(path + "/" + fileName);
-    ride_ = RideFileFactory::instance().openRideFile(file, errors_);
+    ride_ = RideFileFactory::instance().openRideFile(main, file, errors_);
     if (ride_ == NULL) return NULL; // failed to read ride
 
     setDirty(false); // we're gonna use on-disk so by
@@ -60,6 +60,18 @@ RideFile *RideItem::ride()
     connect(ride_, SIGNAL(reverted()), this, SLOT(reverted()));
 
     return ride_;
+}
+
+void
+RideItem::notifyRideDataChanged()
+{
+    emit rideDataChanged();
+}
+
+void
+RideItem::notifyRideMetadataChanged()
+{
+    emit rideMetadataChanged();
 }
 
 void
@@ -128,27 +140,31 @@ int RideItem::hrZoneRange()
 {
     return hrZones->whichRange(dateTime.date());
 }
-
 int RideItem::numZones()
 {
     int zone_range = zoneRange();
     return (zone_range >= 0) ? zones->numZones(zone_range) : 0;
 }
 
+#if 0
 int RideItem::numHrZones()
 {
     int hr_zone_range = hrZoneRange();
     return (hr_zone_range >= 0) ? hrZones->numZones(hr_zone_range) : 0;
 }
+#endif
+
+#if 0
 
 double RideItem::timeInZone(int zone)
 {
-    computeMetrics();
     if (!ride())
         return 0.0;
     assert(zone < numZones());
-    return time_in_zone[zone];
+    //return time_in_zone[zone];
+    return 0;
 }
+
 
 double RideItem::timeInHrZone(int zone)
 {
@@ -158,6 +174,7 @@ double RideItem::timeInHrZone(int zone)
     assert(zone < numHrZones());
     return time_in_hr_zone[zone];
 }
+#endif
 
 void
 RideItem::freeMemory()
@@ -168,6 +185,7 @@ RideItem::freeMemory()
     }
 }
 
+#if 0
 void
 RideItem::computeMetrics()
 {
@@ -220,6 +238,7 @@ RideItem::computeMetrics()
         allMetrics.append(factory.metricName(i));
     metrics = RideMetric::computeMetrics(ride(), zones, hrZones, allMetrics);
 }
+#endif
 
 void
 RideItem::setStartTime(QDateTime newDateTime)

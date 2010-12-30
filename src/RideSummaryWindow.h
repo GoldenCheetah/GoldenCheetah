@@ -18,15 +18,18 @@
 
 #ifndef _GC_RideSummaryWindow_h
 #define _GC_RideSummaryWindow_h 1
+#include "GoldenCheetah.h"
 
 #include <QWidget>
 
 class MainWindow;
 class QTextEdit;
 
-class RideSummaryWindow : public QWidget
+class RideSummaryWindow : public GcWindow
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
 
@@ -35,6 +38,9 @@ class RideSummaryWindow : public QWidget
     protected slots:
 
         void refresh();
+        void rideSelected();
+        void rideItemChanged();
+        void metadataChanged();
 
     protected:
 
@@ -42,6 +48,8 @@ class RideSummaryWindow : public QWidget
 
         MainWindow *mainWindow;
         QTextEdit *rideSummary;
+
+        RideItem *_connected;
 };
 
 #endif // _GC_RideSummaryWindow_h

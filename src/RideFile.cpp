@@ -19,6 +19,7 @@
 
 #include "RideFile.h"
 #include "DataProcessor.h"
+#include "RideMetadata.h"
 #include "Settings.h"
 #include "Units.h"
 #include <QtXml/QtXml>
@@ -240,7 +241,7 @@ RideFileFactory::rideFileRegExp() const
     return QRegExp(s.arg(suffixList.join("|")), Qt::CaseInsensitive);
 }
 
-RideFile *RideFileFactory::openRideFile(QFile &file,
+RideFile *RideFileFactory::openRideFile(MainWindow *main, QFile &file,
                                            QStringList &errors) const
 {
     QString suffix = file.fileName();
@@ -249,13 +250,45 @@ RideFile *RideFileFactory::openRideFile(QFile &file,
     suffix.remove(0, dot + 1);
     RideFileReader *reader = readFuncs_.value(suffix.toLower());
     assert(reader);
+//qDebug()<<"open"<<file.fileName()<<"start:"<<QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
     RideFile *result = reader->openRideFile(file, errors);
+//qDebug()<<"open"<<file.fileName()<<"end:"<<QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
 
     // NULL returned to indicate openRide failed
     if (result) {
         if (result->intervals().empty()) result->fillInIntervals();
+
+        // legacy support for .notes file
+        QFileInfo fileInfo(file.fileName());
+        QString notesFileName = fileInfo.absolutePath() + '/' + fileInfo.baseName() + ".notes";
+        QFile notesFile(notesFileName);
+
+        // read it in if it exists and "Notes" is not already set
+        if (result->getTag("Notes", "") == "" && notesFile.exists() &&
+            notesFile.open(QFile::ReadOnly | QFile::Text)) {
+            QTextStream in(&notesFile);
+            result->setTag("Notes", in.readAll());
+            notesFile.close();
+        }
+
+        // Construct the summary text used on the calendar
+        QString calendarText;
+        foreach (FieldDefinition field, main->rideMetadata()->getFields()) {
+            if (field.diary == true && result->getTag(field.name, "") != "") {
+                calendarText += QString("%1\n")
+                        .arg(result->getTag(field.name, ""));
+            }
+        }
+        result->setTag("Calendar Text", calendarText);
+
+        // set other "special" fields
         result->setTag("Filename", file.fileName());
+        result->setTag("Device", result->deviceType());
         result->setTag("Athlete", QFileInfo(file).dir().dirName());
+        result->setTag("Year", result->startTime().toString("yyyy"));
+        result->setTag("Month", result->startTime().toString("MMMM"));
+        result->setTag("Weekday", result->startTime().toString("ddd"));
+
         DataProcessorFactory::instance().autoProcess(result);
     }
 
@@ -271,8 +304,7 @@ QStringList RideFileFactory::listRideFiles(const QDir &dir) const
         filters << ("*." + i.key());
     }
     // This will read the user preferences and change the file list order as necessary:
-    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-    QVariant isAscending = settings->value(GC_ALLRIDES_ASCENDING,Qt::Checked);
+    QVariant isAscending = appsettings->value(NULL, GC_ALLRIDES_ASCENDING,Qt::Checked);
     QFlags<QDir::Filter> spec = QDir::Files;
 #ifdef Q_OS_WIN32
     spec |= QDir::Hidden;

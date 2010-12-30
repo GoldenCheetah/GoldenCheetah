@@ -18,6 +18,7 @@
 
 #ifndef _GC_GoogleMapControl_h
 #define _GC_GoogleMapControl_h
+#include "GoldenCheetah.h"
 
 #include <QWidget>
 #include <QtWebKit>
@@ -35,9 +36,11 @@ class QColor;
 class QVBoxLayout;
 class QTabWidget;
 
-class GoogleMapControl : public QWidget
+class GoogleMapControl : public GcWindow
 {
 Q_OBJECT
+G_OBJECT
+
 
  private:
     MainWindow *main;

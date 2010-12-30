@@ -18,6 +18,7 @@
 
 #ifndef _QuarqParser_h
 #define _QuarqParser_h
+#include "GoldenCheetah.h"
 
 #include "RideFile.h"
 #include <QString>

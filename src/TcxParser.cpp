@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (c) 2008 Sean C. Rhea (srhea@srhea.net),
  *                    J.T Conklin (jtc@acorntoolworks.com)
  *
@@ -6,12 +6,12 @@
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -29,9 +29,8 @@
 TcxParser::TcxParser (RideFile* rideFile)
    : rideFile(rideFile)
 {
-  boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-  isGarminSmartRecording = settings->value(GC_GARMIN_SMARTRECORD,Qt::Checked);
-  GarminHWM = settings->value(GC_GARMIN_HWMARK);
+  isGarminSmartRecording = appsettings->value(NULL, GC_GARMIN_SMARTRECORD,Qt::Checked);
+  GarminHWM = appsettings->value(NULL, GC_GARMIN_HWMARK);
   if (GarminHWM.isNull() || GarminHWM.toInt() == 0)
       GarminHWM.setValue(25); // default to 25 seconds.
 
@@ -55,7 +54,7 @@ TcxParser::startElement( const QString&, const QString&,
         {
             start_time = convertToLocalTime(qAttributes.value("StartTime"));
             rideFile->setStartTime(start_time);
-	    
+
             lastDistance = 0.0;
             last_time = start_time;
 	}

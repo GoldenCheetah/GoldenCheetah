@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -18,6 +18,7 @@
 
 #ifndef _GC_PowerHist_h
 #define _GC_PowerHist_h 1
+#include "GoldenCheetah.h"
 
 #include <qwt_plot.h>
 #include <qwt_plot_zoomer.h>
@@ -76,6 +77,8 @@ class penTooltip: public QwtPlotZoomer
 class PowerHist : public QwtPlot
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
 
@@ -133,7 +136,7 @@ class PowerHist : public QwtPlot
         void setSumY(bool value);
         void pointHover(QwtPlotCurve *curve, int index);
         void configChanged();
-
+        void setAxisTitle(int axis, QString label);
 
     protected:
 
@@ -173,6 +176,7 @@ class PowerHist : public QwtPlot
 
 	PowerHistBackground *bg;
 	HrHistBackground *hrbg;
+
 	bool lny;
 
 	// discritized unit for smoothing

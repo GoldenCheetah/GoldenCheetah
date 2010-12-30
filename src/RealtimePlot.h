@@ -18,6 +18,7 @@
 
 #ifndef _GC_RealtimePlot_h
 #define _GC_RealtimePlot_h 1
+#include "GoldenCheetah.h"
 
 #include <QtGui>
 #include <qwt_plot.h>
@@ -99,6 +100,8 @@ class RealtimeHrData : public QwtData
 class RealtimePlot : public QwtPlot
 {
     Q_OBJECT
+    G_OBJECT
+
 
     private:
 

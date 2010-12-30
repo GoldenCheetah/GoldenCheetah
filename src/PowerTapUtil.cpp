@@ -1,16 +1,16 @@
-/* 
+/*
  * Copyright (c) 2008 Sean C. Rhea (srhea@srhea.net)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -22,7 +22,7 @@
 #include <math.h>
 #include <stdio.h>
 
-bool 
+bool
 PowerTapUtil::is_ignore_record(unsigned char *buf, bool bVer81)
 {
     if (bVer81)
@@ -43,7 +43,7 @@ PowerTapUtil::is_time(unsigned char *buf, bool bVer81)
     return (bVer81 && buf[0] == 0x10) || (!bVer81 && buf[0] == 0x60);
 }
 
-time_t 
+time_t
 PowerTapUtil::unpack_time(unsigned char *buf, struct tm *time, bool bVer81)
 {
     (void) bVer81; // unused
@@ -67,8 +67,8 @@ PowerTapUtil::is_config(unsigned char *buf, bool bVer81)
 const double TIME_UNIT_SEC = 0.021*60.0;
 const double TIME_UNIT_SEC_V81 = 0.01;
 
-int 
-PowerTapUtil::unpack_config(unsigned char *buf, unsigned *interval, 
+int
+PowerTapUtil::unpack_config(unsigned char *buf, unsigned *interval,
                             unsigned *last_interval, double *rec_int_secs,
                             unsigned *wheel_sz_mm, bool bVer81)
 {
@@ -134,7 +134,7 @@ PowerTapUtil::unpack_data(unsigned char *buf, double rec_int_secs,
             *cad = buf[4];
             if (*cad == 0xff)
                 *cad = 0;
-    
+
             double wheel_sz_meters = wheel_sz_mm / 1000.0;
             *dist_m += rotations * wheel_sz_meters;
             double seconds_for_1_rotation = ticks_for_1_rotation * CLOCK_TICK_TIME;
@@ -146,7 +146,7 @@ PowerTapUtil::unpack_data(unsigned char *buf, double rec_int_secs,
         *hr = buf[5];
         if (*hr == 0xff)
             *hr = 0;
-        
+
     }
     else
     {

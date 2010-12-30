@@ -20,28 +20,79 @@
 #include "SpecialFields.h"
 
 #include "MainWindow.h"
+#include "RideSummaryWindow.h"
 #include "Settings.h"
 
 #include <QXmlDefaultHandler>
 #include <QtGui>
+
+// shorthand when looking up our ride via  Q_PROPERTY
+#define ourRideItem meta->property("ride").value<RideItem*>()
 
 /*----------------------------------------------------------------------
  * Master widget for Metadata Entry "on" RideSummaryWindow
  *--------------------------------------------------------------------*/
 RideMetadata::RideMetadata(MainWindow *parent) : QWidget(parent), main(parent)
 {
+    _ride = _connected = NULL;
+
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->setSpacing(0);
+    mainLayout->setContentsMargins(0,0,0,0);
+
+    QPalette palette;
+    palette.setBrush(QPalette::Background, Qt::NoBrush);
+
+    setAutoFillBackground(false);
+    setPalette(palette);
 
     // setup the tabs widget
     tabs = new QTabWidget(this);
     tabs->setMovable(true);
+    tabs->setPalette(palette);
+    tabs->setAutoFillBackground(false);
+
     mainLayout->addWidget(tabs);
 
     // read in metadata.xml and setup the tabs etc
+    qRegisterMetaType<RideItem*>("ride"); // XXX we're first here... bit of a hack
     configUpdate();
 
     // watch for config changes
     connect(main, SIGNAL(configChanged()), this, SLOT(configUpdate()));
+}
+
+void
+RideMetadata::setRideItem(RideItem *ride)
+{
+    static QPointer<RideItem> _connected = NULL;
+    if (_connected) {
+        disconnect(_connected, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
+    }
+    _connected=_ride=ride;
+    connect (_connected, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
+
+    // and now retrieve that data
+    metadataChanged();
+}
+
+RideItem*
+RideMetadata::rideItem() const
+{
+    return _ride;
+}
+
+void
+RideMetadata::metadataChanged()
+{
+    // loop through each tab
+    QMapIterator<QString, Form*> d(tabList);
+    d.toFront();
+    while (d.hasNext()) {
+       d.next();
+       foreach(FormField *field, d.value()->fields) // keep track so we can destroy
+          field->metadataChanged();
+    }
 }
 
 void
@@ -69,7 +120,7 @@ RideMetadata::configUpdate()
 
         Form *form;
         if ((form = tabList.value(field.tab, NULL)) == NULL) {
-            form = new Form(main);
+            form = new Form(this);
             tabs->addTab(form, field.tab);
             tabList.insert(field.tab, form);
         }
@@ -84,15 +135,27 @@ RideMetadata::configUpdate()
            i.value()->arrange();
     }
 
-    main->notifyRideSelected(); // refresh
+    // when constructing we have not registered
+    // the properties nor selected a ride
+    metadataChanged(); // re-read the values!
 }
 
 /*----------------------------------------------------------------------
  * Forms (one per tab)
  *--------------------------------------------------------------------*/
-Form::Form(MainWindow *main) : main(main)
+Form::Form(RideMetadata *meta) : meta(meta)
 {
+    QPalette palette;
+    palette.setBrush(QPalette::Background, Qt::NoBrush);
+
+    setPalette(palette);
+    setAutoFillBackground(false);
+
+    palette.setBrush(QPalette::Background, Qt::NoBrush);
     contents = new QWidget;
+    contents->setPalette(palette);
+    contents->setAutoFillBackground(false);
+
     QVBoxLayout *mainLayout = new QVBoxLayout(contents);
     hlayout = new QHBoxLayout;
     vlayout1 = vlayout2 = NULL;
@@ -179,6 +242,9 @@ Form::arrange()
             override->addWidget(fields[i]->widget);
             here->addLayout(override, y, 1, alignment);
 
+        //} else  if (fields[i]->definition.type == FIELD_TEXTBOX) {
+        //    here->addWidget(fields[i]->widget, ++y, 0, 2, 2, alignment);
+        //    y++;
         } else {
             here->addWidget(fields[i]->widget, y, 1, alignment);
         }
@@ -189,20 +255,24 @@ Form::arrange()
 /*----------------------------------------------------------------------
  * Form fields
  *--------------------------------------------------------------------*/
-FormField::FormField(FieldDefinition field, MainWindow *main) : definition(field), main(main), active(false)
+FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(field), meta(meta), active(false)
 {
+    QFont font;
+    font.setPointSize(font.pointSize()-2);
+
     QString units;
 
     if (sp.isMetric(field.name)) {
         field.type = FIELD_DOUBLE; // whatever they say, we want a double!
-        boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-        QVariant unit = settings->value(GC_UNIT);
+        QVariant unit = appsettings->value(this, GC_UNIT);
         bool useMetricUnits = (unit.toString() == "Metric");
         units = sp.rideMetric(field.name)->units(useMetricUnits);
         if (units != "") units = QString(" (%1)").arg(units);
     }
 
     label = new QLabel(QString("%1%2").arg(field.name).arg(units), this);
+    //label->setFont(font);
+    //label->setFixedHeight(18);
 
     switch(field.type) {
 
@@ -212,34 +282,35 @@ FormField::FormField(FieldDefinition field, MainWindow *main) : definition(field
             widget = new KeywordField(this);
         else
             widget = new QLineEdit(this);
+        //widget->setFixedHeight(18);
         connect (widget, SIGNAL(textChanged(const QString&)), this, SLOT(dataChanged()));
         connect (widget, SIGNAL(editingFinished()), this, SLOT(editFinished()));
         break;
 
     case FIELD_TEXTBOX : // textbox
-        if (field.name == "Notes") {
-            widget = main->rideNotesWidget();
+        widget = new QTextEdit(this);
+        if (field.name == "Change History") {
+            dynamic_cast<QTextEdit*>(widget)->setReadOnly(true);
+            // pick up when ride saved - since it gets updated then
+            // XXX ? connect (main, SIGNAL(rideClean()), this, SLOT(rideSelected()));
         } else {
-            widget = new QTextEdit(this);
-            if (field.name == "Change History") {
-                dynamic_cast<QTextEdit*>(widget)->setReadOnly(true);
-                // pick up when ride saved - since it gets updated then
-                connect (main, SIGNAL(rideClean()), this, SLOT(rideSelected()));
-            } else {
-                connect (widget, SIGNAL(textChanged()), this, SLOT(editFinished()));
-            }
+            connect (widget, SIGNAL(textChanged()), this, SLOT(editFinished()));
         }
         break;
 
     case FIELD_INTEGER : // integer
         widget = new QSpinBox(this);
+        //widget->setFixedHeight(18);
         ((QSpinBox*)widget)->setSingleStep(1);
+        ((QSpinBox*)widget)->setMinimum(-99999999);
+        ((QSpinBox*)widget)->setMaximum(99999999);
         connect (widget, SIGNAL(valueChanged(int)), this, SLOT(dataChanged()));
         connect (widget, SIGNAL(editingFinished()), this, SLOT(editFinished()));
         break;
 
     case FIELD_DOUBLE : // double
         widget = new QDoubleSpinBox(this);
+        //widget->setFixedHeight(18);
         ((QDoubleSpinBox*)widget)->setSingleStep(0.01);
         ((QDoubleSpinBox*)widget)->setMaximum(999999.99);
         if (sp.isMetric(field.name)) {
@@ -252,43 +323,45 @@ FormField::FormField(FieldDefinition field, MainWindow *main) : definition(field
 
     case FIELD_DATE : // date
         widget = new QDateEdit(this);
+        //widget->setFixedHeight(18);
         connect (widget, SIGNAL(dateChanged(const QDate)), this, SLOT(dataChanged()));
         connect (widget, SIGNAL(editingFinished()), this, SLOT(editFinished()));
         break;
 
     case FIELD_TIME : // time
         widget = new QTimeEdit(this);
+        //widget->setFixedHeight(18);
         ((QTimeEdit*)widget)->setDisplayFormat("hh:mm:ss AP");
         connect (widget, SIGNAL(timeChanged(const QTime)), this, SLOT(dataChanged()));
         connect (widget, SIGNAL(editingFinished()), this, SLOT(editFinished()));
         break;
     }
-    connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+    //widget->setFont(font);
+    //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
 }
 
 FormField::~FormField()
 {
     delete label;
 
-    if (definition.name == "Notes") {
-        ((QTextEdit*)widget)->setParent(main->rideMetadata()); // change parent to stop it
-                                                             // being zapped by Qt
-    } else {
-        switch (definition.type) {
-            case FIELD_TEXT:
-            case FIELD_SHORTTEXT: if (definition.name == "Keywords")
-                        delete (KeywordField*)widget;
-                    else
-                        delete (QLineEdit*)widget;
-                    break;
-            case FIELD_TEXTBOX : delete ((QTextEdit*)widget); break;
-            case FIELD_INTEGER : delete ((QSpinBox*)widget); break;
-            case FIELD_DOUBLE : delete ((QDoubleSpinBox*)widget); break;
-            case FIELD_DATE : delete ((QDateEdit*)widget); break;
-            case FIELD_TIME : delete ((QTimeEdit*)widget); break;
-        }
-        if (sp.isMetric(definition.name)) delete enabled;
+    switch (definition.type) {
+        case FIELD_TEXT:
+        case FIELD_SHORTTEXT: if (definition.name == "Keywords")
+                    delete (KeywordField*)widget;
+                else
+                    delete (QLineEdit*)widget;
+                break;
+        case FIELD_TEXTBOX : if (definition.name == "Summary")
+                                 delete ((RideSummaryWindow *)widget);
+                             else
+                                 delete ((QTextEdit*)widget);
+                             break;
+        case FIELD_INTEGER : delete ((QSpinBox*)widget); break;
+        case FIELD_DOUBLE : delete ((QDoubleSpinBox*)widget); break;
+        case FIELD_DATE : delete ((QDateEdit*)widget); break;
+        case FIELD_TIME : delete ((QTimeEdit*)widget); break;
     }
+    if (sp.isMetric(definition.name)) delete enabled;
 }
 
 void
@@ -301,9 +374,9 @@ FormField::dataChanged()
 void
 FormField::editFinished()
 {
-    if (active || main->rideItem() == NULL ||
+    if (active || ourRideItem == NULL ||
         (edited == false && definition.type != FIELD_TEXTBOX) ||
-        main->rideItem()->ride() == NULL) return;
+        ourRideItem == NULL) return;
 
     // get values from the widgets
     QString text;
@@ -331,33 +404,32 @@ FormField::editFinished()
 
     // Update special field
     if (definition.name == "Device") {
-        main->rideItem()->ride()->setDeviceType(text);
-        main->notifyRideSelected();
+        ourRideItem->ride()->setDeviceType(text);
+        ourRideItem->notifyRideMetadataChanged();
     } else if (definition.name == "Recording Interval") {
-        main->rideItem()->ride()->setRecIntSecs(text.toDouble());
-        main->notifyRideSelected();
+        ourRideItem->ride()->setRecIntSecs(text.toDouble());
+        ourRideItem->notifyRideMetadataChanged();
     } else if (definition.name == "Start Date") {
-        QDateTime current = main->rideItem()->ride()->startTime();
+        QDateTime current = ourRideItem->ride()->startTime();
         QDate date(/* year*/text.mid(6,4).toInt(),
                    /* month */text.mid(3,2).toInt(),
                    /* day */text.mid(0,2).toInt());
         QDateTime update = QDateTime(date, current.time());
-        main->rideItem()->setStartTime(update);
-        main->notifyRideSelected();
+        ourRideItem->setStartTime(update);
+        ourRideItem->notifyRideMetadataChanged();
     } else if (definition.name == "Start Time") {
-        QDateTime current = main->rideItem()->ride()->startTime();
+        QDateTime current = ourRideItem->ride()->startTime();
         QTime time(/* hours*/ text.mid(0,2).toInt(),
                    /* minutes */ text.mid(3,2).toInt(),
                    /* seconds */ text.mid(6,2).toInt(),
                    /* milliseconds */ text.mid(9,3).toInt());
         QDateTime update = QDateTime(current.date(), time);
-        main->rideItem()->setStartTime(update);
-        main->notifyRideSelected();
-    } else {
+        ourRideItem->setStartTime(update);
+        ourRideItem->notifyRideMetadataChanged();
+    } else if (definition.name != "Summary") {
         if (sp.isMetric(definition.name) && enabled->isChecked()) {
 
-            boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-            QVariant unit = settings->value(GC_UNIT);
+            QVariant unit = appsettings->value(this, GC_UNIT);
             bool useMetricUnits = (unit.toString() == "Metric");
 
             // convert from imperial to metric if needed
@@ -369,19 +441,28 @@ FormField::editFinished()
             // update metric override QMap!
             QMap<QString,QString> override;
             override.insert("value", text);
-            main->rideItem()->ride()->metricOverrides.insert(sp.metricSymbol(definition.name), override);
+            ourRideItem->ride()->metricOverrides.insert(sp.metricSymbol(definition.name), override);
 
             // get widgets updated with new override
-	        main->rideItem()->computeMetricsTime = QDateTime(); // force refresh
-            main->notifyRideSelected();
+            ourRideItem->notifyRideMetadataChanged();
         } else {
             // just update the tags QMap!
-            main->rideItem()->ride()->setTag(definition.name, text);
+            ourRideItem->ride()->setTag(definition.name, text);
         }
     }
 
+    // Construct the summary text used on the calendar
+    QString calendarText;
+    foreach (FieldDefinition field, meta->getFields()) {
+        if (field.diary == true) {
+            calendarText += QString("%1\n")
+                    .arg(ourRideItem->ride()->getTag(field.name, ""));
+        }
+    }
+    ourRideItem->ride()->setTag("Calendar Text", calendarText);
+
     // rideFile is now dirty!
-    main->rideItem()->setDirty(true);
+    ourRideItem->setDirty(true);
 }
 
 void
@@ -394,8 +475,8 @@ FormField::stateChanged(int state)
 
     // remove from overrides if neccessary
     QMap<QString,QString> override;
-    if (main->rideItem() && main->rideItem()->ride())
-        override  = main->rideItem()->ride()->metricOverrides.value
+    if (ourRideItem && ourRideItem->ride())
+        override  = ourRideItem->ride()->metricOverrides.value
                                         (sp.metricSymbol(definition.name));
 
     // setup initial override value
@@ -408,40 +489,37 @@ FormField::stateChanged(int state)
     } else if (override.contains("value")) // clear override value
          override.remove("value");
 
-    if (main->rideItem() && main->rideItem()->ride()) {
+    if (ourRideItem && ourRideItem->ride()) {
         // update overrides for this metric in the main QMap
-        main->rideItem()->ride()->metricOverrides.insert(sp.metricSymbol(definition.name), override);
+        ourRideItem->ride()->metricOverrides.insert(sp.metricSymbol(definition.name), override);
 
         // rideFile is now dirty!
-        main->rideItem()->setDirty(true);
+        ourRideItem->setDirty(true);
 
         // get refresh done, coz overrides state has changed
-	    main->rideItem()->computeMetricsTime = QDateTime();
-        main->notifyRideSelected();
+        ourRideItem->notifyRideMetadataChanged();
     }
 }
 
 void
-FormField::rideSelected()
+FormField::metadataChanged()
 {
     active = true;
     edited = false;
+    QString value;
 
-    if (main->rideItem() && main->rideItem()->ride()) {
-
-        QString value;
+    if (ourRideItem && ourRideItem->ride()) {
 
         // Handle "Special" fields
-        if (definition.name == "Notes") return;
-        else if (definition.name == "Device") value = main->rideItem()->ride()->deviceType();
-        else if (definition.name == "Recording Interval") value = QString("%1").arg(main->rideItem()->ride()->recIntSecs());
-        else if (definition.name == "Start Date") value = main->rideItem()->ride()->startTime().date().toString("dd.MM.yyyy");
-        else if (definition.name == "Start Time") value = main->rideItem()->ride()->startTime().time().toString("hh:mm:ss.zzz");
+        if (definition.name == "Device") value = ourRideItem->ride()->deviceType();
+        else if (definition.name == "Recording Interval") value = QString("%1").arg(ourRideItem->ride()->recIntSecs());
+        else if (definition.name == "Start Date") value = ourRideItem->ride()->startTime().date().toString("dd.MM.yyyy");
+        else if (definition.name == "Start Time") value = ourRideItem->ride()->startTime().time().toString("hh:mm:ss.zzz");
         else {
             if (sp.isMetric(definition.name)) {
                 //  get from metric overrides
                 const QMap<QString,QString> override =
-                      main->rideItem()->ride()->metricOverrides.value(sp.metricSymbol(definition.name));
+                      ourRideItem->ride()->metricOverrides.value(sp.metricSymbol(definition.name));
                 if (override.contains("value")) {
                     enabled->setChecked(true);
                     widget->setEnabled(true);
@@ -450,8 +528,7 @@ FormField::rideSelected()
 
                     // does it need conversion from metric?
                     if (sp.rideMetric(definition.name)->conversion() != 1.0) {
-                        boost::shared_ptr<QSettings> settings = GetApplicationSettings();
-                        QVariant unit = settings->value(GC_UNIT);
+                        QVariant unit = appsettings->value(this, GC_UNIT);
                         bool useMetricUnits = (unit.toString() == "Metric");
 
                         // do we want imperial?
@@ -467,50 +544,55 @@ FormField::rideSelected()
                     widget->setHidden(true);
                 }
             } else {
-                value = main->rideItem()->ride()->getTag(definition.name, "");
+                value = ourRideItem->ride()->getTag(definition.name, "");
             }
         }
+    } else {
+        value ="";
+    }
 
-        switch (definition.type) {
-        case FIELD_TEXT : // text
-        case FIELD_SHORTTEXT : // shorttext
-            if (definition.name == "Keywords")
-                ((KeywordField*)widget)->setText(value);
-            else
-                ((QLineEdit*)widget)->setText(value);
-            break;
+    switch (definition.type) {
+    case FIELD_TEXT : // text
+    case FIELD_SHORTTEXT : // shorttext
+        if (definition.name == "Keywords")
+            ((KeywordField*)widget)->setText(value);
+        else
+            ((QLineEdit*)widget)->setText(value);
+        break;
 
-        case FIELD_TEXTBOX : // textbox
+    case FIELD_TEXTBOX : // textbox
+        if (definition.name != "Summary")
             ((QTextEdit*)widget)->setText(value);
-            break;
+        break;
 
-        case FIELD_INTEGER : // integer
-            ((QSpinBox*)widget)->setValue(value.toInt());
-            break;
+    case FIELD_INTEGER : // integer
+        ((QSpinBox*)widget)->setValue(value.toInt());
+        break;
 
-        case FIELD_DOUBLE : // double
-            ((QDoubleSpinBox*)widget)->setValue(value.toDouble());
-            break;
+    case FIELD_DOUBLE : // double
+        ((QDoubleSpinBox*)widget)->setValue(value.toDouble());
+        break;
 
-        case FIELD_DATE : // date
-            {
-            QDate date(/* year*/value.mid(6,4).toInt(),
-                       /* month */value.mid(3,2).toInt(),
-                       /* day */value.mid(0,2).toInt());
-            ((QDateEdit*)widget)->setDate(date);
-            }
-            break;
-
-        case FIELD_TIME : // time
-            {
-            QTime time(/* hours*/ value.mid(0,2).toInt(),
-                       /* minutes */ value.mid(3,2).toInt(),
-                       /* seconds */ value.mid(6,2).toInt(),
-                       /* milliseconds */ value.mid(9,3).toInt());
-            ((QTimeEdit*)widget)->setTime(time);
-            }
-            break;
+    case FIELD_DATE : // date
+        {
+        if (value == "") value = "          ";
+        QDate date(/* year*/value.mid(6,4).toInt(),
+                   /* month */value.mid(3,2).toInt(),
+                   /* day */value.mid(0,2).toInt());
+        ((QDateEdit*)widget)->setDate(date);
         }
+        break;
+
+    case FIELD_TIME : // time
+        {
+        if (value == "") value = "            ";
+        QTime time(/* hours*/ value.mid(0,2).toInt(),
+                   /* minutes */ value.mid(3,2).toInt(),
+                   /* seconds */ value.mid(6,2).toInt(),
+                   /* milliseconds */ value.mid(9,3).toInt());
+        ((QTimeEdit*)widget)->setTime(time);
+        }
+        break;
     }
     active = false;
 }
@@ -582,6 +664,7 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
         out<<QString("\t\t\t<fieldtab>\"%1\"</fieldtab>\n").arg(xmlprotect(field.tab));
         out<<QString("\t\t\t<fieldname>\"%1\"</fieldname>\n").arg(xmlprotect(field.name));
         out<<QString("\t\t\t<fieldtype>%1</fieldtype>\n").arg(field.type);
+        out<<QString("\t\t\t<fielddiary>%1</fielddiary>\n").arg(field.diary ? 1 : 0);
         out<<QString("\t\t</field>\n");
     }
     out <<"\t</fields>\n";
@@ -627,6 +710,27 @@ RideMetadata::readXML(QString filename, QList<KeywordDefinition>&keywordDefiniti
 
     keywordDefinitions = handler.getKeywords();
     fieldDefinitions = handler.getFields();
+
+    // now auto append special fields, in case
+    // the user wiped them or we have introduced
+    // them in this release. This is to ensure
+    // they get written to metricDB
+    bool hasCalendarText = false;
+    foreach (FieldDefinition field, fieldDefinitions) {
+        if (field.name == "Calendar Text") {
+            hasCalendarText = true;
+        }
+        // other fields here...
+    }
+    if (!hasCalendarText) {
+        FieldDefinition add;
+        add.name = "Calendar Text";
+        add.type = 1;
+        add.diary = false;
+        add.tab = "";
+
+        fieldDefinitions.append(add);
+    }
 }
 
 // to see the format of the charts.xml file, look at the serialize()
@@ -645,7 +749,11 @@ bool MetadataXMLParser::endElement( const QString&, const QString&, const QStrin
     }
     else if(qName == "fieldtab") field.tab = unprotect(buffer);
     else if(qName == "fieldname") field.name =  unprotect(buffer);
-    else if(qName == "fieldtype") field.type = buffer.trimmed().toInt();
+    else if(qName == "fieldtype") {
+        field.type = buffer.trimmed().toInt();
+        if (field.tab != "" && field.type < 3 && field.name != "Filename" &&
+            field.name != "Change History") field.diary = true; // default!
+    } else if (qName == "fielddiary") field.diary = (buffer.trimmed().toInt() != 0);
 
     //
     // Complex Elements

@@ -18,6 +18,7 @@
 
 #ifndef _FitRideFile_h
 #define _FitRideFile_h
+#include "GoldenCheetah.h"
 
 #include "RideFile.h"
 

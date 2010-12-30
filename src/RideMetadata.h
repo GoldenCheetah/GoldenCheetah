@@ -18,6 +18,7 @@
 
 #ifndef _GC_RideMetadata_h
 #define _GC_RideMetadata_h
+#include "GoldenCheetah.h"
 
 #include "MainWindow.h"
 #include "SpecialFields.h"
@@ -47,14 +48,19 @@ class FieldDefinition
         QString tab,
                 name;
         int type;
+        bool diary; // show in summary on diary page...
+
+    FieldDefinition() : tab(""), name(""), type(0), diary(false) {}
 };
 
 class FormField : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
-        FormField(FieldDefinition, MainWindow *);
+        FormField(FieldDefinition, RideMetadata *);
         ~FormField();
         FieldDefinition definition; // define the field
         QLabel  *label;             // label
@@ -64,11 +70,11 @@ class FormField : public QWidget
     public slots:
         void dataChanged();         // from the widget - we changed something
         void editFinished();        // from the widget - we finished editing this field
-        void rideSelected();        // from GC - a new ride got picked
+        void metadataChanged();     // from GC - a new ride got picked / changed elsewhere
         void stateChanged(int);     // should we enable/disable the widget?
 
     private:
-        MainWindow *main;
+        RideMetadata *meta;
         bool edited;                // value has been changed
         bool active;                // when data being changed for rideSelected
         SpecialFields sp;
@@ -77,6 +83,8 @@ class FormField : public QWidget
 class KeywordCompleter : public QCompleter
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
         KeywordCompleter(QWidget *parent) : QCompleter(parent) {}
@@ -90,6 +98,8 @@ class KeywordCompleter : public QCompleter
 class KeywordField : public QLineEdit
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
         KeywordField(QWidget *);
@@ -108,28 +118,33 @@ class KeywordField : public QLineEdit
 class Form : public QScrollArea
 {
     Q_OBJECT
+    G_OBJECT
+
 
     public:
-        Form(MainWindow *);
+        Form(RideMetadata *);
         ~Form();
-        void addField(FieldDefinition x) { fields.append(new FormField(x, main)); }
+        void addField(FieldDefinition x) { fields.append(new FormField(x, meta)); }
         void arrange(); // the meat of the action, arranging fields on the screen
 
+        QList<FormField*> fields; // keep track so we can destroy
+        QList<QHBoxLayout *> overrides; // keep track so we can destroy
     private:
-        MainWindow *main;
+        RideMetadata *meta;
         SpecialFields sp;
         QWidget *contents;
         QHBoxLayout *hlayout;
         QVBoxLayout *vlayout1, *vlayout2;
         QGridLayout *grid1, *grid2;
-        QList<FormField*> fields; // keep track so we can destroy
-        QList<QHBoxLayout *> overrides; // keep track so we can destroy
 
 };
 
 class RideMetadata : public QWidget
 {
     Q_OBJECT
+    G_OBJECT
+    Q_PROPERTY(RideItem *ride READ rideItem WRITE setRideItem)
+    RideItem *_ride, *_connected;
 
     public:
         RideMetadata(MainWindow *);
@@ -138,8 +153,12 @@ class RideMetadata : public QWidget
         QList<KeywordDefinition> getKeywords() { return keywordDefinitions; }
         QList<FieldDefinition> getFields() { return fieldDefinitions; }
 
+        void setRideItem(RideItem *x);
+        RideItem *rideItem() const;
+
     public slots:
         void configUpdate();
+        void metadataChanged(); // when its changed elsewhere we need to refresh fields
 
     private:
         MainWindow *main;

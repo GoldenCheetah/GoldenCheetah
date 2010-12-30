@@ -139,14 +139,18 @@ using namespace gm;
 
 #define GOOGLE_KEY "ABQIAAAAS9Z2oFR8vUfLGYSzz40VwRQ69UCJw2HkJgivzGoninIyL8-QPBTtnR-6pM84ljHLEk3PDql0e2nJmg"
 
-GoogleMapControl::GoogleMapControl(MainWindow *mw) : main(mw), range(-1), current(NULL)
+GoogleMapControl::GoogleMapControl(MainWindow *mw) : GcWindow(mw), main(mw), range(-1), current(NULL)
 {
+    setInstanceName("Google Map");
+    setControls(NULL);
+
     parent = mw;
     view = new QWebView();
     layout = new QVBoxLayout();
     layout->addWidget(view);
     setLayout(layout);
-    connect(parent, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+    //connect(parent, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+    connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(view, SIGNAL(loadStarted()), this, SLOT(loadStarted()));
     connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
     loadingPage = false;
@@ -156,9 +160,10 @@ GoogleMapControl::GoogleMapControl(MainWindow *mw) : main(mw), range(-1), curren
 void
 GoogleMapControl::rideSelected()
 {
-  if (parent->activeTab() != this) return;
+  if (!amVisible())
+     return;
 
-  RideItem * ride = parent->rideItem();
+  RideItem * ride = myRideItem;
   if (ride == current || !ride || !ride->ride())
       return;
   else
@@ -182,6 +187,14 @@ GoogleMapControl::rideSelected()
   {
       RideFilePoint curRfp = *rfp;
 
+      if(ceil(rfp->lon) == 180 ||
+         ceil(rfp->lat) == 180 ||
+         rfp->lon == 0 ||
+         rfp->lat == 0)
+      {
+          curRfp.lon = prevLon;
+          curRfp.lat = prevLat;
+      }
       // wko imports can have -320 type of values for roughly 40 degrees
       // This if range is a guess that we only have these -ve type numbers for actual 0 to 90 deg of Latitude
       if(curRfp.lat <= -270 && curRfp.lat >= -360)
@@ -207,7 +220,7 @@ GoogleMapControl::rideSelected()
 void GoogleMapControl::resizeEvent(QResizeEvent * )
 {
     static bool first = true;
-    if (parent->activeTab() != this) return;
+    if (!amVisible()) return;
 
     if (first == true) {
         first = false;
@@ -274,7 +287,9 @@ void GoogleMapControl::createHtml()
             maxLon = std::max(maxLon,rfp.lon);
         }
     }
-    if(minLon == 1000)
+    RideItem * ride = myRideItem;
+    if(!ride->ride() || ride->ride()->areDataPresent()->lat == false ||
+                        ride->ride()->areDataPresent()->lon == false)
     {
         currentPage << tr("No GPS Data Present").toStdString();
         return;
@@ -407,8 +422,7 @@ void GoogleMapControl::CreateSubPolyLine(const std::vector<RideFilePoint> &point
 
 string GoogleMapControl::CreateIntervalMarkers()
 {
-    bool useMetricUnits = (GetApplicationSettings()->value(GC_UNIT).toString()
-                           == "Metric");
+    bool useMetricUnits = (appsettings->value(this, GC_UNIT).toString() == "Metric");
 
     ostringstream oss;
     oss.precision(6);
