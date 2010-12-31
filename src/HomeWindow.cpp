@@ -28,6 +28,12 @@ HomeWindow::HomeWindow(MainWindow *mainWindow) :
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
+#if 0
+    QPalette mypalette;
+    mypalette.setBrush(this->backgroundRole(), QBrush(QImage(":/images/dark.jpg")));
+    setPalette(mypalette);
+#endif
+
     QFont bigandbold;
     bigandbold.setPointSize(bigandbold.pointSize() + 2);
     bigandbold.setWeight(QFont::Bold);
@@ -87,12 +93,14 @@ HomeWindow::HomeWindow(MainWindow *mainWindow) :
 
     winWidget = new QWidget(this);
     winWidget->setContentsMargins(0,0,0,0);
+    QPalette palette;
+    palette.setBrush(winWidget->backgroundRole(), QBrush(QImage(":/images/carbon.jpg")));
+    winWidget->setPalette(palette);
     //tileWidget->setMouseTracking(true);
     //tileWidget->installEventFilter(this);
 
-    winFlow = new GcWindowLayout(winWidget);
-    winFlow->setSpacing(0);
-    winFlow->setContentsMargins(0,0,0,0);
+    winFlow = new GcWindowLayout(winWidget, 0, 20, 20);
+    winFlow->setContentsMargins(20,20,20,20);
 
     winArea = new QScrollArea(this);
     winArea->setWidgetResizable(true);
@@ -349,9 +357,10 @@ HomeWindow::addChart(GcWindow* newone)
                               (2*(winArea->contentsMargins().left()+winArea->contentsMargins().right()))
                               - ((2*widthFactor) * 6) ) / widthFactor;
 #else
-                int newwidth = (winArea->width() - 20 -
-                              (2*(winArea->contentsMargins().left()+winArea->contentsMargins().right()))
-                              - ((1+widthFactor) * 5) ) / widthFactor;
+                int newwidth = (winArea->width() - 20 /* scrollbar */
+                               - 40 /* left and right marings */
+                               - ((widthFactor-1) * 20) /* internal spacing */
+                               ) / widthFactor;
 #endif
 
                 int newheight = (winArea->height() -
@@ -451,9 +460,10 @@ HomeWindow::resizeEvent(QResizeEvent *)
                           (2*(winArea->contentsMargins().left()+winArea->contentsMargins().right()))
                           - ((2*widthFactor) * 6) ) / widthFactor;
 #else
-            int newwidth = (winArea->width() - 20 -
-                          (2*(winArea->contentsMargins().left()+winArea->contentsMargins().right()))
-                          - ((1+widthFactor) * 5) ) / widthFactor;
+                int newwidth = (winArea->width() - 20 /* scrollbar */
+                               - 40 /* left and right marings */
+                               - ((widthFactor-1) * 20) /* internal spacing */
+                               ) / widthFactor;
 #endif
             int newheight = (winArea->height() -
                           (winArea->contentsMargins().left()+winArea->contentsMargins().right())

@@ -121,6 +121,9 @@ void
 GcWindow::paintEvent(QPaintEvent * /*event*/)
 {
     static QPixmap closeImage = QPixmap(":images/toolbar/popbutton.png");
+    static QPixmap aluBar = QPixmap(":images/aluBar.png");
+    static QPixmap aluBarDark = QPixmap(":images/aluBarDark.png");
+    static QPixmap aluLight = QPixmap(":images/aluLight.jpg");
 
     if (contentsMargins().top() > 0) {
         // draw a rectangle in the contents margins
@@ -129,15 +132,21 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         // setup a painter and the area to paint
         QPainter painter(this);
 
+        // background light gray for now?
+        QRect all(0,0,width(),height());
+        painter.drawTiledPixmap(all, aluLight);
+
         // fill in the title bar
         QRect bar(0,0,width(),contentsMargins().top());
         QColor bg;
-        if (property("active").toBool() == true)
+        if (property("active").toBool() == true) {
             bg = GColor(CTILEBARSELECT);
-        else
+            painter.drawPixmap(bar, aluBarDark);
+        } else {
             bg = GColor(CTILEBAR);
+            painter.drawPixmap(bar, aluBar);
+        }
 
-        painter.fillRect(bar, bg);
 
         // heading
         QFont font;
