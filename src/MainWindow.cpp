@@ -139,7 +139,7 @@ MainWindow::MainWindow(const QDir &home) :
                   "QTabWidget { background = Qt::white; };"
                   "::pane { FrameStyle = QFrame::NoFrame; border: 0px; };");
 
-    setContentsMargins(10,10,10,10);
+    setContentsMargins(0,0,0,0);
 
     QVariant unit = appsettings->value(this, GC_UNIT);
     useMetricUnits = (unit.toString() == "Metric");
