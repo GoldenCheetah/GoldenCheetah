@@ -352,6 +352,18 @@ DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
     profLabel = new QLabel(tr("Device Profile"),this);
     deviceProfile = new QLineEdit(tr(""), this);
 
+    virtualPowerLabel = new QLabel(tr("Virtual Channel"), this);
+    virtualPower = new QComboBox(this);
+
+    // XXX NOTE: THESE MUST CORRESPOND TO THE CODE
+    //           IN RealtimeController.cpp WHICH
+    //           POST-PROCESSES INBOUND TELEMETRY
+    virtualPower->addItem("None");
+    virtualPower->addItem("Power - Kurt Kinetic Cyclone");
+    virtualPower->addItem("Power - Kurt Kinetic Road Machine");
+    virtualPower->addItem("Power - Cyclops Fluid 2");
+    virtualPower->setCurrentIndex(0);
+
 // THIS CODE IS DISABLED FOR THIS RELEASE XXX
 //    isDefaultDownload = new QCheckBox(tr("Default download device"), this);
 //    isDefaultRealtime = new QCheckBox(tr("Default realtime device"), this);
@@ -400,6 +412,8 @@ DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
     leftLayout->addWidget(profLabel, 5,0);
     leftLayout->addWidget(deviceProfile, 5,2);
     leftLayout->setColumnMinimumWidth(1,10);
+    leftLayout->addWidget(virtualPowerLabel, 6,0);
+    leftLayout->addWidget(virtualPower, 6,2);
 
 // THIS CODE IS DISABLED FOR THIS RELEASE XXX
 //    leftLayout->addWidget(isDefaultDownload, 6,1);
@@ -498,6 +512,10 @@ deviceModel::add(DeviceConfiguration &newone)
     // insert Profile
     index = deviceModel::index(0,3, QModelIndex());
     setData(index, newone.deviceProfile, Qt::EditRole);
+
+    // insert postProcess
+    index = deviceModel::index(0,4, QModelIndex());
+    setData(index, newone.postProcess, Qt::EditRole);
 }
 
 // delete an existing configuration
@@ -544,7 +562,7 @@ deviceModel::rowCount(const QModelIndex &parent) const
 int
 deviceModel::columnCount(const QModelIndex &) const
 {
-    return 4;
+    return 5;
 }
 
 
@@ -563,6 +581,8 @@ QVariant deviceModel::headerData(int section, Qt::Orientation orientation, int r
                  return tr("Port Spec");
              case 3:
                  return tr("Profile");
+             case 4:
+                 return tr("Virtual");
              default:
                  return QVariant();
          }
@@ -594,6 +614,8 @@ QVariant deviceModel::data(const QModelIndex &index, int role) const
                 break;
             case 3 :
                 return Entry.deviceProfile;
+            case 4 :
+                return Entry.postProcess;
          }
      }
 
@@ -648,6 +670,9 @@ bool deviceModel::setData(const QModelIndex &index, const QVariant &value, int r
                     break;
                 case 3 : // Profile
                     p.deviceProfile = value.toString();
+                    break;
+                case 4 : // Profile
+                    p.postProcess = value.toInt();
                     break;
             }
             Configuration.replace(row,p);

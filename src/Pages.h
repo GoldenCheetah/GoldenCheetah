@@ -177,6 +177,9 @@ class DevicePage : public QWidget
         QCheckBox *isDefaultDownload;
         QCheckBox *isDefaultRealtime;
 
+        QLabel *virtualPowerLabel; // do we compute power using an algorithm?
+        QComboBox *virtualPower;
+
         QTableView *deviceList;
 
         QPushButton *addButton;
