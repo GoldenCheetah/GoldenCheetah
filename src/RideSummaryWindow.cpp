@@ -41,7 +41,7 @@ RideSummaryWindow::RideSummaryWindow(MainWindow *mainWindow) :
 
     QVBoxLayout *vlayout = new QVBoxLayout;
     vlayout->setSpacing(0);
-    vlayout->setContentsMargins(0,0,0,0);
+    vlayout->setContentsMargins(10,10,10,10);
     rideSummary = new QTextEdit(this);
     rideSummary->setReadOnly(true);
     vlayout->addWidget(rideSummary);

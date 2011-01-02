@@ -328,3 +328,96 @@ LTMSettings::readChartXML(QDir home, QList<LTMSettings> &charts)
     xmlReader.parse( source );
     charts = handler.getSettings();
 }
+
+/*----------------------------------------------------------------------
+ * Marshall/Unmarshall to DataStream to store as a QVariant
+ *----------------------------------------------------------------------*/
+QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
+{
+    // all the baisc fields first
+    out<<settings.name;
+    out<<settings.title;
+    out<<settings.start;
+    out<<settings.end;
+    out<<settings.groupBy;
+    out<<settings.shadeZones;
+    out<<settings.legend;
+    out<<settings.field1;
+    out<<settings.field2;
+    out<<settings.metrics.count();
+    foreach(MetricDetail metric, settings.metrics) {
+        out<<metric.type;
+        out<<metric.stack;
+        out<<metric.symbol;
+        out<<metric.name;
+        out<<metric.uname;
+        out<<metric.uunits;
+        out<<metric.smooth;
+        out<<metric.trend;
+        out<<metric.topN;
+        out<<metric.topOut;
+        out<<metric.baseline;
+        out<<metric.showOnPlot;
+        out<<metric.filter;
+        out<<metric.from;
+        out<<metric.to;
+        out<<static_cast<int>(metric.curveStyle);
+        out<<static_cast<int>(metric.symbolStyle);
+        out<<metric.penColor;
+        out<<metric.penAlpha;
+        out<<metric.penWidth;
+        out<<metric.penStyle;
+        out<<metric.brushColor;
+        out<<metric.brushAlpha;
+    }
+    return out;
+}
+
+QDataStream &operator>>(QDataStream &in, LTMSettings &settings)
+{
+    RideMetricFactory &factory = RideMetricFactory::instance();
+    int counter=0;
+
+    // all the basic fields first
+    in>>settings.name;
+    in>>settings.title;
+    in>>settings.start;
+    in>>settings.end;
+    in>>settings.groupBy;
+    in>>settings.shadeZones;
+    in>>settings.legend;
+    in>>settings.field1;
+    in>>settings.field2;
+    in>>counter;
+    while(counter--) {
+        MetricDetail m;
+        in>>m.type;
+        in>>m.stack;
+        in>>m.symbol;
+        in>>m.name;
+        in>>m.uname;
+        in>>m.uunits;
+        in>>m.smooth;
+        in>>m.trend;
+        in>>m.topN;
+        in>>m.topOut;
+        in>>m.baseline;
+        in>>m.showOnPlot;
+        in>>m.filter;
+        in>>m.from;
+        in>>m.to;
+        int x;
+        in>> x; m.curveStyle = static_cast<QwtPlotCurve::CurveStyle>(x);
+        in>> x; m.symbolStyle = static_cast<QwtSymbol::Style>(x);
+        in>>m.penColor;
+        in>>m.penAlpha;
+        in>>m.penWidth;
+        in>>m.penStyle;
+        in>>m.brushColor;
+        in>>m.brushAlpha;
+        // get a metric pointer (if it exists)
+        m.metric = factory.rideMetric(m.symbol);
+        settings.metrics.append(m);
+    }
+    return in;
+}

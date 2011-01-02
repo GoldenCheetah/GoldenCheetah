@@ -124,6 +124,7 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
     static QPixmap aluBar = QPixmap(":images/aluBar.png");
     static QPixmap aluBarDark = QPixmap(":images/aluBarDark.png");
     static QPixmap aluLight = QPixmap(":images/aluLight.jpg");
+    static QPixmap carbon = QPixmap(":images/carbon.jpg");
 
     if (contentsMargins().top() > 0) {
         // draw a rectangle in the contents margins
@@ -150,7 +151,7 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
 
         // heading
         QFont font;
-        font.setPointSize(contentsMargins().top()/2);
+        font.setPointSize((contentsMargins().top()/2)+2);
         font.setWeight(QFont::Bold);
         QString title = property("title").toString();
         painter.setFont(font);
@@ -167,6 +168,16 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         } else {
             painter.setPen(bg);
             painter.drawRect(QRect(0,0,width()-1,height()-1));
+        }
+    } else {
+        // is this a layout manager?
+        // background light gray for now?
+        QPainter painter(this);
+        QRect all(0,0,width(),height());
+        if (property("isManager").toBool() == true) {
+            painter.drawTiledPixmap(all, carbon);
+        } else {
+            painter.drawTiledPixmap(all, aluLight);
         }
     }
 }

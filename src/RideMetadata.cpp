@@ -38,7 +38,7 @@ RideMetadata::RideMetadata(MainWindow *parent) : QWidget(parent), main(parent)
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(0,0,0,0);
+    mainLayout->setContentsMargins(10,10,10,10);
 
     QPalette palette;
     palette.setBrush(QPalette::Background, Qt::NoBrush);
@@ -70,10 +70,11 @@ RideMetadata::setRideItem(RideItem *ride)
         disconnect(_connected, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
     }
     _connected=_ride=ride;
-    connect (_connected, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
 
-    // and now retrieve that data
-    metadataChanged();
+    if (ride) {
+        connect (_connected, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
+        metadataChanged();
+    }
 }
 
 RideItem*

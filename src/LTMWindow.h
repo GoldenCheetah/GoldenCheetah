@@ -69,8 +69,6 @@ class LTMToolTip : public QwtPlotPicker
     QString tip;
 };
 
-Q_DECLARE_METATYPE(LTMSettings);
-
 class LTMWindow : public GcWindow
 {
     Q_OBJECT
@@ -81,6 +79,7 @@ class LTMWindow : public GcWindow
     Q_PROPERTY(bool shade READ shade WRITE setShade USER true)
     Q_PROPERTY(bool legend READ legend WRITE setLegend USER true)
     Q_PROPERTY(QString dateRange READ dateRange WRITE setDateRange USER true)
+    Q_PROPERTY(LTMSettings settings READ getSettings WRITE applySettings USER true)
 
     public:
 

@@ -183,7 +183,7 @@ MainWindow::MainWindow(const QDir &home) :
     toolbar->setIconSize(QSize(32,32));
 #ifndef Q_OS_MAC
     toolbar->setAutoFillBackground(false);
-    toolbar->setStyleSheet("background-color: QColor(231,231,231,0); border: 0px;");
+    toolbar->setStyleSheet("background-image: url(\":/images/aluLight.jpg\"); border: 0px;");
     toolbar->setContentsMargins(0,0,0,0);
 #else
     QIcon tickIcon(":images/toolbar/main/tick.png");
