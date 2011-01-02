@@ -223,7 +223,7 @@ LTMPlot::setData(LTMSettings *set)
     }
 
     // setup the curves
-    int count;
+    int count=0;
     double width = appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble();
     bool donestack = false;
 
@@ -253,6 +253,9 @@ LTMPlot::setData(LTMSettings *set)
         ydata = *stackY[stackcounter];
         stackcounter--;
         count = xdata.size()-2;
+
+        // no data to plot!
+        if (count <= 0) continue;
 
         // Create a curve
         QwtPlotCurve *current = new QwtPlotCurve(metricDetail.uname);
@@ -293,7 +296,7 @@ LTMPlot::setData(LTMSettings *set)
         }
 
         if (metricDetail.curveStyle == QwtPlotCurve::Steps) {
-
+            
             // fill the bars
             QColor brushColor = metricDetail.penColor;
             if (metricDetail.stack == true)
@@ -315,7 +318,7 @@ LTMPlot::setData(LTMSettings *set)
             // and shift all the x-values left by 0.5 so that
             // they centre over x-axis labels
             int i=0;
-            for (i=0; i<=count; i++) xdata[i] -= 0.5;
+            for (i=0; i<count; i++) xdata[i] -= 0.5;
             // now add a final 0 value to get the last
             // column drawn - no resize neccessary
             // since it is always sized for 1 + maxnumber of entries
@@ -360,7 +363,7 @@ LTMPlot::setData(LTMSettings *set)
         // in tooltip
         *stackX[stackcounter+1] = xdata;
         *stackY[stackcounter+1] = ydata;
-
+        
         // update min/max Y values for the chosen axis
         if (current->maxYValue() > maxY[axisid]) maxY[axisid] = current->maxYValue();
         if (current->minYValue() < minY[axisid]) minY[axisid] = current->minYValue();
@@ -385,6 +388,9 @@ LTMPlot::setData(LTMSettings *set)
             createCurveData(settings, metricDetail, xdata, ydata, count);
         else
             createTODCurveData(settings, metricDetail, xdata, ydata, count);
+
+        // no data to plot!
+        if (count <= 0) continue;
 
         // Create a curve
         QwtPlotCurve *current = new QwtPlotCurve(metricDetail.uname);
@@ -573,8 +579,7 @@ LTMPlot::setData(LTMSettings *set)
             top->attach(this);
         }
         if (metricDetail.curveStyle == QwtPlotCurve::Steps) {
-
-
+            
             // fill the bars
             QColor brushColor = metricDetail.penColor;
             brushColor.setAlpha(200); // now side by side, less transparency required
@@ -593,7 +598,7 @@ LTMPlot::setData(LTMSettings *set)
             // and shift all the x-values left by 0.5 so that
             // they centre over x-axis labels
             int i=0;
-            for (i=0; i<=count; i++) xdata[i] -= 0.5;
+            for (i=0; i<count; i++) xdata[i] -= 0.5;
             // now add a final 0 value to get the last
             // column drawn - no resize neccessary
             // since it is always sized for 1 + maxnumber of entries

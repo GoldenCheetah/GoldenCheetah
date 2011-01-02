@@ -22,6 +22,8 @@
 
 #include <QtGui>
 #include <QList>
+#include <QDataStream>
+
 #include <qwt_plot.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_curve.h>
@@ -30,6 +32,7 @@
 #include <qwt_symbol.h>
 
 class LTMTool;
+class LTMSettings;
 class SummaryMetrics;
 class MainWindow;
 class RideMetric;
@@ -93,10 +96,22 @@ class MetricDetail {
     int brushAlpha;
 };
 
+// so we can marshal and unmarshall LTMSettings when we save
+// asa QVariant we need to provide our own functions to
+// do this
+QDataStream &operator<<(QDataStream &out, const LTMSettings &settings);
+QDataStream &operator>>(QDataStream &in, LTMSettings &settings);
+Q_DECLARE_METATYPE(LTMSettings);
+
 // used to maintain details about the metrics being plotted
 class LTMSettings {
 
     public:
+
+        LTMSettings() {
+            // we need to register the stream operators
+            qRegisterMetaTypeStreamOperators<LTMSettings>("LTMSettings");
+        }
 
         void writeChartXML(QDir, QList<LTMSettings>);
         void readChartXML(QDir, QList<LTMSettings>&charts);

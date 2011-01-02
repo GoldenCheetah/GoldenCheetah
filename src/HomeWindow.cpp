@@ -18,29 +18,28 @@
 
 
 #include "HomeWindow.h"
+#include "LTMSettings.h"
 
 HomeWindow::HomeWindow(MainWindow *mainWindow) :
     GcWindow(mainWindow), mainWindow(mainWindow), active(false), clicked(NULL)
 {
     setInstanceName("Home Window");
     setControls(new QStackedWidget(this));
+    setProperty("isManager", true);
     setAcceptDrops(true);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
-
-#if 0
-    QPalette mypalette;
-    mypalette.setBrush(this->backgroundRole(), QBrush(QImage(":/images/dark.jpg")));
-    setPalette(mypalette);
-#endif
 
     QFont bigandbold;
     bigandbold.setPointSize(bigandbold.pointSize() + 2);
     bigandbold.setWeight(QFont::Bold);
 
     QHBoxLayout *titleBar = new QHBoxLayout;
-    title = new QLabel("Home", this);
+    title = new QLabel("  Home", this);
     title->setFont(bigandbold);
+    QPalette mypalette;
+    mypalette.setColor(title->foregroundRole(), Qt::white);
+    title->setPalette(mypalette);
     titleBar->addWidget(title);
     titleBar->addStretch();
 
@@ -69,14 +68,19 @@ HomeWindow::HomeWindow(MainWindow *mainWindow) :
     layout->setContentsMargins(0,0,0,0);
     layout->addWidget(style);
 
+    QPalette palette;
+    palette.setBrush(backgroundRole(), QBrush(QImage(":/images/carbon.jpg")));
+
     // each style has its own container widget
     tabbed = new QTabWidget(this);
     tabbed->setContentsMargins(0,0,0,0);
     tabbed->setTabsClosable(true);
+    tabbed->setPalette(palette);
     style->addWidget(tabbed);
 
     // tiled
     tileWidget = new QWidget(this);
+    tileWidget->setPalette(palette);
     tileWidget->setContentsMargins(0,0,0,0);
     //tileWidget->setMouseTracking(true);
     //tileWidget->installEventFilter(this);
@@ -93,8 +97,6 @@ HomeWindow::HomeWindow(MainWindow *mainWindow) :
 
     winWidget = new QWidget(this);
     winWidget->setContentsMargins(0,0,0,0);
-    QPalette palette;
-    palette.setBrush(winWidget->backgroundRole(), QBrush(QImage(":/images/carbon.jpg")));
     winWidget->setPalette(palette);
     //tileWidget->setMouseTracking(true);
     //tileWidget->installEventFilter(this);
@@ -240,7 +242,7 @@ HomeWindow::styleChanged(int id)
             break;
         case 1 : // they are lists in a GridLayout
             tileGrid->addWidget(charts[i], i,0);
-            charts[i]->setContentsMargins(0,15,0,0);
+            charts[i]->setContentsMargins(0,25,0,0);
             charts[i]->show();
             break;
         case 2 : // thet are in a FlowLayout
@@ -266,8 +268,6 @@ void
 HomeWindow::dragEnterEvent(QDragEnterEvent *event)
 {
     if (event->mimeData()->formats().contains("application/x-qabstractitemmodeldatalist"))
-        event->accept();
-    else
         event->accept();
 }
 
@@ -337,7 +337,7 @@ HomeWindow::addChart(GcWindow* newone)
             newone->setFixedHeight(newone->width() * 0.7);
             int row = chartnum; // / 2;
             int column = 0; //chartnum % 2;
-            newone->setContentsMargins(0,15,0,0);
+            newone->setContentsMargins(0,25,0,0);
             tileGrid->addWidget(newone, row, column);
             }
             break;
@@ -349,23 +349,15 @@ HomeWindow::addChart(GcWindow* newone)
                 // width of area minus content margins and spacing around each item
                 // divided by the number of items
 
-#ifdef Q_OS_MAC
-                // Mac QT fucks about with spacing limits, and doesn't honor
-                // spacing < 6 or thereabouts anyway
-
-                int newwidth = (winArea->width() - 20 -
-                              (2*(winArea->contentsMargins().left()+winArea->contentsMargins().right()))
-                              - ((2*widthFactor) * 6) ) / widthFactor;
-#else
                 int newwidth = (winArea->width() - 20 /* scrollbar */
                                - 40 /* left and right marings */
                                - ((widthFactor-1) * 20) /* internal spacing */
                                ) / widthFactor;
-#endif
 
-                int newheight = (winArea->height() -
-                              (winArea->contentsMargins().left()+winArea->contentsMargins().right())
-                              - ((1+heightFactor) * 5) ) / heightFactor;
+                int newheight = (winArea->height()
+                               - 40 /* top and bottom marings */
+                               - ((heightFactor-1) * 20) /* internal spacing */
+                               ) / heightFactor;
 
                 int minWidth = 10;
                 int minHeight = 10;
@@ -452,22 +444,15 @@ HomeWindow::resizeEvent(QResizeEvent *)
             int widthFactor = x->property("widthFactor").toInt();
 
 
-#ifdef Q_OS_MAC
-                // Mac QT fucks about with spacing limits, and doesn't honor
-                // spacing < 6 or thereabouts anyway
+            int newwidth = (winArea->width() - 20 /* scrollbar */
+                           - 40 /* left and right marings */
+                           - ((widthFactor-1) * 20) /* internal spacing */
+                           ) / widthFactor;
 
-            int newwidth = (winArea->width() - 20 -
-                          (2*(winArea->contentsMargins().left()+winArea->contentsMargins().right()))
-                          - ((2*widthFactor) * 6) ) / widthFactor;
-#else
-                int newwidth = (winArea->width() - 20 /* scrollbar */
-                               - 40 /* left and right marings */
-                               - ((widthFactor-1) * 20) /* internal spacing */
-                               ) / widthFactor;
-#endif
-            int newheight = (winArea->height() -
-                          (winArea->contentsMargins().left()+winArea->contentsMargins().right())
-                          - ((1+heightFactor) * 5) ) / heightFactor;
+            int newheight = (winArea->height()  
+                           - 40 /* top and bottom marings */
+                           - ((heightFactor-1) * 20) /* internal spacing */
+                           ) / heightFactor;
 
             int minWidth = 10;
             int minHeight = 10;
@@ -709,8 +694,6 @@ HomeWindow::saveState()
         for (int i=0; i<m->propertyCount(); i++) {
             QMetaProperty p = m->property(i);
             if (p.isUser(chart)) {
-               if (QString(p.typeName()) == "LTMSettings") qDebug()<<"not supported yet...";
-               else {
                out<<"\t\t<property name=\""<<xmlprotect(p.name())<<"\" "
                   <<"type=\""<<p.typeName()<<"\" "
                   <<"value=\"";
@@ -719,9 +702,15 @@ HomeWindow::saveState()
                 if (QString(p.typeName()) == "double") out<<p.read(chart).toDouble();
                 if (QString(p.typeName()) == "QString") out<<xmlprotect(p.read(chart).toString());
                 if (QString(p.typeName()) == "bool") out<<p.read(chart).toBool();
+                if (QString(p.typeName()) == "LTMSettings") {
+                    QByteArray marshall;
+                    QDataStream s(&marshall, QIODevice::WriteOnly);
+                    LTMSettings x = p.read(chart).value<LTMSettings>();
+                    s << x;
+                    out<<marshall.toBase64();
+                }
 
                 out<<"\" />\n";
-                }
             }
         }
         out<<"\t</chart>\n";
@@ -808,7 +797,14 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
         if (type == "double") chart->setProperty(name.toLatin1(), QVariant(value.toDouble()));
         if (type == "QString") chart->setProperty(name.toLatin1(), QVariant(QString(value)));
         if (type == "bool") chart->setProperty(name.toLatin1(), QVariant(value.toInt() ? true : false));
-        if (type == "LTMSettings") qDebug()<<"not supported yet...";
+        if (type == "LTMSettings") {
+            QByteArray base64(value.toLatin1());
+            QByteArray unmarshall = QByteArray::fromBase64(base64);
+            QDataStream s(&unmarshall, QIODevice::ReadOnly);
+            LTMSettings x;
+            s >> x;
+            chart->setProperty(name.toLatin1(), QVariant().fromValue<LTMSettings>(x));
+        }
 
     }
     return TRUE;

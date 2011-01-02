@@ -46,6 +46,7 @@ class TreeMapWindow : public GcWindow
 
     Q_PROPERTY(QString f1 READ f1 WRITE setf1 USER true)
     Q_PROPERTY(QString f2 READ f2 WRITE setf2 USER true)
+    Q_PROPERTY(LTMSettings settings READ getSettings WRITE applySettings USER true)
 
     public:
 
@@ -57,6 +58,8 @@ class TreeMapWindow : public GcWindow
         void setf1(QString x) const { field1->setCurrentIndex(field1->findText(x)); }
         QString f2() const { return field2->currentText(); }
         void setf2(QString x) const { field2->setCurrentIndex(field1->findText(x)); }
+        LTMSettings getSettings() const { return settings; }
+        void applySettings(LTMSettings x) { ltmTool->applySettings(&x); }
 
     public slots:
         void rideSelected();

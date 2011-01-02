@@ -87,7 +87,7 @@ class HomeWindow : public GcWindow
         QStackedWidget *style; // tab, freeform, tiled
 
         // each style has its own container widget
-        QTabWidget *tabbed;
+        QTabWidget *tabbed; 
 
         QScrollArea *tileArea;
         QWidget *tileWidget;

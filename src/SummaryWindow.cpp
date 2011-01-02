@@ -28,7 +28,7 @@ SummaryWindow::SummaryWindow(MainWindow *mainWindow) :
     splitter = new QSplitter(Qt::Vertical, this);
     QVBoxLayout *vlayout = new QVBoxLayout(this);
     vlayout->setSpacing(0);
-    vlayout->setContentsMargins(0,0,0,0);
+    vlayout->setContentsMargins(1,1,1,1);
     vlayout->addWidget(splitter);
 
     rideSummary = new RideSummaryWindow(mainWindow);
