@@ -20,7 +20,7 @@
 #include "Computrainer.h"
 #include "RealtimeData.h"
 
-ComputrainerController::ComputrainerController(RealtimeWindow *parent,  DeviceConfiguration *dc) : RealtimeController(parent)
+ComputrainerController::ComputrainerController(RealtimeWindow *parent,  DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
     myComputrainer = new Computrainer (parent, dc->portSpec);
 }
@@ -95,6 +95,14 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
     rtData.setHr(HeartRate);
     rtData.setCadence(Cadence);
     rtData.setSpeed(Speed);
+
+    // post processing, probably not used
+    // since its used to compute power for
+    // non-power devices, but we may add other
+    // calculations later that might apply
+    // means we could calculate power based
+    // upon speed even for CT!
+    processRealtimeData(rtData);
 
     //
     // BUTTONS

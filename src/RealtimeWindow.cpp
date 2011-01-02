@@ -22,8 +22,10 @@
 #include "RealtimePlot.h"
 #include "math.h" // for round()
 #include "Units.h" // for MILES_PER_KM
+#include <QDebug>
 
 // Three current realtime device types supported are:
+#include "RealtimeController.h"
 #include "ComputrainerController.h"
 #include "ANTplusController.h"
 #include "SimpleNetworkController.h"
@@ -331,6 +333,7 @@ void RealtimeWindow::setDeviceController()
             deviceController = new SimpleNetworkController(this, &temp);
         }
     }
+
 }
 
 void RealtimeWindow::setStreamController()

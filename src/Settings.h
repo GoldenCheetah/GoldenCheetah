@@ -79,6 +79,7 @@
 #define GC_DEV_TYPE  "devicetype"
 #define GC_DEV_DEFI  "devicedefi"
 #define GC_DEV_DEFR  "devicedefr"
+#define GC_DEV_VIRTUAL  "devicepostProcess"
 
 // data processor config
 #define GC_DPFG_TOLERANCE "dataprocess/fixgaps/tolerance"
