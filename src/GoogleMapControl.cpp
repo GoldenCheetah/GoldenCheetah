@@ -23,11 +23,11 @@
 #include "Zones.h"
 #include "Settings.h"
 #include "Units.h"
+#include "TimeUtils.h"
 
 #include <QDebug>
 
-#include <iostream>
-#include <sstream>
+
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -115,7 +115,10 @@ namespace gm
             totalHR += rfp.hr;
             samples++;
         }
-        int HR() { return totalHR / samples; }
+        int HR() {
+            if(samples == 0) return 0;
+            return totalHR / samples;
+        }
         operator int() { return HR(); }
     };
 
@@ -320,7 +323,7 @@ void GoogleMapControl::createHtml()
         << " {size: new GSize(" << width << "," << height << ") } );" << endl
         << "map.setUIToDefault()" << endl
         << CreatePolyLine() << endl
-        << CreateIntervalMarkers() << endl
+        << CreateMarkers() << endl
         << "var sw = new GLatLng(" << minLat << "," << minLon << ");" << endl
         << "var ne = new GLatLng(" << maxLat << "," << maxLon << ");" << endl
         << "var bounds = new GLatLngBounds(sw,ne);" << endl
@@ -419,76 +422,137 @@ void GoogleMapControl::CreateSubPolyLine(const std::vector<RideFilePoint> &point
     oss << "map.addOverlay (polyline);" << endl;
 }
 
-
-string GoogleMapControl::CreateIntervalMarkers()
+string GoogleMapControl::CreateIntervalMarkers(RideItem *rideItem)
 {
-    bool useMetricUnits = (appsettings->value(this, GC_UNIT).toString() == "Metric");
+    ostringstream oss;
 
+    RideFile *ride = rideItem->ride();
+    if(ride->intervals().size() == 0)
+        return "";
+
+    bool metricUnits = (appsettings->value(this, GC_UNIT).toString() == "Metric");
+
+    QStringList intervalMetrics = appsettings->value(this, 
+                                    GC_SETTINGS_INTERVAL_METRICS,
+                                    GC_SETTINGS_INTERVAL_METRICS_DEFAULT).toString().split(",");
+
+    int row = 0;
+    foreach (RideFileInterval interval, ride->intervals()) {
+        // create a temp RideFile to be used to figure out the metrics for the interval
+        RideFile f(ride->startTime(), ride->recIntSecs());
+        for (int i = ride->intervalBegin(interval); i < ride->dataPoints().size(); ++i) {
+            const RideFilePoint *p = ride->dataPoints()[i];
+            if (p->secs >= interval.stop)
+                break;
+            f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
+                          p->watts, p->alt, p->lon, p->lat, p->headwind, 0);
+        }
+        if (f.dataPoints().size() == 0) {
+            // Interval empty, do not compute any metrics
+            continue;
+        }
+
+        QHash<QString,RideMetricPtr> metrics =
+                RideMetric::computeMetrics(main, &f, parent->zones(), parent->hrZones(), intervalMetrics);
+
+        string html = CreateIntervalHtml(metrics,intervalMetrics,interval.name,metricUnits);
+        row++;
+        oss << CreateMarker(row,f.dataPoints().front()->lat,f.dataPoints().front()->lon,html);
+    }
+    return oss.str();
+}
+
+string GoogleMapControl::CreateIntervalHtml(QHash<QString,RideMetricPtr> &metrics, QStringList &intervalMetrics,
+                                            QString &intervalName, bool metricUnits)
+{
+    ostringstream oss;
+
+    oss << "<p><h2>" << intervalName.toStdString() << "</h2>";
+    oss << "<table align=\\\"center\\\" cellspacing=0 border=0>";
+    int row = 0;
+    foreach (QString symbol, intervalMetrics) {
+        RideMetricPtr m = metrics.value(symbol);
+        if(m == NULL)
+            continue;
+        if (row % 2)
+            oss << "<tr>";
+        else {
+            QColor color = QApplication::palette().alternateBase().color();
+            color = QColor::fromHsv(color.hue(), color.saturation() * 2, color.value());
+            oss << "<tr bgcolor='" + color.name().toStdString() << "'>";
+        }
+        oss.setf(ios::fixed);
+        oss.precision(m->precision());
+        oss << "<td align=\\\"left\\\">" + m->name().toStdString() << "</td>";
+        oss << "<td align=\\\"left\\\">";
+        if (m->units(metricUnits) == "seconds")
+            oss << time_to_string(m->value(metricUnits)).toStdString();
+        else
+        {
+            oss << m->value(metricUnits);
+            oss << " " << m->units(metricUnits).toStdString();
+        }
+        oss <<"</td>";
+        oss << "</tr>";
+        row++;
+    }
+    oss << "</table>";
+    return oss.str();
+}
+
+string GoogleMapControl::CreateMarkers()
+{
     ostringstream oss;
     oss.precision(6);
     oss.setf(ios::fixed,ios::floatfield);
 
+    RideItem *ride = myRideItem;
+
+    // start marker
     oss << "var marker;" << endl;
-    int currentInterval = 0;
-    std::vector<RideFilePoint> intervalPoints;
-    BOOST_FOREACH(RideFilePoint rfp, rideData)
-    {
-        intervalPoints.push_back(rfp);
-        if(currentInterval < rfp.interval)
-        {
-            // want to see avg power, avg speed, alt changes, avg hr
-            double distance = intervalPoints.back().km -
-                               intervalPoints.front().km ;
-            distance = (useMetricUnits ? distance : distance * MILES_PER_KM);
+    oss << "var blueIcon = new GIcon(G_DEFAULT_ICON);" << endl;
+    oss << "blueIcon.image = \"http://gmaps-samples.googlecode.com/svn/trunk/markers/blue/blank.png\"" << endl;
+    oss << "markerOptions = { icon:blueIcon };" << endl;
+    oss << "marker = new GMarker(new GLatLng(";
+    oss << rideData.front().lat << "," << rideData.front().lon << "),blueIcon);" << endl;
+    oss << "marker.bindInfoWindowHtml(\"<h3>Start</h3>\");" << endl;
+    oss << "map.addOverlay(marker);" << endl;
 
-            int secs = intervalPoints.back().secs -
-                intervalPoints.front().secs;
+    oss << CreateIntervalMarkers(ride);
 
-            double avgSpeed = (distance/((double)secs)) * 3600;
+    // end marker
+    bool metricUnits = (appsettings->value(main, GC_UNIT, "Metric").toString() == "Metric");
 
-            QTime time;
-            time = time.addSecs(secs);
+    QStringList intervalMetrics = appsettings->value(this, 
+                                    GC_SETTINGS_INTERVAL_METRICS,
+                                    GC_SETTINGS_INTERVAL_METRICS_DEFAULT).toString().split(",");
 
-            AvgHR avgHr = for_each(intervalPoints.begin(),
-                                   intervalPoints.end(),
-                                       AvgHR());
-            AvgPower avgPower = for_each(intervalPoints.begin(),
-                                         intervalPoints.end(),
-                                         AvgPower());
+    QHash<QString,RideMetricPtr> metrics =
+            RideMetric::computeMetrics(main, ride->ride(), parent->zones(), parent->hrZones(), intervalMetrics);
+    QString name = "Ride Summary";
+    string html = CreateIntervalHtml(metrics,intervalMetrics,name,metricUnits);
+    oss << "var redIcon = new GIcon(G_DEFAULT_ICON);" << endl;
+    oss << "redIcon.image = \"http://gmaps-samples.googlecode.com/svn/trunk/markers/red/blank.png\"" << endl;
+    oss << "markerOptions = { icon:redIcon };" << endl;
+    oss << "marker = new GMarker(new GLatLng(";
+    oss << rideData.back().lat << "," << rideData.back().lon << "),redIcon);" << endl;
+    oss << "marker.bindInfoWindowHtml(\""<< html << "\");" << endl;
+    oss << "map.addOverlay(marker);" << endl;
+    return oss.str();
+}
 
-            int altGained =ceil(for_each(intervalPoints.begin(),
-                                       intervalPoints.end(),
-                                            AltGained()));
-            altGained = ceil((useMetricUnits ? altGained :
-                              altGained * FEET_PER_METER));
-            oss.precision(6);
-            oss << "marker = new GMarker(new GLatLng( ";
-            oss<< rfp.lat << "," << rfp.lon << "));" << endl;
-            oss << "marker.bindInfoWindowHtml(" <<endl;
-            oss << "\"<p><h3>Lap: " << currentInterval << "</h3></p>" ;
-            oss.precision(1);
-            oss << "<p>Distance: " << distance << " "
-                << (useMetricUnits ? "KM" : "Miles") << "</p>" ;
-            oss << "<p>Time: " << time.toString().toStdString() << "</p>";
-            oss << "<p>Avg Speed</>: " << avgSpeed << " "
-                << (useMetricUnits ? tr("KPH") : tr("MPH")).toStdString()
-                << "</p>";
-            if(avgHr != 0) {
-                oss << "<p>Avg HR: " << avgHr << "</p>";
-            }
-            if(avgPower != 0)
-            {
-                oss << "<p>Avg Power: " << avgPower << " Watts</p>";
-            }
-            oss << "<p>Alt Gained: " << altGained << " "
-                << (useMetricUnits ? tr("Meters") : tr("Feet")).toStdString()
-                << "</p>";
-            oss << "\");" << endl;
-            oss << "map.addOverlay(marker);" << endl;
-            currentInterval = rfp.interval;
-            intervalPoints.clear();
-        }
-    }
+std::string GoogleMapControl::CreateMarker(int number, double lat, double lon, string &html)
+{
+    ostringstream oss;
+    oss.precision(6);
+    oss << "intervalIcon = new GIcon(G_DEFAULT_ICON);" << endl;
+    oss << "intervalIcon.image = \"http://gmaps-samples.googlecode.com/svn/trunk/markers/green/marker" << number << ".png\"" << endl;
+    oss << "markerOptions = { icon:intervalIcon };" << endl;
+    oss << "marker = new GMarker(new GLatLng( ";
+    oss<< lat << "," << lon << "),intervalIcon);" << endl;
+    oss << "marker.bindInfoWindowHtml(\"" << html << "\");";
+    oss.precision(1);
+    oss << "map.addOverlay(marker);" << endl;
     return oss.str();
 }
 

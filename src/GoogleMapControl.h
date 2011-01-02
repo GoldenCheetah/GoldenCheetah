@@ -54,8 +54,12 @@ G_OBJECT
                            std::ostringstream &oss,
                            int avgPower);
     std::string CreateMapToolTipJavaScript();
-    std::string CreateIntervalMarkers();
+    std::string CreateIntervalHtml(QHash<QString,RideMetricPtr> &metrics, QStringList &intervalMetrics,
+                                   QString &intervalName, bool useMetrics);
+    std::string CreateMarkers();
+    std::string CreateIntervalMarkers(RideItem *ride);
     void loadRide();
+    std::string CreateMarker(int number, double lat, double lon, std::string &html);
     // the web browser is loading a page, do NOT start another load
     bool loadingPage;
     // the ride has changed, load a new page
