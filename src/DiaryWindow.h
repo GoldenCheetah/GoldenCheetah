@@ -18,6 +18,7 @@
 
 #ifndef _GC_DiaryWindow_h
 #define _GC_DiaryWindow_h 1
+
 #include "GoldenCheetah.h"
 
 #include <QtGui>

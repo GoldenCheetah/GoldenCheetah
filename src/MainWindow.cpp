@@ -46,7 +46,9 @@
 #include "RideItem.h"
 #include "IntervalItem.h"
 #include "RideEditor.h"
+#ifdef GC_HAVE_ICAL
 #include "DiaryWindow.h"
+#endif
 #include "RideNavigator.h"
 #include "RideFile.h"
 #include "SummaryWindow.h"
@@ -204,11 +206,13 @@ MainWindow::MainWindow(const QDir &home) :
     connect(homeAct, SIGNAL(triggered()), this, SLOT(selectHome()));
     toolbar->addAction(homeAct);
 
+#ifdef GC_HAVE_ICAL
     // diary
     QIcon diaryIcon(":images/toolbar/main/diary.png");
     diaryAct = new QAction(diaryIcon, tr("Diary"), this);
     connect(diaryAct, SIGNAL(triggered()), this, SLOT(selectDiary()));
     toolbar->addAction(diaryAct);
+#endif
 
     // analyse
     QIcon analysisIcon(":images/toolbar/main/analysis.png");
@@ -412,10 +416,11 @@ MainWindow::MainWindow(const QDir &home) :
     tabs.append(TabInfo(summaryWindow, tr("Summary")));
 
     /////////////////////////// Diary ///////////////////////////
-
+#ifdef GC_HAVE_ICAL
     diaryWindow = new DiaryWindow(this);
     diaryWindow->setControls(_rideMetadata);
     diaryControls->addWidget(diaryWindow->controls());
+#endif
 
     /////////////////////////// Ride Plot Tab ///////////////////////////
     allPlotWindow = new AllPlotWindow(this);
@@ -496,7 +501,11 @@ MainWindow::MainWindow(const QDir &home) :
     views->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
     views->addWidget(tabWidget);          // Analysis stuff
     views->addWidget(trainWindow);      // Train Stuff
+#ifdef GC_HAVE_ICAL
     views->addWidget(diaryWindow);
+#else
+    views->addWidget(new QWidget(this)); // need to keep indexes consistent
+#endif
     views->addWidget(homeWindow);
     views->setCurrentIndex(0);          // default to Analysis
     views->setContentsMargins(0,0,0,0);
@@ -1192,7 +1201,9 @@ MainWindow::rideTreeWidgetSelectionChanged()
     _rideMetadata->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
 
     homeWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
+#ifdef GC_HAVE_ICAL
     diaryWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
+#endif
     trainWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
 
     if (!ride)

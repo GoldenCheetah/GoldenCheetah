@@ -23,11 +23,15 @@
 #include "AerolabWindow.h"
 #include "AllPlotWindow.h"
 #include "CriticalPowerWindow.h"
+#ifdef GC_HAVE_ICAL
 #include "DiaryWindow.h"
+#endif
 #include "GoogleMapControl.h"
 #include "HistogramWindow.h"
 #include "LTMWindow.h"
+#ifdef GC_HAVE_QWTPLOT3D
 #include "ModelWindow.h"
+#endif
 #include "PerformanceManagerWindow.h"
 #include "PfPvWindow.h"
 #include "RaceWindow.h" // XXX not done
@@ -71,7 +75,11 @@ GcWindowRegistry::newGcWindow(GcWinID id, MainWindow *main) //XXX mainWindow wil
     case GcWindowTypes::Aerolab: returning = new AerolabWindow(main); break;
     case GcWindowTypes::AllPlot: returning = new AllPlotWindow(main); break;
     case GcWindowTypes::CriticalPower: returning = new CriticalPowerWindow(main->home, main); break;
+#ifdef GC_HAVE_ICAL
     case GcWindowTypes::Diary: returning = new DiaryWindow(main); break;
+#else
+    case GcWindowTypes::Diary: returning = new GcWindow(); break;
+#endif
     case GcWindowTypes::GoogleMap: returning = new GoogleMapControl(main); break;
     case GcWindowTypes::Histogram: returning = new HistogramWindow(main); break;
     case GcWindowTypes::LTM: returning = new LTMWindow(main, main->useMetricUnits, main->home); break;
