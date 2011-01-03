@@ -128,7 +128,7 @@ class GcWindowDialog : public QDialog
         QPushButton *ok, *cancel;
         GcWindow *win;
         QLineEdit *title;
-        QSpinBox *height, *width;
+        QDoubleSpinBox *height, *width;
 };
 
 class ViewParser : public QXmlDefaultHandler
