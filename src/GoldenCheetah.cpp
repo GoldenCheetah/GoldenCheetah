@@ -21,6 +21,8 @@
 #include <QDebug>
 #include <QPainter>
 #include <QPixmap>
+#include <QEvent>
+#include <QMouseEvent>
 
 QWidget *GcWindow::controls() const
 {
@@ -65,33 +67,43 @@ void GcWindow::setRideItem(RideItem* x)
     emit rideItemChanged(_rideItem);
 }
 
-int GcWindow::widthFactor() const
+double GcWindow::widthFactor() const
 {
     return _widthFactor;
 }
 
-void GcWindow::setWidthFactor(int x)
+void GcWindow::setWidthFactor(double x)
 {
     _widthFactor = x;
     emit widthFactorChanged(x);
 }
 
-int  GcWindow::heightFactor() const
+double  GcWindow::heightFactor() const
 {
     return _heightFactor;
 }
 
-void GcWindow::setHeightFactor(int x)
+void GcWindow::setHeightFactor(double x)
 {
     _heightFactor = x;
     emit heightFactorChanged(x);
+}
+
+void GcWindow::setResizable(bool x)
+{
+    _resizable = x;
+}
+
+bool GcWindow::resizable() const
+{
+    return _resizable;
 }
 
 GcWindow::GcWindow()
 {
 }
 
-GcWindow::GcWindow(QWidget *parent) : QFrame(parent) {
+GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
     qRegisterMetaType<QWidget*>("controls");
     qRegisterMetaType<RideItem*>("ride");
     qRegisterMetaType<GcWinID>("type");
@@ -100,6 +112,8 @@ GcWindow::GcWindow(QWidget *parent) : QFrame(parent) {
     setRideItem(NULL);
     setTitle("");
     setContentsMargins(0,0,0,0);
+    setResizable(false);
+    setMouseTracking(true);
 }
 
 GcWindow::~GcWindow()
@@ -118,7 +132,7 @@ GcWindow::amVisible()
 
 
 void
-GcWindow::paintEvent(QPaintEvent * /*event*/)
+GcWindow::paintEvent(QPaintEvent *event)
 {
     static QPixmap closeImage = QPixmap(":images/toolbar/popbutton.png");
     static QPixmap aluBar = QPixmap(":images/aluBar.png");
@@ -179,5 +193,285 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         } else {
             painter.drawTiledPixmap(all, aluLight);
         }
+    }
+}
+
+/*----------------------------------------------------------------------
+ * Drag and resize tiles
+ *--------------------------------------------------------------------*/
+
+bool
+GcWindow::eventFilter(QObject *, QEvent *e)
+{
+    if (!resizable()) return false;
+
+    // handle moving / resizing activity
+    if (dragState != None) {
+        switch (e->type()) {
+        case QEvent::MouseMove:
+            mouseMoveEvent((QMouseEvent*)e);
+            return false;
+            break;
+        case QEvent::MouseButtonRelease:
+            mouseReleaseEvent((QMouseEvent*)e);
+            return false;
+            break;
+        default:
+            break;
+        }
+    }
+    return false;
+}
+
+void
+GcWindow::mousePressEvent(QMouseEvent *e)
+{
+    if (!resizable() || e->button() == Qt::NoButton || isHidden()) {
+        setDragState(None);
+        return;
+    }
+
+    DragState h = spotHotSpot(e);
+
+    // is it on the close icon?
+    if (h == Close) {
+        setDragState(None);
+        hide();
+        //emit exit();
+        return;
+    } else if (h == Flip) {
+        setDragState(None);
+        //flip();
+    }
+
+    // get current window state
+    oWidth = width();
+    oHeight = height();
+    oWidthFactor = widthFactor();
+    oHeightFactor = heightFactor();
+    oX = pos().x();
+    oY = pos().y();
+    mX = e->globalX();
+    mY = e->globalY();
+
+    setDragState(h); // set drag state then!
+
+    repaint();
+}
+
+void
+GcWindow::mouseReleaseEvent(QMouseEvent *)
+{
+    setDragState(None);
+    repaint();
+}
+
+// for the mouse position, are we in a hotspot?
+// if so, what would the drag state become if we
+// clicked?
+GcWindow::DragState
+GcWindow::spotHotSpot(QMouseEvent *e)
+{
+    // corner
+    int corner = 9;
+    int borderWidth = 3;
+
+    // account for offset XXX map to GcWindow geom
+    int _y = e->y();
+    int _x = e->x();
+    int _height = height();
+    int _width = width();
+
+    if (e->x() > (2 + width() - corner) && e->y() < corner) return (Close);
+    else if (_x <= corner && _y <= corner) return (TLCorner);
+    else if (_x >= (_width-corner) && _y <= corner) return (TRCorner);
+    else if (_x <= corner && _y >= (_height-corner)) return (BLCorner);
+    else if (_x >= (_width-corner) && _y >= (_height-corner)) return (BRCorner);
+    else if (_x <= borderWidth) return (Left);
+    else if (_x >= (_width-borderWidth)) return (Right);
+    else if (_y <= borderWidth) return (Top);
+    else if (_y >= (_height-borderWidth)) return (Bottom);
+    else return (Move);
+}
+
+void
+GcWindow::mouseMoveEvent(QMouseEvent *e)
+{
+    if (!resizable()) return;
+
+    if (dragState == None) {
+        // set the cursor shape
+        setCursorShape(spotHotSpot(e));
+        return;
+    }
+
+    // work out the relative move x and y
+    int relx = e->globalX() - mX;
+    int rely = e->globalY() - mY;
+
+    switch (dragState) {
+
+    default:
+    case Move :
+        move(oX + relx, oY + rely);
+        break;
+
+    case TLCorner :
+        {
+            int newWidth = oWidth - relx;
+            int newHeight = oHeight - rely;
+
+            // need to move and resize
+            if (newWidth > 30 && newHeight > 30) {
+                move(oX + relx, oY + rely);
+                setNewSize(newWidth, newHeight);
+            }
+        }
+        break;
+
+    case TRCorner :
+        {
+            int newWidth = oWidth + relx;
+            int newHeight = oHeight - rely;
+
+            // need to move and resize if changes on y plane
+            if (newWidth > 30 && newHeight > 30) {
+                move(oX, oY + rely);
+                setNewSize(newWidth, newHeight);
+            }
+        }
+        break;
+
+    case BLCorner :
+        {
+            int newWidth = oWidth - relx;
+            int newHeight = oHeight + rely;
+
+            // need to move and resize
+            if (newWidth > 30 && newHeight > 30) {
+                move(oX + relx, oY);
+                setNewSize(newWidth, newHeight);
+            }
+        }
+        break;
+
+    case BRCorner :
+        {
+            int newWidth = oWidth + relx;
+            int newHeight = oHeight + rely;
+
+            // need to move and resize
+            if (newWidth > 30 && newHeight > 30) {
+                setNewSize(newWidth, newHeight);
+            }
+        }
+        break;
+
+    case Top :
+        {
+            int newHeight = oHeight - rely;
+
+            // need to move and resize
+            if (newHeight > 30) {
+                move (oX, oY + rely);
+                setNewSize(oWidth, newHeight);
+            }
+        }
+        break;
+
+    case Bottom :
+        {
+            int newHeight = oHeight + rely;
+
+            // need to move and resize
+            if (newHeight > 30) {
+                setNewSize(oWidth, newHeight);
+            }
+        }
+        break;
+
+    case Left :
+        {
+            int newWidth = oWidth - relx;
+
+            // need to move and resize
+            if (newWidth > 30) {
+                move (oX + relx, oY);
+                setNewSize(newWidth, oHeight);
+            }
+        }
+        break;
+
+    case Right :
+        {
+            int newWidth = oWidth + relx;
+
+            // need to move and resize
+            if (newWidth > 30) {
+                setNewSize(newWidth, oHeight);
+            }
+        }
+        break;
+    }
+
+    //repaint();
+    //QApplication::processEvents(); // flicker...
+}
+
+void
+GcWindow::setNewSize(int w, int h)
+{
+    // convert to height factor
+    double newHF = (double(oHeight) * oHeightFactor) / double(h);
+    double newWF = (double(oWidth) * oWidthFactor) / double(w);
+
+    // don't get too big!
+    if (newHF < 1 || newWF < 1) return; // too big
+
+    // now apply
+    setFixedSize(QSize(w,h));
+
+    // adjust factors
+    setHeightFactor(newHF);
+    setWidthFactor(newWF);
+}
+
+void
+GcWindow::setDragState(DragState d)
+{
+    dragState = d;
+    setCursorShape(d);
+}
+
+void
+GcWindow::setCursorShape(DragState d)
+{
+    // set cursor
+    switch (d) {
+    case Bottom:
+    case Top:
+        setCursor(Qt::SizeVerCursor);
+        break;
+    case Left:
+    case Right:
+        setCursor(Qt::SizeHorCursor);
+        break;
+    case TLCorner:
+    case BRCorner:
+        setCursor(Qt::SizeFDiagCursor);
+        break;
+    case TRCorner:
+    case BLCorner:
+        setCursor(Qt::SizeBDiagCursor);
+        break;
+    case Move:
+        //setCursor(Qt::OpenHandCursor); //XXX sub widgets don't set the cursor...
+        setCursor(Qt::ArrowCursor);
+        break;
+    default:
+    case Close:
+    case None:
+        setCursor(Qt::ArrowCursor);
+        break;
     }
 }

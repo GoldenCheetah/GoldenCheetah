@@ -238,16 +238,19 @@ HomeWindow::styleChanged(int id)
         case 0 : // they are tabs in a TabWidget
             tabbed->addTab(charts[i], charts[i]->property("title").toString());
             charts[i]->setContentsMargins(0,0,0,0);
+            charts[i]->setResizable(false); // we need to show on tab selection!
             charts[i]->hide(); // we need to show on tab selection!
             break;
         case 1 : // they are lists in a GridLayout
             tileGrid->addWidget(charts[i], i,0);
             charts[i]->setContentsMargins(0,25,0,0);
+            charts[i]->setResizable(false); // we need to show on tab selection!
             charts[i]->show();
             break;
         case 2 : // thet are in a FlowLayout
             winFlow->addWidget(charts[i]);
             charts[i]->setContentsMargins(0,15,0,0);
+            charts[i]->setResizable(true); // we need to show on tab selection!
             charts[i]->show();
         default:
             break;
@@ -327,6 +330,7 @@ HomeWindow::addChart(GcWindow* newone)
 
         case 0 :
             newone->setContentsMargins(0,0,0,0);
+            newone->setResizable(false); // we need to show on tab selection!
             tabbed->addTab(newone, newone->property("title").toString());
             break;
         case 1 :
@@ -335,6 +339,7 @@ HomeWindow::addChart(GcWindow* newone)
             // set geometry
             newone->setFixedWidth((tileArea->width()-50));
             newone->setFixedHeight(newone->width() * 0.7);
+            newone->setResizable(false); // we need to show on tab selection!
             int row = chartnum; // / 2;
             int column = 0; //chartnum % 2;
             newone->setContentsMargins(0,25,0,0);
@@ -343,18 +348,18 @@ HomeWindow::addChart(GcWindow* newone)
             break;
         case 2 :
             {
-                int heightFactor = newone->property("heightFactor").toInt();
-                int widthFactor = newone->property("widthFactor").toInt();
+                double heightFactor = newone->property("heightFactor").toDouble();
+                double widthFactor = newone->property("widthFactor").toDouble();
 
                 // width of area minus content margins and spacing around each item
                 // divided by the number of items
 
-                int newwidth = (winArea->width() - 20 /* scrollbar */
+                double newwidth = (winArea->width() - 20 /* scrollbar */
                                - 40 /* left and right marings */
                                - ((widthFactor-1) * 20) /* internal spacing */
                                ) / widthFactor;
 
-                int newheight = (winArea->height()
+                double newheight = (winArea->height()
                                - 40 /* top and bottom marings */
                                - ((heightFactor-1) * 20) /* internal spacing */
                                ) / heightFactor;
@@ -366,6 +371,7 @@ HomeWindow::addChart(GcWindow* newone)
                 if (newheight < minHeight) newheight = minHeight;
                 else newone->setFixedHeight(newheight);
                 newone->setContentsMargins(0,15,0,0);
+                newone->setResizable(true); // we need to show on tab selection!
                 winFlow->addWidget(newone);
             }
             break;
@@ -422,7 +428,7 @@ HomeWindow::removeChart(int num)
 }
 
 void
-HomeWindow::resizeEvent(QResizeEvent *)
+HomeWindow::resizeEvent(QResizeEvent *e)
 {
     foreach (GcWindow *x, charts) {
 
@@ -440,16 +446,16 @@ HomeWindow::resizeEvent(QResizeEvent *)
 
         case 2 : // flow
             {
-            int heightFactor = x->property("heightFactor").toInt();
-            int widthFactor = x->property("widthFactor").toInt();
+            double heightFactor = x->property("heightFactor").toDouble();
+            double widthFactor = x->property("widthFactor").toDouble();
 
 
-            int newwidth = (winArea->width() - 20 /* scrollbar */
+            double newwidth = (winArea->width() - 20 /* scrollbar */
                            - 40 /* left and right marings */
                            - ((widthFactor-1) * 20) /* internal spacing */
                            ) / widthFactor;
 
-            int newheight = (winArea->height()  
+            double newheight = (winArea->height()  
                            - 40 /* top and bottom marings */
                            - ((heightFactor-1) * 20) /* internal spacing */
                            ) / heightFactor;
@@ -534,7 +540,7 @@ HomeWindow::eventFilter(QObject *object, QEvent *e)
                             clicked = NULL;
                         }
                     }
-                    return true;
+                    return false;
                 }
             }
         }
@@ -565,11 +571,11 @@ GcWindowDialog::GcWindowDialog(GcWinID type, MainWindow *mainWindow) : mainWindo
     chartLayout->addWidget(win);
 
     controlLayout = new QFormLayout;
-    height=new QSpinBox(this);
+    height=new QDoubleSpinBox(this);
     height->setRange(1,10);
     height->setSingleStep(1);
     height->setValue(2);
-    width=new QSpinBox(this);
+    width=new QDoubleSpinBox(this);
     width->setRange(1,10);
     width->setSingleStep(1);
     width->setValue(2);
@@ -625,6 +631,9 @@ GcWindowDialog::exec()
     } else return NULL;
 }
 
+/*----------------------------------------------------------------------
+ * Save and restore state (xxxx-layout.xml)
+ *--------------------------------------------------------------------*/
 // static helper to protect special xml characters
 // ideally we would use XMLwriter to do this but
 // the file format is trivial and this implementation
@@ -820,3 +829,4 @@ bool ViewParser::endDocument()
 {
     return TRUE;
 }
+

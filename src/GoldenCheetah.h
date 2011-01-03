@@ -65,26 +65,37 @@ private:
     Q_PROPERTY(RideItem* ride READ rideItem WRITE setRideItem NOTIFY rideItemChanged)
 
     // geometry factor
-    Q_PROPERTY(int widthFactor READ widthFactor WRITE setWidthFactor NOTIFY widthFactorChanged USER true);
-    Q_PROPERTY(int heightFactor READ heightFactor WRITE setHeightFactor NOTIFY widthFactorChanged USER true);
+    Q_PROPERTY(double widthFactor READ widthFactor WRITE setWidthFactor NOTIFY widthFactorChanged USER true);
+    Q_PROPERTY(double heightFactor READ heightFactor WRITE setHeightFactor NOTIFY widthFactorChanged USER true);
+
+    // can be resized
+    Q_PROPERTY(bool resizable READ resizable WRITE setResizable USER true);
 
     QWidget *_controls;
     QString _title;
     QString _instanceName;
     RideItem *_rideItem;
     GcWinID _type;
-    int _widthFactor;
-    int _heightFactor;
+    double _widthFactor;
+    double _heightFactor;
+    bool _resizable;
 
     // we paint a heading if there is space in the top margin
     void paintEvent (QPaintEvent * event);
+    enum drag { None, Close, Flip, Move, Left, Right, Top, Bottom, TLCorner, TRCorner, BLCorner, BRCorner };
+    typedef enum drag DragState;
+    // state data for resizing tiles
+    DragState dragState;
+    int oWidth, oHeight, oX, oY, mX, mY;
+    double oHeightFactor, oWidthFactor;
+
 
 signals:
     void controlsChanged(QWidget*);
     void titleChanged(QString);
     void rideItemChanged(RideItem*);
-    void heightFactorChanged(int);
-    void widthFactorChanged(int);
+    void heightFactorChanged(double);
+    void widthFactorChanged(double);
 
 public:
 
@@ -105,16 +116,30 @@ public:
     void setRideItem(RideItem *);
     RideItem *rideItem() const;
 
-    void setWidthFactor(int);
-    int widthFactor() const;
+    void setWidthFactor(double);
+    double widthFactor() const;
 
-    void setHeightFactor(int);
-    int heightFactor() const;
+    void setHeightFactor(double);
+    double heightFactor() const;
+
+    void setResizable(bool);
+    bool resizable() const;
 
     GcWinID type() const { return _type; }
     void setType(GcWinID x) { _type = x; } // only really used by the window registry
 
     virtual bool amVisible();
+
+    // mouse actions -- resizing and dragging tiles
+    bool eventFilter(QObject *object, QEvent *e);
+    virtual void mousePressEvent(QMouseEvent *);
+    virtual void mouseReleaseEvent(QMouseEvent *);
+    virtual void mouseMoveEvent(QMouseEvent *);
+    void setDragState(DragState);
+    void setCursorShape(DragState);
+    DragState spotHotSpot(QMouseEvent *);
+    void setNewSize(int w, int h);
+
 };
 
 
