@@ -67,8 +67,8 @@ qwt3d {
 }
 
 !isEmpty( ICAL_INSTALL) {
-    HEADERS += ICalendar.h
-    SOURCES += ICalendar.cpp
+    HEADERS += ICalendar.h DiaryWindow.h GcCalendarModel.h
+    SOURCES += ICalendar.cpp DiaryWindow.cpp
     ICAL_INCLUDE = $${ICAL_INSTALL}/include
     ICAL_LIBS = $${ICAL_INSTALL}/lib/libical.a
     DEFINES += GC_HAVE_ICAL
@@ -146,12 +146,10 @@ HEADERS += \
         Device.h \
         DeviceTypes.h \
         DeviceConfiguration.h \
-        DiaryWindow.h \
         DownloadRideDialog.h \
         ErgFile.h \
         ErgFilePlot.h \
         FitRideFile.h \
-        GcCalendarModel.h \
         GcPane.h \
         GcRideFile.h \
         GcWindowLayout.h \
@@ -291,7 +289,6 @@ SOURCES += \
         Device.cpp \
         DeviceTypes.cpp \
         DeviceConfiguration.cpp \
-        DiaryWindow.cpp \
         DownloadRideDialog.cpp \
         ErgFile.cpp \
         ErgFilePlot.cpp \
