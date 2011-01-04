@@ -382,10 +382,10 @@ HomeWindow::addChart(GcWindow* newone)
     }
 }
 
-void
+bool
 HomeWindow::removeChart(int num)
 {
-    if (num >= charts.count()) return; // out of bounds (!)
+    if (num >= charts.count()) return false; // out of bounds (!)
 
     // better let the user confirm since this
     // is undoable etc - code swiped from delete
@@ -397,7 +397,7 @@ HomeWindow::removeChart(int num)
     msgBox.setDefaultButton(QMessageBox::Cancel);
     msgBox.setIcon(QMessageBox::Critical);
     msgBox.exec();
-    if(msgBox.clickedButton() != deleteButton) return;
+    if(msgBox.clickedButton() != deleteButton) return false;
 
     charts[num]->hide();
 
@@ -425,6 +425,7 @@ HomeWindow::removeChart(int num)
     charts.removeAt(num);
 
     update();
+    return true;
 }
 
 void
@@ -517,7 +518,7 @@ HomeWindow::eventFilter(QObject *object, QEvent *e)
 
                     // close button?
                     if (x > (charts[i]->width()-15)) {
-                        removeChart(i);
+                        return removeChart(i);
 
                     } else {
 
