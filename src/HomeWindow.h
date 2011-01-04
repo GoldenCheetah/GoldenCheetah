@@ -61,7 +61,7 @@ class HomeWindow : public GcWindow
         // My widget signals and events
         void styleChanged(int);
         void addChart(GcWindow* newone);
-        void removeChart(int);
+        bool removeChart(int);
 
         // save / restore window state
         void saveState();

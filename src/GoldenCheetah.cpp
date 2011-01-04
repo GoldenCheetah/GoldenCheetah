@@ -236,7 +236,7 @@ GcWindow::mousePressEvent(QMouseEvent *e)
     // is it on the close icon?
     if (h == Close) {
         setDragState(None);
-        hide();
+        //hide();
         //emit exit();
         return;
     } else if (h == Flip) {
@@ -425,8 +425,8 @@ GcWindow::setNewSize(int w, int h)
     double newHF = (double(oHeight) * oHeightFactor) / double(h);
     double newWF = (double(oWidth) * oWidthFactor) / double(w);
 
-    // don't get too big!
-    if (newHF < 1 || newWF < 1) return; // too big
+    // don't get too wide
+    if (newWF < 1) return; // too big
 
     // now apply
     setFixedSize(QSize(w,h));
