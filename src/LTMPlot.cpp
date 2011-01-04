@@ -305,7 +305,7 @@ LTMPlot::setData(LTMSettings *set)
                 brushColor.setAlpha(200); // now side by side, less transparency required
             QBrush brush = QBrush(brushColor);
             current->setBrush(brush);
-            current->setPen(cpen);
+            current->setPen(Qt::NoPen);
             current->setCurveAttribute(QwtPlotCurve::Inverted, true);
 
             sym.setStyle(QwtSymbol::NoSymbol);
@@ -585,7 +585,7 @@ LTMPlot::setData(LTMSettings *set)
             brushColor.setAlpha(200); // now side by side, less transparency required
             QBrush brush = QBrush(brushColor);
             current->setBrush(brush);
-            current->setPen(cpen);
+            current->setPen(Qt::NoPen);
             current->setCurveAttribute(QwtPlotCurve::Inverted, true);
 
             sym.setStyle(QwtSymbol::NoSymbol);
