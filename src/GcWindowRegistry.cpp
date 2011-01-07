@@ -34,6 +34,7 @@
 #endif
 #include "PerformanceManagerWindow.h"
 #include "PfPvWindow.h"
+#include "HrPwWindow.h"
 #include "RaceWindow.h" // XXX not done
 #include "RealtimeWindow.h"
 #include "RideEditor.h"
@@ -56,6 +57,7 @@ GcWindowRegistry GcWindows[] = {
     { "3d",                     GcWindowTypes::Model },
     { "Performance Manager",    GcWindowTypes::PerformanceManager },
     { "PfPv",                   GcWindowTypes::PfPv },
+    { "HrPw",                   GcWindowTypes::HrPw },
     { "Training",               GcWindowTypes::Training },
     { "Ride Editor",            GcWindowTypes::RideEditor },
     { "Ride Summary",           GcWindowTypes::RideSummary },
@@ -90,6 +92,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, MainWindow *main) //XXX mainWindow wil
 #endif
     case GcWindowTypes::PerformanceManager: returning = new PerformanceManagerWindow(main); break;
     case GcWindowTypes::PfPv: returning = new PfPvWindow(main); break;
+    case GcWindowTypes::HrPw: returning = new HrPwWindow(main); break;
     case GcWindowTypes::Training: returning = new TrainWindow(main, main->home); break;
     case GcWindowTypes::RideEditor: returning = new RideEditor(main); break;
     case GcWindowTypes::RideSummary: returning = new RideSummaryWindow(main); break;

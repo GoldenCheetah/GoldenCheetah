@@ -46,6 +46,7 @@ enum gcwinid {
         Train =17,
         TreeMap =18,
         WeeklySummary =19,
+        HrPw =20,
 };
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;
