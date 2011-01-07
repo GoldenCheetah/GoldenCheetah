@@ -38,6 +38,7 @@
 #endif
 #include "LTMWindow.h"
 #include "PfPvWindow.h"
+#include "HrPwWindow.h"
 #include "DownloadRideDialog.h"
 #include "ManualRideDialog.h"
 #include "HistogramWindow.h"
@@ -440,6 +441,11 @@ MainWindow::MainWindow(const QDir &home) :
 
     pfPvWindow = new PfPvWindow(this);
     tabs.append(TabInfo(pfPvWindow, tr("PF/PV")));
+
+    //////////////////////// HrPw Plot ////////////////////////
+
+    hrPwWindow = new HrPwWindow(this);
+    tabs.append(TabInfo(hrPwWindow, tr("HrPw")));
 
     //////////////////////// Scatter Plot ////////////////////////
 

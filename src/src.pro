@@ -164,6 +164,8 @@ HEADERS += \
         HistogramWindow.h \
         HomeWindow.h \
         HrZones.h \
+        HrPwPlot.h \
+        HrPwWindow.h \
         IntervalItem.h \
         JsonRideFile.h \
         LogTimeScaleDraw.h \
@@ -217,6 +219,7 @@ HEADERS += \
         RideNavigator.h \
         RideNavigatorProxy.h \
         SaveDialogs.h \
+        SmallPlot.h \
         RideSummaryWindow.h \
         ScatterPlot.h \
         ScatterWindow.h \
@@ -312,6 +315,8 @@ SOURCES += \
         HomeWindow.cpp \
         HrTimeInZone.cpp \
         HrZones.cpp \
+        HrPwPlot.cpp \
+        HrPwWindow.cpp \
         IntervalItem.cpp \
         LogTimeScaleDraw.cpp \
         LogTimeScaleEngine.cpp \
@@ -372,6 +377,7 @@ SOURCES += \
         Settings.cpp \
         SimpleNetworkController.cpp \
         SimpleNetworkClient.cpp \
+        SmallPlot.cpp \
         SpecialFields.cpp \
         SplitRideDialog.cpp \
         SrdRideFile.cpp \
@@ -379,7 +385,7 @@ SOURCES += \
         StressCalculator.cpp \
         SummaryMetrics.cpp \
         SummaryWindow.cpp \
-	    TacxCafRideFile.cpp \
+        TacxCafRideFile.cpp \
         TcxParser.cpp \
         TcxRideFile.cpp \
         TxtRideFile.cpp \

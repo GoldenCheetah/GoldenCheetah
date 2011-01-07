@@ -36,6 +36,7 @@ class AllPlotWindow;
 class CriticalPowerWindow;
 class HistogramWindow;
 class PfPvWindow;
+class HrPwWindow;
 class QwtPlotPanner;
 class QwtPlotPicker;
 class QwtPlotZoomer;
@@ -291,6 +292,8 @@ class MainWindow : public QMainWindow
 
         // pedal force/pedal velocity scatter plot widgets
         PfPvWindow  *pfPvWindow;
+
+        HrPwWindow  *hrPwWindow;
 
 	RideItem *ride;  // the currently selected ride
 

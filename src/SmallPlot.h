@@ -1,0 +1,70 @@
+/*
+ * Copyright (c) 2011 Damien Grauser
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#ifndef _GC_SmallPlot_h
+#define _GC_SmallPlot_h 1
+
+#include <qwt_plot.h>
+#include <QtGui>
+
+class QwtPlotCurve;
+class QwtPlotGrid;
+class QwtPlotMarker;
+class RideItem;
+
+class SmallPlot : public QwtPlot
+{
+    Q_OBJECT
+
+    public:
+
+        SmallPlot(QWidget *parent=0);
+
+
+        int smoothing() const { return smooth; }
+        void setData(RideItem *ride);
+        void setAxisTitle(int axis, QString label);
+        void recalc();
+        void setYMax();
+        void setXTitle();
+
+    public slots:
+
+        void showPower(int state);
+        void showHr(int state);
+        void setSmoothing(int value);
+
+    protected:
+
+        QwtPlotGrid *grid;
+        QwtPlotCurve *wattsCurve;
+        QwtPlotCurve *hrCurve;
+
+        QwtPlotMarker* d_mrk;
+        QVector<double> hrArray;
+        QVector<double> wattsArray;
+        QVector<double> timeArray;
+        QVector<QwtPlotCurve*> timeCurves;
+        int arrayLength;
+
+        QVector<int> interArray;
+
+        int smooth;
+};
+
+#endif // _GC_SmallPlot_h
