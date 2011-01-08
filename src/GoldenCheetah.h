@@ -70,6 +70,7 @@ private:
 
     // can be resized
     Q_PROPERTY(bool resizable READ resizable WRITE setResizable USER true);
+    Q_PROPERTY(bool gripped READ gripped WRITE setGripped);
 
     QWidget *_controls;
     QString _title;
@@ -79,6 +80,7 @@ private:
     double _widthFactor;
     double _heightFactor;
     bool _resizable;
+    bool _gripped;
 
     // we paint a heading if there is space in the top margin
     void paintEvent (QPaintEvent * event);
@@ -96,6 +98,10 @@ signals:
     void rideItemChanged(RideItem*);
     void heightFactorChanged(double);
     void widthFactorChanged(double);
+    void resizing(GcWindow*);
+    void moving(GcWindow*);
+    void resized(GcWindow*); // finished resizing
+    void moved(GcWindow*);   // finished moving
 
 public:
 
@@ -125,10 +131,16 @@ public:
     void setResizable(bool);
     bool resizable() const;
 
+    void setGripped(bool);
+    bool gripped() const;
+
     GcWinID type() const { return _type; }
     void setType(GcWinID x) { _type = x; } // only really used by the window registry
 
     virtual bool amVisible();
+
+    // for sorting... we look at x
+    bool operator< (GcWindow right) const { return geometry().x() < right.geometry().x(); }
 
     // mouse actions -- resizing and dragging tiles
     bool eventFilter(QObject *object, QEvent *e);

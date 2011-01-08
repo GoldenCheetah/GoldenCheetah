@@ -379,6 +379,12 @@ HomeWindow::addChart(GcWindow* newone)
         // add to the list
         charts.append(newone);
         newone->hide();
+
+        // watch for moves etc
+        connect(newone, SIGNAL(resizing(GcWindow*)), this, SLOT(windowResizing(GcWindow*)));
+        connect(newone, SIGNAL(moving(GcWindow*)), this, SLOT(windowMoving(GcWindow*)));
+        connect(newone, SIGNAL(resized(GcWindow*)), this, SLOT(windowResized(GcWindow*)));
+        connect(newone, SIGNAL(moved(GcWindow*)), this, SLOT(windowMoved(GcWindow*)));
     }
 }
 
@@ -456,7 +462,7 @@ HomeWindow::resizeEvent(QResizeEvent *e)
                            - ((widthFactor-1) * 20) /* internal spacing */
                            ) / widthFactor;
 
-            double newheight = (winArea->height()  
+            double newheight = (winArea->height()
                            - 40 /* top and bottom marings */
                            - ((heightFactor-1) * 20) /* internal spacing */
                            ) / heightFactor;
@@ -548,6 +554,167 @@ HomeWindow::eventFilter(QObject *object, QEvent *e)
         return false;
     }
     return false;
+}
+
+void
+HomeWindow::windowMoved(GcWindow*w)
+{
+
+}
+
+void
+HomeWindow::windowResized(GcWindow*w)
+{
+}
+
+void
+HomeWindow::windowMoving(GcWindow*w)
+{
+    // ensure the mouse pointer is visible
+    QPoint pos = winWidget->mapFromGlobal(QCursor::pos());
+    winArea->ensureVisible(pos.x(), pos.y(), 20, 20);
+
+    // since the widget has moved, the mouse is no longer
+    // in the same position relevant to the widget, so
+    // move the mouse back to the same position relevant
+    // to the widget
+    QCursor::setPos(winWidget->mapToGlobal(pos));
+
+    // Move the other windows out the way...
+    for(int i=0; i<charts.count(); i++) {
+        if (charts[i] != w && !charts[i]->gripped() && charts[i]->geometry().intersects(w->geometry())) {
+            // shift whilst we move then
+            QRect inter = charts[i]->geometry().intersected(w->geometry());
+            // move left
+            if (charts[i]->geometry().x() < w->geometry().x()) {
+                int newx = inter.x() - 20 - charts[i]->geometry().width();
+                if (charts[i]->geometry().x() > newx)
+                    charts[i]->move(newx, charts[i]->geometry().y());
+            } else {
+                int newx = inter.x()+inter.width() + 20;
+                if (charts[i]->geometry().x() < newx)
+                charts[i]->move(newx, charts[i]->geometry().y());
+            }
+            windowMoving(charts[i]); // move the rest...
+        }
+    }
+
+    // now if any are off the screen try and get them
+    // back on the screen without disturbing the other
+    // charts (unless they are off the screen too)
+    for(int i=0; i<charts.count(); i++) {
+
+        if (!charts[i]->gripped() && (charts[i]->x() < 20 || (charts[i]->x()+charts[i]->width()) > winArea->geometry().width())) {
+
+            // to the left...
+            if (charts[i]->geometry().x() < 20) {
+
+                QRect back(20, charts[i]->geometry().y(),
+                           charts[i]->geometry().width(),
+                           charts[i]->geometry().height());
+
+                // loop through the other charts and see
+                // how far it can sneak back on...
+                for(int j=0; j<charts.count(); j++) {
+                    if (charts[j] != charts[i]) {
+                        if (back.intersects(charts[j]->geometry())) {
+                            QRect inter = back.intersected(charts[j]->geometry());
+                            int newx = inter.x() - back.width() - 20;
+                            if (back.x() > newx) {
+                                back.setX(newx);
+                                back.setWidth(charts[i]->width());
+                            }
+                        }
+                    }
+                }
+#if 0
+                // any space?
+                if (back.x() < 20) {
+                    // we're still off screen so
+                    // lets shift all the windows to the
+                    // right if we can
+                    QList<GcWindow*> obstacles;
+                    QRect fback(20, charts[i]->geometry().y(),
+                            charts[i]->geometry().width(),
+                            charts[i]->geometry().height());
+
+
+                    // order obstacles left to right
+                    for(int j=0; j<charts.count(); j++) {
+                        if (charts[j] != charts[i] &&
+                            fback.intersects(charts[j]->geometry()))
+                        obstacles.append(charts[j]);
+                        qSort(obstacles);
+                    }
+
+                    // where to stop? all or is the
+                    // gripped window in there
+                    // or stop if offscreen already
+                    int stop=0;
+                    while (stop < obstacles.count()) {
+                        if (obstacles[stop]->gripped() ||
+                            (obstacles[stop]->geometry().x() + obstacles[stop]->width()) > winArea->width())
+                            break;
+                        stop++;
+                    }
+
+                    // at this point we know that members
+                    // 0 - stop are possibly in our way
+                    // we need to move the leftmost, if it
+                    // fits we stop, if not we move the next one
+                    // and the leftmost, then the next one
+                    // until we have exhausted all candidates
+
+                    // try again!
+                    // loop through the other charts and see
+                    // how far it can sneak back on...
+                    back = QRect(20, charts[i]->geometry().y(),
+                           charts[i]->geometry().width(),
+                           charts[i]->geometry().height());
+                    for(int j=0; j<charts.count(); j++) {
+                        if (charts[j] != charts[i]) {
+                            if (back.intersects(charts[j]->geometry())) {
+                                QRect inter = back.intersected(charts[j]->geometry());
+                                back.setX(inter.x()-back.width()-20);
+                            }
+                        }
+                    }
+                }
+#endif
+
+                charts[i]->move(back.x(), back.y());
+
+            } else {
+
+                QRect back(winArea->width() - charts[i]->width() - 20,
+                           charts[i]->geometry().y(),
+                           charts[i]->geometry().width(),
+                           charts[i]->geometry().height());
+
+                // loop through the other charts and see
+                // how far it can sneak back on...
+                for(int j=0; j<charts.count(); j++) {
+                    if (charts[j] != charts[i]) {
+                        if (back.intersects(charts[j]->geometry())) {
+                            QRect inter = back.intersected(charts[j]->geometry());
+                            int newx = inter.x() + inter.width() + 20;
+                            if (back.x() < newx) back.setX(newx);
+                        }
+                    }
+                }
+
+                // any space?
+                charts[i]->move(back.x(), back.y());
+            }
+        }
+    }
+}
+
+void
+HomeWindow::windowResizing(GcWindow*w)
+{
+    QPoint pos = this->mapFromGlobal(QCursor::pos());
+    winArea->ensureVisible(pos.x(), pos.y(), 20, 20);
 }
 
 GcWindowDialog::GcWindowDialog(GcWinID type, MainWindow *mainWindow) : mainWindow(mainWindow), type(type)
@@ -830,4 +997,3 @@ bool ViewParser::endDocument()
 {
     return TRUE;
 }
-
