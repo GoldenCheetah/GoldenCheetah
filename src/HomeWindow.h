@@ -70,6 +70,12 @@ class HomeWindow : public GcWindow
         //notifiction that been made visible
         void selected();
 
+        // moved or resized
+        void windowMoving(GcWindow*);
+        void windowResizing(GcWindow*);
+        void windowMoved(GcWindow*);
+        void windowResized(GcWindow*);
+
     protected:
         MainWindow *mainWindow;
         bool active; // ignore gui signals when changing views

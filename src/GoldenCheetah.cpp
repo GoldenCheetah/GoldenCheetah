@@ -99,6 +99,16 @@ bool GcWindow::resizable() const
     return _resizable;
 }
 
+void GcWindow::setGripped(bool x)
+{
+    _gripped = x;
+}
+
+bool GcWindow::gripped() const
+{
+    return _gripped;
+}
+
 GcWindow::GcWindow()
 {
 }
@@ -251,8 +261,8 @@ GcWindow::mousePressEvent(QMouseEvent *e)
     oHeightFactor = heightFactor();
     oX = pos().x();
     oY = pos().y();
-    mX = e->globalX();
-    mY = e->globalY();
+    mX = mapFromGlobal(QCursor::pos()).x();
+    mY = mapFromGlobal(QCursor::pos()).y();
 
     setDragState(h); // set drag state then!
 
@@ -262,6 +272,20 @@ GcWindow::mousePressEvent(QMouseEvent *e)
 void
 GcWindow::mouseReleaseEvent(QMouseEvent *)
 {
+    // tell the owner!
+    if (dragState == Move) {
+        setProperty("gripped", false);
+        emit moved(this);
+    } else if (dragState == Left ||
+               dragState == Right ||
+               dragState == Top ||
+               dragState == Bottom ||
+               dragState == TLCorner ||
+               dragState == TRCorner ||
+               dragState == BLCorner ||
+               dragState == BRCorner) {
+        emit resized(this);
+    }
     setDragState(None);
     repaint();
 }
@@ -306,14 +330,15 @@ GcWindow::mouseMoveEvent(QMouseEvent *e)
     }
 
     // work out the relative move x and y
-    int relx = e->globalX() - mX;
-    int rely = e->globalY() - mY;
+    int relx = mapFromGlobal(QCursor::pos()).x() - mX;
+    int rely = mapFromGlobal(QCursor::pos()).y() - mY;
 
     switch (dragState) {
 
     default:
     case Move :
         move(oX + relx, oY + rely);
+        emit moving(this);
         break;
 
     case TLCorner :
@@ -325,6 +350,7 @@ GcWindow::mouseMoveEvent(QMouseEvent *e)
             if (newWidth > 30 && newHeight > 30) {
                 move(oX + relx, oY + rely);
                 setNewSize(newWidth, newHeight);
+                emit resizing(this);
             }
         }
         break;
@@ -338,6 +364,7 @@ GcWindow::mouseMoveEvent(QMouseEvent *e)
             if (newWidth > 30 && newHeight > 30) {
                 move(oX, oY + rely);
                 setNewSize(newWidth, newHeight);
+                emit resizing(this);
             }
         }
         break;
@@ -351,6 +378,7 @@ GcWindow::mouseMoveEvent(QMouseEvent *e)
             if (newWidth > 30 && newHeight > 30) {
                 move(oX + relx, oY);
                 setNewSize(newWidth, newHeight);
+                emit resizing(this);
             }
         }
         break;
@@ -363,6 +391,7 @@ GcWindow::mouseMoveEvent(QMouseEvent *e)
             // need to move and resize
             if (newWidth > 30 && newHeight > 30) {
                 setNewSize(newWidth, newHeight);
+                emit resizing(this);
             }
         }
         break;
@@ -375,6 +404,7 @@ GcWindow::mouseMoveEvent(QMouseEvent *e)
             if (newHeight > 30) {
                 move (oX, oY + rely);
                 setNewSize(oWidth, newHeight);
+                emit resizing(this);
             }
         }
         break;
@@ -386,6 +416,7 @@ GcWindow::mouseMoveEvent(QMouseEvent *e)
             // need to move and resize
             if (newHeight > 30) {
                 setNewSize(oWidth, newHeight);
+                emit resizing(this);
             }
         }
         break;
@@ -398,6 +429,7 @@ GcWindow::mouseMoveEvent(QMouseEvent *e)
             if (newWidth > 30) {
                 move (oX + relx, oY);
                 setNewSize(newWidth, oHeight);
+                emit resizing(this);
             }
         }
         break;
@@ -409,11 +441,14 @@ GcWindow::mouseMoveEvent(QMouseEvent *e)
             // need to move and resize
             if (newWidth > 30) {
                 setNewSize(newWidth, oHeight);
+                emit resizing(this);
             }
         }
         break;
     }
 
+    oX = pos().x();
+    oY = pos().y();
     //repaint();
     //QApplication::processEvents(); // flicker...
 }
@@ -440,6 +475,7 @@ void
 GcWindow::setDragState(DragState d)
 {
     dragState = d;
+    setProperty("gripped", dragState == Move ? true : false);
     setCursorShape(d);
 }
 
