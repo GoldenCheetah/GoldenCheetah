@@ -53,8 +53,6 @@ class HrPwPlot : public QwtPlot
         void setShadeZones(int);
         int isShadeZones() const;
         void refreshZoneLabels();
-
-        int smoothing() const { return smooth; }
         void setDataFromRide(RideItem *ride);
         void setJoinLine(bool value);
         void setAxisTitle(int axis, QString label);
@@ -91,8 +89,10 @@ class HrPwPlot : public QwtPlot
         double *array;
         int arrayLength2;
 
-        int smooth;
-        int hrMin;
+        int delay;
+        int minHr;
+        int minWatt;
+        int maxWatt;
 
         QList <HrPwPlotZoneLabel *> zoneLabels;
         bool shade_zones;     // whether power should be shaded
@@ -103,7 +103,7 @@ class HrPwPlot : public QwtPlot
 
         void addWattStepCurve(QVector<double> &finalWatts, int nbpoints);
         void addHrStepCurve(QVector<double> &finalHr, int nbpoints);
-        void addRegLinCurve(QVector<double> &finalHr, QVector<double> &finalWatts, int nbpoints);
+        void addRegLinCurve(double rpente, double rordonnee);
 
     private:
         QSettings settings;

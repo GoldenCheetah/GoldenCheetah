@@ -79,6 +79,7 @@ HrPwWindow::HrPwWindow(MainWindow *mainWindow) :
     QWidget *c = new QWidget(this);
     setControls(c);
     QFormLayout *cl = new QFormLayout(c);
+
     QLabel *delayLabel = new QLabel(tr("HR delay"), this);
     delayEdit = new QLineEdit(this);
     delayEdit->setFixedWidth(30);
@@ -87,11 +88,28 @@ HrPwWindow::HrPwWindow(MainWindow *mainWindow) :
     delaySlider->setTickPosition(QSlider::TicksBelow);
     delaySlider->setTickInterval(1);
     delaySlider->setMinimum(1);
-    delaySlider->setMaximum(100);;
+    delaySlider->setMaximum(100);
     delayEdit->setValidator(new QIntValidator(delaySlider->minimum(),
                                               delaySlider->maximum(),
                                               delayEdit));
     cl->addRow(delaySlider);
+
+    smooth = 240;
+    QLabel *smoothLabel = new QLabel(tr("Smooth"), this);
+    smoothEdit = new QLineEdit(this);
+    smoothEdit->setFixedWidth(30);
+    smoothEdit->setText(QString("%1").arg(smooth));
+    cl->addRow(smoothLabel, smoothEdit);
+    smoothSlider = new QSlider(Qt::Horizontal);
+    smoothSlider->setTickPosition(QSlider::TicksBelow);
+    smoothSlider->setTickInterval(10);
+    smoothSlider->setMinimum(0);
+    smoothSlider->setMaximum(500);
+    smoothSlider->setValue(smooth);
+    smoothEdit->setValidator(new QIntValidator(smoothSlider->minimum(),
+                                               smoothSlider->maximum(),
+                                               smoothEdit));
+    cl->addRow(smoothSlider);
 
     joinlineCheckBox = new QCheckBox(this);;
     joinlineCheckBox->setText(tr("Join points"));
@@ -110,7 +128,10 @@ HrPwWindow::HrPwWindow(MainWindow *mainWindow) :
                             hrPwPlot, SLOT(pointHover(QwtPlotCurve*, int)));
     connect(joinlineCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setJoinLineFromCheckBox()));
     connect(shadeZones, SIGNAL(stateChanged(int)), this, SLOT(setShadeZones()));
-    connect(delayEdit, SIGNAL(editingFinished()), this, SLOT(setSmoothingFromLineEdit()));
+    connect(smoothEdit, SIGNAL(editingFinished()), this, SLOT(setSmoothingFromLineEdit()));
+    connect(smoothSlider, SIGNAL(valueChanged(int)), this, SLOT(setSmoothingFromSlider()));
+    connect(delayEdit, SIGNAL(editingFinished()), this, SLOT(setDelayFromLineEdit()));
+    connect(delaySlider, SIGNAL(valueChanged(int)), this, SLOT(setDelayFromSlider()));
     //connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
 }
@@ -130,6 +151,7 @@ HrPwWindow::rideSelected()
 void
 HrPwWindow::setData(RideItem *ride)
 {
+    setSmooth(240);
     hrPwPlot->setDataFromRide(ride);
     smallPlot->setData(ride);
 }
@@ -153,13 +175,46 @@ HrPwWindow::setShadeZones()
 }
 
 void
+HrPwWindow::setSmooth(int _smooth)
+{
+    smooth = _smooth;
+    smoothSlider->setValue(_smooth);
+    smoothEdit->setText(QString("%1").arg(_smooth));
+    hrPwPlot->recalc();
+}
+
+void
 HrPwWindow::setSmoothingFromLineEdit()
 {
-    int value = delayEdit->text().toInt();
-        //if (value != allPlot->smoothing()) {
-        //allPlot->setSmoothing(value);
-        delaySlider->setValue(value);
-    //}
+    int _smooth = smoothEdit->text().toInt();
+    setSmooth(_smooth);
+}
+
+void
+HrPwWindow::setSmoothingFromSlider()
+{
+    setSmooth(smoothSlider->value());
+}
+
+void
+HrPwWindow::setDelayFromLineEdit()
+{
+    int delay = delayEdit->text().toInt();
+    if (hrPwPlot->delay != delay) {
+        delaySlider->setValue(delay);
+        hrPwPlot->delay = delaySlider->value();
+        hrPwPlot->recalc();
+    }
+}
+
+void
+HrPwWindow::setDelayFromSlider()
+{
+    if (hrPwPlot->delay != delaySlider->value()) {
+        delayEdit->setText(QString("%1").arg(delaySlider->value()));
+        hrPwPlot->delay = delaySlider->value();
+        hrPwPlot->recalc();
+    }
 }
 
 int

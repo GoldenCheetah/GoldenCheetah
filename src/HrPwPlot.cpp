@@ -42,20 +42,13 @@ HrPwPlot::HrPwPlot(MainWindow *mainWindow, HrPwWindow *hrPwWindow) :
     QwtPlot(hrPwWindow),
     hrPwWindow(hrPwWindow),
     mainWindow(mainWindow),
-    bg(NULL), smooth(240), hrMin(50),
+    bg(NULL), delay(-1),
+    minHr(50), minWatt(50), maxWatt(500),
     settings(GC_SETTINGS_CO, GC_SETTINGS_APP),
     unit(settings.value(GC_UNIT))
 {
     setCanvasBackground(Qt::white);
     setXTitle(); // Power (Watts)
-
-    // Heart Rate Curve
-
-    hrCurves.resize(36);
-    for (int i = 0; i < 36; ++i) {
-        hrCurves[i] = new QwtPlotCurve;
-        hrCurves[i]->attach(this);
-    }
 
     // Linear Regression Curve
     regCurve = new QwtPlotCurve("reg");
@@ -82,6 +75,14 @@ HrPwPlot::HrPwPlot(MainWindow *mainWindow, HrPwWindow *hrPwWindow) :
     hrStepCurve->setPen(QPen(hrColor2));
     hrStepCurve->setBrush(QBrush(hrColor));
     hrStepCurve->attach(this);
+
+    // Heart Rate Curve
+
+    hrCurves.resize(36);
+    for (int i = 0; i < 36; ++i) {
+        hrCurves[i] = new QwtPlotCurve;
+        hrCurves[i]->attach(this);
+    }
 
     // Grid
     grid = new QwtPlotGrid();
@@ -123,6 +124,7 @@ HrPwPlot::setAxisTitle(int axis, QString label)
     QwtPlot::setAxisFont(axis, stGiles);
     QwtPlot::setAxisTitle(axis, title);
 }
+
 void
 HrPwPlot::recalc()
 {
@@ -134,9 +136,12 @@ HrPwPlot::recalc()
         return;
     }
 
+
+
+
     // Find Hr Delay
     //int delayori = findDelay(wattsArray, hrArray, rideTimeSecs/5);
-    int delay  = 0;
+    //int delay  = 0;
 
 
     // ------ smoothing -----
@@ -150,20 +155,21 @@ HrPwPlot::recalc()
     QVector<double> smoothTime(rideTimeSecs + 1);
     int decal=0;
 
-    for (int secs = 0; ((secs < smooth) && (secs < rideTimeSecs)); ++secs) {
+    /*for (int secs = 0; ((secs < smooth) && (secs < rideTimeSecs)); ++secs) {
         smoothWatts[secs] = 0.0;
         smoothHr[secs]    = 0.0;
-    }
+    }*/
 
     //int interval = 0;
+    int smooth = hrPwWindow->smooth;
 
-    for (int secs = smooth; secs <= rideTimeSecs-delay; ++secs) {
+    for (int secs = smooth; secs <= rideTimeSecs; ++secs) {
         while ((i < arrayLength) && (timeArray[i] <= secs)) {
             DataPoint *dp =
-                new DataPoint(timeArray[i], hrArray[i+delay], wattsArray[i], interArray[i]);
+                new DataPoint(timeArray[i], hrArray[i], wattsArray[i], interArray[i]);
 	
             totalWatts += wattsArray[i];
-	        totalHr    += hrArray[i+delay];
+                totalHr    += hrArray[i];
 	        list.append(dp);
 
             ++i;
@@ -188,103 +194,116 @@ HrPwPlot::recalc()
         smoothTime[secs]  = secs / 60.0;
     }
 
-    rideTimeSecs = rideTimeSecs-delay-decal;
+    rideTimeSecs = rideTimeSecs-decal;
+    smoothWatts.resize(rideTimeSecs);
+    smoothHr.resize(rideTimeSecs);
+
+    // Clip to max
+    QVector<double> clipWatts(rideTimeSecs);
+    QVector<double> clipHr(rideTimeSecs);
+
+    /*for (int secs = 0; secs < rideTimeSecs; ++secs) {
+        clipWatts[secs] = 0.0;
+        clipHr[secs] = 0.0;
+    }*/
+
+    decal = 0;
+    for (int secs = 0; secs < rideTimeSecs; ++secs) {
+                if (smoothHr[secs]>= minHr && smoothWatts[secs]>= minWatt && smoothWatts[secs]<maxWatt) {
+                        clipWatts[secs-decal]    = smoothWatts[secs];
+                        clipHr[secs-decal]    = smoothHr[secs];
+                }
+                else
+                        decal ++;
+        }
+    rideTimeSecs = rideTimeSecs-decal;
+    clipWatts.resize(rideTimeSecs);
+    clipHr.resize(rideTimeSecs);
+
+
 
     // Find Hr Delay
-    delay = hrPwWindow->findDelay(smoothWatts, smoothHr, rideTimeSecs);
-    //delayori = delay;
+    if (delay == -1)
+       delay = hrPwWindow->findDelay(clipWatts, clipHr, clipWatts.size());
 
-    //double rpente = pente(smoothWatts, smoothHr, rideTimeSecs);
-    //double rordonnee = ordonnee(smoothWatts, smoothHr, rideTimeSecs);
-
-    // Applique le delai
-    QVector<double> clipWatts(rideTimeSecs-delay);
-    QVector<double> clipHr(rideTimeSecs-delay);
+    // Apply delay
+    QVector<double> delayWatts(rideTimeSecs-delay);
+    QVector<double> delayHr(rideTimeSecs-delay);
 
     for (int secs = 0; secs < rideTimeSecs-delay; ++secs) {
-    		clipWatts[secs] = 0.0;
-        	clipHr[secs] = 0.0;
-        }
+        delayWatts[secs]    = clipWatts[secs];
+        delayHr[secs]    = clipHr[secs+delay];
+    }
+    rideTimeSecs = rideTimeSecs-delay;
 
-    decal = 0;
-    for (int secs = 0; secs < rideTimeSecs-delay; ++secs) {
-        	if (smoothHr[secs+delay]>= 50 && smoothWatts[secs]>= 80 && smoothWatts[secs]<500) {
-        		clipWatts[secs-decal]    = smoothWatts[secs];
-        		clipHr[secs-decal]    = smoothHr[secs+delay];
-        	}
-        	else
-        		decal ++;
-        }
-    rideTimeSecs = rideTimeSecs-delay-decal;
+    double rpente = hrPwWindow->pente(delayWatts, delayHr, delayWatts.size());
+    double rordonnee = hrPwWindow->ordonnee(delayWatts, delayHr, delayWatts.size());
+    double maxr = hrPwWindow->corr(delayWatts, delayHr, delayWatts.size());
 
-    // ----- limit points ---
+    // ----- limit plotted points ---
     // ----------------------
-    int intpoints = 10;//(int)floor(rideTimeSecs/1000);
+    int intpoints = 10; // could be ride length dependent
     int nbpoints = (int)floor(rideTimeSecs/intpoints);
 
-    QVector<double> finalWatts(nbpoints);
-    QVector<double> finalHr(nbpoints);
-
-    decal = 0;
+    QVector<double> plotedWatts(nbpoints);
+    QVector<double> plotedHr(nbpoints);
 
     for (int secs = 0; secs < nbpoints; ++secs) {
-        finalWatts[secs-decal]    = clipWatts[secs*intpoints];
-        finalHr[secs-decal]    = clipHr[secs*intpoints];
+        plotedWatts[secs]    = clipWatts[secs*intpoints];
+        plotedHr[secs]    = clipHr[secs*intpoints];
     }
-    nbpoints = nbpoints-decal;
-
-
     int nbpoints2 = (int)floor(nbpoints/36)+2;
 
-    double *finalWattsArray[36];
-    double *finalHrArray[36];
+    double *plotedWattsArray[36];
+    double *plotedHrArray[36];
 
     for (int i = 0; i < 36; ++i) {
-        finalWattsArray[i]= new double[nbpoints2];
-        finalHrArray[i]= new double[nbpoints2];
+        plotedWattsArray[i]= new double[nbpoints2];
+        plotedHrArray[i]= new double[nbpoints2];
     }
 
     for (int secs = 0; secs < nbpoints; ++secs) {
         for (int i = 0; i < 36; ++i) {
             if (secs >= i*nbpoints2 && secs< (i+1)*nbpoints2) {
-                finalWattsArray[i][secs-i*nbpoints2] = finalWatts[secs-i];
-                finalHrArray[i][secs-i*nbpoints2]    = finalHr[secs-i];
+                plotedWattsArray[i][secs-i*nbpoints2] = plotedWatts[secs-i];
+                plotedHrArray[i][secs-i*nbpoints2]    = plotedHr[secs-i];
             }
         }
     }
 
 
-    // Calcul corr
-    double maxr = hrPwWindow->corr(smoothWatts, smoothHr, rideTimeSecs);
-
     for (int i = 0; i < 36; ++i) {
 
     	if (nbpoints-i*nbpoints2>0) {
 
-    		hrCurves[i]->setData(finalWattsArray[i], finalHrArray[i], (nbpoints-i*nbpoints2<nbpoints2?nbpoints-i*nbpoints2:nbpoints2));
+                hrCurves[i]->setData(plotedWattsArray[i], plotedHrArray[i], (nbpoints-i*nbpoints2<nbpoints2?nbpoints-i*nbpoints2:nbpoints2));
     		hrCurves[i]->setVisible(true);
     	} else
     		hrCurves[i]->setVisible(false);
     }
 
 
-    setAxisScale(xBottom, 0.0, 500);
+    setAxisScale(xBottom, 0.0, maxWatt);
 
     setYMax();
     refreshZoneLabels();
 
     QString labelp;
-    double rpente = hrPwWindow->pente(finalWatts, finalHr, nbpoints);
-    labelp.setNum(rpente);
+
+    labelp.setNum(rpente, 'f', 3);
     QString labelo;
-    double rordonnee = hrPwWindow->ordonnee(finalWatts, finalHr, nbpoints);
-    labelo.setNum(rordonnee);
+    labelo.setNum(rordonnee, 'f', 1);
 
     QString labelr;
-    labelr.setNum(maxr);
+    labelr.setNum(maxr, 'f', 3);
     QString labeldelay;
     labeldelay.setNum(delay);
-    QwtText textr = QwtText(labelp+"*x+"+labelo+" : R "+labelr+" ("+labeldelay+")");
+
+    int power150 =  (int)floor((150-rordonnee)/rpente);
+    QString labelpower150;
+    labelpower150.setNum(power150);
+
+    QwtText textr = QwtText(labelp+"*x+"+labelo+" : R "+labelr+" ("+labeldelay+") \n Power@150:"+labelpower150+"W");
     textr.setFont(QFont("Helvetica", 10, QFont::Bold));
     textr.setColor(Qt::black);
 
@@ -292,7 +311,7 @@ HrPwPlot::recalc()
     r_mrk1->setLineStyle(QwtPlotMarker::VLine);
     r_mrk1->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
     r_mrk1->setLinePen(QPen(Qt::black, 0, Qt::DashDotLine));
-    double moyennewatt = hrPwWindow->moyenne(smoothWatts, rideTimeSecs);
+    double moyennewatt = hrPwWindow->moyenne(clipWatts, clipWatts.size());
     r_mrk1->setValue(moyennewatt, 0.0);
     r_mrk1->setLabel(textr);
 
@@ -300,13 +319,13 @@ HrPwPlot::recalc()
     r_mrk2->setLineStyle(QwtPlotMarker::HLine);
     r_mrk2->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
     r_mrk2->setLinePen(QPen(Qt::black, 0, Qt::DashDotLine));
-    double moyennehr = hrPwWindow->moyenne(smoothHr, rideTimeSecs);
+    double moyennehr = hrPwWindow->moyenne(clipHr,  clipHr.size());
     r_mrk2->setValue(0.0,moyennehr);
 
-    addWattStepCurve(finalWatts, nbpoints);
-    addHrStepCurve(finalHr, nbpoints);
+    addWattStepCurve(clipWatts, clipWatts.size());
+    addHrStepCurve(clipHr, clipHr.size());
 
-    addRegLinCurve(finalHr, finalWatts, nbpoints);
+    addRegLinCurve(rpente, rordonnee);
 
     setJoinLine(joinLine);
     replot();
@@ -323,7 +342,7 @@ HrPwPlot::setYMax()
 	        //ylabel += QString((ylabel == "") ? "" : " / ") + "BPM";
 	    }
     }
-    setAxisScale(yLeft, hrMin, ymax * 1.2);
+    setAxisScale(yLeft, minHr, ymax * 1.2);
     setAxisTitle(yLeft, tr("Heart Rate(BPM)"));
 }
 
@@ -360,7 +379,7 @@ HrPwPlot::addWattStepCurve(QVector<double> &finalWatts, int nbpoints)
     	int high = low + 10;
 
         smoothWattsStep[t] = low;
-        smoothTimeStep[t]  = hrMin;
+        smoothTimeStep[t]  = minHr;
         while (low < high) {
         	smoothTimeStep[t] += array[low++]/ nbpoints * 300;
         }
@@ -415,13 +434,12 @@ HrPwPlot::addHrStepCurve(QVector<double> &finalHr, int nbpoints)
 }
 
 void
-HrPwPlot::addRegLinCurve(QVector<double> &finalHr, QVector<double> &finalWatts, int nbpoints)
+HrPwPlot::addRegLinCurve( double rpente, double rordonnee)
 {
     double regWatts[]     = {0, 0};
     double regHr[]        = {0, 500};
-    double rpente = hrPwWindow->pente(finalWatts, finalHr, nbpoints);
-    double rordonnee = hrPwWindow->ordonnee(finalWatts, finalHr, nbpoints);
-	regWatts[0] = regHr[0]*rpente+rordonnee;
+
+    regWatts[0] = regHr[0]*rpente+rordonnee;
     regWatts[1] = regHr[1]*rpente+rordonnee;
 
     regCurve->setData(regHr, regWatts, 2);
@@ -468,7 +486,7 @@ HrPwPlot::setDataFromRide(RideItem *_rideItem)
             ++arrayLength;
         }
 
-
+        delay = -1;
         recalc();
     }
 }
