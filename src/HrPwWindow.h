@@ -59,13 +59,19 @@ class HrPwWindow : public GcWindow
         double corr(QVector<double> &Xi, QVector<double> &Yi,int n);
         double moyenne(QVector<double> &Xi,int n);
 
+        int smooth;
+
     public slots:
         void rideSelected();
 
     protected slots:
         void setJoinLineFromCheckBox();
+        void setDelayFromLineEdit();
+        void setDelayFromSlider();
         void setSmoothingFromLineEdit();
+        void setSmoothingFromSlider();
         void setShadeZones();
+        void setSmooth(int);
 
     protected:
         MainWindow *mainWindow;
@@ -79,6 +85,9 @@ class HrPwWindow : public GcWindow
 
         QSlider *delaySlider;
         QLineEdit *delayEdit;
+
+        QSlider *smoothSlider;
+        QLineEdit *smoothEdit;
 
     private:
 
