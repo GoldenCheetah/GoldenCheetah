@@ -33,7 +33,7 @@ class RealtimeController
 public:
     RealtimeWindow *parent;                     // for push devices
 
-    RealtimeController (RealtimeWindow *parent);
+    RealtimeController (RealtimeWindow *parent, DeviceConfiguration *dc = 0);
     virtual ~RealtimeController() {}
 
     virtual int start();
@@ -55,6 +55,14 @@ public:
     virtual void setLoad(double) { return; }
     virtual void setGradient(double) { return; }
     virtual void setMode(int) { return; }
+
+    // post process, based upon device configuration
+    void processRealtimeData(RealtimeData &rtData);
+    void processSetup();
+
+private:
+    DeviceConfiguration *dc;
+    DeviceConfiguration devConf;
 };
 
 #endif // _GC_RealtimeController_h

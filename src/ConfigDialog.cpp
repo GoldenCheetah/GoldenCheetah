@@ -224,6 +224,7 @@ ConfigDialog::devaddClicked()
     add.type = devicePage->typeSelector->itemData(devicePage->typeSelector->currentIndex()).toInt();
     add.portSpec = devicePage->deviceSpecifier->displayText();
     add.deviceProfile = devicePage->deviceProfile->displayText();
+    add.postProcess = devicePage->virtualPower->currentIndex();
 
     // NOT IMPLEMENTED IN THIS RELEASE XXX
     //add.isDefaultDownload = devicePage->isDefaultDownload->isChecked() ? true : false;

@@ -22,11 +22,13 @@
 #include "RealtimePlot.h"
 #include "math.h" // for round()
 #include "Units.h" // for MILES_PER_KM
+#include <QDebug>
 
 // user selections for device/server/workout here
 #include "TrainTool.h"
 
 // Three current realtime device types supported are:
+#include "RealtimeController.h"
 #include "ComputrainerController.h"
 #include "ANTplusController.h"
 #include "NullController.h"
@@ -306,6 +308,7 @@ void RealtimeWindow::setDeviceController()
             deviceController = new NullController(this, &temp);
         }
     }
+
 }
 
 // open a connection to the GoldenServer via a GoldenClient

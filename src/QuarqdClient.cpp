@@ -42,13 +42,13 @@ static QString sensorLostStr  = "<SensorLost ";
 #define ANT_RUNNING  0x01
 #define ANT_PAUSED   0x02
 
-QuarqdClient::QuarqdClient(QObject *parent, DeviceConfiguration *config) : QThread(parent)
+QuarqdClient::QuarqdClient(QObject *parent, DeviceConfiguration *devConf) : QThread(parent)
 {
     Status=0;
     // server hostname and TCP port#
-    deviceHostname = config->portSpec.section(':',0,0).toAscii(); // after the colon
-    devicePort = (int)QString(config->portSpec).section(':',1,1).toInt(); // after the colon
-    antIDs = config->deviceProfile.split(",");
+    deviceHostname = devConf->portSpec.section(':',0,0).toAscii(); // after the colon
+    devicePort = (int)QString(devConf->portSpec).section(':',1,1).toInt(); // after the colon
+    antIDs = devConf->deviceProfile.split(",");
     lastReadWatts = 0;
     lastReadCadence = 0;
     lastReadSpeed = 0;
@@ -297,7 +297,6 @@ QuarqdClient::stop()
     return 0;
 }
 
-
 int
 QuarqdClient::quit(int code)
 {
@@ -346,14 +345,14 @@ QuarqdClient::discover(DeviceConfiguration *config, QProgressDialog *progress)
 
         progress->setValue(start.elapsed());
 
-        if(start.elapsed() >= 40000 && sentDual == false)
-        {
-            sentDual = true;
-            tcpSocket->write(strDual); //Dual
-        } else if(start.elapsed() >= 30000 && sentSpeed == false)
+        if(start.elapsed() >= 40000 && sentSpeed == false)
         {
             sentSpeed = true;
             tcpSocket->write(strSpeed); //Speed
+        } else if(start.elapsed() >= 30000 && sentDual == false)
+        {
+            sentDual = true;
+            tcpSocket->write(strDual); //Dual
         } else if(start.elapsed() >= 20000 && sentHR == false)
         {
             sentHR = true;
