@@ -33,6 +33,7 @@ DeviceConfiguration::DeviceConfiguration()
     type=0;
     isDefaultDownload=false;
     isDefaultRealtime=false;
+    postProcess=0;
 }
 
 
@@ -96,6 +97,10 @@ DeviceConfigurations::readConfig()
             configVal = appsettings->value(NULL, configStr);
             Entry.isDefaultRealtime = configVal.toInt();
 
+            configStr = QString("%1%2").arg(GC_DEV_VIRTUAL).arg(i+1);
+            configVal = appsettings->value(NULL, configStr);
+            Entry.postProcess = configVal.toInt();
+
             Entries.append(Entry);
     }
     return Entries;
@@ -134,6 +139,10 @@ DeviceConfigurations::writeConfig(QList<DeviceConfiguration> Configuration)
         // isDefaultRealtime
         configStr = QString("%1%2").arg(GC_DEV_DEFR).arg(i+1);
         appsettings->setValue(configStr, Configuration.at(i).isDefaultRealtime);
+
+        // virtual post Process...
+        configStr = QString("%1%2").arg(GC_DEV_VIRTUAL).arg(i+1);
+        appsettings->setValue(configStr, Configuration.at(i).postProcess);
     }
 
 }

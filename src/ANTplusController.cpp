@@ -21,7 +21,7 @@
 #include "QuarqdClient.h"
 #include "RealtimeData.h"
 
-ANTplusController::ANTplusController(RealtimeWindow *parent, DeviceConfiguration *dc) : RealtimeController(parent)
+ANTplusController::ANTplusController(RealtimeWindow *parent, DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
     myANTplus = new QuarqdClient (parent, dc);
 }
@@ -87,6 +87,7 @@ ANTplusController::getRealtimeData(RealtimeData &rtData)
     }
     // get latest telemetry
     rtData = myANTplus->getRealtimeData();
+    processRealtimeData(rtData);
 }
 
 void ANTplusController::pushRealtimeData(RealtimeData &) { } // update realtime data with current values

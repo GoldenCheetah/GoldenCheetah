@@ -37,6 +37,8 @@ class DeviceConfiguration
 
     bool isDefaultDownload,     // not implemented yet
          isDefaultRealtime;     // not implemented yet
+
+    int  postProcess;
 };
 
 class DeviceConfigurations
