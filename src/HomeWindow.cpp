@@ -899,7 +899,7 @@ HomeWindow::drawCursor()
 
     // lets draw at to the right of the
     // last chart...
-    if (chartCursor == -1) {
+    if (chartCursor == -1 && charts.count()) {
 
         // background light gray for now?
         QRect line(charts[charts.count()-1]->geometry().x() + charts[charts.count()-1]->width() + 8,
