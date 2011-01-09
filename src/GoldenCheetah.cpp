@@ -337,7 +337,8 @@ GcWindow::mouseMoveEvent(QMouseEvent *e)
 
     default:
     case Move :
-        move(oX + relx, oY + rely);
+        //move(oX + relx, oY + rely);
+        setCursor(Qt::DragMoveCursor);
         emit moving(this);
         break;
 

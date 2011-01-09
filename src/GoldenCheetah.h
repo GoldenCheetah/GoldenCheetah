@@ -82,8 +82,6 @@ private:
     bool _resizable;
     bool _gripped;
 
-    // we paint a heading if there is space in the top margin
-    void paintEvent (QPaintEvent * event);
     enum drag { None, Close, Flip, Move, Left, Right, Top, Bottom, TLCorner, TRCorner, BLCorner, BRCorner };
     typedef enum drag DragState;
     // state data for resizing tiles
@@ -141,6 +139,9 @@ public:
 
     // for sorting... we look at x
     bool operator< (GcWindow right) const { return geometry().x() < right.geometry().x(); }
+
+    // we paint a heading if there is space in the top margin
+    void paintEvent (QPaintEvent * event);
 
     // mouse actions -- resizing and dragging tiles
     bool eventFilter(QObject *object, QEvent *e);

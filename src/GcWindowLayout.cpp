@@ -43,6 +43,12 @@ void GcWindowLayout::addItem(QLayoutItem *item)
     itemList.append(item);
 }
 
+void GcWindowLayout::insert(int index, QWidget *widget)
+{
+    addChildWidget(widget);
+    itemList.insert(index, new QWidgetItem(widget));
+}
+
 int GcWindowLayout::horizontalSpacing() const
 {
     if (m_hSpace >= 0) {

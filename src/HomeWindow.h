@@ -76,10 +76,15 @@ class HomeWindow : public GcWindow
         void windowMoved(GcWindow*);
         void windowResized(GcWindow*);
 
+        // when moving tiles
+        int pointTile(QPoint pos);
+        void drawCursor();
+
     protected:
         MainWindow *mainWindow;
         bool active; // ignore gui signals when changing views
         GcWindow *clicked; // keep track of selected charts
+        bool dropPending;
 
         // top bar
         QLabel *title;
@@ -105,6 +110,7 @@ class HomeWindow : public GcWindow
 
         // the charts!
         QList<GcWindow*> charts;
+        int chartCursor;
 
 };
 
