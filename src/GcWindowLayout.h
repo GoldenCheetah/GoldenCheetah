@@ -36,6 +36,8 @@ public:
     ~GcWindowLayout();
 
     void addItem(QLayoutItem *item);
+    void insert(int index, QWidget *item);
+
     int horizontalSpacing() const;
     int verticalSpacing() const;
     Qt::Orientations expandingDirections() const;
@@ -49,8 +51,8 @@ public:
     QLayoutItem *takeAt(int index);
 
 private:
-    int doLayout(const QRect &rect, bool testOnly) const;
     int smartSpacing(QStyle::PixelMetric pm) const;
+    int doLayout(const QRect &rect, bool testOnly) const;
 
     QList<QLayoutItem *> itemList;
     int m_hSpace;

@@ -21,7 +21,7 @@
 #include "LTMSettings.h"
 
 HomeWindow::HomeWindow(MainWindow *mainWindow) :
-    GcWindow(mainWindow), mainWindow(mainWindow), active(false), clicked(NULL)
+    GcWindow(mainWindow), mainWindow(mainWindow), active(false), clicked(NULL), dropPending(false), chartCursor(-2)
 {
     setInstanceName("Home Window");
     setControls(new QStackedWidget(this));
@@ -98,8 +98,6 @@ HomeWindow::HomeWindow(MainWindow *mainWindow) :
     winWidget = new QWidget(this);
     winWidget->setContentsMargins(0,0,0,0);
     winWidget->setPalette(palette);
-    //tileWidget->setMouseTracking(true);
-    //tileWidget->installEventFilter(this);
 
     winFlow = new GcWindowLayout(winWidget, 0, 20, 20);
     winFlow->setContentsMargins(20,20,20,20);
@@ -110,6 +108,8 @@ HomeWindow::HomeWindow(MainWindow *mainWindow) :
     winArea->setFrameStyle(QFrame::NoFrame);
     winArea->setContentsMargins(0,0,0,0);
     style->addWidget(winArea);
+    winWidget->installEventFilter(this); // to draw cursor
+    winWidget->setMouseTracking(true); // to draw cursor
 
     currentStyle=2;
 #ifdef Q_OS_MAC
@@ -130,6 +130,10 @@ HomeWindow::HomeWindow(MainWindow *mainWindow) :
 #endif
 
     restoreState();
+
+    // watch drop operations
+    //setMouseTracking(true);
+    installEventFilter(this);
 }
 
 HomeWindow::~HomeWindow()
@@ -270,8 +274,10 @@ HomeWindow::styleChanged(int id)
 void
 HomeWindow::dragEnterEvent(QDragEnterEvent *event)
 {
-    if (event->mimeData()->formats().contains("application/x-qabstractitemmodeldatalist"))
+    if (event->mimeData()->formats().contains("application/x-qabstractitemmodeldatalist")) {
         event->accept();
+        dropPending = true;
+    }
 }
 
 void
@@ -280,6 +286,8 @@ HomeWindow::dropEvent(QDropEvent *event)
     QStandardItemModel model;
     model.dropMimeData(event->mimeData(), Qt::CopyAction, 0,0, QModelIndex());
     QString chart = model.data(model.index(0,0), Qt::DisplayRole).toString();
+
+    dropPending = false;
 
     // which one am i?
     for (int i = 0; GcWindows[i].id != GcWindowTypes::None; i++) {
@@ -296,12 +304,21 @@ HomeWindow::dropEvent(QDropEvent *event)
                 addChart(newone);
                 newone->show();
             }
+
+            // before we return lets turn the cursor off
+            chartCursor = -2;
+            winWidget->repaint();
             return;
         }
     }
 
     // nope not one of ours
     event->ignore();
+
+    // turn off cursor
+    chartCursor = -2;
+    winWidget->repaint();
+
     return;
 }
 
@@ -317,7 +334,11 @@ HomeWindow::addChart(GcWindow* newone)
 
         QWidget *x = dynamic_cast<GcWindow*>(newone)->controls();
         QWidget *c = (x != NULL) ? x : new QWidget(this);
-        m->addWidget(c);
+
+        if (chartCursor >= 0)
+            m->insertWidget(chartCursor, c);
+        else
+            m->addWidget(c);
 
         // watch for enter events!
         newone->installEventFilter(this);
@@ -372,12 +393,15 @@ HomeWindow::addChart(GcWindow* newone)
                 else newone->setFixedHeight(newheight);
                 newone->setContentsMargins(0,15,0,0);
                 newone->setResizable(true); // we need to show on tab selection!
-                winFlow->addWidget(newone);
+
+                if (chartCursor >= 0) winFlow->insert(chartCursor, newone);
+                else winFlow->addWidget(newone);
             }
             break;
         }
         // add to the list
-        charts.append(newone);
+        if (chartCursor >= 0) charts.insert(chartCursor, newone);
+        else charts.append(newone);
         newone->hide();
 
         // watch for moves etc
@@ -485,6 +509,29 @@ HomeWindow::resizeEvent(QResizeEvent *e)
 bool
 HomeWindow::eventFilter(QObject *object, QEvent *e)
 {
+    // we watch the mouse when
+    // dropping charts, to update
+    // the cursor position
+    // dropping and mouse move?
+    if (object == this) {
+        if (dropPending == true && e->type() == QEvent::DragMove) {
+            QPoint pos = winWidget->mapFromGlobal(QCursor::pos());
+            winArea->ensureVisible(pos.x(), pos.y(), 20, 20);
+            chartCursor = pointTile(pos);
+            winWidget->repaint(); // show cursor
+        }
+        return false;
+    }
+
+    // draw a cursor when winWidget paint event kicks off
+    if (object == winWidget) {
+        if (e->type() == QEvent::Paint) drawCursor();
+        return false;
+    }
+
+    // From here on, we're looking at events
+    // from the charts...
+
     // is it a mouse enter event?
     if (e->type() == QEvent::Enter) {
 
@@ -556,10 +603,108 @@ HomeWindow::eventFilter(QObject *object, QEvent *e)
     return false;
 }
 
+// which tile to place before, -1 means append
+int
+HomeWindow::pointTile(QPoint pos)
+{
+    // find the window that is to the right of
+    // the drop point
+
+    // is the cursor above a widget?
+    int i;
+    int here = -1; // chart number to the right of cursor...
+    for (i=0; i<charts.count(); i++) {
+        if (charts[i]->geometry().contains(pos)) {
+            here = i;
+            break;
+        }
+    }
+
+    //  is it to the right?
+    if (here == -1) {
+
+        int toRight = pos.x();
+        while (here == -1 && toRight < winArea->width()) {
+            toRight += 20;
+            QPoint right = QPoint(toRight, pos.y());
+            for (i=0; i<charts.count(); i++) {
+                if (charts[i]->geometry().contains(right)) {
+                    here = i;
+                    break;
+                }
+            }
+        }
+    }
+
+    //  is it to the left?
+    if (here == -1) {
+
+        int toLeft = pos.x();
+        while (here == -1 && toLeft > 0) {
+            toLeft -= 20;
+            QPoint left = QPoint(toLeft, pos.y());
+            for (i=0; i<charts.count(); i++) {
+                if (charts[i]->geometry().contains(left)) {
+                    here = i+1;
+                    break;
+                }
+            }
+        }
+    }
+
+    // well it must be below, so if there is
+    // anything at y+20, use that, otherwise
+    // we can assume we are at the end and
+    // append to the list...
+    if (here == -1) {
+        QPoint below(20, pos.y()+20);
+        for (i=0; i<charts.count(); i++) {
+            if (charts[i]->geometry().contains(below)) {
+                here = i;
+                break;
+            }
+        }
+    }
+
+    // all done
+    if (here == -1 || here >= charts.count()) return -1;
+    return here;
+}
+
 void
 HomeWindow::windowMoved(GcWindow*w)
 {
+    // now drop at the cursor
+    if (currentStyle == 2) {
+        // go find...
+        int before=0;
+        for (;before < charts.count(); before++) {
+            if (charts[before] == w) {
+                QWidget *m = winFlow->takeAt(before)->widget();
+                QWidget *c = dynamic_cast<QStackedWidget*>(controls())->widget(before);
+                dynamic_cast<QStackedWidget*>(controls())->removeWidget(c);
+                QWidget *l = charts.takeAt(before);
+                if (chartCursor > before) chartCursor--;
+                if (chartCursor >= 0) {
+                    dynamic_cast<QStackedWidget*>(controls())->insertWidget(chartCursor, c);
+                    winFlow->insert(chartCursor, m);
+                    charts.insert(chartCursor, dynamic_cast<GcWindow*>(l));
+                } else {
+                    dynamic_cast<QStackedWidget*>(controls())->addWidget(c);
+                    winFlow->addWidget(m);
+                    charts.append(dynamic_cast<GcWindow*>(l));
+                }
+                break;
+            }
+        }
+        //winFlow->doLayout(winFlow->geometry(), false);
+        winFlow->update();
+        chartCursor = -2;
+        winWidget->repaint();
+    }
 
+    // remove the cursor
+    chartCursor = -2; // -2 means don't show
 }
 
 void
@@ -570,8 +715,20 @@ HomeWindow::windowResized(GcWindow*w)
 void
 HomeWindow::windowMoving(GcWindow*w)
 {
-    // ensure the mouse pointer is visible
+    // ensure the mouse pointer is visible, scrolls
+    // as we get near to the margins...
     QPoint pos = winWidget->mapFromGlobal(QCursor::pos());
+    winArea->ensureVisible(pos.x(), pos.y(), 20, 20);
+
+    chartCursor = pointTile(pos);
+    winWidget->repaint(); // show cursor
+
+#if 0
+    // code for bumping tiles movement
+    // disaobled for now in preference for
+    // a drag operation with a cursor that
+    // highlights where the window will be
+    // moved to...
     winArea->ensureVisible(pos.x(), pos.y(), 20, 20);
 
     // since the widget has moved, the mouse is no longer
@@ -708,6 +865,7 @@ HomeWindow::windowMoving(GcWindow*w)
             }
         }
     }
+#endif
 }
 
 void
@@ -715,6 +873,45 @@ HomeWindow::windowResizing(GcWindow*w)
 {
     QPoint pos = this->mapFromGlobal(QCursor::pos());
     winArea->ensureVisible(pos.x(), pos.y(), 20, 20);
+}
+
+void
+HomeWindow::drawCursor()
+{
+    if (chartCursor == -2) return;
+
+    QPainter painter(winWidget);
+
+    // lets draw to the left of the chart...
+    if (chartCursor > -1) {
+
+        // background light gray for now?
+        QRect line(charts[chartCursor]->geometry().x()-12,
+                   charts[chartCursor]->geometry().y(),
+                   4, 
+                   charts[chartCursor]->geometry().height());
+
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(QBrush(Qt::white));
+        painter.drawRect(line);
+
+    }
+
+    // lets draw at to the right of the
+    // last chart...
+    if (chartCursor == -1) {
+
+        // background light gray for now?
+        QRect line(charts[charts.count()-1]->geometry().x() + charts[charts.count()-1]->width() + 8,
+                   charts[charts.count()-1]->geometry().y(),
+                   4, 
+                   charts[charts.count()-1]->geometry().height());
+
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(QBrush(Qt::white));
+        painter.drawRect(line);
+
+    }
 }
 
 GcWindowDialog::GcWindowDialog(GcWinID type, MainWindow *mainWindow) : mainWindow(mainWindow), type(type)
