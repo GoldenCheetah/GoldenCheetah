@@ -674,6 +674,9 @@ HomeWindow::pointTile(QPoint pos)
 void
 HomeWindow::windowMoved(GcWindow*w)
 {
+    // fix single click error
+    if (chartCursor == -2) return; // no it didn't!
+
     // now drop at the cursor
     if (currentStyle == 2) {
         // go find...
