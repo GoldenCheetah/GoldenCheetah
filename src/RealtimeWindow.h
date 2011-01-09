@@ -45,6 +45,7 @@ class TrainTabs;
 #define STREAMRATE     200 // rate at which we stream updates to remote peer
 #define SAMPLERATE     1000 // disk update in milliseconds
 #define LOADRATE       1000 // rate at which load is adjusted
+#define METRICSRATE    1000 // rate the metrics are updated
 
 
 class RealtimeController;
@@ -89,6 +90,7 @@ class RealtimeWindow : public GcWindow
         void diskUpdate();          // writes to CSV file
         void streamUpdate();        // writes to remote Peer
         void loadUpdate();          // sets Load on CT like devices
+        void metricsUpdate();       // calculates the metrics
 
         // Handle config updates
         void configUpdate();            // called when config changes
@@ -116,6 +118,9 @@ class RealtimeWindow : public GcWindow
         double displayDistance, displayWorkoutDistance;
         int displayLap;            // user increment for Lap
         int displayWorkoutLap;     // which Lap in the workout are we at?
+        double kjoules;
+        double bikescore;
+        double xpower;
 
         // for non-zero average calcs
         int pwrcount, cadcount, hrcount, spdcount, lodcount, grdcount; // for NZ average calc
@@ -124,6 +129,7 @@ class RealtimeWindow : public GcWindow
 
         QFile *recordFile;      // where we record!
         ErgFile *ergFile;       // workout file
+        boost::shared_ptr<RideFile> rideFile;     // keeps track of the workout to figure out BikeScore
 
         long total_msecs,
              lap_msecs,
@@ -145,14 +151,16 @@ class RealtimeWindow : public GcWindow
                     *lapLabel,
                     *laptimeLabel,
                     *timeLabel,
-                    *distanceLabel;
+                    *distanceLabel,
+                    *kjouleLabel,
+                    *bikescoreLabel,
+                    *xpowerLabel;
 
         double avgPower, avgHeartRate, avgSpeed, avgCadence, avgLoad, avgGradient;
         QLabel *avgpowerLabel,
                     *avgheartrateLabel,
                     *avgspeedLabel,
-                    *avgcadenceLabel,
-                    *avgloadLabel;
+                    *avgcadenceLabel;
 
         QHBoxLayout *button_layout,
                     *option_layout;
@@ -170,18 +178,21 @@ class RealtimeWindow : public GcWindow
                     *lapLCD,
                     *laptimeLCD,
                     *timeLCD,
-                    *distanceLCD;
+                    *distanceLCD,
+                    *kjouleLCD,
+                    *bikescoreLCD,
+                    *xpowerLCD;
 
         QLCDNumber *avgpowerLCD,
                     *avgheartrateLCD,
                     *avgspeedLCD,
-                    *avgcadenceLCD,
-                    *avgloadLCD;
+                    *avgcadenceLCD;
 
         QTimer      *gui_timer,     // refresh the gui
                     *stream_timer,  // send telemetry to server
                     *load_timer,    // change the load on the device
-                    *disk_timer;    // write to .CSV file
+                    *disk_timer,    // write to .CSV file
+                    *metrics_timer; // computational intense metrics
 
 };
 

@@ -110,6 +110,9 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, TrainTool *trainTool, const Q
     loadLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
     distanceLabel = new QLabel(useMetricUnits ? tr("Distance (KM)") : tr("Distance (Miles)"), this);
     distanceLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
+    kjouleLabel = new QLabel(tr("kJoules"),this);
+    kjouleLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
+
 
     avgpowerLabel = new QLabel(tr("Avg WATTS"), this);
     avgpowerLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
@@ -119,8 +122,10 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, TrainTool *trainTool, const Q
     avgspeedLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
     avgcadenceLabel = new QLabel(tr("Avg RPM"), this);
     avgcadenceLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
-//    avgloadLabel = new QLabel(tr("Avg Load WATTS"), this);
-//    avgloadLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
+    xpowerLabel = new QLabel(tr("xPower"), this);
+    xpowerLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
+    bikescoreLabel = new QLabel(tr("BikeScore"),this);
+    bikescoreLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
 
     laptimeLabel = new QLabel(tr("LAP TIME"), this);
     laptimeLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
@@ -135,43 +140,80 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, TrainTool *trainTool, const Q
     loadLCD = new QLCDNumber(this); loadLCD->setSegmentStyle(QLCDNumber::Filled);
     distanceLCD = new QLCDNumber(this); distanceLCD->setSegmentStyle(QLCDNumber::Filled);
     distanceLCD->setNumDigits(9); // just to be same size as timers!
+    kjouleLCD = new QLCDNumber(this); distanceLCD->setSegmentStyle(QLCDNumber::Filled);
+    bikescoreLCD = new QLCDNumber(this); distanceLCD->setSegmentStyle(QLCDNumber::Filled);
 
     avgpowerLCD = new QLCDNumber(this); avgpowerLCD->setSegmentStyle(QLCDNumber::Filled);
     avgheartrateLCD = new QLCDNumber(this); avgheartrateLCD->setSegmentStyle(QLCDNumber::Filled);
     avgspeedLCD = new QLCDNumber(this); avgspeedLCD->setSegmentStyle(QLCDNumber::Filled);
     avgcadenceLCD = new QLCDNumber(this); avgcadenceLCD->setSegmentStyle(QLCDNumber::Filled);
-//    avgloadLCD = new QLCDNumber(this); avgloadLCD->setSegmentStyle(QLCDNumber::Filled);
+    xpowerLCD = new QLCDNumber(this); xpowerLCD->setSegmentStyle(QLCDNumber::Filled);
 
     laptimeLCD = new QLCDNumber(this); laptimeLCD->setSegmentStyle(QLCDNumber::Filled);
     laptimeLCD->setNumDigits(9);
     timeLCD = new QLCDNumber(this); timeLCD->setSegmentStyle(QLCDNumber::Filled);
     timeLCD->setNumDigits(9);
 
+    // 4 x 6 grid.
+    int row = 0;
+    int colm = 0;
     gridLayout = new QGridLayout();
-    gridLayout->addWidget(powerLabel, 1, 0);
-    gridLayout->addWidget(cadenceLabel, 1, 1);
-    gridLayout->addWidget(heartrateLabel, 1, 2);
-    gridLayout->addWidget(speedLabel, 1, 3);
-    gridLayout->addWidget(lapLabel, 1, 4);
-    gridLayout->addWidget(powerLCD, 2, 0);
-    gridLayout->addWidget(cadenceLCD, 2, 1);
-    gridLayout->addWidget(heartrateLCD, 2, 2);
-    gridLayout->addWidget(speedLCD, 2, 3);
-    gridLayout->addWidget(lapLCD, 2, 4);
-    gridLayout->addWidget(avgpowerLabel, 3, 0);
-    gridLayout->addWidget(avgcadenceLabel, 3, 1);
-    gridLayout->addWidget(avgheartrateLabel, 3, 2);
-    gridLayout->addWidget(avgspeedLabel, 3, 3);
-//  gridLayout->addWidget(avgloadLabel, 3, 4);
-    gridLayout->addWidget(loadLabel, 3, 4);
-    gridLayout->addWidget(loadLCD, 4, 4);
-    gridLayout->addWidget(avgpowerLCD, 4, 0);
-    gridLayout->addWidget(avgcadenceLCD, 4, 1);
-    gridLayout->addWidget(avgheartrateLCD, 4, 2);
-    gridLayout->addWidget(avgspeedLCD, 4, 3);
-//  gridLayout->addWidget(avgloadLCD, 4, 4);
-    gridLayout->setRowStretch(2, 4);
-    gridLayout->setRowStretch(4, 3);
+
+    gridLayout->addWidget(powerLabel, row, colm);
+    gridLayout->addWidget(powerLCD, row+1, colm);
+
+    colm++;
+    gridLayout->addWidget(cadenceLabel, row, colm);
+    gridLayout->addWidget(cadenceLCD, row+1, colm);
+
+    colm++;
+    gridLayout->addWidget(heartrateLabel, row, colm);
+    gridLayout->addWidget(heartrateLCD, row+1, colm);
+
+    colm++;
+    gridLayout->addWidget(speedLabel, row, colm);
+    gridLayout->addWidget(speedLCD, row+1, colm);
+
+    colm++;
+    gridLayout->addWidget(lapLabel, row, colm);
+    gridLayout->addWidget(lapLCD, row+1, colm);
+
+    colm++;
+    gridLayout->addWidget(kjouleLabel,row,colm);
+    gridLayout->addWidget(kjouleLCD, row +1,colm);
+
+    // end of first row of data
+    colm = 0;
+    row += 2;
+    gridLayout->addWidget(avgpowerLabel, row, colm);
+    gridLayout->addWidget(avgpowerLCD, row+1, colm);
+
+    colm++;
+    gridLayout->addWidget(avgcadenceLabel, row, colm);
+    gridLayout->addWidget(avgcadenceLCD, row+1, colm);
+
+    colm++;
+    gridLayout->addWidget(avgheartrateLabel, row, colm);
+    gridLayout->addWidget(avgheartrateLCD, row+1, colm);
+
+    colm++;
+    gridLayout->addWidget(avgspeedLabel, row, colm);
+    gridLayout->addWidget(avgspeedLCD, row+1, colm);
+
+    colm++;
+    gridLayout->addWidget(xpowerLabel, row, colm);
+    gridLayout->addWidget(xpowerLCD, row+1, colm);
+
+    colm++;
+    gridLayout->addWidget(bikescoreLabel, row, colm);
+    gridLayout->addWidget(bikescoreLCD, row+1, colm);
+
+    colm++;
+    gridLayout->addWidget(loadLabel, row, colm);
+    gridLayout->addWidget(loadLCD, row+1, colm);
+
+    gridLayout->setRowStretch(1, 3);
+    gridLayout->setRowStretch(3, 3);
 
     // timers etc
     timer_layout->addWidget(timeLabel, 0, 0);
@@ -210,6 +252,7 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, TrainTool *trainTool, const Q
     disk_timer = new QTimer(this);
     stream_timer = new QTimer(this);
     load_timer = new QTimer(this);
+    metrics_timer = new QTimer(this);
 
     recordFile = NULL;
     status = 0;
@@ -225,10 +268,14 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, TrainTool *trainTool, const Q
     displaySpeed = displayCadence = displayGradient = displayLoad = 0;
     avgPower= avgHeartRate= avgSpeed= avgCadence= avgLoad= 0;
 
+    rideFile = boost::shared_ptr<RideFile>(new RideFile(QDateTime::currentDateTime(),1));
+
     connect(gui_timer, SIGNAL(timeout()), this, SLOT(guiUpdate()));
     connect(disk_timer, SIGNAL(timeout()), this, SLOT(diskUpdate()));
     connect(stream_timer, SIGNAL(timeout()), this, SLOT(streamUpdate()));
     connect(load_timer, SIGNAL(timeout()), this, SLOT(loadUpdate()));
+    connect(metrics_timer, SIGNAL(timeout()), this, SLOT(metricsUpdate()));
+
 
     configUpdate(); // apply current config
 
@@ -357,6 +404,9 @@ void RealtimeWindow::Start()       // when start button is pressed
         } else {
             status &= ~RT_RECORDING;
         }
+        // create a new rideFile
+        rideFile = boost::shared_ptr<RideFile>(new RideFile(QDateTime::currentDateTime(),1));
+
 
         // stream
         if (status & RT_STREAMING) {
@@ -364,6 +414,7 @@ void RealtimeWindow::Start()       // when start button is pressed
         }
 
         gui_timer->start(REFRESHRATE);      // start recording
+        metrics_timer->start(METRICSRATE);
 
     }
 }
@@ -380,6 +431,7 @@ void RealtimeWindow::Pause()        // pause capture to recalibrate
         deviceController->restart();
         trainTool->setPauseText(tr("Pause"));
         gui_timer->start(REFRESHRATE);
+        metrics_timer->start(METRICSRATE);
         if (status & RT_STREAMING) stream_timer->start(STREAMRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         if (status & RT_WORKOUT) load_timer->start(LOADRATE);
@@ -388,6 +440,7 @@ void RealtimeWindow::Pause()        // pause capture to recalibrate
         trainTool->setPauseText(tr("Un-Pause"));
         status |=RT_PAUSED;
         gui_timer->stop();
+        metrics_timer->stop();
         if (status & RT_STREAMING) stream_timer->stop();
         if (status & RT_RECORDING) disk_timer->stop();
         if (status & RT_WORKOUT) load_timer->stop();
@@ -409,6 +462,7 @@ void RealtimeWindow::Stop(int deviceStatus)        // when stop button is presse
     deviceController = NULL;
 
     gui_timer->stop();
+    metrics_timer->stop();
 
     if (status & RT_RECORDING) {
         disk_timer->stop();
@@ -511,7 +565,8 @@ void RealtimeWindow::guiUpdate()           // refreshes the telemetry
 
     // Cadence, HR and Power needs to be rounded to 0 decimal places
     powerLCD->display(round(displayPower));
-    speedLCD->display(round(displaySpeed * (useMetricUnits ? 1.0 : MILES_PER_KM) * 10.00)/10.00);
+    displaySpeed *=(useMetricUnits ? 1.0 : MILES_PER_KM);
+    speedLCD->display(QString::number(displaySpeed,'f', 1));
     cadenceLCD->display(round(displayCadence));
     heartrateLCD->display(round(displayHeartRate));
     lapLCD->display(displayWorkoutLap+displayLap);
@@ -521,12 +576,13 @@ void RealtimeWindow::guiUpdate()           // refreshes the telemetry
     else loadLCD->display(round(displayGradient*10)/10.00);
 
     // distance
-    distanceLCD->display(round(displayDistance*(useMetricUnits ? 1.0 : MILES_PER_KM) *10.00) /10.00);
+    distanceLCD->display(QString::number(displayDistance*(useMetricUnits ? 1.0 : MILES_PER_KM),'f',1));
 
     // NZ Averages.....
     if (displayPower) { //NZAP is bogus - make it configurable!!!
         pwrcount++; if (pwrcount ==1) avgPower = displayPower;
         avgPower = ((avgPower * (double)pwrcount) + displayPower) /(double) (pwrcount+1);
+        kjoules = avgPower * total_msecs /(1000*1000);
     }
     if (displayCadence) {
         cadcount++; if (cadcount ==1) avgCadence = displayCadence;
@@ -544,20 +600,23 @@ void RealtimeWindow::guiUpdate()           // refreshes the telemetry
     if (displayLoad && status&RT_MODE_ERGO) {
         lodcount++; if (lodcount ==1) avgLoad = displayLoad;
         avgLoad = ((avgLoad * (double)lodcount) + displayLoad) /(double) (lodcount+1);
-        avgloadLCD->display((int)avgLoad);
+        //avgloadLCD->display((int)avgLoad);
     }
 #endif
     if (status&RT_MODE_SPIN) {
         grdcount++; if (grdcount ==1) avgGradient = displayGradient;
         avgGradient = ((avgGradient * (double)grdcount) + displayGradient) /(double) (grdcount+1);
-        //avgloadLCD->display((int)avgGradient);
+     //   avgloadLCD->display((int)avgGradient);
     }
 
     avgpowerLCD->display((int)avgPower);
-    avgspeedLCD->display(round(avgSpeed * (useMetricUnits ? 1.0 : MILES_PER_KM) * 10.00)/10.00);
+    avgspeedLCD->display(QString::number(avgSpeed,'f', 1));
+
     avgcadenceLCD->display((int)avgCadence);
     avgheartrateLCD->display((int)avgHeartRate);
-
+    kjouleLCD->display(round(kjoules));
+    bikescoreLCD->display(round(bikescore));
+    xpowerLCD->display(round(xpower));
 
     // now that plot....
     rtPlot->pwrData.addData(displayPower); // add new data point
@@ -680,6 +739,24 @@ void RealtimeWindow::diskUpdate()
                         << "," << (displayLap + displayWorkoutLap)
                         << "," << Altitude
                         << "," << "\n";
+
+    rideFile->appendPoint(total_msecs/1000,displayCadence,displayHeartRate,displayDistance,displaySpeed,0,
+                          displayPower,Altitude,0,0,0,displayLap + displayWorkoutLap);
+}
+
+void RealtimeWindow::metricsUpdate()
+{
+    // calculate bike score, xpower
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    const RideMetric *rm = factory.rideMetric("skiba_xpower");
+
+    QStringList metrics;
+    metrics.append("skiba_bike_score");
+    metrics.append("skiba_xpower");
+    QHash<QString,RideMetricPtr> results = rm->computeMetrics(
+            this->main,&*rideFile,this->main->zones(),this->main->hrZones(),metrics);
+    bikescore = results["skiba_bike_score"]->value(true);
+    xpower = results["skiba_xpower"]->value(true);
 }
 
 //----------------------------------------------------------------------
@@ -741,14 +818,12 @@ RealtimeWindow::SelectWorkout()
         if (deviceController != NULL) deviceController->setMode(RT_MODE_ERGO);
         // set the labels on the gui
         loadLabel->setText("Load WATTS");
-        //avgloadLabel->setText("Avg Load WATTS");
     } else { // SLOPE MODE
         status |= RT_MODE_SPIN;
         status &= ~RT_MODE_ERGO;
         if (deviceController != NULL) deviceController->setMode(RT_MODE_SPIN);
         // set the labels on the gui
         loadLabel->setText("Gradient PERCENT");
-        //avgloadLabel->setText("Avg Gradient PERCENT");
     }
 }
 
