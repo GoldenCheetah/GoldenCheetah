@@ -87,7 +87,7 @@ QtMacSegmentedButton::QtMacSegmentedButton (int aCount, QWidget *aParent /* = 0 
     mNativeRef = [[NSSegmentedControl alloc] init];
     [mNativeRef setSegmentCount:aCount];
     [mNativeRef setSegmentStyle:NSSegmentStyleRoundRect];
-    [[mNativeRef cell] setTrackingMode: NSSegmentSwitchTrackingMomentary];
+    [[mNativeRef cell] setTrackingMode: NSSegmentSwitchTrackingSelectOne];
     [mNativeRef setFont: [NSFont controlContentFontOfSize:
         [NSFont systemFontSizeForControlSize: NSSmallControlSize]]];
     [mNativeRef sizeToFit];
@@ -109,6 +109,11 @@ QSize QtMacSegmentedButton::sizeHint() const
 {
     NSRect frame = [mNativeRef frame];
     return QSize (frame.size.width, frame.size.height);
+}
+
+void QtMacSegmentedButton::setSelected(int index) const
+{
+    [mNativeRef setSelected:true forSegment:index];
 }
 
 void QtMacSegmentedButton::setTitle (int aSegment, const QString &aTitle)

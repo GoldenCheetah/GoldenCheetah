@@ -113,7 +113,7 @@ HomeWindow::HomeWindow(MainWindow *mainWindow) :
 
     currentStyle=2;
 #ifdef Q_OS_MAC
-    styleSelector->setEnabled (2, true);
+    styleSelector->setSelected(2);
 #else
     styleSelector->setCurrentIndex(2);
 #endif

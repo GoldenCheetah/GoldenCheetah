@@ -63,6 +63,7 @@ public:
     void setTitle (int aSegment, const QString &aTitle);
     void setToolTip (int aSegment, const QString &aTip);
     void setEnabled (int aSegment, bool fEnabled);
+    void setSelected(int index) const;
     void animateClick (int aSegment);
     void onClicked (int aSegment);
 
