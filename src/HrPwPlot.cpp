@@ -35,7 +35,7 @@
 #include <qwt_data.h>
 
 
-static const inline double
+static inline double
 max(double a, double b) { if (a > b) return a; else return b; }
 
 HrPwPlot::HrPwPlot(MainWindow *mainWindow, HrPwWindow *hrPwWindow) :
@@ -100,7 +100,6 @@ HrPwPlot::HrPwPlot(MainWindow *mainWindow, HrPwWindow *hrPwWindow) :
     r_mrk1->attach(this);
     r_mrk2->attach(this);
 
-    zoneLabels = QList <HrPwPlotZoneLabel *>::QList();
     shade_zones = true;
 }
 
