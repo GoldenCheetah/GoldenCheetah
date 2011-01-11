@@ -874,7 +874,7 @@ HomeWindow::windowMoving(GcWindow*w)
 void
 HomeWindow::windowResizing(GcWindow*w)
 {
-    QPoint pos = this->mapFromGlobal(QCursor::pos());
+    QPoint pos = winWidget->mapFromGlobal(QCursor::pos());
     winArea->ensureVisible(pos.x(), pos.y(), 20, 20);
 }
 
