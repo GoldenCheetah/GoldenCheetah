@@ -48,6 +48,7 @@ class MetricAggregator : public QWidget
         QList<SummaryMetrics> getAllMetricsFor(QDateTime start, QDateTime end);
         QList<SummaryMetrics> getAllMeasuresFor(QDateTime start, QDateTime end);
         SummaryMetrics getRideMetrics(QString filename);
+        void writeAsCSV(QString filename); // export all...
 
     signals:
         void dataChanged(); // when metricDB table changed
