@@ -546,8 +546,6 @@ MainWindow::MainWindow(const QDir &home) :
     rideMenu->addAction(tr("&Manual ride entry..."), this,
                         SLOT(manualRide()), tr("Ctrl+M"));
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("&Export ALL files to GC..."), this,
-                        SLOT(exportALL()), tr(""));
     rideMenu->addAction(tr("&Export to CSV..."), this,
                         SLOT(exportCSV()), tr("Ctrl+E"));
     rideMenu->addAction(tr("Export to GC..."), this,
@@ -561,6 +559,9 @@ MainWindow::MainWindow(const QDir &home) :
     rideMenu->addAction(tr("Export to PWX..."), this,
                         SLOT(exportPWX()));
 #ifdef GC_HAVE_SOAP
+    rideMenu->addSeparator ();
+    rideMenu->addAction(tr("&Export Metrics as CSV..."), this,
+                        SLOT(exportMetrics()), tr(""));
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Upload to Training Peaks"), this,
                         SLOT(uploadTP()), tr("Ctrl+U"));
@@ -960,32 +961,13 @@ MainWindow::exportGC()
 }
 
 void
-MainWindow::exportALL()
+MainWindow::exportMetrics()
 {
-    // get a list of rides to export
-    QStringList filenames = RideFileFactory::instance().listRideFiles(home);
-
-    QProgressBar *progress = new QProgressBar();
-    progress->setMinimum(0);
-    progress->setMaximum(filenames.count());
-    progress->show();
-
-    foreach (const QString &filename, filenames) {
-        progress->setValue(progress->value() + 1);
-        QStringList errors;
-
-        QString inFileName = home.absolutePath() + '/' + filename;
-        QFile inFile(inFileName);
-        RideFile *p = RideFileFactory::instance().openRideFile(this, inFile, errors);
-
-        if (p) {
-            QString outName = "/home/markl/Desktop/Daniel/" + QFileInfo(filename).baseName() + ".gc";
-            QFile outFile(outName);
-            GcFileReader reader;
-            reader.writeRideFile(p, outFile);
-        }
-    }
-    delete progress;
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Export Metrics"), QDir::homePath(), tr("Comma Separated Variables (*.csv)"));
+    if (fileName.length() == 0)
+        return;
+    metricDB->writeAsCSV(fileName);
 }
 
 void

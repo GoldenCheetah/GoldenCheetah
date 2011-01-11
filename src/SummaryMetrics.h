@@ -57,6 +57,8 @@ class SummaryMetrics
         // get unit string to use for this symbol
         QString getUnitsForSymbol(QString symbol, bool UseMetric) const;
 
+        QMap<QString, double> &values() { return value; }
+
 	private:
 	    QString fileName;
         QDateTime rideDate;

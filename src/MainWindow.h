@@ -159,7 +159,7 @@ class MainWindow : public QMainWindow
         void exportCSV();
         void exportGC();
         void exportJson();
-        void exportALL();
+        void exportMetrics();
 #ifdef GC_HAVE_KML
         void exportKML();
 #endif
