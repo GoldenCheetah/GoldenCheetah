@@ -127,6 +127,8 @@ class RealtimeWindow : public QWidget
              lap_msecs,
              load_msecs;
 
+        qint64 start_msec, elapsed_msec, lap_start_msec;
+
         // GUI WIDGETS
         // layout
         RealtimePlot *rtPlot;
