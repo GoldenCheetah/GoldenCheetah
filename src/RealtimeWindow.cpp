@@ -376,23 +376,17 @@ void RealtimeWindow::Start()       // when start button is pressed
         streamSelector->setEnabled(false);
         deviceSelector->setEnabled(false);
 
+        QDateTime now = QDateTime::currentDateTime();
+        start_msec = lap_start_msec = now.toMSecsSinceEpoch();
+        elapsed_msec = 0;
+
         if (status & RT_WORKOUT) {
             load_timer->start(LOADRATE);      // start recording
         }
         if (status & RT_RECORDING) {
 
             // setup file
-            QDate date = QDate().currentDate();
-            QTime time = QTime().currentTime();
-            QDateTime now(date, time);
-            QChar zero = QLatin1Char ( '0' );
-            QString filename = QString ( "%1_%2_%3_%4_%5_%6.csv" )
-                               .arg ( now.date().year(), 4, 10, zero )
-                               .arg ( now.date().month(), 2, 10, zero )
-                               .arg ( now.date().day(), 2, 10, zero )
-                               .arg ( now.time().hour(), 2, 10, zero )
-                               .arg ( now.time().minute(), 2, 10, zero )
-                               .arg ( now.time().second(), 2, 10, zero );
+            QString filename = now.toString(QString("yyyy_MM_dd_hh_mm_ss")) + QString(".csv");
 
             QString fulltarget = home.absolutePath() + "/" + filename;
             if (recordFile) delete recordFile;
@@ -426,6 +420,7 @@ void RealtimeWindow::Pause()        // pause capture to recalibrate
     if ((status&RT_RUNNING) == 0) return;
 
     if (status&RT_PAUSED) {
+        start_msec = QDateTime::currentDateTime().toMSecsSinceEpoch();
         status &=~RT_PAUSED;
         deviceController->restart();
         pauseButton->setText(tr("Pause"));
@@ -434,6 +429,7 @@ void RealtimeWindow::Pause()        // pause capture to recalibrate
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         if (status & RT_WORKOUT) load_timer->start(LOADRATE);
     } else {
+        elapsed_msec = total_msecs;
         deviceController->pause();
         pauseButton->setText(tr("Un-Pause"));
         status |=RT_PAUSED;
@@ -452,6 +448,8 @@ void RealtimeWindow::Stop(int deviceStatus)        // when stop button is presse
     startButton->setText(tr("Start"));
     deviceController->stop();
     gui_timer->stop();
+
+    QDateTime now = QDateTime::currentDateTime();
 
     if (status & RT_RECORDING) {
         disk_timer->stop();
@@ -497,6 +495,9 @@ void RealtimeWindow::Stop(int deviceStatus)        // when stop button is presse
     displayWorkoutLap = displayLap =0;
     lap_msecs = 0;
     total_msecs = 0;
+    elapsed_msec = 0;
+    start_msec = now.toMSecsSinceEpoch();
+    lap_start_msec = now.toMSecsSinceEpoch();
     avgPower= avgHeartRate= avgSpeed= avgCadence= avgLoad= 0;
     displayWorkoutDistance = displayDistance = 0;
     guiUpdate();
@@ -538,6 +539,10 @@ void RealtimeWindow::guiUpdate()           // refreshes the telemetry
     // Distance assumes current speed for the last second. from km/h to km/sec
     displayDistance += displaySpeed / (5 * 3600); // XXX assumes 200ms refreshrate
     displayWorkoutDistance += displaySpeed / (5 * 3600); // XXX assumes 200ms refreshrate
+
+    qint64 now = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    total_msecs = (long)(elapsed_msec + now - start_msec);
+    lap_msecs = (long)(now - lap_start_msec);
 
     // update those LCDs!
     timeLCD->display(QString("%1:%2:%3.%4").arg(total_msecs/3600000)
@@ -608,10 +613,6 @@ void RealtimeWindow::guiUpdate()           // refreshes the telemetry
 
     this->update();
 
-    // add time
-    total_msecs += REFRESHRATE;
-    lap_msecs += REFRESHRATE;
-
 }
 
 // can be called from the controller - when user presses "Lap" button
@@ -624,6 +625,8 @@ void RealtimeWindow::newLap()
     cadcount  = 0;
     hrcount   = 0;
     spdcount  = 0;
+
+    lap_start_msec = QDateTime::currentDateTime().toMSecsSinceEpoch();
 
     // set avg to current values to ensure averages represent from now onwards
     // and not from beginning of workout
