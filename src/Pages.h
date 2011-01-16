@@ -153,7 +153,11 @@ class CredentialsPage : public QScrollArea
         QLineEdit *wiUser;
         QLineEdit *wiPass;
 
-        QLineEdit *webcalURL; // url for iCal file (e.g. TP.com, Google Calendar)
+        QLineEdit *webcalURL; // url for webcal calendar (read only, TP.com, Google Calendar)
+
+        QLineEdit *dvURL; // url for calDAV calendar (read/write, e.g. Google, Hotmail)
+        QLineEdit *dvUser;
+        QLineEdit *dvPass;
 };
 
 class ProxyPage : public QWidget

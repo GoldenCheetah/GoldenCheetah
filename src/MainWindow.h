@@ -60,10 +60,11 @@ class RideNavigator;
 class WithingsDownload;
 class CalendarDownload;
 class DiaryWindow;
-class ICalendar;
 class TreeMapWindow;
 class GcWindowTool;
 class HomeWindow;
+class ICalendar;
+class CalDAV;
 
 class MainWindow : public QMainWindow
 {
@@ -118,6 +119,7 @@ class MainWindow : public QMainWindow
         CalendarDownload *calendarDownload;
 #ifdef GC_HAVE_ICAL
         ICalendar *rideCalendar;
+        CalDAV *davCalendar;
 #endif
 
     protected:
@@ -167,6 +169,9 @@ class MainWindow : public QMainWindow
 #ifdef GC_HAVE_SOAP
         void uploadTP();
         void downloadTP();
+#endif
+#ifdef GC_HAVE_ICAL
+        void uploadCalendar(); // upload ride to calendar
 #endif
         void importFile();
         void findBestIntervals();
