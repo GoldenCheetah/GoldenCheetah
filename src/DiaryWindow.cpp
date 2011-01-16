@@ -36,9 +36,8 @@ DiaryWindow::DiaryWindow(MainWindow *mainWindow) :
     bold.setPointSize(14);
     bold.setWeight(QFont::Bold);
     title = new QLabel("", this);
+    title->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
     title->setFont(bold);
-    title->setFixedWidth(250);
-    title->setAlignment(Qt::AlignCenter);
 
     QIcon prevIcon(":images/toolbar/back_alt.png");
     QIcon nextIcon(":images/toolbar/forward_alt.png");
@@ -59,14 +58,10 @@ DiaryWindow::DiaryWindow(MainWindow *mainWindow) :
 
     viewMode->setCurrentIndex(appsettings->cvalue(mainWindow->cyclist, GC_DIARY_VIEW, "1").toInt());
 
-    QLabel *spacer = new QLabel(this);
-    spacer->setFixedWidth(120); // same as viewMode, centering controls...
-
-    controls->addWidget(spacer);
-    controls->addStretch();
     controls->addWidget(prev);
-    controls->addWidget(title);
     controls->addWidget(next);
+    controls->addStretch();
+    controls->addWidget(title, Qt::AlignCenter | Qt::AlignVCenter);
     controls->addStretch();
     controls->addWidget(viewMode);
 
@@ -85,6 +80,7 @@ DiaryWindow::DiaryWindow(MainWindow *mainWindow) :
     monthlyView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
     monthlyView->verticalHeader()->setResizeMode(QHeaderView::Stretch);
     monthlyView->viewport()->installEventFilter(this);
+    monthlyView->setGridStyle(Qt::DotLine);
 
     // weekly view via QxtScheduleView
     weeklyView = new QxtScheduleView;
