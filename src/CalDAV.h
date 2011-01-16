@@ -51,7 +51,7 @@ class CalDAV : public QObject
     Q_OBJECT
     G_OBJECT
 
-    enum action { Put, Get, Events, None };
+    enum action { Put, Get, Events, Report, None };
     typedef enum action ActionType;
 
 public:
@@ -61,20 +61,22 @@ public:
 public slots:
 
     // authentication (and refresh all events)
-    bool authenticate();
+    bool download();
 
-    // upload ride and data (as attachment) to calendar
+    // Query CalDAV server for events ...
+    bool report();
+
+    // Upload ride as a VEVENT
     bool upload(RideItem *rideItem);
 
+    // Catch NAM signals ...
+    void requestReply(QNetworkReply *reply);
     void userpass(QNetworkReply*r,QAuthenticator*a);
     void sslErrors(QNetworkReply*,QList<QSslError>&);
-    void authenticateResponse(QNetworkReply *reply);
 
 private:
     MainWindow *main;
     QNetworkAccessManager *nam;
     ActionType mode;
-
-/*    CalendarParser *parser; */
 };
 #endif

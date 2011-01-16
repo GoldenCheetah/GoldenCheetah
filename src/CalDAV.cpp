@@ -21,7 +21,7 @@
 CalDAV::CalDAV(MainWindow *main) : main(main), mode(None)
 {
     nam = new QNetworkAccessManager(this);
-    connect(nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(authenticateResponse(QNetworkReply*)));
+    connect(nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestReply(QNetworkReply*)));
 
     connect(nam, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)), this,
         SLOT(userpass(QNetworkReply*,QAuthenticator*)));
@@ -29,8 +29,11 @@ CalDAV::CalDAV(MainWindow *main) : main(main), mode(None)
 //        SLOT(sslErrors(QNetworkReply*,QList<QSslError>)));
 }
 
+//
+// GET event directory listing
+//
 bool
-CalDAV::authenticate()
+CalDAV::download()
 {
     QString url = appsettings->cvalue(main->cyclist, GC_DVURL, "").toString();
     if (url == "") return false; // not configured
@@ -46,35 +49,44 @@ CalDAV::authenticate()
     return true;
 }
 
-void
-CalDAV::authenticateResponse(QNetworkReply *reply)
+
+//
+// REPORT of "all" VEVENTS
+//
+bool
+CalDAV::report()
 {
-    switch (mode) {
-    case Events:
-        main->rideCalendar->refreshRemote(reply->readAll());
-        break;
-    default:
-    case Put:
-        break;
+    QString url = appsettings->cvalue(main->cyclist, GC_DVURL, "").toString();
+    if (url == "") return false; // not configured
+
+    QNetworkRequest request = QNetworkRequest(QUrl(url));
+    QByteArray *queryText = new QByteArray("<x1:calendar-query xmlns:x1=\"urn:ietf:params:xml:ns:caldav\">"
+                     "<x0:prop xmlns:x0=\"DAV:\">"
+                     "<x0:getetag/>"
+                     "<x1:calendar-data/>"
+                     "</x0:prop>"
+                     "<x1:filter>"
+                     "<x1:comp-filter name=\"VCALENDAR\">"
+                     "<x1:comp-filter name=\"VEVENT\">"
+                     "<x1:time-range end=\"21001231\" start=\"20000101T000000Z\"/>"
+                     "</x1:comp-filter>"
+                     "</x1:comp-filter>"
+                     "</x1:filter>"
+                     "</x1:calendar-query>");
+
+    QBuffer *query = new QBuffer(queryText);
+
+    mode = Report;
+    QNetworkReply *reply = nam->sendCustomRequest(request, "REPORT", query);
+    if (reply->error() != QNetworkReply::NoError) {
+        QMessageBox::warning(main, tr("CalDAV REPORT url error"), reply->errorString());
+        mode = None;
+        return false;
     }
-    mode = None;
+    return true;
 }
 
-void
-CalDAV::userpass(QNetworkReply*,QAuthenticator*a)
-{
-    QString user = appsettings->cvalue(main->cyclist, GC_DVUSER, "").toString();
-    QString pass = appsettings->cvalue(main->cyclist, GC_DVPASS, "").toString();
-    a->setUser(user);
-    a->setPassword(pass);
-}
-
-void
-CalDAV::sslErrors(QNetworkReply*,QList<QSslError>&)
-{
-}
-
-// convert a rideItem into a vcard ICal Event
+// utility function to create a VCALENDAR from a single RideItem
 static
 icalcomponent *createEvent(RideItem *rideItem)
 {
@@ -141,6 +153,9 @@ icalcomponent *createEvent(RideItem *rideItem)
     return root;
 }
 
+//
+// PUT a ride item
+//
 bool
 CalDAV::upload(RideItem *rideItem)
 {
@@ -174,3 +189,41 @@ CalDAV::upload(RideItem *rideItem)
     return true;
 }
 
+//
+// All queries/commands respond here
+//
+void
+CalDAV::requestReply(QNetworkReply *reply)
+{
+    QString response = reply->readAll();
+    switch (mode) {
+    case Report:
+    case Events:
+        main->rideCalendar->refreshRemote(response);
+        break;
+    default:
+    case Put:
+        break;
+    }
+    mode = None;
+}
+
+//
+// Provide user credentials, called when receive a 401
+//
+void
+CalDAV::userpass(QNetworkReply*,QAuthenticator*a)
+{
+    QString user = appsettings->cvalue(main->cyclist, GC_DVUSER, "").toString();
+    QString pass = appsettings->cvalue(main->cyclist, GC_DVPASS, "").toString();
+    a->setUser(user);
+    a->setPassword(pass);
+}
+
+//
+// Trap SSL errors, does nothing ... for now
+//
+void
+CalDAV::sslErrors(QNetworkReply*,QList<QSslError>&)
+{
+}

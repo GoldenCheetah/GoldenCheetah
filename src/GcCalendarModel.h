@@ -417,13 +417,13 @@ class GcCalendarDelegate : public QItemDelegate
 
                 QPen pen;
                 pen.setColor(Qt::black);
-                pen.setWidth(2);
+                painter->setPen(Qt::NoPen);
                 QColor fillColor = colors[i++];
-                fillColor.setAlpha(250);
+                fillColor.setAlpha(200);
                 painter->setBrush(fillColor);
-                painter->setPen(pen);
                 painter->setRenderHint(QPainter::Antialiasing);
                 painter->drawPath(cachePath);
+                painter->setPen(pen);
                 painter->drawText(bd, text);
             }
         }

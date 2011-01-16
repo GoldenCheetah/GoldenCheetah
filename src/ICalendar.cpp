@@ -255,16 +255,26 @@ QVariant ICalendar::data(QDate date, int role)
                 QList<icalcomponent*>*p = localCalendar.value(date, NULL);
                 if (p) {
                     foreach(icalcomponent*event, *p) {
+                        QString desc;
+                        icalproperty *summary = icalcomponent_get_first_property(event, ICAL_SUMMARY_PROPERTY);
+                        desc = propertyToString(summary);
                         icalproperty *property = icalcomponent_get_first_property(event, ICAL_DESCRIPTION_PROPERTY);
-                        strings << propertyToString(property);
+                        desc += " ";
+                        desc += propertyToString(property);
+                        strings << desc;
                     }
                 }
                 // remote
                 p = remoteCalendar.value(date, NULL);
                 if (p) {
                     foreach(icalcomponent*event, *p) {
+                        QString desc;
+                        icalproperty *summary = icalcomponent_get_first_property(event, ICAL_SUMMARY_PROPERTY);
+                        desc = propertyToString(summary);
                         icalproperty *property = icalcomponent_get_first_property(event, ICAL_DESCRIPTION_PROPERTY);
-                        strings << propertyToString(property);
+                        desc += " ";
+                        desc += propertyToString(property);
+                        strings << desc;
                     }
                 }
                 return strings;
