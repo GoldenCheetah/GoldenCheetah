@@ -67,8 +67,8 @@ qwt3d {
 }
 
 !isEmpty( ICAL_INSTALL) {
-    HEADERS += ICalendar.h DiaryWindow.h GcCalendarModel.h
-    SOURCES += ICalendar.cpp DiaryWindow.cpp
+    HEADERS += ICalendar.h DiaryWindow.h GcCalendarModel.h CalDAV.h
+    SOURCES += ICalendar.cpp DiaryWindow.cpp CalDAV.cpp
     ICAL_INCLUDE = $${ICAL_INSTALL}/include
     ICAL_LIBS = $${ICAL_INSTALL}/lib/libical.a
     DEFINES += GC_HAVE_ICAL

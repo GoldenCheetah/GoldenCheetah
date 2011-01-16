@@ -90,6 +90,9 @@
 #define GC_WIURL          "wi/url"
 #define GC_WIUSER         "wi/user"
 #define GC_WIKEY         "wi/key"
+#define GC_DVURL          "dv/url"
+#define GC_DVUSER         "dv/user"
+#define GC_DVPASS         "dv/pass"
 
 
 // device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended

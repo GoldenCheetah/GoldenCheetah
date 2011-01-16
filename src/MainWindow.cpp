@@ -90,6 +90,7 @@
 #endif
 #ifdef GC_HAVE_ICAL
 #include "ICalendar.h"
+#include "CalDAV.h"
 #endif
 #include "HelpWindow.h"
 #include "HomeWindow.h"
@@ -318,6 +319,8 @@ MainWindow::MainWindow(const QDir &home) :
 
 #ifdef GC_HAVE_ICAL
     rideCalendar = new ICalendar(this); // my local/remote calendar entries
+    davCalendar = new CalDAV(this); // remote caldav
+    davCalendar->authenticate(); // login
 #endif
 
     QTreeWidgetItem *last = NULL;
@@ -598,6 +601,8 @@ MainWindow::MainWindow(const QDir &home) :
                            SLOT(showTools()));
 #ifdef GC_HAVE_ICAL
     optionsMenu->addSeparator();
+    optionsMenu->addAction(tr("Upload Ride to Calendar"), this,
+                        SLOT(uploadCalendar()), tr (""));
     optionsMenu->addAction(tr("Import Calendar..."), this,
                         SLOT(importCalendar()), tr (""));
     optionsMenu->addAction(tr("Export Calendar..."), this,
@@ -1799,8 +1804,20 @@ MainWindow::importMeasures()
 void
 MainWindow::refreshCalendar()
 {
+#ifdef GC_HAVE_ICAL
+    davCalendar->authenticate();
     calendarDownload->download();
+#endif
 }
+
+#ifdef GC_HAVE_ICAL
+void
+MainWindow::uploadCalendar()
+{
+    davCalendar->upload((RideItem*)currentRideItem()); // remove const coz it updates the ride
+                                               // to set GID and upload date
+}
+#endif
 
 void
 MainWindow::importCalendar()

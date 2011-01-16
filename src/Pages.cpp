@@ -460,8 +460,13 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
 
     QLabel *webcal = new QLabel(tr("Web Calendar"));
     webcal->setFont(current);
-
     QLabel *wcurlLabel = new QLabel(tr("Webcal URL"));
+
+    QLabel *dv = new QLabel(tr("CalDAV Calendar"));
+    QLabel *dvurlLabel = new QLabel(tr("CalDAV Calendar"));
+    QLabel *dvuserLabel = new QLabel(tr("CalDAV User Id"));
+    QLabel *dvpassLabel = new QLabel(tr("CalDAV Password"));
+
 
     gcURL = new QLineEdit(this);
     gcURL->setText(appsettings->cvalue(mainWindow->cyclist, GC_GCURL, "http://race.goldencheetah.org").toString());
@@ -511,6 +516,16 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     webcalURL = new QLineEdit(this);
     webcalURL->setText(appsettings->cvalue(mainWindow->cyclist, GC_WEBCAL_URL, "").toString());
 
+    dvURL = new QLineEdit(this);
+    dvURL->setText(appsettings->cvalue(mainWindow->cyclist, GC_DVURL, "https://www.google.com/calendar/dav/<email>/events/").toString());
+
+    dvUser = new QLineEdit(this);
+    dvUser->setText(appsettings->cvalue(mainWindow->cyclist, GC_DVUSER, "").toString());
+
+    dvPass = new QLineEdit(this);
+    dvPass->setEchoMode(QLineEdit::Password);
+    dvPass->setText(appsettings->cvalue(mainWindow->cyclist, GC_DVPASS, "").toString());
+
     grid->addWidget(tp, 0,0);
     grid->addWidget(urlLabel, 1,0);
     grid->addWidget(userLabel, 2,0);
@@ -530,6 +545,10 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     grid->addWidget(wipassLabel, 16,0);
     grid->addWidget(webcal, 17, 0);
     grid->addWidget(wcurlLabel, 18, 0);
+    grid->addWidget(dv, 19,0);
+    grid->addWidget(dvurlLabel, 20,0);
+    grid->addWidget(dvuserLabel, 21,0);
+    grid->addWidget(dvpassLabel, 22,0);
 
     grid->addWidget(tpURL, 1, 1, 0);
     grid->addWidget(tpUser, 2, 1, Qt::AlignLeft | Qt::AlignVCenter);
@@ -549,6 +568,10 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     grid->addWidget(wiPass, 16, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
     grid->addWidget(webcalURL, 18, 1, 0);
+
+    grid->addWidget(dvURL, 20, 1, 0);
+    grid->addWidget(dvUser, 21, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(dvPass, 22, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
     grid->setColumnStretch(0,0);
     grid->setColumnStretch(1,3);
@@ -578,6 +601,9 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(mainWindow->cyclist, GC_WIUSER, wiUser->text());
     appsettings->setCValue(mainWindow->cyclist, GC_WIKEY, wiPass->text());
     appsettings->setCValue(mainWindow->cyclist, GC_WEBCAL_URL, webcalURL->text());
+    appsettings->setCValue(mainWindow->cyclist, GC_DVURL, dvURL->text());
+    appsettings->setCValue(mainWindow->cyclist, GC_DVUSER, dvUser->text());
+    appsettings->setCValue(mainWindow->cyclist, GC_DVPASS, dvPass->text());
     saveTwitter(); // get secret key if PIN set
 }
 
