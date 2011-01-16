@@ -108,6 +108,7 @@ class RideFile : public QObject // QObject to emit signals
         void appendPoint(double secs, double cad, double hr, double km,
                          double kph, double nm, double watts, double alt,
                          double lon, double lat, double headwind, int interval);
+        void appendPoint(const RideFilePoint &);
         const QVector<RideFilePoint*> &dataPoints() const { return dataPoints_; }
 
         // Working with DATAPRESENT flags
