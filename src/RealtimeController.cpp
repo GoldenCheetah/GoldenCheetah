@@ -78,7 +78,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         double mph = rtData.getSpeed() * MILES_PER_KM;
         // using the algorithm from:
         // http://thebikegeek.blogspot.com/2009/12/while-we-wait-for-better-and-better.html
-        rtData.setWatts((0.0115*(mph*mph*mph)) - ((0.0137)*(mph*mph)) - ((8.9788)*(mph)));
+        rtData.setWatts((0.0115*(mph*mph*mph)) - ((0.0137)*(mph*mph)) + ((8.9788)*(mph)));
         }
     default : // unknown - do nothing
         break;
