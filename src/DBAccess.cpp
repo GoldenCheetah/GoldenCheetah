@@ -40,7 +40,7 @@
 // DB Schema Version - YOU MUST UPDATE THIS IF THE SCHEMA VERSION CHANGES!!!
 // Schema version will change if a) the default metadata.xml is updated
 //                            or b) new metrics are added / old changed
-static int DBSchemaVersion = 23;
+static int DBSchemaVersion = 24;
 
 DBAccess::DBAccess(MainWindow* main, QDir home) : main(main), home(home)
 {
@@ -145,6 +145,7 @@ bool DBAccess::createMetricsTable()
     // we need to create it!
     if (rc && createTables) {
         QString createMetricTable = "create table metrics (filename varchar primary key,"
+                                    "identifier varchar,"
                                     "timestamp integer,"
                                     "ride_date date,"
                                     "fingerprint integer";
@@ -374,7 +375,7 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, unsign
     }
 
     // construct an insert statement
-    QString insertStatement = "insert into metrics ( filename, timestamp, ride_date, fingerprint ";
+    QString insertStatement = "insert into metrics ( filename, identifier, timestamp, ride_date, fingerprint ";
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i=0; i<factory.metricCount(); i++)
         insertStatement += QString(", X%1 ").arg(factory.metricName(i));
@@ -392,7 +393,7 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, unsign
         }
     }
 
-    insertStatement += " ) values (?,?,?,?"; // filename, timestamp, ride_date
+    insertStatement += " ) values (?,?,?,?,?"; // filename, identifier, timestamp, ride_date
     for (int i=0; i<factory.metricCount(); i++)
         insertStatement += ",?";
     foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
@@ -406,6 +407,7 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, unsign
 
     // filename, timestamp, ride date
 	query.addBindValue(summaryMetrics->getFileName());
+	query.addBindValue(summaryMetrics->getId());
 	query.addBindValue(timestamp.toTime_t());
     query.addBindValue(summaryMetrics->getRideDate());
     query.addBindValue((int)fingerprint);
@@ -476,7 +478,7 @@ QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
     if (end == QDateTime()) end = QDateTime::currentDateTime().addYears(+10);
 
     // construct the select statement
-    QString selectStatement = "SELECT filename, ride_date";
+    QString selectStatement = "SELECT filename, identifier, ride_date";
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i=0; i<factory.metricCount(); i++)
         selectStatement += QString(", X%1 ").arg(factory.metricName(i));
@@ -499,20 +501,21 @@ QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
 
         // filename and date
         summaryMetrics.setFileName(query.value(0).toString());
-        summaryMetrics.setRideDate(query.value(1).toDateTime());
+        summaryMetrics.setId(query.value(1).toString());
+        summaryMetrics.setRideDate(query.value(2).toDateTime());
         // the values
         int i=0;
         for (; i<factory.metricCount(); i++)
-            summaryMetrics.setForSymbol(factory.metricName(i), query.value(i+2).toDouble());
+            summaryMetrics.setForSymbol(factory.metricName(i), query.value(i+3).toDouble());
         foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
             if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
                 QString underscored = field.name;
-                summaryMetrics.setForSymbol(underscored.replace("_"," "), query.value(i+2).toDouble());
+                summaryMetrics.setForSymbol(underscored.replace("_"," "), query.value(i+3).toDouble());
                 i++;
             } else if (!sp.isMetric(field.name) && field.type < 3) {
                 QString underscored = field.name;
                 // ignore texts for now XXX todo if want metadata from Summary Metrics
-                summaryMetrics.setText(underscored.replace("_"," "), query.value(i+2).toString());
+                summaryMetrics.setText(underscored.replace("_"," "), query.value(i+3).toString());
                 i++;
             }
         }
@@ -527,7 +530,7 @@ SummaryMetrics DBAccess::getRideMetrics(QString filename)
     SummaryMetrics summaryMetrics;
 
     // construct the select statement
-    QString selectStatement = "SELECT filename";
+    QString selectStatement = "SELECT filename, identifier";
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i=0; i<factory.metricCount(); i++)
         selectStatement += QString(", X%1 ").arg(factory.metricName(i));
@@ -546,19 +549,20 @@ SummaryMetrics DBAccess::getRideMetrics(QString filename)
     {
         // filename and date
         summaryMetrics.setFileName(query.value(0).toString());
+        summaryMetrics.setId(query.value(1).toString());
         // the values
         int i=0;
         for (; i<factory.metricCount(); i++)
-            summaryMetrics.setForSymbol(factory.metricName(i), query.value(i+1).toDouble());
+            summaryMetrics.setForSymbol(factory.metricName(i), query.value(i+2).toDouble());
         foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
             if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
                 QString underscored = field.name;
-                summaryMetrics.setForSymbol(underscored.replace(" ","_"), query.value(i+1).toDouble());
+                summaryMetrics.setForSymbol(underscored.replace(" ","_"), query.value(i+2).toDouble());
                 i++;
             } else if (!sp.isMetric(field.name) && field.type < 3) {
                 // ignore texts for now XXX todo if want metadata from Summary Metrics
                 QString underscored = field.name;
-                summaryMetrics.setText(underscored.replace("_"," "), query.value(i+1).toString());
+                summaryMetrics.setText(underscored.replace("_"," "), query.value(i+2).toString());
                 i++;
             }
         }

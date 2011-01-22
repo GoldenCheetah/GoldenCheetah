@@ -175,6 +175,7 @@ bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, u
     QDateTime dateTime(date, time);
 
     summaryMetric->setRideDate(dateTime);
+    summaryMetric->setId(ride->id());
 
     const RideMetricFactory &factory = RideMetricFactory::instance();
     QStringList metrics;

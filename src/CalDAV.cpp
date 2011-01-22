@@ -39,10 +39,104 @@ CalDAV::download()
     if (url == "") return false; // not configured
 
     QNetworkRequest request = QNetworkRequest(QUrl(url));
+
+    QByteArray *queryText = new QByteArray( "<?xml version=\"1.0\" encoding=\"utf-8\" ?>"
+                                            "<C:calendar-query xmlns:D=\"DAV:\""
+                                            "                 xmlns:C=\"urn:ietf:params:xml:ns:caldav\">"
+                                            " <D:prop>"
+                                            "   <D:getetag/>"
+                                            "   <C:calendar-data/>"
+                                            " </D:prop>"
+                                            " <C:filter>"
+                                            "   <C:comp-filter name=\"VCALENDAR\">"
+                                            "     <C:comp-filter name=\"VEVENT\">"
+                                            "       <C:time-range end=\"20200101T000000Z\" start=\"20000101T000000Z\"/>"
+                                            "     </C:comp-filter>"
+                                            "   </C:comp-filter>"
+                                            " </C:filter>"
+                                            "</C:calendar-query>\r\n");
+
+    request.setRawHeader("Depth", "0");
+    request.setRawHeader("Content-Type", "application/xml; charset=\"utf-8\"");
+    request.setRawHeader("Content-Length", (QString("%1").arg(queryText->size())).toLatin1());
+
+    QBuffer *query = new QBuffer(queryText);
+
     mode = Events;
-    QNetworkReply *reply = nam->get(request);
+    QNetworkReply *reply = nam->sendCustomRequest(request, "REPORT", query);
     if (reply->error() != QNetworkReply::NoError) {
-        QMessageBox::warning(main, tr("CalDAV Calendar url error"), reply->errorString());
+        QMessageBox::warning(main, tr("CalDAV REPORT url error"), reply->errorString());
+        mode = None;
+        return false;
+    }
+    return true;
+}
+
+//
+// Get OPTIONS available
+//
+bool
+CalDAV::options()
+{
+    QString url = appsettings->cvalue(main->cyclist, GC_DVURL, "").toString();
+    if (url == "") return false; // not configured
+
+    QNetworkRequest request = QNetworkRequest(QUrl(url));
+
+
+    QByteArray *queryText = new QByteArray("<?xml version=\"1.0\" encoding=\"utf-8\" ?>"
+                                           "<D:options xmlns:D=\"DAV:\">"
+                                           "  <C:calendar-home-set xmlns:C=\"urn:ietf:params:xml:ns:caldav\"/>"
+                                           "</D:options>");
+
+    request.setRawHeader("Depth", "0");
+    request.setRawHeader("Content-Type", "text/xml; charset=\"utf-8\"");
+    request.setRawHeader("Content-Length", (QString("%1").arg(queryText->size())).toLatin1());
+
+    QBuffer *query = new QBuffer(queryText);
+
+    mode = Options;
+    QNetworkReply *reply = nam->sendCustomRequest(request, "OPTIONS", query);
+    if (reply->error() != QNetworkReply::NoError) {
+        QMessageBox::warning(main, tr("CalDAV OPTIONS url error"), reply->errorString());
+        mode = None;
+        return false;
+    }
+    return true;
+}
+
+//
+// Get URI Properties via PROPFIND
+//
+bool
+CalDAV::propfind()
+{
+    QString url = appsettings->cvalue(main->cyclist, GC_DVURL, "").toString();
+    if (url == "") return false; // not configured
+
+    QNetworkRequest request = QNetworkRequest(QUrl(url));
+
+
+    QByteArray *queryText = new QByteArray( "<?xml version=\"1.0\" encoding=\"utf-8\" ?>"
+                                            "<D:propfind xmlns:D=\"DAV:\""
+                                            "                 xmlns:C=\"urn:ietf:params:xml:ns:caldav\">"
+                                            "  <D:prop>"
+                                            "    <D:displayname/>"
+                                            "    <C:calendar-timezone/> "
+                                            "    <C:supported-calendar-component-set/> "
+                                            "  </D:prop>"
+                                            "</D:propfind>\r\n");
+
+    request.setRawHeader("Content-Type", "text/xml; charset=\"utf-8\"");
+    request.setRawHeader("Content-Length", (QString("%1").arg(queryText->size())).toLatin1());
+    request.setRawHeader("Depth", "0");
+
+    QBuffer *query = new QBuffer(queryText);
+
+    mode = PropFind;
+    QNetworkReply *reply = nam->sendCustomRequest(request, "PROPFIND" , query);
+    if (reply->error() != QNetworkReply::NoError) {
+        QMessageBox::warning(main, tr("CalDAV OPTIONS url error"), reply->errorString());
         mode = None;
         return false;
     }
@@ -90,8 +184,28 @@ CalDAV::report()
 static
 icalcomponent *createEvent(RideItem *rideItem)
 {
+    // calendar
     icalcomponent *root = icalcomponent_new(ICAL_VCALENDAR_COMPONENT);
+
+    // calendar version
+    icalproperty *version = icalproperty_new_version("2.0");
+    icalcomponent_add_property(root, version);
+
+
     icalcomponent *event = icalcomponent_new(ICAL_VEVENT_COMPONENT);
+
+    //
+    // Unique ID
+    //
+    QString id = rideItem->ride()->id();
+    if (id == "") {
+        id = QUuid::createUuid().toString() + "@" + "goldencheetah.org";
+        rideItem->ride()->setId(id);
+        rideItem->notifyRideMetadataChanged();
+        rideItem->setDirty(true); // need to save this!
+    }
+    icalproperty *uid = icalproperty_new_uid(id.toLatin1());
+    icalcomponent_add_property(event, uid); 
 
     //
     // START DATE
@@ -153,6 +267,50 @@ icalcomponent *createEvent(RideItem *rideItem)
     return root;
 }
 
+// extract <calendar-data> entries and concatenate
+// into a single string. This is from a query response
+// where the VEVENTS are embedded within an XML document
+static QString extractComponents(QString document)
+{
+    QString returning = "";
+
+    // parse the document and extract the multistatus node (there is only one of those)
+    QDomDocument doc;
+    if (document == "" || doc.setContent(document) == false) return "";
+    QDomNode multistatus = doc.documentElement();
+    if (multistatus.isNull())  return "";
+
+    // Google Calendar retains the namespace prefix in the results
+    // Apple MobileMe doesn't. This means the element names will
+    // possibly need a prefix...
+    QString Dprefix = "";
+    QString Cprefix = "";
+    if (multistatus.nodeName().startsWith("D:")) {
+        Dprefix = "D:";
+        Cprefix = "C:";
+    }
+
+    // read all the responses within the multistatus
+    for (QDomNode response = multistatus.firstChildElement(Dprefix + "response");
+         response.nodeName() == (Dprefix + "response"); response = response.nextSiblingElement(Dprefix + "response")) {
+
+        // skate over the nest of crap to get at the calendar-data
+        QDomNode propstat = response.firstChildElement(Dprefix + "propstat");
+        QDomNode prop = propstat.firstChildElement(Dprefix + "prop");
+        QDomNode calendardata = prop.firstChildElement(Cprefix + "calendar-data");
+
+        // extract the calendar entry - top and tail the other crap
+        QString text = calendardata.toElement().text();
+        int start = text.indexOf("BEGIN:VEVENT");
+        int stop = text.indexOf("END:VEVENT");
+
+        if (start == -1 || stop == -1) continue;
+
+        returning += text.mid(start, stop-start+10) + "\n";
+    }
+    return returning;
+}
+
 //
 // PUT a ride item
 //
@@ -196,13 +354,17 @@ void
 CalDAV::requestReply(QNetworkReply *reply)
 {
     QString response = reply->readAll();
+
     switch (mode) {
     case Report:
     case Events:
-        main->rideCalendar->refreshRemote(response);
+        main->rideCalendar->refreshRemote(extractComponents(response));
         break;
     default:
+    case Options:
+    case PropFind:
     case Put:
+        //nothing at the moment XXX FIXME need some diags / error checking
         break;
     }
     mode = None;

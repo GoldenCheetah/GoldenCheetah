@@ -517,7 +517,9 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     webcalURL->setText(appsettings->cvalue(mainWindow->cyclist, GC_WEBCAL_URL, "").toString());
 
     dvURL = new QLineEdit(this);
-    dvURL->setText(appsettings->cvalue(mainWindow->cyclist, GC_DVURL, "https://www.google.com/calendar/dav/<email>/events/").toString());
+    QString url = appsettings->cvalue(mainWindow->cyclist, GC_DVURL, "").toString();
+    url.replace("%40", "@"); // remove escape of @ character
+    dvURL->setText(url);
 
     dvUser = new QLineEdit(this);
     dvUser->setText(appsettings->cvalue(mainWindow->cyclist, GC_DVUSER, "").toString());
@@ -601,7 +603,11 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(mainWindow->cyclist, GC_WIUSER, wiUser->text());
     appsettings->setCValue(mainWindow->cyclist, GC_WIKEY, wiPass->text());
     appsettings->setCValue(mainWindow->cyclist, GC_WEBCAL_URL, webcalURL->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_DVURL, dvURL->text());
+
+    // escape the at character
+    QString url = dvURL->text();
+    url.replace("@", "%40");
+    appsettings->setCValue(mainWindow->cyclist, GC_DVURL, url);
     appsettings->setCValue(mainWindow->cyclist, GC_DVUSER, dvUser->text());
     appsettings->setCValue(mainWindow->cyclist, GC_DVPASS, dvPass->text());
     saveTwitter(); // get secret key if PIN set
