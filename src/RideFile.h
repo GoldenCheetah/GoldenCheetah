@@ -122,6 +122,8 @@ class RideFile : public QObject // QObject to emit signals
         void setRecIntSecs(double value) { recIntSecs_ = value; }
         const QString &deviceType() const { return deviceType_; }
         void setDeviceType(const QString &value) { deviceType_ = value; }
+        const QString id() const { return id_; }
+        void setId(const QString &value) { id_ = value; }
 
         // Working with INTERVALS
         const QList<RideFileInterval> &intervals() const { return intervals_; }
@@ -179,6 +181,7 @@ class RideFile : public QObject // QObject to emit signals
 
     private:
 
+        QString id_; // global uuid@goldencheetah.org
         QDateTime startTime_;  // time of day that the ride started
         double recIntSecs_;    // recording interval in seconds
         QVector<RideFilePoint*> dataPoints_;

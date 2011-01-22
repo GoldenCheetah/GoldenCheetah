@@ -31,6 +31,10 @@ class SummaryMetrics
 	    QString getFileName() { return fileName; }
         void    setFileName(QString fileName) { this->fileName = fileName; }
 
+        // Identifier
+        QString getId() { return id; }
+        void setId(QString id) { this->id = id; }
+
         // ride date
         QDateTime getRideDate() { return rideDate; }
         void setRideDate(QDateTime rideDate) { this->rideDate = rideDate; }
@@ -61,6 +65,7 @@ class SummaryMetrics
 
 	private:
 	    QString fileName;
+        QString id;
         QDateTime rideDate;
         QMap<QString, double> value;
         QMap<QString, QString> texts;

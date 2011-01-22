@@ -25,6 +25,7 @@ SpecialFields::SpecialFields()
 {
     names_  << "Start Date"    // linked to RideFile::starttime
             << "Start Time"    // linked to RideFile::starttime
+            << "Identifier"    // linkned to RideFile::id
             << "Workout Code" // in WKO and possibly others
             << "Sport"        // in WKO and possible others
             << "Objective"    // in WKO as "goal" nad possibly others

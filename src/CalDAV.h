@@ -46,12 +46,15 @@
 #include "RideFile.h"
 #include "JsonRideFile.h"
 
+// create a UUID
+#include <QUuid>
+
 class CalDAV : public QObject
 {
     Q_OBJECT
     G_OBJECT
 
-    enum action { Put, Get, Events, Report, None };
+    enum action { Options, PropFind, Put, Get, Events, Report, None };
     typedef enum action ActionType;
 
 public:
@@ -59,6 +62,12 @@ public:
 
 
 public slots:
+
+    // Query CalDAV server Options
+    bool options();
+
+    // Query CalDAV server Options
+    bool propfind();
 
     // authentication (and refresh all events)
     bool download();

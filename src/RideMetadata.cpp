@@ -407,6 +407,9 @@ FormField::editFinished()
     if (definition.name == "Device") {
         ourRideItem->ride()->setDeviceType(text);
         ourRideItem->notifyRideMetadataChanged();
+    } else if (definition.name == "Identifier") {
+        ourRideItem->ride()->setId(text);
+        ourRideItem->notifyRideMetadataChanged();
     } else if (definition.name == "Recording Interval") {
         ourRideItem->ride()->setRecIntSecs(text.toDouble());
         ourRideItem->notifyRideMetadataChanged();
@@ -516,6 +519,7 @@ FormField::metadataChanged()
         else if (definition.name == "Recording Interval") value = QString("%1").arg(ourRideItem->ride()->recIntSecs());
         else if (definition.name == "Start Date") value = ourRideItem->ride()->startTime().date().toString("dd.MM.yyyy");
         else if (definition.name == "Start Time") value = ourRideItem->ride()->startTime().time().toString("hh:mm:ss.zzz");
+        else if (definition.name == "Identifier") value = ourRideItem->ride()->id();
         else {
             if (sp.isMetric(definition.name)) {
                 //  get from metric overrides

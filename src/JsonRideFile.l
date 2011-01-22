@@ -43,6 +43,7 @@
 \"STARTTIME\"       return STARTTIME;
 \"RECINTSECS\"      return RECINTSECS;
 \"DEVICETYPE\"      return DEVICETYPE;
+\"IDENTIFIER\"      return IDENTIFIER;
 \"OVERRIDES\"       return OVERRIDES;
 \"TAGS\"            return TAGS;
 \"INTERVALS\"       return INTERVALS;

@@ -64,6 +64,9 @@ GcFileReader::openRideFile(QFile &file, QStringList &errors) const
             // now set in localtime
             rideFile->setStartTime(asUTC.toLocalTime());
         }
+        if (key == "Identifier") {
+            rideFile->setId(value);
+        }
     }
 
     // read in metric overrides:
@@ -186,6 +189,10 @@ GcFileReader::writeRideFile(const RideFile *ride, QFile &file) const
     attributes.appendChild(attribute);
     attribute.setAttribute("key", "Device type");
     attribute.setAttribute("value", ride->deviceType());
+    attribute = doc.createElement("attribute");
+    attributes.appendChild(attribute);
+    attribute.setAttribute("key", "Identifier");
+    attribute.setAttribute("value", ride->id());
 
     // write out in metric overrides:
     //  <override>

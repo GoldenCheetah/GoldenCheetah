@@ -63,21 +63,22 @@ void JsonRideFileerror(const char *error) // used by parser aka yyerror()
 //
 
 // Escape special characters (JSON compliance)
-static QString protect(QString string)
+static QString protect(const QString string)
 {
-    string.replace("\\", "\\\\"); // backslash
-    string.replace("\"", "\\\""); // quote
-    string.replace("\t", "\\t");  // tab
-    string.replace("\n", "\\n");  // newline
-    string.replace("\r", "\\r");  // carriage-return
-    string.replace("\b", "\\b");  // backspace
-    string.replace("\f", "\\f");  // formfeed
-    string.replace("/", "\\/");   // solidus
-    return string;
+    QString s = string;
+    s.replace("\\", "\\\\"); // backslash
+    s.replace("\"", "\\\""); // quote
+    s.replace("\t", "\\t");  // tab
+    s.replace("\n", "\\n");  // newline
+    s.replace("\r", "\\r");  // carriage-return
+    s.replace("\b", "\\b");  // backspace
+    s.replace("\f", "\\f");  // formfeed
+    s.replace("/", "\\/");   // solidus
+    return s;
 }
 
 // Un-Escape special characters (JSON compliance)
-static QString unprotect(QString string)
+static QString unprotect(const QString string)
 {
     // this is a lexer string so it will be enclosed
     // in quotes. Lets strip those first
@@ -98,7 +99,7 @@ static QString unprotect(QString string)
 %}
 
 %token STRING INTEGER FLOAT
-%token RIDE STARTTIME RECINTSECS DEVICETYPE
+%token RIDE STARTTIME RECINTSECS DEVICETYPE IDENTIFIER
 %token OVERRIDES
 %token TAGS INTERVALS NAME START STOP
 %token SAMPLES SECS KM WATTS NM CAD KPH HR ALTITUDE LAT LON HEADWIND
@@ -124,6 +125,7 @@ rideelement_list: rideelement_list ',' rideelement
 rideelement: starttime
             | recordint
             | devicetype
+            | identifier
             | overrides
             | tags
             | intervals
@@ -140,6 +142,7 @@ starttime: STARTTIME ':' string         {
                                         }
 recordint: RECINTSECS ':' number        { JsonRide->setRecIntSecs(JsonNumber); }
 devicetype: DEVICETYPE ':' string       { JsonRide->setDeviceType(JsonString); }
+identifier: IDENTIFIER ':' string       { JsonRide->setId(JsonString); }
 
 /*
  * Metric Overrides
@@ -279,7 +282,8 @@ JsonFileReader::writeRideFile(const RideFile *ride, QFile &file) const
     // first class variables
     out << "\t\t\"STARTTIME\":\"" << protect(ride->startTime().toUTC().toString(DATETIME_FORMAT)) << "\",\n";
     out << "\t\t\"RECINTSECS\":" << ride->recIntSecs() << ",\n";
-    out << "\t\t\"DEVICETYPE\":\"" << protect(ride->deviceType()) << "\"";
+    out << "\t\t\"DEVICETYPE\":\"" << protect(ride->deviceType()) << "\",\n";
+    out << "\t\t\"IDENTIFIER\":\"" << protect(ride->id()) << "\"";
 
     //
     // OVERRIDES

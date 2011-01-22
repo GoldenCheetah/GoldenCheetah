@@ -320,7 +320,7 @@ MainWindow::MainWindow(const QDir &home) :
 #ifdef GC_HAVE_ICAL
     rideCalendar = new ICalendar(this); // my local/remote calendar entries
     davCalendar = new CalDAV(this); // remote caldav
-    davCalendar->download(); // login
+    davCalendar->download(); // refresh the diary window
 #endif
 
     QTreeWidgetItem *last = NULL;
