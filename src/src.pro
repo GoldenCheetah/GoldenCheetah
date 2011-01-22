@@ -315,5 +315,7 @@ TRANSLATIONS = translations/gc_fr.ts \
                translations/gc_ja.ts \
                translations/gc_it.ts \
                translations/gc_pt-br.ts \
-               translations/gc_de.ts
+               translations/gc_de.ts \
+               translations/gc_cs.ts \
+               translations/gc_ru.ts
 
