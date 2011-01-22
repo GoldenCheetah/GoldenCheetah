@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="ja" version="2.0">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="ja">
 <context>
     <name>AerobicDecoupling</name>
     <message>
@@ -327,54 +329,54 @@
 <context>
     <name>CPPage</name>
     <message>
-        <location filename="../Pages.cpp" line="1540"/>
+        <location filename="../Pages.cpp" line="1580"/>
         <source>Add CP</source>
         <translation>CPを追加</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1541"/>
+        <location filename="../Pages.cpp" line="1581"/>
         <source>Delete CP</source>
         <translation>CPを削除</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1542"/>
+        <location filename="../Pages.cpp" line="1582"/>
         <source>Default</source>
         <translation>デフォルト</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1545"/>
+        <location filename="../Pages.cpp" line="1585"/>
         <source>Add Zone</source>
         <translation>ゾーンを追加</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1546"/>
+        <location filename="../Pages.cpp" line="1586"/>
         <source>Delete Zone</source>
         <translation>ゾーンを削除</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1560"/>
-        <location filename="../Pages.cpp" line="1578"/>
+        <location filename="../Pages.cpp" line="1600"/>
+        <location filename="../Pages.cpp" line="1618"/>
         <source>From Date</source>
         <translation>開始日</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1561"/>
-        <location filename="../Pages.cpp" line="1579"/>
+        <location filename="../Pages.cpp" line="1601"/>
+        <location filename="../Pages.cpp" line="1619"/>
         <source>Critical Power</source>
         <translation>クリティカルパワー</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1608"/>
+        <location filename="../Pages.cpp" line="1648"/>
         <source>Short</source>
         <translation>略称</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1609"/>
+        <location filename="../Pages.cpp" line="1649"/>
         <source>Long</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1610"/>
+        <location filename="../Pages.cpp" line="1650"/>
         <source>From Watts</source>
         <translation>最低ワット</translation>
     </message>
@@ -462,7 +464,7 @@
     </message>
     <message>
         <location filename="../ChooseCyclistDialog.cpp" line="88"/>
-        <source>Enter New Cyclist's Name</source>
+        <source>Enter New Cyclist&apos;s Name</source>
         <translation>サイクリスト名を入力してください</translation>
     </message>
     <message>
@@ -472,7 +474,7 @@
     </message>
     <message>
         <location filename="../ChooseCyclistDialog.cpp" line="95"/>
-        <source>Can't create new directory </source>
+        <source>Can&apos;t create new directory </source>
         <translation>新しいディレクトリが作成できません</translation>
     </message>
 </context>
@@ -519,32 +521,32 @@
         <translation>Twitter</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="176"/>
+        <location filename="../ConfigDialog.cpp" line="186"/>
         <source>Short Term Stress</source>
         <translation>短期ストレス (STS)</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="177"/>
+        <location filename="../ConfigDialog.cpp" line="187"/>
         <source>STS</source>
         <translation>STS</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="178"/>
+        <location filename="../ConfigDialog.cpp" line="188"/>
         <source>Long Term Stress</source>
         <translation>長期ストレス (LTS)</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="179"/>
+        <location filename="../ConfigDialog.cpp" line="189"/>
         <source>LTS</source>
         <translation>LTS</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="180"/>
+        <location filename="../ConfigDialog.cpp" line="190"/>
         <source>Stress Balance</source>
         <translation>ストレスバランス (SB)</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="181"/>
+        <location filename="../ConfigDialog.cpp" line="191"/>
         <source>SB</source>
         <translation>SB</translation>
     </message>
@@ -592,87 +594,112 @@
         <translation>日本語</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="50"/>
+        <location filename="../Pages.cpp" line="38"/>
+        <source>Portugese (Brazil)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="39"/>
+        <source>Italian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="40"/>
+        <source>German</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="41"/>
+        <source>Russian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="42"/>
+        <source>Czech</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="65"/>
         <source>Unit of Measurement:</source>
         <translation>計測単位:</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="53"/>
+        <location filename="../Pages.cpp" line="68"/>
         <source>Metric</source>
         <translation>メートル</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="54"/>
+        <location filename="../Pages.cpp" line="69"/>
         <source>Imperial</source>
         <translation>ヤード・ポンド</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="63"/>
+        <location filename="../Pages.cpp" line="78"/>
         <source>Crank Length:</source>
         <translation>クランク長:</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="102"/>
+        <location filename="../Pages.cpp" line="117"/>
         <source>Sort ride list ascending.</source>
         <translation>ライドを昇順に並び替える。</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="115"/>
+        <location filename="../Pages.cpp" line="130"/>
         <source>Use Garmin Smart Recording.</source>
         <translation>Garminスマートレコーディングを使用する。</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="122"/>
+        <location filename="../Pages.cpp" line="137"/>
         <source>Smart Recording Threshold </source>
         <translation>スマートレコーディング閾値</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="123"/>
+        <location filename="../Pages.cpp" line="138"/>
         <source> secs.</source>
         <translation>秒</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="132"/>
+        <location filename="../Pages.cpp" line="147"/>
         <source>Requires Restart To Take Effect</source>
         <translation>再起動後に設定されます</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="156"/>
+        <location filename="../Pages.cpp" line="171"/>
         <source>BikeScore Estimate: use rides within last </source>
         <translation>BikeScore予測: 利用する過去のライド日数 </translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="157"/>
+        <location filename="../Pages.cpp" line="172"/>
         <source> days</source>
         <translation> 日</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="161"/>
+        <location filename="../Pages.cpp" line="176"/>
         <source>BikeScore estimate mode: </source>
         <translation>バイクスコア予測モード: </translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="163"/>
+        <location filename="../Pages.cpp" line="178"/>
         <source>time</source>
         <translation>時間</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="164"/>
+        <location filename="../Pages.cpp" line="179"/>
         <source>distance</source>
         <translation>距離</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="179"/>
+        <location filename="../Pages.cpp" line="194"/>
         <source>Workout Library</source>
         <translation>ワークアウトライブラリ</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="182"/>
+        <location filename="../Pages.cpp" line="197"/>
         <source>Browse</source>
         <translation>参照</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="306"/>
+        <location filename="../Pages.cpp" line="321"/>
         <source>Select Workout Library</source>
         <translation>ワークアウトライブラリの選択</translation>
     </message>
@@ -828,43 +855,43 @@ This may take a while.
 <context>
     <name>CyclistPage</name>
     <message>
-        <location filename="../Pages.cpp" line="228"/>
         <location filename="../Pages.cpp" line="243"/>
+        <location filename="../Pages.cpp" line="258"/>
         <source>Performance Manager</source>
         <translation>パフォーマンスマネージャ</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="226"/>
+        <location filename="../Pages.cpp" line="241"/>
         <source>Power Zones</source>
         <translation>パワーゾーン</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="225"/>
+        <location filename="../Pages.cpp" line="240"/>
         <source>Rider</source>
         <translation>ライダー</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="227"/>
+        <location filename="../Pages.cpp" line="242"/>
         <source>HR Zones</source>
         <translation>心拍ゾーン</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="244"/>
+        <location filename="../Pages.cpp" line="259"/>
         <source>Show Stress Balance Today</source>
         <translation>今日のストレスバランスを見る</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="247"/>
+        <location filename="../Pages.cpp" line="262"/>
         <source>Starting LTS</source>
         <translation>初期LTS</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="248"/>
+        <location filename="../Pages.cpp" line="263"/>
         <source>STS average (days)</source>
         <translation>短期ストレス平均に用いる日数</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="249"/>
+        <location filename="../Pages.cpp" line="264"/>
         <source>LTS average (days)</source>
         <translation>長期ストレス平均に用いる日数</translation>
     </message>
@@ -961,42 +988,47 @@ Click Cancel to exit.</source>
 <context>
     <name>DevicePage</name>
     <message>
-        <location filename="../Pages.cpp" line="315"/>
+        <location filename="../Pages.cpp" line="330"/>
         <source>Devices</source>
         <translation>デバイス</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="323"/>
+        <location filename="../Pages.cpp" line="338"/>
         <source>Device Name</source>
         <translation>デバイス名</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="326"/>
+        <location filename="../Pages.cpp" line="341"/>
         <source>Device Type</source>
         <translation>デバイスタイプ</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="338"/>
+        <location filename="../Pages.cpp" line="353"/>
         <source>Device Port</source>
         <translation>ポート</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="343"/>
+        <location filename="../Pages.cpp" line="358"/>
         <source>Device Profile</source>
         <translation>プロファイル</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="350"/>
+        <location filename="../Pages.cpp" line="361"/>
+        <source>Virtual Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="377"/>
         <source>Add</source>
         <translation>追加</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="351"/>
+        <location filename="../Pages.cpp" line="378"/>
         <source>Delete</source>
         <translation>削除</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="352"/>
+        <location filename="../Pages.cpp" line="379"/>
         <source>Pair</source>
         <translation>ペアリング</translation>
     </message>
@@ -1195,42 +1227,42 @@ then click &quot;Rescan&quot; to check again.</source>
 <context>
     <name>FieldsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="1095"/>
+        <location filename="../Pages.cpp" line="1135"/>
         <source>Move up</source>
         <translation>上へ</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1096"/>
+        <location filename="../Pages.cpp" line="1136"/>
         <source>Move down</source>
         <translation>下へ</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1097"/>
+        <location filename="../Pages.cpp" line="1137"/>
         <source>Insert</source>
         <translation>挿入</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1098"/>
+        <location filename="../Pages.cpp" line="1138"/>
         <source>Rename</source>
         <translation>リネーム</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1099"/>
+        <location filename="../Pages.cpp" line="1139"/>
         <source>Delete</source>
         <translation>削除</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1110"/>
+        <location filename="../Pages.cpp" line="1150"/>
         <source>Screen Tab</source>
         <translation>スクリーンタブ</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1111"/>
+        <location filename="../Pages.cpp" line="1151"/>
         <source>Field</source>
         <translation>フィールド</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1112"/>
+        <location filename="../Pages.cpp" line="1152"/>
         <source>Type</source>
         <translation>種別</translation>
     </message>
@@ -1293,19 +1325,16 @@ then click &quot;Rescan&quot; to check again.</source>
         <translation>閉じる</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1543"/>
         <source>Time</source>
-        <translation>時間</translation>
+        <translation type="obsolete">時間</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1543"/>
         <source>Column</source>
-        <translation>カラム</translation>
+        <translation type="obsolete">カラム</translation>
     </message>
     <message>
-        <location filename="../RideEditor.cpp" line="1543"/>
         <source>Value</source>
-        <translation>値</translation>
+        <translation type="obsolete">値</translation>
     </message>
 </context>
 <context>
@@ -1405,29 +1434,25 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>GoogleMapControl</name>
     <message>
-        <location filename="../GoogleMapControl.cpp" line="279"/>
+        <location filename="../GoogleMapControl.cpp" line="282"/>
         <source>No GPS Data Present</source>
         <translation>GPSデータがありません</translation>
     </message>
     <message>
-        <location filename="../GoogleMapControl.cpp" line="460"/>
         <source>KPH</source>
-        <translation>km/h</translation>
+        <translation type="obsolete">km/h</translation>
     </message>
     <message>
-        <location filename="../GoogleMapControl.cpp" line="460"/>
         <source>MPH</source>
-        <translation>m/h</translation>
+        <translation type="obsolete">m/h</translation>
     </message>
     <message>
-        <location filename="../GoogleMapControl.cpp" line="470"/>
         <source>Meters</source>
-        <translation>メートル</translation>
+        <translation type="obsolete">メートル</translation>
     </message>
     <message>
-        <location filename="../GoogleMapControl.cpp" line="470"/>
         <source>Feet</source>
-        <translation>フィート</translation>
+        <translation type="obsolete">フィート</translation>
     </message>
 </context>
 <context>
@@ -1506,38 +1531,38 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>HrSchemePage</name>
     <message>
-        <location filename="../Pages.cpp" line="1902"/>
+        <location filename="../Pages.cpp" line="1942"/>
         <source>Add</source>
         <translation>追加</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1903"/>
+        <location filename="../Pages.cpp" line="1943"/>
         <source>Rename</source>
         <translation>リネーム</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1904"/>
+        <location filename="../Pages.cpp" line="1944"/>
         <source>Delete</source>
         <translation>削除</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1913"/>
+        <location filename="../Pages.cpp" line="1953"/>
         <source>Short</source>
         <translation>略称</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1914"/>
+        <location filename="../Pages.cpp" line="1954"/>
         <source>Long</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1915"/>
+        <location filename="../Pages.cpp" line="1955"/>
         <source>Percent of LT</source>
         <translatorcomment>いまいち</translatorcomment>
         <translation>対LTの割合</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1916"/>
+        <location filename="../Pages.cpp" line="1956"/>
         <source>Trimp k</source>
         <translatorcomment>でいいのかな？</translatorcomment>
         <translation>Trimp係数</translation>
@@ -1546,12 +1571,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>HrZonePage</name>
     <message>
-        <location filename="../Pages.cpp" line="1885"/>
+        <location filename="../Pages.cpp" line="1925"/>
         <source>Lactic Threshold History</source>
         <translation>LT値履歴</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1886"/>
+        <location filename="../Pages.cpp" line="1926"/>
         <source>Default Zones</source>
         <translation>デフォルトゾーン</translation>
     </message>
@@ -1715,24 +1740,24 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>IntervalMetricsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="704"/>
+        <location filename="../Pages.cpp" line="744"/>
         <source>Available Metrics</source>
         <translation>使用可能な統計</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="709"/>
+        <location filename="../Pages.cpp" line="749"/>
         <source>Selected Metrics</source>
         <translation>選択された統計</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="760"/>
-        <location filename="../Pages.cpp" line="770"/>
+        <location filename="../Pages.cpp" line="800"/>
+        <location filename="../Pages.cpp" line="810"/>
         <source>&amp;#8482;</source>
         <translation>&amp;#8482;</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="760"/>
-        <location filename="../Pages.cpp" line="770"/>
+        <location filename="../Pages.cpp" line="800"/>
+        <location filename="../Pages.cpp" line="810"/>
         <source> (TM)</source>
         <translation> (TM)</translation>
     </message>
@@ -1740,27 +1765,27 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>KeywordsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="929"/>
+        <location filename="../Pages.cpp" line="969"/>
         <source>Move up</source>
         <translation>上へ</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="930"/>
+        <location filename="../Pages.cpp" line="970"/>
         <source>Move down</source>
         <translation>下へ</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="931"/>
+        <location filename="../Pages.cpp" line="971"/>
         <source>Insert</source>
         <translation>挿入</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="932"/>
+        <location filename="../Pages.cpp" line="972"/>
         <source>Rename</source>
         <translation>リネーム</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="933"/>
+        <location filename="../Pages.cpp" line="973"/>
         <source>Delete</source>
         <translation>削除</translation>
     </message>
@@ -1913,71 +1938,71 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>LTPage</name>
     <message>
-        <location filename="../Pages.cpp" line="2077"/>
+        <location filename="../Pages.cpp" line="2117"/>
         <source>Add LT</source>
         <translation>LT値を追加</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2078"/>
+        <location filename="../Pages.cpp" line="2118"/>
         <source>Delete LT</source>
         <translation>LT値を削除</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2079"/>
+        <location filename="../Pages.cpp" line="2119"/>
         <source>Default</source>
         <translation>デフォルト</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2082"/>
+        <location filename="../Pages.cpp" line="2122"/>
         <source>Add Zone</source>
         <translation>ゾーンを追加</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2083"/>
+        <location filename="../Pages.cpp" line="2123"/>
         <source>Delete Zone</source>
         <translation>ゾーンを削除</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2097"/>
         <location filename="../Pages.cpp" line="2137"/>
+        <location filename="../Pages.cpp" line="2177"/>
         <source>From Date</source>
         <translation>開始日</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2098"/>
         <location filename="../Pages.cpp" line="2138"/>
+        <location filename="../Pages.cpp" line="2178"/>
         <source>Lactic Threshold</source>
         <translation>LT値</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2115"/>
-        <location filename="../Pages.cpp" line="2139"/>
+        <location filename="../Pages.cpp" line="2155"/>
+        <location filename="../Pages.cpp" line="2179"/>
         <source>Rest HR</source>
         <translation>安静時心拍数</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2116"/>
-        <location filename="../Pages.cpp" line="2140"/>
+        <location filename="../Pages.cpp" line="2156"/>
+        <location filename="../Pages.cpp" line="2180"/>
         <source>Max HR</source>
         <translation>最大心拍数</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2177"/>
+        <location filename="../Pages.cpp" line="2217"/>
         <source>Short</source>
         <translation>略称</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2178"/>
+        <location filename="../Pages.cpp" line="2218"/>
         <source>Long</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2179"/>
+        <location filename="../Pages.cpp" line="2219"/>
         <source>From BPM</source>
         <translation>最低心拍数</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2180"/>
+        <location filename="../Pages.cpp" line="2220"/>
         <source>Trimp k</source>
         <translation>Trimp係数</translation>
     </message>
@@ -2268,7 +2293,7 @@ Skipping file...</source>
     <message>
         <location filename="../MainWindow.cpp" line="627"/>
         <location filename="../MainWindow.cpp" line="1242"/>
-        <source>Can't rename %1 to %2</source>
+        <source>Can&apos;t rename %1 to %2</source>
         <translation>%1 から %2 にリネームできません</translation>
     </message>
     <message>
@@ -2355,7 +2380,7 @@ Skipping file...</source>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="785"/>
-        <source>The file %1 can't be opened for writing</source>
+        <source>The file %1 can&apos;t be opened for writing</source>
         <translation>%1 への書き込みに失敗しました</translation>
     </message>
     <message>
@@ -2447,7 +2472,7 @@ Skipping file...</source>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1218"/>
-        <source>Can't read notes file %1</source>
+        <source>Can&apos;t read notes file %1</source>
         <translation>ノートファイル %1 の読み込みに失敗</translation>
     </message>
     <message>
@@ -2458,7 +2483,7 @@ Skipping file...</source>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1249"/>
-        <source>Can't write notes file %1</source>
+        <source>Can&apos;t write notes file %1</source>
         <translation>ノートファイル %1 の書き込みに失敗</translation>
     </message>
     <message>
@@ -2481,7 +2506,7 @@ CP値%3ワットに設定されました</translation>
     <message>
         <location filename="../MainWindow.cpp" line="1347"/>
         <source>&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;Build date: %1 %2&lt;p&gt;Version: %3&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Ride files and other data are stored in&lt;br&gt;&lt;a href=&quot;%4&quot;&gt;%5&lt;/a&gt;&lt;/center&gt;</source>
-        <translation>&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;<byte value="x1f"/>Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;Build date: %1 %2&lt;p&gt;Version: %3&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;ソースコードは以下の公式サイトより入手可能です。&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;&lt;p&gt;各種ライドデータは次のディレクトリを御覧ください。&lt;br&gt;&lt;a href=&quot;%4&quot;&gt;%5&lt;/a&gt;&lt;/center&gt;</translation>
+        <translation>&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;&lt;byte value=&quot;x1f&quot;/&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;Build date: %1 %2&lt;p&gt;Version: %3&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;ソースコードは以下の公式サイトより入手可能です。&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;&lt;p&gt;各種ライドデータは次のディレクトリを御覧ください。&lt;br&gt;&lt;a href=&quot;%4&quot;&gt;%5&lt;/a&gt;&lt;/center&gt;</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1426"/>
@@ -2639,7 +2664,7 @@ CP値%3ワットに設定されました</translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="290"/>
-        <source>The values you've entered in:
+        <source>The values you&apos;ve entered in:
  </source>
         <translation>入力された値: 
 </translation>
@@ -2738,17 +2763,17 @@ CP値%3ワットに設定されました</translation>
 <context>
     <name>MetadataPage</name>
     <message>
-        <location filename="../Pages.cpp" line="891"/>
+        <location filename="../Pages.cpp" line="931"/>
         <source>Fields</source>
         <translation>フィールド</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="892"/>
+        <location filename="../Pages.cpp" line="932"/>
         <source>Notes Keywords</source>
         <translation>ノートキーワード</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="893"/>
+        <location filename="../Pages.cpp" line="933"/>
         <source>Processing</source>
         <translation>処理中</translation>
     </message>
@@ -3269,14 +3294,12 @@ Do you want to continue?</source>
 <context>
     <name>PfPvPlot</name>
     <message>
-        <location filename="../PfPvPlot.cpp" line="140"/>
         <source>Average Effective Pedal Force (N)</source>
-        <translation>実効平均ペダルフォース (N)</translation>
+        <translation type="obsolete">実効平均ペダルフォース (N)</translation>
     </message>
     <message>
-        <location filename="../PfPvPlot.cpp" line="142"/>
         <source>Circumferential Pedal Velocity (m/s)</source>
-        <translation>ペダル周速度 (m/s)</translation>
+        <translation type="obsolete">ペダル周速度 (m/s)</translation>
     </message>
     <message>
         <location filename="../PfPvPlot.cpp" line="372"/>
@@ -3402,27 +3425,27 @@ Do you want to continue?</source>
 <context>
     <name>ProcessorPage</name>
     <message>
-        <location filename="../Pages.cpp" line="1281"/>
+        <location filename="../Pages.cpp" line="1321"/>
         <source>Processor</source>
         <translation>処理</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1282"/>
+        <location filename="../Pages.cpp" line="1322"/>
         <source>Apply</source>
         <translation>適用</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1283"/>
+        <location filename="../Pages.cpp" line="1323"/>
         <source>Settings</source>
         <translation>設定</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1307"/>
+        <location filename="../Pages.cpp" line="1347"/>
         <source>Manual</source>
         <translation>手動</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1308"/>
+        <location filename="../Pages.cpp" line="1348"/>
         <source>Auto</source>
         <translation>自動</translation>
     </message>
@@ -3438,138 +3461,138 @@ Do you want to continue?</source>
 <context>
     <name>RealtimeWindow</name>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="131"/>
+        <location filename="../RealtimeWindow.cpp" line="133"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="134"/>
-        <location filename="../RealtimeWindow.cpp" line="449"/>
+        <location filename="../RealtimeWindow.cpp" line="136"/>
+        <location filename="../RealtimeWindow.cpp" line="452"/>
         <source>Start</source>
         <translation>開始</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="136"/>
-        <location filename="../RealtimeWindow.cpp" line="428"/>
+        <location filename="../RealtimeWindow.cpp" line="138"/>
+        <location filename="../RealtimeWindow.cpp" line="431"/>
         <source>Pause</source>
         <translation>一時停止</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="138"/>
+        <location filename="../RealtimeWindow.cpp" line="140"/>
         <source>Stop</source>
         <translation>停止</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="174"/>
+        <location filename="../RealtimeWindow.cpp" line="176"/>
         <source>WATTS</source>
         <translation>出力 (ワット)</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="176"/>
+        <location filename="../RealtimeWindow.cpp" line="178"/>
         <source>BPM</source>
         <translation>心拍数 (BPM)</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="50"/>
-        <location filename="../RealtimeWindow.cpp" line="178"/>
+        <location filename="../RealtimeWindow.cpp" line="52"/>
+        <location filename="../RealtimeWindow.cpp" line="180"/>
         <source>KPH</source>
         <translation>速度 (km/h)</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="180"/>
+        <location filename="../RealtimeWindow.cpp" line="182"/>
         <source>RPM</source>
         <translation>ケイデンス (RPM)</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="182"/>
-        <location filename="../RealtimeWindow.cpp" line="371"/>
+        <location filename="../RealtimeWindow.cpp" line="184"/>
+        <location filename="../RealtimeWindow.cpp" line="374"/>
         <source>Lap/Interval</source>
         <translation>ラップ</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="184"/>
-        <location filename="../RealtimeWindow.cpp" line="779"/>
+        <location filename="../RealtimeWindow.cpp" line="186"/>
+        <location filename="../RealtimeWindow.cpp" line="782"/>
         <source>Load WATTS</source>
         <translation>負荷ワット</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="49"/>
-        <location filename="../RealtimeWindow.cpp" line="186"/>
+        <location filename="../RealtimeWindow.cpp" line="51"/>
+        <location filename="../RealtimeWindow.cpp" line="188"/>
         <source>Distance (KM)</source>
         <translation>距離 (km)</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="189"/>
+        <location filename="../RealtimeWindow.cpp" line="191"/>
         <source>Avg WATTS</source>
         <translation>平均出力 (ワット)</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="191"/>
+        <location filename="../RealtimeWindow.cpp" line="193"/>
         <source>Avg BPM</source>
         <translation>平均心拍数 (BPM)</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="51"/>
-        <location filename="../RealtimeWindow.cpp" line="193"/>
+        <location filename="../RealtimeWindow.cpp" line="53"/>
+        <location filename="../RealtimeWindow.cpp" line="195"/>
         <source>Avg KPH</source>
         <translation>平均速度 (km/h)</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="49"/>
-        <location filename="../RealtimeWindow.cpp" line="186"/>
+        <location filename="../RealtimeWindow.cpp" line="51"/>
+        <location filename="../RealtimeWindow.cpp" line="188"/>
         <source>Distance (Miles)</source>
         <translation>距離 (マイル)</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="50"/>
-        <location filename="../RealtimeWindow.cpp" line="178"/>
+        <location filename="../RealtimeWindow.cpp" line="52"/>
+        <location filename="../RealtimeWindow.cpp" line="180"/>
         <source>MPH</source>
         <translation>m/h</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="51"/>
-        <location filename="../RealtimeWindow.cpp" line="193"/>
+        <location filename="../RealtimeWindow.cpp" line="53"/>
+        <location filename="../RealtimeWindow.cpp" line="195"/>
         <source>Avg MPH</source>
         <translation>平均時速 (m/h)</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="195"/>
+        <location filename="../RealtimeWindow.cpp" line="197"/>
         <source>Avg RPM</source>
         <translation>平均ケイデンス (RPM)</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="197"/>
-        <location filename="../RealtimeWindow.cpp" line="780"/>
+        <location filename="../RealtimeWindow.cpp" line="199"/>
+        <location filename="../RealtimeWindow.cpp" line="783"/>
         <source>Avg Load WATTS</source>
         <translation>平均負荷 (ワット)</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="200"/>
+        <location filename="../RealtimeWindow.cpp" line="202"/>
         <source>LAP TIME</source>
         <translation>ラップ時間</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="202"/>
+        <location filename="../RealtimeWindow.cpp" line="204"/>
         <source>TIME</source>
         <translation>時間</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="435"/>
+        <location filename="../RealtimeWindow.cpp" line="438"/>
         <source>Un-Pause</source>
         <translation>再開</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="644"/>
+        <location filename="../RealtimeWindow.cpp" line="647"/>
         <source>No Devices Configured</source>
         <translation>デバイスが設定されていません</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="786"/>
+        <location filename="../RealtimeWindow.cpp" line="789"/>
         <source>Gradient PERCENT</source>
         <translation>勾配</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="787"/>
+        <location filename="../RealtimeWindow.cpp" line="790"/>
         <source>Avg Gradient PERCENT</source>
         <translation>平均勾配</translation>
     </message>
@@ -4249,7 +4272,7 @@ Do you want to continue?</source>
     <name>RideSummaryWindow</name>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="71"/>
-        <source>&lt;p&gt;Couldn't read file &quot;</source>
+        <source>&lt;p&gt;Couldn&apos;t read file &quot;</source>
         <translation>&lt;p&gt;ファイルを読み込めませんでした &quot;</translation>
     </message>
     <message>
@@ -4291,57 +4314,57 @@ Do you want to continue?</source>
 <context>
     <name>RiderPage</name>
     <message>
-        <location filename="../Pages.cpp" line="2491"/>
+        <location filename="../Pages.cpp" line="2531"/>
         <source>Nickname</source>
         <translation>ニックネーム</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2492"/>
+        <location filename="../Pages.cpp" line="2532"/>
         <source>Date of Birth</source>
         <translation>誕生日</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2493"/>
+        <location filename="../Pages.cpp" line="2533"/>
         <source>Gender</source>
         <translation>性別</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2494"/>
+        <location filename="../Pages.cpp" line="2534"/>
         <source>Bio</source>
         <translation>Bio</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2496"/>
+        <location filename="../Pages.cpp" line="2536"/>
         <source>Weight (%1)</source>
         <translation>体重 (%1)</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2496"/>
+        <location filename="../Pages.cpp" line="2536"/>
         <source>kg</source>
         <translation>kg</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2496"/>
+        <location filename="../Pages.cpp" line="2536"/>
         <source>lb</source>
         <translation>lb</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2506"/>
+        <location filename="../Pages.cpp" line="2546"/>
         <source>Male</source>
         <translation>男性</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2507"/>
+        <location filename="../Pages.cpp" line="2547"/>
         <source>Female</source>
         <translation>女性</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2559"/>
+        <location filename="../Pages.cpp" line="2599"/>
         <source>Choose Picture</source>
         <translation>写真の選択</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2560"/>
+        <location filename="../Pages.cpp" line="2600"/>
         <source>Images (*.png *.jpg *.bmp</source>
         <translation>画像フォーマット (*.png *.jpg *.bmp</translation>
     </message>
@@ -4399,7 +4422,7 @@ You have made changes to </source>
     <message>
         <location filename="../SaveDialogs.cpp" line="214"/>
         <source> If you want to save
-them, we need to convert the ride to GoldenCheetah's
+them, we need to convert the ride to GoldenCheetah&apos;s
 native format. Should we do so?
 </source>
         <translation>ファイルに変更が加えられましたが保存されていません。
@@ -4429,32 +4452,32 @@ native format. Should we do so?
 <context>
     <name>SchemePage</name>
     <message>
-        <location filename="../Pages.cpp" line="1380"/>
+        <location filename="../Pages.cpp" line="1420"/>
         <source>Add</source>
         <translation>追加</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1381"/>
+        <location filename="../Pages.cpp" line="1421"/>
         <source>Rename</source>
         <translation>リネーム</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1382"/>
+        <location filename="../Pages.cpp" line="1422"/>
         <source>Delete</source>
         <translation>削除</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1391"/>
+        <location filename="../Pages.cpp" line="1431"/>
         <source>Short</source>
         <translation>略称</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1392"/>
+        <location filename="../Pages.cpp" line="1432"/>
         <source>Long</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1393"/>
+        <location filename="../Pages.cpp" line="1433"/>
         <source>Percent of CP</source>
         <translation>対CPの割合</translation>
     </message>
@@ -4817,22 +4840,22 @@ native format. Should we do so?
 <context>
     <name>TwitterPage</name>
     <message>
-        <location filename="../Pages.cpp" line="2589"/>
+        <location filename="../Pages.cpp" line="2629"/>
         <source>Twitter Config</source>
         <translation>Twitter設定</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2591"/>
+        <location filename="../Pages.cpp" line="2631"/>
         <source>Authorize</source>
         <translation>認証</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2596"/>
+        <location filename="../Pages.cpp" line="2636"/>
         <source>Click the Authorize button. Your default browser will open to Twitter. Once you have authorized Golden Cheetah access your Twitter account, Copy/Paste PIN number from Twitter into PIN field. Click Save</source>
         <translation>認証ボタンをクリックするとブラウザが開きます。TwitterでGoldenCheetahの認証を受けるとPINコードが出力されます。コピーアンドペーストして保存をクリックします</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2599"/>
+        <location filename="../Pages.cpp" line="2639"/>
         <source>Enter PIN: </source>
         <translation>PINの入力: </translation>
     </message>
@@ -4914,12 +4937,12 @@ native format. Should we do so?
 <context>
     <name>ZonePage</name>
     <message>
-        <location filename="../Pages.cpp" line="1363"/>
+        <location filename="../Pages.cpp" line="1403"/>
         <source>Critical Power History</source>
         <translation>CP履歴</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1364"/>
+        <location filename="../Pages.cpp" line="1404"/>
         <source>Default Zones</source>
         <translation>デフォルトゾーン</translation>
     </message>
@@ -5045,7 +5068,7 @@ native format. Should we do so?
     <message>
         <location filename="../Zones.cpp" line="361"/>
         <source>CP must be greater than zero in zone range %1 of power.zones</source>
-        <translation>CP値はパワーゾーンレンジ%1に含まれ、<byte value="x1c"/>ゼロ以上である必要があります<byte value="x1c"/></translation>
+        <translation>CP値はパワーゾーンレンジ%1に含まれ、&lt;byte value=&quot;x1c&quot;/&gt;ゼロ以上である必要があります&lt;byte value=&quot;x1c&quot;/&gt;</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="380"/>
@@ -5093,24 +5116,29 @@ native format. Should we do so?
 <context>
     <name>deviceModel</name>
     <message>
-        <location filename="../Pages.cpp" line="550"/>
+        <location filename="../Pages.cpp" line="583"/>
         <source>Device Name</source>
         <translation>デバイス名</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="552"/>
+        <location filename="../Pages.cpp" line="585"/>
         <source>Device Type</source>
         <translation>デバイスタイプ</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="554"/>
+        <location filename="../Pages.cpp" line="587"/>
         <source>Port Spec</source>
         <translation>ポート</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="556"/>
+        <location filename="../Pages.cpp" line="589"/>
         <source>Profile</source>
         <translation>プロファイル</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="591"/>
+        <source>Virtual</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

@@ -146,6 +146,10 @@ void ConfigDialog::save_Clicked()
         appsettings->setValue(GC_LANG, "it");
     else if (configPage->langCombo->currentIndex()==5)
         appsettings->setValue(GC_LANG, "de");
+    else if (configPage->langCombo->currentIndex()==6)
+        appsettings->setValue(GC_LANG, "ru");
+    else if (configPage->langCombo->currentIndex()==7)
+        appsettings->setValue(GC_LANG, "cs");
 
     if (configPage->unitCombo->currentIndex()==0)
         appsettings->setValue(GC_UNIT, "Metric");
