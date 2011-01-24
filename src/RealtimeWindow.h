@@ -127,7 +127,8 @@ class RealtimeWindow : public QWidget
              lap_msecs,
              load_msecs;
 
-        qint64 start_msec, elapsed_msec, lap_start_msec;
+        uint session_elapsed_msec, lap_elapsed_msec;
+        QTime session_time, lap_time;
 
         // GUI WIDGETS
         // layout
