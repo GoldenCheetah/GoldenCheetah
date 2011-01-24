@@ -288,6 +288,11 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, TrainTool *trainTool, const Q
     stream_timer = new QTimer(this);
     load_timer = new QTimer(this);
 
+    session_time = QTime();
+    session_elapsed_msec = 0;
+    lap_time = QTime();
+    lap_elapsed_msec = 0;
+
     recordFile = NULL;
     status = 0;
     status |= RT_RECORDING;         // recording is on by default! - add others here
@@ -376,14 +381,16 @@ void RealtimeWindow::Start()       // when start button is pressed
         streamSelector->setEnabled(false);
         deviceSelector->setEnabled(false);
 
-        QDateTime now = QDateTime::currentDateTime();
-        start_msec = lap_start_msec = now.toMSecsSinceEpoch();
-        elapsed_msec = 0;
+        session_time.start();
+        session_elapsed_msec = 0;
+        lap_time.start();
+        lap_elapsed_msec = 0;
 
         if (status & RT_WORKOUT) {
             load_timer->start(LOADRATE);      // start recording
         }
         if (status & RT_RECORDING) {
+            QDateTime now = QDateTime::currentDateTime();
 
             // setup file
             QString filename = now.toString(QString("yyyy_MM_dd_hh_mm_ss")) + QString(".csv");
@@ -420,7 +427,8 @@ void RealtimeWindow::Pause()        // pause capture to recalibrate
     if ((status&RT_RUNNING) == 0) return;
 
     if (status&RT_PAUSED) {
-        start_msec = QDateTime::currentDateTime().toMSecsSinceEpoch();
+        session_time.start();
+        lap_time.start();
         status &=~RT_PAUSED;
         deviceController->restart();
         pauseButton->setText(tr("Pause"));
@@ -429,7 +437,8 @@ void RealtimeWindow::Pause()        // pause capture to recalibrate
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         if (status & RT_WORKOUT) load_timer->start(LOADRATE);
     } else {
-        elapsed_msec = total_msecs;
+        session_elapsed_msec += session_time.elapsed();
+        lap_elapsed_msec += lap_time.elapsed();
         deviceController->pause();
         pauseButton->setText(tr("Un-Pause"));
         status |=RT_PAUSED;
@@ -493,11 +502,10 @@ void RealtimeWindow::Stop(int deviceStatus)        // when stop button is presse
     spdcount = 0;
     lodcount = 0;
     displayWorkoutLap = displayLap =0;
-    lap_msecs = 0;
-    total_msecs = 0;
-    elapsed_msec = 0;
-    start_msec = now.toMSecsSinceEpoch();
-    lap_start_msec = now.toMSecsSinceEpoch();
+    session_elapsed_msec = 0;
+    session_time.restart();
+    lap_elapsed_msec = 0;
+    lap_time.restart();
     avgPower= avgHeartRate= avgSpeed= avgCadence= avgLoad= 0;
     displayWorkoutDistance = displayDistance = 0;
     guiUpdate();
@@ -540,9 +548,8 @@ void RealtimeWindow::guiUpdate()           // refreshes the telemetry
     displayDistance += displaySpeed / (5 * 3600); // XXX assumes 200ms refreshrate
     displayWorkoutDistance += displaySpeed / (5 * 3600); // XXX assumes 200ms refreshrate
 
-    qint64 now = QDateTime::currentDateTime().toMSecsSinceEpoch();
-    total_msecs = (long)(elapsed_msec + now - start_msec);
-    lap_msecs = (long)(now - lap_start_msec);
+    total_msecs = session_elapsed_msec + session_time.elapsed();
+    lap_msecs = lap_elapsed_msec + lap_time.elapsed();
 
     // update those LCDs!
     timeLCD->display(QString("%1:%2:%3.%4").arg(total_msecs/3600000)
@@ -620,13 +627,13 @@ void RealtimeWindow::newLap()
 {
     displayLap++;
 
-    lap_msecs = 0;
     pwrcount  = 0;
     cadcount  = 0;
     hrcount   = 0;
     spdcount  = 0;
 
-    lap_start_msec = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    lap_time.restart();
+    lap_elapsed_msec = 0;
 
     // set avg to current values to ensure averages represent from now onwards
     // and not from beginning of workout
@@ -703,6 +710,7 @@ void RealtimeWindow::diskUpdate()
     QTextStream recordFileStream(recordFile);
 
     // convert from milliseconds to minutes
+    total_msecs = session_elapsed_msec + session_time.elapsed();
     Minutes = total_msecs;
     Minutes /= 1000.00;
     Minutes *= (1.0/60);
