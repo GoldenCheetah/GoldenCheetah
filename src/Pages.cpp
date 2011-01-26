@@ -368,6 +368,7 @@ DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
     virtualPower->addItem("Power - Kurt Kinetic Cyclone");
     virtualPower->addItem("Power - Kurt Kinetic Road Machine");
     virtualPower->addItem("Power - Cyclops Fluid 2");
+    virtualPower->addItem("Power - BT Advanced Training System");
     virtualPower->setCurrentIndex(0);
 
 // THIS CODE IS DISABLED FOR THIS RELEASE XXX

@@ -160,6 +160,7 @@ QuarqdClient::parseElement(QString &strBuf) // updates QuarqdClient::telemetry
                 if (value > 0) {
                     // TODO: let wheel size be a configurable, default now to 2101 mm
                     telemetry.setSpeed((value*2101/1000*60)/1000); // meter/minute -> meter/hour -> km/hour
+                    telemetry.setWheelRpm(value);
                     lastReadSpeed = elapsedTime.elapsed();
                 }
                 telemetry.setTime(getTimeStamp(str));
