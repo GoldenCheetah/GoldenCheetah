@@ -46,6 +46,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
     */
     QRegExp ergomoCSV("(ZEIT|STRECKE)", Qt::CaseInsensitive);
     bool ergomo = false;
+
+    QChar ergomo_separator;
     int unitsHeader = 1;
     int total_pause = 0;
     int currentInterval = 0;
@@ -97,6 +99,14 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                     ergomo = true;
                     rideFile->setDeviceType("Ergomo CSV");
                     unitsHeader = 2;
+
+                    QStringList headers = line.split(';');
+
+                    if (headers.size()>1)
+                        ergomo_separator = ';';
+                    else
+                        ergomo_separator = ',';
+
                     ++lineno;
                     continue;
                 }
@@ -201,20 +211,24 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                 }
                 else {
                      // for ergomo formatted CSV files
-                     minutes     = line.section(',', 0, 0).toDouble() + total_pause;
-                     km = line.section(',', 1, 1).toDouble();
-                     watts = line.section(',', 2, 2).toDouble();
-                     cad = line.section(',', 3, 3).toDouble();
-                     kph = line.section(',', 4, 4).toDouble();
-                     hr = line.section(',', 5, 5).toDouble();
-                     alt = line.section(',', 6, 6).toDouble();
+                     minutes     = line.section(ergomo_separator, 0, 0).toDouble() + total_pause;
+                     QString km_string = line.section(ergomo_separator, 1, 1);
+                     km_string.replace(",",".");
+                     km = km_string.toDouble();
+                     watts = line.section(ergomo_separator, 2, 2).toDouble();
+                     cad = line.section(ergomo_separator, 3, 3).toDouble();
+                     QString kph_string = line.section(ergomo_separator, 4, 4);
+                     kph_string.replace(",",".");
+                     kph = kph_string.toDouble();
+                     hr = line.section(ergomo_separator, 5, 5).toDouble();
+                     alt = line.section(ergomo_separator, 6, 6).toDouble();
                      interval = line.section(',', 8, 8).toInt();
                      if (interval != prevInterval) {
                          prevInterval = interval;
                          if (interval != 0) currentInterval++;
                      }
                      if (interval != 0) interval = currentInterval;
-                     pause = line.section(',', 9, 9).toInt();
+                     pause = line.section(ergomo_separator, 9, 9).toInt();
                      total_pause += pause;
                      nm = NULL; // torque is not provided in the Ergomo file
 
