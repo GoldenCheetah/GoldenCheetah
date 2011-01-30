@@ -80,6 +80,19 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         // http://thebikegeek.blogspot.com/2009/12/while-we-wait-for-better-and-better.html
         rtData.setWatts((0.0115*(mph*mph*mph)) - ((0.0137)*(mph*mph)) + ((8.9788)*(mph)));
         }
+    case 4 : // BT-ATS - BT Advanced Training System
+        {
+        //        v is expressed in revs/second
+        double v = rtData.getWheelRpm()/60.0;
+        // using the algorithm from Steven Sansonetti of BT:
+        //  This is a 3rd order polynomial, where P = av3 + bv2 + cv + d
+        //  where:
+                double a =       2.90390167E-01; // ( 0.290390167)
+                double b =     - 4.61311774E-02; // ( -0.0461311774)
+                double c =       5.92125507E-01; // (0.592125507)
+                double d =       0.0;
+        rtData.setWatts(a*v*v*v + b*v*v +c*v + d);
+        }
     default : // unknown - do nothing
         break;
     }
@@ -100,6 +113,8 @@ RealtimeController::processSetup()
     case 2 : // TODO Kurt Kinetic - use an algorithm...
         break;
     case 3 : // TODO Cyclops Fluid 2 - use an algorithm
+        break;
+    case 4 : // TODO BT-ATS - BT Advanced Training System - use an algorithm
         break;
     default : // unknown - do nothing
         break;

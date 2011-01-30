@@ -36,6 +36,7 @@ public:
     void setHr(double hr);
     void setTime(long time);
     void setSpeed(double speed);
+    void setWheelRpm(double wheelRpm);
     void setCadence(double aCadence);
     void setLoad(double load);
     char *getName();
@@ -43,14 +44,14 @@ public:
     double getHr();
     long getTime();
     double getSpeed();
+    double getWheelRpm();
     double getCadence();
     double getLoad();
 
 private:
     char name[64];
-    double hr, watts, speed, load;
     unsigned long time;
-
+    double hr, watts, speed, wheelRpm, load;
     double cadence;      // in rpm
 };
 
