@@ -65,6 +65,7 @@ class GcWindowTool;
 class HomeWindow;
 class ICalendar;
 class CalDAV;
+class Seasons;
 
 class MainWindow : public QMainWindow
 {
@@ -111,6 +112,8 @@ class MainWindow : public QMainWindow
         // db connections to cyclistdir/metricDB - one per active MainWindow
         QSqlDatabase db;
         MetricAggregator *metricDB;
+        Seasons *seasons;
+
         int session;
         bool isclean;
         QString cyclist; // the cyclist name
@@ -139,6 +142,7 @@ class MainWindow : public QMainWindow
         void intervalSelected();
         void intervalsChanged();
         void zonesChanged();
+        void seasonsChanged();
         void configChanged();
         void viewChanged(int);
         void rideAdded(RideItem *);

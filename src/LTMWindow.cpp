@@ -35,9 +35,10 @@
 #include <qwt_plot_marker.h>
 
 LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) :
-            GcWindow(parent), main(parent), home(home),
+            LTMPlotContainer(parent), home(home),
             useMetricUnits(useMetricUnits), active(false), dirty(true)
 {
+    main = parent;
     setInstanceName("Metric Window");
 
     // the plot

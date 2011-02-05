@@ -37,8 +37,14 @@ bool SeasonParser::endElement( const QString&, const QString&, const QString &qN
         season.setEnd(seasonDateToDate(buffer.trimmed()));
     else if (qName == "type")
         season.setType(buffer.trimmed().toInt());
-    else if(qName == "season")
-    {
+    else if (qName == "id")
+        season.setId(QUuid(buffer.trimmed()));
+    else if (qName == "load") {
+        season.load().resize(loadcount+1);
+        season.load()[loadcount] = buffer.trimmed().toInt();
+        loadcount++;
+    } else if(qName == "season") {
+
         if(seasons.size() >= 1) {
             // only set end date for previous season if
             // it is not null
@@ -53,8 +59,10 @@ bool SeasonParser::endElement( const QString&, const QString&, const QString &qN
 bool SeasonParser::startElement( const QString&, const QString&, const QString &name, const QXmlAttributes & )
 {
     buffer.clear();
-    if(name == "season")
+    if(name == "season") {
         season = Season();
+        loadcount = 0;
+    }
 
     return TRUE;
 }
@@ -115,16 +123,25 @@ SeasonParser::serialize(QString filename, QList<Season>Seasons)
     // write out to file
     foreach (Season season, Seasons) {
         if (season.getType() != Season::temporary) {
+
+            // main attributes
             out<<QString("\t<season>\n"
                   "\t\t<name>%1</name>\n"
                   "\t\t<startdate>%2</startdate>\n"
                   "\t\t<enddate>%3</enddate>\n"
                   "\t\t<type>%4</type>\n"
-                  "\t</season>\n")
-            .arg(season.getName())
-            .arg(season.getStart().toString("yyyy-MM-dd"))
-            .arg(season.getEnd().toString("yyyy-MM-dd"))
-            .arg(season.getType());
+                  "\t\t<id>%5</id>\n") .arg(season.getName())
+                                           .arg(season.getStart().toString("yyyy-MM-dd"))
+                                           .arg(season.getEnd().toString("yyyy-MM-dd"))
+                                           .arg(season.getType())
+                                           .arg(season.id().toString());
+                                    
+
+            // load profile
+            for (int i=9; i<season.load().count(); i++)
+                out <<QString("\t<load>%1</load>\n").arg(season.load()[i]);
+
+            out <<QString("\t</season>\n");
         }
     }
 

@@ -69,7 +69,16 @@ class LTMToolTip : public QwtPlotPicker
     QString tip;
 };
 
-class LTMWindow : public GcWindow
+class LTMPlotContainer : public GcWindow
+{
+    public:
+        LTMPlotContainer(QWidget *parent) : GcWindow(parent) {}
+        virtual LTMToolTip *toolTip() = 0;
+        virtual void pointClicked(QwtPlotCurve *, int) = 0;
+        MainWindow *main;
+};
+
+class LTMWindow : public LTMPlotContainer
 {
     Q_OBJECT
     G_OBJECT
@@ -83,7 +92,6 @@ class LTMWindow : public GcWindow
 
     public:
 
-        MainWindow *main; // used by zones shader
         LTMWindow(MainWindow *, bool, const QDir &);
         ~LTMWindow();
         LTMToolTip *toolTip() { return picker; }

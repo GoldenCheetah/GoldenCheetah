@@ -84,8 +84,7 @@ class LTMTool : public QWidget
         void colorPicker();
         void editMetric();
         void configChanged();
-        void readSeasons();
-        void writeSeasons();
+        void resetSeasons(); // rebuild the seasons list if it changes
 
     private:
 
@@ -95,8 +94,9 @@ class LTMTool : public QWidget
         const QDir home;
         MainWindow *main;
         bool useMetricUnits;
+        bool active; // ignore season changed signals since we triggered them
 
-        QList<Season> seasons;
+        Seasons *seasons;
         QTreeWidget *dateRangeTree;
         QTreeWidgetItem *allDateRanges;
         const Season *dateRange;

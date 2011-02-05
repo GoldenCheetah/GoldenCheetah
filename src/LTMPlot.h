@@ -35,7 +35,7 @@
 
 class LTMPlotBackground;
 class LTMPlotZoneLabel;
-
+class LTMPlotContainer;
 class LTMScaleDraw;
 
 class LTMPlot : public QwtPlot
@@ -45,14 +45,15 @@ class LTMPlot : public QwtPlot
 
 
     public:
-        LTMPlot(LTMWindow *, MainWindow *main, QDir home);
+        LTMPlot(LTMPlotContainer *, MainWindow *main, QDir home);
         ~LTMPlot();
         void setData(LTMSettings *);
         void setAxisTitle(int axis, QString label);
 
     public slots:
         void pointHover(QwtPlotCurve*, int);
-        void pointClicked(QwtPlotCurve*, int);
+        void pointClicked(QwtPlotCurve*, int); // point clicked
+        void changeValue(QwtPlotCurve*, int, double); // point moved
         void pickerMoved(QPoint);
         void pickerAppended(QPoint);
         void configUpdate();
@@ -64,7 +65,7 @@ class LTMPlot : public QwtPlot
         LTMPlotBackground *bg;
         QList <LTMPlotZoneLabel *> zoneLabels;
 
-        LTMWindow *parent;
+        LTMPlotContainer *parent;
         double minY[10], maxY[10], maxX;      // for all possible 10 curves
 
     private:

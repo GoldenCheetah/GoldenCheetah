@@ -23,9 +23,12 @@
 #include "SeasonParser.h"
 #include <QXmlSimpleReader>
 
+#define tr(s) QObject::tr(s)
+
 Season::Season()
 {
     type = season;  // by default seasons are of type season
+    _id = QUuid::createUuid(); // in case it isn't set yet
 }
 
 QString Season::getName() {
@@ -138,4 +141,146 @@ void
 EditSeasonDialog::cancelClicked()
 {
     reject();
+}
+
+//
+// Manage the seasons array
+//
+void
+Seasons::readSeasons()
+{
+    QFile seasonFile(home.absolutePath() + "/seasons.xml");
+    QXmlInputSource source( &seasonFile );
+    QXmlSimpleReader xmlReader;
+    SeasonParser( handler );
+    xmlReader.setContentHandler(&handler);
+    xmlReader.setErrorHandler(&handler);
+    xmlReader.parse( source );
+    seasons = handler.getSeasons();
+
+    Season season;
+    QDate today = QDate::currentDate();
+    QDate eom = QDate(today.year(), today.month(), today.daysInMonth());
+
+    // add Default Date Ranges
+    season.setName(tr("All Dates"));
+    season.setType(Season::temporary);
+    season.setStart(QDate::currentDate().addYears(-50));
+    season.setEnd(QDate::currentDate().addYears(50));
+    season.setId(QUuid("{00000000-0000-0000-0000-000000000001}"));
+    seasons.append(season);
+
+    season.setName(tr("This Year"));
+    season.setType(Season::temporary);
+    season.setStart(QDate(today.year(), 1,1));
+    season.setEnd(QDate(today.year(), 12, 31));
+    season.setId(QUuid("{00000000-0000-0000-0000-000000000002}"));
+    seasons.append(season);
+
+    season.setName(tr("This Month"));
+    season.setType(Season::temporary);
+    season.setStart(QDate(today.year(), today.month(),1));
+    season.setEnd(eom);
+    season.setId(QUuid("{00000000-0000-0000-0000-000000000003}"));
+    seasons.append(season);
+
+    season.setName(tr("This Week"));
+    season.setType(Season::temporary);
+    // from Mon-Sun
+    QDate wstart = QDate::currentDate();
+    wstart = wstart.addDays(Qt::Monday - wstart.dayOfWeek());
+    QDate wend = wstart.addDays(6); // first day + 6 more
+    season.setStart(wstart);
+    season.setEnd(wend);
+    season.setId(QUuid("{00000000-0000-0000-0000-000000000004}"));
+    seasons.append(season);
+
+    season.setName(tr("Last 7 days"));
+    season.setType(Season::temporary);
+    season.setStart(today.addDays(-6)); // today plus previous 6
+    season.setEnd(today);
+    season.setId(QUuid("{00000000-0000-0000-0000-000000000005}"));
+    seasons.append(season);
+
+    season.setName(tr("Last 14 days"));
+    season.setType(Season::temporary);
+    season.setStart(today.addDays(-13));
+    season.setEnd(today);
+    season.setId(QUuid("{00000000-0000-0000-0000-000000000006}"));
+    seasons.append(season);
+
+    season.setName(tr("Last 28 days"));
+    season.setType(Season::temporary);
+    season.setStart(today.addDays(-27));
+    season.setEnd(today);
+    season.setId(QUuid("{00000000-0000-0000-0000-000000000007}"));
+    seasons.append(season);
+
+    season.setName(tr("Last 3 months"));
+    season.setType(Season::temporary);
+    season.setEnd(today);
+    season.setStart(today.addMonths(-3));
+    season.setId(QUuid("{00000000-0000-0000-0000-000000000008}"));
+    seasons.append(season);
+
+    season.setName(tr("Last 6 months"));
+    season.setType(Season::temporary);
+    season.setEnd(today);
+    season.setStart(today.addMonths(-6));
+    season.setId(QUuid("{00000000-0000-0000-0000-000000000009}"));
+    seasons.append(season);
+
+    season.setName(tr("Last 12 months"));
+    season.setType(Season::temporary);
+    season.setEnd(today);
+    season.setStart(today.addMonths(-12));
+    season.setId(QUuid("{00000000-0000-0000-0000-000000000010}"));
+    seasons.append(season);
+}
+
+int
+Seasons::newSeason(QString name, QDate start, QDate end, int type)
+{
+    Season add;
+    add.setName(name);
+    add.setStart(start);
+    add.setEnd(end);
+    add.setType(type);
+    seasons.insert(0, add);
+
+    // save changes away
+    writeSeasons();
+
+    return 0; // always add at the top
+}
+
+void
+Seasons::updateSeason(int index, QString name, QDate start, QDate end, int type)
+{
+    seasons[index].setName(name);
+    seasons[index].setStart(start);
+    seasons[index].setEnd(end);
+    seasons[index].setType(type);
+
+    // save changes away
+    writeSeasons();
+
+}
+
+void
+Seasons::deleteSeason(int index)
+{
+    // now delete!
+    seasons.removeAt(index);
+    writeSeasons();
+}
+
+void
+Seasons::writeSeasons()
+{
+    // update seasons.xml
+    QString file = QString(home.absolutePath() + "/seasons.xml");
+    SeasonParser::serialize(file, seasons);
+
+    seasonsChanged(); // signal!
 }
