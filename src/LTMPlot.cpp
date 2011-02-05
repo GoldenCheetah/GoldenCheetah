@@ -43,7 +43,7 @@
 
 static int supported_axes[] = { QwtPlot::yLeft, QwtPlot::yRight, QwtPlot::yLeft1, QwtPlot::yRight1, QwtPlot::yLeft2, QwtPlot::yRight2, QwtPlot::yLeft3, QwtPlot::yRight3 };
 
-LTMPlot::LTMPlot(LTMWindow *parent, MainWindow *main, QDir home) : bg(NULL), parent(parent), main(main),
+LTMPlot::LTMPlot(LTMPlotContainer *parent, MainWindow *main, QDir home) : bg(NULL), parent(parent), main(main),
                                                                    home(home), highlighter(NULL)
 {
     setInstanceName("Metric Plot");
@@ -1186,6 +1186,13 @@ LTMPlot::aggregateCurves(QVector<double> &a, QVector<double>&w)
     for(int i=0; i<a.size(); i++) a[i] += w[i];
 }
 
+void
+LTMPlot::changeValue(QwtPlotCurve*, int, double)
+{
+    // point moved, so emit signal with curve name, date and value
+    // XXX does nothing right now
+}
+
 /*----------------------------------------------------------------------
  * Draw Power Zone Shading on Background (here to end of source file)
  *
@@ -1369,4 +1376,3 @@ LTMPlot::refreshZoneLabels(int axisid)
     bg = new LTMPlotBackground(this, axisid);
     bg->attach(this);
 }
-

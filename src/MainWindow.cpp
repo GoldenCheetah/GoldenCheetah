@@ -175,6 +175,9 @@ MainWindow::MainWindow(const QDir &home) :
             QMessageBox::warning(this, tr("Reading HR Zones File"), hrzones_->warningString());
     }
 
+    // Get athlete seasons
+    seasons = new Seasons(home);
+
     QVariant geom = appsettings->value(this, GC_SETTINGS_MAIN_GEOM);
     if (geom == QVariant())
         resize(640, 480);

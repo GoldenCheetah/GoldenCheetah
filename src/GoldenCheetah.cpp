@@ -315,7 +315,8 @@ GcWindow::spotHotSpot(QMouseEvent *e)
     else if (_x >= (_width-borderWidth)) return (Right);
     else if (_y <= borderWidth) return (Top);
     else if (_y >= (_height-borderWidth)) return (Bottom);
-    else return (Move);
+    else if (_y <= contentsMargins().top()) return (Move);
+    else return (None);
 }
 
 void

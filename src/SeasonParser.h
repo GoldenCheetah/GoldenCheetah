@@ -43,6 +43,7 @@ protected:
     QDate seasonDateToDate(QString);
     Season season;
     QList<Season> seasons;
+    int loadcount;
 
 };
 #endif //SeasonParser
