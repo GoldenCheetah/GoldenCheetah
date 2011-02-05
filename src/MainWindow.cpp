@@ -83,6 +83,8 @@
 #include "TwitterDialog.h"
 #include "WithingsDownload.h"
 #include "CalendarDownload.h"
+#include "WorkoutWizard.h"
+
 #include "GcWindowTool.h"
 #ifdef GC_HAVE_SOAP
 #include "TPUploadDialog.h"
@@ -602,6 +604,9 @@ MainWindow::MainWindow(const QDir &home) :
                            SLOT(showOptions()), tr("Ctrl+O"));
     optionsMenu->addAction(tr("Critical Power Calculator..."), this,
                            SLOT(showTools()));
+    optionsMenu->addAction(tr("Workout Wizard"), this,
+                           SLOT(showWorkoutWizard()));
+
 #ifdef GC_HAVE_ICAL
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Upload Ride to Calendar"), this,
@@ -1623,6 +1628,12 @@ void MainWindow::showTools()
 {
    ToolsDialog *td = new ToolsDialog();
    td->show();
+}
+
+void MainWindow::showWorkoutWizard()
+{
+   WorkoutWizard *ww = new WorkoutWizard(this);
+   ww->show();
 }
 
 void
