@@ -335,6 +335,12 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     dataPresent.interval |= (interval != 0);
 }
 
+void RideFile::appendPoint(const RideFilePoint &point)
+{
+    dataPoints_.append(new RideFilePoint(point.secs,point.cad,point.hr,point.km,point.kph,point.nm,point.watts,point.alt,point.lon,point.lat,
+                                         point.headwind,point.interval));
+}
+
 void
 RideFile::setDataPresent(SeriesType series, bool value)
 {

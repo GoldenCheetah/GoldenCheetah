@@ -44,6 +44,8 @@ class NP : public RideMetric {
         QVector<double> last30secs;
 
         double secsDelta = ride->recIntSecs();
+        if(secsDelta == 0)
+            return;
         double sampsPerWindow = ceil(30.0 / secsDelta);
         last30secs.resize(sampsPerWindow + 1); // add 1 just in case
 
