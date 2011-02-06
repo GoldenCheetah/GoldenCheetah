@@ -31,6 +31,7 @@
 #include "RealtimeController.h"
 #include "ComputrainerController.h"
 #include "ANTplusController.h"
+#include "ANTlocalController.h"
 #include "NullController.h"
 #include "ErgFile.h"
 
@@ -302,7 +303,6 @@ void RealtimeWindow::setDeviceController()
         deviceController = NULL;
     }
 
-
     if (Devices.count() > 0) {
         DeviceConfiguration temp = Devices.at(deviceno);
         if (Devices.at(deviceno).type == DEV_ANTPLUS) {
@@ -311,6 +311,8 @@ void RealtimeWindow::setDeviceController()
             deviceController = new ComputrainerController(this, &temp);
         } else if (Devices.at(deviceno).type == DEV_NULL) {
             deviceController = new NullController(this, &temp);
+        } else if (Devices.at(deviceno).type == DEV_ANTLOCAL) {
+            deviceController = new ANTlocalController(this, &temp);
         }
     }
 

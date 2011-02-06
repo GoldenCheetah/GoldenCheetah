@@ -253,7 +253,7 @@ ConfigDialog::devaddClicked()
 
     // check the portSpec is valid, based upon the connection type
     switch (Supported.getType(add.type).connector) {
-        case DEV_ANT :
+        case DEV_QUARQ :
             if (antSpec.exactMatch(add.portSpec) == false) {
                 QMessageBox::critical(0, "Invalid Port Specification",
                 QString("For ANT devices the specifier must be ") +

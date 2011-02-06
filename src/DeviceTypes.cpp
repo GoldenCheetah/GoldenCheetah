@@ -29,7 +29,8 @@
 static DeviceType SupportedDevices[] =
 {
       { DEV_CT,       DEV_SERIAL,  (char *) "Computrainer",          true,    false },
-      { DEV_ANTPLUS,  DEV_ANT,     (char *) "ANT+ via Quarqd",       true,    false },
+      { DEV_ANTPLUS,  DEV_QUARQ,   (char *) "ANT+ via Quarqd",       true,    false },
+      { DEV_ANTLOCAL, DEV_SERIAL,  (char *) "Native ANT+",           true,    false },
       { DEV_GSERVER,  DEV_TCP,     (char *) "Golden Cheetah Server", false,   false },
       { DEV_NULL,     DEV_TCP,     (char *) "Null device (testing)", false,   false },
 //    { DEV_PT,       DEV_SERIAL,  (char *) "Powertap Head Unit",    false,   true  },
