@@ -125,6 +125,9 @@ HEADERS += \
         AthleteTool.h \
         AllPlot.h \
         AllPlotWindow.h \
+        ANT.h \
+        ANTMessages.h \
+        ANTlocalController.h \
         ANTplusController.h \
         BestIntervalDialog.h \
         BinRideFile.h \
@@ -269,6 +272,8 @@ SOURCES += \
         AllPlot.cpp \
         AllPlotWindow.cpp \
         AthleteTool.cpp \
+        ANT.cpp \
+        ANTlocalController.cpp \
         ANTplusController.cpp \
         BasicRideMetrics.cpp \
         BestIntervalDialog.cpp \

@@ -28,12 +28,13 @@
 #define DEV_PT         0x0001
 #define DEV_SRM        0x0002
 #define DEV_CT         0x0010
-#define DEV_ANTPLUS    0x0020
+#define DEV_ANTPLUS    0x0020   // Quarqd ANT+ device
 #define DEV_NULL       0x0040
+#define DEV_ANTLOCAL   0x0080   // Local ANT+ device
 #define DEV_GSERVER    0x0100   // NOT IMPLEMENTED IN THIS RELEASE XXX
 #define DEV_GCLIENT    0x0200   // NOT IMPLEMENTED IN THIS RELEASE XXX
 
-#define DEV_ANT        0x01     // ants use id:hostname:port
+#define DEV_QUARQ      0x01     // ants use id:hostname:port
 #define DEV_SERIAL     0x02     // use filename COMx or /dev/cuxxxx
 #define DEV_TCP        0x03     // tcp port is hostname:port NOT IMPLEMENTED IN THIS RELEASE
 

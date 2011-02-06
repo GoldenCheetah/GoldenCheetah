@@ -865,7 +865,7 @@ DevicePage::setConfigPane()
     // sorry... ;-) obfuscated c++ contest winner 2009
     switch (Supported.getType(typeSelector->itemData(typeSelector->currentIndex()).toInt()).connector) {
 
-    case DEV_ANT:
+    case DEV_QUARQ:
         specHint->setText("hostname:port");
         profHint->setText("antid 1, antid 2 ...");
         profHint->show();
@@ -879,10 +879,21 @@ DevicePage::setConfigPane()
 #else
         specHint->setText("/dev/xxxx");
 #endif
-        pairButton->hide();
-        profHint->hide();
-        profLabel->hide();
-        deviceProfile->hide();
+        // we have ANT+ sticks on serial and we have Computrainers
+        // on serial, which one is it?
+        if (Supported.getType(typeSelector->itemData(typeSelector->currentIndex())
+            .toInt()).type == DEV_ANTLOCAL) {
+            pairButton->show();
+            profHint->setText("antid 1, antid 2 ...");
+            profHint->show();
+            profLabel->show();
+            deviceProfile->show();
+        } else {
+            pairButton->hide();
+            profHint->hide();
+            profLabel->hide();
+            deviceProfile->hide();
+        }
         break;
     case DEV_TCP:
         specHint->setText("hostname:port");
