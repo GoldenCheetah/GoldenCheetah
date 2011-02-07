@@ -867,12 +867,19 @@ int Computrainer::openPort()
     deviceSettings.fParity = NOPARITY;
     deviceSettings.ByteSize = 8;
     deviceSettings.StopBits = ONESTOPBIT;
+    deviceSettings.XonChar = 11;
+    deviceSettings.XoffChar = 13;
     deviceSettings.EofChar = 0x0;
     deviceSettings.ErrorChar = 0x0;
     deviceSettings.EvtChar = 0x0;
     deviceSettings.fBinary = true;
-    deviceSettings.fRtsControl = RTS_CONTROL_HANDSHAKE;
-    deviceSettings.fOutxCtsFlow = TRUE;
+    deviceSettings.fOutX = 0;
+    deviceSettings.fInX = 0;
+    deviceSettings.XonLim = 0;
+    deviceSettings.XoffLim = 0;
+    deviceSettings.fRtsControl = RTS_CONTROL_ENABLE;
+    deviceSettings.fDtrControl = DTR_CONTROL_ENABLE;
+    deviceSettings.fOutxCtsFlow = FALSE; //TRUE;
 
 
     if (SetCommState(devicePort, &deviceSettings) == false) {
