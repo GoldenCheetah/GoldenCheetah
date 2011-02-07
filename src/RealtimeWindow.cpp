@@ -389,6 +389,11 @@ void RealtimeWindow::Start()       // when start button is pressed
         if (status & RT_WORKOUT) {
             load_timer->start(LOADRATE);      // start recording
         }
+
+        if (recordSelector->isChecked()) {
+            status |= RT_RECORDING;
+        }
+
         if (status & RT_RECORDING) {
             QDateTime now = QDateTime::currentDateTime();
 
