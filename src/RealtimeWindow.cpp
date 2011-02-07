@@ -387,6 +387,11 @@ void RealtimeWindow::Start()       // when start button is pressed
         if (status & RT_WORKOUT) {
             load_timer->start(LOADRATE);      // start recording
         }
+
+        if (trainTool->recordSelector->isChecked()) {
+            status |= RT_RECORDING;
+        }
+
         if (status & RT_RECORDING) {
             QDateTime now = QDateTime::currentDateTime();
 
@@ -406,9 +411,8 @@ void RealtimeWindow::Start()       // when start button is pressed
                 recordFileStream << "Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID,Altitude (m)\n";
                 disk_timer->start(SAMPLERATE);  // start screen
             }
-        } else {
-            status &= ~RT_RECORDING;
         }
+
         // create a new rideFile
         rideFile = boost::shared_ptr<RideFile>(new RideFile(QDateTime::currentDateTime(),1));
 
