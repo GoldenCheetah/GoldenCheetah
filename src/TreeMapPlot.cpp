@@ -38,7 +38,7 @@ bool TreeMapLessThan(const TreeMap *a, const TreeMap *b) {
 }
 
 TreeMapPlot::TreeMapPlot(TreeMapWindow *parent, MainWindow *main, QDir home)
-            : QFrame (parent), parent(parent), main(main), home(home)
+            : QWidget (parent), parent(parent), main(main), home(home)
 {
     setInstanceName("TreeMap Plot");
 
@@ -50,8 +50,8 @@ TreeMapPlot::TreeMapPlot(TreeMapWindow *parent, MainWindow *main, QDir home)
     setMouseTracking(true);
     installEventFilter(this);
 
-    // pretty border
-    setFrameStyle(QFrame::Box | QFrame::Raised);
+    // no margins
+    setContentsMargins(0,0,0,0);
 
     configUpdate(); // set basic colors
     connect(main, SIGNAL(configChanged()), this, SLOT(configUpdate()));
@@ -96,7 +96,7 @@ void
 TreeMapPlot::resizeEvent(QResizeEvent *)
 {
     // layout the map
-    if (root) root->layout(geometry());
+    if (root) root->layout(QRect(9,9,geometry().width()-18, geometry().height()-18));
 }
 
 
