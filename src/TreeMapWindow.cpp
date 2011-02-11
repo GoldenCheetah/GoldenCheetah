@@ -41,7 +41,7 @@ TreeMapWindow::TreeMapWindow(MainWindow *parent, bool useMetricUnits, const QDir
     setInstanceName("Treemap Window");
 
     // the plot
-    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout = new QVBoxLayout;
     ltmPlot = new TreeMapPlot(this, main, home);
     mainLayout->addWidget(ltmPlot);
     mainLayout->setSpacing(0);
@@ -117,6 +117,18 @@ TreeMapWindow::TreeMapWindow(MainWindow *parent, bool useMetricUnits, const QDir
 TreeMapWindow::~TreeMapWindow()
 {
     delete popup;
+}
+
+QString
+TreeMapWindow::dateRange() const
+{
+    return ltmTool->_dateRange();
+}
+
+void
+TreeMapWindow::setDateRange(QString s)
+{
+    ltmTool->setDateRange(s);
 }
 
 void

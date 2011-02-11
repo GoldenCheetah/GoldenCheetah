@@ -234,7 +234,7 @@ class TreeMap
 };
 
 
-class TreeMapPlot : public QFrame
+class TreeMapPlot : public QWidget
 {
     Q_OBJECT
     G_OBJECT
