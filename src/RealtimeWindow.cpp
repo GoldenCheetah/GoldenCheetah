@@ -376,6 +376,7 @@ void RealtimeWindow::Start()       // when start button is pressed
     } else {
         status |=RT_RUNNING;
         deviceController->start();          // start device
+        load_period.restart();
         startButton->setText(tr("Lap/Interval"));
         recordSelector->setEnabled(false);
         streamSelector->setEnabled(false);
@@ -440,6 +441,7 @@ void RealtimeWindow::Pause()        // pause capture to recalibrate
         gui_timer->start(REFRESHRATE);
         if (status & RT_STREAMING) stream_timer->start(STREAMRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
+        load_period.restart();
         if (status & RT_WORKOUT) load_timer->start(LOADRATE);
     } else {
         session_elapsed_msec += session_time.elapsed();
@@ -451,6 +453,7 @@ void RealtimeWindow::Pause()        // pause capture to recalibrate
         if (status & RT_STREAMING) stream_timer->stop();
         if (status & RT_RECORDING) disk_timer->stop();
         if (status & RT_WORKOUT) load_timer->stop();
+        load_msecs += load_period.restart();
     }
 }
 
@@ -569,17 +572,24 @@ void RealtimeWindow::guiUpdate()           // refreshes the telemetry
 
     // Cadence, HR and Power needs to be rounded to 0 decimal places
     powerLCD->display(round(displayPower));
-    speedLCD->display(round(displaySpeed * (useMetricUnits ? 1.0 : MILES_PER_KM) * 10.00)/10.00);
+    double val = round(displaySpeed * (useMetricUnits ? 1.0 : MILES_PER_KM) * 10.00)/10.00;
+    speedLCD->display(QString::number(val, 'f', 1)); // always show 1 decimal point
     cadenceLCD->display(round(displayCadence));
     heartrateLCD->display(round(displayHeartRate));
     lapLCD->display(displayWorkoutLap+displayLap);
 
     // load or gradient depending on mode we are running
-    if (status&RT_MODE_ERGO) loadLCD->display(displayLoad);
-    else loadLCD->display(round(displayGradient*10)/10.00);
+    if (status&RT_MODE_ERGO)
+        loadLCD->display(displayLoad);
+    else
+    {
+        val = round(displayGradient*10)/10.00;
+        loadLCD->display(QString::number(val, 'f', 1)); // always show 1 decimal point
+    }
 
     // distance
-    distanceLCD->display(round(displayDistance*(useMetricUnits ? 1.0 : MILES_PER_KM) *10.00) /10.00);
+    val = round(displayDistance*(useMetricUnits ? 1.0 : MILES_PER_KM) *10.00) /10.00;
+    distanceLCD->display(QString::number(val, 'f', 1)); // always show 1 decimal point
 
     // NZ Averages.....
     if (displayPower) { //NZAP is bogus - make it configurable!!!
@@ -610,7 +620,8 @@ void RealtimeWindow::guiUpdate()           // refreshes the telemetry
     }
 
     avgpowerLCD->display((int)avgPower);
-    avgspeedLCD->display(round(avgSpeed * (useMetricUnits ? 1.0 : MILES_PER_KM) * 10.00)/10.00);
+    val = round(avgSpeed * (useMetricUnits ? 1.0 : MILES_PER_KM) * 10.00)/10.00;
+    avgspeedLCD->display(QString::number(val, 'f', 1)); // always show 1 decimal point
     avgcadenceLCD->display((int)avgCadence);
     avgheartrateLCD->display((int)avgHeartRate);
 
@@ -811,7 +822,9 @@ void RealtimeWindow::loadUpdate()
 {
     long load;
     double gradient;
-    load_msecs += LOADRATE;
+    // the period between loadUpdate calls is not constant, and not exactly LOADRATE,
+    // therefore, use a QTime timer to measure the load period
+    load_msecs += load_period.restart();
 
     if (status&RT_MODE_ERGO) {
         load = ergFile->wattsAt(load_msecs, displayWorkoutLap);
