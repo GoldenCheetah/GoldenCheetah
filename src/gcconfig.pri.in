@@ -6,6 +6,14 @@ BOOST_INSTALL = /usr/local/boost
 SRMIO_INSTALL = /usr/local/srmio
 D2XX_INCLUDE = /usr/local/include/D2XX
 
+#let us know where flex/bison are:
+#QMAKE_LEX  = flex
+#QMAKE_YACC = bison
+#win32 {
+#  QMAKE_YACC = bison --file-prefix=y -t
+#  QMAKE_MOVE = cmd /c move
+#}
+
 #if you have PHONON compiled in and working
 #uncomment the below, for video playback support
 #in the training and racing view
@@ -59,10 +67,6 @@ D2XX_INCLUDE = /usr/local/include/D2XX
 # then set the following variable appropriately
 # to the root of the libs/includ path
 #ICAL_INSTALL = /usr/local/libical
-
-# let us know where flex/bison are:
-#QMAKE_LEX = flex
-#QMAKE_YACC = bison
 
 # We recommend a debug build for development, and a static build for releases.
 CONFIG += debug
