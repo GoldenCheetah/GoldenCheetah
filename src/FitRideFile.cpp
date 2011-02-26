@@ -76,12 +76,13 @@ struct FitFileReaderState
     int devices;
     bool stopped;
     int last_event_type;
+    int last_event;
     int last_msg_type;
 
     FitFileReaderState(QFile &file, QStringList &errors) :
         file(file), errors(errors), rideFile(NULL), start_time(0),
         last_time(0), interval(0), devices(0), stopped(true),
-        last_event_type(-1), last_msg_type(-1)
+        last_event_type(-1), last_event(-1), last_msg_type(-1)
     {
         if (global_msg_names.isEmpty()) {
             global_msg_names.insert(0,  "file_id");
@@ -93,6 +94,7 @@ struct FitFileReaderState
             global_msg_names.insert(23, "device_info");
             global_msg_names.insert(34, "activity");
             global_msg_names.insert(49, "file_creator");
+            global_msg_names.insert(72, "undocumented_2"); // New for Garmin 800
         }
     }
 
@@ -143,6 +145,7 @@ struct FitFileReaderState
                 case 988: rideFile->setDeviceType("Garmin FR60"); break;
                 case 1018: rideFile->setDeviceType("Garmin FR310XT"); break;
                 case 1036: rideFile->setDeviceType("Garmin Edge 500"); break;
+                case 1169: rideFile->setDeviceType("Garmin Edge 800"); break;
                 default: rideFile->setDeviceType(QString("Unknown Garmin Device %1").arg(prod));
             }
         }
@@ -153,31 +156,48 @@ struct FitFileReaderState
 
     void decodeEvent(const FitDefinition &def, int, const std::vector<int> values) {
         time_t time = 0;
-        int type = -1;
+        int event = -1;
+        int event_type = -1;
         int i = 0;
         foreach(const FitField &field, def.fields) {
             int value = values[i++];
             switch (field.num) {
                 case 253: time = value + qbase_time.toTime_t(); break;
-                case 1: type = value; break;
+                case 0: event = value; break;
+                case 1: event_type = value; break;
                 default: ; // do nothing
             }
         }
-        switch (type) {
-            case 0: // start
-                stopped = false;
-                break;
-            case 3: // marker
-                break;
-            case 4: // stop all
-            case 9: // stop disable all
-                stopped = true;
-                break;
-            default:
-                errors << QString("unknown event type %1").arg(type);
+        if (event == 0) { // Timer event
+            switch (event_type) {
+                case 0: // start
+                    stopped = false;
+                    break;
+                case 1: // stop
+                    stopped = true;
+                    break;
+                case 2: // consecutive_depreciated
+                case 3: // marker
+                    break;
+                case 4: // stop all
+                    stopped = true;
+                    break;
+                case 5: // begin_depreciated
+                case 6: // end_depreciated
+                case 7: // end_all_depreciated
+                case 8: // stop_disable
+                    stopped = true;
+                    break;
+                case 9: // stop_disable_all
+                    stopped = true;
+                    break;
+                default:
+                    errors << QString("Unknown event type %1").arg(event_type);
+            }
         }
-        // printf("event type %d\n", type);
-        last_event_type = type;
+        // printf("event type %d\n", event_type);
+        last_event = event;
+        last_event_type = event_type;
     }
 
     void decodeLap(const FitDefinition &def, int time_offset, const std::vector<int> values) {
@@ -238,7 +258,7 @@ struct FitFileReaderState
             /*
             errors << QString("At %1 seconds, time is stopped, but got record "
                               "anyway.  Ignoring it.  Last event type was "
-                              "%2.").arg(time-start_time).arg(last_event_type);
+                              "%2 for event %3.").arg(time-start_time).arg(last_event_type).arg(last_event);
             return;
             */
         }
@@ -399,6 +419,7 @@ struct FitFileReaderState
                 case 23: /* device info */
                 case 18: /* session */
                 case 22: /* undocumented */
+                case 72: /* undocumented  - new for garmin 800*/
                 case 34: /* activity */
                 case 49: /* file creator */
                     break;
