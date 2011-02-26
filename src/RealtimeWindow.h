@@ -134,6 +134,7 @@ class RealtimeWindow : public GcWindow
         long total_msecs,
              lap_msecs,
              load_msecs;
+        QTime load_period;
 
         uint session_elapsed_msec, lap_elapsed_msec;
         QTime session_time, lap_time;
