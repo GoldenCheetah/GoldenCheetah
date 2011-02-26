@@ -127,6 +127,14 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : QWidget(parent), ho
     connect(startButton, SIGNAL(clicked()), this, SLOT(Start()));
     connect(pauseButton, SIGNAL(clicked()), this, SLOT(Pause()));
     connect(stopButton, SIGNAL(clicked()), this, SLOT(Stop()));
+
+    // add a watch on all directories
+    QVariant workoutDir = appsettings->value(NULL, GC_WORKOUTDIR);
+    watcher = boost::shared_ptr<QFileSystemWatcher>(new QFileSystemWatcher());
+    watcher->addPaths(workoutDir.toStringList());
+
+    connect(&*watcher,SIGNAL(directoryChanged(QString)),this,SLOT(configChanged()));
+    connect(&*watcher,SIGNAL(fileChanged(QString)),this,SLOT(configChanged()));
 }
 
 void

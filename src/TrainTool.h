@@ -103,6 +103,7 @@ class TrainTool : public QWidget
     public:
         // everyone else wants this
         QCheckBox   *recordSelector;
+        boost::shared_ptr<QFileSystemWatcher> watcher;
 };
 
 #endif // _GC_TrainTool_h

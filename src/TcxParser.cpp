@@ -65,7 +65,7 @@ TcxParser::startElement( const QString&, const QString&,
         power = 0.0;
         cadence = 0.0;
         hr = 0.0;
-	alt = 0.0;
+        //alt = 0.0; // TCS from FIT files have not alt point for each trackpoint
         distance = -1;  // nh - we set this to -1 so we can detect if there was a distance in the trackpoint.
     }
     return TRUE;

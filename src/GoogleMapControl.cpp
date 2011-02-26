@@ -509,14 +509,16 @@ string GoogleMapControl::CreateMarkers()
     RideItem *ride = myRideItem;
 
     // start marker
+    /*
     oss << "var marker;" << endl;
-    oss << "var blueIcon = new GIcon(G_DEFAULT_ICON);" << endl;
-    oss << "blueIcon.image = \"http://gmaps-samples.googlecode.com/svn/trunk/markers/blue/blank.png\"" << endl;
-    oss << "markerOptions = { icon:blueIcon };" << endl;
+    oss << "var greenIcon = new GIcon(G_DEFAULT_ICON);" << endl;
+    oss << "greenIcon.image = \"http://gmaps-samples.googlecode.com/svn/trunk/markers/green/blank.png\"" << endl;
+    oss << "markerOptions = { icon:greenIcon };" << endl;
     oss << "marker = new GMarker(new GLatLng(";
-    oss << rideData.front().lat << "," << rideData.front().lon << "),blueIcon);" << endl;
+    oss << rideData.front().lat << "," << rideData.front().lon << "),greenIcon);" << endl;
     oss << "marker.bindInfoWindowHtml(\"<h3>Start</h3>\");" << endl;
     oss << "map.addOverlay(marker);" << endl;
+    */
 
     oss << CreateIntervalMarkers(ride);
 
@@ -546,7 +548,10 @@ std::string GoogleMapControl::CreateMarker(int number, double lat, double lon, s
     ostringstream oss;
     oss.precision(6);
     oss << "intervalIcon = new GIcon(G_DEFAULT_ICON);" << endl;
-    oss << "intervalIcon.image = \"http://gmaps-samples.googlecode.com/svn/trunk/markers/green/marker" << number << ".png\"" << endl;
+    if ( number == 1 )
+        oss << "intervalIcon.image = \"http://gmaps-samples.googlecode.com/svn/trunk/markers/green/marker" << number << ".png\"" << endl;
+    else
+        oss << "intervalIcon.image = \"http://gmaps-samples.googlecode.com/svn/trunk/markers/blue/marker" << number << ".png\"" << endl;
     oss << "markerOptions = { icon:intervalIcon };" << endl;
     oss << "marker = new GMarker(new GLatLng( ";
     oss<< lat << "," << lon << "),intervalIcon);" << endl;
