@@ -62,7 +62,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
     //cpintAllValue->setFixedWidth(width);
     //cpintCPValue->setFixedWidth(width); // so lines up nicely
 
-    cpintTimeValue->setReadOnly(true);
+    cpintTimeValue->setReadOnly(false);
     cpintTodayValue->setReadOnly(true);
     cpintAllValue->setReadOnly(true);
     cpintCPValue->setReadOnly(true);
@@ -93,6 +93,8 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
 
     connect(picker, SIGNAL(moved(const QPoint &)),
             SLOT(pickerMoved(const QPoint &)));
+    connect(cpintTimeValue, SIGNAL(editingFinished()),
+      this, SLOT(cpintTimeValueEntered()));
     connect(cpintSetCPButton, SIGNAL(clicked()),
 	    this, SLOT(cpintSetCPButtonClicked()));
     connect(cComboSeason, SIGNAL(currentIndexChanged(int)),
@@ -183,19 +185,16 @@ curve_to_point(double x, const QwtPlotCurve *curve)
 }
 
 void
-CriticalPowerWindow::pickerMoved(const QPoint &pos)
+CriticalPowerWindow::updateCpint(double minutes)
 {
-    double minutes = cpintPlot->invTransform(QwtPlot::xBottom, pos.x());
-    cpintTimeValue->setText(interval_to_str(60.0*minutes));
-
     // current ride
     {
       unsigned watts = curve_to_point(minutes, cpintPlot->getThisCurve());
       QString label;
       if (watts > 0)
-          label = QString(cpintPlot->energyMode() ? "%1 kJ" : "%1 watts").arg(watts);
+        label = QString(cpintPlot->energyMode() ? "%1 kJ" : "%1 watts").arg(watts);
       else
-	label = tr("no data");
+	      label = tr("no data");
       cpintTodayValue->setText(label);
     }
 
@@ -204,9 +203,9 @@ CriticalPowerWindow::pickerMoved(const QPoint &pos)
       unsigned watts = curve_to_point(minutes, cpintPlot->getCPCurve());
       QString label;
       if (watts > 0)
-          label = QString(cpintPlot->energyMode() ? "%1 kJ" : "%1 watts").arg(watts);
+        label = QString(cpintPlot->energyMode() ? "%1 kJ" : "%1 watts").arg(watts);
       else
-       label = tr("no data");
+        label = tr("no data");
       cpintCPValue->setText(label);
     }
 
@@ -215,7 +214,7 @@ CriticalPowerWindow::pickerMoved(const QPoint &pos)
       QString label;
       int index = (int) ceil(minutes * 60);
       if (cpintPlot->getBests().count() > index) {
-	  QDate date = cpintPlot->getBestDates()[index];
+          QDate date = cpintPlot->getBestDates()[index];
           unsigned watts = cpintPlot->getBests()[index];
           if (cpintPlot->energyMode())
               label = QString("%1 kJ (%2)").arg(watts * minutes * 60.0 / 1000.0, 0, 'f', 0);
@@ -223,10 +222,26 @@ CriticalPowerWindow::pickerMoved(const QPoint &pos)
               label = QString("%1 watts (%2)").arg(watts);
           label = label.arg(date.isValid() ? date.toString(tr("MM/dd/yyyy")) : tr("no date"));
       }
-      else
-	  label = tr("no data");
+      else {
+        label = tr("no data");
+      }
       cpintAllValue->setText(label);
     }
+}
+
+void
+CriticalPowerWindow::cpintTimeValueEntered()
+{
+  double minutes = str_to_interval(cpintTimeValue->text()) / 60.0;
+  updateCpint(minutes);
+}
+
+void
+CriticalPowerWindow::pickerMoved(const QPoint &pos)
+{
+    double minutes = cpintPlot->invTransform(QwtPlot::xBottom, pos.x());
+    cpintTimeValue->setText(interval_to_str(60.0*minutes));
+    updateCpint(minutes);
 }
 
 void CriticalPowerWindow::addSeasons()

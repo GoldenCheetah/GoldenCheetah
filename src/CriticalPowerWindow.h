@@ -51,12 +51,15 @@ class CriticalPowerWindow : public GcWindow
         void setMode(int x) { yAxisCombo->setCurrentIndex(x); }
 
     protected slots:
-
+        void cpintTimeValueEntered();
         void cpintSetCPButtonClicked();
         void pickerMoved(const QPoint &pos);
         void rideSelected();
         void seasonSelected(int season);
         void setEnergyMode(int index);
+
+    private:
+        void updateCpint(double minutes);
 
     protected:
 
