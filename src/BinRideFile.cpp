@@ -660,7 +660,7 @@ struct BinFileReaderState
             foreach(int num, unknown_format_identifiers) {
                 errors << QString("unknow format identifier %1; ignoring it").arg(num);
             }
-            foreach(int num, unused_record_types) {
+            /*foreach(int num, unused_record_types) {
                 errors << QString("unused record type \"%1\" (%2)\n").arg(global_record_types[num].toAscii().constData())
                                                                      .arg(num);
             }
@@ -673,7 +673,7 @@ struct BinFileReaderState
                            .arg(global_record_types[record_type].toAscii().constData())
                            .arg(record_type);
                 }
-            }
+            }*/
             foreach(int num, unexpected_record_types) {
                 errors << QString("unexpected record type %1 (%2)\n").arg(global_record_types[num]).arg(num);
             }
