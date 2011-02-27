@@ -46,6 +46,7 @@
 #include "RealtimeWindow.h"
 #include "RideItem.h"
 #include "IntervalItem.h"
+#include "IntervalSummaryWindow.h"
 #include "RideEditor.h"
 #ifdef GC_HAVE_ICAL
 #include "DiaryWindow.h"
@@ -305,7 +306,8 @@ MainWindow::MainWindow(const QDir &home) :
     treeWidget->expandItem(allRides);
     treeWidget->setFirstItemColumnSpanned (allRides, true);
 
-    intervalWidget = new QTreeWidget(this);
+    intervalSummaryWindow = new IntervalSummaryWindow(this);
+    intervalWidget = new QTreeWidget();
     intervalWidget->setColumnCount(1);
     intervalWidget->setIndentation(5);
     intervalWidget->setSortingEnabled(false);
@@ -320,7 +322,10 @@ MainWindow::MainWindow(const QDir &home) :
     allIntervals->setText(0, tr("Intervals"));
     intervalWidget->expandItem(allIntervals);
 
-
+    intervalSplitter = new QSplitter(this);
+    intervalSplitter->setOrientation(Qt::Vertical);
+    intervalSplitter->addWidget(intervalWidget);
+    intervalSplitter->addWidget(intervalSummaryWindow);
 
 #ifdef GC_HAVE_ICAL
     rideCalendar = new ICalendar(this); // my local/remote calendar entries
@@ -403,7 +408,7 @@ MainWindow::MainWindow(const QDir &home) :
     dock->setWidget(toolBox);
 #endif
     toolBox->addItem(treeWidget, "Rides");
-    toolBox->addItem(intervalWidget, "Intervals");
+    toolBox->addItem(intervalSplitter, "Intervals");
     toolBox->addItem(masterControls, "Controls");
     toolBox->addItem(new AthleteTool(QFileInfo(home.path()).path(), this), "Athletes");
     toolBox->addItem(chartTool, "Charts");
