@@ -221,8 +221,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     else shade_zones = true;
 
     smooth = settings->value(GC_RIDE_PLOT_SMOOTHING).toInt();
-    if (smooth < 2)
-        smooth = 30;
+    if (smooth < 1) smooth = 1;
 
     // create a background object for shading
     bg = new AllPlotBackground(this);
