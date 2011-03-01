@@ -6,7 +6,7 @@
     <message>
         <location filename="../AerobicDecoupling.cpp" line="50"/>
         <source>Aerobic Decoupling</source>
-        <translation></translation>
+        <translation>Aerobic Decoupling</translation>
     </message>
     <message>
         <location filename="../AerobicDecoupling.cpp" line="52"/>
@@ -25,7 +25,7 @@
     <message>
         <location filename="../Aerolab.cpp" line="73"/>
         <source>Elevation</source>
-        <translation>Výška </translation>
+        <translation>Výška</translation>
     </message>
     <message>
         <location filename="../Aerolab.cpp" line="290"/>
@@ -58,7 +58,7 @@
     <message>
         <location filename="../AerolabWindow.cpp" line="111"/>
         <source>Total Mass (kg)</source>
-        <translation>Celková hmotnost (kg)</translation>
+        <translation>Hmotnost (kg)</translation>
     </message>
     <message>
         <location filename="../AerolabWindow.cpp" line="130"/>
@@ -68,7 +68,7 @@
     <message>
         <location filename="../AerolabWindow.cpp" line="149"/>
         <source>Eoffset (m)</source>
-        <translation>Výškový posun (m)</translation>
+        <translation>Posun výšky (m)</translation>
     </message>
 </context>
 <context>
@@ -81,7 +81,7 @@
     <message>
         <location filename="../AllPlot.cpp" line="238"/>
         <source>Heart Rate</source>
-        <translation>Tep</translation>
+        <translation>Tepy</translation>
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="241"/>
@@ -126,7 +126,7 @@
     <message>
         <location filename="../AllPlot.cpp" line="588"/>
         <source>Time (minutes)</source>
-        <translation>Čas (minuty)</translation>
+        <translation>Čas (Minuty)</translation>
     </message>
 </context>
 <context>
@@ -139,17 +139,17 @@
     <message>
         <location filename="../AllPlotWindow.cpp" line="60"/>
         <source>Stacked view</source>
-        <translation>Zvrstvený pohled</translation>
+        <translation>Zobrazit vrstveně</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="90"/>
         <source>Grid</source>
-        <translation>Mřižka</translation>
+        <translation>mřížka</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="94"/>
         <source>Heart Rate</source>
-        <translation>Srdeční tep</translation>
+        <translation>Tepy</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="98"/>
@@ -164,17 +164,17 @@
     <message>
         <location filename="../AllPlotWindow.cpp" line="106"/>
         <source>Altitude</source>
-        <translation>Nadm. výška</translation>
+        <translation>Nadmořská výška</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="111"/>
         <source>Power + shade</source>
-        <translation>Výkon a zóny</translation>
+        <translation>Výkon + zóny </translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="112"/>
         <source>Power - shade</source>
-        <translation>Výkon</translation>
+        <translation>Výkon bez zón</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="113"/>
@@ -224,13 +224,13 @@
     <message>
         <location filename="../BasicRideMetrics.cpp" line="272"/>
         <source>Average Heart Rate</source>
-        <translation>Průměrný tep</translation>
+        <translation>Průměrné tepy</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="273"/>
         <location filename="../BasicRideMetrics.cpp" line="274"/>
         <source>bpm</source>
-        <translation>bpm</translation>
+        <translation>tepy/m</translation>
     </message>
 </context>
 <context>
@@ -238,13 +238,13 @@
     <message>
         <location filename="../BasicRideMetrics.cpp" line="240"/>
         <source>Average Power</source>
-        <translation>Průměrný výkon</translation>
+        <translation>Průměrné watty</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="241"/>
         <location filename="../BasicRideMetrics.cpp" line="242"/>
         <source>watts</source>
-        <translation>Waty</translation>
+        <translation>Watty</translation>
     </message>
 </context>
 <context>
@@ -270,22 +270,22 @@
     <message>
         <location filename="../BestIntervalDialog.cpp" line="34"/>
         <source>Interval length: </source>
-        <translation>Délka intervalu</translation>
+        <translation>Délka intervalu:</translation>
     </message>
     <message>
         <location filename="../BestIntervalDialog.cpp" line="63"/>
         <source>How many to find: </source>
-        <translation>Zadej počet: </translation>
+        <translation>Počet intervalů:</translation>
     </message>
     <message>
         <location filename="../BestIntervalDialog.cpp" line="74"/>
         <source>Results:</source>
-        <translation>Výsledek</translation>
+        <translation>Výsledek:</translation>
     </message>
     <message>
         <location filename="../BestIntervalDialog.cpp" line="89"/>
         <source>&amp;Find Intervals</source>
-        <translation>&amp;Hledej interval</translation>
+        <translation>&amp;Vyhledat intervaly</translation>
     </message>
     <message>
         <location filename="../BestIntervalDialog.cpp" line="91"/>
@@ -295,7 +295,7 @@
     <message>
         <location filename="../BestIntervalDialog.cpp" line="93"/>
         <source>&amp;Add to Intervals</source>
-        <translation>&amp;Přidej interval</translation>
+        <translation>&amp;Přidat do intervalů</translation>
     </message>
     <message>
         <location filename="../BestIntervalDialog.cpp" line="148"/>
@@ -305,7 +305,7 @@
     <message>
         <location filename="../BestIntervalDialog.cpp" line="148"/>
         <source>No ride selected!</source>
-        <translation>Nebyl vybrán záznam!</translation>
+        <translation>Nebyl vybraný záznam!</translation>
     </message>
     <message>
         <location filename="../BestIntervalDialog.cpp" line="158"/>
@@ -315,7 +315,7 @@
     <message>
         <location filename="../BestIntervalDialog.cpp" line="159"/>
         <source>Interval length must be greater than zero!</source>
-        <translation>Délka intervalu musí byt větší než nula!</translation>
+        <translation>Interval musí být delší než nula!</translation>
     </message>
 </context>
 <context>
@@ -329,56 +329,56 @@
 <context>
     <name>CPPage</name>
     <message>
-        <location filename="../Pages.cpp" line="1580"/>
+        <location filename="../Pages.cpp" line="1581"/>
         <source>Add CP</source>
         <translation>Přidej CP</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1581"/>
+        <location filename="../Pages.cpp" line="1582"/>
         <source>Delete CP</source>
         <translation>Smaž CP</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1582"/>
+        <location filename="../Pages.cpp" line="1583"/>
         <source>Default</source>
-        <translation>Základní</translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="1585"/>
-        <source>Add Zone</source>
-        <translation>Přidej zónu</translation>
+        <translation>Výchozí</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1586"/>
-        <source>Delete Zone</source>
-        <translation>Smaž zónu</translation>
+        <source>Add Zone</source>
+        <translation>Přidat zónu</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1600"/>
-        <location filename="../Pages.cpp" line="1618"/>
-        <source>From Date</source>
-        <translation>Od </translation>
+        <location filename="../Pages.cpp" line="1587"/>
+        <source>Delete Zone</source>
+        <translation>Smazat zónu</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1601"/>
         <location filename="../Pages.cpp" line="1619"/>
-        <source>Critical Power</source>
-        <translation>Kriticky výkon CP</translation>
+        <source>From Date</source>
+        <translation>Od</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1648"/>
-        <source>Short</source>
-        <translation>Setřiď</translation>
+        <location filename="../Pages.cpp" line="1602"/>
+        <location filename="../Pages.cpp" line="1620"/>
+        <source>Critical Power</source>
+        <translation>Kritický výkon CP</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1649"/>
-        <source>Long</source>
-        <translation>Dlouhý</translation>
+        <source>Short</source>
+        <translation>Zóna </translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1650"/>
+        <source>Long</source>
+        <translation>Název zóny</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1651"/>
         <source>From Watts</source>
-        <translation>Od watů</translation>
+        <translation>Výkon od wattů</translation>
     </message>
 </context>
 <context>
@@ -386,7 +386,7 @@
     <message>
         <location filename="../LTMSettings.cpp" line="96"/>
         <source>Manage Charts</source>
-        <translation>Upravit grafy</translation>
+        <translation>Správa grafů</translation>
     </message>
     <message>
         <location filename="../LTMSettings.cpp" line="100"/>
@@ -406,12 +406,12 @@
     <message>
         <location filename="../LTMSettings.cpp" line="103"/>
         <source>Move down</source>
-        <translation>Posun dolů</translation>
+        <translation>Posun dolu</translation>
     </message>
     <message>
         <location filename="../LTMSettings.cpp" line="104"/>
         <source>Rename</source>
-        <translation>Přejmenovat</translation>
+        <translation>Přejmenuj</translation>
     </message>
     <message>
         <location filename="../LTMSettings.cpp" line="105"/>
@@ -426,7 +426,7 @@
     <message>
         <location filename="../LTMSettings.cpp" line="134"/>
         <source>&amp;Cancel</source>
-        <translation>&amp;Zruš</translation>
+        <translation>&amp;Zrušit</translation>
     </message>
     <message>
         <location filename="../LTMSettings.cpp" line="177"/>
@@ -450,7 +450,7 @@
     <message>
         <location filename="../ChooseCyclistDialog.cpp" line="38"/>
         <source>&amp;Open</source>
-        <translation>&amp;Open</translation>
+        <translation>&amp;Otevřít</translation>
     </message>
     <message>
         <location filename="../ChooseCyclistDialog.cpp" line="39"/>
@@ -460,7 +460,7 @@
     <message>
         <location filename="../ChooseCyclistDialog.cpp" line="87"/>
         <source>Create New Cyclist</source>
-        <translation>Vytvoř nového cyklistu</translation>
+        <translation>Přidat nového cyklistu</translation>
     </message>
     <message>
         <location filename="../ChooseCyclistDialog.cpp" line="88"/>
@@ -508,7 +508,7 @@
     <message>
         <location filename="../ConfigDialog.cpp" line="109"/>
         <source>Athlete</source>
-        <translation>Sportovec</translation>
+        <translation>Osobní profil</translation>
     </message>
     <message>
         <location filename="../ConfigDialog.cpp" line="115"/>
@@ -518,12 +518,12 @@
     <message>
         <location filename="../ConfigDialog.cpp" line="122"/>
         <source>Twitter</source>
-        <translation>Twitter</translation>
+        <translation>Nastavní Twitter</translation>
     </message>
     <message>
         <location filename="../ConfigDialog.cpp" line="186"/>
         <source>Short Term Stress</source>
-        <translation>Short Term Stress</translation>
+        <translation>ShortTermStress STS</translation>
     </message>
     <message>
         <location filename="../ConfigDialog.cpp" line="187"/>
@@ -533,7 +533,7 @@
     <message>
         <location filename="../ConfigDialog.cpp" line="188"/>
         <source>Long Term Stress</source>
-        <translation>Long Term Stress</translation>
+        <translation>LongTermStress LTS</translation>
     </message>
     <message>
         <location filename="../ConfigDialog.cpp" line="189"/>
@@ -543,7 +543,7 @@
     <message>
         <location filename="../ConfigDialog.cpp" line="190"/>
         <source>Stress Balance</source>
-        <translation>Stress Balance</translation>
+        <translation>Stress Balance SB</translation>
     </message>
     <message>
         <location filename="../ConfigDialog.cpp" line="191"/>
@@ -566,7 +566,7 @@
     <message>
         <location filename="../Pages.cpp" line="27"/>
         <source>Interval Metrics</source>
-        <translation>Metrika - Intervaly</translation>
+        <translation>Metrika intervalů</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="28"/>
@@ -581,42 +581,42 @@
     <message>
         <location filename="../Pages.cpp" line="35"/>
         <source>English</source>
-        <translation>Angličtina</translation>
+        <translation>anglicky</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="36"/>
         <source>French</source>
-        <translation>Francouština</translation>
+        <translation>francouzsky</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="37"/>
         <source>Japanese</source>
-        <translation>Japonština</translation>
+        <translation>japonsky</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="38"/>
         <source>Portugese (Brazil)</source>
-        <translation type="unfinished"></translation>
+        <translation>portugalsky</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="39"/>
         <source>Italian</source>
-        <translation type="unfinished"></translation>
+        <translation>italsky</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="40"/>
         <source>German</source>
-        <translation type="unfinished"></translation>
+        <translation>německy</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="41"/>
         <source>Russian</source>
-        <translation type="unfinished"></translation>
+        <translation>rusky</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="42"/>
         <source>Czech</source>
-        <translation type="unfinished"></translation>
+        <translation>česky</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="65"/>
@@ -626,32 +626,32 @@
     <message>
         <location filename="../Pages.cpp" line="68"/>
         <source>Metric</source>
-        <translation>Metrické (metry, kilometry)</translation>
+        <translation>Metrické CZ</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="69"/>
         <source>Imperial</source>
-        <translation>Imperiální (stopy, míle)</translation>
+        <translation>Imperiální US</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="78"/>
         <source>Crank Length:</source>
-        <translation>Délka klik:</translation>
+        <translation>Délka klik (mm):</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="117"/>
         <source>Sort ride list ascending.</source>
-        <translation>Řadit od nejstaršího.</translation>
+        <translation>Řadit záznamy od nejstaršího.</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="130"/>
         <source>Use Garmin Smart Recording.</source>
-        <translation>Použij &quot;Garmin Smart Recording&quot;.</translation>
+        <translation>Uživám Garmin Smart Recording.</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="137"/>
         <source>Smart Recording Threshold </source>
-        <translation>Hranice pro &quot;Garmin Smart Recording&quot;.</translation>
+        <translation>Hodnota pro &quot;Garmin Smart Recording&quot;</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="138"/>
@@ -661,22 +661,22 @@
     <message>
         <location filename="../Pages.cpp" line="147"/>
         <source>Requires Restart To Take Effect</source>
-        <translation>Vyžaduje restart</translation>
+        <translation>Nastavení vyžaduje restart aplikace</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="171"/>
         <source>BikeScore Estimate: use rides within last </source>
-        <translation>Výpočet BikeScore : výpočet z posledních </translation>
+        <translation>Výpočet BikeScore z posledních </translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="172"/>
         <source> days</source>
-        <translation>dny</translation>
+        <translation>dnů</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="176"/>
         <source>BikeScore estimate mode: </source>
-        <translation>Režim výpočtu BikeScore dle: </translation>
+        <translation>Režim výpočtu BikeScore podle:</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="178"/>
@@ -738,9 +738,8 @@
         <source>Computing critical power intervals.
 This may take a while.
 </source>
-        <translation>Počítam CP intervaly.
-Prosím o strpení, bude chvíli trvat.
-</translation>
+        <translation>Počítám křivku kritického výkonu - CP.
+Prosím o strpení. </translation>
     </message>
     <message>
         <location filename="../CpintPlot.cpp" line="620"/>
@@ -750,7 +749,7 @@ Prosím o strpení, bude chvíli trvat.
     <message>
         <location filename="../CpintPlot.cpp" line="629"/>
         <source>Processing %1...</source>
-        <translation>Zpracovávám %1..</translation>
+        <translation>Zpracovávám %1...</translation>
     </message>
     <message>
         <location filename="../CpintPlot.cpp" line="647"/>
@@ -768,7 +767,7 @@ Prosím o strpení, bude chvíli trvat.
     <message>
         <location filename="../PeakPower.cpp" line="56"/>
         <source>60 min Peak Power</source>
-        <translation>60 min špička</translation>
+        <translation>60min CP</translation>
     </message>
 </context>
 <context>
@@ -796,27 +795,27 @@ Prosím o strpení, bude chvíli trvat.
     <message>
         <location filename="../CriticalPowerWindow.cpp" line="47"/>
         <source>Best:</source>
-        <translation>Nejlepší</translation>
+        <translation>Nejlepší:</translation>
     </message>
     <message>
         <location filename="../CriticalPowerWindow.cpp" line="49"/>
         <source>CP Curve:</source>
-        <translation>Křivka kritického výkonu CP</translation>
+        <translation>CP křivka:</translation>
     </message>
     <message>
         <location filename="../CriticalPowerWindow.cpp" line="74"/>
         <source>&amp;Save CP value</source>
-        <translation>Ulož hodnoty CP</translation>
+        <translation>&amp;Ulož hodnoty CP</translation>
     </message>
     <message>
         <location filename="../CriticalPowerWindow.cpp" line="79"/>
         <source>Y Axis Shows Power</source>
-        <translation>Osa Y - Výkon</translation>
+        <translation>Osa Y - výkon (W)</translation>
     </message>
     <message>
         <location filename="../CriticalPowerWindow.cpp" line="80"/>
         <source>Y Axis Shows Energy</source>
-        <translation>Osa Y - Práce</translation>
+        <translation>Osa Y - práce (J)</translation>
     </message>
     <message>
         <location filename="../CriticalPowerWindow.cpp" line="152"/>
@@ -827,7 +826,7 @@ Prosím o strpení, bude chvíli trvat.
         <location filename="../CriticalPowerWindow.cpp" line="153"/>
         <source>No non-zero extracted value was identified:
 </source>
-        <translation>Nenalezena žádná nenulová hodnota:
+        <translation>Nebyla nalezena žádná nenulová hodnota:
 </translation>
     </message>
     <message>
@@ -843,7 +842,7 @@ Prosím o strpení, bude chvíli trvat.
     <message>
         <location filename="../CriticalPowerWindow.cpp" line="224"/>
         <source>MM/dd/yyyy</source>
-        <translation>mm/dd/rrrr</translation>
+        <translation>MM/dd/yyyy</translation>
     </message>
     <message>
         <location filename="../CriticalPowerWindow.cpp" line="246"/>
@@ -911,7 +910,7 @@ Click Cancel to exit.</source>
         <translation>Nemohu navázat spojenií s databází. 
 Vyžaduje Qt SQLite ovladač, více v dokumentaci.
 
-Zmáčkni tlačítko Zrušit</translation>
+Zmáčkni tlačítko Zrušit.</translation>
     </message>
 </context>
 <context>
@@ -933,7 +932,7 @@ Zmáčkni tlačítko Zrušit</translation>
     <message>
         <location filename="../DanielsPoints.cpp" line="49"/>
         <source>Daniels Points</source>
-        <translation>Daniels Points</translation>
+        <translation>DanielsPoints</translation>
     </message>
 </context>
 <context>
@@ -946,7 +945,7 @@ Zmáčkni tlačítko Zrušit</translation>
     <message>
         <location filename="../DatePickerDialog.cpp" line="59"/>
         <source>File to import...</source>
-        <translation>Soubor k importu...</translation>
+        <translation>Soubor pro import...</translation>
     </message>
     <message>
         <location filename="../DatePickerDialog.cpp" line="62"/>
@@ -961,12 +960,12 @@ Zmáčkni tlačítko Zrušit</translation>
     <message>
         <location filename="../DatePickerDialog.cpp" line="102"/>
         <source>Import CSV</source>
-        <translation>Import do CSV</translation>
+        <translation>Import CSV</translation>
     </message>
     <message>
         <location filename="../DatePickerDialog.cpp" line="103"/>
         <source>Comma Separated Values (*.csv)</source>
-        <translation>Formát CSV (.csv)</translation>
+        <translation>Formát CSV (*.csv)</translation>
     </message>
 </context>
 <context>
@@ -1015,22 +1014,22 @@ Zmáčkni tlačítko Zrušit</translation>
     <message>
         <location filename="../Pages.cpp" line="361"/>
         <source>Virtual Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Virtuální kanál</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="377"/>
+        <location filename="../Pages.cpp" line="378"/>
         <source>Add</source>
         <translation>Přidej</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="378"/>
+        <location filename="../Pages.cpp" line="379"/>
         <source>Delete</source>
         <translation>Smaž</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="379"/>
+        <location filename="../Pages.cpp" line="380"/>
         <source>Pair</source>
-        <translation>Navaž spojení</translation>
+        <translation>Navázat spojení</translation>
     </message>
 </context>
 <context>
@@ -1048,18 +1047,18 @@ Zmáčkni tlačítko Zrušit</translation>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="52"/>
         <source>&amp;Erase Ride(s)</source>
-        <translation>&amp;Vymaž záznamy</translation>
+        <translation>&amp;Vymaž záznam v přístroji</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="53"/>
         <source>&amp;Rescan</source>
-        <translation>&amp;Hledání</translation>
+        <translation>&amp;Opakovat hledání</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="54"/>
         <location filename="../DownloadRideDialog.cpp" line="181"/>
         <source>&amp;Cancel</source>
-        <translation>&amp;Zruš</translation>
+        <translation>&amp;Zrušit</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="68"/>
@@ -1069,14 +1068,14 @@ Zmáčkni tlačítko Zrušit</translation>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="70"/>
         <source>Select device type:</source>
-        <translation>Vyber typ zařízení: </translation>
+        <translation>Vyber zařizení:</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="83"/>
         <source>No devices found.  Make sure the device
 unit is plugged into the computer,
 then click &quot;Rescan&quot; to check again.</source>
-        <translation>Zařízení nenalezeno. Zkontroluj, že je přístroj připojen k PC, poté zmáčkni Hledání.</translation>
+        <translation>Zařízení nenalezeno. Zkontroluj, že je přístroj připojen k PC, poté stiskni tlačítko &quot;Opakovat hledání&quot;.</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="161"/>
@@ -1096,7 +1095,7 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="177"/>
         <source>Ride Already Downloaded</source>
-        <translation>Záznam již existuje </translation>
+        <translation>Záznam již existuje</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="178"/>
@@ -1106,12 +1105,12 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="179"/>
         <source>been downloaded.  Do you want to </source>
-        <translation>stažený. Chceš </translation>
+        <translation>stažený. Chceš</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="180"/>
         <source>overwrite the previous download?</source>
-        <translation>přepsat předešle stažené soubory?</translation>
+        <translation>přepsat předchozí stažené soubory?</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="181"/>
@@ -1137,7 +1136,7 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="205"/>
         <source> to </source>
-        <translation>  na </translation>
+        <translation>na</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="212"/>
@@ -1165,7 +1164,7 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../LTMSettings.cpp" line="51"/>
         <source>&amp;Cancel</source>
-        <translation>Zrušit</translation>
+        <translation>&amp;Zrušit</translation>
     </message>
 </context>
 <context>
@@ -1178,7 +1177,7 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../LTMTool.cpp" line="873"/>
         <source>&amp;OK</source>
-        <translation>&amp; OK</translation>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="874"/>
@@ -1191,7 +1190,7 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../Season.cpp" line="77"/>
         <source>Edit Date Range</source>
-        <translation>Uprav časový rozsah</translation>
+        <translation>Upravit časový rozsah</translation>
     </message>
     <message>
         <location filename="../Season.cpp" line="116"/>
@@ -1209,7 +1208,7 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="128"/>
         <source>Elevation Gain</source>
-        <translation>Získané převýšení</translation>
+        <translation>Převýšení</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="130"/>
@@ -1225,42 +1224,42 @@ then click &quot;Rescan&quot; to check again.</source>
 <context>
     <name>FieldsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="1135"/>
-        <source>Move up</source>
-        <translation>Pohyb nahoru</translation>
-    </message>
-    <message>
         <location filename="../Pages.cpp" line="1136"/>
-        <source>Move down</source>
-        <translation>Pohyb dolů</translation>
+        <source>Move up</source>
+        <translation>Posun nahoru</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1137"/>
+        <source>Move down</source>
+        <translation>Posun dolu</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1138"/>
         <source>Insert</source>
         <translation>Vložit</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1138"/>
+        <location filename="../Pages.cpp" line="1139"/>
         <source>Rename</source>
         <translation>Přejmenovat</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1139"/>
+        <location filename="../Pages.cpp" line="1140"/>
         <source>Delete</source>
-        <translation>Odstranit</translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="1150"/>
-        <source>Screen Tab</source>
-        <translation>Obrazovka Tab Nerovný</translation>
+        <translation>Smazat</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1151"/>
+        <source>Screen Tab</source>
+        <translation>Screen Tab</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1152"/>
         <source>Field</source>
         <translation>Pole</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1152"/>
+        <location filename="../Pages.cpp" line="1153"/>
         <source>Type</source>
         <translation>Typ</translation>
     </message>
@@ -1290,17 +1289,17 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../RideEditor.cpp" line="1506"/>
         <source>Less Than</source>
-        <translation>Méně než</translation>
+        <translation>Menší než</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="1507"/>
         <source>Equal To</source>
-        <translation>Rovná se</translation>
+        <translation>Rovný</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="1508"/>
         <source>Not Equal To</source>
-        <translation>Není rovno</translation>
+        <translation>Nerovný</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="1510"/>
@@ -1320,7 +1319,7 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../RideEditor.cpp" line="1535"/>
         <source>Close</source>
-        <translation>Zavřít</translation>
+        <translation>Zavři</translation>
     </message>
     <message>
         <source>Time</source>
@@ -1340,7 +1339,7 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../FixGPS.cpp" line="38"/>
         <source>Remove GPS errors and interpolate positional data where the GPS device did not record any data, or the data that was recorded is invalid.</source>
-        <translation>Vymaž GPS záznamy a oprav pozice kde GPS nefunfovala nebo chybovala.</translation>
+        <translation>Odstranit chyby GPS záznamu a opravit pozice kde GPSka nefungovala nebo chybovala.</translation>
     </message>
 </context>
 <context>
@@ -1353,7 +1352,7 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../FixGaps.cpp" line="47"/>
         <source>Stop</source>
-        <translation>Zastav</translation>
+        <translation>Zarážka</translation>
     </message>
     <message>
         <location filename="../FixGaps.cpp" line="70"/>
@@ -1367,16 +1366,25 @@ tolerance - this defines the minimum size of a recording gap (in seconds) that w
 
 stop - this defines the maximum size of gap (in seconds) that will have a smoothing algorithm applied. Where a gap is shorter than this value it will be filled with values interpolated from the values recorded before and after the gap. If it is longer than this value, it will be filled with zero values.</source>
         <translatorcomment>長いな・・・</translatorcomment>
-        <translation>Many devices, especially wireless devices, will drop connections to the bike computer. This leads to lost samples in the resulting data, or so-called drops in recording.
+        <translation>Mnoho bezdrátový přístrojů občas ztratí signál s cyklopočítačem. 
+To vede ke ztrátě dat a vytvoření chyb (mezer) v záznamu. 
+Podobné mezery vznikají také při zapnuté funkci Smart Recording v Garminu. 
+Ty se však v GC opravují automaticky pokud je zaplá fce. viz. Nástroje-&gt;Volby-&gt;Nastavení.
 
-In order to calculate peak powers and averages, it is very helpful to remove these gaps, and either smooth the data where it is missing or just replace with zero value samples
+Pro výpočet výkonu je žádoucí tyto chyby odstranit. 
+Toho lze dosáhnou dvěma způsoby. 
+Buď se jednoduše mezery pouze vymažou a hodnoty se nahradí nulou, nebo se použije tzv. vyhlazení.
+To je matematický odhad správných hodnot, který k opravě využíva dvou parametrů: Toleranci a Zarážku
 
-This function performs this task, taking two parameters;
+Tolerance je minimální velikost mezery (sec.) v záznamu od kdy se oprava záznamu použije.
 
-tolerance - this defines the minimum size of a recording gap (in seconds) that will be processed. any gap shorter than this will not be affected.
+Zarážka je definován jako maximální velikost mezery (sec.), kde bude záznam pomocí vyhlazení opraven. 
+Vyhlazení vypočte náhradní hodnoty na základě hodnot na okraji mezery (interpolace).
+Pokud bude mezera delší než zarážka, nahradí se zbytek mezery v záznamu nulami.
 
-stop - this defines the maximum size of gap (in seconds) that will have a smoothing algorithm applied. Where a gap is shorter than this value it will be filled with values interpolated from the values recorded before and after the gap. If it is longer than this value, it will be filled with zero values.
-NEJASNE</translation>
+Poznámka překladatele. 
+Prakticky tuto fci nevyužívám, ale mám v Garmin705 vypnutý režim Smart Recording.  
+        </translation>
     </message>
 </context>
 <context>
@@ -1389,7 +1397,7 @@ NEJASNE</translation>
     <message>
         <location filename="../FixSpikes.cpp" line="48"/>
         <source>Variance</source>
-        <translation>Rozsah</translation>
+        <translation>Variance</translation>
     </message>
     <message>
         <location filename="../FixSpikes.cpp" line="71"/>
@@ -1402,16 +1410,19 @@ It takes the following parameters:
 Absolute Max - this defines an absolute value for watts, and will smooth any values above this absolute value that have been identified as being anomalies (i.e. at odds with the data surrounding it)
 
 Variance (%) - this will smooth any values which are higher than this percentage of the rolling average wattage for the 30 seconds leading up to the spike.</source>
-        <translation>Occasionally power meters will erroneously report high values for power. For crank based power meters such as SRM and Quarq this is caused by an erroneous cadence reading as a result of triggering a reed switch whilst pushing off
+        <translation>Měřiče výkonu občas zaznamenají špatnou hodnotu výkonu, tzv. anomálii.
+Např. pro měřiče výkonu na klikách, jako SRM nebo Quarq je to způsobeno chybně načtenou kadencí.
 
-This function will look for spikes/anomalies in power data and replace the erroneous data by smoothing/interpolating the data from either side of the point in question
+K opravě se použije tzv. funkce vyhlazení, tedy matematického odhadu hodnot v chybujícím místě.
 
-It takes the following parameters:
+Anomálie v záznamu se určuje na základě dvou uživatelem stanovených hodnot - a to  MaxP a Variance
 
-Absolute Max - this defines an absolute value for watts, and will smooth any values above this absolute value that have been identified as being anomalies (i.e. at odds with the data surrounding it)
+Max je hodnota pro max. výkon, který je ještě fyziologicky možný, vše nad ním bude bráno jako anomálie. 
+Pro většinu závodníku bude hodnota kolem 1500-1800 wattů. 
 
-Variance (%) - this will smooth any values which are higher than this percentage of the rolling average wattage for the 30 seconds leading up to the spike.
-NEJASNE</translation>
+Variance je procentuální násobek vůči průměrnému výkonu za posledních 30s. 
+        
+        </translation>
     </message>
 </context>
 <context>
@@ -1419,17 +1430,17 @@ NEJASNE</translation>
     <message>
         <location filename="../FixTorque.cpp" line="46"/>
         <source>Torque Adjust</source>
-        <translation>Nastavení kroutícího momentu</translation>
+        <translation>Oprava momentu</translation>
     </message>
     <message>
         <location filename="../FixTorque.cpp" line="59"/>
         <source>Adjusting torque values allows you to uplift or degrade the torque values when the calibration of your power meter was incorrect. It takes a single parameter:
 
 Torque Adjust - this defines an absolute value in poinds per square inch or newton meters to modify values by. Negative values are supported. (e.g. enter &quot;1.2 nm&quot; or &quot;-0.5 pi&quot;).</source>
-        <translation>Adjusting torque values allows you to uplift or degrade the torque values when the calibration of your power meter was incorrect. It takes a single parameter:
+        <translation>Zde můžete opravit naměřené hodnoty točivého momentu pokud kalibrace měřiče výkonu selhala.
 
-Torque Adjust - this defines an absolute value in poinds per square inch or newton meters to modify values by. Negative values are supported. (e.g. enter &quot;1.2 nm&quot; or &quot;-0.5 pi&quot;).
-NEJASNE</translation>
+Hodnota Oprava momentu - definuje rozdíl vůči naměřené hodnotě.
+např. zadejte &quot;1,2 nm&quot; pro navýšení nebo &quot;-0,5 nm&quot; pro snížení. </translation>
     </message>
 </context>
 <context>
@@ -1437,7 +1448,7 @@ NEJASNE</translation>
     <message>
         <location filename="../GoogleMapControl.cpp" line="282"/>
         <source>No GPS Data Present</source>
-        <translation>Chybějící GPS údaje. </translation>
+        <translation>Nejsou zaznamenány GPS souřadnice</translation>
     </message>
     <message>
         <source>KPH</source>
@@ -1445,7 +1456,7 @@ NEJASNE</translation>
     </message>
     <message>
         <source>MPH</source>
-        <translation type="obsolete">mile/h</translation>
+        <translation type="obsolete">mi/h</translation>
     </message>
     <message>
         <source>Meters</source>
@@ -1461,32 +1472,32 @@ NEJASNE</translation>
     <message>
         <location filename="../HistogramWindow.cpp" line="36"/>
         <source>Bin width</source>
-        <translation>Bin width</translation>
+        <translation>Šířka </translation>
     </message>
     <message>
         <location filename="../HistogramWindow.cpp" line="50"/>
         <source>Log Y</source>
-        <translation>Log Y</translation>
+        <translation>Log y</translation>
     </message>
     <message>
         <location filename="../HistogramWindow.cpp" line="54"/>
         <source>With zeros</source>
-        <translation>S nulama</translation>
+        <translation>S nulou</translation>
     </message>
     <message>
         <location filename="../HistogramWindow.cpp" line="58"/>
         <source>Shade zones</source>
-        <translation>Skryj zóny</translation>
+        <translation>Schovat zóny</translation>
     </message>
     <message>
         <location filename="../HistogramWindow.cpp" line="66"/>
         <source>Absolute Time</source>
-        <translation>Celkový čas</translation>
+        <translation>Čas v minutách</translation>
     </message>
     <message>
         <location filename="../HistogramWindow.cpp" line="67"/>
         <source>Percentage Time</source>
-        <translation>Procento času</translation>
+        <translation>Čas v procentech</translation>
     </message>
     <message>
         <location filename="../HistogramWindow.cpp" line="277"/>
@@ -1496,7 +1507,7 @@ NEJASNE</translation>
     <message>
         <location filename="../HistogramWindow.cpp" line="281"/>
         <source>Watts (by Zone)</source>
-        <translation>Waty (dle zóny)</translation>
+        <translation>Watty v zóně</translation>
     </message>
     <message>
         <location filename="../HistogramWindow.cpp" line="286"/>
@@ -1506,12 +1517,12 @@ NEJASNE</translation>
     <message>
         <location filename="../HistogramWindow.cpp" line="290"/>
         <source>Heartrate</source>
-        <translation>Srdeční tep</translation>
+        <translation>Tepy</translation>
     </message>
     <message>
         <location filename="../HistogramWindow.cpp" line="293"/>
         <source>Heartrate (by Zone)</source>
-        <translation>Srdeční tep (dle  zóny)</translation>
+        <translation>Tepy v zóně</translation>
     </message>
     <message>
         <location filename="../HistogramWindow.cpp" line="298"/>
@@ -1526,60 +1537,60 @@ NEJASNE</translation>
     <message>
         <location filename="../HistogramWindow.cpp" line="337"/>
         <source>no data</source>
-        <translation>zádná data</translation>
+        <translation>nejsou data</translation>
     </message>
 </context>
 <context>
     <name>HrSchemePage</name>
     <message>
-        <location filename="../Pages.cpp" line="1942"/>
+        <location filename="../Pages.cpp" line="1943"/>
         <source>Add</source>
         <translation>Přidej</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1943"/>
-        <source>Rename</source>
-        <translation>Přejmenuj</translation>
-    </message>
-    <message>
         <location filename="../Pages.cpp" line="1944"/>
-        <source>Delete</source>
-        <translation>Smaž</translation>
+        <source>Rename</source>
+        <translation>Přejmenovat</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1953"/>
-        <source>Short</source>
-        <translation>Třiď</translation>
+        <location filename="../Pages.cpp" line="1945"/>
+        <source>Delete</source>
+        <translation>Smazat</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1954"/>
-        <source>Long</source>
-        <translation>Délka</translation>
+        <source>Short</source>
+        <translation>Zóna</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1955"/>
+        <source>Long</source>
+        <translation>Název zóny</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1956"/>
         <source>Percent of LT</source>
         <translatorcomment>いまいち</translatorcomment>
         <translation>Procento z LT</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1956"/>
+        <location filename="../Pages.cpp" line="1957"/>
         <source>Trimp k</source>
         <translatorcomment>でいいのかな？</translatorcomment>
-        <translation>Trimp k</translation>
+        <translation>TRIMP k</translation>
     </message>
 </context>
 <context>
     <name>HrZonePage</name>
     <message>
-        <location filename="../Pages.cpp" line="1925"/>
+        <location filename="../Pages.cpp" line="1926"/>
         <source>Lactic Threshold History</source>
-        <translation>Historie LT</translation>
+        <translation>Historie laktátového prahu LT</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1926"/>
+        <location filename="../Pages.cpp" line="1927"/>
         <source>Default Zones</source>
-        <translation>Základní zóny</translation>
+        <translation>Výchozí Zóny</translation>
     </message>
 </context>
 <context>
@@ -1651,67 +1662,52 @@ NEJASNE</translation>
     <message>
         <location filename="../HrZones.cpp" line="188"/>
         <source>line %1: read new range without reading any zones for previous one</source>
-        <translation>line %1: read new range without reading any zones for previous one
-NEJASNE</translation>
+        <translation>Chyba %1:  překlep, špatny formát souboru hr.zones nebo power.zones! Proveď kontrolu</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="247"/>
         <source>line %1: read zone without preceeding date range</source>
-        <translation>line %1: read zone without preceeding date range
-NEJASNE</translation>
+        <translation>Chyba %1: překlep, špatny formát souboru hr.zones nebo power.zones! Proveď kontrolu</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="262"/>
         <source>attempt to set zone based on % of LT without setting LT in line number %1.
 </source>
-        <translation>attempt to set zone based on % of LT without setting LT in line number %1.
-NEJASNE
-</translation>
+        <translation>Chyba %1: překlep, špatný formát souboru hr.zones nebo power.zones! Proveď kontrolu.</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="297"/>
         <source>file ended without reading any zones for last range</source>
-        <translation>file ended without reading any zones for last range
-NEJASNE</translation>
+        <translation>Chyba v souboru hr.zones nebo power.zones - file ended without reading any zones for last range</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="346"/>
         <source>Setting end date of range %1 to start date of range %2.
 </source>
-        <translation>Setting end date of range %1 to start date of range %2.
-NEJASNE
-</translation>
+        <translation>Chyba %1 %2-  překlep špatny formát souboru hr.zones nebo power.zones!  Proveď kontrolu.</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="357"/>
         <source>Extending final range %1 to infinite to include present date.
 </source>
-        <translation>Extending final range %1 to infinite to include present date.
-NEJASNE
-</translation>
+        <translation>Chyba %1-  překlep, špatný formát souboru hr.zones nebo power.zones! Proveď kontrolu.</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="364"/>
         <source>LT must be greater than zero in zone range %1 of hr.zones</source>
-        <translation>LT must be greater than zero in zone range %1 of hr.zones
-NEJASNE</translation>
+        <translation>Chyba v souboru hr.zones  - LT must be greater than zero in zone range %1 of hr.zones</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="383"/>
         <source>Range %1: matching top of zone %2 (%3) to bottom of zone %4 (%5).
 </source>
-        <translation>Range %1: matching top of zone %2 (%3) to bottom of zone %4 (%5).
-NEJASNE
-</translation>
+        <translation>Chyba %1 %2 %3 %4 %5 -  překlep, špatný formát souboru hr.zones nebo power.zones! Proveď kontrolu.</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="397"/>
         <source>Range %1: setting top of zone %2 from %3 to MAX.
 </source>
-        <translation>Range %1: setting top of zone %2 from %3 to MAX.
-NEJASNE
-
-</translation>
+        <translation>Chyba %1 %2 %3 -  překlep, špatný formát souboru hr.zones nebo power.zones! Proveď kontrolu.</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="611"/>
@@ -1726,17 +1722,17 @@ NEJASNE
     <message>
         <location filename="../HrZones.cpp" line="618"/>
         <source>&lt;td align=&quot;center&quot;&gt;Description&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;Popis&lt;/td&gt;</translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;Název zóny&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="619"/>
         <source>&lt;td align=&quot;center&quot;&gt;Low&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;Dolní&lt;/td&gt;</translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;od&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="620"/>
         <source>&lt;td align=&quot;center&quot;&gt;High&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;Horní&lt;/td&gt;</translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;do&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="621"/>
@@ -1755,52 +1751,52 @@ NEJASNE
 <context>
     <name>IntervalMetricsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="744"/>
+        <location filename="../Pages.cpp" line="745"/>
         <source>Available Metrics</source>
         <translation>Dostupná metrika</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="749"/>
+        <location filename="../Pages.cpp" line="750"/>
         <source>Selected Metrics</source>
         <translation>Vybraná metrika</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="800"/>
-        <location filename="../Pages.cpp" line="810"/>
+        <location filename="../Pages.cpp" line="801"/>
+        <location filename="../Pages.cpp" line="811"/>
         <source>&amp;#8482;</source>
         <translation>&amp;#8482;</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="800"/>
-        <location filename="../Pages.cpp" line="810"/>
+        <location filename="../Pages.cpp" line="801"/>
+        <location filename="../Pages.cpp" line="811"/>
         <source> (TM)</source>
-        <translation> (TM)</translation>
+        <translation>(TM)</translation>
     </message>
 </context>
 <context>
     <name>KeywordsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="969"/>
-        <source>Move up</source>
-        <translation>Přesuň nahoru</translation>
-    </message>
-    <message>
         <location filename="../Pages.cpp" line="970"/>
-        <source>Move down</source>
-        <translation>Posun dolů</translation>
+        <source>Move up</source>
+        <translation>Posun nahoru</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="971"/>
+        <source>Move down</source>
+        <translation>Posun dolu</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="972"/>
         <source>Insert</source>
         <translation>Vložit</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="972"/>
+        <location filename="../Pages.cpp" line="973"/>
         <source>Rename</source>
         <translation>Přejmenovat</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="973"/>
+        <location filename="../Pages.cpp" line="974"/>
         <source>Delete</source>
         <translation>Smazat</translation>
     </message>
@@ -1810,7 +1806,7 @@ NEJASNE
     <message>
         <location filename="../LTMPlot.cpp" line="711"/>
         <source>watts</source>
-        <translation>waty</translation>
+        <translation>watty</translation>
     </message>
 </context>
 <context>
@@ -1912,7 +1908,7 @@ NEJASNE
     <message>
         <location filename="../LTMWindow.cpp" line="103"/>
         <source>Add</source>
-        <translation>Přidat</translation>
+        <translation>Přidej</translation>
     </message>
     <message>
         <location filename="../LTMWindow.cpp" line="104"/>
@@ -1947,77 +1943,77 @@ NEJASNE
     <message>
         <location filename="../LTMWindow.cpp" line="123"/>
         <source>Shade Zones</source>
-        <translation>Schovej zónu</translation>
+        <translation>Schovat zóny</translation>
     </message>
 </context>
 <context>
     <name>LTPage</name>
     <message>
-        <location filename="../Pages.cpp" line="2117"/>
+        <location filename="../Pages.cpp" line="2118"/>
         <source>Add LT</source>
         <translation>Přidej LT</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2118"/>
+        <location filename="../Pages.cpp" line="2119"/>
         <source>Delete LT</source>
         <translation>Smaž LT</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2119"/>
+        <location filename="../Pages.cpp" line="2120"/>
         <source>Default</source>
         <translation>Výchozí</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2122"/>
-        <source>Add Zone</source>
-        <translation>Přidej zónu</translation>
-    </message>
-    <message>
         <location filename="../Pages.cpp" line="2123"/>
-        <source>Delete Zone</source>
-        <translation>Smaž zónu</translation>
+        <source>Add Zone</source>
+        <translation>Přidat zónu</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2137"/>
-        <location filename="../Pages.cpp" line="2177"/>
-        <source>From Date</source>
-        <translation>Od data</translation>
+        <location filename="../Pages.cpp" line="2124"/>
+        <source>Delete Zone</source>
+        <translation>Smazat zónu</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="2138"/>
         <location filename="../Pages.cpp" line="2178"/>
-        <source>Lactic Threshold</source>
-        <translation>Laktátový práh</translation>
+        <source>From Date</source>
+        <translation>Od</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2155"/>
+        <location filename="../Pages.cpp" line="2139"/>
         <location filename="../Pages.cpp" line="2179"/>
-        <source>Rest HR</source>
-        <translation>Klidový tep</translation>
+        <source>Lactic Threshold</source>
+        <translation>Laktátový práh LT </translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="2156"/>
         <location filename="../Pages.cpp" line="2180"/>
+        <source>Rest HR</source>
+        <translation>Klidový tep</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2157"/>
+        <location filename="../Pages.cpp" line="2181"/>
         <source>Max HR</source>
         <translation>Maximální tep</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2217"/>
-        <source>Short</source>
-        <translation>Krátký</translation>
-    </message>
-    <message>
         <location filename="../Pages.cpp" line="2218"/>
-        <source>Long</source>
-        <translation>Dlouhý</translation>
+        <source>Short</source>
+        <translation>Zóna</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="2219"/>
-        <source>From BPM</source>
-        <translation>Od bpm</translation>
+        <source>Long</source>
+        <translation>Název zóny</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="2220"/>
+        <source>From BPM</source>
+        <translation>Tepy od</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2221"/>
         <source>Trimp k</source>
         <translation>Trimp k</translation>
     </message>
@@ -2042,7 +2038,7 @@ Přeskakuji soubor...</translation>
         <location filename="../MainWindow.cpp" line="126"/>
         <location filename="../MainWindow.cpp" line="1463"/>
         <source>Zones File Error</source>
-        <translation>Chyba v souboru se zónami</translation>
+        <translation>Chyba v souboru power.zones</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="130"/>
@@ -2054,7 +2050,7 @@ Přeskakuji soubor...</translation>
         <location filename="../MainWindow.cpp" line="176"/>
         <location filename="../MainWindow.cpp" line="940"/>
         <source>All Rides</source>
-        <translation>Všechny jízdy/záznamy</translation>
+        <translation>Záznamy</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="191"/>
@@ -2065,7 +2061,7 @@ Přeskakuji soubor...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="269"/>
         <source>Ride Summary</source>
-        <translation>Přehled tréninku</translation>
+        <translation>Trénink</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="273"/>
@@ -2075,12 +2071,12 @@ Přeskakuji soubor...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="306"/>
         <source>3D</source>
-        <translation>3D grafy</translation>
+        <translation>Grafy 3D</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="313"/>
         <source>Weekly Summary</source>
-        <translation>Tydení přehled</translation>
+        <translation>Týdenní přehled</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="370"/>
@@ -2121,17 +2117,17 @@ Přeskakuji soubor...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="378"/>
         <source>&amp;Ride</source>
-        <translation>&amp;Jízda</translation>
+        <translation>&amp;Záznam</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="398"/>
         <source>Ctrl+S</source>
-        <translation>Ctrl+S</translation>
+        <translation>Ctrl+R</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="379"/>
         <source>&amp;Download from device...</source>
-        <translation>&amp;Stáhnout z přístroje...</translation>
+        <translation>&amp;Nahrát z přístroje...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="380"/>
@@ -2141,7 +2137,7 @@ Přeskakuji soubor...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="386"/>
         <source>&amp;Export to CSV...</source>
-        <translation>&amp;Exportovat to CSV...</translation>
+        <translation>&amp;Export do CSV...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="387"/>
@@ -2176,7 +2172,7 @@ Přeskakuji soubor...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="401"/>
         <source>Split &amp;ride...</source>
-        <translation>Sloučit &amp; jízdu...</translation>
+        <translation>Rozdělit &amp;záznam...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="399"/>
@@ -2186,13 +2182,13 @@ Přeskakuji soubor...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="383"/>
         <source>&amp;Manual ride entry...</source>
-        <translation>&amp;Ručně zapsat hodnoty...</translation>
+        <translation>&amp;Ručně zapsat trénink...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="136"/>
         <location filename="../MainWindow.cpp" line="1474"/>
         <source>Hr Zones File Error</source>
-        <translation>Chyba v souboru se TF zónami</translation>
+        <translation>Chyba v souboru s TF zónami</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="140"/>
@@ -2208,7 +2204,7 @@ Přeskakuji soubor...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="290"/>
         <source>Critical Power</source>
-        <translation>Kritický výkon CP</translation>
+        <translation>Křivka CP</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="295"/>
@@ -2228,7 +2224,7 @@ Přeskakuji soubor...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="325"/>
         <source>PM</source>
-        <translation>PM</translation>
+        <translation>Správce výkonosti PM</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="331"/>
@@ -2253,7 +2249,7 @@ Přeskakuji soubor...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="384"/>
         <source>Ctrl+M</source>
-        <translation>Ctrl+M</translation>
+        <translation>Crtl+M</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="388"/>
@@ -2293,7 +2289,7 @@ Přeskakuji soubor...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="442"/>
         <source>&amp;View</source>
-        <translation>&amp;Pohled</translation>
+        <translation>&amp;Zobrazení</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="458"/>
@@ -2303,7 +2299,7 @@ Přeskakuji soubor...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="459"/>
         <source>&amp;About GoldenCheetah</source>
-        <translation>&amp; O aplikaci GoldenCheetah</translation>
+        <translation>&amp;O aplikaci GoldenCheetah</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="627"/>
@@ -2355,7 +2351,7 @@ Přeskakuji soubor...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="744"/>
         <source>Google Earth KML (*.kml)</source>
-        <translation>Google Earth KML (*.kml)</translation>
+        <translation>Google Earth (*.kml)</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="768"/>
@@ -2380,7 +2376,7 @@ Přeskakuji soubor...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="777"/>
         <source>Export CSV</source>
-        <translation>Export CSV</translation>
+        <translation>Export do CSV</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="778"/>
@@ -2411,7 +2407,7 @@ Přeskakuji soubor...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="947"/>
         <source>Save Changes to Ride</source>
-        <translation>Uložit změny do záznamu</translation>
+        <translation>Ulož změny do záznamu</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="950"/>
@@ -2467,7 +2463,7 @@ Přeskakuji soubor...</translation>
         <location filename="../MainWindow.cpp" line="1133"/>
         <source>Computing bike score estimating factors.
 </source>
-        <translation>Počítám bike score na základe faktorů. NEJASNE
+        <translation>Počítám bike score na základe faktorů.
 </translation>
     </message>
     <message>
@@ -2478,7 +2474,7 @@ Přeskakuji soubor...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="1151"/>
         <source>Processing %1...</source>
-        <translation>Zpracování %1...</translation>
+        <translation>Zpracovám %1...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1217"/>
@@ -2521,7 +2517,7 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../MainWindow.cpp" line="1347"/>
         <source>&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;Build date: %1 %2&lt;p&gt;Version: %3&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Ride files and other data are stored in&lt;br&gt;&lt;a href=&quot;%4&quot;&gt;%5&lt;/a&gt;&lt;/center&gt;</source>
-        <translation>&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;Build date: %1 %2&lt;p&gt;Version: %3&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Ride files and other data are stored in&lt;br&gt;&lt;a href=&quot;%4&quot;&gt;%5&lt;/a&gt;&lt;/center&gt;</translation>
+        <translation>&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Software pro analýzu výkonu v cyklistice &lt;br&gt;pro Linux, Mac and Windows&lt;p&gt;Vytvořeno dne: %1 %2&lt;p&gt;Verze: %3&lt;p&gt;GoldenCheetah je licencován pod &lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Zdrojové kódy aplikace jsou zde&lt;br&gt;&lt;a href=&quot;http://www.goldencheetah.org/&quot;&gt;http://www.goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Soubory s konfigurací a záznamy tréninků jsou v &lt;br&gt;&lt;a href=&quot;%4&quot;&gt;%5&lt;/a&gt;&lt;p&gt;Poznámky a připomínky k českému překladu prosím na &lt;a href=&quot;mailto:beeda@post.cz?subject=CZ překlad v GC&quot;&gt;beeda@post.cz&lt;/a&gt;, ještě spousta práce:-). &lt;br&gt;&lt;/center&gt;</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1426"/>
@@ -2559,7 +2555,7 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../DataProcessor.cpp" line="93"/>
         <source>Cancel</source>
-        <translation>Zruš</translation>
+        <translation>Zrušit</translation>
     </message>
 </context>
 <context>
@@ -2567,12 +2563,12 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../ManualRideDialog.cpp" line="40"/>
         <source>Manually Enter Ride Data</source>
-        <translation>Ruční vložení záznamu</translation>
+        <translation>Ruční záznam tréninku</translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="43"/>
         <source>Ride date: </source>
-        <translation>Datum jízdy:</translation>
+        <translation>Datum: </translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="46"/>
@@ -2582,12 +2578,12 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../ManualRideDialog.cpp" line="50"/>
         <source>Ride length: </source>
-        <translation>Délka:</translation>
+        <translation>Délka: </translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="52"/>
         <source>hours</source>
-        <translation>hodiny</translation>
+        <translation>hod</translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="61"/>
@@ -2602,12 +2598,12 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../ManualRideDialog.cpp" line="78"/>
         <source>(1 sec to 99:59:59) </source>
-        <translation>(od 1 sec to 99:59:59) </translation>
+        <translation>(od 1 sek do 99:59:59)</translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="82"/>
         <source>Distance </source>
-        <translation>Vzdálenost </translation>
+        <translation>Vzdálenost</translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="84"/>
@@ -2629,7 +2625,7 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../ManualRideDialog.cpp" line="103"/>
         <source>Average HR: </source>
-        <translation>Průměrná TF:  </translation>
+        <translation>Průměrná TF: </translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="109"/>
@@ -2649,17 +2645,17 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../ManualRideDialog.cpp" line="131"/>
         <source>Distance</source>
-        <translation>Vzdálenost</translation>
+        <translation>Vzdálenosti</translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="138"/>
         <source>BikeScore: </source>
-        <translation>BikeScore: </translation>
+        <translation>BikeScore™: </translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="151"/>
         <source>Daniels Points: </source>
-        <translation>Daniels Points: </translation>
+        <translation>DanielsPoints: </translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="163"/>
@@ -2670,7 +2666,7 @@ CP závodníka nastaven na %3 wattů</translation>
         <location filename="../ManualRideDialog.cpp" line="164"/>
         <location filename="../ManualRideDialog.cpp" line="329"/>
         <source>&amp;Cancel</source>
-        <translation>Zrušit</translation>
+        <translation>&amp;Zrušit</translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="289"/>
@@ -2696,12 +2692,12 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../ManualRideDialog.cpp" line="325"/>
         <source>This ride appears to have already </source>
-        <translation>Tato jízda byla už </translation>
+        <translation>Tato záznam byl už </translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="326"/>
         <source>been downloaded.  Do you want to </source>
-        <translation>stažena. Chcete</translation>
+        <translation>stažený. Chcete</translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="327"/>
@@ -2716,7 +2712,7 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../ManualRideDialog.cpp" line="329"/>
         <source>&amp;Overwrite</source>
-        <translation>&amp; Přepsat</translation>
+        <translation>&amp;Přepsat</translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="348"/>
@@ -2743,7 +2739,7 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../ManualRideDialog.cpp" line="441"/>
         <source> to </source>
-        <translation>na </translation>
+        <translation> do </translation>
     </message>
 </context>
 <context>
@@ -2765,29 +2761,29 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="335"/>
         <source>Max Power</source>
-        <translation>Maximální výkon</translation>
+        <translation>Max výkon</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="336"/>
         <location filename="../BasicRideMetrics.cpp" line="337"/>
         <source>watts</source>
-        <translation>watty</translation>
+        <translation>Watty</translation>
     </message>
 </context>
 <context>
     <name>MetadataPage</name>
     <message>
-        <location filename="../Pages.cpp" line="931"/>
+        <location filename="../Pages.cpp" line="932"/>
         <source>Fields</source>
         <translation>Položky</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="932"/>
+        <location filename="../Pages.cpp" line="933"/>
         <source>Notes Keywords</source>
         <translation>Klíčová slova</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="933"/>
+        <location filename="../Pages.cpp" line="934"/>
         <source>Processing</source>
         <translation>Zpracovávám</translation>
     </message>
@@ -2797,7 +2793,7 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../MetricAggregator.cpp" line="94"/>
         <source>Refreshing Metrics Database...</source>
-        <translation>Aktualizuji databázi s metrikou ...</translation>
+        <translation>Aktualizuji databázi s metrikou...</translation>
     </message>
     <message>
         <location filename="../MetricAggregator.cpp" line="94"/>
@@ -2810,7 +2806,7 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../ModelWindow.cpp" line="33"/>
         <source>Power</source>
-        <translation>výkon</translation>
+        <translation>Výkon</translation>
     </message>
     <message>
         <location filename="../ModelWindow.cpp" line="34"/>
@@ -2820,7 +2816,7 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../ModelWindow.cpp" line="35"/>
         <source>Heartrate</source>
-        <translation>Tepová frekvence</translation>
+        <translation>Tepy</translation>
     </message>
     <message>
         <location filename="../ModelWindow.cpp" line="36"/>
@@ -2855,17 +2851,17 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../ModelWindow.cpp" line="42"/>
         <source>Distance</source>
-        <translation>Vzdálenost</translation>
+        <translation>Vzdálenosti</translation>
     </message>
     <message>
         <location filename="../ModelWindow.cpp" line="43"/>
         <source>Latitude</source>
-        <translation>Zeměpisná šířka</translation>
+        <translation>GPS šířka</translation>
     </message>
     <message>
         <location filename="../ModelWindow.cpp" line="44"/>
         <source>Longitude</source>
-        <translation>Zeměpisná délka</translation>
+        <translation>GPS délka</translation>
     </message>
     <message>
         <location filename="../ModelWindow.cpp" line="63"/>
@@ -2890,18 +2886,18 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../ModelWindow.cpp" line="67"/>
         <source>Color:</source>
-        <translation>Barva:</translation>
+        <translation>Barvit:</translation>
     </message>
     <message>
         <location filename="../ModelWindow.cpp" line="68"/>
         <source>Bin Width:</source>
-        <translation>Šířka sloupce:</translation>
+        <translation>Šířka sloupu:</translation>
     </message>
     <message>
         <location filename="../ModelWindow.cpp" line="81"/>
         <location filename="../ModelWindow.cpp" line="87"/>
         <source>Time at X&amp;Y</source>
-        <translation>Čas na X &amp; Y</translation>
+        <translation>Čas na X&amp;Y</translation>
     </message>
     <message>
         <location filename="../ModelWindow.cpp" line="86"/>
@@ -2911,7 +2907,7 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../ModelWindow.cpp" line="91"/>
         <source>Bar</source>
-        <translation>Sloupcový graf</translation>
+        <translation>Sloupcový</translation>
     </message>
     <message>
         <location filename="../ModelWindow.cpp" line="92"/>
@@ -2926,7 +2922,7 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../ModelWindow.cpp" line="94"/>
         <source>Dots</source>
-        <translation>Spojnicový</translation>
+        <translation>Bodový</translation>
     </message>
     <message>
         <location filename="../ModelWindow.cpp" line="97"/>
@@ -2952,12 +2948,12 @@ CP závodníka nastaven na %3 wattů</translation>
         <location filename="../ModelWindow.cpp" line="116"/>
         <location filename="../ModelWindow.cpp" line="298"/>
         <source>Reset View</source>
-        <translation>Reset Zobrazení</translation>
+        <translation>Vykreslit graf</translation>
     </message>
     <message>
         <location filename="../ModelWindow.cpp" line="291"/>
         <source>Plot</source>
-        <translation>Vykreslit</translation>
+        <translation>Vykreslit graf</translation>
     </message>
 </context>
 <context>
@@ -2965,7 +2961,7 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="389"/>
         <source>95% Heartrate</source>
-        <translation>95% maximálni TF</translation>
+        <translation>95% maximální TF</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="390"/>
@@ -2994,7 +2990,7 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../RideEditor.cpp" line="1804"/>
         <source>Append</source>
-        <translation>Připojit</translation>
+        <translation>Přidat</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="1805"/>
@@ -3009,7 +3005,7 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../RideEditor.cpp" line="1815"/>
         <source>Tab</source>
-        <translation>Záložka</translation>
+        <translation>Tab</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="1817"/>
@@ -3082,7 +3078,7 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../RideEditor.cpp" line="2022"/>
         <source>Heartrate</source>
-        <translation>Tepová frekvence</translation>
+        <translation>Tepy</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="2023"/>
@@ -3092,12 +3088,12 @@ CP závodníka nastaven na %3 wattů</translation>
     <message>
         <location filename="../RideEditor.cpp" line="2024"/>
         <source>Latitude</source>
-        <translation>Zeměpisná šířka</translation>
+        <translation>GPS šířka</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="2025"/>
         <source>Longitude</source>
-        <translation>Zeměpisná délka</translation>
+        <translation>GPS délka</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="2026"/>
@@ -3128,7 +3124,7 @@ CP závodníka nastaven na %3 wattů</translation>
         <location filename="../RideEditor.cpp" line="2144"/>
         <source>Copy/Paste Mismatch</source>
         <translatorcomment>いまいち</translatorcomment>
-        <translation>Neshoda mezi Copy a Paste</translation>
+        <translation>Neshoda mezi kopirováním  a vložením</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="2145"/>
@@ -3136,6 +3132,7 @@ CP závodníka nastaven na %3 wattů</translation>
 
 Do you want to continue?</source>
         <translation>Zvolený rozsah a dostupné data mají různou velikost, může dojít ke ztrátě dat. 
+
 Chcete pokračovat?</translation>
     </message>
 </context>
@@ -3145,7 +3142,7 @@ Chcete pokračovat?</translation>
         <location filename="../PeakPower.cpp" line="35"/>
         <location filename="../PeakPower.cpp" line="36"/>
         <source>watts</source>
-        <translation>watty</translation>
+        <translation>Watty</translation>
     </message>
 </context>
 <context>
@@ -3153,7 +3150,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="155"/>
         <source>10 min Peak Power</source>
-        <translation>10 min Maximální výkon</translation>
+        <translation>Max výkon 10min</translation>
     </message>
 </context>
 <context>
@@ -3161,7 +3158,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="89"/>
         <source>10 sec Peak Power</source>
-        <translation>10 sec Maximální výkon</translation>
+        <translation>Max výkon 10sec</translation>
     </message>
 </context>
 <context>
@@ -3169,7 +3166,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="100"/>
         <source>15 sec Peak Power</source>
-        <translation>15 sec Maximální výkon</translation>
+        <translation>Max výkon 15sec</translation>
     </message>
 </context>
 <context>
@@ -3177,7 +3174,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="133"/>
         <source>1 min Peak Power</source>
-        <translation>1 min Maximální výkon</translation>
+        <translation>Max výkon 1min</translation>
     </message>
 </context>
 <context>
@@ -3185,7 +3182,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="67"/>
         <source>1 sec Peak Power</source>
-        <translation>1 sec Maximální výkon</translation>
+        <translation>Max výkon 1sec</translation>
     </message>
 </context>
 <context>
@@ -3193,7 +3190,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="166"/>
         <source>20 min Peak Power</source>
-        <translation>20 min Maximální výkon</translation>
+        <translation>Max výkon 20min</translation>
     </message>
 </context>
 <context>
@@ -3201,7 +3198,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="111"/>
         <source>20 sec Peak Power</source>
-        <translation>20 sec Maximální výkon</translation>
+        <translation>Max výkon 20sec</translation>
     </message>
 </context>
 <context>
@@ -3209,7 +3206,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="177"/>
         <source>30 min Peak Power</source>
-        <translation>30 min Maximální výkon</translation>
+        <translation>Max výkon 30min</translation>
     </message>
 </context>
 <context>
@@ -3217,7 +3214,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="122"/>
         <source>30 sec Peak Power</source>
-        <translation>30 sec Maximální výkon</translation>
+        <translation>Max výkon 30sec</translation>
     </message>
 </context>
 <context>
@@ -3225,7 +3222,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="144"/>
         <source>5 min Peak Power</source>
-        <translation>5 min Maximální výkon</translation>
+        <translation>Max výkon 5m</translation>
     </message>
 </context>
 <context>
@@ -3233,7 +3230,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="78"/>
         <source>5 sec Peak Power</source>
-        <translation>5 sec Maximální výkon</translation>
+        <translation>Max výkon 5sec</translation>
     </message>
 </context>
 <context>
@@ -3241,7 +3238,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../PerfPlot.cpp" line="35"/>
         <source>Performance Manager</source>
-        <translation>Performance Manager</translation>
+        <translation>PerformanceManager</translation>
     </message>
     <message>
         <location filename="../PerfPlot.cpp" line="99"/>
@@ -3251,17 +3248,17 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../PerfPlot.cpp" line="118"/>
         <source>Short Term Stress</source>
-        <translation>Short Term Stress</translation>
+        <translation>Short Term Stress STS</translation>
     </message>
     <message>
         <location filename="../PerfPlot.cpp" line="131"/>
         <source>Long Term Stress</source>
-        <translation>Long Term Stress</translation>
+        <translation>Long Term Stress LTS</translation>
     </message>
     <message>
         <location filename="../PerfPlot.cpp" line="144"/>
         <source>Stress Balance</source>
-        <translation>Stres bilance</translation>
+        <translation>Stress Balance SB</translation>
     </message>
 </context>
 <context>
@@ -3274,22 +3271,22 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../PerformanceManagerWindow.cpp" line="47"/>
         <source>no data</source>
-        <translation>žádná data</translation>
+        <translation>chybí data</translation>
     </message>
     <message>
         <location filename="../PerformanceManagerWindow.cpp" line="52"/>
         <source>Use BikeScore</source>
-        <translation>Použijte BikeScore</translation>
+        <translation>Použít BikeScore™</translation>
     </message>
     <message>
         <location filename="../PerformanceManagerWindow.cpp" line="53"/>
         <source>Use DanielsPoints</source>
-        <translation>Použijte DanielsPoints</translation>
+        <translation>Použít DanielsPoints</translation>
     </message>
     <message>
         <location filename="../PerformanceManagerWindow.cpp" line="54"/>
         <source>Use TRIMP</source>
-        <translation>Použijte TRIMP</translation>
+        <translation>Použít TRIMP</translation>
     </message>
     <message>
         <location filename="../PerformanceManagerWindow.cpp" line="76"/>
@@ -3317,7 +3314,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../PfPvPlot.cpp" line="372"/>
         <source>no cadence</source>
-        <translation>bez kadence</translation>
+        <translation>Graf se nevykreslí protože v záznamu chybí některá veličina - např. kadence</translation>
     </message>
 </context>
 <context>
@@ -3330,17 +3327,17 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../PfPvWindow.cpp" line="35"/>
         <source>RPM:</source>
-        <translation>ot/m:</translation>
+        <translation>RPM:</translation>
     </message>
     <message>
         <location filename="../PfPvWindow.cpp" line="38"/>
         <source>Crank Length (m):</source>
-        <translation>Délka kliky (m):</translation>
+        <translation>Déka kliky (m):</translation>
     </message>
     <message>
         <location filename="../PfPvWindow.cpp" line="41"/>
         <source>Shade zones</source>
-        <translation>Schovat zóny</translation>
+        <translation>Zóny v pozadí</translation>
     </message>
     <message>
         <location filename="../PfPvWindow.cpp" line="44"/>
@@ -3359,13 +3356,13 @@ Chcete pokračovat?</translation>
         <location filename="../PowerHist.cpp" line="340"/>
         <location filename="../PowerHist.cpp" line="1022"/>
         <source>Time (minutes)</source>
-        <translation>Čas (min)</translation>
+        <translation>Čas (minuty)</translation>
     </message>
     <message>
         <location filename="../PowerHist.cpp" line="340"/>
         <location filename="../PowerHist.cpp" line="1022"/>
         <source>Time (percent)</source>
-        <translation>Čas (%)</translation>
+        <translation>Čas (proceta)</translation>
     </message>
     <message>
         <location filename="../PowerHist.cpp" line="1000"/>
@@ -3375,17 +3372,17 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../PowerHist.cpp" line="1003"/>
         <source>Power zone</source>
-        <translation>Zóna výkonu</translation>
+        <translation>Zóny výkonu</translation>
     </message>
     <message>
         <location filename="../PowerHist.cpp" line="1006"/>
         <source>Heartrate (bpm)</source>
-        <translation>Tepové frekvence (tepy/m)</translation>
+        <translation>Tep (tepy/m)</translation>
     </message>
     <message>
         <location filename="../PowerHist.cpp" line="1009"/>
         <source>Heartrate zone</source>
-        <translation>Zóna tepové frekvence </translation>
+        <translation>Zóna tepu</translation>
     </message>
     <message>
         <location filename="../PowerHist.cpp" line="1012"/>
@@ -3415,7 +3412,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../PowerHist.cpp" line="1018"/>
         <source>N-m</source>
-        <translation>N-m</translation>
+        <translation>Nm</translation>
     </message>
     <message>
         <location filename="../PowerHist.cpp" line="1018"/>
@@ -3438,29 +3435,29 @@ Chcete pokračovat?</translation>
 <context>
     <name>ProcessorPage</name>
     <message>
-        <location filename="../Pages.cpp" line="1321"/>
+        <location filename="../Pages.cpp" line="1322"/>
         <source>Processor</source>
         <translation>Procesor</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1322"/>
+        <location filename="../Pages.cpp" line="1323"/>
         <source>Apply</source>
         <translation>Provést</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1323"/>
+        <location filename="../Pages.cpp" line="1324"/>
         <source>Settings</source>
         <translation>Nastavení</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1347"/>
+        <location filename="../Pages.cpp" line="1348"/>
         <source>Manual</source>
-        <translation>Ruční</translation>
+        <translation>Ručně</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1348"/>
+        <location filename="../Pages.cpp" line="1349"/>
         <source>Auto</source>
-        <translation>Auto</translation>
+        <translation>Automaticky</translation>
     </message>
 </context>
 <context>
@@ -3480,13 +3477,13 @@ Chcete pokračovat?</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="136"/>
-        <location filename="../RealtimeWindow.cpp" line="452"/>
+        <location filename="../RealtimeWindow.cpp" line="465"/>
         <source>Start</source>
         <translation>Start</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="138"/>
-        <location filename="../RealtimeWindow.cpp" line="431"/>
+        <location filename="../RealtimeWindow.cpp" line="440"/>
         <source>Pause</source>
         <translation>Pauza</translation>
     </message>
@@ -3498,35 +3495,35 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../RealtimeWindow.cpp" line="176"/>
         <source>WATTS</source>
-        <translation>WATTS</translation>
+        <translation>Výkon</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="178"/>
         <source>BPM</source>
-        <translation>BPM</translation>
+        <translation>Tep</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="52"/>
         <location filename="../RealtimeWindow.cpp" line="180"/>
         <source>KPH</source>
-        <translation>KPH</translation>
+        <translation>Rychlost</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="182"/>
         <source>RPM</source>
-        <translation>RPM</translation>
+        <translation>Kadence</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="184"/>
-        <location filename="../RealtimeWindow.cpp" line="374"/>
+        <location filename="../RealtimeWindow.cpp" line="380"/>
         <source>Lap/Interval</source>
         <translation>Kolo/Interval</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="186"/>
-        <location filename="../RealtimeWindow.cpp" line="782"/>
+        <location filename="../RealtimeWindow.cpp" line="809"/>
         <source>Load WATTS</source>
-        <translation>Načíst watty</translation>
+        <translation>Zátížení (Watty)</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="51"/>
@@ -3537,18 +3534,18 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../RealtimeWindow.cpp" line="191"/>
         <source>Avg WATTS</source>
-        <translation>Avg WATTS</translation>
+        <translation>Průměrný výkon</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="193"/>
         <source>Avg BPM</source>
-        <translation>Avg BPM</translation>
+        <translation>Průměrný tep</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="53"/>
         <location filename="../RealtimeWindow.cpp" line="195"/>
         <source>Avg KPH</source>
-        <translation>Avg KPH</translation>
+        <translation>Průměrná rychlost</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="51"/>
@@ -3560,24 +3557,24 @@ Chcete pokračovat?</translation>
         <location filename="../RealtimeWindow.cpp" line="52"/>
         <location filename="../RealtimeWindow.cpp" line="180"/>
         <source>MPH</source>
-        <translation>MPH</translation>
+        <translation>mi/h</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="53"/>
         <location filename="../RealtimeWindow.cpp" line="195"/>
         <source>Avg MPH</source>
-        <translation>Průmerná rychlost</translation>
+        <translation>Průměrná rychlost</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="197"/>
         <source>Avg RPM</source>
-        <translation>Průmerná kadence</translation>
+        <translation>Průměrná kadence</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="199"/>
-        <location filename="../RealtimeWindow.cpp" line="783"/>
+        <location filename="../RealtimeWindow.cpp" line="810"/>
         <source>Avg Load WATTS</source>
-        <translation>Průmerná zátěž</translation>
+        <translation>Průměrná zátěž</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="202"/>
@@ -3590,24 +3587,24 @@ Chcete pokračovat?</translation>
         <translation>Čas</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="438"/>
+        <location filename="../RealtimeWindow.cpp" line="450"/>
         <source>Un-Pause</source>
-        <translation>Un-Pause</translation>
+        <translation>Pokračovat</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="647"/>
+        <location filename="../RealtimeWindow.cpp" line="673"/>
         <source>No Devices Configured</source>
-        <translation>Není nakonfigurováno žádné zařízení</translation>
+        <translation>Přístroj není nakonfigurován nebo připojen</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="789"/>
+        <location filename="../RealtimeWindow.cpp" line="816"/>
         <source>Gradient PERCENT</source>
-        <translation>Stoupání </translation>
+        <translation>Stoupání (%)</translation>
     </message>
     <message>
-        <location filename="../RealtimeWindow.cpp" line="790"/>
+        <location filename="../RealtimeWindow.cpp" line="817"/>
         <source>Avg Gradient PERCENT</source>
-        <translation>Průmerné procentuální stoupaní</translation>
+        <translation>Průměrné stoupání (%)</translation>
     </message>
 </context>
 <context>
@@ -3638,7 +3635,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../RideEditor.cpp" line="79"/>
         <source>Find</source>
-        <translation>Hledat</translation>
+        <translation>Najdi</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="98"/>
@@ -3650,7 +3647,7 @@ Chcete pokračovat?</translation>
         <location filename="../RideEditor.cpp" line="103"/>
         <location filename="../RideEditor.cpp" line="467"/>
         <source>Redo</source>
-        <translation>Vrátit zpět</translation>
+        <translation>Předělat</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="164"/>
@@ -3675,7 +3672,7 @@ Chcete pokračovat?</translation>
         <location filename="../RideEditor.cpp" line="167"/>
         <location filename="../RideEditor.cpp" line="712"/>
         <source>Heartrate</source>
-        <translation>Tepová frekvence</translation>
+        <translation>Tepy</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="168"/>
@@ -3705,13 +3702,13 @@ Chcete pokračovat?</translation>
         <location filename="../RideEditor.cpp" line="172"/>
         <location filename="../RideEditor.cpp" line="707"/>
         <source>Latitude</source>
-        <translation>Zeměpisná šířka</translation>
+        <translation>GPS šířka</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="173"/>
         <location filename="../RideEditor.cpp" line="708"/>
         <source>Longitude</source>
-        <translation>Zeměpisná délka</translation>
+        <translation>GPS délka</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="174"/>
@@ -3730,7 +3727,7 @@ Chcete pokračovat?</translation>
         <location filename="../RideEditor.cpp" line="317"/>
         <source>Invalid recording gap</source>
         <translatorcomment>微妙</translatorcomment>
-        <translation>Špatny záznam mezery </translation>
+        <translation>Špatny záznam mezery</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="323"/>
@@ -3741,12 +3738,12 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../RideEditor.cpp" line="331"/>
         <source>Suspiciously high cadence</source>
-        <translation>Podezřele vysoké kadence.</translation>
+        <translation>Podezřele vysoká kadence</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="335"/>
         <source>Suspiciously high heartrate</source>
-        <translation>Podezřele vysoký tep.</translation>
+        <translation>Podezřele vysoký tep</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="339"/>
@@ -3762,12 +3759,12 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../RideEditor.cpp" line="351"/>
         <source>Non-zero torque but zero cadence</source>
-        <translation>Nenulový moment při nulové kadenci je fyzikálně nemožné.</translation>
+        <translation>Nenulový moment při nulové kadenci je fyzikálně nemožné</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="375"/>
         <source>Data spike candidate</source>
-        <translation>Možná chyba měření</translation>
+        <translation>Místo možné chyby měření</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="475"/>
@@ -3830,7 +3827,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../RideEditor.cpp" line="738"/>
         <source>Please select target cell or cells to paste values into.</source>
-        <translation>Prosím vyber cílové buňky pro vložení obsahu</translation>
+        <translation>Prosím vyber cílové buňky pro vložení obsahu.</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="753"/>
@@ -3840,7 +3837,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../RideEditor.cpp" line="762"/>
         <source>Copy buffer has more columns than available.</source>
-        <translation>Kopírovaný obsah má více sloupců, než je k dispozici.</translation>
+        <translation>Kopírovaný obsah má více sloupců než je k dispozici.</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="771"/>
@@ -3863,7 +3860,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../RideFile.cpp" line="63"/>
         <source>Heartrate</source>
-        <translation>Tepová frekvence</translation>
+        <translation>Tepy</translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="64"/>
@@ -3893,12 +3890,12 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../RideFile.cpp" line="69"/>
         <source>Longitude</source>
-        <translation>Zeměpisná délka</translation>
+        <translation>GPS délka</translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="70"/>
         <source>Latitude</source>
-        <translation>Zeměpisná šířka</translation>
+        <translation>GPS šířka</translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="71"/>
@@ -3946,7 +3943,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../RideFileTableModel.cpp" line="82"/>
         <source>Heartrate</source>
-        <translation>Tepová frekvence</translation>
+        <translation>Tepy</translation>
     </message>
     <message>
         <location filename="../RideFileTableModel.cpp" line="86"/>
@@ -3961,12 +3958,12 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../RideFileTableModel.cpp" line="94"/>
         <source>Latitude</source>
-        <translation>Zeměpisná šířka</translation>
+        <translation>GPS šířka</translation>
     </message>
     <message>
         <location filename="../RideFileTableModel.cpp" line="98"/>
         <source>Longitude</source>
-        <translation>Zeměpisná délka</translation>
+        <translation>GPS délka</translation>
     </message>
     <message>
         <location filename="../RideFileTableModel.cpp" line="102"/>
@@ -4029,7 +4026,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../RideImportWizard.cpp" line="67"/>
         <source>Choose Date</source>
-        <translation>Vyberte datum</translation>
+        <translation>Vyber datum</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="68"/>
@@ -4123,7 +4120,7 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../RideImportWizard.cpp" line="269"/>
         <source>Parsing...</source>
-        <translation>Analyzuji...</translation>
+        <translation>Prohlížím obsah...</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="282"/>
@@ -4156,7 +4153,7 @@ Chcete pokračovat?</translation>
         <location filename="../RideImportWizard.cpp" line="284"/>
         <location filename="../RideImportWizard.cpp" line="338"/>
         <source> </source>
-        <translation> .</translation>
+        <translation> </translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="348"/>
@@ -4198,17 +4195,17 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../RideImportWizard.cpp" line="626"/>
         <source>Saving...</source>
-        <translation>Ukládám záznamy...</translation>
+        <translation>Ukládání záznamu...</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="688"/>
         <source>Error - Source is Target</source>
-        <translation>Chyba - zdroj je zároveň cílem</translation>
+        <translation>Chyba - zdrojový soubor je zároveň cílovým</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="691"/>
         <source>Overwriting file...</source>
-        <translation>Přepsání souboru ...</translation>
+        <translation>Přepisuji soubor...</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="693"/>
@@ -4218,13 +4215,13 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../RideImportWizard.cpp" line="693"/>
         <source>.tmp</source>
-        <translation>.tmp</translation>
+        <translation>*.tmp</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="674"/>
         <location filename="../RideImportWizard.cpp" line="702"/>
         <source>File Overwritten</source>
-        <translation>Soubor přepsán</translation>
+        <translation>Soubor byl přepsán</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="705"/>
@@ -4257,12 +4254,12 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../RideImportWizard.cpp" line="733"/>
         <source>Step 5 of 5: Calculating Critical Powers</source>
-        <translation>Krok 5 z 5: Výpočet kritického výkonu</translation>
+        <translation>Krok 5 z 5: Výpočet kritického výkonu CP</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="741"/>
         <source>Calculating...</source>
-        <translation>Počítám ...</translation>
+        <translation>Počítám...</translation>
     </message>
     <message>
         <location filename="../RideImportWizard.cpp" line="750"/>
@@ -4301,12 +4298,12 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="139"/>
         <source>^Average </source>
-        <translation>^Průměrné </translation>
+        <translation>^Průměrné</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="175"/>
         <source>&lt;h2&gt;Hr Zones&lt;/h2&gt;</source>
-        <translation>&lt;h2&gt;TF zóny&lt;/h2&gt;</translation>
+        <translation>&lt;h2&gt;Zóny tepu&lt;/h2&gt;</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="188"/>
@@ -4316,70 +4313,70 @@ Chcete pokračovat?</translation>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="248"/>
         <source>&lt;p&gt;&lt;h2&gt;Errors reading file:&lt;/h2&gt;&lt;ul&gt;</source>
-        <translation>&lt;p&gt; &lt;h2&gt; Chyby při čtení ze souboru: &lt;/ h2&gt; &lt;ul&gt;</translation>
+        <translation>&lt;p&gt;&lt;h2&gt;Chyby při čtení ze souboru:&lt;/h2&gt;&lt;ul&gt;</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="167"/>
         <source>&lt;h2&gt;Power Zones&lt;/h2&gt;</source>
-        <translation>&lt;h2&gt;  Zóny výkon &lt;/ h2&gt;</translation>
+        <translation>&lt;h2&gt;Zóny výkonu&lt;/h2&gt;</translation>
     </message>
 </context>
 <context>
     <name>RiderPage</name>
     <message>
-        <location filename="../Pages.cpp" line="2531"/>
+        <location filename="../Pages.cpp" line="2532"/>
         <source>Nickname</source>
         <translation>Jméno</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2532"/>
+        <location filename="../Pages.cpp" line="2533"/>
         <source>Date of Birth</source>
         <translation>Datum narození</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2533"/>
+        <location filename="../Pages.cpp" line="2534"/>
         <source>Gender</source>
         <translation>Pohlaví</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2534"/>
+        <location filename="../Pages.cpp" line="2535"/>
         <source>Bio</source>
-        <translation>Bio</translation>
+        <translation>Popis</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2536"/>
+        <location filename="../Pages.cpp" line="2537"/>
         <source>Weight (%1)</source>
         <translation>Hmotnost (%1)</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2536"/>
+        <location filename="../Pages.cpp" line="2537"/>
         <source>kg</source>
         <translation>kg</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2536"/>
+        <location filename="../Pages.cpp" line="2537"/>
         <source>lb</source>
         <translation>lb</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2546"/>
+        <location filename="../Pages.cpp" line="2547"/>
         <source>Male</source>
         <translation>Muž</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2547"/>
+        <location filename="../Pages.cpp" line="2548"/>
         <source>Female</source>
         <translation>Žena</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2599"/>
+        <location filename="../Pages.cpp" line="2600"/>
         <source>Choose Picture</source>
-        <translation>Vyber si fotku kde vypadáš hezky :-D</translation>
+        <translation>Vyber fotku kde ti to sluší:-)</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2600"/>
+        <location filename="../Pages.cpp" line="2601"/>
         <source>Images (*.png *.jpg *.bmp</source>
-        <translation>Obrázky (*.png *.jpg *.bmp</translation>
+        <translation>Obrázky (*.png *.jpg *.bmp)</translation>
     </message>
 </context>
 <context>
@@ -4392,18 +4389,18 @@ You have made changes to some rides which
 have not been saved. They are listed below.</source>
         <translation>VAROVÁNÍ
 
-Provedl jsi změny u některých jízd, které nebyly uloženy. 
-Jejich seznam je uveden níže.</translation>
+Provedl jsi změny které nebyly uloženy. 
+Seznam záznamů je uveden níže.</translation>
     </message>
     <message>
         <location filename="../SaveDialogs.cpp" line="307"/>
         <source>&amp;Save and Exit</source>
-        <translation>&amp; Uložit a Exit</translation>
+        <translation>&amp;Uložit a Exit</translation>
     </message>
     <message>
         <location filename="../SaveDialogs.cpp" line="309"/>
         <source>&amp;Discard and Exit</source>
-        <translation>&amp; Neukládat a Exit</translation>
+        <translation>&amp;Nekládat a Exit</translation>
     </message>
     <message>
         <location filename="../SaveDialogs.cpp" line="311"/>
@@ -4425,12 +4422,12 @@ Jejich seznam je uveden níže.</translation>
 You have made changes to </source>
         <translation>VAROVÁNÍ
 
-Provedl jsi změny</translation>
+Provedl jsi změny </translation>
     </message>
     <message>
         <location filename="../SaveDialogs.cpp" line="210"/>
         <source>Save and Conversion</source>
-        <translation>Uložit a převést </translation>
+        <translation>Uložit a převést</translation>
     </message>
     <message>
         <location filename="../SaveDialogs.cpp" line="214"/>
@@ -4439,24 +4436,23 @@ them, we need to convert the ride to GoldenCheetah&apos;s
 native format. Should we do so?
 </source>
         <translation>Jestliže chceš jízdu uložit,
-musíš převést záznam do nativního formátu GoldenCheetah.
-Chceš to udělat?
-</translation>
+musíš převést záznam do formátu GC GoldenCheetah.
+Chceš to udělat?</translation>
     </message>
     <message>
         <location filename="../SaveDialogs.cpp" line="219"/>
         <source>&amp;Save and Convert</source>
-        <translation>&amp; Uložit a převést do *.gc</translation>
+        <translation>&amp;Uložit a převést do *.gc</translation>
     </message>
     <message>
         <location filename="../SaveDialogs.cpp" line="221"/>
         <source>&amp;Discard Changes</source>
-        <translation>Zrušit změny</translation>
+        <translation>&amp;Zrušit změny</translation>
     </message>
     <message>
         <location filename="../SaveDialogs.cpp" line="223"/>
         <source>&amp;Cancel Save</source>
-        <translation>Zrušit ukládání</translation>
+        <translation>&amp;Zrušit ukládání</translation>
     </message>
     <message>
         <location filename="../SaveDialogs.cpp" line="228"/>
@@ -4467,32 +4463,32 @@ Chceš to udělat?
 <context>
     <name>SchemePage</name>
     <message>
-        <location filename="../Pages.cpp" line="1420"/>
-        <source>Add</source>
-        <translation>Přidat</translation>
-    </message>
-    <message>
         <location filename="../Pages.cpp" line="1421"/>
-        <source>Rename</source>
-        <translation>Přejmenovat</translation>
+        <source>Add</source>
+        <translation>Přidej</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1422"/>
-        <source>Delete</source>
-        <translation>Smazat</translation>
+        <source>Rename</source>
+        <translation>Přejmenuj</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1431"/>
-        <source>Short</source>
-        <translation>Krátký</translation>
+        <location filename="../Pages.cpp" line="1423"/>
+        <source>Delete</source>
+        <translation>Smaž</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1432"/>
-        <source>Long</source>
-        <translation>Délka</translation>
+        <source>Short</source>
+        <translation>Zóna</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1433"/>
+        <source>Long</source>
+        <translation>Název zóny</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1434"/>
         <source>Percent of CP</source>
         <translation>Procento z CP</translation>
     </message>
@@ -4524,7 +4520,7 @@ Chceš to udělat?
     <message>
         <location filename="../SplitRideDialog.cpp" line="67"/>
         <source>&amp;OK</source>
-        <translation>&amp; OK</translation>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <location filename="../SplitRideDialog.cpp" line="68"/>
@@ -4534,7 +4530,7 @@ Chceš to udělat?
     <message>
         <location filename="../SplitRideDialog.cpp" line="166"/>
         <source>Split Ride</source>
-        <translation>Rozděl záznam</translation>
+        <translation>Rozdělit záznam</translation>
     </message>
     <message>
         <location filename="../SplitRideDialog.cpp" line="166"/>
@@ -4585,17 +4581,17 @@ Chceš to udělat?
     <message>
         <location filename="../ToolsDialog.cpp" line="62"/>
         <source>Critical Power Calculator</source>
-        <translation>Výpočet CP výkonu</translation>
+        <translation>Výpočet kritického výkonu CP</translation>
     </message>
     <message>
         <location filename="../ToolsDialog.cpp" line="67"/>
         <source>Your best short effort (3-5 min):</source>
-        <translation>Vaš nejlepší (3-5min) výkon:</translation>
+        <translation>Vaš nejlepší 3-5min výkon:</translation>
     </message>
     <message>
         <location filename="../ToolsDialog.cpp" line="71"/>
         <source>Your best long effort (15-60 min):</source>
-        <translation>Vaš nejlepší (15-60 min) výkon: </translation>
+        <translation>Vaš nejlepší 15-60min výkon:</translation>
     </message>
     <message>
         <location filename="../ToolsDialog.cpp" line="76"/>
@@ -4650,7 +4646,7 @@ Chceš to udělat?
     <message>
         <location filename="../TrainTabs.cpp" line="27"/>
         <source>Solo Ride</source>
-        <translation>Jednotlivá jízda</translation>
+        <translation>Trénink</translation>
     </message>
 </context>
 <context>
@@ -4658,17 +4654,17 @@ Chceš to udělat?
     <message>
         <location filename="../TrainTool.cpp" line="69"/>
         <source>Workout Library</source>
-        <translation>Pracovní adresář se záznamy</translation>
+        <translation>Trénink</translation>
     </message>
     <message>
-        <location filename="../TrainTool.cpp" line="100"/>
+        <location filename="../TrainTool.cpp" line="110"/>
         <source>Manual Ergo Mode</source>
-        <translation>Ruční Ergo režim</translation>
+        <translation>Režim tréninku Ergo</translation>
     </message>
     <message>
-        <location filename="../TrainTool.cpp" line="102"/>
+        <location filename="../TrainTool.cpp" line="112"/>
         <source>Manual Slope  Mode</source>
-        <translation>Ruční Slope režim</translation>
+        <translation>Režim tréninku Slope</translation>
     </message>
 </context>
 <context>
@@ -4676,7 +4672,7 @@ Chceš to udělat?
     <message>
         <location filename="../TwitterDialog.cpp" line="34"/>
         <source>Choose which metrics you wish to tweet: </source>
-        <translation>Vyber hodnoty, které si přeješ poslat na Twetter:</translation>
+        <translation>Vyber hodnoty, které chceš poslat na Twetter:</translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="36"/>
@@ -4686,7 +4682,7 @@ Chceš to udělat?
     <message>
         <location filename="../TwitterDialog.cpp" line="37"/>
         <source>Time Riding</source>
-        <translation>Délka jízdy</translation>
+        <translation>Čas jízdy</translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="38"/>
@@ -4716,7 +4712,7 @@ Chceš to udělat?
     <message>
         <location filename="../TwitterDialog.cpp" line="43"/>
         <source>Average Heart Rate</source>
-        <translation>Průměrná tepová frekvence</translation>
+        <translation>Průměrné tepy</translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="44"/>
@@ -4726,7 +4722,7 @@ Chceš to udělat?
     <message>
         <location filename="../TwitterDialog.cpp" line="45"/>
         <source>Max Power</source>
-        <translation>Maximální výkon</translation>
+        <translation>Max výkon</translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="46"/>
@@ -4741,7 +4737,7 @@ Chceš to udělat?
     <message>
         <location filename="../TwitterDialog.cpp" line="67"/>
         <source>Message Length: </source>
-        <translation>Délka zprávy: </translation>
+        <translation>Délka zprávy:</translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="72"/>
@@ -4781,7 +4777,7 @@ Chceš to udělat?
     <message>
         <location filename="../TwitterDialog.cpp" line="124"/>
         <source>Tweet must be 140 characters or fewer.</source>
-        <translation>Text na Twitter musí být menší než 140 znaků </translation>
+        <translation>Text na Twitter musí být menší než 140 znaků.</translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="137"/>
@@ -4791,7 +4787,7 @@ Chceš to udělat?
     <message>
         <location filename="../TwitterDialog.cpp" line="137"/>
         <source>There was an error connecting to Twitter.  Check your network connection and try again.</source>
-        <translation>Chyba spojení s Twitterem. Zkontroluj síťové spojení a opakuj akci.</translation>
+        <translation>Chyba ve spojení s Twitterem. Zkontroluj síťové spojení a opakuj akci.</translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="176"/>
@@ -4832,7 +4828,7 @@ Chceš to udělat?
         <location filename="../TwitterDialog.cpp" line="207"/>
         <location filename="../TwitterDialog.cpp" line="231"/>
         <source>watts</source>
-        <translation>waty</translation>
+        <translation>watty</translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="215"/>
@@ -4855,25 +4851,24 @@ Chceš to udělat?
 <context>
     <name>TwitterPage</name>
     <message>
-        <location filename="../Pages.cpp" line="2629"/>
+        <location filename="../Pages.cpp" line="2630"/>
         <source>Twitter Config</source>
         <translation>Konfigurace Twitter.com</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2631"/>
+        <location filename="../Pages.cpp" line="2632"/>
         <source>Authorize</source>
-        <translation>Ověřit</translation>
+        <translation>Ověření</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2636"/>
+        <location filename="../Pages.cpp" line="2637"/>
         <source>Click the Authorize button. Your default browser will open to Twitter. Once you have authorized Golden Cheetah access your Twitter account, Copy/Paste PIN number from Twitter into PIN field. Click Save</source>
-        <translation>Stiskni tlačítko Ověřit. Prohlížeč otevře stránky Twitter.com. Pomocí emailu a hesla se přihlaš se do svého Twitter účtu. Následně obdržíš z Twitteru PIN.
-Tento vygenerovaný PIN vlož do políčka. K dokončení stiskni tlačítko Uložit.</translation>
+        <translation>Stiskni tlačítko Ověřit. Prohlížeč otevře stránky Twitter.com. Pomocí emailu a hesla se přihlaš se do svého Twitter účtu. Následně obdržíš z Twitteru PIN.Tento vygenerovaný PIN vlož do políčka.K dokončení stiskni tlačítko Uložit</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2639"/>
+        <location filename="../Pages.cpp" line="2640"/>
         <source>Enter PIN: </source>
-        <translation>PIN: </translation>
+        <translation>PIN:</translation>
     </message>
 </context>
 <context>
@@ -4889,12 +4884,12 @@ Tento vygenerovaný PIN vlož do políčka. K dokončení stiskni tlačítko Ulo
     <message>
         <location filename="../ViewSelection.cpp" line="39"/>
         <source>Ride Analysis View</source>
-        <translation>Zobrazení analýzy záznamu</translation>
+        <translation>Režim analýzy záznamu</translation>
     </message>
     <message>
         <location filename="../ViewSelection.cpp" line="40"/>
         <source>Train and Racing View</source>
-        <translation>Zobrazení tréninku a závodu</translation>
+        <translation>Režim tréninku</translation>
     </message>
 </context>
 <context>
@@ -4902,7 +4897,7 @@ Tento vygenerovaný PIN vlož do políčka. K dokončení stiskni tlačítko Ulo
     <message>
         <location filename="../WeeklySummaryWindow.cpp" line="263"/>
         <source>&lt;center&gt;&lt;h2&gt;Week of %1 through %2&lt;/h2&gt;&lt;h2&gt;Summary&lt;/h2&gt;&lt;p&gt;&lt;table align=&quot;center&quot; width=&quot;60%&quot; border=0&gt;&lt;tr&gt;&lt;td&gt;Total time riding:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3:%4:%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total distance (%6):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total work (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Daily Average work (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%9&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation>&lt;center&gt;&lt;h2&gt;Týden od%1 do %2&lt;/h2&gt;&lt;h2&gt;Souhrn&lt;/h2&gt;&lt;p&gt;&lt;table align=&quot;center&quot; width=&quot;60%&quot; border=0&gt;&lt;tr&gt;&lt;td&gt;Celková  čas jízdy:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3:%4:%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Celková vzdálenost (%6):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Celková práce (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Průměrná denní práce (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%9&lt;/td&gt;&lt;/tr&gt;</translation>
+        <translation>&lt;center&gt;&lt;h2&gt;Týden od %1 do %2&lt;/h2&gt;&lt;h2&gt;Týdenní přehled&lt;/h2&gt;&lt;p&gt;&lt;table align=&quot;center&quot; width=&quot;60%&quot; border=0&gt;&lt;tr&gt;&lt;td&gt;Celkový čas jízd:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3:%4:%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Vzdálenost (%6):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Celková práce (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Průměrná denní práce (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%9&lt;/td&gt;&lt;/tr&gt;</translation>
     </message>
     <message>
         <location filename="../WeeklySummaryWindow.cpp" line="278"/>
@@ -4914,12 +4909,12 @@ Tento vygenerovaný PIN vlož do políčka. K dokončení stiskni tlačítko Ulo
         <location filename="../WeeklySummaryWindow.cpp" line="294"/>
         <source>&lt;tr&gt;&lt;td&gt;Total BikeScore:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total Daniels Points:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Net Relative Intensity:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3&lt;/td&gt;&lt;/tr&gt;</source>
         <translatorcomment>微妙</translatorcomment>
-        <translation>&lt;tr&gt;&lt;td&gt;Total BikeScore:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total Daniels Points:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Net Relative Intensity:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3&lt;/td&gt;&lt;/tr&gt;</translation>
+        <translation>&lt;tr&gt;&lt;td&gt;Celkové BikeScore:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Celkové Daniels Points:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt; Relative Intensita:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3&lt;/td&gt;&lt;/tr&gt;</translation>
     </message>
     <message>
         <location filename="../WeeklySummaryWindow.cpp" line="307"/>
         <source>&lt;/table&gt;&lt;h2&gt;Power Zones&lt;/h2&gt;</source>
-        <translation>&lt;/table&gt;&lt;h2&gt;Zóny Výkonu&lt;/h2&gt;</translation>
+        <translation>&lt;/table&gt;&lt;h2&gt;Zóny výkonu&lt;/h2&gt;</translation>
     </message>
 </context>
 <context>
@@ -4927,13 +4922,13 @@ Tento vygenerovaný PIN vlož do políčka. K dokončení stiskni tlačítko Ulo
     <message>
         <location filename="../BasicRideMetrics.cpp" line="33"/>
         <source>Duration</source>
-        <translation>Trvání</translation>
+        <translation>Délka</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="34"/>
         <location filename="../BasicRideMetrics.cpp" line="35"/>
         <source>seconds</source>
-        <translation>skundy</translation>
+        <translation>sekundy</translation>
     </message>
 </context>
 <context>
@@ -4947,18 +4942,18 @@ Tento vygenerovaný PIN vlož do políčka. K dokončení stiskni tlačítko Ulo
         <location filename="../BikeScore.cpp" line="47"/>
         <location filename="../BikeScore.cpp" line="48"/>
         <source>watts</source>
-        <translation>waty</translation>
+        <translation>watty</translation>
     </message>
 </context>
 <context>
     <name>ZonePage</name>
     <message>
-        <location filename="../Pages.cpp" line="1403"/>
+        <location filename="../Pages.cpp" line="1404"/>
         <source>Critical Power History</source>
-        <translation>Historie kritického výkonu</translation>
+        <translation>Historie kritického výkonu CP</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1404"/>
+        <location filename="../Pages.cpp" line="1405"/>
         <source>Default Zones</source>
         <translation>Výchozí zóny</translation>
     </message>
@@ -5032,7 +5027,7 @@ Tento vygenerovaný PIN vlož do políčka. K dokončení stiskni tlačítko Ulo
     <message>
         <location filename="../TimeInZone.cpp" line="156"/>
         <source>L8 Time in Zone</source>
-        <translation>Čas v zóně L8</translation>
+        <translation>Čas v zóně L9</translation>
     </message>
 </context>
 <context>
@@ -5048,77 +5043,68 @@ Tento vygenerovaný PIN vlož do políčka. K dokončení stiskni tlačítko Ulo
     <message>
         <location filename="../Zones.cpp" line="176"/>
         <source>line %1: read new range without reading any zones for previous one</source>
-        <translation>line %1: read new range without reading any zones for previous one NEJASNE</translation>
+        <translation>Chyba %1-  překlep, špatny formát  souboru power.zones !  proveď kontrolu</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="227"/>
         <source>line %1: read zone without preceeding date range</source>
-        <translation>line %1: read zone without preceeding date range
-NEJASNE</translation>
+        <translation>Chyba %1-  překlep, špatny formát  souboru power.zones !  proveď kontrolu</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="241"/>
         <location filename="../Zones.cpp" line="263"/>
         <source>attempt to set zone based on % of CP without setting CP in line number %1.
 </source>
-        <translation>attempt to set zone based on % of CP without setting CP in line number %1.
-NEJASNE
-</translation>
+        <translation>Chyba %1-  překlep, špatny formát  souboru power.zones !  proveď kontrolu.</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="295"/>
         <source>file ended without reading any zones for last range</source>
-        <translation>soubor skončil bez načtení nějaké zóny v danném rozsah</translation>
+        <translation>Chyba -  překlep, špatny formát souboru power.zones !  proveď kontrolu</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="343"/>
         <source>Setting end date of range %1 to start date of range %2.
 </source>
-        <translation>Setting end date of range %1 to start date of range %2.
-NEJASNE
-</translation>
+        <translation>Chyba %1 %2-  překlep špatny formát  v souboru power.zones !  proveď kontrolu.</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="354"/>
         <source>Extending final range %1 to infinite to include present date.
 </source>
-        <translation>Extending final range %1 to infinite to include present date.
-NEJASNE
-</translation>
+        <translation>Chyba %1-  překlep, špatný formát  souboru power.zones !  proveď kontrolu.</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="361"/>
         <source>CP must be greater than zero in zone range %1 of power.zones</source>
-        <translation>CP musí být větší než nula v zóně rozmezí %1 z zóny výkonu</translation>
+        <translation>Chyba %1-  překlep, špatný formát  souboru power.zones !  proveď kontrolu</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="380"/>
         <source>Range %1: matching top of zone %2 (%3) to bottom of zone %4 (%5).
 </source>
-        <translation>Rozsah %1: odpovídá od horní části zóny %2 (%3) do spodní části zóny %4 (%5).
-</translation>
+        <translation>Chyba %1 %2 (%3) %4 (%5)-  překlep, špatný formát  souboru power.zones !  proveď kontrolu.</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="394"/>
         <source>Range %1: setting top of zone %2 from %3 to MAX.
 </source>
-        <translation>Rozsah %1: nastavení stropu zóny %2 z %3 do MAX.
-</translation>
+        <translation>Chyba %1 %2 %3 -  překlep, špatný formát  souboru power.zones !  proveď kontrolu.</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="568"/>
         <source>Critical Power: %1</source>
-        <translation>Kritický výkon: %1</translation>
+        <translation>Kritický výkon CP: %1</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="574"/>
         <source>&lt;td align=&quot;center&quot;&gt;Zone&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;Zóny&lt;/td&gt;</translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;Zóna&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="575"/>
         <source>&lt;td align=&quot;center&quot;&gt;Description&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;Popis&lt;/td&gt;</translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;Název zóny&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="576"/>
@@ -5139,29 +5125,29 @@ NEJASNE
 <context>
     <name>deviceModel</name>
     <message>
-        <location filename="../Pages.cpp" line="583"/>
+        <location filename="../Pages.cpp" line="584"/>
         <source>Device Name</source>
         <translation>Jméno zařízení</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="585"/>
+        <location filename="../Pages.cpp" line="586"/>
         <source>Device Type</source>
         <translation>Typ zařízení</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="587"/>
+        <location filename="../Pages.cpp" line="588"/>
         <source>Port Spec</source>
         <translation>Specifikace portu</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="589"/>
+        <location filename="../Pages.cpp" line="590"/>
         <source>Profile</source>
         <translation>Profil</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="591"/>
+        <location filename="../Pages.cpp" line="592"/>
         <source>Virtual</source>
-        <translation type="unfinished"></translation>
+        <translation>Virtuální kanál</translation>
     </message>
 </context>
 </TS>
