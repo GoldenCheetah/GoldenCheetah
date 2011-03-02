@@ -262,12 +262,17 @@ CyclistPage::CyclistPage(MainWindow *main) :
     perfManStartLabel = new QLabel(tr("Starting LTS"));
     perfManSTSLabel = new QLabel(tr("STS average (days)"));
     perfManLTSLabel = new QLabel(tr("LTS average (days)"));
+    perfManDaysLabel = new QLabel(tr("Default range (days)"));
     perfManStartValidator = new QIntValidator(0,200,this);
     perfManSTSavgValidator = new QIntValidator(1,21,this);
     perfManLTSavgValidator = new QIntValidator(7,56,this);
+    perfManDaysValidator = new QIntValidator(1,182,this);
     QVariant perfManStartVal = settings->value(GC_INITIAL_STS);
     QVariant perfManSTSVal = settings->value(GC_STS_DAYS);
+    QVariant perfManDaysVal = settings->value(GC_PM_DAYS);
 
+    if (perfManDaysVal.isNull() || perfManDaysVal.toInt() == 0)
+        perfManDaysVal = 182;
     if (perfManSTSVal.isNull() || perfManSTSVal.toInt() == 0)
 	perfManSTSVal = 7;
     QVariant perfManLTSVal = settings->value(GC_LTS_DAYS);
@@ -279,12 +284,17 @@ CyclistPage::CyclistPage(MainWindow *main) :
     perfManSTSavg->setValidator(perfManSTSavgValidator);
     perfManLTSavg = new QLineEdit(perfManLTSVal.toString(),this);
     perfManLTSavg->setValidator(perfManLTSavgValidator);
+    perfManDays = new QLineEdit(perfManDaysVal.toString(),this);
+    perfManDays->setValidator(perfManDaysValidator);
 
     // performance manager
     perfManLayout = new QVBoxLayout(); // outer
     perfManStartValLayout = new QHBoxLayout();
     perfManSTSavgLayout = new QHBoxLayout();
     perfManLTSavgLayout = new QHBoxLayout();
+    perfManDaysLayout = new QHBoxLayout();
+    perfManDaysLayout->addWidget(perfManDaysLabel);
+    perfManDaysLayout->addWidget(perfManDays);
     perfManStartValLayout->addWidget(perfManStartLabel);
     perfManStartValLayout->addWidget(perfManStart);
     perfManSTSavgLayout->addWidget(perfManSTSLabel);
@@ -292,6 +302,7 @@ CyclistPage::CyclistPage(MainWindow *main) :
     perfManLTSavgLayout->addWidget(perfManLTSLabel);
     perfManLTSavgLayout->addWidget(perfManLTSavg);
     perfManLayout->addWidget(showSBToday);
+    perfManLayout->addLayout(perfManDaysLayout);
     perfManLayout->addLayout(perfManStartValLayout);
     perfManLayout->addLayout(perfManSTSavgLayout);
     perfManLayout->addLayout(perfManLTSavgLayout);

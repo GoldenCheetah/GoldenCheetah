@@ -96,9 +96,11 @@ class CyclistPage : public QWidget
         QLabel *perfManStartLabel;
         QLabel *perfManSTSLabel;
         QLabel *perfManLTSLabel;
+        QLabel *perfManDaysLabel;
         QLineEdit *perfManStart;
         QLineEdit *perfManSTSavg;
         QLineEdit *perfManLTSavg;
+        QLineEdit *perfManDays;
         QCheckBox *showSBToday;
 
     private:
@@ -112,11 +114,13 @@ class CyclistPage : public QWidget
         QHBoxLayout *perfManStartValLayout;
         QHBoxLayout *perfManSTSavgLayout;
         QHBoxLayout *perfManLTSavgLayout;
+        QHBoxLayout *perfManDaysLayout;
         QVBoxLayout *cyclistLayout;
         QVBoxLayout *mainLayout;
         QIntValidator *perfManStartValidator;
         QIntValidator *perfManSTSavgValidator;
         QIntValidator *perfManLTSavgValidator;
+        QIntValidator *perfManDaysValidator;
 };
 
 class deviceModel : public QAbstractTableModel

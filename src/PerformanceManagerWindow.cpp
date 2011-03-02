@@ -223,8 +223,8 @@ void PerformanceManagerWindow::replot()
 
 		// set slider values  only on the first time
 		// set left slider to last 6 months
-		if (newdays > 182)
-		    PMleftSlider->setValue(newdays - 182);
+		if (newdays > (settings->value(GC_PM_DAYS)).toInt())
+		    PMleftSlider->setValue(newdays - (settings->value(GC_PM_DAYS).toInt()));
 		else
 		    PMleftSlider->setValue(0);
 

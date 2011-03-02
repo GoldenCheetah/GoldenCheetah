@@ -52,6 +52,7 @@
 #define GC_BIKESCOREDAYS	    "bikeScoreDays"
 #define GC_BIKESCOREMODE	    "bikeScoreMode"
 #define GC_SB_TODAY             "PMshowSBtoday"
+#define GC_PM_DAYS              "pmDays"
 #define GC_INITIAL_LTS		    "initialLTS"
 #define GC_INITIAL_STS		    "initialSTS"
 #define GC_LTS_DAYS		    "LTSdays"
