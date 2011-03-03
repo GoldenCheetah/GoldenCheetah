@@ -174,6 +174,7 @@ void ConfigDialog::save_Clicked()
     settings->setValue(GC_ALLRIDES_ASCENDING, configPage->allRidesAscending->checkState());
     settings->setValue(GC_GARMIN_SMARTRECORD, configPage->garminSmartRecord->checkState());
     settings->setValue(GC_GARMIN_HWMARK, configPage->garminHWMarkedit->text());
+    settings->setValue(GC_MAP_INTERVAL, configPage->mapIntervaledit->text());
     settings->setValue(GC_CRANKLENGTH, configPage->crankLengthCombo->currentText());
     settings->setValue(GC_BIKESCOREDAYS, configPage->BSdaysEdit->text());
     settings->setValue(GC_BIKESCOREMODE, configPage->bsModeCombo->currentText());

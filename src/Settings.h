@@ -101,6 +101,9 @@
 #define GC_GARMIN_SMARTRECORD "garminSmartRecord"
 #define GC_GARMIN_HWMARK "garminHWMark"
 
+// Map Interval period
+#define GC_MAP_INTERVAL "mapInterval"
+
 #include <QSettings>
 #include <boost/shared_ptr.hpp>
 
