@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2009 Mark Rages
  * Copyright (c) 2009 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
