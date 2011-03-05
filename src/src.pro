@@ -126,6 +126,8 @@ HEADERS += \
         AllPlot.h \
         AllPlotWindow.h \
         ANT.h \
+        ANTChannel.h \
+        ANTMessage.h \
         ANTMessages.h \
         ANTlocalController.h \
         ANTplusController.h \
@@ -274,6 +276,8 @@ SOURCES += \
         AllPlotWindow.cpp \
         AthleteTool.cpp \
         ANT.cpp \
+        ANTChannel.cpp \
+        ANTMessage.cpp \
         ANTlocalController.cpp \
         ANTplusController.cpp \
         BasicRideMetrics.cpp \
