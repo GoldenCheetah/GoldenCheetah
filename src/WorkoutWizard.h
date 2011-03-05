@@ -23,7 +23,7 @@
 
 #include <QFileDialog>
 #include <QDebug>
-#include <Settings.h>
+#include "Settings.h"
 #include <QTextStream>
 #include <QRadioButton>
 #include <QButtonGroup>
@@ -42,8 +42,8 @@ class RideItem;
 
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
-#include <RideItem.h>
-#include <Units.h>
+#include "RideItem.h"
+#include "Units.h"
 #include <QTableWidget>
 #include "Zones.h"
 
