@@ -87,7 +87,8 @@ class ANTMessage {
         uint8_t key[8];
 
         // ANT Sport values
-        uint8_t power_type;
+        uint8_t data_page, calibrationID, ctfID;
+        uint16_t srmOffset, srmSlope, srmSerial;
         uint8_t eventCount;
         uint16_t measurementTime, wheelMeasurementTime, crankMeasurementTime;
         uint8_t heartrateBeats, instantHeartrate; // heartrate

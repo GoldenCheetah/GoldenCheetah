@@ -199,6 +199,7 @@ static inline double get_timestamp( void ) {
 #define ANT_QUARQ_FREQUENCY 61
 
 #define ANT_SPORT_CALIBRATION_MESSAGE                 0x01
+#define ANT_SPORT_SRM_CALIBRATIONID                   0x10
 #define ANT_SPORT_AUTOZERO_OFF                        0x00
 #define ANT_SPORT_AUTOZERO_ON                         0x01
 #define ANT_SPORT_CALIBRATION_REQUEST_MANUALZERO      0xAA

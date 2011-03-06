@@ -32,11 +32,11 @@ void RealtimeData::setName(char *name)
 }
 void RealtimeData::setWatts(double watts)
 {
-    this->watts = watts;
+    this->watts = (int)watts;
 }
 void RealtimeData::setHr(double hr)
 {
-    this->hr = hr;
+    this->hr = (int)hr;
 }
 void RealtimeData::setTime(long time)
 {
@@ -52,7 +52,7 @@ void RealtimeData::setWheelRpm(double wheelRpm)
 }
 void RealtimeData::setCadence(double aCadence)
 {
-    cadence = aCadence;
+    cadence = (int)aCadence;
 }
 void RealtimeData::setLoad(double load)
 {

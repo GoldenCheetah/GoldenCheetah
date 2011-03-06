@@ -372,6 +372,8 @@ qDebug()<<"request message";
 
 qDebug()<<"broadcast data, channel="<<message[3]<<"type="<<message[4]<<"calid?"<<message[5];
 
+            data_page = message[4];
+
             // we need to handle ant sport messages here
             switch(parent->antChannel[message[3]]->channel_type) {
 
@@ -398,11 +400,11 @@ qDebug()<<"broadcast data, channel="<<message[3]<<"type="<<message[4]<<"calid?"<
             case ANTChannel::CHANNEL_TYPE_FAST_QUARQ_NEW:
 
                 channel = message[3];
-                power_type = message[4];
 
-                switch (power_type) {
+                switch (data_page) {
 
                 case ANT_STANDARD_POWER: // 0x10 - standard power
+
                     eventCount = message[5];
                     instantCadence = message[6];
                     sumPower = message[7] + (message[8]<<8);
@@ -432,9 +434,41 @@ qDebug()<<"broadcast data, channel="<<message[3]<<"type="<<message[4]<<"calid?"<
                     torque = message[11] + (message[10]<<8); // yes it is bigendian
                     break;
 
-                default: // UNKNOWN
+                case ANT_SPORT_CALIBRATION_MESSAGE:
+
+                    calibrationID = message[5];
+                    ctfID = message[6];
+
+                    switch (calibrationID) {
+
+                        case ANT_SPORT_SRM_CALIBRATIONID:
+
+                            switch(ctfID) { // different types of calibration for SRMs
+
+                            case 0x01 : // srm_offset
+                                srmOffset = message[11] + (message[10]<<8); // yes it is bigendian
+                                break;
+
+                            case 0x02 : // slope
+                                srmSlope = message[11] + (message[10]<<8); // yes it is bigendian
+                                break;
+
+                            case 0x03 : //serial number
+                                srmSerial = message[11] + (message[10]<<8); // yes it is bigendian
+                                break;
+
+                            default:
+                            case 0xAC : // ack
+                                break;
+                            }
+                            break;
+
+                        default: // XXX calib support for Quarq/PT
+                            break;
+
+                    }
                     break;
-                }
+                } // data_page
                 break;
 
             case ANTChannel::CHANNEL_TYPE_SPEED:
@@ -535,7 +569,7 @@ ANTMessage::ANTMessage(const unsigned char len,
 void ANTMessage::init()
 {
     timestamp = get_timestamp();
-    power_type = frequency = deviceType = transmitPower = searchTimeout = 0;
+    data_page = frequency = deviceType = transmitPower = searchTimeout = 0;
     transmissionType = networkNumber = channelType = channel = 0;
     channelPeriod = deviceNumber = 0;
     wheelMeasurementTime = crankMeasurementTime = measurementTime = 0;
@@ -544,6 +578,8 @@ void ANTMessage::init()
     wheelRevolutions = crankRevolutions = 0;
     slope = period = torque = 0;
     sync = length = type = 0;
+    srmOffset = srmSlope = srmSerial = 0;
+    calibrationID = ctfID = 0;
 }
 
 ANTMessage ANTMessage::resetSystem()

@@ -285,7 +285,53 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
            case CHANNEL_TYPE_FAST_QUARQ_NEW:
 
                 // what kind of power device is this?
-                switch(antMessage.power_type) {
+                switch(antMessage.data_page) {
+
+                case ANT_SPORT_CALIBRATION_MESSAGE:
+                {
+                    // Always ack calibs unless they are acks too!
+                    if (antMessage.data[6] != 0xAC) {
+                        antMessage.data[6] = 0xAC;
+                        qDebug()<<"sending calibration ack...";
+                        parent->sendMessage(antMessage);
+                    }
+
+                    // each device sends a different type
+                    // of calibration message...
+                    switch (antMessage.calibrationID) {
+
+                    case ANT_SPORT_SRM_CALIBRATIONID:
+
+                        switch (antMessage.ctfID) {
+
+                            case 0x01: // offset
+                                // if we're getting calibration messages then
+                                // we should be coasting, so power and cadence
+                                // will be zero
+                                srm_offset = antMessage.srmOffset;
+                                parent->setWatts(0);
+                                parent->setCadence(0);
+qDebug()<<"got new offset!"<<srm_offset;
+                                break;
+
+                            case 0x02: // slope
+                                break;
+
+                            case 0x03: // serial number
+                                break;
+
+                            default:
+                                break;
+
+                            }
+                            break;
+
+                        default: //XXX need to support Powertap/Quarq too!!
+                            break;
+                    }
+
+                } // ANT_SPORT_CALIBRATION
+                break;
 
                 //
                 // SRM - crank torque frequency
@@ -313,6 +359,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                     } else {
 
                         nullCount++;
+                        antMessage.type = 0; // we need a new data pair
+
                         if (nullCount >= 4) { // 4 messages on an SRM
                             parent->setWatts(0);
                             parent->setCadence(0);
