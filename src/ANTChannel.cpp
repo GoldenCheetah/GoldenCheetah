@@ -138,38 +138,6 @@ void ANTChannel::receiveMessage(unsigned char *ant_message)
     } else blanked=0;
 }
 
-// static helper to conver message codes to an english string
-// when outputing diagnostics for received messages
-static const char *errormessage(unsigned char c)
-{
-    switch (c) {
-    case 0 : return "No error";
-    case 1 : return "Search timeout";
-    case 2 : return "Message RX fail";
-    case 3 : return "Event TX";
-    case 4 : return "Receive TX fail";
-    case 5 : return "Ack or Burst completed";
-    case 6 : return "Event transfer TX failed";
-    case 7 : return "Channel closed success";
-    case 8 : return "dropped to search after missing too many messages.";
-    case 9 : return "Channel collision";
-    case 10 : return "Burst starts";
-    case 21 : return "Channel in wrong state";
-    case 22 : return "Channel not opened";
-    case 24 : return "Open without valid id";
-    case 25 : return "OpenRXScan when other channels open";
-    case 31 : return "Transmit whilst transfer in progress";
-    case 32 : return "Sequence number out of order";
-    case 33 : return "Burst message past sequence number not transmitted";
-    case 40 : return "INVALID PARAMETERS";
-    case 41 : return "INVALID NETWORK";
-    case 48 : return "ID out of bounds";
-    case 49 : return "Transmit during scan mode";
-    case 64 : return "NVM for SensRciore mode is full";
-    case 65 : return "NVM write failed";
-    default: return "UNKNOWN MESSAGE CODE";
-    }
-}
 
 // process a channel event message
 // XXX should re-use ANTMessage rather than
@@ -229,8 +197,7 @@ void ANTChannel::channelEvent(unsigned char *ant_message) {
 
     } else {
 
-        // Not very friendly but useful for now!
-        fprintf(stderr, "WARNING type=%x channel=%x id=%x code=%s\n", *message, *(message+1), *(message+2), errormessage(*(message+3)));
+        // XXX not handled!
     }
 }
 
@@ -325,8 +292,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 //
                 case ANT_CRANKSRM_POWER: // 0x20 - crank torque (SRM)
                 {
-                    int period = antMessage.period - lastMessage.period;
-                    int torque = antMessage.torque - lastMessage.torque;
+                    uint16_t period = antMessage.period - lastMessage.period;
+                    uint16_t torque = antMessage.torque - lastMessage.torque;
                     float time = (float)period / (float)2000.00;
 
                     if (time && antMessage.slope && period) {
@@ -359,9 +326,9 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 //
                 case ANT_WHEELTORQUE_POWER: // 0x11 - wheel torque (Powertap)
                 {
-                    int events = antMessage.eventCount - lastMessage.eventCount;
-                    int period = antMessage.period - lastMessage.period;
-                    int torque = antMessage.torque - lastMessage.torque;
+                    uint8_t events = antMessage.eventCount - lastMessage.eventCount;
+                    uint16_t period = antMessage.period - lastMessage.period;
+                    uint16_t torque = antMessage.torque - lastMessage.torque;
 
                     if (events && period) {
 
@@ -390,7 +357,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 //
                 case ANT_STANDARD_POWER: // 0x10 - standard power
                 {
-                    int events = antMessage.eventCount - lastMessage.eventCount;
+                    uint8_t events = antMessage.eventCount - lastMessage.eventCount;
                     if (events) {
                         nullCount =0;
                         parent->setWatts(antMessage.instantPower);
@@ -410,9 +377,9 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 //
                 case ANT_CRANKTORQUE_POWER: // 0x12 - crank torque (Quarq)
                 {
-                    int events = antMessage.eventCount - lastMessage.eventCount;
-                    int period = antMessage.period - lastMessage.period;
-                    int torque = antMessage.torque - lastMessage.torque;
+                    uint8_t events = antMessage.eventCount - lastMessage.eventCount;
+                    uint16_t period = antMessage.period - lastMessage.period;
+                    uint16_t torque = antMessage.torque - lastMessage.torque;
 
                     if (events && period) {
                         nullCount = 0;
@@ -443,7 +410,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
            case CHANNEL_TYPE_HR:
            {
                // cadence first...
-               int time = antMessage.measurementTime - lastMessage.measurementTime;
+               uint16_t time = antMessage.measurementTime - lastMessage.measurementTime;
                if (time) {
                    nullCount = 0;
                    parent->setBPM(antMessage.instantHeartrate);
@@ -457,8 +424,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
            // Cadence
            case CHANNEL_TYPE_CADENCE:
            {
-               int time = antMessage.crankMeasurementTime - lastMessage.crankMeasurementTime;
-               int revs = antMessage.crankRevolutions - lastMessage.crankRevolutions;
+               uint16_t time = antMessage.crankMeasurementTime - lastMessage.crankMeasurementTime;
+               uint16_t revs = antMessage.crankRevolutions - lastMessage.crankRevolutions;
                if (time) {
                    float cadence = 1024*60*revs / time;
                    parent->setCadence(cadence);
@@ -470,8 +437,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
            case CHANNEL_TYPE_SandC:
            {
                // cadence first...
-               int time = antMessage.crankMeasurementTime - lastMessage.crankMeasurementTime;
-               int revs = antMessage.crankRevolutions - lastMessage.crankRevolutions;
+               uint16_t time = antMessage.crankMeasurementTime - lastMessage.crankMeasurementTime;
+               uint16_t revs = antMessage.crankRevolutions - lastMessage.crankRevolutions;
                if (time) {
                    nullCount = 0;
                    float cadence = 1024*60*revs / time;
@@ -500,8 +467,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
            // Speed
            case CHANNEL_TYPE_SPEED:
            {
-               int time = antMessage.wheelMeasurementTime - lastMessage.wheelMeasurementTime;
-               int revs = antMessage.wheelRevolutions - lastMessage.wheelRevolutions;
+               uint16_t time = antMessage.wheelMeasurementTime - lastMessage.wheelMeasurementTime;
+               uint16_t revs = antMessage.wheelRevolutions - lastMessage.wheelRevolutions;
                if (time) {
                    nullCount=0;
                    float rpm = 1024*60*revs / time;
