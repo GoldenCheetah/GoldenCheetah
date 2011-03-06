@@ -185,6 +185,39 @@ ANTMessage::ANTMessage(void) {
     init();
 }
 
+// static helper to conver message codes to an english string
+// when outputing diagnostics for received messages
+static const char *channelEventMessage(unsigned char c)
+{
+    switch (c) {
+    case 0 : return "No error";
+    case 1 : return "Search timeout";
+    case 2 : return "Message RX fail";
+    case 3 : return "Event TX";
+    case 4 : return "Receive TX fail";
+    case 5 : return "Ack or Burst completed";
+    case 6 : return "Event transfer TX failed";
+    case 7 : return "Channel closed success";
+    case 8 : return "dropped to search after missing too many messages.";
+    case 9 : return "Channel collision";
+    case 10 : return "Burst starts";
+    case 21 : return "Channel in wrong state";
+    case 22 : return "Channel not opened";
+    case 24 : return "Open without valid id";
+    case 25 : return "OpenRXScan when other channels open";
+    case 31 : return "Transmit whilst transfer in progress";
+    case 32 : return "Sequence number out of order";
+    case 33 : return "Burst message past sequence number not transmitted";
+    case 40 : return "INVALID PARAMETERS";
+    case 41 : return "INVALID NETWORK";
+    case 48 : return "ID out of bounds";
+    case 49 : return "Transmit during scan mode";
+    case 64 : return "NVM for SensRciore mode is full";
+    case 65 : return "NVM write failed";
+    default: return "UNKNOWN MESSAGE CODE";
+    }
+}
+
 // construct an ant message based upon a message structure
 // the message structure must include the sync byte
 ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
@@ -204,29 +237,35 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
     switch(type) {
         case ANT_UNASSIGN_CHANNEL:
             channel = message[3];
+qDebug()<<"unassign channel"<<channel;
             break;
         case ANT_ASSIGN_CHANNEL:
             channel = message[3];
             channelType = message[4];
             networkNumber = message[5];
+qDebug()<<"assign channel"<<channel;
             break;
         case ANT_CHANNEL_ID:
             channel = message[3];
             deviceNumber = message[4] + (message[5]<<8);
             deviceType = message[6];
             transmissionType = message[7];
+qDebug()<<"assign channel id"<<deviceNumber;
             break;
         case ANT_CHANNEL_PERIOD:
             channel = message[3];
             channelPeriod = message[4] + (message[5]<<8);
+qDebug()<<"channel period"<<channel<<channelPeriod;
             break;
         case ANT_SEARCH_TIMEOUT:
             channel = message[3];
             searchTimeout = message[4];
+qDebug()<<"search timeout"<<channel<<searchTimeout;
             break;
         case ANT_CHANNEL_FREQUENCY:
             channel = message[3];
             frequency = message[4];
+qDebug()<<"channel frequency"<<channel<<frequency;
             break;
         case ANT_SET_NETWORK:
             channel = message[3];
@@ -241,31 +280,44 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
             break;
         case ANT_TX_POWER:
             transmitPower = message[4];
+qDebug()<<"transmit power"<<transmitPower;
             break;
         case ANT_ID_LIST_ADD:
+qDebug()<<"ant id list add ";
             break;
         case ANT_ID_LIST_CONFIG:
+qDebug()<<"ant list config ";
             break;
         case ANT_CHANNEL_TX_POWER:
+qDebug()<<"ant channel txpower ";
             break;
         case ANT_LP_SEARCH_TIMEOUT:
+qDebug()<<"ant lp search timeout ";
             break;
         case ANT_SET_SERIAL_NUMBER:
+qDebug()<<"serial number";
             break;
         case ANT_ENABLE_EXT_MSGS:
+qDebug()<<"enable extended messages";
             break;
         case ANT_ENABLE_LED:
+qDebug()<<"enable led";
             break;
         case ANT_SYSTEM_RESET:
+qDebug()<<"system reset";
             break; // nothing to do, this is ok
         case ANT_OPEN_CHANNEL:
             channel = message[3];
+qDebug()<<"open channel"<<channel;
             break;
         case ANT_CLOSE_CHANNEL:
+qDebug()<<"close channel";
             break;
         case ANT_OPEN_RX_SCAN_CH:
+qDebug()<<"open rx scan channel";
             break;
         case ANT_REQ_MESSAGE:
+qDebug()<<"request message";
             break;
 
         //
@@ -273,6 +325,53 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
         // dependant so we examine based upon the channel configuration
         //
         case ANT_BROADCAST_DATA:
+
+            // ANT Sport Device profiles
+            //
+            // Broadcast data comes in lots of flavours
+            // the data page identifier tells us what to
+            // expect, but USAGE DIFFERS BY DEVICE TYPE:
+            //
+            // XXX at present we just extract the basic telemetry
+            //     based upon device type, these pages need to be
+            //     supported in the next update
+            //
+            // HEARTRATE (high bit is used to indicate data changed)
+            //           (every 65th message is a background data message)
+            //           (get page # with mask 0x7F)
+            //   0x00 - Heartrate data
+            //   0x01 - Background data page (cumulative data)
+            //   0x02 - manufacturer ID and Serial Number
+            //   0x03 - Product, Model and Software ID
+            //   0x04 - Last transmitted heartbeat
+            //
+            // SPEED AND CADENCE - (high bit used to indicate data changed)
+            //                     (get page # with mask 0x7F)
+            //   0x01 - Cumulative operating time
+            //   0x02 - manufacturer ID
+            //   0x03 - product ID
+            //
+            // POWER
+            //   0x01 - calibration data
+            //          (Autozero status are sent every 121 messages)
+            //          Has sub types;
+            //          0xAA - Rx Calibration Request
+            //          0xAC - Tx Acknowledge
+            //          0xAF - Tx Fail
+            //          0xAB - Rx Autozero configuration
+            //          0xAC - Tx Acknowledge
+            //          0xAF - Tx Fail
+            //          0x12 - Autozero status
+            //
+            //   0x10 - Standard Power Only
+            //   0x11 - Wheel torque (Powertap)
+            //   0x12 - Crank Torque (Quarq)
+            //   0x20 - Crank Torque Frequency (SRM)
+            //   0x50 - Manufacturer UD
+            //   0x52 - Battery Voltage
+
+qDebug()<<"broadcast data, channel="<<message[3]<<"type="<<message[4]<<"calid?"<<message[5];
+
             // we need to handle ant sport messages here
             switch(parent->antChannel[message[3]]->channel_type) {
 
@@ -362,24 +461,35 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
             }
             break;
         case ANT_ACK_DATA:
+qDebug()<<"ack data";
             break;
         case ANT_BURST_DATA:
+qDebug()<<"burst data";
             break;
         case ANT_CHANNEL_EVENT:
+qDebug()<<"channel event" << "ID"<<message[4] << channelEventMessage(message[5]);
+
             break;
         case ANT_CHANNEL_STATUS:
+qDebug()<<"channel status";
             break;
         case ANT_VERSION:
+qDebug()<<"ant version";
             break;
         case ANT_CAPABILITIES:
+qDebug()<<"ant capabilities";
             break;
         case ANT_SERIAL_NUMBER:
+qDebug()<<"ant serial number";
             break;
         case ANT_CW_INIT:
+qDebug()<<"cw init";
             break;
         case ANT_CW_TEST:
+qDebug()<<"cw test";
             break;
         default:
+qDebug()<<"message id>>"<< type;
             break; // shouldn't get here!
     }
 }

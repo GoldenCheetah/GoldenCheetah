@@ -144,8 +144,8 @@ void ANT::run()
 
             // not configured, just pair with whatever you can find
             addDevice(0, ANTChannel::CHANNEL_TYPE_POWER, 0);
-            addDevice(0, ANTChannel::CHANNEL_TYPE_CADENCE, 1);
-            addDevice(0, ANTChannel::CHANNEL_TYPE_SandC, 2);
+            addDevice(0, ANTChannel::CHANNEL_TYPE_SandC, 1);
+            addDevice(0, ANTChannel::CHANNEL_TYPE_CADENCE, 2);
             addDevice(0, ANTChannel::CHANNEL_TYPE_HR, 3);
         }
 
@@ -514,6 +514,7 @@ void
 ANT::processMessage(void) {
 
 //qDebug()<<"processing ant message"<<rxMessage[ANT_OFFSET_ID];
+    ANTMessage(this, rxMessage); // for debug!
 
     switch (rxMessage[ANT_OFFSET_ID]) {
         case ANT_ACK_DATA:
@@ -710,20 +711,10 @@ int ANT::rawRead(uint8_t bytes[], int size)
     // until we timeout waiting then return error
     for (i=0; i<size; i++) {
         timeout =0;
-        rc=0;
-        while (rc==0 && timeout < ANT_READTIMEOUT) {
             rc = read(devicePort, &byte, 1);
-            if (rc == -1) return -1; // error!
-            else if (rc == 0) {
-                msleep(50); // sleep for 1/20th of a second
-                timeout += 50;
-            } else {
-                bytes[i] = byte;
-            }
-        }
-        if (timeout >= ANT_READTIMEOUT) return -1; // we timed out!
+            if (rc == -1 || rc == 0) return -1; // error!
+            else bytes[i] = byte;
     }
-
     return i;
 
 #endif
