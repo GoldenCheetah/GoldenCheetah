@@ -76,6 +76,14 @@ qwt3d {
     LIBS += $${ICAL_LIBS}
 }
 
+!isEmpty( USBXPRESS_INSTALL ) {
+    LIBS += $${USBXPRESS_INSTALL}/x86/SiUSBXp.lib
+    INCLUDEPATH += $${USBXPRESS_INSTALL}
+    SOURCES += USBXpress.cpp
+    HEADERS += USBXpress.h
+    DEFINES += GC_HAVE_USBXPRESS
+}
+
 macx {
     LIBS += -lobjc -framework Carbon -framework AppKit
     HEADERS += QtMacSegmentedButton.h

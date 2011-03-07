@@ -46,6 +46,7 @@ class ANTMessage {
         static ANTMessage assignChannel(const unsigned char channel,
                                         const unsigned char type,
                                         const unsigned char network);
+        static ANTMessage boostSignal(const unsigned char channel);
         static ANTMessage unassignChannel(const unsigned char channel);
         static ANTMessage setSearchTimeout(const unsigned char channel,
                                            const unsigned char timeout);
@@ -96,6 +97,7 @@ class ANTMessage {
         uint16_t sumPower, instantPower; // power
         uint16_t wheelRevolutions, crankRevolutions; // speed and power and cadence
         uint8_t instantCadence; // cadence
+        uint8_t autoZeroStatus, autoZeroEnable;
 
     private:
         void init();
