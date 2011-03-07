@@ -45,15 +45,6 @@
 //
 // Serial i/o stuff
 //
-#ifdef WIN32
-#include <windows.h>
-#include <winbase.h>
-#else
-#include <termios.h> // unix!!
-#include <unistd.h> // unix!!
-#include <sys/ioctl.h>
-#endif
-
 #include <stdio.h>
 #include <stdint.h>
 #include <stddef.h>
@@ -61,6 +52,16 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/types.h>
+
+#ifdef WIN32
+#include <windows.h>
+#include <winbase.h>
+#include "USBXpress.h" // for Garmin USB1 sticks
+#else
+#include <termios.h> // unix!!
+#include <unistd.h> // unix!!
+#include <sys/ioctl.h>
+#endif
 
 // timeouts for read/write of serial port in ms
 #define ANT_READTIMEOUT    1000
@@ -199,11 +200,19 @@ static inline double get_timestamp( void ) {
 #define ANT_QUARQ_FREQUENCY 61
 
 #define ANT_SPORT_CALIBRATION_MESSAGE                 0x01
+
+// Calibration messages carry a calibration id
 #define ANT_SPORT_SRM_CALIBRATIONID                   0x10
-#define ANT_SPORT_AUTOZERO_OFF                        0x00
-#define ANT_SPORT_AUTOZERO_ON                         0x01
 #define ANT_SPORT_CALIBRATION_REQUEST_MANUALZERO      0xAA
 #define ANT_SPORT_CALIBRATION_REQUEST_AUTOZERO_CONFIG 0xAB
+#define ANT_SPORT_ZEROOFFSET_SUCCESS                  0xAC
+#define ANT_SPORT_AUTOZERO_SUCCESS                    0xAC
+#define ANT_SPORT_ZEROOFFSET_FAIL                     0xAF
+#define ANT_SPORT_AUTOZERO_FAIL                       0xAF
+#define ANT_SPORT_AUTOZERO_SUPPORT                    0x12
+
+#define ANT_SPORT_AUTOZERO_OFF                        0x00
+#define ANT_SPORT_AUTOZERO_ON                         0x01
 
 //======================================================================
 // Worker thread

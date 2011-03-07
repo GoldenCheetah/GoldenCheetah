@@ -159,7 +159,7 @@ void ANT::run()
         // read more bytes from the device
         uint8_t byte;
         if (rawRead(&byte, 1) > 0) receiveByte((unsigned char)byte);
-        //else msleep(300);
+        //else msleep(5);
 
         //----------------------------------------------------------------------
         // LISTEN TO CONTROLLER FOR COMMANDS
@@ -610,6 +610,9 @@ int ANT::openPort()
     tcgetattr(devicePort, &deviceSettings);
 
 #else
+#ifdef GC_HAVE_USBXPRESS
+    return USBXpress::open(&devicePort);
+#else
     // WINDOWS USES SET/GETCOMMSTATE AND READ/WRITEFILE
 
     COMMTIMEOUTS timeouts; // timeout settings on serial ports
@@ -659,6 +662,7 @@ int ANT::openPort()
     timeouts.WriteTotalTimeoutMultiplier = 0;
     SetCommTimeouts(devicePort, &timeouts);
 #endif
+#endif
 
     // success
     return 0;
@@ -666,15 +670,20 @@ int ANT::openPort()
 
 int ANT::rawWrite(uint8_t *bytes, int size) // unix!!
 {
-    int rc=0,ibytes;
+    int rc=0;
 
 #ifdef WIN32
+#ifdef GC_HAVE_USBXPRESS
+    rc = USBXpress::write(&devicePort, bytes, size);
+#else
     DWORD cBytes;
     rc = WriteFile(devicePort, bytes, size, &cBytes, NULL);
+#endif
     if (!rc) return -1;
     return rc;
 
 #else
+    int ibytes;
 
     ioctl(devicePort, FIONREAD, &ibytes);
 
@@ -695,13 +704,16 @@ int ANT::rawRead(uint8_t bytes[], int size)
     int rc=0;
 
 #ifdef WIN32
+#ifdef GC_HAVE_USBXPRESS
+    return USBXpress::read(&devicePort, bytes, size);
+#else
 
     // Readfile deals with timeouts and readyread issues
     DWORD cBytes;
     rc = ReadFile(devicePort, bytes, size, &cBytes, NULL);
     if (rc) return (int)cBytes;
     else return (-1);
-
+#endif
 #else
 
     int timeout=0, i=0;

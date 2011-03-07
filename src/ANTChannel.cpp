@@ -236,6 +236,8 @@ void ANTChannel::sendCinqoSuccess() {}
 void ANTChannel::broadcastEvent(unsigned char *ant_message)
 {
 
+    ANTMessage antMessage(parent, ant_message);
+
     unsigned char *message=ant_message+2;
     double timestamp=get_timestamp();
 
@@ -272,8 +274,6 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
         //
         // We got some telemetry on this channel
         //
-        ANTMessage antMessage(parent, ant_message);
-
         if (lastMessage.type != 0) {
 
            switch (channel_type) {
@@ -647,6 +647,10 @@ void ANTChannel::attemptTransition(int message_id)
             setId();
 //qDebug()<<"st network is"<<st->network;
             parent->sendMessage(ANTMessage::assignChannel(number, 0, st->network)); // recieve channel on network 1
+            // XXX commented out since newer host controllers do not exhibit this issue
+            // XXX but may be relevant for Arduino/Sparkfun guys, but we don't really support
+            // XXX those devices anyway as they are too slow
+            // XXX parent->sendMessage(ANTMessage::boostSignal(number)); // "boost" signal on REV C AP2 devices
         }
         break;
 

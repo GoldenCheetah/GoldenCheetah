@@ -1,4 +1,4 @@
-/*
+/*;
  * Copyright (c) 2011 Mark Liversedge (liversedge@gmail.com)
  * Copyright (c) 2009 Mark Rages (Quarq)
  *
@@ -363,7 +363,7 @@ qDebug()<<"request message";
             //          0xAF - Tx Fail
             //          0x12 - Autozero status
             //
-            //   0x10 - Standard Power Only
+            //   0x10 - Standard Power Only - sent every 2 seconds, but not SRMs
             //   0x11 - Wheel torque (Powertap)
             //   0x12 - Crank Torque (Quarq)
             //   0x20 - Crank Torque Frequency (SRM)
@@ -441,7 +441,7 @@ qDebug()<<"broadcast data, channel="<<message[3]<<"type="<<message[4]<<"calid?"<
 
                     switch (calibrationID) {
 
-                        case ANT_SPORT_SRM_CALIBRATIONID:
+                        case ANT_SPORT_SRM_CALIBRATIONID: // 0x01
 
                             switch(ctfID) { // different types of calibration for SRMs
 
@@ -461,6 +461,21 @@ qDebug()<<"broadcast data, channel="<<message[3]<<"type="<<message[4]<<"calid?"<
                             case 0xAC : // ack
                                 break;
                             }
+                            break;
+
+                        case ANT_SPORT_ZEROOFFSET_SUCCESS: //0xAC
+                        // is also ANT_SPORT_AUTOZERO_SUCCESS: // 0xAC
+                            autoZeroStatus = message[6];
+                            break;
+
+                        case ANT_SPORT_ZEROOFFSET_FAIL: //0xAF
+                        // is also ANT_SPORT_AUTOZERO_FAIL: // 0xAF
+                            autoZeroStatus = message[6];
+                            break;
+
+                        case ANT_SPORT_AUTOZERO_SUPPORT: //0x12
+                            autoZeroEnable = message[6] & 0x01;
+                            autoZeroStatus = message[6] & 0x02;
                             break;
 
                         default: // XXX calib support for Quarq/PT
@@ -580,6 +595,7 @@ void ANTMessage::init()
     sync = length = type = 0;
     srmOffset = srmSlope = srmSerial = 0;
     calibrationID = ctfID = 0;
+    autoZeroStatus = autoZeroEnable = 0;
 }
 
 ANTMessage ANTMessage::resetSystem()
@@ -649,6 +665,14 @@ ANTMessage ANTMessage::requestCalibrate(const unsigned char channel)
 {
     return ANTMessage(4, ANT_ACK_DATA, channel, ANT_SPORT_CALIBRATION_MESSAGE,
                                        ANT_SPORT_CALIBRATION_REQUEST_MANUALZERO);
+}
+
+// see http://www.thisisant.com/images/Resources/PDF/ap2_rf_transceiver_module_errata.pdf
+ANTMessage ANTMessage::ANTMessage::boostSignal(const unsigned char channel)
+{
+    // [A4][02][6A][XX][57][9B]
+    return ANTMessage(2, 0x6A, channel, 0x57); 
+                                       
 }
 
 ANTMessage ANTMessage::open(const unsigned char channel)

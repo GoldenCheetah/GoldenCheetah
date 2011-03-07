@@ -1,5 +1,3 @@
-// this was imported directly from quarqd_dist/quarqd/src/generated-messages.h
-
 // defines for message 'assign_channel'
 #define ASSIGN_CHANNEL_CHANNEL(message)          ((uint8_t)message[1])
 #define ASSIGN_CHANNEL_CHANNEL_TYPE(message)     ((uint8_t)message[2])
@@ -1736,11 +1734,3 @@
 	TRANSMIT((((uint16_t)wheel_revs_sum)>>8));                 \
 	SEND_CHECK();                                              \
 } while (0);
-
-#if 0
-int xml_message_interpret_power_broadcast(ant_channel_t *self, unsigned char *message);
-int xml_message_interpret_heartrate_broadcast(ant_channel_t *self, unsigned char *message);
-int xml_message_interpret_speed_broadcast(ant_channel_t *self, unsigned char *message);
-int xml_message_interpret_cadence_broadcast(ant_channel_t *self, unsigned char *message);
-int xml_message_interpret_speed_cadence_broadcast(ant_channel_t *self, unsigned char *message);
-#endif
