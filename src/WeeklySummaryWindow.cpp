@@ -295,8 +295,12 @@ WeeklySummaryWindow::refresh()
                 .arg(weeklyCS, 0, 'f', 1)
 		.arg(weeklyRI, 0, 'f', 3);
 
-        summary += tr( "</table>" "<h2>Power Zones</h2>");
-        summary += mainWindow->zones()->summarize(zone_range, time_in_zone);
+        if (zone_range >= 0) {
+            summary += tr( "</table>" "<h2>Power Zones</h2>");
+            summary += mainWindow->zones()->summarize(zone_range, time_in_zone);
+        } else {
+            summary += "No zones configured - zone summary not available.";
+        }
     }
 
     summary += "</center>";
