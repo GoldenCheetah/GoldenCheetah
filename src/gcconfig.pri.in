@@ -12,6 +12,7 @@ D2XX_INCLUDE = /usr/local/include/D2XX
 #win32 {
 #  QMAKE_YACC = bison --file-prefix=y -t
 #  QMAKE_MOVE = cmd /c move
+#  QMAKE_DEL = rm -f
 #}
 
 #if you have PHONON compiled in and working
