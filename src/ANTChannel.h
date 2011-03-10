@@ -144,7 +144,7 @@ class ANTChannel {
 
         ANT *parent;
 
-        ANTMessage lastMessage;
+        ANTMessage lastMessage, lastStdPwrMessage;
         int dualNullCount, nullCount;
         double last_message_timestamp;
         double blanking_timestamp;

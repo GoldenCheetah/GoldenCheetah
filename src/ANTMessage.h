@@ -91,6 +91,7 @@ class ANTMessage {
         uint8_t data_page, calibrationID, ctfID;
         uint16_t srmOffset, srmSlope, srmSerial;
         uint8_t eventCount;
+        uint8_t pedalPower;
         uint16_t measurementTime, wheelMeasurementTime, crankMeasurementTime;
         uint8_t heartrateBeats, instantHeartrate; // heartrate
         uint16_t slope, period, torque; // power

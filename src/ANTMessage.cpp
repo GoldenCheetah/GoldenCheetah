@@ -406,9 +406,10 @@ qDebug()<<"broadcast data, channel="<<message[3]<<"type="<<message[4]<<"calid?"<
                 case ANT_STANDARD_POWER: // 0x10 - standard power
 
                     eventCount = message[5];
-                    instantCadence = message[6];
-                    sumPower = message[7] + (message[8]<<8);
-                    instantPower = message[9] + (message[10]<<8);
+                    pedalPower = message[6]; // left/right 0xFF = not used
+                    instantCadence = message[7];
+                    sumPower = message[8] + (message[9]<<8);
+                    instantPower = message[10] + (message[11]<<8);
                     break;
 
                 case ANT_WHEELTORQUE_POWER: // 0x11 - wheel torque (Powertap)
@@ -593,6 +594,7 @@ void ANTMessage::init()
     wheelRevolutions = crankRevolutions = 0;
     slope = period = torque = 0;
     sync = length = type = 0;
+    pedalPower = 0;
     srmOffset = srmSlope = srmSerial = 0;
     calibrationID = ctfID = 0;
     autoZeroStatus = autoZeroEnable = 0;
