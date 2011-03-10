@@ -42,7 +42,7 @@ ANTChannel::ANTChannel(int number, ANT *parent) : number(number), parent(parent)
     messages_received=0;
     messages_dropped=0;
     setId();
-    srm_offset=0;
+    srm_offset=400; // default relatively arbitrary, but matches common 'indoors' values
     burstInit();
 }
 
@@ -237,6 +237,9 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 {
 
     ANTMessage antMessage(parent, ant_message);
+    bool savemessage = true; // flag to stop lastmessage being
+                             // overwritten for standard power
+                             // messages
 
     unsigned char *message=ant_message+2;
     double timestamp=get_timestamp();
@@ -245,6 +248,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
     last_message_timestamp=timestamp;
 
     if (state != MESSAGE_RECEIVED) {
+qDebug()<<"who are you? sent";
         // first message! who are we talking to?
         parent->sendMessage(ANTMessage::requestMessage(number, ANT_CHANNEL_ID));
         blanking_timestamp=get_timestamp();
@@ -292,7 +296,6 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                     // Always ack calibs unless they are acks too!
                     if (antMessage.data[6] != 0xAC) {
                         antMessage.data[6] = 0xAC;
-                        qDebug()<<"sending calibration ack...";
                         parent->sendMessage(antMessage);
                     }
 
@@ -331,6 +334,7 @@ qDebug()<<"got new offset!"<<srm_offset;
                     }
 
                 } // ANT_SPORT_CALIBRATION
+                savemessage = false; // we don't want to overwrite other messages
                 break;
 
                 //
@@ -345,7 +349,7 @@ qDebug()<<"got new offset!"<<srm_offset;
                     if (time && antMessage.slope && period) {
 
                         nullCount = 0;
-                        float torque_freq = torque / time - 428/*srm_offset*/; //XXX need to support calibration
+                        float torque_freq = torque / time - 420/*srm_offset*/;
                         float nm_torque = 10.0 * torque_freq / antMessage.slope;
                         float cadence = 2000.0 * 60 * (antMessage.eventCount - lastMessage.eventCount) / period;
                         float power = 3.14159 * nm_torque * cadence / 30;
@@ -359,7 +363,7 @@ qDebug()<<"got new offset!"<<srm_offset;
                     } else {
 
                         nullCount++;
-                        antMessage.type = 0; // we need a new data pair
+                        //antMessage.type = 0; // we need a new data pair XXX bad!!!
 
                         if (nullCount >= 4) { // 4 messages on an SRM
                             parent->setWatts(0);
@@ -401,21 +405,20 @@ qDebug()<<"got new offset!"<<srm_offset;
                 break;
 
                 //
-                // Standard Power
+                // Standard Power - interleaved with other messages 1 per second
+                //                  NOTE: Standard power messages are interleaved
+                //                        with other power broadcast messages and so
+                //                        we need to make sure lastmessage is NOT
+                //                        updated with this message and instead we
+                //                        store in a special lastStdPwrMessage
                 //
                 case ANT_STANDARD_POWER: // 0x10 - standard power
                 {
-                    uint8_t events = antMessage.eventCount - lastMessage.eventCount;
-                    if (events) {
-                        nullCount =0;
+                    if (lastStdPwrMessage.type != 0) {
                         parent->setWatts(antMessage.instantPower);
-                    } else {
-                        nullCount++;
-
-                        if (nullCount >= 4) { // 4 messages on Standard Power ? XXX validate this
-                            parent->setWatts(0);
-                        }
                     }
+                    lastStdPwrMessage = antMessage;
+                    savemessage = false;
                 }
                 break;
 
@@ -537,7 +540,10 @@ qDebug()<<"got new offset!"<<srm_offset;
             // reset nullCount if receiving first telemetry update
             dualNullCount = nullCount = 0;
         }
-        lastMessage = antMessage;
+
+        // we don't overwrite for Standard Power messages
+        // these are maintained separately in lastStdPwrMessage
+        if (savemessage) lastMessage = antMessage;
     }
 }
 
