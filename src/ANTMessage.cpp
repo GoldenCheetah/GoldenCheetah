@@ -339,6 +339,8 @@ qDebug()<<"request message";
             // HEARTRATE (high bit is used to indicate data changed)
             //           (every 65th message is a background data message)
             //           (get page # with mask 0x7F)
+            //   ** Note older devices (e.g. GARMIN) do not support
+            //   ** multiple data pages (listed below)
             //   0x00 - Heartrate data
             //   0x01 - Background data page (cumulative data)
             //   0x02 - manufacturer ID and Serial Number
@@ -377,7 +379,12 @@ qDebug()<<"broadcast data, channel="<<message[3]<<"type="<<message[4]<<"calid?"<
             // we need to handle ant sport messages here
             switch(parent->antChannel[message[3]]->channel_type) {
 
-            // Heartrate is fairly simple
+            // Heartrate is fairly simple. Although
+            // many older heart rate devices do not support
+            // multiple data pages, and provide random values
+            // for the data page itself. (E.g. 1st Gen GARMIN)
+            // since we do not care hugely about operating time
+            // and serial numbers etc, we don't even try
             case ANTChannel::CHANNEL_TYPE_HR:
                 channel = message[3];
                 measurementTime = message[8] + (message[9]<<8);

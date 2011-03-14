@@ -36,6 +36,7 @@
 #include <QStringList>
 #include <QTime>
 #include <QProgressDialog>
+#include <QFile>
 
 //
 // Time
@@ -329,6 +330,8 @@ private:
     int bytes;
     int checksum;
 
+    // antlog.bin ant message stream
+    QFile antlog;
 };
 
 #endif

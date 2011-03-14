@@ -278,6 +278,7 @@ qDebug()<<"who are you? sent";
         //
         // We got some telemetry on this channel
         //
+qDebug()<<"broadcast datapage="<<antMessage.data_page;
         if (lastMessage.type != 0) {
 
            switch (channel_type) {
@@ -355,7 +356,7 @@ qDebug()<<"got new offset!"<<srm_offset;
                         float power = 3.14159 * nm_torque * cadence / 30;
 
                         // ignore the occassional spikes XXX is this a boundary error on event count ?
-                        if (power > 0 && power < 2501 && cadence >0 && cadence < 256) {
+                        if (power >= 0 && power < 2501 && cadence >=0 && cadence < 256) {
                             parent->setWatts(power);
                             parent->setCadence(cadence);
                         }

@@ -123,6 +123,9 @@ void ANT::run()
 
     if (openPort() == 0) {
 
+        antlog.setFileName("antlog.bin");
+        antlog.open(QIODevice::WriteOnly | QIODevice::Truncate);
+
         isPortOpen = true;
         sendMessage(ANTMessage::resetSystem());
         sendMessage(ANTMessage::setNetworkKey(1, key));
@@ -242,6 +245,9 @@ ANT::stop()
     pvars.lock();
     Status = 0; // Terminate it!
     pvars.unlock();
+
+    // close debug file
+    antlog.close();
     return 0;
 }
 
@@ -515,6 +521,11 @@ ANT::processMessage(void) {
 
 //qDebug()<<"processing ant message"<<rxMessage[ANT_OFFSET_ID];
     ANTMessage(this, rxMessage); // for debug!
+
+    QDataStream out(&antlog);
+    for (int i=0; i<ANT_MAX_MESSAGE_SIZE; i++)
+        out<<rxMessage[i];
+    
 
     switch (rxMessage[ANT_OFFSET_ID]) {
         case ANT_ACK_DATA:
