@@ -220,9 +220,14 @@ void WorkoutTypePage::initializePage()
     absWattageRadioButton->click();
     relWattageRadioButton = new QRadioButton(tr("% FTP Wattage"));
     gradientRadioButton = new QRadioButton(tr("Gradient"));
-    QString s = hackMW->rideItem()->ride()->startTime().toLocalTime().toString();
-    QString importStr = "Import Selected Ride (" + s + ")";
-    importRadioButton = new QRadioButton((importStr));
+
+    if (hackMW->rideItem()) {
+        QString s = hackMW->rideItem()->ride()->startTime().toLocalTime().toString();
+        QString importStr = "Import Selected Ride (" + s + ")";
+        importRadioButton = new QRadioButton((importStr));
+    } else {
+        importRadioButton = new QRadioButton("No ride selected");
+    }
     QVBoxLayout *groupBoxLayout = new QVBoxLayout();
 
     groupBoxLayout->addWidget(absWattageRadioButton);
