@@ -19,10 +19,13 @@
 #ifndef gc_USBXpress_h
 #define gc_USBXpress_h
 
-#if defined (WIN32) && defined (GC_HAVE_USBXPRESS) // only include if windows and have USBXpress installed
+#if defined WIN32 
 
 #include <Windows.h>
+
+#ifdef GC_HAVE_USBXPRESS
 #include <SiUSBXp.h> // for the constants etc
+#endif
 
 #define GARMIN_USB1_PID 0x0fcf
 #define GARMIN_USB1_VID 0x1004
@@ -37,5 +40,5 @@ public:
     static int write(HANDLE *handle, unsigned char *buf, int bytes);
 };
 
-#endif
-#endif
+#endif // WIN32
+#endif // gc_USBXpress_h
