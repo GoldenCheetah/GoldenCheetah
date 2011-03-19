@@ -58,6 +58,7 @@
 #include <windows.h>
 #include <winbase.h>
 #include "USBXpress.h" // for Garmin USB1 sticks
+#include "LibUsb.h"    // for Garmin USB2 sticks
 #else
 #include <termios.h> // unix!!
 #include <unistd.h> // unix!!
@@ -240,6 +241,11 @@ public slots:
 
     // channel management
     bool discover(DeviceConfiguration *, QProgressDialog *);              // confirm Server available at portSpec
+    void dropInfo(int number);    // we dropped a connection
+    void lostInfo(int number);    // we lost informa
+    void staleInfo(int number);   // info is now stale
+    void searchTimeout(int number); // search timed out
+    void searchComplete(int number); // search completed successfully
 
     // get telemetry
     RealtimeData getRealtimeData();             // return current realtime data
@@ -310,6 +316,9 @@ private:
 #ifdef WIN32
     HANDLE devicePort;              // file descriptor for reading from com3
     DCB deviceSettings;             // serial port settings baud rate et al
+    LibUsb *usb2;                   // used for USB2 support
+    enum UsbMode { USBNone, USB1, USB2 };
+    enum UsbMode usbMode;
 #else
     int devicePort;                 // unix!!
     struct termios deviceSettings;  // unix!!
@@ -324,8 +333,8 @@ private:
     unsigned char rxMessage[ANT_MAX_MESSAGE_SIZE];
 
     // state machine whilst receiving bytes
-    enum States {ST_WAIT_FOR_SYNC, ST_GET_LENGTH, ST_GET_MESSAGE_ID, ST_GET_DATA, ST_VALIDATE_PACKET};
-    enum States state;
+    enum States {ST_WAIT_FOR_SYNC, ST_GET_LENGTH, ST_GET_MESSAGE_ID, ST_GET_DATA, ST_VALIDATE_PACKET} state;
+    //enum States state;
     int length;
     int bytes;
     int checksum;

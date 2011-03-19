@@ -79,6 +79,12 @@ D2XX_INCLUDE = /usr/local/include/D2XX
 # pathname (SiLabs in your root directory)
 #USBXPRESS_INSTALL=/c/SiLabs/MCU/USBXpress/USBXpress_API/Host/
 
+# ** note this is also only required on windowsto work with
+# ** Garmin USB2 sticks whose driver uses libusb-win32.
+# You must make sure you install v0.1.12.2 of libusb-win from:
+# http://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/0.1.12.2/
+#LIBUSB_INSTALL=/c/libusb-win32-device-bin-0.1.12.2
+
 # We recommend a debug build for development, and a static build for releases.
 CONFIG += debug
 #CONFIG += static

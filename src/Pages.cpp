@@ -866,44 +866,55 @@ DevicePage::setConfigPane()
     switch (Supported.getType(typeSelector->itemData(typeSelector->currentIndex()).toInt()).connector) {
 
     case DEV_QUARQ:
+        specHint->show();
+        specLabel->show();
+        deviceSpecifier->show();
         specHint->setText("hostname:port");
         profHint->setText("antid 1, antid 2 ...");
         profHint->show();
-        pairButton->show();
         profLabel->show();
         deviceProfile->show();
         break;
+
     case DEV_SERIAL:
 #ifdef WIN32
         specHint->setText("COMx");
 #else
         specHint->setText("/dev/xxxx");
 #endif
-        // we have ANT+ sticks on serial and we have Computrainers
-        // on serial, which one is it?
-        if (Supported.getType(typeSelector->itemData(typeSelector->currentIndex())
-            .toInt()).type == DEV_ANTLOCAL) {
-            pairButton->show();
-            profHint->setText("antid 1, antid 2 ...");
-            profHint->show();
-            profLabel->show();
-            deviceProfile->show();
-        } else {
-            pairButton->hide();
-            profHint->hide();
-            profLabel->hide();
-            deviceProfile->hide();
-        }
-        break;
-    case DEV_TCP:
-        specHint->setText("hostname:port");
-        pairButton->hide();
+        specHint->show();
+        specLabel->show();
+        deviceSpecifier->show();
         profHint->hide();
         profLabel->hide();
         deviceProfile->hide();
         break;
+
+    case DEV_TCP:
+        specHint->show();
+        specLabel->show();
+        deviceSpecifier->show();
+        specHint->setText("hostname:port");
+        profHint->hide();
+        profLabel->hide();
+        deviceProfile->hide();
+        break;
+
+    case DEV_USB:
+        specHint->hide();
+        specLabel->hide();
+        deviceSpecifier->hide();
+        profHint->setText("antid 1, antid 2 ...");
+        profHint->show();
+        profLabel->show();
+        deviceProfile->show();
+        break;
     }
-    //specHint->setTextFormat(Qt::Italic); // mmm need to read the docos
+
+    // pair button only valid for ANT+ (Quarqd or Native)
+    int type = Supported.getType(typeSelector->itemData(typeSelector->currentIndex()).toInt()).type;
+    if (type == DEV_ANTLOCAL || type == DEV_ANTPLUS) pairButton->show();
+    else pairButton->hide();
 }
 
 

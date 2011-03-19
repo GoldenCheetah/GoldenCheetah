@@ -16,11 +16,14 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#if defined (WIN32) && defined (GC_HAVE_USBXPRESS) // only include if windows and have USBXpress installed
-
-#include "USBXpress.h"
+#ifdef WIN32
 #include <QString>
 #include <QDebug>
+
+#ifdef GC_HAVE_USBXPRESS
+
+// if we have usbxpress installed then use it...
+#include "USBXpress.h"
 
 USBXpress::USBXpress() {} // nothing to do - all members are static
 
@@ -97,4 +100,31 @@ int USBXpress::write(HANDLE *handle, unsigned char *buf, int bytes)
         return -1;
 }
 
-#endif
+#else
+
+// if we don't have USBXpress installed then stubs return fail
+USBXpress::USBXpress() {} // nothing to do - all members are static
+
+int USBXpress::open(HANDLE *)
+{
+    return -1;
+}
+
+int USBXpress::close(HANDLE *)
+{
+    return -1;
+}
+
+
+int USBXpress::read(HANDLE *, unsigned char *, int)
+{
+    return -1;
+}
+
+int USBXpress::write(HANDLE *, unsigned char *, int)
+{
+    return -1;
+}
+
+#endif // USBXpress
+#endif // Win32
