@@ -19,11 +19,9 @@
 #ifdef WIN32
 #include <QString>
 #include <QDebug>
+#include "USBXpress.h"
 
 #ifdef GC_HAVE_USBXPRESS
-
-// if we have usbxpress installed then use it...
-#include "USBXpress.h"
 
 USBXpress::USBXpress() {} // nothing to do - all members are static
 
