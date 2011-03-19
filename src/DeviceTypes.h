@@ -37,6 +37,7 @@
 #define DEV_QUARQ      0x01     // ants use id:hostname:port
 #define DEV_SERIAL     0x02     // use filename COMx or /dev/cuxxxx
 #define DEV_TCP        0x03     // tcp port is hostname:port NOT IMPLEMENTED IN THIS RELEASE
+#define DEV_USB        0x04     // use filename COMx or /dev/cuxxxx
 
 class DeviceType
 {

@@ -185,9 +185,9 @@ ANTMessage::ANTMessage(void) {
     init();
 }
 
-// static helper to conver message codes to an english string
-// when outputing diagnostics for received messages
-static const char *channelEventMessage(unsigned char c)
+// convert message codes to an english string
+const char *
+ANTMessage::channelEventMessage(unsigned char c)
 {
     switch (c) {
     case 0 : return "No error";
@@ -237,35 +237,29 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
     switch(type) {
         case ANT_UNASSIGN_CHANNEL:
             channel = message[3];
-qDebug()<<"unassign channel"<<channel;
             break;
         case ANT_ASSIGN_CHANNEL:
             channel = message[3];
             channelType = message[4];
             networkNumber = message[5];
-qDebug()<<"assign channel"<<channel;
             break;
         case ANT_CHANNEL_ID:
             channel = message[3];
             deviceNumber = message[4] + (message[5]<<8);
             deviceType = message[6];
             transmissionType = message[7];
-qDebug()<<"assign channel id"<<deviceNumber;
             break;
         case ANT_CHANNEL_PERIOD:
             channel = message[3];
             channelPeriod = message[4] + (message[5]<<8);
-qDebug()<<"channel period"<<channel<<channelPeriod;
             break;
         case ANT_SEARCH_TIMEOUT:
             channel = message[3];
             searchTimeout = message[4];
-qDebug()<<"search timeout"<<channel<<searchTimeout;
             break;
         case ANT_CHANNEL_FREQUENCY:
             channel = message[3];
             frequency = message[4];
-qDebug()<<"channel frequency"<<channel<<frequency;
             break;
         case ANT_SET_NETWORK:
             channel = message[3];
@@ -280,44 +274,31 @@ qDebug()<<"channel frequency"<<channel<<frequency;
             break;
         case ANT_TX_POWER:
             transmitPower = message[4];
-qDebug()<<"transmit power"<<transmitPower;
             break;
         case ANT_ID_LIST_ADD:
-qDebug()<<"ant id list add ";
             break;
         case ANT_ID_LIST_CONFIG:
-qDebug()<<"ant list config ";
             break;
         case ANT_CHANNEL_TX_POWER:
-qDebug()<<"ant channel txpower ";
             break;
         case ANT_LP_SEARCH_TIMEOUT:
-qDebug()<<"ant lp search timeout ";
             break;
         case ANT_SET_SERIAL_NUMBER:
-qDebug()<<"serial number";
             break;
         case ANT_ENABLE_EXT_MSGS:
-qDebug()<<"enable extended messages";
             break;
         case ANT_ENABLE_LED:
-qDebug()<<"enable led";
             break;
         case ANT_SYSTEM_RESET:
-qDebug()<<"system reset";
             break; // nothing to do, this is ok
         case ANT_OPEN_CHANNEL:
             channel = message[3];
-qDebug()<<"open channel"<<channel;
             break;
         case ANT_CLOSE_CHANNEL:
-qDebug()<<"close channel";
             break;
         case ANT_OPEN_RX_SCAN_CH:
-qDebug()<<"open rx scan channel";
             break;
         case ANT_REQ_MESSAGE:
-qDebug()<<"request message";
             break;
 
         //
@@ -371,8 +352,6 @@ qDebug()<<"request message";
             //   0x20 - Crank Torque Frequency (SRM)
             //   0x50 - Manufacturer UD
             //   0x52 - Battery Voltage
-
-qDebug()<<"broadcast data, channel="<<message[3]<<"type="<<message[4]<<"calid?"<<message[5];
 
             data_page = message[4];
 
@@ -518,35 +497,24 @@ qDebug()<<"broadcast data, channel="<<message[3]<<"type="<<message[4]<<"calid?"<
             }
             break;
         case ANT_ACK_DATA:
-qDebug()<<"ack data";
             break;
         case ANT_BURST_DATA:
-qDebug()<<"burst data";
             break;
         case ANT_CHANNEL_EVENT:
-qDebug()<<"channel event" << "ID"<<message[4] << channelEventMessage(message[5]);
-
             break;
         case ANT_CHANNEL_STATUS:
-qDebug()<<"channel status";
             break;
         case ANT_VERSION:
-qDebug()<<"ant version";
             break;
         case ANT_CAPABILITIES:
-qDebug()<<"ant capabilities";
             break;
         case ANT_SERIAL_NUMBER:
-qDebug()<<"ant serial number";
             break;
         case ANT_CW_INIT:
-qDebug()<<"cw init";
             break;
         case ANT_CW_TEST:
-qDebug()<<"cw test";
             break;
         default:
-qDebug()<<"message id>>"<< type;
             break; // shouldn't get here!
     }
 }

@@ -22,6 +22,7 @@
 
 #include "ANT.h"
 #include "ANTMessage.h"
+#include <QObject>
 
 #define CHANNEL_TYPE_QUICK_SEARCH 0x10 // or'ed with current channel type
 /* after fast search, wait for slow search.  Otherwise, starting slow
@@ -71,9 +72,39 @@ class ANTChannelInitialisation {
 };
 
 
-class ANTChannel {
+class ANTChannel : public QObject {
+
+    private:
+
+        Q_OBJECT
+
+        ANT *parent;
+
+        ANTMessage lastMessage, lastStdPwrMessage;
+        int dualNullCount, nullCount;
+        double last_message_timestamp;
+        double blanking_timestamp;
+        int blanked;
+        char id[10]; // short identifier
+        bool channel_assigned;
+        ANTChannelInitialisation mi;
+
+        int messages_received; // for signal strength metric
+        int messages_dropped;
+
+        unsigned char rx_burst_data[RX_BURST_DATA_LEN];
+        int           rx_burst_data_index;
+        unsigned char rx_burst_next_sequence;
+        void (*rx_burst_disposition)(struct ant_channel *);
+        void (*tx_ack_disposition)(struct ant_channel *);
+
+        // what we got
+        int manufacturer_id;
+        int product_id;
+        int product_version;
 
     public:
+
         enum channeltype {
             CHANNEL_TYPE_UNUSED,
             CHANNEL_TYPE_HR,
@@ -124,14 +155,6 @@ class ANTChannel {
         void attemptTransition(int message_code);
         int setTimeout(char *type, float value, int connection);
 
-        // Should be signals ? XXX
-        void channelInfo();
-        void dropInfo();
-        void lostInfo();
-        void staleInfo();
-        void reportTimeouts();
-        void searchComplete();
-
         // search
         int isSearching();
 
@@ -140,33 +163,13 @@ class ANTChannel {
         void sendCinqoSuccess();
         void checkCinqo();
 
-    private:
+    signals:
 
-        ANT *parent;
-
-        ANTMessage lastMessage, lastStdPwrMessage;
-        int dualNullCount, nullCount;
-        double last_message_timestamp;
-        double blanking_timestamp;
-        int blanked;
-        char id[10]; // short identifier
-        bool channel_assigned;
-        ANTChannelInitialisation mi;
-
-        int messages_received; // for signal strength metric
-        int messages_dropped;
-
-        unsigned char rx_burst_data[RX_BURST_DATA_LEN];
-        int           rx_burst_data_index;
-        unsigned char rx_burst_next_sequence;
-        void (*rx_burst_disposition)(struct ant_channel *);
-        void (*tx_ack_disposition)(struct ant_channel *);
-
-
-        // what we got
-        int manufacturer_id;
-        int product_id;
-        int product_version;
-
+        void channelInfo(); // we got a channel info message
+        void dropInfo(int number);    // we dropped a connection
+        void lostInfo(int number);    // we lost informa
+        void staleInfo(int number);   // info is now stale
+        void searchTimeout(int number); // search timed out
+        void searchComplete(int number); // search completed successfully
 };
 #endif

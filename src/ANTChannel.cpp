@@ -25,7 +25,7 @@ static float timeout_drop=2.0; // time before reporting dropped message
 static float timeout_scan=10.0; // time to do initial scan
 static float timeout_lost=30.0; // time to do more thorough scan
 
-ANTChannel::ANTChannel(int number, ANT *parent) : number(number), parent(parent)
+ANTChannel::ANTChannel(int number, ANT *parent) : parent(parent), number(number)
 {
     channel_type=CHANNEL_TYPE_UNUSED;
     channel_type_flags=0;
@@ -97,7 +97,7 @@ void ANTChannel::open(int device, int chan_type)
 // close an ant channel assignment
 void ANTChannel::close()
 {
-    lostInfo();
+    emit lostInfo(number);
     lastMessage = ANTMessage();
     parent->sendMessage(ANTMessage::close(number));
 }
@@ -133,7 +133,7 @@ void ANTChannel::receiveMessage(unsigned char *ant_message)
     if (get_timestamp() > blanking_timestamp + timeout_blanking) {
         if (!blanked) {
             blanked=1;
-            staleInfo(); //XXX does nothing for now....
+            emit staleInfo(number);
         }
     } else blanked=0;
 }
@@ -159,12 +159,14 @@ void ANTChannel::channelEvent(unsigned char *ant_message) {
         // timeouts are normal for search channel
         if (channel_type_flags & CHANNEL_TYPE_QUICK_SEARCH) {
 
-        channel_type_flags &= ~CHANNEL_TYPE_QUICK_SEARCH;
-        channel_type_flags |= CHANNEL_TYPE_WAITING;
+            channel_type_flags &= ~CHANNEL_TYPE_QUICK_SEARCH;
+            channel_type_flags |= CHANNEL_TYPE_WAITING;
+
+            emit searchTimeout(number);
 
         } else {
 
-            lostInfo(); //XXX does nothing for now
+            emit lostInfo(number);
 
             channel_type=CHANNEL_TYPE_UNUSED;
             channel_type_flags=0;
@@ -182,7 +184,7 @@ void ANTChannel::channelEvent(unsigned char *ant_message) {
         double t=get_timestamp();
 
         if (t > (last_message_timestamp + timeout_drop)) {
-            if (channel_type != CHANNEL_TYPE_UNUSED) dropInfo();
+            if (channel_type != CHANNEL_TYPE_UNUSED) emit dropInfo(number);
             // this is a hacky way to prevent the drop message from sending multiple times
             last_message_timestamp+=2*timeout_drop;
         }
@@ -248,7 +250,6 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
     last_message_timestamp=timestamp;
 
     if (state != MESSAGE_RECEIVED) {
-qDebug()<<"who are you? sent";
         // first message! who are we talking to?
         parent->sendMessage(ANTMessage::requestMessage(number, ANT_CHANNEL_ID));
         blanking_timestamp=get_timestamp();
@@ -278,7 +279,6 @@ qDebug()<<"who are you? sent";
         //
         // We got some telemetry on this channel
         //
-qDebug()<<"broadcast datapage="<<antMessage.data_page;
         if (lastMessage.type != 0) {
 
            switch (channel_type) {
@@ -315,7 +315,6 @@ qDebug()<<"broadcast datapage="<<antMessage.data_page;
                                 srm_offset = antMessage.srmOffset;
                                 parent->setWatts(0);
                                 parent->setCadence(0);
-qDebug()<<"got new offset!"<<srm_offset;
                                 break;
 
                             case 0x02: // slope
@@ -563,9 +562,9 @@ void ANTChannel::channelId(unsigned char *ant_message) {
     state=MESSAGE_RECEIVED;
 
     setId();
-    channelInfo();
+    emit channelInfo();
 
-  // if we were searching,
+    // if we were searching,
     if (channel_type_flags & CHANNEL_TYPE_QUICK_SEARCH) {
         parent->sendMessage(ANTMessage::setSearchTimeout(number, (int)(timeout_lost/2.5)));
     }
@@ -634,7 +633,6 @@ void ANTChannel::attemptTransition(int message_id)
     switch (state) {
 
     case ANT_CLOSE_CHANNEL:
-//qDebug()<<"transition ... close channel...";
         // next step is unassign and start over
         // but we must wait until event_channel_closed
         // which is its own channel event
@@ -642,7 +640,6 @@ void ANTChannel::attemptTransition(int message_id)
         break;
 
     case ANT_UNASSIGN_CHANNEL:
-//qDebug()<<"transition ... unassign channel...";
         channel_assigned=0;
         if (st->type==CHANNEL_TYPE_UNUSED) {
             // we're shutting the channel down
@@ -652,23 +649,21 @@ void ANTChannel::attemptTransition(int message_id)
                 device_id |= 0x80;
             }
             setId();
-//qDebug()<<"st network is"<<st->network;
             parent->sendMessage(ANTMessage::assignChannel(number, 0, st->network)); // recieve channel on network 1
-            // XXX commented out since newer host controllers do not exhibit this issue
-            // XXX but may be relevant for Arduino/Sparkfun guys, but we don't really support
-            // XXX those devices anyway as they are too slow
-            // XXX parent->sendMessage(ANTMessage::boostSignal(number)); // "boost" signal on REV C AP2 devices
+
+            // commented out since newer host controllers do not exhibit this issue
+            // but may be relevant for Arduino/Sparkfun guys, but we don't really support
+            // those devices anyway as they are too slow
+            // parent->sendMessage(ANTMessage::boostSignal(number)); // "boost" signal on REV C AP2 devices
         }
         break;
 
     case ANT_ASSIGN_CHANNEL:
-//qDebug()<<"transition ... assign channel...";
         channel_assigned=1;
         parent->sendMessage(ANTMessage::setChannelID(number, device_number, device_id, 0));
         break;
 
     case ANT_CHANNEL_ID:
-//qDebug()<<"transition ... channel id...";
         if (channel_type & CHANNEL_TYPE_QUICK_SEARCH) {
             parent->sendMessage(ANTMessage::setSearchTimeout(number, (int)(timeout_scan/2.5)));
         } else {
@@ -677,7 +672,6 @@ void ANTChannel::attemptTransition(int message_id)
         break;
 
     case ANT_SEARCH_TIMEOUT:
-//qDebug()<<"transition ... search timeout...";
         if (previous_state==ANT_CHANNEL_ID) {
             // continue down the intialization chain
             parent->sendMessage(ANTMessage::setChannelPeriod(number, st->period));
@@ -689,18 +683,15 @@ void ANTChannel::attemptTransition(int message_id)
         break;
 
     case ANT_CHANNEL_PERIOD:
-//qDebug()<<"transition ... channel period...";
         parent->sendMessage(ANTMessage::setChannelFreq(number, st->frequency));
         break;
 
     case ANT_CHANNEL_FREQUENCY:
-//qDebug()<<"transition ... channel frequency...";
         parent->sendMessage(ANTMessage::open(number));
         mi.initialise();
         break;
 
     case ANT_OPEN_CHANNEL:
-//qDebug()<<"transition ... open channel...";
         break;
 
     default:
@@ -711,14 +702,16 @@ void ANTChannel::attemptTransition(int message_id)
 // refactored out XXX fix this
 int ANTChannel::setTimeout(char * /*type*/, float /*value*/, int /*connection*/) { return 0; }
 
+#if 0 // ARE NOW SIGNALS
 // These should emit signals to notify the channel manager
 // but for now we just ignore XXX fix this
 void ANTChannel::searchComplete() {}
-void ANTChannel::reportTimeouts() {}
+void ANTChannel::searchTimeout() {}
 void ANTChannel::staleInfo() {}
 void ANTChannel::lostInfo() {}
 void ANTChannel::dropInfo() {}
 void ANTChannel::channelInfo() {}
+#endif
 
 //
 // Calibrate... XXX not used at present

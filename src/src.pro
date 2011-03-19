@@ -76,12 +76,18 @@ qwt3d {
     LIBS += $${ICAL_LIBS}
 }
 
+# are we supporting USB1 devices on Windows?
 !isEmpty( USBXPRESS_INSTALL ) {
     LIBS += $${USBXPRESS_INSTALL}/x86/SiUSBXp.lib
     INCLUDEPATH += $${USBXPRESS_INSTALL}
-    SOURCES += USBXpress.cpp
-    HEADERS += USBXpress.h
     DEFINES += GC_HAVE_USBXPRESS
+}
+
+# are we supporting USB2 devices on Windows?
+!isEmpty( LIBUSB_INSTALL ) {
+    LIBS += $${LIBUSB_INSTALL}/lib/msvc/libusb.lib
+    INCLUDEPATH += $${LIBUSB_INSTALL}/include
+    DEFINES += GC_HAVE_LIBUSB
 }
 
 macx {
@@ -101,6 +107,10 @@ win32 {
         -Wl,--script,win32/i386pe.x-no-rdata,--enable-auto-import
     //QMAKE_CXXFLAGS += -fdata-sections
     RC_FILE = windowsico.rc
+
+    # Windows only USB support
+    SOURCES += USBXpress.cpp LibUsb.cpp
+    HEADERS += USBXpress.h LibUsb.h
 }
 
 # local qxt widgets - rather than add another dependency on libqxt

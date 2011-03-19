@@ -90,11 +90,32 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf) : QThread(parent)
         antIDs.clear();
 
     // setup the channels
-    for (int i=0; i<ANT_MAX_CHANNELS; i++) antChannel[i] = new ANTChannel(i, this);
+    for (int i=0; i<ANT_MAX_CHANNELS; i++) {
+
+        // create the channel
+        antChannel[i] = new ANTChannel(i, this);
+
+        // connect up its signals
+        connect(antChannel[i], SIGNAL(dropInfo(int)), this, SLOT(dropInfo(int)));
+        connect(antChannel[i], SIGNAL(lostInfo(int)), this, SLOT(lostInfo(int)));
+        connect(antChannel[i], SIGNAL(staleInfo(int)), this, SLOT(staleInfo(int)));
+        connect(antChannel[i], SIGNAL(searchTimeout(int)), this, SLOT(searchTimeout(int)));
+        connect(antChannel[i], SIGNAL(searchComplete(int)), this, SLOT(searchComplete(int)));
+    }
+
+    // on windows we use libusb to read from USB2
+    // sticks, if it is not available we use stubs
+#ifdef WIN32
+    usbMode = USBNone;
+    usb2 = new LibUsb();
+#endif
 }
 
 ANT::~ANT()
 {
+#ifdef WIN32
+    delete usb2;
+#endif
 }
 
 void ANT::setDevice(QString x)
@@ -114,7 +135,6 @@ void ANT::setBaud(int x)
 
 void ANT::run()
 {
-    //qDebug() << "Starting ANT thread...";
     int status; // control commands from controller
     bool isPortOpen = false;
 
@@ -254,7 +274,6 @@ ANT::stop()
 int
 ANT::quit(int code)
 {
-//qDebug()<<"Stopping ANT thread...";
     // event code goes here!
     closePort();
     exit(code);
@@ -287,7 +306,7 @@ ANT::addDevice(int device_number, int device_type, int channel_number)
         if (((antChannel[i]->channel_type & 0xf ) == device_type) &&
             (antChannel[i]->device_number == device_number)) {
             // send the channel found...
-            antChannel[i]->channelInfo();
+            //XXX antChannel[i]->channelInfo();
             return 1;
         }
     }
@@ -375,7 +394,8 @@ void
 ANT::report()
 {
     for (int i=0; i<ANT_MAX_CHANNELS; i++)
-        antChannel[i]->channelInfo();
+        //XXX antChannel[i]->channelInfo();
+        ;
 }
 
 void
@@ -438,6 +458,36 @@ bool
 ANT::discover(DeviceConfiguration *, QProgressDialog *)
 {
     return false;
+}
+
+void
+ANT::dropInfo(int number)    // we dropped a connection
+{
+    qDebug()<<"drop info for channel"<<number;
+}
+
+void
+ANT::lostInfo(int number)    // we lost informa
+{
+    qDebug()<<"lost info for channel"<<number;
+}
+
+void
+ANT::staleInfo(int number)   // info is now stale
+{
+    qDebug()<<"stale info for channel"<<number;
+}
+
+void
+ANT::searchTimeout(int number) // search timed out
+{
+    qDebug()<<"search timeout on channel"<<number;
+}
+
+void
+ANT::searchComplete(int number) // search completed successfully
+{
+    qDebug()<<"search completed on channel"<<number;
 }
 
 /*----------------------------------------------------------------------
@@ -509,9 +559,7 @@ ANT::handleChannelEvent(void) {
     int channel = rxMessage[ANT_OFFSET_DATA] & 0x7;
     if(channel >= 0 && channel < 4) {
 
-    // handle a channel event here!
-//qDebug()<<"channel event on channel:"<<channel;
-
+        // handle a channel event here!
         antChannel[channel]->receiveMessage(rxMessage);
     }
 }
@@ -519,7 +567,6 @@ ANT::handleChannelEvent(void) {
 void
 ANT::processMessage(void) {
 
-//qDebug()<<"processing ant message"<<rxMessage[ANT_OFFSET_ID];
     ANTMessage(this, rxMessage); // for debug!
 
     QDataStream out(&antlog);
@@ -569,7 +616,18 @@ ANT::processMessage(void) {
 int ANT::closePort()
 {
 #ifdef WIN32
-    return (int)!CloseHandle(devicePort);
+    switch (usbMode) {
+    case USB2 :
+        usb2->close();
+        return 0;
+        break;
+    case USB1 :
+        return (int)!CloseHandle(devicePort);
+        break;
+    default :
+        return -1;
+        break;
+    }
 #else
     tcflush(devicePort, TCIOFLUSH); // clear out the garbage
     return close(devicePort);
@@ -578,8 +636,22 @@ int ANT::closePort()
 
 int ANT::openPort()
 {
-#ifndef WIN32
+#ifdef WIN32
+    int rc;
 
+    // on windows we try on USB2 then on USB1 then fail...
+    if ((rc=usb2->open()) != -1) {
+        usbMode = USB2;
+        return rc;
+    } else if ((rc= USBXpress::open(&devicePort)) != -1) {
+        usbMode = USB1;
+        return rc;
+    } else {
+        usbMode = USBNone;
+        return -1;
+    }
+
+#else
     // LINUX AND MAC USES TERMIO / IOCTL / STDIO
 
 #if defined(Q_OS_MACX)
@@ -620,59 +692,6 @@ int ANT::openPort()
     if(tcsetattr(devicePort, TCSANOW, &deviceSettings) == -1) return errno;
     tcgetattr(devicePort, &deviceSettings);
 
-#else
-#ifdef GC_HAVE_USBXPRESS
-    return USBXpress::open(&devicePort);
-#else
-    // WINDOWS USES SET/GETCOMMSTATE AND READ/WRITEFILE
-
-    COMMTIMEOUTS timeouts; // timeout settings on serial ports
-
-    // if deviceFilename references a port above COM9
-    // then we need to open "\\.\COMX" not "COMX"
-    QString portSpec;
-    int portnum = deviceFilename.midRef(3).toString().toInt();
-    if (portnum < 10)
-       portSpec = deviceFilename;
-    else
-       portSpec = "\\\\.\\" + deviceFilename;
-    wchar_t deviceFilenameW[32]; // \\.\COM32 needs 9 characters, 32 should be enough?
-    MultiByteToWideChar(CP_ACP, 0, portSpec.toAscii(), -1, (LPWSTR)deviceFilenameW,
-                    sizeof(deviceFilenameW));
-
-    // win32 commport API
-    devicePort = CreateFile (deviceFilenameW, GENERIC_READ|GENERIC_WRITE,
-        FILE_SHARE_DELETE|FILE_SHARE_WRITE|FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-
-    if (devicePort == INVALID_HANDLE_VALUE) return -1;
-
-    if (GetCommState (devicePort, &deviceSettings) == false) return -1;
-
-    // so we've opened the comm port lets set it up for
-    deviceSettings.BaudRate = CBR_2400;
-    deviceSettings.fParity = NOPARITY;
-    deviceSettings.ByteSize = 8;
-    deviceSettings.StopBits = ONESTOPBIT;
-    deviceSettings.EofChar = 0x0;
-    deviceSettings.ErrorChar = 0x0;
-    deviceSettings.EvtChar = 0x0;
-    deviceSettings.fBinary = true;
-    deviceSettings.fRtsControl = RTS_CONTROL_HANDSHAKE;
-    deviceSettings.fOutxCtsFlow = TRUE;
-
-
-    if (SetCommState(devicePort, &deviceSettings) == false) {
-        CloseHandle(devicePort);
-        return -1;
-    }
-
-    timeouts.ReadIntervalTimeout = 0;
-    timeouts.ReadTotalTimeoutConstant = 1000;
-    timeouts.ReadTotalTimeoutMultiplier = 50;
-    timeouts.WriteTotalTimeoutConstant = 2000;
-    timeouts.WriteTotalTimeoutMultiplier = 0;
-    SetCommTimeouts(devicePort, &timeouts);
-#endif
 #endif
 
     // success
@@ -684,13 +703,19 @@ int ANT::rawWrite(uint8_t *bytes, int size) // unix!!
     int rc=0;
 
 #ifdef WIN32
-#ifdef GC_HAVE_USBXPRESS
-    rc = USBXpress::write(&devicePort, bytes, size);
-#else
-    DWORD cBytes;
-    rc = WriteFile(devicePort, bytes, size, &cBytes, NULL);
-#endif
-    if (!rc) return -1;
+    switch (usbMode) {
+    case USB1:
+        rc = USBXpress::write(&devicePort, bytes, size);
+        break;
+    case USB2:
+        rc = usb2->write((char *)bytes, size);
+        break;
+    default:
+        rc = 0;
+        break;
+    }
+
+    if (!rc) rc = -1; // return -1 if nothing written
     return rc;
 
 #else
@@ -704,9 +729,9 @@ int ANT::rawWrite(uint8_t *bytes, int size) // unix!!
     if (rc != -1) tcdrain(devicePort); // wait till its gone.
 
     ioctl(devicePort, FIONREAD, &ibytes);
+    return rc;
 #endif
 
-    return rc;
 
 }
 
@@ -715,16 +740,18 @@ int ANT::rawRead(uint8_t bytes[], int size)
     int rc=0;
 
 #ifdef WIN32
-#ifdef GC_HAVE_USBXPRESS
-    return USBXpress::read(&devicePort, bytes, size);
-#else
+    switch (usbMode) {
+    case USB1:
+        return USBXpress::read(&devicePort, bytes, size);
+        break;
+    case USB2:
+        return usb2->read((char *)bytes, size);
+        break;
+    default:
+        rc = 0;
+        break;
+    }
 
-    // Readfile deals with timeouts and readyread issues
-    DWORD cBytes;
-    rc = ReadFile(devicePort, bytes, size, &cBytes, NULL);
-    if (rc) return (int)cBytes;
-    else return (-1);
-#endif
 #else
 
     int timeout=0, i=0;
