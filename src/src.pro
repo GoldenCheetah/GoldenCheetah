@@ -85,7 +85,6 @@ qwt3d {
 
 # are we supporting USB2 devices on Windows?
 !isEmpty( LIBUSB_INSTALL ) {
-    LIBS += $${LIBUSB_INSTALL}/lib/msvc/libusb.lib
     INCLUDEPATH += $${LIBUSB_INSTALL}/include
     DEFINES += GC_HAVE_LIBUSB
 }
