@@ -23,6 +23,7 @@
 
 #ifdef GC_HAVE_LIBUSB
 #include <usb.h> // for the constants etc
+#include <QLibrary> // for dynamically loading libusb0.dll
 #endif
 
 #define GARMIN_USB2_VID 0x0fcf
@@ -38,6 +39,38 @@ public:
     int write(char *buf, int bytes);
 private:
 #ifdef GC_HAVE_LIBUSB
+
+    /*************************************************************************
+     * Functions to load from libusb0.dll
+     */
+    typedef void (*VoidIntProto)(int);
+    typedef void (*VoidProto)();
+    typedef int (*IntVoidProto)();
+    typedef char * (*CharVoidProto)();
+    typedef int (*IntUsb_dev_handleUintProto)(usb_dev_handle *dev, unsigned int);
+    typedef int (*IntUsb_dev_handleIntProto)(usb_dev_handle *, int);
+    typedef int (*IntUsb_dev_handleProto)(usb_dev_handle *);
+    typedef int (*IntUsb_dev_handleIntCharIntIntProto)(usb_dev_handle *, int, char *, int, int);
+    typedef struct usb_bus * (*Usb_busVoidProto)();
+    typedef struct usb_dev_handle * (*Usb_dev_handleUsb_deviceProto)(struct usb_device *);
+
+    VoidIntProto usb_set_debug;
+    CharVoidProto usb_strerror;
+    IntVoidProto usb_init;
+    IntVoidProto usb_find_busses;
+    IntVoidProto usb_find_devices;
+    IntUsb_dev_handleUintProto usb_clear_halt;
+    IntUsb_dev_handleIntProto usb_release_interface;
+    IntUsb_dev_handleProto usb_close;
+    IntUsb_dev_handleIntCharIntIntProto usb_bulk_read;
+    IntUsb_dev_handleIntCharIntIntProto usb_interrupt_write;
+    Usb_busVoidProto usb_get_busses;
+    Usb_dev_handleUsb_deviceProto usb_open;
+    IntUsb_dev_handleIntProto usb_set_configuration;
+    IntUsb_dev_handleIntProto usb_claim_interface;
+    IntUsb_dev_handleIntProto usb_set_altinterface;
+    /************************************************************************/
+
     struct usb_dev_handle* OpenAntStick();
     struct usb_interface_descriptor* usb_find_interface(struct usb_config_descriptor* config_descriptor);
     struct usb_dev_handle* device;
