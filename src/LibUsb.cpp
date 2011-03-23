@@ -27,30 +27,30 @@
 
 LibUsb::LibUsb()
 {
-    QLibrary myLib("libusb0");
+    QLibrary libusb0("libusb0");
 
     /*************************************************************************
      * Load functions from libusb0.dll
      */
-    usb_set_debug = (VoidIntProto) myLib.resolve("usb_set_debug");
-    usb_strerror = (CharVoidProto) myLib.resolve("usb_strerror");
-    usb_init = (IntVoidProto) myLib.resolve("usb_init");
-    usb_find_busses = (IntVoidProto) myLib.resolve("usb_find_busses");
-    usb_find_devices = (IntVoidProto) myLib.resolve("usb_find_devices");
-    usb_clear_halt = (IntUsb_dev_handleUintProto) myLib.resolve("usb_clear_halt");
-    usb_release_interface = (IntUsb_dev_handleIntProto) myLib.resolve("usb_release_interface");
-    usb_close = (IntUsb_dev_handleProto) myLib.resolve("usb_close");
-    usb_bulk_read = (IntUsb_dev_handleIntCharIntIntProto) myLib.resolve("usb_bulk_read");
-    usb_interrupt_write = (IntUsb_dev_handleIntCharIntIntProto) myLib.resolve("usb_interrupt_write");
-    usb_get_busses = (Usb_busVoidProto) myLib.resolve("usb_get_busses");
-    usb_open = (Usb_dev_handleUsb_deviceProto) myLib.resolve("usb_open");
-    usb_set_configuration = (IntUsb_dev_handleIntProto) myLib.resolve("usb_set_configuration");
-    usb_claim_interface = (IntUsb_dev_handleIntProto) myLib.resolve("usb_claim_interface");
-    usb_set_altinterface = (IntUsb_dev_handleIntProto) myLib.resolve("usb_set_altinterface");
+    usb_set_debug = (VoidIntProto) libusb0.resolve("usb_set_debug");
+    usb_strerror = (CharVoidProto) libusb0.resolve("usb_strerror");
+    usb_init = (IntVoidProto) libusb0.resolve("usb_init");
+    usb_find_busses = (IntVoidProto) libusb0.resolve("usb_find_busses");
+    usb_find_devices = (IntVoidProto) libusb0.resolve("usb_find_devices");
+    usb_clear_halt = (IntUsb_dev_handleUintProto) libusb0.resolve("usb_clear_halt");
+    usb_release_interface = (IntUsb_dev_handleIntProto) libusb0.resolve("usb_release_interface");
+    usb_close = (IntUsb_dev_handleProto) libusb0.resolve("usb_close");
+    usb_bulk_read = (IntUsb_dev_handleIntCharIntIntProto) libusb0.resolve("usb_bulk_read");
+    usb_interrupt_write = (IntUsb_dev_handleIntCharIntIntProto) libusb0.resolve("usb_interrupt_write");
+    usb_get_busses = (Usb_busVoidProto) libusb0.resolve("usb_get_busses");
+    usb_open = (Usb_dev_handleUsb_deviceProto) libusb0.resolve("usb_open");
+    usb_set_configuration = (IntUsb_dev_handleIntProto) libusb0.resolve("usb_set_configuration");
+    usb_claim_interface = (IntUsb_dev_handleIntProto) libusb0.resolve("usb_claim_interface");
+    usb_set_altinterface = (IntUsb_dev_handleIntProto) libusb0.resolve("usb_set_altinterface");
 
-    if (!usb_set_debug)
+    if (!(isDllLoaded = libusb0.isLoaded()))
     {
-        qFatal("Could not load usb_set_debug() from libusb0.dll");
+        qWarning("libusb0.dll was not loaded");
         return;
     }
     /************************************************************************/
@@ -74,6 +74,9 @@ LibUsb::LibUsb()
 
 int LibUsb::open()
 {
+    if (!isDllLoaded)
+        return -1;
+
      // Search busses & devices for USB2 ANT+ stick
      device = OpenAntStick();
 
@@ -93,6 +96,7 @@ int LibUsb::open()
 
 void LibUsb::close()
 {
+
     if (device) {
         usb_release_interface(device, 0);
         usb_close(device);
@@ -103,6 +107,9 @@ void LibUsb::close()
 
 int LibUsb::read(char *buf, int bytes)
 {
+    if (!isDllLoaded)
+        return -1;
+
     // The USB2 stick really doesn't like you reading 1 byte when more are available
     //  so we need a buffered reader
 
@@ -152,6 +159,9 @@ int LibUsb::read(char *buf, int bytes)
 
 int LibUsb::write(char *buf, int bytes)
 {
+    if (!isDllLoaded)
+        return -1;
+
     int rc = usb_interrupt_write(device, writeEndpoint, buf, bytes, 1000);
 
     if (rc < 0)

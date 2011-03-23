@@ -80,6 +80,8 @@ private:
     char readBuf[64];
     int readBufIndex;
     int readBufSize;
+
+    bool isDllLoaded;
 #endif
 };
 #endif // WIN32
