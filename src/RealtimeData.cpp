@@ -19,6 +19,8 @@
 
 #include "RealtimeData.h"
 
+#define tr(s) QObject::tr(s)
+
 RealtimeData::RealtimeData()
 {
     name[0] = '\0';
@@ -91,4 +93,81 @@ double RealtimeData::getCadence()
 double RealtimeData::getLoad()
 {
     return load;
+}
+
+double RealtimeData::value(DataSeries series) const
+{
+    switch (series) {
+
+    case Time: return time;
+        break;
+
+    case Watts: return watts;
+        break;
+
+    case Speed: return speed;
+        break;
+
+    case Cadence: return cadence;
+        break;
+
+    case HeartRate: return hr;
+        break;
+
+    case Load: return load;
+        break;
+
+    case None: 
+    default:
+        return 0;
+        break;
+
+    }
+}
+
+// provide a list of data series
+const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
+{
+    static QList<DataSeries> seriesList;
+
+    if (seriesList.count() == 0) {
+
+        // better populate it first!
+        seriesList << None;
+        seriesList << Time;
+        seriesList << Watts;
+        seriesList << Speed;
+        seriesList << Cadence;
+        seriesList << HeartRate;
+        seriesList << Load;
+    }
+    return seriesList;
+}
+
+QString RealtimeData::seriesName(DataSeries series)
+{
+    switch (series) {
+
+    default:
+    case None: return tr("None");
+        break;
+
+    case Time: return tr("Time");
+        break;
+
+    case Watts: return tr("Power");
+        break;
+
+    case Speed: return tr("Speed");
+        break;
+
+    case Cadence: return tr("Cadence");
+        break;
+
+    case HeartRate: return tr("Heart Rate");
+        break;
+
+    case Load: return tr("Target Power");
+        break;
+    }
 }

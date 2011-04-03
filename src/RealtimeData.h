@@ -29,6 +29,13 @@ class RealtimeData
 
 public:
 
+    // abstract to dataseries
+    enum dataseries { None=0, Time, Watts, Speed, Cadence, HeartRate, Load };
+    typedef enum dataseries DataSeries;
+    double value(DataSeries) const;
+    static QString seriesName(DataSeries);
+    static const QList<DataSeries> &listDataSeries();
+
     RealtimeData();
     void reset(); // set all values to zero
     void setName(char *name);
@@ -47,6 +54,7 @@ public:
     double getWheelRpm();
     double getCadence();
     double getLoad();
+
 
 private:
     char name[64];

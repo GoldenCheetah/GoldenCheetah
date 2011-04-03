@@ -165,10 +165,10 @@ class ANTChannel : public QObject {
 
     signals:
 
-        void channelInfo(); // we got a channel info message
-        void dropInfo(int number);    // we dropped a connection
-        void lostInfo(int number);    // we lost informa
-        void staleInfo(int number);   // info is now stale
+        void channelInfo(int number, int device_number, int device_id); // we got a channel info message
+        void dropInfo(int number);    // we dropped a packet
+        void lostInfo(int number);    // we lost a connection
+        void staleInfo(int number);   // the connection is stale
         void searchTimeout(int number); // search timed out
         void searchComplete(int number); // search completed successfully
 };

@@ -17,64 +17,89 @@
 */
 
 #include "VideoWindow.h"
-#include "MainWindow.h"
-#include "RealtimeData.h"
-#include "RaceDispatcher.h"
-#include "math.h" // for round()
-#include "Units.h" // for MILES_PER_KM
 
-// Two current realtime device types supported are:
-#include "ComputrainerController.h"
-#include "ANTplusController.h"
-
-#include "TrainTool.h"
-
-#include <phonon/phonon>
-
-VideoWindow::VideoWindow(MainWindow *parent, TrainTool *trainTool, const QDir &home)  :
-QGraphicsView(parent), home(home), main(parent), trainTool(trainTool)
+VideoWindow::VideoWindow(MainWindow *parent, const QDir &home)  :
+GcWindow(parent), home(home), main(parent)
 {
+    setControls(NULL);
     setInstanceName("Video Window");
 
-    setRenderHint(QPainter::Antialiasing, false);
-    setRenderHint(QPainter::TextAntialiasing, false);
-    setRenderHint(QPainter::SmoothPixmapTransform, false);
+    QHBoxLayout *layout = new QHBoxLayout();
+    setLayout(layout);
 
-    QWidget *w = new QWidget;
-    setViewport(new QGLWidget);
-    QGraphicsProxyWidget* proxy = new QGraphicsProxyWidget();
+    // config paramaters to libvlc
+    const char * const vlc_args[] = {
+                    "-I", "dummy", /* Don't use any interface */
+                    "--ignore-config", /* Don't use VLC's config */
+                    "--extraintf=logger", //log anything
+                    "--verbose=-1" // -1 = no output at all
+                };
 
-    // black background for video
-    setBackgroundBrush(QBrush(Qt::black));
+    /* create an exception handler */
+    //libvlc_exception_init(&exceptions);
+    //vlc_exceptions(&exceptions);
 
-    //setup media object
-    Phonon::MediaObject *media = new Phonon::MediaObject(proxy);
+    /* Load the VLC engine */
+    inst = libvlc_new(sizeof(vlc_args) / sizeof(vlc_args[0]), vlc_args);
+    //vlc_exceptions(&exceptions);
 
-    //setup audio
-    Phonon::AudioOutput *audioOutput = new Phonon::AudioOutput(proxy);
-    Phonon::createPath(media, audioOutput);
+    /* Create a new item */
+    // XXX need to add controls - not everyone is going to want to play a video from
+    //                            my desktop!!!
+    m = libvlc_media_new_path(inst, "/home/markl/Desktop/My Documents/fightclub.mp4");
+    //vlc_exceptions(&exceptions);
+        
+    /* Create a media player playing environement */
+    mp = libvlc_media_player_new (inst);
+    //vlc_exceptions(&exceptions);
 
-    // Setup video output in 16:9 (4:3 is so 80s)
-    Phonon::VideoWidget *videoWidget = new Phonon::VideoWidget(w);
-    videoWidget->setFixedSize(QSize(960,540));
-    Phonon::createPath(media, videoWidget);
+    /* set the media to playback */
+    libvlc_media_player_set_media (mp, m);
+    //vlc_exceptions(&exceptions);
 
-    //connect(videoPlayer, SIGNAL(finished()), videoPlayer, SLOT(deleteLater()));
-    proxy->setWidget(w);
-    scene = new QGraphicsScene;
-    scene->addItem(proxy);
-    setScene(scene);
+    /* No need to keep the media now */
+    libvlc_media_release (m);
+ 
+    /* This is a non working code that show how to hooks into a window,
+     * if we have a window around */
+#ifdef Q_OS_LINUX
+     x11Container = new QX11EmbedContainer(this);
+     layout->addWidget(x11Container);
+     libvlc_media_player_set_xwindow (mp, x11Container->winId());
+    //vlc_exceptions(&exceptions);
+#endif
 
-    // Open the vid and play!
-    media->setCurrentSource(Phonon::MediaSource("/home/markl/Desktop/My Documents/fightclub.mp4"));
-    videoWidget->show();
-    //media->play();
+#if 0 // XXX what abut windows and mac!!!
+    /* or on windows */
+     libvlc_media_player_set_hwnd (mp, hwnd);
+    /* or on mac os */
+     libvlc_media_player_set_nsobject (mp, view);
+#endif
 
-    // what we got?
-    foreach (QString key, media->metaData().values()) qDebug()<<key<<media->metaData(key);
+    /* play the media_player */
+    libvlc_media_player_play (mp);
+
+    show();
+}
+
+VideoWindow::~VideoWindow()
+{
+    // unembed vlc backend first
+    x11Container->discardClient();
+
+    // stop playback & wipe player
+    libvlc_media_player_stop (mp);
+    libvlc_media_player_release (mp);
+
+    // unload vlc 
+    libvlc_release (inst);
 }
 
 void VideoWindow::resizeEvent(QResizeEvent * )
 {
-    fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+#if 0
+    if (isVisible()) {
+        x11Container->show();
+    }
+#endif
 }

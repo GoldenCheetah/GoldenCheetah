@@ -96,10 +96,11 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf) : QThread(parent)
         antChannel[i] = new ANTChannel(i, this);
 
         // connect up its signals
+        connect(antChannel[i], SIGNAL(channelInfo(int,int,int)), this, SLOT(channelInfo(int,int,int)));
         connect(antChannel[i], SIGNAL(dropInfo(int)), this, SLOT(dropInfo(int)));
         connect(antChannel[i], SIGNAL(lostInfo(int)), this, SLOT(lostInfo(int)));
         connect(antChannel[i], SIGNAL(staleInfo(int)), this, SLOT(staleInfo(int)));
-        connect(antChannel[i], SIGNAL(searchTimeout(int)), this, SLOT(searchTimeout(int)));
+        connect(antChannel[i], SIGNAL(searchTimeout(int)), this, SLOT(slotSearchTimeout(int)));
         connect(antChannel[i], SIGNAL(searchComplete(int)), this, SLOT(searchComplete(int)));
     }
 
@@ -461,26 +462,42 @@ ANT::discover(DeviceConfiguration *, QProgressDialog *)
 }
 
 void
-ANT::dropInfo(int number)    // we dropped a connection
+ANT::channelInfo(int channel, int device_number, int device_id)
 {
-    qDebug()<<"drop info for channel"<<number;
+    emit foundDevice(channel, device_number, device_id);
+    //qDebug()<<"found device number"<<device_number<<"type"<<device_id<<"on channel"<<channel
+    //<< "is a "<<deviceTypeDescription(device_id) << "with code"<<deviceTypeCode(device_id);
 }
 
 void
-ANT::lostInfo(int number)    // we lost informa
+ANT::dropInfo(int /*number*/)    // we dropped a message
 {
+    return; // ignore for now, dropped messages are not so interesting
+}
+
+void
+ANT::lostInfo(int number)    // we lost the connection
+{
+    if (number < 0 || number > 3) return; // ignore out of bound
+
+    emit lostDevice(number);
     qDebug()<<"lost info for channel"<<number;
 }
 
 void
-ANT::staleInfo(int number)   // info is now stale
+ANT::staleInfo(int number)   // info is now stale - set to zero
 {
+    if (number < 0 || number > 3) return; // ignore out of bound
+
     qDebug()<<"stale info for channel"<<number;
 }
 
 void
-ANT::searchTimeout(int number) // search timed out
+ANT::slotSearchTimeout(int number) // search timed out
 {
+    if (number < 0 || number > 3) return; // ignore out of bound
+
+    emit searchTimeout(number);
     qDebug()<<"search timeout on channel"<<number;
 }
 
@@ -780,4 +797,26 @@ int ANT::interpretSuffix(char c)
     } while (++st, st->type != ANTChannel::CHANNEL_TYPE_GUARD);
 
     return -1;
+}
+
+// convert ANT value to 'p' 'c' values
+char ANT::deviceTypeCode(int type)
+{
+    const ant_sensor_type_t *st=ant_sensor_types;
+
+    do {
+        if (st->device_id==type) return st->suffix;
+    } while (++st, st->type != ANTChannel::CHANNEL_TYPE_GUARD);
+    return '-';
+}
+
+// convert ANT value to human string
+const char * ANT::deviceTypeDescription(int type)
+{
+    const ant_sensor_type_t *st=ant_sensor_types;
+
+    do {
+        if (st->device_id==type) return st->descriptive_name;
+    } while (++st, st->type != ANTChannel::CHANNEL_TYPE_GUARD);
+    return "Unknown device type";
 }

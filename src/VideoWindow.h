@@ -20,17 +20,27 @@
 #define _GC_VideoWindow_h 1
 #include "GoldenCheetah.h"
 
+// for vlc
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+extern "C" {
+#include <vlc/vlc.h>
+#include <vlc/libvlc_media.h>
+}
+
+// QT stuff etc
 #include <QtGui>
 #include <QTimer>
-#include <QtOpenGL>
+#include <QX11EmbedContainer>
 #include "MainWindow.h"
 #include "DeviceConfiguration.h"
 #include "DeviceTypes.h"
 #include "RealtimeData.h"
-
 #include "TrainTool.h"
 
-class VideoWindow : public QGraphicsView
+class VideoWindow : public GcWindow
 {
     Q_OBJECT
     G_OBJECT
@@ -40,7 +50,8 @@ class VideoWindow : public QGraphicsView
 
         RealtimeController *deviceController;   // read from
 
-        VideoWindow(MainWindow *, TrainTool *, const QDir &);
+        VideoWindow(MainWindow *, const QDir &);
+        ~VideoWindow();
 
     public slots:
 
@@ -51,10 +62,15 @@ class VideoWindow : public QGraphicsView
         // passed from MainWindow
         QDir home;
         MainWindow *main;
-        TrainTool *trainTool;
 
-        QGraphicsScene *scene;
+        libvlc_instance_t * inst;
+        //libvlc_exception_t exceptions;
+        libvlc_media_player_t *mp;
+        libvlc_media_t *m;
+
+#ifdef Q_OS_LINUX
+        QX11EmbedContainer *x11Container;
+#endif
 };
 
 #endif // _GC_VideoWindow_h
-

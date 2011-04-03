@@ -47,6 +47,8 @@ enum gcwinid {
         TreeMap =18,
         WeeklySummary =19,
         HrPw =20,
+        VideoPlayer =21,
+        DialWindow =22,
 };
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;
