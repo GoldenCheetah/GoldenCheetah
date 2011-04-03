@@ -562,7 +562,7 @@ void ANTChannel::channelId(unsigned char *ant_message) {
     state=MESSAGE_RECEIVED;
 
     setId();
-    emit channelInfo();
+    emit channelInfo(number, device_number, device_id);
 
     // if we were searching,
     if (channel_type_flags & CHANNEL_TYPE_QUICK_SEARCH) {

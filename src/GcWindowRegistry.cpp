@@ -32,6 +32,9 @@
 #ifdef GC_HAVE_QWTPLOT3D
 #include "ModelWindow.h"
 #endif
+#ifdef GC_HAVE_VLC
+#include "VideoWindow.h"
+#endif
 #include "PerformanceManagerWindow.h"
 #include "PfPvWindow.h"
 #include "HrPwWindow.h"
@@ -44,6 +47,7 @@
 #include "TrainWindow.h" // XXX not done
 #include "TreeMapWindow.h"
 #include "WeeklySummaryWindow.h"
+#include "DialWindow.h"
 
 GcWindowRegistry GcWindows[] = {
     // name                     GcWinID
@@ -65,6 +69,8 @@ GcWindowRegistry GcWindows[] = {
     { "Ride Summary & Fields",  GcWindowTypes::Summary },
     { "Treemap",                GcWindowTypes::TreeMap },
     { "Weekly Summary",         GcWindowTypes::WeeklySummary },
+    { "Video Player",           GcWindowTypes::VideoPlayer },
+    { "Realtime Dial",          GcWindowTypes::DialWindow },
     { "", GcWindowTypes::None }};
 
 // instantiate a new window
@@ -100,6 +106,12 @@ GcWindowRegistry::newGcWindow(GcWinID id, MainWindow *main) //XXX mainWindow wil
     case GcWindowTypes::Summary: returning = new SummaryWindow(main); break;
     case GcWindowTypes::TreeMap: returning = new TreeMapWindow(main, main->useMetricUnits, main->home); break;
     case GcWindowTypes::WeeklySummary: returning = new WeeklySummaryWindow(main->useMetricUnits, main); break;
+#ifdef GC_HAVE_VLC
+    case GcWindowTypes::VideoPlayer: returning = new VideoWindow(main, main->home); break;
+#else
+    case GcWindowTypes::VideoPlayer: returning = new GcWindow(); break;
+#endif
+    case GcWindowTypes::DialWindow: returning = new DialWindow(main); break;
     default: return NULL; break;
     }
     if (returning) returning->setProperty("type", QVariant::fromValue<GcWinID>(id));

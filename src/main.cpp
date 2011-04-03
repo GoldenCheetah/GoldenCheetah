@@ -23,6 +23,10 @@
 #include "MainWindow.h"
 #include "Settings.h"
 
+#ifdef Q_OS_X11
+#include <X11/Xlib.h>
+#endif
+
 // BLECK - homedir passing via global becuase ridefile is pure virtual and
 //         cannot pass with current definition -- Sean can advise!!
 extern QString WKO_HOMEDIR;
@@ -30,6 +34,10 @@ extern QString WKO_HOMEDIR;
 int
 main(int argc, char *argv[])
 {
+#ifdef Q_OS_X11
+    XInitThreads();
+#endif
+
     QApplication app(argc, argv);
     //app.setApplicationName("Golden Cheetah"); //XXX affect location of home on Win32
 

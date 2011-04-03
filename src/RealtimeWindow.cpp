@@ -559,7 +559,9 @@ void RealtimeWindow::guiUpdate()           // refreshes the telemetry
 
     // get latest telemetry from device (if it is a pull device e.g. Computrainer //
     if (status&RT_RUNNING && deviceController->doesPull() == true) {
+
         deviceController->getRealtimeData(rtData);
+        main->notifyTelemetryUpdate(rtData); // signal everyone to update telemetry
         displayPower = rtData.getWatts();
         displayCadence = rtData.getCadence();
         displayHeartRate = rtData.getHr();

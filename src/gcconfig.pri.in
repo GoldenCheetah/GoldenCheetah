@@ -85,6 +85,16 @@ D2XX_INCLUDE = /usr/local/include/D2XX
 # http://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/0.1.12.2/
 #LIBUSB_INSTALL=/c/libusb-win32-device-bin-0.1.12.2
 
+# if you want video playback on training mode then
+# download and install vlc (videolan) from
+# ftp.videolan.org/pub/vlc/1.1.8 for your platform
+# there are sdks for Mac and Windows. On Linux you
+# will need to use the latest distro (e.g. Meerkat
+# on Ubuntu) to be sure apt-get installs the latest
+# builds (we need 1.1.6 or higher).
+#
+#VLC_INSTALL = /usr/include/vlc/
+
 # We recommend a debug build for development, and a static build for releases.
 CONFIG += debug
 #CONFIG += static

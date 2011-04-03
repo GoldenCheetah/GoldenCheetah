@@ -89,6 +89,15 @@ qwt3d {
     DEFINES += GC_HAVE_LIBUSB
 }
 
+# are we supporting video playback?
+!isEmpty( VLC_INSTALL ) {
+    INCLUDEPATH += $${VLC_INSTALL}/include
+    LIBS += -lvlc
+    DEFINES += GC_HAVE_VLC
+    HEADERS += VideoWindow.h
+    SOURCES += VideoWindow.cpp
+}
+
 macx {
     LIBS += -lobjc -framework Carbon -framework AppKit
     HEADERS += QtMacSegmentedButton.h
@@ -168,6 +177,7 @@ HEADERS += \
         Device.h \
         DeviceTypes.h \
         DeviceConfiguration.h \
+        DialWindow.h \
         DownloadRideDialog.h \
         ErgFile.h \
         ErgFilePlot.h \
@@ -320,6 +330,7 @@ SOURCES += \
         Device.cpp \
         DeviceTypes.cpp \
         DeviceConfiguration.cpp \
+        DialWindow.cpp \
         DownloadRideDialog.cpp \
         ErgFile.cpp \
         ErgFilePlot.cpp \

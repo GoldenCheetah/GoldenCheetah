@@ -28,6 +28,7 @@
 #include "RideItem.h"
 #include "IntervalItem.h"
 #include "QuarqdClient.h"
+#include "RealtimeData.h"
 #include <boost/shared_ptr.hpp>
 
 class AerolabWindow;
@@ -107,6 +108,7 @@ class MainWindow : public QMainWindow
                                     // rideItem date/time changes
         void notifyRideClean() { rideClean(); }
         void notifyRideDirty() { rideDirty(); }
+        void notifyTelemetryUpdate(RealtimeData rtData) { telemetryUpdate(rtData); }
         void selectView(int);
         void selectRideFile(QString);
 
@@ -150,6 +152,7 @@ class MainWindow : public QMainWindow
         void rideDeleted(RideItem *);
         void rideDirty();
         void rideClean();
+        void telemetryUpdate(RealtimeData rtData);
 
     private slots:
         void tabViewTriggered(bool);

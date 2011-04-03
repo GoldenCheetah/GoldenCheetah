@@ -230,6 +230,11 @@ public:
     ANT(QObject *parent = 0, DeviceConfiguration *dc=0);
     ~ANT();
 
+signals:
+    void foundDevice(int channel, int device_number, int device_id); // channelInfo
+    void lostDevice(int channel);            // dropInfo
+    void searchTimeout(int channel);         // searchTimeount
+
 public slots:
 
     // runtime controls
@@ -241,10 +246,11 @@ public slots:
 
     // channel management
     bool discover(DeviceConfiguration *, QProgressDialog *);              // confirm Server available at portSpec
+    void channelInfo(int number, int device_number, int device_id);  // found a device
     void dropInfo(int number);    // we dropped a connection
     void lostInfo(int number);    // we lost informa
     void staleInfo(int number);   // info is now stale
-    void searchTimeout(int number); // search timed out
+    void slotSearchTimeout(int number); // search timed out
     void searchComplete(int number); // search completed successfully
 
     // get telemetry
@@ -305,6 +311,8 @@ private:
 
     void run();
     static int interpretSuffix(char c); // utility to convert e.g. 'c' to CHANNEL_TYPE_CADENCE
+    static const char *deviceTypeDescription(int type); // utility to convert CHANNEL_TYPE_XXX to human string
+    static char deviceTypeCode(int type); // utility to convert CHANNEL_TYPE_XXX to 'c', 'p' et al
 
     RealtimeData telemetry;
     QMutex pvars;  // lock/unlock access to telemetry data between thread and controller
