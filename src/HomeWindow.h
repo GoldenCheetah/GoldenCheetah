@@ -39,7 +39,7 @@ class HomeWindow : public GcWindow
 
     public:
 
-        HomeWindow(MainWindow *);
+        HomeWindow(MainWindow *, QString name);
         ~HomeWindow();
 
         //int view() const { return viewMode->currentIndex(); }
@@ -82,6 +82,7 @@ class HomeWindow : public GcWindow
 
     protected:
         MainWindow *mainWindow;
+        QString name;
         bool active; // ignore gui signals when changing views
         GcWindow *clicked; // keep track of selected charts
         bool dropPending;

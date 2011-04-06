@@ -20,8 +20,9 @@
 #include "HomeWindow.h"
 #include "LTMSettings.h"
 
-HomeWindow::HomeWindow(MainWindow *mainWindow) :
-    GcWindow(mainWindow), mainWindow(mainWindow), active(false), clicked(NULL), dropPending(false), chartCursor(-2), loaded(false)
+HomeWindow::HomeWindow(MainWindow *mainWindow, QString name) :
+    GcWindow(mainWindow), mainWindow(mainWindow), name(name), active(false),
+    clicked(NULL), dropPending(false), chartCursor(-2), loaded(false)
 {
     setInstanceName("Home Window");
     setControls(new QStackedWidget(this));
@@ -1053,13 +1054,13 @@ HomeWindow::saveState()
     // XXX currently we support QString, int, double and bool types - beware custom types!!
     if (charts.count() == 0) return; // don't save empty, use default instead
 
-    QString filename = mainWindow->home.absolutePath() + "/" + "home" + "-layout.xml";
+    QString filename = mainWindow->home.absolutePath() + "/" + name + "-layout.xml";
     QFile file(filename);
     file.open(QFile::WriteOnly);
     file.resize(0);
     QTextStream out(&file);
 
-    out<<"<layout name=\"home\">\n";
+    out<<"<layout name=\""<< name <<"\">\n";
 
     // iterate over charts
     foreach (GcWindow *chart, charts) {
@@ -1103,7 +1104,7 @@ void
 HomeWindow::restoreState()
 {
     // restore window state
-    QString filename = mainWindow->home.absolutePath() + "/" + "home" + "-layout.xml";
+    QString filename = mainWindow->home.absolutePath() + "/" + name + "-layout.xml";
     QFile file(filename);
 
     // setup the handler
