@@ -112,6 +112,8 @@ class HomeWindow : public GcWindow
         QList<GcWindow*> charts;
         int chartCursor;
 
+        bool loaded;
+
 };
 
 // setup the chart

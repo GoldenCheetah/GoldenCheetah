@@ -21,7 +21,7 @@
 #include "LTMSettings.h"
 
 HomeWindow::HomeWindow(MainWindow *mainWindow) :
-    GcWindow(mainWindow), mainWindow(mainWindow), active(false), clicked(NULL), dropPending(false), chartCursor(-2)
+    GcWindow(mainWindow), mainWindow(mainWindow), active(false), clicked(NULL), dropPending(false), chartCursor(-2), loaded(false)
 {
     setInstanceName("Home Window");
     setControls(new QStackedWidget(this));
@@ -129,8 +129,6 @@ HomeWindow::HomeWindow(MainWindow *mainWindow) :
     connect(styleSelector, SIGNAL(currentIndexChanged(int)), SLOT(styleChanged(int)));
 #endif
 
-    restoreState();
-
     // watch drop operations
     //setMouseTracking(true);
     installEventFilter(this);
@@ -176,6 +174,11 @@ HomeWindow::configChanged()
 void
 HomeWindow::selected()
 {
+    if (loaded == false) {
+        restoreState();
+        loaded = true;
+    }
+
     resizeEvent(NULL); // force a relayout
     rideSelected();
 }

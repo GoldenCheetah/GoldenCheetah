@@ -32,7 +32,7 @@ GcWindow(parent), home(home), main(parent)
                     "-I", "dummy", /* Don't use any interface */
                     "--ignore-config", /* Don't use VLC's config */
                     "--extraintf=logger", //log anything
-                    "--verbose=-1" // -1 = no output at all
+                    "--verbose=2" // -1 = no output at all
                 };
 
     /* create an exception handler */
@@ -78,8 +78,6 @@ GcWindow(parent), home(home), main(parent)
 
     /* play the media_player */
     libvlc_media_player_play (mp);
-
-    show();
 }
 
 VideoWindow::~VideoWindow()
