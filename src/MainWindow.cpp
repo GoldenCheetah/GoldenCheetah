@@ -388,7 +388,7 @@ MainWindow::MainWindow(const QDir &home) :
     homeControls->setContentsMargins(0,0,0,0);
     masterControls->addWidget(homeControls);
 
-    homeWindow = new HomeWindow(this);
+    homeWindow = new HomeWindow(this, "home");
     homeControls->addWidget(homeWindow->controls());
     homeControls->setCurrentIndex(0);
     // setup trainWindow
