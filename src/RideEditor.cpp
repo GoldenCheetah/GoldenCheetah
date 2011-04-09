@@ -256,7 +256,7 @@ RideEditor::isColumnSelected()
 void
 RideEditor::saveFile()
 {
-    if (ride->isDirty()) {
+    if (ride && ride->isDirty()) {
         main->saveRideSingleDialog(ride);
     }
 }
@@ -264,13 +264,15 @@ RideEditor::saveFile()
 void
 RideEditor::undo()
 {
-    ride->ride()->command->undoCommand();
+    if (ride && ride->ride() && ride->ride()->command)
+        ride->ride()->command->undoCommand();
 }
 
 void
 RideEditor::redo()
 {
-    ride->ride()->command->redoCommand();
+    if (ride && ride->ride() && ride->ride()->command)
+        ride->ride()->command->redoCommand();
 }
 
 void
@@ -1080,7 +1082,10 @@ void
 RideEditor::rideSelected()
 {
     RideItem *current = myRideItem;
-    if (!current || !current->ride()) return;
+    if (!current || !current->ride()) {
+        model->setRide(NULL);
+        return;
+    }
 
     ride = current;
 
@@ -1092,7 +1097,6 @@ RideEditor::rideSelected()
         data = ride->ride()->editorData();
         data->found.clear(); // search is not active, so clear
     }
-
     model->setRide(ride->ride());
 
     // reset the save icon on the toolbar

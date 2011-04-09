@@ -50,6 +50,7 @@ RideFile::RideFile() : recIntSecs_(0.0), deviceType_("unknown"), data(NULL)
 
 RideFile::~RideFile()
 {
+    emit deleted();
     foreach(RideFilePoint *point, dataPoints_)
         delete point;
     delete command;

@@ -536,7 +536,12 @@ RideNavigator::rideTreeSelectionChanged()
     if (active == true) return;
     else active = true;
 
-    QTreeWidgetItem *which = main->rideTreeWidget()->selectedItems().first();
+    QTreeWidgetItem *which;
+    if (main->rideTreeWidget()->selectedItems().count())
+        which = main->rideTreeWidget()->selectedItems().first();
+    else // no rides slected
+        which = NULL;
+
     if (which && which->type() == RIDE_TYPE) {
         RideItem *rideItem = static_cast<RideItem *>(which);
 

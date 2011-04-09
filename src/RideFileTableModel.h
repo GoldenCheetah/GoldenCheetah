@@ -83,6 +83,12 @@ class RideFileTableModel : public QAbstractTableModel
         void beginCommand(bool undo, RideCommand *);
         void endCommand(bool undo, RideCommand *);
 
+        // Import wizard frees the ridefile memory to
+        // stop exhausting memory, but we need to know
+        // coz we reference the ride file and not the 
+        // ride item. long story.
+        void deleted();
+
         // force redraw - used by anomaly detection and find
         void forceRedraw();
 
