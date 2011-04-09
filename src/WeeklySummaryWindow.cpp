@@ -216,7 +216,7 @@ WeeklySummaryWindow::refresh()
 
             // average RI for the day
             if (dailyRides[day] > 1)
-                dailyRI[day] = ((dailyRI[day] * (dailyRides[i]-1))
+                dailyRI[day] = ((dailyRI[day] * (dailyRides[day]-1))
                                 + metrics.getForSymbol("skiba_relative_intensity")) / dailyRides[day];
             else
                 dailyRI[day] = metrics.getForSymbol("skiba_relative_intensity");
