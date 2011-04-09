@@ -601,7 +601,7 @@ QString HrZones::summarize(int rnum, QVector<double> &time_in_zone) const
 {
     assert(rnum < ranges.size());
     const HrZoneRange &range = ranges[rnum];
-    assert(time_in_zone.size() == range.zones.size());
+    assert(time_in_zone.size() >= range.zones.size());
     QString summary;
     if(range.lt > 0){
         summary += "<table align=\"center\" width=\"70%\" border=\"0\">";

@@ -146,13 +146,11 @@ int RideItem::numZones()
     return (zone_range >= 0) ? zones->numZones(zone_range) : 0;
 }
 
-#if 0
 int RideItem::numHrZones()
 {
     int hr_zone_range = hrZoneRange();
     return (hr_zone_range >= 0) ? hrZones->numZones(hr_zone_range) : 0;
 }
-#endif
 
 #if 0
 

@@ -90,8 +90,8 @@ class RideItem : public QObject, public QTreeWidgetItem //<< for signals/slots
         int hrZoneRange();
         int numZones();
 
-#if 0
         int numHrZones();
+#if 0
         double timeInZone(int zone);
         double timeInHrZone(int zone);
 #endif
