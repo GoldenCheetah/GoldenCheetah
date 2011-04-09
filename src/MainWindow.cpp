@@ -1054,8 +1054,10 @@ MainWindow::exportKML()
 void
 MainWindow::uploadTP()
 {
-    TPUploadDialog uploader(cyclist, currentRide(), this);
-    uploader.exec();
+    if (ride) {
+        TPUploadDialog uploader(cyclist, currentRide(), this);
+        uploader.exec();
+    }
 }
 
 void
@@ -1158,6 +1160,9 @@ MainWindow::addIntervalForPowerPeaksForSecs(RideFile *ride, int windowSizeSecs, 
 void
 MainWindow::findPowerPeaks()
 {
+
+    if (!ride) return;
+
     QTreeWidgetItem *which = treeWidget->selectedItems().first();
     if (which->type() != RIDE_TYPE) {
         return;
@@ -1644,7 +1649,14 @@ void MainWindow::showWorkoutWizard()
 void
 MainWindow::saveRide()
 {
-    saveRideSingleDialog(ride); // will signal save to everyone
+    if (ride)
+        saveRideSingleDialog(ride); // will signal save to everyone
+    else {
+        QMessageBox oops(QMessageBox::Critical, tr("No Ride To Save"),
+                         tr("There is no currently selected ride to save."));
+        oops.exec();
+        return;
+    }
 }
 
 void
@@ -1661,7 +1673,7 @@ MainWindow::revertRide()
 void
 MainWindow::splitRide()
 {
-    (new SplitRideDialog(this))->exec();
+    if (ride) (new SplitRideDialog(this))->exec();
 }
 
 void
