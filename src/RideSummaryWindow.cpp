@@ -169,6 +169,20 @@ RideSummaryWindow::htmlSummary() const
         NULL
     };
 
+    const char *timeInZonesHR[] = {
+        "time_in_zone_H1",
+        "time_in_zone_H2",
+        "time_in_zone_H3",
+        "time_in_zone_H4",
+        "time_in_zone_H5",
+        "time_in_zone_H6",
+        "time_in_zone_H7",
+        "time_in_zone_H8",
+        "time_in_zone_H9",
+        "time_in_zone_H10",
+        NULL
+    };
+
     // Use pre-computed and saved metric values if the ride has not
     // been edited. Otherwise we need to re-compute every time.
     SummaryMetrics metrics;
@@ -248,6 +262,17 @@ RideSummaryWindow::htmlSummary() const
             time_in_zone[i] = metrics.getForSymbol(timeInZones[i]);
         summary += tr("<h2>Power Zones</h2>");
         summary += mainWindow->zones()->summarize(rideItem->zoneRange(), time_in_zone);
+    }
+
+    //
+    // Time In Zones HR
+    //
+    if (rideItem->numHrZones() > 0) {
+        QVector<double> time_in_zone(rideItem->numZones());
+        for (int i = 0; i < rideItem->numZones(); ++i)
+            time_in_zone[i] = metrics.getForSymbol(timeInZonesHR[i]);
+        summary += tr("<h2>Heart Rate Zones</h2>");
+        summary += mainWindow->hrZones()->summarize(rideItem->hrZoneRange(), time_in_zone);
     }
 
     //
