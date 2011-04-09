@@ -520,6 +520,12 @@ string GoogleMapControl::CreateMarkers()
     oss << "map.addOverlay(marker);" << endl;
     */
 
+    // if we have no data (missing or not initialised) then
+    // return empty. This also fixes a bug on show/hide sidebar
+    // that causes a resize event before the map has been
+    // drawn for the first time
+    if (rideData.size() == 0) return "";
+
     oss << CreateIntervalMarkers(ride);
 
     // end marker
