@@ -687,7 +687,6 @@ RideImportWizard::abortClicked()
             }
 
         } else {
-
             // for native file formats the filename IS the ride date time so
             // no need to write -- we just copy
 
@@ -725,6 +724,9 @@ RideImportWizard::abortClicked()
                         mainWindow->addRide(QFileInfo(fulltarget).fileName(), true); // add to tree view
                         // free immediately otherwise all imported rides are cached
                         // and with large imports this can lead to memory exhaustion
+                        // BUT! Some charts/windows will hava snaffled away the ridefile
+                        // pointer which is now invalid so once all the rides have been imported
+                        // we need to select the last one... see below
                         mainWindow->rideItem()->freeMemory();
                     } else
                         tableWidget->item(i,5)->setText(tr("Error - copy failed"));

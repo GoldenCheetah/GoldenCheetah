@@ -174,6 +174,7 @@ class RideFile : public QObject // QObject to emit signals
         void saved();
         void reverted();
         void modified();
+        void deleted();
 
     protected:
         void emitSaved();

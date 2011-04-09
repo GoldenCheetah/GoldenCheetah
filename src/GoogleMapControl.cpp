@@ -291,7 +291,7 @@ void GoogleMapControl::createHtml()
         }
     }
     RideItem * ride = myRideItem;
-    if(!ride->ride() || ride->ride()->areDataPresent()->lat == false ||
+    if(!ride || !ride->ride() || ride->ride()->areDataPresent()->lat == false ||
                         ride->ride()->areDataPresent()->lon == false)
     {
         currentPage << tr("No GPS Data Present").toStdString();
