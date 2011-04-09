@@ -45,10 +45,18 @@ RideFileTableModel::setRide(RideFile *newride)
         connection = ride->command;
         connect(ride->command, SIGNAL(beginCommand(bool,RideCommand*)), this, SLOT(beginCommand(bool,RideCommand*)));
         connect(ride->command, SIGNAL(endCommand(bool,RideCommand*)), this, SLOT(endCommand(bool,RideCommand*)));
+        connect(ride, SIGNAL(deleted()), this, SLOT(deleted()));
 
         // refresh
         emit layoutChanged();
     }
+}
+
+void
+RideFileTableModel::deleted()
+{
+    // we don't need to disconnect since they're free'd up by QT
+    ride = NULL;
 }
 
 void

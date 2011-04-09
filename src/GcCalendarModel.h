@@ -202,7 +202,7 @@ public:
             if (arr) {
                 foreach (int i, *arr)
                 // we have rides on this day...
-                    if (sourceModel()->data(index(i, dateIndex, QModelIndex())).toDateTime() == mainWindow->rideItem()->dateTime)
+                    if (mainWindow->rideItem() && sourceModel()->data(index(i, dateIndex, QModelIndex())).toDateTime() == mainWindow->rideItem()->dateTime)
                         colors.append(GColor(CCALCURRENT));
                     else
                         colors.append(GColor(CCALACTUAL));
