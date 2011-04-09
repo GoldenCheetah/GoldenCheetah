@@ -159,6 +159,7 @@ WeeklySummaryWindow::refresh()
 
     // weekly values
     QVector<double> time_in_zone; // max 10 zones supported
+    QVector<double> time_in_hrzone; // max 10 zones supported
 
     double weeklyRides=0;
     double weeklySeconds=0;
@@ -190,6 +191,9 @@ WeeklySummaryWindow::refresh()
     // how many zones did we see?
     int num_zones = -1;
     int zone_range = -1;
+
+    int num_hrzones = -1;
+    int hrzone_range = -1;
 
     for (int i = 0; i < allRides->childCount(); ++i) {
 
@@ -236,6 +240,7 @@ WeeklySummaryWindow::refresh()
                 weeklyRI = metrics.getForSymbol("skiba_relative_intensity");
 
             // compute time in zones
+            // Power
             if (num_zones < item->numZones()) {
                 num_zones = item->numZones();
                 time_in_zone.resize(num_zones);
@@ -245,7 +250,18 @@ WeeklySummaryWindow::refresh()
             for (int j=0; j<item->numZones(); j++) {
                 QString symbol = QString("time_in_zone_L%1").arg(j+1);
                 time_in_zone[j] += metrics.getForSymbol(symbol);
-	    }
+	        }
+            // HR
+            if (num_hrzones < item->numHrZones()) {
+                num_hrzones = item->numHrZones();
+                time_in_hrzone.resize(num_hrzones);
+            }
+            hrzone_range = item->hrZoneRange();
+
+            for (int j=0; j<item->numHrZones(); j++) {
+                QString symbol = QString("time_in_zone_H%1").arg(j+1);
+                time_in_hrzone[j] += metrics.getForSymbol(symbol);
+	        }
         }
     }
 
@@ -300,6 +316,10 @@ WeeklySummaryWindow::refresh()
             summary += mainWindow->zones()->summarize(zone_range, time_in_zone);
         } else {
             summary += "No zones configured - zone summary not available.";
+        }
+        if (hrzone_range >= 0) {
+            summary += tr( "</table>" "<h2>Heart Rate Zones</h2>");
+            summary += mainWindow->hrZones()->summarize(hrzone_range, time_in_hrzone);
         }
     }
 
