@@ -33,12 +33,15 @@ extern "C" {
 // QT stuff etc
 #include <QtGui>
 #include <QTimer>
-#include <QX11EmbedContainer>
 #include "MainWindow.h"
 #include "DeviceConfiguration.h"
 #include "DeviceTypes.h"
 #include "RealtimeData.h"
 #include "TrainTool.h"
+
+#ifdef Q_OS_LINUX
+#include <QX11EmbedContainer>
+#endif
 
 class VideoWindow : public GcWindow
 {
@@ -70,6 +73,9 @@ class VideoWindow : public GcWindow
 
 #ifdef Q_OS_LINUX
         QX11EmbedContainer *x11Container;
+#endif
+#ifdef WIN32
+        QWidget *container;
 #endif
 };
 

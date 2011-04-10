@@ -561,31 +561,44 @@ void RealtimeWindow::guiUpdate()           // refreshes the telemetry
     if (status&RT_RUNNING && deviceController->doesPull() == true) {
 
         deviceController->getRealtimeData(rtData);
-        main->notifyTelemetryUpdate(rtData); // signal everyone to update telemetry
+
+        // Distance assumes current speed for the last second. from km/h to km/sec
+        displayDistance += displaySpeed / (5 * 3600); // XXX assumes 200ms refreshrate
+        displayWorkoutDistance += displaySpeed / (5 * 3600); // XXX assumes 200ms refreshrate
+        rtData.setDistance(displayDistance);
+
+        // time
+        total_msecs = session_elapsed_msec + session_time.elapsed();
+        lap_msecs = lap_elapsed_msec + lap_time.elapsed();
+        rtData.setMsecs(total_msecs);
+        rtData.setLapMsecs(lap_msecs);
+
+        // metrics
+        rtData.setJoules(kjoules);
+        rtData.setBikeScore(bikescore);
+        rtData.setXPower(xpower);
+
+        // update those LCDs!
+        timeLCD->display(QString("%1:%2:%3.%4").arg(total_msecs/3600000)
+                                               .arg((total_msecs%3600000)/60000,2,10,QLatin1Char('0'))
+                                               .arg((total_msecs%60000)/1000,2,10,QLatin1Char('0'))
+                                               .arg((total_msecs%1000)/100));
+
+        laptimeLCD->display(QString("%1:%2:%3.%4").arg(lap_msecs/3600000,2)
+                                                  .arg((lap_msecs%3600000)/60000,2,10,QLatin1Char('0'))
+                                                  .arg((lap_msecs%60000)/1000,2,10,QLatin1Char('0'))
+                                                  .arg((lap_msecs%1000)/100));
+
+        // local stuff ...
         displayPower = rtData.getWatts();
         displayCadence = rtData.getCadence();
         displayHeartRate = rtData.getHr();
         displaySpeed = rtData.getSpeed();
         displayLoad = rtData.getLoad();
+
+        // go update the displays...
+        main->notifyTelemetryUpdate(rtData); // signal everyone to update telemetry
     }
-
-    // Distance assumes current speed for the last second. from km/h to km/sec
-    displayDistance += displaySpeed / (5 * 3600); // XXX assumes 200ms refreshrate
-    displayWorkoutDistance += displaySpeed / (5 * 3600); // XXX assumes 200ms refreshrate
-
-    total_msecs = session_elapsed_msec + session_time.elapsed();
-    lap_msecs = lap_elapsed_msec + lap_time.elapsed();
-
-    // update those LCDs!
-    timeLCD->display(QString("%1:%2:%3.%4").arg(total_msecs/3600000)
-                                           .arg((total_msecs%3600000)/60000,2,10,QLatin1Char('0'))
-                                           .arg((total_msecs%60000)/1000,2,10,QLatin1Char('0'))
-                                           .arg((total_msecs%1000)/100));
-
-    laptimeLCD->display(QString("%1:%2:%3.%4").arg(lap_msecs/3600000,2)
-                                              .arg((lap_msecs%3600000)/60000,2,10,QLatin1Char('0'))
-                                              .arg((lap_msecs%60000)/1000,2,10,QLatin1Char('0'))
-                                              .arg((lap_msecs%1000)/100));
 
     // Cadence, HR and Power needs to be rounded to 0 decimal places
     powerLCD->display(round(displayPower));

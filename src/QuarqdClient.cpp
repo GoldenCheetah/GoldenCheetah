@@ -128,7 +128,7 @@ QuarqdClient::parseElement(QString &strBuf) // updates QuarqdClient::telemetry
 
             if (ok && mid != "nan" && mid != "inf") {
                 telemetry.setWatts(value);
-                telemetry.setTime(getTimeStamp(str));
+                telemetry.setMsecs(getTimeStamp(str));
                 lastReadWatts = elapsedTime.elapsed();
             }
         } else if(str.startsWith(cadenceStr))
@@ -142,7 +142,7 @@ QuarqdClient::parseElement(QString &strBuf) // updates QuarqdClient::telemetry
 
             if (ok && mid != "nan" && mid != "inf") {
                 telemetry.setCadence(value);
-                telemetry.setTime(getTimeStamp(str));
+                telemetry.setMsecs(getTimeStamp(str));
                 lastReadCadence = elapsedTime.elapsed();
             }
         } else if(str.startsWith(speedStr))
@@ -163,7 +163,7 @@ QuarqdClient::parseElement(QString &strBuf) // updates QuarqdClient::telemetry
                     telemetry.setWheelRpm(value);
                     lastReadSpeed = elapsedTime.elapsed();
                 }
-                telemetry.setTime(getTimeStamp(str));
+                telemetry.setMsecs(getTimeStamp(str));
             }
         } else if(str.startsWith(heartRateStr))
         {
@@ -176,7 +176,7 @@ QuarqdClient::parseElement(QString &strBuf) // updates QuarqdClient::telemetry
 
             if (ok && mid != "nan" && mid != "inf") {
                 telemetry.setHr(value);
-                telemetry.setTime(getTimeStamp(str));
+                telemetry.setMsecs(getTimeStamp(str));
             }
         } else if(str.startsWith(sensorDropStr) || str.startsWith(sensorStaleStr) || str.startsWith(sensorLostStr))//Try and save
         {
