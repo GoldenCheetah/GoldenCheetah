@@ -30,7 +30,10 @@ class RealtimeData
 public:
 
     // abstract to dataseries
-    enum dataseries { None=0, Time, Watts, Speed, Cadence, HeartRate, Load };
+    enum dataseries { None=0, Time, LapTime, Distance, Lap,
+                      Watts, Speed, Cadence, HeartRate, Load,
+                      XPower, BikeScore, Joules };
+
     typedef enum dataseries DataSeries;
     double value(DataSeries) const;
     static QString seriesName(DataSeries);
@@ -38,6 +41,7 @@ public:
 
     RealtimeData();
     void reset(); // set all values to zero
+
     void setName(char *name);
     void setWatts(double watts);
     void setHr(double hr);
@@ -46,6 +50,13 @@ public:
     void setWheelRpm(double wheelRpm);
     void setCadence(double aCadence);
     void setLoad(double load);
+    void setMsecs(long);
+    void setLapMsecs(long);
+    void setDistance(double);
+    void setBikeScore(long);
+    void setJoules(long);
+    void setXPower(long);
+
     char *getName();
     double getWatts();
     double getHr();
@@ -54,13 +65,27 @@ public:
     double getWheelRpm();
     double getCadence();
     double getLoad();
+    long getMsecs();
+    long getLapMsecs();
+    double getDistance();
+    long getBikeScore();
+    long getJoules();
+    long getXPower();
 
 
 private:
     char name[64];
-    unsigned long time;
+
+    // realtime telemetry
     double hr, watts, speed, wheelRpm, load;
     double cadence;      // in rpm
+
+    // derived data
+    double distance;
+    int lap;
+    long msecs;
+    long lapMsecs;
+    long bikeScore, joules, xPower;
 };
 
 

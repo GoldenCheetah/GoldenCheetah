@@ -279,6 +279,7 @@ class MainWindow : public QMainWindow
         SummaryWindow *summaryWindow;
         DiaryWindow *diaryWindow;
         HomeWindow *homeWindow;
+        TrainWindow *trainWindow;
         AllPlotWindow *allPlotWindow;
         HistogramWindow *histogramWindow;
         WeeklySummaryWindow *weeklySummaryWindow;
@@ -296,9 +297,6 @@ class MainWindow : public QMainWindow
         QSplitter *leftLayout;
         RideMetadata *_rideMetadata;
         QSplitter *summarySplitter;
-
-        // Train
-        TrainWindow   *trainWindow;
 
         //QwtPlotCurve *weeklyBSCurve;
         //QwtPlotCurve *weeklyRICurve;

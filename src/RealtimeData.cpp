@@ -25,7 +25,7 @@ RealtimeData::RealtimeData()
 {
     name[0] = '\0';
     watts = hr = speed = wheelRpm = cadence  = load = 0;
-    time = 0;
+    msecs = lapMsecs = bikeScore = joules = 0;
 }
 
 void RealtimeData::setName(char *name)
@@ -39,10 +39,6 @@ void RealtimeData::setWatts(double watts)
 void RealtimeData::setHr(double hr)
 {
     this->hr = (int)hr;
-}
-void RealtimeData::setTime(long time)
-{
-    this->time = time;
 }
 void RealtimeData::setSpeed(double speed)
 {
@@ -60,6 +56,31 @@ void RealtimeData::setLoad(double load)
 {
     this->load = load;
 }
+void RealtimeData::setMsecs(long x)
+{
+    this->msecs = x;
+}
+void RealtimeData::setLapMsecs(long x)
+{
+    this->lapMsecs = x;
+}
+void RealtimeData::setDistance(double x)
+{
+    this->distance = x;
+}
+void RealtimeData::setJoules(long x)
+{
+    this->joules = x;
+}
+void RealtimeData::setBikeScore(long x)
+{
+    this->bikeScore = x;
+}
+void RealtimeData::setXPower(long x)
+{
+    this->xPower = x;
+}
+
 char *
 RealtimeData::getName()
 {
@@ -73,11 +94,6 @@ double RealtimeData::getHr()
 {
     return hr;
 }
-long RealtimeData::getTime()
-{
-    return time;
-}
-
 double RealtimeData::getSpeed()
 {
     return speed;
@@ -94,12 +110,51 @@ double RealtimeData::getLoad()
 {
     return load;
 }
+long RealtimeData::getMsecs()
+{
+    return msecs;
+}
+long RealtimeData::getLapMsecs()
+{
+    return lapMsecs;
+}
+double RealtimeData::getDistance()
+{
+    return distance;
+}
+long RealtimeData::getJoules()
+{
+    return joules;
+}
+long RealtimeData::getBikeScore()
+{
+    return bikeScore;
+}
+long RealtimeData::getXPower()
+{
+    return xPower;
+}
 
 double RealtimeData::value(DataSeries series) const
 {
     switch (series) {
 
-    case Time: return time;
+    case Time: return msecs;
+        break;
+
+    case LapTime: return lapMsecs;
+        break;
+
+    case Distance: return distance;
+        break;
+
+    case Joules: return joules;
+        break;
+
+    case BikeScore: return bikeScore;
+        break;
+
+    case XPower: return xPower;
         break;
 
     case Watts: return watts;
@@ -135,11 +190,16 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         // better populate it first!
         seriesList << None;
         seriesList << Time;
+        seriesList << LapTime;
+        seriesList << Distance;
         seriesList << Watts;
         seriesList << Speed;
         seriesList << Cadence;
         seriesList << HeartRate;
         seriesList << Load;
+        seriesList << BikeScore;
+        seriesList << XPower;
+        seriesList << Joules;
     }
     return seriesList;
 }
@@ -153,6 +213,21 @@ QString RealtimeData::seriesName(DataSeries series)
         break;
 
     case Time: return tr("Time");
+        break;
+
+    case LapTime: return tr("Lap Time");
+        break;
+
+    case BikeScore: return tr("BikeScore");
+        break;
+
+    case Joules: return tr("Joules");
+        break;
+
+    case XPower: return tr("XPower");
+        break;
+
+    case Distance: return tr("Distance");
         break;
 
     case Watts: return tr("Power");

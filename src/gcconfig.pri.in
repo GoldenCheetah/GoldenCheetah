@@ -92,8 +92,10 @@ D2XX_INCLUDE = /usr/local/include/D2XX
 # will need to use the latest distro (e.g. Meerkat
 # on Ubuntu) to be sure apt-get installs the latest
 # builds (we need 1.1.6 or higher).
-#
+# e.g. LINUX
 #VLC_INSTALL = /usr/include/vlc/
+# e.g. WINDOWS
+#VLC_INSTALL = /c/GC/vlc-1.1.8/sdk
 
 # We recommend a debug build for development, and a static build for releases.
 CONFIG += debug

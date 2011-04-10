@@ -92,10 +92,16 @@ qwt3d {
 # are we supporting video playback?
 !isEmpty( VLC_INSTALL ) {
     INCLUDEPATH += $${VLC_INSTALL}/include
-    LIBS += -lvlc
     DEFINES += GC_HAVE_VLC
     HEADERS += VideoWindow.h
     SOURCES += VideoWindow.cpp
+
+    win32 {
+    	LIBS += $${VLC_INSTALL}/lib/libvlc.dll.a
+    	LIBS += $${VLC_INSTALL}/lib/libvlccore.dll.a
+    } else {
+    	LIBS += -lvlc
+    }
 }
 
 macx {

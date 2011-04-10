@@ -55,6 +55,9 @@ DialWindow::DialWindow(MainWindow *mainWindow) :
 
     // setup fontsize etc
     resizeEvent(NULL);
+
+    // set to zero
+    telemetryUpdate(RealtimeData());
 }
 
 void
@@ -85,15 +88,38 @@ void
 DialWindow::telemetryUpdate(RealtimeData rtData)
 {
     // we got some!
-    RealtimeData::DataSeries series = static_cast<RealtimeData::DataSeries>(seriesSelector->itemData(seriesSelector->currentIndex()).toInt());
+    RealtimeData::DataSeries series = static_cast<RealtimeData::DataSeries>
+                  (seriesSelector->itemData(seriesSelector->currentIndex()).toInt());
+
     double value = rtData.value(series);
-    valueLabel->setText(QString("%1").arg(round(value)));
+
+    switch (series) {
+
+    case RealtimeData::Time:
+    case RealtimeData::LapTime:
+        {
+        long msecs = value;
+        valueLabel->setText(QString("%1:%2:%3.%4").arg(msecs/3600000)
+                                               .arg((msecs%3600000)/60000,2,10,QLatin1Char('0'))
+                                               .arg((msecs%60000)/1000,2,10,QLatin1Char('0'))
+                                               .arg((msecs%1000)/100));
+        }
+        break;
+
+    default:
+        valueLabel->setText(QString("%1").arg(round(value)));
+        break;
+
+    }
 }
 
 void DialWindow::resizeEvent(QResizeEvent * )
 {
+
+   if (geometry().height()-37 < 0) return;
+
    QFont font;
-   font.setPointSize(geometry().height()/2);
+   font.setPointSize((geometry().height()-37));
    font.setWeight(QFont::Bold);
    valueLabel->setFont(font);
 }

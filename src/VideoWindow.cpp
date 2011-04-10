@@ -32,7 +32,7 @@ GcWindow(parent), home(home), main(parent)
                     "-I", "dummy", /* Don't use any interface */
                     "--ignore-config", /* Don't use VLC's config */
                     "--extraintf=logger", //log anything
-                    "--verbose=2" // -1 = no output at all
+                    "--verbose=-1" // -1 = no output at all
                 };
 
     /* create an exception handler */
@@ -66,13 +66,14 @@ GcWindow(parent), home(home), main(parent)
      x11Container = new QX11EmbedContainer(this);
      layout->addWidget(x11Container);
      libvlc_media_player_set_xwindow (mp, x11Container->winId());
-    //vlc_exceptions(&exceptions);
+#endif
+#ifdef WIN32
+     container = new QWidget(this);
+     layout->addWidget(container);
+     libvlc_media_player_set_hwnd (mp, container->winId());
 #endif
 
-#if 0 // XXX what abut windows and mac!!!
-    /* or on windows */
-     libvlc_media_player_set_hwnd (mp, hwnd);
-    /* or on mac os */
+#if 0 // XXX what abut mac!!!
      libvlc_media_player_set_nsobject (mp, view);
 #endif
 
@@ -82,8 +83,10 @@ GcWindow(parent), home(home), main(parent)
 
 VideoWindow::~VideoWindow()
 {
+#ifdef Q_OS_LINUX
     // unembed vlc backend first
     x11Container->discardClient();
+#endif
 
     // stop playback & wipe player
     libvlc_media_player_stop (mp);
@@ -95,9 +98,5 @@ VideoWindow::~VideoWindow()
 
 void VideoWindow::resizeEvent(QResizeEvent * )
 {
-#if 0
-    if (isVisible()) {
-        x11Container->show();
-    }
-#endif
+    // do nothing .. for now
 }
