@@ -308,7 +308,9 @@ struct BinFileReaderState
                             deviceInfo += QString("Resistance Unit Id %1\n").arg(value);
                         break;
                     case FORMAT_ID__WORKOUT_ID :
-                        rideFile->setTag("Workout Code", QString(value));
+                        // Commented out since value is numeric and in no way
+                        // represents a Workout Code.
+                        //rideFile->setTag("Workout Code", QString(value));
                         break;
                     case FORMAT_ID__USER_WEIGHT :
                         unused_format_identifiers_for_record_types[def.format_identifier].insert(field.id);

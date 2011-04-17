@@ -893,8 +893,15 @@ MainWindow::removeCurrentRide()
     }
 
     // notify AFTER deleted!
+    item->freeMemory();
     rideDeleted(item);
     delete item;
+
+    // any left?
+    if (allRides->childCount() == 0) {
+        ride = NULL;
+        rideTreeWidgetSelectionChanged(); // notifies children
+    }
 
     // added djconnel: remove old cpi file, then update bests which are associated with the file
     criticalPowerWindow->deleteCpiFile(strOldFileName);

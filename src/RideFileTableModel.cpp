@@ -57,6 +57,9 @@ RideFileTableModel::deleted()
 {
     // we don't need to disconnect since they're free'd up by QT
     ride = NULL;
+    beginResetModel();
+    endResetModel();
+    dataChanged(createIndex(0,0), createIndex(90,999999));
 }
 
 void
@@ -274,7 +277,8 @@ void
 RideFileTableModel::forceRedraw()
 {
     // tell the view to redraw everything
-    dataChanged(createIndex(0,0), createIndex(headingsType.count(), ride->dataPoints().count()));
+    if (ride)
+        dataChanged(createIndex(0,0), createIndex(headingsType.count(), ride->dataPoints().count()));
 }
 
 //
