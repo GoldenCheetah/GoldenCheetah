@@ -893,6 +893,7 @@ MainWindow::removeCurrentRide()
     }
 
     // notify AFTER deleted!
+    item->freeMemory();
     rideDeleted(item);
     delete item;
 
