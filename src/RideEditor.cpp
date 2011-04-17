@@ -281,11 +281,11 @@ RideEditor::find()
     // look for a value in a range and allow user to next/previous across
     //RideEditorFindDialog finder(this, table);
     //finder.exec();
-    FindDialog *finder = new FindDialog(this);
+    //FindDialog *finder = new FindDialog(this);
 
     // clear when a new ride is selected
-    connect(main, SIGNAL(rideSelected()), finder, SLOT(clear()));
-    finder->show();
+    //connect(main, SIGNAL(rideSelected()), finder, SLOT(clear()));
+    //finder->show();
 }
 
 void
@@ -1084,6 +1084,11 @@ RideEditor::rideSelected()
     RideItem *current = myRideItem;
     if (!current || !current->ride()) {
         model->setRide(NULL);
+        if (data) {
+            delete data;
+            data = NULL;
+        }
+        findTool->rideSelected();
         return;
     }
 
@@ -1605,6 +1610,8 @@ FindDialog::typeChanged(int index)
 void
 FindDialog::find()
 {
+    if (rideEditor->data == NULL) return;
+
     // are we looking anywhere?
     bool search = false;
     foreach (QCheckBox *c, channels) if (c->isChecked()) search = true;
@@ -1746,10 +1753,11 @@ FindDialog::dataChanged()
 void
 FindDialog::clear()
 {
-    rideEditor->data->found.clear();
-    clearResultsTable();
-    rideEditor->model->forceRedraw();
-
+    if (rideEditor->data) {
+        rideEditor->data->found.clear();
+        clearResultsTable();
+        rideEditor->model->forceRedraw();
+    }
 }
 
 void

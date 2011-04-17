@@ -728,7 +728,10 @@ PowerHist::recalc()
         // zone scale draw
         if (selected == wattsZone && rideItem && rideItem->zones) {
             setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(rideItem->zones, rideItem->zoneRange()));
-            setAxisScale(QwtPlot::xBottom, -0.99, rideItem->zones->numZones(rideItem->zoneRange()), 1);
+            if (rideItem->zoneRange() >= 0)
+                setAxisScale(QwtPlot::xBottom, -0.99, rideItem->zones->numZones(rideItem->zoneRange()), 1);
+            else
+                setAxisScale(QwtPlot::xBottom, -0.99, 0, 1);
         }
 
         // hr scale draw
@@ -736,7 +739,11 @@ PowerHist::recalc()
         if (selected == hrZone && rideItem && mainWindow->hrZones() &&
             (hrRange=mainWindow->hrZones()->whichRange(rideItem->dateTime.date())) != -1) {
             setAxisScaleDraw(QwtPlot::xBottom, new HrZoneScaleDraw(mainWindow->hrZones(), hrRange));
-            setAxisScale(QwtPlot::xBottom, -0.99, mainWindow->hrZones()->numZones(hrRange), 1);
+
+            if (hrRange >= 0)
+                setAxisScale(QwtPlot::xBottom, -0.99, mainWindow->hrZones()->numZones(hrRange), 1);
+            else
+                setAxisScale(QwtPlot::xBottom, -0.99, 0, 1);
         }
 
         setAxisMaxMinor(QwtPlot::xBottom, 0);
