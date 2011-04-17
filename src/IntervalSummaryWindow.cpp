@@ -34,6 +34,9 @@ IntervalSummaryWindow::~IntervalSummaryWindow() {
 
 void IntervalSummaryWindow::intervalSelected()
 {
+    // if no ride available don't bother
+    if (mainWindow->currentRideItem() == NULL || mainWindow->currentRide() == NULL) return;
+
 	QString html;
     if (mainWindow->allIntervalItems() != NULL) {
         for (int i=0; i<mainWindow->allIntervalItems()->childCount(); i++) {
