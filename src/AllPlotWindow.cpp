@@ -519,8 +519,18 @@ AllPlotWindow::rideSelected()
 
     // setup the charts to reflect current ride selection
     fullPlot->setDataFromRide(ride);
-    allPlot->setDataFromPlot(fullPlot, ride->ride()->timeIndex(spanSlider->lowerValue()),
-                                ride->ride()->timeIndex(spanSlider->upperValue()));
+
+
+    // Fixup supplied by Josef Gebel
+    int startidx, stopidx;
+    if ( fullPlot->bydist == true ) {
+        startidx = ride->ride()->distanceIndex( ( double ) spanSlider->lowerValue() / 1000.0 );
+        stopidx = ride->ride()->distanceIndex( ( double ) spanSlider->upperValue() / 1000.0 );
+    } else {
+        startidx = ride->ride()->timeIndex( spanSlider->lowerValue() );
+        stopidx = ride->ride()->timeIndex( spanSlider->upperValue() );
+    }
+    allPlot->setDataFromPlot( fullPlot, startidx, stopidx );
 
     // redraw all the plots, they will check
     // to see if they are currently visible
