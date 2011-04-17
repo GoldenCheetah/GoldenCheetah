@@ -277,7 +277,8 @@ void
 RideFileTableModel::forceRedraw()
 {
     // tell the view to redraw everything
-    dataChanged(createIndex(0,0), createIndex(headingsType.count(), ride->dataPoints().count()));
+    if (ride)
+        dataChanged(createIndex(0,0), createIndex(headingsType.count(), ride->dataPoints().count()));
 }
 
 //
