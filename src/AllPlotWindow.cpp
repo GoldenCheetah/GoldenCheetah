@@ -494,6 +494,8 @@ AllPlotWindow::rideSelected()
 {
     RideItem *ride = myRideItem;
 
+    if (ride == NULL) current = NULL;
+
     // ignore if not active
     if (!amVisible()) {
         stale = true;
@@ -501,7 +503,10 @@ AllPlotWindow::rideSelected()
     }
 
     // ignore if null, or manual / empty
-    if (!ride || !ride->ride() || !ride->ride()->dataPoints().count()) return;
+    if (!ride || !ride->ride() || !ride->ride()->dataPoints().count()) {
+        current = NULL;
+        return;
+    }
 
     // we already plotted it!
     if (ride == current && stale == false) return;
@@ -1005,6 +1010,8 @@ AllPlotWindow::hideSelection()
 void
 AllPlotWindow::setShowPower(int value)
 {
+    if (!current) return;
+
     // we only show the power shading on the
     // allPlot / stack plots, not on the fullPlot
     allPlot->showPower(value);
@@ -1027,6 +1034,8 @@ AllPlotWindow::setShowPower(int value)
 void
 AllPlotWindow::setShowHr(int value)
 {
+    if (!current) return;
+
     allPlot->showHr(value);
     foreach (AllPlot *plot, allPlots)
         plot->showHr(value);
@@ -1035,6 +1044,8 @@ AllPlotWindow::setShowHr(int value)
 void
 AllPlotWindow::setShowSpeed(int value)
 {
+    if (!current) return;
+
     allPlot->showSpeed(value);
     foreach (AllPlot *plot, allPlots)
         plot->showSpeed(value);
@@ -1043,6 +1054,8 @@ AllPlotWindow::setShowSpeed(int value)
 void
 AllPlotWindow::setShowCad(int value)
 {
+    if (!current) return;
+
     allPlot->showCad(value);
     foreach (AllPlot *plot, allPlots)
         plot->showCad(value);
@@ -1051,6 +1064,8 @@ AllPlotWindow::setShowCad(int value)
 void
 AllPlotWindow::setShowAlt(int value)
 {
+    if (!current) return;
+
     allPlot->showAlt(value);
     foreach (AllPlot *plot, allPlots)
         plot->showAlt(value);
@@ -1059,6 +1074,8 @@ AllPlotWindow::setShowAlt(int value)
 void
 AllPlotWindow::setShowGrid(int value)
 {
+    if (!current) return;
+
     allPlot->showGrid(value);
     foreach (AllPlot *plot, allPlots)
         plot->showGrid(value);
@@ -1067,6 +1084,8 @@ AllPlotWindow::setShowGrid(int value)
 void
 AllPlotWindow::setByDistance(int value)
 {
+    if (!current) return;
+
     fullPlot->setByDistance(value);
     allPlot->setByDistance(value);
 
@@ -1082,6 +1101,8 @@ AllPlotWindow::setByDistance(int value)
 void
 AllPlotWindow::setSmoothing(int value)
 {
+    if (!current) return;
+
     // recalculate etc
     fullPlot->setSmoothing(value);
 
@@ -1097,6 +1118,8 @@ AllPlotWindow::setSmoothing(int value)
 void
 AllPlotWindow::resetStackedDatas()
 {
+    if (!current) return;
+
     int _stackWidth = stackWidth;
     if (allPlot->bydist)
         _stackWidth = stackWidth/3;
@@ -1164,6 +1187,8 @@ AllPlotWindow::setStackZoomUp()
 void
 AllPlotWindow::setStackZoomDown()
 {
+    if (!current) return;
+
     if (stackWidth>4) {
 
         stackWidth = floor(stackWidth / 1.25);
