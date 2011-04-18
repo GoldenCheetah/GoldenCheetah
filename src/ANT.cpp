@@ -183,7 +183,7 @@ void ANT::run()
         // read more bytes from the device
         uint8_t byte;
         if (rawRead(&byte, 1) > 0) receiveByte((unsigned char)byte);
-        //else msleep(5);
+        else msleep(1);
 
         //----------------------------------------------------------------------
         // LISTEN TO CONTROLLER FOR COMMANDS
