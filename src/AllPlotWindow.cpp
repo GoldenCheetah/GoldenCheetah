@@ -275,7 +275,8 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     fullPlot = new AllPlot(this, mainWindow);
     fullPlot->setInstanceName("fullPlot");
     fullPlot->grid->enableY(false);
-    fullPlot->setCanvasBackground(GColor(CPLOTTHUMBNAIL));
+    QPalette def;
+    fullPlot->setCanvasBackground(def.color(QPalette::Window));
     fullPlot->setCanvasLineWidth(0);
     fullPlot->enableAxis(QwtPlot::yLeft, false);
     fullPlot->enableAxis(QwtPlot::yLeft2, false);
