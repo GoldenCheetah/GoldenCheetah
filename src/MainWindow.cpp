@@ -188,12 +188,13 @@ MainWindow::MainWindow(const QDir &home) :
         setGeometry(geom.toRect());
 
     toolbar = new QToolBar(this);
-    toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    //toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     toolbar->setFloatable(false);
     toolbar->setIconSize(QSize(32,32));
 #ifndef Q_OS_MAC
-    toolbar->setAutoFillBackground(false);
-    toolbar->setStyleSheet("background-image: url(\":/images/aluLight.jpg\"); border: 0px;");
+    //toolbar->setAutoFillBackground(false);
+    //toolbar->setStyleSheet("background-image: url(\":/images/aluLight.jpg\"); border: 0px;");
     toolbar->setContentsMargins(0,0,0,0);
 #else
     QIcon tickIcon(":images/toolbar/main/tick.png");

@@ -149,6 +149,7 @@ GcWindow::paintEvent(QPaintEvent *event)
     static QPixmap aluBarDark = QPixmap(":images/aluBarDark.png");
     static QPixmap aluLight = QPixmap(":images/aluLight.jpg");
     static QPixmap carbon = QPixmap(":images/carbon.jpg");
+    static QPalette defaultPalette;
 
     if (contentsMargins().top() > 0) {
         // draw a rectangle in the contents margins
@@ -159,7 +160,8 @@ GcWindow::paintEvent(QPaintEvent *event)
 
         // background light gray for now?
         QRect all(0,0,width(),height());
-        painter.drawTiledPixmap(all, aluLight);
+        //painter.drawTiledPixmap(all, aluLight);
+        painter.fillRect(all, defaultPalette.color(QPalette::Window));
 
         // fill in the title bar
         QRect bar(0,0,width(),contentsMargins().top());
@@ -201,7 +203,7 @@ GcWindow::paintEvent(QPaintEvent *event)
         if (property("isManager").toBool() == true) {
             painter.drawTiledPixmap(all, carbon);
         } else {
-            painter.drawTiledPixmap(all, aluLight);
+            //painter.drawTiledPixmap(all, aluLight);
         }
     }
 }
