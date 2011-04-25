@@ -122,6 +122,16 @@ void MetricAggregator::refreshMetrics()
 
         RideFile *ride = NULL;
 
+        // update progress bar
+        long elapsedtime = elapsed.elapsed();
+        QString elapsedString = QString("%1:%2:%3").arg(elapsedtime/3600000,2)
+                                                .arg((elapsedtime%3600000)/60000,2,10,QLatin1Char('0'))
+                                                .arg((elapsedtime%60000)/1000,2,10,QLatin1Char('0'));
+        QString title = tr("Refreshing Ride Statistics...\nElapsed: %1\n%2").arg(elapsedString).arg(name);
+        bar.setLabelText(title);
+        bar.setValue(++processed);
+        QApplication::processEvents();
+
         if (dbTimeStamp < QFileInfo(file).lastModified().toTime_t() ||
             zoneFingerPrint != fingerprint) {
 
@@ -149,16 +159,6 @@ void MetricAggregator::refreshMetrics()
 
         // free memory - if needed
         if (ride) delete ride;
-
-        // update progress bar
-        long elapsedtime = elapsed.elapsed();
-        QString elapsedString = QString("%1:%2:%3").arg(elapsedtime/3600000,2)
-                                                .arg((elapsedtime%3600000)/60000,2,10,QLatin1Char('0'))
-                                                .arg((elapsedtime%60000)/1000,2,10,QLatin1Char('0'));
-        QString title = tr("Refreshing Ride Statistics...\nElapsed: %1").arg(elapsedString);
-        bar.setLabelText(title);
-        bar.setValue(++processed);
-        QApplication::processEvents();
 
         if (bar.wasCanceled()) {
             out << "METRIC REFRESH CANCELLED\r\n";
