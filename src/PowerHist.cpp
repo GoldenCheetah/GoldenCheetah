@@ -21,6 +21,7 @@
 #include "RideItem.h"
 #include "IntervalItem.h"
 #include "RideFile.h"
+#include "RideFileCache.h"
 #include "Settings.h"
 #include "Zones.h"
 #include "HrZones.h"
@@ -770,6 +771,8 @@ PowerHist::setData(RideItem *_rideItem)
     if (!rideItem) return;
 
     RideFile *ride = rideItem->ride();
+
+    RideFileCache updater(mainWindow, mainWindow->home.absolutePath() + "/" + rideItem->fileName, ride);
 
     bool hasData = (selected == watts && ride->areDataPresent()->watts) ||
                    (selected == nm && ride->areDataPresent()->nm) ||
