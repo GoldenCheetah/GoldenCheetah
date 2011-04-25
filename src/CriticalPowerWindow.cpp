@@ -73,16 +73,15 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
     cl->addLayout(cpintPickerLayout);
 
     // tools /properties
+    seriesCombo = new QComboBox(this);
+    addSeries();
     cComboSeason = new QComboBox(this);
     addSeasons();
     cpintSetCPButton = new QPushButton(tr("&Save CP value"), this);
     cpintSetCPButton->setEnabled(false);
     cl->addWidget(cpintSetCPButton);
     cl->addWidget(cComboSeason);
-    yAxisCombo = new QComboBox(this);
-    yAxisCombo->addItem(tr("Y Axis Shows Power"));
-    yAxisCombo->addItem(tr("Y Axis Shows Energy"));
-    cl->addWidget(yAxisCombo);
+    cl->addWidget(seriesCombo);
     cl->addStretch();
 
     picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
@@ -91,16 +90,11 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
                                QwtPicker::AlwaysOff, cpintPlot->canvas());
     picker->setRubberBandPen(GColor(CPLOTTRACKER));
 
-    connect(picker, SIGNAL(moved(const QPoint &)),
-            SLOT(pickerMoved(const QPoint &)));
-    connect(cpintTimeValue, SIGNAL(editingFinished()),
-      this, SLOT(cpintTimeValueEntered()));
-    connect(cpintSetCPButton, SIGNAL(clicked()),
-	    this, SLOT(cpintSetCPButtonClicked()));
-    connect(cComboSeason, SIGNAL(currentIndexChanged(int)),
-    this, SLOT(seasonSelected(int)));
-    connect(yAxisCombo, SIGNAL(currentIndexChanged(int)),
-            this, SLOT(setEnergyMode(int)));
+    connect(picker, SIGNAL(moved(const QPoint &)), SLOT(pickerMoved(const QPoint &)));
+    connect(cpintTimeValue, SIGNAL(editingFinished()), this, SLOT(cpintTimeValueEntered()));
+    connect(cpintSetCPButton, SIGNAL(clicked()), this, SLOT(cpintSetCPButtonClicked()));
+    connect(cComboSeason, SIGNAL(currentIndexChanged(int)), this, SLOT(seasonSelected(int)));
+    connect(seriesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setSeries(int)));
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(configChanged()), cpintPlot, SLOT(configChanged()));
@@ -112,14 +106,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
 void
 CriticalPowerWindow::newRideAdded()
 {
-    cpintPlot->needToScanRides = true;
-}
-
-void
-CriticalPowerWindow::deleteCpiFile(QString rideFilename)
-{
-    cpintPlot->deleteCpiFile(home.absolutePath() + "/" +
-                             ride_filename_to_cpi_filename(rideFilename));
+    // XXX
 }
 
 void
@@ -138,10 +125,12 @@ CriticalPowerWindow::rideSelected()
 }
 
 void
-CriticalPowerWindow::setEnergyMode(int index)
+CriticalPowerWindow::setSeries(int index)
 {
-    cpintPlot->setEnergyMode(index != 0);
-    cpintPlot->calculate(currentRide);
+    if (index >= 0) {
+        cpintPlot->setSeries(static_cast<RideFile::SeriesType>(seriesCombo->itemData(index).toInt()));
+        cpintPlot->calculate(currentRide);
+    }
 }
 
 void
@@ -187,12 +176,43 @@ curve_to_point(double x, const QwtPlotCurve *curve)
 void
 CriticalPowerWindow::updateCpint(double minutes)
 {
+    QString units;
+
+    switch (series()) {
+
+        case RideFile::none:
+            units = "kJ";
+            break;
+
+        case RideFile::cad:
+            units = "rpm";
+            break;
+
+        case RideFile::kph:
+            units = "kph";
+            break;
+
+        case RideFile::hr:
+            units = "bpm";
+            break;
+
+        case RideFile::nm:
+            units = "nm";
+            break;
+
+        default:
+        case RideFile::watts:
+            units = "Watts";
+            break;
+
+    }
+
     // current ride
     {
-      unsigned watts = curve_to_point(minutes, cpintPlot->getThisCurve());
+      unsigned value = curve_to_point(minutes, cpintPlot->getThisCurve());
       QString label;
-      if (watts > 0)
-        label = QString(cpintPlot->energyMode() ? "%1 kJ" : "%1 watts").arg(watts);
+      if (value > 0)
+        label = QString("%1 %2").arg(value).arg(units);
       else
 	      label = tr("no data");
       cpintTodayValue->setText(label);
@@ -200,10 +220,10 @@ CriticalPowerWindow::updateCpint(double minutes)
 
     // cp line
     if (cpintPlot->getCPCurve()) {
-      unsigned watts = curve_to_point(minutes, cpintPlot->getCPCurve());
+      unsigned value = curve_to_point(minutes, cpintPlot->getCPCurve());
       QString label;
-      if (watts > 0)
-        label = QString(cpintPlot->energyMode() ? "%1 kJ" : "%1 watts").arg(watts);
+      if (value > 0)
+        label = QString("%1 %2").arg(value).arg(units);
       else
         label = tr("no data");
       cpintCPValue->setText(label);
@@ -213,14 +233,14 @@ CriticalPowerWindow::updateCpint(double minutes)
     {
       QString label;
       int index = (int) ceil(minutes * 60);
-      if (cpintPlot->getBests().count() > index) {
+      if (index >= 0 && cpintPlot->getBests().count() > index) {
           QDate date = cpintPlot->getBestDates()[index];
-          unsigned watts = cpintPlot->getBests()[index];
-          if (cpintPlot->energyMode())
+          unsigned value = cpintPlot->getBests()[index];
+#if 0
               label = QString("%1 kJ (%2)").arg(watts * minutes * 60.0 / 1000.0, 0, 'f', 0);
-          else
-              label = QString("%1 watts (%2)").arg(watts);
-          label = label.arg(date.isValid() ? date.toString(tr("MM/dd/yyyy")) : tr("no date"));
+#endif
+              label = QString("%1 %2 (%3)").arg(value).arg(units)
+                      .arg(date.isValid() ? date.toString(tr("MM/dd/yyyy")) : tr("no date"));
       }
       else {
         label = tr("no data");
@@ -242,6 +262,27 @@ CriticalPowerWindow::pickerMoved(const QPoint &pos)
     double minutes = cpintPlot->invTransform(QwtPlot::xBottom, pos.x());
     cpintTimeValue->setText(interval_to_str(60.0*minutes));
     updateCpint(minutes);
+}
+void CriticalPowerWindow::addSeries()
+{
+    // setup series list
+    seriesList << RideFile::watts
+#if 0 // need to work out the best algorithm
+               << RideFile::xPower
+               << RideFile::NP
+#endif
+               << RideFile::hr
+               << RideFile::kph
+               << RideFile::cad
+               << RideFile::nm
+               << RideFile::none; // XXX actually this shows energy (hack)
+
+    foreach (RideFile::SeriesType x, seriesList) {
+        if (x==RideFile::none)
+            seriesCombo->addItem(tr("Energy"), static_cast<int>(x));
+        else
+            seriesCombo->addItem(RideFile::seriesName(x), static_cast<int>(x));
+    }
 }
 
 void CriticalPowerWindow::addSeasons()

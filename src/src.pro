@@ -249,6 +249,7 @@ HEADERS += \
         RideCalendar.h \
         RideEditor.h \
         RideFile.h \
+        RideFileCache.h \
         RideFileCommand.h \
         RideFileTableModel.h \
         RideImportWizard.h \
@@ -406,6 +407,7 @@ SOURCES += \
         RideCalendar.cpp \
         RideEditor.cpp \
         RideFile.cpp \
+        RideFileCache.cpp \
         RideFileCommand.cpp \
         RideFileTableModel.cpp \
         RideImportWizard.cpp \
