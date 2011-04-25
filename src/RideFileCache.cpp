@@ -382,7 +382,7 @@ MeanMaxComputer::run()
 
     // now we have downsampled lets find bests for every 20s
     // starting at 6mins
-    for (int slice = 360; slice < (downsampled.size() * samplerate); slice += 20) {
+    for (int slice = 360; slice < ride_bests.size(); slice += 20) {
 
         QVector<double> sums(downsampled.size());
         int windowsize = slice / samplerate;
