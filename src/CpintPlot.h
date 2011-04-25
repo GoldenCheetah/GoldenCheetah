@@ -20,6 +20,8 @@
 #define _GC_CpintPlot_h 1
 #include "GoldenCheetah.h"
 
+#include "RideFileCache.h"
+
 #include <qwt_plot.h>
 #include <QtGui>
 
@@ -30,8 +32,6 @@ class RideItem;
 class Zones;
 class MainWindow;
 
-QString ride_filename_to_cpi_filename(const QString filename);
-
 class CpintPlot : public QwtPlot
 {
     Q_OBJECT
@@ -41,20 +41,18 @@ class CpintPlot : public QwtPlot
     public:
 
         CpintPlot(MainWindow *, QString path, const Zones *zones);
-        bool needToScanRides;
 
         const QwtPlotCurve *getThisCurve() const { return thisCurve; }
         const QwtPlotCurve *getCPCurve() const { return CPCurve; }
 
-        QVector<QDate> getBestDates() { return bestDates; }
-        QVector<double> getBests() { return bests; }
         double cp, tau, t0; // CP model parameters
         void deriveCPParameters();
-        bool deleteCpiFile(QString filename);
         void changeSeason(const QDate &start, const QDate &end);
-        void setEnergyMode(bool value);
-        bool energyMode() const { return energyMode_; }
         void setAxisTitle(int axis, QString label);
+        void setSeries(RideFile::SeriesType);
+
+        QVector<double> getBests() { return bests->meanMaxArray(series); }
+        QVector<QDate> getBestDates() { return bests->meanMaxDates(series); }
 
     public slots:
 
@@ -70,19 +68,18 @@ class CpintPlot : public QwtPlot
         QwtPlotCurve *thisCurve;
         QwtPlotCurve *CPCurve;
         QList<QwtPlotCurve*> allCurves;
+        QwtPlotCurve *allCurve; // bests but not zoned
         QList<QwtPlotMarker*> allZoneLabels;
         void clear_CP_Curves();
         QStringList filterForSeason(QStringList cpints, QDate startDate, QDate endDate);
         QwtPlotGrid *grid;
-        QVector<double> bests;
-        QVector<QDate> bestDates;
         QDate startDate;
         QDate endDate;
         const Zones *zones;
-        // keys are CPI files contributing to bests (at least originally)
-        QHash<QString,bool> cpiDataInBests;
-        bool energyMode_;
+        RideFile::SeriesType series;
         MainWindow *mainWindow;
+
+        RideFileCache *current, *bests;
 };
 
 #endif // _GC_CpintPlot_h

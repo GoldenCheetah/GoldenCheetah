@@ -444,7 +444,7 @@ MainWindow::MainWindow(const QDir &home) :
     ////////////////////// Critical Power Plot Tab //////////////////////
 
     criticalPowerWindow = new CriticalPowerWindow(home, this);
-    tabs.append(TabInfo(criticalPowerWindow, tr("Critical Power")));
+    tabs.append(TabInfo(criticalPowerWindow, tr("Critical Durations")));
 
     //////////////////////// Power Histogram Tab ////////////////////////
 
@@ -905,7 +905,7 @@ MainWindow::removeCurrentRide()
     }
 
     // added djconnel: remove old cpi file, then update bests which are associated with the file
-    criticalPowerWindow->deleteCpiFile(strOldFileName);
+    //XXX need to clean up in metricaggregator criticalPowerWindow->deleteCpiFile(strOldFileName);
 
     treeWidget->setCurrentItem(itemToSelect);
     rideTreeWidgetSelectionChanged();

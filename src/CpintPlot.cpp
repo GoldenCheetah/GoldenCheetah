@@ -41,13 +41,15 @@
 #define USE_T0_IN_CP_MODEL 0 // added djconnel 08Apr2009: allow 3-parameter CP model
 
 CpintPlot::CpintPlot(MainWindow *main, QString p, const Zones *zones) :
-    needToScanRides(true),
     path(p),
     thisCurve(NULL),
     CPCurve(NULL),
+    allCurve(NULL),
     zones(zones),
+    series(RideFile::watts),
     mainWindow(main),
-    energyMode_(false)
+    current(NULL),
+    bests(NULL)
 {
     setInstanceName("CP Plot");
     assert(!USE_T0_IN_CP_MODEL); // doesn't work with energyMode=true
@@ -90,229 +92,73 @@ CpintPlot::setAxisTitle(int axis, QString label)
     QwtPlot::setAxisTitle(axis, title);
 }
 
-struct cpi_file_info {
-    QString file, inname, outname;
-};
-
-QString
-ride_filename_to_cpi_filename(const QString filename)
-{
-    return (QFileInfo(filename).completeBaseName() + ".cpi");
-}
-
-static void
-cpi_files_to_update(const QDir &dir, QList<cpi_file_info> &result)
-{
-    QStringList filenames = RideFileFactory::instance().listRideFiles(dir);
-    foreach (const QString &filename, filenames) {
-        if (RideFileFactory::instance().rideFileRegExp().exactMatch(filename)) {
-            QString inname = dir.absoluteFilePath(filename);
-            QString outname =
-                dir.absoluteFilePath(ride_filename_to_cpi_filename(filename));
-            QFileInfo ifi(inname), ofi(outname);
-            if (!ofi.exists() || (ofi.lastModified() < ifi.lastModified())) {
-                cpi_file_info info;
-                info.file = filename;
-                info.inname = inname;
-                info.outname = outname;
-                result.append(info);
-            }
-        }
-    }
-}
-
-struct cpint_point
-{
-    double secs;
-    int watts;
-    cpint_point() : secs(0.0), watts(0) {}
-    cpint_point(double s, int w) : secs(s), watts(w) {}
-};
-
-struct cpint_data {
-    QStringList errors;
-    QVector<cpint_point> points;
-    int rec_int_ms;
-    cpint_data() : rec_int_ms(0) {}
-};
-
-static void
-update_cpi_file(MainWindow *mainWindow, const cpi_file_info *info, QProgressDialog *progress,
-                double &progress_sum, double progress_max)
-{
-    QFile file(info->inname);
-    QStringList errors;
-    boost::scoped_ptr<RideFile> rideFile(
-        RideFileFactory::instance().openRideFile(mainWindow, file, errors));
-    if (!rideFile || rideFile->dataPoints().isEmpty())
-        return;
-    cpint_data data;
-    data.rec_int_ms = (int) round(rideFile->recIntSecs() * 1000.0);
-    foreach (const RideFilePoint *p, rideFile->dataPoints()) {
-        double secs = round(p->secs * 1000.0) / 1000;
-        if (secs > 0)
-            data.points.append(cpint_point(secs, (int) round(p->watts)));
-    }
-
-    FILE *out = fopen(info->outname.toAscii().constData(), "w");
-    assert(out);
-
-    int total_secs = (int) ceil(data.points.back().secs);
-
-    // don't allow data more than one week
-    #define SECONDS_PER_WEEK 7 * 24 * 60 * 60
-    if (total_secs > SECONDS_PER_WEEK) {
-        fclose(out);
-        return;
-    }
-
-    QVector <double> ride_bests(total_secs + 1);
-    bool canceled = false;
-    int progress_count = 0;
-    for (int i = 0; i < data.points.size() - 1; ++i) {
-        cpint_point *p = &data.points[i];
-        double sum = 0.0;
-        double prev_secs = p->secs;
-        for (int j = i + 1; j < data.points.size(); ++j) {
-            cpint_point *q = &data.points[j];
-            if (++progress_count % 1000 == 0) {
-                double x = (progress_count + progress_sum)
-                    / progress_max * 1000.0;
-                // Use min() just in case math is wrong...
-                int n = qMin((int) round(x), 1000);
-                progress->setValue(n);
-                QCoreApplication::processEvents();
-                if (progress->wasCanceled()) {
-                    canceled = true;
-                    goto done;
-                }
-            }
-            sum += data.rec_int_ms / 1000.0 * q->watts;
-            double dur_secs = q->secs - p->secs;
-            double avg = sum / dur_secs;
-            int dur_secs_top = (int) floor(dur_secs);
-            int dur_secs_bot =
-                qMax((int) floor(dur_secs - data.rec_int_ms / 1000.0), 0);
-            for (int k = dur_secs_top; k > dur_secs_bot; --k) {
-                if (ride_bests[k] < avg)
-                    ride_bests[k] = avg;
-            }
-            prev_secs = q->secs;
-        }
-    }
-
-    // avoid decreasing work with increasing duration
-    {
-        double maxwork = 0.0;
-        for (int i = 1; i <= total_secs; ++i) {
-            // note index is being used here in lieu of time, as the index
-            // is assumed to be proportional to time
-            double work = ride_bests[i] * i;
-            if (maxwork > work)
-                ride_bests[i] = round(maxwork / i);
-            else
-                maxwork = work;
-            if (ride_bests[i] != 0)
-                fprintf(out, "%6.3f %3.0f\n", i / 60.0, round(ride_bests[i]));
-        }
-    }
-
-done:
-    fclose(out);
-    if (canceled)
-        unlink(info->outname.toAscii().constData());
-    progress_sum += progress_count;
-}
-
-static QDate
-cpi_filename_to_date(const QString filename) {
-    QRegExp rx("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_\\d\\d_\\d\\d_\\d\\d\\.cpi$");
-    if (rx.exactMatch(filename)) {
-        assert(rx.numCaptures() == 3);
-        QDate date(rx.cap(1).toInt(), rx.cap(2).toInt(), rx.cap(3).toInt());
-        if (date.isValid())
-            return date;
-    }
-    return QDate(); // nil date
-}
-
-static int
-read_one(const QDir& dir, const QString &filename, QVector<double> &bests,
-         QVector<QDate> *bestDates, QHash<QString,bool> *cpiDataInBests)
-{
-    QString inname = dir.absoluteFilePath(filename);
-    FILE *in = fopen(inname.toAscii().constData(), "r");
-    if (!in)
-        return -1;
-    int lineno = 1;
-    char line[40];
-
-    while (fgets(line, sizeof(line), in) != NULL) {
-        double mins;
-        int watts;
-        if (sscanf(line, "%lf %d\n", &mins, &watts) != 2) {
-            QMessageBox::warning(
-                NULL, "Warning",
-                QString("Error reading %1, line %2").arg(inname).arg(line),
-                QMessageBox::Ok,
-                QMessageBox::NoButton);
-            fclose(in);
-            return -1;
-        }
-        int secs = (int) round(mins * 60.0);
-        if (secs >= bests.size()) {
-            bests.resize(secs + 1);
-            if (bestDates)
-                bestDates->resize(secs + 1);
-        }
-        if (bests[secs] < watts){
-            bests[secs] = watts;
-            if (bestDates)
-                (*bestDates)[secs] = cpi_filename_to_date(filename);
-
-            // mark the filename as having contributed to the bests
-            // Note this contribution may subsequently be over-written, so
-            // for example the first file scanned will always be tagged.
-            if (cpiDataInBests)
-                (*cpiDataInBests)[inname] = true;
-        }
-        ++lineno;
-    }
-    fclose(in);
-
-    return 0;
-}
-
 void
 CpintPlot::changeSeason(const QDate &start, const QDate &end)
 {
-    startDate = start;
-    endDate = end;
-    needToScanRides = true;
-    delete CPCurve;
-    CPCurve = NULL;
-    clear_CP_Curves();
+    // wipe out current - calculate will reinstate
+    startDate = (start == QDate()) ? QDate(1900, 1, 1) : start;
+    endDate = (end == QDate()) ? QDate(3000, 12, 31) : end;
+
+    if (CPCurve) {
+        delete CPCurve;
+        CPCurve = NULL;
+        clear_CP_Curves();
+    }
+    if (bests) {
+        delete bests;
+        bests = NULL;
+    }
 }
 
 void
-CpintPlot::setEnergyMode(bool value)
+CpintPlot::setSeries(RideFile::SeriesType x)
 {
-    energyMode_ = value;
-    if (energyMode_) {
-        setAxisTitle(yLeft, tr("Total work (kJ)"));
-        setAxisScaleEngine(xBottom, new QwtLinearScaleEngine);
-        setAxisScaleDraw(xBottom, new QwtScaleDraw);
-        setAxisTitle(xBottom, tr("Interval Length (minutes)"));
+    series = x;
+
+    // Log scale for all bar Energy
+    setAxisScaleEngine(xBottom, new LogTimeScaleEngine);
+    setAxisScaleDraw(xBottom, new LogTimeScaleDraw);
+    setAxisTitle(xBottom, tr("Interval Length"));
+
+    switch (series) {
+
+        case RideFile::none:
+            setAxisTitle(yLeft, tr("Total work (kJ)"));
+            setAxisScaleEngine(xBottom, new QwtLinearScaleEngine);
+            setAxisScaleDraw(xBottom, new QwtScaleDraw);
+            setAxisTitle(xBottom, tr("Interval Length (minutes)"));
+            break;
+
+        case RideFile::cad:
+            setAxisTitle(yLeft, tr("Average Cadence (rpm)"));
+            break;
+
+        case RideFile::hr:
+            setAxisTitle(yLeft, tr("Average Heartrate (bpm)"));
+            break;
+
+        case RideFile::kph:
+            setAxisTitle(yLeft, tr("Average Speed (kph)"));
+            break;
+
+        case RideFile::nm:
+            setAxisTitle(yLeft, tr("Average Pedal Force (nm)"));
+            break;
+
+        default:
+        case RideFile::watts:
+            setAxisTitle(yLeft, tr("Average Power (watts)"));
+            break;
+
     }
-    else {
-        setAxisTitle(yLeft, tr("Average Power (watts)"));
-        setAxisScaleEngine(xBottom, new LogTimeScaleEngine);
-        setAxisScaleDraw(xBottom, new LogTimeScaleDraw);
-        setAxisTitle(xBottom, tr("Interval Length"));
-    }
+
     delete CPCurve;
     CPCurve = NULL;
     clear_CP_Curves();
+    if (allCurve) {
+        delete allCurve;
+        allCurve = NULL;
+    }
 }
 
 // extract critical power parameters which match the given curve
@@ -338,18 +184,18 @@ CpintPlot::deriveCPParameters()
     // find the indexes associated with the bounds
     // the first point must be at least the minimum for the anaerobic interval, or quit
     for (i1 = 0; i1 < 60 * t1; i1++)
-        if (i1 + 1 >= bests.size())
+        if (i1 + 1 >= bests->meanMaxArray(series).size())
             return;
     // the second point is the maximum point suitable for anaerobicly dominated efforts.
     for (i2 = i1; i2 + 1 <= 60 * t2; i2++)
-        if (i2 + 1 >= bests.size())
+        if (i2 + 1 >= bests->meanMaxArray(series).size())
             return;
     // the third point is the beginning of the minimum duration for aerobic efforts
     for (i3 = i2; i3 < 60 * t3; i3++)
-        if (i3 + 1 >= bests.size())
+        if (i3 + 1 >= bests->meanMaxArray(series).size())
             return;
     for (i4 = i3; i4 + 1 <= 60 * t4; i4++)
-        if (i4 + 1 >= bests.size())
+        if (i4 + 1 >= bests->meanMaxArray(series).size())
             break;
 
     // initial estimate of tau
@@ -398,7 +244,7 @@ CpintPlot::deriveCPParameters()
         int i;
         cp = 0;
         for (i = i3; i <= i4; i++) {
-            double cpn = bests[i] / (1 + tau / (t0 + i / 60.0));
+            double cpn = bests->meanMaxArray(series)[i] / (1 + tau / (t0 + i / 60.0));
             if (cp < cpn)
                 cp = cpn;
         }
@@ -410,14 +256,14 @@ CpintPlot::deriveCPParameters()
         // estimate tau, given cp
         tau = tau_min;
         for (i = i1; i <= i2; i++) {
-            double taun = (bests[i] / cp - 1) * (i / 60.0 + t0) - t0;
+            double taun = (bests->meanMaxArray(series)[i] / cp - 1) * (i / 60.0 + t0) - t0;
             if (tau < taun)
                 tau = taun;
         }
 
         // update t0 if we're using that model
         #if USE_T0_IN_CP_MODEL
-        t0 = tau / (bests[1] / cp - 1) - 1 / 60.0;
+        t0 = tau / (bests->meanMaxArray(series)[1] / cp - 1) - 1 / 60.0;
         #endif
 
     } while ((fabs(tau - tau_prev) > tau_delta_max) ||
@@ -452,7 +298,7 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
         double x = (double) i / (curve_points - 1);
         double t = pow(tmax, x) * pow(tmin, 1-x);
         cp_curve_time[i] = t;
-        if (energyMode_)
+        if (series == RideFile::none) //XXX this is ENERGY
             cp_curve_power[i] = (cp * t + cp * tau) * 60.0 / 1000.0;
         else
             cp_curve_power[i] = cp * (1 + tau / (t + t0));
@@ -537,17 +383,16 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
             curve->attach(thisPlot);
             color.setAlpha(64);
             curve->setBrush(color);  // brush fills below the line
-            if (energyMode_) {
+            if (series == RideFile::none) { // this is Energy mode 
                 curve->setData(time_values.data() + low,
                                energyBests.data() + low, high - low + 1);
-            }
-            else {
+            } else {
                 curve->setData(time_values.data() + low,
                                power_values + low, high - low + 1);
             }
             allCurves.append(curve);
 
-            if (!energyMode_ || energyBests[high] > 100.0) {
+            if (series != RideFile::none || energyBests[high] > 100.0) {
                 QwtText text(name);
                 text.setFont(QFont("Helvetica", 20, QFont::Bold));
                 color.setAlpha(255);
@@ -555,7 +400,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
                 QwtPlotMarker *label_mark = new QwtPlotMarker();
                 // place the text in the geometric mean in time, at a decent power
                 double x, y;
-                if (energyMode_) {
+                if (series == RideFile::none) {
                     x = (time_values[low] + time_values[high]) / 2;
                     y = (energyBests[low] + energyBests[high]) / 5;
                 }
@@ -584,7 +429,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
         QColor brush_color = GColor(CCP);
         brush_color.setAlpha(200);
         curve->setBrush(brush_color);   // brush fills below the line
-        if (energyMode_)
+        if (series == RideFile::none)
             curve->setData(time_values.data(), energyBests.data(), n_values);
         else
             curve->setData(time_values.data(), power_values, n_values);
@@ -594,11 +439,11 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
 
     // Energy mode is really only interesting in the range where energy is
     // linear in interval duration--up to about 1 hour.
-    double xmax = energyMode_ ? 60.0 : time_values[n_values - 1];
+    double xmax = (series == RideFile::none)  ? 60.0 : time_values[n_values - 1];
     thisPlot->setAxisScale(thisPlot->xBottom, (double) 0.017, (double)xmax);
 
     double ymax;
-    if (energyMode_) {
+    if (series == RideFile::none) {
         int i = std::lower_bound(time_values.begin(), time_values.end(), 60.0) - time_values.begin();
         ymax = 10 * ceil(energyBests[i] / 10);
     }
@@ -618,104 +463,22 @@ CpintPlot::calculate(RideItem *rideItem)
     QDir dir(path);
     QFileInfo file(fileName);
 
-    if (needToScanRides) {
-        bests.clear();
-        bestDates.clear();
-        cpiDataInBests.clear();
-        bool aborted = false;
-        QList<cpi_file_info> to_update;
-        cpi_files_to_update(dir, to_update);
-        double progress_max = 0.0;
-        if (!to_update.empty()) {
-            foreach (const cpi_file_info &info, to_update) {
-                QFile file(info.inname);
-                QStringList errors;
-                boost::scoped_ptr<RideFile> rideFile(
-                    RideFileFactory::instance().openRideFile(mainWindow, file, errors));
-                if (rideFile) {
-                    double x = rideFile->dataPoints().size();
-                    progress_max += x * (x + 1.0) / 2.0;
-                }
-            }
-        }
-        QProgressDialog progress(
-            QString(tr("Computing critical power intervals.\n"
-                       "This may take a while.\n")),
-            tr("Abort"), 0, 1000, this);
-        double progress_sum = 0.0;
-        int endingOffset = progress.labelText().size();
-        if (!to_update.empty()) {
-            int count = 1;
-            foreach (const cpi_file_info &info, to_update) {
-                QString existing = progress.labelText();
-                existing.chop(progress.labelText().size() - endingOffset);
-                progress.setLabelText(
-                    existing + QString(tr("Processing %1...")).arg(info.file));
-                progress.setValue(count++);
-                update_cpi_file(mainWindow, &info, &progress, progress_sum, progress_max);
-                QCoreApplication::processEvents();
-                if (progress.wasCanceled()) {
-                    aborted = true;
-                    break;
-                }
-            }
-        }
-        if (!aborted) {
-            QString existing = progress.labelText();
-            existing.chop(progress.labelText().size() - endingOffset);
-            QStringList filters;
-            filters << "*.cpi";
-            QStringList list = dir.entryList(filters, QDir::Files, QDir::Name);
-            list = filterForSeason(list, startDate, endDate);
-            progress.setLabelText(
-                existing + tr("Aggregating over all files."));
-            progress.setRange(0, list.size());
-            progress.setValue(0);
-            progress.show();
-            foreach (const QString &filename, list) {
-                QString path = dir.absoluteFilePath(filename);
-                read_one(dir, filename, bests, &bestDates, &cpiDataInBests);
-                progress.setValue(progress.value() + 1);
-                QCoreApplication::processEvents();
-                if (progress.wasCanceled()) {
-                    aborted = true;
-                    break;
-                }
-            }
-        }
-        if (!aborted && bests.size()) {
-            // check that total work doesn't decrease with time
-            double maxwork = 0.0;
+    // get current ride statistics
+    current = new RideFileCache(mainWindow, mainWindow->home.absolutePath() + "/" + fileName);
 
-            for (int i = 0; i < bests.size(); ++i) {
-                // note index is being used here in lieu of time, as the index
-                // is assumed to be proportional to time
-                double work = bests[i] * i;
-                if ((i > 0) && (maxwork > work)) {
-                    bests[i] = round(maxwork / i);
-                    bestDates[i] = bestDates[i - 1];
-                }
-                else
-                    maxwork = work;
-            }
+    // get aggregates - incase not initialised from date change
+    if (bests == NULL) bests = new RideFileCache(mainWindow, startDate, endDate);
 
-            // derive CP model
-            if (bests.size() > 1) {
-                // cp model parameters
-                cp  = 0;
-                tau = 0;
-                t0  = 0;
-
-                // calculate CP model from all-time best data
-                deriveCPParameters();
-            }
-            needToScanRides = false;
+    //
+    // PLOT MODEL CURVE (DERIVED)
+    //
+    if (series == RideFile::watts || series == RideFile::none) {
+        if (bests->meanMaxArray(series).size() > 1) {
+            // calculate CP model from all-time best data
+            cp  = tau = t0  = 0;
+            deriveCPParameters();
         }
-    }
-
-    if (!needToScanRides) {
-        if (!CPCurve)
-            plot_CP_curve(this, cp, tau, t0);
+        if (!CPCurve) plot_CP_curve(this, cp, tau, t0);
         else {
             // make sure color reflects latest config
             QPen pen(GColor(CCP));
@@ -723,72 +486,143 @@ CpintPlot::calculate(RideItem *rideItem)
             pen.setStyle(Qt::DashLine);
             CPCurve->setPen(pen);
         }
-        if (allCurves.empty()) {
+
+        //
+        // PLOT ZONE (RAINBOW) AGGREGATED CURVE
+        //
+        if (bests->meanMaxArray(series).size()) {
             int maxNonZero = 0;
-            for (int i = 0; i < bests.size(); ++i) {
-                if (bests[i] > 0)
-                    maxNonZero = i;
+            for (int i = 0; i < bests->meanMaxArray(series).size(); ++i) {
+                if (bests->meanMaxArray(series)[i] > 0) maxNonZero = i;
             }
-            plot_allCurve(this, maxNonZero - 1, bests.constData() + 1);
+            plot_allCurve(this, maxNonZero, bests->meanMaxArray(series).constData() + 1);
+        }
+    } else {
+
+        //
+        // PLOT BESTS IN SERIES COLOR
+        //
+        if (allCurve) {
+            delete allCurve;
+            allCurve = NULL;
+        }
+        if (bests->meanMaxArray(series).size()) {
+
+            int maxNonZero = 0;
+            QVector<double> timeArray(bests->meanMaxArray(series).size());
+            for (int i = 0; i < bests->meanMaxArray(series).size(); ++i) {
+                timeArray[i] = i / 60.0;
+                if (bests->meanMaxArray(series)[i] > 0) maxNonZero = i;
+            }
+
+            if (maxNonZero > 1) {
+
+                allCurve = new QwtPlotCurve(dateTime.toString(tr("ddd MMM d, yyyy h:mm AP")));
+                allCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+
+                QPen line;
+                QColor fill;
+                switch (series) {
+
+                    case RideFile::kph:
+                        line.setColor(GColor(CSPEED).darker(200));
+                        fill = (GColor(CSPEED));
+                        break;
+
+                    case RideFile::cad:
+                        line.setColor(GColor(CCADENCE).darker(200));
+                        fill = (GColor(CCADENCE));
+                        break;
+
+                    case RideFile::nm:
+                        line.setColor(GColor(CTORQUE).darker(200));
+                        fill = (GColor(CTORQUE));
+                        break;
+
+                    default:
+                    case RideFile::hr:
+                        line.setColor(GColor(CHEARTRATE).darker(200));
+                        fill = (GColor(CHEARTRATE));
+                        break;
+                }
+
+                // wow, QVector really doesn't have a max/min method!
+                double ymax = 0;
+                double ymin = 100000;
+                foreach(double v, current->meanMaxArray(series)) {
+                    if (v > ymax) ymax = v;
+                    if (v && v < ymin) ymin = v;
+                }
+                foreach(double v, bests->meanMaxArray(series)) {
+                    if (v > ymax) ymax = v;
+                    if (v&& v < ymin) ymin = v;
+                }
+                if (ymin == 100000) ymin = 0;
+
+                ymax *= 1.1; // bit of headroom
+                ymin *= 0.9;
+
+                // xmax is directly related to the size of the arrays
+                double xmax = current->meanMaxArray(series).size();
+                if (bests->meanMaxArray(series).size() > xmax)
+                    xmax = bests->meanMaxArray(series).size();
+                xmax /= 60; // its in minutes not seconds
+
+                setAxisScale(yLeft, ymin, ymax);
+                setAxisScale(xBottom, 0.017, xmax);
+                allCurve->setPen(line);
+                fill.setAlpha(64);
+                allCurve->setBrush(fill);
+                allCurve->attach(this);
+                allCurve->setData(timeArray.data() + 1, bests->meanMaxArray(series).constData() + 1, maxNonZero - 1);
+            }
+        }
+    }
+
+    //
+    // PLOT THIS RIDE CURVE
+    //
+    if (thisCurve) {
+        delete thisCurve;
+        thisCurve = NULL;
+    }
+
+    if (current->meanMaxArray(series).size()) {
+        int maxNonZero = 0;
+        QVector<double> timeArray(current->meanMaxArray(series).size());
+        for (int i = 0; i < current->meanMaxArray(series).size(); ++i) {
+            timeArray[i] = i / 60.0;
+            if (current->meanMaxArray(series)[i] > 0) maxNonZero = i;
         }
 
-        if (thisCurve) {
-            delete thisCurve;
-            thisCurve = NULL;
-        }
-        QVector<double> bests;
-        QString filename = file.completeBaseName() + ".cpi";
-        if ((read_one(dir, filename, bests, NULL, NULL) == 0) && bests.size()) {
-            QVector<double> energyArray(bests.size());
-            QVector<double> timeArray(bests.size());
-            int maxNonZero = 0;
-            for (int i = 0; i < bests.size(); ++i) {
-                timeArray[i] = i / 60.0;
-                energyArray[i] = timeArray[i] * bests[i] * 60.0 / 1000.0;
-                if (bests[i] > 0) maxNonZero = i;
-            }
-            if (maxNonZero > 1) {
-                thisCurve = new QwtPlotCurve(
-                    dateTime.toString(tr("ddd MMM d, yyyy h:mm AP")));
-                thisCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-                thisCurve->setPen(QPen(Qt::black));
-                thisCurve->attach(this);
-                if (energyMode_) {
-                    thisCurve->setData(timeArray.data() + 1,
-                                       energyArray.constData() + 1,
-                                       maxNonZero - 1);
+        if (maxNonZero > 1) {
+
+            thisCurve = new QwtPlotCurve(dateTime.toString(tr("ddd MMM d, yyyy h:mm AP")));
+            thisCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+            thisCurve->setPen(QPen(Qt::black));
+            thisCurve->attach(this);
+
+            if (series == RideFile::none) {
+
+                // Calculate Energy
+                QVector<double> energyArray(current->meanMaxArray(RideFile::watts).size());
+                for (int i = 0; i <= maxNonZero; ++i) {
+                    energyArray[i] = 
+                    timeArray[i] * 
+                    current->meanMaxArray(RideFile::watts)[i] * 60.0 / 1000.0;
                 }
-                else {
-                    thisCurve->setData(timeArray.data() + 1,
-                                       bests.constData() + 1,
-                                       maxNonZero - 1);
-                }
+                thisCurve->setData(timeArray.data() + 1, energyArray.constData() + 1, maxNonZero - 1);
+
+            } else {
+
+                // normal
+                thisCurve->setData(timeArray.data() + 1, 
+                current->meanMaxArray(series).constData() + 1, maxNonZero - 1);
             }
         }
     }
 
     replot();
-}
-
-// delete a CPI file
-bool
-CpintPlot::deleteCpiFile(QString filename)
-{
-    // first, get ride of the file
-    if (! QFile::remove(filename))
-        return false;
-
-    // now check to see if this file contributed to the bests
-    // in the current implementation a false means it does
-    // not contribute, but a true only means it at one time
-    // contributed (may not in the end).
-    if (cpiDataInBests.contains(filename)) {
-        if (cpiDataInBests[filename])
-            needToScanRides = true;
-        cpiDataInBests.remove(filename);
-    }
-
-    return true;
 }
 
 void
@@ -798,21 +632,3 @@ CpintPlot::showGrid(int state)
     grid->setVisible(state == Qt::Checked);
     replot();
 }
-
-QStringList
-CpintPlot::filterForSeason(QStringList cpints, QDate startDate, QDate endDate)
-{
-    //Check to see if no date was assigned.
-    QDate nilDate;
-    if(startDate == nilDate)
-        return cpints;
-    QStringList returnList;
-    foreach (const QString &cpi, cpints) {
-        QDate cpiDate = cpi_filename_to_date(cpi);
-        if(cpiDate > startDate && cpiDate < endDate)
-            returnList << cpi;
-
-    }
-    return returnList;
-}
-
