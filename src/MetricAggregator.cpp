@@ -19,6 +19,7 @@
 #include "MetricAggregator.h"
 #include "DBAccess.h"
 #include "RideFile.h"
+#include "RideFileCache.h"
 #include "Zones.h"
 #include "HrZones.h"
 #include "Settings.h"
@@ -92,9 +93,16 @@ void MetricAggregator::refreshMetrics()
 
     // update statistics for ride files which are out of date
     // showing a progress bar as we go
-    QProgressDialog bar(tr("Refreshing Metrics Database..."), tr("Abort"), 0, filenames.count(), main);
+    QTime elapsed;
+    elapsed.start();
+    QString title = tr("Refreshing Ride Statistics...\nStarted");
+    QProgressDialog bar(title, tr("Abort"), 0, filenames.count(), main);
     bar.setWindowModality(Qt::WindowModal);
+    bar.setMinimumDuration(0);
+    bar.show();
+
     int processed=0;
+    QApplication::processEvents(); // get that dialog up!
 
     // log of progress
     QFile log(home.absolutePath() + "/" + "metric.log");
@@ -111,14 +119,17 @@ void MetricAggregator::refreshMetrics()
         status current = dbStatus.value(name);
         unsigned long dbTimeStamp = current.timestamp;
         unsigned long fingerprint = current.fingerprint;
+
+        RideFile *ride = NULL;
+
         if (dbTimeStamp < QFileInfo(file).lastModified().toTime_t() ||
             zoneFingerPrint != fingerprint) {
 
             // log
             out << "Opening ride: " << name << "\r\n";
 
-            // read file and process it
-            RideFile *ride = RideFileFactory::instance().openRideFile(main, file, errors);
+            // read file and process it if we didn't already...
+            if (ride == NULL) ride = RideFileFactory::instance().openRideFile(main, file, errors);
 
             out << "File open completed: " << name << "\r\n";
 
@@ -126,10 +137,26 @@ void MetricAggregator::refreshMetrics()
 
                 out << "Updating statistics: " << name << "\r\n";
                 importRide(home, ride, name, zoneFingerPrint, (dbTimeStamp > 0));
-                delete ride;
+
             }
         }
+
+        // update cache (will check timestamps itself)
+        // if ride wasn't opened it will do it itself
+        // we only want to check so passing check=true
+        // because we don't actually want the results now
+        RideFileCache updater(main, home.absolutePath() + "/" + name, ride, true);
+
+        // free memory - if needed
+        if (ride) delete ride;
+
         // update progress bar
+        long elapsedtime = elapsed.elapsed();
+        QString elapsedString = QString("%1:%2:%3").arg(elapsedtime/3600000,2)
+                                                .arg((elapsedtime%3600000)/60000,2,10,QLatin1Char('0'))
+                                                .arg((elapsedtime%60000)/1000,2,10,QLatin1Char('0'));
+        QString title = tr("Refreshing Ride Statistics...\nElapsed: %1").arg(elapsedString);
+        bar.setLabelText(title);
         bar.setValue(++processed);
         QApplication::processEvents();
 

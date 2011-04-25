@@ -20,6 +20,7 @@
 #include "MainWindow.h"
 #include "PowerHist.h"
 #include "RideFile.h"
+#include "RideFileCache.h"
 #include "RideItem.h"
 #include "Settings.h"
 #include <QtGui>
@@ -85,7 +86,10 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow) :
     histSumY = new QComboBox();
     histSumY->addItem(tr("Absolute Time"));
     histSumY->addItem(tr("Percentage Time"));
+    cComboSeason = new QComboBox(this);
+    addSeasons();
     cl->addWidget(histSumY);
+    cl->addWidget(cComboSeason);
     cl->addStretch();
 
     // sort out default values
@@ -114,6 +118,7 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow) :
     connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
     connect(mainWindow, SIGNAL(configChanged()), powerHist, SLOT(configChanged()));
+    connect(cComboSeason, SIGNAL(currentIndexChanged(int)), this, SLOT(seasonSelected(int)));
 }
 
 void
@@ -154,6 +159,47 @@ HistogramWindow::zonesChanged()
     powerHist->replot();
 }
 
+void HistogramWindow::seasonSelected(int index)
+{
+    if (index > 0) {
+        index--; // it is now an index into the season array
+
+        // Set data from BESTS
+        Season season = seasons.at(index);
+
+    } else if (!index) {
+        // Set data from RIDE
+
+    }
+}
+
+void HistogramWindow::addSeasons()
+{
+    QFile seasonFile(mainWindow->home.absolutePath() + "/seasons.xml");
+    QXmlInputSource source( &seasonFile );
+    QXmlSimpleReader xmlReader;
+    SeasonParser( handler );
+    xmlReader.setContentHandler(&handler);
+    xmlReader.setErrorHandler(&handler);
+    bool ok = xmlReader.parse( source );
+    if(!ok)
+        qWarning("Failed to parse seasons.xml");
+
+    seasons = handler.getSeasons();
+    Season season;
+    season.setName(tr("All Seasons"));
+    seasons.insert(0,season);
+
+    cComboSeason->addItem("Selected Ride");
+    foreach (Season season, seasons)
+        cComboSeason->addItem(season.getName());
+    if (!seasons.empty()) {
+        cComboSeason->setCurrentIndex(cComboSeason->count() - 1);
+        Season season = seasons.last();
+        // set default parameters here
+        // XXX todo
+    }
+}
 void
 HistogramWindow::setBinWidthFromSlider()
 {

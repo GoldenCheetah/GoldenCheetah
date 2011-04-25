@@ -29,6 +29,10 @@
 #include <QObject>
 
 class RideItem;
+class RideFile;
+struct RideFilePoint;
+struct RideFileDataPresent;
+struct RideFileInterval;
 class EditorData;      // attached to a RideFile
 class RideFileCommand; // for manipulating ride data
 class MainWindow;      // for context; cyclist, homedir
@@ -47,18 +51,6 @@ class MainWindow;      // for context; cyclist, homedir
 // RideFileFactory is a singleton that maintains a mapping from ride file
 // suffixes to the RideFileReader objects capable of converting those files
 // into RideFile objects.
-
-struct RideFilePoint
-{
-    double secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind;
-    int interval;
-    RideFilePoint() : secs(0.0), cad(0.0), hr(0.0), km(0.0), kph(0.0),
-        nm(0.0), watts(0.0), alt(0.0), lon(0.0), lat(0.0), headwind(0.0), interval(0) {}
-    RideFilePoint(double secs, double cad, double hr, double km, double kph,
-                  double nm, double watts, double alt, double lon, double lat, double headwind, int interval) :
-        secs(secs), cad(cad), hr(hr), km(km), kph(kph), nm(nm),
-        watts(watts), alt(alt), lon(lon), lat(lat), headwind(headwind), interval(interval) {}
-};
 
 struct RideFileDataPresent
 {
@@ -95,7 +87,7 @@ class RideFile : public QObject // QObject to emit signals
         virtual ~RideFile();
 
         // Working with DATASERIES
-        enum seriestype { secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, interval, none };
+        enum seriestype { secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, interval, NP, xPower, none };
         typedef enum seriestype SeriesType;
         static QString seriesName(SeriesType);
         static int decimalsFor(SeriesType series);
@@ -104,7 +96,7 @@ class RideFile : public QObject // QObject to emit signals
 
         // Working with DATAPOINTS -- ***use command to modify***
         RideFileCommand *command;
-        double getPointValue(int index, SeriesType series);
+        double getPointValue(int index, SeriesType series) const;
         void appendPoint(double secs, double cad, double hr, double km,
                          double kph, double nm, double watts, double alt,
                          double lon, double lat, double headwind, int interval);
@@ -193,6 +185,19 @@ class RideFile : public QObject // QObject to emit signals
         QMap<QString,QString> tags_;
         EditorData *data;
 
+};
+
+struct RideFilePoint
+{
+    double secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind;
+    int interval;
+    RideFilePoint() : secs(0.0), cad(0.0), hr(0.0), km(0.0), kph(0.0),
+        nm(0.0), watts(0.0), alt(0.0), lon(0.0), lat(0.0), headwind(0.0), interval(0) {}
+    RideFilePoint(double secs, double cad, double hr, double km, double kph,
+                  double nm, double watts, double alt, double lon, double lat, double headwind, int interval) :
+        secs(secs), cad(cad), hr(hr), km(km), kph(kph), nm(nm),
+        watts(watts), alt(alt), lon(lon), lat(lat), headwind(headwind), interval(interval) {}
+    double value(RideFile::SeriesType series) const;
 };
 
 struct RideFileReader {

@@ -67,6 +67,8 @@ RideFile::seriesName(SeriesType series)
     case RideFile::kph: return QString(tr("Speed"));
     case RideFile::nm: return QString(tr("Torque"));
     case RideFile::watts: return QString(tr("Power"));
+    case RideFile::xPower: return QString(tr("xPower"));
+    case RideFile::NP: return QString(tr("Normalised Power"));
     case RideFile::alt: return QString(tr("Altitude"));
     case RideFile::lon: return QString(tr("Longitude"));
     case RideFile::lat: return QString(tr("Latitude"));
@@ -358,6 +360,7 @@ RideFile::setDataPresent(SeriesType series, bool value)
         case lat : dataPresent.lat = value; break;
         case headwind : dataPresent.headwind = value; break;
         case interval : dataPresent.interval = value; break;
+        default:
         case none : break;
     }
 }
@@ -378,7 +381,8 @@ RideFile::isDataPresent(SeriesType series)
         case lat : return dataPresent.lat; break;
         case headwind : return dataPresent.headwind; break;
         case interval : return dataPresent.interval; break;
-        case none : break;
+        default:
+        case none : return false; break;
     }
     return false;
 }
@@ -398,29 +402,37 @@ RideFile::setPointValue(int index, SeriesType series, double value)
         case lat : dataPoints_[index]->lat = value; break;
         case headwind : dataPoints_[index]->headwind = value; break;
         case interval : dataPoints_[index]->interval = value; break;
+        default:
         case none : break;
     }
 }
 
 double
-RideFile::getPointValue(int index, SeriesType series)
+RideFilePoint::value(RideFile::SeriesType series) const
 {
     switch (series) {
-        case secs : return dataPoints_[index]->secs; break;
-        case cad : return dataPoints_[index]->cad; break;
-        case hr : return dataPoints_[index]->hr; break;
-        case km : return dataPoints_[index]->km; break;
-        case kph : return dataPoints_[index]->kph; break;
-        case nm : return dataPoints_[index]->nm; break;
-        case watts : return dataPoints_[index]->watts; break;
-        case alt : return dataPoints_[index]->alt; break;
-        case lon : return dataPoints_[index]->lon; break;
-        case lat : return dataPoints_[index]->lat; break;
-        case headwind : return dataPoints_[index]->headwind; break;
-        case interval : return dataPoints_[index]->interval; break;
-        case none : break;
+        case RideFile::secs : return secs; break;
+        case RideFile::cad : return cad; break;
+        case RideFile::hr : return hr; break;
+        case RideFile::km : return km; break;
+        case RideFile::kph : return kph; break;
+        case RideFile::nm : return nm; break;
+        case RideFile::watts : return watts; break;
+        case RideFile::alt : return alt; break;
+        case RideFile::lon : return lon; break;
+        case RideFile::lat : return lat; break;
+        case RideFile::headwind : return headwind; break;
+        case RideFile::interval : return interval; break;
+        default:
+        case RideFile::none : break;
     }
-    return 0.0; // shutup the compiler
+    return 0.0;
+}
+
+double
+RideFile::getPointValue(int index, SeriesType series) const
+{
+    return dataPoints_[index]->value(series);
 }
 
 int
@@ -434,6 +446,8 @@ RideFile::decimalsFor(SeriesType series)
         case kph : return 4; break;
         case nm : return 2; break;
         case watts : return 0; break;
+        case xPower : return 0; break;
+        case NP : return 0; break;
         case alt : return 3; break;
         case lon : return 6; break;
         case lat : return 6; break;
@@ -449,12 +463,14 @@ RideFile::maximumFor(SeriesType series)
 {
     switch (series) {
         case secs : return 999999; break;
-        case cad : return 300; break;
-        case hr : return 300; break;
+        case cad : return 255; break;
+        case hr : return 255; break;
         case km : return 999999; break;
-        case kph : return 999; break;
-        case nm : return 999; break;
-        case watts : return 4000; break;
+        case kph : return 150; break;
+        case nm : return 100; break;
+        case watts : return 2500; break;
+        case NP : return 2500; break;
+        case xPower : return 2500; break;
         case alt : return 8850; break; // mt everest is highest point above sea level
         case lon : return 180; break;
         case lat : return 90; break;
@@ -476,6 +492,8 @@ RideFile::minimumFor(SeriesType series)
         case kph : return 0; break;
         case nm : return 0; break;
         case watts : return 0; break;
+        case xPower : return 0; break;
+        case NP : return 0; break;
         case alt : return -413; break; // the Red Sea is lowest land point on earth
         case lon : return -180; break;
         case lat : return -90; break;

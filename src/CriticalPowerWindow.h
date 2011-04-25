@@ -47,8 +47,13 @@ class CriticalPowerWindow : public GcWindow
         // set/get properties
         int season() const { return cComboSeason->currentIndex(); }
         void setSeason(int x) { cComboSeason->setCurrentIndex(x); }
-        int mode() const { return yAxisCombo->currentIndex(); }
-        void setMode(int x) { yAxisCombo->setCurrentIndex(x); }
+        int mode() const { return seriesCombo->currentIndex(); }
+        void setMode(int x) { seriesCombo->setCurrentIndex(x); }
+
+        RideFile::SeriesType series() { 
+            return static_cast<RideFile::SeriesType>
+                (seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
+        }
 
     protected slots:
         void cpintTimeValueEntered();
@@ -56,7 +61,7 @@ class CriticalPowerWindow : public GcWindow
         void pickerMoved(const QPoint &pos);
         void rideSelected();
         void seasonSelected(int season);
-        void setEnergyMode(int index);
+        void setSeries(int index);
 
     private:
         void updateCpint(double minutes);
@@ -70,13 +75,15 @@ class CriticalPowerWindow : public GcWindow
         QLineEdit *cpintTodayValue;
         QLineEdit *cpintAllValue;
         QLineEdit *cpintCPValue;
+        QComboBox *seriesCombo;
         QComboBox *cComboSeason;
-        QComboBox *yAxisCombo;
         QPushButton *cpintSetCPButton;
         QwtPlotPicker *picker;
         void addSeasons();
+        void addSeries();
         QList<Season> seasons;
         RideItem *currentRide;
+        QList<RideFile::SeriesType> seriesList;
 };
 
 #endif // _GC_CriticalPowerWindow_h

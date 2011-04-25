@@ -20,6 +20,9 @@
 #define _GC_HistogramWindow_h 1
 #include "GoldenCheetah.h"
 
+#include "Season.h"
+#include "SeasonParser.h"
+
 #include <QtGui>
 
 class MainWindow;
@@ -70,9 +73,11 @@ class HistogramWindow : public GcWindow
         void setWithZerosFromCheckBox();
         void setHistSelection(int id);
         void setSumY(int);
+        void seasonSelected(int season);
 
     protected:
 
+        QList<Season> seasons;
         void setHistTextValidator();
         void setHistBinWidthText();
 
@@ -85,6 +90,8 @@ class HistogramWindow : public GcWindow
         QCheckBox *histShadeZones;
         QComboBox *histParameterCombo;
         QComboBox *histSumY;
+        QComboBox *cComboSeason;
+        void addSeasons();
 
         int powerRange, hrRange;
 };
