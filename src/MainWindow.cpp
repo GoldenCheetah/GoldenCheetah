@@ -1204,8 +1204,7 @@ MainWindow::rideTreeWidgetSelectionChanged()
         ride = NULL;
     else {
         QTreeWidgetItem *which = treeWidget->selectedItems().first();
-        if (which->type() != RIDE_TYPE)
-            ride = NULL;
+        if (which->type() != RIDE_TYPE) return; // ignore!
         else
             ride = (RideItem*) which;
     }
