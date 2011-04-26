@@ -258,20 +258,6 @@ void RideFileCache::RideFileCache::compute()
 void
 MeanMaxComputer::run()
 {
-// XXX not implemented yet
-#if 0
-    // Derived data series are a special case
-    if (series == RideFile::xPower) {
-        computeMeanMaxXPower();
-        return;
-    }
-
-    if (series == RideFile::NP) {
-        computeMeanMaxNP();
-        return;
-    }
-#endif
-
     // only bother if the data series is actually present
     if (ride->isDataPresent(series) == false) return;
 
@@ -285,10 +271,25 @@ MeanMaxComputer::run()
     // decritize the data series - seems wrong, since it just
     // rounds to the nearest second - what if the recIntSecs
     // is less than a second? Has been used for a long while
-    // so going to leave in tact for now
+    // so going to leave in tact for now - apart from the
+    // addition of code to fill in gaps in recording since
+    // they affect the NP/xPower algorithm badly and will skew
+    // the calculations of >6m since windowsize is used to
+    // determine segment duration rather than examining the
+    // timestamps on each sample
     cpintdata data;
     data.rec_int_ms = (int) round(ride->recIntSecs() * 1000.0);
+    double lastsecs = -1;
     foreach (const RideFilePoint *p, ride->dataPoints()) {
+
+        // fill in any gaps in recording - use same dodgy rounding as before
+        if (lastsecs != -1) {
+            int count = (p->secs - lastsecs - ride->recIntSecs()) / ride->recIntSecs();
+            for(int i=0; i<count; i++) 
+                data.points.append(cpintpoint(round(lastsecs+((i+1)*ride->recIntSecs() *1000.0)/1000), 0));
+        }
+        lastsecs = p->secs;
+
         double secs = round(p->secs * 1000.0) / 1000;
         if (secs > 0) data.points.append(cpintpoint(secs, (int) round(p->value(series))));
     }
