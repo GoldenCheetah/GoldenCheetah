@@ -216,21 +216,15 @@ void RideFileCache::RideFileCache::compute()
     }
 
     // all the mean maxes
-    MeanMaxComputer thread1(ride, npMeanMax, RideFile::NP); thread1.start();
-    MeanMaxComputer thread2(ride, xPowerMeanMax, RideFile::xPower); thread2.start();
-    MeanMaxComputer thread3(ride, wattsMeanMax, RideFile::watts); thread3.start();
-    MeanMaxComputer thread4(ride, hrMeanMax, RideFile::hr); thread4.start();
-    MeanMaxComputer thread5(ride, cadMeanMax, RideFile::cad); thread5.start();
-    MeanMaxComputer thread6(ride, nmMeanMax, RideFile::nm); thread6.start();
-    MeanMaxComputer thread7(ride, kphMeanMax, RideFile::kph); thread7.start();
-    MeanMaxComputer thread8(ride, xPowerMeanMax, RideFile::xPower); thread8.start();
-    MeanMaxComputer thread9(ride, npMeanMax, RideFile::NP); thread9.start();
+    MeanMaxComputer thread1(ride, wattsMeanMax, RideFile::watts); thread1.start();
+    MeanMaxComputer thread2(ride, hrMeanMax, RideFile::hr); thread2.start();
+    MeanMaxComputer thread3(ride, cadMeanMax, RideFile::cad); thread2.start();
+    MeanMaxComputer thread4(ride, nmMeanMax, RideFile::nm); thread4.start();
+    MeanMaxComputer thread5(ride, kphMeanMax, RideFile::kph); thread5.start();
+    //MeanMaxComputer thread6(ride, xPowerMeanMax, RideFile::xPower); thread6.start();
+    //MeanMaxComputer thread7(ride, npMeanMax, RideFile::NP); thread7.start();
 
     // all the different distributions
-#if 0
-    MeanMaxComputer thread10(ride, npDistribution, RideFile::NP); thread10.start();
-    MeanMaxComputer thread11(ride, xPowerDistribution, RideFile::xPower); thread11.start();
-#endif
     computeDistribution(wattsDistribution, RideFile::watts);
     computeDistribution(hrDistribution, RideFile::hr);
     computeDistribution(cadDistribution, RideFile::cad);
@@ -245,13 +239,9 @@ void RideFileCache::RideFileCache::compute()
     thread3.wait();
     thread4.wait();
     thread5.wait();
+#if 0
     thread6.wait();
     thread7.wait();
-    thread8.wait();
-    thread9.wait();
-#if 0
-    thread10.wait();
-    thread11.wait();
 #endif
 }
 
