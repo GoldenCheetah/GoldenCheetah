@@ -269,15 +269,13 @@ MeanMaxComputer::run()
     // timestamps on each sample
     cpintdata data;
     data.rec_int_ms = (int) round(ride->recIntSecs() * 1000.0);
-    double lastsecs = -1;
+    double lastsecs = 0;
     foreach (const RideFilePoint *p, ride->dataPoints()) {
 
         // fill in any gaps in recording - use same dodgy rounding as before
-        if (lastsecs != -1) {
-            int count = (p->secs - lastsecs - ride->recIntSecs()) / ride->recIntSecs();
-            for(int i=0; i<count; i++) 
-                data.points.append(cpintpoint(round(lastsecs+((i+1)*ride->recIntSecs() *1000.0)/1000), 0));
-        }
+        int count = (p->secs - lastsecs - ride->recIntSecs()) / ride->recIntSecs();
+        for(int i=0; i<count; i++) 
+            data.points.append(cpintpoint(round(lastsecs+((i+1)*ride->recIntSecs() *1000.0)/1000), 0));
         lastsecs = p->secs;
 
         double secs = round(p->secs * 1000.0) / 1000;
