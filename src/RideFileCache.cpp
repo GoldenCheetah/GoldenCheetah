@@ -300,6 +300,7 @@ MeanMaxComputer::run()
         cpintpoint *p = &data.points[i];
 
         double sum = 0.0;
+        int count = 0;
         double prev_secs = p->secs;
 
         // from current point to end loop over remaining points
@@ -308,9 +309,11 @@ MeanMaxComputer::run()
 
             cpintpoint *q = &data.points[j];
 
-            sum += data.rec_int_ms / 1000.0 * q->value;
+            sum += q->value;
+            count++;
+
             double dur_secs = q->secs - p->secs;
-            double avg = sum / dur_secs;
+            double avg = sum / count;
             int dur_secs_top = (int) floor(dur_secs);
             int dur_secs_bot = qMax((int) floor(dur_secs - data.rec_int_ms / 1000.0), 0);
 
