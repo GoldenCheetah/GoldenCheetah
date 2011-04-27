@@ -218,7 +218,7 @@ void RideFileCache::RideFileCache::compute()
     // all the mean maxes
     MeanMaxComputer thread1(ride, wattsMeanMax, RideFile::watts); thread1.start();
     MeanMaxComputer thread2(ride, hrMeanMax, RideFile::hr); thread2.start();
-    MeanMaxComputer thread3(ride, cadMeanMax, RideFile::cad); thread2.start();
+    MeanMaxComputer thread3(ride, cadMeanMax, RideFile::cad); thread3.start();
     MeanMaxComputer thread4(ride, nmMeanMax, RideFile::nm); thread4.start();
     MeanMaxComputer thread5(ride, kphMeanMax, RideFile::kph); thread5.start();
     //MeanMaxComputer thread6(ride, xPowerMeanMax, RideFile::xPower); thread6.start();
