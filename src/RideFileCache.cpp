@@ -221,8 +221,8 @@ void RideFileCache::RideFileCache::compute()
     MeanMaxComputer thread3(ride, cadMeanMax, RideFile::cad); thread3.start();
     MeanMaxComputer thread4(ride, nmMeanMax, RideFile::nm); thread4.start();
     MeanMaxComputer thread5(ride, kphMeanMax, RideFile::kph); thread5.start();
-    //MeanMaxComputer thread6(ride, xPowerMeanMax, RideFile::xPower); thread6.start();
-    //MeanMaxComputer thread7(ride, npMeanMax, RideFile::NP); thread7.start();
+    MeanMaxComputer thread6(ride, xPowerMeanMax, RideFile::xPower); thread6.start();
+    MeanMaxComputer thread7(ride, npMeanMax, RideFile::NP); thread7.start();
 
     // all the different distributions
     computeDistribution(wattsDistribution, RideFile::watts);
@@ -239,24 +239,25 @@ void RideFileCache::RideFileCache::compute()
     thread3.wait();
     thread4.wait();
     thread5.wait();
-#if 0
     thread6.wait();
     thread7.wait();
-#endif
 }
 
 void
 MeanMaxComputer::run()
 {
+    // xPower and NP need watts to be present
+    RideFile::SeriesType baseSeries = (series == RideFile::xPower || series == RideFile::NP) ? RideFile::watts : series;
+
     // only bother if the data series is actually present
-    if (ride->isDataPresent(series) == false) return;
+    if (ride->isDataPresent(baseSeries) == false) return;
 
     // if we want decimal places only keep to 1 dp max
     // this is a factor that is applied at the end to
     // convert from high-precision double to long
     // e.g. 145.456 becomes 1455 if we want decimals
     // and becomes 145 if we don't
-    double decimals = RideFile::decimalsFor(series) ? 10 : 1;
+    double decimals = RideFile::decimalsFor(baseSeries) ? 10 : 1;
 
     // decritize the data series - seems wrong, since it just
     // rounds to the nearest second - what if the recIntSecs
@@ -279,7 +280,7 @@ MeanMaxComputer::run()
         lastsecs = p->secs;
 
         double secs = round(p->secs * 1000.0) / 1000;
-        if (secs > 0) data.points.append(cpintpoint(secs, (int) round(p->value(series))));
+        if (secs > 0) data.points.append(cpintpoint(secs, (int) round(p->value(baseSeries))));
     }
     int total_secs = (int) ceil(data.points.back().secs);
 
@@ -295,36 +296,44 @@ MeanMaxComputer::run()
 
     // loop through the decritized data from top
     // FIRST 5 MINUTES DO BESTS FOR EVERY SECOND
-    for (int i = 0; i < data.points.size() - 1; ++i) {
+    // WE DO NOT DO THIS FOR NP or xPower SINCE
+    // IT IS WELL KNOWN THAT THEY ARE NOT VALID
+    // FOR SUCH SHORT DURATIONS AND IT IS VERY
+    // CPU INTENSIVE, SO WE DON'T BOTHER
+    if (series != RideFile::xPower && series != RideFile::NP) {
 
-        cpintpoint *p = &data.points[i];
+        for (int i = 0; i < data.points.size() - 1; ++i) {
 
-        double sum = 0.0;
-        int count = 0;
-        double prev_secs = p->secs;
+            cpintpoint *p = &data.points[i];
 
-        // from current point to end loop over remaining points
-        // look at every duration int seconds up to 300 seconds (5 minutes)
-        for (int j = i + 1; j < data.points.size() && data.points[j].secs - data.points[i].secs <= 360 ; ++j) {
+            double sum = 0.0;
+            int count = 0;
+            double prev_secs = p->secs;
 
-            cpintpoint *q = &data.points[j];
+            // from current point to end loop over remaining points
+            // look at every duration int seconds up to 300 seconds (5 minutes)
+            for (int j = i + 1; j < data.points.size() && data.points[j].secs - data.points[i].secs <= 360 ; ++j) {
 
-            sum += q->value;
-            count++;
+                cpintpoint *q = &data.points[j];
 
-            double dur_secs = q->secs - p->secs;
-            double avg = sum / count;
-            int dur_secs_top = (int) floor(dur_secs);
-            int dur_secs_bot = qMax((int) floor(dur_secs - data.rec_int_ms / 1000.0), 0);
+                sum += q->value;
+                count++;
 
-            // loop over our bests (1 for every second of the ride)
-            // to see if we have a new best
-            for (int k = dur_secs_top; k > dur_secs_bot; --k) {
-                if (ride_bests[k] < avg) ride_bests[k] = avg;
+                double dur_secs = q->secs - p->secs;
+                double avg = sum / count;
+                int dur_secs_top = (int) floor(dur_secs);
+                int dur_secs_bot = qMax((int) floor(dur_secs - data.rec_int_ms / 1000.0), 0);
+
+                // loop over our bests (1 for every second of the ride)
+                // to see if we have a new best
+                for (int k = dur_secs_top; k > dur_secs_bot; --k) {
+                    if (ride_bests[k] < avg) ride_bests[k] = avg;
+                }
+                prev_secs = q->secs;
             }
-            prev_secs = q->secs;
         }
-    }
+
+    } 
 
     // NOW DO BESTS FOR EVERY 60s 
     // BETWEEN 6mins and the rest of the ride
@@ -370,7 +379,78 @@ MeanMaxComputer::run()
             }
         }
     }
-//qDebug()<<"downsampled to "<<samplerate <<"second samples, ride duration="<<data.points.last().secs <<"have"<<downsampled.size()<<"samples";
+
+    // pre-process the data from watts to weighted 
+    // rolling averages if performing NP or xPower calculations
+    // we do this after downsampling to reduce the overhead since
+    // we do not calculate either for durations shorter than
+    // 6 minutes anyway
+    //
+    // NOTE: We can do this since all averages have an equal weight
+
+    // NP - rolling 30s avg ^ 4
+    if (series == RideFile::NP) {
+
+        int rollingwindowsize = 30 / samplerate;
+
+        // no point doing a rolling average if the
+        // sample rate is greater than the rolling average
+        // window!!
+        if (rollingwindowsize > 1) {
+
+            QVector<double> rolling(rollingwindowsize);
+            int index = 0;
+            double sum = 0;
+
+            // loop over the data and convert to a rolling
+            // average for the given windowsize
+            for (int i=0; i<downsampled.size(); i++) {
+
+                sum += downsampled[i];
+                sum -= rolling[index];
+
+                rolling[index] = downsampled[i];
+                downsampled[i] = pow(sum/rollingwindowsize,4); // raise rolling average to 4th power
+
+                // move index on/round
+                index = (index >= rollingwindowsize-1) ? 0 : index+1;
+            }
+        }
+    }
+
+    // xPower - 25s EWA - uses same algorithm as BikeScore.cpp
+    if (series == RideFile::xPower) {
+
+        const double exp = 2.0f / ((25.0f / samplerate) + 1.0f);
+        const double rem = 1.0f - exp;
+
+        int rollingwindowsize = 25 / samplerate;
+        double ewma = 0.0;
+        double sum = 0.0; // as we ramp up
+
+        // no point doing a rolling average if the
+        // sample rate is greater than the rolling average
+        // window!!
+        if (rollingwindowsize > 1) {
+
+            // loop over the data and convert to a EWMA
+            for (int i=0; i<downsampled.size(); i++) {
+
+                if (i < rollingwindowsize) {
+
+                    // get up to speed
+                    sum += downsampled[i];
+                    ewma = sum / (i+1);
+
+                } else {
+
+                    // we're up to speed
+                    ewma = (downsampled[i] * exp) + (ewma * rem);
+                }
+                downsampled[i] = pow(ewma, 4);
+            }
+        }
+    }
 
     // now we have downsampled lets find bests for every 20s
     // starting at 6mins
@@ -390,7 +470,11 @@ MeanMaxComputer::run()
             }
         }
         qSort(sums.begin(), sums.end());
-        ride_bests[slice] = sums.last() / windowsize;
+
+        if (series == RideFile::NP || series == RideFile::xPower)
+            ride_bests[slice] = pow((sums.last() / windowsize), 0.25);
+        else
+            ride_bests[slice] = sums.last() / windowsize;
     }
 
     // XXX Commented out since it just 'smooths' the drop
@@ -633,6 +717,8 @@ RideFileCache::readCache()
         cadMeanMax.resize(head.cadMeanMaxCount);
         nmMeanMax.resize(head.nmMeanMaxCount);
         kphMeanMax.resize(head.kphMeanMaxCount);
+        npMeanMax.resize(head.npMeanMaxCount);
+        xPowerMeanMax.resize(head.xPowerMeanMaxCount);
         wattsDistribution.resize(head.wattsDistCount);
         hrDistribution.resize(head.hrDistCount);
         cadDistribution.resize(head.cadDistCount);
@@ -665,6 +751,8 @@ RideFileCache::readCache()
         doubleArray(cadMeanMaxDouble, cadMeanMax, RideFile::cad);
         doubleArray(nmMeanMaxDouble, nmMeanMax, RideFile::nm);
         doubleArray(kphMeanMaxDouble, kphMeanMax, RideFile::kph);
+        doubleArray(npMeanMaxDouble, npMeanMax, RideFile::NP);
+        doubleArray(xPowerMeanMaxDouble, xPowerMeanMax, RideFile::xPower);
         doubleArray(wattsDistributionDouble, wattsDistribution, RideFile::watts);
         doubleArray(hrDistributionDouble, hrDistribution, RideFile::hr);
         doubleArray(cadDistributionDouble, cadDistribution, RideFile::cad);

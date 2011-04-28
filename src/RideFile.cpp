@@ -68,7 +68,7 @@ RideFile::seriesName(SeriesType series)
     case RideFile::nm: return QString(tr("Torque"));
     case RideFile::watts: return QString(tr("Power"));
     case RideFile::xPower: return QString(tr("xPower"));
-    case RideFile::NP: return QString(tr("Normalised Power"));
+    case RideFile::NP: return QString(tr("Normalized Power"));
     case RideFile::alt: return QString(tr("Altitude"));
     case RideFile::lon: return QString(tr("Longitude"));
     case RideFile::lat: return QString(tr("Latitude"));

@@ -267,10 +267,8 @@ void CriticalPowerWindow::addSeries()
 {
     // setup series list
     seriesList << RideFile::watts
-#if 0 // need to work out the best algorithm
                << RideFile::xPower
                << RideFile::NP
-#endif
                << RideFile::hr
                << RideFile::kph
                << RideFile::cad
