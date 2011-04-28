@@ -145,6 +145,14 @@ CpintPlot::setSeries(RideFile::SeriesType x)
             setAxisTitle(yLeft, tr("Average Pedal Force (nm)"));
             break;
 
+        case RideFile::NP:
+            setAxisTitle(yLeft, tr("Normalized Power (watts)"));
+            break;
+
+        case RideFile::xPower:
+            setAxisTitle(yLeft, tr("Skiba xPower (watts)"));
+            break;
+
         default:
         case RideFile::watts:
             setAxisTitle(yLeft, tr("Average Power (watts)"));
@@ -440,7 +448,11 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
     // Energy mode is really only interesting in the range where energy is
     // linear in interval duration--up to about 1 hour.
     double xmax = (series == RideFile::none)  ? 60.0 : time_values[n_values - 1];
-    thisPlot->setAxisScale(thisPlot->xBottom, (double) 0.017, (double)xmax);
+
+    if (series == RideFile::xPower || series == RideFile::NP)
+        thisPlot->setAxisScale(thisPlot->xBottom, (double) 6, (double)xmax);
+    else
+        thisPlot->setAxisScale(thisPlot->xBottom, (double) 0.017, (double)xmax);
 
     double ymax;
     if (series == RideFile::none) {
@@ -473,6 +485,7 @@ CpintPlot::calculate(RideItem *rideItem)
     // PLOT MODEL CURVE (DERIVED)
     //
     if (series == RideFile::watts || series == RideFile::none) {
+
         if (bests->meanMaxArray(series).size() > 1) {
             // calculate CP model from all-time best data
             cp  = tau = t0  = 0;
@@ -539,10 +552,16 @@ CpintPlot::calculate(RideItem *rideItem)
                         fill = (GColor(CTORQUE));
                         break;
 
-                    default:
                     case RideFile::hr:
                         line.setColor(GColor(CHEARTRATE).darker(200));
                         fill = (GColor(CHEARTRATE));
+
+                    default:
+                    case RideFile::watts: // won't ever get here
+                    case RideFile::NP:
+                    case RideFile::xPower:
+                        line.setColor(GColor(CPOWER).darker(200));
+                        fill = (GColor(CPOWER));
                         break;
                 }
 
@@ -569,7 +588,12 @@ CpintPlot::calculate(RideItem *rideItem)
                 xmax /= 60; // its in minutes not seconds
 
                 setAxisScale(yLeft, ymin, ymax);
-                setAxisScale(xBottom, 0.017, xmax);
+
+                if (series == RideFile::xPower || series == RideFile::NP)
+                    setAxisScale(xBottom, 6, xmax);
+                else
+                    setAxisScale(xBottom, 0.017, xmax);
+
                 allCurve->setPen(line);
                 fill.setAlpha(64);
                 allCurve->setBrush(fill);
