@@ -90,6 +90,7 @@ class RideFile : public QObject // QObject to emit signals
         enum seriestype { secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, interval, NP, xPower, none };
         typedef enum seriestype SeriesType;
         static QString seriesName(SeriesType);
+        static QString unitName(SeriesType);
         static int decimalsFor(SeriesType series);
         static double maximumFor(SeriesType series);
         static double minimumFor(SeriesType series);
