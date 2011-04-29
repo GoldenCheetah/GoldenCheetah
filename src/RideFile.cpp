@@ -78,6 +78,29 @@ RideFile::seriesName(SeriesType series)
     }
 }
 
+QString
+RideFile::unitName(SeriesType series)
+{
+    bool useMetricUnits = (appsettings->value(NULL, GC_UNIT).toString() == "Metric");
+
+    switch (series) {
+    case RideFile::secs: return QString(tr("seconds"));
+    case RideFile::cad: return QString(tr("rpm"));
+    case RideFile::hr: return QString(tr("bpm"));
+    case RideFile::km: return QString(useMetricUnits ? tr("km") : tr("miles"));
+    case RideFile::kph: return QString(useMetricUnits ? tr("kph") : tr("mph"));
+    case RideFile::nm: return QString(tr("N"));
+    case RideFile::watts: return QString(tr("watts"));
+    case RideFile::xPower: return QString(tr("watts"));
+    case RideFile::NP: return QString(tr("watts"));
+    case RideFile::alt: return QString(useMetricUnits ? tr("metres") : tr("feet"));
+    case RideFile::lon: return QString(tr("lon"));
+    case RideFile::lat: return QString(tr("lat"));
+    case RideFile::headwind: return QString(tr("kph"));
+    case RideFile::interval: return QString(tr("Interval"));
+    default: return QString(tr("Unknown"));
+    }
+}
 
 void
 RideFile::clearIntervals()

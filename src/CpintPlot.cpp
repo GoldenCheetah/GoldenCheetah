@@ -35,6 +35,9 @@
 #include "RideFile.h"
 #include "Season.h"
 #include "Settings.h"
+#include "LTMCanvasPicker.h"
+#include "TimeUtils.h"
+
 #include <boost/scoped_ptr.hpp>
 #include <algorithm> // for std::lower_bound
 
@@ -65,6 +68,13 @@ CpintPlot::CpintPlot(MainWindow *main, QString p, const Zones *zones) :
     grid = new QwtPlotGrid();
     grid->enableX(true);
     grid->attach(this);
+
+    zoomer = new penTooltip(this->canvas());
+    zoomer->setMousePattern(QwtEventPattern::MouseSelect1,
+                            Qt::LeftButton, Qt::ShiftModifier);
+
+    canvasPicker = new LTMCanvasPicker(this);
+    connect(canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), this, SLOT(pointHover(QwtPlotCurve*, int)));
 
     configChanged(); // apply colors
 }
@@ -555,6 +565,7 @@ CpintPlot::calculate(RideItem *rideItem)
                     case RideFile::hr:
                         line.setColor(GColor(CHEARTRATE).darker(200));
                         fill = (GColor(CHEARTRATE));
+                        break;
 
                     default:
                     case RideFile::watts: // won't ever get here
@@ -655,4 +666,27 @@ CpintPlot::showGrid(int state)
     assert(state != Qt::PartiallyChecked);
     grid->setVisible(state == Qt::Checked);
     replot();
+}
+
+void
+CpintPlot::pointHover(QwtPlotCurve *curve, int index)
+{
+    if (index >= 0) {
+
+        double xvalue = curve->x(index);
+        double yvalue = curve->y(index);
+        QString text;
+
+            // output the tooltip
+        text = QString("%1\n%3 %4")
+            .arg(interval_to_str(60.0*xvalue))
+            .arg(yvalue, 0, 'f', RideFile::decimalsFor(series) ? 1 : 0)
+            .arg(RideFile::unitName(series));
+
+        // set that text up
+        zoomer->setText(text);
+        return;
+    }
+    // no point
+    zoomer->setText("");
 }

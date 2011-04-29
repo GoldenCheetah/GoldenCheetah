@@ -23,6 +23,7 @@
 #include "RideFileCache.h"
 
 #include <qwt_plot.h>
+#include <qwt_plot_zoomer.h>
 #include <QtGui>
 
 class QwtPlotCurve;
@@ -31,6 +32,43 @@ class QwtPlotMarker;
 class RideItem;
 class Zones;
 class MainWindow;
+class LTMCanvasPicker;
+
+class penTooltip: public QwtPlotZoomer
+{
+    public:
+         penTooltip(QwtPlotCanvas *canvas):
+             QwtPlotZoomer(canvas), tip("")
+         {
+                 // With some versions of Qt/Qwt, setting this to AlwaysOn
+                 // causes an infinite recursion.
+                 //setTrackerMode(AlwaysOn);
+                 setTrackerMode(AlwaysOn);
+         }
+
+    virtual QwtText trackerText(const QwtDoublePoint &/*pos*/) const
+    {
+        QColor bg = QColor(255,255, 170); // toolyip yellow
+#if QT_VERSION >= 0x040300
+        bg.setAlpha(200);
+#endif
+        QwtText text;
+        QFont def;
+        //def.setPointSize(8); // too small on low res displays (Mac)
+        //double val = ceil(pos.y()*100) / 100; // round to 2 decimal place
+        //text.setText(QString("%1 %2").arg(val).arg(format), QwtText::PlainText);
+        text.setText(tip);
+        text.setFont(def);
+        text.setBackgroundBrush( QBrush( bg ));
+        text.setRenderFlags(Qt::AlignLeft | Qt::AlignTop);
+        return text;
+    }
+    void setFormat(QString fmt) { format = fmt; }
+    void setText(QString txt) { tip = txt; }
+    private:
+    QString format;
+    QString tip;
+};
 
 class CpintPlot : public QwtPlot
 {
@@ -61,6 +99,7 @@ class CpintPlot : public QwtPlot
         void plot_CP_curve(CpintPlot *plot, double cp, double tau, double t0n);
         void plot_allCurve(CpintPlot *plot, int n_values, const double *power_values);
         void configChanged();
+        void pointHover(QwtPlotCurve *curve, int index);
 
     protected:
 
@@ -80,6 +119,8 @@ class CpintPlot : public QwtPlot
         MainWindow *mainWindow;
 
         RideFileCache *current, *bests;
+        LTMCanvasPicker *canvasPicker;
+        penTooltip *zoomer;
 };
 
 #endif // _GC_CpintPlot_h
