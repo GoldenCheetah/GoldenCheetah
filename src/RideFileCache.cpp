@@ -230,8 +230,6 @@ void RideFileCache::RideFileCache::compute()
     computeDistribution(cadDistribution, RideFile::cad);
     computeDistribution(nmDistribution, RideFile::nm);
     computeDistribution(kphDistribution, RideFile::kph);
-    computeDistribution(xPowerDistribution, RideFile::xPower);
-    computeDistribution(npDistribution, RideFile::NP);
 
     // wait for them threads
     thread1.wait();
@@ -247,7 +245,8 @@ void
 MeanMaxComputer::run()
 {
     // xPower and NP need watts to be present
-    RideFile::SeriesType baseSeries = (series == RideFile::xPower || series == RideFile::NP) ? RideFile::watts : series;
+    RideFile::SeriesType baseSeries = (series == RideFile::xPower || series == RideFile::NP) ?
+                                      RideFile::watts : series;
 
     // only bother if the data series is actually present
     if (ride->isDataPresent(baseSeries) == false) return;
@@ -295,7 +294,7 @@ MeanMaxComputer::run()
     QVector <double> ride_bests(total_secs + 1);
 
     // loop through the decritized data from top
-    // FIRST 5 MINUTES DO BESTS FOR EVERY SECOND
+    // FIRST 6 MINUTES DO BESTS FOR EVERY SECOND
     // WE DO NOT DO THIS FOR NP or xPower SINCE
     // IT IS WELL KNOWN THAT THEY ARE NOT VALID
     // FOR SUCH SHORT DURATIONS AND IT IS VERY
@@ -344,6 +343,10 @@ MeanMaxComputer::run()
     // data now to 5s samples - but if the recording interval
     // is > 5s we won't bother, just set the interval used to
     // whatever the sample rate is for the device.
+    //
+    // NOTE: 5s was chosen since it is a common denominator
+    //       of 25s used for EWMA for xPower and 30s used
+    //       for Normalised Power.
     QVector<double> downsampled(0);
     double samplerate;
 
@@ -356,11 +359,11 @@ MeanMaxComputer::run()
 
     } else {
 
-        // moving to 10s samples is DECREASING the work...
+        // moving to 5s samples is DECREASING the work...
         samplerate = 5;
 
-        // we are downsampling to 10s
-        long five=5; // start at 1st 10s sample
+        // we are downsampling to 5s
+        long five=5; // start at 1st 5s sample
         double fivesum=0;
         int fivecount=0;
         for (int i=0; i<data.points.size(); i++) {
@@ -452,9 +455,9 @@ MeanMaxComputer::run()
         }
     }
 
-    // now we have downsampled lets find bests for every 20s
-    // starting at 6mins
-    for (int slice = 360; slice < ride_bests.size(); slice += 20) {
+    // now we have downsampled lets find bests starting at 6mins
+    // with duration searched increasing as ride duration does
+    for (int slice = 360; slice < ride_bests.size();) {
 
         QVector<double> sums(downsampled.size());
         int windowsize = slice / samplerate;
@@ -475,6 +478,15 @@ MeanMaxComputer::run()
             ride_bests[slice] = pow((sums.last() / windowsize), 0.25);
         else
             ride_bests[slice] = sums.last() / windowsize;
+
+        // increment interval duration we are going to search
+        // for next, gaps increase as duration increases to
+        // reduce overall work, since we require far less
+        // precision as the ride duration increases
+        if (slice < 3600) slice +=20; // 20s up to one hour
+        else if (slice < 7200) slice +=60; // 1m up to two hours
+        else if (slice < 10800) slice += 300; // 5mins up to three hours
+        else slice += 600; // 10mins after that
     }
 
     // XXX Commented out since it just 'smooths' the drop
@@ -497,7 +509,7 @@ MeanMaxComputer::run()
 #endif
 
     //
-    // FILL IN THE GAPS
+    // FILL IN THE GAPS AND FILL TARGET ARRAY
     //
     // We want to present a full set of bests for
     // every duration so the data interface for this
@@ -506,38 +518,20 @@ MeanMaxComputer::run()
     // future if some fancy new algorithm arrives
     //
     double last = 0;
+    array.resize(ride_bests.count());
     for (int i=ride_bests.size()-1; i; i--) {
         if (ride_bests[i] == 0) ride_bests[i]=last;
         else last = ride_bests[i];
-    }
-
-    //
-    // Now copy across into the array passed
-    // encoding decimal places as we go
-    array.resize(ride_bests.count());
-    for (int i=0; i<ride_bests.count(); i++) {
 
         // convert from double to long, preserving the
         // precision by applying a multiplier
         array[i] = ride_bests[i] * decimals;
-
     }
 }
 
 void
 RideFileCache::computeDistribution(QVector<unsigned long> &array, RideFile::SeriesType series)
 {
-    // Derived data series are a special case
-    if (series == RideFile::xPower) {
-        computeDistributionXPower();
-        return;
-    }
-
-    if (series == RideFile::NP) {
-        computeDistributionNP();
-        return;
-    }
-
     // only bother if the data series is actually present
     if (ride->isDataPresent(series) == false) return;
 
@@ -559,18 +553,6 @@ RideFileCache::computeDistribution(QVector<unsigned long> &array, RideFile::Seri
         if (offset >= 0 && offset < array.size()) array[offset]++; // XXX recintsecs != 1
     }
 }
-
-void
-RideFileCache::computeDistributionNP() {}
-
-void
-RideFileCache::computeDistributionXPower() {}
-
-void
-RideFileCache::computeMeanMaxNP() {}
-
-void
-RideFileCache::computeMeanMaxXPower() {}
 
 //
 // AGGREGATE FOR A GIVEN DATE RANGE
