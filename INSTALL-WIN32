@@ -1,0 +1,116 @@
+
+
+                                 +++++++++++++++++++++++
+                                 WIN32 BUILD WALKTHROUGH
+                                 +++++++++++++++++++++++
+
+                                       Gareth Coco
+
+                                        May 2011
+
+For my install, I am installing all my files into the directory: d:\coding.
+You can use any directory structure you like, you’ll just have to change paths.
+Just ensure that any folder path you use does not have a space in it.
+
+Download the NSI installer application. I use the Portable Apps version from:
+  http://portableapps.com/apps/development/nsis_portable
+- Install in D:\Coding\NSISPortable\
+
+Download Qt SDK from:
+ http://qt.nokia.com/downloads/sdk-windows-cpp
+ (File I am using is qt-sdk-win-opensource-2010.02.1.exe)
+- Install in D:\Coding\Qt
+
+Download latest Boost from:
+ http://sourceforge.net/projects/boost/files/boost/
+ (File I am using is boost_1_42_0.zip)
+- Install in D:\Coding\Boost
+
+Download the D2XX drivers:
+ http://www.ftdichip.com/Drivers/D2XX.htm
+ (File I am using is: CDM 202.06.00 WHQL Certified.zip)
+- Install in D:\Coding\D2XX
+
+Download qwt-plot3d from:
+ http://sourceforge.net/projects/qwtplot3d/files/
+ (File I am using is qwtplot3d-0.2.7.zip)
+- Install in D:\Coding\qwtplot3d
+
+Edit D:\coding\qwtplot3d\src\qwt3d_function.cpp
+- Add at top of file: #include <cstdio>
+Edit D:\coding\qwtplot3d\qwtplot3d.pro
+- Comment out: #win32:TEMPLATE    = vclib
+
+Then I start the “Qt Command Prompt” from the Qt SDK folder.
+
+d:
+cd d:\coding\qwtplot3d\
+qmake -win32
+mingw32-make release
+
+Now check out your favourite web sites until the code is built.
+
+Leave the Qt Command Prompt window open as we use it later.
+
+Download GoldenCheetah source
+(Either use GIT – git://github.com/srhea/GoldenCheetah.git
+ or download the zip file:
+ http://github.com/srhea/GoldenCheetah/zipball/master)
+- Install in D:\Coding\GoldenCheetah
+
+Copy D:\Coding\GoldenCheetah\src\gccconfig.pri.in
+  to D:\Coding\GoldenCheetah\src\gccconfig.pri and edit
+- Set: BOOST_INSTALL = d:/coding/boost
+- Set: D2XX_INCLUDE = d:/coding/D2XX
+- Comment out #SRMIO_INSTALL
+- Set: BOOST_INCLUDE = $${BOOST_INSTALL}/
+- Comment out: CONFIG += debug
+- Uncomment: CONFIG += static
+
+Copy D:\Coding\GoldenCheetah\qwt\qwtconfig.pri.in
+  to D:\Coding\GoldenCheetah\qwt\qwtconfig.pri and edit
+- Set win32 { INSTALLBASE    = D:/Coding/Qt  }
+- In #Qt4 win32 { section
+  – Comment out: #CONFIG           += debug     # release/debug/debug_and_release
+  – Add in:   CONFIG           += release
+
+Using the “Qt Command Prompt” window from before:
+
+cd d:\coding\GoldenCheetah
+qmake -win32
+mingw32-make release
+
+Go back to checking your email or favourite web sites while this builds.
+
+When all is finished, you should have a release version in:
+
+D:\Coding\GoldenCheetah\src\release\
+
+Next , move required build files into the d:\coding\GoldenCheetah\src\release directory.
+
+cd d:\coding\GoldenCheetah
+copy /y ..\Qt\qt\bin\mingwm10.dll src\release\
+copy /y ..\Qt\qt\bin\QtCore4.dll src\release\
+copy /y ..\Qt\qt\bin\QtGui4.dll src\release\
+copy /y ..\Qt\qt\bin\QtSql4.dll src\release\
+copy /y ..\Qt\qt\bin\QtXml4.dll src\release\
+copy /y ..\Qt\qt\bin\QtNetwork4.dll src\release\
+copy /y ..\Qt\qt\bin\QtOpenGL4.dll src\release\
+copy /y ..\Qt\qt\bin\QtWebKit4.dll src\release\
+copy /y ..\Qt\qt\bin\QtXmlPatterns4.dll src\release\
+copy /y ..\Qt\qt\bin\phonon4.dll src\release\
+copy /y ..\Qt\qt\bin\libgcc_s_dw2-1.dll src\release\
+copy /y ..\qwtplot3d\lib\qwtplot3d.dll src\release\
+mkdir src\release\sqldrivers
+copy /y ..\Qt\qt\plugins\sqldrivers\qsqlite4.dll src\release\sqldrivers\
+mkdir src\release\imageformats
+copy /y ..\Qt\qt\plugins\imageformats\qjpeg4.dll src\release\imageformats\
+
+To build the self installer:
+
+cd d:\coding\GoldenCheetah\src\win32
+d:\coding\NSISPortable\App\NSIS\makensis.exe GoldenCheetahInstall.nsi
+
+You should find the installer file in the directory you are in.
+
+Install and enjoy.
