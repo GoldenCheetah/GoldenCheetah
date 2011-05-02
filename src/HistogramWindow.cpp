@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2009 Sean C. Rhea (srhea@srhea.net)
+ *               2011 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -29,8 +30,7 @@
 #include "Zones.h"
 #include "HrZones.h"
 
-HistogramWindow::HistogramWindow(MainWindow *mainWindow) :
-    GcWindow(mainWindow), mainWindow(mainWindow)
+HistogramWindow::HistogramWindow(MainWindow *mainWindow) : GcWindow(mainWindow), mainWindow(mainWindow), source(NULL)
 {
     setInstanceName("Histogram Window");
 
@@ -60,119 +60,141 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow) :
     binWidthLayout->addWidget(binWidthSlider);
     cl->addLayout(binWidthLayout);
 
-    lnYHistCheckBox = new QCheckBox;
-    lnYHistCheckBox->setText(tr("Log Y"));
-    cl->addWidget(lnYHistCheckBox);
+    showLnY = new QCheckBox;
+    showLnY->setText(tr("Log Y"));
+    cl->addWidget(showLnY);
 
-    withZerosCheckBox = new QCheckBox;
-    withZerosCheckBox->setText(tr("With zeros"));
-    cl->addWidget(withZerosCheckBox);
+    showZeroes = new QCheckBox;
+    showZeroes->setText(tr("With zeros"));
+    cl->addWidget(showZeroes);
 
-    histShadeZones = new QCheckBox;
-    histShadeZones->setText(tr("Shade zones"));
-    cl->addWidget(histShadeZones);
+    shadeZones = new QCheckBox;
+    shadeZones->setText(tr("Shade zones"));
+    shadeZones->setChecked(powerHist->shade);
+    cl->addWidget(shadeZones);
 
-    histParameterCombo = new QComboBox();
-    histParameterCombo->addItem(tr("Watts"));
-    histParameterCombo->addItem(tr("Watts (by Zone)"));
-    histParameterCombo->addItem(tr("Torque"));
-    histParameterCombo->addItem(tr("Heartrate"));
-    histParameterCombo->addItem(tr("Heartrate (by Zone)"));
-    histParameterCombo->addItem(tr("Speed"));
-    histParameterCombo->addItem(tr("Cadence"));
-    histParameterCombo->setCurrentIndex(0);
-    cl->addWidget(histParameterCombo);
+    showInZones = new QCheckBox;
+    showInZones->setText(tr("Show in zones"));
+    cl->addWidget(showInZones);
 
-    histSumY = new QComboBox();
-    histSumY->addItem(tr("Absolute Time"));
-    histSumY->addItem(tr("Percentage Time"));
-    cComboSeason = new QComboBox(this);
+    seriesCombo = new QComboBox();
+    addSeries();
+    cl->addWidget(seriesCombo);
+
+    showSumY = new QComboBox();
+    showSumY->addItem(tr("Absolute Time"));
+    showSumY->addItem(tr("Percentage Time"));
+    seasonCombo = new QComboBox(this);
     addSeasons();
-    cl->addWidget(histSumY);
-    cl->addWidget(cComboSeason);
+    seasonCombo->setCurrentIndex(0); // default to current ride selected
+    cl->addWidget(showSumY);
+    cl->addWidget(seasonCombo);
     cl->addStretch();
 
     // sort out default values
     setHistTextValidator();
-    lnYHistCheckBox->setChecked(powerHist->islnY());
-    withZerosCheckBox->setChecked(powerHist->withZeros());
+    showLnY->setChecked(powerHist->islnY());
+    showZeroes->setChecked(powerHist->withZeros());
     binWidthSlider->setValue(powerHist->binWidth());
     setHistBinWidthText();
 
-    connect(binWidthSlider, SIGNAL(valueChanged(int)),
-            this, SLOT(setBinWidthFromSlider()));
-    connect(binWidthLineEdit, SIGNAL(editingFinished()),
-            this, SLOT(setBinWidthFromLineEdit()));
-    connect(lnYHistCheckBox, SIGNAL(stateChanged(int)),
-            this, SLOT(setlnYHistFromCheckBox()));
-    connect(withZerosCheckBox, SIGNAL(stateChanged(int)),
-            this, SLOT(setWithZerosFromCheckBox()));
-    connect(histParameterCombo, SIGNAL(currentIndexChanged(int)),
-            this, SLOT(setHistSelection(int)));
-    connect(histShadeZones, SIGNAL(stateChanged(int)),
-            this, SLOT(setHistSelection(int)));
-    connect(histSumY, SIGNAL(currentIndexChanged(int)),
-            this, SLOT(setSumY(int)));
-    //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+    // set the defaults etc
+    updateChart();
+
+    // the bin slider/input update each other
+    // only the input box triggers an update to the chart
+    connect(binWidthSlider, SIGNAL(valueChanged(int)), this, SLOT(setBinWidthFromSlider()));
+    connect(binWidthLineEdit, SIGNAL(editingFinished()), this, SLOT(setBinWidthFromLineEdit()));
+
+    // when season changes we need to retrieve data from the cache then update the chart
+    connect(seasonCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(seasonSelected(int)));
+
+    // if any of the controls change we pass the chart everything
+    connect(showLnY, SIGNAL(stateChanged(int)), this, SLOT(updateChart()));
+    connect(showZeroes, SIGNAL(stateChanged(int)), this, SLOT(updateChart()));
+    connect(seriesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(updateChart()));
+    connect(showInZones, SIGNAL(stateChanged(int)), this, SLOT(updateChart()));
+    connect(shadeZones, SIGNAL(stateChanged(int)), this, SLOT(updateChart()));
+    connect(showSumY, SIGNAL(currentIndexChanged(int)), this, SLOT(updateChart()));
+
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
     connect(mainWindow, SIGNAL(configChanged()), powerHist, SLOT(configChanged()));
-    connect(cComboSeason, SIGNAL(currentIndexChanged(int)), this, SLOT(seasonSelected(int)));
 }
 
 void
 HistogramWindow::rideSelected()
 {
-    if (!amVisible())
-        return;
+    if (!amVisible()) return;
+
     RideItem *ride = myRideItem;
-    if (!ride)
-        return;
+    if (!ride || seasonCombo->currentIndex() != 0) return;
 
     // get range that applies to this ride
     powerRange = mainWindow->zones()->whichRange(ride->dateTime.date());
     hrRange = mainWindow->hrZones()->whichRange(ride->dateTime.date());
 
-    // set the histogram data
-    powerHist->setData(ride);
+    // update
+    updateChart();
 }
 
 void
 HistogramWindow::intervalSelected()
 {
-    if (!amVisible())
-        return;
-    RideItem *ride = myRideItem;
-    if (!ride) return;
+    if (!amVisible()) return;
 
-    // set the histogram data
-    powerHist->setData(ride);
+    RideItem *ride = myRideItem;
+
+    // null? or not plotting current ride, ignore signal
+    if (!ride || seasonCombo->currentIndex() != 0) return;
+
+    // update
+    interval = true;
+    updateChart();
 }
 
 void
 HistogramWindow::zonesChanged()
 {
-    if (!amVisible())
-        return;
+    if (!amVisible()) return;
+
     powerHist->refreshZoneLabels();
     powerHist->replot();
 }
 
 void HistogramWindow::seasonSelected(int index)
 {
+    RideFileCache *old = source;
+
     if (index > 0) {
         index--; // it is now an index into the season array
 
         // Set data from BESTS
         Season season = seasons.at(index);
+        QDate start = season.getStart();
+        QDate end = season.getEnd();
+        if (end == QDate()) end = QDate(3000,12,31);
+        if (start == QDate()) start = QDate(1900,1,1);
+        source = new RideFileCache(mainWindow, start, end);
 
-    } else if (!index) {
-        // Set data from RIDE
-
+        if (old) delete old; // guarantee source pointer changes
     }
+    updateChart();
 }
 
+void HistogramWindow::addSeries()
+{
+    // setup series list
+    seriesList << RideFile::watts
+               << RideFile::hr
+               << RideFile::kph
+               << RideFile::cad
+               << RideFile::nm;
+
+    foreach (RideFile::SeriesType x, seriesList) 
+        seriesCombo->addItem(RideFile::seriesName(x), static_cast<int>(x));
+}
 void HistogramWindow::addSeasons()
 {
     QFile seasonFile(mainWindow->home.absolutePath() + "/seasons.xml");
@@ -182,52 +204,26 @@ void HistogramWindow::addSeasons()
     xmlReader.setContentHandler(&handler);
     xmlReader.setErrorHandler(&handler);
     bool ok = xmlReader.parse( source );
-    if(!ok)
-        qWarning("Failed to parse seasons.xml");
+    if(!ok) qWarning("Failed to parse seasons.xml");
 
     seasons = handler.getSeasons();
     Season season;
     season.setName(tr("All Seasons"));
     seasons.insert(0,season);
 
-    cComboSeason->addItem("Selected Ride");
+    seasonCombo->addItem("Selected Ride");
     foreach (Season season, seasons)
-        cComboSeason->addItem(season.getName());
-    if (!seasons.empty()) {
-        cComboSeason->setCurrentIndex(cComboSeason->count() - 1);
-        Season season = seasons.last();
-        // set default parameters here
-        // XXX todo
-    }
+        seasonCombo->addItem(season.getName());
 }
+
 void
 HistogramWindow::setBinWidthFromSlider()
 {
     if (powerHist->binWidth() != binWidthSlider->value()) {
         powerHist->setBinWidth(binWidthSlider->value());
-	setHistBinWidthText();
-    }
-}
+        setHistBinWidthText();
 
-void
-HistogramWindow::setlnYHistFromCheckBox()
-{
-    if (powerHist->islnY() != lnYHistCheckBox->isChecked())
-	powerHist->setlnY(! powerHist->islnY());
-}
-
-void
-HistogramWindow::setSumY(int index)
-{
-    if (index < 0) return; // being destroyed
-    else powerHist->setSumY(index == 0);
-}
-
-void
-HistogramWindow::setWithZerosFromCheckBox()
-{
-    if (powerHist->withZeros() != withZerosCheckBox->isChecked()) {
-        powerHist->setWithZeros(withZerosCheckBox->isChecked());
+        updateChart();
     }
 }
 
@@ -242,67 +238,21 @@ HistogramWindow::setHistTextValidator()
 {
     double delta = powerHist->getDelta();
     int digits = powerHist->getDigits();
-    binWidthLineEdit->setValidator(
-	    (digits == 0) ?
-	    (QValidator *) (
-		new QIntValidator(binWidthSlider->minimum() * delta,
-		    binWidthSlider->maximum() * delta,
-		    binWidthLineEdit
-		    )
-		) :
-	    (QValidator *) (
-		new QDoubleValidator(binWidthSlider->minimum() * delta,
-		    binWidthSlider->maximum() * delta,
-		    digits,
-		    binWidthLineEdit
-		    )
-		)
-	    );
 
-}
+    QValidator *validator;
+    if (digits == 0) {
 
-void
-HistogramWindow::setHistSelection(int /*id*/)
-{
-    // Set shading first, since the dataseries selection
-    // below will trigger a redraw, and we need to have
-    // set the shading beforehand. OK, so we could make
-    // either change trigger it, but this makes for simpler
-    // code here and in powerhist.cpp
-    if (histShadeZones->isChecked()) powerHist->setShading(true);
-    else powerHist->setShading(false);
+        validator = new QIntValidator(binWidthSlider->minimum() * delta,
+                                      binWidthSlider->maximum() * delta,
+                                      binWidthLineEdit);
+    } else {
 
-    // Which data series are we plotting?
-    switch (histParameterCombo->currentIndex()) {
-    default:
-    case 0 :
-	    powerHist->setSelection(PowerHist::watts);
-        break;
-
-    case 1 :
-	    powerHist->setSelection(PowerHist::wattsZone);
-        break;
-
-    case 2 :
-	    powerHist->setSelection(PowerHist::nm);
-        break;
-
-    case 3 :
-	    powerHist->setSelection(PowerHist::hr);
-        break;
-
-    case 4 :
-	    powerHist->setSelection(PowerHist::hrZone);
-        break;
-    case 5 :
-	    powerHist->setSelection(PowerHist::kph);
-        break;
-
-    case 6 :
-	    powerHist->setSelection(PowerHist::cad);
+        validator = new QDoubleValidator(binWidthSlider->minimum() * delta,
+                                         binWidthSlider->maximum() * delta,
+                                         digits,
+                                         binWidthLineEdit);
     }
-    setHistBinWidthText();
-    setHistTextValidator();
+    binWidthLineEdit->setValidator(validator);
 }
 
 void
@@ -310,7 +260,43 @@ HistogramWindow::setBinWidthFromLineEdit()
 {
     double value = binWidthLineEdit->text().toDouble();
     if (value != powerHist->binWidth()) {
-	binWidthSlider->setValue(powerHist->setBinWidthRealUnits(value));
-	setHistBinWidthText();
+        binWidthSlider->setValue(powerHist->setBinWidthRealUnits(value));
+        setHistBinWidthText();
+
+        updateChart();
     }
+}
+
+void
+HistogramWindow::updateChart()
+{
+    // set data
+    if (seasonCombo->currentIndex() != 0 && source)
+        powerHist->setData(source);
+    else if (seasonCombo->currentIndex() == 0 && myRideItem)
+        powerHist->setData(myRideItem, interval); // intervals selected forces data to
+                                                  // be recomputed since interval selection
+                                                  // has changed.
+
+    // and now the controls
+    powerHist->setShading(shadeZones->isChecked() ? true : false);
+    powerHist->setZoned(showInZones->isChecked() ? true : false);
+    powerHist->setlnY(showLnY->isChecked() ? true : false);
+    powerHist->setWithZeros(showZeroes->isChecked() ? true : false);
+    powerHist->setSumY(showSumY->currentIndex()== 0 ? true : false);
+    powerHist->setBinWidth(binWidthLineEdit->text().toDouble());
+
+    // and which series to plot
+    powerHist->setSeries(static_cast<RideFile::SeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt()));
+
+    // now go plot yourself
+    //powerHist->setAxisTitle(int axis, QString label);
+    powerHist->recalc(interval); // interval changed? force recalc
+    powerHist->replot();
+
+    interval = false;// we force a recalc whem called coz intervals
+                     // have been selected. The recalc routine in
+                     // powerhist optimises out, but doesn't keep track
+                     // of interval selection -- simplifies the setters
+                     // and getters, so worth this 'hack'.
 }

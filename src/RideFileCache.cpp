@@ -161,6 +161,37 @@ RideFileCache::meanMaxArray(RideFile::SeriesType series)
     }
 }
 
+QVector<double> &
+RideFileCache::distributionArray(RideFile::SeriesType series)
+{
+    switch (series) {
+
+        case RideFile::watts:
+            return wattsDistributionDouble;
+            break;
+
+        case RideFile::cad:
+            return cadDistributionDouble;
+            break;
+
+        case RideFile::hr:
+            return hrDistributionDouble;
+            break;
+
+        case RideFile::nm:
+            return nmDistributionDouble;
+            break;
+
+        case RideFile::kph:
+            return kphDistributionDouble;
+            break;
+
+        default:
+            //? dunno give em power anyway
+            return wattsMeanMaxDouble;
+            break;
+    }
+}
 
 //
 // COMPUTATION
@@ -550,7 +581,7 @@ RideFileCache::computeDistribution(QVector<unsigned long> &array, RideFile::Seri
         unsigned long lvalue = value * pow(10, decimals);
 
         int offset = lvalue - min;
-        if (offset >= 0 && offset < array.size()) array[offset]++; // XXX recintsecs != 1
+        if (offset >= 0 && offset < array.size()) array[offset] += ride->recIntSecs();
     }
 }
 
@@ -584,7 +615,8 @@ static void meanMaxAggregate(QVector<double> &into, QVector<double> &other, QVec
 // resize into and then sum the arrays
 static void distAggregate(QVector<double> &into, QVector<double> &other)
 {
-    for (int i=0; i<into.size(); i++) into[i] += other[i];
+    if (into.size() < other.size()) into.resize(other.size());
+    for (int i=0; i<other.size(); i++) into[i] += other[i];
 }
 
 RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end)
