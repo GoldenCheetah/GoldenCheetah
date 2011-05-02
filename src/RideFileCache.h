@@ -118,14 +118,10 @@ class RideFileCache
         void serialize(QDataStream *out); // write to file
 
         void compute();             // compute all arrays
+
+        // NOW replaced computeMeanMax with MeanMaxComputer class see bottom of file
         //void computeMeanMax(QVector<unsigned long>&, RideFile::SeriesType);      // compute mean max arrays
         void computeDistribution(QVector<unsigned long>&, RideFile::SeriesType); // compute the distributions
-
-        // derived values are processed slightly differently
-        void computeDistributionNP();
-        void computeDistributionXPower();
-        void computeMeanMaxNP();
-        void computeMeanMaxXPower();
 
 
     private:

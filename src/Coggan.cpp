@@ -41,39 +41,45 @@ class NP : public RideMetric {
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
                  const MainWindow *) {
-        QVector<double> last30secs;
 
-        double secsDelta = ride->recIntSecs();
-        if(secsDelta == 0)
-            return;
-        double sampsPerWindow = ceil(30.0 / secsDelta);
-        last30secs.resize(sampsPerWindow + 1); // add 1 just in case
+        if(ride->recIntSecs() == 0) return;
 
-        double total = 0.0;
+        int rollingwindowsize = 30 / ride->recIntSecs();
+
+        double total = 0;
         int count = 0;
 
-        foreach(const RideFilePoint *point, ride->dataPoints()) {
-            if (count < sampsPerWindow) {
-                last30secs[count] = point->watts;
-                count++;
-            } else {
+        // no point doing a rolling average if the
+        // sample rate is greater than the rolling average
+        // window!!
+        if (rollingwindowsize > 1) {
 
-                double rolling = 0.0;
-                for (int i=0; i<sampsPerWindow; i++) {
-                    rolling += last30secs[i];
-                }
-                rolling /= sampsPerWindow;
-                total += pow(rolling, 4.0);
+            QVector<double> rolling(rollingwindowsize);
+            int index = 0;
+            double sum = 0;
 
-                last30secs.remove(0);
-                last30secs.resize(sampsPerWindow+1); // add 1 to the end
-                last30secs[sampsPerWindow-1] = point->watts;
-                count++;
+            // loop over the data and convert to a rolling
+            // average for the given windowsize
+            for (int i=0; i<ride->dataPoints().size(); i++) {
+
+                sum += ride->dataPoints()[i]->watts;
+                sum -= rolling[index];
+
+                rolling[index] = ride->dataPoints()[i]->watts;
+
+                total += pow(sum/rollingwindowsize,4); // raise rolling average to 4th power
+                count ++;
+
+                // move index on/round
+                index = (index >= rollingwindowsize-1) ? 0 : index+1;
             }
         }
-        if (count > sampsPerWindow)
-            np = pow(total / (count-sampsPerWindow), 0.25);
-        secs = count * secsDelta;
+        if (count) {
+            np = pow(total / (count), 0.25);
+            secs = count * ride->recIntSecs();
+        } else {
+            np = secs = 0;
+        }
 
         setValue(np);
         setCount(secs);
