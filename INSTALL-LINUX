@@ -1,0 +1,360 @@
+
+                                 +++++++++++++++++++++++
+                                 LINUX BUILD WALKTHROUGH
+                                 +++++++++++++++++++++++
+
+                                     Mark Liversedge
+                                     John Ehrlinger
+
+                                        May 2011
+                                      Version 1.0
+
+A walkthrough of building GoldenCheetah from scratch on Ubuntu linux. This walkthrough
+should be largely the same for any Linux distro.
+
+CONTENTS
+
+1. BASIC INSTALLATION WITH MANDATORY DEPENDENCIES
+   - boost
+   - QT
+   - git
+
+2. ADDING OPTIONAL DEPENDENCIES WHEN BUILDING VERSION 2
+   - FTDI D2XX
+   - SRMIO
+   - liboauth
+   - QwtPlot3d
+   - libkml
+
+3. ADDING OPTIONAL DEPENDENCIES WHEN BUILDING VERSION 3
+   - checking out the release 3 branch & building with MANDATORY dependencies
+     - flex
+     - bison
+   - libical - Diary window and CalDAV support (google/mobileme calendar integration)
+
+
+1. BASIC INSTALLATION WITH MANDATORY DEPENDENCIES
+=================================================
+
+Installed Ubuntu 11.04 from CD image amd-64.iso. You will not need to do this if you
+already have a Linux distribution installed. Left this step in to highlight the
+Linux distribution the commands below were executed on.
+
+login and open a terminal to get a shell prompt
+
+Download MANDATORY DEPENDENCIES (browser)
+-----------------------------------------
+Download Qt-sdk1.1 from http://developer.qt.nokia.com/prereleases, chose Linux 64-bit
+Run the Qt installer (need to chmod +x it first) and install to default location (home)
+Put qmake in path (e.g. sudo cp ~/QtSDK/Desktop/Qt/473/gcc/bin/qmake /usr/local/bin)
+Test qmake is ok with: qmake --version (should report 4.7.0 or higher)
+
+Download Boost 1.46.1 from http://sourceforge.net/projects/boost/files/boost/1.46.1/
+Extract files with archive manager into home directory (~/boost_1_46_1/) or you
+may be able to install with
+$ sudo apt-get install libboost1.42-dev
+
+Install git with:
+$ sudo apt-get install git
+Said Y to prompt about all git files installed (git-gui et al)
+
+Get latest GOLDEN CHEETAH source files
+--------------------------------------
+$ mkdir -p ~/Projects/Live
+$ cd ~/Projects/Live
+$ git clone git://github.com/srhea/GoldenCheetah.git
+$ cd GoldenCheetah
+
+Configure MANDATORY DEPENDENCIES
+--------------------------------
+$ cd qwt
+$ cp qwtconfig.pri.in qwtconfig.pri
+$ cd ../src
+$ cp gcconfig.pri.in gcconfig.pri
+$ vi gcconfig.pri
+
+Comment out the D2XX_INCLUDE and SRMIO_INSTALL lines for now (put # in first character of the line
+to comment out), we will install that in a moment, if we need to.
+
+Adjust the boost location to the location we installed to (home), so it should read something
+like below (my home directory is markl)
+
+BOOST_INSTALL=/home/markl/boost_1_46_1
+
+also, BOOST_INCLUDE should not have a trailing include on it, this is a legacy setting
+that a lot of other users have used in the past, look for it towards the end if gcconfig.pri
+and it should read like this (take off trailing /include):
+
+BOOST_INCLUDE=$${BOOST_INSTALL)
+
+Save and exit
+
+$ cd ..
+
+BUILD WITH BASIC CONFIGURATION
+$ qmake
+$ make
+
+Congratulations you have now build a basic GoldenCheetah and can run this safely. See below for
+optional dependencies you can install to support other features.
+
+ADDING OPTIONAL DEPENDENCIES WHEN BUILDING VERSION 2
+====================================================
+
+D2XX - For Powertap downloads via USB
+-------------------------------------
+
+Download the FTDI drivers from http://www.ftdichip.com/Drivers/D2XX.htm (e.g. I used Linux 
+64-bit drivers from http://www.ftdichip.com/Drivers/D2XX/Linux/libftd2xx1.0.4.tar.gz)
+
+Extract into your home directory (I put mine into ~/Projects/ with archive manager which
+created a sub-directory ~/Projects/libftd2xx1.0.4
+
+$ cd src
+$ vi gcconfig.pri
+
+Uncomment the D2XX_INCLUDE entry and make it match (my home is /home/markl)
+D2XX_INCLUDE = /home/markl/libftd2xx1.0.4
+
+Make clean is needed if you have previouslt built, since source files examine #defines before
+including this feature. You can skip it if you know why ;)
+$ make clean
+$ qmake
+$ make
+
+You now have D2XX support, for downloading from a PT via a USB cradle.
+
+SRMIO - For SRM powercontrol V downloads via Serial
+---------------------------------------------------
+
+$ cd ~/Projects
+$ git clone git://github.com/rclasen/srmio srmio
+$ cd srmio
+
+Get automake and tools, if you don't already have them (I didn't after a fresh install)
+$ sudo apt-get install automake
+$ sudo apt-get install libtool
+
+Generate the configure script, run it, build and install srmio
+$ sh genautomake.sh
+$ ./configure
+$ make
+$ sudo make install
+
+Lets go config GC and build with SRMIO
+$ cd ~/Projects/Live/GoldenCheetah/src
+$ vi gcconfig.pri
+
+Uncomment the SRMIO_INSTALL and replace with the target used from srmio install:
+SRMIO_INSTALL = /usr/local/
+
+At the bottom of gcconfig.pri you will see the include directory should reference from
+the base install location (/usr/local) make sure it says:
+
+SRMIO_INCLUDE = $${SRMIO_INSTALL}/include
+SRMIO_LIB = $${SRMIO_INSTALL}/lib/libsrmio.a
+
+Make clean is needed if you have previouslt built, since source files examine #defines before
+including this feature. You can skip it if you know why ;)
+$ make clean
+$ qmake
+$ make
+
+You now have SRM support built in.
+
+OAUTH/CRYPT - For Tweet my ride (twitter) support
+-------------------------------------------------
+
+You should be able to install liboauth and dependencies
+directly with:
+$ sudo apt-get install liboauth-dev
+
+If this does not work then:
+
+    Download the source from: http://sourceforge.net/projects/liboauth/files/liboauth-0.9.4.tar.gz/download and
+    unpack it into ~/Projects/liboauth-0.9.4 using archive manager
+
+    $ cd ~/Projects/liboauth-0.9.4
+
+    You may find that libcurl is not installed (which liboauth depends upon) so download it
+    from http://curl.haxx.se/download/curl-7.21.6.tar.gz and unpack it into ~/Projects/curl-7.21.6
+    using archive manager to drag and drop into your Projects folder
+
+    $ cd ~/Projects/curl-7.21.6
+    $ ./configure
+    $ make
+    $ sudo make install
+
+    You should now have libcurl and friends installed in /usr/local
+
+    You may find that liboauth also requires the openssl libs installed, these are available
+    pre-packaged thankfully so:
+    $ sudo apt-get install libssl-dev
+
+    This will also install zlibg which liboauth also desires.
+
+    $ cd ~/Projects/liboauth-0.9.4
+    $ ./configure
+    $ make
+    $ sudo make install
+
+Now we have liboauth and libcurl in /usr/local and libssl in /usr/lib, so we can go back to
+GoldenCheetah and update the gcconfig.pri to point at the right places:
+
+$ cd ~/Projects/Live/GoldenCheetah/src
+$ vi gcconfig.pri
+
+Make sure the following are set:
+LIBOAUTH_INSTALL = /usr/local
+LIBCRYPTO_INSTALL = -lcrypto
+LIBCURL_INSTALL=-lcurl
+
+Make clean is needed if you have previously built, since source files examine #defines before
+including this feature. You can skip it if you know why ;)
+$ make clean
+$ qmake
+$ make
+
+You can now tweet your rides and amaze your friends, or alternatively tweet your rides but
+omit to mention average power to hide your weaknesses.
+
+LIBQWTPLOT3D - For 3D plot
+--------------------------
+
+Download the tarball from http://qwtplot3d.svn.sourceforge.net/viewvc/qwtplot3d/branches/maintain_0_2_x/qwtplot3d/?view=tar
+and unarchive it into your Projects directory using archive manager. There is no version number it just creates a
+subdirectory called qwtplot3d
+
+$ cd ~/Projects/qwtplot3d
+
+XXX - TODO - Natty Narwhal has funky OpenGL libs XXX will sort this later!
+
+LIBKML - For export to Google Earth
+-----------------------------------
+
+You will need Google Earth 5.2 or later and therefore libkml that supports this. Unfortunately at the time of writing
+the officially packaged libkml is too old, so you will need to install from source, which means you will need to have
+subversion installed and expat. You may be able to use the currently packaged libkml with
+
+$ sudo apt-get install libkml-dev
+
+if this does not work you will need to build from source:
+
+    $ sudo apt-get install subversion
+    $ sudo apt-get install expat libexpat1 libexpat1-dev
+
+    Once svn is installed you can grab the libkml source and configure build etc:
+    $ cd ~/Projects
+    $ svn checkout http://libkml.googlecode.com/svn/trunk/ libkml
+    $ cd libkml
+
+    You will need automake and friends (see SRMIO above)
+    $ sh autogen.sh
+    $ ./configure
+    $ make
+    $ make install
+    $ sudo make install
+
+    If you get errors about use of 'long long' then edit:
+    - src/kml/{convenience,dom,engine,regionator,xsd}/Makefile
+    - examples/{engine,gpx,gx,hellonet,helloworld,regionator,xsd}/Makefile
+    - and look for the flag -pedantic and remove it. I got this on Linux 64bit builds ymmv.
+
+Once libkml is installed and built:
+
+$ cd ~/Projects/Live/GoldenCheetah/src
+$ vi gcconfig.pri
+
+Ensure KML_INSTALL=/usr/local
+
+Make clean is needed if you have previously built, since source files examine #defines before
+including this feature. You can skip it if you know why ;)
+$ make clean
+$ qmake
+$ make
+
+You can now export rides to Google Earth kml format.
+
+ADDING OPTIONAL DEPENDENCIES WHEN BUILDING VERSION 3
+====================================================
+
+Checking out the Release 3 branch & bulding with MANDATORY dependencies
+-----------------------------------------------------------------------
+
+Release 3 is being maintained as a branch (master is currently the v2 branch). To
+checkout the latest v3 source:
+
+First create a local tracking branch
+$ git branch --track release_3.0.0dev origin/release_3.0.0dev
+
+Now checkout the release3 code
+$ git checkout release_3.0.0dev
+
+You will now be on the release 3 branch. So lets build afresh. Note that the v3 code
+requires flex/bison to be installed, but these will not be available as standard on most
+Linux distros.
+
+$ sudo apt-get install bison
+$ sudo apt-get install flex
+$ vi gcconfig.pri
+
+Ensure you have the following lines (which are now also in gcconfig.pri.in which has
+been updated to reflect the new dependencies in version 3)
+
+QMAKE_LEX  = flex
+QMAKE_YACC = bison
+win32 {
+  QMAKE_YACC = bison --file-prefix=y -t
+  QMAKE_MOVE = cmd /c move
+  QMAKE_DEL_FILE = rm -f
+}
+
+Obviously, the win32 piece is not relevant for Linux builds :)
+
+$ make clean
+$ qmake
+$ make
+
+You will now have a release3 binary but with none of the release3 dependencies compiled in.
+
+NOTE: When you run version 3 it will refresh ride metrics and CP files -- this only occurs the
+      first time it runs (and will refresh only rides that change after that). I find it is best
+      to import ride files once your build where you want it. i.e. don't import until you have
+      got all your dependencies sorted.
+
+NOTE: To reduce the dependencies on 'dormant' code there are a number of new pieces of source
+      that are included in the release3 tree. Notably; qtsoap from qt-solutions, since they
+      work but are likely to be archived and deprecated. If and when that happens we may well
+      adopt whatever classes Trolltech introduce.
+
+
+LIBICAL - Diary integration with Google or MobileMe calendars
+-------------------------------------------------------------
+
+$ cd ~/Projects/Live/GoldenCheetah/src
+
+$ sudo apt-get install libical-dev
+$ vi gcconfig.pri
+
+ICAL_INSTALL=/usr/include
+ICAL_LIBS=-lical
+
+Since the src.pro wants ICAL installed in a different place we need to hack it, *** this will
+be fixed shortly ***
+
+$ vi src.pro
+
+Comment out the ICAL_LIBS entry:
+
+#ICAL_LIBS = $${ICAL_INSTALL}/lib/libical.a
+
+$ make clean
+$ qmake
+$ make
+
+You should now have diary functions.
+
+NOTE: That upload to MobileMe and Google requires a functioning https lib in QT. Depending
+      upon the version installed this might not be the case and will need to be built and
+      configured -- this is beyond the scope of this walkthough. Sorry.
+
