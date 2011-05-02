@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
+ *               2011 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -19,6 +20,10 @@
 #ifndef _GC_PowerHist_h
 #define _GC_PowerHist_h 1
 #include "GoldenCheetah.h"
+#include "RideFile.h"
+#include "MainWindow.h"
+#include "Zones.h"
+#include "HrZones.h"
 
 #include <qwt_plot.h>
 #include <qwt_plot_zoomer.h>
@@ -31,6 +36,7 @@ class QwtPlotGrid;
 class MainWindow;
 class RideItem;
 class RideFilePoint;
+class RideFileCache;
 class PowerHistBackground;
 class PowerHistZoneLabel;
 class HrHistBackground;
@@ -41,167 +47,437 @@ class ZoneScaleDraw;
 class penTooltip: public QwtPlotZoomer
 {
     public:
-         penTooltip(QwtPlotCanvas *canvas):
-             QwtPlotZoomer(canvas), tip("")
-         {
-                 // With some versions of Qt/Qwt, setting this to AlwaysOn
-                 // causes an infinite recursion.
-                 //setTrackerMode(AlwaysOn);
-                 setTrackerMode(AlwaysOn);
+         penTooltip(QwtPlotCanvas *canvas): QwtPlotZoomer(canvas), tip("") {
+             // With some versions of Qt/Qwt, setting this to AlwaysOn
+             // causes an infinite recursion.
+             //setTrackerMode(AlwaysOn);
+             setTrackerMode(AlwaysOn);
          }
 
-    virtual QwtText trackerText(const QwtDoublePoint &/*pos*/) const
-    {
-        QColor bg = QColor(255,255, 170); // toolyip yellow
+        virtual QwtText trackerText(const QwtDoublePoint &/*pos*/) const {
+            QColor bg = QColor(255,255, 170); // toolyip yellow
 #if QT_VERSION >= 0x040300
-        bg.setAlpha(200);
+            bg.setAlpha(200);
 #endif
-        QwtText text;
-        QFont def;
-        //def.setPointSize(8); // too small on low res displays (Mac)
-        //double val = ceil(pos.y()*100) / 100; // round to 2 decimal place
-        //text.setText(QString("%1 %2").arg(val).arg(format), QwtText::PlainText);
-        text.setText(tip);
-        text.setFont(def);
-        text.setBackgroundBrush( QBrush( bg ));
-        text.setRenderFlags(Qt::AlignLeft | Qt::AlignTop);
-        return text;
-    }
-    void setFormat(QString fmt) { format = fmt; }
-    void setText(QString txt) { tip = txt; }
+            QwtText text;
+            QFont def;
+            //def.setPointSize(8); // too small on low res displays (Mac)
+            //double val = ceil(pos.y()*100) / 100; // round to 2 decimal place
+            //text.setText(QString("%1 %2").arg(val).arg(format), QwtText::PlainText);
+            text.setText(tip);
+            text.setFont(def);
+            text.setBackgroundBrush( QBrush( bg ));
+            text.setRenderFlags(Qt::AlignLeft | Qt::AlignTop);
+            return text;
+        }
+
+        void setFormat(QString fmt) { format = fmt; }
+        void setText(QString txt) { tip = txt; }
+
     private:
-    QString format;
-    QString tip;
- };
+        QString format;
+        QString tip;
+};
 
 class PowerHist : public QwtPlot
 {
     Q_OBJECT
     G_OBJECT
 
+    friend class ::HrHistBackground;
+    friend class ::HrHistZoneLabel;
+    friend class ::PowerHistBackground;
+    friend class ::PowerHistZoneLabel;
+    friend class ::HistogramWindow;
 
     public:
 
-        QwtPlotCurve *curve, *curveSelected;
-	QList <PowerHistZoneLabel *> zoneLabels;
-	QList <HrHistZoneLabel *> hrzoneLabels;
-
         PowerHist(MainWindow *mainWindow);
-	~PowerHist();
+        ~PowerHist();
 
-        int binWidth() const { return binw; }
-        inline bool islnY() const { return lny; }
-        inline bool withZeros() const { return withz; }
-        bool shadeZones() const;
-        bool shadeHRZones() const;
-
-	enum Selection {
-	    watts,
-	    wattsZone,
-	    nm,
-	    hr,
-        hrZone,
-	    kph,
-	    cad
-	} selected;
-	inline Selection selection() { return selected; }
-
-    bool shade;
-    inline bool shaded() const { return shade; }
-
-
-        void setData(RideItem *_rideItem);
-
-	void setSelection(Selection selection);
-	void fixSelection();
-
-    void setShading(bool x) { shade=x; }
-
-        void setBinWidth(int value);
-	double getDelta();
-	int    getDigits();
-        double getBinWidthRealUnits();
-        int setBinWidthRealUnits(double value);
-
-	void refreshZoneLabels();
-	void refreshHRZoneLabels();
-
-	RideItem *rideItem;
-    MainWindow *mainWindow;
 
     public slots:
 
+        // public setters
+        void setShading(bool x) { shade=x; }
+        void setSeries(RideFile::SeriesType series);
+        void setData(RideItem *_rideItem, bool force=false);
+        void setData(RideFileCache *source);
         void setlnY(bool value);
         void setWithZeros(bool value);
+        void setZoned(bool value);
         void setSumY(bool value);
-        void pointHover(QwtPlotCurve *curve, int index);
         void configChanged();
         void setAxisTitle(int axis, QString label);
+        void setYMax();
+        void setBinWidth(int value);
+        int setBinWidthRealUnits(double value);
+
+        // public getters
+        double getDelta();
+        double getBinWidthRealUnits();
+        int getDigits();
+        inline bool islnY() const { return lny; }
+        inline bool withZeros() const { return withz; }
+        inline int binWidth() const { return binw; }
+
+        // react to plot signals
+        void pointHover(QwtPlotCurve *curve, int index);
+
+        // get told to refresh
+        void recalc(bool force=false);
+        void refreshZoneLabels();
 
     protected:
 
-        QwtPlotGrid *grid;
+        void refreshHRZoneLabels();
+        void setParameterAxisTitle();
+        bool isSelected(const RideFilePoint *p, double);
+        void percentify(QVector<double> &, double factor); // and a function to convert
 
-        // storage for data counts
-        QVector<unsigned int>
-        wattsArray,
-        wattsZoneArray,
-        nmArray,
-        hrArray,
-        hrZoneArray,
-        kphArray,
-        cadArray;
+        bool shadeZones() const; // check if zone shading is both wanted and possible
+        bool shadeHRZones() const; // check if zone shading is both wanted and possible
 
-        // storage for data counts in interval selected
-        QVector<unsigned int>
-        wattsSelectedArray,
-        wattsZoneSelectedArray,
-        nmSelectedArray,
-        hrSelectedArray,
-        hrZoneSelectedArray,
-        kphSelectedArray,
-        cadSelectedArray;
-
+        // plot settings
+        RideItem *rideItem;
+        MainWindow *mainWindow;
+        RideFile::SeriesType series;
+        bool useMetricUnits;  // whether metric units are used (or imperial)
+        QVariant unit;
+        bool lny;
+        bool shade;
+        bool zoned;        // show in zones
         int binw;
-
         bool withz;        // whether zeros are included in histogram
-	double dt;         // length of sample
+        double dt;         // length of sample
+        bool absolutetime; // do we sum absolute or percentage?
 
-        void recalc();
-        void setYMax();
-        penTooltip *zoomer;
 
     private:
-        QVariant unit;
 
-	PowerHistBackground *bg;
-	HrHistBackground *hrbg;
+        // plot objects
+        QwtPlotGrid *grid;
+        PowerHistBackground *bg;
+        HrHistBackground *hrbg;
+        penTooltip *zoomer;
+        LTMCanvasPicker *canvasPicker;
+        QwtPlotCurve *curve, *curveSelected;
+        QList <PowerHistZoneLabel *> zoneLabels;
+        QList <HrHistZoneLabel *> hrzoneLabels;
 
-	bool lny;
+        // source cache
+        RideFileCache *cache;
 
-	// discritized unit for smoothing
+        // discritized unit for smoothing
         static const double wattsDelta = 1.0;
-	static const double nmDelta    = 0.1;
-	static const double hrDelta    = 1.0;
-	static const double kphDelta   = 0.1;
-	static const double cadDelta   = 1.0;
+        static const double nmDelta    = 0.1;
+        static const double hrDelta    = 1.0;
+        static const double kphDelta   = 0.1;
+        static const double cadDelta   = 1.0;
 
-	// digits for text entry validator
+        // digits for text entry validator
         static const int wattsDigits = 0;
-	static const int nmDigits    = 1;
-	static const int hrDigits    = 0;
-	static const int kphDigits   = 1;
-	static const int cadDigits   = 0;
+        static const int nmDigits    = 1;
+        static const int hrDigits    = 0;
+        static const int kphDigits   = 1;
+        static const int cadDigits   = 0;
 
-	void setParameterAxisTitle();
-	bool isSelected(const RideFilePoint *p, double);
+        // storage for data counts
+        QVector<unsigned int> wattsArray, wattsZoneArray, nmArray, hrArray,
+                              hrZoneArray, kphArray, cadArray;
 
-	bool useMetricUnits;  // whether metric units are used (or imperial)
+        // storage for data counts in interval selected
+        QVector<unsigned int> wattsSelectedArray, wattsZoneSelectedArray,
+                              nmSelectedArray, hrSelectedArray,
+                              hrZoneSelectedArray, kphSelectedArray,
+                              cadSelectedArray;
 
-    bool absolutetime; // do we sum absolute or percentage?
-    void percentify(QVector<double> &, double factor); // and a function to convert
+        enum Source { Ride, Cache } source, LASTsource;
 
-    LTMCanvasPicker *canvasPicker;
+        // last plot settings - to avoid lots of uneeded recalcs
+        RideItem *LASTrideItem;
+        RideFileCache *LASTcache;
+        RideFile::SeriesType LASTseries;
+        bool LASTshade;
+        bool LASTuseMetricUnits;  // whether metric units are used (or imperial)
+        bool LASTlny;
+        bool LASTzoned;        // show in zones
+        int LASTbinw;
+        bool LASTwithz;        // whether zeros are included in histogram
+        double LASTdt;         // length of sample
+        bool LASTabsolutetime; // do we sum absolute or percentage?
+};
+
+/*----------------------------------------------------------------------
+ * From here to the end of source file the routines for zone shading
+ *--------------------------------------------------------------------*/
+
+// define a background class to handle shading of power zones
+// draws power zone bands IF zones are defined and the option
+// to draw bonds has been selected
+class PowerHistBackground: public QwtPlotItem
+{
+private:
+    PowerHist *parent;
+
+public:
+    PowerHistBackground(PowerHist *_parent)
+    {
+        setZ(0.0);
+	parent = _parent;
+    }
+
+    virtual int rtti() const
+    {
+        return QwtPlotItem::Rtti_PlotUserItem;
+    }
+
+    virtual void draw(QPainter *painter,
+		      const QwtScaleMap &xMap, const QwtScaleMap &,
+		      const QRect &rect) const
+    {
+	RideItem *rideItem = parent->rideItem;
+
+	if (! rideItem)
+	    return;
+
+	const Zones *zones       = rideItem->zones;
+	int zone_range     = rideItem->zoneRange();
+
+	if (parent->shadeZones() && (zone_range >= 0)) {
+	    QList <int> zone_lows = zones->getZoneLows(zone_range);
+	    int num_zones = zone_lows.size();
+	    if (num_zones > 0) {
+		for (int z = 0; z < num_zones; z ++) {
+		    QRect r = rect;
+
+		    QColor shading_color =
+			zoneColor(z, num_zones);
+		    shading_color.setHsv(
+					 shading_color.hue(),
+					 shading_color.saturation() / 4,
+					 shading_color.value()
+					 );
+		    r.setLeft(xMap.transform(zone_lows[z]));
+		    if (z + 1 < num_zones)
+			r.setRight(xMap.transform(zone_lows[z + 1]));
+		    if (r.right() >= r.left())
+			painter->fillRect(r, shading_color);
+		}
+	    }
+	}
+    }
+};
+
+
+// Zone labels are drawn if power zone bands are enabled, automatically
+// at the center of the plot
+class PowerHistZoneLabel: public QwtPlotItem
+{
+private:
+    PowerHist *parent;
+    int zone_number;
+    double watts;
+    QwtText text;
+
+public:
+    PowerHistZoneLabel(PowerHist *_parent, int _zone_number)
+    {
+	parent = _parent;
+	zone_number = _zone_number;
+
+	RideItem *rideItem = parent->rideItem;
+
+	if (! rideItem)
+	    return;
+
+	const Zones *zones       = rideItem->zones;
+	int zone_range     = rideItem->zoneRange();
+
+	setZ(1.0 + zone_number / 100.0);
+
+	// create new zone labels if we're shading
+	if (parent->shadeZones() && (zone_range >= 0)) {
+	    QList <int> zone_lows = zones->getZoneLows(zone_range);
+	    QList <QString> zone_names = zones->getZoneNames(zone_range);
+	    int num_zones = zone_lows.size();
+	    assert(zone_names.size() == num_zones);
+	    if (zone_number < num_zones) {
+		watts =
+		    (
+		     (zone_number + 1 < num_zones) ?
+		     0.5 * (zone_lows[zone_number] + zone_lows[zone_number + 1]) :
+		     (
+		      (zone_number > 0) ?
+		      (1.5 * zone_lows[zone_number] - 0.5 * zone_lows[zone_number - 1]) :
+		      2.0 * zone_lows[zone_number]
+		      )
+		     );
+
+		text = QwtText(zone_names[zone_number]);
+		text.setFont(QFont("Helvetica",24, QFont::Bold));
+		QColor text_color = zoneColor(zone_number, num_zones);
+		text_color.setAlpha(64);
+		text.setColor(text_color);
+	    }
+	}
+
+    }
+
+    virtual int rtti() const
+    {
+        return QwtPlotItem::Rtti_PlotUserItem;
+    }
+
+    void draw(QPainter *painter,
+	      const QwtScaleMap &xMap, const QwtScaleMap &,
+	      const QRect &rect) const
+    {
+	if (parent->shadeZones()) {
+	    int x = xMap.transform(watts);
+	    int y = (rect.bottom() + rect.top()) / 2;
+
+	    // the following code based on source for QwtPlotMarker::draw()
+	    QRect tr(QPoint(0, 0), text.textSize(painter->font()));
+	    tr.moveCenter(QPoint(y, -x));
+	    painter->rotate(90);             // rotate text to avoid overlap: this needs to be fixed
+	    text.draw(painter, tr);
+	}
+    }
+};
+
+// define a background class to handle shading of HR zones
+// draws power zone bands IF zones are defined and the option
+// to draw bonds has been selected
+class HrHistBackground: public QwtPlotItem
+{
+private:
+    PowerHist *parent;
+
+public:
+    HrHistBackground(PowerHist *_parent)
+    {
+        setZ(0.0);
+	parent = _parent;
+    }
+
+    virtual int rtti() const
+    {
+        return QwtPlotItem::Rtti_PlotUserItem;
+    }
+
+    virtual void draw(QPainter *painter,
+		      const QwtScaleMap &xMap, const QwtScaleMap &,
+		      const QRect &rect) const
+    {
+	RideItem *rideItem = parent->rideItem;
+
+	if (! rideItem)
+	    return;
+
+	const HrZones *zones       = parent->mainWindow->hrZones();
+	int zone_range     = rideItem->hrZoneRange();
+
+	if (parent->shadeHRZones() && (zone_range >= 0)) {
+	    QList <int> zone_lows = zones->getZoneLows(zone_range);
+	    int num_zones = zone_lows.size();
+	    if (num_zones > 0) {
+		for (int z = 0; z < num_zones; z ++) {
+		    QRect r = rect;
+
+		    QColor shading_color =
+			hrZoneColor(z, num_zones);
+		    shading_color.setHsv(
+					 shading_color.hue(),
+					 shading_color.saturation() / 4,
+					 shading_color.value()
+					 );
+		    r.setLeft(xMap.transform(zone_lows[z]));
+		    if (z + 1 < num_zones)
+			r.setRight(xMap.transform(zone_lows[z + 1]));
+		    if (r.right() >= r.left())
+			painter->fillRect(r, shading_color);
+		}
+	    }
+	}
+    }
+};
+
+
+// Zone labels are drawn if power zone bands are enabled, automatically
+// at the center of the plot
+class HrHistZoneLabel: public QwtPlotItem
+{
+private:
+    PowerHist *parent;
+    int zone_number;
+    double watts;
+    QwtText text;
+
+public:
+    HrHistZoneLabel(PowerHist *_parent, int _zone_number)
+    {
+	parent = _parent;
+	zone_number = _zone_number;
+
+	RideItem *rideItem = parent->rideItem;
+
+	if (! rideItem)
+	    return;
+
+	const HrZones *zones       = parent->mainWindow->hrZones();
+	int zone_range     = rideItem->hrZoneRange();
+
+	setZ(1.0 + zone_number / 100.0);
+
+	// create new zone labels if we're shading
+	if (parent->shadeHRZones() && (zone_range >= 0)) {
+	    QList <int> zone_lows = zones->getZoneLows(zone_range);
+	    QList <QString> zone_names = zones->getZoneNames(zone_range);
+	    int num_zones = zone_lows.size();
+	    assert(zone_names.size() == num_zones);
+	    if (zone_number < num_zones) {
+		watts =
+		    (
+		     (zone_number + 1 < num_zones) ?
+		     0.5 * (zone_lows[zone_number] + zone_lows[zone_number + 1]) :
+		     (
+		      (zone_number > 0) ?
+		      (1.5 * zone_lows[zone_number] - 0.5 * zone_lows[zone_number - 1]) :
+		      2.0 * zone_lows[zone_number]
+		      )
+		     );
+
+		text = QwtText(zone_names[zone_number]);
+		text.setFont(QFont("Helvetica",24, QFont::Bold));
+		QColor text_color = hrZoneColor(zone_number, num_zones);
+		text_color.setAlpha(64);
+		text.setColor(text_color);
+	    }
+	}
+
+    }
+
+    virtual int rtti() const
+    {
+        return QwtPlotItem::Rtti_PlotUserItem;
+    }
+
+    void draw(QPainter *painter,
+	      const QwtScaleMap &xMap, const QwtScaleMap &,
+	      const QRect &rect) const
+    {
+	if (parent->shadeHRZones()) {
+	    int x = xMap.transform(watts);
+	    int y = (rect.bottom() + rect.top()) / 2;
+
+	    // the following code based on source for QwtPlotMarker::draw()
+	    QRect tr(QPoint(0, 0), text.textSize(painter->font()));
+	    tr.moveCenter(QPoint(y, -x));
+	    painter->rotate(90);             // rotate text to avoid overlap: this needs to be fixed
+	    text.draw(painter, tr);
+	}
+    }
 };
 
 #endif // _GC_PowerHist_h

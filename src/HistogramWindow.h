@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2009 Sean C. Rhea (srhea@srhea.net)
+ *               2011 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -28,6 +29,7 @@
 class MainWindow;
 class PowerHist;
 class RideItem;
+class RideFileCache;
 
 class HistogramWindow : public GcWindow
 {
@@ -40,24 +42,30 @@ class HistogramWindow : public GcWindow
     Q_PROPERTY(bool logY READ logY WRITE setLogY USER true)
     Q_PROPERTY(bool zeroes READ zeroes WRITE setZeroes USER true)
     Q_PROPERTY(bool shade READ shade WRITE setShade USER true)
+    Q_PROPERTY(bool zoned READ zoned WRITE setZoned USER true)
+    Q_PROPERTY(bool scope READ scope WRITE setScope USER true)
 
     public:
 
         HistogramWindow(MainWindow *mainWindow);
 
         // get/set properties
-        int series() const { return histParameterCombo->currentIndex(); }
-        void setSeries(int x) { histParameterCombo->setCurrentIndex(x); }
-        int percent() const { return histSumY->currentIndex(); }
-        void setPercent(int x) { histSumY->setCurrentIndex(x); }
+        int series() const { return seriesCombo->currentIndex(); }
+        void setSeries(int x) { seriesCombo->setCurrentIndex(x); }
+        int percent() const { return showSumY->currentIndex(); }
+        void setPercent(int x) { showSumY->setCurrentIndex(x); }
         double bin() const { return binWidthSlider->value(); }
         void setBin(double x) { binWidthSlider->setValue(x); }
-        bool logY() const { return lnYHistCheckBox->isChecked(); }
-        void setLogY(bool x) { lnYHistCheckBox->setChecked(x); }
-        bool zeroes() const { return withZerosCheckBox->isChecked(); }
-        void setZeroes(bool x) { withZerosCheckBox->setChecked(x); }
-        bool shade() const { return histShadeZones->isChecked(); }
-        void setShade(bool x) { histShadeZones->setChecked(x); }
+        bool logY() const { return showLnY->isChecked(); }
+        void setLogY(bool x) { showLnY->setChecked(x); }
+        bool zeroes() const { return showZeroes->isChecked(); }
+        void setZeroes(bool x) { showZeroes->setChecked(x); }
+        bool shade() const { return shadeZones->isChecked(); }
+        void setShade(bool x) { shadeZones->setChecked(x); }
+        bool zoned() const { return showInZones->isChecked(); }
+        void setZoned(bool x) { return showInZones->setChecked(x); }
+        int scope() const { return seasonCombo->currentIndex(); }
+        void setScope(int x) { seasonCombo->setCurrentIndex(x); }
 
     public slots:
 
@@ -69,13 +77,10 @@ class HistogramWindow : public GcWindow
 
         void setBinWidthFromSlider();
         void setBinWidthFromLineEdit();
-        void setlnYHistFromCheckBox();
-        void setWithZerosFromCheckBox();
-        void setHistSelection(int id);
-        void setSumY(int);
         void seasonSelected(int season);
+        void updateChart();
 
-    protected:
+    private:
 
         QList<Season> seasons;
         void setHistTextValidator();
@@ -83,17 +88,25 @@ class HistogramWindow : public GcWindow
 
         MainWindow *mainWindow;
         PowerHist *powerHist;
-        QSlider *binWidthSlider;
-        QLineEdit *binWidthLineEdit;
-        QCheckBox *lnYHistCheckBox;
-        QCheckBox *withZerosCheckBox;
-        QCheckBox *histShadeZones;
-        QComboBox *histParameterCombo;
-        QComboBox *histSumY;
-        QComboBox *cComboSeason;
+
+        QSlider *binWidthSlider;        // seet Bin Width from a slider
+        QLineEdit *binWidthLineEdit;    // set Bin Width from the line edit
+        QCheckBox *showLnY;     // set show as Log(y)
+        QCheckBox *showZeroes;   // Include zeroes
+        QComboBox *showSumY;            // ??
+        QCheckBox *shadeZones;      // Shade zone background
+        QCheckBox *showInZones;       // Plot by Zone
+        QComboBox *seriesCombo;         // Which data series to plot
+        QComboBox *seasonCombo;         // Plot for Date range or current ride
+
+        QList<RideFile::SeriesType> seriesList;
         void addSeasons();
+        void addSeries();
 
         int powerRange, hrRange;
+
+        RideFileCache *source;
+        bool interval;
 };
 
 #endif // _GC_HistogramWindow_h
