@@ -38,12 +38,13 @@ static const unsigned int RideFileCacheVersion = 3;
 // version  date         description
 // 1        29-Apr-11    Initial - header, mean-max & distribution data blocks
 // 2        02-May-11    Added LTHR/CP used to header and Time In Zone block
+// 3        02-May-11    Moved to float precision not integer.
 
 // The cache file (.cpx) has a binary format:
 // 1 x Header data - describing the version and contents of the cache
 // n x Blocks - meanmax or distribution arrays
-// 1 x Watts TIZ - 10 unsigned longs
-// 1 x Heartrate TIZ - 10 unsigned longs
+// 1 x Watts TIZ - 10 floats
+// 1 x Heartrate TIZ - 10 floats
 
 // The header is written directly to disk, the only
 // field which is endian sensitive is the count field
@@ -115,8 +116,8 @@ class RideFileCache
         QVector<double> &meanMaxArray(RideFile::SeriesType); // return meanmax array for the given series
         QVector<QDate> &meanMaxDates(RideFile::SeriesType series); // the dates of the bests
         QVector<double> &distributionArray(RideFile::SeriesType); // return distribution array for the given series
-        QVector<unsigned long> &wattsZoneArray() { return wattsTimeInZone; }
-        QVector<unsigned long> &hrZoneArray() { return hrTimeInZone; }
+        QVector<float> &wattsZoneArray() { return wattsTimeInZone; }
+        QVector<float> &hrZoneArray() { return hrTimeInZone; }
 
         // explain the array binning / sampling
         double &distBinSize(RideFile::SeriesType); // return distribution bin size
@@ -131,8 +132,8 @@ class RideFileCache
         void compute();             // compute all arrays
 
         // NOW replaced computeMeanMax with MeanMaxComputer class see bottom of file
-        //void computeMeanMax(QVector<unsigned long>&, RideFile::SeriesType);      // compute mean max arrays
-        void computeDistribution(QVector<unsigned long>&, RideFile::SeriesType); // compute the distributions
+        //void computeMeanMax(QVector<float>&, RideFile::SeriesType);      // compute mean max arrays
+        void computeDistribution(QVector<float>&, RideFile::SeriesType); // compute the distributions
 
 
     private:
@@ -155,13 +156,13 @@ class RideFileCache
         // MEAN MAXIMAL VALUES
         //
         // each array has a best for duration 0 - RideDuration seconds
-        QVector<unsigned long> wattsMeanMax; // RideFile::watts
-        QVector<unsigned long> hrMeanMax; // RideFile::hr
-        QVector<unsigned long> cadMeanMax; // RideFile::cad
-        QVector<unsigned long> nmMeanMax; // RideFile::nm
-        QVector<unsigned long> kphMeanMax; // RideFile::kph
-        QVector<unsigned long> xPowerMeanMax; // RideFile::kph
-        QVector<unsigned long> npMeanMax; // RideFile::kph
+        QVector<float> wattsMeanMax; // RideFile::watts
+        QVector<float> hrMeanMax; // RideFile::hr
+        QVector<float> cadMeanMax; // RideFile::cad
+        QVector<float> nmMeanMax; // RideFile::nm
+        QVector<float> kphMeanMax; // RideFile::kph
+        QVector<float> xPowerMeanMax; // RideFile::kph
+        QVector<float> npMeanMax; // RideFile::kph
         QVector<double> wattsMeanMaxDouble; // RideFile::watts
         QVector<double> hrMeanMaxDouble; // RideFile::hr
         QVector<double> cadMeanMaxDouble; // RideFile::cad
@@ -185,13 +186,13 @@ class RideFileCache
         // from RideFile::minimumFor() to RideFile::maximumFor(). The steps (binsize)
         // is 1.0 or if the dataseries in question does have a nonZero value for
         // RideFile::decimalsFor() then it will be distributed in 0.1 of a unit
-        QVector<unsigned long> wattsDistribution; // RideFile::watts
-        QVector<unsigned long> hrDistribution; // RideFile::hr
-        QVector<unsigned long> cadDistribution; // RideFile::cad
-        QVector<unsigned long> nmDistribution; // RideFile::nm
-        QVector<unsigned long> kphDistribution; // RideFile::kph
-        QVector<unsigned long> xPowerDistribution; // RideFile::kph
-        QVector<unsigned long> npDistribution; // RideFile::kph
+        QVector<float> wattsDistribution; // RideFile::watts
+        QVector<float> hrDistribution; // RideFile::hr
+        QVector<float> cadDistribution; // RideFile::cad
+        QVector<float> nmDistribution; // RideFile::nm
+        QVector<float> kphDistribution; // RideFile::kph
+        QVector<float> xPowerDistribution; // RideFile::kph
+        QVector<float> npDistribution; // RideFile::kph
         QVector<double> wattsDistributionDouble; // RideFile::watts
         QVector<double> hrDistributionDouble; // RideFile::hr
         QVector<double> cadDistributionDouble; // RideFile::cad
@@ -200,12 +201,12 @@ class RideFileCache
         QVector<double> xPowerDistributionDouble; // RideFile::kph
         QVector<double> npDistributionDouble; // RideFile::kph
 
-        QVector<unsigned long> wattsTimeInZone;   // time in zone in seconds
-        QVector<unsigned long> hrTimeInZone;      // time in zone in seconds
+        QVector<float> wattsTimeInZone;   // time in zone in seconds
+        QVector<float> hrTimeInZone;      // time in zone in seconds
 
         // we need to return doubles not longs, we just use longs
         // to reduce disk storage
-        void doubleArray(QVector<double> &into, QVector<unsigned long> &from, RideFile::SeriesType series);
+        void doubleArray(QVector<double> &into, QVector<float> &from, RideFile::SeriesType series);
 };
 
 // Working structured inherited from CpintPlot.cpp
@@ -230,13 +231,13 @@ struct cpintdata {
 class MeanMaxComputer : public QThread
 {
     public:
-        MeanMaxComputer(RideFile *ride, QVector<unsigned long>&array, RideFile::SeriesType series)
+        MeanMaxComputer(RideFile *ride, QVector<float>&array, RideFile::SeriesType series)
         : ride(ride), array(array), series(series) {}
         void run();
 
     private:
         RideFile *ride;
-        QVector<unsigned long> &array;
+        QVector<float> &array;
         RideFile::SeriesType series;
 };
 #endif // _GC_RideFileCache_h

@@ -591,7 +591,7 @@ MeanMaxComputer::run()
 }
 
 void
-RideFileCache::computeDistribution(QVector<unsigned long> &array, RideFile::SeriesType series)
+RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType series)
 {
     // only bother if the data series is actually present
     if (ride->isDataPresent(series) == false) return;
@@ -618,7 +618,7 @@ RideFileCache::computeDistribution(QVector<unsigned long> &array, RideFile::Seri
 
     foreach(RideFilePoint *dp, ride->dataPoints()) {
         double value = dp->value(series);
-        unsigned long lvalue = value * pow(10, decimals);
+        float lvalue = value * pow(10, decimals);
 
         // watts time in zone
         if (series == RideFile::watts && zoneRange != -1)
@@ -765,26 +765,26 @@ RideFileCache::serialize(QDataStream *out)
     out->writeRawData((const char *) &head, sizeof(head));
 
     // write meanmax
-    out->writeRawData((const char *) wattsMeanMax.data(), sizeof(unsigned long) * wattsMeanMax.size());
-    out->writeRawData((const char *) hrMeanMax.data(), sizeof(unsigned long) * hrMeanMax.size());
-    out->writeRawData((const char *) cadMeanMax.data(), sizeof(unsigned long) * cadMeanMax.size());
-    out->writeRawData((const char *) nmMeanMax.data(), sizeof(unsigned long) * nmMeanMax.size());
-    out->writeRawData((const char *) kphMeanMax.data(), sizeof(unsigned long) * kphMeanMax.size());
-    out->writeRawData((const char *) xPowerMeanMax.data(), sizeof(unsigned long) * xPowerMeanMax.size());
-    out->writeRawData((const char *) npMeanMax.data(), sizeof(unsigned long) * npMeanMax.size());
+    out->writeRawData((const char *) wattsMeanMax.data(), sizeof(float) * wattsMeanMax.size());
+    out->writeRawData((const char *) hrMeanMax.data(), sizeof(float) * hrMeanMax.size());
+    out->writeRawData((const char *) cadMeanMax.data(), sizeof(float) * cadMeanMax.size());
+    out->writeRawData((const char *) nmMeanMax.data(), sizeof(float) * nmMeanMax.size());
+    out->writeRawData((const char *) kphMeanMax.data(), sizeof(float) * kphMeanMax.size());
+    out->writeRawData((const char *) xPowerMeanMax.data(), sizeof(float) * xPowerMeanMax.size());
+    out->writeRawData((const char *) npMeanMax.data(), sizeof(float) * npMeanMax.size());
 
     // write dist
-    out->writeRawData((const char *) wattsDistribution.data(), sizeof(unsigned long) * wattsDistribution.size());
-    out->writeRawData((const char *) hrDistribution.data(), sizeof(unsigned long) * hrDistribution.size());
-    out->writeRawData((const char *) cadDistribution.data(), sizeof(unsigned long) * cadDistribution.size());
-    out->writeRawData((const char *) nmDistribution.data(), sizeof(unsigned long) * nmDistribution.size());
-    out->writeRawData((const char *) kphDistribution.data(), sizeof(unsigned long) * kphDistribution.size());
-    out->writeRawData((const char *) xPowerDistribution.data(), sizeof(unsigned long) * xPowerDistribution.size());
-    out->writeRawData((const char *) npDistribution.data(), sizeof(unsigned long) * npDistribution.size());
+    out->writeRawData((const char *) wattsDistribution.data(), sizeof(float) * wattsDistribution.size());
+    out->writeRawData((const char *) hrDistribution.data(), sizeof(float) * hrDistribution.size());
+    out->writeRawData((const char *) cadDistribution.data(), sizeof(float) * cadDistribution.size());
+    out->writeRawData((const char *) nmDistribution.data(), sizeof(float) * nmDistribution.size());
+    out->writeRawData((const char *) kphDistribution.data(), sizeof(float) * kphDistribution.size());
+    out->writeRawData((const char *) xPowerDistribution.data(), sizeof(float) * xPowerDistribution.size());
+    out->writeRawData((const char *) npDistribution.data(), sizeof(float) * npDistribution.size());
 
     // time in zone
-    out->writeRawData((const char *) wattsTimeInZone.data(), sizeof(unsigned long) * wattsTimeInZone.size());
-    out->writeRawData((const char *) hrTimeInZone.data(), sizeof(unsigned long) * hrTimeInZone.size());
+    out->writeRawData((const char *) wattsTimeInZone.data(), sizeof(float) * wattsTimeInZone.size());
+    out->writeRawData((const char *) hrTimeInZone.data(), sizeof(float) * hrTimeInZone.size());
 }
 
 void
@@ -815,26 +815,26 @@ RideFileCache::readCache()
         npDistribution.resize(head.npDistCount);
 
         // read in the arrays
-        inFile.readRawData((char *) wattsMeanMax.data(), sizeof(unsigned long) * wattsMeanMax.size());
-        inFile.readRawData((char *) hrMeanMax.data(), sizeof(unsigned long) * hrMeanMax.size());
-        inFile.readRawData((char *) cadMeanMax.data(), sizeof(unsigned long) * cadMeanMax.size());
-        inFile.readRawData((char *) nmMeanMax.data(), sizeof(unsigned long) * nmMeanMax.size());
-        inFile.readRawData((char *) kphMeanMax.data(), sizeof(unsigned long) * kphMeanMax.size());
-        inFile.readRawData((char *) xPowerMeanMax.data(), sizeof(unsigned long) * xPowerMeanMax.size());
-        inFile.readRawData((char *) npMeanMax.data(), sizeof(unsigned long) * npMeanMax.size());
+        inFile.readRawData((char *) wattsMeanMax.data(), sizeof(float) * wattsMeanMax.size());
+        inFile.readRawData((char *) hrMeanMax.data(), sizeof(float) * hrMeanMax.size());
+        inFile.readRawData((char *) cadMeanMax.data(), sizeof(float) * cadMeanMax.size());
+        inFile.readRawData((char *) nmMeanMax.data(), sizeof(float) * nmMeanMax.size());
+        inFile.readRawData((char *) kphMeanMax.data(), sizeof(float) * kphMeanMax.size());
+        inFile.readRawData((char *) xPowerMeanMax.data(), sizeof(float) * xPowerMeanMax.size());
+        inFile.readRawData((char *) npMeanMax.data(), sizeof(float) * npMeanMax.size());
 
         // write dist
-        inFile.readRawData((char *) wattsDistribution.data(), sizeof(unsigned long) * wattsDistribution.size());
-        inFile.readRawData((char *) hrDistribution.data(), sizeof(unsigned long) * hrDistribution.size());
-        inFile.readRawData((char *) cadDistribution.data(), sizeof(unsigned long) * cadDistribution.size());
-        inFile.readRawData((char *) nmDistribution.data(), sizeof(unsigned long) * nmDistribution.size());
-        inFile.readRawData((char *) kphDistribution.data(), sizeof(unsigned long) * kphDistribution.size());
-        inFile.readRawData((char *) xPowerDistribution.data(), sizeof(unsigned long) * xPowerDistribution.size());
-        inFile.readRawData((char *) npDistribution.data(), sizeof(unsigned long) * npDistribution.size());
+        inFile.readRawData((char *) wattsDistribution.data(), sizeof(float) * wattsDistribution.size());
+        inFile.readRawData((char *) hrDistribution.data(), sizeof(float) * hrDistribution.size());
+        inFile.readRawData((char *) cadDistribution.data(), sizeof(float) * cadDistribution.size());
+        inFile.readRawData((char *) nmDistribution.data(), sizeof(float) * nmDistribution.size());
+        inFile.readRawData((char *) kphDistribution.data(), sizeof(float) * kphDistribution.size());
+        inFile.readRawData((char *) xPowerDistribution.data(), sizeof(float) * xPowerDistribution.size());
+        inFile.readRawData((char *) npDistribution.data(), sizeof(float) * npDistribution.size());
 
         // time in zone
-        inFile.readRawData((char *) wattsTimeInZone.data(), sizeof(unsigned long) * 10);
-        inFile.readRawData((char *) hrTimeInZone.data(), sizeof(unsigned long) * 10);
+        inFile.readRawData((char *) wattsTimeInZone.data(), sizeof(float) * 10);
+        inFile.readRawData((char *) hrTimeInZone.data(), sizeof(float) * 10);
 
         // setup the doubles the users use
         doubleArray(wattsMeanMaxDouble, wattsMeanMax, RideFile::watts);
@@ -857,7 +857,7 @@ RideFileCache::readCache()
 }
 
 // unpack the longs into a double array
-void RideFileCache::doubleArray(QVector<double> &into, QVector<unsigned long> &from, RideFile::SeriesType series)
+void RideFileCache::doubleArray(QVector<double> &into, QVector<float> &from, RideFile::SeriesType series)
 {
     double divisor = RideFile::decimalsFor(series) ? 10 : 1;
     into.resize(from.size());
