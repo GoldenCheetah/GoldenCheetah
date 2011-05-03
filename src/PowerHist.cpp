@@ -513,6 +513,20 @@ PowerHist::recalc(bool force)
                 setAxisScale(QwtPlot::xBottom, -0.99, 0, 1);
         }
 
+        // watts zoned for a time range
+        if (source == Cache && zoned && series == RideFile::watts && mainWindow->zones()) {
+            setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(mainWindow->zones(), 0));
+            if (mainWindow->zones()->getRangeSize())
+                setAxisScale(QwtPlot::xBottom, -0.99, mainWindow->zones()->numZones(0), 1); // XXX use zones from first defined range
+        }
+
+        // hr zoned for a time range
+        if (source == Cache && zoned && series == RideFile::hr && mainWindow->hrZones()) {
+            setAxisScaleDraw(QwtPlot::xBottom, new HrZoneScaleDraw(mainWindow->hrZones(), 0));
+            if (mainWindow->hrZones()->getRangeSize())
+                setAxisScale(QwtPlot::xBottom, -0.99, mainWindow->hrZones()->numZones(0), 1); // XXX use zones from first defined range
+        }
+
         setAxisMaxMinor(QwtPlot::xBottom, 0);
     }
 
@@ -554,10 +568,10 @@ PowerHist::setData(RideFileCache *cache)
     // Now go set all those tedious arrays from
     // the ride cache
     wattsArray.resize(0);
-    wattsZoneArray.resize(0);
+    wattsZoneArray.resize(10);
     nmArray.resize(0);
     hrArray.resize(0);
-    hrZoneArray.resize(0);
+    hrZoneArray.resize(10);
     kphArray.resize(0);
     cadArray.resize(0);
 
@@ -584,6 +598,12 @@ PowerHist::setData(RideFileCache *cache)
 
         for(int i=0; i<nmArray.size(); i++) nmArray[i] = nmArray[i] * torque_factor;
         for(int i=0; i<kphArray.size(); i++) kphArray[i] = kphArray[i] * speed_factor;
+    }
+
+    // zone array
+    for (int i=0; i<10; i++) {
+        wattsZoneArray[i] = cache->wattsZoneArray()[i];
+        hrZoneArray[i] = cache->hrZoneArray()[i];
     }
 }
 
