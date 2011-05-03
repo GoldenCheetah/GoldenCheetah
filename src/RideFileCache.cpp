@@ -18,6 +18,9 @@
 
 #include "RideFileCache.h"
 #include "MainWindow.h"
+#include "Zones.h"
+#include "HrZones.h"
+
 #include <math.h> // for pow()
 #include <QDebug>
 #include <QFileInfo>
@@ -44,6 +47,10 @@ RideFileCache::RideFileCache(MainWindow *main, QString fileName, RideFile *passe
     xPowerDistribution.resize(0);
     npDistribution.resize(0);
 
+    // time in zone are fixed to 10 zone max
+    wattsTimeInZone.resize(10);
+    hrTimeInZone.resize(10);
+
     // Get info for ride file and cache file
     QFileInfo rideFileInfo(rideFileName);
     cacheFileName = rideFileInfo.path() + "/" + rideFileInfo.baseName() + ".cpx";
@@ -51,10 +58,33 @@ RideFileCache::RideFileCache(MainWindow *main, QString fileName, RideFile *passe
 
     // is it up-to-date?
     if (cacheFileInfo.exists() && rideFileInfo.lastModified() < cacheFileInfo.lastModified() &&
-        cacheFileInfo.size() != 0) {
-        if (check == false) readCache(); // if check is false we aren't just checking
-        return;
+        cacheFileInfo.size() >= (int)sizeof(struct RideFileCacheHeader)) {
+
+        // we have a file, it is more recent than the ride file
+        // but is it the latest version?
+        RideFileCacheHeader head;
+        QFile cacheFile(cacheFileName);
+        if (cacheFile.open(QIODevice::ReadOnly) == true) {
+
+            // read the header
+            QDataStream inFile(&cacheFile);
+            inFile.readRawData((char *) &head, sizeof(head));
+            cacheFile.close();
+
+            // is it as recent as we are?
+            if (head.version == RideFileCacheVersion) {
+
+                // Are the CP/LTHR values still correct
+                // XXX todo
+
+                // WE'RE GOOD
+                if (check == false) readCache(); // if check is false we aren't just checking
+                return;
+            }
+        }
     }
+
+    // NEED TO UPDATE!!
 
     // not up-to-date we need to refresh from the ridefile
     if (ride) {
@@ -566,6 +596,16 @@ RideFileCache::computeDistribution(QVector<unsigned long> &array, RideFile::Seri
     // only bother if the data series is actually present
     if (ride->isDataPresent(series) == false) return;
 
+    // get zones that apply, if any
+    int zoneRange = main->zones() ? main->zones()->whichRange(ride->startTime().date()) : -1;
+    int hrZoneRange = main->hrZones() ? main->hrZones()->whichRange(ride->startTime().date()) : -1;
+
+    if (zoneRange != -1) CP=main->zones()->getCP(zoneRange);
+    else CP=0;
+
+    if (hrZoneRange != -1) LTHR=main->hrZones()->getLT(hrZoneRange);
+    else LTHR=0;
+
     // setup the array based upon the ride
     int decimals = RideFile::decimalsFor(series) ? 1 : 0;
     double min = RideFile::minimumFor(series) * pow(10, decimals);
@@ -579,6 +619,14 @@ RideFileCache::computeDistribution(QVector<unsigned long> &array, RideFile::Seri
     foreach(RideFilePoint *dp, ride->dataPoints()) {
         double value = dp->value(series);
         unsigned long lvalue = value * pow(10, decimals);
+
+        // watts time in zone
+        if (series == RideFile::watts && zoneRange != -1)
+            wattsTimeInZone[main->zones()->whichZone(zoneRange, dp->value(series))] += ride->recIntSecs();
+
+        // hr time in zone
+        if (series == RideFile::hr && hrZoneRange != -1)
+            hrTimeInZone[main->hrZones()->whichZone(hrZoneRange, dp->value(series))] += ride->recIntSecs();
 
         int offset = lvalue - min;
         if (offset >= 0 && offset < array.size()) array[offset] += ride->recIntSecs();
@@ -617,6 +665,7 @@ static void distAggregate(QVector<double> &into, QVector<double> &other)
 {
     if (into.size() < other.size()) into.resize(other.size());
     for (int i=0; i<other.size(); i++) into[i] += other[i];
+
 }
 
 RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end)
@@ -639,6 +688,14 @@ RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end)
     kphDistribution.resize(0);
     xPowerDistribution.resize(0);
     npDistribution.resize(0);
+
+    // time in zone are fixed to 10 zone max
+    wattsTimeInZone.resize(10);
+    hrTimeInZone.resize(10);
+
+    // set cursor busy whilst we aggregate -- bit of feedback
+    // and less intrusive than a popup box
+    main->setCursor(Qt::WaitCursor);
 
     // Iterate over the ride files (not the cpx files since they /might/ not
     // exist, or /might/ be out of date.
@@ -664,8 +721,17 @@ RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end)
             distAggregate(kphDistributionDouble, rideCache.kphDistributionDouble);
             distAggregate(xPowerDistributionDouble, rideCache.xPowerDistributionDouble);
             distAggregate(npDistributionDouble, rideCache.npDistributionDouble);
+
+            // cumulate timeinzones
+            for (int i=0; i<10; i++) {
+                hrTimeInZone[i] += rideCache.hrTimeInZone[i];
+                wattsTimeInZone[i] += rideCache.wattsTimeInZone[i];
+            }
         }
     }
+
+    // set the cursor back to normal
+    main->setCursor(Qt::ArrowCursor);
 }
 
 //
@@ -678,6 +744,9 @@ RideFileCache::serialize(QDataStream *out)
 
     // write header
     head.version = RideFileCacheVersion;
+    head.CP = CP;
+    head.LTHR = LTHR;
+
     head.wattsMeanMaxCount = wattsMeanMax.size();
     head.hrMeanMaxCount = hrMeanMax.size();
     head.cadMeanMaxCount = cadMeanMax.size();
@@ -712,6 +781,10 @@ RideFileCache::serialize(QDataStream *out)
     out->writeRawData((const char *) kphDistribution.data(), sizeof(unsigned long) * kphDistribution.size());
     out->writeRawData((const char *) xPowerDistribution.data(), sizeof(unsigned long) * xPowerDistribution.size());
     out->writeRawData((const char *) npDistribution.data(), sizeof(unsigned long) * npDistribution.size());
+
+    // time in zone
+    out->writeRawData((const char *) wattsTimeInZone.data(), sizeof(unsigned long) * wattsTimeInZone.size());
+    out->writeRawData((const char *) hrTimeInZone.data(), sizeof(unsigned long) * hrTimeInZone.size());
 }
 
 void
@@ -758,6 +831,10 @@ RideFileCache::readCache()
         inFile.readRawData((char *) kphDistribution.data(), sizeof(unsigned long) * kphDistribution.size());
         inFile.readRawData((char *) xPowerDistribution.data(), sizeof(unsigned long) * xPowerDistribution.size());
         inFile.readRawData((char *) npDistribution.data(), sizeof(unsigned long) * npDistribution.size());
+
+        // time in zone
+        inFile.readRawData((char *) wattsTimeInZone.data(), sizeof(unsigned long) * 10);
+        inFile.readRawData((char *) hrTimeInZone.data(), sizeof(unsigned long) * 10);
 
         // setup the doubles the users use
         doubleArray(wattsMeanMaxDouble, wattsMeanMax, RideFile::watts);

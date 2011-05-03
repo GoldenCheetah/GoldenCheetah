@@ -33,13 +33,17 @@ class RideFile;
 // arrays when plotting CP curves and histograms. It is precoputed
 // to save time and cached in a file .cpx
 //
-// The contents of the cache reflect the data that is available within
-// the source file.
-static const unsigned int RideFileCacheVersion = 1;
+static const unsigned int RideFileCacheVersion = 3;
+// revision history:
+// version  date         description
+// 1        29-Apr-11    Initial - header, mean-max & distribution data blocks
+// 2        02-May-11    Added LTHR/CP used to header and Time In Zone block
 
-// The current version of the file has a binary format:
+// The cache file (.cpx) has a binary format:
 // 1 x Header data - describing the version and contents of the cache
 // n x Blocks - meanmax or distribution arrays
+// 1 x Watts TIZ - 10 unsigned longs
+// 1 x Heartrate TIZ - 10 unsigned longs
 
 // The header is written directly to disk, the only
 // field which is endian sensitive is the count field
@@ -48,6 +52,7 @@ static const unsigned int RideFileCacheVersion = 1;
 struct RideFileCacheHeader {
 
     unsigned int version;
+
     unsigned int wattsMeanMaxCount,
                  hrMeanMaxCount,
                  cadMeanMaxCount,
@@ -62,8 +67,12 @@ struct RideFileCacheHeader {
                  kphDistCount,
                  xPowerDistCount,
                  npDistCount;
+
+    int LTHR, // used to calculate Time in Zone (TIZ)
+        CP;   // used to calculate Time in Zone (TIZ)
                 
 };
+
 
 // Each block of data is an array of uint32_t (32-bit "local-endian")
 // integers so the "count" setting within the block definition tells
@@ -106,6 +115,8 @@ class RideFileCache
         QVector<double> &meanMaxArray(RideFile::SeriesType); // return meanmax array for the given series
         QVector<QDate> &meanMaxDates(RideFile::SeriesType series); // the dates of the bests
         QVector<double> &distributionArray(RideFile::SeriesType); // return distribution array for the given series
+        QVector<unsigned long> &wattsZoneArray() { return wattsTimeInZone; }
+        QVector<unsigned long> &hrZoneArray() { return hrTimeInZone; }
 
         // explain the array binning / sampling
         double &distBinSize(RideFile::SeriesType); // return distribution bin size
@@ -130,6 +141,10 @@ class RideFileCache
         QString rideFileName; // filename of ride
         QString cacheFileName; // filename of cache file
         RideFile *ride;
+
+        // used for zoning
+        int CP;
+        int LTHR;
 
         // Should be 1 regardless of the rideFile::recIntSecs
         // this might change in the future - but at the moment
@@ -184,6 +199,9 @@ class RideFileCache
         QVector<double> kphDistributionDouble; // RideFile::kph
         QVector<double> xPowerDistributionDouble; // RideFile::kph
         QVector<double> npDistributionDouble; // RideFile::kph
+
+        QVector<unsigned long> wattsTimeInZone;   // time in zone in seconds
+        QVector<unsigned long> hrTimeInZone;      // time in zone in seconds
 
         // we need to return doubles not longs, we just use longs
         // to reduce disk storage
