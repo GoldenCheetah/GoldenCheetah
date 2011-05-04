@@ -496,15 +496,16 @@ CpintPlot::calculate(RideItem *rideItem)
     //
     if (series == RideFile::xPower || series == RideFile::NP || series == RideFile::watts || series == RideFile::none) {
 
+        if (bests->meanMaxArray(series).size() > 1) {
+            // calculate CP model from all-time best data
+            cp  = tau = t0  = 0;
+            deriveCPParameters();
+        }
+
         //
         // CP curve only relevant for Energy or Watts (?)
         //
         if (series == RideFile::watts || series == RideFile::none) {
-            if (bests->meanMaxArray(series).size() > 1) {
-                // calculate CP model from all-time best data
-                cp  = tau = t0  = 0;
-                deriveCPParameters();
-            }
             if (!CPCurve) plot_CP_curve(this, cp, tau, t0);
             else {
                 // make sure color reflects latest config
