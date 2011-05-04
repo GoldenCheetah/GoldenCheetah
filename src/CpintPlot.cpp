@@ -494,20 +494,25 @@ CpintPlot::calculate(RideItem *rideItem)
     //
     // PLOT MODEL CURVE (DERIVED)
     //
-    if (series == RideFile::watts || series == RideFile::none) {
+    if (series == RideFile::xPower || series == RideFile::NP || series == RideFile::watts || series == RideFile::none) {
 
-        if (bests->meanMaxArray(series).size() > 1) {
-            // calculate CP model from all-time best data
-            cp  = tau = t0  = 0;
-            deriveCPParameters();
-        }
-        if (!CPCurve) plot_CP_curve(this, cp, tau, t0);
-        else {
-            // make sure color reflects latest config
-            QPen pen(GColor(CCP));
-            pen.setWidth(2.0);
-            pen.setStyle(Qt::DashLine);
-            CPCurve->setPen(pen);
+        //
+        // CP curve only relevant for Energy or Watts (?)
+        //
+        if (series == RideFile::watts || series == RideFile::none) {
+            if (bests->meanMaxArray(series).size() > 1) {
+                // calculate CP model from all-time best data
+                cp  = tau = t0  = 0;
+                deriveCPParameters();
+            }
+            if (!CPCurve) plot_CP_curve(this, cp, tau, t0);
+            else {
+                // make sure color reflects latest config
+                QPen pen(GColor(CCP));
+                pen.setWidth(2.0);
+                pen.setStyle(Qt::DashLine);
+                CPCurve->setPen(pen);
+            }
         }
 
         //
