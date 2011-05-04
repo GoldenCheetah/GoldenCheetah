@@ -460,7 +460,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
     double xmax = (series == RideFile::none)  ? 60.0 : time_values[n_values - 1];
 
     if (series == RideFile::xPower || series == RideFile::NP)
-        thisPlot->setAxisScale(thisPlot->xBottom, (double) 6, (double)xmax);
+        thisPlot->setAxisScale(thisPlot->xBottom, (double) 0.017, (double)xmax);
     else
         thisPlot->setAxisScale(thisPlot->xBottom, (double) 0.017, (double)xmax);
 
@@ -601,7 +601,7 @@ CpintPlot::calculate(RideItem *rideItem)
                 setAxisScale(yLeft, ymin, ymax);
 
                 if (series == RideFile::xPower || series == RideFile::NP)
-                    setAxisScale(xBottom, 6, xmax);
+                    setAxisScale(xBottom, 0.017, xmax);
                 else
                     setAxisScale(xBottom, 0.017, xmax);
 

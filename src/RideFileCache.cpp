@@ -302,6 +302,107 @@ void RideFileCache::RideFileCache::compute()
     thread7.wait();
 }
 
+//----------------------------------------------------------------------
+// Mark Rages' Algorithm for Fast Find of Mean-Max
+//----------------------------------------------------------------------
+
+data_t *
+MeanMaxComputer::integrate_series(cpintdata &data)
+{
+
+    data_t *integrated= (data_t *)malloc(sizeof(data_t)*(data.points.size()+1)); //XXX use QVector... todo
+    int i;
+    data_t acc=0;
+
+    for (i=0; i<data.points.size(); i++) {
+        integrated[i]=acc;
+        acc+=data.points[i].value;
+    }
+    integrated[i]=acc;
+    
+    return integrated;
+}
+
+data_t
+MeanMaxComputer::partial_max_mean(data_t *dataseries_i, int start, int end, int length, int *offset)
+{
+    int i;
+    data_t candidate=0;
+
+    int best_i;
+
+    for (i=start; i<(1+end-length); i++) {
+        data_t test_energy=dataseries_i[length+i]-dataseries_i[i];
+        if (test_energy>candidate) {
+            candidate=test_energy;
+            best_i=i;
+        }
+    }
+    if (offset) *offset=best_i;
+
+    return candidate;
+}
+ 
+
+data_t
+MeanMaxComputer::divided_max_mean(data_t *dataseries_i, int datalength, int length, int *offset)
+{
+    int shift=length;
+
+    //if sorting data the following is an important speedup hack
+    //if (shift>180) shift=180;
+
+    int window_length=length+shift;
+
+    if (window_length>datalength) window_length=datalength;
+
+    // put down as many windows as will fit without overrunning data
+    int start;
+    int end;
+    data_t energy;
+
+    data_t candidate=0;
+    int this_offset;
+
+    for (start=0; start+window_length<=datalength; start+=shift) {
+        end=start+window_length;
+        energy=dataseries_i[end]-dataseries_i[start];
+
+        if (energy < candidate) {
+          continue;
+        }
+        data_t window_mm=partial_max_mean(dataseries_i, start, end, length, &this_offset);
+
+        if (window_mm>candidate) {
+            candidate=window_mm;
+            if (offset) *offset=this_offset;
+        }
+    }
+
+    // if the overlapping windows don't extend to the end of the data,
+    // let's tack another one on at the end
+
+    if (end<datalength) {
+        start=datalength-window_length;
+        end=datalength;
+        energy=dataseries_i[end]-dataseries_i[start];
+
+        if (energy >= candidate) {
+
+            data_t window_mm=partial_max_mean(dataseries_i, start, end, length, &this_offset);
+
+            if (window_mm>candidate) {
+                candidate=window_mm;
+                if (offset) *offset=this_offset;
+            }
+        }
+    }
+
+    // now, the windows are set up.
+    return candidate;
+}
+
+
 void
 MeanMaxComputer::run()
 {
@@ -349,113 +450,10 @@ MeanMaxComputer::run()
     // than 2 days, even if you are doing RAAM
     if (total_secs > 2*24*60*60) return;
 
-    // ride_bests is used to temporarily hold
-    // the computed best intervals since I do
-    // not want to disturb the code at this stage
-    QVector <double> ride_bests(total_secs + 1);
-
-    // loop through the decritized data from top
-    // FIRST 6 MINUTES DO BESTS FOR EVERY SECOND
-    // WE DO NOT DO THIS FOR NP or xPower SINCE
-    // IT IS WELL KNOWN THAT THEY ARE NOT VALID
-    // FOR SUCH SHORT DURATIONS AND IT IS VERY
-    // CPU INTENSIVE, SO WE DON'T BOTHER
-    if (series != RideFile::xPower && series != RideFile::NP) {
-
-        for (int i = 0; i < data.points.size() - 1; ++i) {
-
-            cpintpoint *p = &data.points[i];
-
-            double sum = 0.0;
-            int count = 0;
-            double prev_secs = p->secs;
-
-            // from current point to end loop over remaining points
-            // look at every duration int seconds up to 300 seconds (5 minutes)
-            for (int j = i + 1; j < data.points.size() && data.points[j].secs - data.points[i].secs <= 360 ; ++j) {
-
-                cpintpoint *q = &data.points[j];
-
-                sum += q->value;
-                count++;
-
-                double dur_secs = q->secs - p->secs;
-                double avg = sum / count;
-                int dur_secs_top = (int) floor(dur_secs);
-                int dur_secs_bot = qMax((int) floor(dur_secs - data.rec_int_ms / 1000.0), 0);
-
-                // loop over our bests (1 for every second of the ride)
-                // to see if we have a new best
-                for (int k = dur_secs_top; k > dur_secs_bot; --k) {
-                    if (ride_bests[k] < avg) ride_bests[k] = avg;
-                }
-                prev_secs = q->secs;
-            }
-        }
-
-    } 
-
-    // NOW DO BESTS FOR EVERY 60s 
-    // BETWEEN 6mins and the rest of the ride
-    //
-    // because we are dealing with longer durations we
-    // can afford to be less sensitive to missed data
-    // and sample rates - so we can downsample the sample
-    // data now to 5s samples - but if the recording interval
-    // is > 5s we won't bother, just set the interval used to
-    // whatever the sample rate is for the device.
-    //
-    // NOTE: 5s was chosen since it is a common denominator
-    //       of 25s used for EWMA for xPower and 30s used
-    //       for Normalised Power.
-    QVector<double> downsampled(0);
-    double samplerate;
-
-    // moving to 5s samples would INCREASE the work...
-    if (ride->recIntSecs() >= 5) {
-
-        samplerate = ride->recIntSecs();
-        for (int i=0; i<data.points.size(); i++)
-            downsampled.append(data.points[i].value);
-
-    } else {
-
-        // moving to 5s samples is DECREASING the work...
-        samplerate = 5;
-
-        // we are downsampling to 5s
-        long five=5; // start at 1st 5s sample
-        double fivesum=0;
-        int fivecount=0;
-        for (int i=0; i<data.points.size(); i++) {
-
-            if (data.points[i].secs <= five) {
-
-                fivesum += data.points[i].value;
-                fivecount++;
-
-            } else {
-
-                downsampled.append(fivesum / fivecount);
-                fivecount = 1;
-                fivesum = data.points[i].value;
-                five += 5;
-            }
-        }
-    }
-
-    // pre-process the data from watts to weighted 
-    // rolling averages if performing NP or xPower calculations
-    // we do this after downsampling to reduce the overhead since
-    // we do not calculate either for durations shorter than
-    // 6 minutes anyway
-    //
-    // NOTE: We can do this since all averages have an equal weight
-
     // NP - rolling 30s avg ^ 4
     if (series == RideFile::NP) {
 
-        int rollingwindowsize = 30 / samplerate;
+        int rollingwindowsize = 30 / ride->recIntSecs();
 
         // no point doing a rolling average if the
         // sample rate is greater than the rolling average
@@ -468,13 +466,13 @@ MeanMaxComputer::run()
 
             // loop over the data and convert to a rolling
             // average for the given windowsize
-            for (int i=0; i<downsampled.size(); i++) {
+            for (int i=0; i<data.points.size(); i++) {
 
-                sum += downsampled[i];
+                sum += data.points[i].value;
                 sum -= rolling[index];
 
-                rolling[index] = downsampled[i];
-                downsampled[i] = pow(sum/rollingwindowsize,4); // raise rolling average to 4th power
+                rolling[index] = data.points[i].value;
+                data.points[i].value = pow(sum/(double)rollingwindowsize,4.0f); // raise rolling average to 4th power
 
                 // move index on/round
                 index = (index >= rollingwindowsize-1) ? 0 : index+1;
@@ -485,10 +483,10 @@ MeanMaxComputer::run()
     // xPower - 25s EWA - uses same algorithm as BikeScore.cpp
     if (series == RideFile::xPower) {
 
-        const double exp = 2.0f / ((25.0f / samplerate) + 1.0f);
+        const double exp = 2.0f / ((25.0f / ride->recIntSecs()) + 1.0f);
         const double rem = 1.0f - exp;
 
-        int rollingwindowsize = 25 / samplerate;
+        int rollingwindowsize = 25 / ride->recIntSecs();
         double ewma = 0.0;
         double sum = 0.0; // as we ramp up
 
@@ -498,76 +496,46 @@ MeanMaxComputer::run()
         if (rollingwindowsize > 1) {
 
             // loop over the data and convert to a EWMA
-            for (int i=0; i<downsampled.size(); i++) {
+            for (int i=0; i<data.points.size(); i++) {
 
                 if (i < rollingwindowsize) {
 
                     // get up to speed
-                    sum += downsampled[i];
+                    sum += data.points[i].value;
                     ewma = sum / (i+1);
 
                 } else {
 
                     // we're up to speed
-                    ewma = (downsampled[i] * exp) + (ewma * rem);
+                    ewma = (data.points[i].value * exp) + (ewma * rem);
                 }
-                downsampled[i] = pow(ewma, 4);
+                data.points[i].value = pow(ewma, 4.0f);
             }
         }
     }
 
-    // now we have downsampled lets find bests starting at 6mins
-    // with duration searched increasing as ride duration does
-    for (int slice = 360; slice < ride_bests.size();) {
+    // the bests go in here...
+    QVector <double> ride_bests(total_secs + 1);
 
-        QVector<double> sums(downsampled.size());
-        int windowsize = slice / samplerate;
-        int index=0;
-        double sum=0;
+    data_t *dataseries_i = integrate_series(data);
 
-        for (int i=0; i<downsampled.size(); i++) {
-            sum += downsampled[i];
+    for (int i=1; i<data.points.size(); i++) {
 
-            if (i>windowsize) {
-                sum -= downsampled[i-windowsize];
-                sums[index++] = sum;
-            }
-        }
-        qSort(sums.begin(), sums.end());
+        int offset;
+        data_t c=divided_max_mean(dataseries_i,data.points.size(),i,&offset);
 
-        if (series == RideFile::NP || series == RideFile::xPower)
-            ride_bests[slice] = pow((sums.last() / windowsize), 0.25);
-        else
-            ride_bests[slice] = sums.last() / windowsize;
+        // snaffle it away
+        int sec = i*ride->recIntSecs();
+        data_t val = c / (data_t)i;
 
-        // increment interval duration we are going to search
-        // for next, gaps increase as duration increases to
-        // reduce overall work, since we require far less
-        // precision as the ride duration increases
-        if (slice < 3600) slice +=20; // 20s up to one hour
-        else if (slice < 7200) slice +=60; // 1m up to two hours
-        else if (slice < 10800) slice += 300; // 5mins up to three hours
-        else slice += 600; // 10mins after that
-    }
-
-    // XXX Commented out since it just 'smooths' the drop
-    //     off in CPs which is actually quite enlightening
-    //     LEFT HERE IN CASE IT IS IMPORTANT!
-#if 0
-    // avoid decreasing work with increasing duration
-    {
-        double maxwork = 0.0;
-        for (int i = 1; i <= total_secs; ++i) {
-            // note index is being used here in lieu of time, as the index
-            // is assumed to be proportional to time
-            double work = ride_bests[i] * i;
-            if (maxwork > work)
-                ride_bests[i] = round(maxwork / i);
+        if (sec < ride_bests.size()) {
+            if (series == RideFile::NP || series == RideFile::xPower)
+                ride_bests[sec] = pow(val, 0.25f);
             else
-                maxwork = work;
+                ride_bests[sec] = val;
         }
     }
-#endif
+    free(dataseries_i);
 
     //
     // FILL IN THE GAPS AND FILL TARGET ARRAY
@@ -588,6 +556,7 @@ MeanMaxComputer::run()
         // precision by applying a multiplier
         array[i] = ride_bests[i] * decimals;
     }
+
 }
 
 void
@@ -822,6 +791,7 @@ RideFileCache::readCache()
         inFile.readRawData((char *) kphMeanMax.data(), sizeof(float) * kphMeanMax.size());
         inFile.readRawData((char *) xPowerMeanMax.data(), sizeof(float) * xPowerMeanMax.size());
         inFile.readRawData((char *) npMeanMax.data(), sizeof(float) * npMeanMax.size());
+
 
         // write dist
         inFile.readRawData((char *) wattsDistribution.data(), sizeof(float) * wattsDistribution.size());

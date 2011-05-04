@@ -29,16 +29,22 @@ class RideFile;
 
 #include "GoldenCheetah.h"
 
+// used by Mark Rages' Mean Max Algorithm
+#include <stdlib.h>
+#include <stdint.h>
+typedef double data_t;
+
 // RideFileCache is used to get meanmax and sample distribution
 // arrays when plotting CP curves and histograms. It is precoputed
 // to save time and cached in a file .cpx
 //
-static const unsigned int RideFileCacheVersion = 3;
+static const unsigned int RideFileCacheVersion = 4;
 // revision history:
 // version  date         description
 // 1        29-Apr-11    Initial - header, mean-max & distribution data blocks
 // 2        02-May-11    Added LTHR/CP used to header and Time In Zone block
 // 3        02-May-11    Moved to float precision not integer.
+// 4        02-May-11    Moved to Mark Rages mean-max function with higher precision
 
 // The cache file (.cpx) has a binary format:
 // 1 x Header data - describing the version and contents of the cache
@@ -215,7 +221,7 @@ class RideFileCache
 // and stable legacy code intact
 struct cpintpoint {
     double secs;
-    int value;
+    double value;
     cpintpoint() : secs(0.0), value(0) {}
     cpintpoint(double s, int w) : secs(s), value(w) {}
 };
@@ -236,8 +242,16 @@ class MeanMaxComputer : public QThread
         void run();
 
     private:
+
+        // Mark Rages' algorithm for fast find of mean max
+        data_t *integrate_series(cpintdata &data);
+        data_t partial_max_mean(data_t *dataseries_i, int start, int end, int length, int *offset);
+        data_t divided_max_mean(data_t *dataseries_i, int datalength, int length, int *offset);
+
         RideFile *ride;
         QVector<float> &array;
+        QVector<data_t> integratedArray;
+
         RideFile::SeriesType series;
 };
 #endif // _GC_RideFileCache_h
