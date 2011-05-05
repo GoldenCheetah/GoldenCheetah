@@ -6,6 +6,11 @@ TEMPLATE = app
 TARGET = GoldenCheetah
 DEPENDPATH += .
 
+# We use g++ on all platforms so switch on
+# auto vectorization amongst other things to
+# speed up looping over ride file points
+QMAKE_CXXFLAGS += -O3
+
 !isEmpty( BOOST_INCLUDE ) { INCLUDEPATH += $${BOOST_INCLUDE} }
 INCLUDEPATH += ../qwt/src ../qxt/src
 QT += xml sql network webkit phonon
