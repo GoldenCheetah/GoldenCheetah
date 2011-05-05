@@ -257,7 +257,7 @@ RideFileCache::refreshCache()
         err.setText(errMessage);
         err.setIcon(QMessageBox::Warning);
         err.exec();
-        return; 
+        return;
 
     } else {
 
@@ -266,7 +266,7 @@ RideFileCache::refreshCache()
     }
 }
 
-// this function is a candidate for supporting 
+// this function is a candidate for supporting
 // threaded calculations, each of the computes
 // in here could go in its own thread. Users
 // with many cores would benefit enormously
@@ -306,6 +306,123 @@ void RideFileCache::RideFileCache::compute()
 // Mark Rages' Algorithm for Fast Find of Mean-Max
 //----------------------------------------------------------------------
 
+/*
+
+   A Faster Mean-Max Algorithm
+
+   Premises:
+
+   1 - maximum average power for a given interval occurs at maximum
+       energy for the interval, because the interval time is fixed;
+
+   2 - the energy in an interval enclosing a smaller interval will
+       always be equal or greater than an interval;
+
+   3 - finding maximum of means is a search algorithm, so biggest
+       gains are found in reducing the search space as quickly as
+       possible.
+
+   Algorithm
+
+   note: I find it easier to reason with concrete numbers, so I will
+   describe the algorithm in terms of power and 60 second max-mean:
+
+   To find the maximum average power for one minute:
+
+   1 - integrate the watts over the entire ride to get accumulated
+       energy in joules.  This is a monotonic function (assuming watts
+       are positive).  The final value is the energy for the whole
+       ride.  Once this is done, the energy for any section can be
+       found with a single subtraction.
+
+   2 - divide the energy into overlapping two-minute sections.
+       Section one = 0:00 -> 2:00, section two = 1:00 -> 3:00, etc.
+
+       Example:  Find 60s MM in 5-minute file
+
+       +----------+----------+----------+----------+----------+
+       | minute 1 | minute 2 | minute 3 | minute 4 | minute 5 |
+       +----------+----------+----------+----------+----------+
+       |             |_MEAN_MAX_|                             |
+       +---------------------+---------------------+----------+
+       |      segment 1      |      segment 3      |
+       +----------+----------+----------+----------+----------+
+                  |      segment 2      |      segment 4      |
+                  +---------------------+---------------------+
+
+       So no matter where the MEAN_MAX segment is located in time, it
+       will be wholly contained in one segment.
+
+       In practice, it is a little faster to make the windows smaller
+       and overlap more:
+       +----------+----------+----------+----------+----------+
+       | minute 1 | minute 2 | minute 3 | minute 4 | minute 5 |
+       +----------+----------+----------+----------+----------+
+       |             |_MEAN_MAX_|                             |
+       +-------------+----------------------------------------+
+          |  segment 1  |
+          +--+----------+--+
+          |  segment 2  |
+          +--+----------+--+
+             |  segment 3  |
+             +--+----------+--+
+                |  segment 4  |
+                +--+----------+--+
+                   |  segment 5  |
+                   +--+----------+--+
+                      |  segment 6  |
+                      +--+----------+--+
+                         |  segment 7  |
+                         +--+----------+--+
+                            |  segment 8  |
+                            +--+----------+--+
+                               |  segment 9  |
+                               +-------------+
+                                            ... etc.
+
+       ( This is because whenever the actual mean max energy is
+         greater than a segment energy, we can skip the detail
+         comparison within that segment altogether.  The exact
+         tradeoff for optimum performance depends on the distribution
+         of the data.  It's a pretty shallow curve.  Values in the 1
+         minute to 1.5 minute range seem to work pretty well. )
+
+   3 - for each two minute section, subtract the accumulated energy at
+       the end of the section from the accumulated energy at the
+       beginning of the section.  That gives the energy for that section.
+
+   4 - in the first section, go second-by-second to find the maximum
+       60-second energy.  This is our candidate for 60-second energy
+
+   5 - go down the sorted list of sections.  If the energy in the next
+       section is less than the 60-second energy in the best candidate so
+       far, skip to the next section without examining it carefully,
+       because the section cannot possibly have a one-minute section with
+       greater energy.
+
+       while (section->energy > candidate) {
+         candidate=max(candidate, search(section, 60));
+         section++;
+       }
+
+   6. candidate is the mean max for 60 seconds.
+
+   Enhancements that are not implemented:
+
+     - The two-minute overlapping sections can be reused for 59
+       seconds, etc.  The algorithm will degrade to exhaustive search
+       if the looked-for interval is much smaller than the enclosing
+       interval.
+
+     - The sections can be sorted by energy in reverse order before
+       step #4.  Then the search in #5 can be terminated early, the
+       first time it fails.  In practice, the comparisons in the
+       search outnumber the saved comparisons.  But this might be a
+       useful optimization if the windows are reused per the previous
+       idea.
+
+*/
+
 data_t *
 MeanMaxComputer::integrate_series(cpintdata &data)
 {
@@ -319,7 +436,7 @@ MeanMaxComputer::integrate_series(cpintdata &data)
         acc+=data.points[i].value;
     }
     integrated[i]=acc;
-    
+
     return integrated;
 }
 
@@ -342,7 +459,7 @@ MeanMaxComputer::partial_max_mean(data_t *dataseries_i, int start, int end, int 
 
     return candidate;
 }
- 
+
 
 data_t
 MeanMaxComputer::divided_max_mean(data_t *dataseries_i, int datalength, int length, int *offset)
@@ -350,7 +467,7 @@ MeanMaxComputer::divided_max_mean(data_t *dataseries_i, int datalength, int leng
     int shift=length;
 
     //if sorting data the following is an important speedup hack
-    //if (shift>180) shift=180;
+    if (shift>180) shift=180;
 
     int window_length=length+shift;
 
@@ -398,7 +515,6 @@ MeanMaxComputer::divided_max_mean(data_t *dataseries_i, int datalength, int leng
         }
     }
 
-    // now, the windows are set up.
     return candidate;
 }
 
@@ -436,7 +552,7 @@ MeanMaxComputer::run()
 
         // fill in any gaps in recording - use same dodgy rounding as before
         int count = (p->secs - lastsecs - ride->recIntSecs()) / ride->recIntSecs();
-        for(int i=0; i<count; i++) 
+        for(int i=0; i<count; i++)
             data.points.append(cpintpoint(round(lastsecs+((i+1)*ride->recIntSecs() *1000.0)/1000), 0));
         lastsecs = p->secs;
 
@@ -622,7 +738,7 @@ static void meanMaxAggregate(QVector<double> &into, QVector<double> &other, QVec
         dates.resize(other.size());
     }
 
-    for (int i=0; i<other.size(); i++) 
+    for (int i=0; i<other.size(); i++)
         if (other[i] > into[i]) {
             into[i] = other[i];
             dates[i] = rideDate;
@@ -764,7 +880,7 @@ RideFileCache::readCache()
 
     if (cacheFile.open(QIODevice::ReadOnly) == true) {
         QDataStream inFile(&cacheFile);
-    
+
         inFile.readRawData((char *) &head, sizeof(head));
 
         // resize all the arrays to fit
