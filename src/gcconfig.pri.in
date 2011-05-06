@@ -6,6 +6,11 @@ BOOST_INSTALL = /usr/local/boost
 SRMIO_INSTALL = /usr/local/srmio
 D2XX_INCLUDE = /usr/local/include/D2XX
 
+# We use g++ on all platforms so switch on
+# auto vectorization amongst other things to
+# speed up looping over ride file points
+#QMAKE_CXXFLAGS += -O3
+
 #let us know where flex/bison are:
 #QMAKE_LEX  = flex
 #QMAKE_YACC = bison
