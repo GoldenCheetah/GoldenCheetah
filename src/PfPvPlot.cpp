@@ -137,9 +137,9 @@ PfPvPlot::PfPvPlot(MainWindow *mainWindow)
 {
     setCanvasBackground(Qt::white);
 
-    setAxisTitle(yLeft, "Average Effective Pedal Force (N)");
+    setAxisTitle(yLeft, tr("Average Effective Pedal Force (N)"));
     setAxisScale(yLeft, 0, 600);
-    setAxisTitle(xBottom, "Circumferential Pedal Velocity (m/s)");
+    setAxisTitle(xBottom, tr("Circumferential Pedal Velocity (m/s)"));
     setAxisScale(xBottom, 0, 3);
 
     mX = new QwtPlotMarker();

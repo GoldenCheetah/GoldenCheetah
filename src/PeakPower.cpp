@@ -21,7 +21,12 @@
 #include "Zones.h"
 #include <math.h>
 
-#define tr(s) QObject::tr(s)
+#ifdef ENABLE_METRICS_TRANSLATION
+#include <QApplication>
+#define translate(c,s) QApplication::translate(c,s)
+#else
+#define translate(c,s) QObject::tr(s)
+#endif
 
 class PeakPower : public RideMetric {
     double watts;
@@ -32,8 +37,12 @@ class PeakPower : public RideMetric {
     PeakPower() : watts(0.0), secs(0.0)
     {
         setType(RideMetric::Peak);
-        setMetricUnits(tr("watts"));
-        setImperialUnits(tr("watts"));
+#ifdef ENABLE_METRICS_TRANSLATION
+    }
+    void initialize() {
+#endif
+        setMetricUnits(translate("PeakPower", "watts"));
+        setImperialUnits(translate("PeakPower", "watts"));
     }
     void setSecs(double secs) { this->secs=secs; }
     void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
@@ -53,7 +62,11 @@ class CriticalPower : public PeakPower {
         {
             setSecs(3600);
             setSymbol("60m_critical_power");
-            setName(tr("60 min Peak Power"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("CriticalPower", "60 min Peak Power"));
         }
         RideMetric *clone() const { return new CriticalPower(*this); }
 };
@@ -64,7 +77,11 @@ class PeakPower1s : public PeakPower {
         {
             setSecs(1);
             setSymbol("1s_critical_power");
-            setName(tr("1 sec Peak Power"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("PeakPower1s", "1 sec Peak Power"));
         }
         RideMetric *clone() const { return new PeakPower1s(*this); }
 };
@@ -75,7 +92,11 @@ class PeakPower5s : public PeakPower {
         {
             setSecs(5);
             setSymbol("5s_critical_power");
-            setName(tr("5 sec Peak Power"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("PeakPower5s", "5 sec Peak Power"));
         }
         RideMetric *clone() const { return new PeakPower5s(*this); }
 };
@@ -86,7 +107,11 @@ class PeakPower10s : public PeakPower {
         {
             setSecs(10);
             setSymbol("10s_critical_power");
-            setName(tr("10 sec Peak Power"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("PeakPower10s", "10 sec Peak Power"));
         }
         RideMetric *clone() const { return new PeakPower10s(*this); }
 };
@@ -97,7 +122,11 @@ class PeakPower15s : public PeakPower {
         {
             setSecs(15);
             setSymbol("15s_critical_power");
-            setName(tr("15 sec Peak Power"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("PeakPower15s", "15 sec Peak Power"));
         }
         RideMetric *clone() const { return new PeakPower15s(*this); }
 };
@@ -108,7 +137,11 @@ class PeakPower20s : public PeakPower {
         {
             setSecs(20);
             setSymbol("20s_critical_power");
-            setName(tr("20 sec Peak Power"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("PeakPower20s", "20 sec Peak Power"));
         }
         RideMetric *clone() const { return new PeakPower20s(*this); }
 };
@@ -119,7 +152,11 @@ class PeakPower30s : public PeakPower {
         {
             setSecs(30);
             setSymbol("30s_critical_power");
-            setName(tr("30 sec Peak Power"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("PeakPower30s", "30 sec Peak Power"));
         }
         RideMetric *clone() const { return new PeakPower30s(*this); }
 };
@@ -130,7 +167,11 @@ class PeakPower1m : public PeakPower {
         {
             setSecs(60);
             setSymbol("1m_critical_power");
-            setName(tr("1 min Peak Power"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("PeakPower1m", "1 min Peak Power"));
         }
         RideMetric *clone() const { return new PeakPower1m(*this); }
 };
@@ -141,7 +182,11 @@ class PeakPower5m : public PeakPower {
         {
             setSecs(300);
             setSymbol("5m_critical_power");
-            setName(tr("5 min Peak Power"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("PeakPower5m", "5 min Peak Power"));
         }
         RideMetric *clone() const { return new PeakPower5m(*this); }
 };
@@ -152,7 +197,11 @@ class PeakPower10m : public PeakPower {
         {
             setSecs(600);
             setSymbol("10m_critical_power");
-            setName(tr("10 min Peak Power"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("PeakPower10m", "10 min Peak Power"));
         }
         RideMetric *clone() const { return new PeakPower10m(*this); }
 };
@@ -163,7 +212,11 @@ class PeakPower20m : public PeakPower {
         {
             setSecs(1200);
             setSymbol("20m_critical_power");
-            setName(tr("20 min Peak Power"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("PeakPower20m", "20 min Peak Power"));
         }
         RideMetric *clone() const { return new PeakPower20m(*this); }
 };
@@ -174,7 +227,11 @@ class PeakPower30m : public PeakPower {
         {
             setSecs(1800);
             setSymbol("30m_critical_power");
-            setName(tr("30 min Peak Power"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("PeakPower30m", "30 min Peak Power"));
         }
         RideMetric *clone() const { return new PeakPower30m(*this); }
 };

@@ -318,17 +318,17 @@ WeeklySummaryWindow::refresh()
     summary += "</center>";
 
     // set the axis labels of the weekly plots
-    QwtText textLabel = QwtText(useMetricUnits ? "km" : "miles");
+    QwtText textLabel = QwtText(useMetricUnits ? tr("km") : tr("miles"));
     QFont weeklyPlotAxisTitleFont = textLabel.font();
     weeklyPlotAxisTitleFont.setPointSize(10);
     weeklyPlotAxisTitleFont.setBold(true);
     textLabel.setFont(weeklyPlotAxisTitleFont);
     weeklyPlot->setAxisTitle(QwtPlot::yLeft, textLabel);
-    textLabel.setText("Minutes");
+    textLabel.setText(tr("Minutes"));
     weeklyPlot->setAxisTitle(QwtPlot::yRight, textLabel);
-    textLabel.setText(useBikeScore ? "BikeScore" : "kJoules");
+    textLabel.setText(useBikeScore ? tr("BikeScore") : tr("kJoules"));
     weeklyBSPlot->setAxisTitle(QwtPlot::yLeft, textLabel);
-    textLabel.setText(useBikeScore ? "Intensity" : "xPower");
+    textLabel.setText(useBikeScore ? tr("Intensity") : tr("xPower"));
     weeklyBSPlot->setAxisTitle(QwtPlot::yRight, textLabel);
 
     // for the daily distance/duration and bikescore plots:
@@ -411,7 +411,7 @@ WeeklySummaryWindow::refresh()
     weeklyDistCurve->setData(xdist, ydist, 16);
     weeklyPlot->setAxisScale(QwtPlot::yLeft, 0, weeklyDistCurve->maxYValue()*1.1, 0);
     weeklyPlot->setAxisScale(QwtPlot::xBottom, 0.5, 7.5, 0);
-    weeklyPlot->setAxisTitle(QwtPlot::yLeft, useMetricUnits ? "Kilometers" : "Miles");
+    weeklyPlot->setAxisTitle(QwtPlot::yLeft, useMetricUnits ? tr("Kilometers") : tr("Miles"));
 
     weeklyDurationCurve->setData(xdur, ydur, 16);
     weeklyPlot->setAxisScale(QwtPlot::yRight, 0, weeklyDurationCurve->maxYValue()*1.1, 0);

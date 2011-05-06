@@ -17,9 +17,14 @@
  */
 
 #include "RideMetric.h"
-#include <QObject>
 
-#define tr(s) QObject::tr(s)
+#ifdef ENABLE_METRICS_TRANSLATION
+#include <QApplication>
+#define translate(c,s) QApplication::translate(c,s)
+#else
+#include <QObject>
+#define translate(c,s) QObject::tr(s)
+#endif
 
 // This metric computes aerobic decoupling percentage as described
 // by Joe Friel:
@@ -47,10 +52,14 @@ class AerobicDecoupling : public RideMetric {
     AerobicDecoupling() : percent(0.0)
     {
         setSymbol("aerobic_decoupling");
-        setName(tr("Aerobic Decoupling"));
+#ifdef ENABLE_METRICS_TRANSLATION
+    }
+    void initialize() {
+#endif
+        setName(translate("AerobicDecoupling", "Aerobic Decoupling"));
         setType(RideMetric::Average);
-        setMetricUnits(tr("%"));
-        setImperialUnits(tr("%"));
+        setMetricUnits(translate("AerobicDecoupling", "%"));
+        setImperialUnits(translate("AerobicDecoupling", "%"));
         setPrecision(2);
     }
     void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,

@@ -33,9 +33,9 @@ PerfPlot::PerfPlot() : STScurve(NULL), LTScurve(NULL), SBcurve(NULL), DAYcurve(N
 {
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setTitle(tr("Performance Manager"));
-    setAxisTitle(yLeft, "Exponentially Weighted Average Stress");
-    setAxisTitle(xBottom, "Time (days)");
-    setAxisTitle(yRight, "Daily Stress");
+    setAxisTitle(yLeft, tr("Exponentially Weighted Average Stress"));
+    setAxisTitle(xBottom, tr("Time (days)"));
+    setAxisTitle(yRight, tr("Daily Stress"));
     enableAxis(yRight, true);
 
     grid = new QwtPlotGrid();

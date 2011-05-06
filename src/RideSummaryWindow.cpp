@@ -90,7 +90,7 @@ RideSummaryWindow::htmlSummary() const
     bool metricUnits = (unit.toString() == "Metric");
 
     const int columns = 3;
-    const char *columnNames[] = { "Totals", "Averages", "Metrics*" };
+    QString columnNames[] = { tr("Totals"), tr("Averages"), tr("Metrics*") };
     const char *totalColumn[] = {
         "workout_time",
         "time_riding",

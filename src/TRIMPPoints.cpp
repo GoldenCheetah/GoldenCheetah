@@ -23,7 +23,12 @@
 #include <QObject>
 #include <math.h>
 
-#define tr(s) QObject::tr(s)
+#ifdef ENABLE_METRICS_TRANSLATION
+#include <QApplication>
+#define translate(c,s) QApplication::translate(c,s)
+#else
+#define translate(c,s) QObject::tr(s)
+#endif
 
 // This is Morton/Banister with Green et al coefficient.
 //
@@ -43,12 +48,15 @@ class TRIMPPoints : public RideMetric {
     TRIMPPoints() : score(0.0)
     {
         setSymbol("trimp_points");
-        setName(tr("TRIMP Points"));
+#ifdef ENABLE_METRICS_TRANSLATION
+    }
+    void initialize() {
+#endif
+        setName(translate("TRIMPPoints", "TRIMP Points"));
         setMetricUnits("");
         setImperialUnits("");
         setType(RideMetric::Total);
     }
-
     void compute(const RideFile *rideFile,
                  const Zones *, int ,
                  const HrZones *hrZones, int hrZoneRange,
@@ -110,12 +118,15 @@ public:
     TRIMP100Points() : score(0.0)
     {
         setSymbol("trimp_100_points");
-        setName(tr("TRIMP(100) Points"));
+#ifdef ENABLE_METRICS_TRANSLATION
+    }
+    void initialize() {
+#endif
+        setName(translate("TRIMP100Points", "TRIMP(100) Points"));
         setMetricUnits("");
         setImperialUnits("");
         setType(RideMetric::Total);
     }
-
     void compute(const RideFile *rideFile,
                  const Zones *, int,
                  const HrZones *hrZones, int hrZoneRange,
@@ -177,12 +188,15 @@ public:
     TRIMPZonalPoints() : score(0.0)
     {
         setSymbol("trimp_zonal_points");
-        setName(tr("TRIMP Zonal Points"));
+#ifdef ENABLE_METRICS_TRANSLATION
+    }
+    void initialize() {
+#endif
+        setName(translate("TRIMP Zonal Points", "TRIMP Zonal Points"));
         setMetricUnits("");
         setImperialUnits("");
         setType(RideMetric::Total);
     }
-
     void compute(const RideFile *,
                  const Zones *, int,
                  const HrZones *hrZones, int hrZoneRange,

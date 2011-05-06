@@ -163,6 +163,8 @@ void ConfigDialog::save_Clicked()
         settings->setValue(GC_LANG, "ru");
     else if (configPage->langCombo->currentIndex()==7)
         settings->setValue(GC_LANG, "cs");
+    else if (configPage->langCombo->currentIndex()==8)
+        settings->setValue(GC_LANG, "sp");
 
     if (configPage->unitCombo->currentIndex()==0)
         settings->setValue(GC_UNIT, "Metric");

@@ -22,7 +22,12 @@
 #include "Zones.h"
 #include <math.h>
 
-#define tr(s) QObject::tr(s)
+#ifdef ENABLE_METRICS_TRANSLATION
+#include <QApplication>
+#define translate(c,s) QApplication::translate(c,s)
+#else
+#define translate(c,s) QObject::tr(s)
+#endif
 
 class ZoneTime : public RideMetric {
     int level;
@@ -40,7 +45,12 @@ class ZoneTime : public RideMetric {
         setImperialUnits("seconds");
         setPrecision(0);
         setConversion(1.0);
+#ifdef ENABLE_METRICS_TRANSLATION
     }
+    void initialize() {
+#endif
+    }
+
     void setLevel(int level) { this->level=level-1; } // zones start from zero not 1
     void compute(const RideFile *ride, const Zones *zone, int zoneRange, const HrZones *, int,
                  const QHash<QString,RideMetric*> &)
@@ -69,7 +79,11 @@ class ZoneTime1 : public ZoneTime {
         {
             setLevel(1);
             setSymbol("time_in_zone_L1");
-            setName(tr("L1 Time in Zone"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("ZoneTime1", "L1 Time in Zone"));
         }
         RideMetric *clone() const { return new ZoneTime1(*this); }
 };
@@ -81,7 +95,11 @@ class ZoneTime2 : public ZoneTime {
         {
             setLevel(2);
             setSymbol("time_in_zone_L2");
-            setName(tr("L2 Time in Zone"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("ZoneTime2", "L2 Time in Zone"));
         }
         RideMetric *clone() const { return new ZoneTime2(*this); }
 };
@@ -93,7 +111,11 @@ class ZoneTime3 : public ZoneTime {
         {
             setLevel(3);
             setSymbol("time_in_zone_L3");
-            setName(tr("L3 Time in Zone"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("ZoneTime3", "L3 Time in Zone"));
         }
         RideMetric *clone() const { return new ZoneTime3(*this); }
 };
@@ -105,7 +127,11 @@ class ZoneTime4 : public ZoneTime {
         {
             setLevel(4);
             setSymbol("time_in_zone_L4");
-            setName(tr("L4 Time in Zone"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("ZoneTime4", "L4 Time in Zone"));
         }
         RideMetric *clone() const { return new ZoneTime4(*this); }
 };
@@ -117,7 +143,11 @@ class ZoneTime5 : public ZoneTime {
         {
             setLevel(5);
             setSymbol("time_in_zone_L5");
-            setName(tr("L5 Time in Zone"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("ZoneTime5", "L5 Time in Zone"));
         }
         RideMetric *clone() const { return new ZoneTime5(*this); }
 };
@@ -129,7 +159,11 @@ class ZoneTime6 : public ZoneTime {
         {
             setLevel(6);
             setSymbol("time_in_zone_L6");
-            setName(tr("L6 Time in Zone"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("ZoneTime6", "L6 Time in Zone"));
         }
         RideMetric *clone() const { return new ZoneTime6(*this); }
 };
@@ -141,7 +175,11 @@ class ZoneTime7 : public ZoneTime {
         {
             setLevel(7);
             setSymbol("time_in_zone_L7");
-            setName(tr("L7 Time in Zone"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("ZoneTime7", "L7 Time in Zone"));
         }
         RideMetric *clone() const { return new ZoneTime7(*this); }
 };
@@ -153,7 +191,11 @@ class ZoneTime8 : public ZoneTime {
         {
             setLevel(8);
             setSymbol("time_in_zone_L8");
-            setName(tr("L8 Time in Zone"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("ZoneTime8", "L8 Time in Zone"));
         }
         RideMetric *clone() const { return new ZoneTime8(*this); }
 };
@@ -165,7 +207,11 @@ class ZoneTime9 : public ZoneTime {
         {
             setLevel(9);
             setSymbol("time_in_zone_L9");
-            setName(tr("L9 Time in Zone"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("ZoneTime9", "L9 Time in Zone"));
         }
         RideMetric *clone() const { return new ZoneTime9(*this); }
 };
@@ -177,7 +223,11 @@ class ZoneTime10 : public ZoneTime {
         {
             setLevel(10);
             setSymbol("time_in_zone_L10");
-            setName(tr("L10 Time in Zone"));
+#ifdef ENABLE_METRICS_TRANSLATION
+        }
+        void initialize () {
+#endif
+            setName(translate("ZoneTime10", "L10 Time in Zone"));
         }
         RideMetric *clone() const { return new ZoneTime10(*this); }
 };

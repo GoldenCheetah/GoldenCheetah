@@ -36,7 +36,6 @@ class RideMetric;
 typedef QSharedPointer<RideMetric> RideMetricPtr;
 
 struct RideMetric {
-
     enum metrictype { Total, Average, Peak } types;
     typedef enum metrictype MetricType;
 
@@ -50,6 +49,9 @@ struct RideMetric {
         value_ = 0.0;
     }
     virtual ~RideMetric() {}
+
+    // Initialization moved from constructor to enable translation
+    virtual void initialize() {}
 
     // The string by which we refer to this RideMetric in the code,
     // configuration files, and caches (like stress.cache).  It should
@@ -182,6 +184,11 @@ class RideMetricFactory {
     }
 
     int metricCount() const { return metricNames.size(); }
+
+    void initialize() {
+        foreach(const QString &metricName, metrics.keys())
+            metrics[metricName]->initialize();
+    }
 
     const QString &metricName(int i) const { return metricNames[i]; }
     const RideMetric::MetricType &metricType(int i) const { return metricTypes[i]; }

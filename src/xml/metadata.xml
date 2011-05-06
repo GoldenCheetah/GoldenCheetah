@@ -137,67 +137,67 @@
 		</field>
 		<field>
 			<fieldtab>"Metric"</fieldtab>
-			<fieldname>"Duration"</fieldname>
+			<fieldname>"workout_time"</fieldname>
 			<fieldtype>4</fieldtype>
 		</field>
 		<field>
 			<fieldtab>"Metric"</fieldtab>
-			<fieldname>"Time Riding"</fieldname>
+			<fieldname>"time_riding"</fieldname>
 			<fieldtype>4</fieldtype>
 		</field>
 		<field>
 			<fieldtab>"Metric"</fieldtab>
-			<fieldname>"Distance"</fieldname>
+			<fieldname>"total_distance"</fieldname>
 			<fieldtype>4</fieldtype>
 		</field>
 		<field>
 			<fieldtab>"Metric"</fieldtab>
-			<fieldname>"Work"</fieldname>
+			<fieldname>"total_work"</fieldname>
 			<fieldtype>4</fieldtype>
 		</field>
 		<field>
 			<fieldtab>"Metric"</fieldtab>
-			<fieldname>"Elevation Gain"</fieldname>
+			<fieldname>"elevation_gain"</fieldname>
 			<fieldtype>4</fieldtype>
 		</field>
 		<field>
 			<fieldtab>"Metric"</fieldtab>
-			<fieldname>"Average Speed"</fieldname>
+			<fieldname>"average_speed"</fieldname>
 			<fieldtype>4</fieldtype>
 		</field>
 		<field>
 			<fieldtab>"Metric"</fieldtab>
-			<fieldname>"Average Power"</fieldname>
+			<fieldname>"average_power"</fieldname>
 			<fieldtype>4</fieldtype>
 		</field>
 		<field>
 			<fieldtab>"Metric"</fieldtab>
-			<fieldname>"Average Heart Rate"</fieldname>
+			<fieldname>"average_hr"</fieldname>
 			<fieldtype>4</fieldtype>
 		</field>
 		<field>
 			<fieldtab>"Metric"</fieldtab>
-			<fieldname>"Average Cadence"</fieldname>
+			<fieldname>"average_cad"</fieldname>
 			<fieldtype>4</fieldtype>
 		</field>
 		<field>
 			<fieldtab>"Metric"</fieldtab>
-			<fieldname>"BikeScore&amp;#8482;"</fieldname>
+			<fieldname>"skiba_bike_score"</fieldname>
 			<fieldtype>4</fieldtype>
 		</field>
 		<field>
 			<fieldtab>"Metric"</fieldtab>
-			<fieldname>"xPower"</fieldname>
+			<fieldname>"skiba_xpower"</fieldname>
 			<fieldtype>4</fieldtype>
 		</field>
 		<field>
 			<fieldtab>"Metric"</fieldtab>
-			<fieldname>"Daniels Points"</fieldname>
+			<fieldname>"daniels_points"</fieldname>
 			<fieldtype>4</fieldtype>
 		</field>
 		<field>
 			<fieldtab>"Metric"</fieldtab>
-			<fieldname>"Daniels EqP"</fieldname>
+			<fieldname>"daniels_equivalent_power"</fieldname>
 			<fieldtype>4</fieldtype>
 		</field>
 	</fields>
