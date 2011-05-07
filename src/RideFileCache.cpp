@@ -57,9 +57,8 @@ RideFileCache::RideFileCache(MainWindow *main, QString fileName, RideFile *passe
     QFileInfo cacheFileInfo(cacheFileName);
 
     // is it up-to-date?
-    if (cacheFileInfo.exists() && rideFileInfo.lastModified() < cacheFileInfo.lastModified() &&
+    if (cacheFileInfo.exists() && rideFileInfo.lastModified() <= cacheFileInfo.lastModified() &&
         cacheFileInfo.size() >= (int)sizeof(struct RideFileCacheHeader)) {
-
         // we have a file, it is more recent than the ride file
         // but is it the latest version?
         RideFileCacheHeader head;
