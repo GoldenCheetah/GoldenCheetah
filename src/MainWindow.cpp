@@ -264,18 +264,10 @@ MainWindow::MainWindow(const QDir &home) :
     connect(helpAct, SIGNAL(triggered()), this, SLOT(helpView()));
     toolbar->addAction(helpAct);
 
-    QWidget *central = new QWidget(this);
-    central->setContentsMargins(0,0,0,0);
-    QHBoxLayout *centralLayout = new QHBoxLayout(central);
-    centralLayout->setSpacing(0);
-    centralLayout->setContentsMargins(0,0,0,0);
-    //centralLayout->addWidget(toolbar);
-
     // need to get metadata in before calendar!
     _rideMetadata = new RideMetadata(this);
     metricDB = new MetricAggregator(this, home, zones(), hrZones()); // just to catch config updates!
     metricDB->refreshMetrics();
-
 
     // setup our downloaders
     withingsDownload = new WithingsDownload(this);
@@ -529,8 +521,6 @@ MainWindow::MainWindow(const QDir &home) :
     views->addWidget(homeWindow);
     views->setCurrentIndex(0);          // default to Analysis
     views->setContentsMargins(0,0,0,0);
-
-    centralLayout->addWidget(views);
 
     // now make the splitter the main widget
     // on a mac it has only one widget since the
