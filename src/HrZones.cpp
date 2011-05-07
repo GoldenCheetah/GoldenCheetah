@@ -426,13 +426,13 @@ int HrZones::whichRange(const QDate &date) const
 
 int HrZones::numZones(int rnum) const
 {
-    assert(rnum < ranges.size());
+    if (rnum < ranges.size()) return 0;
     return ranges[rnum].zones.size();
 }
 
 int HrZones::whichZone(int rnum, double value) const
 {
-    assert(rnum < ranges.size());
+    if (rnum < 0 || rnum > ranges.size()) return 0;
     const HrZoneRange &range = ranges[rnum];
     for (int j = 0; j < range.zones.size(); ++j) {
         const HrZoneInfo &info = range.zones[j];
@@ -460,7 +460,7 @@ void HrZones::zoneInfo(int rnum, int znum,
 
 int HrZones::getLT(int rnum) const
 {
-    assert(rnum < ranges.size());
+    if (rnum < 0 || rnum > ranges.size()) return 0;
     return ranges[rnum].lt;
 }
 
@@ -484,7 +484,7 @@ int HrZones::lowsFromLT(QList <int> *lows, int lt) const {
 
 int HrZones::getRestHr(int rnum) const
 {
-    assert(rnum < ranges.size());
+    if (rnum < 0 || rnum > ranges.size()) return 0;
     return ranges[rnum].restHr;
 }
 
@@ -496,7 +496,7 @@ void HrZones::setRestHr(int rnum, int restHr)
 
 int HrZones::getMaxHr(int rnum) const
 {
-    assert(rnum < ranges.size());
+    if (rnum < 0 || rnum > ranges.size()) return 0;
     return ranges[rnum].maxHr;
 }
 
@@ -601,7 +601,7 @@ QString HrZones::summarize(int rnum, QVector<double> &time_in_zone) const
 {
     assert(rnum < ranges.size());
     const HrZoneRange &range = ranges[rnum];
-    assert(time_in_zone.size() >= range.zones.size());
+    if (time_in_zone.size() < range.zones.size()) return "";
     QString summary;
     if(range.lt > 0){
         summary += "<table align=\"center\" width=\"70%\" border=\"0\">";
