@@ -31,7 +31,7 @@
 #include <QtXml/QtXml>
 #include <QProgressDialog>
 
-MetricAggregator::MetricAggregator(MainWindow *main, QDir home, const Zones *zones, const HrZones *hrzones) : QWidget(main), main(main), home(home), zones(zones), hrzones(hrzones)
+MetricAggregator::MetricAggregator(MainWindow *main, QDir home, const Zones *zones, const HrZones *hrzones) : QObject(main), main(main), home(home), zones(zones), hrzones(hrzones)
 {
     dbaccess = new DBAccess(main, home);
     connect(main, SIGNAL(configChanged()), this, SLOT(update()));

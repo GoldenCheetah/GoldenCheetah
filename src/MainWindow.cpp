@@ -266,6 +266,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     // need to get metadata in before calendar!
     _rideMetadata = new RideMetadata(this);
+    _rideMetadata->hide(); // never displayed
     metricDB = new MetricAggregator(this, home, zones(), hrZones()); // just to catch config updates!
     metricDB->refreshMetrics();
 
@@ -533,7 +534,6 @@ MainWindow::MainWindow(const QDir &home) :
     setCentralWidget(splitter);
 
     /////////////////////////////// Menus ///////////////////////////////
-
     QMenu *fileMenu = menuBar()->addMenu(tr("&Cyclist"));
     fileMenu->addAction(tr("&New..."), this,
                         SLOT(newCyclist()), tr("Ctrl+N"));

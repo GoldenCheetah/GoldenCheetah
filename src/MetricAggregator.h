@@ -31,7 +31,7 @@
 #include "MainWindow.h"
 #include "DBAccess.h"
 
-class MetricAggregator : public QWidget
+class MetricAggregator : public QObject
 {
     Q_OBJECT
     G_OBJECT
