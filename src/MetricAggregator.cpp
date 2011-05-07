@@ -183,6 +183,7 @@ void MetricAggregator::refreshMetrics()
 void MetricAggregator::addRide(RideItem*ride)
 {
     importRide(main->home, ride->ride(), ride->fileName, main->zones()->getFingerprint(), true);
+    RideFileCache updater(main, home.absolutePath() + "/" + ride->fileName, ride->ride(), true); // update cpx etc
     dataChanged(); // notify models/views
 }
 
