@@ -44,6 +44,7 @@
 #include "RideSummaryWindow.h"
 #include "ScatterWindow.h"
 #include "SummaryWindow.h"
+#include "MetadataWindow.h"
 #include "TrainWindow.h" // XXX not done
 #include "TreeMapWindow.h"
 #include "WeeklySummaryWindow.h"
@@ -71,6 +72,7 @@ GcWindowRegistry GcWindows[] = {
     { "Weekly Summary",         GcWindowTypes::WeeklySummary },
     { "Video Player",           GcWindowTypes::VideoPlayer },
     { "Realtime Dial",          GcWindowTypes::DialWindow },
+    { "Metadata Fields",        GcWindowTypes::MetadataWindow },
     { "", GcWindowTypes::None }};
 
 // instantiate a new window
@@ -112,6 +114,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, MainWindow *main) //XXX mainWindow wil
     case GcWindowTypes::VideoPlayer: returning = new GcWindow(); break;
 #endif
     case GcWindowTypes::DialWindow: returning = new DialWindow(main); break;
+    case GcWindowTypes::MetadataWindow: returning = new MetadataWindow(main); break;
     default: return NULL; break;
     }
     if (returning) returning->setProperty("type", QVariant::fromValue<GcWinID>(id));
