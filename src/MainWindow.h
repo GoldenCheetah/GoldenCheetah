@@ -68,6 +68,7 @@ class ICalendar;
 class CalDAV;
 class Seasons;
 class IntervalSummaryWindow;
+class ErgFile;
 
 class MainWindow : public QMainWindow
 {
@@ -108,9 +109,13 @@ class MainWindow : public QMainWindow
                                     // rideItem date/time changes
         void notifyRideClean() { rideClean(); }
         void notifyRideDirty() { rideDirty(); }
-        void notifyTelemetryUpdate(RealtimeData rtData) { telemetryUpdate(rtData); }
         void selectView(int);
         void selectRideFile(QString);
+
+        // realtime signals
+        void notifyTelemetryUpdate(RealtimeData rtData) { telemetryUpdate(rtData); }
+        void notifyErgFileSelected(ErgFile *x) { ergFileSelected(x); }
+        void notifySetNow(long now) { setNow(now); }
 
         // db connections to cyclistdir/metricDB - one per active MainWindow
         QSqlDatabase db;
@@ -153,6 +158,8 @@ class MainWindow : public QMainWindow
         void rideDirty();
         void rideClean();
         void telemetryUpdate(RealtimeData rtData);
+        void ergFileSelected(ErgFile *);
+        void setNow(long);
 
     private slots:
         void tabViewTriggered(bool);

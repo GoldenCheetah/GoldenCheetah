@@ -50,7 +50,8 @@ enum gcwinid {
         VideoPlayer =21,
         DialWindow =22,
         MetadataWindow = 23,
-        RealtimePlot = 24
+        RealtimePlot = 24,
+        WorkoutPlot = 25
 };
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;

@@ -509,6 +509,7 @@ void RealtimeWindow::Stop(int deviceStatus)        // when stop button is presse
     if (status & RT_WORKOUT) {
         load_timer->stop();
         load_msecs = 0;
+        main->notifySetNow(load_msecs);
         ergPlot->setNow(load_msecs);
         ergPlot->replot();
     }
@@ -847,6 +848,7 @@ RealtimeWindow::SelectWorkout()
             // success! we have a load file
             // setup the course profile in the
             // display!
+            main->notifyErgFileSelected(ergFile);
             ergPlot->setData(ergFile);
             ergPlot->setVisible(true);
             ergPlot->replot();
@@ -888,6 +890,7 @@ void RealtimeWindow::loadUpdate()
         } else {
             displayLoad = load;
             deviceController->setLoad(displayLoad);
+            main->notifySetNow(load_msecs);
             ergPlot->setNow(load_msecs);
         }
     } else {
@@ -899,6 +902,7 @@ void RealtimeWindow::loadUpdate()
         } else {
             displayGradient = gradient;
             deviceController->setGradient(displayGradient);
+            main->notifySetNow(displayWorkoutDistance * 1000);
             ergPlot->setNow(displayWorkoutDistance * 1000); // now is in meters we keep it in kilometers
         }
     }
