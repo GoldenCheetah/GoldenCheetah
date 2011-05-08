@@ -50,6 +50,7 @@
 #include "WeeklySummaryWindow.h"
 #include "DialWindow.h"
 #include "RealtimePlotWindow.h"
+#include "WorkoutPlotWindow.h"
 
 GcWindowRegistry GcWindows[] = {
     // name                     GcWinID
@@ -75,6 +76,7 @@ GcWindowRegistry GcWindows[] = {
     { "Realtime Dial",          GcWindowTypes::DialWindow },
     { "Metadata Fields",        GcWindowTypes::MetadataWindow },
     { "Realtime Plot",          GcWindowTypes::RealtimePlot },
+    { "Workout Plot",           GcWindowTypes::WorkoutPlot },
     { "", GcWindowTypes::None }};
 
 // instantiate a new window
@@ -118,6 +120,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, MainWindow *main) //XXX mainWindow wil
     case GcWindowTypes::DialWindow: returning = new DialWindow(main); break;
     case GcWindowTypes::MetadataWindow: returning = new MetadataWindow(main); break;
     case GcWindowTypes::RealtimePlot: returning = new RealtimePlotWindow(main); break;
+    case GcWindowTypes::WorkoutPlot: returning = new WorkoutPlotWindow(main); break;
     default: return NULL; break;
     }
     if (returning) returning->setProperty("type", QVariant::fromValue<GcWinID>(id));

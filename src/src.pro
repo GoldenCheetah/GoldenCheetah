@@ -294,6 +294,7 @@ HEADERS += \
         WeeklyViewItemDelegate.h \
         WithingsDownload.h \
         WkoRideFile.h \
+        WorkoutPlotWindow.h \
         WorkoutWizard.h \
         Zones.h \
         ZoneScaleDraw.h
@@ -455,6 +456,7 @@ SOURCES += \
         WithingsDownload.cpp \
         WeeklySummaryWindow.cpp \
         WkoRideFile.cpp \
+        WorkoutPlotWindow.cpp \
         WorkoutWizard.cpp \
         Zones.cpp \
         main.cpp \
