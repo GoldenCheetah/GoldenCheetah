@@ -26,28 +26,21 @@
 #include "RealtimePlot.h"
 #include "Colors.h"
 
-// infuriating qwtdata api...
-// power stores last 30 seconds for 30 second rolling avg, all else
-// just the last 30 seconds
-double pwrData[150], cadData[50], hrData[50], spdData[50], lodData[50];
-double pwr30;
-int pwrCur, cadCur, hrCur, spdCur, lodCur;
-
 
 // Power history
 double RealtimePwrData::x(size_t i) const { return (double)50-i; }
 double RealtimePwrData::y(size_t i) const { return pwrData[(pwrCur+100+i) <150  ? (pwrCur+100+i) : (pwrCur+100+i-150)]; }
 size_t RealtimePwrData::size() const { return 50; }
-QwtData *RealtimePwrData::copy() const { return new RealtimePwrData(); }
+QwtData *RealtimePwrData::copy() const { return new RealtimePwrData(const_cast<RealtimePwrData*>(this)); }
 void RealtimePwrData::init() { pwrCur=0; for (int i=0; i<150; i++) pwrData[i]=0; }
 void RealtimePwrData::addData(double v) { pwrData[pwrCur++] = v; if (pwrCur==150) pwrCur=0; }
 
 // 30 second Power rolling avg
 double Realtime30PwrData::x(size_t i) const { return (double)50-i; }
 
-double Realtime30PwrData::y(size_t i) const { if (i==1) { pwr30=0; for (int x=0; x<150; x++) { pwr30+=pwrData[x]; } pwr30 /= 150; } return pwr30; }
+double Realtime30PwrData::y(size_t i) const { int pwr30=0; if (i==1) { for (int x=0; x<150; x++) { pwr30+=pwrData[x]; } pwr30 /= 150; } return pwr30; }
 size_t Realtime30PwrData::size() const { return 50; }
-QwtData *Realtime30PwrData::copy() const { return new Realtime30PwrData(); }
+QwtData *Realtime30PwrData::copy() const { return new Realtime30PwrData(const_cast<Realtime30PwrData*>(this)); }
 void Realtime30PwrData::init() { pwrCur=0; for (int i=0; i<150; i++) pwrData[i]=0; }
 void Realtime30PwrData::addData(double v) { pwrData[pwrCur++] = v; if (pwrCur==150) pwrCur=0; }
 
@@ -55,7 +48,7 @@ void Realtime30PwrData::addData(double v) { pwrData[pwrCur++] = v; if (pwrCur==1
 double RealtimeCadData::x(size_t i) const { return (double)50-i; }
 double RealtimeCadData::y(size_t i) const { return cadData[(cadCur+i) < 50 ? (cadCur+i) : (cadCur+i-50)]; }
 size_t RealtimeCadData::size() const { return 50; }
-QwtData *RealtimeCadData::copy() const { return new RealtimeCadData(); }
+QwtData *RealtimeCadData::copy() const { return new RealtimeCadData(const_cast<RealtimeCadData*>(this)); }
 void RealtimeCadData::init() { cadCur=0; for (int i=0; i<50; i++) cadData[i]=0; }
 void RealtimeCadData::addData(double v) { cadData[cadCur++] = v; if (cadCur==50) cadCur=0; }
 
@@ -63,7 +56,7 @@ void RealtimeCadData::addData(double v) { cadData[cadCur++] = v; if (cadCur==50)
 double RealtimeSpdData::x(size_t i) const { return (double)50-i; }
 double RealtimeSpdData::y(size_t i) const { return spdData[(spdCur+i) < 50 ? (spdCur+i) : (spdCur+i-50)]; }
 size_t RealtimeSpdData::size() const { return 50; }
-QwtData *RealtimeSpdData::copy() const { return new RealtimeSpdData(); }
+QwtData *RealtimeSpdData::copy() const { return new RealtimeSpdData(const_cast<RealtimeSpdData*>(this)); }
 void RealtimeSpdData::init() { spdCur=0; for (int i=0; i<50; i++) spdData[i]=0; }
 void RealtimeSpdData::addData(double v) { spdData[spdCur++] = v; if (spdCur==50) spdCur=0; }
 
@@ -71,7 +64,7 @@ void RealtimeSpdData::addData(double v) { spdData[spdCur++] = v; if (spdCur==50)
 double RealtimeHrData::x(size_t i) const { return (double)50-i; }
 double RealtimeHrData::y(size_t i) const { return hrData[(hrCur+i) < 50 ? (hrCur+i) : (hrCur+i-50)]; }
 size_t RealtimeHrData::size() const { return 50; }
-QwtData *RealtimeHrData::copy() const { return new RealtimeHrData(); }
+QwtData *RealtimeHrData::copy() const { return new RealtimeHrData(const_cast<RealtimeHrData*>(this)); }
 void RealtimeHrData::init() { hrCur=0; for (int i=0; i<50; i++) hrData[i]=0; }
 void RealtimeHrData::addData(double v) { hrData[hrCur++] = v; if (hrCur==50) hrCur=0; }
 

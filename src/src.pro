@@ -243,6 +243,7 @@ HEADERS += \
         RawRideFile.h \
         RaceDispatcher.h \
         RealtimeData.h \
+        RealtimePlotWindow.h \
         RealtimeWindow.h \
         RealtimeController.h \
         ComputrainerController.h \
@@ -406,6 +407,7 @@ SOURCES += \
         ComputrainerController.cpp \
         RealtimeWindow.cpp \
         RealtimePlot.cpp \
+        RealtimePlotWindow.cpp \
         RideCalendar.cpp \
         RideEditor.cpp \
         RideFile.cpp \
