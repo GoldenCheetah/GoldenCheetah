@@ -221,6 +221,7 @@ HEADERS += \
         MainWindow.h \
         ManualRideDialog.h \
         ManualRideFile.h \
+        MetadataWindow.h \
         MetricAggregator.h \
         MultiWindow.h \
         NullController.h \
@@ -379,6 +380,7 @@ SOURCES += \
         MainWindow.cpp \
         ManualRideDialog.cpp \
         ManualRideFile.cpp \
+        MetadataWindow.cpp \
         MetricAggregator.cpp \
         MultiWindow.cpp \
         NullController.cpp \
