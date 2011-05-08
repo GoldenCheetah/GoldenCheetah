@@ -49,6 +49,7 @@
 #include "TreeMapWindow.h"
 #include "WeeklySummaryWindow.h"
 #include "DialWindow.h"
+#include "RealtimePlotWindow.h"
 
 GcWindowRegistry GcWindows[] = {
     // name                     GcWinID
@@ -73,6 +74,7 @@ GcWindowRegistry GcWindows[] = {
     { "Video Player",           GcWindowTypes::VideoPlayer },
     { "Realtime Dial",          GcWindowTypes::DialWindow },
     { "Metadata Fields",        GcWindowTypes::MetadataWindow },
+    { "Realtime Plot",          GcWindowTypes::RealtimePlot },
     { "", GcWindowTypes::None }};
 
 // instantiate a new window
@@ -115,6 +117,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, MainWindow *main) //XXX mainWindow wil
 #endif
     case GcWindowTypes::DialWindow: returning = new DialWindow(main); break;
     case GcWindowTypes::MetadataWindow: returning = new MetadataWindow(main); break;
+    case GcWindowTypes::RealtimePlot: returning = new RealtimePlotWindow(main); break;
     default: return NULL; break;
     }
     if (returning) returning->setProperty("type", QVariant::fromValue<GcWinID>(id));

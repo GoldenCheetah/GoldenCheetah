@@ -49,7 +49,8 @@ enum gcwinid {
         HrPw =20,
         VideoPlayer =21,
         DialWindow =22,
-        MetadataWindow = 23
+        MetadataWindow = 23,
+        RealtimePlot = 24
 };
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;

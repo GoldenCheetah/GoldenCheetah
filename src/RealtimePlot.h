@@ -29,10 +29,17 @@
 #include <qwt_data.h>
 #include "Settings.h"
 
-
 class Realtime30PwrData : public QwtData
 {
+    int pwrCur_; 
+    mutable int &pwrCur;
+    double pwrData_[150];
+    mutable double (&pwrData)[150];
+
     public:
+    Realtime30PwrData() : pwrCur(pwrCur_), pwrData(pwrData_) {}
+    Realtime30PwrData(Realtime30PwrData *other) : pwrCur(other->pwrCur_), pwrData(other->pwrData_) {}
+
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
@@ -43,7 +50,15 @@ class Realtime30PwrData : public QwtData
 
 class RealtimePwrData : public QwtData
 {
+    int pwrCur_;
+    mutable int &pwrCur;
+    double pwrData_[150];
+    mutable double (&pwrData)[150];
+
     public:
+    RealtimePwrData() : pwrCur(pwrCur_), pwrData(pwrData_) {}
+    RealtimePwrData(RealtimePwrData *other) : pwrCur(other->pwrCur_), pwrData(other->pwrData_) {}
+
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
@@ -54,7 +69,15 @@ class RealtimePwrData : public QwtData
 
 class RealtimeLodData : public QwtData
 {
+    int lodCur_;
+    mutable int &lodCur;
+    double lodData_[50];
+    mutable double (&lodData)[50];
+
     public:
+    RealtimeLodData() : lodCur(lodCur_), lodData(lodData_) {}
+    RealtimeLodData(RealtimeLodData *other) : lodCur(other->lodCur_), lodData(other->lodData_) {}
+
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
@@ -66,7 +89,15 @@ class RealtimeLodData : public QwtData
 // tedious virtual data interface for QWT
 class RealtimeCadData : public QwtData
 {
+    int cadCur_;
+    mutable int &cadCur;
+    double cadData_[50];
+    mutable double (&cadData)[50];
+
     public:
+    RealtimeCadData() : cadCur(cadCur_), cadData(cadData_) {}
+    RealtimeCadData(RealtimeCadData *other) : cadCur(other->cadCur_), cadData(other->cadData_) {}
+
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
@@ -74,10 +105,19 @@ class RealtimeCadData : public QwtData
     void init() ;
     void addData(double v) ;
 };
+
 // tedious virtual data interface for QWT
 class RealtimeSpdData : public QwtData
 {
+    int spdCur_;
+    mutable int &spdCur;
+    double spdData_[50];
+    mutable double (&spdData)[50];
+
     public:
+    RealtimeSpdData() : spdCur(spdCur_), spdData(spdData_) {}
+    RealtimeSpdData(RealtimeSpdData *other) : spdCur(other->spdCur_), spdData(other->spdData_) {}
+
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
@@ -85,10 +125,19 @@ class RealtimeSpdData : public QwtData
     void init() ;
     void addData(double v) ;
 };
+
 // tedious virtual data interface for QWT
 class RealtimeHrData : public QwtData
 {
+    int hrCur_;
+    mutable int &hrCur;
+    double hrData_[50];
+    mutable double (&hrData)[50];
+
     public:
+    RealtimeHrData() : hrCur(hrCur_), hrData(hrData_) {}
+    RealtimeHrData(RealtimeHrData *other) : hrCur(other->hrCur_), hrData(other->hrData_) {}
+
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
@@ -102,7 +151,6 @@ class RealtimePlot : public QwtPlot
     Q_OBJECT
     G_OBJECT
 
-
     private:
 
 	QwtPlotGrid *grid;
@@ -113,6 +161,10 @@ class RealtimePlot : public QwtPlot
 	QwtPlotCurve *hrCurve;
 	//QwtPlotCurve *lodCurve;
 
+#if 0
+    // power stores last 30 seconds for 30 second rolling avg, all else
+    // just the last 30 seconds
+#endif
 
     public:
     Realtime30PwrData pwr30Data;
@@ -126,7 +178,6 @@ class RealtimePlot : public QwtPlot
 
     public slots:
     void configChanged();
-
 };
 
 
