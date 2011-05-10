@@ -19,7 +19,7 @@
 
 // Abstract base class for Realtime device controllers
 #include "RealtimeData.h"
-#include "RealtimeWindow.h"
+#include "TrainTool.h"
 
 #ifndef _GC_RealtimeController_h
 #define _GC_RealtimeController_h 1
@@ -31,9 +31,9 @@
 class RealtimeController
 {
 public:
-    RealtimeWindow *parent;                     // for push devices
+    TrainTool *parent;                     // for push devices
 
-    RealtimeController (RealtimeWindow *parent, DeviceConfiguration *dc = 0);
+    RealtimeController (TrainTool *parent, DeviceConfiguration *dc = 0);
     virtual ~RealtimeController() {}
 
     virtual int start();

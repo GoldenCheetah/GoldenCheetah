@@ -20,7 +20,7 @@
 #include "HomeWindow.h"
 #include "LTMSettings.h"
 
-HomeWindow::HomeWindow(MainWindow *mainWindow, QString name) :
+HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString windowtitle) :
     GcWindow(mainWindow), mainWindow(mainWindow), name(name), active(false),
     clicked(NULL), dropPending(false), chartCursor(-2), loaded(false)
 {
@@ -36,7 +36,7 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name) :
     bigandbold.setWeight(QFont::Bold);
 
     QHBoxLayout *titleBar = new QHBoxLayout;
-    title = new QLabel("  Home", this);
+    title = new QLabel(windowtitle, this);
     title->setFont(bigandbold);
     QPalette mypalette;
     mypalette.setColor(title->foregroundRole(), Qt::white);
@@ -1105,6 +1105,12 @@ HomeWindow::restoreState()
 {
     // restore window state
     QString filename = mainWindow->home.absolutePath() + "/" + name + "-layout.xml";
+    QFileInfo finfo(filename);
+
+    // use a default if not there
+    if (!finfo.exists()) filename = QString(":xml/%1-layout.xml").arg(name);
+
+    // now go read...
     QFile file(filename);
 
     // setup the handler

@@ -18,7 +18,6 @@
 
 #include "TrainTool.h"
 #include "MainWindow.h"
-#include "ViewSelection.h"
 #include "Settings.h"
 #include "Units.h"
 #include "DeviceTypes.h"
@@ -27,6 +26,13 @@
 #include <QApplication>
 #include <QtGui>
 #include <QRegExp>
+
+// Three current realtime device types supported are:
+#include "RealtimeController.h"
+#include "ComputrainerController.h"
+#include "ANTplusController.h"
+#include "ANTlocalController.h"
+#include "NullController.h"
 
 
 TrainTool::TrainTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(home), main(parent)
@@ -73,8 +79,6 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : QWidget(parent), ho
     allWorkouts->setText(0, tr("Workout Library"));
     workoutTree->expandItem(allWorkouts);
 
-    configChanged(); // will reset the workout tree
-
     buttonPanel = new QFrame;
     buttonPanel->setLineWidth(1);
     buttonPanel->setFrameStyle(QFrame::Box | QFrame::Raised);
@@ -114,14 +118,11 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : QWidget(parent), ho
     trainSplitter->addWidget(workoutTree);
     trainSplitter->setCollapsible(3, true);
 
-    connect(serverTree,SIGNAL(itemSelectionChanged()),
-            this, SLOT(serverTreeWidgetSelectionChanged()));
-    connect(deviceTree,SIGNAL(itemSelectionChanged()),
-            this, SLOT(deviceTreeWidgetSelectionChanged()));
-    connect(workoutTree,SIGNAL(itemSelectionChanged()),
-            this, SLOT(workoutTreeWidgetSelectionChanged()));
-    connect(main, SIGNAL(configChanged()),
-            this, SLOT(configChanged()));
+    // handle config changes
+    connect(serverTree,SIGNAL(itemSelectionChanged()), this, SLOT(serverTreeWidgetSelectionChanged()));
+    connect(deviceTree,SIGNAL(itemSelectionChanged()), this, SLOT(deviceTreeWidgetSelectionChanged()));
+    connect(workoutTree,SIGNAL(itemSelectionChanged()), this, SLOT(workoutTreeWidgetSelectionChanged()));
+    connect(main, SIGNAL(configChanged()), this, SLOT(configChanged()));
 
     // connect train tool buttons!
     connect(startButton, SIGNAL(clicked()), this, SLOT(Start()));
@@ -135,6 +136,52 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : QWidget(parent), ho
 
     connect(&*watcher,SIGNAL(directoryChanged(QString)),this,SLOT(configChanged()));
     connect(&*watcher,SIGNAL(fileChanged(QString)),this,SLOT(configChanged()));
+
+    // set home
+    main = parent;
+    deviceController = NULL;
+    streamController = NULL;
+    ergFile = NULL;
+
+    // metric or imperial?
+    QVariant unit = appsettings->value(this, GC_UNIT);
+    useMetricUnits = (unit.toString() == "Metric");
+
+    // now the GUI is setup lets sort our control variables
+    gui_timer = new QTimer(this);
+    disk_timer = new QTimer(this);
+    stream_timer = new QTimer(this);
+    load_timer = new QTimer(this);
+    metrics_timer = new QTimer(this);
+
+    session_time = QTime();
+    session_elapsed_msec = 0;
+    lap_time = QTime();
+    lap_elapsed_msec = 0;
+
+    recordFile = NULL;
+    status = 0;
+    status |= RT_MODE_ERGO;         // ergo mode by default
+    displayWorkoutLap = displayLap = 0;
+    pwrcount = 0;
+    cadcount = 0;
+    hrcount = 0;
+    spdcount = 0;
+    lodcount = 0;
+    load_msecs = total_msecs = lap_msecs = 0;
+    displayWorkoutDistance = displayDistance = displayPower = displayHeartRate =
+    displaySpeed = displayCadence = displayGradient = displayLoad = 0;
+
+    rideFile = boost::shared_ptr<RideFile>(new RideFile(QDateTime::currentDateTime(),1));
+
+    connect(gui_timer, SIGNAL(timeout()), this, SLOT(guiUpdate()));
+    connect(disk_timer, SIGNAL(timeout()), this, SLOT(diskUpdate()));
+    connect(stream_timer, SIGNAL(timeout()), this, SLOT(streamUpdate()));
+    connect(load_timer, SIGNAL(timeout()), this, SLOT(loadUpdate()));
+    connect(metrics_timer, SIGNAL(timeout()), this, SLOT(metricsUpdate()));
+
+    configChanged(); // will reset the workout tree
+
 }
 
 void
@@ -149,7 +196,7 @@ TrainTool::configChanged()
     for (int i=0; i<devices.count(); i++) delete devices.at(i);
 
     DeviceConfigurations all;
-    QList<DeviceConfiguration> Devices;
+    Devices.clear();
     Devices = all.getList();
     for (int i=0; i<Devices.count(); i++) {
         if (Devices.at(i).type == DEV_GSERVER) {
@@ -180,28 +227,20 @@ TrainTool::configChanged()
         QTreeWidgetItem *work = new QTreeWidgetItem(allWorkouts, WORKOUT_TYPE);
         work->setText(0, name);
     }
+
+    // Athlete
+    FTP=285; // default to 285 if zones are not set
+    int range = main->zones()->whichRange(QDate::currentDate());
+    if (range != -1) FTP = main->zones()->getCP(range);
+
+    // metric or imperial changed?
+    QVariant unit = appsettings->value(this, GC_UNIT);
+    useMetricUnits = (unit.toString() == "Metric");
 }
 
 /*----------------------------------------------------------------------
  * Buttons!
  *----------------------------------------------------------------------*/
-void
-TrainTool::Start()
-{
-    start();
-}
-
-void
-TrainTool::Stop()
-{
-    stop();
-}
-
-void
-TrainTool::Pause()
-{
-    pause();
-}
 
 void
 TrainTool::setStartText(QString string)
@@ -270,7 +309,60 @@ TrainTool::workoutTreeWidgetSelectionChanged()
         else
             workout = which;
     }
-    workoutSelected();
+
+    int mode;
+
+    // wip away the current selected workout
+    if (ergFile) {
+        delete ergFile;
+        ergFile = NULL;
+    }
+
+    // which one is selected?
+    if (currentWorkout() == NULL || currentWorkout()->type() != WORKOUT_TYPE) return;
+
+    // is it the auto mode?
+    int index = workoutItems()->indexOfChild((QTreeWidgetItem *)currentWorkout());
+    if (index == 0) {
+        // ergo mode
+        mode = ERG;
+        status &= ~RT_WORKOUT;
+        //ergPlot->setVisible(false);
+    } else if (index == 1) {
+        // slope mode
+        mode = CRS;
+        status &= ~RT_WORKOUT;
+        //ergPlot->setVisible(false);
+    } else {
+        // workout mode
+        QVariant workoutDir = appsettings->value(this, GC_WORKOUTDIR);
+        QString fileName = workoutDir.toString() + "/" + currentWorkout()->text(0); // filename
+
+        // Get users CP for relative watts calculations
+        QDate today = QDate::currentDate();
+
+        ergFile = new ErgFile(fileName, mode, FTP);
+        if (ergFile->isValid()) {
+
+            status |= RT_WORKOUT;
+
+            // success! we have a load file
+            // setup the course profile in the
+            // display!
+            main->notifyErgFileSelected(ergFile);
+        }
+    }
+
+    // set the device to the right mode
+    if (mode == ERG || mode == MRC) {
+        status |= RT_MODE_ERGO;
+        status &= ~RT_MODE_SPIN;
+        if (deviceController != NULL) deviceController->setMode(RT_MODE_ERGO);
+    } else { // SLOPE MODE
+        status |= RT_MODE_SPIN;
+        status &= ~RT_MODE_ERGO;
+        if (deviceController != NULL) deviceController->setMode(RT_MODE_SPIN);
+    }
 }
 
 QStringList
@@ -282,4 +374,523 @@ TrainTool::listWorkoutFiles(const QDir &dir) const
     filters << "*.crs";
 
     return dir.entryList(filters, QDir::Files, QDir::Name);
+}
+
+/*--------------------------------------------------------------------------------
+ * Was realtime window, now local and manages controller and chart updates etc
+ *------------------------------------------------------------------------------*/
+
+void TrainTool::setDeviceController()
+{
+    int deviceno = selectedDeviceNumber();
+
+    if (deviceno == -1) // not selected, maybe they are spectating
+        return;
+
+    // zap the current one
+    if (deviceController != NULL) {
+        delete deviceController;
+        deviceController = NULL;
+    }
+
+    if (Devices.count() > 0) {
+        DeviceConfiguration temp = Devices.at(deviceno);
+        if (Devices.at(deviceno).type == DEV_ANTPLUS) {
+            deviceController = new ANTplusController(this, &temp);
+        } else if (Devices.at(deviceno).type == DEV_CT) {
+            deviceController = new ComputrainerController(this, &temp);
+        } else if (Devices.at(deviceno).type == DEV_NULL) {
+            deviceController = new NullController(this, &temp);
+        } else if (Devices.at(deviceno).type == DEV_ANTLOCAL) {
+            deviceController = new ANTlocalController(this, &temp);
+        }
+    }
+}
+
+// open a connection to the GoldenServer via a GoldenClient
+void TrainTool::setStreamController()
+{
+    int deviceno = selectedServerNumber();
+
+    if (deviceno == -1) return;
+
+    // zap the current one
+    if (streamController != NULL) {
+        delete streamController;
+        streamController = NULL;
+    }
+
+    if (Devices.count() > 0) {
+        DeviceConfiguration config = Devices.at(deviceno);
+        streamController = new GoldenClient;
+
+        // connect
+        QStringList speclist = config.portSpec.split(":", QString::SkipEmptyParts);
+        bool rc = streamController->connect(speclist[0], // host
+                                  speclist[1].toInt(),   // port
+                                  "9cf638294030cea7b1590a4ca32e7f58", // raceid
+                                  appsettings->cvalue(main->cyclist, GC_NICKNAME).toString(), // name
+                                  FTP, // CP60
+                                  appsettings->cvalue(main->cyclist, GC_WEIGHT).toDouble()); // weight
+
+        // no connection
+        if (rc == false) {
+            streamController->closeAndExit();
+            streamController = NULL;
+            status &= ~RT_STREAMING;
+            QMessageBox msgBox;
+            msgBox.setText(QString(tr("Cannot Connect to Server %1 on port %2").arg(speclist[0]).arg(speclist[1])));
+            msgBox.setIcon(QMessageBox::Critical);
+            msgBox.exec();
+        }
+    }
+}
+
+void TrainTool::Start()       // when start button is pressed
+{
+    if (status&RT_RUNNING) {
+        newLap();
+    } else {
+
+        // open the controller if it is selected
+        setDeviceController();
+        if (deviceController == NULL) return;
+        else deviceController->start();          // start device
+
+        // we're away!
+        status |=RT_RUNNING;
+
+        // should we be streaming too?
+        setStreamController();
+        if (streamController != NULL) status |= RT_STREAMING;
+
+        setStartText(tr("Lap/Interval"));
+
+        load_period.restart();
+        session_time.start();
+        session_elapsed_msec = 0;
+        lap_time.start();
+        lap_elapsed_msec = 0;
+
+        if (status & RT_WORKOUT) {
+            load_timer->start(LOADRATE);      // start recording
+        }
+
+        if (recordSelector->isChecked()) {
+            status |= RT_RECORDING;
+        }
+
+        if (status & RT_RECORDING) {
+            QDateTime now = QDateTime::currentDateTime();
+
+            // setup file
+            QString filename = now.toString(QString("yyyy_MM_dd_hh_mm_ss")) + QString(".csv");
+
+            QString fulltarget = home.absolutePath() + "/" + filename;
+            if (recordFile) delete recordFile;
+            recordFile = new QFile(fulltarget);
+            if (!recordFile->open(QFile::WriteOnly | QFile::Truncate)) {
+                status &= ~RT_RECORDING;
+            } else {
+
+                // CSV File header
+
+                QTextStream recordFileStream(recordFile);
+                recordFileStream << "Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID,Altitude (m)\n";
+                disk_timer->start(SAMPLERATE);  // start screen
+            }
+        }
+
+        // create a new rideFile
+        rideFile = boost::shared_ptr<RideFile>(new RideFile(QDateTime::currentDateTime(),1));
+
+
+        // stream
+        if (status & RT_STREAMING) {
+            stream_timer->start(STREAMRATE);
+        }
+
+        gui_timer->start(REFRESHRATE);      // start recording
+        metrics_timer->start(METRICSRATE);
+
+    }
+}
+
+void TrainTool::Pause()        // pause capture to recalibrate
+{
+    if (deviceController == NULL) return;
+
+    // we're not running fool!
+    if ((status&RT_RUNNING) == 0) return;
+
+    if (status&RT_PAUSED) {
+        session_time.start();
+        lap_time.start();
+        status &=~RT_PAUSED;
+        deviceController->restart();
+        setPauseText(tr("Pause"));
+        gui_timer->start(REFRESHRATE);
+        metrics_timer->start(METRICSRATE);
+        if (status & RT_STREAMING) stream_timer->start(STREAMRATE);
+        if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
+        load_period.restart();
+        if (status & RT_WORKOUT) load_timer->start(LOADRATE);
+    } else {
+        session_elapsed_msec += session_time.elapsed();
+        lap_elapsed_msec += lap_time.elapsed();
+        deviceController->pause();
+        setPauseText(tr("Un-Pause"));
+        status |=RT_PAUSED;
+        gui_timer->stop();
+        metrics_timer->stop();
+        if (status & RT_STREAMING) stream_timer->stop();
+        if (status & RT_RECORDING) disk_timer->stop();
+        if (status & RT_WORKOUT) load_timer->stop();
+        load_msecs += load_period.restart();
+    }
+}
+
+void TrainTool::Stop(int deviceStatus)        // when stop button is pressed
+{
+    if (deviceController == NULL) return;
+
+    if ((status&RT_RUNNING) == 0) return;
+
+    status &= ~RT_RUNNING;
+    setStartText(tr("Start"));
+
+    // wipe connection
+    deviceController->stop();
+    delete deviceController;
+    deviceController = NULL;
+
+    gui_timer->stop();
+    metrics_timer->stop();
+
+    QDateTime now = QDateTime::currentDateTime();
+
+    if (status & RT_RECORDING) {
+        disk_timer->stop();
+
+        // close and reset File
+        recordFile->close();
+
+        if(deviceStatus == DEVICE_ERROR)
+        {
+            recordFile->remove();
+        }
+        else {
+            // add to the view - using basename ONLY
+            QString name;
+            name = recordFile->fileName();
+            main->addRide(QFileInfo(name).fileName(), true);
+        }
+    }
+
+    if (status & RT_STREAMING) {
+        stream_timer->stop();
+        streamController->closeAndExit();
+        delete streamController;
+        streamController = NULL;
+    }
+
+    if (status & RT_WORKOUT) {
+        load_timer->stop();
+        load_msecs = 0;
+        main->notifySetNow(load_msecs);
+    }
+
+    // Re-enable gui elements
+    //recordSelector->setEnabled(true);
+
+    // reset counters etc
+    pwrcount = 0;
+    cadcount = 0;
+    hrcount = 0;
+    spdcount = 0;
+    lodcount = 0;
+    displayWorkoutLap = displayLap =0;
+    session_elapsed_msec = 0;
+    session_time.restart();
+    lap_elapsed_msec = 0;
+    lap_time.restart();
+    displayWorkoutDistance = displayDistance = 0;
+    guiUpdate();
+
+    return;
+}
+
+
+// Called by push devices (e.g. ANT+)
+void TrainTool::updateData(RealtimeData &rtData)
+{
+        displayPower = rtData.getWatts();
+        displayCadence = rtData.getCadence();
+        displayHeartRate = rtData.getHr();
+        displaySpeed = rtData.getSpeed();
+        displayLoad = rtData.getLoad();
+    // Gradient not supported
+        return;
+}
+
+//----------------------------------------------------------------------
+// SCREEN UPDATE FUNCTIONS
+//----------------------------------------------------------------------
+
+void TrainTool::guiUpdate()           // refreshes the telemetry
+{
+    RealtimeData rtData;
+
+    if (deviceController == NULL) return;
+
+    // get latest telemetry from device (if it is a pull device e.g. Computrainer //
+    if (status&RT_RUNNING && deviceController->doesPull() == true) {
+
+        deviceController->getRealtimeData(rtData);
+
+        // Distance assumes current speed for the last second. from km/h to km/sec
+        displayDistance += displaySpeed / (5 * 3600); // XXX assumes 200ms refreshrate
+        displayWorkoutDistance += displaySpeed / (5 * 3600); // XXX assumes 200ms refreshrate
+        rtData.setDistance(displayDistance);
+
+        // time
+        total_msecs = session_elapsed_msec + session_time.elapsed();
+        lap_msecs = lap_elapsed_msec + lap_time.elapsed();
+        rtData.setMsecs(total_msecs);
+        rtData.setLapMsecs(lap_msecs);
+
+        // metrics
+        rtData.setJoules(kjoules);
+        rtData.setBikeScore(bikescore);
+        rtData.setXPower(xpower);
+
+        // local stuff ...
+        displayPower = rtData.getWatts();
+        displayCadence = rtData.getCadence();
+        displayHeartRate = rtData.getHr();
+        displaySpeed = rtData.getSpeed();
+        displayLoad = rtData.getLoad();
+
+        // go update the displays...
+        main->notifyTelemetryUpdate(rtData); // signal everyone to update telemetry
+    }
+}
+
+// can be called from the controller - when user presses "Lap" button
+void TrainTool::newLap()
+{
+    displayLap++;
+
+    pwrcount  = 0;
+    cadcount  = 0;
+    hrcount   = 0;
+    spdcount  = 0;
+
+    lap_time.restart();
+    lap_elapsed_msec = 0;
+
+}
+
+// can be called from the controller
+void TrainTool::nextDisplayMode()
+{
+}
+
+void TrainTool::warnnoConfig()
+{
+    QMessageBox::warning(this, tr("No Devices Configured"), "Please configure a device in Preferences.");
+}
+
+//----------------------------------------------------------------------
+// STREAMING FUNCTION
+//----------------------------------------------------------------------
+#if 0
+TrainTool::SelectStream(int index)
+{
+
+    if (index > 0) {
+        status |= RT_STREAMING;
+        setStreamController();
+    } else {
+        status &= ~RT_STREAMING;
+    }
+}
+#endif
+
+void
+TrainTool::streamUpdate()
+{
+    // send over the wire...
+    if (streamController) {
+
+        // send my data
+        streamController->sendTelemetry(displayPower,
+                                        displayCadence,
+                                        displayDistance,
+                                        displayHeartRate,
+                                        displaySpeed);
+
+        // get standings for everyone else
+        RaceStatus current = streamController->getStandings();
+
+        // send out to all the widgets...
+        notifyRaceStandings(current);
+
+        // has the race finished?
+        if (current.race_finished == true) {
+            Stop(0); // all over dude
+            QMessageBox msgBox;
+            msgBox.setText(tr("Race Over!"));
+            msgBox.setIcon(QMessageBox::Information);
+            msgBox.exec();
+        }
+    }
+}
+
+//----------------------------------------------------------------------
+// DISK UPDATE FUNCTIONS
+//----------------------------------------------------------------------
+void TrainTool::diskUpdate()
+{
+    double  Minutes;
+
+    long Torq = 0, Altitude = 0;
+    QTextStream recordFileStream(recordFile);
+
+    // convert from milliseconds to minutes
+    total_msecs = session_elapsed_msec + session_time.elapsed();
+    Minutes = total_msecs;
+    Minutes /= 1000.00;
+    Minutes *= (1.0/60);
+
+    // PowerAgent Format "Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID,Altitude (m)"
+    recordFileStream    << Minutes
+                        << "," << Torq
+                        << "," << displaySpeed
+                        << "," << displayPower
+                        << "," << displayDistance
+                        << "," << displayCadence
+                        << "," << displayHeartRate
+                        << "," << (displayLap + displayWorkoutLap)
+                        << "," << Altitude
+                        << "," << "\n";
+
+    rideFile->appendPoint(total_msecs/1000,displayCadence,displayHeartRate,displayDistance,displaySpeed,0,
+                          displayPower,Altitude,0,0,0,displayLap + displayWorkoutLap);
+}
+
+void TrainTool::metricsUpdate()
+{
+    // calculate bike score, xpower
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    const RideMetric *rm = factory.rideMetric("skiba_xpower");
+
+    QStringList metrics;
+    metrics.append("skiba_bike_score");
+    metrics.append("skiba_xpower");
+    QHash<QString,RideMetricPtr> results = rm->computeMetrics(
+            this->main,&*rideFile,this->main->zones(),this->main->hrZones(),metrics);
+    bikescore = results["skiba_bike_score"]->value(true);
+    xpower = results["skiba_xpower"]->value(true);
+}
+
+//----------------------------------------------------------------------
+// WORKOUT MODE
+//----------------------------------------------------------------------
+
+void TrainTool::loadUpdate()
+{
+    long load;
+    double gradient;
+    // the period between loadUpdate calls is not constant, and not exactly LOADRATE,
+    // therefore, use a QTime timer to measure the load period
+    load_msecs += load_period.restart();
+
+    if (deviceController == NULL) return;
+
+    if (status&RT_MODE_ERGO) {
+        load = ergFile->wattsAt(load_msecs, displayWorkoutLap);
+
+        // we got to the end!
+        if (load == -100) {
+            Stop(DEVICE_OK);
+        } else {
+            displayLoad = load;
+            deviceController->setLoad(displayLoad);
+            main->notifySetNow(load_msecs);
+        }
+    } else {
+        gradient = ergFile->gradientAt(displayWorkoutDistance*1000, displayWorkoutLap);
+
+        // we got to the end!
+        if (gradient == -100) {
+            Stop(DEVICE_OK);
+        } else {
+            displayGradient = gradient;
+            deviceController->setGradient(displayGradient);
+            main->notifySetNow(displayWorkoutDistance * 1000);
+        }
+    }
+}
+
+void TrainTool::FFwd()
+{
+    if (status&RT_MODE_ERGO) load_msecs += 10000; // jump forward 10 seconds
+    else displayWorkoutDistance += 1; // jump forward a kilometer in the workout
+}
+
+void TrainTool::Rewind()
+{
+    if (status&RT_MODE_ERGO) {
+        load_msecs -=10000; // jump back 10 seconds
+        if (load_msecs < 0) load_msecs = 0;
+    } else {
+        displayWorkoutDistance -=1; // jump back a kilometer
+        if (displayWorkoutDistance < 0) displayWorkoutDistance = 0;
+    }
+}
+
+
+// jump to next Lap marker (if there is one?)
+void TrainTool::FFwdLap()
+{
+    double lapmarker;
+
+    if (status&RT_MODE_ERGO) {
+        lapmarker = ergFile->nextLap(load_msecs);
+        if (lapmarker != -1) load_msecs = lapmarker; // jump forward to lapmarker
+    } else {
+        lapmarker = ergFile->nextLap(displayWorkoutDistance*1000);
+        if (lapmarker != -1) displayWorkoutDistance = lapmarker/1000; // jump forward to lapmarker
+    }
+}
+
+// higher load/gradient
+void TrainTool::Higher()
+{
+    if (deviceController == NULL) return;
+
+    if (status&RT_MODE_ERGO) displayLoad += 5;
+    else displayGradient += 0.1;
+
+    if (displayLoad >1500) displayLoad = 1500;
+    if (displayGradient >15) displayGradient = 15;
+
+    if (status&RT_MODE_ERGO) deviceController->setLoad(displayLoad);
+    else deviceController->setGradient(displayGradient);
+}
+
+// higher load/gradient
+void TrainTool::Lower()
+{
+    if (deviceController == NULL) return;
+
+    if (status&RT_MODE_ERGO) displayLoad -= 5;
+    else displayGradient -= 0.1;
+
+    if (displayLoad <0) displayLoad = 0;
+    if (displayGradient <-10) displayGradient = -10;
+
+    if (status&RT_MODE_ERGO) deviceController->setLoad(displayLoad);
+    else deviceController->setGradient(displayGradient);
 }

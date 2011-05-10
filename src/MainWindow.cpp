@@ -43,7 +43,6 @@
 #include "ManualRideDialog.h"
 #include "HistogramWindow.h"
 #include "ModelWindow.h"
-#include "RealtimeWindow.h"
 #include "RideItem.h"
 #include "IntervalItem.h"
 #include "IntervalSummaryWindow.h"
@@ -79,7 +78,6 @@
 #include "MetricAggregator.h"
 #include "SplitRideDialog.h"
 #include "PerformanceManagerWindow.h"
-#include "TrainWindow.h"
 #include "TreeMapWindow.h"
 #include "TwitterDialog.h"
 #include "WithingsDownload.h"
@@ -193,9 +191,9 @@ MainWindow::MainWindow(const QDir &home) :
     toolbar->setFloatable(false);
     toolbar->setIconSize(QSize(32,32));
 #ifndef Q_OS_MAC
-    //toolbar->setAutoFillBackground(false);
     //toolbar->setStyleSheet("background-image: url(\":/images/aluLight.jpg\"); border: 0px;");
     toolbar->setContentsMargins(0,0,0,0);
+    toolbar->setAutoFillBackground(true);
 #else
     QIcon tickIcon(":images/toolbar/main/tick.png");
     QPushButton *showControls = new QPushButton(tickIcon, "", this);
@@ -382,12 +380,13 @@ MainWindow::MainWindow(const QDir &home) :
     homeControls->setContentsMargins(0,0,0,0);
     masterControls->addWidget(homeControls);
 
-    homeWindow = new HomeWindow(this, "home");
+    homeWindow = new HomeWindow(this, "home", "Home");
     homeControls->addWidget(homeWindow->controls());
     homeControls->setCurrentIndex(0);
+
     // setup trainWindow
-    trainWindow = new TrainWindow(this, home);
-    trainControls->addWidget(trainWindow->controls());
+    trainWindow = new HomeWindow(this, "train", "Training");
+    trainControls->addWidget(new TrainTool(this, this->home));
 
     // ToolBox has one thing at the mo... will change soon
     toolBox = new QToolBox(this);
@@ -752,18 +751,6 @@ MainWindow::tabViewTriggered(bool)
     tabChanged(tabWidget->currentIndex());
     connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     appsettings->setValue(GC_TABS_TO_HIDE, tabsToHide.join(","));
-}
-
-void
-MainWindow::selectView(int view)
-{
-    if (view == VIEW_ANALYSIS)
-        views->setCurrentIndex(0); // set stacked widget to Analysis
-    else if (view == VIEW_TRAIN)
-        views->setCurrentIndex(1); // set stacked widget to Train
-
-    // notify with a signal
-    viewChanged(view);
 }
 
 void
@@ -1509,6 +1496,7 @@ MainWindow::closeEvent(QCloseEvent* event)
 
         // save the state of all the pages
         homeWindow->saveState();
+        trainWindow->saveState();
 
         // clear the clipboard if neccessary
         QApplication::clipboard()->setText("");
@@ -1881,6 +1869,7 @@ MainWindow::selectTrain()
 {
     masterControls->setCurrentIndex(1);
     views->setCurrentIndex(1);
+    trainWindow->selected(); // tell it!
 }
 
 void

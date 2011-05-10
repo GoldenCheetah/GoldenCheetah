@@ -46,7 +46,7 @@ GcWindow(parent), home(home), main(parent)
     /* Create a new item */
     // XXX need to add controls - not everyone is going to want to play a video from
     //                            my desktop!!!
-    m = libvlc_media_new_path(inst, "/home/markl/Desktop/My Documents/fightclub.mp4");
+    m = libvlc_media_new_path(inst, "/home/markl/Videos/fightclub.mp4");
     //vlc_exceptions(&exceptions);
         
     /* Create a media player playing environement */

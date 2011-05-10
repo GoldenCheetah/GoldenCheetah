@@ -23,7 +23,7 @@
 #include "RaceDispatcher.h"
 #include "RealtimeData.h"
 
-NullController::NullController(RealtimeWindow *parent,
+NullController::NullController(TrainTool *parent,
                                                  DeviceConfiguration *)
   : RealtimeController(parent), parent(parent), load(100)
 {

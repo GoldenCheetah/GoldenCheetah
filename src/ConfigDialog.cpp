@@ -4,7 +4,6 @@
 
 #include "MainWindow.h"
 #include "ConfigDialog.h"
-#include "RealtimeWindow.h"
 #include "Pages.h"
 #include "Settings.h"
 #include "Zones.h"

@@ -39,13 +39,11 @@
 #include "PfPvWindow.h"
 #include "HrPwWindow.h"
 #include "RaceWindow.h" // XXX not done
-#include "RealtimeWindow.h"
 #include "RideEditor.h"
 #include "RideSummaryWindow.h"
 #include "ScatterWindow.h"
 #include "SummaryWindow.h"
 #include "MetadataWindow.h"
-#include "TrainWindow.h" // XXX not done
 #include "TreeMapWindow.h"
 #include "WeeklySummaryWindow.h"
 #include "DialWindow.h"
@@ -65,16 +63,15 @@ GcWindowRegistry GcWindows[] = {
     { "Performance Manager",    GcWindowTypes::PerformanceManager },
     { "PfPv",                   GcWindowTypes::PfPv },
     { "HrPw",                   GcWindowTypes::HrPw },
-    { "Training",               GcWindowTypes::Training },
     { "Ride Editor",            GcWindowTypes::RideEditor },
     { "Ride Summary",           GcWindowTypes::RideSummary },
-    { "Scatter",                GcWindowTypes::Scatter },
+    { "Metadata Fields",        GcWindowTypes::MetadataWindow },
     { "Ride Summary & Fields",  GcWindowTypes::Summary },
+    { "Scatter",                GcWindowTypes::Scatter },
     { "Treemap",                GcWindowTypes::TreeMap },
     { "Weekly Summary",         GcWindowTypes::WeeklySummary },
     { "Video Player",           GcWindowTypes::VideoPlayer },
     { "Realtime Dial",          GcWindowTypes::DialWindow },
-    { "Metadata Fields",        GcWindowTypes::MetadataWindow },
     { "Realtime Plot",          GcWindowTypes::RealtimePlot },
     { "Workout Plot",           GcWindowTypes::WorkoutPlot },
     { "", GcWindowTypes::None }};
@@ -105,7 +102,6 @@ GcWindowRegistry::newGcWindow(GcWinID id, MainWindow *main) //XXX mainWindow wil
     case GcWindowTypes::PerformanceManager: returning = new PerformanceManagerWindow(main); break;
     case GcWindowTypes::PfPv: returning = new PfPvWindow(main); break;
     case GcWindowTypes::HrPw: returning = new HrPwWindow(main); break;
-    case GcWindowTypes::Training: returning = new TrainWindow(main, main->home); break;
     case GcWindowTypes::RideEditor: returning = new RideEditor(main); break;
     case GcWindowTypes::RideSummary: returning = new RideSummaryWindow(main); break;
     case GcWindowTypes::Scatter: returning = new ScatterWindow(main, main->home); break;

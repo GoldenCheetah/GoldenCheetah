@@ -17,13 +17,13 @@
  */
 
 #include "RealtimeController.h"
-#include "RealtimeWindow.h"
+#include "TrainTool.h"
 #include "RealtimeData.h"
 #include "Units.h"
 
 // Abstract base class for Realtime device controllers
 
-RealtimeController::RealtimeController(RealtimeWindow *parent, DeviceConfiguration *dc) : parent(parent), dc(dc)
+RealtimeController::RealtimeController(TrainTool *parent, DeviceConfiguration *dc) : parent(parent), dc(dc)
 {
     if (dc != NULL)
     {

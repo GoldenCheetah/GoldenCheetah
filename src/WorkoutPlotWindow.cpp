@@ -27,6 +27,7 @@ WorkoutPlotWindow::WorkoutPlotWindow(MainWindow *mainWindow) :
     setControls(NULL);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setSpacing(0);
     ergPlot = new ErgFilePlot(0);
     layout->addWidget(ergPlot);
 

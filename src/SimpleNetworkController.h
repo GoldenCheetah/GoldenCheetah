@@ -44,11 +44,11 @@ class SimpleNetworkController : public RealtimeController
 {
  public:
 
-  RealtimeWindow *parent;
+  TrainTool *parent;
 
   // hostname and port are the hostname/port of the server to which
   // this SimpleNetworkControlller should connect.
-  SimpleNetworkController(RealtimeWindow *parent,
+  SimpleNetworkController(TrainTool *parent,
                           DeviceConfiguration *dc);
   ~SimpleNetworkController() { }
 

@@ -82,7 +82,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
 
         // set up again
         ergFile = ergfile;
-        setTitle(ergFile->Name);
+        //setTitle(ergFile->Name);
         courseData = &ergfile->Points;
         MaxWatts = ergfile->MaxWatts;
 

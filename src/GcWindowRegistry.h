@@ -38,7 +38,6 @@ enum gcwinid {
         PerformanceManager =9,
         PfPv =10,
         Race =11,
-        Training =12,
         RideEditor =13,
         RideSummary =14,
         Scatter =15,

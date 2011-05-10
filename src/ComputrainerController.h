@@ -22,7 +22,6 @@
 
 // Abstract base class for Realtime device controllers
 
-
 #ifndef _GC_ComputrainerController_h
 #define _GC_ComputrainerController_h 1
 
@@ -30,7 +29,7 @@ class ComputrainerController : public RealtimeController
 {
 
 public:
-    ComputrainerController (RealtimeWindow *, DeviceConfiguration *);
+    ComputrainerController (TrainTool *, DeviceConfiguration *);
 
     Computrainer *myComputrainer;               // the device itself
 

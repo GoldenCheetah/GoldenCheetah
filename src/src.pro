@@ -244,7 +244,6 @@ HEADERS += \
         RaceDispatcher.h \
         RealtimeData.h \
         RealtimePlotWindow.h \
-        RealtimeWindow.h \
         RealtimeController.h \
         ComputrainerController.h \
         RealtimePlot.h \
@@ -283,13 +282,10 @@ HEADERS += \
         TxtRideFile.h \
         TimeUtils.h \
         ToolsDialog.h \
-        TrainTabs.h \
         TrainTool.h \
-        TrainWindow.h \
         TreeMapWindow.h \
         TreeMapPlot.h \
         Units.h \
-        ViewSelection.h \
         WeeklySummaryWindow.h \
         WeeklyViewItemDelegate.h \
         WithingsDownload.h \
@@ -406,7 +402,6 @@ SOURCES += \
         RealtimeData.cpp \
         RealtimeController.cpp \
         ComputrainerController.cpp \
-        RealtimeWindow.cpp \
         RealtimePlot.cpp \
         RealtimePlotWindow.cpp \
         RideCalendar.cpp \
@@ -445,13 +440,10 @@ SOURCES += \
         TimeInZone.cpp \
         TimeUtils.cpp \
         ToolsDialog.cpp \
-        TrainTabs.cpp \
         TrainTool.cpp \
-        TrainWindow.cpp \
         TreeMapWindow.cpp \
         TreeMapPlot.cpp \
         TRIMPPoints.cpp \
-        ViewSelection.cpp \
         WattsPerKilogram.cpp \
         WithingsDownload.cpp \
         WeeklySummaryWindow.cpp \

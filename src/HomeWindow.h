@@ -39,7 +39,7 @@ class HomeWindow : public GcWindow
 
     public:
 
-        HomeWindow(MainWindow *, QString name);
+        HomeWindow(MainWindow *, QString name, QString title);
         ~HomeWindow();
 
         //int view() const { return viewMode->currentIndex(); }
