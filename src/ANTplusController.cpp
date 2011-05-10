@@ -21,7 +21,7 @@
 #include "QuarqdClient.h"
 #include "RealtimeData.h"
 
-ANTplusController::ANTplusController(RealtimeWindow *parent, DeviceConfiguration *dc) : RealtimeController(parent, dc)
+ANTplusController::ANTplusController(TrainTool *parent, DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
     myANTplus = new QuarqdClient (parent, dc);
 }

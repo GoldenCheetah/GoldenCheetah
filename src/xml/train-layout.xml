@@ -1,0 +1,93 @@
+<layout name="train">
+	<chart id="25" name="RT Plot" title="Workout" >
+		<property name="instanceName" type="QString" value="RT Plot" />
+		<property name="title" type="QString" value="Workout" />
+		<property name="widthFactor" type="double" value="1.69427" />
+		<property name="heightFactor" type="double" value="5.24068" />
+		<property name="resizable" type="bool" value="1" />
+	</chart>
+	<chart id="22" name="Dial" title="Time" >
+		<property name="instanceName" type="QString" value="Dial" />
+		<property name="title" type="QString" value="Time" />
+		<property name="widthFactor" type="double" value="2.43816" />
+		<property name="heightFactor" type="double" value="5.03571" />
+		<property name="resizable" type="bool" value="1" />
+		<property name="showInstant" type="bool" value="0" />
+		<property name="avgType" type="int" value="4" />
+		<property name="dataSeries" type="int" value="1" />
+		<property name="style" type="int" value="42092544" />
+	</chart>
+	<chart id="24" name="RT Plot" title="Performance" >
+		<property name="instanceName" type="QString" value="RT Plot" />
+		<property name="title" type="QString" value="Performance" />
+		<property name="widthFactor" type="double" value="1" />
+		<property name="heightFactor" type="double" value="1.54422" />
+		<property name="resizable" type="bool" value="1" />
+	</chart>
+	<chart id="22" name="Dial" title="Power" >
+		<property name="instanceName" type="QString" value="Dial" />
+		<property name="title" type="QString" value="Power" />
+		<property name="widthFactor" type="double" value="6" />
+		<property name="heightFactor" type="double" value="6" />
+		<property name="resizable" type="bool" value="1" />
+		<property name="showInstant" type="bool" value="1" />
+		<property name="avgType" type="int" value="32634" />
+		<property name="dataSeries" type="int" value="4" />
+		<property name="style" type="int" value="32512" />
+	</chart>
+	<chart id="22" name="Dial" title="Cadence" >
+		<property name="instanceName" type="QString" value="Dial" />
+		<property name="title" type="QString" value="Cadence" />
+		<property name="widthFactor" type="double" value="6" />
+		<property name="heightFactor" type="double" value="6" />
+		<property name="resizable" type="bool" value="1" />
+		<property name="showInstant" type="bool" value="1" />
+		<property name="avgType" type="int" value="0" />
+		<property name="dataSeries" type="int" value="6" />
+		<property name="style" type="int" value="0" />
+	</chart>
+	<chart id="22" name="Dial" title="Heartrate" >
+		<property name="instanceName" type="QString" value="Dial" />
+		<property name="title" type="QString" value="Heartrate" />
+		<property name="widthFactor" type="double" value="6" />
+		<property name="heightFactor" type="double" value="6" />
+		<property name="resizable" type="bool" value="1" />
+		<property name="showInstant" type="bool" value="1" />
+		<property name="avgType" type="int" value="27263016" />
+		<property name="dataSeries" type="int" value="7" />
+		<property name="style" type="int" value="27263071" />
+	</chart>
+	<chart id="22" name="Dial" title="Speed" >
+		<property name="instanceName" type="QString" value="Dial" />
+		<property name="title" type="QString" value="Speed" />
+		<property name="widthFactor" type="double" value="6" />
+		<property name="heightFactor" type="double" value="6" />
+		<property name="resizable" type="bool" value="1" />
+		<property name="showInstant" type="bool" value="1" />
+		<property name="avgType" type="int" value="507" />
+		<property name="dataSeries" type="int" value="5" />
+		<property name="style" type="int" value="616" />
+	</chart>
+	<chart id="22" name="Dial" title="Energy" >
+		<property name="instanceName" type="QString" value="Dial" />
+		<property name="title" type="QString" value="Energy" />
+		<property name="widthFactor" type="double" value="6" />
+		<property name="heightFactor" type="double" value="6" />
+		<property name="resizable" type="bool" value="1" />
+		<property name="showInstant" type="bool" value="1" />
+		<property name="avgType" type="int" value="0" />
+		<property name="dataSeries" type="int" value="11" />
+		<property name="style" type="int" value="68510928" />
+	</chart>
+	<chart id="22" name="Dial" title="BikeScore" >
+		<property name="instanceName" type="QString" value="Dial" />
+		<property name="title" type="QString" value="BikeScore" />
+		<property name="widthFactor" type="double" value="6" />
+		<property name="heightFactor" type="double" value="6" />
+		<property name="resizable" type="bool" value="1" />
+		<property name="showInstant" type="bool" value="0" />
+		<property name="avgType" type="int" value="0" />
+		<property name="dataSeries" type="int" value="9" />
+		<property name="style" type="int" value="3072" />
+	</chart>
+</layout>

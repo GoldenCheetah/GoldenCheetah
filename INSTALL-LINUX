@@ -31,6 +31,7 @@ CONTENTS
      - flex
      - bison
    - libical - Diary window and CalDAV support (google/mobileme calendar integration)
+   - libvlc - Video playback in training mode
 
 
 1. BASIC INSTALLATION WITH MANDATORY DEPENDENCIES
@@ -86,6 +87,13 @@ that a lot of other users have used in the past, look for it towards the end if 
 and it should read like this (take off trailing /include):
 
 BOOST_INCLUDE=$${BOOST_INSTALL)
+
+If you are building for your local host you may find that you get better performance if
+compiling with gcc -O3 (tree vectorization can have a significat impact)
+
+If so you might like to uncomment:
+
+QMAKE_CXXFLAGS += -O3
 
 Save and exit
 
@@ -358,3 +366,18 @@ NOTE: That upload to MobileMe and Google requires a functioning https lib in QT.
       upon the version installed this might not be the case and will need to be built and
       configured -- this is beyond the scope of this walkthough. Sorry.
 
+LIBVLC - Video playback in Realtime (Experimental)
+--------------------------------------------------
+
+You will need libvlc 1.1.9 or higher (1.1.8 is ok but will segv on exit)
+$ sudo apt-get install libvlc-dev
+
+$ vi gcconfig.pri
+
+Comment out VLC_INSTALL and it should read:
+
+VLC_INSTALL = /usr/include/vlc/
+
+$ make clean
+$ qmake
+$ make

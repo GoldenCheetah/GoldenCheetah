@@ -20,7 +20,7 @@
 #include "Computrainer.h"
 #include "RealtimeData.h"
 
-ComputrainerController::ComputrainerController(RealtimeWindow *parent,  DeviceConfiguration *dc) : RealtimeController(parent, dc)
+ComputrainerController::ComputrainerController(TrainTool *parent,  DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
     myComputrainer = new Computrainer (parent, dc->portSpec);
 }
@@ -77,7 +77,6 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
 
     if(!myComputrainer->isRunning())
     {
-        parent->Stop();
         QMessageBox msgBox;
         msgBox.setText("Cannot Connect to Computrainer");
         msgBox.setIcon(QMessageBox::Critical);

@@ -152,7 +152,6 @@ class MainWindow : public QMainWindow
         void zonesChanged();
         void seasonsChanged();
         void configChanged();
-        void viewChanged(int);
         void rideAdded(RideItem *);
         void rideDeleted(RideItem *);
         void rideDirty();
@@ -261,7 +260,6 @@ class MainWindow : public QMainWindow
         IntervalItem *activeInterval; // currently active for context menu popup
         RideItem *activeRide; // currently active for context menu popup
 
-        ViewSelection *viewSelection;
         QStackedWidget *views;
 
         // each view has its own controls XXX more to come
@@ -286,7 +284,7 @@ class MainWindow : public QMainWindow
         SummaryWindow *summaryWindow;
         DiaryWindow *diaryWindow;
         HomeWindow *homeWindow;
-        TrainWindow *trainWindow;
+        HomeWindow *trainWindow;
         AllPlotWindow *allPlotWindow;
         HistogramWindow *histogramWindow;
         WeeklySummaryWindow *weeklySummaryWindow;

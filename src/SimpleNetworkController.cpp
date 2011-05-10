@@ -22,7 +22,7 @@
 #include "SimpleNetworkController.h"
 #include "RealtimeData.h"
 
-SimpleNetworkController::SimpleNetworkController(RealtimeWindow *parent,
+SimpleNetworkController::SimpleNetworkController(TrainTool *parent,
                                                  DeviceConfiguration *dc)
   : RealtimeController(parent), parent(parent), client(parent, dc), state(DISCONNECTED)
 {

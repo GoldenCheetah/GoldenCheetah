@@ -34,11 +34,11 @@ class NullController : public RealtimeController
 {
  public:
 
-  RealtimeWindow *parent;
+  TrainTool *parent;
 
   // hostname and port are the hostname/port of the server to which
   // this NullControlller should connect.
-  NullController(RealtimeWindow *parent,
+  NullController(TrainTool *parent,
                           DeviceConfiguration *dc);
   ~NullController() { }
 

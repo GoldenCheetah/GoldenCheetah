@@ -22,7 +22,7 @@
 #include "ANT.h"
 #include "RealtimeData.h"
 
-ANTlocalController::ANTlocalController(RealtimeWindow *parent, DeviceConfiguration *dc) : RealtimeController(parent, dc)
+ANTlocalController::ANTlocalController(TrainTool *parent, DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
     myANTlocal = new ANT (parent, dc);
 }

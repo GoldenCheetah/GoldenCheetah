@@ -32,7 +32,7 @@ class ANTplusController : public RealtimeController
 {
 
 public:
-    ANTplusController (RealtimeWindow *parent =0, DeviceConfiguration *dc =0);
+    ANTplusController (TrainTool *parent =0, DeviceConfiguration *dc =0);
 
     QuarqdClient *myANTplus;               // the device itself
 
