@@ -81,6 +81,9 @@ void MetricAggregator::refreshMetrics()
         dbStatus.insert(filename, add);
     }
 
+    // begin LUW -- byproduct of turning off sync (nosync)
+    dbaccess->connection().transaction();
+
     // Delete statistics for non-existant ride files
     QHash<QString, status>::iterator d;
     for (d = dbStatus.begin(); d != dbStatus.end(); ++d) {
@@ -169,6 +172,9 @@ void MetricAggregator::refreshMetrics()
     // stop logging
     out << "METRIC REFRESH ENDS: " << QDateTime::currentDateTime().toString() + "\r\n";
     log.close();
+
+    // end LUW -- now syncs DB
+    dbaccess->connection().commit();
 
     main->isclean = true;
 
