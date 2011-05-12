@@ -600,10 +600,11 @@ TPDownloadDialog::downloadClicked()
     downloadtotal = 0;
     listindex = 0;
 
-    QTreeWidget *which;
+    QTreeWidget *which = NULL;
     switch(tabs->currentIndex()) {
         case 0 : which = rideList; break;
         case 1 : which = rideListUp; break;
+        default:
         case 2 : which = rideListSync; break;
     }
 

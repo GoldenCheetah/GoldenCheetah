@@ -442,10 +442,10 @@ MeanMaxComputer::integrate_series(cpintdata &data)
 data_t
 MeanMaxComputer::partial_max_mean(data_t *dataseries_i, int start, int end, int length, int *offset)
 {
-    int i;
+    int i=0;
     data_t candidate=0;
 
-    int best_i;
+    int best_i=0;
 
     for (i=start; i<(1+end-length); i++) {
         data_t test_energy=dataseries_i[length+i]-dataseries_i[i];
@@ -473,12 +473,12 @@ MeanMaxComputer::divided_max_mean(data_t *dataseries_i, int datalength, int leng
     if (window_length>datalength) window_length=datalength;
 
     // put down as many windows as will fit without overrunning data
-    int start;
-    int end;
-    data_t energy;
+    int start=0;
+    int end=0;
+    data_t energy=0;
 
     data_t candidate=0;
-    int this_offset;
+    int this_offset=0;
 
     for (start=0; start+window_length<=datalength; start+=shift) {
         end=start+window_length;

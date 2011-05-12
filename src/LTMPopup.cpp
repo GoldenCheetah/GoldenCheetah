@@ -269,7 +269,7 @@ LTMPopup::resizeEvent(QResizeEvent *)
 }
 
 bool
-LTMPopup::eventFilter(QObject *object, QEvent *e)
+LTMPopup::eventFilter(QObject * /*object*/, QEvent *e)
 {
 
     //if (object != (QObject *)plot()->canvas() )

@@ -781,7 +781,7 @@ LTMPlot::createTODCurveData(LTMSettings *settings, MetricDetail metricDetail, QV
 void
 LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVector<double>&x,QVector<double>&y,int&n)
 {
-    QList<SummaryMetrics> *data;
+    QList<SummaryMetrics> *data = NULL;
 
     // resize the curve array to maximum possible size
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
@@ -992,7 +992,7 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
         const RideMetricFactory &factory = RideMetricFactory::instance();
         double value;
         QString units;
-        int precision;
+        int precision = 0;
         QString datestr;
 
         LTMScaleDraw *lsd = new LTMScaleDraw(settings->start, groupForDate(settings->start.date(), settings->groupBy), settings->groupBy);

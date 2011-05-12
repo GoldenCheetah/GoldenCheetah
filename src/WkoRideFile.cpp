@@ -481,7 +481,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, WKO_ULONG version, RideFile *rideFile,
 WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, WKO_ULONG version, RideFile *rideFile, QStringList &errors)
 {
     unsigned long julian, sincemidnight;
-    WKO_UCHAR *goal, *notes, *code; // save location of WKO metadata
+    WKO_UCHAR *goal=NULL, *notes=NULL, *code=NULL; // save location of WKO metadata
 
     enum configtype lastchart;
     unsigned int x,z,i;

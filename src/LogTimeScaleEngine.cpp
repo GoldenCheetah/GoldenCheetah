@@ -188,7 +188,7 @@ void LogTimeScaleEngine::buildTicks(
 
 struct tick_info_t {
     double x;
-    char *label;
+    const char *label;
 };
 
 tick_info_t tick_info[] = {

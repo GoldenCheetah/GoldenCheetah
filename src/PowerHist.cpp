@@ -253,10 +253,10 @@ PowerHist::refreshHRZoneLabels()
 void
 PowerHist::recalc(bool force)
 {
-    QVector<unsigned int> *array;
-    QVector<unsigned int> *selectedArray;
+    QVector<unsigned int> *array = NULL;
+    QVector<unsigned int> *selectedArray = NULL;
     int arrayLength = 0;
-    double delta;
+    double delta = 0;
 
     // lets make sure we need to recalculate
     if (force == false &&
