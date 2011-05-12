@@ -47,7 +47,7 @@ RideImportWizard::RideImportWizard(QList<QString> files, QDir &home, MainWindow 
 }
 
 void
-RideImportWizard::init(QList<QString> files, QDir &home, MainWindow *mainWindow)
+RideImportWizard::init(QList<QString> files, QDir &home, MainWindow * /*mainWindow*/)
 {
 
     // initialise dialog box

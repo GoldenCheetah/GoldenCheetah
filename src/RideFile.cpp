@@ -116,7 +116,7 @@ RideFile::fillInIntervals()
     intervals_.clear();
     double start = 0.0;
     int interval = dataPoints().first()->interval;
-    const RideFilePoint *point, *previous;
+    const RideFilePoint *point=NULL, *previous=NULL;
     foreach (point, dataPoints()) {
         if (point->interval != interval)
             mark();

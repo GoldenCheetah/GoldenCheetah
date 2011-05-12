@@ -32,7 +32,7 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors) const
 {
     QRegExp metricUnits("(km|kph|km/h)", Qt::CaseInsensitive);
     QRegExp englishUnits("(miles|mph|mp/h)", Qt::CaseInsensitive);
-    bool metric;
+    bool metric = false;
 
     int unitsHeader = 2;
 
@@ -45,7 +45,7 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors) const
     QRegExp manualCSV("manual", Qt::CaseInsensitive);
     bool manual = false;
 
-    double rideSec;
+    double rideSec = 0;
 
     if (!file.open(QFile::ReadOnly)) {
 	errors << ("Could not open ride file: \""
@@ -96,9 +96,9 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors) const
 	    }
 	    // minutes,kph,watts,km,hr,bikeScore
 	    else if (lineno > unitsHeader) {
-		double minutes,kph,watts,km,hr,alt,bs;
-		double cad, nm;
-		int interval;
+		double minutes=0,kph=0,watts=0,km=0,hr=0,alt=0,bs=0;
+		double cad=0, nm=0;
+		int interval=0;
                 QStringList fields = line.split(",");
                 minutes = fields[0].toDouble();
                 kph = fields[1].toDouble();

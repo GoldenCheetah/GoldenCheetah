@@ -34,7 +34,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
 {
     QRegExp metricUnits("(km|kph|km/h)", Qt::CaseInsensitive);
     QRegExp englishUnits("(miles|mph|mp/h)", Qt::CaseInsensitive);
-    bool metric;
+    bool metric = true;
     QDateTime startTime;
 
     // TODO: a more robust regex for ergomo files
@@ -66,7 +66,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
         //  Modified the regExp string to allow for 2-digit version numbers - 23 Mar 2009, thm
     QRegExp iBikeCSV("iBike,\\d\\d?,[a-z]+", Qt::CaseInsensitive);
     bool iBike = false;
-    int recInterval;
+    int recInterval = 1;
 
     if (!file.open(QFile::ReadOnly)) {
         errors << ("Could not open ride file: \""
@@ -153,8 +153,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                 double minutes,nm,kph,watts,km,cad,alt,hr,dfpm;
                 double lat = 0.0, lon = 0.0;
                 double headwind = 0.0;
-                int interval;
-                int pause;
+                int interval=0;
+                int pause=0;
                 if (!ergomo && !iBike) {
                      minutes = line.section(',', 0, 0).toDouble();
                      nm = line.section(',', 1, 1).toDouble();
@@ -180,7 +180,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                     // For iBike software version 11 or higher:
                     // use "power" field until a the "dfpm" field becomes non-zero.
                      minutes = (recInterval * lineno - unitsHeader)/60.0;
-                     nm = NULL; //no torque
+                     nm = 0; //no torque
                      kph = line.section(',', 0, 0).toDouble();
                      dfpm = line.section( ',', 11, 11).toDouble();
                      if( iBikeVersion >= 11 && ( dfpm > 0.0 || dfpmExists ) ) {
@@ -230,7 +230,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                      if (interval != 0) interval = currentInterval;
                      pause = line.section(ergomo_separator, 9, 9).toInt();
                      total_pause += pause;
-                     nm = NULL; // torque is not provided in the Ergomo file
+                     nm = 0; // torque is not provided in the Ergomo file
 
                      // the ergomo records the time in whole seconds
                      // RECORDING INT. 1, 2, 5, 10, 15 or 30 per sec

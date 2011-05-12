@@ -296,7 +296,7 @@ RideEditor::check()
 
     QVector<double> power;
     QVector<double> secs;
-    double lastdistance;
+    double lastdistance=9;
     int count = 0;
 
     foreach (RideFilePoint *point, ride->ride()->dataPoints()) {
@@ -533,7 +533,7 @@ void
 RideEditor::borderMenu(const QPoint &pos)
 {
 
-    int column, row;
+    int column=0, row=0;
 
     // but we need to set the row or column to zero since
     // we are in the border, this seems an easy and quick way
@@ -2015,7 +2015,7 @@ PasteSpecialDialog::okClicked()
     // is why we do an anomaly check at the end.
 
     // add these to the pasted rows
-    double timeOffset, distanceOffset;
+    double timeOffset=0, distanceOffset=0;
     int where = rideEditor->ride->ride()->dataPoints().count();
 
     if (append->isChecked() && rideEditor->ride->ride()->dataPoints().count()) {

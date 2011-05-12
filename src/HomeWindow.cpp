@@ -463,7 +463,7 @@ HomeWindow::removeChart(int num)
 }
 
 void
-HomeWindow::resizeEvent(QResizeEvent *e)
+HomeWindow::resizeEvent(QResizeEvent * /* e */)
 {
     foreach (GcWindow *x, charts) {
 
@@ -715,12 +715,12 @@ HomeWindow::windowMoved(GcWindow*w)
 }
 
 void
-HomeWindow::windowResized(GcWindow*w)
+HomeWindow::windowResized(GcWindow* /*w*/)
 {
 }
 
 void
-HomeWindow::windowMoving(GcWindow*w)
+HomeWindow::windowMoving(GcWindow* /*w*/)
 {
     // ensure the mouse pointer is visible, scrolls
     // as we get near to the margins...
@@ -876,7 +876,7 @@ HomeWindow::windowMoving(GcWindow*w)
 }
 
 void
-HomeWindow::windowResizing(GcWindow*w)
+HomeWindow::windowResizing(GcWindow* /*w*/)
 {
     QPoint pos = winWidget->mapFromGlobal(QCursor::pos());
     winArea->ensureVisible(pos.x(), pos.y(), 20, 20);

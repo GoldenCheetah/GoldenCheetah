@@ -16,7 +16,7 @@ static GSettings *GetApplicationSettings()
 }
 
 QVariant
-GSettings::value(const QObject *me, const QString key, const QVariant def) const
+GSettings::value(const QObject * /*me*/, const QString key, const QVariant def) const
 {
 
     // debug output ?

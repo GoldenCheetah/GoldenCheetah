@@ -76,7 +76,7 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
     // the next 4 bytes are the ASCII characters 'perf'
     char perfStr[5];
     is.readRawData(perfStr, 4);
-    perfStr[4] = NULL;
+    perfStr[4] = '\0';
     if(strcmp(perfStr,"perf"))
     {
         errors << "File is encrypted.";

@@ -180,7 +180,7 @@ TreeMapPlot::eventFilter(QObject *, QEvent *e)
 
     if (e->type() == QEvent::MouseMove) {
        QPoint pos = static_cast<QMouseEvent*>(e)->pos();
-       TreeMap *underMouse;
+       TreeMap *underMouse = NULL;
 
         // look at the bottom rung.
         foreach (TreeMap *first, root->children)

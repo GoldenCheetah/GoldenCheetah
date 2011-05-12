@@ -142,7 +142,7 @@ GcWindow::amVisible()
 
 
 void
-GcWindow::paintEvent(QPaintEvent *event)
+GcWindow::paintEvent(QPaintEvent * /*event*/)
 {
     static QPixmap closeImage = QPixmap(":images/toolbar/popbutton.png");
     static QPixmap aluBar = QPixmap(":images/aluBar.png");

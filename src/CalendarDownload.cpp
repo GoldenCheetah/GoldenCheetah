@@ -48,7 +48,7 @@ CalendarDownload::download()
     return true;
 }
 
-#ifdef GC_HAVE_ICAL
+#if 0
 static QString propertyToString(icalproperty *p)
 {
     if (p) {
