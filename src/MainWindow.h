@@ -29,6 +29,7 @@
 #include "IntervalItem.h"
 #include "QuarqdClient.h"
 #include "RealtimeData.h"
+#include "SpecialFields.h"
 #include <boost/shared_ptr.hpp>
 
 class AerolabWindow;
@@ -120,6 +121,7 @@ class MainWindow : public QMainWindow
         // db connections to cyclistdir/metricDB - one per active MainWindow
         QSqlDatabase db;
         MetricAggregator *metricDB;
+        SpecialFields specialFields;
         Seasons *seasons;
 
         int session;
@@ -322,6 +324,7 @@ class MainWindow : public QMainWindow
     WithingsDownload *withingsDownload;
 
     GcWindowTool *chartTool;
+
 };
 
 #endif // _GC_MainWindow_h
