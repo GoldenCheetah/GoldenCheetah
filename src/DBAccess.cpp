@@ -125,7 +125,6 @@ computeFileCRC(QString filename)
 
 bool DBAccess::createMetricsTable()
 {
-    SpecialFields sp;
     QSqlQuery query(dbconn);
     bool rc;
     bool createTables = true;
@@ -157,15 +156,15 @@ bool DBAccess::createMetricsTable()
 
         // And all the metadata texts
         foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
-            if (!sp.isMetric(field.name) && (field.type < 3)) {
-                createMetricTable += QString(", Z%1 varchar").arg(sp.makeTechName(field.name));
+            if (!main->specialFields.isMetric(field.name) && (field.type < 3)) {
+                createMetricTable += QString(", Z%1 varchar").arg(main->specialFields.makeTechName(field.name));
             }
         }
 
         // And all the metadata metrics
         foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
-            if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
-                createMetricTable += QString(", Z%1 double").arg(sp.makeTechName(field.name));
+            if (!main->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
+                createMetricTable += QString(", Z%1 double").arg(main->specialFields.makeTechName(field.name));
             }
         }
         createMetricTable += " )";
@@ -220,7 +219,6 @@ bool DBAccess::createMeasuresTable()
     if (rc && createTables) {
 
         // read definitions from measures.xml
-        SpecialFields sp; // just for makeTechName function...
         QList<FieldDefinition> fieldDefinitions;
         QList<KeywordDefinition> keywordDefinitions; //NOTE: not used in measures.xml
 
@@ -234,12 +232,12 @@ bool DBAccess::createMeasuresTable()
 
         // And all the metadata texts
         foreach(FieldDefinition field, fieldDefinitions)
-            if (field.type < 3) createMeasuresTable += QString(", Z%1 varchar").arg(sp.makeTechName(field.name));
+            if (field.type < 3) createMeasuresTable += QString(", Z%1 varchar").arg(main->specialFields.makeTechName(field.name));
 
         // And all the metadata measures
         foreach(FieldDefinition field, fieldDefinitions)
             if (field.type == 3 || field.type == 4)
-                createMeasuresTable += QString(", Z%1 double").arg(sp.makeTechName(field.name));
+                createMeasuresTable += QString(", Z%1 double").arg(main->specialFields.makeTechName(field.name));
 
         createMeasuresTable += " )";
 
@@ -363,7 +361,6 @@ void DBAccess::checkDBVersion()
  *----------------------------------------------------------------------*/
 bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, unsigned long fingerprint, bool modify)
 {
-    SpecialFields sp;
 	QSqlQuery query(dbconn);
     QDateTime timestamp = QDateTime::currentDateTime();
 
@@ -382,14 +379,14 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, unsign
 
     // And all the metadata texts
     foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
-        if (!sp.isMetric(field.name) && (field.type < 3)) {
-            insertStatement += QString(", Z%1 ").arg(sp.makeTechName(field.name));
+        if (!main->specialFields.isMetric(field.name) && (field.type < 3)) {
+            insertStatement += QString(", Z%1 ").arg(main->specialFields.makeTechName(field.name));
         }
     }
         // And all the metadata metrics
     foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
-        if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
-            insertStatement += QString(", Z%1 ").arg(sp.makeTechName(field.name));
+        if (!main->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
+            insertStatement += QString(", Z%1 ").arg(main->specialFields.makeTechName(field.name));
         }
     }
 
@@ -397,7 +394,7 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, unsign
     for (int i=0; i<factory.metricCount(); i++)
         insertStatement += ",?";
     foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
-        if (!sp.isMetric(field.name) && field.type < 5) {
+        if (!main->specialFields.isMetric(field.name) && field.type < 5) {
             insertStatement += ",?";
         }
     }
@@ -420,16 +417,16 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, unsign
     // And all the metadata texts
     foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
 
-        if (!sp.isMetric(field.name) && (field.type < 3)) {
+        if (!main->specialFields.isMetric(field.name) && (field.type < 3)) {
             query.addBindValue(ride->getTag(field.name, ""));
         }
     }
     // And all the metadata metrics
     foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
 
-        if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
+        if (!main->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
             query.addBindValue(ride->getTag(field.name, "0.0").toDouble());
-        } else if (!sp.isMetric(field.name)) {
+        } else if (!main->specialFields.isMetric(field.name)) {
             if (field.name == "Recording Interval")  // XXX Special - need a better way...
                 query.addBindValue(ride->recIntSecs());
         }
@@ -469,7 +466,6 @@ QList<QDateTime> DBAccess::getAllDates()
 
 QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
 {
-    SpecialFields sp;
     QList<SummaryMetrics> metrics;
 
     // null date range fetches all, but not currently used by application code
@@ -483,8 +479,8 @@ QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
     for (int i=0; i<factory.metricCount(); i++)
         selectStatement += QString(", X%1 ").arg(factory.metricName(i));
     foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
-        if (!sp.isMetric(field.name) && field.type < 5) {
-            selectStatement += QString(", Z%1 ").arg(sp.makeTechName(field.name));
+        if (!main->specialFields.isMetric(field.name) && field.type < 5) {
+            selectStatement += QString(", Z%1 ").arg(main->specialFields.makeTechName(field.name));
         }
     }
     selectStatement += " FROM metrics where DATE(ride_date) >=DATE(:start) AND DATE(ride_date) <=DATE(:end) "
@@ -508,11 +504,11 @@ QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
         for (; i<factory.metricCount(); i++)
             summaryMetrics.setForSymbol(factory.metricName(i), query.value(i+3).toDouble());
         foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
-            if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
+            if (!main->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
                 QString underscored = field.name;
                 summaryMetrics.setForSymbol(underscored.replace("_"," "), query.value(i+3).toDouble());
                 i++;
-            } else if (!sp.isMetric(field.name) && field.type < 3) {
+            } else if (!main->specialFields.isMetric(field.name) && field.type < 3) {
                 QString underscored = field.name;
                 // ignore texts for now XXX todo if want metadata from Summary Metrics
                 summaryMetrics.setText(underscored.replace("_"," "), query.value(i+3).toString());
@@ -526,7 +522,6 @@ QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
 
 SummaryMetrics DBAccess::getRideMetrics(QString filename)
 {
-    SpecialFields sp;
     SummaryMetrics summaryMetrics;
 
     // construct the select statement
@@ -535,8 +530,8 @@ SummaryMetrics DBAccess::getRideMetrics(QString filename)
     for (int i=0; i<factory.metricCount(); i++)
         selectStatement += QString(", X%1 ").arg(factory.metricName(i));
     foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
-        if (!sp.isMetric(field.name) && field.type < 5) {
-            selectStatement += QString(", Z%1 ").arg(sp.makeTechName(field.name));
+        if (!main->specialFields.isMetric(field.name) && field.type < 5) {
+            selectStatement += QString(", Z%1 ").arg(main->specialFields.makeTechName(field.name));
         }
     }
     selectStatement += " FROM metrics where filename == :filename ;";
@@ -555,11 +550,11 @@ SummaryMetrics DBAccess::getRideMetrics(QString filename)
         for (; i<factory.metricCount(); i++)
             summaryMetrics.setForSymbol(factory.metricName(i), query.value(i+2).toDouble());
         foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
-            if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
+            if (!main->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
                 QString underscored = field.name;
                 summaryMetrics.setForSymbol(underscored.replace(" ","_"), query.value(i+2).toDouble());
                 i++;
-            } else if (!sp.isMetric(field.name) && field.type < 3) {
+            } else if (!main->specialFields.isMetric(field.name) && field.type < 3) {
                 // ignore texts for now XXX todo if want metadata from Summary Metrics
                 QString underscored = field.name;
                 summaryMetrics.setText(underscored.replace("_"," "), query.value(i+2).toString());
@@ -630,7 +625,6 @@ bool DBAccess::importMeasure(SummaryMetrics *summaryMetrics)
 
 QList<SummaryMetrics> DBAccess::getAllMeasuresFor(QDateTime start, QDateTime end)
 {
-    SpecialFields sp;
     QList<FieldDefinition> fieldDefinitions;
     QList<KeywordDefinition> keywordDefinitions; //NOTE: not used in measures.xml
 
@@ -649,8 +643,8 @@ QList<SummaryMetrics> DBAccess::getAllMeasuresFor(QDateTime start, QDateTime end
     // construct the select statement
     QString selectStatement = "SELECT timestamp, measure_date";
     foreach(FieldDefinition field, fieldDefinitions) {
-        if (!sp.isMetric(field.name) && field.type < 5) {
-            selectStatement += QString(", Z%1 ").arg(sp.makeTechName(field.name));
+        if (!main->specialFields.isMetric(field.name) && field.type < 5) {
+            selectStatement += QString(", Z%1 ").arg(main->specialFields.makeTechName(field.name));
         }
     }
     selectStatement += " FROM measures where DATE(measure_date) >=DATE(:start) AND DATE(measure_date) <=DATE(:end) "
