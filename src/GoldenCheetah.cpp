@@ -111,6 +111,15 @@ bool GcWindow::gripped() const
 
 GcWindow::GcWindow()
 {
+    qRegisterMetaType<QWidget*>("controls");
+    qRegisterMetaType<RideItem*>("ride");
+    qRegisterMetaType<GcWinID>("type");
+    setControls(NULL);
+    setRideItem(NULL);
+    setTitle("");
+    setContentsMargins(0,0,0,0);
+    setResizable(false);
+    setMouseTracking(true);
 }
 
 GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
