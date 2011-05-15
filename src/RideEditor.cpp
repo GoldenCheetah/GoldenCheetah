@@ -56,7 +56,7 @@ RideEditor::RideEditor(MainWindow *main) : GcWindow(main), data(NULL), ride(NULL
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(0,0,0,0);
+    mainLayout->setContentsMargins(2,2,2,2);
 
     //Left in the code to display a title, but
     //its a waste of screen estate, maybe uncomment
