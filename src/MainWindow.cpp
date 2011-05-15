@@ -175,6 +175,12 @@ MainWindow::MainWindow(const QDir &home) :
 #ifndef Q_OS_MAC
     toolbar->setContentsMargins(0,0,0,0);
     toolbar->setAutoFillBackground(true);
+    QPalette pal;
+    //pal.setColor(QPalette::Button, QColor(60,59,55));
+    pal.setColor(QPalette::Window, GColor(CTOOLBAR));
+    pal.setColor(QPalette::Button, GColor(CTOOLBAR));
+    toolbar->setPalette(pal);
+    toolbar->setMovable(false);
 #else
     QIcon tickIcon(":images/toolbar/main/tick.png");
     QPushButton *showControls = new QPushButton(tickIcon, "", this);
@@ -1546,6 +1552,14 @@ MainWindow::notifyConfigChanged()
        else if (! hrzones_->warningString().isEmpty())
             QMessageBox::warning(this, tr("Reading HR Zones File"), hrzones_->warningString());
     }
+
+    // update the toolbar color if not Mac
+#ifndef Q_OS_MAC
+    QPalette pal;
+    pal.setColor(QPalette::Window, GColor(CTOOLBAR));
+    pal.setColor(QPalette::Button, GColor(CTOOLBAR));
+    toolbar->setPalette(pal);
+#endif
 
     // now tell everyone else
     configChanged();

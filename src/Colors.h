@@ -107,5 +107,6 @@ class GCColor : public QObject
 #define CPOPUPTEXT            52
 #define CTILEBAR              53
 #define CTILEBARSELECT        54
+#define CTOOLBAR              55
 
 #endif
