@@ -426,7 +426,7 @@ int HrZones::whichRange(const QDate &date) const
 
 int HrZones::numZones(int rnum) const
 {
-    if (rnum < ranges.size()) return 0;
+    if (rnum < 0 || rnum >= ranges.size()) return 0;
     return ranges[rnum].zones.size();
 }
 
