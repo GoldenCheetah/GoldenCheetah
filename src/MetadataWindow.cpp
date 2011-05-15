@@ -24,9 +24,15 @@ MetadataWindow::MetadataWindow(MainWindow *mainWindow) :
     setInstanceName("Metadata Window");
     setControls(NULL);
     setRideItem(NULL);
+    setContentsMargins(0,0,0,0);
 
     QVBoxLayout *vlayout = new QVBoxLayout(this);
+    vlayout->setSpacing(0);
     rideMetadata = new RideMetadata(mainWindow);
+    QFont font;
+    font.setPointSize(font.pointSize()-2);
+    rideMetadata->setFont(font);
+    rideMetadata->setContentsMargins(0,0,0,0);
     vlayout->addWidget(rideMetadata);
 
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideItemChanged()));

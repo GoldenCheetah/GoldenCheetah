@@ -22,7 +22,7 @@
 #include <QDir>
 #include "Settings.h"
 
-static Colors ColorList[56] = {
+static Colors ColorList[57] = {
     { "Plot Background", "COLORPLOTBACKGROUND", Qt::white },
     { "Ride Plot Background", "COLORRIDEPLOTBACKGROUND", Qt::black },
     { "Plot Thumbnail Background", "COLORPLOTTHUMBNAIL", Qt::gray },
@@ -78,6 +78,7 @@ static Colors ColorList[56] = {
     { "Pop Up Windows Foreground", "CPOPUPTEXT", Qt::white },
     { "Chart Bar Unselected", "CTILEBAR", Qt::gray },
     { "Chart Bar Selected", "CTILEBARSELECT", Qt::yellow },
+    { "ToolBar Background", "CTOOLBAR", Qt::white },
     { "", "", QColor(0,0,0) },
 };
 
@@ -111,6 +112,12 @@ GCColor::readConfig()
             ColorList[i].color = QColor(rgb[0].toInt(),
                                         rgb[1].toInt(),
                                         rgb[2].toInt());
+        } else {
+            // set sensible defaults for any not set...
+            if (ColorList[i].name == "CTOOLBAR") {
+                QPalette def;
+                ColorList[i].color = def.color(QPalette::Window);
+            }
         }
     }
 }

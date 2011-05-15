@@ -38,7 +38,7 @@ RideMetadata::RideMetadata(MainWindow *parent) : QWidget(parent), main(parent)
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(10,10,10,10);
+    mainLayout->setContentsMargins(0,0,0,0);
 
     QPalette palette;
     palette.setBrush(QPalette::Background, Qt::NoBrush);
