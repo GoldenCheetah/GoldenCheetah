@@ -202,8 +202,6 @@ class MainWindow : public QMainWindow
         void showOptions();
         void showTools();
         void showWorkoutWizard();
-        void importRideToDB();
-        void scanForMissing();
         void dateChanged(const QDate &);
         void showTreeContextMenuPopup(const QPoint &);
         void showContextMenuPopup(const QPoint &);
@@ -242,6 +240,9 @@ class MainWindow : public QMainWindow
         static QString notesFileName(QString rideFileName);
 
     private:
+        boost::shared_ptr<QSettings> settings;
+        IntervalItem *activeInterval; // currently active for context menu popup
+        RideItem *activeRide; // currently active for context menu popup
         RideItem *ride;  // the currently selected ride
 
         QToolBox *toolBox;
@@ -249,11 +250,9 @@ class MainWindow : public QMainWindow
         QDockWidget *dock;
         QAction *homeAct, *diaryAct, *analysisAct, *measuresAct, *trainAct, *athleteAct, *helpAct, *configAct;
 
-        boost::shared_ptr<QSettings> settings;
-        IntervalItem *activeInterval; // currently active for context menu popup
-        RideItem *activeRide; // currently active for context menu popup
-
         QStackedWidget *views;
+        QAction *sideView;
+        QAction *toolView;
 
         // each view has its own controls XXX more to come
         QStackedWidget *masterControls,
@@ -261,9 +260,6 @@ class MainWindow : public QMainWindow
                        *trainControls,
                        *diaryControls,
                        *homeControls;
-
-        QAction *sideView;
-        QAction *toolView;
 
         // Top-level views
         HomeWindow *homeWindow;
