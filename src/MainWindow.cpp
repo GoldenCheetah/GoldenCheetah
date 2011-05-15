@@ -126,7 +126,7 @@ MainWindow::parseRideFileName(const QString &name, QString *notesFileName, QDate
 
 MainWindow::MainWindow(const QDir &home) :
     home(home), session(0), isclean(false),
-    zones_(new Zones), hrzones_(new HrZones), calendar(NULL),
+    zones_(new Zones), hrzones_(new HrZones),
     ride(NULL)
 {
     setAttribute(Qt::WA_DeleteOnClose);
@@ -273,12 +273,6 @@ MainWindow::MainWindow(const QDir &home) :
     calendarDownload = new CalendarDownload(this);
 
 
-    // Analysis toolbox contents
-    calendar = new RideCalendar(this);
-    calendar->setHome(home);
-    calendar->setFixedHeight(250);
-    calendar->hide();
-
     chartTool = new GcWindowTool(this);
 
     treeWidget = new QTreeWidget;
@@ -334,17 +328,11 @@ MainWindow::MainWindow(const QDir &home) :
             last = new RideItem(RIDE_TYPE, home.path(),
                                 name, dt, zones(), hrZones(), notesFileName, this);
             allRides->addChild(last);
-	    calendar->update();
         }
     }
 
     splitter = new QSplitter;
     splitter->setContentsMargins(0, 0, 0, 0); // attempting to follow some UI guides
-
-    tabWidget = new QTabWidget;
-    tabWidget->setUsesScrollButtons(true);
-    tabWidget->setTabPosition(QTabWidget::North);
-    tabWidget->setContentsMargins(0,0,0,0);
 
     // setup the stacks for all the view controls
     // a stacked widget for each toolbar option
@@ -388,9 +376,14 @@ MainWindow::MainWindow(const QDir &home) :
     trainWindow = new HomeWindow(this, "train", "Training");
     trainControls->addWidget(new TrainTool(this, this->home));
 
+    // analysis
+    analWindow = new HomeWindow(this, "analysis", "Analysis");
+    analysisControls->addWidget(analWindow->controls());
+
     // ToolBox has one thing at the mo... will change soon
     toolBox = new QToolBox(this);
     toolBox->setStyleSheet(" QToolBox::tab:selected { font: bold; }");
+    toolBox->setFixedWidth(300);
 
     //toolBox->addItem(calendar, "Calendar"); //XXX some folks will complain, I HATE IT with a PASSION!
 #ifdef Q_OS_MAC // on a mac the controls go into a dock drawer widget
@@ -417,11 +410,6 @@ MainWindow::MainWindow(const QDir &home) :
         splitter->setSizes(sizes);
     }
 
-    /////////////////////////// Summary /////////////////////////
-
-    summaryWindow = new SummaryWindow(this);
-    tabs.append(TabInfo(summaryWindow, tr("Summary")));
-
     /////////////////////////// Diary ///////////////////////////
 #ifdef GC_HAVE_ICAL
     diaryWindow = new DiaryWindow(this);
@@ -429,89 +417,12 @@ MainWindow::MainWindow(const QDir &home) :
     diaryControls->addWidget(diaryWindow->controls());
 #endif
 
-    /////////////////////////// Ride Plot Tab ///////////////////////////
-    allPlotWindow = new AllPlotWindow(this);
-    tabs.append(TabInfo(allPlotWindow, tr("Ride Plot")));
-
-    ////////////////////// Critical Power Plot Tab //////////////////////
-
-    criticalPowerWindow = new CriticalPowerWindow(home, this);
-    tabs.append(TabInfo(criticalPowerWindow, tr("Critical Durations")));
-
-    //////////////////////// Power Histogram Tab ////////////////////////
-
-    histogramWindow = new HistogramWindow(this);
-    tabs.append(TabInfo(histogramWindow, tr("Histograms")));
-
-    //////////////////////// Pedal Force/zones_Velocity Plot ////////////////////////
-
-    pfPvWindow = new PfPvWindow(this);
-    tabs.append(TabInfo(pfPvWindow, tr("PF/PV")));
-
-    //////////////////////// HrPw Plot ////////////////////////
-
-    hrPwWindow = new HrPwWindow(this);
-    tabs.append(TabInfo(hrPwWindow, tr("HrPw")));
-
-    //////////////////////// Scatter Plot ////////////////////////
-
-    scatterWindow = new ScatterWindow(this, home);
-    tabs.append(TabInfo(scatterWindow, tr("2D")));
-
-    //////////////////////// 3d Model Window ////////////////////////////
-
-#ifdef GC_HAVE_QWTPLOT3D
-    modelWindow = new ModelWindow(this, home);
-    tabs.append(TabInfo(modelWindow, tr("3D")));
-#endif
-
-    //////////////////////// Weekly Summary ////////////////////////
-
-    // add daily distance / duration graph:
-    weeklySummaryWindow = new WeeklySummaryWindow(useMetricUnits, this);
-    tabs.append(TabInfo(weeklySummaryWindow, tr("Weekly Summary")));
-
-    //////////////////////// LTM ////////////////////////
-
-    // long term metrics window
-    ltmWindow = new LTMWindow(this, useMetricUnits, home);
-    ltmWindow->setChart(0); // XXX mimic old style, before properties managed by layout manager
-    ltmWindow->setDateRange("All Dates"); // XXX this is going soon anyway
-    tabs.append(TabInfo(ltmWindow, tr("Metrics")));
-
-    //////////////////////// Treemap ////////////////////////
-
-    // treemap window
-    treemapWindow = new TreeMapWindow(this, useMetricUnits, home);
-    tabs.append(TabInfo(treemapWindow, tr("Treemap")));
-
-    //////////////////////// Performance Manager  ////////////////////////
-
-    performanceManagerWindow = new PerformanceManagerWindow(this);
-    tabs.append(TabInfo(performanceManagerWindow, tr("PM")));
-
-
-    ///////////////////////////// Aerolab //////////////////////////////////
-
-    aerolabWindow = new AerolabWindow(this);
-    tabs.append(TabInfo(aerolabWindow, tr("Aerolab")));
-
-    ///////////////////////////// GoogleMaps //////////////////////////////////
-
-    googleMap = new GoogleMapControl(this);
-    tabs.append(TabInfo(googleMap, tr("Map")));
-
-    ///////////////////////////// Editor  //////////////////////////////////
-
-    rideEdit = new RideEditor(this);
-    tabs.append(TabInfo(rideEdit, tr("Editor")));
-
     /////////////////////////// Views //////////////////////////////////////
 
     // Setup the two views
     views = new QStackedWidget(this);
     views->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
-    views->addWidget(tabWidget);          // Analysis stuff
+    views->addWidget(analWindow);          // Analysis stuff
     views->addWidget(trainWindow);      // Train Stuff
 #ifdef GC_HAVE_ICAL
     views->addWidget(diaryWindow);
@@ -526,10 +437,10 @@ MainWindow::MainWindow(const QDir &home) :
     // on a mac it has only one widget since the
     // toolBox is in a drawer, on other platforms
     // it has the views and the toolBox
-    splitter->addWidget(views);
 #ifndef Q_OS_MAC
    splitter->addWidget(toolBox);
 #endif
+    splitter->addWidget(views);
     setCentralWidget(splitter);
 
     /////////////////////////////// Menus ///////////////////////////////
@@ -644,6 +555,7 @@ MainWindow::MainWindow(const QDir &home) :
         }
     }
 
+#if 0
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
 
 #ifndef Q_OS_MAC
@@ -677,6 +589,7 @@ MainWindow::MainWindow(const QDir &home) :
         viewMenu->addAction(tab.action);
     }
     tabViewTriggered(true);
+#endif
 
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(tr("&About GoldenCheetah"), this, SLOT(aboutDialog()));
@@ -697,16 +610,10 @@ MainWindow::MainWindow(const QDir &home) :
     setUnifiedTitleAndToolBarOnMac(true);
 
     // now we're up and runnning lets connect the signals
-    connect(calendar, SIGNAL(clicked(const QDate &)),
-            this, SLOT(dateChanged(const QDate &)));
     connect(treeWidget,SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(showTreeContextMenuPopup(const QPoint &)));
     connect(treeWidget, SIGNAL(itemSelectionChanged()),
             this, SLOT(rideTreeWidgetSelectionChanged()));
-    connect(splitter, SIGNAL(splitterMoved(int,int)),
-            this, SLOT(splitterMoved()));
-    connect(tabWidget, SIGNAL(currentChanged(int)),
-            this, SLOT(tabChanged(int)));
     connect(intervalWidget,SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(showContextMenuPopup(const QPoint &)));
     connect(intervalWidget,SIGNAL(itemSelectionChanged()),
@@ -716,41 +623,15 @@ MainWindow::MainWindow(const QDir &home) :
 
     // Kick off
     rideTreeWidgetSelectionChanged();
+
+    // default to analysis
+    analWindow->selected();
 }
 
 void
 MainWindow::showDock()
 {
     dock->toggleViewAction()->activate(QAction::Trigger);
-}
-
-void
-MainWindow::tabViewTriggered(bool)
-{
-#ifndef Q_OS_MAC
-    // lets show/hide
-    if (sideView->isChecked()) toolBox->show();
-    else toolBox->hide();
-#endif
-
-    disconnect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
-    QWidget *currentWidget = tabWidget->currentWidget();
-    int currentIndex = tabWidget->currentIndex();
-    tabWidget->clear();
-    QStringList tabsToHide;
-    foreach (const TabInfo &tab, tabs) {
-        if (!tab.action || tab.action->isChecked())
-            tabWidget->addTab(tab.contents, tab.name);
-        else
-            tabsToHide << tab.name;
-    }
-    if (tabWidget->indexOf(currentWidget) >= 0)
-        tabWidget->setCurrentWidget(currentWidget);
-    else if (currentIndex < tabWidget->count())
-        tabWidget->setCurrentIndex(currentIndex);
-    tabChanged(tabWidget->currentIndex());
-    connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
-    appsettings->setValue(GC_TABS_TO_HIDE, tabsToHide.join(","));
 }
 
 void
@@ -780,7 +661,7 @@ MainWindow::dropEvent(QDropEvent *event)
 }
 
 void
-MainWindow::addRide(QString name, bool bSelect /*=true*/)
+MainWindow::addRide(QString name, bool /* bSelect =true*/)
 {
     QString notesFileName;
     QDateTime dt;
@@ -814,13 +695,6 @@ MainWindow::addRide(QString name, bool bSelect /*=true*/)
     }
     rideAdded(last); // here so emitted BEFORE rideSelected is emitted!
     allRides->insertChild(index, last);
-    calendar->update();
-    criticalPowerWindow->newRideAdded();
-    if (bSelect)
-    {
-        tabWidget->setCurrentWidget(summaryWindow);
-        treeWidget->setCurrentItem(last);
-    }
 }
 
 void
@@ -886,7 +760,6 @@ MainWindow::removeCurrentRide()
 
     treeWidget->setCurrentItem(itemToSelect);
     rideTreeWidgetSelectionChanged();
-    calendar->update();
 }
 
 void
@@ -1190,21 +1063,15 @@ MainWindow::rideTreeWidgetSelectionChanged()
     // update the ride property on all widgets
     // to let them know they need to replot new
     // selected ride
-    foreach (TabInfo tab, tabs) {
-        tab.contents->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
-    }
     _rideMetadata->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
-
+    analWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
     homeWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
 #ifdef GC_HAVE_ICAL
     diaryWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
 #endif
     trainWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
 
-    if (!ride)
-        return;
-
-    calendar->setSelectedDate(ride->dateTime.date());
+    if (!ride) return;
 
     // refresh interval list for bottom left
     // first lets wipe away the existing intervals
@@ -1230,25 +1097,8 @@ MainWindow::rideTreeWidgetSelectionChanged()
             }
         }
     }
-
-	// turn off tabs that don't make sense for manual file entry
-    int histIndex = tabWidget->indexOf(histogramWindow);
-    int pfpvIndex = tabWidget->indexOf(pfPvWindow);
-    int plotIndex = tabWidget->indexOf(allPlotWindow);
-    int modelIndex = tabWidget->indexOf(modelWindow);
-    int mapIndex   = tabWidget->indexOf(googleMap);
-    int editorIndex   = tabWidget->indexOf(rideEdit);
-
-    bool enabled = (ride->ride() && ride->ride()->deviceType() != QString("Manual CSV") &&
-                     !ride->ride()->dataPoints().isEmpty());
-
-    if (histIndex >= 0) tabWidget->setTabEnabled(histIndex, enabled);
-    if (pfpvIndex >= 0) tabWidget->setTabEnabled(pfpvIndex, enabled);
-    if (plotIndex >= 0) tabWidget->setTabEnabled(plotIndex, enabled);
-    if (modelIndex >= 0) tabWidget->setTabEnabled(modelIndex, enabled);
-    if (mapIndex >= 0) tabWidget->setTabEnabled(mapIndex, enabled);
-    if (editorIndex >= 0) tabWidget->setTabEnabled(editorIndex, enabled);
 }
+
 void
 MainWindow::showTreeContextMenuPopup(const QPoint &pos)
 {
@@ -1315,15 +1165,19 @@ MainWindow::showContextMenuPopup(const QPoint &pos)
         connect(actFrontInt, SIGNAL(triggered(void)), this, SLOT(frontInterval(void)));
         connect(actBackInt, SIGNAL(triggered(void)), this, SLOT(backInterval(void)));
 
+#if 0
         if (tabWidget->currentWidget() == allPlotWindow)
             menu.addAction(actZoomInt);
+#endif
         menu.addAction(actRenameInt);
         menu.addAction(actDeleteInt);
+#if 0
         if ((tabWidget->currentWidget() == pfPvWindow || tabWidget->currentWidget() == scatterWindow)
              && activeInterval->isSelected()) {
             menu.addAction(actFrontInt);
             menu.addAction(actBackInt);
         }
+#endif
         menu.exec(intervalWidget->mapToGlobal( pos ));
     }
 }
@@ -1381,7 +1235,7 @@ MainWindow::intervalEdited(QTreeWidgetItem *, int) {
 void
 MainWindow::zoomInterval() {
     // zoom into this interval on allPlot
-    allPlotWindow->zoomInterval(activeInterval);
+    //allPlotWindow->zoomInterval(activeInterval);
 }
 
 void
@@ -1495,6 +1349,7 @@ MainWindow::closeEvent(QCloseEvent* event)
     else {
 
         // save the state of all the pages
+        analWindow->saveState();
         homeWindow->saveState();
         trainWindow->saveState();
 
@@ -1503,23 +1358,6 @@ MainWindow::closeEvent(QCloseEvent* event)
     }
 }
 
-void
-MainWindow::leftLayoutMoved()
-{
-    appsettings->setValue(GC_SETTINGS_CALENDAR_SIZES, leftLayout->saveState());
-}
-
-void
-MainWindow::splitterMoved()
-{
-    appsettings->setValue(GC_SETTINGS_SPLITTER_SIZES, splitter->saveState());
-}
-
-void
-MainWindow::summarySplitterMoved()
-{
-    appsettings->setValue(GC_SETTINGS_SUMMARYSPLITTER_SIZES, metaSplitter->saveState());
-}
 // set the rider value of CP to the value derived from the CP model extraction
 void
 MainWindow::setCriticalPower(int cp)
@@ -1555,25 +1393,6 @@ MainWindow::setCriticalPower(int cp)
 			   arg(cp)
 			   );
   zonesChanged();
-}
-
-void
-MainWindow::tabChanged(int id)
-{
-    // id is the tab number and not the offset
-    // into the full list, so lets find the tab
-    // we just changed to and set the controls
-    // to the one selected
-    if (ride == NULL) return;
-
-    GcWindow *selected = static_cast<GcWindow*>(tabWidget->widget(id));
-    for(int i=0; i< tabs.count(); i++) {
-        if (tabs[i].contents == selected) {
-            analysisControls->setCurrentIndex(i);
-            tabs[i].contents->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
-            break;
-        }
-    }
 }
 
 void
@@ -1747,8 +1566,6 @@ MainWindow::notifyConfigChanged()
 void
 MainWindow::notifyRideSelected()
 {
-    //rideSelected();
-    if (calendar) calendar->configUpdate(); //XXX << nasty hack fix to refresh calendar when ride start changes
 }
 
 void
@@ -1862,6 +1679,7 @@ MainWindow::selectAnalysis()
 {
     masterControls->setCurrentIndex(0);
     views->setCurrentIndex(0);
+    analWindow->selected(); // tell it!
 }
 
 void

@@ -32,77 +32,99 @@
 #include "SpecialFields.h"
 #include <boost/shared_ptr.hpp>
 
-class AerolabWindow;
-class GoogleMapControl;
-class AllPlotWindow;
-class CriticalPowerWindow;
-class HistogramWindow;
-class PfPvWindow;
-class HrPwWindow;
-class QwtPlotPanner;
-class QwtPlotPicker;
-class QwtPlotZoomer;
-class LTMWindow;
 class MetricAggregator;
-class ModelWindow;
-class ScatterWindow;
-class RealtimeWindow;
-class RideFile;
-class RideMetadata;
-class WeeklySummaryWindow;
 class Zones;
 class HrZones;
-class RideCalendar;
-class PerformanceManagerWindow;
-class SummaryWindow;
-class ViewSelection;
-class TrainWindow;
-class RideEditor;
-class RideNavigator;
+class RideFile;
+class ErgFile;
+class RideMetadata;
 class WithingsDownload;
 class CalendarDownload;
 class DiaryWindow;
-class TreeMapWindow;
-class GcWindowTool;
-class HomeWindow;
 class ICalendar;
 class CalDAV;
+class HomeWindow;
+class GcWindowTool;
 class Seasons;
 class IntervalSummaryWindow;
-class ErgFile;
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
     G_OBJECT
 
-
     public:
-        MainWindow(const QDir &home);
-        void addRide(QString name, bool bSelect=true);
-        void removeCurrentRide();
-        const RideFile *currentRide();
-        const RideItem *currentRideItem() { return ride; }
-        const QTreeWidgetItem *allRideItems() { return allRides; }
-        const QTreeWidgetItem *allIntervalItems() { return allIntervals; }
-        QTreeWidget *intervalTreeWidget() { return intervalWidget; }
-        QTreeWidget *rideTreeWidget() { return treeWidget; }
-        QTreeWidgetItem *mutableIntervalItems() { return allIntervals; }
-	    void getBSFactors(double &timeBS, double &distanceBS,
-                          double &timeDP, double &distanceDP);
-        QDir home;
-        void setCriticalPower(int cp);
 
+        MainWindow(const QDir &home);
+
+        // *********************************************
+        // ATHLETE INFO
+        // *********************************************
+
+        // general data
+        QString cyclist; // the cyclist name
+        bool useMetricUnits;  // metric/imperial prefs
+        QDir home;
         const Zones *zones() const { return zones_; }
         const HrZones *hrZones() const { return hrzones_; }
+        void setCriticalPower(int cp);
+        QSqlDatabase db;
+        MetricAggregator *metricDB;
+        Seasons *seasons;
 
-        void updateRideFileIntervals();
+        // athlete's ride library
+        void addRide(QString name, bool bSelect=true);
+        void removeCurrentRide();
+        void getBSFactors(double &timeBS, double &distanceBS,
+                          double &timeDP, double &distanceDP);
+
+        // athlete's calendar
+        CalendarDownload *calendarDownload;
+#ifdef GC_HAVE_ICAL
+        ICalendar *rideCalendar;
+        CalDAV *davCalendar;
+#endif
+
+        // *********************************************
+        // ATHLETE RIDE LIBRARY
+        // *********************************************
+
+        // save a ride to disk
         void saveSilent(RideItem *);
         bool saveRideSingleDialog(RideItem *);
+
+        // currently selected ride item, files, metadata
+        void selectRideFile(QString);
+        QTreeWidget *rideTreeWidget() { return treeWidget; }
+        const QTreeWidgetItem *allRideItems() { return allRides; }
         RideItem *rideItem() const { return ride; }
+        const RideFile *currentRide();
+        const RideItem *currentRideItem() { return ride; }
+        void updateRideFileIntervals();
         RideMetadata *rideMetadata() { return _rideMetadata; }
 
-        // let the other widgets know when ride status changes
+        // ride intervals
+        const QTreeWidgetItem *allIntervalItems() { return allIntervals; }
+        QTreeWidget *intervalTreeWidget() { return intervalWidget; }
+        QTreeWidgetItem *mutableIntervalItems() { return allIntervals; }
+
+        // *********************************************
+        // MAINWINDOW STATE DATA
+        // *********************************************
+
+        // state data
+        SpecialFields specialFields;
+        int session;
+        bool isclean;
+
+
+        // *********************************************
+        // APPLICATION EVENTS
+        // *********************************************
+
+        // MainWindow signals are used to notify
+        // widgets of important events, these methods
+        // can be called to raise signals
         void notifyConfigChanged(); // used by ConfigDialog to notify MainWindow
                                     // when config has changed - and to get a
                                     // signal emitted to notify its children
@@ -110,30 +132,13 @@ class MainWindow : public QMainWindow
                                     // rideItem date/time changes
         void notifyRideClean() { rideClean(); }
         void notifyRideDirty() { rideDirty(); }
-        void selectView(int);
-        void selectRideFile(QString);
 
         // realtime signals
         void notifyTelemetryUpdate(RealtimeData rtData) { telemetryUpdate(rtData); }
         void notifyErgFileSelected(ErgFile *x) { ergFileSelected(x); }
         void notifySetNow(long now) { setNow(now); }
 
-        // db connections to cyclistdir/metricDB - one per active MainWindow
-        QSqlDatabase db;
-        MetricAggregator *metricDB;
-        SpecialFields specialFields;
-        Seasons *seasons;
 
-        int session;
-        bool isclean;
-        QString cyclist; // the cyclist name
-	    bool useMetricUnits;  // whether metric units are used (or imperial)
-
-        CalendarDownload *calendarDownload;
-#ifdef GC_HAVE_ICAL
-        ICalendar *rideCalendar;
-        CalDAV *davCalendar;
-#endif
 
     protected:
 
@@ -148,7 +153,6 @@ class MainWindow : public QMainWindow
 
     signals:
 
-        //void rideSelected();
         void intervalSelected();
         void intervalsChanged();
         void zonesChanged();
@@ -163,12 +167,8 @@ class MainWindow : public QMainWindow
         void setNow(long);
 
     private slots:
-        void tabViewTriggered(bool);
         void rideTreeWidgetSelectionChanged();
         void intervalTreeWidgetSelectionChanged();
-        void leftLayoutMoved();
-        void splitterMoved();
-        void summarySplitterMoved();
         void newCyclist();
         void openCyclist();
         void downloadRide();
@@ -195,7 +195,6 @@ class MainWindow : public QMainWindow
         void findPowerPeaks();
         void splitRide();
         void deleteRide();
-        void tabChanged(int index);
         void aboutDialog();
         void saveRide();                        // save current ride menu item
         void revertRide();
@@ -203,9 +202,9 @@ class MainWindow : public QMainWindow
         void showOptions();
         void showTools();
         void showWorkoutWizard();
-	void importRideToDB();
+        void importRideToDB();
         void scanForMissing();
-	void dateChanged(const QDate &);
+        void dateChanged(const QDate &);
         void showTreeContextMenuPopup(const QPoint &);
         void showContextMenuPopup(const QPoint &);
         void deleteInterval();
@@ -243,20 +242,12 @@ class MainWindow : public QMainWindow
         static QString notesFileName(QString rideFileName);
 
     private:
+        RideItem *ride;  // the currently selected ride
+
         QToolBox *toolBox;
         QToolBar *toolbar;
-	QDockWidget *dock;
+        QDockWidget *dock;
         QAction *homeAct, *diaryAct, *analysisAct, *measuresAct, *trainAct, *athleteAct, *helpAct, *configAct;
-
-	bool parseRideFileName(const QString &name, QString *notesFileName, QDateTime *dt);
-        struct TabInfo {
-            GcWindow *contents;
-            QString name;
-            QAction *action;
-            TabInfo(GcWindow *contents, QString name) :
-                contents(contents), name(name), action(NULL) {}
-        };
-        QList<TabInfo> tabs;
 
         boost::shared_ptr<QSettings> settings;
         IntervalItem *activeInterval; // currently active for context menu popup
@@ -274,57 +265,32 @@ class MainWindow : public QMainWindow
         QAction *sideView;
         QAction *toolView;
 
-        // Analysis
-        RideCalendar *calendar;
+        // Top-level views
+        HomeWindow *homeWindow;
+        DiaryWindow *diaryWindow;
+        HomeWindow *trainWindow;
+        HomeWindow *analWindow;
+
+        // sidebar
+        QTreeWidgetItem *allRides;
+        QTreeWidgetItem *allIntervals;
+        IntervalSummaryWindow *intervalSummaryWindow;
+        QSplitter *leftLayout;
+        RideMetadata *_rideMetadata;
+        GcWindowTool *chartTool;
+
+        QSplitter *summarySplitter;
         QSplitter *splitter;
         QSplitter *metaSplitter;
         QTreeWidget *treeWidget;
         QSplitter *intervalSplitter;
         QTreeWidget *intervalWidget;
-        IntervalSummaryWindow *intervalSummaryWindow;
-        QTabWidget *tabWidget;
-        SummaryWindow *summaryWindow;
-        DiaryWindow *diaryWindow;
-        HomeWindow *homeWindow;
-        HomeWindow *trainWindow;
-        AllPlotWindow *allPlotWindow;
-        HistogramWindow *histogramWindow;
-        WeeklySummaryWindow *weeklySummaryWindow;
-        LTMWindow *ltmWindow;
-        CriticalPowerWindow *criticalPowerWindow;
-        ModelWindow *modelWindow;
-        ScatterWindow *scatterWindow;
-        AerolabWindow *aerolabWindow;
-        GoogleMapControl *googleMap;
-        TreeMapWindow *treemapWindow;
-        RideEditor *rideEdit;
-        RideNavigator *rideNavigator;
-        QTreeWidgetItem *allRides;
-        QTreeWidgetItem *allIntervals;
-        QSplitter *leftLayout;
-        RideMetadata *_rideMetadata;
-        QSplitter *summarySplitter;
 
-        //QwtPlotCurve *weeklyBSCurve;
-        //QwtPlotCurve *weeklyRICurve;
-	PerformanceManagerWindow *performanceManagerWindow;
-
-
-        // pedal force/pedal velocity scatter plot widgets
-        PfPvWindow  *pfPvWindow;
-
-        HrPwWindow  *hrPwWindow;
-
-	RideItem *ride;  // the currently selected ride
-
-
-    QuarqdClient *client;
-
-    QSignalMapper *toolMapper;
-    WithingsDownload *withingsDownload;
-
-    GcWindowTool *chartTool;
-
+        // Miscellany
+        QuarqdClient *client;
+        QSignalMapper *toolMapper;
+        WithingsDownload *withingsDownload;
+        bool parseRideFileName(const QString &name, QString *notesFileName, QDateTime *dt);
 };
 
 #endif // _GC_MainWindow_h

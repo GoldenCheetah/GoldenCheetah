@@ -357,7 +357,8 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
 void
 AllPlotWindow::configChanged()
 {
-    fullPlot->setCanvasBackground(GColor(CPLOTTHUMBNAIL));
+    //We now use the window background color
+    //fullPlot->setCanvasBackground(GColor(CPLOTTHUMBNAIL));
 
     // we're going to replot, but only if we're active
     // and all the other guff
@@ -414,7 +415,8 @@ AllPlotWindow::redrawFullPlot()
 
     // hide the usual plot decorations etc
     fullPlot->showPower(1);
-    fullPlot->setCanvasBackground(GColor(CPLOTTHUMBNAIL));
+    //We now use the window background color
+    //fullPlot->setCanvasBackground(GColor(CPLOTTHUMBNAIL));
     fullPlot->setCanvasLineWidth(0);
     fullPlot->grid->enableY(false);
     fullPlot->enableAxis(QwtPlot::yLeft, false);

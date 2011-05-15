@@ -463,6 +463,12 @@ HomeWindow::removeChart(int num)
 }
 
 void
+HomeWindow::showEvent(QShowEvent *)
+{
+    resizeEvent(NULL);
+}
+
+void
 HomeWindow::resizeEvent(QResizeEvent * /* e */)
 {
     foreach (GcWindow *x, charts) {

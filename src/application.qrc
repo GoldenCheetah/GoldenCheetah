@@ -36,6 +36,7 @@
     <file>xml/metadata.xml</file>
     <file>xml/measures.xml</file>
     <file>xml/train-layout.xml</file>
+    <file>xml/analysis-layout.xml</file>
     <file>html/ltm-summary.html</file>
     <file>images/toolbar/close-icon.png</file>
     <file>images/toolbar/save.png</file>
