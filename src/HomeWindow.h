@@ -56,6 +56,7 @@ class HomeWindow : public GcWindow
         virtual void dragEnterEvent(QDragEnterEvent *);
         virtual void dropEvent(QDropEvent *);
         void resizeEvent(QResizeEvent *);
+        void showEvent(QShowEvent *);
         bool eventFilter(QObject *object, QEvent *e);
 
         // My widget signals and events

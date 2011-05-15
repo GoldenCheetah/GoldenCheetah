@@ -34,6 +34,10 @@
 
 #include <math.h>
 
+class QwtPlotPanner;
+class QwtPlotPicker;
+class QwtPlotZoomer;
+
 #include <qwt_plot_picker.h>
 #include <qwt_text_engine.h>
 

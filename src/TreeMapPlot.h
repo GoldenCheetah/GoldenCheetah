@@ -28,6 +28,8 @@
 
 #include "MainWindow.h"
 
+class TreeMapWindow;
+
 // for sorting
 class TreeMap;
 bool TreeMapLessThan(const TreeMap *, const TreeMap *);

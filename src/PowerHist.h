@@ -37,6 +37,7 @@ class MainWindow;
 class RideItem;
 class RideFilePoint;
 class RideFileCache;
+class HistogramWindow;
 class PowerHistBackground;
 class PowerHistZoneLabel;
 class HrHistBackground;

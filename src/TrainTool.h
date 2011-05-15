@@ -146,7 +146,6 @@ class TrainTool : public QWidget
 
         const QDir home;
         MainWindow *main;
-        ViewSelection *viewSelection;
 
         QTreeWidget *workoutTree;
         QTreeWidget *deviceTree;

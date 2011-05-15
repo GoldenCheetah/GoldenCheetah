@@ -39,6 +39,8 @@
 #include <qwt_plot_picker.h>
 #include <qwt_text_engine.h>
 
+class TreeMapPlot;
+
 class TreeMapWindow : public GcWindow
 {
     Q_OBJECT
