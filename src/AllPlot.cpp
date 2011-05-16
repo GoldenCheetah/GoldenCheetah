@@ -701,7 +701,21 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
 
         arrayLength = 0;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
-            timeArray[arrayLength]  = point->secs;
+
+            // we round the time to nearest 100th of a second
+            // before adding to the array, to avoid situation
+            // where 'high precision' time slice is an artefact
+            // of double precision or slight timing anomalies
+            // e.g. where realtime gives timestamps like
+            // 940.002 followed by 940.998 and were previouslt
+            // both rounded to 940s
+            //
+            // NOTE: this rounding mechanism is identical to that
+            //       used by the Ride Editor.
+            double secs = floor(point->secs);
+            double msecs = round((point->secs - secs) * 100) * 10;
+
+            timeArray[arrayLength]  = secs + msecs/1000;
             if (!wattsArray.empty())
                 wattsArray[arrayLength] = max(0, point->watts);
             if (!hrArray.empty())
