@@ -126,7 +126,7 @@ bool Zones::read(QFile &file)
     // ZoneRange *range = NULL;
     bool in_range = false;
     QDate begin = date_zero, end = date_infinity;
-    int cp;
+    int cp=0;
     QList<ZoneInfo> zoneInfos;
 
     // true if zone defaults are found in the file (then we need to write them)
