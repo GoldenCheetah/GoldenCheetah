@@ -186,7 +186,7 @@ void QxtScheduleItemDelegate::paintItemBody(QPainter *painter, const QRect rect 
  * \a const QxtStyleOptionScheduleViewItem & option
  * \a const QModelIndex &index the items model index
  */
-void QxtScheduleItemDelegate::paintItemHeader(QPainter *painter, const QRect rect , const QxtStyleOptionScheduleViewItem & option, const QModelIndex &index) const
+void QxtScheduleItemDelegate::paintItemHeader(QPainter * /*painter*/, const QRect /*rect*/ , const QxtStyleOptionScheduleViewItem & option, const QModelIndex &index) const
 {
     bool converted = false;
     int startUnixTime =  index.data(Qxt::ItemStartTimeRole).toInt(&converted);
@@ -225,7 +225,7 @@ void QxtScheduleItemDelegate::paintItemHeader(QPainter *painter, const QRect rec
  * \a const QxtStyleOptionScheduleViewItem & option
  * \a const QModelIndex &index the items model index
  */
-void QxtScheduleItemDelegate::paintSubItem(QPainter * /*painter*/, const QRect /*rect*/, const QxtStyleOptionScheduleViewItem & /*option*/, const QModelIndex & index) const
+void QxtScheduleItemDelegate::paintSubItem(QPainter * /*painter*/, const QRect /*rect*/, const QxtStyleOptionScheduleViewItem & /*option*/, const QModelIndex & /*index*/) const
 {
 }
 

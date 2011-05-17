@@ -685,9 +685,9 @@ int QxtScheduleView::cols() const
     if (!model())
         return 0;
 
-    int cols = 0;
-    int timeToShow = qxt_d().m_endUnixTime - qxt_d().m_startUnixTime + 1 ;
-    int timePerCol = timePerColumn();
+    //int cols = 0;
+    //int timeToShow = qxt_d().m_endUnixTime - qxt_d().m_startUnixTime + 1 ;
+    //int timePerCol = timePerColumn();
 
     //Q_ASSERT(timeToShow % timePerCol == 0);
     //cols = (timeToShow / timePerCol);
