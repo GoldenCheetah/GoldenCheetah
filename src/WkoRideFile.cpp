@@ -374,7 +374,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, WKO_ULONG version, RideFile *rideFile,
                         break;
                     case 'G' : /* two longs */
                         {
-                            signed long llat, llon;
+                            int32_t llat, llon;
                             char slat[20], slon[20];
 
                             // stored 2s complement
