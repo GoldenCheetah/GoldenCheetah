@@ -257,19 +257,7 @@ void GoogleMapControl::loadRide()
         createHtml();
         newRideToLoad = false;
         loadingPage = true;
-
-        QString htmlFile(QDir::tempPath());
-        htmlFile.append("/maps.html");
-        QFile file(htmlFile);
-        file.remove();
-        file.open(QIODevice::ReadWrite);
-        file.write(currentPage.str().c_str(),currentPage.str().length());
-        file.flush();
-        file.close();
-        QString filename("file:///");
-        filename.append(htmlFile);
-        QUrl url(filename);
-        view->load(url);
+        view->setHtml(currentPage.str().c_str());
     }
 }
 
