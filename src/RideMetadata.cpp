@@ -192,7 +192,6 @@ Form::arrange()
 FormField::FormField(FieldDefinition field, MainWindow *main) : definition(field), main(main), active(false)
 {
     QString units;
-    QString fieldName;
 
     if (sp.isMetric(field.name)) {
         field.type = FIELD_DOUBLE; // whatever they say, we want a double!
@@ -201,17 +200,9 @@ FormField::FormField(FieldDefinition field, MainWindow *main) : definition(field
         bool useMetricUnits = (unit.toString() == "Metric");
         units = sp.rideMetric(field.name)->units(useMetricUnits);
         if (units != "") units = QString(" (%1)").arg(units);
-#ifdef ENABLE_METRICS_TRANSLATION
-        QTextEdit processHTML(sp.rideMetric(field.name)->name());
-        fieldName = processHTML.toPlainText();
-    } else {
-        fieldName = field.name;
     }
-    label = new QLabel(QString("%1%2").arg(fieldName).arg(units), this);
-#else
-    }
+
     label = new QLabel(QString("%1%2").arg(field.name).arg(units), this);
-#endif
 
     switch(field.type) {
 

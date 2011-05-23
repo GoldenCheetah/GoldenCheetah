@@ -20,15 +20,9 @@
 #include "Units.h"
 #include <algorithm>
 
-#ifdef ENABLE_METRICS_TRANSLATION
-#include <QApplication>
-#define translate(c,s) QApplication::translate(c,s)
-#else
-#define translate(c,s) QObject::tr(s)
-#endif
+#define tr(s) QObject::tr(s)
 
 class WorkoutTime : public RideMetric {
-
     double seconds;
 
     public:
@@ -36,14 +30,11 @@ class WorkoutTime : public RideMetric {
     WorkoutTime() : seconds(0.0)
     {
         setSymbol("workout_time");
-#ifdef ENABLE_METRICS_TRANSLATION
+        setName(tr("Duration"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
     }
-    void initialize() {
-#endif
-        setName(translate("WorkoutTime", "Duration"));
-        setMetricUnits("seconds"); // Not translated, "seconds" converted to hours
-        setImperialUnits("seconds"); // Not translated, "seconds" converted to hours
-    }
+
     void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
                  const QHash<QString,RideMetric*> &) {
         seconds = ride->dataPoints().back()->secs -
@@ -66,13 +57,9 @@ class TimeRiding : public RideMetric {
     TimeRiding() : secsMovingOrPedaling(0.0)
     {
         setSymbol("time_riding");
-#ifdef ENABLE_METRICS_TRANSLATION
-    }
-    void initialize() {
-#endif
-        setName(translate("TimeRiding", "Time Riding"));
-        setMetricUnits("seconds"); // Not translated, "seconds" converted to hours
-        setImperialUnits("seconds"); // Not translated, "seconds" converted to hours
+        setName(tr("Time Riding"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
     }
     void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
                  const QHash<QString,RideMetric*> &) {
@@ -103,14 +90,10 @@ class TotalDistance : public RideMetric {
     TotalDistance() : km(0.0)
     {
         setSymbol("total_distance");
-#ifdef ENABLE_METRICS_TRANSLATION
-    }
-    void initialize() {
-#endif
-        setName(translate("TotalDistance", "Distance"));
+        setName(tr("Distance"));
         setType(RideMetric::Total);
-        setMetricUnits(translate("TotalDistance", "km"));
-        setImperialUnits(translate("TotalDistance", "miles"));
+        setMetricUnits(tr("km"));
+        setImperialUnits(tr("miles"));
         setPrecision(1);
         setConversion(MILES_PER_KM);
     }
@@ -142,14 +125,10 @@ class ElevationGain : public RideMetric {
     ElevationGain() : elegain(0.0), prevalt(0.0)
     {
         setSymbol("elevation_gain");
-#ifdef ENABLE_METRICS_TRANSLATION
-    }
-    void initialize() {
-#endif
-        setName(translate("ElevationGain", "Elevation Gain"));
+        setName(tr("Elevation Gain"));
         setType(RideMetric::Total);
-        setMetricUnits(translate("ElevationGain", "meters"));
-        setImperialUnits(translate("ElevationGain", "feet"));
+        setMetricUnits(tr("meters"));
+        setImperialUnits(tr("feet"));
         setConversion(FEET_PER_METER);
     }
     void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
@@ -187,13 +166,9 @@ class TotalWork : public RideMetric {
     TotalWork() : joules(0.0)
     {
         setSymbol("total_work");
-#ifdef ENABLE_METRICS_TRANSLATION
-    }
-    void initialize() {
-#endif
-        setName(translate("TotalWork", "Work"));
-        setMetricUnits(translate("TotalWork", "kJ"));
-        setImperialUnits(translate("TotalWork", "kJ"));
+        setName(tr("Work"));
+        setMetricUnits(tr("kJ"));
+        setImperialUnits(tr("kJ"));
     }
     void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
                  const QHash<QString,RideMetric*> &) {
@@ -220,17 +195,14 @@ class AvgSpeed : public RideMetric {
     AvgSpeed() : secsMoving(0.0), km(0.0)
     {
         setSymbol("average_speed");
-#ifdef ENABLE_METRICS_TRANSLATION
-    }
-    void initialize() {
-#endif
-        setName(translate("AvgSpeed", "Average Speed"));
-        setMetricUnits(translate("AvgSpeed", "kph"));
-        setImperialUnits(translate("AvgSpeed", "mph"));
+        setName(tr("Average Speed"));
+        setMetricUnits(tr("kph"));
+        setImperialUnits(tr("mph"));
         setType(RideMetric::Average);
         setPrecision(1);
         setConversion(MILES_PER_KM);
     }
+
     void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps) {
         assert(deps.contains("total_distance"));
@@ -265,13 +237,9 @@ struct AvgPower : public RideMetric {
     AvgPower()
     {
         setSymbol("average_power");
-#ifdef ENABLE_METRICS_TRANSLATION
-    }
-    void initialize() {
-#endif
-        setName(translate("AvgPower", "Average Power"));
-        setMetricUnits(translate("AvgPower", "watts"));
-        setImperialUnits(translate("AvgPower", "watts"));
+        setName(tr("Average Power"));
+        setMetricUnits(tr("watts"));
+        setImperialUnits(tr("watts"));
         setType(RideMetric::Average);
     }
     void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
@@ -301,13 +269,9 @@ struct AvgHeartRate : public RideMetric {
     AvgHeartRate()
     {
         setSymbol("average_hr");
-#ifdef ENABLE_METRICS_TRANSLATION
-    }
-    void initialize() {
-#endif
-        setName(translate("AvgHeartRate", "Average Heart Rate"));
-        setMetricUnits(translate("AvgHeartRate", "bpm"));
-        setImperialUnits(translate("AvgHeartRate", "bpm"));
+        setName(tr("Average Heart Rate"));
+        setMetricUnits(tr("bpm"));
+        setImperialUnits(tr("bpm"));
         setType(RideMetric::Average);
     }
     void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
@@ -337,13 +301,9 @@ struct AvgCadence : public RideMetric {
     AvgCadence()
     {
         setSymbol("average_cad");
-#ifdef ENABLE_METRICS_TRANSLATION
-    }
-    void initialize() {
-#endif
-        setName(translate("AvgCadence", "Average Cadence"));
-        setMetricUnits(translate("AvgCadence", "rpm"));
-        setImperialUnits(translate("AvgCadence", "rpm"));
+        setName(tr("Average Cadence"));
+        setMetricUnits(tr("rpm"));
+        setImperialUnits(tr("rpm"));
         setType(RideMetric::Average);
     }
     void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
@@ -372,13 +332,9 @@ class MaxPower : public RideMetric {
     MaxPower() : max(0.0)
     {
         setSymbol("max_power");
-#ifdef ENABLE_METRICS_TRANSLATION
-    }
-    void initialize() {
-#endif
-        setName(translate("MaxPower", "Max Power"));
-        setMetricUnits(translate("MaxPower", "watts"));
-        setImperialUnits(translate("MaxPower", "watts"));
+        setName(tr("Max Power"));
+        setMetricUnits(tr("watts"));
+        setImperialUnits(tr("watts"));
         setType(RideMetric::Peak);
     }
     void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
@@ -403,13 +359,9 @@ class MaxHr : public RideMetric {
     MaxHr() : max(0.0)
     {
         setSymbol("max_heartrate");
-#ifdef ENABLE_METRICS_TRANSLATION
-    }
-    void initialize() {
-#endif
-        setName(translate("MaxHr", "Max Heartrate"));
-        setMetricUnits(translate("MaxHr", "bpm"));
-        setImperialUnits(translate("MaxHr", "bpm"));
+        setName(tr("Max Heartrate"));
+        setMetricUnits(tr("bpm"));
+        setImperialUnits(tr("bpm"));
         setType(RideMetric::Peak);
     }
     void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
@@ -434,13 +386,9 @@ class NinetyFivePercentHeartRate : public RideMetric {
     NinetyFivePercentHeartRate() : hr(0.0)
     {
         setSymbol("ninety_five_percent_hr");
-#ifdef ENABLE_METRICS_TRANSLATION
-    }
-    void initialize() {
-#endif
-        setName(translate("NinetyFivePercentHeartRate", "95% Heartrate"));
-        setMetricUnits(translate("NinetyFivePercentHeartRate", "bpm"));
-        setImperialUnits(translate("NinetyFivePercentHeartRate", "bpm"));
+        setName(tr("95% Heartrate"));
+        setMetricUnits(tr("bpm"));
+        setImperialUnits(tr("bpm"));
         setType(RideMetric::Average);
     }
     void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,

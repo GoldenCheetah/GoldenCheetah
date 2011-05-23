@@ -47,14 +47,9 @@ SpecialFields::SpecialFields()
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i=0; i<factory.metricCount(); i++) {
         const RideMetric *add = factory.rideMetric(factory.metricName(i));
-#ifdef ENABLE_METRICS_TRANSLATION
-        names_ << factory.metricName(i);
-        metricmap.insert(factory.metricName(i), add);
-#else
         QTextEdit processHTML(add->name());
         names_ << processHTML.toPlainText();
         metricmap.insert(processHTML.toPlainText(), add);
-#endif
     }
 
     model_ = new QStringListModel;

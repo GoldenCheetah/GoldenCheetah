@@ -22,12 +22,7 @@
 #include "HrZones.h"
 #include <math.h>
 
-#ifdef ENABLE_METRICS_TRANSLATION
-#include <QApplication>
-#define translate(c,s) QApplication::translate(c,s)
-#else
-#define translate(c,s) QObject::tr(s)
-#endif
+#define tr(s) QObject::tr(s)
 
 class HrZoneTime : public RideMetric {
     int level;
@@ -45,10 +40,6 @@ public:
         setImperialUnits("seconds");
         setPrecision(0);
         setConversion(1.0);
-#ifdef ENABLE_METRICS_TRANSLATION
-    }
-    void initialize() {
-#endif
     }
     void setLevel(int level) { this->level=level-1; } // zones start from zero not 1
     void compute(const RideFile *ride, const Zones *, int, const HrZones *hrZone, int hrZoneRange,
@@ -78,11 +69,7 @@ public:
     {
         setLevel(1);
         setSymbol("time_in_zone_H1");
-#ifdef ENABLE_METRICS_TRANSLATION
-        }
-        void initialize () {
-#endif
-        setName(translate("HrZoneTime1", "H1 Time in Zone"));
+        setName(tr("H1 Time in Zone"));
     }
     RideMetric *clone() const { return new HrZoneTime1(*this); }
 };
@@ -94,11 +81,7 @@ public:
     {
         setLevel(2);
         setSymbol("time_in_zone_H2");
-#ifdef ENABLE_METRICS_TRANSLATION
-        }
-        void initialize () {
-#endif
-        setName(translate("HrZoneTime2", "H2 Time in Zone"));
+        setName(tr("H2 Time in Zone"));
     }
     RideMetric *clone() const { return new HrZoneTime2(*this); }
 };
@@ -110,11 +93,7 @@ public:
     {
         setLevel(3);
         setSymbol("time_in_zone_H3");
-#ifdef ENABLE_METRICS_TRANSLATION
-        }
-        void initialize () {
-#endif
-        setName(translate("HrZoneTime3", "H3 Time in Zone"));
+        setName(tr("H3 Time in Zone"));
     }
     RideMetric *clone() const { return new HrZoneTime3(*this); }
 };
@@ -126,11 +105,7 @@ public:
     {
         setLevel(4);
         setSymbol("time_in_zone_H4");
-#ifdef ENABLE_METRICS_TRANSLATION
-        }
-        void initialize () {
-#endif
-        setName(translate("HrZoneTime4", "H4 Time in Zone"));
+        setName(tr("H4 Time in Zone"));
     }
     RideMetric *clone() const { return new HrZoneTime4(*this); }
 };
@@ -142,11 +117,7 @@ public:
     {
         setLevel(5);
         setSymbol("time_in_zone_H5");
-#ifdef ENABLE_METRICS_TRANSLATION
-        }
-        void initialize () {
-#endif
-        setName(translate("HrZoneTime5", "H5 Time in Zone"));
+        setName(tr("H5 Time in Zone"));
     }
     RideMetric *clone() const { return new HrZoneTime5(*this); }
 };
@@ -158,11 +129,7 @@ public:
     {
         setLevel(6);
         setSymbol("time_in_zone_H6");
-#ifdef ENABLE_METRICS_TRANSLATION
-        }
-        void initialize () {
-#endif
-        setName(translate("HrZoneTime6", "H6 Time in Zone"));
+        setName(tr("H6 Time in Zone"));
     }
     RideMetric *clone() const { return new HrZoneTime6(*this); }
 };
@@ -174,11 +141,7 @@ public:
     {
         setLevel(7);
         setSymbol("time_in_zone_H7");
-#ifdef ENABLE_METRICS_TRANSLATION
-        }
-        void initialize () {
-#endif
-        setName(translate("HrZoneTime7", "H7 Time in Zone"));
+        setName(tr("H7 Time in Zone"));
     }
     RideMetric *clone() const { return new HrZoneTime7(*this); }
 };
@@ -190,11 +153,7 @@ public:
     {
         setLevel(8);
         setSymbol("time_in_zone_H8");
-#ifdef ENABLE_METRICS_TRANSLATION
-        }
-        void initialize () {
-#endif
-        setName(translate("HrZoneTime8", "H8 Time in Zone"));
+        setName(tr("H8 Time in Zone"));
     }
     RideMetric *clone() const { return new HrZoneTime8(*this); }
 };

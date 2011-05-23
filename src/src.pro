@@ -86,9 +86,6 @@ DEFINES += QXT_STATIC
 SOURCES += ../qxt/src/qxtspanslider.cpp
 HEADERS += ../qxt/src/qxtspanslider.h ../qxt/src/qxtspanslider_p.h
 
-# Enable Metrics Translation
-DEFINES += ENABLE_METRICS_TRANSLATION
-
 HEADERS += \
         Aerolab.h \
         AerolabWindow.h \
@@ -320,6 +317,5 @@ TRANSLATIONS = translations/gc_fr.ts \
                translations/gc_pt-br.ts \
                translations/gc_de.ts \
                translations/gc_cs.ts \
-               translations/gc_sp.ts \
                translations/gc_ru.ts
 

@@ -63,9 +63,9 @@ Aerolab::Aerolab(QWidget *parent):
   setCanvasBackground(Qt::white);
 
   setXTitle();
-  setAxisTitle(yLeft, tr("Elevation (m)"));
+  setAxisTitle(yLeft, "Elevation (m)");
   setAxisScale(yLeft, -300, 300);
-  setAxisTitle(xBottom, tr("Distance (km)"));
+  setAxisTitle(xBottom, "Distance (km)");
   setAxisScale(xBottom, 0, 60);
 
   veCurve = new QwtPlotCurve(tr("V-Elevation"));
@@ -264,7 +264,7 @@ void
 Aerolab::setYMax() {
 
   if (veCurve->isVisible()) {
-    setAxisTitle(yLeft, tr("Elevation"));
+    setAxisTitle(yLeft, "Elevation");
     if ( !altArray.empty() ) {
       setAxisScale(yLeft,
              min( veCurve->minYValue(), altCurve->minYValue() ) - 10,

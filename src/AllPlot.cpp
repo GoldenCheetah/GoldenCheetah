@@ -516,7 +516,7 @@ void
 AllPlot::setYMax()
 {
     if (wattsCurve->isVisible()) {
-        setAxisTitle(yLeft, tr("Watts"));
+        setAxisTitle(yLeft, "Watts");
         if (referencePlot == NULL)
             setAxisScale(yLeft, 0.0, 1.05 * wattsCurve->maxYValue());
         else
@@ -528,14 +528,14 @@ AllPlot::setYMax()
         double ymax = 0;
         QStringList labels;
         if (hrCurve->isVisible()) {
-            labels << tr("BPM");
+            labels << "BPM";
             if (referencePlot == NULL)
                 ymax = hrCurve->maxYValue();
             else
                 ymax = referencePlot->hrCurve->maxYValue();
         }
         if (cadCurve->isVisible()) {
-            labels << tr("RPM");
+            labels << "RPM";
             if (referencePlot == NULL)
                 ymax = qMax(ymax, cadCurve->maxYValue());
             else

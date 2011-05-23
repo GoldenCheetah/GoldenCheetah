@@ -20,12 +20,7 @@
 #include "Zones.h"
 #include <math.h>
 
-#ifdef ENABLE_METRICS_TRANSLATION
-#include <QApplication>
-#define translate(c,s) QApplication::translate(c,s)
-#else
-#define translate(c,s) QObject::tr(s)
-#endif
+#define tr(s) QObject::tr(s)
 
 const double  bikeScoreN   = 4.0;
 
@@ -47,14 +42,10 @@ class XPower : public RideMetric {
     XPower() : xpower(0.0), secs(0.0)
     {
         setSymbol("skiba_xpower");
-#ifdef ENABLE_METRICS_TRANSLATION
-    }
-    void initialize() {
-#endif
-        setName(translate("XPower", "xPower"));
+        setName(tr("xPower"));
         setType(RideMetric::Average);
-        setMetricUnits(translate("XPower", "watts"));
-        setImperialUnits(translate("XPower", "watts"));
+        setMetricUnits(tr("watts"));
+        setImperialUnits(tr("watts"));
     }
 
     void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
@@ -106,14 +97,10 @@ class VariabilityIndex : public RideMetric {
     VariabilityIndex() : vi(0.0), secs(0.0)
     {
         setSymbol("skiba_variability_index");
-#ifdef ENABLE_METRICS_TRANSLATION
-    }
-    void initialize() {
-#endif
-        setName(translate("VariabilityIndex", "Skiba VI"));
+        setName(tr("Skiba VI"));
         setType(RideMetric::Average);
-        setMetricUnits(translate("VariabilityIndex", ""));
-        setImperialUnits(translate("VariabilityIndex", ""));
+        setMetricUnits(tr(""));
+        setImperialUnits(tr(""));
         setPrecision(3);
     }
 
@@ -142,14 +129,10 @@ class RelativeIntensity : public RideMetric {
     RelativeIntensity() : reli(0.0), secs(0.0)
     {
         setSymbol("skiba_relative_intensity");
-#ifdef ENABLE_METRICS_TRANSLATION
-    }
-    void initialize() {
-#endif
-        setName(translate("RelativeIntensity", "Relative Intensity"));
+        setName(tr("Relative Intensity"));
         setType(RideMetric::Average);
-        setMetricUnits(translate("RelativeIntensity", ""));
-        setImperialUnits(translate("RelativeIntensity", ""));
+        setMetricUnits(tr(""));
+        setImperialUnits(tr(""));
         setPrecision(3);
     }
     void compute(const RideFile *, const Zones *zones, int zoneRange, const HrZones *, int,
@@ -188,14 +171,11 @@ class BikeScore : public RideMetric {
     BikeScore() : score(0.0)
     {
         setSymbol("skiba_bike_score");
-#ifdef ENABLE_METRICS_TRANSLATION
-    }
-    void initialize() {
-#endif
-        setName(translate("BikeScore", "BikeScore&#8482;"));
+        setName(tr("BikeScore&#8482;"));
         setMetricUnits("");
         setImperialUnits("");
     }
+
     void compute(const RideFile *, const Zones *zones, int zoneRange,const HrZones *, int,
 	    const QHash<QString,RideMetric*> &deps) {
 	    if (!zones || zoneRange < 0)

@@ -22,7 +22,6 @@
 #include "ChooseCyclistDialog.h"
 #include "MainWindow.h"
 #include "Settings.h"
-#include "RideMetric.h"
 
 // BLECK - homedir passing via global becuase ridefile is pure virtual and
 //         cannot pass with current definition -- Sean can advise!!
@@ -94,10 +93,6 @@ main(int argc, char *argv[])
     QTranslator gcTranslator;
     gcTranslator.load(":translations/gc_" + lang.toString() + ".qm");
     app.installTranslator(&gcTranslator);
- 
-#ifdef ENABLE_METRICS_TRANSLATION
-    RideMetricFactory::instance().initialize();
-#endif
 
     QVariant lastOpened = settings->value(GC_SETTINGS_LAST);
     QVariant unit = settings->value(GC_UNIT);

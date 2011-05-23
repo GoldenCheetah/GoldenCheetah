@@ -40,7 +40,6 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
     langCombo->addItem(tr("German"));
     langCombo->addItem(tr("Russian"));
     langCombo->addItem(tr("Czech"));
-    langCombo->addItem(tr("Spanish"));
 
     QVariant lang = settings->value(GC_LANG);
 
@@ -60,8 +59,6 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
         langCombo->setCurrentIndex(6);
     else if(lang.toString() == "cs")
         langCombo->setCurrentIndex(7);
-    else if(lang.toString() == "sp")
-        langCombo->setCurrentIndex(8);
     else // default : English
         langCombo->setCurrentIndex(0);
 
