@@ -80,6 +80,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         // http://thebikegeek.blogspot.com/2009/12/while-we-wait-for-better-and-better.html
         rtData.setWatts((0.0115*(mph*mph*mph)) - ((0.0137)*(mph*mph)) + ((8.9788)*(mph)));
         }
+        break;
     case 4 : // BT-ATS - BT Advanced Training System
         {
         //        v is expressed in revs/second
