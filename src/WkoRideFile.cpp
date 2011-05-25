@@ -1064,13 +1064,13 @@ unsigned int bitsize(char g, int WKO_device)
         case 0x04:
         case 0x05:
         case 0x06:
-        case 0x11:
         case 0x19:
         default:
             return 19;
             break;
         case 0x01:
         case 0x16: // Cycleops PT300
+        case 0x11:
         case 0x00:
         case 0x12: // Garmin Edge 205/305
         case 0x13:
