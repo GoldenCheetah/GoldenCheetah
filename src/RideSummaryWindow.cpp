@@ -44,6 +44,7 @@ RideSummaryWindow::RideSummaryWindow(MainWindow *mainWindow) :
     vlayout->setContentsMargins(10,10,10,10);
     rideSummary = new QTextEdit(this);
     rideSummary->setReadOnly(true);
+    rideSummary->setFrameStyle(QFrame::NoFrame);
     vlayout->addWidget(rideSummary);
 
     QFont font;

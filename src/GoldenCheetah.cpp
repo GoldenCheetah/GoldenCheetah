@@ -170,17 +170,18 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         // background light gray for now?
         QRect all(0,0,width(),height());
         //painter.drawTiledPixmap(all, aluLight);
-        painter.fillRect(all, defaultPalette.color(QPalette::Window));
+        //painter.fillRect(all, defaultPalette.color(QPalette::Window));
+        painter.fillRect(all, Qt::white);
 
         // fill in the title bar
         QRect bar(0,0,width(),contentsMargins().top());
         QColor bg;
         if (property("active").toBool() == true) {
             bg = GColor(CTILEBARSELECT);
-            painter.drawPixmap(bar, aluBarDark);
+            painter.drawPixmap(bar, aluBar);
         } else {
             bg = GColor(CTILEBAR);
-            painter.drawPixmap(bar, aluBar);
+            painter.drawPixmap(bar, aluBarDark);
         }
 
 
@@ -210,7 +211,8 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         QPainter painter(this);
         QRect all(0,0,width(),height());
         if (property("isManager").toBool() == true) {
-            painter.drawTiledPixmap(all, carbon);
+            //painter.drawTiledPixmap(all, carbon);
+            painter.fillRect(all, QColor("#A8A8A8"));
         } else {
             //painter.drawTiledPixmap(all, aluLight);
         }
