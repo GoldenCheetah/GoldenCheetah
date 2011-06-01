@@ -35,17 +35,16 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString windowtitle
     bigandbold.setPointSize(bigandbold.pointSize() + 2);
     bigandbold.setWeight(QFont::Bold);
 
+#if 0
     QHBoxLayout *titleBar = new QHBoxLayout;
     title = new QLabel(windowtitle, this);
     title->setFont(bigandbold);
-#if 0
     title->setStyleSheet("QLabel {"
                            "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
                            "stop: 0 #FFFFFF, stop: 0.4 #DDDDDD,"
                            "stop: 0.5 #D8D8D8, stop: 1.0 #CCCCCC);"
                            "color: #535353;"
                            "font-weight: bold; }");
-#endif
 
     QPalette mypalette;
     mypalette.setColor(title->foregroundRole(), Qt::white);
@@ -72,6 +71,7 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString windowtitle
 
     titleBar->addWidget(styleSelector);
     layout->addLayout(titleBar);
+#endif
 
     style = new QStackedWidget(this);
     layout->setSpacing(0);
@@ -123,10 +123,12 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString windowtitle
     winWidget->setMouseTracking(true); // to draw cursor
 
     currentStyle=2;
+#if 0
 #ifdef Q_OS_MAC
     styleSelector->setSelected(2);
 #else
     styleSelector->setCurrentIndex(2);
+#endif
 #endif
     style->setCurrentIndex(2); // tile area
 
@@ -134,10 +136,12 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString windowtitle
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(tabbed, SIGNAL(currentChanged(int)), this, SLOT(tabSelected(int)));
     connect(tabbed, SIGNAL(tabCloseRequested(int)), this, SLOT(removeChart(int)));
+#if 0
 #ifdef Q_OS_MAC
     connect(styleSelector, SIGNAL(clicked(int,bool)), SLOT(styleChanged(int)));
 #else
     connect(styleSelector, SIGNAL(currentIndexChanged(int)), SLOT(styleChanged(int)));
+#endif
 #endif
 
     // watch drop operations
