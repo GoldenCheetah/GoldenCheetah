@@ -69,6 +69,14 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
     //tableView->setFont(smaller);
     tableView->installEventFilter(this);
     tableView->setFrameStyle(QFrame::NoFrame);
+
+#if 0
+    tableView->header()->setStyleSheet( "::section { background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+                                        "stop: 0 #CFCFCF, stop: 1.0 #A8A8A8);"
+                                        "border: 2px; border-color: #A8A8A8; "
+                                        "color: #535353;"
+                                        "font-weight: bold; }");
+#endif
     tableView->show();
 
     // this maps friendly names to metric names

@@ -79,7 +79,8 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString windowtitle
     layout->addWidget(style);
 
     QPalette palette;
-    palette.setBrush(backgroundRole(), QBrush(QImage(":/images/carbon.jpg")));
+    //palette.setBrush(backgroundRole(), QBrush(QImage(":/images/carbon.jpg")));
+    palette.setBrush(backgroundRole(), QColor("#A8A8A8"));
 
     // each style has its own container widget
     tabbed = new QTabWidget(this);

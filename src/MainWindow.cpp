@@ -121,8 +121,8 @@ MainWindow::MainWindow(const QDir &home) :
     pal.setColor(QPalette::Button, GColor(CTOOLBAR));
     pal.setColor(QPalette::WindowText, Qt::white); //XXX should be black/white for CTOOLBAR
     statusBar()->setPalette(pal);
-#endif
     statusBar()->showMessage(tr("Ready"));
+#endif
 
     /*----------------------------------------------------------------------
      *  Athlete details
@@ -184,6 +184,7 @@ MainWindow::MainWindow(const QDir &home) :
 #ifndef Q_OS_MAC
     toolbar->setContentsMargins(0,0,0,0);
     toolbar->setAutoFillBackground(true);
+    toolbar->setStyleSheet("background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #CFCFCF, stop: 1.0 #A8A8A8);");
 #if 0
     toolbar->setPalette(pal);
 #endif
@@ -320,10 +321,6 @@ MainWindow::MainWindow(const QDir &home) :
     }
 
     splitter = new QSplitter;
-    splitter->setHandleWidth(2);
-    splitter->setFrameStyle(QFrame::NoFrame);
-    splitter->setStyleSheet("QSplitter::handle { color: black; }");
-    splitter->setContentsMargins(0, 0, 0, 0); // attempting to follow some UI guides
 
     // CHARTS
     chartTool = new GcWindowTool(this);
@@ -331,10 +328,15 @@ MainWindow::MainWindow(const QDir &home) :
     // TOOLBOX
     toolBox = new QToolBox(this);
     toolBox->setStyleSheet("QToolBox::tab {"
-                           "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-                           "stop: 0 #FFFFFF, stop: 0.5 #DDDDDD,"
-                           "stop: 0.6 #D8D8D8, stop: 1.0 #CCCCCC);"
+#if 0
+                           "background-image: url(:images/aluToolBar.png);"
+                           "background-position: top right;"
+                           "background-origin: content;"
+                           "background-repeat: repeat-x;"
+#endif
                            "max-height: 18px; "
+                           "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+                           "stop: 0 #CFCFCF, stop: 1.0 #A8A8A8);"
                            "color: #535353;"
                            "font-weight: bold; }");
 
@@ -442,8 +444,11 @@ MainWindow::MainWindow(const QDir &home) :
         sizes.append(390);
         splitter->setSizes(sizes);
     }
-    splitter->setHandleWidth(2); // gets munged by restore state from older versions
     splitter->setChildrenCollapsible(false); // QT BUG crash QTextLayout do not undo this
+    splitter->setHandleWidth(1);
+    splitter->setFrameStyle(QFrame::NoFrame);
+    splitter->setStyleSheet("QSplitter { border: 0px; background-color: #A8A8A8; }");
+    splitter->setContentsMargins(0, 0, 0, 0); // attempting to follow some UI guides
     setCentralWidget(splitter);
 
     /*----------------------------------------------------------------------
@@ -579,9 +584,11 @@ MainWindow::rideTreeWidgetSelectionChanged()
             ride = (RideItem*) which;
     }
 
+#if 0
     // update the status bar
     if (!ride) statusBar()->showMessage(tr("No ride selected"));
     else statusBar()->showMessage(ride->dateTime.toString("ddd MMM d, yyyy h:mm AP")); // same format as ride list
+#endif
 
     // update the ride property on all widgets
     // to let them know they need to replot new
