@@ -90,10 +90,11 @@ RideSummaryWindow::refresh()
     // XXX: activeTab is never equaly to RideSummaryWindow right now because
     // it's wrapped in the summarySplitter in MainWindow.
     if (!myRideItem) {
-	    rideSummary->clear();
+	    rideSummary->setHtml("");
         return;
     }
-    rideSummary->setHtml(htmlSummary());
+    QString text = htmlSummary(); //debug CRASH in QTextLayout destructor.
+    rideSummary->setHtml(text);
     rideSummary->setAlignment(Qt::AlignCenter);
 }
 

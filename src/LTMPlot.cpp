@@ -57,6 +57,8 @@ LTMPlot::LTMPlot(LTMPlotContainer *parent, MainWindow *main, QDir home) : bg(NUL
     setAxisMaxMinor(QwtPlot::xBottom,-1);
     setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(QDateTime::currentDateTime(), 0, LTM_DAY));
 
+    canvas()->setFrameStyle(QFrame::NoFrame);
+
     grid = new QwtPlotGrid();
     grid->enableX(false);
     grid->attach(this);
@@ -957,6 +959,10 @@ LTMPlot::chooseYAxis(QString units)
         else setAxisTitle(chosen, units);
         enableAxis(chosen, true);
         axes.insert(units, chosen);
+        QwtScaleDraw *sd = new QwtScaleDraw;
+        sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+        setAxisScaleDraw(chosen, sd);
+        setAxisMaxMinor(chosen, 0);
         return chosen;
     } else {
         // eek!

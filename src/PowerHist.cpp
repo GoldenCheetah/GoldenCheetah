@@ -77,6 +77,7 @@ PowerHist::PowerHist(MainWindow *mainWindow):
     hrbg->attach(this);
 
     setCanvasBackground(Qt::white);
+    canvas()->setFrameStyle(QFrame::NoFrame);
 
     setParameterAxisTitle();
     setAxisTitle(yLeft, absolutetime ? tr("Time (minutes)") : tr("Time (percent)"));
@@ -101,6 +102,9 @@ PowerHist::PowerHist(MainWindow *mainWindow):
     zoomer = new penTooltip(this->canvas());
     canvasPicker = new LTMCanvasPicker(this);
     connect(canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), this, SLOT(pointHover(QwtPlotCurve*, int)));
+
+    setAxisMaxMinor(xBottom, 0);
+    setAxisMaxMinor(yLeft, 0);
 
     configChanged();
 }
@@ -406,7 +410,9 @@ PowerHist::recalc(bool force)
         brush.setColor(bcol);
         //curve->setBrush(brush); //XXX weird artefact on first run only?
 
-        setAxisScaleDraw(QwtPlot::xBottom, new QwtScaleDraw);
+        QwtScaleDraw *sd = new QwtScaleDraw;
+        sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+        setAxisScaleDraw(QwtPlot::xBottom, sd);
 
         // HR typically starts at 80 or so, rather than zero
         // lets crop the chart so we can focus on the data
@@ -541,6 +547,10 @@ PowerHist::setYMax()
     if (MaxY < curveSelected->maxYValue()) MaxY = curveSelected->maxYValue();
     static const double tmin = 1.0/60;
     setAxisScale(yLeft, (lny ? tmin : 0.0), MaxY * 1.1);
+
+    QwtScaleDraw *sd = new QwtScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisScaleDraw(QwtPlot::yLeft, sd);
 }
 
 static void

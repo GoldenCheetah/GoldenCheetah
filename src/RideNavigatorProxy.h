@@ -62,6 +62,8 @@ private:
 
     RideNavigator *rideNavigator;
     int groupBy;
+    int calendarText;
+    ColorEngine *colorEngine;
 
     QList<QString> groups;
     QList<QModelIndex> groupIndexes;
@@ -87,14 +89,23 @@ private:
 
 public:
 
-    GroupByModel(RideNavigator *parent = NULL) : QAbstractProxyModel(parent), rideNavigator(parent), groupBy(-1) {
+    GroupByModel(RideNavigator *parent) : QAbstractProxyModel(parent), rideNavigator(parent), groupBy(-1) {
         setParent(parent);
+        colorEngine = new ColorEngine(parent->main);
     }
     ~GroupByModel() {}
 
     void setSourceModel(QAbstractItemModel *model) {
         QAbstractProxyModel::setSourceModel(model);
         setGroupBy(groupBy);
+
+        // find the Calendar TextColumn
+        calendarText = -1;
+        for(int i=0; i<model->columnCount(); i++) {
+            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "ZCalendar_Text") {
+                calendarText = i;
+            }
+        }
 
         connect(model, SIGNAL(modelReset()), this, SLOT(sourceModelChanged()));
         connect(model, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(sourceModelChanged()));
@@ -170,15 +181,50 @@ public:
 
     QVariant data(const QModelIndex &proxyIndex, int role = Qt::DisplayRole) const {
 
-        if (!proxyIndex.isValid()) return QVariant();
+        // this is never called ! (QT-BUG)
+        if (role == Qt::TextAlignmentRole) {
+            return QVariant(Qt::AlignLeft | Qt::AlignTop);
+        }
 
+        if (!proxyIndex.isValid()) return QVariant();
         QVariant returning;
 
         // if we are not at column 0 or we have a parent
         //if (proxyIndex.internalPointer() != NULL || proxyIndex.column() > 0) {
         if (proxyIndex.column() > 0) {
 
-            returning = sourceModel()->data(mapToSource(proxyIndex), role);
+            if (role == Qt::UserRole) {
+
+                QString string;
+
+                if (calendarText != -1 && proxyIndex.internalPointer()) {
+
+                    // hideous code, sorry
+                    int groupNo = ((QModelIndex*)proxyIndex.internalPointer())->row();
+                    if (groupNo < 0 || groupNo >= groups.count() || proxyIndex.column() == 0) returning="";
+                    else string = sourceModel()->data(sourceModel()->index(groupToSourceRow.value(groups[groupNo])->at(proxyIndex.row()), calendarText)).toString();
+
+                    // get rid of cr, lf and tab chars
+                    string.replace("\n", " ");
+                    string.replace("\t", " ");
+                    string.replace("\r", " ");
+
+                } else {
+
+                    string = "";
+                }
+
+                returning = string;
+
+
+            } else if (role == Qt::BackgroundRole) {
+
+                returning = colorEngine->colorFor(data(proxyIndex, Qt::UserRole).toString());
+
+            } else {
+
+                returning = sourceModel()->data(mapToSource(proxyIndex), role);
+            }
 
         } else if (proxyIndex.internalPointer() == NULL) {
 
@@ -262,6 +308,10 @@ public:
             return false;
 
         }
+    }
+
+    void sort(int, Qt::SortOrder) {
+        qDebug()<<"ASKED TO SORT!";
     }
 
     //
@@ -380,6 +430,25 @@ public slots:
             rideNavigator->tableView->setFirstColumnSpanned(i, QModelIndex(), true);
         // now show em
         rideNavigator->tableView->expandAll();
+    }
+};
+
+// SEE QT-BUG #14831 - when it is fixed this can be removed
+class BUGFIXQSortFilterProxyModel : public QSortFilterProxyModel
+{
+
+    public:
+
+    BUGFIXQSortFilterProxyModel(QWidget *p) : QSortFilterProxyModel(p) {}
+
+    bool lessThan(const QModelIndex &left, const QModelIndex &right) const {
+        QVariant l = (left.model() ? left.model()->data(left, sortRole()) : QVariant());
+        QVariant r = (right.model() ? right.model()->data(right, sortRole()) : QVariant());
+        switch (l.userType()) {
+            case QVariant::Invalid: return (r.type() == QVariant::Invalid);
+            default: return QSortFilterProxyModel::lessThan(left, right);
+        }
+        return false;
     }
 };
 #endif

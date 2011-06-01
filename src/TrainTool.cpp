@@ -52,7 +52,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : QWidget(parent), ho
     serverTree->setColumnCount(1);
     serverTree->setSelectionMode(QAbstractItemView::SingleSelection);
     serverTree->header()->hide();
-    serverTree->setAlternatingRowColors (true);
+    serverTree->setAlternatingRowColors (false);
     serverTree->setIndentation(5);
     allServers = new QTreeWidgetItem(serverTree, HEAD_TYPE);
     allServers->setText(0, tr("Race Servers"));
@@ -62,7 +62,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : QWidget(parent), ho
     deviceTree->setSelectionMode(QAbstractItemView::MultiSelection);
     deviceTree->setColumnCount(1);
     deviceTree->header()->hide();
-    deviceTree->setAlternatingRowColors (true);
+    deviceTree->setAlternatingRowColors (false);
     deviceTree->setIndentation(5);
     allDevices = new QTreeWidgetItem(deviceTree, HEAD_TYPE);
     allDevices->setText(0, tr("Devices"));
@@ -72,7 +72,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : QWidget(parent), ho
     workoutTree->setColumnCount(1);
     workoutTree->setSelectionMode(QAbstractItemView::SingleSelection);
     workoutTree->header()->hide();
-    workoutTree->setAlternatingRowColors (true);
+    workoutTree->setAlternatingRowColors (false);
     workoutTree->setIndentation(5);
 
     allWorkouts = new QTreeWidgetItem(workoutTree, HEAD_TYPE);

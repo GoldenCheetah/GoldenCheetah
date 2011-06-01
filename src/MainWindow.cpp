@@ -115,6 +115,15 @@ MainWindow::MainWindow(const QDir &home) :
     QVariant unit = appsettings->value(this, GC_UNIT);
     useMetricUnits = (unit.toString() == "Metric");
 
+#if 0
+    QPalette pal;
+    pal.setColor(QPalette::Window, GColor(CTOOLBAR));
+    pal.setColor(QPalette::Button, GColor(CTOOLBAR));
+    pal.setColor(QPalette::WindowText, Qt::white); //XXX should be black/white for CTOOLBAR
+    statusBar()->setPalette(pal);
+#endif
+    statusBar()->showMessage(tr("Ready"));
+
     /*----------------------------------------------------------------------
      *  Athlete details
      *--------------------------------------------------------------------*/
@@ -175,11 +184,9 @@ MainWindow::MainWindow(const QDir &home) :
 #ifndef Q_OS_MAC
     toolbar->setContentsMargins(0,0,0,0);
     toolbar->setAutoFillBackground(true);
-    QPalette pal;
-    //pal.setColor(QPalette::Button, QColor(60,59,55));
-    pal.setColor(QPalette::Window, GColor(CTOOLBAR));
-    pal.setColor(QPalette::Button, GColor(CTOOLBAR));
+#if 0
     toolbar->setPalette(pal);
+#endif
     toolbar->setMovable(false);
 #else
     QIcon tickIcon(":images/toolbar/main/tick.png");
@@ -253,6 +260,8 @@ MainWindow::MainWindow(const QDir &home) :
      *--------------------------------------------------------------------*/
 
     // RIDES
+
+    // OLD Ride List (retained for legacy)
     treeWidget = new QTreeWidget;
     treeWidget->setColumnCount(3);
     treeWidget->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -261,14 +270,17 @@ MainWindow::MainWindow(const QDir &home) :
     treeWidget->header()->resizeSection(1,100);
     treeWidget->header()->resizeSection(2,70);
     treeWidget->header()->hide();
-    treeWidget->setAlternatingRowColors (true);
+    treeWidget->setAlternatingRowColors (false);
     treeWidget->setIndentation(5);
-    treeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    treeWidget->hide();
 
     allRides = new QTreeWidgetItem(treeWidget, FOLDER_TYPE);
     allRides->setText(0, tr("All Rides"));
     treeWidget->expandItem(allRides);
     treeWidget->setFirstItemColumnSpanned (allRides, true);
+
+    // UI Ride List (configurable)
+    listView = new RideNavigator(this);
 
     // INTERVALS
     intervalSummaryWindow = new IntervalSummaryWindow(this);
@@ -277,20 +289,23 @@ MainWindow::MainWindow(const QDir &home) :
     intervalWidget->setIndentation(5);
     intervalWidget->setSortingEnabled(false);
     intervalWidget->header()->hide();
-    intervalWidget->setAlternatingRowColors (true);
+    intervalWidget->setAlternatingRowColors (false);
     intervalWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     intervalWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     intervalWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
     intervalWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    intervalWidget->setFrameStyle(QFrame::NoFrame);
 
     allIntervals = new QTreeWidgetItem(intervalWidget, FOLDER_TYPE);
     allIntervals->setText(0, tr("Intervals"));
     intervalWidget->expandItem(allIntervals);
 
     intervalSplitter = new QSplitter(this);
+    intervalSplitter->setHandleWidth(1);
     intervalSplitter->setOrientation(Qt::Vertical);
     intervalSplitter->addWidget(intervalWidget);
     intervalSplitter->addWidget(intervalSummaryWindow);
+    intervalSplitter->setFrameStyle(QFrame::NoFrame);
 
     QTreeWidgetItem *last = NULL;
     QStringListIterator i(RideFileFactory::instance().listRideFiles(home));
@@ -305,16 +320,30 @@ MainWindow::MainWindow(const QDir &home) :
     }
 
     splitter = new QSplitter;
+    splitter->setHandleWidth(2);
+    splitter->setFrameStyle(QFrame::NoFrame);
+    splitter->setStyleSheet("QSplitter::handle { color: black; }");
     splitter->setContentsMargins(0, 0, 0, 0); // attempting to follow some UI guides
 
     // CHARTS
     chartTool = new GcWindowTool(this);
 
-
     // TOOLBOX
     toolBox = new QToolBox(this);
-    toolBox->setStyleSheet(" QToolBox::tab:selected { font: bold; }");
-    toolBox->setFixedWidth(300);
+    toolBox->setStyleSheet("QToolBox::tab {"
+                           "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+                           "stop: 0 #FFFFFF, stop: 0.5 #DDDDDD,"
+                           "stop: 0.6 #D8D8D8, stop: 1.0 #CCCCCC);"
+                           "max-height: 18px; "
+                           "color: #535353;"
+                           "font-weight: bold; }");
+
+    toolBox->setFrameStyle(QFrame::NoFrame);
+    toolBox->setPalette(toolbar->palette());
+    toolBox->setContentsMargins(0,0,0,0);
+    toolBox->layout()->setSpacing(0);
+
+    //toolBox->setFixedWidth(350);
 
     // CONTAINERS FOR TOOLBOX
     masterControls = new QStackedWidget(this);
@@ -349,7 +378,7 @@ MainWindow::MainWindow(const QDir &home) :
     // DIARY WINDOW & CONTROLS
 #ifdef GC_HAVE_ICAL
     diaryWindow = new DiaryWindow(this);
-    diaryWindow->setControls(_rideMetadata);
+    diaryWindow->setControls(new QWidget(this));
     diaryControls->addWidget(diaryWindow->controls());
 #endif
 
@@ -361,7 +390,6 @@ MainWindow::MainWindow(const QDir &home) :
     analWindow = new HomeWindow(this, "analysis", "Analysis");
     analysisControls->addWidget(analWindow->controls());
 
-
     // DOCK DRAWER ON MAC
 #ifdef Q_OS_MAC // on a mac the controls go into a dock drawer widget
     // setup analysis window controls stack
@@ -372,11 +400,12 @@ MainWindow::MainWindow(const QDir &home) :
 #endif
 
     // POPULATE TOOLBOX
-    toolBox->addItem(treeWidget, "Rides");
-    toolBox->addItem(intervalSplitter, "Intervals");
-    toolBox->addItem(masterControls, "Controls");
-    toolBox->addItem(new AthleteTool(QFileInfo(home.path()).path(), this), "Athletes");
-    toolBox->addItem(chartTool, "Charts");
+    //toolBox->addItem(treeWidget, "Rides");
+    toolBox->addItem(listView, QIcon(":images/activity.png"), "Activity History");
+    toolBox->addItem(intervalSplitter, QIcon(":images/stopwatch.png"), "Best Intervals and Laps");
+    toolBox->addItem(masterControls, QIcon(":images/settings.png"), "Chart Settings");
+    toolBox->addItem(new AthleteTool(QFileInfo(home.path()).path(), this), QIcon(":images/toolbar/main/athlete.png"), "Athletes");
+    toolBox->addItem(chartTool, QIcon(":images/addchart.png"), "Charts");
 
 
     /*----------------------------------------------------------------------
@@ -385,6 +414,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     views = new QStackedWidget(this);
     views->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
+    views->setMinimumWidth(500);
 
     // add all the layouts
     views->addWidget(analWindow);
@@ -403,6 +433,17 @@ MainWindow::MainWindow(const QDir &home) :
    splitter->addWidget(toolBox);
 #endif
     splitter->addWidget(views);
+    QVariant splitterSizes = appsettings->value(this, GC_SETTINGS_SPLITTER_SIZES); 
+    if (splitterSizes != QVariant())
+        splitter->restoreState(splitterSizes.toByteArray());
+    else {
+        QList<int> sizes;
+        sizes.append(250);
+        sizes.append(390);
+        splitter->setSizes(sizes);
+    }
+    splitter->setHandleWidth(2); // gets munged by restore state from older versions
+    splitter->setChildrenCollapsible(false); // QT BUG crash QTextLayout do not undo this
     setCentralWidget(splitter);
 
     /*----------------------------------------------------------------------
@@ -499,24 +540,16 @@ MainWindow::MainWindow(const QDir &home) :
      * Lets go, choose latest ride and get GUI up and running
      *--------------------------------------------------------------------*/
 
-    QVariant isAscending = appsettings->value(this, GC_ALLRIDES_ASCENDING,Qt::Checked);
-    if(isAscending.toInt()>0){
-            if (last != NULL) treeWidget->setCurrentItem(last);
-    } else {
-        // selects the first ride in the list:
-        if (allRides->child(0) != NULL){
-            treeWidget->scrollToItem(allRides->child(0), QAbstractItemView::EnsureVisible);
-            treeWidget->setCurrentItem(allRides->child(0));
-        }
-    }
-
+    // selects the latest ride in the list:
+    if (allRides->childCount() != 0)
+        treeWidget->setCurrentItem(allRides->child(allRides->childCount()-1));
 
     // now we're up and runnning lets connect the signals
-    connect(treeWidget,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showTreeContextMenuPopup(const QPoint &)));
     connect(treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(rideTreeWidgetSelectionChanged()));
     connect(intervalWidget,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showContextMenuPopup(const QPoint &)));
     connect(intervalWidget,SIGNAL(itemSelectionChanged()), this, SLOT(intervalTreeWidgetSelectionChanged()));
     connect(intervalWidget,SIGNAL(itemChanged(QTreeWidgetItem *,int)), this, SLOT(intervalEdited(QTreeWidgetItem*, int)));
+    connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
 
     // Kick off
     rideTreeWidgetSelectionChanged();
@@ -546,7 +579,10 @@ MainWindow::rideTreeWidgetSelectionChanged()
             ride = (RideItem*) which;
     }
 
-    //rideSelected();
+    // update the status bar
+    if (!ride) statusBar()->showMessage(tr("No ride selected"));
+    else statusBar()->showMessage(ride->dateTime.toString("ddd MMM d, yyyy h:mm AP")); // same format as ride list
+
     // update the ride property on all widgets
     // to let them know they need to replot new
     // selected ride
@@ -589,13 +625,10 @@ MainWindow::rideTreeWidgetSelectionChanged()
 void
 MainWindow::showTreeContextMenuPopup(const QPoint &pos)
 {
-    QTreeWidgetItem *trItem = treeWidget->itemAt( pos );
-    if (trItem != NULL && trItem->text(0) != tr("All Rides")) {
+    RideItem *rideItem = (RideItem *)treeWidget->selectedItems().first();
+    if (rideItem != NULL && rideItem->text(0) != tr("All Rides")) {
         QMenu menu(treeWidget);
 
-        RideItem *rideItem = (RideItem *)treeWidget->selectedItems().first();
-
-        activeRide = (RideItem *)trItem;
 
         QAction *actSaveRide = new QAction(tr("Save Changes to Ride"), treeWidget);
         connect(actSaveRide, SIGNAL(triggered(void)), this, SLOT(saveRide()));
@@ -629,7 +662,7 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
         connect(actTweetRide, SIGNAL(triggered(void)), this, SLOT(tweetRide()));
         menu.addAction(actTweetRide);
 #endif
-        menu.exec(treeWidget->mapToGlobal( pos ));
+        menu.exec(listView->mapToGlobal( pos ));
     }
 }
 
@@ -663,6 +696,13 @@ void
 MainWindow::resizeEvent(QResizeEvent*)
 {
     appsettings->setValue(GC_SETTINGS_MAIN_GEOM, geometry());
+}
+
+void
+MainWindow::splitterMoved(int pos, int /*index*/)
+{
+    listView->setWidth(pos);
+    appsettings->setValue(GC_SETTINGS_SPLITTER_SIZES, splitter->saveState());
 }
 
 void
@@ -881,10 +921,8 @@ MainWindow::addRide(QString name, bool /* bSelect =true*/)
         fprintf(stderr, "bad name: %s\n", name.toAscii().constData());
         assert(false);
     }
-    RideItem *last = new RideItem(RIDE_TYPE, home.path(),
-                                  name, dt, zones(), hrZones(), notesFileName, this);
+    RideItem *last = new RideItem(RIDE_TYPE, home.path(), name, dt, zones(), hrZones(), notesFileName, this);
 
-    QVariant isAscending = appsettings->value(this, GC_ALLRIDES_ASCENDING,Qt::Checked); // default is ascending sort
     int index = 0;
     while (index < allRides->childCount()) {
         QTreeWidgetItem *item = allRides->child(index);
@@ -892,13 +930,7 @@ MainWindow::addRide(QString name, bool /* bSelect =true*/)
             continue;
         RideItem *other = static_cast<RideItem*>(item);
 
-        if(isAscending.toInt() > 0 ){
-            if (other->dateTime > dt)
-                break;
-        } else {
-            if (other->dateTime < dt)
-                break;
-        }
+        if (other->dateTime > dt) break;
         if (other->fileName == name) {
             delete allRides->takeChild(index);
             break;
@@ -1559,10 +1591,13 @@ MainWindow::notifyConfigChanged()
 
     // update the toolbar color if not Mac
 #ifndef Q_OS_MAC
+#if 0
     QPalette pal;
     pal.setColor(QPalette::Window, GColor(CTOOLBAR));
     pal.setColor(QPalette::Button, GColor(CTOOLBAR));
     toolbar->setPalette(pal);
+    statusBar()->setPalette(pal);
+#endif
 #endif
 
     // now tell everyone else

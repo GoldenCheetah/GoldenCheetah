@@ -49,7 +49,6 @@
 #define GC_BIO                      "bio"
 #define GC_AVATAR                   "avatar"
 #define GC_SETTINGS_LAST_IMPORT_PATH "mainwindow/lastImportPath"
-#define GC_ALLRIDES_ASCENDING       "allRidesAscending"
 #define GC_CRANKLENGTH              "crankLength"
 #define GC_BIKESCOREDAYS	    "bikeScoreDays"
 #define GC_BIKESCOREMODE	    "bikeScoreMode"
@@ -118,6 +117,8 @@
 #define GC_NAVHEADINGS    "navigator/headings"
 #define GC_NAVHEADINGWIDTHS "bavigator/headingwidths"
 #define GC_NAVGROUPBY       "navigator/groupby"
+#define GC_SORTBY           "navigator/sortby"
+#define GC_SORTBYORDER      "navigator/sortbyorder"
 
 //Twitter oauth keys
 #define GC_TWITTER_CONSUMER_KEY    "qbbmhDt8bG8ZBcT3r9nYw" //< consumer key

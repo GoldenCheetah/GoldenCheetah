@@ -146,12 +146,18 @@ GoogleMapControl::GoogleMapControl(MainWindow *mw) : GcWindow(mw), main(mw), ran
 {
     setInstanceName("Google Map");
     setControls(NULL);
+    setContentsMargins(0,0,0,0);
 
     parent = mw;
     view = new QWebView();
+    view->setContentsMargins(0,0,0,0);
+    view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     layout = new QVBoxLayout();
     layout->addWidget(view);
+    layout->setSpacing(0);
     setLayout(layout);
+
     //connect(parent, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(view, SIGNAL(loadStarted()), this, SLOT(loadStarted()));

@@ -58,11 +58,18 @@ CpintPlot::CpintPlot(MainWindow *main, QString p, const Zones *zones) :
     assert(!USE_T0_IN_CP_MODEL); // doesn't work with energyMode=true
 
     //insertLegend(new QwtLegend(), QwtPlot::BottomLegend); //XXX ugly in small, needs fixing
-    setAxisTitle(yLeft, tr("Average Power (watts)"));
     setAxisTitle(xBottom, tr("Interval Length"));
-    setAxisScaleDraw(xBottom, new LogTimeScaleDraw);
+    LogTimeScaleDraw *ld = new LogTimeScaleDraw;
+    ld->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisScaleDraw(xBottom, ld);
     setAxisScaleEngine(xBottom, new LogTimeScaleEngine);
     setAxisScale(xBottom, (double)0.017, (double)60);
+
+    QwtScaleDraw *sd = new QwtScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisScaleDraw(yLeft, sd);
+    setAxisTitle(yLeft, tr("Average Power (watts)"));
+    setAxisMaxMinor(yLeft, 0);
     plotLayout()->setAlignCanvasToScales(true);
 
     grid = new QwtPlotGrid();
@@ -74,6 +81,7 @@ CpintPlot::CpintPlot(MainWindow *main, QString p, const Zones *zones) :
                             Qt::LeftButton, Qt::ShiftModifier);
 
     canvasPicker = new LTMCanvasPicker(this);
+    canvas()->setFrameStyle(QFrame::NoFrame);
     connect(canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), this, SLOT(pointHover(QwtPlotCurve*, int)));
 
     configChanged(); // apply colors

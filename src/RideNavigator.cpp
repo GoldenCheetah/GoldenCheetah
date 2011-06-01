@@ -28,7 +28,7 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
 {
     // get column headings
     QList<QString> defaultColumns = appsettings->value(this, GC_NAVHEADINGS,
-        "File|Date|Keywords|Duration|Distance|Work").toString().split("|", QString::SkipEmptyParts);
+        "Duration|Distance|TSS|IF|Date").toString().split("|", QString::SkipEmptyParts);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(0);
@@ -36,36 +36,40 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
 
     sqlModel = new QSqlTableModel(this, main->metricDB->db()->connection());
     sqlModel->setTable("metrics");
-    sqlModel->setSort(2, Qt::AscendingOrder); // date backwards
+    //sqlModel->setSort(2, Qt::AscendingOrder); // date backwards
     sqlModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
-
-    // get all the data
     sqlModel->select();
-    while (sqlModel->canFetchMore(QModelIndex()))
-        sqlModel->fetchMore(QModelIndex());
+    while (sqlModel->canFetchMore(QModelIndex())) sqlModel->fetchMore(QModelIndex());
 
     groupByModel = new GroupByModel(this);
     groupByModel->setSourceModel(sqlModel);
 
-    sortModel = new QSortFilterProxyModel(this);
+    sortModel = new BUGFIXQSortFilterProxyModel(this);
     sortModel->setSourceModel(groupByModel);
     sortModel->setDynamicSortFilter(true);
+    //sortModel->setSort(2, Qt::AscendingOrder); // date backwards
 
     tableView = new QTreeView;
-    tableView->setItemDelegate(new NavigatorCellDelegate(this));
+    delegate = new NavigatorCellDelegate(this);
+    tableView->setItemDelegate(delegate);
     tableView->setModel(sortModel);
     tableView->setSortingEnabled(true);
-    tableView->sortByColumn(2);
-    tableView->setAlternatingRowColors(true);
+    tableView->setAlternatingRowColors(false);
     tableView->setEditTriggers(QAbstractItemView::NoEditTriggers); // read-only
     mainLayout->addWidget(tableView);
-
     tableView->expandAll();
-    tableView->show();
+    tableView->horizontalScrollBar()->setDisabled(true);
+    tableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+    tableView->header()->setStretchLastSection(false);
+    tableView->header()->setMinimumSectionSize(20);
+    //tableView->setUniformRowHeights(true);
     QFont smaller;
-    smaller.setPointSize(smaller.pointSize()-1);
+    smaller.setPointSize(smaller.pointSize()-2);
     //tableView->setFont(smaller);
     tableView->installEventFilter(this);
+    tableView->setFrameStyle(QFrame::NoFrame);
+    tableView->show();
 
     // this maps friendly names to metric names
     QMap <QString, QString> nameMap;
@@ -122,14 +126,19 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
     }
 
     // initialise to whatever groupBy we want to start with
-    groupBy = -1;
-    currentColumn = appsettings->value(this, GC_NAVGROUPBY, "-1").toInt();
-    setGroupBy();
+    tableView->sortByColumn(appsettings->value(this, GC_SORTBY, "2").toInt(),
+                              static_cast<Qt::SortOrder>(appsettings->value(this, GC_SORTBYORDER, static_cast<int>(Qt::AscendingOrder)).toInt()));
+    //tableView->setColumnHidden(0, true);
+    tableView->setColumnWidth(0,0);
 
     // set the column widths
     int columnnumber=0;
-    foreach(QString size, appsettings->value(this, GC_NAVHEADINGWIDTHS, "").toString().split("|", QString::SkipEmptyParts))
+    foreach(QString size, appsettings->value(this, GC_NAVHEADINGWIDTHS, "50|50|50|50|50").toString().split("|", QString::SkipEmptyParts))
         tableView->setColumnWidth(columnnumber++,size.toInt());
+
+    groupBy = -1;
+    currentColumn = appsettings->value(this, GC_NAVGROUPBY, "-1").toInt();
+    setGroupBy();
 
     // refresh when database is updated
     connect(main->metricDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
@@ -148,8 +157,12 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
     connect(tableView->header(), SIGNAL(sectionResized(int,int,int)), this, SLOT(columnsChanged()));
     // user sorted by column
     connect(tableView->header(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(selectRow()));
+    // context menu is provided by mainWindow
+    connect(tableView,SIGNAL(customContextMenuRequested(const QPoint &)), main, SLOT(showTreeContextMenuPopup(const QPoint &)));
+    connect(tableView->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)), this, SLOT(setSortBy(int,Qt::SortOrder)));
     // we accept drag and drop operations
     setAcceptDrops(true);
+    setWidth(999);
 
 }
 
@@ -166,6 +179,21 @@ RideNavigator::refresh()
     sqlModel->select();
     while (sqlModel->canFetchMore(QModelIndex()))
         sqlModel->fetchMore(QModelIndex());
+}
+
+void
+RideNavigator::setWidth(int x)
+{
+    // is it narrower than the headings?
+    int headwidth=0;
+    for (int i=0; i<tableView->header()->count(); i++)
+        if (tableView->header()->isSectionHidden(i) == false)
+            headwidth += tableView->header()->sectionSize(i);
+
+    if (headwidth < x)
+        delegate->setWidth(pwidth=headwidth);
+    else
+        delegate->setWidth(pwidth=x);
 }
 
 void
@@ -193,6 +221,7 @@ RideNavigator::columnsChanged()
         widths += QString("%1|").arg(tableView->columnWidth(i));
 
     appsettings->setValue(GC_NAVHEADINGWIDTHS, widths);
+    setWidth(main->getSplitter()->sizes()[0]); // calculate width...
 }
 
 bool
@@ -320,6 +349,17 @@ RideNavigator::setGroupBy()
 
     // save away
     appsettings->setValue(GC_NAVGROUPBY, groupBy);
+
+    // reselect current ride - since selectionmodel
+    // is changed by setGroupBy()
+    rideTreeSelectionChanged();
+}
+
+void
+RideNavigator::setSortBy(int index, Qt::SortOrder order)
+{
+    appsettings->setValue(GC_SORTBY, index);
+    appsettings->setValue(GC_SORTBYORDER, order);
 }
 
 //
@@ -558,7 +598,8 @@ RideNavigator::rideTreeSelectionChanged()
                     QItemSelection row(tableView->model()->index(j,0,group),
                                        tableView->model()->index(j,tableView->model()->columnCount()-1, group));
                     tableView->selectionModel()->select(row, QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
-                    tableView->selectionModel()->setCurrentIndex(tableView->model()->index(j,2,group), QItemSelectionModel::NoUpdate);
+                    //tableView->selectionModel()->setCurrentIndex(tableView->model()->index(j,0,group), QItemSelectionModel::NoUpdate);
+                    tableView->selectionModel()->setCurrentIndex(tableView->model()->index(j,0,group), QItemSelectionModel::NoUpdate);
                     tableView->scrollTo(tableView->model()->index(j,2,group), QAbstractItemView::PositionAtCenter);
                     active = false;
                     return;
@@ -586,11 +627,12 @@ RideNavigator::dropEvent(QDropEvent *event)
     // fugly, but it works for BikeScore with the (TM) in it...
     if (name == "BikeScore?") name = QTextEdit("BikeScore&#8482;").toPlainText();
     tableView->setColumnHidden(logicalHeadings.indexOf(name), false);
+    tableView->setColumnWidth(logicalHeadings.indexOf(name), 50);
     columnsChanged();
 }
 
 NavigatorCellDelegate::NavigatorCellDelegate(RideNavigator *rideNavigator, QObject *parent) :
-    QItemDelegate(parent), rideNavigator(rideNavigator)
+    QItemDelegate(parent), rideNavigator(rideNavigator), pwidth(300)
 {
 }
 
@@ -600,6 +642,21 @@ void NavigatorCellDelegate::commitAndCloseEditor() { }
 void NavigatorCellDelegate::setEditorData(QWidget *, const QModelIndex &) const { }
 void NavigatorCellDelegate::updateEditorGeometry(QWidget *, const QStyleOptionViewItem &, const QModelIndex &) const {}
 void NavigatorCellDelegate::setModelData(QWidget *, QAbstractItemModel *, const QModelIndex &) const { }
+
+QSize NavigatorCellDelegate::sizeHint(const QStyleOptionViewItem & /*option*/, const QModelIndex &index) const 
+{
+    QSize s;
+
+    if (rideNavigator->groupByModel->mapToSource(rideNavigator->sortModel->mapToSource(index)) != QModelIndex() &&
+        rideNavigator->groupByModel->data(rideNavigator->sortModel->mapToSource(index), Qt::UserRole).toString() != "") {
+        s.setHeight(64);
+    } else s.setHeight(18);
+#if 0
+    if (rideNavigator->tableView->model()->data(index, Qt::UserRole).toString() != "") s.setHeight(18);
+    else s.setHeight(36);
+#endif
+    return s;
+}
 
 // anomalies are underlined in red, otherwise straight paintjob
 void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
@@ -638,7 +695,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         value = index.model()->data(index, Qt::DisplayRole).toString();
         if (columnName == tr("Date")) {
             QDateTime dateTime = QDateTime::fromString(value, Qt::ISODate);
-            value = dateTime.toString("ddd MMM d, yyyy h:mm AP"); // same format as ride list
+            value = dateTime.toString("MMM d, yyyy"); // same format as ride list
         } else if (columnName == tr("Last updated")) {
             QDateTime dateTime;
             dateTime.setTime_t(index.model()->data(index, Qt::DisplayRole).toInt());
@@ -656,9 +713,71 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     }
 
     // normal render
-    myOption.displayAlignment = Qt::AlignLeft | Qt::AlignVCenter;
-    drawDisplay(painter, myOption, myOption.rect, value);
-    drawFocus(painter, myOption, myOption.rect);
+    QString calendarText = rideNavigator->tableView->model()->data(index, Qt::UserRole).toString();
+    QBrush background = rideNavigator->tableView->model()->data(index, Qt::BackgroundRole).value<QBrush>();
+
+    if (columnName != "*") {
+        myOption.displayAlignment = Qt::AlignLeft | Qt::AlignTop;
+        //myOption.rect.setHeight(18);
+        painter->fillRect(myOption.rect, background);
+        //drawFocus(painter, myOption, myOption.rect);
+        drawDisplay(painter, myOption, myOption.rect, ""); //added
+        //QPen rpen(Qt::DotLine);
+        QPen rpen;
+        rpen.setWidth(0.5);
+        rpen.setColor(Qt::lightGray);
+        painter->setPen(rpen);
+        painter->drawLine(0,myOption.rect.y(),rideNavigator->pwidth,myOption.rect.y());
+        //painter->drawLine(0,myOption.rect.y()+myOption.rect.height()-1,rideNavigator->pwidth,myOption.rect.y()+myOption.rect.height()-1);
+        painter->drawLine(0,myOption.rect.y()+myOption.rect.height(),rideNavigator->pwidth,myOption.rect.y()+myOption.rect.height());
+        //painter->drawLine(0,myOption.rect.y()+myOption.rect.height()-1,0,myOption.rect.y()+myOption.rect.height()-1);
+        painter->drawLine(0,myOption.rect.y()+myOption.rect.height(),0,myOption.rect.y()+myOption.rect.height());
+        //painter->drawLine(rideNavigator->pwidth,myOption.rect.y(),rideNavigator->pwidth, myOption.rect.y()+myOption.rect.height()-1);
+        painter->drawLine(rideNavigator->pwidth,myOption.rect.y(),rideNavigator->pwidth, myOption.rect.y()+myOption.rect.height());
+        myOption.rect.setHeight(18); //added
+        drawDisplay(painter, myOption, myOption.rect, value);
+
+        if (calendarText != "") {
+            myOption.rect.setX(0);
+            myOption.rect.setY(myOption.rect.y() + 23);//was +18
+            myOption.rect.setWidth(rideNavigator->pwidth);
+            myOption.rect.setHeight(36);
+            myOption.font.setPointSize(myOption.font.pointSize()-2);
+            //myOption.font.setStyle(QFont::StyleItalic);
+            painter->fillRect(myOption.rect, background);
+            //drawFocus(painter, myOption, myOption.rect);
+            drawDisplay(painter, myOption, myOption.rect, "");
+            myOption.rect.setX(50);
+            myOption.rect.setWidth(pwidth-100);
+            //drawDisplay(painter, myOption, myOption.rect, calendarText);
+            painter->setFont(myOption.font);
+            painter->drawText(myOption.rect, Qt::AlignLeft | Qt::TextWordWrap, calendarText);
+        }
+
+    } else {
+
+        if (value != "") {
+            QPen blueLine(Qt::darkBlue);
+            blueLine.setWidth(3);
+            painter->setPen(blueLine);
+            myOption.displayAlignment = Qt::AlignLeft | Qt::AlignBottom;
+            myOption.rect.setX(0);
+            myOption.rect.setHeight(18);
+            myOption.rect.setWidth(rideNavigator->pwidth);
+            painter->fillRect(myOption.rect, GColor(CRIDEGROUP));
+            painter->drawLine(0,myOption.rect.y()+myOption.rect.height()-1,rideNavigator->pwidth,myOption.rect.y()+myOption.rect.height()-1);
+            //drawFocus(painter, myOption, myOption.rect);
+            //myOption.font.setPointSize(10);
+            //myOption.font.setWeight(QFont::Bold);
+            //painter->drawText(myOption.rect, Qt::AlignLeft | Qt::AlignVCenter, value);
+        }
+        drawDisplay(painter, myOption, myOption.rect, value);
+    }
+
+
+#if 0
+    QStyledItemDelegate::paint(painter, option, index);
+#endif
 }
 
 ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)

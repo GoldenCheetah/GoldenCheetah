@@ -50,7 +50,6 @@ DiaryWindow::DiaryWindow(MainWindow *mainWindow) :
 
     // viewMode - monthly or weekly
     viewMode = new QComboBox;
-    viewMode->addItem("View List");
     viewMode->addItem("View Month");
     viewMode->addItem("View Week"); // we can add more later...
     viewMode->addItem("View Ride"); // we can add more later...
@@ -67,12 +66,9 @@ DiaryWindow::DiaryWindow(MainWindow *mainWindow) :
 
     vlayout->addLayout(controls);
 
-    // list view RideNavigator
-    listView = new RideNavigator(mainWindow);
-
     // monthly view via QCalendarWidget
     calendarModel = new GcCalendarModel(this, &fieldDefinitions, mainWindow);
-    calendarModel->setSourceModel(listView->sqlModel);
+    calendarModel->setSourceModel(mainWindow->listView->sqlModel);
 
     monthlyView = new QTableView(this);
     monthlyView->setItemDelegate(new GcCalendarDelegate);
@@ -81,18 +77,18 @@ DiaryWindow::DiaryWindow(MainWindow *mainWindow) :
     monthlyView->verticalHeader()->setResizeMode(QHeaderView::Stretch);
     monthlyView->viewport()->installEventFilter(this);
     monthlyView->setGridStyle(Qt::DotLine);
+    monthlyView->setFrameStyle(QFrame::NoFrame);
 
     // weekly view via QxtScheduleView
     weeklyView = new QxtScheduleView;
     weeklyViewProxy = new QxtScheduleViewProxy(this, &fieldDefinitions, mainWindow);
-    weeklyViewProxy->setSourceModel(listView->sqlModel);
+    weeklyViewProxy->setSourceModel(mainWindow->listView->sqlModel);
     weeklyView->setCurrentZoomDepth (30, Qxt::Minute);
     weeklyView->setDateRange(QDate(2010,9,2), QDate(2010,9,8));
     weeklyView->setModel(weeklyViewProxy);
 
     RideSummaryWindow *rideSummary = new RideSummaryWindow(mainWindow);
     allViews = new QStackedWidget(this);
-    allViews->addWidget(listView);
     allViews->addWidget(monthlyView);
     allViews->addWidget(weeklyView);
     allViews->addWidget(rideSummary);
@@ -152,24 +148,19 @@ DiaryWindow::rideSelected()
 
     // ok update title
     switch (viewMode->currentIndex()) {
-    case 0 : // list
-        title->setText("");
-        next->hide();
-        prev->hide();
-        break;
-    case 1 : // monthly
+    case 0 : // monthly
         title->setText(QString("%1 %2").arg(QDate::longMonthName(month)).arg(year));
         next->show();
         prev->show();
         break;
-    case 2 : // weekly
+    case 1 : // weekly
         title->setText(QString("Week %1 %2").arg(weekNumber).arg(year));
         next->show();
         prev->show();
         break;
 
     default:
-    case 3 : //ride
+    case 2 : //ride
         title->setText("");
         next->hide();
         prev->hide();
@@ -181,9 +172,7 @@ void
 DiaryWindow::prevClicked()
 {
     switch (viewMode->currentIndex()) {
-    case 0 : // list - should be hidded!
-        break;
-    case 1 : // monthly
+    case 0 : // monthly
         {
         int month = calendarModel->getMonth();
         int year = calendarModel->getYear();
@@ -192,7 +181,7 @@ DiaryWindow::prevClicked()
         title->setText(QString("%1 %2").arg(QDate::longMonthName(when.month())).arg(when.year()));
         }
         break;
-    case 2 : // weekly
+    case 1 : // weekly
         {
         QDateTime when = weeklyView->getStartTime();
         when = when.addDays(-7);
@@ -208,9 +197,7 @@ void
 DiaryWindow::nextClicked()
 {
     switch (viewMode->currentIndex()) {
-    case 0 : // list - should be hidded!
-        break;
-    case 1 : // monthly
+    case 0 : // monthly
         {
         int month = calendarModel->getMonth();
         int year = calendarModel->getYear();
@@ -219,7 +206,7 @@ DiaryWindow::nextClicked()
         title->setText(QString("%1 %2").arg(QDate::longMonthName(when.month())).arg(when.year()));
         }
         break;
-    case 2 : // weekly
+    case 1 : // weekly
         {
         QDateTime when = weeklyView->getStartTime();
         when = when.addDays(7);

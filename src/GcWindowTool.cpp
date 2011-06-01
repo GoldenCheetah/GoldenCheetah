@@ -34,9 +34,10 @@ GcWindowTool::GcWindowTool(QWidget *parent) : QWidget(parent)
     chartTree->setColumnCount(1);
     chartTree->setSelectionMode(QAbstractItemView::SingleSelection);
     chartTree->header()->hide();
-    chartTree->setAlternatingRowColors (true);
+    chartTree->setAlternatingRowColors (false);
     chartTree->setIndentation(5);
     chartTree->setDragDropMode(QAbstractItemView::DragOnly);
+    chartTree->setFrameStyle(QFrame::NoFrame);
     allCharts = new QTreeWidgetItem(chartTree, ROOT_TYPE);
     allCharts->setText(0, tr("Chart"));
 

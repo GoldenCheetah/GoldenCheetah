@@ -47,6 +47,7 @@ class HomeWindow;
 class GcWindowTool;
 class Seasons;
 class IntervalSummaryWindow;
+class RideNavigator;
 
 class MainWindow : public QMainWindow
 {
@@ -69,6 +70,7 @@ class MainWindow : public QMainWindow
         const HrZones *hrZones() const { return hrzones_; }
         void setCriticalPower(int cp);
         QSqlDatabase db;
+        RideNavigator *listView;
         MetricAggregator *metricDB;
         Seasons *seasons;
 
@@ -116,6 +118,7 @@ class MainWindow : public QMainWindow
         SpecialFields specialFields;
         int session;
         bool isclean;
+        QSplitter *getSplitter() { return splitter; }
 
 
         // *********************************************
@@ -169,6 +172,7 @@ class MainWindow : public QMainWindow
     private slots:
         void rideTreeWidgetSelectionChanged();
         void intervalTreeWidgetSelectionChanged();
+        void splitterMoved(int, int);
         void newCyclist();
         void openCyclist();
         void downloadRide();

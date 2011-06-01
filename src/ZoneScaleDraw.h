@@ -30,6 +30,7 @@ class ZoneScaleDraw: public QwtScaleDraw
     public:
         ZoneScaleDraw(const Zones *zones, int range=-1) : zones(zones) {
             setRange(range);
+            setTickLength(QwtScaleDiv::MajorTick, 3);
         }
 
         // modify later if neccessary
@@ -79,6 +80,7 @@ class HrZoneScaleDraw: public QwtScaleDraw
     public:
         HrZoneScaleDraw(const HrZones *zones, int range=-1) : zones(zones) {
             setRange(range);
+            setTickLength(QwtScaleDiv::MajorTick, 3);
         }
 
         // modify later if neccessary

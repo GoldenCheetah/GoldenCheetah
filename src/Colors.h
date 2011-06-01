@@ -49,6 +49,27 @@ class GCColor : public QObject
         void readConfig();
 };
 
+// return a color for a ride file
+class ColorEngine : public QObject
+{
+    Q_OBJECT
+    G_OBJECT
+
+    public:
+        ColorEngine(MainWindow*);
+
+        QColor colorFor(QString);
+
+    public slots:
+        void configUpdate();
+
+    private:
+        QMap<QString, QColor> workoutCodes;
+        QColor defaultColor;
+        MainWindow *mainWindow;
+};
+
+
 // shorthand
 #define GColor(x) GCColor::getColor(x)
 
@@ -108,5 +129,6 @@ class GCColor : public QObject
 #define CTILEBAR              53
 #define CTILEBARSELECT        54
 #define CTOOLBAR              55
+#define CRIDEGROUP            56
 
 #endif

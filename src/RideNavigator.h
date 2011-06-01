@@ -26,6 +26,7 @@
 #include "DBAccess.h"
 #include "MainWindow.h"
 #include "Settings.h"
+#include "Colors.h"
 
 #include <QSqlTableModel>
 #include <QTableView>
@@ -33,6 +34,7 @@
 class NavigatorCellDelegate;
 class GroupByModel;
 class DiaryWindow;
+class BUGFIXQSortFilterProxyModel;
 
 //
 // The RideNavigator
@@ -86,10 +88,14 @@ class RideNavigator : public QWidget
         void dragEnterEvent(QDragEnterEvent *event);
         void dropEvent(QDropEvent *event);
 
+        // how wide am I?
+        void setWidth(int x);
+        void setSortBy(int index, Qt::SortOrder);
+
     protected:
         QSqlTableModel *sqlModel; // the sql table
         GroupByModel *groupByModel; // for group by
-        QSortFilterProxyModel *sortModel; // for sort/filter
+        BUGFIXQSortFilterProxyModel *sortModel; // for sort/filter
 
         // keep track of the headers
         QList<QString> logicalHeadings;
@@ -102,6 +108,8 @@ class RideNavigator : public QWidget
         bool active;
         int groupBy;
         int currentColumn;
+        int pwidth;
+        NavigatorCellDelegate *delegate;
 };
 
 //
@@ -122,11 +130,16 @@ public:
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
     void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
+    // We increase the row height if there is a calendar text to display
+    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const ;
+
     // override stanard painter to use color config to paint background
     // and perform correct level of rounding for each column before displaying
     // it will also override the values returned from metricDB with in-core values
     // when the ride has been modified but not saved (i.e. data is dirty)
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+
+    void setWidth(int x) { pwidth=x; }
 
 private slots:
 
@@ -134,6 +147,7 @@ private slots:
 
 private:
     RideNavigator *rideNavigator;
+    int pwidth;
 
 };
 

@@ -30,8 +30,10 @@
 #include <assert.h>
 #include <qwt_data.h>
 #include <qwt_legend.h>
+#include <qwt_plot_canvas.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
+#include <qwt_scale_draw.h>
 #include <qwt_symbol.h>
 #include <set>
 
@@ -138,11 +140,20 @@ PfPvPlot::PfPvPlot(MainWindow *mainWindow)
     setInstanceName("PfPv Plot");
 
     setCanvasBackground(Qt::white);
+    canvas()->setFrameStyle(QFrame::NoFrame);
 
     setAxisTitle(yLeft, "Average Effective Pedal Force (N)");
     setAxisScale(yLeft, 0, 600);
     setAxisTitle(xBottom, "Circumferential Pedal Velocity (m/s)");
     setAxisScale(xBottom, 0, 3);
+    setAxisMaxMinor(yLeft, 0);
+    setAxisMaxMinor(xBottom, 0);
+    QwtScaleDraw *sd = new QwtScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisScaleDraw(xBottom, sd);
+    sd = new QwtScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisScaleDraw(yLeft, sd);
 
     mX = new QwtPlotMarker();
     mX->setLineStyle(QwtPlotMarker::VLine);

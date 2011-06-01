@@ -38,6 +38,15 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString windowtitle
     QHBoxLayout *titleBar = new QHBoxLayout;
     title = new QLabel(windowtitle, this);
     title->setFont(bigandbold);
+#if 0
+    title->setStyleSheet("QLabel {"
+                           "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+                           "stop: 0 #FFFFFF, stop: 0.4 #DDDDDD,"
+                           "stop: 0.5 #D8D8D8, stop: 1.0 #CCCCCC);"
+                           "color: #535353;"
+                           "font-weight: bold; }");
+#endif
+
     QPalette mypalette;
     mypalette.setColor(title->foregroundRole(), Qt::white);
     title->setPalette(mypalette);

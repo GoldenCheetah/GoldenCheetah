@@ -226,6 +226,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
 
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+    canvas()->setFrameStyle(QFrame::NoFrame);
 
     setXTitle();
 
@@ -259,6 +260,11 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
 
     // get rid of nasty blank space on right of the plot
     plotLayout()->setAlignCanvasToScales(true);
+    setAxisMaxMinor(xBottom, 0);
+    setAxisMaxMinor(yLeft, 0);
+    setAxisMaxMinor(yLeft2, 0);
+    setAxisMaxMinor(yRight, 0);
+    setAxisMaxMinor(yRight2, 0);
 
     configChanged(); // set colors
 }
@@ -307,6 +313,23 @@ AllPlot::configChanged()
     QPen gridPen(GColor(CPLOTGRID));
     gridPen.setStyle(Qt::DotLine);
     grid->setPen(gridPen);
+
+    // tick draw
+    QwtScaleDraw *sd = new QwtScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisScaleDraw(QwtPlot::xBottom, sd);
+    sd = new QwtScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisScaleDraw(QwtPlot::yLeft, sd);
+    sd = new QwtScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisScaleDraw(QwtPlot::yLeft2, sd);
+    sd = new QwtScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisScaleDraw(QwtPlot::yRight, sd);
+    sd = new QwtScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisScaleDraw(QwtPlot::yRight2, sd);
 }
 
 struct DataPoint {
@@ -529,8 +552,10 @@ AllPlot::setYMax()
         QwtValueList xytick[QwtScaleDiv::NTickTypes];
         for (int i=0;i<maxY;i+=100)
             xytick[QwtScaleDiv::MajorTick]<<i;
+#if 0
         for (int i=0;i<maxY;i+=25)
             xytick[QwtScaleDiv::MinorTick]<<i;
+#endif
 
         setAxisTitle(yLeft, "Watts");
         //setAxisScale(yLeft, 0.0, maxY);
@@ -669,10 +694,6 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     altCurve->setSymbol(sym);
 
     setYMax();
-    setAxisMaxMajor(yLeft, 5);
-    setAxisMaxMajor(yLeft2, 5);
-    setAxisMaxMajor(yRight, 5);
-    setAxisMaxMajor(yRight2, 5);
 
     setAxisScale(xBottom, xaxis[0], xaxis[stopidx-startidx-1]);
 
