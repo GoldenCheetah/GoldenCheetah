@@ -1320,6 +1320,11 @@ AllPlotWindow::setupStackPlots()
 
         // No x axis titles
         _allPlot->setAxisTitle(QwtPlot::xBottom,NULL);
+        _allPlot->setAxisMaxMinor(QwtPlot::xBottom, 0);
+        _allPlot->setAxisMaxMinor(QwtPlot::yLeft, 0);
+        _allPlot->setAxisMaxMinor(QwtPlot::yLeft2, 0);
+        _allPlot->setAxisMaxMinor(QwtPlot::yRight, 0);
+        _allPlot->setAxisMaxMinor(QwtPlot::yRight2, 0);
 #if 0
         // Smaller y axis Titles
         QFont axisFont = QFont("Helvetica",10, QFont::Normal);

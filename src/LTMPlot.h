@@ -108,6 +108,7 @@ class LTMScaleDraw: public QwtScaleDraw
     public:
     LTMScaleDraw(const QDateTime &base, int startGroup, int groupBy) :
         baseTime(base), groupBy(groupBy), startGroup(startGroup) {
+        setTickLength(QwtScaleDiv::MajorTick, 3);
     }
 
     // used by LTMPopup

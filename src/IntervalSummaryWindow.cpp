@@ -25,6 +25,7 @@
 IntervalSummaryWindow::IntervalSummaryWindow(MainWindow *mainWindow) : mainWindow(mainWindow) {
 	setWindowTitle(tr("Interval Summary"));
 	setReadOnly(true);
+    setFrameStyle(QFrame::NoFrame);
 
     connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
 }

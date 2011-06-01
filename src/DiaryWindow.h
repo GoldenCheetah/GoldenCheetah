@@ -75,7 +75,6 @@ class DiaryWindow : public GcWindow
 
         QComboBox *viewMode;
         QStackedWidget *allViews;
-        RideNavigator *listView;
 
         QTableView *monthlyView;
         GcCalendarModel *calendarModel;

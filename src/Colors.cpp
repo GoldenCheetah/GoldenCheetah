@@ -18,11 +18,12 @@
 
 #include "Colors.h"
 #include "MainWindow.h"
+#include "RideMetadata.h"
 #include <QObject>
 #include <QDir>
 #include "Settings.h"
 
-static Colors ColorList[57] = {
+static Colors ColorList[58] = {
     { "Plot Background", "COLORPLOTBACKGROUND", Qt::white },
     { "Ride Plot Background", "COLORRIDEPLOTBACKGROUND", Qt::black },
     { "Plot Thumbnail Background", "COLORPLOTTHUMBNAIL", Qt::gray },
@@ -79,6 +80,7 @@ static Colors ColorList[57] = {
     { "Chart Bar Unselected", "CTILEBAR", Qt::gray },
     { "Chart Bar Selected", "CTILEBARSELECT", Qt::yellow },
     { "ToolBar Background", "CTOOLBAR", Qt::white },
+    { "Activity History Group", "CRIDEGROUP", QColor(236,246,255) },
     { "", "", QColor(0,0,0) },
 };
 
@@ -126,4 +128,43 @@ QColor
 GCColor::getColor(int colornum)
 {
     return ColorList[colornum].color;
+}
+
+ColorEngine::ColorEngine(MainWindow* main) : QObject(main), mainWindow(main), defaultColor(QColor(Qt::white))
+{
+    configUpdate();
+    connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configUpdate()));
+}
+
+void ColorEngine::configUpdate()
+{
+    // clear existing
+    workoutCodes.clear();
+
+    // setup the keyword/color combinations from config settings
+    foreach (KeywordDefinition keyword, mainWindow->rideMetadata()->getKeywords()) {
+        if (keyword.name == "Default")
+            defaultColor = keyword.color;
+        else {
+            workoutCodes[keyword.name] = keyword.color;
+
+            // alternative texts in notes
+            foreach (QString token, keyword.tokens) {
+                workoutCodes[token] = keyword.color;
+            }
+        }
+    }
+}
+
+QColor
+ColorEngine::colorFor(QString text)
+{
+    QColor color = defaultColor;
+
+    foreach(QString code, workoutCodes.keys()) {
+        if (text.contains(code, Qt::CaseInsensitive)) {
+           color = workoutCodes[code];
+        }
+    }
+    return color;
 }

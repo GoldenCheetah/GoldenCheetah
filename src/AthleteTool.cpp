@@ -34,8 +34,9 @@ AthleteTool::AthleteTool(QString path, QWidget *parent) : QWidget(parent)
     athleteTree->setColumnCount(1);
     athleteTree->setSelectionMode(QAbstractItemView::SingleSelection);
     athleteTree->header()->hide();
-    athleteTree->setAlternatingRowColors (true);
+    athleteTree->setAlternatingRowColors (false);
     athleteTree->setIndentation(5);
+    athleteTree->setFrameStyle(QFrame::NoFrame);
     athleteTree->setDragDropMode(QAbstractItemView::DragOnly);
     allAthletes = new QTreeWidgetItem(athleteTree, ROOT_TYPE);
     allAthletes->setText(0, tr("Athletes"));

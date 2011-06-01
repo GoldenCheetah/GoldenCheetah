@@ -119,14 +119,6 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
     if(crankLength.toString() == "185")
 	crankLengthCombo->setCurrentIndex(10);
 
-    allRidesAscending = new QCheckBox(tr("Sort ride list ascending."), this);
-    QVariant isAscending = appsettings->value(this, GC_ALLRIDES_ASCENDING,Qt::Checked); // default is ascending sort
-    if(isAscending.toInt() > 0 ){
-	allRidesAscending->setCheckState(Qt::Checked);
-    } else {
-	allRidesAscending->setCheckState(Qt::Unchecked);
-    }
-
     // garmin Smart Recording options
     QVariant garminHWMark = appsettings->value(this, GC_GARMIN_HWMARK);
     if (garminHWMark.isNull() || garminHWMark.toInt() == 0)
@@ -210,7 +202,6 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
 
     configLayout->addLayout(langLayout);
     configLayout->addLayout(unitLayout);
-    configLayout->addWidget(allRidesAscending);
     configLayout->addLayout(garminLayout);
     //SmartRecord);
     configLayout->addLayout(crankLengthLayout);
