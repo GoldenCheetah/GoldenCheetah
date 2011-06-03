@@ -184,7 +184,8 @@ MainWindow::MainWindow(const QDir &home) :
 #ifndef Q_OS_MAC
     toolbar->setContentsMargins(0,0,0,0);
     toolbar->setAutoFillBackground(true);
-    toolbar->setStyleSheet("background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #CFCFCF, stop: 1.0 #A8A8A8);");
+    toolbar->setStyleSheet("background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #CFCFCF, stop: 1.0 #A8A8A8);"
+                           "border: 0px;");
 #if 0
     toolbar->setPalette(pal);
 #endif
@@ -337,6 +338,7 @@ MainWindow::MainWindow(const QDir &home) :
                            "max-height: 18px; "
                            "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
                            "stop: 0 #CFCFCF, stop: 1.0 #A8A8A8);"
+                           "border: 1px solid rgba(255, 255, 255, 32);"
                            "color: #535353;"
                            "font-weight: bold; }");
 

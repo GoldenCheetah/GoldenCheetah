@@ -130,7 +130,7 @@ GCColor::getColor(int colornum)
     return ColorList[colornum].color;
 }
 
-ColorEngine::ColorEngine(MainWindow* main) : QObject(main), mainWindow(main), defaultColor(QColor(Qt::white))
+ColorEngine::ColorEngine(MainWindow* main) : QObject(main), defaultColor(QColor(Qt::white)), mainWindow(main)
 {
     configUpdate();
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configUpdate()));

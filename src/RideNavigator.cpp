@@ -765,15 +765,19 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     } else {
 
         if (value != "") {
+#if 0
             QPen blueLine(Qt::darkBlue);
             blueLine.setWidth(3);
             painter->setPen(blueLine);
+#endif
             myOption.displayAlignment = Qt::AlignLeft | Qt::AlignBottom;
             myOption.rect.setX(0);
             myOption.rect.setHeight(18);
             myOption.rect.setWidth(rideNavigator->pwidth);
             painter->fillRect(myOption.rect, GColor(CRIDEGROUP));
+#if 0
             painter->drawLine(0,myOption.rect.y()+myOption.rect.height()-1,rideNavigator->pwidth,myOption.rect.y()+myOption.rect.height()-1);
+#endif
             //drawFocus(painter, myOption, myOption.rect);
             //myOption.font.setPointSize(10);
             //myOption.font.setWeight(QFont::Bold);

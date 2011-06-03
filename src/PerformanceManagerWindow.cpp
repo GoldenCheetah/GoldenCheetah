@@ -145,8 +145,8 @@ void PerformanceManagerWindow::replot()
     const QTreeWidgetItem *allRides = mainWindow->allRideItems();
 
     int newdays, endIndex;
-    RideItem *firstRideItem;
-    RideItem *lastRideItem;
+    RideItem *firstRideItem = NULL;
+    RideItem *lastRideItem = NULL;
     QDateTime now;
 
 

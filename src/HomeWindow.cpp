@@ -20,7 +20,7 @@
 #include "HomeWindow.h"
 #include "LTMSettings.h"
 
-HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString windowtitle) :
+HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowtitle */) :
     GcWindow(mainWindow), mainWindow(mainWindow), name(name), active(false),
     clicked(NULL), dropPending(false), chartCursor(-2), loaded(false)
 {
