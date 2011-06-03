@@ -23,6 +23,7 @@
 #include <QPixmap>
 #include <QEvent>
 #include <QMouseEvent>
+#include <QGraphicsDropShadowEffect>
 
 QWidget *GcWindow::controls() const
 {
@@ -120,6 +121,12 @@ GcWindow::GcWindow()
     setContentsMargins(0,0,0,0);
     setResizable(false);
     setMouseTracking(true);
+
+    QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
+    shadow->setBlurRadius(20);
+    shadow->setXOffset(10);
+    shadow->setYOffset(10);
+    setGraphicsEffect(shadow);
 }
 
 GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
@@ -133,6 +140,12 @@ GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
     setContentsMargins(0,0,0,0);
     setResizable(false);
     setMouseTracking(true);
+
+    QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
+    shadow->setBlurRadius(20);
+    shadow->setXOffset(10);
+    shadow->setYOffset(10);
+    setGraphicsEffect(shadow);
 }
 
 GcWindow::~GcWindow()
@@ -189,8 +202,17 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         QFont font;
         font.setPointSize((contentsMargins().top()/2)+2);
         font.setWeight(QFont::Bold);
-        QString title = property("title").toString();
         painter.setFont(font);
+        QString title = property("title").toString();
+
+        // embossed...
+        QRect shad = bar;
+        shad.setY(bar.y()+2);
+        shad.setX(bar.x()+2);
+        painter.setPen(QColor(255,255,255,180));
+        painter.drawText(shad, title, Qt::AlignVCenter | Qt::AlignCenter);
+
+        painter.setPen(QColor(0,0,0,200));
         painter.drawText(bar, title, Qt::AlignVCenter | Qt::AlignCenter);
 
         // border

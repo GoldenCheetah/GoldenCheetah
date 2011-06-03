@@ -403,7 +403,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
             QwtPlotCurve *curve = new QwtPlotCurve(name);
             if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
                 curve->setRenderHint(QwtPlotItem::RenderAntialiased);
-            QPen pen(color);
+            QPen pen(color.darker(200));
             pen.setWidth(appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble());
             curve->setPen(pen);
             curve->attach(thisPlot);
