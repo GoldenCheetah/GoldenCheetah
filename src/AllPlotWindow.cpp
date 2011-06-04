@@ -284,7 +284,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     fullPlot->enableAxis(QwtPlot::yRight, false);
     fullPlot->enableAxis(QwtPlot::yRight2, false);
     fullPlot->enableAxis(QwtPlot::xBottom, false);
-    fullPlot->legend()->clear();
+    //fullPlot->legend()->clear();
     //fullPlot->setTitle("");
     fullPlot->setContentsMargins(0,0,0,0);
 
@@ -425,7 +425,7 @@ AllPlotWindow::redrawFullPlot()
     fullPlot->enableAxis(QwtPlot::yRight, false);
     fullPlot->enableAxis(QwtPlot::yRight2, false);
     fullPlot->enableAxis(QwtPlot::xBottom, false);
-    fullPlot->legend()->clear();
+    //fullPlot->legend()->clear();
     //fullPlot->setTitle("");
 
     if (fullPlot->bydist)
@@ -1310,12 +1310,12 @@ AllPlotWindow::setupStackPlots()
         if (i==0){
             // First plot view title and legend
             //_allPlot->setTitle(allPlot->title());
-            _allPlot->plotLayout()->setLegendPosition(QwtPlot::TopLegend);
+            //_allPlot->plotLayout()->setLegendPosition(QwtPlot::TopLegend);
             _allPlot->setFixedHeight(120+stackWidth*2+50);
         }
         else {
            _allPlot->setTitle("");
-           _allPlot->insertLegend(NULL);
+           //_allPlot->insertLegend(NULL);
            _allPlot->setFixedHeight(120+stackWidth*2);
         }
 

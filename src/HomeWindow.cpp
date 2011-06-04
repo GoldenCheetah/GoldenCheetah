@@ -20,6 +20,10 @@
 #include "HomeWindow.h"
 #include "LTMSettings.h"
 
+#ifdef Q_OS_LINUX
+#include <QGraphicsDropShadowEffect>
+#endif
+
 HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowtitle */) :
     GcWindow(mainWindow), mainWindow(mainWindow), name(name), active(false),
     clicked(NULL), dropPending(false), chartCursor(-2), loaded(false)
@@ -35,8 +39,8 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     bigandbold.setPointSize(bigandbold.pointSize() + 2);
     bigandbold.setWeight(QFont::Bold);
 
-#if 0
     QHBoxLayout *titleBar = new QHBoxLayout;
+#if 0
     title = new QLabel(windowtitle, this);
     title->setFont(bigandbold);
     title->setStyleSheet("QLabel {"
@@ -50,6 +54,7 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     mypalette.setColor(title->foregroundRole(), Qt::white);
     title->setPalette(mypalette);
     titleBar->addWidget(title);
+#endif
     titleBar->addStretch();
 
 #ifdef Q_OS_MAC
@@ -67,15 +72,14 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     small.setPointSize(8);
     styleSelector->setFont(small);
     styleSelector->setFixedHeight(20);
-#endif
 
     titleBar->addWidget(styleSelector);
-    layout->addLayout(titleBar);
 #endif
 
     style = new QStackedWidget(this);
     layout->setSpacing(0);
     layout->setContentsMargins(0,0,0,0);
+    layout->addLayout(titleBar);
     layout->addWidget(style);
 
     QPalette palette;
@@ -83,11 +87,41 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     palette.setBrush(backgroundRole(), QColor("#A8A8A8"));
 
     // each style has its own container widget
+    QWidget *tabArea = new QWidget(this);
+    tabArea->setContentsMargins(20,0,20,20);
+    tabArea->setAutoFillBackground(false);
+    //tabArea->setFrameStyle(QFrame::NoFrame);
+    QVBoxLayout *tabLayout = new QVBoxLayout(tabArea);
+    tabLayout->setContentsMargins(0,0,0,0);
+    tabLayout->setSpacing(0);
     tabbed = new QTabWidget(this);
     tabbed->setContentsMargins(0,0,0,0);
-    tabbed->setTabsClosable(true);
+    tabbed->setTabsClosable(false);
     tabbed->setPalette(palette);
-    style->addWidget(tabbed);
+    tabbed->setDocumentMode(true);
+
+    // styling commented out whilst work out the differences
+    // between mac and linux and windows
+#if 0
+    tabbed->setStyleSheet("QTabBar::tab {"
+                           "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+                           "stop: 0 #CFCFCF, stop: 1.0 #A8A8A8);"
+                           "border: 1px solid rgba(255, 255, 255, 32);"
+                           "color: #535353;}"
+                           "QTabBar::tab:selected {"
+                           "min-height: 30px;"
+                           "background: rgba(255,255,255,255); }");
+#endif
+
+    tabLayout->addWidget(tabbed);
+#ifdef Q_OS_LINUX // only reliably works on Linux right now
+    QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
+    shadow->setBlurRadius(20);
+    shadow->setXOffset(10);
+    shadow->setYOffset(10);
+    tabbed->setGraphicsEffect(shadow);
+#endif
+    style->addWidget(tabArea);
 
     // tiled
     tileWidget = new QWidget(this);
@@ -123,12 +157,10 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     winWidget->setMouseTracking(true); // to draw cursor
 
     currentStyle=2;
-#if 0
 #ifdef Q_OS_MAC
     styleSelector->setSelected(2);
 #else
     styleSelector->setCurrentIndex(2);
-#endif
 #endif
     style->setCurrentIndex(2); // tile area
 
@@ -136,12 +168,10 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(tabbed, SIGNAL(currentChanged(int)), this, SLOT(tabSelected(int)));
     connect(tabbed, SIGNAL(tabCloseRequested(int)), this, SLOT(removeChart(int)));
-#if 0
 #ifdef Q_OS_MAC
     connect(styleSelector, SIGNAL(clicked(int,bool)), SLOT(styleChanged(int)));
 #else
     connect(styleSelector, SIGNAL(currentIndexChanged(int)), SLOT(styleChanged(int)));
-#endif
 #endif
 
     // watch drop operations

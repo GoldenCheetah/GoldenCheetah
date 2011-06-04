@@ -122,11 +122,13 @@ GcWindow::GcWindow()
     setResizable(false);
     setMouseTracking(true);
 
+#ifdef Q_OS_LINUX // only reliably works on Linux right now
     QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
     shadow->setBlurRadius(20);
     shadow->setXOffset(10);
     shadow->setYOffset(10);
     setGraphicsEffect(shadow);
+#endif
 }
 
 GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
@@ -141,11 +143,13 @@ GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
     setResizable(false);
     setMouseTracking(true);
 
+#ifdef Q_OS_LINUX // only reliably works on Linux right now
     QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
     shadow->setBlurRadius(20);
     shadow->setXOffset(10);
     shadow->setYOffset(10);
     setGraphicsEffect(shadow);
+#endif
 }
 
 GcWindow::~GcWindow()
@@ -173,18 +177,14 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
     static QPixmap carbon = QPixmap(":images/carbon.jpg");
     static QPalette defaultPalette;
 
+    // setup a painter and the area to paint
+    QPainter painter(this);
+
+    // background light gray for now?
+    QRect all(0,0,width(),height());
+    painter.fillRect(all, Qt::white);
+
     if (contentsMargins().top() > 0) {
-        // draw a rectangle in the contents margins
-        // at the top of the widget
-
-        // setup a painter and the area to paint
-        QPainter painter(this);
-
-        // background light gray for now?
-        QRect all(0,0,width(),height());
-        //painter.drawTiledPixmap(all, aluLight);
-        //painter.fillRect(all, defaultPalette.color(QPalette::Window));
-        painter.fillRect(all, Qt::white);
 
         // fill in the title bar
         QRect bar(0,0,width(),contentsMargins().top());
@@ -196,7 +196,6 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
             bg = GColor(CTILEBAR);
             painter.drawPixmap(bar, aluBarDark);
         }
-
 
         // heading
         QFont font;
