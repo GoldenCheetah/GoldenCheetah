@@ -122,13 +122,11 @@ GcWindow::GcWindow()
     setResizable(false);
     setMouseTracking(true);
 
-#ifdef Q_OS_LINUX // only reliably works on Linux right now
     QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
     shadow->setBlurRadius(20);
     shadow->setXOffset(10);
     shadow->setYOffset(10);
     setGraphicsEffect(shadow);
-#endif
 }
 
 GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
@@ -143,13 +141,11 @@ GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
     setResizable(false);
     setMouseTracking(true);
 
-#ifdef Q_OS_LINUX // only reliably works on Linux right now
     QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
     shadow->setBlurRadius(20);
     shadow->setXOffset(10);
     shadow->setYOffset(10);
     setGraphicsEffect(shadow);
-#endif
 }
 
 GcWindow::~GcWindow()

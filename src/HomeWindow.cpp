@@ -20,9 +20,7 @@
 #include "HomeWindow.h"
 #include "LTMSettings.h"
 
-#ifdef Q_OS_LINUX
 #include <QGraphicsDropShadowEffect>
-#endif
 
 HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowtitle */) :
     GcWindow(mainWindow), mainWindow(mainWindow), name(name), active(false),
@@ -113,13 +111,11 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
 #endif
 
     tabLayout->addWidget(tabbed);
-#ifdef Q_OS_LINUX // only reliably works on Linux right now
     QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
     shadow->setBlurRadius(20);
     shadow->setXOffset(10);
     shadow->setYOffset(10);
     tabbed->setGraphicsEffect(shadow);
-#endif
     style->addWidget(tabArea);
 
     // tiled
