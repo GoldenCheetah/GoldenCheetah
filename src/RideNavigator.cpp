@@ -743,6 +743,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         //painter->drawLine(rideNavigator->pwidth,myOption.rect.y(),rideNavigator->pwidth, myOption.rect.y()+myOption.rect.height()-1);
         painter->drawLine(rideNavigator->pwidth,myOption.rect.y(),rideNavigator->pwidth, myOption.rect.y()+myOption.rect.height());
         myOption.rect.setHeight(18); //added
+        myOption.font.setWeight(QFont::Bold);
         drawDisplay(painter, myOption, myOption.rect, value);
 
         if (calendarText != "") {
@@ -751,6 +752,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             myOption.rect.setWidth(rideNavigator->pwidth);
             myOption.rect.setHeight(36);
             myOption.font.setPointSize(myOption.font.pointSize()-2);
+            myOption.font.setWeight(QFont::Normal);
             //myOption.font.setStyle(QFont::StyleItalic);
             painter->fillRect(myOption.rect, background);
             //drawFocus(painter, myOption, myOption.rect);

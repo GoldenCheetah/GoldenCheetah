@@ -224,7 +224,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     bg = new AllPlotBackground(this);
     bg->attach(this);
 
-    insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
+    //insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     canvas()->setFrameStyle(QFrame::NoFrame);
 
@@ -249,7 +249,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     intervalHighlighterCurve->setYAxis(yLeft);
     intervalHighlighterCurve->setData(IntervalPlotData(this, mainWindow));
     intervalHighlighterCurve->attach(this);
-    this->legend()->remove(intervalHighlighterCurve); // don't show in legend
+    //this->legend()->remove(intervalHighlighterCurve); // don't show in legend
 
 
     // setup that grid
@@ -309,7 +309,7 @@ AllPlot::configChanged()
     QColor ihlbrush = QColor(GColor(CINTERVALHIGHLIGHTER));
     ihlbrush.setAlpha(64);
     intervalHighlighterCurve->setBrush(ihlbrush);   // fill below the line
-    this->legend()->remove(intervalHighlighterCurve); // don't show in legend
+    //this->legend()->remove(intervalHighlighterCurve); // don't show in legend
     QPen gridPen(GColor(CPLOTGRID));
     gridPen.setStyle(Qt::DotLine);
     grid->setPen(gridPen);
@@ -664,7 +664,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     double *xaxis = bydist ? smoothD : smoothT;
 
     // attach appropriate curves
-    if (this->legend()) this->legend()->hide();
+    //if (this->legend()) this->legend()->hide();
 
     wattsCurve->detach();
     hrCurve->detach();
@@ -706,7 +706,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     refreshIntervalMarkers();
     refreshZoneLabels();
 
-    if (this->legend()) this->legend()->show();
+    //if (this->legend()) this->legend()->show();
     //replot();
 }
 
