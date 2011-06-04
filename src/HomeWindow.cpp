@@ -1027,6 +1027,7 @@ void GcWindowDialog::okClicked()
     // note that in reject they are not and will
     // get deleted (this has been verfied with
     // some debug statements in ~GcWindow).
+    chartLayout->removeWidget(win); // remove from layout!
     win->setParent(mainWindow);
     if (win->controls()) win->controls()->setParent(mainWindow);
 
