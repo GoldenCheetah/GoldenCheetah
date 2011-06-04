@@ -177,9 +177,9 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
     static QPixmap carbon = QPixmap(":images/carbon.jpg");
     static QPalette defaultPalette;
 
+
     // setup a painter and the area to paint
     QPainter painter(this);
-
     // background light gray for now?
     QRect all(0,0,width(),height());
     painter.fillRect(all, Qt::white);
@@ -229,7 +229,6 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
     } else {
         // is this a layout manager?
         // background light gray for now?
-        QPainter painter(this);
         QRect all(0,0,width(),height());
         if (property("isManager").toBool() == true) {
             //painter.drawTiledPixmap(all, carbon);

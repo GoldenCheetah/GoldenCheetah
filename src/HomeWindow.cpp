@@ -53,12 +53,10 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     QPalette mypalette;
     mypalette.setColor(title->foregroundRole(), Qt::white);
     title->setPalette(mypalette);
-    titleBar->addWidget(title);
 #endif
-    titleBar->addStretch();
 
 #ifdef Q_OS_MAC
-    static CocoaInitializer cocoaInitializer; // we only need one
+    CocoaInitializer cocoaInitializer; // we only need one
     styleSelector = new QtMacSegmentedButton (3, this);
     styleSelector->setTitle(0, "Tab");
     styleSelector->setTitle(1, "Scroll");
@@ -73,12 +71,13 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     styleSelector->setFont(small);
     styleSelector->setFixedHeight(20);
 
-    titleBar->addWidget(styleSelector);
 #endif
 
     style = new QStackedWidget(this);
     layout->setSpacing(0);
     layout->setContentsMargins(0,0,0,0);
+    titleBar->addStretch();
+    titleBar->addWidget(styleSelector);
     layout->addLayout(titleBar);
     layout->addWidget(style);
 
