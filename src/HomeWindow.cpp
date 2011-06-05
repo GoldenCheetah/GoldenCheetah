@@ -19,6 +19,7 @@
 
 #include "HomeWindow.h"
 #include "LTMSettings.h"
+#include "Settings.h"
 
 #include <QGraphicsDropShadowEffect>
 
@@ -112,11 +113,13 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
 #endif
 
     tabLayout->addWidget(tabbed);
-    QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
-    shadow->setBlurRadius(20);
-    shadow->setXOffset(10);
-    shadow->setYOffset(10);
-    tabbed->setGraphicsEffect(shadow);
+    if (appsettings->value(this, GC_DROPSHADOW, true).toBool()) {
+        QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
+        shadow->setBlurRadius(20);
+        shadow->setXOffset(10);
+        shadow->setYOffset(10);
+        tabbed->setGraphicsEffect(shadow);
+    }
     style->addWidget(tabArea);
 
     // tiled
@@ -348,6 +351,9 @@ HomeWindow::dropEvent(QDropEvent *event)
                 addChart(newone);
                 newone->show();
             }
+
+            // now wipe it
+            delete f;
 
             // before we return lets turn the cursor off
             chartCursor = -2;
@@ -969,7 +975,7 @@ HomeWindow::drawCursor()
 
 GcWindowDialog::GcWindowDialog(GcWinID type, MainWindow *mainWindow) : mainWindow(mainWindow), type(type)
 {
-    setAttribute(Qt::WA_DeleteOnClose);
+    //setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     setWindowTitle("Chart Setup");
     setFixedHeight(500);
@@ -985,7 +991,7 @@ GcWindowDialog::GcWindowDialog(GcWinID type, MainWindow *mainWindow) : mainWindo
     title = new QLineEdit(this);
     chartLayout->addWidget(title);
 
-    win = GcWindowRegistry::newGcWindow(type, mainWindow);
+    win = mainWindow->chartFoundry.newGcWindow(type, mainWindow);
     chartLayout->addWidget(win);
 
     controlLayout = new QFormLayout;
@@ -1028,9 +1034,9 @@ void GcWindowDialog::okClicked()
     // note that in reject they are not and will
     // get deleted (this has been verfied with
     // some debug statements in ~GcWindow).
-    chartLayout->removeWidget(win); // remove from layout!
-    win->setParent(mainWindow);
-    if (win->controls()) win->controls()->setParent(mainWindow);
+    //chartLayout->removeWidget(win); // remove from layout!
+    //win->setParent(mainWindow); // already is!
+    //if (win->controls()) win->controls()->setParent(mainWindow);
 
     // set its title property and geometry factors
     win->setProperty("title", title->text());
