@@ -22,12 +22,12 @@
 #include <algorithm>
 #include <QVector>
 
-#define tr(s) QObject::tr(s)
-
 // Config widget used by the Preferences/Options config panes
 class FixGaps;
 class FixGapsConfig : public DataProcessorConfig
 {
+    Q_DECLARE_TR_FUNCTIONS(FixGapsConfig)
+
     friend class ::FixGaps;
     protected:
         QHBoxLayout *layout;
@@ -109,6 +109,7 @@ class FixGapsConfig : public DataProcessorConfig
 //                           to ensure dataPoints are contiguous in time
 //
 class FixGaps : public DataProcessor {
+    Q_DECLARE_TR_FUNCTIONS(FixGaps)
 
     public:
         FixGaps() {}
@@ -121,9 +122,13 @@ class FixGaps : public DataProcessor {
         DataProcessorConfig* processorConfig(QWidget *parent) {
             return new FixGapsConfig(parent);
         }
+        // Localized Name
+        QString name() {
+            return (tr("Fix Gaps in Recording"));
+        }
 };
 
-static bool fixGapsAdded = DataProcessorFactory::instance().registerProcessor(QString(tr("Fix Gaps in Recording")), new FixGaps());
+static bool fixGapsAdded = DataProcessorFactory::instance().registerProcessor((QString("Fix Gaps in Recording")), new FixGaps());
 
 bool
 FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)

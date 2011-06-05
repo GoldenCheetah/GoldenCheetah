@@ -22,6 +22,7 @@
 #include "ChooseCyclistDialog.h"
 #include "MainWindow.h"
 #include "Settings.h"
+#include "RideMetric.h"
 
 // BLECK - homedir passing via global becuase ridefile is pure virtual and
 //         cannot pass with current definition -- Sean can advise!!
@@ -87,15 +88,34 @@ main(int argc, char *argv[])
     boost::shared_ptr<QSettings> settings;
     settings = GetApplicationSettings();
 
-    // Language setting
-    QVariant lang = settings->value(GC_LANG);
+#ifdef ENABLE_METRICS_TRANSLATION
+    // install QT Translator to enable QT Dialogs translation
+    QTranslator qtTranslator;
+    qtTranslator.load("qt_" + QLocale::system().name(),
+             QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+    app.installTranslator(&qtTranslator);
+#endif
+
+    // Language setting (default to system locale)
+    QVariant lang = settings->value(GC_LANG, QLocale::system().name());
+
     // Load specific translation
     QTranslator gcTranslator;
     gcTranslator.load(":translations/gc_" + lang.toString() + ".qm");
     app.installTranslator(&gcTranslator);
+ 
+#ifdef ENABLE_METRICS_TRANSLATION
+    RideMetricFactory::instance().initialize();
+#endif
 
     QVariant lastOpened = settings->value(GC_SETTINGS_LAST);
     QVariant unit = settings->value(GC_UNIT);
+#ifdef ENABLE_METRICS_TRANSLATION
+    if (unit.isNull()) { // Default to system locale
+        unit = QLocale::system().measurementSystem() == QLocale::MetricSystem ? "Metric" : "Imperial";
+        settings->setValue(GC_UNIT, unit);
+    }
+#endif
     double crankLength = settings->value(GC_CRANKLENGTH).toDouble();
     if(crankLength<=0) {
        settings->setValue(GC_CRANKLENGTH,172.5);

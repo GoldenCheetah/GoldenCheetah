@@ -148,7 +148,7 @@ void RideCalendar::paintCell(QPainter *painter, const QRect &rect, const QDate &
         QString notesPath = home.absolutePath() + "/" + ride->notesFileName;
         QFile notesFile(notesPath);
         QColor color = defaultColor;
-        QString line("Ride");
+        QString line(tr("Ride"));
         QString code;
         if (notesFile.exists()) {
             if (notesFile.open(QFile::ReadOnly | QFile::Text)) {

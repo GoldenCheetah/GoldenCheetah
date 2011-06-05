@@ -110,8 +110,8 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
     skibaLTS.smooth = false;
     skibaLTS.trend = false;
     skibaLTS.topN = 5;
-    skibaLTS.uname = skibaLTS.name = "Skiba Long Term Stress";
-    skibaLTS.uunits = "Stress";
+    skibaLTS.uname = skibaLTS.name = tr("Skiba Long Term Stress");
+    skibaLTS.uunits = tr("Stress");
     metrics.append(skibaLTS);
 
     MetricDetail skibaSTS;
@@ -124,8 +124,8 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
     skibaSTS.smooth = false;
     skibaSTS.trend = false;
     skibaSTS.topN = 5;
-    skibaSTS.uname = skibaSTS.name = "Skiba Short Term Stress";
-    skibaSTS.uunits = "Stress";
+    skibaSTS.uname = skibaSTS.name = tr("Skiba Short Term Stress");
+    skibaSTS.uunits = tr("Stress");
     metrics.append(skibaSTS);
 
     MetricDetail skibaSB;
@@ -138,8 +138,8 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
     skibaSB.smooth = false;
     skibaSB.trend = false;
     skibaSB.topN = 1;
-    skibaSB.uname = skibaSB.name = "Skiba Stress Balance";
-    skibaSB.uunits = "Stress Balance";
+    skibaSB.uname = skibaSB.name = tr("Skiba Stress Balance");
+    skibaSB.uunits = tr("Stress Balance");
     metrics.append(skibaSB);
 
     MetricDetail skibaSTR;
@@ -152,8 +152,8 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
     skibaSTR.smooth = false;
     skibaSTR.trend = false;
     skibaSTR.topN = 1;
-    skibaSTR.uname = skibaSTR.name = "Skiba STS Ramp";
-    skibaSTR.uunits = "Ramp";
+    skibaSTR.uname = skibaSTR.name = tr("Skiba STS Ramp");
+    skibaSTR.uunits = tr("Ramp");
     metrics.append(skibaSTR);
 
     MetricDetail skibaLTR;
@@ -166,8 +166,8 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
     skibaLTR.smooth = false;
     skibaLTR.trend = false;
     skibaLTR.topN = 1;
-    skibaLTR.uname = skibaLTR.name = "Skiba LTS Ramp";
-    skibaLTR.uunits = "Ramp";
+    skibaLTR.uname = skibaLTR.name = tr("Skiba LTS Ramp");
+    skibaLTR.uunits = tr("Ramp");
     metrics.append(skibaLTR);
 
     // DANIELS LTS
@@ -181,8 +181,8 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
     danielsLTS.smooth = false;
     danielsLTS.trend = false;
     danielsLTS.topN = 5;
-    danielsLTS.uname = danielsLTS.name = "Daniels Long Term Stress";
-    danielsLTS.uunits = "Stress";
+    danielsLTS.uname = danielsLTS.name = tr("Daniels Long Term Stress");
+    danielsLTS.uunits = tr("Stress");
     metrics.append(danielsLTS);
 
     MetricDetail danielsSTS;
@@ -195,8 +195,8 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
     danielsSTS.smooth = false;
     danielsSTS.trend = false;
     danielsSTS.topN = 5;
-    danielsSTS.uname = danielsSTS.name = "Daniels Short Term Stress";
-    danielsSTS.uunits = "Stress";
+    danielsSTS.uname = danielsSTS.name = tr("Daniels Short Term Stress");
+    danielsSTS.uunits = tr("Stress");
     metrics.append(danielsSTS);
 
     MetricDetail danielsSB;
@@ -209,8 +209,8 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
     danielsSB.smooth = false;
     danielsSB.trend = false;
     danielsSB.topN = 1;
-    danielsSB.uname = danielsSB.name = "Daniels Stress Balance";
-    danielsSB.uunits = "Stress Balance";
+    danielsSB.uname = danielsSB.name = tr("Daniels Stress Balance");
+    danielsSB.uunits = tr("Stress Balance");
     metrics.append(danielsSB);
 
     MetricDetail danielsSTR;
@@ -223,8 +223,8 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
     danielsSTR.smooth = false;
     danielsSTR.trend = false;
     danielsSTR.topN = 1;
-    danielsSTR.uname = danielsSTR.name = "Daniels STS Ramp";
-    danielsSTR.uunits = "Ramp";
+    danielsSTR.uname = danielsSTR.name = tr("Daniels STS Ramp");
+    danielsSTR.uunits = tr("Ramp");
     metrics.append(danielsSTR);
 
     MetricDetail danielsLTR;
@@ -237,8 +237,8 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
     danielsLTR.smooth = false;
     danielsLTR.trend = false;
     danielsLTR.topN = 1;
-    danielsLTR.uname = danielsLTR.name = "Daniels LTS Ramp";
-    danielsLTR.uunits = "Ramp";
+    danielsLTR.uname = danielsLTR.name = tr("Daniels LTS Ramp");
+    danielsLTR.uunits = tr("Ramp");
     metrics.append(danielsLTR);
 
     // TRIMP LTS
@@ -252,8 +252,8 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
     trimpLTS.smooth = false;
     trimpLTS.trend = false;
     trimpLTS.topN = 5;
-    trimpLTS.uname = trimpLTS.name = "TRIMP Long Term Stress";
-    trimpLTS.uunits = "Stress";
+    trimpLTS.uname = trimpLTS.name = tr("TRIMP Long Term Stress");
+    trimpLTS.uunits = tr("Stress");
     metrics.append(trimpLTS);
 
     MetricDetail trimpSTS;
@@ -266,8 +266,8 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
     trimpSTS.smooth = false;
     trimpSTS.trend = false;
     trimpSTS.topN = 5;
-    trimpSTS.uname = trimpSTS.name = "TRIMP Short Term Stress";
-    trimpSTS.uunits = "Stress";
+    trimpSTS.uname = trimpSTS.name = tr("TRIMP Short Term Stress");
+    trimpSTS.uunits = tr("Stress");
     metrics.append(trimpSTS);
 
     MetricDetail trimpSB;
@@ -280,8 +280,8 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
     trimpSB.smooth = false;
     trimpSB.trend = false;
     trimpSB.topN = 1;
-    trimpSB.uname = trimpSB.name = "TRIMP Stress Balance";
-    trimpSB.uunits = "Stress Balance";
+    trimpSB.uname = trimpSB.name = tr("TRIMP Stress Balance");
+    trimpSB.uunits = tr("Stress Balance");
     metrics.append(trimpSB);
 
     MetricDetail trimpSTR;
@@ -294,8 +294,8 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
     trimpSTR.smooth = false;
     trimpSTR.trend = false;
     trimpSTR.topN = 1;
-    trimpSTR.uname = trimpSTR.name = "TRIMP STS Ramp";
-    trimpSTR.uunits = "Ramp";
+    trimpSTR.uname = trimpSTR.name = tr("TRIMP STS Ramp");
+    trimpSTR.uunits = tr("Ramp");
     metrics.append(trimpSTR);
 
     MetricDetail trimpLTR;
@@ -308,8 +308,8 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
     trimpLTR.smooth = false;
     trimpLTR.trend = false;
     trimpLTR.topN = 1;
-    trimpLTR.uname = trimpLTR.name = "TRIMP LTS Ramp";
-    trimpLTR.uunits = "Ramp";
+    trimpLTR.uname = trimpLTR.name = tr("TRIMP LTS Ramp");
+    trimpLTR.uunits = tr("Ramp");
     metrics.append(trimpLTR);
 
 
@@ -327,7 +327,11 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(h
             metametric.smooth = false;
             metametric.trend = false;
             metametric.topN = 5;
+#ifdef ENABLE_METRICS_TRANSLATION
+            metametric.uname = metametric.name = sp.displayName(field.name);
+#else
             metametric.uname = metametric.name = field.name;
+#endif
             metametric.uunits = "";
             metrics.append(metametric);
         }
@@ -789,42 +793,42 @@ EditMetricDetailDialog::EditMetricDetailDialog(MainWindow *mainWindow, MetricDet
     // Grid
     QGridLayout *grid = new QGridLayout;
 
-    QLabel *name = new QLabel("Name");
-    QLabel *units = new QLabel("Axis Label / Units");
+    QLabel *name = new QLabel(tr("Name"));
+    QLabel *units = new QLabel(tr("Axis Label / Units"));
     userName = new QLineEdit(this);
     userName->setText(metricDetail->uname);
     userUnits = new QLineEdit(this);
     userUnits->setText(metricDetail->uunits);
 
-    QLabel *style = new QLabel("Curve");
+    QLabel *style = new QLabel(tr("Curve"));
     curveStyle = new QComboBox(this);
-    curveStyle->addItem("Bar", QwtPlotCurve::Steps);
-    curveStyle->addItem("Line", QwtPlotCurve::Lines);
-    curveStyle->addItem("Sticks", QwtPlotCurve::Sticks);
-    curveStyle->addItem("Dots", QwtPlotCurve::Dots);
+    curveStyle->addItem(tr("Bar"), QwtPlotCurve::Steps);
+    curveStyle->addItem(tr("Line"), QwtPlotCurve::Lines);
+    curveStyle->addItem(tr("Sticks"), QwtPlotCurve::Sticks);
+    curveStyle->addItem(tr("Dots"), QwtPlotCurve::Dots);
     curveStyle->setCurrentIndex(curveStyle->findData(metricDetail->curveStyle));
 
 
-    QLabel *symbol = new QLabel("Symbol");
+    QLabel *symbol = new QLabel(tr("Symbol"));
     curveSymbol = new QComboBox(this);
-    curveSymbol->addItem("None", QwtSymbol::NoSymbol);
-    curveSymbol->addItem("Circle", QwtSymbol::Ellipse);
-    curveSymbol->addItem("Square", QwtSymbol::Rect);
-    curveSymbol->addItem("Diamond", QwtSymbol::Diamond);
-    curveSymbol->addItem("Triangle", QwtSymbol::Triangle);
-    curveSymbol->addItem("Cross", QwtSymbol::XCross);
-    curveSymbol->addItem("Hexagon", QwtSymbol::Hexagon);
-    curveSymbol->addItem("Star", QwtSymbol::Star1);
+    curveSymbol->addItem(tr("None"), QwtSymbol::NoSymbol);
+    curveSymbol->addItem(tr("Circle"), QwtSymbol::Ellipse);
+    curveSymbol->addItem(tr("Square"), QwtSymbol::Rect);
+    curveSymbol->addItem(tr("Diamond"), QwtSymbol::Diamond);
+    curveSymbol->addItem(tr("Triangle"), QwtSymbol::Triangle);
+    curveSymbol->addItem(tr("Cross"), QwtSymbol::XCross);
+    curveSymbol->addItem(tr("Hexagon"), QwtSymbol::Hexagon);
+    curveSymbol->addItem(tr("Star"), QwtSymbol::Star1);
     curveSymbol->setCurrentIndex(curveSymbol->findData(metricDetail->symbolStyle));
 
-    QLabel *color = new QLabel("Color");
+    QLabel *color = new QLabel(tr("Color"));
     curveColor = new QPushButton(this);
 
     // color background...
     penColor = metricDetail->penColor;
     setButtonIcon(penColor);
 
-    QLabel *topN = new QLabel("Highlight Best");
+    QLabel *topN = new QLabel(tr("Highlight Best"));
     showBest = new QDoubleSpinBox(this);
     showBest->setDecimals(0);
     showBest->setMinimum(0);
@@ -832,7 +836,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(MainWindow *mainWindow, MetricDet
     showBest->setSingleStep(1.0);
     showBest->setValue(metricDetail->topN);
 
-    QLabel *baseline = new QLabel("Baseline");
+    QLabel *baseline = new QLabel(tr("Baseline"));
     baseLine = new QDoubleSpinBox(this);
     baseLine->setDecimals(0);
     baseLine->setMinimum(-999999);
@@ -840,10 +844,10 @@ EditMetricDetailDialog::EditMetricDetailDialog(MainWindow *mainWindow, MetricDet
     baseLine->setSingleStep(1.0);
     baseLine->setValue(metricDetail->baseline);
 
-    curveSmooth = new QCheckBox("Smooth Curve", this);
+    curveSmooth = new QCheckBox(tr("Smooth Curve"), this);
     curveSmooth->setChecked(metricDetail->smooth);
 
-    curveTrend = new QCheckBox("Trend Line", this);
+    curveTrend = new QCheckBox(tr("Trend Line"), this);
     curveTrend->setChecked(metricDetail->trend);
 
     // add to grid
@@ -941,4 +945,41 @@ EditMetricDetailDialog::setButtonIcon(QColor color)
     curveColor->setIcon(icon);
     curveColor->setContentsMargins(2,2,2,2);
     curveColor->setFixedWidth(34);
+}
+
+void
+LTMTool::translateDefaultCharts(QList<LTMSettings>&charts)
+{
+    // Map default (english) chart name to external (Localized) name
+    // New default charts need to be added to this list to be translated
+    QMap<QString, QString> chartNameMap;
+    chartNameMap.insert("Aerobic Power", tr("Aerobic Power"));
+    chartNameMap.insert("Anaerobic Power", tr("Anaerobic Power"));
+    chartNameMap.insert("Critical Power Trend", tr("Critical Power Trend"));
+    chartNameMap.insert("Power & Speed Trend", tr("Power & Speed Trend"));
+    chartNameMap.insert("Cardiovascular Response", tr("Cardiovascular Response"));
+    chartNameMap.insert("Training Mix", tr("Training Mix"));
+    chartNameMap.insert("Tempo & Threshold Time", tr("Tempo & Threshold Time"));
+    chartNameMap.insert("Time & Distance", tr("Time & Distance"));
+    chartNameMap.insert("Daniels Power", tr("Daniels Power"));
+    chartNameMap.insert("Skiba Power", tr("Skiba Power"));
+    chartNameMap.insert("Skiba PM", tr("Skiba PM"));
+    chartNameMap.insert("Daniels PM", tr("Daniels PM"));
+
+    for(int i=0; i<charts.count(); i++) {
+        // Replace chart name for localized version, default to english name
+        charts[i].name = chartNameMap.value(charts[i].name, charts[i].name);
+        // For each metric in chart
+        for (int j=0; j<charts[i].metrics.count(); j++) {
+            if (charts[i].metrics[j].uname == charts[i].metrics[j].name) { // Default uname
+                for (int k=0; k<metrics.count(); k++) // Look in metrics list
+                    if (metrics[k].symbol == charts[i].metrics[j].symbol) { // Replace with default translated values
+                        charts[i].metrics[j].name = metrics[k].name;
+                        charts[i].metrics[j].uname = metrics[k].uname;
+                        charts[i].metrics[j].uunits = metrics[k].uunits;
+                        break;
+                    }
+            }
+        }
+    }
 }

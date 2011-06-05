@@ -477,7 +477,7 @@ string GoogleMapControl::CreateIntervalHtml(QHash<QString,RideMetricPtr> &metric
         oss.precision(m->precision());
         oss << "<td align=\\\"left\\\">" + m->name().toStdString() << "</td>";
         oss << "<td align=\\\"left\\\">";
-        if (m->units(metricUnits) == "seconds")
+        if (m->units(metricUnits) == "seconds" || m->units(metricUnits) == tr("seconds"))
             oss << time_to_string(m->value(metricUnits)).toStdString();
         else
         {

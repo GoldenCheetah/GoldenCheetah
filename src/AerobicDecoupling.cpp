@@ -17,9 +17,7 @@
  */
 
 #include "RideMetric.h"
-#include <QObject>
-
-#define tr(s) QObject::tr(s)
+#include <QApplication>
 
 // This metric computes aerobic decoupling percentage as described
 // by Joe Friel:
@@ -39,6 +37,7 @@
 // in heart rate to power ratio as described by Friel.
 
 class AerobicDecoupling : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(AerobicDecoupling)
 
     double percent;
 
@@ -47,6 +46,11 @@ class AerobicDecoupling : public RideMetric {
     AerobicDecoupling() : percent(0.0)
     {
         setSymbol("aerobic_decoupling");
+#ifdef ENABLE_METRICS_TRANSLATION
+        setInternalName("Aerobic Decoupling");
+    }
+    void initialize() {
+#endif
         setName(tr("Aerobic Decoupling"));
         setType(RideMetric::Average);
         setMetricUnits(tr("%"));

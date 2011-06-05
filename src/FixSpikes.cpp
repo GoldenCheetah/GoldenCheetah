@@ -23,12 +23,12 @@
 #include <algorithm>
 #include <QVector>
 
-#define tr(s) QObject::tr(s)
-
 // Config widget used by the Preferences/Options config panes
 class FixSpikes;
 class FixSpikesConfig : public DataProcessorConfig
 {
+    Q_DECLARE_TR_FUNCTIONS(FixSpikesConfig)
+
     friend class ::FixSpikes;
     protected:
         QHBoxLayout *layout;
@@ -110,6 +110,7 @@ class FixSpikesConfig : public DataProcessorConfig
 //                           to ensure dataPoints are contiguous in time
 //
 class FixSpikes : public DataProcessor {
+    Q_DECLARE_TR_FUNCTIONS(FixSpikes)
 
     public:
         FixSpikes() {}
@@ -122,9 +123,13 @@ class FixSpikes : public DataProcessor {
         DataProcessorConfig* processorConfig(QWidget *parent) {
             return new FixSpikesConfig(parent);
         }
+        // Localized Name
+        QString name() {
+            return (tr("Fix Power Spikes"));
+        }
 };
 
-static bool fixSpikesAdded = DataProcessorFactory::instance().registerProcessor(QString(tr("Fix Power Spikes")), new FixSpikes());
+static bool fixSpikesAdded = DataProcessorFactory::instance().registerProcessor((QString("Fix Power Spikes")), new FixSpikes());
 
 bool
 FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0)

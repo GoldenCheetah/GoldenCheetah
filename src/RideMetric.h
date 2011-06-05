@@ -36,7 +36,6 @@ class RideMetric;
 typedef QSharedPointer<RideMetric> RideMetricPtr;
 
 struct RideMetric {
-
     enum metrictype { Total, Average, Peak } types;
     typedef enum metrictype MetricType;
 
@@ -51,6 +50,11 @@ struct RideMetric {
     }
     virtual ~RideMetric() {}
 
+#ifdef ENABLE_METRICS_TRANSLATION
+    // Initialization moved from constructor to enable translation
+    virtual void initialize() {}
+#endif
+
     // The string by which we refer to this RideMetric in the code,
     // configuration files, and caches (like stress.cache).  It should
     // not be translated, and it should never be shown to the user.
@@ -60,6 +64,11 @@ struct RideMetric {
     // summaries, configuration dialogs, etc.  It should be translated
     // using QObject::tr().
     virtual QString name() const { return name_; }
+
+#ifdef ENABLE_METRICS_TRANSLATION
+    // English name used in metadata.xml for compatibility
+    virtual QString internalName() const { return internalName_; }
+#endif
 
     // What type of metric is this?
     // Drives the way metrics combined over a day or week in the
@@ -133,6 +142,9 @@ struct RideMetric {
     void setMetricUnits(QString x) { metricUnits_ = x; }
     void setImperialUnits(QString x) { imperialUnits_ = x; }
     void setName(QString x) { name_ = x; }
+#ifdef ENABLE_METRICS_TRANSLATION
+    void setInternalName(QString x) { internalName_ = x; }
+#endif
     void setSymbol(QString x) { symbol_ = x; }
     void setType(MetricType x) { type_ = x; }
     void setAggregate(bool x) { aggregate_ = x; }
@@ -146,6 +158,9 @@ struct RideMetric {
 
         QString metricUnits_, imperialUnits_;
         QString name_, symbol_;
+#ifdef ENABLE_METRICS_TRANSLATION
+        QString internalName_;
+#endif
         MetricType type_;
 };
 
@@ -182,6 +197,13 @@ class RideMetricFactory {
     }
 
     int metricCount() const { return metricNames.size(); }
+
+#ifdef ENABLE_METRICS_TRANSLATION
+    void initialize() {
+        foreach(const QString &metricName, metrics.keys())
+            metrics[metricName]->initialize();
+    }
+#endif
 
     const QString &metricName(int i) const { return metricNames[i]; }
     const RideMetric::MetricType &metricType(int i) const { return metricTypes[i]; }

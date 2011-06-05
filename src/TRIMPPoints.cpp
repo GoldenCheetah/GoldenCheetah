@@ -22,8 +22,7 @@
 #include "HrZones.h"
 #include <QObject>
 #include <math.h>
-
-#define tr(s) QObject::tr(s)
+#include <QApplication>
 
 // This is Morton/Banister with Green et al coefficient.
 //
@@ -33,6 +32,7 @@
 // RHR = resting heart rate
 //
 class TRIMPPoints : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(TRIMPPoints)
 
     double score;
 
@@ -43,12 +43,16 @@ class TRIMPPoints : public RideMetric {
     TRIMPPoints() : score(0.0)
     {
         setSymbol("trimp_points");
+#ifdef ENABLE_METRICS_TRANSLATION
+        setInternalName("TRIMP Points");
+    }
+    void initialize() {
+#endif
         setName(tr("TRIMP Points"));
         setMetricUnits("");
         setImperialUnits("");
         setType(RideMetric::Total);
     }
-
     void compute(const RideFile *rideFile,
                  const Zones *, int ,
                  const HrZones *hrZones, int hrZoneRange,
@@ -100,6 +104,7 @@ class TRIMPPoints : public RideMetric {
 
 
 class TRIMP100Points : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(TRIMP100Points)
 
     double score;
 
@@ -110,12 +115,16 @@ public:
     TRIMP100Points() : score(0.0)
     {
         setSymbol("trimp_100_points");
+#ifdef ENABLE_METRICS_TRANSLATION
+        setInternalName("TRIMP(100) Points");
+    }
+    void initialize() {
+#endif
         setName(tr("TRIMP(100) Points"));
         setMetricUnits("");
         setImperialUnits("");
         setType(RideMetric::Total);
     }
-
     void compute(const RideFile *rideFile,
                  const Zones *, int,
                  const HrZones *hrZones, int hrZoneRange,
@@ -167,6 +176,7 @@ public:
 // 0.9 (zone 1 0-55%), 1.1 (zone 2 55-66%), 1.2 (zone 3 66-75%), 2 (zone 4 75-84%), and 5 (zone 5 84-100%)
 
 class TRIMPZonalPoints : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(TRIMPZonalPoints)
 
     double score;
 
@@ -177,12 +187,16 @@ public:
     TRIMPZonalPoints() : score(0.0)
     {
         setSymbol("trimp_zonal_points");
+#ifdef ENABLE_METRICS_TRANSLATION
+        setInternalName("TRIMP Zonal Points");
+    }
+    void initialize() {
+#endif
         setName(tr("TRIMP Zonal Points"));
         setMetricUnits("");
         setImperialUnits("");
         setType(RideMetric::Total);
     }
-
     void compute(const RideFile *,
                  const Zones *, int,
                  const HrZones *hrZones, int hrZoneRange,

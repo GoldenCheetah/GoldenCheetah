@@ -281,6 +281,7 @@ class FieldsPage : public QWidget
         void deleteClicked();
 
     private:
+        void addFieldTypes(QComboBox *p);
 
         QTreeWidget *fields;
 

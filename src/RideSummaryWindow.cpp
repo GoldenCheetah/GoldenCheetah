@@ -90,7 +90,7 @@ RideSummaryWindow::htmlSummary() const
     bool metricUnits = (unit.toString() == "Metric");
 
     const int columns = 3;
-    const char *columnNames[] = { "Totals", "Averages", "Metrics*" };
+    QString columnNames[] = { tr("Totals"), tr("Averages"), tr("Metrics*") };
     const char *totalColumn[] = {
         "workout_time",
         "time_riding",
@@ -137,7 +137,7 @@ RideSummaryWindow::htmlSummary() const
             if (!symbol) break;
             RideMetricPtr m = rideItem->metrics.value(symbol);
             QString name = m->name().replace(QRegExp(tr("^Average ")), "");
-            if (m->units(metricUnits) == "seconds") {
+            if (m->units(metricUnits) == "seconds" || m->units(metricUnits) == tr("seconds")) {
                 QString s("<tr><td>%1:</td><td "
                           "align=\"right\">%2</td></tr>");
                 s = s.arg(name);
@@ -212,7 +212,7 @@ RideSummaryWindow::htmlSummary() const
                     RideMetricPtr m = metrics.value(symbol);
                     if (!m) continue;
                     summary += "<td align=\"center\" valign=\"bottom\">" + m->name();
-                    if (m->units(metricUnits) == "seconds")
+                    if (m->units(metricUnits) == "seconds" || m->units(metricUnits) == tr("seconds"))
                         ; // don't do anything
                     else if (m->units(metricUnits).size() > 0)
                         summary += " (" + m->units(metricUnits) + ")";
@@ -234,7 +234,7 @@ RideSummaryWindow::htmlSummary() const
                 RideMetricPtr m = metrics.value(symbol);
                 if (!m) continue;
                 QString s("<td align=\"center\">%1</td>");
-                if (m->units(metricUnits) == "seconds")
+                if (m->units(metricUnits) == "seconds" || m->units(metricUnits) == tr("seconds"))
                     summary += s.arg(time_to_string(m->value(metricUnits)));
                 else
                     summary += s.arg(m->value(metricUnits), 0, 'f', m->precision());

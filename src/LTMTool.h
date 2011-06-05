@@ -59,6 +59,9 @@ class LTMTool : public QWidget
         // apply settings to the metric selector
         void applySettings(LTMSettings *);
 
+        // Helper function for default charts translation
+        void translateDefaultCharts(QList<LTMSettings>&charts);
+
     signals:
 
         void dateRangeSelected(const Season *);

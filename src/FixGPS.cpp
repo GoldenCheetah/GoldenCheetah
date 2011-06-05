@@ -22,12 +22,12 @@
 #include <algorithm>
 #include <QVector>
 
-#define tr(s) QObject::tr(s)
-
 // Config widget used by the Preferences/Options config panes
 class FixGPS;
 class FixGPSConfig : public DataProcessorConfig
 {
+    Q_DECLARE_TR_FUNCTIONS(FixGPSConfig)
+
     friend class ::FixGPS;
     protected:
     public:
@@ -50,6 +50,7 @@ class FixGPSConfig : public DataProcessorConfig
 //                           to ensure dataPoints are contiguous in time
 //
 class FixGPS : public DataProcessor {
+    Q_DECLARE_TR_FUNCTIONS(FixGPS)
 
     public:
         FixGPS() {}
@@ -62,9 +63,13 @@ class FixGPS : public DataProcessor {
         DataProcessorConfig* processorConfig(QWidget *parent) {
             return new FixGPSConfig(parent);
         }
+        // Localized Name
+        QString name() {
+            return (tr("Fix GPS errors"));
+        }
 };
 
-static bool fixGPSAdded = DataProcessorFactory::instance().registerProcessor(QString(tr("Fix GPS errors")), new FixGPS());
+static bool fixGPSAdded = DataProcessorFactory::instance().registerProcessor((QString("Fix GPS errors")), new FixGPS());
 
 bool
 FixGPS::postProcess(RideFile *ride, DataProcessorConfig *)

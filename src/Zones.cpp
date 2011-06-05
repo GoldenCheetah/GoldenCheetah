@@ -39,9 +39,9 @@ void Zones::initializeZoneParameters()
     static int initial_zone_default[] = {
         0, 55, 75, 90, 105, 120, 150
     };
-    static const char *initial_zone_default_desc[] = {
-        "Active Recovery", "Endurance", "Tempo", "Threshold",
-        "VO2Max", "Anaerobic", "Neuromuscular"
+    static const QString initial_zone_default_desc[] = {
+        tr("Active Recovery"), tr("Endurance"), tr("Tempo"), tr("Threshold"),
+        tr("VO2Max"), tr("Anaerobic"), tr("Neuromuscular")
     };
     static const char *initial_zone_default_name[] = {
         "Z1", "Z2", "Z3", "Z4", "Z5", "Z6", "Z7"
@@ -63,7 +63,7 @@ void Zones::initializeZoneParameters()
 	    scheme.zone_default.append(initial_zone_default[z]);
 	    scheme.zone_default_is_pct.append(true);
 	    scheme.zone_default_name.append(QString(initial_zone_default_name[z]));
-	    scheme.zone_default_desc.append(QString(initial_zone_default_desc[z]));
+	    scheme.zone_default_desc.append(initial_zone_default_desc[z]);
     }
 }
 

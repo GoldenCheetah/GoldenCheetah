@@ -51,7 +51,7 @@ LTMPlot::LTMPlot(LTMWindow *parent, MainWindow *main, QDir home) : bg(NULL), par
 
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setAxisTitle(yLeft, tr(""));
-    setAxisTitle(xBottom, "Date");
+    setAxisTitle(xBottom, tr("Date"));
     setAxisMaxMinor(QwtPlot::xBottom,-1);
     setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(QDateTime::currentDateTime(), 0, LTM_DAY));
 
@@ -203,7 +203,7 @@ LTMPlot::setData(LTMSettings *set)
         // need more than 2 points for a trend line
         if (metricDetail.trend == true && count > 2) {
 
-            QString trendName = QString("%1 trend").arg(metricDetail.uname);
+            QString trendName = QString(tr("%1 trend")).arg(metricDetail.uname);
             QString trendSymbol = QString("%1_trend").arg(metricDetail.symbol);
             QwtPlotCurve *trend = new QwtPlotCurve(trendName);
 
@@ -261,11 +261,11 @@ LTMPlot::setData(LTMSettings *set)
             // lets setup a curve with this data then!
             QString topName;
             if (counter > 1)
-                topName = QString("%1 Best %2")
+                topName = QString(tr("%1 Best %2"))
                           .arg(metricDetail.uname)
                           .arg(counter); // starts from zero
             else
-                topName = QString("Best %1").arg(metricDetail.uname);
+                topName = QString(tr("Best %1")).arg(metricDetail.uname);
 
             QString topSymbol = QString("%1_topN").arg(metricDetail.symbol);
             QwtPlotCurve *top = new QwtPlotCurve(topName);
@@ -420,9 +420,13 @@ LTMPlot::setData(LTMSettings *set)
 
     // draw zone labels axisid of -1 means delete whats there
     // cause no watts are being displayed
-    if (settings->shadeZones == true)
-        refreshZoneLabels(axes.value("watts", -1));
-    else
+    if (settings->shadeZones == true) {
+        int axisid = axes.value("watts", -1);
+#ifdef ENABLE_METRICS_TRANSLATION
+        if (axisid == -1) axisid = axes.value(tr("watts"), -1); // Try translated version
+#endif
+        refreshZoneLabels(axisid);
+    } else
         refreshZoneLabels(-1); // turn em off
 
     // plot
@@ -471,7 +475,7 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
             if (useMetricUnits == false) value *= metricDetail.metric->conversion();
 
             // convert seconds to hours
-            if (metricDetail.metric->units(true) == "seconds") value /= 3600;
+            if (metricDetail.metric->units(true) == "seconds" || metricDetail.metric->units(true) == tr("seconds")) value /= 3600;
         }
 
         if (value || wantZero) {
@@ -494,7 +498,7 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
                 // sum totals, average averages and choose best for Peaks
                 int type = metricDetail.metric ? metricDetail.metric->type() : RideMetric::Average;
 
-                if (metricDetail.uunits == "Ramp") type = RideMetric::Total;
+                if (metricDetail.uunits == "Ramp" || metricDetail.uunits == tr("Ramp")) type = RideMetric::Total;
 
                 switch (type) {
                 case RideMetric::Total:
@@ -589,7 +593,7 @@ LTMPlot::chooseYAxis(QString units)
     if ((chosen = axes.value(units, -1)) != -1) return chosen;
     else if (axes.count() < 8) {
         chosen = supported_axes[axes.count()];
-        if (units == "seconds") setAxisTitle(chosen, "hours"); // we convert seconds to hours
+        if (units == "seconds" || units == tr("seconds")) setAxisTitle(chosen, tr("hours")); // we convert seconds to hours
         else setAxisTitle(chosen, units);
         enableAxis(chosen, true);
         axes.insert(units, chosen);
@@ -664,8 +668,8 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
         value = curve->y(index);
 
         // convert seconds to hours for the LTM plot
-        if (units == "seconds") {
-            units = "hours"; // we translate from seconds to hours
+        if (units == "seconds" || units == tr("seconds")) {
+            units = tr("hours"); // we translate from seconds to hours
             value = ceil(curve->y(index)*10.0)/10.0;
             precision = 1; // new more precision since converting to hours
         }

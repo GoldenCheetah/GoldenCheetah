@@ -110,6 +110,8 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
     // read charts.xml and populate the picker
     LTMSettings reader;
     reader.readChartXML(home, presets);
+    // Translate Default Charts
+    ltmTool->translateDefaultCharts(presets);
     for(int i=0; i<presets.count(); i++)
         presetPicker->addItem(presets[i].name, i);
 

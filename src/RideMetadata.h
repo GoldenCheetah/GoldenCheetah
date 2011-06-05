@@ -143,6 +143,9 @@ class RideMetadata : public QWidget
 
     private:
         MainWindow *main;
+#ifdef ENABLE_METRICS_TRANSLATION
+        SpecialTabs specialTabs;
+#endif
 
     QTabWidget *tabs;
     QMap <QString, Form *> tabList;

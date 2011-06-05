@@ -71,6 +71,9 @@ ManualDataProcessorDialog::ManualDataProcessorDialog(MainWindow *main, QString n
 
     if (processor == NULL) reject();
 
+    // Change window title to Localized Name
+    setWindowTitle(processor->name());
+
     QFont font;
     font.setWeight(QFont::Black);
     QLabel *configLabel = new QLabel(tr("Settings"), this);

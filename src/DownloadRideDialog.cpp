@@ -33,7 +33,7 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     downloadInProgress(false)
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowTitle("Download Ride Data");
+    setWindowTitle(tr("Download Ride Data"));
 
     portCombo = new QComboBox(this);
 
@@ -90,9 +90,9 @@ DownloadRideDialog::setReadyInstruct()
         Device &device = Device::device(deviceCombo->currentText());
         QString inst = device.downloadInstructions();
         if (inst.size() == 0)
-            label->setText("Click Download to begin downloading.");
+            label->setText(tr("Click Download to begin downloading."));
         else
-            label->setText(inst + ", \nthen click Download.");
+            label->setText(inst + tr(", \nthen click Download."));
         downloadButton->setEnabled(true);
         if (deviceCombo->currentText() == "SRM") // only SRM supports erase ride for now
             eraseRideButton->setEnabled(true);
@@ -106,9 +106,9 @@ DownloadRideDialog::scanCommPorts()
     QString err;
     devList = CommPort::listCommPorts(err);
     if (err != "") {
-        QString msg = "Warning(s):\n\n" + err + "\n\nYou may need to (re)install "
-            "the FTDI or PL2303 drivers before downloading.";
-        QMessageBox::warning(0, "Error Loading Device Drivers", msg, 
+        QString msg = tr("Warning(s):\n\n") + err + tr("\n\nYou may need to (re)install "
+            "the FTDI or PL2303 drivers before downloading.");
+        QMessageBox::warning(0, tr("Error Loading Device Drivers"), msg,
                              QMessageBox::Ok, QMessageBox::NoButton);
     }
     for (int i = 0; i < devList.size(); ++i) {

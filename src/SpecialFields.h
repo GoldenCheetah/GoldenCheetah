@@ -19,12 +19,15 @@
 #ifndef _GC_SpecialFields_h
 #define _GC_SpecialFields_h
 
+#include <QApplication>
 #include <QStringList>
 #include <QStringListModel>
 #include "RideMetric.h"
 
 class SpecialFields
 {
+    Q_DECLARE_TR_FUNCTIONS(SpecialFields)
+
     public:
         SpecialFields();
 
@@ -36,16 +39,40 @@ class SpecialFields
 
         QString makeTechName(QString &) const;        // return a SQL friendly name
         QString metricSymbol(QString &) const;        // return symbol for user friendly name
-        const RideMetric *rideMetric(QString&) const; // retuen metric ptr for user friendly name
+        const RideMetric *rideMetric(QString&) const; // return metric ptr for user friendly name
+#ifdef ENABLE_METRICS_TRANSLATION
+        QString displayName(QString &) const;         // return display (localized) name for name
+        QString internalName(QString) const;        // return internal (english) Name for display
+#else
+        const QStringList &names() const { return names_; }
+#endif
 
         // the config pane uses the model
-        const QStringList &names() const { return names_; }
         QStringListModel *model() { return model_; }
 
     private:
+#ifdef ENABLE_METRICS_TRANSLATION
+        QMap<QString, QString> namesmap; // Map Internal (english) name to external (Localized) name
+#else
         QStringList names_;
+#endif
         QMap<QString, const RideMetric *> metricmap;
         QStringListModel *model_;
 };
+
+#ifdef ENABLE_METRICS_TRANSLATION
+class SpecialTabs
+{
+    Q_DECLARE_TR_FUNCTIONS(SpecialTabs)
+
+    public:
+        SpecialTabs();
+        QString displayName(QString &) const;       // return display (localized)
+        QString internalName(QString) const;        // return internal (english)
+
+    private:
+        QMap<QString, QString> namesmap; // Map Internal (english) name to external (Localized) name
+};
+#endif
 
 #endif

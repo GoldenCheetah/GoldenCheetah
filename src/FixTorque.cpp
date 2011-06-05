@@ -23,12 +23,12 @@
 #include <algorithm>
 #include <QVector>
 
-#define tr(s) QObject::tr(s)
-
 // Config widget used by the Preferences/Options config panes
 class FixTorque;
 class FixTorqueConfig : public DataProcessorConfig
 {
+    Q_DECLARE_TR_FUNCTIONS(FixTorqueConfig)
+
     friend class ::FixTorque;
     protected:
         QHBoxLayout *layout;
@@ -83,6 +83,7 @@ class FixTorqueConfig : public DataProcessorConfig
 //                           to ensure dataPoints are contiguous in time
 //
 class FixTorque : public DataProcessor {
+    Q_DECLARE_TR_FUNCTIONS(FixTorque)
 
     public:
         FixTorque() {}
@@ -95,9 +96,13 @@ class FixTorque : public DataProcessor {
         DataProcessorConfig* processorConfig(QWidget *parent) {
             return new FixTorqueConfig(parent);
         }
+        // Localized Name
+        QString name() {
+            return (tr("Adjust Torque Values"));
+        }
 };
 
-static bool fixTorqueAdded = DataProcessorFactory::instance().registerProcessor(QString(tr("Adjust Torque Values")), new FixTorque());
+static bool fixTorqueAdded = DataProcessorFactory::instance().registerProcessor((QString("Adjust Torque Values")), new FixTorque());
 
 bool
 FixTorque::postProcess(RideFile *ride, DataProcessorConfig *config=0)

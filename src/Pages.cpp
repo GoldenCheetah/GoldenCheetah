@@ -40,25 +40,29 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
     langCombo->addItem(tr("German"));
     langCombo->addItem(tr("Russian"));
     langCombo->addItem(tr("Czech"));
+    langCombo->addItem(tr("Spanish"));
 
-    QVariant lang = settings->value(GC_LANG);
+    // Default to system locale
+    QVariant lang = settings->value(GC_LANG, QLocale::system().name());
 
-    if(lang.toString() == "en")
+    if(lang.toString().startsWith("en"))
         langCombo->setCurrentIndex(0);
-    else if(lang.toString() == "fr")
+    else if(lang.toString().startsWith("fr"))
         langCombo->setCurrentIndex(1);
-    else if(lang.toString() == "ja")
+    else if(lang.toString().startsWith("ja"))
         langCombo->setCurrentIndex(2);
-    else if(lang.toString() == "pt-br")
+    else if(lang.toString().startsWith("pt-br"))
         langCombo->setCurrentIndex(3);
-    else if(lang.toString() == "it")
+    else if(lang.toString().startsWith("it"))
         langCombo->setCurrentIndex(4);
-    else if(lang.toString() == "de")
+    else if(lang.toString().startsWith("de"))
         langCombo->setCurrentIndex(5);
-    else if(lang.toString() == "ru")
+    else if(lang.toString().startsWith("ru"))
         langCombo->setCurrentIndex(6);
-    else if(lang.toString() == "cs")
+    else if(lang.toString().startsWith("cs"))
         langCombo->setCurrentIndex(7);
+    else if(lang.toString().startsWith("es"))
+        langCombo->setCurrentIndex(8);
     else // default : English
         langCombo->setCurrentIndex(0);
 
@@ -707,8 +711,8 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
     colors = new QTreeWidget;
-    colors->headerItem()->setText(0, "Color");
-    colors->headerItem()->setText(1, "Select");
+    colors->headerItem()->setText(0, tr("Color"));
+    colors->headerItem()->setText(1, tr("Select"));
     colors->setColumnCount(2);
     colors->setSelectionMode(QAbstractItemView::NoSelection);
     //colors->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
@@ -961,19 +965,6 @@ MetadataPage::saveClicked()
     processorPage->saveClicked();
 }
 
-// little helper since we create/recreate combos
-// for field types all over the place (init, move up, move down)
-static void addFieldTypes(QComboBox *p)
-{
-    p->addItem("Text");
-    p->addItem("Textbox");
-    p->addItem("ShortText");
-    p->addItem("Integer");
-    p->addItem("Double");
-    p->addItem("Date");
-    p->addItem("Time");
-}
-
 KeywordsPage::KeywordsPage(QWidget *parent, QList<KeywordDefinition>keywordDefinitions) : QWidget(parent)
 {
     QGridLayout *mainLayout = new QGridLayout(this);
@@ -1140,6 +1131,20 @@ KeywordsPage::getDefinitions(QList<KeywordDefinition> &keywordList)
     }
 }
 
+// little helper since we create/recreate combos
+// for field types all over the place (init, move up, move down)
+void
+FieldsPage::addFieldTypes(QComboBox *p)
+{
+    p->addItem(tr("Text"));
+    p->addItem(tr("Textbox"));
+    p->addItem(tr("ShortText"));
+    p->addItem(tr("Integer"));
+    p->addItem(tr("Double"));
+    p->addItem(tr("Date"));
+    p->addItem(tr("Time"));
+}
+
 FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) : QWidget(parent)
 {
     QGridLayout *mainLayout = new QGridLayout(this);
@@ -1171,6 +1176,9 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     fields->header()->resizeSection(1,140);
 
     SpecialFields specials;
+#ifdef ENABLE_METRICS_TRANSLATION
+    SpecialTabs specialTabs;
+#endif
     foreach(FieldDefinition field, fieldDefinitions) {
         QTreeWidgetItem *add;
         QComboBox *comboButton = new QComboBox(this);
@@ -1186,10 +1194,17 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
         add = new QTreeWidgetItem(fields->invisibleRootItem());
         add->setFlags(add->flags() | Qt::ItemIsEditable);
 
+#ifdef ENABLE_METRICS_TRANSLATION
+        // tab name
+        add->setText(0, specialTabs.displayName(field.tab));
+        // field name
+        add->setText(1, specials.displayName(field.name));
+#else
         // tab name
         add->setText(0, field.tab);
         // field name
         add->setText(1, field.name);
+#endif
 
         // type button
         add->setTextAlignment(2, Qt::AlignHCenter);
@@ -1292,6 +1307,9 @@ void
 FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
 {
     SpecialFields sp;
+#ifdef ENABLE_METRICS_TRANSLATION
+    SpecialTabs st;
+#endif
     QStringList checkdups;
 
     // clear current just in case
@@ -1306,8 +1324,13 @@ FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
         if (checkdups.contains(item->text(1))) continue;
         else checkdups << item->text(1);
 
+#ifdef ENABLE_METRICS_TRANSLATION
+        add.tab = st.internalName(item->text(0));
+        add.name = sp.internalName(item->text(1));
+#else
         add.tab = item->text(0);
         add.name = item->text(1);
+#endif
 
         if (sp.isMetric(add.name))
             add.type = 4;
@@ -1351,8 +1374,8 @@ ProcessorPage::ProcessorPage(MainWindow *main) : main(main)
         add = new QTreeWidgetItem(processorTree->invisibleRootItem());
         add->setFlags(add->flags() & ~Qt::ItemIsEditable);
 
-        // Processor Name
-        add->setText(0, i.key());
+        // Processor Name - changed to show localized name
+        add->setText(0, i.value()->name());
 
         // Auto or Manual run?
         QComboBox *comboButton = new QComboBox(this);

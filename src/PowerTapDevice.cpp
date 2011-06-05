@@ -28,8 +28,8 @@ static bool powerTapRegistered =
 QString
 PowerTapDevice::downloadInstructions() const
 {
-    return ("Make sure the PowerTap unit is turned\n"
-            "on and that its display says, \"Host\"");
+    return (tr("Make sure the PowerTap unit is turned\n"
+            "on and that its display says, \"Host\""));
 }
 
 static bool

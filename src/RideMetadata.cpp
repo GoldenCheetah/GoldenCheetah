@@ -68,11 +68,19 @@ RideMetadata::configUpdate()
         if (field.tab == "") continue; // not to be shown!
 
         Form *form;
+#ifdef ENABLE_METRICS_TRANSLATION
+        if ((form = tabList.value(specialTabs.displayName(field.tab), NULL)) == NULL) {
+            form = new Form(main);
+            tabs->addTab(form, specialTabs.displayName(field.tab));
+            tabList.insert(specialTabs.displayName(field.tab), form);
+        }
+#else
         if ((form = tabList.value(field.tab, NULL)) == NULL) {
             form = new Form(main);
             tabs->addTab(form, field.tab);
             tabList.insert(field.tab, form);
         }
+#endif
         form->addField(field);
     }
 
@@ -201,8 +209,11 @@ FormField::FormField(FieldDefinition field, MainWindow *main) : definition(field
         units = sp.rideMetric(field.name)->units(useMetricUnits);
         if (units != "") units = QString(" (%1)").arg(units);
     }
-
+#ifdef ENABLE_METRICS_TRANSLATION
+    label = new QLabel(QString("%1%2").arg(sp.displayName(field.name)).arg(units), this);
+#else
     label = new QLabel(QString("%1%2").arg(field.name).arg(units), this);
+#endif
 
     switch(field.type) {
 

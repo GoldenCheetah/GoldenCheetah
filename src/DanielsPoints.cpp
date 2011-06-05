@@ -20,8 +20,7 @@
 #include "Zones.h"
 #include <QObject>
 #include <math.h>
-
-#define tr(s) QObject::tr(s)
+#include <QApplication>
 
 // The idea: Fit a curve to the points system in Table 2.2 of "Daniel's Running
 // Formula", Second Edition, assume that power at VO2Max is 1.2 * FTP, further
@@ -33,6 +32,7 @@
 
 
 class DanielsPoints : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(DanielsPoints)
 
     double score;
     void inc(double secs, double watts, double cp) {
@@ -46,6 +46,11 @@ class DanielsPoints : public RideMetric {
     DanielsPoints() : score(0.0)
     {
         setSymbol("daniels_points");
+#ifdef ENABLE_METRICS_TRANSLATION
+        setInternalName("Daniels Points");
+    }
+    void initialize() {
+#endif
         setName(tr("Daniels Points"));
         setMetricUnits("");
         setImperialUnits("");
@@ -98,6 +103,8 @@ class DanielsPoints : public RideMetric {
 const double DanielsPoints::K = 100.0 / 3600.0;
 
 class DanielsEquivalentPower : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(DanielsEquivalentPower)
+
     double watts;
 
     public:
@@ -105,12 +112,16 @@ class DanielsEquivalentPower : public RideMetric {
     DanielsEquivalentPower() : watts(0.0)
     {
         setSymbol("daniels_equivalent_power");
+#ifdef ENABLE_METRICS_TRANSLATION
+        setInternalName("Daniels EqP");
+    }
+    void initialize() {
+#endif
         setName(tr("Daniels EqP"));
         setMetricUnits(tr("watts"));
         setImperialUnits(tr("watts"));
         setType(RideMetric::Average);
     }
-
     void compute(const RideFile *, const Zones *zones, int zoneRange, const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps)
     {
