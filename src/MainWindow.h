@@ -27,6 +27,7 @@
 #include <qwt_plot_curve.h>
 #include "RideItem.h"
 #include "IntervalItem.h"
+#include "GcWindowRegistry.h"
 #include "QuarqdClient.h"
 #include "RealtimeData.h"
 #include "SpecialFields.h"
@@ -111,7 +112,7 @@ class MainWindow : public QMainWindow
         QTreeWidgetItem *mutableIntervalItems() { return allIntervals; }
 
         // *********************************************
-        // MAINWINDOW STATE DATA
+        // MAINWINDOW STATE / GUI DATA
         // *********************************************
 
         // state data
@@ -119,6 +120,7 @@ class MainWindow : public QMainWindow
         int session;
         bool isclean;
         QSplitter *getSplitter() { return splitter; }
+        GcWindowRegistry chartFoundry;
 
 
         // *********************************************
