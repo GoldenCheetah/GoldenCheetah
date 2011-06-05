@@ -369,6 +369,7 @@ class ColorsPage : public QWidget
 
         // General stuff
         QCheckBox *antiAliased;
+        QCheckBox *dropShadowed;
         QCheckBox *shadeZones;
         QDoubleSpinBox *lineWidth;
 

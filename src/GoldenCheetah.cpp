@@ -18,6 +18,7 @@
 
 #include "GoldenCheetah.h"
 #include "Colors.h"
+#include "Settings.h"
 #include <QDebug>
 #include <QPainter>
 #include <QPixmap>
@@ -122,11 +123,13 @@ GcWindow::GcWindow()
     setResizable(false);
     setMouseTracking(true);
 
-    QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
-    shadow->setBlurRadius(20);
-    shadow->setXOffset(10);
-    shadow->setYOffset(10);
-    setGraphicsEffect(shadow);
+    if (appsettings->value(this, GC_DROPSHADOW, true).toBool()) {
+        QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
+        shadow->setBlurRadius(20);
+        shadow->setXOffset(10);
+        shadow->setYOffset(10);
+        setGraphicsEffect(shadow);
+    }
 }
 
 GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
@@ -141,11 +144,13 @@ GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
     setResizable(false);
     setMouseTracking(true);
 
-    QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
-    shadow->setBlurRadius(20);
-    shadow->setXOffset(10);
-    shadow->setYOffset(10);
-    setGraphicsEffect(shadow);
+    if (appsettings->value(this, GC_DROPSHADOW, true).toBool()) {
+        QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
+        shadow->setBlurRadius(20);
+        shadow->setXOffset(10);
+        shadow->setYOffset(10);
+        setGraphicsEffect(shadow);
+    }
 }
 
 GcWindow::~GcWindow()
@@ -219,7 +224,7 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
             painter.drawRect(QRect(0,0,width()-1,height()-1));
             painter.drawPixmap(width()-sized.width(), 0, sized.width(), sized.height(), sized);
         } else {
-            painter.setPen(bg);
+            painter.setPen(Qt::darkGray);
             painter.drawRect(QRect(0,0,width()-1,height()-1));
         }
     } else {
