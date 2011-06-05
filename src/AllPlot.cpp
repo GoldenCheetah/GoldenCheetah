@@ -33,6 +33,7 @@
 #include <qwt_plot_layout.h>
 #include <qwt_plot_marker.h>
 #include <qwt_scale_div.h>
+#include <qwt_scale_widget.h>
 #include <qwt_valuelist.h>
 #include <qwt_text.h>
 #include <qwt_legend.h>
@@ -314,22 +315,41 @@ AllPlot::configChanged()
     gridPen.setStyle(Qt::DotLine);
     grid->setPen(gridPen);
 
+    QPalette pal;
+
     // tick draw
     QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisScaleDraw(QwtPlot::xBottom, sd);
+
     sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisScaleDraw(QwtPlot::yLeft, sd);
+    pal.setColor(QPalette::WindowText, GColor(CPOWER));
+    pal.setColor(QPalette::Text, GColor(CPOWER));
+    axisWidget(QwtPlot::yLeft)->setPalette(pal);
+
     sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisScaleDraw(QwtPlot::yLeft2, sd);
+    pal.setColor(QPalette::WindowText, GColor(CHEARTRATE));
+    pal.setColor(QPalette::Text, GColor(CHEARTRATE));
+    axisWidget(QwtPlot::yLeft2)->setPalette(pal);
+
     sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisScaleDraw(QwtPlot::yRight, sd);
+    pal.setColor(QPalette::WindowText, GColor(CSPEED));
+    pal.setColor(QPalette::Text, GColor(CSPEED));
+    axisWidget(QwtPlot::yRight)->setPalette(pal);
+
     sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisScaleDraw(QwtPlot::yRight2, sd);
+    pal.setColor(QPalette::WindowText, GColor(CALTITUDE));
+    pal.setColor(QPalette::Text, GColor(CALTITUDE));
+    axisWidget(QwtPlot::yRight2)->setPalette(pal);
+
 }
 
 struct DataPoint {

@@ -96,6 +96,7 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     tabbed->setTabsClosable(false);
     tabbed->setPalette(palette);
     tabbed->setDocumentMode(true);
+    tabbed->setStyleSheet("QTabBar { alignment: center; }");
 
     // styling commented out whilst work out the differences
     // between mac and linux and windows
