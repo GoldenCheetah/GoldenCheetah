@@ -32,9 +32,9 @@
 class Realtime30PwrData : public QwtData
 {
     int pwrCur_; 
-    mutable int &pwrCur;
+    int &pwrCur;
     double pwrData_[150];
-    mutable double (&pwrData)[150];
+    double (&pwrData)[150];
 
     public:
     Realtime30PwrData() : pwrCur(pwrCur_), pwrData(pwrData_) {}
@@ -51,9 +51,9 @@ class Realtime30PwrData : public QwtData
 class RealtimePwrData : public QwtData
 {
     int pwrCur_;
-    mutable int &pwrCur;
+    int &pwrCur;
     double pwrData_[150];
-    mutable double (&pwrData)[150];
+    double (&pwrData)[150];
 
     public:
     RealtimePwrData() : pwrCur(pwrCur_), pwrData(pwrData_) {}
@@ -70,9 +70,9 @@ class RealtimePwrData : public QwtData
 class RealtimeLodData : public QwtData
 {
     int lodCur_;
-    mutable int &lodCur;
+    int &lodCur;
     double lodData_[50];
-    mutable double (&lodData)[50];
+    double (&lodData)[50];
 
     public:
     RealtimeLodData() : lodCur(lodCur_), lodData(lodData_) {}
@@ -90,9 +90,9 @@ class RealtimeLodData : public QwtData
 class RealtimeCadData : public QwtData
 {
     int cadCur_;
-    mutable int &cadCur;
+    int &cadCur;
     double cadData_[50];
-    mutable double (&cadData)[50];
+    double (&cadData)[50];
 
     public:
     RealtimeCadData() : cadCur(cadCur_), cadData(cadData_) {}
@@ -110,9 +110,9 @@ class RealtimeCadData : public QwtData
 class RealtimeSpdData : public QwtData
 {
     int spdCur_;
-    mutable int &spdCur;
+    int &spdCur;
     double spdData_[50];
-    mutable double (&spdData)[50];
+    double (&spdData)[50];
 
     public:
     RealtimeSpdData() : spdCur(spdCur_), spdData(spdData_) {}
@@ -130,9 +130,9 @@ class RealtimeSpdData : public QwtData
 class RealtimeHrData : public QwtData
 {
     int hrCur_;
-    mutable int &hrCur;
+    int &hrCur;
     double hrData_[50];
-    mutable double (&hrData)[50];
+    double (&hrData)[50];
 
     public:
     RealtimeHrData() : hrCur(hrCur_), hrData(hrData_) {}
