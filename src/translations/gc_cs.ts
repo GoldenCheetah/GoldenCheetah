@@ -809,9 +809,15 @@ Prosím o strpení. </translation>
 <context>
     <name>CriticalPower</name>
     <message>
-        <location filename="../PeakPower.cpp" line="68"/>
+        <location filename="../PeakPower.cpp" line="62"/>
         <source>60 min Peak Power</source>
         <translation>60min CP</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="63"/>
+        <location filename="../PeakPower.cpp" line="64"/>
+        <source>watts</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2118,7 +2124,7 @@ např. zadejte &quot;1,2 nm&quot; pro navýšení nebo &quot;-0,5 nm&quot; pro s
 <context>
     <name>HrZoneTime1</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="83"/>
+        <location filename="../HrTimeInZone.cpp" line="79"/>
         <source>H1 Time in Zone</source>
         <translation>H1 čas v zóně</translation>
     </message>
@@ -2126,7 +2132,7 @@ např. zadejte &quot;1,2 nm&quot; pro navýšení nebo &quot;-0,5 nm&quot; pro s
 <context>
     <name>HrZoneTime2</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="101"/>
+        <location filename="../HrTimeInZone.cpp" line="97"/>
         <source>H2 Time in Zone</source>
         <translation>H2 čas v zóně</translation>
     </message>
@@ -2134,7 +2140,7 @@ např. zadejte &quot;1,2 nm&quot; pro navýšení nebo &quot;-0,5 nm&quot; pro s
 <context>
     <name>HrZoneTime3</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="119"/>
+        <location filename="../HrTimeInZone.cpp" line="115"/>
         <source>H3 Time in Zone</source>
         <translation>H3 čas v zóně</translation>
     </message>
@@ -2142,7 +2148,7 @@ např. zadejte &quot;1,2 nm&quot; pro navýšení nebo &quot;-0,5 nm&quot; pro s
 <context>
     <name>HrZoneTime4</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="137"/>
+        <location filename="../HrTimeInZone.cpp" line="133"/>
         <source>H4 Time in Zone</source>
         <translation>H4 čas v zóně</translation>
     </message>
@@ -2150,7 +2156,7 @@ např. zadejte &quot;1,2 nm&quot; pro navýšení nebo &quot;-0,5 nm&quot; pro s
 <context>
     <name>HrZoneTime5</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="155"/>
+        <location filename="../HrTimeInZone.cpp" line="151"/>
         <source>H5 Time in Zone</source>
         <translation>H5 čas v zóně</translation>
     </message>
@@ -2158,7 +2164,7 @@ např. zadejte &quot;1,2 nm&quot; pro navýšení nebo &quot;-0,5 nm&quot; pro s
 <context>
     <name>HrZoneTime6</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="173"/>
+        <location filename="../HrTimeInZone.cpp" line="169"/>
         <source>H6 Time in Zone</source>
         <translation>H6 čas v zóně</translation>
     </message>
@@ -2166,7 +2172,7 @@ např. zadejte &quot;1,2 nm&quot; pro navýšení nebo &quot;-0,5 nm&quot; pro s
 <context>
     <name>HrZoneTime7</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="191"/>
+        <location filename="../HrTimeInZone.cpp" line="187"/>
         <source>H7 Time in Zone</source>
         <translation>H7 čas v zóně</translation>
     </message>
@@ -2174,7 +2180,7 @@ např. zadejte &quot;1,2 nm&quot; pro navýšení nebo &quot;-0,5 nm&quot; pro s
 <context>
     <name>HrZoneTime8</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="209"/>
+        <location filename="../HrTimeInZone.cpp" line="205"/>
         <source>H8 Time in Zone</source>
         <translation>H8 čas v zóně</translation>
     </message>
@@ -2591,62 +2597,62 @@ např. zadejte &quot;1,2 nm&quot; pro navýšení nebo &quot;-0,5 nm&quot; pro s
         <translation>Nastavení</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="955"/>
+        <location filename="../LTMTool.cpp" line="956"/>
         <source>Aerobic Power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="956"/>
+        <location filename="../LTMTool.cpp" line="957"/>
         <source>Anaerobic Power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="957"/>
+        <location filename="../LTMTool.cpp" line="958"/>
         <source>Critical Power Trend</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="958"/>
+        <location filename="../LTMTool.cpp" line="959"/>
         <source>Power &amp; Speed Trend</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="959"/>
+        <location filename="../LTMTool.cpp" line="960"/>
         <source>Cardiovascular Response</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="960"/>
+        <location filename="../LTMTool.cpp" line="961"/>
         <source>Training Mix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="961"/>
+        <location filename="../LTMTool.cpp" line="962"/>
         <source>Tempo &amp; Threshold Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="962"/>
+        <location filename="../LTMTool.cpp" line="963"/>
         <source>Time &amp; Distance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="963"/>
+        <location filename="../LTMTool.cpp" line="964"/>
         <source>Daniels Power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="964"/>
+        <location filename="../LTMTool.cpp" line="965"/>
         <source>Skiba Power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="965"/>
+        <location filename="../LTMTool.cpp" line="966"/>
         <source>Skiba PM</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="966"/>
+        <location filename="../LTMTool.cpp" line="967"/>
         <source>Daniels PM</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3887,18 +3893,22 @@ Chcete pokračovat?</translation>
 <context>
     <name>PeakPower</name>
     <message>
-        <location filename="../PeakPower.cpp" line="40"/>
-        <location filename="../PeakPower.cpp" line="41"/>
         <source>watts</source>
-        <translation>Watty</translation>
+        <translation type="obsolete">Watty</translation>
     </message>
 </context>
 <context>
     <name>PeakPower10m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="230"/>
+        <location filename="../PeakPower.cpp" line="242"/>
         <source>10 min Peak Power</source>
         <translation>Max výkon 10min</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="243"/>
+        <location filename="../PeakPower.cpp" line="244"/>
+        <source>watts</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3908,77 +3918,137 @@ Chcete pokračovat?</translation>
         <source>10 sec Peak Power</source>
         <translation>Max výkon 10sec</translation>
     </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="123"/>
+        <location filename="../PeakPower.cpp" line="124"/>
+        <source>watts</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PeakPower15s</name>
     <message>
-        <location filename="../PeakPower.cpp" line="140"/>
+        <location filename="../PeakPower.cpp" line="142"/>
         <source>15 sec Peak Power</source>
         <translation>Max výkon 15sec</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="143"/>
+        <location filename="../PeakPower.cpp" line="144"/>
+        <source>watts</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>PeakPower1m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="194"/>
+        <location filename="../PeakPower.cpp" line="202"/>
         <source>1 min Peak Power</source>
         <translation>Max výkon 1min</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="203"/>
+        <location filename="../PeakPower.cpp" line="204"/>
+        <source>watts</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>PeakPower1s</name>
     <message>
-        <location filename="../PeakPower.cpp" line="86"/>
+        <location filename="../PeakPower.cpp" line="82"/>
         <source>1 sec Peak Power</source>
         <translation>Max výkon 1sec</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="83"/>
+        <location filename="../PeakPower.cpp" line="84"/>
+        <source>watts</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>PeakPower20m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="248"/>
+        <location filename="../PeakPower.cpp" line="262"/>
         <source>20 min Peak Power</source>
         <translation>Max výkon 20min</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="263"/>
+        <location filename="../PeakPower.cpp" line="264"/>
+        <source>watts</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>PeakPower20s</name>
     <message>
-        <location filename="../PeakPower.cpp" line="158"/>
+        <location filename="../PeakPower.cpp" line="162"/>
         <source>20 sec Peak Power</source>
         <translation>Max výkon 20sec</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="163"/>
+        <location filename="../PeakPower.cpp" line="164"/>
+        <source>watts</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>PeakPower30m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="266"/>
+        <location filename="../PeakPower.cpp" line="282"/>
         <source>30 min Peak Power</source>
         <translation>Max výkon 30min</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="283"/>
+        <location filename="../PeakPower.cpp" line="284"/>
+        <source>watts</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>PeakPower30s</name>
     <message>
-        <location filename="../PeakPower.cpp" line="176"/>
+        <location filename="../PeakPower.cpp" line="182"/>
         <source>30 sec Peak Power</source>
         <translation>Max výkon 30sec</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="183"/>
+        <location filename="../PeakPower.cpp" line="184"/>
+        <source>watts</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>PeakPower5m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="212"/>
+        <location filename="../PeakPower.cpp" line="222"/>
         <source>5 min Peak Power</source>
         <translation>Max výkon 5m</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="223"/>
+        <location filename="../PeakPower.cpp" line="224"/>
+        <source>watts</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>PeakPower5s</name>
     <message>
-        <location filename="../PeakPower.cpp" line="104"/>
+        <location filename="../PeakPower.cpp" line="102"/>
         <source>5 sec Peak Power</source>
         <translation>Max výkon 5sec</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="103"/>
+        <location filename="../PeakPower.cpp" line="104"/>
+        <source>watts</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5935,7 +6005,7 @@ Chceš to udělat?</translation>
 <context>
     <name>ZoneTime1</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="84"/>
+        <location filename="../TimeInZone.cpp" line="80"/>
         <source>L1 Time in Zone</source>
         <translation>Čas v zóně L1</translation>
     </message>
@@ -5943,7 +6013,7 @@ Chceš to udělat?</translation>
 <context>
     <name>ZoneTime10</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="246"/>
+        <location filename="../TimeInZone.cpp" line="242"/>
         <source>L10 Time in Zone</source>
         <translation>Čas v zóně L10</translation>
     </message>
@@ -5951,7 +6021,7 @@ Chceš to udělat?</translation>
 <context>
     <name>ZoneTime2</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="102"/>
+        <location filename="../TimeInZone.cpp" line="98"/>
         <source>L2 Time in Zone</source>
         <translation>Čas v zóně L2</translation>
     </message>
@@ -5959,7 +6029,7 @@ Chceš to udělat?</translation>
 <context>
     <name>ZoneTime3</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="120"/>
+        <location filename="../TimeInZone.cpp" line="116"/>
         <source>L3 Time in Zone</source>
         <translation>Čas v zóně L3</translation>
     </message>
@@ -5967,7 +6037,7 @@ Chceš to udělat?</translation>
 <context>
     <name>ZoneTime4</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="138"/>
+        <location filename="../TimeInZone.cpp" line="134"/>
         <source>L4 Time in Zone</source>
         <translation>Čas v zóně L4</translation>
     </message>
@@ -5975,7 +6045,7 @@ Chceš to udělat?</translation>
 <context>
     <name>ZoneTime5</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="156"/>
+        <location filename="../TimeInZone.cpp" line="152"/>
         <source>L5 Time in Zone</source>
         <translation>Čas v zóně L5</translation>
     </message>
@@ -5983,7 +6053,7 @@ Chceš to udělat?</translation>
 <context>
     <name>ZoneTime6</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="174"/>
+        <location filename="../TimeInZone.cpp" line="170"/>
         <source>L6 Time in Zone</source>
         <translation>Čas v zóně L6</translation>
     </message>
@@ -5991,7 +6061,7 @@ Chceš to udělat?</translation>
 <context>
     <name>ZoneTime7</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="192"/>
+        <location filename="../TimeInZone.cpp" line="188"/>
         <source>L7 Time in Zone</source>
         <translation>Čas v zóně L7</translation>
     </message>
@@ -5999,7 +6069,7 @@ Chceš to udělat?</translation>
 <context>
     <name>ZoneTime8</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="210"/>
+        <location filename="../TimeInZone.cpp" line="206"/>
         <source>L8 Time in Zone</source>
         <translation>Čas v zóně L9</translation>
     </message>
@@ -6007,7 +6077,7 @@ Chceš to udělat?</translation>
 <context>
     <name>ZoneTime9</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="228"/>
+        <location filename="../TimeInZone.cpp" line="224"/>
         <source>L9 Time in Zone</source>
         <translation>Čas v zóně L9</translation>
     </message>

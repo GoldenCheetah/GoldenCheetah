@@ -811,9 +811,15 @@ This may take a while.
 <context>
     <name>CriticalPower</name>
     <message>
-        <location filename="../PeakPower.cpp" line="68"/>
+        <location filename="../PeakPower.cpp" line="62"/>
         <source>60 min Peak Power</source>
         <translation>60分間の最大出力</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="63"/>
+        <location filename="../PeakPower.cpp" line="64"/>
+        <source>watts</source>
+        <translation type="unfinished">ワット</translation>
     </message>
 </context>
 <context>
@@ -2106,7 +2112,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>HrZoneTime1</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="83"/>
+        <location filename="../HrTimeInZone.cpp" line="79"/>
         <source>H1 Time in Zone</source>
         <translation>H1 滞在時間</translation>
     </message>
@@ -2114,7 +2120,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>HrZoneTime2</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="101"/>
+        <location filename="../HrTimeInZone.cpp" line="97"/>
         <source>H2 Time in Zone</source>
         <translation>H2 滞在時間</translation>
     </message>
@@ -2122,7 +2128,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>HrZoneTime3</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="119"/>
+        <location filename="../HrTimeInZone.cpp" line="115"/>
         <source>H3 Time in Zone</source>
         <translation>H3 滞在時間</translation>
     </message>
@@ -2130,7 +2136,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>HrZoneTime4</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="137"/>
+        <location filename="../HrTimeInZone.cpp" line="133"/>
         <source>H4 Time in Zone</source>
         <translation>H4 滞在時間</translation>
     </message>
@@ -2138,7 +2144,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>HrZoneTime5</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="155"/>
+        <location filename="../HrTimeInZone.cpp" line="151"/>
         <source>H5 Time in Zone</source>
         <translation>H5 滞在時間</translation>
     </message>
@@ -2146,7 +2152,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>HrZoneTime6</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="173"/>
+        <location filename="../HrTimeInZone.cpp" line="169"/>
         <source>H6 Time in Zone</source>
         <translation>H6 滞在時間</translation>
     </message>
@@ -2154,7 +2160,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>HrZoneTime7</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="191"/>
+        <location filename="../HrTimeInZone.cpp" line="187"/>
         <source>H7 Time in Zone</source>
         <translation>H7 滞在時間</translation>
     </message>
@@ -2162,7 +2168,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>HrZoneTime8</name>
     <message>
-        <location filename="../HrTimeInZone.cpp" line="209"/>
+        <location filename="../HrTimeInZone.cpp" line="205"/>
         <source>H8 Time in Zone</source>
         <translation>H8 滞在時間</translation>
     </message>
@@ -2580,62 +2586,62 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation>設定</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="955"/>
+        <location filename="../LTMTool.cpp" line="956"/>
         <source>Aerobic Power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="956"/>
+        <location filename="../LTMTool.cpp" line="957"/>
         <source>Anaerobic Power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="957"/>
+        <location filename="../LTMTool.cpp" line="958"/>
         <source>Critical Power Trend</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="958"/>
+        <location filename="../LTMTool.cpp" line="959"/>
         <source>Power &amp; Speed Trend</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="959"/>
+        <location filename="../LTMTool.cpp" line="960"/>
         <source>Cardiovascular Response</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="960"/>
+        <location filename="../LTMTool.cpp" line="961"/>
         <source>Training Mix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="961"/>
+        <location filename="../LTMTool.cpp" line="962"/>
         <source>Tempo &amp; Threshold Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="962"/>
+        <location filename="../LTMTool.cpp" line="963"/>
         <source>Time &amp; Distance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="963"/>
+        <location filename="../LTMTool.cpp" line="964"/>
         <source>Daniels Power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="964"/>
+        <location filename="../LTMTool.cpp" line="965"/>
         <source>Skiba Power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="965"/>
+        <location filename="../LTMTool.cpp" line="966"/>
         <source>Skiba PM</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="966"/>
+        <location filename="../LTMTool.cpp" line="967"/>
         <source>Daniels PM</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3877,18 +3883,22 @@ Do you want to continue?</source>
 <context>
     <name>PeakPower</name>
     <message>
-        <location filename="../PeakPower.cpp" line="40"/>
-        <location filename="../PeakPower.cpp" line="41"/>
         <source>watts</source>
-        <translation>ワット</translation>
+        <translation type="obsolete">ワット</translation>
     </message>
 </context>
 <context>
     <name>PeakPower10m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="230"/>
+        <location filename="../PeakPower.cpp" line="242"/>
         <source>10 min Peak Power</source>
         <translation>10分間の最大出力</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="243"/>
+        <location filename="../PeakPower.cpp" line="244"/>
+        <source>watts</source>
+        <translation type="unfinished">ワット</translation>
     </message>
 </context>
 <context>
@@ -3898,77 +3908,137 @@ Do you want to continue?</source>
         <source>10 sec Peak Power</source>
         <translation>10秒間の最大出力</translation>
     </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="123"/>
+        <location filename="../PeakPower.cpp" line="124"/>
+        <source>watts</source>
+        <translation type="unfinished">ワット</translation>
+    </message>
 </context>
 <context>
     <name>PeakPower15s</name>
     <message>
-        <location filename="../PeakPower.cpp" line="140"/>
+        <location filename="../PeakPower.cpp" line="142"/>
         <source>15 sec Peak Power</source>
         <translation>15秒間の最大出力</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="143"/>
+        <location filename="../PeakPower.cpp" line="144"/>
+        <source>watts</source>
+        <translation type="unfinished">ワット</translation>
     </message>
 </context>
 <context>
     <name>PeakPower1m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="194"/>
+        <location filename="../PeakPower.cpp" line="202"/>
         <source>1 min Peak Power</source>
         <translation>1分間の最大出力</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="203"/>
+        <location filename="../PeakPower.cpp" line="204"/>
+        <source>watts</source>
+        <translation type="unfinished">ワット</translation>
     </message>
 </context>
 <context>
     <name>PeakPower1s</name>
     <message>
-        <location filename="../PeakPower.cpp" line="86"/>
+        <location filename="../PeakPower.cpp" line="82"/>
         <source>1 sec Peak Power</source>
         <translation>1秒間の最大出力</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="83"/>
+        <location filename="../PeakPower.cpp" line="84"/>
+        <source>watts</source>
+        <translation type="unfinished">ワット</translation>
     </message>
 </context>
 <context>
     <name>PeakPower20m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="248"/>
+        <location filename="../PeakPower.cpp" line="262"/>
         <source>20 min Peak Power</source>
         <translation>20分間の最大出力</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="263"/>
+        <location filename="../PeakPower.cpp" line="264"/>
+        <source>watts</source>
+        <translation type="unfinished">ワット</translation>
     </message>
 </context>
 <context>
     <name>PeakPower20s</name>
     <message>
-        <location filename="../PeakPower.cpp" line="158"/>
+        <location filename="../PeakPower.cpp" line="162"/>
         <source>20 sec Peak Power</source>
         <translation>20秒間の最大出力</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="163"/>
+        <location filename="../PeakPower.cpp" line="164"/>
+        <source>watts</source>
+        <translation type="unfinished">ワット</translation>
     </message>
 </context>
 <context>
     <name>PeakPower30m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="266"/>
+        <location filename="../PeakPower.cpp" line="282"/>
         <source>30 min Peak Power</source>
         <translation>30分間の最大出力</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="283"/>
+        <location filename="../PeakPower.cpp" line="284"/>
+        <source>watts</source>
+        <translation type="unfinished">ワット</translation>
     </message>
 </context>
 <context>
     <name>PeakPower30s</name>
     <message>
-        <location filename="../PeakPower.cpp" line="176"/>
+        <location filename="../PeakPower.cpp" line="182"/>
         <source>30 sec Peak Power</source>
         <translation>30 sec Peak Power</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="183"/>
+        <location filename="../PeakPower.cpp" line="184"/>
+        <source>watts</source>
+        <translation type="unfinished">ワット</translation>
     </message>
 </context>
 <context>
     <name>PeakPower5m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="212"/>
+        <location filename="../PeakPower.cpp" line="222"/>
         <source>5 min Peak Power</source>
         <translation>5分間の最大出力</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="223"/>
+        <location filename="../PeakPower.cpp" line="224"/>
+        <source>watts</source>
+        <translation type="unfinished">ワット</translation>
     </message>
 </context>
 <context>
     <name>PeakPower5s</name>
     <message>
-        <location filename="../PeakPower.cpp" line="104"/>
+        <location filename="../PeakPower.cpp" line="102"/>
         <source>5 sec Peak Power</source>
         <translation>5秒間の最大出力</translation>
+    </message>
+    <message>
+        <location filename="../PeakPower.cpp" line="103"/>
+        <location filename="../PeakPower.cpp" line="104"/>
+        <source>watts</source>
+        <translation type="unfinished">ワット</translation>
     </message>
 </context>
 <context>
@@ -5924,7 +5994,7 @@ native format. Should we do so?
 <context>
     <name>ZoneTime1</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="84"/>
+        <location filename="../TimeInZone.cpp" line="80"/>
         <source>L1 Time in Zone</source>
         <translation>L1 滞留時間</translation>
     </message>
@@ -5932,7 +6002,7 @@ native format. Should we do so?
 <context>
     <name>ZoneTime10</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="246"/>
+        <location filename="../TimeInZone.cpp" line="242"/>
         <source>L10 Time in Zone</source>
         <translation>L10 滞留時間</translation>
     </message>
@@ -5940,7 +6010,7 @@ native format. Should we do so?
 <context>
     <name>ZoneTime2</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="102"/>
+        <location filename="../TimeInZone.cpp" line="98"/>
         <source>L2 Time in Zone</source>
         <translation>L2 滞留時間</translation>
     </message>
@@ -5948,7 +6018,7 @@ native format. Should we do so?
 <context>
     <name>ZoneTime3</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="120"/>
+        <location filename="../TimeInZone.cpp" line="116"/>
         <source>L3 Time in Zone</source>
         <translation>L3 滞留時間</translation>
     </message>
@@ -5956,7 +6026,7 @@ native format. Should we do so?
 <context>
     <name>ZoneTime4</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="138"/>
+        <location filename="../TimeInZone.cpp" line="134"/>
         <source>L4 Time in Zone</source>
         <translation>L4 滞留時間</translation>
     </message>
@@ -5964,7 +6034,7 @@ native format. Should we do so?
 <context>
     <name>ZoneTime5</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="156"/>
+        <location filename="../TimeInZone.cpp" line="152"/>
         <source>L5 Time in Zone</source>
         <translation>L5 滞留時間</translation>
     </message>
@@ -5972,7 +6042,7 @@ native format. Should we do so?
 <context>
     <name>ZoneTime6</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="174"/>
+        <location filename="../TimeInZone.cpp" line="170"/>
         <source>L6 Time in Zone</source>
         <translation>L6 滞留時間</translation>
     </message>
@@ -5980,7 +6050,7 @@ native format. Should we do so?
 <context>
     <name>ZoneTime7</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="192"/>
+        <location filename="../TimeInZone.cpp" line="188"/>
         <source>L7 Time in Zone</source>
         <translation>L7 滞留時間</translation>
     </message>
@@ -5988,7 +6058,7 @@ native format. Should we do so?
 <context>
     <name>ZoneTime8</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="210"/>
+        <location filename="../TimeInZone.cpp" line="206"/>
         <source>L8 Time in Zone</source>
         <translation>L8 滞留時間</translation>
     </message>
@@ -5996,7 +6066,7 @@ native format. Should we do so?
 <context>
     <name>ZoneTime9</name>
     <message>
-        <location filename="../TimeInZone.cpp" line="228"/>
+        <location filename="../TimeInZone.cpp" line="224"/>
         <source>L9 Time in Zone</source>
         <translation>L9 滞留時間</translation>
     </message>
