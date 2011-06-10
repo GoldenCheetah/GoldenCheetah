@@ -5876,69 +5876,74 @@ native format. Should we do so?
 <context>
     <name>WeeklySummaryWindow</name>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="263"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="279"/>
         <source>&lt;center&gt;&lt;h2&gt;Week of %1 through %2&lt;/h2&gt;&lt;h2&gt;Summary&lt;/h2&gt;&lt;p&gt;&lt;table align=&quot;center&quot; width=&quot;60%&quot; border=0&gt;&lt;tr&gt;&lt;td&gt;Total time riding:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3:%4:%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total distance (%6):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total work (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Daily Average work (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%9&lt;/td&gt;&lt;/tr&gt;</source>
         <translation>&lt;center&gt;&lt;h2&gt;%1から%2まで&lt;/h2&gt;&lt;h2&gt;概要&lt;/h2&gt;&lt;p&gt;&lt;table align=&quot;center&quot; width=&quot;60%&quot; border=&quot;0&quot;&gt;&lt;tr&gt;&lt;td&gt;走行時間:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3:%4:%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;走行距離 (%6):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;エネルギー (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;日平均のエネルギー (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%9&lt;/td&gt;&lt;/tr&gt;</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="278"/>
-        <location filename="../WeeklySummaryWindow.cpp" line="279"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="294"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="295"/>
         <source>MM/dd/yyyy</source>
         <translation>yyyy年MMMMd日</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="294"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="310"/>
         <source>&lt;tr&gt;&lt;td&gt;Total BikeScore:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total Daniels Points:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Net Relative Intensity:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3&lt;/td&gt;&lt;/tr&gt;</source>
         <translatorcomment>微妙</translatorcomment>
         <translation>&lt;tr&gt;&lt;td&gt;Total BikeScore:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total Daniels Points:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Net Relative Intensity:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3&lt;/td&gt;&lt;/tr&gt;</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="307"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="323"/>
         <source>&lt;/table&gt;&lt;h2&gt;Power Zones&lt;/h2&gt;</source>
         <translation>&lt;/table&gt;&lt;h2&gt;パワーゾーン&lt;/h2&gt;</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="321"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="334"/>
+        <source>&lt;/table&gt;&lt;h2&gt;Heart Rate Zones&lt;/h2&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../WeeklySummaryWindow.cpp" line="341"/>
         <source>km</source>
         <translation type="unfinished">キロメートル</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="321"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="341"/>
         <source>miles</source>
         <translation type="unfinished">マイル</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="327"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="347"/>
         <source>Minutes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="329"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="349"/>
         <source>BikeScore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="329"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="349"/>
         <source>kJoules</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="331"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="351"/>
         <source>Intensity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="331"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="351"/>
         <source>xPower</source>
         <translation type="unfinished">xPower</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="414"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="434"/>
         <source>Kilometers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="414"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="434"/>
         <source>Miles</source>
         <translation type="unfinished"></translation>
     </message>

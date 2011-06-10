@@ -22,6 +22,7 @@
 #include "RideItem.h"
 #include "RideMetric.h"
 #include "Zones.h"
+#include "HrZones.h"
 #include <QtGui>
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
@@ -143,6 +144,7 @@ WeeklySummaryWindow::refresh()
         return;
     const QTreeWidgetItem *allRides = mainWindow->allRideItems();
     const Zones *zones = mainWindow->zones();
+    const HrZones *hrZones = mainWindow->hrZones();
     QDate wstart = ride->dateTime.date();
     wstart = wstart.addDays(Qt::Monday - wstart.dayOfWeek());
     assert(wstart.dayOfWeek() == Qt::Monday);
@@ -184,8 +186,11 @@ WeeklySummaryWindow::refresh()
     }
 
     int zone_range = -1;
+    int hrzone_range = -1;
     QVector<double> time_in_zone;
+    QVector<double> time_in_hrzone; // max 10 zones supported
     int num_zones = -1;
+    int num_hrzones = -1;
     bool zones_ok = true;
 
     for (int i = 0; i < allRides->childCount(); ++i) {
@@ -249,7 +254,18 @@ WeeklySummaryWindow::refresh()
 			time_in_zone[j] += item->timeInZone(j);
 		}
 	    }
-        }
+	    if (hrZones) {
+                // HR
+                if (num_hrzones < item->numHrZones()) {
+                    num_hrzones = item->numHrZones();
+                    time_in_hrzone.resize(num_hrzones);
+                }
+                hrzone_range = item->hrZoneRange();
+
+                for (int j=0; j<item->numHrZones(); j++)
+                    time_in_hrzone[j] += item->timeInHrZone(j);
+            }
+            }
     }
 
     int seconds = ((int) round(weeklySeconds->value(true)));
@@ -313,6 +329,10 @@ WeeklySummaryWindow::refresh()
         else {
             summary += zones->summarize(zone_range, time_in_zone);
         }
+    }
+    if (hrzone_range >= 0) {
+        summary += tr( "</table>" "<h2>Heart Rate Zones</h2>");
+        summary += hrZones->summarize(hrzone_range, time_in_hrzone);
     }
 
     summary += "</center>";

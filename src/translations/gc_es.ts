@@ -818,7 +818,7 @@ Puede demorar.
         <location filename="../PeakPower.cpp" line="63"/>
         <location filename="../PeakPower.cpp" line="64"/>
         <source>watts</source>
-        <translation type="unfinished">vatios</translation>
+        <translation>vatios</translation>
     </message>
 </context>
 <context>
@@ -2263,7 +2263,7 @@ Ajuste de Torque - define un valor fijo en libras por pulgada o newton por metro
     <message>
         <location filename="../HrZones.cpp" line="617"/>
         <source>&lt;td align=&quot;center&quot;&gt;Zone&lt;/td&gt;</source>
-        <translation>d align=&quot;center&quot;&gt;Zona&lt;/td&gt;</translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;Zona&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="618"/>
@@ -2273,7 +2273,7 @@ Ajuste de Torque - define un valor fijo en libras por pulgada o newton por metro
     <message>
         <location filename="../HrZones.cpp" line="619"/>
         <source>&lt;td align=&quot;center&quot;&gt;Low&lt;/td&gt;</source>
-        <translation>td align=&quot;center&quot;&gt;Inferior&lt;/td&gt;</translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;Inferior&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="620"/>
@@ -3901,7 +3901,7 @@ Do you want to continue?</source>
         <location filename="../PeakPower.cpp" line="243"/>
         <location filename="../PeakPower.cpp" line="244"/>
         <source>watts</source>
-        <translation type="unfinished">vatios</translation>
+        <translation>vatios</translation>
     </message>
 </context>
 <context>
@@ -3915,7 +3915,7 @@ Do you want to continue?</source>
         <location filename="../PeakPower.cpp" line="123"/>
         <location filename="../PeakPower.cpp" line="124"/>
         <source>watts</source>
-        <translation type="unfinished">vatios</translation>
+        <translation>vatios</translation>
     </message>
 </context>
 <context>
@@ -3929,7 +3929,7 @@ Do you want to continue?</source>
         <location filename="../PeakPower.cpp" line="143"/>
         <location filename="../PeakPower.cpp" line="144"/>
         <source>watts</source>
-        <translation type="unfinished">vatios</translation>
+        <translation>vatios</translation>
     </message>
 </context>
 <context>
@@ -3943,7 +3943,7 @@ Do you want to continue?</source>
         <location filename="../PeakPower.cpp" line="203"/>
         <location filename="../PeakPower.cpp" line="204"/>
         <source>watts</source>
-        <translation type="unfinished">vatios</translation>
+        <translation>vatios</translation>
     </message>
 </context>
 <context>
@@ -3957,7 +3957,7 @@ Do you want to continue?</source>
         <location filename="../PeakPower.cpp" line="83"/>
         <location filename="../PeakPower.cpp" line="84"/>
         <source>watts</source>
-        <translation type="unfinished">vatios</translation>
+        <translation>vatios</translation>
     </message>
 </context>
 <context>
@@ -3971,7 +3971,7 @@ Do you want to continue?</source>
         <location filename="../PeakPower.cpp" line="263"/>
         <location filename="../PeakPower.cpp" line="264"/>
         <source>watts</source>
-        <translation type="unfinished">vatios</translation>
+        <translation>vatios</translation>
     </message>
 </context>
 <context>
@@ -3985,7 +3985,7 @@ Do you want to continue?</source>
         <location filename="../PeakPower.cpp" line="163"/>
         <location filename="../PeakPower.cpp" line="164"/>
         <source>watts</source>
-        <translation type="unfinished">vatios</translation>
+        <translation>vatios</translation>
     </message>
 </context>
 <context>
@@ -3999,7 +3999,7 @@ Do you want to continue?</source>
         <location filename="../PeakPower.cpp" line="283"/>
         <location filename="../PeakPower.cpp" line="284"/>
         <source>watts</source>
-        <translation type="unfinished">vatios</translation>
+        <translation>vatios</translation>
     </message>
 </context>
 <context>
@@ -4013,7 +4013,7 @@ Do you want to continue?</source>
         <location filename="../PeakPower.cpp" line="183"/>
         <location filename="../PeakPower.cpp" line="184"/>
         <source>watts</source>
-        <translation type="unfinished">vatios</translation>
+        <translation>vatios</translation>
     </message>
 </context>
 <context>
@@ -4027,7 +4027,7 @@ Do you want to continue?</source>
         <location filename="../PeakPower.cpp" line="223"/>
         <location filename="../PeakPower.cpp" line="224"/>
         <source>watts</source>
-        <translation type="unfinished">vatios</translation>
+        <translation>vatios</translation>
     </message>
 </context>
 <context>
@@ -4041,7 +4041,7 @@ Do you want to continue?</source>
         <location filename="../PeakPower.cpp" line="103"/>
         <location filename="../PeakPower.cpp" line="104"/>
         <source>watts</source>
-        <translation type="unfinished">vatios</translation>
+        <translation>vatios</translation>
     </message>
 </context>
 <context>
@@ -5870,68 +5870,73 @@ formato GoldenCheetah. ¿Confirma?</translation>
 <context>
     <name>WeeklySummaryWindow</name>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="263"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="279"/>
         <source>&lt;center&gt;&lt;h2&gt;Week of %1 through %2&lt;/h2&gt;&lt;h2&gt;Summary&lt;/h2&gt;&lt;p&gt;&lt;table align=&quot;center&quot; width=&quot;60%&quot; border=0&gt;&lt;tr&gt;&lt;td&gt;Total time riding:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3:%4:%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total distance (%6):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total work (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Daily Average work (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%9&lt;/td&gt;&lt;/tr&gt;</source>
         <translation>&lt;center&gt;&lt;h2&gt;Semana desde el %1 al %2&lt;/h2&gt;&lt;h2&gt;Resúmen&lt;/h2&gt;&lt;p&gt;&lt;table align=&quot;center&quot; width=&quot;60%&quot; border=0&gt;&lt;tr&gt;&lt;td&gt;Tiempo total de entrenamiento:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3:%4:%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Distancia total (%6):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Trabajo total (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Trabajo promedio diario (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%9&lt;/td&gt;&lt;/tr&gt;</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="278"/>
-        <location filename="../WeeklySummaryWindow.cpp" line="279"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="294"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="295"/>
         <source>MM/dd/yyyy</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="294"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="310"/>
         <source>&lt;tr&gt;&lt;td&gt;Total BikeScore:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total Daniels Points:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Net Relative Intensity:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3&lt;/td&gt;&lt;/tr&gt;</source>
         <translation>&lt;tr&gt;&lt;td&gt;Total BikeScore:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total Puntos Daniels:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Intensidad Relativa neta:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3&lt;/td&gt;&lt;/tr&gt;</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="307"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="323"/>
         <source>&lt;/table&gt;&lt;h2&gt;Power Zones&lt;/h2&gt;</source>
         <translation>&lt;/table&gt;&lt;h2&gt;Zones de Potencia&lt;/h2&gt;</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="321"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="334"/>
+        <source>&lt;/table&gt;&lt;h2&gt;Heart Rate Zones&lt;/h2&gt;</source>
+        <translation>&lt;/table&gt;&lt;h2&gt;Zonas Frec.Card.&lt;/h2&gt;</translation>
+    </message>
+    <message>
+        <location filename="../WeeklySummaryWindow.cpp" line="341"/>
         <source>km</source>
         <translation>km</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="321"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="341"/>
         <source>miles</source>
         <translation>millas</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="327"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="347"/>
         <source>Minutes</source>
         <translation>Minutos</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="329"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="349"/>
         <source>BikeScore</source>
         <translation>BikeScore</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="329"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="349"/>
         <source>kJoules</source>
         <translation>kJ</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="331"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="351"/>
         <source>Intensity</source>
         <translation>Intensidad</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="331"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="351"/>
         <source>xPower</source>
         <translation>xPower</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="414"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="434"/>
         <source>Kilometers</source>
         <translation>Kilómetros</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="414"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="434"/>
         <source>Miles</source>
         <translation>Millas</translation>
     </message>

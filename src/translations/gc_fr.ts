@@ -5896,68 +5896,73 @@ Voulez-vous continuer?
 <context>
     <name>WeeklySummaryWindow</name>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="263"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="279"/>
         <source>&lt;center&gt;&lt;h2&gt;Week of %1 through %2&lt;/h2&gt;&lt;h2&gt;Summary&lt;/h2&gt;&lt;p&gt;&lt;table align=&quot;center&quot; width=&quot;60%&quot; border=0&gt;&lt;tr&gt;&lt;td&gt;Total time riding:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3:%4:%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total distance (%6):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total work (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Daily Average work (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%9&lt;/td&gt;&lt;/tr&gt;</source>
         <translation>&lt;center&gt;&lt;h2&gt;Semaine du %1 au %2&lt;/h2&gt;&lt;h2&gt;Résumé&lt;/h2&gt;&lt;p&gt;&lt;table align=&quot;center&quot; width=&quot;60%&quot; border=0&gt;&lt;tr&gt;&lt;td&gt;Temps total  à rouler:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3:%4:%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Distance totale (%6):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Travail total (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Travail journalier moyen (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%9&lt;/td&gt;&lt;/tr&gt;</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="278"/>
-        <location filename="../WeeklySummaryWindow.cpp" line="279"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="294"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="295"/>
         <source>MM/dd/yyyy</source>
         <translation>dd.MM.yyyy</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="294"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="310"/>
         <source>&lt;tr&gt;&lt;td&gt;Total BikeScore:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total Daniels Points:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Net Relative Intensity:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3&lt;/td&gt;&lt;/tr&gt;</source>
         <translation>&lt;tr&gt;&lt;td&gt;BikeScore total:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Daniels Points total:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Intensité Relative nette:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3&lt;/td&gt;&lt;/tr&gt;</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="307"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="323"/>
         <source>&lt;/table&gt;&lt;h2&gt;Power Zones&lt;/h2&gt;</source>
         <translation>&lt;/table&gt;&lt;h2&gt;Zones de puissance&lt;/h2&gt;</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="321"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="334"/>
+        <source>&lt;/table&gt;&lt;h2&gt;Heart Rate Zones&lt;/h2&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../WeeklySummaryWindow.cpp" line="341"/>
         <source>km</source>
         <translation>km</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="321"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="341"/>
         <source>miles</source>
         <translation>miles</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="327"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="347"/>
         <source>Minutes</source>
         <translation>Minutes</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="329"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="349"/>
         <source>BikeScore</source>
         <translation>BikeScore</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="329"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="349"/>
         <source>kJoules</source>
         <translation>kJoules</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="331"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="351"/>
         <source>Intensity</source>
         <translation>Intensité</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="331"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="351"/>
         <source>xPower</source>
         <translation>xPower</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="414"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="434"/>
         <source>Kilometers</source>
         <translation>Kilomètres</translation>
     </message>
     <message>
-        <location filename="../WeeklySummaryWindow.cpp" line="414"/>
+        <location filename="../WeeklySummaryWindow.cpp" line="434"/>
         <source>Miles</source>
         <translation>Miles</translation>
     </message>
