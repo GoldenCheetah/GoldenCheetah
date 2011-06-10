@@ -22,6 +22,7 @@
 #include <qwt_data.h>
 #include <qwt_legend.h>
 #include <qwt_plot_curve.h>
+#include <qwt_plot_canvas.h>
 #include <qwt_plot_grid.h>
 #include "RideItem.h"
 #include "RideFile.h"
@@ -34,11 +35,27 @@ PerfPlot::PerfPlot() : STScurve(NULL), LTScurve(NULL), SBcurve(NULL), DAYcurve(N
     setInstanceName("PM Plot");
 
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
-    setTitle(tr("Performance Manager"));
     setAxisTitle(yLeft, "Exponentially Weighted Average Stress");
     setAxisTitle(xBottom, "Time (days)");
     setAxisTitle(yRight, "Daily Stress");
     enableAxis(yRight, true);
+    canvas()->setFrameStyle(QFrame::NoFrame);
+
+    setAxisMaxMinor(xBottom, 0);
+    setAxisMaxMinor(yLeft, 0);
+    setAxisMaxMinor(yRight, 0);
+
+    QwtScaleDraw *sd = new QwtScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisScaleDraw(QwtPlot::xBottom, sd);
+
+    sd = new QwtScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisScaleDraw(QwtPlot::yLeft, sd);
+
+    sd = new QwtScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisScaleDraw(QwtPlot::yRight, sd);
 
     grid = new QwtPlotGrid();
     grid->attach(this);
@@ -176,5 +193,16 @@ void PerfPlot::resize(int newmin, int newmax)
 
 }
 
+void
+PerfPlot::setAxisTitle(int axis, QString label)
+{
+    // setup the default fonts
+    QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
+    stGiles.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+    stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
 
-
+    QwtText title(label);
+    title.setFont(stGiles);
+    QwtPlot::setAxisFont(axis, stGiles);
+    QwtPlot::setAxisTitle(axis, title);
+}

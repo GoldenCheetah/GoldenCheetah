@@ -26,6 +26,8 @@
 #include "Units.h"
 #include "math.h"
 #include <qwt_plot.h>
+#include <qwt_plot_grid.h>
+#include <qwt_symbol.h>
 
 #define MODEL_NONE          0
 #define MODEL_POWER         1
@@ -58,6 +60,7 @@ class ScatterPlot : public QwtPlot
         ScatterPlot(MainWindow *);
         void setData(ScatterSettings *);
         void showTime(ScatterSettings *, int offset, int secs);
+        void setAxisTitle(int axis, QString label);
 
     public slots:
         void configChanged();
@@ -76,5 +79,8 @@ class ScatterPlot : public QwtPlot
         QVector<double> y;
 
         QList <QwtPlotCurve *> intervalCurves; // each curve on plot
+
+        QwtPlotCurve *all;
+        QwtPlotGrid *grid;
 };
 #endif // _GC_ScatterPlot_h
