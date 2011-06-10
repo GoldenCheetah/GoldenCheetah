@@ -97,7 +97,17 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     tabbed->setTabsClosable(false);
     tabbed->setPalette(palette);
     tabbed->setDocumentMode(true);
-    tabbed->setStyleSheet("QTabBar { alignment: center; }");
+
+    QTabBar *tb = tabbed->findChild<QTabBar*>(QLatin1String("qt_tabwidget_tabbar"));
+    tb->setShape(QTabBar::RoundedSouth);
+    tb->setDrawBase(false);
+    tabbed->setStyleSheet("QTabBar { alignment: center; }"
+                          "QTabWidget::pane { top: 20px; }"
+#if 0
+                          "QTabBar::tab:selected { background: #A8A8A8; font: bold; border: 1px; border-color: black; }"
+                          "QTabBar::tab:!selected { background: #A8A8A8;font: normal; }" 
+#endif
+                         );
 
     // styling commented out whilst work out the differences
     // between mac and linux and windows
@@ -288,7 +298,7 @@ HomeWindow::styleChanged(int id)
         switch (id) {
         case 0 : // they are tabs in a TabWidget
             tabbed->addTab(charts[i], charts[i]->property("title").toString());
-            charts[i]->setContentsMargins(0,0,0,0);
+            charts[i]->setContentsMargins(0,25,0,0);
             charts[i]->setResizable(false); // we need to show on tab selection!
             charts[i]->hide(); // we need to show on tab selection!
             break;
@@ -400,7 +410,7 @@ HomeWindow::addChart(GcWindow* newone)
         switch (currentStyle) {
 
         case 0 :
-            newone->setContentsMargins(0,0,0,0);
+            newone->setContentsMargins(0,25,0,0);
             newone->setResizable(false); // we need to show on tab selection!
             tabbed->addTab(newone, newone->property("title").toString());
             break;

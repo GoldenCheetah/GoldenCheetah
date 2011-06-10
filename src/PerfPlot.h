@@ -88,6 +88,7 @@ class PerfPlot : public QwtPlot
     void setStressCalculator(StressCalculator *sc);
 
     void plot();
+    void setAxisTitle(int axis, QString label);
     void resize(int newmin, int newmax);
 
 };

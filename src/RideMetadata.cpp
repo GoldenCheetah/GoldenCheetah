@@ -52,6 +52,10 @@ RideMetadata::RideMetadata(MainWindow *parent) : QWidget(parent), main(parent)
     tabs->setPalette(palette);
     tabs->setAutoFillBackground(false);
 
+    tabs->setStyleSheet("QTabBar { alignment: center; }"
+                          "QTabWidget::pane { top: 0px; }"
+                       );
+
     mainLayout->addWidget(tabs);
 
     // read in metadata.xml and setup the tabs etc

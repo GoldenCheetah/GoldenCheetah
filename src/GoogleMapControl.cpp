@@ -147,17 +147,16 @@ GoogleMapControl::GoogleMapControl(MainWindow *mw) : GcWindow(mw), main(mw), ran
     setInstanceName("Google Map");
     setControls(NULL);
     setContentsMargins(0,0,0,0);
+    layout = new QVBoxLayout();
+    layout->setSpacing(0);
+    setLayout(layout);
 
     parent = mw;
     view = new QWebView();
     view->setContentsMargins(0,0,0,0);
     view->page()->view()->setContentsMargins(0,0,0,0);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-    layout = new QVBoxLayout();
     layout->addWidget(view);
-    layout->setSpacing(0);
-    setLayout(layout);
 
     //connect(parent, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
@@ -587,7 +586,10 @@ string GoogleMapControl::CreateMapToolTipJavaScript()
         << "}"<< endl
         << "div.style.padding = this.options.padding || '5px';"<< endl
         << "div.style.backgroundColor = this.options.backgroundColor || '#ffffff';"<< endl
+#if 0
         << "div.style.border = this.options.border || '1px solid #000000';"<< endl
+#endif
+        << "div.style.border = '0px solid #000000';"<< endl
         << "div.style.fontSize = this.options.fontSize || '80%';"<< endl
         << "div.style.color = this.options.color || '#000';"<< endl
         << "div.innerHTML = this.html;"<< endl

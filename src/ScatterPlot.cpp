@@ -31,6 +31,8 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
 #include <qwt_plot_marker.h>
+#include <qwt_plot_canvas.h>
+#include <qwt_scale_draw.h>
 #include <qwt_symbol.h>
 
 #define PI M_PI
@@ -147,6 +149,21 @@ static QString describeType(int type, bool longer, bool useMetricUnits)
 ScatterPlot::ScatterPlot(MainWindow *parent) : main(parent)
 {
     setInstanceName("2D Plot");
+    all = NULL;
+    grid = NULL;
+    canvas()->setFrameStyle(QFrame::NoFrame);
+
+    setAxisMaxMinor(xBottom, 0);
+    setAxisMaxMinor(yLeft, 0);
+
+    QwtScaleDraw *sd = new QwtScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisScaleDraw(QwtPlot::xBottom, sd);
+
+    sd = new QwtScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisScaleDraw(QwtPlot::yLeft, sd);
+
     connect(main, SIGNAL(configChanged()), this, SLOT(configChanged()));
     configChanged(); // use latest colors etc
 }
@@ -196,14 +213,13 @@ void ScatterPlot::setData (ScatterSettings *settings)
         }
     }
 
-    static QwtSymbol sym;
+    QwtSymbol sym;
     sym.setStyle(QwtSymbol::Ellipse);
     sym.setSize(6);
     sym.setPen(GCColor::invert(GColor(CPLOTBACKGROUND)));
     sym.setBrush(QBrush(Qt::NoBrush));
 
     // wipe away existing
-    static QwtPlotCurve *all = NULL;
 	if (all) {
         all->detach();
 	    delete all;
@@ -221,10 +237,9 @@ void ScatterPlot::setData (ScatterSettings *settings)
         all = NULL;
     }
 
-    static QPen gridPen(GColor(CPLOTGRID));
+    QPen gridPen(GColor(CPLOTGRID));
     gridPen.setStyle(Qt::DotLine);
 
-    static QwtPlotGrid *grid = NULL;
     if (grid) {
         grid->detach();
         delete grid;
@@ -240,7 +255,6 @@ void ScatterPlot::setData (ScatterSettings *settings)
         grid = NULL;
     }
 
-	setTitle(settings->ride->ride()->startTime().toString(GC_DATETIME_FORMAT));
     setAxisTitle(yLeft, describeType(settings->y, true, useMetricUnits));
     setAxisTitle(xBottom, describeType(settings->x, true, useMetricUnits));
 
@@ -382,3 +396,16 @@ ScatterPlot::showTime(ScatterSettings *settings, int offset, int secs)
     }
 }
 
+void
+ScatterPlot::setAxisTitle(int axis, QString label)
+{
+    // setup the default fonts
+    QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
+    stGiles.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+    stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+
+    QwtText title(label);
+    title.setFont(stGiles);
+    QwtPlot::setAxisFont(axis, stGiles);
+    QwtPlot::setAxisTitle(axis, title);
+}

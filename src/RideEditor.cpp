@@ -56,7 +56,7 @@ RideEditor::RideEditor(MainWindow *main) : GcWindow(main), data(NULL), ride(NULL
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(2,2,2,2);
+    mainLayout->setContentsMargins(2,0,2,2);
 
     //Left in the code to display a title, but
     //its a waste of screen estate, maybe uncomment
@@ -72,6 +72,8 @@ RideEditor::RideEditor(MainWindow *main) : GcWindow(main), data(NULL), ride(NULL
     toolbar = new QToolBar(this);
     toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     toolbar->setFloatable(true);
+    toolbar->setStyleSheet("background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #CFCFCF, stop: 1.0 #A8A8A8);"
+                           "border: 0px;");
 
     QIcon saveIcon(":images/toolbar/save.png");
     saveAct = new QAction(saveIcon, tr("Save"), this);
