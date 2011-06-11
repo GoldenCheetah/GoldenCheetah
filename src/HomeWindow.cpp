@@ -54,8 +54,8 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     title->setPalette(mypalette);
 #endif
 
-#ifdef Q_OS_MAC
-    CocoaInitializer cocoaInitializer; // we only need one
+#if 0
+    static CocoaInitializer cocoaInitializer; // we only need one
     styleSelector = new QtMacSegmentedButton (3, this);
     styleSelector->setTitle(0, "Tab");
     styleSelector->setTitle(1, "Scroll");
@@ -96,7 +96,7 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     tabbed->setContentsMargins(0,0,0,0);
     tabbed->setTabsClosable(false);
     tabbed->setPalette(palette);
-    tabbed->setDocumentMode(true);
+    tabbed->setDocumentMode(false);
 
     QTabBar *tb = tabbed->findChild<QTabBar*>(QLatin1String("qt_tabwidget_tabbar"));
     tb->setShape(QTabBar::RoundedSouth);
@@ -166,7 +166,7 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     winWidget->setMouseTracking(true); // to draw cursor
 
     currentStyle=2;
-#ifdef Q_OS_MAC
+#if 0
     styleSelector->setSelected(2);
 #else
     styleSelector->setCurrentIndex(2);
@@ -177,7 +177,7 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(tabbed, SIGNAL(currentChanged(int)), this, SLOT(tabSelected(int)));
     connect(tabbed, SIGNAL(tabCloseRequested(int)), this, SLOT(removeChart(int)));
-#ifdef Q_OS_MAC
+#if 0
     connect(styleSelector, SIGNAL(clicked(int,bool)), SLOT(styleChanged(int)));
 #else
     connect(styleSelector, SIGNAL(currentIndexChanged(int)), SLOT(styleChanged(int)));

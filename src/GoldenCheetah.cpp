@@ -208,7 +208,7 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         // embossed...
         QRect shad = bar;
         shad.setY(bar.y()+2);
-        shad.setX(bar.x()+2);
+        //shad.setX(bar.x()+2);
         painter.setPen(QColor(255,255,255,180));
         painter.drawText(shad, title, Qt::AlignVCenter | Qt::AlignCenter);
 
