@@ -190,7 +190,8 @@ MainWindow::MainWindow(const QDir &home) :
     toolbar->setPalette(pal);
 #endif
     toolbar->setMovable(false);
-#else
+#endif
+#if 0
     QIcon tickIcon(":images/toolbar/main/tick.png");
     QPushButton *showControls = new QPushButton(tickIcon, "", this);
     showControls->setFixedWidth(10);
@@ -328,6 +329,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     // TOOLBOX
     toolBox = new QToolBox(this);
+    toolBox->setAcceptDrops(true);
     toolBox->setStyleSheet("QToolBox::tab {"
 #if 0
                            "background-image: url(:images/aluToolBar.png);"
@@ -396,12 +398,13 @@ MainWindow::MainWindow(const QDir &home) :
     analysisControls->addWidget(analWindow->controls());
 
     // DOCK DRAWER ON MAC
-#ifdef Q_OS_MAC // on a mac the controls go into a dock drawer widget
+#if 0 // on a mac the controls go into a dock drawer widget
     // setup analysis window controls stack
     dock = new QDockWidget("Tools", this, Qt::Drawer);
     dock->hide();
     dock->setAllowedAreas(Qt::LeftDockWidgetArea);
     dock->setWidget(toolBox);
+    dock->setAcceptDrops(true);
 #endif
 
     // POPULATE TOOLBOX
@@ -434,9 +437,7 @@ MainWindow::MainWindow(const QDir &home) :
     views->setContentsMargins(0,0,0,0);
 
     // SPLITTER
-#ifndef Q_OS_MAC
    splitter->addWidget(toolBox);
-#endif
     splitter->addWidget(views);
     QVariant splitterSizes = appsettings->value(this, GC_SETTINGS_SPLITTER_SIZES); 
     if (splitterSizes != QVariant())

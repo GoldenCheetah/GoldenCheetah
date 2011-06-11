@@ -90,7 +90,7 @@ class HomeWindow : public GcWindow
 
         // top bar
         QLabel *title;
-#ifdef Q_OS_MAC
+#if 0
         QtMacSegmentedButton *styleSelector;
 #else
         QComboBox *styleSelector;
