@@ -238,6 +238,10 @@ LTMChartParser::serialize(QString filename, QList<LTMSettings> charts)
     file.resize(0);
     QTextStream out(&file);
 
+    // Character set encoding added to support international characters in names
+    out.setCodec("UTF-8");
+    out << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+
     // begin document
     out << "<charts>\n";
 
