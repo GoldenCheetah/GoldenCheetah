@@ -97,15 +97,16 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     tabbed->setTabsClosable(false);
     tabbed->setPalette(palette);
     tabbed->setDocumentMode(false);
+    tabbed->setMovable(true);
 
     QTabBar *tb = tabbed->findChild<QTabBar*>(QLatin1String("qt_tabwidget_tabbar"));
     tb->setShape(QTabBar::RoundedSouth);
     tb->setDrawBase(false);
-    tabbed->setStyleSheet("QTabBar { alignment: center; }"
+    tabbed->setStyleSheet("QTabWidget::tab-bar { alignment: center; }"
                           "QTabWidget::pane { top: 20px; }"
 #if 0
-                          "QTabBar::tab:selected { background: #A8A8A8; font: bold; border: 1px; border-color: black; }"
-                          "QTabBar::tab:!selected { background: #A8A8A8;font: normal; }" 
+                          "QTabWidget::tab-bar::tab:selected { background: #A8A8A8; font: bold; border: 1px; border-color: black; }"
+                          "QTabWidget::tab-bar::tab:!selected { background: #A8A8A8;font: normal; }" 
 #endif
                          );
 
@@ -177,6 +178,7 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(tabbed, SIGNAL(currentChanged(int)), this, SLOT(tabSelected(int)));
     connect(tabbed, SIGNAL(tabCloseRequested(int)), this, SLOT(removeChart(int)));
+    connect(tb, SIGNAL(tabMoved(int,int)), this, SLOT(tabMoved(int,int)));
 #if 0
     connect(styleSelector, SIGNAL(clicked(int,bool)), SLOT(styleChanged(int)));
 #else
@@ -260,6 +262,24 @@ HomeWindow::tabSelected(int index)
         charts[index]->setProperty("ride", property("ride"));
         dynamic_cast<QStackedWidget*>(controls())->setCurrentIndex(index);
     }
+}
+
+void
+HomeWindow::tabMoved(int to, int from)
+{
+    // re-order the tabs
+    GcWindow *orig = charts[to];
+    charts[to] = charts[from];
+    charts[from] = orig;
+
+    // re-order the controls
+    QStackedWidget *stack = dynamic_cast<QStackedWidget*>(controls());
+    stack->blockSignals(true);
+    QWidget *w = stack->widget(from);
+    stack->removeWidget(w);
+    stack->insertWidget(to, w);
+    stack->setCurrentIndex(to);
+    stack->blockSignals(false);
 }
 
 void
@@ -386,6 +406,9 @@ void
 HomeWindow::addChart(GcWindow* newone)
 {
     int chartnum = charts.count();
+
+    active = true;
+
     if (newone) {
         //GcWindow *newone = GcWindowRegistry::newGcWindow(GcWindows[i].id, mainWindow);
 
@@ -395,7 +418,7 @@ HomeWindow::addChart(GcWindow* newone)
         QWidget *x = dynamic_cast<GcWindow*>(newone)->controls();
         QWidget *c = (x != NULL) ? x : new QWidget(this);
 
-        if (chartCursor >= 0)
+        if (currentStyle == 2 && chartCursor >= 0)
             m->insertWidget(chartCursor, c);
         else
             m->addWidget(c);
@@ -454,13 +477,13 @@ HomeWindow::addChart(GcWindow* newone)
                 newone->setContentsMargins(0,15,0,0);
                 newone->setResizable(true); // we need to show on tab selection!
 
-                if (chartCursor >= 0) winFlow->insert(chartCursor, newone);
+                if (currentStyle == 2 && chartCursor >= 0) winFlow->insert(chartCursor, newone);
                 else winFlow->addWidget(newone);
             }
             break;
         }
         // add to the list
-        if (chartCursor >= 0) charts.insert(chartCursor, newone);
+        if (currentStyle == 2 && chartCursor >= 0) charts.insert(chartCursor, newone);
         else charts.append(newone);
         newone->hide();
 
@@ -470,6 +493,7 @@ HomeWindow::addChart(GcWindow* newone)
         connect(newone, SIGNAL(resized(GcWindow*)), this, SLOT(windowResized(GcWindow*)));
         connect(newone, SIGNAL(moved(GcWindow*)), this, SLOT(windowMoved(GcWindow*)));
     }
+    active = false;
 }
 
 bool
@@ -1122,8 +1146,9 @@ HomeWindow::saveState()
     file.open(QFile::WriteOnly);
     file.resize(0);
     QTextStream out(&file);
+    out.setCodec("UTF-8");
 
-    out<<"<layout name=\""<< name <<"\">\n";
+    out<<"<layout name=\""<< name <<"\" style=\"" << currentStyle <<"\">\n";
 
     // iterate over charts
     foreach (GcWindow *chart, charts) {
@@ -1187,6 +1212,7 @@ HomeWindow::restoreState()
     xmlReader.parse(source);
 
     // layout the results
+    styleSelector->setCurrentIndex(handler.style);
     foreach(GcWindow *chart, handler.charts) addChart(chart);
 }
 
@@ -1209,7 +1235,11 @@ bool ViewParser::endElement( const QString&, const QString&, const QString &qNam
 bool ViewParser::startElement( const QString&, const QString&, const QString &name, const QXmlAttributes &attrs )
 {
     if (name == "layout") {
-        // XXX do nothing - need to remember style (tab/scroll/tile) ...
+        for(int i=0; i<attrs.count(); i++) {
+            if (attrs.qName(i) == "style") {
+                style = unprotect(attrs.value(i)).toInt();
+            }
+        }
     }
     else if (name == "chart") {
 

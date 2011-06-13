@@ -309,7 +309,7 @@ public:
 
         if (role == Qt::DisplayRole) {
             if (orientation == Qt::Horizontal) {
-                return QDate::longDayName(section+1);
+                return QDate::shortDayName(section+1);
             } else {
                 return QString("%1").arg(date(index(section,0)).weekNumber());
             }

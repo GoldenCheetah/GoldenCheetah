@@ -149,6 +149,7 @@ GoogleMapControl::GoogleMapControl(MainWindow *mw) : GcWindow(mw), main(mw), ran
     setContentsMargins(0,0,0,0);
     layout = new QVBoxLayout();
     layout->setSpacing(0);
+    layout->setContentsMargins(2,0,2,2);
     setLayout(layout);
 
     parent = mw;
@@ -158,10 +159,20 @@ GoogleMapControl::GoogleMapControl(MainWindow *mw) : GcWindow(mw), main(mw), ran
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(view);
 
+    // we redraw on resize after a timeout
+    // to let the user move splitter etc
+    // without an immediate redraw, since it
+    // makes the UI unresponsive
+    delay = new QTimer(this);
+    delay->setSingleShot(true);
+
     //connect(parent, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(view, SIGNAL(loadStarted()), this, SLOT(loadStarted()));
     connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
+    connect(delay, SIGNAL(timeout()), this, SLOT(loadRide()));
+
+    first = true;
     loadingPage = false;
     newRideToLoad = false;
 }
@@ -169,8 +180,7 @@ GoogleMapControl::GoogleMapControl(MainWindow *mw) : GcWindow(mw), main(mw), ran
 void
 GoogleMapControl::rideSelected()
 {
-  if (!amVisible())
-     return;
+  if (myRideItem == NULL || !amVisible()) return;
 
   RideItem * ride = myRideItem;
   if (ride == current || !ride || !ride->ride())
@@ -228,15 +238,16 @@ GoogleMapControl::rideSelected()
 
 void GoogleMapControl::resizeEvent(QResizeEvent * )
 {
-    static bool first = true;
     if (!amVisible()) return;
 
     if (first == true) {
         first = false;
-    } else {
-        newRideToLoad = true;
-        loadRide();
+        return;
     }
+
+    newRideToLoad = true;
+    delay->stop();
+    delay->start(1000);
 }
 
 void GoogleMapControl::loadStarted()

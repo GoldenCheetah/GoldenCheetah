@@ -75,6 +75,7 @@ DiaryWindow::DiaryWindow(MainWindow *mainWindow) :
     monthlyView->setModel(calendarModel);
     monthlyView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
     monthlyView->verticalHeader()->setResizeMode(QHeaderView::Stretch);
+    monthlyView->verticalHeader()->hide();
     monthlyView->viewport()->installEventFilter(this);
     monthlyView->setGridStyle(Qt::DotLine);
     monthlyView->setFrameStyle(QFrame::NoFrame);

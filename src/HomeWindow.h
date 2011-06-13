@@ -53,6 +53,7 @@ class HomeWindow : public GcWindow
 
         // QT Widget events and signals
         void tabSelected(int id);
+        void tabMoved(int from, int to);
         virtual void dragEnterEvent(QDragEnterEvent *);
         virtual void dropEvent(QDropEvent *);
         void resizeEvent(QResizeEvent *);
@@ -151,10 +152,11 @@ class ViewParser : public QXmlDefaultHandler
 {
 
 public:
-    ViewParser(MainWindow *mainWindow) : mainWindow(mainWindow) {}
+    ViewParser(MainWindow *mainWindow) : style(2), mainWindow(mainWindow) {}
 
     // the results!
     QList<GcWindow*> charts;
+    int style;
 
     // unmarshall
     bool startDocument();
