@@ -21,7 +21,7 @@
 
 #if defined WIN32 
 
-#include <Windows.h>
+#include <windows.h>
 
 #ifdef GC_HAVE_USBXPRESS
 #include <SiUSBXp.h> // for the constants etc
