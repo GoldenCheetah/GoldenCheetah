@@ -58,7 +58,6 @@ G_OBJECT
                                    QString &intervalName, bool useMetrics);
     std::string CreateMarkers();
     std::string CreateIntervalMarkers(RideItem *ride);
-    void loadRide();
     std::string CreateMarker(int number, double lat, double lon, std::string &html);
     // the web browser is loading a page, do NOT start another load
     bool loadingPage;
@@ -81,6 +80,7 @@ G_OBJECT
     void rideSelected();
 
  private slots:
+    void loadRide();
     void loadStarted();
     void loadFinished(bool);
 
@@ -91,6 +91,8 @@ G_OBJECT
  public:
     GoogleMapControl(MainWindow *);
     virtual ~GoogleMapControl() { }
+    QTimer *delay;
+    bool first;
 };
 
 #endif
