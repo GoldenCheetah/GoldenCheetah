@@ -48,14 +48,28 @@ static quint16 readShort(QDataStream &in)
 {
     quint16 value;
     in >> value;
-    return htons(value); // SRM uses big endian
+    return value;
+}
+
+static qint16 readSignedShort(QDataStream &in)
+{
+    qint16 value;
+    in >> value;
+    return value;
 }
 
 static quint32 readLong(QDataStream &in)
 {
     quint32 value;
     in >> value;
-    return htonl(value); // SRM uses big endian
+    return value;
+}
+
+static qint32 readSignedLong(QDataStream &in)
+{
+    qint32 value;
+    in >> value;
+    return value;
 }
 
 struct marker
@@ -80,6 +94,8 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings) co
         return NULL;
     }
     QDataStream in(&file);
+    in.setByteOrder( QDataStream::LittleEndian );
+
     RideFile *result = new RideFile;
     result->setDeviceType("SRM");
 
@@ -201,9 +217,12 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings) co
             watts = readShort(in);
             cad = readByte(in);
             hr = readByte(in);
-            kph = readLong(in) * 3.6 / 1000.0;
-            alt = readLong(in);
-            double temp = 0.1 * (qint16) readShort(in);
+
+            qint32 kph_tmp = readSignedLong(in);
+            kph = kph_tmp < 0 ? 0 : kph_tmp * 3.6 / 1000.0;
+
+            alt = readSignedLong(in);
+            double temp = 0.1 * readSignedShort(in);
             (void) temp; // unused for now
         }
 
