@@ -125,19 +125,19 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings) co
         quint16 avgspeed = readShort(in);
         quint16 pwc150 = readShort(in);
 
-	// data fixup: Although the data chunk index in srm files starts
-	// with 1, some srmwin wrote files referencing index 0.
-	if( end < 1 ) end = 1;
-	if( start < 1 ) start = 1;
+    // data fixup: Although the data chunk index in srm files starts
+    // with 1, some srmwin wrote files referencing index 0.
+    if( end < 1 ) end = 1;
+    if( start < 1 ) start = 1;
 
-	// data fixup: some srmwin versions wrote markers with start > end
-	if( end < start ){
-		markers[i].start = end;
-		markers[i].end = start;
-	} else {
-		markers[i].start = start;
-		markers[i].end = end;
-	}
+    // data fixup: some srmwin versions wrote markers with start > end
+    if( end < start ){
+        markers[i].start = end;
+        markers[i].end = start;
+    } else {
+        markers[i].start = start;
+        markers[i].end = end;
+    }
 
         (void) active;
         (void) avgwatts;
@@ -271,3 +271,4 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings) co
     return result;
 }
 
+// vi:expandtab tabstop=4 shiftwidth=4
