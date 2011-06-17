@@ -63,8 +63,6 @@ struct FitDefinition {
 
 struct FitFileReaderState
 {
-    static QMap<int,QString> global_msg_names;
-
     QFile &file;
     QStringList &errors;
     RideFile *rideFile;
@@ -84,18 +82,6 @@ struct FitFileReaderState
         last_time(0), interval(0), devices(0), stopped(true),
         last_event_type(-1), last_event(-1), last_msg_type(-1)
     {
-        if (global_msg_names.isEmpty()) {
-            global_msg_names.insert(0,  "file_id");
-            global_msg_names.insert(18, "session");
-            global_msg_names.insert(19, "lap");
-            global_msg_names.insert(RECORD_TYPE, "record");
-            global_msg_names.insert(21, "event");
-            global_msg_names.insert(22, "undocumented");
-            global_msg_names.insert(23, "device_info");
-            global_msg_names.insert(34, "activity");
-            global_msg_names.insert(49, "file_creator");
-            global_msg_names.insert(72, "undocumented_2"); // New for Garmin 800
-        }
     }
 
     struct TruncatedRead {};
@@ -335,14 +321,8 @@ struct FitFileReaderState
             int reserved = read_byte(&count); (void) reserved; // unused
             int architecture = read_byte(&count);
             int global_msg_num = read_short(&count);
-            if (!global_msg_names.contains(global_msg_num)) {
-                errors << QString("unknown global_msg_num %1").arg(global_msg_num);
-                stop = true;
-                return count;
-            }
-            /*printf("definition: local type %d is %s\n",
-                   local_msg_type,
-                   global_msg_names[global_msg_num].toAscii().constData());*/
+            /*printf("definition: local type %d\n",
+                   local_msg_type);*/
             if (architecture != 0) {
                 errors << QString("unsupported architecture %1").arg(architecture);
                 stop = true;
@@ -410,7 +390,7 @@ struct FitFileReaderState
             // other one that might be useful is DeviceInfo, but it doesn't
             // seem to be filled in properly.  Sean's Cinqo, for example,
             // shows up as manufacturer #65535, even though it should be #7.
-            // printf("msg: %s\n", global_msg_names[def.global_msg_num].toAscii().constData());
+            // printf("msg: %d\n", global_msg_num);
             switch (def.global_msg_num) {
                 case 0:  decodeFileId(def, time_offset, values); break;
                 case 19: decodeLap(def, time_offset, values); break;
@@ -489,13 +469,7 @@ struct FitFileReaderState
             int crc = read_short();
             (void) crc;
             foreach(int num, unknown_global_msg_nums) {
-                if (global_msg_names.contains(num)) {
-                    errors << ("unsupported global message \"" + global_msg_names[num] +
-                               "\" (%1); ignoring it").arg(num);
-                }
-                else {
-                    errors << QString("unsupported global message number %1; ignoring it").arg(num);
-                }
+                errors << QString("unknown global message number %1; ignoring it").arg(num);
             }
             foreach(int num, unknown_record_fields)
                 errors << QString("unknown record field %1; ignoring it").arg(num);
@@ -503,8 +477,6 @@ struct FitFileReaderState
         }
     }
 };
-
-QMap<int,QString> FitFileReaderState::global_msg_names;
 
 RideFile *FitFileReader::openRideFile(QFile &file, QStringList &errors) const
 {
