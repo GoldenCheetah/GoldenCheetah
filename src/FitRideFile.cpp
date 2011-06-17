@@ -20,6 +20,7 @@
 #include <QSharedPointer>
 #include <QMap>
 #include <QSet>
+#include <QtEndian>
 #include <assert.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -58,6 +59,7 @@ struct FitField {
 
 struct FitDefinition {
     int global_msg_num;
+    bool is_big_endian;
     std::vector<FitField> fields;
 };
 
@@ -95,22 +97,26 @@ struct FitFileReaderState
         return 0xff & c;
     }
 
-    int read_short(int *count = NULL) {
+    int read_short(bool is_big_endian, int *count = NULL) {
         uint16_t s;
         if (file.read(reinterpret_cast<char*>(&s), 2) != 2)
             throw TruncatedRead();
         if (count)
             (*count) += 2;
-        return 0xffff & s;
+        return 0xffff & ( is_big_endian
+            ? qFromBigEndian<quint16>( s )
+            : qFromLittleEndian<quint16>( s ) );
     }
 
-    int read_long(int *count = NULL) {
+    int read_long(bool is_big_endian, int *count = NULL) {
         uint32_t l;
         if (file.read(reinterpret_cast<char*>(&l), 4) != 4)
             throw TruncatedRead();
         if (count)
             (*count) += 4;
-        return l;
+        return is_big_endian
+            ? qFromBigEndian<quint32>( l )
+            : qFromLittleEndian<quint32>( l );
     }
 
     void decodeFileId(const FitDefinition &def, int, const std::vector<int> values) {
@@ -318,42 +324,38 @@ struct FitFileReaderState
         if (!(header_byte & 0x80) && (header_byte & 0x40)) {
             // Definition record
             int local_msg_type = header_byte & 0xf;
-            int reserved = read_byte(&count); (void) reserved; // unused
-            int architecture = read_byte(&count);
-            int global_msg_num = read_short(&count);
-            /*printf("definition: local type %d\n",
-                   local_msg_type);*/
-            if (architecture != 0) {
-                errors << QString("unsupported architecture %1").arg(architecture);
-                stop = true;
-                return count;
-            }
-            int num_fields = read_byte(&count);
-            // printf(", %d num_fields:\n", num_fields);
+
             local_msg_types.insert(local_msg_type, FitDefinition());
             FitDefinition &def = local_msg_types[local_msg_type];
-            def.global_msg_num = global_msg_num;
+
+            int reserved = read_byte(&count); (void) reserved; // unused
+            def.is_big_endian = read_byte(&count);
+            def.global_msg_num = read_short(def.is_big_endian, &count);
+            int num_fields = read_byte(&count);
+            /*printf("definition: local type %d\n",
+                   local_msg_type);*/
+            // printf(", %d num_fields:\n", num_fields);
+
             for (int i = 0; i < num_fields; ++i) {
                 def.fields.push_back(FitField());
                 FitField &field = def.fields.back();
-                int field_def_num = read_byte(&count);
-                int field_size = read_byte(&count);
-                field.size = field_size;
+
+                field.num = read_byte(&count);
+                field.size = read_byte(&count);
                 int base_type = read_byte(&count);
-                int base_type_num = base_type & 0x1f;
-                if (base_type_num >= base_type_names_size) {
-                    errors << QString("unknown base type %1").arg(base_type_num);
+                field.type = base_type & 0x1f;
+                if (field.type >= base_type_names_size) {
+                    errors << QString("unknown base type %1").arg(field.type);
                     stop = true;
                     return count;
                 }
-                field.type = base_type_num;
-                field.num = field_def_num;
                 /*printf("  field %d: %d bytes, num %d, type %s, %s endianness\n",
                        i, field_size, field_def_num, base_type_names[base_type_num],
                        (base_type & 0x80) ? "with" : "without");*/
             }
         }
         else {
+            // Data record
             int local_msg_type = 0;
             int time_offset = 0;
             if (header_byte & 0x80) {
@@ -376,8 +378,8 @@ struct FitFileReaderState
                 int v;
                 switch (field.size) {
                     case 1: v = read_byte(&count); break;
-                    case 2: v = read_short(&count); break;
-                    case 4: v = read_long(&count); break;
+                    case 2: v = read_short(def.is_big_endian, &count); break;
+                    case 4: v = read_long(def.is_big_endian, &count); break;
                     default:
                         errors << QString("unsupported field size %1").arg(field.size);
                         stop = true;
@@ -435,9 +437,9 @@ struct FitFileReaderState
         }
         int protocol_version = read_byte();
         (void) protocol_version;
-        int profile_version = read_short(); // not sure what to do with this
-        (void) profile_version;
-        int data_size = read_long(); // always little endian
+        int profile_version = read_short(false); // always littleEndian
+        (void) profile_version; // not sure what to do with this
+        int data_size = read_long(false); // always littleEndian
         char fit_str[5];
         if (file.read(fit_str, 4) != 4) {
             errors << "truncated header";
@@ -466,7 +468,7 @@ struct FitFileReaderState
             return NULL;
         }
         else {
-            int crc = read_short();
+            int crc = read_short( false ); // always littleEndian
             (void) crc;
             foreach(int num, unknown_global_msg_nums) {
                 errors << QString("unknown global message number %1; ignoring it").arg(num);
@@ -484,3 +486,4 @@ RideFile *FitFileReader::openRideFile(QFile &file, QStringList &errors) const
     return state->run();
 }
 
+// vi:expandtab tabstop=4 shiftwidth=4
