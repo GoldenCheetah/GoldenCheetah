@@ -549,7 +549,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
                 allZoneLabels.append(label_mark);
             }
 
-            high = low - 1;
+            high = low;
             ++zone;
         }
     }
