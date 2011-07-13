@@ -108,7 +108,25 @@ RideSummaryWindow::htmlSummary() const
         NULL
     };
 
-    const char *metricColumn[] = {
+    QString s;
+
+    if (settings->contains(GC_SETTINGS_SUMMARY_METRICS))
+        s = settings->value(GC_SETTINGS_SUMMARY_METRICS).toString();
+    else
+        s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
+    QStringList metricColumnList = s.split(",");
+
+    char **metricColumnTmp;
+    // Copy QStringList to char **
+    metricColumnTmp = new char*[metricColumnList.size() + 1];
+    for (int i = 0; i < metricColumnList.size(); i++) {
+        metricColumnTmp[i] = new char[strlen(metricColumnList.at(i).toStdString().c_str())+1];
+        memcpy(metricColumnTmp[i], metricColumnList.at(i).toStdString().c_str(), strlen(metricColumnList.at(i).toStdString().c_str())+1);
+    }
+    metricColumnTmp[metricColumnList.size()] = NULL;
+    char const **metricColumn = (const char**)metricColumnTmp;
+
+    /*const char *metricColumn[] = {
         "skiba_xpower",
         "skiba_relative_intensity",
         "skiba_bike_score",
@@ -117,7 +135,7 @@ RideSummaryWindow::htmlSummary() const
         "trimp_points",
         "aerobic_decoupling",
         NULL
-    };
+    };*/
 
     summary += "<table border=0 cellspacing=10><tr>";
     for (int i = 0; i < columns; ++i) {
@@ -135,6 +153,7 @@ RideSummaryWindow::htmlSummary() const
         for (int j = 0;; ++j) {
             const char *symbol = metricsList[j];
             if (!symbol) break;
+
             RideMetricPtr m = rideItem->metrics.value(symbol);
             QString name = m->name().replace(QRegExp(tr("^Average ")), "");
             if (m->units(metricUnits) == "seconds" || m->units(metricUnits) == tr("seconds")) {

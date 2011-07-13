@@ -35,6 +35,7 @@ class QHBoxLayout;
 class QVBoxLayout;
 class ColorsPage;
 class IntervalMetricsPage;
+class SummaryMetricsPage;
 class MetadataPage;
 class KeywordsPage;
 class FieldsPage;
@@ -66,6 +67,7 @@ class ConfigurationPage : public QWidget
     private:
         MainWindow *main;
         ColorsPage *colorsPage;
+        SummaryMetricsPage *summaryMetrics;
         IntervalMetricsPage *intervalMetrics;
         MetadataPage *metadataPage;
 
@@ -227,6 +229,36 @@ class IntervalMetricsPage : public QWidget
         QPushButton *leftButton;
         QPushButton *rightButton;
 };
+
+class SummaryMetricsPage : public QWidget
+{
+    Q_OBJECT
+
+    public:
+
+        SummaryMetricsPage(QWidget *parent = NULL);
+
+    public slots:
+
+        void upClicked();
+        void downClicked();
+        void leftClicked();
+        void rightClicked();
+        void availChanged();
+        void selectedChanged();
+        void saveClicked();
+
+    protected:
+
+        bool changed;
+        QListWidget *availList;
+        QListWidget *selectedList;
+        QPushButton *upButton;
+        QPushButton *downButton;
+        QPushButton *leftButton;
+        QPushButton *rightButton;
+};
+
 
 class KeywordsPage : public QWidget
 {

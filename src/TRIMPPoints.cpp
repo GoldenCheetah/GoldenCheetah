@@ -293,6 +293,58 @@ public:
     RideMetric *clone() const { return new TRIMPZonalPoints(*this); }
 };
 
+
+// RPE is the rate of percieved exercion (borg scale).
+// Is a numerical value the riders give in "average" fatigue of the training session he percieved.
+//
+// Calculate the session RPE that is the product of RPE * time (minutes) of training/race ride. I
+// We have 3 different "training load" parameters:
+//    - internal load (TRIMPS)
+//    - external load (bikescore/TSS)
+//    - perceived load (session RPE)
+//
+class SessionRPE : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(TRIMPPoints)
+
+    double score;
+
+    public:
+
+    SessionRPE() : score(0.0)
+    {
+        setSymbol("session_rpe");
+#ifdef ENABLE_METRICS_TRANSLATION
+        setInternalName("Session RPE");
+    }
+    void initialize() {
+#endif
+        setName(tr("Session RPE"));
+        setMetricUnits("");
+        setImperialUnits("");
+        setType(RideMetric::Total);
+    }
+    void compute(const RideFile *rideFile,
+                 const Zones *, int ,
+                 const HrZones *hrZones, int hrZoneRange,
+                 const QHash<QString,RideMetric*> &deps)
+    {
+        // use RPE value in ride metadata
+        double rpe = rideFile->getTag("RPE", "0.0").toDouble();
+
+        assert(deps.contains("workout_time"));
+        const RideMetric *workoutTimeMetric = deps.value("workout_time");
+        assert(workoutTimeMetric);
+
+        double secs = workoutTimeMetric->value(true);
+
+        // ok lets work the score out
+        score = ((secs == 0.0 || rpe == 0) ? 0.0 :  secs/60 *rpe);
+        setValue(score);
+    }
+
+    RideMetric *clone() const { return new SessionRPE(*this); }
+};
+
 static bool added() {
     QVector<QString> deps;
     deps.append("workout_time");
@@ -312,6 +364,10 @@ static bool added() {
     deps.append("time_in_zone_H4");
     deps.append("time_in_zone_H5");
     RideMetricFactory::instance().addMetric(TRIMPZonalPoints(), &deps);
+
+    deps.clear();
+    deps.append("workout_time");
+    RideMetricFactory::instance().addMetric(SessionRPE(), &deps);
     return true;
 }
 
