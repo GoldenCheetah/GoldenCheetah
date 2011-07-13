@@ -146,7 +146,20 @@ RideSummaryWindow::htmlSummary() const
         NULL
     };
 
-    const char *metricColumn[] = {
+    QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
+    QStringList metricColumnList = s.split(",");
+
+    char **metricColumnTmp;
+    // Copy QStringList to char **
+    metricColumnTmp = new char*[metricColumnList.size() + 1];
+    for (int i = 0; i < metricColumnList.size(); i++) {
+        metricColumnTmp[i] = new char[strlen(metricColumnList.at(i).toStdString().c_str())+1];
+        memcpy(metricColumnTmp[i], metricColumnList.at(i).toStdString().c_str(), strlen(metricColumnList.at(i).toStdString().c_str())+1);
+    }
+    metricColumnTmp[metricColumnList.size()] = NULL;
+    char const **metricColumn = (const char**)metricColumnTmp;
+
+    /*const char *metricColumn[] = {
         "skiba_xpower",
         "skiba_relative_intensity",
         "skiba_bike_score",
@@ -155,7 +168,7 @@ RideSummaryWindow::htmlSummary() const
         "trimp_points",
         "aerobic_decoupling",
         NULL
-    };
+    };*/
 
     const char *timeInZones[] = {
         "time_in_zone_L1",
@@ -230,23 +243,23 @@ RideSummaryWindow::htmlSummary() const
             const char *symbol = metricsList[j];
             if (!symbol) break;
 
-            const RideMetric *m = factory.rideMetric(symbol);
-            if (!m) break;
-
-            // HTML table row
-            QString s("<tr><td>%1%2:</td><td align=\"right\">%3</td></tr>");
-
-            // Average Average looks nasty, remove from name for display
-            s = s.arg(m->name().replace(QRegExp(tr("^Average ")), ""));
-
-            // Add units (if needed)  and value (with right precision)
-            if (m->units(metricUnits) == "seconds") {
-                s = s.arg(""); // no units
-                s = s.arg(time_to_string(metrics.getForSymbol(symbol)));
-            } else {
-                if (m->units(metricUnits) != "") s = s.arg(" (" + m->units(metricUnits) + ")");
-                else s = s.arg("");
-                s = s.arg(metrics.getForSymbol(symbol) * (metricUnits ? 1 : m->conversion()), 0, 'f', m->precision());
+             const RideMetric *m = factory.rideMetric(symbol);
+             if (!m) break;
+ 
+             // HTML table row
+             QString s("<tr><td>%1%2:</td><td align=\"right\">%3</td></tr>");
+ 
+             // Average Average looks nasty, remove from name for display
+             s = s.arg(m->name().replace(QRegExp(tr("^Average ")), ""));
+ 
+             // Add units (if needed)  and value (with right precision)
+             if (m->units(metricUnits) == "seconds") {
+                 s = s.arg(""); // no units
+                 s = s.arg(time_to_string(metrics.getForSymbol(symbol)));
+             } else {
+                 if (m->units(metricUnits) != "") s = s.arg(" (" + m->units(metricUnits) + ")");
+                 else s = s.arg("");
+                 s = s.arg(metrics.getForSymbol(symbol) * (metricUnits ? 1 : m->conversion()), 0, 'f', m->precision());
             }
 
             summary += s;
