@@ -49,10 +49,11 @@ G_OBJECT
     MainWindow *parent;
     GoogleMapControl();  // default ctor
     int range;
-    std::string CreatePolyLine();
+    std::string CreatePolyLine(bool bg);
     void CreateSubPolyLine(const std::vector<RideFilePoint> &points,
                            std::ostringstream &oss,
-                           int avgPower);
+                           int avgPower,
+                           bool bg);
     std::string CreateMapToolTipJavaScript();
     std::string CreateIntervalHtml(QHash<QString,RideMetricPtr> &metrics, QStringList &intervalMetrics,
                                    QString &intervalName, bool useMetrics);
