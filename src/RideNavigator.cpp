@@ -58,8 +58,8 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
     tableView->setEditTriggers(QAbstractItemView::NoEditTriggers); // read-only
     mainLayout->addWidget(tableView);
     tableView->expandAll();
-    tableView->horizontalScrollBar()->setDisabled(true);
-    tableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //XXXtableView->horizontalScrollBar()->setDisabled(true);
+    //XXXtableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     tableView->setContextMenuPolicy(Qt::CustomContextMenu);
     tableView->header()->setStretchLastSection(false);
     tableView->header()->setMinimumSectionSize(20);
@@ -170,7 +170,7 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
     connect(tableView->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)), this, SLOT(setSortBy(int,Qt::SortOrder)));
     // we accept drag and drop operations
     setAcceptDrops(true);
-    setWidth(999);
+    //setWidth(999);
 
 }
 
@@ -192,21 +192,51 @@ RideNavigator::refresh()
 void
 RideNavigator::setWidth(int x)
 {
+    active = true;
+
+    if (tableView->verticalScrollBar())
+        x -= tableView->verticalScrollBar()->width();
+
     // is it narrower than the headings?
     int headwidth=0;
     for (int i=0; i<tableView->header()->count(); i++)
         if (tableView->header()->isSectionHidden(i) == false)
-            headwidth += tableView->header()->sectionSize(i);
+            headwidth += tableView->columnWidth(i);
+
+    // headwidth is no, x is to-be width
+    // we need to 'stretch' the sections 
+    // proportionally to fit into new
+    // layout
+    int setwidth=0;
+    int last=0;
+    int newwidth=0;
+    for (int i=0; i<tableView->header()->count(); i++) {
+        if (tableView->header()->isSectionHidden(i) == false) {
+            newwidth = ((double)tableView->columnWidth(i)/(double)headwidth) * (double)x; 
+            if (newwidth < 20) newwidth = 20;
+            QString columnName = tableView->model()->headerData(i, Qt::Horizontal).toString();
+            if (columnName == "*") newwidth = 0;
+            tableView->setColumnWidth(i, newwidth);
+            setwidth += newwidth;
+            last = i;
+        }
+    }
+    tableView->setColumnWidth(last, newwidth + (x-setwidth)); // account for rounding errors
 
     if (headwidth < x)
         delegate->setWidth(pwidth=headwidth);
     else
         delegate->setWidth(pwidth=x);
+
+    active = false;
 }
 
 void
 RideNavigator::columnsChanged()
 {
+    if (active == true) return;
+    active = true;
+
     visualHeadings.clear(); // they have moved
 
     // get the names used
@@ -229,7 +259,9 @@ RideNavigator::columnsChanged()
         widths += QString("%1|").arg(tableView->columnWidth(i));
 
     appsettings->setValue(GC_NAVHEADINGWIDTHS, widths);
-    setWidth(main->getSplitter()->sizes()[0]); // calculate width...
+    //setWidth(main->getSplitter()->sizes()[0]); // calculate width...
+
+    active = false;
 }
 
 bool
