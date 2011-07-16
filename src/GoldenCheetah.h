@@ -56,9 +56,10 @@ private:
     // controls are updated by widget when it is constructed
     Q_PROPERTY(QWidget* controls READ controls WRITE setControls NOTIFY controlsChanged)
 
-    // the title is shown in the title bar - set by
+    // the title is shown in the tab bar - set by
     // the layout manager
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged USER true)
+    Q_PROPERTY(QString subtitle READ subtitle WRITE setSubTitle NOTIFY subtitleChanged USER true)
 
     // the ride to plot - not set by the widget but
     // informed by the layout manager
@@ -74,6 +75,7 @@ private:
 
     QWidget *_controls;
     QString _title;
+    QString _subtitle;
     QString _instanceName;
     RideItem *_rideItem;
     GcWinID _type;
@@ -93,6 +95,7 @@ private:
 signals:
     void controlsChanged(QWidget*);
     void titleChanged(QString);
+    void subtitleChanged(QString);
     void rideItemChanged(RideItem*);
     void heightFactorChanged(double);
     void widthFactorChanged(double);
@@ -112,6 +115,9 @@ public:
 
     void setControls(QWidget *x);
     QWidget *controls() const;
+
+    void setSubTitle(QString x);
+    QString subtitle() const;
 
     void setTitle(QString x);
     QString title() const;

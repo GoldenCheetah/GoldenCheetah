@@ -47,9 +47,21 @@ void GcWindow::_setInstanceName(QString x)
     _instanceName = x;
 }
 
+QString GcWindow::subtitle() const
+{
+    return _subtitle;
+}
+
 QString GcWindow::title() const
 {
     return _title;
+}
+
+void GcWindow::setSubTitle(QString x)
+{
+    _subtitle = x;
+    emit subtitleChanged(_title);
+    repaint();
 }
 
 void GcWindow::setTitle(QString x)
@@ -203,17 +215,19 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         font.setPointSize((contentsMargins().top()/2)+2);
         font.setWeight(QFont::Bold);
         painter.setFont(font);
+        QString subtitle = property("subtitle").toString();
         QString title = property("title").toString();
+        QString heading = subtitle != "" ? subtitle : title;
 
         // embossed...
         QRect shad = bar;
         shad.setY(bar.y()+2);
         //shad.setX(bar.x()+2);
         painter.setPen(QColor(255,255,255,180));
-        painter.drawText(shad, title, Qt::AlignVCenter | Qt::AlignCenter);
+        painter.drawText(shad, heading, Qt::AlignVCenter | Qt::AlignCenter);
 
         painter.setPen(QColor(0,0,0,200));
-        painter.drawText(bar, title, Qt::AlignVCenter | Qt::AlignCenter);
+        painter.drawText(bar, heading, Qt::AlignVCenter | Qt::AlignCenter);
 
         // border
         painter.setBrush(Qt::NoBrush);

@@ -188,6 +188,9 @@ GoogleMapControl::rideSelected()
   else
       current = ride;
 
+  // Route metadata ...
+  setSubTitle(ride->ride()->getTag("Route", "Route"));
+
   range =ride->zoneRange();
   if(range < 0)
   {
@@ -326,8 +329,13 @@ void GoogleMapControl::createHtml()
         << "if (GBrowserIsCompatible()) {" << endl
         << "map = new GMap2(document.getElementById(\"map_canvas\")," << endl
         << " {size: new GSize(" << width << "," << height << ") } );" << endl
-        << "map.setUIToDefault()" << endl
-        << CreatePolyLine() << endl
+        << "map.setUIToDefault();" << endl
+#if 0
+        << "var bikeLayer = new google.maps.BicyclingLayer();" << endl
+        << "bikeLayer.setMap(map);" << endl
+#endif
+        << CreatePolyLine(true) << endl
+        << CreatePolyLine(false) << endl
         << CreateMarkers() << endl
         << "var sw = new GLatLng(" << minLat << "," << minLon << ");" << endl
         << "var ne = new GLatLng(" << maxLat << "," << maxLon << ");" << endl
@@ -363,7 +371,7 @@ QColor GoogleMapControl::GetColor(int watts)
 
 
 /// create the ride line
-string GoogleMapControl::CreatePolyLine()
+string GoogleMapControl::CreatePolyLine(bool bg)
 {
     std::vector<RideFilePoint> intervalPoints;
     ostringstream oss;
@@ -382,7 +390,7 @@ string GoogleMapControl::CreatePolyLine()
             // find the color
 
             // create the polyline
-            CreateSubPolyLine(intervalPoints,oss,avgPower);
+            CreateSubPolyLine(intervalPoints,oss,avgPower,bg);
             intervalPoints.clear();
             intervalPoints.push_back(rfp);
 
@@ -395,13 +403,17 @@ string GoogleMapControl::CreatePolyLine()
 
 void GoogleMapControl::CreateSubPolyLine(const std::vector<RideFilePoint> &points,
                                          std::ostringstream &oss,
-                                         int avgPower)
+                                         int avgPower,
+                                         bool bg)
 {
     oss.precision(6);
     QColor color = GetColor(avgPower);
+    if (bg) color = QColor(Qt::yellow);
     QString colorstr = color.name();
     oss.setf(ios::fixed,ios::floatfield);
-    oss << "var polyline = new GPolyline([";
+    if (bg) {
+        oss << "var bgline = new GPolyline([";
+    } else oss << "var polyline = new GPolyline([";
 
     BOOST_FOREACH(RideFilePoint rfp, points)
     {
@@ -410,21 +422,26 @@ void GoogleMapControl::CreateSubPolyLine(const std::vector<RideFilePoint> &point
             oss << "new GLatLng(" << rfp.lat << "," << rfp.lon << ")," << endl;
         }
     }
-    oss << "],\"" << colorstr.toStdString() << "\",4);" << endl;
+    oss << "],\"" << colorstr.toStdString() << "\"," << (bg ? "10, 1" : "4, 1" )  << ");" << endl;
 
+    if (!bg) {
     oss << "GEvent.addListener(polyline, 'mouseover', function() {" << endl
-        << "var tooltip_text = '30s Power: " << avgPower << "';" << endl
-        << "var ss={'weight':8};" << endl
+        << "var tooltip_text = '30s Power: " << avgPower << "';" << endl;
+        oss << "var ss={'weight':8,opacity:1};" << endl
         << "this.setStrokeStyle(ss);" << endl
         << "this.overlay = new MapTooltip(this,tooltip_text);" << endl
         << "map.addOverlay(this.overlay);" << endl
         << "});" << endl
         << "GEvent.addListener(polyline, 'mouseout', function() {" << endl
         << "map.removeOverlay(this.overlay);" << endl
-        << "var ss={'weight':5};" << endl
+        << "var ss={'weight':4,opacity:1};" << endl
         << "this.setStrokeStyle(ss);" << endl
         << "});" << endl;
-    oss << "map.addOverlay (polyline);" << endl;
+    }
+
+    if (bg) {
+        oss << "map.addOverlay (bgline);" << endl;
+    } else oss << "map.addOverlay (polyline);" << endl;
 }
 
 string GoogleMapControl::CreateIntervalMarkers(RideItem *rideItem)
