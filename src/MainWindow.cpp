@@ -323,6 +323,7 @@ MainWindow::MainWindow(const QDir &home) :
     }
 
     splitter = new QSplitter;
+    splitter->setOpaqueResize(false); // redraw when released, snappier UI
 
     // CHARTS
     chartTool = new GcWindowTool(this);
@@ -437,7 +438,7 @@ MainWindow::MainWindow(const QDir &home) :
     views->setContentsMargins(0,0,0,0);
 
     // SPLITTER
-   splitter->addWidget(toolBox);
+    splitter->addWidget(toolBox);
     splitter->addWidget(views);
     QVariant splitterSizes = appsettings->value(this, GC_SETTINGS_SPLITTER_SIZES); 
     if (splitterSizes != QVariant())
@@ -448,6 +449,9 @@ MainWindow::MainWindow(const QDir &home) :
         sizes.append(390);
         splitter->setSizes(sizes);
     }
+    splitter->setStretchFactor(0,0);
+    splitter->setStretchFactor(1,1);
+
     splitter->setChildrenCollapsible(false); // QT BUG crash QTextLayout do not undo this
     splitter->setHandleWidth(1);
     splitter->setFrameStyle(QFrame::NoFrame);
