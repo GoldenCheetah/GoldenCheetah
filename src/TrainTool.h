@@ -179,6 +179,9 @@ class TrainTool : public GcWindow
         double kjoules;
         double bikescore;
         double xpower;
+        bool manualOverride; // during an erg woprkout, if the Higher/Lower
+                             // signals are called, it switches to manual
+                             // until the next lap/interval
 
         // for non-zero average calcs
         int pwrcount, cadcount, hrcount, spdcount, lodcount, grdcount; // for NZ average calc
