@@ -23,8 +23,14 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/foreach.hpp>
 #include <errno.h>
+#include <stdio.h>
 
-static bool srmRegistered = Device::addDevice("SRM", new SrmDevice());
+#define tr(s) QObject::tr(s)
+
+static bool srm5Registered = Device::addDevice("SRM PCV", new SrmDevice( 5 ));
+static bool srm7Registered = Device::addDevice("SRM PCVI/7", new SrmDevice( 7 ));
+
+static Device::StatusCallback cb;
 
 QString
 SrmDevice::downloadInstructions() const
@@ -32,14 +38,13 @@ SrmDevice::downloadInstructions() const
     return ""; // no particular instructions for SRM
 }
 
-static Device::StatusCallback cb;
-
-static void
-logfunc(const char *msg)
+static void progress( size_t total, size_t done, void *user_data )
 {
-    // XXX: better log function
-    // fprintf(stderr, "%s\n", msg);
-    cb(QString(msg).left(40));
+    (void)user_data;
+
+    // XXX: better way to pass statusCallback - that's what we have
+    // "user_data" for...
+    cb( tr("progress: %1/%1").arg(done).arg(total) );
 }
 
 static bool
@@ -58,88 +63,208 @@ get_tmpname(const QDir &tmpdir, QString &tmpname, QString &err)
     return true;
 }
 
-struct SrmpcConn : public boost::noncopyable
-{
-    srmpc_conn_t d;
-    SrmpcConn(const QString &path, srmpc_log_callback_t logfunc = NULL) {
-        int opt_force = 0; // setting this to 1 is potentially dangerous
-        d = srmpc_open(path.toAscii().constData(), opt_force, logfunc);
-    }
-    ~SrmpcConn() { if (d) srmpc_close(d); }
-};
-
-struct SrmioData : public boost::noncopyable
-{
-    srm_data_t d;
-    SrmioData(srm_data_t d) : d(d) {}
-    ~SrmioData() { if (d) srm_data_free(d); }
-};
-
-static bool
-dev2path(CommPortPtr dev, QString &path, QString &err)
-{
-    if ( dev->type() == "Serial" ) {
-        err = "SRM download not supported by device " + dev->id();
-        return false;
-    }
-    path = dev->name();
-    return true;
-}
-
 bool
 SrmDevice::download(CommPortPtr dev, const QDir &tmpdir,
                     QString &tmpname, QString &filename,
                     StatusCallback statusCallback, QString &err)
 {
-    // Totally ghetto, proof-of-concept integration with srmio.
+    srmio_io_t io( NULL );
+    srmio_pc_t pc( NULL );
+    srmio_data_t data( NULL );
+    FILE *fh( NULL );
+    QDateTime startTime;
+
     cb = statusCallback;
-    QString path;
-    if (!dev2path(dev, path, err))
-        return false;
+
     if (!get_tmpname(tmpdir, tmpname, err))
         return false;
-    SrmpcConn srm(path, logfunc);
-    if (!srm.d) {
-        err = "Couldn't open device " + path + ": " + strerror(errno);
+
+    if( dev->type() == "Serial" ){
+        io = srmio_ios_new( dev->name().toAscii().constData() );
+        if( ! io ){
+            err = tr("failed to allocate device handle: %1")
+                .arg(strerror(errno));
+            return false;
+        }
+
+    } else {
+        err = tr("device type %1 is unsupported")
+            .arg(dev->type());
         return false;
     }
-    int opt_all = 0; // only get new data
-    int opt_fixup = 1; // fix bad data like srmwin.exe does
-    SrmioData srmdata(srmpc_get_data(srm.d, opt_all, opt_fixup));
-    if (!srmdata.d) {
-        err = "srmpc_get_data failed: ";
-        err += strerror(errno);
-        return false;
+
+    switch( protoVersion ){
+      case 5:
+        pc = srmio_pc5_new();
+        break;
+
+      case 6:
+      case 7:
+        pc = srmio_pc7_new();
+        break;
+
+      default:
+        err = tr("unsupported SRM Protocl version: %1")
+            .arg(protoVersion);
+        goto fail;
     }
-    if( ! srmdata.d->cused ){
-        err = "no data available";
-        return false;
+    if( ! pc ){
+        err = tr("failed to allocate Powercontrol handle: %1")
+            .arg(strerror(errno));
+        goto fail;
     }
-    if (srm_data_write_srm7(srmdata.d, tmpname.toAscii().constData()) < 0) {
-        err = "Couldn't write to file " + tmpname + ": " + strerror(errno);
-        return false;
+
+    statusCallback( tr("opening device %1").arg(dev->name()) );
+    if( ! srmio_io_open(io ) ){
+        err = tr("Couldn't open device %1: %2")
+            .arg(dev->name())
+            .arg(strerror(errno));
+        goto fail;
     }
-    QDateTime startTime;
-    startTime.setTime_t( srmdata.d->chunks[0]->time / 10 );
+
+    if( ! srmio_pc_set_device( pc, io ) ){
+        err = tr("failed to set Powercontrol io handle: %1")
+            .arg(strerror(errno));
+        goto fail;
+    }
+
+    statusCallback( tr("initializing PowerControl...") );
+    if( ! srmio_pc_open( pc ) ){
+        err = tr("failed to initialize Powercontrol communication: %1")
+            .arg(strerror(errno));
+        goto fail;
+    }
+
+    data = srmio_data_new();
+    if( ! data ){
+        err = tr("failed to allocate data handle: %1")
+            .arg(strerror(errno));
+        goto fail;
+    }
+
+    if( ! srmio_pc_xfer_all( pc, data, progress, NULL ) ){
+        err = tr( "failed to download data from Powercontrol: %1")
+            .arg(strerror(errno));
+        goto fail;
+    }
+
+    statusCallback( tr("got %1 records").arg(data->cused) );
+
+    if( ! data->cused ){
+        err = tr("no data available");
+        goto fail;
+    }
+
+    fh = fopen( tmpname.toAscii().constData(), "w" );
+    if( ! fh ){
+        err = tr( "failed to open file %1: %2")
+            .arg(tmpname)
+            .arg(strerror(errno));
+        goto fail;
+    }
+
+    if( ! srmio_file_srm7_write(data, fh) ){
+        err = tr("Couldn't write to file %1: %2")
+            .arg(tmpname)
+            .arg(strerror(errno));
+        goto fail;
+    }
+
+    startTime.setTime_t( 0.1 * data->chunks[0]->time );
     filename = startTime.toString("yyyy_MM_dd_hh_mm_ss") + ".srm";
 
+    srmio_data_free( data );
+    srmio_pc_free( pc );
+    srmio_io_free( io );
+    fclose( fh );
     return true;
+
+fail:
+    if( data ) srmio_data_free( data );
+    if( pc ) srmio_pc_free( pc );
+    if( io ) srmio_io_free( io );
+    if( fh ) fclose( fh );
+    return false;
 }
 
 void
 SrmDevice::cleanup(CommPortPtr dev)
 {
-    QString path, err;
-    if (!dev2path(dev, path, err))
-        assert(false);
+    QString err;
+    srmio_io_t io( NULL );
+    srmio_pc_t pc( NULL );
+
     if (QMessageBox::question(0, "Powercontrol",
                               "Erase ride from device memory?",
-                              "&Erase", "&Cancel", "", 1, 1) == 0) {
-        SrmpcConn srm(path);
-        if(!srm.d || (srmpc_clear_chunks(srm.d) < 0)) {
-            QMessageBox::warning(0, "Error",
-                                 "Error communicating with device.");
+                              "&Erase", "&Cancel", "", 1, 1) != 0)
+        return;
+
+
+    if( dev->type() == "Serial" ){
+        io = srmio_ios_new( dev->name().toAscii().constData() );
+        if( ! io ){
+            err = tr("failed to allocate device handle: %1")
+                .arg(strerror(errno));
+            goto cleanup;
         }
+
+    } else {
+        err = tr("device type %1 is unsupported")
+            .arg(dev->type());
+        goto cleanup;
     }
+
+    if( ! srmio_io_open(io ) ){
+        err = tr("Couldn't open device %1: %2")
+            .arg(dev->name())
+            .arg(strerror(errno));
+        goto cleanup;
+    }
+
+    switch( protoVersion ){
+      case 5:
+        pc = srmio_pc5_new();
+        break;
+
+      case 6:
+      case 7:
+        pc = srmio_pc7_new();
+        break;
+
+      default:
+        err = tr("unsupported SRM Protocl version: %1")
+            .arg(protoVersion);
+        goto cleanup;
+    }
+    if( ! pc ){
+        err = tr("failed to allocate Powercontrol handle: %1")
+            .arg(strerror(errno));
+        goto cleanup;
+    }
+
+    if( ! srmio_pc_set_device( pc, io ) ){
+        err = tr("failed to set Powercontrol io handle: %1")
+            .arg(strerror(errno));
+        goto cleanup;
+    }
+
+    if( ! srmio_pc_open( pc ) ){
+        err = tr("failed to initialize Powercontrol communication: %1")
+            .arg(strerror(errno));
+        goto cleanup;
+    }
+
+    if( ! srmio_pc_cmd_clear( pc ) ){
+        err = tr("failed to clear Powercontrol memory: %1")
+            .arg(strerror(errno));
+        goto cleanup;
+    }
+
+cleanup:
+    if( err.length() )
+        QMessageBox::warning(0, "Error", err );
+
+    if( pc ) srmio_pc_free( pc );
+    if( io ) srmio_io_free( io );
 }
 
