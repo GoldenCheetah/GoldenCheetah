@@ -78,13 +78,11 @@ struct SrmioData : public boost::noncopyable
 static bool
 dev2path(CommPortPtr dev, QString &path, QString &err)
 {
-    // Read device path out of device name.  Sketchy.
-    QRegExp rx("^Serial: (.+)$");
-    if (!rx.exactMatch(dev->name())) {
-        err = "SRM download not supported by device " + dev->name();
+    if ( dev->type() == "Serial" ) {
+        err = "SRM download not supported by device " + dev->id();
         return false;
     }
-    path = rx.cap(1);
+    path = dev->name();
     return true;
 }
 

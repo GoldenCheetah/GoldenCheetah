@@ -95,7 +95,7 @@ static D2XXWrapper *lib; // singleton lib instance
 bool D2XXRegistered = CommPort::addListFunction(&D2XX::myListCommPorts);
 
 D2XX::D2XX(const FT_DEVICE_LIST_INFO_NODE &info) :
-    info(info), isOpen(false)
+    info(info), isOpen(false), CommPort( "D2XX" )
 {
 }
 
@@ -186,7 +186,7 @@ D2XX::write(void *buf, size_t nbyte, QString &err)
 QString
 D2XX::name() const
 {
-    return QString("D2XX: ") + info.Description;
+    return info.Description;
 }
 
 QVector<CommPortPtr>

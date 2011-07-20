@@ -112,7 +112,7 @@ DownloadRideDialog::scanCommPorts()
                              QMessageBox::Ok, QMessageBox::NoButton);
     }
     for (int i = 0; i < devList.size(); ++i) {
-        portCombo->addItem(devList[i]->name());
+        portCombo->addItem(devList[i]->id());
         // Hack: SRM PCV download cables use the PL2203 chipset.  If the
         // first device name contains "PL2303", then, we're probably dealing
         // with an SRM, so go ahead and select the SRM device.  Generalize?
@@ -144,7 +144,7 @@ DownloadRideDialog::downloadClicked()
     downloadInProgress = true;
     CommPortPtr dev;
     for (int i = 0; i < devList.size(); ++i) {
-        if (devList[i]->name() == portCombo->currentText()) {
+        if (devList[i]->id() == portCombo->currentText()) {
             dev = devList[i];
             break;
         }
@@ -227,7 +227,7 @@ DownloadRideDialog::eraseClicked()
     downloadInProgress = true;
     CommPortPtr dev;
     for (int i = 0; i < devList.size(); ++i) {
-        if (devList[i]->name() == portCombo->currentText()) {
+        if (devList[i]->id() == portCombo->currentText()) {
             dev = devList[i];
             break;
         }

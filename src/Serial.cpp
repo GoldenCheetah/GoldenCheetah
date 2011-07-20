@@ -46,11 +46,11 @@
 bool SerialRegistered = CommPort::addListFunction(&Serial::myListCommPorts);
 
 #ifdef Q_OS_WIN32
-Serial::Serial(const QString &path) : path(path), isOpen(false)
+Serial::Serial(const QString &path) : CommPort("Serial"), path(path), isOpen(false)
 {
 }
 #else
-Serial::Serial(const QString &path) : path(path), fd(-1)
+Serial::Serial(const QString &path) : CommPort("Serial"), path(path), fd(-1)
 {
 }
 #endif
@@ -309,7 +309,7 @@ Serial::write(void *buf, size_t nbyte, QString &err)
 QString
 Serial::name() const
 {
-    return QString("Serial: ") + path;
+    return path;
 }
 
 #ifndef Q_OS_WIN32
