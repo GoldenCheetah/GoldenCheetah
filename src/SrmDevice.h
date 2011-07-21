@@ -20,16 +20,33 @@
 #define _GC_SrmDevice_h 1
 #include "GoldenCheetah.h"
 
-#include "CommPort.h"
 #include "Device.h"
+
+struct SrmDevices : public Devices
+{
+    SrmDevices( int protoVersion ) : protoVersion( protoVersion ) {}
+
+    virtual DevicePtr newDevice( CommPortPtr dev );
+    virtual bool canCleanup( void ) {return true; };
+
+private:
+    int protoVersion;
+};
 
 struct SrmDevice : public Device
 {
-    virtual QString downloadInstructions() const;
-    virtual bool download(CommPortPtr dev, const QDir &tmpdir,
+    SrmDevice( CommPortPtr dev, int protoVersion ) :
+        Device( dev ),
+        protoVersion( protoVersion ) {};
+
+    virtual bool download( const QDir &tmpdir,
                           QString &tmpname, QString &filename,
                           StatusCallback statusCallback, QString &err);
-    virtual void cleanup(CommPortPtr dev);
+
+    virtual void cleanup();
+
+private:
+    int protoVersion;
 };
 
 #endif // _GC_SrmDevice_h

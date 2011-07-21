@@ -27,15 +27,17 @@
 
 #define tr(s) QObject::tr(s)
 
-static bool srm5Registered = Device::addDevice("SRM PCV", new SrmDevice( 5 ));
-static bool srm7Registered = Device::addDevice("SRM PCVI/7", new SrmDevice( 7 ));
+static bool srm5Registered =
+    Devices::addType("SRM PCV", DevicesPtr(new SrmDevices( 5 )) );
+static bool srm7Registered =
+    Devices::addType("SRM PCVI/7", DevicesPtr(new SrmDevices( 7 )));
 
 static Device::StatusCallback cb;
 
-QString
-SrmDevice::downloadInstructions() const
+DevicePtr
+SrmDevices::newDevice( CommPortPtr dev )
 {
-    return ""; // no particular instructions for SRM
+    return DevicePtr( new SrmDevice( dev, protoVersion));
 }
 
 static void progress( size_t total, size_t done, void *user_data )
@@ -64,7 +66,7 @@ get_tmpname(const QDir &tmpdir, QString &tmpname, QString &err)
 }
 
 bool
-SrmDevice::download(CommPortPtr dev, const QDir &tmpdir,
+SrmDevice::download( const QDir &tmpdir,
                     QString &tmpname, QString &filename,
                     StatusCallback statusCallback, QString &err)
 {
@@ -188,7 +190,7 @@ fail:
 }
 
 void
-SrmDevice::cleanup(CommPortPtr dev)
+SrmDevice::cleanup()
 {
     QString err;
     srmio_io_t io( NULL );
