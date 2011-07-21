@@ -65,22 +65,14 @@ get_tmpname(const QDir &tmpdir, QString &tmpname, QString &err)
     return true;
 }
 
-bool
-SrmDevice::download( const QDir &tmpdir,
-                    QString &tmpname, QString &filename,
-                    StatusCallback statusCallback, QString &err)
+SrmDevice::~SrmDevice()
 {
-    srmio_io_t io( NULL );
-    srmio_pc_t pc( NULL );
-    srmio_data_t data( NULL );
-    FILE *fh( NULL );
-    QDateTime startTime;
+    close();
+}
 
-    cb = statusCallback;
-
-    if (!get_tmpname(tmpdir, tmpname, err))
-        return false;
-
+bool
+SrmDevice::open( QString &err )
+{
     if( dev->type() == "Serial" ){
         io = srmio_ios_new( dev->name().toAscii().constData() );
         if( ! io ){
@@ -116,7 +108,6 @@ SrmDevice::download( const QDir &tmpdir,
         goto fail;
     }
 
-    statusCallback( tr("opening device %1").arg(dev->name()) );
     if( ! srmio_io_open(io ) ){
         err = tr("Couldn't open device %1: %2")
             .arg(dev->name())
@@ -130,11 +121,64 @@ SrmDevice::download( const QDir &tmpdir,
         goto fail;
     }
 
-    statusCallback( tr("initializing PowerControl...") );
     if( ! srmio_pc_open( pc ) ){
         err = tr("failed to initialize Powercontrol communication: %1")
             .arg(strerror(errno));
         goto fail;
+    }
+
+    is_open = true;
+    return true;
+
+fail:
+    if( pc ){
+        srmio_pc_free( pc );
+        pc = NULL;
+    }
+
+    if( io ){
+        srmio_io_free( io );
+        io = NULL;
+    }
+
+    return false;
+}
+
+bool
+SrmDevice::close( void )
+{
+    if( pc ){
+        srmio_pc_free( pc );
+        pc = NULL;
+    }
+
+    if( io ){
+        srmio_io_free( io );
+        io = NULL;
+    }
+
+    is_open = false;
+    return true;
+}
+
+bool
+SrmDevice::download(const QDir &tmpdir,
+                    QString &tmpname, QString &filename,
+                    StatusCallback statusCallback, QString &err)
+{
+    srmio_data_t data( NULL );
+    FILE *fh( NULL );
+    QDateTime startTime;
+
+    cb = statusCallback;
+
+    if (!get_tmpname(tmpdir, tmpname, err))
+        return false;
+
+    if( ! is_open ){
+        statusCallback( tr("opening device %1").arg(dev->name()) );
+        if( ! open( err ) )
+            return false;
     }
 
     data = srmio_data_new();
@@ -176,16 +220,13 @@ SrmDevice::download( const QDir &tmpdir,
     filename = startTime.toString("yyyy_MM_dd_hh_mm_ss") + ".srm";
 
     srmio_data_free( data );
-    srmio_pc_free( pc );
-    srmio_io_free( io );
     fclose( fh );
     return true;
 
 fail:
     if( data ) srmio_data_free( data );
-    if( pc ) srmio_pc_free( pc );
-    if( io ) srmio_io_free( io );
     if( fh ) fclose( fh );
+    close();
     return false;
 }
 
@@ -193,8 +234,6 @@ void
 SrmDevice::cleanup()
 {
     QString err;
-    srmio_io_t io( NULL );
-    srmio_pc_t pc( NULL );
 
     if (QMessageBox::question(0, "Powercontrol",
                               "Erase ride from device memory?",
@@ -202,58 +241,9 @@ SrmDevice::cleanup()
         return;
 
 
-    if( dev->type() == "Serial" ){
-        io = srmio_ios_new( dev->name().toAscii().constData() );
-        if( ! io ){
-            err = tr("failed to allocate device handle: %1")
-                .arg(strerror(errno));
+    if( ! is_open ){
+        if( ! open( err ) )
             goto cleanup;
-        }
-
-    } else {
-        err = tr("device type %1 is unsupported")
-            .arg(dev->type());
-        goto cleanup;
-    }
-
-    if( ! srmio_io_open(io ) ){
-        err = tr("Couldn't open device %1: %2")
-            .arg(dev->name())
-            .arg(strerror(errno));
-        goto cleanup;
-    }
-
-    switch( protoVersion ){
-      case 5:
-        pc = srmio_pc5_new();
-        break;
-
-      case 6:
-      case 7:
-        pc = srmio_pc7_new();
-        break;
-
-      default:
-        err = tr("unsupported SRM Protocl version: %1")
-            .arg(protoVersion);
-        goto cleanup;
-    }
-    if( ! pc ){
-        err = tr("failed to allocate Powercontrol handle: %1")
-            .arg(strerror(errno));
-        goto cleanup;
-    }
-
-    if( ! srmio_pc_set_device( pc, io ) ){
-        err = tr("failed to set Powercontrol io handle: %1")
-            .arg(strerror(errno));
-        goto cleanup;
-    }
-
-    if( ! srmio_pc_open( pc ) ){
-        err = tr("failed to initialize Powercontrol communication: %1")
-            .arg(strerror(errno));
-        goto cleanup;
     }
 
     if( ! srmio_pc_cmd_clear( pc ) ){
@@ -262,11 +252,12 @@ SrmDevice::cleanup()
         goto cleanup;
     }
 
-cleanup:
-    if( err.length() )
-        QMessageBox::warning(0, "Error", err );
+    return;
 
-    if( pc ) srmio_pc_free( pc );
-    if( io ) srmio_io_free( io );
+cleanup:
+    if( err.length() ){
+        QMessageBox::warning(0, "Error", err );
+        close();
+    }
 }
 

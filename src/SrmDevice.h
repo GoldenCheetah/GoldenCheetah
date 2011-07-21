@@ -18,6 +18,7 @@
 
 #ifndef _GC_SrmDevice_h
 #define _GC_SrmDevice_h 1
+#include <srmio.h>
 #include "GoldenCheetah.h"
 
 #include "Device.h"
@@ -37,7 +38,10 @@ struct SrmDevice : public Device
 {
     SrmDevice( CommPortPtr dev, int protoVersion ) :
         Device( dev ),
-        protoVersion( protoVersion ) {};
+        protoVersion( protoVersion ),
+        is_open( false ),
+        io( NULL ), pc( NULL ) { };
+    ~SrmDevice();
 
     virtual bool download( const QDir &tmpdir,
                           QString &tmpname, QString &filename,
@@ -47,6 +51,12 @@ struct SrmDevice : public Device
 
 private:
     int protoVersion;
+    bool is_open;
+    srmio_io_t io;
+    srmio_pc_t pc;
+
+    bool open ( QString &err );
+    bool close( void );
 };
 
 #endif // _GC_SrmDevice_h
