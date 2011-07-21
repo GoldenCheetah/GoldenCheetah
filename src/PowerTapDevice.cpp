@@ -121,8 +121,11 @@ readUntilNewline(CommPortPtr dev, char *buf, int len, QString &err)
 
 bool
 PowerTapDevice::download( const QDir &tmpdir,
-                         QString &tmpname, QString &filename,
-                         StatusCallback statusCallback, QString &err)
+                         QList<DeviceDownloadFile> &files,
+                         CancelCallback cancelCallback,
+                         StatusCallback statusCallback,
+                         ProgressCallback progressCallback,
+                         QString &err)
 {
     if (!dev->open(err)) {
         err = "ERROR: open failed: " + err;
@@ -130,7 +133,6 @@ PowerTapDevice::download( const QDir &tmpdir,
     }
     // make several attempts at reading the version
     int attempts = 3;
-    QString cbtext;
     int veridx = -1;
     int version_len;
     char vbuf[256];
@@ -140,8 +142,8 @@ PowerTapDevice::download( const QDir &tmpdir,
 	if (!doWrite(dev, 0x56, false, err)) // 'V'
 	    return false;
 
-	cbtext = "Reading version...";
-	if (!statusCallback(cbtext)) {
+	statusCallback( "Reading version..." );
+	if (cancelCallback()) {
 	    err = "download cancelled";
 	    return false;
 	}
@@ -172,8 +174,8 @@ PowerTapDevice::download( const QDir &tmpdir,
     bool hwecho = version.indexOf('V') < veridx;
     if (PT_DEBUG) printf("hwecho=%s\n", hwecho ? "true" : "false");
 
-    cbtext += "done.\nReading header...";
-    if (!statusCallback(cbtext)) {
+    statusCallback( "Reading header..." );
+    if (cancelCallback()) {
         err = "download cancelled";
         return false;
     }
@@ -198,12 +200,11 @@ PowerTapDevice::download( const QDir &tmpdir,
     for (size_t i = 0; i < sizeof(header); ++i)
         records.append(header[i]);
 
-    cbtext += "done.\nReading ride data...\n";
-    if (!statusCallback(cbtext)) {
+    statusCallback( "Reading ride data..." );
+    if (cancelCallback()) {
         err = "download cancelled";
         return false;
     }
-    int cbtextlen = cbtext.length();
     double recIntSecs = 0.0;
 
     fflush(stdout);
@@ -265,11 +266,11 @@ PowerTapDevice::download( const QDir &tmpdir,
         }
         if (recIntSecs != 0.0) {
             int min = (int) round(records.size() / 6 * recIntSecs);
-            cbtext.chop(cbtext.size() - cbtextlen);
-            cbtext.append(QString("Ride data read: %1:%2").arg(min / 60)
-                            .arg(min % 60, 2, 10, QLatin1Char('0')));
+            progressCallback( QString("progress: %1:%2")
+                .arg(min / 60)
+                .arg(min % 60, 2, 10, QLatin1Char('0')));
         }
-        if (!statusCallback(cbtext)) {
+        if (cancelCallback()) {
             err = "download cancelled";
             return false;
         }
@@ -285,11 +286,20 @@ PowerTapDevice::download( const QDir &tmpdir,
             + tmpl + ": " + tmp.error();
         return false;
     }
+    // QTemporaryFile initially has permissions set to 0600.
+    // Make it readable by everyone.
+    tmp.setPermissions(tmp.permissions()
+                       | QFile::ReadOwner | QFile::ReadUser
+                       | QFile::ReadGroup | QFile::ReadOther);
+
+    DeviceDownloadFile file;
+    file.extension = "raw";
+    file.name = tmp.fileName();
+
     QTextStream os(&tmp);
     os << hex;
     os.setPadChar('0');
 
-    struct tm time;
     bool time_set = false;
     unsigned char *data = records.data();
     bool bIsVer81 = PowerTapUtil::is_Ver81(data);
@@ -304,7 +314,9 @@ PowerTapDevice::download( const QDir &tmpdir,
             os << ((j == 5) ? "\n" : " ");
         }
         if (!time_set && PowerTapUtil::is_time(data + i, bIsVer81)) {
-            PowerTapUtil::unpack_time(data + i, &time, bIsVer81);
+            struct tm time;
+            time_t timet = PowerTapUtil::unpack_time(data + i, &time, bIsVer81);
+            file.startTime.fromTime_t( timet );
             time_set = true;
         }
     }
@@ -313,21 +325,8 @@ PowerTapDevice::download( const QDir &tmpdir,
         tmp.setAutoRemove(true);
         return false;
     }
-    tmpname = tmp.fileName(); // after close(), tmp.fileName() is ""
-    tmp.close();
-    // QTemporaryFile initially has permissions set to 0600.
-    // Make it readable by everyone.
-    tmp.setPermissions(tmp.permissions()
-                       | QFile::ReadOwner | QFile::ReadUser
-                       | QFile::ReadGroup | QFile::ReadOther);
 
-    char filename_tmp[32];
-    sprintf(filename_tmp, "%04d_%02d_%02d_%02d_%02d_%02d.raw",
-            time.tm_year + 1900, time.tm_mon + 1,
-            time.tm_mday, time.tm_hour, time.tm_min,
-            time.tm_sec);
-    filename = filename_tmp;
-
+    files << file;
     return true;
 }
 

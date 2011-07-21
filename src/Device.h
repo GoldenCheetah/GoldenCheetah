@@ -23,6 +23,21 @@
 #include "CommPort.h"
 #include <boost/function.hpp>
 
+struct DeviceDownloadFile
+{
+    QString     name;
+    QDateTime   startTime;
+    QString     extension;
+};
+
+struct DeviceRideItem
+{
+    bool        wanted;
+    QDateTime   startTime;
+    unsigned    work;
+};
+typedef boost::shared_ptr<DeviceRideItem> DeviceRideItemPtr;
+
 struct Device;
 typedef boost::shared_ptr<Device> DevicePtr;
 
@@ -31,15 +46,24 @@ struct Device
     Device( CommPortPtr dev ) : dev( dev ) {};
     virtual ~Device();
 
-    typedef boost::function<bool (const QString &statusText)> StatusCallback;
+    typedef boost::function<bool (void)> CancelCallback;
+    typedef boost::function<void (const QString &statusText)> StatusCallback;
+    typedef boost::function<void (const QString &progressText)> ProgressCallback;
+
+    virtual bool preview( StatusCallback statusCallback, QString &err );
+    virtual QList<DeviceRideItemPtr> &rides();
 
     virtual bool download( const QDir &tmpdir,
-                          QString &tmpname, QString &filename,
-                          StatusCallback statusCallback, QString &err) = 0;
+                          QList<DeviceDownloadFile> &files,
+                          CancelCallback cancelCallback,
+                          StatusCallback statusCallback,
+                          ProgressCallback progressCallback,
+                          QString &err) = 0;
 
-    virtual void cleanup() { (void) dev; };
+    virtual bool cleanup( QString &err );
 
 protected:
+    QList<DeviceRideItemPtr> rideList;
     CommPortPtr dev;
 
 };
@@ -52,7 +76,7 @@ struct Devices
     virtual DevicePtr newDevice( CommPortPtr ) = 0;
 
     virtual bool canCleanup() { return false; };
-    virtual QString downloadInstructions() { return ""; };
+    virtual QString downloadInstructions() const { return ""; };
 
 
     static QList<QString> typeNames();

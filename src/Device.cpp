@@ -38,6 +38,31 @@ Device::~Device()
         dev->close();
 }
 
+bool
+Device::preview( StatusCallback statusCallback, QString &err )
+{
+    (void) statusCallback;
+    (void) err;
+
+    return true;
+}
+
+QList<DeviceRideItemPtr> &Device::rides()
+{
+    return rideList;
+}
+
+bool
+Device::cleanup( QString &err )
+{
+    (void) dev;
+
+    err = tr("cleanup is not supported");
+
+    return false;
+}
+
+
 QList<QString>
 Devices::typeNames()
 {

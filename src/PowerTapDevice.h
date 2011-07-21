@@ -34,8 +34,11 @@ struct PowerTapDevice : public Device
         Device( dev ) {};
 
     virtual bool download( const QDir &tmpdir,
-                          QString &tmpname, QString &filename,
-                          StatusCallback statusCallback, QString &err);
+                          QList<DeviceDownloadFile> &files,
+                          CancelCallback cancelCallback,
+                          StatusCallback statusCallback,
+                          ProgressCallback progressCallback,
+                          QString &err);
 };
 
 #endif // _GC_PowerTapDevice_h

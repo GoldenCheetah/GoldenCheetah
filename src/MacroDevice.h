@@ -19,10 +19,13 @@ struct MacroDevice : public Device
         Device( dev ) {};
 
     virtual bool download( const QDir &tmpdir,
-                          QString &tmpname, QString &filename,
-                          StatusCallback statusCallback, QString &err);
+                          QList<DeviceDownloadFile> &files,
+                          CancelCallback cancelCallback,
+                          StatusCallback statusCallback,
+                          ProgressCallback progressCallback,
+                          QString &err);
 
-    virtual void cleanup();
+    virtual bool cleanup( QString &err );
 };
 
 class MacroPacket
