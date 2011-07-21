@@ -23,22 +23,43 @@
 #include "CommPort.h"
 #include <boost/function.hpp>
 
+struct Device;
+typedef boost::shared_ptr<Device> DevicePtr;
+
 struct Device
 {
-    virtual ~Device() {}
+    Device( CommPortPtr dev ) : dev( dev ) {};
+    virtual ~Device();
 
     typedef boost::function<bool (const QString &statusText)> StatusCallback;
 
-    virtual QString downloadInstructions() const = 0;
-    virtual bool download(CommPortPtr dev, const QDir &tmpdir,
+    virtual bool download( const QDir &tmpdir,
                           QString &tmpname, QString &filename,
                           StatusCallback statusCallback, QString &err) = 0;
-    virtual void cleanup(CommPortPtr dev) { (void) dev; }
 
-    static QList<QString> deviceTypes();
-    static Device &device(const QString &deviceType);
-    static bool addDevice(const QString &deviceType, Device *device);
+    virtual void cleanup() { (void) dev; };
+
+protected:
+    CommPortPtr dev;
+
 };
+
+struct Devices;
+typedef boost::shared_ptr<Devices> DevicesPtr;
+
+struct Devices
+{
+    virtual DevicePtr newDevice( CommPortPtr ) = 0;
+
+    virtual bool canCleanup() { return false; };
+    virtual QString downloadInstructions() { return ""; };
+
+
+    static QList<QString> typeNames();
+    static DevicesPtr getType(const QString &deviceTypeName );
+    static bool addType(const QString &deviceTypeName, DevicesPtr p );
+};
+
 
 #endif // _GC_Device_h
 

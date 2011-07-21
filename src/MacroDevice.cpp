@@ -41,13 +41,19 @@
 #define LAST_PAGE 0xFA0A // LastPage number
 
 static bool macroRegistered =
-    Device::addDevice("O-Synce Macro PC-Link", new MacroDevice());
+    Devices::addType("O-Synce Macro PC-Link", DevicesPtr(new MacroDevices()) );
 
 QString
-MacroDevice::downloadInstructions() const
+MacroDevices::downloadInstructions() const
 {
     return ("Make sure the Macro unit is turned\n"
             "on and that its display says, \"PC Link\"");
+}
+
+DevicePtr
+MacroDevices::newDevice( CommPortPtr dev )
+{
+    return DevicePtr( new MacroDevice( dev ));
 }
 
 static QString
@@ -85,7 +91,7 @@ hexHex2Int(char c, char c2)
 }
 
 bool
-MacroDevice::download(CommPortPtr dev, const QDir &tmpdir,
+MacroDevice::download( const QDir &tmpdir,
                          QString &tmpname, QString &filename,
                          StatusCallback statusCallback, QString &err)
 {
@@ -239,7 +245,7 @@ MacroDevice::download(CommPortPtr dev, const QDir &tmpdir,
 }
 
 void
-MacroDevice::cleanup(CommPortPtr dev){
+MacroDevice::cleanup(){
     if (MACRO_DEBUG) printf("Erase all records on computer\n");
 
     QString err;

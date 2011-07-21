@@ -42,7 +42,7 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     label->setIndent(10);
 
     deviceCombo = new QComboBox(this);
-    QList<QString> deviceTypes = Device::deviceTypes();
+    QList<QString> deviceTypes = Devices::typeNames();
     assert(deviceTypes.size() > 0);
     BOOST_FOREACH(QString device, deviceTypes) {
         deviceCombo->addItem(device);
@@ -87,8 +87,8 @@ DownloadRideDialog::setReadyInstruct()
         eraseRideButton->setEnabled(false);
     }
     else {
-        Device &device = Device::device(deviceCombo->currentText());
-        QString inst = device.downloadInstructions();
+        DevicesPtr devtype = Devices::getType(deviceCombo->currentText());
+        QString inst = devtype->downloadInstructions();
         if (inst.size() == 0)
             label->setText("Click Download to begin downloading.");
         else
@@ -152,9 +152,11 @@ DownloadRideDialog::downloadClicked()
     assert(dev);
     QString err;
     QString tmpname, filename;
-    Device &device = Device::device(deviceCombo->currentText());
-    if (!device.download(
-            dev, home, tmpname, filename,
+    DevicesPtr devtype = Devices::getType(deviceCombo->currentText());
+    DevicePtr device = devtype->newDevice( dev );
+
+    if (!device->download(
+            home, tmpname, filename,
             boost::bind(&DownloadRideDialog::statusCallback, this, _1), err))
     {
         if (cancelled) {
@@ -212,7 +214,7 @@ DownloadRideDialog::downloadClicked()
     QMessageBox::information(this, tr("Success"), tr("Download complete."));
     mainWindow->addRide(filename);
 
-    device.cleanup(dev);
+    device->cleanup();
 
     downloadInProgress = false;
     accept();
@@ -233,8 +235,9 @@ DownloadRideDialog::eraseClicked()
         }
     }
     assert(dev);
-    Device &device = Device::device(deviceCombo->currentText());
-    device.cleanup(dev);
+    DevicesPtr devtype = Devices::getType(deviceCombo->currentText());
+    DevicePtr device = devtype->newDevice( dev );
+    device->cleanup();
     downloadInProgress = false;
     accept();
 }

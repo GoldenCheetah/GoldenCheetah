@@ -23,10 +23,16 @@
 #define PT_DEBUG false
 
 static bool powerTapRegistered =
-    Device::addDevice("PowerTap", new PowerTapDevice());
+    Devices::addType("PowerTap", DevicesPtr(new PowerTapDevices()) );
+
+DevicePtr
+PowerTapDevices::newDevice( CommPortPtr dev )
+{
+    return DevicePtr( new PowerTapDevice( dev ));
+}
 
 QString
-PowerTapDevice::downloadInstructions() const
+PowerTapDevices::downloadInstructions() const
 {
     return ("Make sure the PowerTap unit is turned\n"
             "on and that its display says, \"Host\"");
@@ -114,7 +120,7 @@ readUntilNewline(CommPortPtr dev, char *buf, int len, QString &err)
 }
 
 bool
-PowerTapDevice::download(CommPortPtr dev, const QDir &tmpdir,
+PowerTapDevice::download( const QDir &tmpdir,
                          QString &tmpname, QString &filename,
                          StatusCallback statusCallback, QString &err)
 {

@@ -18,7 +18,9 @@
 
 #include "Device.h"
 
-typedef QMap<QString,Device*> DevicesMap;
+#define tr(s) QObject::tr(s)
+
+typedef QMap<QString,DevicesPtr> DevicesMap;
 
 static DevicesMap *devicesPtr;
 
@@ -26,28 +28,34 @@ inline DevicesMap &
 devices()
 {
     if (devicesPtr == NULL)
-        devicesPtr = new QMap<QString,Device*>;
+        devicesPtr = new QMap<QString,DevicesPtr>;
     return *devicesPtr;
 }
 
+Device::~Device()
+{
+    if( dev->isOpen() )
+        dev->close();
+}
+
 QList<QString>
-Device::deviceTypes()
+Devices::typeNames()
 {
     return devices().keys();
 }
 
-Device &
-Device::device(const QString &deviceType)
+DevicesPtr
+Devices::getType(const QString &deviceTypeName )
 {
-    assert(devices().contains(deviceType));
-    return *devices().value(deviceType);
+    assert(devices().contains(deviceTypeName));
+    return devices().value(deviceTypeName);
 }
 
 bool
-Device::addDevice(const QString &deviceType, Device *device)
+Devices::addType(const QString &deviceTypeName, DevicesPtr p )
 {
-    assert(!devices().contains(deviceType));
-    devices().insert(deviceType, device);
+    assert(!devices().contains(deviceTypeName));
+    devices().insert(deviceTypeName, p);
     return true;
 }
 
