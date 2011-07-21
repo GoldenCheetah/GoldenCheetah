@@ -33,7 +33,7 @@ class D2XX : public CommPort
 
     FT_DEVICE_LIST_INFO_NODE info;
     FT_HANDLE ftHandle;
-    bool isOpen;
+    bool _isOpen;
     D2XX(const FT_DEVICE_LIST_INFO_NODE &info);
 
     public:
@@ -41,6 +41,7 @@ class D2XX : public CommPort
     static QVector<CommPortPtr> myListCommPorts(QString &err);
 
     virtual ~D2XX();
+    virtual bool isOpen();
     virtual bool open(QString &err);
     virtual void close();
     virtual int read(void *buf, size_t nbyte, QString &err);
