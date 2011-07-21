@@ -20,6 +20,11 @@ qrc_application.cpp
 # ignore other object files
 *.o
 
+# ignore lex/yacc generated files
+*_lex.cpp
+*_yacc.cpp
+*_yacc.h
+
 # ignore qmake-generated Makefile
 Makefile
 
