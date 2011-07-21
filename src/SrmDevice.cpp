@@ -32,21 +32,22 @@ static bool srm5Registered =
 static bool srm7Registered =
     Devices::addType("SRM PCVI/7", DevicesPtr(new SrmDevices( 7 )));
 
-static Device::StatusCallback cb;
-
 DevicePtr
 SrmDevices::newDevice( CommPortPtr dev )
 {
     return DevicePtr( new SrmDevice( dev, protoVersion));
 }
 
+static Device::ProgressCallback cb;
+
 static void progress( size_t total, size_t done, void *user_data )
 {
     (void)user_data;
 
-    // XXX: better way to pass statusCallback - that's what we have
-    // "user_data" for...
-    cb( tr("progress: %1/%1").arg(done).arg(total) );
+    // XXX: hack, unnecessary when switching from srmio_pc_xfer_all
+    cb( tr("progress: %1/%2")
+        .arg(done)
+        .arg(total));
 }
 
 static bool
@@ -147,6 +148,8 @@ fail:
 bool
 SrmDevice::close( void )
 {
+    rideList.clear();
+
     if( pc ){
         srmio_pc_free( pc );
         pc = NULL;
@@ -162,17 +165,32 @@ SrmDevice::close( void )
 }
 
 bool
-SrmDevice::download(const QDir &tmpdir,
-                    QString &tmpname, QString &filename,
-                    StatusCallback statusCallback, QString &err)
+SrmDevice::preview( StatusCallback statusCallback, QString &err )
+{
+    (void) statusCallback;
+    (void) err;
+    // XXX add preview
+    return true;
+}
+
+bool
+SrmDevice::download( const QDir &tmpdir,
+                    QList<DeviceDownloadFile> &files,
+                    CancelCallback cancelCallback,
+                    StatusCallback statusCallback,
+                    ProgressCallback progressCallback,
+                    QString &err)
 {
     srmio_data_t data( NULL );
     FILE *fh( NULL );
     QDateTime startTime;
 
-    cb = statusCallback;
+    cb = progressCallback;
 
-    if (!get_tmpname(tmpdir, tmpname, err))
+    DeviceDownloadFile file;
+    file.extension = "srm";
+
+    if (!get_tmpname(tmpdir, file.name, err))
         return false;
 
     if( ! is_open ){
@@ -188,6 +206,12 @@ SrmDevice::download(const QDir &tmpdir,
         goto fail;
     }
 
+    if( cancelCallback() ){
+        err = tr("download cancelled");
+        goto fail;
+    }
+
+    // XXX use rideList, migrate from xfer_all to chunk_next
     if( ! srmio_pc_xfer_all( pc, data, progress, NULL ) ){
         err = tr( "failed to download data from Powercontrol: %1")
             .arg(strerror(errno));
@@ -196,28 +220,33 @@ SrmDevice::download(const QDir &tmpdir,
 
     statusCallback( tr("got %1 records").arg(data->cused) );
 
+    if( cancelCallback() ){
+        err = tr("download cancelled");
+        goto fail;
+    }
+
     if( ! data->cused ){
         err = tr("no data available");
         goto fail;
     }
 
-    fh = fopen( tmpname.toAscii().constData(), "w" );
+    fh = fopen( file.name.toAscii().constData(), "w" );
     if( ! fh ){
         err = tr( "failed to open file %1: %2")
-            .arg(tmpname)
+            .arg(file.name)
             .arg(strerror(errno));
         goto fail;
     }
 
     if( ! srmio_file_srm7_write(data, fh) ){
         err = tr("Couldn't write to file %1: %2")
-            .arg(tmpname)
+            .arg(file.name)
             .arg(strerror(errno));
         goto fail;
     }
 
-    startTime.setTime_t( 0.1 * data->chunks[0]->time );
-    filename = startTime.toString("yyyy_MM_dd_hh_mm_ss") + ".srm";
+    file.startTime.setTime_t( 0.1 * data->chunks[0]->time );
+    files << file;
 
     srmio_data_free( data );
     fclose( fh );
@@ -230,17 +259,9 @@ fail:
     return false;
 }
 
-void
-SrmDevice::cleanup()
+bool
+SrmDevice::cleanup( QString &err )
 {
-    QString err;
-
-    if (QMessageBox::question(0, "Powercontrol",
-                              "Erase ride from device memory?",
-                              "&Erase", "&Cancel", "", 1, 1) != 0)
-        return;
-
-
     if( ! is_open ){
         if( ! open( err ) )
             goto cleanup;
@@ -252,12 +273,10 @@ SrmDevice::cleanup()
         goto cleanup;
     }
 
-    return;
+    return true;
 
 cleanup:
-    if( err.length() ){
-        QMessageBox::warning(0, "Error", err );
-        close();
-    }
+    close();
+    return false;
 }
 

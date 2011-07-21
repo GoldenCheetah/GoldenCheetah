@@ -26,20 +26,29 @@
 #include <QtGui>
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
+#include <stdio.h>
 
 DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
                                        const QDir &home) :
     mainWindow(mainWindow), home(home), cancelled(false),
-    downloadInProgress(false)
+    action(actionIdle)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("Download Ride Data");
 
     portCombo = new QComboBox(this);
 
-    QLabel *instructLabel = new QLabel(tr("Instructions:"), this);
-    label = new QLabel(this);
-    label->setIndent(10);
+
+    statusLabel = new QLabel(this);
+    statusLabel->setIndent(10);
+    statusLabel->setTextFormat(Qt::PlainText);
+    // XXX: make statusLabel scrollable
+
+    // would prefer a progress bar, but some devices (eg. PTap) don't give
+    // a hint about the total work, so this isn't possible.
+    progressLabel = new QLabel(this);
+    progressLabel->setIndent(10);
+    progressLabel->setTextFormat(Qt::PlainText);
 
     deviceCombo = new QComboBox(this);
     QList<QString> deviceTypes = Devices::typeNames();
@@ -47,30 +56,37 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     BOOST_FOREACH(QString device, deviceTypes) {
         deviceCombo->addItem(device);
     }
+    connect(deviceCombo, SIGNAL(currentIndexChanged(QString)), this, SLOT(deviceChanged(QString)));
 
     downloadButton = new QPushButton(tr("&Download"), this);
     eraseRideButton = new QPushButton(tr("&Erase Ride(s)"), this);
     rescanButton = new QPushButton(tr("&Rescan"), this);
     cancelButton = new QPushButton(tr("&Cancel"), this);
+    closeButton = new QPushButton(tr("&Close"), this);
+
+    downloadButton->setDefault( true );
 
     connect(downloadButton, SIGNAL(clicked()), this, SLOT(downloadClicked()));
     connect(eraseRideButton, SIGNAL(clicked()), this, SLOT(eraseClicked()));
     connect(rescanButton, SIGNAL(clicked()), this, SLOT(scanCommPorts()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(closeClicked()));
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(downloadButton);
     buttonLayout->addWidget(eraseRideButton);
     buttonLayout->addWidget(rescanButton);
     buttonLayout->addWidget(cancelButton);
+    buttonLayout->addWidget(closeButton);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->addWidget(new QLabel(tr("Select port:"), this));
-    mainLayout->addWidget(portCombo);
     mainLayout->addWidget(new QLabel(tr("Select device type:"), this));
     mainLayout->addWidget(deviceCombo);
-    mainLayout->addWidget(instructLabel);
-    mainLayout->addWidget(label);
+    mainLayout->addWidget(new QLabel(tr("Select port:"), this));
+    mainLayout->addWidget(portCombo);
+    mainLayout->addWidget(new QLabel(tr("Info:"), this));
+    mainLayout->addWidget(statusLabel, 1);
+    mainLayout->addWidget(progressLabel);
     mainLayout->addLayout(buttonLayout);
 
     scanCommPorts();
@@ -79,23 +95,23 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
 void
 DownloadRideDialog::setReadyInstruct()
 {
+    progressLabel->setText("");
+
     if (portCombo->count() == 0) {
-        label->setText(tr("No devices found.  Make sure the device\n"
+        statusLabel->setText(tr("No devices found.  Make sure the device\n"
                           "unit is plugged into the computer,\n"
                           "then click \"Rescan\" to check again."));
-        downloadButton->setEnabled(false);
-        eraseRideButton->setEnabled(false);
+        updateAction( actionMissing );
     }
     else {
         DevicesPtr devtype = Devices::getType(deviceCombo->currentText());
         QString inst = devtype->downloadInstructions();
         if (inst.size() == 0)
-            label->setText("Click Download to begin downloading.");
+            statusLabel->setText("Click Download to begin downloading.");
         else
-            label->setText(inst + ", \nthen click Download.");
-        downloadButton->setEnabled(true);
-        if (deviceCombo->currentText() == "SRM") // only SRM supports erase ride for now
-            eraseRideButton->setEnabled(true);
+            statusLabel->setText(inst + ", \nthen click Download.");
+
+        updateAction( actionIdle );
     }
 }
 
@@ -113,7 +129,7 @@ DownloadRideDialog::scanCommPorts()
     }
     for (int i = 0; i < devList.size(); ++i) {
         portCombo->addItem(devList[i]->id());
-        // Hack: SRM PCV download cables use the PL2203 chipset.  If the
+        // XXX Hack: SRM PCV download cables use the PL2203 chipset.  If the
         // first device name contains "PL2303", then, we're probably dealing
         // with an SRM, so go ahead and select the SRM device.  Generalize?
         if ((i == 0) && devList[i]->name().contains("PL2303")) {
@@ -128,20 +144,89 @@ DownloadRideDialog::scanCommPorts()
 }
 
 bool
-DownloadRideDialog::statusCallback(const QString &statusText)
+DownloadRideDialog::isCancelled()
 {
-    label->setText(statusText);
+    return cancelled;
+}
+
+void
+DownloadRideDialog::updateAction( downloadAction newAction )
+{
+
+    switch( newAction ){
+      case actionMissing:
+        downloadButton->setEnabled(false);
+        eraseRideButton->setEnabled(false);
+        rescanButton->setEnabled(true);
+        cancelButton->setEnabled(false);
+        closeButton->setEnabled(true);
+        portCombo->setEnabled(false);
+        deviceCombo->setEnabled(true);
+        break;
+
+      case actionIdle: {
+        DevicesPtr devtype = Devices::getType(deviceCombo->currentText());
+
+        downloadButton->setEnabled(true);
+        eraseRideButton->setEnabled(devtype->canCleanup());
+        rescanButton->setEnabled(true);
+        cancelButton->setEnabled(false);
+        closeButton->setEnabled(true);
+        portCombo->setEnabled(true);
+        deviceCombo->setEnabled(true);
+        break;
+        }
+
+      case actionDownload:
+      case actionCleaning:
+        downloadButton->setEnabled(false);
+        eraseRideButton->setEnabled(false);
+        rescanButton->setEnabled(false);
+        cancelButton->setEnabled(true);
+        closeButton->setEnabled(false);
+        portCombo->setEnabled(false);
+        deviceCombo->setEnabled(false);
+        break;
+
+    }
+
+    action = newAction;
+    cancelled = false;
     QCoreApplication::processEvents();
-    return !cancelled;
+}
+
+void
+DownloadRideDialog::updateStatus(const QString &statusText)
+{
+    statusLabel->setText(statusLabel->text() + "\n" + statusText);
+    QCoreApplication::processEvents();
+}
+
+void
+DownloadRideDialog::updateProgress( const QString &progressText )
+{
+    progressLabel->setText(progressText);
+    QCoreApplication::processEvents();
+}
+
+
+void
+DownloadRideDialog::deviceChanged( QString deviceType )
+{
+    (void)deviceType;
+
+    updateAction(action);
+    setReadyInstruct();
 }
 
 void
 DownloadRideDialog::downloadClicked()
 {
-    downloadButton->setEnabled(false);
-    eraseRideButton->setEnabled(false);
-    rescanButton->setEnabled(false);
-    downloadInProgress = true;
+    updateAction( actionDownload );
+
+    updateProgress( "" );
+    statusLabel->setText( "" );
+
     CommPortPtr dev;
     for (int i = 0; i < devList.size(); ++i) {
         if (devList[i]->id() == portCombo->currentText()) {
@@ -151,13 +236,33 @@ DownloadRideDialog::downloadClicked()
     }
     assert(dev);
     QString err;
-    QString tmpname, filename;
+    QList<DeviceDownloadFile> files;
+
     DevicesPtr devtype = Devices::getType(deviceCombo->currentText());
     DevicePtr device = devtype->newDevice( dev );
 
-    if (!device->download(
-            home, tmpname, filename,
-            boost::bind(&DownloadRideDialog::statusCallback, this, _1), err))
+    if( ! device->preview(
+        boost::bind(&DownloadRideDialog::updateStatus, this, _1),
+        err ) ){
+
+        QMessageBox::information(this, tr("Preview failed"), err);
+        updateAction( actionIdle );
+        return;
+    }
+
+    QList<DeviceRideItemPtr> &rides( device->rides() );
+    if( ! rides.empty() ){
+        // XXX: let user select, which rides he wants to download
+        for( int i = 0; i < rides.size(); ++i ){
+            rides.at(i)->wanted = true;
+        }
+    }
+
+    if (!device->download( home, files,
+            boost::bind(&DownloadRideDialog::isCancelled, this),
+            boost::bind(&DownloadRideDialog::updateStatus, this, _1),
+            boost::bind(&DownloadRideDialog::updateProgress, this, _1),
+            err))
     {
         if (cancelled) {
             QMessageBox::information(this, tr("Download canceled"),
@@ -167,66 +272,90 @@ DownloadRideDialog::downloadClicked()
         else {
             QMessageBox::information(this, tr("Download failed"), err);
         }
-        downloadInProgress = false;
-        reject();
+        updateStatus(tr("Download failed"));
+        updateAction( actionIdle );
         return;
     }
 
-    QString filepath = home.absolutePath() + "/" + filename;
-    if (QFile::exists(filepath)) {
-        if (QMessageBox::warning(
-                this,
-                tr("Ride Already Downloaded"),
-                tr("This ride appears to have already ")
-                + tr("been downloaded.  Do you want to ")
-                + tr("overwrite the previous download?"),
-                tr("&Overwrite"), tr("&Cancel"),
-                QString(), 1, 1) == 1) {
-            reject();
-            return;
+    updateProgress( "" );
+
+    int failures = 0;
+    for( int i = 0; i < files.size(); ++i ){
+        QString filename( files.at(i).startTime
+            .toString("yyyy_MM_dd_hh_mm_ss")
+            + "." + files.at(i).extension );
+        QString filepath( home.absoluteFilePath(filename) );
+
+        if (QFile::exists(filepath)) {
+            if (QMessageBox::warning( this,
+                    tr("Ride Already Downloaded"),
+                    tr("The ride starting at %1 appears to have already "
+                        "been downloaded.  Do you want to overwrite the "
+                        "previous download?")
+                        .arg(files.at(i).startTime.toString()),
+                    tr("&Overwrite"), tr("&Skip"),
+                    QString(), 1, 1) == 1) {
+                QFile::remove(files.at(i).name);
+                updateStatus(tr("skipped file %1")
+                    .arg( files.at(i).name ));
+                continue;
+            }
         }
-    }
 
 #ifdef __WIN32__
-    // Windows ::rename won't overwrite an existing file.
-    if (QFile::exists(filepath)) {
-        QFile old(filepath);
-        if (!old.remove()) {
-            QMessageBox::critical(this, tr("Error"),
-                                  tr("Failed to remove existing file ")
-                                  + filepath + ": " + old.error());
-            QFile::remove(tmpname);
-            reject();
+        // Windows ::rename won't overwrite an existing file.
+        if (QFile::exists(filepath)) {
+            QFile old(filepath);
+            if (!old.remove()) {
+                QMessageBox::critical(this, tr("Error"),
+                    tr("Failed to remove existing file %1: %2")
+                        .arg(filepath)
+                        .arg(old.error()) );
+                QFile::remove(files.at(i).name);
+                updateStatus(tr("failed to rename %1 to %2")
+                    .arg( files.at(i).name )
+                    .arg( filename ));
+                ++failures;
+                continue;
+            }
         }
-    }
 #endif
 
-    // Use ::rename() instead of QFile::rename() to get forced overwrite.
-    if (rename(QFile::encodeName(tmpname), QFile::encodeName(filepath)) < 0) {
-        QMessageBox::critical(this, tr("Error"),
-                              tr("Failed to rename ") + tmpname + tr(" to ")
-                              + filepath + ": " + strerror(errno));
-        QFile::remove(tmpname);
-        reject();
-        return;
+        // Use ::rename() instead of QFile::rename() to get forced overwrite.
+        if (rename(QFile::encodeName(files.at(i).name),
+            QFile::encodeName(filepath)) < 0) {
+
+            QMessageBox::critical(this, tr("Error"),
+                tr("Failed to rename %1 to %2: %3")
+                    .arg(files.at(i).name)
+                    .arg(filepath)
+                    .arg(strerror(errno)) );
+                updateStatus(tr("failed to rename %1 to %2")
+                    .arg( files.at(i).name )
+                    .arg( filename ));
+            QFile::remove(files.at(i).name);
+            ++failures;
+            continue;
+        }
+
+        QFile::remove(files.at(i).name);
+        mainWindow->addRide(filename);
     }
 
-    QMessageBox::information(this, tr("Success"), tr("Download complete."));
-    mainWindow->addRide(filename);
+    if( ! failures )
+        updateStatus( tr("download completed successfully") );
 
-    device->cleanup();
-
-    downloadInProgress = false;
-    accept();
+    updateAction( actionIdle );
 }
 
 void
 DownloadRideDialog::eraseClicked()
 {
-    downloadButton->setEnabled(false);
-    eraseRideButton->setEnabled(false);
-    rescanButton->setEnabled(false);
-    downloadInProgress = true;
+    updateAction( actionCleaning );
+
+    statusLabel->setText( "" );
+    updateProgress( "" );
+
     CommPortPtr dev;
     for (int i = 0; i < devList.size(); ++i) {
         if (devList[i]->id() == portCombo->currentText()) {
@@ -237,17 +366,35 @@ DownloadRideDialog::eraseClicked()
     assert(dev);
     DevicesPtr devtype = Devices::getType(deviceCombo->currentText());
     DevicePtr device = devtype->newDevice( dev );
-    device->cleanup();
-    downloadInProgress = false;
-    accept();
+
+    QString err;
+    if( device->cleanup( err) )
+        updateStatus( tr("cleaned data") );
+    else
+        updateStatus( err );
+
+    updateAction( actionIdle );
 }
 
 void
 DownloadRideDialog::cancelClicked()
 {
-    if (!downloadInProgress)
-        reject();
-    else
+    switch( action ){
+      case actionIdle:
+      case actionMissing:
+        // do nothing
+        break;
+
+      default:
         cancelled = true;
+        break;
+     }
 }
+
+void
+DownloadRideDialog::closeClicked()
+{
+    accept();
+}
+
 

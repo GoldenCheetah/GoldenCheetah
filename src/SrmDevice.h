@@ -43,11 +43,16 @@ struct SrmDevice : public Device
         io( NULL ), pc( NULL ) { };
     ~SrmDevice();
 
-    virtual bool download( const QDir &tmpdir,
-                          QString &tmpname, QString &filename,
-                          StatusCallback statusCallback, QString &err);
+    virtual bool preview( StatusCallback statusCallback, QString &err );
 
-    virtual void cleanup();
+    virtual bool download( const QDir &tmpdir,
+                          QList<DeviceDownloadFile> &files,
+                          CancelCallback cancelCallback,
+                          StatusCallback statusCallback,
+                          ProgressCallback progressCallback,
+                          QString &err);
+
+    virtual bool cleanup( QString &err );
 
 private:
     int protoVersion;
