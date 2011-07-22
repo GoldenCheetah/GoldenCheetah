@@ -381,7 +381,10 @@ GoogleMapControl::drawShadedRoute()
                             "    map.removeOverlay(this.overlay);\n"
                             "});\n"
 #endif
-                            "}\n").arg(color.name()).arg(avgWatts);
+                            "}\n").arg(color.name());
+#if 0 //XXX map.{add,remove}Overlay is deprecated..
+.arg(avgWatts);
+#endif
 
             view->page()->mainFrame()->evaluateJavaScript(code);
         }
