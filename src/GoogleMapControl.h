@@ -35,65 +35,93 @@ class MainWindow;
 class QColor;
 class QVBoxLayout;
 class QTabWidget;
+class GoogleMapControl;
+
+// trick the maps api into ignoring gestures by
+// pretending to be chrome. see: http://developer.qt.nokia.com/forums/viewthread/1643/P15
+class myWebPage : public QWebPage
+{
+    virtual QString userAgentForUrl(const QUrl&) const {
+        return "Chrome/1.0";
+    }
+};
+
+class WebBridge : public QObject
+{
+    Q_OBJECT;
+
+    private:
+        MainWindow *mainWindow;
+        GoogleMapControl *gm;
+
+    public:
+        WebBridge(MainWindow *mainWindow, GoogleMapControl *gm) : mainWindow(mainWindow), gm(gm) {}
+
+    public slots:
+        Q_INVOKABLE void call(int count);
+
+        // drawing basic route, and interval polylines
+        Q_INVOKABLE int intervalCount();
+        Q_INVOKABLE QVariantList getLatLons(int i); // get array of latitudes for highlighted n
+
+        // once map and basic route is loaded
+        // this slot is called to draw additional
+        // overlays e.g. shaded route, markers
+        Q_INVOKABLE void drawOverlays();
+
+        // display/toggle interval on map
+        Q_INVOKABLE void toggleInterval(int);
+        void intervalsChanged() { emit drawIntervals(); }
+
+    signals:
+        void drawIntervals();
+};
 
 class GoogleMapControl : public GcWindow
 {
-Q_OBJECT
-G_OBJECT
+    Q_OBJECT
+    G_OBJECT
 
+    private:
+        MainWindow *main;
+        QVBoxLayout *layout;
+        QWebView *view;
+        MainWindow *parent;
+        WebBridge *webBridge;
+        GoogleMapControl();  // default ctor
+        int range;
+        int rideCP; // rider's CP
+        QString currentPage;
+        RideItem *current;
 
- private:
-    MainWindow *main;
-    QVBoxLayout *layout;
-    QWebView *view;
-    MainWindow *parent;
-    GoogleMapControl();  // default ctor
-    int range;
-    std::string CreatePolyLine(bool bg);
-    void CreateSubPolyLine(const std::vector<RideFilePoint> &points,
-                           std::ostringstream &oss,
-                           int avgPower,
-                           bool bg);
-    std::string CreateMapToolTipJavaScript();
-    std::string CreateIntervalHtml(QHash<QString,RideMetricPtr> &metrics, QStringList &intervalMetrics,
-                                   QString &intervalName, bool useMetrics);
-    std::string CreateMarkers();
-    std::string CreateIntervalMarkers(RideItem *ride);
-    std::string CreateMarker(int number, double lat, double lon, std::string &html);
-    // the web browser is loading a page, do NOT start another load
-    bool loadingPage;
-    // the ride has changed, load a new page
-    bool newRideToLoad;
+        // the web browser is loading a page, do NOT start another load
+        bool loadingPage;
+        // the ride has changed, load a new page
+        bool newRideToLoad;
 
-    QColor GetColor(int watts);
+        QColor GetColor(int watts);
+        void createHtml();
+        QString createMapToolTipJavaScript();
 
-    // a GPS normalized vectory of ride data points,
-    // when a GPS unit loses signal it seems to
-    // put a coordinate close to 180 into the data
-    std::vector<RideFilePoint> rideData;
-    // current ride CP
-    int rideCP;
-    // current HTML for the ride
-    std::ostringstream currentPage;
-    RideItem *current;
+    public slots:
+        void rideSelected();
+        void createMarkers();
+        void drawShadedRoute();
 
- public slots:
-    void rideSelected();
+    private slots:
+        void loadRide();
+        void updateFrame();
+        void loadStarted();
+        void loadFinished(bool);
 
- private slots:
-    void loadRide();
-    void loadStarted();
-    void loadFinished(bool);
+    protected:
+        void resizeEvent(QResizeEvent *);
 
- protected:
-    void createHtml();
-    void resizeEvent(QResizeEvent *);
-
- public:
-    GoogleMapControl(MainWindow *);
-    virtual ~GoogleMapControl() { }
-    QTimer *delay;
-    bool first;
+    public:
+        GoogleMapControl(MainWindow *);
+        virtual ~GoogleMapControl() {}
+        QTimer *delay;
+        bool first;
 };
 
 #endif

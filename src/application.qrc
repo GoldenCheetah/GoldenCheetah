@@ -9,6 +9,11 @@
     <file>images/toolbar/main/home.png</file>
     <file>images/toolbar/main/measures.png</file>
     <file>images/toolbar/main/train.png</file>
+    <file>images/maps/cycling_feed.png</file>
+    <file>images/maps/loop.png</file>
+    <file>images/maps/cycling.png</file>
+    <file>images/maps/cycling_sprint.png</file>
+    <file>images/maps/finish.png</file>
     <file>images/aluBar.png</file>
     <file>images/aluToolBar.png</file>
     <file>images/aluBarDark.png</file>
