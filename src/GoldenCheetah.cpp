@@ -232,11 +232,11 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         // border
         painter.setBrush(Qt::NoBrush);
         if (underMouse()) {
-            QPixmap sized = closeImage.scaled(QSize(contentsMargins().top(),
-                                                    contentsMargins().top()));
+            QPixmap sized = closeImage.scaled(QSize(contentsMargins().top()-6,
+                                                    contentsMargins().top()-6));
             painter.setPen(Qt::black);
             painter.drawRect(QRect(0,0,width()-1,height()-1));
-            painter.drawPixmap(width()-sized.width(), 0, sized.width(), sized.height(), sized);
+            painter.drawPixmap(width()-3-sized.width(), 3, sized.width(), sized.height(), sized);
         } else {
             painter.setPen(Qt::darkGray);
             painter.drawRect(QRect(0,0,width()-1,height()-1));
