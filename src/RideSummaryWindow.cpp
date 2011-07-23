@@ -94,6 +94,8 @@ RideSummaryWindow::refresh()
 	    rideSummary->setHtml("");
         return;
     }
+    RideItem *rideItem = myRideItem;
+    setSubTitle(rideItem->dateTime.toString(tr("dddd MMMM d, yyyy, h:mm AP")));
     QString text = htmlSummary(); //debug CRASH in QTextLayout destructor.
     rideSummary->setHtml(text);
     rideSummary->setAlignment(Qt::AlignCenter);
@@ -117,9 +119,7 @@ RideSummaryWindow::htmlSummary() const
         return summary;
     }
 
-    summary = ("<p><center><h2>"
-               + rideItem->dateTime.toString(tr("dddd MMMM d, yyyy, h:mm AP"))
-               + "</h2><h3>" + tr("Device Type: ") + ride->deviceType() + "</h3>");
+    summary = ("<center><p><h3>" + tr("Device Type: ") + ride->deviceType() + "</h3>");
 
     QVariant unit = appsettings->value(this, GC_UNIT);
 
@@ -216,7 +216,7 @@ RideSummaryWindow::htmlSummary() const
     summary += "<table border=0 cellspacing=10><tr>";
     for (int i = 0; i < columns; ++i) {
         summary += "<td align=\"center\" width=\"%1%\"><table>"
-            "<tr><td align=\"center\" colspan=2><h2>%2</h2></td></tr>";
+            "<tr><td align=\"center\" colspan=2><h3>%2</h3></td></tr>";
         summary = summary.arg(90 / columns);
         summary = summary.arg(columnNames[i]);
         const char **metricsList;
@@ -262,7 +262,7 @@ RideSummaryWindow::htmlSummary() const
         QVector<double> time_in_zone(rideItem->numZones());
         for (int i = 0; i < rideItem->numZones(); ++i)
             time_in_zone[i] = metrics.getForSymbol(timeInZones[i]);
-        summary += tr("<h2>Power Zones</h2>");
+        summary += tr("<h3>Power Zones</h3>");
         summary += mainWindow->zones()->summarize(rideItem->zoneRange(), time_in_zone);
     }
 
@@ -273,7 +273,7 @@ RideSummaryWindow::htmlSummary() const
         QVector<double> time_in_zone(rideItem->numZones());
         for (int i = 0; i < rideItem->numZones(); ++i)
             time_in_zone[i] = metrics.getForSymbol(timeInZonesHR[i]);
-        summary += tr("<h2>Heart Rate Zones</h2>");
+        summary += tr("<h3>Heart Rate Zones</h3>");
         summary += mainWindow->hrZones()->summarize(rideItem->hrZoneRange(), time_in_zone);
     }
 
@@ -288,7 +288,7 @@ RideSummaryWindow::htmlSummary() const
         else
             s = GC_SETTINGS_INTERVAL_METRICS_DEFAULT;
         QStringList intervalMetrics = s.split(",");
-        summary += "<p><h2>"+tr("Intervals")+"</h2>\n<p>\n";
+        summary += "<p><h3>"+tr("Intervals")+"</h3>\n<p>\n";
         summary += "<table align=\"center\" width=\"90%\" ";
         summary += "cellspacing=0 border=0>";
         bool even = false;
