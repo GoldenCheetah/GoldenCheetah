@@ -150,6 +150,7 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
 
     // refresh when database is updated
     connect(main->metricDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
+
     // refresh when config changes (metric/imperial?)
     connect(main, SIGNAL(configChanged()), this, SLOT(refresh()));
     // refresh when rides added/removed
@@ -187,6 +188,9 @@ RideNavigator::refresh()
     sqlModel->select();
     while (sqlModel->canFetchMore(QModelIndex()))
         sqlModel->fetchMore(QModelIndex());
+
+    active=false;
+    rideTreeSelectionChanged();
 }
 
 void
