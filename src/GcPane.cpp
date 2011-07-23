@@ -18,12 +18,6 @@
 
 #include "GcPane.h"
 
-// on a mac we remove the drop shadows, since
-// they leave nasty artefacts for the close icon
-#ifdef Q_OS_MAC
-#include "/Developer/Headers/FlatCarbon/MacWindows.h"
-#endif
-
 GcPane::GcPane(QLayout *p)
 {
     GcPane();
@@ -35,11 +29,6 @@ GcPane::GcPane() : QWidget(NULL, Qt::FramelessWindowHint),
 {
     closeImage = QPixmap(":images/toolbar/popbutton.png");
     flipImage = QPixmap(":images/toolbar/flipbutton.png");
-#ifdef Q_OS_MAC
-    HIViewRef v = (HIViewRef)winId();
-    WindowRef w = HIViewGetWindow(v);
-    ChangeWindowAttributes(w, kWindowNoShadowAttribute, kWindowNoAttributes);
-#endif
     setAttribute(Qt::WA_DeleteOnClose);
     setAttribute(Qt::WA_TranslucentBackground);
     setAttribute(Qt::WA_NoSystemBackground);
