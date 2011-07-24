@@ -41,13 +41,19 @@
 #define LAST_PAGE 0xFA0A // LastPage number
 
 static bool macroRegistered =
-    Device::addDevice("O-Synce Macro PC-Link", new MacroDevice());
+    Devices::addType("O-Synce Macro PC-Link", DevicesPtr(new MacroDevices()) );
 
 QString
-MacroDevice::downloadInstructions() const
+MacroDevices::downloadInstructions() const
 {
     return ("Make sure the Macro unit is turned\n"
             "on and that its display says, \"PC Link\"");
+}
+
+DevicePtr
+MacroDevices::newDevice( CommPortPtr dev )
+{
+    return DevicePtr( new MacroDevice( dev ));
 }
 
 static QString
@@ -85,9 +91,12 @@ hexHex2Int(char c, char c2)
 }
 
 bool
-MacroDevice::download(CommPortPtr dev, const QDir &tmpdir,
-                         QString &tmpname, QString &filename,
-                         StatusCallback statusCallback, QString &err)
+MacroDevice::download( const QDir &tmpdir,
+                         QList<DeviceDownloadFile> &files,
+                         CancelCallback cancelCallback,
+                         StatusCallback statusCallback,
+                         ProgressCallback progressCallback,
+                         QString &err)
 {
     if (MACRO_DEBUG) printf("download O-Synce Macro");
 
@@ -96,8 +105,7 @@ MacroDevice::download(CommPortPtr dev, const QDir &tmpdir,
         return false;
     }
 
-    QString cbtext;
-    cbtext = "Request number of training...";
+    statusCallback("Request number of training...");
     if (MACRO_DEBUG) printf("Request number of training\n");
 
     MacroPacket cmd(NUMBER_OF_TRAINING_REQUESTS);
@@ -105,8 +113,7 @@ MacroDevice::download(CommPortPtr dev, const QDir &tmpdir,
 
     if (!cmd.write(dev, err)) return false;
 
-    cbtext = "Reading number of training...";
-    if (!statusCallback(cbtext))
+    if (cancelCallback())
     {
         err = "download cancelled";
         return false;
@@ -130,30 +137,11 @@ MacroDevice::download(CommPortPtr dev, const QDir &tmpdir,
         return false;
     }
 
-    if (!statusCallback(cbtext))
+    if (cancelCallback())
     {
         err = "download cancelled";
         return false;
     }
-
-    if (MACRO_DEBUG) printf("Acknowledge");
-    cmd= MacroPacket(ACKNOWLEDGE);
-    cmd.addToPayload(response.command);
-    if (!cmd.write(dev, err)) return false;
-
-    // filename from the first training
-    int sec = bcd2Int(response.payload.at(2));
-    int min = bcd2Int(response.payload.at(3));
-    int hour = bcd2Int(response.payload.at(4));
-    int day = bcd2Int(response.payload.at(5));
-    int month = hex2Int(response.payload.at(6));
-    int year = bcd2Int(response.payload.at(7));
-
-    char *filename_tmp = new char[32];
-
-    sprintf(filename_tmp, "%04d_%02d_%02d_%02d_%02d_%02d.osyn",
-            year + 2000, month, day, hour, min, sec);
-    filename = filename_tmp;
 
     // create temporary file
     QString tmpl = tmpdir.absoluteFilePath(".macrodl.XXXXXX");
@@ -166,14 +154,37 @@ MacroDevice::download(CommPortPtr dev, const QDir &tmpdir,
         return false;
     }
 
+    if (MACRO_DEBUG) printf("Acknowledge");
+    cmd= MacroPacket(ACKNOWLEDGE);
+    cmd.addToPayload(response.command);
+    if (!cmd.write(dev, err)) return false;
+
+    // timestamp from the first training
+    struct tm start;
+    start.tm_sec = bcd2Int(response.payload.at(2));
+    start.tm_min = bcd2Int(response.payload.at(3));
+    start.tm_hour = bcd2Int(response.payload.at(4));
+    start.tm_mday = bcd2Int(response.payload.at(5));
+    start.tm_mon = hex2Int(response.payload.at(6)) -1;
+    start.tm_year = bcd2Int(response.payload.at(7)) -100;
+    start.tm_isdst = -1;
+
+    DeviceDownloadFile file;
+    file.extension = "osyn";
+    file.name = tmp.fileName();
+    file.startTime.setTime_t( mktime( &start ));
+    files.append(file);
+
     QTextStream os(&tmp);
     os << hex;
 
     for (int i = 0; i < count; i++)
     {
         if (MACRO_DEBUG) printf("Request training %d\n",i);
-        cbtext = QString("Request datas of training %1 / %2...").arg(i+1).arg((int)count);
-        if (!statusCallback(cbtext))
+        statusCallback( QString("Request datas of training %1 / %2...")
+            .arg(i+1).arg((int)count) );
+
+        if (cancelCallback())
         {
             err = "download cancelled";
             return false;
@@ -183,8 +194,7 @@ MacroDevice::download(CommPortPtr dev, const QDir &tmpdir,
         cmd.addToPayload(i);
         if (!cmd.write(dev, err)) return false;
 
-        cbtext =  QString("Read datas of training %1 / %2...").arg(i+1).arg((int)count);
-        if (!statusCallback(cbtext))
+        if (cancelCallback())
         {
             err = "download cancelled";
             return false;
@@ -206,8 +216,11 @@ MacroDevice::download(CommPortPtr dev, const QDir &tmpdir,
 
             //int training_flag = hex2Int(response2.payload.at(43));
             tmp.write(response2.dataArray());
-            cbtext =  QString("Read datas of training %1 / %2... (%3 bytes)").arg(i+1).arg((int)count).arg(tmp.size());
-            if (!statusCallback(cbtext))
+            progressCallback( QString("training %1/%2... (%3 Bytes)")
+                .arg(i+1)
+                .arg((int)count)
+                .arg(tmp.size()) );
+            if (cancelCallback())
             {
                 err = "download cancelled";
                 return false;
@@ -223,7 +236,6 @@ MacroDevice::download(CommPortPtr dev, const QDir &tmpdir,
      }
 
 
-    tmpname = tmp.fileName(); // after close(), tmp.fileName() is ""
     tmp.close();
 
     dev->close();
@@ -238,11 +250,9 @@ MacroDevice::download(CommPortPtr dev, const QDir &tmpdir,
     return true;
 }
 
-void
-MacroDevice::cleanup(CommPortPtr dev){
+bool
+MacroDevice::cleanup( QString &err ){
     if (MACRO_DEBUG) printf("Erase all records on computer\n");
-
-    QString err;
 
     if (!dev->open(err)) {
         err = "ERROR: open failed: " + err;
@@ -262,6 +272,8 @@ MacroDevice::cleanup(CommPortPtr dev){
     }
 
     dev->close();
+
+    return true;
 }
 
 // --------------------------------------

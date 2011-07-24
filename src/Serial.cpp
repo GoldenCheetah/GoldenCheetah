@@ -46,23 +46,28 @@
 bool SerialRegistered = CommPort::addListFunction(&Serial::myListCommPorts);
 
 #ifdef Q_OS_WIN32
-Serial::Serial(const QString &path) : path(path), isOpen(false)
+Serial::Serial(const QString &path) : CommPort("Serial"), path(path), _isOpen(false)
 {
 }
 #else
-Serial::Serial(const QString &path) : path(path), fd(-1)
+Serial::Serial(const QString &path) : CommPort("Serial"), path(path), fd(-1)
 {
 }
 #endif
 
 Serial::~Serial()
 {
-#ifdef Q_OS_WIN32
-    if (isOpen == true) {
+    if( isOpen() )
         close();
-    }
+}
+
+bool
+Serial::isOpen()
+{
+#ifdef Q_OS_WIN32
+    return _isOpen;
 #else
-    if (fd >= 0) close();
+    return fd >= 0;
 #endif
 }
 
@@ -129,9 +134,9 @@ Serial::open(QString &err)
     fd = CreateFile (deviceFilenameW, GENERIC_READ|GENERIC_WRITE,
         FILE_SHARE_DELETE|FILE_SHARE_WRITE|FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 
-    if (fd == INVALID_HANDLE_VALUE) return isOpen = false;
+    if (fd == INVALID_HANDLE_VALUE) return _isOpen = false;
 
-    if (GetCommState (fd, &deviceSettings) == false) return isOpen = false;
+    if (GetCommState (fd, &deviceSettings) == false) return _isOpen = false;
 
     // so we've opened the comm port lets set it up for
     deviceSettings.BaudRate = CBR_9600;
@@ -148,7 +153,7 @@ Serial::open(QString &err)
 
     if (SetCommState(fd, &deviceSettings) == false) {
         CloseHandle(fd);
-        return isOpen = false;
+        return _isOpen = false;
     }
 
     timeouts.ReadIntervalTimeout = 0;
@@ -158,7 +163,7 @@ Serial::open(QString &err)
     timeouts.WriteTotalTimeoutMultiplier = 0;
     SetCommTimeouts(fd, &timeouts);
 
-    return isOpen = true;
+    return _isOpen = true;
 #endif
 }
 
@@ -170,9 +175,9 @@ Serial::close()
     ::close(fd);
     fd = -1;
 #else
-    if (isOpen == true) {
+    if (_isOpen == true) {
         CloseHandle(fd);
-        isOpen = false;
+        _isOpen = false;
     }
 #endif
 }
@@ -309,7 +314,7 @@ Serial::write(void *buf, size_t nbyte, QString &err)
 QString
 Serial::name() const
 {
-    return QString("Serial: ") + path;
+    return path;
 }
 
 #ifndef Q_OS_WIN32

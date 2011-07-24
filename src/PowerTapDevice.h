@@ -20,15 +20,25 @@
 #define _GC_PowerTapDevice_h 1
 #include "GoldenCheetah.h"
 
-#include "CommPort.h"
 #include "Device.h"
+
+struct PowerTapDevices : public Devices
+{
+    virtual DevicePtr newDevice( CommPortPtr dev );
+    virtual QString downloadInstructions() const;
+};
 
 struct PowerTapDevice : public Device
 {
-    virtual QString downloadInstructions() const;
-    virtual bool download(CommPortPtr dev, const QDir &tmpdir,
-                          QString &tmpname, QString &filename,
-                          StatusCallback statusCallback, QString &err);
+    PowerTapDevice( CommPortPtr dev ) :
+        Device( dev ) {};
+
+    virtual bool download( const QDir &tmpdir,
+                          QList<DeviceDownloadFile> &files,
+                          CancelCallback cancelCallback,
+                          StatusCallback statusCallback,
+                          ProgressCallback progressCallback,
+                          QString &err);
 };
 
 #endif // _GC_PowerTapDevice_h

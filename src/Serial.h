@@ -36,7 +36,7 @@ class Serial : public CommPort
 #ifndef Q_OS_WIN32
     int fd;
 #else
-    bool isOpen;            // don't rely on fd value to determine if
+    bool _isOpen;            // don't rely on fd value to determine if
                             // the COM port is open
     HANDLE fd;              // file descriptor for reading from com3
 #endif
@@ -47,6 +47,7 @@ class Serial : public CommPort
     static QVector<CommPortPtr> myListCommPorts(QString &err);
 
     virtual ~Serial();
+    virtual bool isOpen();
     virtual bool open(QString &err);
     virtual void close();
     virtual int read(void *buf, size_t nbyte, QString &err);
