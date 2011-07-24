@@ -218,6 +218,7 @@ HEADERS += \
         LTMTool.h \
         LTMTrend.h \
         LTMWindow.h \
+        MacroDevice.h \
         MainWindow.h \
         ManualRideDialog.h \
         ManualRideFile.h \
@@ -276,6 +277,7 @@ HEADERS += \
         StressCalculator.h \
         SummaryMetrics.h \
         SummaryWindow.h \
+        SyncRideFile.h \
         TcxParser.h \
         TcxRideFile.h \
         TxtRideFile.h \
@@ -374,6 +376,7 @@ SOURCES += \
         LTMTool.cpp \
         LTMTrend.cpp \
         LTMWindow.cpp \
+        MacroDevice.cpp \
         MainWindow.cpp \
         ManualRideDialog.cpp \
         ManualRideFile.cpp \
@@ -431,6 +434,7 @@ SOURCES += \
         StressCalculator.cpp \
         SummaryMetrics.cpp \
         SummaryWindow.cpp \
+        SyncRideFile.cpp \
         TacxCafRideFile.cpp \
         TcxParser.cpp \
         TcxRideFile.cpp \
