@@ -305,7 +305,7 @@ void GoogleMapControl::createHtml()
     "    webBridge.drawOverlays();\n" 
 
     "}\n" 
-    "</script>\n").arg(minLat,0,'g',6).arg(minLon,0,'g',6).arg(maxLat,0,'g',6).arg(maxLon,0,'g',6); 
+    "</script>\n").arg(minLat,0,'g',11).arg(minLon,0,'g',11).arg(maxLat,0,'g',11).arg(maxLon,0,'g',11); 
 
     // the main page is rather trivial
     currentPage += QString("</head>\n" 
@@ -343,7 +343,7 @@ GoogleMapControl::drawShadedRoute()
                    "   path = polyline.getPath();\n");
         } else {
             if (rfp->lat || rfp->lon)
-                code += QString("path.push(new google.maps.LatLng(%1,%2));\n").arg(rfp->lat,0,'g',6).arg(rfp->lon,0,'g',6);
+                code += QString("path.push(new google.maps.LatLng(%1,%2));\n").arg(rfp->lat,0,'g',11).arg(rfp->lon,0,'g',11);
         }
 
         // running total of time
@@ -433,20 +433,20 @@ GoogleMapControl::createMarkers()
         code = QString("{ var latlng = new google.maps.LatLng(%1,%2);" 
                    "var image = new google.maps.MarkerImage('qrc:images/maps/loop.png');"
                    "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
-                   "marker.setMap(map); }").arg(points[0]->lat,0,'g',6).arg(points[0]->lon,0,'g',6);
+                   "marker.setMap(map); }").arg(points[0]->lat,0,'g',11).arg(points[0]->lon,0,'g',11);
         view->page()->mainFrame()->evaluateJavaScript(code);
     } else {
         // start / finish markers
         code = QString("{ var latlng = new google.maps.LatLng(%1,%2);" 
                    "var image = new google.maps.MarkerImage('qrc:images/maps/cycling.png');"
                    "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
-                   "marker.setMap(map); }").arg(points[0]->lat,0,'g',6).arg(points[0]->lon,0,'g',6);
+                   "marker.setMap(map); }").arg(points[0]->lat,0,'g',11).arg(points[0]->lon,0,'g',11);
         view->page()->mainFrame()->evaluateJavaScript(code);
 
         code = QString("{ var latlng = new google.maps.LatLng(%1,%2);" 
                    "var image = new google.maps.MarkerImage('qrc:images/maps/finish.png');"
                    "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
-                   "marker.setMap(map); }").arg(points[points.count()-1]->lat,0,'g',6).arg(points[points.count()-1]->lon,0,'g',6);
+                   "marker.setMap(map); }").arg(points[points.count()-1]->lat,0,'g',11).arg(points[points.count()-1]->lon,0,'g',11);
         view->page()->mainFrame()->evaluateJavaScript(code);
     }
 
@@ -492,7 +492,7 @@ GoogleMapControl::createMarkers()
                     "var image = new google.maps.MarkerImage('qrc:images/maps/cycling_feed.png');"
                     "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
                     "marker.setMap(map);"
-                "}").arg(rfp->lat,0,'g',6).arg(rfp->lon,0,'g',6);
+                "}").arg(rfp->lat,0,'g',11).arg(rfp->lon,0,'g',11);
                 view->page()->mainFrame()->evaluateJavaScript(code);
                 stoptime=0;
             }
@@ -518,8 +518,8 @@ GoogleMapControl::createMarkers()
             "   markerList.push(marker);" // keep track of those suckers
             "   google.maps.event.addListener(marker, 'click', function(event) { webBridge.toggleInterval(%4); });"
             "}")
-                                    .arg(myRideItem->ride()->dataPoints()[offset]->lat,0,'g',6)
-                                    .arg(myRideItem->ride()->dataPoints()[offset]->lon,0,'g',6)
+                                    .arg(myRideItem->ride()->dataPoints()[offset]->lat,0,'g',11)
+                                    .arg(myRideItem->ride()->dataPoints()[offset]->lon,0,'g',11)
                                     .arg(x.name)
                                     .arg(interval);
         view->page()->mainFrame()->evaluateJavaScript(code);
