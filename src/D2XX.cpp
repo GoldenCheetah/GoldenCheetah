@@ -95,27 +95,33 @@ static D2XXWrapper *lib; // singleton lib instance
 bool D2XXRegistered = CommPort::addListFunction(&D2XX::myListCommPorts);
 
 D2XX::D2XX(const FT_DEVICE_LIST_INFO_NODE &info) :
-    info(info), isOpen(false)
+    CommPort( "D2XX" ), info(info), _isOpen(false)
 {
 }
 
 D2XX::~D2XX()
 {
-    if (isOpen)
+    if (_isOpen)
         close();
+}
+
+bool
+D2XX::isOpen()
+{
+    return _isOpen;
 }
 
 bool
 D2XX::open(QString &err)
 {
-    assert(!isOpen);
+    assert(!_isOpen);
     FT_STATUS ftStatus =
         lib->open_ex(info.Description, FT_OPEN_BY_DESCRIPTION, &ftHandle);
     if (ftStatus != FT_OK) {
         err = QString("FT_Open: %1").arg(ftStatus);
         return false;
     }
-    isOpen = true;
+    _isOpen = true;
     ftStatus = lib->set_baud_rate(ftHandle, 9600);
     if (ftStatus != FT_OK) {
         err = QString("FT_SetBaudRate: %1").arg(ftStatus);
@@ -142,15 +148,15 @@ D2XX::open(QString &err)
 void
 D2XX::close()
 {
-    assert(isOpen);
+    assert(_isOpen);
     lib->close(ftHandle);
-    isOpen = false;
+    _isOpen = false;
 }
 
 int
 D2XX::read(void *buf, size_t nbyte, QString &err)
 {
-    assert(isOpen);
+    assert(_isOpen);
     DWORD rxbytes;
     FT_STATUS ftStatus = lib->get_queue_status(ftHandle, &rxbytes);
     if (ftStatus != FT_OK) {
@@ -174,7 +180,7 @@ D2XX::read(void *buf, size_t nbyte, QString &err)
 int
 D2XX::write(void *buf, size_t nbyte, QString &err)
 {
-    assert(isOpen);
+    assert(_isOpen);
     DWORD n;
     FT_STATUS ftStatus = lib->write(ftHandle, buf, nbyte, &n);
     if (ftStatus == FT_OK)
@@ -186,7 +192,7 @@ D2XX::write(void *buf, size_t nbyte, QString &err)
 QString
 D2XX::name() const
 {
-    return QString("D2XX: ") + info.Description;
+    return info.Description;
 }
 
 QVector<CommPortPtr>

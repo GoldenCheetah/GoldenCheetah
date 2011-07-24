@@ -29,17 +29,24 @@ typedef boost::shared_ptr<CommPort> CommPortPtr;
 class CommPort
 {
     public:
+    CommPort( const QString type ) : commType( type ) {};
 
     typedef QVector<CommPortPtr> (*ListFunction)(QString &err);
     static bool addListFunction(ListFunction f);
     static QVector<CommPortPtr> listCommPorts(QString &err);
 
-    virtual ~CommPort() {}
+    virtual ~CommPort() {};
+    virtual bool isOpen() = 0;
     virtual bool open(QString &err) = 0;
     virtual void close() = 0;
     virtual int read(void *buf, size_t nbyte, QString &err) = 0;
     virtual int write(void *buf, size_t nbyte, QString &err) = 0;
     virtual QString name() const = 0;
+    QString type( void ) const;
+    QString id( void ) const;
+
+private:
+    QString commType;
 
 };
 

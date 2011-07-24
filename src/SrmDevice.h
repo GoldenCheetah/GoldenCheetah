@@ -18,18 +18,50 @@
 
 #ifndef _GC_SrmDevice_h
 #define _GC_SrmDevice_h 1
+#include <srmio.h>
 #include "GoldenCheetah.h"
 
-#include "CommPort.h"
 #include "Device.h"
+
+struct SrmDevices : public Devices
+{
+    SrmDevices( int protoVersion ) : protoVersion( protoVersion ) {}
+
+    virtual DevicePtr newDevice( CommPortPtr dev );
+    virtual bool canCleanup( void ) {return true; };
+
+private:
+    int protoVersion;
+};
 
 struct SrmDevice : public Device
 {
-    virtual QString downloadInstructions() const;
-    virtual bool download(CommPortPtr dev, const QDir &tmpdir,
-                          QString &tmpname, QString &filename,
-                          StatusCallback statusCallback, QString &err);
-    virtual void cleanup(CommPortPtr dev);
+    SrmDevice( CommPortPtr dev, int protoVersion ) :
+        Device( dev ),
+        protoVersion( protoVersion ),
+        is_open( false ),
+        io( NULL ), pc( NULL ) { };
+    ~SrmDevice();
+
+    virtual bool preview( StatusCallback statusCallback, QString &err );
+
+    virtual bool download( const QDir &tmpdir,
+                          QList<DeviceDownloadFile> &files,
+                          CancelCallback cancelCallback,
+                          StatusCallback statusCallback,
+                          ProgressCallback progressCallback,
+                          QString &err);
+
+    virtual bool cleanup( QString &err );
+
+private:
+    int protoVersion;
+    bool is_open;
+    srmio_io_t io;
+    srmio_pc_t pc;
+
+    bool open ( QString &err );
+    bool close( void );
 };
 
 #endif // _GC_SrmDevice_h

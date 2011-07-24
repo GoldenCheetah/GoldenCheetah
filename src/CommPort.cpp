@@ -48,3 +48,18 @@ CommPort::listCommPorts(QString &err)
     return result;
 }
 
+QString
+CommPort::type() const
+{
+    return commType;
+}
+
+QString
+CommPort::id() const
+{
+    QString id = commType + ": ";
+    id += name();
+    return id;
+}
+
+

@@ -6,15 +6,26 @@
 
 class DeviceFileInfo;
 
+struct MacroDevices : public Devices
+{
+    virtual DevicePtr newDevice( CommPortPtr dev );
+    virtual QString downloadInstructions() const;
+    virtual bool canCleanup( void ) {return true; };
+};
+
 struct MacroDevice : public Device
 {
-    virtual QString downloadInstructions() const;
+    MacroDevice( CommPortPtr dev ) :
+        Device( dev ) {};
 
-    virtual bool download(CommPortPtr dev, const QDir &tmpdir,
-                          QString &tmpname, QString &filename,
-                          StatusCallback statusCallback, QString &err);
+    virtual bool download( const QDir &tmpdir,
+                          QList<DeviceDownloadFile> &files,
+                          CancelCallback cancelCallback,
+                          StatusCallback statusCallback,
+                          ProgressCallback progressCallback,
+                          QString &err);
 
-    virtual void cleanup(CommPortPtr dev);
+    virtual bool cleanup( QString &err );
 };
 
 class MacroPacket

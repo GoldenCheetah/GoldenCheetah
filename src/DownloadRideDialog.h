@@ -34,26 +34,42 @@ class DownloadRideDialog : public QDialog
     public:
         DownloadRideDialog(MainWindow *mainWindow, const QDir &home);
 
-        void downloadFinished();
-        bool statusCallback(const QString &statusText);
+        bool isCancelled();
+        void updateStatus(const QString &statusText);
+        void updateProgress(const QString &progressText);
 
     private slots:
         void downloadClicked();
         void eraseClicked();
         void cancelClicked();
+        void closeClicked();
         void setReadyInstruct();
         void scanCommPorts();
+        void deviceChanged(QString);
 
     private:
 
         MainWindow *mainWindow;
         QDir home;
-        QPushButton *downloadButton, *eraseRideButton, *rescanButton, *cancelButton;
+        QPushButton *downloadButton, *eraseRideButton, *rescanButton,
+            *cancelButton, *closeButton;
         QComboBox *portCombo, *deviceCombo;
-        QLabel *label;
+        QTextEdit *statusLabel;
+        QLabel *progressLabel;
 
         QVector<CommPortPtr> devList;
-        bool cancelled, downloadInProgress;
+        bool cancelled;
+
+        typedef enum {
+            actionIdle,
+            actionMissing,
+            actionDownload,
+            actionCleaning,
+        } downloadAction;
+
+        downloadAction action;
+
+        void updateAction( downloadAction action );
 };
 
 #endif // _GC_DownloadRideDialog_h

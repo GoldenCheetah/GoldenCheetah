@@ -23,23 +23,19 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/foreach.hpp>
 #include <errno.h>
+#include <stdio.h>
 
-static bool srmRegistered = Device::addDevice("SRM", new SrmDevice());
+#define tr(s) QObject::tr(s)
 
-QString
-SrmDevice::downloadInstructions() const
+static bool srm5Registered =
+    Devices::addType("SRM PCV", DevicesPtr(new SrmDevices( 5 )) );
+static bool srm7Registered =
+    Devices::addType("SRM PCVI/7", DevicesPtr(new SrmDevices( 7 )));
+
+DevicePtr
+SrmDevices::newDevice( CommPortPtr dev )
 {
-    return ""; // no particular instructions for SRM
-}
-
-static Device::StatusCallback cb;
-
-static void
-logfunc(const char *msg)
-{
-    // XXX: better log function
-    // fprintf(stderr, "%s\n", msg);
-    cb(QString(msg).left(40));
+    return DevicePtr( new SrmDevice( dev, protoVersion));
 }
 
 static bool
@@ -58,90 +54,450 @@ get_tmpname(const QDir &tmpdir, QString &tmpname, QString &err)
     return true;
 }
 
-struct SrmpcConn : public boost::noncopyable
+SrmDevice::~SrmDevice()
 {
-    srmpc_conn_t d;
-    SrmpcConn(const QString &path, srmpc_log_callback_t logfunc = NULL) {
-        int opt_force = 0; // setting this to 1 is potentially dangerous
-        d = srmpc_open(path.toAscii().constData(), opt_force, logfunc);
-    }
-    ~SrmpcConn() { if (d) srmpc_close(d); }
-};
+    close();
+}
 
-struct SrmioData : public boost::noncopyable
+bool
+SrmDevice::open( QString &err )
 {
-    srm_data_t d;
-    SrmioData(srm_data_t d) : d(d) {}
-    ~SrmioData() { if (d) srm_data_free(d); }
-};
+    if( dev->type() == "Serial" ){
+        io = srmio_ios_new( dev->name().toAscii().constData() );
+        if( ! io ){
+            err = tr("failed to allocate device handle: %1")
+                .arg(strerror(errno));
+            return false;
+        }
 
-static bool
-dev2path(CommPortPtr dev, QString &path, QString &err)
-{
-    // Read device path out of device name.  Sketchy.
-    QRegExp rx("^Serial: (.+)$");
-    if (!rx.exactMatch(dev->name())) {
-        err = "SRM download not supported by device " + dev->name();
+    } else {
+        err = tr("device type %1 is unsupported")
+            .arg(dev->type());
         return false;
     }
-    path = rx.cap(1);
+
+    switch( protoVersion ){
+      case 5:
+        pc = srmio_pc5_new();
+        break;
+
+      case 6:
+      case 7:
+        pc = srmio_pc7_new();
+        break;
+
+      default:
+        err = tr("unsupported SRM Protocl version: %1")
+            .arg(protoVersion);
+        goto fail;
+    }
+    if( ! pc ){
+        err = tr("failed to allocate Powercontrol handle: %1")
+            .arg(strerror(errno));
+        goto fail;
+    }
+
+    if( ! srmio_io_open(io ) ){
+        err = tr("Couldn't open device %1: %2")
+            .arg(dev->name())
+            .arg(strerror(errno));
+        goto fail;
+    }
+
+    if( ! srmio_pc_set_device( pc, io ) ){
+        err = tr("failed to set Powercontrol io handle: %1")
+            .arg(strerror(errno));
+        goto fail;
+    }
+
+    if( ! srmio_pc_open( pc ) ){
+        err = tr("failed to initialize Powercontrol communication: %1")
+            .arg(strerror(errno));
+        goto fail;
+    }
+
+    is_open = true;
+    return true;
+
+fail:
+    if( pc ){
+        srmio_pc_free( pc );
+        pc = NULL;
+    }
+
+    if( io ){
+        srmio_io_free( io );
+        io = NULL;
+    }
+
+    return false;
+}
+
+bool
+SrmDevice::close( void )
+{
+    rideList.clear();
+
+    if( pc ){
+        srmio_pc_free( pc );
+        pc = NULL;
+    }
+
+    if( io ){
+        srmio_io_free( io );
+        io = NULL;
+    }
+
+    is_open = false;
     return true;
 }
 
 bool
-SrmDevice::download(CommPortPtr dev, const QDir &tmpdir,
-                    QString &tmpname, QString &filename,
-                    StatusCallback statusCallback, QString &err)
+SrmDevice::preview( StatusCallback statusCallback, QString &err )
 {
-    // Totally ghetto, proof-of-concept integration with srmio.
-    cb = statusCallback;
-    QString path;
-    if (!dev2path(dev, path, err))
-        return false;
-    if (!get_tmpname(tmpdir, tmpname, err))
-        return false;
-    SrmpcConn srm(path, logfunc);
-    if (!srm.d) {
-        err = "Couldn't open device " + path + ": " + strerror(errno);
-        return false;
+    struct _srmio_pc_xfer_block_t block;
+
+    if( ! is_open ){
+        statusCallback( tr("opening device %1").arg(dev->name()) );
+        if( ! open( err ) )
+            return false;
     }
-    int opt_all = 0; // only get new data
-    int opt_fixup = 1; // fix bad data like srmwin.exe does
-    SrmioData srmdata(srmpc_get_data(srm.d, opt_all, opt_fixup));
-    if (!srmdata.d) {
-        err = "srmpc_get_data failed: ";
-        err += strerror(errno);
-        return false;
+
+    rideList.clear();
+
+    if( ! srmio_pc_can_preview( pc ) )
+        // nothing to do
+        return true;
+
+    if( ! srmio_pc_xfer_start( pc ) ){
+        err = tr("failed to start download: %1")
+            .arg(strerror(errno));
+        goto fail;
     }
-    if( ! srmdata.d->cused ){
-        err = "no data available";
-        return false;
+
+    while( srmio_pc_xfer_block_next( pc, &block )){
+        DeviceRideItemPtr ride( new DeviceRideItem );
+
+        ride->startTime.setTime_t( 0.1 * block.start );
+        ride->work = block.total;
+        rideList.append( ride );
+
+        if( block.athlete )
+            free( block.athlete );
+        block.athlete = NULL;
     }
-    if (srm_data_write_srm7(srmdata.d, tmpname.toAscii().constData()) < 0) {
-        err = "Couldn't write to file " + tmpname + ": " + strerror(errno);
-        return false;
+
+    if( ! srmio_pc_xfer_finish( pc ) ){
+        err = tr("download failed: %1")
+            .arg(strerror(errno));
+        goto fail;
     }
-    QDateTime startTime;
-    startTime.setTime_t( srmdata.d->chunks[0]->time / 10 );
-    filename = startTime.toString("yyyy_MM_dd_hh_mm_ss") + ".srm";
+
 
     return true;
+
+fail:
+    rideList.clear();
+    return false;
 }
 
-void
-SrmDevice::cleanup(CommPortPtr dev)
+bool
+SrmDevice::download( const QDir &tmpdir,
+                    QList<DeviceDownloadFile> &files,
+                    CancelCallback cancelCallback,
+                    StatusCallback statusCallback,
+                    ProgressCallback progressCallback,
+                    QString &err)
 {
-    QString path, err;
-    if (!dev2path(dev, path, err))
-        assert(false);
-    if (QMessageBox::question(0, "Powercontrol",
-                              "Erase ride from device memory?",
-                              "&Erase", "&Cancel", "", 1, 1) == 0) {
-        SrmpcConn srm(path);
-        if(!srm.d || (srmpc_clear_chunks(srm.d) < 0)) {
-            QMessageBox::warning(0, "Error",
-                                 "Error communicating with device.");
-        }
+    unsigned firmware;
+    srmio_io_baudrate_t baudrateId;
+    unsigned baudrate;
+    struct _srmio_pc_xfer_block_t block;
+    srmio_data_t data( NULL );
+    srmio_data_t *splitList( NULL );
+    srmio_data_t *split;
+    int mfirst( -1 );
+    size_t block_cnt, block_num( 0 );
+    size_t prog_sum( 0 ), prog_prev( 0 );
+    size_t chunks_done( 0 );
+    srmio_time_t splitGap( 72000 ); // 2h - XXX: make this configurable
+
+    if( ! is_open ){
+        statusCallback( tr("opening device %1").arg(dev->name()) );
+        if( ! open( err ) )
+            return false;
     }
+
+    if( ! srmio_pc_get_version( pc, &firmware ) ){
+        err = tr("failed to get firmware version: %1")
+            .arg(strerror(errno));
+        goto fail;
+    }
+
+    if( ! srmio_pc_get_baudrate( pc, &baudrateId ) ){
+        err = tr("failed to get baud rate: %1")
+            .arg(strerror(errno));
+        goto fail;
+    }
+
+    if( ! srmio_io_baud2name( baudrateId, &baudrate ) ){
+        err = tr("failed to get baud rate name: %1")
+            .arg(strerror(errno));
+    }
+
+    statusCallback(tr("found Powercontrol version 0x%1 using %2 baud")
+        .arg(firmware, 4, 16 )
+        .arg(baudrate));
+
+    // fetch preview in case user didn't
+    if( srmio_pc_can_preview(pc) && rideList.size() == 0 ){
+        if( ! preview( statusCallback, err ) )
+            return false;
+    }
+
+    data = srmio_data_new();
+    if( ! data ){
+        err = tr("failed to allocate data handle: %1")
+            .arg(strerror(errno));
+        goto fail;
+    }
+
+    if( cancelCallback() ){
+        err = tr("download cancelled");
+        goto fail;
+    }
+
+    if( ! srmio_pc_xfer_start( pc )){
+        err = tr("failed to start download: %1")
+            .arg(strerror(errno));
+        goto fail;
+    }
+
+    if( ! srmio_pc_xfer_get_blocks( pc, &block_cnt ) ){
+        err = tr("failed to get number of data blocks: %1")
+            .arg(strerror(errno));
+        goto fail1;
+    }
+    statusCallback(tr("found %1 ride blocks").arg(block_cnt));
+
+    for( int i = 0; i < rideList.size(); ++i ){
+        if( rideList.at(i)->wanted )
+            prog_sum += rideList.at(i)->work;
+    }
+
+    while( srmio_pc_xfer_block_next( pc, &block )){
+        bool wanted = false;
+        struct _srmio_chunk_t chunk;
+        bool is_int;
+        bool is_first;
+        size_t prog_total;
+
+        if( rideList.empty() ){
+            wanted = true;
+
+        } else {
+            for( int i = 0; i < rideList.size(); ++i ){
+                if( rideList.at(i)->startTime.toTime_t() == block.start / 10 ){
+                    wanted = rideList.at(i)->wanted;
+                    break;
+                }
+            }
+        }
+
+        if( ! wanted ){
+            statusCallback(tr("skipping unselected ride block %1")
+                .arg(block_num +1));
+            continue;
+        }
+        statusCallback(tr("downloading ride block %1/%2")
+            .arg(block_num +1)
+            .arg(block_cnt) );
+
+        data->slope = block.slope;
+        data->zeropos = block.zeropos;
+        data->circum = block.circum;
+        if( block.athlete ){
+            if( data->athlete )
+                free( data->athlete );
+            data->athlete = strdup( block.athlete );
+        }
+
+        if( ! rideList.empty() ){
+            prog_total = prog_sum;
+
+        } else if( block_cnt == 1 ){
+            prog_total = block.total;
+
+        } else {
+            prog_total = block_cnt * 1000;
+        }
+
+        while( srmio_pc_xfer_chunk_next( pc, &chunk, &is_int, &is_first  ) ){
+            if( cancelCallback() ){
+                err = tr("download cancelled");
+                goto fail1;
+            }
+
+            if( chunks_done % 16 == 0 ){
+                size_t block_done;
+
+                srmio_pc_xfer_block_progress( pc, &block_done );
+                if( ! rideList.empty() ){
+                    block_done += prog_prev;
+
+                } else if( block_cnt == 1 ){
+                    // unchanged
+
+                } else {
+                    block_done = (double)block_num * 1000
+                        + 1000 * block.total / block_done;
+                }
+
+                progressCallback( tr("progress: %1/%2")
+                    .arg(block_done)
+                    .arg(prog_total));
+            }
+
+            if( ! srmio_data_add_chunk( data, &chunk ) )
+                goto fail1;
+
+            ++chunks_done;
+
+            /* finish previous marker */
+            if( mfirst >= 0 && ( ! is_int || is_first ) )
+                srmio_data_add_marker( data, mfirst, data->cused -1 );
+
+            /* start marker */
+            if( is_first ){
+                mfirst = (int)data->cused;
+
+            } else if( ! is_int ){
+                mfirst = -1;
+
+            }
+        }
+
+        /* finalize marker at block end */
+        if( mfirst >= 0 ){
+            srmio_data_add_marker( data, mfirst, data->cused -1 );
+            mfirst = -1;
+        }
+
+        if( ! rideList.empty() )
+            prog_prev += block.total;
+        else
+            prog_prev += 1000;
+
+        if( block.athlete )
+            free( block.athlete );
+        block.athlete = NULL;
+
+        ++block_num;
+    }
+
+    if( ! srmio_pc_xfer_finish( pc ) ){
+        err = tr( "download failed: %1")
+            .arg(strerror(errno));
+        goto fail;
+    }
+
+    statusCallback( tr("got %1 records").arg(data->cused) );
+
+    if( cancelCallback() ){
+        err = tr("download cancelled");
+        goto fail;
+    }
+
+    if( ! data->cused ){
+        err = tr("no data available");
+        goto fail;
+    }
+
+    splitList = srmio_data_split( data, splitGap, 1000 );
+    if( ! splitList ){
+        err = tr("Couldn't split data: %1")
+            .arg(strerror(errno));
+        goto fail;
+    }
+
+    for( split = splitList; *split; ++split ){
+        FILE *fh( NULL );
+        srmio_time_t stime;
+        DeviceDownloadFile file;
+
+        file.extension = "srm";
+
+        if (!get_tmpname(tmpdir, file.name, err))
+            goto fail;
+
+        if( ! srmio_data_time_start( *split, &stime ) ){
+            err = tr("Couldn't get start time of data: %1")
+                .arg(strerror(errno));
+            goto fail;
+        }
+        file.startTime.setTime_t( 0.1 * stime );
+
+        fh = fopen( file.name.toAscii().constData(), "w" );
+        if( ! fh ){
+            err = tr( "failed to open file %1: %2")
+                .arg(file.name)
+                .arg(strerror(errno));
+            goto fail;
+        }
+
+        if( ! srmio_file_srm7_write(*split, fh) ){
+            err = tr("Couldn't write to file %1: %2")
+                .arg(file.name)
+                .arg(strerror(errno));
+            fclose(fh);
+            goto fail;
+        }
+
+        files.append(file);
+
+        fclose( fh );
+
+    }
+
+    for( split = splitList; *split; ++split )
+        srmio_data_free( *split );
+    free(splitList);
+
+    srmio_data_free( data );
+    return true;
+
+fail1:
+    srmio_pc_xfer_finish(pc);
+
+fail:
+    if( data ) srmio_data_free( data );
+    if( splitList ){
+        for( split = splitList; *split; ++split )
+            srmio_data_free( *split );
+        free(splitList);
+    }
+    close();
+    return false;
+}
+
+bool
+SrmDevice::cleanup( QString &err )
+{
+    if( ! is_open ){
+        if( ! open( err ) )
+            goto cleanup;
+    }
+
+    if( ! srmio_pc_cmd_clear( pc ) ){
+        err = tr("failed to clear Powercontrol memory: %1")
+            .arg(strerror(errno));
+        goto cleanup;
+    }
+
+    return true;
+
+cleanup:
+    close();
+    return false;
 }
 
