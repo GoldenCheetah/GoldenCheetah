@@ -54,7 +54,8 @@ class DownloadRideDialog : public QDialog
         QPushButton *downloadButton, *eraseRideButton, *rescanButton,
             *cancelButton, *closeButton;
         QComboBox *portCombo, *deviceCombo;
-        QLabel *statusLabel, *progressLabel;
+        QTextEdit *statusLabel;
+        QLabel *progressLabel;
 
         QVector<CommPortPtr> devList;
         bool cancelled;

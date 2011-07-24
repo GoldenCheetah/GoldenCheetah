@@ -39,10 +39,9 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     portCombo = new QComboBox(this);
 
 
-    statusLabel = new QLabel(this);
-    statusLabel->setIndent(10);
-    statusLabel->setTextFormat(Qt::PlainText);
-    // XXX: make statusLabel scrollable
+    statusLabel = new QTextEdit(this);
+    statusLabel->setReadOnly(true);
+    statusLabel->setAcceptRichText(false);
 
     // would prefer a progress bar, but some devices (eg. PTap) don't give
     // a hint about the total work, so this isn't possible.
@@ -98,7 +97,7 @@ DownloadRideDialog::setReadyInstruct()
     progressLabel->setText("");
 
     if (portCombo->count() == 0) {
-        statusLabel->setText(tr("No devices found.  Make sure the device\n"
+        statusLabel->setPlainText(tr("No devices found.  Make sure the device\n"
                           "unit is plugged into the computer,\n"
                           "then click \"Rescan\" to check again."));
         updateAction( actionMissing );
@@ -107,9 +106,9 @@ DownloadRideDialog::setReadyInstruct()
         DevicesPtr devtype = Devices::getType(deviceCombo->currentText());
         QString inst = devtype->downloadInstructions();
         if (inst.size() == 0)
-            statusLabel->setText("Click Download to begin downloading.");
+            statusLabel->setPlainText("Click Download to begin downloading.");
         else
-            statusLabel->setText(inst + ", \nthen click Download.");
+            statusLabel->setPlainText(inst + ", \nthen click Download.");
 
         updateAction( actionIdle );
     }
@@ -198,7 +197,7 @@ DownloadRideDialog::updateAction( downloadAction newAction )
 void
 DownloadRideDialog::updateStatus(const QString &statusText)
 {
-    statusLabel->setText(statusLabel->text() + "\n" + statusText);
+    statusLabel->append(statusText);
     QCoreApplication::processEvents();
 }
 
@@ -225,7 +224,7 @@ DownloadRideDialog::downloadClicked()
     updateAction( actionDownload );
 
     updateProgress( "" );
-    statusLabel->setText( "" );
+    statusLabel->setPlainText( "" );
 
     CommPortPtr dev;
     for (int i = 0; i < devList.size(); ++i) {
@@ -353,7 +352,7 @@ DownloadRideDialog::eraseClicked()
 {
     updateAction( actionCleaning );
 
-    statusLabel->setText( "" );
+    statusLabel->setPlainText( "" );
     updateProgress( "" );
 
     CommPortPtr dev;
