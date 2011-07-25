@@ -101,9 +101,24 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings) co
 
     char magic[4];
     in.readRawData(magic, sizeof(magic));
-    assert(strncmp(magic, "SRM", 3) == 0);
+    if( strncmp(magic, "SRM", 3)){
+        errorStrings << QString("Unrecognized file type, missing magic." );
+        return NULL;
+    }
+
     int version = magic[3] - '0';
-    assert(version == 5 || version == 6 || version == 7);
+    switch( version ){
+      case 5:
+      case 6:
+      case 7:
+        // ok
+        break;
+
+      default:
+        errorStrings << QString("Unsupported SRM file format version: %1")
+            .arg(version);
+        return NULL;
+    }
 
     quint16 dayssince1880 = readShort(in);
     quint16 wheelcirc = readShort(in);
