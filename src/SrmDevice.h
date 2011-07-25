@@ -29,6 +29,8 @@ struct SrmDevices : public Devices
 
     virtual DevicePtr newDevice( CommPortPtr dev );
     virtual bool canCleanup( void ) {return true; };
+    virtual bool supportsPort( CommPortPtr dev );
+    virtual bool exclusivePort( CommPortPtr dev );
 
 private:
     int protoVersion;

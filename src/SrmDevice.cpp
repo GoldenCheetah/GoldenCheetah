@@ -23,7 +23,6 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/foreach.hpp>
 #include <errno.h>
-#include <stdio.h>
 
 #define tr(s) QObject::tr(s)
 
@@ -37,6 +36,36 @@ SrmDevices::newDevice( CommPortPtr dev )
 {
     return DevicePtr( new SrmDevice( dev, protoVersion));
 }
+
+bool
+SrmDevices::supportsPort( CommPortPtr dev )
+{
+    if( dev->type() == "Serial" )
+        return true;
+
+    return false;
+}
+
+bool
+SrmDevices::exclusivePort( CommPortPtr dev )
+{
+    switch( protoVersion ){
+      case 5:
+        // XXX: this has to go, once we have other devices using prolific
+        if( dev->type() == "Serial" && dev->name().contains( "PL2303" ) )
+            return true;
+        break;
+
+      case 6:
+      case 7:
+        if( dev->type() == "D2XX" && dev->name().startsWith( "POWERCONTROL" ) )
+            return true;
+        break;
+    }
+
+    return false;
+}
+
 
 static bool
 get_tmpname(const QDir &tmpdir, QString &tmpname, QString &err)
