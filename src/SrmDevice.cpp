@@ -423,6 +423,7 @@ SrmDevice::download( const QDir &tmpdir,
     for( split = splitList; *split; ++split ){
         FILE *fh( NULL );
         srmio_time_t stime;
+        srmio_data_t fixed;
         DeviceDownloadFile file;
 
         file.extension = "srm";
@@ -430,7 +431,15 @@ SrmDevice::download( const QDir &tmpdir,
         if (!get_tmpname(tmpdir, file.name, err))
             goto fail;
 
-        if( ! srmio_data_time_start( *split, &stime ) ){
+        fixed = srmio_data_fixup( *split );
+        if( ! fixed ){
+            err = tr("Couldn't fixup data: %1")
+                .arg(strerror(errno));
+            goto fail;
+        }
+
+        if( ! srmio_data_time_start( fixed, &stime ) ){
+            srmio_data_free(fixed);
             err = tr("Couldn't get start time of data: %1")
                 .arg(strerror(errno));
             goto fail;
@@ -439,13 +448,15 @@ SrmDevice::download( const QDir &tmpdir,
 
         fh = fopen( file.name.toAscii().constData(), "w" );
         if( ! fh ){
+            srmio_data_free(fixed);
             err = tr( "failed to open file %1: %2")
                 .arg(file.name)
                 .arg(strerror(errno));
             goto fail;
         }
 
-        if( ! srmio_file_srm7_write(*split, fh) ){
+        if( ! srmio_file_srm7_write(fixed, fh) ){
+            srmio_data_free(fixed);
             err = tr("Couldn't write to file %1: %2")
                 .arg(file.name)
                 .arg(strerror(errno));
@@ -456,6 +467,7 @@ SrmDevice::download( const QDir &tmpdir,
         files.append(file);
 
         fclose( fh );
+        srmio_data_free(fixed);
 
     }
 
