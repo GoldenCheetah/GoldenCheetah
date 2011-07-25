@@ -26,7 +26,6 @@
 #include <QtGui>
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
-#include <stdio.h>
 
 DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
                                        const QDir &home) :
@@ -36,8 +35,15 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("Download Ride Data");
 
-    portCombo = new QComboBox(this);
+    deviceCombo = new QComboBox(this);
+    QList<QString> deviceTypes = Devices::typeNames();
+    assert(deviceTypes.size() > 0);
+    BOOST_FOREACH(QString device, deviceTypes) {
+        deviceCombo->addItem(device);
+    }
+    connect(deviceCombo, SIGNAL(currentIndexChanged(QString)), this, SLOT(deviceChanged(QString)));
 
+    portCombo = new QComboBox(this);
 
     statusLabel = new QTextEdit(this);
     statusLabel->setReadOnly(true);
@@ -48,14 +54,6 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     progressLabel = new QLabel(this);
     progressLabel->setIndent(10);
     progressLabel->setTextFormat(Qt::PlainText);
-
-    deviceCombo = new QComboBox(this);
-    QList<QString> deviceTypes = Devices::typeNames();
-    assert(deviceTypes.size() > 0);
-    BOOST_FOREACH(QString device, deviceTypes) {
-        deviceCombo->addItem(device);
-    }
-    connect(deviceCombo, SIGNAL(currentIndexChanged(QString)), this, SLOT(deviceChanged(QString)));
 
     downloadButton = new QPushButton(tr("&Download"), this);
     eraseRideButton = new QPushButton(tr("&Erase Ride(s)"), this);
@@ -117,7 +115,7 @@ DownloadRideDialog::setReadyInstruct()
 void
 DownloadRideDialog::scanCommPorts()
 {
-    portCombo->clear();
+
     QString err;
     devList = CommPort::listCommPorts(err);
     if (err != "") {
@@ -126,19 +124,49 @@ DownloadRideDialog::scanCommPorts()
         QMessageBox::warning(0, "Error Loading Device Drivers", msg,
                              QMessageBox::Ok, QMessageBox::NoButton);
     }
+
+    updatePort();
+}
+
+void
+DownloadRideDialog::updatePort()
+{
+
+    portCombo->clear();
+    QList<QString> typeNames( Devices::typeNames() );
+    DevicesPtr selectedType = Devices::getType(deviceCombo->currentText());
+
     for (int i = 0; i < devList.size(); ++i) {
-        portCombo->addItem(devList[i]->id());
-        // XXX Hack: SRM PCV download cables use the PL2203 chipset.  If the
-        // first device name contains "PL2303", then, we're probably dealing
-        // with an SRM, so go ahead and select the SRM device.  Generalize?
-        if ((i == 0) && devList[i]->name().contains("PL2303")) {
-            int j = deviceCombo->findText("SRM");
-            if (j >= 0)
-                deviceCombo->setCurrentIndex(j);
+        // suppress unsupported ports
+        if( ! selectedType->supportsPort( devList.at(i) ) )
+            continue;
+
+        // suppress ports exclusively supported by other devices
+        bool otherExclusive = false;
+        for( int t = 0; t < typeNames.size(); ++t ){
+            DevicesPtr otherType = Devices::getType(typeNames.at(t));
+
+            // hmm, comparing pointers makes me feel a bit dizzy...
+            if( selectedType == otherType )
+                continue;
+
+            if( otherType->exclusivePort( devList.at(i) ) ){
+                otherExclusive = true;
+                break;
+            }
         }
+
+        if( otherExclusive )
+            continue;
+
+        // add port
+        portCombo->addItem( devList[i]->id());
+
+        // make an exclusive port the default selection:
+        if( selectedType->exclusivePort( devList.at(i) ) )
+            portCombo->setCurrentIndex(portCombo->findText(devList[i]->id()));
     }
-    if (portCombo->count() > 0)
-        downloadButton->setFocus();
+
     setReadyInstruct();
 }
 
@@ -214,8 +242,8 @@ DownloadRideDialog::deviceChanged( QString deviceType )
 {
     (void)deviceType;
 
-    updateAction(action);
-    setReadyInstruct();
+    updateAction(action); // adjust erase button visibility
+    updatePort();
 }
 
 void

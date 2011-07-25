@@ -23,7 +23,6 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/foreach.hpp>
 #include <errno.h>
-#include <stdio.h>
 
 #define tr(s) QObject::tr(s)
 
@@ -37,6 +36,36 @@ SrmDevices::newDevice( CommPortPtr dev )
 {
     return DevicePtr( new SrmDevice( dev, protoVersion));
 }
+
+bool
+SrmDevices::supportsPort( CommPortPtr dev )
+{
+    if( dev->type() == "Serial" )
+        return true;
+
+    return false;
+}
+
+bool
+SrmDevices::exclusivePort( CommPortPtr dev )
+{
+    switch( protoVersion ){
+      case 5:
+        // XXX: this has to go, once we have other devices using prolific
+        if( dev->type() == "Serial" && dev->name().contains( "PL2303" ) )
+            return true;
+        break;
+
+      case 6:
+      case 7:
+        if( dev->type() == "D2XX" && dev->name().startsWith( "POWERCONTROL" ) )
+            return true;
+        break;
+    }
+
+    return false;
+}
+
 
 static bool
 get_tmpname(const QDir &tmpdir, QString &tmpname, QString &err)
@@ -423,6 +452,7 @@ SrmDevice::download( const QDir &tmpdir,
     for( split = splitList; *split; ++split ){
         FILE *fh( NULL );
         srmio_time_t stime;
+        srmio_data_t fixed;
         DeviceDownloadFile file;
 
         file.extension = "srm";
@@ -430,7 +460,15 @@ SrmDevice::download( const QDir &tmpdir,
         if (!get_tmpname(tmpdir, file.name, err))
             goto fail;
 
-        if( ! srmio_data_time_start( *split, &stime ) ){
+        fixed = srmio_data_fixup( *split );
+        if( ! fixed ){
+            err = tr("Couldn't fixup data: %1")
+                .arg(strerror(errno));
+            goto fail;
+        }
+
+        if( ! srmio_data_time_start( fixed, &stime ) ){
+            srmio_data_free(fixed);
             err = tr("Couldn't get start time of data: %1")
                 .arg(strerror(errno));
             goto fail;
@@ -439,13 +477,15 @@ SrmDevice::download( const QDir &tmpdir,
 
         fh = fopen( file.name.toAscii().constData(), "w" );
         if( ! fh ){
+            srmio_data_free(fixed);
             err = tr( "failed to open file %1: %2")
                 .arg(file.name)
                 .arg(strerror(errno));
             goto fail;
         }
 
-        if( ! srmio_file_srm7_write(*split, fh) ){
+        if( ! srmio_file_srm7_write(fixed, fh) ){
+            srmio_data_free(fixed);
             err = tr("Couldn't write to file %1: %2")
                 .arg(file.name)
                 .arg(strerror(errno));
@@ -456,6 +496,7 @@ SrmDevice::download( const QDir &tmpdir,
         files.append(file);
 
         fclose( fh );
+        srmio_data_free(fixed);
 
     }
 
