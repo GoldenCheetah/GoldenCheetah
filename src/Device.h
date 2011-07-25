@@ -75,9 +75,18 @@ struct Devices
 {
     virtual DevicePtr newDevice( CommPortPtr ) = 0;
 
-    virtual bool canCleanup() { return false; };
-    virtual QString downloadInstructions() const { return ""; };
+    // port *might* be supported by this device type implementation:
+    virtual bool supportsPort( CommPortPtr dev ) { (void)dev; return true; };
 
+    // port is only useful for this device type - no matter if it's
+    // actually supported. Prevents this port to be offered for download
+    // with other device types:
+    virtual bool exclusivePort( CommPortPtr dev ) { (void)dev; return false; };
+
+    // cleanup for this device type is implemented:
+    virtual bool canCleanup() { return false; };
+
+    virtual QString downloadInstructions() const { return ""; };
 
     static QList<QString> typeNames();
     static DevicesPtr getType(const QString &deviceTypeName );

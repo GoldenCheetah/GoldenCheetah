@@ -70,6 +70,7 @@ class DownloadRideDialog : public QDialog
         downloadAction action;
 
         void updateAction( downloadAction action );
+        void updatePort();
 };
 
 #endif // _GC_DownloadRideDialog_h
