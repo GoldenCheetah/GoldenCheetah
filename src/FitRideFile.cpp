@@ -22,7 +22,6 @@
 #include <QSet>
 #include <QtEndian>
 #include <QDebug>
-#include <assert.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <limits>
@@ -78,6 +77,7 @@ struct FitFileReaderState
     }
 
     struct TruncatedRead {};
+    struct BadDelta {};
 
     void read_unknown( int size, int *count = NULL ){
         char c[size+1];
@@ -388,9 +388,11 @@ struct FitFileReaderState
             // Evil smart recording.  Linearly interpolate missing points.
             RideFilePoint *prevPoint = rideFile->dataPoints().back();
             int deltaSecs = (int) (secs - prevPoint->secs);
-            assert(deltaSecs == secs - prevPoint->secs); // no fractional part
+            if(deltaSecs != secs - prevPoint->secs)
+                throw BadDelta(); // no fractional part
             // This is only true if the previous record was of type record:
-            assert(deltaSecs == time - last_time);
+            if(deltaSecs != time - last_time)
+                throw BadDelta();
             // If the last lat/lng was missing (0/0) then all points up to lat/lng are marked as 0/0.
             if (prevPoint->lat == 0 && prevPoint->lon == 0 ) {
                 badgps = 1;
@@ -568,6 +570,11 @@ struct FitFileReaderState
         }
         catch (TruncatedRead &e) {
             errors << "truncated file body";
+            delete rideFile;
+            return NULL;
+        }
+        catch (BadDelta &e) {
+            errors << "Unsupported smart recording interval found";
             delete rideFile;
             return NULL;
         }
