@@ -40,11 +40,20 @@ SrmDevices::newDevice( CommPortPtr dev )
 bool
 SrmDevices::supportsPort( CommPortPtr dev )
 {
+#ifdef SRMIO_HAVE_TERMIOS
     if( dev->type() == "Serial" )
         return true;
+#endif
 
-    if( dev->type() == "D2XX" )
-        return true;
+#ifdef SRMIO_HAVE_D2XX
+    if( dev->type() == "D2XX" ){
+        switch( protoVersion ){
+          case 6:
+          case 7:
+            return true;
+        }
+    }
+#endif
 
     return false;
 }
@@ -95,21 +104,32 @@ bool
 SrmDevice::open( QString &err )
 {
     if( dev->type() == "Serial" ){
+#ifdef SRMIO_HAVE_TERMIOS
         io = srmio_ios_new( dev->name().toAscii().constData() );
         if( ! io ){
             err = tr("failed to allocate device handle: %1")
                 .arg(strerror(errno));
             return false;
         }
+#else
+        err = tr("device type %1 is unsupported")
+            .arg(dev->type());
+        return false;
+#endif
 
     } else if( dev->type() == "D2XX" ){
+#ifdef SRMIO_HAVE_D2XX
         io = srmio_d2xx_description_new( dev->name().toAscii().constData() );
         if( ! io ){
             err = tr("failed to allocate device handle: %1")
                 .arg(strerror(errno));
             return false;
         }
-
+#else
+        err = tr("device type %1 is unsupported")
+            .arg(dev->type());
+        return false;
+#endif
 
     } else {
         err = tr("device type %1 is unsupported")
