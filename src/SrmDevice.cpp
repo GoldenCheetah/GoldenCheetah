@@ -43,6 +43,9 @@ SrmDevices::supportsPort( CommPortPtr dev )
     if( dev->type() == "Serial" )
         return true;
 
+    if( dev->type() == "D2XX" )
+        return true;
+
     return false;
 }
 
@@ -98,6 +101,15 @@ SrmDevice::open( QString &err )
                 .arg(strerror(errno));
             return false;
         }
+
+    } else if( dev->type() == "D2XX" ){
+        io = srmio_d2xx_description_new( dev->name().toAscii().constData() );
+        if( ! io ){
+            err = tr("failed to allocate device handle: %1")
+                .arg(strerror(errno));
+            return false;
+        }
+
 
     } else {
         err = tr("device type %1 is unsupported")
