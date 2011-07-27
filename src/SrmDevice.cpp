@@ -103,12 +103,14 @@ SrmDevice::~SrmDevice()
 bool
 SrmDevice::open( QString &err )
 {
+    srmio_error_t serr;
+
     if( dev->type() == "Serial" ){
 #ifdef SRMIO_HAVE_TERMIOS
-        io = srmio_ios_new( dev->name().toAscii().constData() );
+        io = srmio_ios_new( dev->name().toAscii().constData(), &serr );
         if( ! io ){
             err = tr("failed to allocate device handle: %1")
-                .arg(strerror(errno));
+                .arg(serr.message);
             return false;
         }
 #else
@@ -119,10 +121,11 @@ SrmDevice::open( QString &err )
 
     } else if( dev->type() == "D2XX" ){
 #ifdef SRMIO_HAVE_D2XX
-        io = srmio_d2xx_description_new( dev->name().toAscii().constData() );
+        io = srmio_d2xx_description_new(
+            dev->name().toAscii().constData(), &serr );
         if( ! io ){
             err = tr("failed to allocate device handle: %1")
-                .arg(strerror(errno));
+                .arg(serr.message);
             return false;
         }
 #else
@@ -139,12 +142,12 @@ SrmDevice::open( QString &err )
 
     switch( protoVersion ){
       case 5:
-        pc = srmio_pc5_new();
+        pc = srmio_pc5_new( &serr );
         break;
 
       case 6:
       case 7:
-        pc = srmio_pc7_new();
+        pc = srmio_pc7_new( &serr );
         break;
 
       default:
@@ -154,26 +157,26 @@ SrmDevice::open( QString &err )
     }
     if( ! pc ){
         err = tr("failed to allocate Powercontrol handle: %1")
-            .arg(strerror(errno));
+            .arg(serr.message);
         goto fail;
     }
 
-    if( ! srmio_io_open(io ) ){
+    if( ! srmio_io_open( io, &serr ) ){
         err = tr("Couldn't open device %1: %2")
             .arg(dev->name())
-            .arg(strerror(errno));
+            .arg(serr.message);
         goto fail;
     }
 
-    if( ! srmio_pc_set_device( pc, io ) ){
+    if( ! srmio_pc_set_device( pc, io, &serr ) ){
         err = tr("failed to set Powercontrol io handle: %1")
-            .arg(strerror(errno));
+            .arg(serr.message);
         goto fail;
     }
 
-    if( ! srmio_pc_open( pc ) ){
+    if( ! srmio_pc_open( pc, &serr ) ){
         err = tr("failed to initialize Powercontrol communication: %1")
-            .arg(strerror(errno));
+            .arg(serr.message);
         goto fail;
     }
 
@@ -216,6 +219,7 @@ SrmDevice::close( void )
 bool
 SrmDevice::preview( StatusCallback statusCallback, QString &err )
 {
+    srmio_error_t serr;
     struct _srmio_pc_xfer_block_t block;
 
     if( ! is_open ){
@@ -230,9 +234,9 @@ SrmDevice::preview( StatusCallback statusCallback, QString &err )
         // nothing to do
         return true;
 
-    if( ! srmio_pc_xfer_start( pc ) ){
+    if( ! srmio_pc_xfer_start( pc, &serr ) ){
         err = tr("failed to start download: %1")
-            .arg(strerror(errno));
+            .arg(serr.message);
         goto fail;
     }
 
@@ -251,9 +255,9 @@ SrmDevice::preview( StatusCallback statusCallback, QString &err )
         block.athlete = NULL;
     }
 
-    if( ! srmio_pc_xfer_finish( pc ) ){
+    if( ! srmio_pc_xfer_finish( pc, &serr ) ){
         err = tr("download failed: %1")
-            .arg(strerror(errno));
+            .arg(serr.message);
         goto fail;
     }
 
@@ -273,6 +277,7 @@ SrmDevice::download( const QDir &tmpdir,
                     ProgressCallback progressCallback,
                     QString &err)
 {
+    srmio_error_t serr;
     unsigned firmware;
     srmio_io_baudrate_t baudrateId;
     unsigned baudrate;
@@ -292,21 +297,21 @@ SrmDevice::download( const QDir &tmpdir,
             return false;
     }
 
-    if( ! srmio_pc_get_version( pc, &firmware ) ){
+    if( ! srmio_pc_get_version( pc, &firmware, &serr ) ){
         err = tr("failed to get firmware version: %1")
-            .arg(strerror(errno));
+            .arg(serr.message);
         goto fail;
     }
 
-    if( ! srmio_pc_get_baudrate( pc, &baudrateId ) ){
+    if( ! srmio_pc_get_baudrate( pc, &baudrateId, &serr ) ){
         err = tr("failed to get baud rate: %1")
-            .arg(strerror(errno));
+            .arg(serr.message);
         goto fail;
     }
 
     if( ! srmio_io_baud2name( baudrateId, &baudrate ) ){
         err = tr("failed to get baud rate name: %1")
-            .arg(strerror(errno));
+            .arg(serr.message);
     }
 
     statusCallback(tr("found Powercontrol version 0x%1 using %2 baud")
@@ -319,10 +324,10 @@ SrmDevice::download( const QDir &tmpdir,
             return false;
     }
 
-    data = srmio_data_new();
+    data = srmio_data_new( &serr );
     if( ! data ){
         err = tr("failed to allocate data handle: %1")
-            .arg(strerror(errno));
+            .arg(serr.message);
         goto fail;
     }
 
@@ -331,15 +336,15 @@ SrmDevice::download( const QDir &tmpdir,
         goto fail;
     }
 
-    if( ! srmio_pc_xfer_start( pc )){
+    if( ! srmio_pc_xfer_start( pc, &serr )){
         err = tr("failed to start download: %1")
-            .arg(strerror(errno));
+            .arg(serr.message);
         goto fail;
     }
 
-    if( ! srmio_pc_xfer_get_blocks( pc, &block_cnt ) ){
+    if( ! srmio_pc_xfer_get_blocks( pc, &block_cnt, &serr ) ){
         err = tr("failed to get number of data blocks: %1")
-            .arg(strerror(errno));
+            .arg(serr.message);
         goto fail1;
     }
     statusCallback(tr("found %1 ride blocks").arg(block_cnt));
@@ -422,14 +427,21 @@ SrmDevice::download( const QDir &tmpdir,
                     .arg(prog_total));
             }
 
-            if( ! srmio_data_add_chunk( data, &chunk ) )
+            if( ! srmio_data_add_chunk( data, &chunk, &serr ) ){
+                err = tr("adding chunk failed: %1")
+                    .arg(serr.message);
                 goto fail1;
+            }
 
             ++chunks_done;
 
             /* finish previous marker */
             if( mfirst >= 0 && ( ! is_int || is_first ) )
-                srmio_data_add_marker( data, mfirst, data->cused -1 );
+                if( ! srmio_data_add_marker( data, mfirst, data->cused -1, &serr ) ){
+                    err = tr("adding marker failed: %1")
+                        .arg(serr.message);
+                    goto fail1;
+                }
 
             /* start marker */
             if( is_first ){
@@ -443,7 +455,11 @@ SrmDevice::download( const QDir &tmpdir,
 
         /* finalize marker at block end */
         if( mfirst >= 0 ){
-            srmio_data_add_marker( data, mfirst, data->cused -1 );
+            if( ! srmio_data_add_marker( data, mfirst, data->cused -1, &serr ) ){;
+                err = tr("adding marker failed: %1")
+                  .arg(serr.message);
+                goto fail1;
+            }
             mfirst = -1;
         }
 
@@ -459,9 +475,9 @@ SrmDevice::download( const QDir &tmpdir,
         ++block_num;
     }
 
-    if( ! srmio_pc_xfer_finish( pc ) ){
+    if( ! srmio_pc_xfer_finish( pc, &serr ) ){
         err = tr( "download failed: %1")
-            .arg(strerror(errno));
+            .arg(serr.message);
         goto fail;
     }
 
@@ -477,10 +493,10 @@ SrmDevice::download( const QDir &tmpdir,
         goto fail;
     }
 
-    splitList = srmio_data_split( data, splitGap, 1000 );
+    splitList = srmio_data_split( data, splitGap, 1000, &serr );
     if( ! splitList ){
         err = tr("Couldn't split data: %1")
-            .arg(strerror(errno));
+            .arg(serr.message);
         goto fail;
     }
 
@@ -495,17 +511,17 @@ SrmDevice::download( const QDir &tmpdir,
         if (!get_tmpname(tmpdir, file.name, err))
             goto fail;
 
-        fixed = srmio_data_fixup( *split );
+        fixed = srmio_data_fixup( *split, &serr );
         if( ! fixed ){
             err = tr("Couldn't fixup data: %1")
-                .arg(strerror(errno));
+                .arg(serr.message);
             goto fail;
         }
 
-        if( ! srmio_data_time_start( fixed, &stime ) ){
+        if( ! srmio_data_time_start( fixed, &stime, &serr ) ){
             srmio_data_free(fixed);
             err = tr("Couldn't get start time of data: %1")
-                .arg(strerror(errno));
+                .arg(serr.message);
             goto fail;
         }
         file.startTime.setTime_t( 0.1 * stime );
@@ -519,11 +535,11 @@ SrmDevice::download( const QDir &tmpdir,
             goto fail;
         }
 
-        if( ! srmio_file_srm7_write(fixed, fh) ){
+        if( ! srmio_file_srm7_write(fixed, fh, &serr) ){
             srmio_data_free(fixed);
             err = tr("Couldn't write to file %1: %2")
                 .arg(file.name)
-                .arg(strerror(errno));
+                .arg(serr.message);
             fclose(fh);
             goto fail;
         }
@@ -543,7 +559,7 @@ SrmDevice::download( const QDir &tmpdir,
     return true;
 
 fail1:
-    srmio_pc_xfer_finish(pc);
+    srmio_pc_xfer_finish(pc, NULL);
 
 fail:
     if( data ) srmio_data_free( data );
@@ -559,14 +575,16 @@ fail:
 bool
 SrmDevice::cleanup( QString &err )
 {
+    srmio_error_t serr;
+
     if( ! is_open ){
         if( ! open( err ) )
             goto cleanup;
     }
 
-    if( ! srmio_pc_cmd_clear( pc ) ){
+    if( ! srmio_pc_cmd_clear( pc, &serr ) ){
         err = tr("failed to clear Powercontrol memory: %1")
-            .arg(strerror(errno));
+            .arg(serr.message);
         goto cleanup;
     }
 
