@@ -308,6 +308,12 @@ DownloadRideDialog::downloadClicked()
 
     int failures = 0;
     for( int i = 0; i < files.size(); ++i ){
+        if( ! files.at(i).startTime.isValid() ){
+            updateStatus(tr("file %1 has no valid timestamp, falling back to 'now'")
+                .arg(files.at(i).name));
+            files[i].startTime = QDateTime::currentDateTime();
+        }
+
         QString filename( files.at(i).startTime
             .toString("yyyy_MM_dd_hh_mm_ss")
             + "." + files.at(i).extension );
