@@ -239,7 +239,10 @@ SrmDevice::preview( StatusCallback statusCallback, QString &err )
     while( srmio_pc_xfer_block_next( pc, &block )){
         DeviceRideItemPtr ride( new DeviceRideItem );
 
-        ride->startTime.setTime_t( 0.1 * block.start );
+        if( block.start )
+            ride->startTime.setTime_t( 0.1 * block.start );
+        if( block.end )
+            ride->startTime.setTime_t( 0.1 * block.end );
         ride->work = block.total;
         rideList.append( ride );
 
