@@ -327,12 +327,14 @@ HomeWindow::styleChanged(int id)
             charts[i]->setContentsMargins(0,25,0,0);
             charts[i]->setResizable(false); // we need to show on tab selection!
             charts[i]->show();
+            charts[i]->setProperty("ride", property("ride"));
             break;
         case 2 : // thet are in a FlowLayout
             winFlow->addWidget(charts[i]);
             charts[i]->setContentsMargins(0,15,0,0);
             charts[i]->setResizable(true); // we need to show on tab selection!
             charts[i]->show();
+            charts[i]->setProperty("ride", property("ride"));
         default:
             break;
         }
