@@ -1,0 +1,189 @@
+
+/*
+ * Copyright (c) 2011 Mark Liversedge (liversedge@gmail.com)
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#include "NewCyclistDialog.h"
+#include "Zones.h"
+#include "HrZones.h"
+
+NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(home)
+{
+    setAttribute(Qt::WA_DeleteOnClose, false); // caller must delete me, once they've extracted the name
+    useMetricUnits = (appsettings->value(this, GC_UNIT).toString() == "Metric");
+
+    QVBoxLayout *all = new QVBoxLayout(this);
+    QGridLayout *grid = new QGridLayout;
+
+    QLabel *namelabel = new QLabel(tr("Cyclist Name"));
+    QLabel *doblabel = new QLabel(tr("Date of Birth"));
+    QLabel *sexlabel = new QLabel(tr("Sex"));
+    QLabel *biolabel = new QLabel(tr("Bio"));
+    QLabel *cplabel = new QLabel(tr("Critical Power (FTP)"));
+    QLabel *resthrlabel = new QLabel(tr("Resting Heartrate"));
+    QLabel *lthrlabel = new QLabel(tr("Lactate Heartrate"));
+    QLabel *maxhrlabel = new QLabel(tr("Maximum Heartrate"));
+
+    QString weighttext = QString(tr("Weight (%1)")).arg(useMetricUnits ? tr("kg") : tr("lb"));
+    QLabel *weightlabel = new QLabel(weighttext);
+
+    name = new QLineEdit(this);
+
+    dob = new QDateEdit(this);
+
+    sex = new QComboBox(this);
+    sex->addItem(tr("Male"));
+    sex->addItem(tr("Female"));
+
+    weight = new QDoubleSpinBox(this);
+    weight->setMaximum(999.9);
+    weight->setMinimum(0.0);
+    weight->setDecimals(1);
+    weight->setValue(75); // default
+
+    cp = new QSpinBox(this);
+    cp->setMinimum(100); // juniors may average 100w for an hour, lower values might be seen for para-juniors (?)
+    cp->setMaximum(500); // thats over 6w/kg for a 80kg rider, anything higher is physiologically unlikely
+    cp->setSingleStep(5);      // for those that insist on using the spinners, make it a bit quicker
+    cp->setValue(250);   // seems like a 'sensible' default for those that 'don't know' ?
+
+
+    lthr = new QSpinBox(this);
+    lthr->setMinimum(80);
+    lthr->setMaximum(220);
+    lthr->setSingleStep(1);
+    lthr->setValue(165);
+
+    resthr = new QSpinBox(this);
+    resthr->setMinimum(30);
+    resthr->setMaximum(100);
+    resthr->setSingleStep(1);
+    resthr->setValue(60);
+
+    maxhr = new QSpinBox(this);
+    maxhr->setMinimum(150);
+    maxhr->setMaximum(250);
+    maxhr->setSingleStep(1);
+    maxhr->setValue(190);
+
+    bio = new QTextEdit(this);
+
+    avatar = QPixmap(":/images/noavatar.png");
+    avatarButton = new QPushButton(this);
+    avatarButton->setContentsMargins(0,0,0,0);
+    avatarButton->setFlat(true);
+    avatarButton->setIcon(avatar.scaled(140,140));
+    avatarButton->setIconSize(QSize(140,140));
+    avatarButton->setFixedHeight(140);
+    avatarButton->setFixedWidth(140);
+
+    Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
+
+    grid->addWidget(namelabel, 0, 0, alignment);
+    grid->addWidget(doblabel, 1, 0, alignment);
+    grid->addWidget(sexlabel, 2, 0, alignment);
+    grid->addWidget(weightlabel, 3, 0, alignment);
+    grid->addWidget(cplabel, 4, 0, alignment);
+    grid->addWidget(resthrlabel, 5, 0, alignment);
+    grid->addWidget(lthrlabel, 6, 0, alignment);
+    grid->addWidget(maxhrlabel, 7, 0, alignment);
+    grid->addWidget(biolabel, 8, 0, alignment);
+
+    grid->addWidget(name, 0, 1, alignment);
+    grid->addWidget(dob, 1, 1, alignment);
+    grid->addWidget(sex, 2, 1, alignment);
+    grid->addWidget(weight, 3, 1, alignment);
+    grid->addWidget(cp, 4, 1, alignment);
+    grid->addWidget(resthr, 5, 1, alignment);
+    grid->addWidget(lthr, 6, 1, alignment);
+    grid->addWidget(maxhr, 7, 1, alignment);
+    grid->addWidget(bio, 9, 0, 1, 4);
+
+    grid->addWidget(avatarButton, 0, 2, 4, 2, Qt::AlignRight|Qt::AlignVCenter);
+    all->addLayout(grid);
+    all->addStretch();
+
+    // dialog buttons
+    save = new QPushButton("Save", this);
+    cancel = new QPushButton("Cancel", this);
+    QHBoxLayout *h = new QHBoxLayout;
+    h->addStretch();
+    h->addWidget(cancel);
+    h->addWidget(save);
+    all->addLayout(h);
+
+    connect (avatarButton, SIGNAL(clicked()), this, SLOT(chooseAvatar()));
+    connect (save, SIGNAL(clicked()), this, SLOT(saveClicked()));
+    connect (cancel, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+}
+
+void
+NewCyclistDialog::chooseAvatar()
+{
+    QString filename = QFileDialog::getOpenFileName(this, tr("Choose Picture"),
+                            "", tr("Images (*.png *.jpg *.bmp"));
+    if (filename != "") {
+
+        avatar = QPixmap(filename);
+        avatarButton->setIcon(avatar.scaled(140,140));
+        avatarButton->setIconSize(QSize(140,140));
+    }
+}
+
+void
+NewCyclistDialog::cancelClicked()
+{
+    reject();
+}
+
+void
+NewCyclistDialog::saveClicked()
+{
+    // if we have a name...
+    if (!name->text().isEmpty()) {
+        if (!home.exists(name->text())) {
+            if (home.mkdir(name->text())) {
+
+                // lets setup!
+                appsettings->setCValue(name->text(), GC_DOB, dob->date());
+                appsettings->setCValue(name->text(), GC_WEIGHT, weight->value() * (useMetricUnits ? 1.0 : KG_PER_LB));
+                appsettings->setCValue(name->text(), GC_SEX, sex->currentIndex());
+                appsettings->setCValue(name->text(), GC_BIO, bio->toPlainText());
+                avatar.save(home.path() + "/" + name->text() + "/" + "avatar.png", "PNG");
+
+                // Setup Power Zones
+                Zones zones;
+                zones.addZoneRange(QDate(1900, 01, 01), cp->value());
+                zones.write(QDir(home.path() + "/" + name->text()));
+
+                // HR Zones too!
+                HrZones hrzones;
+                hrzones.addHrZoneRange(QDate(1900, 01, 01), lthr->value(), resthr->value(), maxhr->value());
+                hrzones.write(QDir(home.path() + "/" + name->text()));
+
+                accept();
+            } else {
+                QMessageBox::critical(0, tr("Fatal Error"), tr("Can't create new directory ") + home.path() + "/" + name->text(), "OK");
+            }
+        } else {
+            QMessageBox::critical(0, tr("Fatal Error"), tr("Cyclist already exists ")  + name->text(), "OK");
+        }
+    } else {
+        QMessageBox::critical(0, tr("Fatal Error"), tr("Cyclist name is mandatory"), "OK");
+    }
+    return;
+}
