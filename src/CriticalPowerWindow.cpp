@@ -291,10 +291,7 @@ void CriticalPowerWindow::addSeasons()
     SeasonParser( handler );
     xmlReader.setContentHandler(&handler);
     xmlReader.setErrorHandler(&handler);
-    bool ok = xmlReader.parse( source );
-    if(!ok)
-        qWarning("Failed to parse seasons.xml");
-
+    xmlReader.parse( source );
     seasons = handler.getSeasons();
     Season season;
     season.setName(tr("All Seasons"));
