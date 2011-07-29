@@ -17,6 +17,7 @@
  */
 
 #include "ChooseCyclistDialog.h"
+#include "NewCyclistDialog.h"
 #include <QtGui>
 
 ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) :
@@ -80,23 +81,22 @@ ChooseCyclistDialog::cancelClicked()
 }
 
 QString
-ChooseCyclistDialog::newCyclistDialog(QDir &homeDir, QWidget *parent)
+ChooseCyclistDialog::newCyclistDialog(QDir &homeDir, QWidget *)
 {
-    QDir home(homeDir);
-    bool ok;
-    QString name = QInputDialog::getText(parent, tr("Create New Cyclist"),
-                                         tr("Enter New Cyclist's Name"),
-                                         QLineEdit::Normal, "", &ok);
-    if (ok && !name.isEmpty()) {
-        if (!home.exists(name)) {
-            if (home.mkdir(name))
-                return name;
-            QMessageBox::critical(0, tr("Fatal Error"),
-                                  tr("Can't create new directory ")
-                                  + home.path() + "/" + name, "OK");
-        }
-    }
-    return QString();
+    NewCyclistDialog *newone = new NewCyclistDialog(homeDir);
+
+    // get new one..
+    QString name;
+    if (newone->exec() == QDialog::Accepted) 
+        name = newone->name->text();
+    else
+        name = "";
+
+    // zap the dialog now we have the results
+    delete newone;
+
+    // blank if cancelled
+    return name;
 }
 
 void
