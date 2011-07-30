@@ -323,7 +323,6 @@ MainWindow::MainWindow(const QDir &home) :
     }
 
     splitter = new QSplitter;
-    splitter->setOpaqueResize(false); // redraw when released, snappier UI
 
     // CHARTS
     chartTool = new GcWindowTool(this);
@@ -440,10 +439,11 @@ MainWindow::MainWindow(const QDir &home) :
     // SPLITTER
     splitter->addWidget(toolBox);
     splitter->addWidget(views);
-    QVariant splitterSizes = appsettings->value(this, GC_SETTINGS_SPLITTER_SIZES); 
-    if (splitterSizes != QVariant())
+    QVariant splitterSizes = appsettings->cvalue(cyclist, GC_SETTINGS_SPLITTER_SIZES); 
+    if (splitterSizes != QVariant()) {
         splitter->restoreState(splitterSizes.toByteArray());
-    else {
+        splitter->setOpaqueResize(true); // redraw when released, snappier UI
+    } else {
         QList<int> sizes;
         sizes.append(250);
         sizes.append(390);
@@ -719,7 +719,7 @@ void
 MainWindow::splitterMoved(int pos, int /*index*/)
 {
     listView->setWidth(pos);
-    appsettings->setValue(GC_SETTINGS_SPLITTER_SIZES, splitter->saveState());
+    appsettings->setCValue(cyclist, GC_SETTINGS_SPLITTER_SIZES, splitter->saveState());
 }
 
 void

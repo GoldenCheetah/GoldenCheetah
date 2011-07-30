@@ -29,7 +29,7 @@ static const QString defaultconfig = QString("Duration|Distance|TSS|IF|Date");
 RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), groupBy(-1)
 {
     // get column headings
-    QList<QString> defaultColumns = appsettings->value(this, GC_NAVHEADINGS, defaultconfig)
+    QList<QString> defaultColumns = appsettings->cvalue(main->cyclist, GC_NAVHEADINGS, defaultconfig)
                                     .toString().split("|", QString::SkipEmptyParts);
 
     if (defaultColumns.count() < 2) defaultColumns = defaultconfig.split("|", QString::SkipEmptyParts);
@@ -138,18 +138,18 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
     }
 
     // initialise to whatever groupBy we want to start with
-    tableView->sortByColumn(appsettings->value(this, GC_SORTBY, "2").toInt(),
+    tableView->sortByColumn(appsettings->cvalue(main->cyclist, GC_SORTBY, "2").toInt(),
                               static_cast<Qt::SortOrder>(appsettings->value(this, GC_SORTBYORDER, static_cast<int>(Qt::AscendingOrder)).toInt()));
     //tableView->setColumnHidden(0, true);
     tableView->setColumnWidth(0,0);
 
     // set the column widths
     int columnnumber=0;
-    foreach(QString size, appsettings->value(this, GC_NAVHEADINGWIDTHS, "50|50|50|50|50").toString().split("|", QString::SkipEmptyParts))
+    foreach(QString size, appsettings->cvalue(main->cyclist, GC_NAVHEADINGWIDTHS, "50|50|50|50|50").toString().split("|", QString::SkipEmptyParts))
         tableView->setColumnWidth(columnnumber++,size.toInt());
 
     groupBy = -1;
-    currentColumn = appsettings->value(this, GC_NAVGROUPBY, "-1").toInt();
+    currentColumn = appsettings->cvalue(main->cyclist, GC_NAVGROUPBY, "-1").toInt();
     setGroupBy();
 
     // refresh when database is updated
@@ -175,7 +175,6 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
     connect(tableView->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)), this, SLOT(setSortBy(int,Qt::SortOrder)));
     // we accept drag and drop operations
     setAcceptDrops(true);
-    //setWidth(999);
 
 }
 
@@ -202,14 +201,25 @@ RideNavigator::setWidth(int x)
 {
     active = true;
 
-    if (tableView->verticalScrollBar())
+    if (tableView->verticalScrollBar()->isVisible())
         x -= tableView->verticalScrollBar()->width();
+
+    // ** NOTE **
+    // When iterating over the section headings we
+    // always use the tableview not the sortmodel
+    // so we can skip over the virtual column 0
+    // which is used to group by, is visible but
+    // must have a width of 0. This is why all
+    // the for loops start with i=1
 
     // is it narrower than the headings?
     int headwidth=0;
-    for (int i=0; i<tableView->header()->count(); i++)
-        if (tableView->header()->isSectionHidden(i) == false)
+    int n=0;
+    for (int i=1; i<tableView->header()->count(); i++)
+        if (tableView->header()->isSectionHidden(i) == false) {
             headwidth += tableView->columnWidth(i);
+            n++;
+        }
 
     // headwidth is no, x is to-be width
     // we need to 'stretch' the sections 
@@ -218,7 +228,7 @@ RideNavigator::setWidth(int x)
     int setwidth=0;
     int last=0;
     int newwidth=0;
-    for (int i=0; i<tableView->header()->count(); i++) {
+    for (int i=1; i<tableView->header()->count(); i++) {
         if (tableView->header()->isSectionHidden(i) == false) {
             newwidth = (double)((((double)tableView->columnWidth(i)/(double)headwidth)) * (double)x); 
             if (newwidth < 20) newwidth = 20;
@@ -237,14 +247,14 @@ RideNavigator::setWidth(int x)
     if (setwidth != x) {
         // how many columns we got to snip from?
         int colsleft = 0;
-        for (int i=0; i<tableView->header()->count(); i++)
+        for (int i=1; i<tableView->header()->count(); i++)
             if (tableView->header()->isSectionHidden(i) == false && tableView->columnWidth(i)>20)
                 colsleft++;
 
         // run through ... again.. snipping off some pixels
         if (colsleft) {
             int snip = (setwidth-x) / colsleft; //could be negative too
-            for (int i=0; i<tableView->header()->count(); i++) {
+            for (int i=1; i<tableView->header()->count(); i++) {
                 if (tableView->header()->isSectionHidden(i) == false && tableView->columnWidth(i)>20) {
                     tableView->setColumnWidth(i, tableView->columnWidth(i)-snip);
                     setwidth -= snip;
@@ -255,12 +265,23 @@ RideNavigator::setWidth(int x)
 
     //tableView->setColumnWidth(last, newwidth + (x-setwidth)); // account for rounding errors
 
-    if (headwidth < x)
-        delegate->setWidth(pwidth=headwidth);
+    if (setwidth < x)
+        delegate->setWidth(pwidth=setwidth);
     else
         delegate->setWidth(pwidth=x);
 
     active = false;
+}
+
+// make sure the columns are all neat and tidy when the ride navigator is shown
+bool
+RideNavigator::event(QEvent *e)
+{
+    if (e->type() == QEvent::WindowActivate) {
+        active=false;
+        setWidth(main->getSplitter()->sizes()[0]); // calculate width...
+    }
+    return QWidget::event(e);
 }
 
 void
@@ -283,17 +304,17 @@ RideNavigator::columnsChanged()
     foreach(QString name, visualHeadings)
         headings += name + "|";
 
-    appsettings->setValue(GC_NAVHEADINGS, headings);
+    appsettings->setCValue(main->cyclist, GC_NAVHEADINGS, headings);
 
     // get column widths
     QString widths;
     for (int i=0; i<tableView->header()->count(); i++)
         widths += QString("%1|").arg(tableView->columnWidth(i));
 
-    appsettings->setValue(GC_NAVHEADINGWIDTHS, widths);
-    //setWidth(main->getSplitter()->sizes()[0]); // calculate width...
-
+    // clean up
     active = false;
+    setWidth(main->getSplitter()->sizes()[0]); // calculate width...
+    appsettings->setCValue(main->cyclist, GC_NAVHEADINGWIDTHS, widths);
 }
 
 bool
@@ -420,7 +441,7 @@ RideNavigator::setGroupBy()
     tableView->expandAll();
 
     // save away
-    appsettings->setValue(GC_NAVGROUPBY, groupBy);
+    appsettings->setCValue(main->cyclist, GC_NAVGROUPBY, groupBy);
 
     // reselect current ride - since selectionmodel
     // is changed by setGroupBy()
@@ -430,8 +451,8 @@ RideNavigator::setGroupBy()
 void
 RideNavigator::setSortBy(int index, Qt::SortOrder order)
 {
-    appsettings->setValue(GC_SORTBY, index);
-    appsettings->setValue(GC_SORTBYORDER, order);
+    appsettings->setCValue(main->cyclist, GC_SORTBY, index);
+    appsettings->setCValue(main->cyclist, GC_SORTBYORDER, order);
 }
 
 //
@@ -599,8 +620,12 @@ GroupByModel::groupFromValue(QString headingName, QString value, double rank, do
 void
 RideNavigator::removeColumn()
 {
+    active = true;
     tableView->setColumnHidden(currentColumn, true);
-    columnsChanged();
+    active = false;
+    
+    setWidth(main->getSplitter()->sizes()[0]); // calculate width...
+    columnsChanged(); // need to do after, just once
 }
 
 void

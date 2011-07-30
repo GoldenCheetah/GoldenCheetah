@@ -66,6 +66,7 @@ class RideNavigator : public QWidget
 
     public slots:
         void refresh();
+        bool event(QEvent *event);
 
         // working with columns
         void columnsChanged();
