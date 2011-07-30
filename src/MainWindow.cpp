@@ -640,6 +640,8 @@ MainWindow::rideTreeWidgetSelectionChanged()
 void
 MainWindow::showTreeContextMenuPopup(const QPoint &pos)
 {
+    if (treeWidget->selectedItems().size() == 0) return; //none selected!
+
     RideItem *rideItem = (RideItem *)treeWidget->selectedItems().first();
     if (rideItem != NULL && rideItem->text(0) != tr("All Rides")) {
         QMenu menu(treeWidget);
