@@ -46,6 +46,7 @@ GoogleMapControl::GoogleMapControl(MainWindow *mw) : GcWindow(mw), main(mw), ran
     view->setContentsMargins(0,0,0,0);
     view->page()->view()->setContentsMargins(0,0,0,0);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    view->setAcceptDrops(false);
     layout->addWidget(view);
 
     webBridge = new WebBridge(mw, this);
