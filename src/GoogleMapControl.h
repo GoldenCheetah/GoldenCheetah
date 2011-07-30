@@ -82,6 +82,16 @@ class GoogleMapControl : public GcWindow
     Q_OBJECT
     G_OBJECT
 
+    public:
+        GoogleMapControl(MainWindow *);
+        virtual ~GoogleMapControl() {}
+        bool first;
+
+    public slots:
+        void rideSelected();
+        void createMarkers();
+        void drawShadedRoute();
+
     private:
         MainWindow *main;
         QVBoxLayout *layout;
@@ -94,34 +104,13 @@ class GoogleMapControl : public GcWindow
         QString currentPage;
         RideItem *current;
 
-        // the web browser is loading a page, do NOT start another load
-        bool loadingPage;
-        // the ride has changed, load a new page
-        bool newRideToLoad;
-
         QColor GetColor(int watts);
         void createHtml();
-        QString createMapToolTipJavaScript();
-
-    public slots:
-        void rideSelected();
-        void createMarkers();
-        void drawShadedRoute();
 
     private slots:
         void loadRide();
         void updateFrame();
-        void loadStarted();
-        void loadFinished(bool);
 
-    protected:
-        void resizeEvent(QResizeEvent *);
-
-    public:
-        GoogleMapControl(MainWindow *);
-        virtual ~GoogleMapControl() {}
-        QTimer *delay;
-        bool first;
 };
 
 #endif
