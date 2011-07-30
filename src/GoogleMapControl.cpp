@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2009 Greg Lonnon (greg.lonnon@gmail.com)
+ *               2011 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -17,6 +18,7 @@
  */
 
 #include "GoogleMapControl.h"
+
 #include "RideItem.h"
 #include "RideFile.h"
 #include "MainWindow.h"
@@ -27,15 +29,6 @@
 #include "TimeUtils.h"
 
 #include <QDebug>
-
-
-#include <string>
-#include <vector>
-#include <algorithm>
-#include <boost/foreach.hpp>
-#include <boost/circular_buffer.hpp>
-
-using namespace std;
 
 GoogleMapControl::GoogleMapControl(MainWindow *mw) : GcWindow(mw), main(mw), range(-1), current(NULL)
 {
@@ -55,28 +48,14 @@ GoogleMapControl::GoogleMapControl(MainWindow *mw) : GcWindow(mw), main(mw), ran
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(view);
 
-    // we redraw on resize after a timeout
-    // to let the user move splitter etc
-    // without an immediate redraw, since it
-    // makes the UI unresponsive
-    delay = new QTimer(this);
-    delay->setSingleShot(true);
-
     webBridge = new WebBridge(mw, this);
 
-    //connect(parent, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(view->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(updateFrame()));
-    connect(view, SIGNAL(loadStarted()), this, SLOT(loadStarted()));
-    connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
-    connect(delay, SIGNAL(timeout()), this, SLOT(loadRide()));
     connect(mw, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
     connect(mw, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
 
     first = true;
-    loadingPage = false;
-    newRideToLoad = false;
-
 }
 
 void
@@ -95,51 +74,13 @@ GoogleMapControl::rideSelected()
     if(range < 0) rideCP = 300;  // default cp to 300 watts
     else rideCP = ride->zones->getCP(range);
 
-    newRideToLoad = true;
     loadRide();
-}
-
-void GoogleMapControl::resizeEvent(QResizeEvent * )
-{
-    // XXX v3 API removes the need to do all this nonsense
-    //     since the map is enlarged as neccessary
-    return;
-
-    //XXX kept old code, just in case we decide
-    //    we still want to redraw on resize
-    if (!amVisible()) return;
-
-    if (first == true) {
-        first = false;
-        return;
-    }
-
-    newRideToLoad = true;
-    delay->stop();
-    delay->start(1000);
-}
-
-void GoogleMapControl::loadStarted()
-{
-    loadingPage = true;
-}
-
-/// called after the load is finished
-void GoogleMapControl::loadFinished(bool)
-{
-    loadingPage = false;
 }
 
 void GoogleMapControl::loadRide()
 {
-    if(loadingPage == true) return;
-
-    if(newRideToLoad == true) {
-        newRideToLoad = false;
-        loadingPage = true;
-        createHtml();
-        view->page()->mainFrame()->setHtml(currentPage);
-    }
+    createHtml();
+    view->page()->mainFrame()->setHtml(currentPage);
 }
 
 void GoogleMapControl::updateFrame()
@@ -181,11 +122,6 @@ void GoogleMapControl::createHtml()
     "<link href=\"http://code.google.com/apis/maps/documentation/javascript/examples/default.css\" rel=\"stylesheet\" type=\"text/css\" /> \n"
     "<script type=\"text/javascript\" src=\"http://maps.googleapis.com/maps/api/js?sensor=false\"></script> \n");
 
-#if 0 // XXX overlay routine only works with MAPS api v2
-    // add in our library routines
-    currentPage += createMapToolTipJavaScript();
-#endif
-
     // local functions
     currentPage += QString("<script type=\"text/javascript\">\n"
     "var map;\n"  // the map object
@@ -197,68 +133,68 @@ void GoogleMapControl::createHtml()
     // to supply the data to a) reduce bandwidth and
     // b) allow local manipulation. This makes the UI
     // considerably more 'snappy'
-    "function drawRoute() {\n" 
+    "function drawRoute() {\n"
 
     // route will be drawn with these options
-    "    var routeOptionsYellow = {\n" 
-    "        strokeColor: '#FFFF00',\n" 
-    "        strokeOpacity: 0.4,\n" 
-    "        strokeWeight: 10,\n" 
-    "        zIndex: -2\n" 
-    "    };\n" 
+    "    var routeOptionsYellow = {\n"
+    "        strokeColor: '#FFFF00',\n"
+    "        strokeOpacity: 0.4,\n"
+    "        strokeWeight: 10,\n"
+    "        zIndex: -2\n"
+    "    };\n"
 
     // load the GPS co-ordinates
     "    var latlons = webBridge.getLatLons(0);\n" // interval "0" is the entire route
 
     // create the route Polyline
-    "    var routeYellow = new google.maps.Polyline(routeOptionsYellow);\n" 
-    "    routeYellow.setMap(map);\n" 
+    "    var routeYellow = new google.maps.Polyline(routeOptionsYellow);\n"
+    "    routeYellow.setMap(map);\n"
 
     // lastly, populate the route path
-    "    var path = routeYellow.getPath();\n" 
-    "    var j=0;\n" 
-    "    while (j < latlons.length) { \n" 
-    "        path.push(new google.maps.LatLng(latlons[j], latlons[j+1]));\n" 
-    "        j += 2;\n" 
-    "    }\n" 
-    "}\n" 
+    "    var path = routeYellow.getPath();\n"
+    "    var j=0;\n"
+    "    while (j < latlons.length) { \n"
+    "        path.push(new google.maps.LatLng(latlons[j], latlons[j+1]));\n"
+    "        j += 2;\n"
+    "    }\n"
+    "}\n"
 
-    "function drawIntervals() { \n" 
+    "function drawIntervals() { \n"
     // intervals will be drawn with these options
-    "    var polyOptions = {\n" 
-    "        strokeColor: '#0000FF',\n" 
-    "        strokeOpacity: 0.6,\n" 
-    "        strokeWeight: 10,\n" 
+    "    var polyOptions = {\n"
+    "        strokeColor: '#0000FF',\n"
+    "        strokeOpacity: 0.6,\n"
+    "        strokeWeight: 10,\n"
     "        zIndex: -1\n"  // put at the bottom
-    "    }\n" 
+    "    }\n"
 
     // remove previous intervals highlighted
-    "    j= intervalList.length;\n" 
-    "    while (j) {\n" 
-    "       var highlighted = intervalList.pop();\n" 
-    "       highlighted.setMap(null);\n" 
-    "       j--;\n" 
-    "    }\n" 
+    "    j= intervalList.length;\n"
+    "    while (j) {\n"
+    "       var highlighted = intervalList.pop();\n"
+    "       highlighted.setMap(null);\n"
+    "       j--;\n"
+    "    }\n"
 
     // how many to draw?
-    "    var intervals = webBridge.intervalCount();\n" 
-    "    while (intervals > 0) {\n" 
-    "        var latlons = webBridge.getLatLons(intervals);\n" 
-    "        var intervalHighlighter = new google.maps.Polyline(polyOptions);\n" 
-    "        intervalHighlighter.setMap(map);\n" 
-    "        intervalList.push(intervalHighlighter);\n" 
-    "        var path = intervalHighlighter.getPath();\n" 
-    "        var j=0;\n" 
-    "        while (j<latlons.length) {\n" 
-    "          path.push(new google.maps.LatLng(latlons[j], latlons[j+1]));\n" 
-    "          j += 2;\n" 
-    "        }\n" 
-    "        intervals--;\n" 
-    "    }\n" 
-    "}\n" 
+    "    var intervals = webBridge.intervalCount();\n"
+    "    while (intervals > 0) {\n"
+    "        var latlons = webBridge.getLatLons(intervals);\n"
+    "        var intervalHighlighter = new google.maps.Polyline(polyOptions);\n"
+    "        intervalHighlighter.setMap(map);\n"
+    "        intervalList.push(intervalHighlighter);\n"
+    "        var path = intervalHighlighter.getPath();\n"
+    "        var j=0;\n"
+    "        while (j<latlons.length) {\n"
+    "          path.push(new google.maps.LatLng(latlons[j], latlons[j+1]));\n"
+    "          j += 2;\n"
+    "        }\n"
+    "        intervals--;\n"
+    "    }\n"
+    "}\n"
 
     // initialise function called when map loaded
-    "function initialize() {\n" 
+    "function initialize() {\n"
 
     // TERRAIN style map please and make it draggable
     // note that because QT webkit offers touch/gesture
@@ -279,39 +215,39 @@ void GoogleMapControl::createHtml()
     "    map = new google.maps.Map(document.getElementById('map_canvas'), myOptions);\n"
     "    var sw = new google.maps.LatLng(%1,%2);\n"  // .ARG 1, 2
     "    var ne = new google.maps.LatLng(%3,%4);\n"  // .ARG 3, 4
-    "    var bounds = new google.maps.LatLngBounds(sw,ne);\n" 
+    "    var bounds = new google.maps.LatLngBounds(sw,ne);\n"
     "    map.fitBounds(bounds);\n"
 
     // add the bike layer, useful in some areas, but coverage
     // is limited, US gets best coverage at this point (Summer 2011)
-    "    var bikeLayer = new google.maps.BicyclingLayer();\n" 
-    "    bikeLayer.setMap(map);\n" 
+    "    var bikeLayer = new google.maps.BicyclingLayer();\n"
+    "    bikeLayer.setMap(map);\n"
 
     // initialise local variables
-    "    markerList = new Array();\n" 
-    "    intervalList = new Array();\n" 
-    "    polyList = new Array();\n" 
+    "    markerList = new Array();\n"
+    "    intervalList = new Array();\n"
+    "    polyList = new Array();\n"
 
     // draw the main route data, getting the geo
     // data from the webbridge - reduces data sent/received
     // to the map server and makes the UI pretty snappy
-    "    drawRoute();\n" 
-    "    drawIntervals();\n" 
+    "    drawRoute();\n"
+    "    drawIntervals();\n"
 
     // catch signals to redraw intervals
-    "    webBridge.drawIntervals.connect(drawIntervals);\n" 
+    "    webBridge.drawIntervals.connect(drawIntervals);\n"
 
     // we're done now let the C++ side draw its overlays
-    "    webBridge.drawOverlays();\n" 
+    "    webBridge.drawOverlays();\n"
 
-    "}\n" 
-    "</script>\n").arg(minLat,0,'g',11).arg(minLon,0,'g',11).arg(maxLat,0,'g',11).arg(maxLon,0,'g',11); 
+    "}\n"
+    "</script>\n").arg(minLat,0,'g',11).arg(minLon,0,'g',11).arg(maxLat,0,'g',11).arg(maxLon,0,'g',11);
 
     // the main page is rather trivial
-    currentPage += QString("</head>\n" 
+    currentPage += QString("</head>\n"
     "<body onload=\"initialize()\">\n"
     "<div id=\"map_canvas\"></div>\n"
-    "</body>\n" 
+    "</body>\n"
     "</html>\n");
 }
 
@@ -322,8 +258,7 @@ QColor GoogleMapControl::GetColor(int watts)
     else return zoneColor(main->zones()->whichZone(range, watts), 7);
 }
 
-
-/// create the ride line
+// create the ride line
 void
 GoogleMapControl::drawShadedRoute()
 {
@@ -369,22 +304,7 @@ GoogleMapControl::drawShadedRoute()
                             "    zIndex: 0,\n"
                             "}\n"
                             "polyline.setOptions(polyOptions);\n"
-
-#if 0 //XXX map.{add,remove}Overlay is deprecated..
-                            // tooltip
-                            "google.maps.event.addListener(polyline, 'mouseover', function() {\n"
-                            "    var tooltip_text = '30s Power: %2';\n"
-                            "    this.overlay = new MapTooltip(this,tooltip_text);\n"
-                            "    map.addOverlay(this.overlay);\n"
-                            "});\n"
-                            "google.maps.event.addListener(polyline, 'mouseout', function() {\n"
-                            "    map.removeOverlay(this.overlay);\n"
-                            "});\n"
-#endif
                             "}\n").arg(color.name());
-#if 0 //XXX map.{add,remove}Overlay is deprecated..
-.arg(avgWatts);
-#endif
 
             view->page()->mainFrame()->evaluateJavaScript(code);
         }
@@ -430,20 +350,20 @@ GoogleMapControl::createMarkers()
 
     if (loop) {
 
-        code = QString("{ var latlng = new google.maps.LatLng(%1,%2);" 
+        code = QString("{ var latlng = new google.maps.LatLng(%1,%2);"
                    "var image = new google.maps.MarkerImage('qrc:images/maps/loop.png');"
                    "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
                    "marker.setMap(map); }").arg(points[0]->lat,0,'g',11).arg(points[0]->lon,0,'g',11);
         view->page()->mainFrame()->evaluateJavaScript(code);
     } else {
         // start / finish markers
-        code = QString("{ var latlng = new google.maps.LatLng(%1,%2);" 
+        code = QString("{ var latlng = new google.maps.LatLng(%1,%2);"
                    "var image = new google.maps.MarkerImage('qrc:images/maps/cycling.png');"
                    "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
                    "marker.setMap(map); }").arg(points[0]->lat,0,'g',11).arg(points[0]->lon,0,'g',11);
         view->page()->mainFrame()->evaluateJavaScript(code);
 
-        code = QString("{ var latlng = new google.maps.LatLng(%1,%2);" 
+        code = QString("{ var latlng = new google.maps.LatLng(%1,%2);"
                    "var image = new google.maps.MarkerImage('qrc:images/maps/finish.png');"
                    "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
                    "marker.setMap(map); }").arg(points[points.count()-1]->lat,0,'g',11).arg(points[points.count()-1]->lon,0,'g',11);
@@ -488,7 +408,7 @@ GoogleMapControl::createMarkers()
                 lastlat = stoplat;
                 lastlon = stoplon;
                 code = QString(
-                    "{ var latlng = new google.maps.LatLng(%1,%2);" 
+                    "{ var latlng = new google.maps.LatLng(%1,%2);"
                     "var image = new google.maps.MarkerImage('qrc:images/maps/cycling_feed.png');"
                     "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
                     "marker.setMap(map);"
@@ -512,7 +432,7 @@ GoogleMapControl::createMarkers()
         int offset = myRideItem->ride()->intervalBegin(x);
         code = QString(
             "{"
-            "   var latlng = new google.maps.LatLng(%1,%2);" 
+            "   var latlng = new google.maps.LatLng(%1,%2);"
             "   var marker = new google.maps.Marker({ title: '%3', animation: google.maps.Animation.DROP, position: latlng });"
             "   marker.setMap(map);"
             "   markerList.push(marker);" // keep track of those suckers
@@ -525,78 +445,12 @@ GoogleMapControl::createMarkers()
         view->page()->mainFrame()->evaluateJavaScript(code);
         interval++;
     }
-    
-    return; 
-}
 
-QString GoogleMapControl::createMapToolTipJavaScript()
-{
-    return("<script type=\"text/javascript\">\n"
-           "var MapTooltip = function(obj, html, options) {\n"
-           "this.obj = obj;\n"
-           "this.html = html;\n"
-           "this.options = options || {};\n"
-           "}\n"
-           "MapTooltip.prototype = new GOverlay();\n"
-           "MapTooltip.prototype.initialize = function(map) {\n"
-           "var div = document.getElementById('MapTooltipContainer');\n"
-           "var that = this;\n"
-           "if (!div) {\n"
-           "var div = document.createElement('div');\n"
-           "div.setAttribute('id', 'MapTooltipContainer');\n"
-           "}\n"
-           "if (this.options.maxWidth || this.options.minWidth) {\n"
-           "div.style.maxWidth = this.options.maxWidth || '150px';\n"
-           "div.style.minWidth = this.options.minWidth || '150px';\n"
-           "} else {\n"
-           "div.style.width = this.options.width || '150px';\n"
-           "}\n"
-           "div.style.padding = this.options.padding || '5px';\n"
-           "div.style.backgroundColor = this.options.backgroundColor || '#ffffff';\n"
-#if 0
-        << "div.style.border = this.options.border || '1px solid #000000';"<< endl
-#endif
-           "div.style.border = '0px solid #000000';\n"
-           "div.style.fontSize = this.options.fontSize || '80%';\n"
-           "div.style.color = this.options.color || '#000';\n"
-           "div.innerHTML = this.html;\n"
-           "div.style.position = 'absolute';\n"
-           "div.style.zIndex = '1000';\n"
-           "var offsetX = this.options.offsetX || 10;\n"
-           "var offsetY = this.options.offsetY || 0;\n"
-           "var bounds = map.getBounds();\n"
-           "rightEdge = map.fromLatLngToDivPixel(bounds.getNorthEast()).x;\n"
-           "bottomEdge = map.fromLatLngToDivPixel(bounds.getSouthWest()).y;\n"
-           "var mapev = GEvent.addListener(map, 'mousemove', function(latlng) {\n"
-           "GEvent.removeListener(mapev);\n"
-           "var pixelPosX = (map.fromLatLngToDivPixel(latlng)).x + offsetX;\n"
-           "var pixelPosY = (map.fromLatLngToDivPixel(latlng)).y - offsetY;\n"
-           "div.style.left = pixelPosX + 'px';\n"
-           "div.style.top = pixelPosY + 'px';\n"
-           "map.getPane(G_MAP_FLOAT_PANE).appendChild(div);\n"
-           "if ( (pixelPosX + div.offsetWidth) > rightEdge ) {\n"
-           "div.style.left = (rightEdge - div.offsetWidth - 10) + 'px';\n"
-           "}\n"
-           "if ( (pixelPosY + div.offsetHeight) > bottomEdge ) {\n"
-           "div.style.top = (bottomEdge - div.offsetHeight - 10) + 'px';\n"
-           "}\n"
-           "});\n"
-           "this._map = map;\n"
-           "this._div = div;\n"
-           "}\n"
-           "MapTooltip.prototype.remove = function() {\n"
-           "if(this._div != null) {\n"
-           "this._div.parentNode.removeChild(this._div);\n"
-           "}\n"
-           "}\n"
-           "MapTooltip.prototype.redraw = function(force) {\n"
-           "}\n"
-           "</script>\n");
+    return;
 }
 
 // quick diag, used to debug code only
 void WebBridge::call(int count) { qDebug()<<"webBridge call:"<<count; }
-
 
 // how many intervals are highlighted?
 int
