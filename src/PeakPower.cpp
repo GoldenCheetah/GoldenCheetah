@@ -181,6 +181,125 @@ class PeakPower30m : public PeakPower {
         RideMetric *clone() const { return new PeakPower30m(*this); }
 };
 
+class PeakPowerHr : public RideMetric {
+
+    double hr;
+    double secs;
+
+    public:
+
+    PeakPowerHr() : hr(0.0), secs(0.0)
+    {
+        setType(RideMetric::Peak);
+    }
+    void setSecs(double secs) { this->secs=secs; }
+    void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
+                 const QHash<QString,RideMetric*> &, const MainWindow *) {
+        QList<BestIntervalDialog::BestInterval> results;
+        BestIntervalDialog::findBests(ride, secs, 1, results);
+        if (results.count() > 0) {
+            double start = results.first().start;
+            double stop = results.first().stop;
+            int points = 0;
+
+            foreach(const RideFilePoint *point, ride->dataPoints()) {
+                if (point->secs >= start && point->secs < stop) {
+                    hr = point->hr + (points>0?hr/points:0);
+                    points++;
+                }
+            }
+        }
+
+        setValue(hr);
+    }
+    RideMetric *clone() const { return new PeakPowerHr(*this); }
+};
+
+class PeakPowerHr1m : public PeakPowerHr {
+
+    public:
+        PeakPowerHr1m()
+        {
+            setSecs(60);
+            setSymbol("1m_critical_power_hr");
+            setName(tr("1 min Peak Power HR"));
+            setMetricUnits(tr("bpm"));
+            setImperialUnits(tr("bpm"));
+        }
+        RideMetric *clone() const { return new PeakPowerHr1m(*this); }
+};
+
+class PeakPowerHr5m : public PeakPowerHr {
+
+    public:
+        PeakPowerHr5m()
+        {
+            setSecs(300);
+            setSymbol("5m_critical_power_hr");
+            setName(tr("5 min Peak Power HR"));
+            setMetricUnits(tr("bpm"));
+            setImperialUnits(tr("bpm"));
+        }
+        RideMetric *clone() const { return new PeakPowerHr5m(*this); }
+};
+
+class PeakPowerHr10m : public PeakPowerHr {
+
+    public:
+        PeakPowerHr10m()
+        {
+            setSecs(600);
+            setSymbol("10m_critical_power_hr");
+            setName(tr("10 min Peak Power HR"));
+            setMetricUnits(tr("bpm"));
+            setImperialUnits(tr("bpm"));
+        }
+        RideMetric *clone() const { return new PeakPowerHr10m(*this); }
+};
+
+class PeakPowerHr20m : public PeakPowerHr {
+
+    public:
+        PeakPowerHr20m()
+        {
+            setSecs(1200);
+            setSymbol("20m_critical_power_hr");
+            setName(tr("20 min Peak Power HR"));
+            setMetricUnits(tr("bpm"));
+            setImperialUnits(tr("bpm"));
+        }
+        RideMetric *clone() const { return new PeakPowerHr20m(*this); }
+};
+
+class PeakPowerHr30m : public PeakPowerHr {
+
+    public:
+        PeakPowerHr30m()
+        {
+            setSecs(1800);
+            setSymbol("30m_critical_power_hr");
+            setName(tr("30 min Peak Power HR"));
+            setMetricUnits(tr("bpm"));
+            setImperialUnits(tr("bpm"));
+        }
+        RideMetric *clone() const { return new PeakPowerHr30m(*this); }
+};
+
+
+class PeakPowerHr60m : public PeakPowerHr {
+
+    public:
+        PeakPowerHr60m()
+        {
+            setSecs(3600);
+            setSymbol("60m_critical_power_hr");
+            setName(tr("60 min Peak Power HR"));
+            setMetricUnits(tr("bpm"));
+            setImperialUnits(tr("bpm"));
+        }
+        RideMetric *clone() const { return new PeakPowerHr60m(*this); }
+};
+
 static bool addAllPeaks() {
     RideMetricFactory::instance().addMetric(PeakPower1s());
     RideMetricFactory::instance().addMetric(PeakPower5s());
@@ -194,6 +313,12 @@ static bool addAllPeaks() {
     RideMetricFactory::instance().addMetric(PeakPower20m());
     RideMetricFactory::instance().addMetric(PeakPower30m());
     RideMetricFactory::instance().addMetric(CriticalPower());
+    RideMetricFactory::instance().addMetric(PeakPowerHr1m());
+    RideMetricFactory::instance().addMetric(PeakPowerHr5m());
+    RideMetricFactory::instance().addMetric(PeakPowerHr10m());
+    RideMetricFactory::instance().addMetric(PeakPowerHr20m());
+    RideMetricFactory::instance().addMetric(PeakPowerHr30m());
+    RideMetricFactory::instance().addMetric(PeakPowerHr60m());
     return true;
 }
 
