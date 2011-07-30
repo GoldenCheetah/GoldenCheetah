@@ -24,11 +24,15 @@
 
 #define tr(s) QObject::tr(s)
 
+static const QString defaultconfig = QString("Duration|Distance|TSS|IF|Date");
+
 RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), groupBy(-1)
 {
     // get column headings
-    QList<QString> defaultColumns = appsettings->value(this, GC_NAVHEADINGS,
-        "Duration|Distance|TSS|IF|Date").toString().split("|", QString::SkipEmptyParts);
+    QList<QString> defaultColumns = appsettings->value(this, GC_NAVHEADINGS, defaultconfig)
+                                    .toString().split("|", QString::SkipEmptyParts);
+
+    if (defaultColumns.count() < 2) defaultColumns = defaultconfig.split("|", QString::SkipEmptyParts);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(0);
@@ -216,7 +220,7 @@ RideNavigator::setWidth(int x)
     int newwidth=0;
     for (int i=0; i<tableView->header()->count(); i++) {
         if (tableView->header()->isSectionHidden(i) == false) {
-            newwidth = ((double)tableView->columnWidth(i)/(double)headwidth) * (double)x; 
+            newwidth = (double)((((double)tableView->columnWidth(i)/(double)headwidth)) * (double)x); 
             if (newwidth < 20) newwidth = 20;
             QString columnName = tableView->model()->headerData(i, Qt::Horizontal).toString();
             if (columnName == "*") newwidth = 0;
@@ -225,7 +229,31 @@ RideNavigator::setWidth(int x)
             last = i;
         }
     }
-    tableView->setColumnWidth(last, newwidth + (x-setwidth)); // account for rounding errors
+
+    // UGH. Now account for the fact that the smaller columns
+    //      didn't take their fair share of a negative resize
+    //      so we need to snip off from the larger columns.
+    // XXX this is a hack, we should use stretch factors...
+    if (setwidth != x) {
+        // how many columns we got to snip from?
+        int colsleft = 0;
+        for (int i=0; i<tableView->header()->count(); i++)
+            if (tableView->header()->isSectionHidden(i) == false && tableView->columnWidth(i)>20)
+                colsleft++;
+
+        // run through ... again.. snipping off some pixels
+        if (colsleft) {
+            int snip = (setwidth-x) / colsleft; //could be negative too
+            for (int i=0; i<tableView->header()->count(); i++) {
+                if (tableView->header()->isSectionHidden(i) == false && tableView->columnWidth(i)>20) {
+                    tableView->setColumnWidth(i, tableView->columnWidth(i)-snip);
+                    setwidth -= snip;
+                }
+            }
+        }
+    }
+
+    //tableView->setColumnWidth(last, newwidth + (x-setwidth)); // account for rounding errors
 
     if (headwidth < x)
         delegate->setWidth(pwidth=headwidth);
