@@ -211,6 +211,7 @@ RideNavigator::setWidth(int x)
     // which is used to group by, is visible but
     // must have a width of 0. This is why all
     // the for loops start with i=1
+    tableView->setColumnWidth(0,0); // in case use grabbed it
 
     // is it narrower than the headings?
     int headwidth=0;
