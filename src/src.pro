@@ -165,6 +165,7 @@ HEADERS += \
         ANTplusController.h \
         BestIntervalDialog.h \
         BinRideFile.h \
+        BingMap.h \
         CalendarDownload.h \
         ChooseCyclistDialog.h \
         Colors.h \
@@ -319,6 +320,7 @@ SOURCES += \
         BestIntervalDialog.cpp \
         BikeScore.cpp \
         BinRideFile.cpp \
+        BingMap.cpp \
         CalendarDownload.cpp \
         ChooseCyclistDialog.cpp \
         Coggan.cpp \
@@ -466,4 +468,3 @@ TRANSLATIONS = translations/gc_fr.ts \
                translations/gc_de.ts \
                translations/gc_cs.ts \
                translations/gc_ru.ts
-

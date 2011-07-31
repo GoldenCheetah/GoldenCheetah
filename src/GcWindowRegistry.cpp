@@ -49,6 +49,7 @@
 #include "DialWindow.h"
 #include "RealtimePlotWindow.h"
 #include "WorkoutPlotWindow.h"
+#include "BingMap.h"
 
 GcWindowRegistry GcWindows[] = {
     // name                     GcWinID
@@ -56,7 +57,8 @@ GcWindowRegistry GcWindows[] = {
     { "Ride Performance Graph",GcWindowTypes::AllPlot },
     { "Critical Mean Maximals",GcWindowTypes::CriticalPower },
     { "Activity Calendar",GcWindowTypes::Diary },
-    { "Route Map",GcWindowTypes::GoogleMap },
+    { "Google Route Map",GcWindowTypes::GoogleMap },
+    { "Bing Route Map",GcWindowTypes::BingMap },
     { "Distribution Histogram",GcWindowTypes::Histogram },
     { "Long Term Metrics",GcWindowTypes::LTM },
     { "3d Ride Analysis",GcWindowTypes::Model },
@@ -117,6 +119,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, MainWindow *main) //XXX mainWindow wil
     case GcWindowTypes::MetadataWindow: returning = new MetadataWindow(main); break;
     case GcWindowTypes::RealtimePlot: returning = new RealtimePlotWindow(main); break;
     case GcWindowTypes::WorkoutPlot: returning = new WorkoutPlotWindow(main); break;
+    case GcWindowTypes::BingMap: returning = new BingMap(main); break;
     default: return NULL; break;
     }
     if (returning) returning->setProperty("type", QVariant::fromValue<GcWinID>(id));
