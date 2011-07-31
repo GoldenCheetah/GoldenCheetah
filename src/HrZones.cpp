@@ -440,7 +440,10 @@ int HrZones::whichZone(int rnum, double value) const
         if ((value >= info.lo) && (value < info.hi))
             return j;
     }
-    return -1;
+
+    // if we got here either it is negative, nan, inf or way high
+    if (value < 0 || isnan(value)) return 0;
+    else return range.zones.size()-1;
 }
 
 void HrZones::zoneInfo(int rnum, int znum,
