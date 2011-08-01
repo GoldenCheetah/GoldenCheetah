@@ -26,7 +26,6 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
     mainWindow(mainWindow), zones(_zones)
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 
     home = _home;
 
