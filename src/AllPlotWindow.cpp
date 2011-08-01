@@ -669,12 +669,16 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
 	    showCad->setEnabled(dataPresent->cad);
 	    showAlt->setEnabled(dataPresent->alt);
 
+            showHr->setChecked(dataPresent->hr);
+            showSpeed->setChecked(dataPresent->kph);
+            showCad->setChecked(dataPresent->cad);
+            showAlt->setChecked(dataPresent->alt);
     } else {
-	    showPower->setEnabled(false);
-	    showHr->setEnabled(false);
-	    showSpeed->setEnabled(false);
-	    showCad->setEnabled(false);
-	    showAlt->setEnabled(false);
+            showPower->setEnabled(false);
+            showHr->setEnabled(false);
+            showSpeed->setEnabled(false);
+            showCad->setEnabled(false);
+            showAlt->setEnabled(false);
     }
 
     // turn on/off shading, if it's not available
