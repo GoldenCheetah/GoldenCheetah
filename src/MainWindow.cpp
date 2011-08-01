@@ -1018,6 +1018,15 @@ MainWindow::removeCurrentRide()
             .arg(strOldFileName).arg(strNewName));
     }
 
+    // remove any other derived/additional files; notes, cpi etc
+    QStringList extras;
+    extras << "notes" << "cpi" << "cpx";
+    foreach (QString extension, extras) {
+
+        QString deleteMe = QFileInfo(strOldFileName).baseName() + "." + extension;
+        QFile::remove(home.absolutePath() + "/" + deleteMe);
+    }
+
     // notify AFTER deleted!
     item->freeMemory();
     rideDeleted(item);
