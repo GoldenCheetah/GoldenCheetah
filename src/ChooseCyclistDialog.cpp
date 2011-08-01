@@ -33,12 +33,12 @@ ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) :
     while (i.hasNext()) {
         QString name = i.next();
 
-        // only offer cyclists which are not already open
-        bool available=true;
-        foreach (MainWindow *x, mainwindows)
-            if (x->cyclist == name) available=false;
+        QListWidgetItem *newone = new QListWidgetItem(name, listWidget);
 
-        if (available) new QListWidgetItem(name, listWidget);
+        // only allow selection of cyclists which are not already open
+        foreach (MainWindow *x, mainwindows)
+            if (x->cyclist == name)
+                newone->setFlags(newone->flags() & ~Qt::ItemIsEnabled);
     }
 
     if (allowNew)
