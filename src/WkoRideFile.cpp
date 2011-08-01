@@ -372,13 +372,19 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, RideFile *rideFile, QStringList &error
                             memcpy(&llat, &val, 4);
                             lat = (double)llat;
                             lat *= 0.00000008381903171539306640625;
-                            sprintf(slat, "%-3.9g", lat);
 
                             val = get_bits(thelot, bit-32,32);
                             memcpy(&llon, &val, 4);
                             lon = (double)llon;
                             lon *= 0.00000008381903171539306640625;
+
+                            // WKO handles drops in recording of GPS data
+                            // as 180,180 -- we expect 0,0
+                            llat=round(lat); llon=round(lon);
+                            if (llat == 180 && llon == 180) lat=lon=0;
+
                             sprintf(slon, "%-3.9g", lon);
+                            sprintf(slat, "%-3.9g", lat);
 
                             sprintf(GRAPHDATA[i], "%13s %13s", slat,slon);
 
