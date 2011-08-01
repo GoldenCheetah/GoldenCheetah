@@ -83,11 +83,15 @@
 #define GC_VERSION "(developer build)"
 #endif
 
+QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
+
 MainWindow::MainWindow(const QDir &home) :
     home(home), session(0), isclean(false),
     zones_(new Zones), hrzones_(new HrZones),
     ride(NULL)
 {
+
+    mainwindows.append(this); // add us to the list of open windows
 
     /*----------------------------------------------------------------------
      *  Basic GUI setup
@@ -749,6 +753,10 @@ MainWindow::closeEvent(QCloseEvent* event)
 
         // clear the clipboard if neccessary
         QApplication::clipboard()->setText("");
+
+        // now remove from the list
+        if(mainwindows.removeOne(this) == false)
+            qDebug()<<"closeEvent: mainwindows list error";
     }
 }
 

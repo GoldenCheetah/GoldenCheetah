@@ -50,6 +50,8 @@ class Seasons;
 class IntervalSummaryWindow;
 class RideNavigator;
 
+extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
