@@ -581,60 +581,48 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, WKO_ULONG version, R
         rideFile->setStartTime(datetime);
     }
 
-    // Create a Notes file for Goal, Notes and Workout Code from original
-    QChar zero = QLatin1Char('0');
-    QString notesFileName = QString("%1_%2_%3_%4_%5_%6.notes")
-        .arg(rideFile->startTime().date().year(), 4, 10, zero)
-        .arg(rideFile->startTime().date().month(), 2, 10, zero)
-        .arg(rideFile->startTime().date().day(), 2, 10, zero)
-        .arg(rideFile->startTime().time().hour(), 2, 10, zero)
-        .arg(rideFile->startTime().time().minute(), 2, 10, zero)
-        .arg(rideFile->startTime().time().second(), 2, 10, zero);
+    QString notesTag;
 
-    // Create the Notes file ONLY IF IT DOES NOT ALREADY EXIST
-    QFile notesFile(WKO_HOMEDIR + "/" + notesFileName);
-    if (!notesFile.exists()) {
-        notesFile.open(QFile::WriteOnly);
-                QTextStream out(&notesFile);
-        QString scode, sgoal, snote;
+    // Sport type
+    switch (sport) {
 
-        // Sport type
-        switch (sport) {
+    case 0x01 : notesTag += "Swim " ; break;
+    case 0x02 : notesTag += "Bike " ; break;
+    case 0x03 : notesTag += "Run " ; break;
+    case 0x04 : notesTag += "Brick " ; break;
+    case 0x05 : notesTag += "Cross Train " ; break;
+    case 0x06 : notesTag += "Race " ; break;
+    case 0x07 : notesTag += "Day Off " ; break;
+    case 0x08 : notesTag += "Mountain Bike " ; break;
+    case 0x09 : notesTag += "Strength " ; break;
+    case 0x0B : notesTag += "XC Ski " ; break;
+    case 0x0C : notesTag += "Rowing " ; break;
+    default   :
+    case 0x64 : notesTag += "Other"; break;
 
-        case 0x01 : out << "Swim " ; break;
-        case 0x02 : out << "Bike " ; break;
-        case 0x03 : out << "Run " ; break;
-        case 0x04 : out << "Brick " ; break;
-        case 0x05 : out << "Cross Train " ; break;
-        case 0x06 : out << "Race " ; break;
-        case 0x07 : out << "Day Off " ; break;
-        case 0x08 : out << "Mountain Bike " ; break;
-        case 0x09 : out << "Strength " ; break;
-        case 0x0B : out << "XC Ski " ; break;
-        case 0x0C : out << "Rowing " ; break;
-        default   :
-        case 0x64 : out << "Other" << endl; break;
-
-        }
-
-        if (version != 1) {
-            // Workout Code
-            dotext(code, &txtbuf[0]);
-            scode = (const char *)&txtbuf[0];
-            out << scode << endl;
-
-            dotext(goal, &txtbuf[0]);
-            sgoal = (const char *)&txtbuf[0];
-            out << "WORKOUT GOAL" << endl << sgoal << endl;
-
-            dotext(notes, &txtbuf[0]);
-            snote = (const char *)&txtbuf[0];
-            out << endl << "WORKOUT NOTES" << endl << snote << endl;
-        } else {
-            out << snote << endl;
-        }
-        notesFile.close();
     }
+    notesTag += "\n";
+
+    QString scode, sgoal, snote;
+
+    if (version != 1) {
+        // Workout Code
+        dotext(code, &txtbuf[0]);
+        scode = (const char *)&txtbuf[0];
+        notesTag += scode; notesTag += "\n";
+
+        dotext(goal, &txtbuf[0]);
+        sgoal = (const char *)&txtbuf[0];
+        notesTag += "WORKOUT GOAL"; notesTag += "\n";
+        notesTag += sgoal; notesTag += "\n";
+
+        dotext(notes, &txtbuf[0]);
+        snote = (const char *)&txtbuf[0];
+        notesTag += "WORKOUT NOTES"; notesTag += "\n";
+        notesTag += snote; notesTag += "\n";
+    }
+
+    rideFile->setTag("Notes", notesTag);
 
     if (version != 1) {
         p += donumber(p, &ul); /* 13: distance travelled in meters */
