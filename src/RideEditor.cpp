@@ -1644,7 +1644,8 @@ FindDialog::find()
                     switch(type->currentIndex()) {
 
                     case 0 : // between
-                        if (value >= from->value() && value <= to->value()) match = true;
+                        if ((value >= from->value() && value <= to->value()) ||
+                            (value <= from->value() && value >= to->value())) match = true;
                         break;
 
                     case 1 : // not between
