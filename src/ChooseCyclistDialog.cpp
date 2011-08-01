@@ -18,6 +18,7 @@
 
 #include "ChooseCyclistDialog.h"
 #include "NewCyclistDialog.h"
+#include "MainWindow.h"
 #include <QtGui>
 
 ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) :
@@ -31,7 +32,13 @@ ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) :
     QStringListIterator i(home.entryList(QDir::Dirs | QDir::NoDotAndDotDot));
     while (i.hasNext()) {
         QString name = i.next();
-        new QListWidgetItem(name, listWidget);
+
+        // only offer cyclists which are not already open
+        bool available=true;
+        foreach (MainWindow *x, mainwindows)
+            if (x->cyclist == name) available=false;
+
+        if (available) new QListWidgetItem(name, listWidget);
     }
 
     if (allowNew)
