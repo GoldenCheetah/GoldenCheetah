@@ -155,24 +155,27 @@ RideSummaryWindow::htmlSummary() const
             if (!symbol) break;
 
             RideMetricPtr m = rideItem->metrics.value(symbol);
-            QString name = m->name().replace(QRegExp(tr("^Average ")), "");
-            if (m->units(metricUnits) == "seconds" || m->units(metricUnits) == tr("seconds")) {
-                QString s("<tr><td>%1:</td><td "
-                          "align=\"right\">%2</td></tr>");
-                s = s.arg(name);
-                s = s.arg(time_to_string(m->value(metricUnits)));
-                summary += s;
-            }
-            else {
-                QString s = "<tr><td>" + name;
-                if (m->units(metricUnits) != "")
-                    s += " (" + m->units(metricUnits) + ")";
-                s += ":</td><td align=\"right\">%1</td></tr>";
-                if (m->precision() == 0)
-                    s = s.arg((unsigned) round(m->value(metricUnits)));
-                else
-                    s = s.arg(m->value(metricUnits), 0, 'f', m->precision());
-                summary += s;
+
+            if (m) { // only if the metric still exists (ride metric forwards compatibility)
+                QString name = m->name().replace(QRegExp(tr("^Average ")), "");
+                if (m->units(metricUnits) == "seconds" || m->units(metricUnits) == tr("seconds")) {
+                    QString s("<tr><td>%1:</td><td "
+                            "align=\"right\">%2</td></tr>");
+                    s = s.arg(name);
+                    s = s.arg(time_to_string(m->value(metricUnits)));
+                    summary += s;
+
+                } else {
+                    QString s = "<tr><td>" + name;
+                    if (m->units(metricUnits) != "")
+                        s += " (" + m->units(metricUnits) + ")";
+                    s += ":</td><td align=\"right\">%1</td></tr>";
+                    if (m->precision() == 0)
+                        s = s.arg((unsigned) round(m->value(metricUnits)));
+                    else
+                        s = s.arg(m->value(metricUnits), 0, 'f', m->precision());
+                    summary += s;
+                }
             }
         }
         summary += "</table></td>";
