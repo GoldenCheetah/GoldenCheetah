@@ -307,7 +307,11 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                                      rideTime.cap(6).toInt()));
             rideFile->setStartTime(datetime);
         } else {
-            qWarning("Failed to set start time");
+            // XXX Note: qWarning("Failed to set start time");
+            // console messages are no use, so commented out
+            // this problem will ONLY occur during the import
+            // process which traps these and corrects them
+            // so no need to do anything here
         }
     }
 
