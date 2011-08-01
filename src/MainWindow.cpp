@@ -345,7 +345,9 @@ MainWindow::MainWindow(const QDir &home) :
                            "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
                            "stop: 0 #CFCFCF, stop: 1.0 #A8A8A8);"
                            "border: 1px solid rgba(255, 255, 255, 32);"
+#if 0
                            "color: #535353;"
+#endif
                            "font-weight: bold; }");
 
     toolBox->setFrameStyle(QFrame::NoFrame);
@@ -459,7 +461,6 @@ MainWindow::MainWindow(const QDir &home) :
     splitter->setChildrenCollapsible(false); // QT BUG crash QTextLayout do not undo this
     splitter->setHandleWidth(1);
     splitter->setFrameStyle(QFrame::NoFrame);
-    splitter->setStyleSheet("QSplitter { border: 0px; background-color: #A8A8A8; }");
     splitter->setContentsMargins(0, 0, 0, 0); // attempting to follow some UI guides
     setCentralWidget(splitter);
 

@@ -78,6 +78,9 @@ class RideEditor : public GcWindow
         void find();
         void check();
 
+        // anomaly list
+        void anomalySelected();
+
         // context menu functions
         void smooth();
         void cut();
@@ -116,6 +119,7 @@ class RideEditor : public GcWindow
         RideFileTableModel *model;
         QStringList copyHeadings;
         FindDialog *findTool;
+        QTableWidget *anomalyList;
 
     private:
         MainWindow *main;
