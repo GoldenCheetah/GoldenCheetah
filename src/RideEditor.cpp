@@ -140,9 +140,34 @@ RideEditor::RideEditor(MainWindow *main) : GcWindow(main), data(NULL), ride(NULL
     connect(main, SIGNAL(rideDirty()), this, SLOT(rideDirty()));
     connect(main, SIGNAL(rideClean()), this, SLOT(rideClean()));
 
-    // our tool is the search dialog
+    // put find tool and anomaly list in the controls
     findTool = new FindDialog(this);
-    setControls(findTool);
+
+    anomalyList = new QTableWidget(this);
+    anomalyList->setColumnCount(2);
+    anomalyList->setColumnHidden(0, true);
+    anomalyList->setSortingEnabled(false);
+    QStringList header;
+    header << "Id" << "Anomalies";
+    anomalyList->setHorizontalHeaderLabels(header);
+    anomalyList->horizontalHeader()->setStretchLastSection(true);
+    anomalyList->verticalHeader()->hide();
+    anomalyList->setShowGrid(false);
+    anomalyList->setSelectionMode(QAbstractItemView::SingleSelection);
+    anomalyList->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    QSplitter *controlSplitter = new QSplitter(Qt::Vertical, main);
+    controlSplitter->setHandleWidth(1);
+    //controlSplitter->setStyleSheet("background-color: white; border: none;");
+    controlSplitter->setFrameStyle(QFrame::NoFrame);
+    controlSplitter->setAutoFillBackground(true);
+    controlSplitter->setOrientation(Qt::Vertical);
+    controlSplitter->addWidget(findTool);
+    controlSplitter->addWidget(anomalyList);
+    setControls(controlSplitter);
+
+    // allow us to jump to an anomaly
+    connect(anomalyList, SIGNAL(itemSelectionChanged()), this, SLOT(anomalySelected()));
 }
 
 void
@@ -296,6 +321,12 @@ RideEditor::check()
     // run through all the available channels and find anomalies
     data->anomalies.clear();
 
+    // clear the list
+    anomalyList->clear();
+    QStringList header;
+    header << "Id" << "Anomalies";
+    anomalyList->setHorizontalHeaderLabels(header);
+
     QVector<double> power;
     QVector<double> secs;
     double lastdistance=9;
@@ -376,6 +407,30 @@ RideEditor::check()
             // which one is it
             data->anomalies.insert(xsstring(outliers->getIndexForRank(i), RideFile::watts), tr("Data spike candidate"));
         }
+    }
+
+    // now fill in the anomaly list
+    anomalyList->setRowCount(0); // <<< fixes crash at ZZZZ
+    anomalyList->setRowCount(data->anomalies.count()); // <<< ZZZZ
+
+    int counter = 0;
+    QMapIterator<QString,QString> f(data->anomalies);
+    while (f.hasNext()) {
+
+        f.next();
+
+        QTableWidgetItem *t = new QTableWidgetItem;
+        t->setText(f.key());
+        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+        anomalyList->setItem(counter, 0, t);
+
+        t = new QTableWidgetItem;
+        t->setText(f.value());
+        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+        t->setForeground(QBrush(Qt::red));
+        anomalyList->setItem(counter, 1, t);
+
+        counter++;
     }
 
     // redraw - even if no anomalies were found since
@@ -1132,6 +1187,18 @@ RideEditor::rideSelected()
 
     // update finder pane to show available channels
     findTool->rideSelected();
+}
+
+void
+RideEditor::anomalySelected()
+{
+    if (anomalyList->currentRow() < 0) return;
+
+    // jump to the found item in the main table
+    int row;
+    RideFile::SeriesType series;
+    unxsstring(anomalyList->item(anomalyList->currentRow(), 0)->text(), row, series);
+    table->setCurrentIndex(model->index(row,model->columnFor(series)));
 }
 
 // We update the current selection on the table view
