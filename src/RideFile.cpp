@@ -254,6 +254,20 @@ RideFile *RideFileFactory::openRideFile(QFile &file,
     // NULL returned to indicate openRide failed
     if (result) {
         if (result->intervals().empty()) result->fillInIntervals();
+
+        // override the file ride time with that set from the filename
+        // but only if it matches the GC format
+        QFileInfo fileInfo(file.fileName());
+        QRegExp rx ("^((\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d))\\.(.+)$");
+
+        if (rx.exactMatch(fileInfo.fileName())) {
+
+            QDate date(rx.cap(2).toInt(), rx.cap(3).toInt(),rx.cap(4).toInt());
+            QTime time(rx.cap(5).toInt(), rx.cap(6).toInt(),rx.cap(7).toInt());
+            QDateTime datetime(date, time);
+            result->setStartTime(datetime);
+        }
+
         result->setTag("Filename", file.fileName());
         result->setTag("Athlete", QFileInfo(file).dir().dirName());
         DataProcessorFactory::instance().autoProcess(result);

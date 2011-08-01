@@ -131,14 +131,14 @@ RideImportWizard::init(QList<QString> files, QDir &home, MainWindow *main)
         // Date
         t = new QTableWidgetItem();
         t->setText(tr(""));
-        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+        t->setFlags(t->flags()  | Qt::ItemIsEditable);
         t->setBackgroundColor(Qt::red);
         tableWidget->setItem(i,1,t);
 
         // Time
         t = new QTableWidgetItem();
         t->setText(tr(""));
-        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+        t->setFlags(t->flags() | Qt::ItemIsEditable);
         tableWidget->setItem(i,2,t);
 
         // Duration
@@ -344,31 +344,21 @@ RideImportWizard::process()
         this->repaint();
     }
 
-   // Pass 3 - get missing date and times for imported files
+    // Pass 3 - get missing date and times for imported files
+    //         Actually allow us to edit date on ANY ride, we
+    //         make sure that the ride date/time is set from
+    //         the filename and never from the ride data
     phaseLabel->setText(tr("Step 3 of 4: Confirm Date and Time"));
 
-   int needdates=0;
-   bool first = true;
-   for (int i=0; i<filenames.count(); i++) {
+    int needdates=0;
+    for (int i=0; i<filenames.count(); i++) {
 
         // ignore errors
         QTableWidgetItem *t = tableWidget->item(i,5);
         if (t->text().startsWith(tr("Error"))) continue;
 
-       // date needed?
-        if (blanks[i] || filenames[i].endsWith(".gc", Qt::CaseInsensitive)) { // but we can override gc ride files
-            if (blanks[i]) needdates++; // count the blanks tho
-            t = tableWidget->item(i,1);
-            t->setFlags(t->flags() | (Qt::ItemIsEditable)); // make editable ONLY if not present -
-                                                            // we cannot override the RideFileReader
-            if (first) {
-                tableWidget->editItem(t);
-                first = false;
-            }
-            t = tableWidget->item(i,2);
-            t->setFlags(t->flags() | (Qt::ItemIsEditable)); // make editable ONLY if not present -
-                                                            // we cannot override the RideFileReader
-        }
+        if (blanks[i]) needdates++; // count the blanks tho -- these MUST be edited
+
         // does nothing for the moment
         progressBar->setValue(progressBar->value()+1);
         progressBar->repaint();
@@ -444,12 +434,15 @@ RideImportWizard::todayClicked(int index)
 {
     QDate selectedDate; // the date we're gonna apply to the row(s) highlighted
 
+    // set the index back to 0, so we can select again
+    todayButton->setCurrentIndex(0);
+
     // 0 = nothing selected, 1 = Today - 2 = last monday thru to 8 = last sunday
     if (index == 0) { // no selection
         return;
     } else if (index == 1) { // today
         selectedDate = QDate().currentDate();
-    } else if (index == 10) { // other date - set focus on first highlighted date
+    } else if (index == 9) { // other date - set focus on first highlighted date
         for (int i=0; i<filenames.count(); i++) {
             if (tableWidget->item(i,0)->isSelected() ||
                 tableWidget->item(i,1)->isSelected() ||
@@ -457,10 +450,8 @@ RideImportWizard::todayClicked(int index)
                 tableWidget->item(i,3)->isSelected() ||
                 tableWidget->item(i,4)->isSelected() ||
                 tableWidget->item(i,5)->isSelected()) {
-                if (blanks[i]) {
-                    tableWidget->editItem(tableWidget->item(i,1));
-                    return;
-                }
+                tableWidget->editItem(tableWidget->item(i,1));
+                return;
             }
         }
         return;
