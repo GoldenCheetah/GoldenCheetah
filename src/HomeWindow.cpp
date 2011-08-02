@@ -243,13 +243,19 @@ void
 HomeWindow::rideSelected()
 {
     if (amVisible()) {
-        foreach(GcWindow *x, charts) {
-            if (currentStyle) x->show(); // keep tabs hidden, show the rest
-            x->setProperty("ride", property("ride"));
-        }
+        for (int i=0; i < charts.count(); i++) {
 
-        // show current tab
-        if (!currentStyle && charts.count()) tabSelected(tabbed->currentIndex());
+            // show if its not a tab
+            if (currentStyle) charts[i]->show(); // keep tabs hidden, show the rest
+
+            // if we are tabbed AND its the current tab then mimic tabselected
+            // to force the tabwidget to refresh AND set its ride property (see below)
+            //otherwise just go ahead and notify it of a new ride
+            if (!currentStyle && charts.count() && i==tabbed->currentIndex())
+                tabSelected(tabbed->currentIndex());
+            else
+                charts[i]->setProperty("ride", property("ride"));
+        }
     }
 }
 
@@ -257,6 +263,7 @@ void
 HomeWindow::tabSelected(int index)
 {
     if (active || currentStyle != 0) return;
+
     if (index >= 0) {
         charts[index]->show();
         charts[index]->setProperty("ride", property("ride"));

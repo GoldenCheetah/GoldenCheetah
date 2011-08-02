@@ -51,6 +51,8 @@ class FieldDefinition
         bool diary; // show in summary on diary page...
 
     FieldDefinition() : tab(""), name(""), type(0), diary(false) {}
+    FieldDefinition(QString tab, QString name, int type, bool diary)
+                      : tab(tab), name(name), type(type), diary(diary) {}
 };
 
 class FormField : public QWidget
@@ -126,6 +128,8 @@ class Form : public QScrollArea
         ~Form();
         void addField(FieldDefinition x) { fields.append(new FormField(x, meta)); }
         void arrange(); // the meat of the action, arranging fields on the screen
+        void clear();  // destroy contents prior to delete
+        void initialise();  // re-initialise contents (after clear)
 
         QList<FormField*> fields; // keep track so we can destroy
         QList<QHBoxLayout *> overrides; // keep track so we can destroy
@@ -159,12 +163,14 @@ class RideMetadata : public QWidget
     public slots:
         void configUpdate();
         void metadataChanged(); // when its changed elsewhere we need to refresh fields
+        void setExtraTab();     // shows fields not configured but present in ride file
 
     private:
         MainWindow *main;
 
     QTabWidget *tabs;
     QMap <QString, Form *> tabList;
+    Form *extraForm;
 
     QStringList keywordList; // for completer
     QList<KeywordDefinition> keywordDefinitions;

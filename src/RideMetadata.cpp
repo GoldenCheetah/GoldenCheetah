@@ -34,6 +34,7 @@
  *--------------------------------------------------------------------*/
 RideMetadata::RideMetadata(MainWindow *parent) : QWidget(parent), main(parent)
 {
+
     _ride = _connected = NULL;
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -60,10 +61,18 @@ RideMetadata::RideMetadata(MainWindow *parent) : QWidget(parent), main(parent)
 
     // read in metadata.xml and setup the tabs etc
     qRegisterMetaType<RideItem*>("ride"); // XXX we're first here... bit of a hack
+
+    extraForm = new Form(this);
+
     configUpdate();
 
     // watch for config changes
     connect(main, SIGNAL(configChanged()), this, SLOT(configUpdate()));
+
+    // Extra tab is expensive to update so we only update if it
+    // is visible. In this case we need to trigger refresh when the
+    // tab is selected -or- when the ride changes. Below is for tab.
+    connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(setExtraTab()));
 }
 
 void
@@ -77,7 +86,68 @@ RideMetadata::setRideItem(RideItem *ride)
 
     if (ride) {
         connect (_connected, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
+        setExtraTab();
         metadataChanged();
+    }
+}
+
+// the extra tab has all the fields that are in the current
+// ride that are not shown on the tabs
+void
+RideMetadata::setExtraTab()
+{
+    // wipe out the form & re-initialise -- special case for extras
+    extraForm->clear();
+    extraForm->initialise();
+
+    // no ride available...
+    if (!extraForm->isVisible() || !rideItem()) {
+        return;
+    }
+
+    // look for metadata not in config
+    QMapIterator<QString,QString> tags(rideItem()->ride()->tags());
+    tags.toFront();
+    while (tags.hasNext()) {
+
+        tags.next();
+
+        bool configured = false;
+        foreach (FieldDefinition x, fieldDefinitions) {
+            if (x.tab != "" && x.name == tags.key()) {
+                configured = true;
+                break;
+            }
+        }
+
+        // Try and guess the field type, for now we assume everything
+        // is a string; if its short make it a shorttext
+        //              if it contains newlines make it a textbox
+        //              Otherwise make it a text
+        //
+        if (!configured) {
+            int type;
+            if (tags.value().contains("\n")) type = FIELD_TEXTBOX;
+            else if (tags.value().length() < 30) type = FIELD_SHORTTEXT;
+            else type = FIELD_TEXT;
+
+            extraForm->addField(FieldDefinition("Extra", tags.key(), type, false));
+        }
+    }
+
+    // now arrange the form - but only if we have anything to display!
+    if (extraForm->fields.count()) {
+        // arrange them
+        extraForm->arrange();
+
+        // fetch values
+        foreach(FormField *field, extraForm->fields) {
+            field->metadataChanged();
+
+            // since we show EVERYTHING, don't let the user edit them
+            // we might get more selective later?
+            field->widget->setEnabled(false);
+        }
     }
 }
 
@@ -140,6 +210,12 @@ RideMetadata::configUpdate()
            i.value()->arrange();
     }
 
+    // add extra back
+    tabs->addTab(extraForm, "Extra");
+
+    // set Extra tab for current ride
+    setExtraTab();
+
     // when constructing we have not registered
     // the properties nor selected a ride
     metadataChanged(); // re-read the values!
@@ -149,6 +225,40 @@ RideMetadata::configUpdate()
  * Forms (one per tab)
  *--------------------------------------------------------------------*/
 Form::Form(RideMetadata *meta) : meta(meta)
+{
+    initialise();
+}
+
+Form::~Form()
+{
+    clear();
+}
+
+void
+Form::clear()
+{
+
+    // wipe the fields
+    foreach (FormField *current, fields) {
+        delete current;
+    }
+    fields.clear();
+
+    // wipe away the layouts
+    foreach (QHBoxLayout *h, overrides) delete h;
+    overrides.clear();
+
+    // clear out and set back to NULL to indicate not allocated
+    if (grid1) { delete grid1; grid1 = NULL; }
+    if (grid2) { delete grid2; grid2 = NULL; }
+    if (vlayout1) { delete vlayout1; vlayout1 = NULL; }
+    if (vlayout2) { delete vlayout2; vlayout2 = NULL; }
+    if (hlayout) { delete hlayout; hlayout = NULL; }
+    if (contents) { delete contents; contents = NULL; }
+}
+
+void
+Form::initialise()
 {
     QPalette palette;
     palette.setBrush(QPalette::Background, Qt::NoBrush);
@@ -172,22 +282,6 @@ Form::Form(RideMetadata *meta) : meta(meta)
     setFrameStyle(QFrame::NoFrame);
     setWidgetResizable(true);
     setWidget(contents);
-}
-
-Form::~Form()
-{
-    // wipe the fields
-    foreach (FormField *current, fields) {
-        delete current;
-    }
-    // wipe away the layouts
-    foreach (QHBoxLayout *h, overrides) delete h;
-    if (grid1) delete grid1;
-    if (grid2) delete grid2;
-    if (vlayout1) delete vlayout1;
-    if (vlayout2) delete vlayout2;
-    delete hlayout;
-    delete contents;
 }
 
 void
@@ -216,7 +310,6 @@ Form::arrange()
 
 
     for (int i=0; i<fields.count(); i++) {
-
         if (y >= rows) {
             x+=1;
             y=0;
