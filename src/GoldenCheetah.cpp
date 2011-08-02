@@ -135,7 +135,7 @@ GcWindow::GcWindow()
     setResizable(false);
     setMouseTracking(true);
 
-    if (appsettings->value(this, GC_DROPSHADOW, true).toBool()) {
+    if (appsettings->value(this, GC_DROPSHADOW, false).toBool()) {
         QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
         shadow->setBlurRadius(20);
         shadow->setXOffset(10);
