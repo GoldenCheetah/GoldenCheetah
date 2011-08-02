@@ -1397,6 +1397,9 @@ void
 MainWindow::saveRide()
 {
     saveRideSingleDialog(ride); // will update Dirty flag if saved
+    ride->computeMetricsTime = QDateTime();
+    ride->computeMetrics();
+    rideSelected();
 }
 
 void
