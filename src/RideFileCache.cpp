@@ -558,6 +558,10 @@ MeanMaxComputer::run()
         double secs = round(p->secs * 1000.0) / 1000;
         if (secs > 0) data.points.append(cpintpoint(secs, (int) round(p->value(baseSeries))));
     }
+
+    // don't bother with insufficient data
+    if (!data.points.count()) return;
+
     int total_secs = (int) ceil(data.points.back().secs);
 
     // don't allow data more than two days
