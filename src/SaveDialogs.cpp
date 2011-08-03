@@ -150,8 +150,11 @@ MainWindow::saveSilent(RideItem *rideItem)
     if (currentFI.baseName() != targetnosuffix) {
 
         // rename as backup current if converting, or just delete it if its already .gc
-        if (convert) currentFile.rename(currentFile.fileName(), currentFile.fileName() + ".bak");
-        else currentFile.remove();
+        // unlink previous .bak if it is already there
+        if (convert) {
+            QFile::remove(currentFile.fileName()+".bak"); // ignore errors if not there
+            currentFile.rename(currentFile.fileName(), currentFile.fileName() + ".bak");
+        } else currentFile.remove();
         convert = false; // we just did it already!
 
         // set the new filename & Start time everywhere
@@ -182,6 +185,7 @@ MainWindow::saveSilent(RideItem *rideItem)
     if (convert) {
 
         // rename on disk
+        QFile::remove(currentFile.fileName()+".bak"); // ignore errors if not there
         currentFile.rename(currentFile.fileName(), currentFile.fileName() + ".bak");
 
         // rename in memory
