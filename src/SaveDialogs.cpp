@@ -159,8 +159,11 @@ MainWindow::saveSilent(RideItem *rideItem)
         ride->notesFileName = targetnosuffix + ".notes";
 
         // rename as backup current if converting, or just delete it if its already .gc
-        if (convert) currentFile.rename(currentFile.fileName(), currentFile.fileName() + ".bak");
-        else currentFile.remove();
+        // delete old .bak file if it is there
+        if (convert) {
+            QFile::remove(currentFile.fileName() + ".bak");
+            currentFile.rename(currentFile.fileName(), currentFile.fileName() + ".bak");
+        } else currentFile.remove();
         convert = false; // we just did it already!
 
         // set the new filename & Start time everywhere
@@ -190,7 +193,8 @@ MainWindow::saveSilent(RideItem *rideItem)
     // rename the file and update the rideItem list to reflect the change
     if (convert) {
 
-        // rename on disk
+        // rename on disk and delete old .bak if it is there
+        QFile::remove(currentFile.fileName() + ".bak");
         currentFile.rename(currentFile.fileName(), currentFile.fileName() + ".bak");
 
         // rename in memory
