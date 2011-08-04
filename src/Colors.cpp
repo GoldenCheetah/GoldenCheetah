@@ -23,66 +23,86 @@
 #include <QDir>
 #include "Settings.h"
 
-static Colors ColorList[58] = {
-    { "Plot Background", "COLORPLOTBACKGROUND", Qt::white },
-    { "Ride Plot Background", "COLORRIDEPLOTBACKGROUND", Qt::black },
-    { "Plot Thumbnail Background", "COLORPLOTTHUMBNAIL", Qt::gray },
-    { "Plot Title", "COLORPLOTTITLE", Qt::black },
-    { "Plot Selection Pen", "COLORPLOTSELECT", Qt::blue },
-    { "Plot TrackerPen", "COLORPLOTTRACKER", Qt::blue },
-    { "Plot Markers", "COLORPLOTMARKER", Qt::black },
-    { "Plot Grid", "COLORGRID", Qt::black },
-    { "Interval Highlighter", "COLORINTERVALHIGHLIGHTER", Qt::blue },
-    { "Heart Rate", "COLORHEARTRATE", Qt::blue },
-    { "Speed", "COLORSPEED", Qt::green },
-    { "Power", "COLORPOWER", Qt::red },
-    { "Critical Power", "COLORCP", Qt::red },
-    { "Cadence", "COLORCADENCE", QColor(0,204,204) },
-    { "Altitude", "COLORALTITUTDE", QColor(124,91,31) },
-    { "Altitude Shading", "COLORALTITUDESHADE", QColor(124,91,31) },
-    { "Wind Speed", "COLORWINDSPEED", Qt::darkGreen },
-    { "Torque", "COLORTORQUE", Qt::magenta },
-    { "Short Term Stress", "COLORSTS", Qt::blue },
-    { "Long Term Stress", "COLORLTS", Qt::green },
-    { "Stress Balance", "COLORSB", Qt::black },
-    { "Daily Stress", "COLORDAILYSTRESS", Qt::red },
-    { "Calendar Text", "COLORCALENDARTEXT", Qt::black },
-    { "Power Zone 1 Shading", "COLORZONE1", QColor(255,0,255) },
-    { "Power Zone 2 Shading", "COLORZONE2", QColor(42,0,255) },
-    { "Power Zone 3 Shading", "COLORZONE3", QColor(0,170,255) },
-    { "Power Zone 4 Shading", "COLORZONE4", QColor(0,255,128) },
-    { "Power Zone 5 Shading", "COLORZONE5", QColor(85,255,0) },
-    { "Power Zone 6 Shading", "COLORZONE6", QColor(255,213,0) },
-    { "Power Zone 7 Shading", "COLORZONE7", QColor(255,0,0) },
-    { "Power Zone 8 Shading", "COLORZONE8", Qt::gray },
-    { "Power Zone 9 Shading", "COLORZONE9", Qt::gray },
-    { "Power Zone 10 Shading", "COLORZONE10", Qt::gray },
-    { "HR Zone 1 Shading", "HRCOLORZONE1", QColor(255,0,255) },
-    { "HR Zone 2 Shading", "HRCOLORZONE2", QColor(42,0,255) },
-    { "HR Zone 3 Shading", "HRCOLORZONE3", QColor(0,170,255) },
-    { "HR Zone 4 Shading", "HRCOLORZONE4", QColor(0,255,128) },
-    { "HR Zone 5 Shading", "HRCOLORZONE5", QColor(85,255,0) },
-    { "HR Zone 6 Shading", "HRCOLORZONE6", QColor(255,213,0) },
-    { "HR Zone 7 Shading", "HRCOLORZONE7", QColor(255,0,0) },
-    { "HR Zone 8 Shading", "HRCOLORZONE8", Qt::gray },
-    { "HR Zone 9 Shading", "HRCOLORZONE9", Qt::gray },
-    { "HR Zone 10 Shading", "HRCOLORZONE10", Qt::gray },
-    { "Aerolab VE", "COLORAEROVE", Qt::blue },
-    { "Aerolab Elevation", "COLORAEROEL", Qt::green },
-    { "Calendar background", "CCALCELL", Qt::white },
-    { "Calendar heading", "CCALHEAD", QColor(230,230,230) },
-    { "Calendar Current Selection", "CCALCURRENT", Qt::darkBlue },
-    { "Calendar Actual Workout", "CCALACTUAL", Qt::green },
-    { "Calendar Planned Workout", "CCALPLANNED", Qt::yellow },
-    { "Calendar Today", "CCALTODAY", Qt::cyan },
-    { "Pop Up Windows Background", "CPOPUP", Qt::lightGray },
-    { "Pop Up Windows Foreground", "CPOPUPTEXT", Qt::white },
-    { "Chart Bar Unselected", "CTILEBAR", Qt::gray },
-    { "Chart Bar Selected", "CTILEBARSELECT", Qt::yellow },
-    { "ToolBar Background", "CTOOLBAR", Qt::white },
-    { "Activity History Group", "CRIDEGROUP", QColor(236,246,255) },
-    { "", "", QColor(0,0,0) },
-};
+static Colors ColorList[58], DefaultColorList[58];
+
+static void copyArray(Colors source[], Colors target[])
+{
+    for (int i=0; source[i].name != ""; i++)
+        target[i] = source[i];
+}
+
+static bool setupColors()
+{
+    // XXX remove when we can guarantee extended initialisation support in gcc (c++0x not supported by Qt currently)
+    Colors init[58] = {
+        { "Plot Background", "COLORPLOTBACKGROUND", Qt::white },
+        { "Ride Plot Background", "COLORRIDEPLOTBACKGROUND", Qt::black },
+        { "Plot Thumbnail Background", "COLORPLOTTHUMBNAIL", Qt::gray },
+        { "Plot Title", "COLORPLOTTITLE", Qt::black },
+        { "Plot Selection Pen", "COLORPLOTSELECT", Qt::blue },
+        { "Plot TrackerPen", "COLORPLOTTRACKER", Qt::blue },
+        { "Plot Markers", "COLORPLOTMARKER", Qt::black },
+        { "Plot Grid", "COLORGRID", Qt::black },
+        { "Interval Highlighter", "COLORINTERVALHIGHLIGHTER", Qt::blue },
+        { "Heart Rate", "COLORHEARTRATE", Qt::blue },
+        { "Speed", "COLORSPEED", Qt::green },
+        { "Power", "COLORPOWER", Qt::red },
+        { "Critical Power", "COLORCP", Qt::red },
+        { "Cadence", "COLORCADENCE", QColor(0,204,204) },
+        { "Altitude", "COLORALTITUTDE", QColor(124,91,31) },
+        { "Altitude Shading", "COLORALTITUDESHADE", QColor(124,91,31) },
+        { "Wind Speed", "COLORWINDSPEED", Qt::darkGreen },
+        { "Torque", "COLORTORQUE", Qt::magenta },
+        { "Short Term Stress", "COLORSTS", Qt::blue },
+        { "Long Term Stress", "COLORLTS", Qt::green },
+        { "Stress Balance", "COLORSB", Qt::black },
+        { "Daily Stress", "COLORDAILYSTRESS", Qt::red },
+        { "Calendar Text", "COLORCALENDARTEXT", Qt::black },
+        { "Power Zone 1 Shading", "COLORZONE1", QColor(255,0,255) },
+        { "Power Zone 2 Shading", "COLORZONE2", QColor(42,0,255) },
+        { "Power Zone 3 Shading", "COLORZONE3", QColor(0,170,255) },
+        { "Power Zone 4 Shading", "COLORZONE4", QColor(0,255,128) },
+        { "Power Zone 5 Shading", "COLORZONE5", QColor(85,255,0) },
+        { "Power Zone 6 Shading", "COLORZONE6", QColor(255,213,0) },
+        { "Power Zone 7 Shading", "COLORZONE7", QColor(255,0,0) },
+        { "Power Zone 8 Shading", "COLORZONE8", Qt::gray },
+        { "Power Zone 9 Shading", "COLORZONE9", Qt::gray },
+        { "Power Zone 10 Shading", "COLORZONE10", Qt::gray },
+        { "HR Zone 1 Shading", "HRCOLORZONE1", QColor(255,0,255) },
+        { "HR Zone 2 Shading", "HRCOLORZONE2", QColor(42,0,255) },
+        { "HR Zone 3 Shading", "HRCOLORZONE3", QColor(0,170,255) },
+        { "HR Zone 4 Shading", "HRCOLORZONE4", QColor(0,255,128) },
+        { "HR Zone 5 Shading", "HRCOLORZONE5", QColor(85,255,0) },
+        { "HR Zone 6 Shading", "HRCOLORZONE6", QColor(255,213,0) },
+        { "HR Zone 7 Shading", "HRCOLORZONE7", QColor(255,0,0) },
+        { "HR Zone 8 Shading", "HRCOLORZONE8", Qt::gray },
+        { "HR Zone 9 Shading", "HRCOLORZONE9", Qt::gray },
+        { "HR Zone 10 Shading", "HRCOLORZONE10", Qt::gray },
+        { "Aerolab VE", "COLORAEROVE", Qt::blue },
+        { "Aerolab Elevation", "COLORAEROEL", Qt::green },
+        { "Calendar background", "CCALCELL", Qt::white },
+        { "Calendar heading", "CCALHEAD", QColor(230,230,230) },
+        { "Calendar Current Selection", "CCALCURRENT", Qt::darkBlue },
+        { "Calendar Actual Workout", "CCALACTUAL", Qt::green },
+        { "Calendar Planned Workout", "CCALPLANNED", Qt::yellow },
+        { "Calendar Today", "CCALTODAY", Qt::cyan },
+        { "Pop Up Windows Background", "CPOPUP", Qt::lightGray },
+        { "Pop Up Windows Foreground", "CPOPUPTEXT", Qt::white },
+        { "Chart Bar Unselected", "CTILEBAR", Qt::gray },
+        { "Chart Bar Selected", "CTILEBARSELECT", Qt::yellow },
+        { "ToolBar Background", "CTOOLBAR", Qt::white },
+        { "Activity History Group", "CRIDEGROUP", QColor(236,246,255) },
+        { "", "", QColor(0,0,0) },
+    };
+
+    copyArray(init, DefaultColorList);
+    copyArray(init, ColorList);
+
+    return true;
+}
+
+// initialise on startup
+static bool setColors = setupColors();
 
 
 GCColor::GCColor(MainWindow *main) : QObject(main)
@@ -94,6 +114,16 @@ GCColor::GCColor(MainWindow *main) : QObject(main)
 const Colors * GCColor::colorSet()
 {
     return ColorList;
+}
+
+const Colors * GCColor::defaultColorSet()
+{
+    return DefaultColorList;
+}
+
+void GCColor::resetColors()
+{
+    copyArray(DefaultColorList, ColorList);
 }
 
 QColor
