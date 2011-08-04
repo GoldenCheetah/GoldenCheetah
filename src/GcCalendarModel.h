@@ -92,7 +92,7 @@ public slots:
             columns << column;
             if (column == tr("Duration")) durationIndex = i;
             if (column == tr("Date")) dateIndex = i;
-            if (column == tr("Filename")) filenameIndex = i;
+            if (column == tr("File")) filenameIndex = i;
             if (column == tr("Calendar Text")) textIndex = i;
         }
 
