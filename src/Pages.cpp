@@ -1155,6 +1155,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     lineWidth->setMaximum(5);
     lineWidth->setMinimum(0.5);
     lineWidth->setSingleStep(0.5);
+    reset = new QPushButton("Reset Default Colors");
     lineWidth->setValue(appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble());
 
     QLabel *lineWidthLabel = new QLabel(tr("Line Width"));
@@ -1250,6 +1251,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     grid->addWidget(antiAliased, 1,4, Qt::AlignVCenter|Qt::AlignLeft);
     grid->addWidget(dropShadowed, 2,4, Qt::AlignVCenter|Qt::AlignLeft);
     grid->addWidget(shadeZones, 3,4, Qt::AlignVCenter|Qt::AlignLeft);
+    grid->addWidget(reset, 5,4, Qt::AlignVCenter|Qt::AlignRight);
 
     grid->addWidget(defaultLabel, 0,0);
     grid->addWidget(titlesLabel, 1,0);
@@ -1282,6 +1284,23 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     mainLayout->addWidget(colors);
 
     colorSet = GCColor::colorSet();
+    for (int i=0; colorSet[i].name != ""; i++) {
+
+        QTreeWidgetItem *add;
+        ColorButton *colorButton = new ColorButton(this, colorSet[i].name, colorSet[i].color);
+        add = new QTreeWidgetItem(colors->invisibleRootItem());
+        add->setText(0, colorSet[i].name);
+        colors->setItemWidget(add, 1, colorButton);
+
+    }
+    connect(reset, SIGNAL(clicked()), this, SLOT(resetClicked()));
+}
+
+void
+ColorsPage::resetClicked()
+{
+    colorSet = GCColor::defaultColorSet();
+    colors->clear();
     for (int i=0; colorSet[i].name != ""; i++) {
 
         QTreeWidgetItem *add;

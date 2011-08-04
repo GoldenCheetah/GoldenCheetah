@@ -396,6 +396,7 @@ class ColorsPage : public QWidget
         void saveClicked();
 
     public slots:
+        void resetClicked();
 
     private:
 
@@ -423,6 +424,7 @@ class ColorsPage : public QWidget
         // Colors
         QTreeWidget *colors;
         const Colors *colorSet;
+        QPushButton *reset;
 };
 
 class FieldsPage : public QWidget

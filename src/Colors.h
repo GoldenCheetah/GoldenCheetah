@@ -43,6 +43,8 @@ class GCColor : public QObject
         GCColor(MainWindow*);
         static QColor getColor(int);
         static const Colors *colorSet();
+        static const Colors *defaultColorSet();
+        static void resetColors();
         static QColor invert(QColor);
 
     public slots:
