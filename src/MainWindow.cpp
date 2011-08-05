@@ -473,6 +473,8 @@ MainWindow::MainWindow(const QDir &home) :
         }
     }
 
+    treeWidget->setFocus(); // For MacOs QT (4.6.0-4.7.0 bug)
+
     setAttribute(Qt::WA_DeleteOnClose);
 }
 
