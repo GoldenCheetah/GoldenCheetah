@@ -35,8 +35,16 @@ RideSummaryWindow::RideSummaryWindow(MainWindow *mainWindow) :
     QWidget(mainWindow), mainWindow(mainWindow)
 {
     QVBoxLayout *vlayout = new QVBoxLayout;
-    rideSummary = new QTextEdit(this);
-    rideSummary->setReadOnly(true);
+    rideSummary = new QWebView(this);
+    rideSummary->setContentsMargins(0,0,0,0);
+    rideSummary->page()->view()->setContentsMargins(0,0,0,0);
+    rideSummary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    rideSummary->setAcceptDrops(false);
+
+    QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
+    rideSummary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
+    rideSummary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
+
     vlayout->addWidget(rideSummary);
 
     connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(refresh()));
@@ -51,17 +59,16 @@ RideSummaryWindow::refresh()
     // XXX: activeTab is never equaly to RideSummaryWindow right now because
     // it's wrapped in the summarySplitter in MainWindow.
     if (!mainWindow->rideItem()) {
-	rideSummary->clear();
+	    rideSummary->page()->mainFrame()->setHtml("");
         return;
     }
-    rideSummary->setHtml(htmlSummary());
-    rideSummary->setAlignment(Qt::AlignCenter);
+    rideSummary->page()->mainFrame()->setHtml(htmlSummary());
 }
 
 QString
 RideSummaryWindow::htmlSummary() const
 {
-    QString summary;
+    QString summary("");
 
     RideItem *rideItem = mainWindow->rideItem();
     RideFile *ride = rideItem->ride();
@@ -139,8 +146,8 @@ RideSummaryWindow::htmlSummary() const
 
     summary += "<table border=0 cellspacing=10><tr>";
     for (int i = 0; i < columns; ++i) {
-        summary += "<td align=\"center\" width=\"%1%\"><table>"
-            "<tr><td align=\"center\" colspan=2><h2>%2</h2></td></tr>";
+        summary += "<td align=\"center\" valign=\"top\" width=\"%1%\"><table>"
+            "<tr><td align=\"center\" colspan=2><h3>%2</h3></td></tr>";
         summary = summary.arg(90 / columns);
         summary = summary.arg(columnNames[i]);
         const char **metricsList;
@@ -273,11 +280,11 @@ RideSummaryWindow::htmlSummary() const
             summary += " <li>" + i.next();
         summary += "</ul>";
     }
-    summary += "<br><hr width=\"80%\"></center>";
+    summary += "<br><hr width=\"80%\">";
 
     // The extra <center> works around a bug in QT 4.3.1,
     // which will otherwise put the following above the <hr>.
-    summary += "<center>BikeScore is a trademark of Dr. Philip "
+    summary += "<br>BikeScore is a trademark of Dr. Philip "
         "Friere Skiba, PhysFarm Training Systems LLC</center>";
 
     return summary;

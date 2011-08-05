@@ -20,9 +20,10 @@
 #define _GC_RideSummaryWindow_h 1
 
 #include <QWidget>
+#include <QWebView>
+#include <QWebFrame>
 
 class MainWindow;
-class QTextEdit;
 
 class RideSummaryWindow : public QWidget
 {
@@ -41,7 +42,8 @@ class RideSummaryWindow : public QWidget
         QString htmlSummary() const;
 
         MainWindow *mainWindow;
-        QTextEdit *rideSummary;
+        QWebView *rideSummary;
+
 };
 
 #endif // _GC_RideSummaryWindow_h
