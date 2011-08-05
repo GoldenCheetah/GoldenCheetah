@@ -23,6 +23,7 @@
 #include "Colors.h"
 #include "ConfigDialog.h"
 #include "PwxRideFile.h"
+#include "TcxRideFile.h"
 #include "GcRideFile.h"
 #include "JsonRideFile.h"
 #ifdef GC_HAVE_KML
@@ -486,6 +487,7 @@ MainWindow::MainWindow(const QDir &home) :
     rideMenu->addAction(tr("&Export to KML..."), this, SLOT(exportKML()));
 #endif
     rideMenu->addAction(tr("Export to PWX..."), this, SLOT(exportPWX()));
+    rideMenu->addAction(tr("Export to TCX..."), this, SLOT(exportTCX()));
 #ifdef GC_HAVE_SOAP
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Export Metrics as CSV..."), this, SLOT(exportMetrics()), tr(""));
@@ -1126,6 +1128,26 @@ MainWindow::exportPWX()
     QFile file(fileName);
     PwxFileReader reader;
     reader.writeRideFile(cyclist, currentRide(), file);
+}
+
+void
+MainWindow::exportTCX()
+{
+    if ((treeWidget->selectedItems().size() != 1)
+        || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
+        QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
+        return;
+    }
+
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Export TCX"), QDir::homePath(), tr("TCX (*.tcx)"));
+    if (fileName.length() == 0)
+        return;
+
+    QString err;
+    QFile file(fileName);
+    TcxFileReader reader;
+    reader.writeRideFile(this, cyclist, currentRide(), file);
 }
 
 #ifdef GC_HAVE_KML

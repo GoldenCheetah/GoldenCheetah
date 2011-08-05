@@ -182,6 +182,7 @@ class MainWindow : public QMainWindow
         void downloadRide();
         void manualRide();
         void exportPWX();
+        void exportTCX();
         void exportCSV();
         void exportGC();
         void exportJson();
