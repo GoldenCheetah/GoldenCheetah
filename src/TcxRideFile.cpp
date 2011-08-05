@@ -146,13 +146,13 @@ TcxFileReader::writeRideFile(MainWindow *mainWindow, const QString cyclist, cons
 
                 // lat
                 QDomElement lat = doc.createElement("LatitudeDegrees");
-                text = doc.createTextNode(QString("%1").arg(point->lat));
+                text = doc.createTextNode(QString("%1").arg(point->lat, 0, 'g', 11));
                 lat.appendChild(text);
                 position.appendChild(lat);
 
                 // lon
                 QDomElement lon = doc.createElement("LongitudeDegrees");
-                text = doc.createTextNode(QString("%1").arg(point->lon));
+                text = doc.createTextNode(QString("%1").arg(point->lon, 0, 'g', 11));
                 lon.appendChild(text);
                 position.appendChild(lon);
             }
