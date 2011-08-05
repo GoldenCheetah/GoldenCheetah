@@ -42,14 +42,17 @@ RideSummaryWindow::RideSummaryWindow(MainWindow *mainWindow) :
     QVBoxLayout *vlayout = new QVBoxLayout;
     vlayout->setSpacing(0);
     vlayout->setContentsMargins(10,10,10,10);
-    rideSummary = new QTextEdit(this);
-    rideSummary->setReadOnly(true);
-    rideSummary->setFrameStyle(QFrame::NoFrame);
-    vlayout->addWidget(rideSummary);
+    rideSummary = new QWebView(this);
+    rideSummary->setContentsMargins(0,0,0,0);
+    rideSummary->page()->view()->setContentsMargins(0,0,0,0);
+    rideSummary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    rideSummary->setAcceptDrops(false);
 
-    QFont font;
-    font.setPointSize(font.pointSize()-2);
-    rideSummary->setFont(font);
+    QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
+    rideSummary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
+    rideSummary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
+
+    vlayout->addWidget(rideSummary);
 
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideItemChanged()));
     connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(refresh()));
@@ -91,20 +94,18 @@ RideSummaryWindow::refresh()
     // XXX: activeTab is never equaly to RideSummaryWindow right now because
     // it's wrapped in the summarySplitter in MainWindow.
     if (!myRideItem) {
-	    rideSummary->setHtml("");
+	    rideSummary->page()->mainFrame()->setHtml("");
         return;
     }
     RideItem *rideItem = myRideItem;
     setSubTitle(rideItem->dateTime.toString(tr("dddd MMMM d, yyyy, h:mm AP")));
-    QString text = htmlSummary(); //debug CRASH in QTextLayout destructor.
-    rideSummary->setHtml(text);
-    rideSummary->setAlignment(Qt::AlignCenter);
+    rideSummary->page()->mainFrame()->setHtml(htmlSummary());
 }
 
 QString
 RideSummaryWindow::htmlSummary() const
 {
-    QString summary;
+    QString summary("");
 
     RideItem *rideItem = myRideItem;
     RideFile *ride = rideItem->ride();
@@ -228,7 +229,7 @@ RideSummaryWindow::htmlSummary() const
     //
     summary += "<table border=0 cellspacing=10><tr>";
     for (int i = 0; i < columns; ++i) {
-        summary += "<td align=\"center\" width=\"%1%\"><table>"
+        summary += "<td align=\"center\" valign=\"top\" width=\"%1%\"><table>"
             "<tr><td align=\"center\" colspan=2><h3>%2</h3></td></tr>";
         summary = summary.arg(90 / columns);
         summary = summary.arg(columnNames[i]);
@@ -367,14 +368,14 @@ RideSummaryWindow::htmlSummary() const
             summary += " <li>" + i.next();
         summary += "</ul>";
     }
-    summary += "<br><hr width=\"80%\"></center>";
+    summary += "<br><hr width=\"80%\">";
 
     // The extra <center> works around a bug in QT 4.3.1,
     // which will otherwise put the following above the <hr>.
-    summary += "<center>BikeScore is a trademark of Dr. Philip "
-        "Friere Skiba, PhysFarm Training Systems LLC</center>";
+    summary += "<br>BikeScore is a trademark of Dr. Philip "
+        "Friere Skiba, PhysFarm Training Systems LLC";
 
-    summary += "<center>TSS, NP and IF are trademarks of Peaksware LLC</center>";
+    summary += "<br>TSS, NP and IF are trademarks of Peaksware LLC</center>";
     return summary;
 }
 
