@@ -204,7 +204,7 @@ pt_read_raw(FILE *in, void *context,
     }
 }
 
-RideFile *RawFileReader::openRideFile(QFile &file, QStringList &errors) const
+RideFile *RawFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
     RideFile *rideFile = new RideFile;
     rideFile->setDeviceType("PowerTap");

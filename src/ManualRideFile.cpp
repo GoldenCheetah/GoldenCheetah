@@ -28,7 +28,7 @@
 static int manualFileReaderRegistered =
     RideFileFactory::instance().registerReader("man", "Manual Ride File", new ManualFileReader());
 
-RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors) const
+RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
     QRegExp metricUnits("(km|kph|km/h)", Qt::CaseInsensitive);
     QRegExp englishUnits("(miles|mph|mp/h)", Qt::CaseInsensitive);

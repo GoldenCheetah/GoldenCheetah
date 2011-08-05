@@ -731,7 +731,7 @@ struct BinFileReaderState
 QMap<int,QString> BinFileReaderState::global_record_types;
 QMap<int,QString> BinFileReaderState::global_format_identifiers;
 
-RideFile *BinFileReader::openRideFile(QFile &file, QStringList &errors) const
+RideFile *BinFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
     QSharedPointer<BinFileReaderState> state(new BinFileReaderState(file, errors));
     return state->run();

@@ -48,7 +48,8 @@ static int Computrainer3dpFileReaderRegistered =
                                                ());
 
 RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
-                                                  QStringList & errors)
+                                                  QStringList & errors,
+                                                  QList<RideFile*>*)
     const
 {
     // open up the .3dp file, prepare a little-endian-ordered

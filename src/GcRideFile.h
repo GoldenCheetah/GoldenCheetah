@@ -23,7 +23,7 @@
 #include "RideFile.h"
 
 struct GcFileReader : public RideFileReader {
-    virtual RideFile *openRideFile(QFile &file, QStringList &errors) const;
+    virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 
     virtual void writeRideFile(const RideFile *ride, QFile &file) const;
 };
 

@@ -28,6 +28,7 @@
 #include "Units.h"
 #include "GcRideFile.h"
 #include "JsonRideFile.h"
+#include "TcxRideFile.h"
 
 
 // drag and drop passes urls ... convert to a list of files and call main constructor
@@ -273,7 +274,97 @@ RideImportWizard::process()
               if (aborted) { done(0); }
               this->repaint();
 
-              boost::scoped_ptr<RideFile> ride(RideFileFactory::instance().openRideFile(mainWindow, thisfile, errors));
+              QList<RideFile*> rides;
+              boost::scoped_ptr<RideFile> ride(RideFileFactory::instance().openRideFile(mainWindow, thisfile, errors, &rides));
+
+              // is this an archive of files?
+              if (rides.count() > 1) {
+
+                 int here = i;
+
+                 // remove current filename from state arrays and tableview
+                 filenames.removeAt(here);
+                 blanks.removeAt(here);
+                 tableWidget->removeRow(here);
+
+                 // resize dialog according to the number of rows we expect
+                 int willhave = filenames.count() + rides.count();
+                 resize(920 + ((willhave > 16 ? 24 : 0) +
+                     (willhave > 9 && willhave < 17) ? 8 : 0),
+                     118 + (willhave > 16 ? 17*20 : (willhave+1) * 20));
+
+                 // ok so create a temporary file and add to the tableWidget
+                 int counter = 0;
+                 foreach(RideFile *extracted, rides) {
+
+                     // write as a temporary file, using the original
+                     // filename with "-n" appended
+                     QString fulltarget = QDir::tempPath() + "/" + QFileInfo(thisfile).baseName() + QString("-%1.tcx").arg(counter+1);
+                     TcxFileReader reader;
+                     QFile target(fulltarget);
+                     reader.writeRideFile(mainWindow, mainWindow->cyclist, extracted, target);
+                     
+                     // now add each temporary file ...
+                     filenames.insert(here, fulltarget);
+                     blanks.insert(here, true); // by default editable
+                     tableWidget->insertRow(here+counter);
+
+                     QTableWidgetItem *t;
+
+                     // Filename
+                     t = new QTableWidgetItem();
+                     t->setText(fulltarget);
+                     t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+                     tableWidget->setItem(here+counter,0,t);
+
+                     // Date
+                     t = new QTableWidgetItem();
+                     t->setText(tr(""));
+                     t->setFlags(t->flags()  | Qt::ItemIsEditable);
+                     t->setBackgroundColor(Qt::red);
+                     tableWidget->setItem(here+counter,1,t);
+
+                     // Time
+                     t = new QTableWidgetItem();
+                     t->setText(tr(""));
+                     t->setFlags(t->flags() | Qt::ItemIsEditable);
+                     tableWidget->setItem(here+counter,2,t);
+
+                     // Duration
+                     t = new QTableWidgetItem();
+                     t->setText(tr(""));
+                     t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+                     tableWidget->setItem(here+counter,3,t);
+
+                     // Distance
+                     t = new QTableWidgetItem();
+                     t->setText(tr(""));
+                     t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+                     tableWidget->setItem(here+counter,4,t);
+
+                     // Import Status
+                     t = new QTableWidgetItem();
+                     t->setText(tr(""));
+                     t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+                     tableWidget->setItem(here+counter,5,t);
+
+                     counter++;
+
+                     tableWidget->adjustSize();
+                     QApplication::processEvents();
+                 }
+
+
+                 // progress bar needs to adjust...
+                 progressBar->setMaximum(filenames.count()*4);
+
+                 // then go back one and re-parse from there
+                 rides.clear();
+   
+                 i--;
+                 goto next; // buttugly I know, but count em across 100,000 lines of code
+
+              }
 
               // did it parse ok?
               if (ride) {
@@ -342,6 +433,8 @@ RideImportWizard::process()
         QApplication::processEvents();
         if (aborted) { done(0); }
         this->repaint();
+
+        next:;
     }
 
     // Pass 3 - get missing date and times for imported files

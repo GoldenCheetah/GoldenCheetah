@@ -26,7 +26,7 @@
 bool quarqInterpreterInstalled( void );
 
 struct QuarqFileReader : public RideFileReader {
-    virtual RideFile *openRideFile(QFile &file, QStringList &errors) const;
+    virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 
 };
 
 #endif // _QuarqRideFile_h

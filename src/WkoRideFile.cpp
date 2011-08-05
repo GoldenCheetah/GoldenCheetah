@@ -72,7 +72,7 @@ static int wkoFileReaderRegistered =
 //******************************************************************************
 // Main Entry Point from MainWindow() called to read data file
 //******************************************************************************
-RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors) const
+RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
     WKO_UCHAR *headerdata, *rawdata, *footerdata;
     WKO_ULONG version;

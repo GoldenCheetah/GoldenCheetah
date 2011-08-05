@@ -107,7 +107,7 @@ static int antFileReaderRegistered = quarqInterpreterInstalled()
         "qla", "Quarq ANT+ Files", new QuarqFileReader())
     : 0;
 
-RideFile *QuarqFileReader::openRideFile(QFile &file, QStringList &errors) const
+RideFile *QuarqFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
     (void) errors;
     RideFile *rideFile = new RideFile();

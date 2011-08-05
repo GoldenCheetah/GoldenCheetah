@@ -24,7 +24,7 @@
 #include <assert.h>
 
 struct TacxCafFileReader : public RideFileReader {
-    virtual RideFile *openRideFile(QFile &file, QStringList &errors) const;
+    virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const;
 };
 
 static int tacxCafFileReaderRegistered =
@@ -84,7 +84,7 @@ static const int TACX_RIDE_DATA_BLOCK = 3020;
 
 static const QString TACX_FORTIUS_DEVICE_TYPE = "Tacx Fortius";
 
-RideFile *TacxCafFileReader::openRideFile(QFile &file, QStringList &errors) const {
+RideFile *TacxCafFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const {
     if (!file.open(QFile::ReadOnly)) {
        errors << ("Could not open ride file: \""
                    + file.fileName() + "\"");

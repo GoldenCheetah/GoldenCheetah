@@ -23,7 +23,7 @@ static int smfFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "smf", "Sigma Memory File", new SmfFileReader());
 
-RideFile *SmfFileReader::openRideFile(QFile &file, QStringList &errors) const
+RideFile *SmfFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
     (void) errors;
     RideFile *rideFile = new RideFile();

@@ -29,7 +29,7 @@ static int polarFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "hrm", "Polar Precision", new PolarFileReader());
 
-RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors) const
+RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
 /*
 * Polar HRM file format documented at www.polar.fi/files/Polar_HRM_file%20format.pdf

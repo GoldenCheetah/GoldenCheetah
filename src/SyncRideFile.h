@@ -22,7 +22,7 @@
 #include "RideFile.h"
 
 struct SyncFileReader : public RideFileReader {
-    virtual RideFile *openRideFile(QFile &file, QStringList &errors) const;
+    virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 
 };
 
 #endif // _SyncRideFile_h
