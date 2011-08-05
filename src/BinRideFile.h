@@ -23,7 +23,7 @@
 #include "RideFile.h"
 
 struct BinFileReader : public RideFileReader {
-    virtual RideFile *openRideFile(QFile &file, QStringList &errors) const;
+    virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 
 };
 
 #endif // _BinRideFile_h

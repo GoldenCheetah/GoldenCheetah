@@ -31,7 +31,7 @@ static int gcFileReaderRegistered =
         "gc", "GoldenCheetah XML Format", new GcFileReader());
 
 RideFile *
-GcFileReader::openRideFile(QFile &file, QStringList &errors) const
+GcFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
     QDomDocument doc("GoldenCheetah");
     if (!file.open(QIODevice::ReadOnly)) {

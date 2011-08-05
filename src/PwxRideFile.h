@@ -24,7 +24,7 @@
 #include <QDomDocument>
 
 struct PwxFileReader : public RideFileReader {
-    virtual RideFile *openRideFile(QFile &file, QStringList &errors) const;
+    virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 
     virtual bool writeRideFile(const QString cyclist, const RideFile *ride, QFile &file) const;
     virtual RideFile *PwxFromDomDoc(QDomDocument doc, QStringList &errors) const;
 };

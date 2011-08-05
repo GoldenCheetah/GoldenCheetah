@@ -29,7 +29,7 @@ static int pwxFileReaderRegistered =
         "pwx", "Training Peaks PWX", new PwxFileReader());
 
 RideFile *
-PwxFileReader::openRideFile(QFile &file, QStringList &errors) const
+PwxFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
     QDomDocument doc("Training Peaks PWX");
     if (!file.open(QIODevice::ReadOnly)) {

@@ -590,7 +590,7 @@ struct FitFileReaderState
     }
 };
 
-RideFile *FitFileReader::openRideFile(QFile &file, QStringList &errors) const
+RideFile *FitFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
     QSharedPointer<FitFileReaderState> state(new FitFileReaderState(file, errors));
     return state->run();

@@ -38,8 +38,7 @@
 #define WKO_ULONG  uint32_t
 #define WKO_LONG   int32_t
 struct WkoFileReader : public RideFileReader {
-    RideFile *openRideFile(QFile &file, QStringList &errors) const;
-
+    virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 
 };
 
 typedef std::auto_ptr<QDataStream> QDataStreamPtr;

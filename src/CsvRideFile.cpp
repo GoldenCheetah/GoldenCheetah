@@ -30,7 +30,7 @@ static int csvFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "csv","Comma-Separated Values", new CsvFileReader());
 
-RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
+RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
     QRegExp metricUnits("(km|kph|km/h)", Qt::CaseInsensitive);
     QRegExp englishUnits("(miles|mph|mp/h)", Qt::CaseInsensitive);

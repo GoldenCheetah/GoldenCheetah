@@ -203,7 +203,7 @@ struct RideFilePoint
 
 struct RideFileReader {
     virtual ~RideFileReader() {}
-    virtual RideFile *openRideFile(QFile &file, QStringList &errors) const = 0;
+    virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const = 0;
 };
 
 class RideFileFactory {
@@ -222,7 +222,7 @@ class RideFileFactory {
 
         int registerReader(const QString &suffix, const QString &description,
                            RideFileReader *reader);
-        RideFile *openRideFile(MainWindow *main, QFile &file, QStringList &errors) const;
+        RideFile *openRideFile(MainWindow *main, QFile &file, QStringList &errors, QList<RideFile*>* = 0) const;
         QStringList listRideFiles(const QDir &dir) const;
         QStringList suffixes() const;
         QString description(const QString &suffix) const {

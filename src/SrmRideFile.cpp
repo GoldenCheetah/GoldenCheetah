@@ -87,7 +87,7 @@ static int srmFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "srm", "SRM training files", new SrmFileReader());
 
-RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings) const
+RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QList<RideFile*>*) const
 {
     if (!file.open(QFile::ReadOnly)) {
         errorStrings << QString("can't open file %1").arg(file.fileName());

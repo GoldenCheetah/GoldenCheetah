@@ -32,7 +32,7 @@ static int srdFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "srd", "Polar SRD files", new SrdFileReader());
 
-RideFile *SrdFileReader::openRideFile(QFile &file, QStringList &errorStrings) const
+RideFile *SrdFileReader::openRideFile(QFile &file, QStringList &errorStrings, QList<RideFile*>*) const
 {
     workout_t *      w;
     S710_Filter      filter = S710_FILTER_OFF;

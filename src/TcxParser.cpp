@@ -26,13 +26,15 @@
 // use stc strtod to bypass Qt toDouble() issues
 #include <stdlib.h>
 
-TcxParser::TcxParser (RideFile* rideFile)
-   : rideFile(rideFile)
+TcxParser::TcxParser (RideFile* rideFile, QList<RideFile*> *rides)
+   : rideFile(rideFile), rides(rides)
 {
   isGarminSmartRecording = appsettings->value(NULL, GC_GARMIN_SMARTRECORD,Qt::Checked);
   GarminHWM = appsettings->value(NULL, GC_GARMIN_HWMARK);
   if (GarminHWM.isNull() || GarminHWM.toInt() == 0)
       GarminHWM.setValue(25); // default to 25 seconds.
+
+  first = true;
 
 }
 
@@ -46,6 +48,17 @@ TcxParser::startElement( const QString&, const QString&,
     if (qName == "Activity")
     {
         lap = 0;
+
+        if (first == true) first = false;
+        else {
+
+            // if caller is looking for rides...
+            if (rides) rides->append(rideFile);
+
+            rideFile = new RideFile();
+            rideFile->setRecIntSecs(1.0);
+            rideFile->setDeviceType("Garmin TCX");
+        }
     }
     else if (qName == "Lap")
     {

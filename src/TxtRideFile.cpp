@@ -46,7 +46,7 @@ static int txtFileReaderRegistered =
 // There are two example files in the test/rides directory which
 // can be used as a reference for the file format.
 
-RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors) const
+RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
     QString deviceInfo; // keep a record of all the data in the
                         // sections so we can store it in the device

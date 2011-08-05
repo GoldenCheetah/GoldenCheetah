@@ -248,7 +248,7 @@ struct SyncFileReaderState
 };
 
 
-RideFile *SyncFileReader::openRideFile(QFile &file, QStringList &errors) const
+RideFile *SyncFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
     QSharedPointer<SyncFileReaderState> state(new SyncFileReaderState(file, errors));
     return state->run();

@@ -26,7 +26,7 @@ static int tcxFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "gpx", "GGPS Exchange format", new GpxFileReader());
 
-RideFile *GpxFileReader::openRideFile(QFile &file, QStringList &errors) const
+RideFile *GpxFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
     (void) errors;
     RideFile *rideFile = new RideFile();

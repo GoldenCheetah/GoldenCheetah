@@ -23,7 +23,7 @@ static int slfFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "slf", "Sigma Log File", new SlfFileReader());
 
-RideFile *SlfFileReader::openRideFile(QFile &file, QStringList &errors) const
+RideFile *SlfFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
     (void) errors;
     RideFile *rideFile = new RideFile();

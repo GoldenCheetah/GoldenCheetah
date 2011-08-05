@@ -32,14 +32,14 @@ static int tcxFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "tcx", "Garmin Training Centre", new TcxFileReader());
 
-RideFile *TcxFileReader::openRideFile(QFile &file, QStringList &errors) const
+RideFile *TcxFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*list) const
 {
     (void) errors;
     RideFile *rideFile = new RideFile();
     rideFile->setRecIntSecs(1.0);
     rideFile->setDeviceType("Garmin TCX");
 
-    TcxParser handler(rideFile);
+    TcxParser handler(rideFile, list);
 
     QXmlInputSource source (&file);
     QXmlSimpleReader reader;
@@ -52,6 +52,7 @@ RideFile *TcxFileReader::openRideFile(QFile &file, QStringList &errors) const
 bool
 TcxFileReader::writeRideFile(MainWindow *mainWindow, const QString cyclist, const RideFile *ride, QFile &file) const
 {
+    Q_UNUSED(cyclist);
     QDomText text;
     QDomDocument doc;
     QDomProcessingInstruction hdr = doc.createProcessingInstruction("xml","version=\"1.0\"");

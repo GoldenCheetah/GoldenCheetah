@@ -268,7 +268,7 @@ RideFileFactory::rideFileRegExp() const
 }
 
 RideFile *RideFileFactory::openRideFile(MainWindow *main, QFile &file,
-                                           QStringList &errors) const
+                                           QStringList &errors, QList<RideFile*> *rideList) const
 {
     QString suffix = file.fileName();
     int dot = suffix.lastIndexOf(".");
@@ -277,7 +277,7 @@ RideFile *RideFileFactory::openRideFile(MainWindow *main, QFile &file,
     RideFileReader *reader = readFuncs_.value(suffix.toLower());
     assert(reader);
 //qDebug()<<"open"<<file.fileName()<<"start:"<<QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
-    RideFile *result = reader->openRideFile(file, errors);
+    RideFile *result = reader->openRideFile(file, errors, rideList);
 //qDebug()<<"open"<<file.fileName()<<"end:"<<QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
 
     // NULL returned to indicate openRide failed
