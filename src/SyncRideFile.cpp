@@ -25,6 +25,7 @@
 #include <stdint.h>
 #include <math.h>
 
+
 static int syncFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "osyn", "Macro GoldenCheetah Sync File", new SyncFileReader());
@@ -150,52 +151,61 @@ struct SyncFileReaderState
             int page_number = read_bytes(2, &bytes_read, &sum); // Page #
             int data_number = read_bytes(1, &bytes_read, &sum); // # of data in page
 
-            if (page_number == 1) {
-                // 2. Training Summary data (60 bytes)";
-                read_bytes(39, &bytes_read, &sum);
+            if (page_number == 64010 and secs == 0.0) {
+                //start with a 64010 !
+                //ignore datas
+                read_bytes(12,  &bytes_read, &sum);
 
-                int record_training_flag = read_bytes(1, &bytes_read, &sum); // Training Flag
-
-                if ((record_training_flag & 0x01) == 0) {
-                    // Only new lap
-                    rideFile->addInterval(last_interval_secs, secs, ""+interval);
-                    last_interval_secs = secs;
-                    interval ++;
-                }
-
-                read_bytes(20, &bytes_read, &sum); // Don't care
-            }
-
-            if (page_number == 1) {
-                // Section Start time and date data (12 byte)
-
-                int sec = read_bsd_byte(&bytes_read, &sum); // Section start time sec
-                int min = read_bsd_byte(&bytes_read, &sum); // Section start time min
-                int hour = read_bsd_byte(&bytes_read, &sum); // Section start time hour
-                int day = read_bsd_byte(&bytes_read, &sum); // Section start time day
-                int month = read_bytes(1, &bytes_read, &sum); // Section start time month
-                int year = read_bsd_byte(&bytes_read, &sum); // Section start time year
-
-                QDateTime t = QDateTime(QDate(2000+year,month,day), QTime(hour,min,sec));
-
-                if (secs == 0.0 || rideFile->startTime().toTime_t() == (unsigned int)-1 ) {
-
-                    rideFile->setStartTime(t);
-                }
-                else {
-                    int gap = (t.toTime_t() - rideFile->startTime().toTime_t()) - secs;
-                    secs += gap;
-                }
-
-                read_bytes(5, &bytes_read, &sum); // Don't care
-
-                read_bytes(1, &bytes_read, &sum); // Data Flag
                 data_number--;
+            } else {
+
+                if (page_number == 1) {
+                    // 2. Training Summary data (60 bytes)";
+                    read_bytes(39, &bytes_read, &sum);
+
+                    int record_training_flag = read_bytes(1, &bytes_read, &sum); // Training Flag
+
+                    if ((record_training_flag & 0x01) == 0) {
+                        // Only new lap
+                        rideFile->addInterval(last_interval_secs, secs, ""+interval);
+                        last_interval_secs = secs;
+                        interval ++;
+                    }
+
+                    read_bytes(20, &bytes_read, &sum); // Don't care
+                }
+
+                if (page_number == 1) {
+                    // Section Start time and date data (12 byte)
+
+                    int sec = read_bsd_byte(&bytes_read, &sum); // Section start time sec
+                    int min = read_bsd_byte(&bytes_read, &sum); // Section start time min
+                    int hour = read_bsd_byte(&bytes_read, &sum); // Section start time hour
+                    int day = read_bsd_byte(&bytes_read, &sum); // Section start time day
+                    int month = read_bytes(1, &bytes_read, &sum); // Section start time month
+                    int year = read_bsd_byte(&bytes_read, &sum); // Section start time year
+
+                    QDateTime t = QDateTime(QDate(2000+year,month,day), QTime(hour,min,sec));
+
+                    if (secs == 0.0 || rideFile->startTime().toTime_t()<0) {
+                        rideFile->setStartTime(t);
+                    }
+                    else {
+                        int gap = (t.toTime_t() - rideFile->startTime().toTime_t()) - secs;
+                        secs += gap;
+                    }
+
+                    read_bytes(5, &bytes_read, &sum); // Don't care
+                    read_bytes(1, &bytes_read, &sum); // Data Flag
+                    data_number--;
+                }
+
+                for (int i = 0; i < data_number; ++i) {
+                    read_graph_data(&secs, &bytes_read, &sum);
+                }
             }
 
-            for (int i = 0; i < data_number; ++i) {
-                read_graph_data(&secs, &bytes_read, &sum);
-            }
+
 
             int finish = 259-bytes_read;
 
