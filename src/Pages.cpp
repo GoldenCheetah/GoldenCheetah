@@ -149,6 +149,18 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
     garminLayout->addWidget(garminHWMarkedit,1,1);
     garminLayout->addWidget(garminHWLabel2,1,2);
 
+    // Map interval period
+    QVariant mapInterval = settings->value(GC_MAP_INTERVAL);
+    if (mapInterval.isNull() || mapInterval.toInt() == 0)
+      mapInterval.setValue(30); // by default its 30 sec
+    QGridLayout *mapIntervalLayout = new QGridLayout;
+    QLabel *mapIntervalLabel1 = new QLabel(tr("Map interval period"));
+    QLabel *mapIntervalLabel2 = new QLabel(tr(" secs."));
+    mapIntervaledit = new QLineEdit(mapInterval.toString(),this);
+    mapIntervaledit->setInputMask("009");
+    mapIntervalLayout->addWidget(mapIntervalLabel1,1,0);
+    mapIntervalLayout->addWidget(mapIntervaledit,1,1);
+    mapIntervalLayout->addWidget(mapIntervalLabel2,1,2);
 
     warningLabel = new QLabel(tr("Requires Restart To Take Effect"));
 
@@ -214,6 +226,7 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
     configLayout->addWidget(allRidesAscending);
     configLayout->addLayout(garminLayout);
     //SmartRecord);
+    configLayout->addLayout(mapIntervalLayout);
     configLayout->addLayout(crankLengthLayout);
     configLayout->addLayout(bsDaysLayout);
     configLayout->addLayout(bsModeLayout);

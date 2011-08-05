@@ -347,13 +347,16 @@ string GoogleMapControl::CreatePolyLine()
 {
     std::vector<RideFilePoint> intervalPoints;
     ostringstream oss;
-    int intervalTime = 30;  // 30 seconds
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+    QVariant intervalTime = settings->value(GC_MAP_INTERVAL).toInt();
+    if (intervalTime.isNull() || intervalTime.toInt() == 0)
+       intervalTime.setValue(30);
 
     BOOST_FOREACH(RideFilePoint rfp, rideData)
     {
         intervalPoints.push_back(rfp);
         if((intervalPoints.back().secs - intervalPoints.front().secs) >
-           intervalTime)
+           intervalTime.toInt())
         {
             // find the avg power and color code it and create a polyline...
             AvgPower avgPower = for_each(intervalPoints.begin(),
@@ -377,6 +380,10 @@ void GoogleMapControl::CreateSubPolyLine(const std::vector<RideFilePoint> &point
                                          std::ostringstream &oss,
                                          int avgPower)
 {
+    boost::shared_ptr<QSettings> settings = GetApplicationSettings();
+    QVariant intervalTime = settings->value(GC_MAP_INTERVAL);
+    if (intervalTime.isNull() || intervalTime.toInt() == 0)
+       intervalTime.setValue(30);
     oss.precision(6);
     QColor color = GetColor(avgPower);
     QString colorstr = color.name();
@@ -393,7 +400,7 @@ void GoogleMapControl::CreateSubPolyLine(const std::vector<RideFilePoint> &point
     oss << "],\"" << colorstr.toStdString() << "\",4);" << endl;
 
     oss << "GEvent.addListener(polyline, 'mouseover', function() {" << endl
-        << "var tooltip_text = '30s Power: " << avgPower << "';" << endl
+        << "var tooltip_text = '" << intervalTime.toInt() << "s Power: " << avgPower << "';" << endl
         << "var ss={'weight':8};" << endl
         << "this.setStrokeStyle(ss);" << endl
         << "this.overlay = new MapTooltip(this,tooltip_text);" << endl

@@ -56,6 +56,7 @@ class ConfigurationPage : public QWidget
         QCheckBox *allRidesAscending;
         QCheckBox *garminSmartRecord;
         QLineEdit *garminHWMarkedit;
+        QLineEdit *mapIntervaledit;
         QLineEdit *BSdaysEdit;
         QComboBox *bsModeCombo;
         QLineEdit *workoutDirectory;
@@ -85,6 +86,7 @@ class ConfigurationPage : public QWidget
         QGridLayout *bsDaysLayout;
         QHBoxLayout *bsModeLayout;
         QGridLayout *garminLayout;
+        QGridLayout *mapIntervalLayout;
 };
 
 class CyclistPage : public QWidget
