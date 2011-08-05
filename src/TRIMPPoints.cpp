@@ -67,14 +67,15 @@ class TRIMPPoints : public RideMetric {
         double restHr = hrZones->getRestHr(hrZoneRange);
         restHr = rideFile->getTag("Rest HR", QString("%1").arg(restHr)).toDouble();
 
-        assert(deps.contains("workout_time"));
+        assert(deps.contains("time_riding"));
         assert(deps.contains("average_hr"));
-        const RideMetric *workoutTimeMetric = deps.value("workout_time");
+        //const RideMetric *workoutTimeMetric = deps.value("workout_time");
+        const RideMetric *timeRidingMetric = deps.value("time_riding");
         const RideMetric *averageHrMetric = deps.value("average_hr");
-        assert(workoutTimeMetric);
+        assert(timeRidingMetric);
         assert(averageHrMetric);
 
-        double secs = workoutTimeMetric->value(true);
+        double secs = timeRidingMetric->value(true);
         double hr = averageHrMetric->value(true);
 
         //TRIMP: = t x %HRR x 0.64e1,92(%HRR)
@@ -312,11 +313,11 @@ class SessionRPE : public RideMetric {
         // use RPE value in ride metadata
         double rpe = rideFile->getTag("RPE", "0.0").toDouble();
 
-        assert(deps.contains("workout_time"));
-        const RideMetric *workoutTimeMetric = deps.value("workout_time");
-        assert(workoutTimeMetric);
+        assert(deps.contains("time_riding"));
+        const RideMetric *timeRidingMetric = deps.value("time_riding");
+        assert(timeRidingMetric);
 
-        double secs = workoutTimeMetric->value(true);
+        double secs = timeRidingMetric->value(true);
 
         // ok lets work the score out
         score = ((secs == 0.0 || rpe == 0) ? 0.0 :  secs/60 *rpe);
@@ -328,12 +329,11 @@ class SessionRPE : public RideMetric {
 
 static bool added() {
     QVector<QString> deps;
-    deps.append("workout_time");
+    deps.append("time_riding");
     deps.append("average_hr");
     RideMetricFactory::instance().addMetric(TRIMPPoints(), &deps);
 
     deps.clear();
-    deps.append("workout_time");
     deps.append("trimp_points");
     RideMetricFactory::instance().addMetric(TRIMP100Points(), &deps);
 
@@ -347,7 +347,7 @@ static bool added() {
     RideMetricFactory::instance().addMetric(TRIMPZonalPoints(), &deps);
 
     deps.clear();
-    deps.append("workout_time");
+    deps.append("time_riding");
     RideMetricFactory::instance().addMetric(SessionRPE(), &deps);
     return true;
 }
