@@ -653,8 +653,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
     referencePlot = plot;
 
-    //setTitle(plot->rideItem->ride()->startTime().toString(GC_DATETIME_FORMAT));
-
+    // You got to give me some data first!
+    if (!plot->distanceArray.count() || !plot->timeArray.count()) return;
 
     // reference the plot for data and state
     rideItem = plot->rideItem;
