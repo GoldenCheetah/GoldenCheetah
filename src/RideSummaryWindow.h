@@ -19,11 +19,12 @@
 #ifndef _GC_RideSummaryWindow_h
 #define _GC_RideSummaryWindow_h 1
 #include "GoldenCheetah.h"
+#include "MainWindow.h"
 
 #include <QWidget>
+#include <QWebView>
+#include <QWebFrame>
 
-class MainWindow;
-class QTextEdit;
 
 class RideSummaryWindow : public GcWindow
 {
@@ -47,7 +48,7 @@ class RideSummaryWindow : public GcWindow
         QString htmlSummary() const;
 
         MainWindow *mainWindow;
-        QTextEdit *rideSummary;
+        QWebView *rideSummary;
 
         RideItem *_connected;
 };
