@@ -52,13 +52,13 @@ TcxParser::startElement( const QString&, const QString&,
         if (first == true) first = false;
         else {
 
-            // if caller is looking for rides...
-            if (rides) rides->append(rideFile);
-
             rideFile = new RideFile();
             rideFile->setRecIntSecs(1.0);
             rideFile->setDeviceType("Garmin TCX");
         }
+
+        // if caller is looking for rides...
+        if (rides) rides->append(rideFile);
     }
     else if (qName == "Lap")
     {
