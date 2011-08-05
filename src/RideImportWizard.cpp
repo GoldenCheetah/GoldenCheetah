@@ -276,7 +276,7 @@ RideImportWizard::process()
               this->repaint();
 
               QList<RideFile*> rides;
-              boost::scoped_ptr<RideFile> ride(RideFileFactory::instance().openRideFile(mainWindow, thisfile, errors, &rides));
+              RideFile *ride = RideFileFactory::instance().openRideFile(mainWindow, thisfile, errors, &rides);
 
               // is this an archive of files?
               if (rides.count() > 1) {
@@ -305,6 +305,7 @@ RideImportWizard::process()
                      QFile target(fulltarget);
                      reader.writeRideFile(mainWindow, mainWindow->cyclist, extracted, target);
                      deleteMe.append(fulltarget);
+                     delete extracted;
                      
                      // now add each temporary file ...
                      filenames.insert(here, fulltarget);
@@ -426,6 +427,8 @@ RideImportWizard::process()
                        : QString ("%1 mi").arg(km * MILES_PER_KM, 0, 'f', 1);
                    tableWidget->item(i,4)->setText(dist);
                    tableWidget->item(i,4)->setTextAlignment(Qt::AlignRight); // put in the middle
+
+                   delete ride;
                } else {
                    // nope - can't handle this file
                    tableWidget->item(i,5)->setText(tr("Error - ") + errors.join(tr(" ")));
