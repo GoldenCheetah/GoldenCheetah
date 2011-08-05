@@ -682,6 +682,13 @@ LTMPlot::setData(LTMSettings *set)
     }
 
     if (settings->groupBy != LTM_TOD) {
+
+        // make start date always fall on a Monday
+        if (settings->groupBy == LTM_WEEK) {
+            int dow = settings->start.date().dayOfWeek(); // 1-7, where 1=monday
+            settings->start.date().addDays(dow-1*-1);
+        }
+
         // setup the xaxis at the bottom
         int tics;
         maxX = 0.5 + groupForDate(settings->end.date(), settings->groupBy) -
