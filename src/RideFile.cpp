@@ -289,14 +289,14 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
 {
     // negative values are not good, make them zero
     // although alt, lat, lon, headwind can be negative of course!
-    if (secs<0) secs=0;
-    if (cad<0) cad=0;
-    if (hr<0) hr=0;
-    if (km<0) km=0;
-    if (kph<0) kph=0;
-    if (nm<0) nm=0;
-    if (watts<0) watts=0;
-    if (interval<0) interval=0;
+    if (!isfinite(secs) || secs<0) secs=0;
+    if (!isfinite(cad) || cad<0) cad=0;
+    if (!isfinite(hr) || hr<0) hr=0;
+    if (!isfinite(km) || km<0) km=0;
+    if (!isfinite(kph) || kph<0) kph=0;
+    if (!isfinite(nm) || nm<0) nm=0;
+    if (!isfinite(watts) || watts<0) watts=0;
+    if (!isfinite(interval) || interval<0) interval=0;
 
     dataPoints_.append(new RideFilePoint(secs, cad, hr, km, kph,
                                          nm, watts, alt, lon, lat, headwind, interval));
