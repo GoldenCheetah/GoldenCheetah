@@ -229,7 +229,7 @@ static int jsonFileReaderRegistered =
         "json", "GoldenCheetah Json  Format", new JsonFileReader());
 
 RideFile *
-JsonFileReader::openRideFile(QFile &file, QStringList &errors) const
+JsonFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
     // jsonRide is local and static, used in the parser
     // JsonRideFilein is the FILE * used by the lexer

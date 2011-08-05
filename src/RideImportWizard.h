@@ -67,6 +67,8 @@ private:
     QCheckBox *overFiles;      // chance to set overwrite when asking for dates
     bool overwriteFiles; // flag to overwrite files from checkbox
     MainWindow *mainWindow; // caller
+
+    QStringList deleteMe; // list of temp files created during import
 };
 
 // Item Delegate for Editing Date and Time of Ride inside the

@@ -34,6 +34,7 @@
 // drag and drop passes urls ... convert to a list of files and call main constructor
 RideImportWizard::RideImportWizard(QList<QUrl> *urls, QDir &home, MainWindow *main, QWidget *parent) : QDialog(parent), mainWindow(main)
 {
+    setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     QList<QString> filenames;
     for (int i=0; i<urls->count(); i++)
@@ -303,6 +304,7 @@ RideImportWizard::process()
                      TcxFileReader reader;
                      QFile target(fulltarget);
                      reader.writeRideFile(mainWindow, mainWindow->cyclist, extracted, target);
+                     deleteMe.append(fulltarget);
                      
                      // now add each temporary file ...
                      filenames.insert(here, fulltarget);
@@ -867,27 +869,10 @@ RideImportWizard::abortClicked()
     aborted = false;
 }
 
-// destructor - not sure it ever gets called tho, even by RideImportWizard::done()
+// clean up files
 RideImportWizard::~RideImportWizard()
 {
-    // Fill in the filenames and all the textItems
-    for (int i=0; i < filenames.count(); i++) {
-        QTableWidgetItem *t;
-        t = tableWidget->item(i,0); delete t;
-        t = tableWidget->item(i,1); delete t;
-        t = tableWidget->item(i,2); delete t;
-        t = tableWidget->item(i,3); delete t;
-        t = tableWidget->item(i,4); delete t;
-        t = tableWidget->item(i,5); delete t;
-    }
-    delete tableWidget;
-    filenames.clear();
-    delete phaseLabel;
-    delete progressBar;
-    delete abortButton;
-    delete cancelButton;
-    delete todayButton;
-    delete overFiles;
+    foreach(QString name, deleteMe) QFile(name).remove();
 }
 
 
