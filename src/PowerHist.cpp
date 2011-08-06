@@ -387,8 +387,10 @@ PowerHist::recalc(bool force)
             }
         }
         totalTime[i] = 1e-9;       // nonzero to accomodate log plot
+        totalTimeSelected[i] = 1e-9;       // nonzero to accomodate log plot
         parameterValue[i] = i * delta * binw;
         totalTime[0] = 1e-9;
+        totalTimeSelected[0] = 1e-9;
         parameterValue[0] = 0;
 
         // convert vectors from absolute time to percentage
@@ -857,11 +859,13 @@ PowerHist::setlnY(bool value)
 
         setAxisScaleEngine(yLeft, new QwtLog10ScaleEngine);
         curve->setBaseline(1e-6);
+        curveSelected->setBaseline(1e-6);
 
     } else {
 
         setAxisScaleEngine(yLeft, new QwtLinearScaleEngine);
         curve->setBaseline(0);
+        curveSelected->setBaseline(0);
 
     }
     setYMax();
