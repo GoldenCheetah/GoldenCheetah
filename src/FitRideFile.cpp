@@ -326,7 +326,11 @@ struct FitFileReaderState
                 continue;
 
             switch (field.num) {
-                case 253: time = value + qbase_time.toTime_t(); break;
+                case 253: time = value + qbase_time.toTime_t();
+                          // Time MUST NOT go backwards
+                          // You canny break the laws of physics, Jim
+                          if (time < last_time) time = last_time;
+                          break;
                 case 0: lati = value; break;
                 case 1: lngi = value; break;
                 case 2: alt = value / 5.0 - 500.0; break;
