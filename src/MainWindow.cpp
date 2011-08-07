@@ -1029,9 +1029,11 @@ MainWindow::removeCurrentRide()
         QFile::remove(home.absolutePath() + "/" + deleteMe);
     }
 
-    // notify AFTER deleted!
-    item->freeMemory();
+    // notify AFTER deleted from DISK..
     rideDeleted(item);
+
+    // ..but before MEMORY cleared
+    item->freeMemory();
     delete item;
 
     // any left?
