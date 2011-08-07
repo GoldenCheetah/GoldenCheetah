@@ -70,6 +70,7 @@ class HistogramWindow : public GcWindow
     public slots:
 
         void rideSelected();
+        void rideAddorRemove(RideItem*);
         void intervalSelected();
         void zonesChanged();
 
@@ -105,6 +106,7 @@ class HistogramWindow : public GcWindow
 
         int powerRange, hrRange;
 
+        bool stale;
         RideFileCache *source;
         bool interval;
 };

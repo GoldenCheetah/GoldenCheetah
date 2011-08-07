@@ -30,7 +30,7 @@
 #include "Zones.h"
 #include "HrZones.h"
 
-HistogramWindow::HistogramWindow(MainWindow *mainWindow) : GcWindow(mainWindow), mainWindow(mainWindow), source(NULL)
+HistogramWindow::HistogramWindow(MainWindow *mainWindow) : GcWindow(mainWindow), mainWindow(mainWindow), stale(true), source(NULL)
 {
     setInstanceName("Histogram Window");
 
@@ -121,6 +121,9 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow) : GcWindow(mainWindow),
     connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
     connect(mainWindow, SIGNAL(configChanged()), powerHist, SLOT(configChanged()));
+
+    connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
+    connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideAddorRemove(RideItem*)));
 }
 
 void
@@ -129,14 +132,35 @@ HistogramWindow::rideSelected()
     if (!amVisible()) return;
 
     RideItem *ride = myRideItem;
-    if (!ride || seasonCombo->currentIndex() != 0) return;
 
-    // get range that applies to this ride
-    powerRange = mainWindow->zones()->whichRange(ride->dateTime.date());
-    hrRange = mainWindow->hrZones()->whichRange(ride->dateTime.date());
+    if (!ride || (seasonCombo->currentIndex() != 0 && !stale)) return;
+
+    if (seasonCombo->currentIndex()) {
+        // get range that applies to this ride
+        powerRange = mainWindow->zones()->whichRange(ride->dateTime.date());
+        hrRange = mainWindow->hrZones()->whichRange(ride->dateTime.date());
+    }
 
     // update
     updateChart();
+}
+
+void
+HistogramWindow::rideAddorRemove(RideItem *here)
+{
+    int index = seasonCombo->currentIndex();
+    if (!index) return; // displaying ride only
+    else {
+        Season season = seasons.at(index);
+
+        bool refresh = ((here->dateTime.date() >= season.getStart() || season.getStart() == QDate())
+            && (here->dateTime.date() <= season.getEnd() || season.getEnd() == QDate()));
+
+        if (refresh && amVisible()) {
+            stale = true;
+            updateChart();
+        } else stale = true;
+    }
 }
 
 void
@@ -177,6 +201,8 @@ void HistogramWindow::seasonSelected(int index)
         if (end == QDate()) end = QDate(3000,12,31);
         if (start == QDate()) start = QDate(1900,1,1);
         source = new RideFileCache(mainWindow, start, end);
+
+        stale = false;
 
         if (old) delete old; // guarantee source pointer changes
     }
@@ -268,6 +294,30 @@ HistogramWindow::setBinWidthFromLineEdit()
 void
 HistogramWindow::updateChart()
 {
+    // refresh the ridefile cache if it is stale
+    if (stale) {
+
+        RideFileCache *old = source;
+        int index = seasonCombo->currentIndex();
+
+        if (index > 0) {
+            index--; // it is now an index into the season array
+
+            // Set data from BESTS
+            Season season = seasons.at(index);
+            QDate start = season.getStart();
+            QDate end = season.getEnd();
+            if (end == QDate()) end = QDate(3000,12,31);
+            if (start == QDate()) start = QDate(1900,1,1);
+            source = new RideFileCache(mainWindow, start, end);
+
+            stale = false;
+
+            if (old) delete old; // guarantee source pointer changes
+        }
+        stale = false; // well we tried
+    }
+
     // set data
     if (seasonCombo->currentIndex() != 0 && source)
         powerHist->setData(source);
