@@ -1,4 +1,4 @@
-<layout name="analysis">
+<layout name="analysis" style="0">
 	<chart id="14" name="Ride Summary Window" title="Summary" >
 		<property name="instanceName" type="QString" value="Ride Summary Window" />
 		<property name="title" type="QString" value="Summary" />
