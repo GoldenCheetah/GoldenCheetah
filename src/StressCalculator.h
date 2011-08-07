@@ -79,8 +79,6 @@ class StressCalculator:public QObject {
 	QDateTime getStartDate(void) { return startDate; }
 	QDateTime getEndDate(void) { return startDate.addDays(days); }
 
-    // use metricDB pre-calculated values
-    MetricAggregator *metricDB;
 };
 
 
