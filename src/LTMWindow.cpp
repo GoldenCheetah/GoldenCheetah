@@ -36,7 +36,7 @@
 
 LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) :
             LTMPlotContainer(parent), home(home),
-            useMetricUnits(useMetricUnits), active(false), dirty(true)
+            useMetricUnits(useMetricUnits), dirty(true)
 {
     main = parent;
     setInstanceName("Metric Window");
@@ -151,7 +151,7 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
     connect(picker, SIGNAL(moved(QPoint)), ltmPlot, SLOT(pickerMoved(QPoint)));
     connect(picker, SIGNAL(appended(const QPoint &)), ltmPlot, SLOT(pickerAppended(const QPoint &)));
 
-    // config changes or ride file activities cause a redraw/refresh (but only if active)
+    // config changes or ride file activities cause a redraw/refresh (but only if visible)
     //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected(void)));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
@@ -181,8 +181,6 @@ LTMWindow::setDateRange(QString s)
 void
 LTMWindow::rideSelected()
 {
-    active = amVisible();
-
 #if 0
     if (active == true) {
 
@@ -192,11 +190,11 @@ LTMWindow::rideSelected()
         ltmTool->selectDateRange(0);
         chartSelected(0);
 #endif
-    if (active == true && dirty == true) {
+    if (amVisible() == true && dirty == true) {
 
         // plot needs to be redrawn
         refresh();
-    } else if (active == false) {
+    } else if (amVisible() == false) {
         popup->hide();
     }
 }
@@ -204,7 +202,7 @@ LTMWindow::rideSelected()
 void
 LTMWindow::refreshPlot()
 {
-    if (active == true) ltmPlot->setData(&settings);
+    if (amVisible() == true) ltmPlot->setData(&settings);
 }
 
 // total redraw, reread data etc
@@ -212,7 +210,7 @@ void
 LTMWindow::refresh()
 {
     // refresh for changes to ridefiles / zones
-    if (active == true && main->metricDB != NULL) {
+    if (amVisible() == true && main->metricDB != NULL) {
         // if config has changed get new useMetricUnits
         useMetricUnits = appsettings->value(this, GC_UNIT).toString() == "Metric";
 

@@ -150,7 +150,6 @@ class LTMWindow : public LTMPlotContainer
         QList<LTMSettings> presets;
 
         // local state
-        bool active;
         bool dirty;
         LTMSettings settings; // all the plot settings
         QList<SummaryMetrics> results;
