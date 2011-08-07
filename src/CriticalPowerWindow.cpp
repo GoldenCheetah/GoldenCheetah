@@ -108,6 +108,9 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
 void
 CriticalPowerWindow::newRideAdded(RideItem *here)
 {
+    // mine just got Zapped, a new rideitem would not be my current item
+    if (here == currentRide) currentRide = NULL;
+
     Season season = seasons.at(cComboSeason->currentIndex());
 
     // Refresh global curve if a ride is added during those dates
