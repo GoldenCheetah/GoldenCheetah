@@ -293,7 +293,13 @@ MetricAggregator::getAllMetricsFor(QDateTime start, QDateTime end)
         qDebug()<<"lost db connection?";
         return empty;
     }
-    return dbaccess->getAllMetricsFor(start, end);
+
+    // apparently using transactions for queries
+    // can improve performance!
+    dbaccess->connection().transaction();
+    QList<SummaryMetrics> results = dbaccess->getAllMetricsFor(start, end);
+    dbaccess->connection().commit();
+    return results;
 }
 
 QList<SummaryMetrics>
