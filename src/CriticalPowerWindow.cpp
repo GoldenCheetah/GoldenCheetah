@@ -101,12 +101,23 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
 
     // redraw on config change -- this seems the simplest approach
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(rideSelected()));
+    connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
+    connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
 }
 
 void
-CriticalPowerWindow::newRideAdded()
+CriticalPowerWindow::newRideAdded(RideItem *here)
 {
-    // XXX
+    Season season = seasons.at(cComboSeason->currentIndex());
+
+    // Refresh global curve if a ride is added during those dates
+    if ((here->dateTime.date() >= season.getStart() || season.getStart() == QDate())
+        && (here->dateTime.date() <= season.getEnd() || season.getEnd() == QDate()))
+        cpintPlot->changeSeason(season.getStart(), season.getEnd());
+
+    // if visible make the changes visible
+    // rideSelected is easiest way
+    if (amVisible()) rideSelected();
 }
 
 void

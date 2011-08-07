@@ -41,7 +41,6 @@ class CriticalPowerWindow : public GcWindow
 
         CriticalPowerWindow(const QDir &home, MainWindow *parent);
 
-        void newRideAdded();
         void deleteCpiFile(QString filename);
 
         // set/get properties
@@ -56,6 +55,7 @@ class CriticalPowerWindow : public GcWindow
         }
 
     protected slots:
+        void newRideAdded(RideItem*);
         void cpintTimeValueEntered();
         void cpintSetCPButtonClicked();
         void pickerMoved(const QPoint &pos);
