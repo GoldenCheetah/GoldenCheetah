@@ -70,10 +70,8 @@ void StressCalculator::calculateStress(MainWindow *main, QString home, const QSt
     // get all metric data from the year 1900 - 3000
     QList<SummaryMetrics> results;
 
-    // refresh metrics
-    metricDB = new MetricAggregator(main, home, main->zones(), main->hrZones());
-    results = metricDB->getAllMetricsFor(QDateTime(QDate(1900,1,1)), QDateTime(QDate(3000,1,1)));
-    delete metricDB;
+    // get metrics
+    results = main->metricDB->getAllMetricsFor(QDateTime(QDate(1900,1,1)), QDateTime(QDate(3000,1,1)));
 
     if (results.count() == 0) return; // no ride files found
 
