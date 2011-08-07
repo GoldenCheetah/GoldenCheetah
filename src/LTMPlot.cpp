@@ -225,7 +225,6 @@ LTMPlot::setData(LTMSettings *set)
     }
 
     // setup the curves
-    int count=0;
     double width = appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble();
     bool donestack = false;
 
@@ -244,6 +243,7 @@ LTMPlot::setData(LTMSettings *set)
     int stackcounter = stackX.size()-1;
     for (int m=settings->metrics.count()-1; m>=0; m--) {
 
+        int count=0;
         MetricDetail metricDetail = settings->metrics[m];
 
         if (metricDetail.stack == false) continue;
@@ -386,13 +386,14 @@ LTMPlot::setData(LTMSettings *set)
 
         QVector<double> xdata, ydata;
 
+        int count;
         if (settings->groupBy != LTM_TOD)
             createCurveData(settings, metricDetail, xdata, ydata, count);
         else
             createTODCurveData(settings, metricDetail, xdata, ydata, count);
 
         // no data to plot!
-        if (count <= 0) continue;
+        // if (count <= 0) continue; //XXX
 
         // Create a curve
         QwtPlotCurve *current = new QwtPlotCurve(metricDetail.uname);
@@ -599,6 +600,8 @@ LTMPlot::setData(LTMSettings *set)
             // histogram columns look nice.
             // and shift all the x-values left by 0.5 so that
             // they centre over x-axis labels
+            count = xdata.size()-2;
+
             int i=0;
             for (i=0; i<count; i++) xdata[i] -= 0.5;
             // now add a final 0 value to get the last
