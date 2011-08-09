@@ -310,8 +310,8 @@ class PeakPowerHr : public RideMetric {
 
             foreach(const RideFilePoint *point, ride->dataPoints()) {
                 if (point->secs >= start && point->secs < stop) {
-                    hr = point->hr + (points>0?hr/points:0);
                     points++;
+                    hr = (point->hr + (points-1)*hr) / (points);
                 }
             }
         }
