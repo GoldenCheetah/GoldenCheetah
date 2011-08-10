@@ -28,7 +28,21 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     clicked(NULL), dropPending(false), chartCursor(-2), loaded(false)
 {
     setInstanceName("Home Window");
-    setControls(new QStackedWidget(this));
+
+    // setup control area
+    QWidget *cw = new QWidget(this);
+    QVBoxLayout *cl = new QVBoxLayout(cw);
+    QLabel *titleLabel = new QLabel("Title", this);
+    QHBoxLayout *hl = new QHBoxLayout;
+
+    titleEdit = new QLineEdit(this);
+    controlStack = new QStackedWidget(this);
+    hl->addWidget(titleLabel);
+    hl->addWidget(titleEdit);
+    cl->addLayout(hl);
+    cl->addWidget(controlStack);
+    setControls(cw);
+
     setProperty("isManager", true);
     setAcceptDrops(true);
 
@@ -184,6 +198,7 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
 #else
     connect(styleSelector, SIGNAL(currentIndexChanged(int)), SLOT(styleChanged(int)));
 #endif
+    connect(titleEdit, SIGNAL(textChanged(const QString&)), SLOT(titleChanged()));
 
     // watch drop operations
     //setMouseTracking(true);
@@ -240,6 +255,24 @@ HomeWindow::selected()
 }
 
 void
+HomeWindow::titleChanged()
+{
+    if (titleEdit->text() != charts[controlStack->currentIndex()]->property("title").toString()) {
+
+        // set the title property
+        charts[controlStack->currentIndex()]->setProperty("title", titleEdit->text());
+
+        // rename the tab
+        if (!currentStyle) {
+            tabbed->setTabText(controlStack->currentIndex(), titleEdit->text());
+        }
+
+        // repaint to reflect
+        charts[controlStack->currentIndex()]->repaint();
+    }
+}
+
+void
 HomeWindow::rideSelected()
 {
     if (amVisible()) {
@@ -267,7 +300,8 @@ HomeWindow::tabSelected(int index)
     if (index >= 0) {
         charts[index]->show();
         charts[index]->setProperty("ride", property("ride"));
-        dynamic_cast<QStackedWidget*>(controls())->setCurrentIndex(index);
+        controlStack->setCurrentIndex(index);
+        titleEdit->setText(charts[index]->property("title").toString());
     }
 }
 
@@ -280,13 +314,12 @@ HomeWindow::tabMoved(int to, int from)
     charts[from] = orig;
 
     // re-order the controls
-    QStackedWidget *stack = dynamic_cast<QStackedWidget*>(controls());
-    stack->blockSignals(true);
-    QWidget *w = stack->widget(from);
-    stack->removeWidget(w);
-    stack->insertWidget(to, w);
-    stack->setCurrentIndex(to);
-    stack->blockSignals(false);
+    controlStack->blockSignals(true);
+    QWidget *w = controlStack->widget(from);
+    controlStack->removeWidget(w);
+    controlStack->insertWidget(to, w);
+    controlStack->setCurrentIndex(to);
+    controlStack->blockSignals(false);
 }
 
 void
@@ -434,15 +467,13 @@ HomeWindow::addChart(GcWindow* newone)
         //GcWindow *newone = GcWindowRegistry::newGcWindow(GcWindows[i].id, mainWindow);
 
         // add the controls
-        QStackedWidget *m = dynamic_cast<QStackedWidget*>(controls());
-
         QWidget *x = dynamic_cast<GcWindow*>(newone)->controls();
         QWidget *c = (x != NULL) ? x : new QWidget(this);
 
         if (currentStyle == 2 && chartCursor >= 0)
-            m->insertWidget(chartCursor, c);
+            controlStack->insertWidget(chartCursor, c);
         else
-            m->addWidget(c);
+            controlStack->addWidget(c);
 
         // watch for enter events!
         newone->installEventFilter(this);
@@ -540,8 +571,8 @@ HomeWindow::removeChart(int num)
     if (clicked == charts[num]) clicked=NULL;
 
     // remove the controls
-    QWidget *m = dynamic_cast<QStackedWidget*>(controls())->widget(num);
-    if (m) dynamic_cast<QStackedWidget*>(controls())->removeWidget(m);
+    QWidget *m = controlStack->widget(num);
+    if (m) controlStack->removeWidget(m);
 
     switch(currentStyle) {
         case 0 : // delete tab and widget
@@ -652,7 +683,10 @@ HomeWindow::eventFilter(QObject *object, QEvent *e)
 
                 // if we havent clicked on a chart lets set the controls
                 // on a mouse over
-                if (!clicked) dynamic_cast<QStackedWidget*>(controls())->setCurrentIndex(i);
+                if (!clicked) {
+                    controlStack->setCurrentIndex(i);
+                    titleEdit->setText(charts[i]->property("title").toString());
+                }
 
                 // paint the border!
                 charts[i]->repaint();
@@ -697,7 +731,8 @@ HomeWindow::eventFilter(QObject *object, QEvent *e)
                             charts[i]->setProperty("active", true);
                             charts[i]->repaint();
                             clicked = charts[i];
-                            dynamic_cast<QStackedWidget*>(controls())->setCurrentIndex(i);
+                            controlStack->setCurrentIndex(i);
+                            titleEdit->setText(charts[i]->property("title").toString());
 
                         } else { // already clicked so unclick it (toggle)
                             charts[i]->setProperty("active", false);
@@ -795,16 +830,16 @@ HomeWindow::windowMoved(GcWindow*w)
         for (;before < charts.count(); before++) {
             if (charts[before] == w) {
                 QWidget *m = winFlow->takeAt(before)->widget();
-                QWidget *c = dynamic_cast<QStackedWidget*>(controls())->widget(before);
-                dynamic_cast<QStackedWidget*>(controls())->removeWidget(c);
+                QWidget *c = controlStack->widget(before);
+                controlStack->removeWidget(c);
                 QWidget *l = charts.takeAt(before);
                 if (chartCursor > before) chartCursor--;
                 if (chartCursor >= 0) {
-                    dynamic_cast<QStackedWidget*>(controls())->insertWidget(chartCursor, c);
+                    controlStack->insertWidget(chartCursor, c);
                     winFlow->insert(chartCursor, m);
                     charts.insert(chartCursor, dynamic_cast<GcWindow*>(l));
                 } else {
-                    dynamic_cast<QStackedWidget*>(controls())->addWidget(c);
+                    controlStack->addWidget(c);
                     winFlow->addWidget(m);
                     charts.append(dynamic_cast<GcWindow*>(l));
                 }
