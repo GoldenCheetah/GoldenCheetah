@@ -370,7 +370,7 @@ void
 HomeWindow::dropEvent(QDropEvent *event)
 {
     QStandardItemModel model;
-    model.dropMimeData(event->mimeData(), Qt::CopyAction, 0,0, QModelIndex());
+    model.dropMimeData(event->mimeData(), Qt::CopyAction, -1,-1, QModelIndex());
     QString chart = model.data(model.index(0,0), Qt::DisplayRole).toString();
 
     dropPending = false;
@@ -381,6 +381,17 @@ HomeWindow::dropEvent(QDropEvent *event)
 
             event->accept();
 
+            GcWindow *newone = GcWindowRegistry::newGcWindow(GcWindows[i].id, mainWindow);
+            newone->setProperty("title", GcWindows[i].name);
+            newone->setProperty("widthFactor", (double)2.0);
+            newone->setProperty("heightFactor", (double)2.0);
+            newone->setProperty("GcWinID", GcWindows[i].id);
+            if (currentStyle == 2) newone->setResizable(true);
+            addChart(newone);
+            newone->show();
+            newone->setProperty("ride", property("ride"));
+            resizeEvent(NULL);
+#if 0
             // GcWindowDialog is delete on close, so no need to delete
             GcWindowDialog *f = new GcWindowDialog(GcWindows[i].id, mainWindow);
             GcWindow *newone = f->exec();
@@ -393,6 +404,7 @@ HomeWindow::dropEvent(QDropEvent *event)
 
             // now wipe it
             delete f;
+#endif
 
             // before we return lets turn the cursor off
             chartCursor = -2;
