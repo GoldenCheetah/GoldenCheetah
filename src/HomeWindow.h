@@ -64,6 +64,7 @@ class HomeWindow : public GcWindow
         void styleChanged(int);
         void addChart(GcWindow* newone);
         bool removeChart(int);
+        void titleChanged();
 
         // save / restore window state
         void saveState();
@@ -91,6 +92,8 @@ class HomeWindow : public GcWindow
 
         // top bar
         QLabel *title;
+        QLineEdit *titleEdit;
+
 #if 0
         QtMacSegmentedButton *styleSelector;
 #else
@@ -99,6 +102,7 @@ class HomeWindow : public GcWindow
         int currentStyle;
 
         QStackedWidget *style; // tab, freeform, tiled
+        QStackedWidget *controlStack; // window controls
 
         // each style has its own container widget
         QTabWidget *tabbed; 
