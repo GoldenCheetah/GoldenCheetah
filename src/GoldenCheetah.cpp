@@ -134,14 +134,6 @@ GcWindow::GcWindow()
     setContentsMargins(0,0,0,0);
     setResizable(false);
     setMouseTracking(true);
-
-    if (appsettings->value(this, GC_DROPSHADOW, false).toBool()) {
-        QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
-        shadow->setBlurRadius(20);
-        shadow->setXOffset(10);
-        shadow->setYOffset(10);
-        setGraphicsEffect(shadow);
-    }
 }
 
 GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
@@ -155,14 +147,6 @@ GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
     setContentsMargins(0,0,0,0);
     setResizable(false);
     setMouseTracking(true);
-
-    if (appsettings->value(this, GC_DROPSHADOW, true).toBool()) {
-        QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
-        shadow->setBlurRadius(20);
-        shadow->setXOffset(10);
-        shadow->setYOffset(10);
-        setGraphicsEffect(shadow);
-    }
 }
 
 GcWindow::~GcWindow()
