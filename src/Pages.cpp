@@ -1149,8 +1149,6 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     shadeZones->setChecked(appsettings->value(this, GC_SHADEZONES, true).toBool());
     antiAliased = new QCheckBox;
     antiAliased->setChecked(appsettings->value(this, GC_ANTIALIAS, false).toBool());
-    dropShadowed = new QCheckBox;
-    dropShadowed->setChecked(appsettings->value(this, GC_DROPSHADOW, true).toBool());
     lineWidth = new QDoubleSpinBox;
     lineWidth->setMaximum(5);
     lineWidth->setMinimum(0.5);
@@ -1160,7 +1158,6 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 
     QLabel *lineWidthLabel = new QLabel(tr("Line Width"));
     QLabel *antialiasLabel = new QLabel(tr("Antialias" ));
-    QLabel *dropshadowLabel = new QLabel(tr("Drop shadows" ));
     QLabel *shadeZonesLabel = new QLabel(tr("Shade Zones" ));
 
     QLabel *defaultLabel = new QLabel(tr("Default"));
@@ -1245,12 +1242,10 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 
     grid->addWidget(lineWidthLabel, 0,3);
     grid->addWidget(antialiasLabel, 1,3);
-    grid->addWidget(dropshadowLabel, 2,3);
-    grid->addWidget(shadeZonesLabel, 3,3);
+    grid->addWidget(shadeZonesLabel, 2,3);
     grid->addWidget(lineWidth, 0,4, Qt::AlignVCenter|Qt::AlignLeft);
     grid->addWidget(antiAliased, 1,4, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget(dropShadowed, 2,4, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget(shadeZones, 3,4, Qt::AlignVCenter|Qt::AlignLeft);
+    grid->addWidget(shadeZones, 2,4, Qt::AlignVCenter|Qt::AlignLeft);
     grid->addWidget(reset, 5,4, Qt::AlignVCenter|Qt::AlignRight);
 
     grid->addWidget(defaultLabel, 0,0);
@@ -1317,7 +1312,6 @@ ColorsPage::saveClicked()
 {
     appsettings->setValue(GC_LINEWIDTH, lineWidth->value());
     appsettings->setValue(GC_ANTIALIAS, antiAliased->isChecked());
-    appsettings->setValue(GC_DROPSHADOW, dropShadowed->isChecked());
     appsettings->setValue(GC_SHADEZONES, shadeZones->isChecked());
 
     // run down and get the current colors and save
