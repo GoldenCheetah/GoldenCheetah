@@ -33,7 +33,7 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   QHBoxLayout *cLayout      = new QHBoxLayout;
 
   // Plot:
-  aerolab = new Aerolab(this);
+  aerolab = new Aerolab(this, mainWindow);
 
   // Left controls layout:
   QVBoxLayout *leftControls  =  new QVBoxLayout;
@@ -63,11 +63,14 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   QHBoxLayout *cdaLayout = new QHBoxLayout;
   QLabel *cdaLabel = new QLabel(tr("CdA"), this);
   cdaLabel->setFixedWidth(labelWidth1);
-  cdaQLCDNumber    = new QLCDNumber(7);
+  cdaLineEdit = new QLineEdit();
+  cdaLineEdit->setFixedWidth(50);
+  cdaLineEdit->setText(QString("%1").arg(aerolab->getCda()) );
+  /*cdaQLCDNumber    = new QLCDNumber(7);
   cdaQLCDNumber->setMode(QLCDNumber::Dec);
   cdaQLCDNumber->setSmallDecimalPoint(false);
   cdaQLCDNumber->setSegmentStyle(QLCDNumber::Flat);
-  cdaQLCDNumber->display(QString("%1").arg(aerolab->getCda()) );
+  cdaQLCDNumber->display(QString("%1").arg(aerolab->getCda()) );*/
   cdaSlider = new QSlider(Qt::Horizontal);
   cdaSlider->setTickPosition(QSlider::TicksBelow);
   cdaSlider->setTickInterval(100);
@@ -75,7 +78,8 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   cdaSlider->setMaximum(6000);
   cdaSlider->setValue(aerolab->intCda());
   cdaLayout->addWidget( cdaLabel );
-  cdaLayout->addWidget( cdaQLCDNumber );
+  //cdaLayout->addWidget( cdaQLCDNumber );
+  cdaLayout->addWidget( cdaLineEdit );
   cdaLayout->addWidget( cdaSlider );
 
   // Eta:
@@ -157,16 +161,28 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   eoffsetSlider->setTickPosition(QSlider::TicksBelow);
   eoffsetSlider->setTickInterval(1000);
   eoffsetSlider->setMinimum(-30000);
-  eoffsetSlider->setMaximum(30000);
+  eoffsetSlider->setMaximum(100000);
   eoffsetSlider->setValue(aerolab->intEoffset());
   eoffsetLayout->addWidget( eoffsetLabel );
   eoffsetLayout->addWidget( eoffsetQLCDNumber );
   eoffsetLayout->addWidget( eoffsetSlider );
 
+  QCheckBox *eoffsetAuto = new QCheckBox(tr("eoffset auto"), this);
+  eoffsetAuto->setCheckState(Qt::Checked);
+  eoffsetLayout->addWidget(eoffsetAuto);
+
+  QHBoxLayout *smoothLayout = new QHBoxLayout;
+  QComboBox *comboDistance = new QComboBox();
+  comboDistance->addItem(tr("X Axis Shows Time"));
+  comboDistance->addItem(tr("X Axis Shows Distance"));
+  comboDistance->setCurrentIndex(1);
+  smoothLayout->addWidget(comboDistance);
+
   // Add to leftControls:
   rightControls->addLayout( mLayout );
   rightControls->addLayout( rhoLayout );
   rightControls->addLayout( eoffsetLayout );
+  rightControls->addLayout( smoothLayout );
 
 
   // Assemble controls layout:
@@ -180,25 +196,66 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
                             | QwtPicker::CornerToCorner);
   allZoomer->setTrackerMode(QwtPicker::AlwaysOff);
   allZoomer->setEnabled(true);
+  allZoomer->setMousePattern( QwtEventPattern::MouseSelect2, Qt::RightButton, Qt::ControlModifier );
+  allZoomer->setMousePattern( QwtEventPattern::MouseSelect3, Qt::RightButton );
 
   // SIGNALs to SLOTs:
   connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
   connect(crrSlider, SIGNAL(valueChanged(int)),this, SLOT(setCrrFromSlider()));
   connect(cdaSlider, SIGNAL(valueChanged(int)), this, SLOT(setCdaFromSlider()));
+  connect(cdaLineEdit, SIGNAL(textChanged(const QString)), this, SLOT(setCdaFromText(const QString)));
   connect(mSlider, SIGNAL(valueChanged(int)),this, SLOT(setTotalMassFromSlider()));
   connect(rhoSlider, SIGNAL(valueChanged(int)), this, SLOT(setRhoFromSlider()));
   connect(etaSlider, SIGNAL(valueChanged(int)), this, SLOT(setEtaFromSlider()));
   connect(eoffsetSlider, SIGNAL(valueChanged(int)), this, SLOT(setEoffsetFromSlider()));
+  connect(eoffsetAuto, SIGNAL(stateChanged(int)), this, SLOT(setAutoEoffset(int)));
+  connect(comboDistance, SIGNAL(currentIndexChanged(int)), this, SLOT(setByDistance(int)));
   connect(mainWindow, SIGNAL(configChanged()), aerolab, SLOT(configChanged()));
   connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
+  connect(mainWindow, SIGNAL( intervalSelected() ), this, SLOT(intervalSelected()));
+  connect(allZoomer, SIGNAL( zoomed(const QwtDoubleRect) ), this, SLOT(zoomChanged()));
+
 
   // Build the tab layout:
   vLayout->addWidget(aerolab);
   vLayout->addLayout(cLayout);
   setLayout(vLayout);
 
+
+  // tooltip on hover over point
+  //************************************
+    aerolab->tooltip = new LTMToolTip( QwtPlot::xBottom,
+                                       QwtPlot::yLeft,
+                                       QwtPicker::PointSelection,
+                                       QwtPicker::VLineRubberBand,
+                                       QwtPicker::AlwaysOn,
+                                       aerolab->canvas(),
+                                       ""
+                                     );
+    aerolab->tooltip->setSelectionFlags( QwtPicker::PointSelection | QwtPicker::RectSelection | QwtPicker::DragSelection);
+    aerolab->tooltip->setRubberBand( QwtPicker::VLineRubberBand );
+    aerolab->tooltip->setMousePattern( QwtEventPattern::MouseSelect1, Qt::LeftButton, Qt::ShiftModifier );
+    aerolab->tooltip->setTrackerPen( QColor( Qt::black ) );
+    QColor inv( Qt::white );
+    inv.setAlpha( 0 );
+    aerolab->tooltip->setRubberBandPen( inv );
+    aerolab->tooltip->setEnabled( true );
+    aerolab->_canvasPicker = new LTMCanvasPicker( aerolab );
+
+    connect( aerolab->_canvasPicker, SIGNAL( pointHover( QwtPlotCurve*, int ) ),
+             aerolab,                SLOT  ( pointHover( QwtPlotCurve*, int ) ) );
+
+
   configChanged(); // pickup colors etc
 }
+
+void
+AerolabWindow::zoomChanged()
+{
+    RideItem *ride = mainWindow->rideItem();
+    aerolab->setData(ride, false);
+}
+
 
 void
 AerolabWindow::configChanged()
@@ -217,7 +274,10 @@ AerolabWindow::rideSelected() {
   if (!ride)
     return;
 
+
+
   aerolab->setData(ride, true);
+
   allZoomer->setZoomBase();
 }
 
@@ -233,11 +293,24 @@ AerolabWindow::setCrrFromSlider() {
 }
 
 void
+AerolabWindow::setCdaFromText(const QString text) {
+  int value = 10000 * text.toDouble();
+  if (aerolab->intCda() != value) {
+    aerolab->setIntCda(value);
+    //cdaQLCDNumber->display(QString("%1").arg(aerolab->getCda()));
+    cdaSlider->setValue(aerolab->intCda());
+    RideItem *ride = mainWindow->rideItem();
+    aerolab->setData(ride, false);
+  }
+}
+
+void
 AerolabWindow::setCdaFromSlider() {
 
   if (aerolab->intCda() != cdaSlider->value()) {
     aerolab->setIntCda(cdaSlider->value());
-    cdaQLCDNumber->display(QString("%1").arg(aerolab->getCda()));
+    //cdaQLCDNumber->display(QString("%1").arg(aerolab->getCda()));
+    cdaLineEdit->setText(QString("%1").arg(aerolab->getCda()) );
     RideItem *ride = mainWindow->rideItem();
     aerolab->setData(ride, false);
   }
@@ -287,6 +360,23 @@ AerolabWindow::setEoffsetFromSlider() {
   }
 }
 
+void
+AerolabWindow::setAutoEoffset(int value)
+{
+    aerolab->setAutoEoffset(value);
+}
+
+void
+AerolabWindow::setByDistance(int value)
+{
+    aerolab->setByDistance(value);
+    // refresh
+    RideItem *ride = mainWindow->rideItem();
+    aerolab->setData(ride, false);
+}
+
+
+
 
 void
 AerolabWindow::zoomInterval(IntervalItem *which) {
@@ -302,5 +392,35 @@ AerolabWindow::zoomInterval(IntervalItem *which) {
   rect.setTop(aerolab->veCurve->maxYValue()*1.1);
   rect.setBottom(aerolab->veCurve->minYValue()-10);
   allZoomer->zoom(rect);
+
+  aerolab->recalc(false);
 }
 
+void AerolabWindow::intervalSelected()
+{
+    if ( mainWindow->activeTab() != this )
+    {
+        return;
+    }
+
+    RideItem *ride = mainWindow->rideItem();
+    if ( !ride )
+    {
+        return;
+    }
+
+    // set the elevation data
+    aerolab->setData( ride, true );
+}
+
+double AerolabWindow::getCanvasTop() const
+{
+    const QwtDoubleRect &canvasRect = allZoomer->zoomRect();
+    return canvasRect.top();
+}
+
+double AerolabWindow::getCanvasBottom() const
+{
+    const QwtDoubleRect &canvasRect = allZoomer->zoomRect();
+    return canvasRect.bottom();
+}

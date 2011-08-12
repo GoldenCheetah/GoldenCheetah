@@ -17,6 +17,7 @@
  */
 
 #include "Aerolab.h"
+#include "AerolabWindow.h"
 #include "MainWindow.h"
 #include "RideFile.h"
 #include "RideItem.h"
@@ -42,11 +43,193 @@ max(double a, double b) { if (a > b) return a; else return b; }
 static inline double
 min(double a, double b) { if (a < b) return a; else return b; }
 
-Aerolab::Aerolab(QWidget *parent):
+
+/*----------------------------------------------------------------------
+ * Interval plotting
+ *--------------------------------------------------------------------*/
+
+class IntervalAerolabData : public QwtData
+{
+    public:
+        Aerolab *aerolab;
+        MainWindow *mainWindow;
+        IntervalAerolabData
+        (
+            Aerolab    *aerolab,
+            MainWindow *mainWindow
+        ) : aerolab( aerolab ), mainWindow( mainWindow ) { }
+
+        double x( size_t ) const;
+        double y( size_t ) const;
+        size_t size() const;
+        virtual QwtData *copy() const;
+
+        void init();
+
+        IntervalItem *intervalNum( int ) const;
+
+        int intervalCount() const;
+};
+
+/*
+ * HELPER FUNCTIONS:
+ *    intervalNum - returns a pointer to the nth selected interval
+ *    intervalCount - returns the number of highlighted intervals
+ */
+// ------------------------------------------------------------------------------------------------------------
+// note this is operating on the children of allIntervals and not the
+// intervalWidget (QTreeWidget) -- this is why we do not use the
+// selectedItems() member. N starts a one not zero.
+// ------------------------------------------------------------------------------------------------------------
+IntervalItem *IntervalAerolabData::intervalNum
+(
+    int number
+) const
+{
+    int                    highlighted  = 0;
+    const QTreeWidgetItem *allIntervals = mainWindow->allIntervalItems();
+    for ( int ii = 0; ii < allIntervals->childCount(); ii++)
+
+    {
+        IntervalItem *current = (IntervalItem *) allIntervals->child( ii );
+
+        if ( current == NULL)
+        {
+            return NULL;
+        }
+        if ( current->isSelected() == true )
+        {
+            ++highlighted;
+        }
+        if ( highlighted == number )
+        {
+            return current;
+        }
+    }
+
+    return NULL;
+}
+
+// ------------------------------------------------------------------------------------------------------------
+// how many intervals selected?
+// ------------------------------------------------------------------------------------------------------------
+int IntervalAerolabData::intervalCount() const
+{
+    int highlighted = 0;
+
+    if ( mainWindow->allIntervalItems() != NULL )
+    {
+        const QTreeWidgetItem *allIntervals = mainWindow->allIntervalItems();
+        for ( int ii = 0; ii < allIntervals->childCount(); ii++)
+        {
+            IntervalItem *current = (IntervalItem *) allIntervals->child( ii );
+            if ( current != NULL )
+            {
+                if ( current->isSelected() == true )
+                {
+                    ++highlighted;
+                }
+            }
+        }
+    }
+    return highlighted;
+}
+/*
+ * INTERVAL HIGHLIGHTING CURVE
+ * IntervalAerolabData - implements the qwtdata interface where
+ *                    x,y return point co-ordinates and
+ *                    size returns the number of points
+ */
+// The interval curve data is derived from the intervals that have
+// been selected in the MainWindow leftlayout for each selected
+// interval we return 4 data points; bottomleft, topleft, topright
+// and bottom right.
+//
+// the points correspond to:
+// bottom left = interval start, 0 watts
+// top left = interval start, maxwatts
+// top right = interval stop, maxwatts
+// bottom right = interval stop, 0 watts
+//
+double IntervalAerolabData::x
+(
+    size_t number
+) const
+{
+    // for each interval there are four points, which interval is this for?
+    // interval numbers start at 1 not ZERO in the utility functions
+
+    double result = 0;
+
+    int interval_no = number ? 1 + number / 4 : 1;
+    // get the interval
+    IntervalItem *current = intervalNum( interval_no );
+
+    if ( current != NULL )
+    {
+        double multiplier = aerolab->useMetricUnits ? 1 : MILES_PER_KM;
+        // which point are we returning?
+//qDebug() << "number = " << number << endl;
+        switch ( number % 4 )
+        {
+            case 0 : result = aerolab->bydist ? multiplier * current->startKM : current->start/60; // bottom left
+                 break;
+            case 1 : result = aerolab->bydist ? multiplier * current->startKM : current->start/60; // top left
+                 break;
+            case 2 : result = aerolab->bydist ? multiplier * current->stopKM  : current->stop/60;  // bottom right
+                 break;
+            case 3 : result = aerolab->bydist ? multiplier * current->stopKM  : current->stop/60;  // top right
+                 break;
+        }
+    }
+    return result;
+}
+double IntervalAerolabData::y
+(
+    size_t number
+) const
+{
+    // which point are we returning?
+    double result = 0;
+    switch ( number % 4 )
+    {
+        case 0 : result = -5000;  // bottom left
+                 break;
+        case 1 : result = 5000;  // top left - set to out of bound value
+                 break;
+        case 2 : result = 5000;  // top right - set to out of bound value
+                 break;
+        case 3 : result = -5000;  // bottom right
+                 break;
+    }
+    return result;
+}
+
+size_t IntervalAerolabData::size() const
+{
+    return intervalCount() * 4;
+}
+
+QwtData *IntervalAerolabData::copy() const
+{
+    return new IntervalAerolabData( aerolab, mainWindow );
+}
+
+
+//**********************************************
+//**        END IntervalAerolabData           **
+//**********************************************
+
+
+Aerolab::Aerolab(
+    AerolabWindow *parent,
+    MainWindow    *mainWindow
+):
   QwtPlot(parent),
+  parent(parent),
   unit(0),
   rideItem(NULL),
-  smooth(1), bydist(false) {
+  smooth(1), bydist(true), autoEoffset(true) {
 
   crr       = 0.005;
   cda       = 0.500;
@@ -69,8 +252,18 @@ Aerolab::Aerolab(QWidget *parent):
   setAxisScale(xBottom, 0, 60);
 
   veCurve = new QwtPlotCurve(tr("V-Elevation"));
-
   altCurve = new QwtPlotCurve(tr("Elevation"));
+
+  // get rid of nasty blank space on right of the plot
+  veCurve->setYAxis( yLeft );
+  altCurve->setYAxis( yLeft );
+
+  intervalHighlighterCurve = new QwtPlotCurve();
+  intervalHighlighterCurve->setBaseline(-5000);
+  intervalHighlighterCurve->setYAxis( yLeft );
+  intervalHighlighterCurve->setData( IntervalAerolabData( this, mainWindow ) );
+  intervalHighlighterCurve->attach( this );
+  this->legend()->remove( intervalHighlighterCurve ); // don't show in legend
 
   grid = new QwtPlotGrid();
   grid->enableX(false);
@@ -78,6 +271,7 @@ Aerolab::Aerolab(QWidget *parent):
 
   configChanged();
 }
+
 
 void
 Aerolab::configChanged()
@@ -93,6 +287,16 @@ Aerolab::configChanged()
   QPen gridPen(GColor(CPLOTGRID));
   gridPen.setStyle(Qt::DotLine);
   grid->setPen(gridPen);
+
+  QPen ihlPen = QPen( GColor( CINTERVALHIGHLIGHTER ) );
+  ihlPen.setWidth(1);
+  intervalHighlighterCurve->setPen( ihlPen );
+
+  QColor ihlbrush = QColor(GColor(CINTERVALHIGHLIGHTER));
+  ihlbrush.setAlpha(40);
+  intervalHighlighterCurve->setBrush(ihlbrush);   // fill below the line
+
+  this->legend()->remove( intervalHighlighterCurve ); // don't show in legend
 }
 
 void
@@ -158,7 +362,7 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
       if ( arrayLength == 0 )
         e = eoffset;
 
-      timeArray[arrayLength]  = p1->secs;
+      timeArray[arrayLength]  = p1->secs / 60.0;
       if ( have_recorded_alt_curve )
         altArray[arrayLength] = (useMetricUnits
                    ? p1->alt
@@ -173,8 +377,13 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
       }
       double f     = 0.0;
       double a     = 0.0;
-      d += v * dt;
-      distanceArray[arrayLength] = d/1000;
+
+      // Use km data insteed of formula for file with a stop (gap).
+      //d += v * dt;
+      //distanceArray[arrayLength] = d/1000;
+
+      distanceArray[arrayLength] = p1->km;
+
 
 
       if( v > small_number ) {
@@ -201,13 +410,33 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
       veCurve->setVisible(false);
       altCurve->setVisible(false);
   }
-
     recalc(new_zoom);
+    adjustEoffset();
   } else {
     setTitle("no data");
 
   }
 }
+
+void
+Aerolab::adjustEoffset() {
+
+    if (autoEoffset && !altArray.empty()) {
+        double idx = axisScaleDiv( QwtPlot::xBottom )->lowerBound();
+        parent->eoffsetSlider->setEnabled(false);
+
+        if (bydist) {
+            int v = 100*(altArray.at(rideItem->ride()->distanceIndex(idx))-veArray.at(rideItem->ride()->distanceIndex(idx)));
+            parent->eoffsetSlider->setValue(intEoffset()+v);
+        }
+        else {
+            int v = 100*(altArray.at(rideItem->ride()->timeIndex(60*idx))-veArray.at(rideItem->ride()->timeIndex(60*idx)));
+            parent->eoffsetSlider->setValue(intEoffset()+v);
+        }
+    } else
+        parent->eoffsetSlider->setEnabled(true);
+}
+
 
 struct DataPoint {
   double time, hr, watts, speed, cad, alt;
@@ -235,8 +464,7 @@ Aerolab::recalc( bool new_zoom ) {
     return;
   }
 
-
-  QVector<double> &xaxis = distanceArray;
+  QVector<double> &xaxis = (bydist?distanceArray:timeArray);
   int startingIndex = 0;
   int totalPoints   = arrayLength - startingIndex;
 
@@ -251,9 +479,12 @@ Aerolab::recalc( bool new_zoom ) {
   }
 
   if( new_zoom )
-    setAxisScale(xBottom, 0.0, totalRideDistance);
+      setAxisScale(xBottom, 0.0, (bydist?totalRideDistance:rideTimeSecs));
 
-  setYMax();
+
+
+  setYMax(new_zoom );
+  refreshIntervalMarkers();
 
   replot();
 }
@@ -261,19 +492,75 @@ Aerolab::recalc( bool new_zoom ) {
 
 
 void
-Aerolab::setYMax() {
+Aerolab::setYMax(bool new_zoom)
+{
+          if (veCurve->isVisible())
+          {
 
-  if (veCurve->isVisible()) {
-    setAxisTitle(yLeft, tr("Elevation"));
+             if ( useMetricUnits )
+
+             {
+
+                 setAxisTitle( yLeft, "Elevation (m)" );
+
+             }
+
+             else
+
+             {
+
+                 setAxisTitle( yLeft, "Elevation (')" );
+
+             }
+
+            double minY = 0.0;
+            double maxY = 0.0;
+
+            //************
+
+  //if (veCurve->isVisible()) {
+   // setAxisTitle(yLeft, tr("Elevation"));
     if ( !altArray.empty() ) {
-      setAxisScale(yLeft,
-             min( veCurve->minYValue(), altCurve->minYValue() ) - 10,
-             10.0 + max( veCurve->maxYValue(), altCurve->maxYValue() ) );
+   //   setAxisScale(yLeft,
+   //          min( veCurve->minYValue(), altCurve->minYValue() ) - 10,
+   //          10.0 + max( veCurve->maxYValue(), altCurve->maxYValue() ) );
+
+        minY = min( veCurve->minYValue(), altCurve->minYValue() ) - 10;
+        maxY = 10.0 + max( veCurve->maxYValue(), altCurve->maxYValue() );
+
     } else {
-      setAxisScale(yLeft,
-             veCurve->minYValue() ,
-             1.05 * veCurve->maxYValue() );
+      //setAxisScale(yLeft,
+      //       veCurve->minYValue() ,
+      //       1.05 * veCurve->maxYValue() );
+
+        if ( new_zoom )
+
+              {
+
+                minY = veCurve->minYValue();
+
+                maxY = veCurve->maxYValue();
+
+              }
+
+              else
+
+              {
+
+                minY = parent->getCanvasTop();
+
+                maxY = parent->getCanvasBottom();
+
+              }
+
+              //adjust eooffset
+              // TODO
+
+
+
     }
+
+    setAxisScale( yLeft, minY, maxY );
     setAxisLabelRotation(yLeft,270);
     setAxisLabelAlignment(yLeft,Qt::AlignVCenter);
   }
@@ -292,12 +579,18 @@ Aerolab::setXTitle() {
     setAxisTitle(xBottom, tr("Time (minutes)"));
 }
 
+void
+Aerolab::setAutoEoffset(int value)
+{
+    autoEoffset = value;
+    adjustEoffset();
+}
 
 void
-Aerolab::setByDistance() {
-  bydist = true;
+Aerolab::setByDistance(int value) {
+  bydist = value;
   setXTitle();
-  recalc(false);
+  recalc(true);
 }
 
 
@@ -387,4 +680,73 @@ Aerolab::setIntEoffset(
 
   eoffset = (double) value / 100.0;
   recalc(false);
+}
+
+
+
+
+
+
+
+
+
+
+void Aerolab::pointHover (QwtPlotCurve *curve, int index)
+{
+    if ( index >= 0 && curve != intervalHighlighterCurve )
+    {
+        double x_value = curve->x( index );
+        double y_value = curve->y( index );
+        // output the tooltip
+
+        QString text = QString( "%1 %2 %3 %4 %5" )
+              . arg( this->axisTitle( curve->xAxis() ).text() )
+              . arg( x_value, 0, 'f', 3 )
+              . arg( "\n" )
+              . arg( this->axisTitle( curve->yAxis() ).text() )
+              . arg( y_value, 0, 'f', 3 );
+
+        // set that text up
+        tooltip->setText( text );
+    }
+    else
+    {
+        // no point
+        tooltip->setText( "" );
+    }
+}
+
+void Aerolab::refreshIntervalMarkers()
+{
+    foreach( QwtPlotMarker *mrk, d_mrk )
+    {
+        mrk->detach();
+        delete mrk;
+    }
+    d_mrk.clear();
+
+    QRegExp wkoAuto("^(Peak *[0-9]*(s|min)|Entire workout|Find #[0-9]*) *\\([^)]*\\)$");
+    if ( rideItem->ride() )
+    {
+        foreach(const RideFileInterval &interval, rideItem->ride()->intervals()) {
+            // skip WKO autogenerated peak intervals
+            if (wkoAuto.exactMatch(interval.name))
+                continue;
+            QwtPlotMarker *mrk = new QwtPlotMarker;
+            d_mrk.append(mrk);
+            mrk->attach(this);
+            mrk->setLineStyle(QwtPlotMarker::VLine);
+            mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
+            mrk->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
+            QwtText text(interval.name);
+            text.setFont(QFont("Helvetica", 10, QFont::Bold));
+            text.setColor(GColor(CPLOTMARKER));
+            if (!bydist)
+                mrk->setValue(interval.start / 60.0, 0.0);
+            else
+                mrk->setValue((useMetricUnits ? 1 : MILES_PER_KM) *
+                                rideItem->ride()->timeToDistance(interval.start), 0.0);
+            mrk->setLabel(text);
+        }
+    }
 }

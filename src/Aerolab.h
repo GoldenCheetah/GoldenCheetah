@@ -22,6 +22,7 @@
 #include <qwt_plot.h>
 #include <qwt_data.h>
 #include <QtGui>
+#include "LTMWindow.h" // for tooltip/canvaspicker
 
 // forward references
 class RideItem;
@@ -31,31 +32,55 @@ class QwtPlotGrid;
 class QwtPlotMarker;
 class AerolabWindow;
 class MainWindow;
+class IntervalAerolabData;
+class LTMToolTip;
+class LTMCanvasPicker;
+
 
 class Aerolab : public QwtPlot {
 
   Q_OBJECT
 
   public:
-  Aerolab(QWidget *parent);
+  Aerolab( AerolabWindow *, MainWindow * );
   bool byDistance() const { return bydist; }
   bool useMetricUnits;  // whether metric units are used (or imperial)
   void setData(RideItem *_rideItem, bool new_zoom);
 
+  void refreshIntervalMarkers();
+
+  private:
+  AerolabWindow *parent;
+
+  LTMToolTip      *tooltip;
+  LTMCanvasPicker *_canvasPicker; // allow point selection/hover
+
+  void adjustEoffset();
+
   public slots:
-  void setByDistance();
+
+  void setAutoEoffset(int value);
+  void setByDistance(int value);
   void configChanged();
+
+  void pointHover( QwtPlotCurve *, int );
 
   signals:
 
   protected:
   friend class ::AerolabWindow;
+  friend class ::IntervalAerolabData;
+
+
   QVariant unit;
   QwtPlotGrid *grid;
+  QVector<QwtPlotMarker*> d_mrk;
 
   // One curve to plot in the Course Profile:
   QwtPlotCurve *veCurve;   // virtual elevation curve
   QwtPlotCurve *altCurve;    // recorded elevation curve, if available
+
+  QwtPlotCurve *intervalHighlighterCurve;  // highlight selected intervals on the Plot
 
   RideItem *rideItem;
 
@@ -72,6 +97,7 @@ class Aerolab : public QwtPlot {
 
   int smooth;
   bool bydist;
+  bool autoEoffset;
   int arrayLength;
   int iCrr;
   int iCda;
@@ -85,7 +111,7 @@ class Aerolab : public QwtPlot {
 
   double   slope(double, double, double, double, double, double, double);
   void     recalc(bool);
-  void     setYMax();
+  void     setYMax(bool);
   void     setXTitle();
   void     setIntCrr(int);
   void     setIntCda(int);
@@ -93,18 +119,20 @@ class Aerolab : public QwtPlot {
   void     setIntEta(int);
   void     setIntEoffset(int);
   void     setIntTotalMass(int);
-  double   getCrr() const { return (double)crr; };
-  double   getCda() const { return (double)cda; };
-  double   getTotalMass() const { return (double)totalMass; };
-  double   getRho() const { return (double)rho; };
-  double   getEta() const { return (double)eta; };
-  double   getEoffset() const { return (double)eoffset; };
-  int      intCrr() const { return (int)( crr * 1000000  ); };
-  int      intCda() const { return (int)( cda * 100000); };
-  int      intTotalMass() const { return (int)( totalMass * 100); };
-  int      intRho() const { return (int)( rho * 10000); };
-  int      intEta() const { return (int)( eta * 10000); };
-  int      intEoffset() const { return (int)( eoffset * 100); };
+  double   getCrr() const { return (double)crr; }
+  double   getCda() const { return (double)cda; }
+  double   getTotalMass() const { return (double)totalMass; }
+  double   getRho() const { return (double)rho; }
+  double   getEta() const { return (double)eta; }
+  double   getEoffset() const { return (double)eoffset; }
+  int      intCrr() const { return (int)( crr * 1000000  ); }
+  int      intCda() const { return (int)( cda * 10000); }
+  int      intTotalMass() const { return (int)( totalMass * 100); }
+  int      intRho() const { return (int)( rho * 10000); }
+  int      intEta() const { return (int)( eta * 10000); }
+  int      intEoffset() const { return (int)( eoffset * 100); }
+
+
 };
 
 #endif // _GC_Aerolab_h

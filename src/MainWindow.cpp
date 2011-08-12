@@ -1004,7 +1004,7 @@ MainWindow::showContextMenuPopup(const QPoint &pos)
         connect(actFrontInt, SIGNAL(triggered(void)), this, SLOT(frontInterval(void)));
         connect(actBackInt, SIGNAL(triggered(void)), this, SLOT(backInterval(void)));
 
-        if (tabWidget->currentWidget() == allPlotWindow)
+        if (tabWidget->currentWidget() == allPlotWindow || tabWidget->currentWidget() == aerolabWindow)
             menu.addAction(actZoomInt);
         menu.addAction(actRenameInt);
         menu.addAction(actDeleteInt);
@@ -1070,6 +1070,7 @@ void
 MainWindow::zoomInterval() {
     // zoom into this interval on allPlot
     allPlotWindow->zoomInterval(activeInterval);
+    aerolabWindow->zoomInterval(activeInterval);
 }
 
 void
