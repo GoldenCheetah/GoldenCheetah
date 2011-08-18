@@ -272,7 +272,7 @@ class MainWindow : public QMainWindow
 
         // Top-level views
         HomeWindow *homeWindow;
-        DiaryWindow *diaryWindow;
+        HomeWindow *diaryWindow;
         HomeWindow *trainWindow;
         HomeWindow *analWindow;
 

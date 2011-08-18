@@ -389,11 +389,8 @@ MainWindow::MainWindow(const QDir &home) :
     homeControls->setCurrentIndex(0);
 
     // DIARY WINDOW & CONTROLS
-#ifdef GC_HAVE_ICAL
-    diaryWindow = new DiaryWindow(this);
-    diaryWindow->setControls(new QWidget(this));
+    diaryWindow = new HomeWindow(this, "diary", "Diary");
     diaryControls->addWidget(diaryWindow->controls());
-#endif
 
     // TRAIN WINDOW & CONTROLS
     trainWindow = new HomeWindow(this, "train", "Training");
@@ -404,18 +401,7 @@ MainWindow::MainWindow(const QDir &home) :
     analWindow = new HomeWindow(this, "analysis", "Analysis");
     analysisControls->addWidget(analWindow->controls());
 
-    // DOCK DRAWER ON MAC
-#if 0 // on a mac the controls go into a dock drawer widget
-    // setup analysis window controls stack
-    dock = new QDockWidget("Tools", this, Qt::Drawer);
-    dock->hide();
-    dock->setAllowedAreas(Qt::LeftDockWidgetArea);
-    dock->setWidget(toolBox);
-    dock->setAcceptDrops(true);
-#endif
-
     // POPULATE TOOLBOX
-    //toolBox->addItem(treeWidget, "Rides");
     toolBox->addItem(listView, QIcon(":images/activity.png"), "Activity History");
     toolBox->addItem(intervalSplitter, QIcon(":images/stopwatch.png"), "Best Intervals and Laps");
     toolBox->addItem(masterControls, QIcon(":images/settings.png"), "Chart Settings");
@@ -434,12 +420,9 @@ MainWindow::MainWindow(const QDir &home) :
     // add all the layouts
     views->addWidget(analWindow);
     views->addWidget(trainWindow);
-#ifdef GC_HAVE_ICAL
     views->addWidget(diaryWindow);
-#else
-    views->addWidget(new QWidget(this)); // need to keep indexes consistent
-#endif
     views->addWidget(homeWindow);
+
     views->setCurrentIndex(0);          // default to Analysis
     views->setContentsMargins(0,0,0,0);
 
@@ -611,9 +594,7 @@ MainWindow::rideTreeWidgetSelectionChanged()
     _rideMetadata->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
     analWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
     homeWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
-#ifdef GC_HAVE_ICAL
     diaryWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
-#endif
     trainWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
 
     if (!ride) return;
@@ -753,6 +734,7 @@ MainWindow::closeEvent(QCloseEvent* event)
         analWindow->saveState();
         homeWindow->saveState();
         trainWindow->saveState();
+        diaryWindow->saveState();
 
         // clear the clipboard if neccessary
         QApplication::clipboard()->setText("");
@@ -877,6 +859,7 @@ MainWindow::selectDiary()
 {
     masterControls->setCurrentIndex(2);
     views->setCurrentIndex(2);
+    diaryWindow->selected(); // tell it!
 }
 
 void

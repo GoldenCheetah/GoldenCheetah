@@ -1,0 +1,11 @@
+<layout name="diary" style="2">
+	<chart id="4" name="Diary Window" title="Calendar" >
+		<property name="instanceName" type="QString" value="Diary Window" />
+		<property name="title" type="QString" value="Calendar" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="1.00033" />
+		<property name="heightFactor" type="double" value="1.0004" />
+		<property name="resizable" type="bool" value="1" />
+		<property name="view" type="int" value="0" />
+	</chart>
+</layout>
