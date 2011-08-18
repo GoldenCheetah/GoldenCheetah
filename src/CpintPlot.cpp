@@ -171,6 +171,10 @@ CpintPlot::setSeries(RideFile::SeriesType x)
             setAxisTitle(yLeft, tr("Skiba xPower (watts)"));
             break;
 
+        case RideFile::vam:
+            setAxisTitle(yLeft, tr("VAM (meters per hour)"));
+            break;
+
         default:
         case RideFile::watts:
             setAxisTitle(yLeft, tr("Average Power (watts)"));
@@ -467,8 +471,8 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
     // linear in interval duration--up to about 1 hour.
     double xmax = (series == RideFile::none)  ? 60.0 : time_values[n_values - 1];
 
-    if (series == RideFile::xPower || series == RideFile::NP)
-        thisPlot->setAxisScale(thisPlot->xBottom, (double) 0.017, (double)xmax);
+    if (series == RideFile::vam)
+        thisPlot->setAxisScale(thisPlot->xBottom, (double) 4.993, (double)xmax);
     else
         thisPlot->setAxisScale(thisPlot->xBottom, (double) 0.017, (double)xmax);
 
@@ -581,6 +585,11 @@ CpintPlot::calculate(RideItem *rideItem)
                         fill = (GColor(CHEARTRATE));
                         break;
 
+                    case RideFile::vam:
+                        line.setColor(GColor(CALTITUDE).darker(200));
+                        fill = (GColor(CALTITUDE));
+                        break;
+
                     default:
                     case RideFile::watts: // won't ever get here
                     case RideFile::NP:
@@ -603,6 +612,14 @@ CpintPlot::calculate(RideItem *rideItem)
                 }
                 if (ymin == 100000) ymin = 0;
 
+                // VAM is a bit special
+                if (series == RideFile::vam) {
+                    if (bests->meanMaxArray(series).size() > 300)
+                        ymax = bests->meanMaxArray(series)[300];
+                    else
+                        ymax = 2000;
+                }
+
                 ymax *= 1.1; // bit of headroom
                 ymin *= 0.9;
 
@@ -614,8 +631,8 @@ CpintPlot::calculate(RideItem *rideItem)
 
                 setAxisScale(yLeft, ymin, ymax);
 
-                if (series == RideFile::xPower || series == RideFile::NP)
-                    setAxisScale(xBottom, 0.017, xmax);
+                if (series == RideFile::vam)
+                    setAxisScale(xBottom, 4.993, xmax);
                 else
                     setAxisScale(xBottom, 0.017, xmax);
 

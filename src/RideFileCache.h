@@ -38,13 +38,14 @@ typedef double data_t;
 // arrays when plotting CP curves and histograms. It is precoputed
 // to save time and cached in a file .cpx
 //
-static const unsigned int RideFileCacheVersion = 4;
+static const unsigned int RideFileCacheVersion = 5;
 // revision history:
 // version  date         description
 // 1        29-Apr-11    Initial - header, mean-max & distribution data blocks
 // 2        02-May-11    Added LTHR/CP used to header and Time In Zone block
 // 3        02-May-11    Moved to float precision not integer.
 // 4        02-May-11    Moved to Mark Rages mean-max function with higher precision
+// 5        18-Aug-11    Added VAM mean maximals
 
 // The cache file (.cpx) has a binary format:
 // 1 x Header data - describing the version and contents of the cache
@@ -67,6 +68,7 @@ struct RideFileCacheHeader {
                  kphMeanMaxCount,
                  xPowerMeanMaxCount,
                  npMeanMaxCount,
+                 vamMeanMaxCount,
                  wattsDistCount,
                  hrDistCount,
                  cadDistCount,
@@ -169,6 +171,7 @@ class RideFileCache
         QVector<float> kphMeanMax; // RideFile::kph
         QVector<float> xPowerMeanMax; // RideFile::kph
         QVector<float> npMeanMax; // RideFile::kph
+        QVector<float> vamMeanMax; // RideFile::vam
         QVector<double> wattsMeanMaxDouble; // RideFile::watts
         QVector<double> hrMeanMaxDouble; // RideFile::hr
         QVector<double> cadMeanMaxDouble; // RideFile::cad
@@ -176,6 +179,7 @@ class RideFileCache
         QVector<double> kphMeanMaxDouble; // RideFile::kph
         QVector<double> xPowerMeanMaxDouble; // RideFile::kph
         QVector<double> npMeanMaxDouble; // RideFile::kph
+        QVector<double> vamMeanMaxDouble; // RideFile::kph
         QVector<QDate> wattsMeanMaxDate; // RideFile::watts
         QVector<QDate> hrMeanMaxDate; // RideFile::hr
         QVector<QDate> cadMeanMaxDate; // RideFile::cad
@@ -183,6 +187,7 @@ class RideFileCache
         QVector<QDate> kphMeanMaxDate; // RideFile::kph
         QVector<QDate> xPowerMeanMaxDate; // RideFile::kph
         QVector<QDate> npMeanMaxDate; // RideFile::kph
+        QVector<QDate> vamMeanMaxDate; // RideFile::vam
 
         //
         // SAMPLE DISTRIBUTION

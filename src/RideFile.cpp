@@ -74,6 +74,7 @@ RideFile::seriesName(SeriesType series)
     case RideFile::lat: return QString(tr("Latitude"));
     case RideFile::headwind: return QString(tr("Headwind"));
     case RideFile::interval: return QString(tr("Interval"));
+    case RideFile::vam: return QString(tr("VAM"));
     default: return QString(tr("Unknown"));
     }
 }
@@ -98,6 +99,7 @@ RideFile::unitName(SeriesType series)
     case RideFile::lat: return QString(tr("lat"));
     case RideFile::headwind: return QString(tr("kph"));
     case RideFile::interval: return QString(tr("Interval"));
+    case RideFile::vam: return QString(tr("meters per hour"));
     default: return QString(tr("Unknown"));
     }
 }
@@ -496,6 +498,7 @@ RideFile::decimalsFor(SeriesType series)
         case lat : return 6; break;
         case headwind : return 4; break;
         case interval : return 0; break;
+        case vam : return 0; break;
         case none : break;
     }
     return 2; // default
@@ -519,6 +522,7 @@ RideFile::maximumFor(SeriesType series)
         case lat : return 90; break;
         case headwind : return 999; break;
         case interval : return 999; break;
+        case vam : return 9999; break;
         case none : break;
     }
     return 9999; // default
@@ -542,6 +546,7 @@ RideFile::minimumFor(SeriesType series)
         case lat : return -90; break;
         case headwind : return -999; break;
         case interval : return 0; break;
+        case vam : return 0; break;
         case none : break;
     }
     return 0; // default
