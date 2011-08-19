@@ -36,6 +36,7 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     QHBoxLayout *hl = new QHBoxLayout;
 
     titleEdit = new QLineEdit(this);
+    titleEdit->setEnabled(false);
     controlStack = new QStackedWidget(this);
     hl->addWidget(titleLabel);
     hl->addWidget(titleEdit);
@@ -257,6 +258,8 @@ HomeWindow::selected()
 void
 HomeWindow::titleChanged()
 {
+    if (charts.count() == 0) return;
+
     if (titleEdit->text() != charts[controlStack->currentIndex()]->property("title").toString()) {
 
         // set the title property
@@ -545,6 +548,14 @@ HomeWindow::addChart(GcWindow* newone)
         connect(newone, SIGNAL(resized(GcWindow*)), this, SLOT(windowResized(GcWindow*)));
         connect(newone, SIGNAL(moved(GcWindow*)), this, SLOT(windowMoved(GcWindow*)));
     }
+
+    // enable disable
+    if (charts.count()) titleEdit->setEnabled(true);
+    else {
+        titleEdit->setEnabled(false);
+        titleEdit->setText("");
+    }
+
     active = false;
 }
 
@@ -591,6 +602,13 @@ HomeWindow::removeChart(int num)
     charts.removeAt(num);
 
     update();
+
+    if (charts.count()) titleEdit->setEnabled(true);
+    else {
+        titleEdit->setEnabled(false);
+        titleEdit->setText("");
+    }
+
     return true;
 }
 
