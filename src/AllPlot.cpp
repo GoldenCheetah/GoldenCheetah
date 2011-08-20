@@ -427,89 +427,116 @@ AllPlot::recalc()
             altCurve->setData(data, data);
         return;
     }
-    double totalWatts = 0.0;
-    double totalHr = 0.0;
-    double totalSpeed = 0.0;
-    double totalCad = 0.0;
-    double totalDist = 0.0;
-    double totalAlt = 0.0;
+    // we should only smooth the curves if smoothed rate is greater than sample rate
+    if (smooth > rideItem->ride()->recIntSecs()) {
 
-    QList<DataPoint> list;
+        double totalWatts = 0.0;
+        double totalHr = 0.0;
+        double totalSpeed = 0.0;
+        double totalCad = 0.0;
+        double totalDist = 0.0;
+        double totalAlt = 0.0;
 
-    smoothWatts.resize(rideTimeSecs + 1); //(rideTimeSecs + 1);
-    smoothHr.resize(rideTimeSecs + 1);
-    smoothSpeed.resize(rideTimeSecs + 1);
-    smoothCad.resize(rideTimeSecs + 1);
-    smoothTime.resize(rideTimeSecs + 1);
-    smoothDistance.resize(rideTimeSecs + 1);
-    smoothAltitude.resize(rideTimeSecs + 1);
+        QList<DataPoint> list;
 
-    for (int secs = 0; ((secs < smooth)
-                        && (secs < rideTimeSecs)); ++secs) {
-        smoothWatts[secs] = 0.0;
-        smoothHr[secs]    = 0.0;
-        smoothSpeed[secs] = 0.0;
-        smoothCad[secs]   = 0.0;
-        smoothTime[secs]  = secs / 60.0;
-        smoothDistance[secs]  = 0.0;
-        smoothAltitude[secs]  = 0.0;
-    }
+        smoothWatts.resize(rideTimeSecs + 1); //(rideTimeSecs + 1);
+        smoothHr.resize(rideTimeSecs + 1);
+        smoothSpeed.resize(rideTimeSecs + 1);
+        smoothCad.resize(rideTimeSecs + 1);
+        smoothTime.resize(rideTimeSecs + 1);
+        smoothDistance.resize(rideTimeSecs + 1);
+        smoothAltitude.resize(rideTimeSecs + 1);
 
-    int i = 0;
-    for (int secs = smooth; secs <= rideTimeSecs; ++secs) {
-        while ((i < arrayLength) && (timeArray[i] <= secs)) {
-            DataPoint dp(timeArray[i],
-                         (!hrArray.empty() ? hrArray[i] : 0),
-                         (!wattsArray.empty() ? wattsArray[i] : 0),
-                         (!speedArray.empty() ? speedArray[i] : 0),
-                         (!cadArray.empty() ? cadArray[i] : 0),
-                         (!altArray.empty() ? altArray[i] : 0));
-            if (!wattsArray.empty())
-                totalWatts += wattsArray[i];
-            if (!hrArray.empty())
-                totalHr    += hrArray[i];
-            if (!speedArray.empty())
-                totalSpeed += speedArray[i];
-            if (!cadArray.empty())
-                totalCad   += cadArray[i];
-            if (!altArray.empty())
-                totalAlt   += altArray[i];
-            totalDist   = distanceArray[i];
-            list.append(dp);
-            ++i;
-        }
-        while (!list.empty() && (list.front().time < secs - smooth)) {
-            DataPoint &dp = list.front();
-            totalWatts -= dp.watts;
-            totalHr    -= dp.hr;
-            totalSpeed -= dp.speed;
-            totalCad   -= dp.cad;
-            totalAlt   -= dp.alt;
-            list.removeFirst();
-        }
-        // TODO: this is wrong.  We should do a weighted average over the
-        // seconds represented by each point...
-        if (list.empty()) {
+        for (int secs = 0; ((secs < smooth)
+                            && (secs < rideTimeSecs)); ++secs) {
             smoothWatts[secs] = 0.0;
             smoothHr[secs]    = 0.0;
             smoothSpeed[secs] = 0.0;
             smoothCad[secs]   = 0.0;
-            smoothAltitude[secs]   = smoothAltitude[secs - 1];
+            smoothTime[secs]  = secs / 60.0;
+            smoothDistance[secs]  = 0.0;
+            smoothAltitude[secs]  = 0.0;
         }
-        else {
-            smoothWatts[secs]    = totalWatts / list.size();
-            smoothHr[secs]       = totalHr / list.size();
-            smoothSpeed[secs]    = totalSpeed / list.size();
-            smoothCad[secs]      = totalCad / list.size();
-            smoothAltitude[secs]      = totalAlt / list.size();
+
+        int i = 0;
+        for (int secs = smooth; secs <= rideTimeSecs; ++secs) {
+            while ((i < arrayLength) && (timeArray[i] <= secs)) {
+                DataPoint dp(timeArray[i],
+                             (!hrArray.empty() ? hrArray[i] : 0),
+                             (!wattsArray.empty() ? wattsArray[i] : 0),
+                             (!speedArray.empty() ? speedArray[i] : 0),
+                             (!cadArray.empty() ? cadArray[i] : 0),
+                             (!altArray.empty() ? altArray[i] : 0));
+                if (!wattsArray.empty())
+                    totalWatts += wattsArray[i];
+                if (!hrArray.empty())
+                    totalHr    += hrArray[i];
+                if (!speedArray.empty())
+                    totalSpeed += speedArray[i];
+                if (!cadArray.empty())
+                    totalCad   += cadArray[i];
+                if (!altArray.empty())
+                    totalAlt   += altArray[i];
+                totalDist   = distanceArray[i];
+                list.append(dp);
+                ++i;
+            }
+            while (!list.empty() && (list.front().time < secs - smooth)) {
+                DataPoint &dp = list.front();
+                totalWatts -= dp.watts;
+                totalHr    -= dp.hr;
+                totalSpeed -= dp.speed;
+                totalCad   -= dp.cad;
+                totalAlt   -= dp.alt;
+                list.removeFirst();
+            }
+            // TODO: this is wrong.  We should do a weighted average over the
+            // seconds represented by each point...
+            if (list.empty()) {
+                smoothWatts[secs] = 0.0;
+                smoothHr[secs]    = 0.0;
+                smoothSpeed[secs] = 0.0;
+                smoothCad[secs]   = 0.0;
+                smoothAltitude[secs]   = smoothAltitude[secs - 1];
+            }
+            else {
+                smoothWatts[secs]    = totalWatts / list.size();
+                smoothHr[secs]       = totalHr / list.size();
+                smoothSpeed[secs]    = totalSpeed / list.size();
+                smoothCad[secs]      = totalCad / list.size();
+                smoothAltitude[secs]      = totalAlt / list.size();
+            }
+            smoothDistance[secs] = totalDist;
+            smoothTime[secs]  = secs / 60.0;
         }
-        smoothDistance[secs] = totalDist;
-        smoothTime[secs]  = secs / 60.0;
+
+    } else {
+
+        // no smoothing .. just raw data
+        smoothWatts.resize(0);
+        smoothHr.resize(0);
+        smoothSpeed.resize(0);
+        smoothCad.resize(0);
+        smoothTime.resize(0);
+        smoothDistance.resize(0);
+        smoothAltitude.resize(0);
+
+        foreach (RideFilePoint *dp, rideItem->ride()->dataPoints()) {
+            smoothWatts.append(dp->watts);
+            smoothHr.append(dp->hr);
+            smoothSpeed.append(useMetricUnits ? dp->kph : dp->kph * MILES_PER_KM);
+            smoothCad.append(dp->cad);
+            smoothTime.append(dp->secs/60);
+            smoothDistance.append(useMetricUnits ? dp->km : dp->km * MILES_PER_KM);
+            smoothAltitude.append(useMetricUnits ? dp->alt : dp->alt * FEET_PER_METER);
+
+        }
     }
 
     QVector<double> &xaxis = bydist ? smoothDistance : smoothTime;
-    int startingIndex = qMin(smooth, rideTimeSecs);
-    int totalPoints = rideTimeSecs + 1 - startingIndex;
+    int startingIndex = qMin(smooth, xaxis.count());
+    int totalPoints = xaxis.count() - startingIndex;
+
     // set curves
     if (!wattsArray.empty())
         wattsCurve->setData(xaxis.data() + startingIndex, smoothWatts.data() + startingIndex, totalPoints);
