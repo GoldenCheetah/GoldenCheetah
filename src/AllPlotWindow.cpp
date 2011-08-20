@@ -673,6 +673,7 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
             showSpeed->setChecked(dataPresent->kph);
             showCad->setChecked(dataPresent->cad);
             showAlt->setChecked(dataPresent->alt);
+
     } else {
             showPower->setEnabled(false);
             showHr->setEnabled(false);
@@ -687,6 +688,8 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
     else shade = false;
     allPlot->setShadeZones(shade);
     foreach (AllPlot *plot, allPlots) plot->setShadeZones(shade);
+    allPlot->showGrid(showGrid->checkState());
+    foreach (AllPlot *plot, allPlots) plot->showGrid(showGrid->checkState());
 
     // set the SpanSlider for the ride length, by default
     // show the entire ride (the user can adjust later)
@@ -1082,6 +1085,8 @@ AllPlotWindow::setShowAlt(int value)
 void
 AllPlotWindow::setShowGrid(int value)
 {
+    showGrid->setChecked(value);
+
     if (!current) return;
 
     allPlot->showGrid(value);
