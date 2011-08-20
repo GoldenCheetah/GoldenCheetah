@@ -47,12 +47,7 @@ setWarnOnConvert(bool setting)
 static bool
 warnExit()
 {
-    bool setting;
-
-    QVariant warnsetting = appsettings->value(NULL, GC_WARNEXIT);
-    if (warnsetting.isNull()) setting = true;
-    else setting = warnsetting.toBool();
-    return setting;
+    return appsettings->value(NULL, GC_WARNEXIT, true).toBool();
 }
 
 void
