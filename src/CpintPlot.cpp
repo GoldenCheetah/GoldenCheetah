@@ -76,6 +76,10 @@ CpintPlot::CpintPlot(MainWindow *main, QString p, const Zones *zones) :
     grid->enableX(true);
     grid->attach(this);
 
+    curveTitle.attach(this);
+    curveTitle.setXValue(5);
+    curveTitle.setYValue(20);
+
     zoomer = new penTooltip(this->canvas());
     zoomer->setMousePattern(QwtEventPattern::MouseSelect1,
                             Qt::LeftButton, Qt::ShiftModifier);
@@ -341,6 +345,7 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
 #else
     curve_title.sprintf("CP=%.0f W; AWC=%.0f kJ", cp, cp * tau * 60.0 / 1000.0);
 #endif
+    if (series == RideFile::watts) curveTitle.setLabel(QwtText(curve_title, QwtText::PlainText));
 
     CPCurve = new QwtPlotCurve(curve_title);
     if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
@@ -506,6 +511,7 @@ CpintPlot::calculate(RideItem *rideItem)
     //
     // PLOT MODEL CURVE (DERIVED)
     //
+    curveTitle.setLabel(QwtText("", QwtText::PlainText)); // default to no title
     if (series == RideFile::xPower || series == RideFile::NP || series == RideFile::watts || series == RideFile::none) {
 
         if (bests->meanMaxArray(series).size() > 1) {

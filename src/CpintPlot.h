@@ -24,6 +24,7 @@
 
 #include <qwt_plot.h>
 #include <qwt_plot_zoomer.h>
+#include <qwt_plot_marker.h>
 #include <QtGui>
 
 class QwtPlotCurve;
@@ -108,6 +109,7 @@ class CpintPlot : public QwtPlot
         QwtPlotCurve *CPCurve;
         QList<QwtPlotCurve*> allCurves;
         QwtPlotCurve *allCurve; // bests but not zoned
+        QwtPlotMarker curveTitle;
         QList<QwtPlotMarker*> allZoneLabels;
         void clear_CP_Curves();
         QStringList filterForSeason(QStringList cpints, QDate startDate, QDate endDate);
