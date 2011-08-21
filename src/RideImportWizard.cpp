@@ -29,6 +29,7 @@
 #include "GcRideFile.h"
 #include "JsonRideFile.h"
 #include "TcxRideFile.h"
+#include "MetricAggregator.h"
 
 
 // drag and drop passes urls ... convert to a list of files and call main constructor
@@ -237,7 +238,7 @@ RideImportWizard::process()
 
             if (suffixes.exactMatch(thisfile.suffix())) {
 
-        // Woot. We know how to parse this baby
+                // Woot. We know how to parse this baby
                 tableWidget->item(i,5)->setText(tr("Queued"));
 
             } else {
@@ -648,6 +649,45 @@ struct cpi_file_info {
     QString file, inname, outname;
 };
 
+static QStringList
+findDuplicates(QString filename)
+{
+    // does this ride already exist?
+    // either the full name is a match
+    // or the same name but different
+    // filetype: e.g. xxx.gc matches xxx.tcx
+    QStringList duplicates;
+
+    // get a list of possible duplicates (files we support)
+    QString basename = QFileInfo(filename).baseName();
+    QStringList filters;
+    foreach (QString ext, RideFileFactory::instance().suffixes()) {
+        QString check = basename + "." + ext;
+        filters << check;
+    }
+
+    // check if any matched (case insensitive)
+    QFlags<QDir::Filter> spec = QDir::Files;
+#ifdef Q_OS_WIN32
+    spec |= QDir::Hidden;
+#endif
+    // get list and convert to full path
+    foreach(QString name, QFileInfo(filename).dir().entryList(filters, spec, QDir::Name)) {
+        duplicates << QFileInfo(filename).dir().path() + "/" + name;
+    }
+
+    return duplicates;
+}
+
+static void
+removeDuplicate(QString filename)
+{
+    // rename to .bak, if that already exists
+    // then wipe it first
+    QString backup = filename + ".bak";
+    QFile(backup).remove(); // wipe it, if it is there
+    QFile(filename).rename(backup);
+}
 
 void
 RideImportWizard::abortClicked()
@@ -657,12 +697,18 @@ RideImportWizard::abortClicked()
     QString label = abortButton->text();
 
     if (label == tr("Abort")) {
+        hide();
+        mainWindow->isclean = false;
+        mainWindow->metricDB->refreshMetrics();
         aborted=true; // terminated. I'll be back.
         return;
     }
 
     if (label == tr("Finish")) {
-       // phew. our work is done.
+       // phew. our work is done. -- lets force an update stats...
+       hide();
+       mainWindow->isclean = false;
+       mainWindow->metricDB->refreshMetrics();
        done(0);
        return;
     }
@@ -737,12 +783,20 @@ RideImportWizard::abortClicked()
         // if its a gc file we need to parse and serialize
         // using the ridedatetime and target filename
         if (filenames[i].endsWith(".gc", Qt::CaseInsensitive) ||
-            filenames[i].endsWith(",json", Qt::CaseInsensitive)) {
+            filenames[i].endsWith(".json", Qt::CaseInsensitive)) {
 
-            bool existed;
-            if ((existed=QFileInfo(fulltarget).exists()) && !overwriteFiles) {
+            QStringList duplicates;
+
+            // CHECK FOR DUPLICATE
+            duplicates = findDuplicates(fulltarget);
+            if (duplicates.count() && !overwriteFiles) {
                 tableWidget->item(i,5)->setText(tr("Error - File exists"));
             } else {
+
+                // wipe away the duplicate
+                foreach(QString duplicate, duplicates) {
+                    removeDuplicate(duplicate); // we do not use removeRide coz it clashes
+                }
 
                 // read the file (again)
                 QStringList errors;
@@ -766,7 +820,7 @@ RideImportWizard::abortClicked()
                 // clear
                 delete ride;
 
-                if (existed) {
+                if (duplicates.count()) {
                     tableWidget->item(i,5)->setText(tr("File Overwritten"));
                 } else {
                     tableWidget->item(i,5)->setText(tr("File Saved"));
@@ -781,16 +835,22 @@ RideImportWizard::abortClicked()
             // so now we have sourcefile in 'filenames[i]' and target file name in 'target'
             if (!fulltarget.compare(filenames[i])) { // they are the same file! so skip copy
                 tableWidget->item(i,5)->setText(tr("Error - Source is Target"));
-            } else if (QFileInfo(fulltarget).exists()) {
+
+            // CHECK FOR DUPLICATE
+            } else if (findDuplicates(fulltarget).count()) {
                 if (overwriteFiles) {
+
+                    // wipe away that duplicate
+                    foreach(QString duplicate, findDuplicates(fulltarget)) {
+                        removeDuplicate(duplicate);
+                    }
+
                     tableWidget->item(i,5)->setText(tr("Overwriting file..."));
                     QFile source(filenames[i]);
                     QString fulltargettmp(home.absolutePath() + tr("/") + targetnosuffix + tr(".tmp"));
 
                     if (source.copy(fulltargettmp)) {
-                        // tmp version saved now zap original
-                        QFile original(fulltarget);
-                        original.remove(); // zap!
+
                         // mv tmp to target
                         QFile temp(fulltargettmp);
                         if (temp.rename(fulltarget)) {
