@@ -121,9 +121,6 @@ class MainWindow : public QMainWindow
         SpecialFields specialFields;
         int session;
         bool isclean;
-        QSplitter *getSplitter() { return splitter; }
-        GcWindowRegistry chartFoundry;
-
 
         // *********************************************
         // APPLICATION EVENTS
