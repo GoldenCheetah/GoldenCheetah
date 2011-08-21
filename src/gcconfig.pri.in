@@ -6,6 +6,15 @@ BOOST_INSTALL = /usr/local/boost
 SRMIO_INSTALL = /usr/local/srmio
 D2XX_INCLUDE = /usr/local/include/D2XX
 
+#let us know where flex/bison are for compiling JSON support (mandatory)
+#QMAKE_LEX  = flex
+#QMAKE_YACC = bison
+#win32 {
+#  QMAKE_YACC = bison --file-prefix=y -t
+#  QMAKE_MOVE = cmd /c move
+#  QMAKE_DEL_FILE = rm -f
+#}
+
 # If you want Twitter support you must install liboauth
 # http://liboauth.sourceforge.net/
 # Set the path to where liboauth.a was installed

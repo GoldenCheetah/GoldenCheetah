@@ -125,6 +125,7 @@ HEADERS += \
         HistogramWindow.h \
         HrZones.h \
         IntervalItem.h \
+        JsonRideFile.h \
         LogTimeScaleDraw.h \
         LogTimeScaleEngine.h \
         LTMCanvasPicker.h \
@@ -201,6 +202,13 @@ HEADERS += \
         WkoRideFile.h \
         Zones.h \
         ZoneScaleDraw.h
+
+YACCSOURCES = JsonRideFile.y
+LEXSOURCES = JsonRideFile.l
+
+#-t turns on debug, use with caution
+#QMAKE_YACCFLAGS = -t -d
+
 
 SOURCES += \
         AerobicDecoupling.cpp \
