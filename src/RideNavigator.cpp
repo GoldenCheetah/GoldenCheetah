@@ -197,6 +197,12 @@ RideNavigator::refresh()
 }
 
 void
+RideNavigator::resizeEvent(QResizeEvent*)
+{
+    setWidth(geometry().width());
+}
+
+void
 RideNavigator::setWidth(int x)
 {
     active = true;
@@ -280,7 +286,7 @@ RideNavigator::event(QEvent *e)
 {
     if (e->type() == QEvent::WindowActivate) {
         active=false;
-        setWidth(main->getSplitter()->sizes()[0]); // calculate width...
+        setWidth(geometry().width()); // calculate width...
     }
     return QWidget::event(e);
 }
@@ -314,7 +320,7 @@ RideNavigator::columnsChanged()
 
     // clean up
     active = false;
-    setWidth(main->getSplitter()->sizes()[0]); // calculate width...
+    setWidth(geometry().width()); // calculate width...
     appsettings->setCValue(main->cyclist, GC_NAVHEADINGWIDTHS, widths);
 }
 
@@ -625,7 +631,7 @@ RideNavigator::removeColumn()
     tableView->setColumnHidden(currentColumn, true);
     active = false;
     
-    setWidth(main->getSplitter()->sizes()[0]); // calculate width...
+    setWidth(geometry().width()); // calculate width...
     columnsChanged(); // need to do after, just once
 }
 
