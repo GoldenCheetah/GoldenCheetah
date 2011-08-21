@@ -1099,7 +1099,7 @@ GcWindowDialog::GcWindowDialog(GcWinID type, MainWindow *mainWindow) : mainWindo
     title = new QLineEdit(this);
     chartLayout->addWidget(title);
 
-    win = mainWindow->chartFoundry.newGcWindow(type, mainWindow);
+    win = GcWindowRegistry::newGcWindow(type, mainWindow);
     chartLayout->addWidget(win);
 
     controlLayout = new QFormLayout;
