@@ -17,6 +17,11 @@ profile
 moc_*
 qrc_application.cpp
 
+# ignore lex/yacc generated files
+*_lex.cpp
+*_yacc.cpp
+*_yacc.h
+
 # ignore other object files
 *.o
 
