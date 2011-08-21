@@ -121,6 +121,13 @@ MacroDevice::download( const QDir &tmpdir,
 
     MacroPacket response = MacroPacket();
     response.read(dev, 2, err);
+
+    if (response.payload.size() == 0)
+    {
+        err = "no data";
+        return false;
+    }
+
     char count = response.payload.at(0);
 
     if (count == 0)
