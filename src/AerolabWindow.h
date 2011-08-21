@@ -38,18 +38,25 @@ class AerolabWindow : public QWidget {
   AerolabWindow(MainWindow *mainWindow);
   void setData(RideItem *ride);
   void zoomInterval(IntervalItem *); // zoom into a specified interval
+  double getCanvasTop() const;
+  double getCanvasBottom() const;
 
+  QSlider *eoffsetSlider;
 
   public slots:
   void setCrrFromSlider();
   void setCdaFromSlider();
+  void setCdaFromText(const QString text);
   void setTotalMassFromSlider();
   void setRhoFromSlider();
   void setEtaFromSlider();
   void setEoffsetFromSlider();
+  void setAutoEoffset(int value);
+  void setByDistance(int value);
   void rideSelected();
+  void zoomChanged();
   void configChanged();
-
+  void intervalSelected();
 
   protected slots:
 
@@ -74,7 +81,7 @@ class AerolabWindow : public QWidget {
   QSlider *etaSlider;
   QLineEdit *etaLineEdit;
   QLCDNumber *etaQLCDNumber;
-  QSlider *eoffsetSlider;
+
   QLineEdit *eoffsetLineEdit;
   QLCDNumber *eoffsetQLCDNumber;
 
