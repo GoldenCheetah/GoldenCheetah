@@ -333,6 +333,9 @@ HomeWindow::styleChanged(int id)
 
     active = true;
 
+    // block updates as it is butt ugly
+    setUpdatesEnabled(false);
+
     // move the windows from there current
     // position to there new position
     for (int i=0; i<charts.count(); i++) {
@@ -390,6 +393,9 @@ HomeWindow::styleChanged(int id)
 
     if (currentStyle == 0 && charts.count()) tabSelected(0);
     resizeEvent(NULL); // XXX watch out in case resize event uses this!!
+
+    // now refresh as we are done
+    setUpdatesEnabled(true);
     update();
 }
 
