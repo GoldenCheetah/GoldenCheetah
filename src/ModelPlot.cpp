@@ -999,7 +999,7 @@ ModelPlot::ModelPlot(MainWindow *parent, ModelSettings *settings) : QFrame(paren
 
     layout = new QVBoxLayout;
     setLineWidth(1);
-    setFrameStyle(QFrame::Box | QFrame::Raised);
+    setFrameStyle(QFrame::NoFrame);
     setContentsMargins(0,0,0,0);
     basicModelPlot = new BasicModelPlot(parent, settings);
     layout->addWidget(basicModelPlot);
