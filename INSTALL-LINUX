@@ -233,9 +233,26 @@ Download the tarball from http://qwtplot3d.svn.sourceforge.net/viewvc/qwtplot3d/
 and unarchive it into your Projects directory using archive manager. There is no version number it just creates a
 subdirectory called qwtplot3d
 
-$ cd ~/Projects/qwtplot3d
+You will need to install libgl and extensions, this can be done with;
+$ sudo apt-get install libgl1-mesa-dev
+$ sudo apt-get install libglu-dev
 
-XXX - TODO - Natty Narwhal has funky OpenGL libs XXX will sort this later!
+$ cd ~/Projects/qwtplot3d
+Edit the qwtplot3d.pri and add
+CONFIG += staticlib
+
+then build
+$ qmake
+$ make
+
+Then to let gc know where the qwtplot3d libs are you need to edit gcconfig.pri;
+$ cd ~/Projects/Live/GoldenCheetah/src
+$ vi gcconfig.pri
+
+And uncomment the following line and set the install directory to where you build
+QWT3D_INSTALL = ~/Projects/qwtplot3d
+
+
 
 LIBKML - For export to Google Earth
 -----------------------------------
