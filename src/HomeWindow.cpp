@@ -246,6 +246,8 @@ HomeWindow::configChanged()
 void
 HomeWindow::selected()
 {
+    setUpdatesEnabled(false);
+
     if (loaded == false) {
         restoreState();
         loaded = true;
@@ -253,6 +255,9 @@ HomeWindow::selected()
 
     resizeEvent(NULL); // force a relayout
     rideSelected();
+
+    setUpdatesEnabled(true);
+    update();
 }
 
 void
