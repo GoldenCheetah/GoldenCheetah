@@ -340,6 +340,7 @@ HomeWindow::styleChanged(int id)
 
     // block updates as it is butt ugly
     setUpdatesEnabled(false);
+    tabbed->hide(); //XXX QTABWidget setUpdatesEnabled bug (?)
 
     // move the windows from there current
     // position to there new position
@@ -391,6 +392,8 @@ HomeWindow::styleChanged(int id)
         }
 
     }
+
+    tabbed->show(); // XXX QTabWidget setUpdatesEnabled bug (?)
     currentStyle = id;
     style->setCurrentIndex(currentStyle);
 
