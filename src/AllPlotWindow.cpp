@@ -920,15 +920,15 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
             }
         }
         QString s("\n%1%2 %3 %4\n%5%6 %7%8 %9%10");
-        s = s.arg(useMetricUnits ? distance2-distance1 : (distance2-distance1)*MILES_PER_KM, 0, 'f', 1);
-        s = s.arg((useMetricUnits? "km":"m"));
+        s = s.arg(useMetricUnits ? distance2-distance1 : (distance2-distance1)*MILES_PER_KM, 0, 'f', 2);
+        s = s.arg((useMetricUnits? "km":"mi"));
         s = s.arg(time_to_string(duration2-duration1));
         if (duration2-duration1-secsMoving>1)
             s = s.arg("("+time_to_string(secsMoving)+")");
         else
             s = s.arg("");
         s = s.arg((useMetricUnits ? 1 : MILES_PER_KM) * (distance2-distance1)/secsMoving*3600, 0, 'f', 1);
-        s = s.arg((useMetricUnits? "km/h":"m/h"));
+        s = s.arg((useMetricUnits? "km/h":"mph"));
         if (wattsTotal>0) {
             s = s.arg(wattsTotal/arrayLength, 0, 'f', 1);
             s = s.arg("W");
