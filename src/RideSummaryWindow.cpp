@@ -284,8 +284,8 @@ RideSummaryWindow::htmlSummary() const
     // Time In Zones HR
     //
     if (rideItem->numHrZones() > 0) {
-        QVector<double> time_in_zone(rideItem->numZones());
-        for (int i = 0; i < rideItem->numZones(); ++i)
+        QVector<double> time_in_zone(rideItem->numHrZones());
+        for (int i = 0; i < rideItem->numHrZones(); ++i)
             time_in_zone[i] = metrics.getForSymbol(timeInZonesHR[i]);
         summary += tr("<h3>Heart Rate Zones</h3>");
         summary += mainWindow->hrZones()->summarize(rideItem->hrZoneRange(), time_in_zone);
