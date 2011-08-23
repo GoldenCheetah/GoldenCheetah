@@ -393,7 +393,6 @@ HomeWindow::styleChanged(int id)
 
     }
 
-    tabbed->show(); // XXX QTabWidget setUpdatesEnabled bug (?)
     currentStyle = id;
     style->setCurrentIndex(currentStyle);
 
@@ -404,6 +403,8 @@ HomeWindow::styleChanged(int id)
 
     // now refresh as we are done
     setUpdatesEnabled(true);
+    tabbed->show(); // XXX QTabWidget setUpdatesEnabled bug (?)
+                    //     and resize artefact too.. tread carefully.
     update();
 }
 
