@@ -139,13 +139,6 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
 #endif
 
     tabLayout->addWidget(tabbed);
-    if (appsettings->value(this, GC_DROPSHADOW, true).toBool()) {
-        QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect(this);
-        shadow->setBlurRadius(20);
-        shadow->setXOffset(10);
-        shadow->setYOffset(10);
-        tabbed->setGraphicsEffect(shadow);
-    }
     style->addWidget(tabArea);
 
     // tiled
