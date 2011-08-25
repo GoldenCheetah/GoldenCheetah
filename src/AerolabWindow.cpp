@@ -350,6 +350,7 @@ AerolabWindow::setCdaFromSlider() {
   if (aerolab->intCda() != cdaSlider->value()) {
     aerolab->setIntCda(cdaSlider->value());
     //cdaQLCDNumber->display(QString("%1").arg(aerolab->getCda()));
+    cdaLineEdit->setText(QString("%1").arg(aerolab->getCda()) );
     RideItem *ride = myRideItem;
     aerolab->setData(ride, false);
   }
