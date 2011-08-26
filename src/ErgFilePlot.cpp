@@ -44,6 +44,7 @@ ErgFilePlot::ErgFilePlot(QList<ErgFilePoint> *data)
 
     //insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setCanvasBackground(Qt::white);
+    canvas()->setFrameStyle(QFrame::NoFrame);
     courseData = data;                      // what we plot
     Now = 0;                                // where we are
 

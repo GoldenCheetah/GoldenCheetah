@@ -167,6 +167,7 @@ class RealtimePlot : public QwtPlot
 #endif
 
     public:
+    void setAxisTitle(int axis, QString label);
     Realtime30PwrData pwr30Data;
     RealtimePwrData pwrData;
     RealtimeSpdData spdData;

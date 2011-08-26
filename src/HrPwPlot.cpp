@@ -28,6 +28,7 @@
 #include <assert.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
+#include <qwt_plot_canvas.h>
 #include <qwt_plot_marker.h>
 #include <qwt_text.h>
 #include <qwt_symbol.h>
@@ -48,6 +49,7 @@ HrPwPlot::HrPwPlot(MainWindow *mainWindow, HrPwWindow *hrPwWindow) :
     unit(settings.value(GC_UNIT))
 {
     setCanvasBackground(Qt::white);
+    canvas()->setFrameStyle(QFrame::NoFrame);
     setXTitle(); // Power (Watts)
 
     // Linear Regression Curve
