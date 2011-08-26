@@ -24,6 +24,7 @@
 
 #include <assert.h>
 #include <qwt_plot_curve.h>
+#include <qwt_plot_canvas.h>
 #include <qwt_plot_grid.h>
 #include <qwt_plot_marker.h>
 #include <qwt_text.h>
@@ -36,7 +37,8 @@ static double inline max(double a, double b) { if (a > b) return a; else return 
 
 SmallPlot::SmallPlot(QWidget *parent) : QwtPlot(parent), d_mrk(NULL), smooth(30)
 {
-    setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+    setCanvasBackground(GColor(CPLOTBACKGROUND));
+    canvas()->setFrameStyle(QFrame::NoFrame);
 
     setXTitle();
 

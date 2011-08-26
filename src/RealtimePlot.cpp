@@ -22,6 +22,7 @@
 #include <qwt_data.h>
 #include <qwt_legend.h>
 #include <qwt_plot_curve.h>
+#include <qwt_plot_canvas.h>
 #include <qwt_plot_grid.h>
 #include "RealtimePlot.h"
 #include "Colors.h"
@@ -151,7 +152,22 @@ RealtimePlot::RealtimePlot() : pwrCurve(NULL)
 //    lodCurve->setData(lodData);
 //    lodCurve->attach(this);
 //    lodCurve->setYAxis(QwtPlot::yLeft);
+    canvas()->setFrameStyle(QFrame::NoFrame);
     configChanged(); // set colors
+}
+
+void
+RealtimePlot::setAxisTitle(int axis, QString label)
+{
+    // setup the default fonts
+    QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
+    stGiles.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+    stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+
+    QwtText title(label);
+    title.setFont(stGiles);
+    QwtPlot::setAxisFont(axis, stGiles);
+    QwtPlot::setAxisTitle(axis, title);
 }
 
 void

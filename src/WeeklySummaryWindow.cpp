@@ -28,6 +28,7 @@
 #include <QtGui>
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
+#include <qwt_plot_canvas.h>
 #include <qwt_plot_grid.h>
 #include <assert.h>
 
@@ -51,6 +52,8 @@ WeeklySummaryWindow::WeeklySummaryWindow(bool useMetricUnits,
     weeklyPlot->setAxisFont(QwtPlot::xBottom, weeklyPlotAxisFont);
     weeklyPlot->setAxisFont(QwtPlot::yLeft, weeklyPlotAxisFont);
     weeklyPlot->setAxisFont(QwtPlot::yRight, weeklyPlotAxisFont);
+    weeklyPlot->canvas()->setFrameStyle(QFrame::NoFrame);
+    weeklyPlot->setCanvasBackground(Qt::white);
 
     weeklyDistCurve = new QwtPlotCurve();
     weeklyDistCurve->setStyle(QwtPlotCurve::Steps);
@@ -79,6 +82,8 @@ WeeklySummaryWindow::WeeklySummaryWindow(bool useMetricUnits,
     weeklyBSPlot->setAxisFont(QwtPlot::xBottom, weeklyPlotAxisFont);
     weeklyBSPlot->setAxisFont(QwtPlot::yLeft, weeklyPlotAxisFont);
     weeklyBSPlot->setAxisFont(QwtPlot::yRight, weeklyPlotAxisFont);
+    weeklyBSPlot->canvas()->setFrameStyle(QFrame::NoFrame);
+    weeklyBSPlot->setCanvasBackground(Qt::white);
 
     weeklyBSCurve = new QwtPlotCurve();
     weeklyBSCurve->setStyle(QwtPlotCurve::Steps);
@@ -121,6 +126,11 @@ WeeklySummaryWindow::WeeklySummaryWindow(bool useMetricUnits,
 
     weeklySummary = new QTextEdit;
     weeklySummary->setReadOnly(true);
+    weeklySummary->setStyleSheet("QTextEdit { border: 0px}");
+
+    QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
+    defaultFont.setPointSize(defaultFont.pointSize()-2);
+    weeklySummary->setFont(defaultFont);
 
     glayout->addWidget(weeklySummary,0,0,1,-1); // row, col, rowspan, colspan. -1 == fill to edge
     glayout->addWidget(weeklyPlot,1,0);
@@ -275,8 +285,8 @@ WeeklySummaryWindow::refresh()
     QString summary;
     summary = tr(
 	   "<center>"
-	   "<h2>Week of %1 through %2</h2>"
-	   "<h2>Summary</h2>"
+	   "<h3>Week of %1 through %2</h3>"
+	   "<h3>Summary</h3>"
 	   "<p>"
 	   "<table align=\"center\" width=\"60%\" border=0>"
 	   "<tr><td>Total time riding:</td>"
@@ -312,13 +322,13 @@ WeeklySummaryWindow::refresh()
 		.arg(weeklyRI, 0, 'f', 3);
 
         if (zone_range >= 0) {
-            summary += tr( "</table>" "<h2>Power Zones</h2>");
+            summary += tr( "</table>" "<h3>Power Zones</h3>");
             summary += mainWindow->zones()->summarize(zone_range, time_in_zone);
         } else {
             summary += "No zones configured - zone summary not available.";
         }
         if (hrzone_range >= 0) {
-            summary += tr( "</table>" "<h2>Heart Rate Zones</h2>");
+            summary += tr( "</table>" "<h3>Heart Rate Zones</h3>");
             summary += mainWindow->hrZones()->summarize(hrzone_range, time_in_hrzone);
         }
     }
