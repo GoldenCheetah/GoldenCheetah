@@ -421,7 +421,7 @@ PowerHist::recalc(bool force)
         // if we're working with HR data...
         if (series == RideFile::hr) {
             double MinX=0;
-            for (int i=0; i<hrArray.size(); i++) {
+            for (int i=1; i<hrArray.size(); i++) {
                 if (hrArray[i] > 0.1) {
                     MinX = i;
                     break;
