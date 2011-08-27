@@ -59,6 +59,7 @@ ErgFilePlot::ErgFilePlot(QList<ErgFilePoint> *data)
     LodCurve = new QwtPlotCurve("Course Load");
     QPen Lodpen = QPen(Qt::blue, 1.0);
     LodCurve->setPen(Lodpen);
+
     LodCurve->setData(lodData);
     LodCurve->attach(this);
     LodCurve->setYAxis(QwtPlot::yLeft);
@@ -112,6 +113,9 @@ ErgFilePlot::setData(ErgFile *ergfile)
 
             Marks.append(add);
         }
+
+        // set the axis so we use all the screen estate
+        if ((*courseData).count()) setAxisScale(xBottom, (double)0, (double)(*courseData).last().x);
     }
 }
 
