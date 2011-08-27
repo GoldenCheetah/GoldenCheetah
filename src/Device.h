@@ -34,7 +34,8 @@ struct DeviceRideItem
 {
     bool        wanted;
     QDateTime   startTime;
-    unsigned    work;
+    QDateTime   endTime; // optional, check with isValid()
+    unsigned    work;   // for progress indication
 };
 typedef boost::shared_ptr<DeviceRideItem> DeviceRideItemPtr;
 
