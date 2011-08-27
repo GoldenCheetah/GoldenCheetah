@@ -353,6 +353,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(mainWindow, SIGNAL(configChanged()), allPlot, SLOT(configChanged()));
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideDeleted(RideItem*)));
 }
 
 void
@@ -549,6 +550,20 @@ AllPlotWindow::rideSelected()
     setupStackPlots();
 
     stale = false;
+}
+
+void
+AllPlotWindow::rideDeleted(RideItem *ride)
+{
+    if (ride == myRideItem) {
+        // we have nothing to show
+        setProperty("ride", QVariant::fromValue<RideItem*>(NULL));
+
+        // notify all the plots, because when zones are redrawn
+        // they will try and reference AllPlot::rideItem
+        setAllPlotWidgets(NULL);
+        fullPlot->setDataFromRide(NULL);
+    }
 }
 
 void
