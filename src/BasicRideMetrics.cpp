@@ -125,7 +125,7 @@ class TotalDistance : public RideMetric {
         setType(RideMetric::Total);
         setMetricUnits(tr("km"));
         setImperialUnits(tr("miles"));
-        setPrecision(1);
+        setPrecision(2);
         setConversion(MILES_PER_KM);
     }
     void compute(const RideFile *ride, const Zones *, int,
