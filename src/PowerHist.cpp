@@ -422,12 +422,12 @@ PowerHist::recalc(bool force)
         if (series == RideFile::hr) {
             double MinX=0;
             for (int i=0; i<hrArray.size(); i++) {
-                if (hrArray[i] > 0) {
+                if (hrArray[i] > 0.1) {
                     MinX = i;
                     break;
                 }
             }
-            setAxisScale(xBottom, MinX, parameterValue[count + 1]);
+            setAxisScale(xBottom, withz ? 0 : MinX, parameterValue[count + 1]);
          } else {
             setAxisScale(xBottom, 0.0, parameterValue[count + 1]);
          }
