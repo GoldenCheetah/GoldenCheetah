@@ -218,7 +218,6 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     if (appsettings->value(this, GC_SHADEZONES, true).toBool()==false)
         shade_zones = false;
 
-    smooth = appsettings->value(this, GC_RIDE_PLOT_SMOOTHING).toInt();
     if (smooth < 1) smooth = 1;
 
     // create a background object for shading
@@ -976,7 +975,6 @@ void
 AllPlot::setSmoothing(int value)
 {
     smooth = value;
-    appsettings->setValue(GC_RIDE_PLOT_SMOOTHING, value);
     recalc();
 }
 

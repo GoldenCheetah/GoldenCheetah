@@ -63,10 +63,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     cl->addWidget(showLabel);
 
     showStack = new QCheckBox(tr("Stacked view"), this);
-    if (appsettings->value(this, GC_RIDE_PLOT_STACK).toInt())
-        showStack->setCheckState(Qt::Checked);
-    else
-        showStack->setCheckState(Qt::Unchecked);
+    showStack->setCheckState(Qt::Unchecked);
     cl->addWidget(showStack);
 
     stackWidth = 15;
@@ -119,10 +116,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     showPower->addItem(tr("Power - shade"));
     showPower->addItem(tr("No Power"));
     cl->addWidget(showPower);
-    if (appsettings->value(this, GC_SHADEZONES, true).toBool() == true)
-        showPower->setCurrentIndex(0);
-    else
-        showPower->setCurrentIndex(1);
+    showPower->setCurrentIndex(0);
 
     comboDistance = new QComboBox();
     comboDistance->addItem(tr("X Axis Shows Time"));
@@ -1198,7 +1192,8 @@ AllPlotWindow::setByDistance(int value)
 void
 AllPlotWindow::setSmoothing(int value)
 {
-    if (!current) return;
+    //if (!current) return;
+    smoothSlider->setValue(value);
 
     // recalculate etc
     fullPlot->setSmoothing(value);
@@ -1308,8 +1303,6 @@ AllPlotWindow::showStackChanged(int value)
     // out of date. Then call setAllPlotWidgets
     // to make sure all the controls are setup
     // and the right widgets are hidden/shown.
-    appsettings->setValue(GC_RIDE_PLOT_STACK, value);
-
     if (value) {
         // refresh plots
         resetStackedDatas();
