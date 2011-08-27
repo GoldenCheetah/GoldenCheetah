@@ -86,6 +86,14 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     stackZoomDown->setFlat(true);
     cl->addWidget(stackZoomDown);
 
+    showFull = new QCheckBox(tr("Full plot"), this);
+    showFull->setCheckState(Qt::Checked);
+    cl->addWidget(showFull);
+
+    paintBrush = new QCheckBox(tr("Fill Curves"), this);
+    paintBrush->setCheckState(Qt::Unchecked);
+    cl->addWidget(paintBrush);
+
     showGrid = new QCheckBox(tr("Grid"), this);
     showGrid->setCheckState(Qt::Checked);
     cl->addWidget(showGrid);
@@ -231,7 +239,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     //
     // allPlot view
     //
-    QVBoxLayout *allPlotLayout = new QVBoxLayout;
+    allPlotLayout = new QVBoxLayout;
     allPlotLayout->setSpacing(0);
     allPlotLayout->setContentsMargins(0,0,0,0);
     allPlotFrame = new QScrollArea();
@@ -329,7 +337,9 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     connect(showCad, SIGNAL(stateChanged(int)), this, SLOT(setShowCad(int)));
     connect(showAlt, SIGNAL(stateChanged(int)), this, SLOT(setShowAlt(int)));
     connect(showGrid, SIGNAL(stateChanged(int)), this, SLOT(setShowGrid(int)));
+    connect(showFull, SIGNAL(stateChanged(int)), this, SLOT(setShowFull(int)));
     connect(showStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
+    connect(paintBrush, SIGNAL(stateChanged(int)), this, SLOT(setPaintBrush(int)));
     connect(comboDistance, SIGNAL(currentIndexChanged(int)), this, SLOT(setByDistance(int)));
     connect(smoothSlider, SIGNAL(valueChanged(int)), this, SLOT(setSmoothingFromSlider()));
     connect(smoothLineEdit, SIGNAL(editingFinished()), this, SLOT(setSmoothingFromLineEdit()));
@@ -683,18 +693,19 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
 	    showSpeed->setEnabled(dataPresent->kph);
 	    showCad->setEnabled(dataPresent->cad);
 	    showAlt->setEnabled(dataPresent->alt);
-
+#if 0
             showHr->setChecked(dataPresent->hr);
             showSpeed->setChecked(dataPresent->kph);
             showCad->setChecked(dataPresent->cad);
             showAlt->setChecked(dataPresent->alt);
+#endif
 
     } else {
-            showPower->setEnabled(false);
-            showHr->setEnabled(false);
-            showSpeed->setEnabled(false);
-            showCad->setEnabled(false);
-            showAlt->setEnabled(false);
+        showPower->setEnabled(false);
+        showHr->setEnabled(false);
+        showSpeed->setEnabled(false);
+        showCad->setEnabled(false);
+        showAlt->setEnabled(false);
     }
 
     // turn on/off shading, if it's not available
@@ -750,12 +761,23 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
         // show normal view
         allPlotFrame->show();
         allPlot->show();
-        fullPlot->show();
-        controlsLayout->setRowStretch(0, 10);
-        controlsLayout->setRowStretch(1, 1);
-        spanSlider->show();
-        scrollLeft->show();
-        scrollRight->show();
+
+        if (showFull->isChecked()) {
+            fullPlot->show();
+            controlsLayout->setRowStretch(0, 100);
+            controlsLayout->setRowStretch(1, 20);
+            spanSlider->show();
+            scrollLeft->show();
+            scrollRight->show();
+        } else {
+            fullPlot->hide();
+            controlsLayout->setRowStretch(0, 100);
+            controlsLayout->setRowStretch(1, 00);
+            spanSlider->hide();
+            scrollLeft->hide();
+            scrollRight->hide();
+        }
+
         stackZoomUp->setEnabled(false);
         stackZoomDown->setEnabled(false);
     }
@@ -1036,7 +1058,9 @@ AllPlotWindow::hideSelection()
 void
 AllPlotWindow::setShowPower(int value)
 {
-    if (!current) return;
+    showPower->setCurrentIndex(value);
+
+    //if (!current) return;
 
     // we only show the power shading on the
     // allPlot / stack plots, not on the fullPlot
@@ -1060,7 +1084,9 @@ AllPlotWindow::setShowPower(int value)
 void
 AllPlotWindow::setShowHr(int value)
 {
-    if (!current) return;
+    showHr->setChecked(value);
+
+    //if (!current) return;
 
     allPlot->showHr(value);
     foreach (AllPlot *plot, allPlots)
@@ -1070,7 +1096,9 @@ AllPlotWindow::setShowHr(int value)
 void
 AllPlotWindow::setShowSpeed(int value)
 {
-    if (!current) return;
+    showSpeed->setChecked(value);
+
+    //if (!current) return;
 
     allPlot->showSpeed(value);
     foreach (AllPlot *plot, allPlots)
@@ -1080,7 +1108,9 @@ AllPlotWindow::setShowSpeed(int value)
 void
 AllPlotWindow::setShowCad(int value)
 {
-    if (!current) return;
+    showCad->setChecked(value);
+
+    //if (!current) return;
 
     allPlot->showCad(value);
     foreach (AllPlot *plot, allPlots)
@@ -1090,7 +1120,9 @@ AllPlotWindow::setShowCad(int value)
 void
 AllPlotWindow::setShowAlt(int value)
 {
-    if (!current) return;
+    showAlt->setChecked(value);
+
+    //if (!current) return;
 
     allPlot->showAlt(value);
     foreach (AllPlot *plot, allPlots)
@@ -1098,15 +1130,52 @@ AllPlotWindow::setShowAlt(int value)
 }
 
 void
+AllPlotWindow::setShowFull(int value)
+{
+    showFull->setChecked(value);
+    if (showFull->isChecked()) {
+        fullPlot->show();
+        spanSlider->show();
+        scrollLeft->show();
+        scrollRight->show();
+        allPlotLayout->setStretch(1,20);
+    }
+    else {
+        fullPlot->hide();
+        spanSlider->hide();
+        scrollLeft->hide();
+        scrollRight->hide();
+        allPlotLayout->setStretch(1,0);
+    }
+}
+
+void
 AllPlotWindow::setShowGrid(int value)
 {
     showGrid->setChecked(value);
 
-    if (!current) return;
+    //if (!current) return;
 
     allPlot->showGrid(value);
     foreach (AllPlot *plot, allPlots)
         plot->showGrid(value);
+}
+
+void
+AllPlotWindow::setPaintBrush(int value)
+{
+    if (active == true) return;
+
+    active = true;
+    paintBrush->setChecked(value);
+
+    //if (!current) return;
+
+    allPlot->setPaintBrush(value);
+    foreach (AllPlot *plot, allPlots)
+        plot->setPaintBrush(value);
+
+    active = false;
 }
 
 void
