@@ -252,7 +252,6 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     intervalHighlighterCurve->attach(this);
     //this->legend()->remove(intervalHighlighterCurve); // don't show in legend
 
-
     // setup that grid
     grid = new QwtPlotGrid();
     grid->enableX(true);
@@ -314,6 +313,31 @@ AllPlot::configChanged()
     QPen gridPen(GColor(CPLOTGRID));
     gridPen.setStyle(Qt::DotLine);
     grid->setPen(gridPen);
+
+    // curve brushes
+    if (parent->isPaintBrush()) {
+        QColor p;
+        p = wattsCurve->pen().color();
+        p.setAlpha(64);
+        wattsCurve->setBrush(QBrush(p));
+
+        p = hrCurve->pen().color();
+        p.setAlpha(64);
+        hrCurve->setBrush(QBrush(p));
+
+        p = speedCurve->pen().color();
+        p.setAlpha(64);
+        speedCurve->setBrush(QBrush(p));
+
+        p = cadCurve->pen().color();
+        p.setAlpha(64);
+        cadCurve->setBrush(QBrush(p));
+    } else {
+        wattsCurve->setBrush(Qt::NoBrush);
+        hrCurve->setBrush(Qt::NoBrush);
+        speedCurve->setBrush(Qt::NoBrush);
+        cadCurve->setBrush(Qt::NoBrush);
+    }
 
     QPalette pal;
 
@@ -914,6 +938,37 @@ AllPlot::showGrid(int state)
 {
     assert(state != Qt::PartiallyChecked);
     grid->setVisible(state == Qt::Checked);
+    replot();
+}
+
+void
+AllPlot::setPaintBrush(int state)
+{
+    if (state) {
+
+        QColor p;
+        p = wattsCurve->pen().color();
+        p.setAlpha(64);
+        wattsCurve->setBrush(QBrush(p));
+
+        p = hrCurve->pen().color();
+        p.setAlpha(64);
+        hrCurve->setBrush(QBrush(p));
+
+        p = speedCurve->pen().color();
+        p.setAlpha(64);
+        speedCurve->setBrush(QBrush(p));
+
+        p = cadCurve->pen().color();
+        p.setAlpha(64);
+        cadCurve->setBrush(QBrush(p));
+
+    } else {
+        wattsCurve->setBrush(Qt::NoBrush);
+        hrCurve->setBrush(Qt::NoBrush);
+        speedCurve->setBrush(Qt::NoBrush);
+        cadCurve->setBrush(Qt::NoBrush);
+    }
     replot();
 }
 

@@ -75,6 +75,7 @@ class AllPlot : public QwtPlot
         void showCad(int state);
         void showAlt(int state);
         void showGrid(int state);
+        void setPaintBrush(int state);
         void setShadeZones(bool x) { shade_zones=x; }
         void setSmoothing(int value);
         void setByDistance(int value);

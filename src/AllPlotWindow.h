@@ -50,6 +50,7 @@ class AllPlotWindow : public GcWindow
     // plot at the same time.
     Q_PROPERTY(bool stacked READ isStacked WRITE setStacked USER true)
     Q_PROPERTY(int showGrid READ isShowGrid WRITE setShowGrid USER true)
+    Q_PROPERTY(int showFull READ isShowFull WRITE setShowFull USER true)
     Q_PROPERTY(int showHr READ isShowHr WRITE setShowHr USER true)
     Q_PROPERTY(int showSpeed READ isShowSpeed WRITE setShowSpeed USER true)
     Q_PROPERTY(int showCad READ isShowCad WRITE setShowCad USER true)
@@ -57,6 +58,7 @@ class AllPlotWindow : public GcWindow
     Q_PROPERTY(int showPower READ isShowPower WRITE setShowPower USER true)
     Q_PROPERTY(int byDistance READ isByDistance WRITE setByDistance USER true)
     Q_PROPERTY(int smoothing READ smoothing WRITE setSmoothing USER true)
+    Q_PROPERTY(int paintBrush READ isPaintBrush WRITE setPaintBrush USER true)
 
     public:
 
@@ -75,12 +77,14 @@ class AllPlotWindow : public GcWindow
         // get properties - the setters are below
         bool isStacked() const { return showStack->isChecked(); }
         int isShowGrid() const { return showGrid->checkState(); }
+        int isShowFull() const { return showFull->checkState(); }
         int isShowHr() const { return showHr->checkState(); }
         int isShowSpeed() const { return showSpeed->checkState(); }
         int isShowCad() const { return showCad->checkState(); }
         int isShowAlt() const { return showAlt->checkState(); }
         int isShowPower() const { return showPower->currentIndex(); }
         int isByDistance() const { return comboDistance->currentIndex(); }
+        int isPaintBrush() const { return paintBrush->isChecked(); }
         int smoothing() const { return smoothSlider->value(); }
 
    public slots:
@@ -104,6 +108,8 @@ class AllPlotWindow : public GcWindow
         void setShowCad(int state);
         void setShowAlt(int state);
         void setShowGrid(int state);
+        void setPaintBrush(int state);
+        void setShowFull(int state);
         void setSmoothing(int value);
         void setByDistance(int value);
         void setStacked(int value);
@@ -128,6 +134,7 @@ class AllPlotWindow : public GcWindow
         MainWindow *mainWindow;
 
         // All the plot widgets
+        QVBoxLayout *allPlotLayout;
         AllPlot *allPlot;
         AllPlot *fullPlot;
         QList <AllPlot *> allPlots;
@@ -149,6 +156,8 @@ class AllPlotWindow : public GcWindow
         QGridLayout *controlsLayout;
         QCheckBox *showStack;
         QCheckBox *showGrid;
+        QCheckBox *showFull;
+        QCheckBox *paintBrush;
         QCheckBox *showHr;
         QCheckBox *showSpeed;
         QCheckBox *showCad;
