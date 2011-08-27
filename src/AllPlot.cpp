@@ -676,7 +676,10 @@ AllPlot::setXTitle()
 void
 AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 {
-    if (plot == NULL) return;
+    if (plot == NULL) {
+        rideItem = NULL;
+        return;
+    }
 
     referencePlot = plot;
 

@@ -87,6 +87,7 @@ class AllPlotWindow : public GcWindow
 
         // trap GC signals
         void rideSelected();
+        void rideDeleted(RideItem *ride);
         void intervalSelected();
         void zonesChanged();
         void intervalsChanged();
