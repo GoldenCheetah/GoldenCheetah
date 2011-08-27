@@ -544,15 +544,20 @@ struct FitFileReaderState
             return NULL;
         }
         int header_size = read_uint8();
-        if (header_size != 12) {
+        if (header_size != 12 && header_size != 14) {
             errors << QString("bad header size: %1").arg(header_size);
             delete rideFile;
             return NULL;
         }
         int protocol_version = read_uint8();
         (void) protocol_version;
+
+        // if the header size is 14 we have profile minor then profile major
+        // version. We still don't do anything with this information
         int profile_version = read_uint16(false); // always littleEndian
+        if (header_size == 14) profile_version = read_uint16(false);
         (void) profile_version; // not sure what to do with this
+
         int data_size = read_uint32(false); // always littleEndian
         char fit_str[5];
         if (file.read(fit_str, 4) != 4) {
