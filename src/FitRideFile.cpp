@@ -526,6 +526,7 @@ struct FitFileReaderState
                 case 72: /* undocumented  - new for garmin 800*/
                 case 34: /* activity */
                 case 49: /* file creator */
+                case 79: /* unknown */
                     break;
                 default:
                     unknown_global_msg_nums.insert(def.global_msg_num);
@@ -555,7 +556,6 @@ struct FitFileReaderState
         // if the header size is 14 we have profile minor then profile major
         // version. We still don't do anything with this information
         int profile_version = read_uint16(false); // always littleEndian
-        if (header_size == 14) profile_version = read_uint16(false);
         (void) profile_version; // not sure what to do with this
 
         int data_size = read_uint32(false); // always littleEndian
@@ -571,6 +571,10 @@ struct FitFileReaderState
             delete rideFile;
             return NULL;
         }
+
+        // read the rest of the header
+        if (header_size == 14) read_uint16(false);
+
         int bytes_read = 0;
         bool stop = false;
         try {
