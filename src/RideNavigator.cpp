@@ -64,6 +64,7 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
     tableView->expandAll();
     //XXXtableView->horizontalScrollBar()->setDisabled(true);
     //XXXtableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    tableView->header()->setCascadingSectionResizes(true); // easier to resize this way
     tableView->setContextMenuPolicy(Qt::CustomContextMenu);
     tableView->header()->setStretchLastSection(false);
     tableView->header()->setMinimumSectionSize(20);
@@ -837,7 +838,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         //painter->drawLine(0,myOption.rect.y()+myOption.rect.height()-1,0,myOption.rect.y()+myOption.rect.height()-1);
         painter->drawLine(0,myOption.rect.y()+myOption.rect.height(),0,myOption.rect.y()+myOption.rect.height());
         //painter->drawLine(rideNavigator->pwidth,myOption.rect.y(),rideNavigator->pwidth, myOption.rect.y()+myOption.rect.height()-1);
-        painter->drawLine(rideNavigator->pwidth,myOption.rect.y(),rideNavigator->pwidth, myOption.rect.y()+myOption.rect.height());
+        //painter->drawLine(rideNavigator->pwidth,myOption.rect.y(),rideNavigator->pwidth, myOption.rect.y()+myOption.rect.height());
         myOption.rect.setHeight(18); //added
         myOption.font.setWeight(QFont::Bold);
         drawDisplay(painter, myOption, myOption.rect, value);
