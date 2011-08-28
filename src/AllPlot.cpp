@@ -745,6 +745,12 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     cadCurve->detach();
     altCurve->detach();
 
+    wattsCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showPowerState < 2);
+    hrCurve->setVisible(rideItem->ride()->areDataPresent()->hr && showHrState == Qt::Checked);
+    speedCurve->setVisible(rideItem->ride()->areDataPresent()->kph && showSpeedState == Qt::Checked);
+    cadCurve->setVisible(rideItem->ride()->areDataPresent()->cad && showCadState == Qt::Checked);
+    altCurve->setVisible(rideItem->ride()->areDataPresent()->alt && showAltState == Qt::Checked);
+
     wattsCurve->setData(xaxis,smoothW,stopidx-startidx);
     hrCurve->setData(xaxis, smoothHR,stopidx-startidx);
     speedCurve->setData(xaxis, smoothS, stopidx-startidx);
