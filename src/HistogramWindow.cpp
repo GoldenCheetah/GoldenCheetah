@@ -244,6 +244,7 @@ void
 HistogramWindow::setBinWidthFromSlider()
 {
     if (powerHist->binWidth() != binWidthSlider->value()) {
+        //RideFile::SeriesType series = static_cast<RideFile::SeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
         powerHist->setBinWidth(binWidthSlider->value());
         setHistBinWidthText();
 

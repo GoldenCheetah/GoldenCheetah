@@ -374,7 +374,7 @@ PowerHist::recalc(bool force)
 
         // we add a bin on the end since the last "incomplete" bin
         // will be dropped otherwise
-        int count = int(ceil((arrayLength - 1) / binw))+1;
+        int count = int(ceil((arrayLength - 1) / (binw)))+1;
 
         // allocate space for data, plus beginning and ending point
         QVector<double> parameterValue(count+2, 0.0);
@@ -382,10 +382,10 @@ PowerHist::recalc(bool force)
         QVector<double> totalTimeSelected(count+2, 0.0);
         int i;
         for (i = 1; i <= count; ++i) {
-            int high = i * binw;
-            int low = high - binw;
+            double high = i * (binw/delta);
+            double low = high - (binw/delta);
             if (low==0 && !withz) low++;
-            parameterValue[i] = high * delta;
+            parameterValue[i] = high*delta;
             totalTime[i]  = 1e-9;  // nonzero to accomodate log plot
             totalTimeSelected[i] = 1e-9;  // nonzero to accomodate log plot
             while (low < high && low<arrayLength) {
@@ -782,11 +782,10 @@ PowerHist::setData(RideItem *_rideItem, bool force)
 }
 
 void
-PowerHist::setBinWidth(int value)
+PowerHist::setBinWidth(double value)
 {
     if (!value) value = 1; // binwidth must be nonzero
     binw = value;
-    appsettings->setValue(GC_HIST_BIN_WIDTH, value);
 }
 
 void
