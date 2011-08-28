@@ -407,11 +407,6 @@ PowerHist::recalc(bool force)
         QBrush brush = curve->brush();
         QColor bcol = brush.color();
 
-        bool zoning = (zoned && (series == RideFile::watts || series == RideFile::hr));
-        bcol.setAlpha(zoning ? 165 : 200);
-        brush.setColor(bcol);
-        //curve->setBrush(brush); //XXX weird artefact on first run only?
-
         QwtScaleDraw *sd = new QwtScaleDraw;
         sd->setTickLength(QwtScaleDiv::MajorTick, 3);
         setAxisScaleDraw(QwtPlot::xBottom, sd);
@@ -497,6 +492,7 @@ PowerHist::recalc(bool force)
         bcol.setAlpha(200);
         brush.setColor(bcol);
         curve->setBrush(brush);
+        curve->setPen(Qt::NoPen);
 
         curveSelected->setData(selectedxaxis.data(), selectedyaxis.data(), selectedxaxis.size());
 
