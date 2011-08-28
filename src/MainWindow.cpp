@@ -230,6 +230,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     tabWidget = new QTabWidget;
     tabWidget->setUsesScrollButtons(true);
+    tabWidget->setElideMode(Qt::ElideNone);
 
     // setup trainWindow
     trainWindow = new TrainWindow(this, home);
