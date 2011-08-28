@@ -113,6 +113,8 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     tabbed->setPalette(palette);
     tabbed->setDocumentMode(false);
     tabbed->setMovable(true);
+    tabbed->setElideMode(Qt::ElideNone);
+    tabbed->setUsesScrollButtons(true);
 
     QTabBar *tb = tabbed->findChild<QTabBar*>(QLatin1String("qt_tabwidget_tabbar"));
     tb->setShape(QTabBar::RoundedSouth);
