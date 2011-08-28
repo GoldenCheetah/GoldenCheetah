@@ -111,7 +111,7 @@ class PowerHist : public QwtPlot
         void configChanged();
         void setAxisTitle(int axis, QString label);
         void setYMax();
-        void setBinWidth(int value);
+        void setBinWidth(double value);
         int setBinWidthRealUnits(double value);
 
         // public getters
@@ -120,7 +120,7 @@ class PowerHist : public QwtPlot
         int getDigits();
         inline bool islnY() const { return lny; }
         inline bool withZeros() const { return withz; }
-        inline int binWidth() const { return binw; }
+        inline double binWidth() const { return binw; }
 
         // react to plot signals
         void pointHover(QwtPlotCurve *curve, int index);
@@ -148,7 +148,7 @@ class PowerHist : public QwtPlot
         bool lny;
         bool shade;
         bool zoned;        // show in zones
-        int binw;
+        double binw;
         bool withz;        // whether zeros are included in histogram
         double dt;         // length of sample
         bool absolutetime; // do we sum absolute or percentage?
@@ -203,7 +203,7 @@ class PowerHist : public QwtPlot
         bool LASTuseMetricUnits;  // whether metric units are used (or imperial)
         bool LASTlny;
         bool LASTzoned;        // show in zones
-        int LASTbinw;
+        double LASTbinw;
         bool LASTwithz;        // whether zeros are included in histogram
         double LASTdt;         // length of sample
         bool LASTabsolutetime; // do we sum absolute or percentage?
