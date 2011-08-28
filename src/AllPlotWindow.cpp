@@ -446,7 +446,7 @@ AllPlotWindow::redrawFullPlot()
 void
 AllPlotWindow::redrawStackPlot()
 {
-    if (showStack->isChecked() && current) {
+    if (showStack->isChecked()) {
 
         // turn off display updates whilst we
         // do this, it takes a while and is prone
@@ -687,12 +687,6 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
 	    showSpeed->setEnabled(dataPresent->kph);
 	    showCad->setEnabled(dataPresent->cad);
 	    showAlt->setEnabled(dataPresent->alt);
-#if 0
-            showHr->setChecked(dataPresent->hr);
-            showSpeed->setChecked(dataPresent->kph);
-            showCad->setChecked(dataPresent->cad);
-            showAlt->setChecked(dataPresent->alt);
-#endif
 
     } else {
         showPower->setEnabled(false);
@@ -1412,24 +1406,18 @@ AllPlotWindow::setupStackPlots()
         _allPlot->setAxisMaxMinor(QwtPlot::yLeft2, 0);
         _allPlot->setAxisMaxMinor(QwtPlot::yRight, 0);
         _allPlot->setAxisMaxMinor(QwtPlot::yRight2, 0);
-#if 0
-        // Smaller y axis Titles
-        QFont axisFont = QFont("Helvetica",10, QFont::Normal);
-        QwtText text = _allPlot->axisTitle(QwtPlot::yLeft);
-        text.setFont(axisFont);
-        _allPlot->setAxisTitle(QwtPlot::yLeft,text);
-        text = _allPlot->axisTitle(QwtPlot::yLeft2);
-        text.setFont(axisFont);
-        _allPlot->setAxisTitle(QwtPlot::yLeft2,text);
-        text = _allPlot->axisTitle(QwtPlot::yRight);
-        text.setFont(axisFont);
-        _allPlot->setAxisTitle(QwtPlot::yRight,text);
-        text = _allPlot->axisTitle(QwtPlot::yRight2);
-        text.setFont(axisFont);
-        _allPlot->setAxisTitle(QwtPlot::yRight2,text);
-#endif
+
+        // controls
         _allPlot->setShadeZones(showPower->currentIndex() == 0);
-        // XXX todo - set the showHR, showCad stuff too...
+        _allPlot->showPower(showPower->currentIndex());
+        _allPlot->showHr(showHr->checkState());
+        _allPlot->showSpeed(showSpeed->checkState());
+        _allPlot->showCad(showCad->checkState());
+        _allPlot->showAlt(showAlt->checkState());
+        _allPlot->showGrid(showGrid->checkState());
+        _allPlot->setPaintBrush(paintBrush->checkState());
+        _allPlot->setSmoothing(smoothSlider->value());
+        _allPlot->setByDistance(comboDistance->currentIndex());
 
 	    _allPlot->replot();
     }
