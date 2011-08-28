@@ -148,10 +148,18 @@ PowerHist::configChanged()
         curve->setRenderHint(QwtPlotItem::RenderAntialiased);
         curveSelected->setRenderHint(QwtPlotItem::RenderAntialiased);
     }
-    pen.setWidth(width);
-    curve->setPen(pen);
-    brush_color.setAlpha(64);
-    curve->setBrush(brush_color);   // fill below the line
+
+    if (zoned == false || (zoned == true && (series != RideFile::watts && series != RideFile::hr))) {
+        pen.setWidth(width);
+        curve->setPen(pen);
+        brush_color.setAlpha(64);
+        curve->setBrush(brush_color);   // fill below the line
+    } else {
+        pen.setWidth(width);
+        curve->setPen(Qt::NoPen);
+        brush_color.setAlpha(200);
+        curve->setBrush(brush_color);   // fill below the line
+    }
 
     // intervalselection
     QPen ivl(GColor(CINTERVALHIGHLIGHTER).darker(200));
@@ -403,10 +411,6 @@ PowerHist::recalc(bool force)
         curve->setData(parameterValue.data(), totalTime.data(), count + 2);
         curveSelected->setData(parameterValue.data(), totalTimeSelected.data(), count + 2);
 
-        // make see through if we're shading zones
-        QBrush brush = curve->brush();
-        QColor bcol = brush.color();
-
         QwtScaleDraw *sd = new QwtScaleDraw;
         sd->setTickLength(QwtScaleDiv::MajorTick, 3);
         setAxisScaleDraw(QwtPlot::xBottom, sd);
@@ -483,17 +487,9 @@ PowerHist::recalc(bool force)
             percentify(yaxis, 2);
             percentify(selectedyaxis, 2);
         }
+
         // set those curves
         curve->setData(xaxis.data(), yaxis.data(), xaxis.size());
-
-        // Opaque - we don't need to show zone shading
-        QBrush brush = curve->brush();
-        QColor bcol = brush.color();
-        bcol.setAlpha(200);
-        brush.setColor(bcol);
-        curve->setBrush(brush);
-        curve->setPen(Qt::NoPen);
-
         curveSelected->setData(selectedxaxis.data(), selectedyaxis.data(), selectedxaxis.size());
 
         // zone scale draw
@@ -535,6 +531,7 @@ PowerHist::recalc(bool force)
     }
 
     setYMax();
+    configChanged(); // setup the curve colors to appropriate values
     replot();
 }
 
