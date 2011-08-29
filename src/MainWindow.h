@@ -208,6 +208,8 @@ class MainWindow : public QMainWindow
         bool saveRideExitDialog();              // save dirty rides on exit dialog
         void showOptions();
         void showTools();
+        void showSidebar(bool want);
+        void showToolbar(bool want);
         void showWorkoutWizard();
         void dateChanged(const QDate &);
         void showTreeContextMenuPopup(const QPoint &);
@@ -241,6 +243,9 @@ class MainWindow : public QMainWindow
         void selectTrain();
         void selectAthlete();
 
+        void setWindowMenu();
+        void selectWindow(QAction*);
+
         void showDock();
     protected:
 
@@ -260,6 +265,7 @@ class MainWindow : public QMainWindow
         QStackedWidget *views;
         QAction *sideView;
         QAction *toolView;
+        QMenu *windowMenu;
 
         // each view has its own controls XXX more to come
         QStackedWidget *masterControls,

@@ -484,6 +484,7 @@ MainWindow::MainWindow(const QDir &home) :
     rideMenu->addAction(tr("Split &ride..."), this, SLOT(splitRide()));
     rideMenu->addSeparator ();
 
+
     // XXX MEASURES ARE NOT IMPLEMENTED YET
 #if 0
     QMenu *measureMenu = menuBar()->addMenu(tr("&Measure"));
@@ -536,6 +537,29 @@ MainWindow::MainWindow(const QDir &home) :
         }
     }
 
+    QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
+    QAction *showhideSidebar = viewMenu->addAction(tr("Show Sidebar"), this, SLOT(showSidebar(bool)));
+    showhideSidebar->setCheckable(true);
+    showhideSidebar->setChecked(true);
+    //connect(showhideSidebar, SIGNAL(triggered(bool)), this, SLOT(showSidebar(bool)));
+
+    QAction *showhideToolbar = viewMenu->addAction(tr("Show Toolbar"), this, SLOT(showToolbar(bool)));
+    showhideToolbar->setCheckable(true);
+    showhideToolbar->setChecked(true);
+    //connect(showhideSidebar, SIGNAL(triggered(bool)), this, SLOT(showSidebar(bool)));
+
+    viewMenu->addSeparator();
+    viewMenu->addAction(tr("Analysis"), this, SLOT(selectAnalysis()));
+    viewMenu->addAction(tr("Home"), this, SLOT(selectHome()));
+    viewMenu->addAction(tr("Train"), this, SLOT(selectTrain()));
+#ifdef GC_HAVE_ICAL
+    viewMenu->addAction(tr("Diary"), this, SLOT(selectDiary()));
+#endif
+
+    windowMenu = menuBar()->addMenu(tr("&Window"));
+    connect(windowMenu, SIGNAL(aboutToShow()), this, SLOT(setWindowMenu()));
+    connect(windowMenu, SIGNAL(triggered(QAction*)), this, SLOT(selectWindow(QAction*)));
+
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(tr("&About GoldenCheetah"), this, SLOT(aboutDialog()));
 
@@ -567,6 +591,41 @@ void
 MainWindow::showDock()
 {
     dock->toggleViewAction()->activate(QAction::Trigger);
+}
+
+void
+MainWindow::showSidebar(bool want)
+{
+    if (want) toolBox->show();
+    else toolBox->hide();
+}
+
+void
+MainWindow::showToolbar(bool want)
+{
+    if (want) toolbar->show();
+    else toolbar->hide();
+}
+
+void
+MainWindow::setWindowMenu()
+{
+    windowMenu->clear();
+    foreach (MainWindow *m, mainwindows) {
+        windowMenu->addAction(m->cyclist);
+    }
+}
+
+void
+MainWindow::selectWindow(QAction *act)
+{
+    foreach (MainWindow *m, mainwindows) {
+        if (m->cyclist == act->text()) {
+            m->activateWindow();
+            m->raise();
+            break;
+        }
+    }
 }
 
 void
