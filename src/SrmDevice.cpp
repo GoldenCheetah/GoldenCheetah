@@ -40,7 +40,8 @@ SrmDevices::newDevice( CommPortPtr dev )
 bool
 SrmDevices::supportsPort( CommPortPtr dev )
 {
-#ifdef SRMIO_HAVE_TERMIOS
+#if defined(SRMIO_HAVE_TERMIOS) || defined(SRMIO_HAVE_WINCOM)
+    // XXX: check device name starts with "com" or "/dev"?
     if( dev->type() == "Serial" )
         return true;
 #endif
@@ -106,7 +107,17 @@ SrmDevice::open( QString &err )
     srmio_error_t serr;
 
     if( dev->type() == "Serial" ){
-#ifdef SRMIO_HAVE_TERMIOS
+
+        // XXX: check device name starts with "com" or "/dev"?
+
+#ifdef SRMIO_HAVE_WINCOM
+        io = srmio_iow32_new( dev->name().toAscii().constData(), &serr );
+        if( ! io ){
+            err = tr("failed to allocate device handle: %1")
+                .arg(serr.message);
+            return false;
+        }
+#elif defined(SRMIO_HAVE_TERMIOS)
         io = srmio_ios_new( dev->name().toAscii().constData(), &serr );
         if( ! io ){
             err = tr("failed to allocate device handle: %1")
