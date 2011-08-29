@@ -158,6 +158,7 @@ class MainWindow : public QMainWindow
     signals:
 
         void intervalSelected();
+        void intervalZoom(IntervalItem*);
         void intervalsChanged();
         void zonesChanged();
         void seasonsChanged();
