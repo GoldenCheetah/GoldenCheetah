@@ -8,6 +8,8 @@ class DeviceFileInfo;
 
 struct MacroDevice : public Device
 {
+    Q_DECLARE_TR_FUNCTIONS(MacroDevice)
+
     virtual QString downloadInstructions() const;
 
     virtual bool download(CommPortPtr dev, const QDir &tmpdir,
