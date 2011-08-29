@@ -240,7 +240,8 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   connect(comboDistance, SIGNAL(currentIndexChanged(int)), this, SLOT(setByDistance(int)));
   connect(mainWindow, SIGNAL(configChanged()), aerolab, SLOT(configChanged()));
   connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
-  connect(mainWindow, SIGNAL( intervalSelected() ), this, SLOT(intervalSelected()));
+  connect(mainWindow, SIGNAL(intervalSelected() ), this, SLOT(intervalSelected()));
+  connect(mainWindow, SIGNAL(intervalZoom(IntervalItem*) ), this, SLOT(zoomInterval(IntervalItem*)));
   connect(allZoomer, SIGNAL( zoomed(const QwtDoubleRect) ), this, SLOT(zoomChanged()));
 
 
