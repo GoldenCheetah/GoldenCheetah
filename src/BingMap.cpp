@@ -53,6 +53,7 @@ BingMap::BingMap(MainWindow *mw) : GcWindow(mw), main(mw), range(-1), current(NU
     connect(view->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(updateFrame()));
     connect(mw, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
     connect(mw, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
+    connect(mw, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
 
     first = true;
 }
@@ -450,6 +451,49 @@ BingMap::createMarkers()
     }
 
     return;
+}
+
+void BingMap::zoomInterval(IntervalItem *which)
+{
+    RideItem *ride = myRideItem;
+
+    // null ride
+    if (!ride || !ride->ride()) return;
+
+    int start = ride->ride()->timeIndex(which->start);
+    int end = ride->ride()->timeIndex(which->stop);
+
+    // out of bounds
+    if (start < 0 || start > ride->ride()->dataPoints().count()-1 ||
+        end < 0 || end > ride->ride()->dataPoints().count()-1) return;
+
+    // Get the bounding rectangle for this interval
+    double minLat, minLon, maxLat, maxLon;
+    minLat = minLon = 1000;
+    maxLat = maxLon = -1000; // larger than 360
+
+    // get bounding co-ordinates for ride
+    for(int i=start; i<= end; i++) {
+        RideFilePoint *rfp = ride->ride()->dataPoints().at(i);
+        if (rfp->lat || rfp->lon) {
+            minLat = std::min(minLat,rfp->lat);
+            maxLat = std::max(maxLat,rfp->lat);
+            minLon = std::min(minLon,rfp->lon);
+            maxLon = std::max(maxLon,rfp->lon);
+        }
+    }
+
+    // now zoom to interval
+    QString code = QString("{\n"
+                           "    var viewBounds = Microsoft.Maps.LocationRect.fromCorners("
+                           "                                  new Microsoft.Maps.Location(%1,%2), "
+                           "                                  new Microsoft.Maps.Location(%3,%4));\n"
+                           "   map.setView( { bounds: viewBounds });\n }")
+                    .arg(minLat,0,'g',11)
+                    .arg(minLon,0,'g',11)
+                    .arg(maxLat,0,'g',11)
+                    .arg(maxLon,0,'g',11);
+    view->page()->mainFrame()->evaluateJavaScript(code);
 }
 
 // quick diag, used to debug code only

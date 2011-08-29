@@ -82,6 +82,7 @@ class BingMap : public GcWindow
         void rideSelected();
         void createMarkers();
         void drawShadedRoute();
+        void zoomInterval(IntervalItem*);
 
     private:
         MainWindow *main;
