@@ -315,7 +315,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     allPlotLayout->setStretch(1,20);
 
     QVBoxLayout *vlayout = new QVBoxLayout(this);
-    vlayout->setContentsMargins(10,10,10,10);
+    vlayout->setContentsMargins(2,2,2,2);
     vlayout->setSpacing(0);
     vlayout->addWidget(allPlotFrame);
     vlayout->addWidget(stackFrame);
@@ -354,6 +354,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     connect(mainWindow, SIGNAL(rideDirty()), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(zonesChanged()));
     connect(mainWindow, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
+    connect(mainWindow, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
     connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(mainWindow, SIGNAL(configChanged()), allPlot, SLOT(configChanged()));
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));

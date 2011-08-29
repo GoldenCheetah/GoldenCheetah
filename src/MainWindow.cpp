@@ -691,6 +691,7 @@ MainWindow::showContextMenuPopup(const QPoint &pos)
         connect(actFrontInt, SIGNAL(triggered(void)), this, SLOT(frontInterval(void)));
         connect(actBackInt, SIGNAL(triggered(void)), this, SLOT(backInterval(void)));
 
+        menu.addAction(actZoomInt);
         menu.addAction(actRenameInt);
         menu.addAction(actDeleteInt);
         menu.exec(intervalWidget->mapToGlobal( pos ));
@@ -1451,7 +1452,7 @@ MainWindow::intervalEdited(QTreeWidgetItem *, int) {
 void
 MainWindow::zoomInterval() {
     // zoom into this interval on allPlot
-    //allPlotWindow->zoomInterval(activeInterval);
+    emit intervalZoom(activeInterval);
 }
 
 void

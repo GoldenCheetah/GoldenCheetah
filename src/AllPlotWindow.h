@@ -71,9 +71,6 @@ class AllPlotWindow : public GcWindow
         void clearSelection();
         void hideSelection();
 
-        // zoom to interval range (via span-slider)
-        void zoomInterval(IntervalItem *);
-
         // get properties - the setters are below
         bool isStacked() const { return showStack->isChecked(); }
         int isShowGrid() const { return showGrid->checkState(); }
@@ -116,6 +113,7 @@ class AllPlotWindow : public GcWindow
 
         // trap widget signals
         void zoomChanged();
+        void zoomInterval(IntervalItem *);
         void moveLeft();
         void moveRight();
         void showStackChanged(int state);
