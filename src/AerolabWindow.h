@@ -40,7 +40,6 @@ class AerolabWindow : public GcWindow {
   public:
   AerolabWindow(MainWindow *mainWindow);
   void setData(RideItem *ride);
-  void zoomInterval(IntervalItem *); // zoom into a specified interval
   double getCanvasTop() const;
   double getCanvasBottom() const;
 
@@ -65,6 +64,7 @@ class AerolabWindow : public GcWindow {
   void setByDistance(int value);
   void rideSelected();
   void zoomChanged();
+  void zoomInterval(IntervalItem *); // zoom into a specified interval
   void configChanged();
   void intervalSelected();
 
