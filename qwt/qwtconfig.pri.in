@@ -114,7 +114,7 @@ CONFIG     += QwtWidgets
 # Otherwise you have to build it from the designer directory.
 ######################################################################
 
-CONFIG     += QwtDesigner
+#CONFIG     += QwtDesigner
 
 ######################################################################
 # If you want to auto build the examples, enable the line below
