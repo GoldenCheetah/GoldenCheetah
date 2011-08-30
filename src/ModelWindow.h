@@ -125,6 +125,8 @@ class ModelWindow : public GcWindow
         ModelPlot *modelPlot;
 
         // labels
+        QLabel *nodata;
+
         QLabel *presetLabel,
                *xLabel,
                *yLabel,
