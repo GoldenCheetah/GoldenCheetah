@@ -162,9 +162,7 @@ class ModelPlot : public QFrame
     Q_OBJECT
     G_OBJECT
 
-
     public:
-
 
         ModelPlot(MainWindow *, ModelSettings *);
         void setData(ModelSettings *settings);
@@ -175,13 +173,14 @@ class ModelPlot : public QFrame
         void setFrame(bool);
         void setZPane(int);
 
+        BasicModelPlot *basicModelPlot;
+
     public slots:
         void setResolution(int);
 
     private:
         MainWindow *main;
         QVBoxLayout *layout;
-        BasicModelPlot *basicModelPlot;
 };
 
 

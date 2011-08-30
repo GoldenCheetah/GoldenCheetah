@@ -172,11 +172,10 @@ class ModelDataProvider : public Function
             plot.inum.clear();
         }
 
-    private:
-
         QHash<QString, double> mz;        // xy map with max z values;
         QHash<QString, int> mnum;      // xy map with count of values for averaging
 
+    private:
 
         double pointType(const RideFilePoint *, int);
         QString describeType(int, bool);
@@ -476,9 +475,10 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
 
         // create a null plot -- bin too large!
         plot.setTitle("No data or bin size too large");
+        // initialise a null plot
         setDomain(0,0,0,0);
-        setMesh(2,2);
         setMinZ(0);
+        setMesh(0,0);
         mz.clear();
         settings->colorProvider->color.clear();
         create();
@@ -813,6 +813,7 @@ BasicModelPlot::BasicModelPlot(MainWindow *parent, ModelSettings *settings) : ma
     // the data provider returns a z for an x,y
     modelDataProvider = new ModelDataProvider(*this, settings);
 
+
 // qwtplot3d api changes between 0.2.x and 0.3.x
 #if QWT3D_MINOR_VERSION < 3
     setDataColor(modelDataColor);
@@ -926,6 +927,12 @@ BasicModelPlot::setData(ModelSettings *settings)
     delete modelDataProvider;
     settings->colorProvider = modelDataColor;
     modelDataProvider = new ModelDataProvider(*this, settings);
+
+    if (modelDataProvider->mz.count() == 0) {
+        hide();
+    } else {
+        show();
+    }
     //modelDataProvider->assign(this);
     //create();
     //resetViewPoint();

@@ -53,6 +53,10 @@ ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) :
     QFormLayout *cl = new QFormLayout(c);
     setControls(c);
 
+    // hidden text when plot invalid
+    nodata = new QLabel(tr("No data or bin size too large."), this);
+    nodata->hide();
+
     // the plot widget
     QHBoxLayout *mainLayout = new QHBoxLayout;
     modelPlot= new ModelPlot(main, NULL);
@@ -63,6 +67,7 @@ ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) :
     zpane->setValue(0);
     mainLayout->addWidget(zpane);
     mainLayout->addWidget(modelPlot);
+    mainLayout->addWidget(nodata);
     setLayout(mainLayout);
 
     // preset Values
@@ -238,8 +243,24 @@ ModelWindow::setData(bool adjustPlot)
         if (current != NULL && current->isSelected() == true)
                 settings.intervals.append(current);
     }
+
+    setUpdatesEnabled(false);
+
+    // reset the model parameters
     modelPlot->setData(&settings);
+
+    // if setdata resulted in the plot being hidden
+    // then the settings were not valid.
+    if (modelPlot->basicModelPlot->isHidden()) {
+        zpane->hide();
+        nodata->show();
+    } else {
+        zpane->show();
+        nodata->hide();
+    }
     setClean();
+
+    setUpdatesEnabled(true);
 }
 
 void
