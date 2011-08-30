@@ -57,6 +57,7 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     connect(eraseRideButton, SIGNAL(clicked()), this, SLOT(eraseClicked()));
     connect(rescanButton, SIGNAL(clicked()), this, SLOT(scanCommPorts()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+    connect(deviceCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setReadyInstruct()));
 
     QHBoxLayout *buttonLayout = new QHBoxLayout; 
     buttonLayout->addWidget(downloadButton); 
