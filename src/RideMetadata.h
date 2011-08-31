@@ -151,7 +151,7 @@ class RideMetadata : public QWidget
     RideItem *_ride, *_connected;
 
     public:
-        RideMetadata(MainWindow *);
+        RideMetadata(MainWindow *, bool singlecolumn = false);
         static void serialize(QString filename, QList<KeywordDefinition>, QList<FieldDefinition>);
         static void readXML(QString filename, QList<KeywordDefinition>&, QList<FieldDefinition>&);
         QList<KeywordDefinition> getKeywords() { return keywordDefinitions; }
@@ -159,6 +159,8 @@ class RideMetadata : public QWidget
 
         void setRideItem(RideItem *x);
         RideItem *rideItem() const;
+
+        bool singlecolumn;
 
     public slots:
         void configUpdate();
