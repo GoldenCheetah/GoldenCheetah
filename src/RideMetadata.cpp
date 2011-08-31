@@ -32,7 +32,8 @@
 /*----------------------------------------------------------------------
  * Master widget for Metadata Entry "on" RideSummaryWindow
  *--------------------------------------------------------------------*/
-RideMetadata::RideMetadata(MainWindow *parent) : QWidget(parent), main(parent)
+RideMetadata::RideMetadata(MainWindow *parent, bool singlecolumn) : 
+    QWidget(parent), singlecolumn(singlecolumn), main(parent)
 {
 
     _ride = _connected = NULL;
@@ -310,7 +311,7 @@ Form::arrange()
 
 
     for (int i=0; i<fields.count(); i++) {
-        if (y >= rows) {
+        if (y >= rows && meta->singlecolumn==false) {
             x+=1;
             y=0;
 
