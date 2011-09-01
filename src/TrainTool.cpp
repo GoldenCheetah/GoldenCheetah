@@ -35,16 +35,24 @@
 #include "NullController.h"
 
 
-TrainTool::TrainTool(MainWindow *parent, const QDir &home) : QWidget(parent), home(home), main(parent)
+TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), home(home), main(parent)
 {
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    setInstanceName("Train Controls");
 
-    mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(0,0,0,0);
+    QWidget *c = new QWidget;
+    QVBoxLayout *cl = new QVBoxLayout(c);
+    setControls(c);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    setLayout(mainLayout);
+
+    cl->setSpacing(0);
+    cl->setContentsMargins(0,0,0,0);
 
     //setLineWidth(1);
     //setMidLineWidth(0);
     //setFrameStyle(QFrame::Plain | QFrame::Sunken);
+    mainLayout->setSpacing(0);
     setContentsMargins(0,0,0,0);
 
 
@@ -81,10 +89,12 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : QWidget(parent), ho
 
     buttonPanel = new QFrame;
     buttonPanel->setLineWidth(1);
-    buttonPanel->setFrameStyle(QFrame::Box | QFrame::Raised);
+    buttonPanel->setFrameStyle(QFrame::NoFrame);
     buttonPanel->setContentsMargins(0,0,0,0);
     QVBoxLayout *panel = new QVBoxLayout;
+    panel->setSpacing(0);
     QHBoxLayout *buttons = new QHBoxLayout;
+    buttons->setSpacing(0);
     startButton = new QPushButton(tr("Start"), this);
     startButton->setMaximumHeight(100);
     pauseButton = new QPushButton(tr("Pause"), this);
@@ -101,6 +111,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : QWidget(parent), ho
     panel->addWidget(recordSelector);
     buttonPanel->setLayout(panel);
     buttonPanel->setFixedHeight(90);
+    mainLayout->addWidget(buttonPanel);
 
     trainSplitter = new QSplitter;
     trainSplitter->setOrientation(Qt::Vertical);
@@ -108,15 +119,10 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : QWidget(parent), ho
     trainSplitter->setLineWidth(0);
     trainSplitter->setMidLineWidth(0);
 
-    mainLayout->addWidget(trainSplitter);
-    trainSplitter->addWidget(buttonPanel);
-    trainSplitter->setCollapsible(0, false);
+    cl->addWidget(trainSplitter);
     trainSplitter->addWidget(deviceTree);
-    trainSplitter->setCollapsible(1, true);
     trainSplitter->addWidget(serverTree);
-    trainSplitter->setCollapsible(2, true);
     trainSplitter->addWidget(workoutTree);
-    trainSplitter->setCollapsible(3, true);
 
     // handle config changes
     connect(serverTree,SIGNAL(itemSelectionChanged()), this, SLOT(serverTreeWidgetSelectionChanged()));
