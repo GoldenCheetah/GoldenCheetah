@@ -452,7 +452,7 @@ MainWindow::MainWindow(const QDir &home) :
      * Application Menus
      *--------------------------------------------------------------------*/
 
-    QMenu *fileMenu = menuBar()->addMenu(tr("&Cyclist"));
+    QMenu *fileMenu = menuBar()->addMenu(tr("&Athlete"));
     fileMenu->addAction(tr("&New..."), this, SLOT(newCyclist()), tr("Ctrl+N"));
     fileMenu->addAction(tr("&Open..."), this, SLOT(openCyclist()), tr("Ctrl+O"));
     fileMenu->addAction(tr("&Quit"), this, SLOT(close()), tr("Ctrl+Q"));

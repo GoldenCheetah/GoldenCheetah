@@ -29,7 +29,7 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     QVBoxLayout *all = new QVBoxLayout(this);
     QGridLayout *grid = new QGridLayout;
 
-    QLabel *namelabel = new QLabel(tr("Cyclist Name"));
+    QLabel *namelabel = new QLabel(tr("Athlete Name"));
     QLabel *doblabel = new QLabel(tr("Date of Birth"));
     QLabel *sexlabel = new QLabel(tr("Sex"));
     QLabel *biolabel = new QLabel(tr("Bio"));
@@ -180,10 +180,10 @@ NewCyclistDialog::saveClicked()
                 QMessageBox::critical(0, tr("Fatal Error"), tr("Can't create new directory ") + home.path() + "/" + name->text(), "OK");
             }
         } else {
-            QMessageBox::critical(0, tr("Fatal Error"), tr("Cyclist already exists ")  + name->text(), "OK");
+            QMessageBox::critical(0, tr("Fatal Error"), tr("Athlete already exists ")  + name->text(), "OK");
         }
     } else {
-        QMessageBox::critical(0, tr("Fatal Error"), tr("Cyclist name is mandatory"), "OK");
+        QMessageBox::critical(0, tr("Fatal Error"), tr("Athlete name is mandatory"), "OK");
     }
     return;
 }
