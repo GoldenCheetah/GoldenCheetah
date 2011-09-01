@@ -237,13 +237,13 @@ public:
 
                 // format the group by with ride count etc
                 if (groupBy != -1) {
-                    QString returnString = QString("%1: %2 (%3 rides)")
+                    QString returnString = QString("%1: %2 (%3 activities)")
                                            .arg(sourceModel()->headerData(groupBy, Qt::Horizontal).toString())
                                            .arg(group)
                                            .arg(groupToSourceRow.value(groups[proxyIndex.row()])->count());
                     returning = QVariant(returnString);
                 } else {
-                    QString returnString = QString("All %1 rides")
+                    QString returnString = QString("All %1 activities")
                                            .arg(groupToSourceRow.value(groups[proxyIndex.row()])->count());
                     returning = QVariant(returnString);
                 }
@@ -328,7 +328,7 @@ public:
 
     QString whichGroup(int row) const {
 
-        if (groupBy == -1) return tr("All Rides");
+        if (groupBy == -1) return tr("All Activities");
         else return groupFromValue(headerData(groupBy+1,
                                     Qt::Horizontal).toString(),
                                     sourceModel()->data(sourceModel()->index(row,groupBy)).toString(),
@@ -402,7 +402,7 @@ public:
                 rows->append(i);
                 sourceRowToGroupRow.append(i);
             }
-            groupToSourceRow.insert("All Rides", rows);
+            groupToSourceRow.insert("All Activities", rows);
 
         }
 
