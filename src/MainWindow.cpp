@@ -282,7 +282,7 @@ MainWindow::MainWindow(const QDir &home) :
     treeWidget->hide();
 
     allRides = new QTreeWidgetItem(treeWidget, FOLDER_TYPE);
-    allRides->setText(0, tr("All Rides"));
+    allRides->setText(0, tr("All Activities"));
     treeWidget->expandItem(allRides);
     treeWidget->setFirstItemColumnSpanned (allRides, true);
 
@@ -457,10 +457,10 @@ MainWindow::MainWindow(const QDir &home) :
     fileMenu->addAction(tr("&Open..."), this, SLOT(openCyclist()), tr("Ctrl+O"));
     fileMenu->addAction(tr("&Quit"), this, SLOT(close()), tr("Ctrl+Q"));
 
-    QMenu *rideMenu = menuBar()->addMenu(tr("&Ride"));
+    QMenu *rideMenu = menuBar()->addMenu(tr("&Activity"));
     rideMenu->addAction(tr("&Download from device..."), this, SLOT(downloadRide()), tr("Ctrl+D"));
     rideMenu->addAction(tr("&Import from file..."), this, SLOT (importFile()), tr ("Ctrl+I"));
-    rideMenu->addAction(tr("&Manual ride entry..."), this, SLOT(manualRide()), tr("Ctrl+M"));
+    rideMenu->addAction(tr("&Manual activity entry..."), this, SLOT(manualRide()), tr("Ctrl+M"));
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Export to CSV..."), this, SLOT(exportCSV()), tr("Ctrl+E"));
     rideMenu->addAction(tr("Export to GC..."), this, SLOT(exportGC()));
@@ -479,9 +479,9 @@ MainWindow::MainWindow(const QDir &home) :
     rideMenu->addAction(tr("Down&load from Training Peaks..."), this, SLOT(downloadTP()), tr("Ctrl+L"));
 #endif
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("&Save ride"), this, SLOT(saveRide()), tr("Ctrl+S"));
-    rideMenu->addAction(tr("D&elete ride..."), this, SLOT(deleteRide()));
-    rideMenu->addAction(tr("Split &ride..."), this, SLOT(splitRide()));
+    rideMenu->addAction(tr("&Save activity"), this, SLOT(saveRide()), tr("Ctrl+S"));
+    rideMenu->addAction(tr("D&elete activity..."), this, SLOT(deleteRide()));
+    rideMenu->addAction(tr("Split &activity..."), this, SLOT(splitRide()));
     rideMenu->addSeparator ();
 
 
@@ -507,7 +507,7 @@ MainWindow::MainWindow(const QDir &home) :
 
 #ifdef GC_HAVE_ICAL
     optionsMenu->addSeparator();
-    optionsMenu->addAction(tr("Upload Ride to Calendar"), this, SLOT(uploadCalendar()), tr (""));
+    optionsMenu->addAction(tr("Upload Activity to Calendar"), this, SLOT(uploadCalendar()), tr (""));
     optionsMenu->addAction(tr("Import Calendar..."), this, SLOT(importCalendar()), tr (""));
     optionsMenu->addAction(tr("Export Calendar..."), this, SLOT(exportCalendar()), tr (""));
     optionsMenu->addAction(tr("Refresh Calendar"), this, SLOT(refreshCalendar()), tr (""));
@@ -690,17 +690,17 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
     if (treeWidget->selectedItems().size() == 0) return; //none selected!
 
     RideItem *rideItem = (RideItem *)treeWidget->selectedItems().first();
-    if (rideItem != NULL && rideItem->text(0) != tr("All Rides")) {
+    if (rideItem != NULL && rideItem->text(0) != tr("All Activities")) {
         QMenu menu(treeWidget);
 
 
-        QAction *actSaveRide = new QAction(tr("Save Changes to Ride"), treeWidget);
+        QAction *actSaveRide = new QAction(tr("Save Changes"), treeWidget);
         connect(actSaveRide, SIGNAL(triggered(void)), this, SLOT(saveRide()));
 
-        QAction *revertRide = new QAction(tr("Revert to Saved Ride"), treeWidget);
+        QAction *revertRide = new QAction(tr("Revert to Saved version"), treeWidget);
         connect(revertRide, SIGNAL(triggered(void)), this, SLOT(revertRide()));
 
-        QAction *actDeleteRide = new QAction(tr("Delete Ride"), treeWidget);
+        QAction *actDeleteRide = new QAction(tr("Delete Activity"), treeWidget);
         connect(actDeleteRide, SIGNAL(triggered(void)), this, SLOT(deleteRide()));
 
         QAction *actBestInt = new QAction(tr("Find Best Intervals"), treeWidget);
@@ -709,7 +709,7 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
         QAction *actPowerPeaks = new QAction(tr("Find Power Peaks"), treeWidget);
         connect(actPowerPeaks, SIGNAL(triggered(void)), this, SLOT(findPowerPeaks()));
 
-        QAction *actSplitRide = new QAction(tr("Split Ride"), treeWidget);
+        QAction *actSplitRide = new QAction(tr("Split Activity"), treeWidget);
         connect(actSplitRide, SIGNAL(triggered(void)), this, SLOT(splitRide()));
 
         if (rideItem->isDirty() == true) {
@@ -722,7 +722,7 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
         menu.addAction(actPowerPeaks);
         menu.addAction(actSplitRide);
 #ifdef GC_HAVE_LIBOAUTH
-        QAction *actTweetRide = new QAction(tr("Tweet Ride"), treeWidget);
+        QAction *actTweetRide = new QAction(tr("Tweet Activity"), treeWidget);
         connect(actTweetRide, SIGNAL(triggered(void)), this, SLOT(tweetRide()));
         menu.addAction(actTweetRide);
 #endif
@@ -820,7 +820,7 @@ MainWindow::aboutDialog()
             "<p>Source code can be obtained from<br>"
             "<a href=\"http://goldencheetah.org/\">"
             "http://goldencheetah.org/</a>."
-            "<p>Ride files and other data are stored in<br>"
+            "<p>Activity files and other data are stored in<br>"
             "<a href=\"%4\">%5</a>"
             "<p>Trademarks used with permission<br>"
             "TSS, NP, IF courtesy of <a href=\"http://www.peaksware.com\">"
@@ -1120,7 +1120,7 @@ MainWindow::exportGC()
 {
     if ((treeWidget->selectedItems().size() != 1)
         || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
-        QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
+        QMessageBox::critical(this, tr("Select Activity"), tr("No activity selected!"));
         return;
     }
 
@@ -1140,7 +1140,7 @@ MainWindow::exportJson()
 {
     if ((treeWidget->selectedItems().size() != 1)
         || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
-        QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
+        QMessageBox::critical(this, tr("Select Activity"), tr("No activity selected!"));
         return;
     }
 
@@ -1160,7 +1160,7 @@ MainWindow::exportPWX()
 {
     if ((treeWidget->selectedItems().size() != 1)
         || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
-        QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
+        QMessageBox::critical(this, tr("Select Activity"), tr("No activity selected!"));
         return;
     }
 
@@ -1180,7 +1180,7 @@ MainWindow::exportTCX()
 {
     if ((treeWidget->selectedItems().size() != 1)
         || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
-        QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
+        QMessageBox::critical(this, tr("Select Activity"), tr("No activity selected!"));
         return;
     }
 
@@ -1201,7 +1201,7 @@ MainWindow::exportKML()
 {
     if ((treeWidget->selectedItems().size() != 1)
         || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
-        QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
+        QMessageBox::critical(this, tr("Select Activity"), tr("No activity selected!"));
         return;
     }
 
@@ -1222,7 +1222,7 @@ MainWindow::exportCSV()
 {
     if ((treeWidget->selectedItems().size() != 1)
         || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
-        QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
+        QMessageBox::critical(this, tr("Select Activity"), tr("No activity selected!"));
         return;
     }
 
@@ -1247,7 +1247,7 @@ MainWindow::exportCSV()
     QFile file(fileName);
     if (!file.open(QFile::WriteOnly | QFile::Truncate))
     {
-        QMessageBox::critical(this, tr("Split Ride"), tr("The file %1 can't be opened for writing").arg(fileName));
+        QMessageBox::critical(this, tr("Split Activity"), tr("The file %1 can't be opened for writing").arg(fileName));
         return;
     }
 
@@ -1288,7 +1288,7 @@ MainWindow::saveRide()
     if (ride)
         saveRideSingleDialog(ride); // will signal save to everyone
     else {
-        QMessageBox oops(QMessageBox::Critical, tr("No Ride To Save"),
+        QMessageBox oops(QMessageBox::Critical, tr("No Activity To Save"),
                          tr("There is no currently selected ride to save."));
         oops.exec();
         return;
@@ -1320,7 +1320,7 @@ MainWindow::deleteRide()
         return;
     RideItem *item = static_cast<RideItem*>(_item);
     QMessageBox msgBox;
-    msgBox.setText(tr("Are you sure you want to delete the ride:"));
+    msgBox.setText(tr("Are you sure you want to delete the activity:"));
     msgBox.setInformativeText(item->fileName);
     QPushButton *deleteButton = msgBox.addButton(tr("Delete"),QMessageBox::YesRole);
     msgBox.setStandardButtons(QMessageBox::Cancel);
@@ -1631,7 +1631,7 @@ MainWindow::setCriticalPower(int cp)
   QMessageBox::information(
 			   this,
 			   tr("CP saved"),
-			   tr("Range from %1 to %2\nRider CP set to %3 watts") .
+			   tr("Range from %1 to %2\nAthlete CP set to %3 watts") .
 			   arg(startDate.isNull() ? "BEGIN" : startDate.toString()) .
 			   arg(endDate.isNull() ? "END" : endDate.toString()) .
 			   arg(cp)
@@ -1652,7 +1652,7 @@ MainWindow::parseRideFileName(const QString &name, QString *notesFileName, QDate
     QTime time(rx.cap(5).toInt(), rx.cap(6).toInt(),rx.cap(7).toInt());
     if ((! date.isValid()) || (! time.isValid())) {
 	QMessageBox::warning(this,
-			     tr("Invalid Ride File Name"),
+			     tr("Invalid Activity File Name"),
 			     tr("Invalid date/time in filename:\n%1\nSkipping file...").arg(name)
 			     );
 	return false;
