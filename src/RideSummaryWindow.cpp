@@ -260,8 +260,8 @@ RideSummaryWindow::htmlSummary() const
              // HTML table row
              QString s("<tr><td>%1%2:</td><td align=\"right\">%3</td></tr>");
  
-             // Average Average looks nasty, remove from name for display
-             s = s.arg(m->name().replace(QRegExp(tr("^Average ")), ""));
+             // Maximum Max and Average Average looks nasty, remove from name for display
+             s = s.arg(m->name().replace(QRegExp(tr("^(Average|Max) ")), ""));
  
              // Add units (if needed)  and value (with right precision)
              if (m->units(metricUnits) == "seconds") {
