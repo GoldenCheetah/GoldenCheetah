@@ -429,6 +429,84 @@ static bool maxHrAdded =
 
 //////////////////////////////////////////////////////////////////////////////
 
+class MaxSpeed : public RideMetric {
+    public:
+
+    MaxSpeed()
+    {
+        setSymbol("max_speed");
+        setName(tr("Max Speed"));
+        setMetricUnits(tr("kph"));
+        setImperialUnits(tr("mph"));
+        setType(RideMetric::Peak);
+        setPrecision(1);
+        setConversion(MILES_PER_KM);
+    }
+
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const MainWindow *) {
+        double max = 0.0;
+        foreach (const RideFilePoint *point, ride->dataPoints())
+            if (point->kph > max) max = point->kph;
+
+        setValue(max);
+    }
+
+    void aggregateWith(const RideMetric &other) {
+        assert(symbol() == other.symbol());
+        const MaxSpeed &ms = dynamic_cast<const MaxSpeed&>(other);
+
+        setValue(ms.value(true) > value(true) ? ms.value(true) : value(true));
+    }
+    RideMetric *clone() const { return new MaxSpeed(*this); }
+};
+
+static bool maxSpeedAdded =
+    RideMetricFactory::instance().addMetric(MaxSpeed());
+
+//////////////////////////////////////////////////////////////////////////////
+
+class MaxCadence : public RideMetric {
+    public:
+
+    MaxCadence()
+    {
+        setSymbol("max_cadence");
+        setName(tr("Max Cadence"));
+        setMetricUnits(tr("rpm"));
+        setImperialUnits(tr("rpm"));
+        setType(RideMetric::Peak);
+        setPrecision(1);
+        setConversion(MILES_PER_KM);
+    }
+
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const MainWindow *) {
+        double max = 0.0;
+        foreach (const RideFilePoint *point, ride->dataPoints())
+            if (point->cad > max) max = point->cad;
+
+        setValue(max);
+    }
+
+    void aggregateWith(const RideMetric &other) {
+        assert(symbol() == other.symbol());
+        const MaxCadence &mc = dynamic_cast<const MaxCadence&>(other);
+
+        setValue(mc.value(true) > value(true) ? mc.value(true) : value(true));
+    }
+    RideMetric *clone() const { return new MaxCadence(*this); }
+};
+
+static bool maxCadenceAdded =
+    RideMetricFactory::instance().addMetric(MaxCadence());
+
+//////////////////////////////////////////////////////////////////////////////
+
 class NinetyFivePercentHeartRate : public RideMetric {
     double hr;
     public:
@@ -625,3 +703,4 @@ static bool addMaxPowerVariance()
 
 static bool maxPowerVarianceAdded = addMaxPowerVariance();
 
+//////////////////////////////////////////////////////////////////////////////

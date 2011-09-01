@@ -128,8 +128,8 @@ RideSummaryWindow::htmlSummary() const
 
     bool metricUnits = (unit.toString() == "Metric");
 
-    const int columns = 3;
-    const char *columnNames[] = { "Totals", "Averages", "Metrics*" };
+    const int columns = 4;
+    const char *columnNames[] = { "Totals", "Averages", "Maximums", "Metrics*" };
     const char *totalColumn[] = {
         "workout_time",
         "time_riding",
@@ -144,6 +144,14 @@ RideSummaryWindow::htmlSummary() const
         "average_power",
         "average_hr",
         "average_cad",
+        NULL
+    };
+
+    const char *maximumColumn[] = {
+        "max_speed",
+        "max_power",
+        "max_heartrate",
+        "max_cadence",
         NULL
     };
 
@@ -210,6 +218,7 @@ RideSummaryWindow::htmlSummary() const
         QStringList worklist;
         for (int i=0; totalColumn[i];i++) worklist << totalColumn[i];
         for (int i=0; averageColumn[i];i++) worklist << averageColumn[i];
+        for (int i=0; maximumColumn[i];i++) worklist << maximumColumn[i];
         for (int i=0; metricColumn[i];i++) worklist << metricColumn[i];
         for (int i=0; timeInZones[i];i++) worklist << timeInZones[i];
 
@@ -237,7 +246,8 @@ RideSummaryWindow::htmlSummary() const
         switch (i) {
             case 0: metricsList = totalColumn; break;
             case 1: metricsList = averageColumn; break;
-            case 2: metricsList = metricColumn; break;
+            case 2: metricsList = maximumColumn; break;
+            case 3: metricsList = metricColumn; break;
             default: assert(false);
         }
         for (int j = 0;; ++j) {
