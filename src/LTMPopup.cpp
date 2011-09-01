@@ -24,6 +24,7 @@ LTMPopup::LTMPopup(MainWindow *parent) : QWidget(parent), main(parent)
     useMetricUnits = appsettings->value(this, GC_UNIT).toString() == "Metric";
     setAutoFillBackground(false);
     setContentsMargins(0,0,0,0);
+    setFixedWidth(800);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0,0,0,0);
