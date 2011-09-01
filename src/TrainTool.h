@@ -66,7 +66,7 @@ class NullController;
 class RealtimePlot;
 class RealtimeData;
 
-class TrainTool : public QWidget
+class TrainTool : public GcWindow
 {
     Q_OBJECT
     G_OBJECT

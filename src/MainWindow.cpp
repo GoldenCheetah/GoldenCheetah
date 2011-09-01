@@ -394,7 +394,7 @@ MainWindow::MainWindow(const QDir &home) :
     // TRAIN WINDOW & CONTROLS
     trainWindow = new HomeWindow(this, "train", "Training");
     trainWindow->controls()->hide();
-    trainControls->addWidget(new TrainTool(this, this->home));
+    trainControls->addWidget(trainWindow->controls());
 
     // ANALYSIS WINDOW & CONTRAOLS
     analWindow = new HomeWindow(this, "analysis", "Analysis");

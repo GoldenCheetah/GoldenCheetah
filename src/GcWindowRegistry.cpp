@@ -73,6 +73,7 @@ GcWindowRegistry GcWindows[] = {
     { "Ride Collection TreeMap",GcWindowTypes::TreeMap },
     { "Weekly Summary",GcWindowTypes::WeeklySummary },
     { "Video Player",GcWindowTypes::VideoPlayer },
+    { "Realtime Controls", GcWindowTypes::RealtimeControls },
     { "Realtime Dial",GcWindowTypes::DialWindow },
     { "Realtime Plot",GcWindowTypes::RealtimePlot },
     { "Workout Plot",GcWindowTypes::WorkoutPlot },
@@ -117,6 +118,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, MainWindow *main) //XXX mainWindow wil
 #endif
     case GcWindowTypes::DialWindow: returning = new DialWindow(main); break;
     case GcWindowTypes::MetadataWindow: returning = new MetadataWindow(main); break;
+    case GcWindowTypes::RealtimeControls: returning = new TrainTool(main, main->home); break;
     case GcWindowTypes::RealtimePlot: returning = new RealtimePlotWindow(main); break;
     case GcWindowTypes::WorkoutPlot: returning = new WorkoutPlotWindow(main); break;
     case GcWindowTypes::BingMap: returning = new BingMap(main); break;
