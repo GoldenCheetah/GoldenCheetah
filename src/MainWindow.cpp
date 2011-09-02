@@ -457,7 +457,7 @@ MainWindow::MainWindow(const QDir &home) :
     fileMenu->addAction(tr("&Open..."), this, SLOT(openCyclist()), tr("Ctrl+O"));
     fileMenu->addAction(tr("&Quit"), this, SLOT(close()), tr("Ctrl+Q"));
 
-    QMenu *rideMenu = menuBar()->addMenu(tr("&Activity"));
+    QMenu *rideMenu = menuBar()->addMenu(tr("A&ctivity"));
     rideMenu->addAction(tr("&Download from device..."), this, SLOT(downloadRide()), tr("Ctrl+D"));
     rideMenu->addAction(tr("&Import from file..."), this, SLOT (importFile()), tr ("Ctrl+I"));
     rideMenu->addAction(tr("&Manual activity entry..."), this, SLOT(manualRide()), tr("Ctrl+M"));
