@@ -49,6 +49,7 @@ class GcWindowTool;
 class Seasons;
 class IntervalSummaryWindow;
 class RideNavigator;
+class GcToolBar;
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 
@@ -259,7 +260,7 @@ class MainWindow : public QMainWindow
         RideItem *ride;  // the currently selected ride
 
         QToolBox *toolBox;
-        QToolBar *toolbar;
+        GcToolBar *toolbar;
         QDockWidget *dock;
         QAction *homeAct, *diaryAct, *analysisAct, *measuresAct, *trainAct, *athleteAct, *helpAct, *configAct;
 

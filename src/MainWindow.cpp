@@ -59,6 +59,7 @@
 #include "TrainTool.h"
 
 #include "GcWindowTool.h"
+#include "GcToolBar.h"
 #ifdef GC_HAVE_SOAP
 #include "TPUploadDialog.h"
 #include "TPDownloadDialog.h"
@@ -120,15 +121,6 @@ MainWindow::MainWindow(const QDir &home) :
     QVariant unit = appsettings->value(this, GC_UNIT);
     useMetricUnits = (unit.toString() == "Metric");
 
-#if 0
-    QPalette pal;
-    pal.setColor(QPalette::Window, GColor(CTOOLBAR));
-    pal.setColor(QPalette::Button, GColor(CTOOLBAR));
-    pal.setColor(QPalette::WindowText, Qt::white); //XXX should be black/white for CTOOLBAR
-    statusBar()->setPalette(pal);
-    statusBar()->showMessage(tr("Ready"));
-#endif
-
     /*----------------------------------------------------------------------
      *  Athlete details
      *--------------------------------------------------------------------*/
@@ -181,29 +173,8 @@ MainWindow::MainWindow(const QDir &home) :
      * Toolbar
      *--------------------------------------------------------------------*/
 
-    toolbar = new QToolBar(this);
-    toolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    toolbar->setFloatable(false);
-    toolbar->setIconSize(QSize(32,32));
-#ifndef Q_OS_MAC
-    toolbar->setContentsMargins(0,0,0,0);
-    toolbar->setAutoFillBackground(true);
-    toolbar->setStyleSheet("background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #CFCFCF, stop: 1.0 #A8A8A8);"
-                           "border: 0px;");
-    toolbar->setPalette(menuBar()->palette());
-    toolbar->setMovable(false);
-#endif
-#if 0
-    QIcon tickIcon(":images/toolbar/main/tick.png");
-    QPushButton *showControls = new QPushButton(tickIcon, "", this);
-    showControls->setFixedWidth(10);
-    showControls->setFixedHeight(10);
-    showControls->setContentsMargins(0,0,0,0);
-    showControls->setStyleSheet("background-color: QColor(231,231,231,0); border: none;");
-    toolbar->addWidget(showControls);
-    connect(showControls, SIGNAL(clicked()), this, SLOT(showDock()));
-#endif
-    addToolBar(toolbar);
+    toolbar = new GcToolBar(this);
+    toolbar->addStretch();
 
     // home
     QIcon homeIcon(":images/toolbar/main/home.png");
@@ -225,11 +196,13 @@ MainWindow::MainWindow(const QDir &home) :
     connect(analysisAct, SIGNAL(triggered()), this, SLOT(selectAnalysis()));
     toolbar->addAction(analysisAct);
 
+#if 0 // XXX NOT YET IMPLEMENTED
     // measures
     QIcon measuresIcon(":images/toolbar/main/measures.png");
     measuresAct = new QAction(measuresIcon, tr("Measures"), this);
     //connect(measuresAct, SIGNAL(triggered()), this, SLOT(selectMeasures()));
     toolbar->addAction(measuresAct);
+#endif
 
     // train
     QIcon trainIcon(":images/toolbar/main/train.png");
@@ -237,28 +210,15 @@ MainWindow::MainWindow(const QDir &home) :
     connect(trainAct, SIGNAL(triggered()), this, SLOT(selectTrain()));
     toolbar->addAction(trainAct);
 
+#if 0 // XXX NOT YET IMPLEMENTED
     // athletes
     QIcon athleteIcon(":images/toolbar/main/athlete.png");
     athleteAct = new QAction(athleteIcon, tr("Athletes"), this);
     //connect(athleteAct, SIGNAL(triggered()), this, SLOT(athleteView()));
     toolbar->addAction(athleteAct);
+#endif
 
-    // right align with a spacer
-    QWidget* spacer = new QWidget();
-    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    toolbar->addWidget(spacer);
-
-    // config
-    QIcon configIcon(":images/toolbar/main/config.png");
-    configAct = new QAction(configIcon, tr("Settings"), this);
-    connect(configAct, SIGNAL(triggered()), this, SLOT(showOptions()));
-    toolbar->addAction(configAct);
-
-    // help
-    QIcon helpIcon(":images/toolbar/main/help.png");
-    helpAct = new QAction(helpIcon, tr("Help"), this);
-    connect(helpAct, SIGNAL(triggered()), this, SLOT(helpView()));
-    toolbar->addAction(helpAct);
+    toolbar->addStretch();
 
     /*----------------------------------------------------------------------
      * Sidebar
@@ -333,23 +293,16 @@ MainWindow::MainWindow(const QDir &home) :
     toolBox = new QToolBox(this);
     toolBox->setAcceptDrops(true);
     toolBox->setStyleSheet("QToolBox::tab {"
-#if 0
-                           "background-image: url(:images/aluToolBar.png);"
-                           "background-position: top right;"
-                           "background-origin: content;"
-                           "background-repeat: repeat-x;"
-#endif
                            "max-height: 18px; "
                            "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+                           //"stop: 0 #82848A, stop: 1.0 #53555A);" // XXX match toolbar
                            "stop: 0 #CFCFCF, stop: 1.0 #A8A8A8);"
                            "border: 1px solid rgba(255, 255, 255, 32);"
-#if 0
-                           "color: #535353;"
-#endif
+                           "color: #101010;"
                            "font-weight: bold; }");
 
     toolBox->setFrameStyle(QFrame::NoFrame);
-    toolBox->setPalette(toolbar->palette());
+    //toolBox->setPalette(toolbar->palette());
     toolBox->setContentsMargins(0,0,0,0);
     toolBox->layout()->setSpacing(0);
 
@@ -403,7 +356,9 @@ MainWindow::MainWindow(const QDir &home) :
     toolBox->addItem(_rideMetadata, QIcon(":images/metadata.png"), "Activity Details");
     toolBox->addItem(intervalSplitter, QIcon(":images/stopwatch.png"), "Activity Intervals");
     toolBox->addItem(masterControls, QIcon(":images/settings.png"), "Chart Settings");
+#if 0 // XXX NOT YET IMPLEMENTED
     toolBox->addItem(new AthleteTool(QFileInfo(home.path()).path(), this), QIcon(":images/toolbar/main/athlete.png"), "Athletes");
+#endif
     toolBox->addItem(chartTool, QIcon(":images/addchart.png"), "Charts");
 
 
@@ -442,9 +397,27 @@ MainWindow::MainWindow(const QDir &home) :
 
     splitter->setChildrenCollapsible(false); // QT BUG crash QTextLayout do not undo this
     splitter->setHandleWidth(1);
+    splitter->setStyleSheet(" QSplitter::handle { "
+                            "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, "
+                            "stop:0 rgba(255, 255, 255, 0), "
+                            "stop:0.407273 rgba(200, 200, 200, 255), "
+                            "stop:0.4825 rgba(101, 104, 113, 235), "
+                            "stop:0.6 rgba(255, 255, 255, 0)); }");
+
     splitter->setFrameStyle(QFrame::NoFrame);
     splitter->setContentsMargins(0, 0, 0, 0); // attempting to follow some UI guides
-    setCentralWidget(splitter);
+
+    // CENTRAL LAYOUT
+    QWidget *central = new QWidget(this);
+    central->setContentsMargins(0,0,0,0);
+
+    QVBoxLayout *centralLayout = new QVBoxLayout(central);
+    centralLayout->setSpacing(0);
+    centralLayout->setContentsMargins(0,0,0,0);
+    centralLayout->addWidget(toolbar);
+    centralLayout->addWidget(splitter);
+
+    setCentralWidget(central);
 
     /*----------------------------------------------------------------------
      * Application Menus
@@ -641,12 +614,6 @@ MainWindow::rideTreeWidgetSelectionChanged()
         else
             ride = (RideItem*) which;
     }
-
-#if 0
-    // update the status bar
-    if (!ride) statusBar()->showMessage(tr("No ride selected"));
-    else statusBar()->showMessage(ride->dateTime.toString("ddd MMM d, yyyy h:mm AP")); // same format as ride list
-#endif
 
     // update the ride property on all widgets
     // to let them know they need to replot new
@@ -1696,17 +1663,6 @@ MainWindow::notifyConfigChanged()
        else if (! hrzones_->warningString().isEmpty())
             QMessageBox::warning(this, tr("Reading HR Zones File"), hrzones_->warningString());
     }
-
-    // update the toolbar color if not Mac
-#ifndef Q_OS_MAC
-#if 0
-    QPalette pal;
-    pal.setColor(QPalette::Window, GColor(CTOOLBAR));
-    pal.setColor(QPalette::Button, GColor(CTOOLBAR));
-    toolbar->setPalette(pal);
-    statusBar()->setPalette(pal);
-#endif
-#endif
 
     // now tell everyone else
     configChanged();

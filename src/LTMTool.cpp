@@ -46,7 +46,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     dateRangeTree->setColumnCount(1);
     dateRangeTree->setSelectionMode(QAbstractItemView::SingleSelection);
     dateRangeTree->header()->hide();
-    dateRangeTree->setAlternatingRowColors (true);
+    //dateRangeTree->setAlternatingRowColors (true);
     dateRangeTree->setIndentation(5);
     allDateRanges = new QTreeWidgetItem(dateRangeTree, ROOT_TYPE);
     allDateRanges->setText(0, tr("Date Range"));
@@ -64,7 +64,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     else
         metricTree->setSelectionMode(QAbstractItemView::SingleSelection);
     metricTree->header()->hide();
-    metricTree->setAlternatingRowColors (true);
+    //metricTree->setAlternatingRowColors (true);
     metricTree->setIndentation(5);
     allMetrics = new QTreeWidgetItem(metricTree, ROOT_TYPE);
     allMetrics->setText(0, tr("Metric"));
@@ -448,6 +448,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     configChanged(); // will reset the metric tree
 
     ltmSplitter = new QSplitter;
+    ltmSplitter->setHandleWidth(1);
     ltmSplitter->setContentsMargins(0,0,0,0);
     ltmSplitter->setOrientation(Qt::Vertical);
 
