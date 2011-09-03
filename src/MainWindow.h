@@ -236,6 +236,7 @@ class MainWindow : public QMainWindow
         void exportCalendar();
 
         void helpView();
+        void logBug();
 
         void selectHome();
         void selectDiary();
