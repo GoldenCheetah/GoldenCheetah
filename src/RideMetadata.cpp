@@ -132,7 +132,7 @@ RideMetadata::setExtraTab()
             else if (tags.value().length() < 30) type = FIELD_SHORTTEXT;
             else type = FIELD_TEXT;
 
-            extraForm->addField(FieldDefinition("Extra", tags.key(), type, false));
+            extraForm->addField(FieldDefinition("Extra", tags.key(), type, false, QStringList()));
         }
     }
 
@@ -373,14 +373,20 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
     //label->setFont(font);
     //label->setFixedHeight(18);
 
+    completer = NULL; // by default we don't have one
     switch(field.type) {
 
     case FIELD_TEXT : // text
     case FIELD_SHORTTEXT : // shorttext
-        if (field.name == "Keywords")
-            widget = new KeywordField(this);
-        else
-            widget = new QLineEdit(this);
+
+        if (field.values.count()) {
+            completer = new QCompleter(field.values, this);
+            completer->setCaseSensitivity(Qt::CaseInsensitive);
+            completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+        }
+        widget = new QLineEdit(this);
+        dynamic_cast<QLineEdit*>(widget)->setCompleter(completer);
+
         //widget->setFixedHeight(18);
         connect (widget, SIGNAL(textChanged(const QString&)), this, SLOT(dataChanged()));
         connect (widget, SIGNAL(editingFinished()), this, SLOT(editFinished()));
@@ -446,9 +452,8 @@ FormField::~FormField()
     switch (definition.type) {
         case FIELD_TEXT:
         case FIELD_SHORTTEXT: if (definition.name == "Keywords")
-                    delete (KeywordField*)widget;
-                else
-                    delete (QLineEdit*)widget;
+                delete (QLineEdit*)widget;
+                if (completer) delete completer;
                 break;
         case FIELD_TEXTBOX : if (definition.name == "Summary")
                                  delete ((RideSummaryWindow *)widget);
@@ -483,10 +488,14 @@ FormField::editFinished()
     // get the current value into a string
     switch (definition.type) {
     case FIELD_TEXT :
-    case FIELD_SHORTTEXT : if (definition.name == "Keywords")
-                text = ((KeywordField*)widget)->text();
-             else
-                text = ((QLineEdit*)widget)->text();
+    case FIELD_SHORTTEXT :
+             text = ((QLineEdit*)widget)->text();
+
+             // we specified a value list and ignored it...
+             if (text != "" && definition.values.count() && definition.values.indexOf(text) == -1) {
+                  // just warn? - does nothing for now, in case they are just "suggestions"
+                 QMessageBox::warning(this, definition.name, tr("You entered '%1' which is not an expected value.").arg(text));
+             }
              break;
     case FIELD_TEXTBOX :
         {
@@ -657,10 +666,7 @@ FormField::metadataChanged()
     switch (definition.type) {
     case FIELD_TEXT : // text
     case FIELD_SHORTTEXT : // shorttext
-        if (definition.name == "Keywords")
-            ((KeywordField*)widget)->setText(value);
-        else
-            ((QLineEdit*)widget)->setText(value);
+        ((QLineEdit*)widget)->setText(value);
         break;
 
     case FIELD_TEXTBOX : // textbox
@@ -768,6 +774,7 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
         out<<QString("\t\t\t<fieldtab>\"%1\"</fieldtab>\n").arg(xmlprotect(field.tab));
         out<<QString("\t\t\t<fieldname>\"%1\"</fieldname>\n").arg(xmlprotect(field.name));
         out<<QString("\t\t\t<fieldtype>%1</fieldtype>\n").arg(field.type);
+        out<<QString("\t\t\t<fieldvalues>\"%1\"</fieldvalues>\n").arg(xmlprotect(field.values.join(",")));
         out<<QString("\t\t\t<fielddiary>%1</fielddiary>\n").arg(field.diary ? 1 : 0);
         out<<QString("\t\t</field>\n");
     }
@@ -857,6 +864,8 @@ bool MetadataXMLParser::endElement( const QString&, const QString&, const QStrin
         field.type = buffer.trimmed().toInt();
         if (field.tab != "" && field.type < 3 && field.name != "Filename" &&
             field.name != "Change History") field.diary = true; // default!
+    } else if(qName == "fieldvalues") {
+        field.values = unprotect(buffer).split(",", QString::SkipEmptyParts);
     } else if (qName == "fielddiary") field.diary = (buffer.trimmed().toInt() != 0);
 
     //
@@ -903,54 +912,4 @@ bool MetadataXMLParser::characters( const QString& str )
 bool MetadataXMLParser::endDocument()
 {
     return TRUE;
-}
-
-/*----------------------------------------------------------------------
- * Keyword completer
- *--------------------------------------------------------------------*/
-
-KeywordField::KeywordField(QWidget *parent) : QLineEdit(parent)
-{
-//XXX The completer code needs to be implemented separately
-//    and take into account the constraints of the current
-//    QCompleter implementation which assumes the completion
-//    is either for the entire contents or is a directory path
-}
-
-void
-KeywordField::textUpdated(const QString &/*sofar*/)
-{
-}
-
-void
-KeywordField::completeText(QString /*prefix*/, QString /*token*/)
-{
-}
-
-void
-KeywordField::completerActive(const QString &/*p*/)
-{
-}
-
-void
-KeywordCompleter::textUpdated(const QString &/*sofar*/)
-{
-}
-
-// split into comma separated tokens
-QStringList
-KeywordCompleter::splitPath(const QString &sofar) const
-{
-    QStringList returnList;
-
-    // nothing to complete
-    if (sofar == "" || sofar.endsWith(",")) return returnList;
-
-    QStringList tokens = sofar.split(",", QString::SkipEmptyParts);
-    if (tokens.count() == 0) return returnList; // empty!
-
-    for (int i=tokens.count()-1; i>=0; i--) returnList<<tokens[i];
-
-    // set the completion prefix!
-    return returnList;
 }

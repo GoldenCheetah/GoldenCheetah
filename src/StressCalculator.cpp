@@ -65,7 +65,7 @@ double StressCalculator::min(void) {
 
 
 
-void StressCalculator::calculateStress(MainWindow *main, QString home, const QString &metric)
+void StressCalculator::calculateStress(MainWindow *main, QString, const QString &metric)
 {
     // get all metric data from the year 1900 - 3000
     QList<SummaryMetrics> results;

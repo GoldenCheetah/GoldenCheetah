@@ -1946,23 +1946,26 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     fields->headerItem()->setText(0, tr("Screen Tab"));
     fields->headerItem()->setText(1, tr("Field"));
     fields->headerItem()->setText(2, tr("Type"));
-    fields->headerItem()->setText(3, tr("Diary"));
-    fields->setColumnCount(4);
+    fields->headerItem()->setText(3, tr("Values"));
+    fields->headerItem()->setText(4, tr("Diary"));
+    fields->setColumnCount(5);
     fields->setSelectionMode(QAbstractItemView::SingleSelection);
     fields->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     fields->setUniformRowHeights(true);
     fields->setIndentation(0);
 
 #ifdef Q_OS_MAC
-    fields->header()->resizeSection(0,100);
-    fields->header()->resizeSection(1,110);
-    fields->header()->resizeSection(2,110);
-    fields->header()->resizeSection(3,50);
+    fields->header()->resizeSection(0,80); // tab
+    fields->header()->resizeSection(1,110); // name
+    fields->header()->resizeSection(2,80); // type
+    fields->header()->resizeSection(3,120); // values
+    fields->header()->resizeSection(4,50); // diary
 #else
-    fields->header()->resizeSection(0,120);
-    fields->header()->resizeSection(1,130);
-    fields->header()->resizeSection(2,150);
-    fields->header()->resizeSection(3,50);
+    fields->header()->resizeSection(0,80);
+    fields->header()->resizeSection(1,110);
+    fields->header()->resizeSection(2,90);
+    fields->header()->resizeSection(3,120);
+    fields->header()->resizeSection(4,50);
 #endif
 
     SpecialFields specials;
@@ -1987,11 +1990,13 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
         add->setText(0, field.tab);
         // field name
         add->setText(1, field.name);
+        // values
+        add->setText(3, field.values.join(","));
 
         // type button
         add->setTextAlignment(2, Qt::AlignHCenter);
         fields->setItemWidget(add, 2, comboButton);
-        fields->setItemWidget(add, 3, checkBox);
+        fields->setItemWidget(add, 4, checkBox);
     }
     fields->setCurrentItem(fields->invisibleRootItem()->child(0));
 
@@ -2015,7 +2020,7 @@ FieldsPage::upClicked()
 
         // movin on up!
         QWidget *button = fields->itemWidget(fields->currentItem(),2);
-        QWidget *check = fields->itemWidget(fields->currentItem(),3);
+        QWidget *check = fields->itemWidget(fields->currentItem(),4);
         QComboBox *comboButton = new QComboBox(this);
         addFieldTypes(comboButton);
         comboButton->setCurrentIndex(((QComboBox*)button)->currentIndex());
@@ -2024,7 +2029,7 @@ FieldsPage::upClicked()
         QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
         fields->invisibleRootItem()->insertChild(index-1, moved);
         fields->setItemWidget(moved, 2, comboButton);
-        fields->setItemWidget(moved, 3, checkBox);
+        fields->setItemWidget(moved, 4, checkBox);
         fields->setCurrentItem(moved);
     }
 }
@@ -2037,7 +2042,7 @@ FieldsPage::downClicked()
         if (index == (fields->invisibleRootItem()->childCount()-1)) return; // its at the bottom already
 
         QWidget *button = fields->itemWidget(fields->currentItem(),2);
-        QWidget *check = fields->itemWidget(fields->currentItem(),3);
+        QWidget *check = fields->itemWidget(fields->currentItem(),4);
         QComboBox *comboButton = new QComboBox(this);
         addFieldTypes(comboButton);
         comboButton->setCurrentIndex(((QComboBox*)button)->currentIndex());
@@ -2046,7 +2051,7 @@ FieldsPage::downClicked()
         QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
         fields->invisibleRootItem()->insertChild(index+1, moved);
         fields->setItemWidget(moved, 2, comboButton);
-        fields->setItemWidget(moved, 3, checkBox);
+        fields->setItemWidget(moved, 4, checkBox);
         fields->setCurrentItem(moved);
     }
 }
@@ -2082,7 +2087,7 @@ FieldsPage::addClicked()
     // type button
     add->setTextAlignment(2, Qt::AlignHCenter);
     fields->setItemWidget(add, 2, comboButton);
-    fields->setItemWidget(add, 3, checkBox);
+    fields->setItemWidget(add, 4, checkBox);
 }
 
 void
@@ -2116,7 +2121,8 @@ FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
 
         add.tab = item->text(0);
         add.name = item->text(1);
-        add.diary = ((QCheckBox*)fields->itemWidget(item, 3))->isChecked();
+        add.values = item->text(3).split(QRegExp("(, *|,)"), QString::KeepEmptyParts);
+        add.diary = ((QCheckBox*)fields->itemWidget(item, 4))->isChecked();
 
         if (sp.isMetric(add.name))
             add.type = 4;
