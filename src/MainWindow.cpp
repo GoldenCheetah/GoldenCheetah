@@ -559,6 +559,9 @@ MainWindow::MainWindow(const QDir &home) :
     connect(windowMenu, SIGNAL(triggered(QAction*)), this, SLOT(selectWindow(QAction*)));
 
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
+    helpMenu->addAction(tr("&User Guide"), this, SLOT(helpView()));
+    helpMenu->addAction(tr("&Log a bug or feature request"), this, SLOT(logBug()));
+    helpMenu->addSeparator();
     helpMenu->addAction(tr("&About GoldenCheetah"), this, SLOT(aboutDialog()));
 
     /*----------------------------------------------------------------------
@@ -887,6 +890,12 @@ void MainWindow::manualProcess(QString name)
         p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
         p->exec();
     }
+}
+
+void
+MainWindow::logBug()
+{
+    QDesktopServices::openUrl(QUrl("http://bugs.goldencheetah.org/projects/goldencheetah/issues/new"));
 }
 
 void
