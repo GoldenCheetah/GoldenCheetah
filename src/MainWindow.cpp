@@ -190,9 +190,7 @@ MainWindow::MainWindow(const QDir &home) :
     toolbar->setAutoFillBackground(true);
     toolbar->setStyleSheet("background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #CFCFCF, stop: 1.0 #A8A8A8);"
                            "border: 0px;");
-#if 0
-    toolbar->setPalette(pal);
-#endif
+    toolbar->setPalette(menuBar()->palette());
     toolbar->setMovable(false);
 #endif
 #if 0
@@ -894,8 +892,7 @@ void MainWindow::manualProcess(QString name)
 void
 MainWindow::helpView()
 {
-    HelpWindow *help = new HelpWindow(this);
-    help->show();
+    QDesktopServices::openUrl(QUrl("http://bugs.goldencheetah.org/projects/goldencheetah/wiki"));
 }
 
 void
