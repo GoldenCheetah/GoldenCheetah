@@ -67,6 +67,8 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
                                  | QwtPicker::CornerToCorner);
     ltmZoomer->setTrackerMode(QwtPicker::AlwaysOff);
     ltmZoomer->setEnabled(false);
+    ltmZoomer->setMousePattern(QwtEventPattern::MouseSelect1,
+                               Qt::LeftButton, Qt::ShiftModifier);
     ltmZoomer->setMousePattern(QwtEventPattern::MouseSelect2,
                                Qt::RightButton, Qt::ControlModifier);
     ltmZoomer->setMousePattern(QwtEventPattern::MouseSelect3,
@@ -79,7 +81,7 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
                                ltmPlot->canvas(),
                                "");
     picker->setMousePattern(QwtEventPattern::MouseSelect1,
-                            Qt::LeftButton, Qt::ShiftModifier);
+                            Qt::LeftButton);
     picker->setTrackerPen(QColor(Qt::black));
     QColor inv(Qt::white);
     inv.setAlpha(0);
