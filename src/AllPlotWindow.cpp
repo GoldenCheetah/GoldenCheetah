@@ -1475,7 +1475,7 @@ AllPlotWindow::addPickers(AllPlot *_allPlot)
                                "");
     _allPlot->tooltip->setSelectionFlags(QwtPicker::PointSelection | QwtPicker::RectSelection | QwtPicker::DragSelection);
     _allPlot->tooltip->setRubberBand(QwtPicker::VLineRubberBand);
-    _allPlot->tooltip->setMousePattern(QwtEventPattern::MouseSelect1, Qt::LeftButton, Qt::ShiftModifier);
+    _allPlot->tooltip->setMousePattern(QwtEventPattern::MouseSelect1, Qt::LeftButton);
     _allPlot->tooltip->setTrackerPen(QColor(Qt::black));
     QColor inv(Qt::white);
     inv.setAlpha(0);
