@@ -231,7 +231,7 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         QRect all(0,0,width(),height());
         if (property("isManager").toBool() == true) {
             //painter.drawTiledPixmap(all, carbon);
-            painter.fillRect(all, QColor("#A8A8A8"));
+            painter.fillRect(all, QColor("#B3B4BA"));
         } else {
             //painter.drawTiledPixmap(all, aluLight);
         }

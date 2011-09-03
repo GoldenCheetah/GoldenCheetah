@@ -85,9 +85,15 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     styleSelector->setFont(small);
     styleSelector->setFixedHeight(20);
 
+    //styleSelector->hide(); //XXX hack whilst playing
+    QLabel *space = new QLabel("", this);
+    space->setFixedHeight(20);
+    titleBar->addWidget(space);
+
 #endif
 
     style = new QStackedWidget(this);
+    style->setAutoFillBackground(false);
     layout->setSpacing(0);
     layout->setContentsMargins(0,0,0,0);
     titleBar->addStretch();
@@ -97,12 +103,15 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
 
     QPalette palette;
     //palette.setBrush(backgroundRole(), QBrush(QImage(":/images/carbon.jpg")));
-    palette.setBrush(backgroundRole(), QColor("#A8A8A8"));
+    palette.setBrush(backgroundRole(), QColor("#B3B4B6"));
+    //setPalette(palette);
+    setAutoFillBackground(false);
 
     // each style has its own container widget
     QWidget *tabArea = new QWidget(this);
     tabArea->setContentsMargins(20,0,20,20);
-    tabArea->setAutoFillBackground(false);
+    //tabArea->setAutoFillBackground(false);
+    //tabArea->setPalette(palette);
     //tabArea->setFrameStyle(QFrame::NoFrame);
     QVBoxLayout *tabLayout = new QVBoxLayout(tabArea);
     tabLayout->setContentsMargins(0,0,0,0);
@@ -120,31 +129,14 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     tb->setShape(QTabBar::RoundedSouth);
     tb->setDrawBase(false);
     tabbed->setStyleSheet("QTabWidget::tab-bar { alignment: center; }"
-                          "QTabWidget::pane { top: 20px; }"
-#if 0
-                          "QTabWidget::tab-bar::tab:selected { background: #A8A8A8; font: bold; border: 1px; border-color: black; }"
-                          "QTabWidget::tab-bar::tab:!selected { background: #A8A8A8;font: normal; }" 
-#endif
-                         );
-
-    // styling commented out whilst work out the differences
-    // between mac and linux and windows
-#if 0
-    tabbed->setStyleSheet("QTabBar::tab {"
-                           "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-                           "stop: 0 #CFCFCF, stop: 1.0 #A8A8A8);"
-                           "border: 1px solid rgba(255, 255, 255, 32);"
-                           "color: #535353;}"
-                           "QTabBar::tab:selected {"
-                           "min-height: 30px;"
-                           "background: rgba(255,255,255,255); }");
-#endif
+                          "QTabWidget::pane { top: 20px; }");
 
     tabLayout->addWidget(tabbed);
     style->addWidget(tabArea);
 
     // tiled
     tileWidget = new QWidget(this);
+    tileWidget->setAutoFillBackground(false);
     tileWidget->setPalette(palette);
     tileWidget->setContentsMargins(0,0,0,0);
     //tileWidget->setMouseTracking(true);
@@ -154,6 +146,8 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     tileGrid->setSpacing(0);
 
     tileArea = new QScrollArea(this);
+    tileArea->setAutoFillBackground(false);
+    tileArea->setPalette(palette);
     tileArea->setWidgetResizable(true);
     tileArea->setWidget(tileWidget);
     tileArea->setFrameStyle(QFrame::NoFrame);
@@ -161,6 +155,7 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     style->addWidget(tileArea);
 
     winWidget = new QWidget(this);
+    winWidget->setAutoFillBackground(false);
     winWidget->setContentsMargins(0,0,0,0);
     winWidget->setPalette(palette);
 
@@ -168,6 +163,8 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     winFlow->setContentsMargins(20,20,20,20);
 
     winArea = new QScrollArea(this);
+    winArea->setAutoFillBackground(false);
+    winArea->setPalette(palette);
     winArea->setWidgetResizable(true);
     winArea->setWidget(winWidget);
     winArea->setFrameStyle(QFrame::NoFrame);

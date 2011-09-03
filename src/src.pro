@@ -191,6 +191,7 @@ HEADERS += \
         FitRideFile.h \
         GcPane.h \
         GcRideFile.h \
+        GcToolBar.h \
         GcWindowLayout.h \
         GcWindowRegistry.h \
         GcWindowTool.h \
@@ -355,6 +356,7 @@ SOURCES += \
         FixTorque.cpp \
         GcPane.cpp \
         GcRideFile.cpp \
+        GcToolBar.cpp \
         GcWindowLayout.cpp \
         GcWindowRegistry.cpp \
         GcWindowTool.cpp \
