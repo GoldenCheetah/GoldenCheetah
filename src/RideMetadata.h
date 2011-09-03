@@ -49,10 +49,11 @@ class FieldDefinition
                 name;
         int type;
         bool diary; // show in summary on diary page...
+        QStringList values; // autocomplete 'defaults'
 
-    FieldDefinition() : tab(""), name(""), type(0), diary(false) {}
-    FieldDefinition(QString tab, QString name, int type, bool diary)
-                      : tab(tab), name(name), type(type), diary(diary) {}
+    FieldDefinition() : tab(""), name(""), type(0), diary(false), values() {}
+    FieldDefinition(QString tab, QString name, int type, bool diary, QStringList values)
+                      : tab(tab), name(name), type(type), diary(diary), values(values) {}
 };
 
 class FormField : public QWidget
@@ -68,6 +69,7 @@ class FormField : public QWidget
         QLabel  *label;             // label
         QCheckBox *enabled;           // is the widget enabled or not?
         QWidget *widget;            // updating widget
+        QCompleter *completer;      // for completion
 
     public slots:
         void dataChanged();         // from the widget - we changed something
@@ -80,41 +82,6 @@ class FormField : public QWidget
         bool edited;                // value has been changed
         bool active;                // when data being changed for rideSelected
         SpecialFields sp;
-};
-
-class KeywordCompleter : public QCompleter
-{
-    Q_OBJECT
-    G_OBJECT
-
-
-    public:
-        KeywordCompleter(QWidget *parent) : QCompleter(parent) {}
-        KeywordCompleter(QStringList list, QWidget *parent) : QCompleter(list, parent) {}
-        QStringList splitPath(const QString &path) const;
-
-    public slots:
-        void textUpdated(const QString &);
-};
-
-class KeywordField : public QLineEdit
-{
-    Q_OBJECT
-    G_OBJECT
-
-
-    public:
-        KeywordField(QWidget *);
-
-    public slots:
-        void textUpdated(const QString &);
-        void completeText(QString, QString);
-        void completerActive(const QString &);
-
-    private:
-        KeywordCompleter *completer;
-        QString full;
-
 };
 
 class Form : public QScrollArea
