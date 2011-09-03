@@ -401,7 +401,7 @@ MainWindow::MainWindow(const QDir &home) :
     // POPULATE TOOLBOX
     toolBox->addItem(listView, QIcon(":images/activity.png"), "Activity History");
     toolBox->addItem(_rideMetadata, QIcon(":images/metadata.png"), "Activity Details");
-    toolBox->addItem(intervalSplitter, QIcon(":images/stopwatch.png"), "Best Intervals and Laps");
+    toolBox->addItem(intervalSplitter, QIcon(":images/stopwatch.png"), "Activity Intervals");
     toolBox->addItem(masterControls, QIcon(":images/settings.png"), "Chart Settings");
     toolBox->addItem(new AthleteTool(QFileInfo(home.path()).path(), this), QIcon(":images/toolbar/main/athlete.png"), "Athletes");
     toolBox->addItem(chartTool, QIcon(":images/addchart.png"), "Charts");
