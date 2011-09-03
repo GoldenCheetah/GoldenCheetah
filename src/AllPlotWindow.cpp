@@ -160,6 +160,8 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
 
     // RightButton: zoom out by 1
     // Ctrl+RightButton: zoom out to full size
+    allZoomer->setMousePattern(QwtEventPattern::MouseSelect1,
+                               Qt::LeftButton, Qt::ShiftModifier);
     allZoomer->setMousePattern(QwtEventPattern::MouseSelect2,
                                Qt::RightButton, Qt::ControlModifier);
     allZoomer->setMousePattern(QwtEventPattern::MouseSelect3,
@@ -179,7 +181,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
                                "");
     allPlot->tooltip->setSelectionFlags(QwtPicker::PointSelection | QwtPicker::RectSelection | QwtPicker::DragSelection);
     allPlot->tooltip->setRubberBand(QwtPicker::VLineRubberBand);
-    allPlot->tooltip->setMousePattern(QwtEventPattern::MouseSelect1, Qt::LeftButton, Qt::ShiftModifier);
+    allPlot->tooltip->setMousePattern(QwtEventPattern::MouseSelect1, Qt::LeftButton);
     allPlot->tooltip->setTrackerPen(QColor(Qt::black));
     QColor inv(Qt::white);
     inv.setAlpha(0);
