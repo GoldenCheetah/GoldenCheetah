@@ -56,6 +56,7 @@ public slots:
     bool eventFilter(QObject *o,QEvent *e);
     void paintEvent (QPaintEvent *event);
     void addAction(QAction *);
+    void addWidget(QWidget *); // any widget but doesn't toggle selection
     void addStretch();
 
 private:

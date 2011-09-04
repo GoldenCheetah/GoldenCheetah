@@ -47,6 +47,12 @@ GcToolBar::addStretch()
 }
 
 void
+GcToolBar::addWidget(QWidget *x) // add a widget that doesn't toggle selection
+{
+    layout->addWidget(x);
+}
+
+void
 GcToolBar::paintEvent (QPaintEvent *event)
 {
     // paint the darn thing!
