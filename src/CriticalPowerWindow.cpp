@@ -327,6 +327,7 @@ void CriticalPowerWindow::addSeasons()
 
 void CriticalPowerWindow::seasonSelected(int iSeason)
 {
+    if (iSeason >= seasons.count() || iSeason < 0) return;
     Season season = seasons.at(iSeason);
     cpintPlot->changeSeason(season.getStart(), season.getEnd());
     cpintPlot->calculate(currentRide);
