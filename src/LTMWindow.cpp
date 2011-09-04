@@ -49,7 +49,10 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
 
     // the controls
     QWidget *c = new QWidget;
+    //c->setContentsMargins(0,0,0,0); // bit of space is helpful
     QFormLayout *cl = new QFormLayout(c);
+    cl->setContentsMargins(0,0,0,0);
+    cl->setSpacing(0);
     setControls(c);
 
     // the popup

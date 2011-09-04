@@ -31,13 +31,21 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
 
     // setup control area
     QWidget *cw = new QWidget(this);
+    cw->setContentsMargins(0,0,0,0);
+
     QVBoxLayout *cl = new QVBoxLayout(cw);
+    cl->setSpacing(0);
+    cl->setContentsMargins(0,0,0,0);
+
     QLabel *titleLabel = new QLabel("Title", this);
     QHBoxLayout *hl = new QHBoxLayout;
+    hl->setSpacing(5);
+    hl->setContentsMargins(0,0,0,0);
 
     titleEdit = new QLineEdit(this);
     titleEdit->setEnabled(false);
     controlStack = new QStackedWidget(this);
+    controlStack->setContentsMargins(0,0,0,0);
     hl->addWidget(titleLabel);
     hl->addWidget(titleEdit);
     cl->addLayout(hl);
