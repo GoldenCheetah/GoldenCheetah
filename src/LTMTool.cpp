@@ -36,13 +36,19 @@
 
 LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(parent), home(home), main(parent), active(false)
 {
+    setStyleSheet("QFrame { FrameStyle = QFrame::NoFrame };"
+                  "QWidget { background = Qt::white; border:0 px; margin: 2px; };");
+
     // get application settings
     useMetricUnits = appsettings->value(this, GC_UNIT).toString() == "Metric";
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0,0,0,0);
+    mainLayout->setSpacing(0);
+    setContentsMargins(0,0,0,0);
 
     dateRangeTree = new QTreeWidget;
+    dateRangeTree->setFrameStyle(QFrame::NoFrame);
     dateRangeTree->setColumnCount(1);
     dateRangeTree->setSelectionMode(QAbstractItemView::SingleSelection);
     dateRangeTree->header()->hide();
@@ -64,6 +70,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     else
         metricTree->setSelectionMode(QAbstractItemView::SingleSelection);
     metricTree->header()->hide();
+    metricTree->setFrameStyle(QFrame::NoFrame);
     //metricTree->setAlternatingRowColors (true);
     metricTree->setIndentation(5);
     allMetrics = new QTreeWidgetItem(metricTree, ROOT_TYPE);
@@ -449,6 +456,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
 
     ltmSplitter = new QSplitter;
     ltmSplitter->setHandleWidth(1);
+    ltmSplitter->setFrameStyle(QFrame::NoFrame);
     ltmSplitter->setContentsMargins(0,0,0,0);
     ltmSplitter->setOrientation(Qt::Vertical);
 

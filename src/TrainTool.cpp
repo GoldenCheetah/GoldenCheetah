@@ -40,6 +40,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     setInstanceName("Train Controls");
 
     QWidget *c = new QWidget;
+    //c->setContentsMargins(0,0,0,0); // bit of space is useful
     QVBoxLayout *cl = new QVBoxLayout(c);
     setControls(c);
 
@@ -57,6 +58,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
 
 
     serverTree = new QTreeWidget;
+    serverTree->setFrameStyle(QFrame::NoFrame);
     serverTree->setColumnCount(1);
     serverTree->setSelectionMode(QAbstractItemView::SingleSelection);
     serverTree->header()->hide();
@@ -67,6 +69,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     serverTree->expandItem(allServers);
 
     deviceTree = new QTreeWidget;
+    deviceTree->setFrameStyle(QFrame::NoFrame);
     deviceTree->setSelectionMode(QAbstractItemView::MultiSelection);
     deviceTree->setColumnCount(1);
     deviceTree->header()->hide();
@@ -77,6 +80,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     deviceTree->expandItem(allDevices);
 
     workoutTree = new QTreeWidget;
+    workoutTree->setFrameStyle(QFrame::NoFrame);
     workoutTree->setColumnCount(1);
     workoutTree->setSelectionMode(QAbstractItemView::SingleSelection);
     workoutTree->header()->hide();
@@ -114,6 +118,8 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     mainLayout->addWidget(buttonPanel);
 
     trainSplitter = new QSplitter;
+    trainSplitter->setHandleWidth(1);
+    trainSplitter->setFrameStyle(QFrame::NoFrame);
     trainSplitter->setOrientation(Qt::Vertical);
     trainSplitter->setContentsMargins(0,0,0,0);
     trainSplitter->setLineWidth(0);
