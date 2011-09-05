@@ -225,7 +225,8 @@ RideSummaryWindow::htmlSummary() const
         // go calculate them then...
         QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(mainWindow, ride, mainWindow->zones(), mainWindow->hrZones(), worklist);
         for(int i = 0; i < worklist.count(); ++i) {
-            metrics.setForSymbol(worklist[i], computed.value(worklist[i])->value(true));
+            if (worklist[i] != "")
+                metrics.setForSymbol(worklist[i], computed.value(worklist[i])->value(true));
         }
     } else {
 
