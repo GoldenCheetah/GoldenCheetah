@@ -289,6 +289,19 @@ RideNavigator::event(QEvent *e)
         active=false;
         setWidth(geometry().width()); // calculate width...
     }
+
+    if (e->type() == QEvent::ToolTip) {
+        QModelIndex index = tableView->indexAt(dynamic_cast<QHelpEvent*>(e)->pos());
+        if (index.isValid()) {
+            QString hoverFileName = tableView->model()->data(index, Qt::UserRole+1).toString();
+            e->accept();
+            // XXX todo custom tooltip balloon here.
+            //     remember to make it hide when mouse moves again.
+            //     or another tooltip event occurs
+            // qDebug()<<"ride navigator tooltip"<<hoverFileName;
+        }
+    }
+
     return QWidget::event(e);
 }
 

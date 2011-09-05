@@ -279,6 +279,19 @@ DiaryWindow::eventFilter(QObject *object, QEvent *e)
     case QEvent::MouseMove:
     case QEvent::MouseButtonDblClick:
         return true;
+    case QEvent::ToolTip:
+        {
+        QModelIndex index = monthlyView->indexAt(dynamic_cast<QHelpEvent*>(e)->pos());
+        if (index.isValid()) {
+            QStringList hoverFileNames = monthlyView->model()->data(index, GcCalendarModel::FilenamesRole).toStringList();
+            e->accept();
+            // XXX todo custom tooltip balloon here.
+            //     remember to make it hide when mouse moves again.
+            //     or another tooltip event occurs
+            //qDebug()<<"calendar tooltip"<<hoverFileNames;
+        }
+        }
+        return true;
     default:
         return QObject::eventFilter(object, e);
     }

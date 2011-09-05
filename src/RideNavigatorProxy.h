@@ -64,6 +64,7 @@ private:
     int groupBy;
     int calendarText;
     int colorColumn;
+    int fileIndex;
 
     QList<QString> groups;
     QList<QModelIndex> groupIndexes;
@@ -101,7 +102,11 @@ public:
         // find the Calendar TextColumn
         calendarText = -1;
         colorColumn = -1;
+        fileIndex = -1;
         for(int i=0; i<model->columnCount(); i++) {
+            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "filename") {
+                fileIndex = i;
+            }
             if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "color") {
                 colorColumn = i;
             }
@@ -236,6 +241,23 @@ public:
                     returning = QColor(colorstring);
                 } else {
                     returning = QColor("#ffffff");
+                }
+
+            } else if (role == (Qt::UserRole+1)) {
+
+                if (colorColumn != -1 && proxyIndex.internalPointer()) {
+
+                    QString filename;
+
+                    // hideous code, sorry
+                    int groupNo = ((QModelIndex*)proxyIndex.internalPointer())->row();
+                    if (groupNo < 0 || groupNo >= groups.count() || proxyIndex.column() == 0)
+                        filename="";
+                    else filename = sourceModel()->data(sourceModel()->index(groupToSourceRow.value(groups[groupNo])->at(proxyIndex.row()), fileIndex)).toString();
+
+                    returning = filename;
+                } else {
+                    returning = "";
                 }
 
             } else {
