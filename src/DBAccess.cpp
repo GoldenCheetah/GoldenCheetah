@@ -40,7 +40,13 @@
 // DB Schema Version - YOU MUST UPDATE THIS IF THE SCHEMA VERSION CHANGES!!!
 // Schema version will change if a) the default metadata.xml is updated
 //                            or b) new metrics are added / old changed
-static int DBSchemaVersion = 28;
+//                            or c) the metricDB tables structures change
+
+// Revision History -- started at Revision 29
+// Date         Who                What Changed
+// 5th Sep 2011 Mark Liversedge    Added color to the ride fields
+//
+static int DBSchemaVersion = 29;
 
 DBAccess::DBAccess(MainWindow* main, QDir home) : main(main), home(home)
 {
@@ -147,6 +153,7 @@ bool DBAccess::createMetricsTable()
                                     "identifier varchar,"
                                     "timestamp integer,"
                                     "ride_date date,"
+                                    "color varchar,"
                                     "fingerprint integer";
 
         // Add columns for all the metric factory metrics
@@ -359,7 +366,7 @@ void DBAccess::checkDBVersion()
 /*----------------------------------------------------------------------
  * CRUD routines for Metrics table
  *----------------------------------------------------------------------*/
-bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, unsigned long fingerprint, bool modify)
+bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor color, unsigned long fingerprint, bool modify)
 {
 	QSqlQuery query(dbconn);
     QDateTime timestamp = QDateTime::currentDateTime();
@@ -372,7 +379,7 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, unsign
     }
 
     // construct an insert statement
-    QString insertStatement = "insert into metrics ( filename, identifier, timestamp, ride_date, fingerprint ";
+    QString insertStatement = "insert into metrics ( filename, identifier, timestamp, ride_date, color, fingerprint ";
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i=0; i<factory.metricCount(); i++)
         insertStatement += QString(", X%1 ").arg(factory.metricName(i));
@@ -390,7 +397,7 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, unsign
         }
     }
 
-    insertStatement += " ) values (?,?,?,?,?"; // filename, identifier, timestamp, ride_date
+    insertStatement += " ) values (?,?,?,?,?,?"; // filename, identifier, timestamp, ride_date, color, fingerprint
     for (int i=0; i<factory.metricCount(); i++)
         insertStatement += ",?";
     foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
@@ -407,6 +414,7 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, unsign
 	query.addBindValue(summaryMetrics->getId());
 	query.addBindValue(timestamp.toTime_t());
     query.addBindValue(summaryMetrics->getRideDate());
+    query.addBindValue(color.name());
     query.addBindValue((int)fingerprint);
 
     // values

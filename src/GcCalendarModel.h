@@ -65,7 +65,7 @@ private:
     QList<FieldDefinition> *fieldDefinitions;
     QList<QString> columns; // what columns in the sql model
     MainWindow *mainWindow;
-    int filenameIndex, durationIndex, dateIndex, textIndex;
+    int filenameIndex, durationIndex, dateIndex, textIndex, colorIndex;
 
 public slots:
     void refresh() {
@@ -94,6 +94,7 @@ public slots:
             if (column == tr("Date")) dateIndex = i;
             if (column == tr("File")) filenameIndex = i;
             if (column == tr("Calendar Text")) textIndex = i;
+            if (column == "color") colorIndex = i;
         }
 
         // we need to build a list of all the rides
@@ -199,14 +200,14 @@ public:
             {
             QList<QColor> colors;
             QVector<int> *arr = dateToRows.value(date(proxyIndex), NULL);
-            if (arr) {
+            if (arr)
                 foreach (int i, *arr)
-                // we have rides on this day...
                     if (mainWindow->rideItem() && sourceModel()->data(index(i, dateIndex, QModelIndex())).toDateTime() == mainWindow->rideItem()->dateTime)
-                        colors.append(GColor(CCALCURRENT));
+                        colors << GColor(CCALCURRENT); // its the current ride!
                     else
-                        colors.append(GColor(CCALACTUAL));
-            }
+
+                        colors << QColor(sourceModel()->data(index(i, colorIndex, QModelIndex())).toString());
+
             // added planned workouts
             for (int k= mainWindow->rideCalendar->data(date(proxyIndex), EventCountRole).toInt(); k>0; k--)
                 colors.append(GColor(CCALPLANNED));

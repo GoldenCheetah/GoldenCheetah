@@ -33,6 +33,7 @@
 
 MetricAggregator::MetricAggregator(MainWindow *main, QDir home, const Zones *zones, const HrZones *hrzones) : QObject(main), main(main), home(home), zones(zones), hrzones(hrzones)
 {
+    colorEngine = new ColorEngine(main);
     dbaccess = new DBAccess(main, home);
     connect(main, SIGNAL(configChanged()), this, SLOT(update()));
     connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(addRide(RideItem*)));
@@ -42,6 +43,7 @@ MetricAggregator::MetricAggregator(MainWindow *main, QDir home, const Zones *zon
 
 MetricAggregator::~MetricAggregator()
 {
+    delete colorEngine;
     delete dbaccess;
 }
 
@@ -226,7 +228,10 @@ bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, u
         summaryMetric->setForSymbol(factory.metricName(i), computed.value(factory.metricName(i))->value(true));
     }
 
-    dbaccess->importRide(summaryMetric, ride, fingerprint, modify);
+    // what color will this ride be?
+    QColor color = colorEngine->colorFor(ride->getTag("Calendar Text", ""));
+
+    dbaccess->importRide(summaryMetric, ride, color, fingerprint, modify);
     delete summaryMetric;
 
     return true;
