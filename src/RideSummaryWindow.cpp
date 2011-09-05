@@ -128,84 +128,63 @@ RideSummaryWindow::htmlSummary() const
 
     bool metricUnits = (unit.toString() == "Metric");
 
-    const int columns = 4;
-    const char *columnNames[] = { "Totals", "Averages", "Maximums", "Metrics*" };
-    const char *totalColumn[] = {
-        "workout_time",
-        "time_riding",
-        "total_distance",
-        "total_work",
-        "elevation_gain",
-        NULL
-    };
+    QStringList columnNames = QStringList() << "Totals" <<"Averages" <<"Maximums" <<"Metrics*";
+    QStringList totalColumn = QStringList()
+        << "workout_time"
+        << "time_riding"
+        << "total_distance"
+        << "total_work"
+        << "elevation_gain";
 
-    const char *averageColumn[] = {
-        "average_speed",
-        "average_power",
-        "average_hr",
-        "average_cad",
-        NULL
-    };
+    QStringList averageColumn = QStringList()
+        << "average_speed"
+        << "average_power"
+        << "average_hr"
+        << "average_cad";
 
-    const char *maximumColumn[] = {
-        "max_speed",
-        "max_power",
-        "max_heartrate",
-        "max_cadence",
-        NULL
-    };
+    QStringList maximumColumn = QStringList()
+        << "max_speed"
+        << "max_power"
+        << "max_heartrate"
+        << "max_cadence";
 
     QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
-    QStringList metricColumnList = s.split(",");
+    QStringList metricColumn = s.split(",");
 
-    char **metricColumnTmp;
-    // Copy QStringList to char **
-    metricColumnTmp = new char*[metricColumnList.size() + 1];
-    for (int i = 0; i < metricColumnList.size(); i++) {
-        metricColumnTmp[i] = new char[strlen(metricColumnList.at(i).toStdString().c_str())+1];
-        memcpy(metricColumnTmp[i], metricColumnList.at(i).toStdString().c_str(), strlen(metricColumnList.at(i).toStdString().c_str())+1);
-    }
-    metricColumnTmp[metricColumnList.size()] = NULL;
-    char const **metricColumn = (const char**)metricColumnTmp;
+    /* ORIGINAL HARDCODED (AND NOW DEFAULT METRICS)
+    QStringList metricColumn = QStringList()
+        << "skiba_xpower"
+        << "skiba_relative_intensity"
+        << "skiba_bike_score"
+        << "daniels_points"
+        << "daniels_equivalent_power"
+        << "trimp_points"
+        << "aerobic_decoupling";
+    */
 
-    /*const char *metricColumn[] = {
-        "skiba_xpower",
-        "skiba_relative_intensity",
-        "skiba_bike_score",
-        "daniels_points",
-        "daniels_equivalent_power",
-        "trimp_points",
-        "aerobic_decoupling",
-        NULL
-    };*/
+    QStringList timeInZones = QStringList()
+        << "time_in_zone_L1"
+        << "time_in_zone_L2"
+        << "time_in_zone_L3"
+        << "time_in_zone_L4"
+        << "time_in_zone_L5"
+        << "time_in_zone_L6"
+        << "time_in_zone_L7"
+        << "time_in_zone_L8"
+        << "time_in_zone_L9"
+        << "time_in_zone_L10";
 
-    const char *timeInZones[] = {
-        "time_in_zone_L1",
-        "time_in_zone_L2",
-        "time_in_zone_L3",
-        "time_in_zone_L4",
-        "time_in_zone_L5",
-        "time_in_zone_L6",
-        "time_in_zone_L7",
-        "time_in_zone_L8",
-        "time_in_zone_L9",
-        "time_in_zone_L10",
-        NULL
-    };
-
-    const char *timeInZonesHR[] = {
-        "time_in_zone_H1",
-        "time_in_zone_H2",
-        "time_in_zone_H3",
-        "time_in_zone_H4",
-        "time_in_zone_H5",
-        "time_in_zone_H6",
-        "time_in_zone_H7",
-        "time_in_zone_H8",
-        "time_in_zone_H9",
-        "time_in_zone_H10",
-        NULL
-    };
+    QStringList timeInZonesHR = QStringList()
+        << "time_in_zone_H1"
+        << "time_in_zone_H2"
+        << "time_in_zone_H3"
+        << "time_in_zone_H4"
+        << "time_in_zone_H5"
+        << "time_in_zone_H6"
+        << "time_in_zone_H7"
+        << "time_in_zone_H8"
+        << "time_in_zone_H9"
+        << "time_in_zone_H10";
 
     // Use pre-computed and saved metric values if the ride has not
     // been edited. Otherwise we need to re-compute every time.
@@ -216,11 +195,10 @@ RideSummaryWindow::htmlSummary() const
         // instead of calculating them all, just do the
         // ones we display
         QStringList worklist;
-        for (int i=0; totalColumn[i];i++) worklist << totalColumn[i];
-        for (int i=0; averageColumn[i];i++) worklist << averageColumn[i];
-        for (int i=0; maximumColumn[i];i++) worklist << maximumColumn[i];
-        for (int i=0; metricColumn[i];i++) worklist << metricColumn[i];
-        for (int i=0; timeInZones[i];i++) worklist << timeInZones[i];
+        worklist += totalColumn;
+        worklist += maximumColumn;
+        worklist += metricColumn;
+        worklist += timeInZones;
 
         // go calculate them then...
         QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(mainWindow, ride, mainWindow->zones(), mainWindow->hrZones(), worklist);
@@ -235,15 +213,16 @@ RideSummaryWindow::htmlSummary() const
     }
 
     //
-    // 3 top columns - total, average and metric for entire ride
+    // 3 top columns - total, average, maximums and metrics for entire ride
     //
     summary += "<table border=0 cellspacing=10><tr>";
-    for (int i = 0; i < columns; ++i) {
+    for (int i = 0; i < columnNames.count(); ++i) {
         summary += "<td align=\"center\" valign=\"top\" width=\"%1%\"><table>"
             "<tr><td align=\"center\" colspan=2><h3>%2</h3></td></tr>";
-        summary = summary.arg(90 / columns);
+        summary = summary.arg(90 / columnNames.count());
         summary = summary.arg(columnNames[i]);
-        const char **metricsList;
+
+        QStringList metricsList;
         switch (i) {
             case 0: metricsList = totalColumn; break;
             case 1: metricsList = averageColumn; break;
@@ -251,9 +230,8 @@ RideSummaryWindow::htmlSummary() const
             case 3: metricsList = metricColumn; break;
             default: assert(false);
         }
-        for (int j = 0;; ++j) {
-            const char *symbol = metricsList[j];
-            if (!symbol) break;
+        for (int j = 0; j< metricsList.count(); ++j) {
+            QString symbol = metricsList[j];
 
              const RideMetric *m = factory.rideMetric(symbol);
              if (!m) break;
