@@ -1172,7 +1172,10 @@ AllPlotWindow::setPaintBrush(int value)
 void
 AllPlotWindow::setByDistance(int value)
 {
-    if (!current) return;
+    if (value <0 || value >1 || active == true) return;
+
+    active = true;
+    comboDistance->setCurrentIndex(value);
 
     fullPlot->setByDistance(value);
     allPlot->setByDistance(value);
@@ -1184,6 +1187,8 @@ AllPlotWindow::setByDistance(int value)
     redrawFullPlot();
     redrawAllPlot();
     setupStackPlots();
+
+    active = false;
 }
 
 void
