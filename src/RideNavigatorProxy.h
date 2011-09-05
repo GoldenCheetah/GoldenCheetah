@@ -63,7 +63,7 @@ private:
     RideNavigator *rideNavigator;
     int groupBy;
     int calendarText;
-    ColorEngine *colorEngine;
+    int colorColumn;
 
     QList<QString> groups;
     QList<QModelIndex> groupIndexes;
@@ -91,7 +91,6 @@ public:
 
     GroupByModel(RideNavigator *parent) : QAbstractProxyModel(parent), rideNavigator(parent), groupBy(-1) {
         setParent(parent);
-        colorEngine = new ColorEngine(parent->main);
     }
     ~GroupByModel() {}
 
@@ -101,7 +100,11 @@ public:
 
         // find the Calendar TextColumn
         calendarText = -1;
+        colorColumn = -1;
         for(int i=0; i<model->columnCount(); i++) {
+            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "color") {
+                colorColumn = i;
+            }
             if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "ZCalendar_Text") {
                 calendarText = i;
             }
@@ -219,7 +222,21 @@ public:
 
             } else if (role == Qt::BackgroundRole) {
 
-                returning = colorEngine->colorFor(data(proxyIndex, Qt::UserRole).toString());
+
+                if (colorColumn != -1 && proxyIndex.internalPointer()) {
+
+                    QString colorstring;
+
+                    // hideous code, sorry
+                    int groupNo = ((QModelIndex*)proxyIndex.internalPointer())->row();
+                    if (groupNo < 0 || groupNo >= groups.count() || proxyIndex.column() == 0)
+                        colorstring="#ffffff";
+                    else colorstring = sourceModel()->data(sourceModel()->index(groupToSourceRow.value(groups[groupNo])->at(proxyIndex.row()), colorColumn)).toString();
+
+                    returning = QColor(colorstring);
+                } else {
+                    returning = QColor("#ffffff");
+                }
 
             } else {
 

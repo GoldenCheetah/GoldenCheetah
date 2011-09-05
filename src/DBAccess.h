@@ -51,7 +51,7 @@ class DBAccess
     ~DBAccess();
 
     // Create/Delete Metrics
-	bool importRide(SummaryMetrics *summaryMetrics, RideFile *ride, unsigned long, bool);
+	bool importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor color, unsigned long, bool);
     bool deleteRide(QString);
 
     // Create/Delete Measures

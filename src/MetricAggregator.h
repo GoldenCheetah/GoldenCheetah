@@ -30,6 +30,7 @@
 #include "SummaryMetrics.h"
 #include "MainWindow.h"
 #include "DBAccess.h"
+#include "Colors.h"
 
 class MetricAggregator : public QObject
 {
@@ -68,6 +69,7 @@ class MetricAggregator : public QObject
 	    typedef QHash<QString,RideMetric*> MetricMap;
 	    bool importRide(QDir path, RideFile *ride, QString fileName, unsigned long, bool modify);
 	    MetricMap metrics;
+        ColorEngine *colorEngine;
 };
 
 #endif /* METRICAGGREGATOR_H_ */
