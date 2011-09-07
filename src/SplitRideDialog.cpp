@@ -163,11 +163,7 @@ SplitRideDialog::CreateNewRideFile(const RideFile *ride, int nRecStart, int nRec
     QFile file(filePath);
     if (file.exists())
     {
-        QString backupPath = filePath + ".bak";
-        QMessageBox::warning(this, tr("Split Ride"), tr("The file %1 already exists and will backed up to %2").arg(filePath).arg(backupPath));
-
-        QFile(backupPath).remove(); // just wipe away any previously saved backup
-        file.rename(backupPath);
+        QMessageBox::critical(this, tr("Split Ride"), tr("The file %1 already exists and will not be overwritten").arg(filePath));
         return;
     }
 
