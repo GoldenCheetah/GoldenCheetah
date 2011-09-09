@@ -182,9 +182,7 @@ RideSummaryWindow::htmlSummary() const
         << "time_in_zone_H5"
         << "time_in_zone_H6"
         << "time_in_zone_H7"
-        << "time_in_zone_H8"
-        << "time_in_zone_H9"
-        << "time_in_zone_H10";
+        << "time_in_zone_H8";
 
     // Use pre-computed and saved metric values if the ride has not
     // been edited. Otherwise we need to re-compute every time.
@@ -199,12 +197,14 @@ RideSummaryWindow::htmlSummary() const
         worklist += maximumColumn;
         worklist += metricColumn;
         worklist += timeInZones;
+        worklist += timeInZonesHR;
 
         // go calculate them then...
         QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(mainWindow, ride, mainWindow->zones(), mainWindow->hrZones(), worklist);
         for(int i = 0; i < worklist.count(); ++i) {
-            if (worklist[i] != "")
+            if (worklist[i] != "") {
                 metrics.setForSymbol(worklist[i], computed.value(worklist[i])->value(true));
+            }
         }
     } else {
 
