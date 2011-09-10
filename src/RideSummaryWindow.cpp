@@ -203,7 +203,9 @@ RideSummaryWindow::htmlSummary() const
         QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(mainWindow, ride, mainWindow->zones(), mainWindow->hrZones(), worklist);
         for(int i = 0; i < worklist.count(); ++i) {
             if (worklist[i] != "") {
-                metrics.setForSymbol(worklist[i], computed.value(worklist[i])->value(true));
+                RideMetricPtr m = computed.value(worklist[i]);
+                if (m) metrics.setForSymbol(worklist[i], m->value(true));
+                else metrics.setForSymbol(worklist[i], 0.00);
             }
         }
     } else {
