@@ -189,6 +189,7 @@ HEADERS += \
         ErgFile.h \
         ErgFilePlot.h \
         FitRideFile.h \
+        GcBubble.h \
         GcPane.h \
         GcRideFile.h \
         GcToolBar.h \
@@ -354,6 +355,7 @@ SOURCES += \
         FixGPS.cpp \
         FixSpikes.cpp \
         FixTorque.cpp \
+        GcBubble.cpp \
         GcPane.cpp \
         GcRideFile.cpp \
         GcToolBar.cpp \

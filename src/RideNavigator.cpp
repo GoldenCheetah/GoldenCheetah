@@ -73,6 +73,8 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
     smaller.setPointSize(smaller.pointSize()-2);
     //tableView->setFont(smaller);
     tableView->installEventFilter(this);
+    tableView->viewport()->installEventFilter(this);
+    tableView->setMouseTracking(true);
     tableView->setFrameStyle(QFrame::NoFrame);
 
 #if 0
@@ -280,7 +282,7 @@ RideNavigator::setWidth(int x)
 
     active = false;
 }
-
+#if 0
 // make sure the columns are all neat and tidy when the ride navigator is shown
 bool
 RideNavigator::event(QEvent *e)
@@ -290,7 +292,7 @@ RideNavigator::event(QEvent *e)
         setWidth(geometry().width()); // calculate width...
     }
 
-    if (e->type() == QEvent::ToolTip) {
+    if (e->type() == QEvent::ToolTip || e->type() == QEvent::ToolTipChange) {
         QModelIndex index = tableView->indexAt(dynamic_cast<QHelpEvent*>(e)->pos());
         if (index.isValid()) {
             QString hoverFileName = tableView->model()->data(index, Qt::UserRole+1).toString();
@@ -299,11 +301,15 @@ RideNavigator::event(QEvent *e)
             //     remember to make it hide when mouse moves again.
             //     or another tooltip event occurs
             // qDebug()<<"ride navigator tooltip"<<hoverFileName;
+            main->setBubble(hoverFileName, dynamic_cast<QHelpEvent*>(e)->globalPos());
         }
+    } else if (e->object() == this) {
+qDebug()<<"hide bubble on event"<<e->type();
+            main->setBubble("");
     }
-
     return QWidget::event(e);
 }
+#endif
 
 void
 RideNavigator::columnsChanged()
@@ -341,6 +347,13 @@ RideNavigator::columnsChanged()
 bool
 RideNavigator::eventFilter(QObject *object, QEvent *e)
 {
+    // if in doubt hide the tooltip, but paint events are
+    // always generated in the viewport when the popup is shown
+    // so we ignore those
+    if (e->type() != QEvent::ToolTip && e->type() != QEvent::Paint && e->type() != QEvent::Destroy) {
+        main->setBubble("");
+    }
+
     // not for the table?
     if (object != (QObject *)tableView) return false;
 
@@ -399,6 +412,40 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
             }
             break;
         }
+
+        case QEvent::WindowActivate:
+        {
+            active=false;
+            setWidth(geometry().width()); // calculate width...
+        }
+        break;
+
+        case QEvent::ToolTip:
+        case QEvent::ToolTipChange:
+        {
+            QPoint global = dynamic_cast<QHelpEvent*>(e)->globalPos();
+            QPoint local = tableView->viewport()->mapFromGlobal(global);
+
+            // off view port!
+            if (local.y() <= 0 || local.x() <= 0) {
+                main->setBubble("");
+                return false;
+            }
+
+            QModelIndex index = tableView->indexAt(local);
+            if (index.isValid()) {
+                QString hoverFileName = tableView->model()->data(index, Qt::UserRole+1).toString();
+                e->accept();
+                // XXX todo custom tooltip balloon here.
+                //     remember to make it hide when mouse moves again.
+                //     or another tooltip event occurs
+                // qDebug()<<"ride navigator tooltip"<<hoverFileName;
+                QPoint p = dynamic_cast<QHelpEvent*>(e)->pos();
+                p.setX(width()-20);
+                main->setBubble(hoverFileName, mapToGlobal(p));
+            }
+        }
+        break;
 
         default:
             break;

@@ -45,6 +45,7 @@ SpecialFields::SpecialFields()
             << "Year"          // set by the rideFile reader
             << "Change History" // set by RideFileCommand
             << "Calendar Text" // set by openRideFile and rideMetadata
+            << "Data"          // set by openRideFile for areDataPresent
             ;
 
     // now add all the metric fields (for metric overrides)

@@ -50,6 +50,7 @@ class Seasons;
 class IntervalSummaryWindow;
 class RideNavigator;
 class GcToolBar;
+class GcBubble;
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 
@@ -122,6 +123,8 @@ class MainWindow : public QMainWindow
         SpecialFields specialFields;
         int session;
         bool isclean;
+
+        void setBubble(QString text, QPoint pos = QPoint());
 
         // *********************************************
         // APPLICATION EVENTS
@@ -268,6 +271,7 @@ class MainWindow : public QMainWindow
         QAction *sideView;
         QAction *toolView;
         QMenu *windowMenu;
+        GcBubble *bubble;
 
         // each view has its own controls XXX more to come
         QStackedWidget *masterControls,

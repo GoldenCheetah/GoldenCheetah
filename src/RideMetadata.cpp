@@ -827,7 +827,12 @@ RideMetadata::readXML(QString filename, QList<KeywordDefinition>&keywordDefiniti
     // them in this release. This is to ensure
     // they get written to metricDB
     bool hasCalendarText = false;
+    bool hasData = false;
+
     foreach (FieldDefinition field, fieldDefinitions) {
+        if (field.name == "Data") {
+            hasData = true;
+        }
         if (field.name == "Calendar Text") {
             hasCalendarText = true;
         }
@@ -837,6 +842,15 @@ RideMetadata::readXML(QString filename, QList<KeywordDefinition>&keywordDefiniti
         FieldDefinition add;
         add.name = "Calendar Text";
         add.type = 1;
+        add.diary = false;
+        add.tab = "";
+
+        fieldDefinitions.append(add);
+    }
+    if (!hasData) {
+        FieldDefinition add;
+        add.name = "Data";
+        add.type = 2;
         add.diary = false;
         add.tab = "";
 
