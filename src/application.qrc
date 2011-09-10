@@ -14,6 +14,18 @@
     <file>images/maps/cycling.png</file>
     <file>images/maps/cycling_sprint.png</file>
     <file>images/maps/finish.png</file>
+    <file>images/IconAltitude.png</file>
+    <file>images/IconBike.png</file>
+    <file>images/IconCadence.png</file>
+    <file>images/IconGPS.png</file>
+    <file>images/IconHR.png</file>
+    <file>images/IconPower.png</file>
+    <file>images/IconRun.png</file>
+    <file>images/IconSpeed.png</file>
+    <file>images/IconSwim.png</file>
+    <file>images/IconTemp.png</file>
+    <file>images/IconTorque.png</file>
+    <file>images/IconWind.png</file>
     <file>images/aluBar.png</file>
     <file>images/aluToolBar.png</file>
     <file>images/aluBarDark.png</file>

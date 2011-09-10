@@ -237,6 +237,9 @@ bool
 DiaryWindow::eventFilter(QObject *object, QEvent *e)
 {
 
+    if (e->type() != QEvent::ToolTip && e->type() != QEvent::Paint && e->type() != QEvent::Destroy)
+        mainWindow->setBubble("");
+
     //if (object != (QObject *)monthlyView) return false;
 
     switch (e->type()) {
@@ -281,15 +284,38 @@ DiaryWindow::eventFilter(QObject *object, QEvent *e)
         return true;
     case QEvent::ToolTip:
         {
-        QModelIndex index = monthlyView->indexAt(dynamic_cast<QHelpEvent*>(e)->pos());
-        if (index.isValid()) {
-            QStringList hoverFileNames = monthlyView->model()->data(index, GcCalendarModel::FilenamesRole).toStringList();
-            e->accept();
-            // XXX todo custom tooltip balloon here.
-            //     remember to make it hide when mouse moves again.
-            //     or another tooltip event occurs
-            //qDebug()<<"calendar tooltip"<<hoverFileNames;
-        }
+            QModelIndex index = monthlyView->indexAt(dynamic_cast<QHelpEvent*>(e)->pos());
+            if (index.isValid()) {
+                QStringList files = monthlyView->model()->data(index, GcCalendarModel::FilenamesRole).toStringList();
+                e->accept();
+
+                QPoint pos = dynamic_cast<QHelpEvent*>(e)->pos();
+
+                // Popup bubble for ride
+                if (files.count() == 1) {
+                    if (files[0] == "calendar") ; // XXX handle planned rides
+                    else mainWindow->setBubble(files.at(0), monthlyView->viewport()->mapToGlobal(pos));
+
+                } else if (files.count()) {
+
+                    QRect c = monthlyView->visualRect(index);
+
+                    // which ride?
+                    int h = (c.height()-15) / files.count();
+                    int i;
+                    for(i=files.count()-1; i>=0; i--) if (pos.y() > (c.y()+15+(h*i))) break;
+
+                    if (i<0) {
+                        mainWindow->setBubble("");
+                        return true;
+                    }
+
+                    if (files.at(i) == "calendar") ; // XXX handle planned rides
+                    else mainWindow->setBubble(files.at(i), monthlyView->viewport()->mapToGlobal(pos));
+                } else {
+                    mainWindow->setBubble("");
+                }
+            }
         }
         return true;
     default:

@@ -331,6 +331,34 @@ RideFile *RideFileFactory::openRideFile(MainWindow *main, QFile &file,
         result->setTag("Weekday", result->startTime().toString("ddd"));
 
         DataProcessorFactory::instance().autoProcess(result);
+
+        // what data is present - after processor in case 'derived' or adjusted
+        QString flags;
+
+        if (result->areDataPresent()->secs) flags += 'T'; // time
+        else flags += '-';
+        if (result->areDataPresent()->km) flags += 'D'; // distance
+        else flags += '-';
+        if (result->areDataPresent()->kph) flags += 'S'; // speed
+        else flags += '-';
+        if (result->areDataPresent()->watts) flags += 'P'; // Power
+        else flags += '-';
+        if (result->areDataPresent()->watts) flags += 'H'; // Heartrate
+        else flags += '-';
+        if (result->areDataPresent()->cad) flags += 'C'; // cadence
+        else flags += '-';
+        if (result->areDataPresent()->nm) flags += 'N'; // Torque
+        else flags += '-';
+        if (result->areDataPresent()->alt) flags += 'A'; // Altitude
+        else flags += '-';
+        if (result->areDataPresent()->lat ||
+            result->areDataPresent()->lon ) flags += 'G'; // GPS
+        else flags += '-';
+        if (result->areDataPresent()->headwind) flags += 'W'; // Windspeed
+        else flags += '-';
+
+        result->setTag("Data", flags);
+
     }
 
     return result;

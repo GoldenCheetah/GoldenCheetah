@@ -214,12 +214,12 @@ GcToolButton::paintBackground(QPaintEvent * /* event */)
         painter.drawLine(width()-1, 1, width()-1, height()-3);
 
         QPalette pal;
-        pal.setColor(QPalette::WindowText, Qt::black);
+        pal.setColor(QPalette::WindowText, QColor(0,0,0,200));
         label->setPalette(pal);
     } else {
 
         QPalette pal;
-        pal.setColor(QPalette::WindowText, Qt::white);
+        pal.setColor(QPalette::WindowText, QColor(255,255,255,200));
         label->setPalette(pal);
     }
 }

@@ -42,11 +42,12 @@
 //                            or b) new metrics are added / old changed
 //                            or c) the metricDB tables structures change
 
-// Revision History -- started at Revision 29
-// Date         Who                What Changed
-// 5th Sep 2011 Mark Liversedge    Added color to the ride fields
+// Revision History
+// Rev Date         Who                What Changed
+// 29  5th Sep 2011 Mark Liversedge    Added color to the ride fields
+// 30  8th Sep 2011 Mark Liversedge    Metadata 'data' field for data present string
 //
-static int DBSchemaVersion = 29;
+static int DBSchemaVersion = 30;
 
 DBAccess::DBAccess(MainWindow* main, QDir home) : main(main), home(home)
 {
@@ -470,6 +471,60 @@ QList<QDateTime> DBAccess::getAllDates()
         dates << date;
     }
     return dates;
+}
+
+bool
+DBAccess::getRide(QString filename, SummaryMetrics &summaryMetrics, QColor&color)
+{
+    // lookup a ride by filename returning true/false if found
+    bool found = false;
+
+    // construct the select statement
+    QString selectStatement = "SELECT filename, identifier, ride_date, color";
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    for (int i=0; i<factory.metricCount(); i++)
+        selectStatement += QString(", X%1 ").arg(factory.metricName(i));
+    foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+        if (!main->specialFields.isMetric(field.name) && field.type < 5) {
+            selectStatement += QString(", Z%1 ").arg(main->specialFields.makeTechName(field.name));
+        }
+    }
+    selectStatement += " FROM metrics where filename = :name;";
+
+    // execute the select statement
+    QSqlQuery query(selectStatement, dbconn);
+    query.bindValue(":start", filename);
+    query.exec();
+
+    while(query.next())
+    {
+        found = true;
+
+        // filename and date
+        summaryMetrics.setFileName(query.value(0).toString());
+        summaryMetrics.setId(query.value(1).toString());
+        summaryMetrics.setRideDate(query.value(2).toDateTime());
+        color = QColor(query.value(3).toString());
+
+        // the values
+        int i=0;
+        for (; i<factory.metricCount(); i++)
+            summaryMetrics.setForSymbol(factory.metricName(i), query.value(i+4).toDouble());
+
+        foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+            if (!main->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
+                QString underscored = field.name;
+                summaryMetrics.setForSymbol(underscored.replace("_"," "), query.value(i+4).toDouble());
+                i++;
+            } else if (!main->specialFields.isMetric(field.name) && field.type < 3) {
+                QString underscored = field.name;
+                // ignore texts for now XXX todo if want metadata from Summary Metrics
+                summaryMetrics.setText(underscored.replace("_"," "), query.value(i+4).toString());
+                i++;
+            }
+        }
+    }
+    return found;
 }
 
 QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)

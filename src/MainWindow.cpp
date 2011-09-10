@@ -70,6 +70,7 @@
 #endif
 #include "HelpWindow.h"
 #include "HomeWindow.h"
+#include "GcBubble.h"
 
 #include <assert.h>
 #include <QApplication>
@@ -120,6 +121,12 @@ MainWindow::MainWindow(const QDir &home) :
 
     QVariant unit = appsettings->value(this, GC_UNIT);
     useMetricUnits = (unit.toString() == "Metric");
+
+    /*----------------------------------------------------------------------
+     * The help bubble used everywhere
+     *--------------------------------------------------------------------*/
+    bubble = new GcBubble(this);
+    bubble->hide();
 
     /*----------------------------------------------------------------------
      *  Athlete details
@@ -1743,4 +1750,18 @@ MainWindow::exportCalendar()
     // need options to decide wether to
     // include past dates, workout plans only
     // or also workouts themselves
+}
+
+void
+MainWindow::setBubble(QString text, QPoint pos)
+{
+    if (text == "") {
+        bubble->setVisible(false);
+    } else {
+        bubble->setText(text);
+        bubble->setPos(pos.x(), pos.y());
+        bubble->setVisible(true);
+        bubble->raise();
+        bubble->repaint();
+    }
 }
