@@ -50,10 +50,7 @@ GcBubble::GcBubble(MainWindow *parent) : QWidget(parent, Qt::FramelessWindowHint
     display = new QWidget(this);
     display->setContentsMargins(3,3,3,3); // for the 3px border
     display->setAutoFillBackground(false);
-
-    display->setGeometry(0,0, 240, 134);
-
-    setGeometry(0,0,240+spikeHeight+(lineWidth*2),134+(lineWidth*2));
+    display->setGeometry(0,0, 200, 134);
 
     topleft = new QLabel("WCODE", this);
     topmiddle = new QLabel("RIDEDATE", this);
@@ -221,6 +218,9 @@ GcBubble::setPos(int x, int y, Qt::Orientation orientation) // always uses globa
     QPoint here = parent->mapFromGlobal(QPoint(x,y));
     this->orientation = orientation;
 
+    // set to as big as possible
+    setGeometry(0,0,display->width()+spikeHeight+(lineWidth*2),display->height()+spikeHeight+(lineWidth*2));
+
     // lets work out the position of the spike
     // is it left or right or top or bottom?
     if (orientation == Qt::Horizontal) {
@@ -231,16 +231,19 @@ GcBubble::setPos(int x, int y, Qt::Orientation orientation) // always uses globa
         } else {
             spikePosition = left;
         }
+        setGeometry(0,0,display->width()+spikeHeight+(lineWidth*2),display->height()+(lineWidth*2));
 
     } else {
 
         // would the window be off mainwindow?
-        if ((y+height()) > parent->geometry().y()+parent->geometry().height()) {
-            spikePosition = bottom;
-        } else {
+        if ((y-height()) < (parent->geometry().y()+40)) { // +40 for menu and title bar
             spikePosition = top;
+        } else {
+            spikePosition = bottom;
         }
+        setGeometry(0,0,display->width()+(lineWidth*2),display->height()+spikeHeight+(lineWidth*2));
     }
+
 
     // lets put the spike in the middle but possibly
     // move it up/down or left right to make the bubble
@@ -264,7 +267,7 @@ GcBubble::setPos(int x, int y, Qt::Orientation orientation) // always uses globa
 
         }
 
-    } else {
+    } else { // Qt::Vertical
 
         if (x-(width()/2) < parent->geometry().x()) {
             // put it at the left
@@ -302,8 +305,14 @@ GcBubble::setPos(int x, int y, Qt::Orientation orientation) // always uses globa
         break;
 
     case top:
+        body = QRect(lineWidth, lineWidth+spikeHeight,
+                    display->width(),
+                    display->height());
+        break;
     case bottom:
-        // XXX todo
+        body = QRect(lineWidth, lineWidth,
+                    display->width(),
+                    display->height());
         break;
 
     }
@@ -353,8 +362,39 @@ GcBubble::setPos(int x, int y, Qt::Orientation orientation) // always uses globa
         break;
 
     case top:
+        path.lineTo(start.x()+(spikeWidth/2), body.top()); // point to top
+
+        path.lineTo(body.topRight()-QPoint(radius,0)); // to top right corner, before curve
+        path.quadTo(body.topRight(), body.topRight() + QPoint(0, radius)); // curve to rhs
+
+        path.lineTo(body.bottomRight()-QPoint(0, radius)); // to bottom right corner, befor curve
+        path.quadTo(body.bottomRight(), body.bottomRight() - QPoint(radius, 0)); // curve to rhs
+
+        path.lineTo(body.bottomLeft()+QPoint(radius, 0)); // to bottom left corner, before curve
+        path.quadTo(body.bottomLeft(), body.bottomLeft() - QPoint(0, radius)); // curve to lhs
+
+        path.lineTo(body.topLeft() + QPoint(0, radius));  // to top left corner, before curve
+        path.quadTo(body.topLeft(), body.topLeft() + QPoint(radius, 0)); // curve to top
+
+        path.lineTo(start.x()-(spikeWidth/2), body.top()); // rhs before back to point
+        break;
+
     case bottom:
-        //XXX todo
+        path.lineTo(start.x()-(spikeWidth/2), body.bottom()); // point to top
+
+        path.lineTo(body.bottomLeft()+QPoint(radius, 0)); // to bottom left corner, before curve
+        path.quadTo(body.bottomLeft(), body.bottomLeft() - QPoint(0, radius)); // curve to lhs
+
+        path.lineTo(body.topLeft() + QPoint(0, radius));  // to top left corner, before curve
+        path.quadTo(body.topLeft(), body.topLeft() + QPoint(radius, 0)); // curve to top
+
+        path.lineTo(body.topRight()-QPoint(radius,0)); // to top right corner, before curve
+        path.quadTo(body.topRight(), body.topRight() + QPoint(0, radius)); // curve to rhs
+
+        path.lineTo(body.bottomRight()-QPoint(0, radius)); // to bottom right corner, befor curve
+        path.quadTo(body.bottomRight(), body.bottomRight() - QPoint(radius, 0)); // curve to rhs
+
+        path.lineTo(start.x()+(spikeWidth/2), body.bottom()); // rhs before back to point
         break;
     }
     path.lineTo(start);

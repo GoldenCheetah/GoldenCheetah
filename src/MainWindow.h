@@ -124,7 +124,7 @@ class MainWindow : public QMainWindow
         int session;
         bool isclean;
 
-        void setBubble(QString text, QPoint pos = QPoint());
+        void setBubble(QString text, QPoint pos = QPoint(), Qt::Orientation o = Qt::Horizontal);
 
         // *********************************************
         // APPLICATION EVENTS
