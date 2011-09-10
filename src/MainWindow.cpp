@@ -1753,13 +1753,13 @@ MainWindow::exportCalendar()
 }
 
 void
-MainWindow::setBubble(QString text, QPoint pos)
+MainWindow::setBubble(QString text, QPoint pos, Qt::Orientation orientation)
 {
     if (text == "") {
         bubble->setVisible(false);
     } else {
         bubble->setText(text);
-        bubble->setPos(pos.x(), pos.y());
+        bubble->setPos(pos.x(), pos.y(), orientation);
         bubble->setVisible(true);
         bubble->raise();
         bubble->repaint();
