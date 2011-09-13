@@ -140,7 +140,7 @@
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="550"/>
-        <source>KPH</source>
+        <source>km/h</source>
         <translation>км/ч</translation>
     </message>
     <message>
@@ -1992,7 +1992,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="unfinished">секунд</translation>
     </message>
     <message>
-        <source>KPH</source>
+        <source>km/h</source>
         <translation type="obsolete">км/ч</translation>
     </message>
     <message>
@@ -4481,7 +4481,7 @@ on and that its display says, &quot;Host&quot;</source>
     <message>
         <location filename="../RealtimeWindow.cpp" line="52"/>
         <location filename="../RealtimeWindow.cpp" line="180"/>
-        <source>KPH</source>
+        <source>km/h</source>
         <translation>КМ/Ч</translation>
     </message>
     <message>
@@ -4520,7 +4520,7 @@ on and that its display says, &quot;Host&quot;</source>
     <message>
         <location filename="../RealtimeWindow.cpp" line="53"/>
         <location filename="../RealtimeWindow.cpp" line="195"/>
-        <source>Avg KPH</source>
+        <source>Avg km/h</source>
         <translation>Ср. КМ/Ч</translation>
     </message>
     <message>

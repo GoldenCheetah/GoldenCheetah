@@ -49,8 +49,8 @@ RealtimeWindow::configUpdate()
 
     // set labels accordingly
     distanceLabel->setText(useMetricUnits ? tr("Distance (KM)") : tr("Distance (Miles)"));
-    speedLabel->setText(useMetricUnits ? tr("KPH") : tr("MPH"));
-    avgspeedLabel->setText(useMetricUnits ? tr("Avg KPH") : tr("Avg MPH"));
+    speedLabel->setText(useMetricUnits ? tr("km/h") : tr("MPH"));
+    avgspeedLabel->setText(useMetricUnits ? tr("Avg km/h") : tr("Avg MPH"));
 
     // get configured devices
     DeviceConfigurations all;
@@ -177,7 +177,7 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, TrainTool *trainTool, const Q
     powerLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
     heartrateLabel = new QLabel(tr("BPM"), this);
     heartrateLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
-    speedLabel = new QLabel(useMetricUnits ? tr("KPH") : tr("MPH"), this);
+    speedLabel = new QLabel(useMetricUnits ? tr("km/h") : tr("MPH"), this);
     speedLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
     cadenceLabel = new QLabel(tr("RPM"), this);
     cadenceLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
@@ -192,7 +192,7 @@ RealtimeWindow::RealtimeWindow(MainWindow *parent, TrainTool *trainTool, const Q
     avgpowerLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
     avgheartrateLabel = new QLabel(tr("Avg BPM"), this);
     avgheartrateLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
-    avgspeedLabel = new QLabel(useMetricUnits ? tr("Avg KPH") : tr("Avg MPH"), this);
+    avgspeedLabel = new QLabel(useMetricUnits ? tr("Avg km/h") : tr("Avg MPH"), this);
     avgspeedLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
     avgcadenceLabel = new QLabel(tr("Avg RPM"), this);
     avgcadenceLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);

@@ -140,7 +140,7 @@
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="550"/>
-        <source>KPH</source>
+        <source>km/h</source>
         <translation>km/h</translation>
     </message>
     <message>
@@ -2004,7 +2004,7 @@ např. zadejte &quot;1,2 nm&quot; pro navýšení nebo &quot;-0,5 nm&quot; pro s
         <translation type="unfinished">sekundy</translation>
     </message>
     <message>
-        <source>KPH</source>
+        <source>km/h</source>
         <translation type="obsolete">km/h</translation>
     </message>
     <message>
@@ -4487,7 +4487,7 @@ on and that its display says, &quot;Host&quot;</source>
     <message>
         <location filename="../RealtimeWindow.cpp" line="52"/>
         <location filename="../RealtimeWindow.cpp" line="180"/>
-        <source>KPH</source>
+        <source>km/h</source>
         <translation>Rychlost</translation>
     </message>
     <message>
@@ -4526,7 +4526,7 @@ on and that its display says, &quot;Host&quot;</source>
     <message>
         <location filename="../RealtimeWindow.cpp" line="53"/>
         <location filename="../RealtimeWindow.cpp" line="195"/>
-        <source>Avg KPH</source>
+        <source>Avg km/h</source>
         <translation>Průměrná rychlost</translation>
     </message>
     <message>

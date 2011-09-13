@@ -547,7 +547,7 @@ AllPlot::setYMax()
         setAxisLabelAlignment(yLeft2,Qt::AlignVCenter);
     }
     if (speedCurve->isVisible()) {
-        setAxisTitle(yRight, (useMetricUnits ? tr("KPH") : tr("MPH")));
+        setAxisTitle(yRight, (useMetricUnits ? tr("km/h") : tr("MPH")));
         if (referencePlot == NULL)
             setAxisScale(yRight, 0.0, 1.05 * speedCurve->maxYValue());
         else

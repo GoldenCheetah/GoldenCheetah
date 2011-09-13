@@ -140,7 +140,7 @@
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="550"/>
-        <source>KPH</source>
+        <source>km/h</source>
         <translation>km/h</translation>
     </message>
     <message>
@@ -1996,7 +1996,7 @@ Ajuste de Torque - define un valor fijo en libras por pulgada o newton por metro
         <translation>segundos</translation>
     </message>
     <message>
-        <source>KPH</source>
+        <source>km/h</source>
         <translation type="obsolete">Km/h</translation>
     </message>
     <message>
@@ -4482,7 +4482,7 @@ y que muestra la palabra &quot;Host&quot;</translation>
     <message>
         <location filename="../RealtimeWindow.cpp" line="52"/>
         <location filename="../RealtimeWindow.cpp" line="180"/>
-        <source>KPH</source>
+        <source>km/h</source>
         <translation>KM/H</translation>
     </message>
     <message>
@@ -4521,7 +4521,7 @@ y que muestra la palabra &quot;Host&quot;</translation>
     <message>
         <location filename="../RealtimeWindow.cpp" line="53"/>
         <location filename="../RealtimeWindow.cpp" line="195"/>
-        <source>Avg KPH</source>
+        <source>Avg km/h</source>
         <translation>Media KM/H</translation>
     </message>
     <message>

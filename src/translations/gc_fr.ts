@@ -140,7 +140,7 @@
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="550"/>
-        <source>KPH</source>
+        <source>km/h</source>
         <translation>km/h</translation>
     </message>
     <message>
@@ -2008,7 +2008,7 @@ Ajustement du couple - définit la valeur en livre par pouce carré (pi) ou newt
         <translation>secondes</translation>
     </message>
     <message>
-        <source>KPH</source>
+        <source>km/h</source>
         <translation type="obsolete">km/h</translation>
     </message>
     <message>
@@ -4501,7 +4501,7 @@ et que l&apos;affichage indique &quot;HOST&quot;</translation>
     <message>
         <location filename="../RealtimeWindow.cpp" line="52"/>
         <location filename="../RealtimeWindow.cpp" line="180"/>
-        <source>KPH</source>
+        <source>km/h</source>
         <translation>km/h</translation>
     </message>
     <message>
@@ -4540,7 +4540,7 @@ et que l&apos;affichage indique &quot;HOST&quot;</translation>
     <message>
         <location filename="../RealtimeWindow.cpp" line="53"/>
         <location filename="../RealtimeWindow.cpp" line="195"/>
-        <source>Avg KPH</source>
+        <source>Avg km/h</source>
         <translation>Moyenne km/h</translation>
     </message>
     <message>
