@@ -3605,156 +3605,364 @@ PC del ciclista %3 vatios</translation>
     </message>
 </context>
 <context>
-    <name>ModelWindow</name>
+    <name>ModelDataProvider</name>
     <message>
-        <location filename="../ModelWindow.cpp" line="33"/>
+        <location filename="../ModelPlot.cpp" line="270"/>
+        <source>Power (watts)</source>
+        <translation>Potencia (vatios)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="271"/>
+        <source>Cadence (rpm)</source>
+        <translation>Cadencia (rpm)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="272"/>
+        <source>Heartrate (bpm)</source>
+        <translation>Frec. Cardíaca (lpm)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="275"/>
+        <source>Speed (km/h)</source>
+        <translation>Velocidad (km/h)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="277"/>
+        <source>Speed (mph)</source>
+        <translation>Velocidad (mph)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="281"/>
+        <source>Altitude (meters)</source>
+        <translation>Altitud (metros)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="283"/>
+        <source>Altitude (feet)</source>
+        <translation>Altitud (pies)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="285"/>
+        <source>Torque (N)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="286"/>
+        <source>Elapsed Time (secs)</source>
+        <translation>Tiempo Transcurrido (seg)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="289"/>
+        <source>Elapsed Distance (km)</source>
+        <translation>Distancia Recorrida (km)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="291"/>
+        <source>Elapsed Distance (mi)</source>
+        <translation>Distancia Recorrida (mi)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="293"/>
+        <source>Interval Number</source>
+        <translation>Número de Intervalo</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="294"/>
+        <source>Latitude (degree x 1000)</source>
+        <translation>Latitud (grados x 1000)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="295"/>
+        <source>Longitude (degree x 1000)</source>
+        <translation>Longitud (grados x 1000)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="296"/>
+        <source>Circumferential Pedal Velocity (cm/s)</source>
+        <translation>Velocidad tangencial de Pedal (cm/s)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="297"/>
+        <source>Average Effective Pedal Force (N)</source>
+        <translation>Fuerza Efectiva Promedio en los Pedales (N)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="301"/>
+        <source>Time at X/Y (%)</source>
+        <translation>Tiempo en X/Y (%)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="302"/>
+        <source>Power Zone</source>
+        <translation>Zona de Potencia</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="304"/>
+        <source>Unknown</source>
+        <translation>Desconocido</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="308"/>
         <source>Power</source>
         <translation>Potencia</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="34"/>
+        <location filename="../ModelPlot.cpp" line="309"/>
         <source>Cadence</source>
         <translation>Cadencia</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="35"/>
+        <location filename="../ModelPlot.cpp" line="310"/>
         <source>Heartrate</source>
         <translation>Frec. Cardíaca</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="36"/>
+        <location filename="../ModelPlot.cpp" line="311"/>
         <source>Speed</source>
         <translation>Velocidad</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="37"/>
+        <location filename="../ModelPlot.cpp" line="312"/>
         <source>Altitude</source>
         <translation>Altitud</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="38"/>
-        <source>Torque</source>
-        <translation>Torque</translation>
+        <location filename="../ModelPlot.cpp" line="313"/>
+        <source>Pedal Force</source>
+        <translation>Fuerza en los Pedales</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="39"/>
-        <source>AEPF</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../ModelWindow.cpp" line="40"/>
-        <source>CPV</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../ModelWindow.cpp" line="41"/>
+        <location filename="../ModelPlot.cpp" line="314"/>
         <source>Time</source>
         <translation>Tiempo</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="42"/>
+        <location filename="../ModelPlot.cpp" line="315"/>
         <source>Distance</source>
         <translation>Distancia</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="43"/>
+        <location filename="../ModelPlot.cpp" line="316"/>
+        <source>Interval</source>
+        <translation>Intervalo</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="317"/>
         <source>Latitude</source>
         <translation>Latitud</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="318"/>
+        <source>Longitude</source>
+        <translation>Longitud</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="319"/>
+        <source>Time at X/Y</source>
+        <translation>Tiempo en X/Y</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="320"/>
+        <source>Zone</source>
+        <translation>Zona</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="321"/>
+        <source>CPV</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="322"/>
+        <source>AEPF</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="324"/>
+        <source>None</source>
+        <translation>Ninguno</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="494"/>
+        <source>No data or bin size too large</source>
+        <translation>Sin datos o divisiones demasiado grandes</translation>
+    </message>
+</context>
+<context>
+    <name>ModelWindow</name>
+    <message>
         <location filename="../ModelWindow.cpp" line="44"/>
+        <source>Power</source>
+        <translation>Potencia</translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="45"/>
+        <source>Cadence</source>
+        <translation>Cadencia</translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="46"/>
+        <source>Heartrate</source>
+        <translation>Frec. Cardíaca</translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="47"/>
+        <source>Speed</source>
+        <translation>Velocidad</translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="48"/>
+        <source>Altitude</source>
+        <translation>Altitud</translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="49"/>
+        <source>Torque</source>
+        <translation>Torque</translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="50"/>
+        <source>AEPF</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="51"/>
+        <source>CPV</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="52"/>
+        <source>Time</source>
+        <translation>Tiempo</translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="53"/>
+        <source>Distance</source>
+        <translation>Distancia</translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="54"/>
+        <source>Latitude</source>
+        <translation>Latitud</translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="55"/>
         <source>Longitude</source>
         <translation>Longitud</translation>
     </message>
     <message>
         <location filename="../ModelWindow.cpp" line="63"/>
+        <source>User Defined</source>
+        <translation>Definido por el Usuario</translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="64"/>
+        <source>Natural Cadence Selection</source>
+        <translation>Seleción de Cadencia Natural</translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="65"/>
+        <source>Route Visualisation</source>
+        <translation>Visualización de Recorrido</translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="66"/>
+        <source>Power Fatigue</source>
+        <translation>Fatiga de Potencia</translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="67"/>
+        <source>Impact of Altitude</source>
+        <translation>Impacto de la Altitud</translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="84"/>
         <source>Analyse</source>
         <translation>Análsis</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="64"/>
+        <location filename="../ModelWindow.cpp" line="85"/>
         <source>X-Axis:</source>
         <translation>Eje-X:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="65"/>
+        <location filename="../ModelWindow.cpp" line="86"/>
         <source>Y-Axis:</source>
         <translation>Eje-Y:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="66"/>
+        <location filename="../ModelWindow.cpp" line="87"/>
         <source>Z-Axis:</source>
         <translation>Eje Z:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="67"/>
+        <location filename="../ModelWindow.cpp" line="88"/>
         <source>Color:</source>
         <translation>Color:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="68"/>
+        <location filename="../ModelWindow.cpp" line="89"/>
         <source>Bin Width:</source>
         <translation>Ancho Divisiones:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="81"/>
-        <location filename="../ModelWindow.cpp" line="87"/>
+        <location filename="../ModelWindow.cpp" line="102"/>
+        <location filename="../ModelWindow.cpp" line="108"/>
         <source>Time at X&amp;Y</source>
         <translation>Tiempo en X&amp;Y</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="86"/>
+        <location filename="../ModelWindow.cpp" line="107"/>
         <source>Power Zone</source>
         <translation>Zona de Potencia</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="91"/>
+        <location filename="../ModelWindow.cpp" line="112"/>
         <source>Bar</source>
         <translation>Barra</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="92"/>
+        <location filename="../ModelWindow.cpp" line="113"/>
         <source>Grid</source>
         <translation>Grilla</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="93"/>
+        <location filename="../ModelWindow.cpp" line="114"/>
         <source>Surface</source>
         <translation>Superficie</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="94"/>
+        <location filename="../ModelWindow.cpp" line="115"/>
         <source>Dots</source>
         <translation>Puntos</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="97"/>
+        <location filename="../ModelWindow.cpp" line="118"/>
         <source>Ignore Zero</source>
         <translation>Ignorar Cero</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="99"/>
+        <location filename="../ModelWindow.cpp" line="120"/>
         <source>Show Grid</source>
         <translation>Mostrar Grilla</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="101"/>
+        <location filename="../ModelWindow.cpp" line="122"/>
         <source>Frame Intervals</source>
         <translation>Resaltar Intervalos</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="103"/>
+        <location filename="../ModelWindow.cpp" line="124"/>
         <source>Legend</source>
         <translation>Leyenda</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="116"/>
-        <location filename="../ModelWindow.cpp" line="298"/>
+        <location filename="../ModelWindow.cpp" line="137"/>
+        <location filename="../ModelWindow.cpp" line="319"/>
         <source>Reset View</source>
         <translation>Restablecer Vista</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="291"/>
+        <location filename="../ModelWindow.cpp" line="312"/>
         <source>Plot</source>
         <translation>Gráfica</translation>
     </message>
