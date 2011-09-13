@@ -271,7 +271,7 @@ ModelDataProvider::describeType(int type, bool longer)
             case MODEL_HEARTRATE : return ("Heartrate (bpm)");
             case MODEL_SPEED :
                 if (useMetricUnits == true){
-                     return ("Speed (kph)");
+                     return ("Speed (km/h)");
                 }else {
                      return ("Speed (mph)");
                 }

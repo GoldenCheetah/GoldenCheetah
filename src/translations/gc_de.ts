@@ -296,7 +296,7 @@
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="239"/>
-        <source>kph</source>
+        <source>km/h</source>
         <translation>km/h</translation>
     </message>
     <message>
@@ -1181,17 +1181,17 @@ Klicken Sie auf &quot;Abbrechen&quot; um dies Fenster zu schließen.</translatio
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="54"/>
-        <location filename="../DownloadRideDialog.cpp" line="181"/>
+        <location filename="../DownloadRideDialog.cpp" line="182"/>
         <source>&amp;Cancel</source>
         <translation>Abbre&amp;chen</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="68"/>
+        <location filename="../DownloadRideDialog.cpp" line="69"/>
         <source>Select port:</source>
         <translation>Port auswählen:</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="70"/>
+        <location filename="../DownloadRideDialog.cpp" line="71"/>
         <source>Select device type:</source>
         <translation>Gerätetyp auswählen:</translation>
     </message>
@@ -1208,7 +1208,7 @@ Wählen Sie dann &quot;Erneut suchen&quot; um fortzufahren</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="83"/>
+        <location filename="../DownloadRideDialog.cpp" line="84"/>
         <source>No devices found.  Make sure the device
 unit is plugged into the computer,
 then click &quot;Rescan&quot; to check again.</source>
@@ -1217,103 +1217,103 @@ an Ihren Computer angeschlossen ist.
 Wählen Sie dann &quot;Erneut suchen&quot; um fortzufahren.</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="93"/>
+        <location filename="../DownloadRideDialog.cpp" line="94"/>
         <source>Click Download to begin downloading.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="95"/>
+        <location filename="../DownloadRideDialog.cpp" line="96"/>
         <source>, 
 then click Download.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="109"/>
+        <location filename="../DownloadRideDialog.cpp" line="110"/>
         <source>Warning(s):
 
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="109"/>
+        <location filename="../DownloadRideDialog.cpp" line="110"/>
         <source>
 
 You may need to (re)install the FTDI or PL2303 drivers before downloading.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="111"/>
+        <location filename="../DownloadRideDialog.cpp" line="112"/>
         <source>Error Loading Device Drivers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="161"/>
+        <location filename="../DownloadRideDialog.cpp" line="162"/>
         <source>Download canceled</source>
         <translation>Download abgebrochen</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="162"/>
+        <location filename="../DownloadRideDialog.cpp" line="163"/>
         <source>Cancel clicked by user.</source>
         <translation>Vorgan wurde vom Benutzer abgebrochen.</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="166"/>
+        <location filename="../DownloadRideDialog.cpp" line="167"/>
         <source>Download failed</source>
         <translation>Download fehlgeschlagen!</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="177"/>
+        <location filename="../DownloadRideDialog.cpp" line="178"/>
         <source>Ride Already Downloaded</source>
         <translation>Trainingseinheit wurde schon heruntergeladen</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="178"/>
+        <location filename="../DownloadRideDialog.cpp" line="179"/>
         <source>This ride appears to have already </source>
         <translation>Diese Trainingseinheit scheint schon</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="179"/>
+        <location filename="../DownloadRideDialog.cpp" line="180"/>
         <source>been downloaded.  Do you want to </source>
         <translation>heruntergelanden worden zu sein! Möchten </translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="180"/>
+        <location filename="../DownloadRideDialog.cpp" line="181"/>
         <source>overwrite the previous download?</source>
         <translation>Sie die vorherige Datei durch diese ersetzen?</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="181"/>
+        <location filename="../DownloadRideDialog.cpp" line="182"/>
         <source>&amp;Overwrite</source>
         <translation>&amp;Ersetzen</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="193"/>
-        <location filename="../DownloadRideDialog.cpp" line="204"/>
+        <location filename="../DownloadRideDialog.cpp" line="194"/>
+        <location filename="../DownloadRideDialog.cpp" line="205"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="194"/>
+        <location filename="../DownloadRideDialog.cpp" line="195"/>
         <source>Failed to remove existing file </source>
         <translation>Die exisierende Datei konnte nicht überschrieben werden</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="205"/>
+        <location filename="../DownloadRideDialog.cpp" line="206"/>
         <source>Failed to rename </source>
         <translation>Umbenennen fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="205"/>
+        <location filename="../DownloadRideDialog.cpp" line="206"/>
         <source> to </source>
         <translation> zu </translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="212"/>
+        <location filename="../DownloadRideDialog.cpp" line="213"/>
         <source>Success</source>
         <translation>Erfolg</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="212"/>
+        <location filename="../DownloadRideDialog.cpp" line="213"/>
         <source>Download complete.</source>
         <translation>Download erfolgreich.</translation>
     </message>
@@ -4399,7 +4399,7 @@ Möchten Sie fortfahren?</translation>
     </message>
     <message>
         <location filename="../PowerHist.cpp" line="1019"/>
-        <source>kph</source>
+        <source>km/h</source>
         <translation>km/h</translation>
     </message>
     <message>
