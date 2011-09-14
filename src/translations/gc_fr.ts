@@ -30,12 +30,12 @@
     <message>
         <location filename="../Aerolab.cpp" line="254"/>
         <source>V-Elevation</source>
-        <translation>V-Ascensionnelle</translation>
+        <translation>V-Altitude</translation>
     </message>
     <message>
         <location filename="../Aerolab.cpp" line="255"/>
         <source>Elevation</source>
-        <translation>Dénivellation</translation>
+        <translation>Altitude</translation>
     </message>
     <message>
         <location filename="../Aerolab.cpp" line="577"/>
@@ -53,11 +53,13 @@
     <message>
         <location filename="../AerolabWindow.cpp" line="45"/>
         <source>Crr</source>
+        <translatorcomment>Coefficient de frottement</translatorcomment>
         <translation>Crr</translation>
     </message>
     <message>
         <location filename="../AerolabWindow.cpp" line="68"/>
         <source>CdA</source>
+        <translatorcomment>Coefficient de trainée</translatorcomment>
         <translation>CdA</translation>
     </message>
     <message>
@@ -68,7 +70,7 @@
     <message>
         <location filename="../AerolabWindow.cpp" line="123"/>
         <source>Total Mass (kg)</source>
-        <translation>Masse toral (kg)</translation>
+        <translation>Masse total (kg)</translation>
     </message>
     <message>
         <location filename="../AerolabWindow.cpp" line="146"/>
@@ -83,17 +85,17 @@
     <message>
         <location filename="../AerolabWindow.cpp" line="190"/>
         <source>eoffset auto</source>
-        <translation type="unfinished"></translation>
+        <translation>alt offset auto</translation>
     </message>
     <message>
         <location filename="../AerolabWindow.cpp" line="196"/>
         <source>X Axis Shows Time</source>
-        <translation type="unfinished">En fonction du temps</translation>
+        <translation>Abscisse en fonction du temps</translation>
     </message>
     <message>
         <location filename="../AerolabWindow.cpp" line="197"/>
         <source>X Axis Shows Distance</source>
-        <translation type="unfinished">En fonction de la distance</translation>
+        <translation>Abscisse en fonction de la distance</translation>
     </message>
 </context>
 <context>
@@ -131,7 +133,7 @@
     <message>
         <location filename="../AllPlot.cpp" line="531"/>
         <source>BPM</source>
-        <translation>Pulsations</translation>
+        <translation>Pulsations/min</translation>
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="538"/>
@@ -146,7 +148,7 @@
     <message>
         <location filename="../AllPlot.cpp" line="550"/>
         <source>MPH</source>
-        <translation>m/h</translation>
+        <translation>mille/h</translation>
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="559"/>
@@ -174,7 +176,7 @@
     <message>
         <location filename="../AllPlotWindow.cpp" line="57"/>
         <source>Show:</source>
-        <translation>Montre:</translation>
+        <translation>Afficher:</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="60"/>
@@ -224,12 +226,12 @@
     <message>
         <location filename="../AllPlotWindow.cpp" line="124"/>
         <source>X Axis Shows Time</source>
-        <translation>En fonction du temps</translation>
+        <translation>Abscisse en fonction du temps</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="125"/>
         <source>X Axis Shows Distance</source>
-        <translation>En fonction de la distance</translation>
+        <translation>Abscisse en fonction de la distance</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="128"/>
@@ -270,7 +272,7 @@
         <location filename="../BasicRideMetrics.cpp" line="328"/>
         <location filename="../BasicRideMetrics.cpp" line="329"/>
         <source>bpm</source>
-        <translation>pulsations</translation>
+        <translation>pulsations/min</translation>
     </message>
 </context>
 <context>
@@ -302,7 +304,7 @@
     <message>
         <location filename="../BasicRideMetrics.cpp" line="240"/>
         <source>mph</source>
-        <translation>mph</translation>
+        <translation>mille/h</translation>
     </message>
 </context>
 <context>
@@ -335,7 +337,7 @@
     <message>
         <location filename="../BestIntervalDialog.cpp" line="93"/>
         <source>&amp;Add to Intervals</source>
-        <translation>&amp;Ajouter un intervale</translation>
+        <translation>&amp;Ajouter un intervalle</translation>
     </message>
     <message>
         <location filename="../BestIntervalDialog.cpp" line="148"/>
@@ -505,7 +507,7 @@
     <message>
         <location filename="../ChooseCyclistDialog.cpp" line="88"/>
         <source>Enter New Cyclist&apos;s Name</source>
-        <translation>Entrez les nom du nouveau cycliste</translation>
+        <translation>Entrez le nom du nouveau cycliste</translation>
     </message>
     <message>
         <location filename="../ChooseCyclistDialog.cpp" line="94"/>
@@ -638,7 +640,7 @@ from %1 to %2?
     <message>
         <location filename="../Pages.cpp" line="37"/>
         <source>English</source>
-        <translation>Impériales</translation>
+        <translation>Anglais</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="26"/>
@@ -653,12 +655,12 @@ from %1 to %2?
     <message>
         <location filename="../Pages.cpp" line="28"/>
         <source>Summary Metrics</source>
-        <translation type="unfinished"></translation>
+        <translation>Résumé des mesures</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="29"/>
         <source>Interval Metrics</source>
-        <translation>Métriques pour intervalles</translation>
+        <translation>Mesures pour intervalles</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="30"/>
@@ -728,7 +730,7 @@ from %1 to %2?
     <message>
         <location filename="../Pages.cpp" line="143"/>
         <source>Smart Recording Threshold </source>
-        <translation>seuil pour &quot;Smart Recording&quot; </translation>
+        <translation>Seuil pour &quot;Smart Recording&quot; </translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="144"/>
@@ -739,7 +741,7 @@ from %1 to %2?
     <message>
         <location filename="../Pages.cpp" line="157"/>
         <source>Map interval period</source>
-        <translation type="unfinished"></translation>
+        <translation>Interval période carte</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="165"/>
@@ -764,12 +766,12 @@ from %1 to %2?
     <message>
         <location filename="../Pages.cpp" line="196"/>
         <source>time</source>
-        <translation>Temps</translation>
+        <translation>temps</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="197"/>
         <source>distance</source>
-        <translation>Distance</translation>
+        <translation>distance</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="212"/>
@@ -809,20 +811,21 @@ from %1 to %2?
     <message>
         <location filename="../CpintPlot.cpp" line="287"/>
         <source>Interval Length (minutes)</source>
-        <translation>Longueur de l&apos;intervale (minutes)</translation>
+        <translation>Longueur de l&apos;intervalle (minutes)</translation>
     </message>
     <message>
         <location filename="../CpintPlot.cpp" line="558"/>
         <source>maximal power</source>
-        <translation>Puissance max</translation>
+        <translation>puissance maximum</translation>
     </message>
     <message>
         <location filename="../CpintPlot.cpp" line="619"/>
         <source>Computing critical power intervals.
 This may take a while.
 </source>
-        <translation>Analyse de la puissance critique.
-Ceci peut prendre un certain temps.</translation>
+        <translation>Calcul des intervalles de puissance critique.
+Ceci peut prendre un certain temps.
+</translation>
     </message>
     <message>
         <location filename="../CpintPlot.cpp" line="621"/>
@@ -837,7 +840,7 @@ Ceci peut prendre un certain temps.</translation>
     <message>
         <location filename="../CpintPlot.cpp" line="648"/>
         <source>Aggregating over all files.</source>
-        <translation>Aggrégation des résultats.</translation>
+        <translation>Inspection de tous les fichies.</translation>
     </message>
     <message>
         <location filename="../CpintPlot.cpp" line="729"/>
@@ -856,7 +859,7 @@ Ceci peut prendre un certain temps.</translation>
         <location filename="../PeakPower.cpp" line="63"/>
         <location filename="../PeakPower.cpp" line="64"/>
         <source>watts</source>
-        <translation type="unfinished">watts</translation>
+        <translation>watts</translation>
     </message>
 </context>
 <context>
@@ -985,7 +988,7 @@ Ceci peut prendre un certain temps.</translation>
     <message>
         <location filename="../Pages.cpp" line="262"/>
         <source>HR Zones</source>
-        <translation>Zones de pulsations</translation>
+        <translation>Zones de fréquence cardique</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="282"/>
@@ -1161,7 +1164,7 @@ Choisir Annuler pour sortir.</translation>
     <message>
         <location filename="../Pages.cpp" line="389"/>
         <source>Device Profile</source>
-        <translation>Profile de l&apos;appareil</translation>
+        <translation>Profil de l&apos;appareil</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="392"/>
@@ -1240,7 +1243,7 @@ pour vérifier une nouvelle fois.</translation>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="94"/>
         <source>Click Download to begin downloading.</source>
-        <translation>Choisir Télécharger pour commencer le chargement.</translation>
+        <translation>Choisir Télécharger pour commencer le téléchargement.</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="96"/>
@@ -1420,12 +1423,12 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../LTMTool.cpp" line="816"/>
         <source>Square</source>
-        <translation></translation>
+        <translation>Carré</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="817"/>
         <source>Diamond</source>
-        <translation>Carré</translation>
+        <translation>Diamant</translation>
     </message>
     <message>
         <location filename="../LTMTool.cpp" line="818"/>
@@ -1529,7 +1532,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../Pages.cpp" line="1337"/>
         <source>Textbox</source>
-        <translation>Texte</translation>
+        <translation>Boite Textuel</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1338"/>
@@ -1632,7 +1635,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../RideEditor.cpp" line="1508"/>
         <source>Not Equal To</source>
-        <translation>Non égale</translation>
+        <translation>Différent</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="1510"/>
@@ -2356,22 +2359,22 @@ Ajustement du couple - définit la valeur en livre par pouce carré (pi) ou newt
     <message>
         <location filename="../Pages.cpp" line="783"/>
         <source>Move up</source>
-        <translation type="unfinished">Vers le haut</translation>
+        <translation>Vers le haut</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="784"/>
         <source>Move down</source>
-        <translation type="unfinished">Vers le bas</translation>
+        <translation>Vers le bas</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="785"/>
         <source>Exclude</source>
-        <translation type="unfinished"></translation>
+        <translation>Exclure</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="786"/>
         <source>Include</source>
-        <translation type="unfinished"></translation>
+        <translation>Inclure</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="832"/>
@@ -2838,7 +2841,7 @@ Ajustement du couple - définit la valeur en livre par pouce carré (pi) ou newt
         <location filename="../MacroDevice.cpp" line="49"/>
         <source>Make sure the Macro unit is turned
 on and that its display says, &quot;PC Link&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérifier que l&apos;unité Macro est allumée et affiche &quot;PC Link&quot;</translation>
     </message>
 </context>
 <context>
@@ -3633,182 +3636,182 @@ CP du cycliste fixée à %3 watts</translation>
     <message>
         <location filename="../ModelPlot.cpp" line="270"/>
         <source>Power (watts)</source>
-        <translation type="unfinished">Puissance (watts)</translation>
+        <translation>Puissance (watts)</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="271"/>
         <source>Cadence (rpm)</source>
-        <translation type="unfinished">Cadente (t/min)</translation>
+        <translation>Cadence (t/min)</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="272"/>
         <source>Heartrate (bpm)</source>
-        <translation type="unfinished">Fréquence cardiaque (pulsations)</translation>
+        <translation>Fréquence cardiaque (pulsations/min)</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="275"/>
         <source>Speed (km/h)</source>
-        <translation type="unfinished"></translation>
+        <translation>Vitesse (km/h)</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="277"/>
         <source>Speed (mph)</source>
-        <translation type="unfinished"></translation>
+        <translation>Vitesse (mille/h)</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="281"/>
         <source>Altitude (meters)</source>
-        <translation type="unfinished"></translation>
+        <translation>Altitude (mètres)</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="283"/>
         <source>Altitude (feet)</source>
-        <translation type="unfinished"></translation>
+        <translation>Altitude (pieds)</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="285"/>
         <source>Torque (N)</source>
-        <translation type="unfinished"></translation>
+        <translation>Couple (N)</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="286"/>
         <source>Elapsed Time (secs)</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps écoulé (secs)</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="289"/>
         <source>Elapsed Distance (km)</source>
-        <translation type="unfinished"></translation>
+        <translation>Disatnce écoulée (km)</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="291"/>
         <source>Elapsed Distance (mi)</source>
-        <translation type="unfinished"></translation>
+        <translation>Distance écoulée (mille)</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="293"/>
         <source>Interval Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre d&apos;Intervalle</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="294"/>
         <source>Latitude (degree x 1000)</source>
-        <translation type="unfinished"></translation>
+        <translation>Lagitude (degré x 1000)</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="295"/>
         <source>Longitude (degree x 1000)</source>
-        <translation type="unfinished"></translation>
+        <translation>Longitude (degré x 1000)</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="296"/>
         <source>Circumferential Pedal Velocity (cm/s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Vitesse circonférentielle de la pédale (cm/s)</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="297"/>
         <source>Average Effective Pedal Force (N)</source>
-        <translation type="unfinished">Force moyenne effective sur la pédale (N)</translation>
+        <translation>Force moyenne effective sur la pédale (N)</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="301"/>
         <source>Time at X/Y (%)</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps à X/Y (%)</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="302"/>
         <source>Power Zone</source>
-        <translation type="unfinished">Zone de puissance</translation>
+        <translation>Zone de puissance</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="304"/>
         <source>Unknown</source>
-        <translation type="unfinished">Inconnu</translation>
+        <translation>Inconnu</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="308"/>
         <source>Power</source>
-        <translation type="unfinished">Puissance</translation>
+        <translation>Puissance</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="309"/>
         <source>Cadence</source>
-        <translation type="unfinished">Cadence</translation>
+        <translation>Cadence</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="310"/>
         <source>Heartrate</source>
-        <translation type="unfinished">Fréquence cardiaque</translation>
+        <translation>Fréquence cardiaque</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="311"/>
         <source>Speed</source>
-        <translation type="unfinished">Vitesse</translation>
+        <translation>Vitesse</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="312"/>
         <source>Altitude</source>
-        <translation type="unfinished">Altitude</translation>
+        <translation>Altitude</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="313"/>
         <source>Pedal Force</source>
-        <translation type="unfinished"></translation>
+        <translation>Force sur la pédale</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="314"/>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="315"/>
         <source>Distance</source>
-        <translation type="unfinished">Distance</translation>
+        <translation>Distance</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="316"/>
         <source>Interval</source>
-        <translation type="unfinished">Intervalle</translation>
+        <translation>Intervalle</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="317"/>
         <source>Latitude</source>
-        <translation type="unfinished">Latitude</translation>
+        <translation>Latitude</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="318"/>
         <source>Longitude</source>
-        <translation type="unfinished">Longitude</translation>
+        <translation>Longitude</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="319"/>
         <source>Time at X/Y</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps à X/Y</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="320"/>
         <source>Zone</source>
-        <translation type="unfinished"></translation>
+        <translation>Zone</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="321"/>
         <source>CPV</source>
-        <translation type="unfinished">CPV</translation>
+        <translation>CPV</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="322"/>
         <source>AEPF</source>
-        <translation type="unfinished">AEPF</translation>
+        <translation>AEPF</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="324"/>
         <source>None</source>
-        <translation type="unfinished">Rien</translation>
+        <translation>Aucune</translation>
     </message>
     <message>
         <location filename="../ModelPlot.cpp" line="494"/>
         <source>No data or bin size too large</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucune donnée ou taille de la bar (classe) trop large</translation>
     </message>
 </context>
 <context>
@@ -3876,27 +3879,27 @@ CP du cycliste fixée à %3 watts</translation>
     <message>
         <location filename="../ModelWindow.cpp" line="63"/>
         <source>User Defined</source>
-        <translation type="unfinished"></translation>
+        <translation>Défini par l&apos;Utilisateur</translation>
     </message>
     <message>
         <location filename="../ModelWindow.cpp" line="64"/>
         <source>Natural Cadence Selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélection Naturelle de la Cadence de Pédalage</translation>
     </message>
     <message>
         <location filename="../ModelWindow.cpp" line="65"/>
         <source>Route Visualisation</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualisation de la Sortie</translation>
     </message>
     <message>
         <location filename="../ModelWindow.cpp" line="66"/>
         <source>Power Fatigue</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance vs Fatigue</translation>
     </message>
     <message>
         <location filename="../ModelWindow.cpp" line="67"/>
         <source>Impact of Altitude</source>
-        <translation type="unfinished"></translation>
+        <translation>Impact de l&apos;Altitude</translation>
     </message>
     <message>
         <location filename="../ModelWindow.cpp" line="84"/>
@@ -4188,7 +4191,7 @@ Voulez-vous continuer ?</translation>
         <location filename="../PeakPower.cpp" line="243"/>
         <location filename="../PeakPower.cpp" line="244"/>
         <source>watts</source>
-        <translation type="unfinished">watts</translation>
+        <translation>watts</translation>
     </message>
 </context>
 <context>
@@ -4202,7 +4205,7 @@ Voulez-vous continuer ?</translation>
         <location filename="../PeakPower.cpp" line="123"/>
         <location filename="../PeakPower.cpp" line="124"/>
         <source>watts</source>
-        <translation type="unfinished">watts</translation>
+        <translation>watts</translation>
     </message>
 </context>
 <context>
@@ -4216,7 +4219,7 @@ Voulez-vous continuer ?</translation>
         <location filename="../PeakPower.cpp" line="143"/>
         <location filename="../PeakPower.cpp" line="144"/>
         <source>watts</source>
-        <translation type="unfinished">watts</translation>
+        <translation>watts</translation>
     </message>
 </context>
 <context>
@@ -4230,7 +4233,7 @@ Voulez-vous continuer ?</translation>
         <location filename="../PeakPower.cpp" line="203"/>
         <location filename="../PeakPower.cpp" line="204"/>
         <source>watts</source>
-        <translation type="unfinished">watts</translation>
+        <translation>watts</translation>
     </message>
 </context>
 <context>
@@ -4244,7 +4247,7 @@ Voulez-vous continuer ?</translation>
         <location filename="../PeakPower.cpp" line="83"/>
         <location filename="../PeakPower.cpp" line="84"/>
         <source>watts</source>
-        <translation type="unfinished">watts</translation>
+        <translation>watts</translation>
     </message>
 </context>
 <context>
@@ -4258,7 +4261,7 @@ Voulez-vous continuer ?</translation>
         <location filename="../PeakPower.cpp" line="263"/>
         <location filename="../PeakPower.cpp" line="264"/>
         <source>watts</source>
-        <translation type="unfinished">watts</translation>
+        <translation>watts</translation>
     </message>
 </context>
 <context>
@@ -4272,7 +4275,7 @@ Voulez-vous continuer ?</translation>
         <location filename="../PeakPower.cpp" line="163"/>
         <location filename="../PeakPower.cpp" line="164"/>
         <source>watts</source>
-        <translation type="unfinished">watts</translation>
+        <translation>watts</translation>
     </message>
 </context>
 <context>
@@ -4286,7 +4289,7 @@ Voulez-vous continuer ?</translation>
         <location filename="../PeakPower.cpp" line="283"/>
         <location filename="../PeakPower.cpp" line="284"/>
         <source>watts</source>
-        <translation type="unfinished">watts</translation>
+        <translation>watts</translation>
     </message>
 </context>
 <context>
@@ -4300,7 +4303,7 @@ Voulez-vous continuer ?</translation>
         <location filename="../PeakPower.cpp" line="183"/>
         <location filename="../PeakPower.cpp" line="184"/>
         <source>watts</source>
-        <translation type="unfinished">watts</translation>
+        <translation>watts</translation>
     </message>
 </context>
 <context>
@@ -4314,7 +4317,7 @@ Voulez-vous continuer ?</translation>
         <location filename="../PeakPower.cpp" line="223"/>
         <location filename="../PeakPower.cpp" line="224"/>
         <source>watts</source>
-        <translation type="unfinished">watts</translation>
+        <translation>watts</translation>
     </message>
 </context>
 <context>
@@ -4328,7 +4331,7 @@ Voulez-vous continuer ?</translation>
         <location filename="../PeakPower.cpp" line="103"/>
         <location filename="../PeakPower.cpp" line="104"/>
         <source>watts</source>
-        <translation type="unfinished">watts</translation>
+        <translation>watts</translation>
     </message>
 </context>
 <context>
@@ -4336,13 +4339,13 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="377"/>
         <source>10 min Peak Power HR</source>
-        <translation type="unfinished"></translation>
+        <translation>Fréquence cardiaque pour le pique de puissance sur 10 min</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="378"/>
         <location filename="../PeakPower.cpp" line="379"/>
         <source>bpm</source>
-        <translation type="unfinished"></translation>
+        <translation>pulsations/min</translation>
     </message>
 </context>
 <context>
@@ -4350,13 +4353,13 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="337"/>
         <source>1 min Peak Power HR</source>
-        <translation type="unfinished"></translation>
+        <translation>Fréquence cardiaque pour le pique de puissance sur 1 min</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="338"/>
         <location filename="../PeakPower.cpp" line="339"/>
         <source>bpm</source>
-        <translation type="unfinished"></translation>
+        <translation>pulsations/min</translation>
     </message>
 </context>
 <context>
@@ -4364,13 +4367,13 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="397"/>
         <source>20 min Peak Power HR</source>
-        <translation type="unfinished"></translation>
+        <translation>Fréquence cardiaque pour le pique de puissance sur 20 min</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="398"/>
         <location filename="../PeakPower.cpp" line="399"/>
         <source>bpm</source>
-        <translation type="unfinished"></translation>
+        <translation>pulsations/min</translation>
     </message>
 </context>
 <context>
@@ -4378,13 +4381,13 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="417"/>
         <source>30 min Peak Power HR</source>
-        <translation type="unfinished"></translation>
+        <translation>Fréquence cardiaque pour le pique de puissance sur 30 min</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="418"/>
         <location filename="../PeakPower.cpp" line="419"/>
         <source>bpm</source>
-        <translation type="unfinished"></translation>
+        <translation>pulsations/min</translation>
     </message>
 </context>
 <context>
@@ -4392,13 +4395,13 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="357"/>
         <source>5 min Peak Power HR</source>
-        <translation type="unfinished"></translation>
+        <translation>Fréquence cardiaque pour le pique de puissance sur 5 min</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="358"/>
         <location filename="../PeakPower.cpp" line="359"/>
         <source>bpm</source>
-        <translation type="unfinished"></translation>
+        <translation>pulsations/min</translation>
     </message>
 </context>
 <context>
@@ -4406,13 +4409,13 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="438"/>
         <source>60 min Peak Power HR</source>
-        <translation type="unfinished"></translation>
+        <translation>Fréquence cardiaque pour le pique de puissance sur 60 min</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="439"/>
         <location filename="../PeakPower.cpp" line="440"/>
         <source>bpm</source>
-        <translation type="unfinished"></translation>
+        <translation>pulsations/min</translation>
     </message>
 </context>
 <context>
@@ -5890,44 +5893,44 @@ Voulez-vous continuer?
     <message>
         <location filename="../Pages.cpp" line="957"/>
         <source>Available Metrics</source>
-        <translation type="unfinished">Métriques disponibles</translation>
+        <translation>Mesures disponibles</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="962"/>
         <source>Selected Metrics</source>
-        <translation type="unfinished">Métriques sélectionnés</translation>
+        <translation>Mesures sélectionnés</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="964"/>
         <source>Move up</source>
-        <translation type="unfinished">Vers le haut</translation>
+        <translation>Vers le haut</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="965"/>
         <source>Move down</source>
-        <translation type="unfinished">Vers le bas</translation>
+        <translation>Vers le bas</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="966"/>
         <source>Exclude</source>
-        <translation type="unfinished"></translation>
+        <translation>Exclure</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="967"/>
         <source>Include</source>
-        <translation type="unfinished"></translation>
+        <translation>Inclure</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1013"/>
         <location filename="../Pages.cpp" line="1023"/>
         <source>&amp;#8482;</source>
-        <translation type="unfinished">&amp;#8482;</translation>
+        <translation>&amp;#8482;</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1013"/>
         <location filename="../Pages.cpp" line="1023"/>
         <source> (TM)</source>
-        <translation type="unfinished"> (TM)</translation>
+        <translation> (TM)</translation>
     </message>
 </context>
 <context>
@@ -5948,7 +5951,7 @@ Voulez-vous continuer?
     <message>
         <location filename="../TRIMPPoints.cpp" line="322"/>
         <source>Session RPE</source>
-        <translation type="unfinished"></translation>
+        <translation>Session RPE</translation>
     </message>
 </context>
 <context>
@@ -6315,7 +6318,7 @@ Voulez-vous continuer?
     <message>
         <location filename="../WeeklySummaryWindow.cpp" line="334"/>
         <source>&lt;/table&gt;&lt;h2&gt;Heart Rate Zones&lt;/h2&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;/table&gt;&lt;h2&gt;Zones Fréquence Cardiquew&lt;/h2&gt;</translation>
     </message>
     <message>
         <location filename="../WeeklySummaryWindow.cpp" line="341"/>
