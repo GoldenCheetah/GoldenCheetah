@@ -19,6 +19,8 @@
 #include <QtGui>
 #include "GcWindowLayout.h"
 
+#include <stdio.h>
+
 GcWindowLayout::GcWindowLayout(QWidget *parent, int margin, int hSpacing, int vSpacing)
     : QLayout(parent), m_hSpace(hSpacing), m_vSpace(vSpacing)
 {
@@ -123,42 +125,147 @@ QSize GcWindowLayout::minimumSize() const
     return size;
 }
 
+// we sort the points to try from top to bottom
+// and then left to right since this is the sequence
+// we follow to layout the charts
+class QPointS : public QPoint
+{
+    public:
+        QPointS(int x, int y) : QPoint(x,y) {}
+
+        bool operator< (QPointS right) const { 
+            if (y() == right.y())
+                return x() < right.x();
+            else
+                return y() < right.y();
+        }
+};
+
 int GcWindowLayout::doLayout(const QRect &rect, bool testOnly) const
 {
+    // geometry for the layout
     int left, top, right, bottom;
+    int spaceX = horizontalSpacing();
+    int spaceY = verticalSpacing();
     getContentsMargins(&left, &top, &right, &bottom);
-    QRect effectiveRect = rect.adjusted(+left, +top, -right, -bottom);
-    int x = effectiveRect.x();
-    int y = effectiveRect.y();
-    int lineHeight = 0;
 
-    QLayoutItem *item;
-    foreach (item, itemList) {
+    // the space we have to line up our charts
+    QRect effectiveRect = rect.adjusted(+left, +top, -right, -bottom);
+
+    // Charts already positioned are held here
+    QList <QRect> placed; 
+
+    // iterate through each chart, placing it in the
+    // most optimal location top to bottom then
+    // left to right (packed flow)
+    foreach (QLayoutItem *item, itemList) {
+
+        // what widget is in this item
         QWidget *wid = item->widget();
-        int spaceX = horizontalSpacing();
+
+        // handle when no spacing is set (always is for HomeWindow layouts)
         if (spaceX == -1)
-            spaceX = wid->style()->layoutSpacing(
-                QSizePolicy::PushButton, QSizePolicy::PushButton, Qt::Horizontal);
-        int spaceY = verticalSpacing();
+            spaceX = wid->style()->layoutSpacing(QSizePolicy::PushButton, QSizePolicy::PushButton, Qt::Horizontal);
         if (spaceY == -1)
-            spaceY = wid->style()->layoutSpacing(
-                QSizePolicy::PushButton, QSizePolicy::PushButton, Qt::Vertical);
-        int nextX = x + item->sizeHint().width() + spaceX;
-        if (nextX - spaceX > effectiveRect.right() && lineHeight > 0) {
+            spaceY = wid->style()->layoutSpacing( QSizePolicy::PushButton, QSizePolicy::PushButton, Qt::Vertical);
+
+
+        // the location we are going to place
+        int x=-1, y=-1;
+
+        if (placed.count() == 0) { // is first item!
+
             x = effectiveRect.x();
-            y = y + lineHeight + spaceY;
-            nextX = x + item->sizeHint().width() + spaceX;
-            lineHeight = 0;
+            y = effectiveRect.y();
+
+        } else {
+
+            // get a list of all the locations that the chart could be placed at
+            QList<QPointS> attempts;
+
+            // iterate through the charts and create a list of placement
+            // points that we can attempt to put the current chart
+            foreach(QRect here, placed) {
+
+                // always try to the right of another chart
+                attempts.append(QPointS(here.x()+here.width()+spaceX, here.y()));
+
+                int ax = here.x();
+                foreach(QRect there, placed)
+                    attempts.append(QPointS(ax, there.y() + there.height() + spaceY));
+            }
+
+            // now sort the list in order of preference
+            qSort(attempts);
+
+            // see if it fits!
+            foreach(QPointS attempt, attempts) {
+
+                QRect mine(attempt.x(),
+                           attempt.y(),
+                           item->sizeHint().width()+spaceX, 
+                           item->sizeHint().height()+spaceY);
+
+                // doesn't even fit in the boundary
+                if (mine.x()+mine.width()-spaceX > effectiveRect.right()) continue;
+
+
+                // lets assume it will fit and check  if it overlaps with existing
+                bool fits = true;
+                foreach (QRect here, placed) {
+
+                    // add spacing
+                    QRect bigger(here.x(), here.y(), here.width()+spaceY, here.height()+spaceX);
+
+                    // overlaps?
+                    if (bigger.intersects(mine)) {
+                        fits = false;
+                        break;
+                    }
+                }
+
+                // it fits!
+                if (fits == true) {
+                    x = attempt.x();
+                    y = attempt.y();
+                    break;
+                }
+            }
         }
 
-        if (!testOnly)
-            item->setGeometry(QRect(QPoint(x, y), item->sizeHint()));
+        // its just too big ...  fnarr fnarr
+        // stick it at the bottom
+        // this can happen when the layout is being called
+        // to set geometry when width and height are being
+        // derived
+        if ((x < 0 || y < 0) && placed.count()) {
+            int maxy=0;
+            foreach(QRect geom, placed) {
+                if (geom.y()+geom.height()+spaceY > maxy) {
+                    maxy = geom.y()+geom.height()+spaceY;
+                }
+            }
+            x = effectiveRect.x();
+            y = maxy;
+        }
 
-        x = nextX;
-        lineHeight = qMax(lineHeight, item->sizeHint().height());
+        QRect placement(QPoint(x,y), item->sizeHint());
+        placed.append(placement);
+
+        if (!testOnly) item->setGeometry(placement);
+
     }
-    return y + lineHeight - rect.y() + bottom;
+
+    // Return the length of the layout
+    int maxy=0;
+    foreach(QRect geom, placed) {
+        if (geom.y()+geom.height()+spaceY > maxy) {
+            maxy = geom.y()+geom.height()+spaceY;
+        }
+    }
+    return maxy;
 }
+
 int GcWindowLayout::smartSpacing(QStyle::PixelMetric pm) const
 {
     QObject *parent = this->parent();

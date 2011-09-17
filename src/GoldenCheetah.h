@@ -135,6 +135,7 @@ public:
     void setResizable(bool);
     bool resizable() const;
 
+    void moveEvent(QMoveEvent *); // we trap move events to ungrab during resize
     void setGripped(bool);
     bool gripped() const;
 

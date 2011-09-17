@@ -113,6 +113,15 @@ bool GcWindow::resizable() const
     return _resizable;
 }
 
+// if a window moves whilst it is being
+// resized we should let go, because the
+// geometry tends to warp to stupid or
+// tiny sizes as a result
+void GcWindow::moveEvent(QMoveEvent *)
+{
+    if (dragState != Move) setDragState(None);
+}
+
 void GcWindow::setGripped(bool x)
 {
     _gripped = x;
