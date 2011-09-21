@@ -81,56 +81,56 @@ void RealtimeData::setXPower(long x)
     this->xPower = x;
 }
 
-char *
-RealtimeData::getName()
+const char *
+RealtimeData::getName() const
 {
     return name;
 }
-double RealtimeData::getWatts()
+double RealtimeData::getWatts() const
 {
     return watts;
 }
-double RealtimeData::getHr()
+double RealtimeData::getHr() const
 {
     return hr;
 }
-double RealtimeData::getSpeed()
+double RealtimeData::getSpeed() const
 {
     return speed;
 }
-double RealtimeData::getWheelRpm()
+double RealtimeData::getWheelRpm() const
 {
     return wheelRpm;
 }
-double RealtimeData::getCadence()
+double RealtimeData::getCadence() const
 {
     return cadence;
 }
-double RealtimeData::getLoad()
+double RealtimeData::getLoad() const
 {
     return load;
 }
-long RealtimeData::getMsecs()
+long RealtimeData::getMsecs() const
 {
     return msecs;
 }
-long RealtimeData::getLapMsecs()
+long RealtimeData::getLapMsecs() const
 {
     return lapMsecs;
 }
-double RealtimeData::getDistance()
+double RealtimeData::getDistance() const
 {
     return distance;
 }
-long RealtimeData::getJoules()
+long RealtimeData::getJoules() const
 {
     return joules;
 }
-long RealtimeData::getBikeScore()
+long RealtimeData::getBikeScore() const
 {
     return bikeScore;
 }
-long RealtimeData::getXPower()
+long RealtimeData::getXPower() const
 {
     return xPower;
 }
