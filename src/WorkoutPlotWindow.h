@@ -19,6 +19,7 @@
 #ifndef _GC_WorkoutPlotWindow_h
 #define _GC_WorkoutPlotWindow_h 1
 #include "GoldenCheetah.h"
+#include "RideWindow.h"
 
 #include <QtGui>
 #include <QObject> // for Q_PROPERTY
