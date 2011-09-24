@@ -66,12 +66,32 @@ class WkoParser
         WKO_ULONG WKO_device;
         char WKO_GRAPHS[32];
         QList<RideFileInterval *> references;
+        int charts;
 
-        // Header data parsing
+        // used by all the parsers as temporary storage
+        unsigned char txtbuf[102400]; // text buffer
+        WKO_ULONG num;
+        WKO_ULONG ul;
+        WKO_USHORT us;
+
+        // Header data parsing - the first section of
+        //                       a WKO file contains general
+        //                       ride/athlete data, intervals
+        //                       device specific data and then
+        //                       charts and caches
         WKO_UCHAR *parseHeaderData(WKO_UCHAR *data);
+	    WKO_UCHAR *parseCRideSettingsConfig(WKO_UCHAR *data);
+	    WKO_UCHAR *parseCRideGoalConfig(WKO_UCHAR *data);
+	    WKO_UCHAR *parseCRideNotesConfig(WKO_UCHAR *data);
+	    WKO_UCHAR *parseCDistributionChartConfig(WKO_UCHAR *data);
+	    WKO_UCHAR *parseCRideSummaryConfig(WKO_UCHAR *data);
+	    WKO_UCHAR *parseCMeanMaxChartConfig(WKO_UCHAR *data);
+	    WKO_UCHAR *parseCMeanMaxChartCache(WKO_UCHAR *data);
+	    WKO_UCHAR *parseCDistributionChartCache(WKO_UCHAR *data);
 
-        // Raw bit packed data parsing
-        WKO_UCHAR *parseRawData(WKO_UCHAR *data);
+        // re-used across all the segment parsers above
+        WKO_UCHAR *parsePerspective(WKO_UCHAR *p);
+        WKO_UCHAR *parseChart(WKO_UCHAR *p, int type = 0);
 
         // Basic Field decoding
         unsigned int doshort(WKO_UCHAR *p, WKO_USHORT *pnum);
@@ -82,19 +102,26 @@ class WkoParser
         unsigned int optpad(WKO_UCHAR *p),
                     optpad2(WKO_UCHAR *p);
 
+        // Telemetry data parsing - the second section of a
+        //                          WKO file contains the ride
+        //                          telemetry, but bit packed to
+        //                          save storage space
+        WKO_UCHAR *parseRawData(WKO_UCHAR *data);
+
         // Bit twiddling functions
+        void setxormasks();
         int get_bit(WKO_UCHAR *data, unsigned bitoffset);
         unsigned int get_bits(WKO_UCHAR* data, unsigned bitOffset, unsigned numBits); 
-
-        // Decoding setup
-        void setxormasks();
-        WKO_ULONG nullvals(char graph, WKO_ULONG version);
         unsigned long bitget(char *thelot, int offset, int count);
+
+        // Utilities to return bit packed field sizes based
+        // upon the original device type (data is stored in
+        // different lengths (8bit, 11bit, 22bit etc)
+        WKO_ULONG nullvals(char graph, WKO_ULONG version);
         unsigned int bitsize(char graph, int device, WKO_ULONG version);
         void pbin(WKO_UCHAR x); // for debugging
 
-        // different Chart segment types
-
+        // Different chart types
         enum configtype {
 	        CRIDESETTINGSCONFIG,
 	        CRIDEGOALCONFIG,
