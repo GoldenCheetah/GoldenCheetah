@@ -24,31 +24,16 @@
 // the code and that is not particularly enlightening.
 //
 // The code is refactored from my wko2csv sourceforge project
-//
-// Whilst I have applied the coding standards in style.txt to the letter I suspect
-// that some of the casting is as a result of poor design and could be removed
-// altogether. Naybe when I have more time.
 
-// ISSUES
-//
-// 1. WKO_HOMEDIR EXTERNAL GLOBAL
-// The homedirectory is needed to create rideNotes, but is not available either
-// as a global or a passed variable -- since the RideFile function is pure virtual
-// I was unable to modify the caller to pass it, so it is stored in an external
-// global variable called WKO_HOMEDIR.
-//
-// 2. UNUSED GRAPHS
+// 1. UNUSED GRAPHS
 // Windspeed, Temperature, Slope et al are available from WKO
 // data files but is discarded currently since it is not supported by RideFile
 //
-// 3. GOTO
+// 2. GOTO
 // During the ParseHeaderData there are a couple of nasty goto statements
-// to breakout of nested loops / if statements.
-//
-// 4. WKO_device and WKO_GRAPHS STATIC GLOBALS
-// Shared between a number of functions to simplify parameter passing and avoid
-// refactoring as a class.
-//
+// to breakout of nested loops / if statements and to jump into blocks for
+// parsing older versions of the file format
+
 
 #include "WkoRideFile.h"
 #include <QRegExp>
@@ -59,65 +44,79 @@
 #include <assert.h>
 #include "math.h"
 
-// local holding varables shared between WkoParseHeaderData() and WkoParseRawData()
-static WKO_ULONG WKO_device;                   // Device ID used for this workout
-static char WKO_GRAPHS[32];              // GRAPHS available in this workout
-static QList<RideFileInterval *> references; // saved with data point references
+static int wkoFileReaderRegistered = RideFileFactory::instance().registerReader(
+                                     "wko", "WKO+ Files", new WkoFileReader());
 
-static int wkoFileReaderRegistered =
-    RideFileFactory::instance().registerReader(
-        "wko", "WKO+ Files", new WkoFileReader());
-
-
-//******************************************************************************
-// Main Entry Point from MainWindow() called to read data file
-//******************************************************************************
-RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
+RideFile *WkoFileReader::openRideFile(QFile &file,
+                                      QStringList &errors,
+                                      QList<RideFile*>*rides) const
 {
-    WKO_UCHAR *headerdata, *rawdata, *footerdata;
-    WKO_ULONG version;
+    WkoParser parser(file,errors,rides);
+    return parser.result();
+}
+
+/*----------------------------------------------------------------------
+ * WKO Parser for parsing .wko file format, ride is parsed as part
+ * of the constructor, so no need to explicitly call any parsing functions
+ *--------------------------------------------------------------------*/
+
+WkoParser::WkoParser(QFile &file, QStringList &errors, QList<RideFile*>*rides)
+          : file(file), results(NULL), errors(errors), rides(rides)
+{
+    // we reference the filename to parse start date/time
+    filename = file.fileName();
     QFileInfo fileinfo(file);
 
+    // open the source file, we never update so read only and then
+    // read in the whole file, proved faster when bit twiddling the
+    // raw data and avoids unbounded memory allocations when ride data
+    // is corrupt or we parse it incorrectly
     if (!file.open(QFile::ReadOnly)) {
-        errors << ("Could not open ride file: \""
-                   + file.fileName() + "\"");
-        return NULL;
+        errors << ("Could not open ride file: \"" + file.fileName() + "\"");
+        return;
     }
-
-    // read in the whole file and pass to parser routines for decoding
-    boost::scoped_array<WKO_UCHAR> entirefile(new WKO_UCHAR[file.size()]); // with a nod to c++ neophytes
-
-    // read entire raw data stream
+    boost::scoped_array<WKO_UCHAR> entirefile(new WKO_UCHAR[file.size()]);
     QDataStream *rawstream(new QDataStream(&file));
     headerdata = &entirefile[0];
     rawstream->readRawData(reinterpret_cast<char *>(headerdata), file.size());
     file.close();
 
-    // check it is version 28 of the format (the only version supported right now)
+    // We only support versions of the WKO file format we have seen
+    // sufficient source files to reverse engineer and test these
+    // are for CP v1.0 and v1.1 and then WKO v2.2 *or higher*
     donumber(headerdata+4, &version);
+
+    // early versions we don't support are rejected
     if (version < 28 && version != 1 && version != 12 && version != 7) {
         errors << (QString("Version of file (%1) is too old, open and save in WKO then retry: \"").arg(version) + file.fileName() + "\"");
-        return NULL;
+        return;
+
+    // 1.0 and 1.1 are not that reliable so warn of beta support
     } else if (version == 1 || version == 12 || version == 7) {
         errors <<QString("Beta support for v%1 files, please report errors!").arg(version);
+
+    // later versions may change so support but watn
     } else if (version >29) {
         errors << ("Version of file is new and not fully supported yet: \"" +
         file.fileName() + "\"");
     }
 
-    // Golden Cheetah ride file
-    RideFile *rideFile = new RideFile;
+    // Allocate space for newly parsed ride
+    results = new RideFile;
 
     // read header data and store details into rideFile structure
-    rawdata = WkoParseHeaderData(fileinfo.fileName(), headerdata, version, rideFile, errors);
+    rawdata = parseHeaderData(headerdata);
 
     // Parse raw data (which calls rideFile->appendPoint() with each sample
-    if (rawdata) footerdata = WkoParseRawData(rawdata, version, rideFile, errors);
-    else return NULL;
+    if (rawdata) footerdata = parseRawData(rawdata);
+    else {
+        delete results;
+        results = NULL;
+        return;
+    }
 
-    // Post process  the ride intervals to convert from point
-    // offsets to time in seconds
-    QVector<RideFilePoint*> datapoints = rideFile->dataPoints();
+    // Post process  the ride intervals to convert from point offsets to time in seconds
+    QVector<RideFilePoint*> datapoints = results->dataPoints();
     for (int i=0; i<references.count(); i++) {
         RideFileInterval add;
 
@@ -126,33 +125,38 @@ RideFile *WkoFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
         if (references.at(i)->start < datapoints.count())
             add.start = datapoints.at(references.at(i)->start)->secs;
-        else
-            continue;   // out of bounds
+        else continue;
 
         if (references.at(i)->stop < datapoints.count())
-            add.stop = datapoints.at(references.at(i)->stop)->secs + rideFile->recIntSecs()-.001;
-        else
-            continue;   // out of bounds
+            add.stop = datapoints.at(references.at(i)->stop)->secs + results->recIntSecs()-.001;
+        else continue;
 
-        rideFile->addInterval(add.start, add.stop, add.name);
+        results->addInterval(add.start, add.stop, add.name);
     }
 
-    // free up memory
+    // free up temporary storage for range post processing
     for (int i=0; i<references.count(); i++) delete references.at(i);
     references.clear();
 
-    if (footerdata) return (RideFile *)rideFile;
-    else return NULL;
+    // if we got to the end then close with success
+    if (footerdata) return; 
+    else {
+        // failed, so wipe what we got and return
+        delete results;
+        results = NULL;
+        return;
+    }
 }
 
 
 /***************************************************************************************
  * PROCESS THE RAW DATA
  *
- * WkoParseRawData() - read through all the raw data adding record points and return
+ * parseRawData() - read through all the raw data adding record points and return
  *                     a pointer to the footer record
  **************************************************************************************/
-WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, WKO_ULONG version, RideFile *rideFile, QStringList &errors)
+WKO_UCHAR *
+WkoParser::parseRawData(WKO_UCHAR *fb)
 {
     WKO_ULONG WKO_xormasks[32];    // xormasks used all over
     double cad=0, hr=0, km=0, kph=0, nm=0, watts=0, slope=0, alt=0, lon=0, lat=0, wind=0, interval=0;
@@ -203,6 +207,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, WKO_ULONG version, RideFile *rideFile,
     } else {
         records = us;
     }
+    //qDebug()<<"records="<<records;
     if (records == 0) {
         errors << ("Workout is empty.");
         return NULL;
@@ -214,6 +219,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, WKO_ULONG version, RideFile *rideFile,
     } else {
         data = us;
     }
+    //qDebug()<<"data="<<data<<"bytes?";
     thelot = fb;
 
 #if 0
@@ -237,7 +243,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, WKO_ULONG version, RideFile *rideFile,
     interval = inc;
     interval /= 1000;
 
-    rideFile->setRecIntSecs(interval);
+    results->setRecIntSecs(interval);
 
 
     /*------------------------------------------------------------------------------
@@ -431,7 +437,7 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, WKO_ULONG version, RideFile *rideFile,
             // Now output this sample if it is not a null record
             if (!isnull) {
                     // !! needs to be modified to support the new alt patch
-                    rideFile->appendPoint((double)rtime/1000, cad, hr, km,
+                    results->appendPoint((double)rtime/1000, cad, hr, km,
                             kph, nm, watts, alt, lon, lat, wind, 0);
             }
 
@@ -481,10 +487,11 @@ WKO_UCHAR *WkoParseRawData(WKO_UCHAR *fb, WKO_ULONG version, RideFile *rideFile,
  * ZIP THROUGH ALL THE WKO SPECIFIC DATA, LAND ON THE RAW DATA
  * AND RETURN A POINTER TO THE FIRST BYTE OF THE RAW DATA
  *
- * WkoParseHeadeData() - read through file and land on the raw data
+ * parseHeadeData() - read through file and land on the raw data
  *
  *********************************************************************/
-WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, WKO_ULONG version, RideFile *rideFile, QStringList &errors)
+WKO_UCHAR *
+WkoParser::parseHeaderData(WKO_UCHAR *fb)
 {
     unsigned long julian, sincemidnight;
     WKO_UCHAR *goal=NULL, *notes=NULL, *code=NULL; // save location of WKO metadata
@@ -517,7 +524,7 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, WKO_ULONG version, R
     julian = ul + 2415386; // 1/1/1901 is day 2415386 in julian days god bless google.
 
     goal = p; p += dotext(p, &txtbuf[0]); /* 4: goal */
-    rideFile->setTag("Objective", (const char*)&txtbuf[0]);
+    results->setTag("Objective", (const char*)&txtbuf[0]);
     notes = p; p += dotext(p, &txtbuf[0]); /* 5: notes */
 
     p += dotext(p, &txtbuf[0]); /* 6: graphs */
@@ -530,19 +537,19 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, WKO_ULONG version, R
     }
 
     switch (sport) {
-        case 0x01 : rideFile->setTag("Sport", "Swim") ; break;
-        case 0x02 : rideFile->setTag("Sport", "Bike") ; break;
-        case 0x03 : rideFile->setTag("Sport", "Run") ; break;
-        case 0x04 : rideFile->setTag("Sport", "Brick") ; break;
-        case 0x05 : rideFile->setTag("Sport", "Cross Train") ; break;
-        case 0x06 : rideFile->setTag("Sport", "Race ") ; break;
-        case 0x07 : rideFile->setTag("Sport", "Day Off") ; break;
-        case 0x08 : rideFile->setTag("Sport", "Mountain Bike") ; break;
-        case 0x09 : rideFile->setTag("Sport", "Strength") ; break;
-        case 0x0B : rideFile->setTag("Sport", "XC Ski") ; break;
-        case 0x0C : rideFile->setTag("Sport", "Rowing") ; break;
+        case 0x01 : results->setTag("Sport", "Swim") ; break;
+        case 0x02 : results->setTag("Sport", "Bike") ; break;
+        case 0x03 : results->setTag("Sport", "Run") ; break;
+        case 0x04 : results->setTag("Sport", "Brick") ; break;
+        case 0x05 : results->setTag("Sport", "Cross Train") ; break;
+        case 0x06 : results->setTag("Sport", "Race ") ; break;
+        case 0x07 : results->setTag("Sport", "Day Off") ; break;
+        case 0x08 : results->setTag("Sport", "Mountain Bike") ; break;
+        case 0x09 : results->setTag("Sport", "Strength") ; break;
+        case 0x0B : results->setTag("Sport", "XC Ski") ; break;
+        case 0x0C : results->setTag("Sport", "Rowing") ; break;
         default   :
-        case 0x64 : rideFile->setTag("Sport", "Other"); break;
+        case 0x64 : results->setTag("Sport", "Other"); break;
 
     }
 
@@ -550,7 +557,7 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, WKO_ULONG version, R
 
         // workout code and duration not in v1 files
         code = p; p += dotext(p, &txtbuf[0]); /* 8: workout code */
-        rideFile->setTag("Workout Code", (const char*)&txtbuf[0]);
+        results->setTag("Workout Code", (const char*)&txtbuf[0]);
         p += donumber(p, &ul); /* 9: duration 000s of seconds */
     }
 
@@ -564,21 +571,21 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, WKO_ULONG version, R
                                    "_(\\d\\d)_(\\d\\d)_(\\d\\d))\\.(.+)$";
     QRegExp rx(rideFileRegExp);
 
-    if (rx.exactMatch(fname)) {
+    if (rx.exactMatch(filename)) {
 
         // set the date and time from the filename
         QDate date(rx.cap(2).toInt(), rx.cap(3).toInt(),rx.cap(4).toInt());
         QTime time(rx.cap(5).toInt(), rx.cap(6).toInt(),rx.cap(7).toInt());
         QDateTime datetime(date, time);
 
-        rideFile->setStartTime(datetime);
+        results->setStartTime(datetime);
 
     } else {
 
         // date not available from filename use WKO metadata
         QDateTime datetime(QDate::fromJulianDay(julian),
             QTime(sincemidnight/360000, (sincemidnight%360000)/6000, (sincemidnight%6000)/100));
-        rideFile->setStartTime(datetime);
+        results->setStartTime(datetime);
     }
 
     QString notesTag;
@@ -622,7 +629,7 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, WKO_ULONG version, R
         notesTag += snote; notesTag += "\n";
     }
 
-    rideFile->setTag("Notes", notesTag);
+    results->setTag("Notes", notesTag);
 
     if (version != 1) {
         p += donumber(p, &ul); /* 13: distance travelled in meters */
@@ -633,7 +640,7 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, WKO_ULONG version, R
         if (version != 12 && version != 7)
             p += dodouble(p, &g);  /* 18: athlete threshold pace */
         p += donumber(p, &ul); /* 19: weight in grams/10 */
-        rideFile->setTag("Weight", QString("%1").arg((double)ul/100.00));
+        results->setTag("Weight", QString("%1").arg((double)ul/100.00));
 
         if (version != 12) p += 28;
         else p += 36;
@@ -656,17 +663,17 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, WKO_ULONG version, R
     p += donumber(p, &ul); /* 28: WKO_device type */
     WKO_device = ul; // save WKO_device
     switch (WKO_device) {
-    case 0x01 : rideFile->setDeviceType("Powertap"); break;
-    case 0x04 : rideFile->setDeviceType("SRM"); break;
-    case 0x05 : rideFile->setDeviceType("Polar"); break;
-    case 0x06 : rideFile->setDeviceType("Computrainer/Velotron"); break;
-    case 0x11 : rideFile->setDeviceType("Ergomo"); break;
-    case 0x12 : rideFile->setDeviceType("Garmin Edge 205/305"); break;
-    case 0x13 : rideFile->setDeviceType("Garmin Edge 705"); break;
-    case 0x14 : rideFile->setDeviceType("iBike"); break;
-    case 0x16 : rideFile->setDeviceType("Cycleops 300PT"); break;
-    case 0x19 : rideFile->setDeviceType("Ergomo"); break;
-    default : rideFile->setDeviceType("WKO"); break;
+    case 0x01 : results->setDeviceType("Powertap"); break;
+    case 0x04 : results->setDeviceType("SRM"); break;
+    case 0x05 : results->setDeviceType("Polar"); break;
+    case 0x06 : results->setDeviceType("Computrainer/Velotron"); break;
+    case 0x11 : results->setDeviceType("Ergomo"); break;
+    case 0x12 : results->setDeviceType("Garmin Edge 205/305"); break;
+    case 0x13 : results->setDeviceType("Garmin Edge 705"); break;
+    case 0x14 : results->setDeviceType("iBike"); break;
+    case 0x16 : results->setDeviceType("Cycleops 300PT"); break;
+    case 0x19 : results->setDeviceType("Ergomo"); break;
+    default : results->setDeviceType("WKO"); break;
     }
 
     if (version != 12) p += donumber(p, &ul); /* 29: unknown */
@@ -707,7 +714,7 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, WKO_ULONG version, R
     // point because the raw data has not been parsed yet.
     // So intervals are created here with point references
     // and they are post-processed after the call to
-    // WkoParseRawData in openRideFile above.
+    // parseRawData in openRideFile above.
     p += doshort(p, &us); /* 237: Number of ranges XXVARIABLEXX */
     for (i=0; i<us; i++) {
         RideFileInterval *add = new RideFileInterval();    // add new interval
@@ -753,7 +760,7 @@ WKO_UCHAR *WkoParseHeaderData(QString fname, WKO_UCHAR *fb, WKO_ULONG version, R
         p += dotext(p, &txtbuf[0]);
         deviceInfo += QString("%1\n").arg((char*)&txtbuf[0]);
     }
-    rideFile->setTag("Device Info", deviceInfo);
+    results->setTag("Device Info", deviceInfo);
 
     /***************************************************
      * 4: PERSPECTIVE CHARTS & CACHES
@@ -775,10 +782,13 @@ next:
         num = ul;
         lastchart = OTHER;
 
-        if (num==131071) {
+        // Each config section is preceded with
+        // 0xff 0xff 0x01 0x00 
+        if (num==0x01ffff) {
+
             char buf[32];
 
-            /* Config */
+            // Config Type
             p += doshort(p, &us); // got here...
             strncpy (reinterpret_cast<char *>(buf), reinterpret_cast<char *>(p), us); buf[us]=0;
             p += us;
@@ -793,7 +803,11 @@ next:
             if (!strcmp(buf, "CMeanMaxChartCache")) lastchart=type=CMEANMAXCHARTCACHE;
             if (!strcmp(buf, "CDistributionChartCache")) lastchart=type=CDISTRIBUTIONCHARTCACHE;
 
+            //qDebug()<<"CONFIG = "<<buf;
+
             if (type == CDISTRIBUTIONCHARTCACHE) {
+
+                //qDebug()<<"dist cache in:"<<filename;
 
                 p += 346;
                 //p += donumber(p, &ul); /* always 2 */
@@ -804,6 +818,8 @@ next:
                 p += optpad(p);
 
             } else if (type == CMEANMAXCHARTCACHE) {
+
+                //qDebug()<<"meanmax cache in:"<<filename;
 
                 WKO_ULONG recs, term;
 
@@ -996,10 +1012,12 @@ meanmaxconfig:
             p += dotext(p, &txtbuf[0]);
 
         } else if (num==3) {
-
             z--;
             /* Chart */
             p += dotext(p, &txtbuf[0]);
+
+            //qDebug()<<"3 - text"<<QString((const char *)&txtbuf[0]);
+
             /* now lets skip the config and labels etc */
             p += 32; //for (i=0; i<16; i++) doshort(fd,buf,0);
 
@@ -1041,7 +1059,13 @@ meanmaxconfig:
 
                 /* there is more data in there! */
                 doshort(p, &us);
+
+                //qDebug()<<"end if dustchart 2 bytes="<<QString("%1").arg(us,0,16);
+
                 if (us == 1) {
+
+                    //qDebug()<<"bonus data!";
+
                     p += 6;
                     doshort(p, &us);
                     if (us != 0xffff) {
@@ -1168,7 +1192,8 @@ breakout:
  * bitsize() - return size in bits of a given graph for a specific WKO_device
  * nullvals() - return nullvalue for this GRAPH on this WKO_device
  **********************************************************************************/
-unsigned int bitsize(char g, int WKO_device, WKO_ULONG version)
+unsigned int
+WkoParser::bitsize(char g, int WKO_device, WKO_ULONG version)
 {
     if (version != 1 && version != 7) {
         switch (g) {
@@ -1257,7 +1282,8 @@ unsigned int bitsize(char g, int WKO_device, WKO_ULONG version)
     return 0; // impossible (in theory) but keeps compiler happy
 }
 
-WKO_ULONG nullvals(char g, WKO_ULONG version)
+WKO_ULONG
+WkoParser::nullvals(char g, WKO_ULONG version)
 {
     switch (g) {
 
@@ -1288,7 +1314,8 @@ WKO_ULONG nullvals(char g, WKO_ULONG version)
  * optpad() - main entry point for handling optional chart data
  ***********************************************************************/
 
-unsigned int optpad(WKO_UCHAR *p)
+unsigned int
+WkoParser::optpad(WKO_UCHAR *p)
 {
     WKO_USHORT us;
     unsigned int bytes = 0;
@@ -1339,14 +1366,16 @@ unsigned int optpad(WKO_UCHAR *p)
  * get_bits() - return a range of bits read right to left (high bit first)
  *
  ************************************************************************************/
-int get_bit(WKO_UCHAR *data, unsigned bitoffset) // returns the n-th bit
+int
+WkoParser::get_bit(WKO_UCHAR *data, unsigned bitoffset) // returns the n-th bit
 {
     WKO_UCHAR c = data[bitoffset >> 3]; // X>>3 is X/8
     WKO_UCHAR bitmask = 1 << (bitoffset %8);  // X&7 is X%8
     return ((c & bitmask)!=0) ? 1 : 0;
 }
 
-unsigned int get_bits(WKO_UCHAR* data, unsigned bitOffset, unsigned numBits)
+unsigned int
+WkoParser::get_bits(WKO_UCHAR* data, unsigned bitOffset, unsigned numBits)
 {
     unsigned int bits = 0;
     unsigned int currentbit;
@@ -1370,25 +1399,29 @@ unsigned int get_bits(WKO_UCHAR* data, unsigned bitOffset, unsigned numBits)
  * dotext() - read a wko text (1byte len, n bytes string without terminator)
  * pbin() - print a number in binary
  ****************************************************************************/
-unsigned int dofloat(WKO_UCHAR *p, float *pnum)
+unsigned int
+WkoParser::dofloat(WKO_UCHAR *p, float *pnum)
 {
     memcpy(pnum, p, 4);
     return 4;
 }
 
-unsigned int dodouble(WKO_UCHAR *p, double *pnum)
+unsigned int
+WkoParser::dodouble(WKO_UCHAR *p, double *pnum)
 {
     memcpy(pnum, p, 8);
     return 8;
 }
 
-unsigned int donumber(WKO_UCHAR *p, WKO_ULONG *pnum)
+unsigned int
+WkoParser::donumber(WKO_UCHAR *p, WKO_ULONG *pnum)
 {
     *pnum = qFromLittleEndian<quint32>(p);
     return 4;
 }
 
-void pbin(WKO_UCHAR x)
+void
+WkoParser::pbin(WKO_UCHAR x)
 {
     static WKO_UCHAR bits[]={ 128, 64, 32, 16, 8, 4, 2, 1 };
     int i;
@@ -1398,7 +1431,8 @@ void pbin(WKO_UCHAR x)
 }
 
 
-unsigned int dotext(WKO_UCHAR *p, WKO_UCHAR *buf)
+unsigned int
+WkoParser::dotext(WKO_UCHAR *p, WKO_UCHAR *buf)
 {
     WKO_USHORT us;
 
@@ -1418,9 +1452,9 @@ unsigned int dotext(WKO_UCHAR *p, WKO_UCHAR *buf)
     }
 }
 
-unsigned int doshort(WKO_UCHAR *p, WKO_USHORT *pnum)
+unsigned int
+WkoParser::doshort(WKO_UCHAR *p, WKO_USHORT *pnum)
 {
     *pnum = qFromLittleEndian<quint16>(p);
     return 2;
 }
-

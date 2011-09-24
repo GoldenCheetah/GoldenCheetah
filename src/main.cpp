@@ -27,10 +27,6 @@
 #include <X11/Xlib.h>
 #endif
 
-// BLECK - homedir passing via global becuase ridefile is pure virtual and
-//         cannot pass with current definition -- Sean can advise!!
-extern QString WKO_HOMEDIR;
-
 int
 main(int argc, char *argv[])
 {
@@ -119,8 +115,6 @@ main(int argc, char *argv[])
         while (i.hasNext()) {
             QString cyclist = i.next();
             if (home.cd(cyclist)) {
-                // used by WkoRideFileReader to store notes
-                WKO_HOMEDIR = home.absolutePath();
                 MainWindow *mainWindow = new MainWindow(home);
                 mainWindow->show();
                 home.cdUp();
@@ -136,8 +130,6 @@ main(int argc, char *argv[])
         home.cd(d.choice());
         if (!home.exists())
             assert(false);
-        // used by WkoRideFileReader to store notes
-        WKO_HOMEDIR = home.absolutePath();
         MainWindow *mainWindow = new MainWindow(home);
         mainWindow->show();
     }
