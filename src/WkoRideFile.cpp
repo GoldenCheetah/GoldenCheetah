@@ -96,13 +96,14 @@ WkoParser::WkoParser(QFile &file, QStringList &errors, QList<RideFile*>*rides)
         errors <<QString("Beta support for v%1 files, please report errors!").arg(version);
 
     // later versions may change so support but watn
-    } else if (version >29) {
+    } else if (version >31) {
         errors << ("Version of file is new and not fully supported yet: \"" +
         file.fileName() + "\"");
     }
 
     // Allocate space for newly parsed ride
     results = new RideFile;
+    results->setTag("File Format", QString("WKO v%1").arg(version));
 
     // read header data and store details into rideFile structure
     rawdata = parseHeaderData(headerdata);
@@ -207,7 +208,6 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
     } else {
         records = us;
     }
-    //qDebug()<<"records="<<records;
     if (records == 0) {
         errors << ("Workout is empty.");
         return NULL;
@@ -219,12 +219,12 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
     } else {
         data = us;
     }
-    //qDebug()<<"data="<<data<<"bytes?";
+
     thelot = fb;
 
 #if 0
 // used when debugging
-    qDebug()<<version<<WKO_GRAPHS<<"records="<<records;
+    qDebug()<<WKO_device<<version<<WKO_GRAPHS<<"records="<<records;
     for (int xbit=0; xbit < 300; xbit++)
     if (get_bits(thelot, xbit, 1)) fprintf(stderr, "1");
         else fprintf(stderr, "0");
@@ -434,6 +434,12 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
             for (i=0, isnull=1; WKO_GRAPHS[i] != '\0'; i++)
                 if (WKO_GRAPHS[i] != 'G' && WKO_GRAPHS[i] != 'D' && GRAPHDATA[i][0] != '\0') isnull=0;
 
+            // if time is not present (wtf?) we set to 1second sampling and always at 1sec
+            if (QString(WKO_GRAPHS).indexOf("T") == -1) {
+                results->setRecIntSecs(1);
+                rtime += 1000;
+            }
+
             // Now output this sample if it is not a null record
             if (!isnull) {
                     // !! needs to be modified to support the new alt patch
@@ -497,7 +503,6 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
     WKO_UCHAR *goal=NULL, *notes=NULL, *code=NULL; // save location of WKO metadata
 
     enum configtype lastchart;
-    unsigned int x,z,i;
 
     /* utility holders */
     WKO_ULONG num;
@@ -505,8 +510,6 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
     WKO_ULONG sport;
     WKO_USHORT us;
     double g;
-
-    boost::scoped_array<WKO_UCHAR> txtbuf(new WKO_UCHAR[1024000]);
 
     /* working through filebuf */
     WKO_UCHAR *p = fb;
@@ -671,6 +674,7 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
     case 0x12 : results->setDeviceType("Garmin Edge 205/305"); break;
     case 0x13 : results->setDeviceType("Garmin Edge 705"); break;
     case 0x14 : results->setDeviceType("iBike"); break;
+    case 0x15 : results->setDeviceType("Suunto"); break;
     case 0x16 : results->setDeviceType("Cycleops 300PT"); break;
     case 0x19 : results->setDeviceType("Ergomo"); break;
     default : results->setDeviceType("WKO"); break;
@@ -679,7 +683,7 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
     if (version != 12) p += donumber(p, &ul); /* 29: unknown */
 
     if (version != 1 && version !=7) { //!!! Version 1 beta support
-        for (i=0; i< 16; i++) { // 16 types of chart data
+        for (int i=0; i< 16; i++) { // 16 types of chart data
 
             if (version != 12) {
                 p += 44;
@@ -716,7 +720,7 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
     // and they are post-processed after the call to
     // parseRawData in openRideFile above.
     p += doshort(p, &us); /* 237: Number of ranges XXVARIABLEXX */
-    for (i=0; i<us; i++) {
+    for (int i=0; i<us; i++) {
         RideFileInterval *add = new RideFileInterval();    // add new interval
 
         p += 12;
@@ -754,7 +758,7 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
     QString deviceInfo;
     p += doshort(p, &us); /* 249: Device/Token pairs XXVARIABLEXX */
 
-    for (i=0; i<us; i++) {
+    for (int i=0; i<us; i++) {
         p += dotext(p, &txtbuf[0]);
         deviceInfo += QString("%1 = ").arg((char*)&txtbuf[0]);
         p += dotext(p, &txtbuf[0]);
@@ -767,16 +771,14 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
      ***************************************************/
 
     p += doshort(p, &us);       /* 251: Number of charts XXVARIABLEXX */
-    z = us;
+    charts = us;
 
     num=0;
 
-    while (z) {     /* Until we hit first chart data */
-
+    while (charts) {     // keep parsing until we have no charts left
         WKO_ULONG prev=0;
         enum configtype type=INVALID;
 
-next:
         prev=num;
         p += donumber(p, &ul);
         num = ul;
@@ -803,208 +805,43 @@ next:
             if (!strcmp(buf, "CMeanMaxChartCache")) lastchart=type=CMEANMAXCHARTCACHE;
             if (!strcmp(buf, "CDistributionChartCache")) lastchart=type=CDISTRIBUTIONCHARTCACHE;
 
-            //qDebug()<<"CONFIG = "<<buf;
-
             if (type == CDISTRIBUTIONCHARTCACHE) {
 
-                //qDebug()<<"dist cache in:"<<filename;
-
-                p += 346;
-                //p += donumber(p, &ul); /* always 2 */
-                //p += donumber(p, &ul); /* always 1 */
-                //_read(fd,buf,338);   /* dist cache data */
-
-                /* handle "optional padding" */
-                p += optpad(p);
+                p = parseCDistributionChartCache(p);
 
             } else if (type == CMEANMAXCHARTCACHE) {
 
-                //qDebug()<<"meanmax cache in:"<<filename;
+                p = parseCMeanMaxChartCache(p);
 
-                WKO_ULONG recs, term;
+            } else if (type == CRIDESUMMARYCONFIG) {
 
-                p += 20;
-                //_read(fd,buf,20); /* unknown 20 bytes */
+                p = parseCRideSummaryConfig(p);
 
-                p += donumber(p, &ul);
-                p += (ul * 8);
+            } else if (type == CRIDENOTESCONFIG) {
 
-                p += 28;
-                //_read(fd,buf,28); /* further cached data */
+                p = parseCRideNotesConfig(p);
 
-                p += donumber(p, &ul);
-                p += (ul * 8);
-                //_read(fd,buf,recs*8); /* first data block */
+            } else if (type == CRIDEGOALCONFIG) {
 
-                /* now its the main structures from a meanmax chart */
+                p = parseCRideGoalConfig(p);
 
-                /* the code below is cut and paste from the meanmax chart
-                 * code below
-                 */
-                /* How many meanmax records in first set ? */
-                p += doshort(p, &us);
-                recs = us;
+            } else if (type == CRIDESETTINGSCONFIG) {
 
-                while (recs--) {
+                p = parseCRideSettingsConfig(p);
 
-                    p += donumber(p, &ul);
-                    if (!ul) goto next;
-                    else {
+            } else if (type == CDISTRIBUTIONCHARTCONFIG) {
 
-                        /* Read that row */
-                        p += 28;
-                        //p += donumber(p, &ul); /* unknown */
-                        //p += donumber(p, &ul); /* unknown */
-                        //p += donumber(p, &ul); /* unknown */
-                        //p += dodouble(p, &g);  /* value! */
-                        //p += donumber(p, &ul); /* unknown */
-                        //p += donumber(p, &ul); /* unknown */
+                p = parseCDistributionChartConfig(p);
 
-                    }
-                }
+            } else if (type == CMEANMAXCHARTCONFIG) {
 
-                /* 12 byte preamble */
-                p += 12;
-                //p += donumber(p, &ul);
-                //p += donumber(p, &ul);
-                //p += donumber(p, &ul);
+                p = parseCMeanMaxChartConfig(p);
 
-                /* How many meanmax records in second set ? */
-                p += doshort(p, &us);
-                recs = us;
-                term=1;
-
-                while (recs--) {
-
-                    p += donumber(p, &ul);
-                    if (!ul) break;
-                    else {
-
-                        /* Read that row */
-                        p += 28;
-                        //p += donumber(p, &ul); /* unknown */
-                        //p += donumber(p, &ul); /* unknown */
-                        //p += donumber(p, &ul); /* unknown */
-                        //p += dodouble(p, &g);  /* value! */
-                        //p += donumber(p, &ul); /* unknown */
-                        //p += donumber(p, &ul); /* unknown */
-
-                    }
-                }
-
-                /* as long as it didn't get terminated we need to read the end of the data */
-                if (term) p += 24;
-
-                /* might still be padding ? */
-                p += optpad(p);
-
-            } else {
-
-                if (version != 1 && version != 7 && version != 12) {//!!! Version 1 beta support
-                    p += donumber(p, &ul); /* always 2 */
-                    p += dotext(p, &txtbuf[0]); /* perspective */
-                } else {
-                    p += 8;
-                }
-
-                switch (type) {
-
-                case CRIDESUMMARYCONFIG:
-                    if (version == 1) {
-                        p += 14;
-                        goto meanmaxconfig;
-                    } else if (version == 12 || version == 7) {
-                        p += 4;
-                        z--;
-                    } else {
-                        p += donumber(p, &ul);
-                        p += donumber(p, &ul);
-                        z--;
-                        /* might still be padding ? */
-                        p += optpad(p);
-                    }
-                    break;
-                case CRIDENOTESCONFIG:
-                case CRIDEGOALCONFIG:
-                    p += donumber(p, &ul);
-                case CRIDESETTINGSCONFIG:
-                    if (version != 1 && version != 12 && version != 7) { //!!! Version 1 beta support
-                        p += donumber(p, &ul);
-                    }
-                    z--;
-                    break;
-                case CDISTRIBUTIONCHARTCONFIG:
-                    if (version == 1 || version == 7 || version == 12) { //!!! Version 1 beta support
-
-                        // version 1 did not have a CDISTRIBUTIONCHARTCACHE
-                        // type. Instead they appear one after each other
-                        // following a distribution chart. The format is
-                        // largely the same as a DISTRIBUTIONCHARTCACHE with
-                        // each CACHE terminated with our old friend 0x8007
-                        // so lets read them all, until we don't have a 0x8007
-                        // terminator (i.e we got to the end
-                        do {
-
-                            z--;
-
-                            p += dotext(p, &txtbuf[0]); // cache type
-                            p += 24;                    // config et al
-                            p += donumber(p, &ul);
-                            p += 64;
-
-                            if (version == 12 || version == 7) p += 8;
-
-                            /* number of labels */
-                            p += doshort(p, &us);
-
-                            for (i=0; i<us; i++) {
-                                p += donumber(p, &ul);
-                                p += dotext(p, &txtbuf[0]);
-                                p += dotext(p, &txtbuf[0]);
-                                p += donumber(p, &ul);
-                                p += donumber(p, &ul);
-                            }
-
-                            /* there is more data in there! */
-                            doshort(p, &us);
-                            num=us;
-                            if (us == 1) {
-                                p += 6;
-                                doshort(p, &us);
-                                if (us != 0xffff) {
-                                    p += 18;
-                                    p += doshort(p, &us);
-                                    p += us*8;
-                                }
-                            }
-
-                            p += optpad(p);
-
-                            if (num==0x8007) p+= 8;
-                            else {
-                                if (version != 12 && version != 7) z--;
-                            }
-
-                        } while (num == 0x8007);
-                    }
-                    break;
-                case CMEANMAXCHARTCONFIG:
-
-                    if (version == 1 || version == 7 || version == 12) { //!!! Version 1 beta support
-meanmaxconfig:
-                        // version 1 did not have a CMEANMAXCHARTCACHE
-                        // type. Instead it follows a CMEANMAXCHARTCONFIG.
-                        p += dotext(p, &txtbuf[0]); // cache type
-                        p += 24;                    // config et al
-                        p += donumber(p, &ul);
-                        z--;
-                        goto meanmax;               // exactly the same as later versions
-                    }
-                    break;
-                default:
-                    break;
-                }
             }
+
+        } else if (num == 1) {
+
+            // version 12 leaves this at the end of ride summary
 
         } else if (num==2) {
 
@@ -1012,166 +849,16 @@ meanmaxconfig:
             p += dotext(p, &txtbuf[0]);
 
         } else if (num==3) {
-            z--;
-            /* Chart */
-            p += dotext(p, &txtbuf[0]);
 
-            //qDebug()<<"3 - text"<<QString((const char *)&txtbuf[0]);
-
-            /* now lets skip the config and labels etc */
-            p += 32; //for (i=0; i<16; i++) doshort(fd,buf,0);
-
-            /* what type is it? */
-            p += donumber(p, &ul);
-            x = ul;
-
-            if (x == 0x02) {        /* Read through Distribution Chart */
-                p += 64;
-                // /* distribution chart */
-                //p += donumber(p, &ul); /* chart type bin/pie1 */
-                //p += donumber(p, &ul); /* channel */
-                //p += donumber(p, &ul); /* percent/absolute */
-                //p += donumber(p, &ul); /* u1 */
-                //p += donumber(p, &ul); /* Units */
-                //p += donumber(p, &ul); /* Conversion type */
-                //p += dodouble(p, &g); /* first converter */
-                //p += donumber(p, &ul); /* bin mode auto/zone/manual */
-                ///* remaining 28 bytes of config data */
-                //p += donumber(p, &ul); /* include zeros */
-                //p += donumber(p, &ul); /* u2 */
-                //p += donumber(p, &ul); /* lower limit */
-                //p += donumber(p, &ul); /* u3 */
-                //p += donumber(p, &ul);  /* upper limit */
-                //p += donumber(p, &ul); /* u4 */
-                //p += donumber(p, &ul); /* increments */
-
-
-                /* number of labels */
-                p += doshort(p, &us);
-
-                for (i=0; i<us; i++) {
-                    p += donumber(p, &ul);
-                    p += dotext(p, &txtbuf[0]);
-                    p += dotext(p, &txtbuf[0]);
-                    p += donumber(p, &ul);
-                    p += donumber(p, &ul);
-                }
-
-                /* there is more data in there! */
-                doshort(p, &us);
-
-                //qDebug()<<"end if dustchart 2 bytes="<<QString("%1").arg(us,0,16);
-
-                if (us == 1) {
-
-                    //qDebug()<<"bonus data!";
-
-                    p += 6;
-                    doshort(p, &us);
-                    if (us != 0xffff) {
-                        p += 18;
-                        p += doshort(p, &us);
-                        p += us*8;
-                    }
-                }
-
-                p += optpad(p);
-
-            } else if (x == 0x0c) {     /* Read through Mean Max Chart */
-meanmax:
-                WKO_ULONG recs, term;
-                WKO_ULONG two;
-
-                if (version == 12 || version == 7) p += 8;
-                p += donumber(p, &ul); /* 253.4: Log or Linear meanmax ? */
-                p += donumber(p, &ul); /* 253.4: Which Channel ? */
-                p += donumber(p, &ul); /* 253.4: UNKNOWN */
-                p += donumber(p, &ul); /* 253.4: Units */
-                p += donumber(p, &ul); /* 253.4: Conversion type ? */
-                two = ul;
-
-                p += dodouble(p, &g);  /* 253.4: Conversion Factor 1 */
-
-                if (two == 2) p += donumber(p, &ul);  /* 253.4: Conversion Factor 2 */
-
-
-                /* How many meanmax records in first set ? */
-                p += doshort(p, &us);
-                recs = us;
-
-                if (recs) {
-                while (recs--) {
-
-                    p += donumber(p, &ul);
-                    term = ul;
-                    if (!term) goto next;
-                    else {
-
-                        /* Read that row */
-                        p += 28;
-                        //p += donumber(p, &ul); /* unknown */
-                        //p += donumber(p, &ul); /* unknown */
-                        //p += donumber(p, &ul); /* unknown */
-                        //p += dodouble(p, &g); /* value! */
-                        //p += donumber(p, &ul); /* unknown */
-                        //p += donumber(p, &ul); /* unknown */
-
-                    }
-                }
-
-                /* 12 byte preamble */
-                p += 12;
-                //p += donumber(p, &ul);
-                //p += donumber(p, &ul);
-                //p += donumber(p, &ul);
-
-                /* How many meanmax records in second set ? */
-                p += doshort(p, &us);
-                recs=us;
-                term=1;
-
-                while (recs--) {
-
-                    p += donumber(p, &ul);
-                    term=ul;
-                    if (!term) {
-                        break;
-                    } else {
-
-                        /* Read that row */
-                        p += 28;
-                        //p += donumber(p, &ul); /* unknown */
-                        //p += donumber(p, &ul); /* unknown */
-                        //p += donumber(p, &ul); /* unknown */
-                        //dodouble(fd,buf,0); /* value! */
-                        //p += donumber(p, &ul); /* unknown */
-                        //p += donumber(p, &ul); /* unknown */
-                    }
-                }
-
-
-                /* as long as it didn't get terminated we need to read the end of the data */
-                if (term) {
-                    if (version != 1) p += 24; //_read(fd, buf, 24);
-                    else p += 10;
-                }
-                }
-                /* might still be padding ? */
-                p += optpad(p);
-
-            } else {
-
-                goto breakout;
-            }
+            p = parseChart(p);
 
         } else {
 
-            errors << ("Could not parse chart data");
+            errors << "Could not parse chart data"
+                   << QString("0x%1 @0x%2").arg(num, 0, 16).arg(p-fb, 0, 16);
             return NULL;
         }
     }
-
-breakout:
 
     if (WKO_GRAPHS[0] == '\0') {
         errors << ("Manual files not supported");
@@ -1181,6 +868,328 @@ breakout:
         return (p);
     }
 }
+
+
+/*==============================================================================
+ * Parse chart segments - the really hard stuff!
+ *==============================================================================*/
+WKO_UCHAR *WkoParser::parsePerspective(WKO_UCHAR *p)
+{
+    // perspective - not present in early releases
+    if (version != 1 && version != 7 && version != 12) {
+        p += donumber(p, &ul); /* always 2 */
+        p += dotext(p, &txtbuf[0]); /* perspective */
+    } 
+    return p;
+}
+
+WKO_UCHAR *WkoParser::parseChart(WKO_UCHAR *p, int type)
+{
+    charts--;
+
+    // chart name
+    p += dotext(p, &txtbuf[0]);
+
+    // preamble
+    if (version == 1) p+= 24;
+    else p += 32;
+
+    // earlier versions don't have a type marker
+    // so we let the caller tell us what we're parsing
+    // otherwise we work it when we can
+    if (!type) {
+        p += donumber(p, &ul);
+        type = ul;
+    } else {
+        p+= 4;
+    }
+
+    if (type == 0x02) { // distribution chart
+        p += 64;
+
+        // record count
+        p += doshort(p, &us);
+
+        for (int i=0; i<us; i++) {
+            p += donumber(p, &ul);
+            p += dotext(p, &txtbuf[0]);
+            p += dotext(p, &txtbuf[0]);
+            p += donumber(p, &ul);
+            p += donumber(p, &ul);
+        }
+
+        // trailing data, especially for speed/pace distribution
+        doshort(p, &us);
+
+        // version 1 trailing data is different
+        if (version == 1 && us == 0) p += 8;
+        else if (version != 1 && us == 1) {
+
+            p += 6;
+            doshort(p, &us);
+            if (us != 0xffff) {
+                p += 18;
+                p += doshort(p, &us);
+                p += us*8;
+            }
+        }
+
+        p += optpad(p);
+
+    } else {     // Mean Max Chart
+
+        WKO_ULONG recs, term;
+        WKO_ULONG two;
+        double g;
+
+        p += donumber(p, &ul); /* 253.4: Log or Linear meanmax ? */
+        p += donumber(p, &ul); /* 253.4: Which Channel ? */
+        p += donumber(p, &ul); /* 253.4: UNKNOWN */
+        p += donumber(p, &ul); /* 253.4: Units */
+        p += donumber(p, &ul); /* 253.4: Conversion type ? */
+        two = ul;
+
+        p += dodouble(p, &g);  /* 253.4: Conversion Factor 1 */
+
+        if (two == 2) p += donumber(p, &ul);  /* 253.4: Conversion Factor 2 */
+
+        // record count
+        p += doshort(p, &us);
+        recs = us;
+
+        // loop through the records
+        if (recs) {
+        while (recs--) {
+
+            p += donumber(p, &ul);
+            term = ul;
+            if (!term) return p;
+            else {
+
+                p += 28;
+            }
+        }
+
+        // preamble
+        p += 12;
+
+        // get record count
+        p += doshort(p, &us);
+        recs=us;
+        term=1;
+
+        // loop through the records
+        while (recs--) {
+            p += donumber(p, &ul);
+            term=ul;
+            if (!term) {
+                break;
+            } else {
+                p += 28;
+            }
+        }
+
+        /* as long as it didn't get terminated we need to read the end of the data */
+        if (term) {
+            if (version != 1) p += 24; //_read(fd, buf, 24);
+            else p += 10;
+        }
+        }
+        /* might still be padding ? */
+        p += optpad(p);
+
+    }
+
+    return p;
+}
+
+WKO_UCHAR *WkoParser::parseCRideSettingsConfig(WKO_UCHAR *p)
+{
+    p = parsePerspective(p);
+    p += donumber(p, &ul);
+
+    // additional number in earlier release
+    if (version == 12 || version == 1 || version == 7) p += donumber(p,&ul);
+    charts--;
+    return p;
+}
+
+WKO_UCHAR *WkoParser::parseCRideGoalConfig(WKO_UCHAR *p)
+{
+    p = parsePerspective(p);
+    p += donumber(p, &ul);
+    p += donumber(p, &ul);
+
+    // additional number in earlier release
+    if (version == 12 || version == 1 || version == 7) p += donumber(p,&ul);
+
+    charts--;
+    return p;
+}
+
+WKO_UCHAR *WkoParser::parseCRideNotesConfig(WKO_UCHAR *p)
+{
+    p = parsePerspective(p);
+    p += donumber(p, &ul);
+    p += donumber(p, &ul);
+
+    // additional number in earlier release
+    if (version == 12 || version == 1 || version == 7) p += donumber(p,&ul);
+    charts--;
+    return p;
+}
+
+WKO_UCHAR *WkoParser::parseCDistributionChartConfig(WKO_UCHAR *p)
+{
+    do {
+
+        // always an extra number in earlier versions
+        if (version == 1 || version == 7 || version == 12) p += donumber(p,&ul);
+        p = parsePerspective(p);
+
+        p += donumber(p, &ul);
+
+        if (version != 1 && ul != 3) {
+            errors << QString("Error Parsing CDistributionChartConfig got 0x%1 expected 0x03").arg(ul,0,16);
+            return p;
+        }
+
+        p = parseChart(p, version == 1 ? 2 : 0);
+
+        doshort(p, &us);
+
+    } while (charts && us != 0xffff);
+
+    return p;
+}
+
+
+WKO_UCHAR *WkoParser::parseCRideSummaryConfig(WKO_UCHAR *p)
+{
+    p = parsePerspective(p);
+    if (version == 1 || version == 12 || version == 7) {
+        p += 12;
+        charts--;
+
+    } else {
+        p += donumber(p, &ul);
+        p += donumber(p, &ul);
+        charts--;
+        /* might still be padding ? */
+    }
+    p += optpad(p);
+    return p;
+}
+
+WKO_UCHAR *WkoParser::parseCMeanMaxChartConfig(WKO_UCHAR *p)
+{
+    do {
+
+        // always an extra number in earlier versions
+        if (version == 1 || version == 7 || version == 12) p += donumber(p,&ul);
+        p = parsePerspective(p);
+
+        p += donumber(p, &ul);
+
+        if (version != 1 && ul != 3) {
+            errors << QString("Error Parsing CMeanMaxChartConfig got 0x%1 expected 0x03").arg(ul,0,16);
+            return p;
+        }
+
+        p = parseChart(p, version == 1 ? 0x0c : 0);
+
+        doshort(p, &us);
+
+    } while (charts && us != 0xffff);
+
+
+    return p;
+}
+
+WKO_UCHAR *WkoParser::parseCMeanMaxChartCache(WKO_UCHAR *p) // only present in v28 onwards
+{
+
+    WKO_ULONG recs, term;
+
+    p += 20;
+
+    p += donumber(p, &ul);
+    p += (ul * 8);
+
+    p += 28;
+
+    p += donumber(p, &ul);
+    p += (ul * 8);
+
+    /* now its the main structures from a meanmax chart */
+
+    /* How many meanmax records in first set ? */
+    p += doshort(p, &us);
+    recs = us;
+
+    while (recs--) {
+
+        p += donumber(p, &ul);
+        if (!ul) return p;
+        else {
+
+            p += 28;
+        }
+    }
+
+    // preamble
+    p += 12;
+
+    // record count
+    p += doshort(p, &us);
+    recs = us;
+    term=1;
+
+    // loop over records
+    while (recs--) {
+
+        p += donumber(p, &ul);
+        if (!ul) break;
+        else {
+
+            p += 28;
+        }
+    }
+
+    // trail (if not a truncated data set
+    if (term) p += 24;
+
+    // skip over markers
+    p += optpad(p);
+
+    return p;
+}
+
+WKO_UCHAR *WkoParser::parseCDistributionChartCache(WKO_UCHAR *p) // only in v2.2 onwards
+{
+
+    // we just position after the initial block since it is then
+    // followed by chart arrays that can be handled in the main loop
+    // of parseHeaderData (num ==2 and num == 3)
+    p += donumber(p, &ul);
+    p += donumber(p, &ul);
+    p += donumber(p, &ul);
+    p += donumber(p, &ul);
+
+    // count
+    p += doshort(p, &us);
+
+    while (us) {
+        us--;
+        p += donumber(p, &ul);
+        p += donumber(p, &ul);
+    }
+
+    p += optpad(p);
+
+    return p;
+}
+
 
 /*==============================================================================
  * UTILITY FUNCTIONS
@@ -1221,6 +1230,7 @@ WkoParser::bitsize(char g, int WKO_device, WKO_ULONG version)
             case 0x12: // Garmin Edge 205/305
             case 0x13:
             case 0x14:
+            case 0x15: // suunto
             case 0x1a: // SRM Powercontrol VI
                        // Alex Simmons files Oct 2010
                 return 22;
@@ -1245,7 +1255,7 @@ WkoParser::bitsize(char g, int WKO_device, WKO_ULONG version)
         case 'H' : return (8); break;
         case 'C' : return (8); break;
         case 'S' : return (11); break;
-        case 'A' : return (16); break;
+        case 'A' : return (14); break; //was 16
         case 'T' : return (11); break;
         case 'D' :
             /* distance */
@@ -1344,6 +1354,14 @@ WkoParser::optpad(WKO_UCHAR *p)
     case 0x8011 :       /* after fixup for distchart Jan 2010 */
     case 0x8012 :       /* after fixup for distchart Jan 2010 */
     case 0x8013 :       /* after fixup for distchart Jan 2010 */
+    case 0x8014 :       /* Q's v2 file */
+    case 0x8015 :       /* Q's v2 file */
+    case 0x8016 :       /* Q's v2 file */
+    case 0x8017 :       /* Q's v2 file */
+    case 0x8018 :       /* Q's v2 file */
+    case 0x8019 :       /* Rainer's running file */
+    case 0x801a :       /* Rainer's running file */
+    case 0x801b :       /* Rainer's running file */
         break;
 
     case 0x0000 :
