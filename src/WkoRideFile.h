@@ -29,6 +29,12 @@
 #include <boost/scoped_array.hpp>
 #include <QtEndian>
 
+struct WkoFileReader : public RideFileReader {
+    virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 
+};
+
+typedef std::auto_ptr<QDataStream> QDataStreamPtr;
+
 // Explicitly define types using unistd.h definitions to
 // ensure char IS 8 bits and short IS 16 bits and long IS 32 bits
 #define WKO_UCHAR   uint8_t
@@ -37,55 +43,70 @@
 #define WKO_SHORT  int16_t
 #define WKO_ULONG  uint32_t
 #define WKO_LONG   int32_t
-struct WkoFileReader : public RideFileReader {
-    virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 
-};
-
-typedef std::auto_ptr<QDataStream> QDataStreamPtr;
-
-WKO_UCHAR *WkoParseHeaderData(QString filename, WKO_UCHAR *data, WKO_ULONG version, RideFile *rideFile, QStringList &errors) ;
-WKO_UCHAR *WkoParseRawData(WKO_UCHAR *data, WKO_ULONG version, RideFile *rideFile, QStringList &errors) ;
-
-// Some Globals -- try and remove them as I refactor code from the original WKO2CSV source
-QString WKO_HOMEDIR;
-
-// UTILITY FUNCTIONS
-// Field decoding
-unsigned int doshort(WKO_UCHAR *p, WKO_USHORT *pnum);
-unsigned int donumber(WKO_UCHAR *p, WKO_ULONG *pnum);
-unsigned int dotext(WKO_UCHAR *p, WKO_UCHAR *txt);
-unsigned int dofloat(WKO_UCHAR *p, float *pnum);
-unsigned int dodouble(WKO_UCHAR *p, double *pnum);
-unsigned int optpad(WKO_UCHAR *p),
-             optpad2(WKO_UCHAR *p);
-
-// Bit twiddlers
-int get_bit(WKO_UCHAR *data, unsigned bitoffset); // returns 0 or 1
-unsigned int get_bits(WKO_UCHAR* data, unsigned bitOffset, unsigned numBits); // returns 32 bit unsigned
-
-// Decoding setup
-void setxormasks();
-WKO_ULONG nullvals(char graph, WKO_ULONG version);
-unsigned long bitget(char *thelot, int offset, int count);
-unsigned int bitsize(char graph, int device, WKO_ULONG version);
-
-// different Chart segment types
-enum configtype {
-	CRIDESETTINGSCONFIG,
-	CRIDEGOALCONFIG,
-	CRIDENOTESCONFIG,
-	CDISTRIBUTIONCHARTCONFIG,
-	CRIDESUMMARYCONFIG,
-	CMEANMAXCHARTCONFIG,
-	CMEANMAXCHARTCACHE,
-	CDISTRIBUTIONCHARTCACHE,
-	OTHER,
-	INVALID
-};
-
 #define	KMTOMI 0.6213
 #define MTOFT  3.2808
 
+class WkoParser
+{
+    public:
+        WkoParser(QFile &file, QStringList &errors, QList<RideFile*>*rides = 0);
+        RideFile *result() { return results; }
+
+    private:
+
+        QFile &file;
+        QString filename;
+        RideFile *results;
+        QStringList &errors;
+        QList<RideFile*>*rides;
+
+        // state data during parsing
+        WKO_UCHAR *headerdata, *rawdata, *footerdata;
+        WKO_ULONG version;
+        WKO_ULONG WKO_device;
+        char WKO_GRAPHS[32];
+        QList<RideFileInterval *> references;
+
+        // Header data parsing
+        WKO_UCHAR *parseHeaderData(WKO_UCHAR *data);
+
+        // Raw bit packed data parsing
+        WKO_UCHAR *parseRawData(WKO_UCHAR *data);
+
+        // Basic Field decoding
+        unsigned int doshort(WKO_UCHAR *p, WKO_USHORT *pnum);
+        unsigned int donumber(WKO_UCHAR *p, WKO_ULONG *pnum);
+        unsigned int dotext(WKO_UCHAR *p, WKO_UCHAR *txt);
+        unsigned int dofloat(WKO_UCHAR *p, float *pnum);
+        unsigned int dodouble(WKO_UCHAR *p, double *pnum);
+        unsigned int optpad(WKO_UCHAR *p),
+                    optpad2(WKO_UCHAR *p);
+
+        // Bit twiddling functions
+        int get_bit(WKO_UCHAR *data, unsigned bitoffset);
+        unsigned int get_bits(WKO_UCHAR* data, unsigned bitOffset, unsigned numBits); 
+
+        // Decoding setup
+        void setxormasks();
+        WKO_ULONG nullvals(char graph, WKO_ULONG version);
+        unsigned long bitget(char *thelot, int offset, int count);
+        unsigned int bitsize(char graph, int device, WKO_ULONG version);
+        void pbin(WKO_UCHAR x); // for debugging
+
+        // different Chart segment types
+
+        enum configtype {
+	        CRIDESETTINGSCONFIG,
+	        CRIDEGOALCONFIG,
+	        CRIDENOTESCONFIG,
+	        CDISTRIBUTIONCHARTCONFIG,
+	        CRIDESUMMARYCONFIG,
+	        CMEANMAXCHARTCONFIG,
+	        CMEANMAXCHARTCACHE,
+	        CDISTRIBUTIONCHARTCACHE,
+	        OTHER,
+	        INVALID
+        };
+};
 
 #endif // _WkoRideFile_h
-
