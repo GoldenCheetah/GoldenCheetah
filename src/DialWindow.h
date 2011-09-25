@@ -68,7 +68,7 @@ class DialWindow : public GcWindow
    public slots:
 
         // trap signals
-        void telemetryUpdate(RealtimeData rtData); // got new data
+        void telemetryUpdate(const RealtimeData &rtData); // got new data
         void lap(int lapnumber);
         void start();
         void stop();

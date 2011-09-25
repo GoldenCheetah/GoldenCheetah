@@ -368,8 +368,7 @@ void AbsWattagePage::SaveWorkout()
     {
         if(p.first == "LAP")
         {
-            stream << "LAP" << endl;
-
+            stream << currentX << " LAP" << endl;
         }
         else
         {
@@ -497,7 +496,7 @@ void RelWattagePage::SaveWorkout()
     {
         if(p.first == "LAP")
         {
-            stream << "LAP" << endl;
+            stream << currentX << " LAP" << endl;
         }
         else
         {

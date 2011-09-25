@@ -85,7 +85,7 @@ DialWindow::pause()
 }
 
 void
-DialWindow::telemetryUpdate(RealtimeData rtData)
+DialWindow::telemetryUpdate(const RealtimeData &rtData)
 {
     // we got some!
     RealtimeData::DataSeries series = static_cast<RealtimeData::DataSeries>

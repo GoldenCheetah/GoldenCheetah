@@ -263,6 +263,7 @@ HEADERS += \
         RideMetric.h \
         RideNavigator.h \
         RideNavigatorProxy.h \
+        RideWindow.h \
         SaveDialogs.h \
         SmallPlot.h \
         RideSummaryWindow.h \
@@ -429,6 +430,7 @@ SOURCES += \
         RideMetric.cpp \
         RideNavigator.cpp \
         RideSummaryWindow.cpp \
+        RideWindow.cpp \
         SaveDialogs.cpp \
         ScatterPlot.cpp \
         ScatterWindow.cpp \
@@ -471,7 +473,8 @@ SOURCES += \
         Zones.cpp \
         main.cpp \
 
-RESOURCES = application.qrc
+RESOURCES = application.qrc \
+        RideWindow.qrc
 
 TRANSLATIONS = translations/gc_fr.ts \
                translations/gc_ja.ts \
@@ -480,3 +483,12 @@ TRANSLATIONS = translations/gc_fr.ts \
                translations/gc_de.ts \
                translations/gc_cs.ts \
                translations/gc_ru.ts
+
+OTHER_FILES += \
+    web/Rider.js \
+    web/ride.js \
+    web/jquery-1.6.4.min.js \
+    web/MapWindow.html \
+    web/StreetViewWindow.html \
+    web/Window.css
+

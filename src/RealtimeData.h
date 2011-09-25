@@ -57,20 +57,20 @@ public:
     void setJoules(long);
     void setXPower(long);
 
-    char *getName();
-    double getWatts();
-    double getHr();
-    long getTime();
-    double getSpeed();
-    double getWheelRpm();
-    double getCadence();
-    double getLoad();
-    long getMsecs();
-    long getLapMsecs();
-    double getDistance();
-    long getBikeScore();
-    long getJoules();
-    long getXPower();
+    const char *getName() const;
+    double getWatts() const;
+    double getHr() const;
+    long getTime() const;
+    double getSpeed() const;
+    double getWheelRpm() const;
+    double getCadence() const;
+    double getLoad() const;
+    long getMsecs() const;
+    long getLapMsecs() const;
+    double getDistance() const;
+    long getBikeScore() const;
+    long getJoules() const;
+    long getXPower() const;
 
 
 private:

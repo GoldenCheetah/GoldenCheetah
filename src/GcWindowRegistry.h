@@ -51,8 +51,10 @@ enum gcwinid {
         MetadataWindow = 23,
         RealtimePlot = 24,
         WorkoutPlot = 25,
-        BingMap = 26,
-        RealtimeControls = 27
+        MapWindow = 26,
+        StreetViewWindow = 27,
+        BingMap = 28,
+        RealtimeControls = 29,
 };
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;

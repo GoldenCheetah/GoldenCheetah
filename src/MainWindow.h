@@ -142,7 +142,7 @@ class MainWindow : public QMainWindow
         void notifyRideDirty() { rideDirty(); }
 
         // realtime signals
-        void notifyTelemetryUpdate(RealtimeData rtData) { telemetryUpdate(rtData); }
+        void notifyTelemetryUpdate(const RealtimeData &rtData) { telemetryUpdate(rtData); }
         void notifyErgFileSelected(ErgFile *x) { ergFileSelected(x); }
         void notifySetNow(long now) { setNow(now); }
 
