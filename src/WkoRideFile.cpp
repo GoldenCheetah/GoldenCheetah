@@ -1290,7 +1290,7 @@ WkoParser::bitsize(char g, int WKO_device, WKO_ULONG version)
         case 'H' : return (8); break;
         case 'C' : return (8); break;
         case 'S' : return (11); break;
-        case 'A' : return (16); break; //was 14
+        case 'A' : return (14); break; //was 16
         case 'T' : return (11); break;
         case 'D' :
             /* distance */
