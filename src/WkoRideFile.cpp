@@ -116,6 +116,46 @@ WkoParser::WkoParser(QFile &file, QStringList &errors, QList<RideFile*>*rides)
         return;
     }
 
+    // is recIntSecs a daft value?
+    if (results->recIntSecs() < 0.1) {
+
+        // lets see what the most popular recording interval is...
+        QMap<double, int> ints;
+
+        bool first = true;
+        double last = 0;
+
+        foreach(RideFilePoint *p, results->dataPoints()) {
+
+            if (first) {
+                last = p->secs;
+                first = false;
+            } else {
+                double delta = p->secs-last;
+                last = p->secs;
+
+                // lookup
+                int count = ints.value(delta);
+                count++;
+                ints.insert(delta, count);
+            }
+        }
+
+        // which is most popular?
+        double populardelta=1.0;
+        int count=0;
+        QMapIterator<double, int> i(ints);
+        while (i.hasNext()) {
+            i.next();
+
+            if (i.value() > count) {
+                count = i.value();
+                populardelta = i.key();
+            }
+        }
+        results->setRecIntSecs(populardelta);
+    }
+
     // Post process  the ride intervals to convert from point offsets to time in seconds
     QVector<RideFilePoint*> datapoints = results->dataPoints();
     for (int i=0; i<references.count(); i++) {
@@ -240,6 +280,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
         if (version == 1) bit = 32;
         else bit = 43;
     }
+
     interval = inc;
     interval /= 1000;
 
@@ -255,8 +296,8 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
         unsigned int marker;
         WKO_LONG sval=0;
         WKO_ULONG val=0;
-	unsigned long valp; // for printf
-	long svalp; // for printf
+	    unsigned long valp; // for printf
+	    long svalp; // for printf
 
         // reset point values;
         alt = slope = wind = cad= hr= km= kph= nm= watts= 0.0;
@@ -293,7 +334,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
                         } else {
                             sval = val;
                         }
-			svalp = sval;
+			            svalp = sval;
                         sprintf(GRAPHDATA[i], "%8ld", svalp);
                         break;
                     case '^' : /* Slope */
@@ -421,7 +462,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
 
                     case 'C' :
                         cad = val;
-			valp = val;
+			            valp = val;
                         sprintf(GRAPHDATA[i], "%8lu", valp); // just output as numeric
                         break;
                     }
@@ -433,12 +474,6 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
             // and rarely (if ever?) affects the outcome
             for (i=0, isnull=1; WKO_GRAPHS[i] != '\0'; i++)
                 if (WKO_GRAPHS[i] != 'G' && WKO_GRAPHS[i] != 'D' && GRAPHDATA[i][0] != '\0') isnull=0;
-
-            // if time is not present (wtf?) we set to 1second sampling and always at 1sec
-            if (QString(WKO_GRAPHS).indexOf("T") == -1) {
-                results->setRecIntSecs(1);
-                rtime += 1000;
-            }
 
             // Now output this sample if it is not a null record
             if (!isnull) {
@@ -1255,7 +1290,7 @@ WkoParser::bitsize(char g, int WKO_device, WKO_ULONG version)
         case 'H' : return (8); break;
         case 'C' : return (8); break;
         case 'S' : return (11); break;
-        case 'A' : return (14); break; //was 16
+        case 'A' : return (16); break; //was 14
         case 'T' : return (11); break;
         case 'D' :
             /* distance */
