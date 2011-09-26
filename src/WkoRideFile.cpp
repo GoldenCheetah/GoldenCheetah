@@ -262,15 +262,6 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
 
     thelot = fb;
 
-#if 0
-// used when debugging
-    qDebug()<<WKO_device<<version<<WKO_GRAPHS<<"records="<<records;
-    for (int xbit=0; xbit < 300; xbit++)
-    if (get_bits(thelot, xbit, 1)) fprintf(stderr, "1");
-        else fprintf(stderr, "0");
-    qDebug()<<"";
-#endif
-
     /* does data stream at offset 0 ? */
     if (get_bit(thelot, 0)){
         bit = 0;
@@ -286,6 +277,14 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
 
     results->setRecIntSecs(interval);
 
+#if 0
+// used when debugging
+    qDebug()<<WKO_device<<version<<WKO_GRAPHS<<"records="<<records;
+    for (int xbit=bit; xbit < 500; xbit++)
+    if (get_bits(thelot, xbit, 1)) fprintf(stderr, "1");
+        else fprintf(stderr, "0");
+    qDebug()<<"";
+#endif
 
     /*------------------------------------------------------------------------------
      * RUN THROUGH EACH RAW DATA RECORD
@@ -1289,12 +1288,14 @@ WkoParser::bitsize(char g, int WKO_device, WKO_ULONG version)
 
         switch (g) {
         case 'P' : if (version == 1) return 11;
-                   else if (version == 7) return 12;
+                   else if (version == 7) return 12; //  was 12?
                    break;
         case 'H' : return (8); break;
         case 'C' : return (8); break;
         case 'S' : return (11); break;
-        case 'A' : return (14); break; //was 16
+        case 'A' : if (version == 7) return 16;
+                   else return(14);
+                   break; 
         case 'T' : return (11); break;
         case 'D' :
             /* distance */
