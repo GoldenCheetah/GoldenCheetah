@@ -86,16 +86,16 @@ WkoParser::WkoParser(QFile &file, QStringList &errors, QList<RideFile*>*rides)
     // are for CP v1.0 and v1.1 and then WKO v2.2 *or higher*
     donumber(headerdata+4, &version);
 
-    // early versions we don't support are rejected
+    // versions we don't support are rejected
     if (version < 28 && version != 1 && version != 12 && version != 7) {
         errors << (QString("Version of file (%1) is too old, open and save in WKO then retry: \"").arg(version) + file.fileName() + "\"");
         return;
 
-    // 1.0 and 1.1 are not that reliable so warn of beta support
-    } else if (version == 1 || version == 12 || version == 7) {
+    // we haven't seen nearly enough v7 files to support properly
+    } else if (version == 7) {
         errors <<QString("Beta support for v%1 files, please report errors!").arg(version);
 
-    // later versions may change so support but watn
+    // later versions may change so support but warn
     } else if (version >31) {
         errors << ("Version of file is new and not fully supported yet: \"" +
         file.fileName() + "\"");
@@ -715,10 +715,13 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
     default : results->setDeviceType("WKO"); break;
     }
 
-    if (version != 12) p += donumber(p, &ul); /* 29: unknown */
+    if (version != 12) p += donumber(p, &ul); // not in version 12?
 
-    if (version != 1 && version !=7) { //!!! Version 1 beta support
-        for (int i=0; i< 16; i++) { // 16 types of chart data
+    if (version !=7) { // need to see more version 7 files
+
+        int arraysize = (version == 1) ? 8 : 16;
+
+        for (int i=0; i< arraysize; i++) { // 16 types of chart data
 
             if (version != 12) {
                 p += 44;
@@ -741,6 +744,7 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
             }
         }
     } else {
+        // version 7 -- need more files
         p += 0x170; // possibly too invariant!
     }
 
