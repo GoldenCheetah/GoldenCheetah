@@ -91,10 +91,6 @@ WkoParser::WkoParser(QFile &file, QStringList &errors, QList<RideFile*>*rides)
         errors << (QString("Version of file (%1) is too old, open and save in WKO then retry: \"").arg(version) + file.fileName() + "\"");
         return;
 
-    // we haven't seen nearly enough v7 files to support properly
-    } else if (version == 7) {
-        errors <<QString("Beta support for v%1 files, please report errors!").arg(version);
-
     // later versions may change so support but warn
     } else if (version >31) {
         errors << ("Version of file is new and not fully supported yet: \"" +
@@ -716,37 +712,19 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
 
     if (version != 12) p += donumber(p, &ul); // not in version 12?
 
-    if (version !=7) { // need to see more version 7 files
+    int arraysize = (version == 1 || version == 7) ? 8 : 16;
 
-        int arraysize = (version == 1) ? 8 : 16;
+    for (int i=0; i< arraysize; i++) { // 16 types of chart data
 
-        for (int i=0; i< arraysize; i++) { // 16 types of chart data
+        if (version != 12) {
+            p += 44;
 
-            if (version != 12) {
-                p += 44;
-                //p += dofloat(p, &f) /* 30: unknown */
-                //p += dofloat(p, &f) /* 31: unknown */
-                //p += dofloat(p, &f) /* 32: unknown */
-                //p += dofloat(p, &f) /* 33: unknown */
-                //p += dofloat(p, &f) /* 34: unknown */
-                //p += dofloat(p, &f) /* 35: unknown */
-                //p += dofloat(p, &f) /* 36: unknown */
-                //p += donumber(p, &ul); /* 37: x-axis maximum */
-                //p += donumber(p, &ul); /* 38: show chart? */
-                //p += donumber(p, &ul); /* 39: autoscale? */
-                //p += donumber(p, &ul); /* 40: autogridlines? */
-
-                p += doshort(p, &us); /* 41: number of gridlines XXVARIABLEXX */
-                p += (us * 8); // 2 longs x number of gridlines
-            } else {
-                p += 40;
-            }
+            p += doshort(p, &us); /* 41: number of gridlines XXVARIABLEXX */
+            p += (us * 8); // 2 longs x number of gridlines
+        } else {
+            p += 40;
         }
-    } else {
-        // version 7 -- need more files
-        p += 0x170; // possibly too invariant!
     }
-
 
     /* Ranges */
 
