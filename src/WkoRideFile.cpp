@@ -16,24 +16,9 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-// GENERAL NOTES:
-// You will see a lot of 'commented out' code in the parsing functions. This is
-// because the decoding is skipped over, but may be useful in the future and
-// it helps to reference back to the file format spec. For example a whole
-// block of decoding of numbers and texts is replaced with p+= 64 in one part of
-// the code and that is not particularly enlightening.
-//
-// The code is refactored from my wko2csv sourceforge project
-
-// 1. UNUSED GRAPHS
-// Windspeed, Temperature, Slope et al are available from WKO
-// data files but is discarded currently since it is not supported by RideFile
-//
-// 2. GOTO
-// During the ParseHeaderData there are a couple of nasty goto statements
-// to breakout of nested loops / if statements and to jump into blocks for
-// parsing older versions of the file format
-
+// NOTE:
+// Windspeed, Temperature and Slope are not imported because
+// GC does not support them (yet).
 
 #include "WkoRideFile.h"
 #include <QRegExp>
@@ -75,11 +60,29 @@ WkoParser::WkoParser(QFile &file, QStringList &errors, QList<RideFile*>*rides)
         errors << ("Could not open ride file: \"" + file.fileName() + "\"");
         return;
     }
+
+    // is it big enough?
+    if (file.size() < 0x200) {
+        file.close();
+        errors << "Not a WKO+ file";
+        return;
+    }
+
     boost::scoped_array<WKO_UCHAR> entirefile(new WKO_UCHAR[file.size()]);
     QDataStream *rawstream(new QDataStream(&file));
     headerdata = &entirefile[0];
     rawstream->readRawData(reinterpret_cast<char *>(headerdata), file.size());
     file.close();
+
+    // Check the header to make sure it really is a WKO
+    // file, the magic number for WKO is 'W' 'K' 'O' ^Z
+    if (*headerdata != 'W' ||
+        *(headerdata+1) != 'K' ||
+        *(headerdata+2) != 'O' ||
+        *(headerdata+3) != 0x1A) {
+        errors << "Not a WKO+ file";
+        return;
+    }
 
     // We only support versions of the WKO file format we have seen
     // sufficient source files to reverse engineer and test these
@@ -150,6 +153,16 @@ WkoParser::WkoParser(QFile &file, QStringList &errors, QList<RideFile*>*rides)
             }
         }
         results->setRecIntSecs(populardelta);
+    }
+
+    // adjust times to start at zero, some ridefiles have
+    // a start time that really blows up the CPX calculator
+    // e.g. first sample at 19 hrs ..
+    if (results->dataPoints().count() && results->dataPoints().first()->secs > 0) {
+        double sub = results->dataPoints().first()->secs;
+
+        foreach(RideFilePoint *p, results->dataPoints())
+            p->secs -= sub;
     }
 
     // Post process  the ride intervals to convert from point offsets to time in seconds
@@ -675,8 +688,7 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
         p += donumber(p, &ul); /* 19: weight in grams/10 */
         results->setTag("Weight", QString("%1").arg((double)ul/100.00));
 
-        if (version != 12) p += 28;
-        else p += 36;
+        p += 28;
         //p += donumber(p, &ul); /* 20: unknown */
         //p += donumber(p, &ul); /* 21: unknown */
         //p += donumber(p, &ul); /* 22: unknown */
@@ -710,20 +722,19 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
     default : results->setDeviceType("WKO"); break;
     }
 
-    if (version != 12) p += donumber(p, &ul); // not in version 12?
+    p += donumber(p, &ul); // not in version 12?
 
-    int arraysize = (version == 1 || version == 7) ? 8 : 16;
+    int arraysize = 0;
+    if (version < 12) arraysize = 8;
+    if (version == 12) arraysize = 14;
+    if (version >= 28) arraysize = 16;
 
     for (int i=0; i< arraysize; i++) { // 16 types of chart data
 
-        if (version != 12) {
-            p += 44;
+        p += 44;
 
-            p += doshort(p, &us); /* 41: number of gridlines XXVARIABLEXX */
-            p += (us * 8); // 2 longs x number of gridlines
-        } else {
-            p += 40;
-        }
+        p += doshort(p, &us); /* 41: number of gridlines XXVARIABLEXX */
+        p += (us * 8); // 2 longs x number of gridlines
     }
 
     /* Ranges */
