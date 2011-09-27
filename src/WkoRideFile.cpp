@@ -582,6 +582,7 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
         sport = 0x02; // only bike was supported in files this old
     }
 
+
     switch (sport) {
         case 0x01 : results->setTag("Sport", "Swim") ; break;
         case 0x02 : results->setTag("Sport", "Bike") ; break;
@@ -598,6 +599,11 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
         case 0x64 : results->setTag("Sport", "Other"); break;
 
     }
+
+    QString notesTag;
+    notesTag = results->getTag("Sport", "Bike"); // we just set it, so default is meaningless.
+    notesTag += "\n";
+
 
     if (version != 1) { //!!! Version 1 beta support
 
@@ -634,28 +640,6 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
         results->setStartTime(datetime);
     }
 
-    QString notesTag;
-
-    // Sport type
-    switch (sport) {
-
-    case 0x01 : notesTag += "Swim " ; break;
-    case 0x02 : notesTag += "Bike " ; break;
-    case 0x03 : notesTag += "Run " ; break;
-    case 0x04 : notesTag += "Brick " ; break;
-    case 0x05 : notesTag += "Cross Train " ; break;
-    case 0x06 : notesTag += "Race " ; break;
-    case 0x07 : notesTag += "Day Off " ; break;
-    case 0x08 : notesTag += "Mountain Bike " ; break;
-    case 0x09 : notesTag += "Strength " ; break;
-    case 0x0B : notesTag += "XC Ski " ; break;
-    case 0x0C : notesTag += "Rowing " ; break;
-    default   :
-    case 0x64 : notesTag += "Other"; break;
-
-    }
-    notesTag += "\n";
-
     QString scode, sgoal, snote;
 
     if (version != 1) {
@@ -663,17 +647,17 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
         dotext(code, &txtbuf[0]);
         scode = (const char *)&txtbuf[0];
         notesTag += scode; notesTag += "\n";
-
-        dotext(goal, &txtbuf[0]);
-        sgoal = (const char *)&txtbuf[0];
-        notesTag += "WORKOUT GOAL"; notesTag += "\n";
-        notesTag += sgoal; notesTag += "\n";
-
-        dotext(notes, &txtbuf[0]);
-        snote = (const char *)&txtbuf[0];
-        notesTag += "WORKOUT NOTES"; notesTag += "\n";
-        notesTag += snote; notesTag += "\n";
     }
+
+    dotext(goal, &txtbuf[0]);
+    sgoal = (const char *)&txtbuf[0];
+    notesTag += "WORKOUT GOAL"; notesTag += "\n";
+    notesTag += sgoal; notesTag += "\n";
+
+    dotext(notes, &txtbuf[0]);
+    snote = (const char *)&txtbuf[0];
+    notesTag += "WORKOUT NOTES"; notesTag += "\n";
+    notesTag += snote; notesTag += "\n";
 
     results->setTag("Notes", notesTag);
 
