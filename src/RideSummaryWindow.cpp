@@ -149,6 +149,9 @@ RideSummaryWindow::htmlSummary() const
         << "max_cadence";
 
     QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
+
+    // in case they were set tand then unset
+    if (s == "") s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
     QStringList metricColumn = s.split(",");
 
     /* ORIGINAL HARDCODED (AND NOW DEFAULT METRICS)
@@ -234,6 +237,8 @@ RideSummaryWindow::htmlSummary() const
         }
         for (int j = 0; j< metricsList.count(); ++j) {
             QString symbol = metricsList[j];
+
+             if (symbol == "") continue;
 
              const RideMetric *m = factory.rideMetric(symbol);
              if (!m) break;
