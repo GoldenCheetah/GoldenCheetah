@@ -4,15 +4,15 @@
 		<property name="title" type="QString" value="Realtime Controls" />
 		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="3.10484" />
-		<property name="heightFactor" type="double" value="5.39344" />
+		<property name="heightFactor" type="double" value="5.3838" />
 		<property name="resizable" type="bool" value="1" />
 	</chart>
 	<chart id="25" name="RT Plot" title="Workout Plot" >
 		<property name="instanceName" type="QString" value="RT Plot" />
 		<property name="title" type="QString" value="Workout Plot" />
 		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="1.50215" />
-		<property name="heightFactor" type="double" value="4.92038" />
+		<property name="widthFactor" type="double" value="1.48022" />
+		<property name="heightFactor" type="double" value="5.3597" />
 		<property name="resizable" type="bool" value="1" />
 	</chart>
 	<chart id="24" name="RT Plot" title="Realtime" >
@@ -20,7 +20,7 @@
 		<property name="title" type="QString" value="Realtime" />
 		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="1.00045" />
-		<property name="heightFactor" type="double" value="1.44235" />
+		<property name="heightFactor" type="double" value="1.45806" />
 		<property name="resizable" type="bool" value="1" />
 	</chart>
 	<chart id="22" name="Dial" title="Time" >
@@ -39,8 +39,8 @@
 		<property name="instanceName" type="QString" value="Dial" />
 		<property name="title" type="QString" value="Power" />
 		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="6.2459" />
-		<property name="heightFactor" type="double" value="7.99266" />
+		<property name="widthFactor" type="double" value="6.08045" />
+		<property name="heightFactor" type="double" value="8.23859" />
 		<property name="resizable" type="bool" value="1" />
 		<property name="showInstant" type="bool" value="1" />
 		<property name="avgType" type="int" value="32634" />
