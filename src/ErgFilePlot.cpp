@@ -80,20 +80,20 @@ ErgFilePlot::ErgFilePlot(QList<ErgFilePoint> *data)
 void
 ErgFilePlot::setData(ErgFile *ergfile)
 {
+    ergFile = ergfile;
+    // clear the previous marks (if any)
+    for(int i=0; i<Marks.count(); i++) {
+        Marks.at(i)->detach();
+        delete Marks.at(i);
+    }
+    Marks.clear();
+
     if (ergfile) {
 
         // set up again
-        ergFile = ergfile;
         //setTitle(ergFile->Name);
         courseData = &ergfile->Points;
         MaxWatts = ergfile->MaxWatts;
-
-        // clear the previous marks (if any)
-        for(int i=0; i<Marks.count(); i++) {
-            Marks.at(i)->detach();
-            delete Marks.at(i);
-        }
-        Marks.clear();
 
         for(int i=0; i < ergFile->Laps.count(); i++) {
 
@@ -116,6 +116,12 @@ ErgFilePlot::setData(ErgFile *ergfile)
 
         // set the axis so we use all the screen estate
         if ((*courseData).count()) setAxisScale(xBottom, (double)0, (double)(*courseData).last().x);
+
+    } else {
+
+        // clear the plot we have nothing selected
+        MaxWatts = 0;
+        courseData = NULL;
     }
 }
 

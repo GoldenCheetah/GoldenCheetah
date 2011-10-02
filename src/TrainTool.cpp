@@ -332,17 +332,22 @@ TrainTool::workoutTreeWidgetSelectionChanged()
     }
 
     // which one is selected?
-    if (currentWorkout() == NULL || currentWorkout()->type() != WORKOUT_TYPE) return;
+    if (currentWorkout() == NULL || currentWorkout()->type() != WORKOUT_TYPE) {
+        main->notifyErgFileSelected(NULL);
+        return;
+    }
 
     // is it the auto mode?
     int index = workoutItems()->indexOfChild((QTreeWidgetItem *)currentWorkout());
     if (index == 0) {
         // ergo mode
+        main->notifyErgFileSelected(NULL);
         mode = ERG;
         status &= ~RT_WORKOUT;
         //ergPlot->setVisible(false);
     } else if (index == 1) {
         // slope mode
+        main->notifyErgFileSelected(NULL);
         mode = CRS;
         status &= ~RT_WORKOUT;
         //ergPlot->setVisible(false);
