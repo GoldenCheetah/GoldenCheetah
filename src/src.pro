@@ -277,6 +277,7 @@ HEADERS += \
         SimpleNetworkClient.h \
         SpecialFields.h \
         SplitRideDialog.h \
+        SplitActivityWizard.h \
         SlfParser.h \
         SlfRideFile.h \
         SmfParser.h \
@@ -443,6 +444,7 @@ SOURCES += \
         SmallPlot.cpp \
         SpecialFields.cpp \
         SplitRideDialog.cpp \
+        SplitActivityWizard.cpp \
         SlfParser.cpp \
         SlfRideFile.cpp \
         SmfParser.cpp \
