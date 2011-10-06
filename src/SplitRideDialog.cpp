@@ -132,9 +132,32 @@ SplitRideDialog::cancelClicked()
 void
 SplitRideDialog::CreateNewRideFile(const RideFile *ride, int nRecStart, int nRecEnd)
 {
+    // set the start time, taking care to include the offset for the interval
     QDateTime newStart =  ride->startTime();
     RideFilePoint *pointStart = ride->dataPoints().at(nRecStart);
     newStart = newStart.addMSecs(static_cast<qint64>(pointStart->secs*1000 + 0.5));
+
+    QString fileName;
+    QString filePath;
+
+    // adjust start time of file to avoid conflicts with existing files
+    int offset = 0;
+    QDateTime noConflicts;
+    do {
+        noConflicts = newStart.addSecs(offset);
+
+        fileName.sprintf("%04d_%02d_%02d_%02d_%02d_%02d.gc",
+                            noConflicts.date().year(), noConflicts.date().month(),
+                            noConflicts.date().day(), noConflicts.time().hour(), noConflicts.time().minute(),
+                            noConflicts.time().second());
+        filePath = mainWindow->home.absolutePath() + "/" + fileName;
+
+        offset++;
+
+    } while (QFile(filePath).exists());
+    newStart = newStart.addSecs(offset);
+
+    // create the ridefile in memory
     boost::scoped_ptr<RideFile> newRideFile(new RideFile(newStart, ride->recIntSecs()));
     for (int nItem = nRecStart; nItem<nRecEnd; ++nItem)
     {
@@ -153,13 +176,8 @@ SplitRideDialog::CreateNewRideFile(const RideFile *ride, int nRecStart, int nRec
         }
     }
 
-    QString fileName;
-    fileName.sprintf("%04d_%02d_%02d_%02d_%02d_%02d.gc",
-                            newStart.date().year(), newStart.date().month(),
-                            newStart.date().day(), newStart.time().hour(), newStart.time().minute(),
-                            newStart.time().second());
-    QString filePath = mainWindow->home.absolutePath() + "/" + fileName;
-
+    // should never, ever complain.. could wipe out, but lets check anyway
+    // it costs nothing and might save a file one day
     QFile file(filePath);
     if (file.exists())
     {
@@ -167,9 +185,11 @@ SplitRideDialog::CreateNewRideFile(const RideFile *ride, int nRecStart, int nRec
         return;
     }
 
+    // write to disk
     GcFileReader f;
     f.writeRideFile(newRideFile.get(), file);
 
+    // add to the ride list
     mainWindow->addRide(fileName, false);
 }
 void
