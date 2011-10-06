@@ -140,7 +140,7 @@
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="550"/>
-        <source>KPH</source>
+        <source>km/h</source>
         <translation>km/h</translation>
     </message>
     <message>
@@ -296,7 +296,7 @@
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="239"/>
-        <source>kph</source>
+        <source>km/h</source>
         <translation>km/h</translation>
     </message>
     <message>
@@ -1179,125 +1179,125 @@ Zmáčkni tlačítko Zrušit.</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="54"/>
-        <location filename="../DownloadRideDialog.cpp" line="181"/>
+        <location filename="../DownloadRideDialog.cpp" line="182"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Zrušit</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="68"/>
+        <location filename="../DownloadRideDialog.cpp" line="69"/>
         <source>Select port:</source>
         <translation>Vyber port:</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="70"/>
+        <location filename="../DownloadRideDialog.cpp" line="71"/>
         <source>Select device type:</source>
         <translation>Vyber zařizení:</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="83"/>
+        <location filename="../DownloadRideDialog.cpp" line="84"/>
         <source>No devices found.  Make sure the device
 unit is plugged into the computer,
 then click &quot;Rescan&quot; to check again.</source>
         <translation>Zařízení nenalezeno. Zkontroluj, že je přístroj připojen k PC, poté stiskni tlačítko &quot;Opakovat hledání&quot;.</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="93"/>
+        <location filename="../DownloadRideDialog.cpp" line="94"/>
         <source>Click Download to begin downloading.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="95"/>
+        <location filename="../DownloadRideDialog.cpp" line="96"/>
         <source>, 
 then click Download.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="109"/>
+        <location filename="../DownloadRideDialog.cpp" line="110"/>
         <source>Warning(s):
 
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="109"/>
+        <location filename="../DownloadRideDialog.cpp" line="110"/>
         <source>
 
 You may need to (re)install the FTDI or PL2303 drivers before downloading.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="111"/>
+        <location filename="../DownloadRideDialog.cpp" line="112"/>
         <source>Error Loading Device Drivers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="161"/>
+        <location filename="../DownloadRideDialog.cpp" line="162"/>
         <source>Download canceled</source>
         <translation>Stahování zrušeno</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="162"/>
+        <location filename="../DownloadRideDialog.cpp" line="163"/>
         <source>Cancel clicked by user.</source>
         <translation>Zrušeno uživatelem.</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="166"/>
+        <location filename="../DownloadRideDialog.cpp" line="167"/>
         <source>Download failed</source>
         <translation>Chyba stahování</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="177"/>
+        <location filename="../DownloadRideDialog.cpp" line="178"/>
         <source>Ride Already Downloaded</source>
         <translation>Záznam již existuje</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="178"/>
+        <location filename="../DownloadRideDialog.cpp" line="179"/>
         <source>This ride appears to have already </source>
         <translation>Záznam byl již</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="179"/>
+        <location filename="../DownloadRideDialog.cpp" line="180"/>
         <source>been downloaded.  Do you want to </source>
         <translation>stažený. Chceš</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="180"/>
+        <location filename="../DownloadRideDialog.cpp" line="181"/>
         <source>overwrite the previous download?</source>
         <translation>přepsat předchozí stažené soubory?</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="181"/>
+        <location filename="../DownloadRideDialog.cpp" line="182"/>
         <source>&amp;Overwrite</source>
         <translation>&amp;Přepsat</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="193"/>
-        <location filename="../DownloadRideDialog.cpp" line="204"/>
+        <location filename="../DownloadRideDialog.cpp" line="194"/>
+        <location filename="../DownloadRideDialog.cpp" line="205"/>
         <source>Error</source>
         <translation>Chyba</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="194"/>
+        <location filename="../DownloadRideDialog.cpp" line="195"/>
         <source>Failed to remove existing file </source>
         <translation>Chyba přesunu existujícího souboru</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="205"/>
+        <location filename="../DownloadRideDialog.cpp" line="206"/>
         <source>Failed to rename </source>
         <translation>Chyba přejmenování</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="205"/>
+        <location filename="../DownloadRideDialog.cpp" line="206"/>
         <source> to </source>
         <translation>na</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="212"/>
+        <location filename="../DownloadRideDialog.cpp" line="213"/>
         <source>Success</source>
         <translation>V pořádku</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="212"/>
+        <location filename="../DownloadRideDialog.cpp" line="213"/>
         <source>Download complete.</source>
         <translation>Stážení kompletní.</translation>
     </message>
@@ -2004,7 +2004,7 @@ např. zadejte &quot;1,2 nm&quot; pro navýšení nebo &quot;-0,5 nm&quot; pro s
         <translation type="unfinished">sekundy</translation>
     </message>
     <message>
-        <source>KPH</source>
+        <source>km/h</source>
         <translation type="obsolete">km/h</translation>
     </message>
     <message>
@@ -3610,156 +3610,364 @@ CP závodníka nastaven na %3 wattů</translation>
     </message>
 </context>
 <context>
+    <name>ModelDataProvider</name>
+    <message>
+        <location filename="../ModelPlot.cpp" line="270"/>
+        <source>Power (watts)</source>
+        <translation type="unfinished">Výkon (watty)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="271"/>
+        <source>Cadence (rpm)</source>
+        <translation type="unfinished">Kadence (ot/m)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="272"/>
+        <source>Heartrate (bpm)</source>
+        <translation type="unfinished">Tep (tepy/m)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="275"/>
+        <source>Speed (km/h)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="277"/>
+        <source>Speed (mph)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="281"/>
+        <source>Altitude (meters)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="283"/>
+        <source>Altitude (feet)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="285"/>
+        <source>Torque (N)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="286"/>
+        <source>Elapsed Time (secs)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="289"/>
+        <source>Elapsed Distance (km)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="291"/>
+        <source>Elapsed Distance (mi)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="293"/>
+        <source>Interval Number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="294"/>
+        <source>Latitude (degree x 1000)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="295"/>
+        <source>Longitude (degree x 1000)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="296"/>
+        <source>Circumferential Pedal Velocity (cm/s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="297"/>
+        <source>Average Effective Pedal Force (N)</source>
+        <translation type="unfinished">Průměrná efektivní síla na pedál (N)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="301"/>
+        <source>Time at X/Y (%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="302"/>
+        <source>Power Zone</source>
+        <translation type="unfinished">Zóny výkonu</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="304"/>
+        <source>Unknown</source>
+        <translation type="unfinished">Neznámý</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="308"/>
+        <source>Power</source>
+        <translation type="unfinished">Výkon</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="309"/>
+        <source>Cadence</source>
+        <translation type="unfinished">Kadence</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="310"/>
+        <source>Heartrate</source>
+        <translation type="unfinished">Tepy</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="311"/>
+        <source>Speed</source>
+        <translation type="unfinished">Rychlost</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="312"/>
+        <source>Altitude</source>
+        <translation type="unfinished">Nadmořská výška</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="313"/>
+        <source>Pedal Force</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="314"/>
+        <source>Time</source>
+        <translation type="unfinished">Čas</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="315"/>
+        <source>Distance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="316"/>
+        <source>Interval</source>
+        <translation type="unfinished">Interval</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="317"/>
+        <source>Latitude</source>
+        <translation type="unfinished">GPS šířka</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="318"/>
+        <source>Longitude</source>
+        <translation type="unfinished">GPS délka</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="319"/>
+        <source>Time at X/Y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="320"/>
+        <source>Zone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="321"/>
+        <source>CPV</source>
+        <translation type="unfinished">CPV</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="322"/>
+        <source>AEPF</source>
+        <translation type="unfinished">AEPF</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="324"/>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="494"/>
+        <source>No data or bin size too large</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ModelWindow</name>
     <message>
-        <location filename="../ModelWindow.cpp" line="33"/>
+        <location filename="../ModelWindow.cpp" line="44"/>
         <source>Power</source>
         <translation>Výkon</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="34"/>
+        <location filename="../ModelWindow.cpp" line="45"/>
         <source>Cadence</source>
         <translation>Kadence</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="35"/>
+        <location filename="../ModelWindow.cpp" line="46"/>
         <source>Heartrate</source>
         <translation>Tepy</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="36"/>
+        <location filename="../ModelWindow.cpp" line="47"/>
         <source>Speed</source>
         <translation>Rychlost</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="37"/>
+        <location filename="../ModelWindow.cpp" line="48"/>
         <source>Altitude</source>
         <translation>Nadmořská výška</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="38"/>
+        <location filename="../ModelWindow.cpp" line="49"/>
         <source>Torque</source>
         <translation>Točivý moment</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="39"/>
+        <location filename="../ModelWindow.cpp" line="50"/>
         <source>AEPF</source>
         <translation>AEPF</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="40"/>
+        <location filename="../ModelWindow.cpp" line="51"/>
         <source>CPV</source>
         <translation>CPV</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="41"/>
+        <location filename="../ModelWindow.cpp" line="52"/>
         <source>Time</source>
         <translation>Čas</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="42"/>
+        <location filename="../ModelWindow.cpp" line="53"/>
         <source>Distance</source>
         <translation>Vzdálenosti</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="43"/>
+        <location filename="../ModelWindow.cpp" line="54"/>
         <source>Latitude</source>
         <translation>GPS šířka</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="44"/>
+        <location filename="../ModelWindow.cpp" line="55"/>
         <source>Longitude</source>
         <translation>GPS délka</translation>
     </message>
     <message>
         <location filename="../ModelWindow.cpp" line="63"/>
+        <source>User Defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="64"/>
+        <source>Natural Cadence Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="65"/>
+        <source>Route Visualisation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="66"/>
+        <source>Power Fatigue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="67"/>
+        <source>Impact of Altitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="84"/>
         <source>Analyse</source>
         <translation>Analyzovat</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="64"/>
+        <location filename="../ModelWindow.cpp" line="85"/>
         <source>X-Axis:</source>
         <translation>Osa-X:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="65"/>
+        <location filename="../ModelWindow.cpp" line="86"/>
         <source>Y-Axis:</source>
         <translation>Osa-Y:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="66"/>
+        <location filename="../ModelWindow.cpp" line="87"/>
         <source>Z-Axis:</source>
         <translation>Osa-Z:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="67"/>
+        <location filename="../ModelWindow.cpp" line="88"/>
         <source>Color:</source>
         <translation>Barvit:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="68"/>
+        <location filename="../ModelWindow.cpp" line="89"/>
         <source>Bin Width:</source>
         <translation>Šířka sloupu:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="81"/>
-        <location filename="../ModelWindow.cpp" line="87"/>
+        <location filename="../ModelWindow.cpp" line="102"/>
+        <location filename="../ModelWindow.cpp" line="108"/>
         <source>Time at X&amp;Y</source>
         <translation>Čas na X&amp;Y</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="86"/>
+        <location filename="../ModelWindow.cpp" line="107"/>
         <source>Power Zone</source>
         <translation>Zóny výkonu</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="91"/>
+        <location filename="../ModelWindow.cpp" line="112"/>
         <source>Bar</source>
         <translation>Sloupcový</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="92"/>
+        <location filename="../ModelWindow.cpp" line="113"/>
         <source>Grid</source>
         <translation>Spojnicový</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="93"/>
+        <location filename="../ModelWindow.cpp" line="114"/>
         <source>Surface</source>
         <translation>Povrchový</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="94"/>
+        <location filename="../ModelWindow.cpp" line="115"/>
         <source>Dots</source>
         <translation>Bodový</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="97"/>
+        <location filename="../ModelWindow.cpp" line="118"/>
         <source>Ignore Zero</source>
         <translation>Ignorovat nuly</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="99"/>
+        <location filename="../ModelWindow.cpp" line="120"/>
         <source>Show Grid</source>
         <translation>Zobrazit mřížku</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="101"/>
+        <location filename="../ModelWindow.cpp" line="122"/>
         <source>Frame Intervals</source>
         <translation>Označit intervaly</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="103"/>
+        <location filename="../ModelWindow.cpp" line="124"/>
         <source>Legend</source>
         <translation>Legenda</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="116"/>
-        <location filename="../ModelWindow.cpp" line="298"/>
+        <location filename="../ModelWindow.cpp" line="137"/>
+        <location filename="../ModelWindow.cpp" line="319"/>
         <source>Reset View</source>
         <translation>Vykreslit graf</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="291"/>
+        <location filename="../ModelWindow.cpp" line="312"/>
         <source>Plot</source>
         <translation>Vykreslit graf</translation>
     </message>
@@ -4369,7 +4577,7 @@ Chcete pokračovat?</translation>
     </message>
     <message>
         <location filename="../PowerHist.cpp" line="1019"/>
-        <source>kph</source>
+        <source>km/h</source>
         <translation>km/h</translation>
     </message>
     <message>
@@ -4487,7 +4695,7 @@ on and that its display says, &quot;Host&quot;</source>
     <message>
         <location filename="../RealtimeWindow.cpp" line="52"/>
         <location filename="../RealtimeWindow.cpp" line="180"/>
-        <source>KPH</source>
+        <source>km/h</source>
         <translation>Rychlost</translation>
     </message>
     <message>
@@ -4526,7 +4734,7 @@ on and that its display says, &quot;Host&quot;</source>
     <message>
         <location filename="../RealtimeWindow.cpp" line="53"/>
         <location filename="../RealtimeWindow.cpp" line="195"/>
-        <source>Avg KPH</source>
+        <source>Avg km/h</source>
         <translation>Průměrná rychlost</translation>
     </message>
     <message>

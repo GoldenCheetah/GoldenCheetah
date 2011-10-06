@@ -160,6 +160,7 @@ static QHash<QString, double> inum;      // for selected intervals
 
 class ModelDataProvider : public Function
 {
+    Q_DECLARE_TR_FUNCTIONS(ModelDataProvider)
 
     public:
 
@@ -266,61 +267,61 @@ ModelDataProvider::describeType(int type, bool longer)
     if (longer == true) {
         switch(type) {
 
-            case MODEL_POWER : return ("Power (watts)");
-            case MODEL_CADENCE : return ("Cadence (rpm)");
-            case MODEL_HEARTRATE : return ("Heartrate (bpm)");
+            case MODEL_POWER : return tr("Power (watts)");
+            case MODEL_CADENCE : return tr("Cadence (rpm)");
+            case MODEL_HEARTRATE : return tr("Heartrate (bpm)");
             case MODEL_SPEED :
                 if (useMetricUnits == true){
-                     return ("Speed (kph)");
+                     return tr("Speed (km/h)");
                 }else {
-                     return ("Speed (mph)");
+                     return tr("Speed (mph)");
                 }
             case MODEL_ALT :
                   if (useMetricUnits == true){
-                      return ("Altitude (meters)");
+                      return tr("Altitude (meters)");
                   }else {
-                      return ("Altitude (feet)");
+                      return tr("Altitude (feet)");
                   }
-            case MODEL_TORQUE : return ("Torque (N)");
-            case MODEL_TIME : return ("Elapsed Time (secs)");
+            case MODEL_TORQUE : return tr("Torque (N)");
+            case MODEL_TIME : return tr("Elapsed Time (secs)");
             case MODEL_DISTANCE :
                 if (useMetricUnits == true){
-                    return ("Elapsed Distance (km)");
+                    return tr("Elapsed Distance (km)");
                 }else {
-                    return ("Elapsed Distance (mi)");
+                    return tr("Elapsed Distance (mi)");
                 }
-            case MODEL_INTERVAL : return ("Interval Number"); // XXX implemented differently
-            case MODEL_LAT : return ("Latitude (degree x 1000)");
-            case MODEL_LONG : return ("Longitude (degree x 1000)");
-            case MODEL_CPV : return ("Circumferential Pedal Velocity (cm/s)");
-            case MODEL_AEPF : return ("Average Effective Pedal Force (N)");
+            case MODEL_INTERVAL : return tr("Interval Number"); // XXX implemented differently
+            case MODEL_LAT : return tr("Latitude (degree x 1000)");
+            case MODEL_LONG : return tr("Longitude (degree x 1000)");
+            case MODEL_CPV : return tr("Circumferential Pedal Velocity (cm/s)");
+            case MODEL_AEPF : return tr("Average Effective Pedal Force (N)");
 
             // these you need to do yourself cause there is some
             // logic needed and I'm just lookup table!
-            case MODEL_XYTIME : return ("Time at X/Y (%)");
-            case MODEL_POWERZONE : return ("Power Zone");
+            case MODEL_XYTIME : return tr("Time at X/Y (%)");
+            case MODEL_POWERZONE : return tr("Power Zone");
         }
-        return ("Unknown");; // ? unknown channel ?
+        return tr("Unknown");; // ? unknown channel ?
     } else {
         switch(type) {
 
-            case MODEL_POWER : return ("Power");
-            case MODEL_CADENCE : return ("Cadence");
-            case MODEL_HEARTRATE : return ("Heartrate");
-            case MODEL_SPEED : return ("Speed"); //XXX metric / imperial!
-            case MODEL_ALT : return ("Altitude"); // XXX metric / imperial
-            case MODEL_TORQUE : return ("Pedal Force");
-            case MODEL_TIME : return ("Time");
-            case MODEL_DISTANCE : return ("Distance");//XXX metric/imperial
-            case MODEL_INTERVAL : return ("Interval"); // XXX implemented differently
-            case MODEL_LAT : return ("Latitude");
-            case MODEL_LONG : return ("Longitude");
-            case MODEL_XYTIME : return ("Time at X/Y");
-            case MODEL_POWERZONE : return ("Zone");
-            case MODEL_CPV : return ("CPV");
-            case MODEL_AEPF : return ("AEPF");
+            case MODEL_POWER : return tr("Power");
+            case MODEL_CADENCE : return tr("Cadence");
+            case MODEL_HEARTRATE : return tr("Heartrate");
+            case MODEL_SPEED : return tr("Speed"); //XXX metric / imperial!
+            case MODEL_ALT : return tr("Altitude"); // XXX metric / imperial
+            case MODEL_TORQUE : return tr("Pedal Force");
+            case MODEL_TIME : return tr("Time");
+            case MODEL_DISTANCE : return tr("Distance");//XXX metric/imperial
+            case MODEL_INTERVAL : return tr("Interval"); // XXX implemented differently
+            case MODEL_LAT : return tr("Latitude");
+            case MODEL_LONG : return tr("Longitude");
+            case MODEL_XYTIME : return tr("Time at X/Y");
+            case MODEL_POWERZONE : return tr("Zone");
+            case MODEL_CPV : return tr("CPV");
+            case MODEL_AEPF : return tr("AEPF");
         }
-        return ("None");; // ? unknown channel ?
+        return tr("None");; // ? unknown channel ?
     }
 }
 
@@ -490,7 +491,7 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
     if (mz.count() == 0) {
 
         // create a null plot -- bin too large!
-        plot.setTitle("No data or bin size too large");
+        plot.setTitle(tr("No data or bin size too large"));
         setDomain(0,0,0,0);
         setMesh(2,2);
         setMinZ(0);

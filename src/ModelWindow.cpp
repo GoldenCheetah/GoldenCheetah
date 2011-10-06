@@ -27,6 +27,17 @@
 #include <QtGui>
 #include <QString>
 
+//
+// Prepare some preset analysis (initialization moved to constructor to enable translation)
+//
+typedef struct preset {
+    QString name;       // QComboBox value
+    int x, y, z, color; // values for xselector, yselector and zselector and color
+    bool ignore;
+    int bin;            // value for binwidth
+} preset;
+static preset *presets;
+
 void
 ModelWindow::addStandardChannels(QComboBox *box)
 {
@@ -47,6 +58,17 @@ ModelWindow::addStandardChannels(QComboBox *box)
 ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) :
     QWidget(parent), home(home), main(parent), ride(NULL), current(NULL)
 {
+    static preset presetsInit[] = {
+
+        { tr("User Defined"), 0, 0, 0, 0, true, 20 },
+        { tr("Natural Cadence Selection"), 0, 1, 12, 12, false, 5 }, // don't ignore zero for cadences!
+        { tr("Route Visualisation"), 11, 10, 4, 4, false, 5 }, // don't ignore zero for cadences!
+        { tr("Power Fatigue"), 9, 0, 12, 12, true, 5 },
+        { tr("Impact of Altitude"), 4, 2, 0, 12, true, 10 },
+        { "", 0, 0, 0, 0, false, 0 }
+    };
+    presets = presetsInit;
+
     // Layouts
     QVBoxLayout *mainLayout = new QVBoxLayout;
     QHBoxLayout *topLayout = new QHBoxLayout;
@@ -297,24 +319,6 @@ ModelWindow::setClean()
     dirty = false;
     resetView->setText(tr("Reset View"));
 }
-
-//
-// Prepare some preset analysis
-//
-static struct preset {
-    QString name;       // QComboBox value
-    int x, y, z, color; // values for xselector, yselector and zselector and color
-    bool ignore;
-    int bin;            // value for binwidth
-} presets[] = {
-
-    { "User Defined", 0, 0, 0, 0, true, 20 },
-    { "Natural Cadence Selection", 0, 1, 12, 12, false, 5 }, // don't ignore zero for cadences!
-    { "Route Visualisation", 11, 10, 4, 4, false, 5 }, // don't ignore zero for cadences!
-    { "Power Fatigue", 9, 0, 12, 12, true, 5 },
-    { "Impact of Altitude", 4, 2, 0, 12, true, 10 },
-    { "", 0, 0, 0, 0, false, 0 }
-};
 
 void
 ModelWindow::applyPreset(int index)

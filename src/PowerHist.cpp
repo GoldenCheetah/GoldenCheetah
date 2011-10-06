@@ -1016,7 +1016,7 @@ PowerHist::setParameterAxisTitle()
             axislabel = tr("Cadence (rpm)");
             break;
         case kph:
-            axislabel = QString(tr("Speed (%1)")).arg(useMetricUnits ? tr("kph") : tr("mph"));
+            axislabel = QString(tr("Speed (%1)")).arg(useMetricUnits ? tr("km/h") : tr("mph"));
             break;
         case nm:
             axislabel = QString(tr("Torque (%1)")).arg(useMetricUnits ? tr("N-m") : tr("ft-lbf"));

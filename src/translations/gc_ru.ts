@@ -140,7 +140,7 @@
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="550"/>
-        <source>KPH</source>
+        <source>km/h</source>
         <translation>км/ч</translation>
     </message>
     <message>
@@ -296,7 +296,7 @@
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="239"/>
-        <source>kph</source>
+        <source>km/h</source>
         <translation>км/ч</translation>
     </message>
     <message>
@@ -1180,22 +1180,22 @@ Click Cancel to exit.</source>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="54"/>
-        <location filename="../DownloadRideDialog.cpp" line="181"/>
+        <location filename="../DownloadRideDialog.cpp" line="182"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Отмена</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="68"/>
+        <location filename="../DownloadRideDialog.cpp" line="69"/>
         <source>Select port:</source>
         <translation>Выберите порт:</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="70"/>
+        <location filename="../DownloadRideDialog.cpp" line="71"/>
         <source>Select device type:</source>
         <translation>Выберите тип устройства:</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="83"/>
+        <location filename="../DownloadRideDialog.cpp" line="84"/>
         <source>No devices found.  Make sure the device
 unit is plugged into the computer,
 then click &quot;Rescan&quot; to check again.</source>
@@ -1204,103 +1204,103 @@ then click &quot;Rescan&quot; to check again.</source>
 &quot;Пересканировать&amp;quot для проверки.</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="93"/>
+        <location filename="../DownloadRideDialog.cpp" line="94"/>
         <source>Click Download to begin downloading.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="95"/>
+        <location filename="../DownloadRideDialog.cpp" line="96"/>
         <source>, 
 then click Download.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="109"/>
+        <location filename="../DownloadRideDialog.cpp" line="110"/>
         <source>Warning(s):
 
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="109"/>
+        <location filename="../DownloadRideDialog.cpp" line="110"/>
         <source>
 
 You may need to (re)install the FTDI or PL2303 drivers before downloading.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="111"/>
+        <location filename="../DownloadRideDialog.cpp" line="112"/>
         <source>Error Loading Device Drivers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="161"/>
+        <location filename="../DownloadRideDialog.cpp" line="162"/>
         <source>Download canceled</source>
         <translation>Загрузка отменена</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="162"/>
+        <location filename="../DownloadRideDialog.cpp" line="163"/>
         <source>Cancel clicked by user.</source>
         <translation>Отменено пользователем.</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="166"/>
+        <location filename="../DownloadRideDialog.cpp" line="167"/>
         <source>Download failed</source>
         <translation>Загрузка не удалась</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="177"/>
+        <location filename="../DownloadRideDialog.cpp" line="178"/>
         <source>Ride Already Downloaded</source>
         <translation>Тренировка уже загружена</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="178"/>
+        <location filename="../DownloadRideDialog.cpp" line="179"/>
         <source>This ride appears to have already </source>
         <translation>Похоже, что эта тренировка уже</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="179"/>
+        <location filename="../DownloadRideDialog.cpp" line="180"/>
         <source>been downloaded.  Do you want to </source>
         <translation>загружена. Хотите</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="180"/>
+        <location filename="../DownloadRideDialog.cpp" line="181"/>
         <source>overwrite the previous download?</source>
         <translation>перезаписать предыдущую загрузку?</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="181"/>
+        <location filename="../DownloadRideDialog.cpp" line="182"/>
         <source>&amp;Overwrite</source>
         <translation>&amp;Переписать</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="193"/>
-        <location filename="../DownloadRideDialog.cpp" line="204"/>
+        <location filename="../DownloadRideDialog.cpp" line="194"/>
+        <location filename="../DownloadRideDialog.cpp" line="205"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="194"/>
+        <location filename="../DownloadRideDialog.cpp" line="195"/>
         <source>Failed to remove existing file </source>
         <translation>Не удалось удалить существующий файл</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="205"/>
+        <location filename="../DownloadRideDialog.cpp" line="206"/>
         <source>Failed to rename </source>
         <translation>Не удалось переименовать</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="205"/>
+        <location filename="../DownloadRideDialog.cpp" line="206"/>
         <source> to </source>
         <translation>до</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="212"/>
+        <location filename="../DownloadRideDialog.cpp" line="213"/>
         <source>Success</source>
         <translation>Всё получилось</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="212"/>
+        <location filename="../DownloadRideDialog.cpp" line="213"/>
         <source>Download complete.</source>
         <translation>Загрузка завершена.</translation>
     </message>
@@ -1992,7 +1992,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="unfinished">секунд</translation>
     </message>
     <message>
-        <source>KPH</source>
+        <source>km/h</source>
         <translation type="obsolete">км/ч</translation>
     </message>
     <message>
@@ -3604,156 +3604,364 @@ CP велосипедиста установлена в %3 ватт</translation
     </message>
 </context>
 <context>
+    <name>ModelDataProvider</name>
+    <message>
+        <location filename="../ModelPlot.cpp" line="270"/>
+        <source>Power (watts)</source>
+        <translation type="unfinished">Мощность (ватт)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="271"/>
+        <source>Cadence (rpm)</source>
+        <translation type="unfinished">Каденс (об/мин)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="272"/>
+        <source>Heartrate (bpm)</source>
+        <translation type="unfinished">ЧСС (уд/мин)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="275"/>
+        <source>Speed (km/h)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="277"/>
+        <source>Speed (mph)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="281"/>
+        <source>Altitude (meters)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="283"/>
+        <source>Altitude (feet)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="285"/>
+        <source>Torque (N)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="286"/>
+        <source>Elapsed Time (secs)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="289"/>
+        <source>Elapsed Distance (km)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="291"/>
+        <source>Elapsed Distance (mi)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="293"/>
+        <source>Interval Number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="294"/>
+        <source>Latitude (degree x 1000)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="295"/>
+        <source>Longitude (degree x 1000)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="296"/>
+        <source>Circumferential Pedal Velocity (cm/s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="297"/>
+        <source>Average Effective Pedal Force (N)</source>
+        <translation type="unfinished">Средняя эффективная сила на педаль (Н)</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="301"/>
+        <source>Time at X/Y (%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="302"/>
+        <source>Power Zone</source>
+        <translation type="unfinished">Уровень мощности</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="304"/>
+        <source>Unknown</source>
+        <translation type="unfinished">Неизветсно</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="308"/>
+        <source>Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="309"/>
+        <source>Cadence</source>
+        <translation type="unfinished">Каденс</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="310"/>
+        <source>Heartrate</source>
+        <translation type="unfinished">ЧСС</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="311"/>
+        <source>Speed</source>
+        <translation type="unfinished">Скорость</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="312"/>
+        <source>Altitude</source>
+        <translation type="unfinished">Высота</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="313"/>
+        <source>Pedal Force</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="314"/>
+        <source>Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="315"/>
+        <source>Distance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="316"/>
+        <source>Interval</source>
+        <translation type="unfinished">Интервал</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="317"/>
+        <source>Latitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="318"/>
+        <source>Longitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="319"/>
+        <source>Time at X/Y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="320"/>
+        <source>Zone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="321"/>
+        <source>CPV</source>
+        <translation type="unfinished">CPV</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="322"/>
+        <source>AEPF</source>
+        <translation type="unfinished">AEPF</translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="324"/>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="494"/>
+        <source>No data or bin size too large</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ModelWindow</name>
     <message>
-        <location filename="../ModelWindow.cpp" line="33"/>
+        <location filename="../ModelWindow.cpp" line="44"/>
         <source>Power</source>
         <translation>Мощность</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="34"/>
+        <location filename="../ModelWindow.cpp" line="45"/>
         <source>Cadence</source>
         <translation>Каденс</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="35"/>
+        <location filename="../ModelWindow.cpp" line="46"/>
         <source>Heartrate</source>
         <translation>ЧСС</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="36"/>
+        <location filename="../ModelWindow.cpp" line="47"/>
         <source>Speed</source>
         <translation>Скорость</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="37"/>
+        <location filename="../ModelWindow.cpp" line="48"/>
         <source>Altitude</source>
         <translation>Высота</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="38"/>
+        <location filename="../ModelWindow.cpp" line="49"/>
         <source>Torque</source>
         <translation>Крутящий момент</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="39"/>
+        <location filename="../ModelWindow.cpp" line="50"/>
         <source>AEPF</source>
         <translation>AEPF</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="40"/>
+        <location filename="../ModelWindow.cpp" line="51"/>
         <source>CPV</source>
         <translation>CPV</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="41"/>
+        <location filename="../ModelWindow.cpp" line="52"/>
         <source>Time</source>
         <translation>Время</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="42"/>
+        <location filename="../ModelWindow.cpp" line="53"/>
         <source>Distance</source>
         <translation>Дистанция</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="43"/>
+        <location filename="../ModelWindow.cpp" line="54"/>
         <source>Latitude</source>
         <translation>Широта</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="44"/>
+        <location filename="../ModelWindow.cpp" line="55"/>
         <source>Longitude</source>
         <translation>Долгота</translation>
     </message>
     <message>
         <location filename="../ModelWindow.cpp" line="63"/>
+        <source>User Defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="64"/>
+        <source>Natural Cadence Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="65"/>
+        <source>Route Visualisation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="66"/>
+        <source>Power Fatigue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="67"/>
+        <source>Impact of Altitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelWindow.cpp" line="84"/>
         <source>Analyse</source>
         <translation>Анализировать</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="64"/>
+        <location filename="../ModelWindow.cpp" line="85"/>
         <source>X-Axis:</source>
         <translation>Ось X</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="65"/>
+        <location filename="../ModelWindow.cpp" line="86"/>
         <source>Y-Axis:</source>
         <translation>Ось Y</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="66"/>
+        <location filename="../ModelWindow.cpp" line="87"/>
         <source>Z-Axis:</source>
         <translation>Ось Z</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="67"/>
+        <location filename="../ModelWindow.cpp" line="88"/>
         <source>Color:</source>
         <translation>Цвет:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="68"/>
+        <location filename="../ModelWindow.cpp" line="89"/>
         <source>Bin Width:</source>
         <translation>Ширина столбца:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="81"/>
-        <location filename="../ModelWindow.cpp" line="87"/>
+        <location filename="../ModelWindow.cpp" line="102"/>
+        <location filename="../ModelWindow.cpp" line="108"/>
         <source>Time at X&amp;Y</source>
         <translation>Время по X&amp;Y</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="86"/>
+        <location filename="../ModelWindow.cpp" line="107"/>
         <source>Power Zone</source>
         <translation>Уровень мощности</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="91"/>
+        <location filename="../ModelWindow.cpp" line="112"/>
         <source>Bar</source>
         <translation>Столбцы</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="92"/>
+        <location filename="../ModelWindow.cpp" line="113"/>
         <source>Grid</source>
         <translation>Сетка</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="93"/>
+        <location filename="../ModelWindow.cpp" line="114"/>
         <source>Surface</source>
         <translation>Поверхность</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="94"/>
+        <location filename="../ModelWindow.cpp" line="115"/>
         <source>Dots</source>
         <translation>Точки</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="97"/>
+        <location filename="../ModelWindow.cpp" line="118"/>
         <source>Ignore Zero</source>
         <translation>Исключить нули</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="99"/>
+        <location filename="../ModelWindow.cpp" line="120"/>
         <source>Show Grid</source>
         <translation>Показать сетку</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="101"/>
+        <location filename="../ModelWindow.cpp" line="122"/>
         <source>Frame Intervals</source>
         <translation>Frame Intervals</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="103"/>
+        <location filename="../ModelWindow.cpp" line="124"/>
         <source>Legend</source>
         <translation>Легенда</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="116"/>
-        <location filename="../ModelWindow.cpp" line="298"/>
+        <location filename="../ModelWindow.cpp" line="137"/>
+        <location filename="../ModelWindow.cpp" line="319"/>
         <source>Reset View</source>
         <translation>Сбросить вид</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="291"/>
+        <location filename="../ModelWindow.cpp" line="312"/>
         <source>Plot</source>
         <translation>График</translation>
     </message>
@@ -4363,7 +4571,7 @@ Do you want to continue?</source>
     </message>
     <message>
         <location filename="../PowerHist.cpp" line="1019"/>
-        <source>kph</source>
+        <source>km/h</source>
         <translation>км/ч</translation>
     </message>
     <message>
@@ -4481,7 +4689,7 @@ on and that its display says, &quot;Host&quot;</source>
     <message>
         <location filename="../RealtimeWindow.cpp" line="52"/>
         <location filename="../RealtimeWindow.cpp" line="180"/>
-        <source>KPH</source>
+        <source>km/h</source>
         <translation>КМ/Ч</translation>
     </message>
     <message>
@@ -4520,7 +4728,7 @@ on and that its display says, &quot;Host&quot;</source>
     <message>
         <location filename="../RealtimeWindow.cpp" line="53"/>
         <location filename="../RealtimeWindow.cpp" line="195"/>
-        <source>Avg KPH</source>
+        <source>Avg km/h</source>
         <translation>Ср. КМ/Ч</translation>
     </message>
     <message>

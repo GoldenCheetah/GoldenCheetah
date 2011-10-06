@@ -236,7 +236,7 @@ class AvgSpeed : public RideMetric {
     void initialize() {
 #endif
         setName(tr("Average Speed"));
-        setMetricUnits(tr("kph"));
+        setMetricUnits(tr("km/h"));
         setImperialUnits(tr("mph"));
         setType(RideMetric::Average);
         setPrecision(1);
