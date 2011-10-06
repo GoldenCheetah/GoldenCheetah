@@ -51,7 +51,7 @@
 #include "DatePickerDialog.h"
 #include "ToolsDialog.h"
 #include "MetricAggregator.h"
-#include "SplitRideDialog.h"
+#include "SplitActivityWizard.h"
 #include "TwitterDialog.h"
 #include "WithingsDownload.h"
 #include "CalendarDownload.h"
@@ -1289,15 +1289,18 @@ MainWindow::revertRide()
 void
 MainWindow::splitRide()
 {
-    if (ride) (new SplitRideDialog(this))->exec();
+    if (ride) (new SplitActivityWizard(this))->exec();
+    else QMessageBox::critical(this, tr("Split Activity"), tr("No activity selected!"));
 }
 
 void
 MainWindow::deleteRide()
 {
     QTreeWidgetItem *_item = treeWidget->currentItem();
-    if (_item==NULL || _item->type() != RIDE_TYPE)
+    if (_item==NULL || _item->type() != RIDE_TYPE) {
+        QMessageBox::critical(this, tr("Delete Activity"), tr("No activity selected!"));
         return;
+    }
     RideItem *item = static_cast<RideItem*>(_item);
     QMessageBox msgBox;
     msgBox.setText(tr("Are you sure you want to delete the activity:"));
