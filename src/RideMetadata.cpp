@@ -92,6 +92,33 @@ RideMetadata::setRideItem(RideItem *ride)
     }
 }
 
+void
+RideMetadata::warnDateTime(QDateTime datetime)
+{
+    if (rideItem() == NULL) return;
+
+    // see if there is a ride with this date/time already?
+    // Check if an existing ride has the same starttime
+    QChar zero = QLatin1Char('0');
+    QString targetnosuffix = QString ("%1_%2_%3_%4_%5_%6")
+                           .arg(datetime.date().year(), 4, 10, zero)
+                           .arg(datetime.date().month(), 2, 10, zero)
+                           .arg(datetime.date().day(), 2, 10, zero)
+                           .arg(datetime.time().hour(), 2, 10, zero)
+                           .arg(datetime.time().minute(), 2, 10, zero)
+                           .arg(datetime.time().second(), 2, 10, zero);
+
+    // now make a regexp for all know ride types
+    foreach(QString suffix, RideFileFactory::instance().suffixes()) {
+
+        QString conflict = main->home.absolutePath() + "/" + targetnosuffix + "." + suffix;
+        if (QFile(conflict).exists() && QFileInfo(conflict).fileName() != rideItem()->fileName) {
+            QMessageBox::warning(this, "Date/Time Entry", "An activity already exists with that date/time, if you do not change it then you will overwrite and lose existing data");
+            return; // only warn on the first conflict!
+        }
+    }
+}
+
 // the extra tab has all the fields that are in the current
 // ride that are not shown on the tabs
 void
@@ -528,6 +555,10 @@ FormField::editFinished()
         QDateTime update = QDateTime(date, current.time());
         ourRideItem->setStartTime(update);
         ourRideItem->notifyRideMetadataChanged();
+
+        // warn if the ride already exists with that date/time
+        meta->warnDateTime(update);
+
     } else if (definition.name == "Start Time") {
         QDateTime current = ourRideItem->ride()->startTime();
         QTime time(/* hours*/ text.mid(0,2).toInt(),
@@ -537,6 +568,10 @@ FormField::editFinished()
         QDateTime update = QDateTime(current.date(), time);
         ourRideItem->setStartTime(update);
         ourRideItem->notifyRideMetadataChanged();
+
+        // warn if the ride already exists with that date/time
+        meta->warnDateTime(update);
+
     } else if (definition.name != "Summary") {
         if (sp.isMetric(definition.name) && enabled->isChecked()) {
 
