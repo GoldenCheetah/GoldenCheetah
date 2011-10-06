@@ -54,7 +54,7 @@ class FormField : public QWidget
     Q_OBJECT
 
     public:
-        FormField(FieldDefinition, MainWindow *);
+        FormField(FieldDefinition, MainWindow *, RideMetadata *meta);
         ~FormField();
         FieldDefinition definition; // define the field
         QLabel  *label;             // label
@@ -72,6 +72,7 @@ class FormField : public QWidget
         bool edited;                // value has been changed
         bool active;                // when data being changed for rideSelected
         SpecialFields sp;
+        RideMetadata *meta;
 };
 
 class KeywordCompleter : public QCompleter
@@ -110,9 +111,9 @@ class Form : public QScrollArea
     Q_OBJECT
 
     public:
-        Form(MainWindow *);
+        Form(MainWindow *, RideMetadata *meta);
         ~Form();
-        void addField(FieldDefinition x) { fields.append(new FormField(x, main)); }
+        void addField(FieldDefinition x) { fields.append(new FormField(x, main, meta)); }
         void arrange(); // the meat of the action, arranging fields on the screen
 
     private:
@@ -124,6 +125,7 @@ class Form : public QScrollArea
         QGridLayout *grid1, *grid2;
         QList<FormField*> fields; // keep track so we can destroy
         QList<QHBoxLayout *> overrides; // keep track so we can destroy
+        RideMetadata *meta;
 
 };
 
@@ -140,6 +142,7 @@ class RideMetadata : public QWidget
 
     public slots:
         void configUpdate();
+        void warnDateTime(QDateTime); // warn if file already exists after date/time changed
 
     private:
         MainWindow *main;
