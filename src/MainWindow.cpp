@@ -51,7 +51,7 @@
 #include "DatePickerDialog.h"
 #include "ToolsDialog.h"
 #include "MetricAggregator.h"
-#include "SplitActivityWizard.h"
+#include "SplitRideDialog.h"
 #include "TwitterDialog.h"
 #include "WithingsDownload.h"
 #include "CalendarDownload.h"
@@ -1289,7 +1289,7 @@ MainWindow::revertRide()
 void
 MainWindow::splitRide()
 {
-    if (ride) (new SplitActivityWizard(this))->exec();
+    if (ride) (new SplitRideDialog(this))->exec();
     else QMessageBox::critical(this, tr("Split Activity"), tr("No activity selected!"));
 }
 
