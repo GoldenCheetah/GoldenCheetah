@@ -68,6 +68,9 @@ struct RideFileInterval
     RideFileInterval() : start(0.0), stop(0.0) {}
     RideFileInterval(double start, double stop, QString name) :
         start(start), stop(stop), name(name) {}
+
+    // order bu start time
+    bool operator< (RideFileInterval right) const { return start < right.start; }
 };
 
 class RideFile : public QObject // QObject to emit signals

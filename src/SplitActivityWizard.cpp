@@ -24,10 +24,15 @@ static const double defaultMinimumGap = 15; // 15 minutes
 // Minimum size of segment to identify as a new activity
 static const double defaultMinimumSegmentSize = 20; // 20 minutes
 
+// Main wizard
 SplitActivityWizard::SplitActivityWizard(MainWindow *main) : QWizard(main), main(main)
 {
     // delete when done
     setAttribute(Qt::WA_DeleteOnClose);
+
+    // Minimum 600x500 for when selecting intervals
+    setMinimumHeight(500);
+    setMinimumWidth(600);
 
     // title
     setWindowTitle(tr("Split Activity"));
@@ -46,14 +51,18 @@ SplitActivityWizard::SplitActivityWizard(MainWindow *main) : QWizard(main), main
     intervals = new QTreeWidget;
     intervals->headerItem()->setText(0, tr(""));
     intervals->headerItem()->setText(1, tr("Start"));
-    intervals->headerItem()->setText(2, tr("Duration"));
-    intervals->headerItem()->setText(3, tr("Distance"));
-    intervals->headerItem()->setText(4, tr("Interval Name"));
-    intervals->setColumnCount(5);
+    intervals->headerItem()->setText(2, tr(""));
+    intervals->headerItem()->setText(3, tr("Stop"));
+    intervals->headerItem()->setText(4, tr("Duration"));
+    intervals->headerItem()->setText(5, tr("Distance"));
+    intervals->headerItem()->setText(6, tr("Interval Name"));
+    intervals->setColumnCount(7);
     intervals->setColumnWidth(0,30);
     intervals->setColumnWidth(1,80);
-    intervals->setColumnWidth(2,80);
+    intervals->setColumnWidth(2,30);
     intervals->setColumnWidth(3,80);
+    intervals->setColumnWidth(4,80);
+    intervals->setColumnWidth(5,80);
     intervals->setSelectionMode(QAbstractItemView::NoSelection);
     intervals->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     intervals->setUniformRowHeights(true);
@@ -77,6 +86,14 @@ SplitActivityWizard::SplitActivityWizard(MainWindow *main) : QWizard(main), main
     files->setUniformRowHeights(true);
     files->setIndentation(0);
 
+    // just the hr and power as a plot
+    smallPlot = new SmallPlot(this);
+    smallPlot->setFixedHeight(100);
+    smallPlot->setData(rideItem);
+
+    bg = new SplitBackground(this);
+    bg->attach(smallPlot);
+
     // 5 step process, although Conflict may be skipped
     addPage(new SplitWelcome(this));
     addPage(new SplitKeep(this));
@@ -88,7 +105,7 @@ SplitActivityWizard::SplitActivityWizard(MainWindow *main) : QWizard(main), main
 }
 
 void
-SplitActivityWizard::setIntervalsList()
+SplitActivityWizard::setIntervalsList(SplitSelect *selector)
 {
     // didn't change so no need to rebuild
     if (usedMinimumGap == minimumGap && usedMinimumSegmentSize == minimumSegmentSize) return;
@@ -153,24 +170,82 @@ SplitActivityWizard::setIntervalsList()
 
     }
 
+
+    // now look at the segments and add any gaps in recording
+    // because these MUST be honoured (i.e. user cannot unmark
+    // these points, otherwise gaps in recording are retained
+    // in the resulting file
+    foreach(RideFileInterval *p, gaps) { delete p; } gaps.clear(); // wip old ones
+
+    double lastsecs = rideItem->ride()->dataPoints().first()->secs;
+    int gapnum = 0;
+    foreach(RideFileInterval activity, segments) {
+        if (activity.start > lastsecs) {
+            // we have a gap
+            gapnum++;
+
+            // add to gap list
+            RideFileInterval *gap = new RideFileInterval(lastsecs,
+                                                         activity.start,
+                                                         QString("Gap in recording #%1").arg(gapnum));
+            gaps.append(gap);
+
+            // add to interval list
+            segments.append(RideFileInterval(*gap));
+        }
+        lastsecs = activity.stop;
+    }
+    if (lastsecs < rideItem->ride()->dataPoints().last()->secs) {
+        // gap at the end
+        gapnum++;
+
+        // add to gap list
+        RideFileInterval *gap = new RideFileInterval(lastsecs,
+                                                     rideItem->ride()->dataPoints().last()->secs,
+                                                     QString("Gap in recording #%1").arg(gapnum));
+        gaps.append(gap);
+
+        // add to interval list
+        segments.append(RideFileInterval(*gap));
+    }
+
+    // first entry in list should always be entire file
+    // so we can mark the start and stop for splitting
+    segments.insert(0, RideFileInterval(rideItem->ride()->dataPoints().first()->secs,
+                                     rideItem->ride()->dataPoints().last()->secs,
+                                     "Entire Activity"));
+
     // now fold in the ride intervals
     segments.append(rideItem->ride()->intervals());
+
+    // now lets sort the segments in start order
+    qSort(segments.begin(), segments.end());
 
     // first just add all the current ride intervals
     counter = 0;
     QChar zero = QLatin1Char('0');
     foreach (RideFileInterval interval, segments) {
 
-        // skip intervals that are too short
-        if (interval.stop - interval.start < minimumSegmentSize) continue;
+        // DO NOT skip intervals that are too short
+        //if (interval.stop - interval.start < minimumSegmentSize) continue;
 
         QTreeWidgetItem *add = new QTreeWidgetItem(intervals->invisibleRootItem());
         add->setFlags(add->flags() | Qt::ItemIsEditable);
 
-        // selector
+        // we set these intervals as checked by default
+        bool checkit = (interval.name.startsWith("Gap in recording") ||
+                        interval.name == "Entire Activity");
+
+        // disable checkbox editing (i.e. mandatory split) at gaps in recording
+        bool disableit = (interval.name.startsWith("Gap in recording"));
+
+        // selector start
         QCheckBox *checkBox = new QCheckBox("", this);
-        checkBox->setChecked(interval.name.startsWith("Activity Segment") ? true : false);
+        checkBox->setChecked(checkit);
+        checkBox->setEnabled(!disableit);
         intervals->setItemWidget(add, 0, checkBox);
+
+        connect(checkBox, SIGNAL(stateChanged(int)), selector, SLOT(refreshMarkers()));
 
         // interval start
         int secs = interval.start;
@@ -179,9 +254,24 @@ SplitActivityWizard::setIntervalsList()
                         .arg(secs%3600/60,2,10,zero)
                         .arg(secs%60,2,10,zero));
 
+        // selector stop
+        checkBox = new QCheckBox("", this);
+        checkBox->setChecked(checkit);
+        checkBox->setEnabled(!disableit);
+        intervals->setItemWidget(add, 2, checkBox);
+
+        connect(checkBox, SIGNAL(stateChanged(int)), selector, SLOT(refreshMarkers()));
+
+        // interval start
+        secs = interval.stop;
+        add->setText(3, QString("%1:%2:%3")
+                        .arg(secs/3600,2,10,zero)
+                        .arg(secs%3600/60,2,10,zero)
+                        .arg(secs%60,2,10,zero));
+
         // interval duration
         secs = interval.stop - interval.start;
-        add->setText(2, QString("%1:%2:%3")
+        add->setText(4, QString("%1:%2:%3")
                         .arg(secs/3600,2,10,zero)
                         .arg(secs%3600/60,2,10,zero)
                         .arg(secs%60,2,10,zero));
@@ -189,19 +279,20 @@ SplitActivityWizard::setIntervalsList()
         // interval distance
         double distance = rideItem->ride()->timeToDistance(interval.stop) - 
                           rideItem->ride()->timeToDistance(interval.start);
-        add->setText(3, QString("%1 %2")
+        add->setText(5, QString("%1 %2")
                         .arg(distance * (main->useMetricUnits ? 1 : MILES_PER_KM), 0, 'f', 2)
                         .arg(main->useMetricUnits ? "km" : "mi"));
 
         // interval name
-        add->setText(4, interval.name);
+        add->setText(6, interval.name);
 
         // hiddden columns with dataPoint from/to
-        add->setText(5, QString("%1").arg(rideItem->ride()->timeIndex(interval.start)));
-        add->setText(6, QString("%1").arg(rideItem->ride()->timeIndex(interval.stop)));
+        add->setText(7, QString("%1").arg(rideItem->ride()->timeIndex(interval.start)));
+        add->setText(8, QString("%1").arg(rideItem->ride()->timeIndex(interval.stop)));
 
         counter++;
     }
+    smallPlot->replot();
 }
 
 void
@@ -482,18 +573,76 @@ SplitKeep::setWarning()
 // Select
 SplitSelect::SplitSelect(SplitActivityWizard *parent) : QWizardPage(parent), wizard(parent)
 {
-    setTitle(tr("Select Intervals"));
-    setSubTitle(tr("Each interval selected will be saved as a new activity"));
+    setTitle(tr("Select Split Markers"));
+    setSubTitle(tr("Activity will be split between marker points selected"));
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
 
+    layout->addWidget(wizard->smallPlot);
     layout->addWidget(wizard->intervals);
 }
 void
 SplitSelect::initializePage()
 {
-    wizard->setIntervalsList();
+    wizard->setIntervalsList(this);
+    refreshMarkers();
+}
+
+void
+SplitSelect::refreshMarkers()
+{
+    // update the markers on the plot
+    foreach (QwtPlotMarker *m, wizard->markers) {
+        // remove from the plot and delete
+        m->detach();
+        delete m;
+    }
+    wizard->markers.clear();
+    wizard->marks.clear(); // dataPoint indexes
+
+    // now refresh them
+    for(int i=0; i<wizard->intervals->invisibleRootItem()->childCount(); i++) {
+
+        QTreeWidgetItem *current = wizard->intervals->invisibleRootItem()->child(i);
+
+        // add marker for start?
+        if (static_cast<QCheckBox*>(wizard->intervals->itemWidget(current,0))->isChecked()) {
+
+            long index = current->text(7).toInt();
+            double point = wizard->rideItem->ride()->dataPoints().at(index)->secs;
+
+            wizard->marks.append(index);
+            QwtPlotMarker *add = new QwtPlotMarker;
+            wizard->markers.append(add);
+
+            // vertical line will do for now
+            add->setLineStyle(QwtPlotMarker::VLine);
+            add->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
+            add->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
+            add->setValue(point / 60.0, 0.0);
+            add->attach(wizard->smallPlot);
+        }
+
+        // add marker for stop?
+        if (static_cast<QCheckBox*>(wizard->intervals->itemWidget(current,2))->isChecked()) {
+
+            long index = current->text(8).toInt();
+            double point = wizard->rideItem->ride()->dataPoints().at(index)->secs;
+
+            wizard->marks.append(index);
+            QwtPlotMarker *add = new QwtPlotMarker;
+            wizard->markers.append(add);
+
+            // vertical line will do for now
+            add->setLineStyle(QwtPlotMarker::VLine);
+            add->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
+            add->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
+            add->setValue(point / 60.0, 0.0);
+            add->attach(wizard->smallPlot);
+        }
+    }
+    wizard->smallPlot->replot();
 }
 
 // Confirm
@@ -521,17 +670,30 @@ SplitConfirm::initializePage()
     }
     wizard->activities.clear();
 
-    // create one for each interval selected
-    // traverse the selections
-    for(int i=0; i<wizard->intervals->invisibleRootItem()->childCount(); i++) {
+    // create a sorted list of markers, since we
+    // may have duplicates and the sequence is
+    // not guaranteed to be ordered
+    QList<long> points;
+    foreach(long mark, wizard->marks) points.append(mark); // marks are indexes to ensure absolute accuracy
+    qSort(points.begin(), points.end());
 
-        QTreeWidgetItem *current = wizard->intervals->invisibleRootItem()->child(i);
+    // Create a new activity for each marked segment
+    long lastmark = -1;
+    foreach(long mark, points) {
 
-        if (static_cast<QCheckBox*>(wizard->intervals->itemWidget(current,0))->isChecked()) {
-            RideFile *add = createRideFile(current->text(5).toInt(), current->text(6).toInt());
-            wizard->activities.append(add);
+        if (mark == lastmark) continue;
 
+        if (lastmark != -1) {
+
+            // ignore gaps!
+            if (!wizard->bg->isGap(wizard->rideItem->ride()->dataPoints().at(lastmark)->secs/60.0,
+                                   wizard->rideItem->ride()->dataPoints().at(mark)->secs/60.0)) {
+
+                RideFile *add = createRideFile(lastmark, mark);
+                wizard->activities.append(add);
+            }
         }
+        lastmark = mark;
     }
 
     // now lets adjust the starttime to avoid conflicts
@@ -576,15 +738,18 @@ SplitConfirm::initializePage()
 //create a new ride file from the current ride file
 //by using datapoints from index start to stop
 RideFile *
-SplitConfirm::createRideFile(int start, int stop)
+SplitConfirm::createRideFile(long start, long stop)
 {
     RideFile *returning = new RideFile; // target
     RideFile *ride = wizard->rideItem->ride(); // source
 
     // set offset in seconds, make sure in bounds too
     double offset = 0;
-    if (start < ride->dataPoints().count() && start >= 0)
+    double distanceoffset = 0;
+    if (start < ride->dataPoints().count() && start >= 0) {
         offset = ride->dataPoints().at(start)->secs;
+        distanceoffset = ride->dataPoints().at(start)->km;
+    }
 
     // copy first class variables (adjust starttime to include offset)
     returning->setStartTime(ride->startTime().addSecs(offset));
@@ -595,11 +760,11 @@ SplitConfirm::createRideFile(int start, int stop)
     const_cast<QMap<QString,QString>&>(returning->tags()) = QMap<QString,QString>(ride->tags());
 
     // now the dataPoints, check in bounds too!
-    for(int i=start; i<stop && i<ride->dataPoints().count(); i++) {
+    for(long i=start; i<stop && i<ride->dataPoints().count(); i++) {
         RideFilePoint *p = ride->dataPoints().at(i);
 
         returning->appendPoint(p->secs - offset, // start from zero!
-                               p->cad, p->hr, p->km, p->kph,
+                               p->cad, p->hr, p->km - distanceoffset, p->kph,
                                p->nm, p->watts, p->alt, p->lon, p->lat,
                                p->headwind, p->interval);
     }
