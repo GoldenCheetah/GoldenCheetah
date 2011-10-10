@@ -53,12 +53,13 @@ SmallPlot::SmallPlot(QWidget *parent) : QwtPlot(parent), d_mrk(NULL), smooth(30)
     hrCurve->setPen(QPen(GColor(CHEARTRATE)));
     hrCurve->attach(this);
 
-    grid = new QwtPlotGrid();
-    grid->enableX(false);
-    QPen gridPen;
-    gridPen.setStyle(Qt::DotLine);
-    grid->setPen(QPen(GColor(CPLOTGRID)));
-    grid->attach(this);
+    // grid lines on such a small plot look AWFUL
+    //grid = new QwtPlotGrid();
+    //grid->enableX(false);
+    //QPen gridPen;
+    //gridPen.setStyle(Qt::DotLine);
+    //grid->setPen(QPen(GColor(CPLOTGRID)));
+    //grid->attach(this);
 
     timeCurves.resize(36);
     for (int i = 0; i < 36; ++i) {
@@ -226,6 +227,7 @@ SmallPlot::setYMax()
     }
     setAxisScale(yLeft, 0.0, ymax * 1.1);
     setAxisTitle(yLeft, ylabel);
+    enableAxis(yLeft, false); // hide for a small plot
 }
 
 void

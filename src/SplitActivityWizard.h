@@ -21,12 +21,19 @@
 
 #include "GoldenCheetah.h"
 #include "MainWindow.h"
+#include "SmallPlot.h"
 #include "RideItem.h"
 #include "RideFile.h"
 #include "JsonRideFile.h"
 #include "Units.h"
+#include "Colors.h"
 #include <QWizard>
 #include <QDoubleSpinBox>
+
+#include <qwt_plot_marker.h>
+
+class SplitSelect;
+class SplitBackground;
 
 class SplitActivityWizard : public QWizard
 {
@@ -44,10 +51,16 @@ public:
 
     QTreeWidget *intervals;
     QTreeWidget *files; // what we will do!
+    SmallPlot *smallPlot;
     int usedMinimumGap,
         usedMinimumSegmentSize;
 
     QList<RideFile*> activities;
+    QList<QwtPlotMarker *> markers;
+    QList<long> marks; // indexes into dataPoints
+    QList<RideFileInterval *> gaps; // gaps in recording
+
+    SplitBackground *bg;
 
     bool done; // have we finished?
 
@@ -55,7 +68,7 @@ public slots:
     // ride file utilities
     QString hasBackup(QString filename);
     QStringList conflicts(QDateTime datetime);
-    void setIntervalsList();
+    void setIntervalsList(SplitSelect*);
     void setFilesList();
 
 signals:
@@ -117,6 +130,10 @@ class SplitSelect : public QWizardPage
     public:
         SplitSelect(SplitActivityWizard *);
         void initializePage(); // reset the interval list if needed
+
+    public slots:
+        void refreshMarkers(); // set the markers on the plot
+
     private:
         SplitActivityWizard *wizard;
 };
@@ -133,9 +150,123 @@ class SplitConfirm : public QWizardPage
         bool isComplete() const;
 
         // constructs the new ridefile from current ride
-        RideFile* createRideFile(int start, int stop);
+        RideFile* createRideFile(long start, long stop);
     private:
         SplitActivityWizard *wizard;
 };
 
+// paint the alternating rectangles and split numbers
+class SplitBackground: public QwtPlotItem
+{
+    private:
+        SplitActivityWizard *parent;
+        mutable QList<QwtPlotMarker*> labs;
+
+    public:
+
+        SplitBackground(SplitActivityWizard *_parent)
+        {
+            setZ(0.0);
+            parent = _parent;
+        }
+
+        virtual int rtti() const
+        {
+            return QwtPlotItem::Rtti_PlotUserItem;
+        }
+
+        virtual void draw(QPainter *painter,
+                        const QwtScaleMap &xMap, const QwtScaleMap &,
+                        const QRect &rect) const
+        {
+            RideItem *rideItem = parent->rideItem;
+
+            double lastmark = -1;
+            int segment = 0;
+
+            // clear the labels
+            foreach(QwtPlotMarker *l, labs) { l->detach(); delete l; }
+            labs.clear();
+
+            // create a sorted list of markers, since we
+            // may have duplicates and the sequence is
+            // not guaranteed to be ordered
+            QList<double> points;
+            foreach(QwtPlotMarker *m, parent->markers) points.append(m->xValue());
+            qSort(points.begin(), points.end());
+
+            foreach(double mark, points) {
+
+                if (mark == lastmark) continue;
+
+                // construct a rectangle
+                QRect r = rect;
+
+                if (lastmark == -1) {
+                    // before first mark
+                    if (mark > rideItem->ride()->dataPoints().at(0)->secs) {
+                        r.setTop(1000);
+                        r.setBottom(0);
+                        r.setLeft(xMap.transform(0));
+                        r.setRight(xMap.transform(mark));
+                        painter->fillRect(r, Qt::lightGray);
+                    }
+
+                } else {
+
+                    r.setTop(1000);
+                    r.setBottom(0);
+                    r.setLeft(xMap.transform(lastmark));
+                    r.setRight(xMap.transform(mark));
+
+                    if (isGap(lastmark,mark)) { // don't mark as a segment if it is a gap!
+
+                        painter->fillRect(r, Qt::lightGray);
+
+                    } else {
+
+                        segment++; // starts at 0 so increment before use to start from 1
+
+                        painter->fillRect(r, segment%2 ? QColor(216,233,255,200) : QColor(233,255,222,200));
+
+                        // segment number
+                        QwtText text(QString("%1").arg(segment));
+                        text.setFont(QFont("Helvetica", 48, QFont::Bold));
+                        text.setColor(Qt::lightGray);
+
+                        // place the text in the geometric mean in time, at a decent power
+                        QwtPlotMarker *label = new QwtPlotMarker;
+                        label->setValue((lastmark+mark)/2, 200);
+                        label->setLabel(text);
+                        label->attach(plot());
+                        labs.append(label);
+                    }
+
+                }
+                lastmark = mark;
+            }
+
+            // is there some space to the right -- if none selected this
+            // will shade the entire ride gray since lastmark will be -1
+            if (lastmark < (rideItem->ride()->dataPoints().last()->secs-rideItem->ride()->recIntSecs())) {
+
+                QRect r;
+                r.setTop(1000);
+                r.setBottom(0);
+                r.setLeft(xMap.transform(lastmark));
+                r.setRight(xMap.transform(rideItem->ride()->dataPoints().last()->secs-rideItem->ride()->recIntSecs()));
+                painter->fillRect(r, Qt::lightGray);
+            }
+        }
+        bool isGap(double start, double stop) const
+        {
+            foreach(RideFileInterval *g, parent->gaps) {
+
+                double gstart = g->start / 60.0; // convert to minutes
+                double gstop = g->stop / 60.0; // convert to minutes
+                if (start >= gstart && start <= gstop && stop >= gstart && stop <= gstop) return true;
+            }
+            return false;
+        }
+};
 #endif // _SplitActivityWizard_h

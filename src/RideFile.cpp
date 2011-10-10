@@ -177,7 +177,7 @@ RideFile::timeIndex(double secs) const
     QVector<RideFilePoint*>::const_iterator i = std::lower_bound(
         dataPoints_.begin(), dataPoints_.end(), &p, ComparePointSecs());
     if (i == dataPoints_.end())
-        return dataPoints_.size();
+        return dataPoints_.size()-1;
     return i - dataPoints_.begin();
 }
 
