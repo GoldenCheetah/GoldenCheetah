@@ -768,6 +768,20 @@ SplitConfirm::createRideFile(long start, long stop)
                                p->nm, p->watts, p->alt, p->lon, p->lat,
                                p->headwind, p->interval);
     }
+
+    // lets keep intervals that start in our section truncating them
+    // if neccessary (some folks want to keep lap markers)
+    double startTime = wizard->rideItem->ride()->dataPoints().at(start)->secs;
+    double stopTime = wizard->rideItem->ride()->dataPoints().at(stop)->secs;
+    foreach (RideFileInterval interval, wizard->rideItem->ride()->intervals()) {
+
+        if (interval.start >= startTime && interval.start <= stopTime) {
+            if (interval.stop > stopTime)
+                returning->addInterval(interval.start - offset, stopTime, interval.name);
+            else 
+                returning->addInterval(interval.start - offset, interval.stop - offset, interval.name);
+        }
+    }
     return returning;
 }
 
