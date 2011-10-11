@@ -289,7 +289,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
 
 #if 0
 // used when debugging
-    qDebug()<<WKO_device<<version<<WKO_GRAPHS<<"records="<<records;
+    qDebug()<<QString("0x%1").arg(WKO_device,0,16)<<version<<WKO_GRAPHS<<"records="<<records;
     for (int xbit=bit; xbit < 500; xbit++)
     if (get_bits(thelot, xbit, 1)) fprintf(stderr, "1");
         else fprintf(stderr, "0");
@@ -506,7 +506,6 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
 
             // pause record different in version 1
             if (version == 1) pausesize=31;
-            else if (WKO_device == 0x14) pausesize = 39;
             else pausesize=42;
 
             /* set increment value -> if followed by a null record
@@ -517,7 +516,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
             if (version !=  1) inc = pausetime;
 #if 0
                 fprintf(stderr, "pausetime: ");
-                for (int i=0; i<pausesize+20; i++) {
+                for (int i=0; i<pausesize+42; i++) {
                     int x = get_bits(thelot, bit+i, 1);
                     fputc(x ? '1' : '0', stderr);
                 }
