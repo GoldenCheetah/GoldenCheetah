@@ -611,7 +611,7 @@ QString HrZones::summarize(int rnum, QVector<double> &time_in_zone) const
     if(range.lt > 0){
         summary += "<table align=\"center\" width=\"70%\" border=\"0\">";
         summary += "<tr><td align=\"center\">";
-        summary += tr("Threshold: %1").arg(range.lt);
+        summary += tr("Threshold (bpm): %1").arg(range.lt);
         summary += "</td></tr></table>";
     }
     summary += "<table align=\"center\" width=\"70%\" ";
@@ -619,12 +619,17 @@ QString HrZones::summarize(int rnum, QVector<double> &time_in_zone) const
     summary += "<tr>";
     summary += tr("<td align=\"center\">Zone</td>");
     summary += tr("<td align=\"center\">Description</td>");
-    summary += tr("<td align=\"center\">Low</td>");
-    summary += tr("<td align=\"center\">High</td>");
+    summary += tr("<td align=\"center\">Low (bpm)</td>");
+    summary += tr("<td align=\"center\">High (bpm)</td>");
     summary += tr("<td align=\"center\">Time</td>");
+    summary += tr("<td align=\"center\">%</td>");
     summary += "</tr>";
     QColor color = QApplication::palette().alternateBase().color();
     color = QColor::fromHsv(color.hue(), color.saturation() * 2, color.value());
+
+    double duration = 0;
+    foreach(double v, time_in_zone) { duration += v; }
+
     for (int zone = 0; zone < time_in_zone.size(); ++zone) {
         if (time_in_zone[zone] > 0.0) {
             QString name, desc;
@@ -644,6 +649,8 @@ QString HrZones::summarize(int rnum, QVector<double> &time_in_zone) const
                 summary += QString("<td align=\"center\">%1</td>").arg(hi);
             summary += QString("<td align=\"center\">%1</td>")
                 .arg(time_to_string((unsigned) round(time_in_zone[zone])));
+            summary += QString("<td align=\"center\">%1</td>")
+                .arg((double)time_in_zone[zone]/duration * 100, 0, 'f', 0);
             summary += "</tr>";
         }
     }
