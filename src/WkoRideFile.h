@@ -67,6 +67,7 @@ class WkoParser
         char WKO_GRAPHS[32];
         QList<RideFileInterval *> references;
         int charts;
+        long bufferSize;
 
         // used by all the parsers as temporary storage
         unsigned char txtbuf[102400]; // text buffer
