@@ -693,10 +693,13 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
     WKO_device = ul; // save WKO_device
 
     switch (WKO_device) {
+    case 0x00 : // early versions set device to zero for powertap
     case 0x01 : results->setDeviceType("Powertap"); break;
-    case 0x04 : results->setDeviceType("SRM"); break;
+    case 0x1a : // also SRM - PowerControl VI
+    case 0x04 : results->setDeviceType("SRM"); break; // powercontrol V
     case 0x05 : results->setDeviceType("Polar"); break;
     case 0x06 : results->setDeviceType("Computrainer/Velotron"); break;
+    case 0x0e : // also ergomo
     case 0x11 : results->setDeviceType("Ergomo"); break;
     case 0x12 : results->setDeviceType("Garmin Edge 205/305"); break;
     case 0x13 : results->setDeviceType("Garmin Edge 705"); break;
@@ -704,7 +707,7 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
     case 0x15 : results->setDeviceType("Suunto"); break;
     case 0x16 : results->setDeviceType("Cycleops 300PT"); break;
     case 0x19 : results->setDeviceType("Ergomo"); break;
-    default : results->setDeviceType("WKO"); break;
+    default : results->setDeviceType(QString("WKO (0x%1)").arg(WKO_device,0,16)); break;
     }
 
     p += donumber(p, &ul); // not in version 12?
