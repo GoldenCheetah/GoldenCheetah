@@ -68,11 +68,13 @@ WkoParser::WkoParser(QFile &file, QStringList &errors, QList<RideFile*>*rides)
         return;
     }
 
-    boost::scoped_array<WKO_UCHAR> entirefile(new WKO_UCHAR[file.size()]);
+    bufferSize = file.size();
+    boost::scoped_array<WKO_UCHAR> entirefile(new WKO_UCHAR[bufferSize]);
     QDataStream *rawstream(new QDataStream(&file));
     headerdata = &entirefile[0];
     rawstream->readRawData(reinterpret_cast<char *>(headerdata), file.size());
     file.close();
+
 
     // Check the header to make sure it really is a WKO
     // file, the magic number for WKO is 'W' 'K' 'O' ^Z
@@ -280,7 +282,6 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
         if (version == 1) bit = 32;
         else bit = 43;
     }
-
     interval = inc;
     interval /= 1000;
 
@@ -295,11 +296,13 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
     qDebug()<<"";
 #endif
 
+    int maxbit = 8 * (bufferSize - (rawdata-headerdata));
+
     /*------------------------------------------------------------------------------
      * RUN THROUGH EACH RAW DATA RECORD
      *==============================================================================*/
     rdist=rtime=0;
-    while (records) {
+    while (records && bit < maxbit) {
 
         unsigned int marker;
         WKO_LONG sval=0;
@@ -485,6 +488,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
 
             // Now output this sample if it is not a null record
             if (!isnull) {
+static int time=0;
                     // !! needs to be modified to support the new alt patch
                     results->appendPoint((double)rtime/1000, cad, hr, km,
                             kph, nm, watts, alt, lon, lat, wind, 0);
@@ -501,10 +505,9 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
             unsigned long pausetime;
             int pausesize;
 
-            if (WKO_device != 0x14) pausesize=42;
-            else pausesize=39;
-
+            // pause record different in version 1
             if (version == 1) pausesize=31;
+            else pausesize=39;
 
             /* set increment value -> if followed by a null record
                it is to show a pause in recording -- velotrons seem to cause
@@ -691,6 +694,7 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
     p += donumber(p, &ul); /* 27: graph view */
     p += donumber(p, &ul); /* 28: WKO_device type */
     WKO_device = ul; // save WKO_device
+
     switch (WKO_device) {
     case 0x01 : results->setDeviceType("Powertap"); break;
     case 0x04 : results->setDeviceType("SRM"); break;
@@ -1236,12 +1240,12 @@ WkoParser::bitsize(char g, int WKO_device, WKO_ULONG version)
                 break;
             case 0x01:
             case 0x11:
-            case 0x16: // Cycleops PT300
             case 0x00:
             case 0x12: // Garmin Edge 205/305
             case 0x13:
             case 0x14:
             case 0x15: // suunto
+            case 0x16: // Cycleops PT300
             case 0x1a: // SRM Powercontrol VI
                        // Alex Simmons files Oct 2010
                 return 22;
