@@ -488,7 +488,6 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
 
             // Now output this sample if it is not a null record
             if (!isnull) {
-static int time=0;
                     // !! needs to be modified to support the new alt patch
                     results->appendPoint((double)rtime/1000, cad, hr, km,
                             kph, nm, watts, alt, lon, lat, wind, 0);
@@ -507,7 +506,8 @@ static int time=0;
 
             // pause record different in version 1
             if (version == 1) pausesize=31;
-            else pausesize=39;
+            else if (WKO_device == 0x14) pausesize = 39;
+            else pausesize=42;
 
             /* set increment value -> if followed by a null record
                it is to show a pause in recording -- velotrons seem to cause
@@ -516,15 +516,13 @@ static int time=0;
             pausetime = get_bits(thelot, bit, 32);
             if (version !=  1) inc = pausetime;
 #if 0
-            else {
-                //XXX Version 1 pause records debug!
-                fprintf(stderr, "v1 pausetime: ");
-                for (int i=0; i<pausesize; i++) {
+                fprintf(stderr, "pausetime: ");
+                for (int i=0; i<pausesize+20; i++) {
                     int x = get_bits(thelot, bit+i, 1);
                     fputc(x ? '1' : '0', stderr);
                 }
+                fprintf(stderr, " %ld ", pausetime);
                 fputc('\n', stderr);
-            }
 #endif
             bit += pausesize;
         }
