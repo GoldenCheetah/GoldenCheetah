@@ -30,7 +30,7 @@
 
 static int tcxFileReaderRegistered =
     RideFileFactory::instance().registerReader(
-        "tcx", "Garmin Training Centre", new TcxFileReader());
+        "tcx", "Garmin Training Centre TCX", new TcxFileReader());
 
 RideFile *TcxFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*list) const
 {

@@ -226,7 +226,7 @@ string: STRING                          { JsonString = unprotect(JsonRideFiletex
 
 static int jsonFileReaderRegistered =
     RideFileFactory::instance().registerReader(
-        "json", "GoldenCheetah Json Format", new JsonFileReader());
+        "json", "GoldenCheetah Json", new JsonFileReader());
 
 RideFile *
 JsonFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
