@@ -8,7 +8,7 @@ DEPENDPATH += .
 
 !isEmpty( BOOST_INCLUDE ) { INCLUDEPATH += $${BOOST_INCLUDE} }
 INCLUDEPATH += ../qwt/src ../qxt/src
-QT += xml sql network webkit phonon
+QT += xml sql network webkit
 LIBS += ../qwt/lib/libqwt.a
 LIBS += -lm
 
