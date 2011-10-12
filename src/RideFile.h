@@ -131,8 +131,6 @@ class RideFile : public QObject // QObject to emit signals
         void fillInIntervals();
         int intervalBegin(const RideFileInterval &interval) const;
 
-        void writeAsCsv(QFile &file, bool bIsMetric) const;
-
         // Index offset calculations
         double timeToDistance(double) const;  // get distance in km at time in secs
         int timeIndex(double) const;          // get index offset for time in secs
@@ -207,6 +205,10 @@ struct RideFilePoint
 struct RideFileReader {
     virtual ~RideFileReader() {}
     virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const = 0;
+
+    // if hasWrite capability should re-implement writeRideFile and hasWrite
+    virtual bool hasWrite() const { return false; }
+    virtual bool writeRideFile(MainWindow *, const RideFile *, QFile &) const { return false; }
 };
 
 class RideFileFactory {
@@ -226,8 +228,10 @@ class RideFileFactory {
         int registerReader(const QString &suffix, const QString &description,
                            RideFileReader *reader);
         RideFile *openRideFile(MainWindow *main, QFile &file, QStringList &errors, QList<RideFile*>* = 0) const;
+        bool writeRideFile(MainWindow *main, const RideFile *ride, QFile &file, QString format) const;
         QStringList listRideFiles(const QDir &dir) const;
         QStringList suffixes() const;
+        QStringList writeSuffixes() const;
         QString description(const QString &suffix) const {
             return descriptions_[suffix];
         }

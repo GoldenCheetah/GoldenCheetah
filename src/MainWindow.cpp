@@ -440,18 +440,10 @@ MainWindow::MainWindow(const QDir &home) :
     rideMenu->addAction(tr("&Import from file..."), this, SLOT (importFile()), tr ("Ctrl+I"));
     rideMenu->addAction(tr("&Manual activity entry..."), this, SLOT(manualRide()), tr("Ctrl+M"));
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("&Export to CSV..."), this, SLOT(exportCSV()), tr("Ctrl+E"));
-    rideMenu->addAction(tr("Export to GC..."), this, SLOT(exportGC()));
-    rideMenu->addAction(tr("&Export to Json..."), this, SLOT(exportJson()));
-
-#ifdef GC_HAVE_KML
-    rideMenu->addAction(tr("&Export to KML..."), this, SLOT(exportKML()));
-#endif
-    rideMenu->addAction(tr("Export to PWX..."), this, SLOT(exportPWX()));
-    rideMenu->addAction(tr("Export to TCX..."), this, SLOT(exportTCX()));
+    rideMenu->addAction(tr("&Export ..."), this, SLOT(exportRide()), tr("Ctrl+E"));
+    rideMenu->addAction(tr("&Batch export ..."), this, SLOT(exportBatch()), tr("Ctrl+B"));
+    rideMenu->addAction(tr("Export Metrics as CSV..."), this, SLOT(exportMetrics()), tr(""));
 #ifdef GC_HAVE_SOAP
-    rideMenu->addSeparator ();
-    rideMenu->addAction(tr("&Export Metrics as CSV..."), this, SLOT(exportMetrics()), tr(""));
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Upload to Training Peaks"), this, SLOT(uploadTP()), tr("Ctrl+U"));
     rideMenu->addAction(tr("Down&load from Training Peaks..."), this, SLOT(downloadTP()), tr("Ctrl+L"));
@@ -1096,27 +1088,13 @@ MainWindow::currentRide()
 }
 
 void
-MainWindow::exportGC()
+MainWindow::exportBatch()
 {
-    if ((treeWidget->selectedItems().size() != 1)
-        || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
-        QMessageBox::critical(this, tr("Select Activity"), tr("No activity selected!"));
-        return;
-    }
-
-    QString fileName = QFileDialog::getSaveFileName(
-        this, tr("Export GC"), QDir::homePath(), tr("GC XML Format (*.gc)"));
-    if (fileName.length() == 0)
-        return;
-
-    QString err;
-    QFile file(fileName);
-    GcFileReader reader;
-    reader.writeRideFile(currentRide(), file);
+    // XXX todo
 }
 
 void
-MainWindow::exportJson()
+MainWindow::exportRide()
 {
     if ((treeWidget->selectedItems().size() != 1)
         || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
@@ -1124,114 +1102,30 @@ MainWindow::exportJson()
         return;
     }
 
-    QString fileName = QFileDialog::getSaveFileName(
-        this, tr("Export Json"), QDir::homePath(), tr("GC Json Format (*.json)"));
-    if (fileName.length() == 0)
-        return;
+    // what format?
+    const RideFileFactory &rff = RideFileFactory::instance();
+    QStringList allFormats;
+    foreach(QString suffix, rff.writeSuffixes())
+        allFormats << QString("%1 (*.%2)").arg(rff.description(suffix)).arg(suffix);
 
-    QString err;
-    QFile file(fileName);
-    JsonFileReader reader;
-    reader.writeRideFile(currentRide(), file);
-}
+    QString suffix; // what was selected?
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export Activity"), QDir::homePath(), allFormats.join(";;"), &suffix);
 
-void
-MainWindow::exportPWX()
-{
-    if ((treeWidget->selectedItems().size() != 1)
-        || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
-        QMessageBox::critical(this, tr("Select Activity"), tr("No activity selected!"));
-        return;
-    }
+    if (fileName.length() == 0) return;
 
-    QString fileName = QFileDialog::getSaveFileName(
-        this, tr("Export PWX"), QDir::homePath(), tr("PWX (*.pwx)"));
-    if (fileName.length() == 0)
-        return;
-
-    QString err;
-    QFile file(fileName);
-    PwxFileReader reader;
-    reader.writeRideFile(cyclist, currentRide(), file);
-}
-
-void
-MainWindow::exportTCX()
-{
-    if ((treeWidget->selectedItems().size() != 1)
-        || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
-        QMessageBox::critical(this, tr("Select Activity"), tr("No activity selected!"));
-        return;
-    }
-
-    QString fileName = QFileDialog::getSaveFileName(
-        this, tr("Export TCX"), QDir::homePath(), tr("TCX (*.tcx)"));
-    if (fileName.length() == 0)
-        return;
-
-    QString err;
-    QFile file(fileName);
-    TcxFileReader reader;
-    reader.writeRideFile(this, cyclist, currentRide(), file);
-}
-
-#ifdef GC_HAVE_KML
-void
-MainWindow::exportKML()
-{
-    if ((treeWidget->selectedItems().size() != 1)
-        || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
-        QMessageBox::critical(this, tr("Select Activity"), tr("No activity selected!"));
-        return;
-    }
-
-    QString fileName = QFileDialog::getSaveFileName(
-        this, tr("Export KML"), QDir::homePath(), tr("Google Earth KML (*.kml)"));
-    if (fileName.length() == 0)
-        return;
-
-    QString err;
-    QFile file(fileName);
-    KmlFileReader reader;
-    reader.writeRideFile(currentRide(), file);
-}
-#endif
-
-void
-MainWindow::exportCSV()
-{
-    if ((treeWidget->selectedItems().size() != 1)
-        || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
-        QMessageBox::critical(this, tr("Select Activity"), tr("No activity selected!"));
-        return;
-    }
-
-    ride = (RideItem*) treeWidget->selectedItems().first();
-
-    // Ask the user if they prefer to export with English or metric units.
-    QStringList items;
-    items << tr("Metric") << tr("Imperial");
-    bool ok;
-    QString units = QInputDialog::getItem(
-        this, tr("Select Units"), tr("Units:"), items, 0, false, &ok);
-    if(!ok)
-        return;
-    bool useMetricUnits = (units == items[0]);
-
-    QString fileName = QFileDialog::getSaveFileName(
-        this, tr("Export CSV"), QDir::homePath(),
-        tr("Comma-Separated Values (*.csv)"));
-    if (fileName.length() == 0)
-        return;
+    // which file type was selected
+    // extract from the suffix returned
+    QRegExp getSuffix("^[^(]*\\(\\*\\.([^)]*)\\)$");
+    getSuffix.exactMatch(suffix);
 
     QFile file(fileName);
-    if (!file.open(QFile::WriteOnly | QFile::Truncate))
-    {
-        QMessageBox::critical(this, tr("Split Activity"), tr("The file %1 can't be opened for writing").arg(fileName));
-        return;
-    }
+    bool result = RideFileFactory::instance().writeRideFile(this, currentRide(), file, getSuffix.cap(1));
 
-    ride->ride()->writeAsCsv(file, useMetricUnits);
+    if (result == false) {
+        QMessageBox oops(QMessageBox::Critical, tr("Export Failed"),
+                         tr("Failed to export ride, please check permissions"));
+        oops.exec();
+    }
 }
 
 void

@@ -187,7 +187,7 @@ SplitRideDialog::CreateNewRideFile(const RideFile *ride, int nRecStart, int nRec
 
     // write to disk
     GcFileReader f;
-    f.writeRideFile(newRideFile.get(), file);
+    f.writeRideFile(mainWindow, newRideFile.get(), file);
 
     // add to the ride list
     mainWindow->addRide(fileName, false);

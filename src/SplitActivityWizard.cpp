@@ -811,7 +811,7 @@ SplitConfirm::validatePage()
 
             JsonFileReader reader;
             QFile out(target);
-            reader.writeRideFile(wizard->activities.at(i), out);
+            reader.writeRideFile(wizard->main, wizard->activities.at(i), out);
 
             current->setText(5, "Saved");
 

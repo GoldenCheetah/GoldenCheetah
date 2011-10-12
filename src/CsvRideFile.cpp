@@ -350,3 +350,51 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         return NULL;
     }
 }
+
+bool
+CsvFileReader::writeRideFile(MainWindow *, const RideFile *ride, QFile &file) const
+{
+    if (!file.open(QIODevice::WriteOnly)) return(false);
+
+    // always save CSV in metric format
+    bool bIsMetric = true;
+
+    // Use the column headers that make WKO+ happy.
+    double convertUnit;
+    QTextStream out(&file);
+    if (!bIsMetric)
+    {
+        out << "Minutes,Torq (N-m),MPH,Watts,Miles,Cadence,Hrate,ID,Altitude (feet)\n";
+        convertUnit = MILES_PER_KM;
+    }
+    else {
+        out << "Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID,Altitude (m)\n";
+        convertUnit = 1.0;
+    }
+
+    foreach (const RideFilePoint *point, ride->dataPoints()) {
+        if (point->secs == 0.0)
+            continue;
+        out << point->secs/60.0;
+        out << ",";
+        out << ((point->nm >= 0) ? point->nm : 0.0);
+        out << ",";
+        out << ((point->kph >= 0) ? (point->kph * convertUnit) : 0.0);
+        out << ",";
+        out << ((point->watts >= 0) ? point->watts : 0.0);
+        out << ",";
+        out << point->km * convertUnit;
+        out << ",";
+        out << point->cad;
+        out << ",";
+        out << point->hr;
+        out << ",";
+        out << point->interval;
+        out << ",";
+        out << point->alt;
+        out << "\n";
+    }
+
+    file.close();
+    return true;
+}

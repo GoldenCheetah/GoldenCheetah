@@ -56,7 +56,6 @@ class TPDownloadDialog : public QDialog
 
     private:
         MainWindow *main;
-        QString cyclist;
         TPDownload *downloader;
         TPUpload *uploader;
         TPAthlete *athleter;

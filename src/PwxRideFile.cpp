@@ -260,7 +260,7 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
 }
 
 bool
-PwxFileReader::writeRideFile(const QString cyclist, const RideFile *ride, QFile &file) const
+PwxFileReader::writeRideFile(MainWindow *main, const RideFile *ride, QFile &file) const
 {
     QDomText text; // used all over
     QDomDocument doc;
@@ -282,9 +282,9 @@ PwxFileReader::writeRideFile(const QString cyclist, const RideFile *ride, QFile 
     // athlete details
     QDomElement athlete = doc.createElement("athlete");
     QDomElement name = doc.createElement("name");
-    text = doc.createTextNode(cyclist); name.appendChild(text);
+    text = doc.createTextNode(main->cyclist); name.appendChild(text);
     athlete.appendChild(name);
-    double cyclistweight = ride->getTag("Weight", appsettings->cvalue(cyclist, GC_WEIGHT, 0.0).toString()).toDouble();
+    double cyclistweight = ride->getTag("Weight", appsettings->cvalue(main->cyclist, GC_WEIGHT, 0.0).toString()).toDouble();
     if (cyclistweight) {
         QDomElement weight = doc.createElement("weight");
         text = doc.createTextNode(QString("%1").arg(cyclistweight));

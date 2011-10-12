@@ -31,6 +31,7 @@
 
 struct WkoFileReader : public RideFileReader {
     virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 
+    bool hasWrite() const { return false; }
 };
 
 typedef std::auto_ptr<QDataStream> QDataStreamPtr;

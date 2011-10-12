@@ -24,6 +24,7 @@
 
 struct ManualFileReader : public RideFileReader {
     virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 
+    bool hasWrite() const { return false; }
 };
 
 #endif // _ManualRideFile_h

@@ -53,7 +53,7 @@ main(main), cyclist(cyclist), ride(ride)
     connect(uploader, SIGNAL(completed(QString)),this, SLOT(completed(QString)));
 
     uploading = true;
-    int size = uploader->upload(cyclist, ride);
+    int size = uploader->upload(main, ride);
 
     statusLabel->setText(QString(tr("Uploading ride (%1 bytes)...")).arg(size));
 

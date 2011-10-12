@@ -28,7 +28,6 @@ TPDownloadDialog::TPDownloadDialog(MainWindow *main) : QDialog(main, Qt::Dialog)
 {
     setWindowTitle(tr("Download from TrainingPeaks.com"));
 
-    cyclist = main->cyclist;
     athleter = new TPAthlete(this);
 
     connect (athleter, SIGNAL(completed(QList<QMap<QString,QString> >)), this, SLOT(completedAthlete(QList<QMap<QString,QString> >)));
@@ -666,7 +665,7 @@ TPDownloadDialog::syncNext()
                 RideFile *ride = RideFileFactory::instance().openRideFile(main, file, errors);
 
                 if (ride) {
-                    uploader->upload( main->cyclist, ride);
+                    uploader->upload(main, ride);
                     delete ride; // clean up!
                     QApplication::processEvents();
                     return true;
@@ -821,7 +820,7 @@ TPDownloadDialog::uploadNext()
             RideFile *ride = RideFileFactory::instance().openRideFile(main, file, errors);
 
             if (ride) {
-                uploader->upload( main->cyclist, ride);
+                uploader->upload(main, ride);
                 delete ride; // clean up!
                 QApplication::processEvents();
                 return true;
@@ -902,7 +901,7 @@ TPDownloadDialog::saveRide(RideFile *ride, QDomDocument &, QStringList &errors)
 
     JsonFileReader reader;
     QFile file(filename);
-    reader.writeRideFile(ride, file);
+    reader.writeRideFile(main, ride, file);
 
     // add to the ride list
     rideFiles<<targetnosuffix;
