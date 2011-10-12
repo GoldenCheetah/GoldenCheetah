@@ -195,47 +195,6 @@ RideFile::distanceIndex(double km) const
     return i - dataPoints_.begin();
 }
 
-void RideFile::writeAsCsv(QFile &file, bool bIsMetric) const
-{
-
-    // Use the column headers that make WKO+ happy.
-    double convertUnit;
-    QTextStream out(&file);
-    if (!bIsMetric)
-    {
-        out << "Minutes,Torq (N-m),MPH,Watts,Miles,Cadence,Hrate,ID,Altitude (feet)\n";
-        convertUnit = MILES_PER_KM;
-    }
-    else {
-        out << "Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID,Altitude (m)\n";
-        convertUnit = 1.0;
-    }
-
-    foreach (const RideFilePoint *point, dataPoints()) {
-        if (point->secs == 0.0)
-            continue;
-        out << point->secs/60.0;
-        out << ",";
-        out << ((point->nm >= 0) ? point->nm : 0.0);
-        out << ",";
-        out << ((point->kph >= 0) ? (point->kph * convertUnit) : 0.0);
-        out << ",";
-        out << ((point->watts >= 0) ? point->watts : 0.0);
-        out << ",";
-        out << point->km * convertUnit;
-        out << ",";
-        out << point->cad;
-        out << ",";
-        out << point->hr;
-        out << ",";
-        out << point->interval;
-        out << ",";
-        out << point->alt;
-        out << "\n";
-    }
-
-    file.close();
-}
 
 RideFileFactory *RideFileFactory::instance_;
 
@@ -261,12 +220,34 @@ QStringList RideFileFactory::suffixes() const
     return readFuncs_.keys();
 }
 
+QStringList RideFileFactory::writeSuffixes() const
+{
+    QStringList returning;
+    QMapIterator<QString,RideFileReader*> i(readFuncs_);
+    while (i.hasNext()) {
+        i.next();
+        if (i.value()->hasWrite()) returning << i.key();
+    }
+    return returning;
+}
+
 QRegExp
 RideFileFactory::rideFileRegExp() const
 {
     QStringList suffixList = RideFileFactory::instance().suffixes();
     QString s("^(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)_(\\d\\d)\\.(%1)$");
     return QRegExp(s.arg(suffixList.join("|")), Qt::CaseInsensitive);
+}
+
+bool
+RideFileFactory::writeRideFile(MainWindow *main, const RideFile *ride, QFile &file, QString format) const
+{
+    // get the ride file writer for this format
+    RideFileReader *reader = readFuncs_.value(format.toLower());
+
+    // write away
+    if (!reader) return false;
+    else return reader->writeRideFile(main, ride, file);
 }
 
 RideFile *RideFileFactory::openRideFile(MainWindow *main, QFile &file,

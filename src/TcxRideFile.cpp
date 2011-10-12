@@ -50,9 +50,8 @@ RideFile *TcxFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 }
 
 bool
-TcxFileReader::writeRideFile(MainWindow *mainWindow, const QString cyclist, const RideFile *ride, QFile &file) const
+TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile &file) const
 {
-    Q_UNUSED(cyclist);
     QDomText text;
     QDomDocument doc;
     QDomProcessingInstruction hdr = doc.createProcessingInstruction("xml","version=\"1.0\"");

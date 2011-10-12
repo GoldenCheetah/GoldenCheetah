@@ -24,7 +24,8 @@
 
 struct KmlFileReader : public RideFileReader {
     virtual RideFile *openRideFile(QFile &, QStringList &, QList<RideFile*>* =0) const { return NULL; } // does not support reading
-    virtual bool writeRideFile(const RideFile *ride, QFile &file) const;
+    bool writeRideFile(MainWindow *, const RideFile *ride, QFile &file) const;
+    bool hasWrite() const { return true; }
 };
 
 #endif // _KmlRideFile_h

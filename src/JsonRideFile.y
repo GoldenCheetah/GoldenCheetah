@@ -226,7 +226,7 @@ string: STRING                          { JsonString = unprotect(JsonRideFiletex
 
 static int jsonFileReaderRegistered =
     RideFileFactory::instance().registerReader(
-        "json", "GoldenCheetah Json  Format", new JsonFileReader());
+        "json", "GoldenCheetah Json Format", new JsonFileReader());
 
 RideFile *
 JsonFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
@@ -264,11 +264,11 @@ JsonFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*
 }
 
 // Writes valid .json (validated at www.jsonlint.com)
-void
-JsonFileReader::writeRideFile(const RideFile *ride, QFile &file) const
+bool
+JsonFileReader::writeRideFile(MainWindow *, const RideFile *ride, QFile &file) const
 {
     // can we open the file for writing?
-    if (!file.open(QIODevice::WriteOnly)) return;
+    if (!file.open(QIODevice::WriteOnly)) return false;
 
     // truncate existing
     file.resize(0);
@@ -408,4 +408,6 @@ JsonFileReader::writeRideFile(const RideFile *ride, QFile &file) const
 
     // close
     file.close();
+
+    return true;
 }

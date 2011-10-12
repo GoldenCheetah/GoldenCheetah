@@ -60,6 +60,9 @@ using kmldom::TimeStampPtr;
 using kmldom::StylePtr;
 using kmldom::StyleMapPtr;
 
+static int kmlFileReaderRegistered =
+    RideFileFactory::instance().registerReader(
+        "kml", "Google Earth KML Format", new KmlFileReader());
 //
 // Utility functions
 //
@@ -174,7 +177,7 @@ static StyleMapPtr CreateStyleMap(const char* id) {
 // Serialise the ride
 //
 bool
-KmlFileReader::writeRideFile(const RideFile * ride, QFile &file) const
+KmlFileReader::writeRideFile(MainWindow *, const RideFile * ride, QFile &file) const
 {
     // Create a new DOM document and setup styles et al
     kmldom::KmlFactory* kml_factory = kmldom::KmlFactory::GetFactory();

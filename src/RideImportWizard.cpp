@@ -304,7 +304,7 @@ RideImportWizard::process()
                      QString fulltarget = QDir::tempPath() + "/" + QFileInfo(thisfile).baseName() + QString("-%1.tcx").arg(counter+1);
                      TcxFileReader reader;
                      QFile target(fulltarget);
-                     reader.writeRideFile(mainWindow, mainWindow->cyclist, extracted, target);
+                     reader.writeRideFile(mainWindow, extracted, target);
                      deleteMe.append(fulltarget);
                      delete extracted;
                      
@@ -810,11 +810,11 @@ RideImportWizard::abortClicked()
                 if (filenames[i].endsWith(".gc")) {
                     GcFileReader reader;
                     QFile target(fulltarget);
-                    reader.writeRideFile(ride, target);
+                    reader.writeRideFile(mainWindow, ride, target);
                 } else {
                     JsonFileReader reader;
                     QFile target(fulltarget);
-                    reader.writeRideFile(ride, target);
+                    reader.writeRideFile(mainWindow, ride, target);
                 }
 
                 // clear

@@ -183,15 +183,9 @@ class MainWindow : public QMainWindow
         void openCyclist();
         void downloadRide();
         void manualRide();
-        void exportPWX();
-        void exportTCX();
-        void exportCSV();
-        void exportGC();
-        void exportJson();
+        void exportRide();
+        void exportBatch();
         void exportMetrics();
-#ifdef GC_HAVE_KML
-        void exportKML();
-#endif
         void manualProcess(QString);
 #ifdef GC_HAVE_SOAP
         void uploadTP();

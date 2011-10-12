@@ -170,8 +170,8 @@ GcFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) 
 #define add_sample_hp(name) \
     if (present->name) \
         sample.setAttribute(#name, QString("%1").arg(point->name, 0, 'g', 11));
-void
-GcFileReader::writeRideFile(const RideFile *ride, QFile &file) const
+bool
+GcFileReader::writeRideFile(MainWindow *,const RideFile *ride, QFile &file) const
 {
     QDomDocument doc("GoldenCheetah");
     QDomElement root = doc.createElement("ride");
@@ -270,9 +270,9 @@ GcFileReader::writeRideFile(const RideFile *ride, QFile &file) const
 
     QByteArray xml = doc.toByteArray(4);
     if (!file.open(QIODevice::WriteOnly))
-        assert(false);
+        return false;
     if (file.write(xml) != xml.size())
-        assert(false);
+        return false;
     file.close();
+    return true;
 }
-

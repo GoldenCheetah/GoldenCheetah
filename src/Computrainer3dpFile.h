@@ -24,6 +24,7 @@
 
 struct Computrainer3dpFileReader : public RideFileReader {
     virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const;
+    virtual bool hasWrite() const { return false; }
 };
 
 #endif // _GC_COMPUTRAINER3DP_H
