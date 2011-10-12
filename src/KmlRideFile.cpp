@@ -62,7 +62,7 @@ using kmldom::StyleMapPtr;
 
 static int kmlFileReaderRegistered =
     RideFileFactory::instance().registerReader(
-        "kml", "Google Earth KML Format", new KmlFileReader());
+        "kml", "Google Earth KML", new KmlFileReader());
 //
 // Utility functions
 //

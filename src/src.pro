@@ -163,6 +163,7 @@ HEADERS += \
         ANTMessages.h \
         ANTlocalController.h \
         ANTplusController.h \
+        BatchExportDialog.h \
         BestIntervalDialog.h \
         BinRideFile.h \
         BingMap.h \
@@ -325,6 +326,7 @@ SOURCES += \
         ANTlocalController.cpp \
         ANTplusController.cpp \
         BasicRideMetrics.cpp \
+        BatchExportDialog.cpp \
         BestIntervalDialog.cpp \
         BikeScore.cpp \
         BinRideFile.cpp \

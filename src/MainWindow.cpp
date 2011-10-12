@@ -52,6 +52,7 @@
 #include "ToolsDialog.h"
 #include "MetricAggregator.h"
 #include "SplitActivityWizard.h"
+#include "BatchExportDialog.h"
 #include "TwitterDialog.h"
 #include "WithingsDownload.h"
 #include "CalendarDownload.h"
@@ -440,8 +441,8 @@ MainWindow::MainWindow(const QDir &home) :
     rideMenu->addAction(tr("&Import from file..."), this, SLOT (importFile()), tr ("Ctrl+I"));
     rideMenu->addAction(tr("&Manual activity entry..."), this, SLOT(manualRide()), tr("Ctrl+M"));
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("&Export ..."), this, SLOT(exportRide()), tr("Ctrl+E"));
-    rideMenu->addAction(tr("&Batch export ..."), this, SLOT(exportBatch()), tr("Ctrl+B"));
+    rideMenu->addAction(tr("&Export..."), this, SLOT(exportRide()), tr("Ctrl+E"));
+    rideMenu->addAction(tr("&Batch export..."), this, SLOT(exportBatch()), tr("Ctrl+B"));
     rideMenu->addAction(tr("Export Metrics as CSV..."), this, SLOT(exportMetrics()), tr(""));
 #ifdef GC_HAVE_SOAP
     rideMenu->addSeparator ();
@@ -1090,7 +1091,8 @@ MainWindow::currentRide()
 void
 MainWindow::exportBatch()
 {
-    // XXX todo
+    BatchExportDialog *d = new BatchExportDialog(this);
+    d->exec();
 }
 
 void
