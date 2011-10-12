@@ -16,9 +16,13 @@ profile
 # ignore Qt moc files
 moc_*
 qrc_application.cpp
+qrc_RideWindow.cpp
 
 # ignore other object files
 *.o
+
+# logfiles
+vlc-log.txt
 
 # ignore lex/yacc generated files
 *_lex.cpp
