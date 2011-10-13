@@ -508,7 +508,19 @@ GcWindow::setNewSize(int w, int h)
     double newWF = (double(oWidth) * oWidthFactor) / double(w);
 
     // don't get too wide
-    if (newWF < 1) return; // too big
+    if (newWF < 1) newWF = 1;
+    if (newWF > 5) newWF = 5;
+    if (newHF < 1) newHF = 1;
+    if (newWF < 1) newWF = 1;
+
+    // SNAP TO GRID BY DEFAULT
+    int wg = double((1.0 / newWF) * 50);
+    newWF = 1.0 / (double(wg)/50);
+    int hg = double((1.0 / newHF) * 50);
+    newHF = 1.0 / (double(hg) / 50);
+    h = (oHeight * oHeightFactor) / newHF;
+    w = (oWidth * oWidthFactor) / newWF;
+    // END OF SNAP TO GRID BY DEFAULT
 
     // now apply
     setFixedSize(QSize(w,h));
