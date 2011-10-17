@@ -358,6 +358,7 @@ MainWindow::MainWindow(const QDir &home) :
     // ANALYSIS WINDOW & CONTRAOLS
     analWindow = new HomeWindow(this, "analysis", "Analysis");
     analysisControls->addWidget(analWindow->controls());
+    currentWindow = analWindow;
 
     // POPULATE TOOLBOX
     toolBox->addItem(listView, QIcon(":images/activity.png"), "Activity History");
@@ -475,7 +476,6 @@ MainWindow::MainWindow(const QDir &home) :
     optionsMenu->addAction(tr("&Options..."), this, SLOT(showOptions()), tr("Ctrl+O"));
     optionsMenu->addAction(tr("Critical Power Calculator..."), this, SLOT(showTools()));
     optionsMenu->addAction(tr("Workout Wizard"), this, SLOT(showWorkoutWizard()));
-    optionsMenu->addAction(tr("Reset Window Layout"), this, SLOT(resetWindowLayout()));
 
 #ifdef GC_HAVE_ICAL
     optionsMenu->addSeparator();
@@ -527,6 +527,8 @@ MainWindow::MainWindow(const QDir &home) :
 #ifdef GC_HAVE_ICAL
     viewMenu->addAction(tr("Diary"), this, SLOT(selectDiary()));
 #endif
+    viewMenu->addSeparator();
+    viewMenu->addAction(tr("Reset Layout"), this, SLOT(resetWindowLayout()));
 
     windowMenu = menuBar()->addMenu(tr("&Window"));
     connect(windowMenu, SIGNAL(aboutToShow()), this, SLOT(setWindowMenu()));
