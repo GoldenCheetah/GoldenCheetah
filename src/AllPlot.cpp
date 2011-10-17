@@ -231,6 +231,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     setXTitle();
 
     wattsCurve = new QwtPlotCurve(tr("Power"));
+    wattsCurve->setYAxis(yLeft);
 
     hrCurve = new QwtPlotCurve(tr("Heart Rate"));
     hrCurve->setYAxis(yLeft2);
@@ -560,17 +561,33 @@ AllPlot::recalc()
     int startingIndex = qMin(smooth, xaxis.count());
     int totalPoints = xaxis.count() - startingIndex;
 
-    // set curves
-    if (!wattsArray.empty())
+    // set curves - we set the intervalHighlighter to whichver is available
+    if (!wattsArray.empty()) {
+
         wattsCurve->setData(xaxis.data() + startingIndex, smoothWatts.data() + startingIndex, totalPoints);
-    if (!hrArray.empty())
+        intervalHighlighterCurve->setYAxis(yLeft);
+
+    } if (!hrArray.empty()) {
+
         hrCurve->setData(xaxis.data() + startingIndex, smoothHr.data() + startingIndex, totalPoints);
-    if (!speedArray.empty())
+        intervalHighlighterCurve->setYAxis(yLeft2);
+
+    } if (!speedArray.empty()) {
+
         speedCurve->setData(xaxis.data() + startingIndex, smoothSpeed.data() + startingIndex, totalPoints);
-    if (!cadArray.empty())
+        intervalHighlighterCurve->setYAxis(yRight);
+
+    } if (!cadArray.empty()) {
+
         cadCurve->setData(xaxis.data() + startingIndex, smoothCad.data() + startingIndex, totalPoints);
-    if (!altArray.empty())
+        intervalHighlighterCurve->setYAxis(yLeft2);
+
+    } if (!altArray.empty()) {
+
         altCurve->setData(xaxis.data() + startingIndex, smoothAltitude.data() + startingIndex, totalPoints);
+        intervalHighlighterCurve->setYAxis(yRight2);
+
+    }
 
     setYMax();
     refreshIntervalMarkers();
@@ -776,11 +793,26 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
 
     setAxisScale(xBottom, xaxis[0], xaxis[stopidx-startidx-1]);
 
-    if (!plot->smoothAltitude.empty()) altCurve->attach(this);
-    if (!plot->smoothWatts.empty()) wattsCurve->attach(this);
-    if (!plot->smoothHr.empty()) hrCurve->attach(this);
-    if (!plot->smoothSpeed.empty()) speedCurve->attach(this);
-    if (!plot->smoothCad.empty()) cadCurve->attach(this);
+    if (!plot->smoothAltitude.empty()) {
+        altCurve->attach(this);
+        intervalHighlighterCurve->setYAxis(yRight2);
+    }
+    if (!plot->smoothWatts.empty()) {
+        wattsCurve->attach(this);
+        intervalHighlighterCurve->setYAxis(yLeft);
+    }
+    if (!plot->smoothHr.empty()) {
+        hrCurve->attach(this);
+        intervalHighlighterCurve->setYAxis(yLeft2);
+    }
+    if (!plot->smoothSpeed.empty()) {
+        speedCurve->attach(this);
+        intervalHighlighterCurve->setYAxis(yRight);
+    }
+    if (!plot->smoothCad.empty()) {
+        cadCurve->attach(this);
+        intervalHighlighterCurve->setYAxis(yLeft2);
+    }
 
     refreshIntervalMarkers();
     refreshZoneLabels();
