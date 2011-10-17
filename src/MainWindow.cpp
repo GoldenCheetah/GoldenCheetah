@@ -475,6 +475,7 @@ MainWindow::MainWindow(const QDir &home) :
     optionsMenu->addAction(tr("&Options..."), this, SLOT(showOptions()), tr("Ctrl+O"));
     optionsMenu->addAction(tr("Critical Power Calculator..."), this, SLOT(showTools()));
     optionsMenu->addAction(tr("Workout Wizard"), this, SLOT(showWorkoutWizard()));
+    optionsMenu->addAction(tr("Reset Window Layout"), this, SLOT(resetWindowLayout()));
 
 #ifdef GC_HAVE_ICAL
     optionsMenu->addSeparator();
@@ -816,6 +817,11 @@ void MainWindow::showWorkoutWizard()
    ww->show();
 }
 
+void MainWindow::resetWindowLayout()
+{
+    currentWindow->resetLayout();
+}
+
 void MainWindow::dateChanged(const QDate &date)
 {
     for (int i = 0; i < allRides->childCount(); i++)
@@ -877,6 +883,7 @@ MainWindow::selectAnalysis()
     masterControls->setCurrentIndex(0);
     views->setCurrentIndex(0);
     analWindow->selected(); // tell it!
+    currentWindow = analWindow;
 }
 
 void
@@ -885,6 +892,7 @@ MainWindow::selectTrain()
     masterControls->setCurrentIndex(1);
     views->setCurrentIndex(1);
     trainWindow->selected(); // tell it!
+    currentWindow = trainWindow;
 }
 
 void
@@ -893,6 +901,7 @@ MainWindow::selectDiary()
     masterControls->setCurrentIndex(2);
     views->setCurrentIndex(2);
     diaryWindow->selected(); // tell it!
+    currentWindow = diaryWindow;
 }
 
 void
@@ -901,6 +910,7 @@ MainWindow::selectHome()
     masterControls->setCurrentIndex(3);
     views->setCurrentIndex(3);
     homeWindow->selected(); // tell it!
+    currentWindow = homeWindow;
 }
 void
 MainWindow::selectAthlete()

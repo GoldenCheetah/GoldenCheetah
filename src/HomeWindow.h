@@ -45,6 +45,8 @@ class HomeWindow : public GcWindow
         //int view() const { return viewMode->currentIndex(); }
         //void setView(int x) { viewMode->setCurrentIndex(x); }
 
+        void resetLayout();
+
     public slots:
 
         // GC signals
@@ -63,12 +65,12 @@ class HomeWindow : public GcWindow
         // My widget signals and events
         void styleChanged(int);
         void addChart(GcWindow* newone);
-        bool removeChart(int);
+        bool removeChart(int, bool confirm = true);
         void titleChanged();
 
         // save / restore window state
         void saveState();
-        void restoreState();
+        void restoreState(bool useDefault = false);
 
         //notifiction that been made visible
         void selected();

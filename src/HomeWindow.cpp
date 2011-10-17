@@ -575,22 +575,24 @@ HomeWindow::addChart(GcWindow* newone)
 }
 
 bool
-HomeWindow::removeChart(int num)
+HomeWindow::removeChart(int num, bool confirm)
 {
     if (num >= charts.count()) return false; // out of bounds (!)
 
     // better let the user confirm since this
     // is undoable etc - code swiped from delete
     // ride in MainWindow, seems to work ok ;)
-    QMessageBox msgBox;
-    msgBox.setText(tr("Are you sure you want to remove the chart?"));
-    QPushButton *deleteButton = msgBox.addButton(tr("Remove"),QMessageBox::YesRole);
-    msgBox.setStandardButtons(QMessageBox::Cancel);
-    msgBox.setDefaultButton(QMessageBox::Cancel);
-    msgBox.setIcon(QMessageBox::Critical);
-    msgBox.exec();
-    if(msgBox.clickedButton() != deleteButton) return false;
-
+    if(confirm == true)
+    {
+        QMessageBox msgBox;
+        msgBox.setText(tr("Are you sure you want to remove the chart?"));
+        QPushButton *deleteButton = msgBox.addButton(tr("Remove"),QMessageBox::YesRole);
+        msgBox.setStandardButtons(QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Cancel);
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
+        if(msgBox.clickedButton() != deleteButton) return false;
+    }
     charts[num]->hide();
 
     // just in case its currently selected
@@ -625,6 +627,24 @@ HomeWindow::removeChart(int num)
     }
 
     return true;
+}
+
+void
+HomeWindow::resetLayout()
+{
+    setUpdatesEnabled(false);
+    int numCharts = charts.count();
+    for(int i = numCharts - 1; i >= 0; i--) // need to remove the charts from the end to the front
+    {
+        removeChart(i,false);
+    }
+    restoreState(true);
+    for(int i = 0; i < charts.count(); i++)
+    {
+        charts[i]->show();
+    }
+    setUpdatesEnabled(true);
+    update();
 }
 
 void
@@ -1278,11 +1298,16 @@ HomeWindow::saveState()
 }
 
 void
-HomeWindow::restoreState()
+HomeWindow::restoreState(bool useDefault)
 {
     // restore window state
     QString filename = mainWindow->home.absolutePath() + "/" + name + "-layout.xml";
     QFileInfo finfo(filename);
+
+    if(useDefault)
+    {
+        QFile::remove(filename);
+    }
 
     // use a default if not there
     if (!finfo.exists()) filename = QString(":xml/%1-layout.xml").arg(name);

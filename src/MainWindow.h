@@ -209,6 +209,7 @@ class MainWindow : public QMainWindow
         void showSidebar(bool want);
         void showToolbar(bool want);
         void showWorkoutWizard();
+        void resetWindowLayout();
         void dateChanged(const QDate &);
         void showTreeContextMenuPopup(const QPoint &);
         void showContextMenuPopup(const QPoint &);
@@ -279,6 +280,7 @@ class MainWindow : public QMainWindow
         HomeWindow *diaryWindow;
         HomeWindow *trainWindow;
         HomeWindow *analWindow;
+        HomeWindow *currentWindow;  // tracks the curerntly showing window
 
         // sidebar
         QTreeWidgetItem *allRides;
