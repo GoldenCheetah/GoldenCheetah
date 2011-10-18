@@ -109,7 +109,6 @@ class RideFile : public QObject // QObject to emit signals
 
         // Working with DATAPRESENT flags
         inline const RideFileDataPresent *areDataPresent() const { return &dataPresent; }
-        void resetDataPresent();
         bool isDataPresent(SeriesType series);
 
         // Working with FIRST CLASS variables

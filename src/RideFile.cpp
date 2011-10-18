@@ -324,7 +324,7 @@ RideFile *RideFileFactory::openRideFile(MainWindow *main, QFile &file,
         else flags += '-';
         if (result->areDataPresent()->watts) flags += 'P'; // Power
         else flags += '-';
-        if (result->areDataPresent()->watts) flags += 'H'; // Heartrate
+        if (result->areDataPresent()->hr) flags += 'H'; // Heartrate
         else flags += '-';
         if (result->areDataPresent()->cad) flags += 'C'; // cadence
         else flags += '-';

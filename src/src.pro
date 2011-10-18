@@ -189,6 +189,8 @@ HEADERS += \
         DownloadRideDialog.h \
         ErgFile.h \
         ErgFilePlot.h \
+        FitlogRideFile.h \
+        FitlogParser.h \
         FitRideFile.h \
         GcBubble.h \
         GcPane.h \
@@ -354,6 +356,8 @@ SOURCES += \
         DownloadRideDialog.cpp \
         ErgFile.cpp \
         ErgFilePlot.cpp \
+        FitlogRideFile.cpp \
+        FitlogParser.cpp \
         FitRideFile.cpp \
         FixGaps.cpp \
         FixGPS.cpp \
