@@ -1,0 +1,367 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FitnessWorkbook xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.zonefivesoftware.com/xmlschemas/FitnessLogbook/v2">
+ <AthleteLog>
+  <Athlete Id="aa38f8fd-dc82-4df7-b1ca-8a1ccd48a8cd" Name="Joao Santos" />
+  <Activity StartTime="2009-08-04T05:30:51Z" Id="52db18b7-18c2-4b0b-806e-aa30bfac5cbb">
+   <Metadata Source="" Created="2009-11-14T01:31:22Z" Modified="2009-11-14T01:34:14Z" />
+   <Name>04/08/2009 07:30</Name>
+   <Duration TotalSeconds="3201.05" />
+   <Distance TotalMeters="9336.4" />
+   <Calories TotalCal="671" />
+   <Laps>
+    <Lap StartTime="2009-08-04T05:30:51Z" DurationSeconds="317.195">
+     <Distance TotalMeters="1001" />
+    </Lap>
+    <Lap StartTime="2009-08-04T05:36:08.195Z" DurationSeconds="342.012">
+     <Distance TotalMeters="1000" />
+    </Lap>
+    <Lap StartTime="2009-08-04T05:41:50.207Z" DurationSeconds="350.924">
+     <Distance TotalMeters="1001" />
+    </Lap>
+    <Lap StartTime="2009-08-04T05:47:41.131Z" DurationSeconds="350.158">
+     <Distance TotalMeters="1000" />
+    </Lap>
+    <Lap StartTime="2009-08-04T05:53:31.289Z" DurationSeconds="349.745">
+     <Distance TotalMeters="999" />
+    </Lap>
+    <Lap StartTime="2009-08-04T05:59:21.034Z" DurationSeconds="341.848">
+     <Distance TotalMeters="999" />
+    </Lap>
+    <Lap StartTime="2009-08-04T06:05:02.882Z" DurationSeconds="347.941">
+     <Distance TotalMeters="1001" />
+    </Lap>
+    <Lap StartTime="2009-08-04T06:10:50.823Z" DurationSeconds="353.259">
+     <Distance TotalMeters="1001" />
+    </Lap>
+    <Lap StartTime="2009-08-04T06:16:44.082Z" DurationSeconds="343.704">
+     <Distance TotalMeters="998" />
+    </Lap>
+   </Laps>
+   <Category Id="fa756214-cf71-11db-9705-005056c00008" Name="My Activities" />
+   <Location Name="Düsseldorf" />
+   <Track StartTime="2009-08-04T05:30:51Z">
+    <pt tm="0" dist="2.1" />
+    <pt tm="10" dist="28.4" />
+    <pt tm="20" dist="60.8" />
+    <pt tm="30" dist="93.5" />
+    <pt tm="40" dist="128.9" />
+    <pt tm="50" dist="159.6" />
+    <pt tm="60" dist="193.3" />
+    <pt tm="70" dist="223.8" />
+    <pt tm="80" dist="260.3" />
+    <pt tm="90" dist="290.3" />
+    <pt tm="100" dist="324.6" />
+    <pt tm="110" dist="360" />
+    <pt tm="120" dist="393.9" />
+    <pt tm="130" dist="410.4" />
+    <pt tm="140" dist="456.8" />
+    <pt tm="150" dist="489.6" />
+    <pt tm="160" dist="523.1" />
+    <pt tm="170" dist="553.9" />
+    <pt tm="180" dist="584.9" />
+    <pt tm="190" dist="616.8" />
+    <pt tm="200" dist="648.4" />
+    <pt tm="210" dist="679.6" />
+    <pt tm="220" dist="711" />
+    <pt tm="230" dist="743.4" />
+    <pt tm="240" dist="773.6" />
+    <pt tm="250" dist="801.5" />
+    <pt tm="260" dist="832.4" />
+    <pt tm="270" dist="862.6" />
+    <pt tm="280" dist="885.9" />
+    <pt tm="290" dist="918.6" />
+    <pt tm="300" dist="949.5" />
+    <pt tm="310" dist="976.9" />
+    <pt tm="320" dist="1010.9" />
+    <pt tm="330" dist="1038.9" />
+    <pt tm="340" dist="1069.8" />
+    <pt tm="350" dist="1104.3" />
+    <pt tm="360" dist="1131.9" />
+    <pt tm="370" dist="1162.4" />
+    <pt tm="380" dist="1189.2" />
+    <pt tm="390" dist="1220.8" />
+    <pt tm="400" dist="1250.5" />
+    <pt tm="410" dist="1281.1" />
+    <pt tm="420" dist="1308.5" />
+    <pt tm="430" dist="1338" />
+    <pt tm="440" dist="1371" />
+    <pt tm="450" dist="1397.5" />
+    <pt tm="460" dist="1424.4" />
+    <pt tm="470" dist="1456.4" />
+    <pt tm="480" dist="1483.3" />
+    <pt tm="490" dist="1513.2" />
+    <pt tm="500" dist="1543.3" />
+    <pt tm="510" dist="1573" />
+    <pt tm="520" dist="1603.7" />
+    <pt tm="530" dist="1632.5" />
+    <pt tm="540" dist="1658.4" />
+    <pt tm="550" dist="1690.7" />
+    <pt tm="560" dist="1705" />
+    <pt tm="570" dist="1746" />
+    <pt tm="580" dist="1774.6" />
+    <pt tm="590" dist="1803.5" />
+    <pt tm="600" dist="1830.3" />
+    <pt tm="610" dist="1860.4" />
+    <pt tm="620" dist="1887.4" />
+    <pt tm="630" dist="1917" />
+    <pt tm="640" dist="1946.5" />
+    <pt tm="650" dist="1974.7" />
+    <pt tm="660" dist="2003.9" />
+    <pt tm="670" dist="2032.9" />
+    <pt tm="680" dist="2061.1" />
+    <pt tm="690" dist="2087.3" />
+    <pt tm="700" dist="2117" />
+    <pt tm="710" dist="2146.1" />
+    <pt tm="720" dist="2174.7" />
+    <pt tm="730" dist="2200.9" />
+    <pt tm="740" dist="2232.8" />
+    <pt tm="750" dist="2257.9" />
+    <pt tm="760" dist="2279.2" />
+    <pt tm="770" dist="2308.3" />
+    <pt tm="780" dist="2338.5" />
+    <pt tm="790" dist="2368.7" />
+    <pt tm="800" dist="2394.2" />
+    <pt tm="810" dist="2425.1" />
+    <pt tm="820" dist="2454.9" />
+    <pt tm="830" dist="2484.6" />
+    <pt tm="840" dist="2514.6" />
+    <pt tm="850" dist="2541.3" />
+    <pt tm="860" dist="2570.6" />
+    <pt tm="870" dist="2599.8" />
+    <pt tm="880" dist="2629.4" />
+    <pt tm="890" dist="2659.1" />
+    <pt tm="900" dist="2686.5" />
+    <pt tm="910" dist="2713.5" />
+    <pt tm="920" dist="2745.3" />
+    <pt tm="930" dist="2774.6" />
+    <pt tm="940" dist="2804.1" />
+    <pt tm="950" dist="2830.1" />
+    <pt tm="960" dist="2858.5" />
+    <pt tm="970" dist="2887.5" />
+    <pt tm="980" dist="2917.2" />
+    <pt tm="990" dist="2946.7" />
+    <pt tm="1000" dist="2972.8" />
+    <pt tm="1010" dist="3002.3" />
+    <pt tm="1020" dist="3031.5" />
+    <pt tm="1030" dist="3060.8" />
+    <pt tm="1040" dist="3090.3" />
+    <pt tm="1050" dist="3117.1" />
+    <pt tm="1060" dist="3146.5" />
+    <pt tm="1070" dist="3175.8" />
+    <pt tm="1080" dist="3206.3" />
+    <pt tm="1090" dist="3232.1" />
+    <pt tm="1100" dist="3264.8" />
+    <pt tm="1110" dist="3289.7" />
+    <pt tm="1120" dist="3317.3" />
+    <pt tm="1130" dist="3348.4" />
+    <pt tm="1140" dist="3376.6" />
+    <pt tm="1150" dist="3402.1" />
+    <pt tm="1160" dist="3430.2" />
+    <pt tm="1170" dist="3459.1" />
+    <pt tm="1180" dist="3488.3" />
+    <pt tm="1190" dist="3514.6" />
+    <pt tm="1200" dist="3543.6" />
+    <pt tm="1210" dist="3572.4" />
+    <pt tm="1220" dist="3599.2" />
+    <pt tm="1230" dist="3628.9" />
+    <pt tm="1240" dist="3657.5" />
+    <pt tm="1250" dist="3689.5" />
+    <pt tm="1260" dist="3715.6" />
+    <pt tm="1270" dist="3742" />
+    <pt tm="1280" dist="3775" />
+    <pt tm="1290" dist="3801.3" />
+    <pt tm="1300" dist="3831.3" />
+    <pt tm="1310" dist="3860.8" />
+    <pt tm="1320" dist="3890.7" />
+    <pt tm="1330" dist="3916.5" />
+    <pt tm="1340" dist="3946.1" />
+    <pt tm="1350" dist="3977" />
+    <pt tm="1360" dist="4004.7" />
+    <pt tm="1370" dist="4029.9" />
+    <pt tm="1380" dist="4057.6" />
+    <pt tm="1390" dist="4080.9" />
+    <pt tm="1400" dist="4112.2" />
+    <pt tm="1410" dist="4139.2" />
+    <pt tm="1420" dist="4167.3" />
+    <pt tm="1430" dist="4196.4" />
+    <pt tm="1440" dist="4220.4" />
+    <pt tm="1450" dist="4249.8" />
+    <pt tm="1460" dist="4278.6" />
+    <pt tm="1470" dist="4304.8" />
+    <pt tm="1480" dist="4336.5" />
+    <pt tm="1490" dist="4366.3" />
+    <pt tm="1500" dist="4395.8" />
+    <pt tm="1510" dist="4422.3" />
+    <pt tm="1520" dist="4450.7" />
+    <pt tm="1530" dist="4479.7" />
+    <pt tm="1540" dist="4504" />
+    <pt tm="1550" dist="4535.6" />
+    <pt tm="1560" dist="4564.8" />
+    <pt tm="1570" dist="4593.9" />
+    <pt tm="1580" dist="4623.6" />
+    <pt tm="1590" dist="4650.1" />
+    <pt tm="1600" dist="4679.9" />
+    <pt tm="1610" dist="4709.4" />
+    <pt tm="1620" dist="4739" />
+    <pt tm="1630" dist="4765.9" />
+    <pt tm="1640" dist="4795" />
+    <pt tm="1650" dist="4824.1" />
+    <pt tm="1660" dist="4853.8" />
+    <pt tm="1670" dist="4885" />
+    <pt tm="1680" dist="4910.5" />
+    <pt tm="1690" dist="4940.2" />
+    <pt tm="1700" dist="4970.9" />
+    <pt tm="1710" dist="5001.1" />
+    <pt tm="1720" dist="5032" />
+    <pt tm="1730" dist="5059.8" />
+    <pt tm="1740" dist="5088.6" />
+    <pt tm="1750" dist="5119.9" />
+    <pt tm="1760" dist="5150.8" />
+    <pt tm="1770" dist="5180.6" />
+    <pt tm="1780" dist="5209.8" />
+    <pt tm="1790" dist="5236.2" />
+    <pt tm="1800" dist="5265.3" />
+    <pt tm="1810" dist="5294.1" />
+    <pt tm="1820" dist="5323.2" />
+    <pt tm="1830" dist="5356.8" />
+    <pt tm="1840" dist="5382.1" />
+    <pt tm="1850" dist="5413.3" />
+    <pt tm="1860" dist="5443.6" />
+    <pt tm="1870" dist="5470.6" />
+    <pt tm="1880" dist="5502.9" />
+    <pt tm="1890" dist="5529.3" />
+    <pt tm="1900" dist="5558.8" />
+    <pt tm="1910" dist="5589.2" />
+    <pt tm="1920" dist="5618" />
+    <pt tm="1930" dist="5646.8" />
+    <pt tm="1940" dist="5673.5" />
+    <pt tm="1950" dist="5703.4" />
+    <pt tm="1960" dist="5733" />
+    <pt tm="1970" dist="5762" />
+    <pt tm="1980" dist="5792.3" />
+    <pt tm="1990" dist="5818.5" />
+    <pt tm="2000" dist="5848.5" />
+    <pt tm="2010" dist="5878.6" />
+    <pt tm="2020" dist="5905.6" />
+    <pt tm="2030" dist="5934.7" />
+    <pt tm="2040" dist="5967.1" />
+    <pt tm="2050" dist="5994.8" />
+    <pt tm="2060" dist="6024" />
+    <pt tm="2070" dist="6053.5" />
+    <pt tm="2080" dist="6082.9" />
+    <pt tm="2090" dist="6109.7" />
+    <pt tm="2100" dist="6139.4" />
+    <pt tm="2110" dist="6168.7" />
+    <pt tm="2120" dist="6198.2" />
+    <pt tm="2130" dist="6225.3" />
+    <pt tm="2140" dist="6255.3" />
+    <pt tm="2150" dist="6286.9" />
+    <pt tm="2160" dist="6310.6" />
+    <pt tm="2170" dist="6340" />
+    <pt tm="2180" dist="6373.3" />
+    <pt tm="2190" dist="6403.6" />
+    <pt tm="2200" dist="6430" />
+    <pt tm="2210" dist="6459" />
+    <pt tm="2220" dist="6487.9" />
+    <pt tm="2230" dist="6514.2" />
+    <pt tm="2240" dist="6543" />
+    <pt tm="2250" dist="6575.6" />
+    <pt tm="2260" dist="6605.5" />
+    <pt tm="2270" dist="6631.4" />
+    <pt tm="2280" dist="6661.3" />
+    <pt tm="2290" dist="6690" />
+    <pt tm="2300" dist="6715.7" />
+    <pt tm="2310" dist="6744.9" />
+    <pt tm="2320" dist="6773.7" />
+    <pt tm="2330" dist="6799.9" />
+    <pt tm="2340" dist="6829.4" />
+    <pt tm="2350" dist="6860.4" />
+    <pt tm="2360" dist="6889.9" />
+    <pt tm="2370" dist="6914.9" />
+    <pt tm="2380" dist="6943.6" />
+    <pt tm="2390" dist="6972.4" />
+    <pt tm="2400" dist="7001.1" />
+    <pt tm="2410" dist="7030.2" />
+    <pt tm="2420" dist="7059" />
+    <pt tm="2430" dist="7087.8" />
+    <pt tm="2440" dist="7113.5" />
+    <pt tm="2450" dist="7143" />
+    <pt tm="2460" dist="7172.5" />
+    <pt tm="2470" dist="7198.9" />
+    <pt tm="2480" dist="7230.4" />
+    <pt tm="2490" dist="7256.5" />
+    <pt tm="2500" dist="7285.7" />
+    <pt tm="2510" dist="7315.1" />
+    <pt tm="2520" dist="7346.8" />
+    <pt tm="2530" dist="7375.6" />
+    <pt tm="2540" dist="7402.9" />
+    <pt tm="2550" dist="7432.4" />
+    <pt tm="2560" dist="7461.4" />
+    <pt tm="2570" dist="7489.9" />
+    <pt tm="2580" dist="7518.5" />
+    <pt tm="2590" dist="7545" />
+    <pt tm="2600" dist="7575.7" />
+    <pt tm="2610" dist="7605.8" />
+    <pt tm="2620" dist="7632.4" />
+    <pt tm="2630" dist="7664.1" />
+    <pt tm="2640" dist="7692.1" />
+    <pt tm="2650" dist="7711.8" />
+    <pt tm="2660" dist="7745.9" />
+    <pt tm="2670" dist="7774.7" />
+    <pt tm="2680" dist="7802" />
+    <pt tm="2690" dist="7827.7" />
+    <pt tm="2700" dist="7855.9" />
+    <pt tm="2710" dist="7883.2" />
+    <pt tm="2720" dist="7911.6" />
+    <pt tm="2730" dist="7939.4" />
+    <pt tm="2740" dist="7964.9" />
+    <pt tm="2750" dist="7992.8" />
+    <pt tm="2760" dist="8021.5" />
+    <pt tm="2770" dist="8048.8" />
+    <pt tm="2780" dist="8074.5" />
+    <pt tm="2790" dist="8102.7" />
+    <pt tm="2800" dist="8130.7" />
+    <pt tm="2810" dist="8159.1" />
+    <pt tm="2820" dist="8185.7" />
+    <pt tm="2830" dist="8214.7" />
+    <pt tm="2840" dist="8247.2" />
+    <pt tm="2850" dist="8269.7" />
+    <pt tm="2860" dist="8301.6" />
+    <pt tm="2870" dist="8330.9" />
+    <pt tm="2880" dist="8360.3" />
+    <pt tm="2890" dist="8386.4" />
+    <pt tm="2900" dist="8416" />
+    <pt tm="2910" dist="8445.5" />
+    <pt tm="2920" dist="8475.1" />
+    <pt tm="2930" dist="8501.9" />
+    <pt tm="2940" dist="8529.9" />
+    <pt tm="2950" dist="8559.2" />
+    <pt tm="2960" dist="8588.9" />
+    <pt tm="2970" dist="8617.6" />
+    <pt tm="2980" dist="8643.6" />
+    <pt tm="2990" dist="8669.5" />
+    <pt tm="3000" dist="8702.5" />
+    <pt tm="3010" dist="8732.8" />
+    <pt tm="3020" dist="8765.7" />
+    <pt tm="3030" dist="8796.7" />
+    <pt tm="3040" dist="8826.1" />
+    <pt tm="3050" dist="8857" />
+    <pt tm="3060" dist="8887.9" />
+    <pt tm="3070" dist="8916.5" />
+    <pt tm="3080" dist="8947" />
+    <pt tm="3090" dist="8979" />
+    <pt tm="3100" dist="9009.6" />
+    <pt tm="3110" dist="9040.8" />
+    <pt tm="3120" dist="9071.9" />
+    <pt tm="3130" dist="9100.9" />
+    <pt tm="3140" dist="9133.6" />
+    <pt tm="3150" dist="9167.6" />
+    <pt tm="3160" dist="9200.2" />
+    <pt tm="3170" dist="9230.9" />
+    <pt tm="3180" dist="9259.7" />
+    <pt tm="3190" dist="9292.9" />
+    <pt tm="3200" dist="9325.9" />
+   </Track>
+  </Activity>
+ </AthleteLog>
+</FitnessWorkbook>

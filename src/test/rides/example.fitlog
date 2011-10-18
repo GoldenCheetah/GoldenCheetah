@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FitnessWorkbook xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.zonefivesoftware.com/xmlschemas/FitnessLogbook/v2">
+ <AthleteLog>
+  <Athlete Id="6877bb38-2c43-4d93-ba40-b3db1b040366" Name="Hansi" />
+  <Activity StartTime="2011-02-02T07:30:22Z" Id="e90f970b-4669-4a82-babe-8124d7e328ba">
+   <Metadata Source="" Created="2011-02-02T09:04:25Z" Modified="2011-02-02T09:05:29Z" />
+   <Duration TotalSeconds="1805.6" />
+   <Distance TotalMeters="15400" />
+   <Calories TotalCal="527" />
+   <Notes>GA1 im Oberenbereich, 135-140 W, 90 umin</Notes>
+   <Laps>
+    <Lap StartTime="2011-02-02T07:30:22Z" DurationSeconds="1805.6">
+     <Distance TotalMeters="0" />
+     <HeartRate AverageBPM="122" />
+     <Calories TotalCal="0" />
+    </Lap>
+   </Laps>
+   <Weather Conditions="Clear" Temp="-3" />
+   <Category Id="fcec86c8-69d5-49a1-ae3e-826626255d15" Name="Ergotraining" />
+   <Track StartTime="2011-02-02T07:30:23Z">
+    <pt tm="0" hr="86" />
+    <pt tm="1" hr="86" />
+    <pt tm="13" hr="83" />
+    <pt tm="17" hr="80" />
+    <pt tm="27" hr="83" />
+    <pt tm="31" hr="86" />
+    <pt tm="34" hr="89" />
+    <pt tm="38" hr="94" />
+    <pt tm="50" hr="97" />
+    <pt tm="54" hr="100" />
+    <pt tm="70" hr="103" />
+    <pt tm="97" hr="106" />
+    <pt tm="185" hr="109" />
+    <pt tm="195" hr="112" />
+    <pt tm="220" hr="115" />
+    <pt tm="227" hr="112" />
+    <pt tm="242" hr="109" />
+    <pt tm="246" hr="112" />
+    <pt tm="251" hr="116" />
+    <pt tm="269" hr="119" />
+    <pt tm="289" hr="122" />
+    <pt tm="294" hr="118" />
+    <pt tm="300" hr="115" />
+    <pt tm="325" hr="118" />
+    <pt tm="385" hr="121" />
+    <pt tm="427" hr="124" />
+    <pt tm="485" hr="127" />
+    <pt tm="542" hr="130" />
+    <pt tm="574" hr="127" />
+    <pt tm="608" hr="124" />
+    <pt tm="633" hr="127" />
+    <pt tm="653" hr="130" />
+    <pt tm="667" hr="133" />
+    <pt tm="673" hr="130" />
+    <pt tm="689" hr="126" />
+    <pt tm="733" hr="129" />
+    <pt tm="798" hr="126" />
+    <pt tm="818" hr="129" />
+    <pt tm="838" hr="126" />
+    <pt tm="864" hr="129" />
+    <pt tm="870" hr="126" />
+    <pt tm="909" hr="130" />
+    <pt tm="925" hr="127" />
+    <pt tm="1011" hr="130" />
+    <pt tm="1047" hr="127" />
+    <pt tm="1072" hr="130" />
+    <pt tm="1080" hr="127" />
+    <pt tm="1135" hr="130" />
+    <pt tm="1149" hr="127" />
+    <pt tm="1156" hr="124" />
+    <pt tm="1184" hr="127" />
+    <pt tm="1189" hr="124" />
+    <pt tm="1297" hr="127" />
+    <pt tm="1361" hr="124" />
+    <pt tm="1450" hr="128" />
+    <pt tm="1474" hr="125" />
+    <pt tm="1497" hr="128" />
+    <pt tm="1523" hr="125" />
+    <pt tm="1547" hr="128" />
+    <pt tm="1552" hr="125" />
+    <pt tm="1566" hr="128" />
+    <pt tm="1626" hr="125" />
+    <pt tm="1685" hr="128" />
+    <pt tm="1692" hr="131" />
+    <pt tm="1700" hr="128" />
+    <pt tm="1714" hr="125" />
+    <pt tm="1745" hr="122" />
+    <pt tm="1778" hr="119" />
+    <pt tm="1801" hr="116" />
+   </Track>
+  </Activity>
+ </AthleteLog>
+</FitnessWorkbook>
