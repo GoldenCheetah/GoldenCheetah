@@ -24,19 +24,26 @@
 
 #define tr(s) QObject::tr(s)
 
-static const QString defaultconfig = QString("Duration|Distance|TSS|IF|Date");
+// default column layouts etc
+static const QString defaultColumns = QString("Duration|Distance|TSS|IF|Date");
+static const QString defaultWidths = QString("50|50|50|50|50");
+static const int defaultSortBy = 2;
 
-RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), groupBy(-1)
+RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), _groupBy(-1)
 {
     // get column headings
-    QList<QString> defaultColumns = appsettings->cvalue(main->cyclist, GC_NAVHEADINGS, defaultconfig)
-                                    .toString().split("|", QString::SkipEmptyParts);
+    _columns = defaultColumns;
+    _widths = defaultWidths;
+    _sortByIndex = defaultSortBy;
+    _sortByOrder = 0;
+    currentColumn = -1;
+    _groupBy = -1;
 
-    if (defaultColumns.count() < 2) defaultColumns = defaultconfig.split("|", QString::SkipEmptyParts);
+    init = false;
 
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(0,0,0,0);
+    mainLayout->setContentsMargins(3,3,3,3);
 
     sqlModel = new QSqlTableModel(this, main->metricDB->db()->connection());
     sqlModel->setTable("metrics");
@@ -53,6 +60,7 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
     sortModel->setDynamicSortFilter(true);
     //sortModel->setSort(2, Qt::AscendingOrder); // date backwards
 
+    // get setup
     tableView = new QTreeView;
     delegate = new NavigatorCellDelegate(this);
     tableView->setItemDelegate(delegate);
@@ -67,7 +75,7 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
     tableView->header()->setCascadingSectionResizes(true); // easier to resize this way
     tableView->setContextMenuPolicy(Qt::CustomContextMenu);
     tableView->header()->setStretchLastSection(false);
-    tableView->header()->setMinimumSectionSize(20);
+    tableView->header()->setMinimumSectionSize(0);
     //tableView->setUniformRowHeights(true);
     QFont smaller;
     smaller.setPointSize(smaller.pointSize()-2);
@@ -84,76 +92,9 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
                                         "color: #535353;"
                                         "font-weight: bold; }");
 #endif
+    // good to go
     tableView->show();
-
-    // this maps friendly names to metric names
-    QMap <QString, QString> nameMap;
-
-    // add the standard columns to the map
-    nameMap.insert("filename", "File");
-    nameMap.insert("timestamp", "Last updated");
-    nameMap.insert("ride_date", "Date");
-    nameMap.insert("fingerprint", "Config Checksum");
-
-    // add metrics to the map
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-    for (int i=0; i<factory.metricCount(); i++) {
-        QString converted = QTextEdit(factory.rideMetric(factory.metricName(i))->name()).toPlainText();
-
-        // from sql column name to friendly metric name
-        nameMap.insert(QString("X%1").arg(factory.metricName(i)), converted);
-
-        // from friendly metric name to metric pointer
-        columnMetrics.insert(converted, factory.rideMetric(factory.metricName(i)));
-    }
-
-    // add metadata fields...
-    SpecialFields sp; // all the special fields are in here...
-    foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
-        if (!sp.isMetric(field.name) && field.type < 5) {
-            nameMap.insert(QString("Z%1").arg(sp.makeTechName(field.name)), field.name);
-        }
-    }
-
-    // rename and hide columns in the view to be more user friendly
-    // and maintain a list of all the column headings so we can
-    // reference the section for a given column and unhide later
-    // if the user specifically wants to see it
-    for (int i=0; i<tableView->header()->count(); i++) {
-        QString friendly, techname = sortModel->headerData(i, Qt::Horizontal).toString();
-        if ((friendly = nameMap.value(techname, "unknown")) != "unknown") {
-            sortModel->setHeaderData(i, Qt::Horizontal, friendly);
-            logicalHeadings << friendly;
-        } else
-            logicalHeadings << techname;
-
-        if (i && !defaultColumns.contains(friendly)) {
-            tableView->setColumnHidden(i, true);
-        }
-    }
-
-    // now re-order the columns according to the
-    // prevailing preferences. They are listed in
-    // the order we want them, column zero is the
-    // group by column, so we leave that alone
-    for(int i=1; i<defaultColumns.count(); i++) {
-        tableView->header()->moveSection(tableView->header()->visualIndex(logicalHeadings.indexOf(defaultColumns[i])), i);
-    }
-
-    // initialise to whatever groupBy we want to start with
-    tableView->sortByColumn(appsettings->cvalue(main->cyclist, GC_SORTBY, "2").toInt(),
-                              static_cast<Qt::SortOrder>(appsettings->value(this, GC_SORTBYORDER, static_cast<int>(Qt::AscendingOrder)).toInt()));
-    //tableView->setColumnHidden(0, true);
-    tableView->setColumnWidth(0,0);
-
-    // set the column widths
-    int columnnumber=0;
-    foreach(QString size, appsettings->cvalue(main->cyclist, GC_NAVHEADINGWIDTHS, "50|50|50|50|50").toString().split("|", QString::SkipEmptyParts))
-        tableView->setColumnWidth(columnnumber++,size.toInt());
-
-    groupBy = -1;
-    currentColumn = appsettings->cvalue(main->cyclist, GC_NAVGROUPBY, "-1").toInt();
-    setGroupBy();
+    resetView();
 
     // refresh when database is updated
     connect(main->metricDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
@@ -163,22 +104,22 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
     // refresh when rides added/removed
     connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
     connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
+    connect(main->rideTreeWidget(), SIGNAL(itemSelectionChanged()), this, SLOT(rideTreeSelectionChanged()));
     // selection of a ride by double clicking it, we need to update the ride list
     connect(tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(selectRide(QModelIndex)));
     connect(tableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(cursorRide()));
     // user selected a ride on the ride list, we should reflect that too..
-    connect(main->rideTreeWidget(), SIGNAL(itemSelectionChanged()), this, SLOT(rideTreeSelectionChanged()));
     // user moved columns
     connect(tableView->header(), SIGNAL(sectionMoved(int,int,int)), this, SLOT(columnsChanged()));
     connect(tableView->header(), SIGNAL(sectionResized(int,int,int)), this, SLOT(columnsChanged()));
     // user sorted by column
     connect(tableView->header(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(selectRow()));
     // context menu is provided by mainWindow
-    connect(tableView,SIGNAL(customContextMenuRequested(const QPoint &)), main, SLOT(showTreeContextMenuPopup(const QPoint &)));
+    connect(tableView,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showTreeContextMenuPopup(const QPoint &)));
     connect(tableView->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)), this, SLOT(setSortBy(int,Qt::SortOrder)));
+
     // we accept drag and drop operations
     setAcceptDrops(true);
-
 }
 
 RideNavigator::~RideNavigator()
@@ -206,12 +147,106 @@ RideNavigator::resizeEvent(QResizeEvent*)
 }
 
 void
-RideNavigator::setWidth(int x)
+RideNavigator::resetView()
 {
     active = true;
 
+    QList<QString> cols = _columns.split("|", QString::SkipEmptyParts);
+
+    nameMap.clear();
+    columnMetrics.clear();
+
+    // add the standard columns to the map
+    nameMap.insert("filename", "File");
+    nameMap.insert("timestamp", "Last updated");
+    nameMap.insert("ride_date", "Date");
+    nameMap.insert("fingerprint", "Config Checksum");
+
+    // add metrics to the map
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    for (int i=0; i<factory.metricCount(); i++) {
+        QString converted = QTextEdit(factory.rideMetric(factory.metricName(i))->name()).toPlainText();
+
+        // from sql column name to friendly metric name
+        nameMap.insert(QString("X%1").arg(factory.metricName(i)), converted);
+
+        // from friendly metric name to metric pointer
+        columnMetrics.insert(converted, factory.rideMetric(factory.metricName(i)));
+    }
+
+    // add metadata fields...
+    SpecialFields sp; // all the special fields are in here...
+    foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
+        if (!sp.isMetric(field.name) && field.type < 5) {
+            nameMap.insert(QString("Z%1").arg(sp.makeTechName(field.name)), field.name);
+        }
+    }
+
+    logicalHeadings.clear();
+    tableView->reset();
+
+    // setup the logical heading list
+    for (int i=0; i<tableView->header()->count(); i++) {
+        QString friendly, techname = sortModel->headerData(i, Qt::Horizontal).toString();
+        if ((friendly = nameMap.value(techname, "unknown")) != "unknown") {
+            sortModel->setHeaderData(i, Qt::Horizontal, friendly);
+            logicalHeadings << friendly;
+        } else
+            logicalHeadings << techname;
+    }
+
+    // hide and show selected columns
+    for (int i=0; i<tableView->header()->count(); i++) {
+        QString techname = sortModel->headerData(i, Qt::Horizontal).toString();
+        QString friendly = nameMap.value(techname, techname);
+        if (i && !cols.contains(friendly)) {
+            tableView->setColumnHidden(i, true);
+            tableView->setColumnWidth(i, 0);
+        } else if (i) {
+            tableView->setColumnHidden(i, false);
+        }
+    }
+
+    // now re-order the columns according to the
+    // prevailing preferences. They are listed in
+    // the order we want them, column zero is the
+    // group by column, so we leave that alone
+    for(int i=1; i<cols.count(); i++) {
+        tableView->header()->moveSection(tableView->header()->visualIndex(logicalHeadings.indexOf(cols[i])), i);
+    }
+
+    // initialise to whatever groupBy we want to start with
+    tableView->sortByColumn(sortByIndex(), static_cast<Qt::SortOrder>(sortByOrder()));;
+
+    //tableView->setColumnHidden(0, true);
+    tableView->setColumnWidth(0,0);
+
+    // set the column widths
+    int columnnumber=0;
+    foreach(QString size, _widths.split("|", QString::SkipEmptyParts)) {
+        int index = tableView->header()->logicalIndex(columnnumber);
+        tableView->setColumnHidden(index, false);
+        tableView->setColumnWidth(index, columnnumber ? size.toInt() : 0);
+        columnnumber++;
+    }
+
+    setGroupByColumn();
+
+    active = false;
+
+    resizeEvent(NULL);
+}
+
+void
+RideNavigator::setWidth(int x)
+{
+    if (init == false) return;
+
+    active = true;
+
     if (tableView->verticalScrollBar()->isVisible())
-        x -= tableView->verticalScrollBar()->width();
+        x -= tableView->verticalScrollBar()->width()
+             + 6 ; // !! account for content margins of 3,3,3,3
 
     // ** NOTE **
     // When iterating over the section headings we
@@ -274,7 +309,6 @@ RideNavigator::setWidth(int x)
     }
 
     //tableView->setColumnWidth(last, newwidth + (x-setwidth)); // account for rounding errors
-
     if (setwidth < x)
         delegate->setWidth(pwidth=setwidth);
     else
@@ -282,34 +316,15 @@ RideNavigator::setWidth(int x)
 
     active = false;
 }
-#if 0
-// make sure the columns are all neat and tidy when the ride navigator is shown
-bool
-RideNavigator::event(QEvent *e)
-{
-    if (e->type() == QEvent::WindowActivate) {
-        active=false;
-        setWidth(geometry().width()); // calculate width...
-    }
 
-    if (e->type() == QEvent::ToolTip || e->type() == QEvent::ToolTipChange) {
-        QModelIndex index = tableView->indexAt(dynamic_cast<QHelpEvent*>(e)->pos());
-        if (index.isValid()) {
-            QString hoverFileName = tableView->model()->data(index, Qt::UserRole+1).toString();
-            e->accept();
-            // XXX todo custom tooltip balloon here.
-            //     remember to make it hide when mouse moves again.
-            //     or another tooltip event occurs
-            // qDebug()<<"ride navigator tooltip"<<hoverFileName;
-            main->setBubble(hoverFileName, dynamic_cast<QHelpEvent*>(e)->globalPos());
-        }
-    } else if (e->object() == this) {
-qDebug()<<"hide bubble on event"<<e->type();
-            main->setBubble("");
-    }
-    return QWidget::event(e);
+// make sure the columns are all neat and tidy when the ride navigator is shown
+void
+RideNavigator::showEvent(QShowEvent *)
+{
+    resetView();
+    init = true;
+    setWidth(geometry().width());
 }
-#endif
 
 void
 RideNavigator::columnsChanged()
@@ -331,17 +346,18 @@ RideNavigator::columnsChanged()
     foreach(QString name, visualHeadings)
         headings += name + "|";
 
-    appsettings->setCValue(main->cyclist, GC_NAVHEADINGS, headings);
+    _columns = headings;
 
     // get column widths
     QString widths;
     for (int i=0; i<tableView->header()->count(); i++)
+        if (tableView->header()->isSectionHidden(i) != true)
         widths += QString("%1|").arg(tableView->columnWidth(i));
 
     // clean up
     active = false;
     setWidth(geometry().width()); // calculate width...
-    appsettings->setCValue(main->cyclist, GC_NAVHEADINGWIDTHS, widths);
+    _widths = widths;
 }
 
 bool
@@ -415,6 +431,12 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
 
         case QEvent::WindowActivate:
         {
+            active=true;
+            // set the column widths
+            int columnnumber=0;
+            foreach(QString size, _widths.split("|", QString::SkipEmptyParts)) {
+                tableView->setColumnWidth(columnnumber, size.toInt());
+            }
             active=false;
             setWidth(geometry().width()); // calculate width...
         }
@@ -481,10 +503,10 @@ RideNavigator::borderMenu(const QPoint &pos)
     menu.addAction(insCol);
     connect(insCol, SIGNAL(triggered()), this, SLOT(showColumnChooser()));
 
-    QAction *toggleGroupBy = new QAction(groupBy >= 0 ? tr("Do Not Show in Groups") : tr("Show In Groups"), tableView);
+    QAction *toggleGroupBy = new QAction(_groupBy >= 0 ? tr("Do Not Show in Groups") : tr("Show In Groups"), tableView);
     toggleGroupBy->setEnabled(true);
     menu.addAction(toggleGroupBy);
-    connect(toggleGroupBy, SIGNAL(triggered()), this, SLOT(setGroupBy()));
+    connect(toggleGroupBy, SIGNAL(triggered()), this, SLOT(setGroupByColumn()));
 
     // set current column...
     currentColumn = column;
@@ -492,13 +514,13 @@ RideNavigator::borderMenu(const QPoint &pos)
 }
 
 void
-RideNavigator::setGroupBy()
+RideNavigator::setGroupByColumn()
 {
     // toggle
-    groupBy = groupBy >= 0 ? -1 : currentColumn;
+    setGroupBy(_groupBy >= 0 ? -1 : currentColumn);
 
     // set proxy model
-    groupByModel->setGroupBy(groupBy);
+    groupByModel->setGroupBy(_groupBy);
 
     // lets expand column 0 for the groupBy heading
     for (int i=0; i < groupByModel->groupCount(); i++) {
@@ -508,9 +530,6 @@ RideNavigator::setGroupBy()
     // now show em
     tableView->expandAll();
 
-    // save away
-    appsettings->setCValue(main->cyclist, GC_NAVGROUPBY, groupBy);
-
     // reselect current ride - since selectionmodel
     // is changed by setGroupBy()
     rideTreeSelectionChanged();
@@ -519,8 +538,8 @@ RideNavigator::setGroupBy()
 void
 RideNavigator::setSortBy(int index, Qt::SortOrder order)
 {
-    appsettings->setCValue(main->cyclist, GC_SORTBY, index);
-    appsettings->setCValue(main->cyclist, GC_SORTBYORDER, order);
+    _sortByIndex = index;
+    _sortByOrder = static_cast<int>(order);
 }
 
 //
@@ -1008,4 +1027,10 @@ ColumnChooser::buttonClicked(QString name)
     QDrag *drag = new QDrag(this);
     drag->setMimeData(mimeData);
     drag->exec(Qt::MoveAction);
+}
+
+void
+RideNavigator::showTreeContextMenuPopup(const QPoint &pos)
+{
+   main->showTreeContextMenuPopup(mapToGlobal(pos));
 }

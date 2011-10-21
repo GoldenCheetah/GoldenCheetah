@@ -1,11 +1,24 @@
-<layout name="diary" style="2">
+<layout name="diary" style="0">
+	<chart id="30" name="" title="Activity Log" >
+		<property name="instanceName" type="QString" value="" />
+		<property name="title" type="QString" value="Activity Log" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="1.92308" />
+		<property name="heightFactor" type="double" value="1" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="sortByIndex" type="int" value="4" />
+		<property name="sortByOrder" type="int" value="1" />
+		<property name="groupBy" type="int" value="91" />
+		<property name="columns" type="QString" value="*|Date|Sport|Duration|Distance|NP|TSS|VI|Data|" />
+		<property name="widths" type="QString" value="0|67|67|60|37|31|28|60|85|" />
+	</chart>
 	<chart id="4" name="Diary Window" title="Calendar" >
 		<property name="instanceName" type="QString" value="Diary Window" />
 		<property name="title" type="QString" value="Calendar" />
 		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="1.00033" />
-		<property name="heightFactor" type="double" value="1.0004" />
-		<property name="resizable" type="bool" value="1" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="1" />
+		<property name="resizable" type="bool" value="0" />
 		<property name="view" type="int" value="0" />
 	</chart>
 </layout>

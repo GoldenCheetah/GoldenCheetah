@@ -175,6 +175,9 @@ class MainWindow : public QMainWindow
         void ergFileSelected(ErgFile *);
         void setNow(long);
 
+    public slots:
+        void showTreeContextMenuPopup(const QPoint &);
+
     private slots:
         void rideTreeWidgetSelectionChanged();
         void intervalTreeWidgetSelectionChanged();
@@ -211,7 +214,6 @@ class MainWindow : public QMainWindow
         void showWorkoutWizard();
         void resetWindowLayout();
         void dateChanged(const QDate &);
-        void showTreeContextMenuPopup(const QPoint &);
         void showContextMenuPopup(const QPoint &);
         void deleteInterval();
         void renameInterval();
