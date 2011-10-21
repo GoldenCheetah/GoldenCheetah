@@ -25,8 +25,8 @@
 #define tr(s) QObject::tr(s)
 
 // default column layouts etc
-static const QString defaultColumns = QString("Duration|Distance|TSS|IF|Date");
-static const QString defaultWidths = QString("50|50|50|50|50");
+static const QString defaultColumns = QString("*|Duration|Distance|TSS|IF|Date|");
+static const QString defaultWidths = QString("0|50|50|50|50|50|");
 static const int defaultSortBy = 2;
 
 RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), _groupBy(-1)
@@ -184,6 +184,7 @@ RideNavigator::resetView()
 
     logicalHeadings.clear();
     tableView->reset();
+    tableView->header()->reset();
 
     // setup the logical heading list
     for (int i=0; i<tableView->header()->count(); i++) {
@@ -195,16 +196,11 @@ RideNavigator::resetView()
             logicalHeadings << techname;
     }
 
-    // hide and show selected columns
+    // hide everything, we show what we want later
     for (int i=0; i<tableView->header()->count(); i++) {
-        QString techname = sortModel->headerData(i, Qt::Horizontal).toString();
-        QString friendly = nameMap.value(techname, techname);
-        if (i && !cols.contains(friendly)) {
-            tableView->setColumnHidden(i, true);
-            tableView->setColumnWidth(i, 0);
-        } else if (i) {
-            tableView->setColumnHidden(i, false);
-        }
+        int index = tableView->header()->logicalIndex(i);
+        tableView->setColumnHidden(index, true);
+        tableView->setColumnWidth(index, 0);
     }
 
     // now re-order the columns according to the
@@ -224,6 +220,9 @@ RideNavigator::resetView()
     // set the column widths
     int columnnumber=0;
     foreach(QString size, _widths.split("|", QString::SkipEmptyParts)) {
+
+        if (columnnumber >= cols.count()) break;
+
         int index = tableView->header()->logicalIndex(columnnumber);
         tableView->setColumnHidden(index, false);
         tableView->setColumnWidth(index, columnnumber ? size.toInt() : 0);
