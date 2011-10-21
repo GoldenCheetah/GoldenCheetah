@@ -43,11 +43,16 @@ class BUGFIXQSortFilterProxyModel;
 // a QSQLTableModel which reads from the "metrics" table
 // via the DBAccess database connection
 //
-class RideNavigator : public QWidget
+class RideNavigator : public GcWindow
 {
     Q_OBJECT
     G_OBJECT
 
+    Q_PROPERTY(int sortByIndex READ sortByIndex WRITE setSortByIndex USER true)
+    Q_PROPERTY(int sortByOrder READ sortByOrder WRITE setSortByOrder USER true)
+    Q_PROPERTY(int groupBy READ groupBy WRITE setGroupBy USER true)
+    Q_PROPERTY(QString columns READ columns WRITE setColumns USER true)
+    Q_PROPERTY(QString widths READ widths WRITE setWidths USER true)
 
     friend class ::NavigatorCellDelegate;
     friend class ::GroupByModel;
@@ -66,18 +71,16 @@ class RideNavigator : public QWidget
 
     public slots:
         void refresh();
-#if 0
-        bool event(QEvent *event);
-#endif
+
+        void showEvent(QShowEvent *event);
+
         void resizeEvent(QResizeEvent*);
+        void showTreeContextMenuPopup(const QPoint &);
 
         // working with columns
         void columnsChanged();
         void removeColumn();
         void showColumnChooser();
-
-        // user selected a group by column
-        void setGroupBy();
 
         // user double clicked or pressed enter on ride
         void selectRide(const QModelIndex &index);
@@ -95,6 +98,24 @@ class RideNavigator : public QWidget
         // how wide am I?
         void setWidth(int x);
         void setSortBy(int index, Qt::SortOrder);
+        void setGroupByColumn();
+
+        int sortByIndex() const { return _sortByIndex; }
+        void setSortByIndex(int x) { _sortByIndex = x; }
+
+        int sortByOrder() const { return _sortByOrder; }
+        void setSortByOrder(int x) { _sortByOrder = x; }
+
+        int groupBy() const { return _groupBy; }
+        void setGroupBy(int x) { _groupBy = x; }
+ 
+        QString columns() const { return _columns; }
+        void setColumns(QString x) { _columns = x; }
+
+        QString widths() const { return _widths; }
+        void setWidths (QString x) { _widths = x; resetView(); } // only reset once widths are set
+
+        void resetView(); // when columns/width changes
 
     protected:
         QSqlTableModel *sqlModel; // the sql table
@@ -105,15 +126,25 @@ class RideNavigator : public QWidget
         QList<QString> logicalHeadings;
         QList<QString> visualHeadings;
 
+        // this maps friendly names to metric names
+        QMap <QString, QString> nameMap;
         QMap<QString, const RideMetric *> columnMetrics;
 
     private:
         MainWindow *main;
         bool active;
-        int groupBy;
+        bool init;
         int currentColumn;
         int pwidth;
         NavigatorCellDelegate *delegate;
+        QVBoxLayout *mainLayout;
+
+        // properties
+        int _sortByIndex;
+        int _sortByOrder;
+        int _groupBy;
+        QString _columns;
+        QString _widths;
 };
 
 //

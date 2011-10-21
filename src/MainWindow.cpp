@@ -254,6 +254,14 @@ MainWindow::MainWindow(const QDir &home) :
 
     // UI Ride List (configurable)
     listView = new RideNavigator(this);
+    // retrieve settings (properties are saved when we close the window)
+    if (appsettings->cvalue(cyclist, GC_NAVHEADINGS, "").toString() != "") {
+        listView->setSortByIndex(appsettings->cvalue(cyclist, GC_SORTBY).toInt());
+        listView->setSortByOrder(appsettings->cvalue(cyclist, GC_SORTBYORDER).toInt());
+        listView->setGroupBy(appsettings->cvalue(cyclist, GC_NAVGROUPBY).toInt());
+        listView->setColumns(appsettings->cvalue(cyclist, GC_NAVHEADINGS).toString());
+        listView->setWidths(appsettings->cvalue(cyclist, GC_NAVHEADINGWIDTHS).toString());
+    }
 
     // INTERVALS
     intervalSummaryWindow = new IntervalSummaryWindow(this);
@@ -697,7 +705,7 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
         connect(actTweetRide, SIGNAL(triggered(void)), this, SLOT(tweetRide()));
         menu.addAction(actTweetRide);
 #endif
-        menu.exec(listView->mapToGlobal( pos ));
+        menu.exec(pos);
     }
 }
 
@@ -760,6 +768,13 @@ MainWindow::closeEvent(QCloseEvent* event)
 {
     if (saveRideExitDialog() == false) event->ignore();
     else {
+
+        // save ride list config
+        appsettings->setCValue(cyclist, GC_SORTBY, listView->sortByIndex());
+        appsettings->setCValue(cyclist, GC_SORTBYORDER, listView->sortByOrder());
+        appsettings->setCValue(cyclist, GC_NAVGROUPBY, listView->groupBy());
+        appsettings->setCValue(cyclist, GC_NAVHEADINGS, listView->columns());
+        appsettings->setCValue(cyclist, GC_NAVHEADINGWIDTHS, listView->widths());
 
         // save the state of all the pages
         analWindow->saveState();

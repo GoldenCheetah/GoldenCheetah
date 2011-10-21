@@ -40,6 +40,7 @@
 #include "HrPwWindow.h"
 #include "RaceWindow.h" // XXX not done
 #include "RideEditor.h"
+#include "RideNavigator.h"
 #include "RideSummaryWindow.h"
 #include "ScatterWindow.h"
 #include "SummaryWindow.h"
@@ -53,32 +54,33 @@
 
 GcWindowRegistry GcWindows[] = {
     // name                     GcWinID
-    { "Aerolab Chung Analysis",GcWindowTypes::Aerolab },
-    { "Performance Graph",GcWindowTypes::AllPlot },
-    { "Critical Mean Maximals",GcWindowTypes::CriticalPower },
-    { "Activity Calendar",GcWindowTypes::Diary },
-    { "Google Route Map",GcWindowTypes::GoogleMap },
-    { "Bing Route Map",GcWindowTypes::BingMap },
-    { "Distribution Histogram",GcWindowTypes::Histogram },
-    { "Long Term Metrics",GcWindowTypes::LTM },
-    { "3d Analysis",GcWindowTypes::Model },
-    { "Performance Manager",GcWindowTypes::PerformanceManager },
-    { "Pedal Force vs Velocity",GcWindowTypes::PfPv },
-    { "Heartrate vs Power",GcWindowTypes::HrPw },
-    { "Editor",GcWindowTypes::RideEditor },
+    { "Calendar",GcWindowTypes::Diary },
+    { "Navigator", GcWindowTypes::ActivityNavigator },
     { "Summary",GcWindowTypes::RideSummary },
     { "Details",GcWindowTypes::MetadataWindow },
+    { "Editor",GcWindowTypes::RideEditor },
     { "Summary & Details",GcWindowTypes::Summary },
-    { "2d Analysis",GcWindowTypes::Scatter },
-    { "Collection TreeMap",GcWindowTypes::TreeMap },
+    { "Performance",GcWindowTypes::AllPlot },
+    { "Pedal Force vs Velocity",GcWindowTypes::PfPv },
+    { "Critical Mean Maximals",GcWindowTypes::CriticalPower },
+    { "Histogram",GcWindowTypes::Histogram },
+    { "Google Map",GcWindowTypes::GoogleMap },
+    { "Bing Map",GcWindowTypes::BingMap },
+    { "2d Plot",GcWindowTypes::Scatter },
+    { "3d Plot",GcWindowTypes::Model },
+    { "Heartrate vs Power",GcWindowTypes::HrPw },
     { "Weekly Summary",GcWindowTypes::WeeklySummary },
-    { "Video Player",GcWindowTypes::VideoPlayer },
+    { "Long Term Metrics",GcWindowTypes::LTM },
+    { "Performance Manager",GcWindowTypes::PerformanceManager },
+    { "Collection TreeMap",GcWindowTypes::TreeMap },
+    { "Aerolab Chung Analysis",GcWindowTypes::Aerolab },
     { "Realtime Controls", GcWindowTypes::RealtimeControls },
     { "Realtime Dial",GcWindowTypes::DialWindow },
     { "Realtime Plot",GcWindowTypes::RealtimePlot },
     { "Workout Plot",GcWindowTypes::WorkoutPlot },
     { "Train Map Window", GcWindowTypes::MapWindow },
     { "Train StreetView Window", GcWindowTypes::StreetViewWindow },
+    { "Video Player",GcWindowTypes::VideoPlayer },
     { "", GcWindowTypes::None }};
 
 // instantiate a new window
@@ -126,6 +128,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, MainWindow *main) //XXX mainWindow wil
     case GcWindowTypes::BingMap: returning = new BingMap(main); break;
     case GcWindowTypes::MapWindow: returning = new MapWindow(main); break;
     case GcWindowTypes::StreetViewWindow: returning = new StreetViewWindow(main); break;
+    case GcWindowTypes::ActivityNavigator: returning = new RideNavigator(main); break;
     default: return NULL; break;
     }
     if (returning) returning->setProperty("type", QVariant::fromValue<GcWinID>(id));
