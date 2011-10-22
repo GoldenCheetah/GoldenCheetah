@@ -94,13 +94,34 @@ RealtimePlot::RealtimePlot() : pwrCurve(NULL)
     setAxisTitle(yRight2, "Speed");
     setAxisTitle(xBottom, "Seconds Ago");
 
+    QPalette pal;
     setAxisScale(yLeft, 0, 500); // watts
+    pal.setColor(QPalette::WindowText, GColor(CPOWER));
+    pal.setColor(QPalette::Text, GColor(CPOWER));
+    axisWidget(QwtPlot::yLeft)->setPalette(pal);
+    axisWidget(QwtPlot::yLeft)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
+
     setAxisScale(yRight, 0, 230); // cadence / hr
+    pal.setColor(QPalette::WindowText, GColor(CHEARTRATE));
+    pal.setColor(QPalette::Text, GColor(CHEARTRATE));
+    axisWidget(QwtPlot::yRight)->setPalette(pal);
+    axisWidget(QwtPlot::yRight)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
+
     setAxisScale(xBottom, 50, 0, 15); // time ago
+    pal.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
+    pal.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    axisWidget(QwtPlot::xBottom)->setPalette(pal);
+    axisWidget(QwtPlot::xBottom)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
+
     setAxisScale(yRight2, 0, 60); // speed km/h - 60kmh on a turbo is good going!
+    pal.setColor(QPalette::WindowText, GColor(CSPEED));
+    pal.setColor(QPalette::Text, GColor(CSPEED));
+    axisWidget(QwtPlot::yRight2)->setPalette(pal);
+    axisWidget(QwtPlot::yRight2)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
 
 	setAxisLabelRotation(yRight2,90);
 	setAxisLabelAlignment(yRight2,Qt::AlignVCenter);
+
     enableAxis(xBottom, false); // very little value and some cpu overhead
     enableAxis(yLeft, true);
     enableAxis(yRight, true);
@@ -173,7 +194,7 @@ RealtimePlot::setAxisTitle(int axis, QString label)
 void
 RealtimePlot::configChanged()
 {
-    setCanvasBackground(GColor(CPLOTBACKGROUND));
+    setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     QPen pwr30pen = QPen(GColor(CPOWER), 2.0, Qt::DashLine);
     pwr30Curve->setPen(pwr30pen);
     pwr30Curve->setData(pwr30Data);

@@ -25,6 +25,7 @@ RealtimePlotWindow::RealtimePlotWindow(MainWindow *mainWindow) :
     setContentsMargins(0,0,0,0);
     setInstanceName("RT Plot");
     setControls(NULL);
+    setProperty("color", GColor(CRIDEPLOTBACKGROUND));
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     rtPlot = new RealtimePlot();

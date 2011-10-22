@@ -137,18 +137,21 @@ GcWindow::GcWindow()
     qRegisterMetaType<QWidget*>("controls");
     qRegisterMetaType<RideItem*>("ride");
     qRegisterMetaType<GcWinID>("type");
+    qRegisterMetaType<QColor>("color");
     setControls(NULL);
     setRideItem(NULL);
     setTitle("");
     setContentsMargins(0,0,0,0);
     setResizable(false);
     setMouseTracking(true);
+    setProperty("color", Qt::white);
 }
 
 GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
     qRegisterMetaType<QWidget*>("controls");
     qRegisterMetaType<RideItem*>("ride");
     qRegisterMetaType<GcWinID>("type");
+    qRegisterMetaType<QColor>("color");
     setParent(parent);
     setControls(NULL);
     setRideItem(NULL);
@@ -156,6 +159,7 @@ GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
     setContentsMargins(0,0,0,0);
     setResizable(false);
     setMouseTracking(true);
+    setProperty("color", Qt::white);
 }
 
 GcWindow::~GcWindow()
@@ -188,7 +192,7 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
     QPainter painter(this);
     // background light gray for now?
     QRect all(0,0,width(),height());
-    painter.fillRect(all, Qt::white);
+    painter.fillRect(all, property("color").value<QColor>());
 
     if (contentsMargins().top() > 0) {
 
