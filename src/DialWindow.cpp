@@ -38,6 +38,7 @@ DialWindow::DialWindow(MainWindow *mainWindow) :
 
     // data series selection
     QLabel *seriesLabel = new QLabel(tr("Data Series"), this);
+    seriesLabel->setAutoFillBackground(true);
     seriesSelector = new QComboBox(this);
     foreach (RealtimeData::DataSeries x, RealtimeData::listDataSeries()) {
         seriesSelector->addItem(RealtimeData::seriesName(x), static_cast<int>(x));
@@ -52,6 +53,11 @@ DialWindow::DialWindow(MainWindow *mainWindow) :
 
     // get updates..
     connect(mainWindow, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
+    connect(seriesSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(seriesChanged()));
+    connect(mainWindow, SIGNAL(configChanged()), this, SLOT(seriesChanged()));
+
+    // setup colors
+    seriesChanged();
 
     // setup fontsize etc
     resizeEvent(NULL);
@@ -122,4 +128,51 @@ void DialWindow::resizeEvent(QResizeEvent * )
    font.setPointSize((geometry().height()-37));
    font.setWeight(QFont::Bold);
    valueLabel->setFont(font);
+}
+
+void DialWindow::seriesChanged()
+{
+    // we got some!
+    RealtimeData::DataSeries series = static_cast<RealtimeData::DataSeries>
+                  (seriesSelector->itemData(seriesSelector->currentIndex()).toInt());
+
+    // the series selector changed so update the colors
+    switch(series) {
+
+    case RealtimeData::Time:
+    case RealtimeData::LapTime:
+    case RealtimeData::Distance:
+    case RealtimeData::Lap:
+    case RealtimeData::Load:
+    case RealtimeData::None:
+            foreground = GColor(CPLOTMARKER);
+            break;
+
+    case RealtimeData::XPower:
+    case RealtimeData::Joules:
+    case RealtimeData::BikeScore:
+    case RealtimeData::Watts:
+            foreground = GColor(CPOWER);
+            break;
+
+    case RealtimeData::Speed:
+            foreground = GColor(CSPEED);
+            break;
+
+    case RealtimeData::Cadence:
+            foreground = GColor(CCADENCE);
+            break;
+
+    case RealtimeData::HeartRate:
+            foreground = GColor(CHEARTRATE);
+            break;
+    }
+
+    // ugh. we use style sheets becuase palettes don't work on labels
+    background = GColor(CRIDEPLOTBACKGROUND);
+    setProperty("color", background);
+    QString sh = QString("QLabel { background: %1; color: %2; }")
+                 .arg(background.name())
+                 .arg(foreground.name());
+    valueLabel->setStyleSheet(sh);
 }

@@ -28,6 +28,9 @@
 #include "RideFile.h" // for data series types
 #include "RealtimeData.h" // for realtimedata structure
 
+#include "Settings.h" // for realtimedata structure
+#include "Colors.h" // for realtimedata structure
+
 class DialWindow : public GcWindow
 {
     Q_OBJECT
@@ -68,6 +71,7 @@ class DialWindow : public GcWindow
    public slots:
 
         // trap signals
+        void seriesChanged();
         void telemetryUpdate(const RealtimeData &rtData); // got new data
         void lap(int lapnumber);
         void start();
@@ -102,6 +106,8 @@ class DialWindow : public GcWindow
 
         // display
         QLabel *valueLabel;
+
+        QColor foreground, background;
 };
 
 #endif // _GC_DialWindow_h

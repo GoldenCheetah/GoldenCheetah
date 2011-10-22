@@ -29,6 +29,9 @@
 #include "RealtimePlot.h"
 #include "RealtimeData.h" // for realtimedata structure
 
+#include "Settings.h"
+#include "Colors.h"
+
 class RealtimePlotWindow : public GcWindow
 {
     Q_OBJECT

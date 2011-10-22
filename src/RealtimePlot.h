@@ -26,6 +26,8 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
 #include <qwt_scale_draw.h>
+#include <qwt_scale_div.h>
+#include <qwt_scale_widget.h>
 #include <qwt_data.h>
 #include "Settings.h"
 
