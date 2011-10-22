@@ -44,98 +44,81 @@
 // at the center of the plot
 class PfPvPlotZoneLabel: public QwtPlotItem
 {
-    private:
-        PfPvPlot *parent;
-        int zone_number;
-        double watts;
-        QwtText text;
 
-    public:
-        PfPvPlotZoneLabel(PfPvPlot *_parent, int _zone_number)
-        {
-	    parent = _parent;
-	    zone_number = _zone_number;
+private:
 
-	    RideItem *rideItem = parent->rideItem;
-	    const Zones *zones = rideItem->zones;
-	    int zone_range = rideItem->zoneRange();
+    PfPvPlot *parent;
+    int zone_number;
+    double watts;
+    QwtText text;
 
-	    setZ(1.0 + zone_number / 100.0);
+public:
 
-	    // create new zone labels if we're shading
-	    if (zone_range >= 0) {
-		QList <int> zone_lows = zones->getZoneLows(zone_range);
-		QList <QString> zone_names = zones->getZoneNames(zone_range);
-		int num_zones = zone_lows.size();
-		assert(zone_names.size() == num_zones);
-		if (zone_number < num_zones) {
-		    watts =
-			(
-			 (zone_number + 1 < num_zones) ?
-			 0.5 * (zone_lows[zone_number] + zone_lows[zone_number + 1]) :
-			 (
-			  (zone_number > 0) ?
-			  (1.5 * zone_lows[zone_number] - 0.5 * zone_lows[zone_number - 1]) :
-			  2.0 * zone_lows[zone_number]
-			  )
-			 );
+    PfPvPlotZoneLabel(PfPvPlot *_parent, int _zone_number)
+    {
+        parent = _parent;
+        zone_number = _zone_number;
 
-		    text = QwtText(zone_names[zone_number]);
-		    text.setFont(QFont("Helvetica",24, QFont::Bold));
-		    QColor text_color = zoneColor(zone_number, num_zones);
-		    text_color.setAlpha(64);
-		    text.setColor(text_color);
-		}
-	    }
+        RideItem *rideItem = parent->rideItem;
+        const Zones *zones = rideItem->zones;
+        int zone_range = rideItem->zoneRange();
 
-	}
+        setZ(1.0 + zone_number / 100.0);
 
-        virtual int rtti() const
-        {
-	    return QwtPlotItem::Rtti_PlotUserItem;
-	}
+        // create new zone labels if we're shading
+        if (zone_range >= 0) {
 
-        void draw(QPainter *painter,
-	           const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-	           const QRect &rect) const
-        {
-	    if (parent->shadeZones() &&
-		(rect.width() > 0) &&
-		(rect.height() > 0)
-		) {
-		// draw the label along a plot diagonal:
-		// 1. x*y = watts * dx/dv * dy/df
-		// 2. x/width = y/height
-		// =>
-		// 1. x^2 = width/height * watts
-		// 2. y^2 = height/width * watts
+            // retrieve zone setup
+            QList <int> zone_lows = zones->getZoneLows(zone_range);
+            QList <QString> zone_names = zones->getZoneNames(zone_range);
+            int num_zones = zone_lows.size();
+            assert(zone_names.size() == num_zones);
 
-		double xscale = fabs(xMap.transform(3) - xMap.transform(0)) / 3;
-		double yscale = fabs(yMap.transform(600) - yMap.transform(0)) / 600;
-		if ((xscale > 0) && (yscale > 0)) {
-		    double w = watts * xscale * yscale;
-		    int x = xMap.transform(sqrt(w * rect.width() / rect.height()) / xscale);
-		    int y = yMap.transform(sqrt(w * rect.height() / rect.width()) / yscale);
+            if (zone_number < num_zones) {
 
-		    // the following code based on source for QwtPlotMarker::draw()
-		    QRect tr(QPoint(0, 0), text.textSize(painter->font()));
-		    tr.moveCenter(QPoint(x, y));
-		    text.draw(painter, tr);
-		}
-	    }
-	}
+                watts = ((zone_number + 1 < num_zones) ?  0.5 * (zone_lows[zone_number] + zone_lows[zone_number + 1]) : ( (zone_number > 0) ?  (1.5 * zone_lows[zone_number] - 0.5 * zone_lows[zone_number - 1]) : 2.0 * zone_lows[zone_number]));
+
+                text = QwtText(zone_names[zone_number]);
+                text.setFont(QFont("Helvetica",24, QFont::Bold));
+                QColor text_color = zoneColor(zone_number, num_zones);
+                text_color.setAlpha(64);
+                text.setColor(text_color);
+            }
+        }
+    }
+
+    virtual int rtti() const {
+        return QwtPlotItem::Rtti_PlotUserItem;
+    }
+
+    void draw(QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRect &rect) const {
+
+        if (parent->shadeZones() && (rect.width() > 0) && (rect.height() > 0)) {
+            // draw the label along a plot diagonal:
+            // 1. x*y = watts * dx/dv * dy/df
+            // 2. x/width = y/height
+            // =>
+            // 1. x^2 = width/height * watts
+            // 2. y^2 = height/width * watts
+            double xscale = fabs(xMap.transform(parent->maxCPV) - xMap.transform(0)) / parent->maxCPV;
+            double yscale = fabs(yMap.transform(parent->maxAEPF) - yMap.transform(0)) / parent->maxAEPF;
+            if ((xscale > 0) && (yscale > 0)) {
+                double w = watts * xscale * yscale;
+                int x = xMap.transform(sqrt(w * rect.width() / rect.height()) / xscale);
+                int y = yMap.transform(sqrt(w * rect.height() / rect.width()) / yscale);
+
+                // the following code based on source for QwtPlotMarker::draw()
+                QRect tr(QPoint(0, 0), text.textSize(painter->font()));
+                tr.moveCenter(QPoint(x, y));
+                text.draw(painter, tr);
+            }
+        }
+    }
 };
 
 
-QwtArray<double> PfPvPlot::contour_xvalues;
-
 PfPvPlot::PfPvPlot(MainWindow *mainWindow)
-    : rideItem (NULL),
-      mainWindow(mainWindow),
-      cp_ (0),
-      cad_ (85),
-      cl_ (0.175),
-      shade_zones(true)
+    : rideItem (NULL), mainWindow(mainWindow), cp_ (0), cad_ (85), cl_ (0.175), shade_zones(true)
 {
     setInstanceName("PfPv Plot");
 
@@ -222,7 +205,6 @@ PfPvPlot::configChanged()
     mX->setLinePen(marker);
     mY->setLinePen(marker);
     cpCurve->setPen(cp);
-
 }
 
 void
@@ -244,104 +226,97 @@ PfPvPlot::refreshZoneItems()
 {
     // clear out any zone curves which are presently defined
     if (zoneCurves.size()) {
-	QListIterator<QwtPlotCurve *> i(zoneCurves);
-	while (i.hasNext()) {
-	    QwtPlotCurve *curve = i.next();
-	    curve->detach();
-	    delete curve;
-	}
+
+        QListIterator<QwtPlotCurve *> i(zoneCurves);
+        while (i.hasNext()) {
+            QwtPlotCurve *curve = i.next();
+            curve->detach();
+            delete curve;
+        }
     }
     zoneCurves.clear();
 
-
     // delete any existing power zone labels
     if (zoneLabels.size()) {
-	QListIterator<PfPvPlotZoneLabel *> i(zoneLabels);
-	while (i.hasNext()) {
-	    PfPvPlotZoneLabel *label = i.next();
-	    label->detach();
-	    delete label;
-	}
+
+        QListIterator<PfPvPlotZoneLabel *> i(zoneLabels);
+        while (i.hasNext()) {
+            PfPvPlotZoneLabel *label = i.next();
+            label->detach();
+            delete label;
+        }
     }
     zoneLabels.clear();
 
-    if (! rideItem)
-	return;
+    // give up for a null ride
+    if (! rideItem) return;
 
     const Zones *zones = rideItem->zones;
     int zone_range = rideItem->zoneRange();
 
     if (zone_range >= 0) {
-	setCP(zones->getCP(zone_range));
+        setCP(zones->getCP(zone_range));
 
-	// populate the zone curves
-	QList <int> zone_power = zones->getZoneLows(zone_range);
-	QList <QString> zone_name = zones->getZoneNames(zone_range);
-	int num_zones = zone_power.size();
-	assert(zone_name.size() == num_zones);
-	if (num_zones > 0) {
-	    QPen *pen = new QPen();
-	    pen->setStyle(Qt::NoPen);
+        // populate the zone curves
+        QList <int> zone_power = zones->getZoneLows(zone_range);
+        QList <QString> zone_name = zones->getZoneNames(zone_range);
+        int num_zones = zone_power.size();
+        assert(zone_name.size() == num_zones);
 
+        if (num_zones > 0) {
+            QPen *pen = new QPen();
+            pen->setStyle(Qt::NoPen);
 
-	    QwtArray<double> yvalues;
+            QwtArray<double> yvalues;
 
-	    // generate x values
-	    for (int z = 0; z < num_zones; z ++) {
-		QwtPlotCurve *curve;
-		curve = new QwtPlotCurve(zone_name[z]);
-		curve->setPen(*pen);
-		QColor brush_color = zoneColor(z, num_zones);
-		brush_color.setHsv(
-				   brush_color.hue(),
-				   brush_color.saturation() / 4,
-				   brush_color.value()
-				   );
-		curve->setBrush(brush_color);   // fill below the line
-		curve->setZ(1 - 1e-6 * zone_power[z]);
+            // generate x values
+            for (int z = 0; z < num_zones; z ++) {
 
-		// generate data for curve
-		if (z < num_zones - 1) {
-		    QwtArray <double> contour_yvalues;
-		    int watts = zone_power[z + 1];
-		    int dwatts = (double) watts;
-		    for (int i = 0; i < contour_xvalues.size(); i ++)
-			contour_yvalues.append(
-					       (1e6 * contour_xvalues[i] < watts) ?
-					       1e6 :
-					       dwatts / contour_xvalues[i]
-					       );
-		    curve->setData(contour_xvalues, contour_yvalues);
-		}
-		else {
-		    // top zone has a curve at "infinite" power
-		    QwtArray <double> contour_x;
-		    QwtArray <double> contour_y;
-		    contour_x.append(contour_xvalues[0]);
-		    contour_x.append(contour_xvalues[contour_xvalues.size() - 1]);
-		    contour_y.append(1e6);
-		    contour_y.append(1e6);
-		    curve->setData(contour_x, contour_y);
-		}
-		curve->setVisible(shade_zones);
-		curve->attach(this);
-		zoneCurves.append(curve);
-	    }
+                QwtPlotCurve *curve = new QwtPlotCurve(zone_name[z]);
 
-	    delete pen;
+                curve->setPen(*pen);
+                QColor brush_color = zoneColor(z, num_zones);
+                brush_color.setHsv(brush_color.hue(), brush_color.saturation() / 4, brush_color.value());
+                curve->setBrush(brush_color);   // fill below the line
+                curve->setZ(1 - 1e-6 * zone_power[z]);
 
+                // generate data for curve
+                if (z < num_zones - 1) {
+                    QwtArray <double> contour_yvalues;
+                    int watts = zone_power[z + 1];
+                    int dwatts = (double) watts;
+                    for (int i = 0; i < contour_xvalues.size(); i ++) {
+                        contour_yvalues.append( (1e6 * contour_xvalues[i] < watts) ?  1e6 : dwatts / contour_xvalues[i]);
+                    }
+                    curve->setData(contour_xvalues, contour_yvalues);
 
-	    // generate labels for existing zones
-	    for (int z = 0; z < num_zones; z ++) {
-		PfPvPlotZoneLabel *label = new PfPvPlotZoneLabel(this, z);
-		label->setVisible(shade_zones);
-		label->attach(this);
-		zoneLabels.append(label);
-	    }
-	    // get the zones visible, even if data may take awhile
-	    //replot();
+                } else {
 
-	}
+                    // top zone has a curve at "infinite" power
+                    QwtArray <double> contour_x;
+                    QwtArray <double> contour_y;
+                    contour_x.append(contour_xvalues[0]);
+                    contour_x.append(contour_xvalues[contour_xvalues.size() - 1]);
+                    contour_y.append(1e6);
+                    contour_y.append(1e6);
+                    curve->setData(contour_x, contour_y);
+                }
+
+                curve->setVisible(shade_zones);
+                curve->attach(this);
+                zoneCurves.append(curve);
+            }
+
+            delete pen;
+
+            // generate labels for existing zones
+            for (int z = 0; z < num_zones; z ++) {
+                PfPvPlotZoneLabel *label = new PfPvPlotZoneLabel(this, z);
+                label->setVisible(shade_zones);
+                label->attach(this);
+                zoneLabels.append(label);
+            }
+        }
     }
 }
 
@@ -383,52 +358,53 @@ PfPvPlot::setData(RideItem *_rideItem)
     RideFile *ride = rideItem->ride();
 
     if (ride) {
-	    //setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
 
-	    // quickly erase old data
-	    curve->setVisible(false);
+        recalc(); // labels etc may have changed with new ride
 
-	    // handle zone stuff
-	    refreshZoneItems();
+        // quickly erase old data
+        curve->setVisible(false);
 
-	    // due to the discrete power and cadence values returned by the
-	    // power meter, there will very likely be many duplicate values.
-	    // Rather than pass them all to the curve, use a set to strip
-	    // out duplicates.
-	    std::set<std::pair<double, double> > dataSet;
-	    std::set<std::pair<double, double> > dataSetSelected;
+        // handle zone stuff
+        refreshZoneItems();
 
-	    long tot_cad = 0;
-	    long tot_cad_points = 0;
+        // due to the discrete power and cadence values returned by the
+        // power meter, there will very likely be many duplicate values.
+        // Rather than pass them all to the curve, use a set to strip
+        // out duplicates.
+        std::set<std::pair<double, double> > dataSet;
+        std::set<std::pair<double, double> > dataSetSelected;
+
+        long tot_cad = 0;
+        long tot_cad_points = 0;
 
         foreach(const RideFilePoint *p1, ride->dataPoints()) {
 
-	        if (p1->watts != 0 && p1->cad != 0) {
+            if (p1->watts != 0 && p1->cad != 0) {
 
-		        double aepf = (p1->watts * 60.0) / (p1->cad * cl_ * 2.0 * PI);
-		        double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
+                double aepf = (p1->watts * 60.0) / (p1->cad * cl_ * 2.0 * PI);
+                double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
 
                 dataSet.insert(std::make_pair<double, double>(aepf, cpv));
-		        tot_cad += p1->cad;
-		        tot_cad_points++;
-	        }
+                tot_cad += p1->cad;
+                tot_cad_points++;
+            }
         }
 
         setCAD(tot_cad_points ? tot_cad / tot_cad_points : 0);
 
-	    if (tot_cad_points == 0) {
-	        //setTitle(tr("no cadence"));
-	        refreshZoneItems();
-	        curve->setVisible(false);
+        if (tot_cad_points == 0) {
+            //setTitle(tr("no cadence"));
+            refreshZoneItems();
+            curve->setVisible(false);
 
-	    } else {
-	        // Now that we have the set of points, transform them into the
-	        // QwtArrays needed to set the curve's data.
-	        QwtArray<double> aepfArray;
-	        QwtArray<double> cpvArray;
+        } else {
+            // Now that we have the set of points, transform them into the
+            // QwtArrays needed to set the curve's data.
+            QwtArray<double> aepfArray;
+            QwtArray<double> cpvArray;
 
-	        std::set<std::pair<double, double> >::const_iterator j(dataSet.begin());
-	        while (j != dataSet.end()) {
+            std::set<std::pair<double, double> >::const_iterator j(dataSet.begin());
+            while (j != dataSet.end()) {
                 const std::pair<double, double>& dataPoint = *j;
 
                 aepfArray.push_back(dataPoint.first);
@@ -482,8 +458,8 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
        int num_intervals=intervalCount();
 
        if (mergeIntervals()) num_intervals = 1;
-	   if (frameIntervals() || num_intervals==0) curve->setVisible(true);
-	   if (frameIntervals()==false && num_intervals) curve->setVisible(false);
+       if (frameIntervals() || num_intervals==0) curve->setVisible(true);
+       if (frameIntervals()==false && num_intervals) curve->setVisible(false);
        QVector<std::set<std::pair<double, double> > > dataSetInterval(num_intervals);
 
        long tot_cad = 0;
@@ -496,11 +472,12 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
                 double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
 
                 for (int high=-1, t=0; t<mainWindow->allIntervalItems()->childCount(); t++) {
+
                     IntervalItem *current = dynamic_cast<IntervalItem *>(mainWindow->allIntervalItems()->child(t));
+
                     if ((current != NULL) && current->isSelected()) {
                         ++high;
-                        if (p1->secs+ride->recIntSecs() > current->start
-                            && p1->secs< current->stop) {
+                        if (p1->secs+ride->recIntSecs() > current->start && p1->secs< current->stop) {
                             if (mergeIntervals())
                                 dataSetInterval[0].insert(std::make_pair<double, double>(aepf, cpv));
                             else
@@ -541,7 +518,9 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
            int num_intervals_defined=0;
            QVector<int> intervalmap;
            if (mainWindow->allIntervalItems() != NULL) {
+
                 num_intervals_defined = mainWindow->allIntervalItems()->childCount();
+
                 for (int g=0; g<mainWindow->allIntervalItems()->childCount(); g++) {
                     IntervalItem *curr = dynamic_cast<IntervalItem *>(mainWindow->allIntervalItems()->child(g));
                     if (curr->isSelected()) intervalmap.append(g);
@@ -555,7 +534,9 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
             if (mergeIntervals()) intervalOrder.insert(1,0);
             else {
                 for (int i=0; i<mainWindow->allIntervalItems()->childCount(); i++) {
+
                     IntervalItem *current = dynamic_cast<IntervalItem *>(mainWindow->allIntervalItems()->child(i));
+
                     if (current != NULL && current->isSelected() == true) {
                             intervalOrder.insert(current->displaySequence, count++);
                     }
@@ -588,7 +569,7 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
 
                 intervalCurves.append(curve);
             }
-       }
+        }
     }
     replot();
 }
@@ -596,12 +577,64 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
 void
 PfPvPlot::recalc()
 {
-    // initialize x values used for contours
-    if (contour_xvalues.isEmpty()) {
-	for (double x = 0; x <= 3.0; x += x / 20 + 0.02)
-	    contour_xvalues.append(x);
-	contour_xvalues.append(3.0);
+    // adjust the scales if we have some big values
+    // this can happen with track sprinters who put
+    // out big numbers for power and cadence since
+    // hey have a fixed gear and big quads!
+    maxAEPF = 600;
+    maxCPV = 3;
+
+    RideFile *ride;
+    if (rideItem && (ride=rideItem->ride())) {
+
+        // calculate maximums
+        foreach(const RideFilePoint *p1, ride->dataPoints()) {
+
+            if (p1->watts != 0 && p1->cad != 0) {
+
+                double aepf = (p1->watts * 60.0) / (p1->cad * cl_ * 2.0 * PI);
+                double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
+
+                if (aepf > maxAEPF) maxAEPF = aepf;
+                if (cpv > maxCPV) maxCPV = cpv;
+            }
+        }
     }
+
+    if (maxAEPF > 600) {
+
+        setAxisScale(yLeft, 0, maxAEPF * 1.1); // a bit of headroom
+        tiqMarker[0]->setYValue(maxAEPF);
+        tiqMarker[1]->setYValue(maxAEPF);
+
+    } else {
+
+        maxAEPF = 600; // for background shading and CP curve
+        setAxisScale(yLeft, 0, 600);
+        tiqMarker[0]->setYValue(580);
+        tiqMarker[1]->setYValue(580);
+    }
+
+    if (maxCPV > 3) {
+
+        // round *UP* to next integer for axis to fill nicely
+        maxCPV = round(maxCPV + 0.5);
+        setAxisScale(xBottom, 0, maxCPV);
+        tiqMarker[0]->setXValue(maxCPV - 0.5);
+        tiqMarker[3]->setXValue(maxCPV - 0.5);
+
+    } else {
+
+        maxCPV = 3; // for background shading and CP curve
+        setAxisScale(xBottom, 0, 3);
+        tiqMarker[0]->setXValue(2.9);
+        tiqMarker[3]->setXValue(2.9);
+    }
+
+    // initialize x values used for contours
+    contour_xvalues.clear();
+    for (double x = 0; x <= maxCPV; x += x / 20 + 0.02) contour_xvalues.append(x);
+    contour_xvalues.append(maxCPV);
 
     double cpv = (cad_ * cl_ * 2.0 * PI) / 60.0;
     mX->setXValue(cpv);
@@ -610,7 +643,6 @@ PfPvPlot::recalc()
     mY->setYValue(aepf);
 
     // watch out for null rides
-    RideFile *ride;
     if (rideItem && (ride=rideItem->ride())) {
 
         timeInQuadrant[0]=
@@ -635,39 +667,50 @@ PfPvPlot::recalc()
         double totaltime = timeInQuadrant[0] + timeInQuadrant[1] + timeInQuadrant[2] + timeInQuadrant[3] ;
 
         if (totaltime) {
-            tiqMarker[0]->setLabel(QwtText(QString("%1%").arg(timeInQuadrant[0] / totaltime * 100, 0, 'f', 1),QwtText::PlainText));
-            tiqMarker[1]->setLabel(QwtText(QString("%1%").arg(timeInQuadrant[1] / totaltime * 100, 0, 'f', 1),QwtText::PlainText));
-            tiqMarker[2]->setLabel(QwtText(QString("%1%").arg(timeInQuadrant[2] / totaltime * 100, 0, 'f', 1),QwtText::PlainText));
-            tiqMarker[3]->setLabel(QwtText(QString("%1%").arg(timeInQuadrant[3] / totaltime * 100, 0, 'f', 1),QwtText::PlainText));
+
+            tiqMarker[0]->setLabel(QwtText(QString("%1%")
+                          .arg(timeInQuadrant[0] / totaltime * 100, 0, 'f', 1),QwtText::PlainText));
+            tiqMarker[1]->setLabel(QwtText(QString("%1%")
+                          .arg(timeInQuadrant[1] / totaltime * 100, 0, 'f', 1),QwtText::PlainText));
+            tiqMarker[2]->setLabel(QwtText(QString("%1%")
+                          .arg(timeInQuadrant[2] / totaltime * 100, 0, 'f', 1),QwtText::PlainText));
+            tiqMarker[3]->setLabel(QwtText(QString("%1%")
+                          .arg(timeInQuadrant[3] / totaltime * 100, 0, 'f', 1),QwtText::PlainText));
+
         } else {
+
             tiqMarker[0]->setLabel(QwtText("",QwtText::PlainText));
             tiqMarker[1]->setLabel(QwtText("",QwtText::PlainText));
             tiqMarker[2]->setLabel(QwtText("",QwtText::PlainText));
             tiqMarker[3]->setLabel(QwtText("",QwtText::PlainText));
+
         }
+
     } else {
+
         tiqMarker[0]->setLabel(QwtText("",QwtText::PlainText));
         tiqMarker[1]->setLabel(QwtText("",QwtText::PlainText));
         tiqMarker[2]->setLabel(QwtText("",QwtText::PlainText));
         tiqMarker[3]->setLabel(QwtText("",QwtText::PlainText));
+
     }
 
     QwtArray<double> yvalues(contour_xvalues.size());
+
     if (cp_) {
-	for (int i = 0; i < contour_xvalues.size(); i ++)
-	    yvalues[i] =
-		(cpv < cp_ / 1e6) ?
-		1e6 :
-		cp_ / contour_xvalues[i];
 
-	// generate curve at a given power
-	cpCurve->setData(contour_xvalues, yvalues);
+        // reinitialise array
+        for (int i = 0; i < contour_xvalues.size(); i ++)
+            yvalues[i] = (cpv < cp_ / 1e6) ?  1e6 : cp_ / contour_xvalues[i];
+
+        // generate curve at a given power
+        cpCurve->setData(contour_xvalues, yvalues);
+
+    } else {
+
+        // an empty curve if no power (or zero power) is specified
+        cpCurve->setData(QwtArray<double>(), QwtArray<double>());
     }
-    else
-	// an empty curve if no power (or zero power) is specified
-	cpCurve->setData(QwtArray<double>(), QwtArray<double>());
-
-    //replot();
 }
 
 int
@@ -719,9 +762,9 @@ PfPvPlot::setShadeZones(bool value)
 
     // if there are defined zones and labels, set their visibility
     for (int i = 0; i < zoneCurves.size(); i ++)
-	zoneCurves[i]->setVisible(shade_zones);
+    zoneCurves[i]->setVisible(shade_zones);
     for (int i = 0; i < zoneLabels.size(); i ++)
-	zoneLabels[i]->setVisible(shade_zones);
+    zoneLabels[i]->setVisible(shade_zones);
 
     //replot();
 }

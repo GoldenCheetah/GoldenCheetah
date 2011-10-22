@@ -41,19 +41,24 @@ class PfPvPlot : public QwtPlot
     public:
 
         PfPvPlot(MainWindow *mainWindow);
-	void refreshZoneItems();
+        void refreshZoneItems();
         void setData(RideItem *_rideItem);
         void showIntervals(RideItem *_rideItem);
 
-	int getCP();
-	void setCP(int cp);
-	int getCAD();
-	void setCAD(int cadence);
-	double getCL();
-	void setCL(double cranklen);
-	void recalc();
+        int getCP();
+        void setCP(int cp);
+        int getCAD();
+        void setCAD(int cadence);
+        double getCL();
+        void setCL(double cranklen);
+        void recalc();
 
-	RideItem *rideItem;
+        // zone shader uses this
+        double maxAEPF;
+        double maxCPV;
+        QwtArray<double> contour_xvalues;
+
+        RideItem *rideItem;
 
         bool shadeZones() const { return shade_zones; }
         void setShadeZones(bool value);
@@ -76,25 +81,22 @@ class PfPvPlot : public QwtPlot
         int intervalCount() const;
 
         MainWindow *mainWindow;
-    QwtPlotCurve *curve;
-    QList <QwtPlotCurve *> intervalCurves;
-	QwtPlotCurve *cpCurve;
-	QList <QwtPlotCurve *> zoneCurves;
-	QList <PfPvPlotZoneLabel *> zoneLabels;
-	QwtPlotMarker *mX;
-	QwtPlotMarker *mY;
+        QwtPlotCurve *curve;
+        QList <QwtPlotCurve *> intervalCurves;
+        QwtPlotCurve *cpCurve;
+        QList <QwtPlotCurve *> zoneCurves;
+        QList <PfPvPlotZoneLabel *> zoneLabels;
+        QwtPlotMarker *mX;
+        QwtPlotMarker *mY;
 
-	static QwtArray<double> contour_xvalues;   // values used in CP and contour plots: djconnel
-
-	int cp_;
-	int cad_;
-	double cl_;
-	bool shade_zones;    // whether to shade zones, added 27Apr2009 djconnel
-	bool merge_intervals, frame_intervals;
+        int cp_;
+        int cad_;
+        double cl_;
+        bool shade_zones;    // whether to shade zones, added 27Apr2009 djconnel
+        bool merge_intervals, frame_intervals;
 
     double timeInQuadrant[4]; // time in seconds spent in each quadrant
     QwtPlotMarker *tiqMarker[4]; // time in seconds spent in each quadrant
 };
 
 #endif // _GC_QaPlot_h
-
