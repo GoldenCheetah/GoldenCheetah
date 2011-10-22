@@ -21,6 +21,7 @@
 #include "GoldenCheetah.h"
 
 #include <QtGui>
+#include <qwt_plot_zoomer.h>
 
 class MainWindow;
 class PfPvPlot;
@@ -75,6 +76,7 @@ class PfPvWindow : public GcWindow
 
         MainWindow *mainWindow;
         PfPvPlot *pfPvPlot;
+        QwtPlotZoomer *pfpvZoomer;
         QCheckBox *shadeZonesPfPvCheckBox;
         QCheckBox *mergeIntervalPfPvCheckBox;
         QCheckBox *frameIntervalPfPvCheckBox;
