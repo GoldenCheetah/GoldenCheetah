@@ -32,6 +32,9 @@
 #include <qwt_scale_draw.h>
 #include "ErgFile.h"
 
+#include "Settings.h"
+#include "Colors.h"
+
 
 class ErgFileData : public QwtData
 {

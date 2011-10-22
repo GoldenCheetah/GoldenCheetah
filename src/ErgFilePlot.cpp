@@ -43,7 +43,7 @@ ErgFilePlot::ErgFilePlot(QList<ErgFilePoint> *data)
     setInstanceName("ErgFile Plot");
 
     //insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
-    setCanvasBackground(Qt::white);
+    setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     canvas()->setFrameStyle(QFrame::NoFrame);
     courseData = data;                      // what we plot
     Now = 0;                                // where we are
@@ -63,7 +63,7 @@ ErgFilePlot::ErgFilePlot(QList<ErgFilePoint> *data)
     LodCurve->setData(lodData);
     LodCurve->attach(this);
     LodCurve->setYAxis(QwtPlot::yLeft);
-    QColor brush_color = QColor(124, 91, 31);
+    QColor brush_color = QColor(Qt::blue);
     brush_color.setAlpha(64);
     LodCurve->setBrush(brush_color);   // fill below the line
 

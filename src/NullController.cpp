@@ -48,6 +48,7 @@ int NullController::restart() {
 void NullController::getRealtimeData(RealtimeData &rtData) {
     rtData.setName((char *)"Null");
     rtData.setWatts(load);
+    rtData.setLoad(load);
     rtData.setSpeed(20);
     rtData.setCadence(90);
     rtData.setHr(145);

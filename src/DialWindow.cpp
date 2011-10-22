@@ -112,6 +112,10 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         }
         break;
 
+    case RealtimeData::Distance:
+        valueLabel->setText(QString("%1").arg(value, 0, 'f', 3));
+        break;
+
     default:
         valueLabel->setText(QString("%1").arg(round(value)));
         break;
