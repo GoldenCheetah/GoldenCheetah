@@ -21,6 +21,7 @@
 #include "PfPvPlot.h"
 #include "RideItem.h"
 #include "Settings.h"
+#include "Colors.h"
 #include <QtGui>
 
 PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
@@ -37,6 +38,17 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
     pfPvPlot = new PfPvPlot(mainWindow);
     vlayout->addWidget(pfPvPlot);
     setLayout(vlayout);
+
+    // allow zooming
+    pfpvZoomer = new QwtPlotZoomer(pfPvPlot->canvas());
+    pfpvZoomer->setRubberBand(QwtPicker::RectRubberBand);
+    pfpvZoomer->setRubberBandPen(GColor(CPLOTSELECT));
+    pfpvZoomer->setSelectionFlags(QwtPicker::DragSelection | QwtPicker::CornerToCorner);
+    pfpvZoomer->setTrackerMode(QwtPicker::AlwaysOff);
+    pfpvZoomer->setEnabled(true);
+    pfpvZoomer->setMousePattern(QwtEventPattern::MouseSelect1, Qt::LeftButton);
+    pfpvZoomer->setMousePattern(QwtEventPattern::MouseSelect2, Qt::RightButton, Qt::ControlModifier);
+    pfpvZoomer->setMousePattern(QwtEventPattern::MouseSelect3, Qt::RightButton);
 
     // the controls
     QFormLayout *f = new QFormLayout;

@@ -95,8 +95,8 @@ class PfPvPlot : public QwtPlot
         bool shade_zones;    // whether to shade zones, added 27Apr2009 djconnel
         bool merge_intervals, frame_intervals;
 
-    double timeInQuadrant[4]; // time in seconds spent in each quadrant
-    QwtPlotMarker *tiqMarker[4]; // time in seconds spent in each quadrant
+        double timeInQuadrant[4]; // time in seconds spent in each quadrant
+        QwtPlotMarker *tiqMarker[4]; // time in seconds spent in each quadrant
 };
 
 #endif // _GC_QaPlot_h
