@@ -19,14 +19,18 @@
 #include "SplitActivityWizard.h"
 
 // Minimum gap in recording to find a natural break to split
-static const double defaultMinimumGap = 15; // 15 minutes
+static const double defaultMinimumGap = 1; // 1 minute
 
 // Minimum size of segment to identify as a new activity
-static const double defaultMinimumSegmentSize = 20; // 20 minutes
+static const double defaultMinimumSegmentSize = 5; // 5 minutes
 
 // Main wizard
 SplitActivityWizard::SplitActivityWizard(MainWindow *main) : QWizard(main), main(main)
 {
+#ifdef Q_OS_MAX
+    setWizardStyle(QWizard::ModernStyle);
+#endif
+
     // delete when done
     setAttribute(Qt::WA_DeleteOnClose);
 
@@ -237,7 +241,9 @@ SplitActivityWizard::setIntervalsList(SplitSelect *selector)
                         interval.name == "Entire Activity");
 
         // disable checkbox editing (i.e. mandatory split) at gaps in recording
-        bool disableit = (interval.name.startsWith("Gap in recording"));
+        // we have turned this off from user requests, may reinstate or choose
+        // to fix gaps when they are left behind after split.
+        bool disableit = false; /* (interval.name.startsWith("Gap in recording")); */
 
         // selector start
         QCheckBox *checkBox = new QCheckBox("", this);
