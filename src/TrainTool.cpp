@@ -19,6 +19,7 @@
 #include "TrainTool.h"
 #include "MainWindow.h"
 #include "Settings.h"
+#include "Colors.h"
 #include "Units.h"
 #include "DeviceTypes.h"
 #include "DeviceConfiguration.h"
@@ -200,6 +201,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
 void
 TrainTool::configChanged()
 {
+    setProperty("color", GColor(CRIDEPLOTBACKGROUND));
 
     // SERVERS & DEVICES
     // zap whats there
