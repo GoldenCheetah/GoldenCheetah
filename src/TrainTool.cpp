@@ -59,6 +59,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     //setMidLineWidth(0);
     //setFrameStyle(QFrame::Plain | QFrame::Sunken);
     mainLayout->setSpacing(0);
+    mainLayout->setContentsMargins(3,3,3,3);
     setContentsMargins(0,0,0,0);
 
 #if 0 // not in this release .. or for a while TBH
@@ -114,19 +115,27 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     buttonPanel->setLineWidth(1);
     buttonPanel->setFrameStyle(QFrame::NoFrame);
     buttonPanel->setContentsMargins(0,0,0,0);
+
     QVBoxLayout *panel = new QVBoxLayout;
     panel->setSpacing(0);
     panel->setContentsMargins(0,0,0,0);
+
     QHBoxLayout *buttons = new QHBoxLayout;
     buttons->setSpacing(0);
     buttons->setContentsMargins(0,0,0,0);
+
     startButton = new QPushButton(tr("Start"), this);
+    startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     pauseButton = new QPushButton(tr("Pause"), this);
+    pauseButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     stopButton = new QPushButton(tr("Stop"), this);
+    stopButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     recordSelector = new QCheckBox(this);
     recordSelector->setText(tr("Save workout data"));
     recordSelector->setChecked(Qt::Checked);
     recordSelector->hide(); // we don't let users change this for now
+
     buttons->addWidget(startButton);
     buttons->addWidget(pauseButton);
     buttons->addWidget(stopButton);
