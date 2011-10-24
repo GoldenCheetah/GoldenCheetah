@@ -24,7 +24,6 @@ DialWindow::DialWindow(MainWindow *mainWindow) :
 {
     setContentsMargins(0,0,0,0);
     setInstanceName("Dial");
-    resetValues();
 
     QWidget *c = new QWidget;
     QVBoxLayout *cl = new QVBoxLayout(c);
@@ -55,6 +54,8 @@ DialWindow::DialWindow(MainWindow *mainWindow) :
     connect(mainWindow, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
     connect(seriesSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(seriesChanged()));
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(seriesChanged()));
+    connect(mainWindow, SIGNAL(stop()), this, SLOT(stop()));
+    connect(mainWindow, SIGNAL(start()), this, SLOT(start()));
 
     // setup colors
     seriesChanged();
@@ -63,7 +64,7 @@ DialWindow::DialWindow(MainWindow *mainWindow) :
     resizeEvent(NULL);
 
     // set to zero
-    telemetryUpdate(RealtimeData());
+    resetValues();
 }
 
 void
@@ -147,9 +148,12 @@ void DialWindow::seriesChanged()
     case RealtimeData::LapTime:
     case RealtimeData::Distance:
     case RealtimeData::Lap:
-    case RealtimeData::Load:
     case RealtimeData::None:
             foreground = GColor(CPLOTMARKER);
+            break;
+
+    case RealtimeData::Load:
+            foreground = Qt::blue;
             break;
 
     case RealtimeData::XPower:

@@ -30,6 +30,9 @@
 #include "ErgFilePlot.h"
 #include "RealtimeData.h" // for realtimedata structure
 
+#include "Settings.h"
+#include "Colors.h"
+
 class WorkoutPlotWindow : public GcWindow
 {
     Q_OBJECT

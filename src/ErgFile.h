@@ -65,6 +65,7 @@ class ErgFile
         ~ErgFile();             // delete the contents
 
         bool isValid();         // is the file valid or not?
+        int format;             // ERG, CRS or MRC currently supported
         int wattsAt(long, int&);      // return the watts value for the passed msec
         double gradientAt(long, int&);      // return the gradient value for the passed meter
         int nextLap(long);      // return the msecs value for the next Lap marker
@@ -72,8 +73,8 @@ class ErgFile
         QString Version,        // version number / identifer
                 Units,          // units used
                 Filename,       // filename from inside file
-                Name,           // workout name
-                Format;         // only ever seen MINUTES  WATTS
+                Name;           // workout name
+                
         long    Duration;       // Duration of this workout in msecs
         int     Ftp;            // FTP this file was targetted at
         int     MaxWatts;       // maxWatts in this ergfile (scaling)

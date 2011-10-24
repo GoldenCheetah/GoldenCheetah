@@ -23,6 +23,8 @@
 #include "RaceDispatcher.h"
 #include "RealtimeData.h"
 
+#include <math.h>
+
 NullController::NullController(TrainTool *parent,
                                                  DeviceConfiguration *)
   : RealtimeController(parent), parent(parent), load(100)
@@ -47,11 +49,11 @@ int NullController::restart() {
 
 void NullController::getRealtimeData(RealtimeData &rtData) {
     rtData.setName((char *)"Null");
-    rtData.setWatts(load);
+    rtData.setWatts(load + ((rand()%25)-15));
     rtData.setLoad(load);
-    rtData.setSpeed(20);
-    rtData.setCadence(90);
-    rtData.setHr(145);
+    rtData.setSpeed(45 + ((rand()%5)-2));
+    rtData.setCadence(85 + ((rand()%10)-5));
+    rtData.setHr(145 + ((rand()%3)-2));
 }
 
 void NullController::pushRealtimeData(RealtimeData &) {

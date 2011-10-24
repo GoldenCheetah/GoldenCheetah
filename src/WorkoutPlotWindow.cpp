@@ -25,6 +25,7 @@ WorkoutPlotWindow::WorkoutPlotWindow(MainWindow *mainWindow) :
     setContentsMargins(0,0,0,0);
     setInstanceName("RT Plot");
     setControls(NULL);
+    setProperty("color", GColor(CRIDEPLOTBACKGROUND));
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setSpacing(0);
@@ -34,12 +35,17 @@ WorkoutPlotWindow::WorkoutPlotWindow(MainWindow *mainWindow) :
 
     connect(mainWindow, SIGNAL(setNow(long)), this, SLOT(setNow(long)));
     connect(mainWindow, SIGNAL(ergFileSelected(ErgFile*)), this, SLOT(ergFileSelected(ErgFile*)));
-
+    connect(mainWindow, SIGNAL(telemetryUpdate(RealtimeData)), ergPlot, SLOT(performancePlot(RealtimeData)));
+    connect(mainWindow, SIGNAL(start()), ergPlot, SLOT(start()));
 }
 
 void
 WorkoutPlotWindow::ergFileSelected(ErgFile *f)
 {
+    // rename window to workout name
+    if (f && f->Name != "") setProperty("subtitle", f->Name);
+    else setProperty("subtitle", "");
+
     ergPlot->setData(f);
     ergPlot->replot();
 }

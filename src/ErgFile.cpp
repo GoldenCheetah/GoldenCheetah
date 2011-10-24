@@ -26,7 +26,7 @@ ErgFile::ErgFile(QString filename, int &mode, double Cp)
     leftPoint=rightPoint=0;
     MaxWatts = Ftp = 0;
     int lapcounter = 0;
-    int format = ERG;                         // either ERG or MRC
+    format = ERG;                         // either ERG or MRC
 
     // running totals for CRS file format
     long rdist = 0; // running total for distance
@@ -269,7 +269,7 @@ ErgFile::wattsAt(long x, int &lapnum)
         }
         lapnum = lap;
 
-    }
+    } else lapnum = 0;
 
     // find right section of the file
     while (x < Points.at(leftPoint).x || x > Points.at(rightPoint).x) {

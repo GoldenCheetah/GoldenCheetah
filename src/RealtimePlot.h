@@ -35,12 +35,13 @@ class Realtime30PwrData : public QwtData
 {
     int pwrCur_; 
     int &pwrCur;
+    double pwr30;
     double pwrData_[150];
     double (&pwrData)[150];
 
     public:
-    Realtime30PwrData() : pwrCur(pwrCur_), pwrData(pwrData_) {}
-    Realtime30PwrData(Realtime30PwrData *other) : pwrCur(other->pwrCur_), pwrData(other->pwrData_) {}
+    Realtime30PwrData() : pwrCur(pwrCur_), pwrData(pwrData_) { init(); }
+    Realtime30PwrData(Realtime30PwrData *other) : pwrCur(other->pwrCur_), pwrData(other->pwrData_) { init(); }
 
     double x(size_t i) const ;
     double y(size_t i) const ;

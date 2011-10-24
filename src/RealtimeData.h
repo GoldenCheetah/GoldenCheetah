@@ -56,6 +56,7 @@ public:
     void setBikeScore(long);
     void setJoules(long);
     void setXPower(long);
+    void setLap(long);
 
     const char *getName() const;
     double getWatts() const;
@@ -71,6 +72,7 @@ public:
     long getBikeScore() const;
     long getJoules() const;
     long getXPower() const;
+    long getLap() const;
 
 
 private:
@@ -82,7 +84,7 @@ private:
 
     // derived data
     double distance;
-    int lap;
+    long lap;
     long msecs;
     long lapMsecs;
     long bikeScore, joules, xPower;
