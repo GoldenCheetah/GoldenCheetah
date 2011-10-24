@@ -203,10 +203,10 @@ TrainTool::configChanged()
 {
     setProperty("color", GColor(CRIDEPLOTBACKGROUND));
 
-    // SERVERS & DEVICES
+    // DEVICES
     // zap whats there
-    QList<QTreeWidgetItem *> servers = allServers->takeChildren();
-    for (int i=0; i<servers.count(); i++) delete servers.at(i);
+    //QList<QTreeWidgetItem *> servers = allServers->takeChildren();
+    //for (int i=0; i<servers.count(); i++) delete servers.at(i);
     QList<QTreeWidgetItem *> devices = allDevices->takeChildren();
     for (int i=0; i<devices.count(); i++) delete devices.at(i);
 
