@@ -215,8 +215,8 @@ TrainTool::configChanged()
     Devices = all.getList();
     for (int i=0; i<Devices.count(); i++) {
         if (Devices.at(i).type == DEV_GSERVER) {
-            QTreeWidgetItem *server = new QTreeWidgetItem(allServers, i);
-            server->setText(0, Devices.at(i).name);
+            //QTreeWidgetItem *server = new QTreeWidgetItem(allServers, i);
+            //server->setText(0, Devices.at(i).name);
         } else {
             QTreeWidgetItem *device = new QTreeWidgetItem(allDevices, i);
             device->setText(0, Devices.at(i).name);
@@ -488,7 +488,7 @@ void TrainTool::Start()       // when start button is pressed
         status |=RT_RUNNING;
 
         // should we be streaming too?
-        setStreamController();
+        //setStreamController();
         if (streamController != NULL) status |= RT_STREAMING;
 
         setStartText(tr("Lap"));
