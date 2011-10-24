@@ -43,6 +43,22 @@ extern "C" {
 #include <QX11EmbedContainer>
 #endif
 
+class MediaHelper
+{
+    public:
+
+        MediaHelper();
+        ~MediaHelper();
+
+        // get a list of supported media
+        // found in the supplied directory
+        QStringList listMedia(QDir directory);
+
+    private:
+
+        libvlc_instance_t * inst;
+};
+
 class VideoWindow : public GcWindow
 {
     Q_OBJECT
@@ -57,6 +73,12 @@ class VideoWindow : public GcWindow
         ~VideoWindow();
 
     public slots:
+
+        void startPlayback();
+        void stopPlayback();
+        void pausePlayback();
+        void resumePlayback();
+        void mediaSelected(QString filename);
 
     protected:
 

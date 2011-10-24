@@ -80,7 +80,9 @@ class TrainTool : public GcWindow
         GoldenClient       *streamController;   // send out to
 
         const QTreeWidgetItem *currentWorkout() { return workout; }
+        const QTreeWidgetItem *currentMedia() { return media; }
         const QTreeWidgetItem *workoutItems() { return allWorkouts; }
+        const QTreeWidgetItem *mediaItems() { return allMedia; }
         const QTreeWidgetItem *currentServer() { return server; }
         const QTreeWidgetItem *serverItems() { return allServers; }
 
@@ -118,6 +120,7 @@ class TrainTool : public GcWindow
         void serverTreeWidgetSelectionChanged();
         void deviceTreeWidgetSelectionChanged();
         void workoutTreeWidgetSelectionChanged();
+        void mediaTreeWidgetSelectionChanged();
         void configChanged();
 
     public slots:
@@ -146,16 +149,20 @@ class TrainTool : public GcWindow
 
         const QDir home;
         MainWindow *main;
+        QSplitter   *trainSplitter;
 
         QTreeWidget *workoutTree;
         QTreeWidget *deviceTree;
-        QTreeWidgetItem *allWorkouts;
-        QTreeWidgetItem *workout;
-        QSplitter   *trainSplitter;
         QTreeWidget *serverTree;
+        QTreeWidget *mediaTree;
+
         QTreeWidgetItem *allServers;
+        QTreeWidgetItem *allMedia;
         QTreeWidgetItem *allDevices;
         QTreeWidgetItem *server;
+        QTreeWidgetItem *allWorkouts;
+        QTreeWidgetItem *workout;
+        QTreeWidgetItem *media;
 
         // those buttons
         QFrame *buttonPanel;

@@ -144,6 +144,7 @@ class MainWindow : public QMainWindow
         // realtime signals
         void notifyTelemetryUpdate(const RealtimeData &rtData) { telemetryUpdate(rtData); }
         void notifyErgFileSelected(ErgFile *x) { ergFileSelected(x); }
+        void notifyMediaSelected( QString x) { mediaSelected(x); }
         void notifySetNow(long now) { setNow(now); }
         void notifyNewLap() { emit newLap(); }
         void notifyStart() { emit start(); }
@@ -180,6 +181,7 @@ class MainWindow : public QMainWindow
         // realtime
         void telemetryUpdate(RealtimeData rtData);
         void ergFileSelected(ErgFile *);
+        void mediaSelected(QString);
         void setNow(long);
         void newLap();
         void start();
