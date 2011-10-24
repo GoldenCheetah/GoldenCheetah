@@ -455,8 +455,8 @@ MainWindow::MainWindow(const QDir &home) :
     rideMenu->addAction(tr("Export Metrics as CSV..."), this, SLOT(exportMetrics()), tr(""));
 #ifdef GC_HAVE_SOAP
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("&Upload to Training Peaks"), this, SLOT(uploadTP()), tr("Ctrl+U"));
-    rideMenu->addAction(tr("Down&load from Training Peaks..."), this, SLOT(downloadTP()), tr("Ctrl+L"));
+    rideMenu->addAction(tr("&Upload to TrainingPeaks"), this, SLOT(uploadTP()), tr("Ctrl+U"));
+    rideMenu->addAction(tr("Down&load from TrainingPeaks..."), this, SLOT(downloadTP()), tr("Ctrl+L"));
 #endif
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Save activity"), this, SLOT(saveRide()), tr("Ctrl+S"));
