@@ -436,7 +436,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     QLabel *gcuserLabel = new QLabel(tr("Username"));
     QLabel *gcpassLabel = new QLabel(tr("Password"));
 
-    QLabel *tp = new QLabel(tr("Training Peaks"));
+    QLabel *tp = new QLabel(tr("TrainingPeaks"));
     tp->setFont(current);
 
     QLabel *urlLabel = new QLabel(tr("Website"));

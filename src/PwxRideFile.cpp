@@ -26,12 +26,12 @@
 
 static int pwxFileReaderRegistered =
     RideFileFactory::instance().registerReader(
-        "pwx", "Training Peaks PWX", new PwxFileReader());
+        "pwx", "TrainingPeaks PWX", new PwxFileReader());
 
 RideFile *
 PwxFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
 {
-    QDomDocument doc("Training Peaks PWX");
+    QDomDocument doc("TrainingPeaks PWX");
     if (!file.open(QIODevice::ReadOnly)) {
         errors << "Could not open file.";
         return NULL;

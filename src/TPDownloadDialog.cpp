@@ -49,7 +49,7 @@ TPDownloadDialog::completedAthlete(QList<QMap<QString, QString> >athletes)
 
         QMessageBox msgBox;
         msgBox.setWindowTitle(tr("Download from TrainingPeaks.com"));
-        msgBox.setText(tr("You must be a premium member to download from Training Peaks. Please check your cyclist configurations are correct on the Passwords tab."));
+        msgBox.setText(tr("You must be a premium member to download from TrainingPeaks. Please check your cyclist configurations are correct on the Passwords tab."));
         msgBox.setIcon(QMessageBox::Critical);
         msgBox.exec();
         reject();
