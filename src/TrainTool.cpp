@@ -35,6 +35,10 @@
 #include "ANTlocalController.h"
 #include "NullController.h"
 
+#ifdef GC_HAVE_VLC
+// Media selection helper
+#include "VideoWindow.h"
+#endif
 
 TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), home(home), main(parent)
 {
@@ -68,6 +72,19 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     allServers = new QTreeWidgetItem(serverTree, HEAD_TYPE);
     allServers->setText(0, tr("Race Servers"));
     serverTree->expandItem(allServers);
+#endif
+
+#ifdef GC_HAVE_VLC
+    mediaTree = new QTreeWidget;
+    mediaTree->setFrameStyle(QFrame::NoFrame);
+    mediaTree->setColumnCount(1);
+    mediaTree->setSelectionMode(QAbstractItemView::SingleSelection);
+    mediaTree->header()->hide();
+    mediaTree->setAlternatingRowColors (false);
+    mediaTree->setIndentation(5);
+    allMedia = new QTreeWidgetItem(mediaTree, HEAD_TYPE);
+    allMedia->setText(0, tr("Video / Media"));
+    mediaTree->expandItem(allMedia);
 #endif
 
     deviceTree = new QTreeWidget;
@@ -130,11 +147,17 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     trainSplitter->addWidget(deviceTree);
     //trainSplitter->addWidget(serverTree);
     trainSplitter->addWidget(workoutTree);
+#ifdef GC_HAVE_VLC
+    trainSplitter->addWidget(mediaTree);
+#endif
 
     // handle config changes
     //connect(serverTree,SIGNAL(itemSelectionChanged()), this, SLOT(serverTreeWidgetSelectionChanged()));
     connect(deviceTree,SIGNAL(itemSelectionChanged()), this, SLOT(deviceTreeWidgetSelectionChanged()));
     connect(workoutTree,SIGNAL(itemSelectionChanged()), this, SLOT(workoutTreeWidgetSelectionChanged()));
+#ifdef GC_HAVE_VLC
+    connect(mediaTree,SIGNAL(itemSelectionChanged()), this, SLOT(mediaTreeWidgetSelectionChanged()));
+#endif
     connect(main, SIGNAL(configChanged()), this, SLOT(configChanged()));
 
     // connect train tool buttons!
@@ -242,6 +265,20 @@ TrainTool::configChanged()
         QTreeWidgetItem *work = new QTreeWidgetItem(allWorkouts, WORKOUT_TYPE);
         work->setText(0, name);
     }
+
+#ifdef GC_HAVE_VLC
+    // MEDIA
+    QList<QTreeWidgetItem *> media = allMedia->takeChildren();
+    for (int i=0; i<media.count(); i++) delete media.at(i);
+
+    MediaHelper mediaHelper;
+    foreach(QString video, mediaHelper.listMedia(QDir(workoutDir.toString()))) {
+
+        // add a media line for the video (it might be a song though...)
+        QTreeWidgetItem *media = new QTreeWidgetItem(allMedia, WORKOUT_TYPE);
+        media->setText(0, video);
+    }
+#endif
 
     // Athlete
     FTP=285; // default to 285 if zones are not set
@@ -394,6 +431,31 @@ TrainTool::listWorkoutFiles(const QDir &dir) const
     filters << "*.crs";
 
     return dir.entryList(filters, QDir::Files, QDir::Name);
+}
+
+void
+TrainTool::mediaTreeWidgetSelectionChanged()
+{
+    assert(mediaTree->selectedItems().size() <= 1);
+    if (mediaTree->selectedItems().isEmpty())
+        media = NULL;
+    else {
+        QTreeWidgetItem *which = mediaTree->selectedItems().first();
+        if (which->type() != WORKOUT_TYPE)
+            media = NULL;
+        else
+            media = which;
+    }
+
+    // which one is selected?
+    if (currentMedia() == NULL || currentMedia()->type() != WORKOUT_TYPE) {
+        main->notifyMediaSelected("");
+        return;
+    }
+
+    QVariant workoutDir = appsettings->value(this, GC_WORKOUTDIR);
+    QString fileName = workoutDir.toString() + "/" + currentMedia()->text(0); // filename
+    main->notifyMediaSelected(fileName);
 }
 
 /*--------------------------------------------------------------------------------
