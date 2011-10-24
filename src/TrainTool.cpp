@@ -57,7 +57,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     mainLayout->setSpacing(0);
     setContentsMargins(0,0,0,0);
 
-
+#if 0 // not in this release .. or for a while TBH
     serverTree = new QTreeWidget;
     serverTree->setFrameStyle(QFrame::NoFrame);
     serverTree->setColumnCount(1);
@@ -68,6 +68,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     allServers = new QTreeWidgetItem(serverTree, HEAD_TYPE);
     allServers->setText(0, tr("Race Servers"));
     serverTree->expandItem(allServers);
+#endif
 
     deviceTree = new QTreeWidget;
     deviceTree->setFrameStyle(QFrame::NoFrame);
@@ -98,24 +99,23 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     buttonPanel->setContentsMargins(0,0,0,0);
     QVBoxLayout *panel = new QVBoxLayout;
     panel->setSpacing(0);
+    panel->setContentsMargins(0,0,0,0);
     QHBoxLayout *buttons = new QHBoxLayout;
     buttons->setSpacing(0);
+    buttons->setContentsMargins(0,0,0,0);
     startButton = new QPushButton(tr("Start"), this);
-    startButton->setMaximumHeight(100);
     pauseButton = new QPushButton(tr("Pause"), this);
-    pauseButton->setMaximumHeight(100);
     stopButton = new QPushButton(tr("Stop"), this);
-    stopButton->setMaximumHeight(100);
     recordSelector = new QCheckBox(this);
     recordSelector->setText(tr("Save workout data"));
     recordSelector->setChecked(Qt::Checked);
+    recordSelector->hide(); // we don't let users change this for now
     buttons->addWidget(startButton);
     buttons->addWidget(pauseButton);
     buttons->addWidget(stopButton);
     panel->addLayout(buttons);
-    panel->addWidget(recordSelector);
+    //panel->addWidget(recordSelector);
     buttonPanel->setLayout(panel);
-    buttonPanel->setFixedHeight(90);
     mainLayout->addWidget(buttonPanel);
 
     trainSplitter = new QSplitter;
@@ -128,11 +128,11 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
 
     cl->addWidget(trainSplitter);
     trainSplitter->addWidget(deviceTree);
-    trainSplitter->addWidget(serverTree);
+    //trainSplitter->addWidget(serverTree);
     trainSplitter->addWidget(workoutTree);
 
     // handle config changes
-    connect(serverTree,SIGNAL(itemSelectionChanged()), this, SLOT(serverTreeWidgetSelectionChanged()));
+    //connect(serverTree,SIGNAL(itemSelectionChanged()), this, SLOT(serverTreeWidgetSelectionChanged()));
     connect(deviceTree,SIGNAL(itemSelectionChanged()), this, SLOT(deviceTreeWidgetSelectionChanged()));
     connect(workoutTree,SIGNAL(itemSelectionChanged()), this, SLOT(workoutTreeWidgetSelectionChanged()));
     connect(main, SIGNAL(configChanged()), this, SLOT(configChanged()));
@@ -470,12 +470,19 @@ void TrainTool::Start()       // when start button is pressed
 {
     if (status&RT_RUNNING) {
         newLap();
+
+        // tell the world
+        main->notifyNewLap();
+
     } else {
 
         // open the controller if it is selected
         setDeviceController();
         if (deviceController == NULL) return;
         else deviceController->start();          // start device
+
+        // tell the world
+        main->notifyStart();
 
         // we're away!
         status |=RT_RUNNING;
@@ -484,7 +491,7 @@ void TrainTool::Start()       // when start button is pressed
         setStreamController();
         if (streamController != NULL) status |= RT_STREAMING;
 
-        setStartText(tr("Lap/Interval"));
+        setStartText(tr("Lap"));
 
         load_period.restart();
         session_time.start();
@@ -544,6 +551,7 @@ void TrainTool::Pause()        // pause capture to recalibrate
     if ((status&RT_RUNNING) == 0) return;
 
     if (status&RT_PAUSED) {
+
         session_time.start();
         lap_time.start();
         status &=~RT_PAUSED;
@@ -555,7 +563,12 @@ void TrainTool::Pause()        // pause capture to recalibrate
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         load_period.restart();
         if (status & RT_WORKOUT) load_timer->start(LOADRATE);
+
+        // tell the world
+        main->notifyUnPause();
+
     } else {
+
         session_elapsed_msec += session_time.elapsed();
         lap_elapsed_msec += lap_time.elapsed();
         deviceController->pause();
@@ -567,6 +580,9 @@ void TrainTool::Pause()        // pause capture to recalibrate
         if (status & RT_RECORDING) disk_timer->stop();
         if (status & RT_WORKOUT) load_timer->stop();
         load_msecs += load_period.restart();
+
+        // tell the world
+        main->notifyPause();
     }
 }
 
@@ -617,8 +633,13 @@ void TrainTool::Stop(int deviceStatus)        // when stop button is pressed
     if (status & RT_WORKOUT) {
         load_timer->stop();
         load_msecs = 0;
-        main->notifySetNow(load_msecs);
     }
+
+    main->notifySetNow(load_msecs);
+
+
+    // tell the world
+    main->notifyStop();
 
     // Re-enable gui elements
     //recordSelector->setEnabled(true);
@@ -661,6 +682,7 @@ void TrainTool::updateData(RealtimeData &rtData)
 void TrainTool::guiUpdate()           // refreshes the telemetry
 {
     RealtimeData rtData;
+    rtData.setLap(displayLap + displayWorkoutLap); // user laps + predefined workout lap
 
     if (deviceController == NULL) return;
 
@@ -694,6 +716,13 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
 
         // go update the displays...
         main->notifyTelemetryUpdate(rtData); // signal everyone to update telemetry
+
+        // set now to current time when not using a workout
+        // but limit to almost every second (account for
+        // slight timing errors of 100ms or so)
+        if (!(status&RT_WORKOUT) && rtData.getMsecs()%1000 < 100) {
+            main->notifySetNow(rtData.getMsecs());
+        }
     }
 }
 

@@ -145,6 +145,11 @@ class MainWindow : public QMainWindow
         void notifyTelemetryUpdate(const RealtimeData &rtData) { telemetryUpdate(rtData); }
         void notifyErgFileSelected(ErgFile *x) { ergFileSelected(x); }
         void notifySetNow(long now) { setNow(now); }
+        void notifyNewLap() { emit newLap(); }
+        void notifyStart() { emit start(); }
+        void notifyUnPause() { emit unpause(); }
+        void notifyPause() { emit pause(); }
+        void notifyStop() { emit stop(); }
 
 
 
@@ -171,9 +176,16 @@ class MainWindow : public QMainWindow
         void rideDeleted(RideItem *);
         void rideDirty();
         void rideClean();
+
+        // realtime
         void telemetryUpdate(RealtimeData rtData);
         void ergFileSelected(ErgFile *);
         void setNow(long);
+        void newLap();
+        void start();
+        void unpause();
+        void pause();
+        void stop();
 
     public slots:
         void showTreeContextMenuPopup(const QPoint &);

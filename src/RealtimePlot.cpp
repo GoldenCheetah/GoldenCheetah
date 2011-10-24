@@ -30,16 +30,16 @@
 
 // Power history
 double RealtimePwrData::x(size_t i) const { return (double)50-i; }
-double RealtimePwrData::y(size_t i) const { return pwrData[(pwrCur+100+i) <150  ? (pwrCur+100+i) : (pwrCur+100+i-150)]; }
+double RealtimePwrData::y(size_t i) const { return pwrData[(pwrCur+i) < 50 ? (pwrCur+i) : (pwrCur+i-50)]; }
 size_t RealtimePwrData::size() const { return 50; }
 QwtData *RealtimePwrData::copy() const { return new RealtimePwrData(const_cast<RealtimePwrData*>(this)); }
-void RealtimePwrData::init() { pwrCur=0; for (int i=0; i<150; i++) pwrData[i]=0; }
-void RealtimePwrData::addData(double v) { pwrData[pwrCur++] = v; if (pwrCur==150) pwrCur=0; }
+void RealtimePwrData::init() { pwrCur=0; for (int i=0; i<50; i++) pwrData[i]=0; }
+void RealtimePwrData::addData(double v) { pwrData[pwrCur++] = v; if (pwrCur==50) pwrCur=0; }
 
 // 30 second Power rolling avg
-double Realtime30PwrData::x(size_t i) const { return (double)50-i; }
+double Realtime30PwrData::x(size_t i) const { return i ? 0 : 50; }
 
-double Realtime30PwrData::y(size_t i) const { int pwr30=0; if (i==1) { for (int x=0; x<150; x++) { pwr30+=pwrData[x]; } pwr30 /= 150; } return pwr30; }
+double Realtime30PwrData::y(size_t i) const { double pwr30=0; for (int x=0; x<150; x++) { pwr30+=pwrData[x]; } pwr30 /= 150; return pwr30; }
 size_t Realtime30PwrData::size() const { return 50; }
 QwtData *Realtime30PwrData::copy() const { return new Realtime30PwrData(const_cast<Realtime30PwrData*>(this)); }
 void Realtime30PwrData::init() { pwrCur=0; for (int i=0; i<150; i++) pwrData[i]=0; }
@@ -93,6 +93,11 @@ RealtimePlot::RealtimePlot() : pwrCurve(NULL)
     setAxisTitle(yRight, "Cadence / HR");
     setAxisTitle(yRight2, "Speed");
     setAxisTitle(xBottom, "Seconds Ago");
+    setAxisMaxMinor(xBottom, 0);
+    setAxisMaxMinor(yLeft, 0);
+    setAxisMaxMinor(yLeft2, 0);
+    setAxisMaxMinor(yRight, 0);
+    setAxisMaxMinor(yRight2, 0);
 
     QPalette pal;
     setAxisScale(yLeft, 0, 500); // watts

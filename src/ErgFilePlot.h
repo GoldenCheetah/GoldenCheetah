@@ -30,10 +30,15 @@
 #include <qwt_plot.h>
 #include <qwt_plot_marker.h>
 #include <qwt_scale_draw.h>
+#include <qwt_scale_div.h>
+#include <qwt_scale_widget.h>
+#include <qwt_symbol.h>
 #include "ErgFile.h"
 
 #include "Settings.h"
 #include "Colors.h"
+
+#include "RealtimeData.h"
 
 
 class ErgFileData : public QwtData
@@ -56,6 +61,45 @@ class NowData : public QwtData
     void init() ;
 };
 
+// incremental data, for each curve
+class CurveData
+{
+    // A container class for growing data
+public:
+
+    CurveData();
+
+    void append(double *x, double *y, int count);
+    void clear();
+
+    int count() const;
+    int size() const;
+    const double *x() const;
+    const double *y() const;
+
+private:
+    int d_count;
+    QwtArray<double> d_x;
+    QwtArray<double> d_y;
+};
+
+class DistScaleDraw: public QwtScaleDraw
+{
+public:
+    DistScaleDraw() { }
+
+    // we do 100m for <= a kilo
+    virtual QwtText label(double v) const { if (v<1000) return QString("%1").arg(v/1000, 0, 'g', 1);
+                                            else return QString("%1").arg(round(v/1000)); }
+};
+class TimeScaleDraw: public QwtScaleDraw
+{
+public:
+    TimeScaleDraw() { }
+
+    virtual QwtText label(double v) const { return QString("%1").arg(round(v/60000)); }
+};
+
 class ErgFilePlot : public QwtPlot
 {
     Q_OBJECT
@@ -68,17 +112,42 @@ class ErgFilePlot : public QwtPlot
     QList<QwtPlotMarker *> Marks;
 
     void setData(ErgFile *); // set the course
+    void reset(); // reset counters etc when plot changes
     void setNow(long); // set point we're add for progress pointer
-    //void plot();
+
+    public slots:
+
+    void performancePlot(RealtimeData);
+    void start();
 
     private:
 
+    bool bydist;
+
 	QwtPlotGrid *grid;
 	QwtPlotCurve *LodCurve;
+	QwtPlotCurve *wattsCurve;
+	QwtPlotCurve *hrCurve;
+	QwtPlotCurve *cadCurve;
+	QwtPlotCurve *speedCurve;
 	QwtPlotCurve *NowCurve;
+
+    CurveData *wattsData,
+              *hrData,
+              *cadData,
+              *speedData;
+
+    double counter;
+    double wattssum,
+           hrsum,
+           cadsum,
+           speedsum;
 
     ErgFileData lodData;
     NowData nowData;
+
+    DistScaleDraw *distdraw;
+    TimeScaleDraw *timedraw;
 
     ErgFilePlot();
 

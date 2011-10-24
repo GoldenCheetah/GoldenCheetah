@@ -23,7 +23,7 @@
 static ErgFile *ergFile;
 static QList<ErgFilePoint> *courseData;
 static long Now;
-static int MaxWatts;
+static double MaxWatts;
 
 // Load history
 double ErgFileData::x(size_t i) const { return courseData ? courseData->at(i).x : 0; }
@@ -34,7 +34,7 @@ QwtData *ErgFileData::copy() const { return new ErgFileData(); }
 
 // Now bar
 double NowData::x(size_t) const { return Now; }
-double NowData::y(size_t i) const { return (i ? MaxWatts : 0); }
+double NowData::y(size_t i) const { return (i ? (MaxWatts ? MaxWatts : 500) : 0); }
 size_t NowData::size() const { return 2; }
 QwtData *NowData::copy() const { return new NowData(); }
 
@@ -48,24 +48,105 @@ ErgFilePlot::ErgFilePlot(QList<ErgFilePoint> *data)
     courseData = data;                      // what we plot
     Now = 0;                                // where we are
 
-    // Setup the axis (of evil :-)
+    // Setup the left axis (Power)
     setAxisTitle(yLeft, "Watts");
-    //setAxisScale(yLeft, 0, 500); // watts -- Autoscale please!
-    enableAxis(yLeft, false);
-    enableAxis(xBottom, false); // very little value and some cpu overhead
+    enableAxis(yLeft, true);
+    QwtScaleDraw *sd = new QwtScaleDraw;
+    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisMaxMinor(yLeft, 0);
+    setAxisScaleDraw(QwtPlot::yLeft, sd);
+
+    QPalette pal;
+    pal.setColor(QPalette::WindowText, GColor(CPOWER));
+    pal.setColor(QPalette::Text, GColor(CPOWER));
+    axisWidget(QwtPlot::yLeft)->setPalette(pal);
+
+    QFont stGiles;
+    stGiles.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+    stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+    QwtText title("Watts");
+    title.setFont(stGiles);
+    QwtPlot::setAxisFont(yLeft, stGiles);
+    QwtPlot::setAxisTitle(yLeft, title);
+
+
+    //setAxisScale(yLeft, 0, 1000); // we autoscale, since peaks are so much higher than troughs
+    enableAxis(xBottom, true);
+    distdraw = new DistScaleDraw;
+    distdraw->setTickLength(QwtScaleDiv::MajorTick, 3);
+    timedraw = new TimeScaleDraw;
+    timedraw->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisMaxMinor(xBottom, 0);
+    setAxisScaleDraw(QwtPlot::xBottom, timedraw);
+
+    // set the axis so we default to an hour workout
+    setAxisScale(xBottom, (double)0, 1000 * 60  * 60 , 15 * 60 * 1000);
+
+    title.setFont(stGiles);
+    title.setText("Time (mins)");
+    QwtPlot::setAxisFont(xBottom, stGiles);
+    QwtPlot::setAxisTitle(xBottom, title);
+
+    pal.setColor(QPalette::WindowText, Qt::blue);
+    pal.setColor(QPalette::Text, Qt::blue);
+    axisWidget(QwtPlot::xBottom)->setPalette(pal);
+
+
+    // set all the orher axes off but scaled
+    setAxisScale(yRight, 0, 250); // max cadence and hr
     enableAxis(yRight, false);
+    setAxisScale(yRight2, 0, 60); // max speed of 60mph/60kmh seems ok to me!
+    enableAxis(yRight2, false);
 
     // Load Curve
     LodCurve = new QwtPlotCurve("Course Load");
-    QPen Lodpen = QPen(Qt::blue, 1.0);
-    LodCurve->setPen(Lodpen);
-
     LodCurve->setData(lodData);
     LodCurve->attach(this);
     LodCurve->setYAxis(QwtPlot::yLeft);
+
+    // load curve is blue for time and grey for gradient
     QColor brush_color = QColor(Qt::blue);
     brush_color.setAlpha(64);
     LodCurve->setBrush(brush_color);   // fill below the line
+    QPen Lodpen = QPen(Qt::blue, 1.0);
+    LodCurve->setPen(Lodpen);
+
+    // telemetry history
+    wattsCurve = new QwtPlotCurve("Power");
+    QPen wattspen = QPen(GColor(CPOWER));
+    wattsCurve->setPen(wattspen);
+    wattsCurve->attach(this);
+    wattsCurve->setYAxis(QwtPlot::yLeft);
+    wattsCurve->setPaintAttribute(QwtPlotCurve::PaintFiltered);
+    wattsData = new CurveData;
+    wattsCurve->setRawData(wattsData->x(), wattsData->y(), wattsData->count());
+
+    // telemetry history
+    hrCurve = new QwtPlotCurve("Heartrate");
+    QPen hrpen = QPen(GColor(CHEARTRATE));
+    hrCurve->setPen(hrpen);
+    hrCurve->attach(this);
+    hrCurve->setYAxis(QwtPlot::yRight);
+    hrData = new CurveData;
+    hrCurve->setRawData(hrData->x(), hrData->y(), hrData->count());
+
+    // telemetry history
+    cadCurve = new QwtPlotCurve("Cadence");
+    QPen cadpen = QPen(GColor(CCADENCE));
+    cadCurve->setPen(cadpen);
+    cadCurve->attach(this);
+    cadCurve->setYAxis(QwtPlot::yRight);
+    cadData = new CurveData;
+    cadCurve->setRawData(cadData->x(), cadData->y(), cadData->count());
+
+    // telemetry history
+    speedCurve = new QwtPlotCurve("Speed");
+    QPen speedpen = QPen(GColor(CSPEED));
+    speedCurve->setPen(speedpen);
+    speedCurve->attach(this);
+    speedCurve->setYAxis(QwtPlot::yRight2);
+    speedData = new CurveData;
+    speedCurve->setRawData(speedData->x(), speedData->y(), speedData->count());
 
     // Now pointer
     NowCurve = new QwtPlotCurve("Now");
@@ -75,11 +156,16 @@ ErgFilePlot::ErgFilePlot(QList<ErgFilePoint> *data)
     NowCurve->attach(this);
     NowCurve->setYAxis(QwtPlot::yLeft);
 
+    bydist = false;
+
+    setAutoReplot(false);
 }
 
 void
 ErgFilePlot::setData(ErgFile *ergfile)
 {
+    reset();
+
     ergFile = ergfile;
     // clear the previous marks (if any)
     for(int i=0; i<Marks.count(); i++) {
@@ -88,25 +174,52 @@ ErgFilePlot::setData(ErgFile *ergfile)
     }
     Marks.clear();
 
+    // axis fonts
+    QFont stGiles;
+    stGiles.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+    stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+    QPalette pal;
+
     if (ergfile) {
+
+        // is this by distance or time?
+        bydist = (ergfile->format == CRS) ? true : false;
+
+        if (bydist == true) {
+
+            QColor brush_color = QColor(Qt::gray);
+            brush_color.setAlpha(64);
+            LodCurve->setBrush(brush_color);   // fill below the line
+            QPen Lodpen = QPen(Qt::gray, 1.0);
+            LodCurve->setPen(Lodpen);
+
+        } else {
+
+            QColor brush_color = QColor(Qt::blue);
+            brush_color.setAlpha(64);
+            LodCurve->setBrush(brush_color);   // fill below the line
+            QPen Lodpen = QPen(Qt::blue, 1.0);
+            LodCurve->setPen(Lodpen);
+
+        }
 
         // set up again
         //setTitle(ergFile->Name);
         courseData = &ergfile->Points;
-        MaxWatts = ergfile->MaxWatts;
+        MaxWatts = LodCurve->maxYValue();
 
         for(int i=0; i < ergFile->Laps.count(); i++) {
 
             // Show Lap Number
             QwtText text(QString::number(ergFile->Laps.at(i).LapNum));
             text.setFont(QFont("Helvetica", 10, QFont::Bold));
-            text.setColor(Qt::black);
+            text.setColor(GColor(CPLOTMARKER));
 
             // vertical line
             QwtPlotMarker *add = new QwtPlotMarker();
             add->setLineStyle(QwtPlotMarker::VLine);
+            add->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
             add->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
-            add->setLinePen(QPen(Qt::black, 0, Qt::DashDotLine));
             add->setValue(ergFile->Laps.at(i).x, 0.0);
             add->setLabel(text);
             add->attach(this);
@@ -115,13 +228,75 @@ ErgFilePlot::setData(ErgFile *ergfile)
         }
 
         // set the axis so we use all the screen estate
-        if ((*courseData).count()) setAxisScale(xBottom, (double)0, (double)(*courseData).last().x);
+        if ((*courseData).count()) {
+            double maxX = (double)(*courseData).last().x;
+
+            if (bydist) {
+
+                // tics every 5 kilometer, if workout shorter tics every 1000m
+                double step = 5000;
+                if (maxX <= 1000) step = 100;
+                else if (maxX < 5000) step = 1000;
+
+                // axis setup for distance
+                setAxisScale(xBottom, (double)0, maxX, step);
+
+                QwtText title;
+                title.setFont(stGiles);
+                title.setText("Distance (km)");
+                QwtPlot::setAxisFont(xBottom, stGiles);
+                QwtPlot::setAxisTitle(xBottom, title);
+
+                pal.setColor(QPalette::WindowText, Qt::gray);
+                pal.setColor(QPalette::Text, Qt::gray);
+                axisWidget(QwtPlot::xBottom)->setPalette(pal);
+
+                // only allocate a new one if its not the current (they get freed by Qwt)
+                if (axisScaleDraw(xBottom) != distdraw)
+                    setAxisScaleDraw(QwtPlot::xBottom, (distdraw=new DistScaleDraw()));
+
+            } else {
+
+                // tics every 15 minutes, if workout shorter tics every minute
+                setAxisScale(xBottom, (double)0, maxX, maxX > (15*60*1000) ? 15*60*1000 : 60*1000);
+
+                QwtText title;
+                title.setFont(stGiles);
+                title.setText("Time (mins)");
+                QwtPlot::setAxisFont(xBottom, stGiles);
+                QwtPlot::setAxisTitle(xBottom, title);
+
+                pal.setColor(QPalette::WindowText, Qt::blue);
+                pal.setColor(QPalette::Text, Qt::blue);
+                axisWidget(QwtPlot::xBottom)->setPalette(pal);
+
+                // only allocate a new one if its not the current (they get freed by Qwt)
+                if (axisScaleDraw(xBottom) != timedraw)
+                    setAxisScaleDraw(QwtPlot::xBottom, (timedraw=new TimeScaleDraw()));
+            }
+        }
 
     } else {
 
         // clear the plot we have nothing selected
+        bydist = false; // do by time when no workout selected
         MaxWatts = 0;
         courseData = NULL;
+
+        QwtText title;
+        title.setFont(stGiles);
+        title.setText("Time (mins)");
+        QwtPlot::setAxisFont(xBottom, stGiles);
+        QwtPlot::setAxisTitle(xBottom, title);
+
+        pal.setColor(QPalette::WindowText, Qt::blue);
+        pal.setColor(QPalette::Text, Qt::blue);
+        axisWidget(QwtPlot::xBottom)->setPalette(pal);
+
+        // set the axis so we default to an hour workout
+        if (axisScaleDraw(xBottom) != timedraw)
+            setAxisScaleDraw(QwtPlot::xBottom, (timedraw=new TimeScaleDraw()));
+        setAxisScale(xBottom, (double)0, 1000 * 60 * 60, 15*60*1000);
     }
 }
 
@@ -132,3 +307,154 @@ ErgFilePlot::setNow(long msecs)
     replot(); // and update
 }
 
+void
+ErgFilePlot::performancePlot(RealtimeData rtdata)
+{
+    // we got some data
+    // x is plotted in meters or micro-seconds
+    double x = bydist ? (rtdata.getDistance() * 1000) : rtdata.getMsecs();
+
+    // when not using a workout we need to extend the axis when we
+    // go out of bounds -- we do not use autoscale for x, because we
+    // want to control stepping and tick marking add another 30 mins
+    if (!ergFile && axisScaleDiv(xBottom)->upperBound() <= x) {
+        double maxX = x + ( 30 * 60 * 1000);
+        setAxisScale(xBottom, (double)0, maxX, maxX > (15*60*1000) ? 15*60*1000 : 60*1000);
+    }
+
+    double watts = rtdata.getWatts();
+    double speed = rtdata.getSpeed();
+    double cad = rtdata.getCadence();
+    double hr = rtdata.getHr();
+
+    wattssum += watts;
+    hrsum += hr;
+    cadsum += cad;
+    speedsum += speed;
+
+    if (counter < 25) {
+        counter++;
+        return;
+    } else {
+        watts = wattssum / 26;
+        hr = hrsum / 26;
+        cad = cadsum / 26;
+        speed = speedsum / 26;
+        counter=0;
+        wattssum = hrsum = cadsum = speedsum = 0;
+    }
+
+    double zero = 0;
+
+    if (!wattsData->count()) wattsData->append(&zero, &watts, 1);
+    wattsData->append(&x, &watts, 1);
+    wattsCurve->setRawData(wattsData->x(), wattsData->y(), wattsData->count());
+
+    if (!hrData->count()) hrData->append(&zero, &hr, 1);
+    hrData->append(&x, &hr, 1);
+    hrCurve->setRawData(hrData->x(), hrData->y(), hrData->count());
+
+    if (!speedData->count()) speedData->append(&zero, &speed, 1);
+    speedData->append(&x, &speed, 1);
+    speedCurve->setRawData(speedData->x(), speedData->y(), speedData->count());
+
+    if (!cadData->count()) cadData->append(&zero, &cad, 1);
+    cadData->append(&x, &cad, 1);
+    cadCurve->setRawData(cadData->x(), cadData->y(), cadData->count());
+
+    const bool cacheMode = canvas()->testPaintAttribute(QwtPlotCanvas::PaintCached);
+
+#if 0
+#if QT_VERSION >= 0x040000 && defined(Q_WS_X11)
+    // Even if not recommended by TrollTech, Qt::WA_PaintOutsidePaintEvent 
+    // works on X11. This has an tremendous effect on the performance..
+
+    canvas()->setAttribute(Qt::WA_PaintOutsidePaintEvent, true);
+#endif
+
+    canvas()->setPaintAttribute(QwtPlotCanvas::PaintCached, false);
+    wattsCurve->draw(0, wattsCurve->dataSize() - 1);
+    hrCurve->draw(0, hrCurve->dataSize() - 1);
+    cadCurve->draw(0, cadCurve->dataSize() - 1);
+    speedCurve->draw(0, speedCurve->dataSize() - 1);
+    canvas()->setPaintAttribute(QwtPlotCanvas::PaintCached, cacheMode);
+
+#if QT_VERSION >= 0x040000 && defined(Q_WS_X11)
+    canvas()->setAttribute(Qt::WA_PaintOutsidePaintEvent, false);
+#endif
+#endif
+
+}
+
+void
+ErgFilePlot::start()
+{
+    reset();
+}
+
+void
+ErgFilePlot::reset()
+{
+    // reset data
+    counter = hrsum = wattssum = speedsum = cadsum = 0;
+
+    // note the origin of the data is not a point 0, but the first
+    // average over 5 seconds. this leads to a small gap on the left
+    // which is better than the traces all starting from 0,0 which whilst
+    // is factually correct, does not tell us anything useful and look horrid.
+    // instead when we place the first points on the plots we add them twice
+    // once for time/distance of 0 and once for the current point in time
+    wattsData->clear();
+    wattsCurve->setRawData(wattsData->x(), wattsData->y(), wattsData->count());
+    cadData->clear();
+    cadCurve->setRawData(cadData->x(), cadData->y(), cadData->count());
+    hrData->clear();
+    hrCurve->setRawData(hrData->x(), hrData->y(), hrData->count());
+    speedData->clear();
+    speedCurve->setRawData(speedData->x(), speedData->y(), speedData->count());
+}
+
+// curve data.. code snaffled in from the Qwt example (realtime_plot)
+CurveData::CurveData(): d_count(0) { }
+
+void CurveData::append(double *x, double *y, int count)
+{
+    int newSize = ((d_count + count) / 1000 + 1 ) * 1000;
+    if (newSize > size()) {
+        d_x.resize(newSize);
+        d_y.resize(newSize);
+    }
+
+    for (register int i = 0; i < count; i++) {
+        d_x[d_count + i] = x[i];
+        d_y[d_count + i] = y[i];
+    }
+    d_count += count;
+}
+
+int CurveData::count() const
+{
+    return d_count;
+}
+
+int CurveData::size() const
+{
+    return d_x.size();
+}
+
+const double *CurveData::x() const
+{
+    return d_x.data();
+}
+
+const double *CurveData::y() const
+{
+    return d_y.data();
+}
+
+void CurveData::clear()
+{
+    d_count = 0;
+    d_x.clear();
+    d_y.clear();
+}

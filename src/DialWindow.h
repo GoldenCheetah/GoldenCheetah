@@ -99,7 +99,7 @@ class DialWindow : public GcWindow
         double avg30, avgLap, avgTotal;
         double lapNumber;
         int count;
-        void resetValues() { instantValue = avg30 = avgLap = avgTotal = lapNumber = 0; }
+        void resetValues() { instantValue = avg30 = avgLap = avgTotal = lapNumber = 0; telemetryUpdate(RealtimeData()); }
 
         // controls
         QComboBox *seriesSelector;
