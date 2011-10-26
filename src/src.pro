@@ -83,10 +83,20 @@ qwt3d {
     DEFINES += GC_HAVE_USBXPRESS
 }
 
-# are we supporting USB2 devices on Windows?
+# are we supporting USB2 devices
 !isEmpty( LIBUSB_INSTALL ) {
     INCLUDEPATH += $${LIBUSB_INSTALL}/include
     DEFINES += GC_HAVE_LIBUSB
+    SOURCES += LibUsb.cpp
+    HEADERS += LibUsb.h
+
+    macx {
+        // not supported at present
+    } else {
+        unix {
+            LIBS += $${LIBUSB_INSTALL}/lib/libusb.a
+        }
+    }
 }
 
 # are we supporting video playback?
@@ -123,8 +133,8 @@ win32 {
     RC_FILE = windowsico.rc
 
     # Windows only USB support
-    SOURCES += USBXpress.cpp LibUsb.cpp
-    HEADERS += USBXpress.h LibUsb.h
+    SOURCES += USBXpress.cpp
+    HEADERS += USBXpress.h
 }
 
 # local qxt widgets - rather than add another dependency on libqxt

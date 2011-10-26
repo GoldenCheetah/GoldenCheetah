@@ -1,0 +1,16 @@
+LINUX ACCESS PERMISSIONS FOR GARMIN USB2 STICK
+
+When using Garmin USB2 sticks on Linux the udev rules that
+control access to the USB devices tend to mount the Garmin
+stick with permissions that restrict access to normal users.
+
+To change the way permissions are granted you need to configure
+udev with a rules file.
+
+On UBUNTU and other Debian based distros this is achieved by 
+writing a rules file and placing it in /etc/udev/rules.d.
+
+We have createed that file (51-garmin-usb.rules) here and 
+you will need to copy it into /dev/udev/rules.d for the
+Garmin stick to be accessable from GoldenCheetah when run
+as a normal (not root) user.

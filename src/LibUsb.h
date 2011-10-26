@@ -19,10 +19,11 @@
 #ifndef gc_LibUsb_h
 #define gc_LibUsb_h
 
-#if defined WIN32
+#if defined GC_HAVE_LIBUSB && (defined WIN32 || defined __linux__)
 
-#ifdef GC_HAVE_LIBUSB
 #include <usb.h> // for the constants etc
+
+#ifdef WIN32
 #include <QLibrary> // for dynamically loading libusb0.dll
 #endif
 
@@ -38,8 +39,8 @@ public:
     int read(char *buf, int bytes);
     int write(char *buf, int bytes);
 private:
-#ifdef GC_HAVE_LIBUSB
 
+#ifdef WIN32 // we only do dynamic loading on Windows
     /*************************************************************************
      * Functions to load from libusb0.dll
      */
@@ -70,12 +71,16 @@ private:
     IntUsb_dev_handleIntProto usb_claim_interface;
     IntUsb_dev_handleIntProto usb_set_altinterface;
     /************************************************************************/
+#endif
 
     struct usb_dev_handle* OpenAntStick();
     struct usb_interface_descriptor* usb_find_interface(struct usb_config_descriptor* config_descriptor);
     struct usb_dev_handle* device;
     struct usb_interface_descriptor* intf;
+
     int readEndpoint, writeEndpoint;
+    int interface;
+    int alternate;
 
     char readBuf[64];
     int readBufIndex;
@@ -84,5 +89,4 @@ private:
     bool isDllLoaded;
 #endif
 };
-#endif // WIN32
 #endif // gc_LibUsb_h

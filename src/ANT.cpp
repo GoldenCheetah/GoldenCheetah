@@ -104,9 +104,9 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf) : QThread(parent)
         connect(antChannel[i], SIGNAL(searchComplete(int)), this, SLOT(searchComplete(int)));
     }
 
-    // on windows we use libusb to read from USB2
+    // on windows and linux we use libusb to read from USB2
     // sticks, if it is not available we use stubs
-#ifdef WIN32
+#if defined GC_HAVE_LIBUSB && (defined WIN32 || __linux__)
     usbMode = USBNone;
     usb2 = new LibUsb();
 #endif
@@ -114,7 +114,7 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf) : QThread(parent)
 
 ANT::~ANT()
 {
-#ifdef WIN32
+#if defined GC_HAVE_LIBUSB && (defined WIN32 || __linux__)
     delete usb2;
 #endif
 }
@@ -183,7 +183,7 @@ void ANT::run()
         // read more bytes from the device
         uint8_t byte;
         if (rawRead(&byte, 1) > 0) receiveByte((unsigned char)byte);
-        else msleep(1);
+        else msleep(5);
 
         //----------------------------------------------------------------------
         // LISTEN TO CONTROLLER FOR COMMANDS
@@ -646,6 +646,13 @@ int ANT::closePort()
         break;
     }
 #else
+
+#if defined __linux__ && defined GC_HAVE_LIBUSB
+    if (usbMode == USB2) {
+        usb2->close();
+        return 0;
+    }
+#endif
     tcflush(devicePort, TCIOFLUSH); // clear out the garbage
     return close(devicePort);
 #endif
@@ -677,6 +684,15 @@ int ANT::openPort()
     int ldisc=N_TTY; // LINUX
 #endif
 
+#if defined __linux__&& defined GC_HAVE_LIBUSB
+    int rc;
+    if ((rc=usb2->open()) != -1) {
+        usbMode = USB2;
+        return rc;
+    } else {
+        usbMode = USB1;
+    }
+#endif
     if ((devicePort=open(deviceFilename.toAscii(),O_RDWR | O_NOCTTY | O_NONBLOCK)) == -1)
         return errno;
 
@@ -736,6 +752,13 @@ int ANT::rawWrite(uint8_t *bytes, int size) // unix!!
     return rc;
 
 #else
+
+#if defined __linux__ && defined GC_HAVE_LIBUSB
+    if (usbMode == USB2) {
+        return usb2->write((char *)bytes, size);
+    }
+#endif
+
     int ibytes;
 
     ioctl(devicePort, FIONREAD, &ibytes);
@@ -771,6 +794,11 @@ int ANT::rawRead(uint8_t bytes[], int size)
 
 #else
 
+#if defined __linux__ && defined GC_HAVE_LIBUSB
+    if (usbMode == USB2) {
+        return usb2->read((char *)bytes, size);
+    }
+#endif
     int timeout=0, i=0;
     uint8_t byte;
 

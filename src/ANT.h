@@ -58,12 +58,17 @@
 #include <windows.h>
 #include <winbase.h>
 #include "USBXpress.h" // for Garmin USB1 sticks
-#include "LibUsb.h"    // for Garmin USB2 sticks
 #else
 #include <termios.h> // unix!!
 #include <unistd.h> // unix!!
 #include <sys/ioctl.h>
 #endif
+
+#if defined GC_HAVE_LIBUSB && (defined WIN32 || __linux__)
+#include "LibUsb.h"    // for Garmin USB2 sticks
+#endif
+
+#include <QDebug>
 
 // timeouts for read/write of serial port in ms
 #define ANT_READTIMEOUT    1000
@@ -324,12 +329,15 @@ private:
 #ifdef WIN32
     HANDLE devicePort;              // file descriptor for reading from com3
     DCB deviceSettings;             // serial port settings baud rate et al
-    LibUsb *usb2;                   // used for USB2 support
-    enum UsbMode { USBNone, USB1, USB2 };
-    enum UsbMode usbMode;
 #else
     int devicePort;                 // unix!!
     struct termios deviceSettings;  // unix!!
+#endif
+
+#if defined GC_HAVE_LIBUSB && (defined WIN32 || __linux__)
+    LibUsb *usb2;                   // used for USB2 support
+    enum UsbMode { USBNone, USB1, USB2 };
+    enum UsbMode usbMode;
 #endif
 
     // telemetry and state

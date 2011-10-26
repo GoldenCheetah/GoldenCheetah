@@ -90,6 +90,8 @@ D2XX_INCLUDE = /usr/local/include/D2XX
 # ** Garmin USB2 sticks whose driver uses libusb-win32.
 # You must make sure you install v0.1.12.2 of libusb-win from:
 # http://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/0.1.12.2/
+# or on Linux you MUST use 1.12.2 from:
+# http://prdownloads.sourceforge.net/libusb/libusb-0.1.12.tar.gz
 #LIBUSB_INSTALL=/c/libusb-win32-device-bin-0.1.12.2
 
 # if you want video playback on training mode then
