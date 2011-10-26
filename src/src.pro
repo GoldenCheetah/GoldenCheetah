@@ -91,7 +91,7 @@ qwt3d {
     HEADERS += LibUsb.h
 
     unix {
-        // for Linux and Windows
+        # for linux and mac
         LIBS += $${LIBUSB_INSTALL}/lib/libusb.a
     }
 }
