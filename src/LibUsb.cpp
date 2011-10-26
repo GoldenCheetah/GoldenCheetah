@@ -16,17 +16,16 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifdef WIN32
+#if defined GC_HAVE_LIBUSB && (defined WIN32 || __linux__)
 #include <QString>
 #include <QDebug>
 
 #include "LibUsb.h"
 
-#ifdef GC_HAVE_LIBUSB // only include if windows and have libusb installed
-
-
 LibUsb::LibUsb()
 {
+// dynamix load of libusb on Windows, it is statically linked in Linux
+#ifdef WIN32
     QLibrary libusb0("libusb0");
 
     /*************************************************************************
@@ -54,14 +53,16 @@ LibUsb::LibUsb()
         return;
     }
     /************************************************************************/
+#endif
 
 
     intf = NULL;
     readBufIndex = 0;
     readBufSize = 0;
 
-    usb_set_debug(255);
+    usb_set_debug(0);
 
+#ifdef WIN32
    // Initialize the library.
     usb_init();
 
@@ -70,26 +71,41 @@ LibUsb::LibUsb()
 
     // Find all connected devices.
     usb_find_devices();
+#endif
 }
 
 int LibUsb::open()
 {
-    if (!isDllLoaded)
-        return -1;
+#ifdef WIN32
+    if (!isDllLoaded) return -1;
+#else
+   // Initialize the library.
+    usb_init();
 
-     // Search busses & devices for USB2 ANT+ stick
-     device = OpenAntStick();
+    // Find all busses.
+    usb_find_busses();
 
-    if (device == NULL)
-        return -1;
+    // Find all connected devices.
+    usb_find_devices();
+#endif
 
-    int rc = usb_clear_halt(device, writeEndpoint);
-    if (rc < 0)
-        qDebug()<<"usb_clear_halt writeEndpoint Error: "<< usb_strerror();
+    readBufSize = 0;
+    readBufIndex = 0;
+
+    // Search USB busses for USB2 ANT+ stick host controllers
+    device = OpenAntStick();
+
+    if (device == NULL) return -1;
+
+    // reset the device, god only knows what mess we left it in...
+    int rc = usb_reset(device);
+    if (rc < 0) qDebug()<<"usb_reset Error: "<< usb_strerror();
+ 
+    rc = usb_clear_halt(device, writeEndpoint);
+    if (rc < 0) qDebug()<<"usb_clear_halt writeEndpoint Error: "<< usb_strerror();
 
     rc = usb_clear_halt(device, readEndpoint);
-    if (rc < 0)
-        qDebug()<<"usb_clear_halt readEndpoint Error: "<< usb_strerror();
+    if (rc < 0) qDebug()<<"usb_clear_halt readEndpoint Error: "<< usb_strerror();
 
     return rc;
 }
@@ -98,25 +114,32 @@ void LibUsb::close()
 {
 
     if (device) {
-        usb_release_interface(device, 0);
-        usb_close(device);
-    }
+        // stop any further write attempts whilst we close down
+        usb_dev_handle *p = device;
+        device = NULL;
 
-    device = NULL;
+        usb_release_interface(p, interface);
+        usb_close(p);
+    }
 }
 
 int LibUsb::read(char *buf, int bytes)
 {
-    if (!isDllLoaded)
-        return -1;
+    // check it isn't closed
+    if (!device) return -1;
+
+#ifdef WIN32
+    if (!isDllLoaded) return -1;
+#endif
 
     // The USB2 stick really doesn't like you reading 1 byte when more are available
-    //  so we need a buffered reader
+    // so we need a buffered reader BUT ON WINDOWS ONLY appears to be a driver issue
+    // and not related to the underlying hardware
 
     int bufRemain = readBufSize - readBufIndex;
 
     // Can we entirely satisfy the request from the buffer?
-    if (bufRemain > bytes)
+    if (bufRemain >= bytes)
     {
         // Yes, so do it
         memcpy(buf, readBuf+readBufIndex, bytes);
@@ -125,18 +148,20 @@ int LibUsb::read(char *buf, int bytes)
     }
 
     // No, so partially satisfy by emptying the buffer, then refill the buffer for the rest
-    memcpy(buf, readBuf+readBufIndex, bufRemain);
+    if (bufRemain) {
+        memcpy(buf, readBuf+readBufIndex, bufRemain);
+    }
+
     readBufSize = 0;
     readBufIndex = 0;
 
-    int rc = usb_bulk_read(device, readEndpoint, readBuf, 64, 1000);
-
+    int rc = usb_bulk_read(device, readEndpoint, readBuf, 64, 125);
     if (rc < 0)
     {
-        qDebug()<<"usb_bulk_read Error reading: "<< usb_strerror();
+        // don't report timeouts - lots of noise so commented out
+        //qDebug()<<"usb_bulk_read Error reading: "<<rc<< usb_strerror();
         return rc;
     }
-
     readBufSize = rc;
 
     int bytesToGo = bytes - bufRemain;
@@ -159,14 +184,26 @@ int LibUsb::read(char *buf, int bytes)
 
 int LibUsb::write(char *buf, int bytes)
 {
-    if (!isDllLoaded)
-        return -1;
+#ifdef WIN32
+    if (!isDllLoaded) return -1;
+#endif
 
+    // check it isn't closed
+    if (!device) return -1;
+
+#ifdef WIN32
     int rc = usb_interrupt_write(device, writeEndpoint, buf, bytes, 1000);
+#else
+    //int rc=0;
+    //for (int i=0;rc >= 0 && i<bytes;i ++) // interrupt writes in pairs
+        //usb_interrupt_write(device, writeEndpoint, buf+i, 1, 1000);
+    int rc = usb_bulk_write(device, writeEndpoint, buf, bytes, 125);
+#endif
 
     if (rc < 0)
     {
-        qDebug()<<"usb_interrupt_write Error writing: "<< usb_strerror();
+        // don't report timeouts - lots of noise
+        if (rc != -110) qDebug()<<"usb_interrupt_write Error writing: "<< usb_strerror();
     }
 
     return rc;
@@ -184,7 +221,7 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
         {
             if (dev->descriptor.idVendor == GARMIN_USB2_VID && dev->descriptor.idProduct == GARMIN_USB2_PID)
             {
-                qDebug() << "Found a Garmin USB2 ANT+ stick";
+                //qDebug() << "Found a Garmin USB2 ANT+ stick";
 
                 if ((udev = usb_open(dev)))
                 {
@@ -193,14 +230,18 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
                         if ((intf = usb_find_interface(&dev->config[0])) != NULL)
                         {
                             int rc = usb_set_configuration(udev, 1);
-                            if (rc < 0)
+                            if (rc < 0) {
                                 qDebug()<<"usb_set_configuration Error: "<< usb_strerror();
-                            rc = usb_claim_interface(udev, 0);
-                            if (rc < 0)
-                                qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
-                            rc = usb_set_altinterface(udev, 0);
-                            if (rc < 0)
-                                qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
+#ifdef __linux__
+                                qDebug()<<"check permissions on:"<<QString("/dev/bus/usb/%1/%2").arg(bus->dirname).arg(dev->filename);
+#endif
+                            }
+                            rc = usb_claim_interface(udev, interface);
+                            if (rc < 0) qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
+
+                            rc = usb_set_altinterface(udev, alternate);
+                            if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
+
                             return udev;
                         }
                     }
@@ -219,20 +260,21 @@ struct usb_interface_descriptor* LibUsb::usb_find_interface(struct usb_config_de
 
     readEndpoint = -1;
     writeEndpoint = -1;
+    interface = -1;
+    alternate = -1;
 
-    if (!config_descriptor)
-        return NULL;
+    if (!config_descriptor) return NULL;
 
-    if (!config_descriptor->bNumInterfaces)
-        return NULL;
+    if (!config_descriptor->bNumInterfaces) return NULL;
 
-    if (!config_descriptor->interface[0].num_altsetting)
-        return NULL;
+    if (!config_descriptor->interface[0].num_altsetting) return NULL;
 
     intf = &config_descriptor->interface[0].altsetting[0];
 
-    if (intf->bNumEndpoints != 2)
-        return NULL;
+    if (intf->bNumEndpoints != 2) return NULL;
+
+    interface = intf->bInterfaceNumber;
+    alternate = intf->bAlternateSetting;
 
     for (int i = 0 ; i < 2; i++)
     {
@@ -271,5 +313,4 @@ int LibUsb::write(char *, int)
     return -1;
 }
 
-#endif // Have LIBUSB
-#endif // WIN32
+#endif // Have LIBUSB and WIN32 or LINUX

@@ -275,7 +275,6 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
         checkCinqo();
 
     } else {
-
         //
         // We got some telemetry on this channel
         //
