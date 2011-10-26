@@ -2289,8 +2289,27 @@ např. zadejte &quot;1,2 nm&quot; pro navýšení nebo &quot;-0,5 nm&quot; pro s
     </message>
     <message>
         <location filename="../HrZones.cpp" line="614"/>
+        <source>Threshold (bpm): %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../HrZones.cpp" line="622"/>
+        <source>&lt;td align=&quot;center&quot;&gt;Low (bpm)&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../HrZones.cpp" line="623"/>
+        <source>&lt;td align=&quot;center&quot;&gt;High (bpm)&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../HrZones.cpp" line="625"/>
+        <source>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Threshold: %1</source>
-        <translation>LT práh: %1</translation>
+        <translation type="obsolete">LT práh: %1</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="620"/>
@@ -2303,14 +2322,12 @@ např. zadejte &quot;1,2 nm&quot; pro navýšení nebo &quot;-0,5 nm&quot; pro s
         <translation>&lt;td align=&quot;center&quot;&gt;Název zóny&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="622"/>
         <source>&lt;td align=&quot;center&quot;&gt;Low&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;od&lt;/td&gt;</translation>
+        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;od&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="623"/>
         <source>&lt;td align=&quot;center&quot;&gt;High&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;do&lt;/td&gt;</translation>
+        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;do&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="624"/>
@@ -3880,94 +3897,94 @@ CP závodníka nastaven na %3 wattů</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="84"/>
+        <location filename="../ModelWindow.cpp" line="85"/>
         <source>Analyse</source>
         <translation>Analyzovat</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="85"/>
+        <location filename="../ModelWindow.cpp" line="86"/>
         <source>X-Axis:</source>
         <translation>Osa-X:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="86"/>
+        <location filename="../ModelWindow.cpp" line="87"/>
         <source>Y-Axis:</source>
         <translation>Osa-Y:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="87"/>
+        <location filename="../ModelWindow.cpp" line="88"/>
         <source>Z-Axis:</source>
         <translation>Osa-Z:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="88"/>
+        <location filename="../ModelWindow.cpp" line="89"/>
         <source>Color:</source>
         <translation>Barvit:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="89"/>
+        <location filename="../ModelWindow.cpp" line="90"/>
         <source>Bin Width:</source>
         <translation>Šířka sloupu:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="102"/>
-        <location filename="../ModelWindow.cpp" line="108"/>
+        <location filename="../ModelWindow.cpp" line="103"/>
+        <location filename="../ModelWindow.cpp" line="109"/>
         <source>Time at X&amp;Y</source>
         <translation>Čas na X&amp;Y</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="107"/>
+        <location filename="../ModelWindow.cpp" line="108"/>
         <source>Power Zone</source>
         <translation>Zóny výkonu</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="112"/>
+        <location filename="../ModelWindow.cpp" line="113"/>
         <source>Bar</source>
         <translation>Sloupcový</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="113"/>
+        <location filename="../ModelWindow.cpp" line="114"/>
         <source>Grid</source>
         <translation>Spojnicový</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="114"/>
+        <location filename="../ModelWindow.cpp" line="115"/>
         <source>Surface</source>
         <translation>Povrchový</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="115"/>
+        <location filename="../ModelWindow.cpp" line="116"/>
         <source>Dots</source>
         <translation>Bodový</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="118"/>
+        <location filename="../ModelWindow.cpp" line="119"/>
         <source>Ignore Zero</source>
         <translation>Ignorovat nuly</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="120"/>
+        <location filename="../ModelWindow.cpp" line="121"/>
         <source>Show Grid</source>
         <translation>Zobrazit mřížku</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="122"/>
+        <location filename="../ModelWindow.cpp" line="123"/>
         <source>Frame Intervals</source>
         <translation>Označit intervaly</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="124"/>
+        <location filename="../ModelWindow.cpp" line="125"/>
         <source>Legend</source>
         <translation>Legenda</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="137"/>
-        <location filename="../ModelWindow.cpp" line="319"/>
+        <location filename="../ModelWindow.cpp" line="138"/>
+        <location filename="../ModelWindow.cpp" line="320"/>
         <source>Reset View</source>
         <translation>Vykreslit graf</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="312"/>
+        <location filename="../ModelWindow.cpp" line="313"/>
         <source>Plot</source>
         <translation>Vykreslit graf</translation>
     </message>
@@ -5859,12 +5876,12 @@ Chceš to udělat?</translation>
         <translation>&amp;Zrušit</translation>
     </message>
     <message>
-        <location filename="../SplitRideDialog.cpp" line="166"/>
+        <location filename="../SplitRideDialog.cpp" line="184"/>
         <source>Split Ride</source>
         <translation>Rozdělit záznam</translation>
     </message>
     <message>
-        <location filename="../SplitRideDialog.cpp" line="166"/>
+        <location filename="../SplitRideDialog.cpp" line="184"/>
         <source>The file %1 already exists and will not be overwritten</source>
         <translation>Soubor %1 nemůže být přepsán, protože již existuje</translation>
     </message>
@@ -6573,8 +6590,27 @@ Chceš to udělat?</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="571"/>
+        <source>Critical Power (watts): %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Zones.cpp" line="579"/>
+        <source>&lt;td align=&quot;center&quot;&gt;Low (watts)&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Zones.cpp" line="580"/>
+        <source>&lt;td align=&quot;center&quot;&gt;High (watts)&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Zones.cpp" line="582"/>
+        <source>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Critical Power: %1</source>
-        <translation>Kritický výkon CP: %1</translation>
+        <translation type="obsolete">Kritický výkon CP: %1</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="577"/>
@@ -6587,14 +6623,12 @@ Chceš to udělat?</translation>
         <translation>&lt;td align=&quot;center&quot;&gt;Název zóny&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="579"/>
         <source>&lt;td align=&quot;center&quot;&gt;Low&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;od&lt;/td&gt;</translation>
+        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;od&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="580"/>
         <source>&lt;td align=&quot;center&quot;&gt;High&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;do&lt;/td&gt;</translation>
+        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;do&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="581"/>

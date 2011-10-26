@@ -1074,7 +1074,7 @@ Click Cancel to exit.</source>
     <message>
         <location filename="../DaysScaleDraw.h" line="52"/>
         <source>Fri</source>
-        <translation></translation>
+        <translation>金</translation>
     </message>
     <message>
         <location filename="../DaysScaleDraw.h" line="55"/>
@@ -2283,8 +2283,27 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     </message>
     <message>
         <location filename="../HrZones.cpp" line="614"/>
+        <source>Threshold (bpm): %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../HrZones.cpp" line="622"/>
+        <source>&lt;td align=&quot;center&quot;&gt;Low (bpm)&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../HrZones.cpp" line="623"/>
+        <source>&lt;td align=&quot;center&quot;&gt;High (bpm)&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../HrZones.cpp" line="625"/>
+        <source>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Threshold: %1</source>
-        <translation>しきい値: %1</translation>
+        <translation type="obsolete">しきい値: %1</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="620"/>
@@ -2297,14 +2316,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation>&lt;td align=&quot;center&quot;&gt;説明&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="622"/>
         <source>&lt;td align=&quot;center&quot;&gt;Low&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;Low&lt;/td&gt;</translation>
+        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;Low&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="623"/>
         <source>&lt;td align=&quot;center&quot;&gt;High&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;High&lt;/td&gt;</translation>
+        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;High&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="624"/>
@@ -5714,9 +5731,8 @@ native format. Should we do so?
 <context>
     <name>SessionRPE</name>
     <message>
-        <location filename="../TRIMPPoints.cpp" line="322"/>
         <source>Session RPE</source>
-        <translation>セッションのRPE</translation>
+        <translation type="obsolete">セッションのRPE</translation>
     </message>
 </context>
 <context>
@@ -5865,12 +5881,12 @@ native format. Should we do so?
         <translation>&amp;キャンセル</translation>
     </message>
     <message>
-        <location filename="../SplitRideDialog.cpp" line="166"/>
+        <location filename="../SplitRideDialog.cpp" line="184"/>
         <source>Split Ride</source>
         <translation>ライドを分割</translation>
     </message>
     <message>
-        <location filename="../SplitRideDialog.cpp" line="166"/>
+        <location filename="../SplitRideDialog.cpp" line="184"/>
         <source>The file %1 already exists and will not be overwritten</source>
         <translation>ファイル %1 が既に存在するので上書きは行われません</translation>
     </message>
@@ -5943,8 +5959,9 @@ native format. Should we do so?
         <translation>TRIMPポイント</translation>
     </message>
     <message>
+        <location filename="../TRIMPPoints.cpp" line="322"/>
         <source>Session RPE</source>
-        <translation type="obsolete">セッションのRPE</translation>
+        <translation type="unfinished">セッションのRPE</translation>
     </message>
 </context>
 <context>
@@ -6581,8 +6598,27 @@ native format. Should we do so?
     </message>
     <message>
         <location filename="../Zones.cpp" line="571"/>
+        <source>Critical Power (watts): %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Zones.cpp" line="579"/>
+        <source>&lt;td align=&quot;center&quot;&gt;Low (watts)&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Zones.cpp" line="580"/>
+        <source>&lt;td align=&quot;center&quot;&gt;High (watts)&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Zones.cpp" line="582"/>
+        <source>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Critical Power: %1</source>
-        <translation>クリティカルパワー: %1</translation>
+        <translation type="obsolete">クリティカルパワー: %1</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="577"/>
@@ -6595,14 +6631,12 @@ native format. Should we do so?
         <translation>&lt;td align=&quot;center&quot;&gt;説明&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="579"/>
         <source>&lt;td align=&quot;center&quot;&gt;Low&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;Low&lt;/td&gt;</translation>
+        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;Low&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="580"/>
         <source>&lt;td align=&quot;center&quot;&gt;High&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;High&lt;/td&gt;</translation>
+        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;High&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="581"/>

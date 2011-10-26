@@ -2282,8 +2282,27 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     </message>
     <message>
         <location filename="../HrZones.cpp" line="614"/>
+        <source>Threshold (bpm): %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../HrZones.cpp" line="622"/>
+        <source>&lt;td align=&quot;center&quot;&gt;Low (bpm)&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../HrZones.cpp" line="623"/>
+        <source>&lt;td align=&quot;center&quot;&gt;High (bpm)&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../HrZones.cpp" line="625"/>
+        <source>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Threshold: %1</source>
-        <translation>Порог: %1</translation>
+        <translation type="obsolete">Порог: %1</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="620"/>
@@ -2296,14 +2315,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation>&lt;td align=&quot;center&quot;&gt;Описание&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="622"/>
         <source>&lt;td align=&quot;center&quot;&gt;Low&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;Нижняя граница&lt;/td&gt;</translation>
+        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;Нижняя граница&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="623"/>
         <source>&lt;td align=&quot;center&quot;&gt;High&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;Верхняя граница&lt;/td&gt;</translation>
+        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;Верхняя граница&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="624"/>
@@ -3874,94 +3891,94 @@ CP велосипедиста установлена в %3 ватт</translation
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="84"/>
+        <location filename="../ModelWindow.cpp" line="85"/>
         <source>Analyse</source>
         <translation>Анализировать</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="85"/>
+        <location filename="../ModelWindow.cpp" line="86"/>
         <source>X-Axis:</source>
         <translation>Ось X</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="86"/>
+        <location filename="../ModelWindow.cpp" line="87"/>
         <source>Y-Axis:</source>
         <translation>Ось Y</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="87"/>
+        <location filename="../ModelWindow.cpp" line="88"/>
         <source>Z-Axis:</source>
         <translation>Ось Z</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="88"/>
+        <location filename="../ModelWindow.cpp" line="89"/>
         <source>Color:</source>
         <translation>Цвет:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="89"/>
+        <location filename="../ModelWindow.cpp" line="90"/>
         <source>Bin Width:</source>
         <translation>Ширина столбца:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="102"/>
-        <location filename="../ModelWindow.cpp" line="108"/>
+        <location filename="../ModelWindow.cpp" line="103"/>
+        <location filename="../ModelWindow.cpp" line="109"/>
         <source>Time at X&amp;Y</source>
         <translation>Время по X&amp;Y</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="107"/>
+        <location filename="../ModelWindow.cpp" line="108"/>
         <source>Power Zone</source>
         <translation>Уровень мощности</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="112"/>
+        <location filename="../ModelWindow.cpp" line="113"/>
         <source>Bar</source>
         <translation>Столбцы</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="113"/>
+        <location filename="../ModelWindow.cpp" line="114"/>
         <source>Grid</source>
         <translation>Сетка</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="114"/>
+        <location filename="../ModelWindow.cpp" line="115"/>
         <source>Surface</source>
         <translation>Поверхность</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="115"/>
+        <location filename="../ModelWindow.cpp" line="116"/>
         <source>Dots</source>
         <translation>Точки</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="118"/>
+        <location filename="../ModelWindow.cpp" line="119"/>
         <source>Ignore Zero</source>
         <translation>Исключить нули</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="120"/>
+        <location filename="../ModelWindow.cpp" line="121"/>
         <source>Show Grid</source>
         <translation>Показать сетку</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="122"/>
+        <location filename="../ModelWindow.cpp" line="123"/>
         <source>Frame Intervals</source>
         <translation>Frame Intervals</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="124"/>
+        <location filename="../ModelWindow.cpp" line="125"/>
         <source>Legend</source>
         <translation>Легенда</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="137"/>
-        <location filename="../ModelWindow.cpp" line="319"/>
+        <location filename="../ModelWindow.cpp" line="138"/>
+        <location filename="../ModelWindow.cpp" line="320"/>
         <source>Reset View</source>
         <translation>Сбросить вид</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="312"/>
+        <location filename="../ModelWindow.cpp" line="313"/>
         <source>Plot</source>
         <translation>График</translation>
     </message>
@@ -5854,12 +5871,12 @@ native format. Should we do so?
         <translation>&amp;Отмена</translation>
     </message>
     <message>
-        <location filename="../SplitRideDialog.cpp" line="166"/>
+        <location filename="../SplitRideDialog.cpp" line="184"/>
         <source>Split Ride</source>
         <translation>Разделить тренировку</translation>
     </message>
     <message>
-        <location filename="../SplitRideDialog.cpp" line="166"/>
+        <location filename="../SplitRideDialog.cpp" line="184"/>
         <source>The file %1 already exists and will not be overwritten</source>
         <translation>Файл %1 уже существует и не будет перезаписан</translation>
     </message>
@@ -6573,8 +6590,27 @@ native format. Should we do so?
     </message>
     <message>
         <location filename="../Zones.cpp" line="571"/>
+        <source>Critical Power (watts): %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Zones.cpp" line="579"/>
+        <source>&lt;td align=&quot;center&quot;&gt;Low (watts)&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Zones.cpp" line="580"/>
+        <source>&lt;td align=&quot;center&quot;&gt;High (watts)&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Zones.cpp" line="582"/>
+        <source>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Critical Power: %1</source>
-        <translation>Критическая мощность: %1</translation>
+        <translation type="obsolete">Критическая мощность: %1</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="577"/>
@@ -6587,14 +6623,12 @@ native format. Should we do so?
         <translation>&lt;td align=&quot;center&quot;&gt;Описание&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="579"/>
         <source>&lt;td align=&quot;center&quot;&gt;Low&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;Нижний предел&lt;/td&gt;</translation>
+        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;Нижний предел&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="580"/>
         <source>&lt;td align=&quot;center&quot;&gt;High&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;Верхний предел&lt;/td&gt;</translation>
+        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;Верхний предел&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="581"/>

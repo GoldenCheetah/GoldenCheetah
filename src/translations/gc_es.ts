@@ -2282,8 +2282,27 @@ Ajuste de Torque - define un valor fijo en libras por pulgada o newton por metro
     </message>
     <message>
         <location filename="../HrZones.cpp" line="614"/>
+        <source>Threshold (bpm): %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../HrZones.cpp" line="622"/>
+        <source>&lt;td align=&quot;center&quot;&gt;Low (bpm)&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../HrZones.cpp" line="623"/>
+        <source>&lt;td align=&quot;center&quot;&gt;High (bpm)&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../HrZones.cpp" line="625"/>
+        <source>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Threshold: %1</source>
-        <translation>Umbral: %1</translation>
+        <translation type="obsolete">Umbral: %1</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="620"/>
@@ -2296,14 +2315,12 @@ Ajuste de Torque - define un valor fijo en libras por pulgada o newton por metro
         <translation>&lt;td align=&quot;center&quot;&gt;Descripción&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="622"/>
         <source>&lt;td align=&quot;center&quot;&gt;Low&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;Inferior&lt;/td&gt;</translation>
+        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;Inferior&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="623"/>
         <source>&lt;td align=&quot;center&quot;&gt;High&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;Superior&lt;/td&gt;</translation>
+        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;Superior&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="624"/>
@@ -3875,94 +3892,94 @@ PC del ciclista %3 vatios</translation>
         <translation>Impacto de la Altitud</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="84"/>
+        <location filename="../ModelWindow.cpp" line="85"/>
         <source>Analyse</source>
         <translation>Análsis</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="85"/>
+        <location filename="../ModelWindow.cpp" line="86"/>
         <source>X-Axis:</source>
         <translation>Eje-X:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="86"/>
+        <location filename="../ModelWindow.cpp" line="87"/>
         <source>Y-Axis:</source>
         <translation>Eje-Y:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="87"/>
+        <location filename="../ModelWindow.cpp" line="88"/>
         <source>Z-Axis:</source>
         <translation>Eje Z:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="88"/>
+        <location filename="../ModelWindow.cpp" line="89"/>
         <source>Color:</source>
         <translation>Color:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="89"/>
+        <location filename="../ModelWindow.cpp" line="90"/>
         <source>Bin Width:</source>
         <translation>Ancho Divisiones:</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="102"/>
-        <location filename="../ModelWindow.cpp" line="108"/>
+        <location filename="../ModelWindow.cpp" line="103"/>
+        <location filename="../ModelWindow.cpp" line="109"/>
         <source>Time at X&amp;Y</source>
         <translation>Tiempo en X&amp;Y</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="107"/>
+        <location filename="../ModelWindow.cpp" line="108"/>
         <source>Power Zone</source>
         <translation>Zona de Potencia</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="112"/>
+        <location filename="../ModelWindow.cpp" line="113"/>
         <source>Bar</source>
         <translation>Barra</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="113"/>
+        <location filename="../ModelWindow.cpp" line="114"/>
         <source>Grid</source>
         <translation>Grilla</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="114"/>
+        <location filename="../ModelWindow.cpp" line="115"/>
         <source>Surface</source>
         <translation>Superficie</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="115"/>
+        <location filename="../ModelWindow.cpp" line="116"/>
         <source>Dots</source>
         <translation>Puntos</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="118"/>
+        <location filename="../ModelWindow.cpp" line="119"/>
         <source>Ignore Zero</source>
         <translation>Ignorar Cero</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="120"/>
+        <location filename="../ModelWindow.cpp" line="121"/>
         <source>Show Grid</source>
         <translation>Mostrar Grilla</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="122"/>
+        <location filename="../ModelWindow.cpp" line="123"/>
         <source>Frame Intervals</source>
         <translation>Resaltar Intervalos</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="124"/>
+        <location filename="../ModelWindow.cpp" line="125"/>
         <source>Legend</source>
         <translation>Leyenda</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="137"/>
-        <location filename="../ModelWindow.cpp" line="319"/>
+        <location filename="../ModelWindow.cpp" line="138"/>
+        <location filename="../ModelWindow.cpp" line="320"/>
         <source>Reset View</source>
         <translation>Restablecer Vista</translation>
     </message>
     <message>
-        <location filename="../ModelWindow.cpp" line="312"/>
+        <location filename="../ModelWindow.cpp" line="313"/>
         <source>Plot</source>
         <translation>Gráfica</translation>
     </message>
@@ -5850,12 +5867,12 @@ formato GoldenCheetah. ¿Confirma?</translation>
         <translation>&amp;Cancelar</translation>
     </message>
     <message>
-        <location filename="../SplitRideDialog.cpp" line="166"/>
+        <location filename="../SplitRideDialog.cpp" line="184"/>
         <source>Split Ride</source>
         <translation>Dividir Entrenamiento</translation>
     </message>
     <message>
-        <location filename="../SplitRideDialog.cpp" line="166"/>
+        <location filename="../SplitRideDialog.cpp" line="184"/>
         <source>The file %1 already exists and will not be overwritten</source>
         <translation>El archivo %1 ya existe y no se sobreescribirá</translation>
     </message>
@@ -6559,8 +6576,27 @@ formato GoldenCheetah. ¿Confirma?</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="571"/>
+        <source>Critical Power (watts): %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Zones.cpp" line="579"/>
+        <source>&lt;td align=&quot;center&quot;&gt;Low (watts)&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Zones.cpp" line="580"/>
+        <source>&lt;td align=&quot;center&quot;&gt;High (watts)&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Zones.cpp" line="582"/>
+        <source>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Critical Power: %1</source>
-        <translation>Potencia Crítica: %1</translation>
+        <translation type="obsolete">Potencia Crítica: %1</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="577"/>
@@ -6573,14 +6609,12 @@ formato GoldenCheetah. ¿Confirma?</translation>
         <translation>&lt;td align=&quot;center&quot;&gt;Descripción&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="579"/>
         <source>&lt;td align=&quot;center&quot;&gt;Low&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;Inferior&lt;/td&gt;</translation>
+        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;Inferior&lt;/td&gt;</translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="580"/>
         <source>&lt;td align=&quot;center&quot;&gt;High&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;Superior&lt;/td&gt;</translation>
+        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;Superior&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="581"/>
