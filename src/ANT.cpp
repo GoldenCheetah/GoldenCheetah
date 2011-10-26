@@ -106,7 +106,7 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf) : QThread(parent)
 
     // on windows and linux we use libusb to read from USB2
     // sticks, if it is not available we use stubs
-#if defined GC_HAVE_LIBUSB && (defined WIN32 || __linux__)
+#if defined GC_HAVE_LIBUSB
     usbMode = USBNone;
     usb2 = new LibUsb();
 #endif
@@ -114,7 +114,7 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf) : QThread(parent)
 
 ANT::~ANT()
 {
-#if defined GC_HAVE_LIBUSB && (defined WIN32 || __linux__)
+#if defined GC_HAVE_LIBUSB
     delete usb2;
 #endif
 }
@@ -647,7 +647,7 @@ int ANT::closePort()
     }
 #else
 
-#if defined __linux__ && defined GC_HAVE_LIBUSB
+#ifdef GC_HAVE_LIBUSB
     if (usbMode == USB2) {
         usb2->close();
         return 0;
@@ -684,7 +684,7 @@ int ANT::openPort()
     int ldisc=N_TTY; // LINUX
 #endif
 
-#if defined __linux__&& defined GC_HAVE_LIBUSB
+#ifdef GC_HAVE_LIBUSB
     int rc;
     if ((rc=usb2->open()) != -1) {
         usbMode = USB2;
@@ -753,7 +753,7 @@ int ANT::rawWrite(uint8_t *bytes, int size) // unix!!
 
 #else
 
-#if defined __linux__ && defined GC_HAVE_LIBUSB
+#ifdef GC_HAVE_LIBUSB
     if (usbMode == USB2) {
         return usb2->write((char *)bytes, size);
     }
@@ -794,7 +794,7 @@ int ANT::rawRead(uint8_t bytes[], int size)
 
 #else
 
-#if defined __linux__ && defined GC_HAVE_LIBUSB
+#ifdef GC_HAVE_LIBUSB
     if (usbMode == USB2) {
         return usb2->read((char *)bytes, size);
     }

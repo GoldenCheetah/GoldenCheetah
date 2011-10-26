@@ -76,6 +76,7 @@ D2XX_INCLUDE = /usr/local/include/D2XX
 # to the root of the libs/includ path
 #ICAL_INSTALL = /usr/local/libical
 
+# SliLabs USB Xpress SDK
 # ** note this is only required on windows, on Mac and Linux
 # ** the USB stick is presented as a serial device.
 # If you want support for using USB1 sticks in realtime
@@ -86,13 +87,22 @@ D2XX_INCLUDE = /usr/local/include/D2XX
 # pathname (SiLabs in your root directory)
 #USBXPRESS_INSTALL=/c/SiLabs/MCU/USBXpress/USBXpress_API/Host/
 
-# ** note this is also only required on windowsto work with
-# ** Garmin USB2 sticks whose driver uses libusb-win32.
+# Libusb 0.1.12
+# Note this is also only required on build support for Train View
+# to support Garmin USB2 sticks
+#
+# For Windows builds:
 # You must make sure you install v0.1.12.2 of libusb-win from:
 # http://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/0.1.12.2/
-# or on Linux you MUST use 1.12.2 from:
-# http://prdownloads.sourceforge.net/libusb/libusb-0.1.12.tar.gz
 #LIBUSB_INSTALL=/c/libusb-win32-device-bin-0.1.12.2
+#
+# For Linux and OS X builds:
+# You must make sure you libusb v0.1.12.2 from:
+# http://prdownloads.sourceforge.net/libusb/libusb-0.1.12.tar.gz
+# it has been placed in the contrib directory, but you will need
+# to configure and build it separately, take care to build for the
+# right target architecture on OSX (i386) to avoid linker errors
+#LIBUSB_INSTALL=/usr/local
 
 # if you want video playback on training mode then
 # download and install vlc (videolan) from
@@ -100,7 +110,7 @@ D2XX_INCLUDE = /usr/local/include/D2XX
 # there are sdks for Mac and Windows. On Linux you
 # will need to use the latest distro (e.g. Meerkat
 # on Ubuntu) to be sure apt-get installs the latest
-# builds (we need 1.1.6 or higher).
+# builds (we need 1.1.8 or higher).
 # e.g. LINUX
 #VLC_INSTALL = /usr/include/vlc/
 # e.g. WINDOWS

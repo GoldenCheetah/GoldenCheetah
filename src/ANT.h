@@ -64,7 +64,7 @@
 #include <sys/ioctl.h>
 #endif
 
-#if defined GC_HAVE_LIBUSB && (defined WIN32 || __linux__)
+#if defined GC_HAVE_LIBUSB
 #include "LibUsb.h"    // for Garmin USB2 sticks
 #endif
 
@@ -334,7 +334,7 @@ private:
     struct termios deviceSettings;  // unix!!
 #endif
 
-#if defined GC_HAVE_LIBUSB && (defined WIN32 || __linux__)
+#if defined GC_HAVE_LIBUSB
     LibUsb *usb2;                   // used for USB2 support
     enum UsbMode { USBNone, USB1, USB2 };
     enum UsbMode usbMode;
