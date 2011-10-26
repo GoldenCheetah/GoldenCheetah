@@ -94,6 +94,14 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
                 double d =       0.0;
         rtData.setWatts(a*v*v*v + b*v*v +c*v + d);
         }
+
+    case 5 : // Lemond Revolution
+        {
+        double V = rtData.getSpeed() * 0.277777778;
+        // Tom Anhalt spent a lot of time working this all out
+        // for the data / analysis see: http://wattagetraining.com/forum/viewtopic.php?f=2&t=335
+        rtData.setWatts((0.21*pow(V,3))+(4.25*V));
+        }
     default : // unknown - do nothing
         break;
     }
