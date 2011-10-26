@@ -94,6 +94,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
                 double d =       0.0;
         rtData.setWatts(a*v*v*v + b*v*v +c*v + d);
         }
+        break;
 
     case 5 : // Lemond Revolution
         {
