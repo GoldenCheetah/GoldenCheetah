@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011 Darren Hague & Eric Brandt
+ *               Modified to suport Linux and OSX by Mark Liversedge
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -19,7 +20,7 @@
 #ifndef gc_LibUsb_h
 #define gc_LibUsb_h
 
-#if defined GC_HAVE_LIBUSB && (defined WIN32 || defined __linux__)
+#if defined GC_HAVE_LIBUSB
 
 #include <usb.h> // for the constants etc
 
@@ -87,6 +88,6 @@ private:
     int readBufSize;
 
     bool isDllLoaded;
-#endif
 };
+#endif
 #endif // gc_LibUsb_h

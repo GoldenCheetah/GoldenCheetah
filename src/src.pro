@@ -90,12 +90,9 @@ qwt3d {
     SOURCES += LibUsb.cpp
     HEADERS += LibUsb.h
 
-    macx {
-        // not supported at present
-    } else {
-        unix {
-            LIBS += $${LIBUSB_INSTALL}/lib/libusb.a
-        }
+    unix {
+        // for Linux and Windows
+        LIBS += $${LIBUSB_INSTALL}/lib/libusb.a
     }
 }
 
@@ -115,7 +112,7 @@ qwt3d {
 }
 
 macx {
-    LIBS += -lobjc -framework Carbon -framework AppKit
+    LIBS += -lobjc -framework Carbon -framework IOKit -framework AppKit
     HEADERS += QtMacSegmentedButton.h
     SOURCES += QtMacSegmentedButton.mm
 }

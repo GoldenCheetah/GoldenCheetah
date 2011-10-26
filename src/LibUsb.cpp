@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011 Darren Hague & Eric Brandt
+ *               Modified to suport Linux and OSX by Mark Liversedge
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,7 +17,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#if defined GC_HAVE_LIBUSB && (defined WIN32 || __linux__)
+#if defined GC_HAVE_LIBUSB
 #include <QString>
 #include <QDebug>
 
@@ -24,13 +25,12 @@
 
 LibUsb::LibUsb()
 {
-// dynamix load of libusb on Windows, it is statically linked in Linux
+
+// dynamic load of libusb on Windows, it is statically linked in Linux
+// this is to avoid dll conflicts where the lib has already been installed
 #ifdef WIN32
     QLibrary libusb0("libusb0");
 
-    /*************************************************************************
-     * Load functions from libusb0.dll
-     */
     usb_set_debug = (VoidIntProto) libusb0.resolve("usb_set_debug");
     usb_strerror = (CharVoidProto) libusb0.resolve("usb_strerror");
     usb_init = (IntVoidProto) libusb0.resolve("usb_init");
@@ -52,9 +52,7 @@ LibUsb::LibUsb()
         qWarning("libusb0.dll was not loaded");
         return;
     }
-    /************************************************************************/
 #endif
-
 
     intf = NULL;
     readBufIndex = 0;
@@ -62,8 +60,8 @@ LibUsb::LibUsb()
 
     usb_set_debug(0);
 
-#ifdef WIN32
-   // Initialize the library.
+#ifdef WIN32 // we initialise whenever we open on Linux/Mac
+    // Initialize the library.
     usb_init();
 
     // Find all busses.
@@ -76,9 +74,11 @@ LibUsb::LibUsb()
 
 int LibUsb::open()
 {
+
 #ifdef WIN32
     if (!isDllLoaded) return -1;
 #else
+
    // Initialize the library.
     usb_init();
 
@@ -100,12 +100,16 @@ int LibUsb::open()
     // reset the device, god only knows what mess we left it in...
     int rc = usb_reset(device);
     if (rc < 0) qDebug()<<"usb_reset Error: "<< usb_strerror();
- 
+
+#ifndef Q_OS_MAC
+
+    // these functions fail on OS X Lion
     rc = usb_clear_halt(device, writeEndpoint);
     if (rc < 0) qDebug()<<"usb_clear_halt writeEndpoint Error: "<< usb_strerror();
 
     rc = usb_clear_halt(device, readEndpoint);
     if (rc < 0) qDebug()<<"usb_clear_halt readEndpoint Error: "<< usb_strerror();
+#endif
 
     return rc;
 }
@@ -125,7 +129,7 @@ void LibUsb::close()
 
 int LibUsb::read(char *buf, int bytes)
 {
-    // check it isn't closed
+    // check it isn't closed already
     if (!device) return -1;
 
 #ifdef WIN32
@@ -133,9 +137,7 @@ int LibUsb::read(char *buf, int bytes)
 #endif
 
     // The USB2 stick really doesn't like you reading 1 byte when more are available
-    // so we need a buffered reader BUT ON WINDOWS ONLY appears to be a driver issue
-    // and not related to the underlying hardware
-
+    // so we use a local buffered read
     int bufRemain = readBufSize - readBufIndex;
 
     // Can we entirely satisfy the request from the buffer?
@@ -184,19 +186,20 @@ int LibUsb::read(char *buf, int bytes)
 
 int LibUsb::write(char *buf, int bytes)
 {
-#ifdef WIN32
-    if (!isDllLoaded) return -1;
-#endif
 
     // check it isn't closed
     if (!device) return -1;
 
 #ifdef WIN32
+    if (!isDllLoaded) return -1;
+#endif
+
+#ifdef WIN32
     int rc = usb_interrupt_write(device, writeEndpoint, buf, bytes, 1000);
 #else
-    //int rc=0;
-    //for (int i=0;rc >= 0 && i<bytes;i ++) // interrupt writes in pairs
-        //usb_interrupt_write(device, writeEndpoint, buf+i, 1, 1000);
+    // we use a non-interrupted write on Linux/Mac since the interrupt
+    // write block size is incorectly implemented in the version of
+    // libusb we build with. It is no less efficent.
     int rc = usb_bulk_write(device, writeEndpoint, buf, bytes, 125);
 #endif
 
@@ -211,36 +214,44 @@ int LibUsb::write(char *buf, int bytes)
 
 struct usb_dev_handle* LibUsb::OpenAntStick()
 {
+
     struct usb_bus* bus;
     struct usb_device* dev;
     struct usb_dev_handle* udev;
 
-    for (bus = usb_get_busses(); bus; bus = bus->next)
-    {
-        for (dev = bus->devices; dev; dev = dev->next)
-        {
-            if (dev->descriptor.idVendor == GARMIN_USB2_VID && dev->descriptor.idProduct == GARMIN_USB2_PID)
-            {
+    for (bus = usb_get_busses(); bus; bus = bus->next) {
+
+        for (dev = bus->devices; dev; dev = dev->next) {
+
+            if (dev->descriptor.idVendor == GARMIN_USB2_VID && dev->descriptor.idProduct == GARMIN_USB2_PID) {
+
+                //Avoid noisy output
                 //qDebug() << "Found a Garmin USB2 ANT+ stick";
 
-                if ((udev = usb_open(dev)))
-                {
-                    if (dev->descriptor.bNumConfigurations)
-                    {
-                        if ((intf = usb_find_interface(&dev->config[0])) != NULL)
-                        {
+                if ((udev = usb_open(dev))) {
+
+                    if (dev->descriptor.bNumConfigurations) {
+
+                        if ((intf = usb_find_interface(&dev->config[0])) != NULL) {
+
                             int rc = usb_set_configuration(udev, 1);
                             if (rc < 0) {
                                 qDebug()<<"usb_set_configuration Error: "<< usb_strerror();
 #ifdef __linux__
+                                // looks like the udev rule has not been implemented
                                 qDebug()<<"check permissions on:"<<QString("/dev/bus/usb/%1/%2").arg(bus->dirname).arg(dev->filename);
+                                qDebug()<<"did you remember to setup a udev rule for this device?";
 #endif
                             }
+
                             rc = usb_claim_interface(udev, interface);
                             if (rc < 0) qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
 
+#ifndef Q_OS_MAC
+                            // fails on Mac OS X, we don't actually need it anyway
                             rc = usb_set_altinterface(udev, alternate);
                             if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
+#endif
 
                             return udev;
                         }
@@ -256,6 +267,7 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
 
 struct usb_interface_descriptor* LibUsb::usb_find_interface(struct usb_config_descriptor* config_descriptor)
 {
+
     struct usb_interface_descriptor* intf;
 
     readEndpoint = -1;
