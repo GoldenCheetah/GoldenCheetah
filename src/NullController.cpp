@@ -26,8 +26,8 @@
 #include <math.h>
 
 NullController::NullController(TrainTool *parent,
-                                                 DeviceConfiguration *)
-  : RealtimeController(parent), parent(parent), load(100)
+                                                 DeviceConfiguration *dc)
+  : RealtimeController(parent, dc), parent(parent), load(100)
 {
 }
 
@@ -49,11 +49,12 @@ int NullController::restart() {
 
 void NullController::getRealtimeData(RealtimeData &rtData) {
     rtData.setName((char *)"Null");
-    rtData.setWatts(load + ((rand()%25)-15));
+    rtData.setWatts(load + ((rand()%25)-15)); // for testing virtual power
     rtData.setLoad(load);
-    rtData.setSpeed(45 + ((rand()%5)-2));
+    rtData.setSpeed(25 + ((rand()%5)-2));
     rtData.setCadence(85 + ((rand()%10)-5));
     rtData.setHr(145 + ((rand()%3)-2));
+    processRealtimeData(rtData); // for testing virtual power etc
 }
 
 void NullController::pushRealtimeData(RealtimeData &) {

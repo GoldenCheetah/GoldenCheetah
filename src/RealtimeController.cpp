@@ -102,9 +102,12 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         // for the data / analysis see: http://wattagetraining.com/forum/viewtopic.php?f=2&t=335
         rtData.setWatts((0.21*pow(V,3))+(4.25*V));
         }
+        break;
     default : // unknown - do nothing
         break;
     }
+    // if calculating but no cadence then power must be set to zero
+    if (dc->postProcess && !rtData.getCadence()) rtData.setWatts(0);
 }
 
 // for future devices, we may need to setup algorithmic tables etc
