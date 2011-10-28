@@ -94,7 +94,7 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
                 double d =       0.0;
         rtData.setWatts(a*v*v*v + b*v*v +c*v + d);
         }
-
+        break;
     case 5 : // Lemond Revolution
         {
         double V = rtData.getSpeed() * 0.277777778;
@@ -105,6 +105,8 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
     default : // unknown - do nothing
         break;
     }
+    // if calculating but no cadence then power must be set to zero
+    if (dc->postProcess && !rtData.getCadence()) rtData.setWatts(0);
 }
 
 // for future devices, we may need to setup algorithmic tables etc
@@ -119,11 +121,14 @@ RealtimeController::processSetup()
     case 0 : // nothing!
         break;
     case 1 : // TODO Kurt Kinetic - use an algorithm...
+        break;
     case 2 : // TODO Kurt Kinetic - use an algorithm...
         break;
     case 3 : // TODO Cyclops Fluid 2 - use an algorithm
         break;
     case 4 : // TODO BT-ATS - BT Advanced Training System - use an algorithm
+        break;
+    case 5 : // TODO Lemond Revolution - use and algorithm
         break;
     default : // unknown - do nothing
         break;
