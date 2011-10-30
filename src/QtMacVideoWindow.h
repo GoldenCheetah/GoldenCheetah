@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 Mark Liversedge (liversedge@gmail.com)
+ * Copyright (c) 2011 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -20,28 +20,33 @@
 #define _GC_VideoWindow_h 1
 #include "GoldenCheetah.h"
 
-// for vlc
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-
-extern "C" {
-#include <vlc/vlc.h>
-#include <vlc/libvlc_media.h>
-}
-
 // QT stuff etc
 #include <QtGui>
 #include <QTimer>
+#include <QMacCocoaViewContainer>
 #include "MainWindow.h"
 #include "DeviceConfiguration.h"
 #include "DeviceTypes.h"
 #include "RealtimeData.h"
 #include "TrainTool.h"
 
-#ifdef Q_OS_LINUX
-#include <QX11EmbedContainer>
-#endif
+// We add references to the Native objects, but since we
+// will be running Qt's moc utility on this file we need
+// to make sure we use the right semantics for compiling
+// the .mm file versus when parsing the header.
+
+#ifdef __OBJC__
+#define ADD_COCOA_NATIVE_REF(CocoaClass) \
+    @class CocoaClass; \
+    typedef CocoaClass *Native##CocoaClass##Ref
+#else /* __OBJC__ */
+#define ADD_COCOA_NATIVE_REF(CocoaClass) typedef void *Native##CocoaClass##Ref
+#endif /* __OBJC__ */
+
+// The above is merely to do the following, but
+// we may add more native widgets in the future
+ADD_COCOA_NATIVE_REF (QTMovie);
+ADD_COCOA_NATIVE_REF (QTMovieView);
 
 class MediaHelper
 {
@@ -55,8 +60,21 @@ class MediaHelper
         QStringList listMedia(QDir directory);
 
     private:
+};
 
-        libvlc_instance_t * inst;
+class QtMacMovieView : public QMacCocoaViewContainer
+{
+    Q_OBJECT;
+
+public:
+    QtMacMovieView (QWidget *parent = 0);
+    void setMovie(NativeQTMovieRef);
+
+signals:
+
+private:
+    
+    NativeQTMovieViewRef player;
 };
 
 class VideoWindow : public GcWindow
@@ -86,17 +104,11 @@ class VideoWindow : public GcWindow
         QDir home;
         MainWindow *main;
 
-        libvlc_instance_t * inst;
-        //libvlc_exception_t exceptions;
-        libvlc_media_player_t *mp;
-        libvlc_media_t *m;
+        // the active movie
+        NativeQTMovieRef movie;
 
-#ifdef Q_OS_LINUX
-        QX11EmbedContainer *x11Container;
-#endif
-#ifdef WIN32
-        QWidget *container;
-#endif
+        // out video window
+        QtMacMovieView *player;
 };
 
 #endif // _GC_VideoWindow_h
