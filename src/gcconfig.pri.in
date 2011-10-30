@@ -115,6 +115,12 @@ D2XX_INCLUDE = /usr/local/include/D2XX
 #VLC_INSTALL = /usr/include/vlc/
 # e.g. WINDOWS
 #VLC_INSTALL = /c/GC/vlc-1.1.8/sdk
+#
+# *** Mac users NOTE ***
+# On MAC you don't need libvlc since we use the
+# native QTKit (OSX framework) for video playback
+# using Quicktime and on 10.6 or higher Quicktime X
+#
 
 # We recommend a debug build for development, and a static build for releases.
 CONFIG += debug

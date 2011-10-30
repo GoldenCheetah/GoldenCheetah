@@ -97,24 +97,35 @@ qwt3d {
 }
 
 # are we supporting video playback?
+# only on Linux and Windows, since we use QTKit on Mac
 !isEmpty( VLC_INSTALL ) {
-    INCLUDEPATH += $${VLC_INSTALL}/include
-    DEFINES += GC_HAVE_VLC
-    HEADERS += VideoWindow.h
-    SOURCES += VideoWindow.cpp
 
-    win32 {
-    	LIBS += $${VLC_INSTALL}/lib/libvlc.dll.a
-    	LIBS += $${VLC_INSTALL}/lib/libvlccore.dll.a
+    macx {
+        # we do not use VLC on Mac we use Quicktime
+        # so ignore this setting on a Mac build
     } else {
-    	LIBS += -lvlc
+        INCLUDEPATH += $${VLC_INSTALL}/include
+        DEFINES += GC_HAVE_VLC
+        HEADERS += VideoWindow.h
+        SOURCES += VideoWindow.cpp
+
+        win32 {
+    	    LIBS += $${VLC_INSTALL}/lib/libvlc.dll.a
+    	    LIBS += $${VLC_INSTALL}/lib/libvlccore.dll.a
+        } else {
+    	    LIBS += -lvlc
+        }
     }
 }
 
+# Mac specific build for
+# Segmented mac style button (but not used at present)
+# Video playback using Quicktime Framework
 macx {
-    LIBS += -lobjc -framework Carbon -framework IOKit -framework AppKit
-    HEADERS += QtMacSegmentedButton.h
-    SOURCES += QtMacSegmentedButton.mm
+    #LIBS += -lobjc -framework Cocoa -framework IOKit -framework AppKit -framework QTKit
+    LIBS += -lobjc -framework Carbon -framework IOKit -framework AppKit -framework QTKit
+    HEADERS += QtMacSegmentedButton.h QtMacVideoWindow.h
+    SOURCES += QtMacSegmentedButton.mm QtMacVideoWindow.mm
 }
 
 !win32 {

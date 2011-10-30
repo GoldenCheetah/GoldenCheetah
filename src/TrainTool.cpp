@@ -40,6 +40,10 @@
 #include "VideoWindow.h"
 #endif
 
+#ifdef Q_OS_MAC
+#include "QtMacVideoWindow.h"
+#endif
+
 TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), home(home), main(parent)
 {
     setInstanceName("Train Controls");
@@ -75,7 +79,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     serverTree->expandItem(allServers);
 #endif
 
-#ifdef GC_HAVE_VLC
+#if defined Q_OS_MAC || defined GC_HAVE_VLC
     mediaTree = new QTreeWidget;
     mediaTree->setFrameStyle(QFrame::NoFrame);
     mediaTree->setColumnCount(1);
@@ -156,7 +160,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     trainSplitter->addWidget(deviceTree);
     //trainSplitter->addWidget(serverTree);
     trainSplitter->addWidget(workoutTree);
-#ifdef GC_HAVE_VLC
+#if defined Q_OS_MAC || defined GC_HAVE_VLC
     trainSplitter->addWidget(mediaTree);
 #endif
 
@@ -164,7 +168,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     //connect(serverTree,SIGNAL(itemSelectionChanged()), this, SLOT(serverTreeWidgetSelectionChanged()));
     connect(deviceTree,SIGNAL(itemSelectionChanged()), this, SLOT(deviceTreeWidgetSelectionChanged()));
     connect(workoutTree,SIGNAL(itemSelectionChanged()), this, SLOT(workoutTreeWidgetSelectionChanged()));
-#ifdef GC_HAVE_VLC
+#if defined Q_OS_MAC || defined GC_HAVE_VLC
     connect(mediaTree,SIGNAL(itemSelectionChanged()), this, SLOT(mediaTreeWidgetSelectionChanged()));
 #endif
     connect(main, SIGNAL(configChanged()), this, SLOT(configChanged()));
@@ -275,7 +279,7 @@ TrainTool::configChanged()
         work->setText(0, name);
     }
 
-#ifdef GC_HAVE_VLC
+#if defined Q_OS_MAC || defined GC_HAVE_VLC
     // MEDIA
     QList<QTreeWidgetItem *> media = allMedia->takeChildren();
     for (int i=0; i<media.count(); i++) delete media.at(i);
