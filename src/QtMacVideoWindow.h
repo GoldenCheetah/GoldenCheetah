@@ -103,6 +103,7 @@ class VideoWindow : public GcWindow
         // passed from MainWindow
         QDir home;
         MainWindow *main;
+        bool hasMovie;
 
         // the active movie
         NativeQTMovieRef movie;
