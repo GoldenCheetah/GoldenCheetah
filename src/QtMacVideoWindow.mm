@@ -25,7 +25,7 @@
 #include <QTkit/QTMovieView.h>
 
 VideoWindow::VideoWindow(MainWindow *parent, const QDir &home)  :
-GcWindow(parent), home(home), main(parent)
+GcWindow(parent), home(home), main(parent), hasMovie(false)
 {
 
     setControls(NULL);
@@ -60,22 +60,32 @@ void VideoWindow::resizeEvent(QResizeEvent * )
 
 void VideoWindow::startPlayback()
 {
-    if (!movie) return; // no movie selected
+    if (!hasMovie) return; // no movie selected
+
+    [movie gotoBeginning];
+    [movie play];
 }
 
 void VideoWindow::stopPlayback()
 {
-    if (!movie) return; // no movie selected
+    if (!hasMovie) return; // no movie selected
+
+    [movie stop];
+    [movie gotoBeginning];
 }
 
 void VideoWindow::pausePlayback()
 {
-    if (!movie) return; // no movie selected
+    if (!hasMovie) return; // no movie selected
+
+    [movie stop];
 }
 
 void VideoWindow::resumePlayback()
 {
-    if (!movie) return; // no movie selected
+    if (!hasMovie) return; // no movie selected
+
+    [movie play];
 }
 
 static inline NSString *darwinQStringToNSString (const QString &aString)
@@ -86,21 +96,10 @@ static inline NSString *darwinQStringToNSString (const QString &aString)
 
 void VideoWindow::mediaSelected(QString filename)
 {
-qDebug()<<"media selected:"<<filename;
-
     // stop any current playback
-    if (movie) {
-        stopPlayback();
-
-        // if we have an existng movie loaded lets
-        // free up the memory since we don't need it
-        // anymore.
-        //XXX [movie dealloc];
-
-        // but we still change the reference to tell the rest
-        // of our widgets not to use it!
-        movie = NULL;
-    }
+    stopPlayback();
+    hasMovie = false;
+    movie = NULL;
 
     // open the movie file
     if (filename != "" && QFile(filename).exists()) {
@@ -116,18 +115,15 @@ qDebug()<<"media selected:"<<filename;
             nil];
 
         movie = [[QTMovie alloc] initWithAttributes:attributes error:&error];
-
         player->setMovie(movie);
+
+        hasMovie = true;
     }
 }
 
-MediaHelper::MediaHelper()
-{
-}
+MediaHelper::MediaHelper() { }
 
-MediaHelper::~MediaHelper()
-{
-}
+MediaHelper::~MediaHelper() { }
 
 // convert an NSString to a QString
 static QString qt_mac_NSStringToQString(const NSString *nsstr)
@@ -184,12 +180,7 @@ QtMacMovieView::QtMacMovieView (QWidget *parent) : QMacCocoaViewContainer (0, pa
     // allocate the player
     player = [[QTMovieView alloc] initWithFrame:frame];
     [player setPreservesAspectRatio:YES];
-
-#if 0
-    NSSegmentedButtonTarget *bt = [[NSSegmentedButtonTarget alloc] initWithObject1:this];
-    [mNativeRef setTarget:bt];
-    [mNativeRef setAction:@selector(segControlClicked:)];
-#endif
+    [player setControllerVisible:NO];
 
     setCocoaView (player);
 }
@@ -197,8 +188,5 @@ QtMacMovieView::QtMacMovieView (QWidget *parent) : QMacCocoaViewContainer (0, pa
 void
 QtMacMovieView::setMovie(NativeQTMovieRef movie)
 {
-qDebug()<<"setting the movie to qtmovieview...";
     [player setMovie:movie];
-qDebug()<<"playing the movie?";
-    [[player movie] play];
 }
