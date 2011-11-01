@@ -115,7 +115,9 @@ void VideoWindow::mediaSelected(QString filename)
         NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
             file, QTMovieFileNameAttribute,
             num, QTMovieLoopsAttribute,
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
             num, QTMovieOpenForPlaybackAttribute,
+#endif
             nil];
 
         movie = [[QTMovie alloc] initWithAttributes:attributes error:&error];
