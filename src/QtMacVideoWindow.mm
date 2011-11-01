@@ -97,9 +97,12 @@ static inline NSString *darwinQStringToNSString (const QString &aString)
 void VideoWindow::mediaSelected(QString filename)
 {
     // stop any current playback
-    stopPlayback();
-    hasMovie = false;
-    movie = NULL;
+    if (hasMovie) {
+        stopPlayback();
+        [movie invalidate]; // let the view deallocate
+        hasMovie = false;
+        movie = NULL;
+    }
 
     // open the movie file
     if (filename != "" && QFile(filename).exists()) {
