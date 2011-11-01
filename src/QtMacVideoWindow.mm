@@ -16,13 +16,15 @@
 * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "QtMacVideoWindow.h"
-
 //avoid including these in the main headers since all the
 //Objective-C syntax borks the Qt Meta Compiler (moc)
+//we also include them before the QT headers to avoid conflicts
+//between QT keywords 'slots' and a header definition in CALayer.h
 #include <QTKit/QTKit.h>
 #include <QTkit/QTMovie.h>
 #include <QTkit/QTMovieView.h>
+
+#include "QtMacVideoWindow.h"
 
 VideoWindow::VideoWindow(MainWindow *parent, const QDir &home)  :
 GcWindow(parent), home(home), main(parent), hasMovie(false)
