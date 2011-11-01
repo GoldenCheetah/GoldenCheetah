@@ -96,10 +96,11 @@ static inline NSString *darwinQStringToNSString (const QString &aString)
 
 void VideoWindow::mediaSelected(QString filename)
 {
+    NativeQTMovieRef old = movie; // so we can invalidate once View has been reset
+
     // stop any current playback
     if (hasMovie) {
         stopPlayback();
-        [movie invalidate]; // let the view deallocate
         hasMovie = false;
         movie = NULL;
     }
@@ -114,7 +115,7 @@ void VideoWindow::mediaSelected(QString filename)
         NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
             file, QTMovieFileNameAttribute,
             num, QTMovieLoopsAttribute,
-            num, QTMovieOpenAsyncRequiredAttribute,
+            num, QTMovieOpenForPlaybackAttribute,
             nil];
 
         movie = [[QTMovie alloc] initWithAttributes:attributes error:&error];
@@ -122,6 +123,8 @@ void VideoWindow::mediaSelected(QString filename)
 
         hasMovie = true;
     }
+
+    if (old) [old invalidate];
 }
 
 MediaHelper::MediaHelper() { }
