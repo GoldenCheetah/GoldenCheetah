@@ -37,7 +37,9 @@ LionFullScreen::eventFilter(QObject *obj, QEvent *event)
     if (obj != main) return false;
 
     if (event->type() == QEvent::KeyPress &&
-        static_cast<QKeyEvent *>(event)->key() == Qt::Key_Escape) {
+        (static_cast<QKeyEvent *>(event)->key() == Qt::Key_Escape ||
+         (static_cast<QKeyEvent *>(event)->key() == Qt::Key_F && 
+         static_cast<QKeyEvent *>(event)->modifiers() == (Qt::MetaModifier|Qt::ControlModifier)))) {
 
         // if in full screen then toggle, otherwise do nothing
         NSView *nsview = (NSView *) main->winId();
