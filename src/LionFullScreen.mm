@@ -36,16 +36,24 @@ LionFullScreen::eventFilter(QObject *obj, QEvent *event)
 {
     if (obj != main) return false;
 
+    // Ctrl-Cmd-F toggles
     if (event->type() == QEvent::KeyPress &&
-        (static_cast<QKeyEvent *>(event)->key() == Qt::Key_Escape ||
-         (static_cast<QKeyEvent *>(event)->key() == Qt::Key_F && 
-         static_cast<QKeyEvent *>(event)->modifiers() == (Qt::MetaModifier|Qt::ControlModifier)))) {
+         static_cast<QKeyEvent *>(event)->key() == Qt::Key_F && 
+         static_cast<QKeyEvent *>(event)->modifiers() == (Qt::MetaModifier|Qt::ControlModifier)) {
+        toggle();
+        return false;
+
+    }
+
+    // ESC cancels fullscreen
+    if (event->type() == QEvent::KeyPress && static_cast<QKeyEvent *>(event)->key() == Qt::Key_Escape) {
 
         // if in full screen then toggle, otherwise do nothing
         NSView *nsview = (NSView *) main->winId();
         NSWindow *nswindow = [nsview window];
         NSUInteger masks = [nswindow styleMask];
         if (masks & NSFullScreenWindowMask) toggle();
+        return false;
     }
 
     return false; // always pass thru, just in case
