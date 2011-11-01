@@ -51,6 +51,7 @@ class IntervalSummaryWindow;
 class RideNavigator;
 class GcToolBar;
 class GcBubble;
+class LionFullScreen;
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 
@@ -125,6 +126,10 @@ class MainWindow : public QMainWindow
         bool isclean;
 
         void setBubble(QString text, QPoint pos = QPoint(), Qt::Orientation o = Qt::Horizontal);
+
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
+        LionFullScreen *fullScreen;
+#endif
 
         // *********************************************
         // APPLICATION EVENTS
