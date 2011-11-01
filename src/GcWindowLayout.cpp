@@ -22,7 +22,7 @@
 #include <stdio.h>
 
 GcWindowLayout::GcWindowLayout(QWidget *parent, int margin, int hSpacing, int vSpacing)
-    : QLayout(parent), m_hSpace(hSpacing), m_vSpace(vSpacing)
+    : QLayout(parent), m_hSpace(hSpacing), m_vSpace(vSpacing), parent(parent)
 {
     setContentsMargins(margin, margin, margin, margin);
 }
@@ -155,6 +155,9 @@ int GcWindowLayout::doLayout(const QRect &rect, bool testOnly) const
     // Charts already positioned are held here
     QList <QRect> placed; 
 
+    // if not in test mode, set updates enabled before we repaint
+    if (!testOnly) parent->setUpdatesEnabled(false);
+
     // iterate through each chart, placing it in the
     // most optimal location top to bottom then
     // left to right (packed flow)
@@ -256,6 +259,10 @@ int GcWindowLayout::doLayout(const QRect &rect, bool testOnly) const
 
     }
 
+    // if not in test mode, set updates enabled before we repaint
+    if (!testOnly) parent->setUpdatesEnabled(true);
+    parent->repaint();
+
     // Return the length of the layout
     int maxy=0;
     foreach(QRect geom, placed) {
@@ -268,13 +275,5 @@ int GcWindowLayout::doLayout(const QRect &rect, bool testOnly) const
 
 int GcWindowLayout::smartSpacing(QStyle::PixelMetric pm) const
 {
-    QObject *parent = this->parent();
-    if (!parent) {
-        return -1;
-    } else if (parent->isWidgetType()) {
-        QWidget *pw = static_cast<QWidget *>(parent);
-        return pw->style()->pixelMetric(pm, 0, pw);
-    } else {
-        return static_cast<QLayout *>(parent)->spacing();
-    }
+    return parent->style()->pixelMetric(pm, 0, parent);
 }
