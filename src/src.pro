@@ -121,11 +121,12 @@ qwt3d {
 # Mac specific build for
 # Segmented mac style button (but not used at present)
 # Video playback using Quicktime Framework
+# Lion fullscreen playback
 macx {
     #LIBS += -lobjc -framework Cocoa -framework IOKit -framework AppKit -framework QTKit
     LIBS += -lobjc -framework Carbon -framework IOKit -framework AppKit -framework QTKit
-    HEADERS += QtMacSegmentedButton.h QtMacVideoWindow.h
-    SOURCES += QtMacSegmentedButton.mm QtMacVideoWindow.mm
+    HEADERS += QtMacSegmentedButton.h QtMacVideoWindow.h 
+    SOURCES += QtMacSegmentedButton.mm QtMacVideoWindow.mm LionFullScreen.mm
 }
 
 !win32 {
@@ -231,6 +232,7 @@ HEADERS += \
         IntervalItem.h \
         IntervalSummaryWindow.h \
         JsonRideFile.h \
+        LionFullScreen.h \
         LogTimeScaleDraw.h \
         LogTimeScaleEngine.h \
         LTMCanvasPicker.h \
