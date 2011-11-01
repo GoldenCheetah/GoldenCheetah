@@ -260,8 +260,10 @@ int GcWindowLayout::doLayout(const QRect &rect, bool testOnly) const
     }
 
     // if not in test mode, set updates enabled before we repaint
-    if (!testOnly) parent->setUpdatesEnabled(true);
-    parent->repaint();
+    if (!testOnly) {
+        parent->repaint();
+        parent->setUpdatesEnabled(true);
+    }
 
     // Return the length of the layout
     int maxy=0;

@@ -46,6 +46,8 @@ DialWindow::DialWindow(MainWindow *mainWindow) :
 
     // display label...
     QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setSpacing(0);
+    layout->setContentsMargins(3,3,3,3);
     valueLabel = new QLabel(this);
     valueLabel->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
     layout->addWidget(valueLabel);
@@ -126,13 +128,15 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
 void DialWindow::resizeEvent(QResizeEvent * )
 {
+    // set point size
+    int size = geometry().height()-15;
+    if (size <= 0) size = 4;
+    if (size >= 64) size = 64;
 
-   if (geometry().height()-37 < 0) return;
-
-   QFont font;
-   font.setPointSize((geometry().height()-37));
-   font.setWeight(QFont::Bold);
-   valueLabel->setFont(font);
+    QFont font;
+    font.setPointSize(size);
+    font.setWeight(QFont::Bold);
+    valueLabel->setFont(font);
 }
 
 void DialWindow::seriesChanged()
