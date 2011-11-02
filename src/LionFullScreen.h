@@ -16,6 +16,9 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+// What versions are supported by this SDK?
+#include <AvailabilityMacros.h>
+
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
 #ifndef _GC_LionFullScreen_h
 #define _GC_LionFullScreen_h 1

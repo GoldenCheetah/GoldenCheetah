@@ -33,6 +33,11 @@
 #include "SpecialFields.h"
 #include <boost/shared_ptr.hpp>
 
+#ifdef Q_OS_MAC
+// What versions are supported by this SDK?
+#include <AvailabilityMacros.h>
+#endif
+
 class MetricAggregator;
 class Zones;
 class HrZones;
@@ -127,7 +132,7 @@ class MainWindow : public QMainWindow
 
         void setBubble(QString text, QPoint pos = QPoint(), Qt::Orientation o = Qt::Horizontal);
 
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
+#if (defined Q_OS_MAC) && (MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7)
         LionFullScreen *fullScreen;
 #endif
 
