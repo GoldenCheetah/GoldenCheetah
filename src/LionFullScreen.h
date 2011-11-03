@@ -17,7 +17,9 @@
  */
 
 // What versions are supported by this SDK?
+#ifdef Q_OS_MAC
 #include <AvailabilityMacros.h>
+#endif
 
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
 #ifndef _GC_LionFullScreen_h
