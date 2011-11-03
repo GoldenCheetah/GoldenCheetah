@@ -125,7 +125,7 @@ qwt3d {
 macx {
     #LIBS += -lobjc -framework Cocoa -framework IOKit -framework AppKit -framework QTKit
     LIBS += -lobjc -framework Carbon -framework IOKit -framework AppKit -framework QTKit
-    HEADERS += QtMacSegmentedButton.h QtMacVideoWindow.h 
+    HEADERS += QtMacSegmentedButton.h QtMacVideoWindow.h LionFullScreen.h
     SOURCES += QtMacSegmentedButton.mm QtMacVideoWindow.mm LionFullScreen.mm
 }
 
@@ -232,7 +232,6 @@ HEADERS += \
         IntervalItem.h \
         IntervalSummaryWindow.h \
         JsonRideFile.h \
-        LionFullScreen.h \
         LogTimeScaleDraw.h \
         LogTimeScaleEngine.h \
         LTMCanvasPicker.h \
