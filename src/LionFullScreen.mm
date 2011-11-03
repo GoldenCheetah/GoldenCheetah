@@ -18,10 +18,9 @@
 
 #include "LionFullScreen.h"
 
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
-
 LionFullScreen::LionFullScreen(MainWindow *main) : QObject(main), main(main)
 {
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
     // lets enable fullscreen stuff
     NSView *nsview = (NSView *) main->winId(); 
     NSWindow *nswindow = [nsview window];
@@ -29,11 +28,13 @@ LionFullScreen::LionFullScreen(MainWindow *main) : QObject(main), main(main)
 
     // watch for ESC key being hit when in full screen
     main->installEventFilter(this);
+#endif
 }
 
 bool
 LionFullScreen::eventFilter(QObject *obj, QEvent *event)
 {
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
     if (obj != main) return false;
 
     // Ctrl-Cmd-F toggles
@@ -55,7 +56,7 @@ LionFullScreen::eventFilter(QObject *obj, QEvent *event)
         if (masks & NSFullScreenWindowMask) toggle();
         return false;
     }
-
+#endif
     return false; // always pass thru, just in case
 }
 
@@ -63,9 +64,10 @@ LionFullScreen::eventFilter(QObject *obj, QEvent *event)
 void
 LionFullScreen::toggle()
 {
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
     // toggle full screen back
     NSView *nsview = (NSView *) main->winId();
     NSWindow *nswindow = [nsview window];
     [nswindow toggleFullScreen:nil];
-}
 #endif
+}
