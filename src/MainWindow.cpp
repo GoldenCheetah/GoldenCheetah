@@ -76,6 +76,9 @@
 #if (defined Q_OS_MAC) && (MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7)
 #include "LionFullScreen.h"
 #endif
+#ifndef Q_OS_MAC
+#include "QTFullScreen.h"
+#endif
 
 #include <assert.h>
 #include <QApplication>
@@ -129,6 +132,9 @@ MainWindow::MainWindow(const QDir &home) :
 
 #if (defined Q_OS_MAC) && (MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7)
     fullScreen = new LionFullScreen(this);
+#endif
+#ifndef Q_OS_MAC
+    fullScreen = new QTFullScreen(this);
 #endif
 
     /*----------------------------------------------------------------------
@@ -526,6 +532,9 @@ MainWindow::MainWindow(const QDir &home) :
     }
 
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
+#ifndef Q_OS_MAC
+    viewMenu->addAction(tr("Toggle Full Screen"), this, SLOT(toggleFullScreen()));
+#endif
     QAction *showhideSidebar = viewMenu->addAction(tr("Show Sidebar"), this, SLOT(showSidebar(bool)));
     showhideSidebar->setCheckable(true);
     showhideSidebar->setChecked(true);
@@ -535,7 +544,6 @@ MainWindow::MainWindow(const QDir &home) :
     showhideToolbar->setCheckable(true);
     showhideToolbar->setChecked(true);
     //connect(showhideSidebar, SIGNAL(triggered(bool)), this, SLOT(showSidebar(bool)));
-
     viewMenu->addSeparator();
     viewMenu->addAction(tr("Analysis"), this, SLOT(selectAnalysis()));
     viewMenu->addAction(tr("Home"), this, SLOT(selectHome()));
@@ -621,6 +629,13 @@ MainWindow::selectWindow(QAction *act)
     }
 }
 
+#ifndef Q_OS_MAC
+void
+MainWindow::toggleFullScreen()
+{
+    fullScreen->toggle();
+}
+#endif
 void
 MainWindow::rideTreeWidgetSelectionChanged()
 {

@@ -57,6 +57,7 @@ class RideNavigator;
 class GcToolBar;
 class GcBubble;
 class LionFullScreen;
+class QTFullScreen;
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 
@@ -134,6 +135,9 @@ class MainWindow : public QMainWindow
 
 #if (defined Q_OS_MAC) && (MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7)
         LionFullScreen *fullScreen;
+#endif
+#ifndef Q_OS_MAC
+        QTFullScreen *fullScreen;
 #endif
 
         // *********************************************
@@ -273,6 +277,10 @@ class MainWindow : public QMainWindow
         void selectWindow(QAction*);
 
         void showDock();
+#ifndef Q_OS_MAC
+        void toggleFullScreen();
+#endif
+
     protected:
 
         static QString notesFileName(QString rideFileName);
