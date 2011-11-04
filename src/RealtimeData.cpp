@@ -25,7 +25,7 @@ RealtimeData::RealtimeData()
 {
     name[0] = '\0';
     lap = watts = hr = speed = wheelRpm = cadence  = load = 0;
-    msecs = lapMsecs = bikeScore = joules = 0;
+    msecs = lapMsecs = /* bikeScore = joules =*/ 0;
 }
 
 void RealtimeData::setName(char *name)
@@ -68,19 +68,6 @@ void RealtimeData::setDistance(double x)
 {
     this->distance = x;
 }
-void RealtimeData::setJoules(long x)
-{
-    this->joules = x;
-}
-void RealtimeData::setBikeScore(long x)
-{
-    this->bikeScore = x;
-}
-void RealtimeData::setXPower(long x)
-{
-    this->xPower = x;
-}
-
 const char *
 RealtimeData::getName() const
 {
@@ -122,18 +109,6 @@ double RealtimeData::getDistance() const
 {
     return distance;
 }
-long RealtimeData::getJoules() const
-{
-    return joules;
-}
-long RealtimeData::getBikeScore() const
-{
-    return bikeScore;
-}
-long RealtimeData::getXPower() const
-{
-    return xPower;
-}
 
 double RealtimeData::value(DataSeries series) const
 {
@@ -149,15 +124,6 @@ double RealtimeData::value(DataSeries series) const
         break;
 
     case Distance: return distance;
-        break;
-
-    case Joules: return joules;
-        break;
-
-    case BikeScore: return bikeScore;
-        break;
-
-    case XPower: return xPower;
         break;
 
     case Watts: return watts;
@@ -202,8 +168,18 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << HeartRate;
         seriesList << Load;
         seriesList << BikeScore;
+        seriesList << SkibaVI;
+        seriesList << TSS;
         seriesList << XPower;
+        seriesList << NP;
+        seriesList << RI;
+        seriesList << IF;
+        seriesList << VI;
         seriesList << Joules;
+        seriesList << AvgWatts;
+        seriesList << AvgSpeed;
+        seriesList << AvgCadence;
+        seriesList << AvgHeartRate;
     }
     return seriesList;
 }
@@ -225,13 +201,31 @@ QString RealtimeData::seriesName(DataSeries series)
     case LapTime: return tr("Lap Time");
         break;
 
+    case TSS: return tr("TSS");
+        break;
+
     case BikeScore: return tr("BikeScore");
         break;
 
-    case Joules: return tr("Joules");
+    case Joules: return tr("kJoules");
         break;
 
     case XPower: return tr("XPower");
+        break;
+
+    case NP: return tr("Normalized Power");
+        break;
+
+    case IF: return tr("Intensity Factor");
+        break;
+
+    case RI: return tr("Relative Intensity");
+        break;
+
+    case SkibaVI: return tr("Skiba Variability Index");
+        break;
+
+    case VI: return tr("Variability Index");
         break;
 
     case Distance: return tr("Distance");
@@ -250,6 +244,18 @@ QString RealtimeData::seriesName(DataSeries series)
         break;
 
     case Load: return tr("Target Power");
+        break;
+
+    case AvgWatts: return tr("Average Power");
+        break;
+
+    case AvgSpeed: return tr("Average Speed");
+        break;
+
+    case AvgHeartRate: return tr("Average Heartrate");
+        break;
+
+    case AvgCadence: return tr("Average Cadence");
         break;
     }
 }

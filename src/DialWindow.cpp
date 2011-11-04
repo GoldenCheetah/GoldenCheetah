@@ -22,6 +22,8 @@
 DialWindow::DialWindow(MainWindow *mainWindow) :
     GcWindow(mainWindow), mainWindow(mainWindow)
 {
+    rolling.resize(150); // enough for 30 seconds at 5hz
+
     setContentsMargins(0,0,0,0);
     setInstanceName("Dial");
 
@@ -125,6 +127,207 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 3));
         break;
 
+    case RealtimeData::AvgWatts:
+        sum += rtData.value(RealtimeData::Watts);
+        count++;
+        value = sum / count;
+        valueLabel->setText(QString("%1").arg(round(value)));
+        break;
+
+    case RealtimeData::AvgSpeed:
+        sum += rtData.value(RealtimeData::Speed);
+        count++;
+        value = sum / count;
+        if (!mainWindow->useMetricUnits) value *= MILES_PER_KM;
+        valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
+        break;
+
+    case RealtimeData::AvgCadence:
+        sum += rtData.value(RealtimeData::Cadence);
+        count++;
+        value = sum / count;
+        valueLabel->setText(QString("%1").arg(round(value)));
+        break;
+
+    case RealtimeData::AvgHeartRate:
+        sum += rtData.value(RealtimeData::HeartRate);
+        count++;
+        value = sum / count;
+        valueLabel->setText(QString("%1").arg(round(value)));
+        break;
+
+    // ENERGY
+    case RealtimeData::Joules:
+        sum += rtData.value(RealtimeData::Watts) / 5; // joules
+        valueLabel->setText(QString("%1").arg(round(sum/1000))); // kJoules
+        break;
+
+    // COGGAN Metrics
+    case RealtimeData::NP:
+    case RealtimeData::IF:
+    case RealtimeData::TSS:
+    case RealtimeData::VI:
+        {
+
+        // Update sum of watts for last 30 seconds
+        sum += rtData.value(RealtimeData::Watts);
+        sum -= rolling[index];
+        rolling[index] = rtData.value(RealtimeData::Watts);
+
+        // raise average to the 4th power
+        rollingSum += pow(sum/150,4); // raise rolling average to 4th power
+        count ++;
+
+        // move index on/round
+        index = (index >= 149) ? 0 : index+1;
+
+        // calculate NP
+        double np = pow(rollingSum / (count), 0.25);
+
+        if (series == RealtimeData::NP) {
+            // We only wanted NP so thats it
+            valueLabel->setText(QString("%1").arg(round(np)));
+
+        } else {
+
+            double rif, cp;
+            // carry on and calculate IF
+            if (mainWindow->zones()) {
+
+                // get cp for today
+                int zonerange = mainWindow->zones()->whichRange(QDateTime::currentDateTime().date());
+                if (zonerange >= 0) cp = mainWindow->zones()->getCP(zonerange);
+                else cp = 0;
+
+            } else {
+                cp = 0;
+            }
+
+            if (cp) rif = np / cp;
+            else rif = 0;
+
+            if (series == RealtimeData::IF) {
+
+                // we wanted IF so thats it
+                valueLabel->setText(QString("%1").arg(rif, 0, 'f', 3));
+
+            } else {
+
+                double normWork = np * (rtData.value(RealtimeData::Time) / 1000); // msecs
+                double rawTSS = normWork * rif;
+                double workInAnHourAtCP = cp * 3600;
+                double tss = rawTSS / workInAnHourAtCP * 100.0;
+
+                if (series == RealtimeData::TSS) {
+
+                    valueLabel->setText(QString("%1").arg(tss, 0, 'f', 1));
+
+                } else {
+
+                    // track average power for VI
+                    apsum += rtData.value(RealtimeData::Watts);
+                    apcount++;
+
+                    double ap = apsum ? apsum / apcount : 0;
+
+                    // VI is all that is left!
+                    valueLabel->setText(QString("%1").arg(ap ? np / ap : 0, 0, 'f', 3));
+
+                }
+
+            }
+
+        }
+
+        }
+        break;
+
+    // SKIBA Metrics
+    case RealtimeData::XPower:
+    case RealtimeData::RI:
+    case RealtimeData::BikeScore:
+    case RealtimeData::SkibaVI:
+        {
+
+        static const double exp = 2.0f / ((25.0f / 0.2f) + 1.0f);
+        static const double rem = 1.0f - exp;
+
+        count++;
+
+        if (count < 125) {
+
+            // get up to speed
+            rsum += rtData.value(RealtimeData::Watts);
+            ewma = rsum / count;
+
+        } else {
+
+            // we're up to speed
+            ewma = (rtData.value(RealtimeData::Watts) * exp) + (ewma * rem);
+        }
+
+        sum += pow(ewma, 4.0f);
+        double xpower = pow(sum / count, 0.25f);
+
+        if (series == RealtimeData::XPower) {
+
+            // We wanted XPower!
+            valueLabel->setText(QString("%1").arg(round(xpower)));
+
+        } else {
+
+            double rif, cp;
+            // carry on and calculate IF
+            if (mainWindow->zones()) {
+
+                // get cp for today
+                int zonerange = mainWindow->zones()->whichRange(QDateTime::currentDateTime().date());
+                if (zonerange >= 0) cp = mainWindow->zones()->getCP(zonerange);
+                else cp = 0;
+
+            } else {
+                cp = 0;
+            }
+
+            if (cp) rif = xpower / cp;
+            else rif = 0;
+
+            if (series == RealtimeData::RI) {
+
+                // we wanted IF so thats it
+                valueLabel->setText(QString("%1").arg(rif, 0, 'f', 3));
+
+            } else {
+
+                double normWork = xpower * (rtData.value(RealtimeData::Time) / 1000); // msecs
+                double rawTSS = normWork * rif;
+                double workInAnHourAtCP = cp * 3600;
+                double tss = rawTSS / workInAnHourAtCP * 100.0;
+
+                if (series == RealtimeData::BikeScore) {
+
+                    valueLabel->setText(QString("%1").arg(tss, 0, 'f', 1));
+
+                } else {
+
+                    // track average power for Relative Intensity
+                    apsum += rtData.value(RealtimeData::Watts);
+                    apcount++;
+
+                    double ap = apsum ? apsum / apcount : 0;
+
+                    // RI is all that is left!
+                    valueLabel->setText(QString("%1").arg(ap ? xpower / ap : 0, 0, 'f', 3));
+
+                }
+
+            }
+
+        }
+
+        }
+        break;
+
     default:
         valueLabel->setText(QString("%1").arg(round(value)));
         break;
@@ -135,7 +338,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 void DialWindow::resizeEvent(QResizeEvent * )
 {
     // set point size
-    int size = geometry().height()-15;
+    int size = geometry().height()-24;
     if (size <= 0) size = 4;
     if (size >= 64) size = 64;
 
@@ -158,30 +361,40 @@ void DialWindow::seriesChanged()
     case RealtimeData::LapTime:
     case RealtimeData::Distance:
     case RealtimeData::Lap:
+    case RealtimeData::RI:
+    case RealtimeData::IF:
+    case RealtimeData::VI:
+    case RealtimeData::SkibaVI:
     case RealtimeData::None:
             foreground = GColor(CPLOTMARKER);
             break;
 
     case RealtimeData::Load:
+    case RealtimeData::BikeScore:
+    case RealtimeData::TSS:
             foreground = Qt::blue;
             break;
 
     case RealtimeData::XPower:
+    case RealtimeData::NP:
     case RealtimeData::Joules:
-    case RealtimeData::BikeScore:
     case RealtimeData::Watts:
+    case RealtimeData::AvgWatts:
             foreground = GColor(CPOWER);
             break;
 
     case RealtimeData::Speed:
+    case RealtimeData::AvgSpeed:
             foreground = GColor(CSPEED);
             break;
 
     case RealtimeData::Cadence:
+    case RealtimeData::AvgCadence:
             foreground = GColor(CCADENCE);
             break;
 
     case RealtimeData::HeartRate:
+    case RealtimeData::AvgHeartRate:
             foreground = GColor(CHEARTRATE);
             break;
     }

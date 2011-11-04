@@ -50,7 +50,6 @@
 #define STREAMRATE     200 // rate at which we stream updates to remote peer
 #define SAMPLERATE     1000 // disk update in milliseconds
 #define LOADRATE       1000 // rate at which load is adjusted
-#define METRICSRATE    1000 // rate the metrics are updated
 
 // device treeview node types
 #define HEAD_TYPE    6666
@@ -140,7 +139,6 @@ class TrainTool : public GcWindow
         void diskUpdate();          // writes to CSV file
         void streamUpdate();        // writes to remote Peer
         void loadUpdate();          // sets Load on CT like devices
-        void metricsUpdate();       // calculates the metrics
 
         // When no config has been setup
         void warnnoConfig();
@@ -183,9 +181,6 @@ class TrainTool : public GcWindow
         double displayDistance, displayWorkoutDistance;
         int displayLap;            // user increment for Lap
         int displayWorkoutLap;     // which Lap in the workout are we at?
-        double kjoules;
-        double bikescore;
-        double xpower;
         bool manualOverride; // during an erg woprkout, if the Higher/Lower
                              // signals are called, it switches to manual
                              // until the next lap/interval
@@ -197,7 +192,6 @@ class TrainTool : public GcWindow
 
         QFile *recordFile;      // where we record!
         ErgFile *ergFile;       // workout file
-        boost::shared_ptr<RideFile> rideFile;     // keeps track of the workout to figure out BikeScore
 
         long total_msecs,
              lap_msecs,
@@ -210,8 +204,7 @@ class TrainTool : public GcWindow
         QTimer      *gui_timer,     // refresh the gui
                     *stream_timer,  // send telemetry to server
                     *load_timer,    // change the load on the device
-                    *disk_timer,    // write to .CSV file
-                    *metrics_timer; // computational intense metrics
+                    *disk_timer;    // write to .CSV file
 
     public:
         // everyone else wants this

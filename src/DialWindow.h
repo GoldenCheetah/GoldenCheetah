@@ -25,6 +25,7 @@
 
 
 #include "MainWindow.h"
+#include "Zones.h" // for data series types
 #include "RideFile.h" // for data series types
 #include "RealtimeData.h" // for realtimedata structure
 
@@ -99,8 +100,33 @@ class DialWindow : public GcWindow
         double instantValue;
         double avg30, avgLap, avgTotal;
         double lapNumber;
+
+        // for calculating averages
         int count;
-        void resetValues() { instantValue = avg30 = avgLap = avgTotal = lapNumber = 0; telemetryUpdate(RealtimeData()); }
+        double sum;
+
+        // for keeping track of rolling averages (max 30s at 5hz)
+        // used by NP and XPower
+        QVector<double> rolling;
+        double rollingSum;
+        int index; // index into rolling (circular buffer)
+
+        // VI/RI makes us track AP too
+        int apcount;
+        int apsum;
+
+        // used by XPower algorithm
+        double rsum, ewma;
+
+        void resetValues() { 
+
+            rolling.fill(0.00);
+            rsum = ewma = 0.0f;
+            rollingSum = index = 0;
+            apcount = count = sum = instantValue = avg30 =
+            apsum = avgLap = avgTotal = lapNumber = 0;
+            telemetryUpdate(RealtimeData());
+        }
 
         // controls
         QComboBox *seriesSelector;
