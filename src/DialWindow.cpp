@@ -115,7 +115,13 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         }
         break;
 
+    case RealtimeData::Speed:
+        if (!mainWindow->useMetricUnits) value *= MILES_PER_KM;
+        valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
+        break;
+
     case RealtimeData::Distance:
+        if (!mainWindow->useMetricUnits) value *= MILES_PER_KM;
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 3));
         break;
 
