@@ -97,9 +97,10 @@ int LibUsb::open()
 
     if (device == NULL) return -1;
 
+    int rc;
 #ifndef WIN32
     // reset the device, god only knows what mess we left it in...
-    int rc = usb_reset(device);
+    rc = usb_reset(device);
     if (rc < 0) qDebug()<<"usb_reset Error: "<< usb_strerror();
 #endif
 
