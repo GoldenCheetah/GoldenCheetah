@@ -19,6 +19,7 @@
 #ifndef _ErgFile_h
 #define _ErgFile_h
 #include "GoldenCheetah.h"
+#include "MainWindow.h"
 
 #include <QtGui>
 #include <QObject>
@@ -45,6 +46,9 @@
 class ErgFilePoint
 {
     public:
+
+        ErgFilePoint() : x(0), y(0), val(0) {}
+
         long x;     // x axis - time in msecs or distance in meters
         long y;     // y axis - load in watts or altitude
 
@@ -61,7 +65,7 @@ class ErgFileLap
 class ErgFile
 {
     public:
-        ErgFile(QString, int&, double Cp);       // constructor uses filename
+        ErgFile(QString, int&, double Cp, MainWindow *main);       // constructor uses filename
         ~ErgFile();             // delete the contents
 
         bool isValid();         // is the file valid or not?
@@ -80,10 +84,21 @@ class ErgFile
         int     MaxWatts;       // maxWatts in this ergfile (scaling)
         bool valid;             // did it parse ok?
 
-    int leftPoint, rightPoint;            // current points we are between
+        int leftPoint, rightPoint;            // current points we are between
 
-    QList<ErgFilePoint> Points;    // points in workout
-    QList<ErgFileLap>   Laps;      // interval markers in the file
+        QList<ErgFilePoint> Points;    // points in workout
+        QList<ErgFileLap>   Laps;      // interval markers in the file
+
+        void calculateMetrics(); // calculate NP value for ErgFile
+
+        // Metrics for this workout
+        double CP;
+        double AP, NP, IF, TSS, VI; // Coggan for erg / mrc
+        double XP, RI, BS, SVI; // Skiba for erg / mrc
+        double ELE, ELEDIST, GRADE;    // crs
+
+    private:
+        MainWindow *main;
 };
 
 #endif
