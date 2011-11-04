@@ -261,7 +261,7 @@ ErgFile::wattsAt(long x, int &lapnum)
     // point in time in msecs.
 
     // is it in bounds?
-    if (x < 0 || x > Duration) return 0;   // out of bounds!!!
+    if (x < 0 || x > Duration) return -100;   // out of bounds!!!
 
     // do we need to return the Lap marker?
     if (Laps.count() > 0) {
