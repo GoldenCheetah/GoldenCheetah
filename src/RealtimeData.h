@@ -32,7 +32,9 @@ public:
     // abstract to dataseries
     enum dataseries { None=0, Time, LapTime, Distance, Lap,
                       Watts, Speed, Cadence, HeartRate, Load,
-                      XPower, BikeScore, Joules };
+                      XPower, BikeScore, RI, Joules, SkibaVI,
+                      NP, TSS, IF, VI,
+                      AvgWatts, AvgSpeed, AvgCadence, AvgHeartRate };
 
     typedef enum dataseries DataSeries;
     double value(DataSeries) const;
@@ -69,9 +71,6 @@ public:
     long getMsecs() const;
     long getLapMsecs() const;
     double getDistance() const;
-    long getBikeScore() const;
-    long getJoules() const;
-    long getXPower() const;
     long getLap() const;
 
 
@@ -87,8 +86,6 @@ private:
     long lap;
     long msecs;
     long lapMsecs;
-    long bikeScore, joules, xPower;
 };
-
 
 #endif

@@ -201,7 +201,6 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     disk_timer = new QTimer(this);
     stream_timer = new QTimer(this);
     load_timer = new QTimer(this);
-    metrics_timer = new QTimer(this);
 
     session_time = QTime();
     session_elapsed_msec = 0;
@@ -222,13 +221,10 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     displaySpeed = displayCadence = displayGradient = displayLoad = 0;
     manualOverride = false;
 
-    rideFile = boost::shared_ptr<RideFile>(new RideFile(QDateTime::currentDateTime(),1));
-
     connect(gui_timer, SIGNAL(timeout()), this, SLOT(guiUpdate()));
     connect(disk_timer, SIGNAL(timeout()), this, SLOT(diskUpdate()));
     connect(stream_timer, SIGNAL(timeout()), this, SLOT(streamUpdate()));
     connect(load_timer, SIGNAL(timeout()), this, SLOT(loadUpdate()));
-    connect(metrics_timer, SIGNAL(timeout()), this, SLOT(metricsUpdate()));
 
     configChanged(); // will reset the workout tree
 
@@ -603,9 +599,6 @@ void TrainTool::Start()       // when start button is pressed
             }
         }
 
-        // create a new rideFile
-        rideFile = boost::shared_ptr<RideFile>(new RideFile(QDateTime::currentDateTime(),1));
-
 
         // stream
         if (status & RT_STREAMING) {
@@ -613,7 +606,6 @@ void TrainTool::Start()       // when start button is pressed
         }
 
         gui_timer->start(REFRESHRATE);      // start recording
-        metrics_timer->start(METRICSRATE);
 
     }
 }
@@ -633,7 +625,6 @@ void TrainTool::Pause()        // pause capture to recalibrate
         deviceController->restart();
         setPauseText(tr("Pause"));
         gui_timer->start(REFRESHRATE);
-        metrics_timer->start(METRICSRATE);
         if (status & RT_STREAMING) stream_timer->start(STREAMRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         load_period.restart();
@@ -650,7 +641,6 @@ void TrainTool::Pause()        // pause capture to recalibrate
         setPauseText(tr("Un-Pause"));
         status |=RT_PAUSED;
         gui_timer->stop();
-        metrics_timer->stop();
         if (status & RT_STREAMING) stream_timer->stop();
         if (status & RT_RECORDING) disk_timer->stop();
         if (status & RT_WORKOUT) load_timer->stop();
@@ -676,7 +666,6 @@ void TrainTool::Stop(int deviceStatus)        // when stop button is pressed
     deviceController = NULL;
 
     gui_timer->stop();
-    metrics_timer->stop();
 
     QDateTime now = QDateTime::currentDateTime();
 
@@ -776,11 +765,6 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
         lap_msecs = lap_elapsed_msec + lap_time.elapsed();
         rtData.setMsecs(total_msecs);
         rtData.setLapMsecs(lap_msecs);
-
-        // metrics
-        rtData.setJoules(kjoules);
-        rtData.setBikeScore(bikescore);
-        rtData.setXPower(xpower);
 
         // local stuff ...
         displayPower = rtData.getWatts();
@@ -900,23 +884,6 @@ void TrainTool::diskUpdate()
                         << "," << Altitude
                         << "," << "\n";
 
-    rideFile->appendPoint(total_msecs/1000,displayCadence,displayHeartRate,displayDistance,displaySpeed,0,
-                          displayPower,Altitude,0,0,0,displayLap + displayWorkoutLap);
-}
-
-void TrainTool::metricsUpdate()
-{
-    // calculate bike score, xpower
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-    const RideMetric *rm = factory.rideMetric("skiba_xpower");
-
-    QStringList metrics;
-    metrics.append("skiba_bike_score");
-    metrics.append("skiba_xpower");
-    QHash<QString,RideMetricPtr> results = rm->computeMetrics(
-            this->main,&*rideFile,this->main->zones(),this->main->hrZones(),metrics);
-    bikescore = results["skiba_bike_score"]->value(true);
-    xpower = results["skiba_xpower"]->value(true);
 }
 
 //----------------------------------------------------------------------
