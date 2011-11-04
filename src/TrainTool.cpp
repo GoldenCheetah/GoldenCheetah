@@ -42,6 +42,7 @@
 
 #ifdef Q_OS_MAC
 #include "QtMacVideoWindow.h"
+#include <CoreServices/CoreServices.h>
 #endif
 
 TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), home(home), main(parent)
@@ -749,6 +750,15 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
     rtData.setLap(displayLap + displayWorkoutLap); // user laps + predefined workout lap
 
     if (deviceController == NULL) return;
+
+    // On a Mac prevent the screensaver from kicking in
+    // this is apparently the 'supported' mechanism for
+    // disabling the screen saver on a Mac instead of
+    // temporarily adjusting/disabling the user preferences
+    // for screen saving and power management. Makes sense.
+#ifdef Q_OS_MAC
+    UpdateSystemActivity(OverallAct);
+#endif
 
     // get latest telemetry from device (if it is a pull device e.g. Computrainer //
     if (status&RT_RUNNING && deviceController->doesPull() == true) {
