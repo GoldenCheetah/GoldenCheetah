@@ -97,12 +97,13 @@ int LibUsb::open()
 
     if (device == NULL) return -1;
 
+#ifndef WIN32
     // reset the device, god only knows what mess we left it in...
     int rc = usb_reset(device);
     if (rc < 0) qDebug()<<"usb_reset Error: "<< usb_strerror();
+#endif
 
 #ifndef Q_OS_MAC
-
     // these functions fail on OS X Lion
     rc = usb_clear_halt(device, writeEndpoint);
     if (rc < 0) qDebug()<<"usb_clear_halt writeEndpoint Error: "<< usb_strerror();
