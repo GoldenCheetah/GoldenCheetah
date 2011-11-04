@@ -408,7 +408,7 @@ TrainTool::workoutTreeWidgetSelectionChanged()
         // Get users CP for relative watts calculations
         QDate today = QDate::currentDate();
 
-        ergFile = new ErgFile(fileName, mode, FTP);
+        ergFile = new ErgFile(fileName, mode, FTP, main);
         if (ergFile->isValid()) {
 
             status |= RT_WORKOUT;

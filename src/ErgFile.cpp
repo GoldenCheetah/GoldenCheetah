@@ -19,7 +19,7 @@
 #include "ErgFile.h"
 
 
-ErgFile::ErgFile(QString filename, int &mode, double Cp)
+ErgFile::ErgFile(QString filename, int &mode, double Cp, MainWindow *main) : main(main)
 {
     QFile ergFile(filename);
     int section = NOMANSLAND;            // section 0=init, 1=header data, 2=course data
@@ -188,7 +188,7 @@ ErgFile::ErgFile(QString filename, int &mode, double Cp)
 		// gradient and altitude
                 add.val = absoluteSlope.cap(2).toDouble();
                 add.y = ralt;
-		ralt += distance * add.val /100.00 ; /* paused */
+		ralt += distance * add.val / 100; /* paused */
 
                 Points.append(add);
                 if (add.y > MaxWatts) MaxWatts=add.y;
@@ -236,6 +236,8 @@ ErgFile::ErgFile(QString filename, int &mode, double Cp)
         leftPoint = 0;
         rightPoint = 1;
 
+        calculateMetrics();
+
     } else {
         valid = false;
     }
@@ -259,7 +261,7 @@ ErgFile::wattsAt(long x, int &lapnum)
     // point in time in msecs.
 
     // is it in bounds?
-    if (x < 0 || x > Duration) return -100;   // out of bounds!!!
+    if (x < 0 || x > Duration) return 0;   // out of bounds!!!
 
     // do we need to return the Lap marker?
     if (Laps.count() > 0) {
@@ -349,4 +351,127 @@ int ErgFile::nextLap(long x)
         }
     }
     return -1; // nope, no marker ahead of there
+}
+
+void
+ErgFile::calculateMetrics()
+{
+
+    // reset metrics
+    XP = CP = AP = NP = IF = RI = TSS = BS = SVI = VI = 0;
+    ELE = ELEDIST = GRADE = 0;
+
+    if (format == CRS) {
+
+        ErgFilePoint last;
+        bool first = true;
+        foreach (ErgFilePoint p, Points) {
+
+            if (first == true) {
+                first = false;
+            } else if (p.y > last.y) {
+
+                ELEDIST += p.x - last.x;
+                ELE += p.y - last.y;
+            }
+            last = p;
+        }
+        GRADE = ELE/ELEDIST * 100;
+
+    } else {
+
+        QVector<double> rolling(30);
+        rolling.fill(0.0f);
+        int index = 0;
+        double sum = 0; // 30s rolling average
+        double apsum = 0; // average power used in VI calculation
+
+        double total = 0;
+        double count = 0;
+        long nextSecs = 0;
+
+        static const double EPSILON = 0.1;
+        static const double NEGLIGIBLE = 0.1;
+
+        double secsDelta = 1;
+        double sampsPerWindow = 25.0;
+        double attenuation = sampsPerWindow / (sampsPerWindow + secsDelta);
+        double sampleWeight = secsDelta / (sampsPerWindow + secsDelta);
+
+        double lastSecs = 0.0;
+        double weighted = 0.0;
+
+        double sktotal = 0.0;
+        int skcount = 0;
+
+        ErgFilePoint last;
+        foreach (ErgFilePoint p, Points) {
+
+            while (nextSecs < p.x) {
+
+                // CALCULATE NP
+                apsum += last.y;
+                sum +=  last.y;
+                sum -= rolling[index];
+
+                // update 30s circular buffer
+                rolling[index] = last.y;
+                if (index == 29) index=0;
+                else index++;
+
+                total += pow(sum/30, 4);
+                count ++;
+
+                // CALCULATE XPOWER
+                while ((weighted > NEGLIGIBLE) && ((nextSecs / 1000) > (lastSecs/1000) + 1000 + EPSILON)) {
+                    weighted *= attenuation;
+                    lastSecs += 1000;
+                    sktotal += pow(weighted, 4.0);
+                    skcount++;
+                }
+                weighted *= attenuation;
+                weighted += sampleWeight * last.y;
+                lastSecs = p.x;
+                sktotal += pow(weighted, 4.0);
+                skcount++;
+
+                nextSecs += 1000;
+            }
+            last = p;
+        }
+
+        // XP, NP and AP
+        XP = pow(sktotal / skcount, 0.25);
+        NP = pow(total / count, 0.25);
+        AP = apsum / count;
+
+        // CP
+        if (main->zones()) {
+            int zonerange = main->zones()->whichRange(QDateTime::currentDateTime().date());
+            if (zonerange >= 0) CP = main->zones()->getCP(zonerange);
+        }
+
+        // IF
+        if (CP) {
+            IF = NP / CP;
+            RI = XP / CP;
+        }
+
+        // TSS
+        double normWork = NP * (Duration / 1000); // msecs
+        double rawTSS = normWork * IF;
+        double workInAnHourAtCP = CP * 3600;
+        TSS = rawTSS / workInAnHourAtCP * 100.0;
+
+        // BS
+        double xWork = XP * (Duration / 1000); // msecs
+        double rawBS = xWork * RI;
+        BS = rawBS / workInAnHourAtCP * 100.0;
+
+        // VI and RI
+        if (AP) {
+            VI = NP / AP;
+            SVI = XP / AP;
+        }
+    }
 }
