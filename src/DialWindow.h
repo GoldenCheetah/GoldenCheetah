@@ -29,6 +29,7 @@
 #include "RealtimeData.h" // for realtimedata structure
 
 #include "Settings.h" // for realtimedata structure
+#include "Units.h" // for realtimedata structure
 #include "Colors.h" // for realtimedata structure
 
 class DialWindow : public GcWindow
