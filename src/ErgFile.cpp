@@ -19,7 +19,13 @@
 #include "ErgFile.h"
 
 
-ErgFile::ErgFile(QString filename, int &mode, double Cp, MainWindow *main) : main(main)
+ErgFile::ErgFile(QString filename, int &mode, double Cp, MainWindow *main) : 
+    Cp(Cp), filename(filename), main(main), mode(mode)
+{
+    reload();
+}
+
+void ErgFile::reload()
 {
     QFile ergFile(filename);
     int section = NOMANSLAND;            // section 0=init, 1=header data, 2=course data
@@ -27,6 +33,7 @@ ErgFile::ErgFile(QString filename, int &mode, double Cp, MainWindow *main) : mai
     MaxWatts = Ftp = 0;
     int lapcounter = 0;
     format = ERG;                         // either ERG or MRC
+    Points.clear();
 
     // running totals for CRS file format
     long rdist = 0; // running total for distance
@@ -381,7 +388,8 @@ ErgFile::calculateMetrics()
             }
             last = p;
         }
-        GRADE = ELE/ELEDIST * 100;
+        if (ELE == 0 || ELEDIST == 0) GRADE = 0;
+        else GRADE = ELE/ELEDIST * 100;
 
     } else {
 

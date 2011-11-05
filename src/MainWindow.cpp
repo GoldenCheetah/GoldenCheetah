@@ -99,7 +99,7 @@ QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have op
 MainWindow::MainWindow(const QDir &home) :
     home(home), session(0), isclean(false),
     zones_(new Zones), hrzones_(new HrZones),
-    ride(NULL)
+    ride(NULL), workout(NULL)
 {
 
     mainwindows.append(this); // add us to the list of open windows

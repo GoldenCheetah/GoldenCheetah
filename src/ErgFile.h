@@ -68,7 +68,9 @@ class ErgFile
         ErgFile(QString, int&, double Cp, MainWindow *main);       // constructor uses filename
         ~ErgFile();             // delete the contents
 
+        void reload();          // reload after messed about
         bool isValid();         // is the file valid or not?
+        double Cp;
         int format;             // ERG, CRS or MRC currently supported
         int wattsAt(long, int&);      // return the watts value for the passed msec
         double gradientAt(long, int&);      // return the gradient value for the passed meter
@@ -77,6 +79,7 @@ class ErgFile
         QString Version,        // version number / identifer
                 Units,          // units used
                 Filename,       // filename from inside file
+                filename,       // filename on disk
                 Name;           // workout name
                 
         long    Duration;       // Duration of this workout in msecs
@@ -100,6 +103,7 @@ class ErgFile
 
     private:
         MainWindow *main;
+        int &mode;
 };
 
 #endif
