@@ -92,6 +92,7 @@ class ErgFile
         void calculateMetrics(); // calculate NP value for ErgFile
 
         // Metrics for this workout
+        double maxY;                // maximum Y value
         double CP;
         double AP, NP, IF, TSS, VI; // Coggan for erg / mrc
         double XP, RI, BS, SVI; // Skiba for erg / mrc

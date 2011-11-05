@@ -30,7 +30,7 @@ WorkoutPlotWindow::WorkoutPlotWindow(MainWindow *mainWindow) :
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setSpacing(0);
     layout->setContentsMargins(2,2,2,2);
-    ergPlot = new ErgFilePlot(0);
+    ergPlot = new ErgFilePlot(mainWindow);
     layout->addWidget(ergPlot);
 
     connect(mainWindow, SIGNAL(setNow(long)), this, SLOT(setNow(long)));

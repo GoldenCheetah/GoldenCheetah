@@ -157,9 +157,11 @@ class MainWindow : public QMainWindow
 
         // realtime signals
         void notifyTelemetryUpdate(const RealtimeData &rtData) { telemetryUpdate(rtData); }
-        void notifyErgFileSelected(ErgFile *x) { ergFileSelected(x); }
+        void notifyErgFileSelected(ErgFile *x) { workout=x; ergFileSelected(x); }
+        ErgFile *currentErgFile() { return workout; }
         void notifyMediaSelected( QString x) { mediaSelected(x); }
-        void notifySetNow(long now) { setNow(now); }
+        void notifySetNow(long x) { now = x; setNow(x); }
+        long getNow() { return now; }
         void notifyNewLap() { emit newLap(); }
         void notifyStart() { emit start(); }
         void notifyUnPause() { emit unpause(); }
@@ -290,6 +292,9 @@ class MainWindow : public QMainWindow
         IntervalItem *activeInterval; // currently active for context menu popup
         RideItem *activeRide; // currently active for context menu popup
         RideItem *ride;  // the currently selected ride
+
+        ErgFile *workout; // the currently selected workout file
+        long now;
 
         QToolBox *toolBox;
         GcToolBar *toolbar;

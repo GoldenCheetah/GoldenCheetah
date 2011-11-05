@@ -19,34 +19,45 @@
 
 #include "ErgFilePlot.h"
 
-// static locals for now
-static ErgFile *ergFile;
-static QList<ErgFilePoint> *courseData;
-static long Now;
-static double MaxWatts;
+// Bridge between QwtPlot and ErgFile to avoid having to
+// create a separate array for the ergfile data, we plot
+// directly from the ErgFile points array
+double ErgFileData::x(size_t i) const { 
+    if (main->currentErgFile()) return main->currentErgFile()->Points.at(i).x;
+    else return 0;
+}
 
-// Load history
-double ErgFileData::x(size_t i) const { return courseData ? courseData->at(i).x : 0; }
-double ErgFileData::y(size_t i) const { return courseData ? courseData->at(i).y : 0; }
-size_t ErgFileData::size() const { return courseData ? courseData->count() : 0; }
-QwtData *ErgFileData::copy() const { return new ErgFileData(); }
-//void ErgFileData::init() { }
+double ErgFileData::y(size_t i) const {
+    if (main->currentErgFile()) return main->currentErgFile()->Points.at(i).y;
+    else return 0;
+}
+
+size_t ErgFileData::size() const {
+    if (main->currentErgFile()) return main->currentErgFile()->Points.count();
+    else return 0;
+}
+
+QwtData *ErgFileData::copy() const { return new ErgFileData(main); }
 
 // Now bar
-double NowData::x(size_t) const { return Now; }
-double NowData::y(size_t i) const { return (i ? (MaxWatts ? MaxWatts : 500) : 0); }
+double NowData::x(size_t) const { return main->getNow(); }
+double NowData::y(size_t i) const {
+    if (i) {
+        if (main->currentErgFile()) return main->currentErgFile()->maxY;
+        else return 500;
+    } else return 0;
+}
 size_t NowData::size() const { return 2; }
-QwtData *NowData::copy() const { return new NowData(); }
+QwtData *NowData::copy() const { return new NowData(main); }
 
-ErgFilePlot::ErgFilePlot(QList<ErgFilePoint> *data)
+ErgFilePlot::ErgFilePlot(MainWindow *main) : main(main)
 {
     setInstanceName("ErgFile Plot");
 
     //insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     canvas()->setFrameStyle(QFrame::NoFrame);
-    courseData = data;                      // what we plot
-    Now = 0;                                // where we are
+    //courseData = data;                      // what we plot
 
     // Setup the left axis (Power)
     setAxisTitle(yLeft, "Watts");
@@ -98,9 +109,11 @@ ErgFilePlot::ErgFilePlot(QList<ErgFilePoint> *data)
     setAxisScale(yRight2, 0, 60); // max speed of 60mph/60kmh seems ok to me!
     enableAxis(yRight2, false);
 
+    // data bridge to ergfile
+    lodData = new ErgFileData(main);
     // Load Curve
     LodCurve = new QwtPlotCurve("Course Load");
-    LodCurve->setData(lodData);
+    LodCurve->setData(*lodData);
     LodCurve->attach(this);
     LodCurve->setYAxis(QwtPlot::yLeft);
 
@@ -148,11 +161,14 @@ ErgFilePlot::ErgFilePlot(QList<ErgFilePoint> *data)
     speedData = new CurveData;
     speedCurve->setRawData(speedData->x(), speedData->y(), speedData->count());
 
+    // Now data bridge
+    nowData = new NowData(main);
+
     // Now pointer
     NowCurve = new QwtPlotCurve("Now");
     QPen Nowpen = QPen(Qt::red, 2.0);
     NowCurve->setPen(Nowpen);
-    NowCurve->setData(nowData);
+    NowCurve->setData(*nowData);
     NowCurve->attach(this);
     NowCurve->setYAxis(QwtPlot::yLeft);
 
@@ -204,10 +220,6 @@ ErgFilePlot::setData(ErgFile *ergfile)
         }
 
         // set up again
-        //setTitle(ergFile->Name);
-        courseData = &ergfile->Points;
-        MaxWatts = LodCurve->maxYValue();
-
         for(int i=0; i < ergFile->Laps.count(); i++) {
 
             // Show Lap Number
@@ -228,8 +240,8 @@ ErgFilePlot::setData(ErgFile *ergfile)
         }
 
         // set the axis so we use all the screen estate
-        if ((*courseData).count()) {
-            double maxX = (double)(*courseData).last().x;
+        if (main->currentErgFile() && main->currentErgFile()->Points.count()) {
+            double maxX = (double)main->currentErgFile()->Points.last().x;
 
             if (bydist) {
 
@@ -280,8 +292,6 @@ ErgFilePlot::setData(ErgFile *ergfile)
 
         // clear the plot we have nothing selected
         bydist = false; // do by time when no workout selected
-        MaxWatts = 0;
-        courseData = NULL;
 
         QwtText title;
         title.setFont(stGiles);
@@ -303,7 +313,6 @@ ErgFilePlot::setData(ErgFile *ergfile)
 void
 ErgFilePlot::setNow(long msecs)
 {
-    Now = msecs;
     replot(); // and update
 }
 

@@ -19,6 +19,7 @@
 #ifndef _GC_ErgFilePlot_h
 #define _GC_ErgFilePlot_h 1
 #include "GoldenCheetah.h"
+#include "MainWindow.h"
 
 #include <QDebug>
 #include <QtGui>
@@ -44,21 +45,27 @@
 class ErgFileData : public QwtData
 {
     public:
+    ErgFileData (MainWindow *main) : main(main) {}
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
     virtual QwtData *copy() const ;
     void init() ;
+    private:
+    MainWindow *main;
 };
 
 class NowData : public QwtData
 {
     public:
+    NowData (MainWindow *main) : main(main) {}
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
     virtual QwtData *copy() const ;
     void init() ;
+    private:
+    MainWindow *main;
 };
 
 // incremental data, for each curve
@@ -108,7 +115,7 @@ class ErgFilePlot : public QwtPlot
 
     public:
 
-    ErgFilePlot(QList<ErgFilePoint> * = 0);
+    ErgFilePlot(MainWindow *main);
     QList<QwtPlotMarker *> Marks;
 
     void setData(ErgFile *); // set the course
@@ -122,7 +129,9 @@ class ErgFilePlot : public QwtPlot
 
     private:
 
+    MainWindow *main;
     bool bydist;
+    ErgFile *ergFile;
 
 	QwtPlotGrid *grid;
 	QwtPlotCurve *LodCurve;
@@ -143,8 +152,8 @@ class ErgFilePlot : public QwtPlot
            cadsum,
            speedsum;
 
-    ErgFileData lodData;
-    NowData nowData;
+    ErgFileData *lodData;
+    NowData *nowData;
 
     DistScaleDraw *distdraw;
     TimeScaleDraw *timedraw;
