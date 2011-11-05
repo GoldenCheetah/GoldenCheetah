@@ -92,6 +92,9 @@ class TrainTool : public GcWindow
         void setStartText(QString);
         void setPauseText(QString);
 
+        // set labels when ergfile selected etc
+        void setLabels();
+
         // notify widgets of race update
         void notifyRaceStandings(RaceStatus x) { raceStandings(x); }
 
@@ -143,6 +146,9 @@ class TrainTool : public GcWindow
         // When no config has been setup
         void warnnoConfig();
 
+        // User adjusted intensity
+        void adjustIntensity();     // Intensity of workout user adjusted
+
     private:
 
         const QDir home;
@@ -166,7 +172,13 @@ class TrainTool : public GcWindow
         QFrame *buttonPanel;
         QPushButton *startButton,
                     *pauseButton,
-                    *stopButton;
+                    *stopButton,
+                    *plusButton,
+                    *minusButton;
+
+        QLabel *stress, *intensity;
+        QSlider *intensitySlider;
+        int lastAppliedIntensity;// remember how we scaled last time
 
         int FTP; // current FTP
 
@@ -181,9 +193,6 @@ class TrainTool : public GcWindow
         double displayDistance, displayWorkoutDistance;
         int displayLap;            // user increment for Lap
         int displayWorkoutLap;     // which Lap in the workout are we at?
-        bool manualOverride; // during an erg woprkout, if the Higher/Lower
-                             // signals are called, it switches to manual
-                             // until the next lap/interval
 
         // for non-zero average calcs
         int pwrcount, cadcount, hrcount, spdcount, lodcount, grdcount; // for NZ average calc

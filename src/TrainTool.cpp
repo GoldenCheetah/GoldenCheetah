@@ -54,7 +54,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     QVBoxLayout *cl = new QVBoxLayout(c);
     setControls(c);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    QHBoxLayout *mainLayout = new QHBoxLayout(this);
     setLayout(mainLayout);
 
     cl->setSpacing(0);
@@ -125,6 +125,24 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     panel->setSpacing(0);
     panel->setContentsMargins(0,0,0,0);
 
+    QHBoxLayout *labels = new QHBoxLayout;
+    labels->setSpacing(0);
+    labels->setContentsMargins(0,0,0,0);
+    stress = new QLabel(this);
+    intensity = new QLabel(this);
+    labels->addWidget(stress, Qt::AlignVCenter|Qt::AlignCenter);
+    labels->addWidget(intensity, Qt::AlignVCenter|Qt::AlignCenter);
+    panel->addLayout(labels);
+
+    // Make this labels easier to read
+    QColor background = GColor(CRIDEPLOTBACKGROUND);
+    QColor foreground = GColor(CPLOTMARKER);
+    QString sh = QString("QLabel { background: %1; color: %2; font-weight: bold; text-align: center; }")
+                 .arg(background.name())
+                 .arg(foreground.name());
+    stress->setStyleSheet(sh);
+    intensity->setStyleSheet(sh);
+
     QHBoxLayout *buttons = new QHBoxLayout;
     buttons->setSpacing(0);
     buttons->setContentsMargins(0,0,0,0);
@@ -135,6 +153,19 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     pauseButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     stopButton = new QPushButton(tr("Stop"), this);
     stopButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    plusButton = new QPushButton(tr(">>"), this);
+    plusButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    plusButton->setFixedWidth(20);
+    minusButton = new QPushButton(tr("<<"), this);
+    minusButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    minusButton->setFixedWidth(20);
+    QVBoxLayout *updownLayout = new QVBoxLayout;
+    updownLayout->addWidget(plusButton);
+    updownLayout->addWidget(minusButton);
+    intensitySlider = new QSlider(Qt::Vertical, this);
+    intensitySlider->setMinimum(50);
+    intensitySlider->setMaximum(150);
+    intensitySlider->setValue(100);
 
     recordSelector = new QCheckBox(this);
     recordSelector->setText(tr("Save workout data"));
@@ -144,10 +175,11 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     buttons->addWidget(startButton);
     buttons->addWidget(pauseButton);
     buttons->addWidget(stopButton);
+    buttons->addLayout(updownLayout);
     panel->addLayout(buttons);
-    //panel->addWidget(recordSelector);
     buttonPanel->setLayout(panel);
     mainLayout->addWidget(buttonPanel);
+    mainLayout->addWidget(intensitySlider);
 
     trainSplitter = new QSplitter;
     trainSplitter->setHandleWidth(1);
@@ -178,6 +210,9 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     connect(startButton, SIGNAL(clicked()), this, SLOT(Start()));
     connect(pauseButton, SIGNAL(clicked()), this, SLOT(Pause()));
     connect(stopButton, SIGNAL(clicked()), this, SLOT(Stop()));
+    connect(plusButton, SIGNAL(clicked()), this, SLOT(FFwd()));
+    connect(minusButton, SIGNAL(clicked()), this, SLOT(Rewind()));
+    connect(intensitySlider, SIGNAL(valueChanged(int)), this, SLOT(adjustIntensity()));
 
     // add a watch on all directories
     QVariant workoutDir = appsettings->value(NULL, GC_WORKOUTDIR);
@@ -220,7 +255,6 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     load_msecs = total_msecs = lap_msecs = 0;
     displayWorkoutDistance = displayDistance = displayPower = displayHeartRate =
     displaySpeed = displayCadence = displayGradient = displayLoad = 0;
-    manualOverride = false;
 
     connect(gui_timer, SIGNAL(timeout()), this, SLOT(guiUpdate()));
     connect(disk_timer, SIGNAL(timeout()), this, SLOT(diskUpdate()));
@@ -228,6 +262,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     connect(load_timer, SIGNAL(timeout()), this, SLOT(loadUpdate()));
 
     configChanged(); // will reset the workout tree
+    setLabels();
 
 }
 
@@ -383,6 +418,8 @@ TrainTool::workoutTreeWidgetSelectionChanged()
     // which one is selected?
     if (currentWorkout() == NULL || currentWorkout()->type() != WORKOUT_TYPE) {
         main->notifyErgFileSelected(NULL);
+        stress->setText("TSS:");
+        intensity->setText("IF:");
         return;
     }
 
@@ -392,12 +429,14 @@ TrainTool::workoutTreeWidgetSelectionChanged()
         // ergo mode
         main->notifyErgFileSelected(NULL);
         mode = ERG;
+        setLabels();
         status &= ~RT_WORKOUT;
         //ergPlot->setVisible(false);
     } else if (index == 1) {
         // slope mode
         main->notifyErgFileSelected(NULL);
         mode = CRS;
+        setLabels();
         status &= ~RT_WORKOUT;
         //ergPlot->setVisible(false);
     } else {
@@ -417,6 +456,9 @@ TrainTool::workoutTreeWidgetSelectionChanged()
             // setup the course profile in the
             // display!
             main->notifyErgFileSelected(ergFile);
+            intensitySlider->setValue(100);
+            lastAppliedIntensity = 100;
+            setLabels();
         }
     }
 
@@ -700,6 +742,10 @@ void TrainTool::Stop(int deviceStatus)        // when stop button is pressed
         load_msecs = 0;
     }
 
+    // get back to normal after it may have been adusted by the user
+    lastAppliedIntensity=100;
+    intensitySlider->setValue(100);
+    if (main->currentErgFile()) main->currentErgFile()->reload();
     main->notifySetNow(load_msecs);
 
 
@@ -715,7 +761,6 @@ void TrainTool::Stop(int deviceStatus)        // when stop button is pressed
     hrcount = 0;
     spdcount = 0;
     lodcount = 0;
-    manualOverride = false;
     displayWorkoutLap = displayLap =0;
     session_elapsed_msec = 0;
     session_time.restart();
@@ -914,15 +959,6 @@ void TrainTool::loadUpdate()
     if (status&RT_MODE_ERGO) {
         load = ergFile->wattsAt(load_msecs, curLap);
 
-        if(displayWorkoutLap != curLap)
-        {
-            // we are onto a new lap/interval, reset the override
-            manualOverride = false;
-        }
-        if(manualOverride == false)
-        {
-            displayLoad = load;
-        }
         displayWorkoutLap = curLap;
 
         // we got to the end!
@@ -936,15 +972,6 @@ void TrainTool::loadUpdate()
     } else {
         gradient = ergFile->gradientAt(displayWorkoutDistance*1000, curLap);
 
-        if(displayWorkoutLap != curLap)
-        {
-            // we are onto a new lap/interval, reset the override
-            manualOverride = false;
-        }
-        if(manualOverride == false)
-        {
-            displayGradient = gradient;
-        }
         displayWorkoutLap = curLap;
 
         // we got to the end!
@@ -960,12 +987,16 @@ void TrainTool::loadUpdate()
 
 void TrainTool::FFwd()
 {
+    if ((status&RT_RUNNING) == 0) return;
+
     if (status&RT_MODE_ERGO) load_msecs += 10000; // jump forward 10 seconds
     else displayWorkoutDistance += 1; // jump forward a kilometer in the workout
 }
 
 void TrainTool::Rewind()
 {
+    if ((status&RT_RUNNING) == 0) return;
+
     if (status&RT_MODE_ERGO) {
         load_msecs -=10000; // jump back 10 seconds
         if (load_msecs < 0) load_msecs = 0;
@@ -979,6 +1010,8 @@ void TrainTool::Rewind()
 // jump to next Lap marker (if there is one?)
 void TrainTool::FFwdLap()
 {
+    if ((status&RT_RUNNING) == 0) return;
+
     double lapmarker;
 
     if (status&RT_MODE_ERGO) {
@@ -993,33 +1026,137 @@ void TrainTool::FFwdLap()
 // higher load/gradient
 void TrainTool::Higher()
 {
+    if ((status&RT_RUNNING) == 0) return;
     if (deviceController == NULL) return;
 
-    manualOverride = true;
+    if (main->currentErgFile()) {
+        // adjust the workout IF
+        intensitySlider->setValue(intensitySlider->value()+5);
 
-    if (status&RT_MODE_ERGO) displayLoad += 5;
-    else displayGradient += 0.1;
+    } else {
 
-    if (displayLoad >1500) displayLoad = 1500;
-    if (displayGradient >15) displayGradient = 15;
+        if (status&RT_MODE_ERGO) displayLoad += 5;
+        else displayGradient += 0.1;
 
-    if (status&RT_MODE_ERGO) deviceController->setLoad(displayLoad);
-    else deviceController->setGradient(displayGradient);
+        if (displayLoad >1500) displayLoad = 1500;
+        if (displayGradient >15) displayGradient = 15;
+
+        if (status&RT_MODE_ERGO) deviceController->setLoad(displayLoad);
+        else deviceController->setGradient(displayGradient);
+    }
 }
 
 // higher load/gradient
 void TrainTool::Lower()
 {
+    if ((status&RT_RUNNING) == 0) return;
     if (deviceController == NULL) return;
 
-    manualOverride = true;
+    if (main->currentErgFile()) {
+        // adjust the workout IF
+        intensitySlider->setValue(intensitySlider->value()-5);
 
-    if (status&RT_MODE_ERGO) displayLoad -= 5;
-    else displayGradient -= 0.1;
+    } else {
+        if (status&RT_MODE_ERGO) displayLoad -= 5;
+        else displayGradient -= 0.1;
 
-    if (displayLoad <0) displayLoad = 0;
-    if (displayGradient <-10) displayGradient = -10;
+        if (displayLoad <0) displayLoad = 0;
+        if (displayGradient <-10) displayGradient = -10;
 
-    if (status&RT_MODE_ERGO) deviceController->setLoad(displayLoad);
-    else deviceController->setGradient(displayGradient);
+        if (status&RT_MODE_ERGO) deviceController->setLoad(displayLoad);
+        else deviceController->setGradient(displayGradient);
+    }
+}
+
+void TrainTool::setLabels()
+{
+    if (main->currentErgFile()) {
+
+        if (main->currentErgFile()->format == CRS) {
+
+            stress->setText(QString("Ele: %1").arg(main->currentErgFile()->ELE, 0, 'f', 0));
+            intensity->setText(QString("Grade: %1 %").arg(main->currentErgFile()->GRADE, 0, 'f', 1));
+
+        } else {
+
+            stress->setText(QString("TSS: %1").arg(main->currentErgFile()->TSS, 0, 'f', 0));
+            intensity->setText(QString("IF: %1").arg(main->currentErgFile()->IF, 0, 'f', 3));
+        }
+
+    } else {
+
+        stress->setText("TSS:");
+        intensity->setText("IF:");
+    }
+}
+
+void TrainTool::adjustIntensity()
+{
+    if (!main->currentErgFile()) return; // no workout selected
+
+    // block signals temporarily
+    main->blockSignals(true);
+
+    // work through the ergFile from NOW
+    // adjusting back from last intensity setting
+    // and increasing to new intensity setting
+
+    double from = double(lastAppliedIntensity) / 100.00;
+    double to = double(intensitySlider->value()) / 100.00;
+    lastAppliedIntensity = intensitySlider->value();
+
+    long starttime = main->getNow();
+
+    bool insertedNow = main->getNow() ? false : true; // don't add if at start
+
+//XXX what about gradient courses?
+    ErgFilePoint last;
+    for(int i = 0; i < main->currentErgFile()->Points.count(); i++) {
+
+        if (main->currentErgFile()->Points.at(i).x >= starttime) {
+
+            if (insertedNow == false) {
+
+                if (i) {
+                    // add a point to adjust from
+                    ErgFilePoint add;
+                    add.x = main->getNow();
+                    add.val = last.val / from * to;
+
+                    // recalibrate altitude if gradient changing
+                    if (main->currentErgFile()->format == CRS) add.y = last.y + ((add.x-last.x) * (add.val/100));
+                    else add.y = add.val;
+
+                    main->currentErgFile()->Points.insert(i, add);
+
+                    last = add;
+                    i++; // move on to next point (i.e. where we were!)
+
+                }
+                insertedNow = true;
+            }
+
+            ErgFilePoint *p = &main->currentErgFile()->Points[i];
+
+            // recalibrate altitude if in CRS mode
+            p->val = p->val / from * to;
+            if (main->currentErgFile()->format == CRS) {
+                if (i) p->y = last.y + ((p->x-last.x) * (last.val/100));
+            }
+            else p->y = p->val;
+        }
+
+        // remember last
+        last = main->currentErgFile()->Points.at(i);
+    }
+
+    // recalculate metrics
+    main->currentErgFile()->calculateMetrics();
+    setLabels();
+
+    // unblock signals now we are done
+    main->blockSignals(false);
+
+    // force replot
+    main->notifySetNow(main->getNow());
 }
