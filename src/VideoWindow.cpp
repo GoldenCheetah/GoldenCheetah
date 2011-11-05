@@ -32,7 +32,6 @@ GcWindow(parent), home(home), main(parent)
     const char * const vlc_args[] = {
                     "-I", "dummy", /* Don't use any interface */
                     "--ignore-config", /* Don't use VLC's config */
-                    "--extraintf=logger", //log anything
                     "--verbose=-1" // -1 = no output at all
                 };
 
