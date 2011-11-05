@@ -16,14 +16,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-
 #ifndef _GC_LionFullScreen_h
 #define _GC_LionFullScreen_h 1
-
-// What versions are supported by this SDK?
-#ifdef Q_OS_MAC
-#include <AvailabilityMacros.h>
-#endif
 
 #include "GoldenCheetah.h"
 

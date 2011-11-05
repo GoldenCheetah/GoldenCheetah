@@ -116,11 +116,6 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     allWorkouts->setText(0, tr("Workout Library"));
     workoutTree->expandItem(allWorkouts);
 
-    buttonPanel = new QFrame;
-    buttonPanel->setLineWidth(1);
-    buttonPanel->setFrameStyle(QFrame::NoFrame);
-    buttonPanel->setContentsMargins(0,0,0,0);
-
     QVBoxLayout *panel = new QVBoxLayout;
     panel->setSpacing(0);
     panel->setContentsMargins(0,0,0,0);
@@ -153,19 +148,34 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     pauseButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     stopButton = new QPushButton(tr("Stop"), this);
     stopButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    plusButton = new QPushButton(tr(">>"), this);
+    plusButton = new QPushButton(tr(">"), this);
     plusButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     plusButton->setFixedWidth(20);
-    minusButton = new QPushButton(tr("<<"), this);
+    minusButton = new QPushButton(tr("<"), this);
     minusButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     minusButton->setFixedWidth(20);
     QVBoxLayout *updownLayout = new QVBoxLayout;
+    updownLayout->setSpacing(0);
+    updownLayout->setContentsMargins(0,0,0,0);
     updownLayout->addWidget(plusButton);
     updownLayout->addWidget(minusButton);
     intensitySlider = new QSlider(Qt::Vertical, this);
     intensitySlider->setMinimum(50);
     intensitySlider->setMaximum(150);
     intensitySlider->setValue(100);
+
+#ifdef Q_OS_MAC
+    // the mac styling of buttons is freaking annoying
+    // It overrides any attempt to compact, which is
+    // exactly what we need to do, so instead we use
+    // the plastique style on them to get around it
+    QCleanlooksStyle *style = new QCleanlooksStyle();
+    startButton->setStyle(style);
+    pauseButton->setStyle(style);
+    stopButton->setStyle(style);
+    plusButton->setStyle(style);
+    minusButton->setStyle(style);
+#endif
 
     recordSelector = new QCheckBox(this);
     recordSelector->setText(tr("Save workout data"));
@@ -175,10 +185,9 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     buttons->addWidget(startButton);
     buttons->addWidget(pauseButton);
     buttons->addWidget(stopButton);
-    buttons->addLayout(updownLayout);
     panel->addLayout(buttons);
-    buttonPanel->setLayout(panel);
-    mainLayout->addWidget(buttonPanel);
+    mainLayout->addLayout(panel);
+    mainLayout->addLayout(updownLayout);
     mainLayout->addWidget(intensitySlider);
 
     trainSplitter = new QSplitter;

@@ -123,7 +123,6 @@ qwt3d {
 # Video playback using Quicktime Framework
 # Lion fullscreen playback
 macx {
-    #LIBS += -lobjc -framework Cocoa -framework IOKit -framework AppKit -framework QTKit
     LIBS += -lobjc -framework Carbon -framework IOKit -framework AppKit -framework QTKit
     HEADERS += QtMacSegmentedButton.h QtMacVideoWindow.h LionFullScreen.h
     SOURCES += QtMacSegmentedButton.mm QtMacVideoWindow.mm LionFullScreen.mm

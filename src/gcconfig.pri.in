@@ -22,11 +22,6 @@ D2XX_INCLUDE = /usr/local/include/D2XX
 #  QMAKE_DEL_FILE = rm -f
 #}
 
-#if you have PHONON compiled in and working
-#uncomment the below, for video playback support
-#in the training and racing view
-#GC_HAVE_PHONON = true
-
 # If you want Twitter support you must install liboauth
 # http://liboauth.sourceforge.net/
 # Set the path to where liboauth.a was installed
@@ -142,5 +137,8 @@ macx {
 
     # Uncomment this line to build a OS X universal binary:
     #CONFIG+=x86 ppc
+
+    # Uncomment this line if you have SDK 10.7 or higher
+    DEFINES += -DGC_HAVE_LION
 }
 
