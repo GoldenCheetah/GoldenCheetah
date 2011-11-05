@@ -73,7 +73,7 @@
 #include "HomeWindow.h"
 #include "GcBubble.h"
 
-#if (defined Q_OS_MAC) && (MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7)
+#if (defined Q_OS_MAC) && (defined GC_HAVE_LION)
 #include "LionFullScreen.h"
 #endif
 #ifndef Q_OS_MAC
@@ -130,7 +130,7 @@ MainWindow::MainWindow(const QDir &home) :
     QVariant unit = appsettings->value(this, GC_UNIT);
     useMetricUnits = (unit.toString() == "Metric");
 
-#if (defined Q_OS_MAC) && (MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7)
+#if (defined Q_OS_MAC) && (defined GC_HAVE_LION)
     fullScreen = new LionFullScreen(this);
 #endif
 #ifndef Q_OS_MAC

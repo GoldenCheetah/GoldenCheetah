@@ -18,9 +18,12 @@
 
 #include "LionFullScreen.h"
 
+// which version of the SDK?
+#include <Availability.h>
+
 LionFullScreen::LionFullScreen(MainWindow *main) : QObject(main), main(main)
 {
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
+#ifdef GC_HAVE_LION
     // lets enable fullscreen stuff
     NSView *nsview = (NSView *) main->winId(); 
     NSWindow *nswindow = [nsview window];
@@ -34,7 +37,7 @@ LionFullScreen::LionFullScreen(MainWindow *main) : QObject(main), main(main)
 bool
 LionFullScreen::eventFilter(QObject *obj, QEvent *event)
 {
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
+#ifdef GC_HAVE_LION
     if (obj != main) return false;
 
     // Ctrl-Cmd-F toggles
@@ -64,7 +67,7 @@ LionFullScreen::eventFilter(QObject *obj, QEvent *event)
 void
 LionFullScreen::toggle()
 {
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
+#ifdef GC_HAVE_LION
     // toggle full screen back
     NSView *nsview = (NSView *) main->winId();
     NSWindow *nswindow = [nsview window];

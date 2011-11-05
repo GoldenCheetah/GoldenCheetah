@@ -133,7 +133,7 @@ class MainWindow : public QMainWindow
 
         void setBubble(QString text, QPoint pos = QPoint(), Qt::Orientation o = Qt::Horizontal);
 
-#if (defined Q_OS_MAC) && (MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7)
+#if (defined Q_OS_MAC) && (defined GC_HAVE_LION)
         LionFullScreen *fullScreen;
 #endif
 #ifndef Q_OS_MAC

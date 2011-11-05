@@ -169,7 +169,6 @@ class TrainTool : public GcWindow
         QTreeWidgetItem *media;
 
         // those buttons
-        QFrame *buttonPanel;
         QPushButton *startButton,
                     *pauseButton,
                     *stopButton,
