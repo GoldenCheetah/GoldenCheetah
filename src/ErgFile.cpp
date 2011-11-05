@@ -361,11 +361,16 @@ ErgFile::calculateMetrics()
     XP = CP = AP = NP = IF = RI = TSS = BS = SVI = VI = 0;
     ELE = ELEDIST = GRADE = 0;
 
+    maxY = 0; // we need to reset it
+
     if (format == CRS) {
 
         ErgFilePoint last;
         bool first = true;
         foreach (ErgFilePoint p, Points) {
+
+            // set the maximum Y value
+            if (p.y > maxY) maxY= p.y;
 
             if (first == true) {
                 first = false;
@@ -406,6 +411,9 @@ ErgFile::calculateMetrics()
 
         ErgFilePoint last;
         foreach (ErgFilePoint p, Points) {
+
+            // set the maximum Y value
+            if (p.y > maxY) maxY= p.y;
 
             while (nextSecs < p.x) {
 
