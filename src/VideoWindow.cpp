@@ -165,42 +165,55 @@ void VideoWindow::mediaSelected(QString filename)
 
 MediaHelper::MediaHelper()
 {
-    // config paramaters to libvlc
-    const char * const vlc_args[] = {
-                    "-I", "dummy", /* Don't use any interface */
-                    "--ignore-config", /* Don't use VLC's config */
-                    "--extraintf=logger", //log anything
-                    "--verbose=-1" // -1 = no output at all
-                };
-
-    /* Load the VLC engine */
-    inst = libvlc_new(sizeof(vlc_args) / sizeof(vlc_args[0]), vlc_args);
 }
 
 MediaHelper::~MediaHelper()
 {
-    // unload vlc 
-    libvlc_release (inst);
 }
 
 QStringList 
 MediaHelper::listMedia(QDir dir)
 {
+    QStringList supported;
     QStringList returning;
 
+    // construct a list of supported types
+    // Using the basic list from the VLC
+    // Wiki here: http://www.videolan.org/vlc/features.html and then looked for
+    // the common extensions used from here: http://www.fileinfo.com/filetypes/video
+    supported << ".3GP";
+    supported << ".ASF";
+    supported << ".AVI";
+    supported << ".DIVX";
+    supported << ".FLAC";
+    supported << ".FLV";
+    supported << ".M4V";
+    supported << ".MKV";
+    supported << ".MOV";
+    supported << ".MP4";
+    supported << ".MPEG";
+    supported << ".MPG";
+    supported << ".MXF";
+    supported << ".Nut";
+    supported << ".OGG";
+    supported << ".OGM";
+    supported << ".RM";
+    supported << ".VOB";
+    supported << ".WAV";
+    supported << ".WMA";
+    supported << ".WMV";
+
     // whizz through every file in the directory
-    // and try and open it, if we succeed then huzzah
-    // otherwise ignore it
+    // if it has the right extension then we are happy
     foreach(QString name, dir.entryList()) {
 
-        libvlc_media_t *m = libvlc_media_new_path(inst, QString(dir.absolutePath() + "/" + name).toLatin1());
-
-        if (m) {
-
-            libvlc_media_parse(m);
-            if (libvlc_media_get_duration(m) > 0) returning << name;
-            libvlc_media_release(m);
+        foreach(QString extension, supported) {
+            if (name.endsWith(extension, Qt::CaseInsensitive)) {
+                returning << name;
+                break;
+            }
         }
     }
+
     return returning;
 }
