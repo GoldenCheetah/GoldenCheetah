@@ -38,6 +38,7 @@ GcToolBar::addAction(QAction *a)
     GcToolButton *button = new GcToolButton(this, a);
     buttons.append(button);
     layout->addWidget(button);
+    button->installEventFilter(this);
 }
 
 void
@@ -50,6 +51,7 @@ void
 GcToolBar::addWidget(QWidget *x) // add a widget that doesn't toggle selection
 {
     layout->addWidget(x);
+    x->installEventFilter(this);
 }
 
 void
@@ -106,13 +108,18 @@ GcToolBar::paintBackground(QPaintEvent *)
 }
 
 bool
-GcToolBar::eventFilter(QObject *, QEvent *e)
+GcToolBar::eventFilter(QObject *obj, QEvent *e)
 {
+    if (e->type() == QEvent::LayoutRequest) {
+        layout->activate();
+        repaint();
+    }
+
     if (e->type() == QEvent::MouseButtonRelease) {
         // is one of our widgets unfer the mouse
         GcToolButton *activate = NULL;
         foreach(GcToolButton *p, buttons) {
-            if (p->underMouse()) {
+            if (p == obj) {
                 activate = p;
                 break;
             }
