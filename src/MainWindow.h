@@ -58,6 +58,7 @@ class GcToolBar;
 class GcBubble;
 class LionFullScreen;
 class QTFullScreen;
+class TrainTool;
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 
@@ -300,6 +301,7 @@ class MainWindow : public QMainWindow
         GcToolBar *toolbar;
         QDockWidget *dock;
         QAction *homeAct, *diaryAct, *analysisAct, *measuresAct, *trainAct, *athleteAct, *helpAct, *configAct;
+        TrainTool *trainTool;
 
         QStackedWidget *views;
         QAction *sideView;

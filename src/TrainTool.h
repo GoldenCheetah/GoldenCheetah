@@ -88,10 +88,6 @@ class TrainTool : public GcWindow
         int selectedDeviceNumber();
         int selectedServerNumber();
 
-        // button meanings are changed by the windows
-        void setStartText(QString);
-        void setPauseText(QString);
-
         // set labels when ergfile selected etc
         void setLabels();
 
@@ -108,6 +104,9 @@ class TrainTool : public GcWindow
 
         // this
         QTabWidget  *trainTabs;
+
+        // get the panel
+        QWidget *getToolbarButtons() { return toolbarButtons; }
 
     signals:
 
@@ -155,6 +154,8 @@ class TrainTool : public GcWindow
         MainWindow *main;
         QSplitter   *trainSplitter;
 
+        QWidget *toolbarButtons;
+
         QTreeWidget *workoutTree;
         QTreeWidget *deviceTree;
         QTreeWidget *serverTree;
@@ -168,13 +169,8 @@ class TrainTool : public GcWindow
         QTreeWidgetItem *workout;
         QTreeWidgetItem *media;
 
-        // those buttons
-        QPushButton *startButton,
-                    *pauseButton,
-                    *stopButton,
-                    *plusButton,
-                    *minusButton;
-
+        // Panel buttons
+        QPushButton *play;
         QLabel *stress, *intensity;
         QSlider *intensitySlider;
         int lastAppliedIntensity;// remember how we scaled last time
