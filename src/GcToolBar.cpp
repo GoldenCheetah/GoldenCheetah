@@ -132,17 +132,17 @@ GcToolBar::eventFilter(QObject *, QEvent *e)
 GcToolButton::GcToolButton(QWidget *parent, QAction *action) : QWidget(parent), action(action)
 {
     setContentsMargins(0, 0, 0, 0);
-    QHBoxLayout *layout = new QHBoxLayout(this);
-    layout->setSpacing(5);
-    layout->setContentsMargins(10,0,10,0); // spacing either side
-    setLayout(layout);
+    QHBoxLayout *mlayout = new QHBoxLayout(this);
+    mlayout->setSpacing(5);
+    mlayout->setContentsMargins(10,0,10,0); // spacing either side
+    setLayout(mlayout);
 
     QLabel *iconlabel = new QLabel(action->iconText(), this);
     iconlabel->setPixmap(action->icon().pixmap(18,18)); // titchy
-    layout->addWidget(iconlabel);
+    mlayout->addWidget(iconlabel);
 
     label = new QLabel(action->iconText(), this);
-    layout->addWidget(label);
+    mlayout->addWidget(label);
 
     //XXX quick hack
     if (action->iconText() == "Analysis") selected = true;

@@ -190,9 +190,11 @@ void MetricAggregator::refreshMetrics()
 // add a ride (after import / download)
 void MetricAggregator::addRide(RideItem*ride)
 {
-    importRide(main->home, ride->ride(), ride->fileName, main->zones()->getFingerprint(), true);
-    RideFileCache updater(main, home.absolutePath() + "/" + ride->fileName, ride->ride(), true); // update cpx etc
-    dataChanged(); // notify models/views
+    if (ride && ride->ride()) {
+        importRide(main->home, ride->ride(), ride->fileName, main->zones()->getFingerprint(), true);
+        RideFileCache updater(main, home.absolutePath() + "/" + ride->fileName, ride->ride(), true); // update cpx etc
+        dataChanged(); // notify models/views
+    }
 }
 
 bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, unsigned long fingerprint, bool modify)

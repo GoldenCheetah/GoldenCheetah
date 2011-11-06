@@ -54,18 +54,8 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     QVBoxLayout *cl = new QVBoxLayout(c);
     setControls(c);
 
-    QHBoxLayout *mainLayout = new QHBoxLayout(this);
-    setLayout(mainLayout);
-
     cl->setSpacing(0);
     cl->setContentsMargins(0,0,0,0);
-
-    //setLineWidth(1);
-    //setMidLineWidth(0);
-    //setFrameStyle(QFrame::Plain | QFrame::Sunken);
-    mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(3,3,3,3);
-    setContentsMargins(0,0,0,0);
 
 #if 0 // not in this release .. or for a while TBH
     serverTree = new QTreeWidget;
@@ -116,79 +106,97 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     allWorkouts->setText(0, tr("Workout Library"));
     workoutTree->expandItem(allWorkouts);
 
-    QVBoxLayout *panel = new QVBoxLayout;
-    panel->setSpacing(0);
-    panel->setContentsMargins(0,0,0,0);
+    // TOOLBAR BUTTONS ETC
+    QHBoxLayout *toolbuttons=new QHBoxLayout;
+    toolbuttons->setSpacing(0);
+    toolbuttons->setContentsMargins(0,0,0,0);
 
-    QHBoxLayout *labels = new QHBoxLayout;
-    labels->setSpacing(0);
-    labels->setContentsMargins(0,0,0,0);
-    stress = new QLabel(this);
-    intensity = new QLabel(this);
-    labels->addWidget(stress, Qt::AlignVCenter|Qt::AlignCenter);
-    labels->addWidget(intensity, Qt::AlignVCenter|Qt::AlignCenter);
-    panel->addLayout(labels);
+    QIcon rewIcon(":images/oxygen/rewind.png");
+    QPushButton *rewind = new QPushButton(rewIcon, "", this);
+    rewind->setFocusPolicy(Qt::NoFocus);
+    rewind->setIconSize(QSize(24,24));
+    rewind->setAutoFillBackground(false);
+    rewind->setAutoDefault(false);
+    rewind->setFlat(true);
+    rewind->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    toolbuttons->addWidget(rewind);
 
-    // Make this labels easier to read
-    QColor background = GColor(CRIDEPLOTBACKGROUND);
-    QColor foreground = GColor(CPLOTMARKER);
-    QString sh = QString("QLabel { background: %1; color: %2; font-weight: bold; text-align: center; }")
-                 .arg(background.name())
-                 .arg(foreground.name());
-    stress->setStyleSheet(sh);
-    intensity->setStyleSheet(sh);
+    QIcon stopIcon(":images/oxygen/stop.png");
+    QPushButton *stop = new QPushButton(stopIcon, "", this);
+    stop->setFocusPolicy(Qt::NoFocus);
+    stop->setIconSize(QSize(24,24));
+    stop->setAutoFillBackground(false);
+    stop->setAutoDefault(false);
+    stop->setFlat(true);
+    stop->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    toolbuttons->addWidget(stop);
 
-    QHBoxLayout *buttons = new QHBoxLayout;
-    buttons->setSpacing(0);
-    buttons->setContentsMargins(0,0,0,0);
+    QIcon playIcon(":images/oxygen/play.png");
+    play = new QPushButton(playIcon, "", this);
+    play->setFocusPolicy(Qt::NoFocus);
+    play->setIconSize(QSize(24,24));
+    play->setAutoFillBackground(false);
+    play->setAutoDefault(false);
+    play->setFlat(true);
+    play->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    toolbuttons->addWidget(play);
 
-    startButton = new QPushButton(tr("Start"), this);
-    startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    pauseButton = new QPushButton(tr("Pause"), this);
-    pauseButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    stopButton = new QPushButton(tr("Stop"), this);
-    stopButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    plusButton = new QPushButton(tr(">"), this);
-    plusButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    plusButton->setFixedWidth(20);
-    minusButton = new QPushButton(tr("<"), this);
-    minusButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    minusButton->setFixedWidth(20);
-    QVBoxLayout *updownLayout = new QVBoxLayout;
-    updownLayout->setSpacing(0);
-    updownLayout->setContentsMargins(0,0,0,0);
-    updownLayout->addWidget(plusButton);
-    updownLayout->addWidget(minusButton);
-    intensitySlider = new QSlider(Qt::Vertical, this);
+    QIcon fwdIcon(":images/oxygen/ffwd.png");
+    QPushButton *forward = new QPushButton(fwdIcon, "", this);
+    forward->setFocusPolicy(Qt::NoFocus);
+    forward->setIconSize(QSize(24,24));
+    forward->setAutoFillBackground(false);
+    forward->setAutoDefault(false);
+    forward->setFlat(true);
+    forward->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    toolbuttons->addWidget(forward);
+
+    intensitySlider = new QSlider(Qt::Horizontal, this);
+    intensitySlider->setAutoFillBackground(false);
+    intensitySlider->setFocusPolicy(Qt::NoFocus);
     intensitySlider->setMinimum(50);
     intensitySlider->setMaximum(150);
     intensitySlider->setValue(100);
+    toolbuttons->addWidget(intensitySlider);
 
-#ifdef Q_OS_MAC
-    // the mac styling of buttons is freaking annoying
-    // It overrides any attempt to compact, which is
-    // exactly what we need to do, so instead we use
-    // the plastique style on them to get around it
-    QCleanlooksStyle *style = new QCleanlooksStyle();
-    startButton->setStyle(style);
-    pauseButton->setStyle(style);
-    stopButton->setStyle(style);
-    plusButton->setStyle(style);
-    minusButton->setStyle(style);
-#endif
+    QPalette pal;
+    stress = new QLabel(this);
+    stress->setAutoFillBackground(false);
+    stress->setFixedWidth(100);
+    stress->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+    pal.setColor(stress->foregroundRole(), Qt::white);
+    stress->setPalette(pal);
 
+    intensity = new QLabel(this);
+    intensity->setAutoFillBackground(false);
+    intensity->setFixedWidth(100);
+    intensity->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+    pal.setColor(intensity->foregroundRole(), Qt::white);
+    intensity->setPalette(pal);
+
+    toolbuttons->addWidget(stress, Qt::AlignVCenter|Qt::AlignCenter);
+    toolbuttons->addWidget(intensity, Qt::AlignVCenter|Qt::AlignCenter);
+
+    toolbarButtons = new QWidget(this);
+    toolbarButtons->setContentsMargins(0,0,0,0);
+    toolbarButtons->setFocusPolicy(Qt::NoFocus);
+    toolbarButtons->setAutoFillBackground(false);
+    toolbarButtons->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    toolbarButtons->setLayout(toolbuttons);
+
+    toolbarButtons->hide();
+
+    connect(play, SIGNAL(clicked()), this, SLOT(Start()));
+    connect(stop, SIGNAL(clicked()), this, SLOT(Stop()));
+    connect(forward, SIGNAL(clicked()), this, SLOT(FFwd()));
+    connect(rewind, SIGNAL(clicked()), this, SLOT(Rewind()));
+    connect(intensitySlider, SIGNAL(valueChanged(int)), this, SLOT(adjustIntensity()));
+
+    // not used but kept in case re-instated in the future
     recordSelector = new QCheckBox(this);
     recordSelector->setText(tr("Save workout data"));
     recordSelector->setChecked(Qt::Checked);
     recordSelector->hide(); // we don't let users change this for now
-
-    buttons->addWidget(startButton);
-    buttons->addWidget(pauseButton);
-    buttons->addWidget(stopButton);
-    panel->addLayout(buttons);
-    mainLayout->addLayout(panel);
-    mainLayout->addLayout(updownLayout);
-    mainLayout->addWidget(intensitySlider);
 
     trainSplitter = new QSplitter;
     trainSplitter->setHandleWidth(1);
@@ -214,14 +222,6 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     connect(mediaTree,SIGNAL(itemSelectionChanged()), this, SLOT(mediaTreeWidgetSelectionChanged()));
 #endif
     connect(main, SIGNAL(configChanged()), this, SLOT(configChanged()));
-
-    // connect train tool buttons!
-    connect(startButton, SIGNAL(clicked()), this, SLOT(Start()));
-    connect(pauseButton, SIGNAL(clicked()), this, SLOT(Pause()));
-    connect(stopButton, SIGNAL(clicked()), this, SLOT(Stop()));
-    connect(plusButton, SIGNAL(clicked()), this, SLOT(FFwd()));
-    connect(minusButton, SIGNAL(clicked()), this, SLOT(Rewind()));
-    connect(intensitySlider, SIGNAL(valueChanged(int)), this, SLOT(adjustIntensity()));
 
     // add a watch on all directories
     QVariant workoutDir = appsettings->value(NULL, GC_WORKOUTDIR);
@@ -299,6 +299,10 @@ TrainTool::configChanged()
             device->setText(0, Devices.at(i).name);
         }
     }
+    // select the first device
+    if (Devices.count()) {
+        deviceTree->setCurrentItem(allDevices->child(0));
+    }
 
     // WORKOUTS
     // zap whats there
@@ -342,21 +346,6 @@ TrainTool::configChanged()
     // metric or imperial changed?
     QVariant unit = appsettings->value(this, GC_UNIT);
     useMetricUnits = (unit.toString() == "Metric");
-}
-
-/*----------------------------------------------------------------------
- * Buttons!
- *----------------------------------------------------------------------*/
-
-void
-TrainTool::setStartText(QString string)
-{
-    startButton->setText(string);
-}
-void
-TrainTool::setPauseText(QString string)
-{
-    pauseButton->setText(string);
 }
 
 /*----------------------------------------------------------------------
@@ -427,8 +416,7 @@ TrainTool::workoutTreeWidgetSelectionChanged()
     // which one is selected?
     if (currentWorkout() == NULL || currentWorkout()->type() != WORKOUT_TYPE) {
         main->notifyErgFileSelected(NULL);
-        stress->setText("TSS:");
-        intensity->setText("IF:");
+        setLabels();
         return;
     }
 
@@ -452,9 +440,6 @@ TrainTool::workoutTreeWidgetSelectionChanged()
         // workout mode
         QVariant workoutDir = appsettings->value(this, GC_WORKOUTDIR);
         QString fileName = workoutDir.toString() + "/" + currentWorkout()->text(0); // filename
-
-        // Get users CP for relative watts calculations
-        QDate today = QDate::currentDate();
 
         ergFile = new ErgFile(fileName, mode, FTP, main);
         if (ergFile->isValid()) {
@@ -591,13 +576,49 @@ void TrainTool::setStreamController()
 
 void TrainTool::Start()       // when start button is pressed
 {
-    if (status&RT_RUNNING) {
-        newLap();
+    static QIcon playIcon(":images/oxygen/play.png");
+    static QIcon pauseIcon(":images/oxygen/pause.png");
+
+    if (status&RT_PAUSED && deviceController != NULL) {
+
+        // UN PAUSE!
+        play->setIcon(playIcon);
+
+        session_time.start();
+        lap_time.start();
+        status &=~RT_PAUSED;
+        deviceController->restart();
+        gui_timer->start(REFRESHRATE);
+        if (status & RT_STREAMING) stream_timer->start(STREAMRATE);
+        if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
+        load_period.restart();
+        if (status & RT_WORKOUT) load_timer->start(LOADRATE);
 
         // tell the world
-        main->notifyNewLap();
+        main->notifyUnPause();
+
+    } else if (status&RT_RUNNING && deviceController != NULL) {
+
+        // Pause!
+        play->setIcon(playIcon);
+
+        session_elapsed_msec += session_time.elapsed();
+        lap_elapsed_msec += lap_time.elapsed();
+        deviceController->pause();
+        status |=RT_PAUSED;
+        gui_timer->stop();
+        if (status & RT_STREAMING) stream_timer->stop();
+        if (status & RT_RECORDING) disk_timer->stop();
+        if (status & RT_WORKOUT) load_timer->stop();
+        load_msecs += load_period.restart();
+
+        // tell the world
+        main->notifyPause();
 
     } else {
+
+        // START!
+        play->setIcon(pauseIcon);
 
         // open the controller if it is selected
         setDeviceController();
@@ -613,8 +634,6 @@ void TrainTool::Start()       // when start button is pressed
         // should we be streaming too?
         //setStreamController();
         if (streamController != NULL) status |= RT_STREAMING;
-
-        setStartText(tr("Lap"));
 
         load_period.restart();
         session_time.start();
@@ -651,7 +670,6 @@ void TrainTool::Start()       // when start button is pressed
             }
         }
 
-
         // stream
         if (status & RT_STREAMING) {
             stream_timer->start(STREAMRATE);
@@ -675,7 +693,6 @@ void TrainTool::Pause()        // pause capture to recalibrate
         lap_time.start();
         status &=~RT_PAUSED;
         deviceController->restart();
-        setPauseText(tr("Pause"));
         gui_timer->start(REFRESHRATE);
         if (status & RT_STREAMING) stream_timer->start(STREAMRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
@@ -690,7 +707,6 @@ void TrainTool::Pause()        // pause capture to recalibrate
         session_elapsed_msec += session_time.elapsed();
         lap_elapsed_msec += lap_time.elapsed();
         deviceController->pause();
-        setPauseText(tr("Un-Pause"));
         status |=RT_PAUSED;
         gui_timer->stop();
         if (status & RT_STREAMING) stream_timer->stop();
@@ -710,7 +726,6 @@ void TrainTool::Stop(int deviceStatus)        // when stop button is pressed
     if ((status&RT_RUNNING) == 0) return;
 
     status &= ~RT_RUNNING;
-    setStartText(tr("Start"));
 
     // wipe connection
     deviceController->stop();
@@ -862,6 +877,7 @@ void TrainTool::newLap()
     lap_time.restart();
     lap_elapsed_msec = 0;
 
+    main->notifyNewLap();
 }
 
 // can be called from the controller
@@ -947,7 +963,6 @@ void TrainTool::diskUpdate()
                         << "," << (displayLap + displayWorkoutLap)
                         << "," << Altitude
                         << "," << "\n";
-
 }
 
 //----------------------------------------------------------------------
@@ -1081,21 +1096,24 @@ void TrainTool::setLabels()
 {
     if (main->currentErgFile()) {
 
+        intensitySlider->show();
+
         if (main->currentErgFile()->format == CRS) {
 
-            stress->setText(QString("Ele: %1").arg(main->currentErgFile()->ELE, 0, 'f', 0));
-            intensity->setText(QString("Grade: %1 %").arg(main->currentErgFile()->GRADE, 0, 'f', 1));
+            stress->setText(QString("Elevation %1").arg(main->currentErgFile()->ELE, 0, 'f', 0));
+            intensity->setText(QString("Grade %1 %").arg(main->currentErgFile()->GRADE, 0, 'f', 1));
 
         } else {
 
-            stress->setText(QString("TSS: %1").arg(main->currentErgFile()->TSS, 0, 'f', 0));
-            intensity->setText(QString("IF: %1").arg(main->currentErgFile()->IF, 0, 'f', 3));
+            stress->setText(QString("TSS %1").arg(main->currentErgFile()->TSS, 0, 'f', 0));
+            intensity->setText(QString("IF %1").arg(main->currentErgFile()->IF, 0, 'f', 3));
         }
 
     } else {
 
-        stress->setText("TSS:");
-        intensity->setText("IF:");
+        intensitySlider->hide();
+        stress->setText("");
+        intensity->setText("");
     }
 }
 

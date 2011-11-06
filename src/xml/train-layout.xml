@@ -62,7 +62,7 @@
 	<chart id="25" name="RT Plot" title="Performance" >
 		<property name="instanceName" type="QString" value="RT Plot" />
 		<property name="title" type="QString" value="Performance" />
-		<property name="subtitle" type="QString" value=" 130 Minute Road Ride. Hilly start and end, Middle TT section." />
+		<property name="subtitle" type="QString" value="130 Minute Road Ride. Hilly start and end, Middle TT section." />
 		<property name="widthFactor" type="double" value="1.78571" />
 		<property name="heightFactor" type="double" value="1.35135" />
 		<property name="resizable" type="bool" value="1" />
@@ -79,33 +79,13 @@
 		<property name="instanceName" type="QString" value="Dial" />
 		<property name="title" type="QString" value="Elapsed Time" />
 		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="3.125" />
+		<property name="widthFactor" type="double" value="2.38095" />
 		<property name="heightFactor" type="double" value="7.14286" />
 		<property name="resizable" type="bool" value="1" />
 		<property name="showInstant" type="bool" value="0" />
 		<property name="avgType" type="int" value="0" />
 		<property name="dataSeries" type="int" value="1" />
 		<property name="style" type="int" value="74687587" />
-	</chart>
-	<chart id="29" name="Train Controls" title="Controls" >
-		<property name="instanceName" type="QString" value="Train Controls" />
-		<property name="title" type="QString" value="Controls" />
-		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="5" />
-		<property name="heightFactor" type="double" value="7.14286" />
-		<property name="resizable" type="bool" value="1" />
-	</chart>
-	<chart id="22" name="Dial" title="Distance" >
-		<property name="instanceName" type="QString" value="Dial" />
-		<property name="title" type="QString" value="Distance" />
-		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="3.84615" />
-		<property name="heightFactor" type="double" value="7.14286" />
-		<property name="resizable" type="bool" value="1" />
-		<property name="showInstant" type="bool" value="0" />
-		<property name="avgType" type="int" value="1083336304" />
-		<property name="dataSeries" type="int" value="4" />
-		<property name="style" type="int" value="129" />
 	</chart>
 	<chart id="22" name="Dial" title="Lap" >
 		<property name="instanceName" type="QString" value="Dial" />
@@ -118,5 +98,17 @@
 		<property name="avgType" type="int" value="32526" />
 		<property name="dataSeries" type="int" value="2" />
 		<property name="style" type="int" value="86056163" />
+	</chart>
+	<chart id="22" name="Dial" title="Distance" >
+		<property name="instanceName" type="QString" value="Dial" />
+		<property name="title" type="QString" value="Distance" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2.77778" />
+		<property name="heightFactor" type="double" value="7.14286" />
+		<property name="resizable" type="bool" value="1" />
+		<property name="showInstant" type="bool" value="0" />
+		<property name="avgType" type="int" value="1083336304" />
+		<property name="dataSeries" type="int" value="4" />
+		<property name="style" type="int" value="129" />
 	</chart>
 </layout>

@@ -48,6 +48,7 @@
     <file>images/stopwatch.png</file>
     <file>images/settings.png</file>
     <file>images/addchart.png</file>
+    <file>images/library.png</file>
     <file>translations/gc_fr.qm</file>
     <file>translations/gc_ja.qm</file>
     <file>translations/gc_it.qm</file>
@@ -62,6 +63,11 @@
     <file>xml/diary-layout.xml</file>
     <file>xml/analysis-layout.xml</file>
     <file>html/ltm-summary.html</file>
+    <file>images/oxygen/play.png</file>
+    <file>images/oxygen/pause.png</file>
+    <file>images/oxygen/stop.png</file>
+    <file>images/oxygen/ffwd.png</file>
+    <file>images/oxygen/rewind.png</file>
     <file>images/toolbar/close-icon.png</file>
     <file>images/toolbar/save.png</file>
     <file>images/toolbar/search.png</file>

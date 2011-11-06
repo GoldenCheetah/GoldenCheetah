@@ -198,6 +198,11 @@ MainWindow::MainWindow(const QDir &home) :
     toolbar = new GcToolBar(this);
     toolbar->addStretch();
 
+    trainTool = new TrainTool(this, home);
+    trainTool->hide();
+    toolbar->addWidget(trainTool->getToolbarButtons());
+    toolbar->addStretch();
+
     // home
     QIcon homeIcon(":images/toolbar/main/home.png");
     homeAct = new QAction(homeIcon, tr("Home"), this);
@@ -241,6 +246,9 @@ MainWindow::MainWindow(const QDir &home) :
 #endif
 
     toolbar->addStretch();
+
+
+toolbar->addStretch();
 
     /*----------------------------------------------------------------------
      * Sidebar
@@ -386,6 +394,7 @@ MainWindow::MainWindow(const QDir &home) :
     toolBox->addItem(listView, QIcon(":images/activity.png"), "Activity History");
     toolBox->addItem(_rideMetadata, QIcon(":images/metadata.png"), "Activity Details");
     toolBox->addItem(intervalSplitter, QIcon(":images/stopwatch.png"), "Activity Intervals");
+    toolBox->addItem(trainTool->controls(), QIcon(":images/library.png"), "Workout Library");
     toolBox->addItem(masterControls, QIcon(":images/settings.png"), "Chart Settings");
 #if 0 // XXX NOT YET IMPLEMENTED
     toolBox->addItem(new AthleteTool(QFileInfo(home.path()).path(), this), QIcon(":images/toolbar/main/athlete.png"), "Athletes");
@@ -924,6 +933,7 @@ MainWindow::selectAnalysis()
     views->setCurrentIndex(0);
     analWindow->selected(); // tell it!
     currentWindow = analWindow;
+    trainTool->getToolbarButtons()->hide();
 }
 
 void
@@ -933,6 +943,7 @@ MainWindow::selectTrain()
     views->setCurrentIndex(1);
     trainWindow->selected(); // tell it!
     currentWindow = trainWindow;
+    trainTool->getToolbarButtons()->show();
 }
 
 void
@@ -942,6 +953,7 @@ MainWindow::selectDiary()
     views->setCurrentIndex(2);
     diaryWindow->selected(); // tell it!
     currentWindow = diaryWindow;
+    trainTool->getToolbarButtons()->hide();
 }
 
 void
@@ -951,6 +963,7 @@ MainWindow::selectHome()
     views->setCurrentIndex(3);
     homeWindow->selected(); // tell it!
     currentWindow = homeWindow;
+    trainTool->getToolbarButtons()->hide();
 }
 void
 MainWindow::selectAthlete()
