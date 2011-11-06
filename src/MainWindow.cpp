@@ -196,7 +196,14 @@ MainWindow::MainWindow(const QDir &home) :
      *--------------------------------------------------------------------*/
 
     toolbar = new GcToolBar(this);
-    toolbar->addStretch();
+
+    QWidget *lspacer = new QWidget(this);
+    lspacer->setFixedWidth(100);
+    lspacer->setContentsMargins(0,0,0,0);
+    lspacer->setFocusPolicy(Qt::NoFocus);
+    lspacer->setAutoFillBackground(false);
+    lspacer->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    toolbar->addWidget(lspacer);
 
     trainTool = new TrainTool(this, home);
     trainTool->hide();
@@ -245,10 +252,13 @@ MainWindow::MainWindow(const QDir &home) :
     toolbar->addAction(athleteAct);
 #endif
 
-    toolbar->addStretch();
-
-
-toolbar->addStretch();
+    QWidget *rspacer = new QWidget(this);
+    rspacer->setFixedWidth(100);
+    rspacer->setContentsMargins(0,0,0,0);
+    rspacer->setFocusPolicy(Qt::NoFocus);
+    rspacer->setAutoFillBackground(false);
+    rspacer->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    toolbar->addWidget(rspacer);
 
     /*----------------------------------------------------------------------
      * Sidebar
