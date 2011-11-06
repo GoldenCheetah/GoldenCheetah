@@ -176,6 +176,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
 
     toolbuttons->addWidget(stress, Qt::AlignVCenter|Qt::AlignCenter);
     toolbuttons->addWidget(intensity, Qt::AlignVCenter|Qt::AlignCenter);
+    toolbuttons->addStretch();
 
     toolbarButtons = new QWidget(this);
     toolbarButtons->setContentsMargins(0,0,0,0);
