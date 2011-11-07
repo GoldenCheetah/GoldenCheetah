@@ -552,7 +552,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
 #ifndef Q_OS_MAC
-    viewMenu->addAction(tr("Toggle Full Screen"), this, SLOT(toggleFullScreen()));
+    viewMenu->addAction(tr("Toggle Full Screen"), this, SLOT(toggleFullScreen()), QKeySequence("F11"));
 #endif
     QAction *showhideSidebar = viewMenu->addAction(tr("Show Sidebar"), this, SLOT(showSidebar(bool)));
     showhideSidebar->setCheckable(true);
