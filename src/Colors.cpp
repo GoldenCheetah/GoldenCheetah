@@ -41,7 +41,7 @@ static bool setupColors()
         { "Plot Title", "COLORPLOTTITLE", Qt::black },
         { "Plot Selection Pen", "COLORPLOTSELECT", Qt::blue },
         { "Plot TrackerPen", "COLORPLOTTRACKER", Qt::blue },
-        { "Plot Markers", "COLORPLOTMARKER", Qt::black },
+        { "Plot Markers", "COLORPLOTMARKER", Qt::gray },
         { "Plot Grid", "COLORGRID", Qt::black },
         { "Interval Highlighter", "COLORINTERVALHIGHLIGHTER", Qt::blue },
         { "Heart Rate", "COLORHEARTRATE", Qt::blue },
