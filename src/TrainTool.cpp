@@ -773,6 +773,9 @@ void TrainTool::Stop(int deviceStatus)        // when stop button is pressed
     if (main->currentErgFile()) main->currentErgFile()->reload();
     main->notifySetNow(load_msecs);
 
+    // reset the play button
+    QIcon playIcon(":images/oxygen/play.png");
+    play->setIcon(playIcon);
 
     // tell the world
     main->notifyStop();
