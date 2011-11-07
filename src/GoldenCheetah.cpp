@@ -513,7 +513,7 @@ GcWindow::setNewSize(int w, int h)
 
     // don't get too wide
     if (newWF < 1) newWF = 1;
-    if (newWF > 5) newWF = 5;
+    if (newWF > 10) newWF = 10;
     if (newHF < 1) newHF = 1;
     if (newWF < 1) newWF = 1;
 
