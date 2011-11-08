@@ -32,6 +32,9 @@ GcWindow(parent), home(home), main(parent)
     const char * const vlc_args[] = {
                     "-I", "dummy", /* Don't use any interface */
                     "--ignore-config", /* Don't use VLC's config */
+#ifdef Q_OS_LINUX
+                    "--no-xlib", // avoid xlib thread error messages
+#endif
                     "--verbose=-1" // -1 = no output at all
                 };
 
