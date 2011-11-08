@@ -115,6 +115,7 @@ ErgFilePlot::ErgFilePlot(MainWindow *main) : main(main)
     LodCurve = new QwtPlotCurve("Course Load");
     LodCurve->setData(*lodData);
     LodCurve->attach(this);
+    LodCurve->setBaseline(-1000);
     LodCurve->setYAxis(QwtPlot::yLeft);
 
     // load curve is blue for time and grey for gradient
