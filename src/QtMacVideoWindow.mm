@@ -189,6 +189,7 @@ QtMacMovieView::QtMacMovieView (QWidget *parent) : QMacCocoaViewContainer (0, pa
     NSRect frame;
     // allocate the player
     player = [[QTMovieView alloc] initWithFrame:frame];
+    [player setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
     [player setPreservesAspectRatio:YES];
     [player setControllerVisible:NO];
 
