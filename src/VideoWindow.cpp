@@ -35,7 +35,8 @@ GcWindow(parent), home(home), main(parent)
 #ifdef Q_OS_LINUX
                     "--no-xlib", // avoid xlib thread error messages
 #endif
-                    "--verbose=-1" // -1 = no output at all
+                    "--verbose=-1", // -1 = no output at all
+                    "--quiet"
                 };
 
     /* create an exception handler */
@@ -156,10 +157,10 @@ void VideoWindow::mediaSelected(QString filename)
     if (m) libvlc_media_release(m);
     m = NULL;
 
-    if (filename != "" && QFile(filename).exists()) {
+    if (filename.endsWith("/DVD") || (filename != "" && QFile(filename).exists())) {
 
         /* open media */
-        m = libvlc_media_new_path(inst, filename.toLatin1());
+        m = libvlc_media_new_path(inst, filename.endsWith("/DVD") ? "dvd://" : filename.toLatin1());
 
         /* set the media to playback */
         if (m) libvlc_media_player_set_media (mp, m);

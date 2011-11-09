@@ -330,6 +330,12 @@ TrainTool::configChanged()
     QList<QTreeWidgetItem *> media = allMedia->takeChildren();
     for (int i=0; i<media.count(); i++) delete media.at(i);
 
+#ifndef Q_OS_MAC
+    // add dvd playback via VLC
+    QTreeWidgetItem *dvd = new QTreeWidgetItem(allMedia, WORKOUT_TYPE);
+    dvd->setText(0, "DVD");
+#endif
+
     MediaHelper mediaHelper;
     foreach(QString video, mediaHelper.listMedia(QDir(workoutDir.toString()))) {
 
