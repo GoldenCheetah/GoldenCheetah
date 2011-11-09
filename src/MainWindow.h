@@ -240,6 +240,7 @@ class MainWindow : public QMainWindow
         bool saveRideExitDialog();              // save dirty rides on exit dialog
         void showOptions();
         void showTools();
+        void toggleSidebar();
         void showSidebar(bool want);
         void showToolbar(bool want);
         void showWorkoutWizard();
