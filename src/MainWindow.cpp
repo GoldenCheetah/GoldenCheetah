@@ -198,12 +198,26 @@ MainWindow::MainWindow(const QDir &home) :
     toolbar = new GcToolBar(this);
 
     QWidget *lspacer = new QWidget(this);
+    QHBoxLayout *lspacerLayout = new QHBoxLayout(lspacer);
     lspacer->setFixedWidth(100);
     lspacer->setContentsMargins(0,0,0,0);
     lspacer->setFocusPolicy(Qt::NoFocus);
     lspacer->setAutoFillBackground(false);
     lspacer->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     toolbar->addWidget(lspacer);
+
+    // show hide sidbar
+    QIcon rewIcon(":images/toolbar/main/tick.png");
+    QPushButton *side = new QPushButton(rewIcon, "", this);
+    side->setFocusPolicy(Qt::NoFocus);
+    side->setIconSize(QSize(18,18));
+    side->setAutoFillBackground(false);
+    side->setAutoDefault(false);
+    side->setFlat(true);
+    side->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    lspacerLayout->addWidget(side);
+    lspacerLayout->addStretch();
+    connect(side, SIGNAL(clicked()), this, SLOT(toggleSidebar()));
 
     trainTool = new TrainTool(this, home);
     trainTool->hide();
@@ -611,6 +625,12 @@ void
 MainWindow::showDock()
 {
     dock->toggleViewAction()->activate(QAction::Trigger);
+}
+
+void
+MainWindow::toggleSidebar()
+{
+    showSidebar(!toolBox->isVisible());
 }
 
 void
