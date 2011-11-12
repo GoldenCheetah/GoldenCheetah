@@ -49,8 +49,8 @@ class ErgFilePoint
 
         ErgFilePoint() : x(0), y(0), val(0) {}
 
-        long x;     // x axis - time in msecs or distance in meters
-        long y;     // y axis - load in watts or altitude
+        double x;     // x axis - time in msecs or distance in meters
+        double y;     // y axis - load in watts or altitude
 
         double val;   // the value to send to the device (watts/gradient)
 };
@@ -69,6 +69,8 @@ class ErgFile
         ~ErgFile();             // delete the contents
 
         void reload();          // reload after messed about
+        void parseComputrainer(); // its an erg,crs or mrc file
+        void parseTacx();         // its a pgmf file
         bool isValid();         // is the file valid or not?
         double Cp;
         int format;             // ERG, CRS or MRC currently supported

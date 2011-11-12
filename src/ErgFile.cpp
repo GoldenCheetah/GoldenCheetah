@@ -18,6 +18,7 @@
 
 #include "ErgFile.h"
 
+#include <stdint.h>
 
 ErgFile::ErgFile(QString filename, int &mode, double Cp, MainWindow *main) : 
     Cp(Cp), filename(filename), main(main), mode(mode)
@@ -26,6 +27,195 @@ ErgFile::ErgFile(QString filename, int &mode, double Cp, MainWindow *main) :
 }
 
 void ErgFile::reload()
+{
+    // which parser to call? XXX should look at moving to an ergfile factory
+    // like we do with ride files if we end up with lots of different formats
+    if (filename.endsWith(".pgmf", Qt::CaseInsensitive)) parseTacx();
+    else parseComputrainer();
+    
+}
+
+void ErgFile::parseTacx()
+{
+    // Initialise
+    Version = "";
+    Units = "";
+    Filename = "";
+    Name = "";
+    Duration = -1;
+    Ftp = 0;            // FTP this file was targetted at
+    MaxWatts = 0;       // maxWatts in this ergfile (scaling)
+    valid = false;             // did it parse ok?
+    rightPoint = leftPoint = 0;
+    format = CRS; // default to couse until we know
+    Points.clear();
+    Laps.clear();
+
+    // running totals
+    double rdist = 0; // running total for distance
+    double ralt = 200; // always start at 200 meters just to prettify the graph
+
+    // open the file for binary reading and open a datastream
+    QFile pgmfFile(filename);
+    if (pgmfFile.open(QIODevice::ReadOnly) == false) return;
+    QDataStream input(&pgmfFile);
+    input.setByteOrder(QDataStream::LittleEndian);
+    input.setVersion(QDataStream::Qt_4_0); // 32 bit floats not 64 bit.
+
+    bool happy = true; // are we ok to continue reading?
+
+    //
+    // BASIC DATA STRUCTURES
+    //
+    struct {
+        uint16_t fingerprint;
+        uint16_t version;
+        uint32_t blocks;
+    } header; // file header
+
+    struct {
+        uint16_t type;
+        uint16_t version;
+        uint32_t records;
+        uint32_t recordSize;
+    } info; // tells us what to read
+
+    struct {
+        quint32 checksum; // 4
+        // we don't use an array for the filename since C++ arrays are prepended by a 16bit size
+        quint8 name[34];
+        qint32 wattSlopePulse; // 42
+        qint32 timeDist; // 46
+        double totalTimeDist; // 54
+        double energyCons;  // 62
+        float  altStart; // 66
+        qint32 brakeCategory; // 70
+    } general; // type 1010
+
+    struct {
+        float distance;
+        float slope;
+        float friction;
+    } program; // type 1020
+
+    //
+    // FILE HEADER
+    //
+    int rc = input.readRawData((char*)&header, sizeof(header));
+    if (rc == sizeof(header)) {
+        if (header.fingerprint == 1000 && header.version == 100) happy = true;
+        else happy = false;
+    } else happy = false;
+
+    unsigned int block = 0; // keep track of how many blocks we have read
+
+    //
+    // READ THE BLOCKS INSIDE THE FILE
+    //
+    while (happy && block < header.blocks) {
+
+        // read the info for this block
+        rc = input.readRawData((char*)&info, sizeof(info));
+        if (rc == sizeof(info)) {
+
+            // okay now read tha block
+            switch (info.type) {
+
+            case 1010 : // general
+                {
+                    // read it but mostly ignore -- for now
+                    // we read member by member to avoid struct word alignment problem caused
+                    // by the filename being 34 bytes long (why didn't they use 32 or 36?)
+                    input>>general.checksum;
+                    input.readRawData((char*)&general.name[0], 34);
+                    input>>general.wattSlopePulse;
+                    input>>general.timeDist;
+                    input>>general.totalTimeDist;
+                    input>>general.energyCons;
+                    input>>general.altStart;
+                    input>>general.brakeCategory;
+                    switch (general.wattSlopePulse) {
+                    case 0 :
+                        format = ERG;
+                        break;
+                    case 1 :
+                        format = CRS;
+                        break;
+                    default:
+                        happy = false;
+                        break;
+                    }
+                    ralt = general.altStart;
+                }
+                break;
+
+            case 1020 : // program
+                {
+                    // read in the program records
+                    for (unsigned int record=0; record < info.records; record++) {
+
+                        // get the next record
+                        if (sizeof(program) != input.readRawData((char*)&program, sizeof(program))) {
+                            happy = false;
+                            break;
+                        } 
+
+                        ErgFilePoint add;
+
+                        if (format == CRS) {
+		                    // distance guff
+                            add.x = rdist;
+		                    double distance = program.distance; // in meters
+		                    rdist += distance;
+
+		                    // gradient and altitude
+                            add.val = program.slope;
+                            add.y = ralt;
+		                    ralt += (distance * add.val) / 100;
+
+                        } else {
+
+                            add.x = rdist;
+                            rdist += program.distance * 1000; // 1000ths of a second
+                            add.val = add.y = program.slope; // its watts now
+                        }
+
+                        Points.append(add);
+                        if (add.y > MaxWatts) MaxWatts=add.y;
+
+                    }
+                }
+                break;
+
+            default: // unexpected block type
+                happy = false;
+                break;
+            }
+
+            block++;
+
+        } else happy = false;
+    }
+
+    // done
+    pgmfFile.close();
+
+    // if we got here and are still happy then it
+    // must have been a valid file.
+    if (happy) {
+        valid = true;
+
+        // set ErgFile duration
+        Duration = Points.last().x;      // last is the end point in msecs
+        leftPoint = 0;
+        rightPoint = 1;
+
+        // calculate climbing etc
+        calculateMetrics();
+    }
+}
+
+void ErgFile::parseComputrainer()
 {
     QFile ergFile(filename);
     int section = NOMANSLAND;            // section 0=init, 1=header data, 2=course data
@@ -215,7 +405,7 @@ void ErgFile::reload()
     // done.
     ergFile.close();
 
-    if (Points.count() > 0) {
+    if (section == END && Points.count() > 0) {
         valid = true;
 
         // add the last point for a crs file
@@ -266,6 +456,7 @@ ErgFile::wattsAt(long x, int &lapnum)
 {
     // workout what wattage load should be set for any given
     // point in time in msecs.
+    if (!isValid()) return -100; // not a valuid ergfile
 
     // is it in bounds?
     if (x < 0 || x > Duration) return -100;   // out of bounds!!!
@@ -323,6 +514,7 @@ ErgFile::gradientAt(long x, int &lapnum)
 {
     // workout what wattage load should be set for any given
     // point in time in msecs.
+    if (!isValid()) return -100; // not a valid ergfile
 
     // is it in bounds?
     if (x < 0 || x > Duration) return -100;   // out of bounds!!! (-10 through +15 are valid return vals)
@@ -351,6 +543,8 @@ ErgFile::gradientAt(long x, int &lapnum)
 
 int ErgFile::nextLap(long x)
 {
+    if (!isValid()) return -1; // not a valid ergfile
+
     // do we need to return the Lap marker?
     if (Laps.count() > 0) {
         for (int i=0; i<Laps.count(); i++) {
@@ -369,6 +563,9 @@ ErgFile::calculateMetrics()
     ELE = ELEDIST = GRADE = 0;
 
     maxY = 0; // we need to reset it
+
+    // is it valid?
+    if (!isValid()) return;
 
     if (format == CRS) {
 
