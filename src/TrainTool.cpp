@@ -460,6 +460,15 @@ TrainTool::workoutTreeWidgetSelectionChanged()
             intensitySlider->setValue(100);
             lastAppliedIntensity = 100;
             setLabels();
+        } else {
+
+            // couldn't parse fall back to ERG mode
+            delete ergFile;
+            ergFile = NULL;
+            main->notifyErgFileSelected(NULL);
+            mode = ERG;
+            status &= ~RT_WORKOUT;
+            setLabels();
         }
     }
 
@@ -482,6 +491,7 @@ TrainTool::listWorkoutFiles(const QDir &dir) const
     filters << "*.erg";
     filters << "*.mrc";
     filters << "*.crs";
+    filters << "*.pgmf";
 
     return dir.entryList(filters, QDir::Files, QDir::Name);
 }
