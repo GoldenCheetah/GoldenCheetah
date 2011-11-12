@@ -557,18 +557,33 @@ MeanMaxComputer::run()
     // the calculations of >6m since windowsize is used to
     // determine segment duration rather than examining the
     // timestamps on each sample
+    // the decrit will also pull timestamps back to start at
+    // zero, since some files have a very large start time
+    // that creates work for nil effect (but increases compute
+    // time drastically).
     cpintdata data;
     data.rec_int_ms = (int) round(ride->recIntSecs() * 1000.0);
     double lastsecs = 0;
+    bool first = true;
+    double offset = 0;
     foreach (const RideFilePoint *p, ride->dataPoints()) {
 
+        // get offset to apply on all samples if first sample
+        if (first == true) {
+            offset = p->secs;
+            first = false;
+        }
+
+        // drag back to start at 0s
+        double psecs = p->secs - offset;
+
         // fill in any gaps in recording - use same dodgy rounding as before
-        int count = (p->secs - lastsecs - ride->recIntSecs()) / ride->recIntSecs();
+        int count = (psecs - lastsecs - ride->recIntSecs()) / ride->recIntSecs();
         for(int i=0; i<count; i++)
             data.points.append(cpintpoint(round(lastsecs+((i+1)*ride->recIntSecs() *1000.0)/1000), 0));
-        lastsecs = p->secs;
+        lastsecs = psecs;
 
-        double secs = round(p->secs * 1000.0) / 1000;
+        double secs = round(psecs * 1000.0) / 1000;
         if (secs > 0) data.points.append(cpintpoint(secs, (int) round(p->value(baseSeries))));
     }
 
