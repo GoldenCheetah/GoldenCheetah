@@ -280,6 +280,8 @@ class MainWindow : public QMainWindow
         void setWindowMenu();
         void selectWindow(QAction*);
 
+        void toggleStyle();
+        void setStyle();
         void showDock();
 #ifndef Q_OS_MAC
         void toggleFullScreen();
@@ -303,6 +305,12 @@ class MainWindow : public QMainWindow
         QDockWidget *dock;
         QAction *homeAct, *diaryAct, *analysisAct, *measuresAct, *trainAct, *athleteAct, *helpAct, *configAct;
         TrainTool *trainTool;
+        QAction *styleAction;
+        QAction *showhideToolbar;
+        QAction *showhideSidebar;
+
+        // toolbar butttons
+        QPushButton *side, *style;
 
         QStackedWidget *views;
         QAction *sideView;

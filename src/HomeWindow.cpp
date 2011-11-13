@@ -83,7 +83,6 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     styleSelector->setTitle(0, "Tab");
     styleSelector->setTitle(1, "Scroll");
     styleSelector->setTitle(2, "Tile");
-#else
     styleSelector = new QComboBox(this);
     styleSelector->addItem("Tab");
     styleSelector->addItem("Scroll");
@@ -92,7 +91,7 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     small.setPointSize(8);
     styleSelector->setFont(small);
     styleSelector->setFixedHeight(20);
-
+#else
     //styleSelector->hide(); //XXX hack whilst playing
     QLabel *space = new QLabel("", this);
     space->setFixedHeight(20);
@@ -104,9 +103,11 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     style->setAutoFillBackground(false);
     layout->setSpacing(0);
     layout->setContentsMargins(0,0,0,0);
+#if 0
     titleBar->addStretch();
     titleBar->addWidget(styleSelector);
     layout->addLayout(titleBar);
+#endif
     layout->addWidget(style);
 
     QPalette palette;
@@ -181,13 +182,13 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     winWidget->installEventFilter(this); // to draw cursor
     winWidget->setMouseTracking(true); // to draw cursor
 
-    currentStyle=2;
+    currentStyle=-1;
 #if 0
     styleSelector->setSelected(2);
 #else
-    styleSelector->setCurrentIndex(2);
+    //styleSelector->setCurrentIndex(2);
 #endif
-    style->setCurrentIndex(2); // tile area
+    styleChanged(2);
 
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
@@ -197,7 +198,7 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
 #if 0
     connect(styleSelector, SIGNAL(clicked(int,bool)), SLOT(styleChanged(int)));
 #else
-    connect(styleSelector, SIGNAL(currentIndexChanged(int)), SLOT(styleChanged(int)));
+    //connect(styleSelector, SIGNAL(currentIndexChanged(int)), SLOT(styleChanged(int)));
 #endif
     connect(titleEdit, SIGNAL(textChanged(const QString&)), SLOT(titleChanged()));
 
@@ -335,7 +336,6 @@ HomeWindow::styleChanged(int id)
 {
     // ignore if out of bounds or we're already using that style
     if (id > 2 || id < 0 || id == currentStyle) return;
-
     active = true;
 
     // block updates as it is butt ugly
@@ -1304,10 +1304,7 @@ HomeWindow::restoreState(bool useDefault)
     QString filename = mainWindow->home.absolutePath() + "/" + name + "-layout.xml";
     QFileInfo finfo(filename);
 
-    if(useDefault)
-    {
-        QFile::remove(filename);
-    }
+    if (useDefault) QFile::remove(filename);
 
     // use a default if not there
     if (!finfo.exists()) filename = QString(":xml/%1-layout.xml").arg(name);
@@ -1326,7 +1323,7 @@ HomeWindow::restoreState(bool useDefault)
     xmlReader.parse(source);
 
     // layout the results
-    styleSelector->setCurrentIndex(handler.style);
+    styleChanged(handler.style);
     foreach(GcWindow *chart, handler.charts) addChart(chart);
 }
 

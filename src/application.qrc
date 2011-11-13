@@ -1,6 +1,12 @@
 <!DOCTYPE RCC><RCC version="1.0">
  <qresource>
-    <file>images/toolbar/main/tick.png</file>
+    <file>images/toolbar/main/fullscreen.png</file>
+    <file>images/toolbar/main/hideside.png</file>
+    <file>images/toolbar/main/normal.png</file>
+    <file>images/toolbar/main/showside.png</file>
+    <file>images/toolbar/main/style.png</file>
+    <file>images/toolbar/main/tab.png</file>
+    <file>images/toolbar/main/tile.png</file>
     <file>images/toolbar/main/analysis.png</file>
     <file>images/toolbar/main/athlete.png</file>
     <file>images/toolbar/main/config.png</file>

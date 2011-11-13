@@ -96,11 +96,17 @@
 
 QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 
+
 MainWindow::MainWindow(const QDir &home) :
     home(home), session(0), isclean(false),
     zones_(new Zones), hrzones_(new HrZones),
     ride(NULL), workout(NULL)
 {
+
+    static const QIcon hideIcon(":images/toolbar/main/hideside.png");
+    static const QIcon showIcon(":images/toolbar/main/showside.png");
+    static const QIcon tabIcon(":images/toolbar/main/tab.png");
+    static const QIcon tileIcon(":images/toolbar/main/tile.png");
 
     mainwindows.append(this); // add us to the list of open windows
 
@@ -207,17 +213,26 @@ MainWindow::MainWindow(const QDir &home) :
     toolbar->addWidget(lspacer);
 
     // show hide sidbar
-    QIcon rewIcon(":images/toolbar/main/tick.png");
-    QPushButton *side = new QPushButton(rewIcon, "", this);
+    side = new QPushButton(hideIcon, "", this);
     side->setFocusPolicy(Qt::NoFocus);
-    side->setIconSize(QSize(18,18));
+    side->setIconSize(QSize(10,10));
     side->setAutoFillBackground(false);
     side->setAutoDefault(false);
     side->setFlat(true);
     side->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     lspacerLayout->addWidget(side);
-    lspacerLayout->addStretch();
     connect(side, SIGNAL(clicked()), this, SLOT(toggleSidebar()));
+
+    style = new QPushButton(tabIcon, "", this);
+    style->setFocusPolicy(Qt::NoFocus);
+    style->setIconSize(QSize(10,10));
+    style->setAutoFillBackground(false);
+    style->setAutoDefault(false);
+    style->setFlat(true);
+    style->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    lspacerLayout->addWidget(style);
+    lspacerLayout->addStretch();
+    connect(style, SIGNAL(clicked()), this, SLOT(toggleStyle()));
 
     trainTool = new TrainTool(this, home);
     trainTool->hide();
@@ -568,14 +583,19 @@ MainWindow::MainWindow(const QDir &home) :
 #ifndef Q_OS_MAC
     viewMenu->addAction(tr("Toggle Full Screen"), this, SLOT(toggleFullScreen()), QKeySequence("F11"));
 #endif
-    QAction *showhideSidebar = viewMenu->addAction(tr("Show Sidebar"), this, SLOT(showSidebar(bool)));
+    showhideSidebar = viewMenu->addAction(tr("Show Sidebar"), this, SLOT(showSidebar(bool)));
     showhideSidebar->setCheckable(true);
     showhideSidebar->setChecked(true);
     //connect(showhideSidebar, SIGNAL(triggered(bool)), this, SLOT(showSidebar(bool)));
 
-    QAction *showhideToolbar = viewMenu->addAction(tr("Show Toolbar"), this, SLOT(showToolbar(bool)));
+    showhideToolbar = viewMenu->addAction(tr("Show Toolbar"), this, SLOT(showToolbar(bool)));
     showhideToolbar->setCheckable(true);
     showhideToolbar->setChecked(true);
+
+    styleAction = viewMenu->addAction(tr("Tabbed View"), this, SLOT(toggleStyle()));
+    styleAction->setCheckable(true);
+    styleAction->setChecked(true);
+
     //connect(showhideSidebar, SIGNAL(triggered(bool)), this, SLOT(showSidebar(bool)));
     viewMenu->addSeparator();
     viewMenu->addAction(tr("Analysis"), this, SLOT(selectAnalysis()));
@@ -615,6 +635,7 @@ MainWindow::MainWindow(const QDir &home) :
     // Kick off
     rideTreeWidgetSelectionChanged();
     analWindow->selected();
+    setStyle();
 }
 
 /*----------------------------------------------------------------------
@@ -636,8 +657,19 @@ MainWindow::toggleSidebar()
 void
 MainWindow::showSidebar(bool want)
 {
-    if (want) toolBox->show();
-    else toolBox->hide();
+    static const QIcon hideIcon(":images/toolbar/main/hideside.png");
+    static const QIcon showIcon(":images/toolbar/main/showside.png");
+
+    if (want) {
+        toolBox->show();
+        side->setIcon(hideIcon);
+    } else {
+        toolBox->hide();
+        side->setIcon(showIcon);
+    }
+    showhideSidebar->setChecked(toolBox->isVisible());
+    setStyle();
+
 }
 
 void
@@ -666,6 +698,27 @@ MainWindow::selectWindow(QAction *act)
             break;
         }
     }
+}
+
+void
+MainWindow::toggleStyle()
+{
+    if (!currentWindow) return;
+
+    switch (currentWindow->currentStyle) {
+
+    default:
+    case 0 :
+        currentWindow->setStyle(2);
+        styleAction->setChecked(false);
+        break;
+
+    case 2 :
+        currentWindow->setStyle(0);
+        styleAction->setChecked(true);
+        break;
+    }
+    setStyle();
 }
 
 #ifndef Q_OS_MAC
@@ -964,6 +1017,7 @@ MainWindow::selectAnalysis()
     analWindow->selected(); // tell it!
     currentWindow = analWindow;
     trainTool->getToolbarButtons()->hide();
+    setStyle();
 }
 
 void
@@ -974,6 +1028,7 @@ MainWindow::selectTrain()
     trainWindow->selected(); // tell it!
     currentWindow = trainWindow;
     trainTool->getToolbarButtons()->show();
+    setStyle();
 }
 
 void
@@ -984,6 +1039,7 @@ MainWindow::selectDiary()
     diaryWindow->selected(); // tell it!
     currentWindow = diaryWindow;
     trainTool->getToolbarButtons()->hide();
+    setStyle();
 }
 
 void
@@ -994,10 +1050,23 @@ MainWindow::selectHome()
     homeWindow->selected(); // tell it!
     currentWindow = homeWindow;
     trainTool->getToolbarButtons()->hide();
+    setStyle();
 }
 void
 MainWindow::selectAthlete()
 {
+}
+
+void
+MainWindow::setStyle()
+{
+    static const QIcon tabIcon(":images/toolbar/main/tab.png");
+    static const QIcon tileIcon(":images/toolbar/main/tile.png");
+
+    if (!currentWindow) return;
+
+    styleAction->setChecked(currentWindow->currentStyle == 0);
+    style->setIcon((currentWindow->currentStyle == 0) ? tileIcon : tabIcon);
 }
 
 #ifdef GC_HAVE_LIBOAUTH
