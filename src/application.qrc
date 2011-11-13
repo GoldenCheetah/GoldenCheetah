@@ -1,6 +1,6 @@
 <!DOCTYPE RCC><RCC version="1.0">
  <qresource>
-    <file>images/toolbar/main/fullscreen.png</file>
+    <file>images/toolbar/main/togglefull.png</file>
     <file>images/toolbar/main/hideside.png</file>
     <file>images/toolbar/main/normal.png</file>
     <file>images/toolbar/main/showside.png</file>
