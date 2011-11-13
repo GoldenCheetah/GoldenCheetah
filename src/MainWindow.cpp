@@ -206,6 +206,9 @@ MainWindow::MainWindow(const QDir &home) :
 
     QWidget *lspacer = new QWidget(this);
     QHBoxLayout *lspacerLayout = new QHBoxLayout(lspacer);
+    lspacerLayout->setSpacing(0);
+    lspacerLayout->setContentsMargins(0,0,0,0);
+    lspacerLayout->addStretch();
     lspacer->setFixedWidth(100);
     lspacer->setContentsMargins(0,0,0,0);
     lspacer->setFocusPolicy(Qt::NoFocus);
@@ -217,6 +220,7 @@ MainWindow::MainWindow(const QDir &home) :
     side = new QPushButton(hideIcon, "", this);
     side->setFocusPolicy(Qt::NoFocus);
     side->setIconSize(QSize(15,15));
+    side->setFixedWidth(20);
     side->setAutoFillBackground(false);
     side->setAutoDefault(false);
     side->setFlat(true);
@@ -230,6 +234,7 @@ MainWindow::MainWindow(const QDir &home) :
     style->setIconSize(QSize(15,15));
     style->setAutoFillBackground(false);
     style->setAutoDefault(false);
+    style->setFixedWidth(20);
     style->setFlat(true);
     style->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     lspacerLayout->addWidget(style);
@@ -241,12 +246,13 @@ MainWindow::MainWindow(const QDir &home) :
     full->setIconSize(QSize(15,15));
     full->setAutoFillBackground(false);
     full->setAutoDefault(false);
+    full->setFixedWidth(20);
     full->setFlat(true);
     full->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     lspacerLayout->addWidget(full);
-    lspacerLayout->addStretch();
     connect(full, SIGNAL(clicked()), this, SLOT(toggleFullScreen()));
 #endif
+    lspacerLayout->addStretch();
 
     trainTool = new TrainTool(this, home);
     trainTool->hide();
