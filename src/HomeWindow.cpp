@@ -118,7 +118,7 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
 
     // each style has its own container widget
     QWidget *tabArea = new QWidget(this);
-    tabArea->setContentsMargins(20,0,20,20);
+    tabArea->setContentsMargins(20,20,20,20);
     //tabArea->setAutoFillBackground(false);
     //tabArea->setPalette(palette);
     //tabArea->setFrameStyle(QFrame::NoFrame);
