@@ -107,6 +107,7 @@ MainWindow::MainWindow(const QDir &home) :
     static const QIcon showIcon(":images/toolbar/main/showside.png");
     static const QIcon tabIcon(":images/toolbar/main/tab.png");
     static const QIcon tileIcon(":images/toolbar/main/tile.png");
+    static const QIcon fullIcon(":images/toolbar/main/togglefull.png");
 
     mainwindows.append(this); // add us to the list of open windows
 
@@ -212,10 +213,10 @@ MainWindow::MainWindow(const QDir &home) :
     lspacer->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     toolbar->addWidget(lspacer);
 
-    // show hide sidbar
+    // show hide sidebar
     side = new QPushButton(hideIcon, "", this);
     side->setFocusPolicy(Qt::NoFocus);
-    side->setIconSize(QSize(10,10));
+    side->setIconSize(QSize(15,15));
     side->setAutoFillBackground(false);
     side->setAutoDefault(false);
     side->setFlat(true);
@@ -223,16 +224,29 @@ MainWindow::MainWindow(const QDir &home) :
     lspacerLayout->addWidget(side);
     connect(side, SIGNAL(clicked()), this, SLOT(toggleSidebar()));
 
+    // switch tab/tile
     style = new QPushButton(tabIcon, "", this);
     style->setFocusPolicy(Qt::NoFocus);
-    style->setIconSize(QSize(10,10));
+    style->setIconSize(QSize(15,15));
     style->setAutoFillBackground(false);
     style->setAutoDefault(false);
     style->setFlat(true);
     style->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     lspacerLayout->addWidget(style);
-    lspacerLayout->addStretch();
     connect(style, SIGNAL(clicked()), this, SLOT(toggleStyle()));
+
+#ifndef Q_OS_MAC // full screen is in title bar on a Mac
+    full = new QPushButton(fullIcon, "", this);
+    full->setFocusPolicy(Qt::NoFocus);
+    full->setIconSize(QSize(15,15));
+    full->setAutoFillBackground(false);
+    full->setAutoDefault(false);
+    full->setFlat(true);
+    full->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    lspacerLayout->addWidget(full);
+    lspacerLayout->addStretch();
+    connect(full, SIGNAL(clicked()), this, SLOT(toggleFullScreen()));
+#endif
 
     trainTool = new TrainTool(this, home);
     trainTool->hide();

@@ -310,7 +310,7 @@ class MainWindow : public QMainWindow
         QAction *showhideSidebar;
 
         // toolbar butttons
-        QPushButton *side, *style;
+        QPushButton *side, *style, *full;
 
         QStackedWidget *views;
         QAction *sideView;
