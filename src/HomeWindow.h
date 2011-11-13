@@ -47,6 +47,9 @@ class HomeWindow : public GcWindow
 
         void resetLayout();
 
+        void setStyle(int style) { styleChanged(style); }
+        int currentStyle;
+
     public slots:
 
         // GC signals
@@ -101,8 +104,6 @@ class HomeWindow : public GcWindow
 #else
         QComboBox *styleSelector;
 #endif
-        int currentStyle;
-
         QStackedWidget *style; // tab, freeform, tiled
         QStackedWidget *controlStack; // window controls
 
