@@ -97,7 +97,6 @@ class TrainTool : public GcWindow
         // was realtimewindow,merged into tool
         // update charts/dials and manage controller
         void updateData(RealtimeData &);      // to update telemetry by push devices
-        void newLap();                      // start new Lap!
         void nextDisplayMode();     // show next display mode
         void setDeviceController();     // based upon selected device
         void setStreamController();     // based upon selected device
@@ -135,6 +134,7 @@ class TrainTool : public GcWindow
         void FFwdLap();     // jump forward to next Lap marker
         void Higher();      // set load/gradient higher
         void Lower();       // set load/gradient higher
+        void newLap();      // start new Lap!
 
         // Timed actions
         void guiUpdate();           // refreshes the telemetry
