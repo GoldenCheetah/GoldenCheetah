@@ -151,6 +151,16 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     forward->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     toolbuttons->addWidget(forward);
 
+    QIcon lapIcon(":images/oxygen/lap.png");
+    QPushButton *lap = new QPushButton(lapIcon, "", this);
+    lap->setFocusPolicy(Qt::NoFocus);
+    lap->setIconSize(QSize(20,20));
+    lap->setAutoFillBackground(false);
+    lap->setAutoDefault(false);
+    lap->setFlat(true);
+    lap->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    toolbuttons->addWidget(lap);
+
     intensitySlider = new QSlider(Qt::Horizontal, this);
     intensitySlider->setAutoFillBackground(false);
     intensitySlider->setFocusPolicy(Qt::NoFocus);
@@ -191,6 +201,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     connect(stop, SIGNAL(clicked()), this, SLOT(Stop()));
     connect(forward, SIGNAL(clicked()), this, SLOT(FFwd()));
     connect(rewind, SIGNAL(clicked()), this, SLOT(Rewind()));
+    connect(lap, SIGNAL(clicked()), this, SLOT(newLap()));
     connect(intensitySlider, SIGNAL(valueChanged(int)), this, SLOT(adjustIntensity()));
 
     // not used but kept in case re-instated in the future
@@ -887,17 +898,21 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
 // can be called from the controller - when user presses "Lap" button
 void TrainTool::newLap()
 {
-    displayLap++;
+    if (deviceController == NULL) return;
 
-    pwrcount  = 0;
-    cadcount  = 0;
-    hrcount   = 0;
-    spdcount  = 0;
+    if ((status&RT_RUNNING) == RT_RUNNING) {
+        displayLap++;
 
-    lap_time.restart();
-    lap_elapsed_msec = 0;
+        pwrcount  = 0;
+        cadcount  = 0;
+        hrcount   = 0;
+        spdcount  = 0;
 
-    main->notifyNewLap();
+        lap_time.restart();
+        lap_elapsed_msec = 0;
+
+        main->notifyNewLap();
+    }
 }
 
 // can be called from the controller
