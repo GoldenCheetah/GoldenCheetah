@@ -136,10 +136,10 @@ void ErgFile::parseTacx()
                     input>>general.brakeCategory;
                     switch (general.wattSlopePulse) {
                     case 0 :
-                        format = ERG;
+                        mode = format = ERG;
                         break;
                     case 1 :
-                        format = CRS;
+                        mode = format = CRS;
                         break;
                     default:
                         happy = false;
