@@ -97,19 +97,22 @@ CalendarDownload::downloadFinished(QNetworkReply *reply)
         remoteCacheFile.close();
 
     } else {
-        QMessageBox msgBox;
-        msgBox.setText("Remote Calendar not available, reverting to cached workouts.");
-        msgBox.setIcon(QMessageBox::Information);
-        msgBox.exec();
 
-        // read cache
-        // read in the whole thing
-        remoteCacheFile.open(QFile::ReadOnly | QFile::Text);
-        QTextStream in(&remoteCacheFile);
-        fulltext = in.readAll();
-        remoteCacheFile.close();
+        if (remoteCacheFile.exists()) {
+            QMessageBox msgBox;
+            msgBox.setText("Remote Calendar not available, reverting to cached workouts.");
+            msgBox.setIcon(QMessageBox::Information);
+            msgBox.exec();
+
+            // read cache
+            // read in the whole thing
+            remoteCacheFile.open(QFile::ReadOnly | QFile::Text);
+            QTextStream in(&remoteCacheFile);
+            fulltext = in.readAll();
+            remoteCacheFile.close();
+        }
     }
 
-    main->rideCalendar->refreshRemote(fulltext);
+    if (fulltext != "") main->rideCalendar->refreshRemote(fulltext);
 #endif
 }
