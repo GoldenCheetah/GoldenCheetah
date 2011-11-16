@@ -174,6 +174,7 @@ ErgFilePlot::ErgFilePlot(MainWindow *main) : main(main)
     NowCurve->setYAxis(QwtPlot::yLeft);
 
     bydist = false;
+    ergFile = NULL;
 
     setAutoReplot(false);
 }
