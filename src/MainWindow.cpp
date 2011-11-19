@@ -184,6 +184,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     // Metadata fields
     _rideMetadata = new RideMetadata(this,true);
+    _rideMetadata->hide();
     metricDB = new MetricAggregator(this, home, zones(), hrZones()); // just to catch config updates!
     metricDB->refreshMetrics();
 
@@ -474,7 +475,6 @@ MainWindow::MainWindow(const QDir &home) :
 
     // POPULATE TOOLBOX
     toolBox->addItem(listView, QIcon(":images/activity.png"), "Activity History");
-    toolBox->addItem(_rideMetadata, QIcon(":images/metadata.png"), "Activity Details");
     toolBox->addItem(intervalSplitter, QIcon(":images/stopwatch.png"), "Activity Intervals");
     toolBox->addItem(trainTool->controls(), QIcon(":images/library.png"), "Workout Library");
     toolBox->addItem(masterControls, QIcon(":images/settings.png"), "Chart Settings");
