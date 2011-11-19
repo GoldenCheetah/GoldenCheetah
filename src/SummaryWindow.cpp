@@ -26,6 +26,7 @@ SummaryWindow::SummaryWindow(MainWindow *mainWindow) :
     setRideItem(NULL);
 
     splitter = new QSplitter(Qt::Vertical, this);
+    splitter->setHandleWidth(1);
     QVBoxLayout *vlayout = new QVBoxLayout(this);
     vlayout->setSpacing(0);
     vlayout->setContentsMargins(1,1,1,1);
