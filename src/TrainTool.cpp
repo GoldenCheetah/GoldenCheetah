@@ -169,6 +169,15 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     intensitySlider->setValue(100);
     toolbuttons->addWidget(intensitySlider);
 
+#ifdef Q_OS_MAC
+    QWindowsStyle *macstyler = new QWindowsStyle();
+    play->setStyle(macstyler);
+    stop->setStyle(macstyler);
+    rewind->setStyle(macstyler);
+    forward->setStyle(macstyler);
+    lap->setStyle(macstyler);
+#endif
+
     QPalette pal;
     stress = new QLabel(this);
     stress->setAutoFillBackground(false);

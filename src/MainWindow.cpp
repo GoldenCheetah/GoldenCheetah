@@ -137,6 +137,8 @@ MainWindow::MainWindow(const QDir &home) :
     QVariant unit = appsettings->value(this, GC_UNIT);
     useMetricUnits = (unit.toString() == "Metric");
 
+    fullScreen = NULL;
+
 #if (defined Q_OS_MAC) && (defined GC_HAVE_LION)
     fullScreen = new LionFullScreen(this);
 #endif
@@ -331,6 +333,12 @@ MainWindow::MainWindow(const QDir &home) :
     connect(chartMenu, SIGNAL(aboutToShow()), this, SLOT(setChartMenu()));
     connect(chartMenu, SIGNAL(triggered(QAction*)), this, SLOT(addChart(QAction*)));
 
+#ifdef Q_OS_MAC
+    QWindowsStyle *macstyler = new QWindowsStyle();
+    side->setStyle(macstyler);
+    style->setStyle(macstyler);
+    newchart->setStyle(macstyler);
+#endif
     /*----------------------------------------------------------------------
      * Sidebar
      *--------------------------------------------------------------------*/
@@ -804,7 +812,8 @@ MainWindow::toggleStyle()
 void
 MainWindow::toggleFullScreen()
 {
-    fullScreen->toggle();
+    if (fullScreen) fullScreen->toggle();
+    else qDebug()<<"no fullscreen support compiled in."
 }
 #endif
 void
