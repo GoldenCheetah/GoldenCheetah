@@ -813,7 +813,7 @@ void
 MainWindow::toggleFullScreen()
 {
     if (fullScreen) fullScreen->toggle();
-    else qDebug()<<"no fullscreen support compiled in."
+    else qDebug()<<"no fullscreen support compiled in.";
 }
 #endif
 void
