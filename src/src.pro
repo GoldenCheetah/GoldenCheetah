@@ -125,7 +125,7 @@ qwt3d {
 macx {
     LIBS += -lobjc -framework Carbon -framework IOKit -framework AppKit -framework QTKit
     HEADERS += QtMacSegmentedButton.h QtMacVideoWindow.h LionFullScreen.h
-    SOURCES += QtMacSegmentedButton.mm QtMacVideoWindow.mm LionFullScreen.mm
+    OBJECTIVE_SOURCES += QtMacSegmentedButton.mm QtMacVideoWindow.mm LionFullScreen.mm
 } else {
     # not a mac? then F12 to toggle full screen using
     # standard QT showFullScreen / showNormal
