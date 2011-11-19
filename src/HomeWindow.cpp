@@ -418,6 +418,44 @@ HomeWindow::dragEnterEvent(QDragEnterEvent *event)
 }
 
 void
+HomeWindow::appendChart(GcWinID id)
+{
+    GcWindow *newone = GcWindowRegistry::newGcWindow(id, mainWindow);
+    for(int i=0; GcWindows[i].relevance; i++) {
+        if (GcWindows[i].id == id) {
+            newone->setProperty("title", GcWindows[i].name);
+            break;
+        }
+    }
+    newone->setProperty("widthFactor", (double)2.0);
+    newone->setProperty("heightFactor", (double)2.0);
+    newone->setProperty("GcWinID", id);
+    if (currentStyle == 2) newone->setResizable(true);
+    addChart(newone);
+    newone->show();
+    newone->setProperty("ride", property("ride"));
+    resizeEvent(NULL);
+#if 0
+    // GcWindowDialog is delete on close, so no need to delete
+    GcWindowDialog *f = new GcWindowDialog(GcWindows[i].id, mainWindow);
+    GcWindow *newone = f->exec();
+
+    // returns null if cancelled or closed
+    if (newone) {
+        addChart(newone);
+        newone->show();
+    }
+
+    // now wipe it
+    delete f;
+#endif
+
+    // before we return lets turn the cursor off
+    chartCursor = -2;
+    winWidget->repaint();
+}
+
+void
 HomeWindow::dropEvent(QDropEvent *event)
 {
     QStandardItemModel model;
@@ -431,35 +469,7 @@ HomeWindow::dropEvent(QDropEvent *event)
         if (GcWindows[i].name == chart) {
 
             event->accept();
-
-            GcWindow *newone = GcWindowRegistry::newGcWindow(GcWindows[i].id, mainWindow);
-            newone->setProperty("title", GcWindows[i].name);
-            newone->setProperty("widthFactor", (double)2.0);
-            newone->setProperty("heightFactor", (double)2.0);
-            newone->setProperty("GcWinID", GcWindows[i].id);
-            if (currentStyle == 2) newone->setResizable(true);
-            addChart(newone);
-            newone->show();
-            newone->setProperty("ride", property("ride"));
-            resizeEvent(NULL);
-#if 0
-            // GcWindowDialog is delete on close, so no need to delete
-            GcWindowDialog *f = new GcWindowDialog(GcWindows[i].id, mainWindow);
-            GcWindow *newone = f->exec();
-
-            // returns null if cancelled or closed
-            if (newone) {
-                addChart(newone);
-                newone->show();
-            }
-
-            // now wipe it
-            delete f;
-#endif
-
-            // before we return lets turn the cursor off
-            chartCursor = -2;
-            winWidget->repaint();
+            appendChart(GcWindows[i].id);
             return;
         }
     }

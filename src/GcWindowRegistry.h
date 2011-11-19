@@ -60,7 +60,14 @@ enum gcwinid {
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;
 
+// when declaring a window, what view is it relevant for?
+#define VIEW_TRAIN    0x01
+#define VIEW_ANALYSIS 0x02
+#define VIEW_DIARY    0x04
+#define VIEW_HOME     0x08
+
 struct GcWindowRegistry {
+    unsigned int relevance;
     QString name;
     GcWinID id;
 

@@ -55,35 +55,40 @@
 #include "WorkoutPlotWindow.h"
 #include "BingMap.h"
 
+#define VIEW_TRAIN    0x01
+#define VIEW_ANALYSIS 0x02
+#define VIEW_DIARY    0x04
+#define VIEW_HOME     0x08
+
 GcWindowRegistry GcWindows[] = {
     // name                     GcWinID
-    { "Calendar",GcWindowTypes::Diary },
-    { "Navigator", GcWindowTypes::ActivityNavigator },
-    { "Summary",GcWindowTypes::RideSummary },
-    { "Details",GcWindowTypes::MetadataWindow },
-    { "Editor",GcWindowTypes::RideEditor },
-    { "Summary & Details",GcWindowTypes::Summary },
-    { "Performance",GcWindowTypes::AllPlot },
-    { "Pedal Force vs Velocity",GcWindowTypes::PfPv },
-    { "Critical Mean Maximals",GcWindowTypes::CriticalPower },
-    { "Histogram",GcWindowTypes::Histogram },
-    { "Google Map",GcWindowTypes::GoogleMap },
-    { "Bing Map",GcWindowTypes::BingMap },
-    { "2d Plot",GcWindowTypes::Scatter },
-    { "3d Plot",GcWindowTypes::Model },
-    { "Heartrate vs Power",GcWindowTypes::HrPw },
-    { "Weekly Summary",GcWindowTypes::WeeklySummary },
-    { "Long Term Metrics",GcWindowTypes::LTM },
-    { "Performance Manager",GcWindowTypes::PerformanceManager },
-    { "Collection TreeMap",GcWindowTypes::TreeMap },
-    { "Aerolab Chung Analysis",GcWindowTypes::Aerolab },
-    { "Realtime Dial",GcWindowTypes::DialWindow },
-    { "Realtime Plot",GcWindowTypes::RealtimePlot },
-    { "Workout Plot",GcWindowTypes::WorkoutPlot },
-    { "Train Map Window", GcWindowTypes::MapWindow },
-    { "Train StreetView Window", GcWindowTypes::StreetViewWindow },
-    { "Video Player",GcWindowTypes::VideoPlayer },
-    { "", GcWindowTypes::None }};
+    { VIEW_DIARY, "Calendar",GcWindowTypes::Diary },
+    { VIEW_DIARY, "Navigator", GcWindowTypes::ActivityNavigator },
+    { VIEW_ANALYSIS, "Summary",GcWindowTypes::RideSummary },
+    { VIEW_ANALYSIS, "Details",GcWindowTypes::MetadataWindow },
+    { VIEW_ANALYSIS, "Editor",GcWindowTypes::RideEditor },
+    { VIEW_ANALYSIS, "Summary and Details",GcWindowTypes::Summary },
+    { VIEW_HOME,  "Performance",GcWindowTypes::AllPlot },
+    { VIEW_ANALYSIS,  "Pedal Force vs Velocity",GcWindowTypes::PfPv },
+    { VIEW_ANALYSIS|VIEW_HOME,  "Critical Mean Maximals",GcWindowTypes::CriticalPower },
+    { VIEW_ANALYSIS|VIEW_HOME,  "Histogram",GcWindowTypes::Histogram },
+    { VIEW_ANALYSIS,  "Google Map",GcWindowTypes::GoogleMap },
+    { VIEW_ANALYSIS,  "Bing Map",GcWindowTypes::BingMap },
+    { VIEW_ANALYSIS,  "2d Plot",GcWindowTypes::Scatter },
+    { VIEW_ANALYSIS,  "3d Plot",GcWindowTypes::Model },
+    { VIEW_ANALYSIS,  "Heartrate vs Power",GcWindowTypes::HrPw },
+    { VIEW_ANALYSIS|VIEW_HOME,  "Weekly Summary",GcWindowTypes::WeeklySummary },
+    { VIEW_HOME, "Long Term Metrics",GcWindowTypes::LTM },
+    { VIEW_HOME, "Performance Manager",GcWindowTypes::PerformanceManager },
+    { VIEW_HOME, "Collection TreeMap",GcWindowTypes::TreeMap },
+    { VIEW_ANALYSIS, "Aerolab Chung Analysis",GcWindowTypes::Aerolab },
+    { VIEW_TRAIN, "Telemetry Dial",GcWindowTypes::DialWindow },
+    { VIEW_TRAIN, "Realtime Plot",GcWindowTypes::RealtimePlot },
+    { VIEW_TRAIN, "Workout Plot",GcWindowTypes::WorkoutPlot },
+    { VIEW_TRAIN, "Map", GcWindowTypes::MapWindow },
+    { VIEW_TRAIN, "StreetView", GcWindowTypes::StreetViewWindow },
+    { VIEW_TRAIN, "Video Player",GcWindowTypes::VideoPlayer },
+    { 0, "", GcWindowTypes::None }};
 
 // instantiate a new window
 GcWindow *

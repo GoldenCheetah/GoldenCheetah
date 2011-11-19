@@ -307,7 +307,28 @@ MainWindow::MainWindow(const QDir &home) :
     rspacer->setFocusPolicy(Qt::NoFocus);
     rspacer->setAutoFillBackground(false);
     rspacer->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    QHBoxLayout *rspacerLayout = new QHBoxLayout(rspacer);
+    rspacerLayout->addStretch();
     toolbar->addWidget(rspacer);
+
+    // add chart button with a menu
+    chartMenu = new QMenu(this);
+    
+    QIcon chartIcon(":images/addchart.png");
+    QPushButton *newchart = new QPushButton(chartIcon, "", this);
+    newchart->setFocusPolicy(Qt::NoFocus);
+    newchart->setIconSize(QSize(15,15));
+    newchart->setAutoFillBackground(false);
+    newchart->setAutoDefault(false);
+    newchart->setFixedWidth(20);
+    newchart->setFlat(true);
+    newchart->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    newchart->setMenu(chartMenu);
+    rspacerLayout->addStretch();
+    rspacerLayout->addWidget(newchart);
+
+    connect(chartMenu, SIGNAL(aboutToShow()), this, SLOT(setChartMenu()));
+    connect(chartMenu, SIGNAL(triggered(QAction*)), this, SLOT(addChart(QAction*)));
 
     /*----------------------------------------------------------------------
      * Sidebar
@@ -383,8 +404,10 @@ MainWindow::MainWindow(const QDir &home) :
 
     splitter = new QSplitter;
 
+#if 0 // moved to toolbar, keep code in case we change our mind
     // CHARTS
     chartTool = new GcWindowTool(this);
+#endif
 
     // TOOLBOX
     toolBox = new QToolBox(this);
@@ -458,7 +481,10 @@ MainWindow::MainWindow(const QDir &home) :
 #if 0 // XXX NOT YET IMPLEMENTED
     toolBox->addItem(new AthleteTool(QFileInfo(home.path()).path(), this), QIcon(":images/toolbar/main/athlete.png"), "Athletes");
 #endif
+
+#if 0 // moved to toolbar, keep code in case we change our mind
     toolBox->addItem(chartTool, QIcon(":images/addchart.png"), "Charts");
+#endif
 
 
     /*----------------------------------------------------------------------
@@ -697,6 +723,39 @@ MainWindow::showToolbar(bool want)
 {
     if (want) toolbar->show();
     else toolbar->hide();
+}
+
+void
+MainWindow::setChartMenu()
+{
+    unsigned int mask;
+    // called when chart menu about to be shown
+    // setup to only show charts that are relevant
+    // to this view
+    if (currentWindow == analWindow) mask = VIEW_ANALYSIS;
+    if (currentWindow == trainWindow) mask = VIEW_TRAIN;
+    if (currentWindow == diaryWindow) mask = VIEW_DIARY;
+    if (currentWindow == homeWindow) mask = VIEW_HOME;
+
+    chartMenu->clear();
+    for(int i=0; GcWindows[i].relevance; i++) {
+        if (GcWindows[i].relevance & mask) 
+            chartMenu->addAction(GcWindows[i].name);
+    }
+}
+
+void
+MainWindow::addChart(QAction*action)
+{
+    GcWinID id = GcWindowTypes::None;
+    for (int i=0; GcWindows[i].relevance; i++) {
+        if (GcWindows[i].name == action->text()) {
+            id = GcWindows[i].id;
+            break;
+        }
+    }
+    if (id != GcWindowTypes::None)
+        currentWindow->appendChart(id); // called from MainWindow to inset chart
 }
 
 void

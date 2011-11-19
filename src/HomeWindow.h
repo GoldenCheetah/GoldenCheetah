@@ -68,6 +68,7 @@ class HomeWindow : public GcWindow
         // My widget signals and events
         void styleChanged(int);
         void addChart(GcWindow* newone);
+        void appendChart(GcWinID id); // called from MainWindow to inset chart
         bool removeChart(int, bool confirm = true);
         void titleChanged();
 
