@@ -280,6 +280,9 @@ class MainWindow : public QMainWindow
         void setWindowMenu();
         void selectWindow(QAction*);
 
+        void setChartMenu();
+        void addChart(QAction*);
+
         void toggleStyle();
         void setStyle();
         void showDock();
@@ -311,6 +314,7 @@ class MainWindow : public QMainWindow
 
         // toolbar butttons
         QPushButton *side, *style, *full;
+        QMenu *chartMenu;
 
         QStackedWidget *views;
         QAction *sideView;
