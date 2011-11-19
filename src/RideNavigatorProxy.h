@@ -172,7 +172,10 @@ public:
             return QModelIndex();
         } else {
             QModelIndex *p = new QModelIndex(createIndex(groupNo, 0, (void*)NULL));
-            return createIndex(sourceRowToGroupRow[sourceIndex.row()], sourceIndex.column()+1, &p); // accomodate virtual column
+            if (sourceIndex.row() > 0 && sourceIndex.row() < sourceRowToGroupRow.size())
+                return createIndex(sourceRowToGroupRow[sourceIndex.row()], sourceIndex.column()+1, &p); // accomodate virtual column
+            else
+                return QModelIndex();
         }
     }
 
