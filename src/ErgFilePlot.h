@@ -99,10 +99,10 @@ public:
     virtual QwtText label(double v) const { if (v<1000) return QString("%1").arg(v/1000, 0, 'g', 1);
                                             else return QString("%1").arg(round(v/1000)); }
 };
-class TimeScaleDraw: public QwtScaleDraw
+class HourTimeScaleDraw: public QwtScaleDraw
 {
 public:
-    TimeScaleDraw() { }
+    HourTimeScaleDraw() { }
 
     virtual QwtText label(double v) const { return QString("%1").arg(round(v/60000)); }
 };
@@ -156,7 +156,7 @@ class ErgFilePlot : public QwtPlot
     NowData *nowData;
 
     DistScaleDraw *distdraw;
-    TimeScaleDraw *timedraw;
+    HourTimeScaleDraw *timedraw;
 
     ErgFilePlot();
 
