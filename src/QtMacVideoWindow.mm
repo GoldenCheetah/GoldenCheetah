@@ -181,9 +181,6 @@ MediaHelper::listMedia(QDir dir)
     return returning;
 }
 
-#include "QtMacSegmentedButton.h"
-static CocoaInitializer cocoaInitializer; 
-
 QtMacMovieView::QtMacMovieView (QWidget *parent) : QMacCocoaViewContainer (0, parent)
 {
     NSRect frame;
