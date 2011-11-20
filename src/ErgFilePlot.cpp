@@ -85,7 +85,7 @@ ErgFilePlot::ErgFilePlot(MainWindow *main) : main(main)
     enableAxis(xBottom, true);
     distdraw = new DistScaleDraw;
     distdraw->setTickLength(QwtScaleDiv::MajorTick, 3);
-    timedraw = new TimeScaleDraw;
+    timedraw = new HourTimeScaleDraw;
     timedraw->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisMaxMinor(xBottom, 0);
     setAxisScaleDraw(QwtPlot::xBottom, timedraw);
@@ -286,7 +286,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
 
                 // only allocate a new one if its not the current (they get freed by Qwt)
                 if (axisScaleDraw(xBottom) != timedraw)
-                    setAxisScaleDraw(QwtPlot::xBottom, (timedraw=new TimeScaleDraw()));
+                    setAxisScaleDraw(QwtPlot::xBottom, (timedraw=new HourTimeScaleDraw()));
             }
         }
 
@@ -307,7 +307,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
 
         // set the axis so we default to an hour workout
         if (axisScaleDraw(xBottom) != timedraw)
-            setAxisScaleDraw(QwtPlot::xBottom, (timedraw=new TimeScaleDraw()));
+            setAxisScaleDraw(QwtPlot::xBottom, (timedraw=new HourTimeScaleDraw()));
         setAxisScale(xBottom, (double)0, 1000 * 60 * 60, 15*60*1000);
     }
 }
