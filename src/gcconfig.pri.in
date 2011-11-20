@@ -139,6 +139,6 @@ macx {
     #CONFIG+=x86 ppc
 
     # Uncomment this line if you have SDK 10.7 or higher
-    DEFINES += -DGC_HAVE_LION
+    DEFINES += GC_HAVE_LION
 }
 

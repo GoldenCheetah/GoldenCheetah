@@ -137,8 +137,6 @@ MainWindow::MainWindow(const QDir &home) :
     QVariant unit = appsettings->value(this, GC_UNIT);
     useMetricUnits = (unit.toString() == "Metric");
 
-    fullScreen = NULL;
-
 #if (defined Q_OS_MAC) && (defined GC_HAVE_LION)
     fullScreen = new LionFullScreen(this);
 #endif
