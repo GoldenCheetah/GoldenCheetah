@@ -25,6 +25,9 @@
 #include <QtGui>
 #include <QString>
 
+// for strtod
+#include <stdlib.h>
+
 // used to make a lookup string for row/col anomalies
 static QString xsstring(int x, RideFile::SeriesType series)
 {
@@ -820,7 +823,11 @@ RideEditor::getPaste(QVector<QVector<double> >&cells, QStringList &seps, QString
             cells.resize(row+1);
             foreach (QString token, line.split(sep)) {
                 cells[row].resize(col+1);
-                cells[row][col] = token.toDouble();
+
+                // use strtod to get better precision
+                char *p;
+                cells[row][col] = strtod(token.toLatin1(), &p);
+
                 col++;
 
                 // if there are more cols than in the
