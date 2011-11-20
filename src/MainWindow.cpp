@@ -214,7 +214,6 @@ MainWindow::MainWindow(const QDir &home) :
     lspacer->setContentsMargins(0,0,0,0);
     lspacer->setFocusPolicy(Qt::NoFocus);
     lspacer->setAutoFillBackground(false);
-    lspacer->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     toolbar->addWidget(lspacer);
 
     // show hide sidebar
@@ -222,34 +221,34 @@ MainWindow::MainWindow(const QDir &home) :
     side->setFocusPolicy(Qt::NoFocus);
     side->setIconSize(QSize(15,15));
     side->setFixedWidth(20);
+    side->setToolTip("Show/Hide Sidebar");
     side->setAutoFillBackground(false);
     side->setAutoDefault(false);
     side->setFlat(true);
-    side->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     lspacerLayout->addWidget(side);
     connect(side, SIGNAL(clicked()), this, SLOT(toggleSidebar()));
 
     // switch tab/tile
     style = new QPushButton(tabIcon, "", this);
     style->setFocusPolicy(Qt::NoFocus);
+    style->setToolTip("Toggle Tabbed Mode");
     style->setIconSize(QSize(15,15));
     style->setAutoFillBackground(false);
     style->setAutoDefault(false);
     style->setFixedWidth(20);
     style->setFlat(true);
-    style->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     lspacerLayout->addWidget(style);
     connect(style, SIGNAL(clicked()), this, SLOT(toggleStyle()));
 
 #ifndef Q_OS_MAC // full screen is in title bar on a Mac
     full = new QPushButton(fullIcon, "", this);
     full->setFocusPolicy(Qt::NoFocus);
+    full->setToolTip("Toggle Full Screen");
     full->setIconSize(QSize(15,15));
     full->setAutoFillBackground(false);
     full->setAutoDefault(false);
     full->setFixedWidth(20);
     full->setFlat(true);
-    full->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     lspacerLayout->addWidget(full);
     connect(full, SIGNAL(clicked()), this, SLOT(toggleFullScreen()));
 #endif
@@ -307,7 +306,6 @@ MainWindow::MainWindow(const QDir &home) :
     rspacer->setContentsMargins(0,0,0,0);
     rspacer->setFocusPolicy(Qt::NoFocus);
     rspacer->setAutoFillBackground(false);
-    rspacer->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     QHBoxLayout *rspacerLayout = new QHBoxLayout(rspacer);
     rspacerLayout->addStretch();
     toolbar->addWidget(rspacer);
@@ -318,12 +316,12 @@ MainWindow::MainWindow(const QDir &home) :
     QIcon chartIcon(":images/addchart.png");
     QPushButton *newchart = new QPushButton(chartIcon, "", this);
     newchart->setFocusPolicy(Qt::NoFocus);
+    newchart->setToolTip("Add Chart");
     newchart->setIconSize(QSize(15,15));
     newchart->setAutoFillBackground(false);
     newchart->setAutoDefault(false);
     newchart->setFixedWidth(20);
     newchart->setFlat(true);
-    newchart->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     newchart->setMenu(chartMenu);
     rspacerLayout->addStretch();
     rspacerLayout->addWidget(newchart);
