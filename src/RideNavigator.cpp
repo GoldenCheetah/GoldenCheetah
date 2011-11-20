@@ -365,7 +365,8 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
     // if in doubt hide the tooltip, but paint events are
     // always generated in the viewport when the popup is shown
     // so we ignore those
-    if (e->type() != QEvent::ToolTip && e->type() != QEvent::Paint && e->type() != QEvent::Destroy) {
+    if (e->type() != QEvent::ToolTip && e->type() != QEvent::Paint &&
+        e->type() != QEvent::WinIdChange && e->type() != QEvent::Destroy) {
         main->setBubble("");
     }
 
