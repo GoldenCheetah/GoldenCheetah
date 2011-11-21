@@ -81,9 +81,10 @@ DBAccess::initDatabase(QDir home)
     sessionid = QString("%1%2").arg(cyclist).arg(main->session++);
 
     if (main->session == 1) {
-        // first
+        // use different name for v3 metricDB to avoid constant rebuilding
+        // when switching between v2 stable and v3 development builds
         main->db = QSqlDatabase::addDatabase("QSQLITE", sessionid);
-        main->db.setDatabaseName(home.absolutePath() + "/metricDB");
+        main->db.setDatabaseName(home.absolutePath() + "/metricDBv3"); 
         //dbconn = db.database(QString("GC"));
         dbconn = main->db.database(sessionid);
     } else {
