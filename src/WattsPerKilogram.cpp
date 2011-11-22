@@ -46,6 +46,37 @@ getWeight(const MainWindow *main, const RideFile *ride)
     return appsettings->cvalue(main->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
 }
 
+class AverageWPK : public RideMetric {
+
+    public:
+
+    AverageWPK()
+    {
+        setSymbol("average_wpk");
+        setName(tr("Watts Per Kilogram"));
+        setType(RideMetric::Average);
+        setMetricUnits(tr("wpk"));
+        setImperialUnits(tr("wpk"));
+        setPrecision(1);
+    }
+
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &deps,
+                 const MainWindow *main) {
+
+        // get thos dependencies
+        double secs = deps.value("workout_time")->value(true);
+        double weight = getWeight(main, ride);
+        double ap = deps.value("average_power")->value(true);
+
+        // calclate watts per kilo
+        setCount(secs);
+        setValue((secs && ap && weight) ? ap/weight : 0);
+    }
+    RideMetric *clone() const { return new AverageWPK(*this); }
+};
+
 class PeakWPK : public RideMetric {
     double wpk;
     double secs;
@@ -248,6 +279,10 @@ static bool addAllWPK() {
     QVector<QString> deps;
     deps.append("5m_peak_wpk");
     RideMetricFactory::instance().addMetric(Vo2max(), &deps);
+    deps.clear();
+    deps.append("average_power");
+    deps.append("workout_time");
+    RideMetricFactory::instance().addMetric(AverageWPK(), &deps);
     return true;
 }
 
