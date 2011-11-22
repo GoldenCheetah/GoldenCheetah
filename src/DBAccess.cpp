@@ -46,8 +46,9 @@
 // Rev Date         Who                What Changed
 // 29  5th Sep 2011 Mark Liversedge    Added color to the ride fields
 // 30  8th Sep 2011 Mark Liversedge    Metadata 'data' field for data present string
-//
-static int DBSchemaVersion = 30;
+// 31  22  Nov 2011 Mark Liversedge    Added Average WPK metric
+
+static int DBSchemaVersion = 31;
 
 DBAccess::DBAccess(MainWindow* main, QDir home) : main(main), home(home)
 {
