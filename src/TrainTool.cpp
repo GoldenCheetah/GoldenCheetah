@@ -257,6 +257,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     deviceController = NULL;
     streamController = NULL;
     ergFile = NULL;
+    calibrating = false;
 
     // metric or imperial?
     QVariant unit = appsettings->value(this, GC_UNIT);
@@ -677,6 +678,7 @@ void TrainTool::Start()       // when start button is pressed
         session_elapsed_msec = 0;
         lap_time.start();
         lap_elapsed_msec = 0;
+        calibrating = false;
 
         if (status & RT_WORKOUT) {
             load_timer->start(LOADRATE);      // start recording
@@ -770,6 +772,7 @@ void TrainTool::Stop(int deviceStatus)        // when stop button is pressed
     deviceController = NULL;
 
     gui_timer->stop();
+    calibrating = false;
 
     QDateTime now = QDateTime::currentDateTime();
 
@@ -880,8 +883,10 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
         rtData.setDistance(displayDistance);
 
         // time
-        total_msecs = session_elapsed_msec + session_time.elapsed();
-        lap_msecs = lap_elapsed_msec + lap_time.elapsed();
+        if (!calibrating) { // freeze time whilst calibrating
+            total_msecs = session_elapsed_msec + session_time.elapsed();
+            lap_msecs = lap_elapsed_msec + lap_time.elapsed();
+        }
         rtData.setMsecs(total_msecs);
         rtData.setLapMsecs(lap_msecs);
 
@@ -990,6 +995,8 @@ void TrainTool::diskUpdate()
     long Torq = 0, Altitude = 0;
     QTextStream recordFileStream(recordFile);
 
+    if (calibrating) return;
+
     // convert from milliseconds to minutes
     total_msecs = session_elapsed_msec + session_time.elapsed();
     Minutes = total_msecs;
@@ -1018,6 +1025,10 @@ void TrainTool::loadUpdate()
     int curLap;
     long load;
     double gradient;
+
+    // we hold our horses whilst calibration is taking place...
+    if (calibrating) return;
+
     // the period between loadUpdate calls is not constant, and not exactly LOADRATE,
     // therefore, use a QTime timer to measure the load period
     load_msecs += load_period.restart();
@@ -1051,6 +1062,50 @@ void TrainTool::loadUpdate()
             main->notifySetNow(displayWorkoutDistance * 1000);
         }
     }
+}
+
+void TrainTool::Calibrate()
+{
+    static QProgressDialog *bar=NULL;
+
+    if (deviceController == NULL) return;
+
+    // toggle calibration
+    if (calibrating) {
+        bar->reset(); // will hide...
+
+        // restart gui etc
+        session_time.start();
+        lap_time.start();
+        load_period.restart();
+        if (status & RT_WORKOUT) load_timer->start(LOADRATE);
+        main->notifyUnPause(); // get video started again, amongst other things
+
+        // back to ergo/slope mode
+        if (status&RT_MODE_ERGO) deviceController->setMode(RT_MODE_ERGO);
+        else deviceController->setMode(RT_MODE_SPIN);
+    } else {
+
+        if (bar == NULL) {
+            QString title = tr("Calibrating...\nPress F3 on Controller when done.");
+            bar = new QProgressDialog(title, tr("Done"), 0, 0, this);
+            bar->setWindowModality(Qt::WindowModal);
+            bar->setMinimumDuration(0);
+            bar->setAutoClose(true); // hide when reset
+            connect(bar, SIGNAL(canceled()), this, SLOT(Calibrate()));
+        }
+        bar->show();
+
+        // pause gui/load but keep recording!
+        session_elapsed_msec += session_time.elapsed();
+        lap_elapsed_msec += lap_time.elapsed();
+        if (status & RT_WORKOUT) load_timer->stop();
+        load_msecs += load_period.restart();
+        main->notifyPause(); // get video started again, amongst other things
+
+        deviceController->setMode(RT_MODE_CALIBRATE);
+    }
+    calibrating = !calibrating;
 }
 
 void TrainTool::FFwd()

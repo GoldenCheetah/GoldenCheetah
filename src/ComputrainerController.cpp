@@ -108,6 +108,14 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
     // BUTTONS
     //
 
+    // toggle calibration
+    if (Buttons&CT_F3) {
+        parent->Calibrate();
+    }
+
+    // ignore other buttons if calibrating
+    if (parent->calibrating) return;
+
     // ADJUST LOAD
     Load = myComputrainer->getLoad();
     if ((Buttons&CT_PLUS) && !(Buttons&CT_F3)) {
@@ -118,6 +126,7 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
     }
     rtData.setLoad(Load);
 
+#if 0 // F3 now toggles calibration
     // FFWD/REWIND
     if ((Buttons&CT_PLUS) && (Buttons&CT_F3)) {
            parent->FFwd();
@@ -125,7 +134,7 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
     if ((Buttons&CT_MINUS) && (Buttons&CT_F3)) {
            parent->Rewind();
     }
-
+#endif
 
     // LAP/INTERVAL
     if (Buttons&CT_F1 && !(Buttons&CT_F3)) {
@@ -164,5 +173,6 @@ ComputrainerController::setMode(int mode)
 {
     if (mode == RT_MODE_ERGO) mode = CT_ERGOMODE;
     if (mode == RT_MODE_SPIN) mode = CT_SSMODE;
+    if (mode == RT_MODE_CALIBRATE) mode = CT_CALIBRATE;
     myComputrainer->setMode(mode);
 }

@@ -37,8 +37,10 @@
 #include <QDebug>
 
 // Status settings
-#define RT_MODE_ERGO    0x0001        // load generation modes
-#define RT_MODE_SPIN    0x0002        // spinscan like modes
+#define RT_MODE_ERGO        0x0001        // load generation modes
+#define RT_MODE_SPIN        0x0002        // spinscan like modes
+#define RT_MODE_CALIBRATE   0x0004        // calibrate
+
 #define RT_RUNNING      0x0100        // is running now
 #define RT_PAUSED       0x0200        // is paused
 #define RT_RECORDING    0x0400        // is recording to disk
@@ -129,6 +131,7 @@ class TrainTool : public GcWindow
         void Pause();       // when Paude is pressed
         void Stop(int status=0);        // when controller wants to stop
 
+        void Calibrate();   // toggle calibration mode
         void FFwd();        // jump forward when in a workout
         void Rewind();      // jump backwards when in a workout
         void FFwdLap();     // jump forward to next Lap marker
@@ -214,6 +217,7 @@ class TrainTool : public GcWindow
         // everyone else wants this
         QCheckBox   *recordSelector;
         boost::shared_ptr<QFileSystemWatcher> watcher;
+        bool calibrating;
 };
 
 #endif // _GC_TrainTool_h
