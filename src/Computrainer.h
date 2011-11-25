@@ -83,8 +83,9 @@
 #define CT_NONE         0x80
 
 /* Device operation mode */
-#define CT_ERGOMODE 0x01
-#define CT_SSMODE   0x02
+#define CT_ERGOMODE    0x01
+#define CT_SSMODE      0x02
+#define CT_CALIBRATE   0x04
 
 /* UI operation mode */
 #define UI_MANUAL 0x01  // using +/- keys to adjust
