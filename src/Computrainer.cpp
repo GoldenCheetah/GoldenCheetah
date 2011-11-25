@@ -821,15 +821,22 @@ int Computrainer::openPort()
     cfsetspeed(&deviceSettings, B2400);
 
     // further attributes
-    deviceSettings.c_iflag= IGNPAR;
-    deviceSettings.c_oflag=0;
+    deviceSettings.c_iflag &= ~(IGNBRK | BRKINT | ICRNL | INLCR | PARMRK | INPCK | ICANON | ISTRIP | IXON | IXOFF | IXANY);
+    deviceSettings.c_iflag |= IGNPAR;
     deviceSettings.c_cflag &= (~CSIZE & ~CSTOPB);
+    deviceSettings.c_oflag=0;
+
 #if defined(Q_OS_MACX)
-    deviceSettings.c_cflag |= (CS8 | CREAD | HUPCL | CCTS_OFLOW | CRTS_IFLOW);
+    deviceSettings.c_cflag &= (~CCTS_OFLOW & ~CRTS_IFLOW); // no hardware flow control
+    deviceSettings.c_cflag |= (CS8 | CLOCAL | CREAD | HUPCL);
 #else
-    deviceSettings.c_cflag |= (CS8 | CREAD | HUPCL | CRTSCTS);
+    deviceSettings.c_cflag &= (~CRTSCTS); // no hardware flow control
+    deviceSettings.c_cflag |= (CS8 | CLOCAL | CREAD | HUPCL);
 #endif
     deviceSettings.c_lflag=0;
+    deviceSettings.c_cc[VSTART] = 0x11;    
+    deviceSettings.c_cc[VSTOP]  = 0x13;  
+    deviceSettings.c_cc[VEOF]   = 0x20; 
     deviceSettings.c_cc[VMIN]=0;
     deviceSettings.c_cc[VTIME]=0;
 
@@ -837,6 +844,7 @@ int Computrainer::openPort()
     if(tcsetattr(devicePort, TCSANOW, &deviceSettings) == -1) return errno;
     tcgetattr(devicePort, &deviceSettings);
 
+    tcflush(devicePort, TCIOFLUSH); // clear out the garbage
 #else
     // WINDOWS USES SET/GETCOMMSTATE AND READ/WRITEFILE
 
