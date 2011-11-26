@@ -114,8 +114,6 @@ void ConfigDialog::createIcons()
     connect(contentsWidget,
             SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
             this, SLOT(changePage(QListWidgetItem *, QListWidgetItem*)));
-
-    connect(saveButton, SIGNAL(clicked()), this, SLOT(save_Clicked()));
 }
 
 
