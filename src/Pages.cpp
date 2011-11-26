@@ -1,5 +1,6 @@
 #include <QtGui>
 #include <QIntValidator>
+#include <QHttp>
 #include <assert.h>
 #include "Pages.h"
 #include "Units.h"
@@ -451,6 +452,13 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     QLabel *twauthLabel = new QLabel(tr("Authorise"));
     QLabel *twpinLabel = new QLabel(tr("PIN"));
 
+    QLabel *str = new QLabel(tr("Strava"));
+    str->setFont(current);
+
+    QLabel *struserLabel = new QLabel(tr("Username"));
+    QLabel *strpassLabel = new QLabel(tr("Password"));
+
+
     QLabel *wip = new QLabel(tr("Withings Wifi Scales"));
     wip->setFont(current);
 
@@ -504,6 +512,13 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     twitterPIN = new QLineEdit(this);
     twitterPIN->setText("");
 
+    stravaUser = new QLineEdit(this);
+    stravaUser->setText(appsettings->cvalue(mainWindow->cyclist, GC_STRUSER, "").toString());
+
+    stravaPass = new QLineEdit(this);
+    stravaPass->setEchoMode(QLineEdit::Password);
+    stravaPass->setText(appsettings->cvalue(mainWindow->cyclist, GC_STRPASS, "").toString());
+
     wiURL = new QLineEdit(this);
     wiURL->setText(appsettings->cvalue(mainWindow->cyclist, GC_WIURL, "http://wbsapi.withings.net/").toString());
 
@@ -541,16 +556,19 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     grid->addWidget(twurlLabel, 10,0);
     grid->addWidget(twauthLabel, 11,0);
     grid->addWidget(twpinLabel, 12,0);
-    grid->addWidget(wip, 13,0);
-    grid->addWidget(wiurlLabel, 14,0);
-    grid->addWidget(wiuserLabel, 15,0);
-    grid->addWidget(wipassLabel, 16,0);
-    grid->addWidget(webcal, 17, 0);
-    grid->addWidget(wcurlLabel, 18, 0);
-    grid->addWidget(dv, 19,0);
-    grid->addWidget(dvurlLabel, 20,0);
-    grid->addWidget(dvuserLabel, 21,0);
-    grid->addWidget(dvpassLabel, 22,0);
+    grid->addWidget(str, 13,0);
+    grid->addWidget(struserLabel, 14,0);
+    grid->addWidget(strpassLabel, 15,0);
+    grid->addWidget(wip, 16,0);
+    grid->addWidget(wiurlLabel, 17,0);
+    grid->addWidget(wiuserLabel, 18,0);
+    grid->addWidget(wipassLabel, 19,0);
+    grid->addWidget(webcal, 20, 0);
+    grid->addWidget(wcurlLabel, 21, 0);
+    grid->addWidget(dv, 22,0);
+    grid->addWidget(dvurlLabel, 23,0);
+    grid->addWidget(dvuserLabel, 24,0);
+    grid->addWidget(dvpassLabel, 25,0);
 
     grid->addWidget(tpURL, 1, 1, 0);
     grid->addWidget(tpUser, 2, 1, Qt::AlignLeft | Qt::AlignVCenter);
@@ -565,15 +583,18 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     grid->addWidget(twitterAuthorise, 11, 1, Qt::AlignLeft | Qt::AlignVCenter);
     grid->addWidget(twitterPIN, 12, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    grid->addWidget(wiURL, 14, 1, 0);
-    grid->addWidget(wiUser, 15, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(wiPass, 16, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(stravaUser, 14, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(stravaPass, 15, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    grid->addWidget(webcalURL, 18, 1, 0);
+    grid->addWidget(wiURL, 17, 1, 0);
+    grid->addWidget(wiUser, 18, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(wiPass, 19, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    grid->addWidget(dvURL, 20, 1, 0);
-    grid->addWidget(dvUser, 21, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(dvPass, 22, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(webcalURL, 21, 1, 0);
+
+    grid->addWidget(dvURL, 23, 1, 0);
+    grid->addWidget(dvUser, 24, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(dvPass, 25, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
     grid->setColumnStretch(0,0);
     grid->setColumnStretch(1,3);
@@ -597,6 +618,8 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(mainWindow->cyclist, GC_TPURL, tpURL->text());
     appsettings->setCValue(mainWindow->cyclist, GC_TPUSER, tpUser->text());
     appsettings->setCValue(mainWindow->cyclist, GC_TPPASS, tpPass->text());
+    appsettings->setCValue(mainWindow->cyclist, GC_STRUSER, stravaUser->text());
+    appsettings->setCValue(mainWindow->cyclist, GC_STRPASS, stravaPass->text());
     appsettings->setCValue(mainWindow->cyclist, GC_TPTYPE, tpType->currentIndex());
     appsettings->setCValue(mainWindow->cyclist, GC_TWURL, twitterURL->text());
     appsettings->setCValue(mainWindow->cyclist, GC_WIURL, wiURL->text());
