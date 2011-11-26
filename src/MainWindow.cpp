@@ -1885,7 +1885,7 @@ MainWindow::notifyConfigChanged()
     }
 
     // now tell everyone else
-    //configChanged();
+    configChanged();
 }
 
 // notify children that rideSelected
