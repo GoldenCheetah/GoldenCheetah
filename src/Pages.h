@@ -151,6 +151,11 @@ class CredentialsPage : public QScrollArea
         QLineEdit *twitterPIN;
         char *t_key, *t_secret;
 
+        QLineEdit *stravaURL; // url for strava ... http://www.strava.com
+        QPushButton *stravaTest;
+        QLineEdit *stravaUser;
+        QLineEdit *stravaPass;
+
         QLineEdit *wiURL; // url for withings
         QLineEdit *wiUser;
         QLineEdit *wiPass;

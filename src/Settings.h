@@ -89,6 +89,8 @@
 #define GC_TWURL          "tw/url"
 #define GC_TWUSER         "tw/user"
 #define GC_TWPASS         "tw/pass"
+#define GC_STRUSER         "str/user"
+#define GC_STRPASS         "str/pass"
 #define GC_WIURL          "wi/url"
 #define GC_WIUSER         "wi/user"
 #define GC_WIKEY         "wi/key"

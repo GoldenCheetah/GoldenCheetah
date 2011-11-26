@@ -23,6 +23,7 @@
 #include <QDir>
 #include <QSqlDatabase>
 #include <QtGui>
+#include <QNetworkReply>
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include "RideItem.h"
@@ -220,6 +221,7 @@ class MainWindow : public QMainWindow
         void exportRide();
         void exportBatch();
         void exportMetrics();
+        void uploadStrava();
         void manualProcess(QString);
 #ifdef GC_HAVE_SOAP
         void uploadTP();
@@ -277,6 +279,7 @@ class MainWindow : public QMainWindow
         void selectTrain();
         void selectAthlete();
 
+        void setActivityMenu();
         void setWindowMenu();
         void selectWindow(QAction*);
 
@@ -319,6 +322,7 @@ class MainWindow : public QMainWindow
         QStackedWidget *views;
         QAction *sideView;
         QAction *toolView;
+        QAction *stravaAction;
         QMenu *windowMenu;
         GcBubble *bubble;
 

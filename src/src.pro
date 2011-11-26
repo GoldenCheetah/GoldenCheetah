@@ -8,7 +8,7 @@ DEPENDPATH += .
 
 !isEmpty( BOOST_INCLUDE ) { INCLUDEPATH += $${BOOST_INCLUDE} }
 INCLUDEPATH += ../qwt/src ../qxt/src
-QT += xml sql network webkit
+QT += xml sql network webkit script
 LIBS += ../qwt/lib/libqwt.a
 LIBS += -lm
 
@@ -310,6 +310,7 @@ HEADERS += \
         SmfRideFile.h \
         SrdRideFile.h \
         SrmRideFile.h \
+        StravaDialog.h \
         StressCalculator.h \
         SummaryMetrics.h \
         SummaryWindow.h \
@@ -480,6 +481,7 @@ SOURCES += \
         SmfRideFile.cpp \
         SrdRideFile.cpp \
         SrmRideFile.cpp \
+        StravaDialog.cpp \
         StressCalculator.cpp \
         SummaryMetrics.cpp \
         SummaryWindow.cpp \

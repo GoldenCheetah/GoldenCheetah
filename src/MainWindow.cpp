@@ -53,6 +53,7 @@
 #include "MetricAggregator.h"
 #include "SplitActivityWizard.h"
 #include "BatchExportDialog.h"
+#include "StravaDialog.h"
 #include "TwitterDialog.h"
 #include "WithingsDownload.h"
 #include "CalendarDownload.h"
@@ -570,6 +571,12 @@ MainWindow::MainWindow(const QDir &home) :
     rideMenu->addAction(tr("&Upload to TrainingPeaks"), this, SLOT(uploadTP()), tr("Ctrl+U"));
     rideMenu->addAction(tr("Down&load from TrainingPeaks..."), this, SLOT(downloadTP()), tr("Ctrl+L"));
 #endif
+
+    stravaAction = new QAction("Upload to Strava...", this);
+    connect(stravaAction, SIGNAL(triggered(bool)), this, SLOT(uploadStrava()));
+    rideMenu->addAction(stravaAction);
+
+
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Save activity"), this, SLOT(saveRide()), tr("Ctrl+S"));
     rideMenu->addAction(tr("D&elete activity..."), this, SLOT(deleteRide()));
@@ -659,6 +666,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     windowMenu = menuBar()->addMenu(tr("&Window"));
     connect(windowMenu, SIGNAL(aboutToShow()), this, SLOT(setWindowMenu()));
+    connect(rideMenu, SIGNAL(aboutToShow()), this, SLOT(setActivityMenu()));
     connect(windowMenu, SIGNAL(triggered(QAction*)), this, SLOT(selectWindow(QAction*)));
 
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
@@ -745,6 +753,21 @@ MainWindow::setChartMenu()
     for(int i=0; GcWindows[i].relevance; i++) {
         if (GcWindows[i].relevance & mask) 
             chartMenu->addAction(GcWindows[i].name);
+    }
+}
+
+void
+MainWindow::setActivityMenu()
+{
+    // enable/disable upload if already uploaded
+    if (ride && ride->ride()) {
+
+        QString activityId = ride->ride()->getTag("Strava uploadId", "");
+        if (activityId == "") stravaAction->setEnabled(true);
+        else stravaAction->setEnabled(false);
+        
+    } else {
+        stravaAction->setEnabled(false);
     }
 }
 
@@ -1503,6 +1526,24 @@ MainWindow::exportMetrics()
     if (fileName.length() == 0)
         return;
     metricDB->writeAsCSV(fileName);
+}
+
+/*----------------------------------------------------------------------
+* Strava.com
+*--------------------------------------------------------------------*/
+
+void
+MainWindow::uploadStrava()
+{
+    QTreeWidgetItem *_item = treeWidget->currentItem();
+    if (_item==NULL || _item->type() != RIDE_TYPE) return;
+
+    RideItem *item = dynamic_cast<RideItem*>(_item);
+
+    if (item) { // menu is disabled anyway, but belt and braces
+        StravaDialog d(this, item);
+        d.exec();
+    }
 }
 
 /*----------------------------------------------------------------------
