@@ -211,6 +211,8 @@ HEADERS += \
         DialWindow.h \
         DownloadRideDialog.h \
         ErgFile.h \
+        ErgDB.h \
+        ErgDBDownloadDialog.h \
         ErgFilePlot.h \
         FitlogRideFile.h \
         FitlogParser.h \
@@ -378,6 +380,8 @@ SOURCES += \
         DeviceConfiguration.cpp \
         DialWindow.cpp \
         DownloadRideDialog.cpp \
+        ErgDB.cpp \
+        ErgDBDownloadDialog.cpp \
         ErgFile.cpp \
         ErgFilePlot.cpp \
         FitlogRideFile.cpp \
