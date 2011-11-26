@@ -58,6 +58,8 @@
 #include "WithingsDownload.h"
 #include "CalendarDownload.h"
 #include "WorkoutWizard.h"
+#include "ErgDB.h"
+#include "ErgDBDownloadDialog.h"
 #include "TrainTool.h"
 
 #include "GcWindowTool.h"
@@ -602,7 +604,10 @@ MainWindow::MainWindow(const QDir &home) :
     QMenu *optionsMenu = menuBar()->addMenu(tr("&Tools"));
     optionsMenu->addAction(tr("&Options..."), this, SLOT(showOptions()), tr("Ctrl+O"));
     optionsMenu->addAction(tr("Critical Power Calculator..."), this, SLOT(showTools()));
+
+    optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Workout Wizard"), this, SLOT(showWorkoutWizard()));
+    optionsMenu->addAction(tr("Get Workouts from ErgDB"), this, SLOT(downloadErgDB()));
 
 #ifdef GC_HAVE_ICAL
     optionsMenu->addSeparator();
@@ -1547,6 +1552,28 @@ MainWindow::uploadStrava()
 }
 
 /*----------------------------------------------------------------------
+ * ErgDB
+ *--------------------------------------------------------------------*/
+
+void
+MainWindow::downloadErgDB()
+{
+    QString workoutDir = appsettings->value(this, GC_WORKOUTDIR).toString();
+
+    QFileInfo fi(workoutDir);
+
+    if (fi.exists() && fi.isDir()) {
+        ErgDBDownloadDialog *d = new ErgDBDownloadDialog(this);
+        d->exec();
+    } else{
+        QMessageBox::critical(this, tr("Workout Directory Invalid"), 
+        "The workout directory is not configured, or the directory"
+        " selected no longer exists.\n\n"
+        "Please check your preference settings.");
+    }
+}
+
+/*----------------------------------------------------------------------
  * TrainingPeaks.com
  *--------------------------------------------------------------------*/
 
@@ -1858,7 +1885,7 @@ MainWindow::notifyConfigChanged()
     }
 
     // now tell everyone else
-    configChanged();
+    //configChanged();
 }
 
 // notify children that rideSelected

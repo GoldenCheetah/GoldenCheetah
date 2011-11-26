@@ -85,7 +85,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
 
     deviceTree = new QTreeWidget;
     deviceTree->setFrameStyle(QFrame::NoFrame);
-    deviceTree->setSelectionMode(QAbstractItemView::MultiSelection);
+    deviceTree->setSelectionMode(QAbstractItemView::SingleSelection);
     deviceTree->setColumnCount(1);
     deviceTree->header()->hide();
     deviceTree->setAlternatingRowColors (false);
@@ -246,11 +246,13 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
 
     // add a watch on all directories
     QVariant workoutDir = appsettings->value(NULL, GC_WORKOUTDIR);
+#if 0 //XXX Performance issues with this
     watcher = boost::shared_ptr<QFileSystemWatcher>(new QFileSystemWatcher());
     watcher->addPaths(workoutDir.toStringList());
 
     connect(&*watcher,SIGNAL(directoryChanged(QString)),this,SLOT(configChanged()));
     connect(&*watcher,SIGNAL(fileChanged(QString)),this,SLOT(configChanged()));
+#endif
 
     // set home
     main = parent;

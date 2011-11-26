@@ -1,0 +1,231 @@
+/*
+ * Copyright (c) 2011 Mark Liversedge (liversedge@gmail.com)
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#include "ErgDBDownloadDialog.h"
+
+ErgDBDownloadDialog::ErgDBDownloadDialog(MainWindow *main) : QDialog(main), main(main)
+{
+    setAttribute(Qt::WA_DeleteOnClose);
+    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+    setWindowTitle(tr("Download workouts from ErgDB"));
+
+    // make the dialog a resonable size
+    setMinimumWidth(650);
+    setMinimumHeight(400);
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    setLayout(layout);
+
+    files = new QTreeWidget;
+    files->headerItem()->setText(0, tr(""));
+    files->headerItem()->setText(1, tr("Name"));
+    files->headerItem()->setText(2, tr("Type"));
+    files->headerItem()->setText(3, tr("Author"));
+    files->headerItem()->setText(4, tr("Dated"));
+    files->headerItem()->setText(5, tr("Action"));
+
+    files->setColumnCount(6);
+    files->setColumnWidth(0, 30); // selector
+    files->setColumnWidth(1, 140); // filename
+    files->setColumnWidth(2, 100); // Type
+    files->setColumnWidth(3, 120); // Author
+    files->setColumnWidth(4, 90); // dated
+    files->setSelectionMode(QAbstractItemView::SingleSelection);
+    files->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    files->setUniformRowHeights(true);
+    files->setIndentation(0);
+
+    foreach(ErgDBItem item, ergdb.items()) {
+
+        QTreeWidgetItem *add = new QTreeWidgetItem(files->invisibleRootItem());
+        add->setFlags(add->flags() | Qt::ItemIsEditable);
+
+        // selector
+        QCheckBox *checkBox = new QCheckBox("", this);
+        checkBox->setChecked(true);
+        files->setItemWidget(add, 0, checkBox);
+
+        add->setText(1, item.name);
+        add->setText(2, item.workoutType);
+        add->setText(3, item.author);
+        add->setText(4, item.added.toString(tr("dd MMM yyyy")));
+
+        // interval action
+        add->setText(5, "Download");
+
+        // hide away the id
+        add->setText(6, QString("%1").arg(item.id));
+    }
+
+    all = new QCheckBox("check/uncheck all", this);
+    all->setChecked(true);
+
+    // buttons
+    QHBoxLayout *buttons = new QHBoxLayout;
+    status = new QLabel("", this);
+    status->hide();
+    overwrite = new QCheckBox("Overwrite existing workouts", this);
+    cancel = new QPushButton("Cancel", this);
+    ok = new QPushButton("Download", this);
+    buttons->addWidget(overwrite);
+    buttons->addWidget(status);
+    buttons->addStretch();
+    buttons->addWidget(cancel);
+    buttons->addWidget(ok);
+
+    layout->addWidget(all);
+    layout->addWidget(files);
+    layout->addLayout(buttons);
+
+    downloads = fails = 0;
+
+    // connect signals and slots up..
+    connect(ok, SIGNAL(clicked()), this, SLOT(okClicked()));
+    connect(all, SIGNAL(stateChanged(int)), this, SLOT(allClicked()));
+    connect(cancel, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+}
+
+void
+ErgDBDownloadDialog::allClicked()
+{
+    // set/uncheck all rides according to the "all"
+    bool checked = all->isChecked();
+
+    for(int i=0; i<files->invisibleRootItem()->childCount(); i++) {
+        QTreeWidgetItem *current = files->invisibleRootItem()->child(i);
+        static_cast<QCheckBox*>(files->itemWidget(current,0))->setChecked(checked);
+    }
+}
+
+void
+ErgDBDownloadDialog::okClicked()
+{
+    if (ok->text() == "Download") {
+        aborted = false;
+
+        overwrite->hide();
+        status->setText("Download...");
+        status->show();
+        cancel->hide();
+        ok->setText("Abort");
+        downloadFiles();
+        status->setText(QString("%1 workouts downloaded, %2 failed or skipped.").arg(downloads).arg(fails));
+        ok->setText("Finish");
+
+        main->trainTool->configChanged();
+
+    } else if (ok->text() == "Abort") {
+        aborted = true;
+    } else if (ok->text() == "Finish") {
+        accept(); // our work is done!
+    }
+}
+
+void
+ErgDBDownloadDialog::cancelClicked()
+{
+    reject();
+}
+
+void
+ErgDBDownloadDialog::downloadFiles()
+{
+    // where to place them
+    QString workoutDir = appsettings->value(this, GC_WORKOUTDIR).toString();
+
+    // what format to export as?
+    QString type = RideFileFactory::instance().writeSuffixes().at(0);
+
+    // loop through the table and export all selected
+    for(int i=0; i<files->invisibleRootItem()->childCount(); i++) {
+
+        // give user a chance to abort..
+        QApplication::processEvents();
+
+        // did they?
+        if (aborted == true) return; // user aborted!
+
+        QTreeWidgetItem *current = files->invisibleRootItem()->child(i);
+
+        // is it selected
+        if (static_cast<QCheckBox*>(files->itemWidget(current,0))->isChecked()) {
+
+            files->setCurrentItem(current); QApplication::processEvents();
+
+            // this one then
+            current->setText(5, "Downloading..."); QApplication::processEvents();
+
+            // get the id
+            int id = current->text(6).toInt();
+            QString content = ergdb.getFile(id, 300);
+
+            QString filename = workoutDir + "/" + current->text(1) + ".erg";
+            ErgFile *p = ErgFile::fromContent(content, main);
+
+            // open success?
+            if (p->isValid()) {
+
+                delete p; // free memory!
+
+                if (QFile(filename).exists()) {
+
+                    if (overwrite->isChecked() == false) {
+                        // skip existing files
+                        current->setText(5, "Exists - not exported"); QApplication::processEvents();
+                        fails++;
+                        continue;
+
+                    } else {
+
+                        // remove existing
+                        QFile(filename).remove();
+                        current->setText(5, "Removing..."); QApplication::processEvents();
+                    }
+
+                }
+                downloads++;
+
+                QFile out(filename);
+                if (out.open(QIODevice::WriteOnly) == true) {
+
+                    QTextStream output(&out);
+                    output << content;
+                    out.close();
+
+                    downloads++;
+                    current->setText(5, "Saved"); QApplication::processEvents();
+
+                } else {
+
+                    fails++;
+                    current->setText(5, "Write failed"); QApplication::processEvents();
+                }
+
+
+            // couldn't parse
+            } else {
+
+                delete p; // free memory!
+                fails++;
+                current->setText(5, "Invalid File"); QApplication::processEvents();
+
+            }
+
+        }
+    }
+}

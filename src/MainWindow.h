@@ -141,6 +141,7 @@ class MainWindow : public QMainWindow
 #ifndef Q_OS_MAC
         QTFullScreen *fullScreen;
 #endif
+        TrainTool *trainTool;
 
         // *********************************************
         // APPLICATION EVENTS
@@ -222,6 +223,7 @@ class MainWindow : public QMainWindow
         void exportBatch();
         void exportMetrics();
         void uploadStrava();
+        void downloadErgDB();
         void manualProcess(QString);
 #ifdef GC_HAVE_SOAP
         void uploadTP();
@@ -310,7 +312,6 @@ class MainWindow : public QMainWindow
         GcToolBar *toolbar;
         QDockWidget *dock;
         QAction *homeAct, *diaryAct, *analysisAct, *measuresAct, *trainAct, *athleteAct, *helpAct, *configAct;
-        TrainTool *trainTool;
         QAction *styleAction;
         QAction *showhideToolbar;
         QAction *showhideSidebar;

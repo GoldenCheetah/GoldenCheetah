@@ -26,6 +26,20 @@ ErgFile::ErgFile(QString filename, int &mode, double Cp, MainWindow *main) :
     reload();
 }
 
+ErgFile::ErgFile(MainWindow *main) : main(main), mode(nomode)
+{
+    Cp = 300;
+    filename ="";
+}
+
+ErgFile *
+ErgFile::fromContent(QString contents, MainWindow *main)
+{
+    ErgFile *p = new ErgFile(main);
+    p->parseComputrainer(contents);
+    return p;
+}
+
 void ErgFile::reload()
 {
     // which parser to call? XXX should look at moving to an ergfile factory
@@ -215,7 +229,7 @@ void ErgFile::parseTacx()
     }
 }
 
-void ErgFile::parseComputrainer()
+void ErgFile::parseComputrainer(QString p)
 {
     QFile ergFile(filename);
     int section = NOMANSLAND;            // section 0=init, 1=header data, 2=course data
@@ -230,7 +244,7 @@ void ErgFile::parseComputrainer()
     long ralt = 200; // always start at 200 meters just to prettify the graph
 
     // open the file
-    if (ergFile.open(QIODevice::ReadOnly | QIODevice::Text) == false) {
+    if (p == "" && ergFile.open(QIODevice::ReadOnly | QIODevice::Text) == false) {
         valid = false;
         return;
     }
@@ -263,14 +277,16 @@ void ErgFile::parseComputrainer()
 
     // ok. opened ok lets parse.
     QTextStream inputStream(&ergFile);
-    while (!inputStream.atEnd()) {
+    QTextStream stringStream(&p);
+    if (p != "") inputStream.setString(&p); // use a string not a file!
+    while ((p=="" && !inputStream.atEnd()) || (p!="" && !stringStream.atEnd())) {
 
         // Code plagiarised from CsvRideFile.
         // the readLine() method doesn't handle old Macintosh CR line endings
         // this workaround will load the the entire file if it has CR endings
         // then split and loop through each line
         // otherwise, there will be nothing to split and it will read each line as expected.
-        QString linesIn = ergFile.readLine();
+        QString linesIn = (p != "" ? stringStream.readLine() : ergFile.readLine());
         QStringList lines = linesIn.split('\r');
 
         // workaround for empty lines
@@ -395,7 +411,7 @@ void ErgFile::parseComputrainer()
                 // do nothing for this line
             } else {
                 // ignore bad lines for now. just bark.
-                qDebug()<<"huh?" << line;
+                //qDebug()<<"huh?" << line;
 	    }
 
         }
@@ -403,7 +419,7 @@ void ErgFile::parseComputrainer()
     }
 
     // done.
-    ergFile.close();
+    if (p=="") ergFile.close();
 
     if (section == END && Points.count() > 0) {
         valid = true;
