@@ -186,7 +186,7 @@ ErgDBDownloadDialog::downloadFiles()
 
                     if (overwrite->isChecked() == false) {
                         // skip existing files
-                        current->setText(5, "Exists - not exported"); QApplication::processEvents();
+                        current->setText(5, "Exists already"); QApplication::processEvents();
                         fails++;
                         continue;
 
