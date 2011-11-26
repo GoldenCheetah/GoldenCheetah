@@ -66,10 +66,14 @@ class ErgFile
 {
     public:
         ErgFile(QString, int&, double Cp, MainWindow *main);       // constructor uses filename
+        ErgFile(MainWindow *main); // no filename, going to use a string
+
         ~ErgFile();             // delete the contents
 
+        static ErgFile *fromContent(QString, MainWindow *); // read from memory
+
         void reload();          // reload after messed about
-        void parseComputrainer(); // its an erg,crs or mrc file
+        void parseComputrainer(QString p = ""); // its an erg,crs or mrc file
         void parseTacx();         // its a pgmf file
         bool isValid();         // is the file valid or not?
         double Cp;
@@ -106,6 +110,7 @@ class ErgFile
     private:
         MainWindow *main;
         int &mode;
+        int nomode;
 };
 
 #endif

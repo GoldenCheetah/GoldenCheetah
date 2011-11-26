@@ -123,9 +123,9 @@ class TrainTool : public GcWindow
         void deviceTreeWidgetSelectionChanged();
         void workoutTreeWidgetSelectionChanged();
         void mediaTreeWidgetSelectionChanged();
-        void configChanged();
 
     public slots:
+        void configChanged();
 
         void Start();       // when start button is pressed
         void Pause();       // when Paude is pressed
