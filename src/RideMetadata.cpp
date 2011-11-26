@@ -126,6 +126,7 @@ RideMetadata::setExtraTab()
 {
     // wipe out the form & re-initialise -- special case for extras
     extraForm->clear();
+    extraDefs.clear();
     extraForm->initialise();
 
     // no ride available...
@@ -159,7 +160,8 @@ RideMetadata::setExtraTab()
             else if (tags.value().length() < 30) type = FIELD_SHORTTEXT;
             else type = FIELD_TEXT;
 
-            extraForm->addField(FieldDefinition("Extra", tags.key(), type, false, QStringList()));
+            extraDefs.append(FieldDefinition("Extra", tags.key(), type, false, QStringList()));
+            extraForm->addField(extraDefs[extraDefs.count()-1]);
         }
     }
 
@@ -216,18 +218,19 @@ RideMetadata::configUpdate()
     }
     tabList.clear();
 
-    // create forms and populate with fields
-    foreach(FieldDefinition field, fieldDefinitions) {
 
-        if (field.tab == "") continue; // not to be shown!
+    // create forms and populate with fields
+    for(int i=0; i<fieldDefinitions.count(); i++) {
+
+        if (fieldDefinitions[i].tab == "") continue; // not to be shown!
 
         Form *form;
-        if ((form = tabList.value(field.tab, NULL)) == NULL) {
+        if ((form = tabList.value(fieldDefinitions[i].tab, NULL)) == NULL) {
             form = new Form(this);
-            tabs->addTab(form, field.tab);
-            tabList.insert(field.tab, form);
+            tabs->addTab(form, fieldDefinitions[i].tab);
+            tabList.insert(fieldDefinitions[i].tab, form);
         }
-        form->addField(field);
+        form->addField(fieldDefinitions[i]);
     }
 
     // get forms arranged
@@ -246,6 +249,7 @@ RideMetadata::configUpdate()
 
     // when constructing we have not registered
     // the properties nor selected a ride
+
     metadataChanged(); // re-read the values!
 }
 
@@ -313,6 +317,13 @@ Form::initialise()
 }
 
 void
+Form::addField(FieldDefinition &x)
+{
+    FormField *p = new FormField(x, meta);
+    fields.append(p);
+}
+
+void
 Form::arrange()
 {
     QGridLayout *here;
@@ -359,7 +370,7 @@ Form::arrange()
 
         here->addWidget(fields[i]->label, y, 0, labelalignment);
 
-        if (sp.isMetric(fields[i]->definition.name)) {
+        if (meta->sp.isMetric(fields[i]->definition.name)) {
             QHBoxLayout *override = new QHBoxLayout;
             overrides.append(override);
 
@@ -381,18 +392,15 @@ Form::arrange()
 /*----------------------------------------------------------------------
  * Form fields
  *--------------------------------------------------------------------*/
-FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(field), meta(meta), active(false)
+FormField::FormField(FieldDefinition &field, RideMetadata *meta) : definition(field), meta(meta), active(true)
 {
-    QFont font;
-    font.setPointSize(font.pointSize()-2);
-
     QString units;
 
-    if (sp.isMetric(field.name)) {
+    if (meta->sp.isMetric(field.name)) {
         field.type = FIELD_DOUBLE; // whatever they say, we want a double!
         QVariant unit = appsettings->value(this, GC_UNIT);
         bool useMetricUnits = (unit.toString() == "Metric");
-        units = sp.rideMetric(field.name)->units(useMetricUnits);
+        units = meta->sp.rideMetric(field.name)->units(useMetricUnits);
         if (units != "") units = QString(" (%1)").arg(units);
     }
 
@@ -445,7 +453,7 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
         //widget->setFixedHeight(18);
         ((QDoubleSpinBox*)widget)->setSingleStep(0.01);
         ((QDoubleSpinBox*)widget)->setMaximum(999999.99);
-        if (sp.isMetric(field.name)) {
+        if (meta->sp.isMetric(field.name)) {
             enabled = new QCheckBox(this);
             connect(enabled, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
         }
@@ -492,7 +500,7 @@ FormField::~FormField()
         case FIELD_DATE : delete ((QDateEdit*)widget); break;
         case FIELD_TIME : delete ((QTimeEdit*)widget); break;
     }
-    if (sp.isMetric(definition.name)) delete enabled;
+    if (meta->sp.isMetric(definition.name)) delete enabled;
 }
 
 void
@@ -573,21 +581,21 @@ FormField::editFinished()
         meta->warnDateTime(update);
 
     } else if (definition.name != "Summary") {
-        if (sp.isMetric(definition.name) && enabled->isChecked()) {
+        if (meta->sp.isMetric(definition.name) && enabled->isChecked()) {
 
             QVariant unit = appsettings->value(this, GC_UNIT);
             bool useMetricUnits = (unit.toString() == "Metric");
 
             // convert from imperial to metric if needed
             if (!useMetricUnits) {
-                double value = text.toDouble() * (1/ sp.rideMetric(definition.name)->conversion());
+                double value = text.toDouble() * (1/ meta->sp.rideMetric(definition.name)->conversion());
                 text = QString("%1").arg(value);
             }
 
             // update metric override QMap!
             QMap<QString,QString> override;
             override.insert("value", text);
-            ourRideItem->ride()->metricOverrides.insert(sp.metricSymbol(definition.name), override);
+            ourRideItem->ride()->metricOverrides.insert(meta->sp.metricSymbol(definition.name), override);
 
             // get widgets updated with new override
             ourRideItem->notifyRideMetadataChanged();
@@ -623,7 +631,7 @@ FormField::stateChanged(int state)
     QMap<QString,QString> override;
     if (ourRideItem && ourRideItem->ride())
         override  = ourRideItem->ride()->metricOverrides.value
-                                        (sp.metricSymbol(definition.name));
+                                        (meta->sp.metricSymbol(definition.name));
 
     // setup initial override value
     if (state) {
@@ -637,7 +645,7 @@ FormField::stateChanged(int state)
 
     if (ourRideItem && ourRideItem->ride()) {
         // update overrides for this metric in the main QMap
-        ourRideItem->ride()->metricOverrides.insert(sp.metricSymbol(definition.name), override);
+        ourRideItem->ride()->metricOverrides.insert(meta->sp.metricSymbol(definition.name), override);
 
         // rideFile is now dirty!
         ourRideItem->setDirty(true);
@@ -663,10 +671,10 @@ FormField::metadataChanged()
         else if (definition.name == "Start Time") value = ourRideItem->ride()->startTime().time().toString("hh:mm:ss.zzz");
         else if (definition.name == "Identifier") value = ourRideItem->ride()->id();
         else {
-            if (sp.isMetric(definition.name)) {
+            if (meta->sp.isMetric(definition.name)) {
                 //  get from metric overrides
                 const QMap<QString,QString> override =
-                      ourRideItem->ride()->metricOverrides.value(sp.metricSymbol(definition.name));
+                      ourRideItem->ride()->metricOverrides.value(meta->sp.metricSymbol(definition.name));
                 if (override.contains("value")) {
                     enabled->setChecked(true);
                     widget->setEnabled(true);
@@ -674,13 +682,13 @@ FormField::metadataChanged()
                     value = override.value("value");
 
                     // does it need conversion from metric?
-                    if (sp.rideMetric(definition.name)->conversion() != 1.0) {
+                    if (meta->sp.rideMetric(definition.name)->conversion() != 1.0) {
                         QVariant unit = appsettings->value(this, GC_UNIT);
                         bool useMetricUnits = (unit.toString() == "Metric");
 
                         // do we want imperial?
                         if (!useMetricUnits) {
-                            double newvalue = value.toDouble() * sp.rideMetric(definition.name)->conversion();
+                            double newvalue = value.toDouble() * meta->sp.rideMetric(definition.name)->conversion();
                             value = QString("%1").arg(newvalue);
                         }
                     }

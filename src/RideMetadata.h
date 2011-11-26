@@ -63,9 +63,9 @@ class FormField : public QWidget
 
 
     public:
-        FormField(FieldDefinition, RideMetadata *);
+        FormField(FieldDefinition&, RideMetadata *);
         ~FormField();
-        FieldDefinition definition; // define the field
+        FieldDefinition &definition; // define the field
         QLabel  *label;             // label
         QCheckBox *enabled;           // is the widget enabled or not?
         QWidget *widget;            // updating widget
@@ -81,7 +81,6 @@ class FormField : public QWidget
         RideMetadata *meta;
         bool edited;                // value has been changed
         bool active;                // when data being changed for rideSelected
-        SpecialFields sp;
 };
 
 class Form : public QScrollArea
@@ -93,16 +92,15 @@ class Form : public QScrollArea
     public:
         Form(RideMetadata *);
         ~Form();
-        void addField(FieldDefinition x) { fields.append(new FormField(x, meta)); }
+        void addField(FieldDefinition &x);
         void arrange(); // the meat of the action, arranging fields on the screen
         void clear();  // destroy contents prior to delete
         void initialise();  // re-initialise contents (after clear)
 
-        QList<FormField*> fields; // keep track so we can destroy
-        QList<QHBoxLayout *> overrides; // keep track so we can destroy
+        QVector<FormField*> fields; // keep track so we can destroy
+        QVector<QHBoxLayout *> overrides; // keep track so we can destroy
     private:
         RideMetadata *meta;
-        SpecialFields sp;
         QWidget *contents;
         QHBoxLayout *hlayout;
         QVBoxLayout *vlayout1, *vlayout2;
@@ -128,6 +126,7 @@ class RideMetadata : public QWidget
         RideItem *rideItem() const;
 
         bool singlecolumn;
+        SpecialFields sp;
 
     public slots:
         void configUpdate();
@@ -141,6 +140,7 @@ class RideMetadata : public QWidget
     QTabWidget *tabs;
     QMap <QString, Form *> tabList;
     Form *extraForm;
+    QList<FieldDefinition> extraDefs;
 
     QStringList keywordList; // for completer
     QList<KeywordDefinition> keywordDefinitions;
