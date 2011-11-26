@@ -392,9 +392,10 @@ Form::arrange()
 /*----------------------------------------------------------------------
  * Form fields
  *--------------------------------------------------------------------*/
-FormField::FormField(FieldDefinition &field, RideMetadata *meta) : definition(field), meta(meta), active(true)
+FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(field), meta(meta), active(true)
 {
     QString units;
+    enabled = NULL;
 
     if (meta->sp.isMetric(field.name)) {
         field.type = FIELD_DOUBLE; // whatever they say, we want a double!
@@ -500,7 +501,7 @@ FormField::~FormField()
         case FIELD_DATE : delete ((QDateEdit*)widget); break;
         case FIELD_TIME : delete ((QTimeEdit*)widget); break;
     }
-    if (meta->sp.isMetric(definition.name)) delete enabled;
+    if (enabled) delete enabled;
 }
 
 void

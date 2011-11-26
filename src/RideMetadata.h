@@ -63,9 +63,9 @@ class FormField : public QWidget
 
 
     public:
-        FormField(FieldDefinition&, RideMetadata *);
+        FormField(FieldDefinition, RideMetadata *);
         ~FormField();
-        FieldDefinition &definition; // define the field
+        FieldDefinition definition; // define the field
         QLabel  *label;             // label
         QCheckBox *enabled;           // is the widget enabled or not?
         QWidget *widget;            // updating widget
