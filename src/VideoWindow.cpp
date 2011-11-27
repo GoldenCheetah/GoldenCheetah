@@ -160,8 +160,11 @@ void VideoWindow::mediaSelected(QString filename)
 
     if (filename.endsWith("/DVD") || (filename != "" && QFile(filename).exists())) {
 
+        QString fileURL = "file://" + filename.replace(" ","%20").replace("\\", "/");
+        //qDebug()<<"file url="<<fileURL;
+
         /* open media */
-        m = libvlc_media_new_path(inst, filename.endsWith("/DVD") ? "dvd://" : filename.toLatin1());
+        m = libvlc_media_new_path(inst, filename.endsWith("/DVD") ? "dvd://" : fileURL.toLatin1());
 
         /* set the media to playback */
         if (m) libvlc_media_player_set_media (mp, m);
