@@ -160,7 +160,12 @@ void VideoWindow::mediaSelected(QString filename)
 
     if (filename.endsWith("/DVD") || (filename != "" && QFile(filename).exists())) {
 
+#ifdef Q_OS_LINUX
         QString fileURL = "file://" + filename.replace(" ","%20").replace("\\", "/");
+#else
+        // A Windows "c:\xyz\abc def.avi" filename should become file:///c:/xyz/abc%20def.avi
+        QString fileURL = "file:///" + filename.replace(" ","%20").replace("\\", "/");
+#endif
         //qDebug()<<"file url="<<fileURL;
 
         /* open media */
