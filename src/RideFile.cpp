@@ -148,8 +148,11 @@ RideFile::intervalBegin(const RideFileInterval &interval) const
     QVector<RideFilePoint*>::const_iterator i = std::lower_bound(
         dataPoints_.begin(), dataPoints_.end(), &p, ComparePointSecs());
     if (i == dataPoints_.end())
-        return dataPoints_.size();
-    return i - dataPoints_.begin();
+        return dataPoints_.size()-1;
+    int offset = i - dataPoints_.begin();
+    if (offset > dataPoints_.size()) return dataPoints_.size()-1;
+    else if (offset <0) return 0;
+    else return offset;
 }
 
 double
@@ -191,7 +194,7 @@ RideFile::distanceIndex(double km) const
     QVector<RideFilePoint*>::const_iterator i = std::lower_bound(
         dataPoints_.begin(), dataPoints_.end(), &p, ComparePointKm());
     if (i == dataPoints_.end())
-        return dataPoints_.size();
+        return dataPoints_.size()-1;
     return i - dataPoints_.begin();
 }
 
