@@ -26,6 +26,7 @@ RealtimeData::RealtimeData()
     name[0] = '\0';
     lap = watts = hr = speed = wheelRpm = cadence  = load = 0;
     msecs = lapMsecs = /* bikeScore = joules =*/ 0;
+    memset(spinScan, 0, 24);
 }
 
 void RealtimeData::setName(char *name)

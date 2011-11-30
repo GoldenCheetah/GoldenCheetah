@@ -134,7 +134,7 @@ public:
     bool isHRConnected();
     bool isCADConnected();
     void getTelemetry(double &Power, double &HeartRate, double &Cadence, double &Speed,
-                        double &RRC, bool &calibration, int &Buttons, int &Status);
+                        double &RRC, bool &calibration, int &Buttons, uint8_t *ss, int &Status);
     void getSpinScan(double spinData[]);
     int getMode();
     double getGradient();
@@ -171,7 +171,7 @@ private:
     volatile double deviceSpeed;            // current speef in KPH
     volatile double deviceRRC;              // calibrated Rolling Resistance
     volatile bool   deviceCalibrated;       // is it calibrated?
-    volatile double spinData[24];           // SS values only in SS_MODE
+    volatile uint8_t spinScan[24];           // SS values only in SS_MODE
     volatile int    deviceButtons;          // Button status
     volatile bool   deviceHRConnected;      // HR jack is connected
     volatile bool   deviceCADConnected;     // Cadence jack is connected

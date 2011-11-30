@@ -21,6 +21,7 @@
 #define _GC_RealtimeData_h 1
 #include "GoldenCheetah.h"
 
+#include <stdint.h> // uint8_t
 #include <QString>
 
 class RealtimeData
@@ -73,6 +74,7 @@ public:
     double getDistance() const;
     long getLap() const;
 
+    uint8_t spinScan[24];
 
 private:
     char name[64];

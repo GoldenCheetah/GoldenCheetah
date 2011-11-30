@@ -56,6 +56,7 @@ enum gcwinid {
         BingMap = 28,
         RealtimeControls = 29,
         ActivityNavigator = 30,
+        SpinScanPlot = 31,
 };
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;

@@ -304,6 +304,8 @@ HEADERS += \
         SimpleNetworkController.h \
         SimpleNetworkClient.h \
         SpecialFields.h \
+        SpinScanPlot.h \
+        SpinScanPlotWindow.h \
         SplitRideDialog.h \
         SplitActivityWizard.h \
         SlfParser.h \
@@ -477,6 +479,8 @@ SOURCES += \
         SimpleNetworkClient.cpp \
         SmallPlot.cpp \
         SpecialFields.cpp \
+        SpinScanPlot.cpp \
+        SpinScanPlotWindow.cpp \
         SplitRideDialog.cpp \
         SplitActivityWizard.cpp \
         SlfParser.cpp \

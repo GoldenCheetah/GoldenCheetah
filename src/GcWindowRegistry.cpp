@@ -52,6 +52,7 @@
 #include "WeeklySummaryWindow.h"
 #include "DialWindow.h"
 #include "RealtimePlotWindow.h"
+#include "SpinScanPlotWindow.h"
 #include "WorkoutPlotWindow.h"
 #include "BingMap.h"
 
@@ -82,9 +83,10 @@ GcWindowRegistry GcWindows[] = {
     { VIEW_ANALYSIS, "Aerolab Chung Analysis",GcWindowTypes::Aerolab },
     { VIEW_DIARY, "Calendar",GcWindowTypes::Diary },
     { VIEW_DIARY, "Navigator", GcWindowTypes::ActivityNavigator },
-    { VIEW_TRAIN, "Telemetry Dial",GcWindowTypes::DialWindow },
-    { VIEW_TRAIN, "Workout Plot",GcWindowTypes::WorkoutPlot },
-    { VIEW_TRAIN, "Realtime Plot",GcWindowTypes::RealtimePlot },
+    { VIEW_TRAIN, "Telemetry",GcWindowTypes::DialWindow },
+    { VIEW_TRAIN, "Workout",GcWindowTypes::WorkoutPlot },
+    { VIEW_TRAIN, "Realtime",GcWindowTypes::RealtimePlot },
+    { VIEW_TRAIN, "Pedal Stroke",GcWindowTypes::SpinScanPlot },
     { VIEW_TRAIN, "Map", GcWindowTypes::MapWindow },
     { VIEW_TRAIN, "StreetView", GcWindowTypes::StreetViewWindow },
     { VIEW_TRAIN, "Video Player",GcWindowTypes::VideoPlayer },
@@ -131,6 +133,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, MainWindow *main) //XXX mainWindow wil
     case GcWindowTypes::MetadataWindow: returning = new MetadataWindow(main); break;
     case GcWindowTypes::RealtimeControls: returning = new GcWindow(); break;
     case GcWindowTypes::RealtimePlot: returning = new RealtimePlotWindow(main); break;
+    case GcWindowTypes::SpinScanPlot: returning = new SpinScanPlotWindow(main); break;
     case GcWindowTypes::WorkoutPlot: returning = new WorkoutPlotWindow(main); break;
     case GcWindowTypes::BingMap: returning = new BingMap(main); break;
     case GcWindowTypes::MapWindow: returning = new MapWindow(main); break;
