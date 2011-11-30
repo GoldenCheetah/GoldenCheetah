@@ -132,5 +132,6 @@ class ColorEngine : public QObject
 #define CTILEBARSELECT        54
 #define CTOOLBAR              55
 #define CRIDEGROUP            56
+#define CSPINSCAN             57
 
 #endif

@@ -435,7 +435,7 @@ TrainTool::workoutTreeWidgetSelectionChanged()
             workout = which;
     }
 
-    int mode;
+    //int mode;
 
     // wip away the current selected workout
     if (ergFile) {
@@ -663,7 +663,18 @@ void TrainTool::Start()       // when start button is pressed
         // open the controller if it is selected
         setDeviceController();
         if (deviceController == NULL) return;
-        else deviceController->start();          // start device
+
+        if (mode == ERG || mode == MRC) {
+            status |= RT_MODE_ERGO;
+            status &= ~RT_MODE_SPIN;
+            deviceController->setMode(RT_MODE_ERGO);
+        } else { // SLOPE MODE
+            status |= RT_MODE_SPIN;
+            status &= ~RT_MODE_ERGO;
+            deviceController->setMode(RT_MODE_SPIN);
+        }
+
+        deviceController->start();          // start device
 
         // tell the world
         main->notifyStart();

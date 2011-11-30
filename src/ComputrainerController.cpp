@@ -74,6 +74,7 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
     int Buttons, Status;
     bool calibration;
     double Power, HeartRate, Cadence, Speed, RRC, Load;
+    uint8_t ss[24];
 
     if(!myComputrainer->isRunning())
     {
@@ -86,7 +87,7 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
     }
     // get latest telemetry
     myComputrainer->getTelemetry(Power, HeartRate, Cadence, Speed,
-                        RRC, calibration, Buttons, Status);
+                        RRC, calibration, Buttons, ss, Status);
 
     //
     // PASS BACK TELEMETRY
@@ -95,6 +96,8 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
     rtData.setHr(HeartRate);
     rtData.setCadence(Cadence);
     rtData.setSpeed(Speed);
+
+    memcpy(rtData.spinScan, ss, 24);
 
     // post processing, probably not used
     // since its used to compute power for

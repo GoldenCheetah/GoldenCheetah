@@ -72,7 +72,7 @@ Computrainer::Computrainer(QObject *parent,  QString devname) : QThread(parent)
 {
 
     devicePower = deviceHeartRate = deviceCadence = deviceSpeed = deviceRRC = 0.00;
-    for (int i=0; i<24; spinData[i++] = 0.00) ;
+    for (int i=0; i<24; spinScan[i++] = 0) ;
     mode = DEFAULT_MODE;
     load = DEFAULT_LOAD;
     gradient = DEFAULT_GRADIENT;
@@ -166,7 +166,7 @@ bool Computrainer::isCalibrated()
 }
 
 void Computrainer::getTelemetry(double &power, double &heartrate, double &cadence, double &speed,
-                  double &RRC, bool &calibration, int &buttons, int &status)
+                  double &RRC, bool &calibration, int &buttons, uint8_t *ss, int &status)
 {
 
     pvars.lock();
@@ -178,13 +178,14 @@ void Computrainer::getTelemetry(double &power, double &heartrate, double &cadenc
     calibration = deviceCalibrated;
     buttons = deviceButtons;
     status = deviceStatus;
+    memcpy((void*)ss, (void*)spinScan, 24);
     pvars.unlock();
 }
 
 void Computrainer::getSpinScan(double spinData[])
 {
     pvars.lock();
-    for (int i=0; i<24; spinData[i] = this->spinData[i]) ;
+    for (int i=0; i<24; spinData[i] = this->spinScan[i]) ;
     pvars.unlock();
 }
 
@@ -257,7 +258,6 @@ void Computrainer::prepareCommand(int mode, double value)
     switch (mode) {
 
     case CT_ERGOMODE :
-
                 load = (int)value;
                 crc = calcCRC(load);
 
@@ -334,10 +334,8 @@ int Computrainer::calcCRC(int value)
 // funny, just a few lines of code. oh the pain to get this working :-)
 void Computrainer::unpackTelemetry(int &ss1, int &ss2, int &ss3, int &buttons, int &type, int &value8, int &value12)
 {
-    /* ---- looking at spinscan data -- commented out for release
-    static int ss[24];
+    static uint8_t ss[24];
     static int pos=0;
-    ----- */
 
     // inbound data is in the 7 byte array Computrainer::buf[]
     // for code clarity they hjave been put into these holdiing
@@ -357,6 +355,10 @@ void Computrainer::unpackTelemetry(int &ss1, int &ss2, int &ss3, int &buttons, i
     ss2 = s2<<1 | (b3&16)>>4;
     ss3 = s3<<1 | (b3&8)>>3;
 
+    // swap nibbles, is this really right?
+    ss1 = ((ss1&15)<<4) | (ss1&240)>>4;
+    ss2 = ((ss2&15)<<4) | (ss2&240)>>4;
+    ss3 = ((ss3&15)<<4) | (ss3&240)>>4;
 
     // buttons
     buttons = bt<<1 | (b3&4)>>2;
@@ -370,18 +372,23 @@ void Computrainer::unpackTelemetry(int &ss1, int &ss2, int &ss3, int &buttons, i
     // 12 bit value
     value12 = value8 | (b1&7)<<9 | (b3&2)<<7;
 
-    /* ------- Looking at spinscan data ? -- commented out for release
     if (buttons&64) {
-        for (pos=0; pos<24; pos++) fprintf(stderr, "%d, ", ss[pos]);
+        memcpy((void*)spinScan, (void*)ss, 24);
+        //for (pos=0; pos<24; pos++) fprintf(stderr, "%d, ", ss[pos]);
+        //fprintf(stderr, "\n");
         pos=0;
-        fprintf(stderr, "\n");
     }
     if (ss1 || ss2 || ss3) {
-        ss[pos++] = ss1;
-        ss[pos++] = ss2;
-        ss[pos++] = ss3;
+
+        // we drop the msb and do a ones compliment, but
+        // that looks eerily like a signed byte.
+        // suspect there is more hidden in there?
+        // but when decoded as a signed byte the numbers
+        // are all over the place. investigate further!
+        ss[pos++] = 127^(ss1&127);
+        ss[pos++] = 127^(ss2&127);
+        ss[pos++] = 127^(ss3&127);
     }
-    ------- */
 }
 
 
@@ -504,7 +511,6 @@ void Computrainer::run()
     bool curcalibrated;                   // is it calibrated?
     bool curhrconnected;                  // is HR sensor connected?
     bool curcadconnected;                 // is CAD sensor connected?
-    double curspinData[24];               // SS values only in SS_MODE
     int curButtons;                       // Button status
     int curStatus;                        // Device status running, paused, disconnected
 
@@ -530,7 +536,6 @@ void Computrainer::run()
     curButtons = 0;
     this->deviceButtons = 0;
     curStatus = this->deviceStatus;
-    for (int i=0; i<24; i++) curspinData[i] = this->spinData[i] = 0;
     pvars.unlock();
 
 

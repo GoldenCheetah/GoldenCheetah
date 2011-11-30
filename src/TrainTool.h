@@ -214,6 +214,7 @@ class TrainTool : public GcWindow
                     *disk_timer;    // write to .CSV file
 
     public:
+        int mode;
         // everyone else wants this
         QCheckBox   *recordSelector;
         boost::shared_ptr<QFileSystemWatcher> watcher;
