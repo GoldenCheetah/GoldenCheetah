@@ -53,6 +53,10 @@ void RealtimeData::setCadence(double aCadence)
 {
     cadence = (int)aCadence;
 }
+void RealtimeData::setSlope(double slope)
+{
+    this->slope = slope;
+}
 void RealtimeData::setLoad(double load)
 {
     this->load = load;
@@ -93,6 +97,10 @@ double RealtimeData::getWheelRpm() const
 double RealtimeData::getCadence() const
 {
     return cadence;
+}
+double RealtimeData::getSlope() const
+{
+    return slope;
 }
 double RealtimeData::getLoad() const
 {

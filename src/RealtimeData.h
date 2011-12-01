@@ -30,6 +30,8 @@ class RealtimeData
 
 public:
 
+    int mode;
+
     // abstract to dataseries
     enum dataseries { None=0, Time, LapTime, Distance, Lap,
                       Watts, Speed, Cadence, HeartRate, Load,
@@ -53,6 +55,7 @@ public:
     void setWheelRpm(double wheelRpm);
     void setCadence(double aCadence);
     void setLoad(double load);
+    void setSlope(double slope);
     void setMsecs(long);
     void setLapMsecs(long);
     void setDistance(double);
@@ -69,6 +72,7 @@ public:
     double getWheelRpm() const;
     double getCadence() const;
     double getLoad() const;
+    double getSlope() const;
     long getMsecs() const;
     long getLapMsecs() const;
     double getDistance() const;
@@ -80,7 +84,7 @@ private:
     char name[64];
 
     // realtime telemetry
-    double hr, watts, speed, wheelRpm, load;
+    double hr, watts, speed, wheelRpm, load, slope;
     double cadence;      // in rpm
 
     // derived data

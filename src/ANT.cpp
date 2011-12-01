@@ -281,10 +281,17 @@ ANT::quit(int code)
     return 0;
 }
 
-RealtimeData
-ANT::getRealtimeData()
+void
+ANT::getRealtimeData(RealtimeData &rtData)
 {
-    return telemetry;
+    int mode = rtData.mode;
+    long load = rtData.getLoad();
+    double slope = rtData.getSlope();
+
+    rtData = telemetry;
+    rtData.mode = mode;
+    rtData.setLoad(load);
+    rtData.setSlope(slope);
 }
 
 /*======================================================================

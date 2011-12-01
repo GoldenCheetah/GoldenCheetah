@@ -127,7 +127,7 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
     if ((Buttons&CT_MINUS) && !(Buttons&CT_F3)) {
             parent->Lower();
     }
-    rtData.setLoad(Load);
+    //rtData.setLoad(Load);
 
 #if 0 // F3 now toggles calibration
     // FFWD/REWIND

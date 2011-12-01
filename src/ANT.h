@@ -259,7 +259,7 @@ public slots:
     void searchComplete(int number); // search completed successfully
 
     // get telemetry
-    RealtimeData getRealtimeData();             // return current realtime data
+    void getRealtimeData(RealtimeData &);             // return current realtime data
 
 public:
 
