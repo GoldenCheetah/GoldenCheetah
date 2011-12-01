@@ -87,7 +87,7 @@ ANTlocalController::getRealtimeData(RealtimeData &rtData)
         return;
     }
     // get latest telemetry
-    rtData = myANTlocal->getRealtimeData();
+    myANTlocal->getRealtimeData(rtData);
     processRealtimeData(rtData);
 }
 

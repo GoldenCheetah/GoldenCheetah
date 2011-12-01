@@ -27,6 +27,7 @@
 #include "MainWindow.h"
 #include "Zones.h" // for data series types
 #include "RideFile.h" // for data series types
+#include "ErgFile.h" // for workout modes
 #include "RealtimeData.h" // for realtimedata structure
 
 #include "Settings.h" // for realtimedata structure

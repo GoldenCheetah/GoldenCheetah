@@ -287,7 +287,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     lodcount = 0;
     load_msecs = total_msecs = lap_msecs = 0;
     displayWorkoutDistance = displayDistance = displayPower = displayHeartRate =
-    displaySpeed = displayCadence = displayGradient = displayLoad = 0;
+    displaySpeed = displayCadence = slope = load = 0;
 
     connect(gui_timer, SIGNAL(timeout()), this, SLOT(guiUpdate()));
     connect(disk_timer, SIGNAL(timeout()), this, SLOT(diskUpdate()));
@@ -664,6 +664,9 @@ void TrainTool::Start()       // when start button is pressed
         setDeviceController();
         if (deviceController == NULL) return;
 
+        load = 0;
+        slope = 0.0;
+
         if (mode == ERG || mode == MRC) {
             status |= RT_MODE_ERGO;
             status &= ~RT_MODE_SPIN;
@@ -773,8 +776,8 @@ void TrainTool::Pause()        // pause capture to recalibrate
 
 void TrainTool::Stop(int deviceStatus)        // when stop button is pressed
 {
-    if (deviceController == NULL) return;
 
+    if (deviceController == NULL) return;
     if ((status&RT_RUNNING) == 0) return;
 
     status &= ~RT_RUNNING;
@@ -786,6 +789,9 @@ void TrainTool::Stop(int deviceStatus)        // when stop button is pressed
 
     gui_timer->stop();
     calibrating = false;
+
+    load = 0;
+    slope = 0.0;
 
     QDateTime now = QDateTime::currentDateTime();
 
@@ -860,7 +866,7 @@ void TrainTool::updateData(RealtimeData &rtData)
         displayCadence = rtData.getCadence();
         displayHeartRate = rtData.getHr();
         displaySpeed = rtData.getSpeed();
-        displayLoad = rtData.getLoad();
+        load = rtData.getLoad();
     // Gradient not supported
         return;
 }
@@ -873,6 +879,7 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
 {
     RealtimeData rtData;
     rtData.setLap(displayLap + displayWorkoutLap); // user laps + predefined workout lap
+    rtData.mode = mode;
 
     if (deviceController == NULL) return;
 
@@ -888,6 +895,8 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
     // get latest telemetry from device (if it is a pull device e.g. Computrainer //
     if (status&RT_RUNNING && deviceController->doesPull() == true) {
 
+        rtData.setLoad(load); // always set load..
+        rtData.setSlope(slope); // always set load..
         deviceController->getRealtimeData(rtData);
 
         // Distance assumes current speed for the last second. from km/h to km/sec
@@ -908,7 +917,7 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
         displayCadence = rtData.getCadence();
         displayHeartRate = rtData.getHr();
         displaySpeed = rtData.getSpeed();
-        displayLoad = rtData.getLoad();
+        load = rtData.getLoad();
 
         // go update the displays...
         main->notifyTelemetryUpdate(rtData); // signal everyone to update telemetry
@@ -1036,8 +1045,6 @@ void TrainTool::diskUpdate()
 void TrainTool::loadUpdate()
 {
     int curLap;
-    long load;
-    double gradient;
 
     // we hold our horses whilst calibration is taking place...
     if (calibrating) return;
@@ -1057,21 +1064,19 @@ void TrainTool::loadUpdate()
         if (load == -100) {
             Stop(DEVICE_OK);
         } else {
-            displayLoad = load;
-            deviceController->setLoad(displayLoad);
+            deviceController->setLoad(load);
             main->notifySetNow(load_msecs);
         }
     } else {
-        gradient = ergFile->gradientAt(displayWorkoutDistance*1000, curLap);
+        slope = ergFile->gradientAt(displayWorkoutDistance*1000, curLap);
 
         displayWorkoutLap = curLap;
 
         // we got to the end!
-        if (gradient == -100) {
+        if (slope == -100) {
             Stop(DEVICE_OK);
         } else {
-            displayGradient = gradient;
-            deviceController->setGradient(displayGradient);
+            deviceController->setGradient(slope);
             main->notifySetNow(displayWorkoutDistance * 1000);
         }
     }
@@ -1171,14 +1176,14 @@ void TrainTool::Higher()
 
     } else {
 
-        if (status&RT_MODE_ERGO) displayLoad += 5;
-        else displayGradient += 0.1;
+        if (status&RT_MODE_ERGO) load += 5;
+        else slope += 0.1;
 
-        if (displayLoad >1500) displayLoad = 1500;
-        if (displayGradient >15) displayGradient = 15;
+        if (load >1500) load = 1500;
+        if (slope >15) slope = 15;
 
-        if (status&RT_MODE_ERGO) deviceController->setLoad(displayLoad);
-        else deviceController->setGradient(displayGradient);
+        if (status&RT_MODE_ERGO) deviceController->setLoad(load);
+        else deviceController->setGradient(slope);
     }
 }
 
@@ -1193,14 +1198,14 @@ void TrainTool::Lower()
         intensitySlider->setValue(intensitySlider->value()-5);
 
     } else {
-        if (status&RT_MODE_ERGO) displayLoad -= 5;
-        else displayGradient -= 0.1;
+        if (status&RT_MODE_ERGO) load -= 5;
+        else slope -= 0.1;
 
-        if (displayLoad <0) displayLoad = 0;
-        if (displayGradient <-10) displayGradient = -10;
+        if (load <0) load = 0;
+        if (slope <-10) slope = -10;
 
-        if (status&RT_MODE_ERGO) deviceController->setLoad(displayLoad);
-        else deviceController->setGradient(displayGradient);
+        if (status&RT_MODE_ERGO) deviceController->setLoad(load);
+        else deviceController->setGradient(slope);
     }
 }
 

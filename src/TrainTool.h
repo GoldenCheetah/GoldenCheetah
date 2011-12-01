@@ -186,9 +186,10 @@ class TrainTool : public GcWindow
         // updated with a RealtimeData object either from
         // update() - from a push device (quarqd ANT+)
         // Device->getRealtimeData() - from a pull device (Computrainer)
-        double displayPower, displayHeartRate, displayCadence,
-               displayLoad, displayGradient, displaySpeed;
+        double displayPower, displayHeartRate, displayCadence, displaySpeed;
         double displayDistance, displayWorkoutDistance;
+        long load;
+        double slope;
         int displayLap;            // user increment for Lap
         int displayWorkoutLap;     // which Lap in the workout are we at?
 

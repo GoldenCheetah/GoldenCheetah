@@ -328,6 +328,16 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         }
         break;
 
+    case RealtimeData::Load:
+        if (rtData.mode == ERG || rtData.mode == MRC) {
+            value = rtData.getLoad();
+            valueLabel->setText(QString("%1").arg(round(value)));
+        } else {
+            value = rtData.getSlope();
+            valueLabel->setText(QString("%1%").arg(value, 0, 'f', 1));
+        }
+        break;
+
     default:
         valueLabel->setText(QString("%1").arg(round(value)));
         break;
