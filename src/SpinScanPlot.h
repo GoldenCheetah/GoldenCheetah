@@ -35,9 +35,11 @@
 
 class SpinScanData : public QwtData
 {
+    bool isleft;
     uint8_t *spinData;
+
     public:
-    SpinScanData(uint8_t *spinData) : spinData(spinData) { init(); }
+    SpinScanData(uint8_t *spinData, bool isleft) : isleft(isleft), spinData(spinData) { init(); }
 
     double x(size_t i) const ;
     double y(size_t i) const ;
@@ -54,11 +56,13 @@ class SpinScanPlot : public QwtPlot
     private:
 
 	QwtPlotGrid *grid;
-	QwtPlotCurve *spinCurve;
+	QwtPlotCurve *leftCurve;
+	QwtPlotCurve *rightCurve;
 
     public:
     void setAxisTitle(int axis, QString label);
-    SpinScanData *spinScanData;
+    SpinScanData *leftSpinScanData;
+    SpinScanData *rightSpinScanData;
 
     SpinScanPlot(uint8_t *);
 

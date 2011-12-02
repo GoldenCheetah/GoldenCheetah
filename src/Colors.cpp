@@ -23,7 +23,7 @@
 #include <QDir>
 #include "Settings.h"
 
-static Colors ColorList[59], DefaultColorList[59];
+static Colors ColorList[60], DefaultColorList[60];
 
 static void copyArray(Colors source[], Colors target[])
 {
@@ -33,8 +33,9 @@ static void copyArray(Colors source[], Colors target[])
 
 static bool setupColors()
 {
-    // XXX remove when we can guarantee extended initialisation support in gcc (c++0x not supported by Qt currently)
-    Colors init[59] = {
+    // consider removing when we can guarantee extended initialisation support in gcc
+    // (c++0x not supported by Qt currently and not planned for 4.8 or 5.0)
+    Colors init[60] = {
         { "Plot Background", "COLORPLOTBACKGROUND", Qt::white },
         { "Ride Plot Background", "COLORRIDEPLOTBACKGROUND", Qt::black },
         { "Plot Thumbnail Background", "COLORPLOTTHUMBNAIL", Qt::gray },
@@ -92,7 +93,8 @@ static bool setupColors()
         { "Chart Bar Selected", "CTILEBARSELECT", Qt::yellow },
         { "ToolBar Background", "CTOOLBAR", Qt::white },
         { "Activity History Group", "CRIDEGROUP", QColor(236,246,255) },
-        { "SpinScan Foreground", "CSPINSCAN", Qt::gray },
+        { "SpinScan Left", "CSPINSCANLEFT", Qt::gray },
+        { "SpinScan Right", "CSPINSCANRIGHT", Qt::cyan },
         { "", "", QColor(0,0,0) },
     };
 

@@ -39,13 +39,13 @@ static const double xspin[97] = {
 };
 
 // Power history
-double SpinScanData::x(size_t i) const { return xspin[i]; }
-double SpinScanData::y(size_t i) const { return (i%4 == 2 || i%4 == 3) ? spinData[i/4] : 0; }
-size_t SpinScanData::size() const { return 97; }
-QwtData *SpinScanData::copy() const { return new SpinScanData(spinData); }
+double SpinScanData::x(size_t i) const { return xspin[i+(isleft?0:48)]; }
+double SpinScanData::y(size_t i) const { return (i%4 == 2 || i%4 == 3) ? spinData[(i+(isleft?0:48))/4] : 0; }
+size_t SpinScanData::size() const { return 48; }
+QwtData *SpinScanData::copy() const { return new SpinScanData(spinData, isleft); }
 void SpinScanData::init() { }
 
-SpinScanPlot::SpinScanPlot(uint8_t *spinData) : spinCurve(NULL), spinData(spinData)
+SpinScanPlot::SpinScanPlot(uint8_t *spinData) : leftCurve(NULL), rightCurve(NULL), spinData(spinData)
 {
     setInstanceName("SpinScan Plot");
 
@@ -57,8 +57,8 @@ SpinScanPlot::SpinScanPlot(uint8_t *spinData) : spinCurve(NULL), spinData(spinDa
     QPalette pal;
     setAxisScale(yLeft, 0, 90); // max 8 bit plus a little
     setAxisScale(xBottom, 0, 24); // max 8 bit plus a little
-    pal.setColor(QPalette::WindowText, GColor(CSPINSCAN));
-    pal.setColor(QPalette::Text, GColor(CSPINSCAN));
+    pal.setColor(QPalette::WindowText, GColor(CSPINSCANLEFT));
+    pal.setColor(QPalette::Text, GColor(CSPINSCANLEFT));
     axisWidget(QwtPlot::yLeft)->setPalette(pal);
     axisWidget(QwtPlot::yLeft)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
 
@@ -66,12 +66,18 @@ SpinScanPlot::SpinScanPlot(uint8_t *spinData) : spinCurve(NULL), spinData(spinDa
     enableAxis(yLeft, true);
 
     // 30s Power curve
-    spinCurve = new QwtPlotCurve("SpinScan");
-    spinCurve->setRenderHint(QwtPlotItem::RenderAntialiased); // too cpu intensive
-    spinCurve->attach(this);
-    spinCurve->setYAxis(QwtPlot::yLeft);
+    rightCurve = new QwtPlotCurve("SpinScan Left");
+    rightCurve->setRenderHint(QwtPlotItem::RenderAntialiased); // too cpu intensive
+    rightCurve->attach(this);
+    rightCurve->setYAxis(QwtPlot::yLeft);
+    leftCurve = new QwtPlotCurve("SpinScan Right");
+    leftCurve->setRenderHint(QwtPlotItem::RenderAntialiased); // too cpu intensive
+    leftCurve->attach(this);
+    leftCurve->setYAxis(QwtPlot::yLeft);
 
-    spinScanData = new SpinScanData(spinData);
+    leftSpinScanData = new SpinScanData(spinData, true);
+    rightSpinScanData = new SpinScanData(spinData, false);
+
     canvas()->setFrameStyle(QFrame::NoFrame);
     configChanged(); // set colors
 }
@@ -95,11 +101,19 @@ SpinScanPlot::configChanged()
 {
     setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
 
-    QColor col = GColor(CSPINSCAN);
-    spinCurve->setPen(Qt::NoPen);
+    QColor col = GColor(CSPINSCANLEFT);
     col.setAlpha(120);
     QBrush brush = QBrush(col);
-    spinCurve->setBrush(brush);
+    leftCurve->setBrush(brush);
+    leftCurve->setPen(Qt::NoPen);
     //spinCurve->setStyle(QwtPlotCurve::Steps);
-    spinCurve->setData(*spinScanData);
+    leftCurve->setData(*leftSpinScanData);
+
+    QColor col2 = GColor(CSPINSCANRIGHT);
+    col2.setAlpha(120);
+    QBrush brush2 = QBrush(col2);
+    rightCurve->setBrush(brush2);
+    rightCurve->setPen(Qt::NoPen);
+    //spinCurve->setStyle(QwtPlotCurve::Steps);
+    rightCurve->setData(*rightSpinScanData);
 }
