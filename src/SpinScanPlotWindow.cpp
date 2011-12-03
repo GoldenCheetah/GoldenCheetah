@@ -20,7 +20,7 @@
 #include "SpinScanPlotWindow.h"
 
 SpinScanPlotWindow::SpinScanPlotWindow(MainWindow *mainWindow) :
-    GcWindow(mainWindow), mainWindow(mainWindow)
+    GcWindow(mainWindow), mainWindow(mainWindow), active(false)
 {
     setContentsMargins(0,0,0,0);
     setInstanceName("SpinScan Plot");
@@ -88,7 +88,12 @@ SpinScanPlotWindow::SpinScanPlotWindow(MainWindow *mainWindow) :
 void
 SpinScanPlotWindow::setStyle(int x)
 {
+    if (active == true) return;
+
+    active = true;
+    mode->setCurrentIndex(x);
     stack->setCurrentIndex(x);
+    active = false;
 }
 
 void

@@ -87,6 +87,7 @@ class SpinScanPlotWindow : public GcWindow
         int current;
 
         MainWindow *mainWindow;
+        bool active;
 
         QStackedWidget *stack;
         SpinScanPlot *rtPlot;
