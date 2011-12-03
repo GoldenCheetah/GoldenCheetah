@@ -186,6 +186,8 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                 double londelta = (point->lon - last->lon) / (double) count;
                 double latdelta = (point->lat - last->lat) / (double) count;
                 double hwdelta = (point->headwind - last->headwind) / (double) count;
+                double slopedelta = (point->slope - last->slope) / (double) count;
+                double temperaturedelta = (point->temp - last->temp) / (double) count;
 
                 // add the points
                 for(int i=0; i<count; i++) {
@@ -200,6 +202,8 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                                                            last->lon + ((i+1)*londelta),
                                                            last->lat + ((i+1)*latdelta),
                                                            last->headwind + ((i+1)*hwdelta),
+                                                           last->slope + ((i+1)*slopedelta),
+                                                           last->temp + ((i+1)*temperaturedelta),
                                                            last->interval);
                     ride->command->insertPoint(position++, add);
                 }
@@ -223,6 +227,8 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
                                                            0,
                                                            0,
                                                            last->alt,
+                                                           0,
+                                                           0,
                                                            0,
                                                            0,
                                                            0,

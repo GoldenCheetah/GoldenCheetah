@@ -309,7 +309,7 @@ RideSummaryWindow::htmlSummary() const
                 if (p->secs >= interval.stop)
                     break;
                 f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
-                              p->watts, p->alt, p->lon, p->lat, p->headwind, 0);
+                              p->watts, p->alt, p->lon, p->lat, p->headwind, p->slope, p->temp, 0);
             }
             if (f.dataPoints().size() == 0) {
                 // Interval empty, do not compute any metrics

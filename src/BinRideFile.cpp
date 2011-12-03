@@ -383,6 +383,7 @@ struct BinFileReaderState
         int i = 0;
         double secs = 0, alt = 0, cad = 0, km = 0, grade = 0, hr = 0;
         double nm = 0, kph = 0, watts = 0;
+        double temperature = RideFile::noTemp;
 
         foreach(const BinField &field, def.fields) {
             if (!global_format_identifiers.contains(field.id)) {
@@ -394,6 +395,7 @@ struct BinFileReaderState
                 switch (field.id) {
                     case FORMAT_ID__RIDE_DISTANCE :
                         km = value/10000.0;
+                        break;
                     case FORMAT_ID__RIDE_TIME :
                         secs = value / 1000.0;
                         break;
@@ -418,13 +420,17 @@ struct BinFileReaderState
                             hr = value;
                         break;
                     case FORMAT_ID__GRADE :
-                        grade = value;
+                        if (value>37768)
+                            value = value - 256*256;
+                        grade = value/100.0;
+
                         break;
                     case FORMAT_ID__ALTITUDE :
                         alt = value/10.0;
                            break;
                     case FORMAT_ID__ALTITUDE_OLD :
-                        alt = value/10.0;
+                        if (alt == 0.0)
+                            alt = value/10.0;
                         break;
                     default:
                         unexpected_format_identifiers_for_record_types[def.format_identifier].insert(field.id);
@@ -433,16 +439,19 @@ struct BinFileReaderState
         }
 
         double headwind = 0.0;
+
         int interval = 0;
         int lng = 0;
         int lat = 0;
 
-        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, interval);
+        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, grade, temperature, interval);
         //printf("addPoint time %f hr %f speed %f dist %f alt %f\n", secs, hr, kph, km, alt);
     }
 
     void decodeSparseData(const BinDefinition &def, const std::vector<int> values) {
         int i = 0;
+
+        double secs = 0.0;
         int temperature_count = 0;
         double temperature = 0.0;
 
@@ -456,9 +465,12 @@ struct BinFileReaderState
                         // use for average
                         temperature += value/10.0;
                         temperature_count ++;
+
+                        rideFile->dataPoints().at(rideFile->timeIndex(secs))->temp = temperature;
+                        rideFile->setDataPresent(RideFile::temp, true);
                         break;
                     case FORMAT_ID__RIDE_TIME :
-                        unused_format_identifiers_for_record_types[def.format_identifier].insert(field.id);
+                        secs = value / 1000.0;
                         break;
 
                     default:

@@ -106,12 +106,12 @@ struct SyncFileReaderState
     {
         double alt = 0, cad = 0, grade = 0, hr = 0, kph = 0, watts = 0;
 
-        double nm = 0, headwind = 0.0;
+        double nm = 0, headwind = 0.0, temp = 0.0;
         int lng = 0, lat = 0;
 
         // Graph data (12 bytes)
 
-        read_bytes(2, count, sum); // Temperature * 100 (in degree C)
+        temp = read_bytes(2, count, sum) / 100; // Temperature * 100 (in degree C)
 
         alt = read_bytes(2, count, sum); //Alti (in m)
         grade = read_bytes(1, count, sum); // Gradient %
@@ -132,7 +132,7 @@ struct SyncFileReaderState
 
         km += intSecs * kph / 3600.0;
         rideFile->setRecIntSecs(intSecs);
-        rideFile->appendPoint(*secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, interval);
+        rideFile->appendPoint(*secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, grade, temp, interval);
 
         *secs = *secs + intSecs;
 
