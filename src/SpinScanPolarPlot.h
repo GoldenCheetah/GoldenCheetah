@@ -16,8 +16,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _GC_SpinScanPlot_h
-#define _GC_SpinScanPlot_h 1
+#ifndef _GC_SpinScanPolarPlot_h
+#define _GC_SpinScanPolarPlot_h 1
 #include "GoldenCheetah.h"
 
 #include <QtGui>
@@ -33,13 +33,13 @@
 
 #include <stdint.h> //uint8_t
 
-class SpinScanData : public QwtData
+class SpinScanPolarData : public QwtData
 {
     bool isleft;
     uint8_t *spinData;
 
     public:
-    SpinScanData(uint8_t *spinData, bool isleft) : isleft(isleft), spinData(spinData) { init(); }
+    SpinScanPolarData(uint8_t *spinData, bool isleft) : isleft(isleft), spinData(spinData) { init(); }
 
     double x(size_t i) const ;
     double y(size_t i) const ;
@@ -48,23 +48,23 @@ class SpinScanData : public QwtData
     void init() ;
 };
 
-class SpinScanPlot : public QwtPlot
+class SpinScanPolarPlot : public QwtPlot
 {
     Q_OBJECT
     G_OBJECT
 
     private:
 
-	QwtPlotGrid *grid;
 	QwtPlotCurve *leftCurve;
 	QwtPlotCurve *rightCurve;
 
     public:
     void setAxisTitle(int axis, QString label);
-    SpinScanData *leftSpinScanData;
-    SpinScanData *rightSpinScanData;
 
-    SpinScanPlot(QWidget *parent, uint8_t *);
+    SpinScanPolarData *leftSpinScanPolarData;
+    SpinScanPolarData *rightSpinScanPolarData;
+
+    SpinScanPolarPlot(QWidget *parent, uint8_t *);
 
     uint8_t *spinData;
 
@@ -74,5 +74,5 @@ class SpinScanPlot : public QwtPlot
 
 
 
-#endif // _GC_SpinScanPlot_h
+#endif // _GC_SpinScanPolarPlot_h
 

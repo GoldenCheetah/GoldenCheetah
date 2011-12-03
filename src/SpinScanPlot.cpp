@@ -45,7 +45,7 @@ size_t SpinScanData::size() const { return 48; }
 QwtData *SpinScanData::copy() const { return new SpinScanData(spinData, isleft); }
 void SpinScanData::init() { }
 
-SpinScanPlot::SpinScanPlot(uint8_t *spinData) : leftCurve(NULL), rightCurve(NULL), spinData(spinData)
+SpinScanPlot::SpinScanPlot(QWidget *parent, uint8_t *spinData) : QwtPlot(parent), leftCurve(NULL), rightCurve(NULL), spinData(spinData)
 {
     setInstanceName("SpinScan Plot");
 

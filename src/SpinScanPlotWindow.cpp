@@ -24,8 +24,25 @@ SpinScanPlotWindow::SpinScanPlotWindow(MainWindow *mainWindow) :
 {
     setContentsMargins(0,0,0,0);
     setInstanceName("SpinScan Plot");
-    setControls(NULL);
     setProperty("color", GColor(CRIDEPLOTBACKGROUND));
+
+    // setup controls
+    QWidget *c = new QWidget;
+    QVBoxLayout *cl = new QVBoxLayout(c);
+    QHBoxLayout *style = new QHBoxLayout();
+    cl->addLayout(style);
+    cl->addStretch();
+
+    QLabel *label = new QLabel("Style", this);
+    mode = new QComboBox(this);
+    mode->addItem("Bar");
+    mode->addItem("Polar");
+
+    style->addWidget(label);
+    style->addWidget(mode);
+    style->addStretch();
+
+    setControls(c);
 
     // init to zero
     history[0] = set1;
@@ -46,8 +63,18 @@ SpinScanPlotWindow::SpinScanPlotWindow(MainWindow *mainWindow) :
     history[15] = set16;
 
     QVBoxLayout *layout = new QVBoxLayout(this);
-    rtPlot = new SpinScanPlot(spinData);
-    layout->addWidget(rtPlot);
+    stack = new QStackedWidget(this);
+    
+    rtPlot = new SpinScanPlot(this, spinData);
+    plPlot = new SpinScanPolarPlot(this, spinData);
+
+    stack->addWidget(rtPlot);
+    stack->addWidget(plPlot);
+
+    layout->addWidget(stack);
+
+    // when we change styles..
+    connect(mode, SIGNAL(currentIndexChanged(int)), this, SLOT(styleChanged()));
 
     // get updates..
     connect(mainWindow, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
@@ -56,6 +83,20 @@ SpinScanPlotWindow::SpinScanPlotWindow(MainWindow *mainWindow) :
 
     // set to zero
     stop(); // resets the array
+}
+
+void
+SpinScanPlotWindow::setStyle(int x)
+{
+    stack->setCurrentIndex(x);
+}
+
+void
+SpinScanPlotWindow::styleChanged()
+{
+    int index = mode->currentIndex();
+    if (index < 0 || index > 1) return;
+    stack->setCurrentIndex(index);
 }
 
 void
@@ -96,5 +137,6 @@ SpinScanPlotWindow::telemetryUpdate(RealtimeData rtData)
     memcpy(history[current++], rtData.spinScan, 24);
     if (current==16) current=0;
 
+    plPlot->replot();                // redraw
     rtPlot->replot();                // redraw
 }
