@@ -373,7 +373,8 @@ void Computrainer::unpackTelemetry(int &ss1, int &ss2, int &ss3, int &buttons, i
     value12 = value8 | (b1&7)<<9 | (b3&2)<<7;
 
     if (buttons&64) {
-        memcpy((void*)spinScan, (void*)ss, 24);
+        memcpy((void*)spinScan, (void*)ss+3, 21);
+        memcpy((void*)spinScan+21, (void*)ss, 3);
         //for (pos=0; pos<24; pos++) fprintf(stderr, "%d, ", ss[pos]);
         //fprintf(stderr, "\n");
         pos=0;

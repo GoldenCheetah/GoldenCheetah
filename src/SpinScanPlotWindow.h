@@ -26,6 +26,7 @@
 
 #include "MainWindow.h"
 #include "RideFile.h" // for data series types
+#include "SpinScanPolarPlot.h"
 #include "SpinScanPlot.h"
 #include "RealtimeData.h" // for realtimedata structure
 
@@ -36,6 +37,8 @@ class SpinScanPlotWindow : public GcWindow
 {
     Q_OBJECT
     G_OBJECT
+
+    Q_PROPERTY(int style READ getStyle WRITE setStyle USER true)
 
     public:
 
@@ -48,6 +51,10 @@ class SpinScanPlotWindow : public GcWindow
         void start();
         void stop();
         void pause();
+
+        int getStyle() const { return mode->currentIndex(); }
+        void setStyle(int x);
+        void styleChanged();
 
     private:
 
@@ -80,9 +87,14 @@ class SpinScanPlotWindow : public GcWindow
         int current;
 
         MainWindow *mainWindow;
+
+        QStackedWidget *stack;
         SpinScanPlot *rtPlot;
+        SpinScanPolarPlot *plPlot;
 
         uint8_t spinData[24]; // what we give to the plot
+
+        QComboBox *mode;
 };
 
 #endif // _GC_SpinScanPlotWindow_h

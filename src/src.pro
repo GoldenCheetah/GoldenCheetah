@@ -305,6 +305,7 @@ HEADERS += \
         SimpleNetworkClient.h \
         SpecialFields.h \
         SpinScanPlot.h \
+        SpinScanPolarPlot.h \
         SpinScanPlotWindow.h \
         SplitRideDialog.h \
         SplitActivityWizard.h \
@@ -480,6 +481,7 @@ SOURCES += \
         SmallPlot.cpp \
         SpecialFields.cpp \
         SpinScanPlot.cpp \
+        SpinScanPolarPlot.cpp \
         SpinScanPlotWindow.cpp \
         SplitRideDialog.cpp \
         SplitActivityWizard.cpp \
