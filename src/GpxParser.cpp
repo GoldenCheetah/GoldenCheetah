@@ -171,8 +171,7 @@ bool
 
 	if(rideFile->dataPoints().empty()) {
 	    // first point
-	    rideFile->appendPoint(secs, 0, 0, distance,
-				  speed, 0, 0, alt, lon, lat, 0, 0);
+	    rideFile->appendPoint(secs, 0, 0, distance, speed, 0, 0, alt, lon, lat, 0, 0.0, 0.0, 0);
 	}
 	else {
 	    // assumption that the change in ride is linear...  :)
@@ -187,8 +186,7 @@ bool
 	    // Smart Recording High Water Mark.
 	    if ((isGarminSmartRecording.toInt() == 0) || (deltaSecs == 1) || (deltaSecs >= GarminHWM.toInt())) {
 		// no smart recording, or delta exceeds HW treshold, just insert the data
-		rideFile->appendPoint(secs, 0, 0, distance,
-				      speed, 0,0, alt, lon, lat, 0, 0);
+		rideFile->appendPoint(secs, 0, 0, distance, speed, 0,0, alt, lon, lat, 0, 0.0, 0.0, 0);
 	    }
 	    else {
 		// smart recording is on and delta is less than GarminHWM seconds.
@@ -211,6 +209,8 @@ bool
 			    lon, // lon
 			    lat, // lat
 			    0,
+                0.0,
+                0.0,
 			    0);
 		}
 		prevPoint = rideFile->dataPoints().back();

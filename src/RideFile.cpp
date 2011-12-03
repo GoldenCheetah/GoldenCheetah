@@ -73,6 +73,8 @@ RideFile::seriesName(SeriesType series)
     case RideFile::lon: return QString(tr("Longitude"));
     case RideFile::lat: return QString(tr("Latitude"));
     case RideFile::headwind: return QString(tr("Headwind"));
+    case RideFile::slope: return QString(tr("Slope"));
+    case RideFile::temp: return QString(tr("Temperature"));
     case RideFile::interval: return QString(tr("Interval"));
     case RideFile::vam: return QString(tr("VAM"));
     default: return QString(tr("Unknown"));
@@ -98,6 +100,8 @@ RideFile::unitName(SeriesType series)
     case RideFile::lon: return QString(tr("lon"));
     case RideFile::lat: return QString(tr("lat"));
     case RideFile::headwind: return QString(tr("kph"));
+    case RideFile::slope: return QString(tr("%"));
+    case RideFile::temp: return QString(tr("°C"));
     case RideFile::interval: return QString(tr("Interval"));
     case RideFile::vam: return QString(tr("meters per hour"));
     default: return QString(tr("Unknown"));
@@ -366,10 +370,11 @@ QStringList RideFileFactory::listRideFiles(const QDir &dir) const
 
 void RideFile::appendPoint(double secs, double cad, double hr, double km,
                            double kph, double nm, double watts, double alt,
-                           double lon, double lat, double headwind, int interval)
+                           double lon, double lat, double headwind,
+                           double slope, double temp, int interval)
 {
     // negative values are not good, make them zero
-    // although alt, lat, lon, headwind can be negative of course!
+    // although alt, lat, lon, headwind, slope and temperature can be negative of course!
     if (!isfinite(secs) || secs<0) secs=0;
     if (!isfinite(cad) || cad<0) cad=0;
     if (!isfinite(hr) || hr<0) hr=0;
@@ -380,25 +385,27 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     if (!isfinite(interval) || interval<0) interval=0;
 
     dataPoints_.append(new RideFilePoint(secs, cad, hr, km, kph,
-                                         nm, watts, alt, lon, lat, headwind, interval));
-    dataPresent.secs  |= (secs != 0);
-    dataPresent.cad   |= (cad != 0);
-    dataPresent.hr    |= (hr != 0);
-    dataPresent.km    |= (km != 0);
-    dataPresent.kph   |= (kph != 0);
-    dataPresent.nm    |= (nm != 0);
-    dataPresent.watts |= (watts != 0);
-    dataPresent.alt   |= (alt != 0);
-    dataPresent.lon   |= (lon != 0);
-    dataPresent.lat   |= (lat != 0);
+                                         nm, watts, alt, lon, lat, headwind, slope, temp, interval));
+    dataPresent.secs     |= (secs != 0);
+    dataPresent.cad      |= (cad != 0);
+    dataPresent.hr       |= (hr != 0);
+    dataPresent.km       |= (km != 0);
+    dataPresent.kph      |= (kph != 0);
+    dataPresent.nm       |= (nm != 0);
+    dataPresent.watts    |= (watts != 0);
+    dataPresent.alt      |= (alt != 0);
+    dataPresent.lon      |= (lon != 0);
+    dataPresent.lat      |= (lat != 0);
     dataPresent.headwind |= (headwind != 0);
+    dataPresent.slope    |= (slope != 0);
+    dataPresent.temp     |= (temp != 0);
     dataPresent.interval |= (interval != 0);
 }
 
 void RideFile::appendPoint(const RideFilePoint &point)
 {
     dataPoints_.append(new RideFilePoint(point.secs,point.cad,point.hr,point.km,point.kph,point.nm,point.watts,point.alt,point.lon,point.lat,
-                                         point.headwind,point.interval));
+                                         point.headwind, point.slope, point.temp, point.interval));
 }
 
 void
@@ -416,6 +423,8 @@ RideFile::setDataPresent(SeriesType series, bool value)
         case lon : dataPresent.lon = value; break;
         case lat : dataPresent.lat = value; break;
         case headwind : dataPresent.headwind = value; break;
+        case slope : dataPresent.slope = value; break;
+        case temp : dataPresent.temp = value; break;
         case interval : dataPresent.interval = value; break;
         default:
         case none : break;
@@ -479,6 +488,8 @@ RideFilePoint::value(RideFile::SeriesType series) const
         case RideFile::lon : return lon; break;
         case RideFile::lat : return lat; break;
         case RideFile::headwind : return headwind; break;
+        case RideFile::slope : return slope; break;
+        case RideFile::temp : return temp; break;
         case RideFile::interval : return interval; break;
         default:
         case RideFile::none : break;
@@ -490,6 +501,15 @@ double
 RideFile::getPointValue(int index, SeriesType series) const
 {
     return dataPoints_[index]->value(series);
+}
+
+QVariant
+RideFile::getPoint(int index, SeriesType series) const
+{
+    double value = getPointValue(index, series);
+    if (series==RideFile::temp && value == RideFile::noTemp)
+        return "";
+    return value;
 }
 
 int
@@ -509,6 +529,8 @@ RideFile::decimalsFor(SeriesType series)
         case lon : return 6; break;
         case lat : return 6; break;
         case headwind : return 4; break;
+        case slope : return 1; break;
+        case temp : return 1; break;
         case interval : return 0; break;
         case vam : return 0; break;
         case none : break;
@@ -533,6 +555,8 @@ RideFile::maximumFor(SeriesType series)
         case lon : return 180; break;
         case lat : return 90; break;
         case headwind : return 999; break;
+        case slope : return 100; break;
+        case temp : return 100; break;
         case interval : return 999; break;
         case vam : return 9999; break;
         case none : break;
@@ -557,6 +581,8 @@ RideFile::minimumFor(SeriesType series)
         case lon : return -180; break;
         case lat : return -90; break;
         case headwind : return -999; break;
+        case slope : return -100; break;
+        case temp : return -100; break;
         case interval : return 0; break;
         case vam : return 0; break;
         case none : break;

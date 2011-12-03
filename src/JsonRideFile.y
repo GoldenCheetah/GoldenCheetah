@@ -102,7 +102,7 @@ static QString unprotect(const QString string)
 %token RIDE STARTTIME RECINTSECS DEVICETYPE IDENTIFIER
 %token OVERRIDES
 %token TAGS INTERVALS NAME START STOP
-%token SAMPLES SECS KM WATTS NM CAD KPH HR ALTITUDE LAT LON HEADWIND
+%token SAMPLES SECS KM WATTS NM CAD KPH HR ALTITUDE LAT LON HEADWIND SLOPE TEMP
 
 %start document
 %%
@@ -194,7 +194,9 @@ sample: '{' series_list '}'             { JsonRide->appendPoint(JsonPoint.secs, 
                                                     JsonPoint.hr, JsonPoint.km, JsonPoint.kph,
                                                     JsonPoint.nm, JsonPoint.watts, JsonPoint.alt,
                                                     JsonPoint.lon, JsonPoint.lat,
-                                                    JsonPoint.headwind, JsonPoint.interval);
+                                                    JsonPoint.headwind,
+                                                    JsonPoint.slope, JsonPoint.temp,
+                                                    JsonPoint.interval);
                                           JsonPoint = RideFilePoint();
                                         }
 
@@ -210,6 +212,8 @@ series: SECS ':' number                 { JsonPoint.secs = JsonNumber; }
         | LAT ':' number                { JsonPoint.lat = JsonNumber; }
         | LON ':' number                { JsonPoint.lon = JsonNumber; }
         | HEADWIND ':' number           { JsonPoint.headwind = JsonNumber; }
+        | SLOPE ':' number              { JsonPoint.slope = JsonNumber; }
+        | TEMP ':' number               { JsonPoint.temp = JsonNumber; }
         ;
 
 /*
@@ -396,6 +400,8 @@ JsonFileReader::writeRideFile(MainWindow *, const RideFile *ride, QFile &file) c
             if (ride->areDataPresent()->lon)
                 out << ", \"LON\":" << QString("%1").arg(p->lon, 0, 'g', 11);
             if (ride->areDataPresent()->headwind) out << ", \"HEADWIND\":" << QString("%1").arg(p->headwind);
+            if (ride->areDataPresent()->slope) out << ", \"SLOPE\":" << QString("%1").arg(p->slope);
+            if (ride->areDataPresent()->temp && p->temp != RideFile::noTemp) out << ", \"TEMP\":" << QString("%1").arg(p->temp);
 
             // sample points in here!
             out << " }";

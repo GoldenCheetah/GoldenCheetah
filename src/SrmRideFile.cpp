@@ -217,6 +217,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
     for (int i = 0; i < datacnt; ++i) {
         int cad, hr, watts;
         double kph, alt;
+        double temp=-255;
         if (version < 7) {
             quint8 ps[3];
             in.readRawData((char*) ps, sizeof(ps));
@@ -237,8 +238,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
             kph = kph_tmp < 0 ? 0 : kph_tmp * 3.6 / 1000.0;
 
             alt = readSignedLong(in);
-            double temp = 0.1 * readSignedShort(in);
-            (void) temp; // unused for now
+            temp = 0.1 * readSignedShort(in);
         }
 
         if (i == 0) {
@@ -256,7 +256,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
         km += result->recIntSecs() * kph / 3600.0;
 
         double nm = watts / 2.0 / PI / cad * 60.0;
-        result->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, 0.0, 0.0, 0.0, interval);
+        result->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, 0.0, 0.0, 0.0, 0.0, temp, interval);
 
         ++blkidx;
         if ((blkidx == blockhdrs[blknum].chunkcnt) && (blknum + 1 < blockcnt)) {

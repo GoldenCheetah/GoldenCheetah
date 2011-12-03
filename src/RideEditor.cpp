@@ -197,6 +197,8 @@ RideEditor::whatColumns()
          << tr("Latitude")
          << tr("Longitude")
          << tr("Headwind")
+         << tr("Slope")
+         << tr("Temperature")
          << tr("Interval");
 
     return what;
@@ -770,6 +772,9 @@ RideEditor::insColumn(QString name)
     if (name == tr("Headwind")) series = RideFile::headwind;
     if (name == tr("Interval")) series = RideFile::interval;
     if (name == tr("Heartrate")) series = RideFile::hr;
+    if (name == tr("Slope")) series = RideFile::slope;
+    if (name == tr("Temperature")) series = RideFile::temp;
+
 
     model->insertColumn(series);
 }
@@ -2131,6 +2136,8 @@ PasteSpecialDialog::okClicked()
                 if (headings[col] == tr("Longitude")) newrow.lon = value;
                 if (headings[col] == tr("Altitude")) newrow.alt = value;
                 if (headings[col] == tr("Headwind")) newrow.headwind = value;
+                if (headings[col] == tr("Slope")) newrow.slope = value;
+                if (headings[col] == tr("Temperature")) newrow.temp = value;
                 if (headings[col] == tr("Interval")) newrow.interval = value;
             }
 

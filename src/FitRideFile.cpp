@@ -316,7 +316,7 @@ struct FitFileReaderState
         if (time_offset > 0)
             time = last_time + time_offset;
         double alt = 0, cad = 0, km = 0, grade = 0, hr = 0, lat = 0, lng = 0, badgps = 0;
-        double resistance = 0, kph = 0, temperature = 0, time_from_course = 0, watts = 0;
+        double resistance = 0, kph = 0, temperature = RideFile::noTemp, time_from_course = 0, watts = 0;
         fit_value_t lati = NA_VALUE, lngi = NA_VALUE;
         int i = 0;
         foreach(const FitField &field, def.fields) {
@@ -423,11 +423,13 @@ struct FitFileReaderState
                     (badgps == 1) ? 0 : prevPoint->lon + (deltaLon * weight),
                     (badgps == 1) ? 0 : prevPoint->lat + (deltaLat * weight),
                     prevPoint->headwind + (deltaHeadwind * weight),
+                    0,
+                    temperature,
                     interval);
             }
             prevPoint = rideFile->dataPoints().back();
         }
-        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, interval);
+        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, 0, temperature, interval);
         last_time = time;
     }
 

@@ -113,6 +113,14 @@ RideFileTableModel::setHeadings(RideFile::SeriesType series)
             headings_ << tr("Headwind");
             headingsType << RideFile::headwind;
         }
+        if (series == RideFile::slope || ride->areDataPresent()->slope) {
+            headings_ << tr("Slope");
+            headingsType << RideFile::slope;
+        }
+        if (series == RideFile::temp || ride->areDataPresent()->temp) {
+            headings_ << tr("Temperature");
+            headingsType << RideFile::temp;
+        }
         if (series == RideFile::interval || ride->areDataPresent()->interval) {
             headings_ << tr("Interval");
             headingsType << RideFile::interval;
@@ -137,8 +145,9 @@ RideFileTableModel::data(const QModelIndex & index, int role) const
 
     if (index.row() >= ride->dataPoints().count() || index.column() >= headings_.count())
         return QVariant();
-    else
-        return ride->getPointValue(index.row(), headingsType[index.column()]);
+    else {
+        return ride->getPoint(index.row(), headingsType[index.column()]);
+    }
 }
 
 QVariant
