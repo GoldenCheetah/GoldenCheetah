@@ -62,6 +62,8 @@
 \"LAT\"             return LAT;
 \"LON\"             return LON;
 \"HEADWIND\"        return HEADWIND;
+\"SLOPE\"           return SLOPE;
+\"TEMP\"            return TEMP;
 [-+]?[0-9]+            return INTEGER;
 [-+]?[0-9]+e-[0-9]+    return FLOAT;
 [-+]?[0-9]+\.[-e0-9]*  return FLOAT;

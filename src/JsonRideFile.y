@@ -102,7 +102,7 @@ static QString unprotect(const QString string)
 %token RIDE STARTTIME RECINTSECS DEVICETYPE IDENTIFIER
 %token OVERRIDES
 %token TAGS INTERVALS NAME START STOP
-%token SAMPLES SECS KM WATTS NM CAD KPH HR ALTITUDE LAT LON HEADWIND
+%token SAMPLES SECS KM WATTS NM CAD KPH HR ALTITUDE LAT LON HEADWIND SLOPE TEMP
 
 %start document
 %%
@@ -210,6 +210,8 @@ series: SECS ':' number                 { JsonPoint.secs = JsonNumber; }
         | LAT ':' number                { JsonPoint.lat = JsonNumber; }
         | LON ':' number                { JsonPoint.lon = JsonNumber; }
         | HEADWIND ':' number           { JsonPoint.headwind = JsonNumber; }
+        | SLOPE ':' number              { }
+        | TEMP ':' number               { }
         ;
 
 /*
