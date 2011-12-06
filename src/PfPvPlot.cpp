@@ -205,6 +205,8 @@ PfPvPlot::configChanged()
     mX->setLinePen(marker);
     mY->setLinePen(marker);
     cpCurve->setPen(cp);
+
+    setCL(appsettings->value(this, GC_CRANKLENGTH).toDouble() / 1000.0);
 }
 
 void
@@ -354,18 +356,13 @@ PfPvPlot::setData(RideItem *_rideItem)
     intervalCurves.clear();
 
     rideItem = _rideItem;
-
     RideFile *ride = rideItem->ride();
 
     if (ride) {
 
-        recalc(); // labels etc may have changed with new ride
-
         // quickly erase old data
         curve->setVisible(false);
 
-        // handle zone stuff
-        refreshZoneItems();
 
         // due to the discrete power and cadence values returned by the
         // power meter, there will very likely be many duplicate values.
@@ -420,6 +417,7 @@ PfPvPlot::setData(RideItem *_rideItem)
             sym.setBrush(QBrush(Qt::NoBrush));
 
             // now show the data (zone shading would already be visible)
+            refreshZoneItems();
             curve->setVisible(true);
         }
     } else {
@@ -430,8 +428,6 @@ PfPvPlot::setData(RideItem *_rideItem)
     }
 
     replot();
-
-    setCL(appsettings->value(this, GC_CRANKLENGTH).toDouble() / 1000.0);
 }
 
 void
