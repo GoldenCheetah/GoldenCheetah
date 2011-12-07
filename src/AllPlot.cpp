@@ -206,6 +206,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     showSpeedState(Qt::Checked),
     showCadState(Qt::Checked),
     showAltState(Qt::Checked),
+    showTempState(Qt::Checked),
     bydist(false),
     parent(parent)
 {
@@ -246,6 +247,9 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     // altCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     altCurve->setYAxis(yRight2);
 
+    tempCurve = new QwtPlotCurve(tr("Temperature"));
+    tempCurve->setYAxis(yRight);
+
     intervalHighlighterCurve = new QwtPlotCurve();
     intervalHighlighterCurve->setYAxis(yLeft);
     intervalHighlighterCurve->setData(IntervalPlotData(this, mainWindow));
@@ -281,6 +285,7 @@ AllPlot::configChanged()
         speedCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         cadCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         altCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        tempCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         intervalHighlighterCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     }
 
@@ -303,6 +308,20 @@ AllPlot::configChanged()
     QColor brush_color = GColor(CALTITUDEBRUSH);
     brush_color.setAlpha(200);
     altCurve->setBrush(brush_color);   // fill below the line
+    QPen tempPen = QPen(GColor(CTEMP));
+    tempPen.setStyle(Qt::DotLine);
+    tempPen.setWidth(width);
+    //tempCurve->setPen(tempPen);
+
+    QwtSymbol sym;
+    sym.setStyle(QwtSymbol::Ellipse);
+    sym.setSize(width*10);
+    sym.setPen(QPen(GColor(CTEMP)));
+    sym.setBrush(QBrush(GColor(CTEMP)));
+    tempCurve->setPen(tempPen); //Qt::NoPen
+    tempCurve->setStyle(QwtPlotCurve::Dots);
+    tempCurve->setSymbol(sym);
+
     QPen ihlPen = QPen(GColor(CINTERVALHIGHLIGHTER));
     ihlPen.setWidth(width);
     intervalHighlighterCurve->setPen(ihlPen);
@@ -377,9 +396,9 @@ AllPlot::configChanged()
 }
 
 struct DataPoint {
-    double time, hr, watts, speed, cad, alt;
-    DataPoint(double t, double h, double w, double s, double c, double a) :
-        time(t), hr(h), watts(w), speed(s), cad(c), alt(a) {}
+    double time, hr, watts, speed, cad, alt, temp;
+    DataPoint(double t, double h, double w, double s, double c, double a, double te) :
+        time(t), hr(h), watts(w), speed(s), cad(c), alt(a), temp(te) {}
 };
 
 bool AllPlot::shadeZones() const
@@ -449,6 +468,8 @@ AllPlot::recalc()
             cadCurve->setData(data, data);
         if (!altArray.empty())
             altCurve->setData(data, data);
+        if (!tempArray.empty())
+            tempCurve->setData(data, data);
         return;
     }
     // we should only smooth the curves if smoothed rate is greater than sample rate
@@ -460,6 +481,7 @@ AllPlot::recalc()
         double totalCad = 0.0;
         double totalDist = 0.0;
         double totalAlt = 0.0;
+        double totalTemp = 0.0;
 
         QList<DataPoint> list;
 
@@ -470,6 +492,7 @@ AllPlot::recalc()
         smoothTime.resize(rideTimeSecs + 1);
         smoothDistance.resize(rideTimeSecs + 1);
         smoothAltitude.resize(rideTimeSecs + 1);
+        smoothTemp.resize(rideTimeSecs + 1);
 
         for (int secs = 0; ((secs < smooth)
                             && (secs < rideTimeSecs)); ++secs) {
@@ -480,6 +503,7 @@ AllPlot::recalc()
             smoothTime[secs]  = secs / 60.0;
             smoothDistance[secs]  = 0.0;
             smoothAltitude[secs]  = 0.0;
+            smoothTemp[secs]  = 0.0;
         }
 
         int i = 0;
@@ -490,7 +514,8 @@ AllPlot::recalc()
                              (!wattsArray.empty() ? wattsArray[i] : 0),
                              (!speedArray.empty() ? speedArray[i] : 0),
                              (!cadArray.empty() ? cadArray[i] : 0),
-                             (!altArray.empty() ? altArray[i] : 0));
+                             (!altArray.empty() ? altArray[i] : 0),
+                             (!tempArray.empty() ? tempArray[i] : 0));
                 if (!wattsArray.empty())
                     totalWatts += wattsArray[i];
                 if (!hrArray.empty())
@@ -501,6 +526,8 @@ AllPlot::recalc()
                     totalCad   += cadArray[i];
                 if (!altArray.empty())
                     totalAlt   += altArray[i];
+                if (!tempArray.empty())
+                    totalTemp   += tempArray[i];
                 totalDist   = distanceArray[i];
                 list.append(dp);
                 ++i;
@@ -512,6 +539,7 @@ AllPlot::recalc()
                 totalSpeed -= dp.speed;
                 totalCad   -= dp.cad;
                 totalAlt   -= dp.alt;
+                totalTemp   -= dp.temp;
                 list.removeFirst();
             }
             // TODO: this is wrong.  We should do a weighted average over the
@@ -522,6 +550,7 @@ AllPlot::recalc()
                 smoothSpeed[secs] = 0.0;
                 smoothCad[secs]   = 0.0;
                 smoothAltitude[secs]   = smoothAltitude[secs - 1];
+                smoothTemp[secs]   = 0.0;
             }
             else {
                 smoothWatts[secs]    = totalWatts / list.size();
@@ -529,6 +558,7 @@ AllPlot::recalc()
                 smoothSpeed[secs]    = totalSpeed / list.size();
                 smoothCad[secs]      = totalCad / list.size();
                 smoothAltitude[secs]      = totalAlt / list.size();
+                smoothTemp[secs]      = totalTemp / list.size();
             }
             smoothDistance[secs] = totalDist;
             smoothTime[secs]  = secs / 60.0;
@@ -544,6 +574,7 @@ AllPlot::recalc()
         smoothTime.resize(0);
         smoothDistance.resize(0);
         smoothAltitude.resize(0);
+        smoothTemp.resize(0);
 
         foreach (RideFilePoint *dp, rideItem->ride()->dataPoints()) {
             smoothWatts.append(dp->watts);
@@ -553,7 +584,7 @@ AllPlot::recalc()
             smoothTime.append(dp->secs/60);
             smoothDistance.append(useMetricUnits ? dp->km : dp->km * MILES_PER_KM);
             smoothAltitude.append(useMetricUnits ? dp->alt : dp->alt * FEET_PER_METER);
-
+            smoothTemp.append(dp->temp);
         }
     }
 
@@ -586,6 +617,11 @@ AllPlot::recalc()
 
         altCurve->setData(xaxis.data() + startingIndex, smoothAltitude.data() + startingIndex, totalPoints);
         intervalHighlighterCurve->setYAxis(yRight2);
+
+    } if (!tempArray.empty()) {
+
+        tempCurve->setData(xaxis.data() + startingIndex, smoothTemp.data() + startingIndex, totalPoints);
+        intervalHighlighterCurve->setYAxis(yRight);
 
     }
 
@@ -672,12 +708,28 @@ AllPlot::setYMax()
         setAxisLabelRotation(yLeft2,270);
         setAxisLabelAlignment(yLeft2,Qt::AlignVCenter);
     }
-    if (speedCurve->isVisible()) {
-        setAxisTitle(yRight, (useMetricUnits ? tr("KPH") : tr("MPH")));
-        if (referencePlot == NULL)
-            setAxisScale(yRight, 0.0, 1.05 * speedCurve->maxYValue());
-        else
-            setAxisScale(yRight, 0.0, 1.05 * referencePlot->speedCurve->maxYValue());
+    if (speedCurve->isVisible() || tempCurve->isVisible()) {
+        double ymax = 0;
+        QStringList labels;
+
+        if (speedCurve->isVisible()) {
+            labels << (useMetricUnits ? tr("KPH") : tr("MPH"));
+
+            if (referencePlot == NULL)
+                ymax = speedCurve->maxYValue();
+            else
+                ymax = referencePlot->speedCurve->maxYValue();
+        }
+        if (tempCurve->isVisible()) {
+            labels << QString::fromUtf8("°C");
+
+            if (referencePlot == NULL)
+                ymax = qMax(ymax, tempCurve->maxYValue());
+            else
+                ymax = qMax(ymax, referencePlot->tempCurve->maxYValue());
+        }
+        setAxisTitle(yRight, labels.join(" / "));
+        setAxisScale(yRight, 0.0, 1.05 * ymax);
         setAxisLabelRotation(yRight,90);
         setAxisLabelAlignment(yRight,Qt::AlignVCenter);
     }
@@ -750,6 +802,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     double *smoothC = &plot->smoothCad[startidx];
     double *smoothA = &plot->smoothAltitude[startidx];
     double *smoothD = &plot->smoothDistance[startidx];
+    double *smoothTE = &plot->smoothTemp[startidx];
 
     double *xaxis = bydist ? smoothD : smoothT;
 
@@ -761,18 +814,21 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     speedCurve->detach();
     cadCurve->detach();
     altCurve->detach();
+    tempCurve->detach();
 
     wattsCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showPowerState < 2);
     hrCurve->setVisible(rideItem->ride()->areDataPresent()->hr && showHrState == Qt::Checked);
     speedCurve->setVisible(rideItem->ride()->areDataPresent()->kph && showSpeedState == Qt::Checked);
     cadCurve->setVisible(rideItem->ride()->areDataPresent()->cad && showCadState == Qt::Checked);
     altCurve->setVisible(rideItem->ride()->areDataPresent()->alt && showAltState == Qt::Checked);
+    tempCurve->setVisible(rideItem->ride()->areDataPresent()->temp && showTempState == Qt::Checked);
 
     wattsCurve->setData(xaxis,smoothW,stopidx-startidx);
     hrCurve->setData(xaxis, smoothHR,stopidx-startidx);
     speedCurve->setData(xaxis, smoothS, stopidx-startidx);
     cadCurve->setData(xaxis, smoothC, stopidx-startidx);
     altCurve->setData(xaxis, smoothA, stopidx-startidx);
+    tempCurve->setData(xaxis, smoothTE, stopidx-startidx);
 
     QwtSymbol sym;
     sym.setPen(QPen(GColor(CPLOTMARKER)));
@@ -788,6 +844,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     speedCurve->setSymbol(sym);
     cadCurve->setSymbol(sym);
     altCurve->setSymbol(sym);
+    tempCurve->setSymbol(sym);
 
     setYMax();
 
@@ -812,6 +869,10 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     if (!plot->smoothCad.empty()) {
         cadCurve->attach(this);
         intervalHighlighterCurve->setYAxis(yLeft2);
+    }
+    if (!plot->smoothTemp.empty()) {
+        tempCurve->attach(this);
+        intervalHighlighterCurve->setYAxis(yRight);
     }
 
     refreshIntervalMarkers();
@@ -966,6 +1027,16 @@ AllPlot::showAlt(int state)
     showAltState = state;
     assert(state != Qt::PartiallyChecked);
     altCurve->setVisible(state == Qt::Checked);
+    setYMax();
+    replot();
+}
+
+void
+AllPlot::showTemp(int state)
+{
+    showTempState = state;
+    assert(state != Qt::PartiallyChecked);
+    tempCurve->setVisible(state == Qt::Checked);
     setYMax();
     replot();
 }

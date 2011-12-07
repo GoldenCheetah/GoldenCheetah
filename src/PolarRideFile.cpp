@@ -216,7 +216,7 @@ this differently
                     alt *= METERS_PER_FOOT;
                 }
 
-	            rideFile->appendPoint(seconds, cad, hr, km, kph, nm, watts, alt, 0.0, 0.0, 0.0, 0.0, 0.0, interval);
+                    rideFile->appendPoint(seconds, cad, hr, km, kph, nm, watts, alt, 0.0, 0.0, 0.0, 0.0, RideFile::noTemp, interval);
 	            //fprintf(stderr, " %f, %f, %f, %f, %f, %f, %f, %d\n", seconds, cad, hr, km, kph, nm, watts, alt, interval);
             }
 

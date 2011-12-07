@@ -211,7 +211,7 @@ WKO_UCHAR *
 WkoParser::parseRawData(WKO_UCHAR *fb)
 {
     WKO_ULONG WKO_xormasks[32];    // xormasks used all over
-    double cad=0, hr=0, km=0, kph=0, nm=0, watts=0, slope=0, alt=0, lon=0, lat=0, wind=0, interval=0;
+    double cad=0, hr=0, km=0, kph=0, nm=0, watts=0, slope=0, alt=0, lon=0, lat=0, wind=0, temp=RideFile::noTemp, interval=0;
 
     int isnull=0;
     WKO_ULONG records, data;
@@ -312,6 +312,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
 
         // reset point values;
         alt = slope = wind = cad= hr= km= kph= nm= watts= 0.0;
+        temp= RideFile::noTemp;
 
         marker = get_bits(thelot, bit++, 1);
 
@@ -345,7 +346,8 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
                         } else {
                             sval = val;
                         }
-			            svalp = sval;
+                        svalp = sval;
+                        temp = sval;
                         sprintf(GRAPHDATA[i], "%8ld", svalp);
                         break;
                     case '^' : /* Slope */
@@ -490,7 +492,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
             if (!isnull) {
                     // !! needs to be modified to support the new alt patch
                     results->appendPoint((double)rtime/1000, cad, hr, km,
-                            kph, nm, watts, alt, lon, lat, wind, slope, 0.0, 0);
+                            kph, nm, watts, alt, lon, lat, wind, slope, temp, 0);
             }
 
             // increment time - even for null records (perhaps especially for null

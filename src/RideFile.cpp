@@ -398,7 +398,7 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     dataPresent.lat      |= (lat != 0);
     dataPresent.headwind |= (headwind != 0);
     dataPresent.slope    |= (slope != 0);
-    dataPresent.temp     |= (temp != 0);
+    dataPresent.temp     |= (temp != noTemp);
     dataPresent.interval |= (interval != 0);
 }
 

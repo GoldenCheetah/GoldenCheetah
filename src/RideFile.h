@@ -199,7 +199,7 @@ struct RideFilePoint
     double secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp;
     int interval;
     RideFilePoint() : secs(0.0), cad(0.0), hr(0.0), km(0.0), kph(0.0),
-        nm(0.0), watts(0.0), alt(0.0), lon(0.0), lat(0.0), headwind(0.0), slope(0.0), temp(0.0), interval(0) {}
+        nm(0.0), watts(0.0), alt(0.0), lon(0.0), lat(0.0), headwind(0.0), slope(0.0), temp(-255.0), interval(0) {}
     RideFilePoint(double secs, double cad, double hr, double km, double kph,
                   double nm, double watts, double alt, double lon, double lat,
                   double headwind, double slope, double temp, int interval) :

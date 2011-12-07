@@ -203,7 +203,7 @@ bool readRideData(RideFile *rideFile, const QByteArray& block, const int nrOfRec
                               nextDataPoint.kph, nextDataPoint.nm,
                               nextDataPoint.watts, nextDataPoint.alt,
                               nextDataPoint.lon, nextDataPoint.lat,
-                              nextDataPoint.headwind, 0.0, 0.0, nextDataPoint.interval);
+                              nextDataPoint.headwind, 0.0, RideFile::noTemp, nextDataPoint.interval);
     }
     return true;
 }

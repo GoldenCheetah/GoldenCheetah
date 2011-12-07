@@ -156,7 +156,7 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
             double km = kmIndex > -1 ? values[kmIndex].toDouble() : 0.0;
             double kph = kphIndex > -1 ? values[kphIndex].toDouble() : 0.0;
             double headwind = headwindIndex > -1 ? values[headwindIndex].toDouble() : 0.0;
-            rideFile->appendPoint(secs, cad, hr, km, kph, 0.0, watts, 0.0, 0.0, 0.0, headwind, 0.0, 0.0, 0);
+            rideFile->appendPoint(secs, cad, hr, km, kph, 0.0, watts, 0.0, 0.0, 0.0, headwind, 0.0, RideFile::noTemp, 0);
 
         }
     }

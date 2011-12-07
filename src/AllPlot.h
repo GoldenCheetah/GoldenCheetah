@@ -74,6 +74,7 @@ class AllPlot : public QwtPlot
         void showSpeed(int state);
         void showCad(int state);
         void showAlt(int state);
+        void showTemp(int state);
         void showGrid(int state);
         void setPaintBrush(int state);
         void setShadeZones(bool x) { shade_zones=x; }
@@ -105,6 +106,7 @@ class AllPlot : public QwtPlot
         int showSpeedState;
         int showCadState;
         int showAltState;
+        int showTempState;
 
         // plot objects
         QwtPlotGrid *grid;
@@ -116,6 +118,7 @@ class AllPlot : public QwtPlot
         QwtPlotCurve *speedCurve;
         QwtPlotCurve *cadCurve;
         QwtPlotCurve *altCurve;
+        QwtPlotCurve *tempCurve;
         QwtPlotCurve *intervalHighlighterCurve;  // highlight selected intervals on the Plot
         QList <AllPlotZoneLabel *> zoneLabels;
 
@@ -127,6 +130,7 @@ class AllPlot : public QwtPlot
         QVector<double> timeArray;
         QVector<double> distanceArray;
         QVector<double> altArray;
+        QVector<double> tempArray;
 
         // smoothed data
         QVector<double> smoothWatts;
@@ -136,6 +140,7 @@ class AllPlot : public QwtPlot
         QVector<double> smoothTime;
         QVector<double> smoothDistance;
         QVector<double> smoothAltitude;
+        QVector<double> smoothTemp;
 
         // array / smooth state
         int arrayLength;

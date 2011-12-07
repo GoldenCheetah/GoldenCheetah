@@ -134,5 +134,6 @@ class ColorEngine : public QObject
 #define CRIDEGROUP            56
 #define CSPINSCANLEFT         57
 #define CSPINSCANRIGHT        58
+#define CTEMP                 59
 
 #endif

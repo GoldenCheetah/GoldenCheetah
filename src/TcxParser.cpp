@@ -162,7 +162,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 	    if(rideFile->dataPoints().empty()) {
 	        // first point
 	        rideFile->appendPoint(secs, cadence, hr, distance,
-                                   speed, torque, power, alt, lon, lat, headwind, 0.0, 0.0, lap);
+                                   speed, torque, power, alt, lon, lat, headwind, 0.0, RideFile::noTemp, lap);
 	    }
 	    else {
 	      // assumption that the change in ride is linear...  :)
@@ -182,7 +182,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 	  if ((isGarminSmartRecording.toInt() == 0) || (deltaSecs == 1) || (deltaSecs >= GarminHWM.toInt())) {
 		  // no smart recording, or delta exceeds HW treshold, just insert the data
 		  rideFile->appendPoint(secs, cadence, hr, distance,
-                                   speed, torque, power, alt, lon, lat, headwind, 0.0, 0.0, lap);
+                                   speed, torque, power, alt, lon, lat, headwind, 0.0, RideFile::noTemp, lap);
 	      }
 	      else {
 		// smart recording is on and delta is less than GarminHWM seconds.
@@ -208,7 +208,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                         lat, // lat
                         headwind, // headwind
                         0.0,
-                        0.0,
+                        RideFile::noTemp,
 					    lap);
 		  }
 		  prevPoint = rideFile->dataPoints().back();

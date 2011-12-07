@@ -238,7 +238,7 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
           // special case first data point
           rideFile->appendPoint((double) ms/1000, (double) cad,
                                 (double) hr, km, speed, 0.0, watts,
-                                altitude, 0, 0, 0.0, 0.0, 0.0, 0);
+                                altitude, 0, 0, 0.0, 0.0, RideFile::noTemp, 0);
         }
         // while loop since an interval in the .3dp file might
         // span more than one CT_EMIT_MS interval
