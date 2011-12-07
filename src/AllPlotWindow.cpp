@@ -111,6 +111,10 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     showAlt->setCheckState(Qt::Checked);
     cl->addWidget(showAlt);
 
+    showTemp = new QCheckBox(tr("Temperature"), this);
+    showTemp->setCheckState(Qt::Checked);
+    cl->addWidget(showTemp);
+
     showPower = new QComboBox();
     showPower->addItem(tr("Power + shade"));
     showPower->addItem(tr("Power - shade"));
@@ -332,6 +336,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     connect(showSpeed, SIGNAL(stateChanged(int)), this, SLOT(setShowSpeed(int)));
     connect(showCad, SIGNAL(stateChanged(int)), this, SLOT(setShowCad(int)));
     connect(showAlt, SIGNAL(stateChanged(int)), this, SLOT(setShowAlt(int)));
+    connect(showTemp, SIGNAL(stateChanged(int)), this, SLOT(setShowTemp(int)));
     connect(showGrid, SIGNAL(stateChanged(int)), this, SLOT(setShowGrid(int)));
     connect(showFull, SIGNAL(stateChanged(int)), this, SLOT(setShowFull(int)));
     connect(showStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
@@ -690,6 +695,7 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
 	    showSpeed->setEnabled(dataPresent->kph);
 	    showCad->setEnabled(dataPresent->cad);
 	    showAlt->setEnabled(dataPresent->alt);
+            showTemp->setEnabled(dataPresent->temp);
 
     } else {
         showPower->setEnabled(false);
@@ -697,6 +703,7 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
         showSpeed->setEnabled(false);
         showCad->setEnabled(false);
         showAlt->setEnabled(false);
+        showTemp->setEnabled(false);
     }
 
     // turn on/off shading, if it's not available
@@ -1121,6 +1128,18 @@ AllPlotWindow::setShowAlt(int value)
 }
 
 void
+AllPlotWindow::setShowTemp(int value)
+{
+    showTemp->setChecked(value);
+
+    //if (!current) return;
+
+    allPlot->showTemp(value);
+    foreach (AllPlot *plot, allPlots)
+        plot->showTemp(value);
+}
+
+void
 AllPlotWindow::setShowFull(int value)
 {
     showFull->setChecked(value);
@@ -1422,6 +1441,7 @@ AllPlotWindow::setupStackPlots()
         _allPlot->showSpeed(showSpeed->checkState());
         _allPlot->showCad(showCad->checkState());
         _allPlot->showAlt(showAlt->checkState());
+        _allPlot->showTemp(showTemp->checkState());
         _allPlot->showGrid(showGrid->checkState());
         _allPlot->setPaintBrush(paintBrush->checkState());
         _allPlot->setSmoothing(smoothSlider->value());

@@ -125,7 +125,7 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors, QList
 		interval = 0;
 
 		rideFile->appendPoint(minutes * 60.0, cad, hr, km,
-                                      kph, nm, watts, alt, 0.0, 0.0, 0.0, 0.0, 0.0, interval);
+                                      kph, nm, watts, alt, 0.0, 0.0, 0.0, 0.0, RideFile::noTemp, interval);
                 QMap<QString,QString> bsm;
                 bsm.insert("value", QString("%1").arg(bs));
                 rideFile->metricOverrides.insert("skiba_bike_score", bsm);
