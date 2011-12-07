@@ -184,11 +184,16 @@ bool
 	    double deltaLat = lat - prevPoint->lat;
 
 	    // Smart Recording High Water Mark.
-	    if ((isGarminSmartRecording.toInt() == 0) || (deltaSecs == 1) || (deltaSecs >= GarminHWM.toInt())) {
-		// no smart recording, or delta exceeds HW treshold, just insert the data
+        if ((isGarminSmartRecording.toInt() == 0) ||
+                (deltaSecs == 1) ||
+                (deltaSecs >= GarminHWM.toInt()) ||
+                (secs == 0)) {
+
+                // no smart recording, or delta exceeds HW treshold, or no time elements; just insert the data
                 rideFile->appendPoint(secs, 0, 0, distance, speed, 0,0, alt, lon, lat, 0, 0.0, RideFile::noTemp, 0);
-	    }
-	    else {
+
+	    } else {
+
 		// smart recording is on and delta is less than GarminHWM seconds.
 		for(int i = 1; i <= deltaSecs; i++) {
 		    double weight = i/ deltaSecs;
