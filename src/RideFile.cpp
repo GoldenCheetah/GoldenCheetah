@@ -344,6 +344,8 @@ RideFile *RideFileFactory::openRideFile(MainWindow *main, QFile &file,
         else flags += '-';
         if (result->areDataPresent()->headwind) flags += 'W'; // Windspeed
         else flags += '-';
+        if (result->areDataPresent()->temp) flags += 'E'; // Temperature
+        else flags += '-';
 
         result->setTag("Data", flags);
 
