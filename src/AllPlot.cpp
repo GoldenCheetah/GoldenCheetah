@@ -309,18 +309,12 @@ AllPlot::configChanged()
     brush_color.setAlpha(200);
     altCurve->setBrush(brush_color);   // fill below the line
     QPen tempPen = QPen(GColor(CTEMP));
-    tempPen.setStyle(Qt::DotLine);
     tempPen.setWidth(width);
-    //tempCurve->setPen(tempPen);
-
-    QwtSymbol sym;
-    sym.setStyle(QwtSymbol::Ellipse);
-    sym.setSize(width*10);
-    sym.setPen(QPen(GColor(CTEMP)));
-    sym.setBrush(QBrush(GColor(CTEMP)));
-    tempCurve->setPen(tempPen); //Qt::NoPen
-    tempCurve->setStyle(QwtPlotCurve::Dots);
-    tempCurve->setSymbol(sym);
+    tempCurve->setPen(tempPen);
+    if (smooth == 1)
+        tempCurve->setStyle(QwtPlotCurve::Dots);
+    else
+        tempCurve->setStyle(QwtPlotCurve::Lines);
 
     QPen ihlPen = QPen(GColor(CINTERVALHIGHLIGHTER));
     ihlPen.setWidth(width);
@@ -526,8 +520,16 @@ AllPlot::recalc()
                     totalCad   += cadArray[i];
                 if (!altArray.empty())
                     totalAlt   += altArray[i];
-                if (!tempArray.empty())
-                    totalTemp   += tempArray[i];
+                if (!tempArray.empty() ) {
+                    if (tempArray[i] == RideFile::noTemp && i>0) {
+                        dp.temp = (i>0?list.back().temp:0.0);
+                        totalTemp   += dp.temp;
+                    }
+                    else {
+                        totalTemp   += tempArray[i];
+                    }
+                }
+
                 totalDist   = distanceArray[i];
                 list.append(dp);
                 ++i;
@@ -900,6 +902,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         speedArray.resize(dataPresent->kph ? npoints : 0);
         cadArray.resize(dataPresent->cad ? npoints : 0);
         altArray.resize(dataPresent->alt ? npoints : 0);
+        tempArray.resize(dataPresent->temp ? npoints : 0);
         timeArray.resize(npoints);
         distanceArray.resize(npoints);
 
@@ -909,17 +912,21 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         speedCurve->detach();
         cadCurve->detach();
         altCurve->detach();
+        tempCurve->detach();
         if (!altArray.empty()) altCurve->attach(this);
         if (!wattsArray.empty()) wattsCurve->attach(this);
         if (!hrArray.empty()) hrCurve->attach(this);
         if (!speedArray.empty()) speedCurve->attach(this);
         if (!cadArray.empty()) cadCurve->attach(this);
+        if (!tempArray.empty()) tempCurve->attach(this);
 
         wattsCurve->setVisible(dataPresent->watts && showPowerState < 2);
         hrCurve->setVisible(dataPresent->hr && showHrState == Qt::Checked);
         speedCurve->setVisible(dataPresent->kph && showSpeedState == Qt::Checked);
         cadCurve->setVisible(dataPresent->cad && showCadState == Qt::Checked);
         altCurve->setVisible(dataPresent->alt && showAltState == Qt::Checked);
+        tempCurve->setVisible(dataPresent->temp && showTempState == Qt::Checked);
+
 
         arrayLength = 0;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
@@ -953,6 +960,9 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
                 altArray[arrayLength]   = (useMetricUnits
                                            ? point->alt
                                            : point->alt * FEET_PER_METER);
+            if (!tempArray.empty())
+                tempArray[arrayLength]   = point->temp;
+
             distanceArray[arrayLength] = max(0,
                                              (useMetricUnits
                                               ? point->km
@@ -969,6 +979,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         speedCurve->detach();
         cadCurve->detach();
         altCurve->detach();
+        tempCurve->detach();
         foreach(QwtPlotMarker *mrk, d_mrk)
             delete mrk;
         d_mrk.clear();
@@ -1071,11 +1082,16 @@ AllPlot::setPaintBrush(int state)
         p.setAlpha(64);
         cadCurve->setBrush(QBrush(p));
 
+        p = tempCurve->pen().color();
+        p.setAlpha(64);
+        tempCurve->setBrush(QBrush(p));
+
     } else {
         wattsCurve->setBrush(Qt::NoBrush);
         hrCurve->setBrush(Qt::NoBrush);
         speedCurve->setBrush(Qt::NoBrush);
         cadCurve->setBrush(Qt::NoBrush);
+        tempCurve->setBrush(Qt::NoBrush);
     }
     replot();
 }
