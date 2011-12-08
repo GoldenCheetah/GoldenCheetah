@@ -108,7 +108,9 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         break;
     }
     // if calculating but no cadence then power must be set to zero
-    if (dc->postProcess && !rtData.getCadence()) rtData.setWatts(0);
+    // XXX But if there is not cadence device present the virtual
+    //     power will never work! So commented out.
+    // if (dc->postProcess && !rtData.getCadence()) rtData.setWatts(0);
 }
 
 // for future devices, we may need to setup algorithmic tables etc
