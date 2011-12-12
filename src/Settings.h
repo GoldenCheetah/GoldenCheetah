@@ -160,6 +160,8 @@
 #define GC_TM_SECOND              "tm/second"
 #define GC_TM_METRIC              "tm/metric"
 
+#define FORTIUS_FIRMWARE          "fortius/firmware"
+
 #include <QSettings>
 #include <QFileInfo>
 #include <boost/shared_ptr.hpp>

@@ -33,7 +33,10 @@ static DeviceType SupportedDevices[] =
 #else
       { DEV_ANTLOCAL, DEV_SERIAL,  (char *) "Native ANT+",           true,    false },
 #endif
-      { DEV_CT,       DEV_SERIAL,  (char *) "Computrainer",          true,    false },
+      { DEV_CT,       DEV_SERIAL,  (char *) "Racermate Computrainer",true,    false },
+#ifdef GC_HAVE_LIBUSB
+      { DEV_FORTIUS,  DEV_LIBUSB,  (char *) "Tacx Fortius",          true,    false },
+#endif
       { DEV_GSERVER,  DEV_TCP,     (char *) "Golden Cheetah Server", false,   false },
       { DEV_NULL,     DEV_TCP,     (char *) "Null device (testing)", false,   false },
       { DEV_ANTPLUS,  DEV_QUARQ,   (char *) "ANT+ via Quarqd",       true,    false },

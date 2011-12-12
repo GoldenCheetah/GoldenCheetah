@@ -295,6 +295,7 @@ class DevicePage : public QWidget
         QPushButton *addButton;
         QPushButton *delButton;
         QPushButton *pairButton;
+        QPushButton *firmwareButton;
 
         QGridLayout *leftLayout;
         QVBoxLayout *rightLayout;

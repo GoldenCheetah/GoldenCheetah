@@ -22,6 +22,8 @@
 #include <QDebug>
 
 #include "LibUsb.h"
+#include "Settings.h"
+#include "MainWindow.h"
 
 LibUsb::LibUsb()
 {
@@ -72,7 +74,7 @@ LibUsb::LibUsb()
 #endif
 }
 
-int LibUsb::open()
+int LibUsb::open(int type)
 {
 
 #ifdef WIN32
@@ -92,8 +94,16 @@ int LibUsb::open()
     readBufSize = 0;
     readBufIndex = 0;
 
+    switch (type) {
+
     // Search USB busses for USB2 ANT+ stick host controllers
-    device = OpenAntStick();
+    default:
+    case TYPE_ANT: device = OpenAntStick();
+              break;
+
+    case TYPE_FORTIUS: device = OpenFortius();
+              break;
+    }
 
     if (device == NULL) return -1;
 
@@ -214,9 +224,131 @@ int LibUsb::write(char *buf, int bytes)
     return rc;
 }
 
+// Open connection to a Tacx Fortius
+//
+// The Fortius handlebar controller is an EZ-USB device. This is an
+// embedded system using an 8051 microcontroller. Firmware must be
+// downloaded to it once it is connected. This firmware is obviously
+// copyrighted by Tacx and is not distributed with Golden Cheetah.
+// Instead we ask the user to tell us where it can be found when they
+// configure the device. (On Windows platforms the firmware is installed
+// by the standard Tacx software as c:\windows\system32\FortiusSWPID1942Renum.hex).
+//
+// So when we open a Fortius device we need to search for an unitialised
+// handlebar controller 3651:e6be and upload the firmware using the EzUsb
+// functions. Once that has completed the controller will represent itself
+// as 3651:1942.
+// 
+// Firmware will need to be reloaded if the device is disconnected or the
+// USB controller is reset after sleep/resume.
+//
+// The EZUSB code is found in EzUsb.c, which is essentially the code used
+// in the 'fxload' command on Linux, some minor changes have been made to the
+// standard code wrt to logging errors.
+//
+// The only function we use is:
+// int ezusb_load_ram (usb_dev_handle *device, const char *path, int fx2, int stage)
+//      device is a usb device handle
+//      path is the filename of the firmware file
+//      fx2 is non-zero to indicate an fx2 device (we pass 0, since the Fortius is fx)
+//      stage is to control two stage loading, we load in a single stage
+struct usb_dev_handle* LibUsb::OpenFortius()
+{
+    struct usb_bus* bus;
+    struct usb_device* dev;
+    struct usb_dev_handle* udev;
+
+    bool programmed = false;
+
+    //
+    // Search for an UN-INITIALISED Fortius device
+    //
+    for (bus = usb_get_busses(); bus; bus = bus->next) {
+
+        for (dev = bus->devices; dev; dev = dev->next) {
+
+            if (dev->descriptor.idVendor == FORTIUS_VID && dev->descriptor.idProduct == FORTIUS_INIT_PID) {
+
+                if ((udev = usb_open(dev))) {
+
+                    // LOAD THE FIRMWARE
+                    ezusb_load_ram (udev, appsettings->value(NULL, FORTIUS_FIRMWARE, "").toString().toLatin1(), 0, 0);
+                }
+
+                // Now close the connection, our work here is done
+                usb_close(udev);
+                programmed = true;
+
+            }
+        }
+    }
+
+    // We need to rescan devices, since once the Fortius has
+    // been programmed it will present itself again with a
+    // different PID. But it takes its time, so we sleep for
+    // 3 seconds. This may be too short on some operating
+    // systems [XXX validate this]. On my Linux host running
+    // a v3 kernel on an AthlonXP 2 seconds is not long enough.
+    // 
+    // Given this is only required /the first time/ the Fortius
+    // is connected, it can't be that bad?
+    if (programmed == true) {
+        sleep(3);  // do not be tempted to reduce this, it really does take that long!
+        usb_find_busses();
+        usb_find_devices();
+    }
+
+    //
+    // Now search for an INITIALISED Fortius device
+    //
+    for (bus = usb_get_busses(); bus; bus = bus->next) {
+
+        for (dev = bus->devices; dev; dev = dev->next) {
+
+            if (dev->descriptor.idVendor == FORTIUS_VID && dev->descriptor.idProduct == FORTIUS_PID) {
+
+                //Avoid noisy output
+                //qDebug() << "Found a Garmin USB2 ANT+ stick";
+
+                if ((udev = usb_open(dev))) {
+
+                    if (dev->descriptor.bNumConfigurations) {
+
+                        if ((intf = usb_find_interface(&dev->config[0])) != NULL) {
+
+                            int rc = usb_set_configuration(udev, 1);
+                            if (rc < 0) {
+                                qDebug()<<"usb_set_configuration Error: "<< usb_strerror();
+#ifdef __linux__
+                                // looks like the udev rule has not been implemented
+                                qDebug()<<"check permissions on:"<<QString("/dev/bus/usb/%1/%2").arg(bus->dirname).arg(dev->filename);
+                                qDebug()<<"did you remember to setup a udev rule for this device?";
+#endif
+                            }
+
+                            rc = usb_claim_interface(udev, interface);
+                            if (rc < 0) qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
+
+#ifndef Q_OS_MAC
+                            // fails on Mac OS X, we don't actually need it anyway
+                            rc = usb_set_altinterface(udev, alternate);
+                            if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
+#endif
+
+                            return udev;
+                        }
+                    }
+
+                    usb_close(udev);
+                }
+            }
+        }
+    }
+    return NULL;
+}
+
 struct usb_dev_handle* LibUsb::OpenAntStick()
 {
-
     struct usb_bus* bus;
     struct usb_device* dev;
     struct usb_dev_handle* udev;

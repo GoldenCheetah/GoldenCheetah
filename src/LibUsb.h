@@ -24,18 +24,32 @@
 
 #include <usb.h> // for the constants etc
 
+// EZ-USB firmware loader for Fortius
+extern "C" {
+#include "EzUsb.h"
+}
+
 #ifdef WIN32
 #include <QLibrary> // for dynamically loading libusb0.dll
 #endif
 
-#define GARMIN_USB2_VID 0x0fcf
-#define GARMIN_USB2_PID 0x1008
+#define GARMIN_USB2_VID   0x0fcf
+#define GARMIN_USB2_PID   0x1008
+
+#define FORTIUS_VID       0x3561
+#define FORTIUS_INIT_PID  0xe6be    // uninitialised Fortius PID
+#define FORTIUS_PID       0x1942    // once firmware loaded Fortius PID
+
+#define TYPE_ANT     0
+#define TYPE_FORTIUS 1
+
+class MainWindow;
 
 class LibUsb {
 
 public:
     LibUsb();
-    int open();
+    int open(int type);
     void close();
     int read(char *buf, int bytes);
     int write(char *buf, int bytes);
@@ -75,6 +89,7 @@ private:
 #endif
 
     struct usb_dev_handle* OpenAntStick();
+    struct usb_dev_handle* OpenFortius();
     struct usb_interface_descriptor* usb_find_interface(struct usb_config_descriptor* config_descriptor);
     struct usb_dev_handle* device;
     struct usb_interface_descriptor* intf;

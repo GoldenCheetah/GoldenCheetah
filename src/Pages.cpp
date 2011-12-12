@@ -794,6 +794,7 @@ DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
     addButton = new QPushButton(tr("Add"),this);
     delButton = new QPushButton(tr("Delete"),this);
     pairButton = new QPushButton(tr("Pair"),this);
+    firmwareButton = new QPushButton(tr("Firmware"),this);
 
     deviceList = new QTableView(this);
 
@@ -856,6 +857,7 @@ DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
     rightLayout->addSpacing(10);
     rightLayout->addWidget(delButton);
     rightLayout->addStretch();
+    rightLayout->addWidget(firmwareButton);
     rightLayout->addWidget(pairButton);
 
     inLayout->addItem(leftLayout, 0,0);
@@ -927,12 +929,26 @@ DevicePage::setConfigPane()
         profLabel->show();
         deviceProfile->show();
         break;
+
+    case DEV_LIBUSB:
+        specHint->hide();
+        specLabel->hide();
+        deviceSpecifier->hide();
+        profHint->hide();
+        profLabel->hide();
+        deviceProfile->hide();
+        break;
     }
 
-    // pair button only valid for ANT+ (Quarqd or Native)
     int type = Supported.getType(typeSelector->itemData(typeSelector->currentIndex()).toInt()).type;
+
+    // pair button only valid for ANT+ (Quarqd or Native)
     if (type == DEV_ANTLOCAL || type == DEV_ANTPLUS) pairButton->show();
     else pairButton->hide();
+
+    // pair button only valid for ANT+ (Quarqd or Native)
+    if (type == DEV_FORTIUS) firmwareButton->show();
+    else firmwareButton->hide();
 }
 
 
