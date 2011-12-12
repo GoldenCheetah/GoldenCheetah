@@ -294,7 +294,11 @@ struct usb_dev_handle* LibUsb::OpenFortius()
     // Given this is only required /the first time/ the Fortius
     // is connected, it can't be that bad?
     if (programmed == true) {
+#ifdef WIN32
+        Sleep(3000); // windows sleep is in milliseconds
+#else
         sleep(3);  // do not be tempted to reduce this, it really does take that long!
+#endif
         usb_find_busses();
         usb_find_devices();
     }

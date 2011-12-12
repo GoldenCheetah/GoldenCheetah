@@ -22,6 +22,10 @@
 
 #if defined GC_HAVE_LIBUSB
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 #include <usb.h> // for the constants etc
 
 // EZ-USB firmware loader for Fortius
