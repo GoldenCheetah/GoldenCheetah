@@ -30,6 +30,7 @@ class ConfigDialog : public QDialog
         void devaddClicked();
         void devpairClicked();
         void devdelClicked();
+        void firmwareClicked();
 
     private:
         void createIcons();
@@ -55,6 +56,30 @@ class ConfigDialog : public QDialog
 
         // used by device config
     QList<QTreeWidgetItem> twiNames, twiSpecs, twiTypes, twiDefaults;
+    QString fortiusFirmware;
+};
+
+class FortiusDialog : public QDialog
+{
+    Q_OBJECT
+
+    public:
+        FortiusDialog(MainWindow *, QString &path);
+
+    public slots:
+        void okClicked();
+        void cancelClicked();
+        void browseClicked();
+
+    private:
+        QCheckBox *copy;
+        QPushButton *ok, *cancel;
+        QPushButton *browse;
+        QLabel *help;
+        QLabel *file;
+        QLineEdit *name;
+        QString &path;
+        MainWindow *mainWindow;
 };
 
 #endif

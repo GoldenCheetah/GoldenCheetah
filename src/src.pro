@@ -87,8 +87,8 @@ qwt3d {
 !isEmpty( LIBUSB_INSTALL ) {
     INCLUDEPATH += $${LIBUSB_INSTALL}/include
     DEFINES += GC_HAVE_LIBUSB
-    SOURCES += LibUsb.cpp
-    HEADERS += LibUsb.h
+    SOURCES += LibUsb.cpp EzUsb.c Fortius.cpp FortiusController.cpp
+    HEADERS += LibUsb.h EzUsb.h Fortius.cpp FortiusController.h
 
     unix {
         # for linux and mac

@@ -80,9 +80,11 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
 #endif
     setFixedSize(QSize(800, 600));
 
+    fortiusFirmware = appsettings->value(this, FORTIUS_FIRMWARE, "").toString();
     connect(closeButton, SIGNAL(clicked()), this, SLOT(accept()));
     connect(devicePage->typeSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(changedType(int)));
     connect(devicePage->addButton, SIGNAL(clicked()), this, SLOT(devaddClicked()));
+    connect(devicePage->firmwareButton, SIGNAL(clicked()), this, SLOT(firmwareClicked()));
     connect(devicePage->delButton, SIGNAL(clicked()), this, SLOT(devdelClicked()));
     connect(devicePage->pairButton, SIGNAL(clicked()), this, SLOT(devpairClicked()));
     connect(contentsWidget, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
@@ -179,6 +181,7 @@ void ConfigDialog::save_Clicked()
     // Save the device configuration...
     DeviceConfigurations all;
     all.writeConfig(devicePage->deviceListModel->Configuration);
+    appsettings->setValue(FORTIUS_FIRMWARE, fortiusFirmware);
 
     // Tell MainWindow we changed config, so it can emit the signal
     // configChanged() to all its children
@@ -269,6 +272,18 @@ ConfigDialog::devaddClicked()
                 return ;
             }
             break;
+
+        case DEV_LIBUSB :
+
+            // Is the fortius firmware configured?
+            if (add.type == DEV_FORTIUS && fortiusFirmware == "") {
+                QMessageBox::critical(0, "Fortius Firmware",
+                QString("For Fortius devices you must import the firmware ") +
+                        "using the Firmware button.");
+                return ;
+            }
+            break;
+
         case DEV_TCP :
             if (tcpSpec.exactMatch(add.portSpec) == false) {
                 QMessageBox::critical(0, "Invalid Port Specification",
@@ -303,4 +318,123 @@ ConfigDialog::devpairClicked()
     progress->setWindowModality(Qt::WindowModal);
 
     devicePage->pairClicked(&add, progress);
+}
+
+void
+ConfigDialog::firmwareClicked()
+{
+    // we need to set the firmware for this device
+    QString current = fortiusFirmware;
+
+    FortiusDialog *p = new FortiusDialog(mainWindow, fortiusFirmware);
+    p->exec();
+}
+
+//
+// Choose the firmware to use with a Fortius trainer
+//
+FortiusDialog::FortiusDialog(MainWindow *mainWindow, QString &path) : path(path), mainWindow(mainWindow)
+{
+    setAttribute(Qt::WA_DeleteOnClose);
+    setWindowModality(Qt::WindowModal);
+    setWindowTitle("Select Firmware File");
+
+    // create widgets
+    browse = new QPushButton("Browse", this);
+    cancel = new QPushButton("Cancel", this);
+    ok = new QPushButton("OK", this);
+    copy = new QCheckBox("Copy to Library");
+    copy->setChecked(true);
+
+    help = new QLabel(this);
+    help->setWordWrap(true);
+    help->setText("Tacx Fortius trainers require a firmware file "
+                  "which is provided by Tacx BV. This file is a "
+                  "copyrighted file and cannot be distributed with "
+                  "GoldenCheetah.\n\n"
+                  "On windows it is typically installed in C:\\Windows\\system32 "
+                  "and is called 'FortiusSWPID1942Renum.hex'.\n\n"
+                  "On Linux and Apple computers you will need to "
+                  "extract it from the Virtual Reality Software CD that "
+                  "is distributed with the device. The file that "
+                  "we need is contained within the 'data2.cab' file.\n\n"
+                  "The 'data2.cab' file is an InstallShield file. To read "
+                  "this file and extract the FortiusSWPID1942Renum.hex file we need "
+                  "you will need to use the 'unshield' tool.\n\n"
+                  "Please take care to ensure that the file is the latest version "
+                  "of the Firmware file.\n\n"
+                  "If you choose to copy to library the file will be copied into the "
+                  "GoldenCheetah library, otherwise we will reference it. We recommend "
+                  "that you copy the file, but can reference it where it may be updated "
+                  "by the standard Tacx software.\n\n");
+
+    file = new QLabel("File:", this);
+
+    name= new QLineEdit(this);
+    name->setEnabled(false);
+    name->setText(path);
+
+    // Layout widgets
+    QHBoxLayout *buttons = new QHBoxLayout;
+    QHBoxLayout *filedetails = new QHBoxLayout;
+    filedetails->addWidget(file);
+    filedetails->addWidget(name);
+    filedetails->addWidget(browse);
+    filedetails->addStretch();
+
+    buttons->addWidget(copy);
+    buttons->addStretch();
+    buttons->addWidget(cancel);
+    buttons->addWidget(ok);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->addLayout(filedetails);
+    mainLayout->addWidget(help);
+    mainLayout->addLayout(buttons);
+
+    // connect widgets
+    connect(ok, SIGNAL(clicked()), this, SLOT(okClicked()));
+    connect(cancel, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+    connect(browse, SIGNAL(clicked()), this, SLOT(browseClicked()));
+}
+
+void
+FortiusDialog::okClicked()
+{
+    QString filePath = name->text();
+    if (!QFile(filePath).exists()) {
+
+        QMessageBox::critical(0, "No File Selected",
+        QString("You must select a firmware file, typically called ") +
+                 "FortiusSWPID1942Renum.hex");
+        return;
+    }
+
+    // either copy it, or reference it!
+    if (copy->isChecked()) {
+
+        QString fileName = QFileInfo(filePath).fileName();
+        QString targetFileName = QFileInfo(mainWindow->home.absolutePath() + "/../").absolutePath() + "/" + fileName;
+
+        // if the current file exists, wipe it
+        if (QFile(targetFileName).exists()) QFile(targetFileName).remove();
+        QFile(filePath).copy(targetFileName);
+
+        name->setText(targetFileName);
+    }
+    path = name->text();
+    accept();
+}
+
+void
+FortiusDialog::cancelClicked()
+{
+    reject();
+}
+
+void
+FortiusDialog::browseClicked()
+{
+    QString file = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("Intel Firmware File (*.hex)"));
+    if (file != "") name->setText(file);
 }
