@@ -21,6 +21,7 @@
 #include <QString>
 #include <QDebug>
 
+#include <unistd.h>
 #include "LibUsb.h"
 #include "Settings.h"
 #include "MainWindow.h"
