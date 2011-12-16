@@ -103,6 +103,7 @@ class DialWindow : public GcWindow
         double lapNumber;
 
         // for calculating averages
+        int average;
         int count;
         double sum;
 
@@ -111,6 +112,7 @@ class DialWindow : public GcWindow
         QVector<double> rolling;
         double rollingSum;
         int index; // index into rolling (circular buffer)
+
 
         // VI/RI makes us track AP too
         int apcount;
@@ -130,12 +132,20 @@ class DialWindow : public GcWindow
         }
 
         // controls
-        QComboBox *seriesSelector;
+        QComboBox   *seriesSelector;
+
+        QLabel      *averageLabel;
+        QSlider     *averageSlider;
+        QLineEdit   *averageEdit;
 
         // display
         QLabel *valueLabel;
 
         QColor foreground, background;
+
+    private slots :
+        void setAverageFromSlider();
+        void setAverageFromText(const QString text);
 };
 
 #endif // _GC_DialWindow_h
