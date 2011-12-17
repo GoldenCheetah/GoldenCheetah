@@ -205,7 +205,39 @@ class BikeScore : public RideMetric {
     RideMetric *clone() const { return new BikeScore(*this); }
 };
 
-static bool addAllFour() {
+class ResponseIndex : public RideMetric {
+    double ri;
+
+    public:
+
+    ResponseIndex() : ri(0.0)
+    {
+        setSymbol("skiba_response_index");
+        setName(tr("Response Index"));
+        setType(RideMetric::Average);
+        setMetricUnits(tr(""));
+        setImperialUnits(tr(""));
+        setPrecision(3);
+    }
+
+    void compute(const RideFile *, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &deps,
+                 const MainWindow *) {
+        assert(deps.contains("skiba_xpower"));
+        assert(deps.contains("average_hr"));
+        XPower *xp = dynamic_cast<XPower*>(deps.value("skiba_xpower"));
+        assert(xp);
+        RideMetric *ah = dynamic_cast<RideMetric*>(deps.value("average_hr"));
+        assert(ah);
+        ri = xp->value(true) / ah->value(true);
+
+        setValue(ri);
+    }
+    RideMetric *clone() const { return new ResponseIndex(*this); }
+};
+
+static bool addAllFive() {
     RideMetricFactory::instance().addMetric(XPower());
     QVector<QString> deps;
     deps.append("skiba_xpower");
@@ -216,8 +248,12 @@ static bool addAllFour() {
     deps.append("skiba_xpower");
     deps.append("average_power");
     RideMetricFactory::instance().addMetric(VariabilityIndex(), &deps);
+    deps.clear();
+    deps.append("skiba_xpower");
+    deps.append("average_hr");
+    RideMetricFactory::instance().addMetric(ResponseIndex(), &deps);
     return true;
 }
 
-static bool allFourAdded = addAllFour();
+static bool allFiveAdded = addAllFive();
 
