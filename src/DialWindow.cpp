@@ -20,7 +20,7 @@
 #include "DialWindow.h"
 
 DialWindow::DialWindow(MainWindow *mainWindow) :
-    GcWindow(mainWindow), mainWindow(mainWindow)
+    GcWindow(mainWindow), mainWindow(mainWindow), average(1)
 {
     rolling.resize(150); // enough for 30 seconds at 5hz
 
@@ -46,6 +46,28 @@ DialWindow::DialWindow(MainWindow *mainWindow) :
     }
     controlsLayout->addRow(seriesLabel, seriesSelector);
 
+    // average selection
+    averageLabel= new QLabel(tr("Average"), this);
+    averageLabel->hide();
+    averageLabel->setAutoFillBackground(true);
+
+    QHBoxLayout *averageLayout = new QHBoxLayout;
+    averageSlider = new QSlider(Qt::Horizontal);
+    averageSlider->hide();
+    averageSlider->setTickPosition(QSlider::TicksBelow);
+    averageSlider->setTickInterval(5);
+    averageSlider->setMinimum(1);
+    averageSlider->setMaximum(30);
+    averageSlider->setValue(1);
+    averageLayout->addWidget(averageSlider);
+    averageEdit = new QLineEdit();
+    averageEdit->hide();
+    averageEdit->setFixedWidth(20);
+    averageEdit->setText(QString("%1").arg(1) );
+    averageLayout->addWidget(averageEdit);
+
+    controlsLayout->addRow(averageLabel, averageLayout);
+
     // display label...
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setSpacing(0);
@@ -57,6 +79,9 @@ DialWindow::DialWindow(MainWindow *mainWindow) :
     // get updates..
     connect(mainWindow, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
     connect(seriesSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(seriesChanged()));
+    connect(averageSlider, SIGNAL(valueChanged(int)),this, SLOT(setAverageFromSlider()));
+    connect(averageEdit, SIGNAL(textChanged(const QString)), this, SLOT(setAverageFromText(const QString)));
+
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(seriesChanged()));
     connect(mainWindow, SIGNAL(stop()), this, SLOT(stop()));
     connect(mainWindow, SIGNAL(start()), this, SLOT(start()));
@@ -104,6 +129,34 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
     double value = rtData.value(series);
 
+    // Average value for display for HeartRate, Watts and Cadence
+    double displayValue = value;
+
+    if (series == RealtimeData::HeartRate ||
+        series == RealtimeData::Watts  ||
+        series == RealtimeData::Cadence) {
+
+        sum += value;
+        int j = index-(count<average*5?count:average*5);
+        sum -= rolling[(j>=0?j:150+j)];
+
+        //store value
+        rolling[index] = value;
+
+        // move index on/round for next value
+        index = (index >= 149) ? 0 : index+1;
+        count++;
+
+        if (average > 1) {
+            // rolling average
+            if (count < average*5)
+                displayValue = sum/(count);
+            else
+                displayValue = sum/(average*5);
+        }
+
+    }
+
     switch (series) {
 
     case RealtimeData::Time:
@@ -118,12 +171,12 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         break;
 
     case RealtimeData::Speed:
-        if (!mainWindow->useMetricUnits) value *= MILES_PER_KM;
+        if (!mainWindow->useMetricUnits) displayValue *= MILES_PER_KM;
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
         break;
 
     case RealtimeData::Distance:
-        if (!mainWindow->useMetricUnits) value *= MILES_PER_KM;
+        if (!mainWindow->useMetricUnits) displayValue *= MILES_PER_KM;
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 3));
         break;
 
@@ -339,7 +392,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         break;
 
     default:
-        valueLabel->setText(QString("%1").arg(round(value)));
+        valueLabel->setText(QString("%1").arg(round(displayValue)));
         break;
 
     }
@@ -363,6 +416,14 @@ void DialWindow::seriesChanged()
     // we got some!
     RealtimeData::DataSeries series = static_cast<RealtimeData::DataSeries>
                   (seriesSelector->itemData(seriesSelector->currentIndex()).toInt());
+
+    if (series == RealtimeData::HeartRate ||
+        series == RealtimeData::Watts  ||
+        series == RealtimeData::Cadence) {
+        averageLabel->show();
+        averageEdit->show();
+        averageSlider->show();
+    }
 
     // the series selector changed so update the colors
     switch(series) {
@@ -416,4 +477,29 @@ void DialWindow::seriesChanged()
                  .arg(background.name())
                  .arg(foreground.name());
     valueLabel->setStyleSheet(sh);
+}
+
+void
+DialWindow::setAverageFromText(const QString text) {
+    int value = text.toDouble();
+    averageEdit->setText(text);
+    if (average != value) {
+        average = value;
+        averageSlider->setValue(average);
+
+        // correction of sum
+        sum = 0;
+        int j = index-(count<average*5?count:average*5);
+        for (int i=0; i<average*5; i++)  {
+            sum += rolling[(j>=0?j:150+j)];
+            j++;
+        }
+    }
+}
+
+void
+DialWindow::setAverageFromSlider() {
+    if (average != averageSlider->value()) {
+        setAverageFromText(QString("%1").arg(averageSlider->value()));
+    }
 }
