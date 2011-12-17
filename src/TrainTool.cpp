@@ -31,10 +31,12 @@
 // Three current realtime device types supported are:
 #include "RealtimeController.h"
 #include "ComputrainerController.h"
-#include "FortiusController.h"
 #include "ANTplusController.h"
 #include "ANTlocalController.h"
 #include "NullController.h"
+#ifdef GC_HAVE_LIBUSB
+#include "FortiusController.h"
+#endif
 
 #ifdef GC_HAVE_VLC
 // Media selection helper
@@ -568,8 +570,10 @@ void TrainTool::setDeviceController()
             deviceController = new ANTplusController(this, &temp);
         } else if (Devices.at(deviceno).type == DEV_CT) {
             deviceController = new ComputrainerController(this, &temp);
+#ifdef GC_HAVE_LIBUSB
         } else if (Devices.at(deviceno).type == DEV_FORTIUS) {
             deviceController = new FortiusController(this, &temp);
+#endif
         } else if (Devices.at(deviceno).type == DEV_NULL) {
             deviceController = new NullController(this, &temp);
         } else if (Devices.at(deviceno).type == DEV_ANTLOCAL) {
