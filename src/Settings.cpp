@@ -3,6 +3,14 @@
 #include <QSettings>
 #include <QDebug>
 
+#ifdef Q_OS_MAC
+int OperatingSystem = OSX;
+#elif defined Q_OS_WIN32
+int OperatingSystem = WINDOWS;
+#elif defined Q_OS_LINUX
+int OperatingSystem = LINUX;
+#endif
+
 static GSettings *GetApplicationSettings()
 {
   GSettings *settings;
