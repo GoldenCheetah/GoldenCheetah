@@ -193,7 +193,7 @@ class EfficiencyFactor : public RideMetric {
     EfficiencyFactor() : ef(0.0)
     {
         setSymbol("friel_efficiency_factor");
-        setName(tr("EF"));
+        setName(tr("Efficiency Factor"));
         setType(RideMetric::Average);
         setMetricUnits(tr(""));
         setImperialUnits(tr(""));
