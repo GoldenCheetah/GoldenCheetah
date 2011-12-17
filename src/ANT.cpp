@@ -108,7 +108,7 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf) : QThread(parent)
     // sticks, if it is not available we use stubs
 #if defined GC_HAVE_LIBUSB
     usbMode = USBNone;
-    usb2 = new LibUsb();
+    usb2 = new LibUsb(TYPE_ANT);
 #endif
 }
 
@@ -671,7 +671,7 @@ int ANT::openPort()
     int rc;
 
     // on windows we try on USB2 then on USB1 then fail...
-    if ((rc=usb2->open(TYPE_ANT)) != -1) {
+    if ((rc=usb2->open()) != -1) {
         usbMode = USB2;
         return rc;
     } else if ((rc= USBXpress::open(&devicePort)) != -1) {
@@ -693,7 +693,7 @@ int ANT::openPort()
 
 #ifdef GC_HAVE_LIBUSB
     int rc;
-    if ((rc=usb2->open(TYPE_ANT)) != -1) {
+    if ((rc=usb2->open()) != -1) {
         usbMode = USB2;
         return rc;
     } else {
