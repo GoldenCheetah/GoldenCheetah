@@ -29,70 +29,25 @@
 LibUsb::LibUsb(int type) : type(type)
 {
 
-// dynamic load of libusb on Windows, it is statically linked in Linux
-// this is to avoid dll conflicts where the lib has already been installed
-#ifdef WIN32
-    QLibrary libusb0("libusb0");
-
-    usb_set_debug = (VoidIntProto) libusb0.resolve("usb_set_debug");
-    usb_strerror = (CharVoidProto) libusb0.resolve("usb_strerror");
-    usb_init = (IntVoidProto) libusb0.resolve("usb_init");
-    usb_find_busses = (IntVoidProto) libusb0.resolve("usb_find_busses");
-    usb_find_devices = (IntVoidProto) libusb0.resolve("usb_find_devices");
-    usb_clear_halt = (IntUsb_dev_handleUintProto) libusb0.resolve("usb_clear_halt");
-    usb_release_interface = (IntUsb_dev_handleIntProto) libusb0.resolve("usb_release_interface");
-    usb_close = (IntUsb_dev_handleProto) libusb0.resolve("usb_close");
-    usb_bulk_read = (IntUsb_dev_handleIntCharIntIntProto) libusb0.resolve("usb_bulk_read");
-    usb_interrupt_write = (IntUsb_dev_handleIntCharIntIntProto) libusb0.resolve("usb_interrupt_write");
-    usb_get_busses = (Usb_busVoidProto) libusb0.resolve("usb_get_busses");
-    usb_open = (Usb_dev_handleUsb_deviceProto) libusb0.resolve("usb_open");
-    usb_set_configuration = (IntUsb_dev_handleIntProto) libusb0.resolve("usb_set_configuration");
-    usb_claim_interface = (IntUsb_dev_handleIntProto) libusb0.resolve("usb_claim_interface");
-    usb_set_altinterface = (IntUsb_dev_handleIntProto) libusb0.resolve("usb_set_altinterface");
-
-    if (!(isDllLoaded = libusb0.isLoaded()))
-    {
-        qWarning("libusb0.dll was not loaded");
-        return;
-    }
-#endif
-
     intf = NULL;
     readBufIndex = 0;
     readBufSize = 0;
 
+    // Initialize the library.
+    usb_init();
     usb_set_debug(0);
-
-    if (OperatingSystem != WINDOWS) {
-        // Initialize the library.
-        usb_init();
-
-        // Find all busses.
-        usb_find_busses();
-
-        // Find all connected devices.
-        usb_find_devices();
-    }
+    usb_find_busses();
+    usb_find_devices();
 }
 
 int LibUsb::open()
 {
 
-    if (OperatingSystem == WINDOWS) {
+    // Find all busses.
+    usb_find_busses();
 
-        if (!isDllLoaded) return -1;
-
-    } else {
-
-        // Initialize the library.
-        usb_init();
-
-        // Find all busses.
-        usb_find_busses();
-
-        // Find all connected devices.
-        usb_find_devices();
-    }
+    // Find all connected devices.
+    usb_find_devices();
 
     readBufSize = 0;
     readBufIndex = 0;
@@ -134,8 +89,6 @@ int LibUsb::read(char *buf, int bytes)
 {
     // check it isn't closed already
     if (!device) return -1;
-
-    if (OperatingSystem == WINDOWS && !isDllLoaded) return -1;
 
     // The USB2 stick really doesn't like you reading 1 byte when more are available
     // so we use a local buffered read
@@ -190,8 +143,6 @@ int LibUsb::write(char *buf, int bytes)
 
     // check it isn't closed
     if (!device) return -1;
-
-    if (OperatingSystem == WINDOWS && !isDllLoaded) return -1;
 
     int rc;
     if (OperatingSystem == WINDOWS) {
@@ -253,7 +204,9 @@ struct usb_dev_handle* LibUsb::OpenFortius()
     //
     for (bus = usb_get_busses(); bus; bus = bus->next) {
 
+
         for (dev = bus->devices; dev; dev = dev->next) {
+
 
             if (dev->descriptor.idVendor == FORTIUS_VID && dev->descriptor.idProduct == FORTIUS_INIT_PID) {
 

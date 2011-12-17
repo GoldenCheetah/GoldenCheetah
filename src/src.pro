@@ -85,14 +85,17 @@ qwt3d {
 
 # are we supporting USB2 devices
 !isEmpty( LIBUSB_INSTALL ) {
-    INCLUDEPATH += $${LIBUSB_INSTALL}/include
     DEFINES += GC_HAVE_LIBUSB
+    INCLUDEPATH += $${LIBUSB_INSTALL}/include
     SOURCES += LibUsb.cpp EzUsb.c Fortius.cpp FortiusController.cpp
     HEADERS += LibUsb.h EzUsb.h Fortius.cpp FortiusController.h
 
     unix {
-        # for linux and mac
         LIBS += $${LIBUSB_INSTALL}/lib/libusb.a
+    }
+
+    win32 {
+        LIBS += $${LIBUSB_INSTALL}/lib/gcc/libusb.a
     }
 }
 
