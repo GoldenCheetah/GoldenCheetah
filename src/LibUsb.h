@@ -52,8 +52,8 @@ class MainWindow;
 class LibUsb {
 
 public:
-    LibUsb();
-    int open(int type);
+    LibUsb(int type);
+    int open();
     void close();
     int read(char *buf, int bytes);
     int write(char *buf, int bytes);
@@ -107,6 +107,7 @@ private:
     int readBufSize;
 
     bool isDllLoaded;
+    int type;
 };
 #endif
 #endif // gc_LibUsb_h

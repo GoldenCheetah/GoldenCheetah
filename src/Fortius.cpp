@@ -66,7 +66,7 @@ Fortius::Fortius(QObject *parent,  QString) : QThread(parent)
     memcpy(SLOPE_Command, slope_command, 12);
 
     // for interacting over the USB port
-    usb2 = new LibUsb();
+    usb2 = new LibUsb(TYPE_FORTIUS);
 }
 
 Fortius::~Fortius()
@@ -327,6 +327,10 @@ void Fortius::run()
 
             if (readMessage() > 0) {
 
+                msleep(60); //slow down - need to wait for previous interrupt to clear
+                            //            before reading. Not sure why, but solves issues
+                            //            when working on OSX, and possibly Windows
+
                 //----------------------------------------------------------------
                 // UPDATE BASIC TELEMETRY (HR, CAD, SPD et al)
                 // The data structure is very simple, no bit twiddling needed here
@@ -499,7 +503,7 @@ int Fortius::closePort()
 int Fortius::openPort()
 {
     // on windows we try on USB2 then on USB1 then fail...
-    return usb2->open(TYPE_FORTIUS);
+    return usb2->open();
 }
 
 int Fortius::rawWrite(uint8_t *bytes, int size) // unix!!

@@ -26,7 +26,7 @@
 #include "Settings.h"
 #include "MainWindow.h"
 
-LibUsb::LibUsb()
+LibUsb::LibUsb(int type) : type(type)
 {
 
 // dynamic load of libusb on Windows, it is statically linked in Linux
@@ -63,34 +63,36 @@ LibUsb::LibUsb()
 
     usb_set_debug(0);
 
-#ifdef WIN32 // we initialise whenever we open on Linux/Mac
-    // Initialize the library.
-    usb_init();
+    if (OperatingSystem != WINDOWS) {
+        // Initialize the library.
+        usb_init();
 
-    // Find all busses.
-    usb_find_busses();
+        // Find all busses.
+        usb_find_busses();
 
-    // Find all connected devices.
-    usb_find_devices();
-#endif
+        // Find all connected devices.
+        usb_find_devices();
+    }
 }
 
-int LibUsb::open(int type)
+int LibUsb::open()
 {
 
-#ifdef WIN32
-    if (!isDllLoaded) return -1;
-#else
+    if (OperatingSystem == WINDOWS) {
 
-   // Initialize the library.
-    usb_init();
+        if (!isDllLoaded) return -1;
 
-    // Find all busses.
-    usb_find_busses();
+    } else {
 
-    // Find all connected devices.
-    usb_find_devices();
-#endif
+        // Initialize the library.
+        usb_init();
+
+        // Find all busses.
+        usb_find_busses();
+
+        // Find all connected devices.
+        usb_find_devices();
+    }
 
     readBufSize = 0;
     readBufIndex = 0;
@@ -108,23 +110,11 @@ int LibUsb::open(int type)
 
     if (device == NULL) return -1;
 
-    int rc;
-#ifndef WIN32
-    // reset the device, god only knows what mess we left it in...
-    rc = usb_reset(device);
-    if (rc < 0) qDebug()<<"usb_reset Error: "<< usb_strerror();
-#endif
+    // Clear halt is needed, but ignore return code
+    usb_clear_halt(device, writeEndpoint);
+    usb_clear_halt(device, readEndpoint);
 
-#ifndef Q_OS_MAC
-    // these functions fail on OS X Lion
-    rc = usb_clear_halt(device, writeEndpoint);
-    if (rc < 0) qDebug()<<"usb_clear_halt writeEndpoint Error: "<< usb_strerror();
-
-    rc = usb_clear_halt(device, readEndpoint);
-    if (rc < 0) qDebug()<<"usb_clear_halt readEndpoint Error: "<< usb_strerror();
-#endif
-
-    return rc;
+    return 0;
 }
 
 void LibUsb::close()
@@ -145,9 +135,7 @@ int LibUsb::read(char *buf, int bytes)
     // check it isn't closed already
     if (!device) return -1;
 
-#ifdef WIN32
-    if (!isDllLoaded) return -1;
-#endif
+    if (OperatingSystem == WINDOWS && !isDllLoaded) return -1;
 
     // The USB2 stick really doesn't like you reading 1 byte when more are available
     // so we use a local buffered read
@@ -203,18 +191,17 @@ int LibUsb::write(char *buf, int bytes)
     // check it isn't closed
     if (!device) return -1;
 
-#ifdef WIN32
-    if (!isDllLoaded) return -1;
-#endif
+    if (OperatingSystem == WINDOWS && !isDllLoaded) return -1;
 
-#ifdef WIN32
-    int rc = usb_interrupt_write(device, writeEndpoint, buf, bytes, 1000);
-#else
-    // we use a non-interrupted write on Linux/Mac since the interrupt
-    // write block size is incorectly implemented in the version of
-    // libusb we build with. It is no less efficent.
-    int rc = usb_bulk_write(device, writeEndpoint, buf, bytes, 125);
-#endif
+    int rc;
+    if (OperatingSystem == WINDOWS) {
+        rc = usb_interrupt_write(device, writeEndpoint, buf, bytes, 1000);
+    } else {
+        // we use a non-interrupted write on Linux/Mac since the interrupt
+        // write block size is incorectly implemented in the version of
+        // libusb we build with. It is no less efficent.
+        rc = usb_bulk_write(device, writeEndpoint, buf, bytes, 125);
+    }
 
     if (rc < 0)
     {
@@ -324,21 +311,22 @@ struct usb_dev_handle* LibUsb::OpenFortius()
                             int rc = usb_set_configuration(udev, 1);
                             if (rc < 0) {
                                 qDebug()<<"usb_set_configuration Error: "<< usb_strerror();
-#ifdef __linux__
-                                // looks like the udev rule has not been implemented
-                                qDebug()<<"check permissions on:"<<QString("/dev/bus/usb/%1/%2").arg(bus->dirname).arg(dev->filename);
-                                qDebug()<<"did you remember to setup a udev rule for this device?";
-#endif
+
+                                if (OperatingSystem == LINUX) {
+                                    // looks like the udev rule has not been implemented
+                                    qDebug()<<"check permissions on:"<<QString("/dev/bus/usb/%1/%2").arg(bus->dirname).arg(dev->filename);
+                                    qDebug()<<"did you remember to setup a udev rule for this device?";
+                                }
                             }
 
                             rc = usb_claim_interface(udev, interface);
                             if (rc < 0) qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
 
-#ifndef Q_OS_MAC
-                            // fails on Mac OS X, we don't actually need it anyway
-                            rc = usb_set_altinterface(udev, alternate);
-                            if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
-#endif
+                            if (OperatingSystem != OSX) {
+                                // fails on Mac OS X, we don't actually need it anyway
+                                rc = usb_set_altinterface(udev, alternate);
+                                if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
+                            }
 
                             return udev;
                         }
@@ -376,21 +364,21 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
                             int rc = usb_set_configuration(udev, 1);
                             if (rc < 0) {
                                 qDebug()<<"usb_set_configuration Error: "<< usb_strerror();
-#ifdef __linux__
-                                // looks like the udev rule has not been implemented
-                                qDebug()<<"check permissions on:"<<QString("/dev/bus/usb/%1/%2").arg(bus->dirname).arg(dev->filename);
-                                qDebug()<<"did you remember to setup a udev rule for this device?";
-#endif
+                                if (OperatingSystem == LINUX) {
+                                    // looks like the udev rule has not been implemented
+                                    qDebug()<<"check permissions on:"<<QString("/dev/bus/usb/%1/%2").arg(bus->dirname).arg(dev->filename);
+                                    qDebug()<<"did you remember to setup a udev rule for this device?";
+                                }
                             }
 
                             rc = usb_claim_interface(udev, interface);
                             if (rc < 0) qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
 
-#ifndef Q_OS_MAC
-                            // fails on Mac OS X, we don't actually need it anyway
-                            rc = usb_set_altinterface(udev, alternate);
-                            if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
-#endif
+                            if (OperatingSystem != OSX) {
+                                // fails on Mac OS X, we don't actually need it anyway
+                                rc = usb_set_altinterface(udev, alternate);
+                                if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
+                            }
 
                             return udev;
                         }
