@@ -185,6 +185,38 @@ class TSS : public RideMetric {
     RideMetric *clone() const { return new TSS(*this); }
 };
 
+class EfficiencyFactor : public RideMetric {
+    double ef;
+
+    public:
+
+    EfficiencyFactor() : ef(0.0)
+    {
+        setSymbol("friel_efficiency_factor");
+        setName(tr("EF"));
+        setType(RideMetric::Average);
+        setMetricUnits(tr(""));
+        setImperialUnits(tr(""));
+        setPrecision(3);
+    }
+
+    void compute(const RideFile *, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &deps,
+                 const MainWindow *) {
+        assert(deps.contains("coggan_np"));
+        assert(deps.contains("average_hr"));
+        NP *np = dynamic_cast<NP*>(deps.value("coggan_np"));
+        assert(np);
+        RideMetric *ah = dynamic_cast<RideMetric*>(deps.value("average_hr"));
+        assert(ah);
+        ef = np->value(true) / ah->value(true);
+
+        setValue(ef);
+    }
+    RideMetric *clone() const { return new EfficiencyFactor(*this); }
+};
+
 static bool addAllCoggan() {
     RideMetricFactory::instance().addMetric(NP());
     QVector<QString> deps;
@@ -196,6 +228,10 @@ static bool addAllCoggan() {
     deps.append("coggan_np");
     deps.append("average_power");
     RideMetricFactory::instance().addMetric(VI(), &deps);
+    deps.clear();
+    deps.append("coggan_np");
+    deps.append("average_hr");
+    RideMetricFactory::instance().addMetric(EfficiencyFactor(), &deps);
     return true;
 }
 

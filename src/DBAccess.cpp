@@ -44,12 +44,14 @@
 
 // Revision History
 // Rev Date         Who                What Changed
+//-----------------------------------------------------------------------
 // 29  5th Sep 2011 Mark Liversedge    Added color to the ride fields
 // 30  8th Sep 2011 Mark Liversedge    Metadata 'data' field for data present string
 // 31  22  Nov 2011 Mark Liversedge    Added Average WPK metric
 // 32  9th Dec 2011 Damien Grauser     Temperature data flag (metadata field 'Data')
+// 33  17  Dec 2011 Damien Grauser     Added ResponseIndex and EfficiencyFactor
 
-static int DBSchemaVersion = 32;
+static int DBSchemaVersion = 33;
 
 DBAccess::DBAccess(MainWindow* main, QDir home) : main(main), home(home)
 {
