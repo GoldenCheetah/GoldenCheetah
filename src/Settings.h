@@ -191,4 +191,10 @@ class GSettings : public QSettings
 };
 
 extern GSettings *appsettings;
+extern int OperatingSystem;
+
+#define WINDOWS 1
+#define LINUX   2
+#define OSX     3
+
 #endif // _GC_Settings_h
