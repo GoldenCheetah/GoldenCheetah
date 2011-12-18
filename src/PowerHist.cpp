@@ -382,8 +382,8 @@ PowerHist::recalc(bool force)
         QVector<double> totalTimeSelected(count+2, 0.0);
         int i;
         for (i = 1; i <= count; ++i) {
-            double high = i * (binw/delta);
-            double low = high - (binw/delta);
+            double high = i * round(binw/delta);
+            double low = high - round(binw/delta);
             if (low==0 && !withz) low++;
             parameterValue[i] = high*delta;
             totalTime[i]  = 1e-9;  // nonzero to accomodate log plot
