@@ -48,6 +48,8 @@
 #include <CoreServices/CoreServices.h>
 #endif
 
+#include <math.h> // isnan and isinf
+
 TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), home(home), main(parent)
 {
     setInstanceName("Train Controls");
@@ -939,7 +941,7 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
         // algorithm supplied by Tom Compton
         // from www.AnalyticCycling.com
         // 3.6 * ... converts from meters per second to kph
-        rtData.setVirtualSpeed(3.6f * (
+        double vs = 3.6f * (
             (-2*pow(2,0.3333333333333333)*(crr*m + g*m*sl)) /
             pow(54*pow(ad,2)*pow(cdA,2)*pw + 
             sqrt(2916*pow(ad,4)*pow(cdA,4)*pow(pw,2) + 
@@ -949,8 +951,13 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
             sqrt(2916*pow(ad,4)*pow(cdA,4)*pow(pw,2) + 
             864*pow(ad,3)*pow(cdA,3)*pow(crr*m +
             g*m*sl,3)),0.3333333333333333)/
-            (3.*pow(2,0.3333333333333333)*ad*cdA))
-        );
+            (3.*pow(2,0.3333333333333333)*ad*cdA));
+
+        // just in case...
+        if (isnan(vs) || isinf(vs)) vs = 0.00f;
+
+        rtData.setVirtualSpeed(vs);
+        
 
         // go update the displays...
         main->notifyTelemetryUpdate(rtData); // signal everyone to update telemetry
