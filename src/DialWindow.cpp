@@ -47,7 +47,7 @@ DialWindow::DialWindow(MainWindow *mainWindow) :
     controlsLayout->addRow(seriesLabel, seriesSelector);
 
     // average selection
-    averageLabel= new QLabel(tr("Average"), this);
+    averageLabel= new QLabel(tr("Smooth (secs)"), this);
     averageLabel->hide();
     averageLabel->setAutoFillBackground(true);
 
@@ -424,6 +424,10 @@ void DialWindow::seriesChanged()
         averageLabel->show();
         averageEdit->show();
         averageSlider->show();
+    } else {
+        averageLabel->hide();
+        averageEdit->hide();
+        averageSlider->hide();
     }
 
     // the series selector changed so update the colors
