@@ -278,10 +278,10 @@ void Fortius::run()
 
     // we need to average out power for the last second
     // since we get updates every 16ms (60hz)
-    int powerhist[60];     // last 60 values received
+    int powerhist[16];     // last 60s values received
     int powertot=0;        // running total
     int powerindex=0;      // index into the powerhist array
-    for (int i=0; i<60; i++) powerhist[i]=0;
+    for (int i=0; i<16; i++) powerhist[i]=0;
 
     // initialise local cache & main vars
     pvars.lock();
@@ -356,19 +356,19 @@ void Fortius::run()
                 powertot -= powerhist[powerindex];
                 powerhist[powerindex] = power;
 
-                curPower = powertot / 60;
-                powerindex = (powerindex == 59) ? 0 : powerindex+1;
+                curPower = powertot / 16;
+                powerindex = (powerindex == 15) ? 0 : powerindex+1;
                 
                 // heartrate
                 // XXX todo - need a hr strap
                 curHeartRate = 0;
 
-#if 0
+//#if 0
                 // debug
                 fprintf(stderr,"%08d:", timer.elapsed());
                 for(int i=0; i<48; i++) fprintf(stderr, "%02x ", buf[i]);
                 fprintf(stderr, "\n");
-#endif
+//#endif
 
             } else {
 
@@ -425,7 +425,7 @@ void Fortius::run()
             // reset smoothing.
             powertot = 0;
             powerindex = 0;
-            for (int i=0; i<60; i++) powerhist[i]=0;
+            for (int i=0; i<16; i++) powerhist[i]=0;
 
             // send first command to get fortius ready
             prepareCommand(curmode, curmode == FT_ERGOMODE ? curload : curgradient);
