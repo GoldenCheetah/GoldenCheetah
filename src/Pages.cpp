@@ -785,6 +785,7 @@ DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
     virtualPower->addItem("Power - Cyclops Fluid 2");
     virtualPower->addItem("Power - BT Advanced Training System");
     virtualPower->addItem("Power - LeMond Revolution");
+    virtualPower->addItem("Power - 1UP USA Trainer");
     virtualPower->setCurrentIndex(0);
 
 // THIS CODE IS DISABLED FOR THIS RELEASE XXX
