@@ -104,6 +104,16 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         rtData.setWatts((0.21*pow(V,3))+(4.25*V));
         }
         break;
+
+    case 6 : // 1UP USA
+        {
+        double V = rtData.getSpeed() * MILES_PER_KM;
+        // Power curve provided by extraction from SportsTracks plugin
+        rtData.setWatts(25.00 + (2.65f*V) - (0.42f*pow(V,2)) + (0.058f*pow(V,3)));
+        }
+        break;
+
+
     default : // unknown - do nothing
         break;
     }
