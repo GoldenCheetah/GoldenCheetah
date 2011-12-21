@@ -1039,7 +1039,9 @@ MainWindow::aboutDialog()
             "TSS, NP, IF courtesy of <a href=\"http://www.peaksware.com\">"
             "Peaksware LLC</a>.<br>"
             "BikeScore, xPower courtesy of <a href=\"http://www.physfarm.com\">"
-            "Physfarm Training Systems</a>."
+            "Physfarm Training Systems</a>.<br>"
+            "Virtual Speed courtesy of Tom Compton <a href=\"http://www.analyticcycling.com\">"
+            "Analytic Cycling</a>."
             "</center>"
             )
             .arg(__DATE__)

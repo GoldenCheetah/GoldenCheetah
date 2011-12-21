@@ -45,6 +45,10 @@ void RealtimeData::setSpeed(double speed)
 {
     this->speed = speed;
 }
+void RealtimeData::setVirtualSpeed(double speed)
+{
+    this->virtualSpeed = speed;
+}
 void RealtimeData::setWheelRpm(double wheelRpm)
 {
     this->wheelRpm = wheelRpm;
@@ -89,6 +93,10 @@ double RealtimeData::getHr() const
 double RealtimeData::getSpeed() const
 {
     return speed;
+}
+double RealtimeData::getVirtualSpeed() const
+{
+    return virtualSpeed;
 }
 double RealtimeData::getWheelRpm() const
 {
@@ -141,6 +149,9 @@ double RealtimeData::value(DataSeries series) const
     case Speed: return speed;
         break;
 
+    case VirtualSpeed: return virtualSpeed;
+        break;
+
     case Cadence: return cadence;
         break;
 
@@ -189,6 +200,7 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << AvgSpeed;
         seriesList << AvgCadence;
         seriesList << AvgHeartRate;
+        seriesList << VirtualSpeed;
     }
     return seriesList;
 }
@@ -244,6 +256,9 @@ QString RealtimeData::seriesName(DataSeries series)
         break;
 
     case Speed: return tr("Speed");
+        break;
+
+    case VirtualSpeed: return tr("Virtual Speed");
         break;
 
     case Cadence: return tr("Cadence");

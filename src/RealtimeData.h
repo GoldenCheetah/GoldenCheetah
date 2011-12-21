@@ -37,7 +37,8 @@ public:
                       Watts, Speed, Cadence, HeartRate, Load,
                       XPower, BikeScore, RI, Joules, SkibaVI,
                       NP, TSS, IF, VI,
-                      AvgWatts, AvgSpeed, AvgCadence, AvgHeartRate };
+                      AvgWatts, AvgSpeed, AvgCadence, AvgHeartRate,
+                      VirtualSpeed };
 
     typedef enum dataseries DataSeries;
     double value(DataSeries) const;
@@ -52,6 +53,7 @@ public:
     void setHr(double hr);
     void setTime(long time);
     void setSpeed(double speed);
+    void setVirtualSpeed(double speed);
     void setWheelRpm(double wheelRpm);
     void setCadence(double aCadence);
     void setLoad(double load);
@@ -69,6 +71,7 @@ public:
     double getHr() const;
     long getTime() const;
     double getSpeed() const;
+    double getVirtualSpeed() const;
     double getWheelRpm() const;
     double getCadence() const;
     double getLoad() const;
@@ -89,6 +92,7 @@ private:
 
     // derived data
     double distance;
+    double virtualSpeed;
     long lap;
     long msecs;
     long lapMsecs;

@@ -171,6 +171,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         break;
 
     case RealtimeData::Speed:
+    case RealtimeData::VirtualSpeed:
         if (!mainWindow->useMetricUnits) displayValue *= MILES_PER_KM;
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
         break;
@@ -455,6 +456,7 @@ void DialWindow::seriesChanged()
             break;
 
     case RealtimeData::Speed:
+    case RealtimeData::VirtualSpeed:
     case RealtimeData::AvgSpeed:
             foreground = GColor(CSPEED);
             break;
