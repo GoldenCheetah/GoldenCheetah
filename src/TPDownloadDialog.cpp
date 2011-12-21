@@ -98,7 +98,7 @@ TPDownloadDialog::completedAthlete(QList<QMap<QString, QString> >athletes)
     QLabel *toLabel = new QLabel(tr("To:"), this);
 
     from = new QDateEdit(this);
-    from->setDate(QDate::currentDate().addYears(-1));
+    from->setDate(QDate::currentDate().addMonths(-1));
     from->setCalendarPopup(true);
     to = new QDateEdit(this);
     to->setDate(QDate::currentDate());
