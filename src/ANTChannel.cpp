@@ -415,6 +415,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 {
                     if (lastStdPwrMessage.type != 0) {
                         parent->setWatts(antMessage.instantPower);
+                        parent->setWheelRpm(antMessage.instantCadence);
                     }
                     lastStdPwrMessage = antMessage;
                     savemessage = false;
