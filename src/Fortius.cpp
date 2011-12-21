@@ -363,12 +363,12 @@ void Fortius::run()
                 // XXX todo - need a hr strap
                 curHeartRate = 0;
 
-//#if 0
+#if 0
                 // debug
                 fprintf(stderr,"%08d:", timer.elapsed());
                 for(int i=0; i<48; i++) fprintf(stderr, "%02x ", buf[i]);
                 fprintf(stderr, "\n");
-//#endif
+#endif
 
             } else {
 
