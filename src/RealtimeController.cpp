@@ -102,6 +102,13 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         // for the data / analysis see: http://wattagetraining.com/forum/viewtopic.php?f=2&t=335
         rtData.setWatts((0.21*pow(V,3))+(4.25*V));
         }
+    case 6 : // 1UP USA
+        {
+        double V = rtData.getSpeed() * MILES_PER_KM;
+        // Power curve provided by extraction from SportsTracks plugin
+        rtData.setWatts(25.00 + (2.65f*V) - (0.42f*pow(V,2)) + (0.058f*pow(V,3)));
+        }
+        break;
     default : // unknown - do nothing
         break;
     }
@@ -129,6 +136,8 @@ RealtimeController::processSetup()
     case 4 : // TODO BT-ATS - BT Advanced Training System - use an algorithm
         break;
     case 5 : // TODO Lemond Revolution - use and algorithm
+        break;
+    case 6 : // TODO 1UP USA - use and algorithm
         break;
     default : // unknown - do nothing
         break;
