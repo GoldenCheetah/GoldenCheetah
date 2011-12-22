@@ -43,6 +43,7 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
     langCombo->addItem(tr("Russian"));
     langCombo->addItem(tr("Czech"));
     langCombo->addItem(tr("Spanish"));
+    langCombo->addItem(tr("Portugese"));
 
     // Default to system locale
     QVariant lang = settings->value(GC_LANG, QLocale::system().name());
@@ -65,6 +66,8 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
         langCombo->setCurrentIndex(7);
     else if(lang.toString().startsWith("es"))
         langCombo->setCurrentIndex(8);
+    else if(lang.toString().startsWith("pt"))
+        langCombo->setCurrentIndex(9);
     else // default : English
         langCombo->setCurrentIndex(0);
 

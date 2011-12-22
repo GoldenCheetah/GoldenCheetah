@@ -18,6 +18,7 @@
     <file>translations/gc_ru.qm</file>
     <file>translations/gc_cs.qm</file>
     <file>translations/gc_es.qm</file>
+    <file>translations/gc_pt.qm</file>
     <file>xml/charts.xml</file>
     <file>xml/metadata.xml</file>
     <file>images/toolbar/close-icon.png</file>

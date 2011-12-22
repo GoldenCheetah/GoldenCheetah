@@ -315,7 +315,7 @@ SOURCES += \
         SrmRideFile.cpp \
         StressCalculator.cpp \
         SyncRideFile.cpp \
-	    TacxCafRideFile.cpp \
+        TacxCafRideFile.cpp \
         TcxParser.cpp \
         TcxRideFile.cpp \
         TxtRideFile.cpp \
@@ -341,5 +341,6 @@ TRANSLATIONS = translations/gc_fr.ts \
                translations/gc_de.ts \
                translations/gc_cs.ts \
                translations/gc_es.ts \
-               translations/gc_ru.ts
+               translations/gc_ru.ts \
+               translations/gc_pt.ts
 
