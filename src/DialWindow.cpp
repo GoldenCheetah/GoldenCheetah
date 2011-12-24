@@ -442,7 +442,7 @@ void DialWindow::seriesChanged()
     case RealtimeData::VI:
     case RealtimeData::SkibaVI:
     case RealtimeData::None:
-            foreground = GColor(CPLOTMARKER);
+            foreground = GColor(CDIAL);
             break;
 
     case RealtimeData::Load:
