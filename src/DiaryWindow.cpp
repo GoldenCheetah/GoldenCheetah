@@ -48,6 +48,7 @@ DiaryWindow::DiaryWindow(MainWindow *mainWindow) :
     prev->setFlat(true);
 #endif
 
+#if 0
     // viewMode - monthly or weekly
     viewMode = new QComboBox;
     viewMode->addItem("View Month");
@@ -56,13 +57,16 @@ DiaryWindow::DiaryWindow(MainWindow *mainWindow) :
     viewMode->setFixedWidth(120);
 
     viewMode->setCurrentIndex(appsettings->cvalue(mainWindow->cyclist, GC_DIARY_VIEW, "1").toInt());
+#endif
 
     controls->addWidget(prev);
     controls->addWidget(next);
     controls->addStretch();
     controls->addWidget(title, Qt::AlignCenter | Qt::AlignVCenter);
     controls->addStretch();
+#if 0
     controls->addWidget(viewMode);
+#endif
 
     vlayout->addLayout(controls);
 
@@ -93,13 +97,14 @@ DiaryWindow::DiaryWindow(MainWindow *mainWindow) :
     allViews->addWidget(monthlyView);
     allViews->addWidget(weeklyView);
     allViews->addWidget(rideSummary);
-    allViews->setCurrentIndex(viewMode->currentIndex());
+    //allViews->setCurrentIndex(viewMode->currentIndex());
+    allViews->setCurrentIndex(0);
 
     vlayout->addWidget(allViews);
 
-    connect(viewMode, SIGNAL(currentIndexChanged(int)), allViews, SLOT(setCurrentIndex(int)));
-    connect(viewMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setDefaultView(int)));
-    connect(viewMode, SIGNAL(currentIndexChanged(int)), this, SLOT(rideSelected()));
+    //connect(viewMode, SIGNAL(currentIndexChanged(int)), allViews, SLOT(setCurrentIndex(int)));
+    //connect(viewMode, SIGNAL(currentIndexChanged(int)), this, SLOT(setDefaultView(int)));
+    //connect(viewMode, SIGNAL(currentIndexChanged(int)), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
@@ -147,12 +152,15 @@ DiaryWindow::rideSelected()
     weeklyView->setDateRange(when, when.addDays(6));
     weeklyView->setViewMode(QxtScheduleView::DayView);
 
+#if 0
     // ok update title
     switch (viewMode->currentIndex()) {
     case 0 : // monthly
+#endif
         title->setText(QString("%1 %2").arg(QDate::longMonthName(month)).arg(year));
         next->show();
         prev->show();
+#if 0
         break;
     case 1 : // weekly
         title->setText(QString("Week %1 %2").arg(weekNumber).arg(year));
@@ -167,19 +175,23 @@ DiaryWindow::rideSelected()
         prev->hide();
         break;
     }
+#endif
 }
 
 void
 DiaryWindow::prevClicked()
 {
+#if 0
     switch (viewMode->currentIndex()) {
     case 0 : // monthly
         {
+#endif
         int month = calendarModel->getMonth();
         int year = calendarModel->getYear();
         QDate when = QDate(year, month, 1).addDays(-1);
         calendarModel->setMonth(when.month(), when.year());
         title->setText(QString("%1 %2").arg(QDate::longMonthName(when.month())).arg(when.year()));
+#if 0
         }
         break;
     case 1 : // weekly
@@ -192,19 +204,23 @@ DiaryWindow::prevClicked()
         }
         break;
     }
+#endif
 }
 
 void
 DiaryWindow::nextClicked()
 {
+#if 0
     switch (viewMode->currentIndex()) {
     case 0 : // monthly
         {
+#endif
         int month = calendarModel->getMonth();
         int year = calendarModel->getYear();
         QDate when = QDate(year, month, 1).addMonths(1);
         calendarModel->setMonth(when.month(), when.year());
         title->setText(QString("%1 %2").arg(QDate::longMonthName(when.month())).arg(when.year()));
+#if 0
         }
         break;
     case 1 : // weekly
@@ -217,6 +233,7 @@ DiaryWindow::nextClicked()
         }
         break;
     }
+#endif
 }
 
 void

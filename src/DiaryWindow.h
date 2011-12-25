@@ -55,8 +55,8 @@ class DiaryWindow : public GcWindow
 
         DiaryWindow(MainWindow *);
 
-        int view() const { return viewMode->currentIndex(); }
-        void setView(int x) { viewMode->setCurrentIndex(x); }
+        int view() const { return 0; /* viewMode->currentIndex(); */ }
+        void setView(int /* x */ ) { /* viewMode->setCurrentIndex(x); */ }
 
     public slots:
         void rideSelected();
