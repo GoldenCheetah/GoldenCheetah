@@ -712,13 +712,23 @@ CpintPlot::pointHover(QwtPlotCurve *curve, int index)
 
         double xvalue = curve->x(index);
         double yvalue = curve->y(index);
-        QString text;
+        QString text, dateStr;
+
+        // add when to tooltip if its all curve
+        if (allCurves.contains(curve) != NULL) {
+            int index = xvalue * 60;
+            if (index >= 0 && getBests().count() > index) {
+                QDate date = getBestDates()[index];
+                dateStr = date.toString("\nddd, dd MMM yyyy");
+            }
+        }
 
             // output the tooltip
-        text = QString("%1\n%3 %4")
+        text = QString("%1\n%3 %4%5")
             .arg(interval_to_str(60.0*xvalue))
             .arg(yvalue, 0, 'f', RideFile::decimalsFor(series) ? 1 : 0)
-            .arg(RideFile::unitName(series));
+            .arg(RideFile::unitName(series))
+            .arg(dateStr);
 
         // set that text up
         zoomer->setText(text);
