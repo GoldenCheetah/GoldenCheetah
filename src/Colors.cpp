@@ -54,7 +54,6 @@ static bool setupColors()
         { "Altitude Shading", "COLORALTITUDESHADE", QColor(124,91,31) },
         { "Wind Speed", "COLORWINDSPEED", Qt::darkGreen },
         { "Torque", "COLORTORQUE", Qt::magenta },
-        { "Temperature", "COLORTEMPERATURE", Qt::yellow },
         { "Short Term Stress", "COLORSTS", Qt::blue },
         { "Long Term Stress", "COLORLTS", Qt::green },
         { "Stress Balance", "COLORSB", Qt::black },
@@ -96,6 +95,7 @@ static bool setupColors()
         { "Activity History Group", "CRIDEGROUP", QColor(236,246,255) },
         { "SpinScan Left", "CSPINSCANLEFT", Qt::gray },
         { "SpinScan Right", "CSPINSCANRIGHT", Qt::cyan },
+        { "Temperature", "COLORTEMPERATURE", Qt::yellow },
         { "Default Dial Color", "CDIAL", Qt::gray },
         { "", "", QColor(0,0,0) },
     };
