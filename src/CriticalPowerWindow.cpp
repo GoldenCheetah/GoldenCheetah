@@ -48,7 +48,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
 
     // picker details
     QFormLayout *cpintPickerLayout = new QFormLayout;
-    QLabel *cpintTimeLabel = new QLabel(tr("Interval Duration:"), this);
+    QLabel *cpintTimeLabel = new QLabel(tr("Duration:"), this);
     cpintTimeValue = new QLineEdit("0 s");
     QLabel *cpintTodayLabel = new QLabel(tr("Today:"), this);
     cpintTodayValue = new QLineEdit(tr("no data"));
