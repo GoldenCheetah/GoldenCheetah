@@ -210,6 +210,7 @@ class MainWindow : public QMainWindow
 
     public slots:
         void showTreeContextMenuPopup(const QPoint &);
+        void closeAll();
 
     private slots:
         void rideTreeWidgetSelectionChanged();

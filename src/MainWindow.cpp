@@ -558,7 +558,8 @@ MainWindow::MainWindow(const QDir &home) :
     QMenu *fileMenu = menuBar()->addMenu(tr("&Athlete"));
     fileMenu->addAction(tr("&New..."), this, SLOT(newCyclist()), tr("Ctrl+N"));
     fileMenu->addAction(tr("&Open..."), this, SLOT(openCyclist()), tr("Ctrl+O"));
-    fileMenu->addAction(tr("&Quit"), this, SLOT(close()), tr("Ctrl+Q"));
+    fileMenu->addAction(tr("&Close Window"), this, SLOT(close()), tr(""));
+    fileMenu->addAction(tr("&Quit All Windows"), this, SLOT(closeAll()), tr("Ctrl+Q"));
 
     QMenu *rideMenu = menuBar()->addMenu(tr("A&ctivity"));
     rideMenu->addAction(tr("&Download from device..."), this, SLOT(downloadRide()), tr("Ctrl+D"));
@@ -1016,6 +1017,18 @@ MainWindow::closeEvent(QCloseEvent* event)
         if(mainwindows.removeOne(this) == false)
             qDebug()<<"closeEvent: mainwindows list error";
     }
+}
+
+void
+MainWindow::closeAll()
+{
+    QList<MainWindow *> windows = mainwindows; // get a copy, since it is updated as closed
+
+    foreach(MainWindow *window, windows) 
+        if (window != this) window->close();
+
+    // now close us down!
+    close();
 }
 
 void
