@@ -360,8 +360,7 @@ void Fortius::run()
                 powerindex = (powerindex == 15) ? 0 : powerindex+1;
                 
                 // heartrate
-                // XXX todo - need a hr strap
-                curHeartRate = 0;
+                curHeartRate = buf[12];
 
 #if 0
                 // debug
@@ -391,11 +390,6 @@ void Fortius::run()
         deviceSpeed = curSpeed;
         deviceCadence = curCadence;
         deviceHeartRate = curHeartRate;
-
-        //XXX need to smooth this from 60hz to 4hz (gui refresh rate)
-        //    power jumps about over the course of the pedal stroke
-        //    and thus needs to be smoothed out .. might even be
-        //    possible to do some kind of spinscan analysis?
         devicePower = curPower;
 
         pvars.unlock();
