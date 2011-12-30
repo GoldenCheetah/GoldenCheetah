@@ -31,7 +31,7 @@
 #include <qwt_data.h>
 #include "Settings.h"
 
-#define MAXSAMPLES 50
+#define MAXSAMPLES 300
 
 class Realtime30PwrData : public QwtData
 {
