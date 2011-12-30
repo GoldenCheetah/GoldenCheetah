@@ -24,7 +24,7 @@
 RealtimeData::RealtimeData()
 {
     name[0] = '\0';
-    lap = watts = hr = speed = wheelRpm = cadence  = load = 0;
+    lap = altWatts = watts = hr = speed = wheelRpm = cadence  = load = 0;
     msecs = lapMsecs = /* bikeScore = joules =*/ 0;
     memset(spinScan, 0, 24);
 }
@@ -32,6 +32,10 @@ RealtimeData::RealtimeData()
 void RealtimeData::setName(char *name)
 {
     strcpy(this->name, name);
+}
+void RealtimeData::setAltWatts(double watts)
+{
+    this->altWatts = (int)watts;
 }
 void RealtimeData::setWatts(double watts)
 {
@@ -81,6 +85,10 @@ const char *
 RealtimeData::getName() const
 {
     return name;
+}
+double RealtimeData::getAltWatts() const
+{
+    return altWatts;
 }
 double RealtimeData::getWatts() const
 {
@@ -143,6 +151,9 @@ double RealtimeData::value(DataSeries series) const
     case Distance: return distance;
         break;
 
+    case AltWatts: return altWatts;
+        break;
+
     case Watts: return watts;
         break;
 
@@ -201,6 +212,8 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << AvgCadence;
         seriesList << AvgHeartRate;
         seriesList << VirtualSpeed;
+        seriesList << AltWatts;
+        seriesList << LRBalance;
     }
     return seriesList;
 }
@@ -252,6 +265,9 @@ QString RealtimeData::seriesName(DataSeries series)
     case Distance: return tr("Distance");
         break;
 
+    case AltWatts: return tr("Alternate Power");
+        break;
+
     case Watts: return tr("Power");
         break;
 
@@ -280,6 +296,9 @@ QString RealtimeData::seriesName(DataSeries series)
         break;
 
     case AvgCadence: return tr("Average Cadence");
+        break;
+
+    case LRBalance: return tr("Left/Right Balance");
         break;
     }
 }

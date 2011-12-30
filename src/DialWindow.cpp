@@ -170,6 +170,16 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         }
         break;
 
+    case RealtimeData::LRBalance:
+        {
+            double tot = rtData.getWatts() + rtData.getAltWatts();
+            double left = rtData.getWatts() / tot * 100.00f;
+            double right = 100.00 - left;
+            if (tot < 0.1) left = right = 0;
+            valueLabel->setText(QString("%1 / %2").arg(left, 0, 'f', 0).arg(right, 0, 'f', 0));
+        }
+        break;
+
     case RealtimeData::Speed:
     case RealtimeData::VirtualSpeed:
         if (!mainWindow->useMetricUnits) displayValue *= MILES_PER_KM;
@@ -436,6 +446,7 @@ void DialWindow::seriesChanged()
     case RealtimeData::Time:
     case RealtimeData::LapTime:
     case RealtimeData::Distance:
+    case RealtimeData::LRBalance:
     case RealtimeData::Lap:
     case RealtimeData::RI:
     case RealtimeData::IF:
@@ -473,6 +484,10 @@ void DialWindow::seriesChanged()
     case RealtimeData::HeartRate:
     case RealtimeData::AvgHeartRate:
             foreground = GColor(CHEARTRATE);
+            break;
+
+    case RealtimeData::AltWatts:
+            foreground = GColor(CALTPOWER);
             break;
     }
 

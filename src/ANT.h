@@ -311,6 +311,9 @@ public:
     void setWatts(float x) {
         telemetry.setWatts(x);
     }
+    void setAltWatts(float x) {
+        telemetry.setAltWatts(x);
+    }
 
 private:
 
@@ -354,6 +357,7 @@ private:
     int length;
     int bytes;
     int checksum;
+    int powerchannels; // how many power channels do we have?
 
     // antlog.bin ant message stream
     QFile antlog;

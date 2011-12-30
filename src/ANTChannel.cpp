@@ -31,6 +31,7 @@ ANTChannel::ANTChannel(int number, ANT *parent) : parent(parent), number(number)
     channel_type_flags=0;
     is_cinqo=0;
     is_old_cinqo=0;
+    is_alt=0;
     control_channel=NULL;
     manufacturer_id=0;
     product_id=0;
@@ -312,7 +313,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                                 // we should be coasting, so power and cadence
                                 // will be zero
                                 srm_offset = antMessage.srmOffset;
-                                parent->setWatts(0);
+                                is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
                                 parent->setCadence(0);
                                 break;
 
@@ -355,7 +356,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 
                         // ignore the occassional spikes XXX is this a boundary error on event count ?
                         if (power >= 0 && power < 2501 && cadence >=0 && cadence < 256) {
-                            parent->setWatts(power);
+                            is_alt ? parent->setAltWatts(power) : parent->setWatts(power);
                             parent->setCadence(cadence);
                         }
 
@@ -365,7 +366,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                         //antMessage.type = 0; // we need a new data pair XXX bad!!!
 
                         if (nullCount >= 4) { // 4 messages on an SRM
-                            parent->setWatts(0);
+                            is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
                             parent->setCadence(0);
                         }
                     }
@@ -390,14 +391,14 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                         float power = 3.14159 * nm_torque * wheelRPM / 30;
 
                         parent->setWheelRpm(wheelRPM);
-                        parent->setWatts(power);
+                        is_alt ? parent->setAltWatts(power) : parent->setWatts(power);
 
                     } else {
                         nullCount++;
 
                         if (nullCount >= 4) { // 4 messages on Powertap ? XXX validate this
                             parent->setWheelRpm(0);
-                            parent->setWatts(0);
+                            is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
                         }
                     }
                 }
@@ -414,7 +415,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 case ANT_STANDARD_POWER: // 0x10 - standard power
                 {
                     if (lastStdPwrMessage.type != 0) {
-                        parent->setWatts(antMessage.instantPower);
+                        is_alt ? parent->setAltWatts(antMessage.instantPower) : parent->setWatts(antMessage.instantPower);
                         parent->setWheelRpm(antMessage.instantCadence);
                     }
                     lastStdPwrMessage = antMessage;
@@ -440,13 +441,13 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                         float power = 3.14159 * nm_torque * cadence / 30;
 
                         parent->setCadence(cadence);
-                        parent->setWatts(power);
+                        is_alt ? parent->setAltWatts(power) : parent->setWatts(power);
 
                     } else {
                         nullCount++;
                         if (nullCount >= 4) { //XXX 4 on a quarq??? validate this
                             parent->setCadence(0);
-                            parent->setWatts(0);
+                            is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
                         }
                     }
                 }

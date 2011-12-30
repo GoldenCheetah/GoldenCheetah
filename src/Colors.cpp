@@ -23,7 +23,7 @@
 #include <QDir>
 #include "Settings.h"
 
-static Colors ColorList[62], DefaultColorList[62];
+static Colors ColorList[63], DefaultColorList[63];
 
 static void copyArray(Colors source[], Colors target[])
 {
@@ -35,7 +35,7 @@ static bool setupColors()
 {
     // consider removing when we can guarantee extended initialisation support in gcc
     // (c++0x not supported by Qt currently and not planned for 4.8 or 5.0)
-    Colors init[62] = {
+    Colors init[63] = {
         { "Plot Background", "COLORPLOTBACKGROUND", Qt::white },
         { "Ride Plot Background", "COLORRIDEPLOTBACKGROUND", Qt::black },
         { "Plot Thumbnail Background", "COLORPLOTTHUMBNAIL", Qt::gray },
@@ -97,6 +97,7 @@ static bool setupColors()
         { "SpinScan Right", "CSPINSCANRIGHT", Qt::cyan },
         { "Temperature", "COLORTEMPERATURE", Qt::yellow },
         { "Default Dial Color", "CDIAL", Qt::gray },
+        { "Alternate Power", "CALTPOWER", Qt::magenta },
         { "", "", QColor(0,0,0) },
     };
 
