@@ -202,6 +202,11 @@ MainWindow::MainWindow(const QDir &home) :
     davCalendar->download(); // refresh the diary window
 #endif
 
+    // if no workout directory is configured, default to the
+    // top level GoldenCheetah directory
+    if (appsettings->value(NULL, GC_WORKOUTDIR).toString() == "")
+        appsettings->setValue(GC_WORKOUTDIR, QFileInfo(home.absolutePath() + "/../").absolutePath());
+
     /*----------------------------------------------------------------------
      * Toolbar
      *--------------------------------------------------------------------*/
