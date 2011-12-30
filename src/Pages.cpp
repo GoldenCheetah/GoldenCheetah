@@ -944,8 +944,12 @@ DevicePage::setConfigPane()
     int type = Supported.getType(typeSelector->itemData(typeSelector->currentIndex()).toInt()).type;
 
     // pair button only valid for ANT+ (Quarqd or Native)
-    if (type == DEV_ANTLOCAL || type == DEV_ANTPLUS) pairButton->show();
-    else pairButton->hide();
+    if (type == DEV_ANTLOCAL || type == DEV_ANTPLUS) {
+        profHint->show();
+        profLabel->show();
+        pairButton->show();
+        deviceProfile->show();
+    } else pairButton->hide();
 
     // pair button only valid for ANT+ (Quarqd or Native)
     if (type == DEV_FORTIUS) firmwareButton->show();

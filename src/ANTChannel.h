@@ -128,6 +128,7 @@ class ANTChannel : public QObject {
         int device_id;
         bool is_cinqo; // bool
         bool is_old_cinqo; // bool, set for cinqo needing separate control channel
+        bool is_alt; // is alternative channel for power
         int search_type;
         int srm_offset;
         ANTChannel *control_channel;
@@ -162,6 +163,8 @@ class ANTChannel : public QObject {
         void sendCinqoError();
         void sendCinqoSuccess();
         void checkCinqo();
+
+        void setAlt(bool value) { is_alt = value; }
 
     signals:
 

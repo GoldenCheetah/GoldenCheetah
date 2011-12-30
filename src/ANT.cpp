@@ -77,6 +77,7 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf) : QThread(parent)
     Status=0;
     deviceFilename = devConf->portSpec;
     baud=115200;
+    powerchannels=0;
 
     // state machine
     state = ST_WAIT_FOR_SYNC;
@@ -138,6 +139,7 @@ void ANT::run()
 {
     int status; // control commands from controller
     bool isPortOpen = false;
+    powerchannels = 0;
 
     Status = ANT_RUNNING;
     QString strBuf;
@@ -153,6 +155,7 @@ void ANT::run()
 
         // pair with specified devices on next available channel
         if (antIDs.count()) {
+
             foreach(QString antid, antIDs) {
 
                 if (antid.length()) {
@@ -323,6 +326,9 @@ ANT::addDevice(int device_number, int device_type, int channel_number)
     for (int i=0; i<ANT_MAX_CHANNELS; i++) {
         if (antChannel[i]->channel_type == ANTChannel::CHANNEL_TYPE_UNUSED) {
             antChannel[i]->open(device_number, device_type);
+
+            // this is an alternate channel for power
+            if (device_type == ANTChannel::CHANNEL_TYPE_POWER && powerchannels) antChannel[i]->setAlt(true);
             return 1;
         }
     }

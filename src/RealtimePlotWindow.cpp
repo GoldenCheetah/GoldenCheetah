@@ -59,6 +59,7 @@ void
 RealtimePlotWindow::telemetryUpdate(RealtimeData rtData)
 {
     rtPlot->pwrData.addData(rtData.value(RealtimeData::Watts));
+    rtPlot->altPwrData.addData(rtData.value(RealtimeData::AltWatts));
     rtPlot->pwr30Data.addData(rtData.value(RealtimeData::Watts));
     rtPlot->cadData.addData(rtData.value(RealtimeData::Cadence));
     rtPlot->spdData.addData(rtData.value(RealtimeData::Speed));

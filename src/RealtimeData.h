@@ -38,7 +38,7 @@ public:
                       XPower, BikeScore, RI, Joules, SkibaVI,
                       NP, TSS, IF, VI,
                       AvgWatts, AvgSpeed, AvgCadence, AvgHeartRate,
-                      VirtualSpeed };
+                      VirtualSpeed, AltWatts, LRBalance };
 
     typedef enum dataseries DataSeries;
     double value(DataSeries) const;
@@ -50,6 +50,7 @@ public:
 
     void setName(char *name);
     void setWatts(double watts);
+    void setAltWatts(double watts);
     void setHr(double hr);
     void setTime(long time);
     void setSpeed(double speed);
@@ -68,6 +69,7 @@ public:
 
     const char *getName() const;
     double getWatts() const;
+    double getAltWatts() const;
     double getHr() const;
     long getTime() const;
     double getSpeed() const;
@@ -87,7 +89,7 @@ private:
     char name[64];
 
     // realtime telemetry
-    double hr, watts, speed, wheelRpm, load, slope;
+    double hr, watts, altWatts, speed, wheelRpm, load, slope;
     double cadence;      // in rpm
 
     // derived data

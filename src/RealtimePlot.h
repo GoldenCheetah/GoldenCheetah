@@ -31,6 +31,8 @@
 #include <qwt_data.h>
 #include "Settings.h"
 
+#define MAXSAMPLES 50
+
 class Realtime30PwrData : public QwtData
 {
     int pwrCur_; 
@@ -55,8 +57,8 @@ class RealtimePwrData : public QwtData
 {
     int pwrCur_;
     int &pwrCur;
-    double pwrData_[150];
-    double (&pwrData)[150];
+    double pwrData_[MAXSAMPLES];
+    double (&pwrData)[MAXSAMPLES];
 
     public:
     RealtimePwrData() : pwrCur(pwrCur_), pwrData(pwrData_) {}
@@ -74,8 +76,8 @@ class RealtimeLodData : public QwtData
 {
     int lodCur_;
     int &lodCur;
-    double lodData_[50];
-    double (&lodData)[50];
+    double lodData_[MAXSAMPLES];
+    double (&lodData)[MAXSAMPLES];
 
     public:
     RealtimeLodData() : lodCur(lodCur_), lodData(lodData_) {}
@@ -94,8 +96,8 @@ class RealtimeCadData : public QwtData
 {
     int cadCur_;
     int &cadCur;
-    double cadData_[50];
-    double (&cadData)[50];
+    double cadData_[MAXSAMPLES];
+    double (&cadData)[MAXSAMPLES];
 
     public:
     RealtimeCadData() : cadCur(cadCur_), cadData(cadData_) {}
@@ -114,8 +116,8 @@ class RealtimeSpdData : public QwtData
 {
     int spdCur_;
     int &spdCur;
-    double spdData_[50];
-    double (&spdData)[50];
+    double spdData_[MAXSAMPLES];
+    double (&spdData)[MAXSAMPLES];
 
     public:
     RealtimeSpdData() : spdCur(spdCur_), spdData(spdData_) {}
@@ -134,8 +136,8 @@ class RealtimeHrData : public QwtData
 {
     int hrCur_;
     int &hrCur;
-    double hrData_[50];
-    double (&hrData)[50];
+    double hrData_[MAXSAMPLES];
+    double (&hrData)[MAXSAMPLES];
 
     public:
     RealtimeHrData() : hrCur(hrCur_), hrData(hrData_) {}
@@ -158,6 +160,7 @@ class RealtimePlot : public QwtPlot
 
 	QwtPlotGrid *grid;
 	QwtPlotCurve *pwrCurve;
+	QwtPlotCurve *altPwrCurve;
 	QwtPlotCurve *pwr30Curve;
 	QwtPlotCurve *cadCurve;
 	QwtPlotCurve *spdCurve;
@@ -173,6 +176,7 @@ class RealtimePlot : public QwtPlot
     void setAxisTitle(int axis, QString label);
     Realtime30PwrData pwr30Data;
     RealtimePwrData pwrData;
+    RealtimePwrData altPwrData;
     RealtimeSpdData spdData;
     RealtimeHrData hrData;
     RealtimeCadData cadData;

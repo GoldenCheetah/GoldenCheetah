@@ -29,45 +29,45 @@
 
 
 // Power history
-double RealtimePwrData::x(size_t i) const { return (double)50-i; }
-double RealtimePwrData::y(size_t i) const { return pwrData[(pwrCur+i) < 50 ? (pwrCur+i) : (pwrCur+i-50)]; }
-size_t RealtimePwrData::size() const { return 50; }
+double RealtimePwrData::x(size_t i) const { return (double)MAXSAMPLES-i; }
+double RealtimePwrData::y(size_t i) const { return pwrData[(pwrCur+i) < MAXSAMPLES ? (pwrCur+i) : (pwrCur+i-MAXSAMPLES)]; }
+size_t RealtimePwrData::size() const { return MAXSAMPLES; }
 QwtData *RealtimePwrData::copy() const { return new RealtimePwrData(const_cast<RealtimePwrData*>(this)); }
-void RealtimePwrData::init() { pwrCur=0; for (int i=0; i<50; i++) pwrData[i]=0; }
-void RealtimePwrData::addData(double v) { pwrData[pwrCur++] = v; if (pwrCur==50) pwrCur=0; }
+void RealtimePwrData::init() { pwrCur=0; for (int i=0; i<MAXSAMPLES; i++) pwrData[i]=0; }
+void RealtimePwrData::addData(double v) { pwrData[pwrCur++] = v; if (pwrCur==MAXSAMPLES) pwrCur=0; }
 
 // 30 second Power rolling avg
-double Realtime30PwrData::x(size_t i) const { return i ? 0 : 50; }
+double Realtime30PwrData::x(size_t i) const { return i ? 0 : MAXSAMPLES; }
 
 double Realtime30PwrData::y(size_t i) const { double pwr30=0; for (int x=0; x<150; x++) { pwr30+=pwrData[x]; } pwr30 /= 150; return pwr30; }
-size_t Realtime30PwrData::size() const { return 50; }
+size_t Realtime30PwrData::size() const { return 150; }
 QwtData *Realtime30PwrData::copy() const { return new Realtime30PwrData(const_cast<Realtime30PwrData*>(this)); }
 void Realtime30PwrData::init() { pwrCur=0; for (int i=0; i<150; i++) pwrData[i]=0; }
 void Realtime30PwrData::addData(double v) { pwrData[pwrCur++] = v; if (pwrCur==150) pwrCur=0; }
 
 // Cadence history
-double RealtimeCadData::x(size_t i) const { return (double)50-i; }
-double RealtimeCadData::y(size_t i) const { return cadData[(cadCur+i) < 50 ? (cadCur+i) : (cadCur+i-50)]; }
-size_t RealtimeCadData::size() const { return 50; }
+double RealtimeCadData::x(size_t i) const { return (double)MAXSAMPLES-i; }
+double RealtimeCadData::y(size_t i) const { return cadData[(cadCur+i) < MAXSAMPLES ? (cadCur+i) : (cadCur+i-MAXSAMPLES)]; }
+size_t RealtimeCadData::size() const { return MAXSAMPLES; }
 QwtData *RealtimeCadData::copy() const { return new RealtimeCadData(const_cast<RealtimeCadData*>(this)); }
-void RealtimeCadData::init() { cadCur=0; for (int i=0; i<50; i++) cadData[i]=0; }
-void RealtimeCadData::addData(double v) { cadData[cadCur++] = v; if (cadCur==50) cadCur=0; }
+void RealtimeCadData::init() { cadCur=0; for (int i=0; i<MAXSAMPLES; i++) cadData[i]=0; }
+void RealtimeCadData::addData(double v) { cadData[cadCur++] = v; if (cadCur==MAXSAMPLES) cadCur=0; }
 
 // Speed history
-double RealtimeSpdData::x(size_t i) const { return (double)50-i; }
-double RealtimeSpdData::y(size_t i) const { return spdData[(spdCur+i) < 50 ? (spdCur+i) : (spdCur+i-50)]; }
-size_t RealtimeSpdData::size() const { return 50; }
+double RealtimeSpdData::x(size_t i) const { return (double)MAXSAMPLES-i; }
+double RealtimeSpdData::y(size_t i) const { return spdData[(spdCur+i) < MAXSAMPLES ? (spdCur+i) : (spdCur+i-MAXSAMPLES)]; }
+size_t RealtimeSpdData::size() const { return MAXSAMPLES; }
 QwtData *RealtimeSpdData::copy() const { return new RealtimeSpdData(const_cast<RealtimeSpdData*>(this)); }
-void RealtimeSpdData::init() { spdCur=0; for (int i=0; i<50; i++) spdData[i]=0; }
-void RealtimeSpdData::addData(double v) { spdData[spdCur++] = v; if (spdCur==50) spdCur=0; }
+void RealtimeSpdData::init() { spdCur=0; for (int i=0; i<MAXSAMPLES; i++) spdData[i]=0; }
+void RealtimeSpdData::addData(double v) { spdData[spdCur++] = v; if (spdCur==MAXSAMPLES) spdCur=0; }
 
 // HR history
-double RealtimeHrData::x(size_t i) const { return (double)50-i; }
-double RealtimeHrData::y(size_t i) const { return hrData[(hrCur+i) < 50 ? (hrCur+i) : (hrCur+i-50)]; }
-size_t RealtimeHrData::size() const { return 50; }
+double RealtimeHrData::x(size_t i) const { return (double)MAXSAMPLES-i; }
+double RealtimeHrData::y(size_t i) const { return hrData[(hrCur+i) < MAXSAMPLES ? (hrCur+i) : (hrCur+i-MAXSAMPLES)]; }
+size_t RealtimeHrData::size() const { return MAXSAMPLES; }
 QwtData *RealtimeHrData::copy() const { return new RealtimeHrData(const_cast<RealtimeHrData*>(this)); }
-void RealtimeHrData::init() { hrCur=0; for (int i=0; i<50; i++) hrData[i]=0; }
-void RealtimeHrData::addData(double v) { hrData[hrCur++] = v; if (hrCur==50) hrCur=0; }
+void RealtimeHrData::init() { hrCur=0; for (int i=0; i<MAXSAMPLES; i++) hrData[i]=0; }
+void RealtimeHrData::addData(double v) { hrData[hrCur++] = v; if (hrCur==MAXSAMPLES) hrCur=0; }
 
 // Load history
 //double RealtimeLodData::x(size_t i) const { return (double)50-i; }
@@ -84,6 +84,7 @@ RealtimePlot::RealtimePlot() : pwrCurve(NULL)
 
     //insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     pwrData.init();
+    altPwrData.init();
     cadData.init();
     spdData.init();
     hrData.init();
@@ -112,7 +113,7 @@ RealtimePlot::RealtimePlot() : pwrCurve(NULL)
     axisWidget(QwtPlot::yRight)->setPalette(pal);
     axisWidget(QwtPlot::yRight)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
 
-    setAxisScale(xBottom, 50, 0, 15); // time ago
+    setAxisScale(xBottom, MAXSAMPLES, 0, 15); // time ago
     pal.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     pal.setColor(QPalette::Text, GColor(CPLOTMARKER));
     axisWidget(QwtPlot::xBottom)->setPalette(pal);
@@ -143,7 +144,13 @@ RealtimePlot::RealtimePlot() : pwrCurve(NULL)
     //pwrCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     pwrCurve->setData(pwrData);
     pwrCurve->attach(this);
-    pwr30Curve->setYAxis(QwtPlot::yLeft);
+    pwrCurve->setYAxis(QwtPlot::yLeft);
+
+    altPwrCurve = new QwtPlotCurve("Alt Power");
+    //pwrCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    altPwrCurve->setData(altPwrData);
+    altPwrCurve->attach(this);
+    altPwrCurve->setYAxis(QwtPlot::yLeft);
 
     // HR
     hrCurve = new QwtPlotCurve("HeartRate");
@@ -207,6 +214,10 @@ RealtimePlot::configChanged()
     QPen pwrpen = QPen(GColor(CPOWER));
     pwrpen.setWidth(2.0);
     pwrCurve->setPen(pwrpen);
+
+    QPen apwrpen = QPen(GColor(CALTPOWER));
+    apwrpen.setWidth(2.0);
+    altPwrCurve->setPen(apwrpen);
 
     QPen hrpen = QPen(GColor(CHEARTRATE));
     hrpen.setWidth(2.0);
