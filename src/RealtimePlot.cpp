@@ -206,28 +206,30 @@ RealtimePlot::setAxisTitle(int axis, QString label)
 void
 RealtimePlot::configChanged()
 {
+    double width = appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble();
+
     setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
-    QPen pwr30pen = QPen(GColor(CPOWER), 2.0, Qt::DashLine);
+    QPen pwr30pen = QPen(GColor(CPOWER), width, Qt::DashLine);
     pwr30Curve->setPen(pwr30pen);
     pwr30Curve->setData(pwr30Data);
 
     QPen pwrpen = QPen(GColor(CPOWER));
-    pwrpen.setWidth(2.0);
+    pwrpen.setWidth(width);
     pwrCurve->setPen(pwrpen);
 
     QPen apwrpen = QPen(GColor(CALTPOWER));
-    apwrpen.setWidth(2.0);
+    apwrpen.setWidth(width);
     altPwrCurve->setPen(apwrpen);
 
     QPen hrpen = QPen(GColor(CHEARTRATE));
-    hrpen.setWidth(2.0);
+    hrpen.setWidth(width);
     hrCurve->setPen(hrpen);
 
     QPen cadpen = QPen(GColor(CCADENCE));
-    cadpen.setWidth(2.0);
+    cadpen.setWidth(width);
     cadCurve->setPen(cadpen);
 
     QPen spdpen = QPen(GColor(CSPEED));
-    spdpen.setWidth(2.0);
+    spdpen.setWidth(width);
     spdCurve->setPen(spdpen);
 }
