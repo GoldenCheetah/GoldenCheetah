@@ -305,7 +305,7 @@ ANT::getRealtimeData(RealtimeData &rtData)
 int
 ANT::addDevice(int device_number, int device_type, int channel_number)
 {
-    // if we're given a device number, then use that one
+    // if we're given a channel number, then use that one
     if (channel_number>-1) {
         antChannel[channel_number]->close();
         antChannel[channel_number]->open(device_number, device_type);
@@ -313,12 +313,18 @@ ANT::addDevice(int device_number, int device_type, int channel_number)
     }
 
     // if we already have the device, then return.
-    for (int i=0; i<ANT_MAX_CHANNELS; i++) {
-        if (((antChannel[i]->channel_type & 0xf ) == device_type) &&
-            (antChannel[i]->device_number == device_number)) {
-            // send the channel found...
-            //XXX antChannel[i]->channelInfo();
-            return 1;
+    // but only if the device number is given since
+    // we may choose to scan for multiple devices
+    // on separate channels (e.g. 0p on channel 0
+    // and 0p on channel 1
+    if (device_number != 0) {
+        for (int i=0; i<ANT_MAX_CHANNELS; i++) {
+            if (((antChannel[i]->channel_type & 0xf ) == device_type) &&
+                (antChannel[i]->device_number == device_number)) {
+                // send the channel found...
+                //XXX antChannel[i]->channelInfo();
+                return 1;
+            }
         }
     }
 
@@ -328,7 +334,15 @@ ANT::addDevice(int device_number, int device_type, int channel_number)
             antChannel[i]->open(device_number, device_type);
 
             // this is an alternate channel for power
-            if (device_type == ANTChannel::CHANNEL_TYPE_POWER && powerchannels) antChannel[i]->setAlt(true);
+            if (device_type == ANTChannel::CHANNEL_TYPE_POWER) {
+
+                // if we are not the first power channel then set to update
+                // the alternate power channel
+                if (powerchannels) antChannel[i]->setAlt(true);
+
+                // increment the number of power channels
+                powerchannels++;
+            }
             return 1;
         }
     }
