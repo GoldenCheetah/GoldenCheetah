@@ -134,6 +134,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
     if (series == RealtimeData::HeartRate ||
         series == RealtimeData::Watts  ||
+        series == RealtimeData::AltWatts  ||
         series == RealtimeData::Cadence) {
 
         sum += value;
@@ -430,6 +431,7 @@ void DialWindow::seriesChanged()
 
     if (series == RealtimeData::HeartRate ||
         series == RealtimeData::Watts  ||
+        series == RealtimeData::AltWatts  ||
         series == RealtimeData::Cadence) {
         averageLabel->show();
         averageEdit->show();
