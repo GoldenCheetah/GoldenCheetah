@@ -167,6 +167,13 @@ class RealtimePlot : public QwtPlot
 	QwtPlotCurve *hrCurve;
 	//QwtPlotCurve *lodCurve;
 
+    int showPowerState;
+    int showPow30sState;
+    int showHrState;
+    int showSpeedState;
+    int showCadState;
+    int showAltState;
+
 #if 0
     // power stores last 30 seconds for 30 second rolling avg, all else
     // just the last 30 seconds
@@ -183,9 +190,17 @@ class RealtimePlot : public QwtPlot
     //RealtimeLodData lodData;
 
     RealtimePlot();
+    int smooth;
 
     public slots:
     void configChanged();
+    void showPower(int state);
+    void showPow30s(int state);
+    void showHr(int state);
+    void showSpeed(int state);
+    void showCad(int state);
+    void showAlt(int state);
+    void setSmoothing(int value);
 };
 
 

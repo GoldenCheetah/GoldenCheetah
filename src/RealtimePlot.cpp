@@ -78,7 +78,15 @@ void RealtimeHrData::addData(double v) { hrData[hrCur++] = v; if (hrCur==MAXSAMP
 //void RealtimeLodData::addData(double v) { lodData[lodCur++] = v; if (lodCur==50) lodCur=0; }
 
 
-RealtimePlot::RealtimePlot() : pwrCurve(NULL)
+RealtimePlot::RealtimePlot() : 
+    pwrCurve(NULL),
+    showPowerState(Qt::Checked),
+    showPow30sState(Qt::Checked),
+    showHrState(Qt::Checked),
+    showSpeedState(Qt::Checked),
+    showCadState(Qt::Checked),
+    showAltState(Qt::Checked),
+    smooth(0)
 {
     setInstanceName("Realtime Plot");
 
@@ -232,4 +240,64 @@ RealtimePlot::configChanged()
     QPen spdpen = QPen(GColor(CSPEED));
     spdpen.setWidth(width);
     spdCurve->setPen(spdpen);
+}
+
+void
+RealtimePlot::showPower(int state)
+{
+    showPowerState = state;
+    pwrCurve->setVisible(state == Qt::Checked);
+    enableAxis(yLeft, showAltState == Qt::Checked || showPowerState == Qt::Checked || showPow30sState == Qt::Checked);
+    replot();
+}
+
+void
+RealtimePlot::showPow30s(int state)
+{
+    showPow30sState = state;
+    pwr30Curve->setVisible(state == Qt::Checked);
+    enableAxis(yLeft, showAltState == Qt::Checked || showPowerState == Qt::Checked || showPow30sState == Qt::Checked);
+    replot();
+}
+
+void
+RealtimePlot::showHr(int state)
+{
+    showHrState = state;
+    hrCurve->setVisible(state == Qt::Checked);
+    enableAxis(yRight, showCadState == Qt::Checked || showHrState == Qt::Checked);
+    replot();
+}
+
+void
+RealtimePlot::showSpeed(int state)
+{
+    showSpeedState = state;
+    spdCurve->setVisible(state == Qt::Checked);
+    enableAxis(yRight2, state == Qt::Checked);
+    replot();
+}
+
+void
+RealtimePlot::showCad(int state)
+{
+    showCadState = state;
+    cadCurve->setVisible(state == Qt::Checked);
+    enableAxis(yRight, showCadState == Qt::Checked || showHrState == Qt::Checked);
+    replot();
+}
+
+void
+RealtimePlot::showAlt(int state)
+{
+    showAltState = state;
+    altPwrCurve->setVisible(state == Qt::Checked);
+    enableAxis(yLeft, showAltState == Qt::Checked || showPowerState == Qt::Checked || showPow30sState == Qt::Checked);
+    replot();
+}
+
+void
+RealtimePlot::setSmoothing(int value)
+{
+    smooth = value;
 }
