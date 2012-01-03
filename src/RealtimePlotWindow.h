@@ -37,9 +37,26 @@ class RealtimePlotWindow : public GcWindow
     Q_OBJECT
     G_OBJECT
 
+    Q_PROPERTY(int showHr READ isShowHr WRITE setShowHr USER true)
+    Q_PROPERTY(int showSpeed READ isShowSpeed WRITE setShowSpeed USER true)
+    Q_PROPERTY(int showCad READ isShowCad WRITE setShowCad USER true)
+    Q_PROPERTY(int showAlt READ isShowAlt WRITE setShowAlt USER true)
+    Q_PROPERTY(int showPower READ isShowPower WRITE setShowPower USER true)
+    Q_PROPERTY(int showPow30s READ isShowPow30s WRITE setShowPow30s USER true)
+    Q_PROPERTY(int smoothing READ smoothing WRITE setSmoothing USER true)
+
     public:
 
         RealtimePlotWindow(MainWindow *mainWindow);
+
+        // get properties - the setters are below
+        int isShowHr() const { return showHr->checkState(); }
+        int isShowSpeed() const { return showSpeed->checkState(); }
+        int isShowCad() const { return showCad->checkState(); }
+        int isShowAlt() const { return showAlt->checkState(); }
+        int isShowPower() const { return showPower->checkState(); }
+        int isShowPow30s() const { return showPow30s->checkState(); }
+        int smoothing() const { return smoothSlider->value(); }
 
    public slots:
 
@@ -49,10 +66,50 @@ class RealtimePlotWindow : public GcWindow
         void stop();
         void pause();
 
+        // set properties
+        void setSmoothingFromSlider();
+        void setSmoothingFromLineEdit();
+        void setShowPower(int state);
+        void setShowPow30s(int state);
+        void setShowHr(int state);
+        void setShowSpeed(int state);
+        void setShowCad(int state);
+        void setShowAlt(int state);
+        void setSmoothing(int value);
+
     private:
 
         MainWindow *mainWindow;
         RealtimePlot *rtPlot;
+        bool active;
+
+        // Common controls
+        QGridLayout *controlsLayout;
+        QCheckBox *showHr;
+        QCheckBox *showSpeed;
+        QCheckBox *showCad;
+        QCheckBox *showAlt;
+        QCheckBox *showPower;
+        QCheckBox *showPow30s;
+        QSlider *smoothSlider;
+        QLineEdit *smoothLineEdit;
+
+        // for smoothing charts
+        double powHist[150];
+        double powtot;
+        int powindex;
+        double altHist[150];
+        double alttot;
+        int altindex;
+        double spdHist[150];
+        double spdtot;
+        int spdindex;
+        double cadHist[150];
+        double cadtot;
+        int cadindex;
+        double hrHist[150];
+        double hrtot;
+        int hrindex;
 };
 
 #endif // _GC_RealtimePlotWindow_h
