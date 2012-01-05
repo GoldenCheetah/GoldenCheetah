@@ -329,6 +329,7 @@ TrainTool::configChanged()
 
     // wipe whatever is there
     foreach(DeviceConfiguration x, Devices) delete x.controller;
+    Devices.clear();
 
     DeviceConfigurations all;
     Devices = all.getList();
