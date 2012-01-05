@@ -161,6 +161,7 @@
 #define GC_TM_METRIC              "tm/metric"
 
 #define FORTIUS_FIRMWARE          "fortius/firmware"
+#define TRAIN_MULTI               "train/multi"
 
 #include <QSettings>
 #include <QFileInfo>

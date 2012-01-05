@@ -62,6 +62,9 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     cl->setSpacing(0);
     cl->setContentsMargins(0,0,0,0);
 
+    // don't set the source for telemetry
+    bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry = -1;
+
 #if 0 // not in this release .. or for a while TBH
     serverTree = new QTreeWidget;
     serverTree->setFrameStyle(QFrame::NoFrame);
@@ -90,7 +93,10 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
 
     deviceTree = new QTreeWidget;
     deviceTree->setFrameStyle(QFrame::NoFrame);
-    deviceTree->setSelectionMode(QAbstractItemView::SingleSelection);
+    if (appsettings->value(this, TRAIN_MULTI, false).toBool() == true)
+        deviceTree->setSelectionMode(QAbstractItemView::MultiSelection);
+    else
+        deviceTree->setSelectionMode(QAbstractItemView::SingleSelection);
     deviceTree->setColumnCount(1);
     deviceTree->header()->hide();
     deviceTree->setAlternatingRowColors (false);
@@ -261,7 +267,6 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
 
     // set home
     main = parent;
-    deviceController = NULL;
     streamController = NULL;
     ergFile = NULL;
     calibrating = false;
@@ -316,18 +321,45 @@ TrainTool::configChanged()
     QList<QTreeWidgetItem *> devices = allDevices->takeChildren();
     for (int i=0; i<devices.count(); i++) delete devices.at(i);
 
+    if (appsettings->value(this, TRAIN_MULTI, false).toBool() == true)
+        deviceTree->setSelectionMode(QAbstractItemView::MultiSelection);
+    else
+        deviceTree->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    // wipe whatever is there
+    foreach(DeviceConfiguration x, Devices) delete x.controller;
+
     DeviceConfigurations all;
-    Devices.clear();
     Devices = all.getList();
     for (int i=0; i<Devices.count(); i++) {
         if (Devices.at(i).type == DEV_GSERVER) {
             //QTreeWidgetItem *server = new QTreeWidgetItem(allServers, i);
             //server->setText(0, Devices.at(i).name);
         } else {
+
+            // add to the selection tree
             QTreeWidgetItem *device = new QTreeWidgetItem(allDevices, i);
             device->setText(0, Devices.at(i).name);
+
+            // Create the controllers for each device
+            // we can call upon each of these when we need
+            // to interact with the device
+            if (Devices.at(i).type == DEV_ANTPLUS) {
+                Devices[i].controller = new ANTplusController(this, &Devices[i]);
+            } else if (Devices.at(i).type == DEV_CT) {
+                Devices[i].controller = new ComputrainerController(this, &Devices[i]);
+#ifdef GC_HAVE_LIBUSB
+            } else if (Devices.at(i).type == DEV_FORTIUS) {
+                Devices[i].controller = new FortiusController(this, &Devices[i]);
+#endif
+            } else if (Devices.at(i).type == DEV_NULL) {
+                Devices[i].controller = new NullController(this, &Devices[i]);
+            } else if (Devices.at(i).type == DEV_ANTLOCAL) {
+                Devices[i].controller = new ANTlocalController(this, &Devices[i]);
+            }
         }
     }
+
     // select the first device
     if (Devices.count()) {
         deviceTree->setCurrentItem(allDevices->child(0));
@@ -409,6 +441,7 @@ TrainTool::selectedServerNumber()
 void
 TrainTool::deviceTreeWidgetSelectionChanged()
 {
+    bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry = -1;
     deviceSelected();
 }
 
@@ -421,6 +454,17 @@ TrainTool::selectedDeviceNumber()
 
     if (selected->type() == HEAD_TYPE) return -1;
     else return selected->type();
+}
+
+QList<int>
+TrainTool::devices()
+{
+    QList<int> returning;
+    foreach(QTreeWidgetItem *item, deviceTree->selectedItems())
+        if (item->type() != HEAD_TYPE)
+            returning << item->type();
+
+    return returning;
 }
 
 /*----------------------------------------------------------------------
@@ -504,11 +548,16 @@ TrainTool::workoutTreeWidgetSelectionChanged()
     if (mode == ERG || mode == MRC) {
         status |= RT_MODE_ERGO;
         status &= ~RT_MODE_SPIN;
-        if (deviceController != NULL) deviceController->setMode(RT_MODE_ERGO);
+
+        // update every active device
+        foreach(int dev, devices()) Devices[dev].controller->setMode(RT_MODE_ERGO);
+
     } else { // SLOPE MODE
         status |= RT_MODE_SPIN;
         status &= ~RT_MODE_ERGO;
-        if (deviceController != NULL) deviceController->setMode(RT_MODE_SPIN);
+
+        // update every active device
+        foreach(int dev, devices()) Devices[dev].controller->setMode(RT_MODE_SPIN);
     }
 }
 
@@ -552,37 +601,6 @@ TrainTool::mediaTreeWidgetSelectionChanged()
 /*--------------------------------------------------------------------------------
  * Was realtime window, now local and manages controller and chart updates etc
  *------------------------------------------------------------------------------*/
-
-void TrainTool::setDeviceController()
-{
-    int deviceno = selectedDeviceNumber();
-
-    if (deviceno == -1) // not selected, maybe they are spectating
-        return;
-
-    // zap the current one
-    if (deviceController != NULL) {
-        delete deviceController;
-        deviceController = NULL;
-    }
-
-    if (Devices.count() > 0) {
-        DeviceConfiguration temp = Devices.at(deviceno);
-        if (Devices.at(deviceno).type == DEV_ANTPLUS) {
-            deviceController = new ANTplusController(this, &temp);
-        } else if (Devices.at(deviceno).type == DEV_CT) {
-            deviceController = new ComputrainerController(this, &temp);
-#ifdef GC_HAVE_LIBUSB
-        } else if (Devices.at(deviceno).type == DEV_FORTIUS) {
-            deviceController = new FortiusController(this, &temp);
-#endif
-        } else if (Devices.at(deviceno).type == DEV_NULL) {
-            deviceController = new NullController(this, &temp);
-        } else if (Devices.at(deviceno).type == DEV_ANTLOCAL) {
-            deviceController = new ANTlocalController(this, &temp);
-        }
-    }
-}
 
 // open a connection to the GoldenServer via a GoldenClient
 void TrainTool::setStreamController()
@@ -628,7 +646,7 @@ void TrainTool::Start()       // when start button is pressed
     static QIcon playIcon(":images/oxygen/play.png");
     static QIcon pauseIcon(":images/oxygen/pause.png");
 
-    if (status&RT_PAUSED && deviceController != NULL) {
+    if (status&RT_PAUSED) {
 
         // UN PAUSE!
         play->setIcon(playIcon);
@@ -636,7 +654,7 @@ void TrainTool::Start()       // when start button is pressed
         session_time.start();
         lap_time.start();
         status &=~RT_PAUSED;
-        deviceController->restart();
+        foreach(int dev, devices()) Devices[dev].controller->restart();
         gui_timer->start(REFRESHRATE);
         if (status & RT_STREAMING) stream_timer->start(STREAMRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
@@ -646,14 +664,14 @@ void TrainTool::Start()       // when start button is pressed
         // tell the world
         main->notifyUnPause();
 
-    } else if (status&RT_RUNNING && deviceController != NULL) {
+    } else if (status&RT_RUNNING) {
 
         // Pause!
         play->setIcon(playIcon);
 
         session_elapsed_msec += session_time.elapsed();
         lap_elapsed_msec += lap_time.elapsed();
-        deviceController->pause();
+        foreach(int dev, devices()) Devices[dev].controller->pause();
         status |=RT_PAUSED;
         gui_timer->stop();
         if (status & RT_STREAMING) stream_timer->stop();
@@ -666,12 +684,29 @@ void TrainTool::Start()       // when start button is pressed
 
     } else {
 
+        // Stop users from selecting different devices
+        // media or workouts whilst a workout is in progress
+#if defined Q_OS_MAC || defined GC_HAVE_VLC
+        mediaTree->setEnabled(false);
+#endif
+        workoutTree->setEnabled(false);
+        deviceTree->setEnabled(false);
+
+        // if we have selected multiple devices lets
+        // configure the series we collect from each one
+        if (deviceTree->selectedItems().count() > 1) {
+            MultiDeviceDialog *multisetup = new MultiDeviceDialog(main, this);
+            if (multisetup->exec() == false) {
+                qDebug()<<"we canned it with a cancel";
+                return;
+            }
+        } else {
+            bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry = 
+            deviceTree->selectedItems().first()->type();
+        }
+
         // START!
         play->setIcon(pauseIcon);
-
-        // open the controller if it is selected
-        setDeviceController();
-        if (deviceController == NULL) return;
 
         load = 0;
         slope = 0.0;
@@ -679,14 +714,14 @@ void TrainTool::Start()       // when start button is pressed
         if (mode == ERG || mode == MRC) {
             status |= RT_MODE_ERGO;
             status &= ~RT_MODE_SPIN;
-            deviceController->setMode(RT_MODE_ERGO);
+            foreach(int dev, devices()) Devices[dev].controller->setMode(RT_MODE_ERGO);
         } else { // SLOPE MODE
             status |= RT_MODE_SPIN;
             status &= ~RT_MODE_ERGO;
-            deviceController->setMode(RT_MODE_SPIN);
+            foreach(int dev, devices()) Devices[dev].controller->setMode(RT_MODE_SPIN);
         }
 
-        deviceController->start();          // start device
+        foreach(int dev, devices()) Devices[dev].controller->start();
 
         // tell the world
         main->notifyStart();
@@ -746,8 +781,6 @@ void TrainTool::Start()       // when start button is pressed
 
 void TrainTool::Pause()        // pause capture to recalibrate
 {
-    if (deviceController == NULL) return;
-
     // we're not running fool!
     if ((status&RT_RUNNING) == 0) return;
 
@@ -756,7 +789,7 @@ void TrainTool::Pause()        // pause capture to recalibrate
         session_time.start();
         lap_time.start();
         status &=~RT_PAUSED;
-        deviceController->restart();
+        foreach(int dev, devices()) Devices[dev].controller->restart();
         gui_timer->start(REFRESHRATE);
         if (status & RT_STREAMING) stream_timer->start(STREAMRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
@@ -770,7 +803,7 @@ void TrainTool::Pause()        // pause capture to recalibrate
 
         session_elapsed_msec += session_time.elapsed();
         lap_elapsed_msec += lap_time.elapsed();
-        deviceController->pause();
+        foreach(int dev, devices()) Devices[dev].controller->pause();
         status |=RT_PAUSED;
         gui_timer->stop();
         if (status & RT_STREAMING) stream_timer->stop();
@@ -786,15 +819,20 @@ void TrainTool::Pause()        // pause capture to recalibrate
 void TrainTool::Stop(int deviceStatus)        // when stop button is pressed
 {
 
-    if (deviceController == NULL) return;
     if ((status&RT_RUNNING) == 0) return;
 
     status &= ~RT_RUNNING;
 
+    // Stop users from selecting different devices
+    // media or workouts whilst a workout is in progress
+#if defined Q_OS_MAC || defined GC_HAVE_VLC
+    mediaTree->setEnabled(true);
+#endif
+    workoutTree->setEnabled(true);
+    deviceTree->setEnabled(true);
+
     // wipe connection
-    deviceController->stop();
-    delete deviceController;
-    deviceController = NULL;
+    foreach(int dev, devices()) Devices[dev].controller->stop();
 
     gui_timer->stop();
     calibrating = false;
@@ -890,8 +928,6 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
     rtData.setLap(displayLap + displayWorkoutLap); // user laps + predefined workout lap
     rtData.mode = mode;
 
-    if (deviceController == NULL) return;
-
     // On a Mac prevent the screensaver from kicking in
     // this is apparently the 'supported' mechanism for
     // disabling the screen saver on a Mac instead of
@@ -901,12 +937,30 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
     UpdateSystemActivity(OverallAct);
 #endif
 
-    // get latest telemetry from device (if it is a pull device e.g. Computrainer //
-    if (status&RT_RUNNING && deviceController->doesPull() == true) {
+    // get latest telemetry from devices
+    if (status&RT_RUNNING) {
 
         rtData.setLoad(load); // always set load..
         rtData.setSlope(slope); // always set load..
-        deviceController->getRealtimeData(rtData);
+
+        // fetch the right data from each device...
+        foreach(int dev, devices()) {
+
+            RealtimeData local = rtData;
+            Devices[dev].controller->getRealtimeData(local);
+
+            // what are we getting from this one?
+            if (dev == bpmTelemetry) rtData.setHr(local.getHr());
+            if (dev == rpmTelemetry) rtData.setCadence(local.getCadence());
+            if (dev == kphTelemetry) {
+                rtData.setSpeed(local.getSpeed());
+                rtData.setDistance(local.getDistance());
+            }
+            if (dev == wattsTelemetry) {
+                rtData.setWatts(local.getWatts());
+                rtData.setAltWatts(local.getAltWatts());
+            }
+        }
 
         // Distance assumes current speed for the last second. from km/h to km/sec
         displayDistance += displaySpeed / (5 * 3600); // XXX assumes 200ms refreshrate
@@ -974,8 +1028,6 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
 // can be called from the controller - when user presses "Lap" button
 void TrainTool::newLap()
 {
-    if (deviceController == NULL) return;
-
     if ((status&RT_RUNNING) == RT_RUNNING) {
         displayLap++;
 
@@ -1093,8 +1145,6 @@ void TrainTool::loadUpdate()
     // therefore, use a QTime timer to measure the load period
     load_msecs += load_period.restart();
 
-    if (deviceController == NULL) return;
-
     if (status&RT_MODE_ERGO) {
         load = ergFile->wattsAt(load_msecs, curLap);
 
@@ -1104,7 +1154,7 @@ void TrainTool::loadUpdate()
         if (load == -100) {
             Stop(DEVICE_OK);
         } else {
-            deviceController->setLoad(load);
+            foreach(int dev, devices()) Devices[dev].controller->setLoad(load);
             main->notifySetNow(load_msecs);
         }
     } else {
@@ -1116,7 +1166,7 @@ void TrainTool::loadUpdate()
         if (slope == -100) {
             Stop(DEVICE_OK);
         } else {
-            deviceController->setGradient(slope);
+            foreach(int dev, devices()) Devices[dev].controller->setGradient(slope);
             main->notifySetNow(displayWorkoutDistance * 1000);
         }
     }
@@ -1125,8 +1175,6 @@ void TrainTool::loadUpdate()
 void TrainTool::Calibrate()
 {
     static QProgressDialog *bar=NULL;
-
-    if (deviceController == NULL) return;
 
     // toggle calibration
     if (calibrating) {
@@ -1140,8 +1188,11 @@ void TrainTool::Calibrate()
         main->notifyUnPause(); // get video started again, amongst other things
 
         // back to ergo/slope mode
-        if (status&RT_MODE_ERGO) deviceController->setMode(RT_MODE_ERGO);
-        else deviceController->setMode(RT_MODE_SPIN);
+        if (status&RT_MODE_ERGO)
+            foreach(int dev, devices()) Devices[dev].controller->setMode(RT_MODE_ERGO);
+        else
+            foreach(int dev, devices()) Devices[dev].controller->setMode(RT_MODE_SPIN);
+
     } else {
 
         if (bar == NULL) {
@@ -1161,7 +1212,10 @@ void TrainTool::Calibrate()
         load_msecs += load_period.restart();
         main->notifyPause(); // get video started again, amongst other things
 
-        deviceController->setMode(RT_MODE_CALIBRATE);
+        // only do this for computrainers!
+        foreach(int dev, devices())
+            if (Devices[dev].type == DEV_CT)
+                Devices[dev].controller->setMode(RT_MODE_CALIBRATE);
     }
     calibrating = !calibrating;
 }
@@ -1208,7 +1262,6 @@ void TrainTool::FFwdLap()
 void TrainTool::Higher()
 {
     if ((status&RT_RUNNING) == 0) return;
-    if (deviceController == NULL) return;
 
     if (main->currentErgFile()) {
         // adjust the workout IF
@@ -1222,8 +1275,10 @@ void TrainTool::Higher()
         if (load >1500) load = 1500;
         if (slope >15) slope = 15;
 
-        if (status&RT_MODE_ERGO) deviceController->setLoad(load);
-        else deviceController->setGradient(slope);
+        if (status&RT_MODE_ERGO)
+            foreach(int dev, devices()) Devices[dev].controller->setLoad(load);
+        else
+            foreach(int dev, devices()) Devices[dev].controller->setGradient(slope);
     }
 }
 
@@ -1231,7 +1286,6 @@ void TrainTool::Higher()
 void TrainTool::Lower()
 {
     if ((status&RT_RUNNING) == 0) return;
-    if (deviceController == NULL) return;
 
     if (main->currentErgFile()) {
         // adjust the workout IF
@@ -1244,8 +1298,10 @@ void TrainTool::Lower()
         if (load <0) load = 0;
         if (slope <-10) slope = -10;
 
-        if (status&RT_MODE_ERGO) deviceController->setLoad(load);
-        else deviceController->setGradient(slope);
+        if (status&RT_MODE_ERGO)
+            foreach(int dev, devices()) Devices[dev].controller->setLoad(load);
+        else
+            foreach(int dev, devices()) Devices[dev].controller->setGradient(slope);
     }
 }
 
@@ -1343,4 +1399,89 @@ void TrainTool::adjustIntensity()
 
     // force replot
     main->notifySetNow(main->getNow());
+}
+
+MultiDeviceDialog::MultiDeviceDialog(MainWindow *, TrainTool *traintool) : traintool(traintool)
+{
+    setAttribute(Qt::WA_DeleteOnClose);
+    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+    setWindowTitle(tr("Multiple Device Configuration"));
+
+    QVBoxLayout *main = new QVBoxLayout(this);
+    QFormLayout *mainLayout = new QFormLayout;
+    main->addLayout(mainLayout);
+
+    bpmSelect = new QComboBox(this);
+    mainLayout->addRow(new QLabel("Heartrate", this), bpmSelect);
+
+    wattsSelect = new QComboBox(this);
+    mainLayout->addRow(new QLabel("Power", this), wattsSelect);
+
+    rpmSelect = new QComboBox(this);
+    mainLayout->addRow(new QLabel("Cadence", this), rpmSelect);
+
+    kphSelect = new QComboBox(this);
+    mainLayout->addRow(new QLabel("Speed", this), kphSelect);
+
+    // update the device selections for the drop downs
+    foreach(QTreeWidgetItem *selected, traintool->deviceTree->selectedItems()) {
+        if (selected->type() == HEAD_TYPE) continue;
+
+        bpmSelect->addItem(selected->text(0), selected->type());
+        wattsSelect->addItem(selected->text(0), selected->type());
+        rpmSelect->addItem(selected->text(0), selected->type());
+        kphSelect->addItem(selected->text(0), selected->type());
+    }
+
+    bpmSelect->addItem("None", -1);
+    wattsSelect->addItem("None", -1);
+    rpmSelect->addItem("None", -1);
+    kphSelect->addItem("None", -1);
+
+    // set to the current values (if set)
+    if (traintool->bpmTelemetry != -1) {
+        int index = bpmSelect->findData(traintool->bpmTelemetry);
+        if (index >=0) bpmSelect->setCurrentIndex(index);
+    }
+    if (traintool->wattsTelemetry != -1) {
+        int index = wattsSelect->findData(traintool->wattsTelemetry);
+        if (index >=0) wattsSelect->setCurrentIndex(index);
+    }
+    if (traintool->rpmTelemetry != -1) {
+        int index = rpmSelect->findData(traintool->rpmTelemetry);
+        if (index >=0) rpmSelect->setCurrentIndex(index);
+    }
+    if (traintool->kphTelemetry != -1) {
+        int index = kphSelect->findData(traintool->kphTelemetry);
+        if (index >=0) kphSelect->setCurrentIndex(index);
+    }
+
+    QHBoxLayout *buttons = new QHBoxLayout;
+    buttons->addStretch();
+    main->addLayout(buttons);
+
+    cancelButton = new QPushButton("Cancel", this);
+    buttons->addWidget(cancelButton);
+
+    applyButton = new QPushButton("Apply", this);
+    buttons->addWidget(applyButton);
+
+    connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+    connect(applyButton, SIGNAL(clicked()), this, SLOT(applyClicked()));
+}
+
+void
+MultiDeviceDialog::applyClicked()
+{
+    traintool->rpmTelemetry = rpmSelect->itemData(rpmSelect->currentIndex()).toInt();
+    traintool->bpmTelemetry = bpmSelect->itemData(bpmSelect->currentIndex()).toInt();
+    traintool->wattsTelemetry = wattsSelect->itemData(wattsSelect->currentIndex()).toInt();
+    traintool->kphTelemetry = kphSelect->itemData(kphSelect->currentIndex()).toInt();
+    accept();
+}
+
+void
+MultiDeviceDialog::cancelClicked()
+{
+    reject();
 }

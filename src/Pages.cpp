@@ -744,6 +744,11 @@ DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
     QWidget *devs = new QWidget(this);
     tabs->addTab(devs, tr("Devices"));
     QVBoxLayout *devLayout = new QVBoxLayout(devs);
+
+    multiCheck = new QCheckBox("Allow multiple devices in Train View", this);
+    multiCheck->setChecked(appsettings->value(this, TRAIN_MULTI, false).toBool());
+    devLayout->addWidget(multiCheck);
+
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(tabs);
 

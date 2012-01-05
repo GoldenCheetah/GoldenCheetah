@@ -23,6 +23,8 @@
 #define  _GC_DeviceConfiguration_h
 #include "GoldenCheetah.h"
 
+class RealtimeController;
+
 class DeviceConfiguration
 {
     public:   // direct update to class vars from deviceModel!
@@ -39,6 +41,11 @@ class DeviceConfiguration
          isDefaultRealtime;     // not implemented yet
 
     int  postProcess;
+
+    RealtimeController *controller; // can be used to allocate controller for this device
+                                    // although a bit odd, it makes synchronising the config
+                                    // with runtime allocation a bit simpler in traintool
+                                    // we could subclass and add our own, but this aint so bad
 };
 
 class DeviceConfigurations

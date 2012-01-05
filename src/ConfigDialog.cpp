@@ -182,6 +182,7 @@ void ConfigDialog::save_Clicked()
     DeviceConfigurations all;
     all.writeConfig(devicePage->deviceListModel->Configuration);
     appsettings->setValue(FORTIUS_FIRMWARE, fortiusFirmware);
+    appsettings->setValue(TRAIN_MULTI, devicePage->multiCheck->isChecked());
 
     // Tell MainWindow we changed config, so it can emit the signal
     // configChanged() to all its children
