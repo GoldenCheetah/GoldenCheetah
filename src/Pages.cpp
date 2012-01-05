@@ -745,10 +745,6 @@ DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
     tabs->addTab(devs, tr("Devices"));
     QVBoxLayout *devLayout = new QVBoxLayout(devs);
 
-    multiCheck = new QCheckBox("Allow multiple devices in Train View", this);
-    multiCheck->setChecked(appsettings->value(this, TRAIN_MULTI, false).toBool());
-    devLayout->addWidget(multiCheck);
-
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(tabs);
 
@@ -871,8 +867,14 @@ DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
 
     devLayout->addLayout(inLayout);
     devLayout->addWidget(deviceList);
+
+    multiCheck = new QCheckBox("Allow multiple devices in Train View", this);
+    multiCheck->setChecked(appsettings->value(this, TRAIN_MULTI, false).toBool());
+    devLayout->addWidget(multiCheck);
+
     devLayout->setStretch(0,0);
     devLayout->setStretch(1,99);
+    devLayout->setStretch(2,0);
 
     // to make sure the default checkboxes have been set appropiately...
     // THIS CODE IS DISABLED IN THIS RELEASE XXX
@@ -940,6 +942,7 @@ DevicePage::setConfigPane()
         specHint->hide();
         specLabel->hide();
         deviceSpecifier->hide();
+        profHint->setText("antid 1, antid 2 ...");
         profHint->hide();
         profLabel->hide();
         deviceProfile->hide();
