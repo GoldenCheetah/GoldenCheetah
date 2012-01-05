@@ -222,6 +222,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     connect(forward, SIGNAL(clicked()), this, SLOT(FFwd()));
     connect(rewind, SIGNAL(clicked()), this, SLOT(Rewind()));
     connect(lap, SIGNAL(clicked()), this, SLOT(newLap()));
+    connect(main, SIGNAL(newLap()), this, SLOT(resetLapTimer()));
     connect(intensitySlider, SIGNAL(valueChanged(int)), this, SLOT(adjustIntensity()));
 
     // not used but kept in case re-instated in the future
@@ -1036,11 +1037,14 @@ void TrainTool::newLap()
         hrcount   = 0;
         spdcount  = 0;
 
-        lap_time.restart();
-        lap_elapsed_msec = 0;
-
         main->notifyNewLap();
     }
+}
+
+void TrainTool::resetLapTimer()
+{
+    lap_time.restart();
+    lap_elapsed_msec = 0;
 }
 
 // can be called from the controller
@@ -1148,6 +1152,10 @@ void TrainTool::loadUpdate()
     if (status&RT_MODE_ERGO) {
         load = ergFile->wattsAt(load_msecs, curLap);
 
+        if(displayWorkoutLap != curLap)
+        {
+            resetLapTimer();
+        }
         displayWorkoutLap = curLap;
 
         // we got to the end!
@@ -1160,6 +1168,10 @@ void TrainTool::loadUpdate()
     } else {
         slope = ergFile->gradientAt(displayWorkoutDistance*1000, curLap);
 
+        if(displayWorkoutLap != curLap)
+        {
+            resetLapTimer();
+        }
         displayWorkoutLap = curLap;
 
         // we got to the end!

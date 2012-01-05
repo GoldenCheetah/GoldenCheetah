@@ -144,6 +144,7 @@ class TrainTool : public GcWindow
         void Higher();      // set load/gradient higher
         void Lower();       // set load/gradient higher
         void newLap();      // start new Lap!
+        void resetLapTimer(); //reset the lap timer
 
         // Timed actions
         void guiUpdate();           // refreshes the telemetry
