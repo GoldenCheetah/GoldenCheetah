@@ -38,6 +38,7 @@ public:
                       XPower, BikeScore, RI, Joules, SkibaVI,
                       NP, TSS, IF, VI,
                       AvgWatts, AvgSpeed, AvgCadence, AvgHeartRate,
+                      AvgWattsLap, AvgSpeedLap, AvgCadenceLap, AvgHeartRateLap,
                       VirtualSpeed, AltWatts, LRBalance };
 
     typedef enum dataseries DataSeries;

@@ -80,6 +80,7 @@ class DialWindow : public GcWindow
         void start();
         void stop();
         void pause();
+        void onNewLap();
 
     protected:
 
@@ -106,6 +107,7 @@ class DialWindow : public GcWindow
         int average;
         int count;
         double sum;
+        bool isNewLap;
 
         // for keeping track of rolling averages (max 30s at 5hz)
         // used by NP and XPower

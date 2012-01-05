@@ -20,7 +20,7 @@
 #include "DialWindow.h"
 
 DialWindow::DialWindow(MainWindow *mainWindow) :
-    GcWindow(mainWindow), mainWindow(mainWindow), average(1)
+    GcWindow(mainWindow), mainWindow(mainWindow), average(1), isNewLap(false)
 {
     rolling.resize(150); // enough for 30 seconds at 5hz
 
@@ -85,6 +85,7 @@ DialWindow::DialWindow(MainWindow *mainWindow) :
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(seriesChanged()));
     connect(mainWindow, SIGNAL(stop()), this, SLOT(stop()));
     connect(mainWindow, SIGNAL(start()), this, SLOT(start()));
+    connect(mainWindow, SIGNAL(newLap()), this, SLOT(onNewLap()));
 
     // setup colors
     seriesChanged();
@@ -158,6 +159,17 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
     }
 
+    if( isNewLap &&
+        ( series == RealtimeData::AvgCadenceLap ||
+        series == RealtimeData::AvgHeartRateLap ||
+        series == RealtimeData::AvgSpeedLap ||
+        series == RealtimeData::AvgWattsLap ) )
+    {
+        count = 0;
+        sum = 0.0;
+        isNewLap = false;
+    }
+
     switch (series) {
 
     case RealtimeData::Time:
@@ -193,6 +205,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         break;
 
     case RealtimeData::AvgWatts:
+    case RealtimeData::AvgWattsLap:
         sum += rtData.value(RealtimeData::Watts);
         count++;
         value = sum / count;
@@ -200,6 +213,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         break;
 
     case RealtimeData::AvgSpeed:
+    case RealtimeData::AvgSpeedLap:
         sum += rtData.value(RealtimeData::Speed);
         count++;
         value = sum / count;
@@ -208,6 +222,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         break;
 
     case RealtimeData::AvgCadence:
+    case RealtimeData::AvgCadenceLap:
         sum += rtData.value(RealtimeData::Cadence);
         count++;
         value = sum / count;
@@ -215,6 +230,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         break;
 
     case RealtimeData::AvgHeartRate:
+    case RealtimeData::AvgHeartRateLap:
         sum += rtData.value(RealtimeData::HeartRate);
         count++;
         value = sum / count;
@@ -469,22 +485,26 @@ void DialWindow::seriesChanged()
     case RealtimeData::Joules:
     case RealtimeData::Watts:
     case RealtimeData::AvgWatts:
+    case RealtimeData::AvgWattsLap:
             foreground = GColor(CPOWER);
             break;
 
     case RealtimeData::Speed:
     case RealtimeData::VirtualSpeed:
     case RealtimeData::AvgSpeed:
+    case RealtimeData::AvgSpeedLap:
             foreground = GColor(CSPEED);
             break;
 
     case RealtimeData::Cadence:
     case RealtimeData::AvgCadence:
+    case RealtimeData::AvgCadenceLap:
             foreground = GColor(CCADENCE);
             break;
 
     case RealtimeData::HeartRate:
     case RealtimeData::AvgHeartRate:
+    case RealtimeData::AvgHeartRateLap:
             foreground = GColor(CHEARTRATE);
             break;
 
@@ -525,4 +545,10 @@ DialWindow::setAverageFromSlider() {
     if (average != averageSlider->value()) {
         setAverageFromText(QString("%1").arg(averageSlider->value()));
     }
+}
+
+void
+DialWindow::onNewLap()
+{
+    isNewLap = true;
 }
