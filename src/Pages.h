@@ -304,6 +304,8 @@ class DevicePage : public QWidget
         QVBoxLayout *mainLayout;
 
         deviceModel *deviceListModel;
+
+        QCheckBox   *multiCheck;
 };
 
 class IntervalMetricsPage : public QWidget

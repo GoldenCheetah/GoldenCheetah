@@ -66,6 +66,7 @@ class ANTlocalController;
 class NullController;
 class RealtimePlot;
 class RealtimeData;
+class MultiDeviceDialog;
 
 class TrainTool : public GcWindow
 {
@@ -77,7 +78,7 @@ class TrainTool : public GcWindow
         TrainTool(MainWindow *parent, const QDir &home);
         QStringList listWorkoutFiles(const QDir &) const;
 
-        RealtimeController *deviceController;   // read from
+        QList<int> devices(); // convenience function for iterating over active devices
         GoldenClient       *streamController;   // send out to
 
         const QTreeWidgetItem *currentWorkout() { return workout; }
@@ -100,7 +101,6 @@ class TrainTool : public GcWindow
         // update charts/dials and manage controller
         void updateData(RealtimeData &);      // to update telemetry by push devices
         void nextDisplayMode();     // show next display mode
-        void setDeviceController();     // based upon selected device
         void setStreamController();     // based upon selected device
 
         // this
@@ -108,6 +108,12 @@ class TrainTool : public GcWindow
 
         // get the panel
         QWidget *getToolbarButtons() { return toolbarButtons; }
+
+        // where to get telemetry from Device.at(x)
+        int bpmTelemetry;   // Heartrate
+        int wattsTelemetry; // Power (and AltPower)
+        int rpmTelemetry;   // Cadence
+        int kphTelemetry;   // Speed (and Distance)
 
     signals:
 
@@ -151,7 +157,9 @@ class TrainTool : public GcWindow
         // User adjusted intensity
         void adjustIntensity();     // Intensity of workout user adjusted
 
-    private:
+    protected:
+
+        friend class ::MultiDeviceDialog;
 
         const QDir home;
         MainWindow *main;
@@ -222,5 +230,28 @@ class TrainTool : public GcWindow
         bool calibrating;
 };
 
+class MultiDeviceDialog : public QDialog
+{
+    Q_OBJECT
+    G_OBJECT
+
+    public:
+        MultiDeviceDialog(MainWindow *, TrainTool *);
+
+    public slots:
+        void applyClicked();
+        void cancelClicked();
+
+    private:
+
+        MainWindow *mainWindow;
+        TrainTool *traintool;
+        QComboBox  *bpmSelect,          // heartrate
+                   *wattsSelect,        // power
+                   *rpmSelect,          // cadence
+                   *kphSelect;          // speed
+
+        QPushButton *applyButton, *cancelButton;
+};
 #endif // _GC_TrainTool_h
 

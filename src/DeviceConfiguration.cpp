@@ -34,6 +34,7 @@ DeviceConfiguration::DeviceConfiguration()
     isDefaultDownload=false;
     isDefaultRealtime=false;
     postProcess=0;
+    controller=NULL;
 }
 
 
