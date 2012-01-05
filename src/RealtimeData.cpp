@@ -211,6 +211,10 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << AvgSpeed;
         seriesList << AvgCadence;
         seriesList << AvgHeartRate;
+        seriesList << AvgWattsLap;
+        seriesList << AvgSpeedLap;
+        seriesList << AvgCadenceLap;
+        seriesList << AvgHeartRateLap;
         seriesList << VirtualSpeed;
         seriesList << AltWatts;
         seriesList << LRBalance;
@@ -296,6 +300,18 @@ QString RealtimeData::seriesName(DataSeries series)
         break;
 
     case AvgCadence: return tr("Average Cadence");
+        break;
+
+    case AvgWattsLap: return tr("Lap Power");
+        break;
+
+    case AvgSpeedLap: return tr("Lap Speed");
+        break;
+
+    case AvgHeartRateLap: return tr("Lap Heartrate");
+        break;
+
+    case AvgCadenceLap: return tr("Lap Cadence");
         break;
 
     case LRBalance: return tr("Left/Right Balance");
