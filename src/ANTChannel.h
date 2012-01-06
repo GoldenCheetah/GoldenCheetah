@@ -140,6 +140,7 @@ class ANTChannel : public QObject {
         int interpretDescription(char *description);
 
         // channel open/close
+        void init();
         void open(int device_number, int channel_type);
         void close();
 

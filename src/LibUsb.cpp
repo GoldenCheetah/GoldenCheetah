@@ -42,6 +42,10 @@ LibUsb::LibUsb(int type) : type(type)
 
 int LibUsb::open()
 {
+    // reset counters
+    intf = NULL;
+    readBufIndex = 0;
+    readBufSize = 0;
 
     // Find all busses.
     usb_find_busses();
@@ -81,6 +85,7 @@ void LibUsb::close()
         device = NULL;
 
         usb_release_interface(p, interface);
+        //usb_reset(p);
         usb_close(p);
     }
 }
