@@ -29,13 +29,13 @@
 
 class TcxParser : public QXmlDefaultHandler
 {
+
 public:
+
     TcxParser(RideFile* rideFile, QList<RideFile*>*rides);
 
-    bool startElement( const QString&, const QString&, const QString&,
-		       const QXmlAttributes& );
+    bool startElement( const QString&, const QString&, const QString&, const QXmlAttributes& );
     bool endElement( const QString&, const QString&, const QString& );
-
     bool characters( const QString& );
 
     RideFile*	rideFile;
@@ -44,26 +44,29 @@ public:
 private:
 
     QString	buffer;
-    QVariant    isGarminSmartRecording;
-    QVariant    GarminHWM;
+    QVariant isGarminSmartRecording;
+    QVariant GarminHWM;
 
-    QDateTime	start_time;
-    QDateTime	last_time;
-    QDateTime	time;
-    double	lastDistance;
-    double	distance;
+    QDateTime start_time;
+    QDateTime last_time;
+    QDateTime time;
 
-    bool    first; // first ride found, when it may contain collections!
-    int		lap;
-    double	power;
-    double	cadence;
-    double	hr;
-    double      lastAltitude;
-    double      alt;
-    double      lat;
-    double      lon;
-    double      headwind;
+    double last_distance;
+    double distance;
+
+    bool   first; // first ride found, when it may contain collections!
+    int	   lap;
+    double power;
+    double cadence;
+    double hr;
+    double speed;
+    double torque;
+    double lastAltitude;
+    double alt;
+    double lat;
+    double lon;
+    double headwind;
+    double secs;
 };
 
 #endif // _TcxParser_h
-
