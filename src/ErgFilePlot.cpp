@@ -225,7 +225,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
         for(int i=0; i < ergFile->Laps.count(); i++) {
 
             // Show Lap Number
-            QwtText text(QString::number(ergFile->Laps.at(i).LapNum));
+            QwtText text(ergFile->Laps.at(i).name != "" ? ergFile->Laps.at(i).name : QString::number(ergFile->Laps.at(i).LapNum));
             text.setFont(QFont("Helvetica", 10, QFont::Bold));
             text.setColor(GColor(CPLOTMARKER));
 

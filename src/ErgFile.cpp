@@ -272,8 +272,8 @@ void ErgFile::parseComputrainer(QString p)
                            Qt::CaseInsensitive);
 
     // Lap marker in an ERG/MRC file
-    QRegExp lapmarker("^[ \\t]*([0-9\\.]+)[ \\t]*LAP[ \\t\\n]*$", Qt::CaseInsensitive);
-    QRegExp crslapmarker("^[ \\t]*LAP[ \\t\\n]*$", Qt::CaseInsensitive);
+    QRegExp lapmarker("^[ \\t]*([0-9\\.]+)[ \\t]*LAP[ \\t\\n]*(.*)$", Qt::CaseInsensitive);
+    QRegExp crslapmarker("^[ \\t]*LAP[ \\t\\n]*(.*)$", Qt::CaseInsensitive);
 
     // ok. opened ok lets parse.
     QTextStream inputStream(&ergFile);
@@ -321,6 +321,7 @@ void ErgFile::parseComputrainer(QString p)
 
                 add.x = lapmarker.cap(1).toDouble() * 60000; // from mins to 1000ths of a second
                 add.LapNum = ++lapcounter;
+                add.name = lapmarker.cap(2).simplified();
                 Laps.append(add);
 
             } else if (crslapmarker.exactMatch(line)) {
@@ -329,6 +330,7 @@ void ErgFile::parseComputrainer(QString p)
 
                 add.x = rdist;
                 add.LapNum = ++lapcounter;
+                add.name = lapmarker.cap(2).simplified();
                 Laps.append(add);
 
             } else if (settings.exactMatch(line)) {
