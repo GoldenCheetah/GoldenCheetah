@@ -257,11 +257,14 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
     last_message_timestamp=timestamp;
 
     if (state != MESSAGE_RECEIVED) {
+        //qDebug()<<"state not equal to message received";
         // first message! who are we talking to?
         parent->sendMessage(ANTMessage::requestMessage(number, ANT_CHANNEL_ID));
         blanking_timestamp=get_timestamp();
         blanked=0;
         return; // because we can't associate a channel id with the message yet
+    } else {
+        //qDebug()<<"state IS equal to message received";
     }
 
     // for automatically opening quarq channel on early cinqo
