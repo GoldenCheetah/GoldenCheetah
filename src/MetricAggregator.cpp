@@ -67,7 +67,6 @@ void MetricAggregator::refreshMetrics()
 
     // Get a list of the ride files
     QRegExp rx = RideFileFactory::instance().rideFileRegExp();
-    QStringList errors;
     QStringList filenames = RideFileFactory::instance().listRideFiles(home);
     QStringListIterator i(filenames);
 
@@ -139,6 +138,7 @@ void MetricAggregator::refreshMetrics()
 
         if (dbTimeStamp < QFileInfo(file).lastModified().toTime_t() ||
             zoneFingerPrint != fingerprint) {
+            QStringList errors;
 
             // log
             out << "Opening ride: " << name << "\r\n";
