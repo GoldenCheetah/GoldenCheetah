@@ -951,6 +951,11 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
             RealtimeData local = rtData;
             Devices[dev].controller->getRealtimeData(local);
 
+            // get spinscan data from a computrainer?
+            if (Devices[dev].type == DEV_CT) {
+                memcpy((uint8_t*)rtData.spinScan, (uint8_t*)local.spinScan, 24);
+            }
+
             // what are we getting from this one?
             if (dev == bpmTelemetry) rtData.setHr(local.getHr());
             if (dev == rpmTelemetry) rtData.setCadence(local.getCadence());
