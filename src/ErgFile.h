@@ -60,6 +60,7 @@ class ErgFileLap
     public:
         long x;     // when does this LAP marker occur? (time in msecs or distance in meters
         int LapNum;     // from 1 - n
+        QString name;
 };
 
 class ErgFile
