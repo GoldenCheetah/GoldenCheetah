@@ -143,6 +143,13 @@ void ANT::run()
 
     Status = ANT_RUNNING;
     QString strBuf;
+    usbMode = USBNone;
+
+    for (int i=0; i<ANT_MAX_CHANNELS; i++) antChannel[i]->init();
+
+    state = ST_WAIT_FOR_SYNC;
+    length = bytes = 0;
+    checksum = ANT_SYNC_BYTE;
 
     if (openPort() == 0) {
 

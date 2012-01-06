@@ -27,6 +27,12 @@ static float timeout_lost=30.0; // time to do more thorough scan
 
 ANTChannel::ANTChannel(int number, ANT *parent) : parent(parent), number(number)
 {
+    init();
+}
+
+void
+ANTChannel::init()
+{
     channel_type=CHANNEL_TYPE_UNUSED;
     channel_type_flags=0;
     is_cinqo=0;
