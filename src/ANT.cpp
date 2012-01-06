@@ -548,6 +548,10 @@ void
 ANT::sendMessage(ANTMessage m) {
     static const unsigned char padding[5] = { '\0', '\0', '\0', '\0', '\0' };
 
+//fprintf(stderr, ">> send: ");
+//for(int i=0; i<m.length; i++) fprintf(stderr, "%02x ", m.data[i]);
+//fprintf(stderr, "\n");
+
     rawWrite((uint8_t*)m.data, m.length);
 
     // this padding is important, for some reason XXX find out why?
@@ -618,7 +622,11 @@ ANT::handleChannelEvent(void) {
 void
 ANT::processMessage(void) {
 
-    ANTMessage(this, rxMessage); // for debug!
+    ANTMessage m(this, rxMessage); // for debug!
+
+//fprintf(stderr, "<< receive: ");
+//for(int i=0; i<m.length; i++) fprintf(stderr, "%02x ", m.data[i]);
+//fprintf(stderr, "\n");
 
     QDataStream out(&antlog);
     for (int i=0; i<ANT_MAX_MESSAGE_SIZE; i++)

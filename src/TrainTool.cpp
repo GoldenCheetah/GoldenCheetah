@@ -694,6 +694,13 @@ void TrainTool::Start()       // when start button is pressed
         workoutTree->setEnabled(false);
         deviceTree->setEnabled(false);
 
+        // lets reset libusb to clear buffers
+        // and reset connection to device
+        // this appeara to help with ANT USB2 sticks
+#ifdef GC_HAVE_LIBUSB
+        usb_init();
+#endif
+
         // if we have selected multiple devices lets
         // configure the series we collect from each one
         if (deviceTree->selectedItems().count() > 1) {
