@@ -143,7 +143,9 @@ void ANT::run()
 
     Status = ANT_RUNNING;
     QString strBuf;
+#if defined GC_HAVE_LIBUSB
     usbMode = USBNone;
+#endif
 
     for (int i=0; i<ANT_MAX_CHANNELS; i++) antChannel[i]->init();
 
