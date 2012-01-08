@@ -328,6 +328,7 @@ HEADERS += \
         TxtRideFile.h \
         TimeUtils.h \
         ToolsDialog.h \
+        ToolsRhoEstimator.h \
         TrainTool.h \
         TreeMapWindow.h \
         TreeMapPlot.h \
@@ -506,6 +507,7 @@ SOURCES += \
         TimeInZone.cpp \
         TimeUtils.cpp \
         ToolsDialog.cpp \
+        ToolsRhoEstimator.cpp \
         TrainTool.cpp \
         TreeMapWindow.cpp \
         TreeMapPlot.cpp \
