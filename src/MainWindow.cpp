@@ -50,6 +50,7 @@
 #include "RideCalendar.h"
 #include "DatePickerDialog.h"
 #include "ToolsDialog.h"
+#include "ToolsRhoEstimator.h"
 #include "MetricAggregator.h"
 #include "SplitActivityWizard.h"
 #include "BatchExportDialog.h"
@@ -610,6 +611,7 @@ MainWindow::MainWindow(const QDir &home) :
     QMenu *optionsMenu = menuBar()->addMenu(tr("&Tools"));
     optionsMenu->addAction(tr("&Options..."), this, SLOT(showOptions()), tr("Ctrl+O"));
     optionsMenu->addAction(tr("Critical Power Calculator..."), this, SLOT(showTools()));
+    optionsMenu->addAction(tr("Air Density (Rho) Estimator..."), this, SLOT(showRhoEstimator()));
 
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Workout Wizard"), this, SLOT(showWorkoutWizard()));
@@ -1073,6 +1075,12 @@ void MainWindow::showTools()
 {
    ToolsDialog *td = new ToolsDialog();
    td->show();
+}
+
+void MainWindow::showRhoEstimator()
+{
+   ToolsRhoEstimator *tre = new ToolsRhoEstimator();
+   tre->show();
 }
 
 void MainWindow::showWorkoutWizard()
