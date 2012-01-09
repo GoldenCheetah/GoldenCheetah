@@ -940,6 +940,11 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
         connect(actTweetRide, SIGNAL(triggered(void)), this, SLOT(tweetRide()));
         menu.addAction(actTweetRide);
 #endif
+#ifdef GC_HAVE_ICAL
+        QAction *actUploadCalendar = new QAction(tr("Upload Activity to Calendar"), treeWidget);
+        connect(actUploadCalendar, SIGNAL(triggered(void)), this, SLOT(uploadCalendar()));
+        menu.addAction(actUploadCalendar);
+#endif
         menu.exec(pos);
     }
 }
