@@ -706,7 +706,6 @@ void TrainTool::Start()       // when start button is pressed
         if (deviceTree->selectedItems().count() > 1) {
             MultiDeviceDialog *multisetup = new MultiDeviceDialog(main, this);
             if (multisetup->exec() == false) {
-                qDebug()<<"we canned it with a cancel";
                 return;
             }
         } else {
@@ -961,6 +960,8 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
             // get spinscan data from a computrainer?
             if (Devices[dev].type == DEV_CT) {
                 memcpy((uint8_t*)rtData.spinScan, (uint8_t*)local.spinScan, 24);
+                rtData.setLoad(local.getLoad()); // and get load in case it was adjusted
+                                        // to within defined limits
             }
 
             // what are we getting from this one?
@@ -1293,7 +1294,6 @@ void TrainTool::Higher()
         intensitySlider->setValue(intensitySlider->value()+5);
 
     } else {
-
         if (status&RT_MODE_ERGO) load += 5;
         else slope += 0.1;
 
@@ -1317,6 +1317,7 @@ void TrainTool::Lower()
         intensitySlider->setValue(intensitySlider->value()-5);
 
     } else {
+
         if (status&RT_MODE_ERGO) load -= 5;
         else slope -= 0.1;
 
