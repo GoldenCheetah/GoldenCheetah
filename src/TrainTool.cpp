@@ -1168,7 +1168,7 @@ void TrainTool::loadUpdate()
 
         if(displayWorkoutLap != curLap)
         {
-            resetLapTimer();
+            main->notifyNewLap();
         }
         displayWorkoutLap = curLap;
 
@@ -1184,7 +1184,7 @@ void TrainTool::loadUpdate()
 
         if(displayWorkoutLap != curLap)
         {
-            resetLapTimer();
+            main->notifyNewLap();
         }
         displayWorkoutLap = curLap;
 
