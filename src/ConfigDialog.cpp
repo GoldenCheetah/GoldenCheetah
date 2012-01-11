@@ -154,6 +154,7 @@ void ConfigDialog::save_Clicked()
     else if (configPage->unitCombo->currentIndex()==1)
         appsettings->setValue(GC_UNIT, "Imperial");
 
+    appsettings->setValue(GC_GARMIN_SMARTRECORD, configPage->garminSmartRecord->checkState());
     appsettings->setValue(GC_CRANKLENGTH, configPage->crankLengthCombo->currentText());
     appsettings->setValue(GC_BIKESCOREDAYS, configPage->BSdaysEdit->text());
     appsettings->setValue(GC_BIKESCOREMODE, configPage->bsModeCombo->currentText());
