@@ -60,6 +60,7 @@ struct FitFileReaderState
     RideFile *rideFile;
     time_t start_time;
     time_t last_time;
+    double last_distance;
     QMap<int, FitDefinition> local_msg_types;
     QSet<int> unknown_record_fields, unknown_global_msg_nums, unknown_base_type;
     int interval;
@@ -71,7 +72,7 @@ struct FitFileReaderState
 
     FitFileReaderState(QFile &file, QStringList &errors) :
         file(file), errors(errors), rideFile(NULL), start_time(0),
-        last_time(0), interval(0), devices(0), stopped(true),
+        last_time(0), last_distance(0.00f), interval(0), devices(0), stopped(true),
         last_event_type(-1), last_event(-1), last_msg_type(-1)
     {
     }
@@ -404,6 +405,7 @@ struct FitFileReaderState
             double deltaCad = cad - prevPoint->cad;
             double deltaHr = hr - prevPoint->hr;
             double deltaDist = km - prevPoint->km;
+            if (km < 0.00001) deltaDist = 0.000f; // effectively zero distance
             double deltaSpeed = kph - prevPoint->kph;
             double deltaTorque = nm - prevPoint->nm;
             double deltaPower = watts - prevPoint->watts;
@@ -429,8 +431,11 @@ struct FitFileReaderState
             }
             prevPoint = rideFile->dataPoints().back();
         }
+
+        if (km < 0.00001f) km = last_distance;
         rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, interval);
         last_time = time;
+        last_distance = km;
     }
 
     int read_record(bool &stop, QStringList &errors) {
