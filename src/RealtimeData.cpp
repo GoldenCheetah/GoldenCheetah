@@ -19,13 +19,16 @@
 
 #include "RealtimeData.h"
 
+#include <QtDebug>
+
 #define tr(s) QObject::tr(s)
 
 RealtimeData::RealtimeData()
 {
     name[0] = '\0';
     lap = altWatts = watts = hr = speed = wheelRpm = cadence  = load = 0;
-    msecs = lapMsecs = /* bikeScore = joules =*/ 0;
+    msecs = lapMsecs = /* bikeScore = joules =*/ lapMsecsRemaining = 0;
+
     memset(spinScan, 0, 24);
 }
 
@@ -77,6 +80,11 @@ void RealtimeData::setLapMsecs(long x)
 {
     this->lapMsecs = x;
 }
+void RealtimeData::setLapMsecsRemaining(long x)
+{
+    this->lapMsecsRemaining = x;
+}
+
 void RealtimeData::setDistance(double x)
 {
     this->distance = x;
@@ -146,6 +154,9 @@ double RealtimeData::value(DataSeries series) const
         break;
 
     case LapTime: return lapMsecs;
+        break;
+
+    case LapTimeRemaining: return lapMsecsRemaining;
         break;
 
     case Distance: return distance;
@@ -218,6 +229,7 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << VirtualSpeed;
         seriesList << AltWatts;
         seriesList << LRBalance;
+        seriesList << LapTimeRemaining;
     }
     return seriesList;
 }
@@ -237,6 +249,9 @@ QString RealtimeData::seriesName(DataSeries series)
         break;
 
     case LapTime: return tr("Lap Time");
+        break;
+
+    case LapTimeRemaining: return tr("Lap Time Remaining");
         break;
 
     case TSS: return tr("TSS");

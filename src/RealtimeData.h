@@ -39,7 +39,7 @@ public:
                       NP, TSS, IF, VI,
                       AvgWatts, AvgSpeed, AvgCadence, AvgHeartRate,
                       AvgWattsLap, AvgSpeedLap, AvgCadenceLap, AvgHeartRateLap,
-                      VirtualSpeed, AltWatts, LRBalance };
+                      VirtualSpeed, AltWatts, LRBalance, LapTimeRemaining };
 
     typedef enum dataseries DataSeries;
     double value(DataSeries) const;
@@ -62,6 +62,7 @@ public:
     void setSlope(double slope);
     void setMsecs(long);
     void setLapMsecs(long);
+    void setLapMsecsRemaining(long);
     void setDistance(double);
     void setBikeScore(long);
     void setJoules(long);
@@ -99,6 +100,7 @@ private:
     long lap;
     long msecs;
     long lapMsecs;
+    long lapMsecsRemaining;
 };
 
 #endif

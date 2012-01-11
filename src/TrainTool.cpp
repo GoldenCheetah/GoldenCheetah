@@ -986,9 +986,19 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
         if (!calibrating) { // freeze time whilst calibrating
             total_msecs = session_elapsed_msec + session_time.elapsed();
             lap_msecs = lap_elapsed_msec + lap_time.elapsed();
+
+            rtData.setMsecs(total_msecs);
+            rtData.setLapMsecs(lap_msecs);
+
+            long lapTimeRemaining = ergFile->nextLap(load_msecs) - load_msecs;
+            if(lapTimeRemaining < 0)
+            {
+                lapTimeRemaining =  ergFile->Duration - load_msecs;
+                if(lapTimeRemaining < 0)
+                    lapTimeRemaining = 0;
+            }
+            rtData.setLapMsecsRemaining(lapTimeRemaining);
         }
-        rtData.setMsecs(total_msecs);
-        rtData.setLapMsecs(lap_msecs);
 
         // local stuff ...
         displayPower = rtData.getWatts();

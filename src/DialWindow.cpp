@@ -183,6 +183,15 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         }
         break;
 
+    case RealtimeData::LapTimeRemaining:
+        {
+        long msecs = value;
+        valueLabel->setText(QString("%1:%2:%3").arg(msecs/3600000)
+                                               .arg((msecs%3600000)/60000,2,10,QLatin1Char('0'))
+                                               .arg((msecs%60000)/1000,2,10,QLatin1Char('0')));
+        }
+    break;
+
     case RealtimeData::LRBalance:
         {
             double tot = rtData.getWatts() + rtData.getAltWatts();
@@ -463,6 +472,7 @@ void DialWindow::seriesChanged()
 
     case RealtimeData::Time:
     case RealtimeData::LapTime:
+    case RealtimeData::LapTimeRemaining:
     case RealtimeData::Distance:
     case RealtimeData::LRBalance:
     case RealtimeData::Lap:
