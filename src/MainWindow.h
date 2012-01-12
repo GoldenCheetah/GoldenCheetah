@@ -170,6 +170,7 @@ class MainWindow : public QMainWindow
         void notifyUnPause() { emit unpause(); }
         void notifyPause() { emit pause(); }
         void notifyStop() { emit stop(); }
+        void notifySeek(long x) { emit seek(x); }
 
 
 
@@ -202,6 +203,7 @@ class MainWindow : public QMainWindow
         void ergFileSelected(ErgFile *);
         void mediaSelected(QString);
         void setNow(long);
+        void seek(long);
         void newLap();
         void start();
         void unpause();
