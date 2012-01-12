@@ -47,6 +47,7 @@ GcWindow(parent), home(home), main(parent), hasMovie(false)
     connect(main, SIGNAL(start()), this, SLOT(startPlayback()));
     connect(main, SIGNAL(pause()), this, SLOT(pausePlayback()));
     connect(main, SIGNAL(unpause()), this, SLOT(resumePlayback()));
+    connect(main, SIGNAL(seek(long)), this, SLOT(seekPlayback(long)));
     connect(main, SIGNAL(mediaSelected(QString)), this, SLOT(mediaSelected(QString)));
 
 }
@@ -89,6 +90,15 @@ void VideoWindow::resumePlayback()
 
     [movie play];
 }
+
+void VideoWindow::seekPlayback(long ms)
+{
+    if (!hasMovie) return;
+
+    QTTime newTime = QTMakeTime(ms,(long)1000);
+    [movie setCurrentTime:newTime];
+}
+
 
 static inline NSString *darwinQStringToNSString (const QString &aString)
 {
