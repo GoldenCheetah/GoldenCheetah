@@ -420,6 +420,7 @@ HomeWindow::dragEnterEvent(QDragEnterEvent *event)
 void
 HomeWindow::appendChart(GcWinID id)
 {
+#if 0
     GcWindow *newone = GcWindowRegistry::newGcWindow(id, mainWindow);
     for(int i=0; GcWindows[i].relevance; i++) {
         if (GcWindows[i].id == id) {
@@ -435,9 +436,9 @@ HomeWindow::appendChart(GcWinID id)
     newone->show();
     newone->setProperty("ride", property("ride"));
     resizeEvent(NULL);
-#if 0
+#else
     // GcWindowDialog is delete on close, so no need to delete
-    GcWindowDialog *f = new GcWindowDialog(GcWindows[i].id, mainWindow);
+    GcWindowDialog *f = new GcWindowDialog(id, mainWindow);
     GcWindow *newone = f->exec();
 
     // returns null if cancelled or closed
