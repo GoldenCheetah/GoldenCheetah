@@ -1250,8 +1250,12 @@ void TrainTool::FFwd()
 {
     if ((status&RT_RUNNING) == 0) return;
 
-    if (status&RT_MODE_ERGO) load_msecs += 10000; // jump forward 10 seconds
+    if (status&RT_MODE_ERGO) {
+        load_msecs += 10000; // jump forward 10 seconds
+        main->notifySeek(load_msecs);
+    }
     else displayWorkoutDistance += 1; // jump forward a kilometer in the workout
+
 }
 
 void TrainTool::Rewind()
@@ -1261,6 +1265,7 @@ void TrainTool::Rewind()
     if (status&RT_MODE_ERGO) {
         load_msecs -=10000; // jump back 10 seconds
         if (load_msecs < 0) load_msecs = 0;
+        main->notifySeek(load_msecs);
     } else {
         displayWorkoutDistance -=1; // jump back a kilometer
         if (displayWorkoutDistance < 0) displayWorkoutDistance = 0;
@@ -1278,6 +1283,7 @@ void TrainTool::FFwdLap()
     if (status&RT_MODE_ERGO) {
         lapmarker = ergFile->nextLap(load_msecs);
         if (lapmarker != -1) load_msecs = lapmarker; // jump forward to lapmarker
+        main->notifySeek(load_msecs);
     } else {
         lapmarker = ergFile->nextLap(displayWorkoutDistance*1000);
         if (lapmarker != -1) displayWorkoutDistance = lapmarker/1000; // jump forward to lapmarker

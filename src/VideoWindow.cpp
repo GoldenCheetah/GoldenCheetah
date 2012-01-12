@@ -82,6 +82,7 @@ GcWindow(parent), home(home), main(parent)
     connect(main, SIGNAL(stop()), this, SLOT(stopPlayback()));
     connect(main, SIGNAL(start()), this, SLOT(startPlayback()));
     connect(main, SIGNAL(pause()), this, SLOT(pausePlayback()));
+    connect(main, SIGNAL(seek(long)), this, SLOT(seekPlayback(long)));
     connect(main, SIGNAL(unpause()), this, SLOT(resumePlayback()));
     connect(main, SIGNAL(mediaSelected(QString)), this, SLOT(mediaSelected(QString)));
 
@@ -147,6 +148,14 @@ void VideoWindow::resumePlayback()
 
     // stop playback & wipe player
     libvlc_media_player_pause (mp);
+}
+
+void VideoWindow::seekPlayback(long ms)
+{
+    if (!m) return;
+
+    // seek to ms position in current file
+    libvlc_media_player_set_time(mp, (libvlc_time_t) ms);
 }
 
 void VideoWindow::mediaSelected(QString filename)

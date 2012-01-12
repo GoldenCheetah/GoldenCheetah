@@ -76,6 +76,7 @@ class VideoWindow : public GcWindow
         void stopPlayback();
         void pausePlayback();
         void resumePlayback();
+        void seekPlayback(long ms);
         void mediaSelected(QString filename);
 
     protected:
