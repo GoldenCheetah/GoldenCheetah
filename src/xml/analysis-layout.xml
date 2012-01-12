@@ -2,7 +2,7 @@
 	<chart id="16" name="Summary Window" title="Summary" >
 		<property name="instanceName" type="QString" value="Summary Window" />
 		<property name="title" type="QString" value="Summary" />
-		<property name="subtitle" type="QString" value="Sunday October 24, 2010, 9:56 AM" />
+		<property name="subtitle" type="QString" value="Summary Window" />
 		<property name="widthFactor" type="double" value="1" />
 		<property name="heightFactor" type="double" value="2" />
 		<property name="resizable" type="bool" value="0" />
@@ -10,7 +10,7 @@
 	<chart id="5" name="Google Map" title="Map" >
 		<property name="instanceName" type="QString" value="Google Map" />
 		<property name="title" type="QString" value="Map" />
-		<property name="subtitle" type="QString" value="Ferrier Hills" />
+		<property name="subtitle" type="QString" value="Google Map" />
 		<property name="widthFactor" type="double" value="2.27273" />
 		<property name="heightFactor" type="double" value="2.08333" />
 		<property name="resizable" type="bool" value="0" />
