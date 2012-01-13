@@ -74,15 +74,18 @@ static QString protect(const QString string)
     s.replace("\b", "\\b");  // backspace
     s.replace("\f", "\\f");  // formfeed
     s.replace("/", "\\/");   // solidus
+
     return s;
 }
 
 // Un-Escape special characters (JSON compliance)
 static QString unprotect(const QString string)
 {
+    QString string2 = QString::fromLocal8Bit(string.toAscii().data());
+
     // this is a lexer string so it will be enclosed
     // in quotes. Lets strip those first
-    QString s = string.mid(1,string.length()-2);
+    QString s = string2.mid(1,string2.length()-2);
 
     // now un-escape the control characters
     s.replace("\\t", "\t");  // tab
@@ -93,6 +96,7 @@ static QString unprotect(const QString string)
     s.replace("\\/", "/");   // solidus
     s.replace("\\\"", "\""); // quote
     s.replace("\\\\", "\\"); // backslash
+
     return s;
 }
 
