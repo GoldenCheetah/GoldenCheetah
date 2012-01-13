@@ -364,9 +364,9 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
 
     //plot.makeCurrent();
 
-    double maxbinx =-65535, maxbiny =-65535;
-    double minbinx =65535, minbiny =65535;
-    double mincol =65535, maxcol =-65535;
+    double maxbinx =-180000, maxbiny =-180000; // was 65535
+    double minbinx =180000, minbiny =180000; // 180000 is the max value (for longitude)
+    double mincol =180000, maxcol =-180000;
 
     //
     // Create Plot dataset, filter on values and calculate averages etc
