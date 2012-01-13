@@ -130,6 +130,8 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     rewind->setAutoDefault(false);
     rewind->setFlat(true);
     rewind->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    rewind->setAutoRepeat(true);
+    rewind->setAutoRepeatDelay(200);
     toolbuttons->addWidget(rewind);
 
     QIcon stopIcon(":images/oxygen/stop.png");
@@ -160,6 +162,8 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     forward->setAutoDefault(false);
     forward->setFlat(true);
     forward->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    forward->setAutoRepeat(true);
+    forward->setAutoRepeatDelay(200);
     toolbuttons->addWidget(forward);
 
     QIcon lapIcon(":images/oxygen/lap.png");
