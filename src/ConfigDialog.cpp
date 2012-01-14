@@ -157,6 +157,18 @@ void ConfigDialog::save_Clicked()
     appsettings->setValue(GC_GARMIN_HWMARK, configPage->garminHWMarkedit->text().toInt());
     appsettings->setValue(GC_GARMIN_SMARTRECORD, configPage->garminSmartRecord->checkState());
     appsettings->setValue(GC_CRANKLENGTH, configPage->crankLengthCombo->currentText());
+
+    // save wheel size
+    int wheelSize;
+    switch (configPage->wheelSizeCombo->currentIndex()) {
+    default:
+    case 0: wheelSize = 2100 ; break;
+    case 1: wheelSize = 1960 ; break;
+    case 2: wheelSize = 1985 ; break;
+    case 3: wheelSize = 1750 ; break;
+    }
+    appsettings->setValue(GC_WHEELSIZE, wheelSize);
+
     appsettings->setValue(GC_BIKESCOREDAYS, configPage->BSdaysEdit->text());
     appsettings->setValue(GC_BIKESCOREMODE, configPage->bsModeCombo->currentText());
     appsettings->setValue(GC_WORKOUTDIR, configPage->workoutDirectory->text());

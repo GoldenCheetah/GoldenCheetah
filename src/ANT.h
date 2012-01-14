@@ -70,6 +70,8 @@
 
 #include <QDebug>
 
+#include "Settings.h" // for wheel size config
+
 // timeouts for read/write of serial port in ms
 #define ANT_READTIMEOUT    1000
 #define ANT_WRITETIMEOUT   2000
@@ -306,7 +308,7 @@ public:
     }
     void setWheelRpm(float x) {
         telemetry.setWheelRpm(x);
-        telemetry.setSpeed(x * 2.1 * 60 / 1000); // XXX fixed wheel size needs fixing
+        telemetry.setSpeed(x * (appsettings->value(NULL, GC_WHEELSIZE, 2100).toInt()/1000) * 60 / 1000);
     }
     void setWatts(float x) {
         telemetry.setWatts(x);

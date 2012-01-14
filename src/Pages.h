@@ -61,6 +61,7 @@ class ConfigurationPage : public QWidget
         QComboBox *langCombo;
         QComboBox *unitCombo;
         QComboBox *crankLengthCombo;
+        QComboBox *wheelSizeCombo;
         QCheckBox *allRidesAscending;
         QCheckBox *garminSmartRecord;
         QLineEdit *garminHWMarkedit;

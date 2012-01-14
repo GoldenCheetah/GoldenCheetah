@@ -52,6 +52,7 @@
 #define GC_AVATAR                   "avatar"
 #define GC_SETTINGS_LAST_IMPORT_PATH "mainwindow/lastImportPath"
 #define GC_CRANKLENGTH              "crankLength"
+#define GC_WHEELSIZE                "wheelsize"
 #define GC_BIKESCOREDAYS	    "bikeScoreDays"
 #define GC_BIKESCOREMODE	    "bikeScoreMode"
 #define GC_SB_TODAY             "PMshowSBtoday"
