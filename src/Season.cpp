@@ -248,6 +248,8 @@ Seasons::readSeasons()
     season.setStart(today.addMonths(-12));
     season.setId(QUuid("{00000000-0000-0000-0000-000000000010}"));
     seasons.append(season);
+
+    seasonsChanged(); // signal!
 }
 
 int

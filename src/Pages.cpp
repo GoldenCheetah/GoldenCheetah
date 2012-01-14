@@ -3867,9 +3867,6 @@ SeasonsPage::saveClicked()
     QString file = QString(mainWindow->home.absolutePath() + "/seasons.xml");
     SeasonParser::serialize(file, array);
 
-    // wipe existing mainwindow config
-    delete mainWindow->seasons;
-
     // re-read
-    mainWindow->seasons = new Seasons(mainWindow->home);
+    mainWindow->seasons->readSeasons();
 }
