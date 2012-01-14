@@ -994,10 +994,13 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
             rtData.setMsecs(total_msecs);
             rtData.setLapMsecs(lap_msecs);
 
-            long lapTimeRemaining = ergFile->nextLap(load_msecs) - load_msecs;
+            long lapTimeRemaining;
+            if (ergFile) lapTimeRemaining = ergFile->nextLap(load_msecs) - load_msecs;
+            else lapTimeRemaining = 0;
+
             if(lapTimeRemaining < 0)
             {
-                lapTimeRemaining =  ergFile->Duration - load_msecs;
+                if (ergFile) lapTimeRemaining =  ergFile->Duration - load_msecs;
                 if(lapTimeRemaining < 0)
                     lapTimeRemaining = 0;
             }
