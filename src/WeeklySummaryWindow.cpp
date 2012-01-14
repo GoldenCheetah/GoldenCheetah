@@ -148,6 +148,8 @@ WeeklySummaryWindow::WeeklySummaryWindow(bool useMetricUnits,
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(refresh()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(refresh()));
     connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(refresh()));
+    connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
+    connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
 }
 
 void
