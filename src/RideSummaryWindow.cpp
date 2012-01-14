@@ -197,6 +197,7 @@ RideSummaryWindow::htmlSummary() const
         // ones we display
         QStringList worklist;
         worklist += totalColumn;
+        worklist += averageColumn;
         worklist += maximumColumn;
         worklist += metricColumn;
         worklist += timeInZones;

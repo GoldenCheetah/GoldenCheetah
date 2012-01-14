@@ -54,6 +54,7 @@ PowerHist::PowerHist(MainWindow *mainWindow):
     binw(3),
     withz(true),
     dt(1),
+    minX(0),
     absolutetime(true),
     cache(NULL),
     source(Ride)
@@ -418,18 +419,16 @@ PowerHist::recalc(bool force)
         // HR typically starts at 80 or so, rather than zero
         // lets crop the chart so we can focus on the data
         // if we're working with HR data...
-        if (series == RideFile::hr) {
-            double MinX=0;
+        minX=0;
+        if (!withz && series == RideFile::hr) {
             for (int i=1; i<hrArray.size(); i++) {
                 if (hrArray[i] > 0.1) {
-                    MinX = i;
+                    minX = i;
                     break;
                 }
             }
-            setAxisScale(xBottom, withz ? 0 : MinX, parameterValue[count + 1]);
-         } else {
-            setAxisScale(xBottom, 0.0, parameterValue[count + 1]);
-         }
+        }
+        setAxisScale(xBottom, minX, parameterValue[count + 1]);
 
         // we only do zone labels when using absolute values
         refreshZoneLabels();
