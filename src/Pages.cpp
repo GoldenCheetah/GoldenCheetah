@@ -122,6 +122,23 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
     if(crankLength.toString() == "185")
 	crankLengthCombo->setCurrentIndex(10);
 
+    QLabel *wheelSizeLabel = new QLabel("Wheelsize:", this);
+    int wheelSize = appsettings->value(this, GC_WHEELSIZE, 2100).toInt();
+
+    wheelSizeCombo = new QComboBox();
+    wheelSizeCombo->addItem("Road/Cross (700C/622)"); // 2100mm
+    wheelSizeCombo->addItem("Tri/TT (650C)"); // 1960mm
+    wheelSizeCombo->addItem("Mountain (26\")"); // 1985mm
+    wheelSizeCombo->addItem("BMX (20\")"); // 1750mm
+
+    switch (wheelSize) {
+    default:
+    case 2100 : wheelSizeCombo->setCurrentIndex(0); break;
+    case 1960 : wheelSizeCombo->setCurrentIndex(1); break;
+    case 1985 : wheelSizeCombo->setCurrentIndex(2); break;
+    case 1750 : wheelSizeCombo->setCurrentIndex(3); break;
+    }
+
     // garmin Smart Recording options
     QVariant garminHWMark = appsettings->value(this, GC_GARMIN_HWMARK);
     if (garminHWMark.isNull() || garminHWMark.toInt() == 0)
@@ -161,6 +178,9 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
     crankLengthLayout->addWidget(crankLengthLabel);
     crankLengthLayout->addWidget(crankLengthCombo);
 
+    QHBoxLayout *wheelSizeLayout = new QHBoxLayout;
+    wheelSizeLayout->addWidget(wheelSizeLabel);
+    wheelSizeLayout->addWidget(wheelSizeCombo);
 
     // BikeScore Estimate
     QVariant BSdays = appsettings->value(this, GC_BIKESCOREDAYS);
@@ -208,6 +228,7 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
     configLayout->addLayout(garminLayout);
     //SmartRecord);
     configLayout->addLayout(crankLengthLayout);
+    configLayout->addLayout(wheelSizeLayout);
     configLayout->addLayout(bsDaysLayout);
     configLayout->addLayout(bsModeLayout);
     configLayout->addLayout(workoutLayout);
