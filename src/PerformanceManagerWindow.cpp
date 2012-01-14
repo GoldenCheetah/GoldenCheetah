@@ -105,6 +105,8 @@ PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
             this, SLOT(metricChanged()));
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(mainWindow, SIGNAL(configChanged()), perfplot, SLOT(configUpdate()));
+    connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(replot()));
+    connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(replot()));
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
 }
