@@ -29,6 +29,7 @@
 class Season
 {
 	public:
+        static QList<QString> types;
         enum SeasonType { season=0, cycle=1, adhoc=2, temporary=3 };
         //typedef enum seasontype SeasonType;
 
@@ -48,8 +49,6 @@ class Season
         void setId(QUuid x) { _id = x; }
         QVector<int> &load() { return _load; }
 
-
-	private:
         QDate start; // first day of the season
         QDate end; // last day of the season
         int _days; // how many days in this season?

@@ -250,9 +250,11 @@ CyclistPage::CyclistPage(MainWindow *main) :
     QWidget *rdTab = new QWidget(this);
     QWidget *psTab = new QWidget(this);
     QWidget *pmTab = new QWidget(this);
+    QWidget *seTab = new QWidget(this);
     tabs->addTab(rdTab, tr("About Me"));
     tabs->addTab(cpTab, tr("Power Zones"));
     tabs->addTab(hrTab, tr("HR Zones"));
+    tabs->addTab(seTab, tr("Seasons"));
     tabs->addTab(pmTab, tr("Performance Manager"));
     tabs->addTab(psTab, tr("Passwords"));
     QVBoxLayout *cpLayout = new QVBoxLayout(cpTab);
@@ -260,6 +262,7 @@ CyclistPage::CyclistPage(MainWindow *main) :
     QVBoxLayout *pmLayout = new QVBoxLayout(pmTab);
     QVBoxLayout *rdLayout = new QVBoxLayout(rdTab);
     QVBoxLayout *psLayout = new QVBoxLayout(psTab);
+    QVBoxLayout *seLayout = new QVBoxLayout(seTab);
 
     riderPage = new RiderPage(this, mainWindow);
     rdLayout->addWidget(riderPage);
@@ -272,6 +275,9 @@ CyclistPage::CyclistPage(MainWindow *main) :
 
     passPage = new CredentialsPage(this, mainWindow);
     psLayout->addWidget(passPage);
+
+    seasonsPage = new SeasonsPage(this, mainWindow);
+    seLayout->addWidget(seasonsPage);
 
     perfManLabel = new QLabel(tr("Performance Manager"));
     showSBToday = new QCheckBox(tr("Show Stress Balance Today"), this);
@@ -330,6 +336,7 @@ CyclistPage::saveClicked()
     hrZonePage->saveClicked();
     riderPage->saveClicked();
     passPage->saveClicked();
+    seasonsPage->saveClicked();
 }
 
 //
@@ -3631,4 +3638,217 @@ void CredentialsPage::saveTwitter()
         appsettings->setValue(GC_TWITTER_SECRET, oauth_secret);
     }
 #endif
+}
+
+//
+// Season Editor
+//
+SeasonsPage::SeasonsPage(QWidget *parent, MainWindow *mainWindow) : QWidget(parent), mainWindow(mainWindow)
+{
+    QGridLayout *mainLayout = new QGridLayout(this);
+    QFormLayout *editLayout = new QFormLayout;
+    editLayout->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
+
+    // get the list
+    array = mainWindow->seasons->seasons;
+
+    // Edit widgets
+    nameEdit = new QLineEdit(this);
+    typeEdit = new QComboBox(this);
+    foreach(QString t, Season::types) typeEdit->addItem(t);
+    typeEdit->setCurrentIndex(0);
+    fromEdit = new QDateEdit(this);
+    fromEdit->setCalendarPopup(true);
+
+    toEdit = new QDateEdit(this);
+    toEdit->setCalendarPopup(true);
+
+    // set form
+    editLayout->addRow(new QLabel("Name"), nameEdit);
+    editLayout->addRow(new QLabel("Type"), typeEdit);
+    editLayout->addRow(new QLabel("From"), fromEdit);
+    editLayout->addRow(new QLabel("To"), toEdit);
+
+    upButton = new QPushButton(tr("Move up"));
+    downButton = new QPushButton(tr("Move down"));
+    addButton = new QPushButton(tr("Add"));
+    deleteButton = new QPushButton(tr("Delete"));
+
+    QVBoxLayout *actionButtons = new QVBoxLayout;
+    actionButtons->addWidget(deleteButton);
+    actionButtons->addWidget(upButton);
+    actionButtons->addWidget(downButton);
+    actionButtons->addStretch();
+
+    seasons = new QTreeWidget;
+    seasons->headerItem()->setText(0, tr("Name"));
+    seasons->headerItem()->setText(1, tr("Type"));
+    seasons->headerItem()->setText(2, tr("From"));
+    seasons->headerItem()->setText(3, tr("To"));
+    seasons->setColumnCount(4);
+    seasons->setSelectionMode(QAbstractItemView::SingleSelection);
+    //seasons->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
+    seasons->setUniformRowHeights(true);
+    seasons->setIndentation(0);
+
+#ifdef Q_OS_MAC
+    seasons->header()->resizeSection(0,160); // tab
+    seasons->header()->resizeSection(1,80); // name
+    seasons->header()->resizeSection(2,130); // type
+    seasons->header()->resizeSection(3,130); // values
+#else
+    seasons->header()->resizeSection(0,160); // tab
+    seasons->header()->resizeSection(1,80); // name
+    seasons->header()->resizeSection(2,130); // type
+    seasons->header()->resizeSection(3,130); // values
+#endif
+
+    foreach(Season season, array) {
+        QTreeWidgetItem *add;
+
+        if (season.type == Season::temporary) continue;
+
+        add = new QTreeWidgetItem(seasons->invisibleRootItem());
+        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
+
+        // tab name
+        add->setText(0, season.name);
+        // type
+        add->setText(1, Season::types[static_cast<int>(season.type)]);
+        // from
+        add->setText(2, season.start.toString("ddd MMM d, yyyy"));
+        // to
+        add->setText(3, season.end.toString("ddd MMM d, yyyy"));
+        // guid -- hidden
+        add->setText(4, season._id.toString());
+
+    }
+    seasons->setCurrentItem(seasons->invisibleRootItem()->child(0));
+
+    mainLayout->addLayout(editLayout, 0,0);
+    mainLayout->addWidget(addButton, 0,1, Qt::AlignTop);
+    mainLayout->addWidget(seasons, 1,0);
+    mainLayout->addLayout(actionButtons, 1,1);
+
+    // set all the edits to a default value
+    clearEdit();
+
+    // connect up slots
+    connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
+    connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
+    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
+    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+}
+
+void
+SeasonsPage::clearEdit()
+{
+    typeEdit->setCurrentIndex(0);
+    nameEdit->setText("");
+    fromEdit->setDate(QDate::currentDate());
+    toEdit->setDate(QDate::currentDate().addMonths(3));
+}
+
+void
+SeasonsPage::upClicked()
+{
+    if (seasons->currentItem()) {
+        int index = seasons->invisibleRootItem()->indexOfChild(seasons->currentItem());
+        if (index == 0) return; // its at the top already
+
+        // movin on up!
+        QTreeWidgetItem* moved = seasons->invisibleRootItem()->takeChild(index);
+        seasons->invisibleRootItem()->insertChild(index-1, moved);
+        seasons->setCurrentItem(moved);
+    }
+}
+
+void
+SeasonsPage::downClicked()
+{
+    if (seasons->currentItem()) {
+        int index = seasons->invisibleRootItem()->indexOfChild(seasons->currentItem());
+        if (index == (seasons->invisibleRootItem()->childCount()-1)) return; // its at the bottom already
+
+        QTreeWidgetItem* moved = seasons->invisibleRootItem()->takeChild(index);
+        seasons->invisibleRootItem()->insertChild(index+1, moved);
+        seasons->setCurrentItem(moved);
+    }
+}
+
+void
+SeasonsPage::renameClicked()
+{
+    // which one is selected?
+    if (seasons->currentItem()) seasons->editItem(seasons->currentItem(), 0);
+}
+
+void
+SeasonsPage::addClicked()
+{
+    if (nameEdit->text() == "") return; // just ignore it
+
+    // swap if not right way around
+    if (fromEdit->date() > toEdit->date()) {
+        QDate temp = fromEdit->date();
+        fromEdit->setDate(toEdit->date());
+        toEdit->setDate(temp);
+    }
+
+    QTreeWidgetItem *add = new QTreeWidgetItem(seasons->invisibleRootItem());
+    add->setFlags(add->flags() & ~Qt::ItemIsEditable);
+
+    // tab name
+    add->setText(0, nameEdit->text());
+    // type
+    add->setText(1, Season::types[typeEdit->currentIndex()]);
+    // from
+    add->setText(2, fromEdit->date().toString("ddd MMM d, yyyy"));
+    // to
+    add->setText(3, toEdit->date().toString("ddd MMM d, yyyy"));
+    // guid -- hidden
+    add->setText(4, QUuid::createUuid().toString());
+
+    // now clear the edits
+    clearEdit();
+}
+
+void
+SeasonsPage::deleteClicked()
+{
+    if (seasons->currentItem()) {
+        int index = seasons->invisibleRootItem()->indexOfChild(seasons->currentItem());
+
+        // zap!
+        delete seasons->invisibleRootItem()->takeChild(index);
+    }
+}
+
+void
+SeasonsPage::saveClicked()
+{
+    // update the season array to reflect our edits
+    array.clear();
+    for(int i=0; i<seasons->invisibleRootItem()->childCount(); i++) {
+
+        QTreeWidgetItem *item = seasons->invisibleRootItem()->child(i);
+
+        Season add;
+        add.name = item->text(0);
+        add.type = Season::types.indexOf(item->text(1));
+        add.start = QDate::fromString(item->text(2), "ddd MMM d, yyyy");
+        add.end = QDate::fromString(item->text(3), "ddd MMM d, yyyy");
+        add._id = QUuid(item->text(4));
+        array << add;
+    }
+
+    // write to disk
+    QString file = QString(mainWindow->home.absolutePath() + "/seasons.xml");
+    SeasonParser::serialize(file, array);
+
+    // wipe existing mainwindow config
+    delete mainWindow->seasons;
+
+    // re-read
+    mainWindow->seasons = new Seasons(mainWindow->home);
 }

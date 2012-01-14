@@ -25,6 +25,18 @@
 
 #define tr(s) QObject::tr(s)
 
+static QList<QString> _setSeasonTypes()
+{
+    QList<QString> returning;
+    returning << "Season"
+              << "Cycle"
+              << "Adhoc"
+              << "System";
+    return returning;
+}
+
+QList<QString> Season::types = _setSeasonTypes();
+
 Season::Season()
 {
     type = season;  // by default seasons are of type season
