@@ -45,6 +45,7 @@ class HrHistZoneLabel;
 class LTMCanvasPicker;
 class ZoneScaleDraw;
 
+
 class penTooltip: public QwtPlotZoomer
 {
     public:
@@ -96,6 +97,7 @@ class PowerHist : public QwtPlot
         PowerHist(MainWindow *mainWindow);
         ~PowerHist();
 
+        double minX;
 
     public slots:
 
@@ -128,6 +130,8 @@ class PowerHist : public QwtPlot
         // get told to refresh
         void recalc(bool force=false);
         void refreshZoneLabels();
+
+
 
     protected:
 
@@ -438,10 +442,14 @@ public:
 	    int num_zones = zone_lows.size();
 	    assert(zone_names.size() == num_zones);
 	    if (zone_number < num_zones) {
-		watts =
+                double min = parent->minX;
+                if (zone_lows[zone_number]>min)
+                    min = zone_lows[zone_number];
+
+                watts =
 		    (
 		     (zone_number + 1 < num_zones) ?
-		     0.5 * (zone_lows[zone_number] + zone_lows[zone_number + 1]) :
+                     0.5 * (min + zone_lows[zone_number + 1]) :
 		     (
 		      (zone_number > 0) ?
 		      (1.5 * zone_lows[zone_number] - 0.5 * zone_lows[zone_number - 1]) :
@@ -469,7 +477,7 @@ public:
 	      const QRect &rect) const
     {
 	if (parent->shadeHRZones()) {
-	    int x = xMap.transform(watts);
+            int x = xMap.transform(watts);
 	    int y = (rect.bottom() + rect.top()) / 2;
 
 	    // the following code based on source for QwtPlotMarker::draw()
