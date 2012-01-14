@@ -425,7 +425,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 {
                     if (lastStdPwrMessage.type != 0) {
                         is_alt ? parent->setAltWatts(antMessage.instantPower) : parent->setWatts(antMessage.instantPower);
-                        parent->setWheelRpm(antMessage.instantCadence);
+                        parent->setCadence(antMessage.instantCadence); // cadence
                     }
                     lastStdPwrMessage = antMessage;
                     savemessage = false;
