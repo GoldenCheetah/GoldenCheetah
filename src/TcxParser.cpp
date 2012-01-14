@@ -95,7 +95,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 
     } else if (qName == "DistanceMeters") { distance = buffer.toDouble() / 1000; }
     else if (qName == "Watts" || qName == "ns3:Watts") { power = buffer.toDouble(); }
-    else if (qName == "Speed" || qName == "ns3:Speed") { speed = buffer.toDouble(); }
+    else if (qName == "Speed" || qName == "ns3:Speed") { speed = buffer.toDouble() * 3.6; }
     else if (qName == "Value") { hr = buffer.toDouble(); }
     else if (qName == "Cadence") { cadence = buffer.toDouble(); }
     else if (qName == "AltitudeMeters") { alt = buffer.toDouble(); }
