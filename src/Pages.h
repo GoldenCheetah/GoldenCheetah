@@ -24,6 +24,8 @@
 #include "DeviceConfiguration.h"
 #include "RideMetadata.h"
 #include "DataProcessor.h"
+#include "Season.h"
+#include "SeasonParser.h"
 
 #ifdef GC_HAVE_LIBOAUTH
 extern "C" {
@@ -46,6 +48,7 @@ class FieldsPage;
 class MeasuresPage;
 class Colors;
 class RiderPage;
+class SeasonsPage;
 
 class ConfigurationPage : public QWidget
 {
@@ -211,6 +214,7 @@ class CyclistPage : public QWidget
         CredentialsPage *passPage;
         ZonePage *zonePage;
         HrZonePage *hrZonePage;
+        SeasonsPage *seasonsPage;
 
     private:
         QVBoxLayout *perfManLayout;
@@ -682,6 +686,39 @@ protected:
     QTabWidget *tabs;
 
     // local versions for modification
+};
+
+class SeasonsPage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+
+    public:
+        SeasonsPage(QWidget *parent, MainWindow *main);
+        void getDefinitions(QList<Season>&);
+
+    public slots:
+        void addClicked();
+        void upClicked();
+        void downClicked();
+        void renameClicked();
+        void deleteClicked();
+        void clearEdit();
+        void saveClicked();
+
+    private:
+
+        QTreeWidget *seasons;
+        MainWindow *mainWindow;
+
+        QLineEdit *nameEdit;
+        QComboBox *typeEdit;
+        QDateEdit *fromEdit, *toEdit;
+
+        QPushButton *upButton, *downButton, *addButton, *renameButton, *deleteButton;
+
+        QList<Season> array;
 };
 
 class MeasuresPage : public QWidget
