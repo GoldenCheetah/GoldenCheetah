@@ -34,8 +34,12 @@ class CriticalPowerWindow : public GcWindow
     G_OBJECT
 
     // properties can be saved/restored/set by the layout manager
-    Q_PROPERTY(int season READ season WRITE setSeason USER true)
+
+    Q_PROPERTY(QString dateRange READ dateRange WRITE setDateRange USER true)
     Q_PROPERTY(int mode READ mode WRITE setMode USER true)
+
+    // for retro compatibility
+    Q_PROPERTY(int season READ season WRITE setSeason USER false)
 
     public:
 
@@ -44,10 +48,17 @@ class CriticalPowerWindow : public GcWindow
         void deleteCpiFile(QString filename);
 
         // set/get properties
-        int season() const { return cComboSeason->currentIndex(); }
-        void setSeason(int x) { cComboSeason->setCurrentIndex(x); }
+        // ---------------------------------------------------
         int mode() const { return seriesCombo->currentIndex(); }
         void setMode(int x) { seriesCombo->setCurrentIndex(x); }
+
+        // date ranges set/get the string from the treeWidget
+        QString dateRange() const;
+        void setDateRange(QString x);
+
+        // for retro compatibility
+        int season() const { return cComboSeason->currentIndex(); }
+        void setSeason(int x) { cComboSeason->setCurrentIndex(x); }
 
         RideFile::SeriesType series() { 
             return static_cast<RideFile::SeriesType>
@@ -62,9 +73,12 @@ class CriticalPowerWindow : public GcWindow
         void rideSelected();
         void seasonSelected(int season);
         void setSeries(int index);
+        void resetSeasons();
 
     private:
         void updateCpint(double minutes);
+
+        QString _dateRange;
 
     protected:
 
@@ -79,9 +93,9 @@ class CriticalPowerWindow : public GcWindow
         QComboBox *cComboSeason;
         QPushButton *cpintSetCPButton;
         QwtPlotPicker *picker;
-        void addSeasons();
         void addSeries();
-        QList<Season> seasons;
+        Seasons *seasons;
+        QList<Season> seasonsList;
         RideItem *currentRide;
         QList<RideFile::SeriesType> seriesList;
 };

@@ -31,7 +31,7 @@
 #include <QXmlSimpleReader>
 
 CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
-    GcWindow(parent), home(home), mainWindow(parent), currentRide(NULL)
+    GcWindow(parent), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), mainWindow(parent), currentRide(NULL)
 {
     setInstanceName("Critical Power Window");
 
@@ -76,7 +76,8 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
     seriesCombo = new QComboBox(this);
     addSeries();
     cComboSeason = new QComboBox(this);
-    addSeasons();
+    seasons = parent->seasons;
+    resetSeasons();
     cpintSetCPButton = new QPushButton(tr("&Save CP value"), this);
     cpintSetCPButton->setEnabled(false);
     cl->addWidget(cpintSetCPButton);
@@ -103,6 +104,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
     connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
+    connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
 }
 
 void
@@ -111,7 +113,7 @@ CriticalPowerWindow::newRideAdded(RideItem *here)
     // mine just got Zapped, a new rideitem would not be my current item
     if (here == currentRide) currentRide = NULL;
 
-    Season season = seasons.at(cComboSeason->currentIndex());
+    Season season = seasons->seasons.at(cComboSeason->currentIndex());
 
     // Refresh global curve if a ride is added during those dates
     if ((here->dateTime.date() >= season.getStart() || season.getStart() == QDate())
@@ -302,33 +304,53 @@ void CriticalPowerWindow::addSeries()
     }
 }
 
-void CriticalPowerWindow::addSeasons()
-{
-    QFile seasonFile(home.absolutePath() + "/seasons.xml");
-    QXmlInputSource source( &seasonFile );
-    QXmlSimpleReader xmlReader;
-    SeasonParser( handler );
-    xmlReader.setContentHandler(&handler);
-    xmlReader.setErrorHandler(&handler);
-    xmlReader.parse( source );
-    seasons = handler.getSeasons();
-    Season season;
-    season.setName(tr("All Seasons"));
-    seasons.insert(0,season);
+/*----------------------------------------------------------------------
+ * Seasons stuff
+ *--------------------------------------------------------------------*/
 
-    foreach (Season season, seasons)
+
+void
+CriticalPowerWindow::resetSeasons()
+{
+    // remove seasons
+    cComboSeason->clear();
+
+    //Store current selection
+    QString previousDateRange = _dateRange;
+    // insert seasons
+    for (int i=0; i <seasons->seasons.count(); i++) {
+        Season season = seasons->seasons.at(i);
         cComboSeason->addItem(season.getName());
-    if (!seasons.empty()) {
-        cComboSeason->setCurrentIndex(cComboSeason->count() - 1);
-        Season season = seasons.last();
-        cpintPlot->changeSeason(season.getStart(), season.getEnd());
+    }
+    // restore previous selection
+    setDateRange(previousDateRange);
+}
+
+QString
+CriticalPowerWindow::dateRange() const
+{
+    return seasons->seasons[cComboSeason->currentIndex()].id();
+}
+
+void
+CriticalPowerWindow::setDateRange(QString s)
+{
+    QUuid find(s);
+
+    for(int i=0; i<seasons->seasons.count(); i++) {
+        if (seasons->seasons[i].id() == find) {
+            cComboSeason->setCurrentIndex(i);
+            seasonSelected(i);
+            return;
+        }
     }
 }
 
 void CriticalPowerWindow::seasonSelected(int iSeason)
 {
-    if (iSeason >= seasons.count() || iSeason < 0) return;
-    Season season = seasons.at(iSeason);
+    if (iSeason >= seasons->seasons.count() || iSeason < 0) return;
+    Season season = seasons->seasons.at(iSeason);
+    _dateRange = season.id();
     cpintPlot->changeSeason(season.getStart(), season.getEnd());
     cpintPlot->calculate(currentRide);
 }
