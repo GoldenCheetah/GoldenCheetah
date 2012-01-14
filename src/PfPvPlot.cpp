@@ -381,9 +381,11 @@ PfPvPlot::setData(RideItem *_rideItem)
                 double aepf = (p1->watts * 60.0) / (p1->cad * cl_ * 2.0 * PI);
                 double cpv = (p1->cad * cl_ * 2.0 * PI) / 60.0;
 
-                dataSet.insert(std::make_pair<double, double>(aepf, cpv));
-                tot_cad += p1->cad;
-                tot_cad_points++;
+                if (aepf <= 2500) { // > 2500 newtons is our out of bounds
+                    dataSet.insert(std::make_pair<double, double>(aepf, cpv));
+                    tot_cad += p1->cad;
+                    tot_cad_points++;
+                }
             }
         }
 
@@ -599,7 +601,7 @@ PfPvPlot::recalc()
 
     if (maxAEPF > 600) {
 
-        setAxisScale(yLeft, 0, maxAEPF * 1.1); // a bit of headroom
+        setAxisScale(yLeft, 0, maxAEPF < 2500 ? maxAEPF * 1.1 : 2500); // a bit of headroom
         tiqMarker[0]->setYValue(maxAEPF);
         tiqMarker[1]->setYValue(maxAEPF);
 
