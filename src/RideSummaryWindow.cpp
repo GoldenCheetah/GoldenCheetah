@@ -269,7 +269,7 @@ RideSummaryWindow::htmlSummary() const
                  if ((symbol == "average_temp" || symbol == "max_temp") && metrics.getForSymbol(symbol) == RideFile::noTemp)
                     s = s.arg(ride->getTag("Temperature", "-"));
                  else
-                    s = s.arg(metrics.getForSymbol(symbol) * (metricUnits ? 1 : m->conversion()), 0, 'f', m->precision() + (metricUnits ? 0 : m->conversionSum()));
+                    s = s.arg(metrics.getForSymbol(symbol) * (metricUnits ? 1 : m->conversion()) + (metricUnits ? 0 : m->conversionSum()), 0, 'f', m->precision());
             }
 
             summary += s;
