@@ -50,8 +50,9 @@
 // 31  22  Nov 2011 Mark Liversedge    Added Average WPK metric
 // 32  9th Dec 2011 Damien Grauser     Temperature data flag (metadata field 'Data')
 // 33  17  Dec 2011 Damien Grauser     Added ResponseIndex and EfficiencyFactor
+// 34  15  Jan 2012 Mark Liversedge    Added Average and Max Temperature and Metric->conversionSum()
 
-static int DBSchemaVersion = 33;
+static int DBSchemaVersion = 34;
 
 DBAccess::DBAccess(MainWindow* main, QDir home) : main(main), home(home)
 {

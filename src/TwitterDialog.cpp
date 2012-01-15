@@ -158,7 +158,7 @@ static QString metricToString(const RideMetric *m, SummaryMetrics &metrics)
         s = s.arg(time_to_string(metrics.getForSymbol(m->symbol())));
         s = s.arg(""); // no units
     } else {
-        s = s.arg(metrics.getForSymbol(m->symbol()) * (metricUnits ? 1 : m->conversion()), 0, 'f', m->precision());
+        s = s.arg(metrics.getForSymbol(m->symbol()) * (metricUnits ? 1 : m->conversion()), 0, 'f', m->precision() + (metricUnits ? 0 : m->conversionSum()));
         s = s.arg(m->units(metricUnits));
     }
     return s;

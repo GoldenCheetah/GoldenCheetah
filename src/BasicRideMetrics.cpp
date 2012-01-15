@@ -371,6 +371,49 @@ static bool avgCadenceAdded =
 
 //////////////////////////////////////////////////////////////////////////////
 
+struct AvgTemp : public RideMetric {
+
+    double total, count;
+
+    AvgTemp()
+    {
+        setSymbol("average_temp");
+        setName(tr("Average Temp"));
+        setMetricUnits(tr("C"));
+        setImperialUnits(tr("F"));
+        setPrecision(1);
+        setConversion(FAHRENHEIT_PER_CENTIGRADE);
+        setConversionSum(FAHRENHEIT_ADD_CENTIGRADE);
+        setType(RideMetric::Average);
+    }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const MainWindow *) {
+
+        if (ride->areDataPresent()->temp) {
+            total = count = 0;
+            foreach (const RideFilePoint *point, ride->dataPoints()) {
+                if (point->temp != RideFile::noTemp) {
+                    total += point->temp;
+                    ++count;
+                }
+            }
+            setValue(count > 0 ? total / count : count);
+            setCount(count);
+        } else {
+            setValue(RideFile::noTemp);
+            setCount(1);
+        }
+    }
+    RideMetric *clone() const { return new AvgTemp(*this); }
+};
+
+static bool avgTempAdded =
+    RideMetricFactory::instance().addMetric(AvgTemp());
+
+//////////////////////////////////////////////////////////////////////////////
+
 class MaxPower : public RideMetric {
     double max;
     public:
@@ -504,6 +547,51 @@ class MaxCadence : public RideMetric {
 
 static bool maxCadenceAdded =
     RideMetricFactory::instance().addMetric(MaxCadence());
+
+//////////////////////////////////////////////////////////////////////////////
+
+class MaxTemp : public RideMetric {
+    public:
+
+    MaxTemp()
+    {
+        setSymbol("max_temp");
+        setName(tr("Max Temp"));
+        setMetricUnits(tr("C"));
+        setImperialUnits(tr("F"));
+        setType(RideMetric::Peak);
+        setPrecision(1);
+        setConversion(FAHRENHEIT_PER_CENTIGRADE);
+        setConversionSum(FAHRENHEIT_ADD_CENTIGRADE);
+    }
+
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const MainWindow *) {
+
+        if (ride->areDataPresent()->temp) {
+            double max = 0.0;
+            foreach (const RideFilePoint *point, ride->dataPoints())
+                if (point->temp != RideFile::noTemp && point->temp > max) max = point->temp;
+
+            setValue(max);
+        } else {
+            setValue(RideFile::noTemp);
+        }
+    }
+
+    void aggregateWith(const RideMetric &other) {
+        assert(symbol() == other.symbol());
+        const MaxTemp &mc = dynamic_cast<const MaxTemp&>(other);
+
+        setValue(mc.value(true) > value(true) ? mc.value(true) : value(true));
+    }
+    RideMetric *clone() const { return new MaxTemp(*this); }
+};
+
+static bool maxTempAdded =
+    RideMetricFactory::instance().addMetric(MaxTemp());
 
 //////////////////////////////////////////////////////////////////////////////
 

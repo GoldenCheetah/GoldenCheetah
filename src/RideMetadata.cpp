@@ -594,6 +594,7 @@ FormField::editFinished()
             // convert from imperial to metric if needed
             if (!useMetricUnits) {
                 double value = text.toDouble() * (1/ meta->sp.rideMetric(definition.name)->conversion());
+                value -= meta->sp.rideMetric(definition.name)->conversionSum();
                 text = QString("%1").arg(value);
             }
 
@@ -694,6 +695,7 @@ FormField::metadataChanged()
                         // do we want imperial?
                         if (!useMetricUnits) {
                             double newvalue = value.toDouble() * meta->sp.rideMetric(definition.name)->conversion();
+                            newvalue -= meta->sp.rideMetric(definition.name)->conversionSum();
                             value = QString("%1").arg(newvalue);
                         }
                     }
