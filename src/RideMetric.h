@@ -46,6 +46,7 @@ struct RideMetric {
         // some sensible defaults
         aggregate_ = true;
         conversion_ = 1.0;
+        conversionSum_ = 0.0;
         precision_ = 0;
         type_ = Total;
         count_ = 1;
@@ -84,6 +85,8 @@ struct RideMetric {
 
     // Factor to multiple value to convert from metric to imperial
     virtual double conversion() const { return conversion_; }
+    // And sum for example Fahrenheit from CentigradE
+    virtual double conversionSum() const { return conversionSum_; }
 
     // Compute the ride metric from a file.
     virtual void compute(const RideFile *ride,
@@ -132,6 +135,7 @@ struct RideMetric {
     void setValue(double x) { value_ = x; }
     void setCount(double x) { count_ = x; }
     void setConversion(double x) { conversion_ = x; }
+    void setConversionSum(double x) { conversionSum_ = x; }
     void setPrecision(int x) { precision_ = x; }
     void setMetricUnits(QString x) { metricUnits_ = x; }
     void setImperialUnits(QString x) { imperialUnits_ = x; }
@@ -145,6 +149,7 @@ struct RideMetric {
         double  value_,
                 count_, // used when averaging
                 conversion_,
+                conversionSum_,
                 precision_;
 
         QString metricUnits_, imperialUnits_;

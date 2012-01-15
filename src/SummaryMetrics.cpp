@@ -70,7 +70,10 @@ SummaryMetrics::getStringForSymbol(QString symbol, bool UseMetric) const
         double value = getForSymbol(symbol);
 
         // metric imperial conversion
-        if (UseMetric == false) value *= m->conversion();
+        if (UseMetric == false) {
+            value *= m->conversion();
+            value += m->conversionSum();
+        }
 
         if (m->units(true) == "seconds") {
             // format time values...

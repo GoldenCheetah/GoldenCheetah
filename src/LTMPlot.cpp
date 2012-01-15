@@ -760,7 +760,10 @@ LTMPlot::createTODCurveData(LTMSettings *settings, MetricDetail metricDetail, QV
         // Special computed metrics (LTS/STS) have a null metric pointer
         if (metricDetail.metric) {
             // convert from stored metric value to imperial
-            if (useMetricUnits == false) value *= metricDetail.metric->conversion();
+            if (useMetricUnits == false) {
+                value *= metricDetail.metric->conversion();
+                value += metricDetail.metric->conversionSum();
+            }
 
             // convert seconds to hours
             if (metricDetail.metric->units(true) == "seconds") value /= 3600;
@@ -835,7 +838,10 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
         // Special computed metrics (LTS/STS) have a null metric pointer
         if (metricDetail.metric) {
             // convert from stored metric value to imperial
-            if (useMetricUnits == false) value *= metricDetail.metric->conversion();
+            if (useMetricUnits == false) {
+                value *= metricDetail.metric->conversion();
+                value += metricDetail.metric->conversionSum();
+            }
 
             // convert seconds to hours
             if (metricDetail.metric->units(true) == "seconds") value /= 3600;

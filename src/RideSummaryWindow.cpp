@@ -142,11 +142,17 @@ RideSummaryWindow::htmlSummary() const
         << "average_hr"
         << "average_cad";
 
+    // show temp if it is available
+    if (ride->areDataPresent()->temp || ride->getTag("Temperature", "-") != "-") averageColumn << "average_temp";
+
     QStringList maximumColumn = QStringList()
         << "max_speed"
         << "max_power"
         << "max_heartrate"
         << "max_cadence";
+
+    // show temp if it is available
+    if (ride->areDataPresent()->temp || ride->getTag("Temperature", "-") != "-") maximumColumn << "max_temp";
 
     QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
 
@@ -257,7 +263,13 @@ RideSummaryWindow::htmlSummary() const
              } else {
                  if (m->units(metricUnits) != "") s = s.arg(" (" + m->units(metricUnits) + ")");
                  else s = s.arg("");
-                 s = s.arg(metrics.getForSymbol(symbol) * (metricUnits ? 1 : m->conversion()), 0, 'f', m->precision());
+
+                 // temperature is a special case, if it is not present fall back to metadata tag
+                 // if that is not present then just display '-'
+                 if ((symbol == "average_temp" || symbol == "max_temp") && metrics.getForSymbol(symbol) == RideFile::noTemp)
+                    s = s.arg(ride->getTag("Temperature", "-"));
+                 else
+                    s = s.arg(metrics.getForSymbol(symbol) * (metricUnits ? 1 : m->conversion()), 0, 'f', m->precision() + (metricUnits ? 0 : m->conversionSum()));
             }
 
             summary += s;
