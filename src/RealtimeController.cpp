@@ -23,7 +23,7 @@
 
 // Abstract base class for Realtime device controllers
 
-RealtimeController::RealtimeController(TrainTool *parent, DeviceConfiguration *dc) : parent(parent), dc(dc)
+RealtimeController::RealtimeController(TrainTool *parent, DeviceConfiguration *dc) : QObject(parent), parent(parent), dc(dc)
 {
     if (dc != NULL)
     {

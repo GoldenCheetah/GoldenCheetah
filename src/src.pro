@@ -88,7 +88,7 @@ qwt3d {
     DEFINES += GC_HAVE_LIBUSB
     INCLUDEPATH += $${LIBUSB_INSTALL}/include
     SOURCES += LibUsb.cpp EzUsb.c Fortius.cpp FortiusController.cpp
-    HEADERS += LibUsb.h EzUsb.h Fortius.cpp FortiusController.h
+    HEADERS += LibUsb.h EzUsb.h Fortius.h FortiusController.h
 
     unix {
         LIBS += $${LIBUSB_INSTALL}/lib/libusb.a
@@ -161,7 +161,7 @@ SOURCES += ../qxt/src/qxtspanslider.cpp \
            ../qxt/src/qxtscheduleheaderwidget.cpp \
            ../qxt/src/qxtscheduleviewheadermodel_p.cpp \
            ../qxt/src/qxtscheduleitemdelegate.cpp \
-           ../qxt/src/qxtstyleoptionscheduleviewitem.cpp
+	   ../qxt/src/qxtstyleoptionscheduleviewitem.cpp
 
 include( ../qtsolutions/soap/qtsoap.pri )
 HEADERS += TPUpload.h TPUploadDialog.h TPDownload.h TPDownloadDialog.h
@@ -299,6 +299,7 @@ HEADERS += \
         RideNavigator.h \
         RideNavigatorProxy.h \
         RideWindow.h \
+	RunningAverage.h \
         SaveDialogs.h \
         SmallPlot.h \
         RideSummaryWindow.h \
@@ -480,6 +481,7 @@ SOURCES += \
         RideNavigator.cpp \
         RideSummaryWindow.cpp \
         RideWindow.cpp \
+	RunningAverage.cpp \
         SaveDialogs.cpp \
         ScatterPlot.cpp \
         ScatterWindow.cpp \
@@ -546,4 +548,3 @@ OTHER_FILES += \
     web/MapWindow.html \
     web/StreetViewWindow.html \
     web/Window.css
-
