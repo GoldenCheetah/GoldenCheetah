@@ -771,7 +771,7 @@ DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
     QTabWidget *tabs = new QTabWidget(this);
     QWidget *devs = new QWidget(this);
     tabs->addTab(devs, tr("Devices"));
-    QVBoxLayout *devLayout = new QVBoxLayout(devs);
+    QHBoxLayout *devLayout = new QHBoxLayout(devs);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(tabs);
@@ -779,55 +779,10 @@ DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
     DeviceTypes all;
     devices = all.getList();
 
-    nameLabel = new QLabel(tr("Device Name"),this);
-    deviceName = new QLineEdit(tr(""), this);
-
-    typeLabel = new QLabel(tr("Device Type"),this);
-    typeSelector = new QComboBox(this);
-    typeSelector->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLength);
-
-    for (int i=0; i< devices.count(); i++) {
-        DeviceType cur = devices.at(i);
-
-        // WARNING: cur.type is what is stored in configuration
-        //          do not change this!!
-        typeSelector->addItem(cur.name, cur.type);
-    }
-
-    specLabel = new QLabel(tr("Device Port"),this);
-    specHint = new QLabel();
-    profHint = new QLabel();
-    deviceSpecifier= new QLineEdit(tr(""), this);
-
-    profLabel = new QLabel(tr("Device Profile"),this);
-    deviceProfile = new QLineEdit(tr(""), this);
-
-    virtualPowerLabel = new QLabel(tr("Virtual Channel"), this);
-    virtualPower = new QComboBox(this);
-
-    // XXX NOTE: THESE MUST CORRESPOND TO THE CODE
-    //           IN RealtimeController.cpp WHICH
-    //           POST-PROCESSES INBOUND TELEMETRY
-    virtualPower->addItem("None");
-    virtualPower->addItem("Power - Kurt Kinetic Cyclone");
-    virtualPower->addItem("Power - Kurt Kinetic Road Machine");
-    virtualPower->addItem("Power - Cyclops Fluid 2");
-    virtualPower->addItem("Power - BT Advanced Training System");
-    virtualPower->addItem("Power - LeMond Revolution");
-    virtualPower->addItem("Power - 1UP USA Trainer");
-    virtualPower->setCurrentIndex(0);
-
-// THIS CODE IS DISABLED FOR THIS RELEASE XXX
-//    isDefaultDownload = new QCheckBox(tr("Default download device"), this);
-//    isDefaultRealtime = new QCheckBox(tr("Default realtime device"), this);
-
     addButton = new QPushButton(tr("Add"),this);
     delButton = new QPushButton(tr("Delete"),this);
-    pairButton = new QPushButton(tr("Pair"),this);
-    firmwareButton = new QPushButton(tr("Firmware"),this);
 
     deviceList = new QTableView(this);
-
     deviceListModel = new deviceModel(this);
 
     // replace standard model with ours
@@ -846,67 +801,19 @@ DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
     deviceList->setColumnWidth(2,130);
 
     leftLayout = new QGridLayout();
+    leftLayout->addWidget(deviceList);
+
     rightLayout = new QVBoxLayout();
-    inLayout = new QGridLayout();
-
-    leftLayout->addWidget(nameLabel, 0,0);
-    leftLayout->addWidget(deviceName, 0,2);
-    //leftLayout->setRowMinimumHeight(1,10);
-    leftLayout->addWidget(typeLabel, 1,0);
-    leftLayout->addWidget(typeSelector, 1,2);
-    QHBoxLayout *squeeze = new QHBoxLayout;
-    squeeze->addStretch();
-    leftLayout->addLayout(squeeze, 1,3);
-    //leftLayout->setRowMinimumHeight(3,10);
-    leftLayout->addWidget(specHint, 2,2);
-    leftLayout->addWidget(specLabel, 3,0);
-    leftLayout->addWidget(deviceSpecifier, 3,2);
-    //leftLayout->setRowMinimumHeight(6,10);
-    leftLayout->addWidget(profHint, 4,2);
-    leftLayout->addWidget(profLabel, 5,0);
-    leftLayout->addWidget(deviceProfile, 5,2);
-    leftLayout->setColumnMinimumWidth(1,10);
-    leftLayout->addWidget(virtualPowerLabel, 6,0);
-    leftLayout->addWidget(virtualPower, 6,2);
-
-// THIS CODE IS DISABLED FOR THIS RELEASE XXX
-//    leftLayout->addWidget(isDefaultDownload, 6,1);
-//    leftLayout->addWidget(isDefaultRealtime, 8,1);
-
-//    leftLayout->setRowStretch(0, 2);
-//    leftLayout->setRowStretch(1, 1);
-//    leftLayout->setRowStretch(2, 2);
-//    leftLayout->setRowStretch(3, 1);
-//    leftLayout->setRowStretch(4, 2);
-//    leftLayout->setRowStretch(5, 1);
-//    leftLayout->setRowStretch(6, 2);
-//    leftLayout->setRowStretch(7, 1);
-//    leftLayout->setRowStretch(8, 2);
-
     rightLayout->addWidget(addButton);
-    rightLayout->addSpacing(10);
     rightLayout->addWidget(delButton);
     rightLayout->addStretch();
-    rightLayout->addWidget(firmwareButton);
-    rightLayout->addWidget(pairButton);
 
-    inLayout->addItem(leftLayout, 0,0);
-    inLayout->addItem(rightLayout, 0,1);
-
-    devLayout->addLayout(inLayout);
-    devLayout->addWidget(deviceList);
+    devLayout->addLayout(leftLayout);
+    devLayout->addLayout(rightLayout);
 
     multiCheck = new QCheckBox("Allow multiple devices in Train View", this);
     multiCheck->setChecked(appsettings->value(this, TRAIN_MULTI, false).toBool());
-    devLayout->addWidget(multiCheck);
-
-    devLayout->setStretch(0,0);
-    devLayout->setStretch(1,99);
-    devLayout->setStretch(2,0);
-
-    // to make sure the default checkboxes have been set appropiately...
-    // THIS CODE IS DISABLED IN THIS RELEASE XXX
-    // isDefaultRealtime->setEnabled(false);
+    leftLayout->addWidget(multiCheck);
 
     setConfigPane();
 }
@@ -914,82 +821,7 @@ DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
 void
 DevicePage::setConfigPane()
 {
-    // depending upon the type of device selected
-    // the spec hint tells the user the format they should use
-    DeviceTypes Supported;
-
-    // sorry... ;-) obfuscated c++ contest winner 2009
-    switch (Supported.getType(typeSelector->itemData(typeSelector->currentIndex()).toInt()).connector) {
-
-    case DEV_QUARQ:
-        specHint->show();
-        specLabel->show();
-        deviceSpecifier->show();
-        specHint->setText("hostname:port");
-        profHint->setText("antid 1, antid 2 ...");
-        profHint->show();
-        profLabel->show();
-        deviceProfile->show();
-        break;
-
-    case DEV_SERIAL:
-#ifdef WIN32
-        specHint->setText("COMx");
-#else
-        specHint->setText("/dev/xxxx");
-#endif
-        specHint->show();
-        specLabel->show();
-        deviceSpecifier->show();
-        profHint->hide();
-        profLabel->hide();
-        deviceProfile->hide();
-        break;
-
-    case DEV_TCP:
-        specHint->show();
-        specLabel->show();
-        deviceSpecifier->show();
-        specHint->setText("hostname:port");
-        profHint->hide();
-        profLabel->hide();
-        deviceProfile->hide();
-        break;
-
-    case DEV_USB:
-        specHint->hide();
-        specLabel->hide();
-        deviceSpecifier->hide();
-        profHint->setText("antid 1, antid 2 ...");
-        profHint->show();
-        profLabel->show();
-        deviceProfile->show();
-        break;
-
-    case DEV_LIBUSB:
-        specHint->hide();
-        specLabel->hide();
-        deviceSpecifier->hide();
-        profHint->setText("antid 1, antid 2 ...");
-        profHint->hide();
-        profLabel->hide();
-        deviceProfile->hide();
-        break;
-    }
-
-    int type = Supported.getType(typeSelector->itemData(typeSelector->currentIndex()).toInt()).type;
-
-    // pair button only valid for ANT+ (Quarqd or Native)
-    if (type == DEV_ANTLOCAL || type == DEV_ANTPLUS) {
-        profHint->show();
-        profLabel->show();
-        pairButton->show();
-        deviceProfile->show();
-    } else pairButton->hide();
-
-    // pair button only valid for ANT+ (Quarqd or Native)
-    if (type == DEV_FORTIUS) firmwareButton->show();
-    else firmwareButton->hide();
+    // does nothing for now.
 }
 
 
@@ -1040,9 +872,6 @@ deviceModel::del()
 void
 DevicePage::pairClicked(DeviceConfiguration *dc, QProgressDialog *progress)
 {
-    ANTplusController ANTplus(0, dc);
-    ANTplus.discover(dc, progress);
-    deviceProfile->setText(dc->deviceProfile);
 }
 
 deviceModel::deviceModel(QObject *parent) : QAbstractTableModel(parent)

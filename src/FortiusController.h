@@ -37,6 +37,8 @@ public:
     int restart();                              // restart after paused
     int pause();                                // pauses data collection, inbound telemetry is discarded
     int stop();                                 // stops data collection thread
+
+    bool find();
     bool discover(DeviceConfiguration *);              // tell if a device is present at port passed
 
 

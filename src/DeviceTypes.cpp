@@ -29,21 +29,43 @@
 static DeviceType SupportedDevices[] =
 {
 #ifdef Q_OS_WIN32
-      { DEV_ANTLOCAL, DEV_USB,     (char *) "Native ANT+",           true,    false },
+      { DEV_ANTLOCAL, DEV_USB,     (char *) "Native ANT+",            true,    false,
+        "ANT+ devices such as SRM, Powertap or Quarq power meters, Heart rate belts, "
+        "speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick",
+        ":images/devices/garminusb.png" },
 #else
-      { DEV_ANTLOCAL, DEV_SERIAL,  (char *) "Native ANT+",           true,    false },
+      { DEV_ANTLOCAL, DEV_SERIAL,  (char *) "Native ANT+",           true,    false,
+        "ANT+ devices such as SRM, Powertap or Quarq power meters, Heart rate belts, "
+        "speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick" ,
+        ":images/devices/garminusb.png" },
 #endif
-      { DEV_CT,       DEV_SERIAL,  (char *) "Racermate Computrainer",true,    false },
+      { DEV_CT,       DEV_SERIAL,  (char *) "Racermate Computrainer",true,    false,
+        "Racermate Computrainer Lab or Pro bike trainer with the handlebar controller "
+        "connected via a USB adaptor or directly connected to a local serial port." ,
+        ":images/devices/computrainer.png"                                        },
 #ifdef GC_HAVE_LIBUSB
-      { DEV_FORTIUS,  DEV_LIBUSB,  (char *) "Tacx Fortius",          true,    false },
+      { DEV_FORTIUS,  DEV_LIBUSB,  (char *) "Tacx Fortius",          true,    false,
+        "Tacx Fortius/iMagic bike trainer with the handlebar controller connected "
+        "to a USB port. Please make sure you have device firmware to hand." ,
+        ":images/devices/fortius.png" },
 #endif
-      { DEV_GSERVER,  DEV_TCP,     (char *) "Golden Cheetah Server", false,   false },
-      { DEV_NULL,     DEV_TCP,     (char *) "Null device (testing)", false,   false },
-      { DEV_ANTPLUS,  DEV_QUARQ,   (char *) "ANT+ via Quarqd",       true,    false },
+#if 0
+      { DEV_GSERVER,  DEV_TCP,     (char *) "Golden Cheetah Server", false,   false,
+        "Golden Cheetah racing server, not curently supported."                     },
+      { DEV_NULL,     DEV_TCP,     (char *) "Null device (testing)", false,   false,
+        "Testing device used for development only."                                 }.
+#endif
+#if 0 // deprecated, but keeping code until at least 3.1
+      { DEV_ANTPLUS,  DEV_QUARQ,   (char *) "ANT+ via Quarqd",       true,    false,
+        "ANT+ devices such as SRM, Powertap or Quarq power meters, Heart rate belts, "
+        "speed or cadence meters via an existing Quarqd server" ,
+        ":images/devices/quarqd.png" },
+#endif
+
 //    { DEV_PT,       DEV_SERIAL,  (char *) "Powertap Head Unit",    false,   true  },
 //    { DEV_SRM,      DEV_SERIAL,  (char *) "SRM PowerControl V/VI", false,   true  },
 //    { DEV_GCLIENT,  DEV_TCP,     (char *) "Golden Cheetah Client", false,   false },
-      { 0, 0, NULL, 0, 0 }
+      { 0, 0, NULL, 0, 0, "", "" }
 };
 
 DeviceTypes::DeviceTypes()

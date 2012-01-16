@@ -22,7 +22,7 @@
 
 ComputrainerController::ComputrainerController(TrainTool *parent,  DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
-    myComputrainer = new Computrainer (parent, dc->portSpec);
+    myComputrainer = new Computrainer (parent, dc ? dc->portSpec : ""); // we may get NULL passed when configuring
 }
 
 
@@ -55,7 +55,10 @@ ComputrainerController::stop()
 
 
 bool
-ComputrainerController::discover(DeviceConfiguration *) {return false; } // NOT IMPLEMENTED YET
+ComputrainerController::discover(QString name)
+{
+    return myComputrainer->discover(name);  // go probe it...
+}
 
 
 bool ComputrainerController::doesPush() { return false; }

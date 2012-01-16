@@ -69,7 +69,7 @@ class ANTMessage {
         static ANTMessage close(const unsigned char channel);
 
         // convert a channel event message id to human readable string
-        const char * channelEventMessage(unsigned char c);
+        static const char * channelEventMessage(unsigned char c);
 
         // to avoid a myriad of tedious set/getters the data fields
         // are plain public members. This is unlikely to change in the

@@ -152,10 +152,16 @@ class ANTChannel : public QObject {
         void broadcastEvent(unsigned char *message);
         void ackEvent(unsigned char *message);
         void channelId(unsigned char *message);
+        void setChannelID(int device, int id, int txtype);
         void setId();
         void requestCalibrate();
         void attemptTransition(int message_code);
-        int setTimeout(char *type, float value, int connection);
+        int setTimeout(int seconds);
+
+        // telemetry for this channel
+        double channelValue() { return value; }
+        double channelValue2() { return value2; }
+        double value,value2; // used during config, rather than rtData
 
         // search
         int isSearching();
@@ -170,7 +176,7 @@ class ANTChannel : public QObject {
     signals:
 
         void channelInfo(int number, int device_number, int device_id); // we got a channel info message
-        void dropInfo(int number);    // we dropped a packet
+        void dropInfo(int number, int dropped, int received);    // we dropped a packet
         void lostInfo(int number);    // we lost a connection
         void staleInfo(int number);   // the connection is stale
         void searchTimeout(int number); // search timed out

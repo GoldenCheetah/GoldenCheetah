@@ -328,8 +328,24 @@ find_devices(char *result[], int capacity)
     DIR *dirp;
     struct dirent *dp;
     int count = 0;
+
+    // updated serial regexp to include many more serial devices, regardless of whether they are
+    // relevant for PT downloads. The original list was rather restrictive in this respect
+    //
+    // To help decode this regexp;
+    // /dev/cu.PL2303-[0-9A-F]+        - Prolific device driver for USB/serial device
+    // /dev/ANTUSBStick.slabvcp        - Silicon Labs Virtual Com driver for Garmin USB1 stick on a Mac
+    // /dev/SLAB_USBtoUART             - Silicon Labs Driver for USB/Serial
+    // /dev/usbmodem[0-9A-F]+          - Usb modem module driver (generic)
+    // /dev/usbserial-[0-9A-F]+        - usbserial module driver (generic)
+    // /dev/KeySerial[0-9]             - Keyspan USB/Serial driver
+    // /dev/ttyUSB[0-9]                - Standard USB/Serial device on Linux/Mac
+    // /dev/ttyS[0-2]                  - Serial TTY, 0-2 is restrictive, but noone has complained yet!
+    // /dev/ttyACM*                    - ACM converter, admittidly used largely for Mobiles
+    // /dev/ttyMI*                     - MOXA PCI cards
+    // /dev/rfcomm*                    - Bluetooth devices
     if (regcomp(&reg, 
-                "^(cu\\.(PL2303-[0-9A-F]+|SLAB_USBtoUART|usbmodem[0-9A-F]+|usbserial-[0-9A-F]+|KeySerial[0-9])|ttyUSB[0-9]|ttyS[0-2])$",
+                "^(cu\\.(PL2303-[0-9A-F]+|ANTUSBStick.slabvcp|SLAB_USBtoUART|usbmodem[0-9A-F]+|usbserial-[0-9A-F]+|KeySerial[0-9])|ttyUSB[0-9]|ttyS[0-2]|ttyACM*|ttyMI*|rfcomm*)$",
                 REG_EXTENDED|REG_NOSUB)) {
         assert(0);
     }

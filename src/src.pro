@@ -178,6 +178,7 @@ HEADERS += ../qxt/src/qxtspanslider.h \
            ../qxt/src/qxtstyleoptionscheduleviewitem.h
 
 HEADERS += \
+        AddDeviceWizard.h \
         Aerolab.h \
         AerolabWindow.h \
         AthleteTool.h \
@@ -349,6 +350,7 @@ LEXSOURCES = JsonRideFile.l WithingsParser.l
 #QMAKE_YACCFLAGS = -t -d
 
 SOURCES += \
+        AddDeviceWizard.cpp \
         AerobicDecoupling.cpp \
         Aerolab.cpp \
         AerolabWindow.cpp \

@@ -24,12 +24,12 @@
 
 // Abstract base class for Realtime device controllers
 
-
 #ifndef _GC_ANTlocalController_h
 #define _GC_ANTlocalController_h 1
 
 class ANTlocalController : public RealtimeController
 {
+    Q_OBJECT
 
 public:
     ANTlocalController (TrainTool *parent =0, DeviceConfiguration *dc =0);
@@ -40,14 +40,32 @@ public:
     int restart();                              // restart after paused
     int pause();                                // pauses data collection, inbound telemetry is discarded
     int stop();                                 // stops data collection thread
-    bool discover(DeviceConfiguration *dc =0, QProgressDialog *progress = 0);
+
+    int channels() { return myANTlocal->channelCount(); }
+    void setChannel(int channel, int device_number, int device_type) {
+        myANTlocal->setChannel(channel,device_number,device_type); // using QQueue
+    }
+    double channelValue(int channel) { return myANTlocal->channelValue(channel); }
+    double channelValue2(int channel) { return myANTlocal->channelValue2(channel); }
+
+    bool find();
+    bool discover(QString name);
+    void setDevice(QString);
 
     // telemetry push pull
     bool doesPush(), doesPull(), doesLoad();
     void getRealtimeData(RealtimeData &rtData);
     void pushRealtimeData(RealtimeData &rtData);
     void setLoad(double) { return; }
+
+signals:
+    void foundDevice(int channel, int device_number, int device_id); // channelInfo
+    void lostDevice(int channel);            // dropInfo
+    void searchTimeout(int channel);         // searchTimeount
+
+private:
+    QQueue<setChannelAtom> channelQueue;
+    
 };
 
 #endif // _GC_ANTlocalController_h
-

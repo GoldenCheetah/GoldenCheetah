@@ -273,34 +273,10 @@ class DevicePage : public QWidget
 
         QList<DeviceType> devices;
 
-        // GUI Elements
-        QGroupBox *deviceGroup;
-        QLabel *nameLabel;
-        QLineEdit *deviceName;
-
-        QLabel *typeLabel;
-        QComboBox *typeSelector;
-
-        QLabel *specLabel;
-        QLabel *specHint;   // hints at the format for a port spec
-        QLabel *profHint;   // hints at the format for profile info
-        QLineEdit *deviceSpecifier;
-
-        QLabel *profLabel;
-        QLineEdit *deviceProfile;
-
-        QCheckBox *isDefaultDownload;
-        QCheckBox *isDefaultRealtime;
-
-        QLabel *virtualPowerLabel; // do we compute power using an algorithm?
-        QComboBox *virtualPower;
-
         QTableView *deviceList;
 
         QPushButton *addButton;
         QPushButton *delButton;
-        QPushButton *pairButton;
-        QPushButton *firmwareButton;
 
         QGridLayout *leftLayout;
         QVBoxLayout *rightLayout;

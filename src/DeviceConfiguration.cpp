@@ -31,8 +31,8 @@ DeviceConfiguration::DeviceConfiguration()
 {
     // just set all to empty!
     type=0;
-    isDefaultDownload=false;
-    isDefaultRealtime=false;
+    defaultString="";
+    wheelSize=2100;
     postProcess=0;
     controller=NULL;
 }
@@ -86,17 +86,17 @@ DeviceConfigurations::readConfig()
             configVal = appsettings->value(NULL, configStr);
             Entry.type = configVal.toInt();
 
+            configStr = QString("%1%2").arg(GC_DEV_WHEEL).arg(i+1);
+            configVal = appsettings->value(NULL, configStr);
+            Entry.wheelSize = configVal.toInt();
+
             configStr = QString("%1%2").arg(GC_DEV_PROF).arg(i+1);
             configVal = appsettings->value(NULL, configStr);
             Entry.deviceProfile = configVal.toString();
 
-            configStr = QString("%1%2").arg(GC_DEV_DEFI).arg(i+1);
+            configStr = QString("%1%2").arg(GC_DEV_DEF).arg(i+1);
             configVal = appsettings->value(NULL, configStr);
-            Entry.isDefaultDownload = configVal.toInt();
-
-            configStr = QString("%1%2").arg(GC_DEV_DEFR).arg(i+1);
-            configVal = appsettings->value(NULL, configStr);
-            Entry.isDefaultRealtime = configVal.toInt();
+            Entry.defaultString = configVal.toString();
 
             configStr = QString("%1%2").arg(GC_DEV_VIRTUAL).arg(i+1);
             configVal = appsettings->value(NULL, configStr);
@@ -124,6 +124,10 @@ DeviceConfigurations::writeConfig(QList<DeviceConfiguration> Configuration)
         // type
         configStr = QString("%1%2").arg(GC_DEV_TYPE).arg(i+1);
         appsettings->setValue(configStr, Configuration.at(i).type);
+        
+        // wheel size
+        configStr = QString("%1%2").arg(GC_DEV_WHEEL).arg(i+1);
+        appsettings->setValue(configStr, Configuration.at(i).wheelSize);
 
         // portSpec
         configStr = QString("%1%2").arg(GC_DEV_SPEC).arg(i+1);
@@ -133,13 +137,9 @@ DeviceConfigurations::writeConfig(QList<DeviceConfiguration> Configuration)
         configStr = QString("%1%2").arg(GC_DEV_PROF).arg(i+1);
         appsettings->setValue(configStr, Configuration.at(i).deviceProfile);
 
-        // isDefaultDownload
-        configStr = QString("%1%2").arg(GC_DEV_DEFI).arg(i+1);
-        appsettings->setValue(configStr, Configuration.at(i).isDefaultDownload);
-
-        // isDefaultRealtime
-        configStr = QString("%1%2").arg(GC_DEV_DEFR).arg(i+1);
-        appsettings->setValue(configStr, Configuration.at(i).isDefaultRealtime);
+        // default string
+        configStr = QString("%1%2").arg(GC_DEV_DEF).arg(i+1);
+        appsettings->setValue(configStr, Configuration.at(i).defaultString);
 
         // virtual post Process...
         configStr = QString("%1%2").arg(GC_DEV_VIRTUAL).arg(i+1);

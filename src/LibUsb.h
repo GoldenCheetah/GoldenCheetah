@@ -57,10 +57,14 @@ public:
     void close();
     int read(char *buf, int bytes);
     int write(char *buf, int bytes);
+    bool find();
 private:
 
     struct usb_dev_handle* OpenAntStick();
     struct usb_dev_handle* OpenFortius();
+    bool findAntStick();
+    bool findFortius();
+
     struct usb_interface_descriptor* usb_find_interface(struct usb_config_descriptor* config_descriptor);
     struct usb_dev_handle* device;
     struct usb_interface_descriptor* intf;

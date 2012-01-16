@@ -25,8 +25,16 @@
 ANTlocalController::ANTlocalController(TrainTool *parent, DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
     myANTlocal = new ANT (parent, dc);
+    connect(myANTlocal, SIGNAL(foundDevice(int,int,int)), this, SIGNAL(foundDevice(int,int,int)));
+    connect(myANTlocal, SIGNAL(lostDevice(int)), this, SIGNAL(lostDevice(int)));
+    connect(myANTlocal, SIGNAL(searchTimeout(int)), this, SIGNAL(searchTimeout(int)));
 }
 
+void
+ANTlocalController::setDevice(QString device)
+{
+    myANTlocal->setDevice(device);
+}
 
 int
 ANTlocalController::start()
@@ -56,11 +64,16 @@ ANTlocalController::stop()
     return myANTlocal->stop();
 }
 
+bool
+ANTlocalController::find()
+{
+    return myANTlocal->find();
+}
 
 bool
-ANTlocalController::discover(DeviceConfiguration *dc, QProgressDialog *progress)
+ANTlocalController::discover(QString name)
 {
-    return myANTlocal->discover(dc, progress);
+    return myANTlocal->discover(name);
 }
 
 

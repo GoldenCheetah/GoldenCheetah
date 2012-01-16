@@ -72,7 +72,7 @@ class Fortius : public QThread
 {
 
 public:
-    Fortius(QObject *parent=0, QString deviceFilename=0);       // pass device
+    Fortius(QObject *parent=0);       // pass device
     ~Fortius();
 
     QObject *parent;
@@ -83,6 +83,8 @@ public:
     int pause();                                // pauses data collection, inbound telemetry is discarded
     int stop();                                 // stops data collection thread
     int quit(int error);                        // called by thread before exiting
+
+    bool find();                                // either unconfigured or configured device found
     bool discover(QString deviceFilename);        // confirm CT is attached to device
 
     // SET

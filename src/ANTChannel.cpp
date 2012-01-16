@@ -43,6 +43,7 @@ ANTChannel::init()
     product_id=0;
     product_version=0;
     device_number=0;
+    device_id=0;
     channel_assigned=0;
     state=ANT_UNASSIGN_CHANNEL;
     blanked=1;
@@ -51,6 +52,7 @@ ANTChannel::init()
     setId();
     srm_offset=400; // default relatively arbitrary, but matches common 'indoors' values
     burstInit();
+    value2=value=0;
 }
 
 //
@@ -94,11 +96,13 @@ void ANTChannel::open(int device, int chan_type)
 
     setId();
 
+#if 0
     if (channel_assigned) {
         parent->sendMessage(ANTMessage::unassignChannel(number));
     } else {
+#endif
         attemptTransition(ANT_UNASSIGN_CHANNEL);
-    }
+    //}
 }
 
 // close an ant channel assignment
@@ -107,6 +111,7 @@ void ANTChannel::close()
     emit lostInfo(number);
     lastMessage = ANTMessage();
     parent->sendMessage(ANTMessage::close(number));
+    init();
 }
 
 //
@@ -140,6 +145,7 @@ void ANTChannel::receiveMessage(unsigned char *ant_message)
     if (get_timestamp() > blanking_timestamp + timeout_blanking) {
         if (!blanked) {
             blanked=1;
+            value2=value=0;
             emit staleInfo(number);
         }
     } else blanked=0;
@@ -152,6 +158,8 @@ void ANTChannel::receiveMessage(unsigned char *ant_message)
 void ANTChannel::channelEvent(unsigned char *ant_message) {
 
     unsigned char *message=ant_message+2;
+
+//qDebug()<<"channel event:"<< ANTMessage::channelEventMessage(*(message+1));
 
     if (MESSAGE_IS_RESPONSE_NO_ERROR(message)) {
 
@@ -178,6 +186,7 @@ void ANTChannel::channelEvent(unsigned char *ant_message) {
             channel_type=CHANNEL_TYPE_UNUSED;
             channel_type_flags=0;
             device_number=0;
+            value2=value=0;
             setId();
 
             parent->sendMessage(ANTMessage::unassignChannel(number));
@@ -191,7 +200,7 @@ void ANTChannel::channelEvent(unsigned char *ant_message) {
         double t=get_timestamp();
 
         if (t > (last_message_timestamp + timeout_drop)) {
-            if (channel_type != CHANNEL_TYPE_UNUSED) emit dropInfo(number);
+            if (channel_type != CHANNEL_TYPE_UNUSED) emit dropInfo(number, messages_dropped, messages_received);
             // this is a hacky way to prevent the drop message from sending multiple times
             last_message_timestamp+=2*timeout_drop;
         }
@@ -244,7 +253,6 @@ void ANTChannel::sendCinqoSuccess() {}
 //
 void ANTChannel::broadcastEvent(unsigned char *ant_message)
 {
-
     ANTMessage antMessage(parent, ant_message);
     bool savemessage = true; // flag to stop lastmessage being
                              // overwritten for standard power
@@ -256,15 +264,21 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
     messages_received++;
     last_message_timestamp=timestamp;
 
-    if (state != MESSAGE_RECEIVED) {
-        //qDebug()<<"state not equal to message received";
-        // first message! who are we talking to?
+    if (messages_received <= 1) {
+
+        // this is mega important! -- when we get broadcast data from a device
+        // we ask it to identify itself, then when the channel id message is
+        // received we set our channel id to that received. So, if the message
+        // below is not sent, we will never set channel properly.
+
+        // The recent bug with not being able to "pair" intermittently, was caused
+        // by the write below failing (and any write really, but the one below being
+        // pretty critical) -- because the USB stick needed a USB reset which we know
+        // do every time we open the USB device
         parent->sendMessage(ANTMessage::requestMessage(number, ANT_CHANNEL_ID));
         blanking_timestamp=get_timestamp();
         blanked=0;
         return; // because we can't associate a channel id with the message yet
-    } else {
-        //qDebug()<<"state IS equal to message received";
     }
 
     // for automatically opening quarq channel on early cinqo
@@ -324,6 +338,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                                 srm_offset = antMessage.srmOffset;
                                 is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
                                 parent->setCadence(0);
+                                value2=value=0;
                                 break;
 
                             case 0x02: // slope
@@ -365,6 +380,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 
                         // ignore the occassional spikes XXX is this a boundary error on event count ?
                         if (power >= 0 && power < 2501 && cadence >=0 && cadence < 256) {
+                            value2 = value = power;
                             is_alt ? parent->setAltWatts(power) : parent->setWatts(power);
                             parent->setCadence(cadence);
                         }
@@ -375,6 +391,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                         //antMessage.type = 0; // we need a new data pair XXX bad!!!
 
                         if (nullCount >= 4) { // 4 messages on an SRM
+                            value2 = value = 0;
                             is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
                             parent->setCadence(0);
                         }
@@ -399,6 +416,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                         float wheelRPM = 2048.0 * 60.0 * events / period;
                         float power = 3.14159 * nm_torque * wheelRPM / 30;
 
+                        value2 = value = power;
                         parent->setWheelRpm(wheelRPM);
                         is_alt ? parent->setAltWatts(power) : parent->setWatts(power);
 
@@ -407,6 +425,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 
                         if (nullCount >= 4) { // 4 messages on Powertap ? XXX validate this
                             parent->setWheelRpm(0);
+                            value2 = value = 0;
                             is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
                         }
                     }
@@ -425,6 +444,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 {
                     if (lastStdPwrMessage.type != 0) {
                         is_alt ? parent->setAltWatts(antMessage.instantPower) : parent->setWatts(antMessage.instantPower);
+                        value2 = value = antMessage.instantPower;
                         parent->setCadence(antMessage.instantCadence); // cadence
                     }
                     lastStdPwrMessage = antMessage;
@@ -451,12 +471,14 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 
                         parent->setCadence(cadence);
                         is_alt ? parent->setAltWatts(power) : parent->setWatts(power);
+                        value2 = value = power;
 
                     } else {
                         nullCount++;
                         if (nullCount >= 4) { //XXX 4 on a quarq??? validate this
                             parent->setCadence(0);
                             is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
+                            value2 = value = 0;
                         }
                     }
                 }
@@ -475,9 +497,13 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                if (time) {
                    nullCount = 0;
                    parent->setBPM(antMessage.instantHeartrate);
+                   value2 = value = antMessage.instantHeartrate;
                } else {
                    nullCount++;
-                   if (nullCount >= 12) parent->setBPM(0); // 12 according to the docs
+                   if (nullCount >= 12) {
+                        parent->setBPM(0); // 12 according to the docs
+                        value2 = value = 0;
+                    }
                }
            }
            break;
@@ -490,6 +516,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                if (time) {
                    float cadence = 1024*60*revs / time;
                    parent->setCadence(cadence);
+                   value2 = value = cadence;
                }
            }
            break;
@@ -504,9 +531,12 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    nullCount = 0;
                    float cadence = 1024*60*revs / time;
                    parent->setCadence(cadence);
+                   value = cadence;
                } else {
                    nullCount++;
-                   if (nullCount >= 12) parent->setCadence(0);
+                   if (nullCount >= 12) { parent->setCadence(0);
+                                          value = 0;
+                    }
                }
 
                // now speed ...
@@ -517,10 +547,14 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 
                    float rpm = 1024*60*revs / time;
                    parent->setWheelRpm(rpm);
+                   value2 = rpm;
                } else {
 
                     dualNullCount++;
-                    if (dualNullCount >= 12) parent->setWheelRpm(0);
+                    if (dualNullCount >= 12) {
+                        parent->setWheelRpm(0);
+                        value2 = 0;
+                    }
                }
            }
            break;
@@ -534,9 +568,11 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    nullCount=0;
                    float rpm = 1024*60*revs / time;
                    parent->setWheelRpm(rpm);
+                   value2=value=rpm;
                } else {
                    nullCount++;
                    if (nullCount >= 12) parent->setWheelRpm(0);
+                   value2=value=0;
                }
            }
            break;
@@ -549,6 +585,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 
             // reset nullCount if receiving first telemetry update
             dualNullCount = nullCount = 0;
+            value2 = value = 0;
         }
 
         // we don't overwrite for Standard Power messages
@@ -570,9 +607,8 @@ void ANTChannel::channelId(unsigned char *ant_message) {
     device_number=CHANNEL_ID_DEVICE_NUMBER(message);
     device_id=CHANNEL_ID_DEVICE_TYPE_ID(message);
     state=MESSAGE_RECEIVED;
-
-    setId();
     emit channelInfo(number, device_number, device_id);
+    setId();
 
     // if we were searching,
     if (channel_type_flags & CHANNEL_TYPE_QUICK_SEARCH) {
@@ -629,6 +665,13 @@ void ANTChannel::burstData(unsigned char *ant_message) {
     }
 }
 
+// choose this one..
+void ANTChannel::setChannelID(int device_number, int device_id, int txtype)
+{
+    parent->sendMessage(ANTMessage::setChannelID(number, device_number, device_id, 0)); // lets go back to allowing anything
+    parent->sendMessage(ANTMessage::open(number)); // lets go back to allowing anything
+}
+
 void ANTChannel::attemptTransition(int message_id)
 {
 
@@ -651,21 +694,16 @@ void ANTChannel::attemptTransition(int message_id)
 
     case ANT_UNASSIGN_CHANNEL:
         channel_assigned=0;
-        if (st->type==CHANNEL_TYPE_UNUSED) {
-            // we're shutting the channel down
-        } else {
-            device_id=st->device_id;
-            if (channel_type & CHANNEL_TYPE_PAIR) {
-                device_id |= 0x80;
-            }
-            setId();
-            parent->sendMessage(ANTMessage::assignChannel(number, 0, st->network)); // recieve channel on network 1
 
-            // commented out since newer host controllers do not exhibit this issue
-            // but may be relevant for Arduino/Sparkfun guys, but we don't really support
-            // those devices anyway as they are too slow
-            // parent->sendMessage(ANTMessage::boostSignal(number)); // "boost" signal on REV C AP2 devices
-        }
+        // lets make sure this channel is assigned to our network
+        // regardless of its current state.
+        parent->sendMessage(ANTMessage::unassignChannel(number)); // unassign whatever we had before
+
+        // reassign to whatever we need!
+        parent->sendMessage(ANTMessage::assignChannel(number, 0, st->network)); // recieve channel on network 1
+        device_id=st->device_id;
+        parent->sendMessage(ANTMessage::setChannelID(number, 0, device_id, 0)); // lets go back to allowing anything
+        setId();
         break;
 
     case ANT_ASSIGN_CHANNEL:
@@ -702,6 +740,7 @@ void ANTChannel::attemptTransition(int message_id)
         break;
 
     case ANT_OPEN_CHANNEL:
+        parent->sendMessage(ANTMessage::open(number));
         break;
 
     default:
@@ -709,8 +748,11 @@ void ANTChannel::attemptTransition(int message_id)
     }
 }
 
-// refactored out XXX fix this
-int ANTChannel::setTimeout(char * /*type*/, float /*value*/, int /*connection*/) { return 0; }
+// set channel timeout
+int ANTChannel::setTimeout(int seconds)
+{
+    parent->sendMessage(ANTMessage::setSearchTimeout(number, seconds/2.5));
+}
 
 #if 0 // ARE NOW SIGNALS
 // These should emit signals to notify the channel manager

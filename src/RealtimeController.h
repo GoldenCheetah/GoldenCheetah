@@ -28,8 +28,10 @@
 #define DEVICE_ERROR 1
 #define DEVICE_OK 0
 
-class RealtimeController
+class RealtimeController : public QObject
 {
+    Q_OBJECT
+
 public:
     TrainTool *parent;                     // for push devices
 
@@ -40,7 +42,10 @@ public:
     virtual int restart();                              // restart after paused
     virtual int pause();                                // pauses data collection, inbound telemetry is discarded
     virtual int stop();                                 // stops data collection thread
-    virtual bool discover(char *pathname);              // tell if a device is present at port passed
+
+    // for auto-configuration
+    virtual bool find();                                // tell if the device is present (usb typically)
+    virtual bool discover(QString);              // tell if a device is present at serial port passed
 
     // push or pull telemetry
     virtual bool doesPush();                    // this device is a push device (e.g. Quarq)

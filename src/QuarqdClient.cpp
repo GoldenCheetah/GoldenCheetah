@@ -46,9 +46,11 @@ QuarqdClient::QuarqdClient(QObject *parent, DeviceConfiguration *devConf) : QThr
 {
     Status=0;
     // server hostname and TCP port#
-    deviceHostname = devConf->portSpec.section(':',0,0).toAscii(); // after the colon
-    devicePort = (int)QString(devConf->portSpec).section(':',1,1).toInt(); // after the colon
-    antIDs = devConf->deviceProfile.split(",");
+    if (devConf) {
+        deviceHostname = devConf->portSpec.section(':',0,0).toAscii(); // after the colon
+        devicePort = (int)QString(devConf->portSpec).section(':',1,1).toInt(); // after the colon
+        antIDs = devConf->deviceProfile.split(",");
+    }
     lastReadWatts = 0;
     lastReadCadence = 0;
     lastReadSpeed = 0;
