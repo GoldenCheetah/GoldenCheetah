@@ -74,6 +74,13 @@
 #define FORMAT_ID__ALTITUDE 39
 #define FORMAT_ID__THRESHOLD_POWER 40
 
+#define FORMAT_ID__UNKNOW_41 41
+#define FORMAT_ID__UNKNOW_42 42
+#define FORMAT_ID__UNKNOW_43 43
+#define FORMAT_ID__UNKNOW_44 44
+#define FORMAT_ID__UNKNOW_45 45
+#define FORMAT_ID__UNKNOW_46 46
+#define FORMAT_ID__UNKNOW_47 47
 
 static int binFileReaderRegistered =
     RideFileFactory::instance().registerReader(
@@ -172,6 +179,14 @@ struct BinFileReaderState
             global_format_identifiers.insert(FORMAT_ID__RAW_BARO_SENSOR,  "Raw Baro Sensor Value");
             global_format_identifiers.insert(FORMAT_ID__ALTITUDE,  "Altitude");
             global_format_identifiers.insert(FORMAT_ID__THRESHOLD_POWER,  "Threshold power");
+
+            global_format_identifiers.insert(FORMAT_ID__UNKNOW_41,  "Unknow 41");
+            global_format_identifiers.insert(FORMAT_ID__UNKNOW_42,  "Unknow 42");
+            global_format_identifiers.insert(FORMAT_ID__UNKNOW_43,  "Unknow 43");
+            global_format_identifiers.insert(FORMAT_ID__UNKNOW_44,  "Unknow 44");
+            global_format_identifiers.insert(FORMAT_ID__UNKNOW_45,  "Unknow 45");
+            global_format_identifiers.insert(FORMAT_ID__UNKNOW_46,  "Unknow 46");
+            global_format_identifiers.insert(FORMAT_ID__UNKNOW_47,  "Unknow 47");
         }
     }
 
@@ -369,6 +384,12 @@ struct BinFileReaderState
                     case FORMAT_ID__THRESHOLD_POWER :
                         deviceInfo += QString("Threshold Power %1W\n").arg(value);
                         break;
+                    case FORMAT_ID__UNKNOW_41 :
+                        break;
+                    case FORMAT_ID__UNKNOW_42 :
+                        break;
+                    case FORMAT_ID__UNKNOW_43 :
+                        break;
 
                     default:
                         unexpected_format_identifiers_for_record_types[def.format_identifier].insert(field.id);
@@ -424,6 +445,14 @@ struct BinFileReaderState
                            break;
                     case FORMAT_ID__ALTITUDE_OLD :
                         alt = value/10.0;
+                        break;
+                    case FORMAT_ID__UNKNOW_44 :
+                        break;
+                    case FORMAT_ID__UNKNOW_45 :
+                        break;
+                    case FORMAT_ID__UNKNOW_46 :
+                        break;
+                    case FORMAT_ID__UNKNOW_47 :
                         break;
                     default:
                         unexpected_format_identifiers_for_record_types[def.format_identifier].insert(field.id);
