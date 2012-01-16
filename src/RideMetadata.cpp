@@ -259,6 +259,10 @@ FormField::FormField(FieldDefinition field, MainWindow *main, RideMetadata *meta
             widget = main->rideNotesWidget();
         } else {
             widget = new QTextEdit(this);
+
+            // rich text hangs 'fontd' for some users
+            dynamic_cast<QTextEdit*>(widget)->setAcceptRichText(false);
+
             if (field.name == "Change History") {
                 dynamic_cast<QTextEdit*>(widget)->setReadOnly(true);
                 // pick up when ride saved - since it gets updated then
