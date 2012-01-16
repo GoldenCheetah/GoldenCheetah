@@ -702,7 +702,7 @@ void TrainTool::Start()       // when start button is pressed
         // and reset connection to device
         // this appeara to help with ANT USB2 sticks
 #ifdef GC_HAVE_LIBUSB
-        usb_init();
+        //usb_init(); //XXX lets not its a clusterfuck
 #endif
 
         // if we have selected multiple devices lets

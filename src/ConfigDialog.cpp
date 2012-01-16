@@ -8,6 +8,8 @@
 #include "Settings.h"
 #include "Zones.h"
 
+#include "AddDeviceWizard.h"
+
 
 /* cyclist dialog protocol redesign:
  * no zones:
@@ -82,11 +84,8 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
 
     fortiusFirmware = appsettings->value(this, FORTIUS_FIRMWARE, "").toString();
     connect(closeButton, SIGNAL(clicked()), this, SLOT(accept()));
-    connect(devicePage->typeSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(changedType(int)));
     connect(devicePage->addButton, SIGNAL(clicked()), this, SLOT(devaddClicked()));
-    connect(devicePage->firmwareButton, SIGNAL(clicked()), this, SLOT(firmwareClicked()));
     connect(devicePage->delButton, SIGNAL(clicked()), this, SLOT(devdelClicked()));
-    connect(devicePage->pairButton, SIGNAL(clicked()), this, SLOT(devpairClicked()));
     connect(contentsWidget, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
             this, SLOT(changePage(QListWidgetItem *, QListWidgetItem*)));
     connect(saveButton, SIGNAL(clicked()), this, SLOT(save_Clicked()));
@@ -234,82 +233,10 @@ void
 ConfigDialog::devaddClicked()
 {
     DeviceConfiguration add;
-    DeviceTypes Supported;
-
-    // get values from the gui elements
-    add.name = devicePage->deviceName->displayText();
-    add.type = devicePage->typeSelector->itemData(devicePage->typeSelector->currentIndex()).toInt();
-    add.portSpec = devicePage->deviceSpecifier->displayText();
-    add.deviceProfile = devicePage->deviceProfile->displayText();
-    add.postProcess = devicePage->virtualPower->currentIndex();
-
-    // NOT IMPLEMENTED IN THIS RELEASE XXX
-    //add.isDefaultDownload = devicePage->isDefaultDownload->isChecked() ? true : false;
-    //add.isDefaultRealtime = devicePage->isDefaultDownload->isChecked() ? true : false;
-
-    // Validate the name
-    QRegExp nameSpec(".+");
-    if (nameSpec.exactMatch(add.name) == false) {
-        QMessageBox::critical(0, "Invalid Device Name",
-                QString("Device Name should be non-blank"));
-        return ;
+    AddDeviceWizard *p = new AddDeviceWizard(mainWindow, add);
+    if (p->exec() == QDialog::Accepted) {
+        devicePage->deviceListModel->add(add);
     }
-
-    // Validate the portSpec
-    QRegExp antSpec("[^:]*:[^:]*");         // ip:port same as TCP ... for now...
-    QRegExp tcpSpec("[^:]*:[^:]*");         // ip:port
-#ifdef WIN32
-    QRegExp serialSpec("COM[0-9]*");      // COMx for WIN32, /dev/* for others
-#else
-    QRegExp serialSpec("/dev/.*");      // COMx for WIN32, /dev/* for others
-#endif
-
-    // check the portSpec is valid, based upon the connection type
-    switch (Supported.getType(add.type).connector) {
-        case DEV_QUARQ :
-            if (antSpec.exactMatch(add.portSpec) == false) {
-                QMessageBox::critical(0, "Invalid Port Specification",
-                QString("For ANT devices the specifier must be ") +
-                        "hostname:portnumber");
-                return ;
-            }
-            break;
-        case DEV_SERIAL :
-            if (serialSpec.exactMatch(add.portSpec) == false) {
-                QMessageBox::critical(0, "Invalid Port Specification",
-                QString("For Serial devices the specifier must be ") +
-#ifdef WIN32
-                        "COMn"
-#else
-                        "/dev/xxxxx"
-#endif
-                );
-                return ;
-            }
-            break;
-
-        case DEV_LIBUSB :
-
-            // Is the fortius firmware configured?
-            if (add.type == DEV_FORTIUS && fortiusFirmware == "") {
-                QMessageBox::critical(0, "Fortius Firmware",
-                QString("For Fortius devices you must import the firmware ") +
-                        "using the Firmware button.");
-                return ;
-            }
-            break;
-
-        case DEV_TCP :
-            if (tcpSpec.exactMatch(add.portSpec) == false) {
-                QMessageBox::critical(0, "Invalid Port Specification",
-                QString("For TCP streaming devices the specifier must be ") +
-                        "hostname:portnumber");
-                return ;
-            }
-            break;
-    }
-
-    devicePage->deviceListModel->add(add);
 }
 
 void
@@ -321,28 +248,13 @@ ConfigDialog::devdelClicked()
 void
 ConfigDialog::devpairClicked()
 {
-    DeviceConfiguration add;
-
-    // get values from the gui elements
-    add.name = devicePage->deviceName->displayText();
-    add.type = devicePage->typeSelector->itemData(devicePage->typeSelector->currentIndex()).toInt();
-    add.portSpec = devicePage->deviceSpecifier->displayText();
-    add.deviceProfile = devicePage->deviceProfile->displayText();
-
-    QProgressDialog *progress = new QProgressDialog("Looking for Devices...", "Abort Scan", 0, 200, this);
-    progress->setWindowModality(Qt::WindowModal);
-
-    devicePage->pairClicked(&add, progress);
+    // replaced by wizard.
 }
 
 void
 ConfigDialog::firmwareClicked()
 {
-    // we need to set the firmware for this device
-    QString current = fortiusFirmware;
-
-    FortiusDialog *p = new FortiusDialog(mainWindow, fortiusFirmware);
-    p->exec();
+    // replaced by wizard
 }
 
 //

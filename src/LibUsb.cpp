@@ -53,9 +53,6 @@ int LibUsb::open()
     // Find all connected devices.
     usb_find_devices();
 
-    readBufSize = 0;
-    readBufIndex = 0;
-
     switch (type) {
 
     // Search USB busses for USB2 ANT+ stick host controllers
@@ -76,9 +73,26 @@ int LibUsb::open()
     return 0;
 }
 
+bool LibUsb::find()
+{
+    usb_set_debug(0);
+    usb_find_busses();
+    usb_find_devices();
+
+    switch (type) {
+
+    // Search USB busses for USB2 ANT+ stick host controllers
+    default:
+    case TYPE_ANT: return findAntStick();
+              break;
+
+    case TYPE_FORTIUS: return findFortius();
+              break;
+    }
+}
+
 void LibUsb::close()
 {
-
     if (device) {
         // stop any further write attempts whilst we close down
         usb_dev_handle *p = device;
@@ -109,14 +123,16 @@ int LibUsb::read(char *buf, int bytes)
     }
 
     // No, so partially satisfy by emptying the buffer, then refill the buffer for the rest
-    if (bufRemain) {
+    // !!! CHECK bufRemain > 0 rather than non-zero fixes annoying bug with ANT+
+    //     devices not working again after restart "sometimes"
+    if (bufRemain > 0) {
         memcpy(buf, readBuf+readBufIndex, bufRemain);
     }
 
     readBufSize = 0;
     readBufIndex = 0;
 
-    int rc = usb_bulk_read(device, readEndpoint, readBuf, 64, 125);
+    int rc = usb_bulk_read(device, readEndpoint, readBuf, 64, 10);
     if (rc < 0)
     {
         // don't report timeouts - lots of noise so commented out
@@ -161,11 +177,41 @@ int LibUsb::write(char *buf, int bytes)
 
     if (rc < 0)
     {
-        // don't report timeouts - lots of noise
-        if (rc != -110) qDebug()<<"usb_interrupt_write Error writing: "<< usb_strerror();
+        // Report timeouts - previously we ignored -110 errors. This masked a serious
+        // problem with write on Linux/Mac, the USB stick needed a reset to avoid
+        // these error messages, so we DO report them now
+        // XXX if (rc != -110) qDebug()<<"usb_interrupt_write Error writing: "<< usb_strerror();
+        qDebug()<<"usb_interrupt_write Error writing ["<<rc<<"]: "<< usb_strerror();
     }
 
     return rc;
+}
+
+bool LibUsb::findFortius()
+{
+    struct usb_bus* bus;
+    struct usb_device* dev;
+
+    bool found = false;
+
+    //
+    // Search for an UN-INITIALISED Fortius device
+    //
+    for (bus = usb_get_busses(); bus; bus = bus->next) {
+
+
+        for (dev = bus->devices; dev; dev = dev->next) {
+
+
+            if (dev->descriptor.idVendor == FORTIUS_VID && dev->descriptor.idProduct == FORTIUS_INIT_PID) {
+                found = true;
+            }
+            if (dev->descriptor.idVendor == FORTIUS_VID && dev->descriptor.idProduct == FORTIUS_PID) {
+                found = true;
+            }
+        }
+    }
+    return found;
 }
 
 // Open connection to a Tacx Fortius
@@ -298,11 +344,45 @@ struct usb_dev_handle* LibUsb::OpenFortius()
     return NULL;
 }
 
+bool LibUsb::findAntStick()
+{
+    struct usb_bus* bus;
+    struct usb_device* dev;
+    bool found = false;
+    for (bus = usb_get_busses(); bus; bus = bus->next) {
+
+        for (dev = bus->devices; dev; dev = dev->next) {
+
+            if (dev->descriptor.idVendor == GARMIN_USB2_VID && dev->descriptor.idProduct == GARMIN_USB2_PID) {
+                found = true;
+            }
+        }
+    }
+    return found;
+}
+
 struct usb_dev_handle* LibUsb::OpenAntStick()
 {
     struct usb_bus* bus;
     struct usb_device* dev;
     struct usb_dev_handle* udev;
+
+// for Mac and Linux we do a bus reset on it first...
+#ifndef WIN32
+    for (bus = usb_get_busses(); bus; bus = bus->next) {
+
+        for (dev = bus->devices; dev; dev = dev->next) {
+
+            if (dev->descriptor.idVendor == GARMIN_USB2_VID && dev->descriptor.idProduct == GARMIN_USB2_PID) {
+
+                if ((udev = usb_open(dev))) {
+                    usb_reset(udev);
+                    usb_close(udev);
+                }
+            }
+        }
+    }
+#endif
 
     for (bus = usb_get_busses(); bus; bus = bus->next) {
 

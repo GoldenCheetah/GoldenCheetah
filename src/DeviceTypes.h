@@ -49,6 +49,8 @@ class DeviceType
     char *name;         // narrative name
     bool realtime;      // can it do realtime
     bool download;      // can it do download?
+    QString description; // tell me about it
+    QString image;      // filename for image
 };
 
 class DeviceTypes

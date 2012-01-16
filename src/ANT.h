@@ -33,6 +33,7 @@
 #include <QThread>
 #include <QMutex>
 #include <QObject>
+#include <QQueue>
 #include <QStringList>
 #include <QTime>
 #include <QProgressDialog>
@@ -87,6 +88,7 @@ typedef struct ant_sensor_type {
   int network;
   const char *descriptive_name;
   char suffix;
+  const char *iconname;
 
 } ant_sensor_type_t;
 
@@ -100,6 +102,15 @@ static inline double get_timestamp( void ) {
   return tv.tv_sec * 1.0 + tv.tv_usec * 1.0e-6;
 }
 
+
+struct setChannelAtom {
+    setChannelAtom() : channel(0), device_number(0), channel_type(0) {}
+    setChannelAtom(int x, int y, int z) : channel(x), device_number(y), channel_type(z) {}
+
+    int channel;
+    int device_number;
+    int channel_type;
+};
 
 //======================================================================
 // ANT Constants
@@ -164,7 +175,7 @@ static inline double get_timestamp( void ) {
 #define ANT_KEY_LENGTH       8
 #define ANT_MAX_BURST_DATA   8
 #define ANT_MAX_MESSAGE_SIZE 12
-#define ANT_MAX_CHANNELS     4
+#define ANT_MAX_CHANNELS     8
 
 // Channel messages
 #define RESPONSE_NO_ERROR               0
@@ -241,6 +252,8 @@ signals:
     void foundDevice(int channel, int device_number, int device_id); // channelInfo
     void lostDevice(int channel);            // dropInfo
     void searchTimeout(int channel);         // searchTimeount
+    void searchComplete(int channel);         // searchComplete
+    void signalStrength(int channel, double reliability);
 
 public slots:
 
@@ -251,19 +264,32 @@ public slots:
     int stop();                                 // stops data collection thread
     int quit(int error);                        // called by thread before exiting
 
-    // channel management
-    bool discover(DeviceConfiguration *, QProgressDialog *);              // confirm Server available at portSpec
+    // configuration and channel management
+    bool isConfiguring() { return configuring; }
+    void setConfigurationMode(bool x) { configuring = x; }
+    void setChannel(int channel, int device_number, int channel_type) {
+        channelQueue.enqueue(setChannelAtom(channel, device_number, channel_type));
+    }
+    bool find();                              // find usb device
+    bool discover(QString name);              // confirm Server available at portSpec
+
+    int channelCount() { return channels; }   // how many channels we got available?
     void channelInfo(int number, int device_number, int device_id);  // found a device
-    void dropInfo(int number);    // we dropped a connection
+    void dropInfo(int number, int drops, int received);    // we dropped a connection
     void lostInfo(int number);    // we lost informa
     void staleInfo(int number);   // info is now stale
     void slotSearchTimeout(int number); // search timed out
-    void searchComplete(int number); // search completed successfully
+    void slotSearchComplete(int number); // search completed successfully
 
     // get telemetry
     void getRealtimeData(RealtimeData &);             // return current realtime data
 
 public:
+
+    static int interpretSuffix(char c); // utility to convert e.g. 'c' to CHANNEL_TYPE_CADENCE
+    static const char *deviceTypeDescription(int type); // utility to convert CHANNEL_TYPE_XXX to human string
+    static char deviceTypeCode(int type); // utility to convert CHANNEL_TYPE_XXX to 'c', 'p' et al
+    static char deviceIdCode(int type); // utility to convert CHANNEL_TYPE_XXX to 'c', 'p' et al
 
     // debug enums
     enum { DEBUG_LEVEL_ERRORS=1,
@@ -300,6 +326,8 @@ public:
     int rawWrite(uint8_t *bytes, int size);
 
     // channels update our telemetry
+    double channelValue(int channel);
+    double channelValue2(int channel);
     void setBPM(float x) {
         telemetry.setHr(x);
     }
@@ -320,13 +348,12 @@ public:
 private:
 
     void run();
-    static int interpretSuffix(char c); // utility to convert e.g. 'c' to CHANNEL_TYPE_CADENCE
-    static const char *deviceTypeDescription(int type); // utility to convert CHANNEL_TYPE_XXX to human string
-    static char deviceTypeCode(int type); // utility to convert CHANNEL_TYPE_XXX to 'c', 'p' et al
 
     RealtimeData telemetry;
     QMutex pvars;  // lock/unlock access to telemetry data between thread and controller
     int Status;     // what status is the client in?
+    bool configuring; // set to true if we're in configuration mode.
+    int channels;  // how many 4 or 8 ? depends upon the USB stick...
 
     // access to device file
     QString deviceFilename;
@@ -360,6 +387,8 @@ private:
     int bytes;
     int checksum;
     int powerchannels; // how many power channels do we have?
+
+    QQueue<setChannelAtom> channelQueue; // messages for configuring channels from controller
 
     // antlog.bin ant message stream
     QFile antlog;

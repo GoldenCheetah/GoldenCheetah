@@ -1004,8 +1004,10 @@ int Computrainer::rawRead(uint8_t bytes[], int size)
 // returns true if the device exists and false if not
 bool Computrainer::discover(QString filename)
 {
-    uint8_t *greeting = (uint8_t *)"Racermate";
+    bool returning = false;
+    uint8_t *greeting = (uint8_t *)"RacerMate";
     uint8_t handshake[7];
+    int rc;
 
     if (filename.isEmpty()) return false; // no null filenames thanks
 
@@ -1016,10 +1018,18 @@ bool Computrainer::discover(QString filename)
     openPort();
 
     // send a probe
-    if (rawWrite(greeting, 9) == -1) return false;
+    if ((rc=rawWrite(greeting, 9)) == -1) {
+        closePort();
+        return false;
+    }
 
     // did we get something back from the device?
-    if (rawRead(handshake, 6) != 6) return false;
+    if ((rc=rawRead(handshake, 6)) != 6) {
+        closePort();
+        return false;
+    }
+
+    closePort();
 
     handshake[6] = '\0';
 

@@ -37,10 +37,9 @@ class DeviceConfiguration
                                 // used by ANT to store ANTIDs
                                 // available for use by all devices
 
-    bool isDefaultDownload,     // not implemented yet
-         isDefaultRealtime;     // not implemented yet
-
-    int  postProcess;
+    QString defaultString;      // PHCS for power/heartrate/cadence/speed from this device
+    int  wheelSize;             // set wheel size for each device
+    int  postProcess;           // virtualChannel
 
     RealtimeController *controller; // can be used to allocate controller for this device
                                     // although a bit odd, it makes synchronising the config

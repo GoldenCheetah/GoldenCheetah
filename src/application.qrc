@@ -1,5 +1,9 @@
 <!DOCTYPE RCC><RCC version="1.0">
  <qresource>
+    <file>images/devices/garminusb.png</file>
+    <file>images/devices/computrainer.png</file>
+    <file>images/devices/fortius.png</file>
+    <file>images/devices/quarqd.png</file>
     <file>images/toolbar/main/togglefull.png</file>
     <file>images/toolbar/main/hideside.png</file>
     <file>images/toolbar/main/normal.png</file>

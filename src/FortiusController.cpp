@@ -22,7 +22,7 @@
 
 FortiusController::FortiusController(TrainTool *parent,  DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
-    myFortius = new Fortius (parent, dc->portSpec);
+    myFortius = new Fortius (parent);
 }
 
 
@@ -53,6 +53,11 @@ FortiusController::stop()
     return myFortius->stop();
 }
 
+bool
+FortiusController::find()
+{
+    return myFortius->find(); // needs to find either unconfigured or configured device
+}
 
 bool
 FortiusController::discover(DeviceConfiguration *) {return false; } // NOT IMPLEMENTED YET

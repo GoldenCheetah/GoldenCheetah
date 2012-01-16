@@ -46,7 +46,7 @@ const static uint8_t slope_command[12] = {
 /* ----------------------------------------------------------------------
  * CONSTRUCTOR/DESRTUCTOR
  * ---------------------------------------------------------------------- */
-Fortius::Fortius(QObject *parent,  QString) : QThread(parent)
+Fortius::Fortius(QObject *parent) : QThread(parent)
 {
 
     devicePower = deviceHeartRate = deviceCadence = deviceSpeed = 0.00;
@@ -492,6 +492,11 @@ int Fortius::closePort()
 {
     usb2->close();
     return 0;
+}
+
+bool Fortius::find()
+{
+    return usb2->find();
 }
 
 int Fortius::openPort()

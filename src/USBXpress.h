@@ -38,6 +38,7 @@ public:
     static int close(HANDLE *handle);
     static int read(HANDLE *handle, unsigned char *buf, int bytes);
     static int write(HANDLE *handle, unsigned char *buf, int bytes);
+    static bool find();
 };
 
 #endif // WIN32

@@ -42,7 +42,8 @@ int RealtimeController::start() { return 0; }
 int RealtimeController::restart() { return 0; }
 int RealtimeController::pause() { return 0; }
 int RealtimeController::stop() { return 0; }
-bool RealtimeController::discover(char *) { return false; }
+bool RealtimeController::find() { return false; }
+bool RealtimeController::discover(QString) { return false; }
 bool RealtimeController::doesPull() { return false; }
 bool RealtimeController::doesPush() { return false; }
 bool RealtimeController::doesLoad() { return false; }
