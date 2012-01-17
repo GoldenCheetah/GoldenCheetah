@@ -176,12 +176,19 @@ MediaHelper::listMedia(QDir dir)
         supported << QString(".%1").arg(type); // .xxx added
     }
 
-    // whizz through every file in the directory
-    // if it has the right extension then we are happy
-    foreach(QString name, dir.entryList()) {
+    // go through the sub directories
+    QDirIterator directory_walker(dir, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
 
+    while(directory_walker.hasNext()){
+        directory_walker.next();
+        // whizz through every file in the directory
+        // if it has the right extension then we are happy
+        QString name = directory_walker.filePath();
         foreach(QString extension, supported) {
             if (name.endsWith(extension, Qt::CaseInsensitive)) {
+                name.remove(dir.absolutePath());
+                if(name.startsWith('/') || name.startsWith('\\')) // remove '/' (linux/mac) or '\' (windows?)
+                    name.remove(0,1);
                 returning << name;
                 break;
             }
