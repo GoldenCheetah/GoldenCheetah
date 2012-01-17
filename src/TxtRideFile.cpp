@@ -63,6 +63,7 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors) const
     int hrIndex = -1;
     int kmIndex = -1;
     int kphIndex = -1;
+    int milesIndex = -1;
     int wattsIndex = -1;
     int headwindIndex = -1;
 
@@ -138,6 +139,7 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors) const
                 cadIndex = headings.indexOf("rpm");
                 hrIndex = headings.indexOf("hr");
                 kmIndex = headings.indexOf("KM");
+                milesIndex = headings.indexOf("miles");
                 kphIndex = headings.indexOf("speed");
                 headwindIndex = headings.indexOf("wind");
                 continue;
@@ -155,7 +157,14 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors) const
             double hr = hrIndex > -1 ? values[hrIndex].toDouble() : 0.0;
             double km = kmIndex > -1 ? values[kmIndex].toDouble() : 0.0;
             double kph = kphIndex > -1 ? values[kphIndex].toDouble() : 0.0;
+            double miles = milesIndex > -1 ? values[milesIndex].toDouble() : 0.0;
             double headwind = headwindIndex > -1 ? values[headwindIndex].toDouble() : 0.0;
+
+            if (miles != 0) {
+                // imperial!
+                kph *= KM_PER_MILE;
+                km = miles * KM_PER_MILE;
+            }
             rideFile->appendPoint(secs, cad, hr, km, kph, 0.0, watts, 0.0, 0.0, 0.0, headwind, 0);
 
         }
