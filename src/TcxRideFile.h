@@ -20,10 +20,12 @@
 #ifndef _TcxRideFile_h
 #define _TcxRideFile_h
 
+#include "MainWindow.h"
 #include "RideFile.h"
 
 struct TcxFileReader : public RideFileReader {
     virtual RideFile *openRideFile(QFile &file, QStringList &errors) const;
+    virtual bool writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile &file) const;
 };
 
 #endif // _TcxRideFile_h

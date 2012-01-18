@@ -133,6 +133,7 @@ class MainWindow : public QMainWindow
         void downloadRide();
         void manualRide();
         void exportPWX();
+        void exportTCX();
         void exportCSV();
         void exportGC();
 #ifdef GC_HAVE_KML

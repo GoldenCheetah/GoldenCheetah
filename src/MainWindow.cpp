@@ -33,6 +33,7 @@
 #include "KmlRideFile.h"
 #endif
 #include "PwxRideFile.h"
+#include "TcxRideFile.h"
 #include "LTMWindow.h"
 #include "PfPvWindow.h"
 #include "DownloadRideDialog.h"
@@ -394,6 +395,8 @@ MainWindow::MainWindow(const QDir &home) :
 #endif
     rideMenu->addAction(tr("Export to PWX..."), this,
                         SLOT(exportPWX()));
+    rideMenu->addAction(tr("Export to TCX..."), this,
+                        SLOT(exportTCX()));
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Save ride"), this,
                         SLOT(saveRide()), tr("Ctrl+S"));
@@ -712,6 +715,26 @@ MainWindow::exportPWX()
     QFile file(fileName);
     PwxFileReader reader;
     reader.writeRideFile(home.dirName() /* cyclist name */, currentRide(), file);
+}
+
+void
+MainWindow::exportTCX()
+{
+    if ((treeWidget->selectedItems().size() != 1)
+        || (treeWidget->selectedItems().first()->type() != RIDE_TYPE)) {
+        QMessageBox::critical(this, tr("Select Ride"), tr("No ride selected!"));
+        return;
+    }
+
+    QString fileName = QFileDialog::getSaveFileName(
+        this, tr("Export TCX"), QDir::homePath(), tr("TCX (*.tcx)"));
+    if (fileName.length() == 0)
+        return;
+
+    QString err;
+    QFile file(fileName);
+    TcxFileReader reader;
+    reader.writeRideFile(this, currentRide(), file);
 }
 
 void
