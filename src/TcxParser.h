@@ -31,8 +31,7 @@ class TcxParser : public QXmlDefaultHandler
 public:
     TcxParser(RideFile* rideFile);
 
-    bool startElement( const QString&, const QString&, const QString&,
-		       const QXmlAttributes& );
+    bool startElement( const QString&, const QString&, const QString&, const QXmlAttributes& );
     bool endElement( const QString&, const QString&, const QString& );
 
     bool characters( const QString& );
@@ -48,18 +47,21 @@ private:
     QDateTime	start_time;
     QDateTime	last_time;
     QDateTime	time;
-    double	lastDistance;
+    double	last_distance;
     double	distance;
 
     int		lap;
     double	power;
     double	cadence;
     double	hr;
+    double      speed;
+    double      torque;
     double      lastAltitude;
     double      alt;
     double      lat;
     double      lon;
     double      headwind;
+    double      secs;
 };
 
 #endif // _TcxParser_h
