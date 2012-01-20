@@ -278,7 +278,7 @@
     <message>
         <location filename="../BasicRideMetrics.cpp" line="287"/>
         <source>Average Power</source>
-        <translation>Durchschnittliche Leistung</translation>
+        <translation>ø Leistung</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="288"/>
@@ -292,7 +292,7 @@
     <message>
         <location filename="../BasicRideMetrics.cpp" line="238"/>
         <source>Average Speed</source>
-        <translation>Durchschnittliche Geschwindigkeit</translation>
+        <translation>ø Geschwindigkeit</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="239"/>
@@ -699,7 +699,7 @@
     <message>
         <location filename="../Pages.cpp" line="84"/>
         <source>Crank Length:</source>
-        <translation type="unfinished">Kurbelarmlänge (cm):</translation>
+        <translation>Kurbelarmlänge (cm):</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="123"/>
@@ -887,17 +887,17 @@ Dies kann einige Zeit benötigen.
     <message>
         <location filename="../CriticalPowerWindow.cpp" line="74"/>
         <source>&amp;Save CP value</source>
-        <translation>&amp;Speicher CP Wert</translation>
+        <translation>CP Wert &amp;speichern</translation>
     </message>
     <message>
         <location filename="../CriticalPowerWindow.cpp" line="79"/>
         <source>Y Axis Shows Power</source>
-        <translation>&quot;Leistung&quot; auf der y-Achsen</translation>
+        <translation>Leistung (W) auf der y-Achse</translation>
     </message>
     <message>
         <location filename="../CriticalPowerWindow.cpp" line="80"/>
         <source>Y Axis Shows Energy</source>
-        <translation>&quot;Energie&quot; auf der y-Achsen</translation>
+        <translation>Arbeit (KJ) auf der y-Achse</translation>
     </message>
     <message>
         <location filename="../CriticalPowerWindow.cpp" line="154"/>
@@ -1485,7 +1485,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../BasicRideMetrics.cpp" line="154"/>
         <source>Elevation Gain</source>
-        <translation>Höhenmeter</translation>
+        <translation>Aufstieg</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="156"/>
@@ -3373,7 +3373,7 @@ Fahrer CP wurde auf %3 Watt gesetzt.</translation>
     <message>
         <location filename="../MainWindow.cpp" line="1352"/>
         <source>&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;Build date: %1 %2&lt;p&gt;Version: %3&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Ride files and other data are stored in&lt;br&gt;&lt;a href=&quot;%4&quot;&gt;%5&lt;/a&gt;&lt;/center&gt;</source>
-        <translation type="unfinished">&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Leistungsanalyse Software für Radsportler&lt;br&gt;unter Linux, Mac und Windows&lt;p&gt;Erstell am: %1 %2&lt;p&gt;Version: %3&lt;p&gt;Deutsche Bearbeitung: &lt;a href=&quot;mailto:goldencheetah@trainingdigital.info?subject=Feedback%20zu%20GoldenCheetah&quot;&gt;Alexander Pietsch&lt;/a&gt;&lt;p&gt;GoldenCheetah ist lizensiert unter&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Quellcode erhältlich unter&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Fahrer und alle anderen Daten werden gespeichert unter&lt;br&gt;&lt;a href=&quot;%4&quot;&gt;%5&lt;/a&gt;&lt;/center&gt;</translation>
+        <translation>&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Leistungsanalyse Software für Radsportler&lt;br&gt;unter Linux, Mac und Windows&lt;p&gt;Erstell am: %1 %2&lt;p&gt;Version: %3&lt;p&gt;Deutsche Bearbeitung: &lt;a href=&quot;mailto:goldencheetah@trainingdigital.info?subject=Feedback%20zu%20GoldenCheetah&quot;&gt;Alexander Pietsch&lt;/a&gt;&lt;p&gt;GoldenCheetah ist lizensiert unter&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Quellcode erhältlich unter&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Fahrer und alle anderen Daten werden gespeichert unter&lt;br&gt;&lt;a href=&quot;%4&quot;&gt;%5&lt;/a&gt;&lt;/center&gt;</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1434"/>
@@ -3481,7 +3481,7 @@ Fahrer CP wurde auf %3 Watt gesetzt.</translation>
     <message>
         <location filename="../ManualRideDialog.cpp" line="103"/>
         <source>Average HR: </source>
-        <translation>Durchschnittliche Herzfrequenz: </translation>
+        <translation>ø Herzfrequenz: </translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="109"/>
@@ -5541,7 +5541,7 @@ angeschaltet ist und im Display &quot;Host&quot; anzeigt.</translation>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="88"/>
         <source>Device Type: </source>
-        <translation>Gerätetyp:</translation>
+        <translation>Gerätetyp: </translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="100"/>
@@ -5551,7 +5551,7 @@ angeschaltet ist und im Display &quot;Host&quot; anzeigt.</translation>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="100"/>
         <source>Averages</source>
-        <translation>Durchschnittlich</translation>
+        <translation>Durchschnittswerte</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="100"/>
@@ -5606,7 +5606,7 @@ angeschaltet ist und im Display &quot;Host&quot; anzeigt.</translation>
     <message>
         <location filename="../Pages.cpp" line="2765"/>
         <source>Gender</source>
-        <translation>GEschlecht</translation>
+        <translation>Geschlecht</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="2766"/>
@@ -5705,7 +5705,7 @@ Sie haben folgende Einstellungen geändert: </translation>
 them, we need to convert the ride to GoldenCheetah&apos;s
 native format. Should we do so?
 </source>
-        <translation>Wenn Sie die Änderungen speichern möchten, 
+        <translation> Wenn Sie die Änderungen speichern möchten,
 werden die Daten in das von GoldenCheetah verwendete Dateiformat konvertiert. 
 Möchten Sie fortfahren?</translation>
     </message>
@@ -6154,7 +6154,7 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../TwitterDialog.cpp" line="44"/>
         <source>Average Cadence</source>
-        <translation>Durchschnittliche Trittfrequenz</translation>
+        <translation>ø Trittfrequenz</translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="45"/>
