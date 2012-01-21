@@ -709,6 +709,8 @@ AddPair::searchTimeout(int channel)
 void 
 AddPair::getChannelValues()
 {
+    if (wizard->controller == NULL) return;
+
     // enable disable widgets based upon sensor selection
     for (int i=0; i< channelWidget->invisibleRootItem()->childCount(); i++) {
         QTreeWidgetItem *item = channelWidget->invisibleRootItem()->child(i);
