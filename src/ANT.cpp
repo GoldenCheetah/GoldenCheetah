@@ -795,11 +795,11 @@ int ANT::openPort()
         channels = 8;
         return rc;
     }
+    usbMode = USB1;
 #endif
 
     // if usb2 failed / not compiled in, we must be using
     // a USB1 stick so default to 4 channels
-    usbMode = USB1;
     channels = 4;
 
     if ((devicePort=open(deviceFilename.toAscii(),O_RDWR | O_NOCTTY | O_NONBLOCK)) == -1)
