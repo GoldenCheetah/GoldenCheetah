@@ -442,7 +442,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 //
                 case ANT_STANDARD_POWER: // 0x10 - standard power
                 {
-                    if (lastStdPwrMessage.type != 0) {
+                    if (lastStdPwrMessage.type != 0 && antMessage.period) {
                         is_alt ? parent->setAltWatts(antMessage.instantPower) : parent->setWatts(antMessage.instantPower);
                         value2 = value = antMessage.instantPower;
                         parent->setCadence(antMessage.instantCadence); // cadence
@@ -462,7 +462,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                     uint16_t period = antMessage.period - lastMessage.period;
                     uint16_t torque = antMessage.torque - lastMessage.torque;
 
-                    if (events && period) {
+                    if (events && period && lastMessage.period) {
                         nullCount = 0;
 
                         float nm_torque = torque / (32.0 * events);
