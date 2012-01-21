@@ -24,7 +24,9 @@
 #include "DeviceTypes.h"
 #include "Serial.h"
 #include "RealtimeController.h"
+#ifdef GC_HAVE_LIBUSB
 #include "FortiusController.h"
+#endif
 #include "ComputrainerController.h"
 #include "ANTlocalController.h"
 #include "ANTplusController.h"
