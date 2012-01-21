@@ -28,6 +28,7 @@
 #include <qwt_plot_curve.h>
 #include "RideItem.h"
 #include "IntervalItem.h"
+#include "IntervalTreeView.h"
 #include "GcWindowRegistry.h"
 #include "QuarqdClient.h"
 #include "RealtimeData.h"
@@ -358,7 +359,7 @@ class MainWindow : public QMainWindow
         QSplitter *metaSplitter;
         QTreeWidget *treeWidget;
         QSplitter *intervalSplitter;
-        QTreeWidget *intervalWidget;
+        IntervalTreeView *intervalWidget;
 
         // Miscellany
         QuarqdClient *client;
