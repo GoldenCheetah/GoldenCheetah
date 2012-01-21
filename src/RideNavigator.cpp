@@ -234,6 +234,9 @@ RideNavigator::resetView()
     active = false;
 
     resizeEvent(NULL);
+
+    // Select the current ride
+    rideTreeSelectionChanged();
 }
 
 void
