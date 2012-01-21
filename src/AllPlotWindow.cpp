@@ -1011,6 +1011,7 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
 
             QTreeWidgetItem *last = new IntervalItem(ride->ride(), name, duration1, duration2, distance1, distance2,
                                         allIntervals->childCount()+1);
+            last->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
             allIntervals->addChild(last);
 
             // select this new interval

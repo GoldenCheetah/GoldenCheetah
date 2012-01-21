@@ -241,6 +241,7 @@ HEADERS += \
         HrPwWindow.h \
         IntervalItem.h \
         IntervalSummaryWindow.h \
+        IntervalTreeView.h \
         JsonRideFile.h \
         LogTimeScaleDraw.h \
         LogTimeScaleEngine.h \
@@ -421,6 +422,7 @@ SOURCES += \
         HrPwWindow.cpp \
         IntervalItem.cpp \
         IntervalSummaryWindow.cpp \
+        IntervalTreeView.cpp \
         LogTimeScaleDraw.cpp \
         LogTimeScaleEngine.cpp \
         LTMCanvasPicker.cpp \

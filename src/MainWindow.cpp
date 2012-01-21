@@ -33,6 +33,7 @@
 #include "ManualRideDialog.h"
 #include "RideItem.h"
 #include "IntervalItem.h"
+#include "IntervalTreeView.h"
 #include "IntervalSummaryWindow.h"
 #ifdef GC_HAVE_ICAL
 #include "DiaryWindow.h"
@@ -381,7 +382,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     // INTERVALS
     intervalSummaryWindow = new IntervalSummaryWindow(this);
-    intervalWidget = new QTreeWidget();
+    intervalWidget = new IntervalTreeView(this);
     intervalWidget->setColumnCount(1);
     intervalWidget->setIndentation(5);
     intervalWidget->setSortingEnabled(false);
@@ -394,6 +395,8 @@ MainWindow::MainWindow(const QDir &home) :
     intervalWidget->setFrameStyle(QFrame::NoFrame);
 
     allIntervals = new QTreeWidgetItem(intervalWidget, FOLDER_TYPE);
+    allIntervals->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDropEnabled);
+
     allIntervals->setText(0, tr("Intervals"));
     intervalWidget->expandItem(allIntervals);
 
@@ -892,6 +895,7 @@ MainWindow::rideTreeWidgetSelectionChanged()
                                                         selected->timeToDistance(intervals.at(i).start),
                                                         selected->timeToDistance(intervals.at(i).stop),
                                                         allIntervals->childCount()+1);
+                add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
                 allIntervals->addChild(add);
             }
         }
@@ -1653,6 +1657,7 @@ MainWindow::addIntervalForPowerPeaksForSecs(RideFile *ride, int windowSizeSecs, 
                          ride->timeToDistance(i.start),
                          ride->timeToDistance(i.stop),
                          allIntervals->childCount()+1);
+    peak->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
     allIntervals->addChild(peak);
 }
 
@@ -1778,6 +1783,7 @@ MainWindow::intervalTreeWidgetSelectionChanged()
 {
     intervalSelected();
 }
+
 
 /*----------------------------------------------------------------------
  * Utility

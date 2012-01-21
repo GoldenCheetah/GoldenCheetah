@@ -326,6 +326,7 @@ BestIntervalDialog::addClicked()
                                  ride->timeToDistance(start),
                                  ride->timeToDistance(stop),
                                  allIntervals->childCount()+1);
+            last->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
             // add
             allIntervals->addChild(last);
         }
