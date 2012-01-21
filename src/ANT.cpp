@@ -115,9 +115,9 @@ ANT::ANT(QObject *parent, DeviceConfiguration *devConf) : QThread(parent)
     // sticks, if it is not available we use stubs
 #if defined GC_HAVE_LIBUSB
     usbMode = USBNone;
-    channels = 0;
     usb2 = new LibUsb(TYPE_ANT);
 #endif
+    channels = 0;
 }
 
 ANT::~ANT()
@@ -159,8 +159,8 @@ void ANT::run()
     QString strBuf;
 #if defined GC_HAVE_LIBUSB
     usbMode = USBNone;
-    channels = 0;
 #endif
+    channels = 0;
 
     for (int i=0; i<ANT_MAX_CHANNELS; i++) antChannel[i]->init();
 
@@ -794,11 +794,14 @@ int ANT::openPort()
         usbMode = USB2;
         channels = 8;
         return rc;
-    } else {
-        usbMode = USB1;
-        channels = 4;
     }
 #endif
+
+    // if usb2 failed / not compiled in, we must be using
+    // a USB1 stick so default to 4 channels
+    usbMode = USB1;
+    channels = 4;
+
     if ((devicePort=open(deviceFilename.toAscii(),O_RDWR | O_NOCTTY | O_NONBLOCK)) == -1)
         return errno;
 
