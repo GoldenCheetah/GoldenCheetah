@@ -4202,7 +4202,7 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="242"/>
         <source>10 min Peak Power</source>
-        <translation>Pique de puissance sur 10min</translation>
+        <translation>Pic de puissance sur 10min</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="243"/>
@@ -4216,7 +4216,7 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="122"/>
         <source>10 sec Peak Power</source>
-        <translation>Pique de puissance sur 10sec</translation>
+        <translation>Pic de puissance sur 10sec</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="123"/>
@@ -4230,7 +4230,7 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="142"/>
         <source>15 sec Peak Power</source>
-        <translation>Pique de puissance sur 15sec</translation>
+        <translation>Pic de puissance sur 15sec</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="143"/>
@@ -4244,7 +4244,7 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="202"/>
         <source>1 min Peak Power</source>
-        <translation>Pique de puissance sur 1min</translation>
+        <translation>Pic de puissance sur 1min</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="203"/>
@@ -4258,7 +4258,7 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="82"/>
         <source>1 sec Peak Power</source>
-        <translation>Pique de puissance sur 1sec</translation>
+        <translation>Pic de puissance sur 1sec</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="83"/>
@@ -4272,7 +4272,7 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="262"/>
         <source>20 min Peak Power</source>
-        <translation>Pique de puissance sur 20min</translation>
+        <translation>Pic de puissance sur 20min</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="263"/>
@@ -4286,7 +4286,7 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="162"/>
         <source>20 sec Peak Power</source>
-        <translation>Pique de puissance sur 20sec</translation>
+        <translation>Pic de puissance sur 20sec</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="163"/>
@@ -4300,7 +4300,7 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="282"/>
         <source>30 min Peak Power</source>
-        <translation>Pique de puissance sur 30min</translation>
+        <translation>Pic de puissance sur 30min</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="283"/>
@@ -4314,7 +4314,7 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="182"/>
         <source>30 sec Peak Power</source>
-        <translation>Pique de puissance sur 30sec</translation>
+        <translation>Pic de puissance sur 30sec</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="183"/>
@@ -4328,7 +4328,7 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="222"/>
         <source>5 min Peak Power</source>
-        <translation>Pique de puissance sur 5min</translation>
+        <translation>Pic de puissance sur 5min</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="223"/>
@@ -4342,7 +4342,7 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="102"/>
         <source>5 sec Peak Power</source>
-        <translation>Pique de puissance sur 5sec</translation>
+        <translation>Pic de puissance sur 5sec</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="103"/>
@@ -4356,7 +4356,7 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="377"/>
         <source>10 min Peak Power HR</source>
-        <translation>Fréquence cardiaque pour le pique de puissance sur 10 min</translation>
+        <translation>Fréquence cardiaque pour le pic de puissance sur 10 min</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="378"/>
@@ -4370,7 +4370,7 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="337"/>
         <source>1 min Peak Power HR</source>
-        <translation>Fréquence cardiaque pour le pique de puissance sur 1 min</translation>
+        <translation>Fréquence cardiaque pour le pic de puissance sur 1 min</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="338"/>
@@ -4384,7 +4384,7 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="397"/>
         <source>20 min Peak Power HR</source>
-        <translation>Fréquence cardiaque pour le pique de puissance sur 20 min</translation>
+        <translation>Fréquence cardiaque pour le pic de puissance sur 20 min</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="398"/>
@@ -4398,7 +4398,7 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="417"/>
         <source>30 min Peak Power HR</source>
-        <translation>Fréquence cardiaque pour le pique de puissance sur 30 min</translation>
+        <translation>Fréquence cardiaque pour le pic de puissance sur 30 min</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="418"/>
@@ -4412,7 +4412,7 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="357"/>
         <source>5 min Peak Power HR</source>
-        <translation>Fréquence cardiaque pour le pique de puissance sur 5 min</translation>
+        <translation>Fréquence cardiaque pour le pic de puissance sur 5 min</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="358"/>
@@ -4426,7 +4426,7 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PeakPower.cpp" line="438"/>
         <source>60 min Peak Power HR</source>
-        <translation>Fréquence cardiaque pour le pique de puissance sur 60 min</translation>
+        <translation>Fréquence cardiaque pour le pic de puissance sur 60 min</translation>
     </message>
     <message>
         <location filename="../PeakPower.cpp" line="439"/>
