@@ -277,7 +277,8 @@ MainWindow::MainWindow(const QDir &home) :
     saveButton = new QPushButton(saveIcon, "", this);
     saveButton->setContentsMargins(0,0,0,0);
     saveButton->setFocusPolicy(Qt::NoFocus);
-    saveButton->setIconSize(QSize(24,24));
+    saveButton->setIconSize(QSize(20,20));
+    saveButton->setFixedWidth(24);
     saveButton->setAutoFillBackground(false);
     saveButton->setAutoDefault(false);
     saveButton->setFlat(true);
@@ -289,7 +290,8 @@ MainWindow::MainWindow(const QDir &home) :
     QPushButton *open = new QPushButton(openIcon, "", this);
     open->setContentsMargins(0,0,0,0);
     open->setFocusPolicy(Qt::NoFocus);
-    open->setIconSize(QSize(24,24));
+    open->setIconSize(QSize(20,20));
+    open->setFixedWidth(24);
     open->setAutoFillBackground(false);
     open->setAutoDefault(false);
     open->setFlat(true);
@@ -297,9 +299,9 @@ MainWindow::MainWindow(const QDir &home) :
     toolbuttons->addWidget(open);
     QMenu *openMenu = new QMenu(this);
     open->setMenu(openMenu);
-    openMenu->addAction(tr("Device Download"), this, SLOT(downloadRide()), tr("Ctrl+D"));
-    openMenu->addAction(tr("Import file"), this, SLOT (importFile()), tr ("Ctrl+I"));
-    openMenu->addAction(tr("Manual activity"), this, SLOT(manualRide()), tr("Ctrl+M"));
+    openMenu->addAction(tr("Device Download"), this, SLOT(downloadRide()));
+    openMenu->addAction(tr("Import file"), this, SLOT (importFile()));
+    openMenu->addAction(tr("Manual activity"), this, SLOT(manualRide()));
 
 #ifdef Q_OS_MAC
     QWindowsStyle *macstyler = new QWindowsStyle();
