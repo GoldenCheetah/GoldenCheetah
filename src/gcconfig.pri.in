@@ -142,3 +142,6 @@ macx {
     DEFINES += GC_HAVE_LION
 }
 
+#if you want a 'robot' to test realtime code without having
+#to get on your trainer and ride then uncomment below
+#DEFINES += GC_WANT_ROBOT
