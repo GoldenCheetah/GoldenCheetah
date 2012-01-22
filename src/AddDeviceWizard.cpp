@@ -140,7 +140,7 @@ DeviceScanner::run()
 {
     active = true;
     bool result = false;
-    for (int i=0; active && !result && i<10; i++) {
+    for (int i=0; active && !result && i<50; i++) { // search for longer
 
         // better to wait a while, esp. if its just a USB device
 #ifdef WIN32
@@ -215,7 +215,6 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
             // automatically discover a serial port ...
             QString error;
             foreach (CommPortPtr port, Serial::myListCommPorts(error)) {
-
                 if (wizard->controller->discover(port->name()) == true) {
                     isfound = true;
                     wizard->portSpec = port->name();
@@ -295,7 +294,6 @@ AddSearch::chooseCOMPort()
     if (manual->currentIndex() <= 0) { // we unselected or something.
         wizard->found = false;
         wizard->portSpec = "";
-        emit completeChanged();
         return;
     }
 
@@ -309,8 +307,6 @@ AddSearch::chooseCOMPort()
 
     // carry on then 
     wizard->found = true; // ugh
-
-    emit completeChanged();
 }
 
 void
@@ -406,7 +402,7 @@ int
 AddSearch::nextId() const
 {
     // Still no dice. Go to the not found dialog
-    if (wizard->found == false)  return -1;
+    if (wizard->found == false)  return 60;
     else {
         switch(wizard->deviceTypes.Supported[wizard->current].type) {
         case DEV_ANTLOCAL : return 50; break; // pair 

@@ -101,7 +101,6 @@ class AddSearch : public QWizardPage
         void initializePage();
         int nextId() const;
         bool validatePage();
-        bool isComplete() const { return wizard->found; }
         void doScan();
         void scanFinished(bool);
         void cleanupPage();

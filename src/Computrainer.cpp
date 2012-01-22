@@ -1024,7 +1024,7 @@ bool Computrainer::discover(QString filename)
     }
 
     // did we get something back from the device?
-    if ((rc=rawRead(handshake, 6)) != 6) {
+    if ((rc=rawRead(handshake, 6)) < 6) {
         closePort();
         return false;
     }
@@ -1032,7 +1032,6 @@ bool Computrainer::discover(QString filename)
     closePort();
 
     handshake[6] = '\0';
-
     if (strcmp((char *)handshake, "LinkUp")) return false;
     else return true;
 }
