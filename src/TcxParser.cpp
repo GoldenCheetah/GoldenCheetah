@@ -77,6 +77,7 @@ TcxParser::startElement( const QString&, const QString&, const QString& qName, c
         hr = 0.0;
         lat = 0.0;
         lon = 0.0;
+        badgps = false;
         //alt = 0.0; // TCS from FIT files have not alt point for each trackpoint
         distance = -1;  // nh - we set this to -1 so we can detect if there was a distance in the trackpoint.
         secs = 0;
@@ -130,6 +131,8 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 
         // Record trackpoint
 
+        if (lat == 0 && lon == 0) badgps = true;
+
         // for smart recording, the delta_t will not be constant
         // average all the calculations based on the previous
         // point.
@@ -155,6 +158,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
             double deltaLon = lon - prevPoint->lon;
             double deltaLat = lat - prevPoint->lat;
 
+            if (prevPoint->lat == 0 && prevPoint->lon == 0) badgps = true;
             // Smart Recording High Water Mark.
             if ((isGarminSmartRecording.toInt() == 0) || (deltaSecs == 1) || (deltaSecs >= GarminHWM.toInt())) {
 
@@ -172,8 +176,8 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                     kph = kph > 0.35 ? kph : 0;
                     double cad = prevPoint->cad + (deltaCad * weight);
                     cad = cad > 0.35 ? cad : 0;
-                    double lat = prevPoint->lat + (deltaLat * weight);
-                    double lon = prevPoint->lon + (deltaLon * weight);
+                    //double lat = prevPoint->lat + (deltaLat * weight);
+                    //double lon = prevPoint->lon + (deltaLon * weight);
 
                     rideFile->appendPoint(prevPoint->secs + (deltaSecs * weight),
                                           prevPoint->cad  + (deltaCad * weight),
@@ -183,8 +187,8 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                                           prevPoint->nm + (deltaTorque * weight),
                                           prevPoint->watts + (deltaPower * weight),
                                           prevPoint->alt + (deltaAlt * weight),
-                                          lon, // lon
-                                          lat, // lat
+                                          badgps ? 0 : prevPoint->lon + (deltaLon * weight), // lon
+                                          badgps ? 0 : prevPoint->lat + (deltaLat * weight), // lat
                                           headwind, // headwind
                                           0.0,
                                           RideFile::noTemp,
