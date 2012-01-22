@@ -49,22 +49,30 @@ static DeviceType SupportedDevices[] =
         "to a USB port. Please make sure you have device firmware to hand." ,
         ":images/devices/fortius.png" },
 #endif
+#ifdef GC_WANT_ROBOT
+      { DEV_NULL,     DEV_TCP,     (char *) "Robot", false,   false,
+        "Testing device used for development only. If an ERG file is selected it will "
+        "replay back, with a little randomness thrown in.",
+        "" },
+#endif
+
+      // The Quarqd device has been deprecated since we now have native ANT+ support
+      // We have kept the code in the codebase in case it emerges later that there is
+      // a compelling reason to keep it. It might be useful for testing for example.
+      //
+      // The GC server, has actually been written (see simpleserver.py) but the code for
+      // racing has not been coded up. It may be as simple as adding 'dots' on the
+      // workout plot, but lets see that in 3.1
+      //
+
 #if 0
       { DEV_GSERVER,  DEV_TCP,     (char *) "Golden Cheetah Server", false,   false,
         "Golden Cheetah racing server, not curently supported."                     },
-      { DEV_NULL,     DEV_TCP,     (char *) "Null device (testing)", false,   false,
-        "Testing device used for development only."                                 }.
-#endif
-#if 0 // deprecated, but keeping code until at least 3.1
       { DEV_ANTPLUS,  DEV_QUARQ,   (char *) "ANT+ via Quarqd",       true,    false,
         "ANT+ devices such as SRM, Powertap or Quarq power meters, Heart rate belts, "
         "speed or cadence meters via an existing Quarqd server" ,
         ":images/devices/quarqd.png" },
 #endif
-
-//    { DEV_PT,       DEV_SERIAL,  (char *) "Powertap Head Unit",    false,   true  },
-//    { DEV_SRM,      DEV_SERIAL,  (char *) "SRM PowerControl V/VI", false,   true  },
-//    { DEV_GCLIENT,  DEV_TCP,     (char *) "Golden Cheetah Client", false,   false },
       { 0, 0, NULL, 0, 0, "", "" }
 };
 

@@ -47,6 +47,10 @@ int NullController::restart() {
   return 0;
 }
 
+bool NullController::find() {
+    return true;
+}
+
 void NullController::getRealtimeData(RealtimeData &rtData) {
     rtData.setName((char *)"Null");
     rtData.setWatts(load + ((rand()%25)-15)); // for testing virtual power

@@ -46,6 +46,7 @@ class NullController : public RealtimeController
   int stop();
   int pause();
   int restart();
+  bool find();
   bool discover(char *) {  return true;  }
   bool doesPush() {  return false; }
   bool doesPull() {  return true; }
