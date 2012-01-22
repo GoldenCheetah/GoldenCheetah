@@ -274,16 +274,16 @@ MainWindow::MainWindow(const QDir &home) :
     toolbuttons->setContentsMargins(0,0,0,0);
 
     QIcon saveIcon(":images/oxygen/save.png");
-    QPushButton *save = new QPushButton(saveIcon, "", this);
-    save->setContentsMargins(0,0,0,0);
-    save->setFocusPolicy(Qt::NoFocus);
-    save->setIconSize(QSize(24,24));
-    save->setAutoFillBackground(false);
-    save->setAutoDefault(false);
-    save->setFlat(true);
-    save->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
-    toolbuttons->addWidget(save);
-    connect(save, SIGNAL(clicked()), this, SLOT(saveRide()));
+    saveButton = new QPushButton(saveIcon, "", this);
+    saveButton->setContentsMargins(0,0,0,0);
+    saveButton->setFocusPolicy(Qt::NoFocus);
+    saveButton->setIconSize(QSize(24,24));
+    saveButton->setAutoFillBackground(false);
+    saveButton->setAutoDefault(false);
+    saveButton->setFlat(true);
+    saveButton->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    toolbuttons->addWidget(saveButton);
+    connect(saveButton, SIGNAL(clicked()), this, SLOT(saveRide()));
 
     QIcon openIcon(":images/oxygen/open.png");
     QPushButton *open = new QPushButton(openIcon, "", this);
@@ -303,7 +303,7 @@ MainWindow::MainWindow(const QDir &home) :
 
 #ifdef Q_OS_MAC
     QWindowsStyle *macstyler = new QWindowsStyle();
-    save->setStyle(macstyler);
+    saveButton->setStyle(macstyler);
     open->setStyle(macstyler);
 #endif
 
@@ -757,6 +757,9 @@ MainWindow::MainWindow(const QDir &home) :
     connect(intervalWidget,SIGNAL(itemChanged(QTreeWidgetItem *,int)), this, SLOT(intervalEdited(QTreeWidgetItem*, int)));
     connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
 
+    connect(this, SIGNAL(rideDirty()), this, SLOT(enableSaveButton()));
+    connect(this, SIGNAL(rideClean()), this, SLOT(enableSaveButton()));
+
     // Kick off
     rideTreeWidgetSelectionChanged();
     analWindow->selected();
@@ -924,6 +927,8 @@ MainWindow::rideTreeWidgetSelectionChanged()
     diaryWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
     trainWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
 
+    enableSaveButton(); // should it be enabled or not?
+
     if (!ride) return;
 
     // refresh interval list for bottom left
@@ -951,6 +956,18 @@ MainWindow::rideTreeWidgetSelectionChanged()
             }
         }
     }
+}
+
+void
+MainWindow::enableSaveButton()
+{
+    if (!ride) {
+        saveButton->setEnabled(false);
+        return;
+    }
+
+    if (ride->isDirty()) saveButton->setEnabled(true);
+    else saveButton->setEnabled(false);
 }
 
 void

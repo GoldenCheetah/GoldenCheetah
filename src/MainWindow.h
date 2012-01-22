@@ -245,6 +245,7 @@ class MainWindow : public QMainWindow
         void aboutDialog();
         void saveRide();                        // save current ride menu item
         void revertRide();
+        void enableSaveButton();                // enable/disable save button when ride changes etc
         bool saveRideExitDialog();              // save dirty rides on exit dialog
         void showOptions();
         void showTools();
@@ -322,7 +323,7 @@ class MainWindow : public QMainWindow
         QAction *showhideSidebar;
 
         // toolbar butttons
-        QPushButton *side, *style, *full;
+        QPushButton *side, *style, *full, *saveButton;
         QWidget *analButtons;
         QMenu *chartMenu;
 
