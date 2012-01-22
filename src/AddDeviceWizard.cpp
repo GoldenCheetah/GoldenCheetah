@@ -215,7 +215,9 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
             // automatically discover a serial port ...
             QString error;
             foreach (CommPortPtr port, Serial::myListCommPorts(error)) {
-                if (wizard->controller->discover(port->name()) == true) {
+
+                // check if controller still exists. gets deleted when scan cancelled
+                if (wizard->controller && wizard->controller->discover(port->name()) == true) {
                     isfound = true;
                     wizard->portSpec = port->name();
                     break;
