@@ -391,7 +391,6 @@ MainWindow::MainWindow(const QDir &home) :
     connect(chartMenu, SIGNAL(triggered(QAction*)), this, SLOT(addChart(QAction*)));
 
 #ifdef Q_OS_MAC
-    QWindowsStyle *macstyler = new QWindowsStyle();
     side->setStyle(macstyler);
     style->setStyle(macstyler);
     newchart->setStyle(macstyler);
