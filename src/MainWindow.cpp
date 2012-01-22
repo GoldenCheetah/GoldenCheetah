@@ -267,6 +267,57 @@ MainWindow::MainWindow(const QDir &home) :
     trainTool = new TrainTool(this, home);
     trainTool->hide();
     toolbar->addWidget(trainTool->getToolbarButtons());
+
+    // Analysis view buttons too.
+    QHBoxLayout *toolbuttons=new QHBoxLayout;
+    toolbuttons->setSpacing(0);
+    toolbuttons->setContentsMargins(0,0,0,0);
+
+    QIcon saveIcon(":images/oxygen/save.png");
+    QPushButton *save = new QPushButton(saveIcon, "", this);
+    save->setContentsMargins(0,0,0,0);
+    save->setFocusPolicy(Qt::NoFocus);
+    save->setIconSize(QSize(24,24));
+    save->setAutoFillBackground(false);
+    save->setAutoDefault(false);
+    save->setFlat(true);
+    save->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    toolbuttons->addWidget(save);
+    connect(save, SIGNAL(clicked()), this, SLOT(saveRide()));
+
+    QIcon openIcon(":images/oxygen/open.png");
+    QPushButton *open = new QPushButton(openIcon, "", this);
+    open->setContentsMargins(0,0,0,0);
+    open->setFocusPolicy(Qt::NoFocus);
+    open->setIconSize(QSize(24,24));
+    open->setAutoFillBackground(false);
+    open->setAutoDefault(false);
+    open->setFlat(true);
+    open->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    toolbuttons->addWidget(open);
+    QMenu *openMenu = new QMenu(this);
+    open->setMenu(openMenu);
+    openMenu->addAction(tr("Device Download"), this, SLOT(downloadRide()), tr("Ctrl+D"));
+    openMenu->addAction(tr("Import file"), this, SLOT (importFile()), tr ("Ctrl+I"));
+    openMenu->addAction(tr("Manual activity"), this, SLOT(manualRide()), tr("Ctrl+M"));
+
+#ifdef Q_OS_MAC
+    QWindowsStyle *macstyler = new QWindowsStyle();
+    save->setStyle(macstyler);
+    open->setStyle(macstyler);
+#endif
+
+    toolbuttons->addStretch();
+
+    analButtons = new QWidget(this);
+    analButtons->setContentsMargins(0,0,0,0);
+    analButtons->setFocusPolicy(Qt::NoFocus);
+    analButtons->setAutoFillBackground(false);
+    analButtons->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    analButtons->setLayout(toolbuttons);
+    analButtons->show();
+
+    toolbar->addWidget(analButtons);
     toolbar->addStretch();
 
     // home
@@ -1165,6 +1216,7 @@ MainWindow::selectAnalysis()
     views->setCurrentIndex(0);
     analWindow->selected(); // tell it!
     currentWindow = analWindow;
+    analButtons->show();
     trainTool->getToolbarButtons()->hide();
     setStyle();
 }
@@ -1176,6 +1228,7 @@ MainWindow::selectTrain()
     views->setCurrentIndex(1);
     trainWindow->selected(); // tell it!
     currentWindow = trainWindow;
+    analButtons->hide();
     trainTool->getToolbarButtons()->show();
     setStyle();
 }
@@ -1187,6 +1240,7 @@ MainWindow::selectDiary()
     views->setCurrentIndex(2);
     diaryWindow->selected(); // tell it!
     currentWindow = diaryWindow;
+    analButtons->hide();
     trainTool->getToolbarButtons()->hide();
     setStyle();
 }
@@ -1198,6 +1252,7 @@ MainWindow::selectHome()
     views->setCurrentIndex(3);
     homeWindow->selected(); // tell it!
     currentWindow = homeWindow;
+    analButtons->hide();
     trainTool->getToolbarButtons()->hide();
     setStyle();
 }

@@ -323,6 +323,7 @@ class MainWindow : public QMainWindow
 
         // toolbar butttons
         QPushButton *side, *style, *full;
+        QWidget *analButtons;
         QMenu *chartMenu;
 
         QStackedWidget *views;
