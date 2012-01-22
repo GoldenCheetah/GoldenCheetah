@@ -142,7 +142,12 @@ DeviceScanner::run()
     bool result = false;
     for (int i=0; active && !result && i<10; i++) {
 
-        sleep(1); // better to wait a while, esp. if its just a USB device
+        // better to wait a while, esp. if its just a USB device
+#ifdef WIN32
+        Sleep(1000);
+#else
+        sleep(1);
+#endif
         result = quickScan(false);
     }
     if (active) emit finished(result); // only signal if we weren't aborted!
@@ -422,7 +427,14 @@ void
 AddSearch::cleanupPage()
 {
     wizard->scanner->stop();
-    if (isSearching) sleep(2); // give it time to stop...
+    if (isSearching) {
+    // give it time to stop...
+#ifdef WIN32
+        Sleep(2000);
+#else
+        sleep(2);
+#endif
+    }
     isSearching=false;
     if (wizard->controller) {
         delete wizard->controller;
@@ -554,7 +566,11 @@ AddPair::cleanupPage()
     updateValues.stop();
     if (wizard->controller) {
         wizard->controller->stop();
+#ifdef WIN32
+        Sleep(1000);
+#else
         sleep(1);
+#endif
         delete wizard->controller;
         wizard->controller = NULL;
     }
@@ -591,7 +607,12 @@ AddPair::initializePage()
 
     // Channel 0, look for any (0 devicenumber) speed and distance device
 
-    sleep(1); // wait for it to start...
+    // wait for it to start
+#ifdef WIN32
+    Sleep(1000);
+#else
+    sleep(1);
+#endif
     int channels = dynamic_cast<ANTlocalController*>(wizard->controller)->channels();
 
     // Tree Widget of the channel controls
@@ -866,7 +887,11 @@ AddFinal::validatePage()
         // still be connected to the device (in case we hit the back button)
         if (wizard->controller) {
             wizard->controller->stop();
+#ifdef WIN32
+            Sleep(1000);
+#else
             sleep(1);
+#endif
             delete wizard->controller;
             wizard->controller = NULL;
         }
