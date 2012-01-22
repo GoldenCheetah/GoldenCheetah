@@ -62,6 +62,7 @@ private:
     double      lon;
     double      headwind;
     double      secs;
+    bool        badgps;
 };
 
 #endif // _TcxParser_h
