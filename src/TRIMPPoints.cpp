@@ -344,6 +344,9 @@ static bool added() {
     deps.append("time_in_zone_H3");
     deps.append("time_in_zone_H4");
     deps.append("time_in_zone_H5");
+    deps.append("time_in_zone_H6");
+    deps.append("time_in_zone_H7");
+    deps.append("time_in_zone_H8");
     RideMetricFactory::instance().addMetric(TRIMPZonalPoints(), &deps);
 
     deps.clear();
