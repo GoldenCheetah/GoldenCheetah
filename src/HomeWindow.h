@@ -68,6 +68,7 @@ class HomeWindow : public GcWindow
         // My widget signals and events
         void styleChanged(int);
         void addChart(GcWindow* newone);
+        void addChartFromMenu(QAction*action); // called with an action
         void appendChart(GcWinID id); // called from MainWindow to inset chart
         bool removeChart(int, bool confirm = true);
         void titleChanged();
@@ -88,6 +89,7 @@ class HomeWindow : public GcWindow
         // when moving tiles
         int pointTile(QPoint pos);
         void drawCursor();
+        void rightClick(const QPoint &pos);
 
     protected:
         MainWindow *mainWindow;
