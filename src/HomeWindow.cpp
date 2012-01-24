@@ -182,6 +182,14 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     winWidget->installEventFilter(this); // to draw cursor
     winWidget->setMouseTracking(true); // to draw cursor
 
+    // enable right click to add a chart
+    winArea->setContextMenuPolicy(Qt::CustomContextMenu);
+    //tabbed->setContextMenuPolicy(Qt::CustomContextMenu);
+    tabArea->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(winArea,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(rightClick(const QPoint &)));
+    //connect(tabbed,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(rightClick(const QPoint &)));
+    connect(tabArea,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(rightClick(const QPoint &)));
+
     currentStyle=-1;
 #if 0
     styleSelector->setSelected(2);
@@ -236,6 +244,53 @@ qDebug()<<"removing from layouts!";
         }
     }
 #endif
+}
+
+void
+HomeWindow::rightClick(const QPoint & /*pos*/)
+{
+    QMenu chartMenu("Add Chart");
+    unsigned int mask;
+    // called when chart menu about to be shown
+    // setup to only show charts that are relevant
+    // to this view
+    if (mainWindow->currentWindow == mainWindow->analWindow) mask = VIEW_ANALYSIS;
+    if (mainWindow->currentWindow == mainWindow->trainWindow) mask = VIEW_TRAIN;
+    if (mainWindow->currentWindow == mainWindow->diaryWindow) mask = VIEW_DIARY;
+    if (mainWindow->currentWindow == mainWindow->homeWindow) mask = VIEW_HOME;
+
+    chartMenu.addAction("Add Chart.."); // "kind of" a title... :)
+    for(int i=0; GcWindows[i].relevance; i++) {
+        if (GcWindows[i].relevance & mask) 
+            chartMenu.addAction(GcWindows[i].name);
+    }
+    connect(&chartMenu, SIGNAL(triggered(QAction*)), this, SLOT(addChartFromMenu(QAction*)));
+
+    // set cursor...
+    if (currentStyle == 0) { // tabbed
+        chartCursor = tabbed->currentIndex();
+    } else { // tiked
+        QPoint pos = winWidget->mapFromGlobal(QCursor::pos());
+        chartCursor = pointTile(pos);
+    }
+
+    chartMenu.exec(QCursor::pos()); // blocks -- so deleted after choice made and allocated on stack!
+
+    chartCursor = -2;
+}
+
+void
+HomeWindow::addChartFromMenu(QAction*action)
+{
+    GcWinID id = GcWindowTypes::None;
+    for (int i=0; GcWindows[i].relevance; i++) {
+        if (GcWindows[i].name == action->text()) {
+            id = GcWindows[i].id;
+            break;
+        }
+    }
+
+    if (id != GcWindowTypes::None) appendChart(id); // called from MainWindow to inset chart
 }
 
 void

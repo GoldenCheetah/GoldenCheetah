@@ -730,11 +730,14 @@ MainWindow::MainWindow(const QDir &home) :
     viewMenu->addAction(tr("Diary"), this, SLOT(selectDiary()));
 #endif
     viewMenu->addSeparator();
+    subChartMenu = viewMenu->addMenu("Add Chart");
     viewMenu->addAction(tr("Reset Layout"), this, SLOT(resetWindowLayout()));
 
     windowMenu = menuBar()->addMenu(tr("&Window"));
     connect(windowMenu, SIGNAL(aboutToShow()), this, SLOT(setWindowMenu()));
     connect(rideMenu, SIGNAL(aboutToShow()), this, SLOT(setActivityMenu()));
+    connect(subChartMenu, SIGNAL(aboutToShow()), this, SLOT(setSubChartMenu()));
+    connect(subChartMenu, SIGNAL(triggered(QAction*)), this, SLOT(addChart(QAction*)));
     connect(windowMenu, SIGNAL(triggered(QAction*)), this, SLOT(selectWindow(QAction*)));
 
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
@@ -824,6 +827,25 @@ MainWindow::setChartMenu()
     for(int i=0; GcWindows[i].relevance; i++) {
         if (GcWindows[i].relevance & mask) 
             chartMenu->addAction(GcWindows[i].name);
+    }
+}
+
+void
+MainWindow::setSubChartMenu()
+{
+    unsigned int mask;
+    // called when chart menu about to be shown
+    // setup to only show charts that are relevant
+    // to this view
+    if (currentWindow == analWindow) mask = VIEW_ANALYSIS;
+    if (currentWindow == trainWindow) mask = VIEW_TRAIN;
+    if (currentWindow == diaryWindow) mask = VIEW_DIARY;
+    if (currentWindow == homeWindow) mask = VIEW_HOME;
+
+    subChartMenu->clear();
+    for(int i=0; GcWindows[i].relevance; i++) {
+        if (GcWindows[i].relevance & mask) 
+            subChartMenu->addAction(GcWindows[i].name);
     }
 }
 

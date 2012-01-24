@@ -129,6 +129,13 @@ class MainWindow : public QMainWindow
         // MAINWINDOW STATE / GUI DATA
         // *********************************************
 
+        // Top-level views
+        HomeWindow *homeWindow;
+        HomeWindow *diaryWindow;
+        HomeWindow *trainWindow;
+        HomeWindow *analWindow;
+        HomeWindow *currentWindow;  // tracks the curerntly showing window
+
         // state data
         SpecialFields specialFields;
         int session;
@@ -292,6 +299,7 @@ class MainWindow : public QMainWindow
         void selectWindow(QAction*);
 
         void setChartMenu();
+        void setSubChartMenu();
         void addChart(QAction*);
 
         void toggleStyle();
@@ -326,6 +334,7 @@ class MainWindow : public QMainWindow
         QPushButton *side, *style, *full, *saveButton;
         QWidget *analButtons;
         QMenu *chartMenu;
+        QMenu *subChartMenu;
 
         QStackedWidget *views;
         QAction *sideView;
@@ -340,13 +349,6 @@ class MainWindow : public QMainWindow
                        *trainControls,
                        *diaryControls,
                        *homeControls;
-
-        // Top-level views
-        HomeWindow *homeWindow;
-        HomeWindow *diaryWindow;
-        HomeWindow *trainWindow;
-        HomeWindow *analWindow;
-        HomeWindow *currentWindow;  // tracks the curerntly showing window
 
         // sidebar
         QTreeWidgetItem *allRides;
