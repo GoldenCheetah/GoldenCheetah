@@ -235,21 +235,7 @@ LTMPopup::rideSelected()
         // update summary
         metrics->setText(selected[index].toString(summary, useMetricUnits));
 
-        // read notes
-        QString filename = main->home.absolutePath() + "/" +
-                           QFileInfo(selected[index].getFileName()).baseName() +
-                           ".notes";
-
-        QFile notesFile(filename);
-
-        // read it in if it exists
-        if (notesFile.exists() && notesFile.open(QFile::ReadOnly | QFile::Text)) {
-            QTextStream in(&notesFile);
-            notes->setText(in.readAll());
-            notesFile.close();
-        } else {
-            notes->setText("No notes recorded.");
-        }
+        notes->setText(selected[index].getText("Notes", ""));
     }
     resizeEvent(NULL);
 }
