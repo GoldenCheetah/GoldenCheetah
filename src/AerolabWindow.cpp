@@ -78,7 +78,7 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   cdaSlider = new QSlider(Qt::Horizontal);
   cdaSlider->setTickPosition(QSlider::TicksBelow);
   cdaSlider->setTickInterval(100);
-  cdaSlider->setMinimum(1500);
+  cdaSlider->setMinimum(1);
   cdaSlider->setMaximum(6000);
   cdaSlider->setValue(aerolab->intCda());
   cdaLayout->addWidget( cdaLabel );
