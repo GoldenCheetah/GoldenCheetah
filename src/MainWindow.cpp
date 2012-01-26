@@ -67,6 +67,7 @@
 #include "RideCalendar.h"
 #include "DatePickerDialog.h"
 #include "ToolsDialog.h"
+#include "ToolsRhoEstimator.h"
 #include "MetricAggregator.h"
 #include "SplitRideDialog.h"
 #include "PerformanceManagerWindow.h"
@@ -415,6 +416,8 @@ MainWindow::MainWindow(const QDir &home) :
                            SLOT(showOptions()), tr("Ctrl+O")); 
     optionsMenu->addAction(tr("Critical Power Calculator"), this,
                            SLOT(showTools()));
+    optionsMenu->addAction(tr("Air Density (Rho) Estimator"), this,
+                           SLOT(showRhoEstimator()));
     //optionsMenu->addAction(tr("&Reset Metrics..."), this, 
     //                       SLOT(importRideToDB()), tr("Ctrl+R")); 
     //optionsMenu->addAction(tr("&Update Metrics..."), this, 
@@ -1418,6 +1421,12 @@ void MainWindow::showTools()
 {
    ToolsDialog *td = new ToolsDialog();
    td->show();
+}
+
+void MainWindow::showRhoEstimator()
+{
+   ToolsRhoEstimator *tre = new ToolsRhoEstimator();
+   tre->show();
 }
 
 void

@@ -193,6 +193,7 @@ HEADERS += \
         TxtRideFile.h \
         TimeUtils.h \
         ToolsDialog.h \
+        ToolsRhoEstimator.h \
         TrainTabs.h \
         TrainTool.h \
         TrainWindow.h \
@@ -322,6 +323,7 @@ SOURCES += \
         TimeInZone.cpp \
         TimeUtils.cpp \
         ToolsDialog.cpp \
+        ToolsRhoEstimator.cpp \
         TrainTabs.cpp \
         TrainTool.cpp \
         TrainWindow.cpp \

@@ -155,6 +155,7 @@ class MainWindow : public QMainWindow
         void saveNotes();
         void showOptions();
         void showTools();
+        void showRhoEstimator();
 	void importRideToDB();
         void scanForMissing();
 	void saveAndOpenNotes();
