@@ -447,7 +447,7 @@ TrainTool::selectedServerNumber()
 void
 TrainTool::deviceTreeWidgetSelectionChanged()
 {
-    bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry = -1;
+    loadTelemetry = bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry = -1;
     deviceSelected();
 }
 
@@ -713,7 +713,7 @@ void TrainTool::Start()       // when start button is pressed
                 return;
             }
         } else {
-            bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry = 
+            loadTelemetry = bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry =
             deviceTree->selectedItems().first()->type();
         }
 
@@ -979,6 +979,7 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
                 rtData.setWatts(local.getWatts());
                 rtData.setAltWatts(local.getAltWatts());
             }
+            if(dev == loadTelemetry) rtData.setLoad(local.getLoad());
         }
 
         // Distance assumes current speed for the last second. from km/h to km/sec

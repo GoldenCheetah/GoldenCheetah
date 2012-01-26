@@ -114,6 +114,7 @@ class TrainTool : public GcWindow
         int wattsTelemetry; // Power (and AltPower)
         int rpmTelemetry;   // Cadence
         int kphTelemetry;   // Speed (and Distance)
+        int loadTelemetry;  // Load
 
     signals:
 
