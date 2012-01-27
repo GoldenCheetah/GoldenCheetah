@@ -710,7 +710,7 @@ from %1 to %2?
     <message>
         <location filename="../Pages.cpp" line="46"/>
         <source>Portugese</source>
-        <translation type="unfinished"></translation>
+        <translation>Portugais</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="78"/>
@@ -2313,22 +2313,22 @@ Ajustement du couple - définit la valeur en livre par pouce carré (pi) ou newt
     <message>
         <location filename="../HrZones.cpp" line="614"/>
         <source>Threshold (bpm): %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Seuil (pulsations): %1</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="622"/>
         <source>&lt;td align=&quot;center&quot;&gt;Low (bpm)&lt;/td&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;Bas (pulsations)&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="623"/>
         <source>&lt;td align=&quot;center&quot;&gt;High (bpm)&lt;/td&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;Haut (pulsations)&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../HrZones.cpp" line="625"/>
         <source>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</translation>
     </message>
     <message>
         <source>Threshold: %1</source>
@@ -3120,7 +3120,7 @@ Fichier ignoré...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="399"/>
         <source>Export to TCX...</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter en TCX...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="402"/>
@@ -3145,7 +3145,7 @@ Fichier ignoré...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="419"/>
         <source>Air Density (Rho) Estimator</source>
-        <translation type="unfinished"></translation>
+        <translation>Estimateur de densité (Rho)</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="450"/>
@@ -3199,12 +3199,12 @@ Fichier ignoré...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="733"/>
         <source>Export TCX</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter en TCX</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="733"/>
         <source>TCX (*.tcx)</source>
-        <translation type="unfinished"></translation>
+        <translation>TCX (*.tcx)</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="753"/>
@@ -4535,12 +4535,12 @@ Voulez-vous continuer ?</translation>
     <message>
         <location filename="../PerformanceManagerWindow.cpp" line="55"/>
         <source>Use TRIMP 100</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser TRIMP 100</translation>
     </message>
     <message>
         <location filename="../PerformanceManagerWindow.cpp" line="56"/>
         <source>Use Trimp Zonal</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser TRIMP zonal</translation>
     </message>
     <message>
         <location filename="../PerformanceManagerWindow.cpp" line="78"/>
@@ -6068,78 +6068,78 @@ Voulez-vous continuer?
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="38"/>
         <source>Air Density (Rho) Estimator</source>
-        <translation type="unfinished"></translation>
+        <translation>Estimateur de densité (Rho)</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="46"/>
         <source>Enter measured values for the following:</source>
-        <translation type="unfinished"></translation>
+        <translation>Entrez les mesures pour:</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="52"/>
         <source>Metric</source>
-        <translation type="unfinished"></translation>
+        <translation>Métrique</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="55"/>
         <source>Imperial</source>
-        <translation type="unfinished"></translation>
+        <translation>Impériale</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="70"/>
         <location filename="../ToolsRhoEstimator.cpp" line="181"/>
         <source>Temperature (C):</source>
-        <translation type="unfinished"></translation>
+        <translation>Température (°C):</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="74"/>
         <location filename="../ToolsRhoEstimator.cpp" line="171"/>
         <source>Temperature (F):</source>
-        <translation type="unfinished"></translation>
+        <translation>Température (°F):</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="91"/>
         <location filename="../ToolsRhoEstimator.cpp" line="184"/>
         <source>Air Pressure (hPa):</source>
-        <translation type="unfinished"></translation>
+        <translation>Pression atmosphérique (hPa):</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="95"/>
         <location filename="../ToolsRhoEstimator.cpp" line="174"/>
         <source>Air Pressure (inHg):</source>
-        <translation type="unfinished"></translation>
+        <translation>Pression atmosphérique (inHg):</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="112"/>
         <location filename="../ToolsRhoEstimator.cpp" line="186"/>
         <source>Dewpoint (C):</source>
-        <translation type="unfinished"></translation>
+        <translation>Température de rosée (°C):</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="116"/>
         <location filename="../ToolsRhoEstimator.cpp" line="176"/>
         <source>Dewpoint (F):</source>
-        <translation type="unfinished"></translation>
+        <translation>Température de rosée (°F):</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="130"/>
         <source>Estimated air density (rho):</source>
-        <translation type="unfinished"></translation>
+        <translation>Densité estimée (rho):</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="138"/>
         <source>(kg/m^3)</source>
-        <translation type="unfinished"></translation>
+        <translation>(kg/m^3)</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="147"/>
         <source>(lb/ft^3)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="154"/>
         <source>Done</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -6716,22 +6716,22 @@ Voulez-vous continuer?
     <message>
         <location filename="../Zones.cpp" line="571"/>
         <source>Critical Power (watts): %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance critique (W): %1</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="579"/>
         <source>&lt;td align=&quot;center&quot;&gt;Low (watts)&lt;/td&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;Bas (W)&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="580"/>
         <source>&lt;td align=&quot;center&quot;&gt;High (watts)&lt;/td&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;Haut (W)&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="582"/>
         <source>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</translation>
     </message>
     <message>
         <source>Critical Power: %1</source>
