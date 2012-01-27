@@ -684,7 +684,7 @@
     <message>
         <location filename="../Pages.cpp" line="46"/>
         <source>Portugese</source>
-        <translation type="unfinished"></translation>
+        <translation>Portugués</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="74"/>
@@ -3093,7 +3093,7 @@ Saltando archivo...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="399"/>
         <source>Export to TCX...</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportar a TCX...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="402"/>
@@ -3118,7 +3118,7 @@ Saltando archivo...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="419"/>
         <source>Air Density (Rho) Estimator</source>
-        <translation type="unfinished"></translation>
+        <translation>Estimador de la Densidad del Aire (Rho)</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="450"/>
@@ -3172,12 +3172,12 @@ Saltando archivo...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="733"/>
         <source>Export TCX</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportar a TCX</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="733"/>
         <source>TCX (*.tcx)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="753"/>
@@ -4508,12 +4508,12 @@ Do you want to continue?</source>
     <message>
         <location filename="../PerformanceManagerWindow.cpp" line="55"/>
         <source>Use TRIMP 100</source>
-        <translation type="unfinished"></translation>
+        <translation>Usar TRIMP 100</translation>
     </message>
     <message>
         <location filename="../PerformanceManagerWindow.cpp" line="56"/>
         <source>Use Trimp Zonal</source>
-        <translation type="unfinished"></translation>
+        <translation>Usar Trimp por Zonas</translation>
     </message>
     <message>
         <location filename="../PerformanceManagerWindow.cpp" line="78"/>
@@ -6040,42 +6040,78 @@ formato GoldenCheetah. ¿Confirmar?</translation>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="38"/>
         <source>Air Density (Rho) Estimator</source>
-        <translation type="unfinished"></translation>
+        <translation>Estimador de la Densidad del Aire (Rho)</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="46"/>
         <source>Enter measured values for the following:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingrese los siguientes valores medidos:</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="52"/>
         <source>Metric</source>
-        <translation type="unfinished"></translation>
+        <translation>Métrico</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="55"/>
         <source>Imperial</source>
-        <translation type="unfinished">Imperial</translation>
+        <translation>Imperial</translation>
+    </message>
+    <message>
+        <location filename="../ToolsRhoEstimator.cpp" line="70"/>
+        <location filename="../ToolsRhoEstimator.cpp" line="181"/>
+        <source>Temperature (C):</source>
+        <translation>Temperatura (C):</translation>
+    </message>
+    <message>
+        <location filename="../ToolsRhoEstimator.cpp" line="74"/>
+        <location filename="../ToolsRhoEstimator.cpp" line="171"/>
+        <source>Temperature (F):</source>
+        <translation>Temperatura (F):</translation>
+    </message>
+    <message>
+        <location filename="../ToolsRhoEstimator.cpp" line="91"/>
+        <location filename="../ToolsRhoEstimator.cpp" line="184"/>
+        <source>Air Pressure (hPa):</source>
+        <translation>Presión Atmosférica (hPa):</translation>
+    </message>
+    <message>
+        <location filename="../ToolsRhoEstimator.cpp" line="95"/>
+        <location filename="../ToolsRhoEstimator.cpp" line="174"/>
+        <source>Air Pressure (inHg):</source>
+        <translation>Presión Atmosférica (pulgHg):</translation>
+    </message>
+    <message>
+        <location filename="../ToolsRhoEstimator.cpp" line="112"/>
+        <location filename="../ToolsRhoEstimator.cpp" line="186"/>
+        <source>Dewpoint (C):</source>
+        <translation>Temperatura de Rocío (C):</translation>
+    </message>
+    <message>
+        <location filename="../ToolsRhoEstimator.cpp" line="116"/>
+        <location filename="../ToolsRhoEstimator.cpp" line="176"/>
+        <source>Dewpoint (F):</source>
+        <translation>Temperatura de Rocío (F):</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="130"/>
         <source>Estimated air density (rho):</source>
-        <translation type="unfinished"></translation>
+        <translation>Densidad del Aire Estimada (rho):</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="138"/>
         <source>(kg/m^3)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="147"/>
         <source>(lb/ft^3)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="154"/>
         <source>Done</source>
-        <translation type="unfinished">Listo</translation>
+        <translation>Listo</translation>
     </message>
 </context>
 <context>

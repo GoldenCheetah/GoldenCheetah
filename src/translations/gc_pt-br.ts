@@ -6024,6 +6024,42 @@ native format. Should we do so?
         <translation type="unfinished">Imperial</translation>
     </message>
     <message>
+        <location filename="../ToolsRhoEstimator.cpp" line="70"/>
+        <location filename="../ToolsRhoEstimator.cpp" line="181"/>
+        <source>Temperature (C):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ToolsRhoEstimator.cpp" line="74"/>
+        <location filename="../ToolsRhoEstimator.cpp" line="171"/>
+        <source>Temperature (F):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ToolsRhoEstimator.cpp" line="91"/>
+        <location filename="../ToolsRhoEstimator.cpp" line="184"/>
+        <source>Air Pressure (hPa):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ToolsRhoEstimator.cpp" line="95"/>
+        <location filename="../ToolsRhoEstimator.cpp" line="174"/>
+        <source>Air Pressure (inHg):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ToolsRhoEstimator.cpp" line="112"/>
+        <location filename="../ToolsRhoEstimator.cpp" line="186"/>
+        <source>Dewpoint (C):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ToolsRhoEstimator.cpp" line="116"/>
+        <location filename="../ToolsRhoEstimator.cpp" line="176"/>
+        <source>Dewpoint (F):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../ToolsRhoEstimator.cpp" line="130"/>
         <source>Estimated air density (rho):</source>
         <translation type="unfinished"></translation>
