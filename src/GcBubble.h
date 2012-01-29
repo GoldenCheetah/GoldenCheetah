@@ -33,7 +33,11 @@ class GcBubble : public QWidget
         GcBubble(MainWindow *parent = NULL);
         void setText(QString); // set the text displayed according to filename
 
-    protected:
+    protected:  
+        // cached state
+        QSettings *settings;
+        QVariant unit;
+        bool useMetricUnits;
 
     signals:
 
