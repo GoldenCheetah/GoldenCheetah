@@ -6,8 +6,10 @@
     <file>images/devices/quarqd.png</file>
     <file>images/toolbar/main/togglefull.png</file>
     <file>images/toolbar/main/hideside.png</file>
+    <file>images/toolbar/main/hiderside.png</file>
     <file>images/toolbar/main/normal.png</file>
     <file>images/toolbar/main/showside.png</file>
+    <file>images/toolbar/main/showrside.png</file>
     <file>images/toolbar/main/style.png</file>
     <file>images/toolbar/main/tab.png</file>
     <file>images/toolbar/main/tile.png</file>

@@ -222,6 +222,7 @@ HEADERS += \
         FitlogParser.h \
         FitRideFile.h \
         GcBubble.h \
+        GcCalendar.h \
         GcPane.h \
         GcRideFile.h \
         GcToolBar.h \
@@ -402,6 +403,7 @@ SOURCES += \
         FixSpikes.cpp \
         FixTorque.cpp \
         GcBubble.cpp \
+        GcCalendar.cpp \
         GcPane.cpp \
         GcRideFile.cpp \
         GcToolBar.cpp \

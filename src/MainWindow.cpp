@@ -77,6 +77,7 @@
 #include "HelpWindow.h"
 #include "HomeWindow.h"
 #include "GcBubble.h"
+#include "GcCalendar.h"
 
 #if (defined Q_OS_MAC) && (defined GC_HAVE_LION)
 #include "LionFullScreen.h"
@@ -109,7 +110,9 @@ MainWindow::MainWindow(const QDir &home) :
 {
 
     static const QIcon hideIcon(":images/toolbar/main/hideside.png");
+    static const QIcon rhideIcon(":images/toolbar/main/hiderside.png");
     static const QIcon showIcon(":images/toolbar/main/showside.png");
+    static const QIcon rshowIcon(":images/toolbar/main/showrside.png");
     static const QIcon tabIcon(":images/toolbar/main/tab.png");
     static const QIcon tileIcon(":images/toolbar/main/tile.png");
     static const QIcon fullIcon(":images/toolbar/main/togglefull.png");
@@ -386,11 +389,23 @@ MainWindow::MainWindow(const QDir &home) :
     newchart->setFixedWidth(20);
     newchart->setFlat(true);
     newchart->setMenu(chartMenu);
-    rspacerLayout->addStretch();
     rspacerLayout->addWidget(newchart);
-
     connect(chartMenu, SIGNAL(aboutToShow()), this, SLOT(setChartMenu()));
     connect(chartMenu, SIGNAL(triggered(QAction*)), this, SLOT(addChart(QAction*)));
+
+    // show hide sidebar
+    rside = new QPushButton(rhideIcon, "", this);
+    rside->setFocusPolicy(Qt::NoFocus);
+    rside->setIconSize(QSize(15,15));
+    rside->setFixedWidth(20);
+    rside->setToolTip("Show/Hide Sidebar");
+    rside->setAutoFillBackground(false);
+    rside->setAutoDefault(false);
+    rside->setFlat(true);
+    rspacerLayout->addWidget(rside);
+    connect(rside, SIGNAL(clicked()), this, SLOT(toggleRSidebar()));
+    rspacerLayout->addStretch();
+
 
 #ifdef Q_OS_MAC
     side->setStyle(macstyler);
@@ -572,9 +587,25 @@ MainWindow::MainWindow(const QDir &home) :
     views->setCurrentIndex(0);          // default to Analysis
     views->setContentsMargins(0,0,0,0);
 
+    // RIGHT SIDEBAR
+    rightBar = new QWidget(this);
+    QPalette rightpal;
+    rightpal.setColor(QPalette::Background, QColor("#B3B4BA"));
+    rightBar->setPalette(rightpal);
+    rightBar->setContentsMargins(0,0,0,0);
+    rightBar->setAutoFillBackground(true);
+    rightBar->setFixedWidth(250);
+    QVBoxLayout *rbl = new QVBoxLayout;
+    gcCalendar = new GcCalendar(this);
+    rbl->addWidget(gcCalendar);
+    rbl->setSpacing(0);
+    rightBar->setLayout(rbl);
+    rightBar->hide();
+
     // SPLITTER
     splitter->addWidget(toolBox);
     splitter->addWidget(views);
+    splitter->addWidget(rightBar);
     QVariant splitterSizes = appsettings->cvalue(cyclist, GC_SETTINGS_SPLITTER_SIZES); 
     if (splitterSizes != QVariant()) {
         splitter->restoreState(splitterSizes.toByteArray());
@@ -590,15 +621,19 @@ MainWindow::MainWindow(const QDir &home) :
 
     splitter->setChildrenCollapsible(false); // QT BUG crash QTextLayout do not undo this
     splitter->setHandleWidth(1);
+    splitter->setStyleSheet(" QSplitter::handle { background-color: #B3B4BA; "
+                            "                     color: #B3B4BA; }");
+#if 0
     splitter->setStyleSheet(" QSplitter::handle { "
                             "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, "
                             "stop:0 rgba(255, 255, 255, 0), "
                             "stop:0.407273 rgba(200, 200, 200, 255), "
                             "stop:0.4825 rgba(101, 104, 113, 235), "
                             "stop:0.6 rgba(255, 255, 255, 0)); }");
-
+#endif
     splitter->setFrameStyle(QFrame::NoFrame);
     splitter->setContentsMargins(0, 0, 0, 0); // attempting to follow some UI guides
+
 
     // CENTRAL LAYOUT
     QWidget *central = new QWidget(this);
@@ -708,9 +743,12 @@ MainWindow::MainWindow(const QDir &home) :
 #ifndef Q_OS_MAC
     viewMenu->addAction(tr("Toggle Full Screen"), this, SLOT(toggleFullScreen()), QKeySequence("F11"));
 #endif
-    showhideSidebar = viewMenu->addAction(tr("Show Sidebar"), this, SLOT(showSidebar(bool)));
+    showhideSidebar = viewMenu->addAction(tr("Show Left Sidebar"), this, SLOT(showSidebar(bool)));
     showhideSidebar->setCheckable(true);
     showhideSidebar->setChecked(true);
+    showhideRSidebar = viewMenu->addAction(tr("Show Right Sidebar"), this, SLOT(showRSidebar(bool)));
+    showhideRSidebar->setCheckable(true);
+    showhideRSidebar->setChecked(false);
     //connect(showhideSidebar, SIGNAL(triggered(bool)), this, SLOT(showSidebar(bool)));
 
     showhideToolbar = viewMenu->addAction(tr("Show Toolbar"), this, SLOT(showToolbar(bool)));
@@ -781,11 +819,34 @@ MainWindow::showDock()
 }
 
 void
+MainWindow::toggleRSidebar()
+{
+    showRSidebar(!rightBar->isVisible());
+}
+
+void
 MainWindow::toggleSidebar()
 {
     showSidebar(!toolBox->isVisible());
 }
 
+void
+MainWindow::showRSidebar(bool want)
+{
+    static const QIcon hideIcon(":images/toolbar/main/hiderside.png");
+    static const QIcon showIcon(":images/toolbar/main/showrside.png");
+
+    if (want) {
+        rightBar->show();
+        rside->setIcon(hideIcon);
+    } else {
+        rightBar->hide();
+        rside->setIcon(showIcon);
+    }
+    showhideRSidebar->setChecked(rightBar->isVisible());
+    setStyle();
+
+}
 void
 MainWindow::showSidebar(bool want)
 {
@@ -949,6 +1010,7 @@ MainWindow::rideTreeWidgetSelectionChanged()
     homeWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
     diaryWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
     trainWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
+    gcCalendar->setRide(ride);
 
     enableSaveButton(); // should it be enabled or not?
 

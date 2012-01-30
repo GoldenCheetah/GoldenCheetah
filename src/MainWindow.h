@@ -57,6 +57,7 @@ class Seasons;
 class IntervalSummaryWindow;
 class RideNavigator;
 class GcToolBar;
+class GcCalendar;
 class GcBubble;
 class LionFullScreen;
 class QTFullScreen;
@@ -258,7 +259,9 @@ class MainWindow : public QMainWindow
         void showTools();
         void showRhoEstimator();
         void toggleSidebar();
+        void toggleRSidebar();
         void showSidebar(bool want);
+        void showRSidebar(bool want);
         void showToolbar(bool want);
         void showWorkoutWizard();
         void resetWindowLayout();
@@ -329,9 +332,10 @@ class MainWindow : public QMainWindow
         QAction *styleAction;
         QAction *showhideToolbar;
         QAction *showhideSidebar;
+        QAction *showhideRSidebar;
 
         // toolbar butttons
-        QPushButton *side, *style, *full, *saveButton;
+        QPushButton *side, *rside, *style, *full, *saveButton;
         QWidget *analButtons;
         QMenu *chartMenu;
         QMenu *subChartMenu;
@@ -342,6 +346,7 @@ class MainWindow : public QMainWindow
         QAction *stravaAction;
         QMenu *windowMenu;
         GcBubble *bubble;
+        GcCalendar *gcCalendar;
 
         // each view has its own controls XXX more to come
         QStackedWidget *masterControls,
@@ -355,6 +360,7 @@ class MainWindow : public QMainWindow
         QTreeWidgetItem *allIntervals;
         IntervalSummaryWindow *intervalSummaryWindow;
         QSplitter *leftLayout;
+        QWidget *rightBar;
         RideMetadata *_rideMetadata;
         GcWindowTool *chartTool;
 
