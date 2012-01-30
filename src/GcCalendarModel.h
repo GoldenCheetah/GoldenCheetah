@@ -134,7 +134,10 @@ public:
     int getYear() { return year; }
 
     QDate date(QModelIndex index) const {
-        return dates[index.row()*7+index.column()];
+        if (index.row()*7+index.column() < dates.count())
+            return dates[index.row()*7+index.column()];
+        else
+            return QDate();
     }
 
     void setSourceModel(QAbstractItemModel *model) {
@@ -185,7 +188,8 @@ public:
         HeaderColorRole = DateStringRole + 1,
         CellColorRole = HeaderColorRole + 1,
         EventCountRole = CellColorRole + 1,
-        FilenamesRole = EventCountRole + 1
+        FilenamesRole = EventCountRole + 1,
+        DayRole = FilenamesRole + 1
     };
 
     QVariant data(const QModelIndex &proxyIndex, int role = Qt::DisplayRole) const {
@@ -295,6 +299,16 @@ public:
             if (today.month() != month &&
                 (today.addDays(1).month() == month || today.addDays(-1).month() == month))
                 return QString("%1 %2").arg(today.day()).arg(QDate::shortMonthName(today.month()));
+            else
+                return QString("%1").arg(today.day());
+            }
+            break;
+        case DayRole:
+            {
+            QDate today = date(proxyIndex);
+            if (today.month() != month &&
+                (today.addDays(1).month() == month || today.addDays(-1).month() == month))
+                return "";
             else
                 return QString("%1").arg(today.day());
             }
