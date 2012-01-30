@@ -1187,8 +1187,8 @@ GcWindowDialog::GcWindowDialog(GcWinID type, MainWindow *mainWindow) : mainWindo
     //setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     setWindowTitle("Chart Setup");
-    setFixedHeight(500);
-    setFixedWidth(800);
+    setMinimumHeight(500);
+    setMinimumWidth(800);
     setWindowModality(Qt::ApplicationModal);
 
     mainLayout = new QVBoxLayout(this);
