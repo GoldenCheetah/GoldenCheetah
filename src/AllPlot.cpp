@@ -522,7 +522,8 @@ AllPlot::recalc()
                     totalAlt   += altArray[i];
                 if (!tempArray.empty() ) {
                     if (tempArray[i] == RideFile::noTemp && i>0) {
-                        dp.temp = (i>0?list.back().temp:0.0);
+                        if (list.count() && i>0) dp.temp = list.back().temp;
+                        else dp.temp = 0.0f;
                         totalTemp   += dp.temp;
                     }
                     else {
