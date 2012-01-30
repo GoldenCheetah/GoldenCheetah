@@ -203,6 +203,18 @@ GcCalendar::GcCalendar(MainWindow *mainWindow) : mainWindow(mainWindow)
         }
     }
     connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(dayClicked(int)));
+
+    // refresh on these events...
+    connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
+    connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
+    connect(mainWindow, SIGNAL(configChanged()), this, SLOT(refresh()));
+}
+
+void
+GcCalendar::refresh()
+{
+    calendarModel->setMonth(month, year);
+    repaint();
 }
 
 void
@@ -340,11 +352,6 @@ GcCalendar::setRide(RideItem *ride)
     }
 
     repaint();
-}
-
-void
-GcCalendar::configChanged()
-{
 }
 
 void
