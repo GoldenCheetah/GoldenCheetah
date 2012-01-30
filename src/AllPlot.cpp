@@ -754,7 +754,7 @@ AllPlot::setYMax()
 
     enableAxis(yLeft, wattsCurve->isVisible());
     enableAxis(yLeft2, hrCurve->isVisible() || cadCurve->isVisible());
-    enableAxis(yRight, speedCurve->isVisible());
+    enableAxis(yRight, speedCurve->isVisible() || tempCurve->isVisible());
     enableAxis(yRight2, altCurve->isVisible());
 }
 
