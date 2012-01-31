@@ -299,6 +299,14 @@ PwxFileReader::writeRideFile(MainWindow *main, const RideFile *ride, QFile &file
     text = doc.createTextNode(sport); sportType.appendChild(text);
     root.appendChild(sportType);
 
+    // notes
+    if (ride->getTag("Notes","") != "") {
+        QDomElement notes = doc.createElement("cmt");
+        text = doc.createTextNode(ride->getTag("Notes","")); notes.appendChild(text);
+        root.appendChild(notes);
+    }
+    
+    
     // workout code
     if (ride->getTag("Workout Code", "") != "") {
         QString wcode = ride->getTag("Workout Code", "");
@@ -316,8 +324,6 @@ PwxFileReader::writeRideFile(MainWindow *main, const RideFile *ride, QFile &file
     }
 
 
-    // notes
-    // XXX todo
     // device type
     if (ride->deviceType() != "") {
         QDomElement device = doc.createElement("device");
