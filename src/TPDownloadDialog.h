@@ -37,6 +37,12 @@ class TPDownloadDialog : public QDialog
 
     public:
         TPDownloadDialog(MainWindow *main);
+	
+    protected:  
+        // cached state
+        QSettings *settings;
+        QVariant unit;
+        bool useMetricUnits;
 
     public slots:
         void completedAthlete(QList<QMap<QString,QString> >);

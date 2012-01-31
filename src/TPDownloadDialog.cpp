@@ -23,6 +23,7 @@
 #include "RideFile.h"
 #include "Settings.h"
 #include "MetricAggregator.h"
+#include "Units.h"
 
 TPDownloadDialog::TPDownloadDialog(MainWindow *main) : QDialog(main, Qt::Dialog), main(main), downloading(false), aborted(false)
 {
@@ -334,6 +335,9 @@ TPDownloadDialog::tabChanged(int idx)
 void
 TPDownloadDialog::completedWorkout(QList<QMap<QString, QString> >workouts)
 {
+  
+    unit = appsettings->value(this, GC_UNIT);
+    useMetricUnits = (unit.toString() == "Metric");
 
     //
     // Setup the upload list
@@ -369,8 +373,12 @@ TPDownloadDialog::completedWorkout(QList<QMap<QString, QString> >workouts)
         add->setTextAlignment(4, Qt::AlignCenter);
 
         double distance = workouts[i].value("DistanceInMeters").toDouble() / 1000.00;
-        add->setText(5, QString("%1 km").arg(distance, 0, 'f', 1));
-        add->setTextAlignment(5, Qt::AlignRight);
+	if (useMetricUnits) {
+	  add->setText(5, QString("%1 km").arg(distance, 0, 'f', 1));
+	  } else {
+	  add->setText(5, QString("%1 mi").arg(distance*MILES_PER_KM, 0, 'f', 1));
+	  }
+	  add->setTextAlignment(5, Qt::AlignRight);
 
         QString targetnosuffix = QString ( "%1_%2_%3_%4_%5_%6" )
                            .arg ( ridedatetime.date().year(), 4, 10, zero )
