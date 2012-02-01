@@ -44,6 +44,7 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
     dateTimeEdit = new QDateTimeEdit( QDateTime::currentDateTime(), this );
     // Wed 6/24/09 6:55 AM
     dateTimeEdit->setDisplayFormat(tr("ddd MMM d, yyyy  h:mm AP"));
+    dateTimeEdit->setAlignment(Qt::AlignCenter);
     dateTimeEdit->setCalendarPopup(true);
 
     // ride length
@@ -55,15 +56,21 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
     QIntValidator * hoursValidator = new QIntValidator(0,99,this);
     //hrsentry->setInputMask("09");
     hrsentry->setValidator(hoursValidator);
+    hrsentry->setPlaceholderText("00");
+    hrsentry->setMaxLength(2);
+    hrsentry->setAlignment(Qt::AlignCenter);
     manualLengthLayout->addWidget(hrslbl);
     manualLengthLayout->addWidget(hrsentry);
 
     minslbl = new QLabel(tr("mins"),this);
     minslbl->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     minsentry = new QLineEdit(this);
-    QIntValidator * secsValidator = new QIntValidator(0,60,this);
+    QIntValidator * mins_secsValidator = new QIntValidator(0,59,this);
     //minsentry->setInputMask("00");
-    minsentry->setValidator(secsValidator);
+    minsentry->setValidator(mins_secsValidator);
+    minsentry->setPlaceholderText("00");
+    minsentry->setMaxLength(2);
+    minsentry->setAlignment(Qt::AlignCenter);
     manualLengthLayout->addWidget(minslbl);
     manualLengthLayout->addWidget(minsentry);
 
@@ -71,7 +78,10 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
     secslbl->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     secsentry = new QLineEdit(this);
     //secsentry->setInputMask("00");
-    secsentry->setValidator(secsValidator);
+    secsentry->setValidator(mins_secsValidator);
+    secsentry->setPlaceholderText("00");
+    secsentry->setMaxLength(2);
+    secsentry->setAlignment(Qt::AlignCenter);
     manualLengthLayout->addWidget(secslbl);
     manualLengthLayout->addWidget(secsentry);
 
@@ -90,26 +100,30 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
     distanceentry = new QLineEdit(this);
     //distanceentry->setInputMask("009.00");
     distanceentry->setValidator(distanceValidator);
-	distanceentry->setMaxLength(6);
+    distanceentry->setMaxLength(6);
+    distanceentry->setPlaceholderText("0");
+    distanceentry->setAlignment(Qt::AlignCenter);
 
     QLabel *manualDistanceHint = new QLabel(tr("(0-9999) "), this);
     QHBoxLayout *distanceLayout = new QHBoxLayout;
-	distanceLayout->addWidget(distanceentry);
-	distanceLayout->addWidget(manualDistanceHint);
+    distanceLayout->addWidget(distanceentry);
+    distanceLayout->addWidget(manualDistanceHint);
 
 
 
     // AvgHR
     QLabel *HRLabel = new QLabel(tr("Average HR: "), this);
+    QIntValidator * hrValidator =  new QIntValidator(30,199,this);
     HRentry = new QLineEdit(this);
-    QIntValidator *hrValidator =  new QIntValidator(30,200,this);
     //HRentry->setInputMask("099");
     HRentry->setValidator(hrValidator);
+    HRentry->setPlaceholderText("0");
+    HRentry->setAlignment(Qt::AlignCenter);
 
     QLabel *manualHRHint = new QLabel(tr("(30-199) "), this);
     QHBoxLayout *hrLayout = new QHBoxLayout;
-	hrLayout->addWidget(HRentry);
-	hrLayout->addWidget(manualHRHint);
+    hrLayout->addWidget(HRentry);
+    hrLayout->addWidget(manualHRHint);
 
     // how to estimate BikeScore:
     QLabel *BSEstLabel = NULL;
@@ -139,25 +153,29 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
     QDoubleValidator * bsValidator = new QDoubleValidator(0,9999,2,this);
     BSentry = new QLineEdit(this);
     BSentry->setValidator(bsValidator);
-	BSentry->setMaxLength(6);
+    BSentry->setMaxLength(6);
+    BSentry->setPlaceholderText("0");
+    BSentry->setAlignment(Qt::AlignCenter);
     BSentry->clear();
 
     QLabel *manualBSHint = new QLabel(tr("(0-9999) "), this);
     QHBoxLayout *bsLayout = new QHBoxLayout;
-	bsLayout->addWidget(BSentry);
-	bsLayout->addWidget(manualBSHint);
+    bsLayout->addWidget(BSentry);
+    bsLayout->addWidget(manualBSHint);
 
     // DanielsPoints
     QLabel *ManualDPLabel = new QLabel(tr("Daniels Points: "), this);
     QDoubleValidator * dpValidator = new QDoubleValidator(0,9999,2,this);
     DPentry = new QLineEdit(this);
     DPentry->setValidator(dpValidator);
-	DPentry->setMaxLength(6);
+    DPentry->setMaxLength(6);
+    DPentry->setPlaceholderText("0");
+    DPentry->setAlignment(Qt::AlignCenter);
     DPentry->clear();
     QLabel *manualDPHint = new QLabel(tr("(0-9999) "), this);
     QHBoxLayout *dpLayout = new QHBoxLayout;
-	dpLayout->addWidget(DPentry);
-	dpLayout->addWidget(manualDPHint);
+    dpLayout->addWidget(DPentry);
+    dpLayout->addWidget(manualDPHint);
 
     // buttons
     enterButton = new QPushButton(tr("&OK"), this);
@@ -205,7 +223,10 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
     glayout->addWidget(enterButton,row,1);
     glayout->addWidget(cancelButton,row,2);
 
-    this->resize(QSize(400,275));
+#ifdef Q_OS_MAC
+    setMinimumHeight(275);
+    setMinimumWidth(400);
+#endif
 
     connect(enterButton, SIGNAL(clicked()), this, SLOT(enterClicked()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
@@ -284,12 +305,15 @@ ManualRideDialog::enterClicked()
 
   if (!( ( BSentry->text().isEmpty() || BSentry->hasAcceptableInput() ) &&
 		 ( DPentry->text().isEmpty() || DPentry->hasAcceptableInput() ) &&
+                 ( HRentry->hasAcceptableInput() ) &&
 		 ( distanceentry->text().isEmpty() || distanceentry->hasAcceptableInput() ) ) ) {
         QMessageBox::warning( this,
             tr("Values out of range"),
             tr("The values you've entered in:\n ")
 			+((!distanceentry->hasAcceptableInput() && !distanceentry->text().isEmpty() )
 			  ? "  Distance (max 9999)\n " : "")
+                        +((!HRentry->hasAcceptableInput()) 
+                          ? " Average HR (30-199 bpm)\n " : "")
 			+((!BSentry->hasAcceptableInput() && !BSentry->text().isEmpty() )
 			  ? "  BikeScore (max 9999)\n " : "")
 			+((!DPentry->hasAcceptableInput() && !DPentry->text().isEmpty() )
