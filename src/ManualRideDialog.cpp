@@ -223,6 +223,7 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
     glayout->addWidget(enterButton,row,1);
     glayout->addWidget(cancelButton,row,2);
 
+// Mac has sizing issues. This allows it to grow bigger to fit things in.
 #ifdef Q_OS_MAC
     setMinimumHeight(275);
     setMinimumWidth(400);
@@ -310,14 +311,14 @@ ManualRideDialog::enterClicked()
         QMessageBox::warning( this,
             tr("Values out of range"),
             tr("The values you've entered in:\n ")
-			+((!distanceentry->hasAcceptableInput() && !distanceentry->text().isEmpty() )
-			  ? "  Distance (max 9999)\n " : "")
-                        +((!HRentry->hasAcceptableInput()) 
-                          ? " Average HR (30-199 bpm)\n " : "")
-			+((!BSentry->hasAcceptableInput() && !BSentry->text().isEmpty() )
-			  ? "  BikeScore (max 9999)\n " : "")
-			+((!DPentry->hasAcceptableInput() && !DPentry->text().isEmpty() )
-              ? "  Daniels Points (max 9999)\n " : "")
+            +((!distanceentry->hasAcceptableInput() && !distanceentry->text().isEmpty() )
+                ? "  Distance (max 9999)\n " : "")
+            +((!HRentry->hasAcceptableInput()) 
+                ? " Average HR (30-199 bpm)\n " : "")
+            +((!BSentry->hasAcceptableInput() && !BSentry->text().isEmpty() )
+                ? "  BikeScore (max 9999)\n " : "")
+            +((!DPentry->hasAcceptableInput() && !DPentry->text().isEmpty() )
+                ? "  Daniels Points (max 9999)\n " : "")
             + tr("are invalid, please fix.")
         );
         return;
