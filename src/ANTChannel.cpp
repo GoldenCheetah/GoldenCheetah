@@ -442,7 +442,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 //
                 case ANT_STANDARD_POWER: // 0x10 - standard power
                 {
-                    if (lastStdPwrMessage.type != 0 && antMessage.period) {
+                    if (lastStdPwrMessage.type != 0) {
                         is_alt ? parent->setAltWatts(antMessage.instantPower) : parent->setWatts(antMessage.instantPower);
                         value2 = value = antMessage.instantPower;
                         parent->setCadence(antMessage.instantCadence); // cadence
