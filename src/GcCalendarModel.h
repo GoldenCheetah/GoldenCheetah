@@ -41,7 +41,9 @@
 #include "qxtscheduleview.h"
 #include "MainWindow.h"
 #include "RideMetadata.h"
+#ifdef GC_HAVE_ICAL
 #include "ICalendar.h"
+#endif
 #include "Colors.h"
 #include "Settings.h"
 
@@ -147,7 +149,9 @@ public:
         connect(model, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(refresh()));
         connect(model, SIGNAL(rowsMoved(QModelIndex,int,int,QModelIndex,int)), this, SLOT(refresh()));
         connect(model, SIGNAL(rowsRemoved(QModelIndex,int,int)), this, SLOT(refresh()));
+#ifdef GC_HAVE_ICAL
         connect(mainWindow->rideCalendar, SIGNAL(dataChanged()), this, SLOT(refresh()));
+#endif
         refresh();
     }
 
@@ -211,10 +215,11 @@ public:
                     else
 
                         colors << QColor(sourceModel()->data(index(i, colorIndex, QModelIndex())).toString());
-
+#ifdef GC_HAVE_ICAL
             // added planned workouts
             for (int k= mainWindow->rideCalendar->data(date(proxyIndex), EventCountRole).toInt(); k>0; k--)
                 colors.append(GColor(CCALPLANNED));
+#endif
 
             return QVariant::fromValue<QList<QColor> >(colors);
             }
@@ -262,11 +267,13 @@ public:
                 foreach (int i, *arr)
                     filenames << sourceModel()->data(index(i, filenameIndex, QModelIndex())).toString();
 
+#ifdef GC_HAVE_ICAL
             // fold in planned workouts
             if (mainWindow->rideCalendar->data(date(proxyIndex), EventCountRole).toInt()) {
                 foreach(QString x, mainWindow->rideCalendar->data(date(proxyIndex), Qt::DisplayRole).toStringList())
                     filenames << "calendar";
             }
+#endif
 
             return filenames;
             }
@@ -282,12 +289,14 @@ public:
                 foreach (int i, *arr)
                     strings << sourceModel()->data(index(i, textIndex, QModelIndex())).toString();
 
+#ifdef GC_HAVE_ICAL
             // fold in planned workouts
             if (mainWindow->rideCalendar->data(date(proxyIndex), EventCountRole).toInt()) {
                 QStringList planned;
                 planned = mainWindow->rideCalendar->data(date(proxyIndex), Qt::DisplayRole).toStringList();
                 strings << planned;
             }
+#endif
             return strings;
             }
             break;
