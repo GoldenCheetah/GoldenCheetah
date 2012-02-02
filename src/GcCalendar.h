@@ -50,7 +50,7 @@ public slots:
     bool getBg() { return bg; }
     void setBgColor(QColor bg) { bgColor = bg; }
     void setSelected(bool x) { selected = x; }
- 
+
 protected:
     void mouseReleaseEvent(QMouseEvent *) {
         emit clicked();
@@ -71,7 +71,7 @@ class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
     public slots:
 
         void setRide(RideItem *ride);
-        void configChanged();
+        void refresh(); 
 
         void dayClicked(int num); // for when a day is selected
         void next();

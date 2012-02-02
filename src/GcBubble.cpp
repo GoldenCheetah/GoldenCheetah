@@ -29,6 +29,8 @@ static const int spikeMargin = 40;
 #include "MetricAggregator.h"
 #include "SummaryMetrics.h"
 #include "DBAccess.h"
+#include "Settings.h"
+#include "Units.h"
 
 GcBubble::GcBubble(MainWindow *parent) : QWidget(parent, Qt::FramelessWindowHint), borderWidth(3), parent(parent), orientation(Qt::Horizontal)
 {
@@ -416,6 +418,10 @@ void
 GcBubble::setText(QString filename)
 {
         SummaryMetrics metrics = parent->metricDB->getAllMetricsFor(filename);
+	
+	unit = appsettings->value(this, GC_UNIT);
+	useMetricUnits = (unit.toString() == "Metric");
+    
 
         //
         // Workout code
@@ -458,7 +464,12 @@ GcBubble::setText(QString filename)
 
         // Metrics 1,2,3,4
         m1->setText(QTime(0,0,0,0).addSecs(metrics.getForSymbol("workout_time")).toString("hh:mm:ss")); //duration
-        m3->setText(QString("%1 km").arg(metrics.getForSymbol("total_distance"), 0, 'f', 2)); //distance
+        
+	if (useMetricUnits) { 
+	  m3->setText(QString("%1 km").arg(metrics.getForSymbol("total_distance"), 0, 'f', 2));
+	  } else {
+	  m3->setText(QString("%1 mi").arg(metrics.getForSymbol("total_distance")*MILES_PER_KM, 0, 'f', 2));
+	  } //distance
 
         m2->setText(QString("%1 TSS").arg(metrics.getForSymbol("coggan_tss"), 0, 'f', 0));
         m4->setText(QString("%1 IF").arg(metrics.getForSymbol("coggan_if"), 0, 'f', 3));
