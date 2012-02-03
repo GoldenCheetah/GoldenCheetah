@@ -161,7 +161,7 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
                 // duration - convert to end
                 QDomElement duration = summary.firstChildElement("duration");
                 if (!duration.isNull() && add.start != -1)
-                    add.stop = beginning.text().toDouble() + add.start;
+                    add.stop = duration.text().toDouble() + add.start;
                 else
                     add.stop = -1;
 
