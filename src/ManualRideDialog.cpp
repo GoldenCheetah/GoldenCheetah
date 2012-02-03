@@ -304,15 +304,15 @@ ManualRideDialog::enterClicked()
 {
 
   if (!( ( BSentry->text().isEmpty() || BSentry->hasAcceptableInput() ) &&
-		 ( DPentry->text().isEmpty() || DPentry->hasAcceptableInput() ) &&
-                 ( HRentry->hasAcceptableInput() ) &&
-		 ( distanceentry->text().isEmpty() || distanceentry->hasAcceptableInput() ) ) ) {
+     ( DPentry->text().isEmpty() || DPentry->hasAcceptableInput() ) &&
+     ( HRentry->text().isEmpty() || HRentry->hasAcceptableInput() ) &&
+     ( distanceentry->text().isEmpty() || distanceentry->hasAcceptableInput() ) ) ) {
         QMessageBox::warning( this,
             tr("Values out of range"),
             tr("The values you've entered in:\n ")
             +((!distanceentry->hasAcceptableInput() && !distanceentry->text().isEmpty() )
                 ? "  Distance (max 9999)\n " : "")
-            +((!HRentry->hasAcceptableInput()) 
+            +((!HRentry->hasAcceptableInput() && !HRentry->text().isEmpty() )
                 ? " Average HR (30-199 bpm)\n " : "")
             +((!BSentry->hasAcceptableInput() && !BSentry->text().isEmpty() )
                 ? "  BikeScore (max 9999)\n " : "")
