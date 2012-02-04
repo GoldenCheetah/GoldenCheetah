@@ -81,7 +81,7 @@ class ANTChannel : public QObject {
         ANT *parent;
 
         ANTMessage lastMessage, lastStdPwrMessage;
-        int dualNullCount, nullCount;
+        int dualNullCount, nullCount, stdNullCount;
         double last_message_timestamp;
         double blanking_timestamp;
         int blanked;

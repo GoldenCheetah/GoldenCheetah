@@ -442,10 +442,19 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 //
                 case ANT_STANDARD_POWER: // 0x10 - standard power
                 {
-                    if (lastStdPwrMessage.type != 0) {
+                    uint8_t events = antMessage.eventCount - lastStdPwrMessage.eventCount;
+                    if (lastStdPwrMessage.type && events) {
+                        stdNullCount = 0;
                         is_alt ? parent->setAltWatts(antMessage.instantPower) : parent->setWatts(antMessage.instantPower);
                         value2 = value = antMessage.instantPower;
                         parent->setCadence(antMessage.instantCadence); // cadence
+                    } else {
+                       stdNullCount++;
+                       if (stdNullCount >= 2) { //XXX 2 for standard power?
+                           parent->setCadence(0);
+                           is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
+                           value2 = value = 0;
+                       }
                     }
                     lastStdPwrMessage = antMessage;
                     savemessage = false;
