@@ -460,7 +460,7 @@ GcBubble::setText(QString filename)
         // 
         QDateTime rideDate = metrics.getRideDate();
         topmiddle->setText(rideDate.toString("MMM d, yyyy")); // same format as ride list
-        topmiddle2->setText(rideDate.toString("hh:mm:ss"));
+        topmiddle2->setText(rideDate.toString("h:mm AP"));
 
         // Metrics 1,2,3,4
         m1->setText(QTime(0,0,0,0).addSecs(metrics.getForSymbol("workout_time")).toString("hh:mm:ss")); //duration
