@@ -240,7 +240,7 @@ void BingMap::createHtml()
     "    webBridge.drawOverlays();\n"
 
     "}\n"
-    "</script>\n").arg(minLat,0,'g',11).arg(minLon,0,'g',11).arg(maxLat,0,'g',11).arg(maxLon,0,'g',11);
+    "</script>\n").arg(minLat,0,'g',GPS_COORD_TO_STRING).arg(minLon,0,'g',GPS_COORD_TO_STRING).arg(maxLat,0,'g',GPS_COORD_TO_STRING).arg(maxLon,0,'g',GPS_COORD_TO_STRING);
 
     // the main page is rather trivial
     currentPage += QString("</head>\n"
@@ -275,7 +275,7 @@ BingMap::drawShadedRoute()
             code = QString("{\nvar route = new Array();\n");
         } else {
             if (rfp->lat || rfp->lon)
-                code += QString("route.push(new Microsoft.Maps.Location(%1,%2));\n").arg(rfp->lat,0,'g',11).arg(rfp->lon,0,'g',11);
+                code += QString("route.push(new Microsoft.Maps.Location(%1,%2));\n").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
         }
 
         // running total of time
@@ -354,7 +354,7 @@ BingMap::createMarkers()
                    "var pushpinOptions = { icon: 'qrc:images/maps/loop.png', height: 37, width: 32 };"
                    "var pushpin = new Microsoft.Maps.Pushpin(latlng, pushpinOptions);"
                    "map.entities.push(pushpin); }"
-                   ).arg(points[0]->lat,0,'g',11).arg(points[0]->lon,0,'g',11);
+                   ).arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING);
 
         view->page()->mainFrame()->evaluateJavaScript(code);
 
@@ -364,14 +364,14 @@ BingMap::createMarkers()
                    "var pushpinOptions = { icon: 'qrc:images/maps/cycling.png', height: 37, width: 32 };"
                    "var pushpin = new Microsoft.Maps.Pushpin(latlng, pushpinOptions);"
                    "map.entities.push(pushpin); }"
-                   ).arg(points[0]->lat,0,'g',11).arg(points[0]->lon,0,'g',11);
+                   ).arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING);
         view->page()->mainFrame()->evaluateJavaScript(code);
 
         code = QString("{ var latlng = new Microsoft.Maps.Location(%1,%2); " 
                    "var pushpinOptions = { icon: 'qrc:images/maps/finish.png', height: 37, width: 32 };"
                    "var pushpin = new Microsoft.Maps.Pushpin(latlng, pushpinOptions);"
                    "map.entities.push(pushpin); }"
-                   ).arg(points[points.count()-1]->lat,0,'g',11).arg(points[points.count()-1]->lon,0,'g',11);
+                   ).arg(points[points.count()-1]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[points.count()-1]->lon,0,'g',GPS_COORD_TO_STRING);
         view->page()->mainFrame()->evaluateJavaScript(code);
     }
 
@@ -416,7 +416,7 @@ BingMap::createMarkers()
                    "var pushpinOptions = { icon: 'qrc:images/maps/cycling_feed.png', height: 37, width: 32 };"
                    "var pushpin = new Microsoft.Maps.Pushpin(latlng, pushpinOptions);"
                    "map.entities.push(pushpin); }"
-                    ).arg(rfp->lat,0,'g',11).arg(rfp->lon,0,'g',11);
+                    ).arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING);
                 view->page()->mainFrame()->evaluateJavaScript(code);
                 stoptime=0;
             }
@@ -441,8 +441,8 @@ BingMap::createMarkers()
                    "pushpin.cm1001_er_etr.dom.setAttribute('title', '%3');\n"
                    "pushpinClick= Microsoft.Maps.Events.addHandler(pushpin, 'click', function(event) { webBridge.toggleInterval(%4); });\n"
                    " }")
-                   .arg(myRideItem->ride()->dataPoints()[offset]->lat,0,'g',11)
-                   .arg(myRideItem->ride()->dataPoints()[offset]->lon,0,'g',11)
+                   .arg(myRideItem->ride()->dataPoints()[offset]->lat,0,'g',GPS_COORD_TO_STRING)
+                   .arg(myRideItem->ride()->dataPoints()[offset]->lon,0,'g',GPS_COORD_TO_STRING)
                    .arg(x.name)
                    .arg(interval);
 
@@ -489,10 +489,10 @@ void BingMap::zoomInterval(IntervalItem *which)
                            "                                  new Microsoft.Maps.Location(%1,%2), "
                            "                                  new Microsoft.Maps.Location(%3,%4));\n"
                            "   map.setView( { bounds: viewBounds });\n }")
-                    .arg(minLat,0,'g',11)
-                    .arg(minLon,0,'g',11)
-                    .arg(maxLat,0,'g',11)
-                    .arg(maxLon,0,'g',11);
+                    .arg(minLat,0,'g',GPS_COORD_TO_STRING)
+                    .arg(minLon,0,'g',GPS_COORD_TO_STRING)
+                    .arg(maxLat,0,'g',GPS_COORD_TO_STRING)
+                    .arg(maxLon,0,'g',GPS_COORD_TO_STRING);
     view->page()->mainFrame()->evaluateJavaScript(code);
 }
 
