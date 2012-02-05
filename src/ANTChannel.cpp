@@ -593,7 +593,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
         } else {
 
             // reset nullCount if receiving first telemetry update
-            dualNullCount = nullCount = 0;
+            stdNullCount = dualNullCount = nullCount = 0;
             value2 = value = 0;
         }
 
