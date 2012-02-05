@@ -23,6 +23,7 @@
 #include <QUrl>
 #include <QScriptEngine>
 #include "TimeUtils.h"
+#include "Units.h"
 
 // acccess to metrics
 #include "MetricAggregator.h"
@@ -296,7 +297,7 @@ StravaDialog::requestUpload()
 
     connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestUploadFinished(QNetworkReply*)));
     connect(&networkMgr, SIGNAL(finished(QNetworkReply *)), &eventLoop, SLOT(quit()));
-    QByteArray out;
+    QString out;
 
     QVector<RideFilePoint*> vectorPoints = ride->ride()->dataPoints();
     int totalSize = vectorPoints.size();
@@ -318,9 +319,9 @@ StravaDialog::requestUpload()
         out += "[\"";
         out += rideDateTime.toString("yyyy-MM-ddThh:mm:ss-0600");
         out += "\",";
-        out += QString("%1").arg(point->lat);
+        out += QString("%1").arg(point->lat,0,'f',GPS_COORD_TO_STRING);
         out += ",";
-        out += QString("%1").arg(point->lon);
+        out += QString("%1").arg(point->lon,0,'f',GPS_COORD_TO_STRING);
         out += ",";
         out += QString("%1").arg(point->alt);
         out += ",";
@@ -346,7 +347,7 @@ StravaDialog::requestUpload()
     progressBar->setValue(40);
     progressLabel->setText(tr("Upload ride... Sending"));
 
-    networkMgr.post( request, out);
+    networkMgr.post( request, out.toAscii());
     eventLoop.exec();
 }
 
