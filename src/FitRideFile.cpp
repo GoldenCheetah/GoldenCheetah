@@ -289,6 +289,8 @@ struct FitFileReaderState
         time_t time = 0;
         if (time_offset > 0)
             time = last_time + time_offset;
+        else
+            time = last_time;
         int i = 0;
         time_t this_start_time = 0;
         ++interval;
@@ -304,11 +306,11 @@ struct FitFileReaderState
                 default: ; // ignore it
             }
         }
-        if (this_start_time == 0)
-            errors << QString("lap %1 has no start time").arg(interval);
+        if (this_start_time == 0 || this_start_time-start_time < 0)
+            errors << QString("lap %1 has invalid start time").arg(interval);
         else {
-            rideFile->addInterval(this_start_time - start_time, time - start_time,
-                                  QString("%1").arg(interval));
+            if (rideFile->dataPoints().count()) // no samples means no laps..
+                rideFile->addInterval(this_start_time - start_time, time - start_time, QString("%1").arg(interval));
         }
     }
 
