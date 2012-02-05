@@ -179,7 +179,7 @@
     <message>
         <location filename="../AllPlotWindow.cpp" line="60"/>
         <source>Stacked view</source>
-        <translation>Stapelansicht</translation>
+        <translation>Gesplittete Ansicht</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="90"/>
@@ -209,12 +209,12 @@
     <message>
         <location filename="../AllPlotWindow.cpp" line="111"/>
         <source>Power + shade</source>
-        <translation>Leistung: Schattierung erhöhen </translation>
+        <translation>Leistungszonen einblenden</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="112"/>
         <source>Power - shade</source>
-        <translation>Leistung: Schattierung verringern</translation>
+        <translation>Leistungszonen ausblenden</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="113"/>
@@ -250,7 +250,7 @@
     <message>
         <location filename="../BasicRideMetrics.cpp" line="367"/>
         <source>Average Cadence</source>
-        <translation>Durchschnittliche Trittfrequenz</translation>
+        <translation>∅ Trittfrequenz</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="368"/>
@@ -264,7 +264,7 @@
     <message>
         <location filename="../BasicRideMetrics.cpp" line="327"/>
         <source>Average Heart Rate</source>
-        <translation>Durchschnittliche Herzfrequenz</translation>
+        <translation>∅ Herzfrequenz</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="328"/>
@@ -278,7 +278,7 @@
     <message>
         <location filename="../BasicRideMetrics.cpp" line="287"/>
         <source>Average Power</source>
-        <translation>ø Leistung</translation>
+        <translation>∅ Leistung</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="288"/>
@@ -292,7 +292,7 @@
     <message>
         <location filename="../BasicRideMetrics.cpp" line="238"/>
         <source>Average Speed</source>
-        <translation>ø Geschwindigkeit</translation>
+        <translation>∅ Geschwindigkeit</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="239"/>
@@ -684,7 +684,7 @@
     <message>
         <location filename="../Pages.cpp" line="46"/>
         <source>Portugese</source>
-        <translation type="unfinished"></translation>
+        <translation>portugisisch</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="74"/>
@@ -1247,7 +1247,7 @@ und dann auf&quot;Download&quot; klicken.</translation>
         <source>
 
 You may need to (re)install the FTDI or PL2303 drivers before downloading.</source>
-        <translation>Eventuell müssen sie (erneut) das FIDI oder PL2302 Treiberpaket installieren um fortfahren zu können.</translation>
+        <translation> Eventuell müssen sie (erneut) das FIDI oder PL2302 Treiberpaket installieren um fortfahren zu können.</translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="112"/>
@@ -1277,7 +1277,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../DownloadRideDialog.cpp" line="179"/>
         <source>This ride appears to have already </source>
-        <translation>Diese Trainingseinheit scheint schon</translation>
+        <translation>Diese Trainingseinheit scheint schon </translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="180"/>
@@ -1303,12 +1303,12 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../DownloadRideDialog.cpp" line="195"/>
         <source>Failed to remove existing file </source>
-        <translation>Die exisierende Datei konnte nicht überschrieben werden</translation>
+        <translation>Die exisierende Datei konnte nicht überschrieben werden </translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="206"/>
         <source>Failed to rename </source>
-        <translation>Umbenennen fehlgeschlagen</translation>
+        <translation>Umbenennen fehlgeschlagen </translation>
     </message>
     <message>
         <location filename="../DownloadRideDialog.cpp" line="206"/>
@@ -2835,7 +2835,7 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <location filename="../Pages.cpp" line="2392"/>
         <location filename="../Pages.cpp" line="2416"/>
         <source>Rest HR</source>
-        <translation>Ruheherzfrequenz</translation>
+        <translation>Ruhepuls</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="2393"/>
@@ -2872,7 +2872,7 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
 on and that its display says, &quot;PC Link&quot;</source>
         <translation>Stellen Sie bitte Sicher, dass der o-Synce
 Macro radcomputer angeschaltet ist und
-&quot;PC Link&quot; im Display anzeigt</translation>
+&quot;PC Link&quot; im Display anzeigt.</translation>
     </message>
 </context>
 <context>
@@ -3126,7 +3126,7 @@ Skipping file...</source>
     <message>
         <location filename="../MainWindow.cpp" line="399"/>
         <source>Export to TCX...</source>
-        <translation type="unfinished"></translation>
+        <translation>Als *.tcx exportieren</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="402"/>
@@ -3151,7 +3151,7 @@ Skipping file...</source>
     <message>
         <location filename="../MainWindow.cpp" line="419"/>
         <source>Air Density (Rho) Estimator</source>
-        <translation type="unfinished"></translation>
+        <translation>Luftdichte (Rho) Kalkulator</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="450"/>
@@ -3205,12 +3205,12 @@ Skipping file...</source>
     <message>
         <location filename="../MainWindow.cpp" line="733"/>
         <source>Export TCX</source>
-        <translation type="unfinished"></translation>
+        <translation>Als *.tcx Datei exportieren...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="733"/>
         <source>TCX (*.tcx)</source>
-        <translation type="unfinished"></translation>
+        <translation>TCX (*.tcx)</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="753"/>
@@ -3508,7 +3508,7 @@ Fahrer CP wurde auf %3 Watt gesetzt.</translation>
     <message>
         <location filename="../ManualRideDialog.cpp" line="103"/>
         <source>Average HR: </source>
-        <translation>ø Herzfrequenz: </translation>
+        <translation>∅ Herzfrequenz: </translation>
     </message>
     <message>
         <location filename="../ManualRideDialog.cpp" line="109"/>
@@ -4549,12 +4549,12 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../PerformanceManagerWindow.cpp" line="55"/>
         <source>Use TRIMP 100</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwende TRIMP 100</translation>
     </message>
     <message>
         <location filename="../PerformanceManagerWindow.cpp" line="56"/>
         <source>Use Trimp Zonal</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwende Zonenbasierten TRIMP</translation>
     </message>
     <message>
         <location filename="../PerformanceManagerWindow.cpp" line="78"/>
@@ -4775,23 +4775,23 @@ angeschaltet ist und im Display &quot;Host&quot; anzeigt.</translation>
     <message>
         <location filename="../RealtimeWindow.cpp" line="176"/>
         <source>WATTS</source>
-        <translation>Watt</translation>
+        <translation>Leistung (W)</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="178"/>
         <source>BPM</source>
-        <translation>spm</translation>
+        <translation>Herzfrequenz (spm)</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="52"/>
         <location filename="../RealtimeWindow.cpp" line="180"/>
         <source>km/h</source>
-        <translation>km/h</translation>
+        <translation>Geschwindigkeit (km/h)</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="182"/>
         <source>RPM</source>
-        <translation>rpm</translation>
+        <translation>Trittfrequenz (upm)</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="184"/>
@@ -4814,18 +4814,18 @@ angeschaltet ist und im Display &quot;Host&quot; anzeigt.</translation>
     <message>
         <location filename="../RealtimeWindow.cpp" line="191"/>
         <source>Avg WATTS</source>
-        <translation>Leistung Ø</translation>
+        <translation>Ø Leistung</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="193"/>
         <source>Avg BPM</source>
-        <translation>Herzfrequenz Ø</translation>
+        <translation>Ø Herzfrequenz</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="53"/>
         <location filename="../RealtimeWindow.cpp" line="195"/>
         <source>Avg km/h</source>
-        <translation>Geschwindigkeit Ø</translation>
+        <translation>Ø Geschwindigkeit</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="51"/>
@@ -4843,18 +4843,18 @@ angeschaltet ist und im Display &quot;Host&quot; anzeigt.</translation>
         <location filename="../RealtimeWindow.cpp" line="53"/>
         <location filename="../RealtimeWindow.cpp" line="195"/>
         <source>Avg MPH</source>
-        <translation>Geschwindigkeit Ø (mi/h)</translation>
+        <translation>Ø Geschwindigkeit (mi/h)</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="197"/>
         <source>Avg RPM</source>
-        <translation>Trittfrequenz Ø</translation>
+        <translation>Ø Trittfrequenz</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="199"/>
         <location filename="../RealtimeWindow.cpp" line="810"/>
         <source>Avg Load WATTS</source>
-        <translation>Belastung Ø (Watt)</translation>
+        <translation>Ø Belastung (Watt)</translation>
     </message>
     <message>
         <location filename="../RealtimeWindow.cpp" line="202"/>
@@ -4884,7 +4884,7 @@ angeschaltet ist und im Display &quot;Host&quot; anzeigt.</translation>
     <message>
         <location filename="../RealtimeWindow.cpp" line="817"/>
         <source>Avg Gradient PERCENT</source>
-        <translation>Durchschnittliche Steigung (%)</translation>
+        <translation>Ø Steigung (%)</translation>
     </message>
 </context>
 <context>
@@ -6012,7 +6012,7 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../TRIMPPoints.cpp" line="124"/>
         <source>TRIMP(100) Points</source>
-        <translation>TRIMP(100) Punkte</translation>
+        <translation>TRIMP 100 Punkte</translation>
     </message>
 </context>
 <context>
@@ -6088,78 +6088,78 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="38"/>
         <source>Air Density (Rho) Estimator</source>
-        <translation type="unfinished"></translation>
+        <translation>Luftdichte (Rho) Kalkulator</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="46"/>
         <source>Enter measured values for the following:</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebe Messwerte für folgende Werte ein:</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="52"/>
         <source>Metric</source>
-        <translation type="unfinished"></translation>
+        <translation>metrisch</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="55"/>
         <source>Imperial</source>
-        <translation type="unfinished">imperial</translation>
+        <translation>imperial</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="70"/>
         <location filename="../ToolsRhoEstimator.cpp" line="181"/>
         <source>Temperature (C):</source>
-        <translation type="unfinished"></translation>
+        <translation>Temperatur (°C):</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="74"/>
         <location filename="../ToolsRhoEstimator.cpp" line="171"/>
         <source>Temperature (F):</source>
-        <translation type="unfinished"></translation>
+        <translation>Temperatur (Fahrenheit):</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="91"/>
         <location filename="../ToolsRhoEstimator.cpp" line="184"/>
         <source>Air Pressure (hPa):</source>
-        <translation type="unfinished"></translation>
+        <translation>Luftdruck (hPa):</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="95"/>
         <location filename="../ToolsRhoEstimator.cpp" line="174"/>
         <source>Air Pressure (inHg):</source>
-        <translation type="unfinished"></translation>
+        <translation>Luftdruck (inHg):</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="112"/>
         <location filename="../ToolsRhoEstimator.cpp" line="186"/>
         <source>Dewpoint (C):</source>
-        <translation type="unfinished"></translation>
+        <translation>Taupunkt (°C)</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="116"/>
         <location filename="../ToolsRhoEstimator.cpp" line="176"/>
         <source>Dewpoint (F):</source>
-        <translation type="unfinished"></translation>
+        <translation>Taupunkt (Fahrenheit)</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="130"/>
         <source>Estimated air density (rho):</source>
-        <translation type="unfinished"></translation>
+        <translation>Geschätzte Luftdichte (Rho):</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="138"/>
         <source>(kg/m^3)</source>
-        <translation type="unfinished"></translation>
+        <translation>(kg/m^3)</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="147"/>
         <source>(lb/ft^3)</source>
-        <translation type="unfinished"></translation>
+        <translation>(lb/ft^3)</translation>
     </message>
     <message>
         <location filename="../ToolsRhoEstimator.cpp" line="154"/>
         <source>Done</source>
-        <translation type="unfinished">Fertig</translation>
+        <translation>Fertig</translation>
     </message>
 </context>
 <context>
@@ -6260,7 +6260,7 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../TwitterDialog.cpp" line="42"/>
         <source>Average Power</source>
-        <translation>Durchschnittliche Leistung</translation>
+        <translation>∅ Leistung</translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="43"/>
@@ -6270,7 +6270,7 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../TwitterDialog.cpp" line="44"/>
         <source>Average Cadence</source>
-        <translation>ø Trittfrequenz</translation>
+        <translation>Ø Trittfrequenz</translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="45"/>
@@ -6442,7 +6442,7 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../ViewSelection.cpp" line="40"/>
         <source>Train and Racing View</source>
-        <translation>Echtzeitansicht</translation>
+        <translation>Echtzeitmodus</translation>
     </message>
 </context>
 <context>
@@ -6743,12 +6743,12 @@ Möchten Sie fortfahren?</translation>
     <message>
         <location filename="../Zones.cpp" line="579"/>
         <source>&lt;td align=&quot;center&quot;&gt;Low (watts)&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;Untere (Watt)&lt;/td&gt;</translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;Untere Grenze(W)&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="580"/>
         <source>&lt;td align=&quot;center&quot;&gt;High (watts)&lt;/td&gt;</source>
-        <translation>&lt;td align=&quot;center&quot;&gt;Obere (Watt)&lt;/td&gt;</translation>
+        <translation>&lt;td align=&quot;center&quot;&gt;Obere Grenze( W)&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../Zones.cpp" line="582"/>
