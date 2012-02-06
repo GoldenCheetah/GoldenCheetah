@@ -160,8 +160,14 @@ void Fortius::performRead()
 /* ----------------------------------------------------------------------
  * SET
  * ---------------------------------------------------------------------- */
-void Fortius::changeMode(OperationMode mode) {
-    this->mode = mode;
+void Fortius::useErgoMode()
+{
+    this->mode = ErgoMode;
+}
+
+void Fortius::useSlopeMode()
+{
+    this->mode = SlopeMode;
 }
 
 void Fortius::changeLoad(double load) {
@@ -278,7 +284,11 @@ int Fortius::closePort()
 
 bool Fortius::find()
 {
-    return usb2->find();
+    LibUsb usb(TYPE_FORTIUS);
+
+    bool found = usb.find();
+
+    return found;
 }
 
 int Fortius::openPort()

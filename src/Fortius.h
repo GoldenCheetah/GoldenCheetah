@@ -61,8 +61,9 @@ public:
 			QObject *parent=0);
     ~Fortius();
 
-    bool find();                      // find fortius device
+    static bool find();                      // find fortius device
 
+public slots:
     // HIGH-LEVEL FUNCTIONS
     void start();
     void restart();                              // restart after paused
@@ -72,7 +73,8 @@ public:
     // SET
     void changeLoad(double load);                  // set the load to generate in ERGOMODE
     void changeGradient(double gradient);          // set the load to generate in SSMODE
-	void changeMode(OperationMode mode);
+    void useErgoMode();
+    void useSlopeMode();
 
 Q_SIGNALS:
     // GET TELEMETRY AND STATUS

@@ -27,9 +27,9 @@ static const int DEFAULT_GRADIENT = 0.0;
 
 FortiusController::FortiusController(TrainTool *parent,  DeviceConfiguration *dc) :
     RealtimeController(parent, dc),
-	fortius(new Fortius(Fortius::ErgoMode, DEFAULT_LOAD, DEFAULT_GRADIENT, this)),
+    fortius(new Fortius(Fortius::ErgoMode, DEFAULT_LOAD, DEFAULT_GRADIENT)),
     _state(Stopped),
-	_load(DEFAULT_LOAD), _power(0.0), _heartrate(0.0), _cadence(0.0), _speed(0.0)
+    _load(DEFAULT_LOAD), _power(0.0), _heartrate(0.0), _cadence(0.0), _speed(0.0)
 {
     connect(fortius, SIGNAL(signalTelemetry(double,double,double,double)),
 	    SLOT(receiveTelemetry(double,double,double,double)));
@@ -38,16 +38,22 @@ FortiusController::FortiusController(TrainTool *parent,  DeviceConfiguration *dc
     connect(fortius, SIGNAL(downButtonPushed()), SLOT(receiveDownButtonPushed()));
     connect(fortius, SIGNAL(cancelButtonPushed()), SLOT(receiveCancelButtonPushed()));
     connect(fortius, SIGNAL(enterButtonPushed()), SLOT(receiveEnterButtonPushed()));
+
+
 }
 
 FortiusController::~FortiusController()
 {
     stop();
+    delete fortius;
 }
 
 int FortiusController::start()
 {
-    fortius->start();
+    fortiusThread.start();
+    fortius->moveToThread(&fortiusThread);
+
+    QMetaObject::invokeMethod(fortius, "start");
 
     _state = Running;
     return 0;
@@ -56,7 +62,7 @@ int FortiusController::start()
 
 int FortiusController::restart()
 {
-    fortius->restart();
+    QMetaObject::invokeMethod(fortius, "restart");
 
     _state = Running;
     return 0;
@@ -65,7 +71,7 @@ int FortiusController::restart()
 
 int FortiusController::pause()
 {
-    fortius->pause();
+    QMetaObject::invokeMethod(fortius, "pause");
 
     return 0;
 }
@@ -73,15 +79,20 @@ int FortiusController::pause()
 
 int FortiusController::stop()
 {
-    fortius->stop();
+    if (_state == Running)
+    {
+        QMetaObject::invokeMethod(fortius, "stop");
 
-    _state = Stopped;
+        _state = Stopped;
+        fortiusThread.quit();
+        fortiusThread.wait();
+    }
     return 0;
 }
 
 bool FortiusController::find()
 {
-    return fortius->find();
+    return Fortius::find();
 }
 
 bool FortiusController::discover(DeviceConfiguration *) {return false; } // NOT IMPLEMENTED YET
@@ -124,20 +135,20 @@ void FortiusController::getRealtimeData(RealtimeData &rtData)
 void FortiusController::setLoad(double load)
 {
     _load = load;
-    fortius->changeLoad(load);
+    QMetaObject::invokeMethod(fortius, "changeLoad", Q_ARG(double, load));
 }
 
 void FortiusController::setGradient(double grade)
 {
-    fortius->changeGradient(grade);
+    QMetaObject::invokeMethod(fortius, "changeGradient", Q_ARG(double, grade));
 }
 
 void FortiusController::setMode(int mode)
 {
-	if (mode == RT_MODE_ERGO)
-		fortius->changeMode(Fortius::ErgoMode);
-	if (mode == RT_MODE_SPIN)
-		fortius->changeMode(Fortius::SlopeMode);
+    if (mode == RT_MODE_ERGO)
+        QMetaObject::invokeMethod(fortius, "useErgoMode");
+    if (mode == RT_MODE_SPIN)
+        QMetaObject::invokeMethod(fortius, "useSlopeMode");
 }
 
 void FortiusController::receiveTelemetry(double power, double heartrate,

@@ -20,11 +20,9 @@
 #define _GC_FortiusController_h 1
 
 #include "GoldenCheetah.h"
-
 #include "RealtimeController.h"
 
-// Abstract base class for Realtime device controllers
-
+#include <QThread>
 
 class Fortius;
 
@@ -66,7 +64,7 @@ private:
     };
 
     Fortius* fortius;
-
+    QThread fortiusThread;
     FortiusState _state;
     double _load;
     double _power;
