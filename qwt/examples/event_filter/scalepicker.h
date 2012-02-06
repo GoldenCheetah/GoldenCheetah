@@ -11,7 +11,7 @@ public:
     ScalePicker(QwtPlot *plot);
     virtual bool eventFilter(QObject *, QEvent *);
 
-signals:
+Q_SIGNALS:
     void clicked(int axis, double value);
 
 private:

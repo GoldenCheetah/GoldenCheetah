@@ -10,16 +10,6 @@
 #ifndef QWT_DESIGNER_PLUGIN_H
 #define QWT_DESIGNER_PLUGIN_H
 
-#include <qglobal.h>
-
-#if QT_VERSION < 0x040000
-
-#ifdef __GNUC__
-#error This code is Qt4 only
-#endif
-
-#endif
-
 #include <QDesignerCustomWidgetInterface>
 #include <QDesignerTaskMenuExtension>
 #include <QExtensionFactory>
@@ -27,7 +17,7 @@
 namespace QwtDesignerPlugin
 {
 
-class CustomWidgetInterface: public QObject, 
+class CustomWidgetInterface: public QObject,
     public QDesignerCustomWidgetInterface
 {
     Q_OBJECT
@@ -49,11 +39,11 @@ public:
     virtual void initialize(QDesignerFormEditorInterface *);
 
 protected:
-    QString d_name; 
-    QString d_include; 
-    QString d_toolTip; 
-    QString d_whatsThis; 
-    QString d_domXml; 
+    QString d_name;
+    QString d_include;
+    QString d_toolTip;
+    QString d_whatsThis;
+    QString d_domXml;
     QString d_codeTemplate;
     QIcon d_icon;
 
@@ -77,7 +67,7 @@ private:
 };
 
 #ifndef NO_QWT_PLOT
-class PlotInterface: public CustomWidgetInterface 
+class PlotInterface: public CustomWidgetInterface
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -89,7 +79,7 @@ public:
 #endif
 
 #ifndef NO_QWT_WIDGETS
-class AnalogClockInterface: public CustomWidgetInterface 
+class AnalogClockInterface: public CustomWidgetInterface
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -101,7 +91,7 @@ public:
 #endif
 
 #ifndef NO_QWT_WIDGETS
-class CompassInterface: public CustomWidgetInterface 
+class CompassInterface: public CustomWidgetInterface
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -113,7 +103,7 @@ public:
 #endif
 
 #ifndef NO_QWT_WIDGETS
-class CounterInterface: public CustomWidgetInterface 
+class CounterInterface: public CustomWidgetInterface
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -125,7 +115,7 @@ public:
 #endif
 
 #ifndef NO_QWT_WIDGETS
-class DialInterface: public CustomWidgetInterface 
+class DialInterface: public CustomWidgetInterface
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -137,7 +127,7 @@ public:
 #endif
 
 #ifndef NO_QWT_WIDGETS
-class KnobInterface: public CustomWidgetInterface 
+class KnobInterface: public CustomWidgetInterface
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -149,7 +139,7 @@ public:
 #endif
 
 #ifndef NO_QWT_PLOT
-class ScaleWidgetInterface: public CustomWidgetInterface 
+class ScaleWidgetInterface: public CustomWidgetInterface
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -161,7 +151,7 @@ public:
 #endif
 
 #ifndef NO_QWT_WIDGETS
-class SliderInterface: public CustomWidgetInterface 
+class SliderInterface: public CustomWidgetInterface
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -172,7 +162,7 @@ public:
 };
 #endif
 
-class TextLabelInterface: public CustomWidgetInterface 
+class TextLabelInterface: public CustomWidgetInterface
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -183,7 +173,7 @@ public:
 };
 
 #ifndef NO_QWT_WIDGETS
-class ThermoInterface: public CustomWidgetInterface 
+class ThermoInterface: public CustomWidgetInterface
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -195,7 +185,7 @@ public:
 #endif
 
 #ifndef NO_QWT_WIDGETS
-class WheelInterface: public CustomWidgetInterface 
+class WheelInterface: public CustomWidgetInterface
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetInterface)
@@ -214,7 +204,7 @@ public:
     TaskMenuFactory(QExtensionManager *parent = 0);
 
 protected:
-    QObject *createExtension(QObject *object, 
+    QObject *createExtension(QObject *object,
         const QString &iid, QObject *parent) const;
 };
 
@@ -230,7 +220,7 @@ public:
     QAction *preferredEditAction() const;
     QList<QAction *> taskActions() const;
 
-private slots:
+private Q_SLOTS:
     void editProperties();
     void applyProperties(const QString &);
 

@@ -1,6 +1,6 @@
 #include <qdatetime.h>
 
-class CpuStat 
+class CpuStat
 {
 public:
     CpuStat();

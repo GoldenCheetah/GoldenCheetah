@@ -259,7 +259,7 @@ TreeMapWindow::pointClicked(QwtPlotCurve*curve, int index)
     LTMScaleDraw *lsd = new LTMScaleDraw(settings.start,
                         groupForDate(settings.start.date(), settings.groupBy),
                         settings.groupBy);
-    lsd->dateRange((int)round(curve->x(index)), start, end);
+    lsd->dateRange((int)round(curve->sample(index).x()), start, end);
     ltmPopup->setData(settings, start, end);
     popup->show();
 }

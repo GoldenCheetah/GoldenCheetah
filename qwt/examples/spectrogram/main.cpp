@@ -23,56 +23,34 @@ MainWindow::MainWindow(QWidget *parent):
     QToolBar *toolBar = new QToolBar(this);
 
     QToolButton *btnSpectrogram = new QToolButton(toolBar);
-    QToolButton *btnContour = new QToolButton(toolBar);
-    QToolButton *btnPrint = new QToolButton(toolBar);
-
-#if QT_VERSION >= 0x040000
     btnSpectrogram->setText("Spectrogram");
-    //btnSpectrogram->setIcon(QIcon());
     btnSpectrogram->setCheckable(true);
     btnSpectrogram->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     toolBar->addWidget(btnSpectrogram);
+    connect(btnSpectrogram, SIGNAL(toggled(bool)),
+        d_plot, SLOT(showSpectrogram(bool)));
 
+    QToolButton *btnContour = new QToolButton(toolBar);
     btnContour->setText("Contour");
-    //btnContour->setIcon(QIcon());
     btnContour->setCheckable(true);
     btnContour->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     toolBar->addWidget(btnContour);
+    connect(btnContour, SIGNAL(toggled(bool)),
+        d_plot, SLOT(showContour(bool)));
 
-	btnPrint->setText("Print");
+#ifndef QT_NO_PRINTER
+    QToolButton *btnPrint = new QToolButton(toolBar);
+    btnPrint->setText("Print");
     btnPrint->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     toolBar->addWidget(btnPrint);
-#else
-    btnSpectrogram->setTextLabel("Spectrogram");
-    //btnSpectrogram->setPixmap(zoom_xpm);
-    btnSpectrogram->setToggleButton(true);
-    btnSpectrogram->setUsesTextLabel(true);
-
-    btnContour->setTextLabel("Contour");
-    //btnContour->setPixmap(zoom_xpm);
-    btnContour->setToggleButton(true);
-    btnContour->setUsesTextLabel(true);
-
-    btnPrint->setTextLabel("Print");
-    btnPrint->setUsesTextLabel(true);
+    connect(btnPrint, SIGNAL(clicked()),
+        d_plot, SLOT(printPlot()) );
 #endif
 
     addToolBar(toolBar);
 
-    connect(btnSpectrogram, SIGNAL(toggled(bool)), 
-        d_plot, SLOT(showSpectrogram(bool)));
-    connect(btnContour, SIGNAL(toggled(bool)), 
-        d_plot, SLOT(showContour(bool)));
-    connect(btnPrint, SIGNAL(clicked()), 
-        d_plot, SLOT(printPlot()) );
-
-#if QT_VERSION >= 0x040000
     btnSpectrogram->setChecked(true);
     btnContour->setChecked(false);
-#else
-    btnSpectrogram->setOn(true);
-    btnContour->setOn(false);
-#endif
 }
 
 int main(int argc, char **argv)
@@ -80,12 +58,8 @@ int main(int argc, char **argv)
     QApplication a(argc, argv);
 
     MainWindow mainWindow;
-#if QT_VERSION < 0x040000
-    a.setMainWidget(&mainWindow);
-#endif
-
     mainWindow.resize(600,400);
     mainWindow.show();
 
-    return a.exec(); 
+    return a.exec();
 }

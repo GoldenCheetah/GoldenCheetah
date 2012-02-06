@@ -40,16 +40,18 @@ class QwtPlotZoomer;
 
 #include <qwt_plot_picker.h>
 #include <qwt_text_engine.h>
+#include <qwt_picker_machine.h>
+#include <qwt_compat.h>
 
 // track the cursor and display the value for the chosen axis
 class LTMToolTip : public QwtPlotPicker
 {
     public:
-    LTMToolTip(int xaxis, int yaxis, int sflags,
+    LTMToolTip(int xaxis, int yaxis,
                 RubberBand rb, DisplayMode dm, QwtPlotCanvas *pc, QString fmt) :
-                QwtPlotPicker(xaxis, yaxis, sflags, rb, dm, pc),
-                format(fmt) {}
-    virtual QwtText trackerText(const QwtDoublePoint &/*pos*/) const
+                QwtPlotPicker(xaxis, yaxis, rb, dm, pc),
+        format(fmt) { setStateMachine(new QwtPickerDragPointMachine());}
+    virtual QwtText trackerText(const QPoint &/*pos*/) const
     {
         QColor bg = QColor(255,255, 170); // toolyip yellow
 #if QT_VERSION >= 0x040300

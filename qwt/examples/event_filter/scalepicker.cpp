@@ -16,7 +16,7 @@ ScalePicker::ScalePicker(QwtPlot *plot):
 
 bool ScalePicker::eventFilter(QObject *object, QEvent *e)
 {
-    if ( object->inherits("QwtScaleWidget") && 
+    if ( object->inherits("QwtScaleWidget") &&
         e->type() == QEvent::MouseButtonPress )
     {
         mouseClicked((const QwtScaleWidget *)object,
@@ -27,7 +27,7 @@ bool ScalePicker::eventFilter(QObject *object, QEvent *e)
     return QObject::eventFilter(object, e);
 }
 
-void ScalePicker::mouseClicked(const QwtScaleWidget *scale, const QPoint &pos) 
+void ScalePicker::mouseClicked(const QwtScaleWidget *scale, const QPoint &pos)
 {
     QRect rect = scaleRect(scale);
 
@@ -37,40 +37,40 @@ void ScalePicker::mouseClicked(const QwtScaleWidget *scale, const QPoint &pos)
 
     if ( rect.contains(pos) ) // No click on the title
     {
-        // translate the position in a value on the scale 
+        // translate the position in a value on the scale
 
         double value = 0.0;
         int axis = -1;
 
         const QwtScaleDraw *sd = scale->scaleDraw();
-        switch(scale->alignment())   
+        switch(scale->alignment())
         {
             case QwtScaleDraw::LeftScale:
             {
-                value = sd->map().invTransform(pos.y());
+                value = sd->scaleMap().invTransform(pos.y());
                 axis = QwtPlot::yLeft;
                 break;
             }
             case QwtScaleDraw::RightScale:
             {
-                value = sd->map().invTransform(pos.y());
+                value = sd->scaleMap().invTransform(pos.y());
                 axis = QwtPlot::yRight;
                 break;
             }
             case QwtScaleDraw::BottomScale:
             {
-                value = sd->map().invTransform(pos.x());
+                value = sd->scaleMap().invTransform(pos.x());
                 axis = QwtPlot::xBottom;
                 break;
             }
             case QwtScaleDraw::TopScale:
             {
-                value = sd->map().invTransform(pos.x());
+                value = sd->scaleMap().invTransform(pos.x());
                 axis = QwtPlot::xTop;
                 break;
             }
         }
-        emit clicked(axis, value);
+        Q_EMIT clicked(axis, value);
     }
 }
 
@@ -78,12 +78,12 @@ void ScalePicker::mouseClicked(const QwtScaleWidget *scale, const QPoint &pos)
 QRect ScalePicker::scaleRect(const QwtScaleWidget *scale) const
 {
     const int bld = scale->margin();
-    const int mjt = scale->scaleDraw()->majTickLength();
+    const int mjt = scale->scaleDraw()->maxTickLength();
     const int sbd = scale->startBorderDist();
     const int ebd = scale->endBorderDist();
 
     QRect rect;
-    switch(scale->alignment())   
+    switch(scale->alignment())
     {
         case QwtScaleDraw::LeftScale:
         {
@@ -99,13 +99,13 @@ QRect ScalePicker::scaleRect(const QwtScaleWidget *scale) const
         }
         case QwtScaleDraw::BottomScale:
         {
-            rect.setRect(sbd, bld, 
+            rect.setRect(sbd, bld,
                 scale->width() - sbd - ebd, mjt);
             break;
         }
         case QwtScaleDraw::TopScale:
         {
-            rect.setRect(sbd, scale->height() - bld - mjt, 
+            rect.setRect(sbd, scale->height() - bld - mjt,
                 scale->width() - sbd - ebd, mjt);
             break;
         }

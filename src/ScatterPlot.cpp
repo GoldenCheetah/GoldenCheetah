@@ -26,7 +26,7 @@
 #include "Units.h" // for MILES_PER_KM
 
 #include <QWidget>
-#include <qwt_data.h>
+#include <qwt_series_data.h>
 #include <qwt_legend.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
@@ -228,7 +228,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
     // setup the framing curve
     if (settings->frame) {
         all = new QwtPlotCurve();
-        all->setSymbol(sym);
+        all->setSymbol(new QwtSymbol(sym));
         all->setStyle(QwtPlotCurve::Dots);
         all->setRenderHint(QwtPlotItem::RenderAntialiased);
 	    all->setData(x.constData(), y.constData(), points);
@@ -334,7 +334,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
 
             QwtPlotCurve *curve = new QwtPlotCurve();
 
-            curve->setSymbol(sym);
+            curve->setSymbol(new QwtSymbol(sym));
             curve->setStyle(QwtPlotCurve::Dots);
             curve->setRenderHint(QwtPlotItem::RenderAntialiased);
             curve->setData(xvals[idx].constData(), yvals[idx].constData(), points[idx]);
@@ -384,7 +384,7 @@ ScatterPlot::showTime(ScatterSettings *settings, int offset, int secs)
         pen.setColor(Qt::red);
         sym.setPen(pen);
 
-        time->setSymbol(sym);
+        time->setSymbol(new QwtSymbol(sym));
         time->setStyle(QwtPlotCurve::Dots);
         time->setRenderHint(QwtPlotItem::RenderAntialiased);
         time->setData(x.constData()+startidx, y.constData()+startidx, stopidx-startidx);

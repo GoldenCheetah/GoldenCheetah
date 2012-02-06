@@ -1,4 +1,3 @@
-#include <math.h>
 #include <qapplication.h>
 #include <qlabel.h>
 #include <qlayout.h>
@@ -11,11 +10,7 @@ class Layout: public QBoxLayout
 {
 public:
     Layout(Qt::Orientation o, QWidget *parent = NULL):
-#if QT_VERSION < 0x040000
-        QBoxLayout(parent, QBoxLayout::LeftToRight)
-#else
         QBoxLayout(QBoxLayout::LeftToRight, parent)
-#endif
     {
         if ( o == Qt::Vertical )
             setDirection(QBoxLayout::TopToBottom);
@@ -30,11 +25,7 @@ Slider::Slider(QWidget *parent, int sliderType):
 {
     d_slider = createSlider(this, sliderType);
 
-#if QT_VERSION < 0x040000
-    int alignment = Qt::AlignCenter;
-#else
     QFlags<Qt::AlignmentFlag> alignment;
-#endif
     switch(d_slider->scalePosition())
     {
         case QwtSlider::NoScale:
@@ -77,53 +68,52 @@ QwtSlider *Slider::createSlider(QWidget *parent, int sliderType) const
 {
     QwtSlider *slider = NULL;
 
-    switch(sliderType)
+    switch( sliderType )
     {
         case 0:
         {
-            slider = new QwtSlider(parent, 
-                Qt::Horizontal, QwtSlider::TopScale, QwtSlider::BgTrough);
-            slider->setThumbWidth(10);
+            slider = new QwtSlider(parent, Qt::Horizontal,
+                QwtSlider::TopScale, QwtSlider::Trough);
+            slider->setHandleSize( 30, 16 );
             slider->setRange(-10.0, 10.0, 1.0, 0); // paging disabled
             break;
         }
         case 1:
         {
-            slider = new QwtSlider(parent, 
-                Qt::Horizontal, QwtSlider::NoScale, QwtSlider::BgBoth);
+            slider = new QwtSlider(parent, Qt::Horizontal,
+                QwtSlider::NoScale, QwtSlider::Trough | QwtSlider::Groove );
             slider->setRange(0.0, 1.0, 0.01, 5);
             break;
         }
         case 2:
         {
-            slider = new QwtSlider(parent, 
-                Qt::Horizontal, QwtSlider::BottomScale, QwtSlider::BgSlot);
-            slider->setThumbWidth(25);
-            slider->setThumbLength(12);
+            slider = new QwtSlider(parent, Qt::Horizontal,
+                QwtSlider::BottomScale, QwtSlider::Groove);
+            slider->setHandleSize( 12, 25 );
             slider->setRange(1000.0, 3000.0, 10.0, 10);
             break;
         }
         case 3:
         {
-            slider = new QwtSlider(parent, 
-                Qt::Vertical, QwtSlider::LeftScale, QwtSlider::BgSlot);
+            slider = new QwtSlider(parent, Qt::Vertical,
+                QwtSlider::LeftScale, QwtSlider::Groove);
             slider->setRange(0.0, 100.0, 1.0, 5);
             slider->setScaleMaxMinor(5);
             break;
         }
         case 4:
         {
-            slider = new QwtSlider(parent, 
-                Qt::Vertical, QwtSlider::NoScale, QwtSlider::BgTrough);
+            slider = new QwtSlider(parent, Qt::Vertical,
+                QwtSlider::NoScale, QwtSlider::Trough);
             slider->setRange(0.0,100.0,1.0, 10);
             break;
         }
         case 5:
         {
-            slider = new QwtSlider(parent, 
-                Qt::Vertical, QwtSlider::RightScale, QwtSlider::BgBoth);
+            slider = new QwtSlider(parent, Qt::Vertical,
+                QwtSlider::RightScale, QwtSlider::Trough | QwtSlider::Groove);
             slider->setScaleEngine(new QwtLog10ScaleEngine);
-            slider->setThumbWidth(20);
+            slider->setHandleSize( 20, 32 );
             slider->setBorderWidth(1);
             slider->setRange(0.0, 4.0, 0.01);
             slider->setScale(1.0, 1.0e4);
@@ -132,15 +122,21 @@ QwtSlider *Slider::createSlider(QWidget *parent, int sliderType) const
         }
     }
 
+    if ( slider )
+    {
+        QString name( "Slider %1" );
+        slider->setObjectName( name.arg( sliderType ) );
+    }
+
     return slider;
 }
 
-void Slider::setNum(double v)
+void Slider::setNum( double v )
 {
     if ( d_slider->scaleMap().transformation()->type() ==
         QwtScaleTransformation::Log10 )
     {
-        v = pow(10.0, v);
+        v = qPow(10.0, v);
     }
 
     QString text;
@@ -149,7 +145,7 @@ void Slider::setNum(double v)
     d_label->setText(text);
 }
 
-SliderDemo::SliderDemo(QWidget *p): 
+SliderDemo::SliderDemo(QWidget *p):
     QWidget(p)
 {
     int i;
@@ -191,10 +187,6 @@ int main (int argc, char **argv)
     QApplication::setFont(QFont("Helvetica",10));
 
     SliderDemo w;
-
-#if QT_VERSION < 0x040000
-    a.setMainWidget(&w);
-#endif
     w.show();
 
     return a.exec();

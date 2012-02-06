@@ -15,7 +15,7 @@
 
 using namespace QwtDesignerPlugin;
 
-PlotDialog::PlotDialog(const QString &properties, QWidget *parent): 
+PlotDialog::PlotDialog(const QString &properties, QWidget *parent):
     QDialog(parent)
 {
     setWindowTitle("Plot Properties");
@@ -39,4 +39,3 @@ PlotDialog::PlotDialog(const QString &properties, QWidget *parent):
     mainLayout->addLayout(buttonLayout);
     setLayout(mainLayout);
 }
-

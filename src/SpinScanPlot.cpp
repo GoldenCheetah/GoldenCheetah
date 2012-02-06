@@ -19,7 +19,7 @@
 
 #include <assert.h>
 #include <QDebug>
-#include <qwt_data.h>
+#include <qwt_series_data.h>
 #include <qwt_legend.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_canvas.h>
@@ -42,7 +42,17 @@ static const double xspin[97] = {
 double SpinScanData::x(size_t i) const { return xspin[i+(isleft?0:48)]; }
 double SpinScanData::y(size_t i) const { return (i%4 == 2 || i%4 == 3) ? spinData[(i+(isleft?0:48))/4] : 0; }
 size_t SpinScanData::size() const { return 48; }
-QwtData *SpinScanData::copy() const { return new SpinScanData(spinData, isleft); }
+
+QPointF SpinScanData::sample(size_t i) const
+{
+    return QPointF(x(i), y(i));
+}
+
+QRectF SpinScanData::boundingRect() const
+{
+    return QRectF(0,0,0,0);
+}
+
 void SpinScanData::init() { }
 
 SpinScanPlot::SpinScanPlot(QWidget *parent, uint8_t *spinData) : QwtPlot(parent), leftCurve(NULL), rightCurve(NULL), spinData(spinData)
@@ -107,7 +117,7 @@ SpinScanPlot::configChanged()
     leftCurve->setBrush(brush);
     leftCurve->setPen(Qt::NoPen);
     //spinCurve->setStyle(QwtPlotCurve::Steps);
-    leftCurve->setData(*leftSpinScanData);
+    leftCurve->setData(leftSpinScanData);
 
     QColor col2 = GColor(CSPINSCANRIGHT);
     col2.setAlpha(120);
@@ -115,5 +125,5 @@ SpinScanPlot::configChanged()
     rightCurve->setBrush(brush2);
     rightCurve->setPen(Qt::NoPen);
     //spinCurve->setStyle(QwtPlotCurve::Steps);
-    rightCurve->setData(*rightSpinScanData);
+    rightCurve->setData(rightSpinScanData);
 }

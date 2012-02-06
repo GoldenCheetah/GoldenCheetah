@@ -2,7 +2,7 @@
  * Qwt Widget Library
  * Copyright (C) 1997   Josef Wilgen
  * Copyright (C) 2002   Uwe Rathmann
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the Qwt License, Version 1.0
  *****************************************************************************/
@@ -10,9 +10,9 @@
 #ifndef QWT_ROUND_SCALE_DRAW_H
 #define QWT_ROUND_SCALE_DRAW_H
 
-#include <qpoint.h>
 #include "qwt_global.h"
 #include "qwt_abstract_scale_draw.h"
+#include <qpoint.h>
 
 class QPen;
 
@@ -21,7 +21,7 @@ class QPen;
 
   QwtRoundScaleDraw can be used to draw round scales.
   The circle segment can be adjusted by QwtRoundScaleDraw::setAngleRange().
-  The geometry of the scale can be specified with 
+  The geometry of the scale can be specified with
   QwtRoundScaleDraw::moveCenter() and QwtRoundScaleDraw::setRadius().
 
   After a scale division has been specified as a QwtScaleDiv object
@@ -33,37 +33,36 @@ class QWT_EXPORT QwtRoundScaleDraw: public QwtAbstractScaleDraw
 {
 public:
     QwtRoundScaleDraw();
-    QwtRoundScaleDraw(const QwtRoundScaleDraw &);
-
     virtual ~QwtRoundScaleDraw();
 
-    QwtRoundScaleDraw &operator=(const QwtRoundScaleDraw &other);
-
-    void setRadius(int radius);
+    void setRadius( int radius );
     int radius() const;
 
-    void moveCenter(int x, int y);
-    void moveCenter(const QPoint &);
-    QPoint center() const;
+    void moveCenter( double x, double y );
+    void moveCenter( const QPointF & );
+    QPointF center() const;
 
-    void setAngleRange(double angle1, double angle2);
+    void setAngleRange( double angle1, double angle2 );
 
-    virtual int extent(const QPen &, const QFont &) const;
+    virtual double extent( const QFont & ) const;
 
 protected:
-    virtual void drawTick(QPainter *p, double val, int len) const;
-    virtual void drawBackbone(QPainter *p) const;
-    virtual void drawLabel(QPainter *p, double val) const;
+    virtual void drawTick( QPainter *p, double val, double len ) const;
+    virtual void drawBackbone( QPainter *p ) const;
+    virtual void drawLabel( QPainter *p, double val ) const;
 
 private:
+    QwtRoundScaleDraw( const QwtRoundScaleDraw & );
+    QwtRoundScaleDraw &operator=( const QwtRoundScaleDraw &other );
+
     class PrivateData;
     PrivateData *d_data;
 };
 
 //! Move the center of the scale draw, leaving the radius unchanged
-inline void QwtRoundScaleDraw::moveCenter(int x, int y)
+inline void QwtRoundScaleDraw::moveCenter( double x, double y )
 {
-    moveCenter(QPoint(x, y));
+    moveCenter( QPointF( x, y ) );
 }
 
 #endif

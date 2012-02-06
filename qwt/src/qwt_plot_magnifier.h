@@ -2,7 +2,7 @@
  * Qwt Widget Library
  * Copyright (C) 1997   Josef Wilgen
  * Copyright (C) 2002   Uwe Rathmann
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the Qwt License, Version 1.0
  *****************************************************************************/
@@ -32,11 +32,11 @@ class QWT_EXPORT QwtPlotMagnifier: public QwtMagnifier
     Q_OBJECT
 
 public:
-    explicit QwtPlotMagnifier(QwtPlotCanvas *);
+    explicit QwtPlotMagnifier( QwtPlotCanvas * );
     virtual ~QwtPlotMagnifier();
 
-    void setAxisEnabled(int axis, bool on);
-    bool isAxisEnabled(int axis) const;
+    void setAxisEnabled( int axis, bool on );
+    bool isAxisEnabled( int axis ) const;
 
     QwtPlotCanvas *canvas();
     const QwtPlotCanvas *canvas() const;
@@ -45,7 +45,7 @@ public:
     const QwtPlot *plot() const;
 
 protected:
-    virtual void rescale(double factor);
+    virtual void rescale( double factor );
 
 private:
     class PrivateData;

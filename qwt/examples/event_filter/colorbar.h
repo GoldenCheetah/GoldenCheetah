@@ -5,7 +5,7 @@ class ColorBar: public QWidget
     Q_OBJECT
 
 public:
-    ColorBar(Qt::Orientation = Qt::Horizontal, 
+    ColorBar(Qt::Orientation = Qt::Horizontal,
         QWidget * = NULL);
 
     virtual void setOrientation(Qt::Orientation o);
@@ -18,7 +18,7 @@ public:
     QColor light() const { return d_light; }
     QColor dark() const { return d_dark; }
 
-signals:
+Q_SIGNALS:
     void selected(const QColor &);
 
 protected:

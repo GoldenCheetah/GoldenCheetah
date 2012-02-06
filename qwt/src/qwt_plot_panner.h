@@ -2,7 +2,7 @@
  * Qwt Widget Library
  * Copyright (C) 1997   Josef Wilgen
  * Copyright (C) 2002   Uwe Rathmann
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the Qwt License, Version 1.0
  *****************************************************************************/
@@ -17,15 +17,15 @@ class QwtPlotCanvas;
 class QwtPlot;
 
 /*!
-  \brief QwtPlotPanner provides panning of a plot canvas 
+  \brief QwtPlotPanner provides panning of a plot canvas
 
-  QwtPlotPanner is a panner for a QwtPlotCanvas, that 
+  QwtPlotPanner is a panner for a QwtPlotCanvas, that
   adjusts the scales of the axes after dropping
   the canvas on its new position.
 
-  Together with QwtPlotZoomer and QwtPlotMagnifier powerful ways 
+  Together with QwtPlotZoomer and QwtPlotMagnifier powerful ways
   of navigating on a QwtPlot widget can be implemented easily.
-  
+
   \note The axes are not updated, while dragging the canvas
   \sa QwtPlotZoomer, QwtPlotMagnifier
 */
@@ -34,7 +34,7 @@ class QWT_EXPORT QwtPlotPanner: public QwtPanner
     Q_OBJECT
 
 public:
-    explicit QwtPlotPanner(QwtPlotCanvas *);
+    explicit QwtPlotPanner( QwtPlotCanvas * );
     virtual ~QwtPlotPanner();
 
     QwtPlotCanvas *canvas();
@@ -43,11 +43,14 @@ public:
     QwtPlot *plot();
     const QwtPlot *plot() const;
 
-    void setAxisEnabled(int axis, bool on);
-    bool isAxisEnabled(int axis) const;
+    void setAxisEnabled( int axis, bool on );
+    bool isAxisEnabled( int axis ) const;
 
-protected slots:
-    virtual void moveCanvas(int dx, int dy);
+protected Q_SLOTS:
+    virtual void moveCanvas( int dx, int dy );
+
+protected:
+    virtual QBitmap contentsMask() const;
 
 private:
     class PrivateData;

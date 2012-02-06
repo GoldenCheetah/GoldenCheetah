@@ -11,11 +11,7 @@ ColorBar::ColorBar(Qt::Orientation o, QWidget *parent):
     d_dark(Qt::black)
 {
 #ifndef QT_NO_CURSOR
-#if QT_VERSION < 0x040000
-    setCursor(Qt::pointingHandCursor);
-#else
     setCursor(Qt::PointingHandCursor);
-#endif
 #endif
 }
 
@@ -52,13 +48,9 @@ void ColorBar::mousePressEvent(QMouseEvent *e)
         // happened
 
         const QPixmap pm = QPixmap::grabWidget(this);
-#if QT_VERSION < 0x040000
-        const QRgb rgb = pm.convertToImage().pixel(e->x(), e->y());
-#else
         const QRgb rgb = pm.toImage().pixel(e->x(), e->y());
-#endif
-    
-        emit selected(QColor(rgb));
+
+        Q_EMIT selected(QColor(rgb));
         e->accept();
     }
 }
@@ -74,13 +66,8 @@ void ColorBar::drawColorBar(QPainter *painter, const QRect &rect) const
     int h1, s1, v1;
     int h2, s2, v2;
 
-#if QT_VERSION < 0x040000
-    d_light.hsv(&h1, &s1, &v1);
-    d_dark.hsv(&h2, &s2, &v2);
-#else
     d_light.getHsv(&h1, &s1, &v1);
     d_dark.getHsv(&h2, &s2, &v2);
-#endif
 
     painter->save();
     painter->setClipRect(rect);
@@ -89,7 +76,7 @@ void ColorBar::drawColorBar(QPainter *painter, const QRect &rect) const
     painter->fillRect(rect, d_dark);
 
     const int sectionSize = 2;
-    
+
     int numIntervalls;
     if ( d_orientation == Qt::Horizontal )
         numIntervalls = rect.width() / sectionSize;
@@ -122,4 +109,3 @@ void ColorBar::drawColorBar(QPainter *painter, const QRect &rect) const
 
     painter->restore();
 }
-

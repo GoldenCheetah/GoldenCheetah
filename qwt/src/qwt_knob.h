@@ -33,65 +33,124 @@ class QwtRoundScaleDraw;
 
 class QWT_EXPORT QwtKnob : public QwtAbstractSlider, public QwtAbstractScale
 {
-    Q_OBJECT 
-    Q_ENUMS (Symbol)
+    Q_OBJECT
+
+    Q_ENUMS ( KnobStyle )
+    Q_ENUMS ( MarkerStyle )
+
+    Q_PROPERTY( KnobStyle knobStyle READ knobStyle WRITE setKnobStyle )
+    Q_PROPERTY( MarkerStyle markerStyle READ markerStyle WRITE setMarkerStyle )
     Q_PROPERTY( int knobWidth READ knobWidth WRITE setKnobWidth )
     Q_PROPERTY( int borderWidth READ borderWidth WRITE setBorderWidth )
     Q_PROPERTY( double totalAngle READ totalAngle WRITE setTotalAngle )
-    Q_PROPERTY( Symbol symbol READ symbol WRITE setSymbol )
+    Q_PROPERTY( int markerSize READ markerSize WRITE setMarkerSize )
+    Q_PROPERTY( int borderWidth READ borderWidth WRITE setBorderWidth )
 
 public:
     /*!
-        Symbol
-        \sa QwtKnob::QwtKnob()
+       \brief Style of the knob surface
+
+       Depending on the KnobStyle the surface of the knob is
+       filled from the brushes of the widget palette().
+
+       \sa setKnobStyle(), knobStyle()
+     */
+    enum KnobStyle
+    {
+        //! Fill the knob with a brush from QPalette::Button.
+        NoStyle = -1,
+
+        //! Build a gradient from QPalette::Midlight and QPalette::Button
+        Raised,
+
+        /*!
+          Build a gradient from QPalette::Midlight, QPalette::Button
+          and QPalette::Midlight
+         */
+        Sunken
+    };
+
+    /*!
+        \brief Marker type
+
+        The marker indicates the current value on the knob
+        The default setting is a Notch marker.
+
+        \sa setMarkerStyle(), setMarkerSize()
     */
+    enum MarkerStyle
+    {
+        //! Don't paint any marker
+        NoMarker = -1,
 
-    enum Symbol { Line, Dot };
+        //! Paint a single tick in QPalette::ButtonText color
+        Tick,
 
-    explicit QwtKnob(QWidget* parent = NULL);
-#if QT_VERSION < 0x040000
-    explicit QwtKnob(QWidget* parent, const char *name);
-#endif
+        //! Paint a circle in QPalette::ButtonText color
+        Dot,
+
+        /*!
+          Draw a raised ellipse with a gradient build from
+          QPalette::Light and QPalette::Mid
+         */
+        Nub,
+
+        /*!
+          Draw a sunken ellipse with a gradient build from
+          QPalette::Light and QPalette::Mid
+         */
+        Notch
+    };
+
+    explicit QwtKnob( QWidget* parent = NULL );
     virtual ~QwtKnob();
 
-    void setKnobWidth(int w);
+    void setKnobWidth( int w );
     int knobWidth() const;
 
-    void setTotalAngle (double angle);
+    void setTotalAngle ( double angle );
     double totalAngle() const;
 
-    void setBorderWidth(int bw);
+    void setKnobStyle( KnobStyle );
+    KnobStyle knobStyle() const;
+
+    void setBorderWidth( int bw );
     int borderWidth() const;
 
-    void setSymbol(Symbol);
-    Symbol symbol() const;
+    void setMarkerStyle( MarkerStyle );
+    MarkerStyle markerStyle() const;
+
+    void setMarkerSize( int );
+    int markerSize() const;
 
     virtual QSize sizeHint() const;
     virtual QSize minimumSizeHint() const;
-    
-    void setScaleDraw(QwtRoundScaleDraw *);
+
+    void setScaleDraw( QwtRoundScaleDraw * );
     const QwtRoundScaleDraw *scaleDraw() const;
     QwtRoundScaleDraw *scaleDraw();
 
 protected:
-    virtual void paintEvent(QPaintEvent *e);
-    virtual void resizeEvent(QResizeEvent *e);
+    virtual void paintEvent( QPaintEvent * );
+    virtual void resizeEvent( QResizeEvent * );
+    virtual void changeEvent( QEvent * );
 
-    void draw(QPainter *p, const QRect& ur);
-    void drawKnob(QPainter *p, const QRect &r);
-    void drawMarker(QPainter *p, double arc, const QColor &c);
+    virtual void drawKnob( QPainter *, const QRectF & ) const;
+    virtual void drawMarker( QPainter *,
+        const QRectF &, double arc ) const;
+
+    virtual double getValue( const QPoint &p );
+    virtual void getScrollMode( const QPoint &,
+        QwtAbstractSlider::ScrollMode &, int &direction ) const;
 
 private:
     void initKnob();
-    void layoutKnob( bool update = true );
-    double getValue(const QPoint &p);
-    void getScrollMode( const QPoint &p, int &scrollMode, int &direction );
+    void layoutKnob( bool update );
     void recalcAngle();
-    
+
     virtual void valueChange();
     virtual void rangeChange();
     virtual void scaleChange();
-    virtual void fontChange(const QFont &oldFont);
 
     class PrivateData;
     PrivateData *d_data;

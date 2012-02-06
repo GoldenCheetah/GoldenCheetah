@@ -71,10 +71,10 @@ class PerfPlot : public QwtPlot
 
     public:
 
-    double getSTS(int i) { return STScurve->y(i - xmin); }
-    double getLTS(int i) { return LTScurve->y(i - xmin); }
-    double getSB(int i) { return SBcurve->y(i - xmin); }
-    double getDAY(int i) { return DAYcurve->y(i - xmin); }
+    double getSTS(int i) { return STScurve->sample(i - xmin).y(); }
+    double getLTS(int i) { return LTScurve->sample(i - xmin).y(); }
+    double getSB(int i) { return SBcurve->sample(i - xmin).y(); }
+    double getDAY(int i) { return DAYcurve->sample(i - xmin).y(); }
     int n(void) { return days; }
     int max(void) { return xmax; }
     int min(void) { return xmin; }

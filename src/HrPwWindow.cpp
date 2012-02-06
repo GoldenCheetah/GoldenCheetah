@@ -52,14 +52,11 @@ HrPwWindow::HrPwWindow(MainWindow *mainWindow) :
 
     // tooltip on hover over point
     hrPwPlot->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtPlot::yLeft,
-                               QwtPicker::PointSelection,
                                QwtPicker::VLineRubberBand,
                                QwtPicker::AlwaysOn,
                                hrPwPlot->canvas(),
                                "");
 
-    hrPwPlot->tooltip->setSelectionFlags(QwtPicker::PointSelection | QwtPicker::RectSelection
-                                         | QwtPicker::DragSelection);
     hrPwPlot->tooltip->setRubberBand(QwtPicker::VLineRubberBand);
     hrPwPlot->tooltip->setMousePattern(QwtEventPattern::MouseSelect1,
                                          Qt::LeftButton, Qt::ShiftModifier);

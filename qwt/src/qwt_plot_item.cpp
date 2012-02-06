@@ -2,40 +2,38 @@
  * Qwt Widget Library
  * Copyright (C) 1997   Josef Wilgen
  * Copyright (C) 2002   Uwe Rathmann
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the Qwt License, Version 1.0
  *****************************************************************************/
 
+#include "qwt_plot_item.h"
 #include "qwt_text.h"
 #include "qwt_plot.h"
 #include "qwt_legend.h"
 #include "qwt_legend_item.h"
-#include "qwt_plot_item.h"
+#include "qwt_scale_div.h"
+#include <qpainter.h>
 
 class QwtPlotItem::PrivateData
 {
 public:
     PrivateData():
-        plot(NULL),
-        isVisible(true),
-        attributes(0),
-#if QT_VERSION >= 0x040000
-        renderHints(0),
-#endif
-        z(0.0),
-        xAxis(QwtPlot::xBottom),
-        yAxis(QwtPlot::yLeft)
+        plot( NULL ),
+        isVisible( true ),
+        attributes( 0 ),
+        renderHints( 0 ),
+        z( 0.0 ),
+        xAxis( QwtPlot::xBottom ),
+        yAxis( QwtPlot::yLeft )
     {
     }
 
     mutable QwtPlot *plot;
 
     bool isVisible;
-    int attributes;
-#if QT_VERSION >= 0x040000
-    int renderHints;
-#endif
+    QwtPlotItem::ItemAttributes attributes;
+    QwtPlotItem::RenderHints renderHints;
     double z;
 
     int xAxis;
@@ -44,11 +42,11 @@ public:
     QwtText title;
 };
 
-/*! 
+/*!
    Constructor
    \param title Title of the item
 */
-QwtPlotItem::QwtPlotItem(const QwtText &title)
+QwtPlotItem::QwtPlotItem( const QwtText &title )
 {
     d_data = new PrivateData;
     d_data->title = title;
@@ -57,11 +55,11 @@ QwtPlotItem::QwtPlotItem(const QwtText &title)
 //! Destroy the QwtPlotItem
 QwtPlotItem::~QwtPlotItem()
 {
-    attach(NULL);
+    attach( NULL );
     delete d_data;
 }
 
-/*! 
+/*!
   \brief Attach the item to a plot.
 
   This method will attach a QwtPlotItem to the QwtPlot argument. It will first
@@ -70,9 +68,9 @@ QwtPlotItem::~QwtPlotItem()
   was attached to.
 
   \param plot Plot widget
-  \sa QwtPlotItem::detach()
+  \sa detach()
 */
-void QwtPlotItem::attach(QwtPlot *plot)
+void QwtPlotItem::attach( QwtPlot *plot )
 {
     if ( plot == d_data->plot )
         return;
@@ -82,13 +80,9 @@ void QwtPlotItem::attach(QwtPlot *plot)
     if ( d_data->plot )
     {
         if ( d_data->plot->legend() )
-        {
-            QWidget *legendItem = d_data->plot->legend()->find(this);
-            if ( legendItem )
-                delete legendItem; 
-        }
+            d_data->plot->legend()->remove( this );
 
-        d_data->plot->attachItem(this, false);
+        d_data->plot->attachItem( this, false );
 
         if ( d_data->plot->autoReplot() )
             d_data->plot->update();
@@ -100,20 +94,32 @@ void QwtPlotItem::attach(QwtPlot *plot)
     {
         // insert the item into the current plot
 
-        d_data->plot->attachItem(this, true);
+        d_data->plot->attachItem( this, true );
         itemChanged();
     }
 }
 
-/*! 
+/*!
+   \brief This method detaches a QwtPlotItem from any
+          QwtPlot it has been associated with.
+
+   detach() is equivalent to calling attach( NULL )
+   \sa attach()
+*/
+void QwtPlotItem::detach()
+{
+    attach( NULL );
+}
+
+/*!
    Return rtti for the specific class represented. QwtPlotItem is simply
    a virtual interface class, and base classes will implement this method
    with specific rtti values so a user can differentiate them.
 
-   The rtti value is useful for environments, where the 
+   The rtti value is useful for environments, where the
    runtime type information is disabled and it is not possible
    to do a dynamic_cast<...>.
-   
+
    \return rtti value
    \sa RttiValues
 */
@@ -123,9 +129,9 @@ int QwtPlotItem::rtti() const
 }
 
 //! Return attached plot
-QwtPlot *QwtPlotItem::plot() const 
-{ 
-    return d_data->plot; 
+QwtPlot *QwtPlotItem::plot() const
+{
+    return d_data->plot;
 }
 
 /*!
@@ -133,9 +139,9 @@ QwtPlot *QwtPlotItem::plot() const
 
    \return setZ(), QwtPlotDict::itemList()
 */
-double QwtPlotItem::z() const 
-{ 
-    return d_data->z; 
+double QwtPlotItem::z() const
+{
+    return d_data->z;
 }
 
 /*!
@@ -146,43 +152,44 @@ double QwtPlotItem::z() const
    \param z Z-value
    \sa z(), QwtPlotDict::itemList()
 */
-void QwtPlotItem::setZ(double z) 
-{ 
+void QwtPlotItem::setZ( double z )
+{
     if ( d_data->z != z )
     {
-        d_data->z = z; 
+        if ( d_data->plot ) // update the z order
+            d_data->plot->attachItem( this, false );
+
+        d_data->z = z;
+
         if ( d_data->plot )
-        {
-            // update the z order
-            d_data->plot->attachItem(this, false);
-            d_data->plot->attachItem(this, true);
-        }
+            d_data->plot->attachItem( this, true );
+
         itemChanged();
     }
 }
 
-/*! 
+/*!
    Set a new title
 
    \param title Title
-   \sa title() 
-*/  
-void QwtPlotItem::setTitle(const QString &title)
+   \sa title()
+*/
+void QwtPlotItem::setTitle( const QString &title )
 {
-    setTitle(QwtText(title));
+    setTitle( QwtText( title ) );
 }
 
-/*! 
+/*!
    Set a new title
 
    \param title Title
-   \sa title() 
-*/  
-void QwtPlotItem::setTitle(const QwtText &title)
+   \sa title()
+*/
+void QwtPlotItem::setTitle( const QwtText &title )
 {
     if ( d_data->title != title )
     {
-        d_data->title = title; 
+        d_data->title = title;
         itemChanged();
     }
 }
@@ -198,15 +205,15 @@ const QwtText &QwtPlotItem::title() const
 
 /*!
    Toggle an item attribute
- 
+
    \param attribute Attribute type
    \param on true/false
 
    \sa testItemAttribute(), ItemAttribute
 */
-void QwtPlotItem::setItemAttribute(ItemAttribute attribute, bool on)
+void QwtPlotItem::setItemAttribute( ItemAttribute attribute, bool on )
 {
-    if ( bool(d_data->attributes & attribute) != on )
+    if ( bool( d_data->attributes & attribute ) != on )
     {
         if ( on )
             d_data->attributes |= attribute;
@@ -224,24 +231,22 @@ void QwtPlotItem::setItemAttribute(ItemAttribute attribute, bool on)
    \return true/false
    \sa setItemAttribute(), ItemAttribute
 */
-bool QwtPlotItem::testItemAttribute(ItemAttribute attribute) const
+bool QwtPlotItem::testItemAttribute( ItemAttribute attribute ) const
 {
-    return d_data->attributes & attribute;
+    return ( d_data->attributes & attribute );
 }
-
-#if QT_VERSION >= 0x040000
 
 /*!
    Toggle an render hint
- 
+
    \param hint Render hint
    \param on true/false
 
    \sa testRenderHint(), RenderHint
 */
-void QwtPlotItem::setRenderHint(RenderHint hint, bool on)
+void QwtPlotItem::setRenderHint( RenderHint hint, bool on )
 {
-    if ( ((d_data->renderHints & hint) != 0) != on )
+    if ( ( ( d_data->renderHints & hint ) != 0 ) != on )
     {
         if ( on )
             d_data->renderHints |= hint;
@@ -259,51 +264,49 @@ void QwtPlotItem::setRenderHint(RenderHint hint, bool on)
    \return true/false
    \sa setRenderHint(), RenderHint
 */
-bool QwtPlotItem::testRenderHint(RenderHint hint) const
+bool QwtPlotItem::testRenderHint( RenderHint hint ) const
 {
-    return (d_data->renderHints & hint);
+    return ( d_data->renderHints & hint );
 }
-
-#endif
 
 //! Show the item
 void QwtPlotItem::show()
 {
-    setVisible(true);
+    setVisible( true );
 }
 
 //! Hide the item
 void QwtPlotItem::hide()
 {
-    setVisible(false);
+    setVisible( false );
 }
 
-/*! 
+/*!
     Show/Hide the item
 
     \param on Show if true, otherwise hide
     \sa isVisible(), show(), hide()
 */
-void QwtPlotItem::setVisible(bool on) 
-{ 
+void QwtPlotItem::setVisible( bool on )
+{
     if ( on != d_data->isVisible )
     {
-        d_data->isVisible = on; 
-        itemChanged(); 
+        d_data->isVisible = on;
+        itemChanged();
     }
 }
 
-/*! 
+/*!
     \return true if visible
     \sa setVisible(), show(), hide()
 */
 bool QwtPlotItem::isVisible() const
-{ 
-    return d_data->isVisible; 
+{
+    return d_data->isVisible;
 }
 
-/*! 
-   Update the legend and call QwtPlot::autoRefresh for the 
+/*!
+   Update the legend and call QwtPlot::autoRefresh for the
    parent plot.
 
    \sa updateLegend()
@@ -313,13 +316,13 @@ void QwtPlotItem::itemChanged()
     if ( d_data->plot )
     {
         if ( d_data->plot->legend() )
-            updateLegend(d_data->plot->legend());
+            updateLegend( d_data->plot->legend() );
 
         d_data->plot->autoRefresh();
     }
 }
 
-/*!  
+/*!
    Set X and Y axis
 
    The item will painted according to the coordinates its Axes.
@@ -329,82 +332,82 @@ void QwtPlotItem::itemChanged()
 
    \sa setXAxis(), setYAxis(), xAxis(), yAxis()
 */
-void QwtPlotItem::setAxis(int xAxis, int yAxis)
+void QwtPlotItem::setAxes( int xAxis, int yAxis )
 {
-    if (xAxis == QwtPlot::xBottom || xAxis == QwtPlot::xTop )
-       d_data->xAxis = xAxis;
+    if ( xAxis == QwtPlot::xBottom || xAxis == QwtPlot::xTop )
+        d_data->xAxis = xAxis;
 
     if ( yAxis == QwtPlot::yLeft || yAxis == QwtPlot::yRight ||
           yAxis == QwtPlot::yLeft1 || yAxis == QwtPlot::yRight1 ||
           yAxis == QwtPlot::yLeft2 || yAxis == QwtPlot::yRight2 ||
           yAxis == QwtPlot::yLeft3 || yAxis == QwtPlot::yRight3 )
-      d_data->yAxis = yAxis;
+        d_data->yAxis = yAxis;
 
-    itemChanged();    
+    itemChanged();
 }
 
-/*!  
+/*!
    Set the X axis
 
    The item will painted according to the coordinates its Axes.
 
    \param axis X Axis
-   \sa setAxis(), setYAxis(), xAxis()
+   \sa setAxes(), setYAxis(), xAxis()
 */
-void QwtPlotItem::setXAxis(int axis)
+void QwtPlotItem::setXAxis( int axis )
 {
-    if (axis == QwtPlot::xBottom || axis == QwtPlot::xTop )
+    if ( axis == QwtPlot::xBottom || axis == QwtPlot::xTop )
     {
-       d_data->xAxis = axis;
-       itemChanged();    
+        d_data->xAxis = axis;
+        itemChanged();
     }
 }
 
-/*!  
+/*!
    Set the Y axis
 
    The item will painted according to the coordinates its Axes.
 
    \param axis Y Axis
-   \sa setAxis(), setXAxis(), yAxis()
+   \sa setAxes(), setXAxis(), yAxis()
 */
-void QwtPlotItem::setYAxis(int axis)
+void QwtPlotItem::setYAxis( int axis )
 {
-   if ( axis == QwtPlot::yLeft || axis == QwtPlot::yRight ||
+    if ( axis == QwtPlot::yLeft || axis == QwtPlot::yRight ||
          axis == QwtPlot::yLeft1 || axis == QwtPlot::yRight1 ||
          axis == QwtPlot::yLeft2 || axis == QwtPlot::yRight2 ||
          axis == QwtPlot::yLeft3 || axis == QwtPlot::yRight3 )
     {
-       d_data->yAxis = axis;
-       itemChanged();   
+        d_data->yAxis = axis;
+        itemChanged();
     }
 }
 
 //! Return xAxis
-int QwtPlotItem::xAxis() const 
-{ 
-    return d_data->xAxis; 
+int QwtPlotItem::xAxis() const
+{
+    return d_data->xAxis;
 }
 
 //! Return yAxis
-int QwtPlotItem::yAxis() const 
-{ 
-    return d_data->yAxis; 
+int QwtPlotItem::yAxis() const
+{
+    return d_data->yAxis;
 }
 
 /*!
-   \return An invalid bounding rect: QwtDoubleRect(1.0, 1.0, -2.0, -2.0)
+   \return An invalid bounding rect: QRectF(1.0, 1.0, -2.0, -2.0)
 */
-QwtDoubleRect QwtPlotItem::boundingRect() const
+QRectF QwtPlotItem::boundingRect() const
 {
-    return QwtDoubleRect(1.0, 1.0, -2.0, -2.0); // invalid
+    return QRectF( 1.0, 1.0, -2.0, -2.0 ); // invalid
 }
 
 /*!
    \brief Allocate the widget that represents the item on the legend
 
-   The default implementation is made for QwtPlotCurve and returns a 
-   QwtLegendItem(), but an item could be represented by any type of widget,
+   The default implementation returns a QwtLegendItem(), but an item
+   could be represented by any type of widget,
    by overloading legendItem() and updateLegend().
 
    \return QwtLegendItem()
@@ -412,7 +415,15 @@ QwtDoubleRect QwtPlotItem::boundingRect() const
 */
 QWidget *QwtPlotItem::legendItem() const
 {
-    return new QwtLegendItem;
+    QwtLegendItem *item = new QwtLegendItem;
+    if ( d_data->plot )
+    {
+        QObject::connect( item, SIGNAL( clicked() ),
+            d_data->plot, SLOT( legendItemClicked() ) );
+        QObject::connect( item, SIGNAL( checked( bool ) ),
+            d_data->plot, SLOT( legendItemChecked( bool ) ) );
+    }
+    return item;
 }
 
 /*!
@@ -420,54 +431,67 @@ QWidget *QwtPlotItem::legendItem() const
 
    updateLegend() is called from itemChanged() to adopt the widget
    representing the item on the legend to its new configuration.
-   
-   The default implementation is made for QwtPlotCurve and updates a 
-   QwtLegendItem(), but an item could be represented by any type of widget,
+
+   The default implementation updates a QwtLegendItem(),
+   but an item could be represented by any type of widget,
    by overloading legendItem() and updateLegend().
 
    \param legend Legend
 
    \sa legendItem(), itemChanged(), QwtLegend()
 */
-void QwtPlotItem::updateLegend(QwtLegend *legend) const
+void QwtPlotItem::updateLegend( QwtLegend *legend ) const
 {
-    if ( !legend )
+    if ( legend == NULL )
         return;
 
-    QWidget *lgdItem = legend->find(this);
-    if ( testItemAttribute(QwtPlotItem::Legend) )
+    QWidget *lgdItem = legend->find( this );
+    if ( testItemAttribute( QwtPlotItem::Legend ) )
     {
         if ( lgdItem == NULL )
         {
             lgdItem = legendItem();
             if ( lgdItem )
-            {
-                if ( lgdItem->inherits("QwtLegendItem") )
-                {
-                    QwtLegendItem *label = (QwtLegendItem *)lgdItem;
-                    label->setItemMode(legend->itemMode());
-
-                    if ( d_data->plot )
-                    {
-                        QObject::connect(label, SIGNAL(clicked()), 
-                            d_data->plot, SLOT(legendItemClicked()));
-                        QObject::connect(label, SIGNAL(checked(bool)), 
-                            d_data->plot, SLOT(legendItemChecked(bool)));
-                    }
-                }
-                legend->insert(this, lgdItem);
-            }
+                legend->insert( this, lgdItem );
         }
-        if ( lgdItem && lgdItem->inherits("QwtLegendItem") )
+
+        QwtLegendItem *label = qobject_cast<QwtLegendItem *>( lgdItem );
+        if ( label )
         {
-            QwtLegendItem* label = (QwtLegendItem*)lgdItem;
-            if ( label )
-                label->setText(d_data->title);
+            // paint the identifier
+            const QSize sz = label->identifierSize();
+
+            QPixmap identifier( sz.width(), sz.height() );
+            identifier.fill( Qt::transparent );
+
+            QPainter painter( &identifier );
+            painter.setRenderHint( QPainter::Antialiasing,
+                testRenderHint( QwtPlotItem::RenderAntialiased ) );
+            drawLegendIdentifier( &painter,
+                QRect( 0, 0, sz.width(), sz.height() ) );
+            painter.end();
+
+            const bool doUpdate = label->updatesEnabled();
+            if ( doUpdate )
+                label->setUpdatesEnabled( false );
+
+            label->setText( title() );
+            label->setIdentifier( identifier );
+            label->setItemMode( legend->itemMode() );
+
+            if ( doUpdate )
+                label->setUpdatesEnabled( true );
+
+            label->update();
         }
     }
     else
     {
-        delete lgdItem;
+        if ( lgdItem )
+        {
+            lgdItem->hide();
+            lgdItem->deleteLater();
+        }
     }
 }
 
@@ -484,9 +508,11 @@ void QwtPlotItem::updateLegend(QwtLegend *legend) const
 
    \sa QwtPlot::updateAxes()
 */
-void QwtPlotItem::updateScaleDiv(const QwtScaleDiv &,
-    const QwtScaleDiv &) 
-{ 
+void QwtPlotItem::updateScaleDiv( const QwtScaleDiv &xScaleDiv,
+    const QwtScaleDiv &yScaleDiv )
+{
+    Q_UNUSED( xScaleDiv );
+    Q_UNUSED( yScaleDiv );
 }
 
 /*!
@@ -495,12 +521,12 @@ void QwtPlotItem::updateScaleDiv(const QwtScaleDiv &,
    \param xMap X map
    \param yMap X map
 
-   \return Bounding rect of the scale maps
+   \return Bounding scale rect of the scale maps, normalized
 */
-QwtDoubleRect QwtPlotItem::scaleRect(const QwtScaleMap &xMap, 
-    const QwtScaleMap &yMap) const
+QRectF QwtPlotItem::scaleRect( const QwtScaleMap &xMap,
+    const QwtScaleMap &yMap ) const
 {
-    return QwtDoubleRect(xMap.s1(), yMap.s1(), 
+    return QRectF( xMap.s1(), yMap.s1(),
         xMap.sDist(), yMap.sDist() );
 }
 
@@ -510,61 +536,13 @@ QwtDoubleRect QwtPlotItem::scaleRect(const QwtScaleMap &xMap,
    \param xMap X map
    \param yMap X map
 
-   \return Bounding rect of the scale maps
+   \return Bounding paint rect of the scale maps, normalized
 */
-QRect QwtPlotItem::paintRect(const QwtScaleMap &xMap, 
-    const QwtScaleMap &yMap) const
+QRectF QwtPlotItem::paintRect( const QwtScaleMap &xMap,
+    const QwtScaleMap &yMap ) const
 {
-    const QRect rect( qRound(xMap.p1()), qRound(yMap.p1()),
-        qRound(xMap.pDist()), qRound(yMap.pDist()) );
+    const QRectF rect( xMap.p1(), yMap.p1(),
+        xMap.pDist(), yMap.pDist() );
 
     return rect;
-}
-
-/*!
-   Transform a rectangle
-
-   \param xMap X map
-   \param yMap Y map
-   \param rect Rectangle in scale coordinates
-   \return Rectangle in paint coordinates
- 
-   \sa invTransform()
-*/
-QRect QwtPlotItem::transform(const QwtScaleMap &xMap, 
-    const QwtScaleMap &yMap, const QwtDoubleRect& rect) const
-{
-    int x1 = qRound(xMap.transform(rect.left()));
-    int x2 = qRound(xMap.transform(rect.right()));
-    int y1 = qRound(yMap.transform(rect.top()));
-    int y2 = qRound(yMap.transform(rect.bottom()));
-
-    if ( x2 < x1 )
-        qSwap(x1, x2);
-    if ( y2 < y1 )
-        qSwap(y1, y2);
-
-    return QRect(x1, y1, x2 - x1 + 1, y2 - y1 + 1);
-}
-
-/*!
-   Transform a rectangle from paint to scale coordinates
-
-   \param xMap X map
-   \param yMap Y map
-   \param rect Rectangle in paint coordinates
-   \return Rectangle in scale coordinates
-   \sa transform()
-*/
-QwtDoubleRect QwtPlotItem::invTransform(const QwtScaleMap &xMap, 
-    const QwtScaleMap &yMap, const QRect& rect) const
-{
-    const double x1 = xMap.invTransform(rect.left());
-    const double x2 = xMap.invTransform(rect.right());
-    const double y1 = yMap.invTransform(rect.top());
-    const double y2 = yMap.invTransform(rect.bottom());
-        
-    const QwtDoubleRect r(x1, y1, x2 - x1, y2 - y1);
-
-    return r.normalized();
 }

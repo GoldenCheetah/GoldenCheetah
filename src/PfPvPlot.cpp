@@ -28,7 +28,7 @@
 
 #include <math.h>
 #include <assert.h>
-#include <qwt_data.h>
+#include <qwt_series_data.h>
 #include <qwt_legend.h>
 #include <qwt_plot_canvas.h>
 #include <qwt_plot_curve.h>
@@ -91,7 +91,7 @@ public:
         return QwtPlotItem::Rtti_PlotUserItem;
     }
 
-    void draw(QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRect &rect) const {
+    void draw(QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &rect) const {
 
         if (parent->shadeZones() && (rect.width() > 0) && (rect.height() > 0)) {
             // draw the label along a plot diagonal:
@@ -108,7 +108,7 @@ public:
                 int y = yMap.transform(sqrt(w * rect.height() / rect.width()) / yscale);
 
                 // the following code based on source for QwtPlotMarker::draw()
-                QRect tr(QPoint(0, 0), text.textSize(painter->font()));
+                QRect tr(QPoint(0, 0), text.textSize(painter->font()).toSize());
                 tr.moveCenter(QPoint(x, y));
                 text.draw(painter, tr);
             }
@@ -195,7 +195,7 @@ PfPvPlot::configChanged()
     sym.setSize(6);
     sym.setPen(GCColor::invert(GColor(CPLOTBACKGROUND)));
     sym.setBrush(QBrush(Qt::NoBrush));
-    curve->setSymbol(sym);
+    curve->setSymbol(new QwtSymbol(sym));
     curve->setStyle(QwtPlotCurve::Dots);
     curve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
@@ -559,7 +559,7 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
                 pen.setColor(intervalColor);
                 sym.setPen(pen);
 
-                curve->setSymbol(sym);
+                curve->setSymbol(new QwtSymbol(sym));
                 curve->setStyle(QwtPlotCurve::Dots);
                 curve->setRenderHint(QwtPlotItem::RenderAntialiased);
                 curve->setData(cpvArrayInterval[z],aepfArrayInterval[z]);
@@ -707,7 +707,8 @@ PfPvPlot::recalc()
     } else {
 
         // an empty curve if no power (or zero power) is specified
-        cpCurve->setData(QwtArray<double>(), QwtArray<double>());
+        QwtArray<double> data;
+        cpCurve->setData(data,data);
     }
 }
 

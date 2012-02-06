@@ -177,7 +177,7 @@ class SplitBackground: public QwtPlotItem
 
         virtual void draw(QPainter *painter,
                         const QwtScaleMap &xMap, const QwtScaleMap &,
-                        const QRect &rect) const
+                        const QRectF &rect) const
         {
             RideItem *rideItem = parent->rideItem;
 
@@ -200,7 +200,7 @@ class SplitBackground: public QwtPlotItem
                 if (mark == lastmark) continue;
 
                 // construct a rectangle
-                QRect r = rect;
+                QRectF r = rect;
 
                 if (lastmark == -1) {
                     // before first mark

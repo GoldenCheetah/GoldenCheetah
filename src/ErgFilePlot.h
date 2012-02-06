@@ -23,7 +23,7 @@
 
 #include <QDebug>
 #include <QtGui>
-#include <qwt_data.h>
+#include <qwt_series_data.h>
 #include <qwt_legend.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_canvas.h>
@@ -34,38 +34,45 @@
 #include <qwt_scale_div.h>
 #include <qwt_scale_widget.h>
 #include <qwt_symbol.h>
+#include <qwt_compat.h>
 #include "ErgFile.h"
 
 #include "Settings.h"
 #include "Colors.h"
 
 #include "RealtimeData.h"
+#include <qwt_series_data.h>
 
 
-class ErgFileData : public QwtData
+class ErgFileData : public QwtPointArrayData
 {
     public:
-    ErgFileData (MainWindow *main) : main(main) {}
+    ErgFileData (MainWindow *main) : QwtPointArrayData(QVector<double>(), QVector<double>()), main(main) {}
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
-    virtual QwtData *copy() const ;
-    void init() ;
+
     private:
     MainWindow *main;
+
+    virtual QPointF sample(size_t i) const;
+    virtual QRectF boundingRect() const;
 };
 
-class NowData : public QwtData
+class NowData : public QwtPointArrayData
 {
     public:
-    NowData (MainWindow *main) : main(main) {}
+    NowData (MainWindow *main) : QwtPointArrayData(QVector<double>(), QVector<double>()), main(main) {}
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
-    virtual QwtData *copy() const ;
+
     void init() ;
     private:
     MainWindow *main;
+
+    virtual QPointF sample(size_t i) const;
+    //virtual QRectF boundingRect() const;
 };
 
 // incremental data, for each curve

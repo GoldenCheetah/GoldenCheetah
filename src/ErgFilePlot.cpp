@@ -37,18 +37,50 @@ size_t ErgFileData::size() const {
     else return 0;
 }
 
-QwtData *ErgFileData::copy() const { return new ErgFileData(main); }
+QPointF ErgFileData::sample(size_t i) const
+{
+    return QPointF(x(i), y(i));
+}
+
+QRectF ErgFileData::boundingRect() const
+{
+    if (main->currentErgFile()) {
+        double minX, minY, maxX, maxY;
+        minX=minY=maxX=maxY=0.0f;
+        foreach(ErgFilePoint x, main->currentErgFile()->Points) {
+            if (x.y > maxY) maxY = x.y;
+            if (x.x > maxX) maxX = x.x;
+            if (x.y < minY) minY = x.x;
+            if (x.x < minX) minX = x.x;
+        }
+        maxY *= 1.1f; // always need a bit of headroom
+        return QRectF(minX, minY, maxX, maxY);
+    }
+    return QRectF(0,0,0,0);
+}
+
 
 // Now bar
 double NowData::x(size_t) const { return main->getNow(); }
 double NowData::y(size_t i) const {
     if (i) {
         if (main->currentErgFile()) return main->currentErgFile()->maxY;
-        else return 500;
+        else return 0;
     } else return 0;
 }
 size_t NowData::size() const { return 2; }
-QwtData *NowData::copy() const { return new NowData(main); }
+
+
+QPointF NowData::sample(size_t i) const
+{
+    return QPointF(x(i), y(i));
+}
+
+/*QRectF NowData::boundingRect() const
+{
+    // TODO dgr
+    return QRectF(0, 0, 0, 0);
+}*/
 
 ErgFilePlot::ErgFilePlot(MainWindow *main) : main(main)
 {
@@ -65,7 +97,7 @@ ErgFilePlot::ErgFilePlot(MainWindow *main) : main(main)
     QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisMaxMinor(yLeft, 0);
-    setAxisScaleDraw(QwtPlot::yLeft, sd);
+    //setAxisScaleDraw(QwtPlot::yLeft, sd);
 
     QPalette pal;
     pal.setColor(QPalette::WindowText, GColor(CPOWER));
@@ -80,8 +112,6 @@ ErgFilePlot::ErgFilePlot(MainWindow *main) : main(main)
     QwtPlot::setAxisFont(yLeft, stGiles);
     QwtPlot::setAxisTitle(yLeft, title);
 
-
-    //setAxisScale(yLeft, 0, 1000); // we autoscale, since peaks are so much higher than troughs
     enableAxis(xBottom, true);
     distdraw = new DistScaleDraw;
     distdraw->setTickLength(QwtScaleDiv::MajorTick, 3);
@@ -104,6 +134,10 @@ ErgFilePlot::ErgFilePlot(MainWindow *main) : main(main)
 
 
     // set all the orher axes off but scaled
+    setAxisScale(yLeft, 0, 300); // max cadence and hr
+    enableAxis(yLeft, true);
+    setAxisAutoScale(QwtPlot::yLeft, true);// we autoscale, since peaks are so much higher than troughs
+
     setAxisScale(yRight, 0, 250); // max cadence and hr
     enableAxis(yRight, false);
     setAxisScale(yRight2, 0, 60); // max speed of 60mph/60kmh seems ok to me!
@@ -113,7 +147,7 @@ ErgFilePlot::ErgFilePlot(MainWindow *main) : main(main)
     lodData = new ErgFileData(main);
     // Load Curve
     LodCurve = new QwtPlotCurve("Course Load");
-    LodCurve->setData(*lodData);
+    LodCurve->setData(lodData);
     LodCurve->attach(this);
     LodCurve->setBaseline(-1000);
     LodCurve->setYAxis(QwtPlot::yLeft);
@@ -131,9 +165,9 @@ ErgFilePlot::ErgFilePlot(MainWindow *main) : main(main)
     wattsCurve->setPen(wattspen);
     wattsCurve->attach(this);
     wattsCurve->setYAxis(QwtPlot::yLeft);
-    wattsCurve->setPaintAttribute(QwtPlotCurve::PaintFiltered);
+    // dgr wattsCurve->setPaintAttribute(QwtPlotCurve::PaintFiltered);
     wattsData = new CurveData;
-    wattsCurve->setRawData(wattsData->x(), wattsData->y(), wattsData->count());
+    wattsCurve->setData(wattsData->x(), wattsData->y(), wattsData->count());
 
     // telemetry history
     hrCurve = new QwtPlotCurve("Heartrate");
@@ -142,7 +176,7 @@ ErgFilePlot::ErgFilePlot(MainWindow *main) : main(main)
     hrCurve->attach(this);
     hrCurve->setYAxis(QwtPlot::yRight);
     hrData = new CurveData;
-    hrCurve->setRawData(hrData->x(), hrData->y(), hrData->count());
+    hrCurve->setData(hrData->x(), hrData->y(), hrData->count());
 
     // telemetry history
     cadCurve = new QwtPlotCurve("Cadence");
@@ -151,7 +185,7 @@ ErgFilePlot::ErgFilePlot(MainWindow *main) : main(main)
     cadCurve->attach(this);
     cadCurve->setYAxis(QwtPlot::yRight);
     cadData = new CurveData;
-    cadCurve->setRawData(cadData->x(), cadData->y(), cadData->count());
+    cadCurve->setData(cadData->x(), cadData->y(), cadData->count());
 
     // telemetry history
     speedCurve = new QwtPlotCurve("Speed");
@@ -160,7 +194,7 @@ ErgFilePlot::ErgFilePlot(MainWindow *main) : main(main)
     speedCurve->attach(this);
     speedCurve->setYAxis(QwtPlot::yRight2);
     speedData = new CurveData;
-    speedCurve->setRawData(speedData->x(), speedData->y(), speedData->count());
+    speedCurve->setData(speedData->x(), speedData->y(), speedData->count());
 
     // Now data bridge
     nowData = new NowData(main);
@@ -169,7 +203,7 @@ ErgFilePlot::ErgFilePlot(MainWindow *main) : main(main)
     NowCurve = new QwtPlotCurve("Now");
     QPen Nowpen = QPen(Qt::red, 2.0);
     NowCurve->setPen(Nowpen);
-    NowCurve->setData(*nowData);
+    NowCurve->setData(nowData);
     NowCurve->attach(this);
     NowCurve->setYAxis(QwtPlot::yLeft);
 
@@ -359,21 +393,21 @@ ErgFilePlot::performancePlot(RealtimeData rtdata)
 
     if (!wattsData->count()) wattsData->append(&zero, &watts, 1);
     wattsData->append(&x, &watts, 1);
-    wattsCurve->setRawData(wattsData->x(), wattsData->y(), wattsData->count());
+    wattsCurve->setData(wattsData->x(), wattsData->y(), wattsData->count());
 
     if (!hrData->count()) hrData->append(&zero, &hr, 1);
     hrData->append(&x, &hr, 1);
-    hrCurve->setRawData(hrData->x(), hrData->y(), hrData->count());
+    hrCurve->setData(hrData->x(), hrData->y(), hrData->count());
 
     if (!speedData->count()) speedData->append(&zero, &speed, 1);
     speedData->append(&x, &speed, 1);
-    speedCurve->setRawData(speedData->x(), speedData->y(), speedData->count());
+    speedCurve->setData(speedData->x(), speedData->y(), speedData->count());
 
     if (!cadData->count()) cadData->append(&zero, &cad, 1);
     cadData->append(&x, &cad, 1);
-    cadCurve->setRawData(cadData->x(), cadData->y(), cadData->count());
+    cadCurve->setData(cadData->x(), cadData->y(), cadData->count());
 
-    const bool cacheMode = canvas()->testPaintAttribute(QwtPlotCanvas::PaintCached);
+    //const bool cacheMode = canvas()->testPaintAttribute(QwtPlotCanvas::PaintCached);
 
 #if 0
 #if QT_VERSION >= 0x040000 && defined(Q_WS_X11)
@@ -416,13 +450,13 @@ ErgFilePlot::reset()
     // instead when we place the first points on the plots we add them twice
     // once for time/distance of 0 and once for the current point in time
     wattsData->clear();
-    wattsCurve->setRawData(wattsData->x(), wattsData->y(), wattsData->count());
+    wattsCurve->setData(wattsData->x(), wattsData->y(), wattsData->count());
     cadData->clear();
-    cadCurve->setRawData(cadData->x(), cadData->y(), cadData->count());
+    cadCurve->setData(cadData->x(), cadData->y(), cadData->count());
     hrData->clear();
-    hrCurve->setRawData(hrData->x(), hrData->y(), hrData->count());
+    hrCurve->setData(hrData->x(), hrData->y(), hrData->count());
     speedData->clear();
-    speedCurve->setRawData(speedData->x(), speedData->y(), speedData->count());
+    speedCurve->setData(speedData->x(), speedData->y(), speedData->count());
 }
 
 // curve data.. code snaffled in from the Qwt example (realtime_plot)

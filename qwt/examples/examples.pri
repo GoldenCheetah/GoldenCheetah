@@ -1,4 +1,4 @@
-# -*- mode: sh -*- ################################################
+################################################################
 # Qwt Widget Library
 # Copyright (C) 1997   Josef Wilgen
 # Copyright (C) 2002   Uwe Rathmann
@@ -7,55 +7,43 @@
 # modify it under the terms of the Qwt License, Version 1.0
 ###################################################################
 
-QWT_ROOT = ../..
-
+QWT_ROOT = $${PWD}/..
 include( $${QWT_ROOT}/qwtconfig.pri )
-
-SUFFIX_STR =
-VVERSION = $$[QT_VERSION]
-isEmpty(VVERSION) {
-
-    # Qt 3
-    debug {
-        SUFFIX_STR = $${DEBUG_SUFFIX}
-    }
-    else {
-        SUFFIX_STR = $${RELEASE_SUFFIX}
-    }
-}
-else {
-    CONFIG(debug, debug|release) {
-        SUFFIX_STR = $${DEBUG_SUFFIX}
-    }
-    else {
-        SUFFIX_STR = $${RELEASE_SUFFIX}
-    }
-}
+include( $${QWT_ROOT}/qwtbuild.pri )
 
 TEMPLATE     = app
 
-MOC_DIR      = moc
 INCLUDEPATH += $${QWT_ROOT}/src
 DEPENDPATH  += $${QWT_ROOT}/src
-OBJECTS_DIR  = obj$${SUFFIX_STR}
-DESTDIR      = $${QWT_ROOT}/examples/bin$${SUFFIX_STR}
+DESTDIR      = $${QWT_ROOT}/examples/bin
 
-QWTLIB       = qwt$${SUFFIX_STR}
+QMAKE_RPATHDIR *= $${QWT_ROOT}/lib
 
-win32 {
-    contains(CONFIG, QwtDll) {
-        DEFINES    += QT_DLL QWT_DLL
-        QWTLIB = $${QWTLIB}$${VER_MAJ}
-    }
+contains(QWT_CONFIG, QwtFramework) {
 
-    win32-msvc:LIBS  += $${QWT_ROOT}/lib/$${QWTLIB}.lib
-    win32-msvc.net:LIBS  += $${QWT_ROOT}/lib/$${QWTLIB}.lib
-    win32-msvc2002:LIBS += $${QWT_ROOT}/lib/$${QWTLIB}.lib
-    win32-msvc2003:LIBS += $${QWT_ROOT}/lib/$${QWTLIB}.lib
-    win32-msvc2005:LIBS += $${QWT_ROOT}/lib/$${QWTLIB}.lib
-    win32-msvc2008:LIBS += $${QWT_ROOT}/lib/$${QWTLIB}.lib
-    win32-g++:LIBS   += -L$${QWT_ROOT}/lib -l$${QWTLIB}
+    LIBS      += -F$${QWT_ROOT}/lib
 }
 else {
-    LIBS        += -L$${QWT_ROOT}/lib -l$${QWTLIB}
+
+    LIBS      += -L$${QWT_ROOT}/lib
+}
+
+IPATH       = $${INCLUDEPATH}
+qtAddLibrary(qwt)
+INCLUDEPATH = $${IPATH}
+
+contains(QWT_CONFIG, QwtSvg) {
+
+    QT += svg
+}
+else {
+
+    DEFINES += QWT_NO_SVG
+}
+
+
+win32 {
+    contains(QWT_CONFIG, QwtDll) {
+        DEFINES    += QT_DLL QWT_DLL
+    }
 }

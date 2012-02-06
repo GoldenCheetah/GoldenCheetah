@@ -19,7 +19,7 @@
 
 #include <assert.h>
 #include <QDebug>
-#include <qwt_data.h>
+#include <qwt_series_data.h>
 #include <qwt_legend.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_canvas.h>
@@ -47,10 +47,21 @@ static const double siny[24] = {
 
 // SpinScan force/direction to cartesian for plotting
 size_t SpinScanPolarData::size() const { return 13; }
-QwtData *SpinScanPolarData::copy() const { return new SpinScanPolarData(spinData, isleft); }
+//QwtData *SpinScanPolarData::copy() const { return new SpinScanPolarData(spinData, isleft); }
 void SpinScanPolarData::init() { }
 double SpinScanPolarData::x(size_t i) const { i += isleft?0:12; if (i>=24) i=0; return cosx[i] * (double)spinData[i]; }
 double SpinScanPolarData::y(size_t i) const { i += isleft?0:12; if (i>=24) i=0; return siny[i] * (double)spinData[i]; }
+
+QPointF SpinScanPolarData::sample(size_t i) const
+{
+    return QPointF(x(i), y(i));
+}
+
+QRectF SpinScanPolarData::boundingRect() const
+{
+    // TODO dgr
+    return QRectF(-5000, 5000, 10000, 10000);
+}
 
 // Original code before moving to precomputed constants
 //double SpinScanPolarData::x(size_t i) const { if (i==24) i=0; return cos((i*15)*3.14159f/180.00f) * (double)spinData[i]; }
@@ -119,7 +130,7 @@ SpinScanPolarPlot::configChanged()
     rightCurve->setBrush(Qt::NoBrush);
     rightCurve->setPen(pen);
     rightCurve->setStyle(QwtPlotCurve::Lines);
-    rightCurve->setData(*rightSpinScanPolarData);
+    rightCurve->setData(rightSpinScanPolarData);
 
     QColor col2 = GColor(CSPINSCANLEFT);
     col2.setAlpha(120);
@@ -129,5 +140,5 @@ SpinScanPolarPlot::configChanged()
     leftCurve->setBrush(Qt::NoBrush);
     leftCurve->setPen(pen2);
     leftCurve->setStyle(QwtPlotCurve::Lines);
-    leftCurve->setData(*leftSpinScanPolarData);
+    leftCurve->setData(leftSpinScanPolarData);
 }

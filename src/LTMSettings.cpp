@@ -361,7 +361,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
         out<<metric.filter;
         out<<metric.from;
         out<<metric.to;
-        out<<static_cast<int>(metric.curveStyle);
+        out<<static_cast<int>(metric.curveStyle-1); // curveStyle change between qwt 5 and 6
         out<<static_cast<int>(metric.symbolStyle);
         out<<metric.penColor;
         out<<metric.penAlpha;
@@ -407,7 +407,7 @@ QDataStream &operator>>(QDataStream &in, LTMSettings &settings)
         in>>m.from;
         in>>m.to;
         int x;
-        in>> x; m.curveStyle = static_cast<QwtPlotCurve::CurveStyle>(x);
+        in>> x; m.curveStyle = static_cast<QwtPlotCurve::CurveStyle>(x+1);  // curveStyle change between qwt 5 and 6
         in>> x; m.symbolStyle = static_cast<QwtSymbol::Style>(x);
         in>>m.penColor;
         in>>m.penAlpha;

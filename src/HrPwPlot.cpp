@@ -33,7 +33,7 @@
 #include <qwt_text.h>
 #include <qwt_symbol.h>
 #include <qwt_legend.h>
-#include <qwt_data.h>
+#include <qwt_series_data.h>
 
 
 static inline double
@@ -509,7 +509,7 @@ HrPwPlot::setJoinLine(bool value)
             pen.setWidth(1);
             hrCurves[i]->setPen(pen);
             hrCurves[i]->setStyle(QwtPlotCurve::Lines);
-            hrCurves[i]->setSymbol(sym);
+            hrCurves[i]->setSymbol(new QwtSymbol(sym));
         } else {
             QwtSymbol sym;
             sym.setStyle(QwtSymbol::Ellipse);
@@ -518,7 +518,7 @@ HrPwPlot::setJoinLine(bool value)
             sym.setBrush(QBrush(color));
             hrCurves[i]->setPen(Qt::NoPen);
             hrCurves[i]->setStyle(QwtPlotCurve::Dots);
-            hrCurves[i]->setSymbol(sym);
+            hrCurves[i]->setSymbol(new QwtSymbol(sym));
         }
         //hrCurves[i].setRenderHint(QwtPlotItem::RenderAntialiased);
     }
@@ -530,8 +530,8 @@ HrPwPlot::pointHover(QwtPlotCurve *curve, int index)
 {
     if (index >= 0) {
 
-        double yvalue = curve->y(index);
-        double xvalue = curve->x(index);
+        double yvalue = curve->sample(index).y();
+        double xvalue = curve->sample(index).x();
 
         // output the tooltip
         QString text = QString("%1 %2\n%3 %4")
@@ -567,7 +567,7 @@ class HrPwPlotBackground: public QwtPlotItem
 
         virtual void draw(QPainter *painter,
               const QwtScaleMap &xMap, const QwtScaleMap &,
-              const QRect &rect) const {
+              const QRectF &rect) const {
 
             RideItem *rideItem = parent->rideItem;
 
@@ -582,7 +582,7 @@ class HrPwPlotBackground: public QwtPlotItem
                 int num_zones = zone_lows.size();
                 if (num_zones > 0) {
                     for (int z = 0; z < num_zones; z ++) {
-                        QRect r = rect;
+                        QRectF r = rect;
 
                         QColor shading_color = zoneColor(z, num_zones);
                         shading_color.setHsv(
@@ -660,13 +660,13 @@ class HrPwPlotZoneLabel: public QwtPlotItem
 
         void draw(QPainter *painter,
                 const QwtScaleMap &xMap, const QwtScaleMap &,
-                const QRect &rect) const {
+                const QRectF &rect) const {
             if (parent->isShadeZones()) {
                 int y = (rect.bottom() + rect.top()) / 2;
                 int x = xMap.transform(watts);
 
                 // the following code based on source for QwtPlotMarker::draw()
-                QRect tr(QPoint(0, 0), text.textSize(painter->font()));
+                QRect tr(QPoint(0, 0), text.textSize(painter->font()).toSize());
                 tr.moveCenter(QPoint(x, y));
                 text.draw(painter, tr);
             }

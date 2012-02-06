@@ -5,18 +5,10 @@
 #include "speedo_meter.h"
 #include "cockpit_grid.h"
 
-#if QT_VERSION < 0x040000
-typedef QColorGroup Palette;
-#else
-typedef QPalette Palette;
-#endif
-
 CockpitGrid::CockpitGrid(QWidget *parent):
     QFrame(parent)
 {
-#if QT_VERSION >= 0x040100
     setAutoFillBackground(true);
-#endif
 
     setPalette(colorTheme(QColor(Qt::darkGray).dark(150)));
 
@@ -31,13 +23,8 @@ CockpitGrid::CockpitGrid(QWidget *parent):
         layout->addWidget(dial, 0, i);
     }
 
-#if QT_VERSION < 0x040000
-    for ( i = 0; i < layout->numCols(); i++ )
-        layout->setColStretch(i, 1);
-#else
     for ( i = 0; i < layout->columnCount(); i++ )
         layout->setColumnStretch(i, 1);
-#endif
 }
 
 QwtDial *CockpitGrid::createDial(int pos)
@@ -61,7 +48,7 @@ QwtDial *CockpitGrid::createDial(int pos)
                     handColor = Qt::gray;
                     width = 5;
                 }
-                
+
                 QwtDialSimpleNeedle *hand = new QwtDialSimpleNeedle(
                     QwtDialSimpleNeedle::Arrow, true, handColor, knobColor);
                 hand->setWidth(width);
@@ -70,7 +57,7 @@ QwtDial *CockpitGrid::createDial(int pos)
             }
 
             QTimer *timer = new QTimer(d_clock);
-            timer->connect(timer, SIGNAL(timeout()), 
+            timer->connect(timer, SIGNAL(timeout()),
                 d_clock, SLOT(setCurrentTime()));
             timer->start(1000);
 
@@ -84,7 +71,7 @@ QwtDial *CockpitGrid::createDial(int pos)
             d_speedo->setScale(-1, 2, 20);
 
             QTimer *timer = new QTimer(d_speedo);
-            timer->connect(timer, SIGNAL(timeout()), 
+            timer->connect(timer, SIGNAL(timeout()),
                 this, SLOT(changeSpeed()));
             timer->start(50);
 
@@ -96,12 +83,12 @@ QwtDial *CockpitGrid::createDial(int pos)
             d_ai = new AttitudeIndicator(this);
 
             QTimer *gradientTimer = new QTimer(d_ai);
-            gradientTimer->connect(gradientTimer, SIGNAL(timeout()), 
+            gradientTimer->connect(gradientTimer, SIGNAL(timeout()),
                 this, SLOT(changeGradient()));
             gradientTimer->start(100);
 
             QTimer *angleTimer = new QTimer(d_ai);
-            angleTimer->connect(angleTimer, SIGNAL(timeout()), 
+            angleTimer->connect(angleTimer, SIGNAL(timeout()),
                 this, SLOT(changeAngle()));
             angleTimer->start(100);
 
@@ -136,13 +123,13 @@ QPalette CockpitGrid::colorTheme(const QColor &base) const
     {
         QPalette::ColorGroup cg = (QPalette::ColorGroup)i;
 
-        palette.setColor(cg, Palette::Base, base);
-        palette.setColor(cg, Palette::Background, background);
-        palette.setColor(cg, Palette::Mid, mid);
-        palette.setColor(cg, Palette::Light, light);
-        palette.setColor(cg, Palette::Dark, dark);
-        palette.setColor(cg, Palette::Text, text);
-        palette.setColor(cg, Palette::Foreground, foreground);
+        palette.setColor(cg, QPalette::Base, base);
+        palette.setColor(cg, QPalette::Window, background);
+        palette.setColor(cg, QPalette::Mid, mid);
+        palette.setColor(cg, QPalette::Light, light);
+        palette.setColor(cg, QPalette::Dark, dark);
+        palette.setColor(cg, QPalette::Text, text);
+        palette.setColor(cg, QPalette::WindowText, foreground);
     }
 
     return palette;
@@ -154,7 +141,7 @@ void CockpitGrid::changeSpeed()
 
     double speed = d_speedo->value();
 
-    if ( (speed < 40.0 && offset < 0.0 ) ||  
+    if ( (speed < 40.0 && offset < 0.0 ) ||
         (speed > 160.0 && offset > 0.0) )
     {
         offset = -offset;

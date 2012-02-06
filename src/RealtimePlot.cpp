@@ -19,7 +19,7 @@
 
 #include <assert.h>
 #include <QDebug>
-#include <qwt_data.h>
+#include <qwt_series_data.h>
 #include <qwt_legend.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_canvas.h>
@@ -32,42 +32,100 @@
 double RealtimePwrData::x(size_t i) const { return (double)MAXSAMPLES-i; }
 double RealtimePwrData::y(size_t i) const { return pwrData[(pwrCur+i) < MAXSAMPLES ? (pwrCur+i) : (pwrCur+i-MAXSAMPLES)]; }
 size_t RealtimePwrData::size() const { return MAXSAMPLES; }
-QwtData *RealtimePwrData::copy() const { return new RealtimePwrData(const_cast<RealtimePwrData*>(this)); }
+//QwtSeriesData *RealtimePwrData::copy() const { return new RealtimePwrData(const_cast<RealtimePwrData*>(this)); }
 void RealtimePwrData::init() { pwrCur=0; for (int i=0; i<MAXSAMPLES; i++) pwrData[i]=0; }
 void RealtimePwrData::addData(double v) { pwrData[pwrCur++] = v; if (pwrCur==MAXSAMPLES) pwrCur=0; }
+
+QPointF RealtimePwrData::sample(size_t i) const
+{
+    return QPointF(x(i), y(i));
+}
+
+QRectF RealtimePwrData::boundingRect() const
+{
+    // TODO dgr
+    return QRectF(-5000, 5000, 10000, 10000);
+}
 
 // 30 second Power rolling avg
 double Realtime30PwrData::x(size_t i) const { return i ? 0 : MAXSAMPLES; }
 
 double Realtime30PwrData::y(size_t i) const { double pwr30=0; for (int x=0; x<150; x++) { pwr30+=pwrData[x]; } pwr30 /= 150; return pwr30; }
 size_t Realtime30PwrData::size() const { return 150; }
-QwtData *Realtime30PwrData::copy() const { return new Realtime30PwrData(const_cast<Realtime30PwrData*>(this)); }
+//QwtSeriesData *Realtime30PwrData::copy() const { return new Realtime30PwrData(const_cast<Realtime30PwrData*>(this)); }
 void Realtime30PwrData::init() { pwrCur=0; for (int i=0; i<150; i++) pwrData[i]=0; }
 void Realtime30PwrData::addData(double v) { pwrData[pwrCur++] = v; if (pwrCur==150) pwrCur=0; }
+
+QPointF Realtime30PwrData::sample(size_t i) const
+{
+    return QPointF(x(i), y(i));
+}
+
+QRectF Realtime30PwrData::boundingRect() const
+{
+    // TODO dgr
+    return QRectF(-5000, 5000, 10000, 10000);
+}
+
+
+
 
 // Cadence history
 double RealtimeCadData::x(size_t i) const { return (double)MAXSAMPLES-i; }
 double RealtimeCadData::y(size_t i) const { return cadData[(cadCur+i) < MAXSAMPLES ? (cadCur+i) : (cadCur+i-MAXSAMPLES)]; }
 size_t RealtimeCadData::size() const { return MAXSAMPLES; }
-QwtData *RealtimeCadData::copy() const { return new RealtimeCadData(const_cast<RealtimeCadData*>(this)); }
+//QwtSeriesData *RealtimeCadData::copy() const { return new RealtimeCadData(const_cast<RealtimeCadData*>(this)); }
 void RealtimeCadData::init() { cadCur=0; for (int i=0; i<MAXSAMPLES; i++) cadData[i]=0; }
 void RealtimeCadData::addData(double v) { cadData[cadCur++] = v; if (cadCur==MAXSAMPLES) cadCur=0; }
+
+QPointF RealtimeCadData::sample(size_t i) const
+{
+    return QPointF(x(i), y(i));
+}
+
+QRectF RealtimeCadData::boundingRect() const
+{
+    // TODO dgr
+    return QRectF(-5000, 5000, 10000, 10000);
+}
 
 // Speed history
 double RealtimeSpdData::x(size_t i) const { return (double)MAXSAMPLES-i; }
 double RealtimeSpdData::y(size_t i) const { return spdData[(spdCur+i) < MAXSAMPLES ? (spdCur+i) : (spdCur+i-MAXSAMPLES)]; }
 size_t RealtimeSpdData::size() const { return MAXSAMPLES; }
-QwtData *RealtimeSpdData::copy() const { return new RealtimeSpdData(const_cast<RealtimeSpdData*>(this)); }
+//QwtSeriesData *RealtimeSpdData::copy() const { return new RealtimeSpdData(const_cast<RealtimeSpdData*>(this)); }
 void RealtimeSpdData::init() { spdCur=0; for (int i=0; i<MAXSAMPLES; i++) spdData[i]=0; }
 void RealtimeSpdData::addData(double v) { spdData[spdCur++] = v; if (spdCur==MAXSAMPLES) spdCur=0; }
+
+QPointF RealtimeSpdData::sample(size_t i) const
+{
+    return QPointF(x(i), y(i));
+}
+
+QRectF RealtimeSpdData::boundingRect() const
+{
+    // TODO dgr
+    return QRectF(-5000, 5000, 10000, 10000);
+}
 
 // HR history
 double RealtimeHrData::x(size_t i) const { return (double)MAXSAMPLES-i; }
 double RealtimeHrData::y(size_t i) const { return hrData[(hrCur+i) < MAXSAMPLES ? (hrCur+i) : (hrCur+i-MAXSAMPLES)]; }
 size_t RealtimeHrData::size() const { return MAXSAMPLES; }
-QwtData *RealtimeHrData::copy() const { return new RealtimeHrData(const_cast<RealtimeHrData*>(this)); }
+//QwtSeriesData *RealtimeHrData::copy() const { return new RealtimeHrData(const_cast<RealtimeHrData*>(this)); }
 void RealtimeHrData::init() { hrCur=0; for (int i=0; i<MAXSAMPLES; i++) hrData[i]=0; }
 void RealtimeHrData::addData(double v) { hrData[hrCur++] = v; if (hrCur==MAXSAMPLES) hrCur=0; }
+
+QPointF RealtimeHrData::sample(size_t i) const
+{
+    return QPointF(x(i), y(i));
+}
+
+QRectF RealtimeHrData::boundingRect() const
+{
+    // TODO dgr
+    return QRectF(-5000, 5000, 10000, 10000);
+}
 
 // Load history
 //double RealtimeLodData::x(size_t i) const { return (double)50-i; }
@@ -91,11 +149,12 @@ RealtimePlot::RealtimePlot() :
     setInstanceName("Realtime Plot");
 
     //insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
-    pwrData.init();
-    altPwrData.init();
-    cadData.init();
-    spdData.init();
-    hrData.init();
+    pwr30Data = new Realtime30PwrData;
+    pwrData = new RealtimePwrData;
+    altPwrData = new RealtimePwrData;
+    spdData = new RealtimeSpdData;
+    hrData = new RealtimeHrData;
+    cadData = new RealtimeCadData;
 
     // Setup the axis (of evil :-)
     setAxisTitle(yLeft, "Watts");

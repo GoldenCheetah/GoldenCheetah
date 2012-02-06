@@ -38,7 +38,7 @@
 #include <qwt_scale_engine.h>
 #include <qwt_text.h>
 #include <qwt_legend.h>
-#include <qwt_data.h>
+#include <qwt_series_data.h>
 
 #include "LTMCanvasPicker.h" // for tooltip
 
@@ -957,8 +957,8 @@ PowerHist::pointHover(QwtPlotCurve *curve, int index)
 {
     if (index >= 0) {
 
-        double xvalue = curve->x(index);
-        double yvalue = curve->y(index);
+        double xvalue = curve->sample(index).x();
+        double yvalue = curve->sample(index).y();
         QString text;
 
         if (zoned && yvalue > 0) {

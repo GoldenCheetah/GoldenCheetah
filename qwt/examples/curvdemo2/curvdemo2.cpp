@@ -33,27 +33,24 @@ double vval[USize];
 //
 //  CONSTRUCT MAIN WINDOW
 //
-MainWin::MainWin(): 
+MainWin::MainWin():
     QFrame()
 {
     setFrameStyle(QFrame::Box|QFrame::Raised);
     setLineWidth(2);
     setMidLineWidth(3);
-    
+
     const QColor bgColor(30,30,50);
-#if QT_VERSION < 0x040000
-    setPaletteBackgroundColor(bgColor);
-#else
+
     QPalette p = palette();
     p.setColor(backgroundRole(), bgColor);
     setPalette(p);
-#endif
 
-    QwtSplineCurveFitter* curveFitter; 
+    QwtSplineCurveFitter* curveFitter;
 
     //
     //  curve 1
-    // 
+    //
     int i = 0;
     xMap[i].setScaleInterval(-1.5, 1.5);
     yMap[i].setScaleInterval(0.0, 6.28);
@@ -65,15 +62,14 @@ MainWin::MainWin():
     curveFitter->setSplineSize(150);
     curve[i].setCurveFitter(curveFitter);
 
-    QwtSymbol sym;
-    sym.setStyle(QwtSymbol::XCross);
-    sym.setPen(QPen(Qt::yellow,2));
-    sym.setSize(7);
-    
-    curve[i].setSymbol(sym);
+    QwtSymbol *symbol = new QwtSymbol(QwtSymbol::XCross);
+    symbol->setPen(QPen(Qt::yellow,2));
+    symbol->setSize(7);
 
-    curve[i].setRawData(yval,xval,Size);
-    
+    curve[i].setSymbol(symbol);
+
+    curve[i].setRawSamples(yval,xval,Size);
+
     //
     // curve 2
     //
@@ -82,15 +78,15 @@ MainWin::MainWin():
     yMap[i].setScaleInterval(-3.0, 1.1);
     curve[i].setPen(QPen(QColor(200,150,50)));
     curve[i].setStyle(QwtPlotCurve::Sticks);
-    curve[i].setSymbol(QwtSymbol(QwtSymbol::Ellipse,
+    curve[i].setSymbol(new QwtSymbol(QwtSymbol::Ellipse,
         QColor(Qt::blue), QColor(Qt::yellow), QSize(5,5)));
 
-    curve[i].setRawData(xval,zval,Size);
+    curve[i].setRawSamples(xval,zval,Size);
 
-    
+
     //
     //  curve 3
-    // 
+    //
     i++;
     xMap[i].setScaleInterval(-1.1, 3.0);
     yMap[i].setScaleInterval(-1.1, 3.0);
@@ -102,7 +98,7 @@ MainWin::MainWin():
     curveFitter->setSplineSize(200);
     curve[i].setCurveFitter(curveFitter);
 
-    curve[i].setRawData(yval,zval,Size);
+    curve[i].setRawSamples(yval,zval,Size);
 
 
     //
@@ -118,18 +114,18 @@ MainWin::MainWin():
     curveFitter->setSplineSize(200);
     curve[i].setCurveFitter(curveFitter);
 
-    curve[i].setRawData(uval,vval,USize);
+    curve[i].setRawSamples(uval,vval,USize);
 
     //
     //  initialize values
     //
     double base = 2.0 * M_PI / double(USize - 1);
-    double toggle = 1.0; 
+    double toggle = 1.0;
     for (i = 0; i < USize; i++)
     {
-        uval[i] =  toggle * cos( double(i) * base);
-        vval[i] =  toggle * sin( double(i) * base);
-            
+        uval[i] =  toggle * qCos( double(i) * base);
+        vval[i] =  toggle * qSin( double(i) * base);
+
         if (toggle == 1.0)
            toggle = 0.5;
         else
@@ -141,10 +137,9 @@ MainWin::MainWin():
     //
     // start timer
     //
-    (void)startTimer(250);  
+    (void)startTimer(250);
 }
 
-#if QT_VERSION >= 0x040000
 void MainWin::paintEvent(QPaintEvent *event)
 {
     QFrame::paintEvent(event);
@@ -153,7 +148,6 @@ void MainWin::paintEvent(QPaintEvent *event)
     painter.setClipRect(contentsRect());
     drawContents(&painter);
 }
-#endif
 
 void MainWin::drawContents(QPainter *painter)
 {
@@ -184,27 +178,27 @@ void MainWin::newValues()
     int i;
     static double phs = 0.0;
     double s,c,u;
-    
+
     for (i=0;i<Size;i++)
     {
         xval[i] = 6.28 * double(i) / double(Size -1);
-        yval[i] = sin(xval[i] - phs);
-        zval[i] = cos(3.0 * (xval[i] + phs));
+        yval[i] = qSin(xval[i] - phs);
+        zval[i] = qCos(3.0 * (xval[i] + phs));
     }
-    
-    s = 0.25 * sin(phs);
-    c = sqrt(1.0 - s*s);
+
+    s = 0.25 * qSin(phs);
+    c = qSqrt(1.0 - s*s);
     for (i=0; i<USize;i++)
     {
         u = uval[i];
         uval[i] = uval[i] * c - vval[i] * s;
         vval[i] = vval[i] * c + u * s;
     }
-    
+
     phs += 0.0628;
     if (phs > 6.28)
        phs = 0.0;
-    
+
 }
 
 int main (int argc, char **argv)
@@ -213,9 +207,6 @@ int main (int argc, char **argv)
 
     MainWin w;
 
-#if QT_VERSION < 0x040000
-    a.setMainWidget(&w);
-#endif
     w.resize(300,300);
     w.show();
 

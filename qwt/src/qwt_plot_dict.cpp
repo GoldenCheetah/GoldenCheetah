@@ -7,87 +7,60 @@
  * modify it under the terms of the Qwt License, Version 1.0
  *****************************************************************************/
 
-// vim: expandtab
-
 #include "qwt_plot_dict.h"
 
 class QwtPlotDict::PrivateData
 {
 public:
 
-#if QT_VERSION < 0x040000
-    class ItemList: public QValueList<QwtPlotItem *>
-#else
     class ItemList: public QList<QwtPlotItem *>
-#endif
     {
     public:
-        void insertItem(QwtPlotItem *item)
+        void insertItem( QwtPlotItem *item )
         {
             if ( item == NULL )
                 return;
 
-            // Unfortunately there is no inSort operation
-            // for lists in Qt4. The implementation below
-            // is slow, but there shouldn't be many plot items.
-
-#ifdef __GNUC__
-#warning binary search missing
-#endif
-
-#if QT_VERSION < 0x040000
-            QValueListIterator<QwtPlotItem *> it;
-#else
-            QList<QwtPlotItem *>::Iterator it;
-#endif
-            for ( it = begin(); it != end(); ++it )
-            {
-                if ( *it == item )
-                    return;
-
-                if ( (*it)->z() > item->z() )
-                {
-                    insert(it, item);
-                    return;
-                }
-            }
-            append(item);
+            QList<QwtPlotItem *>::iterator it =
+                qUpperBound( begin(), end(), item, LessZThan() );
+            insert( it, item );
         }
 
-        void removeItem(QwtPlotItem *item)
+        void removeItem( QwtPlotItem *item )
         {
             if ( item == NULL )
                 return;
 
-            int i = 0;
+            QList<QwtPlotItem *>::iterator it =
+                qLowerBound( begin(), end(), item, LessZThan() );
 
-#if QT_VERSION < 0x040000
-            QValueListIterator<QwtPlotItem *> it;
-#else
-            QList<QwtPlotItem *>::Iterator it;
-#endif
-            for ( it = begin(); it != end(); ++it )
+            for ( ; it != end(); ++it )
             {
                 if ( item == *it )
                 {
-#if QT_VERSION < 0x040000
-                    remove(it);
-#else
-                    removeAt(i);
-#endif
-                    return;
+                    erase( it );
+                    break;
                 }
-                i++;
             }
         }
+    private:
+        class LessZThan
+        {
+        public:
+            inline bool operator()( const QwtPlotItem *item1,
+                const QwtPlotItem *item2 ) const
+            {
+                return item1->z() < item2->z();
+            }
+        };
     };
 
     ItemList itemList;
     bool autoDelete;
 };
 
-/*! 
-   Constructor 
+/*!
+   Constructor
 
    Auto deletion is enabled.
    \sa setAutoDelete(), attachItem()
@@ -98,7 +71,7 @@ QwtPlotDict::QwtPlotDict()
     d_data->autoDelete = true;
 }
 
-/*! 
+/*!
    Destructor
 
    If autoDelete is on, all attached items will be deleted
@@ -106,7 +79,7 @@ QwtPlotDict::QwtPlotDict()
 */
 QwtPlotDict::~QwtPlotDict()
 {
-    detachItems(QwtPlotItem::Rtti_PlotItem, d_data->autoDelete);
+    detachItems( QwtPlotItem::Rtti_PlotItem, d_data->autoDelete );
     delete d_data;
 }
 
@@ -118,7 +91,7 @@ QwtPlotDict::~QwtPlotDict()
 
    \sa autoDelete(), attachItem()
 */
-void QwtPlotDict::setAutoDelete(bool autoDelete)
+void QwtPlotDict::setAutoDelete( bool autoDelete )
 {
     d_data->autoDelete = autoDelete;
 }
@@ -144,22 +117,22 @@ bool QwtPlotDict::autoDelete() const
 
    \sa setAutoDelete(), ~QwtPlotDict()
 */
-void QwtPlotDict::attachItem(QwtPlotItem *item, bool on)
+void QwtPlotDict::attachItem( QwtPlotItem *item, bool on )
 {
     if ( on )
-        d_data->itemList.insertItem(item);
+        d_data->itemList.insertItem( item );
     else
-        d_data->itemList.removeItem(item);
+        d_data->itemList.removeItem( item );
 }
 
 /*!
    Detach items from the dictionary
 
-   \param rtti In case of QwtPlotItem::Rtti_PlotItem detach all items 
+   \param rtti In case of QwtPlotItem::Rtti_PlotItem detach all items
                otherwise only those items of the type rtti.
    \param autoDelete If true, delete all detached items
 */
-void QwtPlotDict::detachItems(int rtti, bool autoDelete)
+void QwtPlotDict::detachItems( int rtti, bool autoDelete )
 {
     PrivateData::ItemList list = d_data->itemList;
     QwtPlotItemIterator it = list.begin();
@@ -171,20 +144,45 @@ void QwtPlotDict::detachItems(int rtti, bool autoDelete)
 
         if ( rtti == QwtPlotItem::Rtti_PlotItem || item->rtti() == rtti )
         {
-            item->attach(NULL);
+            item->attach( NULL );
             if ( autoDelete )
                 delete item;
         }
     }
 }
 
-//! \brief A QwtPlotItemList of all attached plot items.
-///
-/// Use caution when iterating these lists, as removing/detaching an item will
-/// invalidate the iterator. Instead you can place pointers to objects to be
-/// removed in a removal list, and traverse that list later.
-//! \return List of all attached plot items.
+/*!
+  \brief A QwtPlotItemList of all attached plot items.
+
+  Use caution when iterating these lists, as removing/detaching an item will
+  invalidate the iterator. Instead you can place pointers to objects to be
+  removed in a removal list, and traverse that list later.
+
+  \return List of all attached plot items.
+*/
 const QwtPlotItemList &QwtPlotDict::itemList() const
 {
     return d_data->itemList;
+}
+
+/*!
+  \return List of all attached plot items of a specific type.
+  \sa QwtPlotItem::rtti()
+*/
+QwtPlotItemList QwtPlotDict::itemList( int rtti ) const
+{
+    if ( rtti == QwtPlotItem::Rtti_PlotItem )
+        return d_data->itemList;
+
+    QwtPlotItemList items;
+
+    PrivateData::ItemList list = d_data->itemList;
+    for ( QwtPlotItemIterator it = list.begin(); it != list.end(); ++it )
+    {
+        QwtPlotItem *item = *it;
+        if ( item->rtti() == rtti )
+            items += item;
+    }
+
+    return items;
 }

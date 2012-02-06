@@ -10,9 +10,9 @@
 #ifndef QWT_TEXT_LABEL_H
 #define QWT_TEXT_LABEL_H
 
-#include <qframe.h>
 #include "qwt_global.h"
 #include "qwt_text.h"
+#include <qframe.h>
 
 class QString;
 class QPaintEvent;
@@ -24,23 +24,20 @@ class QPainter;
 
 class QWT_EXPORT QwtTextLabel : public QFrame
 {
-    Q_OBJECT 
+    Q_OBJECT
 
     Q_PROPERTY( int indent READ indent WRITE setIndent )
     Q_PROPERTY( int margin READ margin WRITE setMargin )
 
 public:
-    explicit QwtTextLabel(QWidget *parent = NULL);
-#if QT_VERSION < 0x040000
-    explicit QwtTextLabel(QWidget *parent, const char *name);
-#endif
-    explicit QwtTextLabel(const QwtText &, QWidget *parent = NULL);
+    explicit QwtTextLabel( QWidget *parent = NULL );
+    explicit QwtTextLabel( const QwtText &, QWidget *parent = NULL );
     virtual ~QwtTextLabel();
 
-public slots:
-    void setText(const QString &, 
-        QwtText::TextFormat textFormat = QwtText::AutoText);
-    virtual void setText(const QwtText &);
+public Q_SLOTS:
+    void setText( const QString &,
+        QwtText::TextFormat textFormat = QwtText::AutoText );
+    virtual void setText( const QwtText & );
 
     void clear();
 
@@ -48,21 +45,21 @@ public:
     const QwtText &text() const;
 
     int indent() const;
-    void setIndent(int);
+    void setIndent( int );
 
     int margin() const;
-    void setMargin(int);
+    void setMargin( int );
 
     virtual QSize sizeHint() const;
     virtual QSize minimumSizeHint() const;
-    virtual int heightForWidth(int) const;
+    virtual int heightForWidth( int ) const;
 
     QRect textRect() const;
 
 protected:
-    virtual void paintEvent(QPaintEvent *e);
-    virtual void drawContents(QPainter *);
-    virtual void drawText(QPainter *, const QRect &);
+    virtual void paintEvent( QPaintEvent *e );
+    virtual void drawContents( QPainter * );
+    virtual void drawText( QPainter *, const QRect & );
 
 private:
     void init();

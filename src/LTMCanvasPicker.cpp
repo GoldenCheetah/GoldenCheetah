@@ -23,6 +23,7 @@ LTMCanvasPicker::LTMCanvasPicker(QwtPlot *plot):
 
     canvas->installEventFilter(this);
 
+
     // We want the focus, but no focus rect. The
     canvas->setFocusPolicy(Qt::StrongFocus);
     canvas->setFocusIndicator(QwtPlotCanvas::ItemFocusIndicator);

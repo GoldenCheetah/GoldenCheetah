@@ -21,7 +21,7 @@
 #include "GoldenCheetah.h"
 
 #include <qwt_plot.h>
-#include <qwt_data.h>
+#include <qwt_series_data.h>
 #include <QtGui>
 
 class QwtPlotCurve;

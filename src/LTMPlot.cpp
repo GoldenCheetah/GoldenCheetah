@@ -31,7 +31,7 @@
 
 #include <QSettings>
 
-#include <qwt_data.h>
+#include <qwt_series_data.h>
 #include <qwt_legend.h>
 #include <qwt_plot_curve.h>
 #include <qwt_curve_fitter.h>
@@ -311,7 +311,7 @@ LTMPlot::setData(LTMSettings *set)
             current->setCurveAttribute(QwtPlotCurve::Inverted, true);
 
             sym.setStyle(QwtSymbol::NoSymbol);
-            current->setSymbol(sym);
+            current->setSymbol(new QwtSymbol(sym));
 
             // fudge for date ranges, not for time of day graph
             // XXX FUDGE QWT's LACK OF A BAR CHART
@@ -514,7 +514,7 @@ LTMPlot::setData(LTMSettings *set)
             sym.setPen(metricDetail.penColor);
             sym.setBrush(lighter);
 
-            out->setSymbol(sym);
+            out->setSymbol(new QwtSymbol(sym));
             out->setData(hxdata.data(),hydata.data(), metricDetail.topOut);
             out->setBaseline(0);
             out->setYAxis(axisid);
@@ -575,7 +575,7 @@ LTMPlot::setData(LTMSettings *set)
             sym.setPen(metricDetail.penColor);
             sym.setBrush(lighter);
 
-            top->setSymbol(sym);
+            top->setSymbol(new QwtSymbol(sym));
             top->setData(hxdata.data(),hydata.data(), counter);
             top->setBaseline(0);
             top->setYAxis(axisid);
@@ -592,7 +592,7 @@ LTMPlot::setData(LTMSettings *set)
             current->setCurveAttribute(QwtPlotCurve::Inverted, true);
 
             sym.setStyle(QwtSymbol::NoSymbol);
-            current->setSymbol(sym);
+            current->setSymbol(new QwtSymbol(sym));
 
             // fudge for date ranges, not for time of day graph
             // XXX FUDGE QWT's LACK OF A BAR CHART
@@ -646,7 +646,7 @@ LTMPlot::setData(LTMSettings *set)
             sym.setStyle(metricDetail.symbolStyle);
             sym.setPen(QPen(metricDetail.penColor));
             sym.setBrush(QBrush(metricDetail.penColor));
-            current->setSymbol(sym);
+            current->setSymbol(new QwtSymbol(sym));
             current->setPen(cpen);
 
 
@@ -655,7 +655,7 @@ LTMPlot::setData(LTMSettings *set)
             sym.setStyle(metricDetail.symbolStyle);
             sym.setPen(QPen(metricDetail.penColor));
             sym.setBrush(QBrush(metricDetail.penColor));
-            current->setSymbol(sym);
+            current->setSymbol(new QwtSymbol(sym));
 
         } else if (metricDetail.curveStyle == QwtPlotCurve::Sticks) {
 
@@ -663,7 +663,7 @@ LTMPlot::setData(LTMSettings *set)
             sym.setStyle(metricDetail.symbolStyle);
             sym.setPen(QPen(metricDetail.penColor));
             sym.setBrush(QBrush(Qt::white));
-            current->setSymbol(sym);
+            current->setSymbol(new QwtSymbol(sym));
 
         }
 
@@ -1018,9 +1018,9 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
         QString datestr;
 
         LTMScaleDraw *lsd = new LTMScaleDraw(settings->start, groupForDate(settings->start.date(), settings->groupBy), settings->groupBy);
-        QwtText startText = lsd->label((int)(curve->x(index)+0.5));
+        QwtText startText = lsd->label((int)(curve->sample(index).x()+0.5));
         QwtText endText;
-        endText   = lsd->label((int)(curve->x(index)+1.5));
+        endText   = lsd->label((int)(curve->sample(index).x()+1.5));
 
 
         if (settings->groupBy != LTM_WEEK)
@@ -1050,7 +1050,7 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
         }
 
         // the point value
-        value = curve->y(index);
+        value = curve->sample(index).y();
 
         // de-aggregate stacked values
         if (stacknum > 0) {
@@ -1172,10 +1172,10 @@ LTMPlot::pickerMoved(QPoint pos)
     int x = invTransform(xBottom, pos.x());
 
     // update to reflect new x position
-    curveDataX[0]=highlighter->x(0);
-    curveDataY[0]=highlighter->y(0);
-    curveDataX[1]=highlighter->x(0);
-    curveDataY[1]=highlighter->y(1);
+    curveDataX[0]=highlighter->sample(0).x();
+    curveDataY[0]=highlighter->sample(0).y();
+    curveDataX[1]=highlighter->sample(0).x();
+    curveDataY[1]=highlighter->sample(1).y();
     curveDataX[2]=x;
     curveDataY[2]=curveDataY[1];
     curveDataX[3]=x;
@@ -1231,7 +1231,8 @@ class LTMPlotBackground: public QwtPlotItem
 
         LTMPlotBackground(LTMPlot *_parent, int axisid)
         {
-            setAxis(QwtPlot::xBottom, axisid);
+            //setAxis(QwtPlot::xBottom, axisid);
+            setXAxis(axisid);
             setZ(0.0);
             parent = _parent;
         }
@@ -1243,7 +1244,7 @@ class LTMPlotBackground: public QwtPlotItem
 
     virtual void draw(QPainter *painter,
                       const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-                      const QRect &rect) const
+                      const QRectF &rect) const
     {
         const Zones *zones       = parent->parent->main->zones();
         int zone_range_size     = parent->parent->main->zones()->getRangeSize();
@@ -1270,7 +1271,7 @@ class LTMPlotBackground: public QwtPlotItem
             int num_zones = zone_lows.size();
             if (num_zones > 0) {
                 for (int z = 0; z < num_zones; z ++) {
-                    QRect r = rect;
+                    QRectF r = rect;
                     r.setLeft(left);
                     r.setRight(right);
 
@@ -1314,7 +1315,8 @@ class LTMPlotZoneLabel: public QwtPlotItem
             int zone_range     = zones->whichRange(settings->start.addDays((settings->end.date().toJulianDay()-settings->start.date().toJulianDay())/2).date()); // XXX Damien Fixup
 
             // which axis has watts?
-            setAxis(QwtPlot::xBottom, axisid);
+            //setAxis(QwtPlot::xBottom, axisid);
+            setXAxis(axisid);
 
             // create new zone labels if we're shading
             if (zone_range >= 0) { //parent->shadeZones()
@@ -1350,14 +1352,14 @@ class LTMPlotZoneLabel: public QwtPlotItem
 
         void draw(QPainter *painter,
                   const QwtScaleMap &, const QwtScaleMap &yMap,
-                  const QRect &rect) const
+                  const QRectF &rect) const
         {
             if (true) {//parent->shadeZones()
                 int x = (rect.left() + rect.right()) / 2;
                 int y = yMap.transform(watts);
 
                 // the following code based on source for QwtPlotMarker::draw()
-                QRect tr(QPoint(0, 0), text.textSize(painter->font()));
+                QRect tr(QPoint(0, 0), text.textSize(painter->font()).toSize());
                 tr.moveCenter(QPoint(x, y));
                 text.draw(painter, tr);
             }

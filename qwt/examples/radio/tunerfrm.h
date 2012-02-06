@@ -10,21 +10,17 @@ class TunerFrame : public QFrame
 public:
     TunerFrame(QWidget *p);
 
-signals:
+Q_SIGNALS:
     void fieldChanged(double f);
 
-public slots:
+public Q_SLOTS:
     void setFreq(double frq);
 
-private slots:
+private Q_SLOTS:
     void adjustFreq(double frq);
 
 private:
-    QwtWheel *d_whlFreq;
-    TuningThermo *d_thmTune;
-    QwtSlider *d_sldFreq;
+    QwtWheel *d_wheelFrequency;
+    TuningThermo *d_thermoTune;
+    QwtSlider *d_sliderFrequency;
 };
-
-
-
-

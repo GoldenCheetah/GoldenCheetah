@@ -2,7 +2,7 @@
  * Qwt Widget Library
  * Copyright (C) 1997   Josef Wilgen
  * Copyright (C) 2002   Uwe Rathmann
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the Qwt License, Version 1.0
  *****************************************************************************/
@@ -26,83 +26,80 @@ class QWT_EXPORT QwtPlotLayout
 public:
     /*!
       Options to configure the plot layout engine
-
-      - AlignScales\n
-        Unused
-      - IgnoreScrollbars\n
-        Ignore the dimension of the scrollbars. There are no
-        scrollbars, when the plot is rendered to a paint device 
-        (QwtPlot::print() ).
-      - IgnoreFrames\n
-        Ignore all frames. QwtPlot::print() doesn't paint them.
-      - IgnoreMargin\n
-        Ignore the margin().
-      - IgnoreLegend\n
-        Ignore the legend. 
-
-      \sa activate()
+      \sa activate(), QwtPlotRenderer
      */
-    enum Options
+    enum Option
     {
-        AlignScales = 1,
-        IgnoreScrollbars = 2,
-        IgnoreFrames = 4,
-        IgnoreMargin = 8,
-        IgnoreLegend = 16
+        //! Unused
+        AlignScales = 0x01,
+
+        /*!
+          Ignore the dimension of the scrollbars. There are no
+          scrollbars, when the plot is not rendered to widgets.
+         */
+        IgnoreScrollbars = 0x02,
+
+        //! Ignore all frames.
+        IgnoreFrames = 0x04,
+
+        //! Ignore the legend.
+        IgnoreLegend = 0x08
     };
+
+    //! Layout options
+    typedef QFlags<Option> Options;
 
     explicit QwtPlotLayout();
     virtual ~QwtPlotLayout();
 
-    void setMargin(int);
-    int margin() const;
+    void setCanvasMargin( int margin, int axis = -1 );
+    int canvasMargin( int axis ) const;
 
-    void setCanvasMargin(int margin, int axis = -1);
-    int canvasMargin(int axis) const;
-
-    void setAlignCanvasToScales(bool);
+    void setAlignCanvasToScales( bool );
     bool alignCanvasToScales() const;
 
-    void setSpacing(int);
+    void setSpacing( int );
     int spacing() const;
 
-    void setLegendPosition(QwtPlot::LegendPosition pos, double ratio);
-    void setLegendPosition(QwtPlot::LegendPosition pos);
+    void setLegendPosition( QwtPlot::LegendPosition pos, double ratio );
+    void setLegendPosition( QwtPlot::LegendPosition pos );
     QwtPlot::LegendPosition legendPosition() const;
 
-    void setLegendRatio(double ratio);
+    void setLegendRatio( double ratio );
     double legendRatio() const;
 
-    virtual QSize minimumSizeHint(const QwtPlot *) const;    
+    virtual QSize minimumSizeHint( const QwtPlot * ) const;
 
-    virtual void activate(const QwtPlot *, 
-        const QRect &rect, int options = 0);
+    virtual void activate( const QwtPlot *,
+        const QRectF &rect, Options options = 0x00 );
 
     virtual void invalidate();
 
-    const QRect &titleRect() const;
-    const QRect &legendRect() const;
-    const QRect &scaleRect(int axis) const;
-    const QRect &canvasRect() const;
+    const QRectF &titleRect() const;
+    const QRectF &legendRect() const;
+    const QRectF &scaleRect( int axis ) const;
+    const QRectF &canvasRect() const;
 
     class LayoutData;
 
 protected:
 
-    QRect layoutLegend(int options, const QRect &) const;
-    QRect alignLegend(const QRect &canvasRect, 
-        const QRect &legendRect) const;
+    QRectF layoutLegend( Options options, const QRectF & ) const;
+    QRectF alignLegend( const QRectF &canvasRect,
+        const QRectF &legendRect ) const;
 
-    void expandLineBreaks(int options, const QRect &rect, 
-        int &dimTitle, int dimAxes[QwtPlot::axisCnt]) const;
+    void expandLineBreaks( int options, const QRectF &rect,
+        int &dimTitle, int dimAxes[QwtPlot::axisCnt] ) const;
 
-    void alignScales(int options, QRect &canvasRect,
-        QRect scaleRect[QwtPlot::axisCnt]) const;
+    void alignScales( int options, QRectF &canvasRect,
+        QRectF scaleRect[QwtPlot::axisCnt] ) const;
 
 private:
     class PrivateData;
 
     PrivateData *d_data;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS( QwtPlotLayout::Options )
 
 #endif

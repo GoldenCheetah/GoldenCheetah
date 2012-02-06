@@ -1,135 +1,72 @@
-# -*- mode: sh -*- ###########################
+################################################################
 # Qwt Widget Library
 # Copyright (C) 1997   Josef Wilgen
 # Copyright (C) 2002   Uwe Rathmann
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the Qwt License, Version 1.0
-##############################################
+################################################################
 
-QWT_ROOT = ..
+QWT_ROOT = $${PWD}/..
 
 include ( $${QWT_ROOT}/qwtconfig.pri )
+include ( $${QWT_ROOT}/qwtbuild.pri )
 
-contains(CONFIG, QwtDesigner) {
+contains(QWT_CONFIG, QwtDesigner) {
 
-	CONFIG    += warn_on
+    CONFIG    += qt designer plugin
+    CONFIG    += warn_on
 
-	SUFFIX_STR =
+    TEMPLATE        = lib
+    TARGET          = qwt_designer_plugin
 
-    VVERSION = $$[QT_VERSION]
-    isEmpty(VVERSION) {
+    DESTDIR         = plugins/designer
 
-        # Qt 3
-        debug {
-            SUFFIX_STR = $${DEBUG_SUFFIX}
-        }
-        else {
-            SUFFIX_STR = $${RELEASE_SUFFIX}
-        }
+    INCLUDEPATH    += $${QWT_ROOT}/src
+    DEPENDPATH     += $${QWT_ROOT}/src
+
+    contains(QWT_CONFIG, QwtFramework) {
+
+        LIBS      += -F$${QWT_ROOT}/lib
     }
     else {
 
-        CONFIG(debug, debug|release) {
-            SUFFIX_STR = $${DEBUG_SUFFIX}
-        }
-        else {
-            SUFFIX_STR = $${RELEASE_SUFFIX}
+        LIBS      += -L$${QWT_ROOT}/lib
+    }
+
+    IPATH       = $${INCLUDEPATH}
+    qtAddLibrary(qwt)
+    INCLUDEPATH = $${IPATH}
+
+    contains(QWT_CONFIG, QwtDll) {
+
+        win32 {
+            DEFINES += QT_DLL QWT_DLL
         }
     }
 
-	TEMPLATE        = lib
-	MOC_DIR         = moc
-	OBJECTS_DIR     = obj$${SUFFIX_STR}
-	DESTDIR         = plugins/designer
-	INCLUDEPATH    += $${QWT_ROOT}/src 
-	DEPENDPATH     += $${QWT_ROOT}/src 
+    !contains(QWT_CONFIG, QwtPlot) {
+        DEFINES += NO_QWT_PLOT
+    }
 
-    LIBNAME         = qwt$${SUFFIX_STR}
-	contains(CONFIG, QwtDll) {
-		win32 {
-			DEFINES += QT_DLL QWT_DLL
-			LIBNAME = $${LIBNAME}$${VER_MAJ}
-		}
-	}
+    !contains(QWT_CONFIG, QwtWidgets) {
+        DEFINES += NO_QWT_WIDGETS
+    }
 
-	!contains(CONFIG, QwtPlot) {
-		DEFINES += NO_QWT_PLOT
-	}
+    HEADERS += qwt_designer_plugin.h
+    SOURCES += qwt_designer_plugin.cpp
 
-	!contains(CONFIG, QwtWidgets) {
-		DEFINES += NO_QWT_WIDGETS
-	}
+    contains(QWT_CONFIG, QwtPlot) {
 
-	unix:LIBS      += -L$${QWT_ROOT}/lib -l$${LIBNAME}
-	win32-msvc:LIBS  += $${QWT_ROOT}/lib/$${LIBNAME}.lib
-	win32-msvc.net:LIBS  += $${QWT_ROOT}/lib/$${LIBNAME}.lib
-	win32-msvc2002:LIBS += $${QWT_ROOT}/lib/$${LIBNAME}.lib
-	win32-msvc2003:LIBS += $${QWT_ROOT}/lib/$${LIBNAME}.lib
-	win32-msvc2005:LIBS += $${QWT_ROOT}/lib/$${LIBNAME}.lib
-	win32-msvc2008:LIBS += $${QWT_ROOT}/lib/$${LIBNAME}.lib
-	win32-g++:LIBS   += -L$${QWT_ROOT}/lib -l$${LIBNAME}
+        HEADERS += qwt_designer_plotdialog.h
+        SOURCES += qwt_designer_plotdialog.cpp
+    }
 
-	# isEmpty(QT_VERSION) does not work with Qt-4.1.0/MinGW
+    RESOURCES += qwt_designer_plugin.qrc
 
-	VVERSION = $$[QT_VERSION]
-	isEmpty(VVERSION) {
-		# Qt 3 
-		TARGET    = qwtplugin$${SUFFIX_STR}
-		CONFIG   += qt plugin
-
-		UI_DIR    = ui
-
-		HEADERS  += qwtplugin.h
-		SOURCES  += qwtplugin.cpp
-
-		target.path = $(QTDIR)/plugins/designer
-		INSTALLS += target
-
-		IMAGES  += \
-			pixmaps/qwtplot.png \
-			pixmaps/qwtanalogclock.png \
-			pixmaps/qwtcounter.png \
-			pixmaps/qwtcompass.png \
-			pixmaps/qwtdial.png \
-			pixmaps/qwtknob.png \
-			pixmaps/qwtscale.png \
-			pixmaps/qwtslider.png \
-			pixmaps/qwtthermo.png \
-			pixmaps/qwtwheel.png \
-			pixmaps/qwtwidget.png 
-
-	} else {
-
-		# Qt 4
-
-		TARGET    = qwt_designer_plugin$${SUFFIX_STR}
-		CONFIG    += qt designer plugin 
-
-		RCC_DIR   = resources
-
-		HEADERS += \
-			qwt_designer_plugin.h
-
-		SOURCES += \
-			qwt_designer_plugin.cpp
-
-	    contains(CONFIG, QwtPlot) {
-
-			HEADERS += \
-				qwt_designer_plotdialog.h
-
-			SOURCES += \
-				qwt_designer_plotdialog.cpp
-		}
-
-		RESOURCES += \
-			qwt_designer_plugin.qrc
-
-		target.path = $$[QT_INSTALL_PLUGINS]/designer
-		INSTALLS += target
-	}
+    target.path = $${QWT_INSTALL_PLUGINS}
+    INSTALLS += target
 }
 else {
-	TEMPLATE        = subdirs # do nothing
+    TEMPLATE        = subdirs # do nothing
 }
