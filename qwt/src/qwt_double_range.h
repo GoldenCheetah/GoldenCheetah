@@ -2,7 +2,7 @@
  * Qwt Widget Library
  * Copyright (C) 1997   Josef Wilgen
  * Copyright (C) 2002   Uwe Rathmann
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the Qwt License, Version 1.0
  *****************************************************************************/
@@ -17,14 +17,14 @@
 
   This class is useful as a base class or a member for sliders.
   It represents an interval of type double within which a value can
-  be moved. The value can be either an arbitrary point inside 
+  be moved. The value can be either an arbitrary point inside
   the interval (see QwtDoubleRange::setValue), or it can be fitted
   into a step raster (see QwtDoubleRange::fitValue and
   QwtDoubleRange::incValue).
 
   As a special case, a QwtDoubleRange can be periodic, which means that
   a value outside the interval will be mapped to a value inside the
-  interval when QwtDoubleRange::setValue(), QwtDoubleRange::fitValue(), 
+  interval when QwtDoubleRange::setValue(), QwtDoubleRange::fitValue(),
   QwtDoubleRange::incValue() or QwtDoubleRange::incPages() are called.
 */
 
@@ -34,29 +34,29 @@ public:
     QwtDoubleRange();
     virtual ~QwtDoubleRange();
 
-    void setRange(double vmin, double vmax, double vstep = 0.0,
-        int pagesize = 1);
+    void setRange( double vmin, double vmax,
+        double vstep = 0.0, int pagesize = 1 );
 
-    void setValid(bool);
+    void setValid( bool );
     bool isValid() const;
 
-    virtual void setValue(double);
+    virtual void setValue( double );
     double value() const;
 
-    void setPeriodic(bool tf);
+    void setPeriodic( bool tf );
     bool periodic() const;
 
-    void setStep(double);
+    void setStep( double );
     double step() const;
 
     double maxValue() const;
-    double minValue() const; 
+    double minValue() const;
 
     int pageSize() const;
 
-    virtual void incValue(int);
-    virtual void incPages(int);
-    virtual void fitValue(double);
+    virtual void incValue( int );
+    virtual void incPages( int );
+    virtual void fitValue( double );
 
 protected:
 
@@ -69,20 +69,10 @@ protected:
     virtual void rangeChange();
 
 private:
-    void setNewValue(double x, bool align = false);
+    void setNewValue( double value, bool align = false );
 
-    double d_minValue;
-    double d_maxValue;
-    double d_step;
-    int d_pageSize;
-
-    bool d_isValid;
-    double d_value;
-    double d_exactValue;
-    double d_exactPrevValue;
-    double d_prevValue;
-
-    bool d_periodic;
+    class PrivateData;
+    PrivateData *d_data;
 };
 
 #endif

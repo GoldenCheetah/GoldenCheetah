@@ -19,7 +19,7 @@
 
 #include <assert.h>
 #include <QDebug>
-#include <qwt_data.h>
+#include <qwt_series_data.h>
 #include <qwt_legend.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_canvas.h>

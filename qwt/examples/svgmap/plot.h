@@ -1,5 +1,5 @@
 #include <qwt_plot.h>
-#include <qwt_double_rect.h>
+#include <qrect.h>
 
 class QwtPlotSvgItem;
 
@@ -10,12 +10,17 @@ class Plot: public QwtPlot
 public:
     Plot(QWidget * = NULL);
 
-public slots:
+public Q_SLOTS:
+
+#ifndef QT_NO_FILEDIALOG
     void loadSVG();
+#endif
+
+    void loadSVG(const QString &);
 
 private:
     void rescale();
 
     QwtPlotSvgItem *d_mapItem;
-    const QwtDoubleRect d_mapRect;
+    const QRectF d_mapRect;
 };

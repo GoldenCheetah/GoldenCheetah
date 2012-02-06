@@ -2,19 +2,17 @@
  * Qwt Widget Library
  * Copyright (C) 1997   Josef Wilgen
  * Copyright (C) 2002   Uwe Rathmann
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the Qwt License, Version 1.0
  *****************************************************************************/
 
-// vim: expandtab
-
 #ifndef QWT_COUNTER_H
 #define QWT_COUNTER_H
 
-#include <qwidget.h>
 #include "qwt_global.h"
 #include "qwt_double_range.h"
+#include <qwidget.h>
 
 /*!
   \brief The Counter Widget
@@ -63,8 +61,8 @@ class QWT_EXPORT QwtCounter : public QWidget, public QwtDoubleRange
 
     Q_PROPERTY( int numButtons READ numButtons WRITE setNumButtons )
     Q_PROPERTY( double basicstep READ step WRITE setStep )
-    Q_PROPERTY( double minValue READ minVal WRITE setMinValue )
-    Q_PROPERTY( double maxValue READ maxVal WRITE setMaxValue )
+    Q_PROPERTY( double minValue READ minValue WRITE setMinValue )
+    Q_PROPERTY( double maxValue READ maxValue WRITE setMaxValue )
     Q_PROPERTY( int stepButton1 READ stepButton1 WRITE setStepButton1 )
     Q_PROPERTY( int stepButton2 READ stepButton2 WRITE setStepButton2 )
     Q_PROPERTY( int stepButton3 READ stepButton3 WRITE setStepButton3 )
@@ -72,74 +70,79 @@ class QWT_EXPORT QwtCounter : public QWidget, public QwtDoubleRange
     Q_PROPERTY( bool editable READ editable WRITE setEditable )
 
 public:
-    /*!
-        Button index
-    */
+    //! Button index
+    enum Button
+    {
+        //! Button intended for minor steps
+        Button1,
 
-    enum Button 
-    {   
-        Button1,    
-        Button2,    
-        Button3,    
-        ButtonCnt   
+        //! Button intended for medium steps
+        Button2,
+
+        //! Button intended for large steps
+        Button3,
+
+        //! Number of buttons
+        ButtonCnt
     };
 
-    explicit QwtCounter(QWidget *parent = NULL);
-#if QT_VERSION < 0x040000
-    explicit QwtCounter(QWidget *parent, const char *name);
-#endif
+    explicit QwtCounter( QWidget *parent = NULL );
     virtual ~QwtCounter();
 
     bool editable() const;
-    void setEditable(bool);
- 
-    void setNumButtons(int n);
+    void setEditable( bool );
+
+    void setNumButtons( int n );
     int numButtons() const;
-    
-    void setIncSteps(QwtCounter::Button btn, int nSteps);
-    int incSteps(QwtCounter::Button btn) const;
 
-    virtual void setValue(double);
+    void setIncSteps( QwtCounter::Button btn, int nSteps );
+    int incSteps( QwtCounter::Button btn ) const;
+
+    virtual void setValue( double );
     virtual QSize sizeHint() const;
-
-    virtual void polish();
 
     // a set of dummies to help the designer
 
     double step() const;
-    void setStep(double s);
-    double minVal() const;
-    void setMinValue(double m);
-    double maxVal() const;
-    void setMaxValue(double m);
-    void setStepButton1(int nSteps);
+    void setStep( double s );
+
+    double minValue() const;
+    void setMinValue( double m );
+
+    double maxValue() const;
+    void setMaxValue( double m );
+
+    void setStepButton1( int nSteps );
     int stepButton1() const;
-    void setStepButton2(int nSteps);
+
+    void setStepButton2( int nSteps );
     int stepButton2() const;
-    void setStepButton3(int nSteps);
+
+    void setStepButton3( int nSteps );
     int stepButton3() const;
+
     virtual double value() const;
 
-signals:
+Q_SIGNALS:
     /*!
         This signal is emitted when a button has been released
         \param value The new value
     */
-    void buttonReleased (double value);  
+    void buttonReleased ( double value );
 
     /*!
         This signal is emitted when the counter's value has changed
         \param value The new value
     */
-    void valueChanged (double value);
+    void valueChanged ( double value );
 
 protected:
-    virtual bool event(QEvent *);
-    virtual void wheelEvent(QWheelEvent *);
-    virtual void keyPressEvent(QKeyEvent *);
+    virtual bool event( QEvent * );
+    virtual void wheelEvent( QWheelEvent * );
+    virtual void keyPressEvent( QKeyEvent * );
     virtual void rangeChange();
 
-private slots:
+private Q_SLOTS:
     void btnReleased();
     void btnClicked();
     void textChanged();
@@ -147,9 +150,9 @@ private slots:
 private:
     void initCounter();
     void updateButtons();
-    void showNum(double);
+    void showNum( double );
     virtual void valueChange();
-    
+
     class PrivateData;
     PrivateData *d_data;
 };

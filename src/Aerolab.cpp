@@ -27,7 +27,7 @@
 
 #include <math.h>
 #include <assert.h>
-#include <qwt_data.h>
+#include <qwt_series_data.h>
 #include <qwt_legend.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
@@ -43,12 +43,11 @@ max(double a, double b) { if (a > b) return a; else return b; }
 static inline double
 min(double a, double b) { if (a < b) return a; else return b; }
 
-
 /*----------------------------------------------------------------------
  * Interval plotting
  *--------------------------------------------------------------------*/
 
-class IntervalAerolabData : public QwtData
+class IntervalAerolabData : public QwtSeriesData<QPointF>
 {
     public:
         Aerolab *aerolab;
@@ -62,13 +61,16 @@ class IntervalAerolabData : public QwtData
         double x( size_t ) const;
         double y( size_t ) const;
         size_t size() const;
-        virtual QwtData *copy() const;
+        //virtual QwtData *copy() const;
 
         void init();
 
         IntervalItem *intervalNum( int ) const;
 
         int intervalCount() const;
+
+        virtual QPointF sample(size_t i) const;
+        virtual QRectF boundingRect() const;
 };
 
 /*
@@ -210,11 +212,14 @@ size_t IntervalAerolabData::size() const
     return intervalCount() * 4;
 }
 
-QwtData *IntervalAerolabData::copy() const
-{
-    return new IntervalAerolabData( aerolab, mainWindow );
+QPointF IntervalAerolabData::sample(size_t i) const {
+    return QPointF(x(i), y(i));
 }
 
+QRectF IntervalAerolabData::boundingRect() const
+{
+    return QRectF(-5000, 5000, 10000, 10000);
+}
 
 //**********************************************
 //**        END IntervalAerolabData           **
@@ -261,7 +266,7 @@ Aerolab::Aerolab(
   intervalHighlighterCurve = new QwtPlotCurve();
   intervalHighlighterCurve->setBaseline(-5000);
   intervalHighlighterCurve->setYAxis( yLeft );
-  intervalHighlighterCurve->setData( IntervalAerolabData( this, mainWindow ) );
+  intervalHighlighterCurve->setData( new IntervalAerolabData( this, mainWindow ) );
   intervalHighlighterCurve->attach( this );
   this->legend()->remove( intervalHighlighterCurve ); // don't show in legend
 
@@ -468,7 +473,8 @@ Aerolab::recalc( bool new_zoom ) {
 
   // If the ride is really long, then avoid it like the plague.
   if (rideTimeSecs > 7*24*60*60) {
-    QwtArray<double> data;
+    QVector<double> data;
+
     if (!veArray.empty()){
       veCurve->setData(data, data);
     }
@@ -483,13 +489,12 @@ Aerolab::recalc( bool new_zoom ) {
   int totalPoints   = arrayLength - startingIndex;
 
   // set curves
-  if (!veArray.empty())
-    veCurve->setData(xaxis.data() + startingIndex,
-             veArray.data() + startingIndex, totalPoints);
+  if (!veArray.empty()) {
+      veCurve->setData(xaxis.data() + startingIndex, veArray.data() + startingIndex, totalPoints);
+  }
 
   if (!altArray.empty()){
-    altCurve->setData(xaxis.data() + startingIndex,
-              altArray.data() + startingIndex, totalPoints);
+      altCurve->setData(xaxis.data() + startingIndex, altArray.data() + startingIndex, totalPoints);
   }
 
   if( new_zoom )
@@ -709,8 +714,8 @@ void Aerolab::pointHover (QwtPlotCurve *curve, int index)
 {
     if ( index >= 0 && curve != intervalHighlighterCurve )
     {
-        double x_value = curve->x( index );
-        double y_value = curve->y( index );
+        double x_value = curve->sample( index ).x();
+        double y_value = curve->sample( index ).y();
         // output the tooltip
 
         QString text = QString( "%1 %2 %3 %4 %5" )

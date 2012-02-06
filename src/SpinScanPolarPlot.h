@@ -28,12 +28,12 @@
 #include <qwt_scale_draw.h>
 #include <qwt_scale_div.h>
 #include <qwt_scale_widget.h>
-#include <qwt_data.h>
+#include <qwt_series_data.h>
 #include "Settings.h"
 
 #include <stdint.h> //uint8_t
 
-class SpinScanPolarData : public QwtData
+class SpinScanPolarData : public QwtSeriesData<QPointF>
 {
     bool isleft;
     uint8_t *spinData;
@@ -44,8 +44,11 @@ class SpinScanPolarData : public QwtData
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
-    virtual QwtData *copy() const ;
+    //virtual QwtData *copy() const ;
     void init() ;
+
+    virtual QPointF sample(size_t i) const;
+    virtual QRectF boundingRect() const;
 };
 
 class SpinScanPolarPlot : public QwtPlot

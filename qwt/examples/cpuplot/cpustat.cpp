@@ -41,11 +41,7 @@ void CpuStat::statistic(double &user, double &system)
 void CpuStat::lookUp(double values[NValues]) const
 {
     QFile file("/proc/stat");
-#if QT_VERSION >= 0x040000
     if ( !file.open(QIODevice::ReadOnly) )
-#else
-    if ( !file.open(IO_ReadOnly) )
-#endif
     {
         static double dummyValues[][NValues] =
         {
@@ -193,11 +189,11 @@ void CpuStat::lookUp(double values[NValues]) const
             { 109371, 0, 24019, 827486 },
         };
         static int counter = 0;
-        
+
         for ( int i = 0; i < NValues; i++ )
             values[i] = dummyValues[counter][i];
 
-        counter = (counter + 1) 
+        counter = (counter + 1)
             % (sizeof(dummyValues) / sizeof(dummyValues[0]));
     }
     else
@@ -205,19 +201,11 @@ void CpuStat::lookUp(double values[NValues]) const
         QTextStream textStream(&file);
         do {
             QString line = textStream.readLine();
-#if QT_VERSION < 0x040000
-            line = line.stripWhiteSpace();
-#else
             line = line.trimmed();
-#endif
             if ( line.startsWith("cpu ") )
             {
                 const QStringList valueList =
-#if QT_VERSION < 0x040000
-                    QStringList::split(" ", line);
-#else
                     line.split(" ",  QString::SkipEmptyParts);
-#endif
                 if ( valueList.count() >= 5 )
                 {
                     for ( int i = 0; i < NValues; i++ )
@@ -225,11 +213,6 @@ void CpuStat::lookUp(double values[NValues]) const
                 }
                 break;
             }
-        } 
-#if QT_VERSION < 0x040000
-        while(!textStream.eof());
-#else
-        while(!textStream.atEnd());
-#endif
+        } while(!textStream.atEnd());
     }
 }

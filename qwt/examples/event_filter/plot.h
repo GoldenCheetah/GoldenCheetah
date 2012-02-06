@@ -10,11 +10,11 @@ public:
     Plot(QWidget *parent = NULL);
     virtual bool eventFilter(QObject *, QEvent *);
 
-public slots:
+public Q_SLOTS:
     void setCanvasColor(const QColor &);
     void insertCurve(int axis, double base);
 
-private slots:
+private Q_SLOTS:
     void scrollLeftAxis(double);
 
 private:

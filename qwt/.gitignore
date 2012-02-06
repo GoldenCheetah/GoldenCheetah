@@ -1,2 +1,6 @@
 lib
 qwtconfig.pri
+*.so
+moc*.cpp
+*.obj
+*.o

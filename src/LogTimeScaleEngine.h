@@ -28,6 +28,8 @@
 #include "GoldenCheetah.h"
 
 #include "qwt_scale_engine.h"
+#include "qwt_point_3d.h"
+#include "qwt_compat.h"
 
 class LogTimeScaleEngine : public QwtScaleEngine
 {

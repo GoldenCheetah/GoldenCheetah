@@ -7,28 +7,28 @@
 class MainWindow: public QMainWindow
 {
 public:
-    MainWindow(QWidget *parent = NULL):
-        QMainWindow(parent)
-    {   
+    MainWindow(const QString &fileName)
+    {
         Plot *plot = new Plot(this);
+        if ( !fileName.isEmpty() )
+            plot->loadSVG(fileName);
+
         setCentralWidget(plot);
+
+#ifndef QT_NO_FILEDIALOG
 
         QToolBar *toolBar = new QToolBar(this);
 
         QToolButton *btnLoad = new QToolButton(toolBar);
-        
-#if QT_VERSION >= 0x040000
+
         btnLoad->setText("Load SVG");
         btnLoad->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
         toolBar->addWidget(btnLoad);
-#else
-        btnLoad->setTextLabel("Load SVG");
-        btnLoad->setUsesTextLabel(true);
-#endif
 
         addToolBar(toolBar);
 
-        connect(btnLoad, SIGNAL(clicked()), plot, SLOT(loadSVG())); 
+        connect(btnLoad, SIGNAL(clicked()), plot, SLOT(loadSVG()));
+#endif
     }
 };
 
@@ -36,10 +36,11 @@ int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
 
-    MainWindow w;
-#if QT_VERSION < 0x040000
-    a.setMainWidget(&w);
-#endif
+    QString fileName;
+    if ( argc > 1 )
+        fileName = argv[1];
+
+    MainWindow w(fileName);
     w.resize(600,400);
     w.show();
 

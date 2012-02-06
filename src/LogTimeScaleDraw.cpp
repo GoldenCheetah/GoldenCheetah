@@ -57,13 +57,13 @@ LogTimeScaleDraw::drawLabel(QPainter *painter, double value) const
     if ( lbl.isEmpty() )
         return;
 
-    const QPoint pos = labelPosition(value);
+    const QPointF pos = labelPosition(value);
 
-    QSize labelSize = lbl.textSize(painter->font());
-    if ( labelSize.height() % 2 )
+    QSizeF labelSize = lbl.textSize(painter->font());
+    if ( labelSize.toSize().height() % 2 )
         labelSize.setHeight(labelSize.height() + 1);
 
-    const QwtMatrix m = labelMatrix( pos, labelSize);
+    const QwtMatrix m = labelTransformation( pos, labelSize).toAffine();
 
     painter->save();
 #if QT_VERSION < 0x040000
@@ -72,7 +72,7 @@ LogTimeScaleDraw::drawLabel(QPainter *painter, double value) const
     painter->setMatrix(m, true);
 #endif
 
-    lbl.draw (painter, QRect(QPoint(0, 0), labelSize) );
+    lbl.draw (painter, QRect(QPoint(0, 0), labelSize.toSize()) );
     painter->restore();
 }
 

@@ -135,46 +135,46 @@ RealtimePlotWindow::telemetryUpdate(RealtimeData rtData)
         hrindex++;
         if (hrindex >= rtPlot->smooth) hrindex = 0;
         hr = hrtot / rtPlot->smooth;
-        rtPlot->hrData.addData(hr);
+        rtPlot->hrData->addData(hr);
         
         // Speed
         double spd= rtData.value(RealtimeData::Speed);
         spdtot += spd; spdtot -= spdHist[spdindex]; spdHist[spdindex] = spd;
         spdindex++; if (spdindex >= rtPlot->smooth) spdindex = 0;
         spd = spdtot / rtPlot->smooth;
-        rtPlot->spdData.addData(spd);
+        rtPlot->spdData->addData(spd);
 
         // Power
         double pow = rtData.value(RealtimeData::Watts);
         powtot += pow; powtot -= powHist[powindex]; powHist[powindex] = pow;
         powindex++; if (powindex >= rtPlot->smooth) powindex = 0;
         pow = powtot / rtPlot->smooth;
-        rtPlot->pwrData.addData(pow);
+        rtPlot->pwrData->addData(pow);
 
         // Alternate Power
         double alt = rtData.value(RealtimeData::AltWatts);
         alttot += alt; alttot -= altHist[altindex]; altHist[altindex] = alt;
         altindex++; if (altindex >= rtPlot->smooth) altindex = 0;
         alt = alttot / rtPlot->smooth;
-        rtPlot->altPwrData.addData(alt);
+        rtPlot->altPwrData->addData(alt);
 
         // Cadence
         double cad = rtData.value(RealtimeData::Cadence);
         cadtot += cad; cadtot -= cadHist[cadindex]; cadHist[cadindex] = cad;
         cadindex++; if (cadindex >= rtPlot->smooth) cadindex = 0;
         cad = cadtot / rtPlot->smooth;
-        rtPlot->cadData.addData(cad);
+        rtPlot->cadData->addData(cad);
 
         // its smoothed to 30s anyway
-        rtPlot->pwr30Data.addData(rtData.value(RealtimeData::Watts));
+        rtPlot->pwr30Data->addData(rtData.value(RealtimeData::Watts));
 
     } else {
-        rtPlot->pwrData.addData(rtData.value(RealtimeData::Watts));
-        rtPlot->altPwrData.addData(rtData.value(RealtimeData::AltWatts));
-        rtPlot->pwr30Data.addData(rtData.value(RealtimeData::Watts));
-        rtPlot->cadData.addData(rtData.value(RealtimeData::Cadence));
-        rtPlot->spdData.addData(rtData.value(RealtimeData::Speed));
-        rtPlot->hrData.addData(rtData.value(RealtimeData::HeartRate));
+        rtPlot->pwrData->addData(rtData.value(RealtimeData::Watts));
+        rtPlot->altPwrData->addData(rtData.value(RealtimeData::AltWatts));
+        rtPlot->pwr30Data->addData(rtData.value(RealtimeData::Watts));
+        rtPlot->cadData->addData(rtData.value(RealtimeData::Cadence));
+        rtPlot->spdData->addData(rtData.value(RealtimeData::Speed));
+        rtPlot->hrData->addData(rtData.value(RealtimeData::HeartRate));
     }
     rtPlot->replot();                // redraw
 }

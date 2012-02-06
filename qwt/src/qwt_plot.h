@@ -10,13 +10,12 @@
 #ifndef QWT_PLOT_H
 #define QWT_PLOT_H
 
-#include <qframe.h>
 #include "qwt_global.h"
-#include "qwt_array.h"
 #include "qwt_text.h"
 #include "qwt_plot_dict.h"
 #include "qwt_scale_map.h"
-#include "qwt_plot_printfilter.h"
+#include "qwt_interval.h"
+#include <qframe.h>
 
 class QwtPlotLayout;
 class QwtLegend;
@@ -26,20 +25,19 @@ class QwtScaleDiv;
 class QwtScaleDraw;
 class QwtTextLabel;
 class QwtPlotCanvas;
-class QwtPlotPrintFilter;
 
 /*!
   \brief A 2-D plotting widget
 
   QwtPlot is a widget for plotting two-dimensional graphs.
-  An unlimited number of plot items can be displayed on 
-  its canvas. Plot items might be curves (QwtPlotCurve), markers 
-  (QwtPlotMarker), the grid (QwtPlotGrid), or anything else derived 
+  An unlimited number of plot items can be displayed on
+  its canvas. Plot items might be curves (QwtPlotCurve), markers
+  (QwtPlotMarker), the grid (QwtPlotGrid), or anything else derived
   from QwtPlotItem.
   A plot can have up to four axes, with each plot item attached to an x- and
   a y axis. The scales at the axes can be explicitely set (QwtScaleDiv), or
-  are calculated from the plot items, using algorithms (QwtScaleEngine) which 
-  can be configured separately for each axis. 
+  are calculated from the plot items, using algorithms (QwtScaleEngine) which
+  can be configured separately for each axis.
 
   \image html plot.png
 
@@ -72,96 +70,87 @@ myPlot->replot();
 class QWT_EXPORT QwtPlot: public QFrame, public QwtPlotDict
 {
     Q_OBJECT
-    Q_PROPERTY( QString propertiesDocument 
+    Q_PROPERTY( QString propertiesDocument
         READ grabProperties WRITE applyProperties )
 
 public:
-    /*! 
-      Axis index
+    //! \brief Axis index
+    enum Axis
+    {
+        //! Y axis left of the canvas
+        yLeft,
 
-      - yLeft\n
-      - yRight\n
-      - xBottom\n
-      - xTop\n
-     */
-    enum Axis 
-    { 
-        yLeft, 
-        yLeft1, 
-        yLeft2, 
-        yLeft3, 
-        yRight, 
-        yRight1, 
-        yRight2, 
-        yRight3, 
-        xBottom, 
-        xTop, 
-        axisCnt 
+        yLeft1,
+        yLeft2,
+        yLeft3,
+
+        //! Y axis right of the canvas
+        yRight,
+
+        yRight1,
+        yRight2,
+        yRight3,
+
+        //! X axis below the canvas
+        xBottom,
+
+        //! X axis above the canvas
+        xTop,
+
+        //! Number of axes
+        axisCnt
     };
 
-    /*! 
+    /*!
         Position of the legend, relative to the canvas.
 
-        - LeftLegend\n
-          The legend will be left from the yLeft axis.
-        - RightLegend\n
-          The legend will be right from the yLeft axis.
-        - BottomLegend\n
-          The legend will be right below the xBottom axis.
-        - TopLegend\n
-          The legend will be between xTop axis and the title.
-        - ExternalLegend\n
-          External means that only the content of the legend 
-          will be handled by QwtPlot, but not its geometry. 
-          This might be interesting if an application wants to
-          have a legend in an external window ( or on the canvas ).
-
-        \note In case of ExternalLegend, the legend is not 
-              printed by print().
-
         \sa insertLegend()
+        \note In case of ExternalLegend, the legend is not
+              handled by QwtPlotRenderer
      */
-    enum LegendPosition 
+    enum LegendPosition
     {
+        //! The legend will be left from the QwtPlot::yLeft axis.
         LeftLegend,
+
+        //! The legend will be right from the QwtPlot::yRight axis.
         RightLegend,
+
+        //! The legend will be below QwtPlot::xBottom axis.
         BottomLegend,
+
+        //! The legend will be between QwtPlot::xTop axis and the title.
         TopLegend,
-        
+
+        /*!
+          External means that only the content of the legend
+          will be handled by QwtPlot, but not its geometry.
+          This type can be used to have a legend in an
+          external window ( or on the canvas ).
+         */
         ExternalLegend
     };
 
-    explicit QwtPlot(QWidget * = NULL);
-    explicit QwtPlot(const QwtText &title, QWidget *p = NULL);
-#if QT_VERSION < 0x040000
-    explicit QwtPlot(QWidget *, const char* name);
-#endif
+    explicit QwtPlot( QWidget * = NULL );
+    explicit QwtPlot( const QwtText &title, QWidget *p = NULL );
 
     virtual ~QwtPlot();
 
-    void applyProperties(const QString &);
+    void applyProperties( const QString & );
     QString grabProperties() const;
 
-    void setAutoReplot(bool tf = true);
+    void setAutoReplot( bool tf = true );
     bool autoReplot() const;
-
-    void print(QPaintDevice &p,
-        const QwtPlotPrintFilter & = QwtPlotPrintFilter()) const;
-    virtual void print(QPainter *, const QRect &rect,
-        const QwtPlotPrintFilter & = QwtPlotPrintFilter()) const;
 
     // Layout
 
     QwtPlotLayout *plotLayout();
     const QwtPlotLayout *plotLayout() const;
 
-    void setMargin(int margin);
-    int margin() const;
-
     // Title
 
-    void setTitle(const QString &);
-    void setTitle(const QwtText &t);
+    void setTitle( const QString & );
+    void setTitle( const QwtText &t );
     QwtText title() const;
 
     QwtTextLabel *titleLabel();
@@ -172,88 +161,88 @@ public:
     QwtPlotCanvas *canvas();
     const QwtPlotCanvas *canvas() const;
 
-    void setCanvasBackground (const QColor &c);
-    const QColor& canvasBackground() const;
+    void setCanvasBackground( const QBrush & );
+    QBrush canvasBackground() const;
 
-    void setCanvasLineWidth(int w);
+    void setCanvasLineWidth( int w );
     int canvasLineWidth() const;
 
-    virtual QwtScaleMap canvasMap(int axisId) const;
+    virtual QwtScaleMap canvasMap( int axisId ) const;
 
-    double invTransform(int axisId, int pos) const;
-    int transform(int axisId, double value) const;
+    double invTransform( int axisId, int pos ) const;
+    double transform( int axisId, double value ) const;
 
     // Axes
 
-    QwtScaleEngine *axisScaleEngine(int axisId);
-    const QwtScaleEngine *axisScaleEngine(int axisId) const;
-    void setAxisScaleEngine(int axisId, QwtScaleEngine *);
+    QwtScaleEngine *axisScaleEngine( int axisId );
+    const QwtScaleEngine *axisScaleEngine( int axisId ) const;
+    void setAxisScaleEngine( int axisId, QwtScaleEngine * );
 
-    void setAxisAutoScale(int axisId);
-    bool axisAutoScale(int axisId) const;
+    void setAxisAutoScale( int axisId, bool on = true );
+    bool axisAutoScale( int axisId ) const;
 
-    void enableAxis(int axisId, bool tf = true);
-    bool axisEnabled(int axisId) const;
+    void enableAxis( int axisId, bool tf = true );
+    bool axisEnabled( int axisId ) const;
 
-    void setAxisFont(int axisId, const QFont &f);
-    QFont axisFont(int axisId) const;
+    void setAxisFont( int axisId, const QFont &f );
+    QFont axisFont( int axisId ) const;
 
-    void setAxisScale(int axisId, double min, double max, double step = 0);
-    void setAxisScaleDiv(int axisId, const QwtScaleDiv &);
-    void setAxisScaleDraw(int axisId, QwtScaleDraw *);
+    void setAxisScale( int axisId, double min, double max, double step = 0 );
+    void setAxisScaleDiv( int axisId, const QwtScaleDiv & );
+    void setAxisScaleDraw( int axisId, QwtScaleDraw * );
 
-    double axisStepSize(int axisId) const;
+    double axisStepSize( int axisId ) const;
+    QwtInterval axisInterval( int axisId ) const;
 
-    const QwtScaleDiv *axisScaleDiv(int axisId) const;
-    QwtScaleDiv *axisScaleDiv(int axisId);
+    const QwtScaleDiv *axisScaleDiv( int axisId ) const;
+    QwtScaleDiv *axisScaleDiv( int axisId );
 
-    const QwtScaleDraw *axisScaleDraw(int axisId) const;
-    QwtScaleDraw *axisScaleDraw(int axisId);
+    const QwtScaleDraw *axisScaleDraw( int axisId ) const;
+    QwtScaleDraw *axisScaleDraw( int axisId );
 
-    const QwtScaleWidget *axisWidget(int axisId) const;
-    QwtScaleWidget *axisWidget(int axisId);
+    const QwtScaleWidget *axisWidget( int axisId ) const;
+    QwtScaleWidget *axisWidget( int axisId );
 
-#if QT_VERSION < 0x040000
-    void setAxisLabelAlignment(int axisId, int);
-#else
-    void setAxisLabelAlignment(int axisId, Qt::Alignment);
-#endif
-    void setAxisLabelRotation(int axisId, double rotation);
+    void setAxisLabelAlignment( int axisId, Qt::Alignment );
+    void setAxisLabelRotation( int axisId, double rotation );
 
-    void setAxisTitle(int axisId, const QString &);
-    void setAxisTitle(int axisId, const QwtText &);
-    QwtText axisTitle(int axisId) const;
+    void setAxisTitle( int axisId, const QString & );
+    void setAxisTitle( int axisId, const QwtText & );
+    QwtText axisTitle( int axisId ) const;
 
-    void setAxisMaxMinor(int axisId, int maxMinor);
-    int axisMaxMajor(int axisId) const;
-    void setAxisMaxMajor(int axisId, int maxMajor);
-    int axisMaxMinor(int axisId) const;
+    void setAxisMaxMinor( int axisId, int maxMinor );
+    int axisMaxMinor( int axisId ) const;
 
-    // Legend 
+    void setAxisMaxMajor( int axisId, int maxMajor );
+    int axisMaxMajor( int axisId ) const;
 
-    void insertLegend(QwtLegend *, LegendPosition = QwtPlot::RightLegend,
-        double ratio = -1.0);
+    // Legend
+
+    void insertLegend( QwtLegend *, LegendPosition = QwtPlot::RightLegend,
+        double ratio = -1.0 );
 
     QwtLegend *legend();
     const QwtLegend *legend() const;
 
     // Misc
 
-    virtual void polish();
     virtual QSize sizeHint() const;
     virtual QSize minimumSizeHint() const;
 
     virtual void updateLayout();
-    virtual void drawCanvas(QPainter *);
+    virtual void drawCanvas( QPainter * );
 
     void updateAxes();
 
-    virtual bool event(QEvent *);
+    virtual bool event( QEvent * );
 
-signals:
+    virtual void drawItems( QPainter *, const QRectF &,
+        const QwtScaleMap maps[axisCnt] ) const;
+
+Q_SIGNALS:
     /*!
-      A signal which is emitted when the user has clicked on 
-      a legend item, which is in QwtLegend::ClickableItem mode. 
+      A signal which is emitted when the user has clicked on
+      a legend item, which is in QwtLegend::ClickableItem mode.
 
       \param plotItem Corresponding plot item of the
                  selected legend item
@@ -261,10 +250,10 @@ signals:
       \note clicks are disabled as default
       \sa QwtLegend::setItemMode(), QwtLegend::itemMode()
      */
-    void legendClicked(QwtPlotItem *plotItem);
+    void legendClicked( QwtPlotItem *plotItem );
 
     /*!
-      A signal which is emitted when the user has clicked on 
+      A signal which is emitted when the user has clicked on
       a legend item, which is in QwtLegend::CheckableItem mode
 
       \param plotItem Corresponding plot item of the
@@ -275,49 +264,29 @@ signals:
       \sa QwtLegend::setItemMode(), QwtLegend::itemMode()
      */
 
-    void legendChecked(QwtPlotItem *plotItem, bool on);
+    void legendChecked( QwtPlotItem *plotItem, bool on );
 
-public slots:
-    virtual void clear();
-
+public Q_SLOTS:
     virtual void replot();
     void autoRefresh();
 
-protected slots:
+protected Q_SLOTS:
     virtual void legendItemClicked();
-    virtual void legendItemChecked(bool);
+    virtual void legendItemChecked( bool );
 
 protected:
-    static bool axisValid(int axisId);
-
-    virtual void drawItems(QPainter *, const QRect &,
-        const QwtScaleMap maps[axisCnt],
-        const QwtPlotPrintFilter &) const;
+    static bool axisValid( int axisId );
 
     virtual void updateTabOrder();
 
-    virtual void resizeEvent(QResizeEvent *e);
-
-    virtual void printLegendItem(QPainter *, 
-        const QWidget *, const QRect &) const;
-
-    virtual void printTitle(QPainter *, const QRect &) const;
-
-    virtual void printScale(QPainter *, int axisId, int startDist, int endDist,
-        int baseDist, const QRect &) const;
-
-    virtual void printCanvas(QPainter *, 
-        const QRect &boundingRect, const QRect &canvasRect,
-        const QwtScaleMap maps[axisCnt], const QwtPlotPrintFilter &) const;
-
-    virtual void printLegend(QPainter *, const QRect &) const;
+    virtual void resizeEvent( QResizeEvent *e );
 
 private:
     void initAxesData();
     void deleteAxesData();
     void updateScaleDiv();
 
-    void initPlot(const QwtText &title);
+    void initPlot( const QwtText &title );
 
     class AxisData;
     AxisData *d_axisData[axisCnt];

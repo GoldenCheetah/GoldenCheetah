@@ -214,8 +214,6 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   // Zoomer:
   allZoomer = new QwtPlotZoomer(aerolab->canvas());
   allZoomer->setRubberBand(QwtPicker::RectRubberBand);
-  allZoomer->setSelectionFlags(QwtPicker::DragSelection
-                            | QwtPicker::CornerToCorner);
   allZoomer->setTrackerMode(QwtPicker::AlwaysOff);
   allZoomer->setEnabled(true);
   allZoomer->setMousePattern( QwtEventPattern::MouseSelect2, Qt::RightButton, Qt::ControlModifier );
@@ -242,7 +240,7 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
   connect(mainWindow, SIGNAL(intervalSelected() ), this, SLOT(intervalSelected()));
   connect(mainWindow, SIGNAL(intervalZoom(IntervalItem*) ), this, SLOT(zoomInterval(IntervalItem*)));
-  connect(allZoomer, SIGNAL( zoomed(const QwtDoubleRect) ), this, SLOT(zoomChanged()));
+  connect(allZoomer, SIGNAL( zoomed(const QRectF) ), this, SLOT(zoomChanged()));
 
 
   // Build the tab layout:
@@ -255,13 +253,11 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   //************************************
     aerolab->tooltip = new LTMToolTip( QwtPlot::xBottom,
                                        QwtPlot::yLeft,
-                                       QwtPicker::PointSelection,
                                        QwtPicker::VLineRubberBand,
                                        QwtPicker::AlwaysOn,
                                        aerolab->canvas(),
                                        ""
                                      );
-    aerolab->tooltip->setSelectionFlags( QwtPicker::PointSelection | QwtPicker::RectSelection | QwtPicker::DragSelection);
     aerolab->tooltip->setRubberBand( QwtPicker::VLineRubberBand );
     aerolab->tooltip->setMousePattern( QwtEventPattern::MouseSelect1, Qt::LeftButton, Qt::ShiftModifier );
     aerolab->tooltip->setTrackerPen( QColor( Qt::black ) );

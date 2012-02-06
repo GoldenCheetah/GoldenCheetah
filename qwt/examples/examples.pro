@@ -1,50 +1,52 @@
-# -*- mode: sh -*- ################################################
+################################################################
 # Qwt Widget Library
 # Copyright (C) 1997   Josef Wilgen
 # Copyright (C) 2002   Uwe Rathmann
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the Qwt License, Version 1.0
-###################################################################
+################################################################
 
-include( ../qwtconfig.pri )
+include( $${PWD}/../qwtconfig.pri )
 
 TEMPLATE = subdirs
 
-contains(CONFIG, QwtPlot) {
-	
-	SUBDIRS += \
-    	cpuplot \
-    	curvdemo1   \
-    	curvdemo2 \
-    	many_axes \
-    	simple_plot \
-    	realtime_plot \
-    	spectrogram \
-    	histogram 
+contains(QWT_CONFIG, QwtPlot) {
 
-	contains(CONFIG, QwtWidgets) {
+    SUBDIRS += \
+        cpuplot \
+        curvdemo1   \
+        curvdemo2 \
+        friedberg \
+        sinusplot \
+        realtime \
+        refreshtest \
+        navigation \
+        plotmatrix \
+        spectrogram \
+        rasterview \
+        tvplot
 
-		SUBDIRS += \
-    		bode \
-    		data_plot \
-    		event_filter
-	}
-	
-	contains(CONFIG, QwtSVGItem) {
+    contains(QWT_CONFIG, QwtWidgets) {
 
-		SUBDIRS += \
-			svgmap
-	}
+        SUBDIRS += \
+            bode \
+            event_filter \
+            oscilloscope
+    }
+
+    contains(QWT_CONFIG, QwtSvg) {
+
+        SUBDIRS += \
+            svgmap
+    }
 }
 
-contains(CONFIG, QwtWidgets) {
+contains(QWT_CONFIG, QwtWidgets) {
 
-	SUBDIRS += \
-    	sysinfo \
-    	radio \
-    	dials \
-    	sliders
+    SUBDIRS += \
+        sysinfo \
+        radio \
+        dials \
+        sliders
 }
-
-

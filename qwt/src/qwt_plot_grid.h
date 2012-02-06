@@ -2,7 +2,7 @@
  * Qwt Widget Library
  * Copyright (C) 1997   Josef Wilgen
  * Copyright (C) 2002   Uwe Rathmann
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the Qwt License, Version 1.0
  *****************************************************************************/
@@ -39,43 +39,43 @@ public:
 
     virtual int rtti() const;
 
-    void enableX(bool tf);
+    void enableX( bool tf );
     bool xEnabled() const;
 
-    void enableY(bool tf);
+    void enableY( bool tf );
     bool yEnabled() const;
 
-    void enableXMin(bool tf);
+    void enableXMin( bool tf );
     bool xMinEnabled() const;
 
-    void enableYMin(bool tf);
+    void enableYMin( bool tf );
     bool yMinEnabled() const;
 
-    void setXDiv(const QwtScaleDiv &sx);
+    void setXDiv( const QwtScaleDiv &sx );
     const QwtScaleDiv &xScaleDiv() const;
 
-    void setYDiv(const QwtScaleDiv &sy);
+    void setYDiv( const QwtScaleDiv &sy );
     const QwtScaleDiv &yScaleDiv() const;
 
-    void setPen(const QPen &p);
+    void setPen( const QPen &p );
 
-    void setMajPen(const QPen &p);
+    void setMajPen( const QPen &p );
     const QPen& majPen() const;
 
-    void setMinPen(const QPen &p);
+    void setMinPen( const QPen &p );
     const QPen& minPen() const;
 
-    virtual void draw(QPainter *p, 
+    virtual void draw( QPainter *p,
         const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-        const QRect &rect) const;
+        const QRectF &rect ) const;
 
-    virtual void updateScaleDiv(const QwtScaleDiv &xMap,
-        const QwtScaleDiv &yMap);
+    virtual void updateScaleDiv(
+        const QwtScaleDiv &xMap, const QwtScaleDiv &yMap );
 
 private:
-    void drawLines(QPainter *painter, const QRect &,
-        Qt::Orientation orientation, const QwtScaleMap &, 
-        const QwtValueList &) const;
+    void drawLines( QPainter *painter, const QRectF &,
+        Qt::Orientation orientation, const QwtScaleMap &,
+        const QList<double> & ) const;
 
     class PrivateData;
     PrivateData *d_data;

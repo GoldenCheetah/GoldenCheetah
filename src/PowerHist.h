@@ -27,6 +27,7 @@
 
 #include <qwt_plot.h>
 #include <qwt_plot_zoomer.h>
+#include <qwt_compat.h>
 #include <qsettings.h>
 #include <qvariant.h>
 
@@ -56,7 +57,7 @@ class penTooltip: public QwtPlotZoomer
              setTrackerMode(AlwaysOn);
          }
 
-        virtual QwtText trackerText(const QwtDoublePoint &/*pos*/) const {
+        virtual QwtText trackerText(const QPoint &/*pos*/) const {
             QColor bg = QColor(255,255, 170); // toolyip yellow
 #if QT_VERSION >= 0x040300
             bg.setAlpha(200);
@@ -239,7 +240,7 @@ public:
 
     virtual void draw(QPainter *painter,
 		      const QwtScaleMap &xMap, const QwtScaleMap &,
-		      const QRect &rect) const
+                      const QRectF &rect) const
     {
 	RideItem *rideItem = parent->rideItem;
 
@@ -254,7 +255,7 @@ public:
 	    int num_zones = zone_lows.size();
 	    if (num_zones > 0) {
 		for (int z = 0; z < num_zones; z ++) {
-		    QRect r = rect;
+                    QRectF r = rect;
 
 		    QColor shading_color =
 			zoneColor(z, num_zones);
@@ -336,14 +337,14 @@ public:
 
     void draw(QPainter *painter,
 	      const QwtScaleMap &xMap, const QwtScaleMap &,
-	      const QRect &rect) const
+              const QRectF &rect) const
     {
 	if (parent->shadeZones()) {
 	    int x = xMap.transform(watts);
 	    int y = (rect.bottom() + rect.top()) / 2;
 
 	    // the following code based on source for QwtPlotMarker::draw()
-	    QRect tr(QPoint(0, 0), text.textSize(painter->font()));
+            QRect tr(QPoint(0, 0), text.textSize(painter->font()).toSize());
 	    tr.moveCenter(QPoint(y, -x));
 	    painter->rotate(90);             // rotate text to avoid overlap: this needs to be fixed
 	    text.draw(painter, tr);
@@ -373,7 +374,7 @@ public:
 
     virtual void draw(QPainter *painter,
 		      const QwtScaleMap &xMap, const QwtScaleMap &,
-		      const QRect &rect) const
+                      const QRectF &rect) const
     {
 	RideItem *rideItem = parent->rideItem;
 
@@ -388,7 +389,7 @@ public:
 	    int num_zones = zone_lows.size();
 	    if (num_zones > 0) {
 		for (int z = 0; z < num_zones; z ++) {
-		    QRect r = rect;
+                    QRectF r = rect;
 
 		    QColor shading_color =
 			hrZoneColor(z, num_zones);
@@ -474,14 +475,14 @@ public:
 
     void draw(QPainter *painter,
 	      const QwtScaleMap &xMap, const QwtScaleMap &,
-	      const QRect &rect) const
+              const QRectF &rect) const
     {
 	if (parent->shadeHRZones()) {
             int x = xMap.transform(watts);
 	    int y = (rect.bottom() + rect.top()) / 2;
 
 	    // the following code based on source for QwtPlotMarker::draw()
-	    QRect tr(QPoint(0, 0), text.textSize(painter->font()));
+            QRect tr(QPoint(0, 0), text.textSize(painter->font()).toSize());
 	    tr.moveCenter(QPoint(y, -x));
 	    painter->rotate(90);             // rotate text to avoid overlap: this needs to be fixed
 	    text.draw(painter, tr);

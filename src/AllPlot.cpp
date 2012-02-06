@@ -34,13 +34,13 @@
 #include <qwt_plot_marker.h>
 #include <qwt_scale_div.h>
 #include <qwt_scale_widget.h>
-#include <qwt_valuelist.h>
+#include <qwt_compat.h>
 #include <qwt_text.h>
 #include <qwt_legend.h>
-#include <qwt_data.h>
+#include <qwt_series_data.h>
 #include <QMultiMap>
 
-class IntervalPlotData : public QwtData
+class IntervalPlotData : public QwtSeriesData<QPointF>
 {
     public:
     IntervalPlotData(AllPlot *allPlot, MainWindow *mainWindow) :
@@ -48,12 +48,15 @@ class IntervalPlotData : public QwtData
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
-    virtual QwtData *copy() const ;
+    //virtual QwtData *copy() const ;
     void init() ;
     IntervalItem *intervalNum(int n) const;
     int intervalCount() const;
     AllPlot *allPlot;
     MainWindow *mainWindow;
+
+    virtual QPointF sample(size_t i) const;
+    virtual QRectF boundingRect() const;
 };
 
 // define a background class to handle shading of power zones
@@ -78,7 +81,7 @@ class AllPlotBackground: public QwtPlotItem
 
     virtual void draw(QPainter *painter,
                       const QwtScaleMap &, const QwtScaleMap &yMap,
-                      const QRect &rect) const
+                      const QRectF &rect) const
     {
         RideItem *rideItem = parent->rideItem;
 
@@ -92,7 +95,7 @@ class AllPlotBackground: public QwtPlotItem
             int num_zones = zone_lows.size();
             if (num_zones > 0) {
                 for (int z = 0; z < num_zones; z ++) {
-                    QRect r = rect;
+                    QRect r = rect.toRect();
 
                     QColor shading_color = zoneColor(z, num_zones);
                     shading_color.setHsv(
@@ -178,14 +181,14 @@ class AllPlotZoneLabel: public QwtPlotItem
 
         void draw(QPainter *painter,
                   const QwtScaleMap &, const QwtScaleMap &yMap,
-                  const QRect &rect) const
+                  const QRectF &rect) const
         {
             if (parent->shadeZones()) {
                 int x = (rect.left() + rect.right()) / 2;
                 int y = yMap.transform(watts);
 
                 // the following code based on source for QwtPlotMarker::draw()
-                QRect tr(QPoint(0, 0), text.textSize(painter->font()));
+                QRect tr(QPoint(0, 0), text.textSize(painter->font()).toSize());
                 tr.moveCenter(QPoint(x, y));
                 text.draw(painter, tr);
             }
@@ -252,7 +255,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
 
     intervalHighlighterCurve = new QwtPlotCurve();
     intervalHighlighterCurve->setYAxis(yLeft);
-    intervalHighlighterCurve->setData(IntervalPlotData(this, mainWindow));
+    intervalHighlighterCurve->setData(new IntervalPlotData(this, mainWindow));
     intervalHighlighterCurve->attach(this);
     //this->legend()->remove(intervalHighlighterCurve); // don't show in legend
 
@@ -452,6 +455,7 @@ AllPlot::recalc()
     int rideTimeSecs = (int) ceil(timeArray[arrayLength - 1]);
     if (rideTimeSecs > 7*24*60*60) {
         QwtArray<double> data;
+
         if (!wattsArray.empty())
             wattsCurve->setData(data, data);
         if (!hrArray.empty())
@@ -522,8 +526,7 @@ AllPlot::recalc()
                     totalAlt   += altArray[i];
                 if (!tempArray.empty() ) {
                     if (tempArray[i] == RideFile::noTemp && i>0) {
-                        if (list.count() && i>0) dp.temp = list.back().temp;
-                        else dp.temp = 0.0f;
+                        dp.temp = (i>0?list.back().temp:0.0);
                         totalTemp   += dp.temp;
                     }
                     else {
@@ -597,32 +600,26 @@ AllPlot::recalc()
 
     // set curves - we set the intervalHighlighter to whichver is available
     if (!wattsArray.empty()) {
-
         wattsCurve->setData(xaxis.data() + startingIndex, smoothWatts.data() + startingIndex, totalPoints);
         intervalHighlighterCurve->setYAxis(yLeft);
 
     } if (!hrArray.empty()) {
-
         hrCurve->setData(xaxis.data() + startingIndex, smoothHr.data() + startingIndex, totalPoints);
         intervalHighlighterCurve->setYAxis(yLeft2);
 
     } if (!speedArray.empty()) {
-
         speedCurve->setData(xaxis.data() + startingIndex, smoothSpeed.data() + startingIndex, totalPoints);
         intervalHighlighterCurve->setYAxis(yRight);
 
     } if (!cadArray.empty()) {
-
         cadCurve->setData(xaxis.data() + startingIndex, smoothCad.data() + startingIndex, totalPoints);
         intervalHighlighterCurve->setYAxis(yLeft2);
 
     } if (!altArray.empty()) {
-
         altCurve->setData(xaxis.data() + startingIndex, smoothAltitude.data() + startingIndex, totalPoints);
         intervalHighlighterCurve->setYAxis(yRight2);
 
     } if (!tempArray.empty()) {
-
         tempCurve->setData(xaxis.data() + startingIndex, smoothTemp.data() + startingIndex, totalPoints);
         intervalHighlighterCurve->setYAxis(yRight);
 
@@ -755,7 +752,7 @@ AllPlot::setYMax()
 
     enableAxis(yLeft, wattsCurve->isVisible());
     enableAxis(yLeft2, hrCurve->isVisible() || cadCurve->isVisible());
-    enableAxis(yRight, speedCurve->isVisible() || tempCurve->isVisible());
+    enableAxis(yRight, speedCurve->isVisible());
     enableAxis(yRight2, altCurve->isVisible());
 }
 
@@ -842,12 +839,13 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
         sym.setStyle(QwtSymbol::NoSymbol);
         sym.setSize(0);
     }
-    wattsCurve->setSymbol(sym);
-    hrCurve->setSymbol(sym);
-    speedCurve->setSymbol(sym);
-    cadCurve->setSymbol(sym);
-    altCurve->setSymbol(sym);
-    tempCurve->setSymbol(sym);
+
+    wattsCurve->setSymbol(new QwtSymbol(sym));
+    hrCurve->setSymbol(new QwtSymbol(sym));
+    speedCurve->setSymbol(new QwtSymbol(sym));
+    cadCurve->setSymbol(new QwtSymbol(sym));
+    altCurve->setSymbol(new QwtSymbol(sym));
+    tempCurve->setSymbol(new QwtSymbol(sym));
 
     setYMax();
 
@@ -1246,8 +1244,14 @@ double IntervalPlotData::y(size_t i) const
 
 
 size_t IntervalPlotData::size() const { return intervalCount()*4; }
-QwtData *IntervalPlotData::copy() const {
-    return new IntervalPlotData(allPlot, mainWindow);
+
+QPointF IntervalPlotData::sample(size_t i) const {
+    return QPointF(x(i), y(i));
+}
+
+QRectF IntervalPlotData::boundingRect() const
+{
+    return QRectF(-100, 5000, 5100, 5100);
 }
 
 void
@@ -1255,8 +1259,8 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
 {
     if (index >= 0 && curve != intervalHighlighterCurve) {
 
-        double yvalue = curve->y(index);
-        double xvalue = curve->x(index);
+        double yvalue = curve->sample(index).y();
+        double xvalue = curve->sample(index).x();
 
         // output the tooltip
         QString text = QString("%1 %2\n%3 %4")

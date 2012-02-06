@@ -2,7 +2,7 @@
  * Qwt Widget Library
  * Copyright (C) 1997   Josef Wilgen
  * Copyright (C) 2002   Uwe Rathmann
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the Qwt License, Version 1.0
  *****************************************************************************/
@@ -10,8 +10,9 @@
 #ifndef QWT_EVENT_PATTERN
 #define QWT_EVENT_PATTERN 1
 
+#include "qwt_global.h"
 #include <qnamespace.h>
-#include "qwt_array.h"
+#include <qvector.h>
 
 class QMouseEvent;
 class QKeyEvent;
@@ -20,7 +21,7 @@ class QKeyEvent;
   \brief A collection of event patterns
 
   QwtEventPattern introduces an level of indirection for mouse and
-  keyboard inputs. Those are represented by symbolic names, so 
+  keyboard inputs. Those are represented by symbolic names, so
   the application code can be configured by individual mappings.
 
   \sa QwtPicker, QwtPickerMachine, QwtPlotZoomer
@@ -137,13 +138,17 @@ public:
     class MousePattern
     {
     public:
-        MousePattern(int btn = Qt::NoButton, int st = Qt::NoButton) 
-        { 
+        //! Constructor
+        MousePattern( int btn = Qt::NoButton, int st = Qt::NoButton )
+        {
             button = btn;
             state = st;
         }
 
+        //! Button code
         int button;
+
+        //! State
         int state;
     };
 
@@ -151,71 +156,70 @@ public:
     class KeyPattern
     {
     public:
-        KeyPattern(int k = 0, int st = Qt::NoButton)    
-        { 
-            key = k; 
+        //! Constructor
+        KeyPattern( int k = 0, int st = Qt::NoButton )
+        {
+            key = k;
             state = st;
         }
 
+        //! Key code
         int key;
+
+        //! State
         int state;
     };
 
     QwtEventPattern();
     virtual ~QwtEventPattern();
 
-    void initMousePattern(int numButtons);
+    void initMousePattern( int numButtons );
     void initKeyPattern();
 
-    void setMousePattern(uint pattern, int button, int state = Qt::NoButton);
-    void setKeyPattern(uint pattern, int key, int state = Qt::NoButton);
+    void setMousePattern( uint pattern, int button, int state = Qt::NoButton );
+    void setKeyPattern( uint pattern, int key, int state = Qt::NoButton );
 
-    void setMousePattern(const QwtArray<MousePattern> &);
-    void setKeyPattern(const QwtArray<KeyPattern> &);
+    void setMousePattern( const QVector<MousePattern> & );
+    void setKeyPattern( const QVector<KeyPattern> & );
 
-    const QwtArray<MousePattern> &mousePattern() const;
-    const QwtArray<KeyPattern> &keyPattern() const;
+    const QVector<MousePattern> &mousePattern() const;
+    const QVector<KeyPattern> &keyPattern() const;
 
-    QwtArray<MousePattern> &mousePattern();
-    QwtArray<KeyPattern> &keyPattern();
+    QVector<MousePattern> &mousePattern();
+    QVector<KeyPattern> &keyPattern();
 
-    bool mouseMatch(uint pattern, const QMouseEvent *) const;
-    bool keyMatch(uint pattern, const QKeyEvent *) const;
+    bool mouseMatch( uint pattern, const QMouseEvent * ) const;
+    bool keyMatch( uint pattern, const QKeyEvent * ) const;
 
 protected:
-    virtual bool mouseMatch(const MousePattern &, const QMouseEvent *) const;
-    virtual bool keyMatch(const KeyPattern &, const QKeyEvent *) const;
-    
+    virtual bool mouseMatch( const MousePattern &, const QMouseEvent * ) const;
+    virtual bool keyMatch( const KeyPattern &, const QKeyEvent * ) const;
+
 private:
 
 #if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable: 4251)
 #endif
-    QwtArray<MousePattern> d_mousePattern;
-    QwtArray<KeyPattern> d_keyPattern;
+    QVector<MousePattern> d_mousePattern;
+    QVector<KeyPattern> d_keyPattern;
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif
 };
 
-inline bool operator==(QwtEventPattern::MousePattern b1, 
-   QwtEventPattern::MousePattern  b2)
-{ 
-    return b1.button == b2.button && b1.state == b2.state; 
+//! Compare operator
+inline bool operator==( QwtEventPattern::MousePattern b1,
+    QwtEventPattern::MousePattern  b2 )
+{
+    return b1.button == b2.button && b1.state == b2.state;
 }
 
-inline bool operator==(QwtEventPattern::KeyPattern b1, 
-   QwtEventPattern::KeyPattern  b2)
-{ 
-    return b1.key == b2.key && b1.state == b2.state; 
+//! Compare operator
+inline bool operator==( QwtEventPattern::KeyPattern b1,
+   QwtEventPattern::KeyPattern  b2 )
+{
+    return b1.key == b2.key && b1.state == b2.state;
 }
-
-#if defined(QWT_TEMPLATEDLL)
-// MOC_SKIP_BEGIN
-template class QWT_EXPORT QwtArray<QwtEventPattern::MousePattern>;
-template class QWT_EXPORT QwtArray<QwtEventPattern::KeyPattern>;
-// MOC_SKIP_END
-#endif
 
 #endif

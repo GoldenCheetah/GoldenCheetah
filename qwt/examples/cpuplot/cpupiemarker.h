@@ -14,5 +14,5 @@ public:
 
     virtual void draw(QPainter *p,
         const QwtScaleMap &, const QwtScaleMap &,
-        const QRect &rect) const;
+        const QRectF &rect) const;
 };

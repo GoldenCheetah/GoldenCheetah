@@ -22,7 +22,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include <QDebug>
-#include <qwt_data.h>
+#include <qwt_series_data.h>
 #include <qwt_legend.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
@@ -710,8 +710,8 @@ CpintPlot::pointHover(QwtPlotCurve *curve, int index)
 {
     if (index >= 0) {
 
-        double xvalue = curve->x(index);
-        double yvalue = curve->y(index);
+        double xvalue = curve->sample(index).x();
+        double yvalue = curve->sample(index).y();
         QString text, dateStr;
 
         // add when to tooltip if its all curve

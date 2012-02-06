@@ -11,7 +11,7 @@ public:
 
 protected:
     virtual void drawScaleContents(QPainter *painter,
-        const QPoint &center, int radius) const;
+        const QPointF &center, double radius) const;
 
 private:
     QString d_label;

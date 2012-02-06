@@ -4,26 +4,14 @@
 #include <qwt_dial_needle.h>
 #include "compass_grid.h"
 
-#if QT_VERSION < 0x040000
-typedef QColorGroup Palette;
-#else
-typedef QPalette Palette;
-#endif
-
 CompassGrid::CompassGrid(QWidget *parent):
     QFrame(parent)
 {
-#if QT_VERSION < 0x040000
-    setBackgroundColor(Qt::gray);
-#else
     QPalette p = palette();
     p.setColor(backgroundRole(), Qt::gray);
     setPalette(p);
-#endif
 
-#if QT_VERSION >= 0x040100
     setAutoFillBackground(true);
-#endif
 
     QGridLayout *layout = new QGridLayout(this);
     layout->setSpacing(5);
@@ -36,31 +24,22 @@ CompassGrid::CompassGrid(QWidget *parent):
         layout->addWidget(compass, i / 3, i % 3);
     }
 
-#if QT_VERSION < 0x040000
-    for ( i = 0; i < layout->numCols(); i++ )
-        layout->setColStretch(i, 1);
-#else
     for ( i = 0; i < layout->columnCount(); i++ )
         layout->setColumnStretch(i, 1);
-#endif
 }
 
 QwtCompass *CompassGrid::createCompass(int pos)
 {
     int c;
 
-    Palette colorGroup;
-    for ( c = 0; c < Palette::NColorRoles; c++ )
-        colorGroup.setColor((Palette::ColorRole)c, QColor());
+    QPalette colorGroup;
+    for ( c = 0; c < QPalette::NColorRoles; c++ )
+        colorGroup.setColor((QPalette::ColorRole)c, QColor());
 
-#if QT_VERSION < 0x040000
-    colorGroup.setColor(Palette::Base, backgroundColor().light(120));
-#else
-    colorGroup.setColor(Palette::Base,
+    colorGroup.setColor(QPalette::Base,
         palette().color(backgroundRole()).light(120));
-#endif
-    colorGroup.setColor(Palette::Foreground, 
-        colorGroup.color(Palette::Base));
+    colorGroup.setColor(QPalette::WindowText,
+        colorGroup.color(QPalette::Base));
 
     QwtCompass *compass = new QwtCompass(this);
     compass->setLineWidth(4);
@@ -111,12 +90,13 @@ QwtCompass *CompassGrid::createCompass(int pos)
               a ticks for each degree.
              */
 
-            colorGroup.setColor(Palette::Base, Qt::darkBlue);
-            colorGroup.setColor(Palette::Foreground, 
+            colorGroup.setColor(QPalette::Base, Qt::darkBlue);
+            colorGroup.setColor(QPalette::WindowText,
                 QColor(Qt::darkBlue).dark(120));
-            colorGroup.setColor(Palette::Text, Qt::white);
+            colorGroup.setColor(QPalette::Text, Qt::white);
 
-            compass->setScaleOptions(QwtDial::ScaleTicks | QwtDial::ScaleLabel);
+            compass->setScaleComponents(
+                QwtAbstractScaleDraw::Ticks | QwtAbstractScaleDraw::Labels);
             compass->setScaleTicks(1, 1, 3);
             compass->setScale(36, 5, 0);
 
@@ -132,18 +112,14 @@ QwtCompass *CompassGrid::createCompass(int pos)
               A compass without a frame, showing numbers as tick labels.
               The origin is at 220.0
              */
-#if QT_VERSION < 0x040000
-            colorGroup.setColor(Palette::Base, backgroundColor());
-#else
-            colorGroup.setColor(Palette::Base, 
+            colorGroup.setColor(QPalette::Base,
                 palette().color(backgroundRole()));
-#endif
-            colorGroup.setColor(Palette::Foreground, Qt::blue);
-                
+            colorGroup.setColor(QPalette::WindowText, Qt::blue);
+
             compass->setLineWidth(0);
 
-            compass->setScaleOptions(QwtDial::ScaleBackbone | 
-                QwtDial::ScaleTicks | QwtDial::ScaleLabel);
+            compass->setScaleComponents( QwtAbstractScaleDraw::Backbone |
+                QwtAbstractScaleDraw::Ticks | QwtAbstractScaleDraw::Labels );
             compass->setScaleTicks(0, 0, 3);
 
             QMap<double, QString> map;
@@ -157,7 +133,7 @@ QwtCompass *CompassGrid::createCompass(int pos)
             compass->setScale(36, 5, 0);
 
             compass->setNeedle(new QwtDialSimpleNeedle(QwtDialSimpleNeedle::Ray,
-                false, Qt::white));
+                true, Qt::white));
             compass->setOrigin(220.0);
             compass->setValue(20.0);
             break;
@@ -167,7 +143,8 @@ QwtCompass *CompassGrid::createCompass(int pos)
             /*
              A compass showing another needle
              */
-            compass->setScaleOptions(QwtDial::ScaleTicks | QwtDial::ScaleLabel);
+            compass->setScaleComponents(
+                QwtAbstractScaleDraw::Ticks | QwtAbstractScaleDraw::Labels );
             compass->setScaleTicks(0, 0, 3);
 
             compass->setNeedle(new QwtCompassMagnetNeedle(
@@ -180,7 +157,7 @@ QwtCompass *CompassGrid::createCompass(int pos)
             /*
              A compass with a yellow on black ray
              */
-            colorGroup.setColor(Palette::Foreground, Qt::black);
+            colorGroup.setColor(QPalette::WindowText, Qt::black);
 
             compass->setNeedle(new QwtDialSimpleNeedle(QwtDialSimpleNeedle::Ray,
                 false, Qt::yellow));
@@ -190,16 +167,16 @@ QwtCompass *CompassGrid::createCompass(int pos)
     }
 
     QPalette newPalette = compass->palette();
-    for ( c = 0; c < Palette::NColorRoles; c++ )
+    for ( c = 0; c < QPalette::NColorRoles; c++ )
     {
-        if ( colorGroup.color((Palette::ColorRole)c).isValid() )
+        if ( colorGroup.color((QPalette::ColorRole)c).isValid() )
         {
             for ( int cg = 0; cg < QPalette::NColorGroups; cg++ )
-            {   
+            {
                 newPalette.setColor(
-                    (QPalette::ColorGroup)cg, 
-                    (Palette::ColorRole)c, 
-                    colorGroup.color((Palette::ColorRole)c));
+                    (QPalette::ColorGroup)cg,
+                    (QPalette::ColorRole)c,
+                    colorGroup.color((QPalette::ColorRole)c));
             }
         }
     }
@@ -208,16 +185,16 @@ QwtCompass *CompassGrid::createCompass(int pos)
     {
         QPalette::ColorGroup cg = (QPalette::ColorGroup)i;
 
-        const QColor light = 
-            newPalette.color(cg, Palette::Base).light(170);
-        const QColor dark = newPalette.color(cg, Palette::Base).dark(170);
+        const QColor light =
+            newPalette.color(cg, QPalette::Base).light(170);
+        const QColor dark = newPalette.color(cg, QPalette::Base).dark(170);
         const QColor mid = compass->frameShadow() == QwtDial::Raised
-            ? newPalette.color(cg, Palette::Base).dark(110)
-            : newPalette.color(cg, Palette::Base).light(110);
-    
-        newPalette.setColor(cg, Palette::Dark, dark);
-        newPalette.setColor(cg, Palette::Mid, mid);
-        newPalette.setColor(cg, Palette::Light, light);
+            ? newPalette.color(cg, QPalette::Base).dark(110)
+            : newPalette.color(cg, QPalette::Base).light(110);
+
+        newPalette.setColor(cg, QPalette::Dark, dark);
+        newPalette.setColor(cg, QPalette::Mid, mid);
+        newPalette.setColor(cg, QPalette::Light, light);
     }
     compass->setPalette(newPalette);
 

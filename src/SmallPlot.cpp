@@ -29,7 +29,8 @@
 #include <qwt_plot_marker.h>
 #include <qwt_text.h>
 #include <qwt_legend.h>
-#include <qwt_data.h>
+#include <qwt_series_data.h>
+#include <qwt_compat.h>
 
 static double inline max(double a, double b) { if (a > b) return a; else return b; }
 

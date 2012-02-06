@@ -7,28 +7,18 @@
  * modify it under the terms of the Qwt License, Version 1.0
  *****************************************************************************/
 
-// vim: expandtab
-
 /*! \file !*/
 #ifndef QWT_PLOT_DICT
 #define QWT_PLOT_DICT
 
 #include "qwt_global.h"
 #include "qwt_plot_item.h"
-
-#if QT_VERSION < 0x040000
-#include <qvaluelist.h>
-typedef QValueListConstIterator<QwtPlotItem *> QwtPlotItemIterator;
-/// \var typedef QValueList< QwtPlotItem *> QwtPlotItemList
-/// \brief See QT 3.x assistant documentation for QValueList
-typedef QValueList<QwtPlotItem *> QwtPlotItemList;
-#else
 #include <qlist.h>
-typedef QList<QwtPlotItem *>::ConstIterator QwtPlotItemIterator;
+
 /// \var typedef QList< QwtPlotItem *> QwtPlotItemList
 /// \brief See QT 4.x assistant documentation for QList
 typedef QList<QwtPlotItem *> QwtPlotItemList;
-#endif
+typedef QList<QwtPlotItem *>::ConstIterator QwtPlotItemIterator;
 
 /*!
   \brief A dictionary for plot items
@@ -43,20 +33,21 @@ class QWT_EXPORT QwtPlotDict
 {
 public:
     explicit QwtPlotDict();
-    ~QwtPlotDict();
+    virtual ~QwtPlotDict();
 
-    void setAutoDelete(bool);
+    void setAutoDelete( bool );
     bool autoDelete() const;
 
     const QwtPlotItemList& itemList() const;
+    QwtPlotItemList itemList( int rtti ) const;
 
-    void detachItems(int rtti = QwtPlotItem::Rtti_PlotItem,
-        bool autoDelete = true);
+    void detachItems( int rtti = QwtPlotItem::Rtti_PlotItem,
+        bool autoDelete = true );
 
 private:
     friend class QwtPlotItem;
 
-    void attachItem(QwtPlotItem *, bool);
+    void attachItem( QwtPlotItem *, bool );
 
     class PrivateData;
     PrivateData *d_data;

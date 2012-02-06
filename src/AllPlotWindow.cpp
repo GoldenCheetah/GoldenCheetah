@@ -38,7 +38,7 @@
 #include <qwt_plot_grid.h>
 #include <qwt_text.h>
 #include <qwt_legend.h>
-#include <qwt_data.h>
+#include <qwt_series_data.h>
 
 // span slider specials
 #include <qxtspanslider.h>
@@ -154,8 +154,6 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     allZoomer = new QwtPlotZoomer(allPlot->canvas());
     allZoomer->setRubberBand(QwtPicker::RectRubberBand);
     allZoomer->setRubberBandPen(GColor(CPLOTSELECT));
-    allZoomer->setSelectionFlags(QwtPicker::DragSelection
-                                 | QwtPicker::CornerToCorner);
     allZoomer->setTrackerMode(QwtPicker::AlwaysOff);
     allZoomer->setEnabled(true);
 
@@ -178,12 +176,10 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
 
     // tooltip on hover over point
     allPlot->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtPlot::yLeft,
-                               QwtPicker::PointSelection,
                                QwtPicker::VLineRubberBand,
                                QwtPicker::AlwaysOn,
                                allPlot->canvas(),
                                "");
-    allPlot->tooltip->setSelectionFlags(QwtPicker::PointSelection | QwtPicker::RectSelection | QwtPicker::DragSelection);
     allPlot->tooltip->setRubberBand(QwtPicker::VLineRubberBand);
     allPlot->tooltip->setMousePattern(QwtEventPattern::MouseSelect1, Qt::LeftButton);
     allPlot->tooltip->setTrackerPen(QColor(Qt::black));
@@ -1494,12 +1490,10 @@ AllPlotWindow::addPickers(AllPlot *_allPlot)
 
     // use the tooltip picker rather than a standard picker
     _allPlot->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtPlot::yLeft,
-                               QwtPicker::PointSelection,
                                QwtPicker::VLineRubberBand,
                                QwtPicker::AlwaysOn,
                                _allPlot->canvas(),
                                "");
-    _allPlot->tooltip->setSelectionFlags(QwtPicker::PointSelection | QwtPicker::RectSelection | QwtPicker::DragSelection);
     _allPlot->tooltip->setRubberBand(QwtPicker::VLineRubberBand);
     _allPlot->tooltip->setMousePattern(QwtEventPattern::MouseSelect1, Qt::LeftButton);
     _allPlot->tooltip->setTrackerPen(QColor(Qt::black));

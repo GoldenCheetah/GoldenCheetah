@@ -8,6 +8,7 @@
 #include <qwt_scale_widget.h>
 #include <qwt_legend.h>
 #include <qwt_legend_item.h>
+#include <qwt_plot_canvas.h>
 #include "cpupiemarker.h"
 #include "cpuplot.h"
 
@@ -42,10 +43,10 @@ public:
 
     virtual void draw(QPainter *painter,
         const QwtScaleMap &, const QwtScaleMap &yMap,
-        const QRect &rect) const
+        const QRectF &rect) const
     {
         QColor c(Qt::white);
-        QRect r = rect;
+        QRectF r = rect;
 
         for ( int i = 100; i > 0; i -= 10 )
         {
@@ -64,23 +65,16 @@ public:
     CpuCurve(const QString &title):
         QwtPlotCurve(title)
     {
-#if QT_VERSION >= 0x040000
         setRenderHint(QwtPlotItem::RenderAntialiased);
-#endif
     }
 
     void setColor(const QColor &color)
     {
-#if QT_VERSION >= 0x040000
         QColor c = color;
         c.setAlpha(150);
 
         setPen(c);
         setBrush(c);
-#else
-        setPen(color);
-        setBrush(QBrush(color, Qt::Dense4Pattern));
-#endif
     }
 };
 
@@ -90,6 +84,8 @@ CpuPlot::CpuPlot(QWidget *parent):
 {
     setAutoReplot(false);
 
+    canvas()->setBorderRadius( 10 );
+
     plotLayout()->setAlignCanvasToScales(true);
 
     QwtLegend *legend = new QwtLegend;
@@ -97,7 +93,7 @@ CpuPlot::CpuPlot(QWidget *parent):
     insertLegend(legend, QwtPlot::RightLegend);
 
     setAxisTitle(QwtPlot::xBottom, " System Uptime [h:m:s]");
-    setAxisScaleDraw(QwtPlot::xBottom, 
+    setAxisScaleDraw(QwtPlot::xBottom,
         new TimeScaleDraw(cpuStat.upTime()));
     setAxisScale(QwtPlot::xBottom, 0, HISTORY);
     setAxisLabelRotation(QwtPlot::xBottom, -50.0);
@@ -124,7 +120,7 @@ CpuPlot::CpuPlot(QWidget *parent):
 
     CpuPieMarker *pie = new CpuPieMarker();
     pie->attach(this);
-    
+
     CpuCurve *curve;
 
     curve = new CpuCurve("System");
@@ -177,7 +173,7 @@ void CpuPlot::timerEvent(QTimerEvent *)
 
     cpuStat.statistic(data[User].data[0], data[System].data[0]);
 
-    data[Total].data[0] = data[User].data[0] + 
+    data[Total].data[0] = data[User].data[0] +
         data[System].data[0];
     data[Idle].data[0] = 100.0 - data[Total].data[0];
 
@@ -187,12 +183,12 @@ void CpuPlot::timerEvent(QTimerEvent *)
     for ( int j = 0; j < HISTORY; j++ )
         timeData[j]++;
 
-    setAxisScale(QwtPlot::xBottom, 
+    setAxisScale(QwtPlot::xBottom,
         timeData[HISTORY - 1], timeData[0]);
 
     for ( int c = 0; c < NCpuData; c++ )
     {
-        data[c].curve->setRawData(
+        data[c].curve->setRawSamples(
             timeData, data[c].data, dataCount);
     }
 
@@ -205,24 +201,22 @@ void CpuPlot::showCurve(QwtPlotItem *item, bool on)
     QWidget *w = legend()->find(item);
     if ( w && w->inherits("QwtLegendItem") )
         ((QwtLegendItem *)w)->setChecked(on);
-    
+
     replot();
 }
 
 int main(int argc, char **argv)
 {
-    QApplication a(argc, argv); 
-    
+    QApplication a(argc, argv);
+
     QWidget vBox;
-#if QT_VERSION >= 0x040000
     vBox.setWindowTitle("Cpu Plot");
-#else
-    vBox.setCaption("Cpu Plot");
-#endif
 
     CpuPlot *plot = new CpuPlot(&vBox);
     plot->setTitle("History");
-    plot->setMargin(5);
+
+    const int margin = 5;
+    plot->setContentsMargins(margin, margin, margin, margin);
 
     QString info("Press the legend to en/disable a curve");
 
@@ -232,13 +226,8 @@ int main(int argc, char **argv)
     layout->addWidget(plot);
     layout->addWidget(label);
 
-#if QT_VERSION < 0x040000
-    a.setMainWidget(&vBox);
-#endif
-
     vBox.resize(600,400);
     vBox.show();
 
-    return a.exec();  
-}   
-
+    return a.exec();
+}

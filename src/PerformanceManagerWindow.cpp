@@ -5,7 +5,7 @@
 #include "Colors.h"
 #include "StressCalculator.h"
 #include "RideItem.h"
-
+#include <qwt_picker_machine.h>
 
 
 PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
@@ -96,9 +96,9 @@ PerformanceManagerWindow::PerformanceManagerWindow(MainWindow *mainWindow) :
     setLayout(vlayout);
 
     PMpicker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
-                               QwtPicker::PointSelection,
                                QwtPicker::VLineRubberBand,
                                QwtPicker::AlwaysOff, perfplot->canvas());
+    PMpicker->setStateMachine(new QwtPickerDragPointMachine);
     PMpicker->setRubberBandPen(GColor(CPLOTSELECT));
 
     connect(PMpicker, SIGNAL(moved(const QPoint &)),

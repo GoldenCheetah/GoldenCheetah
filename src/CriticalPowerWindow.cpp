@@ -22,7 +22,9 @@
 #include "RideItem.h"
 #include "TimeUtils.h"
 #include <qwt_picker.h>
+#include <qwt_picker_machine.h>
 #include <qwt_plot_picker.h>
+#include <qwt_compat.h>
 #include <QFile>
 #include "Season.h"
 #include "SeasonParser.h"
@@ -86,9 +88,9 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
     cl->addStretch();
 
     picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
-                               QwtPicker::PointSelection,
                                QwtPicker::VLineRubberBand,
                                QwtPicker::AlwaysOff, cpintPlot->canvas());
+    picker->setStateMachine(new QwtPickerDragPointMachine);
     picker->setRubberBandPen(GColor(CPLOTTRACKER));
 
     connect(picker, SIGNAL(moved(const QPoint &)), SLOT(pickerMoved(const QPoint &)));
@@ -169,15 +171,16 @@ curve_to_point(double x, const QwtPlotCurve *curve)
 {
     unsigned result = 0;
     if (curve) {
-        const QwtData &data = curve->data();
-        if (data.size() > 0) {
-            if (x < data.x(0) || x > data.x(data.size() - 1))
+        const QwtSeriesData<QPointF> *data = curve->data();
+
+        if (data->size() > 0) {
+            if (x < data->sample(0).x() || x > data->sample(data->size() - 1).x())
                 return 0;
-            unsigned min = 0, mid = 0, max = data.size();
+            unsigned min = 0, mid = 0, max = data->size();
             while (min < max - 1) {
                 mid = (max - min) / 2 + min;
-                if (x < data.x(mid)) {
-                    result = (unsigned) round(data.y(mid));
+                if (x < data->sample(mid).x()) {
+                    result = (unsigned) round(data->sample(mid).y());
                     max = mid;
                 }
                 else {

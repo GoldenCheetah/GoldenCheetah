@@ -68,7 +68,7 @@ static int symbolToInt(QwtSymbol::Style x)
     case QwtSymbol::Star1: return 12;
     case QwtSymbol::Star2: return 13;
     case QwtSymbol::Hexagon: return 14;
-    case QwtSymbol::StyleCnt: return 15;
+    // nomore in qwt6 -> case QwtSymbol::StyleCnt: return 15;
 
     }
 }
@@ -92,7 +92,7 @@ static QwtSymbol::Style intToSymbol(int x)
     case 12 : return QwtSymbol::Star1;
     case 13 : return QwtSymbol::Star2;
     case 14 : return QwtSymbol::Hexagon;
-    case 15 : return QwtSymbol::StyleCnt;
+    // nomore in qwt6 ->  case 15 : return QwtSymbol::StyleCnt;
 
     }
 }

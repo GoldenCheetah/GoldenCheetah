@@ -11,7 +11,7 @@ Plot::Plot(QWidget *parent):
     QwtPlot(parent),
     d_mapItem(NULL),
     d_mapRect(0.0, 0.0, 100.0, 100.0) // something
-{   
+{
 #if 1
     /*
        d_mapRect is only a reference for zooming, but
@@ -28,50 +28,46 @@ Plot::Plot(QWidget *parent):
 
     /*
       Navigation:
-      
+
       Left Mouse Button: Panning
       Mouse Wheel:       Zooming In/Out
-      Right Mouse Button: Reset to initial 
+      Right Mouse Button: Reset to initial
     */
 
     (void)new QwtPlotPanner(canvas());
     (void)new QwtPlotMagnifier(canvas());
 
-#if QT_VERSION >= 0x040000
-    using namespace Qt;
-#endif
-    canvas()->setFocusPolicy(WheelFocus);
+    canvas()->setFocusPolicy(Qt::WheelFocus);
     rescale();
 }
+
+#ifndef QT_NO_FILEDIALOG
 
 void Plot::loadSVG()
 {
     QString dir;
-#if 0
-    dir = "/dw/svg";
-#endif
-#if QT_VERSION >= 0x040000
     const QString fileName = QFileDialog::getOpenFileName( NULL,
         "Load a Scaleable Vector Graphic (SVG) Map",
         dir, "SVG Files (*.svg)");
-#else
-    const QString fileName = QFileDialog::getOpenFileName( 
-        dir, "SVG Files (*.svg)", NULL, NULL, 
-        "Load a Scaleable Vector Graphic (SVG) Map" );
-#endif
+
     if ( !fileName.isEmpty() )
+        loadSVG(fileName);
+}
+
+#endif
+
+void Plot::loadSVG(const QString &fileName)
+{
+    if ( d_mapItem == NULL )
     {
-        if ( d_mapItem == NULL )
-        {
-            d_mapItem = new QwtPlotSvgItem();
-            d_mapItem->attach(this);
-        }
-
-        d_mapItem->loadFile(d_mapRect, fileName);
-        rescale();
-
-        replot();
+        d_mapItem = new QwtPlotSvgItem();
+        d_mapItem->attach(this);
     }
+
+    d_mapItem->loadFile(d_mapRect, fileName);
+    rescale();
+
+    replot();
 }
 
 void Plot::rescale()

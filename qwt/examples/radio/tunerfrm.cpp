@@ -6,6 +6,11 @@
 #include <qwt_math.h>
 #include "tunerfrm.h"
 
+#if QT_VERSION < 0x040600
+#define qFastSin(x) ::sin(x)
+#define qFastCos(x) ::cos(x)
+#endif
+
 class TuningThermo: public QWidget
 {
 public:
@@ -15,7 +20,7 @@ public:
         d_thermo = new QwtThermo(this);
         d_thermo->setOrientation(Qt::Horizontal, QwtThermo::NoScale);
         d_thermo->setRange(0.0, 1.0);
-        d_thermo->setFillColor(Qt::green);
+        d_thermo->setFillBrush( Qt::green );
 
         QLabel *label = new QLabel("Tuning", this);
         label->setAlignment(Qt::AlignCenter);
@@ -37,38 +42,38 @@ private:
     QwtThermo *d_thermo;
 };
 
-TunerFrame::TunerFrame(QWidget *parent): 
+TunerFrame::TunerFrame(QWidget *parent):
     QFrame(parent)
 {
-    d_sldFreq = new QwtSlider(this, Qt::Horizontal, QwtSlider::TopScale);
-    d_sldFreq->setRange(87.5, 108, 0.01, 10);
-    d_sldFreq->setScaleMaxMinor(5);
-    d_sldFreq->setScaleMaxMajor(12);
-    d_sldFreq->setThumbLength(80);
-    d_sldFreq->setBorderWidth(1);
+    d_sliderFrequency = new QwtSlider(this, Qt::Horizontal, QwtSlider::TopScale);
+    d_sliderFrequency->setRange(87.5, 108, 0.01, 10);
+    d_sliderFrequency->setScaleMaxMinor(5);
+    d_sliderFrequency->setScaleMaxMajor(12);
+    d_sliderFrequency->setHandleSize(80, 20 );
+    d_sliderFrequency->setBorderWidth(1);
 
-    d_thmTune = new TuningThermo(this);
+    d_thermoTune = new TuningThermo(this);
 
-    d_whlFreq = new QwtWheel(this);
-    d_whlFreq->setMass(0.5);
-    d_whlFreq->setRange(87.5, 108, 0.01);
-    d_whlFreq->setTotalAngle(3600.0);
-    d_whlFreq->setFixedHeight(30);
+    d_wheelFrequency = new QwtWheel(this);
+    d_wheelFrequency->setMass(0.5);
+    d_wheelFrequency->setRange(87.5, 108, 0.01);
+    d_wheelFrequency->setTotalAngle(3600.0);
+    d_wheelFrequency->setFixedHeight(30);
 
 
-    connect(d_whlFreq, SIGNAL(valueChanged(double)), SLOT(adjustFreq(double)));
-    connect(d_sldFreq, SIGNAL(valueChanged(double)), SLOT(adjustFreq(double)));
+    connect(d_wheelFrequency, SIGNAL(valueChanged(double)), SLOT(adjustFreq(double)));
+    connect(d_sliderFrequency, SIGNAL(valueChanged(double)), SLOT(adjustFreq(double)));
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setMargin(10);
     mainLayout->setSpacing(5);
-    mainLayout->addWidget(d_sldFreq);
+    mainLayout->addWidget(d_sliderFrequency);
 
     QHBoxLayout *hLayout = new QHBoxLayout;
     hLayout->setMargin(0);
-    hLayout->addWidget(d_thmTune, 0);
+    hLayout->addWidget(d_thermoTune, 0);
     hLayout->addStretch(5);
-    hLayout->addWidget(d_whlFreq, 2);
+    hLayout->addWidget(d_wheelFrequency, 2);
 
     mainLayout->addLayout(hLayout);
 }
@@ -78,19 +83,19 @@ void TunerFrame::adjustFreq(double frq)
     const double factor = 13.0 / (108 - 87.5);
 
     const double x = (frq - 87.5) * factor;
-    const double field = qwtSqr(sin(x) * cos(4.0 * x));
-    
-    d_thmTune->setValue(field);  
+    const double field = qwtSqr(qFastSin(x) * qFastCos(4.0 * x));
 
-    if (d_sldFreq->value() != frq) 
-        d_sldFreq->setValue(frq);
-    if (d_whlFreq->value() != frq) 
-        d_whlFreq->setValue(frq);
+    d_thermoTune->setValue(field);
 
-    emit fieldChanged(field);   
+    if (d_sliderFrequency->value() != frq)
+        d_sliderFrequency->setValue(frq);
+    if (d_wheelFrequency->value() != frq)
+        d_wheelFrequency->setValue(frq);
+
+    Q_EMIT fieldChanged(field);
 }
 
 void TunerFrame::setFreq(double frq)
 {
-    d_whlFreq->setValue(frq);
+    d_wheelFrequency->setValue(frq);
 }

@@ -66,8 +66,6 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
     ltmZoomer = new QwtPlotZoomer(ltmPlot->canvas());
     ltmZoomer->setRubberBand(QwtPicker::RectRubberBand);
     ltmZoomer->setRubberBandPen(QColor(Qt::black));
-    ltmZoomer->setSelectionFlags(QwtPicker::DragSelection
-                                 | QwtPicker::CornerToCorner);
     ltmZoomer->setTrackerMode(QwtPicker::AlwaysOff);
     ltmZoomer->setEnabled(false);
     ltmZoomer->setMousePattern(QwtEventPattern::MouseSelect1,
@@ -78,7 +76,6 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
                                Qt::RightButton);
 
     picker = new LTMToolTip(QwtPlot::xBottom, QwtPlot::yLeft,
-                               QwtPicker::PointSelection,
                                QwtPicker::VLineRubberBand,
                                QwtPicker::AlwaysOn,
                                ltmPlot->canvas(),
@@ -359,7 +356,7 @@ LTMWindow::pointClicked(QwtPlotCurve*curve, int index)
     LTMScaleDraw *lsd = new LTMScaleDraw(settings.start,
                         groupForDate(settings.start.date(), settings.groupBy),
                         settings.groupBy);
-    lsd->dateRange((int)round(curve->x(index)), start, end);
+    lsd->dateRange((int)round(curve->sample(index).x()), start, end);
     ltmPopup->setData(settings, start, end);
     popup->show();
 }

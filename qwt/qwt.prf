@@ -1,34 +1,44 @@
-# -*- mode: sh -*- ################################################
+################################################################
 # Qwt Widget Library
 # Copyright (C) 1997   Josef Wilgen
 # Copyright (C) 2002   Uwe Rathmann
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the Qwt License, Version 1.0
-###################################################################
+################################################################
 
-QwtBuild = dll
-QwtVersion = 5.2.0
+include ( ./qwtconfig.pri )
 
-unix {
-    QwtBase    = /usr/local/qwt-$${QwtVersion}-svn
-    LIBS        += -L$${QwtBase}/lib -lqwt
-}
-win32 {
-    QwtBase    = C:/Qwt-$${QwtVersion}-svn
+contains(QWT_CONFIG, QwtDll) {
 
-    contains(QwtBuild, dll) {
-        DEFINES    += QWT_DLL
-
-        msvc:LIBS  += $${QwtBase}/lib/qwt5.lib
-        msvc.net:LIBS  += $${QwtBase}/lib/qwt5.lib
-        msvc2005:LIBS += $${QwtBase}/lib/qwt5.lib
-    } else {
-        win32-msvc:LIBS  += $${QwtBase}/lib/qwt.lib
-        win32-msvc.net:LIBS  += $${QwtBase}/lib/qwt.lib
-        win32-msvc2005:LIBS += $${QwtBase}/lib/qwt.lib
-    }
-    g++:LIBS   += -L$${QwtBase}/lib -lqwt
+    DEFINES *= QWT_DLL
 }
 
-INCLUDEPATH += $${QwtBase}/include
+contains(QWT_CONFIG, QwtSvg) {
+
+	QT      *= svg
+}
+else {
+
+	DEFINES *= QWT_NO_SVG
+}
+
+contains(QWT_CONFIG, QwtFramework) {
+
+    INCLUDEPATH *= $${QWT_INSTALL_LIBS}/qwt.framework/Headers
+    LIBS        *= -F$${QWT_INSTALL_LIBS}
+}
+else {
+
+    INCLUDEPATH *= $${QWT_INSTALL_HEADERS}
+    LIBS        *= -L$${QWT_INSTALL_LIBS}
+}
+
+INCLUDEPATH_QWT = $${INCLUDEPATH}
+qtAddLibrary(qwt)
+
+# we don't want qtAddLibrary to expand the
+# include path, with directories, that might
+# conflict with other installations of qwt
+
+INCLUDEPATH      = $${INCLUDEPATH_QWT}

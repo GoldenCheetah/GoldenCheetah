@@ -10,7 +10,7 @@ class Slider: public QWidget
 public:
     Slider(QWidget *parent, int sliderType);
 
-private slots:
+private Q_SLOTS:
     void setNum(double v);
 
 private:

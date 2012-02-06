@@ -43,7 +43,6 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
     pfpvZoomer = new QwtPlotZoomer(pfPvPlot->canvas());
     pfpvZoomer->setRubberBand(QwtPicker::RectRubberBand);
     pfpvZoomer->setRubberBandPen(GColor(CPLOTSELECT));
-    pfpvZoomer->setSelectionFlags(QwtPicker::DragSelection | QwtPicker::CornerToCorner);
     pfpvZoomer->setTrackerMode(QwtPicker::AlwaysOff);
     pfpvZoomer->setEnabled(true);
     pfpvZoomer->setMousePattern(QwtEventPattern::MouseSelect1, Qt::LeftButton);

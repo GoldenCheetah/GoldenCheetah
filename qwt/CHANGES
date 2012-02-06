@@ -1,24 +1,125 @@
+Release 6.0.1
+===================
+
+Changes
+-------
+1) Incompatibilities with Qt < 4.6.1 fixed
+2) Reduce warnings with pedantic compiler options
+3) Examples fixed
+4) Legend identifiers of with symbol and line fixed
+
+Release 6.0.0
+===================
+
+Changes
+-------
+1) Qt3 support dropped
+2) QwtPlot layout/render code ported from int to double
+   Exported/printed documents in scalable formats like SVG or PDF
+   are 100% scalable now.
+3) Template base classes introduced for curve and curve data
+   to be reusable in all plot items displaying series of samples.
+4) New plot items
+   - QwtPlotHistogram
+   - QwtPlotIntervalCurve ( error bars or displaying the area between 2 curves )
+   - QwtPlotSpectroCurve ( mapping the z value to a color )
+5) Raster items
+   - QwtMatrixRasterData introduced
+   - More accurate rendering
+   - Several API changes
+   - Thread support for rendering spectrograms
+6) QwtPlot::print moved to QwtPlotRenderer
+7) Other new classes
+   QwtColumnSymbol
+   QwtDoublePoint3D
+   QwtIntervalSymbol
+   QwtPlotDirectPainter
+   QwtSamplingThread
+   QwtSystemClock
+8) QwtPicker and friends reorganized,
+   QwtPickerTrackerMachine added for displaying a rubberband for
+   mouse moves. Enter/Leave added to events, that are handled
+   by the picker machines.
+9) QwtScaleWidget::LayoutFlag added
+   Introduced to control the direction of vertical axis titles.
+10)QwtWeedingCurveFitter added
+   QwtWeedingCurveFitter is an implementation of the Douglas/Peuker
+   algorithm, that can be used to reduce the number of curve points.
+   It can be very useful to improve the performance of painting
+   curves of many lines ( f.e. by implementing different level of details ).
+11)Legend code update for representing different pixmaps for different
+   types of plot items.
+12)Copy operators removed, using pointers instead
+13)QwtPolarPoint from qwtpolar added
+14)QwtThermo
+   Optional QwtColorMaps added
+15)Interfaces and code of all sliders/dials cleaned up.
+   QApplication::globalStrut(), styled backgrounds ...
+
+
+Release 5.2.2
+===================
+
+Bug Fixes
+---------
+1) QwtSplineCurveFitter
+   Rounding to integers values removed
+2) QwtPlot
+   initial size of 200x200
+3) QwtPlotPrintFilter, QwtPlot::print
+   handling of background color in QwtPlot::print
+4) QwtPlotPrintFilter
+   Problem with colored plot titles fixed
+5) QwtPlotItem
+   Crash fixed, when changing the z order of attached items
+6) QwtLinearScaleEngine, QwtLog10ScaleEngine
+   Several minor fixes
+
 Release 5.2.1
 ===================
 
 Bug Fixes
 ---------
-1) QwtScaleDraw
+1) Export declarations removed from qwt_valuelist.h to avoid
+   compiler errors with Qt 4.6 + certain compilers on Windows.
+2) QwtScaleDraw
    Wrong border dist hints for unregular scale divisions fixed
+   Layout calculation for the tick labels fixed.
+   The layout was wrong by 1 pixel for top/left/bottom axes.
+   On a left axis without a title the labels were sometimes cut off.
+3) QwtPainter
+   Splits polylines for all pens to avoid a bottleneck of the
+   raster paint engine.
+4) QwtScaleWidget
+   Calculation of the colorbar position fixed ( spacing/margin )
+5) QwtPlotCurve
+   Wrong clipping rect fixed
+6) QwtPicker
+   QwtPicker::setTrackerFont() fixed.
+   Recursion on the Mac, when constructing the rubberband fixed.
+   Workaround for a Qt3 bug added that is responsible for left aligning
+   all tracker texts to the canvas.
+
+Changes
+-------
+1) Project files adopted for symbian
+2) qwt.pro
+   CONFIG += ordered added for using make -j
+   CONFIG += silent added
 
 Release 5.2.0
 ===================
 
 Changes
 -------
-1) Ported to Qt 4.5.x 
+1) Ported to Qt 4.5.x
 2) Scaling of non cosmetic pens (for printing to devices in high resolution)
-3) Clipping of polygons for SVG rendering 
+3) Clipping of polygons for SVG rendering
 4) QwtRect removed
    use QwtClipper instead
 5) QwtPlotRescaler 
    Introduced
-6) QwtDoubleInterval 
+6) QwtDoubleInterval
    BorderMode introduced
 7) QwtPlotCurve
    Performance of incremental curve painting ( = draw(from, to) ) improved.
@@ -38,7 +139,7 @@ Changes
    counter clockwise scales introduced
 15)QwtPlotMarker
    Vertical text labels
-16)doc/qwt-5.2.0.qch added foe browsing the Qwt docs in the Qt assistant 
+16)doc/qwt-5.2.0.qch added foe browsing the Qwt docs in the Qt assistant
 
 Bug Fixes
 ---------

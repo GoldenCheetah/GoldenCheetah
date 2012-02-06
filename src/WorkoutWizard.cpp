@@ -20,6 +20,7 @@
 
 #include "qwt_plot.h"
 #include "qwt_plot_curve.h"
+#include "qwt_compat.h"
 #include <limits>
 
 
@@ -50,9 +51,9 @@ public:
     {
         setAxisTitle(QwtPlot::xBottom,title);
     }
-    void setData(QwtData &data)
+    void setData(QVector<double> &xData, QVector<double> &yData)
     {
-        workoutCurve->setData(data);
+        workoutCurve->setData(xData, yData);
     }
 };
 
@@ -324,10 +325,9 @@ void AbsWattagePage::updateMetrics()
 
     }
     // replot workoutplot
-    QwtArrayData d(x,y);
     plot->setAxisAutoScale(QwtPlot::yLeft);
     plot->setAxisAutoScale(QwtPlot::xBottom);
-    plot->setData(d);
+    plot->setData(x,y);
     plot->replot();
 
     // calculate bike score, xpower
@@ -451,10 +451,9 @@ void RelWattagePage::updateMetrics()
     }
 
     // replot workoutplot
-    QwtArrayData d(x,y);
     plot->setAxisAutoScale(QwtPlot::yLeft);
     plot->setAxisAutoScale(QwtPlot::xBottom);
-    plot->setData(d);
+    plot->setData(x,y);;
     plot->replot();
 
     // calculate bike score, xpower
@@ -709,8 +708,7 @@ void ImportPage::updatePlot()
     metrics["Distance"] = QString::number(totalDistance,'f',1);
     metricsSummary->updateMetrics(metrics);
 
-    QwtArrayData profileData(x,y);
-    plot->setData(profileData);
+    plot->setData(x,y);
     plot->replot();
 
     update();

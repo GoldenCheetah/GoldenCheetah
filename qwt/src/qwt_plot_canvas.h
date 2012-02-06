@@ -2,26 +2,26 @@
  * Qwt Widget Library
  * Copyright (C) 1997   Josef Wilgen
  * Copyright (C) 2002   Uwe Rathmann
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the Qwt License, Version 1.0
  *****************************************************************************/
 
-// vim: expandtab
-
 #ifndef QWT_PLOT_CANVAS_H
 #define QWT_PLOT_CANVAS_H
 
+#include "qwt_global.h"
 #include <qframe.h>
 #include <qpen.h>
-#include "qwt_global.h"
+#include <qpainterpath.h>
+#include <qbitmap.h>
 
 class QwtPlot;
 class QPixmap;
 
 /*!
-  \brief Canvas of a QwtPlot. 
-  \sa QwtPlot 
+  \brief Canvas of a QwtPlot.
+  \sa QwtPlot
 */
 class QWT_EXPORT QwtPlotCanvas : public QFrame
 {
@@ -31,30 +31,71 @@ public:
 
     /*!
       \brief Paint attributes
- 
-      - PaintCached\n
-        Paint double buffered and reuse the content of the pixmap buffer 
-        for some spontaneous repaints that happen when a plot gets unhidden, 
-        deiconified or changes the focus.
-        Disabling the cache will improve the performance for
-        incremental paints (using QwtPlotCurve::draw). 
 
-      - PaintPacked\n
-        Suppress system background repaints and paint it together with 
-        the canvas contents.
-        Painting packed might avoid flickering for expensive repaints,
-        when there is a notable gap between painting the background
-        and the plot contents.
+      The default setting enables BackingStore and Opaque.
 
-      The default setting enables PaintCached and PaintPacked
-
-      \sa setPaintAttribute(), testPaintAttribute(), paintCache()
+      \sa setPaintAttribute(), testPaintAttribute()
      */
     enum PaintAttribute
     {
-        PaintCached = 1,
-        PaintPacked = 2
+        /*!
+          \brief Paint double buffered reusing the content
+                 of the pixmap buffer when possible.
+
+          Using a backing store might improve the performance
+          significantly, when workin with widget overlays ( like rubberbands ).
+          Disabling the cache might improve the performance for
+          incremental paints (using QwtPlotDirectPainter ).
+
+          \sa backingStore(), invalidateBackingStore()
+         */
+        BackingStore = 1,
+
+        /*!
+          \brief Try to fill the complete contents rectangle
+                 of the plot canvas
+
+          When using styled backgrounds Qt assumes, that the
+          canvas doesn't fill its area completely
+          ( f.e because of rounded borders ) and fills the area
+          below the canvas. When this is done with gradients it might
+          result in a serious performance bottleneck - depending on the size.
+
+          When the Opaque attribute is enabled the canvas tries to
+          identify the gaps with some heuristics and to fill those only.
+
+          \warning Will not work for semitransparent backgrounds
+         */
+        Opaque       = 2,
+
+        /*!
+          \brief Try to improve painting of styled backgrounds
+
+          QwtPlotCanvas supports the box model attributes for
+          customizing the layout with style sheets. Unfortunately
+          the design of Qt style sheets has no concept how to
+          handle backgrounds with rounded corners - beside of padding.
+
+          When HackStyledBackground is enabled the plot canvas tries
+          to seperate the background from the background border
+          by reverse engeneering to paint the background before and
+          the border after the plot items. In this order the border
+          gets prefectly antialiased and you can avoid some pixel
+          artifacts in the corners.
+         */
+        HackStyledBackground = 4,
+
+        /*!
+          When ImmediatePaint is set replot() calls repaint()
+          instead of update().
+
+          \sa replot(), QWidget::repaint(), QWidget::update()
+         */
+        ImmediatePaint = 8
     };
+
+    //! Paint attributes
+    typedef QFlags<PaintAttribute> PaintAttributes;
 
     /*!
       \brief Focus indicator
@@ -81,39 +122,47 @@ public:
         ItemFocusIndicator
     };
 
-    explicit QwtPlotCanvas(QwtPlot *);
+    explicit QwtPlotCanvas( QwtPlot * );
     virtual ~QwtPlotCanvas();
 
     QwtPlot *plot();
     const QwtPlot *plot() const;
 
-    void setFocusIndicator(FocusIndicator);
+    void setFocusIndicator( FocusIndicator );
     FocusIndicator focusIndicator() const;
 
-    void setPaintAttribute(PaintAttribute, bool on = true);
-    bool testPaintAttribute(PaintAttribute) const;
+    void setBorderRadius( double );
+    double borderRadius() const;
 
-    QPixmap *paintCache();
-    const QPixmap *paintCache() const;
-    void invalidatePaintCache();
+    QPainterPath borderPath( const QRect &rect ) const;
+    QBitmap borderMask( const QSize & ) const;
+
+    void setPaintAttribute( PaintAttribute, bool on = true );
+    bool testPaintAttribute( PaintAttribute ) const;
+
+    const QPixmap *backingStore() const;
+    void invalidateBackingStore();
 
     void replot();
 
+    virtual bool event( QEvent * );
+
 protected:
-    virtual void hideEvent(QHideEvent *);
+    virtual void paintEvent( QPaintEvent * );
+    virtual void resizeEvent( QResizeEvent * );
 
-    virtual void paintEvent(QPaintEvent *);
+    virtual void drawFocusIndicator( QPainter * );
+    virtual void drawBorder( QPainter * );
 
-    virtual void drawContents(QPainter *);
-    virtual void drawFocusIndicator(QPainter *);
+    void updateStyleSheetInfo();
 
-    void drawCanvas(QPainter *painter = NULL);
-
-private:    
-    void setSystemBackground(bool);
+private:
+    void drawCanvas( QPainter *, bool withBackground );
 
     class PrivateData;
     PrivateData *d_data;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS( QwtPlotCanvas::PaintAttributes )
 
 #endif

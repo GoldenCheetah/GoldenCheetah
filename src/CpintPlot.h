@@ -25,6 +25,8 @@
 #include <qwt_plot.h>
 #include <qwt_plot_zoomer.h>
 #include <qwt_plot_marker.h>
+#include <qwt_point_3d.h>
+#include <qwt_compat.h>
 #include <QtGui>
 
 class QwtPlotCurve;
@@ -47,7 +49,7 @@ class penTooltip: public QwtPlotZoomer
                  setTrackerMode(AlwaysOn);
          }
 
-    virtual QwtText trackerText(const QwtDoublePoint &/*pos*/) const
+    virtual QwtText trackerText(const QPoint &/*pos*/) const
     {
         QColor bg = QColor(255,255, 170); // toolyip yellow
 #if QT_VERSION >= 0x040300

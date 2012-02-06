@@ -93,7 +93,7 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_picker.h>
 #include <qwt_plot_grid.h>
-#include <qwt_data.h>
+#include <qwt_series_data.h>
 #include <boost/scoped_ptr.hpp>
 
 #ifndef GC_VERSION

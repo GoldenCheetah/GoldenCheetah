@@ -21,6 +21,7 @@
 #include "GoldenCheetah.h"
 
 #include <QtGui>
+#include <qwt_series_data.h>
 #include <qwt_plot.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_curve.h>
@@ -28,12 +29,12 @@
 #include <qwt_scale_draw.h>
 #include <qwt_scale_div.h>
 #include <qwt_scale_widget.h>
-#include <qwt_data.h>
 #include "Settings.h"
+
 
 #define MAXSAMPLES 300
 
-class Realtime30PwrData : public QwtData
+class Realtime30PwrData : public QwtSeriesData<QPointF>
 {
     int pwrCur_; 
     int &pwrCur;
@@ -43,17 +44,19 @@ class Realtime30PwrData : public QwtData
 
     public:
     Realtime30PwrData() : pwrCur(pwrCur_), pwrData(pwrData_) { init(); }
-    Realtime30PwrData(Realtime30PwrData *other) : pwrCur(other->pwrCur_), pwrData(other->pwrData_) { init(); }
 
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
-    virtual QwtData *copy() const ;
+    //virtual QwtSeriesData *copy() const ;
     void init() ;
     void addData(double v) ;
+
+    virtual QPointF sample(size_t i) const;
+    virtual QRectF boundingRect() const;
 };
 
-class RealtimePwrData : public QwtData
+class RealtimePwrData : public QwtSeriesData<QPointF>
 {
     int pwrCur_;
     int &pwrCur;
@@ -61,18 +64,20 @@ class RealtimePwrData : public QwtData
     double (&pwrData)[MAXSAMPLES];
 
     public:
-    RealtimePwrData() : pwrCur(pwrCur_), pwrData(pwrData_) {}
-    RealtimePwrData(RealtimePwrData *other) : pwrCur(other->pwrCur_), pwrData(other->pwrData_) {}
+    RealtimePwrData() : pwrCur(pwrCur_), pwrData(pwrData_) { init(); }
 
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
-    virtual QwtData *copy() const ;
+    //virtual QwtSeriesData *copy() const ;
     void init() ;
     void addData(double v) ;
+
+    virtual QPointF sample(size_t i) const;
+    virtual QRectF boundingRect() const;
 };
 
-class RealtimeLodData : public QwtData
+class RealtimeLodData : public QwtSeriesData<QPointF>
 {
     int lodCur_;
     int &lodCur;
@@ -80,19 +85,21 @@ class RealtimeLodData : public QwtData
     double (&lodData)[MAXSAMPLES];
 
     public:
-    RealtimeLodData() : lodCur(lodCur_), lodData(lodData_) {}
-    RealtimeLodData(RealtimeLodData *other) : lodCur(other->lodCur_), lodData(other->lodData_) {}
+    RealtimeLodData() : lodCur(lodCur_), lodData(lodData_) { init(); }
 
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
-    virtual QwtData *copy() const ;
+    //virtual QwtSeriesData *copy() const ;
     void init() ;
     void addData(double v) ;
+
+    virtual QPointF sample(size_t i) const;
+    virtual QRectF boundingRect() const;
 };
 
 // tedious virtual data interface for QWT
-class RealtimeCadData : public QwtData
+class RealtimeCadData : public QwtSeriesData<QPointF>
 {
     int cadCur_;
     int &cadCur;
@@ -100,19 +107,21 @@ class RealtimeCadData : public QwtData
     double (&cadData)[MAXSAMPLES];
 
     public:
-    RealtimeCadData() : cadCur(cadCur_), cadData(cadData_) {}
-    RealtimeCadData(RealtimeCadData *other) : cadCur(other->cadCur_), cadData(other->cadData_) {}
+    RealtimeCadData() : cadCur(cadCur_), cadData(cadData_) { init(); }
 
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
-    virtual QwtData *copy() const ;
+    //virtual QwtSeriesData *copy() const ;
     void init() ;
     void addData(double v) ;
+
+    virtual QPointF sample(size_t i) const;
+    virtual QRectF boundingRect() const;
 };
 
 // tedious virtual data interface for QWT
-class RealtimeSpdData : public QwtData
+class RealtimeSpdData : public QwtSeriesData<QPointF>
 {
     int spdCur_;
     int &spdCur;
@@ -120,19 +129,21 @@ class RealtimeSpdData : public QwtData
     double (&spdData)[MAXSAMPLES];
 
     public:
-    RealtimeSpdData() : spdCur(spdCur_), spdData(spdData_) {}
-    RealtimeSpdData(RealtimeSpdData *other) : spdCur(other->spdCur_), spdData(other->spdData_) {}
+    RealtimeSpdData() : spdCur(spdCur_), spdData(spdData_) { init(); }
 
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
-    virtual QwtData *copy() const ;
+    //virtual QwtSeriesData *copy() const ;
     void init() ;
     void addData(double v) ;
+
+    virtual QPointF sample(size_t i) const;
+    virtual QRectF boundingRect() const;
 };
 
 // tedious virtual data interface for QWT
-class RealtimeHrData : public QwtData
+class RealtimeHrData : public QwtSeriesData<QPointF>
 {
     int hrCur_;
     int &hrCur;
@@ -140,15 +151,17 @@ class RealtimeHrData : public QwtData
     double (&hrData)[MAXSAMPLES];
 
     public:
-    RealtimeHrData() : hrCur(hrCur_), hrData(hrData_) {}
-    RealtimeHrData(RealtimeHrData *other) : hrCur(other->hrCur_), hrData(other->hrData_) {}
+    RealtimeHrData() : hrCur(hrCur_), hrData(hrData_) { init(); }
 
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
-    virtual QwtData *copy() const ;
+    //virtual QwtSeriesData *copy() const ;
     void init() ;
     void addData(double v) ;
+
+    virtual QPointF sample(size_t i) const;
+    virtual QRectF boundingRect() const;
 };
 
 class RealtimePlot : public QwtPlot
@@ -181,12 +194,13 @@ class RealtimePlot : public QwtPlot
 
     public:
     void setAxisTitle(int axis, QString label);
-    Realtime30PwrData pwr30Data;
-    RealtimePwrData pwrData;
-    RealtimePwrData altPwrData;
-    RealtimeSpdData spdData;
-    RealtimeHrData hrData;
-    RealtimeCadData cadData;
+
+    Realtime30PwrData *pwr30Data;
+    RealtimePwrData *pwrData;
+    RealtimePwrData *altPwrData;
+    RealtimeSpdData *spdData;
+    RealtimeHrData *hrData;
+    RealtimeCadData *cadData;
     //RealtimeLodData lodData;
 
     RealtimePlot();

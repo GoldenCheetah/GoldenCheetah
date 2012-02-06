@@ -13,7 +13,7 @@ class CockpitGrid: public QFrame
 public:
     CockpitGrid(QWidget *parent = NULL);
 
-private slots:
+private Q_SLOTS:
     void changeSpeed();
     void changeGradient();
     void changeAngle();

@@ -1,9 +1,6 @@
 #include "plot.h"
 #include "colorbar.h"
 #include <qevent.h>
-#if QT_VERSION < 0x040000
-#include <qwhatsthis.h>
-#endif
 #include <qwt_plot_layout.h>
 #include <qwt_plot_canvas.h>
 #include <qwt_plot_grid.h>
@@ -33,8 +30,7 @@ Plot::Plot(QWidget *parent):
     // appear/disappear when scrolling vertically
 
     QwtScaleDraw *sd = axisScaleDraw(QwtPlot::yLeft);
-    sd->setMinimumExtent( sd->extent(QPen(), 
-        axisWidget(QwtPlot::yLeft)->font()));
+    sd->setMinimumExtent( sd->extent(axisWidget(QwtPlot::yLeft)->font()));
 
     plotLayout()->setAlignCanvasToScales(true);
 
@@ -53,17 +49,13 @@ Plot::Plot(QWidget *parent):
     scaleWidget->setMargin(10); // area for the color bar
     d_colorBar = new ColorBar(Qt::Vertical, scaleWidget);
     d_colorBar->setRange(Qt::red, Qt::darkBlue);
-#if QT_VERSION >= 0x040000
-    d_colorBar->setFocusPolicy( Qt::TabFocus  );
-#else
-    d_colorBar->setFocusPolicy( QWidget::TabFocus  );
-#endif
+    d_colorBar->setFocusPolicy(Qt::TabFocus);
 
     connect(d_colorBar, SIGNAL(selected(const QColor &)),
         SLOT(setCanvasColor(const QColor &)));
 
     // we need the resize events, to lay out the color bar
-    scaleWidget->installEventFilter(this); 
+    scaleWidget->installEventFilter(this);
 
     // ------------------------------------
     // We add a wheel to the canvas
@@ -82,16 +74,6 @@ Plot::Plot(QWidget *parent):
     // we need the resize events, to lay out the wheel
     canvas()->installEventFilter(this);
 
-#if QT_VERSION < 0x040000
-    QWhatsThis::add(d_colorBar, 
-        "Selecting a color will change the background of the plot.");
-    QWhatsThis::add(scaleWidget, 
-        "Selecting a value at the scale will insert a new curve.");
-    QWhatsThis::add(d_wheel, 
-        "With the wheel you can move the visible area.");
-    QWhatsThis::add(axisWidget(xBottom), 
-        "Selecting a value at the scale will insert a new curve.");
-#else
     d_colorBar->setWhatsThis(
         "Selecting a color will change the background of the plot.");
     scaleWidget->setWhatsThis(
@@ -100,8 +82,6 @@ Plot::Plot(QWidget *parent):
         "With the wheel you can move the visible area.");
     axisWidget(xBottom)->setWhatsThis(
         "Selecting a value at the scale will insert a new curve.");
-#endif
-
 }
 
 void Plot::setCanvasColor(const QColor &c)
@@ -158,7 +138,7 @@ void Plot::insertCurve(int axis, double base)
         o = Qt::Horizontal;
     else
         o = Qt::Vertical;
-    
+
     QRgb rgb = (uint)rand();
     insertCurve(o, QColor(rgb), base);
     replot();
@@ -170,7 +150,7 @@ void Plot::insertCurve(Qt::Orientation o,
     QwtPlotCurve *curve = new QwtPlotCurve();
 
     curve->setPen(c);
-    curve->setSymbol(QwtSymbol(QwtSymbol::Ellipse,
+    curve->setSymbol(new QwtSymbol(QwtSymbol::Ellipse,
         Qt::gray, c, QSize(8, 8)));
 
     double x[10];
@@ -190,7 +170,7 @@ void Plot::insertCurve(Qt::Orientation o,
             y[i] = v;
         }
     }
-        
-    curve->setData(x, y, sizeof(x) / sizeof(x[0]));
+
+    curve->setSamples(x, y, sizeof(x) / sizeof(x[0]));
     curve->attach(this);
 }

@@ -5,7 +5,7 @@
 
 class QwtPlotCurve;
 
-class CpuPlot : public QwtPlot 
+class CpuPlot : public QwtPlot
 {
     Q_OBJECT
 public:
@@ -26,7 +26,7 @@ public:
 protected:
     void timerEvent(QTimerEvent *e);
 
-private slots:
+private Q_SLOTS:
     void showCurve(QwtPlotItem *, bool on);
 
 private:
