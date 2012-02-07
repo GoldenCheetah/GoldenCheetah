@@ -17,21 +17,31 @@
  */
 #include "RunningAverage.h"
 
-RunningAverage::RunningAverage(int size): _size(size), _values(size, 0.0), _sum(0.0), _index(0) {}
+RunningAverage::RunningAverage() {}
 
 double RunningAverage::average() const {
-    return _sum / _size;
+    if (_values.count() == 0)
+        return 0.0;
+    double sum = 0.0;
+    QListIterator<Item> it(_values);
+    while(it.hasNext())
+        sum += it.next().value;
+
+    return sum / _values.count();
 }
 
 void RunningAverage::add(double value) {
-    _sum -= _values[_index];
-    _values[_index] = value;
-    _sum += value;
-    _index = (_index + 1) % _size;
+    QTime now = QTime::currentTime();
+    QTime oneSecondAgo = now.addSecs(-1);
+    QMutableListIterator<Item> it(_values);
+    while(it.hasNext() && it.next().time < oneSecondAgo)
+        it.remove();
+
+    Item newItem(now, value);
+    _values.append(Item(now, value));
 }
 
 void RunningAverage::reset() {
-    _sum = 0.0;
-    _values.fill(0.0);
+    _values.clear();
 }
 

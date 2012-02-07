@@ -18,7 +18,8 @@
 #ifndef RUNNINGGAVERAGE_H
 #define RUNNINGAVERAGE_H
 
-#include <QVector>
+#include <QList>
+#include <QTime>
 
 /*!
  * Simple Running Average class. Takes the average of a given number of
@@ -30,7 +31,7 @@ public:
       * Creates a new running average wich takes the average of the last
       * \a size values.
       */
-    RunningAverage(int size);
+    RunningAverage();
 
     /*!
       * Get the current value of the Running Average
@@ -48,10 +49,13 @@ public:
     void reset();
 
 private:
-    const int _size;
-    QVector<double> _values;
-    double _sum;
-    int _index;
+    struct Item {
+        Item(QTime time, double value): time(time), value(value) {}
+        QTime time;
+        double value;
+    };
+
+    QList<Item> _values;
 };
 
 #endif // RUNNINGAVERAGE_H

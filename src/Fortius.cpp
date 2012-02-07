@@ -61,7 +61,6 @@ Fortius::Fortius(OperationMode mode, double startLoad, double startGradient,
 				 QObject *parent) : QObject(parent),
     _readTimer(new QTimer(this)),
 	mode(mode), load(startLoad), gradient(startGradient),
-    power(16), heartRate(16), cadence(16), speed(16),
     usb2(new LibUsb(TYPE_FORTIUS))
 {
     connect(_readTimer, SIGNAL(timeout()), SLOT(performRead()));
