@@ -450,7 +450,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                         parent->setCadence(antMessage.instantCadence); // cadence
                     } else {
                        stdNullCount++;
-                       if (stdNullCount >= 2) { //XXX 2 for standard power?
+                       if (stdNullCount >= 6) { //XXX 6 for standard power?
                            parent->setCadence(0);
                            is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
                            value2 = value = 0;
