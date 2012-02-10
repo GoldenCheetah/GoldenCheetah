@@ -115,6 +115,10 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     showTemp->setCheckState(Qt::Checked);
     cl->addWidget(showTemp);
 
+    showWind = new QCheckBox(tr("Headwind"), this);
+    showWind->setCheckState(Qt::Checked);
+    cl->addWidget(showWind);
+
     showPower = new QComboBox();
     showPower->addItem(tr("Power + shade"));
     showPower->addItem(tr("Power - shade"));
@@ -333,6 +337,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     connect(showCad, SIGNAL(stateChanged(int)), this, SLOT(setShowCad(int)));
     connect(showAlt, SIGNAL(stateChanged(int)), this, SLOT(setShowAlt(int)));
     connect(showTemp, SIGNAL(stateChanged(int)), this, SLOT(setShowTemp(int)));
+    connect(showWind, SIGNAL(stateChanged(int)), this, SLOT(setShowWind(int)));
     connect(showGrid, SIGNAL(stateChanged(int)), this, SLOT(setShowGrid(int)));
     connect(showFull, SIGNAL(stateChanged(int)), this, SLOT(setShowFull(int)));
     connect(showStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
@@ -691,7 +696,8 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
 	    showSpeed->setEnabled(dataPresent->kph);
 	    showCad->setEnabled(dataPresent->cad);
 	    showAlt->setEnabled(dataPresent->alt);
-            showTemp->setEnabled(dataPresent->temp);
+        showTemp->setEnabled(dataPresent->temp);
+        showWind->setEnabled(dataPresent->headwind);
 
     } else {
         showPower->setEnabled(false);
@@ -700,6 +706,7 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
         showCad->setEnabled(false);
         showAlt->setEnabled(false);
         showTemp->setEnabled(false);
+        showWind->setEnabled(false);
     }
 
     // turn on/off shading, if it's not available
@@ -1134,6 +1141,18 @@ AllPlotWindow::setShowTemp(int value)
     allPlot->showTemp(value);
     foreach (AllPlot *plot, allPlots)
         plot->showTemp(value);
+}
+
+void
+AllPlotWindow::setShowWind(int value)
+{
+    showWind->setChecked(value);
+
+    //if (!current) return;
+
+    allPlot->showWind(value);
+    foreach (AllPlot *plot, allPlots)
+        plot->showWind(value);
 }
 
 void

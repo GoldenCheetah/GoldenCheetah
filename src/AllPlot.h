@@ -25,6 +25,7 @@
 #include <QtGui>
 
 class QwtPlotCurve;
+class QwtPlotIntervalCurve;
 class QwtPlotGrid;
 class QwtPlotMarker;
 class RideItem;
@@ -75,6 +76,7 @@ class AllPlot : public QwtPlot
         void showCad(int state);
         void showAlt(int state);
         void showTemp(int state);
+        void showWind(int state);
         void showGrid(int state);
         void setPaintBrush(int state);
         void setShadeZones(bool x) { shade_zones=x; }
@@ -107,6 +109,7 @@ class AllPlot : public QwtPlot
         int showCadState;
         int showAltState;
         int showTempState;
+        int showWindState;
 
         // plot objects
         QwtPlotGrid *grid;
@@ -119,6 +122,7 @@ class AllPlot : public QwtPlot
         QwtPlotCurve *cadCurve;
         QwtPlotCurve *altCurve;
         QwtPlotCurve *tempCurve;
+        QwtPlotIntervalCurve *windCurve;
         QwtPlotCurve *intervalHighlighterCurve;  // highlight selected intervals on the Plot
         QList <AllPlotZoneLabel *> zoneLabels;
 
@@ -131,6 +135,7 @@ class AllPlot : public QwtPlot
         QVector<double> distanceArray;
         QVector<double> altArray;
         QVector<double> tempArray;
+        QVector<double> windArray;
 
         // smoothed data
         QVector<double> smoothWatts;
@@ -141,6 +146,8 @@ class AllPlot : public QwtPlot
         QVector<double> smoothDistance;
         QVector<double> smoothAltitude;
         QVector<double> smoothTemp;
+        QVector<double> smoothWind;
+        QVector<QwtIntervalSample> smoothRelSpeed;
 
         // array / smooth state
         int arrayLength;
