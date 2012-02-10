@@ -425,9 +425,9 @@ struct BinFileReaderState
                         nm = value;
                         break;
                     case FORMAT_ID__SPEED :
-                        value = value*3.6/100.0;
-                        if (value < 145) // Limit for data error
-                            kph = value;
+                        kph = value*3.6/100.0;
+                        if (kph > 145) // Limit for data error
+                            kph = 0;
                         break;
                     case FORMAT_ID__CADENCE :
                         if (value < 255) // Limit for data error
