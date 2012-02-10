@@ -105,6 +105,7 @@ class AllPlotWindow : public GcWindow
         void setShowCad(int state);
         void setShowAlt(int state);
         void setShowTemp(int state);
+        void setShowWind(int state);
         void setShowGrid(int state);
         void setPaintBrush(int state);
         void setShowFull(int state);
@@ -162,6 +163,7 @@ class AllPlotWindow : public GcWindow
         QCheckBox *showCad;
         QCheckBox *showAlt;
         QCheckBox *showTemp;
+        QCheckBox *showWind;
         QComboBox *showPower;
         QComboBox *comboDistance;
         QSlider *smoothSlider;
