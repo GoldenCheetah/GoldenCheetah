@@ -266,11 +266,10 @@ DownloadRideDialog::downloadClicked()
     QList<DeviceDownloadFile> files;
 
     DevicesPtr devtype = Devices::getType(deviceCombo->currentText());
-    DevicePtr device = devtype->newDevice( dev );
+    DevicePtr device = devtype->newDevice( dev,
+        boost::bind(&DownloadRideDialog::updateStatus, this, _1) );
 
-    if( ! device->preview(
-        boost::bind(&DownloadRideDialog::updateStatus, this, _1),
-        err ) ){
+    if( ! device->preview( err ) ){
 
         QMessageBox::information(this, tr("Preview failed"), err);
         updateAction( actionIdle );
@@ -287,7 +286,6 @@ DownloadRideDialog::downloadClicked()
 
     if (!device->download( home, files,
             boost::bind(&DownloadRideDialog::isCancelled, this),
-            boost::bind(&DownloadRideDialog::updateStatus, this, _1),
             boost::bind(&DownloadRideDialog::updateProgress, this, _1),
             err))
     {
@@ -398,7 +396,8 @@ DownloadRideDialog::eraseClicked()
     }
     assert(dev);
     DevicesPtr devtype = Devices::getType(deviceCombo->currentText());
-    DevicePtr device = devtype->newDevice( dev );
+    DevicePtr device = devtype->newDevice( dev,
+            boost::bind(&DownloadRideDialog::updateStatus, this, _1) );
 
     QString err;
     if( device->cleanup( err) )

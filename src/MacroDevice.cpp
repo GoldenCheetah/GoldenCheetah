@@ -51,9 +51,9 @@ MacroDevices::downloadInstructions() const
 }
 
 DevicePtr
-MacroDevices::newDevice( CommPortPtr dev )
+MacroDevices::newDevice( CommPortPtr dev, Device::StatusCallback cb )
 {
-    return DevicePtr( new MacroDevice( dev ));
+    return DevicePtr( new MacroDevice( dev, cb ));
 }
 
 static QString
@@ -94,7 +94,6 @@ bool
 MacroDevice::download( const QDir &tmpdir,
                          QList<DeviceDownloadFile> &files,
                          CancelCallback cancelCallback,
-                         StatusCallback statusCallback,
                          ProgressCallback progressCallback,
                          QString &err)
 {

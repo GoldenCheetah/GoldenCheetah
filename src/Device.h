@@ -44,20 +44,21 @@ typedef boost::shared_ptr<Device> DevicePtr;
 
 struct Device
 {
-    Device( CommPortPtr dev ) : dev( dev ) {};
-    virtual ~Device();
-
     typedef boost::function<bool (void)> CancelCallback;
     typedef boost::function<void (const QString &statusText)> StatusCallback;
     typedef boost::function<void (const QString &progressText)> ProgressCallback;
 
-    virtual bool preview( StatusCallback statusCallback, QString &err );
+    Device( CommPortPtr dev, StatusCallback cb )
+        : dev( dev ), statusCallback( cb )
+        {};
+    virtual ~Device();
+
+    virtual bool preview( QString &err );
     virtual QList<DeviceRideItemPtr> &rides();
 
     virtual bool download( const QDir &tmpdir,
                           QList<DeviceDownloadFile> &files,
                           CancelCallback cancelCallback,
-                          StatusCallback statusCallback,
                           ProgressCallback progressCallback,
                           QString &err) = 0;
 
@@ -66,7 +67,7 @@ struct Device
 protected:
     QList<DeviceRideItemPtr> rideList;
     CommPortPtr dev;
-
+    StatusCallback statusCallback;
 };
 
 struct Devices;
@@ -74,7 +75,7 @@ typedef boost::shared_ptr<Devices> DevicesPtr;
 
 struct Devices
 {
-    virtual DevicePtr newDevice( CommPortPtr ) = 0;
+    virtual DevicePtr newDevice( CommPortPtr, Device::StatusCallback ) = 0;
 
     // port *might* be supported by this device type implementation:
     virtual bool supportsPort( CommPortPtr dev ) { (void)dev; return true; };

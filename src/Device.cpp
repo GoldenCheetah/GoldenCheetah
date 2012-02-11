@@ -39,7 +39,7 @@ Device::~Device()
 }
 
 bool
-Device::preview( StatusCallback statusCallback, QString &err )
+Device::preview( QString &err )
 {
     (void) statusCallback;
     (void) err;
