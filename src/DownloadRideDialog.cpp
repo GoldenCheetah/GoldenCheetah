@@ -269,6 +269,7 @@ DownloadRideDialog::downloadClicked()
     DevicePtr device = devtype->newDevice( dev,
         boost::bind(&DownloadRideDialog::updateStatus, this, _1) );
 
+    updateStatus("getting summary ...");
     if( ! device->preview( err ) ){
 
         QMessageBox::information(this, tr("Preview failed"), err);
@@ -284,6 +285,7 @@ DownloadRideDialog::downloadClicked()
         }
     }
 
+    updateStatus("getting data ...");
     if (!device->download( home, files,
             boost::bind(&DownloadRideDialog::isCancelled, this),
             boost::bind(&DownloadRideDialog::updateProgress, this, _1),
