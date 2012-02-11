@@ -282,8 +282,9 @@ SrmDevice::preview( QString &err )
         if( block.start )
             ride->startTime.setTime_t( 0.1 * block.start );
         if( block.end )
-            ride->startTime.setTime_t( 0.1 * block.end );
+            ride->endTime.setTime_t( 0.1 * block.end );
         ride->work = block.total;
+        ride->wanted = false;
         rideList.append( ride );
 
         if( block.athlete )
