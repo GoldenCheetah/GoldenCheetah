@@ -105,6 +105,9 @@ bool
 SrmDevice::open( QString &err )
 {
     srmio_error_t serr;
+    unsigned firmware;
+    srmio_io_baudrate_t baudrateId;
+    unsigned baudrate;
 
     if( dev->type() == "Serial" ){
 
@@ -153,11 +156,13 @@ SrmDevice::open( QString &err )
 
     switch( protoVersion ){
       case 5:
+        statusCallback( tr("opening PCV at %1").arg(dev->name()) );
         pc = srmio_pc5_new( &serr );
         break;
 
       case 6:
       case 7:
+        statusCallback( tr("opening PC6/7 at %1").arg(dev->name()) );
         pc = srmio_pc7_new( &serr );
         break;
 
@@ -190,6 +195,27 @@ SrmDevice::open( QString &err )
             .arg(serr.message);
         goto fail;
     }
+
+    if( ! srmio_pc_get_version( pc, &firmware, &serr ) ){
+        err = tr("failed to get firmware version: %1")
+            .arg(serr.message);
+        goto fail;
+    }
+
+    if( ! srmio_pc_get_baudrate( pc, &baudrateId, &serr ) ){
+        err = tr("failed to get baud rate: %1")
+            .arg(serr.message);
+        goto fail;
+    }
+
+    if( ! srmio_io_baud2name( baudrateId, &baudrate ) ){
+        err = tr("failed to get baud rate name: %1")
+            .arg(serr.message);
+    }
+
+    statusCallback(tr("found Powercontrol version 0x%1 using %2 baud")
+        .arg(firmware, 4, 16 )
+        .arg(baudrate));
 
     is_open = true;
     return true;
@@ -234,7 +260,6 @@ SrmDevice::preview( QString &err )
     struct _srmio_pc_xfer_block_t block;
 
     if( ! is_open ){
-        statusCallback( tr("opening device %1").arg(dev->name()) );
         if( ! open( err ) )
             return false;
     }
@@ -288,9 +313,6 @@ SrmDevice::download( const QDir &tmpdir,
                     QString &err)
 {
     srmio_error_t serr;
-    unsigned firmware;
-    srmio_io_baudrate_t baudrateId;
-    unsigned baudrate;
     struct _srmio_pc_xfer_block_t block;
     srmio_data_t data( NULL );
     srmio_data_t *splitList( NULL );
@@ -302,31 +324,9 @@ SrmDevice::download( const QDir &tmpdir,
     srmio_time_t splitGap( 72000 ); // 2h - XXX: make this configurable
 
     if( ! is_open ){
-        statusCallback( tr("opening device %1").arg(dev->name()) );
         if( ! open( err ) )
             return false;
     }
-
-    if( ! srmio_pc_get_version( pc, &firmware, &serr ) ){
-        err = tr("failed to get firmware version: %1")
-            .arg(serr.message);
-        goto fail;
-    }
-
-    if( ! srmio_pc_get_baudrate( pc, &baudrateId, &serr ) ){
-        err = tr("failed to get baud rate: %1")
-            .arg(serr.message);
-        goto fail;
-    }
-
-    if( ! srmio_io_baud2name( baudrateId, &baudrate ) ){
-        err = tr("failed to get baud rate name: %1")
-            .arg(serr.message);
-    }
-
-    statusCallback(tr("found Powercontrol version 0x%1 using %2 baud")
-        .arg(firmware, 4, 16 )
-        .arg(baudrate));
 
     // fetch preview in case user didn't
     if( srmio_pc_can_preview(pc) && rideList.size() == 0 ){
@@ -591,6 +591,8 @@ SrmDevice::cleanup( QString &err )
         if( ! open( err ) )
             goto cleanup;
     }
+
+    statusCallback( tr("cleaning device ..."));
 
     if( ! srmio_pc_cmd_clear( pc, &serr ) ){
         err = tr("failed to clear Powercontrol memory: %1")
