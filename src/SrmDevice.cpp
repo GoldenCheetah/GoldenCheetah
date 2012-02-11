@@ -387,6 +387,7 @@ SrmDevice::download( const QDir &tmpdir,
         if( ! wanted ){
             statusCallback(tr("skipping unselected ride block %1")
                 .arg(block_num +1));
+            ++block_num;
             continue;
         }
         statusCallback(tr("downloading ride block %1/%2")
