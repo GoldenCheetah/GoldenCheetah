@@ -8,20 +8,19 @@ class DeviceFileInfo;
 
 struct MacroDevices : public Devices
 {
-    virtual DevicePtr newDevice( CommPortPtr dev );
+    virtual DevicePtr newDevice( CommPortPtr dev, Device::StatusCallback cb );
     virtual QString downloadInstructions() const;
     virtual bool canCleanup( void ) {return true; };
 };
 
 struct MacroDevice : public Device
 {
-    MacroDevice( CommPortPtr dev ) :
-        Device( dev ) {};
+    MacroDevice( CommPortPtr dev, StatusCallback cb ) :
+        Device( dev, cb ) {};
 
     virtual bool download( const QDir &tmpdir,
                           QList<DeviceDownloadFile> &files,
                           CancelCallback cancelCallback,
-                          StatusCallback statusCallback,
                           ProgressCallback progressCallback,
                           QString &err);
 

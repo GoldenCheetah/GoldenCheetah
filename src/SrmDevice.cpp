@@ -32,9 +32,9 @@ static bool srm7Registered =
     Devices::addType("SRM PCVI/7", DevicesPtr(new SrmDevices( 7 )));
 
 DevicePtr
-SrmDevices::newDevice( CommPortPtr dev )
+SrmDevices::newDevice( CommPortPtr dev, Device::StatusCallback cb )
 {
-    return DevicePtr( new SrmDevice( dev, protoVersion));
+    return DevicePtr( new SrmDevice( dev, cb, protoVersion));
 }
 
 bool
@@ -228,7 +228,7 @@ SrmDevice::close( void )
 }
 
 bool
-SrmDevice::preview( StatusCallback statusCallback, QString &err )
+SrmDevice::preview( QString &err )
 {
     srmio_error_t serr;
     struct _srmio_pc_xfer_block_t block;
@@ -284,7 +284,6 @@ bool
 SrmDevice::download( const QDir &tmpdir,
                     QList<DeviceDownloadFile> &files,
                     CancelCallback cancelCallback,
-                    StatusCallback statusCallback,
                     ProgressCallback progressCallback,
                     QString &err)
 {
@@ -331,7 +330,7 @@ SrmDevice::download( const QDir &tmpdir,
 
     // fetch preview in case user didn't
     if( srmio_pc_can_preview(pc) && rideList.size() == 0 ){
-        if( ! preview( statusCallback, err ) )
+        if( ! preview( err ) )
             return false;
     }
 
