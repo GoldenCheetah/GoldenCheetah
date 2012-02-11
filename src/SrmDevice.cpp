@@ -101,13 +101,17 @@ SrmDevice::~SrmDevice()
     close();
 }
 
+static void logfunc( const char *msg, void *data )
+{
+    Device::StatusCallback *cb = reinterpret_cast<Device::StatusCallback*>(data);
+
+    (*cb)( msg );
+}
+
 bool
 SrmDevice::open( QString &err )
 {
     srmio_error_t serr;
-    unsigned firmware;
-    srmio_io_baudrate_t baudrateId;
-    unsigned baudrate;
 
     if( dev->type() == "Serial" ){
 
@@ -184,6 +188,14 @@ SrmDevice::open( QString &err )
         goto fail;
     }
 
+    if( ! srmio_pc_set_logfunc( pc, logfunc,
+        reinterpret_cast<void*>( &statusCallback ), &serr ) ){
+
+        err = tr("Couldn't set logging function: %1")
+            .arg(serr.message);
+        goto fail;
+    }
+
     if( ! srmio_pc_set_device( pc, io, &serr ) ){
         err = tr("failed to set Powercontrol io handle: %1")
             .arg(serr.message);
@@ -195,27 +207,6 @@ SrmDevice::open( QString &err )
             .arg(serr.message);
         goto fail;
     }
-
-    if( ! srmio_pc_get_version( pc, &firmware, &serr ) ){
-        err = tr("failed to get firmware version: %1")
-            .arg(serr.message);
-        goto fail;
-    }
-
-    if( ! srmio_pc_get_baudrate( pc, &baudrateId, &serr ) ){
-        err = tr("failed to get baud rate: %1")
-            .arg(serr.message);
-        goto fail;
-    }
-
-    if( ! srmio_io_baud2name( baudrateId, &baudrate ) ){
-        err = tr("failed to get baud rate name: %1")
-            .arg(serr.message);
-    }
-
-    statusCallback(tr("found Powercontrol version 0x%1 using %2 baud")
-        .arg(firmware, 4, 16 )
-        .arg(baudrate));
 
     is_open = true;
     return true;
@@ -257,6 +248,7 @@ bool
 SrmDevice::preview( QString &err )
 {
     srmio_error_t serr;
+    size_t block_cnt;
     struct _srmio_pc_xfer_block_t block;
 
     if( ! is_open ){
@@ -275,6 +267,14 @@ SrmDevice::preview( QString &err )
             .arg(serr.message);
         goto fail;
     }
+
+    if( ! srmio_pc_xfer_get_blocks( pc, &block_cnt, &serr ) ){
+        err = tr("failed to get number of data blocks: %1")
+            .arg(serr.message);
+        goto fail;
+    }
+    statusCallback(tr("found %1 ride blocks").arg(block_cnt));
+
 
     while( srmio_pc_xfer_block_next( pc, &block )){
         DeviceRideItemPtr ride( new DeviceRideItem );
@@ -358,7 +358,6 @@ SrmDevice::download( const QDir &tmpdir,
             .arg(serr.message);
         goto fail1;
     }
-    statusCallback(tr("found %1 ride blocks").arg(block_cnt));
 
     for( int i = 0; i < rideList.size(); ++i ){
         if( rideList.at(i)->wanted )
@@ -390,9 +389,6 @@ SrmDevice::download( const QDir &tmpdir,
             ++block_num;
             continue;
         }
-        statusCallback(tr("downloading ride block %1/%2")
-            .arg(block_num +1)
-            .arg(block_cnt) );
 
         data->slope = block.slope;
         data->zeropos = block.zeropos;
