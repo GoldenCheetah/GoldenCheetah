@@ -27,7 +27,7 @@ struct SrmDevices : public Devices
 {
     SrmDevices( int protoVersion ) : protoVersion( protoVersion ) {}
 
-    virtual DevicePtr newDevice( CommPortPtr dev );
+    virtual DevicePtr newDevice( CommPortPtr dev, Device::StatusCallback cb );
     virtual bool canCleanup( void ) {return true; };
     virtual bool supportsPort( CommPortPtr dev );
     virtual bool exclusivePort( CommPortPtr dev );
@@ -38,19 +38,18 @@ private:
 
 struct SrmDevice : public Device
 {
-    SrmDevice( CommPortPtr dev, int protoVersion ) :
-        Device( dev ),
+    SrmDevice( CommPortPtr dev, StatusCallback cb, int protoVersion ) :
+        Device( dev, cb ),
         protoVersion( protoVersion ),
         is_open( false ),
         io( NULL ), pc( NULL ) { };
     ~SrmDevice();
 
-    virtual bool preview( StatusCallback statusCallback, QString &err );
+    virtual bool preview( QString &err );
 
     virtual bool download( const QDir &tmpdir,
                           QList<DeviceDownloadFile> &files,
                           CancelCallback cancelCallback,
-                          StatusCallback statusCallback,
                           ProgressCallback progressCallback,
                           QString &err);
 

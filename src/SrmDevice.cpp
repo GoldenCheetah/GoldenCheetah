@@ -32,15 +32,16 @@ static bool srm7Registered =
     Devices::addType("SRM PCVI/7", DevicesPtr(new SrmDevices( 7 )));
 
 DevicePtr
-SrmDevices::newDevice( CommPortPtr dev )
+SrmDevices::newDevice( CommPortPtr dev, Device::StatusCallback cb )
 {
-    return DevicePtr( new SrmDevice( dev, protoVersion));
+    return DevicePtr( new SrmDevice( dev, cb, protoVersion));
 }
 
 bool
 SrmDevices::supportsPort( CommPortPtr dev )
 {
-#ifdef SRMIO_HAVE_TERMIOS
+#if defined(SRMIO_HAVE_TERMIOS) || defined(SRMIO_HAVE_WINCOM)
+    // XXX: check device name starts with "com" or "/dev"?
     if( dev->type() == "Serial" )
         return true;
 #endif
@@ -100,13 +101,30 @@ SrmDevice::~SrmDevice()
     close();
 }
 
+static void logfunc( const char *msg, void *data )
+{
+    Device::StatusCallback *cb = reinterpret_cast<Device::StatusCallback*>(data);
+
+    (*cb)( msg );
+}
+
 bool
 SrmDevice::open( QString &err )
 {
     srmio_error_t serr;
 
     if( dev->type() == "Serial" ){
-#ifdef SRMIO_HAVE_TERMIOS
+
+        // XXX: check device name starts with "com" or "/dev"?
+
+#ifdef SRMIO_HAVE_WINCOM
+        io = srmio_iow32_new( dev->name().toAscii().constData(), &serr );
+        if( ! io ){
+            err = tr("failed to allocate device handle: %1")
+                .arg(serr.message);
+            return false;
+        }
+#elif defined(SRMIO_HAVE_TERMIOS)
         io = srmio_ios_new( dev->name().toAscii().constData(), &serr );
         if( ! io ){
             err = tr("failed to allocate device handle: %1")
@@ -142,11 +160,13 @@ SrmDevice::open( QString &err )
 
     switch( protoVersion ){
       case 5:
+        statusCallback( tr("opening PCV at %1").arg(dev->name()) );
         pc = srmio_pc5_new( &serr );
         break;
 
       case 6:
       case 7:
+        statusCallback( tr("opening PC6/7 at %1").arg(dev->name()) );
         pc = srmio_pc7_new( &serr );
         break;
 
@@ -164,6 +184,14 @@ SrmDevice::open( QString &err )
     if( ! srmio_io_open( io, &serr ) ){
         err = tr("Couldn't open device %1: %2")
             .arg(dev->name())
+            .arg(serr.message);
+        goto fail;
+    }
+
+    if( ! srmio_pc_set_logfunc( pc, logfunc,
+        reinterpret_cast<void*>( &statusCallback ), &serr ) ){
+
+        err = tr("Couldn't set logging function: %1")
             .arg(serr.message);
         goto fail;
     }
@@ -217,13 +245,13 @@ SrmDevice::close( void )
 }
 
 bool
-SrmDevice::preview( StatusCallback statusCallback, QString &err )
+SrmDevice::preview( QString &err )
 {
     srmio_error_t serr;
+    size_t block_cnt;
     struct _srmio_pc_xfer_block_t block;
 
     if( ! is_open ){
-        statusCallback( tr("opening device %1").arg(dev->name()) );
         if( ! open( err ) )
             return false;
     }
@@ -240,14 +268,23 @@ SrmDevice::preview( StatusCallback statusCallback, QString &err )
         goto fail;
     }
 
+    if( ! srmio_pc_xfer_get_blocks( pc, &block_cnt, &serr ) ){
+        err = tr("failed to get number of data blocks: %1")
+            .arg(serr.message);
+        goto fail;
+    }
+    statusCallback(tr("found %1 ride blocks").arg(block_cnt));
+
+
     while( srmio_pc_xfer_block_next( pc, &block )){
         DeviceRideItemPtr ride( new DeviceRideItem );
 
         if( block.start )
             ride->startTime.setTime_t( 0.1 * block.start );
         if( block.end )
-            ride->startTime.setTime_t( 0.1 * block.end );
+            ride->endTime.setTime_t( 0.1 * block.end );
         ride->work = block.total;
+        ride->wanted = false;
         rideList.append( ride );
 
         if( block.athlete )
@@ -273,14 +310,10 @@ bool
 SrmDevice::download( const QDir &tmpdir,
                     QList<DeviceDownloadFile> &files,
                     CancelCallback cancelCallback,
-                    StatusCallback statusCallback,
                     ProgressCallback progressCallback,
                     QString &err)
 {
     srmio_error_t serr;
-    unsigned firmware;
-    srmio_io_baudrate_t baudrateId;
-    unsigned baudrate;
     struct _srmio_pc_xfer_block_t block;
     srmio_data_t data( NULL );
     srmio_data_t *splitList( NULL );
@@ -292,35 +325,13 @@ SrmDevice::download( const QDir &tmpdir,
     srmio_time_t splitGap( 72000 ); // 2h - XXX: make this configurable
 
     if( ! is_open ){
-        statusCallback( tr("opening device %1").arg(dev->name()) );
         if( ! open( err ) )
             return false;
     }
 
-    if( ! srmio_pc_get_version( pc, &firmware, &serr ) ){
-        err = tr("failed to get firmware version: %1")
-            .arg(serr.message);
-        goto fail;
-    }
-
-    if( ! srmio_pc_get_baudrate( pc, &baudrateId, &serr ) ){
-        err = tr("failed to get baud rate: %1")
-            .arg(serr.message);
-        goto fail;
-    }
-
-    if( ! srmio_io_baud2name( baudrateId, &baudrate ) ){
-        err = tr("failed to get baud rate name: %1")
-            .arg(serr.message);
-    }
-
-    statusCallback(tr("found Powercontrol version 0x%1 using %2 baud")
-        .arg(firmware, 4, 16 )
-        .arg(baudrate));
-
     // fetch preview in case user didn't
     if( srmio_pc_can_preview(pc) && rideList.size() == 0 ){
-        if( ! preview( statusCallback, err ) )
+        if( ! preview( err ) )
             return false;
     }
 
@@ -347,7 +358,6 @@ SrmDevice::download( const QDir &tmpdir,
             .arg(serr.message);
         goto fail1;
     }
-    statusCallback(tr("found %1 ride blocks").arg(block_cnt));
 
     for( int i = 0; i < rideList.size(); ++i ){
         if( rideList.at(i)->wanted )
@@ -376,11 +386,9 @@ SrmDevice::download( const QDir &tmpdir,
         if( ! wanted ){
             statusCallback(tr("skipping unselected ride block %1")
                 .arg(block_num +1));
+            ++block_num;
             continue;
         }
-        statusCallback(tr("downloading ride block %1/%2")
-            .arg(block_num +1)
-            .arg(block_cnt) );
 
         data->slope = block.slope;
         data->zeropos = block.zeropos;
@@ -581,6 +589,8 @@ SrmDevice::cleanup( QString &err )
         if( ! open( err ) )
             goto cleanup;
     }
+
+    statusCallback( tr("cleaning device ..."));
 
     if( ! srmio_pc_cmd_clear( pc, &serr ) ){
         err = tr("failed to clear Powercontrol memory: %1")

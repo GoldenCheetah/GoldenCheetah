@@ -26,9 +26,9 @@ static bool powerTapRegistered =
     Devices::addType("PowerTap", DevicesPtr(new PowerTapDevices()) );
 
 DevicePtr
-PowerTapDevices::newDevice( CommPortPtr dev )
+PowerTapDevices::newDevice( CommPortPtr dev, Device::StatusCallback cb)
 {
-    return DevicePtr( new PowerTapDevice( dev ));
+    return DevicePtr( new PowerTapDevice( dev, cb ));
 }
 
 QString
@@ -123,7 +123,6 @@ bool
 PowerTapDevice::download( const QDir &tmpdir,
                          QList<DeviceDownloadFile> &files,
                          CancelCallback cancelCallback,
-                         StatusCallback statusCallback,
                          ProgressCallback progressCallback,
                          QString &err)
 {
