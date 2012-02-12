@@ -24,19 +24,18 @@
 
 struct PowerTapDevices : public Devices
 {
-    virtual DevicePtr newDevice( CommPortPtr dev );
+    virtual DevicePtr newDevice( CommPortPtr dev, Device::StatusCallback cb );
     virtual QString downloadInstructions() const;
 };
 
 struct PowerTapDevice : public Device
 {
-    PowerTapDevice( CommPortPtr dev ) :
-        Device( dev ) {};
+    PowerTapDevice( CommPortPtr dev, StatusCallback cb ) :
+        Device( dev, cb ) {};
 
     virtual bool download( const QDir &tmpdir,
                           QList<DeviceDownloadFile> &files,
                           CancelCallback cancelCallback,
-                          StatusCallback statusCallback,
                           ProgressCallback progressCallback,
                           QString &err);
 };
