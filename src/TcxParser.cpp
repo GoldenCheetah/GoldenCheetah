@@ -32,6 +32,9 @@ TcxParser::TcxParser (RideFile* rideFile, QList<RideFile*> *rides) : rideFile(ri
     GarminHWM = appsettings->value(NULL, GC_GARMIN_HWMARK);
     if (GarminHWM.isNull() || GarminHWM.toInt() == 0) GarminHWM.setValue(25); // default to 25 seconds.
     first = true;
+
+    // First initialisation for altitude (not initialised for each point)
+    alt= 0;
 }
 
 bool
@@ -78,7 +81,7 @@ TcxParser::startElement( const QString&, const QString&, const QString& qName, c
         lat = 0.0;
         lon = 0.0;
         badgps = false;
-        //alt = 0.0; // TCS from FIT files have not alt point for each trackpoint
+        //alt = 0.0; // TCX from FIT files have not alt point for each trackpoint
         distance = -1;  // nh - we set this to -1 so we can detect if there was a distance in the trackpoint.
         secs = 0;
 
