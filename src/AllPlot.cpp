@@ -212,6 +212,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     showAltState(Qt::Checked),
     showTempState(Qt::Checked),
     showWindState(Qt::Checked),
+    showTorqueState(Qt::Checked),
     bydist(false),
     parent(parent)
 {
@@ -258,6 +259,9 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     windCurve = new QwtPlotIntervalCurve(tr("Wind"));
     windCurve->setYAxis(yRight);
 
+    torqueCurve = new QwtPlotCurve(tr("Torque"));
+    torqueCurve->setYAxis(yRight);
+
     intervalHighlighterCurve = new QwtPlotCurve();
     intervalHighlighterCurve->setYAxis(yLeft);
     intervalHighlighterCurve->setData(new IntervalPlotData(this, mainWindow));
@@ -295,6 +299,7 @@ AllPlot::configChanged()
         altCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         tempCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         windCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        torqueCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         intervalHighlighterCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     }
 
@@ -330,6 +335,9 @@ AllPlot::configChanged()
     QColor wbrush_color = GColor(CWINDSPEED);
     wbrush_color.setAlpha(200);
     windCurve->setBrush(wbrush_color);   // fill below the line
+    QPen torquePen = QPen(GColor(CTORQUE));
+    torquePen.setWidth(width);
+    torqueCurve->setPen(torquePen);
 
     QPen ihlPen = QPen(GColor(CINTERVALHIGHLIGHTER));
     ihlPen.setWidth(width);
@@ -360,11 +368,16 @@ AllPlot::configChanged()
         p = cadCurve->pen().color();
         p.setAlpha(64);
         cadCurve->setBrush(QBrush(p));
+
+        p = torqueCurve->pen().color();
+        p.setAlpha(64);
+        torqueCurve->setBrush(QBrush(p));
     } else {
         wattsCurve->setBrush(Qt::NoBrush);
         hrCurve->setBrush(Qt::NoBrush);
         speedCurve->setBrush(Qt::NoBrush);
         cadCurve->setBrush(Qt::NoBrush);
+        torqueCurve->setBrush(Qt::NoBrush);
     }
 
     QPalette pal;
@@ -405,9 +418,9 @@ AllPlot::configChanged()
 }
 
 struct DataPoint {
-    double time, hr, watts, speed, cad, alt, temp, wind;
-    DataPoint(double t, double h, double w, double s, double c, double a, double te, double wi) :
-        time(t), hr(h), watts(w), speed(s), cad(c), alt(a), temp(te), wind(wi) {}
+    double time, hr, watts, speed, cad, alt, temp, wind, torque;
+    DataPoint(double t, double h, double w, double s, double c, double a, double te, double wi, double tq) :
+        time(t), hr(h), watts(w), speed(s), cad(c), alt(a), temp(te), wind(wi), torque(tq) {}
 };
 
 bool AllPlot::shadeZones() const
@@ -483,6 +496,8 @@ AllPlot::recalc()
             tempCurve->setData(data, data);
         if (!windArray.empty())
             windCurve->setData(new QwtIntervalSeriesData(intData));
+        if (!torqueArray.empty())
+            torqueCurve->setData(data, data);
 
         return;
     }
@@ -497,6 +512,7 @@ AllPlot::recalc()
         double totalAlt = 0.0;
         double totalTemp = 0.0;
         double totalWind = 0.0;
+        double totalTorque = 0.0;
 
         QList<DataPoint> list;
 
@@ -510,6 +526,7 @@ AllPlot::recalc()
         smoothTemp.resize(rideTimeSecs + 1);
         smoothWind.resize(rideTimeSecs + 1);
         smoothRelSpeed.resize(rideTimeSecs + 1);
+        smoothTorque.resize(rideTimeSecs + 1);
 
         for (int secs = 0; ((secs < smooth)
                             && (secs < rideTimeSecs)); ++secs) {
@@ -523,6 +540,7 @@ AllPlot::recalc()
             smoothTemp[secs]  = 0.0;
             smoothWind[secs]  = 0.0;
             smoothRelSpeed[secs] = QwtIntervalSample();
+            smoothTorque[secs]  = 0.0;
         }
 
         int i = 0;
@@ -535,7 +553,8 @@ AllPlot::recalc()
                              (!cadArray.empty() ? cadArray[i] : 0),
                              (!altArray.empty() ? altArray[i] : 0),
                              (!tempArray.empty() ? tempArray[i] : 0),
-                             (!windArray.empty() ? windArray[i] : 0));
+                             (!windArray.empty() ? windArray[i] : 0),
+                             (!torqueArray.empty() ? torqueArray[i] : 0));
                 if (!wattsArray.empty())
                     totalWatts += wattsArray[i];
                 if (!hrArray.empty())
@@ -557,6 +576,8 @@ AllPlot::recalc()
                 }
                 if (!windArray.empty())
                     totalWind   += windArray[i];
+                if (!torqueArray.empty())
+                    totalTorque   += torqueArray[i];
 
                 totalDist   = distanceArray[i];
                 list.append(dp);
@@ -571,6 +592,7 @@ AllPlot::recalc()
                 totalAlt   -= dp.alt;
                 totalTemp   -= dp.temp;
                 totalWind   -= dp.wind;
+                totalTorque   -= dp.torque;
                 list.removeFirst();
             }
             // TODO: this is wrong.  We should do a weighted average over the
@@ -584,6 +606,7 @@ AllPlot::recalc()
                 smoothTemp[secs]   = 0.0;
                 smoothWind[secs] = 0.0;
                 smoothRelSpeed[secs] =  QwtIntervalSample();
+                smoothTorque[secs] = 0.0;
             }
             else {
                 smoothWatts[secs]    = totalWatts / list.size();
@@ -594,6 +617,7 @@ AllPlot::recalc()
                 smoothTemp[secs]      = totalTemp / list.size();
                 smoothWind[secs]    = totalWind / list.size();
                 smoothRelSpeed[secs] =  QwtIntervalSample( bydist ? totalDist : secs / 60.0, QwtInterval(qMin(totalWind / list.size(), totalSpeed / list.size()), qMax(totalWind / list.size(), totalSpeed / list.size()) ) );
+                smoothTorque[secs]    = totalTorque / list.size();
             }
             smoothDistance[secs] = totalDist;
             smoothTime[secs]  = secs / 60.0;
@@ -612,6 +636,7 @@ AllPlot::recalc()
         smoothTemp.resize(0);
         smoothWind.resize(0);
         smoothRelSpeed.resize(0);
+        smoothTorque.resize(0);
 
         foreach (RideFilePoint *dp, rideItem->ride()->dataPoints()) {
             smoothWatts.append(dp->watts);
@@ -623,6 +648,7 @@ AllPlot::recalc()
             smoothAltitude.append(useMetricUnits ? dp->alt : dp->alt * FEET_PER_METER);
             smoothTemp.append(dp->temp);
             smoothWind.append(useMetricUnits ? dp->headwind : dp->headwind * MILES_PER_KM);
+            smoothTorque.append(dp->nm);
 
             double head = dp->headwind * (useMetricUnits ? 1.0f : MILES_PER_KM);
             double speed = dp->kph * (useMetricUnits ? 1.0f : MILES_PER_KM);
@@ -663,6 +689,11 @@ AllPlot::recalc()
     } if (!windArray.empty()) {
         windCurve->setData(new QwtIntervalSeriesData(smoothRelSpeed));
         intervalHighlighterCurve->setYAxis(yRight);
+
+    } if (!torqueArray.empty()) {
+        torqueCurve->setData(xaxis.data() + startingIndex, smoothTorque.data() + startingIndex, totalPoints);
+        intervalHighlighterCurve->setYAxis(yRight);
+
     }
 
     setYMax();
@@ -748,7 +779,7 @@ AllPlot::setYMax()
         setAxisLabelRotation(yLeft2,270);
         setAxisLabelAlignment(yLeft2,Qt::AlignVCenter);
     }
-    if (speedCurve->isVisible() || tempCurve->isVisible()) {
+    if (speedCurve->isVisible() || tempCurve->isVisible() || torqueCurve->isVisible()) {
         double ymax = 0;
         QStringList labels;
 
@@ -767,6 +798,14 @@ AllPlot::setYMax()
                 ymax = qMax(ymax, tempCurve->maxYValue());
             else
                 ymax = qMax(ymax, referencePlot->tempCurve->maxYValue());
+        }
+        if (torqueCurve->isVisible()) {
+            labels << (useMetricUnits ? tr("Nm") : tr("ftLb"));
+
+            if (referencePlot == NULL)
+                ymax = qMax(ymax, torqueCurve->maxYValue());
+            else
+                ymax = qMax(ymax, referencePlot->torqueCurve->maxYValue());
         }
         setAxisTitle(yRight, labels.join(" / "));
         setAxisScale(yRight, 0.0, 1.05 * ymax);
@@ -844,6 +883,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     double *smoothD = &plot->smoothDistance[startidx];
     double *smoothTE = &plot->smoothTemp[startidx];
     double *smoothWND = &plot->smoothWind[startidx];
+    double *smoothNM = &plot->smoothTorque[startidx];
     QwtIntervalSample *smoothRS = &plot->smoothRelSpeed[startidx];
 
     double *xaxis = bydist ? smoothD : smoothT;
@@ -858,6 +898,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     altCurve->detach();
     tempCurve->detach();
     windCurve->detach();
+    torqueCurve->detach();
 
     wattsCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showPowerState < 2);
     hrCurve->setVisible(rideItem->ride()->areDataPresent()->hr && showHrState == Qt::Checked);
@@ -866,6 +907,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     altCurve->setVisible(rideItem->ride()->areDataPresent()->alt && showAltState == Qt::Checked);
     tempCurve->setVisible(rideItem->ride()->areDataPresent()->temp && showTempState == Qt::Checked);
     windCurve->setVisible(rideItem->ride()->areDataPresent()->headwind && showWindState == Qt::Checked);
+    torqueCurve->setVisible(rideItem->ride()->areDataPresent()->nm && showTorqueState == Qt::Checked);
 
     wattsCurve->setData(xaxis,smoothW,stopidx-startidx);
     hrCurve->setData(xaxis, smoothHR,stopidx-startidx);
@@ -877,6 +919,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     QVector<QwtIntervalSample> tmpWND(stopidx-startidx);
     qMemCopy( tmpWND.data(), smoothRS, (stopidx-startidx) * sizeof( QwtIntervalSample ) );
     windCurve->setData(new QwtIntervalSeriesData(tmpWND));
+    torqueCurve->setData(xaxis, smoothNM, stopidx-startidx);
 
     /*QVector<double> _time(stopidx-startidx);
     qMemCopy( _time.data(), xaxis, (stopidx-startidx) * sizeof( double ) );
@@ -903,6 +946,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     cadCurve->setSymbol(new QwtSymbol(sym));
     altCurve->setSymbol(new QwtSymbol(sym));
     tempCurve->setSymbol(new QwtSymbol(sym));
+    torqueCurve->setSymbol(new QwtSymbol(sym));
 
     setYMax();
 
@@ -936,6 +980,10 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
         windCurve->attach(this);
         intervalHighlighterCurve->setYAxis(yRight);
     }
+    if (!plot->smoothTorque.empty()) {
+        torqueCurve->attach(this);
+        intervalHighlighterCurve->setYAxis(yRight);
+    }
 
     refreshIntervalMarkers();
     refreshZoneLabels();
@@ -964,6 +1012,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         altArray.resize(dataPresent->alt ? npoints : 0);
         tempArray.resize(dataPresent->temp ? npoints : 0);
         windArray.resize(dataPresent->headwind ? npoints : 0);
+        torqueArray.resize(dataPresent->nm ? npoints : 0);
         timeArray.resize(npoints);
         distanceArray.resize(npoints);
 
@@ -975,6 +1024,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         altCurve->detach();
         tempCurve->detach();
         windCurve->detach();
+        torqueCurve->detach();
         if (!altArray.empty()) altCurve->attach(this);
         if (!wattsArray.empty()) wattsCurve->attach(this);
         if (!hrArray.empty()) hrCurve->attach(this);
@@ -982,6 +1032,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         if (!cadArray.empty()) cadCurve->attach(this);
         if (!tempArray.empty()) tempCurve->attach(this);
         if (!windArray.empty()) windCurve->attach(this);
+        if (!torqueArray.empty()) torqueCurve->attach(this);
 
         wattsCurve->setVisible(dataPresent->watts && showPowerState < 2);
         hrCurve->setVisible(dataPresent->hr && showHrState == Qt::Checked);
@@ -990,7 +1041,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         altCurve->setVisible(dataPresent->alt && showAltState == Qt::Checked);
         tempCurve->setVisible(dataPresent->temp && showTempState == Qt::Checked);
         windCurve->setVisible(dataPresent->headwind && showWindState == Qt::Checked);
-
+        torqueCurve->setVisible(dataPresent->nm && showWindState == Qt::Checked);
 
         arrayLength = 0;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
@@ -1037,6 +1088,12 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
                                              (useMetricUnits
                                               ? point->km
                                               : point->km * MILES_PER_KM));
+
+            if (!torqueArray.empty())
+                torqueArray[arrayLength] = max(0,
+                                              (useMetricUnits
+                                               ? point->nm
+                                               : point->nm * FEET_LB_PER_NM));
             ++arrayLength;
         }
         recalc();
@@ -1051,6 +1108,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         altCurve->detach();
         tempCurve->detach();
         windCurve->detach();
+        torqueCurve->detach();
         foreach(QwtPlotMarker *mrk, d_mrk)
             delete mrk;
         d_mrk.clear();
@@ -1134,6 +1192,16 @@ AllPlot::showWind(int state)
 }
 
 void
+AllPlot::showTorque(int state)
+{
+    showTorqueState = state;
+    assert(state != Qt::PartiallyChecked);
+    torqueCurve->setVisible(state == Qt::Checked);
+    setYMax();
+    replot();
+}
+
+void
 AllPlot::showGrid(int state)
 {
     assert(state != Qt::PartiallyChecked);
@@ -1166,12 +1234,17 @@ AllPlot::setPaintBrush(int state)
         p = tempCurve->pen().color();
         p.setAlpha(64);
         tempCurve->setBrush(QBrush(p));
+
+        p = torqueCurve->pen().color();
+        p.setAlpha(64);
+        torqueCurve->setBrush(QBrush(p));
     } else {
         wattsCurve->setBrush(Qt::NoBrush);
         hrCurve->setBrush(Qt::NoBrush);
         speedCurve->setBrush(Qt::NoBrush);
         cadCurve->setBrush(Qt::NoBrush);
         tempCurve->setBrush(Qt::NoBrush);
+        torqueCurve->setBrush(Qt::NoBrush);
     }
     replot();
 }

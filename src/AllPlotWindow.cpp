@@ -119,6 +119,10 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     showWind->setCheckState(Qt::Checked);
     cl->addWidget(showWind);
 
+    showTorque = new QCheckBox(tr("Torque"), this);
+    showTorque->setCheckState(Qt::Checked);
+    cl->addWidget(showTorque);
+
     showPower = new QComboBox();
     showPower->addItem(tr("Power + shade"));
     showPower->addItem(tr("Power - shade"));
@@ -338,6 +342,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     connect(showAlt, SIGNAL(stateChanged(int)), this, SLOT(setShowAlt(int)));
     connect(showTemp, SIGNAL(stateChanged(int)), this, SLOT(setShowTemp(int)));
     connect(showWind, SIGNAL(stateChanged(int)), this, SLOT(setShowWind(int)));
+    connect(showTorque, SIGNAL(stateChanged(int)), this, SLOT(setShowTorque(int)));
     connect(showGrid, SIGNAL(stateChanged(int)), this, SLOT(setShowGrid(int)));
     connect(showFull, SIGNAL(stateChanged(int)), this, SLOT(setShowFull(int)));
     connect(showStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
@@ -698,7 +703,7 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
 	    showAlt->setEnabled(dataPresent->alt);
         showTemp->setEnabled(dataPresent->temp);
         showWind->setEnabled(dataPresent->headwind);
-
+        showTorque->setEnabled(dataPresent->nm);
     } else {
         showPower->setEnabled(false);
         showHr->setEnabled(false);
@@ -707,6 +712,7 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
         showAlt->setEnabled(false);
         showTemp->setEnabled(false);
         showWind->setEnabled(false);
+        showTorque->setEnabled(false);
     }
 
     // turn on/off shading, if it's not available
@@ -1156,6 +1162,18 @@ AllPlotWindow::setShowWind(int value)
 }
 
 void
+AllPlotWindow::setShowTorque(int value)
+{
+    showTorque->setChecked(value);
+
+    //if (!current) return;
+
+    allPlot->showTorque(value);
+    foreach (AllPlot *plot, allPlots)
+        plot->showTorque(value);
+}
+
+void
 AllPlotWindow::setShowFull(int value)
 {
     showFull->setChecked(value);
@@ -1458,6 +1476,7 @@ AllPlotWindow::setupStackPlots()
         _allPlot->showCad(showCad->checkState());
         _allPlot->showAlt(showAlt->checkState());
         _allPlot->showTemp(showTemp->checkState());
+        _allPlot->showTorque(showTorque->checkState());
         _allPlot->showGrid(showGrid->checkState());
         _allPlot->setPaintBrush(paintBrush->checkState());
         _allPlot->setSmoothing(smoothSlider->value());
