@@ -521,8 +521,6 @@ class MaxCadence : public RideMetric {
         setMetricUnits(tr("rpm"));
         setImperialUnits(tr("rpm"));
         setType(RideMetric::Peak);
-        setPrecision(1);
-        setConversion(MILES_PER_KM);
     }
 
     void compute(const RideFile *ride, const Zones *, int,

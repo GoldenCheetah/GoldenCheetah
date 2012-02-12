@@ -51,8 +51,9 @@
 // 32  9th Dec 2011 Damien Grauser     Temperature data flag (metadata field 'Data')
 // 33  17  Dec 2011 Damien Grauser     Added ResponseIndex and EfficiencyFactor
 // 34  15  Jan 2012 Mark Liversedge    Added Average and Max Temperature and Metric->conversionSum()
+// 35  13  Feb 2012 Mark Liversedge    Max/Avg Cadence adjusted conversion
 
-static int DBSchemaVersion = 34;
+static int DBSchemaVersion = 35;
 
 DBAccess::DBAccess(MainWindow* main, QDir home) : main(main), home(home)
 {
