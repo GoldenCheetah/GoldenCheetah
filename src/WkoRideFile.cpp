@@ -16,10 +16,6 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-// NOTE:
-// Windspeed, Temperature and Slope are not imported because
-// GC does not support them (yet).
-
 #include "WkoRideFile.h"
 #include <QRegExp>
 #include <QDebug>
