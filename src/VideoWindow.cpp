@@ -19,7 +19,7 @@
 #include "VideoWindow.h"
 
 VideoWindow::VideoWindow(MainWindow *parent, const QDir &home)  :
-GcWindow(parent), home(home), main(parent)
+    GcWindow(parent), home(home), main(parent), m_MediaChanged(false)
 {
     setControls(NULL);
     setInstanceName("Video Window");
@@ -114,7 +114,6 @@ void VideoWindow::resizeEvent(QResizeEvent * )
 
 void VideoWindow::startPlayback()
 {
-
     if (!m) return; // ignore if no media selected
 
     // stop playback & wipe player
@@ -125,6 +124,8 @@ void VideoWindow::startPlayback()
 
     /* play the media_player */
     libvlc_media_player_play (mp);
+
+    m_MediaChanged = false;
 }
 void VideoWindow::stopPlayback()
 {
@@ -147,7 +148,10 @@ void VideoWindow::resumePlayback()
     if (!m) return; // ignore if no media selected
 
     // stop playback & wipe player
-    libvlc_media_player_pause (mp);
+    if(m_MediaChanged)
+        startPlayback();
+    else
+        libvlc_media_player_pause (mp);
 }
 
 void VideoWindow::seekPlayback(long ms)
@@ -182,6 +186,8 @@ void VideoWindow::mediaSelected(QString filename)
 
         /* set the media to playback */
         if (m) libvlc_media_player_set_media (mp, m);
+
+        m_MediaChanged = true;
     }
 }
 

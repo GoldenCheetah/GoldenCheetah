@@ -87,6 +87,8 @@ class VideoWindow : public GcWindow
         QDir home;
         MainWindow *main;
 
+        bool m_MediaChanged;
+
         libvlc_instance_t * inst;
         //libvlc_exception_t exceptions;
         libvlc_media_player_t *mp;
