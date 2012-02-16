@@ -655,7 +655,7 @@ void TrainTool::Start()       // when start button is pressed
     if (status&RT_PAUSED) {
 
         // UN PAUSE!
-        play->setIcon(playIcon);
+        play->setIcon(pauseIcon);
 
         session_time.start();
         lap_time.start();
@@ -666,6 +666,8 @@ void TrainTool::Start()       // when start button is pressed
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         load_period.restart();
         if (status & RT_WORKOUT) load_timer->start(LOADRATE);
+
+        mediaTree->setEnabled(false);
 
         // tell the world
         main->notifyUnPause();
@@ -684,6 +686,11 @@ void TrainTool::Start()       // when start button is pressed
         if (status & RT_RECORDING) disk_timer->stop();
         if (status & RT_WORKOUT) load_timer->stop();
         load_msecs += load_period.restart();
+
+#if defined Q_OS_MAC || defined GC_HAVE_VLC
+        // enable media tree so we can change movie
+        mediaTree->setEnabled(true);
+#endif
 
         // tell the world
         main->notifyPause();
@@ -808,6 +815,10 @@ void TrainTool::Pause()        // pause capture to recalibrate
         load_period.restart();
         if (status & RT_WORKOUT) load_timer->start(LOADRATE);
 
+#if defined Q_OS_MAC || defined GC_HAVE_VLC
+        mediaTree->setEnabled(false);
+#endif
+
         // tell the world
         main->notifyUnPause();
 
@@ -822,6 +833,9 @@ void TrainTool::Pause()        // pause capture to recalibrate
         if (status & RT_RECORDING) disk_timer->stop();
         if (status & RT_WORKOUT) load_timer->stop();
         load_msecs += load_period.restart();
+
+        // enable media tree so we can change movie
+        mediaTree->setEnabled(true);
 
         // tell the world
         main->notifyPause();
