@@ -217,6 +217,44 @@ GcCalendar::refresh()
     repaint();
 }
 
+bool
+GcCalendar::event(QEvent *e)
+{
+    if (e->type() != QEvent::ToolTip && e->type() != QEvent::Paint && e->type() != QEvent::Destroy &&
+        e->type() != QEvent::LayoutRequest) {
+        mainWindow->setBubble("");
+        //qDebug()<<"event"<<e->type();
+    }
+
+    int n=0;
+    if (e->type() == QEvent::ToolTip) {
+
+        // are we hovering over a label?
+        foreach(GcLabel *label, dayLabels) {
+            if (label->underMouse()) {
+                if (dayLabels.at(n)->text() == "") return false;
+
+                // select a ride if there is one for this one?
+                int row = n / 7;
+                int col = n % 7;
+
+                QModelIndex p = calendarModel->index(row,col);
+                QStringList files = calendarModel->data(p, GcCalendarModel::FilenamesRole).toStringList();
+
+                QPoint pos = dynamic_cast<QHelpEvent*>(e)->pos();
+
+                // Popup bubble for ride
+                if (files.count()) {
+                    if (files[0] == "calendar") ; // XXX handle planned rides
+                    else mainWindow->setBubble(files.at(0), mapToGlobal(pos+QPoint(-2,-2)));
+                }
+            }
+            n++;
+        }
+    }
+    return QWidget::event(e);
+}
+
 void
 GcCalendar::dayClicked(int i)
 {
