@@ -334,10 +334,7 @@ public:
     void setCadence(float x) {
         telemetry.setCadence(x);
     }
-    void setWheelRpm(float x) {
-        telemetry.setWheelRpm(x);
-        telemetry.setSpeed(x * (appsettings->value(NULL, GC_WHEELSIZE, 2100).toInt()/1000) * 60 / 1000);
-    }
+    void setWheelRpm(float x);
     void setWatts(float x) {
         telemetry.setWatts(x);
     }
@@ -356,6 +353,7 @@ private:
     int channels;  // how many 4 or 8 ? depends upon the USB stick...
 
     // access to device file
+    DeviceConfiguration *devConf;
     QString deviceFilename;
     int baud;
 #ifdef WIN32

@@ -89,6 +89,7 @@ DeviceConfigurations::readConfig()
             configStr = QString("%1%2").arg(GC_DEV_WHEEL).arg(i+1);
             configVal = appsettings->value(NULL, configStr);
             Entry.wheelSize = configVal.toInt();
+            if (Entry.wheelSize == 0) Entry.wheelSize = 2100; // default to 700C
 
             configStr = QString("%1%2").arg(GC_DEV_PROF).arg(i+1);
             configVal = appsettings->value(NULL, configStr);

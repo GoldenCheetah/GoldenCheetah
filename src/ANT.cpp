@@ -82,7 +82,7 @@ const ant_sensor_type_t ANT::ant_sensor_types[] = {
 // thread and is part of the GC architecture NOT related to the
 // hardware controller.
 //
-ANT::ANT(QObject *parent, DeviceConfiguration *devConf) : QThread(parent)
+ANT::ANT(QObject *parent, DeviceConfiguration *devConf) : QThread(parent), devConf(devConf)
 {
     // device status and settings
     Status=0;
@@ -150,6 +150,15 @@ double ANT::channelValue2(int channel)
 double ANT::channelValue(int channel)
 {
     return antChannel[channel]->channelValue();
+}
+
+void ANT::setWheelRpm(float x) {
+    telemetry.setWheelRpm(x);
+
+    // devConf will be NULL if we are are running the add device wizard
+    // we can default to the global setting
+    if (devConf) telemetry.setSpeed(x * (devConf->wheelSize/1000) * 60 / 1000);
+    else telemetry.setSpeed(x * (appsettings->value(NULL, GC_WHEELSIZE, 2100).toInt()/1000) * 60 / 1000);
 }
 
 /*======================================================================
