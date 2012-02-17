@@ -77,6 +77,7 @@ class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
         void next();
         void previous();
 
+        bool event(QEvent *e);
 
     protected:
         MainWindow *mainWindow;
