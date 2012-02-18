@@ -45,6 +45,9 @@
 // Revision History
 // Rev Date         Who                What Changed
 //-----------------------------------------------------------------------
+//
+// ******* Prior to version 29 no revision history was maintained *******
+//
 // 29  5th Sep 2011 Mark Liversedge    Added color to the ride fields
 // 30  8th Sep 2011 Mark Liversedge    Metadata 'data' field for data present string
 // 31  22  Nov 2011 Mark Liversedge    Added Average WPK metric
@@ -52,8 +55,9 @@
 // 33  17  Dec 2011 Damien Grauser     Added ResponseIndex and EfficiencyFactor
 // 34  15  Jan 2012 Mark Liversedge    Added Average and Max Temperature and Metric->conversionSum()
 // 35  13  Feb 2012 Mark Liversedge    Max/Avg Cadence adjusted conversion
+// 36  18  Feb 2012 Mark Liversedge    Added Pace (min/mile) and 250m, 500m Pace metrics
 
-static int DBSchemaVersion = 35;
+static int DBSchemaVersion = 36;
 
 DBAccess::DBAccess(MainWindow* main, QDir home) : main(main), home(home)
 {
