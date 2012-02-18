@@ -268,6 +268,48 @@ static bool avgSpeedAdded =
         AvgSpeed(), &(QVector<QString>() << "total_distance"));
 
 //////////////////////////////////////////////////////////////////////////////
+class Pace : public RideMetric {
+    double pace;
+
+    public:
+
+    Pace() : pace(0.0)
+    {
+        setSymbol("pace");
+        setName(tr("Minute Mile Pace"));
+        setType(RideMetric::Average);
+        setMetricUnits(tr("min/mile"));
+        setImperialUnits(tr("min/mile"));
+        setPrecision(1);
+    }
+
+    void compute(const RideFile *, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &deps,
+                 const MainWindow *) {
+
+        AvgSpeed *as = dynamic_cast<AvgSpeed*>(deps.value("average_speed"));
+
+        // divide by zero or stupidly low pace
+        if (as->value(true) > 0.00f) pace = 60.0f / (as->value(true) * MILES_PER_KM); // kph to minutes per mile
+        else pace = 0;
+
+        setValue(pace);
+        setCount(as->count());
+    }
+    RideMetric *clone() const { return new Pace(*this); }
+};
+
+static bool addPace()
+{
+    QVector<QString> deps;
+    deps.append("average_speed");
+    RideMetricFactory::instance().addMetric(Pace(), &deps);
+    return true;
+}
+static bool paceAdded = addPace();
+
+//////////////////////////////////////////////////////////////////////////////
 
 struct AvgPower : public RideMetric {
 
