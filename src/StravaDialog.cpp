@@ -272,6 +272,10 @@ StravaDialog::requestLoginFinished(QNetworkReply *reply)
     }
 }
 
+
+// Documentation is at:
+// https://strava.pbworks.com/w/page/39241255/v2%20upload%20create
+
 void
 StravaDialog::requestUpload()
 {
@@ -317,7 +321,7 @@ StravaDialog::requestUpload()
         rideDateTime = rideDateTime.addSecs(diffSecs);
 
         out += "[\"";
-        out += rideDateTime.toString("yyyy-MM-ddThh:mm:ss-0600");
+        out += rideDateTime.toUTC().toString(Qt::ISODate);
         out += "\",";
         out += QString("%1").arg(point->lat,0,'f',GPS_COORD_TO_STRING);
         out += ",";
