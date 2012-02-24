@@ -61,18 +61,17 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     cp->setSingleStep(5);      // for those that insist on using the spinners, make it a bit quicker
     cp->setValue(250);   // seems like a 'sensible' default for those that 'don't know' ?
 
+    resthr = new QSpinBox(this);
+    resthr->setMinimum(30);
+    resthr->setMaximum(100);
+    resthr->setSingleStep(1);
+    resthr->setValue(60);
 
     lthr = new QSpinBox(this);
     lthr->setMinimum(80);
     lthr->setMaximum(220);
     lthr->setSingleStep(1);
     lthr->setValue(165);
-
-    resthr = new QSpinBox(this);
-    resthr->setMinimum(30);
-    resthr->setMaximum(100);
-    resthr->setSingleStep(1);
-    resthr->setValue(60);
 
     maxhr = new QSpinBox(this);
     maxhr->setMinimum(150);
