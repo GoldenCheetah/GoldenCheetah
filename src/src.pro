@@ -4,120 +4,116 @@ include( gcconfig.pri )
 
 TEMPLATE = app
 TARGET = GoldenCheetah
+!isEmpty( APP_NAME ) { TARGET = $${APP_NAME} }
 DEPENDPATH += .
 
 !isEmpty( BOOST_INCLUDE ) { INCLUDEPATH += $${BOOST_INCLUDE} }
+
 INCLUDEPATH += ../qwt/src ../qxt/src
 QT += xml sql network webkit script
 LIBS += ../qwt/lib/libqwt.a
 LIBS += -lm
 
 !isEmpty( LIBOAUTH_INSTALL ) {
-INCLUDEPATH += $${LIBOAUTH_INSTALL}/include
-LIBS +=  $${LIBOAUTH_INSTALL}/lib/liboauth.a
-LIBS += $${LIBCRYPTO_INSTALL}
-LIBS += $${LIBZ_INSTALL}
-LIBS += $${LIBCURL_INSTALL}
-DEFINES += GC_HAVE_LIBOAUTH
-SOURCES += TwitterDialog.cpp
-HEADERS += TwitterDialog.h
+    isEmpty( LIBOAUTH_INCLUDE ) { LIBOAUTH_INCLUDE += $${LIBOAUTH_INSTALL}/include }
+    isEmpty( LIBOAUTH_LIBS ) {
+        LIBOAUTH_LIBS = $${LIBOAUTH_INSTALL}/lib/liboauth.a \
+                        -lcurl -lcrypto -lz
+    }
+    INCLUDEPATH += $${LIBOAUTH_INCLUDE}
+    LIBS        += $${LIBOAUTH_LIBS}
+    DEFINES     += GC_HAVE_LIBOAUTH
+    SOURCES     += TwitterDialog.cpp
+    HEADERS     += TwitterDialog.h
 }
 
 !isEmpty( D2XX_INCLUDE ) {
-  INCLUDEPATH += $${D2XX_INCLUDE}
-  HEADERS += D2XX.h
-  SOURCES += D2XX.cpp
+    INCLUDEPATH += $${D2XX_INCLUDE}
+    !isEmpty( D2XX_LIBS ) { LIBS += $${D2XX_LIBS} }
+    HEADERS     += D2XX.h
+    SOURCES     += D2XX.cpp
 }
 
 !isEmpty( SRMIO_INSTALL ) {
-    !isEmpty( SRMIO_INCLUDE ) { INCLUDEPATH += $${SRMIO_INCLUDE} }
-    LIBS += $${SRMIO_LIB}
-    HEADERS += SrmDevice.h
-    SOURCES += SrmDevice.cpp
+    isEmpty( SRMIO_INCLUDE ) { SRMIO_INCLUDE = $${SRMIO_INSTALL}/include }
+    isEmpty( SRMIO_LIBS )    { SRMIO_LIBS    = $${SRMIO_INSTALL}/lib/libsrmio.a }
+    INCLUDEPATH += $${SRMIO_INCLUDE}
+    LIBS        += $${SRMIO_LIBS}
+    HEADERS     += SrmDevice.h
+    SOURCES     += SrmDevice.cpp
 }
 
 !isEmpty( QWT3D_INSTALL ) {
-  INCLUDEPATH += $${QWT3D_INSTALL}/include
-  LIBS += $${QWT3D_INSTALL}/lib/libqwtplot3d.a
-  CONFIG += qwt3d
-}
-isEmpty( QWT3D_INSTALL ):linux-g++:exists( /usr/include/qwtplot3d-qt4 ):exists( /usr/lib/libqwtplot3d-qt4.so ) {
-  INCLUDEPATH += /usr/include/qwtplot3d-qt4
-  LIBS += /usr/lib/libqwtplot3d-qt4.so
-  CONFIG += qwt3d
-}
-qwt3d {
-  QT += opengl
-  HEADERS += ModelPlot.h ModelWindow.h
-  SOURCES += ModelPlot.cpp ModelWindow.cpp
-  DEFINES += GC_HAVE_QWTPLOT3D
+    isEmpty( QWT3D_INCLUDE ) { QWT3D_INCLUDE = $${QWT3D_INSTALL}/include }
+    isEmpty( QWT3D_LIBS )    { QWT3D_LIBS    = $${QWT3D_INSTALL}/lib/libqwtplot3d.a }
+    INCLUDEPATH += $${QWT3D_INCLUDE}
+    LIBS        += $${QWT3D_LIBS}
+    QT          += opengl
+    DEFINES     += GC_HAVE_QWTPLOT3D
+    HEADERS     += ModelPlot.h ModelWindow.h
+    SOURCES     += ModelPlot.cpp ModelWindow.cpp
 }
 
 !isEmpty( KML_INSTALL) {
-    KML_INCLUDE = $${KML_INSTALL}/include
-    KML_LIBS = $${KML_INSTALL}/lib/libkmldom.a \
-               $${KML_INSTALL}/lib/libkmlconvenience.a \
-               $${KML_INSTALL}/lib/libkmlengine.a \
-               $${KML_INSTALL}/lib/libkmlbase.a \
-
-    LIBS += $${KML_LIBS} $${KML_LIBS}
-    DEFINES += GC_HAVE_KML
-    SOURCES += KmlRideFile.cpp
-    HEADERS += KmlRideFile.h
+    isEmpty( KML_INCLUDE ) { KML_INCLUDE = $${KML_INSTALL}/include }
+    isEmpty( KML_LIBS )    { 
+        KML_LIBS    = $${KML_INSTALL}/lib/libkmldom.a \
+                      $${KML_INSTALL}/lib/libkmlconvenience.a \
+                      $${KML_INSTALL}/lib/libkmlengine.a \
+                      $${KML_INSTALL}/lib/libkmlbase.a
+    }
+    INCLUDEPATH += $${KML_INCLUDE}
+    LIBS        += $${KML_LIBS}
+    DEFINES     += GC_HAVE_KML
+    SOURCES     += KmlRideFile.cpp
+    HEADERS     += KmlRideFile.h
 }
 
-!isEmpty( ICAL_INSTALL) {
-    HEADERS += ICalendar.h DiaryWindow.h  CalDAV.h
-    SOURCES += ICalendar.cpp DiaryWindow.cpp CalDAV.cpp
-    ICAL_INCLUDE = $${ICAL_INSTALL}/include
-    ICAL_LIBS = $${ICAL_INSTALL}/lib/libical.a
-    DEFINES += GC_HAVE_ICAL
+!isEmpty( ICAL_INSTALL ) {
+    isEmpty( ICAL_INCLUDE ) { ICAL_INCLUDE = $${ICAL_INSTALL}/include }
+    isEmpty( ICAL_LIBS )    { ICAL_LIBS    = $${ICAL_INSTALL}/lib/libical.a }
     INCLUDEPATH += $${ICAL_INCLUDE}
-    LIBS += $${ICAL_LIBS}
-}
-
-# are we supporting USB1 devices on Windows?
-!isEmpty( USBXPRESS_INSTALL ) {
-    LIBS += $${USBXPRESS_INSTALL}/x86/SiUSBXp.lib
-    INCLUDEPATH += $${USBXPRESS_INSTALL}
-    DEFINES += GC_HAVE_USBXPRESS
+    LIBS        += $${ICAL_LIBS}
+    DEFINES     += GC_HAVE_ICAL
+    HEADERS     += ICalendar.h DiaryWindow.h CalDAV.h
+    SOURCES     += ICalendar.cpp DiaryWindow.cpp CalDAV.cpp
 }
 
 # are we supporting USB2 devices
 !isEmpty( LIBUSB_INSTALL ) {
-    DEFINES += GC_HAVE_LIBUSB
-    INCLUDEPATH += $${LIBUSB_INSTALL}/include
-    SOURCES += LibUsb.cpp EzUsb.c Fortius.cpp FortiusController.cpp
-    HEADERS += LibUsb.h EzUsb.h Fortius.cpp FortiusController.h
-
-    unix {
-        LIBS += $${LIBUSB_INSTALL}/lib/libusb.a
+    isEmpty( LIBUSB_INCLUDE ) { LIBUSB_INCLUDE = $${LIBUSB_INSTALL}/include }
+    isEmpty( LIBUSB_LIBS )    {
+        unix  { LIBUSB_LIBS = $${LIBUSB_INSTALL}/lib/libusb.a }
+        win32 { LIBUSB_LIBS = $${LIBUSB_INSTALL}/lib/gcc/libusb.a }
     }
-
-    win32 {
-        LIBS += $${LIBUSB_INSTALL}/lib/gcc/libusb.a
-    }
+    INCLUDEPATH += $${LIBUSB_INCLUDE}
+    LIBS        += $${LIBUSB_LIBS}
+    DEFINES     += GC_HAVE_LIBUSB
+    SOURCES     += LibUsb.cpp EzUsb.c Fortius.cpp FortiusController.cpp
+    HEADERS     += LibUsb.h EzUsb.h Fortius.cpp FortiusController.h
 }
 
 # are we supporting video playback?
 # only on Linux and Windows, since we use QTKit on Mac
 !isEmpty( VLC_INSTALL ) {
-
     macx {
         # we do not use VLC on Mac we use Quicktime
         # so ignore this setting on a Mac build
     } else {
-        INCLUDEPATH += $${VLC_INSTALL}/include
-        DEFINES += GC_HAVE_VLC
-        HEADERS += VideoWindow.h
-        SOURCES += VideoWindow.cpp
-
-        win32 {
-    	    LIBS += $${VLC_INSTALL}/lib/libvlc.dll.a
-    	    LIBS += $${VLC_INSTALL}/lib/libvlccore.dll.a
-        } else {
-    	    LIBS += -lvlc
+        isEmpty( VLC_INCLUDE ) { VLC_INCLUDE = $${VLC_INSTALL}/include }
+        isEmpty( VLC_LIBS )    {
+            win32 {
+                VLC_LIBS = $${VLC_INSTALL}/lib/libvlc.dll.a \
+    	                   $${VLC_INSTALL}/lib/libvlccore.dll.a
+            } else {
+                VLC_LIBS += -lvlc -lvlccore
+            }
         }
+        INCLUDEPATH += $${VLC_INCLUDE}
+        LIBS        += $${VLC_LIBS}
+        DEFINES     += GC_HAVE_VLC
+        HEADERS     += VideoWindow.h
+        SOURCES     += VideoWindow.cpp
     }
 }
 
@@ -126,7 +122,7 @@ qwt3d {
 # Video playback using Quicktime Framework
 # Lion fullscreen playback
 macx {
-    LIBS += -lobjc -framework Carbon -framework IOKit -framework AppKit -framework QTKit
+    LIBS    += -lobjc -framework Carbon -framework IOKit -framework AppKit -framework QTKit
     HEADERS += QtMacVideoWindow.h LionFullScreen.h
     OBJECTIVE_SOURCES += QtMacVideoWindow.mm LionFullScreen.mm
 } else {
@@ -144,13 +140,20 @@ win32 {
     INCLUDEPATH += ./win32 $$[QT_INSTALL_PREFIX]/src/3rdparty/zlib
     LIBS += -lws2_32
     QMAKE_LFLAGS = -Wl,--enable-runtime-pseudo-reloc \
-        -Wl,--script,win32/i386pe.x-no-rdata,--enable-auto-import
+                   -Wl,--script,win32/i386pe.x-no-rdata,--enable-auto-import
     //QMAKE_CXXFLAGS += -fdata-sections
     RC_FILE = windowsico.rc
 
-    # Windows only USB support
-    SOURCES += USBXpress.cpp
-    HEADERS += USBXpress.h
+    # are we supporting USB1 devices on Windows?
+    !isEmpty( USBXPRESS_INSTALL ) {
+        isEmpty( USBXPRESS_INCLUDE ) { USBXPRESS_INCLUDE = $${USBXPRESS_INSTALL} }
+        isEmpty( USBXPRESS_LIBS )    { USBXPRESS_LIBS    = $${USBXPRESS_INSTALL}/x86/SiUSBXp.lib }
+        INCLUDEPATH += $${USBXPRESS_INCLUDE}
+        LIBS        += $${USBXPRESS_LIBS}
+        DEFINES     += GC_HAVE_USBXPRESS
+        SOURCES += USBXpress.cpp
+        HEADERS += USBXpress.h
+    }
 }
 
 # local qxt widgets - rather than add another dependency on libqxt
@@ -163,7 +166,11 @@ SOURCES += ../qxt/src/qxtspanslider.cpp \
            ../qxt/src/qxtscheduleitemdelegate.cpp \
            ../qxt/src/qxtstyleoptionscheduleviewitem.cpp
 
-include( ../qtsolutions/soap/qtsoap.pri )
+isEmpty( QTSOAP_INSTALL ) {
+    include( ../qtsolutions/soap/qtsoap.pri )
+} else {
+    include( $${QTSOAP_INSTALL} )
+}
 HEADERS += TPUpload.h TPUploadDialog.h TPDownload.h TPDownloadDialog.h
 SOURCES += TPUpload.cpp TPUploadDialog.cpp TPDownload.cpp TPDownloadDialog.cpp
 DEFINES += GC_HAVE_SOAP
@@ -171,7 +178,7 @@ DEFINES += GC_HAVE_SOAP
 HEADERS += ../qxt/src/qxtspanslider.h \
            ../qxt/src/qxtspanslider_p.h \
            ../qxt/src/qxtscheduleview.h \
-           .././qxt/src/qxtscheduleview_p.h \
+           ../qxt/src/qxtscheduleview_p.h \
            ../qxt/src/qxtscheduleheaderwidget.h \
            ../qxt/src/qxtscheduleviewheadermodel_p.h \
            ../qxt/src/qxtscheduleitemdelegate.h \
@@ -347,7 +354,7 @@ HEADERS += \
         ZoneScaleDraw.h
 
 YACCSOURCES = JsonRideFile.y WithingsParser.y
-LEXSOURCES = JsonRideFile.l WithingsParser.l
+LEXSOURCES  = JsonRideFile.l WithingsParser.l
 
 #-t turns on debug, use with caution
 #QMAKE_YACCFLAGS = -t -d
@@ -529,7 +536,7 @@ SOURCES += \
         main.cpp \
 
 RESOURCES = application.qrc \
-        RideWindow.qrc
+            RideWindow.qrc
 
 TRANSLATIONS = translations/gc_fr.ts \
                translations/gc_ja.ts \
@@ -546,4 +553,3 @@ OTHER_FILES += \
     web/MapWindow.html \
     web/StreetViewWindow.html \
     web/Window.css
-
