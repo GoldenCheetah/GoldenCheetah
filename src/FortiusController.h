@@ -15,23 +15,23 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-#include "GoldenCheetah.h"
-
-#include "RealtimeController.h"
-#include "Fortius.h"
-
-// Abstract base class for Realtime device controllers
 
 #ifndef _GC_FortiusController_h
 #define _GC_FortiusController_h 1
 
+#include "GoldenCheetah.h"
+#include "RealtimeController.h"
+
+#include <QThread>
+
+class Fortius;
+
 class FortiusController : public RealtimeController
 {
-
+    Q_OBJECT
 public:
-    FortiusController (TrainTool *, DeviceConfiguration *);
-
-    Fortius *myFortius;               // the device itself
+    FortiusController (TrainTool *traintool, DeviceConfiguration *);
+    virtual ~FortiusController();
 
     int start();
     int restart();                              // restart after paused
@@ -41,14 +41,36 @@ public:
     bool find();
     bool discover(DeviceConfiguration *);              // tell if a device is present at port passed
 
-
     // telemetry push pull
     bool doesPush(), doesPull(), doesLoad();
     void getRealtimeData(RealtimeData &rtData);
-    void pushRealtimeData(RealtimeData &rtData);
     void setLoad(double);
     void setGradient(double);
     void setMode(int);
+
+private Q_SLOTS:
+    void receiveTelemetry(double power, double heartrate, double cadence, double speed);
+    void receiveError(int error);
+
+    void receiveUpButtonPushed();
+    void receiveDownButtonPushed();
+    void receiveCancelButtonPushed();
+    void receiveEnterButtonPushed();
+
+private:
+    enum FortiusState {
+	Running,
+	Stopped
+    };
+
+    Fortius* fortius;
+    QThread fortiusThread;
+    FortiusState _state;
+    double _load;
+    double _power;
+    double _heartrate;
+    double _cadence;
+    double _speed;
 };
 
 #endif // _GC_FortiusController_h

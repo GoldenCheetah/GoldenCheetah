@@ -31,120 +31,120 @@
 
 #ifndef _GC_Fortius_h
 #define _GC_Fortius_h 1
-#include "GoldenCheetah.h"
 
-#include <QString>
-#include <QDebug>
-#include <QThread>
-#include <QMutex>
-#include <QFile>
-#include "RealtimeController.h"
+#include <QObject>
 
 #include "LibUsb.h"
-
-#include <stdio.h>
-#include <stdint.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/types.h>
+#include "RunningAverage.h"
 
 /* Device operation mode */
 #define FT_ERGOMODE    0x01
 #define FT_SSMODE      0x02
 #define FT_CALIBRATE   0x04
 
-/* Buttons */
-#define FT_PLUS        0x04
-#define FT_MINUS       0x02
-#define FT_CANCEL      0x08
-#define FT_ENTER       0x01
+// forward declarations
+class QTimer;
 
-/* Control status */
-#define FT_RUNNING 0x01
-#define FT_PAUSED  0x02
+const int FORTIUS_RECEIVE_MESSAGE_SIZE = 48;
 
-#define DEFAULT_LOAD        100.00
-#define DEFAULT_GRADIENT    2.00
-
-class Fortius : public QThread
+class Fortius : public QObject
 {
-
+    Q_OBJECT
 public:
-    Fortius(QObject *parent=0);       // pass device
+	enum OperationMode {
+		ErgoMode,
+		SlopeMode,
+		Calibration
+	};
+
+	Fortius(OperationMode mode, double startLoad, double startGradient,
+			QObject *parent=0);
     ~Fortius();
 
-    QObject *parent;
+    static bool find();                      // find fortius device
 
+public slots:
     // HIGH-LEVEL FUNCTIONS
-    int start();                                // Calls QThread to start
-    int restart();                              // restart after paused
-    int pause();                                // pauses data collection, inbound telemetry is discarded
-    int stop();                                 // stops data collection thread
-    int quit(int error);                        // called by thread before exiting
-
-    bool find();                                // either unconfigured or configured device found
-    bool discover(QString deviceFilename);        // confirm CT is attached to device
+    void start();
+    void restart();                              // restart after paused
+    void pause();                                // pauses data collection, inbound telemetry is discarded
+    void stop();                                 // stops data collection thread
 
     // SET
-    void setLoad(double load);                  // set the load to generate in ERGOMODE
-    void setGradient(double gradient);          // set the load to generate in SSMODE
-    void setMode(int mode, double load=DEFAULT_LOAD, double gradient=DEFAULT_GRADIENT);
-    int getMode();
-    double getGradient();
-    double getLoad();
+    void changeLoad(double load);                  // set the load to generate in ERGOMODE
+    void changeGradient(double gradient);          // set the load to generate in SSMODE
+    void useErgoMode();
+    void useSlopeMode();
 
+Q_SIGNALS:
     // GET TELEMETRY AND STATUS
     // direct access to class variables is not allowed because we need to use wait conditions
     // to sync data read/writes between the run() thread and the main gui thread
-    void getTelemetry(double &power, double &heartrate, double &cadence, double &speed, int &buttons, int &status);
+    void signalTelemetry(double power, double heartrate, double cadence,
+		      double speed);
 
+    void upButtonPushed();
+
+    void downButtonPushed();
+
+    void cancelButtonPushed();
+
+    void enterButtonPushed();
+
+    void error(int errorNr);
+
+private Q_SLOTS:
+    /** Perform read from usb */
+    void performRead();
+    /** Send signal with telemetry */
+    void emitTelemetry();
 private:
-    void run();                                 // called by start to kick off the CT comtrol thread
+
+    /** set all values to 0 */
+    void resetValues();
 
     // 56 bytes comprise of 8 7byte command messages, where
     // the last is the set load / gradient respectively
     uint8_t ERGO_Command[12],
             SLOPE_Command[12];
 
-    // Utility and BG Thread functions
+
+    // Protocol encoding
+    void prepareSlopeCommand();
+    void prepareErgoCommand();
+    void sendCommand();      // writes a command to the device
+
+    // Read message from Fortius
+    int readMessage();
+
+    QTimer *_readTimer;
+
+	// OUTBOUND COMMANDS
+	int mode;
+	double load;
+	double gradient;
+
+    // INBOUND TELEMETRY
+    RunningAverage power;
+    RunningAverage heartRate;
+    RunningAverage cadence;
+    RunningAverage speed;
+
+    // i/o message holder
+    uint8_t buf[FORTIUS_RECEIVE_MESSAGE_SIZE];
+
+    // device port
+    QScopedPointer<LibUsb> usb2;                   // used for USB2 support
+
+    void handleButtons(int buttons);
+
+    // Handling of USB port
     int openPort();
     int closePort();
 
-    // Protocol encoding
-    void prepareCommand(int mode, double value);  // sets up the command packet according to current settings
-    int sendCommand(int mode);      // writes a command to the device
-
-    // Protocol decoding
-    int readMessage();
-    void unpackTelemetry(int &b1, int &b2, int &b3, int &buttons, int &type, int &value8, int &value12);
-
-    // Mutex for controlling accessing private data
-    QMutex pvars;
-
-    // INBOUND TELEMETRY - all volatile since it is updated by the run() thread
-    volatile double devicePower;            // current output power in Watts
-    volatile double deviceHeartRate;        // current heartrate in BPM
-    volatile double deviceCadence;          // current cadence in RPM
-    volatile double deviceSpeed;            // current speef in KPH
-    volatile int    deviceButtons;          // Button status
-    volatile int    deviceStatus;           // Device status running, paused, disconnected
-
-    // OUTBOUND COMMANDS - all volatile since it is updated by the GUI thread
-    volatile int mode;
-    volatile double load;
-    volatile double gradient;
-
-    // i/o message holder
-    uint8_t buf[48];
-
-    // device port
-    LibUsb *usb2;                   // used for USB2 support
-
     // raw device utils
-    int rawWrite(uint8_t *bytes, int size); // unix!!
-    int rawRead(uint8_t *bytes, int size); // unix!!
+    int rawWrite(uint8_t *bytes, int size);
+    int rawRead(uint8_t *bytes, int size);
 };
 
 #endif // _GC_Fortius_h

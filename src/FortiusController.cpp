@@ -20,47 +20,82 @@
 #include "Fortius.h"
 #include "RealtimeData.h"
 
-FortiusController::FortiusController(TrainTool *parent,  DeviceConfiguration *dc) : RealtimeController(parent, dc)
+#include <QMetaObject>
+
+static const int DEFAULT_LOAD = 100.0;
+static const int DEFAULT_GRADIENT = 0.0;
+
+FortiusController::FortiusController(TrainTool *parent,  DeviceConfiguration *dc) :
+    RealtimeController(parent, dc),
+    fortius(new Fortius(Fortius::ErgoMode, DEFAULT_LOAD, DEFAULT_GRADIENT)),
+    _state(Stopped),
+    _load(DEFAULT_LOAD), _power(0.0), _heartrate(0.0), _cadence(0.0), _speed(0.0)
 {
-    myFortius = new Fortius (parent);
+    connect(fortius, SIGNAL(signalTelemetry(double,double,double,double)),
+	    SLOT(receiveTelemetry(double,double,double,double)));
+    connect(fortius, SIGNAL(error(int)), SLOT(receiveError(int)));
+    connect(fortius, SIGNAL(upButtonPushed()), SLOT(receiveUpButtonPushed()));
+    connect(fortius, SIGNAL(downButtonPushed()), SLOT(receiveDownButtonPushed()));
+    connect(fortius, SIGNAL(cancelButtonPushed()), SLOT(receiveCancelButtonPushed()));
+    connect(fortius, SIGNAL(enterButtonPushed()), SLOT(receiveEnterButtonPushed()));
+
+
+}
+
+FortiusController::~FortiusController()
+{
+    stop();
+    delete fortius;
+}
+
+int FortiusController::start()
+{
+    fortiusThread.start();
+    fortius->moveToThread(&fortiusThread);
+
+    QMetaObject::invokeMethod(fortius, "start");
+
+    _state = Running;
+    return 0;
 }
 
 
-int
-FortiusController::start()
+int FortiusController::restart()
 {
-    return myFortius->start();
+    QMetaObject::invokeMethod(fortius, "restart");
+
+    _state = Running;
+    return 0;
 }
 
 
-int
-FortiusController::restart()
+int FortiusController::pause()
 {
-    return myFortius->restart();
+    QMetaObject::invokeMethod(fortius, "pause");
+
+    return 0;
 }
 
 
-int
-FortiusController::pause()
+int FortiusController::stop()
 {
-    return myFortius->pause();
+    if (_state == Running)
+    {
+        QMetaObject::invokeMethod(fortius, "stop");
+
+        _state = Stopped;
+        fortiusThread.quit();
+        fortiusThread.wait();
+    }
+    return 0;
 }
 
-
-int
-FortiusController::stop()
+bool FortiusController::find()
 {
-    return myFortius->stop();
+    return Fortius::find();
 }
 
-bool
-FortiusController::find()
-{
-    return myFortius->find(); // needs to find either unconfigured or configured device
-}
-
-bool
-FortiusController::discover(DeviceConfiguration *) {return false; } // NOT IMPLEMENTED YET
+bool FortiusController::discover(DeviceConfiguration *) {return false; } // NOT IMPLEMENTED YET
 
 
 bool FortiusController::doesPush() { return false; }
@@ -73,80 +108,78 @@ bool FortiusController::doesLoad() { return true; }
  * act accordingly.
  *
  */
-void
-FortiusController::getRealtimeData(RealtimeData &rtData)
+void FortiusController::getRealtimeData(RealtimeData &rtData)
 {
-    int Buttons, Status;
-    double Power, HeartRate, Cadence, Speed, Load;
-
-    if(!myFortius->isRunning())
-    {
-        QMessageBox msgBox;
-        msgBox.setText("Cannot Connect to Fortius");
-        msgBox.setIcon(QMessageBox::Critical);
-        msgBox.exec();
-        parent->Stop(1);
-        return;
+    if (_state == Running) {
+	rtData.setWatts(_power);
+	rtData.setHr(_heartrate);
+	rtData.setCadence(_cadence);
+	rtData.setSpeed(_speed);
+	rtData.setLoad(_load);
+	// post processing, probably not used
+	// since its used to compute power for
+	// non-power devices, but we may add other
+	// calculations later that might apply
+	// means we could calculate power based
+	// upon speed even for a Fortius!
+	processRealtimeData(rtData);
+    } else {
+	QMessageBox msgBox;
+	msgBox.setText("Cannot Connect to Fortius");
+	msgBox.setIcon(QMessageBox::Critical);
+	msgBox.exec();
+	parent->Stop(1);
     }
-    // get latest telemetry
-    myFortius->getTelemetry(Power, HeartRate, Cadence, Speed, Buttons, Status);
-
-    //
-    // PASS BACK TELEMETRY
-    //
-    rtData.setWatts(Power);
-    rtData.setHr(HeartRate);
-    rtData.setCadence(Cadence);
-    rtData.setSpeed(Speed);
-
-    // get current load
-    Load = myFortius->getLoad();
-
-    // post processing, probably not used
-    // since its used to compute power for
-    // non-power devices, but we may add other
-    // calculations later that might apply
-    // means we could calculate power based
-    // upon speed even for a Fortius!
-    processRealtimeData(rtData);
-
-    //
-    // BUTTONS
-    //
-
-    // ignore other buttons if calibrating
-    if (parent->calibrating) return;
-
-    // ADJUST LOAD
-    if ((Buttons&FT_PLUS)) parent->Higher();
-    if ((Buttons&FT_MINUS)) parent->Lower();
-
-    // LAP/INTERVAL
-    if (Buttons&FT_ENTER) parent->newLap();
-
-    // CANCEL
-    if (Buttons&FT_CANCEL) parent->Stop(0);
-
-    rtData.setLoad(Load);
 }
 
-void FortiusController::pushRealtimeData(RealtimeData &) { } // update realtime data with current values
-
-void
-FortiusController::setLoad(double load)
+void FortiusController::setLoad(double load)
 {
-    myFortius->setLoad(load);
+    _load = load;
+    QMetaObject::invokeMethod(fortius, "changeLoad", Q_ARG(double, load));
 }
 
-void
-FortiusController::setGradient(double grade)
+void FortiusController::setGradient(double grade)
 {
-    myFortius->setGradient(grade);
+    QMetaObject::invokeMethod(fortius, "changeGradient", Q_ARG(double, grade));
 }
-void
-FortiusController::setMode(int mode)
+
+void FortiusController::setMode(int mode)
 {
-    if (mode == RT_MODE_ERGO) mode = FT_ERGOMODE;
-    if (mode == RT_MODE_SPIN) mode = FT_SSMODE;
-    myFortius->setMode(mode);
+    if (mode == RT_MODE_ERGO)
+        QMetaObject::invokeMethod(fortius, "useErgoMode");
+    if (mode == RT_MODE_SPIN)
+        QMetaObject::invokeMethod(fortius, "useSlopeMode");
+}
+
+void FortiusController::receiveTelemetry(double power, double heartrate,
+					 double cadence, double speed)
+{
+    _power = power;
+    _heartrate = heartrate;
+    _cadence = cadence;
+    _speed = speed;
+}
+
+void FortiusController::receiveError(int) {
+    _state = Stopped;
+}
+
+void FortiusController::receiveUpButtonPushed()
+{
+    parent->Higher();
+}
+
+void FortiusController::receiveDownButtonPushed()
+{
+    parent->Lower();
+}
+
+void FortiusController::receiveEnterButtonPushed()
+{
+    parent->newLap();
+}
+
+void FortiusController::receiveCancelButtonPushed()
+{
+    parent->Stop();
 }
