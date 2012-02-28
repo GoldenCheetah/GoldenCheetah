@@ -1,19 +1,24 @@
-# To build, copy this file to gcconfig.pri and then fill in the paths to your
-# local installs of Boost and srmio in the copy.  If you don't want
-# support for SRM downloads, just comment out the SRMIO_INSTALL line, but make
-# sure you have installed a version of srmio with PCIV/7 support (please
-# check http://www.zuto.de/project/srmio/ or build from  git://github.com/rclasen/srmio.git
+# To build, copy this file to gcconfig.pri and then fill in the paths.
 
-BOOST_INSTALL = /usr/local/boost
-SRMIO_INSTALL = /usr/local/srmio
-D2XX_INCLUDE = /usr/local/include/D2XX
+# You can define the name of the executage file here.
+# If you do not specify anything then we deafult to: GoldenCheetah
+#APP_NAME = 
 
-# We use g++ on all platforms so switch on
-# auto vectorization amongst other things to
-# speed up looping over ride file points
+# We recommend a debug build for development and a release build for deployment
+#CONFIG += debug
+#CONFIG += release
+
+# If you want a console window to appear on Windows machines
+# then uncomment the following two lines.
+#CONFIG += console
+#QMAKE_LFLAGS = -mwindows
+
+# We use g++ on all platforms so switch on auto vectorization amongst other
+# things to speed up looping over ride file points
 #QMAKE_CXXFLAGS += -O3
 
-#let us know where flex/bison are:
+# Let us know where flex and bison are installed.
+# You may need to specify the full path if things don't work.
 #QMAKE_LEX  = flex
 #QMAKE_YACC = bison
 #win32 {
@@ -22,35 +27,75 @@ D2XX_INCLUDE = /usr/local/include/D2XX
 #  QMAKE_DEL_FILE = rm -f
 #}
 
+# Set path to the root of the boost include files. 
+# If the files are in /usr/include/boost then set
+# BOOST_INCLUDE = /usr/include
+# If you do not define BOOST_INCLUDE the application may or may not compile.
+BOOST_INCLUDE = 
+
+# If you want SRM download support you must install SRMIO
+#     http://www.zuto.de/project/srmio/
+# Set path to the root of the SRMIO installation
+# If you installed in /usr/local/srmio then set
+# SRMIO_INSTALL = /usr/local/srmio
+# This will automatically set:
+# SRMIO_INCLUDE = $${SRMIO_INSTALL}/include 
+# SRMIO_LIBS    = $${SRMIO_INSTALL}/lib/libsrmio.a
+# You may override the INCLUDE and LIB files if you like.
+# You *must* define SRMIO_INSTALL to use this feature.
+#SRMIO_INSTALL = 
+#SRMIO_INCLUDE = 
+#SRMIO_LIBS    = 
+
+# If you want D2XX device downloads, you need the D2XX libraries
+#    http://www.ftdichip.com/Drivers/D2XX.htm
+# Set path to where the D2XX include file (d2xx.h) is located
+# If the files are in /usr/include/d2xx then set
+# D2XX = /usr/include/d2xx
+# If for some reason you need a library to compile d2xx support
+# specify it on the D2XX_LIBS = line.
+# You *must* define D2XX_INCLUDE to use this feature.
+#D2XX_INCLUDE = 
+#D2XX_LIBS    =
+
 # If you want Twitter support you must install liboauth
-# http://liboauth.sourceforge.net/
-# Set the path to where liboauth.a was installed
-# By default it will have been installed like this:
-#
-#LIBOAUTH_INSTALL = /usr/local
-#LIBCRYPTO_INSTALL = -lcrypto
-#LIBCURL_INSTALL=-lcurl
-#LIBZ_INSTALL=-lz
+#     http://liboauth.sourceforge.net/
+# Set path to the root of the OAUTH installation
+# If you installed in /usr/local/oauth then set
+# LIBOAUTH_INSTALL = /usr/local/oauth
+# This will automatically set:
+# LIBOAUTH_INCLUDE = $${LIBOAUTH_INSTALL}/include 
+# LIBOAUTH_LIBS    = $${LIBOAUTH_INSTALL}/lib/liboauth.a -lcurl -lcrypto -lz
+# You may override the INCLUDE and LIB files if you like.
+# You *must* define LIBOAUTH_INSTALL to use this feature.
+#LIBOAUTH_INSTALL = 
+#LIBOAUTH_INCLUDE = 
+#LIBOAUTH_LIBS    = 
 
 # If you want 3D plotting, you need to install qwtplot3d
-#
-#  http://qwtplot3d.sourceforge.net/
-#
-#  If you are running Linux and have font problems, download
-#  the Tar ball from http://qwtplot3d.svn.sourceforge.net/viewvc/qwtplot3d/
-#  Follow Branches -> Maintain_0_2_x -> qwtplot3d
-#
-## then set the following variable appropriately:
+#     http://qwtplot3d.sourceforge.net/
+# If you are running Linux and have font problems, download
+# the Tar ball from http://qwtplot3d.svn.sourceforge.net/viewvc/qwtplot3d/
+# Follow Branches -> Maintain_0_2_x -> qwtplot3d
+# Set path to the root of the qwtplot3d installation
+# If you installed in /usr/local/qwtplot3d then set
+# QWT3D_INSTALL = /usr/local/qwtplot3d
+# This will automatically set:
+# QWT3D_INCLUDE = $${QWT3D_INSTALL}/include 
+# QWT3D_LIBS    = $${QWT3D_INSTALL}/lib/libqwtplot3d.a
+# You may override the INCLUDE and LIB files if you like.
+# You *must* define QWT3D_INSTALL to use this feature.
+#QWT3D_INSTALL = 
+#QWT3D_INCLUDE = 
+#QWT3D_LIBS    = 
 
-#QWT3D_INSTALL = /usr/local/qwtplot3d
-
-# If you want TrainingPeaks.com upload/download you need
-# to install the Qt Soap add-on
-#
-#  http://qt.nokia.com/products/appdev/add-on-products/catalog/4/Utilities/qtsoap
-#
-# then set the following variable appropriately:
-#QTSOAP_INSTALL = /usr/local/qtsoap-2.7_1-opensource/
+# For TrainingPeaks.com upload/download you need to install the Qt Soap add-on
+#     http://qt.nokia.com/products/appdev/add-on-products/catalog/4/Utilities/qtsoap
+# If qtsoap.pri is install in /usr/local/qtsolutions/soap/ then set
+# QTSOAP_INSTALL = /usr/local/qtsolutions/soap
+# By default we use a copy of Qt Soap in the GIT repository.
+# You *must* define QTSOAP_INSTALL to use a different version than this.
+#QTSOAP_INSTALL = 
 
 # If you want support for Google Earth .kml files then you need
 # to install the Google libkml library
@@ -59,45 +104,47 @@ D2XX_INCLUDE = /usr/local/include/D2XX
 # or on Linux sudo apt-get install libkml-dev
 #
 # then set the following variable appropriately
-# to the root of the libs/includ path
+# to the root of the libs/include path
 #KML_INSTALL = /usr/local
+#KML_INCLUDE = 
+#KML_LIBS    = 
 
-# If you want support for Downloading iCal calendars
-# you will need to install libical
-#
-# http://sourceforge.net/projects/freeassociation/
-#
-# then set the following variable appropriately
-# to the root of the libs/includ path
-#ICAL_INSTALL = /usr/local/libical
+# If you want support for downloading from iCal calendars you will need libical
+#     http://sourceforge.net/projects/freeassociation/
+# Set path to the root of the libical installation
+# If you installed in /usr/local/libical then set
+# ICAL_INSTALL = /usr/local/libical
+# This will automatically set:
+# ICAL_INCLUDE = $${ICAL_INSTALL}/include 
+# ICAL_LIBS    = $${ICAL_INSTALL}/lib/libical.a
+# You may override the INCLUDE and LIB files if you like.
+# You *must* define ICAL_INSTALL to use this feature.
+#ICAL_INSTALL = 
+#ICAL_INCLUDE = 
+#ICAL_LIBS    =
 
-# SliLabs USB Xpress SDK
-# ** note this is only required on windows, on Mac and Linux
-# ** the USB stick is presented as a serial device.
-# If you want support for using USB1 sticks in realtime
-# then install the SiLabs USBXpress development kit
-# from http://www.silabs.com/products/mcu/Pages/USBXpress.aspx
-# and set the following to the 'Host' directory within the
-# SDK, the value below is correct if you install using the default
-# pathname (SiLabs in your root directory)
-#USBXPRESS_INSTALL=/c/SiLabs/MCU/USBXpress/USBXpress_API/Host/
+# If you want support for using USB1 sticks in Train View on Windows
+# then install the SiLabs USBXpress Software Development Kit (SDK)
+#     http://www.silabs.com/products/mcu/Pages/USBXpress.aspx
+# and set the following to the 'Host' directory within the SDK
+# USBXPRESS_INSTALL = /c/SiLabs/MCU/USBXpress/USBXpress_API/Host/
+# You may override the INCLUDE and LIB files if you like.
+# You *must* define USBXPRESS_INSTALL to use this feature.
+#USBXPRESS_INSTALL = 
+#USBXPRESS_INCLUDE = 
+#USBXPRESS_LIBS    = 
 
-# Libusb 0.1.12
-# Note this is also only required on build support for Train View
-# to support Garmin USB2 sticks
-#
-# For Windows builds:
-# You must make sure you install v0.1.12.2 of libusb-win from:
-# http://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/0.1.12.2/
-#LIBUSB_INSTALL=/c/libusb-win32-device-bin-0.1.12.2
-#
-# For Linux and OS X builds:
-# You must make sure you libusb v0.1.12.2 from:
-# http://prdownloads.sourceforge.net/libusb/libusb-0.1.12.tar.gz
-# it has been placed in the contrib directory, but you will need
-# to configure and build it separately, take care to build for the
-# right target architecture on OSX (i386) to avoid linker errors
-#LIBUSB_INSTALL=/usr/local
+# If you want support for using USB2 sticks in Train View on Linux or Windows
+# then you need to install libusb (Linux) or libusb-win32 (Windows) version 0.1.12
+# For Linux builds download: (There is a copy in the contrib directory)
+#     http://prdownloads.sourceforge.net/libusb/libusb-0.1.12.tar.gz
+# For Windows builds download:
+#     http://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/0.1.12.2/
+# You may override the INCLUDE and LIB files if you like.
+# You *must* define LIBUSB_INSTALL to use this feature.
+#LIBUSB_INSTALL = /usr/local
+#LIBUSB_INCLUDE = 
+#LIBUSB_LIBS    = 
 
 # if you want video playback on training mode then
 # download and install vlc (videolan) from
@@ -106,30 +153,33 @@ D2XX_INCLUDE = /usr/local/include/D2XX
 # will need to use the latest distro (e.g. Meerkat
 # on Ubuntu) to be sure apt-get installs the latest
 # builds (we need 1.1.8 or higher).
-# e.g. LINUX
-#VLC_INSTALL = /usr/include/vlc/
-# e.g. WINDOWS
-#VLC_INSTALL = /c/GC/vlc-1.1.8/sdk
-#
+# Set path to the root of the VLC installation
+# If the are installed in /usr/local/vlc then set
+# VLC_INSTALL = /usr/local/vlc
+# This will automatically set (Windows and Unix):
+# VLC_INCLUDE = $${VLC_INSTALL}/include 
+# For Windows
+# VLC_LIBS    = $${VLC_INSTALL}/lib/libvlc.dll.a $${VLC_INSTALL}/lib/libvlccore.dll.a
+# For Unix
+# VLC_LIBS    = -lvlc -lvlccore
+# You may override the INCLUDE and LIB files if you like.
+# You *must* define VLC_INSTALL to use this feature.
+#VLC_INSTALL = 
+#VLC_INCLUDE = 
+#VLC_LIBS    = 
+
 # *** Mac users NOTE ***
 # On MAC you don't need libvlc since we use the
 # native QTKit (OSX framework) for video playback
 # using Quicktime and on 10.6 or higher Quicktime X
 #
 
-# We recommend a debug build for development, and a static build for releases.
-CONFIG += debug
-#CONFIG += static
-
-# Edit these paths only if you have a Boost/srmio install that uses
-# a non-standard directory layout.
-
-BOOST_INCLUDE = $${BOOST_INSTALL}/include
-
-!isEmpty( SRMIO_INSTALL ) {
-    SRMIO_INCLUDE = $${SRMIO_INSTALL}/include
-    SRMIO_LIB = $${SRMIO_INSTALL}/lib/libsrmio.a
-}
+# If your system has PKG_CONFIG, QT can use this to get dependent libraries.
+# Add the names of libraries with PKG_CONFIG information.
+# eg. PKGCONFIG = oauth libical
+# Uncomment the following two lines to enable.
+#CONFIG   += link_pkgconfig
+#PKGCONFIG = 
 
 macx {
     # Uncomment this line to build with OS X Tiger support on a Leopard system:
@@ -139,9 +189,6 @@ macx {
     #CONFIG+=x86 ppc
 
     # Uncomment this line if you have SDK 10.7 or higher
-    DEFINES += GC_HAVE_LION
+    #DEFINES += GC_HAVE_LION
 }
 
-#if you want a 'robot' to test realtime code without having
-#to get on your trainer and ride then uncomment below
-#DEFINES += GC_WANT_ROBOT
