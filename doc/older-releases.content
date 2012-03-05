@@ -27,6 +27,81 @@ please see <a href="download.html">the download page</a> instead.
 <a href="GoldenCheetah_2.0.0_Windows_Installer.exe">Windows 32-bit</a>
 </td>
 <td valign="top">
+<p>
+New Features
+  <ul>
+  <li>Aerolab (Andy Froncioni)</li>
+  <li>View ride in Google Maps (Greg Lonnon)</li>
+  <li>Long Term Metrics (Mark Liversedge)</li>
+  <li>User configurable ride metadata (Mark Liversedge)</li>
+  <li>Ride editor and tools (Mark Liversedge)</li>
+  <li>HR Zones and TRIMP Metrics (Damien Grauser)</li>
+  <li>Twitter support (Justin Knotzke)</li>
+  </ul>
+</p>
+
+<p>
+Internationalisation
+  <ul>
+  <li>Updates to French translation (Damien Grauser)</li>
+  <li>Japanese translation (Mitsukuni Sato)</li>
+  </ul>
+</p>
+
+<p>
+New Logo and Icons
+  <ul>
+  <li>Golden Cheetah Logo(Dan Schmalz)</li>
+  </ul>
+</p>
+
+<p>
+Enhanced Ride Plot
+  <ul>
+  <li>Ride plot stacked view (Damien Grauser)</li>
+  <li>Scrolling Ride Plot (Mark Liversedge)</li>
+  </ul>
+</p>
+
+<p>
+New Devices and File Formats Supported
+  <ul>
+  <li>Support for Joule BIN File Format (Damien Grauser)</li>
+  <li>Tacx CAF Ride File Format Support (Ilja Booij)</li>
+  <li>Garmin FIT ride file support (Sean Rhea)</li>
+  <li>Export to Google Earth 5.2 KML (Mark Liversedge)</li>
+  <li>Training Peaks PWX ride file support (Mark Liversedge)</li>
+  <li>Polar SRD ride file support (Mark Liversedge)</li>
+  <li>Racermate CompCS/Ergvideo .TXT ride file support (Mark Liversedge)</li>
+  </ul>
+<p>
+
+<p>
+Numerous enhancements and bug fixes from
+  <ul>
+  <li>Julian Baumgartner</li>
+  <li>Robert Carlsen</li>
+  <li>Rainer Clasen</li>
+  <li>Gareth Coco</li>
+  <li>Dag Gruneau</li>
+  <li>Jamie Kimberley</li>
+  <li>Jim Ley</li>
+  <li>Patrick J. McNerthney</li>
+  <li>Austin Roach</li>
+  <li>Ken Sallot</li>
+  <li>Thomas Weichmann</li>
+  </ul>
+</p>
+
+<p>
+Builds, testing and support
+  <ul>
+  <li>Robert Carlsen</li>
+  <li>Gareth Coco</li>
+  <li>Jamie Kimberley</li>
+  <li>Justin Knotzke</li>
+  </ul>
+</p>
 </td>
 </tr>
 <tr>
