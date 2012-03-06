@@ -62,22 +62,30 @@ and download the version for your operating system and processor.
 On Mac OS X, when the download finishes, Mac OS X should automatically open
 the <code>.dmg</code> file for you.  If not, double-click to open it.  Drag
 the GoldenCheetah icon into your Applications folder, and you're done.
+</p>
 
 <p>
-The Linux version of GoldenCheetah is distributed as a GZipped archive.
+The Windows version has an installer. Just run the Installer, select where
+to install the application and away you go.
+</p>
+
+<p>
+The Linux version of GoldenCheetah is distributed as a GZipped tar archive.
 Download this file and save it to <code>/tmp</code>, then from a terminal:
 
 <pre>
 cd /tmp
-gunzip -vf GoldenCheetah_X.X.X_Linux_x86.gz
-cd GoldenCheetah_X.X.X_Linux_x86
+tar xvzf GoldenCheetah_X.X.X_Linux_ARCH.tgz
+cd GoldenCheetah_X.X.X_Linux_ARCH
+sudo chmod u+x GoldenCheetah
 sudo cp GoldenCheetah /usr/local/bin
 cd ..
-rm -rf GoldenCheetah_X.X.X_Linux_x86.gz
+rm -rf GoldenCheetah_X.X.X_Linux_ARCH
 </pre>
 
 Be sure to replace "X.X.X" with the version of the release you downloaded,
-such as "2.0.0".
+such as "2.1.0" and replace "ARCH" with the architecture of the release
+you download - either "x86" (32bit) or "x84_64" (64bit).
 
 <p>
 <big><font face="arial,helvetica,sanserif">
@@ -86,7 +94,9 @@ Step 3: Running GoldenCheetah
 
 <p>
 To run GoldenCheetah on Mac OS X, double-click on the GoldenCheetah icon in
-your Applications folder.  On Linux, just type "GoldenCheetah" at the prompt.
+your Applications folder. On Windows, click the Start button, All Programs
+link, GoldenCheetah folder and then the Golden Cheetah program. On Linux,
+just type "GoldenCheetah" at the prompt.
 
 <p>
 The first time you run GoldenCheetah, you'll get an empty "Choose a Cyclist"
