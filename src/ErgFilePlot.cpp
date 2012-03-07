@@ -50,10 +50,10 @@ QRectF ErgFileData::boundingRect() const
         foreach(ErgFilePoint x, main->currentErgFile()->Points) {
             if (x.y > maxY) maxY = x.y;
             if (x.x > maxX) maxX = x.x;
-            if (x.y < minY) minY = x.x;
+            if (x.y < minY) minY = x.y;
             if (x.x < minX) minX = x.x;
         }
-        maxY *= 1.1f; // always need a bit of headroom
+        maxY *= 1.3f; // always need a bit of headroom
         return QRectF(minX, minY, maxX, maxY);
     }
     return QRectF(0,0,0,0);

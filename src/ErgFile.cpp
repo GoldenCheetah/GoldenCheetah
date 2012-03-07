@@ -238,6 +238,7 @@ void ErgFile::parseComputrainer(QString p)
     int lapcounter = 0;
     format = ERG;                         // either ERG or MRC
     Points.clear();
+    float unitsConversionFactor = 1.0;
 
     // running totals for CRS file format
     long rdist = 0; // running total for distance
@@ -268,7 +269,7 @@ void ErgFile::parseComputrainer(QString p)
     QRegExp relativeWatts("^[ \\t]*([0-9\\.]+)[ \\t]*([0-9\\.]+)%[ \\t\\n]*$", Qt::CaseInsensitive);
 
     // distance slope wind records
-    QRegExp absoluteSlope("^[ \\t]*([0-9\\.]+)[ \\t]*([-0-9\\.]+)[ \\t\\n]([-0-9\\.]+)[ \\t\\n]*$",
+    QRegExp absoluteSlope("^[ \\t]*([0-9\\.]+)[ \\t]*([-0-9\\.]+)[ \\t\\n]*([-0-9\\.]+)[ \\t\\n]*$",
                            Qt::CaseInsensitive);
 
     // Lap marker in an ERG/MRC file
@@ -346,10 +347,14 @@ void ErgFile::parseComputrainer(QString p)
 
                 QRegExp punit("^UNITS *", Qt::CaseInsensitive);
                 if (punit.exactMatch(settings.cap(1))) {
-			Units = settings.cap(2);
-			// UNITS can be ENGLISH or METRIC (miles/km)
-			// XXX FIXME XXX
-		}
+                    Units = settings.cap(2);
+                    // UNITS can be ENGLISH or METRIC (miles/km)
+                    QRegExp penglish(" ENGLISH$", Qt::CaseInsensitive);
+                    if (penglish.exactMatch(Units)) { // Units <> METRIC 
+                      //qDebug("Setting conversion to ENGLISH");
+                      unitsConversionFactor = 1.609344;
+                    }
+                  }
 
                 QRegExp pftp("^FTP *", Qt::CaseInsensitive);
                 if (pftp.exactMatch(settings.cap(1))) Ftp = settings.cap(2).toInt();
@@ -376,7 +381,7 @@ void ErgFile::parseComputrainer(QString p)
                 case MRC:       // its a percent relative to CP (mrc file)
                     add.y *= Cp;
                     add.y /= 100.00;
-		    add.val = add.y;
+                    add.val = add.y;
                     break;
                 }
                 Points.append(add);
@@ -395,15 +400,15 @@ void ErgFile::parseComputrainer(QString p)
                 // dist, grade, wind strength
                 ErgFilePoint add;
 
-		// distance guff
+                // distance guff
                 add.x = rdist;
-		int distance = absoluteSlope.cap(1).toDouble() * 1000; // convert to meters
-		rdist += distance;
+                int distance = unitsConversionFactor * absoluteSlope.cap(1).toDouble() * 1000; // convert to meters
+                rdist += distance;
 
-		// gradient and altitude
+                // gradient and altitude
                 add.val = absoluteSlope.cap(2).toDouble();
                 add.y = ralt;
-		ralt += distance * add.val / 100; /* paused */
+                ralt += distance * add.val / 100; /* paused */
 
                 Points.append(add);
                 if (add.y > MaxWatts) MaxWatts=add.y;
@@ -412,9 +417,9 @@ void ErgFile::parseComputrainer(QString p)
             } else if (ignore.exactMatch(line)) {
                 // do nothing for this line
             } else {
-                // ignore bad lines for now. just bark.
-                //qDebug()<<"huh?" << line;
-	    }
+              // ignore bad lines for now. just bark.
+              //qDebug()<<"huh?" << line;
+            }
 
         }
 
