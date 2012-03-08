@@ -19,6 +19,7 @@
 #include "ErgFile.h"
 
 #include <stdint.h>
+#include "Units.h"
 
 ErgFile::ErgFile(QString filename, int &mode, double Cp, MainWindow *main) : 
     Cp(Cp), filename(filename), main(main), mode(mode)
@@ -238,7 +239,9 @@ void ErgFile::parseComputrainer(QString p)
     int lapcounter = 0;
     format = ERG;                         // either ERG or MRC
     Points.clear();
-    float unitsConversionFactor = 1.0;
+
+    // start by assuming the input file is Metric
+    bool bIsMetric = true;
 
     // running totals for CRS file format
     long rdist = 0; // running total for distance
@@ -352,7 +355,7 @@ void ErgFile::parseComputrainer(QString p)
                     QRegExp penglish(" ENGLISH$", Qt::CaseInsensitive);
                     if (penglish.exactMatch(Units)) { // Units <> METRIC 
                       //qDebug("Setting conversion to ENGLISH");
-                      unitsConversionFactor = 1.609344;
+                      bIsMetric = false;
                     }
                   }
 
@@ -402,7 +405,9 @@ void ErgFile::parseComputrainer(QString p)
 
                 // distance guff
                 add.x = rdist;
-                int distance = unitsConversionFactor * absoluteSlope.cap(1).toDouble() * 1000; // convert to meters
+                int distance = absoluteSlope.cap(1).toDouble() * 1000; // convert to meters
+
+                if (!bIsMetric) distance *= KM_PER_MILE;
                 rdist += distance;
 
                 // gradient and altitude
