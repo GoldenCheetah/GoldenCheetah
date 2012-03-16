@@ -655,7 +655,7 @@ MainWindow::MainWindow(const QDir &home) :
     QMenu *fileMenu = menuBar()->addMenu(tr("&Athlete"));
     fileMenu->addAction(tr("&New..."), this, SLOT(newCyclist()), tr("Ctrl+N"));
     fileMenu->addAction(tr("&Open..."), this, SLOT(openCyclist()), tr("Ctrl+O"));
-    fileMenu->addAction(tr("&Close Window"), this, SLOT(close()), tr(""));
+    fileMenu->addAction(tr("&Close Window"), this, SLOT(close()), tr ("Ctrl+W"));
     fileMenu->addAction(tr("&Quit All Windows"), this, SLOT(closeAll()), tr("Ctrl+Q"));
 
     QMenu *rideMenu = menuBar()->addMenu(tr("A&ctivity"));
@@ -696,11 +696,11 @@ MainWindow::MainWindow(const QDir &home) :
                         SLOT(importMeasures()), tr("Ctrl+I"));
     measureMenu->addSeparator();
     measureMenu->addAction(tr("Get &Withings Data..."), this,
-                        SLOT (downloadMeasures()), tr ("Ctrl+W"));
+                        SLOT (downloadMeasures()));
 #endif
 
     QMenu *optionsMenu = menuBar()->addMenu(tr("&Tools"));
-    optionsMenu->addAction(tr("&Options..."), this, SLOT(showOptions()), tr("Ctrl+O"));
+    optionsMenu->addAction(tr("&Options..."), this, SLOT(showOptions()));
     optionsMenu->addAction(tr("Critical Power Calculator..."), this, SLOT(showTools()));
     optionsMenu->addAction(tr("Air Density (Rho) Estimator..."), this, SLOT(showRhoEstimator()));
 
