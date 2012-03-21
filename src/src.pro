@@ -186,6 +186,7 @@ HEADERS += ../qxt/src/qxtspanslider.h \
 
 HEADERS += \
         AddDeviceWizard.h \
+        AddIntervalDialog.h \
         Aerolab.h \
         AerolabWindow.h \
         AthleteTool.h \
@@ -361,6 +362,7 @@ LEXSOURCES  = JsonRideFile.l WithingsParser.l
 
 SOURCES += \
         AddDeviceWizard.cpp \
+        AddIntervalDialog.cpp \
         AerobicDecoupling.cpp \
         Aerolab.cpp \
         AerolabWindow.cpp \

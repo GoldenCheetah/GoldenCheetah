@@ -17,6 +17,7 @@
  */
 
 #include "MainWindow.h"
+#include "AddIntervalDialog.h"
 #include "AthleteTool.h"
 #include "BestIntervalDialog.h"
 #include "ChooseCyclistDialog.h"
@@ -715,8 +716,7 @@ MainWindow::MainWindow(const QDir &home) :
     optionsMenu->addAction(tr("Refresh Calendar"), this, SLOT(refreshCalendar()), tr (""));
 #endif
     optionsMenu->addSeparator();
-    optionsMenu->addAction(tr("Find &best intervals..."), this, SLOT(findBestIntervals()), tr ("Ctrl+B"));
-    optionsMenu->addAction(tr("Find power &peaks..."), this, SLOT(findPowerPeaks()), tr ("Ctrl+P"));
+    optionsMenu->addAction(tr("Find intervals..."), this, SLOT(addIntervals()), tr (""));
 
     // Add all the data processors to the tools menu
     const DataProcessorFactory &factory = DataProcessorFactory::instance();
@@ -1797,6 +1797,14 @@ void
 MainWindow::findBestIntervals()
 {
     BestIntervalDialog *p = new BestIntervalDialog(this);
+    p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
+    p->exec();
+}
+
+void
+MainWindow::addIntervals()
+{
+    AddIntervalDialog *p = new AddIntervalDialog(this);
     p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
     p->exec();
 }

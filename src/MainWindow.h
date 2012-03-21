@@ -246,6 +246,7 @@ class MainWindow : public QMainWindow
 #endif
         void importFile();
         void findBestIntervals();
+        void addIntervals();
         void addIntervalForPowerPeaksForSecs(RideFile *ride, int windowSizeSecs, QString name);
         void findPowerPeaks();
         void splitRide();
