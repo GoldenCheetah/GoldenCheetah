@@ -502,7 +502,7 @@ AddIntervalDialog::findPeakPowerStandard(const RideFile *ride, QList<AddedInterv
     findBests(true, ride, 30, 1, results, "Peak 30s");
     findBests(true, ride, 60, 1, results, "Peak 1min");
     findBests(true, ride, 120, 1, results, "Peak 2min");
-    findBests(true, ride, 300, 1, results, "Peak 10min");
+    findBests(true, ride, 300, 1, results, "Peak 5min");
     findBests(true, ride, 600, 1, results, "Peak 10min");
     findBests(true, ride, 1200, 1, results, "Peak 20min");
     findBests(true, ride, 1800, 1, results, "Peak 30min");
