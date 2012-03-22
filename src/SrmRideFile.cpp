@@ -295,7 +295,8 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
         double start_secs = result->dataPoints()[start]->secs;
         int end = qMin(marker.end - 1, result->dataPoints().size() - 1);
         double end_secs = result->dataPoints()[end]->secs + result->recIntSecs();
-        result->addInterval(last, start_secs, "");
+        if( last < start_secs )
+            result->addInterval(last, start_secs, "");
         QString note = QString("%1").arg(i);
         if( marker.note.length() )
             note += QString(" ") + marker.note;
