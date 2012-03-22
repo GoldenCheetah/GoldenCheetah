@@ -75,6 +75,7 @@ static qint32 readSignedLong(QDataStream &in)
 struct marker
 {
     int start, end;
+    QString note;
 };
 
 struct blockhdr
@@ -98,6 +99,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
 
     RideFile *result = new RideFile;
     result->setDeviceType("SRM");
+    result->setTag("Sport", "Bike" );
 
     char magic[4];
     in.readRawData(magic, sizeof(magic));
@@ -132,9 +134,12 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
     char comment[71];
     in.readRawData(comment, sizeof(comment) - 1);
     comment[commentlen - 1] = '\0';
+    result->setTag("Notes", QString(comment) );
 
     result->setRecIntSecs(((double) recint1) / recint2);
     unsigned recintms = (unsigned) round(result->recIntSecs() * 1000.0);
+
+    result->setTag("Wheel Circumference", QString("%1").arg(wheelcirc) );
 
     QDate date(1880, 1, 1);
     date = date.addDays(dayssince1880);
@@ -170,6 +175,12 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
         markers[i].end = end;
     }
 
+        markers[i].note = QString( mcomment);
+
+        if( i == 0 ){
+            result->setTag("Athlete Name", QString(mcomment) );
+        }
+
         (void) active;
         (void) avgwatts;
         (void) avghr;
@@ -197,8 +208,9 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
     quint16 datacnt = readShort(in);
     readByte(in); // padding
 
-    (void) zero;
-    (void) slope;
+    result->setTag("Slope", QString("%1")
+        .arg( 140.0 / 42781 * slope, 0, 'f', 2) );
+    result->setTag("Zero Offset", QString("%1").arg(zero) );
 
     // SRM5 files have no blocks - synthesize one
     if( blockcnt < 1 ){
@@ -292,8 +304,12 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
         double start_secs = result->dataPoints()[start]->secs;
         int end = qMin(marker.end - 1, result->dataPoints().size() - 1);
         double end_secs = result->dataPoints()[end]->secs + result->recIntSecs();
-        result->addInterval(last, start_secs, "");
-        result->addInterval(start_secs, end_secs, QString("%1").arg(i));
+        if( last < start_secs )
+            result->addInterval(last, start_secs, "");
+        QString note = QString("%1").arg(i);
+        if( marker.note.length() )
+            note += QString(" ") + marker.note;
+        result->addInterval(start_secs, end_secs, note );
         last = end_secs;
     }
     if (!markers.empty() && markers.last().end < result->dataPoints().size()) {
