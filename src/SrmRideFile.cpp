@@ -75,6 +75,7 @@ static qint32 readSignedLong(QDataStream &in)
 struct marker
 {
     int start, end;
+    QString note;
 };
 
 struct blockhdr
@@ -169,6 +170,8 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
         markers[i].start = start;
         markers[i].end = end;
     }
+
+        markers[i].note = QString( mcomment);
 
         (void) active;
         (void) avgwatts;
@@ -293,7 +296,10 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
         int end = qMin(marker.end - 1, result->dataPoints().size() - 1);
         double end_secs = result->dataPoints()[end]->secs + result->recIntSecs();
         result->addInterval(last, start_secs, "");
-        result->addInterval(start_secs, end_secs, QString("%1").arg(i));
+        QString note = QString("%1").arg(i);
+        if( marker.note.length() )
+            note += QString(" ") + marker.note;
+        result->addInterval(start_secs, end_secs, note );
         last = end_secs;
     }
     if (!markers.empty() && markers.last().end < result->dataPoints().size()) {
