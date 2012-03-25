@@ -8,18 +8,9 @@ tracker</a>. Instructions for doing so are <a href="bug-tracker.html">here</a>.
 <p>
 Examples of some features are:
 <ul>
-<li>Graph ride metrics (daily hours, work, BikeScore) over the long
-    term (weeks, seasons)</li>
-<li>Display the numbers at the bottom of the ride plot, like the 
-    critical power graph does</li>
-<li>Select intervals in the ride plot and display metrics for them
-    at the bottom</li>
-<li>Pop up an "importing rides" thermometer when importing</li>
+
 <li>Remember last settings for showPower, showHr, etc., in ride plot</li>
-<li>Group rides list into seasons</li>
-<li>Group rides list by type, course</li>
 <li>Add lines to CP plot for seasons, last six (eight?) weeks, etc.</li>
-<li>Create new intervals</li>
 <li>Show mulitple rides (seasons, etc.) in power histogram</li>
 <li>Annotate ride plot</li>
 <li>Label rides by type, course</li>

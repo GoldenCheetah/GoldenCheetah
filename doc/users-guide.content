@@ -1,17 +1,35 @@
 <!-- $Id: users-guide.content,v 1.5 2006/05/27 16:32:46 srhea Exp $ -->
+<p>
+Note that more detailed information is often available on the
+<a href = http://bugs.goldencheetah.org/projects/goldencheetah/wiki>
+Golden Cheetah Wiki</a>.
 
+<p>
+What follows is a brief step-by-step guide to installing and setting up
+Golden Cheetah.
+
+<p>
 <big><font face="arial,helvetica,sanserif">
-Step 1: Installing the FTDI drivers
+Step 1 (optional): Installing the FTDI drivers
 </font></big>
 
 <p>
-Depending on your operating system, you may need to install the <a
-href="http://www.ftdichip.com/Drivers/D2XX.htm">FTDI USB
-driver</a> if you're using the PowerTap's new USB download cradle. The FTDI USB drivers are an optional install if you do not plan on downloading from your device using Golden Cheetah.
-(Note: version 1.7 of the FTDI drivers for Mac seems to be buggy.  Until they
-post a patched version, you can download version 1.6
-<a href="http://bugs.goldencheetah.org/attachments/download/1/Universal_D2XX0.1.6.dmg">here</a>.)
-</p>
+This step is only needed if you want to download rides from a powertap
+pro/comp/cervo head unit via the supplied USB cradle. Furthermore, most
+Windows and Linux systems should recognize the device without installing
+the drivers below.
+
+<p>
+Depending on your operating system, you <i>may</i> need to install the
+<ahref="http://www.ftdichip.com/Drivers/D2XX.htm">FTDI D2XX driver</a> if
+you're using the PowerTap's new USB download cradle.
+Note: version 0.1.7 of the FTDI drivers for Mac seems to be buggy.  Until they
+post a patched version, you can download version 0.1.6
+<a href="http://bugs.goldencheetah.org/attachments/download/1/Universal_D2XX0.1.6.dmg"> here</a>
+and install via the terminal. Or if you are not terminal savvy, download an installer that will
+perform the installation of the 0.1.6 drivers for you
+<a href="http://bugs.goldencheetah.org/attachments/download/248/Install_D2XX_drivers.mpkg.zip">
+here</a>.
 
 <p>
 If you're running Linux, you may also need to uninstall the <code>brtty</code>
@@ -44,22 +62,30 @@ and download the version for your operating system and processor.
 On Mac OS X, when the download finishes, Mac OS X should automatically open
 the <code>.dmg</code> file for you.  If not, double-click to open it.  Drag
 the GoldenCheetah icon into your Applications folder, and you're done.
+</p>
 
 <p>
-The Linux version of GoldenCheetah is distributed as a tarball.  Download this
-file and save it to <code>/tmp</code>, then from a terminal:
+The Windows version has an installer. Just run the Installer, select where
+to install the application and away you go.
+</p>
+
+<p>
+The Linux version of GoldenCheetah is distributed as a GZipped tar archive.
+Download this file and save it to <code>/tmp</code>, then from a terminal:
 
 <pre>
 cd /tmp
-tar xzvf GoldenCheetah_DATE_Linux_x86.tgz
-cd GoldenCheetah_DATE_Linux_x86
+tar xvzf GoldenCheetah_X.X.X_Linux_ARCH.tgz
+cd GoldenCheetah_X.X.X_Linux_ARCH
+sudo chmod u+x GoldenCheetah
 sudo cp GoldenCheetah /usr/local/bin
 cd ..
-rm -rf GoldenCheetah_DATE_Linux_x86.tgz
+rm -rf GoldenCheetah_X.X.X_Linux_ARCH
 </pre>
 
-Be sure to replace "DATE" with the date of the revision you downloaded, such
-as "2007-09-23".
+Be sure to replace "X.X.X" with the version of the release you downloaded,
+such as "2.1.0" and replace "ARCH" with the architecture of the release
+you download - either "x86" (32bit) or "x84_64" (64bit).
 
 <p>
 <big><font face="arial,helvetica,sanserif">
@@ -68,7 +94,9 @@ Step 3: Running GoldenCheetah
 
 <p>
 To run GoldenCheetah on Mac OS X, double-click on the GoldenCheetah icon in
-your Applications folder.  On Linux, just type "GoldenCheetah" at the prompt.
+your Applications folder. On Windows, click the Start button, All Programs
+link, GoldenCheetah folder and then the Golden Cheetah program. On Linux,
+just type "GoldenCheetah" at the prompt.
 
 <p>
 The first time you run GoldenCheetah, you'll get an empty "Choose a Cyclist"
@@ -231,7 +259,7 @@ based on percentages of your CP value.  The zones are:
    <td>150%</td>
  </tr>
  <tr>
-   <td>Z1</td>
+   <td>Z7</td>
    <td>Neuromuscular</td>
    <td>150%</td>
    <td>MAX</td>
