@@ -2413,6 +2413,15 @@ CPPage::addClicked()
     // get current scheme
     zonePage->zones.setScheme(zonePage->schemePage->getScheme());
 
+    int cp = cpEdit->value();
+    if( cp <= 0 ){
+        QMessageBox err;
+        err.setText("CP must be > 0");
+        err.setIcon(QMessageBox::Warning);
+        err.exec();
+        return;
+    }
+
     //int index = ranges->invisibleRootItem()->childCount();
     int index = zonePage->zones.addZoneRange(dateEdit->date(), cpEdit->value());
 

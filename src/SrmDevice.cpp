@@ -445,7 +445,7 @@ SrmDevice::download( const QDir &tmpdir,
 
             /* finish previous marker */
             if( mfirst >= 0 && ( ! is_int || is_first ) )
-                if( ! srmio_data_add_marker( data, mfirst, data->cused -1, &serr ) ){
+                if( ! srmio_data_add_marker( data, mfirst, data->cused -2, &serr ) ){
                     err = tr("adding marker failed: %1")
                         .arg(serr.message);
                     goto fail1;
@@ -453,7 +453,7 @@ SrmDevice::download( const QDir &tmpdir,
 
             /* start marker */
             if( is_first ){
-                mfirst = (int)data->cused;
+                mfirst = (int)data->cused -1;
 
             } else if( ! is_int ){
                 mfirst = -1;
