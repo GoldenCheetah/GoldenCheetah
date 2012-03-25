@@ -17,24 +17,32 @@ before downloading.
 <p>
 On Linux and Mac OS X, Golden Cheetah also downloads from the SRM PCV.  On Mac
 OS X, you'll need to install <a href="http://osx-pl2303.sourceforge.net/">the
-open source PL2303 driver</a> to download from an SRM.
+open source PL2303 driver</a> to download from an SRM. Please see the
+<a href="http://bugs.goldencheetah.org/projects/goldencheetah/wiki/">WIKI</a> article
+ - <a href="http://bugs.goldencheetah.org/projects/goldencheetah/wiki/PCV_on_Mac_OS_X">
+PCV on Mac OS X</a> for further information.
 </p>
 
 <p>
 <font face="arial,helvetica,sanserif">
-<big><strong>Download Release 2.0</strong></big>
+<big><strong>Download Release 2.1</strong></big>
 </font>
+</p>
 
 <ul>
-<li><a href="GoldenCheetah_2.0.0_Linux_x86.gz">Linux x86</a><br>
-<li><a href="GoldenCheetah_2.0.0_Linux_x86_64.gz">Linux x86_64</a><br>
-<li><a href="GoldenCheetah_2.0.0_Mac_Universal.dmg">Mac OS X Universal 10.5 & 10.6</a><br>
-<li><a href="GoldenCheetah_2.0.0_Mac_PPC.dmg">Mac OS X 10.4</a><br>
-<li><a href="GoldenCheetah_2.0.0_Windows_Installer.exe">Windows 32-bit</a>
+<li><a href="GoldenCheetah_2.1.0_Windows_Installer.exe">Windows 32-bit (runs on 64bit as well)</a>
+<li><a href="GoldenCheetah_2.1.0_Mac_Universal.dmg">Mac OS X Universal 10.4->10.7</a><br>
+<li><a href="GoldenCheetah_2.1.0_Linux_x86.tgz">Linux x86</a><br>
+<li><a href="GoldenCheetah_2.1.0_Linux_x86_64.tgz">Linux x86_64</a><br>
 </ul>
+</p>
 
 <p>
-You can also <a href="release-notes.html">view the release notes</a> for 2.0
+Please follow the <a href="/users-guid.html">User's Guide</a> on how to install
+and use Golden Cheetah.
+</p>
+<p>
+You can also <a href="release-notes.html">view the release notes</a> for 2.1
 or <a href="older-releases.html">download older releases</a> of Golden Cheetah.
 </p>
 
@@ -42,21 +50,23 @@ or <a href="older-releases.html">download older releases</a> of Golden Cheetah.
 <font face="arial,helvetica,sanserif">
 <big><strong>Development Releases</strong></big>
 </font>
+</p>
 
 <p>Gareth Coco has also made
-<a href="http://goldencheetah.stand2surf.net/">nightly development builds</a>
-available.  These binaries are based on the latest code, so they have more
-features and (sometimes) more bugs than the stable 2.0 release above.
+<a href="http://goldencheetah.stand2surf.net/">regular development builds</a>
+available.  These binaries are based on the latest source code, so they may have
+more features and less (but sometime more) bugs than the stable release above.
+</p>
 
 <p>
 <font face="arial,helvetica,sanserif">
 <big><strong>Source Code</strong></big>
 </font>
+</p>
 
 <p>
 The Golden Cheetah source code is available via git.  See the
 <a href="developers-guide.html">Developer's Guide</a> for more information.
 You can also <a href="http://github.com/srhea/GoldenCheetah/tree/master/">browse
 the source on github</a>.
-
-
+</p>
