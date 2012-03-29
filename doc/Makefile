@@ -8,10 +8,10 @@ OTHER= 3d.png choose-a-cyclist.png cpint.gp cpint.png critical-power-plot.png cr
        pm.png power.zones realtime.png ride-plot.png ride-plot2.png ride-summary.png sample.gp \
        sample.png weekly-summary.png google-earth.png aerolab.png
 
-BIN=    GoldenCheetah_2.0.0_Linux_x86_64.gz \
-        GoldenCheetah_2.0.0_Linux_x86.gz \
-        GoldenCheetah_2.0.0_Mac_Universal.dmg \
-        GoldenCheetah_2.0.0_Windows_Installer.exe
+BIN=    GoldenCheetah_2.1.0_Linux_x86_64.tgz \
+        GoldenCheetah_2.1.0_Linux_x86.tgz \
+        GoldenCheetah_2.1.0_Mac_Universal.dmg \
+        GoldenCheetah_2.1.0_Windows_Installer.exe
 
 all: $(HTML)
 .PHONY: all clean install
@@ -21,11 +21,11 @@ clean:
 
 install:
 	rsync -avz -e ssh $(HTML) $(TARBALLS) $(OTHER) \
-		liversedge@srhea.net:/home/srhea/wwwroot/goldencheetah.org/
+		goldencheetah.org:/home/srhea/wwwroot/goldencheetah.org/
 
 install-bin:
 	rsync -avz -e ssh $(BIN) \
-		srhea.net:/home/srhea/wwwroot/goldencheetah.org/
+		goldencheetah.org:/home/srhea/wwwroot/goldencheetah.org/
 
 bug-tracker.html: bug-tracker.content genpage.pl
 	./genpage.pl "Bug Tracker" $< > $@
