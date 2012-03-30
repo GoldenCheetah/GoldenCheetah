@@ -57,6 +57,7 @@
 #include "SplitActivityWizard.h"
 #include "BatchExportDialog.h"
 #include "StravaDialog.h"
+#include "RideWithGpsDialog.h"
 #include "TwitterDialog.h"
 #include "WithingsDownload.h"
 #include "CalendarDownload.h"
@@ -676,6 +677,9 @@ MainWindow::MainWindow(const QDir &home) :
     connect(stravaAction, SIGNAL(triggered(bool)), this, SLOT(uploadStrava()));
     rideMenu->addAction(stravaAction);
 
+    rideWithGPSAction = new QAction("Upload to RideWithGPS...", this);
+    connect(rideWithGPSAction, SIGNAL(triggered(bool)), this, SLOT(uploadRideWithGPSAction()));
+    rideMenu->addAction(rideWithGPSAction);
 
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Save activity"), this, SLOT(saveRide()), tr("Ctrl+S"));
@@ -919,9 +923,14 @@ MainWindow::setActivityMenu()
         QString activityId = ride->ride()->getTag("Strava uploadId", "");
         if (activityId == "") stravaAction->setEnabled(true);
         else stravaAction->setEnabled(false);
+
+        QString tripid = ride->ride()->getTag("RideWithGPS tripid", "");
+        if (tripid == "") rideWithGPSAction->setEnabled(true);
+        else rideWithGPSAction->setEnabled(false);
         
     } else {
         stravaAction->setEnabled(false);
+        rideWithGPSAction->setEnabled(false);
     }
 }
 
@@ -1741,6 +1750,24 @@ MainWindow::uploadStrava()
 
     if (item) { // menu is disabled anyway, but belt and braces
         StravaDialog d(this, item);
+        d.exec();
+    }
+}
+
+/*----------------------------------------------------------------------
+* RideWithGPS.com
+*--------------------------------------------------------------------*/
+
+void
+MainWindow::uploadRideWithGPSAction()
+{
+    QTreeWidgetItem *_item = treeWidget->currentItem();
+    if (_item==NULL || _item->type() != RIDE_TYPE) return;
+
+    RideItem *item = dynamic_cast<RideItem*>(_item);
+
+    if (item) { // menu is disabled anyway, but belt and braces
+        RideWithGPSDialog d(this, item);
         d.exec();
     }
 }

@@ -160,6 +160,9 @@ class CredentialsPage : public QScrollArea
         QLineEdit *stravaUser;
         QLineEdit *stravaPass;
 
+        QLineEdit *rideWithGPSUser;
+        QLineEdit *rideWithGPSPass;
+
         QLineEdit *wiURL; // url for withings
         QLineEdit *wiUser;
         QLineEdit *wiPass;

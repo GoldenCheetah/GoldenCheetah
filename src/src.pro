@@ -307,6 +307,7 @@ HEADERS += \
         RideNavigator.h \
         RideNavigatorProxy.h \
         RideWindow.h \
+        RideWithGPSDialog.h \
         SaveDialogs.h \
         SmallPlot.h \
         RideSummaryWindow.h \
@@ -489,6 +490,7 @@ SOURCES += \
         RideNavigator.cpp \
         RideSummaryWindow.cpp \
         RideWindow.cpp \
+        RideWithGPSDialog.cpp \
         SaveDialogs.cpp \
         ScatterPlot.cpp \
         ScatterWindow.cpp \

@@ -235,6 +235,7 @@ class MainWindow : public QMainWindow
         void exportBatch();
         void exportMetrics();
         void uploadStrava();
+        void uploadRideWithGPSAction();
         void downloadErgDB();
         void manualProcess(QString);
 #ifdef GC_HAVE_SOAP
@@ -344,7 +345,7 @@ class MainWindow : public QMainWindow
         QStackedWidget *views;
         QAction *sideView;
         QAction *toolView;
-        QAction *stravaAction;
+        QAction *stravaAction, *rideWithGPSAction;
         QMenu *windowMenu;
         GcBubble *bubble;
         GcCalendar *gcCalendar;
