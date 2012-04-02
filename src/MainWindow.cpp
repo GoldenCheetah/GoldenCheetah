@@ -57,7 +57,7 @@
 #include "SplitActivityWizard.h"
 #include "BatchExportDialog.h"
 #include "StravaDialog.h"
-#include "RideWithGpsDialog.h"
+#include "RideWithGPSDialog.h"
 #include "TwitterDialog.h"
 #include "WithingsDownload.h"
 #include "CalendarDownload.h"
