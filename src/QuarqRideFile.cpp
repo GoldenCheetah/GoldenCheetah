@@ -94,7 +94,7 @@ bool quarqInterpreterInstalled( void ) {
       }
 
       if (!installed)
-	std::cerr << "Cannot open qollector_interpret program, available from http://opensource.quarq.us/qollector_interpret." << std::endl;
+	//std::cerr << "Cannot open qollector_interpret program, available from http://opensource.quarq.us/qollector_interpret." << std::endl;
 
       checkedInstallation = true;
     }
