@@ -370,6 +370,7 @@ public:
 
     QString whichGroup(int row) const {
 
+        if (row == -1) return("");
         if (groupBy == -1) return tr("All Activities");
         else return groupFromValue(headerData(groupBy+1,
                                     Qt::Horizontal).toString(),

@@ -579,6 +579,10 @@ MeanMaxComputer::run()
 
         // fill in any gaps in recording - use same dodgy rounding as before
         int count = (psecs - lastsecs - ride->recIntSecs()) / ride->recIntSecs();
+
+        // gap more than an hour, damn that ride file is a mess
+        if (count > 3600) count = 1;
+
         for(int i=0; i<count; i++)
             data.points.append(cpintpoint(round(lastsecs+((i+1)*ride->recIntSecs() *1000.0)/1000), 0));
         lastsecs = psecs;
@@ -596,6 +600,9 @@ MeanMaxComputer::run()
     // was one week, but no single ride is longer
     // than 2 days, even if you are doing RAAM
     if (total_secs > 2*24*60*60) return;
+
+    // don't allow if badly parsed or time goes backwards
+    if (total_secs < 0) return;
 
     //
     // Pre-process the data for NP, xPower and VAM
