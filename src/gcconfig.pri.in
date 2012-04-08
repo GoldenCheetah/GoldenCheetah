@@ -181,6 +181,13 @@ BOOST_INCLUDE =
 #CONFIG   += link_pkgconfig
 #PKGCONFIG = 
 
+# If your QT build includes its own local compress libs
+# then you should comment the line below, otherwise you
+# will need to have the compress libraries installed
+# separately. 
+LIBZ_INCLUDE =
+LIBZ_LIBS    = -lz
+
 macx {
     # Uncomment this line to build with OS X Tiger support on a Leopard system:
     #QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.4u.sdk
