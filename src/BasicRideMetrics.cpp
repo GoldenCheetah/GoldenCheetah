@@ -345,6 +345,40 @@ static bool avgPowerAdded =
 
 //////////////////////////////////////////////////////////////////////////////
 
+struct NonZeroPower : public RideMetric {
+
+    double count, total;
+
+    NonZeroPower()
+    {
+        setSymbol("nonzero_power");
+        setName(tr("Nonzero Average Power"));
+        setMetricUnits(tr("watts"));
+        setImperialUnits(tr("watts"));
+        setType(RideMetric::Average);
+    }
+    void compute(const RideFile *ride, const Zones *, int,
+                 const HrZones *, int,
+                 const QHash<QString,RideMetric*> &,
+                 const MainWindow *) {
+        total = count = 0;
+        foreach (const RideFilePoint *point, ride->dataPoints()) {
+            if (point->watts > 0.0) {
+                total += point->watts;
+                ++count;
+            }
+        }
+        setValue(count > 0 ? total / count : 0);
+        setCount(count);
+    }
+    RideMetric *clone() const { return new NonZeroPower(*this); }
+};
+
+static bool nonZeroPowerAdded =
+    RideMetricFactory::instance().addMetric(NonZeroPower());
+
+//////////////////////////////////////////////////////////////////////////////
+
 struct AvgHeartRate : public RideMetric {
 
     double total, count;
