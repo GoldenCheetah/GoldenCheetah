@@ -345,6 +345,7 @@ HEADERS += \
         TrainTool.h \
         TreeMapWindow.h \
         TreeMapPlot.h \
+        TtbDialog.h \
         Units.h \
         WeeklySummaryWindow.h \
         WeeklyViewItemDelegate.h \
@@ -529,6 +530,7 @@ SOURCES += \
         TrainTool.cpp \
         TreeMapWindow.cpp \
         TreeMapPlot.cpp \
+        TtbDialog.cpp \
         TRIMPPoints.cpp \
         WattsPerKilogram.cpp \
         WithingsDownload.cpp \
