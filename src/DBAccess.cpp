@@ -56,8 +56,9 @@
 // 34  15  Jan 2012 Mark Liversedge    Added Average and Max Temperature and Metric->conversionSum()
 // 35  13  Feb 2012 Mark Liversedge    Max/Avg Cadence adjusted conversion
 // 36  18  Feb 2012 Mark Liversedge    Added Pace (min/mile) and 250m, 500m Pace metrics
+// 37  06  Apr 2012 Rainer Clasen      Added non-zero average Power (watts)
 
-static int DBSchemaVersion = 36;
+static int DBSchemaVersion = 37;
 
 DBAccess::DBAccess(MainWindow* main, QDir home) : main(main), home(home)
 {
