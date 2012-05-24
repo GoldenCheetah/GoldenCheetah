@@ -21,6 +21,7 @@
 #include "DownloadRideDialog.h"
 #include "Device.h"
 #include "MainWindow.h"
+#include "Settings.h"
 #include <assert.h>
 #include <errno.h>
 #include <QtGui>
@@ -41,6 +42,10 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     BOOST_FOREACH(QString device, deviceTypes) {
         deviceCombo->addItem(device);
     }
+    QString defaultDevice = appsettings->value( NULL, GC_LAST_DOWNLOAD_DEVICE).toString();
+    int idx = deviceCombo->findText( defaultDevice );
+    if( idx >= 0 )
+        deviceCombo->setCurrentIndex( idx );
     connect(deviceCombo, SIGNAL(currentIndexChanged(QString)), this, SLOT(deviceChanged(QString)));
 
     portCombo = new QComboBox(this);
@@ -136,6 +141,7 @@ DownloadRideDialog::updatePort()
     QList<QString> typeNames( Devices::typeNames() );
     DevicesPtr selectedType = Devices::getType(deviceCombo->currentText());
 
+    bool haveExclusivePort = false;
     for (int i = 0; i < devList.size(); ++i) {
         // suppress unsupported ports
         if( ! selectedType->supportsPort( devList.at(i) ) )
@@ -163,8 +169,17 @@ DownloadRideDialog::updatePort()
         portCombo->addItem( devList[i]->id());
 
         // make an exclusive port the default selection:
-        if( selectedType->exclusivePort( devList.at(i) ) )
+        if( selectedType->exclusivePort( devList.at(i) ) ){
             portCombo->setCurrentIndex(portCombo->findText(devList[i]->id()));
+            haveExclusivePort = true;
+        }
+    }
+
+    if( ! haveExclusivePort ){
+        QString defaultPort = appsettings->value( NULL, GC_LAST_DOWNLOAD_PORT ).toString();
+        int idx = portCombo->findText( defaultPort );
+        if( idx >= 0 )
+            portCombo->setCurrentIndex( idx );
     }
 
     setReadyInstruct();
@@ -253,6 +268,9 @@ DownloadRideDialog::downloadClicked()
 
     updateProgress( "" );
     statusLabel->setPlainText( "" );
+
+    appsettings->setValue( GC_LAST_DOWNLOAD_DEVICE, deviceCombo->currentText() );
+    appsettings->setValue( GC_LAST_DOWNLOAD_PORT, portCombo->currentText() );
 
     CommPortPtr dev;
     for (int i = 0; i < devList.size(); ++i) {
