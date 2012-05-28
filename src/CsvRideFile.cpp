@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2007-2009 Sean C. Rhea (srhea@srhea.net),
  *                         Justin F. Knotzke (jknotzke@shampoo.ca)
+ * Copyright (c) 2012      Magnus Gille <mgille@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -47,6 +48,10 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     QRegExp ergomoCSV("(ZEIT|STRECKE)", Qt::CaseInsensitive);
     bool ergomo = false;
 
+    QRegExp motoActvCSV("activity_id", Qt::CaseInsensitive); 
+    bool motoActv = false;
+    bool epoch_set = false;
+    quint64 epoch_offset=0;
     QChar ergomo_separator;
     int unitsHeader = 1;
     int total_pause = 0;
@@ -118,7 +123,15 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         iBikeVersion = line.section( ',', 1, 1 ).toInt();
                         ++lineno;
                         continue;
-                    }
+                    } else if(motoActvCSV.indexIn(line) != 1) {
+		      ++lineno;
+		      motoActv = true;
+		      rideFile->setDeviceType("MotoACTV CSV");
+		      unitsHeader = -1;
+		      /* MotoACTV files are always metric */
+		      metric = true;
+		      continue;
+		    }
                     rideFile->setDeviceType("PowerTap CSV");
                 }
             }
@@ -150,12 +163,15 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 }
             }
             else if (lineno > unitsHeader) {
-                double minutes,nm,kph,watts,km,cad,alt,hr,dfpm;
-                double lat = 0.0, lon = 0.0;
-                double headwind = 0.0;
-                int interval=0;
-                int pause=0;
-                if (!ergomo && !iBike) {
+		 double minutes=0,nm,kph,watts,km,cad,alt,hr,dfpm, seconds=0.0;
+		 bool ok;
+		 double lat = 0.0, lon = 0.0;
+		 double headwind = 0.0;
+		 int interval=0;
+		 int pause=0;
+		 quint64 ms;
+
+		 if (!ergomo && !iBike && !motoActv) {
                      minutes = line.section(',', 0, 0).toDouble();
                      nm = line.section(',', 1, 1).toDouble();
                      kph = line.section(',', 2, 2).toDouble();
@@ -209,6 +225,42 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         headwind *= KM_PER_MILE;
                     }
                 }
+		else if(motoActv) {
+		     /* MotoActv saves it all as kind of SI (m, ms, m/s, NM etc)
+		      *  "double","double",.. so we need to filter out "
+		      */
+		     
+		     km = line.section(',', 0,0).remove("\"").toDouble()/1000;
+		     hr = line.section(',', 2, 2).remove("\"").toDouble();
+		     kph = line.section(',', 3, 3).remove("\"").toDouble()*3.6;
+		     
+		     lat = line.section(',', 5, 5).remove("\"").toDouble();
+		     /* Item 8 is crank torque, 13 is wheel torque */
+		     nm = line.section(',', 8, 8).remove("\"").toDouble(); 
+
+		     /* Ok there's no crank torque, try the wheel */
+		     if(nm == 0.0) {
+			  nm = line.section(',', 13, 13).remove("\"").toDouble(); 
+		     }
+		     if(epoch_set == false) {
+			  epoch_set = true;
+			  epoch_offset = line.section(',', 9,9).remove("\"").toULongLong(&ok, 10);
+
+			  /* We use this first value as the start time */
+			  startTime = QDateTime();
+			  startTime.setMSecsSinceEpoch(epoch_offset); 
+			  rideFile->setStartTime(startTime);
+		     }
+		     
+		     ms = line.section(',', 9,9).remove("\"").toULongLong(&ok, 10);
+		     ms -= epoch_offset;
+		     seconds = ms/1000;
+
+		     alt = line.section(',', 10, 10).remove("\"").toDouble();
+		     watts = line.section(',', 11, 11).remove("\"").toDouble();
+		     lon = line.section(',', 15, 15).remove("\"").toDouble();
+		     cad = line.section(',', 16, 16).remove("\"").toDouble();
+		}
                 else {
                      // for ergomo formatted CSV files
                      minutes     = line.section(ergomo_separator, 0, 0).toDouble() + total_pause;
@@ -249,8 +301,15 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 if (watts == -1)
                     watts = 0;
 
-                rideFile->appendPoint(minutes * 60.0, cad, hr, km,
-                                      kph, nm, watts, alt, lon, lat, headwind, 0.0, RideFile::noTemp, interval);
+		if(motoActv) 
+		     rideFile->appendPoint(seconds, cad, hr, km,
+					   kph, nm, watts, alt, lon, lat, 0.0, 
+					   0.0, RideFile::noTemp, interval);
+		else
+		     rideFile->appendPoint(minutes * 60.0, cad, hr, km,
+					   kph, nm, watts, alt, lon, lat, 
+					   headwind, 0.0, RideFile::noTemp, 
+					   interval);
             }
             ++lineno;
         }
