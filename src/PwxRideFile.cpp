@@ -77,10 +77,10 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
                 rideFile->setTag("Athlete Name", name.text());
             }
 
-            QDomElement weight = node.firstChildElement("weight");
-            if (!weight.isNull()) {
-                rideFile->setTag("Weight", weight.text());
-            }
+	    QDomElement weight = node.firstChildElement("weight");
+	    if (!weight.isNull()) {
+		 rideFile->setTag("Weight", weight.text());
+	    }
 
         // workout code
         } else if (node.nodeName() == "code") {
@@ -285,7 +285,8 @@ PwxFileReader::writeRideFile(MainWindow *main, const RideFile *ride, QFile &file
     text = doc.createTextNode(main->cyclist); name.appendChild(text);
     athlete.appendChild(name);
     double cyclistweight = ride->getTag("Weight", appsettings->cvalue(main->cyclist, GC_WEIGHT, 0.0).toString()).toDouble();
-    if (cyclistweight) {
+
+    if (cyclistweight && appsettings->cvalue(main->cyclist, GC_TPIGNOREWEIGHT, false).toBool() != false) {
         QDomElement weight = doc.createElement("weight");
         text = doc.createTextNode(QString("%1").arg(cyclistweight));
         weight.appendChild(text);
