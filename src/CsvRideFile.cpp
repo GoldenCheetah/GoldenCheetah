@@ -123,7 +123,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         iBikeVersion = line.section( ',', 1, 1 ).toInt();
                         ++lineno;
                         continue;
-                    } else if(motoActvCSV.indexIn(line) != 1) {
+                    } else if(motoActvCSV.indexIn(line) != -1) {
 		      ++lineno;
 		      motoActv = true;
 		      rideFile->setDeviceType("MotoACTV CSV");
