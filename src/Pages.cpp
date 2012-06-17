@@ -472,6 +472,7 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     QLabel *userLabel = new QLabel(tr("Username"));
     QLabel *passLabel = new QLabel(tr("Password"));
     QLabel *typeLabel = new QLabel(tr("Account Type"));
+    QLabel *ignoreWeightLabel = new QLabel(tr("Ignore weight setting"));
 
     QLabel *twp = new QLabel(tr("Twitter"));
     twp->setFont(current);
@@ -541,9 +542,14 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     tpType->addItem("Self Coached Premium");
     tpType->addItem("Shared Self Coached Premium");
     tpType->addItem("Coached Premium");
-    tpType->addItem("Shared Coached Premium");
-
+    tpType->addItem("Shared Coached Premium");    
     tpType->setCurrentIndex(appsettings->cvalue(mainWindow->cyclist, GC_TPTYPE, "0").toInt());
+    tpIgnoreWeight = new QCheckBox(this);
+    if(appsettings->cvalue(mainWindow->cyclist, GC_TPIGNOREWEIGHT, "").toBool()) {
+      tpIgnoreWeight->setCheckState(Qt::Checked);
+    } else {
+            tpIgnoreWeight->setCheckState(Qt::Unchecked);
+    }
 
     twitterURL = new QLineEdit(this);
     twitterURL->setText(appsettings->cvalue(mainWindow->cyclist, GC_TWURL, "http://www.twitter.com").toString());
@@ -601,65 +607,68 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     grid->addWidget(userLabel, 2,0);
     grid->addWidget(passLabel, 3,0);
     grid->addWidget(typeLabel, 4,0);
-    grid->addWidget(gc, 5,0);
-    grid->addWidget(gcurlLabel, 6,0);
-    grid->addWidget(gcuserLabel, 7,0);
-    grid->addWidget(gcpassLabel, 8,0);
-    grid->addWidget(twp, 9,0);
-    grid->addWidget(twurlLabel, 10,0);
-    grid->addWidget(twauthLabel, 11,0);
-    grid->addWidget(twpinLabel, 12,0);
-    grid->addWidget(str, 13,0);
-    grid->addWidget(struserLabel, 14,0);
-    grid->addWidget(strpassLabel, 15,0);
-    grid->addWidget(rwgps, 17,0);
-    grid->addWidget(rwgpsuserLabel, 18,0);
-    grid->addWidget(rwgpspassLabel, 19,0);
-    grid->addWidget(wip, 20,0);
-    grid->addWidget(wiurlLabel, 21,0);
-    grid->addWidget(wiuserLabel, 22,0);
-    grid->addWidget(wipassLabel, 23,0);
-    grid->addWidget(webcal, 24, 0);
-    grid->addWidget(wcurlLabel, 25, 0);
-    grid->addWidget(dv, 26,0);
-    grid->addWidget(dvurlLabel, 27,0);
-    grid->addWidget(dvuserLabel, 28,0);
-    grid->addWidget(dvpassLabel, 29,0);
-    grid->addWidget(ttb, 30,0);
-    grid->addWidget(ttbuserLabel, 31,0);
-    grid->addWidget(ttbpassLabel, 32,0);
+    grid->addWidget(ignoreWeightLabel, 5,0);
+    grid->addWidget(gc, 6,0);
+    grid->addWidget(gcurlLabel, 7,0);
+    grid->addWidget(gcuserLabel, 8,0);
+    grid->addWidget(gcpassLabel, 9,0);
+    grid->addWidget(twp, 10,0);
+    grid->addWidget(twurlLabel, 11,0);
+    grid->addWidget(twauthLabel, 12,0);
+    grid->addWidget(twpinLabel, 13,0);
+    grid->addWidget(str, 14,0);
+    grid->addWidget(struserLabel, 15,0);
+    grid->addWidget(strpassLabel, 16,0);
+    grid->addWidget(rwgps, 18,0);
+    grid->addWidget(rwgpsuserLabel, 19,0);
+    grid->addWidget(rwgpspassLabel, 20,0);
+    grid->addWidget(wip, 21,0);
+    grid->addWidget(wiurlLabel, 22,0);
+    grid->addWidget(wiuserLabel, 23,0);
+    grid->addWidget(wipassLabel, 24,0);
+    grid->addWidget(webcal, 25, 0);
+    grid->addWidget(wcurlLabel, 26, 0);
+    grid->addWidget(dv, 27,0);
+    grid->addWidget(dvurlLabel, 28,0);
+    grid->addWidget(dvuserLabel, 29,0);
+    grid->addWidget(dvpassLabel, 30,0);
+    grid->addWidget(ttb, 31,0);
+    grid->addWidget(ttbuserLabel, 32,0);
+    grid->addWidget(ttbpassLabel, 33,0);
+
 
     grid->addWidget(tpURL, 1, 1, 0);
     grid->addWidget(tpUser, 2, 1, Qt::AlignLeft | Qt::AlignVCenter);
     grid->addWidget(tpPass, 3, 1, Qt::AlignLeft | Qt::AlignVCenter);
     grid->addWidget(tpType, 4, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(tpIgnoreWeight, 5, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    grid->addWidget(gcURL, 6, 1, 0);
-    grid->addWidget(gcUser, 7, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(gcPass, 8, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(gcURL, 7, 1, 0);
+    grid->addWidget(gcUser, 8, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(gcPass, 9, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    grid->addWidget(twitterURL, 10, 1, 0);
-    grid->addWidget(twitterAuthorise, 11, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(twitterPIN, 12, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(twitterURL, 11, 1, 0);
+    grid->addWidget(twitterAuthorise, 12, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(twitterPIN, 13, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    grid->addWidget(stravaUser, 14, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(stravaPass, 15, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(stravaUser, 15, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(stravaPass, 16, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    grid->addWidget(rideWithGPSUser, 18, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(rideWithGPSPass, 19, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(rideWithGPSUser, 19, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(rideWithGPSPass, 20, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    grid->addWidget(wiURL, 21, 1, 0);
-    grid->addWidget(wiUser, 22, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(wiPass, 23, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(wiURL, 22, 1, 0);
+    grid->addWidget(wiUser, 23, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(wiPass, 24, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    grid->addWidget(webcalURL, 24, 1, 0);
+    grid->addWidget(webcalURL, 25, 1, 0);
 
     grid->addWidget(dvURL, 26, 1, 0);
-    grid->addWidget(dvUser, 27, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(dvPass, 28, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(dvUser, 28, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(dvPass, 29, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    grid->addWidget(ttbUser, 31, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(ttbPass, 32, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(ttbUser, 32, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(ttbPass, 33, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
     grid->setColumnStretch(0,0);
     grid->setColumnStretch(1,3);
@@ -690,6 +699,7 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(mainWindow->cyclist, GC_TTBUSER, ttbUser->text());
     appsettings->setCValue(mainWindow->cyclist, GC_TTBPASS, ttbPass->text());
     appsettings->setCValue(mainWindow->cyclist, GC_TPTYPE, tpType->currentIndex());
+    appsettings->setCValue(mainWindow->cyclist, GC_TPIGNOREWEIGHT, tpIgnoreWeight->checkState()); 
     appsettings->setCValue(mainWindow->cyclist, GC_TWURL, twitterURL->text());
     appsettings->setCValue(mainWindow->cyclist, GC_WIURL, wiURL->text());
     appsettings->setCValue(mainWindow->cyclist, GC_WIUSER, wiUser->text());

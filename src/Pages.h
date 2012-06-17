@@ -145,6 +145,7 @@ class CredentialsPage : public QScrollArea
         QLineEdit *tpPass;
         QComboBox *tpType;
         QPushButton *tpTest;
+	QCheckBox *tpIgnoreWeight; 
 
         QLineEdit *gcURL; // url for gc racing (not available yet)
         QLineEdit *gcUser;

@@ -89,6 +89,7 @@
 #define GC_TPUSER         "tp/user"
 #define GC_TPPASS         "tp/pass"
 #define GC_TPTYPE         "tp/type"
+#define GC_TPIGNOREWEIGHT "tp/ignoreweight"
 #define GC_TWURL          "tw/url"
 #define GC_TWUSER         "tw/user"
 #define GC_TWPASS         "tw/pass"
