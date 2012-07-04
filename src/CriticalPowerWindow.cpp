@@ -53,21 +53,28 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
     QLabel *cpintTimeLabel = new QLabel(tr("Duration:"), this);
     cpintTimeValue = new QLineEdit("0 s");
     QLabel *cpintTodayLabel = new QLabel(tr("Today:"), this);
-    cpintTodayValue = new QLineEdit(tr("no data"));
+    cpintTodayValue = new QLabel(tr("no data"));
     QLabel *cpintAllLabel = new QLabel(tr("Best:"), this);
-    cpintAllValue = new QLineEdit(tr("no data"));
+    cpintAllValue = new QLabel(tr("no data"));
     QLabel *cpintCPLabel = new QLabel(tr("CP Curve:"), this);
-    cpintCPValue = new QLineEdit(tr("no data"));
+    cpintCPValue = new QLabel(tr("no data"));
 
-    QFontMetrics metrics(QApplication::font());
+    //QFontMetrics metrics(QApplication::font());
     //int width = metrics.width("8888 watts (88/88/8888)") + 10;
     //cpintAllValue->setFixedWidth(width);
     //cpintCPValue->setFixedWidth(width); // so lines up nicely
 
     cpintTimeValue->setReadOnly(false);
-    cpintTodayValue->setReadOnly(true);
-    cpintAllValue->setReadOnly(true);
-    cpintCPValue->setReadOnly(true);
+    //cpintTodayValue->setReadOnly(true);
+    //cpintAllValue->setReadOnly(true);
+    //cpintCPValue->setReadOnly(true);
+
+    QFont font = cpintTimeValue->font();
+    font.setPointSize(font.pointSize());
+    cpintTodayValue->setFont(font);
+    cpintAllValue->setFont(font);
+    cpintCPValue->setFont(font);
+
     cpintPickerLayout->addRow(cpintTimeLabel, cpintTimeValue);
     cpintPickerLayout->addRow(cpintTodayLabel, cpintTodayValue);
     cpintPickerLayout->addRow(cpintAllLabel, cpintAllValue);
@@ -166,10 +173,10 @@ CriticalPowerWindow::cpintSetCPButtonClicked()
     mainWindow->setCriticalPower(cp);
 }
 
-static unsigned
-curve_to_point(double x, const QwtPlotCurve *curve)
+static double
+curve_to_point(double x, const QwtPlotCurve *curve, RideFile::SeriesType serie)
 {
-    unsigned result = 0;
+    double result = 0;
     if (curve) {
         const QwtSeriesData<QPointF> *data = curve->data();
 
@@ -180,7 +187,10 @@ curve_to_point(double x, const QwtPlotCurve *curve)
             while (min < max - 1) {
                 mid = (max - min) / 2 + min;
                 if (x < data->sample(mid).x()) {
-                    result = (unsigned) round(data->sample(mid).y());
+                    double a = pow(10,RideFileCache::decimalsFor(serie));
+
+                    result = ((int)((0.5/a + data->sample(mid).y()) * a))/a;
+                    //result = (unsigned) round(data->sample(mid).y());
                     max = mid;
                 }
                 else {
@@ -223,6 +233,10 @@ CriticalPowerWindow::updateCpint(double minutes)
             units = "metres/hour";
             break;
 
+        case RideFile::wattsKg:
+            units = "Watts/kg";
+            break;
+
         default:
         case RideFile::watts:
             units = "Watts";
@@ -232,18 +246,18 @@ CriticalPowerWindow::updateCpint(double minutes)
 
     // current ride
     {
-      unsigned value = curve_to_point(minutes, cpintPlot->getThisCurve());
+      double value = curve_to_point(minutes, cpintPlot->getThisCurve(), series());
       QString label;
       if (value > 0)
-        label = QString("%1 %2").arg(value).arg(units);
+          label = QString("%1 %2").arg(value).arg(units);
       else
-	      label = tr("no data");
+          label = tr("no data");
       cpintTodayValue->setText(label);
     }
 
     // cp line
     if (cpintPlot->getCPCurve()) {
-      unsigned value = curve_to_point(minutes, cpintPlot->getCPCurve());
+      double value = curve_to_point(minutes, cpintPlot->getCPCurve(), series());
       QString label;
       if (value > 0)
         label = QString("%1 %2").arg(value).arg(units);
@@ -258,7 +272,11 @@ CriticalPowerWindow::updateCpint(double minutes)
       int index = (int) ceil(minutes * 60);
       if (index >= 0 && cpintPlot->getBests().count() > index) {
           QDate date = cpintPlot->getBestDates()[index];
-          unsigned value = cpintPlot->getBests()[index];
+          double value = cpintPlot->getBests()[index];
+
+          double a = pow(10,RideFileCache::decimalsFor(series()));
+          value = ((int)((0.5/a + value) * a))/a;
+
 #if 0
               label = QString("%1 kJ (%2)").arg(watts * minutes * 60.0 / 1000.0, 0, 'f', 0);
 #endif
@@ -290,6 +308,7 @@ void CriticalPowerWindow::addSeries()
 {
     // setup series list
     seriesList << RideFile::watts
+               << RideFile::wattsKg
                << RideFile::xPower
                << RideFile::NP
                << RideFile::hr

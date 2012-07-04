@@ -40,6 +40,7 @@ RideFileCache::RideFileCache(MainWindow *main, QString fileName, RideFile *passe
     xPowerMeanMax.resize(0);
     npMeanMax.resize(0);
     vamMeanMax.resize(0);
+    wattsKgMeanMax.resize(0);
     wattsDistribution.resize(0);
     hrDistribution.resize(0);
     cadDistribution.resize(0);
@@ -47,6 +48,7 @@ RideFileCache::RideFileCache(MainWindow *main, QString fileName, RideFile *passe
     kphDistribution.resize(0);
     xPowerDistribution.resize(0);
     npDistribution.resize(0);
+    wattsKgDistribution.resize(0);
 
     // time in zone are fixed to 10 zone max
     wattsTimeInZone.resize(10);
@@ -108,6 +110,31 @@ RideFileCache::RideFileCache(MainWindow *main, QString fileName, RideFile *passe
     }
 }
 
+int
+RideFileCache::decimalsFor(RideFile::SeriesType series)
+{
+    switch (series) {
+        case RideFile::cad : return 0; break;
+        case RideFile::hr : return 0; break;
+        case RideFile::kph : return 1; break;
+        case RideFile::nm : return 2; break;
+        case RideFile::watts : return 0; break;
+        case RideFile::xPower : return 0; break;
+        case RideFile::NP : return 0; break;
+        case RideFile::alt : return 1; break;
+        case RideFile::lon : return 6; break;
+        case RideFile::lat : return 6; break;
+        case RideFile::headwind : return 1; break;
+        case RideFile::slope : return 1; break;
+        case RideFile::temp : return 1; break;
+        case RideFile::interval : return 0; break;
+        case RideFile::vam : return 0; break;
+        case RideFile::wattsKg : return 2; break;
+        case RideFile::none : break;
+    }
+    return 2; // default
+}
+
 //
 // DATA ACCESS
 //
@@ -146,6 +173,10 @@ RideFileCache::meanMaxDates(RideFile::SeriesType series)
 
         case RideFile::vam:
             return vamMeanMaxDate;
+            break;
+
+        case RideFile::wattsKg:
+            return wattsKgMeanMaxDate;
             break;
 
         default:
@@ -192,6 +223,10 @@ RideFileCache::meanMaxArray(RideFile::SeriesType series)
             return vamMeanMaxDouble;
             break;
 
+        case RideFile::wattsKg:
+            return wattsKgMeanMaxDouble;
+            break;
+
         default:
             //? dunno give em power anyway
             return wattsMeanMaxDouble;
@@ -222,6 +257,10 @@ RideFileCache::distributionArray(RideFile::SeriesType series)
 
         case RideFile::kph:
             return kphDistributionDouble;
+            break;
+
+        case RideFile::wattsKg:
+            return wattsKgDistributionDouble;
             break;
 
         default:
@@ -293,6 +332,7 @@ void RideFileCache::RideFileCache::compute()
     MeanMaxComputer thread6(ride, xPowerMeanMax, RideFile::xPower); thread6.start();
     MeanMaxComputer thread7(ride, npMeanMax, RideFile::NP); thread7.start();
     MeanMaxComputer thread8(ride, vamMeanMax, RideFile::vam); thread8.start();
+    MeanMaxComputer thread9(ride, wattsKgMeanMax, RideFile::wattsKg); thread9.start();
 
     // all the different distributions
     computeDistribution(wattsDistribution, RideFile::watts);
@@ -300,6 +340,7 @@ void RideFileCache::RideFileCache::compute()
     computeDistribution(cadDistribution, RideFile::cad);
     computeDistribution(nmDistribution, RideFile::nm);
     computeDistribution(kphDistribution, RideFile::kph);
+    computeDistribution(wattsKgDistribution, RideFile::wattsKg);
 
     // wait for them threads
     thread1.wait();
@@ -310,6 +351,7 @@ void RideFileCache::RideFileCache::compute()
     thread6.wait();
     thread7.wait();
     thread8.wait();
+    thread9.wait();
 }
 
 //----------------------------------------------------------------------
@@ -533,7 +575,7 @@ void
 MeanMaxComputer::run()
 {
     // xPower and NP need watts to be present
-    RideFile::SeriesType baseSeries = (series == RideFile::xPower || series == RideFile::NP) ?
+    RideFile::SeriesType baseSeries = (series == RideFile::xPower || series == RideFile::NP || series == RideFile::wattsKg) ?
                                       RideFile::watts : series;
 
     if (series == RideFile::vam) baseSeries = RideFile::alt;
@@ -546,7 +588,8 @@ MeanMaxComputer::run()
     // convert from high-precision double to long
     // e.g. 145.456 becomes 1455 if we want decimals
     // and becomes 145 if we don't
-    double decimals = RideFile::decimalsFor(baseSeries) ? 10 : 1;
+    double decimals =  pow(10, RideFileCache::decimalsFor(series));
+    //double decimals = RideFile::decimalsFor(baseSeries) ? 10 : 1;
 
     // decritize the data series - seems wrong, since it just
     // rounds to the nearest second - what if the recIntSecs
@@ -692,6 +735,13 @@ MeanMaxComputer::run()
         }
     }
 
+    if (series == RideFile::wattsKg) {
+        for (int i=0; i<data.points.size(); i++) {
+            double wattsKg = data.points[i].value / ride->getWeight();
+            data.points[i].value = wattsKg;
+        }
+    }
+
     // the bests go in here...
     QVector <double> ride_bests(total_secs + 1);
 
@@ -741,8 +791,11 @@ MeanMaxComputer::run()
 void
 RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType series)
 {
+    RideFile::SeriesType baseSeries = (series == RideFile::wattsKg) ?
+                                      RideFile::watts : series;
+
     // only bother if the data series is actually present
-    if (ride->isDataPresent(series) == false) return;
+    if (ride->isDataPresent(baseSeries) == false) return;
 
     // get zones that apply, if any
     int zoneRange = main->zones() ? main->zones()->whichRange(ride->startTime().date()) : -1;
@@ -755,7 +808,7 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
     else LTHR=0;
 
     // setup the array based upon the ride
-    int decimals = RideFile::decimalsFor(series) ? 1 : 0;
+    int decimals = decimalsFor(series); //RideFile::decimalsFor(series) ? 1 : 0;
     double min = RideFile::minimumFor(series) * pow(10, decimals);
     double max = RideFile::maximumFor(series) * pow(10, decimals);
 
@@ -830,6 +883,7 @@ RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end)
     xPowerMeanMax.resize(0);
     npMeanMax.resize(0);
     vamMeanMax.resize(0);
+    wattsKgMeanMax.resize(0);
     wattsDistribution.resize(0);
     hrDistribution.resize(0);
     cadDistribution.resize(0);
@@ -837,6 +891,7 @@ RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end)
     kphDistribution.resize(0);
     xPowerDistribution.resize(0);
     npDistribution.resize(0);
+    wattsKgDistribution.resize(0);
 
     // time in zone are fixed to 10 zone max
     wattsTimeInZone.resize(10);
@@ -863,6 +918,7 @@ RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end)
             meanMaxAggregate(xPowerMeanMaxDouble, rideCache.xPowerMeanMaxDouble, xPowerMeanMaxDate, rideDate);
             meanMaxAggregate(npMeanMaxDouble, rideCache.npMeanMaxDouble, npMeanMaxDate, rideDate);
             meanMaxAggregate(vamMeanMaxDouble, rideCache.vamMeanMaxDouble, vamMeanMaxDate, rideDate);
+            meanMaxAggregate(wattsKgMeanMaxDouble, rideCache.wattsKgMeanMaxDouble, wattsKgMeanMaxDate, rideDate);
 
             distAggregate(wattsDistributionDouble, rideCache.wattsDistributionDouble);
             distAggregate(hrDistributionDouble, rideCache.hrDistributionDouble);
@@ -871,6 +927,7 @@ RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end)
             distAggregate(kphDistributionDouble, rideCache.kphDistributionDouble);
             distAggregate(xPowerDistributionDouble, rideCache.xPowerDistributionDouble);
             distAggregate(npDistributionDouble, rideCache.npDistributionDouble);
+            distAggregate(wattsKgDistributionDouble, rideCache.wattsKgDistributionDouble);
 
             // cumulate timeinzones
             for (int i=0; i<10; i++) {
@@ -905,6 +962,7 @@ RideFileCache::serialize(QDataStream *out)
     head.xPowerMeanMaxCount = xPowerMeanMax.size();
     head.npMeanMaxCount = npMeanMax.size();
     head.vamMeanMaxCount = vamMeanMax.size();
+    head.wattsKgMeanMaxCount = wattsKgMeanMax.size();
 
     head.wattsDistCount = wattsDistribution.size();
     head.xPowerDistCount = xPowerDistribution.size();
@@ -913,6 +971,8 @@ RideFileCache::serialize(QDataStream *out)
     head.cadDistCount = cadDistribution.size();
     head.nmDistrCount = nmDistribution.size();
     head.kphDistCount = kphDistribution.size();
+    head.wattsKgDistCount = wattsKgDistribution.size();
+
     out->writeRawData((const char *) &head, sizeof(head));
 
     // write meanmax
@@ -924,6 +984,7 @@ RideFileCache::serialize(QDataStream *out)
     out->writeRawData((const char *) xPowerMeanMax.data(), sizeof(float) * xPowerMeanMax.size());
     out->writeRawData((const char *) npMeanMax.data(), sizeof(float) * npMeanMax.size());
     out->writeRawData((const char *) vamMeanMax.data(), sizeof(float) * vamMeanMax.size());
+    out->writeRawData((const char *) wattsKgMeanMax.data(), sizeof(float) * wattsKgMeanMax.size());
 
     // write dist
     out->writeRawData((const char *) wattsDistribution.data(), sizeof(float) * wattsDistribution.size());
@@ -933,6 +994,7 @@ RideFileCache::serialize(QDataStream *out)
     out->writeRawData((const char *) kphDistribution.data(), sizeof(float) * kphDistribution.size());
     out->writeRawData((const char *) xPowerDistribution.data(), sizeof(float) * xPowerDistribution.size());
     out->writeRawData((const char *) npDistribution.data(), sizeof(float) * npDistribution.size());
+    out->writeRawData((const char *) wattsKgDistribution.data(), sizeof(float) * wattsKgDistribution.size());
 
     // time in zone
     out->writeRawData((const char *) wattsTimeInZone.data(), sizeof(float) * wattsTimeInZone.size());
@@ -959,6 +1021,8 @@ RideFileCache::readCache()
         npMeanMax.resize(head.npMeanMaxCount);
         vamMeanMax.resize(head.vamMeanMaxCount);
         xPowerMeanMax.resize(head.xPowerMeanMaxCount);
+        wattsKgMeanMax.resize(head.wattsKgMeanMaxCount);
+
         wattsDistribution.resize(head.wattsDistCount);
         hrDistribution.resize(head.hrDistCount);
         cadDistribution.resize(head.cadDistCount);
@@ -966,6 +1030,7 @@ RideFileCache::readCache()
         kphDistribution.resize(head.kphDistCount);
         xPowerDistribution.resize(head.xPowerDistCount);
         npDistribution.resize(head.npDistCount);
+        wattsKgDistribution.resize(head.wattsKgDistCount);
 
         // read in the arrays
         inFile.readRawData((char *) wattsMeanMax.data(), sizeof(float) * wattsMeanMax.size());
@@ -976,6 +1041,7 @@ RideFileCache::readCache()
         inFile.readRawData((char *) xPowerMeanMax.data(), sizeof(float) * xPowerMeanMax.size());
         inFile.readRawData((char *) npMeanMax.data(), sizeof(float) * npMeanMax.size());
         inFile.readRawData((char *) vamMeanMax.data(), sizeof(float) * vamMeanMax.size());
+        inFile.readRawData((char *) wattsKgMeanMax.data(), sizeof(float) * wattsKgMeanMax.size());
 
 
         // write dist
@@ -986,6 +1052,7 @@ RideFileCache::readCache()
         inFile.readRawData((char *) kphDistribution.data(), sizeof(float) * kphDistribution.size());
         inFile.readRawData((char *) xPowerDistribution.data(), sizeof(float) * xPowerDistribution.size());
         inFile.readRawData((char *) npDistribution.data(), sizeof(float) * npDistribution.size());
+        inFile.readRawData((char *) wattsKgDistribution.data(), sizeof(float) * wattsKgDistribution.size());
 
         // time in zone
         inFile.readRawData((char *) wattsTimeInZone.data(), sizeof(float) * 10);
@@ -1000,6 +1067,8 @@ RideFileCache::readCache()
         doubleArray(npMeanMaxDouble, npMeanMax, RideFile::NP);
         doubleArray(vamMeanMaxDouble, vamMeanMax, RideFile::vam);
         doubleArray(xPowerMeanMaxDouble, xPowerMeanMax, RideFile::xPower);
+        doubleArray(wattsKgMeanMaxDouble, wattsKgMeanMax, RideFile::wattsKg);
+
         doubleArray(wattsDistributionDouble, wattsDistribution, RideFile::watts);
         doubleArray(hrDistributionDouble, hrDistribution, RideFile::hr);
         doubleArray(cadDistributionDouble, cadDistribution, RideFile::cad);
@@ -1007,6 +1076,7 @@ RideFileCache::readCache()
         doubleArray(kphDistributionDouble, kphDistribution, RideFile::kph);
         doubleArray(xPowerDistributionDouble, xPowerDistribution, RideFile::xPower);
         doubleArray(npDistributionDouble, npDistribution, RideFile::NP);
+        doubleArray(wattsKgDistributionDouble, wattsKgDistribution, RideFile::wattsKg);
 
         cacheFile.close();
     }
@@ -1015,7 +1085,7 @@ RideFileCache::readCache()
 // unpack the longs into a double array
 void RideFileCache::doubleArray(QVector<double> &into, QVector<float> &from, RideFile::SeriesType series)
 {
-    double divisor = RideFile::decimalsFor(series) ? 10 : 1;
+    double divisor = pow(10, decimalsFor(series)); // ? 10 : 1;
     into.resize(from.size());
     for(int i=0; i<from.size(); i++) into[i] = from[i] / divisor;
 

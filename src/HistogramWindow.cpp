@@ -213,6 +213,7 @@ void HistogramWindow::addSeries()
 {
     // setup series list
     seriesList << RideFile::watts
+               << RideFile::wattsKg
                << RideFile::hr
                << RideFile::kph
                << RideFile::cad

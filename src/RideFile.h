@@ -91,7 +91,7 @@ class RideFile : public QObject // QObject to emit signals
         virtual ~RideFile();
 
         // Working with DATASERIES
-        enum seriestype { secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, NP, xPower, vam, none };
+        enum seriestype { secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, NP, xPower, vam, wattsKg, none };
         enum specialValues { noTemp = -255 };
 
         typedef enum seriestype SeriesType;
@@ -146,6 +146,9 @@ class RideFile : public QObject // QObject to emit signals
         QString getTag(QString name, QString fallback) const { return tags_.value(name, fallback); }
         void setTag(QString name, QString value) { tags_.insert(name, value); }
 
+        const MainWindow *mainwindow;
+        double getWeight();
+
         // METRIC OVERRIDES
         QMap<QString,QMap<QString,QString> > metricOverrides;
 
@@ -191,7 +194,6 @@ class RideFile : public QObject // QObject to emit signals
         QList<RideFileInterval> intervals_;
         QMap<QString,QString> tags_;
         EditorData *data;
-
 };
 
 struct RideFilePoint
