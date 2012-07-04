@@ -175,6 +175,13 @@ CpintPlot::setSeries(RideFile::SeriesType x)
             setAxisTitle(yLeft, tr("Skiba xPower (watts)"));
             break;
 
+        case RideFile::wattsKg:
+            if (appsettings->value(NULL, GC_UNIT).toString() == "Metric")
+                setAxisTitle(yLeft, tr("Watts per kilo (watts/kg)"));
+            else
+                setAxisTitle(yLeft, tr("Watts per lb (watts/lb)"));
+            break;
+
         case RideFile::vam:
             setAxisTitle(yLeft, tr("VAM (meters per hour)"));
             break;
@@ -343,9 +350,17 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
 #if USE_T0_IN_CP_MODEL
     curve_title.sprintf("CP=%.1f W; AWC/CP=%.2f m; t0=%.1f s", cp, tau, 60 * t0);
 #else
-    curve_title.sprintf("CP=%.0f W; AWC=%.0f kJ", cp, cp * tau * 60.0 / 1000.0);
+    if (series == RideFile::wattsKg)
+        curve_title.sprintf("CP=%.2f W/kg; AWC=%.2f kJ/kg", cp, cp * tau * 60.0 / 1000.0);
+    else
+        curve_title.sprintf("CP=%.0f W; AWC=%.0f kJ", cp, cp * tau * 60.0 / 1000.0);
 #endif
-    if (series == RideFile::watts) curveTitle.setLabel(QwtText(curve_title, QwtText::PlainText));
+    if (series == RideFile::watts || series == RideFile::wattsKg) curveTitle.setLabel(QwtText(curve_title, QwtText::PlainText));
+
+    if (series == RideFile::wattsKg)
+        curveTitle.setYValue(0.6);
+    else
+        curveTitle.setYValue(20);
 
     CPCurve = new QwtPlotCurve(curve_title);
     if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
@@ -488,6 +503,8 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
     }
     else {
         ymax = 100 * ceil(power_values[0] / 100);
+        if (ymax == 100)
+            ymax = 5 * ceil(power_values[0] / 5);
     }
     thisPlot->setAxisScale(thisPlot->yLeft, 0, ymax);
 }
@@ -512,7 +529,7 @@ CpintPlot::calculate(RideItem *rideItem)
     // PLOT MODEL CURVE (DERIVED)
     //
     curveTitle.setLabel(QwtText("", QwtText::PlainText)); // default to no title
-    if (series == RideFile::xPower || series == RideFile::NP || series == RideFile::watts || series == RideFile::none) {
+    if (series == RideFile::xPower || series == RideFile::NP || series == RideFile::watts  || series == RideFile::wattsKg || series == RideFile::none) {
 
         if (bests->meanMaxArray(series).size() > 1) {
             // calculate CP model from all-time best data
@@ -523,7 +540,7 @@ CpintPlot::calculate(RideItem *rideItem)
         //
         // CP curve only relevant for Energy or Watts (?)
         //
-        if (series == RideFile::watts || series == RideFile::none) {
+        if (series == RideFile::watts || series == RideFile::wattsKg || series == RideFile::none) {
             if (!CPCurve) plot_CP_curve(this, cp, tau, t0);
             else {
                 // make sure color reflects latest config
@@ -726,7 +743,7 @@ CpintPlot::pointHover(QwtPlotCurve *curve, int index)
             // output the tooltip
         text = QString("%1\n%3 %4%5")
             .arg(interval_to_str(60.0*xvalue))
-            .arg(yvalue, 0, 'f', RideFile::decimalsFor(series) ? 1 : 0)
+            .arg(yvalue, 0, 'f', RideFile::decimalsFor(series))
             .arg(RideFile::unitName(series))
             .arg(dateStr);
 

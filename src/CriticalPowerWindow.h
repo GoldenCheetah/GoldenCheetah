@@ -86,9 +86,9 @@ class CriticalPowerWindow : public GcWindow
         CpintPlot *cpintPlot;
         MainWindow *mainWindow;
         QLineEdit *cpintTimeValue;
-        QLineEdit *cpintTodayValue;
-        QLineEdit *cpintAllValue;
-        QLineEdit *cpintCPValue;
+        QLabel *cpintTodayValue;
+        QLabel *cpintAllValue;
+        QLabel *cpintCPValue;
         QComboBox *seriesCombo;
         QComboBox *cComboSeason;
         QPushButton *cpintSetCPButton;

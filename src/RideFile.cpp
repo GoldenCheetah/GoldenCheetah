@@ -77,6 +77,7 @@ RideFile::seriesName(SeriesType series)
     case RideFile::temp: return QString(tr("Temperature"));
     case RideFile::interval: return QString(tr("Interval"));
     case RideFile::vam: return QString(tr("VAM"));
+    case RideFile::wattsKg: return QString(tr("Power/Weight"));
     default: return QString(tr("Unknown"));
     }
 }
@@ -104,6 +105,7 @@ RideFile::unitName(SeriesType series)
     case RideFile::temp: return QString(tr("°C"));
     case RideFile::interval: return QString(tr("Interval"));
     case RideFile::vam: return QString(tr("meters per hour"));
+    case RideFile::wattsKg: return QString(useMetricUnits ? tr("watts/kg") : tr("watts/lb"));
     default: return QString(tr("Unknown"));
     }
 }
@@ -272,6 +274,7 @@ RideFile *RideFileFactory::openRideFile(MainWindow *main, QFile &file,
 
     // NULL returned to indicate openRide failed
     if (result) {
+        result->mainwindow = main;
         if (result->intervals().empty()) result->fillInIntervals();
 
 
@@ -493,6 +496,7 @@ RideFilePoint::value(RideFile::SeriesType series) const
         case RideFile::slope : return slope; break;
         case RideFile::temp : return temp; break;
         case RideFile::interval : return interval; break;
+
         default:
         case RideFile::none : break;
     }
@@ -502,6 +506,8 @@ RideFilePoint::value(RideFile::SeriesType series) const
 double
 RideFile::getPointValue(int index, SeriesType series) const
 {
+    if (series == wattsKg)
+        qDebug() << "wattsKg value";
     return dataPoints_[index]->value(series);
 }
 
@@ -510,6 +516,8 @@ RideFile::getPoint(int index, SeriesType series) const
 {
     double value = getPointValue(index, series);
     if (series==RideFile::temp && value == RideFile::noTemp)
+        return "";
+    else if (series==RideFile::wattsKg)
         return "";
     return value;
 }
@@ -535,6 +543,7 @@ RideFile::decimalsFor(SeriesType series)
         case temp : return 1; break;
         case interval : return 0; break;
         case vam : return 0; break;
+        case wattsKg : return 2; break;
         case none : break;
     }
     return 2; // default
@@ -561,6 +570,7 @@ RideFile::maximumFor(SeriesType series)
         case temp : return 100; break;
         case interval : return 999; break;
         case vam : return 9999; break;
+        case wattsKg : return 50; break;
         case none : break;
     }
     return 9999; // default
@@ -587,6 +597,7 @@ RideFile::minimumFor(SeriesType series)
         case temp : return -100; break;
         case interval : return 0; break;
         case vam : return 0; break;
+        case wattsKg : return 0; break;
         case none : break;
     }
     return 0; // default
@@ -634,4 +645,24 @@ void
 RideFile::emitModified()
 {
     emit modified();
+}
+
+double
+RideFile::getWeight()
+{
+    // ride
+    double weight;
+    if ((weight = getTag("Weight", "0.0").toDouble()) > 0) {
+        return weight;
+    }
+#if 0
+    // withings?
+    QList<SummaryMetrics> measures = main->metricDB->getAllMeasuresFor(QDateTime::fromString("Jan 1 00:00:00 1900"), ride->startTime());
+    if (measures.count()) {
+        return measures.last().getText("Weight", "0.0").toDouble();
+    }
+#endif
+
+    // global options
+    return appsettings->cvalue(mainwindow->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
 }
