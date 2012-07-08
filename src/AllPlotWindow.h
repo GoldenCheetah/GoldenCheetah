@@ -55,6 +55,7 @@ class AllPlotWindow : public GcWindow
     Q_PROPERTY(int showSpeed READ isShowSpeed WRITE setShowSpeed USER true)
     Q_PROPERTY(int showCad READ isShowCad WRITE setShowCad USER true)
     Q_PROPERTY(int showAlt READ isShowAlt WRITE setShowAlt USER true)
+    Q_PROPERTY(int showTorque READ isShowTorque WRITE setShowTorque USER true)
     Q_PROPERTY(int showPower READ isShowPower WRITE setShowPower USER true)
     Q_PROPERTY(int byDistance READ isByDistance WRITE setByDistance USER true)
     Q_PROPERTY(int smoothing READ smoothing WRITE setSmoothing USER true)
@@ -79,6 +80,7 @@ class AllPlotWindow : public GcWindow
         int isShowSpeed() const { return showSpeed->checkState(); }
         int isShowCad() const { return showCad->checkState(); }
         int isShowAlt() const { return showAlt->checkState(); }
+        int isShowTorque() const { return showTorque->checkState(); }
         int isShowPower() const { return showPower->currentIndex(); }
         int isByDistance() const { return comboDistance->currentIndex(); }
         int isPaintBrush() const { return paintBrush->isChecked(); }

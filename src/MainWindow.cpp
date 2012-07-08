@@ -58,6 +58,7 @@
 #include "BatchExportDialog.h"
 #include "StravaDialog.h"
 #include "RideWithGPSDialog.h"
+#include "TtbDialog.h"
 #include "TwitterDialog.h"
 #include "WithingsDownload.h"
 #include "CalendarDownload.h"
@@ -681,6 +682,10 @@ MainWindow::MainWindow(const QDir &home) :
     connect(rideWithGPSAction, SIGNAL(triggered(bool)), this, SLOT(uploadRideWithGPSAction()));
     rideMenu->addAction(rideWithGPSAction);
 
+    ttbAction = new QAction("Upload to Trainingstagebuch...", this);
+    connect(ttbAction, SIGNAL(triggered(bool)), this, SLOT(uploadTtb()));
+    rideMenu->addAction(ttbAction);
+
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Save activity"), this, SLOT(saveRide()), tr("Ctrl+S"));
     rideMenu->addAction(tr("D&elete activity..."), this, SLOT(deleteRide()));
@@ -928,9 +933,14 @@ MainWindow::setActivityMenu()
         if (tripid == "") rideWithGPSAction->setEnabled(true);
         else rideWithGPSAction->setEnabled(false);
         
+        activityId = ride->ride()->getTag("TtbExercise", "");
+        if (activityId == "") ttbAction->setEnabled(true);
+        else ttbAction->setEnabled(false);
+        
     } else {
         stravaAction->setEnabled(false);
         rideWithGPSAction->setEnabled(false);
+        ttbAction->setEnabled(false);
     }
 }
 
@@ -1768,6 +1778,24 @@ MainWindow::uploadRideWithGPSAction()
 
     if (item) { // menu is disabled anyway, but belt and braces
         RideWithGPSDialog d(this, item);
+        d.exec();
+    }
+}
+
+/*----------------------------------------------------------------------
+* trainingstagebuch.org
+*--------------------------------------------------------------------*/
+
+void
+MainWindow::uploadTtb()
+{
+    QTreeWidgetItem *_item = treeWidget->currentItem();
+    if (_item==NULL || _item->type() != RIDE_TYPE) return;
+
+    RideItem *item = dynamic_cast<RideItem*>(_item);
+
+    if (item) { // menu is disabled anyway, but belt and braces
+        TtbDialog d(this, item);
         d.exec();
     }
 }

@@ -165,6 +165,7 @@ void PerformanceManagerWindow::replot()
     if (firstRideItem) {
 
         QDateTime endTime = std::max(lastRideItem->dateTime, now.currentDateTime());
+        endTime = endTime.addDays( (appsettings->cvalue(mainWindow->cyclist, GC_STS_DAYS,7)).toInt() );
         newdays = firstRideItem->dateTime.daysTo(endTime);
         QString newMetric = metricCombo->itemData(metricCombo->currentIndex()).toString();
 

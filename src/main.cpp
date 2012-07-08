@@ -101,7 +101,15 @@ main(int argc, char *argv[])
     gcTranslator.load(":translations/gc_" + lang.toString() + ".qm");
     app.installTranslator(&gcTranslator);
 
-    QVariant lastOpened = appsettings->value(NULL, GC_SETTINGS_LAST);
+    QStringList args( app.arguments() );
+
+    QVariant lastOpened;
+    if( args.size() > 1 ){
+        lastOpened = args.at(1);
+    } else {
+        lastOpened = appsettings->value(NULL, GC_SETTINGS_LAST);
+    }
+
     QVariant unit = appsettings->value(NULL, GC_UNIT);
     double crankLength = appsettings->value(NULL, GC_CRANKLENGTH).toDouble();
     if(crankLength<=0) {

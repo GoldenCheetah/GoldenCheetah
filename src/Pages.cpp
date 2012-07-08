@@ -492,6 +492,11 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     QLabel *rwgpsuserLabel = new QLabel(tr("Username"));
     QLabel *rwgpspassLabel = new QLabel(tr("Password"));
 
+    QLabel *ttb = new QLabel(tr("Trainingstagebuch"));
+    ttb->setFont(current);
+
+    QLabel *ttbuserLabel = new QLabel(tr("Username"));
+    QLabel *ttbpassLabel = new QLabel(tr("Password"));
 
     QLabel *wip = new QLabel(tr("Withings Wifi Scales"));
     wip->setFont(current);
@@ -560,6 +565,13 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     rideWithGPSPass->setEchoMode(QLineEdit::Password);
     rideWithGPSPass->setText(appsettings->cvalue(mainWindow->cyclist, GC_RWGPSPASS, "").toString());
 
+    ttbUser = new QLineEdit(this);
+    ttbUser->setText(appsettings->cvalue(mainWindow->cyclist, GC_TTBUSER, "").toString());
+
+    ttbPass = new QLineEdit(this);
+    ttbPass->setEchoMode(QLineEdit::Password);
+    ttbPass->setText(appsettings->cvalue(mainWindow->cyclist, GC_TTBPASS, "").toString());
+
     wiURL = new QLineEdit(this);
     wiURL->setText(appsettings->cvalue(mainWindow->cyclist, GC_WIURL, "http://wbsapi.withings.net/").toString());
 
@@ -613,6 +625,9 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     grid->addWidget(dvurlLabel, 27,0);
     grid->addWidget(dvuserLabel, 28,0);
     grid->addWidget(dvpassLabel, 29,0);
+    grid->addWidget(ttb, 30,0);
+    grid->addWidget(ttbuserLabel, 31,0);
+    grid->addWidget(ttbpassLabel, 32,0);
 
     grid->addWidget(tpURL, 1, 1, 0);
     grid->addWidget(tpUser, 2, 1, Qt::AlignLeft | Qt::AlignVCenter);
@@ -643,6 +658,9 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     grid->addWidget(dvUser, 27, 1, Qt::AlignLeft | Qt::AlignVCenter);
     grid->addWidget(dvPass, 28, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
+    grid->addWidget(ttbUser, 31, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(ttbPass, 32, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
     grid->setColumnStretch(0,0);
     grid->setColumnStretch(1,3);
 
@@ -669,6 +687,8 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(mainWindow->cyclist, GC_STRPASS, stravaPass->text());
     appsettings->setCValue(mainWindow->cyclist, GC_RWGPSUSER, rideWithGPSUser->text());
     appsettings->setCValue(mainWindow->cyclist, GC_RWGPSPASS, rideWithGPSPass->text());
+    appsettings->setCValue(mainWindow->cyclist, GC_TTBUSER, ttbUser->text());
+    appsettings->setCValue(mainWindow->cyclist, GC_TTBPASS, ttbPass->text());
     appsettings->setCValue(mainWindow->cyclist, GC_TPTYPE, tpType->currentIndex());
     appsettings->setCValue(mainWindow->cyclist, GC_TWURL, twitterURL->text());
     appsettings->setCValue(mainWindow->cyclist, GC_WIURL, wiURL->text());
