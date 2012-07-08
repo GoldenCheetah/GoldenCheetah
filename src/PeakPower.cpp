@@ -40,10 +40,15 @@ class PeakPower : public RideMetric {
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
                  const MainWindow *) {
-        QList<BestIntervalDialog::BestInterval> results;
-        BestIntervalDialog::findBests(ride, secs, 1, results);
-        if (results.count() > 0 && results.first().avg < 3000) watts = results.first().avg;
-        else watts = 0.0;
+
+        if (!ride->dataPoints().isEmpty()) {
+            QList<BestIntervalDialog::BestInterval> results;
+            BestIntervalDialog::findBests(ride, secs, 1, results);
+            if (results.count() > 0 && results.first().avg < 3000) watts = results.first().avg;
+            else watts = 0.0;
+        } else {
+            watts = 0.0;
+        }
         setValue(watts);
     }
     RideMetric *clone() const { return new PeakPower(*this); }
@@ -195,19 +200,24 @@ class PeakPowerHr : public RideMetric {
     void setSecs(double secs) { this->secs=secs; }
     void compute(const RideFile *ride, const Zones *, int, const HrZones *, int,
                  const QHash<QString,RideMetric*> &, const MainWindow *) {
-        QList<BestIntervalDialog::BestInterval> results;
-        BestIntervalDialog::findBests(ride, secs, 1, results);
-        if (results.count() > 0) {
-            double start = results.first().start;
-            double stop = results.first().stop;
-            int points = 0;
 
-            foreach(const RideFilePoint *point, ride->dataPoints()) {
-                if (point->secs >= start && point->secs < stop) {
-                    points++;
-                    hr = (point->hr + (points-1)*hr) / (points);
+        if (!ride->dataPoints().isEmpty()){
+            QList<BestIntervalDialog::BestInterval> results;
+            BestIntervalDialog::findBests(ride, secs, 1, results);
+            if (results.count() > 0) {
+                double start = results.first().start;
+                double stop = results.first().stop;
+                int points = 0;
+
+                foreach(const RideFilePoint *point, ride->dataPoints()) {
+                    if (point->secs >= start && point->secs < stop) {
+                        points++;
+                        hr = (point->hr + (points-1)*hr) / (points);
+                    }
                 }
             }
+        } else {
+            hr = 0;
         }
 
         setValue(hr);
