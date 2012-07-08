@@ -689,7 +689,7 @@ MainWindow::MainWindow(const QDir &home) :
 
 
     // XXX MEASURES ARE NOT IMPLEMENTED YET
-#if 0
+//#if 0
     QMenu *measureMenu = menuBar()->addMenu(tr("&Measure"));
     measureMenu->addAction(tr("&Record Measures..."), this,
                         SLOT(recordMeasure()), tr("Ctrl+R"));
@@ -701,7 +701,7 @@ MainWindow::MainWindow(const QDir &home) :
     measureMenu->addSeparator();
     measureMenu->addAction(tr("Get &Withings Data..."), this,
                         SLOT (downloadMeasures()));
-#endif
+//#endif
 
     QMenu *optionsMenu = menuBar()->addMenu(tr("&Tools"));
     optionsMenu->addAction(tr("&Options..."), this, SLOT(showOptions()));

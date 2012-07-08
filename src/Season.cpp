@@ -221,6 +221,13 @@ Seasons::readSeasons()
     season.setId(QUuid("{00000000-0000-0000-0000-000000000006}"));
     seasons.append(season);
 
+    season.setName(tr("Last 21 days"));
+    season.setType(Season::temporary);
+    season.setStart(today.addDays(-20));
+    season.setEnd(today);
+    season.setId(QUuid("{00000000-0000-0000-0000-000000000011}"));
+    seasons.append(season);
+
     season.setName(tr("Last 28 days"));
     season.setType(Season::temporary);
     season.setStart(today.addDays(-27));
