@@ -194,6 +194,7 @@ class RideFile : public QObject // QObject to emit signals
         QList<RideFileInterval> intervals_;
         QMap<QString,QString> tags_;
         EditorData *data;
+        double weight_; // cached to save calls to getWeight();
 };
 
 struct RideFilePoint
