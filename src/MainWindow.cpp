@@ -692,27 +692,14 @@ MainWindow::MainWindow(const QDir &home) :
     rideMenu->addAction(tr("Split &activity..."), this, SLOT(splitRide()));
     rideMenu->addSeparator ();
 
-
-    // XXX MEASURES ARE NOT IMPLEMENTED YET
-//#if 0
-    QMenu *measureMenu = menuBar()->addMenu(tr("&Measure"));
-    measureMenu->addAction(tr("&Record Measures..."), this,
-                        SLOT(recordMeasure()), tr("Ctrl+R"));
-    measureMenu->addSeparator();
-    measureMenu->addAction(tr("&Export Measures..."), this,
-                        SLOT(exportMeasures()), tr("Ctrl+E"));
-    measureMenu->addAction(tr("&Import Measures..."), this,
-                        SLOT(importMeasures()), tr("Ctrl+I"));
-    measureMenu->addSeparator();
-    measureMenu->addAction(tr("Get &Withings Data..."), this,
-                        SLOT (downloadMeasures()));
-//#endif
-
     QMenu *optionsMenu = menuBar()->addMenu(tr("&Tools"));
     optionsMenu->addAction(tr("&Options..."), this, SLOT(showOptions()));
     optionsMenu->addAction(tr("Critical Power Calculator..."), this, SLOT(showTools()));
     optionsMenu->addAction(tr("Air Density (Rho) Estimator..."), this, SLOT(showRhoEstimator()));
 
+    optionsMenu->addSeparator();
+    optionsMenu->addAction(tr("Get &Withings Data..."), this,
+                        SLOT (downloadMeasures()));
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Workout Wizard"), this, SLOT(showWorkoutWizard()));
     optionsMenu->addAction(tr("Get Workouts from ErgDB"), this, SLOT(downloadErgDB()));

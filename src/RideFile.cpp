@@ -40,12 +40,12 @@
 
 RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
             startTime_(startTime), recIntSecs_(recIntSecs),
-            deviceType_("unknown"), data(NULL)
+            deviceType_("unknown"), data(NULL), weight_(0)
 {
     command = new RideFileCommand(this);
 }
 
-RideFile::RideFile() : recIntSecs_(0.0), deviceType_("unknown"), data(NULL)
+RideFile::RideFile() : recIntSecs_(0.0), deviceType_("unknown"), data(NULL), weight_(0)
 {
     command = new RideFileCommand(this);
 }
@@ -508,8 +508,6 @@ RideFilePoint::value(RideFile::SeriesType series) const
 double
 RideFile::getPointValue(int index, SeriesType series) const
 {
-    if (series == wattsKg)
-        qDebug() << "wattsKg value";
     return dataPoints_[index]->value(series);
 }
 
@@ -634,37 +632,41 @@ RideFile::appendPoints(QVector <struct RideFilePoint *> newRows)
 void
 RideFile::emitSaved()
 {
+    weight_ = 0;
     emit saved();
 }
 
 void
 RideFile::emitReverted()
 {
+    weight_ = 0;
     emit reverted();
 }
 
 void
 RideFile::emitModified()
 {
+    weight_ = 0;
     emit modified();
 }
 
 double
 RideFile::getWeight()
 {
+    if (weight_) return weight_; // cached value
+
     // ride
-    double weight;
-    if ((weight = getTag("Weight", "0.0").toDouble()) > 0) {
-        return weight;
+    if ((weight_ = getTag("Weight", "0.0").toDouble()) > 0) {
+        return weight_;
     }
-#if 0
+
     // withings?
     QList<SummaryMetrics> measures = mainwindow->metricDB->getAllMeasuresFor(QDateTime::fromString("Jan 1 00:00:00 1900"), startTime());
     if (measures.count()) {
-        return measures.last().getText("Weight", "0.0").toDouble();
+        return weight_ = measures.last().getText("Weight", "0.0").toDouble();
     }
-#endif
+
 
     // global options
-    return appsettings->cvalue(mainwindow->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
+    return weight_ = appsettings->cvalue(mainwindow->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
 }
