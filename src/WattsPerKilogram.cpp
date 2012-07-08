@@ -96,12 +96,17 @@ class PeakWPK : public RideMetric {
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
                  const MainWindow *main) {
-        weight = getWeight(main, ride);
-        //weight = ride->getTag("Weight", appsettings->cvalue(GC_WEIGHT, "75.0").toString()).toDouble(); // default to 75kg
-        QList<BestIntervalDialog::BestInterval> results;
-        BestIntervalDialog::findBests(ride, secs, 1, results);
-        if (results.count() > 0 && results.first().avg < 3000) wpk = results.first().avg / weight;
-        else wpk = 0.0;
+
+        if (!ride->dataPoints().isEmpty()) {
+            weight = getWeight(main, ride);
+            //weight = ride->getTag("Weight", appsettings->cvalue(GC_WEIGHT, "75.0").toString()).toDouble(); // default to 75kg
+            QList<BestIntervalDialog::BestInterval> results;
+            BestIntervalDialog::findBests(ride, secs, 1, results);
+            if (results.count() > 0 && results.first().avg < 3000) wpk = results.first().avg / weight;
+            else wpk = 0.0;
+        } else {
+            wpk = 0.0;
+        }
         setValue(wpk);
     }
     RideMetric *clone() const { return new PeakWPK(*this); }

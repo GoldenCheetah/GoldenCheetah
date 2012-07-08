@@ -66,9 +66,14 @@ class WorkoutTime : public RideMetric {
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
                  const MainWindow *) {
-        seconds = ride->dataPoints().back()->secs -
-                  ride->dataPoints().front()->secs + ride->recIntSecs();
+        if (!ride->dataPoints().isEmpty()) { 
+            seconds = ride->dataPoints().back()->secs -
+                      ride->dataPoints().front()->secs + ride->recIntSecs();
+        } else {
+            seconds = 0;
+        }
         setValue(seconds);
+        
     }
     RideMetric *clone() const { return new WorkoutTime(*this); }
 };
@@ -135,8 +140,12 @@ class TotalDistance : public RideMetric {
         // Note: The 'km' in each sample is the distance travelled by the
         // *end* of the sampling period.  The last term in this equation
         // accounts for the distance traveled *during* the first sample.
-        km = ride->dataPoints().back()->km - ride->dataPoints().front()->km
-            + ride->dataPoints().front()->kph / 3600.0 * ride->recIntSecs();
+        if (!ride->dataPoints().isEmpty()) {
+            km = ride->dataPoints().back()->km - ride->dataPoints().front()->km
+                + ride->dataPoints().front()->kph / 3600.0 * ride->recIntSecs();
+        } else {
+            km = 0;
+        }
         setValue(km);
     }
 

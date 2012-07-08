@@ -47,7 +47,7 @@ RideMetric::computeMetrics(const MainWindow *main, const RideFile *ride, const Z
         }
         if (ready) {
             RideMetric *m = factory.newMetric(symbol);
-            if (!ride->dataPoints().isEmpty())
+            //if (!ride->dataPoints().isEmpty())
                 m->compute(ride, zones, zoneRange, hrZones, hrZoneRange, done, main);
             if (ride->metricOverrides.contains(symbol))
                 m->override(ride->metricOverrides.value(symbol));
