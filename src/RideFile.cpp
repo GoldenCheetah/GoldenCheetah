@@ -20,6 +20,8 @@
 #include "RideFile.h"
 #include "DataProcessor.h"
 #include "RideMetadata.h"
+#include "MetricAggregator.h"
+#include "SummaryMetrics.h"
 #include "Settings.h"
 #include "Units.h"
 #include <QtXml/QtXml>
@@ -77,7 +79,7 @@ RideFile::seriesName(SeriesType series)
     case RideFile::temp: return QString(tr("Temperature"));
     case RideFile::interval: return QString(tr("Interval"));
     case RideFile::vam: return QString(tr("VAM"));
-    case RideFile::wattsKg: return QString(tr("Power/Weight"));
+    case RideFile::wattsKg: return QString(tr("Watts per Kilogram"));
     default: return QString(tr("Unknown"));
     }
 }
@@ -657,7 +659,7 @@ RideFile::getWeight()
     }
 #if 0
     // withings?
-    QList<SummaryMetrics> measures = main->metricDB->getAllMeasuresFor(QDateTime::fromString("Jan 1 00:00:00 1900"), ride->startTime());
+    QList<SummaryMetrics> measures = mainwindow->metricDB->getAllMeasuresFor(QDateTime::fromString("Jan 1 00:00:00 1900"), startTime());
     if (measures.count()) {
         return measures.last().getText("Weight", "0.0").toDouble();
     }
