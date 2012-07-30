@@ -133,7 +133,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
 
     char comment[71];
     in.readRawData(comment, sizeof(comment) - 1);
-    comment[commentlen - 1] = '\0';
+    comment[commentlen] = '\0';
     result->setTag("Notes", QString(comment) );
 
     result->setRecIntSecs(((double) recint1) / recint2);
