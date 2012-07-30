@@ -285,12 +285,13 @@ class Pace : public RideMetric {
     Pace() : pace(0.0)
     {
         setSymbol("pace");
-        setName(tr("Minute Mile Pace"));
+        setName(tr("Pace"));
         setType(RideMetric::Average);
-        setMetricUnits(tr("min/mile"));
+        setMetricUnits(tr("min/km"));
         setImperialUnits(tr("min/mile"));
         setPrecision(1);
-    }
+        setConversion(KM_PER_MILE);
+   }
 
     void compute(const RideFile *, const Zones *, int,
                  const HrZones *, int,
@@ -300,7 +301,7 @@ class Pace : public RideMetric {
         AvgSpeed *as = dynamic_cast<AvgSpeed*>(deps.value("average_speed"));
 
         // divide by zero or stupidly low pace
-        if (as->value(true) > 0.00f) pace = 60.0f / (as->value(true) * MILES_PER_KM); // kph to minutes per mile
+        if (as->value(true) > 0.00f) pace = 60.0f / as->value(true);
         else pace = 0;
 
         setValue(pace);
