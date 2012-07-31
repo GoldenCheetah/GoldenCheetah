@@ -292,8 +292,14 @@ SrmDevice::preview( QString &err )
         block.athlete = NULL;
     }
 
+    if( srmio_pc_xfer_state_success != srmio_pc_xfer_status( pc, &serr ) ){
+        err = tr( "preview failed: %1")
+            .arg(serr.message);
+        goto fail;
+    }
+
     if( ! srmio_pc_xfer_finish( pc, &serr ) ){
-        err = tr("download failed: %1")
+        err = tr("preview failed: %1")
             .arg(serr.message);
         goto fail;
     }
@@ -483,6 +489,12 @@ SrmDevice::download( const QDir &tmpdir,
         ++block_num;
     }
 
+    if( srmio_pc_xfer_state_success != srmio_pc_xfer_status( pc, &serr ) ){
+        err = tr( "download failed: %1")
+            .arg(serr.message);
+        goto fail;
+    }
+
     if( ! srmio_pc_xfer_finish( pc, &serr ) ){
         err = tr( "download failed: %1")
             .arg(serr.message);
@@ -514,10 +526,10 @@ SrmDevice::download( const QDir &tmpdir,
         srmio_data_t fixed;
         DeviceDownloadFile file;
 
-        file.extension = "srm";
-
-        if (!get_tmpname(tmpdir, file.name, err))
-            goto fail;
+        // skip empty hunks ... shouldn't happen, just to be safe
+        if( ! (*split)->cused ){
+            continue;
+        }
 
         fixed = srmio_data_fixup( *split, &serr );
         if( ! fixed ){
@@ -525,6 +537,16 @@ SrmDevice::download( const QDir &tmpdir,
                 .arg(serr.message);
             goto fail;
         }
+
+        // skip empty hunks ... shouldn't happen, just to be safe
+        if( ! fixed->cused ){
+            srmio_data_free(fixed);
+            continue;
+        }
+
+        file.extension = "srm";
+        if (!get_tmpname(tmpdir, file.name, err))
+            goto fail;
 
         if( ! srmio_data_time_start( fixed, &stime, &serr ) ){
             srmio_data_free(fixed);
