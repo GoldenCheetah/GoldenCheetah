@@ -58,8 +58,9 @@
 // 36  18  Feb 2012 Mark Liversedge    Added Pace (min/mile) and 250m, 500m Pace metrics
 // 37  06  Apr 2012 Rainer Clasen      Added non-zero average Power (watts)
 // 38  8th Jul 2012 Mark Liversedge    Computes metrics for manual files now
+// 39  18  Aug 2012 Mark Liversedge    New metric LRBalance
 
-static int DBSchemaVersion = 38;
+static int DBSchemaVersion = 39;
 
 DBAccess::DBAccess(MainWindow* main, QDir home) : main(main), home(home)
 {
