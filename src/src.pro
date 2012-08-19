@@ -437,6 +437,7 @@ SOURCES += \
         IntervalItem.cpp \
         IntervalSummaryWindow.cpp \
         IntervalTreeView.cpp \
+        LeftRightBalance.cpp \
         LogTimeScaleDraw.cpp \
         LogTimeScaleEngine.cpp \
         LTMCanvasPicker.cpp \

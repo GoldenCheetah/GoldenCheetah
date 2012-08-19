@@ -304,11 +304,11 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                if(motoActv)
                     rideFile->appendPoint(seconds, cad, hr, km,
                                           kph, nm, watts, alt, lon, lat, 0.0,
-                                          0.0, RideFile::noTemp, interval);
+                                          0.0, RideFile::noTemp, 0.0, interval);
                else
                     rideFile->appendPoint(minutes * 60.0, cad, hr, km,
                                           kph, nm, watts, alt, lon, lat,
-                                          headwind, 0.0, RideFile::noTemp,
+                                          headwind, 0.0, RideFile::noTemp, 0.0,
                                           interval);
             }
             ++lineno;

@@ -469,12 +469,13 @@ struct BinFileReaderState
         }
 
         double headwind = 0.0;
+        double lrbalance = 0.0;
 
         int interval = 0;
         int lng = 0;
         int lat = 0;
 
-        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, grade, temperature, interval);
+        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, grade, temperature, lrbalance, interval);
         //printf("addPoint time %f hr %f speed %f dist %f alt %f\n", secs, hr, kph, km, alt);
     }
 

@@ -106,7 +106,7 @@ static QString unprotect(const QString string)
 %token RIDE STARTTIME RECINTSECS DEVICETYPE IDENTIFIER
 %token OVERRIDES
 %token TAGS INTERVALS NAME START STOP
-%token SAMPLES SECS KM WATTS NM CAD KPH HR ALTITUDE LAT LON HEADWIND SLOPE TEMP
+%token SAMPLES SECS KM WATTS NM CAD KPH HR ALTITUDE LAT LON HEADWIND SLOPE TEMP LRBALANCE
 
 %start document
 %%
@@ -199,7 +199,7 @@ sample: '{' series_list '}'             { JsonRide->appendPoint(JsonPoint.secs, 
                                                     JsonPoint.nm, JsonPoint.watts, JsonPoint.alt,
                                                     JsonPoint.lon, JsonPoint.lat,
                                                     JsonPoint.headwind,
-                                                    JsonPoint.slope, JsonPoint.temp,
+                                                    JsonPoint.slope, JsonPoint.temp, JsonPoint.lrbalance,
                                                     JsonPoint.interval);
                                           JsonPoint = RideFilePoint();
                                         }
@@ -218,6 +218,7 @@ series: SECS ':' number                 { JsonPoint.secs = JsonNumber; }
         | HEADWIND ':' number           { JsonPoint.headwind = JsonNumber; }
         | SLOPE ':' number              { JsonPoint.slope = JsonNumber; }
         | TEMP ':' number               { JsonPoint.temp = JsonNumber; }
+        | LRBALANCE ':' number          { JsonPoint.lrbalance = JsonNumber; }
         ;
 
 /*

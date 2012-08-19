@@ -146,7 +146,7 @@ GcFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) 
         lat = sample.attribute("lat", "0.0").toDouble();
         while ((interval < intervalStops.size()) && (secs >= intervalStops[interval]))
             ++interval;
-        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, 0.0, RideFile::noTemp, interval);
+        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, 0.0, RideFile::noTemp, 0, interval);
         if (!recIntSet) {
             rideFile->setRecIntSecs(sample.attribute("len").toDouble());
             recIntSet = true;
