@@ -137,5 +137,7 @@ class ColorEngine : public QObject
 #define CTEMP                 59
 #define CDIAL                 60
 #define CALTPOWER             61
+#define CBALANCELEFT          62
+#define CBALANCERIGHT         63
 
 #endif

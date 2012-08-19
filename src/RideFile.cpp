@@ -378,7 +378,7 @@ QStringList RideFileFactory::listRideFiles(const QDir &dir) const
 void RideFile::appendPoint(double secs, double cad, double hr, double km,
                            double kph, double nm, double watts, double alt,
                            double lon, double lat, double headwind,
-                           double slope, double temp, int interval)
+                           double slope, double temp, double lrbalance, int interval)
 {
     // negative values are not good, make them zero
     // although alt, lat, lon, headwind, slope and temperature can be negative of course!
@@ -392,7 +392,7 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     if (!isfinite(interval) || interval<0) interval=0;
 
     dataPoints_.append(new RideFilePoint(secs, cad, hr, km, kph,
-                                         nm, watts, alt, lon, lat, headwind, slope, temp, interval));
+                                         nm, watts, alt, lon, lat, headwind, slope, temp, lrbalance, interval));
     dataPresent.secs     |= (secs != 0);
     dataPresent.cad      |= (cad != 0);
     dataPresent.hr       |= (hr != 0);
@@ -406,13 +406,14 @@ void RideFile::appendPoint(double secs, double cad, double hr, double km,
     dataPresent.headwind |= (headwind != 0);
     dataPresent.slope    |= (slope != 0);
     dataPresent.temp     |= (temp != noTemp);
+    dataPresent.lrbalance|= (lrbalance != 0);
     dataPresent.interval |= (interval != 0);
 }
 
 void RideFile::appendPoint(const RideFilePoint &point)
 {
     dataPoints_.append(new RideFilePoint(point.secs,point.cad,point.hr,point.km,point.kph,point.nm,point.watts,point.alt,point.lon,point.lat,
-                                         point.headwind, point.slope, point.temp, point.interval));
+                                         point.headwind, point.slope, point.temp, point.lrbalance, point.interval));
 }
 
 void
@@ -432,6 +433,7 @@ RideFile::setDataPresent(SeriesType series, bool value)
         case headwind : dataPresent.headwind = value; break;
         case slope : dataPresent.slope = value; break;
         case temp : dataPresent.temp = value; break;
+        case lrbalance : dataPresent.lrbalance = value; break;
         case interval : dataPresent.interval = value; break;
         default:
         case none : break;

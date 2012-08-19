@@ -176,6 +176,7 @@ this differently
             }
             else if (section == "[HRData]"){
                 double nm=0,kph=0,watts=0,km=0,cad=0,hr=0,alt=0;
+                double lrbalance=0;
 
                 seconds += recInterval;
 
@@ -197,6 +198,23 @@ this differently
                 }
                 if (power) {
                     watts = line.section('\t', i, i).toDouble();
+                    i++;
+                }
+                if (balance) {
+                    // Power LRB + PI:  The value contains :
+                    //  - Left Right Balance (LRB) and
+                    //  - Pedalling Index (PI)
+                    //
+                    // in the following formula:
+                    // value = PI * 256 + LRB   PI bits 15-8  LRB bits 7-0
+                    // LRB is the value of left foot
+                    // for example if LRB = 45, actual balance is L45 - 55R.
+                    // PI values are percentages from 0 to 100.
+                    // For example value 12857 (= 40 * 256 + 47)
+                    // means: PI = 40 and LRB = 47 => L47 - 53R
+
+                    lrbalance = line.section('\t', i, i).toInt() & 0xff;
+                    i++;
                 }
 
                 distance = distance + kph/60/60*recInterval;
@@ -216,7 +234,7 @@ this differently
                     alt *= METERS_PER_FOOT;
                 }
 
-                    rideFile->appendPoint(seconds, cad, hr, km, kph, nm, watts, alt, 0.0, 0.0, 0.0, 0.0, RideFile::noTemp, interval);
+                rideFile->appendPoint(seconds, cad, hr, km, kph, nm, watts, alt, 0.0, 0.0, 0.0, 0.0, RideFile::noTemp, lrbalance, interval);
 	            //fprintf(stderr, " %f, %f, %f, %f, %f, %f, %f, %d\n", seconds, cad, hr, km, kph, nm, watts, alt, interval);
             }
 

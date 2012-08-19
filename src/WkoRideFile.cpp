@@ -488,7 +488,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
             if (!isnull) {
                     // !! needs to be modified to support the new alt patch
                     results->appendPoint((double)rtime/1000, cad, hr, km,
-                            kph, nm, watts, alt, lon, lat, wind, slope, temp, 0);
+                            kph, nm, watts, alt, lon, lat, wind, slope, temp, 0.0, 0);
             }
 
             // increment time - even for null records (perhaps especially for null

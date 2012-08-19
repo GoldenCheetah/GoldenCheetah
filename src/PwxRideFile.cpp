@@ -235,7 +235,8 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
 
             // add the data point
             rideFile->appendPoint(add.secs, add.cad, add.hr, add.km, add.kph,
-                    add.nm, add.watts, add.alt, add.lon, add.lat, add.headwind, add.slope, add.temp, add.interval);
+                    add.nm, add.watts, add.alt, add.lon, add.lat, add.headwind,
+                    add.slope, add.temp, add.lrbalance, add.interval);
 
 
         // ignored for now

@@ -319,7 +319,7 @@ struct FitFileReaderState
         time_t time = 0;
         if (time_offset > 0)
             time = last_time + time_offset;
-        double alt = 0, cad = 0, km = 0, grade = 0, hr = 0, lat = 0, lng = 0, badgps = 0;
+        double alt = 0, cad = 0, km = 0, grade = 0, hr = 0, lat = 0, lng = 0, badgps = 0, lrbalance = 0;
         double resistance = 0, kph = 0, temperature = RideFile::noTemp, time_from_course = 0, watts = 0;
         fit_value_t lati = NA_VALUE, lngi = NA_VALUE;
         int i = 0;
@@ -349,6 +349,8 @@ struct FitFileReaderState
                 case 11: time_from_course = value / 1000.0; break;
                 case 12: break; // XXX "cycle_length"
                 case 13: temperature = value; break;
+                case 30: lrbalance = (value & 0x80 ? 100 - (value & 0x7F) : value & 0x7F);break;
+
                 default: unknown_record_fields.insert(field.num);
             }
         }
@@ -414,6 +416,8 @@ struct FitFileReaderState
             double deltaLon = lng - prevPoint->lon;
             double deltaLat = lat - prevPoint->lat;
             double deltaHeadwind = headwind - prevPoint->headwind;
+            double deltaLeftRightBalance = lrbalance - prevPoint->lrbalance;
+
             for (int i = 1; i < deltaSecs; i++) {
                 double weight = 1.0 * i / deltaSecs;
                 rideFile->appendPoint(
@@ -430,13 +434,14 @@ struct FitFileReaderState
                     prevPoint->headwind + (deltaHeadwind * weight),
                     0,
                     temperature,
+                    prevPoint->lrbalance + (deltaLeftRightBalance * weight),
                     interval);
             }
             prevPoint = rideFile->dataPoints().back();
         }
 
         if (km < 0.00001f) km = last_distance;
-        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, 0, temperature, interval);
+        rideFile->appendPoint(secs, cad, hr, km, kph, nm, watts, alt, lng, lat, headwind, 0, temperature, lrbalance, interval);
         last_time = time;
         last_distance = km;
     }

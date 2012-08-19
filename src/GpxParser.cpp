@@ -171,7 +171,7 @@ bool
 
 	if(rideFile->dataPoints().empty()) {
 	    // first point
-            rideFile->appendPoint(secs, 0, 0, distance, speed, 0, 0, alt, lon, lat, 0, 0.0, RideFile::noTemp, 0);
+            rideFile->appendPoint(secs, 0, 0, distance, speed, 0, 0, alt, lon, lat, 0, 0.0, RideFile::noTemp, 0.0, 0);
 	}
 	else {
 	    // assumption that the change in ride is linear...  :)
@@ -190,7 +190,7 @@ bool
                 (secs == 0)) {
 
                 // no smart recording, or delta exceeds HW treshold, or no time elements; just insert the data
-                rideFile->appendPoint(secs, 0, 0, distance, speed, 0,0, alt, lon, lat, 0, 0.0, RideFile::noTemp, 0);
+                rideFile->appendPoint(secs, 0, 0, distance, speed, 0,0, alt, lon, lat, 0, 0.0, RideFile::noTemp, 0.0, 0);
 
 	    } else {
 
@@ -213,9 +213,10 @@ bool
 			    prevPoint->alt + (deltaAlt * weight),
 			    lon, // lon
 			    lat, // lat
-                            0,
-                             0.0,
-                             RideFile::noTemp,
+                0,
+                0.0,
+                RideFile::noTemp,
+                0,
 			    0);
 		}
 		prevPoint = rideFile->dataPoints().back();

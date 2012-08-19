@@ -123,6 +123,10 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     showTorque->setCheckState(Qt::Checked);
     cl->addWidget(showTorque);
 
+    showBalance = new QCheckBox(tr("Power balance"), this);
+    showBalance->setCheckState(Qt::Checked);
+    cl->addWidget(showBalance);
+
     showPower = new QComboBox();
     showPower->addItem(tr("Power + shade"));
     showPower->addItem(tr("Power - shade"));
@@ -343,6 +347,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     connect(showTemp, SIGNAL(stateChanged(int)), this, SLOT(setShowTemp(int)));
     connect(showWind, SIGNAL(stateChanged(int)), this, SLOT(setShowWind(int)));
     connect(showTorque, SIGNAL(stateChanged(int)), this, SLOT(setShowTorque(int)));
+    connect(showBalance, SIGNAL(stateChanged(int)), this, SLOT(setShowBalance(int)));
     connect(showGrid, SIGNAL(stateChanged(int)), this, SLOT(setShowGrid(int)));
     connect(showFull, SIGNAL(stateChanged(int)), this, SLOT(setShowFull(int)));
     connect(showStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
@@ -1171,6 +1176,16 @@ AllPlotWindow::setShowTorque(int value)
     allPlot->showTorque(value);
     foreach (AllPlot *plot, allPlots)
         plot->showTorque(value);
+}
+
+void
+AllPlotWindow::setShowBalance(int value)
+{
+    showBalance->setChecked(value);
+
+    allPlot->showBalance(value);
+    foreach (AllPlot *plot, allPlots)
+        plot->showBalance(value);
 }
 
 void

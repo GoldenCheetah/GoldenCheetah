@@ -213,6 +213,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     showTempState(Qt::Checked),
     showWindState(Qt::Checked),
     showTorqueState(Qt::Checked),
+    showBalanceState(Qt::Checked),
     bydist(false),
     parent(parent)
 {
@@ -262,6 +263,12 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     torqueCurve = new QwtPlotCurve(tr("Torque"));
     torqueCurve->setYAxis(yRight);
 
+    balanceLCurve = new QwtPlotCurve(tr("Left Balance"));
+    balanceLCurve->setYAxis(yLeft2);
+
+    balanceRCurve = new QwtPlotCurve(tr("Right Balance"));
+    balanceRCurve->setYAxis(yLeft2);
+
     intervalHighlighterCurve = new QwtPlotCurve();
     intervalHighlighterCurve->setYAxis(yLeft);
     intervalHighlighterCurve->setData(new IntervalPlotData(this, mainWindow));
@@ -300,6 +307,8 @@ AllPlot::configChanged()
         tempCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         windCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         torqueCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        balanceLCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+        balanceRCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
         intervalHighlighterCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     }
 
@@ -338,6 +347,18 @@ AllPlot::configChanged()
     QPen torquePen = QPen(GColor(CTORQUE));
     torquePen.setWidth(width);
     torqueCurve->setPen(torquePen);
+    QPen balanceLPen = QPen(GColor(CBALANCERIGHT));
+    balanceLPen.setWidth(width);
+    balanceLCurve->setPen(balanceLPen);
+    QColor brbrush_color = GColor(CBALANCERIGHT);
+    brbrush_color.setAlpha(200);
+    balanceLCurve->setBrush(brbrush_color);   // fill below the line
+    QPen balanceRPen = QPen(GColor(CBALANCELEFT));
+    balanceRPen.setWidth(width);
+    balanceRCurve->setPen(balanceRPen);
+    QColor blbrush_color = GColor(CBALANCELEFT);
+    blbrush_color.setAlpha(200);
+    balanceRCurve->setBrush(blbrush_color);   // fill below the line
 
     QPen ihlPen = QPen(GColor(CINTERVALHIGHLIGHTER));
     ihlPen.setWidth(width);
@@ -372,12 +393,22 @@ AllPlot::configChanged()
         p = torqueCurve->pen().color();
         p.setAlpha(64);
         torqueCurve->setBrush(QBrush(p));
+
+        /*p = balanceLCurve->pen().color();
+        p.setAlpha(64);
+        balanceLCurve->setBrush(QBrush(p));
+
+        p = balanceRCurve->pen().color();
+        p.setAlpha(64);
+        balanceRCurve->setBrush(QBrush(p));*/
     } else {
         wattsCurve->setBrush(Qt::NoBrush);
         hrCurve->setBrush(Qt::NoBrush);
         speedCurve->setBrush(Qt::NoBrush);
         cadCurve->setBrush(Qt::NoBrush);
         torqueCurve->setBrush(Qt::NoBrush);
+        //balanceLCurve->setBrush(Qt::NoBrush);
+        //balanceRCurve->setBrush(Qt::NoBrush);
     }
 
     QPalette pal;
@@ -418,9 +449,9 @@ AllPlot::configChanged()
 }
 
 struct DataPoint {
-    double time, hr, watts, speed, cad, alt, temp, wind, torque;
-    DataPoint(double t, double h, double w, double s, double c, double a, double te, double wi, double tq) :
-        time(t), hr(h), watts(w), speed(s), cad(c), alt(a), temp(te), wind(wi), torque(tq) {}
+    double time, hr, watts, speed, cad, alt, temp, wind, torque, lrbalance;
+    DataPoint(double t, double h, double w, double s, double c, double a, double te, double wi, double tq, double lrb) :
+        time(t), hr(h), watts(w), speed(s), cad(c), alt(a), temp(te), wind(wi), torque(tq), lrbalance(lrb) {}
 };
 
 bool AllPlot::shadeZones() const
@@ -498,6 +529,10 @@ AllPlot::recalc()
             windCurve->setData(new QwtIntervalSeriesData(intData));
         if (!torqueArray.empty())
             torqueCurve->setData(data, data);
+        if (!balanceArray.empty())
+            balanceLCurve->setData(data, data);
+        if (!balanceArray.empty())
+            balanceRCurve->setData(data, data);
 
         return;
     }
@@ -513,6 +548,7 @@ AllPlot::recalc()
         double totalTemp = 0.0;
         double totalWind = 0.0;
         double totalTorque = 0.0;
+        double totalBalance = 0.0;
 
         QList<DataPoint> list;
 
@@ -527,6 +563,8 @@ AllPlot::recalc()
         smoothWind.resize(rideTimeSecs + 1);
         smoothRelSpeed.resize(rideTimeSecs + 1);
         smoothTorque.resize(rideTimeSecs + 1);
+        smoothBalanceL.resize(rideTimeSecs + 1);
+        smoothBalanceR.resize(rideTimeSecs + 1);
 
         for (int secs = 0; ((secs < smooth)
                             && (secs < rideTimeSecs)); ++secs) {
@@ -541,6 +579,8 @@ AllPlot::recalc()
             smoothWind[secs]  = 0.0;
             smoothRelSpeed[secs] = QwtIntervalSample();
             smoothTorque[secs]  = 0.0;
+            smoothBalanceL[secs]  = 50;
+            smoothBalanceR[secs]  = 50;
         }
 
         int i = 0;
@@ -554,7 +594,8 @@ AllPlot::recalc()
                              (!altArray.empty() ? altArray[i] : 0),
                              (!tempArray.empty() ? tempArray[i] : 0),
                              (!windArray.empty() ? windArray[i] : 0),
-                             (!torqueArray.empty() ? torqueArray[i] : 0));
+                             (!torqueArray.empty() ? torqueArray[i] : 0),
+                             (!balanceArray.empty() ? balanceArray[i] : 0));
                 if (!wattsArray.empty())
                     totalWatts += wattsArray[i];
                 if (!hrArray.empty())
@@ -578,6 +619,8 @@ AllPlot::recalc()
                     totalWind   += windArray[i];
                 if (!torqueArray.empty())
                     totalTorque   += torqueArray[i];
+                if (!balanceArray.empty())
+                    totalBalance   += (balanceArray[i]>0?balanceArray[i]:50);
 
                 totalDist   = distanceArray[i];
                 list.append(dp);
@@ -593,6 +636,7 @@ AllPlot::recalc()
                 totalTemp   -= dp.temp;
                 totalWind   -= dp.wind;
                 totalTorque   -= dp.torque;
+                totalBalance   -= (dp.lrbalance>0?dp.lrbalance:50);
                 list.removeFirst();
             }
             // TODO: this is wrong.  We should do a weighted average over the
@@ -607,6 +651,8 @@ AllPlot::recalc()
                 smoothWind[secs] = 0.0;
                 smoothRelSpeed[secs] =  QwtIntervalSample();
                 smoothTorque[secs] = 0.0;
+                smoothBalanceL[secs] = 50;
+                smoothBalanceR[secs] = 50;
             }
             else {
                 smoothWatts[secs]    = totalWatts / list.size();
@@ -618,6 +664,19 @@ AllPlot::recalc()
                 smoothWind[secs]    = totalWind / list.size();
                 smoothRelSpeed[secs] =  QwtIntervalSample( bydist ? totalDist : secs / 60.0, QwtInterval(qMin(totalWind / list.size(), totalSpeed / list.size()), qMax(totalWind / list.size(), totalSpeed / list.size()) ) );
                 smoothTorque[secs]    = totalTorque / list.size();
+
+                double balance = totalBalance / list.size();
+                if (balance == 0) {
+                    smoothBalanceL[secs]    = 50;
+                    smoothBalanceR[secs]    = 50;
+                } else if (balance >= 50) {
+                    smoothBalanceL[secs]    = balance;
+                    smoothBalanceR[secs]    = 50;
+                }
+                else {
+                    smoothBalanceL[secs]    = 50;
+                    smoothBalanceR[secs]    = balance;
+                }
             }
             smoothDistance[secs] = totalDist;
             smoothTime[secs]  = secs / 60.0;
@@ -637,6 +696,8 @@ AllPlot::recalc()
         smoothWind.resize(0);
         smoothRelSpeed.resize(0);
         smoothTorque.resize(0);
+        smoothBalanceL.resize(0);
+        smoothBalanceR.resize(0);
 
         foreach (RideFilePoint *dp, rideItem->ride()->dataPoints()) {
             smoothWatts.append(dp->watts);
@@ -649,6 +710,19 @@ AllPlot::recalc()
             smoothTemp.append(dp->temp);
             smoothWind.append(useMetricUnits ? dp->headwind : dp->headwind * MILES_PER_KM);
             smoothTorque.append(dp->nm);
+
+            if (dp->lrbalance == 0) {
+                smoothBalanceL.append(50);
+                smoothBalanceR.append(50);
+            }
+            else if (dp->lrbalance >= 50) {
+                smoothBalanceL.append(dp->lrbalance);
+                smoothBalanceR.append(50);
+            }
+            else {
+                smoothBalanceL.append(50);
+                smoothBalanceR.append(dp->lrbalance);
+            }
 
             double head = dp->headwind * (useMetricUnits ? 1.0f : MILES_PER_KM);
             double speed = dp->kph * (useMetricUnits ? 1.0f : MILES_PER_KM);
@@ -694,6 +768,11 @@ AllPlot::recalc()
         torqueCurve->setData(xaxis.data() + startingIndex, smoothTorque.data() + startingIndex, totalPoints);
         intervalHighlighterCurve->setYAxis(yRight);
 
+    } if (!balanceArray.empty()) {
+        balanceLCurve->setData(xaxis.data() + startingIndex, smoothBalanceL.data() + startingIndex, totalPoints);
+        intervalHighlighterCurve->setYAxis(yLeft2);
+        balanceRCurve->setData(xaxis.data() + startingIndex, smoothBalanceR.data() + startingIndex, totalPoints);
+        intervalHighlighterCurve->setYAxis(yLeft2);
     }
 
     setYMax();
@@ -757,7 +836,7 @@ AllPlot::setYMax()
         setAxisLabelRotation(yLeft,270);
         setAxisLabelAlignment(yLeft,Qt::AlignVCenter);
     }
-    if (hrCurve->isVisible() || cadCurve->isVisible()) {
+    if (hrCurve->isVisible() || cadCurve->isVisible() || balanceLCurve->isVisible()) {
         double ymax = 0;
         QStringList labels;
         if (hrCurve->isVisible()) {
@@ -773,6 +852,16 @@ AllPlot::setYMax()
                 ymax = qMax(ymax, cadCurve->maxYValue());
             else
                 ymax = qMax(ymax, referencePlot->cadCurve->maxYValue());
+        }
+        if (balanceLCurve->isVisible()) {
+            labels << "% left";
+            if (referencePlot == NULL)
+                ymax = qMax(ymax, balanceLCurve->maxYValue());
+            else
+                ymax = qMax(ymax, referencePlot->balanceLCurve->maxYValue());
+
+            balanceLCurve->setBaseline(50);
+            balanceRCurve->setBaseline(50);
         }
         setAxisTitle(yLeft2, labels.join(" / "));
         setAxisScale(yLeft2, 0.0, 1.05 * ymax);
@@ -884,6 +973,9 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     double *smoothTE = &plot->smoothTemp[startidx];
     double *smoothWND = &plot->smoothWind[startidx];
     double *smoothNM = &plot->smoothTorque[startidx];
+    double *smoothBALL = &plot->smoothBalanceL[startidx];
+    double *smoothBALR = &plot->smoothBalanceR[startidx];
+
     QwtIntervalSample *smoothRS = &plot->smoothRelSpeed[startidx];
 
     double *xaxis = bydist ? smoothD : smoothT;
@@ -899,6 +991,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     tempCurve->detach();
     windCurve->detach();
     torqueCurve->detach();
+    balanceLCurve->detach();
+    balanceRCurve->detach();
 
     wattsCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showPowerState < 2);
     hrCurve->setVisible(rideItem->ride()->areDataPresent()->hr && showHrState == Qt::Checked);
@@ -908,6 +1002,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     tempCurve->setVisible(rideItem->ride()->areDataPresent()->temp && showTempState == Qt::Checked);
     windCurve->setVisible(rideItem->ride()->areDataPresent()->headwind && showWindState == Qt::Checked);
     torqueCurve->setVisible(rideItem->ride()->areDataPresent()->nm && showTorqueState == Qt::Checked);
+    balanceLCurve->setVisible(rideItem->ride()->areDataPresent()->lrbalance && showBalanceState == Qt::Checked);
+    balanceRCurve->setVisible(rideItem->ride()->areDataPresent()->lrbalance && showBalanceState == Qt::Checked);
 
     wattsCurve->setData(xaxis,smoothW,stopidx-startidx);
     hrCurve->setData(xaxis, smoothHR,stopidx-startidx);
@@ -920,6 +1016,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     qMemCopy( tmpWND.data(), smoothRS, (stopidx-startidx) * sizeof( QwtIntervalSample ) );
     windCurve->setData(new QwtIntervalSeriesData(tmpWND));
     torqueCurve->setData(xaxis, smoothNM, stopidx-startidx);
+    balanceLCurve->setData(xaxis, smoothBALL, stopidx-startidx);
+    balanceRCurve->setData(xaxis, smoothBALR, stopidx-startidx);
 
     /*QVector<double> _time(stopidx-startidx);
     qMemCopy( _time.data(), xaxis, (stopidx-startidx) * sizeof( double ) );
@@ -947,6 +1045,8 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     altCurve->setSymbol(new QwtSymbol(sym));
     tempCurve->setSymbol(new QwtSymbol(sym));
     torqueCurve->setSymbol(new QwtSymbol(sym));
+    balanceLCurve->setSymbol(new QwtSymbol(sym));
+    balanceRCurve->setSymbol(new QwtSymbol(sym));
 
     setYMax();
 
@@ -984,6 +1084,12 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
         torqueCurve->attach(this);
         intervalHighlighterCurve->setYAxis(yRight);
     }
+    if (!plot->smoothBalanceL.empty()) {
+        balanceLCurve->attach(this);
+        balanceRCurve->attach(this);
+        intervalHighlighterCurve->setYAxis(yLeft2);
+    }
+
 
     refreshIntervalMarkers();
     refreshZoneLabels();
@@ -1013,6 +1119,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         tempArray.resize(dataPresent->temp ? npoints : 0);
         windArray.resize(dataPresent->headwind ? npoints : 0);
         torqueArray.resize(dataPresent->nm ? npoints : 0);
+        balanceArray.resize(dataPresent->lrbalance ? npoints : 0);
         timeArray.resize(npoints);
         distanceArray.resize(npoints);
 
@@ -1025,6 +1132,9 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         tempCurve->detach();
         windCurve->detach();
         torqueCurve->detach();
+        balanceLCurve->detach();
+        balanceRCurve->detach();
+
         if (!altArray.empty()) altCurve->attach(this);
         if (!wattsArray.empty()) wattsCurve->attach(this);
         if (!hrArray.empty()) hrCurve->attach(this);
@@ -1033,6 +1143,10 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         if (!tempArray.empty()) tempCurve->attach(this);
         if (!windArray.empty()) windCurve->attach(this);
         if (!torqueArray.empty()) torqueCurve->attach(this);
+        if (!balanceArray.empty()) {
+            balanceLCurve->attach(this);
+            balanceRCurve->attach(this);
+        }
 
         wattsCurve->setVisible(dataPresent->watts && showPowerState < 2);
         hrCurve->setVisible(dataPresent->hr && showHrState == Qt::Checked);
@@ -1042,6 +1156,8 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         tempCurve->setVisible(dataPresent->temp && showTempState == Qt::Checked);
         windCurve->setVisible(dataPresent->headwind && showWindState == Qt::Checked);
         torqueCurve->setVisible(dataPresent->nm && showWindState == Qt::Checked);
+        balanceLCurve->setVisible(dataPresent->lrbalance && showBalanceState == Qt::Checked);
+        balanceRCurve->setVisible(dataPresent->lrbalance && showBalanceState == Qt::Checked);
 
         arrayLength = 0;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
@@ -1084,6 +1200,9 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
                                               ? point->headwind
                                               : point->headwind * MILES_PER_KM));
 
+            if (!balanceArray.empty())
+                balanceArray[arrayLength]   = point->lrbalance;
+
             distanceArray[arrayLength] = max(0,
                                              (useMetricUnits
                                               ? point->km
@@ -1109,6 +1228,9 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         tempCurve->detach();
         windCurve->detach();
         torqueCurve->detach();
+        balanceLCurve->detach();
+        balanceRCurve->detach();
+
         foreach(QwtPlotMarker *mrk, d_mrk)
             delete mrk;
         d_mrk.clear();
@@ -1202,6 +1324,17 @@ AllPlot::showTorque(int state)
 }
 
 void
+AllPlot::showBalance(int state)
+{
+    showBalanceState = state;
+    assert(state != Qt::PartiallyChecked);
+    balanceLCurve->setVisible(state == Qt::Checked);
+    balanceRCurve->setVisible(state == Qt::Checked);
+    setYMax();
+    replot();
+}
+
+void
 AllPlot::showGrid(int state)
 {
     assert(state != Qt::PartiallyChecked);
@@ -1238,6 +1371,14 @@ AllPlot::setPaintBrush(int state)
         p = torqueCurve->pen().color();
         p.setAlpha(64);
         torqueCurve->setBrush(QBrush(p));
+
+        /*p = balanceLCurve->pen().color();
+        p.setAlpha(64);
+        balanceLCurve->setBrush(QBrush(p));
+
+        p = balanceRCurve->pen().color();
+        p.setAlpha(64);
+        balanceRCurve->setBrush(QBrush(p));*/
     } else {
         wattsCurve->setBrush(Qt::NoBrush);
         hrCurve->setBrush(Qt::NoBrush);
@@ -1245,6 +1386,8 @@ AllPlot::setPaintBrush(int state)
         cadCurve->setBrush(Qt::NoBrush);
         tempCurve->setBrush(Qt::NoBrush);
         torqueCurve->setBrush(Qt::NoBrush);
+        //balanceLCurve->setBrush(Qt::NoBrush);
+        //balanceRCurve->setBrush(Qt::NoBrush);
     }
     replot();
 }
