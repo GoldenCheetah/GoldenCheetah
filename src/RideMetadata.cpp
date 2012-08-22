@@ -766,11 +766,8 @@ FormField::metadataChanged()
 // is easier to follow and modify... for now.
 static QString xmlprotect(QString string)
 {
-    QTextEdit trademark("&#8482;"); // process html encoding of(TM)
-    QString tm = trademark.toPlainText();
-
     QString s = string;
-    s.replace( tm, "&#8482;" );
+    s.replace( QChar( 0x2122), "&#8482;" );
     s.replace( "&", "&amp;" );
     s.replace( ">", "&gt;" );
     s.replace( "<", "&lt;" );
@@ -839,16 +836,13 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
 
 static QString unprotect(QString buffer)
 {
-    // get local TM character code
-    QTextEdit trademark("&#8482;"); // process html encoding of(TM)
-    QString tm = trademark.toPlainText();
-
     // remove quotes
     QString t = buffer.trimmed();
     QString s = t.mid(1,t.length()-2);
 
     // replace html (TM) with local TM character
-    s.replace( "&#8482;", tm );
+    s.replace( "&#8482;", QChar( 0x2122) );
+
 
     // html special chars are automatically handled
     // other special characters will not work
