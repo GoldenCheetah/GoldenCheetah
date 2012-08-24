@@ -769,3 +769,118 @@ void Aerolab::refreshIntervalMarkers()
         }
     }
 }
+
+/*
+ * Estimate CdA and Crr usign energy balance in segments defined by
+ * non-zero altitude.
+ * Author: Alejandro Martinez
+ * Date: 23-aug-2012
+ */
+bool Aerolab::estimateCdACrr(RideItem *rideItem)
+{
+    // HARD-CODED DATA: p1->kph
+    const double vfactor = 3.600;
+    const double g = 9.80665;
+    RideFile *ride = rideItem->ride();
+
+    if(ride) {
+        const RideFileDataPresent *dataPresent = ride->areDataPresent();
+        if(dataPresent->alt && dataPresent->alt) {
+            double dt = ride->recIntSecs();
+            int npoints = ride->dataPoints().size();
+            double X1[npoints], X2[npoints], Egain[npoints];
+            int nSeg = -1;
+            double altInit = 0, vInit = 0;
+            /* For each segment, defined between points with alt != 0,
+             * this loop computes X1, X2 and Egain to verify:
+             * Aero-Loss + RR-Loss = Egain
+             * where
+             *      Aero-Loss = X1[nSgeg] * CdA
+             *      RR-Loss = X2[nSgeg] * Crr
+             * are the aero and rr components of the energy loss with
+             *      X1[nSeg] = sum(0.5 * rho * headwind*headwind * distance)
+             *      X2[nSeg] = sum(totalMass * g * distance)
+             * and the energy gain sums power in the segment with
+             * potential and kinetic variations:
+             *      Egain = sum(eta * power * dt) +
+             *              totalMass * (g * (altInit - alt) +
+             *              0.5 * (vInit*vInit - v*v))
+             */
+            foreach(const RideFilePoint *p1, ride->dataPoints()) {
+                // Unpack:
+                double power = max(0, p1->watts);
+                double v     = p1->kph/vfactor;
+                double distance = v * dt;
+                double headwind = v;
+                if( dataPresent->headwind ) {
+                    headwind   = p1->headwind/vfactor;
+                }
+                double alt = p1->alt;
+                // start initial segment
+                if (nSeg < 0 && alt != 0) {
+                    nSeg = 0;
+                    X1[nSeg] = X2[nSeg] = Egain[nSeg] = 0.0;
+                    altInit = alt;
+                    vInit = v;
+                }
+                // accumulate segment data
+                if (nSeg >= 0) {
+                    // X1[nSgeg] * CdA == Aero-Loss
+                    X1[nSeg] += 0.5 * rho * headwind*headwind * distance;
+                    // X2[nSgeg] * Crr == RR-Loss
+                    X2[nSeg] += totalMass * g * distance;
+                    // Energy supplied
+                    Egain[nSeg] += eta * power * dt;
+                }
+                // close current segment and start a new one
+                if (nSeg >= 0 && alt != 0) {
+                    // Add change in potential and kinetic energy
+                    Egain[nSeg] += totalMass * (g * (altInit - alt) + 0.5 * (vInit*vInit - v*v));
+                    // Start a new segment
+                    nSeg++;
+                    X1[nSeg] = X2[nSeg] = Egain[nSeg] = 0.0;
+                    altInit = alt;
+                    vInit = v;
+                }
+            }
+            /* At least two segmentes needed to approximate:
+             *     X1 * CdA + X2 * Crr = Egain
+             * which, in matrix form, is:
+             *    X * [ CdA ; Crr ] = Egain
+             * and pre-multiplying by X transpose (X'):
+             *    X'* X [ CdA ; Crr ] = X' * Egain
+             * which is a system with two equations and two unknowns
+             *    A * [ CdA ; Crr ] = B
+             */
+            if (nSeg >= 2) {
+                // compute the normal equation: A * [ CdA ; Crr ] = B
+                // A = X'*X
+                // B = X'*Egain
+                double A11 = 0, A12 = 0, A21 = 0, A22 = 0, B1 = 0, B2 = 0;
+                for (int i = 0; i < nSeg; i++) {
+                    A11 += X1[i] * X1[i];
+                    A12 += X1[i] * X2[i];
+                    A21 += X2[i] * X1[i];
+                    A22 += X2[i] * X2[i];
+                    B1  += X1[i] * Egain[i];
+                    B2  += X2[i] * Egain[i];
+                }
+                // Solve the normal equation
+                // A11 * CdA + A12 * Crr = B1
+                // A21 * CdA + A22 * Crr = B2
+                double det = A11 * A22 - A12 * A21;
+                if (abs(det) > 0) {
+                    // round and update if the values are in Aerolab's range
+                    double cda = floor(10000 * (A22 * B1 - A12 * B2) / det + 0.5) / 10000;
+                    double crr = floor(1000000 * (A11 * B2 - A21 * B1) / det + 0.5) / 1000000;
+                    if (cda >= 0.001 and cda <= 1.0 and crr >= 0.0001 and crr <= 0.1) {
+                        this->cda = cda;
+                        this->crr = crr;
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
