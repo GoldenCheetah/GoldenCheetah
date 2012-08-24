@@ -59,7 +59,7 @@ class AerolabWindow : public GcWindow {
   void setEtaFromText(const QString text);
   void setEoffsetFromSlider();
   void setEoffsetFromText(const QString text);
-
+  void doEstCdACrr();
   void setAutoEoffset(int value);
   void setByDistance(int value);
   void rideSelected();

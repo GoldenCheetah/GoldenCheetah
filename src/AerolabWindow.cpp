@@ -200,6 +200,9 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   comboDistance->setCurrentIndex(1);
   smoothLayout->addWidget(comboDistance);
 
+  QPushButton *btnEstCdACrr = new QPushButton(tr("&Estimate Cda and Crr"), this);
+  smoothLayout->addWidget(btnEstCdACrr);
+
   // Add to leftControls:
   rightControls->addLayout( mLayout );
   rightControls->addLayout( rhoLayout );
@@ -236,6 +239,7 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   connect(eoffsetLineEdit, SIGNAL(textChanged(const QString)), this, SLOT(setEoffsetFromText(const QString)));
   connect(eoffsetAuto, SIGNAL(stateChanged(int)), this, SLOT(setAutoEoffset(int)));
   connect(comboDistance, SIGNAL(currentIndexChanged(int)), this, SLOT(setByDistance(int)));
+  connect(btnEstCdACrr, SIGNAL(clicked()), this, SLOT(doEstCdACrr()));
   connect(mainWindow, SIGNAL(configChanged()), aerolab, SLOT(configChanged()));
   connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
   connect(mainWindow, SIGNAL(intervalSelected() ), this, SLOT(intervalSelected()));
@@ -466,7 +470,23 @@ AerolabWindow::setByDistance(int value)
     aerolab->setData(ride, false);
 }
 
-
+void
+AerolabWindow::doEstCdACrr()
+{
+    RideItem *ride = mainWindow->rideItem();
+    /* Estimate Crr&Cda */
+    if (aerolab->estimateCdACrr(ride)) {
+        /* Update Crr/Cda values values in UI */
+        crrLineEdit->setText(QString("%1").arg(aerolab->getCrr()) );
+        crrSlider->setValue(aerolab->intCrr());
+        cdaLineEdit->setText(QString("%1").arg(aerolab->getCda()) );
+        cdaSlider->setValue(aerolab->intCda());
+        /* Refresh */
+        aerolab->setData(ride, false);
+    } else {
+        /* report error: insufficient data to estimate Cda&Crr */
+    }
+}
 
 
 void
