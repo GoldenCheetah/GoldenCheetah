@@ -389,6 +389,7 @@ HrPwPlot::addWattStepCurve(QVector<double> &finalWatts, int nbpoints)
     smoothWattsStep[t] = t * 10;
 
     wattsStepCurve->setData(smoothWattsStep.data(), smoothTimeStep.data(), nbSteps+1);
+    delete array;
 }
 
 void
@@ -432,6 +433,7 @@ HrPwPlot::addHrStepCurve(QVector<double> &finalHr, int nbpoints)
     smoothHrStep[t] = t * 2;
 
     hrStepCurve->setData(smoothTimeStep2.data(), smoothHrStep.data(), nbSteps+1);
+    delete array;
 }
 
 void
