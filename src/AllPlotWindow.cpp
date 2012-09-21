@@ -709,6 +709,7 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
         showTemp->setEnabled(dataPresent->temp);
         showWind->setEnabled(dataPresent->headwind);
         showTorque->setEnabled(dataPresent->nm);
+        showBalance->setEnabled(dataPresent->lrbalance);
     } else {
         showPower->setEnabled(false);
         showHr->setEnabled(false);
@@ -718,6 +719,7 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
         showTemp->setEnabled(false);
         showWind->setEnabled(false);
         showTorque->setEnabled(false);
+        showBalance->setEnabled(false);
     }
 
     // turn on/off shading, if it's not available
