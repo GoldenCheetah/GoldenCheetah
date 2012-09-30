@@ -136,8 +136,9 @@ bool
         double dlat = toRadians(lat -lastLat);  // convert to radians
 
         double dlon = toRadians(lon - lastLon);
-        double a = sin(dlat /2) * sin(dlat/2) + cos(lat) * cos(lastLat) * sin(dlon/2) * sin(dlon /2);
-        double c = 2 * atan2(sqrt(a),sqrt(1-a));
+        double a = sin(dlat /2) * sin(dlat/2) + cos(toRadians(lat)) * cos(toRadians(lastLat)) * sin(dlon/2) * sin(dlon /2);
+        //double c = 2*asin(sqrt(fabs(a)));  // Alternate definition.
+        double c = 4*atan2(sqrt(a),1+sqrt(1-fabs(a)));
         double delta_d = r * c;
         if(lastLat != 0)
             distance += delta_d;
