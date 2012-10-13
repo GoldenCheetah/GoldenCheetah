@@ -133,7 +133,7 @@ class IntensityFactor : public RideMetric {
         setType(RideMetric::Average);
         setPrecision(3);
     }
-    void compute(const RideFile *, const Zones *zones, int zoneRange,
+    void compute(const RideFile *r, const Zones *zones, int zoneRange,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
                  const MainWindow *) {
@@ -141,7 +141,8 @@ class IntensityFactor : public RideMetric {
             assert(deps.contains("coggan_np"));
             NP *np = dynamic_cast<NP*>(deps.value("coggan_np"));
             assert(np);
-            rif = np->value(true) / zones->getCP(zoneRange);
+            int cp = r->getTag("CP","0").toInt();
+            rif = np->value(true) / (cp ? cp : zones->getCP(zoneRange));
             secs = np->count();
 
             setValue(rif);
@@ -163,7 +164,7 @@ class TSS : public RideMetric {
         setName("TSS");
         setType(RideMetric::Total);
     }
-    void compute(const RideFile *, const Zones *zones, int zoneRange,
+    void compute(const RideFile *r, const Zones *zones, int zoneRange,
                  const HrZones *, int,
 	    const QHash<QString,RideMetric*> &deps,
                  const MainWindow *) {
@@ -176,7 +177,8 @@ class TSS : public RideMetric {
         assert(rif);
         double normWork = np->value(true) * np->count();
         double rawTSS = normWork * rif->value(true);
-        double workInAnHourAtCP = zones->getCP(zoneRange) * 3600;
+        int cp = r->getTag("CP","0").toInt();
+        double workInAnHourAtCP = (cp ? cp : zones->getCP(zoneRange)) * 3600;
         score = rawTSS / workInAnHourAtCP * 100.0;
 
         setValue(score);

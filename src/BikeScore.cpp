@@ -139,7 +139,7 @@ class RelativeIntensity : public RideMetric {
         setImperialUnits(tr(""));
         setPrecision(3);
     }
-    void compute(const RideFile *, const Zones *zones, int zoneRange,
+    void compute(const RideFile *r, const Zones *zones, int zoneRange,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &deps,
                  const MainWindow *) {
@@ -147,7 +147,8 @@ class RelativeIntensity : public RideMetric {
             assert(deps.contains("skiba_xpower"));
             XPower *xp = dynamic_cast<XPower*>(deps.value("skiba_xpower"));
             assert(xp);
-            reli = xp->value(true) / zones->getCP(zoneRange);
+            int cp = r->getTag("CP","0").toInt();
+            reli = xp->value(true) / (cp ? cp : zones->getCP(zoneRange));
             secs = xp->count();
         }
         setValue(reli);
@@ -182,7 +183,7 @@ class BikeScore : public RideMetric {
         setImperialUnits("");
     }
 
-    void compute(const RideFile *, const Zones *zones, int zoneRange,
+    void compute(const RideFile *r, const Zones *zones, int zoneRange,
                  const HrZones *, int,
 	    const QHash<QString,RideMetric*> &deps,
                  const MainWindow *) {
@@ -196,7 +197,8 @@ class BikeScore : public RideMetric {
         assert(ri);
         double normWork = xp->value(true) * xp->count();
         double rawBikeScore = normWork * ri->value(true);
-        double workInAnHourAtCP = zones->getCP(zoneRange) * 3600;
+        int cp = r->getTag("CP","0").toInt();
+        double workInAnHourAtCP = (cp ? cp : zones->getCP(zoneRange)) * 3600;
         score = rawBikeScore / workInAnHourAtCP * 100.0;
 
         setValue(score);
