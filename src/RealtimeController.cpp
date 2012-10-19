@@ -114,6 +114,63 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
+    // MINOURA - Has many gears
+    case 7 : //MINOURA V100 on H
+        {
+        double V = rtData.getSpeed();
+        // 7 = V100 on H: y = -0.0036x^3 + 0.2815x^2 + 3.4978x - 9.7857 
+        rtData.setWatts(pow(-0.0036*V, 3) + pow(0.2815*V,2) + (3.4978*V) - 9.7857);
+        }
+        break;
+
+    case 8 : //MINOURA V100 on 5
+        {
+        double V = rtData.getSpeed();
+        // 8 = V100 on 5: y = -0.0023x^3 + 0.2067x^2 + 3.8906x - 11.214 
+        rtData.setWatts(pow(-0.0023*V, 3) + pow(0.2067*V,2) + (3.8906*V) - 11.214);
+        }
+        break;
+
+    case 9 : //MINOURA V100 on 4
+        {
+        double V = rtData.getSpeed();
+        // 9 = V100 on 4: y = -0.00173x^3 + 0.1825x^2 + 3.4036x - 10 
+        rtData.setWatts(pow(-0.00173*V, 3) + pow(0.1825*V,2) + (3.4036*V) - 10.00);
+        }
+        break;
+
+    case 10 : //MINOURA V100 on 3
+        {
+        double V = rtData.getSpeed();
+        // 10 = V100 on 3: y = -0.0011x^3 + 0.1433x^2 + 2.8808x - 8.1429 
+        rtData.setWatts(pow(-0.0011*V, 3) + pow(0.1433*V,2) + (2.8808*V) - 8.1429);
+        }
+        break;
+
+    case 11 : //MINOURA V100 on 2
+        {
+        double V = rtData.getSpeed();
+        // 11 = V100 on 2: y = -0.0007x^3 + 0.1348x^2 + 1.581x - 3.3571 
+        rtData.setWatts(pow(-0.0007*V, 3) + pow(0.1348*V,2) + (1.581*V) - 3.3571);
+        }
+        break;
+
+    case 12 : //MINOURA V100 on 1
+        {
+        double V = rtData.getSpeed();
+        // 12 = V100 on 1: y = 0.0004x^3 + 0.057x^2 + 1.7797x - 5.0714 
+        rtData.setWatts(pow(0.0004*V, 3) + pow(0.057*V,2) + (1.7797*V) - 5.0714);
+        }
+        break;
+
+    case 13 : //MINOURA V100 on L
+        {
+        double V = rtData.getSpeed();
+        // 13 = V100 on L: y = 0.0557x^2 + 1.231x - 3.7143 
+        rtData.setWatts(pow(0.0557*V, 2) + (1.231*V) - 3.7143);
+        }
+        break;
+
 
     default : // unknown - do nothing
         break;

@@ -825,6 +825,13 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     virtualPower->addItem("Power - BT Advanced Training System");
     virtualPower->addItem("Power - LeMond Revolution");
     virtualPower->addItem("Power - 1UP USA Trainer");
+    virtualPower->addItem("Power - Minoura V100 Trainer (H)");
+    virtualPower->addItem("Power - Minoura V100 Trainer (5)");
+    virtualPower->addItem("Power - Minoura V100 Trainer (4)");
+    virtualPower->addItem("Power - Minoura V100 Trainer (3)");
+    virtualPower->addItem("Power - Minoura V100 Trainer (2)");
+    virtualPower->addItem("Power - Minoura V100 Trainer (1)");
+    virtualPower->addItem("Power - Minoura V100 Trainer (L)");
 
     wheelSize->addItem("Road/Cross (700C/622)"); // 2100mm
     wheelSize->addItem("Tri/TT (650C)"); // 1960mm
