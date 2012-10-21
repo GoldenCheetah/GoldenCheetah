@@ -21,6 +21,8 @@
     <file>images/toolbar/main/home.png</file>
     <file>images/toolbar/main/measures.png</file>
     <file>images/toolbar/main/train.png</file>
+    <file>images/toolbar/clear.png</file>
+    <file>images/toolbar/search.png</file>
     <file>images/maps/cycling_feed.png</file>
     <file>images/maps/loop.png</file>
     <file>images/maps/cycling.png</file>
@@ -85,7 +87,6 @@
     <file>images/oxygen/open.png</file>
     <file>images/toolbar/close-icon.png</file>
     <file>images/toolbar/save.png</file>
-    <file>images/toolbar/search.png</file>
     <file>images/toolbar/splash green.png</file>
     <file>images/toolbar/cut.png</file>
     <file>images/toolbar/copy.png</file>

@@ -89,6 +89,11 @@
 #include "QTFullScreen.h"
 #endif
 
+#ifdef GC_HAVE_LUCENE
+#include "SearchBox.h"
+#include "Lucene.h"
+#endif
+
 #include <assert.h>
 #include <QApplication>
 #include <QtGui>
@@ -141,7 +146,7 @@ MainWindow::MainWindow(const QDir &home) :
     GCColor *GCColorSet = new GCColor(this); // get/keep colorset
     GCColorSet->colorSet(); // shut up the compiler
     setStyleSheet("QFrame { FrameStyle = QFrame::NoFrame };"
-                  "QWidget { background = Qt::white; border:0 px; margin: 2px; };"
+                  "QWidget { background = Qt::white; border:0 px; margin: 0px; };"
                   "QTabWidget { background = Qt::white; };"
                   "::pane { FrameStyle = QFrame::NoFrame; border: 0px; };");
 
@@ -196,6 +201,9 @@ MainWindow::MainWindow(const QDir &home) :
     // Metadata fields
     _rideMetadata = new RideMetadata(this,true);
     _rideMetadata->hide();
+#ifdef GC_HAVE_LUCENE
+    lucene = new Lucene(this); // before metricDB attempts to refresh
+#endif
     metricDB = new MetricAggregator(this, home, zones(), hrZones()); // just to catch config updates!
     metricDB->refreshMetrics();
 
@@ -321,7 +329,7 @@ MainWindow::MainWindow(const QDir &home) :
     analButtons->setContentsMargins(0,0,0,0);
     analButtons->setFocusPolicy(Qt::NoFocus);
     analButtons->setAutoFillBackground(false);
-    analButtons->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    //XXX analButtons->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     analButtons->setLayout(toolbuttons);
     analButtons->show();
 
@@ -449,6 +457,15 @@ MainWindow::MainWindow(const QDir &home) :
         listView->setColumns(appsettings->cvalue(cyclist, GC_NAVHEADINGS).toString());
         listView->setWidths(appsettings->cvalue(cyclist, GC_NAVHEADINGWIDTHS).toString());
     }
+#ifdef GC_HAVE_LUCENE
+    searchBox = new SearchBox(this);
+    toolbuttons->addWidget(searchBox);
+    //toolbuttons->addStretch();
+    connect(searchBox, SIGNAL(submitQuery(QString)), this, SLOT(searchSubmitted(QString)));
+    connect(searchBox, SIGNAL(clearQuery()), this, SLOT(searchCleared()));
+#endif
+
+
 
     // INTERVALS
     intervalSummaryWindow = new IntervalSummaryWindow(this);
@@ -560,7 +577,16 @@ MainWindow::MainWindow(const QDir &home) :
     currentWindow = analWindow;
 
     // POPULATE TOOLBOX
-    toolBox->addItem(listView, QIcon(":images/activity.png"), "Activity History");
+    QWidget *activityHistory = new QWidget(this);
+    activityHistory->setContentsMargins(0,0,0,0);
+    activityHistory->setStyleSheet("padding: 0px; border: 0px; margin: 0px;");
+    QVBoxLayout *activityLayout = new QVBoxLayout(activityHistory);
+    activityLayout->setSpacing(0);
+    activityLayout->setContentsMargins(0,0,0,0);
+    activityLayout->addWidget(searchBox);
+    activityLayout->addWidget(listView);
+
+    toolBox->addItem(activityHistory, QIcon(":images/activity.png"), "Activity History");
     toolBox->addItem(intervalSplitter, QIcon(":images/stopwatch.png"), "Activity Intervals");
     toolBox->addItem(trainTool->controls(), QIcon(":images/library.png"), "Workout Library");
     toolBox->addItem(masterControls, QIcon(":images/settings.png"), "Chart Settings");
@@ -2224,3 +2250,16 @@ MainWindow::setBubble(QString text, QPoint pos, Qt::Orientation orientation)
         bubble->repaint();
     }
 }
+
+#ifdef GC_HAVE_LUCENE
+void MainWindow::searchSubmitted(QString query)
+{
+    int count = lucene->search(query);
+    emit searchResults(lucene->files());
+}
+
+void MainWindow::searchCleared()
+{
+    emit searchClear();
+}
+#endif

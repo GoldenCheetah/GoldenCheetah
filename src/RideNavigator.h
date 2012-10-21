@@ -34,6 +34,7 @@
 
 class NavigatorCellDelegate;
 class GroupByModel;
+class SearchFilter;
 class DiaryWindow;
 class BUGFIXQSortFilterProxyModel;
 
@@ -119,6 +120,9 @@ class RideNavigator : public GcWindow
 
         void resetView(); // when columns/width changes
 
+        void searchStrings(QStringList);
+        void clearSearch();
+
     protected:
         QSqlTableModel *sqlModel; // the sql table
         GroupByModel *groupByModel; // for group by
@@ -147,6 +151,9 @@ class RideNavigator : public GcWindow
         int _groupBy;
         QString _columns;
         QString _widths;
+
+        // search filter
+        SearchFilter *searchFilter;
 };
 
 //

@@ -59,8 +59,9 @@
 // 37  06  Apr 2012 Rainer Clasen      Added non-zero average Power (watts)
 // 38  8th Jul 2012 Mark Liversedge    Computes metrics for manual files now
 // 39  18  Aug 2012 Mark Liversedge    New metric LRBalance
+// 40  20  Oct 2012 Mark Liversedge    Lucene search/filter and checkbox metadata field
 
-static int DBSchemaVersion = 39;
+static int DBSchemaVersion = 40;
 
 DBAccess::DBAccess(MainWindow* main, QDir home) : main(main), home(home)
 {
@@ -178,7 +179,7 @@ bool DBAccess::createMetricsTable()
 
         // And all the metadata texts
         foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
-            if (!main->specialFields.isMetric(field.name) && (field.type < 3)) {
+            if (!main->specialFields.isMetric(field.name) && (field.type < 3 || field.type == 7)) {
                 createMetricTable += QString(", Z%1 varchar").arg(main->specialFields.makeTechName(field.name));
             }
         }
@@ -254,7 +255,7 @@ bool DBAccess::createMeasuresTable()
 
         // And all the metadata texts
         foreach(FieldDefinition field, fieldDefinitions)
-            if (field.type < 3) createMeasuresTable += QString(", Z%1 varchar").arg(main->specialFields.makeTechName(field.name));
+            if (field.type < 3 || field.type == 7) createMeasuresTable += QString(", Z%1 varchar").arg(main->specialFields.makeTechName(field.name));
 
         // And all the metadata measures
         foreach(FieldDefinition field, fieldDefinitions)
@@ -401,7 +402,7 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor
 
     // And all the metadata texts
     foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
-        if (!main->specialFields.isMetric(field.name) && (field.type < 3)) {
+        if (!main->specialFields.isMetric(field.name) && (field.type < 3 || field.type == 7)) {
             insertStatement += QString(", Z%1 ").arg(main->specialFields.makeTechName(field.name));
         }
     }
@@ -416,7 +417,7 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor
     for (int i=0; i<factory.metricCount(); i++)
         insertStatement += ",?";
     foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
-        if (!main->specialFields.isMetric(field.name) && field.type < 5) {
+        if (!main->specialFields.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
             insertStatement += ",?";
         }
     }
@@ -440,7 +441,7 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor
     // And all the metadata texts
     foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
 
-        if (!main->specialFields.isMetric(field.name) && (field.type < 3)) {
+        if (!main->specialFields.isMetric(field.name) && (field.type < 3 || field.type ==7)) {
             query.addBindValue(ride->getTag(field.name, ""));
         }
     }
@@ -499,7 +500,7 @@ DBAccess::getRide(QString filename, SummaryMetrics &summaryMetrics, QColor&color
     for (int i=0; i<factory.metricCount(); i++)
         selectStatement += QString(", X%1 ").arg(factory.metricName(i));
     foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
-        if (!main->specialFields.isMetric(field.name) && field.type < 5) {
+        if (!main->specialFields.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
             selectStatement += QString(", Z%1 ").arg(main->specialFields.makeTechName(field.name));
         }
     }
@@ -556,7 +557,7 @@ QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
     for (int i=0; i<factory.metricCount(); i++)
         selectStatement += QString(", X%1 ").arg(factory.metricName(i));
     foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
-        if (!main->specialFields.isMetric(field.name) && field.type < 5) {
+        if (!main->specialFields.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
             selectStatement += QString(", Z%1 ").arg(main->specialFields.makeTechName(field.name));
         }
     }
@@ -585,7 +586,7 @@ QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
                 QString underscored = field.name;
                 summaryMetrics.setForSymbol(underscored.replace("_"," "), query.value(i+3).toDouble());
                 i++;
-            } else if (!main->specialFields.isMetric(field.name) && field.type < 3) {
+            } else if (!main->specialFields.isMetric(field.name) && (field.type < 3 || field.type == 7)) {
                 QString underscored = field.name;
                 // ignore texts for now XXX todo if want metadata from Summary Metrics
                 summaryMetrics.setText(underscored.replace("_"," "), query.value(i+3).toString());
@@ -607,7 +608,7 @@ SummaryMetrics DBAccess::getRideMetrics(QString filename)
     for (int i=0; i<factory.metricCount(); i++)
         selectStatement += QString(", X%1 ").arg(factory.metricName(i));
     foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
-        if (!main->specialFields.isMetric(field.name) && field.type < 5) {
+        if (!main->specialFields.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
             selectStatement += QString(", Z%1 ").arg(main->specialFields.makeTechName(field.name));
         }
     }
@@ -631,7 +632,7 @@ SummaryMetrics DBAccess::getRideMetrics(QString filename)
                 QString underscored = field.name;
                 summaryMetrics.setForSymbol(underscored.replace(" ","_"), query.value(i+2).toDouble());
                 i++;
-            } else if (!main->specialFields.isMetric(field.name) && field.type < 3) {
+            } else if (!main->specialFields.isMetric(field.name) && (field.type < 3 || field.type == 7)) {
                 // ignore texts for now XXX todo if want metadata from Summary Metrics
                 QString underscored = field.name;
                 summaryMetrics.setText(underscored.replace("_"," "), query.value(i+2).toString());
@@ -654,7 +655,7 @@ bool DBAccess::importMeasure(SummaryMetrics *summaryMetrics)
 
     // And all the metadata texts
     foreach(FieldDefinition field, mfieldDefinitions) {
-        if (field.type < 3) {
+        if (field.type < 3 || field.type == 7) {
             insertStatement += QString(", Z%1 ").arg(msp.makeTechName(field.name));
         }
     }
@@ -668,7 +669,7 @@ bool DBAccess::importMeasure(SummaryMetrics *summaryMetrics)
     insertStatement += " ) values (?,?"; // timestamp, measure_date
 
     foreach(FieldDefinition field, mfieldDefinitions) {
-        if (field.type < 5) {
+        if (field.type < 5 || field.type == 7) {
             insertStatement += ",?";
         }
     }
@@ -682,7 +683,7 @@ bool DBAccess::importMeasure(SummaryMetrics *summaryMetrics)
 
     // And all the text measures
     foreach(FieldDefinition field, mfieldDefinitions) {
-        if (field.type < 3) {
+        if (field.type < 3 || field.type == 7) {
             query.addBindValue(summaryMetrics->getText(field.name, ""));
         }
     }
@@ -720,7 +721,7 @@ QList<SummaryMetrics> DBAccess::getAllMeasuresFor(QDateTime start, QDateTime end
     // construct the select statement
     QString selectStatement = "SELECT timestamp, measure_date";
     foreach(FieldDefinition field, fieldDefinitions) {
-        if (!main->specialFields.isMetric(field.name) && field.type < 5) {
+        if (!main->specialFields.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
             selectStatement += QString(", Z%1 ").arg(main->specialFields.makeTechName(field.name));
         }
     }
@@ -744,7 +745,7 @@ QList<SummaryMetrics> DBAccess::getAllMeasuresFor(QDateTime start, QDateTime end
             if (field.type == 3 || field.type == 4) {
                 add.setText(field.name, query.value(i).toString());
                 i++;
-            } else if (field.type < 3) {
+            } else if (field.type < 3 || field.type == 7) {
                 add.setText(field.name, query.value(i).toString());
                 i++;
             }

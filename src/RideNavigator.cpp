@@ -43,7 +43,7 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
 
     mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(3,3,3,3);
+    mainLayout->setContentsMargins(0,0,0,0);
 
     sqlModel = new QSqlTableModel(this, main->metricDB->db()->connection());
     sqlModel->setTable("metrics");
@@ -52,8 +52,11 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
     sqlModel->select();
     while (sqlModel->canFetchMore(QModelIndex())) sqlModel->fetchMore(QModelIndex());
 
+    searchFilter = new SearchFilter(this);
+    searchFilter->setSourceModel(sqlModel); // filter out/in search results
+
     groupByModel = new GroupByModel(this);
-    groupByModel->setSourceModel(sqlModel);
+    groupByModel->setSourceModel(searchFilter);
 
     sortModel = new BUGFIXQSortFilterProxyModel(this);
     sortModel->setSourceModel(groupByModel);
@@ -118,6 +121,8 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
     connect(tableView,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showTreeContextMenuPopup(const QPoint &)));
     connect(tableView->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)), this, SLOT(setSortBy(int,Qt::SortOrder)));
 
+    connect(main, SIGNAL(searchResults(QStringList)), this, SLOT(searchStrings(QStringList)));
+    connect(main, SIGNAL(searchClear()), this, SLOT(clearSearch()));
     // we accept drag and drop operations
     setAcceptDrops(true);
 }
@@ -177,7 +182,7 @@ RideNavigator::resetView()
     // add metadata fields...
     SpecialFields sp; // all the special fields are in here...
     foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
-        if (!sp.isMetric(field.name) && field.type < 5) {
+        if (!sp.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
             nameMap.insert(QString("Z%1").arg(sp.makeTechName(field.name)), field.name);
         }
     }
@@ -239,8 +244,17 @@ RideNavigator::resetView()
     rideTreeSelectionChanged();
 }
 
-void
-RideNavigator::setWidth(int x)
+void RideNavigator::searchStrings(QStringList list)
+{
+    searchFilter->setStrings(list);
+}
+
+void RideNavigator::clearSearch()
+{
+    searchFilter->clearStrings();
+}
+
+void RideNavigator::setWidth(int x)
 {
     if (init == false) return;
 
@@ -248,7 +262,7 @@ RideNavigator::setWidth(int x)
 
     if (tableView->verticalScrollBar()->isVisible())
         x -= tableView->verticalScrollBar()->width()
-             + 6 ; // !! account for content margins of 3,3,3,3
+             + 0 ; // !! no longer account for content margins of 3,3,3,3 was + 6
 
     // ** NOTE **
     // When iterating over the section headings we
