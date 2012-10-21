@@ -1701,6 +1701,7 @@ static void addFieldTypes(QComboBox *p)
     p->addItem("Double");
     p->addItem("Date");
     p->addItem("Time");
+    p->addItem("Checkbox");
 }
 
 //

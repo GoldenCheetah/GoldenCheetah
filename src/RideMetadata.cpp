@@ -480,6 +480,12 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
         connect (widget, SIGNAL(timeChanged(const QTime)), this, SLOT(dataChanged()));
         connect (widget, SIGNAL(editingFinished()), this, SLOT(editFinished()));
         break;
+
+    case FIELD_CHECKBOX : // check
+        widget = new QCheckBox(this);
+        //widget->setFixedHeight(18);
+        connect(widget, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
+        break;
     }
     //widget->setFont(font);
     //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
@@ -504,6 +510,7 @@ FormField::~FormField()
         case FIELD_DOUBLE : delete ((QDoubleSpinBox*)widget); break;
         case FIELD_DATE : delete ((QDateEdit*)widget); break;
         case FIELD_TIME : delete ((QTimeEdit*)widget); break;
+        case FIELD_CHECKBOX : delete ((QCheckBox*)widget); break;
     }
     if (enabled) delete enabled;
 }
@@ -628,7 +635,14 @@ FormField::editFinished()
 void
 FormField::stateChanged(int state)
 {
-    if (active) return; // being updated programmatically
+    if (active || ourRideItem == NULL) return; // being updated programmatically
+
+    // are we a checkbox -- do the simple stuff
+    if (definition.type == FIELD_CHECKBOX) {
+        ourRideItem->ride()->setTag(definition.name, ((QCheckBox *)widget)->isChecked() ? "1" : "0");
+        ourRideItem->setDirty(true);
+        return;
+    } 
 
     widget->setEnabled(state ? true : false);
     widget->setHidden(state ? false : true);
@@ -750,6 +764,12 @@ FormField::metadataChanged()
                    /* seconds */ value.mid(6,2).toInt(),
                    /* milliseconds */ value.mid(9,3).toInt());
         ((QTimeEdit*)widget)->setTime(time);
+        }
+        break;
+
+    case FIELD_CHECKBOX : // checkbox
+        {
+        ((QCheckBox*)widget)->setChecked((value == "1") ? true : false);
         }
         break;
     }

@@ -33,6 +33,7 @@
 #define FIELD_DOUBLE    4
 #define FIELD_DATE      5
 #define FIELD_TIME      6
+#define FIELD_CHECKBOX  7
 
 class KeywordDefinition
 {

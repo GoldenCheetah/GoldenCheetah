@@ -62,6 +62,8 @@ class GcBubble;
 class LionFullScreen;
 class QTFullScreen;
 class TrainTool;
+class Lucene;
+class SearchBox;
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 
@@ -151,6 +153,10 @@ class MainWindow : public QMainWindow
         QTFullScreen *fullScreen;
 #endif
         TrainTool *trainTool;
+#ifdef GC_HAVE_LUCENE
+        SearchBox *searchBox;
+        Lucene *lucene;
+#endif
 
         // *********************************************
         // APPLICATION EVENTS
@@ -206,6 +212,13 @@ class MainWindow : public QMainWindow
         void rideDeleted(RideItem *);
         void rideDirty();
         void rideClean();
+
+        // search
+#ifdef GC_HAVE_LUCENE
+        void searchSubmit(QString);
+        void searchResults(QStringList);
+        void searchClear();
+#endif
 
         // realtime
         void telemetryUpdate(RealtimeData rtData);
@@ -313,6 +326,11 @@ class MainWindow : public QMainWindow
         void showDock();
 #ifndef Q_OS_MAC
         void toggleFullScreen();
+#endif
+
+#ifdef GC_HAVE_LUCENE
+        void searchSubmitted(QString);
+        void searchCleared();
 #endif
 
     protected:

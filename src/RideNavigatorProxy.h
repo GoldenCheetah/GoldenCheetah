@@ -285,7 +285,7 @@ public:
                                            .arg(groupToSourceRow.value(groups[proxyIndex.row()])->count());
                     returning = QVariant(returnString);
                 } else {
-                    QString returnString = QString("All %1 activities")
+                    QString returnString = QString("%1 activities")
                                            .arg(groupToSourceRow.value(groups[proxyIndex.row()])->count());
                     returning = QVariant(returnString);
                 }
@@ -493,5 +493,62 @@ class BUGFIXQSortFilterProxyModel : public QSortFilterProxyModel
         }
         return false;
     }
+};
+
+class SearchFilter : public QSortFilterProxyModel
+{
+
+    Q_OBJECT
+
+    public:
+
+    SearchFilter(QWidget *p) : QSortFilterProxyModel(p), searchActive(false) {}
+
+    void setSourceModel(QAbstractItemModel *model) {
+        QAbstractProxyModel::setSourceModel(model);
+        this->model = model;
+
+        // find the filename column
+        fileIndex = -1;
+        for(int i=0; i<model->columnCount(); i++) {
+            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "filename") {
+                fileIndex = i;
+            }
+        }
+    }
+
+    bool filterAcceptsRow (int source_row, const QModelIndex &source_parent) const {
+
+        if (fileIndex == -1 || searchActive == false) return true; // nothing to do
+
+        // lets get the filename
+        QModelIndex source_index = model->index(source_row, fileIndex, source_parent);
+        if (!source_index.isValid()) return true;
+
+        QString key = model->data(source_index, Qt::DisplayRole).toString();
+        return strings.contains(key);
+    }
+
+    public slots:
+
+    void setStrings(QStringList list) {
+        beginResetModel();
+        strings = list;
+        searchActive = true;
+        endResetModel();
+    }
+
+    void clearStrings() {
+        beginResetModel();
+        strings.clear();
+        searchActive = false;
+        endResetModel();
+    }
+
+    private:
+        QAbstractItemModel *model;
+        QStringList strings;
+        int fileIndex;
+        bool searchActive;
 };
 #endif

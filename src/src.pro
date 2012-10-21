@@ -4,6 +4,7 @@ include( gcconfig.pri )
 
 TEMPLATE = app
 TARGET = GoldenCheetah
+
 !isEmpty( APP_NAME ) { TARGET = $${APP_NAME} }
 DEPENDPATH += .
 
@@ -115,6 +116,14 @@ LIBS += -lm $${LIBZ_LIBS}
         HEADERS     += VideoWindow.h
         SOURCES     += VideoWindow.cpp
     }
+}
+
+!isEmpty( CLUCENE_LIBS ) {
+    INCLUDEPATH += $${CLUCENE_INCLUDE}
+    LIBS        += $${CLUCENE_LIBS}
+    DEFINES     += GC_HAVE_LUCENE
+    HEADERS     += Lucene.h SearchBox.h
+    SOURCES     += Lucene.cpp SearchBox.cpp
 }
 
 # Mac specific build for

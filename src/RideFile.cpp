@@ -316,7 +316,7 @@ RideFile *RideFileFactory::openRideFile(MainWindow *main, QFile &file,
         result->setTag("Calendar Text", calendarText);
 
         // set other "special" fields
-        result->setTag("Filename", file.fileName());
+        result->setTag("Filename", QFileInfo(file.fileName()).fileName());
         result->setTag("Device", result->deviceType());
         result->setTag("Athlete", QFileInfo(file).dir().dirName());
         result->setTag("Year", result->startTime().toString("yyyy"));

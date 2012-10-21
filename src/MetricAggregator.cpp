@@ -20,6 +20,7 @@
 #include "DBAccess.h"
 #include "RideFile.h"
 #include "RideFileCache.h"
+#include "Lucene.h"
 #include "Zones.h"
 #include "HrZones.h"
 #include "Settings.h"
@@ -90,6 +91,7 @@ void MetricAggregator::refreshMetrics()
     for (d = dbStatus.begin(); d != dbStatus.end(); ++d) {
         if (QFile(home.absolutePath() + "/" + d.key()).exists() == false) {
             dbaccess->deleteRide(d.key());
+            main->lucene->deleteRide(d.key());
         }
     }
 
@@ -177,6 +179,7 @@ void MetricAggregator::refreshMetrics()
 
     // end LUW -- now syncs DB
     dbaccess->connection().commit();
+    main->lucene->optimise();
 
     main->isclean = true;
 
@@ -234,6 +237,7 @@ bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, u
     QColor color = colorEngine->colorFor(ride->getTag("Calendar Text", ""));
 
     dbaccess->importRide(summaryMetric, ride, color, fingerprint, modify);
+    main->lucene->importRide(summaryMetric, ride, color, fingerprint, modify);
     delete summaryMetric;
 
     return true;
