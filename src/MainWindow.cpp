@@ -583,7 +583,9 @@ MainWindow::MainWindow(const QDir &home) :
     QVBoxLayout *activityLayout = new QVBoxLayout(activityHistory);
     activityLayout->setSpacing(0);
     activityLayout->setContentsMargins(0,0,0,0);
+#ifdef GC_HAVE_LUCENE
     activityLayout->addWidget(searchBox);
+#endif
     activityLayout->addWidget(listView);
 
     toolBox->addItem(activityHistory, QIcon(":images/activity.png"), "Activity History");
