@@ -515,6 +515,13 @@ class SearchFilter : public QSortFilterProxyModel
                 fileIndex = i;
             }
         }
+
+	// make sure changes are propogated upstream
+        connect(model, SIGNAL(modelReset()), this, SIGNAL(modelReset()));
+        connect(model, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SIGNAL(modelReset()));
+        connect(model, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SIGNAL(modelReset()));
+        connect(model, SIGNAL(rowsMoved(QModelIndex,int,int,QModelIndex,int)), this, SIGNAL(modelReset()));
+        connect(model, SIGNAL(rowsRemoved(QModelIndex,int,int)), this, SIGNAL(modelReset()));
     }
 
     bool filterAcceptsRow (int source_row, const QModelIndex &source_parent) const {
