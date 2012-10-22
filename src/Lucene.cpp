@@ -35,7 +35,7 @@ Lucene::Lucene(MainWindow *parent) : QObject(parent), main(parent)
     main->home.mkdir("index");
 
     // make index directory if needed
-    QDir dir(main->home.canonicalPath() + "/index");
+    dir = QDir(main->home.canonicalPath() + "/index");
 
     try {
 
@@ -54,9 +54,6 @@ Lucene::Lucene(MainWindow *parent) : QObject(parent), main(parent)
             delete create;
         }
 
-        // now lets open using a mnodifier since the API is much simpler
-        writer = new IndexWriter(dir.canonicalPath().toLocal8Bit().data(), &analyzer, false); // for updates
-
     } catch (CLuceneError &e) {
 
         qDebug()<<"clucene error!"<<e.what();
@@ -65,12 +62,6 @@ Lucene::Lucene(MainWindow *parent) : QObject(parent), main(parent)
 
 Lucene::~Lucene()
 {
-    try {
-
-        writer->flush();
-        writer->close();
-        //XXXdelete writer; Causes a SEGV !?
-    } catch(CLuceneError &e) {}
 }
 
 bool Lucene::importRide(SummaryMetrics *, RideFile *ride, QColor , unsigned long, bool)
@@ -99,7 +90,17 @@ bool Lucene::importRide(SummaryMetrics *, RideFile *ride, QColor , unsigned long
     deleteRide(ride->getTag("Filename", ""));
 
     // now add to index
-    try { writer->addDocument(&doc); } catch (CLuceneError &e) {}
+    try { 
+
+        // now lets open using a mnodifier since the API is much simpler
+        IndexWriter *writer = new IndexWriter(dir.canonicalPath().toLocal8Bit().data(), &analyzer, false); // for updates
+        writer->addDocument(&doc); 
+        writer->close();
+        delete writer;
+
+    } catch (CLuceneError &e) {
+        qDebug()<<"add document clucene error!"<<e.what();
+    }
 
     doc.clear();
 
@@ -110,16 +111,31 @@ bool Lucene::deleteRide(QString name)
 {
     std::wstring cname = name.toStdWString();
 
-    try { writer->deleteDocuments(new Term(_T("Filename"), cname.c_str())); } catch (CLuceneError &e) {}
+    try {
+
+        IndexReader *reader = IndexReader::open(dir.canonicalPath().toLocal8Bit().data());
+        reader->deleteDocuments(new Term(_T("Filename"), cname.c_str()));
+        reader->close();
+        delete reader;
+
+    } catch (CLuceneError &e) {
+        qDebug()<<"deleteDocuments clucene error!"<<e.what();
+    }
     return true;
 }
 
 void Lucene::optimise()
 {
     try {
-        writer->flush();
+
+        IndexWriter *writer = new IndexWriter(dir.canonicalPath().toLocal8Bit().data(), &analyzer, false); // for updates
         writer->optimize();
-    } catch(CLuceneError &e) {}
+        writer->close();
+        delete writer;
+
+    } catch(CLuceneError &e) {
+        qDebug()<<"optimise clucene error!"<<e.what();
+    }
 }
 
 int Lucene::search(QString query)
@@ -135,17 +151,20 @@ int Lucene::search(QString query)
 
         if (lquery == NULL) return 0;
 
-        reader = IndexReader::open(writer->getDirectory());                // for querying against
-        searcher = new IndexSearcher(reader);           // to perform searches
+        IndexReader *reader = IndexReader::open(dir.canonicalPath().toLocal8Bit().data());
+        IndexSearcher *searcher = new IndexSearcher(reader);           // to perform searches
 
         // go find hits
         hits = searcher->search(lquery);
         filenames.clear();
 
-        for (unsigned int i=0; i< hits->length(); i++) {
+        for (int i=0; i< hits->length(); i++) {
             Document *d = &hits->doc(i);
             filenames << QString::fromWCharArray(d->get(_T("Filename")));
         }
+
+        searcher->close();
+        reader->close();
 
         delete hits;
         delete lquery;

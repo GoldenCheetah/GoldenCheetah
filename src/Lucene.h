@@ -63,12 +63,10 @@ signals:
 
 private:
     MainWindow *main;
+    QDir dir;
 
     // CLucene objects
     SimpleAnalyzer analyzer;
-    IndexWriter* writer;
-    IndexReader* reader;
-    IndexSearcher* searcher;
 
     // Query results
     Hits *hits; // null when no results
