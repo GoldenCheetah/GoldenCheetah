@@ -45,7 +45,7 @@ SmallPlot::SmallPlot(QWidget *parent) : QwtPlot(parent), d_mrk(NULL), smooth(30)
 
     wattsCurve = new QwtPlotCurve("Power");
 
-    timeCurves.resize(36);// wattsCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    //timeCurves.resize(36);// wattsCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     wattsCurve->setPen(QPen(GColor(CPOWER)));
     wattsCurve->attach(this);
 
@@ -62,24 +62,24 @@ SmallPlot::SmallPlot(QWidget *parent) : QwtPlot(parent), d_mrk(NULL), smooth(30)
     //grid->setPen(QPen(GColor(CPLOTGRID)));
     //grid->attach(this);
 
-    timeCurves.resize(36);
-    for (int i = 0; i < 36; ++i) {
-        QColor color = QColor(255,255,255);
-        color.setHsv(60+i*(360/36), 255,255,255);
+    //timeCurves.resize(36);
+    //for (int i = 0; i < 36; ++i) {
+        //QColor color = QColor(255,255,255);
+        //color.setHsv(60+i*(360/36), 255,255,255);
 
-        QPen pen = QPen(color);
-        pen.setWidth(3);
+        //QPen pen = QPen(color);
+        //pen.setWidth(3);
 
-        timeCurves[i] = new QwtPlotCurve();
-        timeCurves[i]->setPen(pen);
-        timeCurves[i]->setStyle(QwtPlotCurve::Lines);
-        timeCurves[i]->setRenderHint(QwtPlotItem::RenderAntialiased);
-        timeCurves[i]->attach(this);
-        QwtLegend *legend = new QwtLegend;
-        legend->setVisible(false);
-        legend->setDisabled(true);
-        timeCurves[i]->updateLegend(legend);
-     }
+        //timeCurves[i] = new QwtPlotCurve();
+        //timeCurves[i]->setPen(pen);
+        //timeCurves[i]->setStyle(QwtPlotCurve::Lines);
+        //timeCurves[i]->setRenderHint(QwtPlotItem::RenderAntialiased);
+        //timeCurves[i]->attach(this);
+        //QwtLegend *legend = new QwtLegend;
+        //legend->setVisible(false);
+        //legend->setDisabled(true);
+        //timeCurves[i]->updateLegend(legend);
+     //}
 }
 
 struct DataPoint {
@@ -94,7 +94,7 @@ SmallPlot::recalc()
 {
     if (!timeArray.size()) return;
 
-    int rideTimeSecs = (int) ceil(timeArray[arrayLength - 1]);
+    int rideTimeSecs = (long) ceil(timeArray[arrayLength - 1]);
     if (rideTimeSecs > 7*24*60*60) {
         QwtArray<double> data;
         wattsCurve->setData(data, data);
