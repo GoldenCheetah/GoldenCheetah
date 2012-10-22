@@ -55,7 +55,7 @@ Lucene::Lucene(MainWindow *parent) : QObject(parent), main(parent)
         }
 
         // now lets open using a mnodifier since the API is much simpler
-        writer = new IndexModifier(dir.canonicalPath().toLocal8Bit().data(), &analyzer, false); // for updates
+        writer = new IndexWriter(dir.canonicalPath().toLocal8Bit().data(), &analyzer, false); // for updates
 
     } catch (CLuceneError &e) {
 
@@ -65,9 +65,12 @@ Lucene::Lucene(MainWindow *parent) : QObject(parent), main(parent)
 
 Lucene::~Lucene()
 {
-    writer->flush();
-    writer->close();
-    //XXXdelete writer; Causes a SEGV !?
+    try {
+
+        writer->flush();
+        writer->close();
+        //XXXdelete writer; Causes a SEGV !?
+    } catch(CLuceneError &e) {}
 }
 
 bool Lucene::importRide(SummaryMetrics *, RideFile *ride, QColor , unsigned long, bool)
@@ -96,7 +99,8 @@ bool Lucene::importRide(SummaryMetrics *, RideFile *ride, QColor , unsigned long
     deleteRide(ride->getTag("Filename", ""));
 
     // now add to index
-    writer->addDocument(&doc);
+    try { writer->addDocument(&doc); } catch (CLuceneError &e) {}
+
     doc.clear();
 
     return true;
@@ -105,15 +109,17 @@ bool Lucene::importRide(SummaryMetrics *, RideFile *ride, QColor , unsigned long
 bool Lucene::deleteRide(QString name)
 {
     std::wstring cname = name.toStdWString();
-    Term term(_T("Filename"), cname.c_str());
 
-    return (writer->deleteDocuments(&term)>0);
+    try { writer->deleteDocuments(new Term(_T("Filename"), cname.c_str())); } catch (CLuceneError &e) {}
+    return true;
 }
 
 void Lucene::optimise()
 {
-    writer->flush();
-    writer->optimize();
+    try {
+        writer->flush();
+        writer->optimize();
+    } catch(CLuceneError &e) {}
 }
 
 int Lucene::search(QString query)
@@ -136,7 +142,7 @@ int Lucene::search(QString query)
         hits = searcher->search(lquery);
         filenames.clear();
 
-        for (int i=0; i< hits->length(); i++) {
+        for (unsigned int i=0; i< hits->length(); i++) {
             Document *d = &hits->doc(i);
             filenames << QString::fromWCharArray(d->get(_T("Filename")));
         }

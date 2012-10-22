@@ -66,7 +66,7 @@ private:
 
     // CLucene objects
     SimpleAnalyzer analyzer;
-    IndexModifier* writer;
+    IndexWriter* writer;
     IndexReader* reader;
     IndexSearcher* searcher;
 
