@@ -408,7 +408,7 @@ any 0.9 branch should work fine, let us know if you experience any issues. You m
 that the libclucene0ldbl runtime is already installed, this is fine and typical since
 clucene is a very popular search library.
 
-$ sudo apt-get install clucene-core
+$ sudo apt-get install libclucene-dev
 $ sudo apt-get install libclucene0ldbl
 
 By default, and this is deliberate, the clucene install places the config headers into
