@@ -45,7 +45,7 @@ SearchBox::SearchBox(QWidget *parent)
     searchButton->setIconSize(search.size());
     searchButton->setCursor(Qt::ArrowCursor);
     searchButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
-    connect(searchButton, SIGNAL(clicked()), this, SLOT(searchSubmit()));
+    connect(searchButton, SIGNAL(clicked()), this, SLOT(toggleMode()));
 
     int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
     setStyleSheet(QString( //"QLineEdit { padding-right: %1px; } "
@@ -75,6 +75,7 @@ SearchBox::SearchBox(QWidget *parent)
                    qMax(msz.height(), clearButton->sizeHint().height() /* + frameWidth * 2 + -2*/));
 
     setPlaceholderText("Search...");
+    mode = Search;
     setDragEnabled(true);
     connect(this, SIGNAL(returnPressed()), this, SLOT(searchSubmit()));
 }
@@ -87,6 +88,38 @@ void SearchBox::resizeEvent(QResizeEvent *)
                       (rect().bottom() + 1 - sz.height())/2);
     searchButton->move(rect().left() + frameWidth,
                       (rect().bottom() + 1 - sz.height())/2);
+}
+
+void SearchBox::toggleMode()
+{
+    if (mode == Search) setMode(Filter);
+    else setMode(Search);
+}
+
+void SearchBox::setMode(SearchBoxMode mode)
+{
+    switch (mode) {
+
+        case Filter:
+        {
+            QPixmap filter(":images/toolbar/filter.png");
+            searchButton->setIcon(QIcon(filter));
+            searchButton->setIconSize(filter.size());
+            setPlaceholderText("Filter...");
+        }
+        break;
+
+        case Search:
+        default:
+        {
+            QPixmap search(":images/toolbar/search.png");
+            searchButton->setIcon(QIcon(search));
+            searchButton->setIconSize(search.size());
+            setPlaceholderText("Search...");
+        }
+        break;
+    }
+    this->mode = mode;
 }
 
 void SearchBox::updateCloseButton(const QString& text)
