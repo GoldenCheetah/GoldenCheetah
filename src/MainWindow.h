@@ -143,6 +143,7 @@ class MainWindow : public QMainWindow
         SpecialFields specialFields;
         int session;
         bool isclean;
+        bool ismultisave;
 
         void setBubble(QString text, QPoint pos = QPoint(), Qt::Orientation o = Qt::Horizontal);
 

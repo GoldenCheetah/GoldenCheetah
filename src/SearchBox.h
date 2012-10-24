@@ -30,7 +30,13 @@ class SearchBox : public QLineEdit
     Q_OBJECT
 
 public:
+    enum searchboxmode { Search, Filter };
+    typedef enum searchboxmode SearchBoxMode;
+
     SearchBox(QWidget *parent = 0);
+
+    // either search box or filter box
+    void setMode(SearchBoxMode mode);
 
 protected:
     void resizeEvent(QResizeEvent *);
@@ -38,6 +44,7 @@ protected:
 private slots:
     void updateCloseButton(const QString &text);
     void searchSubmit();
+    void toggleMode();
 
      // drop column headings from column chooser
      void dragEnterEvent(QDragEnterEvent *event);
@@ -49,6 +56,7 @@ signals:
 
 private:
     QToolButton *clearButton, *searchButton;
+    SearchBoxMode mode;
 };
 
 #endif

@@ -112,7 +112,7 @@ QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have op
 
 
 MainWindow::MainWindow(const QDir &home) :
-    home(home), session(0), isclean(false),
+    home(home), session(0), isclean(false), ismultisave(false),
     zones_(new Zones), hrzones_(new HrZones),
     ride(NULL), workout(NULL)
 {

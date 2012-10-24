@@ -56,7 +56,7 @@ class MetricAggregator : public QObject
         void dataChanged(); // when metricDB table changed
 
     public slots:
-        void update() { main->isclean = false; refreshMetrics(); }
+        void update();
         void addRide(RideItem*);
         void importMeasure(SummaryMetrics *sm);
 
