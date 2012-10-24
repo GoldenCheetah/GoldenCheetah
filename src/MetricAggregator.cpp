@@ -205,6 +205,13 @@ void MetricAggregator::addRide(RideItem*ride)
     }
 }
 
+void MetricAggregator::update() {
+    main->isclean = false;
+    if (!main->ismultisave) {
+        refreshMetrics();
+    }
+}
+
 bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, unsigned long fingerprint, bool modify)
 {
     SummaryMetrics *summaryMetric = new SummaryMetrics();
