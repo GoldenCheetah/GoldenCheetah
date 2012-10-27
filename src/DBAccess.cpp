@@ -60,8 +60,9 @@
 // 38  8th Jul 2012 Mark Liversedge    Computes metrics for manual files now
 // 39  18  Aug 2012 Mark Liversedge    New metric LRBalance
 // 40  20  Oct 2012 Mark Liversedge    Lucene search/filter and checkbox metadata field
+// 41  27  Oct 2012 Mark Liversedge    Lucene switched to StandardAnalyzer and search all texts by default
 
-static int DBSchemaVersion = 40;
+static int DBSchemaVersion = 41;
 
 DBAccess::DBAccess(MainWindow* main, QDir home) : main(main), home(home)
 {

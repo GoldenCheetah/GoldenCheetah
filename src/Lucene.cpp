@@ -73,7 +73,9 @@ bool Lucene::importRide(SummaryMetrics *, RideFile *ride, QColor , unsigned long
     std::wstring cname = ride->getTag("Filename","").toStdWString();
     doc.add( *_CLNEW Field(_T("Filename"), cname.c_str(), Field::STORE_YES | Field::INDEX_UNTOKENIZED));
 
-    // And all the metadata texts
+    QString alltexts;
+
+    // And all the metadata texts individually
     foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
 
         if (!main->specialFields.isMetric(field.name) && (field.type < 3 || field.type == 7)) {
@@ -81,10 +83,14 @@ bool Lucene::importRide(SummaryMetrics *, RideFile *ride, QColor , unsigned long
             std::wstring name = main->specialFields.makeTechName(field.name).toStdWString();
             std::wstring value = ride->getTag(field.name,"").toStdWString();
 
+            alltexts += ride->getTag(field.name,"") + " ";
             doc.add( *_CLNEW Field(name.c_str(), value.c_str(), Field::STORE_YES | Field::INDEX_TOKENIZED));
         }
     }
 
+    // add a catchall text which is concat of all text fields
+    std::wstring value = alltexts.toStdWString();
+    doc.add( *_CLNEW Field(_T("contents"), value.c_str(), Field::STORE_YES | Field::INDEX_TOKENIZED));
     
     // delete if already in the index
     deleteRide(ride->getTag("Filename", ""));
@@ -143,7 +149,7 @@ int Lucene::search(QString query)
 
     try {
         // parse query
-        QueryParser parser(_T("Notes"), &analyzer);
+        QueryParser parser(_T("contents"), &analyzer);
         parser.setPhraseSlop(4);
 
         std::wstring querystring = query.toStdWString();

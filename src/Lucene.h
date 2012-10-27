@@ -66,7 +66,7 @@ private:
     QDir dir;
 
     // CLucene objects
-    SimpleAnalyzer analyzer;
+    lucene::analysis::standard::StandardAnalyzer analyzer;
 
     // Query results
     Hits *hits; // null when no results
