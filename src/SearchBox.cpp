@@ -126,6 +126,8 @@ void SearchBox::updateCloseButton(const QString& text)
 {
     if (clearButton->isVisible() && text.isEmpty()) clearQuery();
     clearButton->setVisible(!text.isEmpty());
+
+    if (mode == Search) searchSubmit();
 }
 
 void SearchBox::searchSubmit()
