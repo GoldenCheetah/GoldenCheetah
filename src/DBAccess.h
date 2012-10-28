@@ -46,6 +46,9 @@ class DBAccess
     // check the db structure is up to date
     void checkDBVersion();
 
+    // get schema version
+    int getDBVersion();
+
     // create and drop connections
 	DBAccess(MainWindow *main, QDir home);
     ~DBAccess();

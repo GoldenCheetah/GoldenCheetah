@@ -17,6 +17,7 @@
  */
 
 #include "MainWindow.h"
+#include "AboutDialog.h"
 #include "AddIntervalDialog.h"
 #include "AthleteTool.h"
 #include "BestIntervalDialog.h"
@@ -104,10 +105,7 @@
 #include <qwt_plot_grid.h>
 #include <qwt_series_data.h>
 #include <boost/scoped_ptr.hpp>
-
-#ifndef GC_VERSION
-#define GC_VERSION "(developer build)"
-#endif
+#include <boost/version.hpp>
 
 QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 
@@ -1241,34 +1239,8 @@ MainWindow::closeAll()
 void
 MainWindow::aboutDialog()
 {
-    QMessageBox::about(this, tr("About GoldenCheetah"), tr(
-            "<center>"
-            "<h2>GoldenCheetah</h2>"
-            "Cycling Power Analysis Software<br>for Linux, Mac, and Windows"
-            "<p>Build date: %1 %2"
-            "<p>Version: %3"
-            "<p>GoldenCheetah is licensed under the<br>"
-            "<a href=\"http://www.gnu.org/copyleft/gpl.html\">GNU General "
-            "Public License</a>."
-            "<p>Source code can be obtained from<br>"
-            "<a href=\"http://goldencheetah.org/\">"
-            "http://goldencheetah.org/</a>."
-            "<p>Activity files and other data are stored in<br>"
-            "<a href=\"%4\">%5</a>"
-            "<p>Trademarks used with permission<br>"
-            "TSS, NP, IF courtesy of <a href=\"http://www.peaksware.com\">"
-            "Peaksware LLC</a>.<br>"
-            "BikeScore, xPower courtesy of <a href=\"http://www.physfarm.com\">"
-            "Physfarm Training Systems</a>.<br>"
-            "Virtual Speed courtesy of Tom Compton <a href=\"http://www.analyticcycling.com\">"
-            "Analytic Cycling</a>."
-            "</center>"
-            )
-            .arg(__DATE__)
-            .arg(__TIME__)
-            .arg(GC_VERSION)
-            .arg(QString(QUrl::fromLocalFile(home.absolutePath()).toEncoded()))
-            .arg(home.absolutePath().replace(" ", "&nbsp;")));
+    AboutDialog *ad = new AboutDialog(this, home);
+    ad->exec();
 }
 
 void MainWindow::showTools()

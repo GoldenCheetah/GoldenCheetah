@@ -33,6 +33,7 @@ LIBS += -lm $${LIBZ_LIBS}
     !isEmpty( D2XX_LIBS ) { LIBS += $${D2XX_LIBS} }
     HEADERS     += D2XX.h
     SOURCES     += D2XX.cpp
+    DEFINES     += GC_HAVE_D2XX
 }
 
 !isEmpty( SRMIO_INSTALL ) {
@@ -42,6 +43,7 @@ LIBS += -lm $${LIBZ_LIBS}
     LIBS        += $${SRMIO_LIBS}
     HEADERS     += SrmDevice.h
     SOURCES     += SrmDevice.cpp
+    DEFINES     += GC_HAVE_SRMIO
 }
 
 !isEmpty( QWT3D_INSTALL ) {
@@ -194,6 +196,7 @@ HEADERS += ../qxt/src/qxtspanslider.h \
            ../qxt/src/qxtstyleoptionscheduleviewitem.h
 
 HEADERS += \
+        AboutDialog.h \
         AddDeviceWizard.h \
         AddIntervalDialog.h \
         Aerolab.h \
@@ -373,6 +376,7 @@ LEXSOURCES  = JsonRideFile.l WithingsParser.l DataFilter.l
 #QMAKE_YACCFLAGS = -t -d
 
 SOURCES += \
+        AboutDialog.cpp \
         AddDeviceWizard.cpp \
         AddIntervalDialog.cpp \
         AerobicDecoupling.cpp \
