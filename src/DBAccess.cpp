@@ -380,6 +380,24 @@ void DBAccess::checkDBVersion()
     }
 }
 
+int DBAccess::getDBVersion()
+{
+    int schema_version = -1;
+    // can we get a version number?
+    QSqlQuery query("SELECT schema_version from version;", dbconn);
+
+    bool rc = query.exec();
+
+    if (rc) {
+        while (query.next()) {
+            if (query.value(0).toInt() > schema_version)
+                schema_version = query.value(0).toInt();
+        }
+    }
+    query.finish();
+    return schema_version;
+}
+
 /*----------------------------------------------------------------------
  * CRUD routines for Metrics table
  *----------------------------------------------------------------------*/
