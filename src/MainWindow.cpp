@@ -92,6 +92,7 @@
 #ifdef GC_HAVE_LUCENE
 #include "SearchBox.h"
 #include "Lucene.h"
+#include "DataFilter.h"
 #endif
 
 #include <assert.h>
@@ -203,6 +204,7 @@ MainWindow::MainWindow(const QDir &home) :
     _rideMetadata->hide();
 #ifdef GC_HAVE_LUCENE
     lucene = new Lucene(this); // before metricDB attempts to refresh
+    datafilter = new DataFilter(this, this); // before metricDB attempts to refresh
 #endif
     metricDB = new MetricAggregator(this, home, zones(), hrZones()); // just to catch config updates!
     metricDB->refreshMetrics();
@@ -462,7 +464,9 @@ MainWindow::MainWindow(const QDir &home) :
     toolbuttons->addWidget(searchBox);
     //toolbuttons->addStretch();
     connect(searchBox, SIGNAL(submitQuery(QString)), this, SLOT(searchSubmitted(QString)));
+    connect(searchBox, SIGNAL(submitFilter(QString)), datafilter, SLOT(parseFilter(QString)));
     connect(searchBox, SIGNAL(clearQuery()), this, SLOT(searchCleared()));
+    connect(searchBox, SIGNAL(clearFilter()), datafilter, SLOT(clearFilter()));
 #endif
 
 

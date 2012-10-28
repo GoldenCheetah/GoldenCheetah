@@ -37,6 +37,7 @@ class GroupByModel;
 class SearchFilter;
 class DiaryWindow;
 class BUGFIXQSortFilterProxyModel;
+class DataFilter;
 
 //
 // The RideNavigator
@@ -60,6 +61,7 @@ class RideNavigator : public GcWindow
     friend class ::GroupByModel;
     friend class ::DiaryWindow;
     friend class ::GcCalendar;
+    friend class ::DataFilter;
 
     public:
         RideNavigator(MainWindow *);
