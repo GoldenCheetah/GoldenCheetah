@@ -35,7 +35,7 @@ SearchBox::SearchBox(QWidget *parent)
     clearButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
     clearButton->hide();
     connect(clearButton, SIGNAL(clicked()), this, SLOT(clear()));
-    connect(clearButton, SIGNAL(clicked()), this, SIGNAL(clearQuery()));
+    connect(clearButton, SIGNAL(clicked()), this, SLOT(clearClicked()));
     connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(updateCloseButton(const QString&)));
 
     // search button
@@ -92,6 +92,7 @@ void SearchBox::resizeEvent(QResizeEvent *)
 
 void SearchBox::toggleMode()
 {
+    clear(); // clear whatever is there first
     if (mode == Search) setMode(Filter);
     else setMode(Search);
 }
@@ -124,18 +125,23 @@ void SearchBox::setMode(SearchBoxMode mode)
 
 void SearchBox::updateCloseButton(const QString& text)
 {
-    if (clearButton->isVisible() && text.isEmpty()) clearQuery();
+    if (clearButton->isVisible() && text.isEmpty()) mode == Search ? clearQuery() : clearFilter();
     clearButton->setVisible(!text.isEmpty());
 
-    if (mode == Search) searchSubmit();
+    if (mode == Search) searchSubmit(); // only do search as you type in search mode
 }
 
 void SearchBox::searchSubmit()
 {
     // return hit / key pressed
     if (text() != "") {
-        submitQuery(text());
+        mode == Search ? submitQuery(text()) : submitFilter(text());
     }
+}
+
+void SearchBox::clearClicked()
+{
+    mode == Search ? clearQuery() : clearFilter();
 }
 
 // Drag and drop columns from the chooser...
@@ -157,5 +163,5 @@ SearchBox::dropEvent(QDropEvent *event)
 
     // we do very little to the name, just space to _ and lower case it for now...
     name.replace(' ', '_');
-    insert(name + ":\"\"");
+    insert(name + (mode == Search ? ":\"\"" : ""));
 }

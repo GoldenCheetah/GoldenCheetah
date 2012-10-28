@@ -45,14 +45,20 @@ private slots:
     void updateCloseButton(const QString &text);
     void searchSubmit();
     void toggleMode();
+    void clearClicked();
 
      // drop column headings from column chooser
      void dragEnterEvent(QDragEnterEvent *event);
      void dropEvent(QDropEvent *event);
 
 signals:
+    // text search mode
     void submitQuery(QString);
     void clearQuery();
+
+    // db filter mode
+    void submitFilter(QString);
+    void clearFilter();
 
 private:
     QToolButton *clearButton, *searchButton;

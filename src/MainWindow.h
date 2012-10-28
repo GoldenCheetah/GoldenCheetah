@@ -63,6 +63,7 @@ class LionFullScreen;
 class QTFullScreen;
 class TrainTool;
 class Lucene;
+class DataFilter;
 class SearchBox;
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
@@ -157,6 +158,7 @@ class MainWindow : public QMainWindow
 #ifdef GC_HAVE_LUCENE
         SearchBox *searchBox;
         Lucene *lucene;
+        DataFilter *datafilter;
 #endif
 
         // *********************************************

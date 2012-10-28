@@ -222,6 +222,7 @@ HEADERS += \
         CpintPlot.h \
         CriticalPowerWindow.h \
         CsvRideFile.h \
+        DataFilter.h \
         DataProcessor.h \
         DBAccess.h \
         DatePickerDialog.h \
@@ -365,8 +366,8 @@ HEADERS += \
         Zones.h \
         ZoneScaleDraw.h
 
-YACCSOURCES = JsonRideFile.y WithingsParser.y
-LEXSOURCES  = JsonRideFile.l WithingsParser.l
+YACCSOURCES = JsonRideFile.y WithingsParser.y DataFilter.y
+LEXSOURCES  = JsonRideFile.l WithingsParser.l DataFilter.l
 
 #-t turns on debug, use with caution
 #QMAKE_YACCFLAGS = -t -d
