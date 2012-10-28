@@ -405,6 +405,7 @@ SOURCES += \
         CriticalPowerWindow.cpp \
         CsvRideFile.cpp \
         DanielsPoints.cpp \
+        DataFilter.cpp \
         DataProcessor.cpp \
         DBAccess.cpp \
         DatePickerDialog.cpp \
