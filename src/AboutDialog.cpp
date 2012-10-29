@@ -225,7 +225,7 @@ VersionPage::VersionPage(MainWindow *main, QDir home) : main(main), home(home)
             "<tr><td colspan=\"2\">GCC</td><td>%4</td></tr>"
             "<tr><td colspan=\"2\">SRMIO</td><td>%5</td></tr>"
             "<tr><td colspan=\"2\">OAUTH</td><td>%6</td></tr>"
-            "<tr><td colspan=\"2\">F2XX</td><td>%7</td></tr>"
+            "<tr><td colspan=\"2\">D2XX</td><td>%7</td></tr>"
             "<tr><td colspan=\"2\">QWTPLOT3D</td><td>%8</td></tr>"
             "<tr><td colspan=\"2\">KML</td><td>%9</td></tr>"
             "<tr><td colspan=\"2\">ICAL</td><td>%10</td></tr>"
