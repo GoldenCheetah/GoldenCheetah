@@ -50,8 +50,8 @@ AboutDialog::AboutDialog(MainWindow *mainWindow, QDir home) : mainWindow(mainWin
     mainLayout = new QVBoxLayout;
     mainLayout->addWidget(tabWidget);
 
-    mainLayout->setContentsMargins(0,0,0,0);
-    mainLayout->setSpacing(0);
+    //mainLayout->setContentsMargins(0,0,0,0);
+    //mainLayout->setSpacing(0);
 
     setLayout(mainLayout);
 }
@@ -206,12 +206,11 @@ VersionPage::VersionPage(MainWindow *main, QDir home) : main(main), home(home)
     #endif
 
     QString gc_version = tr(
-            "<h2>GoldenCheetah</h2>"
             "<p>Build date: %1 %2"
-            "<p>Version: %3"
-            "<p>DB Schema: %4"
-            "<p>OS: %5"
-            "<p>")
+            "<br>Version: %3"
+            "<br>DB Schema: %4"
+            "<br>OS: %5"
+            "<br>")
             .arg(__DATE__)
             .arg(__TIME__)
             .arg(GC_VERSION)
@@ -219,24 +218,23 @@ VersionPage::VersionPage(MainWindow *main, QDir home) : main(main), home(home)
             .arg(os);
 
     QString lib_version = tr(
-            "<table width=300>"
-            "<tr><td color=\"#770077\" colspan=\"2\">Versions</td></tr>"
-            "<tr><td>QT</td><td>%1</td></tr>"
-            "<tr><td>QWT</td><td>%2</td></tr>"
-            "<tr><td>BOOST</td><td>%3</td></tr>"
-            "<tr><td>GCC</td><td>%4</td></tr>"
-            "<tr><td>SRMIO</td><td>%5</td></tr>"
-            "<tr><td>OAUTH</td><td>%6</td></tr>"
-            "<tr><td>F2XX</td><td>%7</td></tr>"
-            "<tr><td>QWTPLOT3D</td><td>%8</td></tr>"
-            "<tr><td>KML</td><td>%9</td></tr>"
-            "<tr><td>ICAL</td><td>%10</td></tr>"
-            "<tr><td>USBXPRESS</td><td>%11</td></tr>"
-            "<tr><td>LIBUSB</td><td>%12</td></tr>"
-            "<tr><td>VLC</td><td>%13</td></tr>"
-            "<tr><td>LUCENE</td><td>%14</td></tr>"
+            "<table>"
+            "<tr><td colspan=\"2\">QT</td><td>%1</td></tr>"
+            "<tr><td colspan=\"2\">QWT</td><td>%2</td></tr>"
+            "<tr><td colspan=\"2\">BOOST</td><td>%3</td></tr>"
+            "<tr><td colspan=\"2\">GCC</td><td>%4</td></tr>"
+            "<tr><td colspan=\"2\">SRMIO</td><td>%5</td></tr>"
+            "<tr><td colspan=\"2\">OAUTH</td><td>%6</td></tr>"
+            "<tr><td colspan=\"2\">F2XX</td><td>%7</td></tr>"
+            "<tr><td colspan=\"2\">QWTPLOT3D</td><td>%8</td></tr>"
+            "<tr><td colspan=\"2\">KML</td><td>%9</td></tr>"
+            "<tr><td colspan=\"2\">ICAL</td><td>%10</td></tr>"
+            "<tr><td colspan=\"2\">USBXPRESS</td><td>%11</td></tr>"
+            "<tr><td colspan=\"2\">LIBUSB</td><td>%12</td></tr>"
+            "<tr><td colspan=\"2\">VLC</td><td>%13</td></tr>"
+            "<tr><td colspan=\"2\">LUCENE</td><td>%14</td></tr>"
             #ifdef Q_OS_MAC
-            "<tr><td>LION SUPPORT</td><td>%15</td></tr>"
+            "<tr><td colspan=\"2\">LION SUPPORT</td><td>%15</td></tr>"
             #endif
             "</table>"
             )
@@ -324,13 +322,12 @@ ContributorsPage::ContributorsPage(MainWindow *main, QDir home) : main(main), ho
     contributors.append("Sean Rhea");
     contributors.append("Steven Gribble");
     contributors.append("Thomas Weichmann");
-    contributors.append("Tom Weichmann");
     contributors.append("Walter B&#252;rki");
 
-    QString contributorsTable = "<center><table width=600><tr>";
+    QString contributorsTable = "<center><table><tr>";
     for (int i=0;i<contributors.count();i++){
         contributorsTable.append("<td>"+contributors.at(i)+"</td>");
-        if ((i+1) % 3 == 0)
+        if ((i+1) % 2 == 0)
             contributorsTable.append("</tr><tr>");
     }
     contributorsTable.append("</tr></table></center>");
