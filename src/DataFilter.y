@@ -114,7 +114,8 @@ lop   : AND
 value : SYMBOL                      { $$ = new Leaf(); $$->type = Leaf::Symbol;
                                       $$->lvalue.n = new QString(DataFiltertext); }
       | STRING                      { $$ = new Leaf(); $$->type = Leaf::String;
-                                      $$->lvalue.s = new QString(DataFiltertext); }
+                                      QString s2(DataFiltertext);
+                                      $$->lvalue.s = new QString(s2.mid(1,s2.length()-2)); }
       | FLOAT                       { $$ = new Leaf(); $$->type = Leaf::Float;
                                       $$->lvalue.f = QString(DataFiltertext).toFloat(); }
       | INTEGER                     { $$ = new Leaf(); $$->type = Leaf::Integer;

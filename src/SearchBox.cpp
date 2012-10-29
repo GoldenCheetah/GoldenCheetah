@@ -129,6 +129,8 @@ void SearchBox::updateCloseButton(const QString& text)
     clearButton->setVisible(!text.isEmpty());
 
     if (mode == Search) searchSubmit(); // only do search as you type in search mode
+
+    setGood(); // if user changing then don't stay red - wait till resubmitted
 }
 
 void SearchBox::searchSubmit()
@@ -142,7 +144,28 @@ void SearchBox::searchSubmit()
 void SearchBox::clearClicked()
 {
     mode == Search ? clearQuery() : clearFilter();
+    setGood();
 }
+
+void SearchBox::setBad(QStringList errors)
+{
+    QPalette pal;
+    pal.setColor(QPalette::Text, Qt::red);
+    setPalette(pal);
+
+    setToolTip(errors.join(" and "));
+}
+
+void SearchBox::setGood()
+{
+    QPalette pal;
+    pal.setColor(QPalette::Text, Qt::black);
+    setPalette(pal);
+
+    setToolTip("");
+}
+
+
 
 // Drag and drop columns from the chooser...
 void

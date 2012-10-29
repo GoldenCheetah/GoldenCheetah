@@ -462,9 +462,11 @@ MainWindow::MainWindow(const QDir &home) :
     toolbuttons->addWidget(searchBox);
     //toolbuttons->addStretch();
     connect(searchBox, SIGNAL(submitQuery(QString)), this, SLOT(searchSubmitted(QString)));
-    connect(searchBox, SIGNAL(submitFilter(QString)), datafilter, SLOT(parseFilter(QString)));
+    connect(searchBox, SIGNAL(submitFilter(QString)), this, SLOT(filterSubmitted(QString)));
     connect(searchBox, SIGNAL(clearQuery()), this, SLOT(searchCleared()));
-    connect(searchBox, SIGNAL(clearFilter()), datafilter, SLOT(clearFilter()));
+    connect(searchBox, SIGNAL(clearFilter()), this, SLOT(filterCleared()));
+    connect(datafilter, SIGNAL(parseGood()), searchBox, SLOT(setGood()));
+    connect(datafilter, SIGNAL(parseBad(QStringList)), searchBox, SLOT(setBad(QStringList)));
 #endif
 
 
@@ -2237,6 +2239,17 @@ void MainWindow::searchSubmitted(QString query)
 }
 
 void MainWindow::searchCleared()
+{
+    emit searchClear();
+}
+void MainWindow::filterSubmitted(QString query)
+{
+    QStringList errors = datafilter->parseFilter(query);
+    if (errors.count() == 0)
+        emit searchResults(datafilter->files());
+}
+
+void MainWindow::filterCleared()
 {
     emit searchClear();
 }

@@ -28,27 +28,27 @@ class SummaryMetrics
 {
 	public:
         // filename
-	    QString getFileName() { return fileName; }
+	    QString getFileName() const { return fileName; }
         void    setFileName(QString fileName) { this->fileName = fileName; }
 
         // Identifier
-        QString getId() { return id; }
+        QString getId() const { return id; }
         void setId(QString id) { this->id = id; }
 
         // ride date
-        QDateTime getRideDate() { return rideDate; }
+        QDateTime getRideDate() const { return rideDate; }
         void setRideDate(QDateTime rideDate) { this->rideDate = rideDate; }
 
         // for non-rides, ie. measures use same field but overload
-        QDateTime getDateTime() { return rideDate; }
+        QDateTime getDateTime() const { return rideDate; }
         void setDateTime(QDateTime dateTime) { this->rideDate = dateTime; }
 
         // metric values
         void setForSymbol(QString symbol, double v) { value.insert(symbol, v); }
         double getForSymbol(QString symbol) const { return value.value(symbol, 0.0); }
 
-        void setText(QString name, QString v) { texts.insert(name, v); }
-        QString getText(QString name, QString fallback) { return texts.value(name, fallback); }
+        void setText(QString name, QString v) { text.insert(name, v); }
+        QString getText(QString name, QString fallback) { return text.value(name, fallback); }
 
         // convert to string, using format supplied
         // replaces ${...:units} or ${...} with unit string
@@ -62,13 +62,14 @@ class SummaryMetrics
         QString getUnitsForSymbol(QString symbol, bool UseMetric) const;
 
         QMap<QString, double> &values() { return value; }
+        QMap<QString, QString> &texts() { return text; }
 
 	private:
 	    QString fileName;
         QString id;
         QDateTime rideDate;
         QMap<QString, double> value;
-        QMap<QString, QString> texts;
+        QMap<QString, QString> text;
 };
 
 
