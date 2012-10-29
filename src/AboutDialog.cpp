@@ -41,6 +41,8 @@ AboutDialog::AboutDialog(MainWindow *mainWindow, QDir home) : mainWindow(mainWin
     contributorsPage = new ContributorsPage(mainWindow, home);
 
     tabWidget = new QTabWidget;
+    tabWidget->setContentsMargins(0,0,0,0);
+
     tabWidget->addTab(aboutPage, tr("About"));
     tabWidget->addTab(versionPage, tr("Version"));
     tabWidget->addTab(contributorsPage, tr("Contributors"));
@@ -48,9 +50,10 @@ AboutDialog::AboutDialog(MainWindow *mainWindow, QDir home) : mainWindow(mainWin
     mainLayout = new QVBoxLayout;
     mainLayout->addWidget(tabWidget);
 
-    setLayout(mainLayout);
+    mainLayout->setContentsMargins(0,0,0,0);
+    mainLayout->setSpacing(0);
 
-    setFixedSize(QSize(800, 600));
+    setLayout(mainLayout);
 }
 
 
@@ -61,6 +64,7 @@ AboutPage::AboutPage(MainWindow *main, QDir home) : main(main), home(home)
 {
     QLabel *text;
     text=new QLabel(this);
+    text->setContentsMargins(0,0,0,0);
     text->setText(
               tr(
                 "<center>"
@@ -88,9 +92,9 @@ AboutPage::AboutPage(MainWindow *main, QDir home) : main(main), home(home)
     );
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->setSpacing(0);
+    mainLayout->setContentsMargins(0,0,0,0);
     mainLayout->addWidget(text);
-
-    mainLayout->addStretch(1);
     setLayout(mainLayout);
 }
 
@@ -257,6 +261,7 @@ VersionPage::VersionPage(MainWindow *main, QDir home) : main(main), home(home)
 
     QLabel *text;
     text=new QLabel(this);
+    text->setContentsMargins(0,0,0,0);
     text->setText("<center>"  +
                   gc_version  +
                   lib_version +
@@ -264,9 +269,10 @@ VersionPage::VersionPage(MainWindow *main, QDir home) : main(main), home(home)
 
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->setSpacing(0);
+    mainLayout->setContentsMargins(0,0,0,0);
     mainLayout->addWidget(text);
 
-    mainLayout->addStretch(1);
     setLayout(mainLayout);
 }
 
@@ -331,12 +337,14 @@ ContributorsPage::ContributorsPage(MainWindow *main, QDir home) : main(main), ho
 
     QLabel *text;
     text=new QLabel(this);
+    text->setContentsMargins(0,0,0,0);
     text->setText(contributorsTable);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->setSpacing(0);
+    mainLayout->setContentsMargins(0,0,0,0);
     mainLayout->addWidget(text);
 
-    mainLayout->addStretch(1);
     setLayout(mainLayout);
 }
 
