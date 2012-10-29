@@ -51,6 +51,10 @@ private slots:
      void dragEnterEvent(QDragEnterEvent *event);
      void dropEvent(QDropEvent *event);
 
+     // highlight errors etc
+     void setBad(QStringList errors);
+     void setGood();
+
 signals:
     // text search mode
     void submitQuery(QString);

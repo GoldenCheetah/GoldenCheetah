@@ -48,7 +48,7 @@ class Leaf {
         Leaf() : type(none) { }
 
         // evaluate against a SummaryMetric
-        bool eval(Leaf *, SummaryMetrics);
+        bool eval(DataFilter *df, Leaf *, SummaryMetrics);
 
         // tree traversal etc
         void print(Leaf *);  // print leaf and all children
@@ -77,6 +77,9 @@ class DataFilter : public QObject
 
     public:
         DataFilter(QObject *parent, MainWindow *main);
+        QStringList &files() { return filenames; }
+
+        // used by Leaf
         QMap<QString,QString> lookupMap;
         QMap<QString,bool> lookupType; // true if a number, false if a string
 
@@ -87,10 +90,14 @@ class DataFilter : public QObject
 
         //void setData(); // set the file list from the current filter
 
+    signals:
+        void parseGood();
+        void parseBad(QStringList erorrs);
+
     private:
         MainWindow *main;
         Leaf *treeRoot;
         QStringList errors;
 
-        QStringList files;
+        QStringList filenames;
 };

@@ -332,6 +332,8 @@ class MainWindow : public QMainWindow
 #endif
 
 #ifdef GC_HAVE_LUCENE
+        void filterSubmitted(QString);
+        void filterCleared();
         void searchSubmitted(QString);
         void searchCleared();
 #endif
