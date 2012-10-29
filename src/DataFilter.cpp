@@ -402,11 +402,11 @@ bool Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m)
             break;
 
         case BEGINSWITH:
-            return lhsstring.endsWith(rhsstring);
+            return lhsstring.startsWith(rhsstring);
             break;
 
         case CONTAINS:
-            return lhsstring.endsWith(rhsstring);
+            return lhsstring.contains(rhsstring);
             break;
 
         default:
