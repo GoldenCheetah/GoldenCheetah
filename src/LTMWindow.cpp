@@ -139,6 +139,7 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
     cl->addRow(ltmTool);
 
     connect(ltmTool, SIGNAL(dateRangeSelected(const Season *)), this, SLOT(dateRangeSelected(const Season *)));
+    connect(ltmTool, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
     connect(ltmTool, SIGNAL(metricSelected()), this, SLOT(metricSelected()));
     connect(groupBy, SIGNAL(currentIndexChanged(int)), this, SLOT(groupBySelected(int)));
     connect(saveButton, SIGNAL(clicked(bool)), this, SLOT(saveClicked(void)));
@@ -246,26 +247,56 @@ void
 LTMWindow::dateRangeSelected(const Season *selected)
 {
     if (selected) {
-        Season dateRange = *selected;
 
+        Season dateRange = *selected;
         settings.start = QDateTime(dateRange.getStart(), QTime(0,0));
         settings.end   = QDateTime(dateRange.getEnd(), QTime(24,0,0));
         settings.title = dateRange.getName();
         settings.data = &results;
         settings.measures = &measures;
 
-        // if we want weeks and start is not a monday go back to the monday
-        int dow = dateRange.getStart().dayOfWeek();
-        if (settings.groupBy == LTM_WEEK && dow >1 && dateRange.getStart() != QDate())
-            settings.start = settings.start.addDays(-1*(dow-1));
-
-        // get the data
-        results.clear(); // clear any old data
-        results = main->metricDB->getAllMetricsFor(settings.start, settings.end);
         measures.clear(); // clear any old data
         measures = main->metricDB->getAllMeasuresFor(settings.start, settings.end);
+
+        // apply filter to new date range too
+        filterChanged();
+
         refreshPlot();
     }
+}
+
+void
+LTMWindow::filterChanged()
+{
+    // first refresh all data - since it is cropped in LTMPlot
+    Season dateRange = *ltmTool->currentDateRange();
+    settings.start = QDateTime(dateRange.getStart(), QTime(0,0));
+    settings.end   = QDateTime(dateRange.getEnd(), QTime(24,0,0));
+    settings.title = dateRange.getName();
+    settings.data = &results;
+
+    // if we want weeks and start is not a monday go back to the monday
+    int dow = dateRange.getStart().dayOfWeek();
+    if (settings.groupBy == LTM_WEEK && dow >1 && dateRange.getStart() != QDate())
+        settings.start = settings.start.addDays(-1*(dow-1));
+
+    // we need to get data again and apply filter
+    results.clear(); // clear any old data
+    results = main->metricDB->getAllMetricsFor(settings.start, settings.end);
+
+    // loop through results removing any not in stringlist..
+    if (ltmTool->isFiltered()) {
+
+        QList<SummaryMetrics> filteredresults;
+        foreach (SummaryMetrics x, results) {
+            if (ltmTool->filters().contains(x.getFileName()))
+                filteredresults << x;
+        }
+        results = filteredresults;
+        settings.data = &results;
+    }
+
+    refreshPlot();
 }
 
 void

@@ -103,6 +103,8 @@ class CpintPlot : public QwtPlot
         void plot_allCurve(CpintPlot *plot, int n_values, const double *power_values);
         void configChanged();
         void pointHover(QwtPlotCurve *curve, int index);
+        void clearFilter();
+        void setFilter(QStringList);
 
     protected:
 
@@ -125,6 +127,9 @@ class CpintPlot : public QwtPlot
         RideFileCache *current, *bests;
         LTMCanvasPicker *canvasPicker;
         penTooltip *zoomer;
+
+        QStringList files;
+        bool isFiltered;
 };
 
 #endif // _GC_CpintPlot_h

@@ -35,6 +35,7 @@
 class NavigatorCellDelegate;
 class GroupByModel;
 class SearchFilter;
+class SearchFilterBox;
 class DiaryWindow;
 class BUGFIXQSortFilterProxyModel;
 class DataFilter;
@@ -156,6 +157,9 @@ class RideNavigator : public GcWindow
 
         // search filter
         SearchFilter *searchFilter;
+
+        // search filter box
+        SearchFilterBox *searchFilterBox;
 };
 
 //

@@ -22,6 +22,9 @@
 
 #include <QtGui>
 #include "Season.h"
+#ifdef GC_HAVE_LUCENE
+#include "SearchFilterBox.h"
+#endif
 
 class CpintPlot;
 class MainWindow;
@@ -36,6 +39,9 @@ class CriticalPowerWindow : public GcWindow
     // properties can be saved/restored/set by the layout manager
 
     Q_PROPERTY(QString dateRange READ dateRange WRITE setDateRange USER true)
+#ifdef GC_HAVE_LUCENE
+    Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
+#endif
     Q_PROPERTY(int mode READ mode WRITE setMode USER true)
 
     // for retro compatibility
@@ -56,6 +62,12 @@ class CriticalPowerWindow : public GcWindow
         QString dateRange() const;
         void setDateRange(QString x);
 
+#ifdef GC_HAVE_LUCENE
+        // filter
+        QString filter() const { return searchBox->filter(); }
+        void setFilter(QString x) { searchBox->setFilter(x); }
+#endif
+
         // for retro compatibility
         int season() const { return cComboSeason->currentIndex(); }
         void setSeason(int x) { cComboSeason->setCurrentIndex(x); }
@@ -74,6 +86,7 @@ class CriticalPowerWindow : public GcWindow
         void seasonSelected(int season);
         void setSeries(int index);
         void resetSeasons();
+        void filterChanged();
 
     private:
         void updateCpint(double minutes);
@@ -98,6 +111,9 @@ class CriticalPowerWindow : public GcWindow
         QList<Season> seasonsList;
         RideItem *currentRide;
         QList<RideFile::SeriesType> seriesList;
+#ifdef GC_HAVE_LUCENE
+        SearchFilterBox *searchBox;
+#endif
 };
 
 #endif // _GC_CriticalPowerWindow_h

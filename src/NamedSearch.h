@@ -1,0 +1,82 @@
+/*
+ * Copyright (c) 2012 Mark Liversedge (liversedge@gmail.com)
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#ifndef Gc_NamedSearch_h
+#define Gc_NamedSearch_h
+#include "GoldenCheetah.h"
+
+#include <QXmlDefaultHandler>
+#include <QString>
+#include <QDir>
+
+class NamedSearch
+{
+	public:
+        enum Type { search=0, filter=1 };
+        NamedSearch() : type(search), count(0) {}
+
+        QString name; // name, typically users name them by year e.g. "2011 Season"
+        int type;
+        int count;   // how many times has it been used (not counting in charts) ?
+        QString text;
+};
+
+class NamedSearches : public QObject {
+
+    Q_OBJECT;
+
+    public:
+        NamedSearches(QDir home) : home(home) { read(); }
+        void read();
+        void write();
+
+        QList<NamedSearch> &getList() { return list; }
+        NamedSearch get(QString name);
+
+    signals:
+        void changed();
+
+
+    private:
+        QDir home;
+        QList<NamedSearch> list;
+};
+
+class NamedSearchParser : public QXmlDefaultHandler
+{
+
+public:
+    // marshall
+    static bool serialize(QString, QList<NamedSearch>);
+
+    // unmarshall
+    bool startDocument();
+    bool endDocument();
+    bool endElement( const QString&, const QString&, const QString &qName );
+    bool startElement( const QString&, const QString&, const QString &name, const QXmlAttributes &attrs );
+    bool characters( const QString& str );
+    QList<NamedSearch> &getResults() { return result; };
+
+protected:
+    QString buffer;
+    NamedSearch namedSearch;
+    QList<NamedSearch> result;
+    int loadcount;
+
+};
+#endif

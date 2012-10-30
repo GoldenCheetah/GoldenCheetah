@@ -121,7 +121,7 @@ class RideFileCache
 
         // Construct a ridefile cache that represents the data
         // across a date range. This is used to provide aggregated data.
-        RideFileCache(MainWindow *main, QDate start, QDate end);
+        RideFileCache(MainWindow *main, QDate start, QDate end, bool filter = false, QStringList files = QStringList());
 
         static int decimalsFor(RideFile::SeriesType series);
 

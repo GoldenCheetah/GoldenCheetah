@@ -187,6 +187,7 @@ QStringList DataFilter::parseFilter(QString query)
                 filenames << allRides.at(i).getFileName();
             }
         }
+        emit results(filenames);
     }
 
     errors = DataFiltererrors;

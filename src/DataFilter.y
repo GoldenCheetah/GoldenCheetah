@@ -70,6 +70,9 @@ extern Leaf *root; // root node for parsed statement
 %type <leaf> value lexpr;
 %type <op> lop op;
 
+%left EQ NEQ LT LTE GT GTE MATCHES ENDSWITH CONTAINS
+%left AND OR
+
 %start filter;
 %%
 

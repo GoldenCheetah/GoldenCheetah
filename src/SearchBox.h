@@ -22,8 +22,12 @@
 #include <QLineEdit>
 #include <QDragEnterEvent>
 #include <QDropEvent>
+#include <QDialog>
 
 class QToolButton;
+class QMenu;
+class MainWindow;
+class QLabel;
 
 class SearchBox : public QLineEdit
 {
@@ -33,13 +37,16 @@ public:
     enum searchboxmode { Search, Filter };
     typedef enum searchboxmode SearchBoxMode;
 
-    SearchBox(QWidget *parent = 0);
+    SearchBox(MainWindow *main, QWidget *parent = 0);
 
     // either search box or filter box
     void setMode(SearchBoxMode mode);
+    void setText(QString);
+    SearchBoxMode getMode() { return mode; }
 
 protected:
     void resizeEvent(QResizeEvent *);
+    void checkMenu(); // only show menu drop down when there is something to show
 
 private slots:
     void updateCloseButton(const QString &text);
@@ -55,6 +62,11 @@ private slots:
      void setBad(QStringList errors);
      void setGood();
 
+     // run etc
+     void runMenu(QAction*);
+     void setMenu();
+     void addNamed();
+
 signals:
     // text search mode
     void submitQuery(QString);
@@ -65,8 +77,9 @@ signals:
     void clearFilter();
 
 private:
-    QToolButton *clearButton, *searchButton;
+    MainWindow *main;
+    QToolButton *clearButton, *searchButton, *toolButton;
+    QMenu *dropMenu;
     SearchBoxMode mode;
 };
-
 #endif

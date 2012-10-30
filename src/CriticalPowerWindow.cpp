@@ -17,6 +17,7 @@
  */
 
 #include "CriticalPowerWindow.h"
+#include "SearchFilterBox.h"
 #include "CpintPlot.h"
 #include "MainWindow.h"
 #include "RideItem.h"
@@ -47,6 +48,16 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
     QWidget *c = new QWidget;
     QVBoxLayout *cl = new QVBoxLayout(c);
     setControls(c);
+
+#ifdef GC_HAVE_LUCENE
+    // searchbox
+    searchBox = new SearchFilterBox(this, parent);
+    connect(searchBox, SIGNAL(searchClear()), cpintPlot, SLOT(clearFilter()));
+    connect(searchBox, SIGNAL(searchResults(QStringList)), cpintPlot, SLOT(setFilter(QStringList)));
+    connect(searchBox, SIGNAL(searchClear()), this, SLOT(filterChanged()));
+    connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(filterChanged()));
+    cl->addWidget(searchBox);
+#endif
 
     // picker details
     QFormLayout *cpintPickerLayout = new QFormLayout;
@@ -377,4 +388,7 @@ void CriticalPowerWindow::seasonSelected(int iSeason)
     cpintPlot->calculate(currentRide);
 }
 
-
+void CriticalPowerWindow::filterChanged()
+{
+    cpintPlot->calculate(currentRide);
+}

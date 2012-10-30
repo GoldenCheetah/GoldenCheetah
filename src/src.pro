@@ -124,8 +124,10 @@ LIBS += -lm $${LIBZ_LIBS}
     INCLUDEPATH += $${CLUCENE_INCLUDE}
     LIBS        += $${CLUCENE_LIBS}
     DEFINES     += GC_HAVE_LUCENE
-    HEADERS     += Lucene.h SearchBox.h
-    SOURCES     += Lucene.cpp SearchBox.cpp
+    HEADERS     += Lucene.h DataFilter.h SearchBox.h NamedSearch.h SearchFilterBox.h
+    SOURCES     += Lucene.cpp DataFilter.cpp SearchBox.cpp NamedSearch.cpp SearchFilterBox.cpp
+    YACCSOURCES += DataFilter.y
+    LEXSOURCES  += DataFilter.l
 }
 
 # Mac specific build for
@@ -225,7 +227,6 @@ HEADERS += \
         CpintPlot.h \
         CriticalPowerWindow.h \
         CsvRideFile.h \
-        DataFilter.h \
         DataProcessor.h \
         DBAccess.h \
         DatePickerDialog.h \
@@ -369,8 +370,8 @@ HEADERS += \
         Zones.h \
         ZoneScaleDraw.h
 
-YACCSOURCES = JsonRideFile.y WithingsParser.y DataFilter.y
-LEXSOURCES  = JsonRideFile.l WithingsParser.l DataFilter.l
+YACCSOURCES += JsonRideFile.y WithingsParser.y
+LEXSOURCES  += JsonRideFile.l WithingsParser.l
 
 #-t turns on debug, use with caution
 #QMAKE_YACCFLAGS = -t -d
@@ -409,7 +410,6 @@ SOURCES += \
         CriticalPowerWindow.cpp \
         CsvRideFile.cpp \
         DanielsPoints.cpp \
-        DataFilter.cpp \
         DataProcessor.cpp \
         DBAccess.cpp \
         DatePickerDialog.cpp \

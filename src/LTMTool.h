@@ -25,6 +25,10 @@
 #include "RideMetric.h"
 #include "LTMSettings.h"
 
+#ifdef GC_HAVE_LUCENE
+#include "SearchFilterBox.h"
+#endif
+
 #include <QDir>
 #include <QtGui>
 
@@ -67,9 +71,16 @@ class LTMTool : public QWidget
         void setDateRange(QString);
         QString _dateRange() const;
 
+        bool isFiltered() { return _amFiltered; }
+        QStringList &filters() { return filenames; }
+
+#ifdef GC_HAVE_LUCENE
+        SearchFilterBox *searchBox;
+#endif
     signals:
 
         void dateRangeSelected(const Season *);
+        void filterChanged();
         void metricSelected();
 
     private slots:
@@ -86,6 +97,9 @@ class LTMTool : public QWidget
         void configChanged();
         void resetSeasons(); // rebuild the seasons list if it changes
 
+        void clearFilter();
+        void setFilter(QStringList);
+
     private:
 
         QwtPlotCurve::CurveStyle curveStyle(RideMetric::MetricType);
@@ -100,6 +114,9 @@ class LTMTool : public QWidget
         QTreeWidget *dateRangeTree;
         QTreeWidgetItem *allDateRanges;
         const Season *dateRange;
+
+        bool _amFiltered; // is a filter appling?
+        QStringList filenames; // filters
 
         QList<MetricDetail> metrics;
         QTreeWidget *metricTree;

@@ -49,6 +49,9 @@ class TreeMapWindow : public GcWindow
     Q_PROPERTY(QString f1 READ f1 WRITE setf1 USER true)
     Q_PROPERTY(QString f2 READ f2 WRITE setf2 USER true)
     Q_PROPERTY(QString dateRange READ dateRange WRITE setDateRange USER true)
+#ifdef GC_HAVE_LUCENE
+    Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
+#endif
     Q_PROPERTY(LTMSettings settings READ getSettings WRITE applySettings USER true)
 
     public:
@@ -63,12 +66,17 @@ class TreeMapWindow : public GcWindow
         void setf2(QString x) const { field2->setCurrentIndex(field1->findText(x)); }
         LTMSettings getSettings() const { return settings; }
         void applySettings(LTMSettings x) { ltmTool->applySettings(&x); }
+#ifdef GC_HAVE_LUCENE
+        QString filter() const { return ltmTool->searchBox->filter(); }
+        void setFilter(QString x) { ltmTool->searchBox->setFilter(x); }
+#endif
 
     public slots:
         void rideSelected();
         void refreshPlot();
         void dateRangeSelected(const Season *);
         void metricSelected();
+        void filterChanged();
         void refresh();
         void fieldSelected(int);
         void pointClicked(QwtPlotCurve*, int);

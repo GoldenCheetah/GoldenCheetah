@@ -922,7 +922,7 @@ LTMPlot::createPMCCurveData(LTMSettings *settings, MetricDetail metricDetail,
 		    (appsettings->value(this, GC_STS_DAYS,7)).toInt(),
 		    (appsettings->value(this, GC_LTS_DAYS,42)).toInt());
 
-    sc->calculateStress(main, home.absolutePath(), scoreType);
+    sc->calculateStress(main, home.absolutePath(), scoreType, settings->ltmTool->isFiltered(), settings->ltmTool->filters());
 
     // pick out any data that is in the date range selected
     // convert to SummaryMetric Format used on the plot
