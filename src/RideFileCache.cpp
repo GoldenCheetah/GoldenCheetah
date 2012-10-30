@@ -869,7 +869,7 @@ static void distAggregate(QVector<double> &into, QVector<double> &other)
 
 }
 
-RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end)
+RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end, bool filter, QStringList files)
                : main(main), rideFileName(""), ride(0)
 {
     // resize all the arrays to zero - expand as neccessary
@@ -905,7 +905,9 @@ RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end)
     // exist, or /might/ be out of date.
     foreach (QString rideFileName, RideFileFactory::instance().listRideFiles(main->home)) {
         QDate rideDate = dateFromFileName(rideFileName);
-        if (rideDate >= start && rideDate <= end) {
+        if (((filter == true && files.contains(rideFileName)) || filter == false) &&
+            rideDate >= start && rideDate <= end) {
+
             // get its cached values (will refresh if needed...)
             RideFileCache rideCache(main, main->home.absolutePath() + "/" + rideFileName);
 

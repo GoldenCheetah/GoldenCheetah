@@ -94,6 +94,9 @@ class LTMWindow : public LTMPlotContainer
     Q_PROPERTY(bool shade READ shade WRITE setShade USER true)
     Q_PROPERTY(bool legend READ legend WRITE setLegend USER true)
     Q_PROPERTY(QString dateRange READ dateRange WRITE setDateRange USER true)
+#ifdef GC_HAVE_LUCENE
+    Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
+#endif
     Q_PROPERTY(LTMSettings settings READ getSettings WRITE applySettings USER true)
 
     public:
@@ -116,6 +119,11 @@ class LTMWindow : public LTMPlotContainer
         QString dateRange() const;
         void setDateRange(QString x);
 
+#ifdef GC_HAVE_LUCENE
+        QString filter() const { return ltmTool->searchBox->filter(); }
+        void setFilter(QString x) { ltmTool->searchBox->setFilter(x); }
+#endif
+
         LTMSettings getSettings() const { return settings; }
         void applySettings(LTMSettings x) { ltmTool->applySettings(&x); }
 
@@ -123,6 +131,7 @@ class LTMWindow : public LTMPlotContainer
         void rideSelected();
         void refreshPlot();
         void dateRangeSelected(const Season *);
+        void filterChanged();
         void metricSelected();
         void groupBySelected(int);
         void shadeZonesClicked(int);

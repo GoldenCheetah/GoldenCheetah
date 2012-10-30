@@ -94,6 +94,8 @@ class DataFilter : public QObject
         void parseGood();
         void parseBad(QStringList erorrs);
 
+        void results(QStringList);
+
     private:
         MainWindow *main;
         Leaf *treeRoot;

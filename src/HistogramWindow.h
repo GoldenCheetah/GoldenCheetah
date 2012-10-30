@@ -23,6 +23,9 @@
 
 #include "Season.h"
 #include "SeasonParser.h"
+#ifdef GC_HAVE_LUCENE
+#include "SearchFilterBox.h"
+#endif
 
 #include <QtGui>
 
@@ -44,6 +47,9 @@ class HistogramWindow : public GcWindow
     Q_PROPERTY(bool shade READ shade WRITE setShade USER true)
     Q_PROPERTY(bool zoned READ zoned WRITE setZoned USER true)
     Q_PROPERTY(bool scope READ scope WRITE setScope USER true)
+#ifdef GC_HAVE_LUCENE
+    Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
+#endif
 
     public:
 
@@ -66,6 +72,10 @@ class HistogramWindow : public GcWindow
         void setZoned(bool x) { return showInZones->setChecked(x); }
         int scope() const { return seasonCombo->currentIndex(); }
         void setScope(int x) { seasonCombo->setCurrentIndex(x); }
+#ifdef GC_HAVE_LUCENE
+        QString filter() const { return searchBox->filter(); }
+        void setFilter(QString x) { searchBox->setFilter(x); }
+#endif
 
     public slots:
 
@@ -73,6 +83,10 @@ class HistogramWindow : public GcWindow
         void rideAddorRemove(RideItem*);
         void intervalSelected();
         void zonesChanged();
+#ifdef GC_HAVE_LUCENE
+        void clearFilter();
+        void setFilter(QStringList files);
+#endif
 
     protected slots:
 
@@ -109,6 +123,11 @@ class HistogramWindow : public GcWindow
         bool stale;
         RideFileCache *source;
         bool interval;
+#ifdef GC_HAVE_LUCENE
+        SearchFilterBox *searchBox;
+        bool isFiltered;
+        QStringList files;
+#endif
 };
 
 #endif // _GC_HistogramWindow_h

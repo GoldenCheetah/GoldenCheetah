@@ -91,9 +91,8 @@
 #endif
 
 #ifdef GC_HAVE_LUCENE
-#include "SearchBox.h"
 #include "Lucene.h"
-#include "DataFilter.h"
+#include "NamedSearch.h"
 #endif
 
 #include <assert.h>
@@ -201,8 +200,7 @@ MainWindow::MainWindow(const QDir &home) :
     _rideMetadata = new RideMetadata(this,true);
     _rideMetadata->hide();
 #ifdef GC_HAVE_LUCENE
-    lucene = new Lucene(this); // before metricDB attempts to refresh
-    datafilter = new DataFilter(this, this); // before metricDB attempts to refresh
+    lucene = new Lucene(this, this); // before metricDB attempts to refresh
 #endif
     metricDB = new MetricAggregator(this, home, zones(), hrZones()); // just to catch config updates!
     metricDB->refreshMetrics();
@@ -447,6 +445,10 @@ MainWindow::MainWindow(const QDir &home) :
     treeWidget->expandItem(allRides);
     treeWidget->setFirstItemColumnSpanned (allRides, true);
 
+#ifdef GC_HAVE_LUCENE
+    namedSearches = new NamedSearches(home); // must be before navigator
+#endif
+
     // UI Ride List (configurable)
     listView = new RideNavigator(this);
     // retrieve settings (properties are saved when we close the window)
@@ -457,19 +459,6 @@ MainWindow::MainWindow(const QDir &home) :
         listView->setColumns(appsettings->cvalue(cyclist, GC_NAVHEADINGS).toString());
         listView->setWidths(appsettings->cvalue(cyclist, GC_NAVHEADINGWIDTHS).toString());
     }
-#ifdef GC_HAVE_LUCENE
-    searchBox = new SearchBox(this);
-    toolbuttons->addWidget(searchBox);
-    //toolbuttons->addStretch();
-    connect(searchBox, SIGNAL(submitQuery(QString)), this, SLOT(searchSubmitted(QString)));
-    connect(searchBox, SIGNAL(submitFilter(QString)), this, SLOT(filterSubmitted(QString)));
-    connect(searchBox, SIGNAL(clearQuery()), this, SLOT(searchCleared()));
-    connect(searchBox, SIGNAL(clearFilter()), this, SLOT(filterCleared()));
-    connect(datafilter, SIGNAL(parseGood()), searchBox, SLOT(setGood()));
-    connect(datafilter, SIGNAL(parseBad(QStringList)), searchBox, SLOT(setBad(QStringList)));
-#endif
-
-
 
     // INTERVALS
     intervalSummaryWindow = new IntervalSummaryWindow(this);
@@ -587,9 +576,6 @@ MainWindow::MainWindow(const QDir &home) :
     QVBoxLayout *activityLayout = new QVBoxLayout(activityHistory);
     activityLayout->setSpacing(0);
     activityLayout->setContentsMargins(0,0,0,0);
-#ifdef GC_HAVE_LUCENE
-    activityLayout->addWidget(searchBox);
-#endif
     activityLayout->addWidget(listView);
 
     toolBox->addItem(activityHistory, QIcon(":images/activity.png"), "Activity History");
@@ -1216,6 +1202,11 @@ MainWindow::closeEvent(QCloseEvent* event)
         homeWindow->saveState();
         trainWindow->saveState();
         diaryWindow->saveState();
+
+#ifdef GC_HAVE_LUCENE
+        // save the named searches
+        namedSearches->write();
+#endif
 
         // clear the clipboard if neccessary
         QApplication::clipboard()->setText("");
@@ -2230,27 +2221,3 @@ MainWindow::setBubble(QString text, QPoint pos, Qt::Orientation orientation)
         bubble->repaint();
     }
 }
-
-#ifdef GC_HAVE_LUCENE
-void MainWindow::searchSubmitted(QString query)
-{
-    int count = lucene->search(query);
-    emit searchResults(lucene->files());
-}
-
-void MainWindow::searchCleared()
-{
-    emit searchClear();
-}
-void MainWindow::filterSubmitted(QString query)
-{
-    QStringList errors = datafilter->parseFilter(query);
-    if (errors.count() == 0)
-        emit searchResults(datafilter->files());
-}
-
-void MainWindow::filterCleared()
-{
-    emit searchClear();
-}
-#endif

@@ -132,8 +132,6 @@ class PowerHist : public QwtPlot
         void recalc(bool force=false);
         void refreshZoneLabels();
 
-
-
     protected:
 
         void refreshHRZoneLabels();
@@ -157,7 +155,6 @@ class PowerHist : public QwtPlot
         bool withz;        // whether zeros are included in histogram
         double dt;         // length of sample
         bool absolutetime; // do we sum absolute or percentage?
-
 
     private:
 

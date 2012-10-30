@@ -29,7 +29,7 @@ using namespace lucene::queryParser;
 using namespace lucene::search;
 using namespace lucene::store;
 
-Lucene::Lucene(MainWindow *parent) : QObject(parent), main(parent)
+Lucene::Lucene(QObject *parent, MainWindow *main) : QObject(parent), main(main)
 {
     // create the directory if needed
     main->home.mkdir("index");
@@ -56,7 +56,7 @@ Lucene::Lucene(MainWindow *parent) : QObject(parent), main(parent)
 
     } catch (CLuceneError &e) {
 
-        qDebug()<<"clucene error!"<<e.what();
+        //qDebug()<<"clucene error!"<<e.what();
     }
 }
 
@@ -179,9 +179,11 @@ int Lucene::search(QString query)
 
     } catch (CLuceneError &e) {
 
-        qDebug()<<"clucene error:"<<e.what();
+        //qDebug()<<"clucene error:"<<e.what();
         return 0;
     }
+
+    emit results(filenames);
 
     return filenames.count();
 }

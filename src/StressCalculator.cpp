@@ -65,13 +65,23 @@ double StressCalculator::min(void) {
 
 
 
-void StressCalculator::calculateStress(MainWindow *main, QString, const QString &metric)
+void StressCalculator::calculateStress(MainWindow *main, QString, const QString &metric, bool isfilter, QStringList filter)
 {
     // get all metric data from the year 1900 - 3000
     QList<SummaryMetrics> results;
 
     // get metrics
     results = main->metricDB->getAllMetricsFor(QDateTime(QDate(1900,1,1)), QDateTime(QDate(3000,1,1)));
+
+    if (isfilter) {
+        // remove any we don't have filtered
+        QList<SummaryMetrics> filteredresults;
+        foreach (SummaryMetrics x, results) {
+            if (filter.contains(x.getFileName()))
+                filteredresults << x;
+        }
+        results = filteredresults;
+    }
 
     if (results.count() == 0) return; // no ride files found
 

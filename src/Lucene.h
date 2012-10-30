@@ -43,7 +43,7 @@ class Lucene : public QObject
     Q_OBJECT
 
 public:
-    Lucene(MainWindow *parent = 0);
+    Lucene(QObject *parent, MainWindow *main);
     ~Lucene();
 
     // Create/Delete Metrics
@@ -51,15 +51,16 @@ public:
     bool deleteRide(QString);
     void optimise(); // for optimising the index once updated
 
-    // search
-    int search(QString query); // run query and return number of results found
     QStringList &files() { return filenames; }
 
 protected:
 
-private slots:
+public slots:
+    // search
+    int search(QString query); // run query and return number of results found
 
 signals:
+    void results(QStringList);
 
 private:
     MainWindow *main;

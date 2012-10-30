@@ -57,7 +57,7 @@ class StressCalculator:public QObject {
 		double initialSTS, double initialLTS,
 		int shortTermDays, int longTermDays);
 
-	void calculateStress(MainWindow *, QString, const QString &metric);
+	void calculateStress(MainWindow *, QString, const QString &metric, bool filter = false, QStringList files = QStringList());
 
 	// x axes:
 	double *getSTSvalues() { return stsvalues.data(); }

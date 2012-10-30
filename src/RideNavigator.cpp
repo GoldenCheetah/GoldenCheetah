@@ -18,6 +18,7 @@
 
 #include "RideNavigator.h"
 #include "RideNavigatorProxy.h"
+#include "SearchFilterBox.h"
 
 #include <QtGui>
 #include <QString>
@@ -62,6 +63,11 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
     sortModel->setSourceModel(groupByModel);
     sortModel->setDynamicSortFilter(true);
     //sortModel->setSort(2, Qt::AscendingOrder); // date backwards
+
+#ifdef GC_HAVE_LUCENE
+    searchFilterBox = new SearchFilterBox(this, main);
+    mainLayout->addWidget(searchFilterBox);
+#endif
 
     // get setup
     tableView = new QTreeView;
@@ -121,8 +127,11 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
     connect(tableView,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showTreeContextMenuPopup(const QPoint &)));
     connect(tableView->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)), this, SLOT(setSortBy(int,Qt::SortOrder)));
 
-    connect(main, SIGNAL(searchResults(QStringList)), this, SLOT(searchStrings(QStringList)));
-    connect(main, SIGNAL(searchClear()), this, SLOT(clearSearch()));
+#ifdef GC_HAVE_LUCENE
+    connect(searchFilterBox, SIGNAL(searchResults(QStringList)), this, SLOT(searchStrings(QStringList)));
+    connect(searchFilterBox, SIGNAL(searchClear()), this, SLOT(clearSearch()));
+#endif
+
     // we accept drag and drop operations
     setAcceptDrops(true);
 }
@@ -951,8 +960,8 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             painter->fillRect(myOption.rect, background);
             //drawFocus(painter, myOption, myOption.rect);
             drawDisplay(painter, myOption, myOption.rect, "");
-            myOption.rect.setX(50);
-            myOption.rect.setWidth(pwidth-100);
+            myOption.rect.setX(25); // wider notes display
+            myOption.rect.setWidth(pwidth-50);// wider notes display
             //drawDisplay(painter, myOption, myOption.rect, calendarText);
             painter->setFont(myOption.font);
             painter->drawText(myOption.rect, Qt::AlignLeft | Qt::TextWordWrap, calendarText);

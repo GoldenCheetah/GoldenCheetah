@@ -52,7 +52,8 @@ CpintPlot::CpintPlot(MainWindow *main, QString p, const Zones *zones) :
     series(RideFile::watts),
     mainWindow(main),
     current(NULL),
-    bests(NULL)
+    bests(NULL),
+    isFiltered(false)
 {
     setInstanceName("CP Plot");
     assert(!USE_T0_IN_CP_MODEL); // doesn't work with energyMode=true
@@ -523,7 +524,7 @@ CpintPlot::calculate(RideItem *rideItem)
     current = new RideFileCache(mainWindow, mainWindow->home.absolutePath() + "/" + fileName);
 
     // get aggregates - incase not initialised from date change
-    if (bests == NULL) bests = new RideFileCache(mainWindow, startDate, endDate);
+    if (bests == NULL) bests = new RideFileCache(mainWindow, startDate, endDate, isFiltered, files);
 
     //
     // PLOT MODEL CURVE (DERIVED)
@@ -753,4 +754,22 @@ CpintPlot::pointHover(QwtPlotCurve *curve, int index)
     }
     // no point
     zoomer->setText("");
+}
+
+void
+CpintPlot::clearFilter()
+{
+    isFiltered = false;
+    files.clear();
+    delete bests;
+    bests = NULL;
+}
+
+void
+CpintPlot::setFilter(QStringList list)
+{
+    isFiltered = true;
+    files = list;
+    delete bests;
+    bests = NULL;
 }

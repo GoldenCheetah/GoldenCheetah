@@ -1002,3 +1002,4 @@ PowerHist::percentify(QVector<double> &array, double factor)
             if (array[i] > 0.01) // greater than 0.8s (i.e. not a double storage issue)
                 array[i] = factor * (array[i] / total) * (double)100.00;
 }
+

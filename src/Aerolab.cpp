@@ -869,7 +869,7 @@ bool Aerolab::estimateCdACrr(RideItem *rideItem)
                 // A11 * CdA + A12 * Crr = B1
                 // A21 * CdA + A22 * Crr = B2
                 double det = A11 * A22 - A12 * A21;
-                if (abs(det) > 0) {
+                if (fabs(det) > 0.00) {
                     // round and update if the values are in Aerolab's range
                     double cda = floor(10000 * (A22 * B1 - A12 * B2) / det + 0.5) / 10000;
                     double crr = floor(1000000 * (A11 * B2 - A21 * B1) / det + 0.5) / 1000000;

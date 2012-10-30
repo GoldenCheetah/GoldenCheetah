@@ -44,6 +44,15 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow) : GcWindow(mainWindow),
     vlayout->addWidget(powerHist);
     setLayout(vlayout);
 
+#ifdef GC_HAVE_LUCENE
+    // search filter box
+    isFiltered = false;
+    searchBox = new SearchFilterBox(this, mainWindow);
+    connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
+    connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
+    cl->addWidget(searchBox);
+#endif
+
     // bin width
     QHBoxLayout *binWidthLayout = new QHBoxLayout;
     QLabel *binWidthLabel = new QLabel(tr("Bin width"), this);
@@ -200,7 +209,11 @@ void HistogramWindow::seasonSelected(int index)
         QDate end = season.getEnd();
         if (end == QDate()) end = QDate(3000,12,31);
         if (start == QDate()) start = QDate(1900,1,1);
+#ifdef GC_HAVE_LUCENE
+        source = new RideFileCache(mainWindow, start, end, isFiltered, files);
+#else
         source = new RideFileCache(mainWindow, start, end);
+#endif
 
         stale = false;
 
@@ -311,7 +324,11 @@ HistogramWindow::updateChart()
             QDate end = season.getEnd();
             if (end == QDate()) end = QDate(3000,12,31);
             if (start == QDate()) start = QDate(1900,1,1);
+#ifdef GC_HAVE_LUCENE
+            source = new RideFileCache(mainWindow, start, end, isFiltered, files);
+#else
             source = new RideFileCache(mainWindow, start, end);
+#endif
 
             stale = false;
 
@@ -350,3 +367,23 @@ HistogramWindow::updateChart()
                      // of interval selection -- simplifies the setters
                      // and getters, so worth this 'hack'.
 }
+
+#ifdef GC_HAVE_LUCENE
+void 
+HistogramWindow::clearFilter()
+{
+    isFiltered = false;
+    files.clear();
+    stale = true;
+    updateChart();
+}
+
+void
+HistogramWindow::setFilter(QStringList list)
+{
+    isFiltered = true;
+    files = list;
+    stale = true;
+    updateChart();
+}
+#endif

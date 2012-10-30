@@ -34,7 +34,7 @@
 #include "RideMetadata.h"
 #include "SpecialFields.h"
 
-LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(parent), home(home), main(parent), active(false)
+LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(parent), home(home), main(parent), active(false), _amFiltered(false)
 {
     setStyleSheet("QFrame { FrameStyle = QFrame::NoFrame };"
                   "QWidget { background = Qt::white; border:0 px; margin: 2px; };");
@@ -46,6 +46,14 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     mainLayout->setContentsMargins(0,0,0,0);
     mainLayout->setSpacing(0);
     setContentsMargins(0,0,0,0);
+
+#ifdef GC_HAVE_LUCENE
+    searchBox = new SearchFilterBox(this, main);
+    connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
+    connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
+
+    mainLayout->addWidget(searchBox);
+#endif
 
     dateRangeTree = new QTreeWidget;
     dateRangeTree->setFrameStyle(QFrame::NoFrame);
@@ -1054,4 +1062,22 @@ LTMTool::deleteRange()
     int index = allDateRanges->indexOfChild(activeDateRange);
     delete allDateRanges->takeChild(index);
     seasons->deleteSeason(index);
+}
+
+void
+LTMTool::clearFilter()
+{
+    filenames.clear();
+    _amFiltered = false;
+
+    emit filterChanged();
+}
+
+void
+LTMTool::setFilter(QStringList files)
+{
+        _amFiltered = true;
+        filenames = files;
+
+        emit filterChanged();
 }
