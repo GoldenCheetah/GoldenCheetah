@@ -77,6 +77,7 @@
     <file>xml/train-layout.xml</file>
     <file>xml/diary-layout.xml</file>
     <file>xml/analysis-layout.xml</file>
+    <file>xml/home-layout.xml</file>
     <file>html/ltm-summary.html</file>
     <file>images/oxygen/play.png</file>
     <file>images/oxygen/pause.png</file>
