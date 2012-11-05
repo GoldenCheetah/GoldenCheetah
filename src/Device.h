@@ -30,6 +30,12 @@ struct DeviceDownloadFile
     QString     extension;
 };
 
+struct DeviceStoredRideItem
+{
+    int         id;
+    QDateTime   startTime;
+};
+
 struct DeviceRideItem
 {
     bool        wanted;

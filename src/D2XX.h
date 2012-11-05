@@ -47,6 +47,7 @@ class D2XX : public CommPort
     virtual int read(void *buf, size_t nbyte, QString &err);
     virtual int write(void *buf, size_t nbyte, QString &err);
     virtual QString name() const;
+    virtual bool setBaudRate(int speed, QString &err);
 };
 
 #endif // _GC_PT_D2XX_h
