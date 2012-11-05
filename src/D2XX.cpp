@@ -195,6 +195,19 @@ D2XX::name() const
     return info.Description;
 }
 
+bool
+D2XX::setBaudRate(int speed, QString &err)
+{
+    assert(_isOpen);
+    FT_STATUS ftStatus = lib->set_baud_rate(ftHandle, speed);
+    if (ftStatus != FT_OK) {
+        err = QString("FT_SetBaudRate: %1").arg(ftStatus);
+        return false;
+    }
+
+    return true;
+}
+
 QVector<CommPortPtr>
 D2XX::myListCommPorts(QString &err)
 {

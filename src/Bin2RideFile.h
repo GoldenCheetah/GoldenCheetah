@@ -16,16 +16,15 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _BinRideFile_h
-#define _BinRideFile_h
+#ifndef _Bin2RideFile_h
+#define _Bin2RideFile_h
 #include "GoldenCheetah.h"
 
 #include "RideFile.h"
 
-struct BinFileReader : public RideFileReader {
-    virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 
+struct Bin2FileReader : public RideFileReader {
+    virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const;
     bool hasWrite() const { return false; }
 };
 
-#endif // _BinRideFile_h
-
+#endif // _Bin2RideFile_h

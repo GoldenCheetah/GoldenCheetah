@@ -177,7 +177,7 @@ SOURCES += ../qxt/src/qxtspanslider.cpp \
            ../qxt/src/qxtscheduleheaderwidget.cpp \
            ../qxt/src/qxtscheduleviewheadermodel_p.cpp \
            ../qxt/src/qxtscheduleitemdelegate.cpp \
-           ../qxt/src/qxtstyleoptionscheduleviewitem.cpp
+           ../qxt/src/qxtstyleoptionscheduleviewitem.cpp \
 
 isEmpty( QTSOAP_INSTALL ) {
     include( ../qtsolutions/soap/qtsoap.pri )
@@ -215,6 +215,7 @@ HEADERS += \
         BatchExportDialog.h \
         BestIntervalDialog.h \
         BinRideFile.h \
+        Bin2RideFile.h \
         BingMap.h \
         CalendarDownload.h \
         ChooseCyclistDialog.h \
@@ -266,6 +267,7 @@ HEADERS += \
         IntervalItem.h \
         IntervalSummaryWindow.h \
         IntervalTreeView.h \
+        JouleDevice.h \
         JsonRideFile.h \
         LogTimeScaleDraw.h \
         LogTimeScaleEngine.h \
@@ -396,6 +398,7 @@ SOURCES += \
         BestIntervalDialog.cpp \
         BikeScore.cpp \
         BinRideFile.cpp \
+        Bin2RideFile.cpp \
         BingMap.cpp \
         CalendarDownload.cpp \
         ChooseCyclistDialog.cpp \
@@ -452,6 +455,7 @@ SOURCES += \
         IntervalItem.cpp \
         IntervalSummaryWindow.cpp \
         IntervalTreeView.cpp \
+        JouleDevice.cpp \
         LeftRightBalance.cpp \
         LogTimeScaleDraw.cpp \
         LogTimeScaleEngine.cpp \

@@ -317,6 +317,19 @@ Serial::name() const
     return path;
 }
 
+bool
+Serial::setBaudRate(int speed, QString &err)
+{
+    /* not yet implemented
+
+    struct termios tty;
+    if (cfsetspeed(&tty, speed) == -1) {
+        perror("cfsetspeed");
+        assert(0);
+    }
+    */
+}
+
 #ifndef Q_OS_WIN32
 //
 // Linux and Mac device enumerator matches wildcards in /dev
@@ -345,7 +358,7 @@ find_devices(char *result[], int capacity)
     // /dev/ttyMI*                     - MOXA PCI cards
     // /dev/rfcomm*                    - Bluetooth devices
     if (regcomp(&reg, 
-                "^(cu\\.(PL2303-[0-9A-F]+|ANTUSBStick.slabvcp|SLAB_USBtoUART|usbmodem[0-9A-F]+|usbserial-[0-9A-F]+|KeySerial[0-9])|ttyUSB[0-9]|ttyS[0-2]|ttyACM*|ttyMI*|rfcomm*)$",
+                "^(cu\\.(PL2303-[0-9A-F]+|ANTUSBStick.slabvcp|SLAB_USBtoUART|usbmodem[0-9A-F]+|usbserial-[0-9A-G]+|KeySerial[0-9])|ttyUSB[0-9]|ttyS[0-2]|ttyACM*|ttyMI*|rfcomm*)$",
                 REG_EXTENDED|REG_NOSUB)) {
         assert(0);
     }

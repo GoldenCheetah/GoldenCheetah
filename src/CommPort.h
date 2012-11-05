@@ -42,6 +42,8 @@ class CommPort
     virtual int read(void *buf, size_t nbyte, QString &err) = 0;
     virtual int write(void *buf, size_t nbyte, QString &err) = 0;
     virtual QString name() const = 0;
+    virtual bool setBaudRate(int speed, QString &err) = 0;
+
     QString type( void ) const;
     QString id( void ) const;
 
