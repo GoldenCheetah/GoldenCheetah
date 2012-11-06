@@ -378,9 +378,12 @@ RideNavigator::columnsChanged()
 
     // get column widths
     QString widths;
-    for (int i=0; i<tableView->header()->count(); i++)
-        if (tableView->header()->isSectionHidden(i) != true)
-        widths += QString("%1|").arg(tableView->columnWidth(i));
+    for (int i=0; i<tableView->header()->count(); i++) {
+        int index = tableView->header()->logicalIndex(i);
+        if (tableView->header()->isSectionHidden(index) != true) {
+           widths += QString("%1|").arg(tableView->columnWidth(index));
+        }
+    }
 
     // clean up
     active = false;
