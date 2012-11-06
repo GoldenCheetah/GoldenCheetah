@@ -91,7 +91,7 @@ struct Bin2FileReaderState
         return res;
     }
 
-    QDateTime read_date(double *secs, int *bytes_read = NULL, int *sum = NULL)
+    QDateTime read_date(int *bytes_read = NULL, int *sum = NULL)
     {
         int sec = bcd2Int(read_bytes(1, bytes_read, sum));
         int min = bcd2Int(read_bytes(1, bytes_read, sum));
@@ -105,14 +105,25 @@ struct Bin2FileReaderState
 
     QDateTime read_RTC_mark(double *secs, int *bytes_read = NULL, int *sum = NULL)
     {
-        QDateTime date = read_date(secs, bytes_read, sum);
+        QDateTime date = read_date(bytes_read, sum);
 
-        int dummy1 = read_bytes(1, bytes_read, sum);
+        read_bytes(1, bytes_read, sum); // dummy
         int time_moving = read_bytes(4, bytes_read, sum);
-        int secs2 = read_bytes(4, bytes_read, sum);
-        int dummy2 = read_bytes(16, bytes_read, sum);
+        *secs = double(read_bytes(4, bytes_read, sum));
+        read_bytes(16, bytes_read, sum);  // dummy
 
         return date;
+    }
+
+    int read_interval_mark(double *secs, int *bytes_read = NULL, int *sum = NULL)
+    {
+        int intervalNumber = read_bytes(1, bytes_read, sum);;
+
+        read_bytes(2, bytes_read, sum); // dummy
+        *secs = double(read_bytes(4, bytes_read, sum));
+        read_bytes(24, bytes_read, sum); // dummy
+
+        return intervalNumber;
     }
 
     void read_detail_record(double *secs, int *bytes_read = NULL, int *sum = NULL)
@@ -183,8 +194,7 @@ struct Bin2FileReaderState
         char data_version = read_bytes(1, bytes_read, sum);
         char firmware_minor_version = read_bytes(1, bytes_read, sum);
 
-        double *sec;
-        QDateTime t = read_date(sec, bytes_read, sum);
+        QDateTime t = read_date(bytes_read, sum);
 
         rideFile->setStartTime(t);
 
@@ -306,11 +316,27 @@ struct Bin2FileReaderState
 
                 for (int i = 0; i < 128; i++) {
                     int flag = read_bytes(1, &bytes_read, &sum);
+                    //b0..b1: "00" Detail Record
+                    //b0..b1: "01" RTC Mark Record
+                    //b0..b1: "00" Interval Record
 
-                    if ((flag & 0x03) == 0x01 || (flag & 0x03) == 0x03){
+                    //b2: reserved
+                    //b3: Power was calculated
+                    //b4: HPR packet missing
+                    //b5: CAD packet missing
+                    //b6: PWR packet missing
+                    //b7: Power data = old (No new power calculated)
+
+                    if (flag == 0xff) {
+                        // means invalid entry
+                        read_bytes(31, &bytes_read, &sum);
+                    }
+                    else if ((flag & 0x03) == 0x01){
                         t= read_RTC_mark(&secs, &bytes_read, &sum);
-                        if ((flag & 0x03) == 0x03)
-                            interval++;
+                    }
+                    else if ((flag & 0x03) == 0x03){
+                        int t = read_interval_mark(&secs, &bytes_read, &sum);
+                        interval = t;
                     }
                     else if ((flag & 0x03) == 0x00 ){
                         read_detail_record(&secs, &bytes_read, &sum);
