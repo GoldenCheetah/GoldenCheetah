@@ -326,7 +326,7 @@ ContributorsPage::ContributorsPage(MainWindow *main, QDir home) : main(main), ho
 
     QString contributorsTable = "<center><table><tr>";
     for (int i=0;i<contributors.count();i++){
-        contributorsTable.append("<td>"+contributors.at(i)+"</td>");
+        contributorsTable.append("<td><center>"+contributors.at(i)+"</center></td>");
         if ((i+1) % 2 == 0)
             contributorsTable.append("</tr><tr>");
     }
