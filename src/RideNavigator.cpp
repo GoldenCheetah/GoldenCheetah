@@ -85,6 +85,9 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
     tableView->setContextMenuPolicy(Qt::CustomContextMenu);
     tableView->header()->setStretchLastSection(false);
     tableView->header()->setMinimumSectionSize(0);
+#ifdef Q_OS_MAC
+    tableView->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
     //tableView->setUniformRowHeights(true);
     QFont smaller;
     smaller.setPointSize(smaller.pointSize()-2);
@@ -859,7 +862,7 @@ QSize NavigatorCellDelegate::sizeHint(const QStyleOptionViewItem & /*option*/, c
 
     if (rideNavigator->groupByModel->mapToSource(rideNavigator->sortModel->mapToSource(index)) != QModelIndex() &&
         rideNavigator->groupByModel->data(rideNavigator->sortModel->mapToSource(index), Qt::UserRole).toString() != "") {
-        s.setHeight(64);
+        s.setHeight(56);
     } else s.setHeight(18);
 #if 0
     if (rideNavigator->tableView->model()->data(index, Qt::UserRole).toString() != "") s.setHeight(18);

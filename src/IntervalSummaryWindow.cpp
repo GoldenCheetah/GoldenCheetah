@@ -22,11 +22,15 @@
 #include "Settings.h"
 #include "TimeUtils.h"
 
-IntervalSummaryWindow::IntervalSummaryWindow(MainWindow *mainWindow) : mainWindow(mainWindow) {
+IntervalSummaryWindow::IntervalSummaryWindow(MainWindow *mainWindow) : mainWindow(mainWindow)
+{
 	setWindowTitle(tr("Interval Summary"));
 	setReadOnly(true);
     setFrameStyle(QFrame::NoFrame);
 
+#ifdef Q_OS_MAC
+    setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
     connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
 }
 
