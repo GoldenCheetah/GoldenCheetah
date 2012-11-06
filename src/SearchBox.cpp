@@ -66,21 +66,22 @@ SearchBox::SearchBox(MainWindow *main, QWidget *parent)
 #ifdef Q_OS_MAC
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
+    setObjectName("SearchBox");
     setStyleSheet(QString( //"QLineEdit { padding-right: %1px; } "
-                          "QLineEdit {"
+                          "QLineEdit#SearchBox {"
                           "    selection-color: white;   "
                           //"    border: 0px groove gray;"
                           "    border-radius: 5px;"
                           "    padding: 0px %1px;"
                           "}"
-                          "QLineEdit:focus {"
+                          "QLineEdit#SearchBox:focus {"
                           "    selection-color: white;   "
                           //"    border: 0px groove gray;"
                           "    border-radius: 5px;"
                           "    padding: 0px %1px;"
                           "}"
                           ""
-                          "QLineEdit:edit-focus {"
+                          "QLineEdit#SearchBox:edit-focus {"
                           "    selection-color: white;   "
                           //"    border: 0px groove gray;"
                           "    border-radius: 5px;"
