@@ -21,6 +21,9 @@
 #include "GoldenCheetah.h"
 
 #include "RideFile.h"
+#ifdef Q_OS_LINUX
+#include <stdint.h>
+#endif
 
 struct Bin2FileReader : public RideFileReader {
     virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const;
