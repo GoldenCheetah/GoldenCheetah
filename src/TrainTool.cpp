@@ -251,6 +251,13 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     trainSplitter->addWidget(mediaTree);
 #endif
 
+#ifdef Q_OS_MAC
+    // get rid of annoying focus rectangle for sidebar components
+    mediaTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+    workoutTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+    deviceTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
+
     // handle config changes
     //connect(serverTree,SIGNAL(itemSelectionChanged()), this, SLOT(serverTreeWidgetSelectionChanged()));
     connect(deviceTree,SIGNAL(itemSelectionChanged()), this, SLOT(deviceTreeWidgetSelectionChanged()));

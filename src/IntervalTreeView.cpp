@@ -26,6 +26,9 @@ IntervalTreeView::IntervalTreeView(MainWindow *mainWindow) : mainWindow(mainWind
     setDragDropMode(QAbstractItemView::InternalMove);
     setDragDropOverwriteMode(true);
     setDropIndicatorShown(true);
+#ifdef Q_OS_MAC
+    setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
     invisibleRootItem()->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 }
 

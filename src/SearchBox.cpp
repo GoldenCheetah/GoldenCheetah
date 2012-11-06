@@ -63,6 +63,9 @@ SearchBox::SearchBox(MainWindow *main, QWidget *parent)
     connect(dropMenu, SIGNAL(triggered(QAction*)), this, SLOT(runMenu(QAction*)));
 
     int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
+#ifdef Q_OS_MAC
+    setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
     setStyleSheet(QString( //"QLineEdit { padding-right: %1px; } "
                           "QLineEdit {"
                           "    selection-color: white;   "
