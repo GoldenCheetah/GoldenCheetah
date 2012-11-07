@@ -24,6 +24,9 @@
 #define myRideItem property("ride").value<RideItem*>()
 
 #include <QString>
+#include <QMenu>
+#include <QPushButton>
+#include <QToolButton>
 #include <QWidget>
 #include <QObject>
 #include <QMetaObject>
@@ -91,6 +94,8 @@ private:
     int oWidth, oHeight, oX, oY, mX, mY;
     double oHeightFactor, oWidthFactor;
 
+public slots:
+    void _closeWindow();
 
 signals:
     void controlsChanged(QWidget*);
@@ -103,6 +108,9 @@ signals:
     void moving(GcWindow*);
     void resized(GcWindow*); // finished resizing
     void moved(GcWindow*);   // finished moving
+
+    void showControls();
+    void closeWindow(GcWindow*);
 
 public:
 
@@ -155,11 +163,16 @@ public:
     virtual void mousePressEvent(QMouseEvent *);
     virtual void mouseReleaseEvent(QMouseEvent *);
     virtual void mouseMoveEvent(QMouseEvent *);
+    void enterEvent(QEvent *);
+    void leaveEvent(QEvent *);
     void setDragState(DragState);
     void setCursorShape(DragState);
     DragState spotHotSpot(QMouseEvent *);
     void setNewSize(int w, int h);
 
+    QPushButton *settingsButton, *closeButton;
+    QToolButton *menuButton;
+    QMenu *menu;
 };
 
 

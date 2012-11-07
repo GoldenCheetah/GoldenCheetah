@@ -64,6 +64,7 @@ class QTFullScreen;
 class TrainTool;
 class Lucene;
 class NamedSearches;
+class ChartSettings;
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 
@@ -138,6 +139,7 @@ class MainWindow : public QMainWindow
         HomeWindow *trainWindow;
         HomeWindow *analWindow;
         HomeWindow *currentWindow;  // tracks the curerntly showing window
+        ChartSettings *chartSettings;
 
         // state data
         SpecialFields specialFields;

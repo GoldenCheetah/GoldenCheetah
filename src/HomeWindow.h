@@ -19,6 +19,7 @@
 #ifndef _GC_HomeWindow_h
 #define _GC_HomeWindow_h 1
 #include "GoldenCheetah.h"
+#include "ChartSettings.h"
 #include "GcWindowRegistry.h"
 #include "GcWindowLayout.h"
 
@@ -72,6 +73,9 @@ class HomeWindow : public GcWindow
         void appendChart(GcWinID id); // called from MainWindow to inset chart
         bool removeChart(int, bool confirm = true);
         void titleChanged();
+
+        // window wants to close...
+        void closeWindow(GcWindow*);
 
         // save / restore window state
         void saveState();

@@ -126,6 +126,9 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     tabLayout->setContentsMargins(0,0,0,0);
     tabLayout->setSpacing(0);
     tabbed = new QTabWidget(this);
+#ifdef Q_OS_MAC
+    tabbed->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
     tabbed->setContentsMargins(0,0,0,0);
     tabbed->setTabsClosable(false);
     tabbed->setPalette(palette);
@@ -554,6 +557,10 @@ HomeWindow::addChart(GcWindow* newone)
         QWidget *x = dynamic_cast<GcWindow*>(newone)->controls();
         QWidget *c = (x != NULL) ? x : new QWidget(this);
 
+        // link settings button to show controls
+        connect(newone, SIGNAL(showControls()), mainWindow->chartSettings, SLOT(show()));
+        connect(newone, SIGNAL(closeWindow(GcWindow*)), this, SLOT(closeWindow(GcWindow*)));
+
         if (currentStyle == 2 && chartCursor >= 0)
             controlStack->insertWidget(chartCursor, c);
         else
@@ -833,12 +840,6 @@ HomeWindow::eventFilter(QObject *object, QEvent *e)
             for(int i=0; i<charts.count(); i++) {
                 if (charts[i] == object) {
 
-                    // close button?
-                    if (x > (charts[i]->width()-15)) {
-                        return removeChart(i);
-
-                    } else {
-
                         if (charts[i] != clicked) { // we aren't clicking to toggle
 
                             // clear the chart that is currently clicked
@@ -858,8 +859,6 @@ HomeWindow::eventFilter(QObject *object, QEvent *e)
                             charts[i]->repaint();
                             clicked = NULL;
                         }
-                    }
-                    return false;
                 }
             }
         }
@@ -1476,4 +1475,9 @@ bool ViewParser::characters( const QString&)
 bool ViewParser::endDocument()
 {
     return TRUE;
+}
+
+void HomeWindow::closeWindow(GcWindow*thisone)
+{
+    if (charts.contains(thisone)) removeChart(charts.indexOf(thisone));
 }
