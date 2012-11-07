@@ -182,7 +182,7 @@ struct Bin2FileReaderState
         (*secs)++;
     }
 
-    void read_header(uint16_t &header, uint16_t &command, u_int16_t &length, int *bytes_read = NULL, int *sum = NULL)
+    void read_header(uint16_t &header, uint16_t &command, uint16_t &length, int *bytes_read = NULL, int *sum = NULL)
     {
         header = read_bytes(2, bytes_read, sum);
         command = read_bytes(2, bytes_read, sum);
@@ -235,7 +235,7 @@ struct Bin2FileReaderState
                 int i = chr->toAscii();
 
                 int flag = read_bytes(1, bytes_read, sum);
-                u_int16_t id = read_bytes(2, bytes_read, sum);
+                uint16_t id = read_bytes(2, bytes_read, sum);
                 read_bytes(2, bytes_read, sum);
                 read_bytes(2, bytes_read, sum);
                 QString device_type_str;
@@ -264,8 +264,8 @@ struct Bin2FileReaderState
 
         if (header1 == 0x10 && header2 == 0x02 && command == 0x2022)
         {
-            u_int16_t length = read_bytes(2, &bytes_read, &sum); // Always 4098 for Joule GPS
-            u_int16_t page_number = read_bytes(2, &bytes_read, &sum); // Page #
+            uint16_t length = read_bytes(2, &bytes_read, &sum); // Always 4098 for Joule GPS
+            uint16_t page_number = read_bytes(2, &bytes_read, &sum); // Page #
 
             if (page_number == 0) {
                 // Page #0
@@ -305,8 +305,8 @@ struct Bin2FileReaderState
 
         if (header1 == 0x10 && header2 == 0x02 && command == 0x2022)
         {
-            u_int16_t length = read_bytes(2, &bytes_read, &sum); // Always 4098
-            u_int16_t page_number = read_bytes(2, &bytes_read, &sum); // Page #
+            uint16_t length = read_bytes(2, &bytes_read, &sum); // Always 4098
+            uint16_t page_number = read_bytes(2, &bytes_read, &sum); // Page #
 
             if (page_number > 0) {
                 // Page # >0
@@ -363,7 +363,7 @@ struct Bin2FileReaderState
 
         if (header == START && command == UNIT_VERSION)
         {
-            u_int16_t length = read_bytes(2, &bytes_read, &sum); // Always 4098 for Joule GPS
+            uint16_t length = read_bytes(2, &bytes_read, &sum); // Always 4098 for Joule GPS
 
             int major_version = read_bytes(1, &bytes_read, &sum);
             int minor_version = read_bytes(2, &bytes_read, &sum);
@@ -388,10 +388,10 @@ struct Bin2FileReaderState
 
         if (header == START && command == SYSTEM_INFO)
         {
-            u_int16_t length = read_bytes(2, &bytes_read, &sum); // Always 4098 for Joule GPS
+            uint16_t length = read_bytes(2, &bytes_read, &sum); // Always 4098 for Joule GPS
 
             read_bytes(52, &bytes_read, &sum);
-            u_int16_t odometer = read_bytes(8, &bytes_read, &sum); // Always 4098 for Joule GPS
+            uint16_t odometer = read_bytes(8, &bytes_read, &sum); // Always 4098 for Joule GPS
             deviceInfo += QString("Odometer %1km\n").arg(odometer/1000.0);
 
             char checksum = read_bytes(1, &bytes_read, &sum); // Always 4098 for Joule GPS
