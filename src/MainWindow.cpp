@@ -498,6 +498,18 @@ MainWindow::MainWindow(const QDir &home) :
     intervalSplitter->addWidget(intervalSummaryWindow);
     intervalSplitter->setFrameStyle(QFrame::NoFrame);
 
+    QVariant intervalSplitterSizes = appsettings->cvalue(cyclist, GC_SETTINGS_INTERVALSPLITTER_SIZES); 
+    if (intervalSplitterSizes != QVariant()) {
+        intervalSplitter->restoreState(intervalSplitterSizes.toByteArray());
+        intervalSplitter->setOpaqueResize(true); // redraw when released, snappier UI
+    } else {
+        QList<int> sizes;
+        sizes.append(400);
+        sizes.append(200);
+        sizes.append(200);
+        intervalSplitter->setSizes(sizes);
+    }
+
     QTreeWidgetItem *last = NULL;
     QStringListIterator i(RideFileFactory::instance().listRideFiles(home));
     while (i.hasNext()) {
@@ -821,6 +833,7 @@ MainWindow::MainWindow(const QDir &home) :
     connect(intervalWidget,SIGNAL(itemSelectionChanged()), this, SLOT(intervalTreeWidgetSelectionChanged()));
     connect(intervalWidget,SIGNAL(itemChanged(QTreeWidgetItem *,int)), this, SLOT(intervalEdited(QTreeWidgetItem*, int)));
     connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
+    connect(intervalSplitter,SIGNAL(splitterMoved(int,int)), this, SLOT(intervalSplitterMoved(int,int)));
 
     connect(this, SIGNAL(rideDirty()), this, SLOT(enableSaveButton()));
     connect(this, SIGNAL(rideClean()), this, SLOT(enableSaveButton()));
@@ -1170,6 +1183,12 @@ void
 MainWindow::resizeEvent(QResizeEvent*)
 {
     appsettings->setValue(GC_SETTINGS_MAIN_GEOM, geometry());
+}
+
+void
+MainWindow::intervalSplitterMoved(int pos, int /*index*/)
+{
+    appsettings->setCValue(cyclist, GC_SETTINGS_INTERVALSPLITTER_SIZES, intervalSplitter->saveState());
 }
 
 void
