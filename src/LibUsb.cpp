@@ -301,7 +301,8 @@ struct usb_dev_handle* LibUsb::OpenFortius()
 
         for (dev = bus->devices; dev; dev = dev->next) {
 
-            if (dev->descriptor.idVendor == FORTIUS_VID && dev->descriptor.idProduct == FORTIUS_PID) {
+            if (dev->descriptor.idVendor == FORTIUS_VID && 
+                (dev->descriptor.idProduct == FORTIUS_PID || dev->descriptor.idProduct == FORTIUSVR_PID)) {
 
                 //Avoid noisy output
                 //qDebug() << "Found a Garmin USB2 ANT+ stick";
