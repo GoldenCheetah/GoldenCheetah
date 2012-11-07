@@ -20,8 +20,8 @@
 
 GcCalendar::GcCalendar(MainWindow *mainWindow) : mainWindow(mainWindow)
 {
-    setAutoFillBackground(false);
     setContentsMargins(0,0,0,0);
+    setAutoFillBackground(true);
 
     month = year = 0;
 
@@ -224,6 +224,13 @@ GcCalendar::event(QEvent *e)
         e->type() != QEvent::LayoutRequest) {
         mainWindow->setBubble("");
         //qDebug()<<"event"<<e->type();
+    }
+
+    if (e->type() == QEvent::Paint) {
+        // fill the background
+        QPainter painter(this);
+        QRect all(0,0,width(),height());
+        painter.fillRect(all, QColor("#B3B4BA"));
     }
 
     int n=0;

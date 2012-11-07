@@ -404,20 +404,6 @@ MainWindow::MainWindow(const QDir &home) :
     connect(chartMenu, SIGNAL(aboutToShow()), this, SLOT(setChartMenu()));
     connect(chartMenu, SIGNAL(triggered(QAction*)), this, SLOT(addChart(QAction*)));
 
-    // show hide sidebar
-    rside = new QPushButton(rhideIcon, "", this);
-    rside->setFocusPolicy(Qt::NoFocus);
-    rside->setIconSize(QSize(15,15));
-    rside->setFixedWidth(20);
-    rside->setToolTip("Show/Hide Sidebar");
-    rside->setAutoFillBackground(false);
-    rside->setAutoDefault(false);
-    rside->setFlat(true);
-    rspacerLayout->addWidget(rside);
-    connect(rside, SIGNAL(clicked()), this, SLOT(toggleRSidebar()));
-    rspacerLayout->addStretch();
-
-
 #ifdef Q_OS_MAC
     side->setStyle(macstyler);
     style->setStyle(macstyler);
@@ -529,6 +515,10 @@ MainWindow::MainWindow(const QDir &home) :
     chartTool = new GcWindowTool(this);
 #endif
 
+    // RIGHT SIDEBAR
+    gcCalendar = new GcCalendar(this);
+    gcCalendar->setStyleSheet("background: #B3B4BA;");
+
     // TOOLBOX
     toolBox = new QToolBox(this);
     toolBox->setAcceptDrops(true);
@@ -542,11 +532,8 @@ MainWindow::MainWindow(const QDir &home) :
                            "font-weight: bold; }");
 
     toolBox->setFrameStyle(QFrame::NoFrame);
-    //toolBox->setPalette(toolbar->palette());
     toolBox->setContentsMargins(0,0,0,0);
     toolBox->layout()->setSpacing(0);
-
-    //toolBox->setFixedWidth(350);
 
     // CONTAINERS FOR TOOLBOX
     masterControls = new QStackedWidget(this);
@@ -595,7 +582,7 @@ MainWindow::MainWindow(const QDir &home) :
     // POPULATE TOOLBOX
 
     toolBox->addItem(intervalSplitter, QIcon(":images/activity.png"), "Activity History");
-    //toolBox->addItem(intervalSplitter, QIcon(":images/stopwatch.png"), "Activity Intervals");
+    toolBox->addItem(gcCalendar, QIcon(":images/toolbar/main/diary.png"), "Calendar");
     toolBox->addItem(trainTool->controls(), QIcon(":images/library.png"), "Workout Library");
 
     // Chart Settings now in their own dialog box
@@ -629,25 +616,10 @@ MainWindow::MainWindow(const QDir &home) :
     views->setCurrentIndex(0);          // default to Analysis
     views->setContentsMargins(0,0,0,0);
 
-    // RIGHT SIDEBAR
-    rightBar = new QWidget(this);
-    QPalette rightpal;
-    rightpal.setColor(QPalette::Background, QColor("#B3B4BA"));
-    rightBar->setPalette(rightpal);
-    rightBar->setContentsMargins(0,0,0,0);
-    rightBar->setAutoFillBackground(true);
-    rightBar->setFixedWidth(250);
-    QVBoxLayout *rbl = new QVBoxLayout;
-    gcCalendar = new GcCalendar(this);
-    rbl->addWidget(gcCalendar);
-    rbl->setSpacing(0);
-    rightBar->setLayout(rbl);
-    rightBar->hide();
 
     // SPLITTER
     splitter->addWidget(toolBox);
     splitter->addWidget(views);
-    splitter->addWidget(rightBar);
     QVariant splitterSizes = appsettings->cvalue(cyclist, GC_SETTINGS_SPLITTER_SIZES); 
     if (splitterSizes != QVariant()) {
         splitter->restoreState(splitterSizes.toByteArray());
@@ -781,10 +753,6 @@ MainWindow::MainWindow(const QDir &home) :
     showhideSidebar = viewMenu->addAction(tr("Show Left Sidebar"), this, SLOT(showSidebar(bool)));
     showhideSidebar->setCheckable(true);
     showhideSidebar->setChecked(true);
-    showhideRSidebar = viewMenu->addAction(tr("Show Right Sidebar"), this, SLOT(showRSidebar(bool)));
-    showhideRSidebar->setCheckable(true);
-    showhideRSidebar->setChecked(false);
-    //connect(showhideSidebar, SIGNAL(triggered(bool)), this, SLOT(showSidebar(bool)));
 
     showhideToolbar = viewMenu->addAction(tr("Show Toolbar"), this, SLOT(showToolbar(bool)));
     showhideToolbar->setCheckable(true);
@@ -855,34 +823,11 @@ MainWindow::showDock()
 }
 
 void
-MainWindow::toggleRSidebar()
-{
-    showRSidebar(!rightBar->isVisible());
-}
-
-void
 MainWindow::toggleSidebar()
 {
     showSidebar(!toolBox->isVisible());
 }
 
-void
-MainWindow::showRSidebar(bool want)
-{
-    static const QIcon hideIcon(":images/toolbar/main/hiderside.png");
-    static const QIcon showIcon(":images/toolbar/main/showrside.png");
-
-    if (want) {
-        rightBar->show();
-        rside->setIcon(hideIcon);
-    } else {
-        rightBar->hide();
-        rside->setIcon(showIcon);
-    }
-    showhideRSidebar->setChecked(rightBar->isVisible());
-    setStyle();
-
-}
 void
 MainWindow::showSidebar(bool want)
 {
