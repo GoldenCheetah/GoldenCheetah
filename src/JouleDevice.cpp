@@ -22,7 +22,7 @@
 #include "Device.h"
 #include <math.h>
 #include <errno.h>
-#include <termios.h>
+//#include <termios.h>
 
 #define JOULE_DEBUG false // debug traces
 
