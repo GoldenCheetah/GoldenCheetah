@@ -89,7 +89,7 @@ SearchBox::SearchBox(MainWindow *main, QWidget *parent)
                           "}"
                           "QMenu { background-color: white; color: black; }"
                           "QMenu::item:selected { background-color: gray; color: white; }"
-                          "QToolTip { background: yellow; foreground black; }"
+                          "QToolTip { background: yellow; color: black; }"
                  ).arg(clearButton->sizeHint().width() + frameWidth + 8));
 
     QSize msz = minimumSizeHint();
