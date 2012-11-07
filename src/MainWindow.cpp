@@ -482,9 +482,18 @@ MainWindow::MainWindow(const QDir &home) :
     allIntervals->setText(0, tr("Intervals"));
     intervalWidget->expandItem(allIntervals);
 
+    QWidget *activityHistory = new QWidget(this);
+    activityHistory->setContentsMargins(0,0,0,0);
+    activityHistory->setStyleSheet("padding: 0px; border: 0px; margin: 0px;");
+    QVBoxLayout *activityLayout = new QVBoxLayout(activityHistory);
+    activityLayout->setSpacing(0);
+    activityLayout->setContentsMargins(0,0,0,0);
+    activityLayout->addWidget(listView);
+
     intervalSplitter = new QSplitter(this);
     intervalSplitter->setHandleWidth(1);
     intervalSplitter->setOrientation(Qt::Vertical);
+    intervalSplitter->addWidget(activityHistory);
     intervalSplitter->addWidget(intervalWidget);
     intervalSplitter->addWidget(intervalSummaryWindow);
     intervalSplitter->setFrameStyle(QFrame::NoFrame);
@@ -572,16 +581,9 @@ MainWindow::MainWindow(const QDir &home) :
     currentWindow = analWindow;
 
     // POPULATE TOOLBOX
-    QWidget *activityHistory = new QWidget(this);
-    activityHistory->setContentsMargins(0,0,0,0);
-    activityHistory->setStyleSheet("padding: 0px; border: 0px; margin: 0px;");
-    QVBoxLayout *activityLayout = new QVBoxLayout(activityHistory);
-    activityLayout->setSpacing(0);
-    activityLayout->setContentsMargins(0,0,0,0);
-    activityLayout->addWidget(listView);
 
-    toolBox->addItem(activityHistory, QIcon(":images/activity.png"), "Activity History");
-    toolBox->addItem(intervalSplitter, QIcon(":images/stopwatch.png"), "Activity Intervals");
+    toolBox->addItem(intervalSplitter, QIcon(":images/activity.png"), "Activity History");
+    //toolBox->addItem(intervalSplitter, QIcon(":images/stopwatch.png"), "Activity Intervals");
     toolBox->addItem(trainTool->controls(), QIcon(":images/library.png"), "Workout Library");
 
     // Chart Settings now in their own dialog box
