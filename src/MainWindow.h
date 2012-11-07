@@ -236,6 +236,7 @@ class MainWindow : public QMainWindow
         void rideTreeWidgetSelectionChanged();
         void intervalTreeWidgetSelectionChanged();
         void splitterMoved(int, int);
+        void intervalSplitterMoved(int, int);
         void newCyclist();
         void openCyclist();
         void downloadRide();
