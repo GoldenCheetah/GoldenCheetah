@@ -218,6 +218,7 @@ HEADERS += \
         Bin2RideFile.h \
         BingMap.h \
         CalendarDownload.h \
+        ChartSettings.h \
         ChooseCyclistDialog.h \
         Colors.h \
         ColorButton.h \
@@ -401,6 +402,7 @@ SOURCES += \
         Bin2RideFile.cpp \
         BingMap.cpp \
         CalendarDownload.cpp \
+        ChartSettings.cpp \
         ChooseCyclistDialog.cpp \
         Coggan.cpp \
         Colors.cpp \

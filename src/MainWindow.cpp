@@ -95,6 +95,8 @@
 #include "NamedSearch.h"
 #endif
 
+#include "ChartSettings.h"
+
 #include <assert.h>
 #include <QApplication>
 #include <QtGui>
@@ -581,7 +583,12 @@ MainWindow::MainWindow(const QDir &home) :
     toolBox->addItem(activityHistory, QIcon(":images/activity.png"), "Activity History");
     toolBox->addItem(intervalSplitter, QIcon(":images/stopwatch.png"), "Activity Intervals");
     toolBox->addItem(trainTool->controls(), QIcon(":images/library.png"), "Workout Library");
-    toolBox->addItem(masterControls, QIcon(":images/settings.png"), "Chart Settings");
+
+    // Chart Settings now in their own dialog box
+    chartSettings = new ChartSettings(this, masterControls);
+    //toolBox->addItem(masterControls, QIcon(":images/settings.png"), "Chart Settings");
+    chartSettings->hide();
+
 #if 0 // XXX NOT YET IMPLEMENTED
     toolBox->addItem(new AthleteTool(QFileInfo(home.path()).path(), this), QIcon(":images/toolbar/main/athlete.png"), "Athletes");
 #endif

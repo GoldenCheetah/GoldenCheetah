@@ -35,6 +35,12 @@ void GcWindow::setControls(QWidget *x)
 {
     _controls = x;
     emit controlsChanged(_controls);
+
+    if (x != NULL) {
+        menu->clear();
+        menu->addAction(tr("Chart Settings"), this, SIGNAL(showControls()));
+        menu->addAction(tr("Close"), this, SLOT(_closeWindow()));
+    }
 }
 
 QString GcWindow::instanceName() const
@@ -145,6 +151,23 @@ GcWindow::GcWindow()
     setResizable(false);
     setMouseTracking(true);
     setProperty("color", Qt::white);
+
+    // make sure its underneath the toggle button
+    menuButton = new QToolButton(this);
+    menuButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
+    menuButton->setCursor(Qt::ArrowCursor);
+    menuButton->setPopupMode(QToolButton::InstantPopup);
+    menuButton->setFixedSize(15,20);
+
+    menu = new QMenu(this);
+    menuButton->setMenu(menu);
+    menu->addAction(tr("Close"), this, SLOT(_closeWindow()));
+
+    menuButton->hide();
+
+#ifndef Q_OS_MAC // spacing ..
+    menuButton->move(0,0);
+#endif
 }
 
 GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
@@ -160,6 +183,23 @@ GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
     setResizable(false);
     setMouseTracking(true);
     setProperty("color", Qt::white);
+
+    // make sure its underneath the toggle button
+    menuButton = new QToolButton(this);
+    menuButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
+    menuButton->setCursor(Qt::ArrowCursor);
+    menuButton->setPopupMode(QToolButton::InstantPopup);
+    menuButton->setFixedSize(15,20);
+
+    menu = new QMenu(this);
+    menuButton->setMenu(menu);
+    menu->addAction(tr("Close"), this, SLOT(_closeWindow()));
+
+    menuButton->hide();
+
+#ifndef Q_OS_MAC // spacing ..
+    menuButton->move(0,0);
+#endif
 }
 
 GcWindow::~GcWindow()
@@ -229,11 +269,13 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         // border
         painter.setBrush(Qt::NoBrush);
         if (underMouse()) {
+#if 0
             QPixmap sized = closeImage.scaled(QSize(contentsMargins().top()-6,
                                                     contentsMargins().top()-6));
             painter.setPen(Qt::black);
             //painter.drawRect(QRect(0,0,width()-1,height()-1));//XXX pointless 
             painter.drawPixmap(width()-3-sized.width(), 3, sized.width(), sized.height(), sized);
+#endif
         } else {
             painter.setPen(Qt::darkGray);
             //painter.drawRect(QRect(0,0,width()-1,height()-1)); //XXX pointless
@@ -351,8 +393,8 @@ GcWindow::spotHotSpot(QMouseEvent *e)
     int _height = height();
     int _width = width();
 
-    if (e->x() > (2 + width() - corner) && e->y() < corner) return (Close);
-    else if (_x <= corner && _y <= corner) return (TLCorner);
+    //if (e->x() > (2 + width() - corner) && e->y() < corner) return (Close);
+    if (_x <= corner && _y <= corner) return (TLCorner);
     else if (_x >= (_width-corner) && _y <= corner) return (TRCorner);
     else if (_x <= corner && _y >= (_height-corner)) return (BLCorner);
     else if (_x >= (_width-corner) && _y >= (_height-corner)) return (BRCorner);
@@ -573,4 +615,27 @@ GcWindow::setCursorShape(DragState d)
         setCursor(Qt::ArrowCursor);
         break;
     }
+}
+
+void
+GcWindow::enterEvent(QEvent *)
+{
+    if (property("isManager").toBool() == false) {
+        if (contentsMargins().top() > 20) menuButton->setFixedSize(15,20);
+        else menuButton->setFixedSize(15,15);
+        menuButton->show();
+    }
+}
+
+
+void
+GcWindow::leaveEvent(QEvent *)
+{
+    menuButton->hide();
+}
+
+void
+GcWindow::_closeWindow()
+{
+    emit closeWindow(this);
 }
