@@ -272,9 +272,7 @@ class MainWindow : public QMainWindow
         void showTools();
         void showRhoEstimator();
         void toggleSidebar();
-        void toggleRSidebar();
         void showSidebar(bool want);
-        void showRSidebar(bool want);
         void showToolbar(bool want);
         void showWorkoutWizard();
         void resetWindowLayout();
@@ -348,7 +346,7 @@ class MainWindow : public QMainWindow
         QAction *showhideRSidebar;
 
         // toolbar butttons
-        QPushButton *side, *rside, *style, *full, *saveButton;
+        QPushButton *side, *style, *full, *saveButton;
         QWidget *analButtons;
         QMenu *chartMenu;
         QMenu *subChartMenu;
