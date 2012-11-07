@@ -43,6 +43,7 @@ extern "C" {
 #define FORTIUS_VID       0x3561
 #define FORTIUS_INIT_PID  0xe6be    // uninitialised Fortius PID
 #define FORTIUS_PID       0x1942    // once firmware loaded Fortius PID
+#define FORTIUSVR_PID     0x1932    // Fortius VR doesn't need firmware download ?
 
 #define TYPE_ANT     0
 #define TYPE_FORTIUS 1
