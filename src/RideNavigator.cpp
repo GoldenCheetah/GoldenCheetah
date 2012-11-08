@@ -26,8 +26,8 @@
 #define tr(s) QObject::tr(s)
 
 // default column layouts etc
-static const QString defaultColumns = QString("*|Duration|Distance|TSS|IF|Date|");
-static const QString defaultWidths = QString("0|50|50|50|50|50|");
+static const QString defaultColumns = QString("*|Workout Code|TSS|Date|");
+static const QString defaultWidths = QString("0|80|50|50|");
 static const int defaultSortBy = 2;
 
 RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), _groupBy(-1)
