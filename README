@@ -1,15 +1,9 @@
-To build
+Golden Cheetah install and build instructions are documented
+for each platform;
 
-  cp src/gcconfig.pri.in src/gcconfig.pri
-  cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
+INSTALL-WIN32   For building on Microsoft Windows
+INSTALL-LINUX   For building on Ubuntu Linux
+INSTALL-MAC     For building on Apple OS X
 
-Edit both src/gcconfig.pri and qwt/qwtconfig.pri as necessary, then
-
-  qmake
-  make
-
-To uninstall the older FTDI VCP drivers on Mac OS X, open a Terminal and type:
-
-  sudo mv /System/Library/Extensions/FTDIUSBSerialDriver.kext /tmp
-
-Type your password when prompted, then restart your computer.
+Alternatively official builds are available from http://www.goldencheetah.org
+whilst latest developer builds are available from http://goldencheetah.stand2surf.net
