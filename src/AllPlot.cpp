@@ -196,6 +196,27 @@ class AllPlotZoneLabel: public QwtPlotItem
         }
 };
 
+class TimeScaleDraw: public QwtScaleDraw
+{
+
+    public:
+
+    TimeScaleDraw(bool *bydist) : QwtScaleDraw(), bydist(bydist) {}
+
+    virtual QwtText label(double v) const
+    {
+        if (*bydist) {
+            return QString("%1").arg(v);
+        } else {
+            QTime t = QTime().addSecs((int)v*60);
+            return t.toString("hh:mm");
+        }
+    }
+    private:
+    bool *bydist;
+
+};
+
 
 static inline double
 max(double a, double b) { if (a > b) return a; else return b; }
@@ -414,11 +435,11 @@ AllPlot::configChanged()
     QPalette pal;
 
     // tick draw
-    QwtScaleDraw *sd = new QwtScaleDraw;
-    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    setAxisScaleDraw(QwtPlot::xBottom, sd);
+    TimeScaleDraw *tsd = new TimeScaleDraw(&this->bydist) ;
+    tsd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisScaleDraw(QwtPlot::xBottom, tsd);
 
-    sd = new QwtScaleDraw;
+    QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisScaleDraw(QwtPlot::yLeft, sd);
     pal.setColor(QPalette::WindowText, GColor(CPOWER));
@@ -930,7 +951,7 @@ AllPlot::setXTitle()
     if (bydist)
         setAxisTitle(xBottom, tr("Distance ")+QString(unit.toString() == "Metric"?"(km)":"(miles)"));
     else
-        setAxisTitle(xBottom, tr("Time (minutes)"));
+        setAxisTitle(xBottom, tr("Time (Hours:Minutes)"));
 }
 
 void
