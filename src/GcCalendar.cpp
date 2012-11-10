@@ -416,7 +416,7 @@ GcLabel::paintEvent(QPaintEvent *e)
     if (selected) {
         QPainter painter(this);
         QRect all(0,0,width(),height());
-        painter.fillRect(all, QColor(Qt::black));
+        painter.fillRect(all, GColor(CCALCURRENT));
     }
 
     if (xoff || yoff) {
