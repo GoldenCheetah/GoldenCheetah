@@ -517,7 +517,8 @@ MainWindow::MainWindow(const QDir &home) :
 
     // RIGHT SIDEBAR
     gcCalendar = new GcCalendar(this);
-    gcCalendar->setStyleSheet("background: #B3B4BA;");
+    //gcCalendar->setStyleSheet("background: #B3B4BA;");
+    gcCalendar->setStyleSheet("background: white;");
 
     // TOOLBOX
     toolBox = new QToolBox(this);

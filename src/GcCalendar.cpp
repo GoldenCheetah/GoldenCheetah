@@ -230,7 +230,8 @@ GcCalendar::event(QEvent *e)
         // fill the background
         QPainter painter(this);
         QRect all(0,0,width(),height());
-        painter.fillRect(all, QColor("#B3B4BA"));
+        //painter.fillRect(all, QColor("#B3B4BA"));
+        painter.fillRect(all, QColor(Qt::white));
     }
 
     int n=0;
@@ -409,6 +410,7 @@ GcLabel::paintEvent(QPaintEvent *e)
         QPainter painter(this);
         QRect all(0,0,width(),height());
         painter.fillRect(all, bgColor);
+        painter.drawRect(QRect(0,0,width()-1,height()-1));
     }
 
     if (selected) {
