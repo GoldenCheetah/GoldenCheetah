@@ -208,8 +208,10 @@ class TimeScaleDraw: public QwtScaleDraw
         if (*bydist) {
             return QString("%1").arg(v);
         } else {
-            QTime t = QTime().addSecs((int)v*60);
-            return t.toString("hh:mm");
+            QTime t = QTime().addSecs(v*60.00);
+            if (scaleMap().sDist() > 5)
+                return t.toString("hh:mm");
+            return t.toString("hh:mm:ss");
         }
     }
     private:
