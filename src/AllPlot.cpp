@@ -1582,11 +1582,19 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
         double yvalue = curve->sample(index).y();
         double xvalue = curve->sample(index).x();
 
+        QString xstring;
+        if (bydist) {
+            xstring = QString("%1").arg(xvalue);
+        } else {
+            QTime t = QTime().addSecs(xvalue*60.00);
+            xstring = t.toString("hh:mm:ss");
+        }
+
         // output the tooltip
         QString text = QString("%1 %2\n%3 %4")
                         .arg(yvalue, 0, 'f', 0)
                         .arg(this->axisTitle(curve->yAxis()).text())
-                        .arg(xvalue, 0, 'f', 2)
+                        .arg(xstring)
                         .arg(this->axisTitle(curve->xAxis()).text());
 
         // set that text up
