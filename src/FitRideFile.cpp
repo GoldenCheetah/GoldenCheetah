@@ -307,12 +307,18 @@ struct FitFileReaderState
                 default: ; // ignore it
             }
         }
-        if (this_start_time == 0 || this_start_time-start_time < 0)
-            errors << QString("lap %1 has invalid start time").arg(interval);
-        else {
-            if (rideFile->dataPoints().count()) // no samples means no laps..
-                rideFile->addInterval(this_start_time - start_time, time - start_time, QString("%1").arg(interval));
+        if (this_start_time == 0 || this_start_time-start_time < 0) {
+            //errors << QString("lap %1 has invalid start time").arg(interval);
+            this_start_time = start_time; // time was corrected after lap start
+
+            if (time == 0 || time-start_time < 0) {
+                errors << QString("lap %1 is ignored (invalid end time)").arg(interval);
+                return;
+            }
         }
+
+        if (rideFile->dataPoints().count()) // no samples means no laps..
+            rideFile->addInterval(this_start_time - start_time, time - start_time, QString("%1").arg(interval));
     }
 
     void decodeRecord(const FitDefinition &def, int time_offset, const std::vector<fit_value_t> values) {
@@ -333,7 +339,8 @@ struct FitFileReaderState
                 case 253: time = value + qbase_time.toTime_t();
                           // Time MUST NOT go backwards
                           // You canny break the laws of physics, Jim
-                          if (time < last_time) time = last_time;
+                          if (time < last_time)
+                              time = last_time;
                           break;
                 case 0: lati = value; break;
                 case 1: lngi = value; break;
