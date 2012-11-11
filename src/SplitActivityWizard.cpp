@@ -761,6 +761,7 @@ SplitConfirm::createRideFile(long start, long stop)
     returning->setStartTime(ride->startTime().addSecs(offset));
     returning->setRecIntSecs(ride->recIntSecs());
     returning->setDeviceType(ride->deviceType());
+    returning->setFileFormat(ride->fileFormat());
 
     // lets keep the metadata too
     const_cast<QMap<QString,QString>&>(returning->tags()) = QMap<QString,QString>(ride->tags());

@@ -102,7 +102,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
             if (lineno == 1) {
                 if (ergomoCSV.indexIn(line) != -1) {
                     ergomo = true;
-                    rideFile->setDeviceType("Ergomo CSV");
+                    rideFile->setDeviceType("Ergomo");
+                    rideFile->setFileFormat("Ergomo CSV (csv)");
                     unitsHeader = 2;
 
                     QStringList headers = line.split(';');
@@ -118,7 +119,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 else {
                     if(iBikeCSV.indexIn(line) != -1) {
                         iBike = true;
-                        rideFile->setDeviceType("iBike CSV");
+                        rideFile->setDeviceType("iBike");
+                        rideFile->setFileFormat("iBike CSV (csv)");
                         unitsHeader = 5;
                         iBikeVersion = line.section( ',', 1, 1 ).toInt();
                         ++lineno;
@@ -126,13 +128,15 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     } else if(motoActvCSV.indexIn(line) != -1) {
                      ++lineno;
                      motoActv = true;
-                     rideFile->setDeviceType("MotoACTV CSV");
+                     rideFile->setDeviceType("MotoACTV");
+                     rideFile->setDeviceType("MotoACTV CSV (csv)");
                      unitsHeader = -1;
                      /* MotoACTV files are always metric */
                      metric = true;
                      continue;
                    }
-                    rideFile->setDeviceType("PowerTap CSV");
+                    rideFile->setDeviceType("PowerTap");
+                    rideFile->setFileFormat("PowerTap CSV (csv)");
                 }
             }
             if (iBike && lineno == 2) {

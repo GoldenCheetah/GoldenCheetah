@@ -28,6 +28,7 @@ RideFile *SlfFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     (void) errors;
     RideFile *rideFile = new RideFile();
     rideFile->setDeviceType("Sigma ROX Log");
+    rideFile->setFileFormat("Sigma Log File (slf)");
 
     SlfParser handler(rideFile);
 

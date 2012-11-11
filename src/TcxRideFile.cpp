@@ -37,7 +37,8 @@ RideFile *TcxFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     (void) errors;
     RideFile *rideFile = new RideFile();
     rideFile->setRecIntSecs(1.0);
-    rideFile->setDeviceType("Garmin TCX");
+    rideFile->setDeviceType("Garmin");
+    rideFile->setFileFormat("Garmin Training Centre (tcx)");
 
     TcxParser handler(rideFile, list);
 

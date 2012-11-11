@@ -125,6 +125,8 @@ class RideFile : public QObject // QObject to emit signals
         void setRecIntSecs(double value) { recIntSecs_ = value; }
         const QString &deviceType() const { return deviceType_; }
         void setDeviceType(const QString &value) { deviceType_ = value; }
+        const QString &fileFormat() const { return fileFormat_; }
+        void setFileFormat(const QString &value) { fileFormat_ = value; }
         const QString id() const { return id_; }
         void setId(const QString &value) { id_ = value; }
 
@@ -192,6 +194,7 @@ class RideFile : public QObject // QObject to emit signals
         QVector<RideFilePoint*> dataPoints_;
         RideFileDataPresent dataPresent;
         QString deviceType_;
+        QString fileFormat_;
         QList<RideFileInterval> intervals_;
         QMap<QString,QString> tags_;
         EditorData *data;

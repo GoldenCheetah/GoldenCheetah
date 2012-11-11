@@ -36,7 +36,8 @@ RideFile *FitlogFileReader::openRideFile(QFile &file, QStringList &errors, QList
     (void) errors;
     RideFile *rideFile = new RideFile();
     rideFile->setRecIntSecs(1.0);
-    rideFile->setDeviceType("SportTracks Fitlog");
+    //rideFile->setDeviceType("SportTracks Fitlog");
+    rideFile->setFileFormat("SportTracks (*.fitlog)");
 
     FitlogParser handler(rideFile, list);
 

@@ -99,6 +99,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
 
     RideFile *result = new RideFile;
     result->setDeviceType("SRM");
+    result->setFileFormat("SRM training files (srm)");
     result->setTag("Sport", "Bike" );
 
     char magic[4];

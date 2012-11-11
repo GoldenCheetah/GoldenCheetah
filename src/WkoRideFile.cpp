@@ -100,7 +100,8 @@ WkoParser::WkoParser(QFile &file, QStringList &errors, QList<RideFile*>*rides)
 
     // Allocate space for newly parsed ride
     results = new RideFile;
-    results->setTag("File Format", QString("WKO v%1").arg(version));
+    //results->setTag("File Format", QString("WKO v%1").arg(version));
+    results->setFileFormat(QString("WKO v%1 (wko)").arg(version));
 
     // read header data and store details into rideFile structure
     rawdata = parseHeaderData(headerdata);

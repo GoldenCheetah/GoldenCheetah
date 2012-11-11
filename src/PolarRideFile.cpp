@@ -42,6 +42,7 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
     QString note("");
 
     double version=0;
+    int monitor=0;
 
     double seconds=0;
     double distance=0;
@@ -107,8 +108,38 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
                     QString versionString = QString(line);
                     versionString.remove(0,8).insert(1, ".");
                     version = versionString.toFloat();
-                    rideFile->setDeviceType("Polar HRM (v"+versionString+")");
+                    rideFile->setFileFormat("Polar HRM v"+versionString+" (hrm)");
+                } else if (line.contains("Monitor=")) {
+                    QString monitorString = QString(line);
+                    monitorString.remove(0,8);
+                    monitor = monitorString.toInt();
+                    switch (monitor) {
+                        case 1: rideFile->setDeviceType("Polar Sport Tester / Vantage XL"); break;
+                        case 2: rideFile->setDeviceType("Polar Vantage NV (VNV)"); break;
+                        case 3: rideFile->setDeviceType("Polar Accurex Plus"); break;
+                        case 4: rideFile->setDeviceType("Polar XTrainer Plus"); break;
+                        case 6: rideFile->setDeviceType("Polar S520"); break;
+                        case 7: rideFile->setDeviceType("Polar Coach"); break;
+                        case 8: rideFile->setDeviceType("Polar S210"); break;
+                        case 9: rideFile->setDeviceType("Polar S410"); break;
+                        case 10: rideFile->setDeviceType("Polar S510"); break;
+                        case 11: rideFile->setDeviceType("Polar S610 / S610i"); break;
+                        case 12: rideFile->setDeviceType("Polar S710 / S710i"); break;
+                        case 13: rideFile->setDeviceType("Polar S810 / S810i"); break;
+                        case 15: rideFile->setDeviceType("Polar E600"); break;
+                        case 20: rideFile->setDeviceType("Polar AXN500"); break;
+                        case 21: rideFile->setDeviceType("Polar AXN700"); break;
+                        case 22: rideFile->setDeviceType("Polar S625X / S725X"); break;
+                        case 23: rideFile->setDeviceType("Polar S725"); break;
+                        case 33: rideFile->setDeviceType("Polar CS400"); break;
+                        case 34: rideFile->setDeviceType("Polar CS600X"); break;
+                        case 35: rideFile->setDeviceType("Polar CS600"); break;
+                        case 36: rideFile->setDeviceType("Polar RS400"); break;
+                        case 37: rideFile->setDeviceType("Polar RS800"); break;
+                        case 38: rideFile->setDeviceType("Polar RS800X"); break;
 
+                        default: rideFile->setDeviceType(QString("Unknown Polar Device %1").arg(monitor));
+                   }
                 } else if (line.contains("SMode=")) {
                     line.remove(0,6);
                     QString smode = QString(line);

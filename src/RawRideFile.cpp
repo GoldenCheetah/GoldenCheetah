@@ -209,6 +209,7 @@ RideFile *RawFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 {
     RideFile *rideFile = new RideFile;
     rideFile->setDeviceType("PowerTap");
+    rideFile->setFileFormat("GoldenCheetah Raw PowerTap (raw)");
     if (!file.open(QIODevice::ReadOnly)) {
         delete rideFile;
         return NULL;

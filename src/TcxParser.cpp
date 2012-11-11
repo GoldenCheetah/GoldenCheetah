@@ -51,7 +51,8 @@ TcxParser::startElement( const QString&, const QString&, const QString& qName, c
 
             rideFile = new RideFile();
             rideFile->setRecIntSecs(1.0);
-            rideFile->setDeviceType("Garmin TCX");
+            rideFile->setDeviceType("Garmin");
+            rideFile->setFileFormat("Garmin Training Centre (tcx)");
         }
 
         // if caller is looking for rides...

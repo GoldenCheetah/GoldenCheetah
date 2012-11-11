@@ -167,6 +167,7 @@ SplitRideDialog::CreateNewRideFile(const RideFile *ride, int nRecStart, int nRec
                  pPoint->temp, pPoint->lrbalance, pPoint->interval-pointStart->interval);
     }
     newRideFile->setDeviceType(ride->deviceType());
+    newRideFile->setFileFormat(ride->fileFormat());
 
     double endSecs = ride->dataPoints().at(nRecEnd - 1)->secs + ride->recIntSecs();
     foreach (RideFileInterval interval, ride->intervals()) {
