@@ -333,7 +333,8 @@ RideFile *Computrainer3dpFileReader::openRideFile(QFile & file,
     rideFile->setRecIntSecs(((double) CT_EMIT_MS) / 1000.0);
 
     // tell GC what kind of device a computrainer is
-    rideFile->setDeviceType("Computrainer 3DP");
+    rideFile->setDeviceType("Computrainer");
+    rideFile->setFileFormat("Computrainer 3DP (3dp)");
 
     // all done!  close up.
     file.close();

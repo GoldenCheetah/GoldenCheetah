@@ -117,6 +117,7 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         // Lets construct our rideFile
         RideFile *rideFile = new RideFile();
         rideFile->setDeviceType("Computrainer/Velotron");
+        rideFile->setFileFormat("Computrainer/Velotron text file (txt)");
 
         while (!is.atEnd()) {
 
@@ -292,6 +293,7 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         // Lets construct our rideFile
         RideFile *rideFile = new RideFile();
         rideFile->setDeviceType("Wattbike");
+        rideFile->setFileFormat("Wattbike text file (txt)");
         rideFile->setRecIntSecs(1);
 
         // We need to work out which column represents 

@@ -234,6 +234,7 @@ struct FitFileReaderState
         else {
             rideFile->setDeviceType(QString("Unknown FIT Device %1:%2").arg(manu).arg(prod));
         }
+        rideFile->setFileFormat("FIT (*.fit)");
     }
 
     void decodeEvent(const FitDefinition &def, int, const std::vector<fit_value_t> values) {

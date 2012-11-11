@@ -64,6 +64,7 @@ RideFile *SrdFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
             result->setDeviceType("Polar HRM");
             break;
         }
+        result->setFileFormat("Polar SRD files (srd)");
 
         //
         // metadata variables

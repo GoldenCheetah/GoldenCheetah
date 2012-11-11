@@ -709,6 +709,7 @@ struct BinFileReaderState
         errors.clear();
         rideFile = new RideFile;
         rideFile->setDeviceType("Joule");
+        rideFile->setFileFormat("CycleOps Joule (bin)");
 
         if (!file.open(QIODevice::ReadOnly)) {
             delete rideFile;

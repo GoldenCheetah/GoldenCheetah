@@ -74,7 +74,8 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors, QList
 	    if (lineno == 1) {
 		if (manualCSV.indexIn(line) != -1) {
 		    manual = true;
-		    rideFile->setDeviceType("Manual CSV");
+            rideFile->setDeviceType("Manual");
+            rideFile->setFileFormat("Manual CSV (csv)");
 		    ++lineno;
 		    continue;
 		}

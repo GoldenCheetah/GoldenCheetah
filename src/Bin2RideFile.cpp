@@ -405,6 +405,7 @@ struct Bin2FileReaderState
         errors.clear();
         rideFile = new RideFile;
         rideFile->setDeviceType("Joule GPS");
+        rideFile->setFileFormat("CycleOps Joule (bin2)");
         rideFile->setRecIntSecs(1);
 
         if (!file.open(QIODevice::ReadOnly)) {

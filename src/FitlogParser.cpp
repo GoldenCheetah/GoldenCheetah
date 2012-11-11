@@ -48,7 +48,8 @@ FitlogParser::startElement( const QString&, const QString&,
 
             rideFile = new RideFile();
             rideFile->setRecIntSecs(1.0);
-            rideFile->setDeviceType("SportTracks");
+            //rideFile->setDeviceType("SportTracks");
+            rideFile->setFileFormat("SportTracks (*.fitlog)");
         }
 
         rideFile->setStartTime(start_time = convertToLocalTime(qAttributes.value("StartTime")));

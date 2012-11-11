@@ -112,6 +112,7 @@ RideFile *QuarqFileReader::openRideFile(QFile &file, QStringList &errors, QList<
     (void) errors;
     RideFile *rideFile = new RideFile();
     rideFile->setDeviceType("Quarq Qollector");
+    rideFile->setFileFormat("Quarq ANT+ Files (qla)");
     rideFile->setRecIntSecs(1.0);
 
     QuarqParser handler(rideFile);

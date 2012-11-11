@@ -119,6 +119,7 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
                 devicetype += model.text();
             }
             rideFile->setDeviceType(devicetype);
+            rideFile->setFileFormat("Peaksware Data File (pwx)");
 
             // device settings data
             QString deviceinfo;

@@ -28,6 +28,7 @@ RideFile *SmfFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     (void) errors;
     RideFile *rideFile = new RideFile();
     rideFile->setDeviceType("Sigma ROX Memory");
+    rideFile->setFileFormat("Sigma Memory File (smf)");
 
     SmfParser handler(rideFile);
 

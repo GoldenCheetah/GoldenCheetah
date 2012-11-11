@@ -120,6 +120,8 @@ RideFile* readBlocks(const QByteArray& blocks, const qint16 version, QStringList
     RideFile* rideFile = new RideFile();
 
     rideFile->setDeviceType(TACX_FORTIUS_DEVICE_TYPE);
+    rideFile->setFileFormat("Tacx Fortius (caf)");
+
 
     QByteArray remainingBytes = blocks;
     while(!remainingBytes.isEmpty()) {

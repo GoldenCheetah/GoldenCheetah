@@ -318,6 +318,7 @@ RideFile *RideFileFactory::openRideFile(MainWindow *main, QFile &file,
         // set other "special" fields
         result->setTag("Filename", QFileInfo(file.fileName()).fileName());
         result->setTag("Device", result->deviceType());
+        result->setTag("File Format", result->fileFormat());
         result->setTag("Athlete", QFileInfo(file).dir().dirName());
         result->setTag("Year", result->startTime().toString("yyyy"));
         result->setTag("Month", result->startTime().toString("MMMM"));
