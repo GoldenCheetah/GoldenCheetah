@@ -22,6 +22,7 @@
 #include "GoldenCheetah.h"
 
 #include <QtGui>
+#include <QWebView>
 
 #include "MainWindow.h"
 #include "GcCalendarModel.h"
@@ -78,9 +79,14 @@ class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
         void previous();
 
         bool event(QEvent *e);
+        void setSummary(); // set the summary at the bottom
+
+        // summary metrics aggregator -- refactor later
+        QString getAggregated(QString name, QList<SummaryMetrics> &results);
 
     protected:
-        MainWindow *mainWindow;
+        MainWindow *main;
+        RideItem *_ride;
         int month, year;
 
         QVBoxLayout *layout;
@@ -102,5 +108,8 @@ class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
         QList<FieldDefinition> fieldDefinitions;
         GcCalendarModel *calendarModel;
 
+        QComboBox *summarySelect;
+        QWebView *summary;
+        QDate from, to;
 };
 #endif // _GC_GcCalendar_h

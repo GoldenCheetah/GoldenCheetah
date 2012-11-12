@@ -145,10 +145,12 @@ MainWindow::MainWindow(const QDir &home) :
 
     GCColor *GCColorSet = new GCColor(this); // get/keep colorset
     GCColorSet->colorSet(); // shut up the compiler
+#if 0
     setStyleSheet("QFrame { FrameStyle = QFrame::NoFrame };"
                   "QWidget { background = Qt::white; border:0 px; margin: 0px; };"
                   "QTabWidget { background = Qt::white; };"
                   "::pane { FrameStyle = QFrame::NoFrame; border: 0px; };");
+#endif
 
     QVariant unit = appsettings->value(this, GC_UNIT);
     useMetricUnits = (unit.toString() == "Metric");
@@ -518,7 +520,7 @@ MainWindow::MainWindow(const QDir &home) :
     // RIGHT SIDEBAR
     gcCalendar = new GcCalendar(this);
     //gcCalendar->setStyleSheet("background: #B3B4BA;");
-    gcCalendar->setStyleSheet("background: white;");
+    //gcCalendar->setStyleSheet("background: white;");
 
     // TOOLBOX
     toolBox = new QToolBox(this);

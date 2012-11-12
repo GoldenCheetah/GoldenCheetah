@@ -17,25 +17,29 @@
  */
 
 #include "GcCalendar.h"
+#include <QWebSettings>
+#include <QWebFrame>
+#include <TimeUtils.h>
 
-GcCalendar::GcCalendar(MainWindow *mainWindow) : mainWindow(mainWindow)
+GcCalendar::GcCalendar(MainWindow *main) : main(main)
 {
     setContentsMargins(0,0,0,0);
     setAutoFillBackground(true);
 
     month = year = 0;
+    _ride = NULL;
 
     layout = new QVBoxLayout(this);
     layout->setSpacing(0);
 
     black.setColor(QPalette::WindowText, QColor(0,0,0,240));
     white.setColor(QPalette::WindowText, QColor(255,255,255,240));
-    grey.setColor(QPalette::WindowText, QColor(127,127,127,240));
+    grey.setColor(QPalette::WindowText, QColor(127,127,127,255));
 
     // get the model
-    fieldDefinitions = mainWindow->rideMetadata()->getFields();
-    calendarModel = new GcCalendarModel(this, &fieldDefinitions, mainWindow);
-    calendarModel->setSourceModel(mainWindow->listView->sqlModel);
+    fieldDefinitions = main->rideMetadata()->getFields();
+    calendarModel = new GcCalendarModel(this, &fieldDefinitions, main);
+    calendarModel->setSourceModel(main->listView->sqlModel);
 
     QFont font;
     font.setPointSize(48);
@@ -109,7 +113,6 @@ GcCalendar::GcCalendar(MainWindow *mainWindow) : mainWindow(mainWindow)
     dayLayout = new QGridLayout;
     dayLayout->setSpacing(1);
     layout->addLayout(dayLayout);
-    layout->addStretch();
 
     font.setWeight(QFont::Normal);
 
@@ -202,18 +205,54 @@ GcCalendar::GcCalendar(MainWindow *mainWindow) : mainWindow(mainWindow)
             signalMapper->setMapping(d, (row-1)*7+col);
         }
     }
+
+    // Summary level selector
+    QHBoxLayout *h = new QHBoxLayout();
+    h->setSpacing(5);
+    summarySelect = new QComboBox(this);
+    //summarySelect->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLength); XXX
+    summarySelect->setFixedWidth(150); // XXX is it impossible to size constrain qcombos?????
+    summarySelect->addItem("Day Summary");
+    summarySelect->addItem("Weekly Summary");
+    summarySelect->addItem("Monthly Summary");
+    summarySelect->setCurrentIndex(1); // default to weekly
+    h->addStretch();
+    h->addWidget(summarySelect, Qt::AlignCenter);
+    h->addStretch();
+    layout->addLayout(h);
+    layout->addStretch();
+
+    summary = new QWebView(this);
+    summary->setContentsMargins(0,0,0,0);
+    summary->page()->view()->setContentsMargins(0,0,0,0);
+    summary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    summary->setAcceptDrops(false);
+
+    QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
+    summary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
+    summary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
+    layout->addWidget(summary);
+
+    // summary mode changed
+    connect(summarySelect, SIGNAL(currentIndexChanged(int)), this, SLOT(refresh()));
+
+    // day clicked
     connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(dayClicked(int)));
 
     // refresh on these events...
-    connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
-    connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
-    connect(mainWindow, SIGNAL(configChanged()), this, SLOT(refresh()));
+    connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
+    connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
+    connect(main, SIGNAL(configChanged()), this, SLOT(refresh()));
+
+    // set up for current selections
+    refresh();
 }
 
 void
 GcCalendar::refresh()
 {
     calendarModel->setMonth(month, year);
+    setSummary();
     repaint();
 }
 
@@ -222,7 +261,7 @@ GcCalendar::event(QEvent *e)
 {
     if (e->type() != QEvent::ToolTip && e->type() != QEvent::Paint && e->type() != QEvent::Destroy &&
         e->type() != QEvent::LayoutRequest) {
-        mainWindow->setBubble("");
+        main->setBubble("");
         //qDebug()<<"event"<<e->type();
     }
 
@@ -254,7 +293,7 @@ GcCalendar::event(QEvent *e)
                 // Popup bubble for ride
                 if (files.count()) {
                     if (files[0] == "calendar") ; // XXX handle planned rides
-                    else mainWindow->setBubble(files.at(0), mapToGlobal(pos+QPoint(-2,-2)));
+                    else main->setBubble(files.at(0), mapToGlobal(pos+QPoint(-2,-2)));
                 }
             }
             n++;
@@ -277,13 +316,14 @@ GcCalendar::dayClicked(int i)
     QStringList files = calendarModel->data(p, GcCalendarModel::FilenamesRole).toStringList();
 
     if (files.count()) // XXX if more than one file cycle through them?
-        mainWindow->selectRideFile(QFileInfo(files[0]).fileName());
+        main->selectRideFile(QFileInfo(files[0]).fileName());
+
 }
 
 void
 GcCalendar::previous()
 {
-    QList<QDateTime> allDates = mainWindow->metricDB->db()->getAllDates();
+    QList<QDateTime> allDates = main->metricDB->db()->getAllDates();
     qSort(allDates);
 
     // begin of month
@@ -302,7 +342,7 @@ GcCalendar::previous()
                 if (date == heredate) {
                     // select this ride...
                     QStringList files = calendarModel->data(p, GcCalendarModel::FilenamesRole).toStringList();
-                    if (files.count()) mainWindow->selectRideFile(QFileInfo(files[0]).fileName());
+                    if (files.count()) main->selectRideFile(QFileInfo(files[0]).fileName());
                 }
             }
             break;
@@ -313,7 +353,7 @@ GcCalendar::previous()
 void
 GcCalendar::next()
 {
-    QList<QDateTime> allDates = mainWindow->metricDB->db()->getAllDates();
+    QList<QDateTime> allDates = main->metricDB->db()->getAllDates();
     qSort(allDates);
 
     // end of month
@@ -332,7 +372,7 @@ GcCalendar::next()
                 if (date == heredate) {
                     // select this ride...
                     QStringList files = calendarModel->data(p, GcCalendarModel::FilenamesRole).toStringList();
-                    if (files.count()) mainWindow->selectRideFile(QFileInfo(files[0]).fileName());
+                    if (files.count()) main->selectRideFile(QFileInfo(files[0]).fileName());
                 }
             }
             break;
@@ -343,8 +383,10 @@ GcCalendar::next()
 void
 GcCalendar::setRide(RideItem *ride)
 {
+    _ride = ride;
+
     QDate when;
-    if (ride && ride->ride()) when = ride->dateTime.date();
+    if (_ride && _ride->ride()) when = _ride->dateTime.date();
     else when = QDate::currentDate();
 
     // refresh the model
@@ -396,8 +438,7 @@ GcCalendar::setRide(RideItem *ride)
             }
         }
     }
-
-    repaint();
+    refresh();
 }
 
 void
@@ -427,7 +468,7 @@ GcLabel::paintEvent(QPaintEvent *e)
         // adjust for emboss
         setContentsMargins(x+xoff,y+yoff,w,l);
         QPalette r;
-        r.setColor(QPalette::WindowText, QColor(0,0,0,160));
+        r.setColor(QPalette::WindowText, QColor(127,127,127,160));
         setPalette(r);
         QLabel::paintEvent(e);
 
@@ -437,4 +478,224 @@ GcLabel::paintEvent(QPaintEvent *e)
     }
 
     QLabel::paintEvent(e);
+}
+
+void
+GcCalendar::setSummary()
+{
+    // are we metric?
+    bool useMetricUnits = (appsettings->value(this, GC_UNIT).toString() == "Metric");
+
+    // where we construct the text
+    QString summaryText("");
+
+    QDate when;
+    if (_ride && _ride->ride()) when = _ride->dateTime.date();
+    else when = QDate::currentDate();
+
+    // main totals
+    static const QStringList totalColumn = QStringList()
+        << "workout_time"
+        << "time_riding"
+        << "total_distance"
+        << "total_work"
+        << "elevation_gain";
+
+    static const QStringList averageColumn = QStringList()
+        << "average_speed"
+        << "average_power"
+        << "average_hr"
+        << "average_cad";
+
+    static const QStringList maximumColumn = QStringList()
+        << "max_speed"
+        << "max_power"
+        << "max_heartrate"
+        << "max_cadence";
+
+    // user defined
+    QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
+
+    // in case they were set tand then unset
+    if (s == "") s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
+    QStringList metricColumn = s.split(",");
+
+    // what date range should we use?
+    QDate newFrom, newTo;
+
+    switch(summarySelect->currentIndex()) {
+
+        case 0 :
+            // DAILY - just the date of the ride
+            newFrom = newTo = when;
+            break;
+        case 1 :
+            // WEEKLY - from Mon to Sun
+            newFrom = when.addDays((when.dayOfWeek()-1)*-1);
+            newTo = newFrom.addDays(6);
+            break;
+
+        default:
+        case 2 : 
+            // MONTHLY - all days in month
+            newFrom = QDate(when.year(), when.month(), 1);
+            newTo = newFrom.addMonths(1).addDays(-1);
+            break;
+    }
+
+    if (newFrom == from && newTo == to) return;
+    else {
+
+        // date range changed lets refresh
+        from = newFrom;
+        to = newTo;
+
+        // lets get the metrics
+        QList<SummaryMetrics>results = main->metricDB->getAllMetricsFor(QDateTime(from,QTime(0,0,0)), QDateTime(to, QTime(24,59,59)));
+
+        // foreach of the metrics get an aggregated value
+        // header of summary
+        summaryText = QString("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 3.2//EN\">"
+                              "<html>"
+                              "<head>"
+                              "<title></title>"
+                              "</head>"
+                              "<body>"
+                              "<center>");
+
+        for (int i=0; i<3; i++) { //XXX taken out maximums -- too much info -- looks ugly
+
+            QString aggname;
+            QStringList list;
+
+            switch(i) {
+                case 0 : // Totals
+                    aggname = "Totals";
+                    list = totalColumn;
+                    break;
+
+                case 1 :  // Averages
+                    aggname = "Averages";
+                    list = averageColumn;
+                    break;
+
+                case 3 :  // Maximums
+                    aggname = "Maximums";
+                    list = maximumColumn;
+                    break;
+
+                case 2 :  // User defined.. 
+                    aggname = "Metrics";
+                    list = metricColumn;
+                    break;
+
+            }
+
+            summaryText += QString("<p><table width=\"85%\">"
+                                   "<tr>"
+                                   "<td align=\"center\" colspan=\"2\">"
+                                   "<b>%1</b>"
+                                   "</td>"
+                                   "</tr>").arg(aggname);
+
+            foreach(QString metricname, list) {
+
+                const RideMetric *metric = RideMetricFactory::instance().rideMetric(metricname);
+
+                QString value = getAggregated(metricname, results);
+
+
+                // don't show units for time values
+                if (metric && (metric->units(useMetricUnits) == "seconds" ||
+                               metric->units(useMetricUnits) == "")) {
+
+                    summaryText += QString("<tr><td>%1:</td><td align=\"right\"> %2</td>")
+                                            .arg(metric ? metric->name() : "unknown")
+                                            .arg(value);
+
+                } else {
+                    summaryText += QString("<tr><td>%1(%2):</td><td align=\"right\"> %3</td>")
+                                            .arg(metric ? metric->name() : "unknown")
+                                            .arg(metric ? metric->units(useMetricUnits) : "unknown")
+                                            .arg(value);
+                }
+            }
+            summaryText += QString("</tr>" "</table>");
+
+        }
+
+        // finish off the html document
+        summaryText += QString("</center>"
+                               "</body>"
+                               "</html>");
+
+        // set webview contents
+        summary->page()->mainFrame()->setHtml(summaryText);
+
+    }
+}
+
+QString GcCalendar::getAggregated(QString name, QList<SummaryMetrics> &results)
+{
+    // get the metric details, so we can convert etc
+    const RideMetric *metric = RideMetricFactory::instance().rideMetric(name);
+    if (!metric) return QString("%1 unknown").arg(name);
+
+    // do we need to convert from metric to imperial?
+    bool useMetricUnits = (appsettings->value(this, GC_UNIT).toString() == "Metric");
+
+    // what we will return
+    double rvalue = 0;
+    double rcount = 0; // using double to avoid rounding issues with int when dividing
+
+    // loop through and aggregate
+    foreach (SummaryMetrics rideMetrics, results) {
+
+        // get this value
+        double value = rideMetrics.getForSymbol(name);
+        double count = rideMetrics.getForSymbol("workout_time"); // for averaging
+
+        
+        // check values are bounded, just in case
+        if (isnan(value) || isinf(value)) value = 0;
+
+        // imperial / metric conversion
+        if (useMetricUnits == false) {
+            value *= metric->conversion();
+            value += metric->conversionSum();
+        }
+
+        switch (metric->type()) {
+        case RideMetric::Total:
+            rvalue += value;
+            break;
+        case RideMetric::Average:
+            {
+            // average should be calculated taking into account
+            // the duration of the ride, otherwise high value but
+            // short rides will skew the overall average
+            rvalue += value*count;
+            rcount += count;
+            break;
+            }
+        case RideMetric::Peak:
+            {
+            if (value > rvalue) rvalue = value;
+            break;
+            }
+        }
+    }
+
+    // now compute the average
+    if (metric->type() == RideMetric::Average) {
+        if (rcount) rvalue = rvalue / rcount;
+    }
+
+
+    // Format appropriately
+    QString result;
+    if (metric->units(useMetricUnits) == "seconds") result = time_to_string(rvalue);
+    else result = QString("%1").arg(rvalue, 0, 'f', metric->precision());
+
+    return result;
 }
