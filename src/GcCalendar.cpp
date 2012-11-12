@@ -20,7 +20,7 @@
 #include "Settings.h"
 #include <QWebSettings>
 #include <QWebFrame>
-#include <TimeUtils.h>
+#include "TimeUtils.h"
 
 GcCalendar::GcCalendar(MainWindow *main) : main(main)
 {
