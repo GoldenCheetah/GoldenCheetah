@@ -254,7 +254,7 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     summary->setAcceptDrops(false);
 
     QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
-    summary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
+    summary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize());
     summary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
     slayout->addWidget(summary);
     slayout->addStretch();
@@ -601,7 +601,7 @@ GcCalendar::setSummary()
                               "<body>"
                               "<center>");
 
-        for (int i=0; i<3; i++) { //XXX taken out maximums -- too much info -- looks ugly
+        for (int i=0; i<4; i++) { //XXX taken out maximums -- too much info -- looks ugly
 
             QString aggname;
             QStringList list;
