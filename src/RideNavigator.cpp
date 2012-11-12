@@ -349,7 +349,7 @@ void RideNavigator::setWidth(int x)
 void
 RideNavigator::showEvent(QShowEvent *)
 {
-    resetView();
+    //resetView();//XXX cocks up on sidebar?
     init = true;
     setWidth(geometry().width());
 }
