@@ -17,6 +17,7 @@
  */
 
 #include "GcCalendar.h"
+#include "Settings.h"
 #include <QWebSettings>
 #include <QWebFrame>
 #include <TimeUtils.h>
@@ -29,8 +30,32 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     month = year = 0;
     _ride = NULL;
 
-    layout = new QVBoxLayout(this);
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->setContentsMargins(0,0,0,0);
+    mainLayout->setSpacing(0);
+
+    // Splitter - cal at top, summary at bottom
+    splitter = new QSplitter(this);
+    splitter->setHandleWidth(1);
+    splitter->setOrientation(Qt::Vertical);
+    splitter->setFrameStyle(QFrame::NoFrame);
+
+    mainLayout->addWidget(splitter);
+    connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
+
+    // cal widget
+    QWidget *cal = new QWidget(this);
+    cal->setContentsMargins(0,0,0,0);
+    layout = new QVBoxLayout(cal);
     layout->setSpacing(0);
+    splitter->addWidget(cal);
+
+    // summary widget
+    QWidget *sum = new QWidget(this);
+    sum->setContentsMargins(0,0,0,0);
+    QVBoxLayout *slayout = new QVBoxLayout(sum);
+    slayout->setSpacing(0);
+    splitter->addWidget(sum);
 
     black.setColor(QPalette::WindowText, QColor(0,0,0,240));
     white.setColor(QPalette::WindowText, QColor(255,255,255,240));
@@ -205,6 +230,7 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
             signalMapper->setMapping(d, (row-1)*7+col);
         }
     }
+    layout->addStretch();
 
     // Summary level selector
     QHBoxLayout *h = new QHBoxLayout();
@@ -219,8 +245,7 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     h->addStretch();
     h->addWidget(summarySelect, Qt::AlignCenter);
     h->addStretch();
-    layout->addLayout(h);
-    layout->addStretch();
+    slayout->addLayout(h);
 
     summary = new QWebView(this);
     summary->setContentsMargins(0,0,0,0);
@@ -231,7 +256,20 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
     summary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
     summary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
-    layout->addWidget(summary);
+    slayout->addWidget(summary);
+    slayout->addStretch();
+
+    // restore splitter
+    QVariant splitterSizes = appsettings->cvalue(main->cyclist, GC_SETTINGS_CALSPLITTER_SIZES); 
+    if (splitterSizes != QVariant()) {
+        splitter->restoreState(splitterSizes.toByteArray());
+        splitter->setOpaqueResize(true); // redraw when released, snappier UI
+    } else {
+        QList<int> sizes;
+        sizes.append(400);
+        sizes.append(400);
+        splitter->setSizes(sizes);
+    }
 
     // summary mode changed
     connect(summarySelect, SIGNAL(currentIndexChanged(int)), this, SLOT(refresh()));
@@ -698,4 +736,10 @@ QString GcCalendar::getAggregated(QString name, QList<SummaryMetrics> &results)
     else result = QString("%1").arg(rvalue, 0, 'f', metric->precision());
 
     return result;
+}
+
+void
+GcCalendar::splitterMoved(int pos, int /*index*/)
+{
+    appsettings->setCValue(main->cyclist, GC_SETTINGS_CALSPLITTER_SIZES, splitter->saveState());
 }
