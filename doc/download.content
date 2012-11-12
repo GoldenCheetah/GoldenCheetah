@@ -18,8 +18,8 @@ before downloading.
 On Linux and Mac OS X, Golden Cheetah also downloads from the SRM PCV.  On Mac
 OS X, you'll need to install <a href="http://osx-pl2303.sourceforge.net/">the
 open source PL2303 driver</a> to download from an SRM. Please see the
-<a href="http://bugs.goldencheetah.org/projects/goldencheetah/wiki/">WIKI</a> article
- - <a href="http://bugs.goldencheetah.org/projects/goldencheetah/wiki/PCV_on_Mac_OS_X">
+<a href="https://github.com/srhea/GoldenCheetah/wiki/Installing-the-d2xx-drivers-on-mac-os">WIKI</a> article
+ - <a href="https://github.com/srhea/GoldenCheetah/wiki/Pcv-on-mac-os-x">
 PCV on Mac OS X</a> for further information.
 </p>
 
