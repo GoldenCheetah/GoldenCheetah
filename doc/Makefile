@@ -72,6 +72,9 @@ search.html: search.content genpage.pl
 users-guide.html: users-guide.content genpage.pl
 	./genpage.pl "User's Guide" $< > $@
 
+wiki.html: wiki.content genpage.pl
+	./genpage.pl "Wiki" $< > $@
+
 wishlist.html: wishlist.content genpage.pl
 	./genpage.pl "Wish List" $< > $@
 
