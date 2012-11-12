@@ -1299,6 +1299,7 @@ MainWindow::selectAnalysis()
     currentWindow = analWindow;
     analButtons->show();
     trainTool->getToolbarButtons()->hide();
+    toolBox->setCurrentIndex(0);
     setStyle();
 }
 
@@ -1311,6 +1312,7 @@ MainWindow::selectTrain()
     currentWindow = trainWindow;
     analButtons->hide();
     trainTool->getToolbarButtons()->show();
+    toolBox->setCurrentIndex(2);
     setStyle();
 }
 
@@ -1323,6 +1325,7 @@ MainWindow::selectDiary()
     currentWindow = diaryWindow;
     analButtons->hide();
     trainTool->getToolbarButtons()->hide();
+    toolBox->setCurrentIndex(1);
     setStyle();
 }
 
@@ -1335,6 +1338,7 @@ MainWindow::selectHome()
     currentWindow = homeWindow;
     analButtons->hide();
     trainTool->getToolbarButtons()->hide();
+    toolBox->setCurrentIndex(1);
     setStyle();
 }
 void
