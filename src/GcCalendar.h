@@ -83,6 +83,7 @@ class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
 
         // summary metrics aggregator -- refactor later
         QString getAggregated(QString name, QList<SummaryMetrics> &results);
+        void splitterMoved(int pos, int index);
 
     protected:
         MainWindow *main;
@@ -107,6 +108,8 @@ class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
         QPalette black, grey, white;
         QList<FieldDefinition> fieldDefinitions;
         GcCalendarModel *calendarModel;
+
+        QSplitter *splitter; // calendar vs summary
 
         QComboBox *summarySelect;
         QWebView *summary;
