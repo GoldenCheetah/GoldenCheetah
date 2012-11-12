@@ -203,6 +203,9 @@ RideMetadata::metadataChanged()
 void
 RideMetadata::configUpdate()
 {
+    // use default font
+    setFont(QFont());
+
     // read metadata.xml
     QString filename = main->home.absolutePath()+"/metadata.xml";
     if (!QFile(filename).exists()) filename = ":/xml/metadata.xml";
