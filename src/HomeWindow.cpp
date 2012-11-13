@@ -217,15 +217,6 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     // watch drop operations
     //setMouseTracking(true);
     installEventFilter(this);
-
-#ifndef WIN32
-    // add a drop shadow to the window
-    if (appsettings->value(this, GC_DROPSHADOWS, false).toBool() == true) {
-        QGraphicsDropShadowEffect *dropShadow = new QGraphicsDropShadowEffect(this);
-        dropShadow->setBlurRadius(10);
-        tabbed->setGraphicsEffect(dropShadow);
-    }
-#endif
 }
 
 HomeWindow::~HomeWindow()
