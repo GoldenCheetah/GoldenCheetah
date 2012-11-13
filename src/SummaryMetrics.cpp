@@ -99,3 +99,68 @@ SummaryMetrics::getUnitsForSymbol(QString symbol, bool UseMetric) const
     if (m) return m->units(UseMetric);
     else return QString("units");
 }
+
+QString SummaryMetrics::getAggregated(QString name, const QList<SummaryMetrics> &results, bool useMetricUnits, bool nofmt)
+{
+    // get the metric details, so we can convert etc
+    const RideMetric *metric = RideMetricFactory::instance().rideMetric(name);
+    if (!metric) return QString("%1 unknown").arg(name);
+
+    // what we will return
+    double rvalue = 0;
+    double rcount = 0; // using double to avoid rounding issues with int when dividing
+
+    // loop through and aggregate
+    foreach (SummaryMetrics rideMetrics, results) {
+
+        // get this value
+        double value = rideMetrics.getForSymbol(name);
+        double count = rideMetrics.getForSymbol("workout_time"); // for averaging
+
+        
+        // check values are bounded, just in case
+        if (isnan(value) || isinf(value)) value = 0;
+
+        // imperial / metric conversion
+        if (useMetricUnits == false) {
+            value *= metric->conversion();
+            value += metric->conversionSum();
+        }
+
+        switch (metric->type()) {
+        case RideMetric::Total:
+            rvalue += value;
+            break;
+        case RideMetric::Average:
+            {
+            // average should be calculated taking into account
+            // the duration of the ride, otherwise high value but
+            // short rides will skew the overall average
+            rvalue += value*count;
+            rcount += count;
+            break;
+            }
+        case RideMetric::Peak:
+            {
+            if (value > rvalue) rvalue = value;
+            break;
+            }
+        }
+    }
+
+    // now compute the average
+    if (metric->type() == RideMetric::Average) {
+        if (rcount) rvalue = rvalue / rcount;
+    }
+
+
+    // Format appropriately
+    QString result;
+    if (metric->units(useMetricUnits) == "seconds") {
+        if (nofmt) result = QString("%1").arg(rvalue);
+        else result = time_to_string(rvalue);
+
+    } else result = QString("%1").arg(rvalue, 0, 'f', metric->precision());
+
+    return result;
+}

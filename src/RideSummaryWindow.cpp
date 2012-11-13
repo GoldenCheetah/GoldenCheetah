@@ -32,8 +32,8 @@
 #include <assert.h>
 #include <math.h>
 
-RideSummaryWindow::RideSummaryWindow(MainWindow *mainWindow) :
-    GcWindow(mainWindow), mainWindow(mainWindow)
+RideSummaryWindow::RideSummaryWindow(MainWindow *mainWindow, bool ridesummary) :
+     GcWindow(mainWindow), mainWindow(mainWindow), ridesummary(ridesummary)
 {
     setInstanceName("Ride Summary Window");
     setControls(NULL);
@@ -54,9 +54,15 @@ RideSummaryWindow::RideSummaryWindow(MainWindow *mainWindow) :
 
     vlayout->addWidget(rideSummary);
 
-    connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideItemChanged()));
-    connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(refresh()));
-    connect(mainWindow, SIGNAL(intervalsChanged()), this, SLOT(refresh()));
+    if (ridesummary) {
+        connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideItemChanged()));
+        connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(refresh()));
+        connect(mainWindow, SIGNAL(intervalsChanged()), this, SLOT(refresh()));
+    } else {
+        connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
+        connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
+        connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
+    }
     setLayout(vlayout);
 }
 
@@ -93,14 +99,26 @@ RideSummaryWindow::refresh()
 {
     // XXX: activeTab is never equaly to RideSummaryWindow right now because
     // it's wrapped in the summarySplitter in MainWindow.
-    if (!myRideItem) {
+    if (ridesummary && !myRideItem) {
 	    rideSummary->page()->mainFrame()->setHtml("");
         return;
     }
-    RideItem *rideItem = myRideItem;
-    setSubTitle(rideItem->dateTime.toString(tr("dddd MMMM d, yyyy, h:mm AP")));
+
+    if (ridesummary) {
+        RideItem *rideItem = myRideItem;
+        setSubTitle(rideItem->dateTime.toString(tr("dddd MMMM d, yyyy, h:mm AP")));
+    } else {
+
+        if (myDateRange.name != "") setSubTitle(myDateRange.name);
+        else {
+        setSubTitle(myDateRange.from.toString("dddd MMMM d") +
+                    " - " +
+                    myDateRange.to.toString("dddd MMMM d"));
+        }
+    }
     rideSummary->page()->mainFrame()->setHtml(htmlSummary());
 }
+
 
 QString
 RideSummaryWindow::htmlSummary() const
@@ -109,9 +127,11 @@ RideSummaryWindow::htmlSummary() const
 
     RideItem *rideItem = myRideItem;
     RideFile *ride = rideItem->ride();
+    QVariant unit = appsettings->value(this, GC_UNIT);
+    bool useMetricUnits = (unit.toString() == "Metric");
 
-    // ridefile read errors?
-    if (!ride) {
+    // ride summary and there were ridefile read errors?
+    if (ridesummary && !ride) {
         summary = tr("<p>Couldn't read file \"");
         summary += rideItem->fileName + "\":";
         QListIterator<QString> i(rideItem->errors());
@@ -120,58 +140,48 @@ RideSummaryWindow::htmlSummary() const
         return summary;
     }
 
-    summary = ("<center><p><h3>" + tr("Device Type: ") + ride->deviceType() + "</h3>");
+    // always centered
+    summary = "<center>";
 
-    QVariant unit = appsettings->value(this, GC_UNIT);
+    // device summary for ride summary, otherwise how many activities?
+    if (ridesummary) summary += ("<p><h3>" + tr("Device Type: ") + ride->deviceType() + "</h3><p>");
+    else summary += ("<p><h3>" + 
+                    QString("%1").arg(data.count()) + (data.count() == 1 ? tr(" activity") : tr(" activities")) +
+                    "</h3><p>");
 
-    summary += "<p>";
-
-    bool metricUnits = (unit.toString() == "Metric");
-
-    QStringList columnNames = QStringList() << "Totals" <<"Averages" <<"Maximums" <<"Metrics*";
-    QStringList totalColumn = QStringList()
+    // All the metrics we will display
+    static const QStringList columnNames = QStringList() << "Totals" <<"Averages" <<"Maximums" <<"Metrics*";
+    static const QStringList totalColumn = QStringList()
         << "workout_time"
         << "time_riding"
         << "total_distance"
         << "total_work"
         << "elevation_gain";
 
-    QStringList averageColumn = QStringList()
+    static QStringList averageColumn = QStringList() // not const as modified below..
         << "average_speed"
         << "average_power"
         << "average_hr"
         << "average_cad";
 
-    // show temp if it is available
-    if (ride->areDataPresent()->temp || ride->getTag("Temperature", "-") != "-") averageColumn << "average_temp";
-
-    QStringList maximumColumn = QStringList()
+    static QStringList maximumColumn = QStringList() // not const as modified below..
         << "max_speed"
         << "max_power"
         << "max_heartrate"
         << "max_cadence";
 
-    // show temp if it is available
-    if (ride->areDataPresent()->temp || ride->getTag("Temperature", "-") != "-") maximumColumn << "max_temp";
+    // show average and max temp if it is available (in ride summary mode)
+    if (ridesummary && (ride->areDataPresent()->temp || ride->getTag("Temperature", "-") != "-")) {
+        averageColumn << "average_temp";
+        maximumColumn << "max_temp";
+    }
 
+    // users determine the metrics to display
     QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
-
-    // in case they were set tand then unset
     if (s == "") s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
     QStringList metricColumn = s.split(",");
 
-    /* ORIGINAL HARDCODED (AND NOW DEFAULT METRICS)
-    QStringList metricColumn = QStringList()
-        << "skiba_xpower"
-        << "skiba_relative_intensity"
-        << "skiba_bike_score"
-        << "daniels_points"
-        << "daniels_equivalent_power"
-        << "trimp_points"
-        << "aerobic_decoupling";
-    */
-
-    QStringList timeInZones = QStringList()
+    static const QStringList timeInZones = QStringList()
         << "time_in_zone_L1"
         << "time_in_zone_L2"
         << "time_in_zone_L3"
@@ -183,7 +193,7 @@ RideSummaryWindow::htmlSummary() const
         << "time_in_zone_L9"
         << "time_in_zone_L10";
 
-    QStringList timeInZonesHR = QStringList()
+    static const QStringList timeInZonesHR = QStringList()
         << "time_in_zone_H1"
         << "time_in_zone_H2"
         << "time_in_zone_H3"
@@ -195,34 +205,40 @@ RideSummaryWindow::htmlSummary() const
 
     // Use pre-computed and saved metric values if the ride has not
     // been edited. Otherwise we need to re-compute every time.
+    // this is only for ride summary, when showing for a date range
+    // we already have a summary metrics array
     SummaryMetrics metrics;
     RideMetricFactory &factory = RideMetricFactory::instance();
-    if (rideItem->isDirty()) {
-        // make a list if the metrics we want computed
-        // instead of calculating them all, just do the
-        // ones we display
-        QStringList worklist;
-        worklist += totalColumn;
-        worklist += averageColumn;
-        worklist += maximumColumn;
-        worklist += metricColumn;
-        worklist += timeInZones;
-        worklist += timeInZonesHR;
 
-        // go calculate them then...
-        QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(mainWindow, ride, mainWindow->zones(), mainWindow->hrZones(), worklist);
-        for(int i = 0; i < worklist.count(); ++i) {
-            if (worklist[i] != "") {
-                RideMetricPtr m = computed.value(worklist[i]);
-                if (m) metrics.setForSymbol(worklist[i], m->value(true));
-                else metrics.setForSymbol(worklist[i], 0.00);
+    if (ridesummary) {
+        if (rideItem->isDirty()) {
+            // make a list if the metrics we want computed
+            // instead of calculating them all, just do the
+            // ones we display
+            QStringList worklist;
+            worklist += totalColumn;
+            worklist += averageColumn;
+            worklist += maximumColumn;
+            worklist += metricColumn;
+            worklist += timeInZones;
+            worklist += timeInZonesHR;
+
+            // go calculate them then...
+            QHash<QString, RideMetricPtr> computed = RideMetric::computeMetrics(mainWindow, ride, mainWindow->zones(), mainWindow->hrZones(), worklist);
+            for(int i = 0; i < worklist.count(); ++i) {
+                if (worklist[i] != "") {
+                    RideMetricPtr m = computed.value(worklist[i]);
+                    if (m) metrics.setForSymbol(worklist[i], m->value(true));
+                    else metrics.setForSymbol(worklist[i], 0.00);
+                }
             }
-        }
-    } else {
+        } else {
 
-        // just use the metricDB versions, nice 'n fast
-        metrics = mainWindow->metricDB->getRideMetrics(rideItem->fileName);
+            // just use the metricDB versions, nice 'n fast
+            metrics = mainWindow->metricDB->getRideMetrics(rideItem->fileName);
+        }
     }
+
 
     //
     // 3 top columns - total, average, maximums and metrics for entire ride
@@ -257,19 +273,28 @@ RideSummaryWindow::htmlSummary() const
              s = s.arg(m->name().replace(QRegExp(tr("^(Average|Max) ")), ""));
  
              // Add units (if needed)  and value (with right precision)
-             if (m->units(metricUnits) == "seconds") {
+             if (m->units(useMetricUnits) == "seconds") {
                  s = s.arg(""); // no units
-                 s = s.arg(time_to_string(metrics.getForSymbol(symbol)));
+
+                 // get the value - from metrics or from data array
+                 if (ridesummary) s = s.arg(time_to_string(metrics.getForSymbol(symbol)));
+                 else s = s.arg(SummaryMetrics::getAggregated(symbol, data, useMetricUnits));
+
              } else {
-                 if (m->units(metricUnits) != "") s = s.arg(" (" + m->units(metricUnits) + ")");
+                 if (m->units(useMetricUnits) != "") s = s.arg(" (" + m->units(useMetricUnits) + ")");
                  else s = s.arg("");
 
                  // temperature is a special case, if it is not present fall back to metadata tag
                  // if that is not present then just display '-'
                  if ((symbol == "average_temp" || symbol == "max_temp") && metrics.getForSymbol(symbol) == RideFile::noTemp)
                     s = s.arg(ride->getTag("Temperature", "-"));
-                 else
-                    s = s.arg(metrics.getForSymbol(symbol) * (metricUnits ? 1 : m->conversion()) + (metricUnits ? 0 : m->conversionSum()), 0, 'f', m->precision());
+                 else {
+
+                    // get the value - from metrics or from data array
+                    if (ridesummary) s = s.arg(metrics.getForSymbol(symbol) * (useMetricUnits ? 1 : m->conversion()) 
+                                               + (useMetricUnits ? 0 : m->conversionSum()), 0, 'f', m->precision());
+                    else s = s.arg(SummaryMetrics::getAggregated(symbol, data, useMetricUnits));
+                }
             }
 
             summary += s;
@@ -283,10 +308,14 @@ RideSummaryWindow::htmlSummary() const
     //
     if (rideItem->numZones() > 0) {
         QVector<double> time_in_zone(rideItem->numZones());
-        for (int i = 0; i < rideItem->numZones(); ++i)
-            time_in_zone[i] = metrics.getForSymbol(timeInZones[i]);
+        for (int i = 0; i < rideItem->numZones(); ++i) {
+
+            // if using metrics or data
+            if (ridesummary) time_in_zone[i] = metrics.getForSymbol(timeInZones[i]);
+            else time_in_zone[i] = SummaryMetrics::getAggregated(timeInZones[i], data, useMetricUnits, true).toDouble();
+        }
         summary += tr("<h3>Power Zones</h3>");
-        summary += mainWindow->zones()->summarize(rideItem->zoneRange(), time_in_zone);
+        summary += mainWindow->zones()->summarize(rideItem->zoneRange(), time_in_zone); //XXX aggregating?
     }
 
     //
@@ -294,84 +323,95 @@ RideSummaryWindow::htmlSummary() const
     //
     if (rideItem->numHrZones() > 0) {
         QVector<double> time_in_zone(rideItem->numHrZones());
-        for (int i = 0; i < rideItem->numHrZones(); ++i)
-            time_in_zone[i] = metrics.getForSymbol(timeInZonesHR[i]);
+        for (int i = 0; i < rideItem->numHrZones(); ++i) {
+
+            // if using metrics or data
+            if (ridesummary) time_in_zone[i] = metrics.getForSymbol(timeInZonesHR[i]);
+            else time_in_zone[i] = SummaryMetrics::getAggregated(timeInZonesHR[i], data, useMetricUnits, true).toDouble();
+        }
+
         summary += tr("<h3>Heart Rate Zones</h3>");
-        summary += mainWindow->hrZones()->summarize(rideItem->hrZoneRange(), time_in_zone);
+        summary += mainWindow->hrZones()->summarize(rideItem->hrZoneRange(), time_in_zone); //XXX aggregating
     }
 
-    //
-    // Interval Summary (recalculated on every refresh since they are not cached at present)
-    //
-    if (ride->intervals().size() > 0) {
-        bool firstRow = true;
-        QString s;
-        if (appsettings->contains(GC_SETTINGS_INTERVAL_METRICS))
-            s = appsettings->value(this, GC_SETTINGS_INTERVAL_METRICS).toString();
-        else
-            s = GC_SETTINGS_INTERVAL_METRICS_DEFAULT;
-        QStringList intervalMetrics = s.split(",");
-        summary += "<p><h3>"+tr("Intervals")+"</h3>\n<p>\n";
-        summary += "<table align=\"center\" width=\"90%\" ";
-        summary += "cellspacing=0 border=0>";
-        bool even = false;
-        foreach (RideFileInterval interval, ride->intervals()) {
-            RideFile f(ride->startTime(), ride->recIntSecs());
-            for (int i = ride->intervalBegin(interval); i < ride->dataPoints().size(); ++i) {
-                const RideFilePoint *p = ride->dataPoints()[i];
-                if (p->secs >= interval.stop)
-                    break;
-                f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
-                              p->watts, p->alt, p->lon, p->lat, p->headwind,
-                              p->slope, p->temp, p->lrbalance, 0);
-            }
-            if (f.dataPoints().size() == 0) {
-                // Interval empty, do not compute any metrics
-                continue;
-            }
+    // Only get interval summary for a ride summary
+    if (ridesummary) {
 
-            QHash<QString,RideMetricPtr> metrics =
-                RideMetric::computeMetrics(mainWindow, &f, mainWindow->zones(), mainWindow->hrZones(), intervalMetrics);
-            if (firstRow) {
-                summary += "<tr>";
-                summary += "<td align=\"center\" valign=\"bottom\">Interval Name</td>";
+        //
+        // Interval Summary (recalculated on every refresh since they are not cached at present)
+        //
+        if (ride->intervals().size() > 0) {
+            bool firstRow = true;
+            QString s;
+            if (appsettings->contains(GC_SETTINGS_INTERVAL_METRICS))
+                s = appsettings->value(this, GC_SETTINGS_INTERVAL_METRICS).toString();
+            else
+                s = GC_SETTINGS_INTERVAL_METRICS_DEFAULT;
+            QStringList intervalMetrics = s.split(",");
+            summary += "<p><h3>"+tr("Intervals")+"</h3>\n<p>\n";
+            summary += "<table align=\"center\" width=\"90%\" ";
+            summary += "cellspacing=0 border=0>";
+            bool even = false;
+            foreach (RideFileInterval interval, ride->intervals()) {
+                RideFile f(ride->startTime(), ride->recIntSecs());
+                for (int i = ride->intervalBegin(interval); i < ride->dataPoints().size(); ++i) {
+                    const RideFilePoint *p = ride->dataPoints()[i];
+                    if (p->secs >= interval.stop)
+                        break;
+                    f.appendPoint(p->secs, p->cad, p->hr, p->km, p->kph, p->nm,
+                                p->watts, p->alt, p->lon, p->lat, p->headwind,
+                                p->slope, p->temp, p->lrbalance, 0);
+                }
+                if (f.dataPoints().size() == 0) {
+                    // Interval empty, do not compute any metrics
+                    continue;
+                }
+
+                QHash<QString,RideMetricPtr> metrics =
+                    RideMetric::computeMetrics(mainWindow, &f, mainWindow->zones(), mainWindow->hrZones(), intervalMetrics);
+                if (firstRow) {
+                    summary += "<tr>";
+                    summary += "<td align=\"center\" valign=\"bottom\">Interval Name</td>";
+                    foreach (QString symbol, intervalMetrics) {
+                        RideMetricPtr m = metrics.value(symbol);
+                        if (!m) continue;
+                        summary += "<td align=\"center\" valign=\"bottom\">" + m->name();
+                        if (m->units(useMetricUnits) == "seconds")
+                            ; // don't do anything
+                        else if (m->units(useMetricUnits).size() > 0)
+                            summary += " (" + m->units(useMetricUnits) + ")";
+                        summary += "</td>";
+                    }
+                    summary += "</tr>";
+                    firstRow = false;
+                }
+                if (even)
+                    summary += "<tr>";
+                else {
+                    QColor color = QApplication::palette().alternateBase().color();
+                    color = QColor::fromHsv(color.hue(), color.saturation() * 2, color.value());
+                    summary += "<tr bgcolor='" + color.name() + "'>";
+                }
+                even = !even;
+                summary += "<td align=\"center\">" + interval.name + "</td>";
                 foreach (QString symbol, intervalMetrics) {
                     RideMetricPtr m = metrics.value(symbol);
                     if (!m) continue;
-                    summary += "<td align=\"center\" valign=\"bottom\">" + m->name();
-                    if (m->units(metricUnits) == "seconds")
-                        ; // don't do anything
-                    else if (m->units(metricUnits).size() > 0)
-                        summary += " (" + m->units(metricUnits) + ")";
-                    summary += "</td>";
+                    QString s("<td align=\"center\">%1</td>");
+                    if (m->units(useMetricUnits) == "seconds")
+                        summary += s.arg(time_to_string(m->value(useMetricUnits)));
+                    else
+                        summary += s.arg(m->value(useMetricUnits), 0, 'f', m->precision());
                 }
                 summary += "</tr>";
-                firstRow = false;
             }
-            if (even)
-                summary += "<tr>";
-            else {
-                QColor color = QApplication::palette().alternateBase().color();
-                color = QColor::fromHsv(color.hue(), color.saturation() * 2, color.value());
-                summary += "<tr bgcolor='" + color.name() + "'>";
-            }
-            even = !even;
-            summary += "<td align=\"center\">" + interval.name + "</td>";
-            foreach (QString symbol, intervalMetrics) {
-                RideMetricPtr m = metrics.value(symbol);
-                if (!m) continue;
-                QString s("<td align=\"center\">%1</td>");
-                if (m->units(metricUnits) == "seconds")
-                    summary += s.arg(time_to_string(m->value(metricUnits)));
-                else
-                    summary += s.arg(m->value(metricUnits), 0, 'f', m->precision());
-            }
-            summary += "</tr>";
+            summary += "</table>";
         }
-        summary += "</table>";
     }
 
-    if (!rideItem->errors().empty()) {
+    // sumarise errors reading file if it was a ride summary
+    if (ridesummary && !rideItem->errors().empty()) {
+
         summary += tr("<p><h2>Errors reading file:</h2><ul>");
         QStringListIterator i(rideItem->errors());
         while(i.hasNext())
@@ -389,3 +429,14 @@ RideSummaryWindow::htmlSummary() const
     return summary;
 }
 
+void RideSummaryWindow::dateRangeChanged(DateRange dr)
+{
+    if (!amVisible()) return;
+
+    // range didnt change ignore it...
+    if (dr.from == current.from && dr.to == current.to) return;
+    else current = dr;
+
+    data = mainWindow->metricDB->getAllMetricsFor(myDateRange);
+    refresh();
+}

@@ -517,10 +517,6 @@ MainWindow::MainWindow(const QDir &home) :
     chartTool = new GcWindowTool(this);
 #endif
 
-    // RIGHT SIDEBAR
-    gcCalendar = new GcCalendar(this);
-    //gcCalendar->setStyleSheet("background: #B3B4BA;");
-    //gcCalendar->setStyleSheet("background: white;");
 
     // TOOLBOX
     toolBox = new QToolBox(this);
@@ -583,6 +579,10 @@ MainWindow::MainWindow(const QDir &home) :
     currentWindow = analWindow;
 
     // POPULATE TOOLBOX
+
+    // do controllers after home windows -- they need their first signals caught
+    gcCalendar = new GcCalendar(this);
+    connect(gcCalendar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
 
     toolBox->addItem(intervalSplitter, QIcon(":images/activity.png"), "Activity History");
     toolBox->addItem(gcCalendar, QIcon(":images/toolbar/main/diary.png"), "Calendar");
@@ -1038,6 +1038,15 @@ MainWindow::rideTreeWidgetSelectionChanged()
 }
 
 void
+MainWindow::dateRangeChanged(DateRange dr)
+{
+    // we got signalled date range changed, tell the current view
+    // when we have multiple sidebars that change date we need to connect
+    // them up individually.... i.e. LTM....
+    diaryWindow->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
+}
+
+void
 MainWindow::enableSaveButton()
 {
     if (!ride) {
@@ -1326,6 +1335,7 @@ MainWindow::selectDiary()
     analButtons->hide();
     trainTool->getToolbarButtons()->hide();
     toolBox->setCurrentIndex(1);
+    gcCalendar->refresh(); // get that signal with the date range...
     setStyle();
 }
 

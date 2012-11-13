@@ -90,6 +90,7 @@ void GcWindow::setRideItem(RideItem* x)
 void GcWindow::setDateRange(DateRange dr)
 {
     _dr = dr;
+    emit dateRangeChanged(_dr);
 }
 
 DateRange GcWindow::dateRange() const
@@ -154,6 +155,7 @@ GcWindow::GcWindow()
     qRegisterMetaType<RideItem*>("ride");
     qRegisterMetaType<GcWinID>("type");
     qRegisterMetaType<QColor>("color");
+    qRegisterMetaType<DateRange>("dateRange");
     setControls(NULL);
     setRideItem(NULL);
     setTitle("");
@@ -185,6 +187,7 @@ GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
     qRegisterMetaType<RideItem*>("ride");
     qRegisterMetaType<GcWinID>("type");
     qRegisterMetaType<QColor>("color");
+    qRegisterMetaType<DateRange>("dateRange");
     setParent(parent);
     setControls(NULL);
     setRideItem(NULL);

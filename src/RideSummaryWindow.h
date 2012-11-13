@@ -25,6 +25,8 @@
 #include <QWebView>
 #include <QWebFrame>
 
+#include "SummaryMetrics.h"
+
 
 class RideSummaryWindow : public GcWindow
 {
@@ -34,12 +36,14 @@ class RideSummaryWindow : public GcWindow
 
     public:
 
-        RideSummaryWindow(MainWindow *parent);
+        // two modes - summarise ride or summarise date range
+        RideSummaryWindow(MainWindow *parent, bool ridesummary = true);
 
     protected slots:
 
         void refresh();
         void rideSelected();
+        void dateRangeChanged(DateRange);
         void rideItemChanged();
         void metadataChanged();
 
@@ -51,6 +55,10 @@ class RideSummaryWindow : public GcWindow
         QWebView *rideSummary;
 
         RideItem *_connected;
+        bool ridesummary; // do we summarise ride or daterange?
+
+        QList<SummaryMetrics> data; // when in date range mode
+        DateRange current;
 };
 
 #endif // _GC_RideSummaryWindow_h

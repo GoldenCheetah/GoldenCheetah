@@ -640,7 +640,7 @@ GcCalendar::setSummary()
 
                 const RideMetric *metric = RideMetricFactory::instance().rideMetric(metricname);
 
-                QString value = getAggregated(metricname, results);
+                QString value = SummaryMetrics::getAggregated(metricname, results, useMetricUnits);
 
 
                 // don't show units for time values
@@ -670,72 +670,15 @@ GcCalendar::setSummary()
         // set webview contents
         summary->page()->mainFrame()->setHtml(summaryText);
 
-    }
-}
-
-QString GcCalendar::getAggregated(QString name, QList<SummaryMetrics> &results)
-{
-    // get the metric details, so we can convert etc
-    const RideMetric *metric = RideMetricFactory::instance().rideMetric(name);
-    if (!metric) return QString("%1 unknown").arg(name);
-
-    // do we need to convert from metric to imperial?
-    bool useMetricUnits = (appsettings->value(this, GC_UNIT).toString() == "Metric");
-
-    // what we will return
-    double rvalue = 0;
-    double rcount = 0; // using double to avoid rounding issues with int when dividing
-
-    // loop through and aggregate
-    foreach (SummaryMetrics rideMetrics, results) {
-
-        // get this value
-        double value = rideMetrics.getForSymbol(name);
-        double count = rideMetrics.getForSymbol("workout_time"); // for averaging
-
+        // tell everyone the date range changed
+        QString name;
+        if (summarySelect->currentIndex() == 0) name = "Day of " + from.toString("dddd MMMM d");
+        else if (summarySelect->currentIndex() == 1) name = QString("Week Commencing %1").arg(from.toString("dddd MMMM d"));
+        else if (summarySelect->currentIndex() == 2) name = from.toString("MMMM yyyy");
         
-        // check values are bounded, just in case
-        if (isnan(value) || isinf(value)) value = 0;
+        emit dateRangeChanged(DateRange(from, to, name));
 
-        // imperial / metric conversion
-        if (useMetricUnits == false) {
-            value *= metric->conversion();
-            value += metric->conversionSum();
-        }
-
-        switch (metric->type()) {
-        case RideMetric::Total:
-            rvalue += value;
-            break;
-        case RideMetric::Average:
-            {
-            // average should be calculated taking into account
-            // the duration of the ride, otherwise high value but
-            // short rides will skew the overall average
-            rvalue += value*count;
-            rcount += count;
-            break;
-            }
-        case RideMetric::Peak:
-            {
-            if (value > rvalue) rvalue = value;
-            break;
-            }
-        }
     }
-
-    // now compute the average
-    if (metric->type() == RideMetric::Average) {
-        if (rcount) rvalue = rvalue / rcount;
-    }
-
-
-    // Format appropriately
-    QString result;
-    if (metric->units(useMetricUnits) == "seconds") result = time_to_string(rvalue);
-    else result = QString("%1").arg(rvalue, 0, 'f', metric->precision());
-
-    return result;
 }
 
 void

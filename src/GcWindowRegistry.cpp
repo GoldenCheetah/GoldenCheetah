@@ -67,7 +67,7 @@ GcWindowRegistry GcWindows[] = {
     { VIEW_HOME, "Performance Manager",GcWindowTypes::PerformanceManager },
     { VIEW_HOME, "Collection TreeMap",GcWindowTypes::TreeMap },
     { VIEW_HOME,  "Weekly Summary",GcWindowTypes::WeeklySummary },
-    { VIEW_ANALYSIS, "Summary",GcWindowTypes::RideSummary },
+    { VIEW_ANALYSIS, "Activity Summary",GcWindowTypes::RideSummary },
     { VIEW_ANALYSIS, "Details",GcWindowTypes::MetadataWindow },
     { VIEW_ANALYSIS, "Summary and Details",GcWindowTypes::Summary },
     { VIEW_ANALYSIS, "Editor",GcWindowTypes::RideEditor },
@@ -83,6 +83,7 @@ GcWindowRegistry GcWindows[] = {
     { VIEW_ANALYSIS, "Aerolab Chung Analysis",GcWindowTypes::Aerolab },
     { VIEW_DIARY, "Calendar",GcWindowTypes::Diary },
     { VIEW_DIARY, "Navigator", GcWindowTypes::ActivityNavigator },
+    { VIEW_DIARY, "Summary", GcWindowTypes::DateRangeSummary },
     { VIEW_TRAIN, "Telemetry",GcWindowTypes::DialWindow },
     { VIEW_TRAIN, "Workout",GcWindowTypes::WorkoutPlot },
     { VIEW_TRAIN, "Realtime",GcWindowTypes::RealtimePlot },
@@ -119,7 +120,8 @@ GcWindowRegistry::newGcWindow(GcWinID id, MainWindow *main) //XXX mainWindow wil
     case GcWindowTypes::PfPv: returning = new PfPvWindow(main); break;
     case GcWindowTypes::HrPw: returning = new HrPwWindow(main); break;
     case GcWindowTypes::RideEditor: returning = new RideEditor(main); break;
-    case GcWindowTypes::RideSummary: returning = new RideSummaryWindow(main); break;
+    case GcWindowTypes::RideSummary: returning = new RideSummaryWindow(main, true); break;
+    case GcWindowTypes::DateRangeSummary: returning = new RideSummaryWindow(main, false); break;
     case GcWindowTypes::Scatter: returning = new ScatterWindow(main, main->home); break;
     case GcWindowTypes::Summary: returning = new SummaryWindow(main); break;
     case GcWindowTypes::TreeMap: returning = new TreeMapWindow(main, main->useMetricUnits, main->home); break;

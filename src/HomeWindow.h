@@ -55,6 +55,7 @@ class HomeWindow : public GcWindow
 
         // GC signals
         void rideSelected();
+        void dateRangeChanged(DateRange);
         void configChanged();
 
         // QT Widget events and signals
