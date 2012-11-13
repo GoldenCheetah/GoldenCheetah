@@ -122,7 +122,7 @@ void GoogleMapControl::createHtml()
     "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\"/>\n"
     "<title>Golden Cheetah Map</title>\n"
     "<link href=\"http://code.google.com/apis/maps/documentation/javascript/examples/default.css\" rel=\"stylesheet\" type=\"text/css\" /> \n"
-    "<script type=\"text/javascript\" src=\"http://maps.googleapis.com/maps/api/js?sensor=false\"></script> \n");
+    "<script type=\"text/javascript\" src=\"http://maps.googleapis.com/maps/api/js?key=AIzaSyASrk4JoJOzESQguDwjk8aq9nQXsrUUskM&sensor=false\"></script> \n");
 
     // local functions
     currentPage += QString("<script type=\"text/javascript\">\n"

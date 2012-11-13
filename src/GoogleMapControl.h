@@ -41,9 +41,11 @@ class GoogleMapControl;
 // pretending to be chrome. see: http://developer.qt.nokia.com/forums/viewthread/1643/P15
 class myWebPage : public QWebPage
 {
+#if 0
     virtual QString userAgentForUrl(const QUrl&) const {
-        return "Chrome/1.0";
+        return "Mozilla/5.0";
     }
+#endif
 };
 
 class WebBridge : public QObject
