@@ -30,7 +30,7 @@ static const QString defaultColumns = QString("*|Workout Code|TSS|Date|");
 static const QString defaultWidths = QString("0|80|50|50|");
 static const int defaultSortBy = 2;
 
-RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), _groupBy(-1)
+RideNavigator::RideNavigator(MainWindow *parent, bool mainwindow) : main(parent), active(false), _groupBy(-1)
 {
     // get column headings
     _columns = defaultColumns;
@@ -44,7 +44,8 @@ RideNavigator::RideNavigator(MainWindow *parent) : main(parent), active(false), 
 
     mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(0,0,0,0);
+    if (mainwindow) mainLayout->setContentsMargins(0,0,0,0);
+    else mainLayout->setContentsMargins(2,2,2,2); // so we can resize!
 
     sqlModel = new QSqlTableModel(this, main->metricDB->db()->connection());
     sqlModel->setTable("metrics");

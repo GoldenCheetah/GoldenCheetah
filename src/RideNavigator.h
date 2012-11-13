@@ -65,7 +65,7 @@ class RideNavigator : public GcWindow
     friend class ::DataFilter;
 
     public:
-        RideNavigator(MainWindow *);
+        RideNavigator(MainWindow *, bool mainwindow = false);
         ~RideNavigator();
 
         void borderMenu(const QPoint &pos);
