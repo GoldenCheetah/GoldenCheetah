@@ -18,9 +18,10 @@
 
 #ifndef _TimeUtils_h
 #define _TimeUtils_h
-#include "GoldenCheetah.h"
 
+#include <QObject>
 #include <QDateTime>
+#include <QDate>
 #include <QString>
 
 QString interval_to_str(double secs);  // output like 1h 2m 3s
@@ -31,5 +32,18 @@ QString time_to_string(double secs);   // output like 1:02:03
 */
 QDateTime convertToLocalTime(QString timestamp);
 
-#endif // _TimeUtils_h
+class DateRange : QObject
+{
+    Q_OBJECT
 
+    public:
+        DateRange(const DateRange& other);
+        DateRange(QDate from = QDate(), QDate to = QDate());
+        DateRange& operator=(const DateRange &);
+        QDate from, to;
+
+    signals:
+        void changed(QDate from, QDate to);
+};
+
+#endif // _TimeUtils_h

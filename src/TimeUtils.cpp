@@ -97,3 +97,23 @@ QDateTime convertToLocalTime(QString timestamp)
     }
 }
 
+DateRange::DateRange(QDate from, QDate to) : QObject()
+{
+    this->from=from;
+    this->to=to;
+}
+
+DateRange::DateRange(const DateRange &other) : QObject()
+{
+    from=other.from;
+    to=other.to;
+}
+
+DateRange& DateRange::operator=(const DateRange &other)
+{
+    from=other.from;
+    to=other.to;
+    emit changed(from, to);
+
+    return *this;
+}
