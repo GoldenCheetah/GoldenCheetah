@@ -77,7 +77,7 @@
 #define GC_LTM_SPLITTER_SIZES  "ltmwindow/splitterSizes"
 #define GC_LINEWIDTH      "linewidth"
 #define GC_ANTIALIAS      "antialias"
-#define GC_DROPSHADOW     "dropshadow"
+#define GC_DROPSHADOWS    "dropshadow"
 #define GC_SHADEZONES     "shadezones"
 #define GC_PROXYTYPE      "proxy/type"
 #define GC_PROXYHOST      "proxy/host"
