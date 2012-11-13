@@ -24,6 +24,7 @@
 #include <QPixmap>
 #include <QEvent>
 #include <QMouseEvent>
+#include <QGraphicsDropShadowEffect>
 
 QWidget *GcWindow::controls() const
 {

@@ -100,7 +100,6 @@
 #include <assert.h>
 #include <QApplication>
 #include <QtGui>
-#include <QGraphicsDropShadowEffect>
 #include <QRegExp>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_picker.h>
@@ -535,14 +534,6 @@ MainWindow::MainWindow(const QDir &home) :
     toolBox->setContentsMargins(0,0,0,0);
     toolBox->layout()->setSpacing(0);
 
-#ifndef WIN32
-    // add a drop shadow to the window
-    if (appsettings->value(this, GC_DROPSHADOWS, false).toBool() == true) {
-        QGraphicsDropShadowEffect *dropShadow = new QGraphicsDropShadowEffect(this);
-        dropShadow->setBlurRadius(10);
-        toolBox->setGraphicsEffect(dropShadow);
-    }
-#endif
     // CONTAINERS FOR TOOLBOX
     masterControls = new QStackedWidget(this);
     masterControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
