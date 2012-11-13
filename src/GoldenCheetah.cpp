@@ -87,6 +87,16 @@ void GcWindow::setRideItem(RideItem* x)
     emit rideItemChanged(_rideItem);
 }
 
+void GcWindow::setDateRange(DateRange dr)
+{
+    _dr = dr;
+}
+
+DateRange GcWindow::dateRange() const
+{
+    return _dr;
+}
+
 double GcWindow::widthFactor() const
 {
     return _widthFactor;

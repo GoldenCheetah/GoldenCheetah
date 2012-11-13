@@ -18,6 +18,7 @@
 
 #ifndef _GC_GoldenCheetah_h
 #define _GC_GoldenCheetah_h
+#include "TimeUtils.h"
 
 #define G_OBJECT Q_PROPERTY(QString instanceName READ instanceName WRITE setInstanceName)
 #define setInstanceName(x) setProperty("instanceName", x)
@@ -42,6 +43,7 @@ class GcWindow;
 Q_DECLARE_METATYPE(QWidget*);
 Q_DECLARE_METATYPE(RideItem*);
 Q_DECLARE_METATYPE(GcWinID);
+Q_DECLARE_METATYPE(DateRange);
 
 
 class GcWindow : public QFrame
@@ -68,9 +70,12 @@ private:
     // informed by the layout manager
     Q_PROPERTY(RideItem* ride READ rideItem WRITE setRideItem NOTIFY rideItemChanged)
 
+    // all charts have a date range, they don't all implement it
+    Q_PROPERTY(DateRange dateRange READ dateRange WRITE setDateRange NOTIFY dateRangeChanged);
+
     // geometry factor
     Q_PROPERTY(double widthFactor READ widthFactor WRITE setWidthFactor NOTIFY widthFactorChanged USER true);
-    Q_PROPERTY(double heightFactor READ heightFactor WRITE setHeightFactor NOTIFY widthFactorChanged USER true);
+    Q_PROPERTY(double heightFactor READ heightFactor WRITE setHeightFactor NOTIFY heightFactorChanged USER true);
 
     // can be resized
     Q_PROPERTY(bool resizable READ resizable WRITE setResizable USER true);
@@ -82,6 +87,7 @@ private:
     QString _instanceName;
     RideItem *_rideItem;
     GcWinID _type;
+    DateRange _dr;
     double _widthFactor;
     double _heightFactor;
     bool _resizable;
@@ -104,6 +110,7 @@ signals:
     void rideItemChanged(RideItem*);
     void heightFactorChanged(double);
     void widthFactorChanged(double);
+    void dateRangeChanged(DateRange);
     void resizing(GcWindow*);
     void moving(GcWindow*);
     void resized(GcWindow*); // finished resizing
@@ -133,6 +140,9 @@ public:
 
     void setRideItem(RideItem *);
     RideItem *rideItem() const;
+
+    void setDateRange(DateRange);
+    DateRange dateRange() const;
 
     void setWidthFactor(double);
     double widthFactor() const;
