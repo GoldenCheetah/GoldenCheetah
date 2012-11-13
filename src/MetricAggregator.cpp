@@ -307,6 +307,12 @@ MetricAggregator::writeAsCSV(QString filename)
 }
 
 QList<SummaryMetrics>
+MetricAggregator::getAllMetricsFor(DateRange dr)
+{
+    return getAllMetricsFor(QDateTime(dr.from, QTime(0,0,0)), QDateTime(dr.to, QTime(23,59,59)));
+}
+
+QList<SummaryMetrics>
 MetricAggregator::getAllMetricsFor(QDateTime start, QDateTime end)
 {
     if (main->isclean == false) refreshMetrics(); // get them up-to-date
@@ -347,6 +353,12 @@ MetricAggregator::getAllMetricsFor(QString filename)
     dbaccess->getRide(filename, results, color);
     dbaccess->connection().commit();
     return results;
+}
+
+QList<SummaryMetrics>
+MetricAggregator::getAllMeasuresFor(DateRange dr)
+{
+    return getAllMeasuresFor(QDateTime(dr.from, QTime(0,0,0)), QDateTime(dr.to, QTime(23,59,59)));
 }
 
 QList<SummaryMetrics>

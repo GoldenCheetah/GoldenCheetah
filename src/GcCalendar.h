@@ -25,6 +25,7 @@
 #include <QWebView>
 
 #include "MainWindow.h"
+#include "TimeUtils.h"
 #include "GcCalendarModel.h"
 #include "RideItem.h"
 #include "RideNavigator.h"
@@ -82,8 +83,10 @@ class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
         void setSummary(); // set the summary at the bottom
 
         // summary metrics aggregator -- refactor later
-        QString getAggregated(QString name, QList<SummaryMetrics> &results);
         void splitterMoved(int pos, int index);
+
+    signals:
+        void dateRangeChanged(DateRange);
 
     protected:
         MainWindow *main;

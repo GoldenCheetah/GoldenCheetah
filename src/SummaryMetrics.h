@@ -61,6 +61,9 @@ class SummaryMetrics
         // get unit string to use for this symbol
         QString getUnitsForSymbol(QString symbol, bool UseMetric) const;
 
+        // when passed a list of summary metrics and a name return aggregated value as a string
+        static QString getAggregated(QString name, const QList<SummaryMetrics> &results, bool useMetricUnits, bool nofmt = false);
+
         QMap<QString, double> &values() { return value; }
         QMap<QString, QString> &texts() { return text; }
 

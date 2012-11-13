@@ -62,8 +62,15 @@ class DBAccess
 
     // Query Records
     QList<SummaryMetrics> getAllMetricsFor(QDateTime start, QDateTime end);
+    QList<SummaryMetrics> getAllMetricsFor(DateRange dr) {
+        return getAllMetricsFor(QDateTime(dr.from,QTime(0,0,0)), QDateTime(dr.to, QTime(23,59,59)));
+    }
+
     bool getRide(QString filename, SummaryMetrics &metrics, QColor&color);
     QList<SummaryMetrics> getAllMeasuresFor(QDateTime start, QDateTime end);
+    QList<SummaryMetrics> getAllMeasuresFor(DateRange dr) { 
+        return getAllMeasuresFor(QDateTime(dr.from,QTime(0,0,0)), QDateTime(dr.to, QTime(23,59,59)));
+    }
 
     SummaryMetrics getRideMetrics(QString filename); // for a filename
 

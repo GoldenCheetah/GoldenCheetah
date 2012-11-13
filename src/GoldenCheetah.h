@@ -23,6 +23,7 @@
 #define G_OBJECT Q_PROPERTY(QString instanceName READ instanceName WRITE setInstanceName)
 #define setInstanceName(x) setProperty("instanceName", x)
 #define myRideItem property("ride").value<RideItem*>()
+#define myDateRange property("dateRange").value<DateRange>()
 
 #include <QString>
 #include <QMenu>

@@ -202,6 +202,7 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     styleChanged(2);
 
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
+    connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(tabbed, SIGNAL(currentChanged(int)), this, SLOT(tabSelected(int)));
     connect(tabbed, SIGNAL(tabCloseRequested(int)), this, SLOT(removeChart(int)));
@@ -360,6 +361,27 @@ HomeWindow::rideSelected()
 }
 
 void
+HomeWindow::dateRangeChanged(DateRange dr)
+{
+    if (amVisible()) {
+
+        for (int i=0; i < charts.count(); i++) {
+
+            // show if its not a tab
+            if (currentStyle) charts[i]->show(); // keep tabs hidden, show the rest
+
+            // if we are tabbed AND its the current tab then mimic tabselected
+            // to force the tabwidget to refresh AND set its ride property (see below)
+            //otherwise just go ahead and notify it of a new ride
+            if (!currentStyle && charts.count() && i==tabbed->currentIndex())
+                tabSelected(tabbed->currentIndex());
+            else
+                charts[i]->setProperty("dateRange", property("dateRange"));
+        }
+    }
+}
+
+void
 HomeWindow::tabSelected(int index)
 {
     if (active || currentStyle != 0) return;
@@ -367,6 +389,7 @@ HomeWindow::tabSelected(int index)
     if (index >= 0) {
         charts[index]->show();
         charts[index]->setProperty("ride", property("ride"));
+        charts[index]->setProperty("dateRange", property("dateRange"));
         controlStack->setCurrentIndex(index);
         titleEdit->setText(charts[index]->property("title").toString());
     }
@@ -430,6 +453,7 @@ HomeWindow::styleChanged(int id)
             tabbed->addTab(charts[i], charts[i]->property("title").toString());
             charts[i]->setContentsMargins(0,25,0,0);
             charts[i]->setResizable(false); // we need to show on tab selection!
+            charts[i]->setProperty("dateRange", property("dateRange"));
             charts[i]->hide(); // we need to show on tab selection!
             break;
         case 1 : // they are lists in a GridLayout
@@ -437,6 +461,7 @@ HomeWindow::styleChanged(int id)
             charts[i]->setContentsMargins(0,25,0,0);
             charts[i]->setResizable(false); // we need to show on tab selection!
             charts[i]->show();
+            charts[i]->setProperty("dateRange", property("dateRange"));
             charts[i]->setProperty("ride", property("ride"));
             break;
         case 2 : // thet are in a FlowLayout
@@ -444,6 +469,7 @@ HomeWindow::styleChanged(int id)
             charts[i]->setContentsMargins(0,15,0,0);
             charts[i]->setResizable(true); // we need to show on tab selection!
             charts[i]->show();
+            charts[i]->setProperty("dateRange", property("dateRange"));
             charts[i]->setProperty("ride", property("ride"));
         default:
             break;
@@ -571,6 +597,7 @@ HomeWindow::addChart(GcWindow* newone)
 
         RideItem *notconst = (RideItem*)mainWindow->currentRideItem();
         newone->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
+        newone->setProperty("dateRange", property("dateRange"));
 
         // add to tabs
         switch (currentStyle) {
@@ -1219,6 +1246,7 @@ GcWindowDialog::GcWindowDialog(GcWinID type, MainWindow *mainWindow) : mainWindo
 
     RideItem *notconst = (RideItem*)mainWindow->currentRideItem();
     win->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
+    win->setProperty("dateRange", property("dateRange"));
 
     layout->setStretch(0, 100);
     layout->setStretch(1, 50);

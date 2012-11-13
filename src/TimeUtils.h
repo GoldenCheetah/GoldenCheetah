@@ -38,9 +38,10 @@ class DateRange : QObject
 
     public:
         DateRange(const DateRange& other);
-        DateRange(QDate from = QDate(), QDate to = QDate());
+        DateRange(QDate from = QDate(), QDate to = QDate(), QString name ="");
         DateRange& operator=(const DateRange &);
         QDate from, to;
+        QString name;
 
     signals:
         void changed(QDate from, QDate to);

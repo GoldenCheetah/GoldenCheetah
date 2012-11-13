@@ -323,6 +323,8 @@ class MainWindow : public QMainWindow
         void toggleFullScreen();
 #endif
 
+        void dateRangeChanged(DateRange);
+
     protected:
 
         static QString notesFileName(QString rideFileName);

@@ -48,7 +48,9 @@ class MetricAggregator : public QObject
         DBAccess *db() { return dbaccess; }
         SummaryMetrics getAllMetricsFor(QString filename); // for a single ride
         QList<SummaryMetrics> getAllMetricsFor(QDateTime start, QDateTime end);
+        QList<SummaryMetrics> getAllMetricsFor(DateRange);
         QList<SummaryMetrics> getAllMeasuresFor(QDateTime start, QDateTime end);
+        QList<SummaryMetrics> getAllMeasuresFor(DateRange);
         SummaryMetrics getRideMetrics(QString filename);
         void writeAsCSV(QString filename); // export all...
 
