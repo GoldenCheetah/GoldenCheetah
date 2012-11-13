@@ -866,7 +866,7 @@ QSize NavigatorCellDelegate::sizeHint(const QStyleOptionViewItem & /*option*/, c
 
     if (rideNavigator->groupByModel->mapToSource(rideNavigator->sortModel->mapToSource(index)) != QModelIndex() &&
         rideNavigator->groupByModel->data(rideNavigator->sortModel->mapToSource(index), Qt::UserRole).toString() != "") {
-        s.setHeight(56);
+        s.setHeight(52);
     } else s.setHeight(18);
 #if 0
     if (rideNavigator->tableView->model()->data(index, Qt::UserRole).toString() != "") s.setHeight(18);
@@ -958,20 +958,23 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
         if (calendarText != "") {
             myOption.rect.setX(0);
-            myOption.rect.setY(myOption.rect.y() + 23);//was +18
+            myOption.rect.setY(myOption.rect.y() + 18);//was +23
             myOption.rect.setWidth(rideNavigator->pwidth);
-            myOption.rect.setHeight(36);
-            myOption.font.setPointSize(myOption.font.pointSize()-2);
+            myOption.rect.setHeight(28); //was 36
+            myOption.font.setPointSize(myOption.font.pointSize());
             myOption.font.setWeight(QFont::Normal);
             //myOption.font.setStyle(QFont::StyleItalic);
             painter->fillRect(myOption.rect, background);
             //drawFocus(painter, myOption, myOption.rect);
             drawDisplay(painter, myOption, myOption.rect, "");
-            myOption.rect.setX(25); // wider notes display
-            myOption.rect.setWidth(pwidth-50);// wider notes display
+            myOption.rect.setX(10); // wider notes display
+            myOption.rect.setWidth(pwidth-20);// wider notes display
             //drawDisplay(painter, myOption, myOption.rect, calendarText);
             painter->setFont(myOption.font);
+            QPen isColor = painter->pen();
+            if (isColor.color() == Qt::black) painter->setPen(Qt::darkGray);
             painter->drawText(myOption.rect, Qt::AlignLeft | Qt::TextWordWrap, calendarText);
+            painter->setPen(isColor);
         }
 
     } else {
