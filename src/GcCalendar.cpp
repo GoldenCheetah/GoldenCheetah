@@ -27,6 +27,7 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     setContentsMargins(0,0,0,0);
     setAutoFillBackground(true);
 
+    setStyleSheet("QLabel { color: gray; }");
     month = year = 0;
     _ride = NULL;
 
@@ -57,9 +58,9 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     slayout->setSpacing(0);
     splitter->addWidget(sum);
 
-    black.setColor(QPalette::WindowText, QColor(0,0,0,240));
-    white.setColor(QPalette::WindowText, QColor(255,255,255,240));
-    grey.setColor(QPalette::WindowText, QColor(127,127,127,255));
+    black.setColor(QPalette::WindowText, Qt::gray);
+    white.setColor(QPalette::WindowText, Qt::white);
+    grey.setColor(QPalette::WindowText, Qt::gray);
 
     // get the model
     fieldDefinitions = main->rideMetadata()->getFields();
@@ -67,18 +68,18 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     calendarModel->setSourceModel(main->listView->sqlModel);
 
     QFont font;
-    font.setPointSize(48);
+    font.setPointSize(40);
     dayNumber = new GcLabel("4", this);
-    dayNumber->setYOff(-1);
+    //dayNumber->setYOff(-1);
     dayNumber->setAutoFillBackground(false);
     dayNumber->setPalette(white);
     dayNumber->setFont(font);
     dayNumber->setAlignment(Qt::AlignLeft);
     layout->addWidget(dayNumber);
 
-    font.setPointSize(24);
+    font.setPointSize(20);
     dayName = new GcLabel("Sunday", this);
-    dayName->setYOff(-1);
+    //dayName->setYOff(-1);
     dayName->setAutoFillBackground(false);
     dayName->setPalette(white);
     dayName->setFont(font);
@@ -94,21 +95,20 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     dayDate->setAlignment(Qt::AlignLeft);
     layout->addWidget(dayDate);
 
-    GcLabel *spacer1 = new GcLabel("", this);
-    spacer1->setFixedHeight(20);
-    layout->addWidget(spacer1);
+    //GcLabel *spacer1 = new GcLabel("", this);
+    //spacer1->setFixedHeight(20);
+    //layout->addWidget(spacer1);
 
     QHBoxLayout *line = new QHBoxLayout;
     line->setSpacing(5);
-    layout->addLayout(line);
 
-    GcLabel *spacer2 = new GcLabel("", this);
-    spacer2->setFixedHeight(10);
-    layout->addWidget(spacer2);
+    //GcLabel *spacer2 = new GcLabel("", this);
+    //spacer2->setFixedHeight(10);
+    //layout->addWidget(spacer2);
 
     font.setPointSize(12);
     left = new GcLabel("<", this);
-    left->setYOff(1);
+    //left->setYOff(1);
     left->setAutoFillBackground(false);
     left->setPalette(white);
     left->setFont(font);
@@ -118,7 +118,7 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
 
     font.setPointSize(12);
     monthName = new GcLabel("January 2012", this);
-    monthName->setYOff(1);
+    //monthName->setYOff(1);
     monthName->setAutoFillBackground(false);
     monthName->setPalette(white);
     monthName->setFont(font);
@@ -127,7 +127,7 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
 
     font.setPointSize(12);
     right = new GcLabel(">", this);
-    right->setYOff(1);
+    //right->setYOff(1);
     right->setAutoFillBackground(false);
     right->setPalette(white);
     right->setFont(font);
@@ -135,9 +135,14 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     line->addWidget(right);
     connect (right, SIGNAL(clicked()), this, SLOT(next()));
 
-    dayLayout = new QGridLayout;
+    QWidget *month = new QWidget(this);
+    month->setContentsMargins(0,0,0,0);
+    month->setFixedWidth(200);
+    month->setFixedHeight(200);
+    dayLayout = new QGridLayout(month);
     dayLayout->setSpacing(1);
-    layout->addLayout(dayLayout);
+    dayLayout->addLayout(line, 0,0,1,7);
+    layout->addWidget(month, Qt::AlignCenter);
 
     font.setWeight(QFont::Normal);
 
@@ -149,7 +154,7 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     day->setPalette(white);
     day->setFont(font);
     day->setAlignment(Qt::AlignCenter);
-    dayLayout->addWidget(day, 0, 0);
+    dayLayout->addWidget(day, 1, 0);
 
     // Tue
     day = new GcLabel("Tue", this);
@@ -158,7 +163,7 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     day->setPalette(white);
     day->setFont(font);
     day->setAlignment(Qt::AlignCenter);
-    dayLayout->addWidget(day, 0, 1);
+    dayLayout->addWidget(day, 1, 1);
 
     // Wed
     day = new GcLabel("Wed", this);
@@ -167,7 +172,7 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     day->setPalette(white);
     day->setFont(font);
     day->setAlignment(Qt::AlignCenter);
-    dayLayout->addWidget(day, 0, 2);
+    dayLayout->addWidget(day, 1, 2);
 
     // Thu
     day = new GcLabel("Thu", this);
@@ -176,7 +181,7 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     day->setPalette(white);
     day->setFont(font);
     day->setAlignment(Qt::AlignCenter);
-    dayLayout->addWidget(day, 0, 3);
+    dayLayout->addWidget(day, 1, 3);
 
     // Fri
     day = new GcLabel("Fri", this);
@@ -185,7 +190,7 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     day->setPalette(white);
     day->setFont(font);
     day->setAlignment(Qt::AlignCenter);
-    dayLayout->addWidget(day, 0, 4);
+    dayLayout->addWidget(day, 1, 4);
 
     // Sat
     day = new GcLabel("Sat", this);
@@ -194,7 +199,7 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     day->setPalette(white);
     day->setFont(font);
     day->setAlignment(Qt::AlignCenter);
-    dayLayout->addWidget(day, 0, 5);
+    dayLayout->addWidget(day, 1, 5);
 
     // Sun
     day = new GcLabel("Sun", this);
@@ -203,31 +208,32 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     day->setPalette(white);
     day->setFont(font);
     day->setAlignment(Qt::AlignCenter);
-    dayLayout->addWidget(day, 0, 6);
+    dayLayout->addWidget(day, 1, 6);
 
     signalMapper = new QSignalMapper(this);
     font.setPointSize(11);
-    for (int row=1; row<7; row++) {
+    for (int row=2; row<8; row++) {
 
         for (int col=0; col < 7; col++) {
 
-            GcLabel *d = new GcLabel(QString("%1").arg((row-1)*7+col), this);
+            GcLabel *d = new GcLabel(QString("%1").arg((row-2)*7+col), this);
             d->setFont(font);
             d->setAutoFillBackground(false);
-            d->setPalette(white);
+            d->setPalette(grey);
+            d->setStyleSheet("color: gray;");
             d->setAlignment(Qt::AlignCenter);
             dayLayout->addWidget(d,row,col);
 
             // we like squares
-            d->setFixedHeight(28);
-            d->setFixedWidth(28);
+            d->setFixedHeight(22);
+            d->setFixedWidth(22);
 
             dayLabels << d;
 
             if (row== 3 && col == 4) d->setSelected(true);
 
             connect (d, SIGNAL(clicked()), signalMapper, SLOT(map()));
-            signalMapper->setMapping(d, (row-1)*7+col);
+            signalMapper->setMapping(d, (row-2)*7+col);
         }
     }
     layout->addStretch();
@@ -484,11 +490,13 @@ GcLabel::paintEvent(QPaintEvent *e)
 {
     int x,y,w,l;
 
+
     if (bg) {
-        // setup a painter and the area to paint
         QPainter painter(this);
+        // setup a painter and the area to paint
         QRect all(0,0,width(),height());
         painter.fillRect(all, bgColor);
+        painter.setPen(Qt::gray);
         painter.drawRect(QRect(0,0,width()-1,height()-1));
     }
 
@@ -515,6 +523,9 @@ GcLabel::paintEvent(QPaintEvent *e)
         setPalette(p);
     }
 
+    QPalette r; // want gray
+    r.setColor(QPalette::WindowText, QColor(127,127,127,160));
+    setPalette(r);
     QLabel::paintEvent(e);
 }
 
