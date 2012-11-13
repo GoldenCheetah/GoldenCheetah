@@ -935,27 +935,31 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     QBrush background = rideNavigator->tableView->model()->data(index, Qt::BackgroundRole).value<QBrush>();
 
     if (columnName != "*") {
+
         myOption.displayAlignment = Qt::AlignLeft | Qt::AlignTop;
-        //myOption.rect.setHeight(18);
         painter->fillRect(myOption.rect, background);
-        //drawFocus(painter, myOption, myOption.rect);
+
+        // clear first
         drawDisplay(painter, myOption, myOption.rect, ""); //added
-        //QPen rpen(Qt::DotLine);
+
+        // draw border of each cell
         QPen rpen;
         rpen.setWidth(0.5);
         rpen.setColor(Qt::lightGray);
         painter->setPen(rpen);
         painter->drawLine(0,myOption.rect.y(),rideNavigator->pwidth,myOption.rect.y());
-        //painter->drawLine(0,myOption.rect.y()+myOption.rect.height()-1,rideNavigator->pwidth,myOption.rect.y()+myOption.rect.height()-1);
         painter->drawLine(0,myOption.rect.y()+myOption.rect.height(),rideNavigator->pwidth,myOption.rect.y()+myOption.rect.height());
-        //painter->drawLine(0,myOption.rect.y()+myOption.rect.height()-1,0,myOption.rect.y()+myOption.rect.height()-1);
         painter->drawLine(0,myOption.rect.y()+myOption.rect.height(),0,myOption.rect.y()+myOption.rect.height());
-        //painter->drawLine(rideNavigator->pwidth,myOption.rect.y(),rideNavigator->pwidth, myOption.rect.y()+myOption.rect.height()-1);
-        //painter->drawLine(rideNavigator->pwidth,myOption.rect.y(),rideNavigator->pwidth, myOption.rect.y()+myOption.rect.height());
+
+        // indent first column and draw all in bold
         myOption.rect.setHeight(18); //added
         myOption.font.setWeight(QFont::Bold);
-        drawDisplay(painter, myOption, myOption.rect, value);
+        if (myOption.rect.x() == 0) {
+            QRect indented(myOption.rect.x()+5, myOption.rect.y(), myOption.rect.width()-5, myOption.rect.height());
+            drawDisplay(painter, myOption, indented, value); //added
+        } else drawDisplay(painter, myOption, myOption.rect, value); //added
 
+        // now get the calendar text to appear ...
         if (calendarText != "") {
             myOption.rect.setX(0);
             myOption.rect.setY(myOption.rect.y() + 18);//was +23
@@ -980,11 +984,6 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     } else {
 
         if (value != "") {
-#if 0
-            QPen blueLine(Qt::darkBlue);
-            blueLine.setWidth(3);
-            painter->setPen(blueLine);
-#endif
             myOption.displayAlignment = Qt::AlignLeft | Qt::AlignBottom;
             myOption.rect.setX(0);
             myOption.rect.setHeight(18);
