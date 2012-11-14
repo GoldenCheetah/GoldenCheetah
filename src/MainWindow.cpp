@@ -62,6 +62,7 @@
 #include "TtbDialog.h"
 #include "TwitterDialog.h"
 #include "WithingsDownload.h"
+#include "ZeoDownload.h"
 #include "CalendarDownload.h"
 #include "WorkoutWizard.h"
 #include "ErgDB.h"
@@ -298,6 +299,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     // Downloaders
     withingsDownload = new WithingsDownload(this);
+    zeoDownload      = new ZeoDownload(this);
     calendarDownload = new CalendarDownload(this);
 
     // Calendar
@@ -806,6 +808,8 @@ MainWindow::MainWindow(const QDir &home) :
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Get &Withings Data..."), this,
                         SLOT (downloadMeasures()));
+    optionsMenu->addAction(tr("Get &Zeo Data..."), this,
+                        SLOT (downloadMeasuresFromZeo()));
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Workout Wizard"), this, SLOT(showWorkoutWizard()));
     optionsMenu->addAction(tr("Get Workouts from ErgDB"), this, SLOT(downloadErgDB()));
@@ -2262,6 +2266,12 @@ void
 MainWindow::downloadMeasures()
 {
     withingsDownload->download();
+}
+
+void
+MainWindow::downloadMeasuresFromZeo()
+{
+    zeoDownload->download();
 }
 
 void
