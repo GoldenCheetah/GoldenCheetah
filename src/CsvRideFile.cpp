@@ -129,7 +129,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                      ++lineno;
                      motoActv = true;
                      rideFile->setDeviceType("MotoACTV");
-                     rideFile->setDeviceType("MotoACTV CSV (csv)");
+                     rideFile->setFileFormat("MotoACTV CSV (csv)");
                      unitsHeader = -1;
                      /* MotoACTV files are always metric */
                      metric = true;
