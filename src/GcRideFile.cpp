@@ -56,7 +56,7 @@ GcFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) 
         QString value = attr.attribute("value");
         if (key == "Device type")
             rideFile->setDeviceType(value);
-        else if (key == "File type")
+        else if (key == "File Format")
             rideFile->setFileFormat(value);
         if (key == "Start time") {
             // by default QDateTime is localtime - the source however is UTC
