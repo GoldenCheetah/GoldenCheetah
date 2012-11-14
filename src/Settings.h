@@ -106,6 +106,9 @@
 #define GC_DVURL          "dv/url"
 #define GC_DVUSER         "dv/user"
 #define GC_DVPASS         "dv/pass"
+#define GC_ZEOURL         "zeo/url"
+#define GC_ZEOUSER        "zeo/user"
+#define GC_ZEOPASS        "zeo/pass"
 
 
 // device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended

@@ -505,12 +505,21 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     QLabel *wiuserLabel = new QLabel(tr("User Id"));
     QLabel *wipassLabel = new QLabel(tr("Public Key"));
 
+    QLabel *zeo = new QLabel(tr("Zeo Sleep Data"));
+    zeo->setFont(current);
+
+    QLabel *zeourlLabel = new QLabel(tr("Website"));
+    QLabel *zeouserLabel = new QLabel(tr("User"));
+    QLabel *zeopassLabel = new QLabel(tr("Password"));
+
+
     QLabel *webcal = new QLabel(tr("Web Calendar"));
     webcal->setFont(current);
     QLabel *wcurlLabel = new QLabel(tr("Webcal URL"));
 
     QLabel *dv = new QLabel(tr("CalDAV Calendar"));
-    QLabel *dvurlLabel = new QLabel(tr("CalDAV Calendar"));
+    dv->setFont(current);
+    QLabel *dvurlLabel = new QLabel(tr("CalDAV URL"));
     QLabel *dvuserLabel = new QLabel(tr("CalDAV User Id"));
     QLabel *dvpassLabel = new QLabel(tr("CalDAV Password"));
 
@@ -581,6 +590,16 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     wiPass = new QLineEdit(this);
     wiPass->setText(appsettings->cvalue(mainWindow->cyclist, GC_WIKEY, "").toString());
 
+    zeoURL = new QLineEdit(this);
+    zeoURL->setText(appsettings->cvalue(mainWindow->cyclist, GC_ZEOURL, "http://app-pro.myzeo.com:8080/").toString());
+
+    zeoUser = new QLineEdit(this);
+    zeoUser->setText(appsettings->cvalue(mainWindow->cyclist, GC_ZEOUSER, "").toString());
+
+    zeoPass = new QLineEdit(this);
+    zeoPass->setEchoMode(QLineEdit::Password);
+    zeoPass->setText(appsettings->cvalue(mainWindow->cyclist, GC_ZEOPASS, "").toString());
+
     webcalURL = new QLineEdit(this);
     webcalURL->setText(appsettings->cvalue(mainWindow->cyclist, GC_WEBCAL_URL, "").toString());
 
@@ -619,15 +638,19 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     grid->addWidget(wiurlLabel, 21,0);
     grid->addWidget(wiuserLabel, 22,0);
     grid->addWidget(wipassLabel, 23,0);
-    grid->addWidget(webcal, 24, 0);
-    grid->addWidget(wcurlLabel, 25, 0);
-    grid->addWidget(dv, 26,0);
-    grid->addWidget(dvurlLabel, 27,0);
-    grid->addWidget(dvuserLabel, 28,0);
-    grid->addWidget(dvpassLabel, 29,0);
-    grid->addWidget(ttb, 30,0);
-    grid->addWidget(ttbuserLabel, 31,0);
-    grid->addWidget(ttbpassLabel, 32,0);
+    grid->addWidget(zeo, 24,0);
+    grid->addWidget(zeourlLabel, 25,0);
+    grid->addWidget(zeouserLabel, 26,0);
+    grid->addWidget(zeopassLabel, 27,0);
+    grid->addWidget(webcal, 28, 0);
+    grid->addWidget(wcurlLabel, 29, 0);
+    grid->addWidget(dv, 30,0);
+    grid->addWidget(dvurlLabel, 31,0);
+    grid->addWidget(dvuserLabel, 32,0);
+    grid->addWidget(dvpassLabel, 33,0);
+    grid->addWidget(ttb, 34,0);
+    grid->addWidget(ttbuserLabel, 35,0);
+    grid->addWidget(ttbpassLabel, 36,0);
 
     grid->addWidget(tpURL, 1, 1, 0);
     grid->addWidget(tpUser, 2, 1, Qt::AlignLeft | Qt::AlignVCenter);
@@ -652,14 +675,18 @@ CredentialsPage::CredentialsPage(QWidget *parent, MainWindow *mainWindow) : QScr
     grid->addWidget(wiUser, 22, 1, Qt::AlignLeft | Qt::AlignVCenter);
     grid->addWidget(wiPass, 23, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    grid->addWidget(webcalURL, 24, 1, 0);
+    grid->addWidget(zeoURL, 25, 1, 0);
+    grid->addWidget(zeoUser, 26, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(zeoPass, 27, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
-    grid->addWidget(dvURL, 26, 1, 0);
-    grid->addWidget(dvUser, 27, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(dvPass, 28, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(webcalURL, 29, 1, 0);
 
-    grid->addWidget(ttbUser, 31, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(ttbPass, 32, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(dvURL, 31, 1, 0);
+    grid->addWidget(dvUser, 32, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(dvPass, 33, 1, Qt::AlignLeft | Qt::AlignVCenter);
+
+    grid->addWidget(ttbUser, 35, 1, Qt::AlignLeft | Qt::AlignVCenter);
+    grid->addWidget(ttbPass, 36, 1, Qt::AlignLeft | Qt::AlignVCenter);
 
     grid->setColumnStretch(0,0);
     grid->setColumnStretch(1,3);
@@ -694,6 +721,9 @@ CredentialsPage::saveClicked()
     appsettings->setCValue(mainWindow->cyclist, GC_WIURL, wiURL->text());
     appsettings->setCValue(mainWindow->cyclist, GC_WIUSER, wiUser->text());
     appsettings->setCValue(mainWindow->cyclist, GC_WIKEY, wiPass->text());
+    appsettings->setCValue(mainWindow->cyclist, GC_ZEOURL, zeoURL->text());
+    appsettings->setCValue(mainWindow->cyclist, GC_ZEOUSER, zeoUser->text());
+    appsettings->setCValue(mainWindow->cyclist, GC_ZEOPASS, zeoPass->text());
     appsettings->setCValue(mainWindow->cyclist, GC_WEBCAL_URL, webcalURL->text());
 
     // escape the at character
