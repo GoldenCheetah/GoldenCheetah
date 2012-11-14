@@ -34,13 +34,12 @@ getWeight(const MainWindow *main, const RideFile *ride)
     if ((weight = ride->getTag("Weight", "0.0").toDouble()) > 0) {
         return weight;
     }
-#if 0
+
     // withings?
     QList<SummaryMetrics> measures = main->metricDB->getAllMeasuresFor(QDateTime::fromString("Jan 1 00:00:00 1900"), ride->startTime());
     if (measures.count()) {
         return measures.last().getText("Weight", "0.0").toDouble();
     }
-#endif
 
     // global options
     return appsettings->cvalue(main->cyclist, GC_WEIGHT, "75.0").toString().toDouble(); // default to 75kg
