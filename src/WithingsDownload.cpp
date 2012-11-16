@@ -49,24 +49,51 @@ WithingsDownload::downloadFinished(QNetworkReply *reply)
     QString text = reply->readAll();
     QStringList errors;
     parser->parse(text, errors);
-    QString status = QString(tr("%1 measurements received.")).arg(parser->readings().count());
-    QMessageBox::information(main, tr("Withings Data Download"), status);
 
     //main->metricDB->db()->connection().transaction();
+    newMeasures = 0;
+    allMeasures = parser->readings().count();
+    QDateTime olderDate;
 
-    // debug output to examine data downloaded
+
     foreach (WithingsReading x, parser->readings()) {
-        SummaryMetrics add;
-        add.setDateTime(x.when);
-        add.setText("Weight", QString("%1").arg(x.weightkg));
-        add.setText("Height", QString("%1").arg(x.sizemeter));
-        add.setText("Lean Mass", QString("%1").arg(x.leankg));
-        add.setText("Fat Mass", QString("%1").arg(x.fatkg));
-        add.setText("Fat Ratio", QString("%1").arg(x.fatpercent));
+        QList<SummaryMetrics> list = main->metricDB->getAllMeasuresFor(x.when,x.when);
+        bool presentOrEmpty = false;
+        for (int i=0;i<list.size();i++) {
+            SummaryMetrics sm = list.at(i);
+            if (((x.weightkg == 0) || (sm.getText("Weight", "").length()>0))  &&
+                ((x.sizemeter == 0) || (sm.getText("Height", "").length()>0))   &&
+                ((x.leankg>0) || (sm.getText("Lean Mass", "").length()>0))  &&
+                ((x.fatkg>0) || (sm.getText("Fat Mass", "").length()>0))  &&
+                ((x.fatpercent>0) || (sm.getText("Fat Ratio", "").length()>0))) {
+                presentOrEmpty = true;
+            }
+        }
 
-        main->metricDB->importMeasure(&add);
+        if (!presentOrEmpty) {
+            newMeasures ++;
+            SummaryMetrics add;
+            add.setDateTime(x.when);
+            add.setText("Weight", QString("%1").arg(x.weightkg));
+            add.setText("Height", QString("%1").arg(x.sizemeter));
+            add.setText("Lean Mass", QString("%1").arg(x.leankg));
+            add.setText("Fat Mass", QString("%1").arg(x.fatkg));
+            add.setText("Fat Ratio", QString("%1").arg(x.fatpercent));
+
+            main->metricDB->importMeasure(&add);
+
+            if (olderDate.isNull() || x.when<olderDate)
+                olderDate = x.when;
+        }
     }
-    //main->metricDB->db()->connection().commit();
+
+    QString status = QString(tr("%1 new on %2 measurements received.")).arg(newMeasures).arg(allMeasures);
+    QMessageBox::information(main, tr("Withings Data Download"), status);
+
+    if (!olderDate.isNull()) {
+        main->isclean = false;
+        main->metricDB->refreshMetrics(olderDate);
+    }
     return;
 }
 
