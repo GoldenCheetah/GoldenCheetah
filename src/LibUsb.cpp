@@ -209,6 +209,9 @@ bool LibUsb::findFortius()
             if (dev->descriptor.idVendor == FORTIUS_VID && dev->descriptor.idProduct == FORTIUS_PID) {
                 found = true;
             }
+            if (dev->descriptor.idVendor == FORTIUS_VID && dev->descriptor.idProduct == FORTIUSVR_PID) {
+                found = true;
+            }
         }
     }
     return found;
