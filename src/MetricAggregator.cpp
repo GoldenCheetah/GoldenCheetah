@@ -59,7 +59,14 @@ MetricAggregator::~MetricAggregator()
 // used to store timestamp and fingerprint used in database
 struct status { unsigned long timestamp, fingerprint; };
 
+// Refresh not up to date metrics
 void MetricAggregator::refreshMetrics()
+{
+    refreshMetrics(QDateTime());
+}
+
+// Refresh not up to date metrics and metrics after date
+void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
 {
     // only if we have established a connection to the database
     if (dbaccess == NULL || main->isclean==true) return;
@@ -143,7 +150,8 @@ void MetricAggregator::refreshMetrics()
         QApplication::processEvents();
 
         if (dbTimeStamp < QFileInfo(file).lastModified().toTime_t() ||
-            zoneFingerPrint != fingerprint) {
+            zoneFingerPrint != fingerprint ||
+            (!forceAfterThisDate.isNull() && name >= forceAfterThisDate.toString("yyyy_MM_dd_hh_mm_ss"))) {
             QStringList errors;
 
             // log
