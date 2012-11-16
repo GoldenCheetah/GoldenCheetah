@@ -43,7 +43,8 @@ class MetricAggregator : public QObject
 		~MetricAggregator();
 
 
-		void refreshMetrics();
+        void refreshMetrics();
+        void refreshMetrics(QDateTime forceAfterThisDate);
         void getFirstLast(QDate &, QDate &);
         DBAccess *db() { return dbaccess; }
         SummaryMetrics getAllMetricsFor(QString filename); // for a single ride

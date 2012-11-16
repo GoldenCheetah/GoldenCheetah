@@ -17,6 +17,7 @@
  */
 
 #include "ZeoDownload.h"
+#include "MetricAggregator.h"
 #include <QScriptEngine>
 
 ZeoDownload::ZeoDownload(MainWindow *main) : main(main)

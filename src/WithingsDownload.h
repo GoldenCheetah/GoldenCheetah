@@ -45,5 +45,8 @@ private:
     MainWindow *main;
     QNetworkAccessManager *nam;
     WithingsParser *parser;
+
+    int allMeasures;
+    int newMeasures;
 };
 #endif
