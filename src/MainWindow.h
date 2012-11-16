@@ -47,6 +47,7 @@ class RideFile;
 class ErgFile;
 class RideMetadata;
 class WithingsDownload;
+class ZeoDownload;
 class CalendarDownload;
 class DiaryWindow;
 class ICalendar;
@@ -293,6 +294,7 @@ class MainWindow : public QMainWindow
         void downloadMeasures();
         void exportMeasures();
         void importMeasures();
+        void downloadMeasuresFromZeo();
 
         // get calendars
         void refreshCalendar();
@@ -389,6 +391,7 @@ class MainWindow : public QMainWindow
         QuarqdClient *client;
         QSignalMapper *toolMapper;
         WithingsDownload *withingsDownload;
+        ZeoDownload *zeoDownload;
         bool parseRideFileName(const QString &name, QString *notesFileName, QDateTime *dt);
 };
 

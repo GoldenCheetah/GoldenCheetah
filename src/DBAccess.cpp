@@ -715,7 +715,7 @@ bool DBAccess::importMeasure(SummaryMetrics *summaryMetrics)
     // go do it!
 	bool rc = query.exec();
 
-	//if(!rc) qDebug() << query.lastError();
+    //if(!rc) qDebug() << query.lastError();
 
 	return rc;
 }
