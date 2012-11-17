@@ -137,7 +137,8 @@ JouleDevice::download( const QDir &tmpdir,
     getSystemInfo(serial, systemInfoArray, err);
 
     QList<DeviceStoredRideItem> trainings;
-    getDownloadableRides(trainings, err);
+    if (getDownloadableRides(trainings, err))
+        return false;
 
     for (int i=0; i<trainings.count(); i++) {
         statusCallback(QString("Read ride detail for ride %1/%2").arg(i+1).arg(trainings.count()));
@@ -379,9 +380,11 @@ JouleDevice::cleanup( QString &err ) {
     if (!dev->open(err)) {
         err = "ERROR: open failed: " + err;
     }
+    dev->setBaudRate(57600, err);
 
     QList<DeviceStoredRideItem> trainings;
-    getDownloadableRides(trainings, err);
+    if (!getDownloadableRides(trainings, err))
+        return false;
 
     for (int i=0; i<trainings.count(); i++) {
         statusCallback(QString("Delete ride detail for ride %1/%2").arg(i+1).arg(trainings.count()));
@@ -395,7 +398,7 @@ JouleDevice::cleanup( QString &err ) {
 
         if (!request.write(dev, err)) return false;
 
-        JoulePacket response = JoulePacket(READ_SYSTEM_INFO);
+        JoulePacket response = JoulePacket(ERASE_RIDE_DETAIL);
         if (!response.read(dev, err))
             return false;
     }
