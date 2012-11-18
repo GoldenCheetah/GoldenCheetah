@@ -70,9 +70,12 @@ private:
      QPushButton *getActivityButton;
      QPushButton *cancelButton;
      MainWindow *mainWindow;
-     QCheckBox *workoutTimeChk;
-     QCheckBox *timeRidingChk;
-     QCheckBox *totalDistanceChk;
+
+     //QCheckBox *gpsChk;
+     QCheckBox *altitudeChk;
+     QCheckBox *powerChk;
+     QCheckBox *cadenceChk;
+     QCheckBox *heartrateChk;
 
      QLineEdit *twitterMessageEdit;
 

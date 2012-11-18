@@ -46,17 +46,33 @@ StravaDialog::StravaDialog(MainWindow *mainWindow, RideItem *item) :
     setWindowTitle("Strava");
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
-    /*QGroupBox *groupBox = new QGroupBox(tr("Choose which metrics you wish to send: "));
+    QGroupBox *groupBox = new QGroupBox(tr("Choose which channels you wish to send: "));
 
-    workoutTimeChk = new QCheckBox(tr("Workout Time"));
-    timeRidingChk = new QCheckBox(tr("Time Riding"));
-    totalDistanceChk = new QCheckBox(tr("Total Distance"));
+    //gpsChk = new QCheckBox(tr("GPS"));
+    altitudeChk = new QCheckBox(tr("Altitude"));
+    powerChk = new QCheckBox(tr("Power"));
+    cadenceChk = new QCheckBox(tr("Cadence"));
+    heartrateChk = new QCheckBox(tr("Heartrate"));
+
+    const RideFileDataPresent *dataPresent = ride->ride()->areDataPresent();
+    altitudeChk->setEnabled(dataPresent->alt);
+    altitudeChk->setChecked(dataPresent->alt);
+    powerChk->setEnabled(dataPresent->watts);
+    powerChk->setChecked(dataPresent->watts);
+    cadenceChk->setEnabled(dataPresent->cad);
+    cadenceChk->setChecked(dataPresent->cad);
+    heartrateChk->setEnabled(dataPresent->hr);
+    heartrateChk->setChecked(dataPresent->hr);
 
     QGridLayout *vbox = new QGridLayout();
-    vbox->addWidget(workoutTimeChk,0,0);
-    vbox->addWidget(timeRidingChk,0,1);
-    vbox->addWidget(totalDistanceChk,1,1);
-    groupBox->setLayout(vbox);*/
+    //vbox->addWidget(gpsChk,0,0);
+    vbox->addWidget(powerChk,0,0);
+    vbox->addWidget(altitudeChk,0,1);
+    vbox->addWidget(cadenceChk,1,0);
+    vbox->addWidget(heartrateChk,1,1);
+
+    groupBox->setLayout(vbox);
+    mainLayout->addWidget(groupBox);
 
     // show progress
     QVBoxLayout *progressLayout = new QVBoxLayout;
@@ -68,9 +84,9 @@ StravaDialog::StravaDialog(MainWindow *mainWindow, RideItem *item) :
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
 
-    /*uploadButton = new QPushButton(tr("&Upload Ride"), this);
+    uploadButton = new QPushButton(tr("&Upload Ride"), this);
     buttonLayout->addWidget(uploadButton);
-    searchActivityButton = new QPushButton(tr("&Update info"), this);
+    /*searchActivityButton = new QPushButton(tr("&Update info"), this);
     buttonLayout->addWidget(searchActivityButton);
     getActivityButton = new QPushButton(tr("&Load Ride"), this);
     buttonLayout->addWidget(getActivityButton);*/
@@ -82,7 +98,7 @@ StravaDialog::StravaDialog(MainWindow *mainWindow, RideItem *item) :
     mainLayout->addLayout(progressLayout);
     mainLayout->addLayout(buttonLayout);
 
-    //connect(uploadButton, SIGNAL(clicked()), this, SLOT(uploadToStrava()));
+    connect(uploadButton, SIGNAL(clicked()), this, SLOT(uploadToStrava()));
     //connect(searchActivityButton, SIGNAL(clicked()), this, SLOT(getActivityFromStrava()));
     //connect(getActivityButton, SIGNAL(clicked()), this, SLOT(reject()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
@@ -91,7 +107,7 @@ StravaDialog::StravaDialog(MainWindow *mainWindow, RideItem *item) :
     //connect(timeRidingChk, SIGNAL(stateChanged(int)),  this, SLOT(onCheck(int)));
     //connect(totalDistanceChk, SIGNAL(stateChanged(int)),  this, SLOT(onCheck(int)));
 
-    uploadToStrava();
+    //uploadToStrava();
 }
 
 
@@ -151,6 +167,7 @@ StravaDialog::uploadToStrava()
         //requestVerifyUpload();
         progressLabel->setText(tr("Successfully uploaded to Strava\n")+uploadStatus);
     }
+    uploadButton->setVisible(false);
     cancelButton->setText("OK");
     QApplication::processEvents();
 }
@@ -327,13 +344,22 @@ StravaDialog::requestUpload()
         out += ",";
         out += QString("%1").arg(point->lon,0,'f',GPS_COORD_TO_STRING);
         out += ",";
-        out += QString("%1").arg(point->alt);
-        out += ",";
-        out += QString("%1").arg(point->watts);
-        out += ",";
-        out += QString("%1").arg(point->cad);
-        out += ",";
-        out += QString("%1").arg(point->hr);
+
+        if (altitudeChk->isChecked()) {
+            out += QString("%1").arg(point->alt);
+            out += ",";
+        }
+        if (powerChk->isChecked()) {
+            out += QString("%1").arg(point->watts);
+            out += ",";
+        }
+        if (altitudeChk->isChecked()) {
+            out += QString("%1").arg(point->cad);
+            out += ",";
+        }
+        if (heartrateChk->isChecked())
+            out += QString("%1").arg(point->hr);
+
         out += "]";
         if(totalSize == size)
             out += "],";
@@ -341,7 +367,17 @@ StravaDialog::requestUpload()
            out += ",";
     }
     out += "\"type\": \"json\", ";
-    out += "\"data_fields\": \[\"time\", \"latitude\", \"longitude\", \"elevation\", \"watts\", \"cadence\", \"heartrate\"]}";
+    out += "\"data_fields\": \[\"time\", \"latitude\", \"longitude\"";
+
+    if (altitudeChk->isChecked())
+        out += ", \"elevation\"";
+    if (powerChk->isChecked())
+        out += ", \"watts\"";
+    if (cadenceChk->isChecked())
+        out += ", \"cadence\"";
+    if (heartrateChk->isChecked())
+        out += ", \"heartrate\"";
+    out += "]}";
 
     QUrl url = QUrl(STRAVA_URL2 + "/upload");
     QNetworkRequest request = QNetworkRequest(url);
