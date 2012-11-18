@@ -53,6 +53,14 @@ inline NSString *darwinQStringToNSString (const QString &aString)
     return [reinterpret_cast<const NSString *> (CFStringCreateWithCharacters (0, reinterpret_cast<const UniChar *> (aString.unicode()), aString.length())) autorelease];
 }
 
+static NSImage* fromQPixmap(const QPixmap &pixmap)
+{
+    CGImageRef cgImage = pixmap.toMacCGImageRef();
+    NSImage *image =[[NSImage alloc] initWithCGImage:cgImage size:NSZeroSize];
+    [image setTemplate:true];
+    return image;
+}
+
 /*----------------------------------------------------------------------
  * QtMacSegmented Button
  *----------------------------------------------------------------------*/
@@ -84,9 +92,12 @@ inline NSString *darwinQStringToNSString (const QString &aString)
 QtMacSegmentedButton::QtMacSegmentedButton (int aCount, QWidget *aParent /* = 0 */)
   : QMacCocoaViewContainer (0, aParent)
 {
+#if QT_VERSION >= 0x040800 // see QT-BUG 22574, QMacCocoaContainer on 4.8 is "broken"
+    setAttribute(Qt::WA_NativeWindow);
+#endif
     mNativeRef = [[NSSegmentedControl alloc] init];
     [mNativeRef setSegmentCount:aCount];
-    [mNativeRef setSegmentStyle:NSSegmentStyleRoundRect];
+    [mNativeRef setSegmentStyle:NSSegmentStyleTexturedRounded];
     [[mNativeRef cell] setTrackingMode: NSSegmentSwitchTrackingSelectOne];
     [mNativeRef setFont: [NSFont controlContentFontOfSize:
         [NSFont systemFontSizeForControlSize: NSSmallControlSize]]];
@@ -98,22 +109,31 @@ QtMacSegmentedButton::QtMacSegmentedButton (int aCount, QWidget *aParent /* = 0 
 
     NSRect frame = [mNativeRef frame];
     resize (frame.size.width, frame.size.height);
-
     setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
 
     setCocoaView (mNativeRef);
-
 }
 
 QSize QtMacSegmentedButton::sizeHint() const
 {
     NSRect frame = [mNativeRef frame];
-    return QSize (frame.size.width, frame.size.height);
+    return QSize (frame.size.width+65, frame.size.height); // +65 is a hack ... XXX fixme soon!
 }
 
-void QtMacSegmentedButton::setSelected(int index) const
+void QtMacSegmentedButton::setNoSelect()
 {
-    [mNativeRef setSelected:true forSegment:index];
+    [[mNativeRef cell] setTrackingMode: NSSegmentSwitchTrackingMomentary];
+}
+
+void QtMacSegmentedButton::setSelected(int index, bool value) const
+{
+    [mNativeRef setSelected:value forSegment:index];
+}
+
+void QtMacSegmentedButton::setImage(int index, const QPixmap &image)
+{
+    [mNativeRef setImage:fromQPixmap(image) forSegment:index];
+    [mNativeRef sizeToFit];
 }
 
 void QtMacSegmentedButton::setTitle (int aSegment, const QString &aTitle)

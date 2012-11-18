@@ -66,8 +66,10 @@ RideNavigator::RideNavigator(MainWindow *parent, bool mainwindow) : main(parent)
     //sortModel->setSort(2, Qt::AscendingOrder); // date backwards
 
 #ifdef GC_HAVE_LUCENE
-    searchFilterBox = new SearchFilterBox(this, main);
-    mainLayout->addWidget(searchFilterBox);
+    if (!mainwindow) {
+        searchFilterBox = new SearchFilterBox(this, main);
+        mainLayout->addWidget(searchFilterBox);
+    }
 #endif
 
     // get setup
@@ -86,6 +88,9 @@ RideNavigator::RideNavigator(MainWindow *parent, bool mainwindow) : main(parent)
     tableView->setContextMenuPolicy(Qt::CustomContextMenu);
     tableView->header()->setStretchLastSection(false);
     tableView->header()->setMinimumSectionSize(0);
+    tableView->header()->setFocusPolicy(Qt::NoFocus);
+    tableView->header()->setSortIndicatorShown(false);
+    //tableView->header()->setHighlightSections(false);
 #ifdef Q_OS_MAC
     tableView->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
@@ -132,8 +137,10 @@ RideNavigator::RideNavigator(MainWindow *parent, bool mainwindow) : main(parent)
     connect(tableView->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)), this, SLOT(setSortBy(int,Qt::SortOrder)));
 
 #ifdef GC_HAVE_LUCENE
-    connect(searchFilterBox, SIGNAL(searchResults(QStringList)), this, SLOT(searchStrings(QStringList)));
-    connect(searchFilterBox, SIGNAL(searchClear()), this, SLOT(clearSearch()));
+    if (!mainwindow) {
+        connect(searchFilterBox, SIGNAL(searchResults(QStringList)), this, SLOT(searchStrings(QStringList)));
+        connect(searchFilterBox, SIGNAL(searchClear()), this, SLOT(clearSearch()));
+    }
 #endif
 
     // we accept drag and drop operations

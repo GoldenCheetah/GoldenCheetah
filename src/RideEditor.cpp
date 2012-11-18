@@ -75,7 +75,7 @@ RideEditor::RideEditor(MainWindow *main) : GcWindow(main), data(NULL), ride(NULL
     toolbar = new QToolBar(this);
     toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     toolbar->setFloatable(true);
-    toolbar->setStyleSheet("background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #CFCFCF, stop: 1.0 #A8A8A8);"
+    toolbar->setStyleSheet("background: white;"
                            "border: 0px;");
 
     QIcon saveIcon(":images/toolbar/save.png");

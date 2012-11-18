@@ -251,6 +251,7 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
 
         // fill in the title bar
         QRect bar(0,0,width(),contentsMargins().top());
+        if (contentsMargins().top() < 25) {
         QColor bg;
         if (property("active").toBool() == true) {
             bg = GColor(CTILEBARSELECT);
@@ -258,6 +259,7 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         } else {
             bg = GColor(CTILEBAR);
             painter.drawPixmap(bar, aluBarDark);
+        }
         }
 
         // heading

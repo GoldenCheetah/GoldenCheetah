@@ -16,6 +16,9 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#ifndef GC_QtMacSegmentedButton_h
+#define GC_QtMacSegmentedButton_h
+
 #include <QMacCocoaViewContainer>
 
 //----------------------------------------------------------------------
@@ -63,9 +66,11 @@ public:
     void setTitle (int aSegment, const QString &aTitle);
     void setToolTip (int aSegment, const QString &aTip);
     void setEnabled (int aSegment, bool fEnabled);
-    void setSelected(int index) const;
+    void setSelected(int index, bool value) const;
     void animateClick (int aSegment);
     void onClicked (int aSegment);
+    void setImage(int index, const QPixmap &image);
+    void setNoSelect();
 
 signals:
     void clicked (int aSegment, bool aChecked = false);
@@ -74,3 +79,5 @@ private:
     /* Private member vars */
     NativeNSSegmentedControlRef mNativeRef;
 };
+
+#endif

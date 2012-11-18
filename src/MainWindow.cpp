@@ -83,11 +83,16 @@
 #include "GcBubble.h"
 #include "GcCalendar.h"
 
-#if (defined Q_OS_MAC) && (defined GC_HAVE_LION)
-#include "LionFullScreen.h"
+#ifdef Q_OS_MAC
+#ifdef GC_HAVE_LION
+#include "LionFullScreen.h" // mac and lion or later
 #endif
-#ifndef Q_OS_MAC
-#include "QTFullScreen.h"
+#include "QtMacButton.h" // mac
+#include "QtMacPopUpButton.h" // mac
+#include "QtMacSegmentedButton.h" // mac
+#include "QtMacSearchBox.h" // mac
+#else
+#include "QTFullScreen.h" // not mac!
 #endif
 
 #ifdef GC_HAVE_LUCENE
@@ -125,6 +130,8 @@ MainWindow::MainWindow(const QDir &home) :
     static const QIcon tileIcon(":images/toolbar/main/tile.png");
     static const QIcon fullIcon(":images/toolbar/main/togglefull.png");
 
+    static CocoaInitializer cocoaInitializer; // we only need one
+
     mainwindows.append(this); // add us to the list of open windows
 
     /*----------------------------------------------------------------------
@@ -132,7 +139,87 @@ MainWindow::MainWindow(const QDir &home) :
      *--------------------------------------------------------------------*/
 
     setAttribute(Qt::WA_DeleteOnClose);
+
+#ifdef Q_OS_MAC
     setUnifiedTitleAndToolBarOnMac(true);
+    head = addToolBar(cyclist);
+
+    // widgets
+    toolBarWidgets = new QWidget(this);
+    toolBarWidgets->setContentsMargins(0,0,0,0);
+
+    macAnalButtons = new QWidget(this);
+    macAnalButtons->setContentsMargins(0,0,0,0);
+
+    // lhs buttons
+    QHBoxLayout *lb = new QHBoxLayout(macAnalButtons);
+    lb->setSpacing(10);
+    QtMacButton *import = new QtMacButton(this, QtMacButton::TexturedRounded);
+    import->setImage(QPixmap(":images/mac/download.png"));
+    import->setToolTip("Download");
+    lb->addWidget(import);
+    QtMacButton *compose = new QtMacButton(this, QtMacButton::TexturedRounded);
+    compose->setImage(QPixmap(":images/mac/compose.png"));
+    compose->setToolTip("Create");
+    lb->addWidget(compose);
+
+    // connect to actions
+    connect(import, SIGNAL(clicked(bool)), this, SLOT(downloadRide()));
+    connect(compose, SIGNAL(clicked(bool)), this, SLOT(manualRide()));
+
+    lb->addWidget(new Spacer(this));
+
+    // activity actions .. peaks, split, delete
+    QWidget *acts = new QWidget(this);
+    acts->setContentsMargins(0,0,0,0);
+    QHBoxLayout *pp = new QHBoxLayout(acts);
+    pp->setContentsMargins(0,0,0,0);
+    pp->setSpacing(0);
+    QtMacSegmentedButton *actbuttons = new QtMacSegmentedButton(3, acts);
+    actbuttons->setNoSelect();
+    actbuttons->setImage(0, QPixmap(":images/mac/stop.png"));
+    actbuttons->setImage(1, QPixmap(":images/mac/split.png"));
+    actbuttons->setImage(2, QPixmap(":images/mac/trash.png"));
+    pp->addWidget(actbuttons);
+    lb->addWidget(acts);
+    connect(actbuttons, SIGNAL(clicked(int,bool)), this, SLOT(actionClicked(int)));
+
+    lb->addWidget(new Spacer(this));
+
+    QtMacSegmentedButton *pushbutton = new QtMacSegmentedButton(4, toolBarWidgets);
+#ifdef GC_HAVE_ICAL
+    pushbutton->setTitle(0,"Home");
+    pushbutton->setTitle(1,"Diary");
+    pushbutton->setTitle(2,"Analysis");
+    pushbutton->setTitle(3,"Train");
+    pushbutton->setSelected(2, true);
+#else
+    pushbutton->setTitle(0,"Home");
+    pushbutton->setTitle(1,"Analysis");
+    pushbutton->setTitle(2,"Train");
+    pushbutton->setSelected(1, true);
+#endif
+
+    // setup Mac thetoolbar
+    toolBarWidgets->setContentsMargins(0,0,0,0);
+    QHBoxLayout *l = new QHBoxLayout(toolBarWidgets);
+    l->setSpacing(0);
+    l->setContentsMargins(0,0,0,0);
+    l->addWidget(pushbutton);
+    head->addWidget(macAnalButtons);
+    head->addWidget(new Spacer(this));
+    head->addWidget(toolBarWidgets);
+    head->addWidget(new Spacer(this));
+
+#ifdef GC_HAVE_LUCENE
+    QtMacSearchBox *searchBox = new QtMacSearchBox(this);
+    head->addWidget(searchBox);
+    connect(searchBox, SIGNAL(textChanged(QString)), this, SLOT(searchTextChanged(QString)));
+#endif
+
+    connect(pushbutton, SIGNAL(clicked(int,bool)), this, SLOT(selectView(int)));
+#endif
+
     setWindowIcon(QIcon(":images/gc.png"));
     setWindowTitle(home.dirName());
     setContentsMargins(0,0,0,0);
@@ -230,6 +317,9 @@ MainWindow::MainWindow(const QDir &home) :
      *--------------------------------------------------------------------*/
 
     toolbar = new GcToolBar(this);
+#ifdef Q_OS_MAC
+    toolbar->hide(); // not on a Mac!
+#endif
 
     QWidget *lspacer = new QWidget(this);
     QHBoxLayout *lspacerLayout = new QHBoxLayout(lspacer);
@@ -282,7 +372,9 @@ MainWindow::MainWindow(const QDir &home) :
 
     trainTool = new TrainTool(this, home);
     trainTool->hide();
+#ifndef Q_OS_MAC
     toolbar->addWidget(trainTool->getToolbarButtons());
+#endif
 
     // Analysis view buttons too.
     QHBoxLayout *toolbuttons=new QHBoxLayout;
@@ -756,10 +848,11 @@ MainWindow::MainWindow(const QDir &home) :
     showhideSidebar = viewMenu->addAction(tr("Show Left Sidebar"), this, SLOT(showSidebar(bool)));
     showhideSidebar->setCheckable(true);
     showhideSidebar->setChecked(true);
-
+#ifndef Q_OS_MAC // not on a Mac
     showhideToolbar = viewMenu->addAction(tr("Show Toolbar"), this, SLOT(showToolbar(bool)));
     showhideToolbar->setCheckable(true);
     showhideToolbar->setChecked(true);
+#endif
 
     styleAction = viewMenu->addAction(tr("Tabbed View"), this, SLOT(toggleStyle()));
     styleAction->setCheckable(true);
@@ -1140,6 +1233,8 @@ void
 MainWindow::resizeEvent(QResizeEvent*)
 {
     appsettings->setValue(GC_SETTINGS_MAIN_GEOM, geometry());
+    head->updateGeometry();
+    repaint();
 }
 
 void
@@ -1300,14 +1395,35 @@ MainWindow::helpView()
 }
 
 void
+MainWindow::selectView(int index)
+{
+#ifdef GC_HAVE_ICAL
+    switch (index) {
+        case 0 : selectHome(); break;
+        case 1 : selectDiary(); break;
+        case 2 : selectAnalysis(); break;
+        case 3 : selectTrain(); break;
+    }
+#else
+    switch (index) {
+        case 0 : selectHome(); break;
+        case 1 : selectAnalysis(); break;
+        case 2 : selectTrain(); break;
+    }
+#endif
+}
+
+void
 MainWindow::selectAnalysis()
 {
     masterControls->setCurrentIndex(0);
     views->setCurrentIndex(0);
     analWindow->selected(); // tell it!
     currentWindow = analWindow;
+#ifndef Q_OS_MAC
     analButtons->show();
     trainTool->getToolbarButtons()->hide();
+#endif
     toolBox->setCurrentIndex(0);
     setStyle();
 }
@@ -1319,8 +1435,10 @@ MainWindow::selectTrain()
     views->setCurrentIndex(1);
     trainWindow->selected(); // tell it!
     currentWindow = trainWindow;
+#ifndef Q_OS_MAC
     analButtons->hide();
     trainTool->getToolbarButtons()->show();
+#endif
     toolBox->setCurrentIndex(2);
     setStyle();
 }
@@ -1332,8 +1450,10 @@ MainWindow::selectDiary()
     views->setCurrentIndex(2);
     diaryWindow->selected(); // tell it!
     currentWindow = diaryWindow;
+#ifndef Q_OS_MAC
     analButtons->hide();
     trainTool->getToolbarButtons()->hide();
+#endif
     toolBox->setCurrentIndex(1);
     gcCalendar->refresh(); // get that signal with the date range...
     setStyle();
@@ -1346,8 +1466,10 @@ MainWindow::selectHome()
     views->setCurrentIndex(3);
     homeWindow->selected(); // tell it!
     currentWindow = homeWindow;
+#ifndef Q_OS_MAC
     analButtons->hide();
     trainTool->getToolbarButtons()->hide();
+#endif
     toolBox->setCurrentIndex(1);
     setStyle();
 }
@@ -2211,3 +2333,36 @@ MainWindow::setBubble(QString text, QPoint pos, Qt::Orientation orientation)
         bubble->repaint();
     }
 }
+
+#ifdef Q_OS_MAC
+void
+MainWindow::searchTextChanged(QString text)
+{
+#ifdef GC_HAVE_LUCENE
+    // clear or set...
+    if (text == "") {
+        listView->clearSearch();
+    } else {
+        lucene->search(text);
+        listView->searchStrings(lucene->files());
+    }
+#endif
+}
+void
+MainWindow::actionClicked(int index)
+{
+    switch(index) {
+
+    default:
+    case 0: addIntervals();
+            break;
+
+    case 1 : splitRide();
+            break;
+
+    case 2 : deleteRide();
+            break;
+
+    }
+}
+#endif
