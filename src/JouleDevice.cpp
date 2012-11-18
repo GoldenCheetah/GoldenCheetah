@@ -27,17 +27,17 @@
 #define JOULE_DEBUG false // debug traces
 
 // Start pattern
-#define START_1 0x10
-#define START_2 0x02
+#define START_1            0x10
+#define START_2            0x02
 
 // Commands send from PC to Joule
-#define READ_UNIT_VERSION 0x2000
-#define GET_FREE_SPACE 0x2002
-#define READ_SYSTEM_INFO 0x2003
-#define READ_RIDE_SUMMARY 0x2020
-#define READ_RIDE_DETAIL 0x2021
-#define PAGE_RIDE_DETAIL 0x2022
-#define ERASE_RIDE_DETAIL 0x2024
+#define READ_UNIT_VERSION  0x2000
+#define GET_FREE_SPACE     0x2002
+#define READ_SYSTEM_INFO   0x2003
+#define READ_RIDE_SUMMARY  0x2020
+#define READ_RIDE_DETAIL   0x2021
+#define PAGE_RIDE_DETAIL   0x2022
+#define ERASE_RIDE_DETAIL  0x2024
 
 static bool jouleRegistered =
     Devices::addType("Joule GPS (BETA)", DevicesPtr(new JouleDevices()) );
@@ -370,7 +370,9 @@ JouleDevice::getDownloadableRides(QList<DeviceStoredRideItem> &rides, QString &e
                 rides.append(ride);
             }
         }
+        return true;
     }
+    return false;
 }
 
 bool
@@ -380,7 +382,18 @@ JouleDevice::cleanup( QString &err ) {
     if (!dev->open(err)) {
         err = "ERROR: open failed: " + err;
     }
+
     dev->setBaudRate(57600, err);
+
+    QString version = QString("");
+    QString serial = QString("");
+    QByteArray versionArray;
+    QByteArray systemInfoArray;
+
+    getUnitVersion(version, versionArray, err);
+    statusCallback("Version"+version);
+
+    getSystemInfo(serial, systemInfoArray, err);
 
     QList<DeviceStoredRideItem> trainings;
     if (!getDownloadableRides(trainings, err))
