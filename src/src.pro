@@ -131,13 +131,26 @@ LIBS += -lm $${LIBZ_LIBS}
 }
 
 # Mac specific build for
-# Segmented mac style button (but not used at present)
+# Segmented mac style button
 # Video playback using Quicktime Framework
 # Lion fullscreen playback
+# search box for title bar
 macx {
     LIBS    += -lobjc -framework Carbon -framework IOKit -framework AppKit -framework QTKit
-    HEADERS += QtMacVideoWindow.h LionFullScreen.h
-    OBJECTIVE_SOURCES += QtMacVideoWindow.mm LionFullScreen.mm
+    HEADERS +=  QtMacVideoWindow.h \
+                LionFullScreen.h \
+                QtMacSegmentedButton.h \
+                QtMacButton.h \
+                QtMacPopUpButton.h \
+                QtMacSearchBox.h 
+
+    OBJECTIVE_SOURCES +=    QtMacVideoWindow.mm \
+                            LionFullScreen.mm \
+                            QtMacSegmentedButton.mm \
+                            QtMacButton.mm \
+                            QtMacPopUpButton.mm \
+                            QtMacSearchBox.mm
+
 } else {
     # not a mac? then F12 to toggle full screen using
     # standard QT showFullScreen / showNormal

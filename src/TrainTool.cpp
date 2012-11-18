@@ -219,8 +219,6 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     toolbarButtons->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     toolbarButtons->setLayout(toolbuttons);
 
-    toolbarButtons->hide();
-
     connect(play, SIGNAL(clicked()), this, SLOT(Start()));
     connect(stop, SIGNAL(clicked()), this, SLOT(Stop()));
     connect(forward, SIGNAL(clicked()), this, SLOT(FFwd()));
@@ -244,6 +242,9 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     trainSplitter->setMidLineWidth(0);
 
     cl->addWidget(trainSplitter);
+#ifdef Q_OS_MAC
+    trainSplitter->addWidget(toolbarButtons);
+#endif
     trainSplitter->addWidget(deviceTree);
     //trainSplitter->addWidget(serverTree);
     trainSplitter->addWidget(workoutTree);
@@ -318,6 +319,10 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
 
     configChanged(); // will reset the workout tree
     setLabels();
+
+#ifndef Q_OS_MAC
+    toolbarButtons->hide();
+#endif
 
 }
 

@@ -100,5 +100,11 @@
     <file>images/toolbar/popbutton.png</file>
     <file>images/toolbar/flipbutton.png</file>
     <file>images/splashscreen.png</file>
+    <file>images/mac/compose.png</file>
+    <file>images/mac/download.png</file>
+    <file>images/mac/share.png</file>
+    <file>images/mac/split.png</file>
+    <file>images/mac/trash.png</file>
+    <file>images/mac/stop.png</file>
  </qresource>
 </RCC>

@@ -302,6 +302,7 @@ class MainWindow : public QMainWindow
         void helpView();
         void logBug();
 
+        void selectView(int);
         void selectHome();
         void selectDiary();
         void selectAnalysis();
@@ -321,6 +322,10 @@ class MainWindow : public QMainWindow
         void showDock();
 #ifndef Q_OS_MAC
         void toggleFullScreen();
+#else
+        // Mac Native Support
+        void searchTextChanged(QString);
+        void actionClicked(int);
 #endif
 
         void dateRangeChanged(DateRange);
@@ -390,6 +395,13 @@ class MainWindow : public QMainWindow
         QSignalMapper *toolMapper;
         WithingsDownload *withingsDownload;
         bool parseRideFileName(const QString &name, QString *notesFileName, QDateTime *dt);
+
+#ifdef Q_OS_MAC
+        // Mac Native Support
+        QWidget *toolBarWidgets;
+        QWidget *macAnalButtons;
+        QToolBar *head;
+#endif
 };
 
 #endif // _GC_MainWindow_h
