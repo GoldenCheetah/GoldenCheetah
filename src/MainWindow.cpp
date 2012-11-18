@@ -131,7 +131,9 @@ MainWindow::MainWindow(const QDir &home) :
     static const QIcon tileIcon(":images/toolbar/main/tile.png");
     static const QIcon fullIcon(":images/toolbar/main/togglefull.png");
 
+#ifdef Q_OS_MAC
     static CocoaInitializer cocoaInitializer; // we only need one
+#endif
 
     mainwindows.append(this); // add us to the list of open windows
 
@@ -1237,8 +1239,10 @@ void
 MainWindow::resizeEvent(QResizeEvent*)
 {
     appsettings->setValue(GC_SETTINGS_MAIN_GEOM, geometry());
+#ifdef Q_OS_MAC
     head->updateGeometry();
     repaint();
+#endif
 }
 
 void
