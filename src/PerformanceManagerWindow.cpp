@@ -148,7 +148,7 @@ void PerformanceManagerWindow::replot()
     const QDir &home = mainWindow->home;
     const QTreeWidgetItem *allRides = mainWindow->allRideItems();
 
-    int newdays, endIndex;
+    int newdays, rightIndex, endIndex;
     RideItem *firstRideItem = NULL;
     RideItem *lastRideItem = NULL;
     QDateTime now;
@@ -163,9 +163,9 @@ void PerformanceManagerWindow::replot()
     }
 
     if (firstRideItem) {
-
+        int lookahead = (appsettings->cvalue(mainWindow->cyclist, GC_STS_DAYS,7)).toInt();
         QDateTime endTime = std::max(lastRideItem->dateTime, now.currentDateTime());
-        endTime = endTime.addDays( (appsettings->cvalue(mainWindow->cyclist, GC_STS_DAYS,7)).toInt() );
+        endTime = endTime.addDays( lookahead );
         newdays = firstRideItem->dateTime.daysTo(endTime);
         QString newMetric = metricCombo->itemData(metricCombo->currentIndex()).toString();
 
@@ -201,6 +201,7 @@ void PerformanceManagerWindow::replot()
 	    perfplot->setStressCalculator(sc);
 
 	    endIndex  = sc->n();
+        rightIndex = std::max(0,endIndex-lookahead);
 
 
 	    PMleftSlider->setMaximum(endIndex);
@@ -230,7 +231,7 @@ void PerformanceManagerWindow::replot()
 		else
 		    PMleftSlider->setValue(0);
 
-		PMrightSlider->setValue(endIndex);
+		PMrightSlider->setValue(rightIndex);
 	    }
 
             perfplot->resize(PMleftSlider->value(),PMrightSlider->value());
