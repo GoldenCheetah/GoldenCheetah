@@ -1393,13 +1393,13 @@ void MainWindow::manualProcess(QString name)
 void
 MainWindow::logBug()
 {
-    QDesktopServices::openUrl(QUrl("http://bugs.goldencheetah.org/projects/goldencheetah/issues/new"));
+    QDesktopServices::openUrl(QUrl("http://www.goldencheetah.org/bug-tracker.html"));
 }
 
 void
 MainWindow::helpView()
 {
-    QDesktopServices::openUrl(QUrl("http://bugs.goldencheetah.org/projects/goldencheetah/wiki"));
+    QDesktopServices::openUrl(QUrl("http://www.goldencheetah.org/wiki.html"));
 }
 
 void
