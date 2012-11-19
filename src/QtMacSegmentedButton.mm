@@ -117,7 +117,7 @@ QtMacSegmentedButton::QtMacSegmentedButton (int aCount, QWidget *aParent /* = 0 
 QSize QtMacSegmentedButton::sizeHint() const
 {
     NSRect frame = [mNativeRef frame];
-    return QSize (frame.size.width+65, frame.size.height); // +65 is a hack ... XXX fixme soon!
+    return QSize (frame.size.width+70, frame.size.height); // +65 is a hack ... XXX fixme soon!
 }
 
 void QtMacSegmentedButton::setNoSelect()
@@ -133,7 +133,7 @@ void QtMacSegmentedButton::setSelected(int index, bool value) const
 void QtMacSegmentedButton::setImage(int index, const QPixmap &image)
 {
     [mNativeRef setImage:fromQPixmap(image) forSegment:index];
-    [mNativeRef sizeToFit];
+    [mNativeRef setWidth:35 forSegment:index];
 }
 
 void QtMacSegmentedButton::setTitle (int aSegment, const QString &aTitle)
