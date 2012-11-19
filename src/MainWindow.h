@@ -24,7 +24,6 @@
 #include <QSqlDatabase>
 #include <QtGui>
 #include <QNetworkReply>
-#include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include "RideItem.h"
 #include "IntervalItem.h"
@@ -346,7 +345,7 @@ class MainWindow : public QMainWindow
         ErgFile *workout; // the currently selected workout file
         long now;
 
-        QToolBox *toolBox;
+        QStackedWidget *toolBox;
         GcToolBar *toolbar;
         QDockWidget *dock;
         QAction *homeAct, *diaryAct, *analysisAct, *measuresAct, *trainAct, *athleteAct, *helpAct, *configAct;

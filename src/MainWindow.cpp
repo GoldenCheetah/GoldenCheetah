@@ -629,7 +629,7 @@ MainWindow::MainWindow(const QDir &home) :
 
 
     // TOOLBOX
-    toolBox = new QToolBox(this);
+    toolBox = new QStackedWidget(this);
     toolBox->setAcceptDrops(true);
     toolBox->setStyleSheet("QToolBox::tab {"
                            "max-height: 18px; "
@@ -694,9 +694,9 @@ MainWindow::MainWindow(const QDir &home) :
     gcCalendar = new GcCalendar(this);
     connect(gcCalendar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
 
-    toolBox->addItem(intervalSplitter, QIcon(":images/activity.png"), "Activity History");
-    toolBox->addItem(gcCalendar, QIcon(":images/toolbar/main/diary.png"), "Calendar");
-    toolBox->addItem(trainTool->controls(), QIcon(":images/library.png"), "Workout Library");
+    toolBox->addWidget(intervalSplitter);
+    toolBox->addWidget(gcCalendar);
+    toolBox->addWidget(trainTool->controls());
 
     // Chart Settings now in their own dialog box
     chartSettings = new ChartSettings(this, masterControls);
