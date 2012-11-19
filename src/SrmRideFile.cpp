@@ -337,7 +337,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
     double last = 0.0;
     for (int i = 1; i < markers.size(); ++i) {
         const marker &marker = markers[i];
-        int start = marker.start - 1;
+        int start = qMin(marker.start, result->dataPoints().size()) - 1;
         double start_secs = result->dataPoints()[start]->secs;
         int end = qMin(marker.end - 1, result->dataPoints().size() - 1);
         double end_secs = result->dataPoints()[end]->secs + result->recIntSecs();
@@ -346,7 +346,8 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
         QString note = QString("%1").arg(i);
         if( marker.note.length() )
             note += QString(" ") + marker.note;
-        result->addInterval(start_secs, end_secs, note );
+        if( start_secs <= end_secs )
+            result->addInterval(start_secs, end_secs, note );
         last = end_secs;
     }
     if (!markers.empty() && markers.last().end < result->dataPoints().size()) {
