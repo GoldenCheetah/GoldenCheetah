@@ -215,14 +215,22 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     stress->setAutoFillBackground(false);
     stress->setFixedWidth(100);
     stress->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+#ifdef Q_OS_MAC
     pal.setColor(stress->foregroundRole(), Qt::black);
+#else
+    pal.setColor(stress->foregroundRole(), Qt::white);
+#endif
     stress->setPalette(pal);
 
     intensity = new QLabel(this);
     intensity->setAutoFillBackground(false);
     intensity->setFixedWidth(100);
     intensity->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+#ifdef Q_OS_MAC
     pal.setColor(intensity->foregroundRole(), Qt::black);
+#else
+    pal.setColor(intensity->foregroundRole(), Qt::white);
+#endif
     intensity->setPalette(pal);
 
     slideLayout->addWidget(stress, Qt::AlignVCenter|Qt::AlignCenter);
