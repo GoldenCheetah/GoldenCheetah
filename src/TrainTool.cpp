@@ -118,9 +118,19 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     workoutTree->expandItem(allWorkouts);
 
     // TOOLBAR BUTTONS ETC
-    QHBoxLayout *toolbuttons=new QHBoxLayout;
+#ifdef Q_OS_MAC
+    QVBoxLayout *toolallbuttons=new QVBoxLayout; // in sidebar
+#else
+    QHBoxLayout *toolallbuttons=new QHBoxLayout; // on toolbar
+#endif
+    toolallbuttons->setSpacing(0);
+    toolallbuttons->setContentsMargins(0,0,0,0);
+
+    QHBoxLayout *toolbuttons = new QHBoxLayout;
+    toolallbuttons->addLayout(toolbuttons);
     toolbuttons->setSpacing(0);
     toolbuttons->setContentsMargins(0,0,0,0);
+    toolbuttons->addStretch();
 
     QIcon rewIcon(":images/oxygen/rewind.png");
     QPushButton *rewind = new QPushButton(rewIcon, "", this);
@@ -175,6 +185,12 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     lap->setFlat(true);
     lap->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     toolbuttons->addWidget(lap);
+    toolbuttons->addStretch();
+
+    QHBoxLayout *slideLayout = new QHBoxLayout;
+    slideLayout->setSpacing(0);
+    slideLayout->setContentsMargins(0,0,0,0);
+    toolallbuttons->addLayout(slideLayout);
 
     intensitySlider = new QSlider(Qt::Horizontal, this);
     intensitySlider->setAutoFillBackground(false);
@@ -182,7 +198,8 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     intensitySlider->setMinimum(50);
     intensitySlider->setMaximum(150);
     intensitySlider->setValue(100);
-    toolbuttons->addWidget(intensitySlider);
+    slideLayout->addStretch();
+    slideLayout->addWidget(intensitySlider);
 
 #ifdef Q_OS_MAC
     QWindowsStyle *macstyler = new QWindowsStyle();
@@ -198,26 +215,26 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     stress->setAutoFillBackground(false);
     stress->setFixedWidth(100);
     stress->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-    pal.setColor(stress->foregroundRole(), Qt::white);
+    pal.setColor(stress->foregroundRole(), Qt::black);
     stress->setPalette(pal);
 
     intensity = new QLabel(this);
     intensity->setAutoFillBackground(false);
     intensity->setFixedWidth(100);
     intensity->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-    pal.setColor(intensity->foregroundRole(), Qt::white);
+    pal.setColor(intensity->foregroundRole(), Qt::black);
     intensity->setPalette(pal);
 
-    toolbuttons->addWidget(stress, Qt::AlignVCenter|Qt::AlignCenter);
-    toolbuttons->addWidget(intensity, Qt::AlignVCenter|Qt::AlignCenter);
-    toolbuttons->addStretch();
+    slideLayout->addWidget(stress, Qt::AlignVCenter|Qt::AlignCenter);
+    slideLayout->addWidget(intensity, Qt::AlignVCenter|Qt::AlignCenter);
+    slideLayout->addStretch();
 
     toolbarButtons = new QWidget(this);
     toolbarButtons->setContentsMargins(0,0,0,0);
     toolbarButtons->setFocusPolicy(Qt::NoFocus);
     toolbarButtons->setAutoFillBackground(false);
     toolbarButtons->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
-    toolbarButtons->setLayout(toolbuttons);
+    toolbarButtons->setLayout(toolallbuttons);
 
     connect(play, SIGNAL(clicked()), this, SLOT(Start()));
     connect(stop, SIGNAL(clicked()), this, SLOT(Stop()));
