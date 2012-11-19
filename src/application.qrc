@@ -106,5 +106,7 @@
     <file>images/mac/split.png</file>
     <file>images/mac/trash.png</file>
     <file>images/mac/stop.png</file>
+    <file>images/mac/tabbed.png</file>
+    <file>images/mac/tiled.png</file>
  </qresource>
 </RCC>
