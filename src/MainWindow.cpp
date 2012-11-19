@@ -179,6 +179,7 @@ MainWindow::MainWindow(const QDir &home) :
     pp->setContentsMargins(0,0,0,0);
     pp->setSpacing(0);
     QtMacSegmentedButton *actbuttons = new QtMacSegmentedButton(3, acts);
+    actbuttons->setWidth(115);
     actbuttons->setNoSelect();
     actbuttons->setImage(0, QPixmap(":images/mac/stop.png"));
     actbuttons->setImage(1, QPixmap(":images/mac/split.png"));
@@ -203,6 +204,18 @@ MainWindow::MainWindow(const QDir &home) :
     pushbutton->setSelected(1, true);
 #endif
 
+    QWidget *viewsel = new QWidget(this);
+    viewsel->setContentsMargins(0,0,0,0);
+    QHBoxLayout *pq = new QHBoxLayout(viewsel);
+    pq->setContentsMargins(0,0,0,0);
+    pq->setSpacing(0);
+    styleSelector = new QtMacSegmentedButton(2, viewsel);
+    styleSelector->setWidth(80); // actually its 80 but we want a 30px space between is and the searchbox
+    styleSelector->setImage(0, QPixmap(":images/mac/tabbed.png"), 24);
+    styleSelector->setImage(1, QPixmap(":images/mac/tiled.png"), 24);
+    pq->addWidget(styleSelector);
+    connect(styleSelector, SIGNAL(clicked(int,bool)), this, SLOT(toggleStyle()));
+
     // setup Mac thetoolbar
     toolBarWidgets->setContentsMargins(0,0,0,0);
     QHBoxLayout *l = new QHBoxLayout(toolBarWidgets);
@@ -213,6 +226,7 @@ MainWindow::MainWindow(const QDir &home) :
     head->addWidget(new Spacer(this));
     head->addWidget(toolBarWidgets);
     head->addWidget(new Spacer(this));
+    head->addWidget(viewsel);
 
 #ifdef GC_HAVE_LUCENE
     QtMacSearchBox *searchBox = new QtMacSearchBox(this);
@@ -1496,6 +1510,9 @@ MainWindow::setStyle()
 
     styleAction->setChecked(currentWindow->currentStyle == 0);
     style->setIcon((currentWindow->currentStyle == 0) ? tileIcon : tabIcon);
+#ifdef Q_OS_MAC
+    styleSelector->setSelected(currentWindow->currentStyle == 0 ? 0 : 1, true);
+#endif
 }
 
 #ifdef GC_HAVE_LIBOAUTH

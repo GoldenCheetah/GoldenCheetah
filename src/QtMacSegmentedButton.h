@@ -69,15 +69,19 @@ public:
     void setSelected(int index, bool value) const;
     void animateClick (int aSegment);
     void onClicked (int aSegment);
-    void setImage(int index, const QPixmap &image);
+    void setImage(int index, const QPixmap &image, int swidth = 35);
     void setNoSelect();
 
+    void setWidth(int);
 signals:
     void clicked (int aSegment, bool aChecked = false);
 
 private:
     /* Private member vars */
     NativeNSSegmentedControlRef mNativeRef;
+    int segments;
+    bool icons;
+    int width;
 };
 
 #endif

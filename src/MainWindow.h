@@ -66,6 +66,7 @@ class TrainTool;
 class Lucene;
 class NamedSearches;
 class ChartSettings;
+class QtMacSegmentedButton;
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 
@@ -403,6 +404,7 @@ class MainWindow : public QMainWindow
         // Mac Native Support
         QWidget *toolBarWidgets;
         QWidget *macAnalButtons;
+        QtMacSegmentedButton *styleSelector;
         QToolBar *head;
 #endif
 };

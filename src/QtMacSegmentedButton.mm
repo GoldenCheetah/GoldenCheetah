@@ -90,7 +90,7 @@ static NSImage* fromQPixmap(const QPixmap &pixmap)
 
 
 QtMacSegmentedButton::QtMacSegmentedButton (int aCount, QWidget *aParent /* = 0 */)
-  : QMacCocoaViewContainer (0, aParent)
+  : QMacCocoaViewContainer (0, aParent), segments(aCount), icons(false), width(-1)
 {
 #if QT_VERSION >= 0x040800 // see QT-BUG 22574, QMacCocoaContainer on 4.8 is "broken"
     setAttribute(Qt::WA_NativeWindow);
@@ -114,10 +114,16 @@ QtMacSegmentedButton::QtMacSegmentedButton (int aCount, QWidget *aParent /* = 0 
     setCocoaView (mNativeRef);
 }
 
+void QtMacSegmentedButton::setWidth(int x)
+{
+    width = x;
+}
+
 QSize QtMacSegmentedButton::sizeHint() const
 {
     NSRect frame = [mNativeRef frame];
-    return QSize (frame.size.width+70, frame.size.height); // +65 is a hack ... XXX fixme soon!
+    return (width == -1 ? QSize (frame.size.width, frame.size.height) :  // +65 is a hack ... XXX fixme soon!
+                   QSize (width, frame.size.height));
 }
 
 void QtMacSegmentedButton::setNoSelect()
@@ -130,10 +136,11 @@ void QtMacSegmentedButton::setSelected(int index, bool value) const
     [mNativeRef setSelected:value forSegment:index];
 }
 
-void QtMacSegmentedButton::setImage(int index, const QPixmap &image)
+void QtMacSegmentedButton::setImage(int index, const QPixmap &image, int swidth)
 {
     [mNativeRef setImage:fromQPixmap(image) forSegment:index];
-    [mNativeRef setWidth:35 forSegment:index];
+    [mNativeRef setWidth:swidth forSegment:index];
+    icons = true;
 }
 
 void QtMacSegmentedButton::setTitle (int aSegment, const QString &aTitle)
