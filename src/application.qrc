@@ -110,5 +110,7 @@
     <file>images/mac/tiled.png</file>
     <file>images/mac/scope-active.png</file>
     <file>images/mac/scope-inactive.png</file>
+    <file>images/mac/hide.png</file>
+    <file>images/mac/show.png</file>
  </qresource>
 </RCC>

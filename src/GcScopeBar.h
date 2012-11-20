@@ -40,9 +40,13 @@ public slots:
     void clickedAnal();
     void clickedTrain();
     void clickedDiary();
+    void showHideClicked();
 
     // mainwindow tells us when it switched without user clicking.
     void selected(int index);
+
+    // main window tells us the sidebar state
+    void setShowSidebar(bool showSidebar);
 
 signals:
     void selectHome();
@@ -50,10 +54,14 @@ signals:
     void selectTrain();
     void selectDiary();
 
+    void showSideBar(bool);
+
 private:
     void paintBackground(QPaintEvent *);
 
     QtMacButton *home, *diary, *anal, *train;
+    QtMacButton *showHide;
+    bool state;
 };
 
 #endif

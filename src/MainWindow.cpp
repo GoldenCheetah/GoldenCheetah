@@ -386,6 +386,7 @@ MainWindow::MainWindow(const QDir &home) :
     connect(scopebar, SIGNAL(selectHome()), this, SLOT(selectHome()));
     connect(scopebar, SIGNAL(selectAnal()), this, SLOT(selectAnalysis()));
     connect(scopebar, SIGNAL(selectTrain()), this, SLOT(selectTrain()));
+    connect(scopebar, SIGNAL(showSideBar(bool)), this, SLOT(toggleSidebar()));
 #endif
 
     // Analysis view buttons too.
@@ -862,6 +863,9 @@ MainWindow::MainWindow(const QDir &home) :
     // Kick off
     rideTreeWidgetSelectionChanged();
     analWindow->selected();
+#ifdef Q_OS_MAC
+    scopebar->setShowSidebar(true);
+#endif
     setStyle();
 }
 
@@ -895,6 +899,9 @@ MainWindow::showSidebar(bool want)
         side->setIcon(showIcon);
     }
     showhideSidebar->setChecked(toolBox->isVisible());
+#ifdef Q_OS_MAC
+    scopebar->setShowSidebar(toolBox->isVisible());
+#endif
     setStyle();
 
 }
