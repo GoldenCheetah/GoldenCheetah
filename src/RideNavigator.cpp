@@ -685,12 +685,12 @@ QString
 GroupByModel::groupFromValue(QString headingName, QString value, double rank, double count) const
 {
     // Check for predefined thresholds / zones / bands for this metric/column
-    foreach (groupRange range, groupRanges) {
-        if (range.column == headingName) {
+    foreach (groupRange orange, groupRanges) {
+        if (orange.column == headingName) {
 
             double number = value.toDouble();
             // use thresholds defined for this column/metric
-            foreach(groupRange::range range, range.ranges) {
+            foreach(groupRange::range range, orange.ranges) {
 
                 // 0-x is lower, x-0 is upper, 0-0 is no data and x-x is a range
                 if (range.low == 0.0 && range.high == 0.0 && number == 0.0) return range.name;

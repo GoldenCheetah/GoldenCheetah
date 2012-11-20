@@ -63,6 +63,9 @@
 #include <termios.h> // unix!!
 #include <unistd.h> // unix!!
 #include <sys/ioctl.h>
+#ifndef N_TTY // for OpenBSD, this is a hack XXX
+#define N_TTY 0
+#endif
 #endif
 
 #if defined GC_HAVE_LIBUSB
