@@ -118,11 +118,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     workoutTree->expandItem(allWorkouts);
 
     // TOOLBAR BUTTONS ETC
-#ifdef Q_OS_MAC
-    QVBoxLayout *toolallbuttons=new QVBoxLayout; // in sidebar
-#else
     QHBoxLayout *toolallbuttons=new QHBoxLayout; // on toolbar
-#endif
     toolallbuttons->setSpacing(0);
     toolallbuttons->setContentsMargins(0,0,0,0);
 
@@ -135,7 +131,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     QIcon rewIcon(":images/oxygen/rewind.png");
     QPushButton *rewind = new QPushButton(rewIcon, "", this);
     rewind->setFocusPolicy(Qt::NoFocus);
-    rewind->setIconSize(QSize(24,24));
+    rewind->setIconSize(QSize(20,20));
     rewind->setAutoFillBackground(false);
     rewind->setAutoDefault(false);
     rewind->setFlat(true);
@@ -147,7 +143,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     QIcon stopIcon(":images/oxygen/stop.png");
     QPushButton *stop = new QPushButton(stopIcon, "", this);
     stop->setFocusPolicy(Qt::NoFocus);
-    stop->setIconSize(QSize(24,24));
+    stop->setIconSize(QSize(20,20));
     stop->setAutoFillBackground(false);
     stop->setAutoDefault(false);
     stop->setFlat(true);
@@ -157,7 +153,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     QIcon playIcon(":images/oxygen/play.png");
     play = new QPushButton(playIcon, "", this);
     play->setFocusPolicy(Qt::NoFocus);
-    play->setIconSize(QSize(24,24));
+    play->setIconSize(QSize(20,20));
     play->setAutoFillBackground(false);
     play->setAutoDefault(false);
     play->setFlat(true);
@@ -167,7 +163,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     QIcon fwdIcon(":images/oxygen/ffwd.png");
     QPushButton *forward = new QPushButton(fwdIcon, "", this);
     forward->setFocusPolicy(Qt::NoFocus);
-    forward->setIconSize(QSize(24,24));
+    forward->setIconSize(QSize(20,20));
     forward->setAutoFillBackground(false);
     forward->setAutoDefault(false);
     forward->setFlat(true);
@@ -215,22 +211,14 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     stress->setAutoFillBackground(false);
     stress->setFixedWidth(100);
     stress->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-#ifdef Q_OS_MAC
-    pal.setColor(stress->foregroundRole(), Qt::black);
-#else
     pal.setColor(stress->foregroundRole(), Qt::white);
-#endif
     stress->setPalette(pal);
 
     intensity = new QLabel(this);
     intensity->setAutoFillBackground(false);
     intensity->setFixedWidth(100);
     intensity->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-#ifdef Q_OS_MAC
-    pal.setColor(intensity->foregroundRole(), Qt::black);
-#else
     pal.setColor(intensity->foregroundRole(), Qt::white);
-#endif
     intensity->setPalette(pal);
 
     slideLayout->addWidget(stress, Qt::AlignVCenter|Qt::AlignCenter);
@@ -267,9 +255,6 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     trainSplitter->setMidLineWidth(0);
 
     cl->addWidget(trainSplitter);
-#ifdef Q_OS_MAC
-    trainSplitter->addWidget(toolbarButtons);
-#endif
     trainSplitter->addWidget(deviceTree);
     //trainSplitter->addWidget(serverTree);
     trainSplitter->addWidget(workoutTree);
@@ -736,12 +721,6 @@ void TrainTool::Start()       // when start button is pressed
 
         // Stop users from selecting different devices
         // media or workouts whilst a workout is in progress
-#if defined Q_OS_MAC || defined GC_HAVE_VLC
-        mediaTree->setEnabled(false);
-#endif
-        workoutTree->setEnabled(false);
-        deviceTree->setEnabled(false);
-
         // lets reset libusb to clear buffers
         // and reset connection to device
         // this appeara to help with ANT USB2 sticks
@@ -756,10 +735,18 @@ void TrainTool::Start()       // when start button is pressed
             if (multisetup->exec() == false) {
                 return;
             }
-        } else {
+        } else if (deviceTree->selectedItems().count() == 1) {
             bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry = 
             deviceTree->selectedItems().first()->type();
+        } else {
+            return;
         }
+
+#if defined Q_OS_MAC || defined GC_HAVE_VLC
+        mediaTree->setEnabled(false);
+#endif
+        workoutTree->setEnabled(false);
+        deviceTree->setEnabled(false);
 
         // START!
         play->setIcon(pauseIcon);

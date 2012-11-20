@@ -221,12 +221,6 @@ MainWindow::MainWindow(const QDir &home) :
     connect(searchBox, SIGNAL(textChanged(QString)), this, SLOT(searchTextChanged(QString)));
 #endif
 
-    scopebar = new GcScopeBar(this);
-    connect(scopebar, SIGNAL(selectDiary()), this, SLOT(selectDiary()));
-    connect(scopebar, SIGNAL(selectHome()), this, SLOT(selectHome()));
-    connect(scopebar, SIGNAL(selectAnal()), this, SLOT(selectAnalysis()));
-    connect(scopebar, SIGNAL(selectTrain()), this, SLOT(selectTrain()));
-
 #endif // MAC NATIVE TOOLBAR AND SCOPEBAR
 
     // COMMON GUI SETUP
@@ -382,8 +376,16 @@ MainWindow::MainWindow(const QDir &home) :
 
     trainTool = new TrainTool(this, home);
     trainTool->hide();
+    trainTool->getToolbarButtons()->hide(); // no show yet
+
 #ifndef Q_OS_MAC
     toolbar->addWidget(trainTool->getToolbarButtons());
+#else
+    scopebar = new GcScopeBar(this, trainTool->getToolbarButtons());
+    connect(scopebar, SIGNAL(selectDiary()), this, SLOT(selectDiary()));
+    connect(scopebar, SIGNAL(selectHome()), this, SLOT(selectHome()));
+    connect(scopebar, SIGNAL(selectAnal()), this, SLOT(selectAnalysis()));
+    connect(scopebar, SIGNAL(selectTrain()), this, SLOT(selectTrain()));
 #endif
 
     // Analysis view buttons too.
@@ -1358,9 +1360,9 @@ MainWindow::selectAnalysis()
     views->setCurrentIndex(0);
     analWindow->selected(); // tell it!
     currentWindow = analWindow;
+    trainTool->getToolbarButtons()->hide();
 #ifndef Q_OS_MAC
     analButtons->show();
-    trainTool->getToolbarButtons()->hide();
 #else
     scopebar->selected(2);
 #endif
@@ -1375,9 +1377,9 @@ MainWindow::selectTrain()
     views->setCurrentIndex(1);
     trainWindow->selected(); // tell it!
     currentWindow = trainWindow;
+    trainTool->getToolbarButtons()->show();
 #ifndef Q_OS_MAC
     analButtons->hide();
-    trainTool->getToolbarButtons()->show();
 #else
     scopebar->selected(3);
 #endif
@@ -1392,9 +1394,9 @@ MainWindow::selectDiary()
     views->setCurrentIndex(2);
     diaryWindow->selected(); // tell it!
     currentWindow = diaryWindow;
+    trainTool->getToolbarButtons()->hide();
 #ifndef Q_OS_MAC
     analButtons->hide();
-    trainTool->getToolbarButtons()->hide();
 #else
     scopebar->selected(1);
 #endif
@@ -1410,9 +1412,9 @@ MainWindow::selectHome()
     views->setCurrentIndex(3);
     homeWindow->selected(); // tell it!
     currentWindow = homeWindow;
+    trainTool->getToolbarButtons()->hide();
 #ifndef Q_OS_MAC
     analButtons->hide();
-    trainTool->getToolbarButtons()->hide();
 #else
     scopebar->selected(0);
 #endif

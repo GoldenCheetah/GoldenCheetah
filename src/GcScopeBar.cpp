@@ -19,14 +19,13 @@
 #include "GcScopeBar.h"
 #include "QtMacButton.h"
 
-GcScopeBar::GcScopeBar(QWidget *parent) : QWidget(parent)
+GcScopeBar::GcScopeBar(QWidget *parent, QWidget *traintool) : QWidget(parent)
 {
     setFixedHeight(25);
     setContentsMargins(10,0,10,0);
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setSpacing(2);
     layout->setContentsMargins(0,0,0,0);
-    installEventFilter(this);
 
     home = new QtMacButton(this, QtMacButton::Recessed);
     home->setText("Home");
@@ -50,8 +49,11 @@ GcScopeBar::GcScopeBar(QWidget *parent) : QWidget(parent)
     train = new QtMacButton(this, QtMacButton::Recessed);
     train->setText("Train");
     layout->addWidget(train);
-    layout->addStretch();
     connect(train, SIGNAL(clicked(bool)), this, SLOT(clickedTrain()));
+
+    layout->addStretch();
+    layout->addWidget(traintool);
+    layout->addStretch();
 }
 
 GcScopeBar::~GcScopeBar()
@@ -63,6 +65,7 @@ GcScopeBar::paintEvent (QPaintEvent *event)
 {
     // paint the darn thing!
     paintBackground(event);
+    QWidget::paintEvent(event);
 }
 
 void
@@ -77,12 +80,6 @@ GcScopeBar::paintBackground(QPaintEvent *)
     // background light gray for now?
     QRect all(0,0,width(),height());
     painter.drawTiledPixmap(all, isActiveWindow() ? active : inactive);
-}
-
-bool
-GcScopeBar::eventFilter(QObject *obj, QEvent *e)
-{
-    return false;
 }
 
 void
