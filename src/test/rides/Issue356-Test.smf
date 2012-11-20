@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Memory revision="210">
+  <GeneralInformation serialNumber="90172361" unit="rox9">
+    <FileDate>Tue Sep 4 10:46:23 GMT+0200 2012</FileDate>
+    <Name><![CDATA[Rondje Bruggen]]></Name>
+    <StartDate>Wed Aug 29 16:11:09 GMT+0200 2012</StartDate>
+    <StopDate>Wed Aug 29 16:37:02 GMT+0200 2012</StopDate>
+    <Measurement>kmh</Measurement>
+    <DateCode>Wed Aug 29 16:11:09 GMT+0200 2012</DateCode>
+    <WheelSize>2133</WheelSize>
+    <Bike>bike1</Bike>
+    <HRMax>197</HRMax>
+    <StartZone1>108</StartZone1>
+    <StartZone2>138</StartZone2>
+    <StartZone3>158</StartZone3>
+    <EndZone3>197</EndZone3>
+  </GeneralInformation>
+  <MetaInformation>
+    <Statistic>false</Statistic>
+    <Notes><![CDATA[]]></Notes>
+    <Rating>1</Rating>
+    <Weather>0</Weather>
+    <Wind>0</Wind>
+    <Profile>0</Profile>
+    <Participant/>
+    <TrainingType><![CDATA[]]></TrainingType>
+    <ExternalLink><![CDATA[]]></ExternalLink>
+    <Temperature>0</Temperature>
+  </MetaInformation>
+  <MemoryValues>
+    <Distance>8049.941999999993</Distance>
+    <Time>1146.5</Time>
+    <AverageSpeed>7.036430776014118</AverageSpeed>
+    <MaximumSpeed>12.872222222222224</MaximumSpeed>
+    <AverageCadence>0</AverageCadence>
+    <MaximumCadence>0</MaximumCadence>
+    <AverageHeartrate>125</AverageHeartrate>
+    <MaximumHeartrate>188</MaximumHeartrate>
+    <Calories>187</Calories>
+    <MaximumAltitude>9</MaximumAltitude>
+    <DistancePlus>0</DistancePlus>
+    <DistanceMinus>0</DistanceMinus>
+    <TimeInZone1>860</TimeInZone1>
+    <TimeInZone2>89</TimeInZone2>
+    <TimeInZone3>90</TimeInZone3>
+    <MinimalTemperature>24</MinimalTemperature>
+    <MaximalTemperature>26</MaximalTemperature>
+    <DistanceUphill>1247.8049999999996</DistanceUphill>
+    <TimeUphill>148.5</TimeUphill>
+    <AverageSpeedUphill>8.183905228758169</AverageSpeedUphill>
+    <AverageInclineUphill>2</AverageInclineUphill>
+    <MaximumInclineUphill>4</MaximumInclineUphill>
+    <AltitudeDifferencesUphill>45</AltitudeDifferencesUphill>
+    <DistanceDownhill>889.4609999999999</DistanceDownhill>
+    <TimeDownhill>121</TimeDownhill>
+    <AverageSpeedDownhill>7.403189300411522</AverageSpeedDownhill>
+    <AverageInclineDownhill>3</AverageInclineDownhill>
+    <MaximumInclineDownhill>9</MaximumInclineDownhill>
+    <AltitudeDifferencesDownhill>40</AltitudeDifferencesDownhill>
+  </MemoryValues>
+</Memory>
