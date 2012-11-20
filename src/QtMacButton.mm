@@ -70,11 +70,11 @@ public:
         NSFont* font = 0;
         switch(bezelStyle) {
             case QtMacButton::RoundRect:
-                font = [NSFont fontWithName:@"Lucida Grande" size:12];
+                font = [NSFont fontWithName:@"Lucida Grande" size:10];
                 break;
 
             case QtMacButton::Recessed:
-                font = [NSFont fontWithName:@"Lucida Grande Bold" size:12];
+                font = [NSFont fontWithName:@"Lucida Grande Bold" size:10];
                 break;
 
 #ifdef __MAC_10_7
@@ -115,8 +115,7 @@ public:
                 break;
             case QtMacButton::RoundRect:
             case QtMacButton::Recessed:
-                qButton->setMinimumWidth(16);
-                qButton->setFixedHeight(18);
+                qButton->setFixedSize(50,18);
                 qButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
                 break;
             case QtMacButton::Disclosure:
@@ -146,14 +145,21 @@ public:
 
         switch(bezelStyle) {
             case QtMacButton::Recessed:
-                [nsButton setButtonType:NSPushOnPushOffButton];
+                [nsButton setButtonType:NSOnOffButton];
+                [nsButton setShowsBorderOnlyWhileMouseInside:true ];
+                [[nsButton cell] setBackgroundStyle:NSBackgroundStyleRaised];
+                //[nsButton setButtonType:NSPushOnPushOffButton];
+                break;
             case QtMacButton::Disclosure:
                 [nsButton setButtonType:NSOnOffButton];
+                break;
             default:
                 [nsButton setButtonType:NSMomentaryPushInButton];
+                break;
         }
 
         [nsButton setBezelStyle:bezelStyle];
+        [nsButton setState:false ];
     }
 
     void clicked()

@@ -92,6 +92,7 @@
 #include "QtMacPopUpButton.h" // mac
 #include "QtMacSegmentedButton.h" // mac
 #include "QtMacSearchBox.h" // mac
+#include "GcScopeBar.h" // mac
 #else
 #include "QTFullScreen.h" // not mac!
 #endif
@@ -131,10 +132,6 @@ MainWindow::MainWindow(const QDir &home) :
     static const QIcon tileIcon(":images/toolbar/main/tile.png");
     static const QIcon fullIcon(":images/toolbar/main/togglefull.png");
 
-#ifdef Q_OS_MAC
-    static CocoaInitializer cocoaInitializer; // we only need one
-#endif
-
     mainwindows.append(this); // add us to the list of open windows
 
     /*----------------------------------------------------------------------
@@ -143,7 +140,8 @@ MainWindow::MainWindow(const QDir &home) :
 
     setAttribute(Qt::WA_DeleteOnClose);
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MAC // MAC NATIVE TOOLBAR
+    static CocoaInitializer cocoaInitializer; // we only need one
     setUnifiedTitleAndToolBarOnMac(true);
     head = addToolBar(cyclist);
     head->setContentsMargins(0,0,0,0);
@@ -194,20 +192,6 @@ MainWindow::MainWindow(const QDir &home) :
 
     lb->addWidget(new Spacer(this));
 
-    QtMacSegmentedButton *pushbutton = new QtMacSegmentedButton(4, toolBarWidgets);
-#ifdef GC_HAVE_ICAL
-    pushbutton->setTitle(0,"Home");
-    pushbutton->setTitle(1,"Diary");
-    pushbutton->setTitle(2,"Analysis");
-    pushbutton->setTitle(3,"Train");
-    pushbutton->setSelected(2, true);
-#else
-    pushbutton->setTitle(0,"Home");
-    pushbutton->setTitle(1,"Analysis");
-    pushbutton->setTitle(2,"Train");
-    pushbutton->setSelected(1, true);
-#endif
-
     QWidget *viewsel = new QWidget(this);
     viewsel->setContentsMargins(0,0,0,0);
     QHBoxLayout *pq = new QHBoxLayout(viewsel);
@@ -225,7 +209,6 @@ MainWindow::MainWindow(const QDir &home) :
     QHBoxLayout *l = new QHBoxLayout(toolBarWidgets);
     l->setSpacing(0);
     l->setContentsMargins(0,0,0,0);
-    l->addWidget(pushbutton);
     head->addWidget(macAnalButtons);
     head->addWidget(new Spacer(this));
     head->addWidget(toolBarWidgets);
@@ -238,9 +221,15 @@ MainWindow::MainWindow(const QDir &home) :
     connect(searchBox, SIGNAL(textChanged(QString)), this, SLOT(searchTextChanged(QString)));
 #endif
 
-    connect(pushbutton, SIGNAL(clicked(int,bool)), this, SLOT(selectView(int)));
-#endif
+    scopebar = new GcScopeBar(this);
+    connect(scopebar, SIGNAL(selectDiary()), this, SLOT(selectDiary()));
+    connect(scopebar, SIGNAL(selectHome()), this, SLOT(selectHome()));
+    connect(scopebar, SIGNAL(selectAnal()), this, SLOT(selectAnalysis()));
+    connect(scopebar, SIGNAL(selectTrain()), this, SLOT(selectTrain()));
 
+#endif // MAC NATIVE TOOLBAR AND SCOPEBAR
+
+    // COMMON GUI SETUP
     setWindowIcon(QIcon(":images/gc.png"));
     setWindowTitle(home.dirName());
     setContentsMargins(0,0,0,0);
@@ -253,12 +242,6 @@ MainWindow::MainWindow(const QDir &home) :
 
     GCColor *GCColorSet = new GCColor(this); // get/keep colorset
     GCColorSet->colorSet(); // shut up the compiler
-#if 0
-    setStyleSheet("QFrame { FrameStyle = QFrame::NoFrame };"
-                  "QWidget { background = Qt::white; border:0 px; margin: 0px; };"
-                  "QTabWidget { background = Qt::white; };"
-                  "::pane { FrameStyle = QFrame::NoFrame; border: 0px; };");
-#endif
 
     QVariant unit = appsettings->value(this, GC_UNIT);
     useMetricUnits = (unit.toString() == "Metric");
@@ -339,8 +322,13 @@ MainWindow::MainWindow(const QDir &home) :
      *--------------------------------------------------------------------*/
 
     toolbar = new GcToolBar(this);
+
 #ifdef Q_OS_MAC
-    toolbar->hide(); // not on a Mac!
+    // not on a Mac - we have native, but lets create everything because there are
+    // so many places in the code that reference it, we may as well just allocate
+    // it and hide it. It also means we can reintroduce it at a later date if it
+    // develops into something we want to use cross platform (unlikely I know).
+    toolbar->hide();
 #endif
 
     QWidget *lspacer = new QWidget(this);
@@ -378,7 +366,7 @@ MainWindow::MainWindow(const QDir &home) :
     lspacerLayout->addWidget(style);
     connect(style, SIGNAL(clicked()), this, SLOT(toggleStyle()));
 
-#ifndef Q_OS_MAC // full screen is in title bar on a Mac
+#ifndef Q_OS_MAC // full screen is in the unified title and toolbar on a Mac
     full = new QPushButton(fullIcon, "", this);
     full->setFocusPolicy(Qt::NoFocus);
     full->setToolTip("Toggle Full Screen");
@@ -433,19 +421,12 @@ MainWindow::MainWindow(const QDir &home) :
     openMenu->addAction(tr("Import file"), this, SLOT (importFile()));
     openMenu->addAction(tr("Manual activity"), this, SLOT(manualRide()));
 
-#ifdef Q_OS_MAC
-    QWindowsStyle *macstyler = new QWindowsStyle();
-    saveButton->setStyle(macstyler);
-    open->setStyle(macstyler);
-#endif
-
     toolbuttons->addStretch();
 
     analButtons = new QWidget(this);
     analButtons->setContentsMargins(0,0,0,0);
     analButtons->setFocusPolicy(Qt::NoFocus);
     analButtons->setAutoFillBackground(false);
-    //XXX analButtons->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     analButtons->setLayout(toolbuttons);
     analButtons->show();
 
@@ -472,27 +453,11 @@ MainWindow::MainWindow(const QDir &home) :
     connect(analysisAct, SIGNAL(triggered()), this, SLOT(selectAnalysis()));
     toolbar->addAction(analysisAct);
 
-#if 0 // XXX NOT YET IMPLEMENTED
-    // measures
-    QIcon measuresIcon(":images/toolbar/main/measures.png");
-    measuresAct = new QAction(measuresIcon, tr("Measures"), this);
-    //connect(measuresAct, SIGNAL(triggered()), this, SLOT(selectMeasures()));
-    toolbar->addAction(measuresAct);
-#endif
-
     // train
     QIcon trainIcon(":images/toolbar/main/train.png");
     trainAct = new QAction(trainIcon, tr("Train"), this);
     connect(trainAct, SIGNAL(triggered()), this, SLOT(selectTrain()));
     toolbar->addAction(trainAct);
-
-#if 0 // XXX NOT YET IMPLEMENTED
-    // athletes
-    QIcon athleteIcon(":images/toolbar/main/athlete.png");
-    athleteAct = new QAction(athleteIcon, tr("Athletes"), this);
-    //connect(athleteAct, SIGNAL(triggered()), this, SLOT(athleteView()));
-    toolbar->addAction(athleteAct);
-#endif
 
     QWidget *rspacer = new QWidget(this);
     rspacer->setFixedWidth(100);
@@ -520,11 +485,6 @@ MainWindow::MainWindow(const QDir &home) :
     connect(chartMenu, SIGNAL(aboutToShow()), this, SLOT(setChartMenu()));
     connect(chartMenu, SIGNAL(triggered(QAction*)), this, SLOT(addChart(QAction*)));
 
-#ifdef Q_OS_MAC
-    side->setStyle(macstyler);
-    style->setStyle(macstyler);
-    newchart->setStyle(macstyler);
-#endif
     /*----------------------------------------------------------------------
      * Sidebar
      *--------------------------------------------------------------------*/
@@ -626,24 +586,9 @@ MainWindow::MainWindow(const QDir &home) :
 
     splitter = new QSplitter;
 
-#if 0 // moved to toolbar, keep code in case we change our mind
-    // CHARTS
-    chartTool = new GcWindowTool(this);
-#endif
-
-
-    // TOOLBOX
+    // TOOLBOX - IS A SPLITTER
     toolBox = new QStackedWidget(this);
     toolBox->setAcceptDrops(true);
-    toolBox->setStyleSheet("QToolBox::tab {"
-                           "max-height: 18px; "
-                           "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-                           //"stop: 0 #82848A, stop: 1.0 #53555A);" // XXX match toolbar
-                           "stop: 0 #CFCFCF, stop: 1.0 #A8A8A8);"
-                           "border: 1px solid rgba(255, 255, 255, 32);"
-                           "color: #101010;"
-                           "font-weight: bold; }");
-
     toolBox->setFrameStyle(QFrame::NoFrame);
     toolBox->setContentsMargins(0,0,0,0);
     toolBox->layout()->setSpacing(0);
@@ -707,15 +652,6 @@ MainWindow::MainWindow(const QDir &home) :
     //toolBox->addItem(masterControls, QIcon(":images/settings.png"), "Chart Settings");
     chartSettings->hide();
 
-#if 0 // XXX NOT YET IMPLEMENTED
-    toolBox->addItem(new AthleteTool(QFileInfo(home.path()).path(), this), QIcon(":images/toolbar/main/athlete.png"), "Athletes");
-#endif
-
-#if 0 // moved to toolbar, keep code in case we change our mind
-    toolBox->addItem(chartTool, QIcon(":images/addchart.png"), "Charts");
-#endif
-
-
     /*----------------------------------------------------------------------
      * Main view
      *--------------------------------------------------------------------*/
@@ -754,14 +690,6 @@ MainWindow::MainWindow(const QDir &home) :
     splitter->setHandleWidth(1);
     splitter->setStyleSheet(" QSplitter::handle { background-color: #B3B4BA; "
                             "                     color: #B3B4BA; }");
-#if 0
-    splitter->setStyleSheet(" QSplitter::handle { "
-                            "background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, "
-                            "stop:0 rgba(255, 255, 255, 0), "
-                            "stop:0.407273 rgba(200, 200, 200, 255), "
-                            "stop:0.4825 rgba(101, 104, 113, 235), "
-                            "stop:0.6 rgba(255, 255, 255, 0)); }");
-#endif
     splitter->setFrameStyle(QFrame::NoFrame);
     splitter->setContentsMargins(0, 0, 0, 0); // attempting to follow some UI guides
 
@@ -774,6 +702,9 @@ MainWindow::MainWindow(const QDir &home) :
     centralLayout->setSpacing(0);
     centralLayout->setContentsMargins(0,0,0,0);
     centralLayout->addWidget(toolbar);
+#ifdef Q_OS_MAC
+    centralLayout->addWidget(scopebar);
+#endif
     centralLayout->addWidget(splitter);
 
     setCentralWidget(central);
@@ -1421,25 +1352,6 @@ MainWindow::helpView()
 }
 
 void
-MainWindow::selectView(int index)
-{
-#ifdef GC_HAVE_ICAL
-    switch (index) {
-        case 0 : selectHome(); break;
-        case 1 : selectDiary(); break;
-        case 2 : selectAnalysis(); break;
-        case 3 : selectTrain(); break;
-    }
-#else
-    switch (index) {
-        case 0 : selectHome(); break;
-        case 1 : selectAnalysis(); break;
-        case 2 : selectTrain(); break;
-    }
-#endif
-}
-
-void
 MainWindow::selectAnalysis()
 {
     masterControls->setCurrentIndex(0);
@@ -1451,6 +1363,7 @@ MainWindow::selectAnalysis()
     trainTool->getToolbarButtons()->hide();
 #endif
     toolBox->setCurrentIndex(0);
+    scopebar->selected(2);
     setStyle();
 }
 
@@ -1466,6 +1379,7 @@ MainWindow::selectTrain()
     trainTool->getToolbarButtons()->show();
 #endif
     toolBox->setCurrentIndex(2);
+    scopebar->selected(3);
     setStyle();
 }
 
@@ -1482,6 +1396,7 @@ MainWindow::selectDiary()
 #endif
     toolBox->setCurrentIndex(1);
     gcCalendar->refresh(); // get that signal with the date range...
+    scopebar->selected(1);
     setStyle();
 }
 
@@ -1497,6 +1412,7 @@ MainWindow::selectHome()
     trainTool->getToolbarButtons()->hide();
 #endif
     toolBox->setCurrentIndex(1);
+    scopebar->selected(0);
     setStyle();
 }
 void

@@ -108,5 +108,7 @@
     <file>images/mac/stop.png</file>
     <file>images/mac/tabbed.png</file>
     <file>images/mac/tiled.png</file>
+    <file>images/mac/scope-active.png</file>
+    <file>images/mac/scope-inactive.png</file>
  </qresource>
 </RCC>
