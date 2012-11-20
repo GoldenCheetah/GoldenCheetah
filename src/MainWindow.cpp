@@ -1361,9 +1361,10 @@ MainWindow::selectAnalysis()
 #ifndef Q_OS_MAC
     analButtons->show();
     trainTool->getToolbarButtons()->hide();
+#else
+    scopebar->selected(2);
 #endif
     toolBox->setCurrentIndex(0);
-    scopebar->selected(2);
     setStyle();
 }
 
@@ -1377,9 +1378,10 @@ MainWindow::selectTrain()
 #ifndef Q_OS_MAC
     analButtons->hide();
     trainTool->getToolbarButtons()->show();
+#else
+    scopebar->selected(3);
 #endif
     toolBox->setCurrentIndex(2);
-    scopebar->selected(3);
     setStyle();
 }
 
@@ -1393,10 +1395,11 @@ MainWindow::selectDiary()
 #ifndef Q_OS_MAC
     analButtons->hide();
     trainTool->getToolbarButtons()->hide();
+#else
+    scopebar->selected(1);
 #endif
     toolBox->setCurrentIndex(1);
     gcCalendar->refresh(); // get that signal with the date range...
-    scopebar->selected(1);
     setStyle();
 }
 
@@ -1410,9 +1413,10 @@ MainWindow::selectHome()
 #ifndef Q_OS_MAC
     analButtons->hide();
     trainTool->getToolbarButtons()->hide();
+#else
+    scopebar->selected(0);
 #endif
     toolBox->setCurrentIndex(1);
-    scopebar->selected(0);
     setStyle();
 }
 void
