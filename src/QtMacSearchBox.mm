@@ -63,6 +63,8 @@ static QString darwintoQString(NSString *string)
 SearchWidget::SearchWidget(QtMacSearchBox *parent)
     : QMacCocoaViewContainer(0, parent), parent(parent)
 {
+    setContentsMargins(0,0,0,0);
+
     // Many Cocoa objects create temporary autorelease objects,
     // so create a pool to catch them.
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -96,7 +98,7 @@ SearchWidget::~SearchWidget()
 
 QSize SearchWidget::sizeHint() const
 {
-    return QSize(200, 40);
+    return QSize(200, 20);
 }
 
 void SearchWidget::textChanged(QString text)
@@ -137,7 +139,8 @@ QtMacSearchBox::QtMacSearchBox(QWidget *parent)
 :QWidget(parent)
 {
     s = new SearchWidget(this);
-    s->move(2,2);
+    setContentsMargins(0,0,0,0);
+    //s->move(2,2);
     setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
 }
 
@@ -155,5 +158,5 @@ Spacer::Spacer(QWidget *parent)
 
 QSize Spacer::sizeHint() const
 {
-    return QSize(1, 1);
+    return QSize(10, 1);
 }

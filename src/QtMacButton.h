@@ -57,6 +57,7 @@ public slots:
     void setToolTip(const QString &text);
     void setImage(const QPixmap &image);
     void setChecked(bool checked);
+    void setWidth(int x);
 
 public:
     void setCheckable(bool checkable);
@@ -68,6 +69,7 @@ signals:
 private:
     friend class QtMacButtonWidget;
     QPointer<QtMacButtonWidget> qtw;
+    int width;
 };
 
 #endif
