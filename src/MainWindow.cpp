@@ -518,6 +518,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     // UI Ride List (configurable)
     listView = new RideNavigator(this, true);
+    listView->setProperty("nomenu", true);
     // retrieve settings (properties are saved when we close the window)
     if (appsettings->cvalue(cyclist, GC_NAVHEADINGS, "").toString() != "") {
         listView->setSortByIndex(appsettings->cvalue(cyclist, GC_SORTBY).toInt());

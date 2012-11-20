@@ -156,6 +156,7 @@ GcWindow::GcWindow()
     qRegisterMetaType<GcWinID>("type");
     qRegisterMetaType<QColor>("color");
     qRegisterMetaType<DateRange>("dateRange");
+    qRegisterMetaType<bool>("nomenu");
     setControls(NULL);
     setRideItem(NULL);
     setTitle("");
@@ -163,6 +164,7 @@ GcWindow::GcWindow()
     setResizable(false);
     setMouseTracking(true);
     setProperty("color", Qt::white);
+    setProperty("nomenu", false);
 
     // make sure its underneath the toggle button
     menuButton = new QToolButton(this);
@@ -188,6 +190,7 @@ GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
     qRegisterMetaType<GcWinID>("type");
     qRegisterMetaType<QColor>("color");
     qRegisterMetaType<DateRange>("dateRange");
+    qRegisterMetaType<bool>("nomenu");
     setParent(parent);
     setControls(NULL);
     setRideItem(NULL);
@@ -196,6 +199,7 @@ GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
     setResizable(false);
     setMouseTracking(true);
     setProperty("color", Qt::white);
+    setProperty("nomenu", false);
 
     // make sure its underneath the toggle button
     menuButton = new QToolButton(this);
@@ -635,7 +639,7 @@ GcWindow::setCursorShape(DragState d)
 void
 GcWindow::enterEvent(QEvent *)
 {
-    if (property("isManager").toBool() == false) {
+    if (property("nomenu") == false && property("isManager").toBool() == false) {
         if (contentsMargins().top() > 20) menuButton->setFixedSize(15,20);
         else menuButton->setFixedSize(15,15);
         menuButton->show();

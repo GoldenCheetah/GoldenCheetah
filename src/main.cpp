@@ -35,7 +35,9 @@ main(int argc, char *argv[])
 #endif
 
     QApplication app(argc, argv);
-    //app.setApplicationName("Golden Cheetah"); //XXX affect location of home on Win32
+#ifdef Q_OS_MAC
+    app.setAttribute(Qt::AA_NativeWindows);
+#endif
 
     QFont font;
     font.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, QFont().toString()).toString());
