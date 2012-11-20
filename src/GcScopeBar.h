@@ -30,11 +30,10 @@ class GcScopeBar : public QWidget
 
 public:
 
-    GcScopeBar(QWidget *parent);
+    GcScopeBar(QWidget *parent, QWidget *traintool);
     ~GcScopeBar();
 
 public slots:
-    bool eventFilter(QObject *o,QEvent *e);
     void paintEvent (QPaintEvent *event);
 
     void clickedHome();
