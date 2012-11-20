@@ -146,21 +146,24 @@ MainWindow::MainWindow(const QDir &home) :
 #ifdef Q_OS_MAC
     setUnifiedTitleAndToolBarOnMac(true);
     head = addToolBar(cyclist);
+    head->setContentsMargins(0,0,0,0);
 
     // widgets
     toolBarWidgets = new QWidget(this);
     toolBarWidgets->setContentsMargins(0,0,0,0);
 
     macAnalButtons = new QWidget(this);
-    macAnalButtons->setContentsMargins(0,0,0,0);
+    macAnalButtons->setContentsMargins(0,0,20,0);
 
     // lhs buttons
     QHBoxLayout *lb = new QHBoxLayout(macAnalButtons);
-    lb->setSpacing(10);
+    lb->setContentsMargins(0,0,0,0);
+    lb->setSpacing(0);
     QtMacButton *import = new QtMacButton(this, QtMacButton::TexturedRounded);
     import->setImage(QPixmap(":images/mac/download.png"));
     import->setToolTip("Download");
     lb->addWidget(import);
+    lb->addWidget(new Spacer(this));
     QtMacButton *compose = new QtMacButton(this, QtMacButton::TexturedRounded);
     compose->setImage(QPixmap(":images/mac/compose.png"));
     compose->setToolTip("Create");
@@ -176,6 +179,7 @@ MainWindow::MainWindow(const QDir &home) :
     QWidget *acts = new QWidget(this);
     acts->setContentsMargins(0,0,0,0);
     QHBoxLayout *pp = new QHBoxLayout(acts);
+    pp->setContentsMargins(0,0,0,0);
     pp->setContentsMargins(0,0,0,0);
     pp->setSpacing(0);
     QtMacSegmentedButton *actbuttons = new QtMacSegmentedButton(3, acts);

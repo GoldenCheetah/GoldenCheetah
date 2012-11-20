@@ -42,7 +42,8 @@ static inline void setupLayout(void *cocoaView, QWidget *parent)
 {
     parent->setAttribute(Qt::WA_NativeWindow);
     QVBoxLayout *layout = new QVBoxLayout(parent);
-    layout->setMargin(0);
+    layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(0);
     layout->addWidget(new QMacCocoaViewContainer(cocoaView, parent));
 }
 
@@ -185,8 +186,10 @@ public:
 }
 @end
 
-QtMacButton::QtMacButton(QWidget *parent, BezelStyle bezelStyle) : QWidget(parent)
+QtMacButton::QtMacButton(QWidget *parent, BezelStyle bezelStyle) : QWidget(parent), width(-1)
 {
+    setContentsMargins(0,0,0,0);
+
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
     NSButton *button = [[NSButton alloc] init];
@@ -203,6 +206,11 @@ QtMacButton::QtMacButton(QWidget *parent, BezelStyle bezelStyle) : QWidget(paren
     [button release];
 
     [pool drain];
+}
+
+void QtMacButton::setWidth(int x)
+{
+    setFixedWidth(x);
 }
 
 void QtMacButton::setToolTip(const QString &text)

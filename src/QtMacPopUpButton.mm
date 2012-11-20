@@ -42,7 +42,8 @@ static inline void setupLayout(void *cocoaView, QWidget *parent)
 {
     parent->setAttribute(Qt::WA_NativeWindow);
     QVBoxLayout *layout = new QVBoxLayout(parent);
-    layout->setMargin(0);
+    layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(0);
     layout->addWidget(new QMacCocoaViewContainer(cocoaView, parent));
 }
 
@@ -177,6 +178,8 @@ public:
 
 QtMacPopUpButton::QtMacPopUpButton(QWidget *parent, BezelStyle bezelStyle) : QWidget(parent)
 {
+    setContentsMargins(0,0,0,0);
+
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
     NSPopUpButton *button = [[NSPopUpButton alloc] init];
