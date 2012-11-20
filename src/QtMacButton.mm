@@ -219,6 +219,11 @@ void QtMacButton::setWidth(int x)
     setFixedWidth(x);
 }
 
+void QtMacButton::setIconAndText()
+{
+    [[qtw->nsButton cell] setImagePosition:NSImageLeft ];
+}
+
 void QtMacButton::setToolTip(const QString &text)
 {
     [qtw->nsButton setToolTip: fromQString(text)];

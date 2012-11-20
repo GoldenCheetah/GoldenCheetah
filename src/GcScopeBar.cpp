@@ -17,6 +17,7 @@
  */
 
 #include "GcScopeBar.h"
+#include "GcCalendar.h"
 #include "QtMacButton.h"
 
 GcScopeBar::GcScopeBar(QWidget *parent, QWidget *traintool) : QWidget(parent)
@@ -27,6 +28,19 @@ GcScopeBar::GcScopeBar(QWidget *parent, QWidget *traintool) : QWidget(parent)
     layout->setSpacing(2);
     layout->setContentsMargins(0,0,0,0);
 
+    showHide = new QtMacButton(this, QtMacButton::Recessed);
+    showHide->setWidth(60);
+    showHide->setIconAndText();
+    state = true;
+    showHideClicked();
+    layout->addWidget(showHide);
+    connect(showHide, SIGNAL(clicked(bool)), this, SLOT(showHideClicked()));
+
+    GcLabel *sep = new GcLabel("|");
+    sep->setFixedWidth(4);
+    sep->setYOff(1);
+    layout->addWidget(sep);
+    
     home = new QtMacButton(this, QtMacButton::Recessed);
     home->setText("Home");
     layout->addWidget(home);
@@ -147,4 +161,29 @@ GcScopeBar::selected(int index)
         case 2 : anal->setChecked(true); break;
         case 3 : train->setChecked(true); break;
     }
+}
+
+void
+GcScopeBar::setShowSidebar(bool showSidebar)
+{
+    static QPixmap hide(":images/mac/hide.png");
+    static QPixmap show(":images/mac/show.png");
+
+    state = showSidebar;
+    if (showSidebar == false) {
+        showHide->setImage(show);
+        showHide->setText("Show");
+    } else {
+        showHide->setImage(hide);
+        showHide->setText("Hide");
+    }
+    showHide->setChecked(false);
+}
+
+void
+GcScopeBar::showHideClicked()
+{
+    state = !state;
+    emit showSideBar(state);
+    setShowSidebar(state);
 }
