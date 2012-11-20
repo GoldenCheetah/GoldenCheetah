@@ -52,6 +52,7 @@ public slots:
     bool getBg() { return bg; }
     void setBgColor(QColor bg) { bgColor = bg; }
     void setSelected(bool x) { selected = x; }
+    bool event(QEvent *e);
 
 protected:
     void mouseReleaseEvent(QMouseEvent *) {

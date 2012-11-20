@@ -485,6 +485,14 @@ GcCalendar::setRide(RideItem *ride)
     refresh();
 }
 
+bool
+GcLabel::event(QEvent *e)
+{
+    // entry / exit event repaint for hover color
+    if (e->type() == QEvent::Leave || e->type() == QEvent::Enter) repaint();
+    return QWidget::event(e);
+}
+
 void
 GcLabel::paintEvent(QPaintEvent *e)
 {
@@ -495,7 +503,9 @@ GcLabel::paintEvent(QPaintEvent *e)
         QPainter painter(this);
         // setup a painter and the area to paint
         QRect all(0,0,width(),height());
-        painter.fillRect(all, bgColor);
+        if (!underMouse()) painter.fillRect(all, bgColor);
+        else painter.fillRect(all, Qt::lightGray);
+
         painter.setPen(Qt::gray);
         painter.drawRect(QRect(0,0,width()-1,height()-1));
     }
