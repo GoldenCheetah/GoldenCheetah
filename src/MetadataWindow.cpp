@@ -30,7 +30,7 @@ MetadataWindow::MetadataWindow(MainWindow *mainWindow) :
     vlayout->setSpacing(0);
     rideMetadata = new RideMetadata(mainWindow);
     QFont font;
-    font.setPointSize(font.pointSize()-2);
+    font.setPointSize(font.pointSize());
     rideMetadata->setFont(font);
     rideMetadata->setContentsMargins(0,0,0,0);
     vlayout->addWidget(rideMetadata);

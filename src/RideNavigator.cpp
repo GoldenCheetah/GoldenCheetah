@@ -95,9 +95,6 @@ RideNavigator::RideNavigator(MainWindow *parent, bool mainwindow) : main(parent)
     tableView->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
     //tableView->setUniformRowHeights(true);
-    QFont smaller;
-    smaller.setPointSize(smaller.pointSize()-2);
-    //tableView->setFont(smaller);
     tableView->installEventFilter(this);
     tableView->viewport()->installEventFilter(this);
     tableView->setMouseTracking(true);
