@@ -66,6 +66,7 @@ class Lucene;
 class NamedSearches;
 class ChartSettings;
 class QtMacSegmentedButton;
+class GcScopeBar;
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 
@@ -304,7 +305,6 @@ class MainWindow : public QMainWindow
         void helpView();
         void logBug();
 
-        void selectView(int);
         void selectHome();
         void selectDiary();
         void selectAnalysis();
@@ -405,6 +405,7 @@ class MainWindow : public QMainWindow
         QWidget *macAnalButtons;
         QtMacSegmentedButton *styleSelector;
         QToolBar *head;
+        GcScopeBar *scopebar;
 #endif
 };
 

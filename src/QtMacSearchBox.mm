@@ -98,7 +98,7 @@ SearchWidget::~SearchWidget()
 
 QSize SearchWidget::sizeHint() const
 {
-    return QSize(200, 20);
+    return QSize(250, 30);
 }
 
 void SearchWidget::textChanged(QString text)

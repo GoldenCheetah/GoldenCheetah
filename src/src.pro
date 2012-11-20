@@ -142,7 +142,8 @@ macx {
                 QtMacSegmentedButton.h \
                 QtMacButton.h \
                 QtMacPopUpButton.h \
-                QtMacSearchBox.h 
+                QtMacSearchBox.h \
+                GcScopeBar.h
 
     OBJECTIVE_SOURCES +=    QtMacVideoWindow.mm \
                             LionFullScreen.mm \
@@ -150,6 +151,8 @@ macx {
                             QtMacButton.mm \
                             QtMacPopUpButton.mm \
                             QtMacSearchBox.mm
+
+    SOURCES +=  GcScopeBar.cpp
 
 } else {
     # not a mac? then F12 to toggle full screen using
