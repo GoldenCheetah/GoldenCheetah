@@ -352,13 +352,14 @@ find_devices(char *result[], int capacity)
     // /dev/usbmodem[0-9A-F]+          - Usb modem module driver (generic)
     // /dev/usbserial-[0-9A-F]+        - usbserial module driver (generic)
     // /dev/KeySerial[0-9]             - Keyspan USB/Serial driver
+    // /dev/ttyU[0-9]                  - Open BSD usb serial devices
     // /dev/ttyUSB[0-9]                - Standard USB/Serial device on Linux/Mac
     // /dev/ttyS[0-2]                  - Serial TTY, 0-2 is restrictive, but noone has complained yet!
     // /dev/ttyACM*                    - ACM converter, admittidly used largely for Mobiles
     // /dev/ttyMI*                     - MOXA PCI cards
     // /dev/rfcomm*                    - Bluetooth devices
     if (regcomp(&reg, 
-                "^(cu\\.(PL2303-[0-9A-F]+|ANTUSBStick.slabvcp|SLAB_USBtoUART|usbmodem[0-9A-F]+|usbserial-[0-9A-G]+|KeySerial[0-9])|ttyUSB[0-9]|ttyS[0-2]|ttyACM*|ttyMI*|rfcomm*)$",
+                "^(cu\\.(PL2303-[0-9A-F]+|ANTUSBStick.slabvcp|SLAB_USBtoUART|usbmodem[0-9A-F]+|usbserial-[0-9A-G]+|KeySerial[0-9])|ttyU[0-9]|ttyUSB[0-9]|ttyS[0-2]|ttyACM*|ttyMI*|rfcomm*)$",
                 REG_EXTENDED|REG_NOSUB)) {
         assert(0);
     }
