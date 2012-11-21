@@ -182,6 +182,7 @@ RideNavigator::resetView()
     nameMap.insert("filename", "File");
     nameMap.insert("timestamp", "Last updated");
     nameMap.insert("ride_date", "Date");
+    nameMap.insert("ride_time", "Time"); // virtual columns show time from ride_date
     nameMap.insert("fingerprint", "Config Checksum");
 
     // add metrics to the map
@@ -541,7 +542,7 @@ RideNavigator::borderMenu(const QPoint &pos)
     connect(insCol, SIGNAL(triggered()), this, SLOT(showColumnChooser()));
 
     QAction *toggleGroupBy = new QAction(_groupBy >= 0 ? tr("Do Not Show in Groups") : tr("Show In Groups"), tableView);
-    toggleGroupBy->setEnabled(true);
+    toggleGroupBy->setEnabled(column!=1?true:false); // No group for Ride Time
     menu.addAction(toggleGroupBy);
     connect(toggleGroupBy, SIGNAL(triggered()), this, SLOT(setGroupByColumn()));
 
@@ -713,7 +714,7 @@ GroupByModel::groupFromValue(QString headingName, QString value, double rank, do
 
     } else {
 
-        if (headingName == "Date") {
+        if (headingName == tr("Date")) {
 
             // get the date from value string
             QDateTime dateTime = QDateTime::fromString(value, Qt::ISODate);
@@ -731,7 +732,22 @@ GroupByModel::groupFromValue(QString headingName, QString value, double rank, do
             else {
                 return dateTime.toString("yyyy-MM (MMMM)");
             }
-        }
+        } /*else if (headingName == tr("Time")) {
+
+            // get the date from value string
+            QDateTime dateTime = QDateTime::fromString(value, Qt::ISODate);
+
+            if (dateTime.time().hour()>=6 && dateTime.time().hour()<13)
+                return "Morning";
+            else if (dateTime.time().hour()>=13 && dateTime.time().hour()<16)
+                return "Afternoon";
+            else if (dateTime.time().hour()>=16 && dateTime.time().hour()<21)
+                return "Evening";
+            else {
+                return "Night";
+            }
+        }*/
+
         // not a metric, i.e. metadata
         return value;
     }
@@ -764,7 +780,7 @@ RideNavigator::showColumnChooser()
 void
 RideNavigator::selectRide(const QModelIndex &index)
 {
-    QModelIndex fileIndex = tableView->model()->index(index.row(), 1, index.parent());
+    QModelIndex fileIndex = tableView->model()->index(index.row(), 2, index.parent()); // column 2 for filename ?
 
     QString filename = tableView->model()->data(fileIndex, Qt::DisplayRole).toString();
     main->selectRideFile(filename);
@@ -813,7 +829,7 @@ RideNavigator::rideTreeSelectionChanged()
             QModelIndex group = tableView->model()->index(i,0,QModelIndex());
             for (int j=0; j<tableView->model()->rowCount(group); j++) {
 
-                QString fileName = tableView->model()->data(tableView->model()->index(j,1, group), Qt::DisplayRole).toString();
+                QString fileName = tableView->model()->data(tableView->model()->index(j,2, group), Qt::DisplayRole).toString();
                 if (fileName == rideItem->fileName) {
                     // we set current index to column 2 (date/time) since we can be guaranteed it is always show (all others are removable)
                     QItemSelection row(tableView->model()->index(j,0,group),
@@ -821,7 +837,7 @@ RideNavigator::rideTreeSelectionChanged()
                     tableView->selectionModel()->select(row, QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
                     //tableView->selectionModel()->setCurrentIndex(tableView->model()->index(j,0,group), QItemSelectionModel::NoUpdate);
                     tableView->selectionModel()->setCurrentIndex(tableView->model()->index(j,0,group), QItemSelectionModel::NoUpdate);
-                    tableView->scrollTo(tableView->model()->index(j,2,group), QAbstractItemView::PositionAtCenter);
+                    tableView->scrollTo(tableView->model()->index(j,3,group), QAbstractItemView::PositionAtCenter);
                     active = false;
                     return;
                 }
@@ -918,6 +934,9 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         if (columnName == tr("Date")) {
             QDateTime dateTime = QDateTime::fromString(value, Qt::ISODate);
             value = dateTime.toString("MMM d, yyyy"); // same format as ride list
+        } else if (columnName == tr("Time")) {
+            QDateTime dateTime = QDateTime::fromString(value, Qt::ISODate);
+            value = dateTime.toString("hh:mm:ss"); // same format as ride list
         } else if (columnName == tr("Last updated")) {
             QDateTime dateTime;
             dateTime.setTime_t(index.model()->data(index, Qt::DisplayRole).toInt());
