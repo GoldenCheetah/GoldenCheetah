@@ -137,7 +137,7 @@ JouleDevice::download( const QDir &tmpdir,
     getSystemInfo(serial, systemInfoArray, err);
 
     QList<DeviceStoredRideItem> trainings;
-    if (getDownloadableRides(trainings, err))
+    if (!getDownloadableRides(trainings, err))
         return false;
 
     for (int i=0; i<trainings.count(); i++) {
