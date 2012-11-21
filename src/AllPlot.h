@@ -70,16 +70,16 @@ class AllPlot : public QwtPlot
 
     public slots:
 
-        void showPower(int state);
-        void showHr(int state);
-        void showSpeed(int state);
-        void showCad(int state);
-        void showAlt(int state);
-        void showTemp(int state);
-        void showWind(int state);
-        void showTorque(int state);
-        void showBalance(int state);
-        void showGrid(int state);
+        void setShowPower(int id);
+        void setShowHr(bool show);
+        void setShowSpeed(bool show);
+        void setShowCad(bool show);
+        void setShowAlt(bool show);
+        void setShowTemp(bool show);
+        void setShowWind(bool show);
+        void setShowTorque(bool show);
+        void setShowBalance(bool show);
+        void setShowGrid(bool show);
         void setPaintBrush(int state);
         void setShadeZones(bool x) { shade_zones=x; }
         void setSmoothing(int value);
@@ -105,14 +105,14 @@ class AllPlot : public QwtPlot
         // controls
         bool shade_zones;
         int showPowerState;
-        int showHrState;
-        int showSpeedState;
-        int showCadState;
-        int showAltState;
-        int showTempState;
-        int showWindState;
-        int showTorqueState;
-        int showBalanceState;
+        bool showHr;
+        bool showSpeed;
+        bool showCad;
+        bool showAlt;
+        bool showTemp;
+        bool showWind;
+        bool showTorque;
+        bool showBalance;
 
         // plot objects
         QwtPlotGrid *grid;

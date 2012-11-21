@@ -228,14 +228,14 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     rideItem(NULL),
     shade_zones(true),
     showPowerState(3),
-    showHrState(Qt::Checked),
-    showSpeedState(Qt::Checked),
-    showCadState(Qt::Checked),
-    showAltState(Qt::Checked),
-    showTempState(Qt::Checked),
-    showWindState(Qt::Checked),
-    showTorqueState(Qt::Checked),
-    showBalanceState(Qt::Checked),
+    showHr(true),
+    showSpeed(true),
+    showCad(true),
+    showAlt(true),
+    showTemp(true),
+    showWind(true),
+    showTorque(true),
+    showBalance(true),
     bydist(false),
     mainWindow(mainWindow),
     parent(parent)
@@ -844,9 +844,26 @@ AllPlot::setYMax()
     if (wattsCurve->isVisible()) {
         double maxY = (referencePlot == NULL) ? (1.05 * wattsCurve->maxYValue()) :
                                              (1.05 * referencePlot->wattsCurve->maxYValue());
-        // grid lines for 100 or 25
+
+        int axisHeight = qRound( plotLayout()->canvasRect().height() );
+        QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(yLeft) );
+        int labelWidth = labelWidthMetric.width( (maxY > 1000) ? "8888 " : "888 " );
+
+        int step = 100;
+        while( ( qCeil(maxY / step) * labelWidth ) > axisHeight )
+        {
+            if( step == 100 || step == 150 )
+            {
+                step += 50;
+            }
+            else
+            {
+                step += 100;
+            }
+        }
+
         QwtValueList xytick[QwtScaleDiv::NTickTypes];
-        for (int i=0;i<maxY;i+=100)
+        for (int i=0;i<maxY;i+=step)
             xytick[QwtScaleDiv::MajorTick]<<i;
 #if 0
         for (int i=0;i<maxY;i+=25)
@@ -1018,15 +1035,15 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     balanceRCurve->detach();
 
     wattsCurve->setVisible(rideItem->ride()->areDataPresent()->watts && showPowerState < 2);
-    hrCurve->setVisible(rideItem->ride()->areDataPresent()->hr && showHrState == Qt::Checked);
-    speedCurve->setVisible(rideItem->ride()->areDataPresent()->kph && showSpeedState == Qt::Checked);
-    cadCurve->setVisible(rideItem->ride()->areDataPresent()->cad && showCadState == Qt::Checked);
-    altCurve->setVisible(rideItem->ride()->areDataPresent()->alt && showAltState == Qt::Checked);
-    tempCurve->setVisible(rideItem->ride()->areDataPresent()->temp && showTempState == Qt::Checked);
-    windCurve->setVisible(rideItem->ride()->areDataPresent()->headwind && showWindState == Qt::Checked);
-    torqueCurve->setVisible(rideItem->ride()->areDataPresent()->nm && showTorqueState == Qt::Checked);
-    balanceLCurve->setVisible(rideItem->ride()->areDataPresent()->lrbalance && showBalanceState == Qt::Checked);
-    balanceRCurve->setVisible(rideItem->ride()->areDataPresent()->lrbalance && showBalanceState == Qt::Checked);
+    hrCurve->setVisible(rideItem->ride()->areDataPresent()->hr && showHr);
+    speedCurve->setVisible(rideItem->ride()->areDataPresent()->kph && showSpeed);
+    cadCurve->setVisible(rideItem->ride()->areDataPresent()->cad && showCad);
+    altCurve->setVisible(rideItem->ride()->areDataPresent()->alt && showAlt);
+    tempCurve->setVisible(rideItem->ride()->areDataPresent()->temp && showTemp);
+    windCurve->setVisible(rideItem->ride()->areDataPresent()->headwind && showWind);
+    torqueCurve->setVisible(rideItem->ride()->areDataPresent()->nm && showTorque);
+    balanceLCurve->setVisible(rideItem->ride()->areDataPresent()->lrbalance && showBalance);
+    balanceRCurve->setVisible(rideItem->ride()->areDataPresent()->lrbalance && showBalance);
 
     wattsCurve->setData(xaxis,smoothW,stopidx-startidx);
     hrCurve->setData(xaxis, smoothHR,stopidx-startidx);
@@ -1172,15 +1189,15 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
         }
 
         wattsCurve->setVisible(dataPresent->watts && showPowerState < 2);
-        hrCurve->setVisible(dataPresent->hr && showHrState == Qt::Checked);
-        speedCurve->setVisible(dataPresent->kph && showSpeedState == Qt::Checked);
-        cadCurve->setVisible(dataPresent->cad && showCadState == Qt::Checked);
-        altCurve->setVisible(dataPresent->alt && showAltState == Qt::Checked);
-        tempCurve->setVisible(dataPresent->temp && showTempState == Qt::Checked);
-        windCurve->setVisible(dataPresent->headwind && showWindState == Qt::Checked);
-        torqueCurve->setVisible(dataPresent->nm && showWindState == Qt::Checked);
-        balanceLCurve->setVisible(dataPresent->lrbalance && showBalanceState == Qt::Checked);
-        balanceRCurve->setVisible(dataPresent->lrbalance && showBalanceState == Qt::Checked);
+        hrCurve->setVisible(dataPresent->hr && showHr);
+        speedCurve->setVisible(dataPresent->kph && showSpeed);
+        cadCurve->setVisible(dataPresent->cad && showCad);
+        altCurve->setVisible(dataPresent->alt && showAlt);
+        tempCurve->setVisible(dataPresent->temp && showTemp);
+        windCurve->setVisible(dataPresent->headwind && showWind);
+        torqueCurve->setVisible(dataPresent->nm && showWind);
+        balanceLCurve->setVisible(dataPresent->lrbalance && showBalance);
+        balanceRCurve->setVisible(dataPresent->lrbalance && showBalance);
 
         arrayLength = 0;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
@@ -1261,7 +1278,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
 }
 
 void
-AllPlot::showPower(int id)
+AllPlot::setShowPower(int id)
 {
     if (showPowerState == id) return;
 
@@ -1277,91 +1294,82 @@ AllPlot::showPower(int id)
 }
 
 void
-AllPlot::showHr(int state)
+AllPlot::setShowHr(bool show)
 {
-    showHrState = state;
-    assert(state != Qt::PartiallyChecked);
-    hrCurve->setVisible(state == Qt::Checked);
+    showHr = show;
+    hrCurve->setVisible(show);
     setYMax();
     replot();
 }
 
 void
-AllPlot::showSpeed(int state)
+AllPlot::setShowSpeed(bool show)
 {
-    showSpeedState = state;
-    assert(state != Qt::PartiallyChecked);
-    speedCurve->setVisible(state == Qt::Checked);
+    showSpeed = show;
+    speedCurve->setVisible(show);
     setYMax();
     replot();
 }
 
 void
-AllPlot::showCad(int state)
+AllPlot::setShowCad(bool show)
 {
-    showCadState = state;
-    assert(state != Qt::PartiallyChecked);
-    cadCurve->setVisible(state == Qt::Checked);
+    showCad = show;
+    cadCurve->setVisible(show);
     setYMax();
     replot();
 }
 
 void
-AllPlot::showAlt(int state)
+AllPlot::setShowAlt(bool show)
 {
-    showAltState = state;
-    assert(state != Qt::PartiallyChecked);
-    altCurve->setVisible(state == Qt::Checked);
+    showAlt = show;
+    altCurve->setVisible(show);
     setYMax();
     replot();
 }
 
 void
-AllPlot::showTemp(int state)
+AllPlot::setShowTemp(bool show)
 {
-    showTempState = state;
-    assert(state != Qt::PartiallyChecked);
-    tempCurve->setVisible(state == Qt::Checked);
+    showTemp = show;
+    tempCurve->setVisible(show);
     setYMax();
     replot();
 }
 
 void
-AllPlot::showWind(int state)
+AllPlot::setShowWind(bool show)
 {
-    showWindState = state;
-    assert(state != Qt::PartiallyChecked);
-    windCurve->setVisible(state == Qt::Checked);
+    showWind = show;
+    windCurve->setVisible(show);
     setYMax();
     replot();
 }
 
 void
-AllPlot::showTorque(int state)
+AllPlot::setShowTorque(bool show)
 {
-    showTorqueState = state;
-    assert(state != Qt::PartiallyChecked);
-    torqueCurve->setVisible(state == Qt::Checked);
+    showTorque = show;
+    torqueCurve->setVisible(show);
     setYMax();
     replot();
 }
 
 void
-AllPlot::showBalance(int state)
+AllPlot::setShowBalance(bool show)
 {
-    showBalanceState = state;
-    assert(state != Qt::PartiallyChecked);
-    balanceLCurve->setVisible(state == Qt::Checked);
-    balanceRCurve->setVisible(state == Qt::Checked);
+    showBalance = show;
+    balanceLCurve->setVisible(show);
+    balanceRCurve->setVisible(show);
     setYMax();
     replot();
 }
 
 void
-AllPlot::showGrid(int state)
+AllPlot::setShowGrid(bool show)
 {
-    assert(state != Qt::PartiallyChecked);
-    grid->setVisible(state == Qt::Checked);
+    grid->setVisible(show);
     replot();
 }
 
