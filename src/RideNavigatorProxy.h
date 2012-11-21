@@ -65,6 +65,9 @@ private:
     int calendarText;
     int colorColumn;
     int fileIndex;
+    int dateColumn;
+
+    QString starttimeHeader;
 
     QList<QString> groups;
     QList<QModelIndex> groupIndexes;
@@ -113,6 +116,10 @@ public:
             if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "ZCalendar_Text") {
                 calendarText = i;
             }
+            if (model->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString() == "ride_date") {
+                dateColumn = i;
+            }
+            starttimeHeader = "ride_time"; //initialisation with techname
         }
 
         connect(model, SIGNAL(modelReset()), this, SLOT(sourceModelChanged()));
@@ -156,7 +163,7 @@ public:
             }
 
             return sourceModel()->index(groupToSourceRow.value(groups[groupNo])->at(proxyIndex.row()),
-                                        proxyIndex.column()-1, // accomodate virtual column
+                                        proxyIndex.column()-2, // accomodate virtual columns
                                         QModelIndex());
         }
         return QModelIndex();
@@ -173,7 +180,7 @@ public:
         } else {
             QModelIndex *p = new QModelIndex(createIndex(groupNo, 0, (void*)NULL));
             if (sourceIndex.row() > 0 && sourceIndex.row() < sourceRowToGroupRow.size())
-                return createIndex(sourceRowToGroupRow[sourceIndex.row()], sourceIndex.column()+1, &p); // accomodate virtual column
+                return createIndex(sourceRowToGroupRow[sourceIndex.row()], sourceIndex.column()+2, &p); // accomodate virtual columns
             else
                 return QModelIndex();
         }
@@ -264,8 +271,20 @@ public:
                 }
 
             } else {
+                // column 1 = ride_time we have to use ride_date
+                if (proxyIndex.column() == 1)  {
+                    QString date;
 
-                returning = sourceModel()->data(mapToSource(proxyIndex), role);
+                    // hideous code, sorry
+                    int groupNo = ((QModelIndex*)proxyIndex.internalPointer())->row();
+                    if (groupNo < 0 || groupNo >= groups.count() || proxyIndex.column() == 0)
+                        date="";
+                    else date = sourceModel()->data(sourceModel()->index(groupToSourceRow.value(groups[groupNo])->at(proxyIndex.row()), dateColumn)).toString();
+
+                    returning = date;//sourceModel()->data(sourceModel()->index(proxyIndex.row(),dateColumn)).toString();
+                }
+                else
+                    returning = sourceModel()->data(mapToSource(proxyIndex), role);
             }
 
         } else if (proxyIndex.internalPointer() == NULL) {
@@ -297,21 +316,25 @@ public:
     }
 
     QVariant headerData (int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const {
-        if (section)
-            return sourceModel()->headerData(section-1, orientation, role);
+        if (section>1)
+            return sourceModel()->headerData(section-2, orientation, role); // accomodate virtual columns
+        else if (section == 1) // return header for virtual column ride_time
+            return  QVariant(starttimeHeader);
         else
             return QVariant("*");
     }
 
     bool setHeaderData (int section, Qt::Orientation orientation, const QVariant & value, int role = Qt::EditRole) {
-        if (section)
-            return sourceModel()->setHeaderData(section-1, orientation, value, role);
+        if (section>1)
+            return sourceModel()->setHeaderData(section-2, orientation, value, role); // accomodate virtual columns
+        else if (section == 1) // set header for virtual column ride_time
+            starttimeHeader = value.toString();
         else
             return true;
     }
 
     int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const {
-        return sourceModel()->columnCount(QModelIndex())+1; // accomodate virtual group column
+        return sourceModel()->columnCount(QModelIndex())+2; // accomodate virtual group column and starttime
     }
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const {
@@ -362,9 +385,9 @@ public:
     void setGroupBy(int column) {
 
         // shift down
-        if (column >= 0) column -= 1;
+        if (column >= 0) column -= 2; // accomodate virtual column
 
-        groupBy = column; // accomodate virtual column
+        groupBy = column;
         setGroups();
     }
 
@@ -372,7 +395,7 @@ public:
 
         if (row == -1) return("");
         if (groupBy == -1) return tr("All Activities");
-        else return groupFromValue(headerData(groupBy+1,
+        else return groupFromValue(headerData(groupBy+2, // accomodate virtual column
                                     Qt::Horizontal).toString(),
                                     sourceModel()->data(sourceModel()->index(row,groupBy)).toString(),
                                     rankedRows[row].value, rankedRows.count());
