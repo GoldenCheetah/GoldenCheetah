@@ -531,13 +531,17 @@ RideNavigator::borderMenu(const QPoint &pos)
 
     QMenu menu(tableView);
 
-    //stdContextMenu(&menu, pos);
-    //menu.addSeparator();
+    // reset viaual headings first
+    columnsChanged();
 
-    QAction *delCol = new QAction(tr("Remove Column"), tableView);
-    delCol->setEnabled(true);
-    menu.addAction(delCol);
-    connect(delCol, SIGNAL(triggered()), this, SLOT(removeColumn()));
+    // don't allow user to delete last column!
+    // need to also include '*' column 0 wide in count hence 2 not 1
+    if (visualHeadings.count() > 2) {
+        QAction *delCol = new QAction(tr("Remove Column"), tableView);
+        delCol->setEnabled(true);
+        menu.addAction(delCol);
+        connect(delCol, SIGNAL(triggered()), this, SLOT(removeColumn()));
+    }
 
     QAction *insCol = new QAction(tr("Column Chooser"), tableView);
     insCol->setEnabled(true);
