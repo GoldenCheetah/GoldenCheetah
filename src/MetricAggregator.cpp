@@ -254,7 +254,7 @@ bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, u
     }
 
     // what color will this ride be?
-    QColor color = colorEngine->colorFor(ride->getTag("Calendar Text", ""));
+    QColor color = colorEngine->colorFor(ride->getTag(main->rideMetadata()->getColorField(), ""));
 
     dbaccess->importRide(summaryMetric, ride, color, fingerprint, modify);
 #ifdef GC_HAVE_LUCENE

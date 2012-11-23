@@ -1692,6 +1692,7 @@ MetadataPage::MetadataPage(MainWindow *main) : main(main)
     // get current config using default file
     keywordDefinitions = main->rideMetadata()->getKeywords();
     fieldDefinitions = main->rideMetadata()->getFields();
+    colorfield = main->rideMetadata()->getColorField();
 
     // setup maintenance pages using current config
     fieldsPage = new FieldsPage(this, fieldDefinitions);
@@ -1702,6 +1703,10 @@ MetadataPage::MetadataPage(MainWindow *main) : main(main)
     tabs->addTab(fieldsPage, tr("Fields"));
     tabs->addTab(keywordsPage, tr("Notes Keywords"));
     tabs->addTab(processorPage, tr("Processing"));
+
+    // refresh the keywords combo when change tabs .. will do more often than
+    // needed but better that than less often than needed
+    connect (tabs, SIGNAL(currentChanged(int)), keywordsPage, SLOT(pageSelected()));
 
     layout->addWidget(tabs);
 }
@@ -1714,7 +1719,7 @@ MetadataPage::saveClicked()
     keywordsPage->getDefinitions(keywordDefinitions);
 
     // write to metadata.xml
-    RideMetadata::serialize(main->home.absolutePath() + "/metadata.xml", keywordDefinitions, fieldDefinitions);
+    RideMetadata::serialize(main->home.absolutePath() + "/metadata.xml", keywordDefinitions, fieldDefinitions, colorfield);
 
     // save processors config
     processorPage->saveClicked();
@@ -1737,9 +1742,17 @@ static void addFieldTypes(QComboBox *p)
 //
 // Calendar coloring page
 //
-KeywordsPage::KeywordsPage(QWidget *parent, QList<KeywordDefinition>keywordDefinitions) : QWidget(parent)
+KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keywordDefinitions) : QWidget(parent), parent(parent)
 {
     QGridLayout *mainLayout = new QGridLayout(this);
+
+    QHBoxLayout *field = new QHBoxLayout();
+    fieldLabel = new QLabel(tr("Field"),this);
+    fieldChooser = new QComboBox(this);
+    field->addWidget(fieldLabel);
+    field->addWidget(fieldChooser);
+    field->addStretch();
+    mainLayout->addLayout(field, 0, 0);
 
     upButton = new QPushButton(tr("Move up"));
     downButton = new QPushButton(tr("Move down"));
@@ -1793,8 +1806,8 @@ KeywordsPage::KeywordsPage(QWidget *parent, QList<KeywordDefinition>keywordDefin
     }
     keywords->setCurrentItem(keywords->invisibleRootItem()->child(0));
 
-    mainLayout->addWidget(keywords, 0,0);
-    mainLayout->addLayout(actionButtons, 0,1);
+    mainLayout->addWidget(keywords, 1,0);
+    mainLayout->addLayout(actionButtons, 1,1);
 
     // connect up slots
     connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
@@ -1802,7 +1815,39 @@ KeywordsPage::KeywordsPage(QWidget *parent, QList<KeywordDefinition>keywordDefin
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(renameButton, SIGNAL(clicked()), this, SLOT(renameClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+
+    connect(fieldChooser, SIGNAL(currentIndexChanged(int)), this, SLOT(colorfieldChanged()));
 }
+
+void
+KeywordsPage::pageSelected()
+{
+    QString prev = "";
+
+    // remember what was selected, if anything?
+    if (fieldChooser->count()) {
+        prev = fieldChooser->itemText(fieldChooser->currentIndex());
+        parent->colorfield = prev;
+    } else prev = parent->colorfield;
+    // load in texts from metadata
+    fieldChooser->clear();
+
+    // get the current fields defiitions 
+    QList<FieldDefinition> fromFieldsPage;
+    parent->fieldsPage->getDefinitions(fromFieldsPage);
+    foreach(FieldDefinition x, fromFieldsPage) {
+        if (x.type < 3) fieldChooser->addItem(x.name);
+    }
+    fieldChooser->setCurrentIndex(fieldChooser->findText(prev));
+}
+
+void
+KeywordsPage::colorfieldChanged()
+{
+    int index = fieldChooser->currentIndex();
+    if (index >=0) parent->colorfield = fieldChooser->itemText(fieldChooser->currentIndex());
+}
+
 
 void
 KeywordsPage::upClicked()
@@ -3356,8 +3401,10 @@ MeasuresPage::MeasuresPage(MainWindow *main) : main(main)
 
     // check we have one and use built in if not there
     QString filename = main->home.absolutePath()+"/measures.xml";
+    QString colorfield;
+
     if (!QFile(filename).exists()) filename = ":/xml/measures.xml";
-    RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions);
+    RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, colorfield);
 
     // iterate over the fields and setup the editable items
     foreach(FieldDefinition field, fieldDefinitions) {
@@ -3504,7 +3551,7 @@ MeasuresPage::saveClicked()
     getDefinitions(current);
 
     // write to measures.xml (uses same format as metadata.xml)
-    RideMetadata::serialize(main->home.absolutePath() + "/measures.xml", QList<KeywordDefinition>(), current);
+    RideMetadata::serialize(main->home.absolutePath() + "/measures.xml", QList<KeywordDefinition>(), current, "");
 }
 
 void CredentialsPage::authoriseTwitter()

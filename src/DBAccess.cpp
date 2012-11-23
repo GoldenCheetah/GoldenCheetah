@@ -71,7 +71,7 @@ DBAccess::DBAccess(MainWindow* main, QDir home) : main(main), home(home)
     // check we have one and use built in if not there
     QString filename = main->home.absolutePath()+"/measures.xml";
     if (!QFile(filename).exists()) filename = ":/xml/measures.xml";
-    RideMetadata::readXML(filename, mkeywordDefinitions, mfieldDefinitions);
+    RideMetadata::readXML(filename, mkeywordDefinitions, mfieldDefinitions, mcolorfield);
 
 }
 
@@ -245,11 +245,12 @@ bool DBAccess::createMeasuresTable()
         // read definitions from measures.xml
         QList<FieldDefinition> fieldDefinitions;
         QList<KeywordDefinition> keywordDefinitions; //NOTE: not used in measures.xml
+        QString colorfield;
 
         // check we have one and use built in if not there
         QString filename = main->home.absolutePath()+"/measures.xml";
         if (!QFile(filename).exists()) filename = ":/xml/measures.xml";
-        RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions);
+        RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, colorfield);
 
         QString createMeasuresTable = "create table measures (timestamp integer primary key,"
                                       "measure_date date";
@@ -724,11 +725,12 @@ QList<SummaryMetrics> DBAccess::getAllMeasuresFor(QDateTime start, QDateTime end
 {
     QList<FieldDefinition> fieldDefinitions;
     QList<KeywordDefinition> keywordDefinitions; //NOTE: not used in measures.xml
+    QString colorfield;
 
     // check we have one and use built in if not there
     QString filename = main->home.absolutePath()+"/measures.xml";
     if (!QFile(filename).exists()) filename = ":/xml/measures.xml";
-    RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions);
+    RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, colorfield);
 
     QList<SummaryMetrics> measures;
 
