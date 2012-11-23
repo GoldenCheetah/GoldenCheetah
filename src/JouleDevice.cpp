@@ -192,12 +192,12 @@ JouleDevice::download( const QDir &tmpdir,
 
                 // timestamp from the first training
                 struct tm start;
-                start.tm_sec = bcd2Int(response.payload.at(4));
-                start.tm_min = bcd2Int(response.payload.at(5));
-                start.tm_hour = bcd2Int(response.payload.at(6));
-                start.tm_mday = bcd2Int(response.payload.at(7));
-                start.tm_mon = bcd2Int(response.payload.at(8))-1;
-                start.tm_year = 2000 + bcd2Int(response.payload.at(9))-1900;
+                start.tm_sec = (isJouleGPS ? bcd2Int(response.payload.at(4))   : qByteArray2Int(response.payload.mid(4,1))   );
+                start.tm_min = (isJouleGPS ? bcd2Int(response.payload.at(5))   : qByteArray2Int(response.payload.mid(5,1))   );
+                start.tm_hour = (isJouleGPS ? bcd2Int(response.payload.at(6))   : qByteArray2Int(response.payload.mid(6,1))   );
+                start.tm_mday = (isJouleGPS ? bcd2Int(response.payload.at(7))   : qByteArray2Int(response.payload.mid(7,1))   );
+                start.tm_mon = (isJouleGPS ? bcd2Int(response.payload.at(8))-1  : qByteArray2Int(response.payload.mid(8,1))-1 );
+                start.tm_year = (isJouleGPS ? bcd2Int(response.payload.at(9))+100  : qByteArray2Int(response.payload.mid(9,1))+100 );
                 start.tm_isdst = -1;
 
                 DeviceDownloadFile file;
