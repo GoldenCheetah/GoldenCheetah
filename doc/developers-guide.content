@@ -16,7 +16,9 @@ Unixes, you can use whatever package manager your distribution provides.  (We
 list the package names for MacPorts and Ubuntu below.)  On Windows, you'll
 probably need to download and install everything by hand.  You might also want
 to read <a href="old-mailing-list-archives/2009-September/002502.html">this
-mailing list message</a>.</p>
+mailing list message</a> or check the
+ <a href="https://github.com/GoldenCheetah/GoldenCheetah">INSTALL</a> documents
+on GitHub.</p>
 
 <p>You'll need the following:</p>
 <table align="center" width="500">
