@@ -5,6 +5,7 @@
 #include "Device.h"
 
 class DeviceFileInfo;
+class JoulePacket;
 
 struct JouleDevices : public Devices
 {
@@ -26,10 +27,13 @@ struct JouleDevice : public Device
 
     virtual bool cleanup( QString &err );
 
-    bool getUnitVersion(QString &version, QByteArray &array, QString &err);
-    bool getUnitFreeSpace(QString &version, QString &err);
-    bool getSystemInfo(QString &version, QByteArray &array, QString &err);
-    bool getDownloadableRides(QList<DeviceStoredRideItem> &rides, QString &err);
+    bool getUnitVersion(JoulePacket &response, QString &err);
+    bool getSystemInfo(JoulePacket &response, QString &err);
+
+    bool getJouleGPS(JoulePacket &versionResponse);
+
+    bool getUnitFreeSpace(QString &txt, QString &err);
+    bool getDownloadableRides(QList<DeviceStoredRideItem> &rides, bool isJouleGPS, QString &err);
 
 };
 
