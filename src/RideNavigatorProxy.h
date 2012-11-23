@@ -387,13 +387,13 @@ public:
         // shift down
         if (column >= 0) column -= 2; // accomodate virtual column
 
-        groupBy = column;
+        groupBy = column < 0 ? -1 : column;
         setGroups();
     }
 
     QString whichGroup(int row) const {
 
-        if (row == -1) return("");
+        if (row < 0 || row >= rankedRows.count()) return ("");
         if (groupBy == -1) return tr("All Activities");
         else return groupFromValue(headerData(groupBy+2, // accomodate virtual column
                                     Qt::Horizontal).toString(),
