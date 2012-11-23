@@ -40,12 +40,12 @@
 #define ERASE_RIDE_DETAIL  0x2024
 
 static bool jouleRegistered =
-    Devices::addType("Joule GPS (BETA)", DevicesPtr(new JouleDevices()) );
+    Devices::addType("Joule 1.0 or GPS (BETA)", DevicesPtr(new JouleDevices()) );
 
 QString
 JouleDevices::downloadInstructions() const
 {
-    return ("Make sure the Joule GPS unit is turned ON\n");
+    return ("Make sure the Joule (1.0 or GPS) unit is turned ON\n");
 }
 
 DevicePtr
@@ -117,27 +117,25 @@ JouleDevice::download( const QDir &tmpdir,
                          ProgressCallback progressCallback,
                          QString &err)
 {
-    if (JOULE_DEBUG) printf("download Joule GPS");
+    if (JOULE_DEBUG) printf("download Joule 1.0 or GPS");
 
     if (!dev->open(err)) {
         err = "ERROR: open failed: " + err;
         return false;
     }
-
     dev->setBaudRate(57600, err);
 
-    QString version = QString("");
-    QString serial = QString("");
-    QByteArray versionArray;
-    QByteArray systemInfoArray;
+    JoulePacket versionResponse;
+    JoulePacket systemResponse;
 
-    getUnitVersion(version, versionArray, err);
-    statusCallback("Version"+version);
+    getUnitVersion(versionResponse, err);
+    getSystemInfo(systemResponse, err);
 
-    getSystemInfo(serial, systemInfoArray, err);
+    bool isJouleGPS = getJouleGPS(versionResponse);
+    statusCallback(QString("Joule %1 indentified").arg(isJouleGPS?"GPS":"1.0"));
 
     QList<DeviceStoredRideItem> trainings;
-    if (!getDownloadableRides(trainings, err))
+    if (!getDownloadableRides(trainings, isJouleGPS, err))
         return false;
 
     for (int i=0; i<trainings.count(); i++) {
@@ -150,7 +148,8 @@ JouleDevice::download( const QDir &tmpdir,
         request.addToPayload((uint16_t)0xFFFF); // Total Ride#
         request.addToPayload((uint16_t)0x0000); // Start Page#
 
-        if (!request.write(dev, err)) return false;
+        if (!request.write(dev, err))
+            return false;
 
         if (cancelCallback())
         {
@@ -206,8 +205,8 @@ JouleDevice::download( const QDir &tmpdir,
                 os << hex;
 
                 qDebug() << tmp.fileName() << "-" << tmpl;
-                tmp.write(versionArray);
-                tmp.write(systemInfoArray);
+                tmp.write(versionResponse.dataArray());
+                tmp.write(systemResponse.dataArray());
                 tmp.write(response.dataArray());
 
                 int _try = 1;
@@ -270,7 +269,7 @@ JouleDevice::download( const QDir &tmpdir,
 }
 
 bool
-JouleDevice::getUnitVersion(QString &version, QByteArray &array, QString &err)
+JouleDevice::getUnitVersion(JoulePacket &response, QString &err)
 {
     statusCallback("Get Unit Software Version...");
     if (JOULE_DEBUG) printf("Get Unit Software Version\n");
@@ -279,16 +278,38 @@ JouleDevice::getUnitVersion(QString &version, QByteArray &array, QString &err)
 
     if (!request.write(dev, err)) return false;
 
-    JoulePacket response = JoulePacket(READ_UNIT_VERSION);
+    response = JoulePacket(READ_UNIT_VERSION);
     if (response.read(dev, err)) {
 
         if (response.payload.length()>4) {
-            array = response.dataArray();
+            //array = response.dataArray();
             int major_version = qByteArray2Int(response.payload.left(1));
             int minor_version = qByteArray2Int(response.payload.mid(1,2));
             int data_version = qByteArray2Int(response.payload.right(2));
 
-            version = QString(minor_version<100?"%1.0%2 (%3)":"%1.%2 (%3)").arg(major_version).arg(minor_version).arg(data_version);
+            QString version = QString(minor_version<100?"%1.0%2 (%3)":"%1.%2 (%3)").arg(major_version).arg(minor_version).arg(data_version);
+            statusCallback("Version"+version);
+        }
+    }
+}
+
+bool
+JouleDevice::getSystemInfo(JoulePacket &response, QString &err)
+{
+    statusCallback("Get System info...");
+    if (JOULE_DEBUG) printf("Get System info\n");
+
+    JoulePacket request(READ_SYSTEM_INFO);
+
+    if (!request.write(dev, err)) return false;
+
+    response = JoulePacket(READ_SYSTEM_INFO);
+    if (response.read(dev, err)) {
+
+        if (response.payload.length()>3) {
+            //array = response.dataArray();
+            int serial = qByteArray2Int(response.payload.left(4));
+            //QString system = QString("%1").arg(serial);
         }
     }
 }
@@ -316,31 +337,10 @@ JouleDevice::getUnitFreeSpace(QString &memory, QString &err)
 }
 
 bool
-JouleDevice::getSystemInfo(QString &system, QByteArray &array, QString &err)
-{
-    statusCallback("Get System info...");
-    if (JOULE_DEBUG) printf("Get System info\n");
-
-    JoulePacket request(READ_SYSTEM_INFO);
-
-    if (!request.write(dev, err)) return false;
-
-    JoulePacket response = JoulePacket(READ_SYSTEM_INFO);
-    if (response.read(dev, err)) {
-
-        if (response.payload.length()>3) {
-            array = response.dataArray();
-            int serial = qByteArray2Int(response.payload.left(4));
-            system = QString("%1").arg(serial);
-        }
-    }
-}
-
-bool
-JouleDevice::getDownloadableRides(QList<DeviceStoredRideItem> &rides, QString &err)
+JouleDevice::getDownloadableRides(QList<DeviceStoredRideItem> &rides, bool isJouleGPS, QString &err)
 {
     statusCallback("Read ride summary...");
-    if (JOULE_DEBUG) printf("Get Unit Software Version\n");
+    if (JOULE_DEBUG) printf("Read ride summary\n");
 
     JoulePacket request(READ_RIDE_SUMMARY);
 
@@ -348,10 +348,11 @@ JouleDevice::getDownloadableRides(QList<DeviceStoredRideItem> &rides, QString &e
 
     JoulePacket response = JoulePacket(READ_RIDE_SUMMARY);
     if (response.read(dev, err)) {
-        int count = response.payload.length()/20;
+        int length = (isJouleGPS?20:16);
+        int count = response.payload.length()/length;
 
         for (int i=0; i<count; i++) {
-            int j = i*20;
+            int j = i*length;
             int sec = bcd2Int(response.payload.at(j));
             int min = bcd2Int(response.payload.at(j+1));
             int hour = bcd2Int(response.payload.at(j+2));
@@ -361,8 +362,8 @@ JouleDevice::getDownloadableRides(QList<DeviceStoredRideItem> &rides, QString &e
 
             QDateTime date = QDateTime(QDate(year,month,day), QTime(hour,min,sec));
 
-            int total = qByteArray2Int(response.payload.mid(j+18,2));
-
+            int total = qByteArray2Int(response.payload.mid(j+length-2,2));
+            qDebug() << date << total;
             if (total > 0) {
                 DeviceStoredRideItem ride;
                 ride.id = i;
@@ -370,6 +371,7 @@ JouleDevice::getDownloadableRides(QList<DeviceStoredRideItem> &rides, QString &e
                 rides.append(ride);
             }
         }
+        statusCallback(QString("%1 detailled rides").arg(rides.count()));
         return true;
     }
     return false;
@@ -377,6 +379,7 @@ JouleDevice::getDownloadableRides(QList<DeviceStoredRideItem> &rides, QString &e
 
 bool
 JouleDevice::cleanup( QString &err ) {
+    statusCallback("Erase all records on computer");
     if (JOULE_DEBUG) printf("Erase all records on computer\n");
 
     if (!dev->open(err)) {
@@ -385,18 +388,12 @@ JouleDevice::cleanup( QString &err ) {
 
     dev->setBaudRate(57600, err);
 
-    QString version = QString("");
-    QString serial = QString("");
-    QByteArray versionArray;
-    QByteArray systemInfoArray;
-
-    getUnitVersion(version, versionArray, err);
-    statusCallback("Version"+version);
-
-    getSystemInfo(serial, systemInfoArray, err);
+    JoulePacket versionResponse;
+    getUnitVersion(versionResponse, err);
+    bool isJouleGPS = getJouleGPS(versionResponse);
 
     QList<DeviceStoredRideItem> trainings;
-    if (!getDownloadableRides(trainings, err))
+    if (!getDownloadableRides(trainings, isJouleGPS, err))
         return false;
 
     for (int i=0; i<trainings.count(); i++) {
@@ -420,6 +417,17 @@ JouleDevice::cleanup( QString &err ) {
 
     return true;
 }
+
+bool
+JouleDevice::getJouleGPS(JoulePacket &versionResponse) {
+    int major_version = qByteArray2Int(versionResponse.payload.left(1));
+
+    bool isJouleGPS = true;
+    if (major_version == 18)
+        isJouleGPS = false;
+    return isJouleGPS;
+}
+
 
 // --------------------------------------
 // JoulePacket
