@@ -63,7 +63,7 @@ checkout the code, execute this command:</p>
 
 <blockquote>
 <pre>
-git clone git://github.com/srhea/GoldenCheetah.git
+git clone git://github.com/GoldenCheetah/GoldenCheetah.git
 </pre>
 </blockquote>
 
@@ -103,9 +103,9 @@ make
 for the build process.  We would too, but none of us know
 <a href="http://www.gnu.org/software/autoconf/">autoconf</a> well
 enough to integrate it with Qt on Mac, Linux, and Windows.  If you can help
-us out with that, please email the
-<a href="cgi-bin/mailman/listinfo/golden-cheetah-users">GoldenCheetah User's
-Mailing List</a>.</p>
+us out with that, please post a message on the
+<a href="https://groups.google.com/forum/?fromgroups&hl=en#!forum/golden-cheetah-users">GoldenCheetah User's
+Google Group</a>.</p>
 
 <big><font face="arial,helvetica,sanserif">
 Making changes
