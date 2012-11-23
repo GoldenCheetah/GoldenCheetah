@@ -365,14 +365,14 @@ JouleDevice::getDownloadableRides(QList<DeviceStoredRideItem> &rides, bool isJou
 
         for (int i=0; i<count; i++) {
             int j = i*length;
-            int sec = bcd2Int(response.payload.at(j));
-            int min = bcd2Int(response.payload.at(j+1));
-            int hour = bcd2Int(response.payload.at(j+2));
-            int day = bcd2Int(response.payload.at(j+3));
-            int month = bcd2Int(response.payload.at(j+4))-1;
-            int year = 2000 + bcd2Int(response.payload.at(j+5));
+            int sec   = (isJouleGPS ? bcd2Int(response.payload.at(j))   : qByteArray2Int(response.payload.mid(j,1))   );
+            int min   = (isJouleGPS ? bcd2Int(response.payload.at(j+1)) : qByteArray2Int(response.payload.mid(j+1,1)) );
+            int hour  = (isJouleGPS ? bcd2Int(response.payload.at(j+2)) : qByteArray2Int(response.payload.mid(j+2,1)) );
+            int day   = (isJouleGPS ? bcd2Int(response.payload.at(j+3)) : qByteArray2Int(response.payload.mid(j+3,1)) );
+            int month = (isJouleGPS ? bcd2Int(response.payload.at(j+4)) : qByteArray2Int(response.payload.mid(j+4,1)) );
+            int year  = (isJouleGPS ? bcd2Int(response.payload.at(j+5)) : qByteArray2Int(response.payload.mid(j+5,1)) );
 
-            QDateTime date = QDateTime(QDate(year,month,day), QTime(hour,min,sec));
+            QDateTime date = QDateTime(QDate(year+2000,month-1,day), QTime(hour,min,sec));
 
             int total = qByteArray2Int(response.payload.mid(j+length-2,2));
             qDebug() << date << total;
