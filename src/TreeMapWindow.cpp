@@ -55,8 +55,9 @@ TreeMapWindow::TreeMapWindow(MainWindow *parent, bool useMetricUnits, const QDir
 
     // read metadata.xml
     QString filename = main->home.absolutePath()+"/metadata.xml";
+    QString colorfield;
     if (!QFile(filename).exists()) filename = ":/xml/metadata.xml";
-    RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions);
+    RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, colorfield);
 
     //title = new QLabel(this);
     //QFont font;

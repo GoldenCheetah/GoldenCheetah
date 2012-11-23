@@ -367,7 +367,7 @@ class KeywordsPage : public QWidget
 
 
     public:
-        KeywordsPage(QWidget *parent, QList<KeywordDefinition>);
+        KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>);
         void getDefinitions(QList<KeywordDefinition>&);
 
     public slots:
@@ -377,11 +377,18 @@ class KeywordsPage : public QWidget
         void renameClicked();
         void deleteClicked();
 
+        void pageSelected(); // reset the list of fields when we are selected...
+        void colorfieldChanged();
+
     private:
 
         QTreeWidget *keywords;
 
         QPushButton *upButton, *downButton, *addButton, *renameButton, *deleteButton;
+        QLabel *fieldLabel;
+        QComboBox *fieldChooser;
+
+        MetadataPage *parent;
 };
 
 class ColorsPage : public QWidget
@@ -480,6 +487,7 @@ class MetadataPage : public QWidget
     Q_OBJECT
     G_OBJECT
 
+    friend class ::KeywordsPage;
 
     public:
 
@@ -502,6 +510,7 @@ class MetadataPage : public QWidget
         // local versions for modification
         QList<KeywordDefinition> keywordDefinitions;
         QList<FieldDefinition>   fieldDefinitions;
+        QString colorfield;
 };
 
 class SchemePage : public QWidget

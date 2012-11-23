@@ -118,10 +118,13 @@ class RideMetadata : public QWidget
 
     public:
         RideMetadata(MainWindow *, bool singlecolumn = false);
-        static void serialize(QString filename, QList<KeywordDefinition>, QList<FieldDefinition>);
-        static void readXML(QString filename, QList<KeywordDefinition>&, QList<FieldDefinition>&);
+        static void serialize(QString filename, QList<KeywordDefinition>, QList<FieldDefinition>, QString colofield);
+        static void readXML(QString filename, QList<KeywordDefinition>&, QList<FieldDefinition>&, QString &colorfield);
         QList<KeywordDefinition> getKeywords() { return keywordDefinitions; }
         QList<FieldDefinition> getFields() { return fieldDefinitions; }
+
+        QString getColorField() const { return colorfield; }
+        void setColorField(QString x) { colorfield = x; }
 
         void setRideItem(RideItem *x);
         RideItem *rideItem() const;
@@ -146,6 +149,8 @@ class RideMetadata : public QWidget
     QStringList keywordList; // for completer
     QList<KeywordDefinition> keywordDefinitions;
     QList<FieldDefinition>   fieldDefinitions;
+
+    QString colorfield;
 };
 
 class MetadataXMLParser : public QXmlDefaultHandler
@@ -160,6 +165,7 @@ public:
 
     QList<KeywordDefinition> getKeywords() { return keywordDefinitions; }
     QList<FieldDefinition> getFields() { return fieldDefinitions; }
+    QString getColorField() { return colorfield; }
 
 protected:
     QString buffer;
@@ -167,6 +173,7 @@ protected:
     // ths results are here
     QList<KeywordDefinition> keywordDefinitions;
     QList<FieldDefinition>   fieldDefinitions;
+    QString colorfield;
 
     // whilst parsing elements are stored here
     KeywordDefinition keyword;

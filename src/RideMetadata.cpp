@@ -209,7 +209,7 @@ RideMetadata::configUpdate()
     // read metadata.xml
     QString filename = main->home.absolutePath()+"/metadata.xml";
     if (!QFile(filename).exists()) filename = ":/xml/metadata.xml";
-    readXML(filename, keywordDefinitions, fieldDefinitions);
+    readXML(filename, keywordDefinitions, fieldDefinitions, colorfield);
 
     // wipe existing tabs
     QMapIterator<QString, Form*> d(tabList);
@@ -800,7 +800,7 @@ static QString xmlprotect(QString string)
 }
 
 void
-RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinitions, QList<FieldDefinition>fieldDefinitions)
+RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinitions, QList<FieldDefinition>fieldDefinitions, QString colorfield)
 {
     // open file - truncate contents
     QFile file(filename);
@@ -812,6 +812,7 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
     // begin document
     out << "<metadata>\n";
 
+    out << QString("<colorfield>\"%1\"</colorfield>").arg(xmlprotect(colorfield));
     //
     // First we write out the keywords
     //
@@ -876,18 +877,24 @@ static QString unprotect(QString buffer)
 }
 
 void
-RideMetadata::readXML(QString filename, QList<KeywordDefinition>&keywordDefinitions, QList<FieldDefinition>&fieldDefinitions)
+RideMetadata::readXML(QString filename, QList<KeywordDefinition>&keywordDefinitions, QList<FieldDefinition>&fieldDefinitions, QString &colorfield)
 {
     QFile metadataFile(filename);
     QXmlInputSource source( &metadataFile );
     QXmlSimpleReader xmlReader;
     MetadataXMLParser handler;
+
+
     xmlReader.setContentHandler(&handler);
     xmlReader.setErrorHandler(&handler);
     xmlReader.parse( source );
 
     keywordDefinitions = handler.getKeywords();
     fieldDefinitions = handler.getFields();
+    colorfield = handler.getColorField();
+
+    // backwards compatible
+    if (colorfield == "") colorfield = "Calendar Text";
 
     // now auto append special fields, in case
     // the user wiped them or we have introduced
@@ -956,6 +963,8 @@ bool MetadataXMLParser::endElement( const QString&, const QString&, const QStrin
         keywordDefinitions.append(keyword);
     else if (qName == "field") // <field></field> block
         fieldDefinitions.append(field);
+    else if (qName == "colorfield")
+        colorfield = unprotect(buffer);
 
     return TRUE;
 }

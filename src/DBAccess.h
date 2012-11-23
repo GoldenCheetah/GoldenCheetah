@@ -86,6 +86,7 @@ class DBAccess
     SpecialFields msp;
     QList<FieldDefinition> mfieldDefinitions;
     QList<KeywordDefinition> mkeywordDefinitions; //NOTE: not used in measures.xml
+    QString mcolorfield;
 
 	typedef QHash<QString,RideMetric*> MetricMap;
 

@@ -428,8 +428,9 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     QList<FieldDefinition> measureDefinitions;
     QList<KeywordDefinition> keywordDefinitions; //NOTE: not used in measures.xml
     QString filename = main->home.absolutePath()+"/measures.xml";
+    QString colorfield;
     if (!QFile(filename).exists()) filename = ":/xml/measures.xml";
-    RideMetadata::readXML(filename, keywordDefinitions, measureDefinitions);
+    RideMetadata::readXML(filename, keywordDefinitions, measureDefinitions, colorfield);
 
     foreach (FieldDefinition field, measureDefinitions) {
         if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
