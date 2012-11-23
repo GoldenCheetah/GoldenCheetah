@@ -128,8 +128,13 @@ JouleDevice::download( const QDir &tmpdir,
     JoulePacket versionResponse;
     JoulePacket systemResponse;
 
-    getUnitVersion(versionResponse, err);
-    getSystemInfo(systemResponse, err);
+    if (!getUnitVersion(versionResponse, err)) {
+        return false;
+    }
+
+    if (!getSystemInfo(systemResponse, err)) {
+        return false;
+    }
 
     bool isJouleGPS = getJouleGPS(versionResponse);
     statusCallback(QString("Joule %1 indentified").arg(isJouleGPS?"GPS":"1.0"));
@@ -281,16 +286,20 @@ JouleDevice::getUnitVersion(JoulePacket &response, QString &err)
     response = JoulePacket(READ_UNIT_VERSION);
     if (response.read(dev, err)) {
 
-        if (response.payload.length()>4) {
-            //array = response.dataArray();
+        if (response.payload.length()>2) {
             int major_version = qByteArray2Int(response.payload.left(1));
             int minor_version = qByteArray2Int(response.payload.mid(1,2));
-            int data_version = qByteArray2Int(response.payload.right(2));
+
+            int data_version = 1;
+                if (response.payload.length()>4)
+                data_version = qByteArray2Int(response.payload.right(2));
 
             QString version = QString(minor_version<100?"%1.0%2 (%3)":"%1.%2 (%3)").arg(major_version).arg(minor_version).arg(data_version);
             statusCallback("Version"+version);
+            return true;
         }
     }
+    return false;
 }
 
 bool
@@ -310,8 +319,11 @@ JouleDevice::getSystemInfo(JoulePacket &response, QString &err)
             //array = response.dataArray();
             int serial = qByteArray2Int(response.payload.left(4));
             //QString system = QString("%1").arg(serial);
+
+            return true;
         }
     }
+    return false;
 }
 
 bool
