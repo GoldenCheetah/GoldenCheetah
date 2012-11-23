@@ -517,7 +517,11 @@ MainWindow::MainWindow(const QDir &home) :
 #endif
 
     // UI Ride List (configurable)
+#ifdef Q_OS_MAC
     listView = new RideNavigator(this, true);
+#else
+    listView = new RideNavigator(this, false);
+#endif
     listView->setProperty("nomenu", true);
     // retrieve settings (properties are saved when we close the window)
     if (appsettings->cvalue(cyclist, GC_NAVHEADINGS, "").toString() != "") {
