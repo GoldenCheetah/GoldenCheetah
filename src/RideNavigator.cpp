@@ -89,9 +89,9 @@ RideNavigator::RideNavigator(MainWindow *parent, bool mainwindow) : main(parent)
     tableView->header()->setStretchLastSection(false);
     tableView->header()->setMinimumSectionSize(0);
     tableView->header()->setFocusPolicy(Qt::NoFocus);
-    tableView->header()->setSortIndicatorShown(false);
     //tableView->header()->setHighlightSections(false);
 #ifdef Q_OS_MAC
+    tableView->header()->setSortIndicatorShown(false); // blue looks nasty
     tableView->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
     //tableView->setUniformRowHeights(true);
@@ -281,6 +281,9 @@ void RideNavigator::setWidth(int x)
     if (tableView->verticalScrollBar()->isVisible())
         x -= tableView->verticalScrollBar()->width()
              + 0 ; // !! no longer account for content margins of 3,3,3,3 was + 6
+
+    // take the margins into accopunt top
+    x -= mainLayout->contentsMargins().left() + mainLayout->contentsMargins().right();
 
     // ** NOTE **
     // When iterating over the section headings we
