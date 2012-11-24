@@ -134,6 +134,13 @@ MainWindow::MainWindow(const QDir &home) :
 
     mainwindows.append(this); // add us to the list of open windows
 
+    // Network proxy
+    QNetworkProxyQuery npq(QUrl("http://www.google.com"));
+    QList<QNetworkProxy> listOfProxies = QNetworkProxyFactory::systemProxyForQuery(npq);
+    if (listOfProxies.count() > 0) {
+        QNetworkProxy::setApplicationProxy(listOfProxies.first());
+    }
+
     /*----------------------------------------------------------------------
      *  Basic GUI setup
      *--------------------------------------------------------------------*/
