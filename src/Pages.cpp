@@ -27,7 +27,7 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
     intervalMetrics = new IntervalMetricsPage;
     metadataPage = new MetadataPage(main);
     measuresPage = new MeasuresPage(main);
-    proxyPage = new ProxyPage(this, main);
+    //proxyPage = new ProxyPage(this, main); // we use system settings
 
     tabs->addTab(config, tr("Settings"));
     tabs->addTab(colorsPage, tr("Appearance"));
@@ -35,7 +35,7 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
     tabs->addTab(intervalMetrics, tr("Interval Metrics"));
     tabs->addTab(metadataPage, tr("Ride Data"));
     tabs->addTab(measuresPage, tr("Athlete Data"));
-    tabs->addTab(proxyPage, tr("Proxy"));
+    //tabs->addTab(proxyPage, tr("Proxy")); // we use system settings
 
     langLabel = new QLabel(tr("Language:"));
 
@@ -247,7 +247,7 @@ ConfigurationPage::saveClicked()
     intervalMetrics->saveClicked();
     metadataPage->saveClicked();
     measuresPage->saveClicked();
-    proxyPage->saveClicked();
+    //proxyPage->saveClicked(); // We use system settings
 }
 
 void
