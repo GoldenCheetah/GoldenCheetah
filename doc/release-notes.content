@@ -163,7 +163,6 @@ Mark Liversedge (59):
       Joule support fixed on download page.
       Add link to wiki from the website.
       Mac PPC binary added to downloads page.
-      Merge branch 'master' of github.com:/srhea/GoldenCheetah
       Translations Bonanza!
       Fix Computrainer with Stereo FTDI adaptor
       Fix 'Save data' in RealtimeWindow
@@ -182,31 +181,26 @@ Mark Liversedge (59):
       Fix annoying gap in CP curve.
       Fix Save when old .bak exists
       Fix SummaryWindow crash
-      Merge branch 'master' of github.com:/srhea/GoldenCheetah
       Don't allow Nan or Inf sample values
       Fix LogY Intervals on Histogram
       Fit files sometimes go backwards
       Guess ride date time for Poweragent CSV files
       Add JSON support to v2.1
-      Merge branch 'master' of github.com:/srhea/GoldenCheetah
       Fix date/time handling when importing rides
       Update .gitignore for Lex/yacc
       Fix Macro device data crash
       Support FR310xt latest firmware
       Fix FitRideFile for header change
       Fix Download Ride Dialog instructions refresh
-      Merge branch 'master' of github.com:/srhea/GoldenCheetah
       SplitRide overwrites existing file
       Revert "SplitRide overwrites existing file"
       Fix Split Ride file loss bug
-      Merge branch 'master' of github.com:/srhea/GoldenCheetah
       Check Date/Time unique
       Summary fixups
       Updated translation files.
       Add virtual power for LeMond Revolution
       Use strtod() to convert text to double
       Fix FTDI Adaptor on Linux and Mac
-      Merge branch 'master' of github.com:/srhea/GoldenCheetah
       Better Bounds Checking in RideFile::intervalBegin()
       Forward support in .json for temp/slope
       Add Virtual Power for 1UP USA bike trainer
@@ -217,7 +211,6 @@ Mark Liversedge (59):
       Fix crash if TRIMP zones > 5
       Fix PWX file intervals
       Fix SEGV on empty/dodgy FIT files
-      Merge branch 'master' of github.com:/srhea/GoldenCheetah
 
 Mitsukuni Sato (1):
       Japanese Translation

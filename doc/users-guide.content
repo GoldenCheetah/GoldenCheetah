@@ -1,7 +1,7 @@
-<!-- $Id: users-guide.content,v 1.5 2006/05/27 16:32:46 srhea Exp $ -->
+<!-- $Id: users-guide.content,v 1.5 2006/05/27 16:32:46 GoldenCheetah Exp $ -->
 <p>
 Note that more detailed information is often available on the
-<a href = http://github.com/srhea/GoldenCheetah/wiki>
+<a href ="wiki.html">
 Golden Cheetah Wiki</a>.
 
 <p>
@@ -21,14 +21,14 @@ the drivers below.
 
 <p>
 Depending on your operating system, you <i>may</i> need to install the
-<ahref="http://www.ftdichip.com/Drivers/D2XX.htm">FTDI D2XX driver</a> if
+<a href="http://www.ftdichip.com/Drivers/D2XX.htm">FTDI D2XX driver</a> if
 you're using the PowerTap's new USB download cradle.
 Note: version 0.1.7 of the FTDI drivers for Mac seems to be buggy.  Until they
 post a patched version, you can download version 0.1.6
- <a href="https://github.com/srhea/GoldenCheetah/blob/master/contrib/Universal_D2XX0.1.6.dmg?raw=true">here</a>
+ <a href="https://github.com/GoldenCheetah/GoldenCheetah/blob/master/contrib/Universal_D2XX0.1.6.dmg?raw=true">here</a>
  and install via the terminal. Or if you are not terminal savvy, download an installer that will
 perform the installation of the 0.1.6 drivers for you
- <a href="https://github.com/srhea/GoldenCheetah/blob/master/contrib/Install_D2XX_drivers.mpkg.zip?raw=true">
+ <a href="https://github.com/GoldenCheetah/GoldenCheetah/blob/master/contrib/Install_D2XX_drivers.mpkg.zip?raw=true">
 here</a>.
 
 <p>
