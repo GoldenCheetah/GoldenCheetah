@@ -488,11 +488,13 @@ file</em>, <code>0001-don-t-include-zero-metrics-in-ride-summary.patch</code>,
 that other people can use to include my change in their own local git
 repositories.</p>
 
-<p>If you have a patch you'd like to share with others, you can email it to
-the <a href="cgi-bin/mailman/listinfo/golden-cheetah-users">GoldenCheetah
-User's Mailing List</a>, and it will be considered for inclusion in the next
-release of GoldenCheetah.  In fact, if you join the mailing list, you'll see
-lots of patches like this.  You may even want to try some of them.</p>
+<p>If you have a patch you'd like to share with others, we recommend that you
+ <a href="https://help.github.com/articles/fork-a-repo">fork</a> the main GIT
+repository and submit a
+ <a href="https://help.github.com/articles/creating-a-pull-request">pull request</a>
+ with your patch. Alternatively you can join the
+ <a href="https://groups.google.com/forum/?fromgroups#!forum/golden-cheetah-developers">
+Golden Cheetah Developer's Group</a> and post a patch there.
 
 <big><font face="arial,helvetica,sanserif">
 Applying patches
