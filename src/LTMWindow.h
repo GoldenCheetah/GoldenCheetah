@@ -93,7 +93,6 @@ class LTMWindow : public LTMPlotContainer
     Q_PROPERTY(int bin READ bin WRITE setBin USER true)
     Q_PROPERTY(bool shade READ shade WRITE setShade USER true)
     Q_PROPERTY(bool legend READ legend WRITE setLegend USER true)
-    Q_PROPERTY(QString dateRange READ dateRange WRITE setDateRange USER true)
 #ifdef GC_HAVE_LUCENE
     Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
 #endif
@@ -115,10 +114,6 @@ class LTMWindow : public LTMPlotContainer
         bool legend() const { return showLegend->isChecked(); }
         void setLegend(bool x) { showLegend->setChecked(x); }
 
-        // date ranges set/get the string from the treeWidget
-        QString dateRange() const;
-        void setDateRange(QString x);
-
 #ifdef GC_HAVE_LUCENE
         QString filter() const { return ltmTool->searchBox->filter(); }
         void setFilter(QString x) { ltmTool->searchBox->setFilter(x); }
@@ -130,7 +125,7 @@ class LTMWindow : public LTMPlotContainer
     public slots:
         void rideSelected();
         void refreshPlot();
-        void dateRangeSelected(const Season *);
+        void dateRangeChanged(DateRange);
         void filterChanged();
         void metricSelected();
         void groupBySelected(int);
@@ -142,6 +137,7 @@ class LTMWindow : public LTMPlotContainer
         void refresh();
         void pointClicked(QwtPlotCurve*, int);
         int groupForDate(QDate, int);
+
 
     private:
         // passed from MainWindow

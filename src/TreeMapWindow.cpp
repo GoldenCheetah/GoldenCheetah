@@ -102,7 +102,7 @@ TreeMapWindow::TreeMapWindow(MainWindow *parent, bool useMetricUnits, const QDir
     cl->addRow(new QLabel("Second"), field2);
     cl->addRow(ltmTool);
 
-    connect(ltmTool, SIGNAL(dateRangeSelected(const Season *)), this, SLOT(dateRangeSelected(const Season *)));
+    connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
     connect(ltmTool, SIGNAL(metricSelected()), this, SLOT(metricSelected()));
     connect(ltmTool, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
     connect(field1, SIGNAL(currentIndexChanged(int)), this, SLOT(fieldSelected(int)));
@@ -114,23 +114,13 @@ TreeMapWindow::TreeMapWindow(MainWindow *parent, bool useMetricUnits, const QDir
     connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
     connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
     connect(main, SIGNAL(configChanged()), this, SLOT(refresh()));
+
+    dateRangeChanged(DateRange());
 }
 
 TreeMapWindow::~TreeMapWindow()
 {
     delete popup;
-}
-
-QString
-TreeMapWindow::dateRange() const
-{
-    return ltmTool->_dateRange();
-}
-
-void
-TreeMapWindow::setDateRange(QString s)
-{
-    ltmTool->setDateRange(s);
 }
 
 void
@@ -142,7 +132,7 @@ TreeMapWindow::rideSelected()
         // mimic user first selection now that
         // we are active - choose a chart and
         // use the first available date range
-        ltmTool->selectDateRange(0);
+        //XXX ltmTool->selectDateRange(0);
 
         // default to duration
         ltmTool->selectMetric(appsettings->value(this, GC_TM_METRIC, "workout_time").toString());
@@ -199,45 +189,37 @@ TreeMapWindow::metricSelected()
 }
 
 void
-TreeMapWindow::dateRangeSelected(const Season *selected)
+TreeMapWindow::dateRangeChanged(DateRange)
 {
-    if (selected) {
-        Season dateRange = *selected;
+    settings.data = &results;
+    settings.measures = &measures;
 
-        settings.start = QDateTime(dateRange.getStart(), QTime(0,0));
-        settings.end   = QDateTime(dateRange.getEnd(), QTime(24,0,0));
-        settings.title = dateRange.getName();
-        settings.data = &results;
-        settings.measures = &measures;
+    // apply filter too.. will read all data etc
+    filterChanged();
 
-        measures.clear(); // clear any old data
-        measures = main->metricDB->getAllMeasuresFor(settings.start, settings.end);
-
-        // apply filter too..
-        filterChanged();
-
-        ltmPlot->setData(&settings);
-    }
+    ltmPlot->setData(&settings);
 }
 
 void
 TreeMapWindow::filterChanged()
 {
     // first refresh all data - since it is cropped in LTMPlot
-    Season dateRange = *ltmTool->currentDateRange();
-    settings.start = QDateTime(dateRange.getStart(), QTime(0,0));
-    settings.end   = QDateTime(dateRange.getEnd(), QTime(24,0,0));
-    settings.title = dateRange.getName();
+    settings.start = QDateTime(myDateRange.from, QTime(0,0));
+    settings.end   = QDateTime(myDateRange.to, QTime(24,0,0));
+    settings.title = myDateRange.name;
     settings.data = &results;
 
     // if we want weeks and start is not a monday go back to the monday
-    int dow = dateRange.getStart().dayOfWeek();
-    if (settings.groupBy == LTM_WEEK && dow >1 && dateRange.getStart() != QDate())
+    int dow = myDateRange.from.dayOfWeek();
+    if (settings.groupBy == LTM_WEEK && dow >1 && myDateRange.from != QDate())
         settings.start = settings.start.addDays(-1*(dow-1));
 
     // we need to get data again and apply filter
     results.clear(); // clear any old data
     results = main->metricDB->getAllMetricsFor(settings.start, settings.end);
+
+    measures.clear(); // clear any old data
+    measures = main->metricDB->getAllMeasuresFor(settings.start, settings.end);
 
     // loop through results removing any not in stringlist..
     if (ltmTool->isFiltered()) {

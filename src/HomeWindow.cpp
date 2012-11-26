@@ -1480,7 +1480,9 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
         // set the chart property
         if (type == "int") chart->setProperty(name.toLatin1(), QVariant(value.toInt()));
         if (type == "double") chart->setProperty(name.toLatin1(), QVariant(value.toDouble()));
-        if (type == "QString") chart->setProperty(name.toLatin1(), QVariant(QString(value)));
+
+        // deprecate dateRange asa chart propert THAT IS DSAVED IN STATE
+        if (type == "QString" && name != "dateRange") chart->setProperty(name.toLatin1(), QVariant(QString(value)));
         if (type == "bool") chart->setProperty(name.toLatin1(), QVariant(value.toInt() ? true : false));
         if (type == "LTMSettings") {
             QByteArray base64(value.toLatin1());

@@ -111,9 +111,9 @@ RideSummaryWindow::refresh()
 
         if (myDateRange.name != "") setSubTitle(myDateRange.name);
         else {
-        setSubTitle(myDateRange.from.toString("dddd MMMM d") +
+        setSubTitle(myDateRange.from.toString("dddd MMMM d yyyy") +
                     " - " +
-                    myDateRange.to.toString("dddd MMMM d"));
+                    myDateRange.to.toString("dddd MMMM d yyyy"));
         }
     }
     rideSummary->page()->mainFrame()->setHtml(htmlSummary());

@@ -83,6 +83,7 @@
 #include "HomeWindow.h"
 #include "GcBubble.h"
 #include "GcCalendar.h"
+#include "LTMSidebar.h"
 
 #ifdef Q_OS_MAC
 #ifdef GC_HAVE_LION
@@ -656,11 +657,16 @@ MainWindow::MainWindow(const QDir &home) :
 
     // do controllers after home windows -- they need their first signals caught
     gcCalendar = new GcCalendar(this);
-    connect(gcCalendar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
+    connect(gcCalendar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChangedDiary(DateRange)));
+
+    ltmSidebar = new LTMSidebar(this, home);
+    connect(ltmSidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChangedLTM(DateRange)));
+    ltmSidebar->dateRangeTreeWidgetSelectionChanged(); // force an update to get first date range shown
 
     toolBox->addWidget(intervalSplitter);
     toolBox->addWidget(gcCalendar);
     toolBox->addWidget(trainTool->controls());
+    toolBox->addWidget(ltmSidebar);
 
     // Chart Settings now in their own dialog box
     chartSettings = new ChartSettings(this, masterControls);
@@ -1107,12 +1113,21 @@ MainWindow::rideTreeWidgetSelectionChanged()
 }
 
 void
-MainWindow::dateRangeChanged(DateRange dr)
+MainWindow::dateRangeChangedDiary(DateRange dr)
 {
     // we got signalled date range changed, tell the current view
     // when we have multiple sidebars that change date we need to connect
     // them up individually.... i.e. LTM....
     diaryWindow->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
+}
+
+void
+MainWindow::dateRangeChangedLTM(DateRange dr)
+{
+    // we got signalled date range changed, tell the current view
+    // when we have multiple sidebars that change date we need to connect
+    // them up individually.... i.e. LTM....
+    homeWindow->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
 }
 
 void
@@ -1437,7 +1452,7 @@ MainWindow::selectHome()
 #else
     scopebar->selected(0);
 #endif
-    toolBox->setCurrentIndex(1);
+    toolBox->setCurrentIndex(3);
     setStyle();
 }
 void

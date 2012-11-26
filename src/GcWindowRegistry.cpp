@@ -63,17 +63,19 @@
 
 GcWindowRegistry GcWindows[] = {
     // name                     GcWinID
-    { VIEW_HOME, "Long Term Metrics",GcWindowTypes::LTM },
+    { VIEW_HOME|VIEW_DIARY, "Long Term Metrics",GcWindowTypes::LTM },
     { VIEW_HOME, "Performance Manager",GcWindowTypes::PerformanceManager },
-    { VIEW_HOME, "Collection TreeMap",GcWindowTypes::TreeMap },
-    { VIEW_HOME,  "Weekly Summary",GcWindowTypes::WeeklySummary },
+    { VIEW_HOME|VIEW_DIARY, "Collection TreeMap",GcWindowTypes::TreeMap },
+    //{ VIEW_HOME,  "Weekly Summary",GcWindowTypes::WeeklySummary },// DEPRECATED
+    { VIEW_HOME|VIEW_DIARY,  "Critical Mean Maximal",GcWindowTypes::CriticalPowerSummary },
     { VIEW_ANALYSIS, "Activity Summary",GcWindowTypes::RideSummary },
     { VIEW_ANALYSIS, "Details",GcWindowTypes::MetadataWindow },
     { VIEW_ANALYSIS, "Summary and Details",GcWindowTypes::Summary },
     { VIEW_ANALYSIS, "Editor",GcWindowTypes::RideEditor },
     { VIEW_ANALYSIS,  "Performance",GcWindowTypes::AllPlot },
-    { VIEW_ANALYSIS|VIEW_HOME,  "Critical Mean Maximals",GcWindowTypes::CriticalPower },
-    { VIEW_ANALYSIS|VIEW_HOME,  "Histogram",GcWindowTypes::Histogram },
+    { VIEW_ANALYSIS,  "Critical Mean Maximals",GcWindowTypes::CriticalPower },
+    { VIEW_ANALYSIS,  "Histogram",GcWindowTypes::Histogram },
+    { VIEW_HOME|VIEW_DIARY,  "Distribution",GcWindowTypes::Distribution },
     { VIEW_ANALYSIS,  "Pedal Force vs Velocity",GcWindowTypes::PfPv },
     { VIEW_ANALYSIS,  "Heartrate vs Power",GcWindowTypes::HrPw },
     { VIEW_ANALYSIS,  "Google Map",GcWindowTypes::GoogleMap },
@@ -83,7 +85,7 @@ GcWindowRegistry GcWindows[] = {
     { VIEW_ANALYSIS, "Aerolab Chung Analysis",GcWindowTypes::Aerolab },
     { VIEW_DIARY, "Calendar",GcWindowTypes::Diary },
     { VIEW_DIARY, "Navigator", GcWindowTypes::ActivityNavigator },
-    { VIEW_DIARY, "Summary", GcWindowTypes::DateRangeSummary },
+    { VIEW_DIARY|VIEW_HOME, "Summary", GcWindowTypes::DateRangeSummary },
     { VIEW_TRAIN, "Telemetry",GcWindowTypes::DialWindow },
     { VIEW_TRAIN, "Workout",GcWindowTypes::WorkoutPlot },
     { VIEW_TRAIN, "Realtime",GcWindowTypes::RealtimePlot },
@@ -103,6 +105,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, MainWindow *main) //XXX mainWindow wil
     case GcWindowTypes::Aerolab: returning = new AerolabWindow(main); break;
     case GcWindowTypes::AllPlot: returning = new AllPlotWindow(main); break;
     case GcWindowTypes::CriticalPower: returning = new CriticalPowerWindow(main->home, main); break;
+    case GcWindowTypes::CriticalPowerSummary: returning = new CriticalPowerWindow(main->home, main, true); break;
 #ifdef GC_HAVE_ICAL
     case GcWindowTypes::Diary: returning = new DiaryWindow(main); break;
 #else
@@ -110,6 +113,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, MainWindow *main) //XXX mainWindow wil
 #endif
     case GcWindowTypes::GoogleMap: returning = new GoogleMapControl(main); break;
     case GcWindowTypes::Histogram: returning = new HistogramWindow(main); break;
+    case GcWindowTypes::Distribution: returning = new HistogramWindow(main, true); break;
     case GcWindowTypes::LTM: returning = new LTMWindow(main, main->useMetricUnits, main->home); break;
 #ifdef GC_HAVE_QWTPLOT3D
     case GcWindowTypes::Model: returning = new ModelWindow(main, main->home); break;

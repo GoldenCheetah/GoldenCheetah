@@ -1,0 +1,96 @@
+/*
+ * Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#ifndef _GC_LTMSidebar_h
+#define _GC_LTMSidebar_h 1
+#include "GoldenCheetah.h"
+
+#include "MainWindow.h"
+#include "Season.h"
+#include "RideMetric.h"
+#include "LTMSettings.h"
+
+#ifdef GC_HAVE_LUCENE
+#include "SearchFilterBox.h"
+#endif
+
+#include <QDir>
+#include <QtGui>
+
+// tree widget types
+#define ROOT_TYPE   1
+#define DATE_TYPE   2
+#define METRIC_TYPE 3
+
+#define SYS_DATE    1
+#define USER_DATE   2
+
+class QWebView;
+class LTMSidebar : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+
+    public:
+
+        LTMSidebar(MainWindow *parent, const QDir &home);
+
+        //const Season *currentDateRange() { return dateRange; }
+        //void selectDateRange(int);
+
+        // allow others to create and update season structures
+        int newSeason(QString, QDate, QDate, int);
+        void updateSeason(int, QString, QDate, QDate, int);
+
+    signals:
+        void dateRangeChanged(DateRange);
+
+    public slots:
+        void dateRangeTreeWidgetSelectionChanged();
+        void dateRangePopup(QPoint);
+        void dateRangeChanged(QTreeWidgetItem *, int);
+        void renameRange();
+        void editRange();
+        void deleteRange();
+
+        void configChanged();
+        void resetSeasons(); // rebuild the seasons list if it changes
+
+        void setSummary(DateRange);
+
+        void splitterMoved(int, int);
+    private:
+
+        const QDir home;
+        MainWindow *main;
+        bool active;
+        QDate from, to; // so we don't repeat update...
+
+        Seasons *seasons;
+        QTreeWidget *dateRangeTree;
+        QTreeWidgetItem *allDateRanges;
+        QTreeWidgetItem *activeDateRange; // when using context menus
+        //const Season *dateRange;
+
+        QWebView *summary;
+
+        QSplitter *splitter;
+};
+
+#endif // _GC_LTMSidebar_h

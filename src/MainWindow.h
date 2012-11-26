@@ -59,6 +59,7 @@ class RideNavigator;
 class GcToolBar;
 class GcCalendar;
 class GcBubble;
+class LTMSidebar;
 class LionFullScreen;
 class QTFullScreen;
 class TrainTool;
@@ -162,6 +163,7 @@ class MainWindow : public QMainWindow
         Lucene *lucene;
         NamedSearches *namedSearches;
 #endif
+        LTMSidebar *ltmSidebar;
 
         // *********************************************
         // APPLICATION EVENTS
@@ -330,7 +332,8 @@ class MainWindow : public QMainWindow
         void actionClicked(int);
 #endif
 
-        void dateRangeChanged(DateRange);
+        void dateRangeChangedDiary(DateRange);
+        void dateRangeChangedLTM(DateRange);
 
     protected:
 

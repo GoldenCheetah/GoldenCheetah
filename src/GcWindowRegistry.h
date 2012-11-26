@@ -57,7 +57,9 @@ enum gcwinid {
         RealtimeControls = 29,
         ActivityNavigator = 30,
         SpinScanPlot = 31,
-        DateRangeSummary = 32
+        DateRangeSummary = 32,
+        CriticalPowerSummary = 33,
+        Distribution = 34
 };
 };
 typedef enum GcWindowTypes::gcwinid GcWinID;

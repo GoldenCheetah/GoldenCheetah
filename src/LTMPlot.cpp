@@ -1092,6 +1092,8 @@ LTMPlot::pointClicked(QwtPlotCurve *curve, int index)
 void
 LTMPlot::pickerAppended(QPoint pos)
 {
+#if 0 //XXX deprecating using the ltm plot to create a date range for now...
+
     // ony work once we have a chart to do it on
     if (settings == NULL || settings->groupBy == LTM_TOD) return;
 
@@ -1156,12 +1158,14 @@ LTMPlot::pickerAppended(QPoint pos)
     seasonid = settings->ltmTool->newSeason(name, start, end, Season::adhoc);
 
     replot();
+#endif
 }
 
 // end of date range selection
 void
 LTMPlot::pickerMoved(QPoint pos)
 {
+#if 0
     if (settings == NULL || settings->groupBy == LTM_TOD) return;
 
     // allow user to select a date range across the plot
@@ -1194,6 +1198,7 @@ LTMPlot::pickerMoved(QPoint pos)
     // update and replot highlighter
     highlighter->setData(curveDataX,curveDataY, 4);
     replot();
+#endif
 }
 
 // aggregate curve data, adds w to a and
