@@ -188,6 +188,8 @@ HistogramWindow::zonesChanged()
 
 void HistogramWindow::dateRangeChanged(DateRange)
 {
+    if (!amVisible()) return;
+
     stale = true;
     updateChart();
 }

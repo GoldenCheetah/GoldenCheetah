@@ -234,6 +234,8 @@ LTMWindow::metricSelected()
 void
 LTMWindow::dateRangeChanged(DateRange range)
 {
+    if (!amVisible()) return;
+
     settings.data = &results;
     settings.measures = &measures;
 
