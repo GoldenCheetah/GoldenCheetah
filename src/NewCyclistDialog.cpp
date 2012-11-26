@@ -24,7 +24,7 @@
 NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(home)
 {
     setAttribute(Qt::WA_DeleteOnClose, false); // caller must delete me, once they've extracted the name
-    useMetricUnits = (appsettings->value(this, GC_UNIT).toString() == "Metric");
+    useMetricUnits = true; // default
 
     QVBoxLayout *all = new QVBoxLayout(this);
     QGridLayout *grid = new QGridLayout;
@@ -32,6 +32,7 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     QLabel *namelabel = new QLabel(tr("Athlete Name"));
     QLabel *doblabel = new QLabel(tr("Date of Birth"));
     QLabel *sexlabel = new QLabel(tr("Sex"));
+    QLabel *unitlabel = new QLabel(tr("Units"));
     QLabel *biolabel = new QLabel(tr("Bio"));
     QLabel *cplabel = new QLabel(tr("Critical Power (FTP)"));
     QLabel *resthrlabel = new QLabel(tr("Resting Heartrate"));
@@ -39,7 +40,7 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     QLabel *maxhrlabel = new QLabel(tr("Maximum Heartrate"));
 
     QString weighttext = QString(tr("Weight (%1)")).arg(useMetricUnits ? tr("kg") : tr("lb"));
-    QLabel *weightlabel = new QLabel(weighttext);
+    weightlabel = new QLabel(weighttext);
 
     name = new QLineEdit(this);
 
@@ -48,6 +49,10 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     sex = new QComboBox(this);
     sex->addItem(tr("Male"));
     sex->addItem(tr("Female"));
+
+    unitCombo = new QComboBox();
+    unitCombo->addItem(tr("Metric"));
+    unitCombo->addItem(tr("Imperial"));
 
     weight = new QDoubleSpinBox(this);
     weight->setMaximum(999.9);
@@ -95,22 +100,24 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     grid->addWidget(namelabel, 0, 0, alignment);
     grid->addWidget(doblabel, 1, 0, alignment);
     grid->addWidget(sexlabel, 2, 0, alignment);
-    grid->addWidget(weightlabel, 3, 0, alignment);
-    grid->addWidget(cplabel, 4, 0, alignment);
-    grid->addWidget(resthrlabel, 5, 0, alignment);
-    grid->addWidget(lthrlabel, 6, 0, alignment);
-    grid->addWidget(maxhrlabel, 7, 0, alignment);
-    grid->addWidget(biolabel, 8, 0, alignment);
+    grid->addWidget(unitlabel, 3, 0, alignment);
+    grid->addWidget(weightlabel, 4, 0, alignment);
+    grid->addWidget(cplabel, 5, 0, alignment);
+    grid->addWidget(resthrlabel, 6, 0, alignment);
+    grid->addWidget(lthrlabel, 7, 0, alignment);
+    grid->addWidget(maxhrlabel, 8, 0, alignment);
+    grid->addWidget(biolabel, 9, 0, alignment);
 
     grid->addWidget(name, 0, 1, alignment);
     grid->addWidget(dob, 1, 1, alignment);
     grid->addWidget(sex, 2, 1, alignment);
-    grid->addWidget(weight, 3, 1, alignment);
-    grid->addWidget(cp, 4, 1, alignment);
-    grid->addWidget(resthr, 5, 1, alignment);
-    grid->addWidget(lthr, 6, 1, alignment);
-    grid->addWidget(maxhr, 7, 1, alignment);
-    grid->addWidget(bio, 9, 0, 1, 4);
+    grid->addWidget(unitCombo, 3, 1, alignment);
+    grid->addWidget(weight, 4, 1, alignment);
+    grid->addWidget(cp, 5, 1, alignment);
+    grid->addWidget(resthr, 6, 1, alignment);
+    grid->addWidget(lthr, 7, 1, alignment);
+    grid->addWidget(maxhr, 8, 1, alignment);
+    grid->addWidget(bio, 10, 0, 1, 4);
 
     grid->addWidget(avatarButton, 0, 2, 4, 2, Qt::AlignRight|Qt::AlignVCenter);
     all->addLayout(grid);
@@ -126,6 +133,7 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     all->addLayout(h);
 
     connect (avatarButton, SIGNAL(clicked()), this, SLOT(chooseAvatar()));
+    connect (unitCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(unitChanged(int)));
     connect (save, SIGNAL(clicked()), this, SLOT(saveClicked()));
     connect (cancel, SIGNAL(clicked()), this, SLOT(cancelClicked()));
 }
@@ -144,6 +152,23 @@ NewCyclistDialog::chooseAvatar()
 }
 
 void
+NewCyclistDialog::unitChanged(int currentIndex)
+{
+    if (currentIndex == 0) {
+        QString weighttext = QString(tr("Weight (%1)")).arg(tr("kg"));
+        weightlabel->setText(weighttext);
+        weight->setValue(weight->value() * LB_PER_KG);
+        useMetricUnits = true;
+    }
+    else {
+        QString weighttext = QString(tr("Weight (%1)")).arg(tr("lb"));
+        weightlabel->setText(weighttext);
+        weight->setValue(weight->value() / LB_PER_KG);
+        useMetricUnits = false;
+    }
+}
+
+void
 NewCyclistDialog::cancelClicked()
 {
     reject();
@@ -158,6 +183,11 @@ NewCyclistDialog::saveClicked()
             if (home.mkdir(name->text())) {
 
                 // lets setup!
+                if (unitCombo->currentIndex()==0)
+                    appsettings->setCValue(name->text(), GC_UNIT, GC_UNIT_METRIC);
+                else if (unitCombo->currentIndex()==1)
+                    appsettings->setCValue(name->text(), GC_UNIT, GC_UNIT_IMPERIAL);
+
                 appsettings->setCValue(name->text(), GC_DOB, dob->date());
                 appsettings->setCValue(name->text(), GC_WEIGHT, weight->value() * (useMetricUnits ? 1.0 : KG_PER_LB));
                 appsettings->setCValue(name->text(), GC_SEX, sex->currentIndex());

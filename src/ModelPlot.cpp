@@ -321,7 +321,7 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
 {
     // get application settings
     cranklength = appsettings->value(NULL, GC_CRANKLENGTH, 0.0).toDouble() / 1000.0;
-    useMetricUnits = appsettings->value(NULL, GC_UNIT).toString() == "Metric";
+    useMetricUnits = plot.main->useMetricUnits;
 
     // if there are no settings or incomplete settings
     // create a null data plot

@@ -231,8 +231,8 @@ Aerolab::Aerolab(
     MainWindow    *mainWindow
 ):
   QwtPlot(parent),
+  mainWindow(mainWindow),
   parent(parent),
-  unit(0),
   rideItem(NULL),
   smooth(1), bydist(true), autoEoffset(true) {
 
@@ -243,8 +243,7 @@ Aerolab::Aerolab(
   eta       = 1.0;
   eoffset   = 0.0;
 
-  unit = appsettings->value(this, GC_UNIT);
-  useMetricUnits = true;
+  useMetricUnits = mainWindow->useMetricUnits;
 
   insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
   setCanvasBackground(Qt::white);
@@ -281,6 +280,8 @@ Aerolab::Aerolab(
 void
 Aerolab::configChanged()
 {
+  useMetricUnits = mainWindow->useMetricUnits;
+
   // set colors
   setCanvasBackground(GColor(CPLOTBACKGROUND));
   QPen vePen = QPen(GColor(CAEROVE));
@@ -593,7 +594,7 @@ void
 Aerolab::setXTitle() {
 
   if (bydist)
-    setAxisTitle(xBottom, tr("Distance ")+QString(unit.toString() == "Metric"?"(km)":"(miles)"));
+    setAxisTitle(xBottom, tr("Distance ")+QString(useMetricUnits?"(km)":"(miles)"));
   else
     setAxisTitle(xBottom, tr("Time (minutes)"));
 }

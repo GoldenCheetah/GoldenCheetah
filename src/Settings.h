@@ -111,6 +111,8 @@
 #define GC_ZEOUSER        "zeo/user"
 #define GC_ZEOPASS        "zeo/pass"
 
+#define GC_UNIT_METRIC    "Metric"
+#define GC_UNIT_IMPERIAL  "Imperial"
 
 // device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended
 // to them to specify which configured device i.e. devices1 ... devicesn where
@@ -202,6 +204,7 @@ class GSettings : public QSettings
     void setCValue(QString cyclist, QString key, QVariant value) {
         QSettings::setValue(cyclist + "/" + key,value);
     }
+
 };
 
 extern GSettings *appsettings;

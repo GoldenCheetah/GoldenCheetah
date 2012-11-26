@@ -43,7 +43,7 @@ TreeMapPlot::TreeMapPlot(TreeMapWindow *parent, MainWindow *main, QDir home)
     setInstanceName("TreeMap Plot");
 
     // get application settings
-    useMetricUnits = appsettings->value(this, GC_UNIT).toString() == "Metric";
+    useMetricUnits = main->useMetricUnits;
     settings = NULL;
 
     root = new TreeMap;
@@ -65,7 +65,7 @@ void
 TreeMapPlot::configUpdate()
 {
     // get application settings
-    useMetricUnits = appsettings->value(this, GC_UNIT).toString() == "Metric";
+    useMetricUnits = main->useMetricUnits;
 }
 
 void

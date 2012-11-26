@@ -172,7 +172,6 @@ void ScatterPlot::setData (ScatterSettings *settings)
 {
     // get application settings
     cranklength = appsettings->value(this, GC_CRANKLENGTH, 0.0).toDouble() / 1000.0;
-    useMetricUnits = appsettings->value(this, GC_UNIT).toString() == "Metric";
 
     // if there are no settings or incomplete settings
     // create a null data plot
@@ -200,8 +199,8 @@ void ScatterPlot::setData (ScatterSettings *settings)
 
     foreach(const RideFilePoint *point, settings->ride->ride()->dataPoints()) {
 
-        double xv = x[points] = pointType(point, settings->x, useMetricUnits, cranklength);
-        double yv = y[points] = pointType(point, settings->y, useMetricUnits, cranklength);
+        double xv = x[points] = pointType(point, settings->x, main->useMetricUnits, cranklength);
+        double yv = y[points] = pointType(point, settings->y, main->useMetricUnits, cranklength);
 
         // skip zeroes?
         if (!(settings->ignore && (x[points] == 0 || y[points] == 0))) {

@@ -295,8 +295,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     calibrating = false;
 
     // metric or imperial?
-    QVariant unit = appsettings->value(this, GC_UNIT);
-    useMetricUnits = (unit.toString() == "Metric");
+    useMetricUnits = main->useMetricUnits;
 
     // now the GUI is setup lets sort our control variables
     gui_timer = new QTimer(this);
@@ -439,8 +438,7 @@ TrainTool::configChanged()
     if (range != -1) FTP = main->zones()->getCP(range);
 
     // metric or imperial changed?
-    QVariant unit = appsettings->value(this, GC_UNIT);
-    useMetricUnits = (unit.toString() == "Metric");
+    useMetricUnits = main->useMetricUnits;
 }
 
 /*----------------------------------------------------------------------

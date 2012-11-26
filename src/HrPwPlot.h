@@ -106,8 +106,6 @@ class HrPwPlot : public QwtPlot
         void addRegLinCurve(double rpente, double rordonnee);
 
     private:
-        QSettings settings;
-        QVariant unit;
 
         LTMToolTip *tooltip;
         LTMCanvasPicker *_canvasPicker; // allow point selection/hover

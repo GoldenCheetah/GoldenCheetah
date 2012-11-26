@@ -64,8 +64,7 @@ void IntervalSummaryWindow::calcInterval(IntervalItem* interval, QString& html)
 {
 	const RideFile* ride = mainWindow->currentRide();
 
-    QVariant unit = appsettings->value(this, GC_UNIT);
-    bool metricUnits = (unit.toString() == "Metric");
+    bool metricUnits = mainWindow->useMetricUnits;
 
     RideFile f(ride->startTime(), ride->recIntSecs());
     int start = ride->timeIndex(interval->start);

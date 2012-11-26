@@ -70,19 +70,6 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
     else // default : English
         langCombo->setCurrentIndex(0);
 
-    unitLabel = new QLabel(tr("Unit of Measurement:"));
-
-    unitCombo = new QComboBox();
-    unitCombo->addItem(tr("Metric"));
-    unitCombo->addItem(tr("Imperial"));
-
-    QVariant unit = appsettings->value(this, GC_UNIT);
-
-    if(unit.toString() == "Metric")
-	unitCombo->setCurrentIndex(0);
-    else
-	unitCombo->setCurrentIndex(1);
-
     QLabel *crankLengthLabel = new QLabel(tr("Crank Length:"));
 
     QVariant crankLength = appsettings->value(this, GC_CRANKLENGTH);
@@ -167,10 +154,6 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
     langLayout->addWidget(langLabel);
     langLayout->addWidget(langCombo);
 
-    unitLayout = new QHBoxLayout;
-    unitLayout->addWidget(unitLabel);
-    unitLayout->addWidget(unitCombo);
-
     warningLayout = new QHBoxLayout;
     warningLayout->addWidget(warningLabel);
 
@@ -224,7 +207,6 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
 
 
     configLayout->addLayout(langLayout);
-    configLayout->addLayout(unitLayout);
     configLayout->addLayout(garminLayout);
     //SmartRecord);
     configLayout->addLayout(crankLengthLayout);
@@ -740,18 +722,17 @@ CredentialsPage::saveClicked()
 //
 RiderPage::RiderPage(QWidget *parent, MainWindow *mainWindow) : QWidget(parent), mainWindow(mainWindow)
 {
-    useMetricUnits = (appsettings->value(this, GC_UNIT).toString() == "Metric");
-
     QVBoxLayout *all = new QVBoxLayout(this);
     QGridLayout *grid = new QGridLayout;
 
     QLabel *nicklabel = new QLabel(tr("Nickname"));
     QLabel *doblabel = new QLabel(tr("Date of Birth"));
     QLabel *sexlabel = new QLabel(tr("Sex"));
+    QLabel *unitlabel = new QLabel(tr("Unit"));
     QLabel *biolabel = new QLabel(tr("Bio"));
 
-    QString weighttext = QString(tr("Weight (%1)")).arg(useMetricUnits ? tr("kg") : tr("lb"));
-    QLabel *weightlabel = new QLabel(weighttext);
+    QString weighttext = QString(tr("Weight (%1)")).arg(mainWindow->useMetricUnits ? tr("kg") : tr("lb"));
+    weightlabel = new QLabel(weighttext);
 
     nickname = new QLineEdit(this);
     nickname->setText(appsettings->cvalue(mainWindow->cyclist, GC_NICKNAME).toString());
@@ -763,15 +744,25 @@ RiderPage::RiderPage(QWidget *parent, MainWindow *mainWindow) : QWidget(parent),
     sex->addItem(tr("Male"));
     sex->addItem(tr("Female"));
 
+
     // we set to 0 or 1 for male or female since this
     // is language independent (and for once the code is easier!)
     sex->setCurrentIndex(appsettings->cvalue(mainWindow->cyclist, GC_SEX).toInt());
+
+    unitCombo = new QComboBox();
+    unitCombo->addItem(tr("Metric"));
+    unitCombo->addItem(tr("Imperial"));
+
+    if (mainWindow->useMetricUnits)
+        unitCombo->setCurrentIndex(0);
+    else
+        unitCombo->setCurrentIndex(1);
 
     weight = new QDoubleSpinBox(this);
     weight->setMaximum(999.9);
     weight->setMinimum(0.0);
     weight->setDecimals(1);
-    weight->setValue(appsettings->cvalue(mainWindow->cyclist, GC_WEIGHT).toDouble() * (useMetricUnits ? 1.0 : LB_PER_KG));
+    weight->setValue(appsettings->cvalue(mainWindow->cyclist, GC_WEIGHT).toDouble() * (mainWindow->useMetricUnits ? 1.0 : LB_PER_KG));
 
     bio = new QTextEdit(this);
     bio->setText(appsettings->cvalue(mainWindow->cyclist, GC_BIO).toString());
@@ -794,20 +785,23 @@ RiderPage::RiderPage(QWidget *parent, MainWindow *mainWindow) : QWidget(parent),
     grid->addWidget(nicklabel, 0, 0, alignment);
     grid->addWidget(doblabel, 1, 0, alignment);
     grid->addWidget(sexlabel, 2, 0, alignment);
-    grid->addWidget(weightlabel, 3, 0, alignment);
-    grid->addWidget(biolabel, 4, 0, alignment);
+    grid->addWidget(unitlabel, 3, 0, alignment);
+    grid->addWidget(weightlabel, 4, 0, alignment);
+    grid->addWidget(biolabel, 5, 0, alignment);
 
     grid->addWidget(nickname, 0, 1, alignment);
     grid->addWidget(dob, 1, 1, alignment);
     grid->addWidget(sex, 2, 1, alignment);
-    grid->addWidget(weight, 3, 1, alignment);
-    grid->addWidget(bio, 5, 0, 1, 4);
+    grid->addWidget(unitCombo, 3, 1, alignment);
+    grid->addWidget(weight, 4, 1, alignment);
+    grid->addWidget(bio, 6, 0, 1, 4);
 
     grid->addWidget(avatarButton, 0, 2, 4, 2, Qt::AlignRight|Qt::AlignVCenter);
     all->addLayout(grid);
     all->addStretch();
 
     connect (avatarButton, SIGNAL(clicked()), this, SLOT(chooseAvatar()));
+    connect (unitCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(unitChanged(int)));
 }
 
 void
@@ -824,11 +818,32 @@ RiderPage::chooseAvatar()
 }
 
 void
+RiderPage::unitChanged(int currentIndex)
+{
+    if (currentIndex == 0) {
+        QString weighttext = QString(tr("Weight (%1)")).arg(tr("kg"));
+        weightlabel->setText(weighttext);
+        weight->setValue(weight->value() * LB_PER_KG);
+    }
+    else {
+        QString weighttext = QString(tr("Weight (%1)")).arg(tr("lb"));
+        weightlabel->setText(weighttext);
+        weight->setValue(weight->value() / LB_PER_KG);
+    }
+}
+
+void
 RiderPage::saveClicked()
 {
     appsettings->setCValue(mainWindow->cyclist, GC_NICKNAME, nickname->text());
     appsettings->setCValue(mainWindow->cyclist, GC_DOB, dob->date());
-    appsettings->setCValue(mainWindow->cyclist, GC_WEIGHT, weight->value() * (useMetricUnits ? 1.0 : KG_PER_LB));
+    appsettings->setCValue(mainWindow->cyclist, GC_WEIGHT, weight->value() * (unitCombo->currentIndex() ? 1.0 : KG_PER_LB));
+
+    if (unitCombo->currentIndex()==0)
+        appsettings->setCValue(mainWindow->cyclist, GC_UNIT, GC_UNIT_METRIC);
+    else if (unitCombo->currentIndex()==1)
+        appsettings->setCValue(mainWindow->cyclist, GC_UNIT, GC_UNIT_IMPERIAL);
+
     appsettings->setCValue(mainWindow->cyclist, GC_SEX, sex->currentIndex());
     appsettings->setCValue(mainWindow->cyclist, GC_BIO, bio->toPlainText());
     avatar.save(mainWindow->home.absolutePath() + "/" + "avatar.png", "PNG");

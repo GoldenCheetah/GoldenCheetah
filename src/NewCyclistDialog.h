@@ -36,6 +36,7 @@ class NewCyclistDialog : public QDialog
 
     public slots:
         void chooseAvatar();
+        void unitChanged(int);
         void saveClicked();
         void cancelClicked();
 
@@ -44,6 +45,8 @@ class NewCyclistDialog : public QDialog
         bool useMetricUnits;
         QDateEdit *dob;
         QComboBox *sex;
+        QLabel *weightlabel;
+        QComboBox *unitCombo;
         QSpinBox *cp, *lthr, *resthr, *maxhr; // mandatory non-zero, default from age
         QDoubleSpinBox *weight;
         QTextEdit  *bio;

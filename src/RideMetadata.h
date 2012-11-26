@@ -132,6 +132,8 @@ class RideMetadata : public QWidget
         bool singlecolumn;
         SpecialFields sp;
 
+        MainWindow *main;
+
     public slots:
         void configUpdate();
         void metadataChanged(); // when its changed elsewhere we need to refresh fields
@@ -139,7 +141,7 @@ class RideMetadata : public QWidget
         void warnDateTime(QDateTime); // warn if file already exists after date/time changed
 
     private:
-        MainWindow *main;
+
 
     QTabWidget *tabs;
     QMap <QString, Form *> tabList;

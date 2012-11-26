@@ -96,7 +96,7 @@ class RideFile : public QObject // QObject to emit signals
 
         typedef enum seriestype SeriesType;
         static QString seriesName(SeriesType);
-        static QString unitName(SeriesType);
+        static QString unitName(SeriesType, MainWindow *main);
         static int decimalsFor(SeriesType series);
         static double maximumFor(SeriesType series);
         static double minimumFor(SeriesType series);
@@ -149,7 +149,7 @@ class RideFile : public QObject // QObject to emit signals
         QString getTag(QString name, QString fallback) const { return tags_.value(name, fallback); }
         void setTag(QString name, QString value) { tags_.insert(name, value); }
 
-        const MainWindow *mainwindow;
+        MainWindow *mainwindow;
         double getWeight();
 
         // METRIC OVERRIDES

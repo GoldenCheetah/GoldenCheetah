@@ -44,9 +44,7 @@ HrPwPlot::HrPwPlot(MainWindow *mainWindow, HrPwWindow *hrPwWindow) :
     hrPwWindow(hrPwWindow),
     mainWindow(mainWindow),
     bg(NULL), delay(-1),
-    minHr(50), minWatt(50), maxWatt(500),
-    settings(GC_SETTINGS_CO, GC_SETTINGS_APP),
-    unit(settings.value(GC_UNIT))
+    minHr(50), minWatt(50), maxWatt(500)
 {
     setCanvasBackground(Qt::white);
     canvas()->setFrameStyle(QFrame::NoFrame);

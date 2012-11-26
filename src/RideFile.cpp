@@ -85,9 +85,9 @@ RideFile::seriesName(SeriesType series)
 }
 
 QString
-RideFile::unitName(SeriesType series)
+RideFile::unitName(SeriesType series, MainWindow *main)
 {
-    bool useMetricUnits = (appsettings->value(NULL, GC_UNIT).toString() == "Metric");
+    bool useMetricUnits = main->useMetricUnits;
 
     switch (series) {
     case RideFile::secs: return QString(tr("seconds"));

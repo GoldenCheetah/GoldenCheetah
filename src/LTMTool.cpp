@@ -40,7 +40,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
                   "QWidget { background = Qt::white; border:0 px; margin: 2px; };");
 
     // get application settings
-    useMetricUnits = appsettings->value(this, GC_UNIT).toString() == "Metric";
+    useMetricUnits = main->useMetricUnits;
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0,0,0,0);
