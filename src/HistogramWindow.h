@@ -46,14 +46,13 @@ class HistogramWindow : public GcWindow
     Q_PROPERTY(bool zeroes READ zeroes WRITE setZeroes USER true)
     Q_PROPERTY(bool shade READ shade WRITE setShade USER true)
     Q_PROPERTY(bool zoned READ zoned WRITE setZoned USER true)
-    Q_PROPERTY(bool scope READ scope WRITE setScope USER true)
 #ifdef GC_HAVE_LUCENE
     Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
 #endif
 
     public:
 
-        HistogramWindow(MainWindow *mainWindow);
+        HistogramWindow(MainWindow *mainWindow, bool rangemode = false);
 
         // get/set properties
         int series() const { return seriesCombo->currentIndex(); }
@@ -70,8 +69,6 @@ class HistogramWindow : public GcWindow
         void setShade(bool x) { shadeZones->setChecked(x); }
         bool zoned() const { return showInZones->isChecked(); }
         void setZoned(bool x) { return showInZones->setChecked(x); }
-        int scope() const { return seasonCombo->currentIndex(); }
-        void setScope(int x) { seasonCombo->setCurrentIndex(x); }
 #ifdef GC_HAVE_LUCENE
         QString filter() const { return searchBox->filter(); }
         void setFilter(QString x) { searchBox->setFilter(x); }
@@ -87,17 +84,16 @@ class HistogramWindow : public GcWindow
         void clearFilter();
         void setFilter(QStringList files);
 #endif
+        void dateRangeChanged(DateRange);
 
     protected slots:
 
         void setBinWidthFromSlider();
         void setBinWidthFromLineEdit();
-        void seasonSelected(int season);
         void updateChart();
 
     private:
 
-        QList<Season> seasons;
         void setHistTextValidator();
         void setHistBinWidthText();
 
@@ -112,10 +108,8 @@ class HistogramWindow : public GcWindow
         QCheckBox *shadeZones;      // Shade zone background
         QCheckBox *showInZones;       // Plot by Zone
         QComboBox *seriesCombo;         // Which data series to plot
-        QComboBox *seasonCombo;         // Plot for Date range or current ride
 
         QList<RideFile::SeriesType> seriesList;
-        void addSeasons();
         void addSeries();
 
         int powerRange, hrRange;
@@ -128,6 +122,8 @@ class HistogramWindow : public GcWindow
         bool isFiltered;
         QStringList files;
 #endif
+
+        bool rangemode;
 };
 
 #endif // _GC_HistogramWindow_h

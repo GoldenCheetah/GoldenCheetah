@@ -293,6 +293,7 @@ HEADERS += \
         LTMOutliers.h \
         LTMPlot.h \
         LTMPopup.h \
+        LTMSidebar.h \
         LTMSettings.h \
         LTMTool.h \
         LTMTrend.h \
@@ -484,6 +485,7 @@ SOURCES += \
         LTMPlot.cpp \
         LTMPopup.cpp \
         LTMSettings.cpp \
+        LTMSidebar.cpp \
         LTMTool.cpp \
         LTMTrend.cpp \
         LTMWindow.cpp \

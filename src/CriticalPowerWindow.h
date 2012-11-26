@@ -38,18 +38,17 @@ class CriticalPowerWindow : public GcWindow
 
     // properties can be saved/restored/set by the layout manager
 
-    Q_PROPERTY(QString dateRange READ dateRange WRITE setDateRange USER true)
 #ifdef GC_HAVE_LUCENE
     Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
 #endif
     Q_PROPERTY(int mode READ mode WRITE setMode USER true)
 
     // for retro compatibility
-    Q_PROPERTY(int season READ season WRITE setSeason USER false)
+    Q_PROPERTY(QString season READ season WRITE setSeason USER true)
 
     public:
 
-        CriticalPowerWindow(const QDir &home, MainWindow *parent);
+        CriticalPowerWindow(const QDir &home, MainWindow *parent, bool range = false);
 
         void deleteCpiFile(QString filename);
 
@@ -58,10 +57,6 @@ class CriticalPowerWindow : public GcWindow
         int mode() const { return seriesCombo->currentIndex(); }
         void setMode(int x) { seriesCombo->setCurrentIndex(x); }
 
-        // date ranges set/get the string from the treeWidget
-        QString dateRange() const;
-        void setDateRange(QString x);
-
 #ifdef GC_HAVE_LUCENE
         // filter
         QString filter() const { return searchBox->filter(); }
@@ -69,8 +64,14 @@ class CriticalPowerWindow : public GcWindow
 #endif
 
         // for retro compatibility
-        int season() const { return cComboSeason->currentIndex(); }
-        void setSeason(int x) { cComboSeason->setCurrentIndex(x); }
+        QString season() const { return cComboSeason->itemText(cComboSeason->currentIndex()); }
+        void setSeason(QString x) { 
+            int index = cComboSeason->findText(x);
+            if (index != -1) {
+                cComboSeason->setCurrentIndex(index);
+                seasonSelected(index);
+            }
+        }
 
         RideFile::SeriesType series() { 
             return static_cast<RideFile::SeriesType>
@@ -87,6 +88,7 @@ class CriticalPowerWindow : public GcWindow
         void setSeries(int index);
         void resetSeasons();
         void filterChanged();
+        void dateRangeChanged(DateRange);
 
     private:
         void updateCpint(double minutes);
@@ -114,6 +116,8 @@ class CriticalPowerWindow : public GcWindow
 #ifdef GC_HAVE_LUCENE
         SearchFilterBox *searchBox;
 #endif
+
+        bool rangemode;
 };
 
 #endif // _GC_CriticalPowerWindow_h

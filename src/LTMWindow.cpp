@@ -138,7 +138,7 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
     cl->addRow(manageButton);
     cl->addRow(ltmTool);
 
-    connect(ltmTool, SIGNAL(dateRangeSelected(const Season *)), this, SLOT(dateRangeSelected(const Season *)));
+    connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
     connect(ltmTool, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
     connect(ltmTool, SIGNAL(metricSelected()), this, SLOT(metricSelected()));
     connect(groupBy, SIGNAL(currentIndexChanged(int)), this, SLOT(groupBySelected(int)));
@@ -167,18 +167,6 @@ LTMWindow::~LTMWindow()
     //qDebug()<<"delete metricdb... crash!!!";
     //if (metricDB != NULL) delete metricDB; //XXX CRASH!!!! -- needs fixing
     delete popup;
-}
-
-QString
-LTMWindow::dateRange() const
-{
-    return ltmTool->_dateRange();
-}
-
-void
-LTMWindow::setDateRange(QString s)
-{
-    ltmTool->setDateRange(s);
 }
 
 void
@@ -212,11 +200,11 @@ LTMWindow::refreshPlot()
 void
 LTMWindow::refresh()
 {
+
     // refresh for changes to ridefiles / zones
     if (amVisible() == true && main->metricDB != NULL) {
         // if config has changed get new useMetricUnits
         useMetricUnits = appsettings->value(this, GC_UNIT).toString() == "Metric";
-
         results.clear(); // clear any old data
         results = main->metricDB->getAllMetricsFor(settings.start, settings.end);
         measures.clear(); // clear any old data
@@ -244,40 +232,28 @@ LTMWindow::metricSelected()
 }
 
 void
-LTMWindow::dateRangeSelected(const Season *selected)
+LTMWindow::dateRangeChanged(DateRange range)
 {
-    if (selected) {
+    settings.data = &results;
+    settings.measures = &measures;
 
-        Season dateRange = *selected;
-        settings.start = QDateTime(dateRange.getStart(), QTime(0,0));
-        settings.end   = QDateTime(dateRange.getEnd(), QTime(24,0,0));
-        settings.title = dateRange.getName();
-        settings.data = &results;
-        settings.measures = &measures;
+    // apply filter to new date range too
+    filterChanged();
 
-        measures.clear(); // clear any old data
-        measures = main->metricDB->getAllMeasuresFor(settings.start, settings.end);
-
-        // apply filter to new date range too
-        filterChanged();
-
-        refreshPlot();
-    }
+    refreshPlot();
 }
 
 void
 LTMWindow::filterChanged()
 {
-    // first refresh all data - since it is cropped in LTMPlot
-    Season dateRange = *ltmTool->currentDateRange();
-    settings.start = QDateTime(dateRange.getStart(), QTime(0,0));
-    settings.end   = QDateTime(dateRange.getEnd(), QTime(24,0,0));
-    settings.title = dateRange.getName();
+    settings.start = QDateTime(myDateRange.from, QTime(0,0));
+    settings.end   = QDateTime(myDateRange.to, QTime(24,0,0));
+    settings.title = myDateRange.name;
     settings.data = &results;
 
     // if we want weeks and start is not a monday go back to the monday
-    int dow = dateRange.getStart().dayOfWeek();
-    if (settings.groupBy == LTM_WEEK && dow >1 && dateRange.getStart() != QDate())
+    int dow = myDateRange.from.dayOfWeek();
+    if (settings.groupBy == LTM_WEEK && dow >1 && myDateRange.from != QDate())
         settings.start = settings.start.addDays(-1*(dow-1));
 
     // we need to get data again and apply filter

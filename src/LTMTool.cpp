@@ -55,22 +55,6 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     mainLayout->addWidget(searchBox);
 #endif
 
-    dateRangeTree = new QTreeWidget;
-    dateRangeTree->setFrameStyle(QFrame::NoFrame);
-    dateRangeTree->setColumnCount(1);
-    dateRangeTree->setSelectionMode(QAbstractItemView::SingleSelection);
-    dateRangeTree->header()->hide();
-    //dateRangeTree->setAlternatingRowColors (true);
-    dateRangeTree->setIndentation(5);
-    allDateRanges = new QTreeWidgetItem(dateRangeTree, ROOT_TYPE);
-    allDateRanges->setText(0, tr("Date Range"));
-
-    dateRangeTree->expandItem(allDateRanges);
-    dateRangeTree->setContextMenuPolicy(Qt::CustomContextMenu);
-
-    seasons = parent->seasons;
-    resetSeasons(); // reset the season list
-
     metricTree = new QTreeWidget;
     metricTree->setColumnCount(1);
     if (multi)
@@ -470,30 +454,14 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     ltmSplitter->setOrientation(Qt::Vertical);
 
     mainLayout->addWidget(ltmSplitter);
-    ltmSplitter->addWidget(dateRangeTree);
-    ltmSplitter->setCollapsible(0, true);
     ltmSplitter->addWidget(metricTree);
-    ltmSplitter->setCollapsible(1, true);
 
-    connect(dateRangeTree,SIGNAL(itemSelectionChanged()),
-            this, SLOT(dateRangeTreeWidgetSelectionChanged()));
     connect(metricTree,SIGNAL(itemSelectionChanged()),
             this, SLOT(metricTreeWidgetSelectionChanged()));
     connect(main, SIGNAL(configChanged()),
             this, SLOT(configChanged()));
-    connect(dateRangeTree,SIGNAL(customContextMenuRequested(const QPoint &)),
-            this, SLOT(dateRangePopup(const QPoint &)));
     connect(metricTree,SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(metricTreePopup(const QPoint &)));
-    connect(dateRangeTree,SIGNAL(itemChanged(QTreeWidgetItem *,int)),
-            this, SLOT(dateRangeChanged(QTreeWidgetItem*, int)));
-    connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
-}
-
-void
-LTMTool::selectDateRange(int index)
-{
-    allDateRanges->child(index)->setSelected(true);
 }
 
 QwtPlotCurve::CurveStyle
@@ -524,54 +492,6 @@ LTMTool::symbolStyle(RideMetric::MetricType type)
 void
 LTMTool::configChanged()
 {
-}
-
-// get/set date range
-QString
-LTMTool::_dateRange() const
-{
-    if (dateRangeTree->selectedItems().isEmpty()) return QString("");
-    else {
-        QTreeWidgetItem *which = dateRangeTree->selectedItems().first();
-        return seasons->seasons[allDateRanges->indexOfChild(which)].id().toString();
-    }
-}
-
-void
-LTMTool::setDateRange(QString s)
-{
-    // clear current selection
-    dateRangeTree->clearSelection();
-
-    QUuid find(s);
-
-    for(int i=0; i<seasons->seasons.count(); i++) {
-        if (seasons->seasons[i].id() == find) {
-            allDateRanges->child(i)->setSelected(true);
-            return;
-        }
-    }
-}
-
-/*----------------------------------------------------------------------
- * Selections Made
- *----------------------------------------------------------------------*/
-
-void
-LTMTool::dateRangeTreeWidgetSelectionChanged()
-{
-    if (active == true) return;
-
-    if (dateRangeTree->selectedItems().isEmpty()) dateRange = NULL;
-    else {
-        QTreeWidgetItem *which = dateRangeTree->selectedItems().first();
-        if (which != allDateRanges) {
-            dateRange = &seasons->seasons.at(allDateRanges->indexOfChild(which));
-        } else {
-            dateRange = NULL;
-        }
-    }
-    dateRangeSelected(dateRange);
 }
 
 void
@@ -930,139 +850,6 @@ EditMetricDetailDialog::setButtonIcon(QColor color)
     curveColor->setIcon(icon);
     curveColor->setContentsMargins(2,2,2,2);
     curveColor->setFixedWidth(34);
-}
-
-/*----------------------------------------------------------------------
- * Seasons stuff
- *--------------------------------------------------------------------*/
-
-void
-LTMTool::resetSeasons()
-{
-    if (active) return;
-
-    QString now = _dateRange(); // remeber now
-
-    active = true;
-    int i;
-    for (i=allDateRanges->childCount(); i > 0; i--) {
-        delete allDateRanges->takeChild(0);
-    }
-    for (i=0; i <seasons->seasons.count(); i++) {
-        Season season = seasons->seasons.at(i);
-        QTreeWidgetItem *add = new QTreeWidgetItem(allDateRanges, season.getType());
-        add->setText(0, season.getName());
-    }
-    setDateRange(now); // reselect now
-    active = false;
-}
-
-int
-LTMTool::newSeason(QString name, QDate start, QDate end, int type)
-{
-    seasons->newSeason(name, start, end, type);
-
-    QTreeWidgetItem *item = new QTreeWidgetItem(USER_DATE);
-    item->setText(0, name);
-    allDateRanges->insertChild(0, item);
-    return 0; // always add at the top
-}
-
-void
-LTMTool::updateSeason(int index, QString name, QDate start, QDate end, int type)
-{
-    seasons->updateSeason(index, name, start, end, type);
-    allDateRanges->child(index)->setText(0, name);
-}
-
-void
-LTMTool::dateRangePopup(QPoint pos)
-{
-    QTreeWidgetItem *item = dateRangeTree->itemAt(pos);
-    if (item != NULL && item->type() != ROOT_TYPE && item->type() != SYS_DATE) {
-
-        // out of bounds or not user defined
-        int index = allDateRanges->indexOfChild(item);
-        if (index == -1 || index >= seasons->seasons.count()
-            || seasons->seasons[index].getType() == Season::temporary)
-            return;
-
-        // save context
-        activeDateRange = item;
-
-        // create context menu
-        QMenu menu(dateRangeTree);
-        QAction *rename = new QAction(tr("Rename range"), dateRangeTree);
-        QAction *edit = new QAction(tr("Edit details"), dateRangeTree);
-        QAction *del = new QAction(tr("Delete range"), dateRangeTree);
-        menu.addAction(rename);
-        menu.addAction(edit);
-        menu.addAction(del);
-
-        // connect menu to functions
-        connect(rename, SIGNAL(triggered(void)), this, SLOT(renameRange(void)));
-        connect(edit, SIGNAL(triggered(void)), this, SLOT(editRange(void)));
-        connect(del, SIGNAL(triggered(void)), this, SLOT(deleteRange(void)));
-
-        // execute the menu
-        menu.exec(dateRangeTree->mapToGlobal(pos));
-    }
-}
-
-void
-LTMTool::renameRange()
-{
-    // go edit the name
-    activeDateRange->setFlags(activeDateRange->flags() | Qt::ItemIsEditable);
-    dateRangeTree->editItem(activeDateRange, 0);
-}
-
-void
-LTMTool::dateRangeChanged(QTreeWidgetItem*item, int)
-{
-    if (item != activeDateRange || active == true) return;
-
-    int index = allDateRanges->indexOfChild(item);
-    seasons->seasons[index].setName(item->text(0));
-
-    // save changes away
-    active = true;
-    seasons->writeSeasons();
-    active = false;
-
-    // signal date selected changed
-    //dateRangeSelected(&seasons->seasons[index]);
-}
-
-void
-LTMTool::editRange()
-{
-    // throw up modal dialog box to edit all the season
-    // fields.
-    int index = allDateRanges->indexOfChild(activeDateRange);
-    EditSeasonDialog dialog(main, &seasons->seasons[index]);
-
-    if (dialog.exec()) {
-        // update name
-        activeDateRange->setText(0, seasons->seasons[index].getName());
-
-        // save changes away
-        active = true;
-        seasons->writeSeasons();
-        active = false;
-
-        // signal its changed!
-        dateRangeSelected(&seasons->seasons[index]);
-    }
-}
-
-void
-LTMTool::deleteRange()
-{
-    // now delete!
-    int index = allDateRanges->indexOfChild(activeDateRange);
-    delete allDateRanges->takeChild(index);
-    seasons->deleteSeason(index);
 }
 
 void

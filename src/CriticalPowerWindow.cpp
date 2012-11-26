@@ -33,8 +33,8 @@
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
 
-CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
-    GcWindow(parent), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), mainWindow(parent), currentRide(NULL)
+CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, bool rangemode) :
+    GcWindow(parent), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), mainWindow(parent), currentRide(NULL), rangemode(rangemode)
 {
     setInstanceName("Critical Power Window");
 
@@ -98,6 +98,8 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
     cComboSeason = new QComboBox(this);
     seasons = parent->seasons;
     resetSeasons();
+    if (rangemode) cComboSeason->hide();
+
     cpintSetCPButton = new QPushButton(tr("&Save CP value"), this);
     cpintSetCPButton->setEnabled(false);
     cl->addWidget(cpintSetCPButton);
@@ -114,7 +116,11 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent) :
     connect(picker, SIGNAL(moved(const QPoint &)), SLOT(pickerMoved(const QPoint &)));
     connect(cpintTimeValue, SIGNAL(editingFinished()), this, SLOT(cpintTimeValueEntered()));
     connect(cpintSetCPButton, SIGNAL(clicked()), this, SLOT(cpintSetCPButtonClicked()));
-    connect(cComboSeason, SIGNAL(currentIndexChanged(int)), this, SLOT(seasonSelected(int)));
+    if (rangemode)
+        connect(this, SIGNAL(dateRangeChanged(DateRange)), SLOT(dateRangeChanged(DateRange)));
+    else
+        connect(cComboSeason, SIGNAL(currentIndexChanged(int)), this, SLOT(seasonSelected(int)));
+
     connect(seriesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setSeries(int)));
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
@@ -345,6 +351,10 @@ void CriticalPowerWindow::addSeries()
 void
 CriticalPowerWindow::resetSeasons()
 {
+    if (rangemode) return;
+
+    QString prev = cComboSeason->itemText(cComboSeason->currentIndex());
+
     // remove seasons
     cComboSeason->clear();
 
@@ -356,27 +366,15 @@ CriticalPowerWindow::resetSeasons()
         cComboSeason->addItem(season.getName());
     }
     // restore previous selection
-    setDateRange(previousDateRange);
-}
-
-QString
-CriticalPowerWindow::dateRange() const
-{
-    return seasons->seasons[cComboSeason->currentIndex()].id();
+    int index = cComboSeason->findText(prev);
+    if (index != -1) cComboSeason->setCurrentIndex(index);
 }
 
 void
-CriticalPowerWindow::setDateRange(QString s)
+CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
 {
-    QUuid find(s);
-
-    for(int i=0; i<seasons->seasons.count(); i++) {
-        if (seasons->seasons[i].id() == find) {
-            cComboSeason->setCurrentIndex(i);
-            seasonSelected(i);
-            return;
-        }
-    }
+    cpintPlot->changeSeason(dateRange.from, dateRange.to);
+    cpintPlot->calculate(currentRide);
 }
 
 void CriticalPowerWindow::seasonSelected(int iSeason)

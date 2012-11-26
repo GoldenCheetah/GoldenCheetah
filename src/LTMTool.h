@@ -51,8 +51,8 @@ class LTMTool : public QWidget
 
         LTMTool(MainWindow *parent, const QDir &home, bool Multi = true);
 
-        const Season *currentDateRange() { return dateRange; }
-        void selectDateRange(int);
+        //const Season *currentDateRange() { return dateRange; }
+        //void selectDateRange(int);
         QList<QTreeWidgetItem *> selectedMetrics() { return metricTree->selectedItems(); }
 
         QString metricName(QTreeWidgetItem *);
@@ -61,15 +61,15 @@ class LTMTool : public QWidget
         void selectMetric(QString symbol);
 
         // allow others to create and update season structures
-        int newSeason(QString, QDate, QDate, int);
-        void updateSeason(int, QString, QDate, QDate, int);
+        //int newSeason(QString, QDate, QDate, int);
+        //void updateSeason(int, QString, QDate, QDate, int);
 
         // apply settings to the metric selector
         void applySettings(LTMSettings *);
 
         // get/set the date range
-        void setDateRange(QString);
-        QString _dateRange() const;
+        //void setDateRange(QString);
+        //QString _dateRange() const;
 
         bool isFiltered() { return _amFiltered; }
         QStringList &filters() { return filenames; }
@@ -79,23 +79,23 @@ class LTMTool : public QWidget
 #endif
     signals:
 
-        void dateRangeSelected(const Season *);
+        //void dateRangeSelected(const Season *);
         void filterChanged();
         void metricSelected();
 
     private slots:
-        void dateRangeTreeWidgetSelectionChanged();
-        void dateRangePopup(QPoint);
-        void dateRangeChanged(QTreeWidgetItem *, int);
-        void renameRange();
-        void editRange();
-        void deleteRange();
+        //void dateRangeTreeWidgetSelectionChanged();
+        //void dateRangePopup(QPoint);
+        //void dateRangeChanged(QTreeWidgetItem *, int);
+        //void renameRange();
+        //void editRange();
+        //void deleteRange();
         void metricTreeWidgetSelectionChanged();
         void metricTreePopup(QPoint);
         void colorPicker();
         void editMetric();
         void configChanged();
-        void resetSeasons(); // rebuild the seasons list if it changes
+        //void resetSeasons(); // rebuild the seasons list if it changes
 
         void clearFilter();
         void setFilter(QStringList);
@@ -110,10 +110,10 @@ class LTMTool : public QWidget
         bool useMetricUnits;
         bool active; // ignore season changed signals since we triggered them
 
-        Seasons *seasons;
-        QTreeWidget *dateRangeTree;
-        QTreeWidgetItem *allDateRanges;
-        const Season *dateRange;
+        //Seasons *seasons;
+        //QTreeWidget *dateRangeTree;
+        //QTreeWidgetItem *allDateRanges;
+        //const Season *dateRange;
 
         bool _amFiltered; // is a filter appling?
         QStringList filenames; // filters
@@ -122,7 +122,7 @@ class LTMTool : public QWidget
         QTreeWidget *metricTree;
         QTreeWidgetItem *allMetrics;
 
-        QTreeWidgetItem *activeDateRange; // when using context menus
+        //QTreeWidgetItem *activeDateRange; // when using context menus
         QTreeWidgetItem *activeMetric; // when using context menus
 
         QSplitter   *ltmSplitter;

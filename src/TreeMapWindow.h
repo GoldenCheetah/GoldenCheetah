@@ -48,7 +48,6 @@ class TreeMapWindow : public GcWindow
 
     Q_PROPERTY(QString f1 READ f1 WRITE setf1 USER true)
     Q_PROPERTY(QString f2 READ f2 WRITE setf2 USER true)
-    Q_PROPERTY(QString dateRange READ dateRange WRITE setDateRange USER true)
 #ifdef GC_HAVE_LUCENE
     Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
 #endif
@@ -74,17 +73,13 @@ class TreeMapWindow : public GcWindow
     public slots:
         void rideSelected();
         void refreshPlot();
-        void dateRangeSelected(const Season *);
+        void dateRangeChanged(DateRange);
         void metricSelected();
         void filterChanged();
         void refresh();
         void fieldSelected(int);
         void pointClicked(QwtPlotCurve*, int);
         int groupForDate(QDate, int);
-
-        // date ranges set/get the string from the treeWidget
-        QString dateRange() const;
-        void setDateRange(QString x);
 
     private:
         // passed from MainWindow
