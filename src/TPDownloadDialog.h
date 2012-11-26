@@ -41,7 +41,6 @@ class TPDownloadDialog : public QDialog
     protected:  
         // cached state
         QSettings *settings;
-        QVariant unit;
         bool useMetricUnits;
 
     public slots:

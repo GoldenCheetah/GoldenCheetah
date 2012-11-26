@@ -110,13 +110,16 @@ class RiderPage : public QWidget
 
     public slots:
         void chooseAvatar();
+        void unitChanged(int currentIndex);
 
     private:
         MainWindow *mainWindow;
-        bool useMetricUnits;
+
         QLineEdit *nickname;
         QDateEdit *dob;
         QComboBox *sex;
+        QLabel *weightlabel;
+        QComboBox *unitCombo;
         QDoubleSpinBox *weight;
         QTextEdit  *bio;
         QPushButton *avatarButton;

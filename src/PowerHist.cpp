@@ -46,8 +46,6 @@ PowerHist::PowerHist(MainWindow *mainWindow):
     rideItem(NULL),
     mainWindow(mainWindow),
     series(RideFile::watts),
-    useMetricUnits(true),
-    unit(0),
     lny(false),
     shade(false),
     zoned(false),
@@ -59,11 +57,6 @@ PowerHist::PowerHist(MainWindow *mainWindow):
     cache(NULL),
     source(Ride)
 {
-
-    unit = appsettings->value(this, GC_UNIT);
-
-    useMetricUnits = (unit.toString() == "Metric");
-
     binw = appsettings->value(this, GC_HIST_BIN_WIDTH, 5).toInt();
     if (appsettings->value(this, GC_SHADEZONES, true).toBool() == true)
         shade = true;
@@ -278,7 +271,7 @@ PowerHist::recalc(bool force)
         LASTrideItem == rideItem &&
         LASTseries == series &&
         LASTshade == shade &&
-        LASTuseMetricUnits == useMetricUnits &&
+        LASTuseMetricUnits == mainWindow->useMetricUnits &&
         LASTlny == lny &&
         LASTzoned == zoned &&
         LASTbinw == binw &&
@@ -295,7 +288,7 @@ PowerHist::recalc(bool force)
         LASTrideItem = rideItem;
         LASTseries = series;
         LASTshade = shade;
-        LASTuseMetricUnits = useMetricUnits;
+        LASTuseMetricUnits = mainWindow->useMetricUnits;
         LASTlny = lny;
         LASTzoned = zoned;
         LASTbinw = binw;
@@ -596,9 +589,9 @@ PowerHist::setData(RideFileCache *cache)
     longFromDouble(cadArray, cache->distributionArray(RideFile::cad));
     longFromDouble(kphArray, cache->distributionArray(RideFile::kph));
 
-    if (!useMetricUnits) {
-        double torque_factor = (useMetricUnits ? 1.0 : 0.73756215);
-        double speed_factor  = (useMetricUnits ? 1.0 : 0.62137119);
+    if (!mainWindow->useMetricUnits) {
+        double torque_factor = (mainWindow->useMetricUnits ? 1.0 : 0.73756215);
+        double speed_factor  = (mainWindow->useMetricUnits ? 1.0 : 0.62137119);
 
         for(int i=0; i<nmArray.size(); i++) nmArray[i] = nmArray[i] * torque_factor;
         for(int i=0; i<kphArray.size(); i++) kphArray[i] = kphArray[i] * speed_factor;
@@ -655,8 +648,8 @@ PowerHist::setData(RideItem *_rideItem, bool force)
         cadSelectedArray.resize(0);
 
         // unit conversion factor for imperial units for selected parameters
-        double torque_factor = (useMetricUnits ? 1.0 : 0.73756215);
-        double speed_factor  = (useMetricUnits ? 1.0 : 0.62137119);
+        double torque_factor = (mainWindow->useMetricUnits ? 1.0 : 0.73756215);
+        double speed_factor  = (mainWindow->useMetricUnits ? 1.0 : 0.62137119);
 
         foreach(const RideFilePoint *p1, ride->dataPoints()) {
             bool selected = isSelected(p1, ride->recIntSecs());
@@ -891,11 +884,11 @@ PowerHist::setParameterAxisTitle()
             break;
 
         case RideFile::kph:
-            axislabel = QString(tr("Speed (%1)")).arg(useMetricUnits ? tr("kph") : tr("mph"));
+            axislabel = QString(tr("Speed (%1)")).arg(mainWindow->useMetricUnits ? tr("kph") : tr("mph"));
             break;
 
         case RideFile::nm:
-            axislabel = QString(tr("Torque (%1)")).arg(useMetricUnits ? tr("N-m") : tr("ft-lbf"));
+            axislabel = QString(tr("Torque (%1)")).arg(mainWindow->useMetricUnits ? tr("N-m") : tr("ft-lbf"));
             break;
 
         default:

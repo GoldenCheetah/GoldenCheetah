@@ -21,7 +21,8 @@
 LTMPopup::LTMPopup(MainWindow *parent) : QWidget(parent), main(parent)
 {
     // get application settings
-    useMetricUnits = appsettings->value(this, GC_UNIT).toString() == "Metric";
+    useMetricUnits = main->useMetricUnits;
+
     setAutoFillBackground(false);
     setContentsMargins(0,0,0,0);
     setFixedWidth(800);
@@ -106,7 +107,7 @@ LTMPopup::setTitle(QString s)
 void
 LTMPopup::setData(LTMSettings &settings, QDate start, QDate end)
 {
-    useMetricUnits = appsettings->value(this, GC_UNIT).toString() == "Metric";
+    useMetricUnits = main->useMetricUnits;
 
     // set the title
     QString _title;

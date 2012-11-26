@@ -32,7 +32,7 @@ static const int spikeMargin = 40;
 #include "Settings.h"
 #include "Units.h"
 
-GcBubble::GcBubble(MainWindow *parent) : QWidget(parent, Qt::FramelessWindowHint), borderWidth(3), parent(parent), orientation(Qt::Horizontal)
+GcBubble::GcBubble(MainWindow *parent) : QWidget(parent, Qt::FramelessWindowHint), borderWidth(3), mainWindow(mainWindow), parent(parent), orientation(Qt::Horizontal)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setAttribute(Qt::WA_TranslucentBackground);
@@ -419,8 +419,7 @@ GcBubble::setText(QString filename)
 {
         SummaryMetrics metrics = parent->metricDB->getAllMetricsFor(filename);
 	
-	unit = appsettings->value(this, GC_UNIT);
-	useMetricUnits = (unit.toString() == "Metric");
+        useMetricUnits = mainWindow->useMetricUnits;
     
 
         //

@@ -112,7 +112,6 @@ main(int argc, char *argv[])
         lastOpened = appsettings->value(NULL, GC_SETTINGS_LAST);
     }
 
-    QVariant unit = appsettings->value(NULL, GC_UNIT);
     double crankLength = appsettings->value(NULL, GC_CRANKLENGTH).toDouble();
     if(crankLength<=0) {
        appsettings->setValue(GC_CRANKLENGTH,172.5);

@@ -335,9 +335,7 @@ TPDownloadDialog::tabChanged(int idx)
 void
 TPDownloadDialog::completedWorkout(QList<QMap<QString, QString> >workouts)
 {
-  
-    unit = appsettings->value(this, GC_UNIT);
-    useMetricUnits = (unit.toString() == "Metric");
+    useMetricUnits = main->useMetricUnits;
 
     //
     // Setup the upload list

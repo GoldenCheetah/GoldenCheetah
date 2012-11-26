@@ -53,13 +53,14 @@ class Aerolab : public QwtPlot {
 
   void refreshIntervalMarkers();
 
-  private:
-  AerolabWindow *parent;
+    private:
+        MainWindow *mainWindow;
+        AerolabWindow *parent;
 
-  LTMToolTip      *tooltip;
-  LTMCanvasPicker *_canvasPicker; // allow point selection/hover
+        LTMToolTip      *tooltip;
+        LTMCanvasPicker *_canvasPicker; // allow point selection/hover
 
-  void adjustEoffset();
+        void adjustEoffset();
 
   public slots:
 
@@ -76,7 +77,6 @@ class Aerolab : public QwtPlot {
   friend class ::IntervalAerolabData;
 
 
-  QVariant unit;
   QwtPlotGrid *grid;
   QVector<QwtPlotMarker*> d_mrk;
 

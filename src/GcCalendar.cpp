@@ -543,7 +543,7 @@ void
 GcCalendar::setSummary()
 {
     // are we metric?
-    bool useMetricUnits = (appsettings->value(this, GC_UNIT).toString() == "Metric");
+    bool useMetricUnits = main->useMetricUnits;
 
     // where we construct the text
     QString summaryText("");

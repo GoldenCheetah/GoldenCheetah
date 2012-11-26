@@ -86,7 +86,7 @@ class MainWindow : public QMainWindow
 
         // general data
         QString cyclist; // the cyclist name
-        bool useMetricUnits;  // metric/imperial prefs
+        bool useMetricUnits;
         QDir home;
         const Zones *zones() const { return zones_; }
         const HrZones *hrZones() const { return hrzones_; }

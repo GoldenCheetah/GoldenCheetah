@@ -87,6 +87,9 @@ class BasicModelPlot : public SurfacePlot
 
     public:
         BasicModelPlot(MainWindow *, ModelSettings *);
+
+        MainWindow *main;
+
         void setData(ModelSettings *);
         void resetViewPoint();
         void setStyle(int);
@@ -109,8 +112,6 @@ class BasicModelPlot : public SurfacePlot
 
     protected:
 
-        // passed from MainWindow
-        MainWindow *main;
         ModelDataColor    *modelDataColor;
 
         Bar *bar;

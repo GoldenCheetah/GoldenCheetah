@@ -36,7 +36,6 @@ class GcBubble : public QWidget
     protected:  
         // cached state
         QSettings *settings;
-        QVariant unit;
         bool useMetricUnits;
 
     signals:
@@ -48,6 +47,8 @@ class GcBubble : public QWidget
         virtual void paintEvent(QPaintEvent *);
 
     private:
+        MainWindow *mainWindow;
+
         int borderWidth;
         MainWindow *parent;
 

@@ -159,7 +159,7 @@ TreeMapWindow::refresh()
     // refresh for changes to ridefiles / zones
     if (active == true) {
         // if config has changed get new useMetricUnits
-        useMetricUnits = appsettings->value(this, GC_UNIT).toString() == "Metric";
+        useMetricUnits = main->useMetricUnits;
 
         results.clear(); // clear any old data
         results = main->metricDB->getAllMetricsFor(settings.start, settings.end);

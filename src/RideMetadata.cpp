@@ -402,9 +402,7 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
 
     if (meta->sp.isMetric(field.name)) {
         field.type = FIELD_DOUBLE; // whatever they say, we want a double!
-        QVariant unit = appsettings->value(this, GC_UNIT);
-        bool useMetricUnits = (unit.toString() == "Metric");
-        units = meta->sp.rideMetric(field.name)->units(useMetricUnits);
+        units = meta->sp.rideMetric(field.name)->units(meta->main->useMetricUnits);
         if (units != "") units = QString(" (%1)").arg(units);
     }
 
@@ -598,11 +596,8 @@ FormField::editFinished()
     } else if (definition.name != "Summary") {
         if (meta->sp.isMetric(definition.name) && enabled->isChecked()) {
 
-            QVariant unit = appsettings->value(this, GC_UNIT);
-            bool useMetricUnits = (unit.toString() == "Metric");
-
             // convert from imperial to metric if needed
-            if (!useMetricUnits) {
+            if (!meta->main->useMetricUnits) {
                 double value = text.toDouble() * (1/ meta->sp.rideMetric(definition.name)->conversion());
                 value -= meta->sp.rideMetric(definition.name)->conversionSum();
                 text = QString("%1").arg(value);
@@ -706,11 +701,8 @@ FormField::metadataChanged()
 
                     // does it need conversion from metric?
                     if (meta->sp.rideMetric(definition.name)->conversion() != 1.0) {
-                        QVariant unit = appsettings->value(this, GC_UNIT);
-                        bool useMetricUnits = (unit.toString() == "Metric");
-
                         // do we want imperial?
-                        if (!useMetricUnits) {
+                        if (!meta->main->useMetricUnits) {
                             double newvalue = value.toDouble() * meta->sp.rideMetric(definition.name)->conversion();
                             newvalue -= meta->sp.rideMetric(definition.name)->conversionSum();
                             value = QString("%1").arg(newvalue);

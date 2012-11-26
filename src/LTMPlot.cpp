@@ -49,7 +49,7 @@ LTMPlot::LTMPlot(LTMPlotContainer *parent, MainWindow *main, QDir home) : bg(NUL
     setInstanceName("Metric Plot");
 
     // get application settings
-    useMetricUnits = appsettings->value(this, GC_UNIT).toString() == "Metric";
+    useMetricUnits = main->useMetricUnits;
 
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setAxisTitle(yLeft, tr(""));
@@ -78,7 +78,7 @@ void
 LTMPlot::configUpdate()
 {
     // get application settings
-    useMetricUnits = appsettings->value(this, GC_UNIT).toString() == "Metric";
+    useMetricUnits = main->useMetricUnits;
 
     // set basic plot colors
     setCanvasBackground(GColor(CPLOTBACKGROUND));

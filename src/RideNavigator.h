@@ -73,6 +73,8 @@ class RideNavigator : public GcWindow
         // so the cell delegate can access
         QTreeView *tableView; // the view
 
+        MainWindow *main;
+
     signals:
 
     public slots:
@@ -140,7 +142,6 @@ class RideNavigator : public GcWindow
         QMap<QString, const RideMetric *> columnMetrics;
 
     private:
-        MainWindow *main;
         bool active;
         bool init;
         int currentColumn;

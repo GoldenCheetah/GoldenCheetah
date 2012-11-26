@@ -146,8 +146,6 @@ class PowerHist : public QwtPlot
         RideItem *rideItem;
         MainWindow *mainWindow;
         RideFile::SeriesType series;
-        bool useMetricUnits;  // whether metric units are used (or imperial)
-        QVariant unit;
         bool lny;
         bool shade;
         bool zoned;        // show in zones

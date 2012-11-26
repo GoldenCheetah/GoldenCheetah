@@ -245,9 +245,6 @@ MainWindow::MainWindow(const QDir &home) :
     GCColor *GCColorSet = new GCColor(this); // get/keep colorset
     GCColorSet->colorSet(); // shut up the compiler
 
-    QVariant unit = appsettings->value(this, GC_UNIT);
-    useMetricUnits = (unit.toString() == "Metric");
-
 #if (defined Q_OS_MAC) && (defined GC_HAVE_LION)
     fullScreen = new LionFullScreen(this);
 #endif
@@ -268,6 +265,13 @@ MainWindow::MainWindow(const QDir &home) :
     cyclist = home.dirName();
     setInstanceName(cyclist);
     seasons = new Seasons(home);
+
+    QVariant unit = appsettings->cvalue(cyclist, GC_UNIT);
+    if (unit == 0) {
+        unit = appsettings->value(this, GC_UNIT);
+        appsettings->setCValue(cyclist, GC_UNIT, unit);
+    }
+    useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
 
     // read power zones...
     QFile zonesFile(home.absolutePath() + "/power.zones");
@@ -1317,7 +1321,7 @@ void MainWindow::showTools()
 
 void MainWindow::showRhoEstimator()
 {
-   ToolsRhoEstimator *tre = new ToolsRhoEstimator();
+   ToolsRhoEstimator *tre = new ToolsRhoEstimator(this);
    tre->show();
 }
 
@@ -2223,6 +2227,9 @@ MainWindow::notifyConfigChanged()
        else if (! hrzones_->warningString().isEmpty())
             QMessageBox::warning(this, tr("Reading HR Zones File"), hrzones_->warningString());
     }
+
+    QVariant unit = appsettings->cvalue(cyclist, GC_UNIT);
+    useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
 
     // now tell everyone else
     configChanged();

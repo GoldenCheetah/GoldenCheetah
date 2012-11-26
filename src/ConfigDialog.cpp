@@ -148,11 +148,6 @@ void ConfigDialog::save_Clicked()
     else if (configPage->langCombo->currentIndex()==7)
         appsettings->setValue(GC_LANG, "cs");
 
-    if (configPage->unitCombo->currentIndex()==0)
-        appsettings->setValue(GC_UNIT, "Metric");
-    else if (configPage->unitCombo->currentIndex()==1)
-        appsettings->setValue(GC_UNIT, "Imperial");
-
     appsettings->setValue(GC_GARMIN_HWMARK, configPage->garminHWMarkedit->text().toInt());
     appsettings->setValue(GC_GARMIN_SMARTRECORD, configPage->garminSmartRecord->checkState());
     appsettings->setValue(GC_CRANKLENGTH, configPage->crankLengthCombo->currentText());

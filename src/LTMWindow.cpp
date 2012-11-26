@@ -204,7 +204,7 @@ LTMWindow::refresh()
     // refresh for changes to ridefiles / zones
     if (amVisible() == true && main->metricDB != NULL) {
         // if config has changed get new useMetricUnits
-        useMetricUnits = appsettings->value(this, GC_UNIT).toString() == "Metric";
+        useMetricUnits = main->useMetricUnits;
         results.clear(); // clear any old data
         results = main->metricDB->getAllMetricsFor(settings.start, settings.end);
         measures.clear(); // clear any old data

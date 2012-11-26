@@ -23,6 +23,8 @@
 #include <QDateTime>
 #include <QtGui>
 
+class MainWindow;
+
 // This class implements a dialog box containing a tool for
 // helping the user estimate rho, the air density, given
 // temperature, pressure, and dew point as inputs.
@@ -31,9 +33,11 @@ class ToolsRhoEstimator : public QDialog {
         G_OBJECT
 
     public:
-        ToolsRhoEstimator(QWidget *parent = 0);
+        ToolsRhoEstimator(MainWindow *mainWindow, QWidget *parent = 0);
 
     private:
+        MainWindow *mainWindow;
+
         bool useMetricUnits;
         QRadioButton *metBut;
         QRadioButton *impBut;

@@ -282,6 +282,7 @@ class GradientPage : public WorkoutPage
 
     WorkoutEditorGradient *we;
     WorkoutMetricsSummary *metricsSummary;
+    MainWindow *mainWindow;
     int ftp;
     bool metricUnits;
 

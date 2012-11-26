@@ -515,7 +515,7 @@ void GradientPage::initializePage()
 {
     int zoneRange = hackMW->zones()->whichRange(QDate::currentDate());
     ftp = hackMW->zones()->getCP(zoneRange);
-    metricUnits = (appsettings->value(NULL, GC_UNIT).toString() == "Metric");
+    metricUnits = hackMW->useMetricUnits;
     setTitle("Workout Wizard");
 
     setSubTitle("Manually crate a workout based on gradient (slope) and distance, maxium grade is 5.");
@@ -609,7 +609,7 @@ void ImportPage::initializePage()
         setFinalPage(true);
         QVBoxLayout *layout = new QVBoxLayout();
         plot = new WorkoutPlot();
-        metricUnits = (appsettings->value(NULL, GC_UNIT).toString() == "Metric");
+        metricUnits = hackMW->useMetricUnits;
         QString s = (metricUnits ? "KM" : "Miles");
         QString distance = QString("Distance (") + s + QString(")");
         plot->setXAxisTitle(distance);

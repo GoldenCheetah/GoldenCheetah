@@ -919,8 +919,8 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
         if (metricValue) {
             // metric / imperial converstion
-            metricValue *= (appsettings->value(this, GC_UNIT).toString() == "Metric") ? 1 : m->conversion();
-            metricValue += (appsettings->value(this, GC_UNIT).toString() == "Metric") ? 0 : m->conversionSum();
+            metricValue *= (rideNavigator->main->useMetricUnits) ? 1 : m->conversion();
+            metricValue += (rideNavigator->main->useMetricUnits) ? 0 : m->conversionSum();
 
             // format with the right precision
             if (m->units(true) == "seconds") {

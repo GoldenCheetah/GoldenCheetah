@@ -226,7 +226,6 @@ max(double a, double b) { if (a > b) return a; else return b; }
 AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     QwtPlot(parent),
     rideItem(NULL),
-    unit(0),
     shade_zones(true),
     showPowerState(3),
     showHrState(Qt::Checked),
@@ -238,14 +237,15 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     showTorqueState(Qt::Checked),
     showBalanceState(Qt::Checked),
     bydist(false),
+    mainWindow(mainWindow),
     parent(parent)
 {
     setInstanceName("AllPlot");
-    unit = appsettings->value(this, GC_UNIT);
 
     referencePlot = NULL;
 
-    useMetricUnits = (unit.toString() == "Metric");
+    useMetricUnits = mainWindow->useMetricUnits;
+
     if (appsettings->value(this, GC_SHADEZONES, true).toBool()==false)
         shade_zones = false;
 
@@ -318,7 +318,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
 void
 AllPlot::configChanged()
 {
-
+    useMetricUnits = mainWindow->useMetricUnits;
     double width = appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble();
 
     if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true) {
@@ -951,7 +951,7 @@ void
 AllPlot::setXTitle()
 {
     if (bydist)
-        setAxisTitle(xBottom, tr("Distance ")+QString(unit.toString() == "Metric"?"(km)":"(miles)"));
+        setAxisTitle(xBottom, tr("Distance ")+QString(useMetricUnits?"(km)":"(miles)"));
     else
         setAxisTitle(xBottom, tr("Time (Hours:Minutes)"));
 }

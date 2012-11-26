@@ -127,8 +127,7 @@ RideSummaryWindow::htmlSummary() const
 
     RideItem *rideItem = myRideItem;
     RideFile *ride = rideItem->ride();
-    QVariant unit = appsettings->value(this, GC_UNIT);
-    bool useMetricUnits = (unit.toString() == "Metric");
+    bool useMetricUnits = mainWindow->useMetricUnits;
 
     // ride summary and there were ridefile read errors?
     if (ridesummary && !ride) {
@@ -291,7 +290,7 @@ RideSummaryWindow::htmlSummary() const
                  else {
 
                     // get the value - from metrics or from data array
-                    if (ridesummary) s = s.arg(metrics.getForSymbol(symbol) * (useMetricUnits ? 1 : m->conversion()) 
+                    if (ridesummary) s = s.arg(metrics.getForSymbol(symbol) * (useMetricUnits ? 1 : m->conversion())
                                                + (useMetricUnits ? 0 : m->conversionSum()), 0, 'f', m->precision());
                     else s = s.arg(SummaryMetrics::getAggregated(symbol, data, useMetricUnits));
                 }

@@ -398,9 +398,6 @@ RideImportWizard::process()
                    tableWidget->item(i,1)->setTextAlignment(Qt::AlignRight); // put in the middle
                    tableWidget->item(i,2)->setTextAlignment(Qt::AlignRight); // put in the middle
 
-                   QVariant unit = appsettings->value(this, GC_UNIT);
-                   bool metric = unit.toString() == "Metric";
-
                    // time and distance from tags (.gc files)
                    QMap<QString,QString> lookup;
                    lookup = ride->metricOverrides.value("total_distance");
@@ -423,7 +420,7 @@ RideImportWizard::process()
                    tableWidget->item(i,3)->setTextAlignment(Qt::AlignHCenter); // put in the middle
 
                    // show distance by looking at last data point
-                   QString dist = metric
+                   QString dist = mainWindow->useMetricUnits
                        ? QString ("%1 km").arg(km, 0, 'f', 1)
                        : QString ("%1 mi").arg(km * MILES_PER_KM, 0, 'f', 1);
                    tableWidget->item(i,4)->setText(dist);

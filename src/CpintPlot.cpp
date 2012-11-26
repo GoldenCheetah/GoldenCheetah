@@ -177,7 +177,7 @@ CpintPlot::setSeries(RideFile::SeriesType x)
             break;
 
         case RideFile::wattsKg:
-            if (appsettings->value(NULL, GC_UNIT).toString() == "Metric")
+            if (mainWindow->useMetricUnits)
                 setAxisTitle(yLeft, tr("Watts per kilo (watts/kg)"));
             else
                 setAxisTitle(yLeft, tr("Watts per lb (watts/lb)"));
@@ -745,7 +745,7 @@ CpintPlot::pointHover(QwtPlotCurve *curve, int index)
         text = QString("%1\n%3 %4%5")
             .arg(interval_to_str(60.0*xvalue))
             .arg(yvalue, 0, 'f', RideFile::decimalsFor(series))
-            .arg(RideFile::unitName(series))
+            .arg(RideFile::unitName(series, mainWindow))
             .arg(dateStr);
 
         // set that text up

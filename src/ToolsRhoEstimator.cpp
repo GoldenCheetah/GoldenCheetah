@@ -20,6 +20,7 @@
 
 #include "ToolsRhoEstimator.h"
 #include "Settings.h"
+#include "MainWindow.h"
 #include "Units.h"
 #include <QtGui>
 #include <sstream>
@@ -27,11 +28,10 @@
 
 typedef QDoubleSpinBox* QDoubleSpinBoxPtr;
 
-ToolsRhoEstimator::ToolsRhoEstimator(QWidget *parent) : QDialog(parent) {
+ToolsRhoEstimator::ToolsRhoEstimator(MainWindow *mainWindow, QWidget *parent) : QDialog(parent), mainWindow(mainWindow) {
   // Does the user prefer metric or imperial?  Set the initial radio
   // button and field settings to their GoldenCheetah preference.
-  QVariant unit = appsettings->value(NULL, GC_UNIT);
-  useMetricUnits = (unit.toString() == "Metric");
+  useMetricUnits = mainWindow->useMetricUnits;
 
   // Set the main window title.
   setWindowTitle(tr("Air Density (Rho) Estimator"));

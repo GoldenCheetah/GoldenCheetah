@@ -100,7 +100,6 @@ class AllPlot : public QwtPlot
         RideItem *rideItem;
         AllPlotBackground *bg;
         QSettings *settings;
-        QVariant unit;
         bool useMetricUnits;
 
         // controls
@@ -167,6 +166,8 @@ class AllPlot : public QwtPlot
         bool bydist;
 
     private:
+        MainWindow *mainWindow;
+
         AllPlot *referencePlot;
         AllPlotWindow *parent;
         LTMToolTip *tooltip;
