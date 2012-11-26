@@ -311,6 +311,7 @@ HomeWindow::selected()
     if (loaded == false) {
         restoreState();
         loaded = true;
+        if (!currentStyle) tabSelected(0);
     }
 
     resizeEvent(NULL); // force a relayout
@@ -353,7 +354,7 @@ HomeWindow::rideSelected()
             // to force the tabwidget to refresh AND set its ride property (see below)
             //otherwise just go ahead and notify it of a new ride
             if (!currentStyle && charts.count() && i==tabbed->currentIndex())
-                tabSelected(tabbed->currentIndex());
+                tabSelected(tabbed->currentIndex(), true); // for ride change
             else
                 charts[i]->setProperty("ride", property("ride"));
         }
@@ -374,7 +375,7 @@ HomeWindow::dateRangeChanged(DateRange dr)
             // to force the tabwidget to refresh AND set its ride property (see below)
             //otherwise just go ahead and notify it of a new ride
             if (!currentStyle && charts.count() && i==tabbed->currentIndex())
-                tabSelected(tabbed->currentIndex());
+                tabSelected(tabbed->currentIndex(), false); // for date range
             else
                 charts[i]->setProperty("dateRange", property("dateRange"));
         }
@@ -384,7 +385,10 @@ HomeWindow::dateRangeChanged(DateRange dr)
 void
 HomeWindow::tabSelected(int index)
 {
+    // user switched tabs -- tell tabe to redraw!
     if (active || currentStyle != 0) return;
+
+    active = true;
 
     if (index >= 0) {
         charts[index]->show();
@@ -393,6 +397,26 @@ HomeWindow::tabSelected(int index)
         controlStack->setCurrentIndex(index);
         titleEdit->setText(charts[index]->property("title").toString());
     }
+
+    active = false;
+}
+
+void
+HomeWindow::tabSelected(int index, bool forride)
+{
+    if (active || currentStyle != 0) return;
+
+    active = true;
+
+    if (index >= 0) {
+        charts[index]->show();
+        if (forride) charts[index]->setProperty("ride", property("ride"));
+        else charts[index]->setProperty("dateRange", property("dateRange"));
+        controlStack->setCurrentIndex(index);
+        titleEdit->setText(charts[index]->property("title").toString());
+    }
+
+    active = false;
 }
 
 void

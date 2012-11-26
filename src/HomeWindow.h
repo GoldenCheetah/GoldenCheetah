@@ -60,6 +60,7 @@ class HomeWindow : public GcWindow
 
         // QT Widget events and signals
         void tabSelected(int id);
+        void tabSelected(int id, bool forride);
         void tabMoved(int from, int to);
         virtual void dragEnterEvent(QDragEnterEvent *);
         virtual void dropEvent(QDropEvent *);

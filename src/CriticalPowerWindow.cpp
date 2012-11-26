@@ -373,6 +373,8 @@ CriticalPowerWindow::resetSeasons()
 void
 CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
 {
+    if (!amVisible()) return;
+
     cpintPlot->changeSeason(dateRange.from, dateRange.to);
     cpintPlot->calculate(currentRide);
 }
