@@ -34,7 +34,7 @@
 #include <QXmlSimpleReader>
 
 CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, bool rangemode) :
-    GcWindow(parent), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), mainWindow(parent), currentRide(NULL), rangemode(rangemode)
+    GcWindow(parent), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), mainWindow(parent), currentRide(NULL), rangemode(rangemode), stale(true)
 {
     setInstanceName("Critical Power Window");
 
@@ -136,6 +136,9 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
 void
 CriticalPowerWindow::newRideAdded(RideItem *here)
 {
+    // any plots we already have are now stale
+    stale = true;
+
     // mine just got Zapped, a new rideitem would not be my current item
     if (here == currentRide) currentRide = NULL;
 
@@ -375,8 +378,14 @@ CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
 {
     if (!amVisible()) return;
 
+    if (dateRange.from == cfrom && dateRange.to == cto && !stale) return;
+
     cpintPlot->changeSeason(dateRange.from, dateRange.to);
     cpintPlot->calculate(currentRide);
+
+    cfrom = dateRange.from;
+    cto = dateRange.to;
+    stale = false;
 }
 
 void CriticalPowerWindow::seasonSelected(int iSeason)

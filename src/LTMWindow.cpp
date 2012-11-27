@@ -193,7 +193,10 @@ LTMWindow::rideSelected()
 void
 LTMWindow::refreshPlot()
 {
-    if (amVisible() == true) ltmPlot->setData(&settings);
+    if (amVisible() == true) {
+        ltmPlot->setData(&settings);
+        dirty = false;
+    }
 }
 
 // total redraw, reread data etc
@@ -234,7 +237,7 @@ LTMWindow::metricSelected()
 void
 LTMWindow::dateRangeChanged(DateRange range)
 {
-    if (!amVisible()) return;
+    if (!amVisible() && !dirty) return;
 
     settings.data = &results;
     settings.measures = &measures;
