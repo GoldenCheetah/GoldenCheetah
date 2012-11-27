@@ -439,7 +439,7 @@ AllPlotWindow::redrawFullPlot()
     if (!ride) return;
 
     // hide the usual plot decorations etc
-    fullPlot->showPower(1);
+    fullPlot->setShowPower(1);
     //We now use the window background color
     //fullPlot->setCanvasBackground(GColor(CPLOTTHUMBNAIL));
     fullPlot->setCanvasLineWidth(0);
@@ -728,8 +728,8 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
     else shade = false;
     allPlot->setShadeZones(shade);
     foreach (AllPlot *plot, allPlots) plot->setShadeZones(shade);
-    allPlot->showGrid(showGrid->checkState());
-    foreach (AllPlot *plot, allPlots) plot->showGrid(showGrid->checkState());
+    allPlot->setShowGrid(showGrid->checkState() == Qt::Checked);
+    foreach (AllPlot *plot, allPlots) plot->setShowGrid(showGrid->checkState() == Qt::Checked);
 
     // set the SpanSlider for the ride length, by default
     // show the entire ride (the user can adjust later)
@@ -1079,13 +1079,13 @@ AllPlotWindow::setShowPower(int value)
 
     // we only show the power shading on the
     // allPlot / stack plots, not on the fullPlot
-    allPlot->showPower(value);
+    allPlot->setShowPower(value);
     if (!showStack->isChecked())
         allPlot->replot();
 
     // redraw
     foreach (AllPlot *plot, allPlots)
-        plot->showPower(value);
+        plot->setShowPower(value);
 
     // now replot 'em - to avoid flicker
     if (showStack->isChecked()) {
@@ -1102,10 +1102,11 @@ AllPlotWindow::setShowHr(int value)
     showHr->setChecked(value);
 
     //if (!current) return;
+    bool checked = ( ( value == Qt::Checked ) && showHr->isEnabled()) ? true : false;
 
-    allPlot->showHr(value);
+    allPlot->setShowHr(checked);
     foreach (AllPlot *plot, allPlots)
-        plot->showHr(value);
+        plot->setShowHr(checked);
 }
 
 void
@@ -1114,10 +1115,11 @@ AllPlotWindow::setShowSpeed(int value)
     showSpeed->setChecked(value);
 
     //if (!current) return;
+    bool checked = ( ( value == Qt::Checked ) && showSpeed->isEnabled()) ? true : false;
 
-    allPlot->showSpeed(value);
+    allPlot->setShowSpeed(checked);
     foreach (AllPlot *plot, allPlots)
-        plot->showSpeed(value);
+        plot->setShowSpeed(checked);
 }
 
 void
@@ -1126,10 +1128,11 @@ AllPlotWindow::setShowCad(int value)
     showCad->setChecked(value);
 
     //if (!current) return;
+    bool checked = ( ( value == Qt::Checked ) && showCad->isEnabled()) ? true : false;
 
-    allPlot->showCad(value);
+    allPlot->setShowCad(checked);
     foreach (AllPlot *plot, allPlots)
-        plot->showCad(value);
+        plot->setShowCad(checked);
 }
 
 void
@@ -1138,10 +1141,11 @@ AllPlotWindow::setShowAlt(int value)
     showAlt->setChecked(value);
 
     //if (!current) return;
+    bool checked = ( ( value == Qt::Checked ) && showAlt->isEnabled()) ? true : false;
 
-    allPlot->showAlt(value);
+    allPlot->setShowAlt(checked);
     foreach (AllPlot *plot, allPlots)
-        plot->showAlt(value);
+        plot->setShowAlt(checked);
 }
 
 void
@@ -1150,10 +1154,11 @@ AllPlotWindow::setShowTemp(int value)
     showTemp->setChecked(value);
 
     //if (!current) return;
+    bool checked = ( ( value == Qt::Checked ) && showTemp->isEnabled()) ? true : false;
 
-    allPlot->showTemp(value);
+    allPlot->setShowTemp(checked);
     foreach (AllPlot *plot, allPlots)
-        plot->showTemp(value);
+        plot->setShowTemp(checked);
 }
 
 void
@@ -1162,22 +1167,24 @@ AllPlotWindow::setShowWind(int value)
     showWind->setChecked(value);
 
     //if (!current) return;
+    bool checked = ( ( value == Qt::Checked ) && showWind->isEnabled()) ? true : false;
 
-    allPlot->showWind(value);
+    allPlot->setShowWind(checked);
     foreach (AllPlot *plot, allPlots)
-        plot->showWind(value);
+        plot->setShowWind(checked);
 }
 
 void
 AllPlotWindow::setShowTorque(int value)
 {
     showTorque->setChecked(value);
+    bool checked = ( ( value == Qt::Checked ) && showTorque->isEnabled()) ? true : false;
 
     //if (!current) return;
 
-    allPlot->showTorque(value);
+    allPlot->setShowTorque(checked);
     foreach (AllPlot *plot, allPlots)
-        plot->showTorque(value);
+        plot->setShowTorque(checked);
 }
 
 void
@@ -1185,9 +1192,11 @@ AllPlotWindow::setShowBalance(int value)
 {
     showBalance->setChecked(value);
 
-    allPlot->showBalance(value);
+    bool checked = ( ( value == Qt::Checked ) && showBalance->isEnabled()) ? true : false;
+
+    allPlot->setShowBalance(checked);
     foreach (AllPlot *plot, allPlots)
-        plot->showBalance(value);
+        plot->setShowBalance(checked);
 }
 
 void
@@ -1217,9 +1226,9 @@ AllPlotWindow::setShowGrid(int value)
 
     //if (!current) return;
 
-    allPlot->showGrid(value);
+    allPlot->setShowGrid(value);
     foreach (AllPlot *plot, allPlots)
-        plot->showGrid(value);
+        plot->setShowGrid(value);
 }
 
 void
@@ -1487,14 +1496,14 @@ AllPlotWindow::setupStackPlots()
 
         // controls
         _allPlot->setShadeZones(showPower->currentIndex() == 0);
-        _allPlot->showPower(showPower->currentIndex());
-        _allPlot->showHr(showHr->checkState());
-        _allPlot->showSpeed(showSpeed->checkState());
-        _allPlot->showCad(showCad->checkState());
-        _allPlot->showAlt(showAlt->checkState());
-        _allPlot->showTemp(showTemp->checkState());
-        _allPlot->showTorque(showTorque->checkState());
-        _allPlot->showGrid(showGrid->checkState());
+        _allPlot->setShowPower(showPower->currentIndex());
+        _allPlot->setShowHr( (showHr->isEnabled()) ? ( showHr->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowSpeed((showSpeed->isEnabled()) ? ( showSpeed->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowCad((showCad->isEnabled()) ? ( showCad->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowAlt((showAlt->isEnabled()) ? ( showAlt->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowTemp((showTemp->isEnabled()) ? ( showTemp->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowTorque((showTorque->isEnabled()) ? ( showTorque->checkState() == Qt::Checked ) : false );
+        _allPlot->setShowGrid(showGrid->checkState() == Qt::Checked);
         _allPlot->setPaintBrush(paintBrush->checkState());
         _allPlot->setSmoothing(smoothSlider->value());
         _allPlot->setByDistance(comboDistance->currentIndex());
