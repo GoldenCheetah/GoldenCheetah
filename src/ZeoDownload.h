@@ -55,6 +55,6 @@ private:
     int allMeasures;
     int newMeasures;
 
-    void nextDate();
+    bool nextDate();
 };
 #endif
