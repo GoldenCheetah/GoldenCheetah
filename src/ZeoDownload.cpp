@@ -108,15 +108,14 @@ ZeoDownload::downloadFinished(QNetworkReply *reply)
         dates.removeFirst();
     }
 
-    nextDate();
-
-    QString status = QString(tr("%1 new on %2 measurements received.")).arg(newMeasures).arg(allMeasures);
-    QMessageBox::information(main, tr("Zeo Data Download"), status);
-
+    if (!nextDate()) {
+        QString status = QString(tr("%1 new on %2 measurements received.")).arg(newMeasures).arg(allMeasures);
+        QMessageBox::information(main, tr("Zeo Data Download"), status);
+    }
     return;
 }
 
-void
+bool
 ZeoDownload::nextDate()
 {
     if (!dates.empty()) {
@@ -131,7 +130,7 @@ ZeoDownload::nextDate()
             if (sm.getText("Sleep time", "").length()>0 && sm.getText("Sleep index (ZQ)", "").length()>0) {
                 present = true;
                 dates.removeFirst();
-                nextDate();
+                return nextDate();
             }
         }
 
@@ -148,9 +147,10 @@ ZeoDownload::nextDate()
 
             if (reply->error() != QNetworkReply::NoError) {
                 QMessageBox::warning(main, tr("Zeo Data Download"), reply->errorString());
-            }
+            } else
+                return true;
         }
     }
 
-    return;
+    return false;
 }
