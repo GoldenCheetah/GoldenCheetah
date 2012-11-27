@@ -68,6 +68,7 @@ class NamedSearches;
 class ChartSettings;
 class QtMacSegmentedButton;
 class GcScopeBar;
+class RideFileCache;
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 
@@ -95,6 +96,7 @@ class MainWindow : public QMainWindow
         RideNavigator *listView;
         MetricAggregator *metricDB;
         Seasons *seasons;
+        QList<RideFileCache*> cpxCache;
 
         // athlete's ride library
         void addRide(QString name, bool bSelect=true);
@@ -233,6 +235,7 @@ class MainWindow : public QMainWindow
         void stop();
 
     public slots:
+        void checkCPX(RideItem*);
         void showTreeContextMenuPopup(const QPoint &);
         void closeAll();
 

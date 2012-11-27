@@ -27,6 +27,8 @@
 #include <QMessageBox>
 #include <QtAlgorithms> // for qStableSort
 
+static const int maxcache = 25; // lets max out at 25 caches
+
 // cache from ride
 RideFileCache::RideFileCache(MainWindow *main, QString fileName, RideFile *passedride, bool check) :
                main(main), rideFileName(fileName), ride(passedride)
@@ -870,8 +872,17 @@ static void distAggregate(QVector<double> &into, QVector<double> &other)
 }
 
 RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end, bool filter, QStringList files)
-               : main(main), rideFileName(""), ride(0)
+               : main(main), rideFileName(""), ride(0), start(start), end(end)
 {
+
+    // Oh lets get from the cache if we can
+    foreach(RideFileCache *p, main->cpxCache) {
+        if (p->start == start && p->end == end) {
+            *this = *p;
+            return;
+        }
+    }
+
     // resize all the arrays to zero - expand as neccessary
     xPowerMeanMax.resize(0);
     npMeanMax.resize(0);
@@ -941,6 +952,14 @@ RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end, bool filt
 
     // set the cursor back to normal
     main->setCursor(Qt::ArrowCursor);
+
+    // lets add to the cache for others to re-use
+    if (main->cpxCache.count() > maxcache) {
+        delete(main->cpxCache.at(0));
+        main->cpxCache.removeAt(0);
+    }
+    main->cpxCache.append(new RideFileCache(this));
+
 }
 
 //
