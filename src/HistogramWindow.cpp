@@ -156,10 +156,7 @@ HistogramWindow::rideSelected()
 void
 HistogramWindow::rideAddorRemove(RideItem *)
 {
-    if (rangemode) {
-        stale = true;
-        updateChart();
-    }
+    stale = true;
 }
 
 void
@@ -186,11 +183,14 @@ HistogramWindow::zonesChanged()
     powerHist->replot();
 }
 
-void HistogramWindow::dateRangeChanged(DateRange)
+void HistogramWindow::dateRangeChanged(DateRange dateRange)
 {
-    if (!amVisible()) return;
+    // has it changed?
+    if (dateRange.from != cfrom || dateRange.to != cto) 
+        stale = true;
 
-    stale = true;
+    if (!amVisible() && !stale) return;
+
     updateChart();
 }
 
@@ -275,7 +275,8 @@ HistogramWindow::updateChart()
 #else
             source = new RideFileCache(mainWindow, myDateRange.from, myDateRange.to);
 #endif
-
+            cfrom = myDateRange.from;
+            cto = myDateRange.to;
             stale = false;
 
             if (old) delete old; // guarantee source pointer changes

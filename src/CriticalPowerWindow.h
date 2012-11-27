@@ -118,6 +118,8 @@ class CriticalPowerWindow : public GcWindow
 #endif
 
         bool rangemode;
+        QDate cfrom, cto;
+        bool stale;
 };
 
 #endif // _GC_CriticalPowerWindow_h

@@ -115,6 +115,7 @@ class HistogramWindow : public GcWindow
         int powerRange, hrRange;
 
         bool stale;
+        QDate cfrom, cto;
         RideFileCache *source;
         bool interval;
 #ifdef GC_HAVE_LUCENE
