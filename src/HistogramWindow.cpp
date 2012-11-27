@@ -189,7 +189,7 @@ void HistogramWindow::dateRangeChanged(DateRange dateRange)
     if (dateRange.from != cfrom || dateRange.to != cto) 
         stale = true;
 
-    if (!amVisible() && !stale) return;
+    if (!amVisible() || !stale) return;
 
     updateChart();
 }

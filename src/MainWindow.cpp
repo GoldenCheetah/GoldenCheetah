@@ -42,6 +42,7 @@
 #endif
 #include "RideNavigator.h"
 #include "RideFile.h"
+#include "RideFileCache.h"
 #include "RideImportWizard.h"
 #include "RideMetadata.h"
 #include "RideMetric.h"
@@ -882,6 +883,10 @@ MainWindow::MainWindow(const QDir &home) :
     connect(this, SIGNAL(rideDirty()), this, SLOT(enableSaveButton()));
     connect(this, SIGNAL(rideClean()), this, SLOT(enableSaveButton()));
 
+    // cpx aggregate cache check
+    connect(this,SIGNAL(rideAdded(RideItem*)),this,SLOT(checkCPX(RideItem*)));
+    connect(this,SIGNAL(rideDeleted(RideItem*)),this,SLOT(checkCPX(RideItem*)));
+
     // Kick off
     rideTreeWidgetSelectionChanged();
     analWindow->selected();
@@ -1638,6 +1643,18 @@ MainWindow::removeCurrentRide()
 }
 
 void
+MainWindow::checkCPX(RideItem*ride)
+{
+    QList<RideFileCache*> newList;
+
+    foreach(RideFileCache *p, cpxCache) {
+        if (ride->dateTime.date() < p->start || ride->dateTime.date() > p->end)
+            newList.append(p);
+    }
+    cpxCache = newList;
+}
+
+void
 MainWindow::downloadRide()
 {
     (new DownloadRideDialog(this, home))->show();
@@ -2363,4 +2380,5 @@ MainWindow::actionClicked(int index)
 
     }
 }
+
 #endif

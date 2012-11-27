@@ -109,6 +109,7 @@ class RideFileCache
     public:
         enum cachetype { meanmax, distribution, none };
         typedef enum cachetype CacheType;
+        QDate start, end;
 
         // Construct from a ridefile or its filename
         // will reference cache if it exists, and create it
@@ -122,6 +123,9 @@ class RideFileCache
         // Construct a ridefile cache that represents the data
         // across a date range. This is used to provide aggregated data.
         RideFileCache(MainWindow *main, QDate start, QDate end, bool filter = false, QStringList files = QStringList());
+
+        // not actually a copy constructor -- but we call it IN the constructor.
+        RideFileCache(RideFileCache *other) { *this = *other; }
 
         static int decimalsFor(RideFile::SeriesType series);
 
