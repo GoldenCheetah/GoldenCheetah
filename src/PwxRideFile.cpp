@@ -257,6 +257,21 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
         // need to determine the recIntSecs - first - second sample?
         rideFile->setRecIntSecs(rideFile->dataPoints()[1]->secs -
                                 rideFile->dataPoints()[0]->secs);
+
+        // if its a daft number then make it 1s -- there is probably
+        // a gap in recording in there.
+        switch ((int)rideFile->recIntSecs()) {
+            case 1 : // lots!
+            case 4 : // garmin smart recording
+            case 5 : // polar sometimes
+            case 10 : // polar and others
+            case 15 :
+                break;
+
+            default:
+                rideFile->setRecIntSecs(1);
+                break;
+        }
     }
     return rideFile;
 }
