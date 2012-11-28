@@ -602,6 +602,8 @@ PowerHist::setData(RideFileCache *cache)
         wattsZoneArray[i] = cache->wattsZoneArray()[i];
         hrZoneArray[i] = cache->hrZoneArray()[i];
     }
+
+    curveSelected->hide();
 }
 
 void
@@ -770,6 +772,7 @@ PowerHist::setData(RideItem *_rideItem, bool force)
         curveSelected->setData(&zero, &zero, 0);
         replot();
     }
+    curveSelected->show();
     zoomer->setZoomBase();
 }
 
