@@ -21,6 +21,11 @@
 #include <QDebug>
 #include <assert.h>
 
+static inline QString unquote(QString quoted)
+{
+    return quoted.mid(1,quoted.length()-2);
+}
+
 bool SeasonParser::startDocument()
 {
     buffer.clear();
@@ -43,6 +48,10 @@ bool SeasonParser::endElement( const QString&, const QString&, const QString &qN
         season.load().resize(loadcount+1);
         season.load()[loadcount] = buffer.trimmed().toInt();
         loadcount++;
+    } else if (qName == "event") {
+
+        season.events.append(SeasonEvent(unquote(buffer.trimmed()), QDate::fromString(dateString)));
+
     } else if(qName == "season") {
 
         if(seasons.size() >= 1) {
@@ -56,12 +65,19 @@ bool SeasonParser::endElement( const QString&, const QString&, const QString &qN
     return TRUE;
 }
 
-bool SeasonParser::startElement( const QString&, const QString&, const QString &name, const QXmlAttributes & )
+bool SeasonParser::startElement( const QString&, const QString&, const QString &name, const QXmlAttributes &attrs )
 {
     buffer.clear();
     if(name == "season") {
         season = Season();
         loadcount = 0;
+    }
+
+    if (name == "event") {
+
+        for(int i=0; i<attrs.count(); i++) {
+            if (attrs.qName(i) == "date") dateString=attrs.value(i);
+        }
     }
 
     return TRUE;
@@ -142,6 +158,13 @@ SeasonParser::serialize(QString filename, QList<Season>Seasons)
             for (int i=9; i<season.load().count(); i++)
                 out <<QString("\t<load>%1</load>\n").arg(season.load()[i]);
 
+            foreach(SeasonEvent x, season.events) {
+
+                out<<QString("\t\t<event date=\"%1\">\"%2\"</event>")
+                            .arg(x.name)
+                            .arg(x.date.toString("yyyy-MM-dd"));
+            
+            }
             out <<QString("\t</season>\n");
         }
     }

@@ -44,6 +44,7 @@ protected:
     Season season;
     QList<Season> seasons;
     int loadcount;
+    QString dateString;
 
 };
 #endif //SeasonParser

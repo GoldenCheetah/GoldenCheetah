@@ -26,6 +26,15 @@
 
 #include "MainWindow.h"
 
+class SeasonEvent
+{
+    public:
+        SeasonEvent(QString name, QDate date) : name(name), date(date) {}
+
+        QString name;
+        QDate date;
+};
+
 class Season
 {
 	public:
@@ -58,6 +67,7 @@ class Season
         int type;
 
         QVector<int> _load; // array of daily planned load
+        QList<SeasonEvent> events;
 };
 
 class EditSeasonDialog : public QDialog
