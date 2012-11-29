@@ -147,6 +147,10 @@ void ConfigDialog::save_Clicked()
         appsettings->setValue(GC_LANG, "ru");
     else if (configPage->langCombo->currentIndex()==7)
         appsettings->setValue(GC_LANG, "cs");
+    else if (configPage->langCombo->currentIndex()==8)
+        appsettings->setValue(GC_LANG, "es");
+    else if (configPage->langCombo->currentIndex()==9)
+        appsettings->setValue(GC_LANG, "pt");
 
     appsettings->setValue(GC_GARMIN_HWMARK, configPage->garminHWMarkedit->text().toInt());
     appsettings->setValue(GC_GARMIN_SMARTRECORD, configPage->garminSmartRecord->checkState());

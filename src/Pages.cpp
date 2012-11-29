@@ -48,27 +48,35 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
     langCombo->addItem(tr("German"));
     langCombo->addItem(tr("Russian"));
     langCombo->addItem(tr("Czech"));
+    langCombo->addItem(tr("Spanish"));
+    langCombo->addItem(tr("Portugese"));
 
-    QVariant lang = appsettings->value(this, GC_LANG);
+    // Default to system locale
+    QVariant lang = appsettings->value(this, GC_LANG, QLocale::system().name());
 
-    if(lang.toString() == "en")
+    if(lang.toString().startsWith("en"))
         langCombo->setCurrentIndex(0);
-    else if(lang.toString() == "fr")
+    else if(lang.toString().startsWith("fr"))
         langCombo->setCurrentIndex(1);
-    else if(lang.toString() == "ja")
+    else if(lang.toString().startsWith("ja"))
         langCombo->setCurrentIndex(2);
-    else if(lang.toString() == "pt-br")
+    else if(lang.toString().startsWith("pt-br"))
         langCombo->setCurrentIndex(3);
-    else if(lang.toString() == "it")
+    else if(lang.toString().startsWith("it"))
         langCombo->setCurrentIndex(4);
-    else if(lang.toString() == "de")
+    else if(lang.toString().startsWith("de"))
         langCombo->setCurrentIndex(5);
-    else if(lang.toString() == "ru")
+    else if(lang.toString().startsWith("ru"))
         langCombo->setCurrentIndex(6);
-    else if(lang.toString() == "cs")
+    else if(lang.toString().startsWith("cs"))
         langCombo->setCurrentIndex(7);
+    else if(lang.toString().startsWith("es"))
+        langCombo->setCurrentIndex(8);
+    else if(lang.toString().startsWith("pt"))
+        langCombo->setCurrentIndex(9);
     else // default : English
         langCombo->setCurrentIndex(0);
+
 
     QLabel *crankLengthLabel = new QLabel(tr("Crank Length:"));
 
