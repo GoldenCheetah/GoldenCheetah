@@ -88,6 +88,7 @@ class LTMPlot : public QwtPlot
               lastDate;
 
         QHash< QwtPlotCurve *, int> stacks; // map curve to stack #
+        QList<QwtPlotMarker*> markers; // seasons and events
         QVector< QVector<double>* > stackX;
         QVector< QVector<double>* > stackY;
 
@@ -100,6 +101,7 @@ class LTMPlot : public QwtPlot
         void aggregateCurves(QVector<double> &a, QVector<double>&w); // aggregate a with w, updates a
         int chooseYAxis(QString);
         void refreshZoneLabels(int);
+        void refreshMarkers(QDate from, QDate to, int groupby);
 };
 
 // Produce Labels for X-Axis
