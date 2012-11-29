@@ -3753,6 +3753,9 @@ SeasonsPage::upClicked()
         QTreeWidgetItem* moved = seasons->invisibleRootItem()->takeChild(index);
         seasons->invisibleRootItem()->insertChild(index-1, moved);
         seasons->setCurrentItem(moved);
+
+        // and move the array too
+        array.move(index, index-1);
     }
 }
 
@@ -3766,6 +3769,8 @@ SeasonsPage::downClicked()
         QTreeWidgetItem* moved = seasons->invisibleRootItem()->takeChild(index);
         seasons->invisibleRootItem()->insertChild(index+1, moved);
         seasons->setCurrentItem(moved);
+
+        array.move(index, index+1);
     }
 }
 
@@ -3790,6 +3795,7 @@ SeasonsPage::addClicked()
 
     QTreeWidgetItem *add = new QTreeWidgetItem(seasons->invisibleRootItem());
     add->setFlags(add->flags() & ~Qt::ItemIsEditable);
+    QString id;
 
     // tab name
     add->setText(0, nameEdit->text());
@@ -3800,10 +3806,18 @@ SeasonsPage::addClicked()
     // to
     add->setText(3, toEdit->date().toString("ddd MMM d, yyyy"));
     // guid -- hidden
-    add->setText(4, QUuid::createUuid().toString());
+    add->setText(4, (id=QUuid::createUuid().toString()));
 
     // now clear the edits
     clearEdit();
+
+    Season addSeason;
+    addSeason.setStart(fromEdit->date());
+    addSeason.setEnd(toEdit->date());
+    addSeason.setName(nameEdit->text());
+    addSeason.setType(typeEdit->currentIndex());
+    addSeason.setId(id);
+    array.append(Season());
 }
 
 void
@@ -3814,25 +3828,25 @@ SeasonsPage::deleteClicked()
 
         // zap!
         delete seasons->invisibleRootItem()->takeChild(index);
+
+        array.removeAt(index);
     }
 }
 
 void
 SeasonsPage::saveClicked()
 {
-    // update the season array to reflect our edits
-    array.clear();
+    // get any edits to the names and dates
+    // since we don't trap these as they are made
     for(int i=0; i<seasons->invisibleRootItem()->childCount(); i++) {
 
         QTreeWidgetItem *item = seasons->invisibleRootItem()->child(i);
 
-        Season add;
-        add.name = item->text(0);
-        add.type = Season::types.indexOf(item->text(1));
-        add.start = QDate::fromString(item->text(2), "ddd MMM d, yyyy");
-        add.end = QDate::fromString(item->text(3), "ddd MMM d, yyyy");
-        add._id = QUuid(item->text(4));
-        array << add;
+        array[i].setName(item->text(0));
+        array[i].setType(Season::types.indexOf(item->text(1)));
+        array[i].setStart(QDate::fromString(item->text(2), "ddd MMM d, yyyy"));
+        array[i].setEnd(QDate::fromString(item->text(3), "ddd MMM d, yyyy"));
+        array[i]._id = QUuid(item->text(4));
     }
 
     // write to disk
