@@ -533,18 +533,20 @@ LTMSidebar::setSummary(DateRange dateRange)
 
                 QString value = SummaryMetrics::getAggregated(metricname, results, useMetricUnits);
 
+                // Maximum Max and Average Average looks nasty, remove from name for display
+                QString s = metric ? metric->name().replace(QRegExp(tr("^(Average|Max) ")), "") : "unknown";
 
                 // don't show units for time values
                 if (metric && (metric->units(useMetricUnits) == "seconds" ||
                                metric->units(useMetricUnits) == "")) {
 
                     summaryText += QString("<tr><td>%1:</td><td align=\"right\"> %2</td>")
-                                            .arg(metric ? metric->name() : "unknown")
+                                            .arg(s)
                                             .arg(value);
 
                 } else {
                     summaryText += QString("<tr><td>%1(%2):</td><td align=\"right\"> %3</td>")
-                                            .arg(metric ? metric->name() : "unknown")
+                                            .arg(s)
                                             .arg(metric ? metric->units(useMetricUnits) : "unknown")
                                             .arg(value);
                 }
