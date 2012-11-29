@@ -96,8 +96,8 @@ main(int argc, char *argv[])
             home.cd(libraryPath);
         }
     }
-    // Language setting
-    QVariant lang = appsettings->value(NULL, GC_LANG);
+    // Language setting (default to system locale)
+    QVariant lang = appsettings->value(NULL, GC_LANG, QLocale::system().name());
     // Load specific translation
     QTranslator gcTranslator;
     gcTranslator.load(":translations/gc_" + lang.toString() + ".qm");
