@@ -734,6 +734,10 @@ LTMPlot::setData(LTMSettings *set)
     // show legend?
     if (settings->legend == false) this->legend()->clear();
 
+    // markers
+    if (settings->groupBy != LTM_TOD)
+        refreshMarkers(settings->start.date(), settings->end.date(), settings->groupBy);
+
     // plot
     replot();
 }
@@ -1370,6 +1374,59 @@ class LTMPlotZoneLabel: public QwtPlotItem
             }
         }
 };
+
+void
+LTMPlot::refreshMarkers(QDate from, QDate to, int groupby)
+{
+    // clear old markers
+    foreach(QwtPlotMarker *m, markers) {
+        m->detach();
+        delete m;
+    }
+    markers.clear();
+
+    // seasons and season events
+    foreach (Season s, main->seasons->seasons) {
+
+        if (s.type != Season::temporary && s.getStart() > from && s.getStart() < to) {
+
+            QwtPlotMarker *mrk = new QwtPlotMarker;
+            markers.append(mrk);
+            mrk->attach(this);
+            mrk->setLineStyle(QwtPlotMarker::VLine);
+            mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
+            mrk->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
+
+            QwtText text(s.getName());
+            text.setFont(QFont("Helvetica", 10, QFont::Bold));
+            text.setColor(GColor(CPLOTMARKER));
+            mrk->setValue(double(groupForDate(s.getStart(), groupby)), 0.0);
+            mrk->setLabel(text);
+        }
+
+        foreach (SeasonEvent event, s.events) {
+
+            if (event.date > from && event.date < to) {
+
+                // and the events...
+                QwtPlotMarker *mrk = new QwtPlotMarker;
+                markers.append(mrk);
+                mrk->attach(this);
+                mrk->setLineStyle(QwtPlotMarker::VLine);
+                mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
+                mrk->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
+
+                QwtText text(event.name);
+                text.setFont(QFont("Helvetica", 10, QFont::Bold));
+                text.setColor(GColor(CPLOTMARKER));
+                mrk->setValue(double(groupForDate(event.date, groupby)), 10.0);
+                mrk->setLabel(text);
+            }
+        }
+
+    }
+    return;
+}
 
 void
 LTMPlot::refreshZoneLabels(int axisid)
