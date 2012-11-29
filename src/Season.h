@@ -93,6 +93,28 @@ class EditSeasonDialog : public QDialog
         QDateEdit *fromEdit, *toEdit;
 };
 
+class EditSeasonEventDialog : public QDialog
+{
+    Q_OBJECT
+    G_OBJECT
+
+
+    public:
+        EditSeasonEventDialog(MainWindow *, SeasonEvent *);
+
+    public slots:
+        void applyClicked();
+        void cancelClicked();
+
+    private:
+        MainWindow *mainWindow;
+        SeasonEvent *event;
+
+        QPushButton *applyButton, *cancelButton;
+        QLineEdit *nameEdit;
+        QDateEdit *dateEdit;
+};
+
 class Seasons : public QObject {
 
     Q_OBJECT;

@@ -62,6 +62,8 @@ class LTMSidebar : public QWidget
         void dateRangeChanged(DateRange);
 
     public slots:
+
+        // date range selection and editing
         void dateRangeTreeWidgetSelectionChanged();
         void dateRangePopup(QPoint);
         void dateRangeChanged(QTreeWidgetItem *, int);
@@ -69,12 +71,19 @@ class LTMSidebar : public QWidget
         void editRange();
         void deleteRange();
 
+        void eventPopup(QPoint);
+        void editEvent();
+        void deleteEvent();
+        void addEvent();
+
+        // config etc
         void configChanged();
         void resetSeasons(); // rebuild the seasons list if it changes
 
+        // gui components
         void setSummary(DateRange);
-
         void splitterMoved(int, int);
+
     private:
 
         const QDir home;
@@ -86,7 +95,10 @@ class LTMSidebar : public QWidget
         QTreeWidget *dateRangeTree;
         QTreeWidgetItem *allDateRanges;
         QTreeWidgetItem *activeDateRange; // when using context menus
-        //const Season *dateRange;
+
+        QTreeWidget *eventTree;
+        QTreeWidgetItem *allEvents;
+        QTreeWidgetItem *activeEvent; // when using context menus
 
         QWebView *summary;
 

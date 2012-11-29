@@ -63,6 +63,22 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     dateRangeTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
 
+    eventTree = new QTreeWidget;
+    allEvents = new QTreeWidgetItem(eventTree, ROOT_TYPE);
+    allEvents->setText(0, tr("Events"));
+    eventTree->setFrameStyle(QFrame::NoFrame);
+    eventTree->setColumnCount(2);
+    eventTree->setSelectionMode(QAbstractItemView::SingleSelection);
+    eventTree->header()->hide();
+    eventTree->setIndentation(5);
+    eventTree->expandItem(allEvents);
+    eventTree->setContextMenuPolicy(Qt::CustomContextMenu);
+    eventTree->horizontalScrollBar()->setDisabled(true);
+    eventTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+#ifdef Q_OS_MAC
+    eventTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
+
     seasons = parent->seasons;
     resetSeasons(); // reset the season list
 
@@ -74,6 +90,7 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     splitter->setContentsMargins(0,0,0,0);
     splitter->setOrientation(Qt::Vertical);
     splitter->addWidget(dateRangeTree);
+    splitter->addWidget(eventTree);
     connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
 
     summary = new QWebView(this);
@@ -105,7 +122,7 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     connect(dateRangeTree,SIGNAL(itemSelectionChanged()), this, SLOT(dateRangeTreeWidgetSelectionChanged()));
     connect(dateRangeTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(dateRangePopup(const QPoint &)));
     connect(dateRangeTree,SIGNAL(itemChanged(QTreeWidgetItem *,int)), this, SLOT(dateRangeChanged(QTreeWidgetItem*, int)));
-
+    connect(eventTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(eventPopup(const QPoint &)));
     // GC signal
     connect(main, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
@@ -125,6 +142,8 @@ LTMSidebar::configChanged()
 void
 LTMSidebar::dateRangeTreeWidgetSelectionChanged()
 {
+    if (active == true) return;
+
     const Season *dateRange = NULL;
 
     if (dateRangeTree->selectedItems().isEmpty()) dateRange = NULL;
@@ -135,6 +154,25 @@ LTMSidebar::dateRangeTreeWidgetSelectionChanged()
         } else {
             dateRange = NULL;
         }
+    }
+
+    if (dateRange) {
+        int i;
+        // clear events - we need to add for currently selected season
+        for (i=allEvents->childCount(); i > 0; i--) {
+            delete allEvents->takeChild(0);
+        }
+
+        // add this seasons events
+        for (i=0; i <dateRange->events.count(); i++) {
+            SeasonEvent event = dateRange->events.at(i);
+            QTreeWidgetItem *add = new QTreeWidgetItem(allEvents);
+            add->setText(0, event.name);
+            add->setText(1, event.date.toString("MMM d, yyyy"));
+        }
+
+        // make sure they fit
+        eventTree->header()->resizeSections(QHeaderView::ResizeToContents);
     }
 
     // Let the view know its changed....
@@ -150,6 +188,8 @@ LTMSidebar::dateRangeTreeWidgetSelectionChanged()
 void
 LTMSidebar::resetSeasons()
 {
+    if (active == true) return;
+
     QString now;
 
     // remember currebt
@@ -210,17 +250,17 @@ LTMSidebar::dateRangePopup(QPoint pos)
 
         // create context menu
         QMenu menu(dateRangeTree);
-        QAction *rename = new QAction(tr("Rename range"), dateRangeTree);
         QAction *edit = new QAction(tr("Edit details"), dateRangeTree);
         QAction *del = new QAction(tr("Delete range"), dateRangeTree);
-        menu.addAction(rename);
+        QAction *event = new QAction(tr("Add Event"), dateRangeTree);
         menu.addAction(edit);
         menu.addAction(del);
+        menu.addAction(event);
 
         // connect menu to functions
-        connect(rename, SIGNAL(triggered(void)), this, SLOT(renameRange(void)));
         connect(edit, SIGNAL(triggered(void)), this, SLOT(editRange(void)));
         connect(del, SIGNAL(triggered(void)), this, SLOT(deleteRange(void)));
+        connect(event, SIGNAL(triggered(void)), this, SLOT(addEvent(void)));
 
         // execute the menu
         menu.exec(dateRangeTree->mapToGlobal(pos));
@@ -228,7 +268,45 @@ LTMSidebar::dateRangePopup(QPoint pos)
 }
 
 void
-LTMSidebar::renameRange()
+LTMSidebar::eventPopup(QPoint pos)
+{
+    // no current season selected
+    if (dateRangeTree->selectedItems().isEmpty()) return;
+
+    QTreeWidgetItem *item = eventTree->itemAt(pos);
+
+    // save context - which season and event are we working with?
+    QTreeWidgetItem *which = dateRangeTree->selectedItems().first();
+    if (which && which != allDateRanges) {
+        activeDateRange = which;
+        activeEvent = item;
+    } else return;
+
+    // OK - we are working with a specific event..
+    QMenu menu(eventTree);
+    if (item != NULL && item->type() != ROOT_TYPE && allEvents->indexOfChild(item) != -1) {
+
+        QAction *edit = new QAction(tr("Edit details"), eventTree);
+        QAction *del = new QAction(tr("Delete event"), eventTree);
+        menu.addAction(edit);
+        menu.addAction(del);
+
+        // connect menu to functions
+        connect(edit, SIGNAL(triggered(void)), this, SLOT(editEvent(void)));
+        connect(del, SIGNAL(triggered(void)), this, SLOT(deleteEvent(void)));
+    }
+
+    // we can always add, regardless of any event being selected...
+    QAction *addEvent = new QAction(tr("Add event"), eventTree);
+    menu.addAction(addEvent);
+    connect(addEvent, SIGNAL(triggered(void)), this, SLOT(addEvent(void)));
+
+    // execute the menu
+    menu.exec(eventTree->mapToGlobal(pos));
+}
+
+void
+LTMSidebar::renameRange() //XXX deprecated
 {
     // go edit the name
     activeDateRange->setFlags(activeDateRange->flags() | Qt::ItemIsEditable);
@@ -261,16 +339,18 @@ LTMSidebar::editRange()
     EditSeasonDialog dialog(main, &seasons->seasons[index]);
 
     if (dialog.exec()) {
+
+        active = true;
+
         // update name
         activeDateRange->setText(0, seasons->seasons[index].getName());
 
         // save changes away
-        active = true;
         seasons->writeSeasons();
         active = false;
 
         // signal its changed!
-        //XXX dateRangeSelected(&seasons->seasons[index]);
+        //dateRangeSelected(&seasons->seasons[index]);
     }
 }
 
@@ -281,6 +361,75 @@ LTMSidebar::deleteRange()
     int index = allDateRanges->indexOfChild(activeDateRange);
     delete allDateRanges->takeChild(index);
     seasons->deleteSeason(index);
+}
+
+void
+LTMSidebar::addEvent()
+{
+    SeasonEvent myevent("", QDate());
+    int seasonindex = allDateRanges->indexOfChild(activeDateRange);
+    EditSeasonEventDialog dialog(main, &myevent);
+
+    if (dialog.exec()) {
+
+        active = true;
+        seasons->seasons[seasonindex].events.append(myevent);
+
+        QTreeWidgetItem *add = new QTreeWidgetItem(allEvents);
+        add->setText(0, myevent.name);
+        add->setText(1, myevent.date.toString("MMM d, yyyy"));
+
+        // make sure they fit
+        eventTree->header()->resizeSections(QHeaderView::ResizeToContents);
+
+        // save changes away
+        seasons->writeSeasons();
+        active = false;
+    }
+}
+
+void
+LTMSidebar::deleteEvent()
+{
+    active = true;
+
+    // now delete!
+    int seasonindex = allDateRanges->indexOfChild(activeDateRange);
+    int eventindex = allEvents->indexOfChild(activeEvent);
+
+    // wipe them away
+    delete allEvents->takeChild(eventindex);
+    seasons->seasons[seasonindex].events.removeAt(eventindex);
+
+    // save changes away
+    seasons->writeSeasons();
+
+    active = false;
+}
+
+void
+LTMSidebar::editEvent()
+{
+    int seasonindex = allDateRanges->indexOfChild(activeDateRange);
+    int eventindex = allEvents->indexOfChild(activeEvent);
+
+    EditSeasonEventDialog dialog(main, &seasons->seasons[seasonindex].events[eventindex]);
+
+    if (dialog.exec()) {
+
+        active = true;
+
+        // update name
+        activeEvent->setText(0, seasons->seasons[seasonindex].events[eventindex].name);
+        activeEvent->setText(1, seasons->seasons[seasonindex].events[eventindex].date.toString("MMM d, yyyy"));
+
+        // save changes away
+        seasons->writeSeasons();
+        active = false;
+
+        // signal its changed!
+        //dateRangeSelected(&seasons->seasons[index]);
+    }
 }
 
 void

@@ -155,6 +155,62 @@ EditSeasonDialog::cancelClicked()
     reject();
 }
 
+/*----------------------------------------------------------------------
+ * EDIT SEASONEVENT DIALOG
+ *--------------------------------------------------------------------*/
+EditSeasonEventDialog::EditSeasonEventDialog(MainWindow *mainWindow, SeasonEvent *event) :
+    QDialog(mainWindow, Qt::Dialog), mainWindow(mainWindow), event(event)
+{
+    setWindowTitle(tr("Edit Event"));
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+
+    // Grid
+    QGridLayout *grid = new QGridLayout;
+    QLabel *name = new QLabel("Name");
+    QLabel *date = new QLabel("Date");
+
+    nameEdit = new QLineEdit(this);
+    nameEdit->setText(event->name);
+
+    dateEdit = new QDateEdit(this);
+    dateEdit->setDate(event->date);
+
+    grid->addWidget(name, 0,0);
+    grid->addWidget(nameEdit, 0,1);
+    grid->addWidget(date, 1,0);
+    grid->addWidget(dateEdit, 1,1);
+
+    mainLayout->addLayout(grid);
+
+    // Buttons
+    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    buttonLayout->addStretch();
+    applyButton = new QPushButton(tr("&OK"), this);
+    cancelButton = new QPushButton(tr("&Cancel"), this);
+    buttonLayout->addWidget(cancelButton);
+    buttonLayout->addWidget(applyButton);
+    mainLayout->addLayout(buttonLayout);
+
+    // connect up slots
+    connect(applyButton, SIGNAL(clicked()), this, SLOT(applyClicked()));
+    connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+}
+
+void
+EditSeasonEventDialog::applyClicked()
+{
+    // get the values back
+    event->name = nameEdit->text();
+    event->date = dateEdit->date();
+    accept();
+}
+
+void
+EditSeasonEventDialog::cancelClicked()
+{
+    reject();
+}
+
 //
 // Manage the seasons array
 //
