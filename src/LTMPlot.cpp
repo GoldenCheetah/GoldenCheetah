@@ -1385,6 +1385,8 @@ LTMPlot::refreshMarkers(QDate from, QDate to, int groupby)
     }
     markers.clear();
 
+    double baseday = groupForDate(from, groupby);
+
     // seasons and season events
     foreach (Season s, main->seasons->seasons) {
 
@@ -1400,7 +1402,7 @@ LTMPlot::refreshMarkers(QDate from, QDate to, int groupby)
             QwtText text(s.getName());
             text.setFont(QFont("Helvetica", 10, QFont::Bold));
             text.setColor(GColor(CPLOTMARKER));
-            mrk->setValue(double(groupForDate(s.getStart(), groupby)), 0.0);
+            mrk->setValue(double(groupForDate(s.getStart(), groupby)) - baseday, 0.0);
             mrk->setLabel(text);
         }
 
@@ -1419,7 +1421,7 @@ LTMPlot::refreshMarkers(QDate from, QDate to, int groupby)
                 QwtText text(event.name);
                 text.setFont(QFont("Helvetica", 10, QFont::Bold));
                 text.setColor(GColor(CPLOTMARKER));
-                mrk->setValue(double(groupForDate(event.date, groupby)), 10.0);
+                mrk->setValue(double(groupForDate(event.date, groupby)) - baseday, 10.0);
                 mrk->setLabel(text);
             }
         }
