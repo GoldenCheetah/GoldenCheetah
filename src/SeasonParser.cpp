@@ -50,7 +50,7 @@ bool SeasonParser::endElement( const QString&, const QString&, const QString &qN
         loadcount++;
     } else if (qName == "event") {
 
-        season.events.append(SeasonEvent(unquote(buffer.trimmed()), QDate::fromString(dateString)));
+        season.events.append(SeasonEvent(unquote(buffer.trimmed()), seasonDateToDate(dateString)));
 
     } else if(qName == "season") {
 
@@ -161,8 +161,8 @@ SeasonParser::serialize(QString filename, QList<Season>Seasons)
             foreach(SeasonEvent x, season.events) {
 
                 out<<QString("\t\t<event date=\"%1\">\"%2\"</event>")
-                            .arg(x.name)
-                            .arg(x.date.toString("yyyy-MM-dd"));
+                            .arg(x.date.toString("yyyy-MM-dd"))
+                            .arg(x.name);
             
             }
             out <<QString("\t</season>\n");
