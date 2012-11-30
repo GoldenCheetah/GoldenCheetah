@@ -2238,6 +2238,24 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     </message>
 </context>
 <context>
+    <name>EditSeasonEventDialog</name>
+    <message>
+        <location filename="../Season.cpp" line="164"/>
+        <source>Edit Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Season.cpp" line="188"/>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <location filename="../Season.cpp" line="189"/>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Cancelar</translation>
+    </message>
+</context>
+<context>
     <name>EfficiencyFactor</name>
     <message>
         <location filename="../Coggan.cpp" line="198"/>
@@ -3348,7 +3366,7 @@ Torque Adjust - isto define um valor absoluto em pontos por polegada quadrada ou
         <translation type="obsolete">Melhor %1</translation>
     </message>
     <message>
-        <location filename="../LTMPlot.cpp" line="1116"/>
+        <location filename="../LTMPlot.cpp" line="1120"/>
         <source>watts</source>
         <translation>Watts</translation>
     </message>
@@ -3373,22 +3391,42 @@ Torque Adjust - isto define um valor absoluto em pontos por polegada quadrada ou
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="213"/>
         <source>Rename range</source>
-        <translation type="unfinished">Renomear s?rie</translation>
+        <translation type="obsolete">Renomear s?rie</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="214"/>
+        <location filename="../LTMSidebar.cpp" line="68"/>
+        <source>Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMSidebar.cpp" line="253"/>
+        <location filename="../LTMSidebar.cpp" line="289"/>
         <source>Edit details</source>
         <translation type="unfinished">Editar dados</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="215"/>
+        <location filename="../LTMSidebar.cpp" line="254"/>
         <source>Delete range</source>
         <translation type="unfinished">Apagar s?rie</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="388"/>
+        <location filename="../LTMSidebar.cpp" line="255"/>
+        <source>Add Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMSidebar.cpp" line="290"/>
+        <source>Delete event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMSidebar.cpp" line="300"/>
+        <source>Add event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMSidebar.cpp" line="537"/>
         <source>^(Average|Max) </source>
         <translation type="unfinished"></translation>
     </message>
@@ -6985,7 +7023,7 @@ e que o ecr? exibe &quot;Host&quot;</translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="107"/>
-        <source>??C</source>
+        <source>Â°C</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7830,57 +7868,57 @@ Quer continuar?</translation>
 <context>
     <name>Seasons</name>
     <message>
-        <location filename="../Season.cpp" line="178"/>
+        <location filename="../Season.cpp" line="234"/>
         <source>All Dates</source>
         <translation type="unfinished">Todas as datas</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="185"/>
+        <location filename="../Season.cpp" line="241"/>
         <source>This Year</source>
         <translation type="unfinished">Este ano</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="192"/>
+        <location filename="../Season.cpp" line="248"/>
         <source>This Month</source>
         <translation type="unfinished">Este m?s</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="199"/>
+        <location filename="../Season.cpp" line="255"/>
         <source>This Week</source>
         <translation type="unfinished">Esta semana</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="210"/>
+        <location filename="../Season.cpp" line="266"/>
         <source>Last 7 days</source>
         <translation type="unfinished">?ltimos 7 dias</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="217"/>
+        <location filename="../Season.cpp" line="273"/>
         <source>Last 14 days</source>
         <translation type="unfinished">?ltimos 14 dias</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="224"/>
+        <location filename="../Season.cpp" line="280"/>
         <source>Last 21 days</source>
         <translation type="unfinished">?ltimos 28 dias {21 ?}</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="231"/>
+        <location filename="../Season.cpp" line="287"/>
         <source>Last 28 days</source>
         <translation type="unfinished">?ltimos 28 dias</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="238"/>
+        <location filename="../Season.cpp" line="294"/>
         <source>Last 3 months</source>
         <translation type="unfinished">?ltimos 3 meses</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="245"/>
+        <location filename="../Season.cpp" line="301"/>
         <source>Last 6 months</source>
         <translation type="unfinished">?ltimos 6 meses</translation>
     </message>
     <message>
-        <location filename="../Season.cpp" line="252"/>
+        <location filename="../Season.cpp" line="308"/>
         <source>Last 12 months</source>
         <translation type="unfinished">?ltimos 12 meses</translation>
     </message>
