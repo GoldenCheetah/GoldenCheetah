@@ -499,13 +499,9 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
             if (index.isValid()) {
                 QString hoverFileName = tableView->model()->data(index, Qt::UserRole+1).toString();
                 e->accept();
-                // XXX todo custom tooltip balloon here.
-                //     remember to make it hide when mouse moves again.
-                //     or another tooltip event occurs
-                // qDebug()<<"ride navigator tooltip"<<hoverFileName;
-                QPoint p = dynamic_cast<QHelpEvent*>(e)->pos();
+                QPoint p = local;
                 p.setX(width()-20);
-                main->setBubble(hoverFileName, mapToGlobal(p));
+                main->setBubble(hoverFileName, tableView->viewport()->mapToGlobal(p));
             }
         }
         break;
