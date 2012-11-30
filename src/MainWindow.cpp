@@ -2338,6 +2338,7 @@ MainWindow::exportCalendar()
 void
 MainWindow::setBubble(QString text, QPoint pos, Qt::Orientation orientation)
 {
+#ifndef Q_OS_MAC // disable on Mac due to painting artefacts / QT bug (?)
     if (text == "") {
         bubble->setVisible(false);
     } else {
@@ -2347,6 +2348,7 @@ MainWindow::setBubble(QString text, QPoint pos, Qt::Orientation orientation)
         bubble->raise();
         bubble->repaint();
     }
+#endif
 }
 
 #ifdef Q_OS_MAC
