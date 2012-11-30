@@ -337,7 +337,7 @@ GcCalendar::event(QEvent *e)
                 // Popup bubble for ride
                 if (files.count()) {
                     if (files[0] == "calendar") ; // XXX handle planned rides
-                    else main->setBubble(files.at(0), mapToGlobal(pos+QPoint(-2,-2)));
+                    else main->setBubble(files.at(0), mapToGlobal(pos+QPoint(+2,+2)));
                 }
             }
             n++;
