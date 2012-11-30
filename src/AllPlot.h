@@ -172,6 +172,8 @@ class AllPlot : public QwtPlot
         AllPlotWindow *parent;
         LTMToolTip *tooltip;
         LTMCanvasPicker *_canvasPicker; // allow point selection/hover
+
+        static void nextStep( int& step );
 };
 
 #endif // _GC_AllPlot_h
