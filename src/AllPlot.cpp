@@ -852,14 +852,7 @@ AllPlot::setYMax()
         int step = 100;
         while( ( qCeil(maxY / step) * labelWidth ) > axisHeight )
         {
-            if( step == 100 || step == 150 )
-            {
-                step += 50;
-            }
-            else
-            {
-                step += 100;
-            }
+            nextStep(step);
         }
 
         QwtValueList xytick[QwtScaleDiv::NTickTypes];
@@ -952,7 +945,24 @@ AllPlot::setYMax()
             ymin = referencePlot->altCurve->minYValue();
             ymax = qMax(ymin + 100, 1.05 * referencePlot->altCurve->maxYValue());
         }
-        setAxisScale(yRight2, ymin, ymax);
+        ymin = ( qRound(ymin) / 100 ) * 100;
+
+        int axisHeight = qRound( plotLayout()->canvasRect().height() );
+        QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(yLeft) );
+        int labelWidth = labelWidthMetric.width( (ymax > 1000) ? " 8888 " : " 888 " );
+
+        int step = 10;
+        while( ( qCeil( (ymax - ymin ) / step) * labelWidth ) > axisHeight )
+        {
+            nextStep(step);
+        }
+
+        QwtValueList xytick[QwtScaleDiv::NTickTypes];
+        for (int i=ymin;i<ymax;i+=step)
+            xytick[QwtScaleDiv::MajorTick]<<i;
+
+        //setAxisScale(yRight2, ymin, ymax);
+        setAxisScaleDiv(yRight2,QwtScaleDiv(ymin,ymax,xytick));
         setAxisLabelRotation(yRight2,90);
         setAxisLabelAlignment(yRight2,Qt::AlignVCenter);
         altCurve->setBaseline(ymin);
@@ -1612,5 +1622,30 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
 
         // no point
         tooltip->setText("");
+    }
+}
+
+void
+AllPlot::nextStep( int& step )
+{
+    if( step < 50 )
+    {
+        step += 10;
+    }
+    else if( step == 50 )
+    {
+        step = 100;
+    }
+    else if( step >= 100 && step < 1000 )
+    {
+        step += 100;
+    }
+    else if( step >= 1000 && step < 5000)
+    {
+        step += 500;
+    }
+    else
+    {
+        step += 1000;
     }
 }
