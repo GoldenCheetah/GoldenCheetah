@@ -740,8 +740,8 @@ HomeWindow::removeChart(int num, bool confirm)
         default:
             break; // never reached
     }
-    (GcWindow*)(charts[num])->close(); // disconnect
-    //(GcWindow*)(charts[num])->deleteLater();
+    ((GcWindow*)(charts[num]))->close(); // disconnect
+    ((GcWindow*)(charts[num]))->deleteLater();
     charts.removeAt(num);
 
     update();

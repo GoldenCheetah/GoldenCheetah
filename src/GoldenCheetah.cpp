@@ -657,5 +657,4 @@ void
 GcWindow::_closeWindow()
 {
     emit closeWindow(this);
-    QObject::deleteLater();
 }
