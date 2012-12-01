@@ -34,6 +34,9 @@ class ChartSettings : public QDialog
         ChartSettings(QWidget *parent, QWidget *contents);
         void closeEvent(QCloseEvent* event);
 
+    public slots:
+        void reject();
+
     private:
         QPushButton *btnOK;
 

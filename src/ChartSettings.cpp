@@ -60,3 +60,9 @@ ChartSettings::closeEvent(QCloseEvent* event)
     event->ignore();
     hide();
 }
+
+void
+ChartSettings::reject()
+{
+    hide();
+}
