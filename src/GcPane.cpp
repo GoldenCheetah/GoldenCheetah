@@ -28,7 +28,6 @@ GcPane::GcPane() : QWidget(NULL, Qt::FramelessWindowHint),
     borderWidth(4), dragState(None)
 {
     closeImage = QPixmap(":images/toolbar/popbutton.png");
-    flipImage = QPixmap(":images/toolbar/flipbutton.png");
     setAttribute(Qt::WA_DeleteOnClose);
     setAttribute(Qt::WA_TranslucentBackground);
     setAttribute(Qt::WA_NoSystemBackground);
@@ -107,7 +106,7 @@ GcPane::paintEvent(QPaintEvent *)
     // Init paint settings
     QPainter painter(this);
     //painter.setRenderHint(QPainter::Antialiasing);
-    QColor color = GColor(CPOPUP);
+    QColor color = Qt::black; //GColor(CPOPUP);
     QPen pen(color);
 
     // border color
@@ -131,19 +130,20 @@ GcPane::paintEvent(QPaintEvent *)
         color.setAlpha(150);
     pen.setWidth(1);
     painter.setPen(pen);
-    painter.setBrush(color);
+    //painter.setBrush(color);
+    // contents fill with a linear gradient
+    QLinearGradient linearGradient(0, 0, 0, height());
+    linearGradient.setColorAt(0.0, QColor(80,80,80, 220));
+    linearGradient.setColorAt(1.0, QColor(0, 0, 0, 220));
+    linearGradient.setSpread(QGradient::PadSpread);
+    painter.setBrush(linearGradient);
     // draw border and background
     painter.drawRoundedRect(4, 1 + (closeImage.height()/2),
                             width()-2-(closeImage.width()/2), height()-2-(closeImage.height()/2)-3,
                             closeImage.width()/2, closeImage.height()/2);
     // close button
     if (underMouse())
-        painter.drawPixmap(width()-closeImage.width(), 0, closeImage.width(), closeImage.height(), closeImage);
-
-    // close button
-    if (underMouse())
-        painter.drawPixmap(width()-(closeImage.width()+5+flipImage.width()), 0,
-                           flipImage.width(), flipImage.height(), flipImage);
+        painter.drawPixmap(width()-closeImage.width()-12, 16, closeImage.width(), closeImage.height(), closeImage);
 
 }
 
@@ -162,7 +162,7 @@ GcPane::spotHotSpot(QMouseEvent *e)
     int _height = height() - (closeImage.height()/2);
     int _width = width() - (closeImage.width()/2);
 
-    if (e->x() > (2 + width() - closeImage.width()) && e->y() < (closeImage.height()-2))
+    if (e->x() > (width() - (closeImage.width()+10)) && e->y() < (closeImage.height()+12))
         return Close;
     else if (e->x() > (width() - 5 - closeImage.width() - flipImage.width()) &&
              e->x() < (width() - 5 - closeImage.width()) &&

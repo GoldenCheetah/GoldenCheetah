@@ -33,7 +33,9 @@ LTMPopup::LTMPopup(MainWindow *parent) : QWidget(parent), main(parent)
     setStyleSheet(QString::fromUtf8(
         "border-width: 0px; \
          border-color: rgba(255,255,255,0); \
+         color: white; \
          background-color: rgba(255, 255, 255, 0); \
+         selection-color: rgba(255,255,255,60); \
          selection-background-color: rgba(0,0,255,60);"));
 
     // title
@@ -52,13 +54,10 @@ LTMPopup::LTMPopup(MainWindow *parent) : QWidget(parent), main(parent)
     rides->setStyle(style);
 #endif
     rides->setFrameStyle(QFrame::NoFrame);
-    //rides->setFixedWidth(LISTWIDTH);
     rides->viewport()->setAutoFillBackground(false);
-    //rides->horizontalHeader()->hide();
-    //rides->horizontalHeader()->setStretchLastSection(true);
     QString styleSheet = "::section {"
                      "spacing: 2px;"
-                     "color: black;"
+                     "color: white;"
                      "background-color: rgba(255,255,255,0);"
                      "border: 0px;"
                      "margin: 0px;"
