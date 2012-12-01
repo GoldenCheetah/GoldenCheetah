@@ -831,12 +831,12 @@ RiderPage::unitChanged(int currentIndex)
     if (currentIndex == 0) {
         QString weighttext = QString(tr("Weight (%1)")).arg(tr("kg"));
         weightlabel->setText(weighttext);
-        weight->setValue(weight->value() * LB_PER_KG);
+        weight->setValue(weight->value() / LB_PER_KG);
     }
     else {
         QString weighttext = QString(tr("Weight (%1)")).arg(tr("lb"));
         weightlabel->setText(weighttext);
-        weight->setValue(weight->value() / LB_PER_KG);
+        weight->setValue(weight->value() * LB_PER_KG);
     }
 }
 
@@ -845,7 +845,7 @@ RiderPage::saveClicked()
 {
     appsettings->setCValue(mainWindow->cyclist, GC_NICKNAME, nickname->text());
     appsettings->setCValue(mainWindow->cyclist, GC_DOB, dob->date());
-    appsettings->setCValue(mainWindow->cyclist, GC_WEIGHT, weight->value() * (unitCombo->currentIndex() ? 1.0 : KG_PER_LB));
+    appsettings->setCValue(mainWindow->cyclist, GC_WEIGHT, weight->value() * (unitCombo->currentIndex() ? KG_PER_LB : 1.0));
 
     if (unitCombo->currentIndex()==0)
         appsettings->setCValue(mainWindow->cyclist, GC_UNIT, GC_UNIT_METRIC);
