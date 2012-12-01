@@ -665,8 +665,12 @@ RideFile::getWeight()
 
     // withings?
     QList<SummaryMetrics> measures = mainwindow->metricDB->getAllMeasuresFor(QDateTime::fromString("Jan 1 00:00:00 1900"), startTime());
-    if (measures.count()) {
-        return weight_ = measures.last().getText("Weight", "0.0").toDouble();
+    int i = measures.count()-1;
+    if (i) {
+        while (i>=0 && weight_ == 0) {
+            weight_ = measures[i].getText("Weight", "0.0").toDouble();
+            i--;
+        }
     }
 
 
