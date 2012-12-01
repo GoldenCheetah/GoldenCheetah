@@ -49,6 +49,7 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     hl->addWidget(titleLabel);
     hl->addWidget(titleEdit);
     cl->addLayout(hl);
+    cl->addSpacing(15);
     cl->addWidget(controlStack);
     setControls(cw);
 

@@ -35,7 +35,6 @@ ChartSettings::ChartSettings(QWidget *parent, QWidget *contents) : QDialog(paren
   mainVBox->addWidget(contents);
 
   // "Done" button.
-  mainVBox->addSpacing(15);
   QHBoxLayout *buttonHBox = new QHBoxLayout;
   btnOK = new QPushButton(this);
   btnOK->setFocusPolicy(Qt::NoFocus);

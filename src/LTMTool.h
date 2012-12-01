@@ -77,6 +77,18 @@ class LTMTool : public QWidget
 #ifdef GC_HAVE_LUCENE
         SearchFilterBox *searchBox;
 #endif
+
+        // preset charts
+        QList<LTMSettings> presets;
+
+        // accessed by LTMWindow hence public
+        QComboBox *presetPicker;
+        QComboBox *groupBy;
+        QCheckBox *shadeZones;
+        QCheckBox *showLegend;
+        QPushButton *saveButton;
+        QPushButton *manageButton;
+
     signals:
 
         //void dateRangeSelected(const Season *);
@@ -125,7 +137,8 @@ class LTMTool : public QWidget
         //QTreeWidgetItem *activeDateRange; // when using context menus
         QTreeWidgetItem *activeMetric; // when using context menus
 
-        QSplitter   *ltmSplitter;
+        QTabWidget *tabs;
+
 };
 
 class EditMetricDetailDialog : public QDialog

@@ -105,14 +105,14 @@ class LTMWindow : public LTMPlotContainer
         LTMToolTip *toolTip() { return picker; }
 
         // get/set properties
-        int chart() const { return presetPicker->currentIndex(); }
-        void setChart(int x) { presetPicker->setCurrentIndex(x); }
-        int bin() const { return groupBy->currentIndex(); }
-        void setBin(int x) { groupBy->setCurrentIndex(x); }
-        bool shade() const { return shadeZones->isChecked(); }
-        void setShade(bool x) { shadeZones->setChecked(x); }
-        bool legend() const { return showLegend->isChecked(); }
-        void setLegend(bool x) { showLegend->setChecked(x); }
+        int chart() const { return ltmTool->presetPicker->currentIndex(); }
+        void setChart(int x) { ltmTool->presetPicker->setCurrentIndex(x); }
+        int bin() const { return ltmTool->groupBy->currentIndex(); }
+        void setBin(int x) { ltmTool->groupBy->setCurrentIndex(x); }
+        bool shade() const { return ltmTool->shadeZones->isChecked(); }
+        void setShade(bool x) { ltmTool->shadeZones->setChecked(x); }
+        bool legend() const { return ltmTool->showLegend->isChecked(); }
+        void setLegend(bool x) { ltmTool->showLegend->setChecked(x); }
 
 #ifdef GC_HAVE_LUCENE
         QString filter() const { return ltmTool->searchBox->filter(); }
@@ -153,9 +153,6 @@ class LTMWindow : public LTMPlotContainer
         GcPane *popup;
         LTMPopup *ltmPopup;
 
-        // preset charts
-        QList<LTMSettings> presets;
-
         // local state
         bool dirty;
         LTMSettings settings; // all the plot settings
@@ -163,16 +160,9 @@ class LTMWindow : public LTMPlotContainer
         QList<SummaryMetrics> measures;
 
         // Widgets
-        QSplitter *ltmSplitter;
         LTMPlot *ltmPlot;
         QwtPlotZoomer *ltmZoomer;
         LTMTool *ltmTool;
-        QComboBox *presetPicker;
-        QComboBox *groupBy;
-        QCheckBox *shadeZones;
-        QCheckBox *showLegend;
-        QPushButton *saveButton;
-        QPushButton *manageButton;
 };
 
 #endif // _GC_LTMWindow_h
