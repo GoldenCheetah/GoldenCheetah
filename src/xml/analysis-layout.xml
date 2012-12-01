@@ -22,7 +22,7 @@
 		<property name="widthFactor" type="double" value="3.61395" />
 		<property name="heightFactor" type="double" value="4" />
 		<property name="resizable" type="bool" value="0" />
-		<property name="series" type="int" value="2" />
+		<property name="series" type="int" value="3" />
 		<property name="percent" type="int" value="0" />
 		<property name="bin" type="double" value="7" />
 		<property name="logY" type="bool" value="0" />
@@ -38,7 +38,7 @@
 		<property name="widthFactor" type="double" value="3.55947" />
 		<property name="heightFactor" type="double" value="4" />
 		<property name="resizable" type="bool" value="0" />
-		<property name="series" type="int" value="3" />
+		<property name="series" type="int" value="4" />
 		<property name="percent" type="int" value="0" />
 		<property name="bin" type="double" value="5" />
 		<property name="logY" type="bool" value="0" />
@@ -70,7 +70,7 @@
 		<property name="widthFactor" type="double" value="3.55947" />
 		<property name="heightFactor" type="double" value="4" />
 		<property name="resizable" type="bool" value="0" />
-		<property name="series" type="int" value="1" />
+		<property name="series" type="int" value="2" />
 		<property name="percent" type="int" value="0" />
 		<property name="bin" type="double" value="2" />
 		<property name="logY" type="bool" value="0" />
