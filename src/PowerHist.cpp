@@ -877,6 +877,10 @@ PowerHist::setParameterAxisTitle()
             else axislabel = tr("Power (watts)");
             break;
 
+        case RideFile::wattsKg:
+            axislabel = tr("Watts Per KG");
+            break;
+
         case RideFile::hr:
             if (zoned) axislabel = tr("Heartrate zone");
             else axislabel = tr("Heartrate (bpm)");

@@ -47,15 +47,70 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     mainLayout->setSpacing(0);
     setContentsMargins(0,0,0,0);
 
+    QWidget *basicsettings = new QWidget(this);
+    mainLayout->addWidget(basicsettings);
+    QFormLayout *basicsettingsLayout = new QFormLayout(basicsettings);
+
 #ifdef GC_HAVE_LUCENE
     searchBox = new SearchFilterBox(this, main);
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
 
-    mainLayout->addWidget(searchBox);
+    basicsettingsLayout->addRow(new QLabel(tr("Filter")), searchBox);
 #endif
 
+    // Basic Controls
+    QWidget *basic = new QWidget(this);
+    basic->setContentsMargins(0,0,0,0);
+    QVBoxLayout *basicLayout = new QVBoxLayout(basic);
+    basicLayout->setContentsMargins(0,0,0,0);
+    basicLayout->setSpacing(0);
+
+    QLabel *presetLabel = new QLabel(tr("Chart"));
+    presetPicker = new QComboBox;
+    presetPicker->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    QHBoxLayout *presetrow = new QHBoxLayout;
+    presetrow->addWidget(presetLabel);
+    presetrow->addWidget(presetPicker);
+    basicLayout->addLayout(presetrow);
+    basicLayout->addStretch();
+
+    // read charts.xml and populate the picker
+    LTMSettings reader;
+    reader.readChartXML(home, presets);
+    for(int i=0; i<presets.count(); i++)
+        presetPicker->addItem(presets[i].name, i);
+    presetPicker->setCurrentIndex(-1);
+
+    groupBy = new QComboBox;
+    groupBy->addItem("Days", LTM_DAY);
+    groupBy->addItem("Weeks", LTM_WEEK);
+    groupBy->addItem("Months", LTM_MONTH);
+    groupBy->addItem("Years", LTM_YEAR);
+    groupBy->addItem("Time Of Day", LTM_TOD);
+    groupBy->setCurrentIndex(0);
+    basicsettingsLayout->addRow(new QLabel("Group by"), groupBy);
+
+    shadeZones = new QCheckBox("Shade Zones");
+    basicsettingsLayout->addRow(shadeZones);
+
+    showLegend = new QCheckBox("Show Legend");
+    basicsettingsLayout->addRow(showLegend);
+
+    // controls
+    saveButton = new QPushButton(tr("Add"));
+    manageButton = new QPushButton(tr("Manage"));
+    QHBoxLayout *buttons = new QHBoxLayout;
+    buttons->addWidget(manageButton);
+    buttons->addStretch();
+    buttons->addWidget(saveButton);
+    basicLayout->addStretch();
+    basicLayout->addLayout(buttons);
+
     metricTree = new QTreeWidget;
+#ifdef Q_OS_MAC
+    metricTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
     metricTree->setColumnCount(1);
     if (multi)
         metricTree->setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -447,14 +502,22 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
 
     configChanged(); // will reset the metric tree
 
-    ltmSplitter = new QSplitter;
-    ltmSplitter->setHandleWidth(1);
-    ltmSplitter->setFrameStyle(QFrame::NoFrame);
-    ltmSplitter->setContentsMargins(0,0,0,0);
-    ltmSplitter->setOrientation(Qt::Vertical);
+    tabs = new QTabWidget(this);
 
-    mainLayout->addWidget(ltmSplitter);
-    ltmSplitter->addWidget(metricTree);
+    mainLayout->addWidget(tabs);
+    basic->setContentsMargins(20,20,20,20);
+
+    // metric tree in a container for spacing etc
+    QWidget *metricContainer = new QWidget(this);
+    metricContainer->setContentsMargins(20,20,20,20);
+    QVBoxLayout *metricContainerLayout = new QVBoxLayout(metricContainer);
+    metricContainerLayout->setContentsMargins(0,0,0,0);
+    metricContainerLayout->setSpacing(0);
+    metricContainerLayout->addWidget(metricTree);
+
+    tabs->addTab(basicsettings, tr("Basic"));
+    tabs->addTab(basic, tr("Preset"));
+    tabs->addTab(metricContainer, tr("Custom"));
 
     connect(metricTree,SIGNAL(itemSelectionChanged()),
             this, SLOT(metricTreeWidgetSelectionChanged()));
@@ -772,7 +835,6 @@ EditMetricDetailDialog::EditMetricDetailDialog(MainWindow *mainWindow, MetricDet
     grid->addWidget(curveTrend, 14,1);
 
     mainLayout->addLayout(grid);
-    mainLayout->addStretch();
 
     // Buttons
     QHBoxLayout *buttonLayout = new QHBoxLayout;

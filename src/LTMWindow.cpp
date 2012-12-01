@@ -49,8 +49,8 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
 
     // the controls
     QWidget *c = new QWidget;
-    //c->setContentsMargins(0,0,0,0); // bit of space is helpful
-    QFormLayout *cl = new QFormLayout(c);
+    c->setContentsMargins(0,0,0,0);
+    QVBoxLayout *cl = new QVBoxLayout(c);
     cl->setContentsMargins(0,0,0,0);
     cl->setSpacing(0);
     setControls(c);
@@ -102,51 +102,17 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
     else
         settings.shadeZones = false;
 
-    QLabel *presetLabel = new QLabel(tr("Chart"));
-    presetPicker = new QComboBox;
-    presetPicker->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    cl->addRow(presetLabel, presetPicker);
-
-    // read charts.xml and populate the picker
-    LTMSettings reader;
-    reader.readChartXML(home, presets);
-    for(int i=0; i<presets.count(); i++)
-        presetPicker->addItem(presets[i].name, i);
-    presetPicker->setCurrentIndex(-1);
-
-    groupBy = new QComboBox;
-    groupBy->addItem("Days", LTM_DAY);
-    groupBy->addItem("Weeks", LTM_WEEK);
-    groupBy->addItem("Months", LTM_MONTH);
-    groupBy->addItem("Years", LTM_YEAR);
-    groupBy->addItem("Time Of Day", LTM_TOD);
-    groupBy->setCurrentIndex(0);
-    cl->addRow(new QLabel("Group by"), groupBy);
-
-    shadeZones = new QCheckBox("Shade Zones");
-    shadeZones->setChecked(settings.shadeZones);
-    cl->addRow(shadeZones);
-
-    showLegend = new QCheckBox("Show Legend");
-    showLegend->setChecked(settings.legend);
-    cl->addRow(showLegend);
-
-    // controls
-    saveButton = new QPushButton(tr("Add"));
-    cl->addRow(saveButton);
-    manageButton = new QPushButton(tr("Manage"));
-    cl->addRow(manageButton);
-    cl->addRow(ltmTool);
+    cl->addWidget(ltmTool);
 
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
     connect(ltmTool, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
     connect(ltmTool, SIGNAL(metricSelected()), this, SLOT(metricSelected()));
-    connect(groupBy, SIGNAL(currentIndexChanged(int)), this, SLOT(groupBySelected(int)));
-    connect(saveButton, SIGNAL(clicked(bool)), this, SLOT(saveClicked(void)));
-    connect(manageButton, SIGNAL(clicked(bool)), this, SLOT(manageClicked(void)));
-    connect(presetPicker, SIGNAL(currentIndexChanged(int)), this, SLOT(chartSelected(int)));
-    connect(shadeZones, SIGNAL(stateChanged(int)), this, SLOT(shadeZonesClicked(int)));
-    connect(showLegend, SIGNAL(stateChanged(int)), this, SLOT(showLegendClicked(int)));
+    connect(ltmTool->groupBy, SIGNAL(currentIndexChanged(int)), this, SLOT(groupBySelected(int)));
+    connect(ltmTool->saveButton, SIGNAL(clicked(bool)), this, SLOT(saveClicked(void)));
+    connect(ltmTool->manageButton, SIGNAL(clicked(bool)), this, SLOT(manageClicked(void)));
+    connect(ltmTool->presetPicker, SIGNAL(currentIndexChanged(int)), this, SLOT(chartSelected(int)));
+    connect(ltmTool->shadeZones, SIGNAL(stateChanged(int)), this, SLOT(shadeZonesClicked(int)));
+    connect(ltmTool->showLegend, SIGNAL(stateChanged(int)), this, SLOT(showLegendClicked(int)));
 
     // connect pickers to ltmPlot
     connect(_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), ltmPlot, SLOT(pointHover(QwtPlotCurve*, int)));
@@ -284,7 +250,7 @@ void
 LTMWindow::groupBySelected(int selected)
 {
     if (selected >= 0) {
-        settings.groupBy = groupBy->itemData(selected).toInt();
+        settings.groupBy = ltmTool->groupBy->itemData(selected).toInt();
         refreshPlot();
     }
 }
@@ -308,38 +274,38 @@ LTMWindow::chartSelected(int selected)
 {
     if (selected >= 0) {
         // what is the index of the chart?
-        int chartid = presetPicker->itemData(selected).toInt();
-        ltmTool->applySettings(&presets[chartid]);
+        int chartid = ltmTool->presetPicker->itemData(selected).toInt();
+        ltmTool->applySettings(&ltmTool->presets[chartid]);
     }
 }
 
 void
 LTMWindow::saveClicked()
 {
-    EditChartDialog editor(main, &settings, presets);
+    EditChartDialog editor(main, &settings, ltmTool->presets);
     if (editor.exec()) {
-        presets.append(settings);
-        settings.writeChartXML(main->home, presets);
-        presetPicker->insertItem(presets.count()-1, settings.name, presets.count()-1);
-        presetPicker->setCurrentIndex(presets.count()-1);
+        ltmTool->presets.append(settings);
+        settings.writeChartXML(main->home, ltmTool->presets);
+        ltmTool->presetPicker->insertItem(ltmTool->presets.count()-1, settings.name, ltmTool->presets.count()-1);
+        ltmTool->presetPicker->setCurrentIndex(ltmTool->presets.count()-1);
     }
 }
 
 void
 LTMWindow::manageClicked()
 {
-    QList<LTMSettings> charts = presets; // get current
+    QList<LTMSettings> charts = ltmTool->presets; // get current
     ChartManagerDialog editor(main, &charts);
     if (editor.exec()) {
         // wipe the current and add the new
-        presets = charts;
-        presetPicker->clear();
+        ltmTool->presets = charts;
+        ltmTool->presetPicker->clear();
         // update the presets to reflect the change
-        for(int i=0; i<presets.count(); i++)
-            presetPicker->addItem(presets[i].name, i);
+        for(int i=0; i<ltmTool->presets.count(); i++)
+            ltmTool->presetPicker->addItem(ltmTool->presets[i].name, i);
 
         // update charts.xml
-        settings.writeChartXML(main->home, presets);
+        settings.writeChartXML(main->home, ltmTool->presets);
     }
 }
 
