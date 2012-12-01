@@ -115,6 +115,7 @@ PowerHist::configChanged()
 
     switch (series) {
     case RideFile::watts:
+    case RideFile::wattsKg:
         pen.setColor(GColor(CPOWER).darker(200));
         brush_color = GColor(CPOWER);
         break;
@@ -143,7 +144,7 @@ PowerHist::configChanged()
         curveSelected->setRenderHint(QwtPlotItem::RenderAntialiased);
     }
 
-    if (zoned == false || (zoned == true && (series != RideFile::watts && series != RideFile::hr))) {
+    if (zoned == false || (zoned == true && (series != RideFile::watts && series != RideFile::wattsKg && series != RideFile::hr))) {
         pen.setWidth(width);
         curve->setPen(pen);
         brush_color.setAlpha(64);
@@ -180,6 +181,7 @@ PowerHist::~PowerHist() {
 // static const variables from PoweHist.h:
 // discritized unit for smoothing
 const double PowerHist::wattsDelta;
+const double PowerHist::wattsKgDelta;
 const double PowerHist::nmDelta;
 const double PowerHist::hrDelta;
 const double PowerHist::kphDelta;
@@ -187,6 +189,7 @@ const double PowerHist::cadDelta;
 
 // digits for text entry validator
 const int PowerHist::wattsDigits;
+const int PowerHist::wattsKgDigits;
 const int PowerHist::nmDigits;
 const int PowerHist::hrDigits;
 const int PowerHist::kphDigits;
@@ -310,12 +313,19 @@ PowerHist::recalc(bool force)
         arrayLength = wattsArray.size();
         selectedArray = &wattsSelectedArray;
 
-    } else if (series == RideFile::watts && zoned == true) {
+    } else if ((series == RideFile::watts || series == RideFile::wattsKg) && zoned == true) {
 
         array = &wattsZoneArray;
         delta = 1;
         arrayLength = wattsZoneArray.size();
         selectedArray = &wattsZoneSelectedArray;
+
+    } else if (series == RideFile::wattsKg && zoned == false) {
+
+        array = &wattsKgArray;
+        delta = wattsKgDelta;
+        arrayLength = wattsKgArray.size();
+        selectedArray = &wattsKgSelectedArray;
 
     } else if (series == RideFile::nm) {
 
@@ -352,8 +362,10 @@ PowerHist::recalc(bool force)
         selectedArray = &cadSelectedArray;
     }
 
+    RideFile::SeriesType baseSeries = (series == RideFile::wattsKg) ? RideFile::watts : series;
+
     // null curve please -- we have no data!
-    if (!array || arrayLength == 0 || (source == Ride && !rideItem->ride()->isDataPresent(series))) {
+    if (!array || arrayLength == 0 || (source == Ride && !rideItem->ride()->isDataPresent(baseSeries))) {
         // create empty curves when no data
         const double zero = 0;
         curve->setData(&zero, &zero, 0);
@@ -364,7 +376,7 @@ PowerHist::recalc(bool force)
 
     // binning of data when not zoned - we can't zone for series besides
     // watts and hr so ignore zoning for those data series
-    if (zoned == false || (zoned == true && (series != RideFile::watts && series != RideFile::hr))) {
+    if (zoned == false || (zoned == true && (series != RideFile::watts && series != RideFile::wattsKg && series != RideFile::hr))) {
 
         // we add a bin on the end since the last "incomplete" bin
         // will be dropped otherwise
@@ -485,7 +497,7 @@ PowerHist::recalc(bool force)
         curveSelected->setData(selectedxaxis.data(), selectedyaxis.data(), selectedxaxis.size());
 
         // zone scale draw
-        if (series == RideFile::watts && zoned && rideItem && rideItem->zones) {
+        if ((series == RideFile::watts || series == RideFile::wattsKg) && zoned && rideItem && rideItem->zones) {
             setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(rideItem->zones, rideItem->zoneRange()));
             if (rideItem->zoneRange() >= 0)
                 setAxisScale(QwtPlot::xBottom, -0.99, rideItem->zones->numZones(rideItem->zoneRange()), 1);
@@ -506,7 +518,7 @@ PowerHist::recalc(bool force)
         }
 
         // watts zoned for a time range
-        if (source == Cache && zoned && series == RideFile::watts && mainWindow->zones()) {
+        if (source == Cache && zoned && (series == RideFile::watts || series == RideFile::wattsKg) && mainWindow->zones()) {
             setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(mainWindow->zones(), 0));
             if (mainWindow->zones()->getRangeSize())
                 setAxisScale(QwtPlot::xBottom, -0.99, mainWindow->zones()->numZones(0), 1); // XXX use zones from first defined range
@@ -566,6 +578,7 @@ PowerHist::setData(RideFileCache *cache)
     // the ride cache
     wattsArray.resize(0);
     wattsZoneArray.resize(10);
+    wattsKgArray.resize(0);
     nmArray.resize(0);
     hrArray.resize(0);
     hrZoneArray.resize(10);
@@ -577,6 +590,7 @@ PowerHist::setData(RideFileCache *cache)
     // with long term data
     wattsSelectedArray.resize(0);
     wattsZoneSelectedArray.resize(0);
+    wattsKgSelectedArray.resize(0);
     nmSelectedArray.resize(0);
     hrSelectedArray.resize(0);
     hrZoneSelectedArray.resize(0);
@@ -584,6 +598,7 @@ PowerHist::setData(RideFileCache *cache)
     cadSelectedArray.resize(0);
 
     longFromDouble(wattsArray, cache->distributionArray(RideFile::watts));
+    longFromDouble(wattsKgArray, cache->distributionArray(RideFile::wattsKg));
     longFromDouble(hrArray, cache->distributionArray(RideFile::hr));
     longFromDouble(nmArray, cache->distributionArray(RideFile::nm));
     longFromDouble(cadArray, cache->distributionArray(RideFile::cad));
@@ -619,7 +634,7 @@ PowerHist::setData(RideItem *_rideItem, bool force)
 
     RideFile *ride = rideItem->ride();
 
-    bool hasData = (series == RideFile::watts && ride->areDataPresent()->watts) ||
+    bool hasData = ((series == RideFile::watts || series == RideFile::wattsKg) && ride->areDataPresent()->watts) ||
                    (series == RideFile::nm && ride->areDataPresent()->nm) ||
                    (series == RideFile::kph && ride->areDataPresent()->kph) ||
                    (series == RideFile::cad && ride->areDataPresent()->cad) ||
@@ -635,6 +650,7 @@ PowerHist::setData(RideItem *_rideItem, bool force)
 
         wattsArray.resize(0);
         wattsZoneArray.resize(0);
+        wattsKgArray.resize(0);
         nmArray.resize(0);
         hrArray.resize(0);
         hrZoneArray.resize(0);
@@ -643,6 +659,7 @@ PowerHist::setData(RideItem *_rideItem, bool force)
 
         wattsSelectedArray.resize(0);
         wattsZoneSelectedArray.resize(0);
+        wattsKgSelectedArray.resize(0);
         nmSelectedArray.resize(0);
         hrSelectedArray.resize(0);
         hrZoneSelectedArray.resize(0);
@@ -688,6 +705,20 @@ PowerHist::setData(RideItem *_rideItem, bool force)
                             wattsZoneSelectedArray.resize(wattsIndex + 1);
                         wattsZoneSelectedArray[wattsIndex]++;
                     }
+                }
+            }
+
+            // wattsKg array
+            int wattsKgIndex = int(floor(p1->watts / ride->getWeight() / wattsKgDelta));
+            if (wattsKgIndex >= 0 && wattsKgIndex < maxSize) {
+                if (wattsKgIndex >= wattsKgArray.size())
+                    wattsKgArray.resize(wattsKgIndex + 1);
+                wattsKgArray[wattsKgIndex]++;
+
+                if (selected) {
+                    if (wattsKgIndex >= wattsKgSelectedArray.size())
+                        wattsKgSelectedArray.resize(wattsKgIndex + 1);
+                    wattsKgSelectedArray[wattsKgIndex]++;
                 }
             }
 
@@ -794,6 +825,7 @@ PowerHist::getDelta()
 {
     switch (series) {
         case RideFile::watts: return wattsDelta;
+        case RideFile::wattsKg: return wattsKgDelta;
         case RideFile::nm: return nmDelta;
         case RideFile::hr: return hrDelta;
         case RideFile::kph: return kphDelta;
@@ -807,6 +839,7 @@ PowerHist::getDigits()
 {
     switch (series) {
         case RideFile::watts: return wattsDigits;
+        case RideFile::wattsKg: return wattsKgDigits;
         case RideFile::nm: return nmDigits;
         case RideFile::hr: return hrDigits;
         case RideFile::kph: return kphDigits;
@@ -878,7 +911,8 @@ PowerHist::setParameterAxisTitle()
             break;
 
         case RideFile::wattsKg:
-            axislabel = tr("Watts Per KG");
+            if (zoned) axislabel = tr("Power zone");
+            else axislabel = tr("Power (watts/kg)");
             break;
 
         case RideFile::hr:
