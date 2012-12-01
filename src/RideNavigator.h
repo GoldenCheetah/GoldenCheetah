@@ -156,6 +156,9 @@ class RideNavigator : public GcWindow
         QString _columns;
         QString _widths;
 
+        // font metrics for display etc
+        int fontHeight;
+
         // search filter
         SearchFilter *searchFilter;
 

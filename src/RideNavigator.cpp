@@ -39,6 +39,7 @@ RideNavigator::RideNavigator(MainWindow *parent, bool mainwindow) : main(parent)
     _sortByOrder = 0;
     currentColumn = -1;
     _groupBy = -1;
+    fontHeight = QFontMetrics(QFont()).height();
 
     init = false;
 
@@ -154,6 +155,8 @@ RideNavigator::~RideNavigator()
 void
 RideNavigator::refresh()
 {
+    fontHeight = QFontMetrics(QFont()).height();
+
     sqlModel->select();
     while (sqlModel->canFetchMore(QModelIndex()))
         sqlModel->fetchMore(QModelIndex());
@@ -889,8 +892,8 @@ QSize NavigatorCellDelegate::sizeHint(const QStyleOptionViewItem & /*option*/, c
 
     if (rideNavigator->groupByModel->mapToSource(rideNavigator->sortModel->mapToSource(index)) != QModelIndex() &&
         rideNavigator->groupByModel->data(rideNavigator->sortModel->mapToSource(index), Qt::UserRole).toString() != "") {
-        s.setHeight(52);
-    } else s.setHeight(18);
+        s.setHeight((rideNavigator->fontHeight+2) * 3);
+    } else s.setHeight(rideNavigator->fontHeight + 2);
 #if 0
     if (rideNavigator->tableView->model()->data(index, Qt::UserRole).toString() != "") s.setHeight(18);
     else s.setHeight(36);
@@ -978,7 +981,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         painter->drawLine(0,myOption.rect.y()+myOption.rect.height(),0,myOption.rect.y()+myOption.rect.height());
 
         // indent first column and draw all in bold
-        myOption.rect.setHeight(18); //added
+        myOption.rect.setHeight(rideNavigator->fontHeight + 2); //added
         myOption.font.setWeight(QFont::Bold);
         if (myOption.rect.x() == 0) {
             QRect indented(myOption.rect.x()+5, myOption.rect.y(), myOption.rect.width()-5, myOption.rect.height());
@@ -988,9 +991,9 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         // now get the calendar text to appear ...
         if (calendarText != "") {
             myOption.rect.setX(0);
-            myOption.rect.setY(myOption.rect.y() + 18);//was +23
+            myOption.rect.setY(myOption.rect.y() + rideNavigator->fontHeight + 2);//was +23
             myOption.rect.setWidth(rideNavigator->pwidth);
-            myOption.rect.setHeight(28); //was 36
+            myOption.rect.setHeight(rideNavigator->fontHeight * 2); //was 36
             myOption.font.setPointSize(myOption.font.pointSize());
             myOption.font.setWeight(QFont::Normal);
             //myOption.font.setStyle(QFont::StyleItalic);
@@ -1012,7 +1015,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         if (value != "") {
             myOption.displayAlignment = Qt::AlignLeft | Qt::AlignBottom;
             myOption.rect.setX(0);
-            myOption.rect.setHeight(18);
+            myOption.rect.setHeight(rideNavigator->fontHeight + 2);
             myOption.rect.setWidth(rideNavigator->pwidth);
             painter->fillRect(myOption.rect, GColor(CRIDEGROUP));
 #if 0
