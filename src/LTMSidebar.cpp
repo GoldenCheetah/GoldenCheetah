@@ -128,6 +128,10 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
 
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(setSummary(DateRange)));
+
+    // let everyone know what date range we are starting with
+    dateRangeTreeWidgetSelectionChanged();
+
 }
 
 void

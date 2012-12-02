@@ -1272,7 +1272,8 @@ GcWindowDialog::GcWindowDialog(GcWinID type, MainWindow *mainWindow) : mainWindo
 
     RideItem *notconst = (RideItem*)mainWindow->currentRideItem();
     win->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
-    win->setProperty("dateRange", property("dateRange"));
+    DateRange dr = mainWindow->currentDateRange();
+    win->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
 
     layout->setStretch(0, 100);
     layout->setStretch(1, 50);

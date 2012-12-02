@@ -1128,6 +1128,7 @@ MainWindow::dateRangeChangedDiary(DateRange dr)
     // when we have multiple sidebars that change date we need to connect
     // them up individually.... i.e. LTM....
     diaryWindow->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
+    _dr = dr;
 }
 
 void
@@ -1137,6 +1138,7 @@ MainWindow::dateRangeChangedLTM(DateRange dr)
     // when we have multiple sidebars that change date we need to connect
     // them up individually.... i.e. LTM....
     homeWindow->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
+    _dr = dr;
 }
 
 void
