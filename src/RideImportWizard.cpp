@@ -254,9 +254,9 @@ RideImportWizard::process()
 
     }
 
-    QApplication::processEvents();
     if (aborted) { done(0); }
     repaint();
+    QApplication::processEvents();
 
     // Pass 2 - Read in with the relevant RideFileReader method
 
@@ -273,8 +273,10 @@ RideImportWizard::process()
               tableWidget->item(i,5)->setText(tr("Parsing..."));
               tableWidget->setCurrentCell(i,5);
               QApplication::processEvents();
+
               if (aborted) { done(0); }
               this->repaint();
+              QApplication::processEvents();
 
               QList<RideFile*> rides;
               RideFile *ride = RideFileFactory::instance().openRideFile(mainWindow, thisfile, errors, &rides);
@@ -294,6 +296,7 @@ RideImportWizard::process()
                  resize(920 + ((willhave > 16 ? 24 : 0) +
                      (willhave > 9 && willhave < 17) ? 8 : 0),
                      118 + (willhave > 16 ? 17*20 : (willhave+1) * 20));
+
 
                  // ok so create a temporary file and add to the tableWidget
                  int counter = 0;
@@ -355,8 +358,8 @@ RideImportWizard::process()
                      counter++;
 
                      tableWidget->adjustSize();
-                     QApplication::processEvents();
                  }
+                 QApplication::processEvents();
 
 
                  // progress bar needs to adjust...
