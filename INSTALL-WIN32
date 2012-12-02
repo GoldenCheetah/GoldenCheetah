@@ -1,5 +1,4 @@
 
-
                                  +++++++++++++++++++++++
                                  WIN32 BUILD WALKTHROUGH
                                  +++++++++++++++++++++++
@@ -53,9 +52,9 @@ Now check out your favourite web sites until the code is built.
 Leave the Qt Command Prompt window open as we use it later.
 
 Download GoldenCheetah source
-(Either use GIT – git://github.com/srhea/GoldenCheetah.git
+(Either use GIT – git://github.com/GoldenCheetah/GoldenCheetah.git
  or download the zip file:
- http://github.com/srhea/GoldenCheetah/zipball/master)
+ http://github.com/GoldenCheetah/GoldenCheetah/zipball/master)
 - Install in D:\Coding\GoldenCheetah
 
 Copy D:\Coding\GoldenCheetah\src\gccconfig.pri.in
