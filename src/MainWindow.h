@@ -32,6 +32,7 @@
 #include "QuarqdClient.h"
 #include "RealtimeData.h"
 #include "SpecialFields.h"
+#include "TimeUtils.h"
 #include <boost/shared_ptr.hpp>
 
 #ifdef Q_OS_MAC
@@ -126,6 +127,7 @@ class MainWindow : public QMainWindow
         RideItem *rideItem() const { return ride; }
         const RideFile *currentRide();
         const RideItem *currentRideItem() { return ride; }
+        DateRange currentDateRange() { return _dr; }
         void updateRideFileIntervals();
         RideMetadata *rideMetadata() { return _rideMetadata; }
 
@@ -347,6 +349,7 @@ class MainWindow : public QMainWindow
         IntervalItem *activeInterval; // currently active for context menu popup
         RideItem *activeRide; // currently active for context menu popup
         RideItem *ride;  // the currently selected ride
+        DateRange _dr;   // the currently selected date range
 
         ErgFile *workout; // the currently selected workout file
         long now;
