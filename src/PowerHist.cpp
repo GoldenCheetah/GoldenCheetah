@@ -211,7 +211,7 @@ PowerHist::refreshZoneLabels()
 
     if (!rideItem) return;
 
-    if (series == RideFile::watts) {
+    if (series == RideFile::watts || series == RideFile::wattsKg) {
         const Zones *zones = rideItem->zones;
         int zone_range = rideItem->zoneRange();
 
@@ -964,7 +964,7 @@ PowerHist::setSeries(RideFile::SeriesType x) {
 
 bool PowerHist::shadeZones() const
 {
-    return (rideItem && rideItem->ride() && series == RideFile::watts && !zoned && shade == true);
+    return (rideItem && rideItem->ride() && (series == RideFile::watts || series == RideFile::wattsKg) && !zoned && shade == true);
 }
 
 bool PowerHist::shadeHRZones() const
