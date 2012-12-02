@@ -700,12 +700,12 @@ MainWindow::MainWindow(const QDir &home) :
     splitter->addWidget(toolBox);
     splitter->addWidget(views);
     QVariant splitterSizes = appsettings->cvalue(cyclist, GC_SETTINGS_SPLITTER_SIZES); 
-    if (splitterSizes != QVariant()) {
+    if (splitterSizes.toByteArray().size() > 1 ) {
         splitter->restoreState(splitterSizes.toByteArray());
         splitter->setOpaqueResize(true); // redraw when released, snappier UI
     } else {
         QList<int> sizes;
-        sizes.append(250);
+        sizes.append(150); // narrow as possible
         sizes.append(390);
         splitter->setSizes(sizes);
     }
