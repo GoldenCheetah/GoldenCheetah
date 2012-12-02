@@ -292,16 +292,22 @@ HistogramWindow::updateChart()
                                                   // be recomputed since interval selection
                                                   // has changed.
 
+
     // and now the controls
     powerHist->setShading(shadeZones->isChecked() ? true : false);
     powerHist->setZoned(showInZones->isChecked() ? true : false);
     powerHist->setlnY(showLnY->isChecked() ? true : false);
     powerHist->setWithZeros(showZeroes->isChecked() ? true : false);
     powerHist->setSumY(showSumY->currentIndex()== 0 ? true : false);
-    powerHist->setBinWidth(binWidthLineEdit->text().toDouble());
 
     // and which series to plot
     powerHist->setSeries(static_cast<RideFile::SeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt()));
+
+    // Correct binWidth if not valid for the selected series
+    if (binWidthLineEdit->text().toDouble()<powerHist->getDelta())
+        binWidthSlider->setValue(powerHist->getDelta());
+    else
+        powerHist->setBinWidth(binWidthLineEdit->text().toDouble());
 
     // now go plot yourself
     //powerHist->setAxisTitle(int axis, QString label);
