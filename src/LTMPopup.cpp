@@ -84,7 +84,6 @@ LTMPopup::LTMPopup(MainWindow *parent) : QWidget(parent), main(parent)
     metricFont.setPointSize(SMALLFONT);
     metrics->setFont(metricFont);
     mainLayout->addWidget(metrics);
-    mainLayout->addStretch();
 
     // display the ride notes here
     notes = new QTextEdit;
