@@ -820,7 +820,11 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
     array.resize(max-min);
 
     foreach(RideFilePoint *dp, ride->dataPoints()) {
-        double value = dp->value(series);
+        double value = dp->value(baseSeries);
+        if (series == RideFile::wattsKg) {
+            value /= ride->getWeight();
+        }
+
         float lvalue = value * pow(10, decimals);
 
         // watts time in zone
@@ -1108,7 +1112,7 @@ void RideFileCache::doubleArray(QVector<double> &into, QVector<float> &from, Rid
 {
     double divisor = pow(10, decimalsFor(series)); // ? 10 : 1;
     into.resize(from.size());
-    for(int i=0; i<from.size(); i++) into[i] = from[i] / divisor;
+    for(int i=0; i<from.size(); i++) into[i] = double(from[i]) / divisor;
 
     return;
 }
