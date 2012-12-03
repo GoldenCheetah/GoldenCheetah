@@ -132,8 +132,8 @@ void PerfPlot::plot() {
     } else if (num < 364) {
 	tics  = 27;
     }
-    //setAxisScale(xBottom, xmin, xmax,tics);
-    //axisWidget(xBottom)->update();
+    setAxisScale(xBottom, xmin, xmax,tics);
+    axisWidget(xBottom)->update();
 
     // set base
     xsd->setBase(startDate);
