@@ -722,24 +722,6 @@ EditMetricDetailDialog::EditMetricDetailDialog(MainWindow *mainWindow, MetricDet
     userUnits = new QLineEdit(this);
     userUnits->setText(metricDetail->uunits);
 
-    QLabel *filterlabel = new QLabel(tr("Filter"));
-    filter = new QComboBox(this);         // no filter / include / exclude
-    filter->addItem(tr("No filter"));
-    filter->addItem(tr("Include"));
-    filter->addItem(tr("Exclude"));
-
-    QLabel *fromlabel = new QLabel(tr("From"));
-    from = new QDoubleSpinBox(this);
-    from->setMinimum(-9999999.99);
-    from->setMaximum(9999999.99);
-
-    QLabel *tolabel = new QLabel(tr("To"));
-    to = new QDoubleSpinBox(this);
-    to->setMinimum(-9999999.99);
-    to->setMaximum(9999999.99);
-
-    showOnPlot = new QCheckBox(tr("Show on plot"), this);
-
     QLabel *style = new QLabel("Curve");
     curveStyle = new QComboBox(this);
     curveStyle->addItem("Bar", QwtPlotCurve::Steps);
@@ -807,32 +789,22 @@ EditMetricDetailDialog::EditMetricDetailDialog(MainWindow *mainWindow, MetricDet
     grid->addWidget(userName, 0,1);
     grid->addWidget(units, 1,0);
     grid->addWidget(userUnits, 1,1);
-
-
-    grid->addWidget(filterlabel, 2,0);
-    grid->addWidget(filter, 2,1);
-    grid->addWidget(fromlabel, 3,0);
-    grid->addWidget(from, 3,1);
-    grid->addWidget(tolabel, 4,0);
-    grid->addWidget(to, 4,1);
-    grid->addWidget(showOnPlot, 5,1);
-
-    grid->addWidget(style, 6,0);
-    grid->addWidget(curveStyle, 6,1);
-    grid->addWidget(symbol, 7,0);
-    grid->addWidget(curveSymbol, 7,1);
-    grid->addWidget(stackLabel, 8, 0);
-    grid->addWidget(stack, 8, 1);
-    grid->addWidget(color, 9,0);
-    grid->addWidget(curveColor, 9,1);
-    grid->addWidget(topN, 10,0);
-    grid->addWidget(showBest, 10,1);
-    grid->addWidget(outN, 11,0);
-    grid->addWidget(showOut, 11,1);
-    grid->addWidget(baseline, 12, 0);
-    grid->addWidget(baseLine, 12,1);
-    grid->addWidget(curveSmooth, 13,1);
-    grid->addWidget(curveTrend, 14,1);
+    grid->addWidget(style, 2,0);
+    grid->addWidget(curveStyle, 2,1);
+    grid->addWidget(symbol, 3,0);
+    grid->addWidget(curveSymbol, 3,1);
+    grid->addWidget(stackLabel, 4, 0);
+    grid->addWidget(stack, 4, 1);
+    grid->addWidget(color, 5,0);
+    grid->addWidget(curveColor, 5,1);
+    grid->addWidget(topN, 6,0);
+    grid->addWidget(showBest, 6,1);
+    grid->addWidget(outN, 7,0);
+    grid->addWidget(showOut, 7,1);
+    grid->addWidget(baseline, 8, 0);
+    grid->addWidget(baseLine, 8,1);
+    grid->addWidget(curveSmooth, 9,1);
+    grid->addWidget(curveTrend, 10,1);
 
     mainLayout->addLayout(grid);
 
