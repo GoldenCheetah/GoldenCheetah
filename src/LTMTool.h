@@ -172,11 +172,6 @@ class EditMetricDetailDialog : public QDialog
         QCheckBox *curveSmooth,
                   *curveTrend;
 
-        // filtering rides
-        QComboBox *filter;         // no filter / include / exclude
-        QDoubleSpinBox *from, *to; // value range
-        QCheckBox *showOnPlot;     // show me on the plot? (or just a criteria)
-
         QPushButton *applyButton, *cancelButton;
 
         QColor penColor; // chosen from color Picker
