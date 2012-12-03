@@ -262,9 +262,21 @@ public:
 					 shading_color.saturation() / 4,
 					 shading_color.value()
 					 );
-		    r.setLeft(xMap.transform(zone_lows[z]));
-		    if (z + 1 < num_zones)
-			r.setRight(xMap.transform(zone_lows[z + 1]));
+
+            double wattsLeft = zone_lows[z];
+            if (parent->series == RideFile::wattsKg) {
+                wattsLeft = wattsLeft / rideItem->ride()->getWeight();
+            }
+            r.setLeft(xMap.transform(wattsLeft));
+
+            if (z + 1 < num_zones)  {
+                double wattsRight = zone_lows[z + 1];
+                if (parent->series == RideFile::wattsKg) {
+                    wattsRight = wattsRight / rideItem->ride()->getWeight();
+                }
+                r.setRight(xMap.transform(wattsRight));
+            }
+
 		    if (r.right() >= r.left())
 			painter->fillRect(r, shading_color);
 		}
@@ -316,7 +328,7 @@ public:
 		      (1.5 * zone_lows[zone_number] - 0.5 * zone_lows[zone_number - 1]) :
 		      2.0 * zone_lows[zone_number]
 		      )
-		     );
+             );
 
 		text = QwtText(zone_names[zone_number]);
 		text.setFont(QFont("Helvetica",24, QFont::Bold));
@@ -337,8 +349,14 @@ public:
 	      const QwtScaleMap &xMap, const QwtScaleMap &,
               const QRectF &rect) const
     {
-	if (parent->shadeZones()) {
-	    int x = xMap.transform(watts);
+        RideItem *rideItem = parent->rideItem;
+
+    if (parent->shadeZones()) {
+        double position = watts;
+        if (parent->series == RideFile::wattsKg) {
+            position = watts / rideItem->ride()->getWeight();
+        }
+        int x = xMap.transform(position);
 	    int y = (rect.bottom() + rect.top()) / 2;
 
 	    // the following code based on source for QwtPlotMarker::draw()
