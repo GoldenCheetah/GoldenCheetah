@@ -38,7 +38,7 @@ typedef double data_t;
 // arrays when plotting CP curves and histograms. It is precoputed
 // to save time and cached in a file .cpx
 //
-static const unsigned int RideFileCacheVersion = 6;
+static const unsigned int RideFileCacheVersion = 7;
 // revision history:
 // version  date         description
 // 1        29-Apr-11    Initial - header, mean-max & distribution data blocks
@@ -47,6 +47,7 @@ static const unsigned int RideFileCacheVersion = 6;
 // 4        02-May-11    Moved to Mark Rages mean-max function with higher precision
 // 5        18-Aug-11    Added VAM mean maximals
 // 6        27-Jun-12    Added W/kg mean maximals and distribution
+// 7        03-Dec-12    Fixed W/kg calculations!
 
 // The cache file (.cpx) has a binary format:
 // 1 x Header data - describing the version and contents of the cache
