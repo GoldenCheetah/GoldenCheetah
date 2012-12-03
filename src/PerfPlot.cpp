@@ -24,15 +24,46 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_canvas.h>
 #include <qwt_plot_grid.h>
+#include <qwt_scale_widget.h>
 #include "RideItem.h"
 #include "RideFile.h"
 #include "PerfPlot.h"
 #include "StressCalculator.h"
 #include "Colors.h"
 
+// handle x-axis names
+class PPTimeScaleDraw: public QwtScaleDraw
+{
+    public:
+	PPTimeScaleDraw(const QDateTime &base):
+	    QwtScaleDraw(), baseTime(base) {
+		format = "MMM d";
+        QwtScaleDraw::invalidateCache();
+	    }
+	virtual QwtText label(double v) const
+	{
+	    QDateTime upTime = baseTime.addDays((int)v);
+	    return upTime.toString(format);
+	}
+    void setBase(QDateTime base)
+    {
+        baseTime = base;
+        invalidateCache();
+    }
+
+    private:
+	QDateTime baseTime;
+	QString format;
+
+};
+
 PerfPlot::PerfPlot() : STScurve(NULL), LTScurve(NULL), SBcurve(NULL), DAYcurve(NULL)
 {
     setInstanceName("PM Plot");
+
+    xsd = new PPTimeScaleDraw(QDateTime());
+    xsd->setTickLength(QwtScaleDiv::MajorTick, 3);
+    setAxisScaleDraw(QwtPlot::xBottom, xsd);
 
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setAxisTitle(yLeft, "Exponentially Weighted Average Stress");
@@ -46,10 +77,6 @@ PerfPlot::PerfPlot() : STScurve(NULL), LTScurve(NULL), SBcurve(NULL), DAYcurve(N
     setAxisMaxMinor(yRight, 0);
 
     QwtScaleDraw *sd = new QwtScaleDraw;
-    sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    setAxisScaleDraw(QwtPlot::xBottom, sd);
-
-    sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisScaleDraw(QwtPlot::yLeft, sd);
 
@@ -105,9 +132,11 @@ void PerfPlot::plot() {
     } else if (num < 364) {
 	tics  = 27;
     }
-    setAxisScale(xBottom, xmin, xmax,tics);
+    //setAxisScale(xBottom, xmin, xmax,tics);
+    //axisWidget(xBottom)->update();
 
-    setAxisScaleDraw(QwtPlot::xBottom, new TimeScaleDraw(startDate));
+    // set base
+    xsd->setBase(startDate);
 
     double width = appsettings->value(this, GC_LINEWIDTH, 20.0).toDouble();
 
@@ -172,6 +201,7 @@ void PerfPlot::plot() {
     SBcurve->setData(_sc->getDays()+xmin,_sc->getSBvalues()+xmin,num);
     SBcurve->attach(this);
 
+    axisWidget(QwtPlot::xBottom)->update();
     replot();
 
 }
@@ -205,4 +235,5 @@ PerfPlot::setAxisTitle(int axis, QString label)
     title.setFont(stGiles);
     QwtPlot::setAxisFont(axis, stGiles);
     QwtPlot::setAxisTitle(axis, title);
+    axisWidget(axis)->update();
 }
