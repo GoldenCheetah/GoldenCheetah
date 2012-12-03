@@ -184,7 +184,7 @@ void QwtAbstractScaleDraw::draw( QPainter *painter,
         {
             const double v = majorTicks[i];
             if ( d_data->scldiv.contains( v ) )
-                drawLabel( painter, majorTicks[i] );
+                drawLabel( painter, v );
         }
 
         painter->restore();

@@ -30,28 +30,7 @@
 #include "Settings.h"
 
 
-
-
-// handle x-axis names
-class TimeScaleDraw: public QwtScaleDraw
-{
-    public:
-	TimeScaleDraw(const QDateTime &base):
-	    baseTime(base) {
-		format = "MMM d";
-	    }
-	virtual QwtText label(double v) const
-	{
-	    QDateTime upTime = baseTime.addDays((int)v);
-	    return upTime.toString(format);
-	}
-    private:
-	QDateTime baseTime;
-	QString format;
-
-};
-
-
+class PPTimeScaleDraw;
 class PerfPlot : public QwtPlot
 {
     Q_OBJECT
@@ -64,6 +43,7 @@ class PerfPlot : public QwtPlot
 	int days;
 	QDateTime startDate;
 	StressCalculator *_sc;
+    PPTimeScaleDraw *xsd;
 	int xmin, xmax;
 
     public slots:
