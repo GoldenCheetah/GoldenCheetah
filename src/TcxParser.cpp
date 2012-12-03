@@ -104,9 +104,20 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
     else if (qName == "Value") { hr = buffer.toDouble(); }
     else if (qName == "Cadence") { cadence = buffer.toDouble(); }
     else if (qName == "AltitudeMeters") { alt = buffer.toDouble(); }
-    else if (qName == "LongitudeDegrees") { char *p; lon = strtod(buffer.toLatin1(), &p); }
-    else if (qName == "LatitudeDegrees") { char *p; lat = strtod(buffer.toLatin1(), &p); }
-    else if (qName == "Trackpoint") {
+    else if (qName == "LongitudeDegrees") {
+
+        char *p; 
+        setlocale(LC_NUMERIC,"C"); // strtod is locale dependent!
+        lon = strtod(buffer.toLatin1(), &p);
+        setlocale(LC_NUMERIC,"");
+
+    } else if (qName == "LatitudeDegrees") {
+        char *p;
+        setlocale(LC_NUMERIC,"C"); // strtod is locale dependent!
+        lat = strtod(buffer.toLatin1(), &p);
+        setlocale(LC_NUMERIC,"");
+
+    } else if (qName == "Trackpoint") {
 
         // Some TCX files have Speed, some have Distance
         // Lets derive Speed from Distance or vice-versa
