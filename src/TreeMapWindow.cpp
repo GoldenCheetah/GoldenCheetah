@@ -121,18 +121,22 @@ TreeMapWindow::TreeMapWindow(MainWindow *parent, bool useMetricUnits, const QDir
     metricTree->expandItem(allMetrics);
     cl->addRow(new QLabel("Metric"), metricTree);
 
+    // chart settings changed
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
     connect(metricTree,SIGNAL(itemSelectionChanged()), this, SLOT(metricTreeWidgetSelectionChanged()));
     connect(field1, SIGNAL(currentIndexChanged(int)), this, SLOT(fieldSelected(int)));
     connect(field2, SIGNAL(currentIndexChanged(int)), this, SLOT(fieldSelected(int)));
 
     // config changes or ride file activities cause a redraw/refresh (but only if active)
-    //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected(void)));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
     connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
     connect(main, SIGNAL(configChanged()), this, SLOT(refresh()));
 
+    // user clicked on a cell in the plot
+    connect(ltmPlot, SIGNAL(clicked(QString,QString)), this, SLOT(cellClicked(QString,QString)));
+
+    // lets refresh / setup state
     refresh();
 }
 
@@ -204,19 +208,26 @@ TreeMapWindow::fieldSelected(int)
 }
 
 void
-TreeMapWindow::pointClicked(QwtPlotCurve*, int )
+TreeMapWindow::cellClicked(QString f1, QString f2)
 {
-//XXX Throw up an LTM Popup when selected...
-#if 0
-    // get the date range for this point
-    QDate start, end;
-    LTMScaleDraw *lsd = new LTMScaleDraw(settings.start,
-                        groupForDate(settings.start.date(), settings.groupBy),
-                        settings.groupBy);
-    lsd->dateRange((int)round(curve->sample(index).x()), start, end);
-    ltmPopup->setData(settings, start, end);
+    QList<SummaryMetrics> cell;
+
+    // create a list of activities in this cell
+    int count = 0;
+    foreach(SummaryMetrics x, results) {
+        if (x.getText(settings.field1, "(unknown)") == f1 &&
+            x.getText(settings.field2, "(unknown)") == f2) {
+            cell.append(x);
+            count++;
+        }
+    }
+
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    const RideMetric *metric = factory.rideMetric(settings.symbol);
+
+    ltmPopup->setData(cell, metric, QString("%1 ride%2").arg(count).arg(count == 1 ? "" : "s"));
     popup->show();
-#endif
+
 }
 
 void

@@ -103,6 +103,97 @@ LTMPopup::setTitle(QString s)
 }
 
 void
+LTMPopup::setData(QList<SummaryMetrics>data, const RideMetric *metric, QString title)
+{
+    // list of activities only need to show 1 value (see symbol)
+    useMetricUnits = main->useMetricUnits;
+
+    // create the ride list
+    int count = 0;
+    rides->clear();
+    selected.clear();
+
+    // set headings
+    rides->setColumnCount(2);
+
+    // when
+    QTableWidgetItem *h = new QTableWidgetItem("Date & Time", QTableWidgetItem::Type);
+    rides->setHorizontalHeaderItem(0,h);
+
+    // value
+    h = new QTableWidgetItem(metric->name(), QTableWidgetItem::Type);
+    rides->setHorizontalHeaderItem(1,h);
+
+    // now add rows to the table for each entry
+    foreach(SummaryMetrics x, data) {
+
+        QDateTime rideDate = x.getRideDate();
+
+        // we'll select it for summary aggregation
+        selected << x;
+
+        // date/time
+        QTableWidgetItem *t = new QTableWidgetItem(rideDate.toString("ddd, dd MMM yy hh:mmA"));
+        t->setFlags(t->flags() & (~Qt::ItemIsEditable));
+        rides->setRowCount(count+1);
+        rides->setItem(count, 0, t);
+        rides->setRowHeight(count, 14);
+
+        // metrics
+        QString value = x.getStringForSymbol(metric->symbol(), useMetricUnits);
+        h = new QTableWidgetItem(value,QTableWidgetItem::Type);
+        h->setFlags(t->flags() & (~Qt::ItemIsEditable));
+        h->setTextAlignment(Qt::AlignHCenter);
+        rides->setItem(count, 1, h);
+
+
+        count++;
+    }
+
+    // make em all visible!
+    rides->resizeColumnsToContents();
+    if (count > 1) {
+        rides->setFixedHeight((count > 10 ? 10 : count) * 14 + rides->horizontalHeader()->height());
+    }
+
+    // select the first one
+    rides->setRangeSelected(QTableWidgetSelectionRange(0,0,0,1), true);
+
+    // for now at least, if multiple rides then show the table
+    // if single ride show the summary, show all if we're grouping by
+    // days tho, since we're interested in specific rides...
+    if (count > 1) {
+        //int size = ((count+1)*14) + rides->horizontalHeader()->height() + 4;
+        //rides->setFixedHeight(size > 100 ? 100 : size);
+
+        rides->show();
+        metrics->show();
+        notes->show();
+
+    } else {
+
+        rides->hide();
+        metrics->show();
+        notes->show();
+    }
+
+    // Metric summary
+    QString filename = main->home.absolutePath()+"/ltm-summary.html";
+    if (!QFile(filename).exists()) filename = ":/html/ltm-summary.html";
+
+    // read it in...
+    QFile summaryFile(filename);
+    if (summaryFile.open(QFile::ReadOnly | QFile::Text)) {
+        QTextStream in(&summaryFile);
+        summary = in.readAll();
+        summaryFile.close();
+    }
+            setTitle(title);
+
+    rideSelected();
+}
+
+void
 LTMPopup::setData(LTMSettings &settings, QDate start, QDate end)
 {
     useMetricUnits = main->useMetricUnits;

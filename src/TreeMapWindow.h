@@ -94,7 +94,7 @@ class TreeMapWindow : public GcWindow
         void metricTreeWidgetSelectionChanged();
         void refresh();
         void fieldSelected(int);
-        void pointClicked(QwtPlotCurve*, int);
+        void cellClicked(QString, QString); // cell clicked
 
     private:
         // passed from MainWindow

@@ -248,6 +248,9 @@ class TreeMapPlot : public QWidget
         void configUpdate();
         bool eventFilter(QObject *object, QEvent *e);
 
+    signals:
+        void clicked(QString, QString);
+
     protected:
 
         TreeMapWindow *parent;
