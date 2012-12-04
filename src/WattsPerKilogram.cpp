@@ -22,8 +22,7 @@
 #include "Settings.h"
 #include "MetricAggregator.h"
 #include <math.h>
-
-#define tr(s) QObject::tr(s)
+#include <QApplication>
 
 // first use RideFile::startTime, then Measure then fallback to Global Setting
 static double
@@ -46,12 +45,16 @@ getWeight(const MainWindow *main, const RideFile *ride)
 }
 
 class AverageWPK : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(AverageWPK)
 
     public:
 
     AverageWPK()
     {
         setSymbol("average_wpk");
+        setInternalName("Watts Per Kilogram");
+    }
+    void initialize () {
         setName(tr("Watts Per Kilogram"));
         setType(RideMetric::Average);
         setMetricUnits(tr("wpk"));
@@ -77,6 +80,7 @@ class AverageWPK : public RideMetric {
 };
 
 class PeakWPK : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(PeakWPK)
     double wpk;
     double secs;
     double weight;
@@ -112,143 +116,195 @@ class PeakWPK : public RideMetric {
 };
 
 class CPWPK : public PeakWPK {
+    Q_DECLARE_TR_FUNCTIONS(CPWPK)
     public:
         CPWPK()
         {
             setSecs(3600);
             setSymbol("60m_peak_wpk");
+            setInternalName("60 min Peak WPK");
+        }
+        void initialize () {
             setName(tr("60 min Peak WPK"));
         }
         RideMetric *clone() const { return new CPWPK(*this); }
 };
 
 class PeakWPK1s : public PeakWPK {
+    Q_DECLARE_TR_FUNCTIONS(PeakWPK1s)
     public:
         PeakWPK1s()
         {
             setSecs(1);
             setSymbol("1s_peak_wpk");
+            setInternalName("1 sec Peak WPK");
+        }
+        void initialize () {
             setName(tr("1 sec Peak WPK"));
         }
         RideMetric *clone() const { return new PeakWPK1s(*this); }
 };
 
 class PeakWPK5s : public PeakWPK {
+    Q_DECLARE_TR_FUNCTIONS(PeakWPK5s)
     public:
         PeakWPK5s()
         {
             setSecs(5);
             setSymbol("5s_peak_wpk");
+            setInternalName("5 sec Peak WPK");
+        }
+        void initialize () {
             setName(tr("5 sec Peak WPK"));
         }
         RideMetric *clone() const { return new PeakWPK5s(*this); }
 };
 
 class PeakWPK10s : public PeakWPK {
+    Q_DECLARE_TR_FUNCTIONS(PeakWPK10s)
     public:
         PeakWPK10s()
         {
             setSecs(10);
             setSymbol("10s_peak_wpk");
+            setInternalName("10 sec Peak WPK");
+        }
+        void initialize () {
             setName(tr("10 sec Peak WPK"));
         }
         RideMetric *clone() const { return new PeakWPK10s(*this); }
 };
 
 class PeakWPK15s : public PeakWPK {
+    Q_DECLARE_TR_FUNCTIONS(PeakWPK15s)
     public:
         PeakWPK15s()
         {
             setSecs(15);
             setSymbol("15s_peak_wpk");
+            setInternalName("15 sec Peak WPK");
+        }
+        void initialize () {
             setName(tr("15 sec Peak WPK"));
         }
         RideMetric *clone() const { return new PeakWPK15s(*this); }
 };
 
 class PeakWPK20s : public PeakWPK {
+    Q_DECLARE_TR_FUNCTIONS(PeakWPK20s)
     public:
         PeakWPK20s()
         {
             setSecs(20);
             setSymbol("20s_peak_wpk");
+            setInternalName("20 sec Peak WPK");
+        }
+        void initialize () {
             setName(tr("20 sec Peak WPK"));
         }
         RideMetric *clone() const { return new PeakWPK20s(*this); }
 };
 
 class PeakWPK30s : public PeakWPK {
+    Q_DECLARE_TR_FUNCTIONS(PeakWPK30s)
     public:
         PeakWPK30s()
         {
             setSecs(30);
             setSymbol("30s_peak_wpk");
+            setInternalName("30 sec Peak WPK");
+        }
+        void initialize () {
             setName(tr("30 sec Peak WPK"));
         }
         RideMetric *clone() const { return new PeakWPK30s(*this); }
 };
 
 class PeakWPK1m : public PeakWPK {
+    Q_DECLARE_TR_FUNCTIONS(PeakWPK1m)
     public:
         PeakWPK1m()
         {
             setSecs(60);
             setSymbol("1m_peak_wpk");
+            setInternalName("1 min Peak WPK");
+        }
+        void initialize () {
             setName(tr("1 min Peak WPK"));
         }
         RideMetric *clone() const { return new PeakWPK1m(*this); }
 };
 
 class PeakWPK5m : public PeakWPK {
+    Q_DECLARE_TR_FUNCTIONS(PeakWPK5m)
     public:
         PeakWPK5m()
         {
             setSecs(300);
             setSymbol("5m_peak_wpk");
+            setInternalName("5 min Peak WPK");
+        }
+        void initialize () {
             setName(tr("5 min Peak WPK"));
         }
         RideMetric *clone() const { return new PeakWPK5m(*this); }
 };
 
 class PeakWPK10m : public PeakWPK {
+    Q_DECLARE_TR_FUNCTIONS(PeakWPK10m)
     public:
         PeakWPK10m()
         {
             setSecs(600);
             setSymbol("10m_peak_wpk");
+            setInternalName("10 min Peak WPK");
+        }
+        void initialize () {
             setName(tr("10 min Peak WPK"));
         }
         RideMetric *clone() const { return new PeakWPK10m(*this); }
 };
 
 class PeakWPK20m : public PeakWPK {
+    Q_DECLARE_TR_FUNCTIONS(PeakWPK20m)
     public:
         PeakWPK20m()
         {
             setSecs(1200);
             setSymbol("20m_peak_wpk");
+            setInternalName("20 min Peak WPK");
+        }
+        void initialize () {
             setName(tr("20 min Peak WPK"));
         }
         RideMetric *clone() const { return new PeakWPK20m(*this); }
 };
 
 class PeakWPK30m : public PeakWPK {
+    Q_DECLARE_TR_FUNCTIONS(PeakWPK30m)
     public:
         PeakWPK30m()
         {
             setSecs(1800);
             setSymbol("30m_peak_wpk");
+            setInternalName("30 min Peak WPK");
+        }
+        void initialize () {
             setName(tr("30 min Peak WPK"));
         }
         RideMetric *clone() const { return new PeakWPK30m(*this); }
 };
 
 class Vo2max : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(Vo2max)
     public:
 
     Vo2max()
     {
         setSymbol("vo2max");
+        setInternalName("Estimated VO2MAX");
+    }
+    void initialize () {
         setName(tr("Estimated VO2MAX"));
         setType(RideMetric::Average);
         setMetricUnits(tr("ml/min/kg"));

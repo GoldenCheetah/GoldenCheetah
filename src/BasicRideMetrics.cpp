@@ -22,15 +22,18 @@
 #include "math.h"
 #include <algorithm>
 #include <QVector>
-
-#define tr(s) QObject::tr(s)
+#include <QApplication>
 
 class RideCount : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(RideCount)
     public:
 
     RideCount()
     {
         setSymbol("ride_count");
+        setInternalName("Rides");
+    }
+    void initialize() {
         setName(tr("Rides"));
         setMetricUnits(tr(""));
         setImperialUnits(tr(""));
@@ -50,6 +53,7 @@ static bool countAdded =
 
 //////////////////////////////////////////////////////////////////////////////
 class WorkoutTime : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(WorkoutTime)
     double seconds;
 
     public:
@@ -57,6 +61,9 @@ class WorkoutTime : public RideMetric {
     WorkoutTime() : seconds(0.0)
     {
         setSymbol("workout_time");
+        setInternalName("Duration");
+    }
+    void initialize() {
         setName(tr("Duration"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
@@ -84,6 +91,7 @@ static bool workoutTimeAdded =
 //////////////////////////////////////////////////////////////////////////////
 
 class TimeRiding : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(TimeRiding)
     double secsMovingOrPedaling;
 
     public:
@@ -91,6 +99,9 @@ class TimeRiding : public RideMetric {
     TimeRiding() : secsMovingOrPedaling(0.0)
     {
         setSymbol("time_riding");
+        setInternalName("Time Riding");
+    }
+    void initialize() {
         setName(tr("Time Riding"));
         setMetricUnits(tr("seconds"));
         setImperialUnits(tr("seconds"));
@@ -119,6 +130,7 @@ static bool timeRidingAdded =
 //////////////////////////////////////////////////////////////////////////////
 
 class TotalDistance : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(TotalDistance)
     double km;
 
     public:
@@ -126,6 +138,9 @@ class TotalDistance : public RideMetric {
     TotalDistance() : km(0.0)
     {
         setSymbol("total_distance");
+        setInternalName("Distance");
+    }
+    void initialize() {
         setName(tr("Distance"));
         setType(RideMetric::Total);
         setMetricUnits(tr("km"));
@@ -159,6 +174,7 @@ static bool totalDistanceAdded =
 
 
 class ElevationGain : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(ElevationGain)
     double elegain;
     double prevalt;
 
@@ -167,6 +183,9 @@ class ElevationGain : public RideMetric {
     ElevationGain() : elegain(0.0), prevalt(0.0)
     {
         setSymbol("elevation_gain");
+        setInternalName("Elevation Gain");
+    }
+    void initialize() {
         setName(tr("Elevation Gain"));
         setType(RideMetric::Total);
         setMetricUnits(tr("meters"));
@@ -203,6 +222,7 @@ static bool elevationGainAdded =
 //////////////////////////////////////////////////////////////////////////////
 
 class TotalWork : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(TotalWork)
     double joules;
 
     public:
@@ -210,6 +230,9 @@ class TotalWork : public RideMetric {
     TotalWork() : joules(0.0)
     {
         setSymbol("total_work");
+        setInternalName("Work");
+    }
+    void initialize() {
         setName(tr("Work"));
         setMetricUnits(tr("kJ"));
         setImperialUnits(tr("kJ"));
@@ -233,6 +256,7 @@ static bool totalWorkAdded =
 //////////////////////////////////////////////////////////////////////////////
 
 class AvgSpeed : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(AvgSpeed)
     double secsMoving;
     double km;
 
@@ -241,6 +265,9 @@ class AvgSpeed : public RideMetric {
     AvgSpeed() : secsMoving(0.0), km(0.0)
     {
         setSymbol("average_speed");
+        setInternalName("Average Speed");
+    }
+    void initialize() {
         setName(tr("Average Speed"));
         setMetricUnits(tr("kph"));
         setImperialUnits(tr("mph"));
@@ -278,6 +305,7 @@ static bool avgSpeedAdded =
 
 //////////////////////////////////////////////////////////////////////////////
 class Pace : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(Pace)
     double pace;
 
     public:
@@ -285,6 +313,9 @@ class Pace : public RideMetric {
     Pace() : pace(0.0)
     {
         setSymbol("pace");
+        setInternalName("Pace");
+    }
+    void initialize() {
         setName(tr("Pace"));
         setType(RideMetric::Average);
         setMetricUnits(tr("min/km"));
@@ -322,12 +353,18 @@ static bool paceAdded = addPace();
 //////////////////////////////////////////////////////////////////////////////
 
 struct AvgPower : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(AvgPower)
 
     double count, total;
+
+    public:
 
     AvgPower()
     {
         setSymbol("average_power");
+        setInternalName("Average Power");
+    }
+    void initialize() {
         setName(tr("Average Power"));
         setMetricUnits(tr("watts"));
         setImperialUnits(tr("watts"));
@@ -356,12 +393,18 @@ static bool avgPowerAdded =
 //////////////////////////////////////////////////////////////////////////////
 
 struct NonZeroPower : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(NonZeroPower)
 
     double count, total;
+
+    public:
 
     NonZeroPower()
     {
         setSymbol("nonzero_power");
+        setInternalName("Nonzero Average Power");
+    }
+    void initialize() {
         setName(tr("Nonzero Average Power"));
         setMetricUnits(tr("watts"));
         setImperialUnits(tr("watts"));
@@ -390,12 +433,18 @@ static bool nonZeroPowerAdded =
 //////////////////////////////////////////////////////////////////////////////
 
 struct AvgHeartRate : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(AvgHeartRate)
 
     double total, count;
+
+    public:
 
     AvgHeartRate()
     {
         setSymbol("average_hr");
+        setInternalName("Average Heart Rate");
+    }
+    void initialize() {
         setName(tr("Average Heart Rate"));
         setMetricUnits(tr("bpm"));
         setImperialUnits(tr("bpm"));
@@ -424,12 +473,18 @@ static bool avgHeartRateAdded =
 //////////////////////////////////////////////////////////////////////////////
 
 struct AvgCadence : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(AvgCadence)
 
     double total, count;
+
+    public:
 
     AvgCadence()
     {
         setSymbol("average_cad");
+        setInternalName("Average Cadence");
+    }
+    void initialize() {
         setName(tr("Average Cadence"));
         setMetricUnits(tr("rpm"));
         setImperialUnits(tr("rpm"));
@@ -458,12 +513,18 @@ static bool avgCadenceAdded =
 //////////////////////////////////////////////////////////////////////////////
 
 struct AvgTemp : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(AvgTemp)
 
     double total, count;
+
+    public:
 
     AvgTemp()
     {
         setSymbol("average_temp");
+        setInternalName("Average Temp");
+    }
+    void initialize() {
         setName(tr("Average Temp"));
         setMetricUnits(tr("C"));
         setImperialUnits(tr("F"));
@@ -501,11 +562,15 @@ static bool avgTempAdded =
 //////////////////////////////////////////////////////////////////////////////
 
 class MaxPower : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(MaxPower)
     double max;
     public:
     MaxPower() : max(0.0)
     {
         setSymbol("max_power");
+        setInternalName("Max Power");
+    }
+    void initialize() {
         setName(tr("Max Power"));
         setMetricUnits(tr("watts"));
         setImperialUnits(tr("watts"));
@@ -530,11 +595,15 @@ static bool maxPowerAdded =
 //////////////////////////////////////////////////////////////////////////////
 
 class MaxHr : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(MaxHr)
     double max;
     public:
     MaxHr() : max(0.0)
     {
         setSymbol("max_heartrate");
+        setInternalName("Max Heartrate");
+    }
+    void initialize() {
         setName(tr("Max Heartrate"));
         setMetricUnits(tr("bpm"));
         setImperialUnits(tr("bpm"));
@@ -559,11 +628,15 @@ static bool maxHrAdded =
 //////////////////////////////////////////////////////////////////////////////
 
 class MaxSpeed : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(MaxSpeed)
     public:
 
     MaxSpeed()
     {
         setSymbol("max_speed");
+        setInternalName("Max Speed");
+    }
+    void initialize() {
         setName(tr("Max Speed"));
         setMetricUnits(tr("kph"));
         setImperialUnits(tr("mph"));
@@ -598,11 +671,15 @@ static bool maxSpeedAdded =
 //////////////////////////////////////////////////////////////////////////////
 
 class MaxCadence : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(MaxCadence)
     public:
 
     MaxCadence()
     {
         setSymbol("max_cadence");
+        setInternalName("Max Cadence");
+    }
+    void initialize() {
         setName(tr("Max Cadence"));
         setMetricUnits(tr("rpm"));
         setImperialUnits(tr("rpm"));
@@ -635,11 +712,15 @@ static bool maxCadenceAdded =
 //////////////////////////////////////////////////////////////////////////////
 
 class MaxTemp : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(MaxTemp)
     public:
 
     MaxTemp()
     {
         setSymbol("max_temp");
+        setInternalName("Max Temp");
+    }
+    void initialize() {
         setName(tr("Max Temp"));
         setMetricUnits(tr("C"));
         setImperialUnits(tr("F"));
@@ -680,11 +761,15 @@ static bool maxTempAdded =
 //////////////////////////////////////////////////////////////////////////////
 
 class NinetyFivePercentHeartRate : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(NinetyFivePercentHeartRate)
     double hr;
     public:
     NinetyFivePercentHeartRate() : hr(0.0)
     {
         setSymbol("ninety_five_percent_hr");
+        setInternalName("95% Heartrate");
+    }
+    void initialize() {
         setName(tr("95% Heartrate"));
         setMetricUnits(tr("bpm"));
         setImperialUnits(tr("bpm"));
@@ -714,11 +799,15 @@ static bool ninetyFivePercentHeartRateAdded =
 ///////////////////////////////////////////////////////////////////////////////
 
 class VAM : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(VAM)
 
     public:
     VAM()
     {
         setSymbol("vam");
+        setInternalName("VAM");
+    }
+    void initialize() {
         setName(tr("VAM"));
         setImperialUnits("");
         setMetricUnits("");
@@ -750,11 +839,15 @@ static bool vamAdded = addVam();
 ///////////////////////////////////////////////////////////////////////////////
 
 class Gradient : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(Gradient)
 
     public:
     Gradient()
     {
         setSymbol("gradient");
+        setInternalName("Gradient");
+    }
+    void initialize() {
         setName(tr("Gradient"));
         setImperialUnits("%");
         setMetricUnits("%");
@@ -790,6 +883,7 @@ static bool gradientAdded = addGradient();
 ///////////////////////////////////////////////////////////////////////////////
 
 class MeanPowerVariance : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(MeanPowerVariance)
 
     public:
     LTMOutliers *outliers;
@@ -798,6 +892,9 @@ class MeanPowerVariance : public RideMetric {
     {
         outliers = NULL;
         setSymbol("meanpowervariance");
+        setInternalName("Average Power Variance");
+    }
+    void initialize() {
         setName(tr("Average Power Variance"));
         setImperialUnits("watts change");
         setMetricUnits("watts change");
@@ -840,11 +937,15 @@ static bool meanPowerVarianceAdded = addMeanPowerVariance();
 ///////////////////////////////////////////////////////////////////////////////
 
 class MaxPowerVariance : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(MaxPowerVariance)
 
     public:
     MaxPowerVariance()
     {
         setSymbol("maxpowervariance");
+        setInternalName("Max Power Variance");
+    }
+    void initialize() {
         setName(tr("Max Power Variance"));
         setImperialUnits("watts change");
         setMetricUnits("watts change");
