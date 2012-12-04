@@ -19,17 +19,20 @@
 #include "RideMetric.h"
 #include "Zones.h"
 #include <math.h>
-
-#define tr(s) QObject::tr(s)
+#include <QApplication>
 
 class LeftRightBalance : public RideMetric {
-     double count, total;
+    Q_DECLARE_TR_FUNCTIONS(LeftRightBalance)
+    double count, total;
 
     public:
 
     LeftRightBalance()
     {
         setSymbol("left_right_balance");
+        setInternalName("Left/Right Balance");
+    }
+    void initialize() {
         setName(tr("Left/Right Balance"));
         setMetricUnits(tr("%"));
         setImperialUnits(tr("%"));
