@@ -19,10 +19,10 @@
 #include "RideMetric.h"
 #include "Zones.h"
 #include <math.h>
-
-#define tr(s) QObject::tr(s)
+#include <QApplication>
 
 class NP : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(NP)
     double np;
     double secs;
 
@@ -31,6 +31,9 @@ class NP : public RideMetric {
     NP() : np(0.0), secs(0.0)
     {
         setSymbol("coggan_np");
+        setInternalName("NP");
+    }
+    void initialize() {
         setName("NP");
         setType(RideMetric::Average);
         setMetricUnits("watts");
@@ -88,6 +91,7 @@ class NP : public RideMetric {
 };
 
 class VI : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(VI)
     double vi;
     double secs;
 
@@ -96,6 +100,9 @@ class VI : public RideMetric {
     VI() : vi(0.0), secs(0.0)
     {
         setSymbol("coggam_variability_index");
+        setInternalName("VI");
+    }
+    void initialize() {
         setName("VI");
         setType(RideMetric::Average);
         setPrecision(3);
@@ -121,6 +128,7 @@ class VI : public RideMetric {
 };
 
 class IntensityFactor : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(IntensityFactor)
     double rif;
     double secs;
 
@@ -129,6 +137,9 @@ class IntensityFactor : public RideMetric {
     IntensityFactor() : rif(0.0), secs(0.0)
     {
         setSymbol("coggan_if");
+        setInternalName("IF");
+    }
+    void initialize() {
         setName("IF");
         setType(RideMetric::Average);
         setPrecision(3);
@@ -154,6 +165,7 @@ class IntensityFactor : public RideMetric {
 };
 
 class TSS : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(TSS)
     double score;
 
     public:
@@ -161,6 +173,9 @@ class TSS : public RideMetric {
     TSS() : score(0.0)
     {
         setSymbol("coggan_tss");
+        setInternalName("TSS");
+    }
+    void initialize() {
         setName("TSS");
         setType(RideMetric::Total);
     }
@@ -188,6 +203,7 @@ class TSS : public RideMetric {
 };
 
 class EfficiencyFactor : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(EfficiencyFactor)
     double ef;
 
     public:
@@ -195,6 +211,9 @@ class EfficiencyFactor : public RideMetric {
     EfficiencyFactor() : ef(0.0)
     {
         setSymbol("friel_efficiency_factor");
+        setInternalName("Efficiency Factor");
+    }
+    void initialize() {
         setName(tr("Efficiency Factor"));
         setType(RideMetric::Average);
         setMetricUnits(tr(""));

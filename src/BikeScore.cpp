@@ -19,8 +19,7 @@
 #include "RideMetric.h"
 #include "Zones.h"
 #include <math.h>
-
-#define tr(s) QObject::tr(s)
+#include <QApplication>
 
 const double  bikeScoreN   = 4.0;
 
@@ -34,6 +33,7 @@ const double  bikeScoreN   = 4.0;
 // a spreadsheet provided by Dr. Skiba.
 
 class XPower : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(XPower)
     double xpower;
     double secs;
 
@@ -42,6 +42,9 @@ class XPower : public RideMetric {
     XPower() : xpower(0.0), secs(0.0)
     {
         setSymbol("skiba_xpower");
+        setInternalName("xPower");
+    }
+    void initialize() {
         setName(tr("xPower"));
         setType(RideMetric::Average);
         setMetricUnits(tr("watts"));
@@ -91,6 +94,7 @@ class XPower : public RideMetric {
 };
 
 class VariabilityIndex : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(VariabilityIndex)
     double vi;
     double secs;
 
@@ -99,6 +103,9 @@ class VariabilityIndex : public RideMetric {
     VariabilityIndex() : vi(0.0), secs(0.0)
     {
         setSymbol("skiba_variability_index");
+        setInternalName("Skiba VI");
+    }
+    void initialize() {
         setName(tr("Skiba VI"));
         setType(RideMetric::Average);
         setMetricUnits(tr(""));
@@ -125,6 +132,7 @@ class VariabilityIndex : public RideMetric {
 };
 
 class RelativeIntensity : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(RelativeIntensity)
     double reli;
     double secs;
 
@@ -133,6 +141,9 @@ class RelativeIntensity : public RideMetric {
     RelativeIntensity() : reli(0.0), secs(0.0)
     {
         setSymbol("skiba_relative_intensity");
+        setInternalName("Relative Intensity");
+    }
+    void initialize() {
         setName(tr("Relative Intensity"));
         setType(RideMetric::Average);
         setMetricUnits(tr(""));
@@ -171,6 +182,7 @@ class RelativeIntensity : public RideMetric {
 };
 
 class BikeScore : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(BikeScore)
     double score;
 
     public:
@@ -178,6 +190,9 @@ class BikeScore : public RideMetric {
     BikeScore() : score(0.0)
     {
         setSymbol("skiba_bike_score");
+        setInternalName("BikeScore&#8482;");
+    }
+    void initialize() {
         setName(tr("BikeScore&#8482;"));
         setMetricUnits("");
         setImperialUnits("");
@@ -208,6 +223,7 @@ class BikeScore : public RideMetric {
 };
 
 class ResponseIndex : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(ResponseIndex)
     double ri;
 
     public:
@@ -215,6 +231,9 @@ class ResponseIndex : public RideMetric {
     ResponseIndex() : ri(0.0)
     {
         setSymbol("skiba_response_index");
+        setInternalName("Response Index");
+    }
+    void initialize() {
         setName(tr("Response Index"));
         setType(RideMetric::Average);
         setMetricUnits(tr(""));

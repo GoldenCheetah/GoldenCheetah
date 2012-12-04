@@ -99,6 +99,8 @@ main(int argc, char *argv[])
     QTranslator gcTranslator;
     gcTranslator.load(":translations/gc_" + lang.toString() + ".qm");
     app.installTranslator(&gcTranslator);
+    // Initialize metics once the translator is installed
+    RideMetricFactory::instance().initialize();
 
     QStringList args( app.arguments() );
 
