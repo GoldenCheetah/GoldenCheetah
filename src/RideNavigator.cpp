@@ -274,7 +274,8 @@ void RideNavigator::searchStrings(QStringList list)
 void RideNavigator::clearSearch()
 {
     searchFilter->clearStrings();
-    setWidth(geometry().width());
+    QApplication::processEvents(); // repaint/resize list view - scrollbar..
+    setWidth(geometry().width());  // before we update column sizes!
 }
 
 void RideNavigator::setWidth(int x)
