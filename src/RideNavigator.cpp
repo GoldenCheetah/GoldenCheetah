@@ -268,11 +268,13 @@ RideNavigator::resetView()
 void RideNavigator::searchStrings(QStringList list)
 {
     searchFilter->setStrings(list);
+    setWidth(geometry().width());
 }
 
 void RideNavigator::clearSearch()
 {
     searchFilter->clearStrings();
+    setWidth(geometry().width());
 }
 
 void RideNavigator::setWidth(int x)
