@@ -1390,7 +1390,7 @@ LTMPlot::refreshMarkers(QDate from, QDate to, int groupby)
     // seasons and season events
     foreach (Season s, main->seasons->seasons) {
 
-        if (s.type != Season::temporary && s.getStart() > from && s.getStart() < to) {
+        if (s.type != Season::temporary && s.name != settings->title && s.getStart() >= from && s.getStart() < to) {
 
             QwtPlotMarker *mrk = new QwtPlotMarker;
             markers.append(mrk);
