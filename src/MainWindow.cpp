@@ -567,7 +567,9 @@ MainWindow::MainWindow(const QDir &home) :
 
     QWidget *activityHistory = new QWidget(this);
     activityHistory->setContentsMargins(0,0,0,0);
+#ifndef Q_OS_MAC // not on mac thanks
     activityHistory->setStyleSheet("padding: 0px; border: 0px; margin: 0px;");
+#endif
     QVBoxLayout *activityLayout = new QVBoxLayout(activityHistory);
     activityLayout->setSpacing(0);
     activityLayout->setContentsMargins(0,0,0,0);
@@ -714,8 +716,10 @@ MainWindow::MainWindow(const QDir &home) :
 
     splitter->setChildrenCollapsible(false); // QT BUG crash QTextLayout do not undo this
     splitter->setHandleWidth(1);
+#ifndef Q_OS_MAC // not on Mac thanks
     splitter->setStyleSheet(" QSplitter::handle { background-color: #B3B4BA; "
                             "                     color: #B3B4BA; }");
+#endif
     splitter->setFrameStyle(QFrame::NoFrame);
     splitter->setContentsMargins(0, 0, 0, 0); // attempting to follow some UI guides
 
