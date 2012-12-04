@@ -343,23 +343,24 @@ StravaDialog::requestUpload()
         out += QString("%1").arg(point->lat,0,'f',GPS_COORD_TO_STRING);
         out += ",";
         out += QString("%1").arg(point->lon,0,'f',GPS_COORD_TO_STRING);
-        out += ",";
 
         if (altitudeChk->isChecked()) {
-            out += QString("%1").arg(point->alt);
             out += ",";
+            out += QString("%1").arg(point->alt);
+
         }
         if (powerChk->isChecked()) {
-            out += QString("%1").arg(point->watts);
             out += ",";
+            out += QString("%1").arg(point->watts);
         }
         if (altitudeChk->isChecked()) {
-            out += QString("%1").arg(point->cad);
             out += ",";
+            out += QString("%1").arg(point->cad);
         }
-        if (heartrateChk->isChecked())
+        if (heartrateChk->isChecked()) {
+            out += ",";
             out += QString("%1").arg(point->hr);
-
+        }
         out += "]";
         if(totalSize == size)
             out += "],";
