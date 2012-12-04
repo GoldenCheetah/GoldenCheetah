@@ -76,35 +76,53 @@ TreeMapWindow::TreeMapWindow(MainWindow *parent, bool useMetricUnits, const QDir
     popupLayout->addWidget(ltmPopup);
     popup->setLayout(popupLayout);
 
-    ltmTool = new LTMTool(parent, home, false); // false for single selection
-    settings.ltmTool = ltmTool;
-
-    // initialise
-    settings.data = NULL;
-    settings.groupBy = LTM_DAY;
-    if (appsettings->value(this, GC_SHADEZONES, true).toBool()==true)
-        settings.shadeZones = true;
-    else
-        settings.shadeZones = false;
-
     // controls
     field1 = new QComboBox(this);
     addTextFields(field1);
     field2 = new QComboBox(this);
     addTextFields(field2);
 
-    field1->setCurrentIndex(field1->findText(appsettings->value(this, GC_TM_FIRST, "None").toString()));
-    field2->setCurrentIndex(field2->findText(appsettings->value(this, GC_TM_SECOND, "None").toString()));
-    settings.field1 = field1->currentText();
-    settings.field2 = field2->currentText();
-
     cl->addRow(new QLabel("First"), field1);
     cl->addRow(new QLabel("Second"), field2);
-    cl->addRow(ltmTool);
+
+    // metric selector .. just ride metrics
+    metricTree = new QTreeWidget;
+#ifdef Q_OS_MAC
+    metricTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
+    metricTree->setColumnCount(1);
+    metricTree->setSelectionMode(QAbstractItemView::SingleSelection);
+    metricTree->header()->hide();
+    //metricTree->setFrameStyle(QFrame::NoFrame);
+    //metricTree->setAlternatingRowColors (true);
+    metricTree->setIndentation(5);
+    allMetrics = new QTreeWidgetItem(metricTree, ROOT_TYPE);
+    allMetrics->setText(0, tr("Metric"));
+    metricTree->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    // initialise the metrics catalogue and user selector
+    const RideMetricFactory &factory = RideMetricFactory::instance();
+    for (int i = 0; i < factory.metricCount(); ++i) {
+
+        QTreeWidgetItem *add;
+        add = new QTreeWidgetItem(allMetrics, METRIC_TYPE);
+
+        // I didn't define this API with name referring to a symbol in the factory
+        // I know it is confusing, but changing it will mean changing it absolutely
+        // everywhere. Just remember - in the factory "name" refers to symbol and
+        // if you want the user friendly metric description you get it via the metric
+        QString title = factory.rideMetric(factory.metricName(i))->name();
+        add->setText(0, title); // long name
+        add->setText(1, factory.metricName(i)); // symbol (hidden)
+
+        // by default use workout_time
+        if (factory.metricName(i) == "workout_time") allMetrics->child(i)->setSelected(true);
+    }
+    metricTree->expandItem(allMetrics);
+    cl->addRow(new QLabel("Metric"), metricTree);
 
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
-    connect(ltmTool, SIGNAL(metricSelected()), this, SLOT(metricSelected()));
-    connect(ltmTool, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
+    connect(metricTree,SIGNAL(itemSelectionChanged()), this, SLOT(metricTreeWidgetSelectionChanged()));
     connect(field1, SIGNAL(currentIndexChanged(int)), this, SLOT(fieldSelected(int)));
     connect(field2, SIGNAL(currentIndexChanged(int)), this, SLOT(fieldSelected(int)));
 
@@ -115,7 +133,7 @@ TreeMapWindow::TreeMapWindow(MainWindow *parent, bool useMetricUnits, const QDir
     connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
     connect(main, SIGNAL(configChanged()), this, SLOT(refresh()));
 
-    dateRangeChanged(DateRange());
+    refresh();
 }
 
 TreeMapWindow::~TreeMapWindow()
@@ -126,146 +144,70 @@ TreeMapWindow::~TreeMapWindow()
 void
 TreeMapWindow::rideSelected()
 {
-    active = amVisible();
-
-    if (active == true) {
-        // mimic user first selection now that
-        // we are active - choose a chart and
-        // use the first available date range
-        //XXX ltmTool->selectDateRange(0);
-
-        // default to duration
-        ltmTool->selectMetric(appsettings->value(this, GC_TM_METRIC, "workout_time").toString());
-
-    } else if (active == true && dirty == true) {
-
-        // plot needs to be redrawn
-        refresh();
-    } else if (active == false) {
-        popup->hide();
-    }
 }
 
 void
 TreeMapWindow::refreshPlot()
 {
-    if (active == true) ltmPlot->setData(&settings);
+    ltmPlot->setData(&settings);
 }
 
 // total redraw, reread data etc
 void
 TreeMapWindow::refresh()
 {
+    if (!amVisible()) return;
+
     // refresh for changes to ridefiles / zones
-    if (active == true) {
+    if (active == false) {
         // if config has changed get new useMetricUnits
         useMetricUnits = main->useMetricUnits;
 
+        // setup settings to current user selection
+        foreach(QTreeWidgetItem *metric, metricTree->selectedItems()) {
+            if (metric->type() != ROOT_TYPE) {
+                QString symbol = metric->text(1);
+                settings.symbol = symbol;
+            }
+        }
+        settings.from = myDateRange.from;
+        settings.to = myDateRange.to;
+        settings.field1 = field1->currentText();
+        settings.field2 = field2->currentText();
+        settings.data = &results;
+
+        // get the data
         results.clear(); // clear any old data
-        results = main->metricDB->getAllMetricsFor(settings.start, settings.end);
-        measures.clear(); // clear any old data
-        measures = main->metricDB->getAllMeasuresFor(settings.start, settings.end);
+        results = main->metricDB->getAllMetricsFor(QDateTime(myDateRange.from, QTime(0,0,0)),
+                                                   QDateTime(myDateRange.to, QTime(0,0,0)));
+
         refreshPlot();
-        dirty = false;
-    } else {
-        dirty = true;
     }
 }
 
 void
-TreeMapWindow::metricSelected()
+TreeMapWindow::metricTreeWidgetSelectionChanged()
 {
-    // wipe existing settings
-    settings.metrics.clear();
-
-    foreach(QTreeWidgetItem *metric, ltmTool->selectedMetrics()) {
-        if (metric->type() != ROOT_TYPE) {
-            QString symbol = ltmTool->metricSymbol(metric);
-            settings.metrics.append(ltmTool->metricDetails(metric));
-            appsettings->setValue(GC_TM_METRIC, settings.metrics[0].symbol);
-        }
-    }
-    ltmPlot->setData(&settings);
+    refresh();
 }
 
 void
 TreeMapWindow::dateRangeChanged(DateRange)
 {
-    settings.data = &results;
-    settings.measures = &measures;
-
-    // apply filter too.. will read all data etc
-    filterChanged();
-
-    ltmPlot->setData(&settings);
-}
-
-void
-TreeMapWindow::filterChanged()
-{
-    // first refresh all data - since it is cropped in LTMPlot
-    settings.start = QDateTime(myDateRange.from, QTime(0,0));
-    settings.end   = QDateTime(myDateRange.to, QTime(24,0,0));
-    settings.title = myDateRange.name;
-    settings.data = &results;
-
-    // if we want weeks and start is not a monday go back to the monday
-    int dow = myDateRange.from.dayOfWeek();
-    if (settings.groupBy == LTM_WEEK && dow >1 && myDateRange.from != QDate())
-        settings.start = settings.start.addDays(-1*(dow-1));
-
-    // we need to get data again and apply filter
-    results.clear(); // clear any old data
-    results = main->metricDB->getAllMetricsFor(settings.start, settings.end);
-
-    measures.clear(); // clear any old data
-    measures = main->metricDB->getAllMeasuresFor(settings.start, settings.end);
-
-    // loop through results removing any not in stringlist..
-    if (ltmTool->isFiltered()) {
-
-        QList<SummaryMetrics> filteredresults;
-        foreach (SummaryMetrics x, results) {
-            if (ltmTool->filters().contains(x.getFileName()))
-                filteredresults << x;
-        }
-        results = filteredresults;
-        settings.data = &results;
-    }
-
-    refreshPlot();
+    refresh();
 }
 
 void
 TreeMapWindow::fieldSelected(int)
 {
-    settings.field1 = field1->currentText();
-    settings.field2 = field2->currentText();
-    ltmPlot->setData(&settings);
-    appsettings->setValue(GC_TM_FIRST, field1->currentText());
-    appsettings->setValue(GC_TM_SECOND, field2->currentText());
+    refresh();
 }
 
-int
-TreeMapWindow::groupForDate(QDate date, int groupby)
-{
-    switch(groupby) {
-    case LTM_WEEK:
-        {
-        // must start from 1 not zero!
-        return 1 + ((date.toJulianDay() - settings.start.date().toJulianDay()) / 7);
-        }
-    case LTM_MONTH: return (date.year()*12) + date.month();
-    case LTM_YEAR:  return date.year();
-    case LTM_DAY:
-    default:
-        return date.toJulianDay();
-
-    }
-}
 void
-TreeMapWindow::pointClicked(QwtPlotCurve*curve, int index)
+TreeMapWindow::pointClicked(QwtPlotCurve*, int )
 {
+//XXX Throw up an LTM Popup when selected...
+#if 0
     // get the date range for this point
     QDate start, end;
     LTMScaleDraw *lsd = new LTMScaleDraw(settings.start,
@@ -274,6 +216,7 @@ TreeMapWindow::pointClicked(QwtPlotCurve*curve, int index)
     lsd->dateRange((int)round(curve->sample(index).x()), start, end);
     ltmPopup->setData(settings, start, end);
     popup->show();
+#endif
 }
 
 void

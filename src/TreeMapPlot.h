@@ -22,13 +22,10 @@
 
 #include <QtGui>
 
-#include "LTMTool.h"
-#include "LTMSettings.h"
 #include "MetricAggregator.h"
-
+#include "TreeMapWindow.h"
 #include "MainWindow.h"
 
-class TreeMapWindow;
 
 // for sorting
 class TreeMap;
@@ -245,7 +242,7 @@ class TreeMapPlot : public QWidget
     public:
         TreeMapPlot(TreeMapWindow *, MainWindow *main, QDir home);
         ~TreeMapPlot();
-        void setData(LTMSettings *);
+        void setData(TMSettings *);
 
     public slots:
         void configUpdate();
@@ -261,7 +258,7 @@ class TreeMapPlot : public QWidget
         MainWindow *main;
         QDir home;
         bool useMetricUnits;
-        struct LTMSettings *settings;
+        struct TMSettings *settings;
 
         TreeMap *root;      // the tree map data structure
         TreeMap *highlight; // currently needs to be highlighted
