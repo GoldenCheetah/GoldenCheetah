@@ -213,7 +213,7 @@ TreeMapPlot::eventFilter(QObject *, QEvent *e)
 
             // got one?
             if (underMouse) {
-                //qDebug()<<"clicked on:"<<underMouse->parent->name<<underMouse->name;
+                emit clicked(underMouse->parent->name, underMouse->name);
             }
         }
     }

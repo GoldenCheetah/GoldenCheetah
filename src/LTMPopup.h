@@ -24,6 +24,7 @@
 #include "Settings.h"
 #include "LTMSettings.h"
 #include "MetricAggregator.h"
+#include "RideMetric.h"
 
 #include <QDir>
 #include <QtGui>
@@ -38,7 +39,12 @@ class LTMPopup : public QWidget
 
         LTMPopup(MainWindow *parent);
         void setTitle(QString);
+
+        // when called from LTM chart
         void setData(LTMSettings &settings, QDate start, QDate end);
+
+        // when called from a TreeMap chart
+        void setData(QList<SummaryMetrics>data, const RideMetric *metric, QString title);
 
     signals:
 
