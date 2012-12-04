@@ -69,15 +69,12 @@ TreeMapPlot::configUpdate()
 }
 
 void
-TreeMapPlot::setData(LTMSettings *settings)
+TreeMapPlot::setData(TMSettings *settings)
 {
-    // make sure we have a metric to plot...
-    if (settings->metrics.count() != 1) return;
-
     root->clear();
 
     foreach (SummaryMetrics rideMetrics, *(settings->data)) {
-        double value = rideMetrics.getForSymbol(settings->metrics[0].symbol);
+        double value = rideMetrics.getForSymbol(settings->symbol);
         QString text1 = rideMetrics.getText(settings->field1, "(unknown)");
         QString text2 = rideMetrics.getText(settings->field2, "(unknown)");
         if (text1 == "") text1 = "(unknown)";
@@ -200,6 +197,26 @@ TreeMapPlot::eventFilter(QObject *, QEvent *e)
         highlight = NULL;
         repaint();
         return true;
+
+    } else if (e->type() == QEvent::MouseButtonPress) {
+
+        QPoint pos = static_cast<QMouseEvent*>(e)->pos();
+        Qt::MouseButton button = static_cast<QMouseEvent*>(e)->button();
+
+        if (button == Qt::LeftButton) {
+            TreeMap *underMouse = NULL;
+
+            // look at the bottom rung.
+            foreach (TreeMap *first, root->children)
+                if ((underMouse = first->findAt(pos)) != NULL)
+                    break;
+
+            // got one?
+            if (underMouse) {
+                //qDebug()<<"clicked on:"<<underMouse->parent->name<<underMouse->name;
+            }
+        }
     }
+
     return false;
 }

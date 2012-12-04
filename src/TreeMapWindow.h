@@ -26,12 +26,7 @@
 #include "MetricAggregator.h"
 #include "RideMetadata.h"
 #include "Season.h"
-#include "TreeMapPlot.h"
 #include "LTMPopup.h"
-#include "LTMTool.h"
-#include "LTMSettings.h"
-#include "LTMWindow.h"
-#include "LTMCanvasPicker.h"
 #include "GcPane.h"
 
 #include <math.h>
@@ -39,8 +34,16 @@
 #include <qwt_plot_picker.h>
 #include <qwt_text_engine.h>
 
-class TreeMapPlot;
+class TMSettings
+{
+    public:
+        QString symbol;
+        QString field1, field2;
+        QDate from, to;
+        QList<SummaryMetrics> *data;
+};
 
+class TreeMapPlot;
 class TreeMapWindow : public GcWindow
 {
     Q_OBJECT
@@ -48,10 +51,7 @@ class TreeMapWindow : public GcWindow
 
     Q_PROPERTY(QString f1 READ f1 WRITE setf1 USER true)
     Q_PROPERTY(QString f2 READ f2 WRITE setf2 USER true)
-#ifdef GC_HAVE_LUCENE
-    Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
-#endif
-    Q_PROPERTY(LTMSettings settings READ getSettings WRITE applySettings USER true)
+    Q_PROPERTY(QString metric READ symbol WRITE setsymbol USER true)
 
     public:
 
@@ -63,28 +63,44 @@ class TreeMapWindow : public GcWindow
         void setf1(QString x) const { field1->setCurrentIndex(field1->findText(x)); }
         QString f2() const { return field2->currentText(); }
         void setf2(QString x) const { field2->setCurrentIndex(field1->findText(x)); }
-        LTMSettings getSettings() const { return settings; }
-        void applySettings(LTMSettings x) { ltmTool->applySettings(&x); }
-#ifdef GC_HAVE_LUCENE
-        QString filter() const { return ltmTool->searchBox->filter(); }
-        void setFilter(QString x) { ltmTool->searchBox->setFilter(x); }
-#endif
+
+        QString symbol() const {
+            // we got a selection?
+            if (metricTree->selectedItems().count()) {
+                return metricTree->selectedItems().first()->text(1);
+            } else {
+                return "";
+            }
+        }
+        void setsymbol(QString name) {
+            if (name == "") return;
+
+            // Go find it...
+            active = true;
+            for (int i=0; i<allMetrics->childCount(); i++) {
+                if (allMetrics->child(i)->text(1) == name) {
+                    allMetrics->child(i)->setSelected(true);
+                } else {
+                    allMetrics->child(i)->setSelected(false);
+                }
+            }
+            active = false;
+        }
 
     public slots:
         void rideSelected();
         void refreshPlot();
         void dateRangeChanged(DateRange);
-        void metricSelected();
-        void filterChanged();
+        void metricTreeWidgetSelectionChanged();
         void refresh();
         void fieldSelected(int);
         void pointClicked(QwtPlotCurve*, int);
-        int groupForDate(QDate, int);
 
     private:
         // passed from MainWindow
         QDir home;
         bool useMetricUnits;
+        TMSettings settings;
 
         // popup - the GcPane to display within
         //         and the LTMPopup contents widdget
@@ -96,18 +112,17 @@ class TreeMapWindow : public GcWindow
         bool dirty;
         QList<KeywordDefinition> keywordDefinitions;
         QList<FieldDefinition>   fieldDefinitions;
-        LTMSettings settings; // all the plot settings
         QList<SummaryMetrics> results;
-        QList<SummaryMetrics> measures;
 
         // Widgets
         QVBoxLayout *mainLayout;
         TreeMapPlot *ltmPlot;
-        LTMTool *ltmTool;
         QLabel *title;
 
         QComboBox *field1,
                   *field2;
+        QTreeWidget *metricTree;
+        QTreeWidgetItem *allMetrics;
         void addTextFields(QComboBox *);
 };
 
