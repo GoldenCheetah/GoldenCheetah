@@ -23,54 +23,55 @@
 
 SpecialFields::SpecialFields()
 {
-    names_  << "Start Date"    // linked to RideFile::starttime
-            << "Start Time"    // linked to RideFile::starttime
-            << "Identifier"    // linkned to RideFile::id
-            << "Workout Code" // in WKO and possibly others
-            << "Sport"        // in WKO and possible others
-            << "Objective"    // in WKO as "goal" nad possibly others
-            << "Summary"      // embeds the RideSummary widget
-            << "Notes"        // linked to MainWindow::rideNotes
-            << "Keywords"     // extracted from Notes / used for highlighting calendar
-            << "Recording Interval" // linked to RideFile::recIntSecs
-            << "Weight"       // in WKO and possibly others
-            << "Device"       // RideFile::devicetype
-            << "Device Info"  // in WKO and TCX and possibly others
-            << "Dropouts"     // calculated from source data by FixGaps
-            << "Dropout Time" // calculated from source data vy FixGaps
-            << "Spikes"       // calculated from source data by FixSpikes
-            << "Spike Time"   // calculated from source data by FixSpikes
-            << "Torque Adjust" // the last torque adjust applied
-            << "Filename"      // set by the rideFile reader
-            << "Year"          // set by the rideFile reader
-            << "Change History" // set by RideFileCommand
-            << "Calendar Text" // set by openRideFile and rideMetadata
-            << "Data"          // set by openRideFile for areDataPresent
-            ;
+    namesmap.insert("Start Date", tr("Start Date"));                 // linked to RideFile::starttime
+    namesmap.insert("Start Time", tr("Start Time"));                 // linked to RideFile::starttime
+    namesmap.insert("Identifier", tr("Identifier"));                 // linked to RideFile::id
+    namesmap.insert("Workout Code", tr("Workout Code"));             // in WKO and possibly others
+    namesmap.insert("Sport", tr("Sport"));                           // in WKO and possible others
+    namesmap.insert("Objective", tr("Objective"));                   // in WKO as "goal" nad possibly others
+    namesmap.insert("Summary", tr("Summary"));                       // embeds the RideSummary widget
+    namesmap.insert("Notes", tr("Notes"));                           // linked to MainWindow::rideNotes
+    namesmap.insert("Keywords", tr("Keywords"));                     // extracted from Notes / used for highlighting calendar
+    namesmap.insert("Recording Interval", tr("Recording Interval")); // linked to RideFile::recIntSecs
+    namesmap.insert("Weight", tr("Weight"));                         // in WKO and possibly others
+    namesmap.insert("Device", tr("Device"));                         // RideFile::devicetype
+    namesmap.insert("Device Info", tr("Device Info"));               // in WKO and TCX and possibly others
+    namesmap.insert("Dropouts", tr("Dropouts"));                     // calculated from source data by FixGaps
+    namesmap.insert("Dropout Time", tr("Dropout Time"));             // calculated from source data vy FixGaps
+    namesmap.insert("Spikes", tr("Spikes"));                         // calculated from source data by FixSpikes
+    namesmap.insert("Spike Time", tr("Spike Time"));                 // calculated from source data by FixSpikes
+    namesmap.insert("Torque Adjust", tr("Torque Adjust"));           // the last torque adjust applied
+    namesmap.insert("Filename", tr("Filename"));                     // set by the rideFile reader
+    namesmap.insert("Year", tr("Year"));                             // set by the rideFile reader
+    namesmap.insert("Change History", tr("Change History"));         // set by RideFileCommand
+    namesmap.insert("Calendar Text", tr("Calendar Text"));           // set by openRideFile and rideMetadata
+    namesmap.insert("Data", tr("Data"));                             // set by openRideFile for areDataPresent
 
     // now add all the metric fields (for metric overrides)
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i=0; i<factory.metricCount(); i++) {
         const RideMetric *add = factory.rideMetric(factory.metricName(i));
         QTextEdit processHTML(add->name());
-        names_ << processHTML.toPlainText();
-        metricmap.insert(processHTML.toPlainText(), add);
+        QTextEdit processHTMLinternal(add->internalName());
+        // add->internalName() used for compatibility win metadata.xml, could be replaced by factory.metricName(i) or add->symbol()
+        namesmap.insert(processHTMLinternal.toPlainText(), processHTML.toPlainText());
+        metricmap.insert(processHTMLinternal.toPlainText(), add);
     }
 
     model_ = new QStringListModel;
-    model_->setStringList(names_);
+    model_->setStringList(namesmap.keys());
 }
 
 bool
 SpecialFields::isSpecial(QString &name) const
 {
-    return names_.contains(name);
+    return namesmap.contains(name);
 }
 
 bool
 SpecialFields::isUser(QString &name) const
 {
-    return !names_.contains(name);
+    return !namesmap.contains(name);
 }
 
 bool
@@ -103,3 +104,52 @@ SpecialFields::rideMetric(QString&name) const
 {
     return metricmap.value(name, NULL);
 }
+
+QString
+SpecialFields::displayName(QString &name) const
+{
+    // return localized name for display
+    if (namesmap.contains(name)) return namesmap.value(name);
+    else return(name);
+}
+
+QString
+SpecialFields::internalName(QString displayName) const
+{
+    // return internal name for storage
+    QMapIterator<QString, QString> i(namesmap);
+    while (i.hasNext()) {
+        i.next();
+        if (i.value() == displayName) return i.key();
+    }
+    return(displayName);
+}
+
+SpecialTabs::SpecialTabs()
+{
+    namesmap.insert("Workout", tr("Workout"));
+    namesmap.insert("Notes", tr("Notes"));
+    namesmap.insert("Metric", tr("Metric"));
+    namesmap.insert("Metric", tr("Extra"));
+}
+
+QString
+SpecialTabs::displayName(QString &internalName) const
+{
+    // return localized name for display
+    if (namesmap.contains(internalName)) return namesmap.value(internalName);
+    else return(internalName);
+}
+
+QString
+SpecialTabs::internalName(QString displayName) const
+{
+    // return internal name for storage
+    QMapIterator<QString, QString> i(namesmap);
+    while (i.hasNext()) {
+        i.next();
+        if (i.value() == displayName) return i.key();
+    }
+    return(displayName);
+}
+
