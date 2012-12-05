@@ -2019,6 +2019,7 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
 #endif
 
     SpecialFields specials;
+    SpecialTabs specialTabs;
     foreach(FieldDefinition field, fieldDefinitions) {
         QTreeWidgetItem *add;
         QComboBox *comboButton = new QComboBox(this);
@@ -2037,9 +2038,9 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
         add->setFlags(add->flags() | Qt::ItemIsEditable);
 
         // tab name
-        add->setText(0, field.tab);
+        add->setText(0, specialTabs.displayName(field.tab));
         // field name
-        add->setText(1, field.name);
+        add->setText(1, specials.displayName(field.name));
         // values
         add->setText(3, field.values.join(","));
 
@@ -2155,6 +2156,7 @@ void
 FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
 {
     SpecialFields sp;
+    SpecialTabs st;
     QStringList checkdups;
 
     // clear current just in case
@@ -2169,8 +2171,8 @@ FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
         if (checkdups.contains(item->text(1))) continue;
         else checkdups << item->text(1);
 
-        add.tab = item->text(0);
-        add.name = item->text(1);
+        add.tab = st.internalName(item->text(0));
+        add.name = sp.internalName(item->text(1));
         add.values = item->text(3).split(QRegExp("(, *|,)"), QString::KeepEmptyParts);
         add.diary = ((QCheckBox*)fields->itemWidget(item, 4))->isChecked();
 
