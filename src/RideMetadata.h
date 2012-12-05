@@ -133,6 +133,7 @@ class RideMetadata : public QWidget
         SpecialFields sp;
 
         MainWindow *main;
+        SpecialTabs specialTabs;
 
     public slots:
         void configUpdate();

@@ -228,10 +228,11 @@ RideMetadata::configUpdate()
         if (fieldDefinitions[i].tab == "") continue; // not to be shown!
 
         Form *form;
-        if ((form = tabList.value(fieldDefinitions[i].tab, NULL)) == NULL) {
+        QString tabName = specialTabs.displayName(fieldDefinitions[i].tab);
+        if ((form = tabList.value(tabName, NULL)) == NULL) {
             form = new Form(this);
-            tabs->addTab(form, fieldDefinitions[i].tab);
-            tabList.insert(fieldDefinitions[i].tab, form);
+            tabs->addTab(form, tabName);
+            tabList.insert(tabName, form);
         }
         form->addField(fieldDefinitions[i]);
     }
@@ -406,7 +407,7 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
         if (units != "") units = QString(" (%1)").arg(units);
     }
 
-    label = new QLabel(QString("%1%2").arg(field.name).arg(units), this);
+    label = new QLabel(QString("%1%2").arg(meta->sp.displayName(field.name)).arg(units), this);
     //label->setFont(font);
     //label->setFixedHeight(18);
 
