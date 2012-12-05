@@ -726,10 +726,13 @@ LTMPlot::setData(LTMSettings *set)
 
     // draw zone labels axisid of -1 means delete whats there
     // cause no watts are being displayed
-    if (settings->shadeZones == true)
-        refreshZoneLabels(axes.value("watts", -1));
-    else
+    if (settings->shadeZones == true) {
+        int axisid = axes.value("watts", -1);
+        if (axisid == -1) axisid = axes.value(tr("watts"), -1); // Try translated version
+        refreshZoneLabels(axisid);
+    } else {
         refreshZoneLabels(-1); // turn em off
+    }
 
     // show legend?
     if (settings->legend == false) this->legend()->clear();
