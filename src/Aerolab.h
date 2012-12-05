@@ -135,7 +135,7 @@ class Aerolab : public QwtPlot {
   int      intRho() const { return (int)( rho * 10000); }
   int      intEta() const { return (int)( eta * 10000); }
   int      intEoffset() const { return (int)( eoffset * 100); }
-  bool     estimateCdACrr(RideItem* rideItem);
+  QString  estimateCdACrr(RideItem* rideItem);
 
 };
 

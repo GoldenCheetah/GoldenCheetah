@@ -774,19 +774,22 @@ void Aerolab::refreshIntervalMarkers()
 /*
  * Estimate CdA and Crr usign energy balance in segments defined by
  * non-zero altitude.
+ * Returns an explanatory error message ff it fails to do the estimation,
+ * otherwise it updates cda and crr and returns an empty error message.
  * Author: Alejandro Martinez
  * Date: 23-aug-2012
  */
-bool Aerolab::estimateCdACrr(RideItem *rideItem)
+QString Aerolab::estimateCdACrr(RideItem *rideItem)
 {
     // HARD-CODED DATA: p1->kph
     const double vfactor = 3.600;
     const double g = 9.80665;
     RideFile *ride = rideItem->ride();
+    QString errMsg;
 
     if(ride) {
         const RideFileDataPresent *dataPresent = ride->areDataPresent();
-        if(dataPresent->alt && dataPresent->alt) {
+        if(dataPresent->alt && dataPresent->watts) {
             double dt = ride->recIntSecs();
             int npoints = ride->dataPoints().size();
             double X1[npoints], X2[npoints], Egain[npoints];
@@ -877,11 +880,21 @@ bool Aerolab::estimateCdACrr(RideItem *rideItem)
                     if (cda >= 0.001 and cda <= 1.0 and crr >= 0.0001 and crr <= 0.1) {
                         this->cda = cda;
                         this->crr = crr;
-                        return true;
+                        errMsg = ""; // No error
+                    } else {
+                        errMsg = tr("Estimates out-of-range");
                     }
+                } else {
+                    errMsg = tr("At least two segments must be independent");
                 }
+            } else {
+                errMsg = tr("At least two segments must be defined");
             }
+        } else {
+            errMsg = tr("Altitude and Power data must be present");
         }
+    } else {
+        errMsg = tr("No ride selected");
     }
-    return false;
+    return errMsg;
 }
