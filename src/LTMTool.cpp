@@ -457,7 +457,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
             metametric.smooth = false;
             metametric.trend = false;
             metametric.topN = 5;
-            metametric.uname = metametric.name = field.name;
+            metametric.uname = metametric.name = sp.displayName(field.name);
             metametric.uunits = "";
             metrics.append(metametric);
         }
