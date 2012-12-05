@@ -475,7 +475,8 @@ AerolabWindow::doEstCdACrr()
 {
     RideItem *ride = mainWindow->rideItem();
     /* Estimate Crr&Cda */
-    if (aerolab->estimateCdACrr(ride)) {
+    const QString errMsg = aerolab->estimateCdACrr(ride);
+    if (errMsg.isEmpty()) {
         /* Update Crr/Cda values values in UI */
         crrLineEdit->setText(QString("%1").arg(aerolab->getCrr()) );
         crrSlider->setValue(aerolab->intCrr());
@@ -485,6 +486,7 @@ AerolabWindow::doEstCdACrr()
         aerolab->setData(ride, false);
     } else {
         /* report error: insufficient data to estimate Cda&Crr */
+        QMessageBox::warning(this, tr("Estimate Cda and Crr"), errMsg);
     }
 }
 
