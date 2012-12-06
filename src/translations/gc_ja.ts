@@ -287,6 +287,31 @@
         <source>Time (minutes)</source>
         <translation>時間 (分)</translation>
     </message>
+    <message>
+        <location filename="../Aerolab.cpp" line="885"/>
+        <source>Estimates out-of-range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Aerolab.cpp" line="888"/>
+        <source>At least two segments must be independent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Aerolab.cpp" line="891"/>
+        <source>At least two segments must be defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Aerolab.cpp" line="894"/>
+        <source>Altitude and Power data must be present</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Aerolab.cpp" line="897"/>
+        <source>No ride selected</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AerolabWindow</name>
@@ -338,6 +363,11 @@
     <message>
         <location filename="../AerolabWindow.cpp" line="203"/>
         <source>&amp;Estimate Cda and Crr</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AerolabWindow.cpp" line="489"/>
+        <source>Estimate Cda and Crr</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2677,6 +2707,31 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>HrZones</name>
     <message>
+        <location filename="../HrZones.cpp" line="46"/>
+        <source>Active Recovery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../HrZones.cpp" line="46"/>
+        <source>Endurance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../HrZones.cpp" line="46"/>
+        <source>Tempo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../HrZones.cpp" line="46"/>
+        <source>Threshold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../HrZones.cpp" line="47"/>
+        <source>VO2Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../HrZones.cpp" line="188"/>
         <source>line %1: read new range without reading any zones for previous one</source>
         <translation>%1行目: 前回のゾーン読み込みを除いて新しいレンジを読み込み</translation>
@@ -2899,32 +2954,45 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     </message>
     <message>
         <location filename="../LTMSidebar.cpp" line="257"/>
-        <location filename="../LTMSidebar.cpp" line="293"/>
+        <source>Add season</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMSidebar.cpp" line="258"/>
+        <source>Edit season</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMSidebar.cpp" line="259"/>
+        <source>Delete season</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMSidebar.cpp" line="296"/>
         <source>Edit details</source>
         <translation type="unfinished">詳細の編集</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="258"/>
         <source>Delete range</source>
-        <translation type="unfinished">レンジを削除</translation>
+        <translation type="obsolete">レンジを削除</translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="259"/>
+        <location filename="../LTMSidebar.cpp" line="260"/>
         <source>Add Event</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="294"/>
+        <location filename="../LTMSidebar.cpp" line="297"/>
         <source>Delete event</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="304"/>
+        <location filename="../LTMSidebar.cpp" line="307"/>
         <source>Add event</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMSidebar.cpp" line="541"/>
+        <location filename="../LTMSidebar.cpp" line="565"/>
         <source>^(Average|Max) </source>
         <translation type="unfinished"></translation>
     </message>
@@ -6664,9 +6732,36 @@ Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../RideSummaryWindow.cpp" line="152"/>
+        <source>Totals</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="152"/>
+        <source>Averages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="152"/>
+        <source>Maximums</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="152"/>
+        <source>Metrics*</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../RideSummaryWindow.cpp" line="272"/>
         <source>^(Average|Max) </source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="275"/>
+        <location filename="../RideSummaryWindow.cpp" line="378"/>
+        <location filename="../RideSummaryWindow.cpp" line="400"/>
+        <source>seconds</source>
+        <translation type="unfinished">秒</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="316"/>
@@ -6676,6 +6771,16 @@ Do you want to continue?</source>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="332"/>
         <source>&lt;h3&gt;Heart Rate Zones&lt;/h3&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="424"/>
+        <source>&lt;br&gt;BikeScore is a trademark of Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideSummaryWindow.cpp" line="427"/>
+        <source>&lt;br&gt;TSS, NP and IF are trademarks of Peaksware LLC&lt;/center&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8832,6 +8937,41 @@ Press F3 on Controller when done.</source>
 </context>
 <context>
     <name>Zones</name>
+    <message>
+        <location filename="../Zones.cpp" line="43"/>
+        <source>Active Recovery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Zones.cpp" line="43"/>
+        <source>Endurance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Zones.cpp" line="43"/>
+        <source>Tempo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Zones.cpp" line="43"/>
+        <source>Threshold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Zones.cpp" line="44"/>
+        <source>VO2Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Zones.cpp" line="44"/>
+        <source>Anaerobic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Zones.cpp" line="44"/>
+        <source>Neuromuscular</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <location filename="../Zones.cpp" line="176"/>
         <source>line %1: read new range without reading any zones for previous one</source>
