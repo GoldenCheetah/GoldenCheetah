@@ -254,14 +254,17 @@ LTMSidebar::dateRangePopup(QPoint pos)
 
         // create context menu
         QMenu menu(dateRangeTree);
-        QAction *edit = new QAction(tr("Edit details"), dateRangeTree);
-        QAction *del = new QAction(tr("Delete range"), dateRangeTree);
+        QAction *add = new QAction(tr("Add season"), dateRangeTree);
+        QAction *edit = new QAction(tr("Edit season"), dateRangeTree);
+        QAction *del = new QAction(tr("Delete season"), dateRangeTree);
         QAction *event = new QAction(tr("Add Event"), dateRangeTree);
+        menu.addAction(add);
         menu.addAction(edit);
         menu.addAction(del);
         menu.addAction(event);
 
         // connect menu to functions
+        connect(add, SIGNAL(triggered(void)), this, SLOT(addRange(void)));
         connect(edit, SIGNAL(triggered(void)), this, SLOT(editRange(void)));
         connect(del, SIGNAL(triggered(void)), this, SLOT(deleteRange(void)));
         connect(event, SIGNAL(triggered(void)), this, SLOT(addEvent(void)));
@@ -332,6 +335,27 @@ LTMSidebar::dateRangeChanged(QTreeWidgetItem*item, int)
 
     // signal date selected changed
     //dateRangeSelected(&seasons->seasons[index]);
+}
+
+void
+LTMSidebar::addRange()
+{
+    Season newOne;
+
+    EditSeasonDialog dialog(main, &newOne);
+
+    if (dialog.exec()) {
+
+        active = true;
+
+        // save 
+        seasons->seasons.insert(0, newOne);
+        seasons->writeSeasons();
+        active = false;
+
+        // signal its changed!
+        resetSeasons();
+    }
 }
 
 void
