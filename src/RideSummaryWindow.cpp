@@ -149,7 +149,7 @@ RideSummaryWindow::htmlSummary() const
                     "</h3><p>");
 
     // All the metrics we will display
-    static const QStringList columnNames = QStringList() << "Totals" <<"Averages" <<"Maximums" <<"Metrics*";
+    static const QStringList columnNames = QStringList() << tr("Totals") << tr("Averages") << tr("Maximums") << tr("Metrics*");
     static const QStringList totalColumn = QStringList()
         << "workout_time"
         << "time_riding"
@@ -272,7 +272,7 @@ RideSummaryWindow::htmlSummary() const
              s = s.arg(m->name().replace(QRegExp(tr("^(Average|Max) ")), ""));
  
              // Add units (if needed)  and value (with right precision)
-             if (m->units(useMetricUnits) == "seconds") {
+             if (m->units(useMetricUnits) == "seconds" || m->units(useMetricUnits) == tr("seconds")) {
                  s = s.arg(""); // no units
 
                  // get the value - from metrics or from data array
@@ -375,7 +375,7 @@ RideSummaryWindow::htmlSummary() const
                         RideMetricPtr m = metrics.value(symbol);
                         if (!m) continue;
                         summary += "<td align=\"center\" valign=\"bottom\">" + m->name();
-                        if (m->units(useMetricUnits) == "seconds")
+                        if (m->units(useMetricUnits) == "seconds" || m->units(useMetricUnits) == tr("seconds"))
                             ; // don't do anything
                         else if (m->units(useMetricUnits).size() > 0)
                             summary += " (" + m->units(useMetricUnits) + ")";
@@ -397,7 +397,7 @@ RideSummaryWindow::htmlSummary() const
                     RideMetricPtr m = metrics.value(symbol);
                     if (!m) continue;
                     QString s("<td align=\"center\">%1</td>");
-                    if (m->units(useMetricUnits) == "seconds")
+                    if (m->units(useMetricUnits) == "seconds" || m->units(useMetricUnits) == tr("seconds"))
                         summary += s.arg(time_to_string(m->value(useMetricUnits)));
                     else
                         summary += s.arg(m->value(useMetricUnits), 0, 'f', m->precision());
@@ -421,10 +421,10 @@ RideSummaryWindow::htmlSummary() const
 
     // The extra <center> works around a bug in QT 4.3.1,
     // which will otherwise put the following above the <hr>.
-    summary += "<br>BikeScore is a trademark of Dr. Philip "
-        "Friere Skiba, PhysFarm Training Systems LLC";
+    summary += tr("<br>BikeScore is a trademark of Dr. Philip "
+        "Friere Skiba, PhysFarm Training Systems LLC");
 
-    summary += "<br>TSS, NP and IF are trademarks of Peaksware LLC</center>";
+    summary += tr("<br>TSS, NP and IF are trademarks of Peaksware LLC</center>");
     return summary;
 }
 
