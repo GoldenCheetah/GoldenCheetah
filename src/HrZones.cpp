@@ -42,9 +42,9 @@ void HrZones::initializeZoneParameters()
     static double initial_zone_default_trimp[] = {
         0.9, 1.1, 1.2, 2.0, 5.0
     };
-    static const char *initial_zone_default_desc[] = {
-        "Active Recovery", "Endurance", "Tempo", "Threshold",
-        "VO2Max"
+    static const QString initial_zone_default_desc[] = {
+        tr("Active Recovery"), tr("Endurance"), tr("Tempo"), tr("Threshold"),
+        tr("VO2Max")
     };
     static const char *initial_zone_default_name[] = {
         "Z1", "Z2", "Z3", "Z4", "Z5"

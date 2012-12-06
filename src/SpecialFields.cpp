@@ -130,7 +130,7 @@ SpecialTabs::SpecialTabs()
     namesmap.insert("Workout", tr("Workout"));
     namesmap.insert("Notes", tr("Notes"));
     namesmap.insert("Metric", tr("Metric"));
-    namesmap.insert("Metric", tr("Extra"));
+    namesmap.insert("Extra", tr("Extra"));
 }
 
 QString
