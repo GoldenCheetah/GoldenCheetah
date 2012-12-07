@@ -142,7 +142,7 @@ GeneralPage::GeneralPage(MainWindow *main) : main(main)
     //
     // garmin Smart Recording options
     QVariant garminHWMark = appsettings->value(this, GC_GARMIN_HWMARK);
-    garminSmartRecord = new QCheckBox(tr("Use Garmin Smart Recording."), this);
+    garminSmartRecord = new QCheckBox(tr("Use Garmin Smart Recording"), this);
     QVariant isGarminSmartRecording = appsettings->value(this, GC_GARMIN_SMARTRECORD, Qt::Checked);
     garminSmartRecord->setCheckState(isGarminSmartRecording.toInt() > 0 ? Qt::Checked : Qt::Unchecked);
 
@@ -1624,7 +1624,7 @@ static void addFieldTypes(QComboBox *p)
 //
 KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keywordDefinitions) : QWidget(parent), parent(parent)
 {
-    QGridLayout *mainLayout = new QGridLayout(this);
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
     QHBoxLayout *field = new QHBoxLayout();
     fieldLabel = new QLabel(tr("Field"),this);
@@ -1632,21 +1632,19 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
     field->addWidget(fieldLabel);
     field->addWidget(fieldChooser);
     field->addStretch();
-    mainLayout->addLayout(field, 0, 0);
+    mainLayout->addLayout(field);
 
     upButton = new QPushButton(tr("Up"));
     downButton = new QPushButton(tr("Down"));
     addButton = new QPushButton(tr("+"));
-    renameButton = new QPushButton(tr("Rename"));
     deleteButton = new QPushButton(tr("-"));
 
-    QVBoxLayout *actionButtons = new QVBoxLayout;
-    actionButtons->addWidget(addButton);
-    actionButtons->addWidget(renameButton);
-    actionButtons->addWidget(deleteButton);
+    QHBoxLayout *actionButtons = new QHBoxLayout;
     actionButtons->addWidget(upButton);
     actionButtons->addWidget(downButton);
     actionButtons->addStretch();
+    actionButtons->addWidget(addButton);
+    actionButtons->addWidget(deleteButton);
 
     keywords = new QTreeWidget;
     keywords->headerItem()->setText(0, "Keyword");
@@ -1686,14 +1684,13 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
     }
     keywords->setCurrentItem(keywords->invisibleRootItem()->child(0));
 
-    mainLayout->addWidget(keywords, 1,0);
-    mainLayout->addLayout(actionButtons, 1,1);
+    mainLayout->addWidget(keywords);
+    mainLayout->addLayout(actionButtons);
 
     // connect up slots
     connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
     connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
-    connect(renameButton, SIGNAL(clicked()), this, SLOT(renameClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
 
     connect(fieldChooser, SIGNAL(currentIndexChanged(int)), this, SLOT(colorfieldChanged()));
