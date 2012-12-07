@@ -184,9 +184,9 @@ GeneralPage::GeneralPage(MainWindow *main) : main(main)
     // Performance manager
     //
 
-    perfManStartLabel = new QLabel(tr("Starting LTS"));
-    perfManSTSLabel = new QLabel(tr("STS average (days)"));
-    perfManLTSLabel = new QLabel(tr("LTS average (days)"));
+    perfManStartLabel = new QLabel(tr("Starting LTS:"));
+    perfManSTSLabel = new QLabel(tr("STS average (days):"));
+    perfManLTSLabel = new QLabel(tr("LTS average (days):"));
     perfManStartValidator = new QIntValidator(0,200,this);
     perfManSTSavgValidator = new QIntValidator(1,21,this);
     perfManLTSavgValidator = new QIntValidator(7,56,this);
