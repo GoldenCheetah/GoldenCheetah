@@ -268,12 +268,15 @@
 <context>
     <name>Aerolab</name>
     <message>
+        <location filename="../Aerolab.cpp" line="253"/>
+        <location filename="../Aerolab.cpp" line="524"/>
         <source>Elevation (m)</source>
-        <translation type="obsolete">Elevação (m)</translation>
+        <translation type="unfinished">Elevação (m)</translation>
     </message>
     <message>
+        <location filename="../Aerolab.cpp" line="255"/>
         <source>Distance (km)</source>
-        <translation type="obsolete">Distância (km)</translation>
+        <translation type="unfinished">Distância (km)</translation>
     </message>
     <message>
         <location filename="../Aerolab.cpp" line="258"/>
@@ -284,6 +287,11 @@
         <location filename="../Aerolab.cpp" line="259"/>
         <source>Elevation</source>
         <translation>Elevação</translation>
+    </message>
+    <message>
+        <location filename="../Aerolab.cpp" line="532"/>
+        <source>Elevation (&apos;)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Aerolab.cpp" line="597"/>
@@ -432,21 +440,34 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../AllPlot.cpp" line="890"/>
+        <source>% left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../AllPlot.cpp" line="983"/>
         <source>Time (Hours:Minutes)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../AllPlot.cpp" line="1161"/>
+        <source>Manual CSV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="866"/>
         <source>Watts</source>
-        <translation type="obsolete">Watts</translation>
+        <translation type="unfinished">Watts</translation>
     </message>
     <message>
+        <location filename="../AllPlot.cpp" line="876"/>
         <source>BPM</source>
-        <translation type="obsolete">BPM</translation>
+        <translation type="unfinished">BPM</translation>
     </message>
     <message>
+        <location filename="../AllPlot.cpp" line="883"/>
         <source>RPM</source>
-        <translation type="obsolete">RPM</translation>
+        <translation type="unfinished">RPM</translation>
     </message>
     <message>
         <source>km/h</source>
