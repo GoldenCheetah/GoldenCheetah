@@ -268,12 +268,15 @@
 <context>
     <name>Aerolab</name>
     <message>
+        <location filename="../Aerolab.cpp" line="253"/>
+        <location filename="../Aerolab.cpp" line="524"/>
         <source>Elevation (m)</source>
-        <translation type="obsolete">Elevación (m)</translation>
+        <translation>Elevación (m)</translation>
     </message>
     <message>
+        <location filename="../Aerolab.cpp" line="255"/>
         <source>Distance (km)</source>
-        <translation type="obsolete">Distancia (km)</translation>
+        <translation>Distancia (km)</translation>
     </message>
     <message>
         <location filename="../Aerolab.cpp" line="258"/>
@@ -284,6 +287,11 @@
         <location filename="../Aerolab.cpp" line="259"/>
         <source>Elevation</source>
         <translation>Altimetría</translation>
+    </message>
+    <message>
+        <location filename="../Aerolab.cpp" line="532"/>
+        <source>Elevation (&apos;)</source>
+        <translation>Altimetría (&apos;)</translation>
     </message>
     <message>
         <location filename="../Aerolab.cpp" line="597"/>
@@ -298,27 +306,27 @@
     <message>
         <location filename="../Aerolab.cpp" line="885"/>
         <source>Estimates out-of-range</source>
-        <translation type="unfinished"></translation>
+        <translation>Valores estimados fuera de rango</translation>
     </message>
     <message>
         <location filename="../Aerolab.cpp" line="888"/>
         <source>At least two segments must be independent</source>
-        <translation type="unfinished"></translation>
+        <translation>Al menos dos segmentos deben ser independientes</translation>
     </message>
     <message>
         <location filename="../Aerolab.cpp" line="891"/>
         <source>At least two segments must be defined</source>
-        <translation type="unfinished"></translation>
+        <translation>Deben definirse al menos dos segmentos</translation>
     </message>
     <message>
         <location filename="../Aerolab.cpp" line="894"/>
         <source>Altitude and Power data must be present</source>
-        <translation type="unfinished"></translation>
+        <translation>Deben existir datos de potencia y altimetría</translation>
     </message>
     <message>
         <location filename="../Aerolab.cpp" line="897"/>
         <source>No ride selected</source>
-        <translation type="unfinished"></translation>
+        <translation>No hay un entrenamiento seleccionado</translation>
     </message>
 </context>
 <context>
@@ -370,13 +378,13 @@
     </message>
     <message>
         <location filename="../AerolabWindow.cpp" line="203"/>
-        <source>&amp;Estimate Cda and Crr</source>
-        <translation type="unfinished"></translation>
+        <source>&amp;Estimate CdA and Crr</source>
+        <translation>&amp;Estimar CdA y Crr</translation>
     </message>
     <message>
         <location filename="../AerolabWindow.cpp" line="489"/>
-        <source>Estimate Cda and Crr</source>
-        <translation type="unfinished"></translation>
+        <source>Estimate CdA and Crr</source>
+        <translation>Estimar CdA y Crr</translation>
     </message>
 </context>
 <context>
@@ -409,48 +417,57 @@
     <message>
         <location filename="../AllPlot.cpp" line="280"/>
         <source>Temperature</source>
-        <translation type="unfinished"></translation>
+        <translation>Temperatura</translation>
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="283"/>
         <source>Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Viento</translation>
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="286"/>
         <source>Torque</source>
-        <translation type="unfinished">Par</translation>
+        <translation>Par</translation>
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="289"/>
         <source>Left Balance</source>
-        <translation type="unfinished"></translation>
+        <translation>Balance Izq.</translation>
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="292"/>
         <source>Right Balance</source>
-        <translation type="unfinished"></translation>
+        <translation>Balance Der.</translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="890"/>
+        <source>% left</source>
+        <translation>% Izq.</translation>
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="983"/>
         <source>Time (Hours:Minutes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tiempo (Horas:Minutos)</translation>
     </message>
     <message>
+        <location filename="../AllPlot.cpp" line="1161"/>
+        <source>Manual CSV</source>
+        <translation>CSV Manual</translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="866"/>
         <source>Watts</source>
-        <translation type="obsolete">Vatios</translation>
+        <translation>Vatios</translation>
     </message>
     <message>
+        <location filename="../AllPlot.cpp" line="876"/>
         <source>BPM</source>
-        <translation type="obsolete">PPM</translation>
+        <translation>PPM</translation>
     </message>
     <message>
+        <location filename="../AllPlot.cpp" line="883"/>
         <source>RPM</source>
-        <translation type="obsolete">RPM</translation>
-    </message>
-    <message>
-        <source>km/h</source>
-        <translation type="obsolete">km/h</translation>
+        <translation>RPM</translation>
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="909"/>
@@ -460,17 +477,17 @@
     <message>
         <location filename="../AllPlot.cpp" line="909"/>
         <source>KPH</source>
-        <translation type="unfinished"></translation>
+        <translation>km/h</translation>
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="925"/>
         <source>Nm</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="925"/>
         <source>ftLb</source>
-        <translation type="unfinished"></translation>
+        <translation>lib/pie</translation>
     </message>
     <message>
         <location filename="../AllPlot.cpp" line="938"/>
@@ -495,13 +512,9 @@
 <context>
     <name>AllPlotWindow</name>
     <message>
-        <source>Show:</source>
-        <translation type="obsolete">Mostrar:</translation>
-    </message>
-    <message>
         <location filename="../AllPlotWindow.cpp" line="62"/>
         <source>Show</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="65"/>
@@ -511,12 +524,12 @@
     <message>
         <location filename="../AllPlotWindow.cpp" line="86"/>
         <source>Full plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Gráfico completo</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="90"/>
         <source>Fill Curves</source>
-        <translation type="unfinished"></translation>
+        <translation>Rellenar Curvas</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="94"/>
@@ -546,22 +559,22 @@
     <message>
         <location filename="../AllPlotWindow.cpp" line="114"/>
         <source>Temperature</source>
-        <translation type="unfinished"></translation>
+        <translation>Temperatura</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="118"/>
         <source>Headwind</source>
-        <translation type="unfinished">Viento en contra</translation>
+        <translation>Viento en contra</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="122"/>
         <source>Torque</source>
-        <translation type="unfinished">Par</translation>
+        <translation>Par</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="126"/>
         <source>Power balance</source>
-        <translation type="unfinished"></translation>
+        <translation>Balance de Potencia</translation>
     </message>
     <message>
         <location filename="../AllPlotWindow.cpp" line="131"/>
@@ -676,11 +689,7 @@
     <message>
         <location filename="../BasicRideMetrics.cpp" line="272"/>
         <source>kph</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>km/h</source>
-        <translation type="obsolete">km/h</translation>
+        <translation>km/h</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="273"/>
@@ -1282,7 +1291,7 @@
     <message>
         <location filename="../Pages.cpp" line="182"/>
         <source>BikeScore Estimate: use rides within last </source>
-        <translation>Estimación de BikeScore: usa entrenamientos dentro de los últimos </translation>
+        <translation>Estimar BikeScore: usa entrenamientos dentro de los últimos </translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="183"/>
@@ -4827,13 +4836,13 @@ PC del ciclista %3 vatios</translation>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="683"/>
         <source>Max Cadence</source>
-        <translation type="unfinished"></translation>
+        <translation>Cadencia Máx</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="684"/>
         <location filename="../BasicRideMetrics.cpp" line="685"/>
         <source>rpm</source>
-        <translation type="unfinished">rpm</translation>
+        <translation>rpm</translation>
     </message>
 </context>
 <context>
@@ -4855,7 +4864,7 @@ PC del ciclista %3 vatios</translation>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="574"/>
         <source>Max Power</source>
-        <translation>Potencia Máxima</translation>
+        <translation>Potencia Máx</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="575"/>
@@ -4869,7 +4878,7 @@ PC del ciclista %3 vatios</translation>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="949"/>
         <source>Max Power Variance</source>
-        <translation type="unfinished"></translation>
+        <translation>Variación Potencia Máx</translation>
     </message>
 </context>
 <context>
@@ -4877,17 +4886,17 @@ PC del ciclista %3 vatios</translation>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="640"/>
         <source>Max Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Velocidad Máx</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="641"/>
         <source>kph</source>
-        <translation type="unfinished"></translation>
+        <translation>km/h</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="642"/>
         <source>mph</source>
-        <translation type="unfinished">mph</translation>
+        <translation>mph</translation>
     </message>
 </context>
 <context>
@@ -4895,17 +4904,17 @@ PC del ciclista %3 vatios</translation>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="724"/>
         <source>Max Temp</source>
-        <translation type="unfinished"></translation>
+        <translation>Temp Máx</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="725"/>
         <source>C</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="726"/>
         <source>F</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4913,7 +4922,7 @@ PC del ciclista %3 vatios</translation>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="898"/>
         <source>Average Power Variance</source>
-        <translation type="unfinished"></translation>
+        <translation>Variación Potencia Media</translation>
     </message>
 </context>
 <context>
@@ -7575,12 +7584,12 @@ y que muestra la palabra &quot;Host&quot;</translation>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="148"/>
         <source> activity</source>
-        <translation type="unfinished"></translation>
+        <translation> actividad</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="148"/>
         <source> activities</source>
-        <translation type="unfinished"></translation>
+        <translation> actividades</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="152"/>
@@ -7600,47 +7609,39 @@ y que muestra la palabra &quot;Host&quot;</translation>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="152"/>
         <source>Maximums</source>
-        <translation type="unfinished"></translation>
+        <translation>Máximos</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="272"/>
         <source>^(Average|Max) </source>
-        <translation type="unfinished"></translation>
+        <translation>( Media| Máx)</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="316"/>
         <source>&lt;h3&gt;Power Zones&lt;/h3&gt;</source>
-        <translation type="unfinished">&lt;h2&gt;Zonas de Potencia&lt;/h2&gt; {3&gt;?} {3&gt;?}</translation>
+        <translation>&lt;h3&gt;Zonas de Potencia&lt;/h3&gt;</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="332"/>
         <source>&lt;h3&gt;Heart Rate Zones&lt;/h3&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;h3&gt;Zonas de Frecuencia Cardíaca&lt;/h3&gt;</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="424"/>
         <source>&lt;br&gt;BikeScore is a trademark of Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;br&gt;BikeScore es una marca registrada del Dr. Philip Friere Skiba, PhysFarm Training Systems LLC</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="427"/>
         <source>&lt;br&gt;TSS, NP and IF are trademarks of Peaksware LLC&lt;/center&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>^Average </source>
-        <translation type="obsolete"> Media$</translation>
+        <translation>&lt;br&gt;TSS, NP e IF son marcas registradas de Peaksware LLC&lt;/center&gt;</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="275"/>
         <location filename="../RideSummaryWindow.cpp" line="378"/>
         <location filename="../RideSummaryWindow.cpp" line="400"/>
         <source>seconds</source>
-        <translation type="unfinished">segundos</translation>
-    </message>
-    <message>
-        <source>&lt;h2&gt;Hr Zones&lt;/h2&gt;</source>
-        <translation type="obsolete">&lt;h2&gt;Zonas de FC&lt;/h2&gt;</translation>
+        <translation>segundos</translation>
     </message>
     <message>
         <location filename="../RideSummaryWindow.cpp" line="350"/>
@@ -7651,10 +7652,6 @@ y que muestra la palabra &quot;Host&quot;</translation>
         <location filename="../RideSummaryWindow.cpp" line="414"/>
         <source>&lt;p&gt;&lt;h2&gt;Errors reading file:&lt;/h2&gt;&lt;ul&gt;</source>
         <translation>&lt;p&gt;&lt;h2&gt;Errores leyendo archivo:&lt;/h2&gt;&lt;ul&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;h2&gt;Power Zones&lt;/h2&gt;</source>
-        <translation type="obsolete">&lt;h2&gt;Zonas de Potencia&lt;/h2&gt;</translation>
     </message>
 </context>
 <context>
@@ -9380,12 +9377,12 @@ Press F3 on Controller when done.</source>
     <message>
         <location filename="../TwitterDialog.cpp" line="49"/>
         <source>Max Power</source>
-        <translation>Potencia Máxima</translation>
+        <translation>Potencia Máx</translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="50"/>
         <source>Max Heart Rate</source>
-        <translation>Frec. Cardíaca Máxima</translation>
+        <translation>Frec. Cardíaca Máx</translation>
     </message>
     <message>
         <location filename="../TwitterDialog.cpp" line="67"/>
