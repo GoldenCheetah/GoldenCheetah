@@ -2271,7 +2271,7 @@ Puede ser necesario (re)instalar el controlador FTDI o PL2303 antes de descargar
     <message>
         <location filename="../Coggan.cpp" line="217"/>
         <source>Efficiency Factor</source>
-        <translation type="unfinished"></translation>
+        <translation>Factor de Eficiencia</translation>
     </message>
 </context>
 <context>
@@ -2811,7 +2811,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../GcCalendar.cpp" line="668"/>
         <source>^(Average|Max) </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">( Media| Máx)</translation>
     </message>
 </context>
 <context>
@@ -3433,52 +3433,77 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../LTMSidebar.cpp" line="54"/>
         <source>Date Ranges</source>
-        <translation type="unfinished"></translation>
+        <translation>Rangos de Fechas</translation>
     </message>
     <message>
         <location filename="../LTMSidebar.cpp" line="68"/>
         <source>Events</source>
-        <translation type="unfinished"></translation>
+        <translation>Eventos</translation>
     </message>
     <message>
         <location filename="../LTMSidebar.cpp" line="257"/>
         <source>Add season</source>
-        <translation type="unfinished"></translation>
+        <translation>Agregar temporada</translation>
     </message>
     <message>
         <location filename="../LTMSidebar.cpp" line="258"/>
         <source>Edit season</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar temporada</translation>
     </message>
     <message>
         <location filename="../LTMSidebar.cpp" line="259"/>
         <source>Delete season</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar temporada</translation>
     </message>
     <message>
         <location filename="../LTMSidebar.cpp" line="260"/>
         <source>Add Event</source>
-        <translation type="unfinished"></translation>
+        <translation>Agregar evento</translation>
     </message>
     <message>
         <location filename="../LTMSidebar.cpp" line="296"/>
         <source>Edit details</source>
-        <translation type="unfinished">Editar detalles</translation>
+        <translation>Editar detalles</translation>
     </message>
     <message>
         <location filename="../LTMSidebar.cpp" line="297"/>
         <source>Delete event</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar evento</translation>
     </message>
     <message>
         <location filename="../LTMSidebar.cpp" line="307"/>
         <source>Add event</source>
-        <translation type="unfinished"></translation>
+        <translation>Agregar evento</translation>
+    </message>
+    <message>
+        <location filename="../LTMSidebar.cpp" line="530"/>
+        <source>Totals</source>
+        <translation>Totales</translation>
+    </message>
+    <message>
+        <location filename="../LTMSidebar.cpp" line="535"/>
+        <source>Averages</source>
+        <translation>Promedios</translation>
+    </message>
+    <message>
+        <location filename="../LTMSidebar.cpp" line="540"/>
+        <source>Maximums</source>
+        <translation>Máximos</translation>
+    </message>
+    <message>
+        <location filename="../LTMSidebar.cpp" line="545"/>
+        <source>Metrics</source>
+        <translation>Métricas</translation>
     </message>
     <message>
         <location filename="../LTMSidebar.cpp" line="565"/>
         <source>^(Average|Max) </source>
-        <translation type="unfinished"></translation>
+        <translation>( Media| Máx)</translation>
+    </message>
+    <message>
+        <location filename="../LTMSidebar.cpp" line="569"/>
+        <source>seconds</source>
+        <translation>segundos</translation>
     </message>
 </context>
 <context>
@@ -5502,13 +5527,13 @@ Elapsed: %1
     <message>
         <location filename="../BasicRideMetrics.cpp" line="408"/>
         <source>Nonzero Average Power</source>
-        <translation type="unfinished"></translation>
+        <translation>Potencia Media sin Ceros</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="409"/>
         <location filename="../BasicRideMetrics.cpp" line="410"/>
         <source>watts</source>
-        <translation type="unfinished">vatios</translation>
+        <translation>vatios</translation>
     </message>
 </context>
 <context>
@@ -5516,17 +5541,17 @@ Elapsed: %1
     <message>
         <location filename="../BasicRideMetrics.cpp" line="319"/>
         <source>Pace</source>
-        <translation type="unfinished"></translation>
+        <translation>Ritmo</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="321"/>
         <source>min/km</source>
-        <translation type="unfinished"></translation>
+        <translation>min/km</translation>
     </message>
     <message>
         <location filename="../BasicRideMetrics.cpp" line="322"/>
         <source>min/mile</source>
-        <translation type="unfinished"></translation>
+        <translation>min/milla</translation>
     </message>
 </context>
 <context>
@@ -5672,7 +5697,7 @@ Elapsed: %1
     <message>
         <location filename="../RideEditor.cpp" line="2140"/>
         <source>Temperature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Temperatura</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="2141"/>
@@ -6033,16 +6058,19 @@ Do you want to continue?</source>
         <translation type="obsolete">Administrador del Rendimiento</translation>
     </message>
     <message>
+        <location filename="../PerfPlot.cpp" line="69"/>
         <source>Exponentially Weighted Average Stress</source>
-        <translation type="obsolete">Media Móvil Exponencial del Estrés</translation>
+        <translation type="unfinished">Media Móvil Exponencial del Estrés</translation>
     </message>
     <message>
+        <location filename="../PerfPlot.cpp" line="70"/>
         <source>Time (days)</source>
-        <translation type="obsolete">Tiempo (días)</translation>
+        <translation type="unfinished">Tiempo (días)</translation>
     </message>
     <message>
+        <location filename="../PerfPlot.cpp" line="71"/>
         <source>Daily Stress</source>
-        <translation type="obsolete">Estrés Diario</translation>
+        <translation type="unfinished">Estrés Diario</translation>
     </message>
     <message>
         <location filename="../PerfPlot.cpp" line="147"/>
@@ -6080,7 +6108,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../PerformanceManagerWindow.cpp" line="53"/>
         <source>Use TSS</source>
-        <translation type="unfinished"></translation>
+        <translation>Usar TSS</translation>
     </message>
     <message>
         <location filename="../PerformanceManagerWindow.cpp" line="54"/>
@@ -6123,16 +6151,14 @@ Do you want to continue?</source>
 <context>
     <name>PfPvPlot</name>
     <message>
+        <location filename="../PfPvPlot.cpp" line="128"/>
         <source>Average Effective Pedal Force (N)</source>
-        <translation type="obsolete">Fuerza Efectiva Media en los Pedales (N)</translation>
+        <translation>Fuerza Efectiva Media en los Pedales (N)</translation>
     </message>
     <message>
+        <location filename="../PfPvPlot.cpp" line="130"/>
         <source>Circumferential Pedal Velocity (m/s)</source>
-        <translation type="obsolete">Velocidad Circular de los Pedales (m/s)</translation>
-    </message>
-    <message>
-        <source>no cadence</source>
-        <translation type="obsolete">sin cadencia</translation>
+        <translation>Velocidad Circular de los Pedales (m/s)</translation>
     </message>
 </context>
 <context>
@@ -6230,7 +6256,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../PowerHist.cpp" line="928"/>
         <source>kph</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">km/h</translation>
     </message>
     <message>
         <location filename="../PowerHist.cpp" line="932"/>
@@ -6539,7 +6565,7 @@ y que muestra la palabra &quot;Host&quot;</translation>
     <message>
         <location filename="../RealtimePlotWindow.cpp" line="34"/>
         <source>Show</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mostrar</translation>
     </message>
     <message>
         <location filename="../RealtimePlotWindow.cpp" line="37"/>
@@ -6845,7 +6871,7 @@ y que muestra la palabra &quot;Host&quot;</translation>
         <location filename="../RideEditor.cpp" line="201"/>
         <location filename="../RideEditor.cpp" line="776"/>
         <source>Temperature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Temperatura</translation>
     </message>
     <message>
         <location filename="../RideEditor.cpp" line="202"/>
@@ -7048,7 +7074,7 @@ y que muestra la palabra &quot;Host&quot;</translation>
     <message>
         <location filename="../RideFile.cpp" line="79"/>
         <source>Temperature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Temperatura</translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="80"/>
@@ -7101,7 +7127,7 @@ y que muestra la palabra &quot;Host&quot;</translation>
         <location filename="../RideFile.cpp" line="97"/>
         <location filename="../RideFile.cpp" line="105"/>
         <source>kph</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">km/h</translation>
     </message>
     <message>
         <location filename="../RideFile.cpp" line="97"/>
@@ -7231,7 +7257,7 @@ y que muestra la palabra &quot;Host&quot;</translation>
     <message>
         <location filename="../RideFileTableModel.cpp" line="121"/>
         <source>Temperature</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Temperatura</translation>
     </message>
     <message>
         <location filename="../RideFileTableModel.cpp" line="125"/>

@@ -527,22 +527,22 @@ LTMSidebar::setSummary(DateRange dateRange)
 
             switch(i) {
                 case 0 : // Totals
-                    aggname = "Totals";
+                    aggname = tr("Totals");
                     list = totalColumn;
                     break;
 
                 case 1 :  // Averages
-                    aggname = "Averages";
+                    aggname = tr("Averages");
                     list = averageColumn;
                     break;
 
                 case 3 :  // Maximums
-                    aggname = "Maximums";
+                    aggname = tr("Maximums");
                     list = maximumColumn;
                     break;
 
                 case 2 :  // User defined.. 
-                    aggname = "Metrics";
+                    aggname = tr("Metrics");
                     list = metricColumn;
                     break;
 
@@ -566,6 +566,7 @@ LTMSidebar::setSummary(DateRange dateRange)
 
                 // don't show units for time values
                 if (metric && (metric->units(useMetricUnits) == "seconds" ||
+                               metric->units(useMetricUnits) == tr("seconds") ||
                                metric->units(useMetricUnits) == "")) {
 
                     summaryText += QString("<tr><td>%1:</td><td align=\"right\"> %2</td>")
