@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2012 Mark Liversedge (liversedge@gmail.com)
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 #include <QtGui>
 #include <QIntValidator>
 #include <QHttp>
@@ -7,6 +25,7 @@
 #include "Settings.h"
 #include "Units.h"
 #include "Colors.h"
+#include "AddDeviceWizard.h"
 #include "DeviceTypes.h"
 #include "DeviceConfiguration.h"
 #include "ANTplusController.h"
@@ -17,28 +36,22 @@
 //
 // Main Config Page - tabs for each sub-page
 //
-ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
+GeneralPage::GeneralPage(MainWindow *main) : main(main)
 {
-    QTabWidget *tabs = new QTabWidget(this);
-    QWidget *config = new QWidget(this);
-    QVBoxLayout *configLayout = new QVBoxLayout(config);
-    colorsPage = new ColorsPage(main);
-    summaryMetrics = new SummaryMetricsPage;
-    intervalMetrics = new IntervalMetricsPage;
-    metadataPage = new MetadataPage(main);
-    measuresPage = new MeasuresPage(main);
-    //proxyPage = new ProxyPage(this, main); // we use system settings
+    // layout without too wide margins
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    QGridLayout *configLayout = new QGridLayout;
+    mainLayout->addLayout(configLayout);
+    mainLayout->addStretch();
+    setContentsMargins(0,0,0,0);
+    mainLayout->setSpacing(0);
+    mainLayout->setContentsMargins(0,0,0,0);
+    configLayout->setSpacing(10);
 
-    tabs->addTab(config, tr("Settings"));
-    tabs->addTab(colorsPage, tr("Appearance"));
-    tabs->addTab(summaryMetrics, tr("Summary Metrics"));
-    tabs->addTab(intervalMetrics, tr("Interval Metrics"));
-    tabs->addTab(metadataPage, tr("Ride Data"));
-    tabs->addTab(measuresPage, tr("Athlete Data"));
-    //tabs->addTab(proxyPage, tr("Proxy")); // we use system settings
-
+    //
+    // Language Selection
+    //
     langLabel = new QLabel(tr("Language:"));
-
     langCombo = new QComboBox();
     langCombo->addItem(tr("English"));
     langCombo->addItem(tr("French"));
@@ -54,34 +67,26 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
     // Default to system locale
     QVariant lang = appsettings->value(this, GC_LANG, QLocale::system().name());
 
-    if(lang.toString().startsWith("en"))
-        langCombo->setCurrentIndex(0);
-    else if(lang.toString().startsWith("fr"))
-        langCombo->setCurrentIndex(1);
-    else if(lang.toString().startsWith("ja"))
-        langCombo->setCurrentIndex(2);
-    else if(lang.toString().startsWith("pt-br"))
-        langCombo->setCurrentIndex(3);
-    else if(lang.toString().startsWith("it"))
-        langCombo->setCurrentIndex(4);
-    else if(lang.toString().startsWith("de"))
-        langCombo->setCurrentIndex(5);
-    else if(lang.toString().startsWith("ru"))
-        langCombo->setCurrentIndex(6);
-    else if(lang.toString().startsWith("cs"))
-        langCombo->setCurrentIndex(7);
-    else if(lang.toString().startsWith("es"))
-        langCombo->setCurrentIndex(8);
-    else if(lang.toString().startsWith("pt"))
-        langCombo->setCurrentIndex(9);
-    else // default : English
-        langCombo->setCurrentIndex(0);
+    if(lang.toString().startsWith("en")) langCombo->setCurrentIndex(0);
+    else if(lang.toString().startsWith("fr")) langCombo->setCurrentIndex(1);
+    else if(lang.toString().startsWith("ja")) langCombo->setCurrentIndex(2);
+    else if(lang.toString().startsWith("pt-br")) langCombo->setCurrentIndex(3);
+    else if(lang.toString().startsWith("it")) langCombo->setCurrentIndex(4);
+    else if(lang.toString().startsWith("de")) langCombo->setCurrentIndex(5);
+    else if(lang.toString().startsWith("ru")) langCombo->setCurrentIndex(6);
+    else if(lang.toString().startsWith("cs")) langCombo->setCurrentIndex(7);
+    else if(lang.toString().startsWith("es")) langCombo->setCurrentIndex(8);
+    else if(lang.toString().startsWith("pt")) langCombo->setCurrentIndex(9);
+    else langCombo->setCurrentIndex(0);
 
+    configLayout->addWidget(langLabel, 0,0, Qt::AlignRight);
+    configLayout->addWidget(langCombo, 0,1, Qt::AlignLeft);
 
+    //
+    // Crank length - only used by PfPv chart (should move there!)
+    //
     QLabel *crankLengthLabel = new QLabel(tr("Crank Length:"));
-
     QVariant crankLength = appsettings->value(this, GC_CRANKLENGTH);
-
     crankLengthCombo = new QComboBox();
     crankLengthCombo->addItem("160");
     crankLengthCombo->addItem("162.5");
@@ -94,29 +99,24 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
     crankLengthCombo->addItem("180");
     crankLengthCombo->addItem("182.5");
     crankLengthCombo->addItem("185");
-    if(crankLength.toString() == "160")
-	crankLengthCombo->setCurrentIndex(0);
-    if(crankLength.toString() == "162.5")
-	crankLengthCombo->setCurrentIndex(1);
-    if(crankLength.toString() == "165")
-	crankLengthCombo->setCurrentIndex(2);
-    if(crankLength.toString() == "167.5")
-	crankLengthCombo->setCurrentIndex(3);
-    if(crankLength.toString() == "170")
-	crankLengthCombo->setCurrentIndex(4);
-    if(crankLength.toString() == "172.5")
-	crankLengthCombo->setCurrentIndex(5);
-    if(crankLength.toString() == "175")
-	crankLengthCombo->setCurrentIndex(6);
-    if(crankLength.toString() == "177.5")
-	crankLengthCombo->setCurrentIndex(7);
-    if(crankLength.toString() == "180")
-	crankLengthCombo->setCurrentIndex(8);
-    if(crankLength.toString() == "182.5")
-	crankLengthCombo->setCurrentIndex(9);
-    if(crankLength.toString() == "185")
-	crankLengthCombo->setCurrentIndex(10);
+    if(crankLength.toString() == "160") crankLengthCombo->setCurrentIndex(0);
+    if(crankLength.toString() == "162.5") crankLengthCombo->setCurrentIndex(1);
+    if(crankLength.toString() == "165") crankLengthCombo->setCurrentIndex(2);
+    if(crankLength.toString() == "167.5") crankLengthCombo->setCurrentIndex(3);
+    if(crankLength.toString() == "170") crankLengthCombo->setCurrentIndex(4);
+    if(crankLength.toString() == "172.5") crankLengthCombo->setCurrentIndex(5);
+    if(crankLength.toString() == "175") crankLengthCombo->setCurrentIndex(6);
+    if(crankLength.toString() == "177.5") crankLengthCombo->setCurrentIndex(7);
+    if(crankLength.toString() == "180") crankLengthCombo->setCurrentIndex(8);
+    if(crankLength.toString() == "182.5") crankLengthCombo->setCurrentIndex(9);
+    if(crankLength.toString() == "185") crankLengthCombo->setCurrentIndex(10);
 
+    configLayout->addWidget(crankLengthLabel, 1,0, Qt::AlignRight);
+    configLayout->addWidget(crankLengthCombo, 1,1, Qt::AlignLeft);
+
+    //
+    // Wheel size
+    //
     QLabel *wheelSizeLabel = new QLabel("Wheelsize:", this);
     int wheelSize = appsettings->value(this, GC_WHEELSIZE, 2100).toInt();
 
@@ -134,165 +134,55 @@ ConfigurationPage::ConfigurationPage(MainWindow *main) : main(main)
     case 1750 : wheelSizeCombo->setCurrentIndex(3); break;
     }
 
+    configLayout->addWidget(wheelSizeLabel, 2,0, Qt::AlignRight);
+    configLayout->addWidget(wheelSizeCombo, 2,1, Qt::AlignLeft);
+
+    //
+    // Garmin crap
+    //
     // garmin Smart Recording options
     QVariant garminHWMark = appsettings->value(this, GC_GARMIN_HWMARK);
-    if (garminHWMark.isNull() || garminHWMark.toInt() == 0)
-      garminHWMark.setValue(25); // by default, set the threshold to 25 seconds
-    QGridLayout *garminLayout = new QGridLayout;
     garminSmartRecord = new QCheckBox(tr("Use Garmin Smart Recording."), this);
     QVariant isGarminSmartRecording = appsettings->value(this, GC_GARMIN_SMARTRECORD, Qt::Checked);
-    if (isGarminSmartRecording.toInt() > 0){
-      garminSmartRecord->setCheckState(Qt::Checked);
-    } else {
-      garminSmartRecord->setCheckState(Qt::Unchecked);
-    }
-    QLabel *garminHWLabel1 = new QLabel(tr("Smart Recording Threshold "));
-    QLabel *garminHWLabel2 = new QLabel(tr(" secs."));
+    garminSmartRecord->setCheckState(isGarminSmartRecording.toInt() > 0 ? Qt::Checked : Qt::Unchecked);
+
+    // by default, set the threshold to 25 seconds
+    if (garminHWMark.isNull() || garminHWMark.toInt() == 0) garminHWMark.setValue(25);
+    QLabel *garminHWLabel = new QLabel(tr("Threshold (secs):"));
     garminHWMarkedit = new QLineEdit(garminHWMark.toString(),this);
     garminHWMarkedit->setInputMask("009");
-    garminLayout->addWidget(garminSmartRecord);
-    garminLayout->addWidget(garminHWLabel1,1,0);
-    garminLayout->addWidget(garminHWMarkedit,1,1);
-    garminLayout->addWidget(garminHWLabel2,1,2);
 
+    configLayout->addWidget(garminSmartRecord, 3,1, Qt::AlignLeft);
+    configLayout->addWidget(garminHWLabel, 4,0, Qt::AlignRight);
+    configLayout->addWidget(garminHWMarkedit, 4,1, Qt::AlignLeft);
 
-    warningLabel = new QLabel(tr("Requires Restart To Take Effect"));
-
-    langLayout = new QHBoxLayout;
-    langLayout->addWidget(langLabel);
-    langLayout->addWidget(langCombo);
-
-    warningLayout = new QHBoxLayout;
-    warningLayout->addWidget(warningLabel);
-
-    QHBoxLayout *crankLengthLayout = new QHBoxLayout;
-    crankLengthLayout->addWidget(crankLengthLabel);
-    crankLengthLayout->addWidget(crankLengthCombo);
-
-    QHBoxLayout *wheelSizeLayout = new QHBoxLayout;
-    wheelSizeLayout->addWidget(wheelSizeLabel);
-    wheelSizeLayout->addWidget(wheelSizeCombo);
-
+    //
+    // Bikescore crap
+    //
     // BikeScore Estimate
     QVariant BSdays = appsettings->value(this, GC_BIKESCOREDAYS);
     QVariant BSmode = appsettings->value(this, GC_BIKESCOREMODE);
 
-    QGridLayout *bsDaysLayout = new QGridLayout;
-    bsModeLayout = new QHBoxLayout;
-    QLabel *BSDaysLabel1 = new QLabel(tr("BikeScore Estimate: use rides within last "));
-    QLabel *BSDaysLabel2 = new QLabel(tr(" days"));
+    QLabel *BSDaysLabel = new QLabel(tr("BikeScore Estimate (days):"));
     BSdaysEdit = new QLineEdit(BSdays.toString(),this);
     BSdaysEdit->setInputMask("009");
 
-    QLabel *BSModeLabel = new QLabel(tr("BikeScore estimate mode: "));
+    configLayout->addWidget(BSDaysLabel, 5,0, Qt::AlignRight);
+    configLayout->addWidget(BSdaysEdit, 5,1, Qt::AlignLeft);
+
+    QLabel *BSModeLabel = new QLabel(tr("BikeScore Estimate by:"));
     bsModeCombo = new QComboBox();
     bsModeCombo->addItem(tr("time"));
     bsModeCombo->addItem(tr("distance"));
-    if (BSmode.toString() == "time")
-	bsModeCombo->setCurrentIndex(0);
-    else
-	bsModeCombo->setCurrentIndex(1);
+    if (BSmode.toString() == "time") bsModeCombo->setCurrentIndex(0);
+    else bsModeCombo->setCurrentIndex(1);
 
-    bsDaysLayout->addWidget(BSDaysLabel1,0,0);
-    bsDaysLayout->addWidget(BSdaysEdit,0,1);
-    bsDaysLayout->addWidget(BSDaysLabel2,0,2);
+    configLayout->addWidget(BSModeLabel, 6,0, Qt::AlignRight);
+    configLayout->addWidget(bsModeCombo, 6,1, Qt::AlignLeft);
 
-    bsModeLayout->addWidget(BSModeLabel);
-    bsModeLayout->addWidget(bsModeCombo);
-
-    // Workout Library
-    QVariant workoutDir = appsettings->value(this, GC_WORKOUTDIR);
-    workoutLabel = new QLabel(tr("Workout Library"));
-    workoutDirectory = new QLineEdit;
-    workoutDirectory->setText(workoutDir.toString());
-    workoutBrowseButton = new QPushButton(tr("Browse"));
-    workoutLayout = new QHBoxLayout;
-    workoutLayout->addWidget(workoutLabel);
-    workoutLayout->addWidget(workoutBrowseButton);
-    workoutLayout->addWidget(workoutDirectory);
-    connect(workoutBrowseButton, SIGNAL(clicked()),
-            this, SLOT(browseWorkoutDir()));
-
-
-    configLayout->addLayout(langLayout);
-    configLayout->addLayout(garminLayout);
-    //SmartRecord);
-    configLayout->addLayout(crankLengthLayout);
-    configLayout->addLayout(wheelSizeLayout);
-    configLayout->addLayout(bsDaysLayout);
-    configLayout->addLayout(bsModeLayout);
-    configLayout->addLayout(workoutLayout);
-    configLayout->addLayout(warningLayout);
-
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(tabs);
-    setLayout(mainLayout);
-}
-
-void
-ConfigurationPage::saveClicked()
-{
-    colorsPage->saveClicked();
-    summaryMetrics->saveClicked();
-    intervalMetrics->saveClicked();
-    metadataPage->saveClicked();
-    measuresPage->saveClicked();
-    //proxyPage->saveClicked(); // We use system settings
-}
-
-void
-ConfigurationPage::browseWorkoutDir()
-{
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Select Workout Library"),
-                            "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    workoutDirectory->setText(dir);
-}
-
-
-//
-// Cyclist settings - About me, Zones Config, PM and Password tabs
-//
-CyclistPage::CyclistPage(MainWindow *main) :
-    mainWindow(main)
-{
-    QTabWidget *tabs = new QTabWidget(this);
-    QWidget *cpTab = new QWidget(this);
-    QWidget *hrTab = new QWidget(this);
-    QWidget *rdTab = new QWidget(this);
-    QWidget *psTab = new QWidget(this);
-    QWidget *pmTab = new QWidget(this);
-    QWidget *seTab = new QWidget(this);
-    tabs->addTab(rdTab, tr("About Me"));
-    tabs->addTab(cpTab, tr("Power Zones"));
-    tabs->addTab(hrTab, tr("HR Zones"));
-    tabs->addTab(seTab, tr("Seasons"));
-    tabs->addTab(pmTab, tr("Performance Manager"));
-    tabs->addTab(psTab, tr("Passwords"));
-    QVBoxLayout *cpLayout = new QVBoxLayout(cpTab);
-    QVBoxLayout *hrLayout = new QVBoxLayout(hrTab);
-    QVBoxLayout *pmLayout = new QVBoxLayout(pmTab);
-    QVBoxLayout *rdLayout = new QVBoxLayout(rdTab);
-    QVBoxLayout *psLayout = new QVBoxLayout(psTab);
-    QVBoxLayout *seLayout = new QVBoxLayout(seTab);
-
-    riderPage = new RiderPage(this, mainWindow);
-    rdLayout->addWidget(riderPage);
-
-    zonePage = new ZonePage(mainWindow);
-    cpLayout->addWidget(zonePage);
-
-    hrZonePage = new HrZonePage(mainWindow);
-    hrLayout->addWidget(hrZonePage);
-
-    passPage = new CredentialsPage(this, mainWindow);
-    psLayout->addWidget(passPage);
-
-    seasonsPage = new SeasonsPage(this, mainWindow);
-    seLayout->addWidget(seasonsPage);
-
-    perfManLabel = new QLabel(tr("Performance Manager"));
-    showSBToday = new QCheckBox(tr("Show Stress Balance Today"), this);
-    showSBToday->setChecked(appsettings->cvalue(mainWindow->cyclist, GC_SB_TODAY).toInt());
+    //
+    // Performance manager
+    //
 
     perfManStartLabel = new QLabel(tr("Starting LTS"));
     perfManSTSLabel = new QLabel(tr("STS average (days)"));
@@ -300,14 +190,14 @@ CyclistPage::CyclistPage(MainWindow *main) :
     perfManStartValidator = new QIntValidator(0,200,this);
     perfManSTSavgValidator = new QIntValidator(1,21,this);
     perfManLTSavgValidator = new QIntValidator(7,56,this);
-    QVariant perfManStartVal = appsettings->cvalue(mainWindow->cyclist, GC_INITIAL_STS);
-    QVariant perfManSTSVal = appsettings->cvalue(mainWindow->cyclist, GC_STS_DAYS);
 
-    if (perfManSTSVal.isNull() || perfManSTSVal.toInt() == 0)
-	perfManSTSVal = 7;
-    QVariant perfManLTSVal = appsettings->cvalue(mainWindow->cyclist, GC_LTS_DAYS);
-    if (perfManLTSVal.isNull() || perfManLTSVal.toInt() == 0)
-	perfManLTSVal = 42;
+    // get config or set to defaults
+    QVariant perfManStartVal = appsettings->cvalue(main->cyclist, GC_INITIAL_STS);
+    QVariant perfManSTSVal = appsettings->cvalue(main->cyclist, GC_STS_DAYS);
+    if (perfManSTSVal.isNull() || perfManSTSVal.toInt() == 0) perfManSTSVal = 7;
+    QVariant perfManLTSVal = appsettings->cvalue(main->cyclist, GC_LTS_DAYS);
+    if (perfManLTSVal.isNull() || perfManLTSVal.toInt() == 0) perfManLTSVal = 42;
+
     perfManStart = new QLineEdit(perfManStartVal.toString(),this);
     perfManStart->setValidator(perfManStartValidator);
     perfManSTSavg = new QLineEdit(perfManSTSVal.toString(),this);
@@ -315,125 +205,83 @@ CyclistPage::CyclistPage(MainWindow *main) :
     perfManLTSavg = new QLineEdit(perfManLTSVal.toString(),this);
     perfManLTSavg->setValidator(perfManLTSavgValidator);
 
-    // performance manager
-    perfManLayout = new QVBoxLayout(); // outer
-    perfManStartValLayout = new QHBoxLayout();
-    perfManSTSavgLayout = new QHBoxLayout();
-    perfManLTSavgLayout = new QHBoxLayout();
-    perfManStartValLayout->addWidget(perfManStartLabel);
-    perfManStartValLayout->addWidget(perfManStart);
-    perfManSTSavgLayout->addWidget(perfManSTSLabel);
-    perfManSTSavgLayout->addWidget(perfManSTSavg);
-    perfManLTSavgLayout->addWidget(perfManLTSLabel);
-    perfManLTSavgLayout->addWidget(perfManLTSavg);
-    perfManLayout->addWidget(showSBToday);
-    perfManLayout->addLayout(perfManStartValLayout);
-    perfManLayout->addLayout(perfManSTSavgLayout);
-    perfManLayout->addLayout(perfManLTSavgLayout);
-    perfManLayout->addStretch();
+    showSBToday = new QCheckBox(tr("PMC Stress Balance Today"), this);
+    showSBToday->setChecked(appsettings->cvalue(main->cyclist, GC_SB_TODAY).toInt());
 
-    pmLayout->addLayout(perfManLayout);
+    configLayout->addWidget(perfManStartLabel, 7,0, Qt::AlignRight);
+    configLayout->addWidget(perfManStart, 7,1, Qt::AlignLeft);
+    configLayout->addWidget(perfManSTSLabel, 8,0, Qt::AlignRight);
+    configLayout->addWidget(perfManSTSavg, 8,1, Qt::AlignLeft);
+    configLayout->addWidget(perfManLTSLabel, 9,0, Qt::AlignRight);
+    configLayout->addWidget(perfManLTSavg, 9,1, Qt::AlignLeft);
+    configLayout->addWidget(showSBToday, 10,1, Qt::AlignLeft);
 
-    mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(tabs);
-    setLayout(mainLayout);
+    //
+    // Workout directory (train view)
+    //
+    QVariant workoutDir = appsettings->value(this, GC_WORKOUTDIR);
+    workoutLabel = new QLabel(tr("Workout Library:"));
+    workoutDirectory = new QLineEdit;
+    workoutDirectory->setText(workoutDir.toString());
+    workoutBrowseButton = new QPushButton(tr("Browse"));
+    workoutBrowseButton->setFixedWidth(70);
+
+    configLayout->addWidget(workoutLabel, 11,0, Qt::AlignRight);
+    configLayout->addWidget(workoutDirectory, 11,1);
+    configLayout->addWidget(workoutBrowseButton, 12,1);
+
+    connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
+
 }
 
 void
-CyclistPage::saveClicked()
+GeneralPage::saveClicked()
 {
-    // save zone config (other stuff is saved by configdialog)
-    zonePage->saveClicked();
-    hrZonePage->saveClicked();
-    riderPage->saveClicked();
-    passPage->saveClicked();
-    seasonsPage->saveClicked();
+    // Language
+    static const QString langs[] = {
+        "en", "fr", "ja", "pt-br", "it", "de", "ru", "cs", "es", "pt"
+    };
+    appsettings->setValue(GC_LANG, langs[langCombo->currentIndex()]);
+
+    // Garmon and cranks
+    appsettings->setValue(GC_GARMIN_HWMARK, garminHWMarkedit->text().toInt());
+    appsettings->setValue(GC_GARMIN_SMARTRECORD, garminSmartRecord->checkState());
+    appsettings->setValue(GC_CRANKLENGTH, crankLengthCombo->currentText());
+
+    // save wheel size
+    static const int wheelSizes[] = {
+        2100, 1960, 1985, 1750
+    };
+
+    appsettings->setValue(GC_WHEELSIZE, wheelSizes[wheelSizeCombo->currentIndex()]);
+
+    // Bike score estimation
+    appsettings->setValue(GC_BIKESCOREDAYS, BSdaysEdit->text());
+    appsettings->setValue(GC_BIKESCOREMODE, bsModeCombo->currentText());
+    appsettings->setValue(GC_WORKOUTDIR, workoutDirectory->text());
+
+    // Performance Manager
+    appsettings->setCValue(main->cyclist, GC_INITIAL_STS, perfManStart->text());
+    appsettings->setCValue(main->cyclist, GC_INITIAL_LTS, perfManStart->text());
+    appsettings->setCValue(main->cyclist, GC_STS_DAYS, perfManSTSavg->text());
+    appsettings->setCValue(main->cyclist, GC_LTS_DAYS, perfManLTSavg->text());
+    appsettings->setCValue(main->cyclist, GC_SB_TODAY, (int) showSBToday->isChecked());
+
+    // set default stress names if not set:
+    appsettings->setValue(GC_STS_NAME, appsettings->value(this, GC_STS_NAME,tr("Short Term Stress")));
+    appsettings->setValue(GC_STS_ACRONYM, appsettings->value(this, GC_STS_ACRONYM,tr("STS")));
+    appsettings->setValue(GC_LTS_NAME, appsettings->value(this, GC_LTS_NAME,tr("Long Term Stress")));
+    appsettings->setValue(GC_LTS_ACRONYM, appsettings->value(this, GC_LTS_ACRONYM,tr("LTS")));
+    appsettings->setValue(GC_SB_NAME, appsettings->value(this, GC_SB_NAME,tr("Stress Balance")));
+    appsettings->setValue(GC_SB_ACRONYM, appsettings->value(this, GC_SB_ACRONYM,tr("SB")));
 }
 
-//
-// Proxy settings page
-//
-ProxyPage::ProxyPage(QWidget *parent, MainWindow *mainWindow) : QWidget(parent), mainWindow(mainWindow)
+void
+GeneralPage::browseWorkoutDir()
 {
-    QVBoxLayout *main = new QVBoxLayout(this);
-    QGridLayout *grid = new QGridLayout;
-
-    QLabel *typeLabel = new QLabel(tr("Proxy Type"));
-    QLabel *hostLabel = new QLabel(tr("Hostname"));
-    QLabel *portLabel = new QLabel(tr("Port"));
-    QLabel *userLabel = new QLabel(tr("Username"));
-    QLabel *passLabel = new QLabel(tr("Password"));
-
-    pxType = new QComboBox(this);
-    pxType->addItem(tr("Direct"));
-    pxType->addItem(tr("Open"));
-    pxType->addItem(tr("Authenticated"));
-    pxType->setCurrentIndex(appsettings->value(this, GC_PROXYTYPE, 0).toInt());
-
-    pxHost = new QLineEdit(this);
-    pxHost->setText(appsettings->value(this, GC_PROXYHOST, "").toString());
-
-    pxPort = new QSpinBox(this);
-    pxPort->setMaximum(99999);
-    pxPort->setMinimum(0);
-    pxPort->setValue(appsettings->value(this, GC_PROXYPORT, 0).toInt());
-
-    pxUser = new QLineEdit(this);
-    pxUser->setText(appsettings->value(this, GC_PROXYUSER, "").toString());
-
-    pxPass = new QLineEdit(this);
-    pxPass->setEchoMode(QLineEdit::Password);
-    pxPass->setText(appsettings->value(this, GC_PROXYPASS, "").toString());
-
-    grid->addWidget(typeLabel, 0,0);
-    grid->addWidget(hostLabel, 1,0);
-    grid->addWidget(portLabel, 2,0);
-    grid->addWidget(userLabel, 3,0);
-    grid->addWidget(passLabel, 4,0);
-
-    grid->addWidget(pxType, 0, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(pxHost, 1, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(pxPort, 2, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(pxUser, 3, 1, Qt::AlignLeft | Qt::AlignVCenter);
-    grid->addWidget(pxPass, 4, 1, Qt::AlignLeft | Qt::AlignVCenter);
-
-    grid->setColumnStretch(0,0);
-    grid->setColumnStretch(1,3);
-
-    main->addLayout(grid);
-    main->addStretch();
-
-    typeSelected(); // enable/disable as neccessary
-
-    connect(pxType, SIGNAL(currentIndexChanged(int)), this, SLOT(typeSelected()));
-}
-
-void ProxyPage::typeSelected()
-{
-    pxUser->setEnabled(false);
-    pxPass->setEnabled(false);
-    pxHost->setEnabled(false);
-    pxPort->setEnabled(false);
-    switch (pxType->currentIndex())
-    {
-    case 2 : // all fields enabled
-        pxUser->setEnabled(true);
-        pxPass->setEnabled(true);
-    case 1 : // only host and port
-        pxHost->setEnabled(true);
-        pxPort->setEnabled(true);
-    case 0 :
-        break;
-    }
-}
-
-void ProxyPage::saveClicked()
-{
-    appsettings->setValue(GC_PROXYTYPE, pxType->currentIndex());
-    appsettings->setValue(GC_PROXYHOST, pxHost->text());
-    appsettings->setValue(GC_PROXYPORT, pxPort->value());
-    appsettings->setValue(GC_PROXYUSER, pxUser->text());
-    appsettings->setValue(GC_PROXYPASS, pxPass->text());
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Select Workout Library"),
+                            "", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    workoutDirectory->setText(dir);
 }
 
 //
@@ -860,23 +708,20 @@ RiderPage::saveClicked()
 //
 // Realtime devices page
 //
-DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
+DevicePage::DevicePage(QWidget *parent, MainWindow *mainWindow) : QWidget(parent), mainWindow(mainWindow)
 {
-    QTabWidget *tabs = new QTabWidget(this);
-    QWidget *devs = new QWidget(this);
-    tabs->addTab(devs, tr("Devices"));
-    QHBoxLayout *devLayout = new QHBoxLayout(devs);
-
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->addWidget(tabs);
 
     DeviceTypes all;
     devices = all.getList();
 
-    addButton = new QPushButton(tr("Add"),this);
-    delButton = new QPushButton(tr("Delete"),this);
+    addButton = new QPushButton(tr("+"),this);
+    delButton = new QPushButton(tr("-"),this);
 
     deviceList = new QTableView(this);
+#ifdef Q_OS_MAC
+    deviceList->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
     deviceListModel = new deviceModel(this);
 
     // replace standard model with ours
@@ -890,34 +735,47 @@ DevicePage::DevicePage(QWidget *parent) : QWidget(parent)
     deviceList->verticalHeader()->hide();
     deviceList->setEditTriggers(QAbstractItemView::NoEditTriggers);
     deviceList->setSelectionMode(QAbstractItemView::SingleSelection);
-    deviceList->setColumnWidth(0,130);
-    deviceList->setColumnWidth(1,130);
-    deviceList->setColumnWidth(2,130);
-
-    leftLayout = new QGridLayout();
-    leftLayout->addWidget(deviceList);
-
-    rightLayout = new QVBoxLayout();
-    rightLayout->addWidget(addButton);
-    rightLayout->addWidget(delButton);
-    rightLayout->addStretch();
-
-    devLayout->addLayout(leftLayout);
-    devLayout->addLayout(rightLayout);
 
     multiCheck = new QCheckBox("Allow multiple devices in Train View", this);
     multiCheck->setChecked(appsettings->value(this, TRAIN_MULTI, false).toBool());
-    leftLayout->addWidget(multiCheck);
 
-    setConfigPane();
+    mainLayout->addWidget(deviceList);
+    QHBoxLayout *bottom = new QHBoxLayout;
+    bottom->setSpacing(0);
+    bottom->addWidget(multiCheck);
+    bottom->addStretch();
+    bottom->addWidget(addButton);
+    bottom->addWidget(delButton);
+    mainLayout->addLayout(bottom);
+
+    connect(addButton, SIGNAL(clicked()), this, SLOT(devaddClicked()));
+    connect(delButton, SIGNAL(clicked()), this, SLOT(devdelClicked()));
 }
 
 void
-DevicePage::setConfigPane()
+DevicePage::saveClicked()
 {
-    // does nothing for now.
+    // Save the device configuration...
+    DeviceConfigurations all;
+    all.writeConfig(deviceListModel->Configuration);
+    appsettings->setValue(TRAIN_MULTI, multiCheck->isChecked());
 }
 
+void
+DevicePage::devaddClicked()
+{
+    DeviceConfiguration add;
+    AddDeviceWizard *p = new AddDeviceWizard(mainWindow, add);
+    if (p->exec() == QDialog::Accepted) {
+        deviceListModel->add(add);
+    }
+}
+
+void
+DevicePage::devdelClicked()
+{
+    deviceListModel->del();
+}
 
 // add a new configuration
 void
@@ -961,11 +819,6 @@ deviceModel::del()
         //int row = this->mapToSource(index).row();
         removeRows(index.row(), 1, QModelIndex());
     }
-}
-
-void
-DevicePage::pairClicked(DeviceConfiguration *dc, QProgressDialog *progress)
-{
 }
 
 deviceModel::deviceModel(QObject *parent) : QAbstractTableModel(parent)
@@ -1147,7 +1000,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     //colors->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     colors->setUniformRowHeights(true);
     colors->setIndentation(0);
-    colors->header()->resizeSection(0,300);
+    //colors->header()->resizeSection(0,300);
 
     shadeZones = new QCheckBox;
     shadeZones->setChecked(appsettings->value(this, GC_SHADEZONES, true).toBool());
@@ -1157,7 +1010,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     lineWidth->setMaximum(5);
     lineWidth->setMinimum(0.5);
     lineWidth->setSingleStep(0.5);
-    reset = new QPushButton("Reset Default Colors");
+    reset = new QPushButton("Reset");
     lineWidth->setValue(appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble());
 
     QLabel *lineWidthLabel = new QLabel(tr("Line Width"));
@@ -1244,13 +1097,16 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     QGridLayout *grid = new QGridLayout;
     grid->setSpacing(5);
 
-    grid->addWidget(lineWidthLabel, 0,3);
-    grid->addWidget(antialiasLabel, 1,3);
-    grid->addWidget(shadeZonesLabel, 2,3);
-    grid->addWidget(lineWidth, 0,4, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget(antiAliased, 1,4, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget(shadeZones, 2,4, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget(reset, 5,4, Qt::AlignVCenter|Qt::AlignRight);
+    QHBoxLayout *misc = new QHBoxLayout;
+    misc->addWidget(lineWidthLabel);
+    misc->addWidget(lineWidth);
+    misc->addStretch();
+    misc->addWidget(antialiasLabel);
+    misc->addWidget(antiAliased);
+    misc->addWidget(shadeZonesLabel);
+    misc->addWidget(shadeZones);
+    misc->addStretch();
+    misc->addWidget(reset);
 
     grid->addWidget(defaultLabel, 0,0);
     grid->addWidget(titlesLabel, 1,0);
@@ -1280,6 +1136,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     grid->setColumnStretch(4,3);
 
     mainLayout->addLayout(grid);
+    mainLayout->addLayout(misc);
     mainLayout->addWidget(colors);
 
     colorSet = GCColor::colorSet();
@@ -1370,10 +1227,10 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
     QVBoxLayout *selectedLayout = new QVBoxLayout;
     selectedLayout->addWidget(new QLabel(tr("Selected Metrics")));
     selectedLayout->addWidget(selectedList);
-    upButton = new QPushButton("Move up");
-    downButton = new QPushButton("Move down");
-    leftButton = new QPushButton("Exclude");
-    rightButton = new QPushButton("Include");
+    upButton = new QPushButton("Up");
+    downButton = new QPushButton("Down");
+    leftButton = new QPushButton("<<");
+    rightButton = new QPushButton(">>");
     QVBoxLayout *buttonGrid = new QVBoxLayout;
     QHBoxLayout *upLayout = new QHBoxLayout;
     QHBoxLayout *inexcLayout = new QHBoxLayout;
@@ -1548,10 +1405,10 @@ SummaryMetricsPage::SummaryMetricsPage(QWidget *parent) :
     QVBoxLayout *selectedLayout = new QVBoxLayout;
     selectedLayout->addWidget(new QLabel(tr("Selected Metrics")));
     selectedLayout->addWidget(selectedList);
-    upButton = new QPushButton("Move up");
-    downButton = new QPushButton("Move down");
-    leftButton = new QPushButton("Exclude");
-    rightButton = new QPushButton("Include");
+    upButton = new QPushButton("Up");
+    downButton = new QPushButton("Down");
+    leftButton = new QPushButton("<<");
+    rightButton = new QPushButton(">>");
     QVBoxLayout *buttonGrid = new QVBoxLayout;
     QHBoxLayout *upLayout = new QHBoxLayout;
     QHBoxLayout *inexcLayout = new QHBoxLayout;
@@ -1777,11 +1634,11 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
     field->addStretch();
     mainLayout->addLayout(field, 0, 0);
 
-    upButton = new QPushButton(tr("Move up"));
-    downButton = new QPushButton(tr("Move down"));
-    addButton = new QPushButton(tr("Insert"));
+    upButton = new QPushButton(tr("Up"));
+    downButton = new QPushButton(tr("Down"));
+    addButton = new QPushButton(tr("+"));
     renameButton = new QPushButton(tr("Rename"));
-    deleteButton = new QPushButton(tr("Delete"));
+    deleteButton = new QPushButton(tr("-"));
 
     QVBoxLayout *actionButtons = new QVBoxLayout;
     actionButtons->addWidget(addButton);
@@ -1800,8 +1657,8 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
     keywords->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     keywords->setUniformRowHeights(true);
     keywords->setIndentation(0);
-    keywords->header()->resizeSection(0,100);
-    keywords->header()->resizeSection(1,45);
+    //keywords->header()->resizeSection(0,100);
+    //keywords->header()->resizeSection(1,45);
 
     foreach(KeywordDefinition keyword, keywordDefinitions) {
         QTreeWidgetItem *add;
@@ -1978,19 +1835,17 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
 {
     QGridLayout *mainLayout = new QGridLayout(this);
 
-    upButton = new QPushButton(tr("Move up"));
-    downButton = new QPushButton(tr("Move down"));
-    addButton = new QPushButton(tr("Insert"));
-    renameButton = new QPushButton(tr("Rename"));
-    deleteButton = new QPushButton(tr("Delete"));
+    upButton = new QPushButton(tr("Up"));
+    downButton = new QPushButton(tr("Down"));
+    addButton = new QPushButton(tr("+"));
+    deleteButton = new QPushButton(tr("-"));
 
-    QVBoxLayout *actionButtons = new QVBoxLayout;
-    actionButtons->addWidget(addButton);
-    actionButtons->addWidget(renameButton);
-    actionButtons->addWidget(deleteButton);
+    QHBoxLayout *actionButtons = new QHBoxLayout;
     actionButtons->addWidget(upButton);
     actionButtons->addWidget(downButton);
     actionButtons->addStretch();
+    actionButtons->addWidget(addButton);
+    actionButtons->addWidget(deleteButton);
 
     fields = new QTreeWidget;
     fields->headerItem()->setText(0, tr("Screen Tab"));
@@ -2004,20 +1859,6 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     fields->setUniformRowHeights(true);
     fields->setIndentation(0);
 
-#ifdef Q_OS_MAC
-    fields->header()->resizeSection(0,80); // tab
-    fields->header()->resizeSection(1,110); // name
-    fields->header()->resizeSection(2,80); // type
-    fields->header()->resizeSection(3,120); // values
-    fields->header()->resizeSection(4,50); // diary
-#else
-    fields->header()->resizeSection(0,80);
-    fields->header()->resizeSection(1,110);
-    fields->header()->resizeSection(2,90);
-    fields->header()->resizeSection(3,120);
-    fields->header()->resizeSection(4,50);
-#endif
-
     SpecialFields specials;
     SpecialTabs specialTabs;
     foreach(FieldDefinition field, fieldDefinitions) {
@@ -2025,11 +1866,6 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
         QComboBox *comboButton = new QComboBox(this);
         QCheckBox *checkBox = new QCheckBox("", this);
         checkBox->setChecked(field.diary);
-        //QLineEdit *linedit = new QLineEdit(this); //XXX need a custom delegate for this
-        //QCompleter *completer = new QCompleter(linedit);
-        //completer->setModel(specials.model());
-        //completer->setCaseSensitivity(Qt::CaseInsensitive);
-        //linedit->setCompleter(completer);
 
         addFieldTypes(comboButton);
         comboButton->setCurrentIndex(field.type);
@@ -2052,13 +1888,12 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     fields->setCurrentItem(fields->invisibleRootItem()->child(0));
 
     mainLayout->addWidget(fields, 0,0);
-    mainLayout->addLayout(actionButtons, 0,1);
+    mainLayout->addLayout(actionButtons, 1,0);
 
     // connect up slots
     connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
     connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
-    connect(renameButton, SIGNAL(clicked()), this, SLOT(renameClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
 }
 
@@ -2205,7 +2040,7 @@ ProcessorPage::ProcessorPage(MainWindow *main) : main(main)
     processorTree->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     processorTree->setUniformRowHeights(true);
     processorTree->setIndentation(0);
-    processorTree->header()->resizeSection(0,150);
+    //processorTree->header()->resizeSection(0,150);
 
     // iterate over all the processors and add an entry to the
     QMapIterator<QString, DataProcessor*> i(processors);
@@ -2277,8 +2112,8 @@ ZonePage::ZonePage(MainWindow *main) : main(main)
     cpPage = new CPPage(this);
 
     tabs = new QTabWidget(this);
-    tabs->addTab(cpPage, tr("Critical Power History"));
-    tabs->addTab(schemePage, tr("Default Zones"));
+    tabs->addTab(cpPage, tr("Critical Power"));
+    tabs->addTab(schemePage, tr("Default"));
 
     layout->addWidget(tabs);
 }
@@ -2292,17 +2127,15 @@ ZonePage::saveClicked()
 
 SchemePage::SchemePage(ZonePage* zonePage) : zonePage(zonePage)
 {
-    QGridLayout *mainLayout = new QGridLayout(this);
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
-    addButton = new QPushButton(tr("Add"));
-    renameButton = new QPushButton(tr("Rename"));
-    deleteButton = new QPushButton(tr("Delete"));
+    addButton = new QPushButton(tr("+"));
+    deleteButton = new QPushButton(tr("-"));
 
-    QVBoxLayout *actionButtons = new QVBoxLayout;
-    actionButtons->addWidget(addButton);
-    actionButtons->addWidget(renameButton);
-    actionButtons->addWidget(deleteButton);
+    QHBoxLayout *actionButtons = new QHBoxLayout;
     actionButtons->addStretch();
+    actionButtons->addWidget(addButton);
+    actionButtons->addWidget(deleteButton);
 
     scheme = new QTreeWidget;
     scheme->headerItem()->setText(0, tr("Short"));
@@ -2313,9 +2146,9 @@ SchemePage::SchemePage(ZonePage* zonePage) : zonePage(zonePage)
     scheme->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     scheme->setUniformRowHeights(true);
     scheme->setIndentation(0);
-    scheme->header()->resizeSection(0,90);
-    scheme->header()->resizeSection(1,200);
-    scheme->header()->resizeSection(2,80);
+    //scheme->header()->resizeSection(0,90);
+    //scheme->header()->resizeSection(1,200);
+    //scheme->header()->resizeSection(2,80);
 
     // setup list
     for (int i=0; i< zonePage->zones.getScheme().nzones_default; i++) {
@@ -2338,12 +2171,11 @@ SchemePage::SchemePage(ZonePage* zonePage) : zonePage(zonePage)
         scheme->setItemWidget(add, 2, loedit);
     }
 
-    mainLayout->addWidget(scheme, 0,0);
-    mainLayout->addLayout(actionButtons, 0,1);
+    mainLayout->addWidget(scheme);
+    mainLayout->addLayout(actionButtons);
 
     // button connect
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
-    connect(renameButton, SIGNAL(clicked()), this, SLOT(renameClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
 }
 
@@ -2453,25 +2285,28 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     active = false;
 
     QGridLayout *mainLayout = new QGridLayout(this);
+    mainLayout->setSpacing(10);
 
-    addButton = new QPushButton(tr("Add CP"));
-    deleteButton = new QPushButton(tr("Delete CP"));
-    defaultButton = new QPushButton(tr("Default"));
+    addButton = new QPushButton(tr("+"));
+    deleteButton = new QPushButton(tr("-"));
+    defaultButton = new QPushButton(tr("Def"));
     defaultButton->hide();
 
-    addZoneButton = new QPushButton(tr("Add Zone"));
-    deleteZoneButton = new QPushButton(tr("Delete Zone"));
+    addZoneButton = new QPushButton(tr("+"));
+    deleteZoneButton = new QPushButton(tr("-"));
 
-    QVBoxLayout *actionButtons = new QVBoxLayout;
+    QHBoxLayout *actionButtons = new QHBoxLayout;
+    actionButtons->setSpacing(0);
+    actionButtons->addStretch();
     actionButtons->addWidget(addButton);
     actionButtons->addWidget(deleteButton);
     actionButtons->addWidget(defaultButton);
-    actionButtons->addStretch();
 
-    QVBoxLayout *zoneButtons = new QVBoxLayout;
+    QHBoxLayout *zoneButtons = new QHBoxLayout;
+    zoneButtons->addStretch();
+    zoneButtons->setSpacing(0);
     zoneButtons->addWidget(addZoneButton);
     zoneButtons->addWidget(deleteZoneButton);
-    zoneButtons->addStretch();
 
     QHBoxLayout *addLayout = new QHBoxLayout;
     QLabel *dateLabel = new QLabel(tr("From Date"));
@@ -2499,7 +2334,7 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     //ranges->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     ranges->setUniformRowHeights(true);
     ranges->setIndentation(0);
-    ranges->header()->resizeSection(0,180);
+    //ranges->header()->resizeSection(0,180);
 
     // setup list of ranges
     for (int i=0; i< zonePage->zones.getRangeSize(); i++) {
@@ -2530,14 +2365,14 @@ CPPage::CPPage(ZonePage* zonePage) : zonePage(zonePage)
     zones->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     zones->setUniformRowHeights(true);
     zones->setIndentation(0);
-    zones->header()->resizeSection(0,80);
-    zones->header()->resizeSection(1,150);
+    //zones->header()->resizeSection(0,80);
+    //zones->header()->resizeSection(1,150);
 
     mainLayout->addLayout(addLayout, 0,0);
+    mainLayout->addLayout(actionButtons, 1,0);
     mainLayout->addWidget(ranges, 2,0);
+    mainLayout->addLayout(zoneButtons, 3,0);
     mainLayout->addWidget(zones, 4,0);
-    mainLayout->addLayout(actionButtons, 0,1,0,3);
-    mainLayout->addLayout(zoneButtons, 4,1);
 
     // button connect
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
@@ -2808,8 +2643,8 @@ HrZonePage::HrZonePage(MainWindow *main) : main(main)
     ltPage = new LTPage(this);
 
     tabs = new QTabWidget(this);
-    tabs->addTab(ltPage, tr("Lactic Threshold History"));
-    tabs->addTab(schemePage, tr("Default Zones"));
+    tabs->addTab(ltPage, tr("Lactic Threshold"));
+    tabs->addTab(schemePage, tr("Default"));
 
     layout->addWidget(tabs);
 }
@@ -2823,17 +2658,15 @@ HrZonePage::saveClicked()
 
 HrSchemePage::HrSchemePage(HrZonePage* zonePage) : zonePage(zonePage)
 {
-    QGridLayout *mainLayout = new QGridLayout(this);
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
-    addButton = new QPushButton(tr("Add"));
-    renameButton = new QPushButton(tr("Rename"));
-    deleteButton = new QPushButton(tr("Delete"));
+    addButton = new QPushButton(tr("+"));
+    deleteButton = new QPushButton(tr("-"));
 
-    QVBoxLayout *actionButtons = new QVBoxLayout;
-    actionButtons->addWidget(addButton);
-    actionButtons->addWidget(renameButton);
-    actionButtons->addWidget(deleteButton);
+    QHBoxLayout *actionButtons = new QHBoxLayout;
     actionButtons->addStretch();
+    actionButtons->addWidget(addButton);
+    actionButtons->addWidget(deleteButton);
 
     scheme = new QTreeWidget;
     scheme->headerItem()->setText(0, tr("Short"));
@@ -2845,10 +2678,10 @@ HrSchemePage::HrSchemePage(HrZonePage* zonePage) : zonePage(zonePage)
     scheme->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     scheme->setUniformRowHeights(true);
     scheme->setIndentation(0);
-    scheme->header()->resizeSection(0,60);
-    scheme->header()->resizeSection(1,180);
-    scheme->header()->resizeSection(2,65);
-    scheme->header()->resizeSection(3,65);
+    //scheme->header()->resizeSection(0,60);
+    //scheme->header()->resizeSection(1,180);
+    //scheme->header()->resizeSection(2,65);
+    //scheme->header()->resizeSection(3,65);
 
     // setup list
     for (int i=0; i< zonePage->zones.getScheme().nzones_default; i++) {
@@ -2880,12 +2713,11 @@ HrSchemePage::HrSchemePage(HrZonePage* zonePage) : zonePage(zonePage)
         scheme->setItemWidget(add, 3, trimpedit);
     }
 
-    mainLayout->addWidget(scheme, 0,0);
-    mainLayout->addLayout(actionButtons, 0,1);
+    mainLayout->addWidget(scheme);
+    mainLayout->addLayout(actionButtons);
 
     // button connect
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
-    connect(renameButton, SIGNAL(clicked()), this, SLOT(renameClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
 }
 
@@ -2998,26 +2830,26 @@ LTPage::LTPage(HrZonePage* zonePage) : zonePage(zonePage)
 {
     active = false;
 
-    QGridLayout *mainLayout = new QGridLayout(this);
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
-    addButton = new QPushButton(tr("Add LT"));
-    deleteButton = new QPushButton(tr("Delete LT"));
-    defaultButton = new QPushButton(tr("Default"));
+    addButton = new QPushButton(tr("+"));
+    deleteButton = new QPushButton(tr("-"));
+    defaultButton = new QPushButton(tr("Def"));
     defaultButton->hide();
 
-    addZoneButton = new QPushButton(tr("Add Zone"));
-    deleteZoneButton = new QPushButton(tr("Delete Zone"));
+    addZoneButton = new QPushButton(tr("+"));
+    deleteZoneButton = new QPushButton(tr("-"));
 
-    QVBoxLayout *actionButtons = new QVBoxLayout;
+    QHBoxLayout *actionButtons = new QHBoxLayout;
+    actionButtons->addStretch();
     actionButtons->addWidget(addButton);
     actionButtons->addWidget(deleteButton);
     actionButtons->addWidget(defaultButton);
-    actionButtons->addStretch();
 
-    QVBoxLayout *zoneButtons = new QVBoxLayout;
+    QHBoxLayout *zoneButtons = new QHBoxLayout;
+    zoneButtons->addStretch();
     zoneButtons->addWidget(addZoneButton);
     zoneButtons->addWidget(deleteZoneButton);
-    zoneButtons->addStretch();
 
     QHBoxLayout *addLayout = new QHBoxLayout;
     QLabel *dateLabel = new QLabel(tr("From Date"));
@@ -3069,7 +2901,7 @@ LTPage::LTPage(HrZonePage* zonePage) : zonePage(zonePage)
     //ranges->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     ranges->setUniformRowHeights(true);
     ranges->setIndentation(0);
-    ranges->header()->resizeSection(0,180);
+    //ranges->header()->resizeSection(0,180);
 
     // setup list of ranges
     for (int i=0; i< zonePage->zones.getRangeSize(); i++) {
@@ -3109,17 +2941,17 @@ LTPage::LTPage(HrZonePage* zonePage) : zonePage(zonePage)
     zones->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     zones->setUniformRowHeights(true);
     zones->setIndentation(0);
-    zones->header()->resizeSection(0,50);
-    zones->header()->resizeSection(1,150);
-    zones->header()->resizeSection(2,65);
-    zones->header()->resizeSection(3,65);
+    //zones->header()->resizeSection(0,50);
+    //zones->header()->resizeSection(1,150);
+    //zones->header()->resizeSection(2,65);
+    //zones->header()->resizeSection(3,65);
 
-    mainLayout->addLayout(addLayout, 0,0);
-    mainLayout->addLayout(addLayout2, 1,0);
-    mainLayout->addWidget(ranges, 2,0);
-    mainLayout->addWidget(zones, 4,0);
-    mainLayout->addLayout(actionButtons, 0,1,0,3);
-    mainLayout->addLayout(zoneButtons, 4,1);
+    mainLayout->addLayout(addLayout);
+    mainLayout->addLayout(addLayout2);
+    mainLayout->addLayout(actionButtons);
+    mainLayout->addWidget(ranges);
+    mainLayout->addLayout(zoneButtons);
+    mainLayout->addWidget(zones);
 
     // button connect
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
@@ -3394,19 +3226,17 @@ MeasuresPage::MeasuresPage(MainWindow *main) : main(main)
 {
     QGridLayout *mainLayout = new QGridLayout(this);
 
-    upButton = new QPushButton(tr("Move up"));
-    downButton = new QPushButton(tr("Move down"));
-    addButton = new QPushButton(tr("Insert"));
-    renameButton = new QPushButton(tr("Rename"));
-    deleteButton = new QPushButton(tr("Delete"));
+    upButton = new QPushButton(tr("Up"));
+    downButton = new QPushButton(tr("Down"));
+    addButton = new QPushButton(tr("+"));
+    deleteButton = new QPushButton(tr("-"));
 
-    QVBoxLayout *actionButtons = new QVBoxLayout;
-    actionButtons->addWidget(addButton);
-    actionButtons->addWidget(renameButton);
-    actionButtons->addWidget(deleteButton);
+    QHBoxLayout *actionButtons = new QHBoxLayout;
     actionButtons->addWidget(upButton);
     actionButtons->addWidget(downButton);
     actionButtons->addStretch();
+    actionButtons->addWidget(addButton);
+    actionButtons->addWidget(deleteButton);
 
     fields = new QTreeWidget;
     fields->headerItem()->setText(0, tr("Screen Tab"));
@@ -3417,8 +3247,8 @@ MeasuresPage::MeasuresPage(MainWindow *main) : main(main)
     fields->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     fields->setUniformRowHeights(true);
     fields->setIndentation(0);
-    fields->header()->resizeSection(0,130);
-    fields->header()->resizeSection(1,140);
+    //fields->header()->resizeSection(0,130);
+    //fields->header()->resizeSection(1,140);
 
     // temporary storage for measures config
     QList<FieldDefinition> fieldDefinitions;
@@ -3454,13 +3284,12 @@ MeasuresPage::MeasuresPage(MainWindow *main) : main(main)
     fields->setCurrentItem(fields->invisibleRootItem()->child(0));
 
     mainLayout->addWidget(fields, 0,0);
-    mainLayout->addLayout(actionButtons, 0,1);
+    mainLayout->addLayout(actionButtons, 1,0);
 
     // connect up slots
     connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
     connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
-    connect(renameButton, SIGNAL(clicked()), this, SLOT(renameClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
 }
 
@@ -3672,10 +3501,10 @@ SeasonsPage::SeasonsPage(QWidget *parent, MainWindow *mainWindow) : QWidget(pare
     editLayout->addRow(new QLabel("From"), fromEdit);
     editLayout->addRow(new QLabel("To"), toEdit);
 
-    upButton = new QPushButton(tr("Move up"));
-    downButton = new QPushButton(tr("Move down"));
-    addButton = new QPushButton(tr("Add"));
-    deleteButton = new QPushButton(tr("Delete"));
+    upButton = new QPushButton(tr("Up"));
+    downButton = new QPushButton(tr("Down"));
+    addButton = new QPushButton(tr("+"));
+    deleteButton = new QPushButton(tr("-"));
 
     QVBoxLayout *actionButtons = new QVBoxLayout;
     actionButtons->addWidget(deleteButton);
@@ -3695,15 +3524,15 @@ SeasonsPage::SeasonsPage(QWidget *parent, MainWindow *mainWindow) : QWidget(pare
     seasons->setIndentation(0);
 
 #ifdef Q_OS_MAC
-    seasons->header()->resizeSection(0,160); // tab
-    seasons->header()->resizeSection(1,80); // name
-    seasons->header()->resizeSection(2,130); // type
-    seasons->header()->resizeSection(3,130); // values
+    //seasons->header()->resizeSection(0,160); // tab
+    //seasons->header()->resizeSection(1,80); // name
+    //seasons->header()->resizeSection(2,130); // type
+    //seasons->header()->resizeSection(3,130); // values
 #else
-    seasons->header()->resizeSection(0,160); // tab
-    seasons->header()->resizeSection(1,80); // name
-    seasons->header()->resizeSection(2,130); // type
-    seasons->header()->resizeSection(3,130); // values
+    //seasons->header()->resizeSection(0,160); // tab
+    //seasons->header()->resizeSection(1,80); // name
+    //seasons->header()->resizeSection(2,130); // type
+    //seasons->header()->resizeSection(3,130); // values
 #endif
 
     foreach(Season season, array) {

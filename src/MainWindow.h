@@ -183,6 +183,7 @@ class MainWindow : public QMainWindow
                                     // rideItem date/time changes
         void notifyRideClean() { rideClean(); }
         void notifyRideDirty() { rideDirty(); }
+        void notifyZonesChanged() { zonesChanged(); }
 
         // realtime signals
         void notifyTelemetryUpdate(const RealtimeData &rtData) { telemetryUpdate(rtData); }

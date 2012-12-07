@@ -1246,7 +1246,7 @@ MainWindow::resizeEvent(QResizeEvent*)
 }
 
 void
-MainWindow::intervalSplitterMoved(int pos, int /*index*/)
+MainWindow::intervalSplitterMoved(int /* pos */, int /*index*/)
 {
     appsettings->setCValue(cyclist, GC_SETTINGS_INTERVALSPLITTER_SIZES, intervalSplitter->saveState());
 }
@@ -1262,8 +1262,7 @@ void
 MainWindow::showOptions()
 {
     ConfigDialog *cd = new ConfigDialog(home, zones_, this);
-    cd->exec();
-    zonesChanged();
+    cd->show();
 }
 
 void

@@ -43,26 +43,32 @@ class HrZonePage;
 class SummaryMetricsPage;
 class MetadataPage;
 class KeywordsPage;
-class ProxyPage;
 class FieldsPage;
 class MeasuresPage;
 class Colors;
 class RiderPage;
 class SeasonsPage;
 
-class ConfigurationPage : public QWidget
+class GeneralPage : public QWidget
 {
     Q_OBJECT
     G_OBJECT
 
     public:
-        ConfigurationPage(MainWindow *main);
+        GeneralPage(MainWindow *main);
         void saveClicked();
+
+
+    public slots:
+        void browseWorkoutDir();
+
+    private:
+        MainWindow *main;
+
         QComboBox *langCombo;
         QComboBox *unitCombo;
         QComboBox *crankLengthCombo;
         QComboBox *wheelSizeCombo;
-        QCheckBox *allRidesAscending;
         QCheckBox *garminSmartRecord;
         QLineEdit *garminHWMarkedit;
         QLineEdit *BSdaysEdit;
@@ -70,32 +76,22 @@ class ConfigurationPage : public QWidget
         QLineEdit *workoutDirectory;
         QPushButton *workoutBrowseButton;
 
-    public slots:
-        void browseWorkoutDir();
-
-    private:
-        MainWindow *main;
-        ColorsPage *colorsPage;
-        SummaryMetricsPage *summaryMetrics;
-        IntervalMetricsPage *intervalMetrics;
-        MetadataPage *metadataPage;
-        ProxyPage *proxyPage;
-        MeasuresPage *measuresPage;
-
-        QGroupBox *configGroup;
         QLabel *langLabel;
         QLabel *unitLabel;
         QLabel *warningLabel;
         QLabel *workoutLabel;
-        QHBoxLayout *langLayout;
-        QHBoxLayout *unitLayout;
-        QHBoxLayout *warningLayout;
-        QHBoxLayout *workoutLayout;
-        QVBoxLayout *configLayout;
-        QVBoxLayout *mainLayout;
-        QGridLayout *bsDaysLayout;
-        QHBoxLayout *bsModeLayout;
-        QGridLayout *garminLayout;
+
+        QLabel *perfManLabel;
+        QLabel *perfManStartLabel;
+        QLabel *perfManSTSLabel;
+        QLabel *perfManLTSLabel;
+        QLineEdit *perfManStart;
+        QLineEdit *perfManSTSavg;
+        QLineEdit *perfManLTSavg;
+        QCheckBox *showSBToday;
+        QIntValidator *perfManStartValidator;
+        QIntValidator *perfManSTSavgValidator;
+        QIntValidator *perfManLTSavgValidator;
 };
 
 class RiderPage : public QWidget
@@ -184,65 +180,6 @@ class CredentialsPage : public QScrollArea
         QLineEdit *dvPass;
 };
 
-class ProxyPage : public QWidget
-{
-    Q_OBJECT
-    G_OBJECT
-
-
-    public:
-        ProxyPage(QWidget *parent, MainWindow *mainWindow);
-        void saveClicked();
-
-    public slots:
-        void typeSelected();
-
-    private:
-        MainWindow *mainWindow;
-        QComboBox *pxType; // direct, unauth, authenticated
-        QLineEdit *pxHost; // proxy host
-        QSpinBox  *pxPort; // proxy Port
-        QLineEdit *pxUser; // user for proxy auth
-        QLineEdit *pxPass; // pass for proxy auth
-};
-
-class CyclistPage : public QWidget
-{
-    Q_OBJECT
-    G_OBJECT
-
-    public:
-        CyclistPage(MainWindow *mainWindow);
-        void saveClicked();
-
-        QLabel *perfManLabel;
-        QLabel *perfManStartLabel;
-        QLabel *perfManSTSLabel;
-        QLabel *perfManLTSLabel;
-        QLineEdit *perfManStart;
-        QLineEdit *perfManSTSavg;
-        QLineEdit *perfManLTSavg;
-        QCheckBox *showSBToday;
-
-        RiderPage *riderPage;
-        CredentialsPage *passPage;
-        ZonePage *zonePage;
-        HrZonePage *hrZonePage;
-        SeasonsPage *seasonsPage;
-
-    private:
-        QVBoxLayout *perfManLayout;
-        QHBoxLayout *perfManStartValLayout;
-        QHBoxLayout *perfManSTSavgLayout;
-        QHBoxLayout *perfManLTSavgLayout;
-        QVBoxLayout *cyclistLayout;
-        QVBoxLayout *mainLayout;
-        QIntValidator *perfManStartValidator;
-        QIntValidator *perfManSTSavgValidator;
-        QIntValidator *perfManLTSavgValidator;
-        MainWindow *mainWindow;
-};
-
 class deviceModel : public QAbstractTableModel
 {
     Q_OBJECT
@@ -280,13 +217,19 @@ class DevicePage : public QWidget
     G_OBJECT
 
     public:
-        DevicePage(QWidget *parent = 0);
-        void setConfigPane();
-        void pairClicked(DeviceConfiguration *, QProgressDialog *);
-
-        QList<DeviceType> devices;
+        DevicePage(QWidget *, MainWindow *);
+        void saveClicked();
 
         QTableView *deviceList;
+
+    public slots:
+        void devaddClicked();
+        void devdelClicked();
+
+    private:
+        MainWindow *mainWindow;
+
+        QList<DeviceType> devices;
 
         QPushButton *addButton;
         QPushButton *delButton;
@@ -744,94 +687,5 @@ class MeasuresPage : public QWidget
         QTreeWidget *fields;
         QPushButton *upButton, *downButton, *addButton, *renameButton, *deleteButton;
 };
-
-#if 0
-class HrSchemePage : public QWidget
-{
-    Q_OBJECT
-    G_OBJECT
-
-
-public:
-    HrSchemePage(HrZonePage *parent);
-    HrZoneScheme getScheme();
-    void saveClicked();
-
-    public slots:
-    void addClicked();
-    void deleteClicked();
-    void renameClicked();
-
-private:
-    HrZonePage *zonePage;
-    QTreeWidget *scheme;
-    QPushButton *addButton, *renameButton, *deleteButton;
-};
-
-
-class LTPage : public QWidget
-{
-    Q_OBJECT
-    G_OBJECT
-
-
-public:
-    LTPage(HrZonePage *parent);
-
-    public slots:
-    void addClicked();
-    void deleteClicked();
-    void defaultClicked();
-    void rangeSelectionChanged();
-    void addZoneClicked();
-    void deleteZoneClicked();
-    void zonesChanged();
-
-private:
-    bool active;
-
-    QDateEdit *dateEdit;
-    QDoubleSpinBox *ltEdit;
-    QDoubleSpinBox *restHrEdit;
-    QDoubleSpinBox *maxHrEdit;
-
-    HrZonePage  *zonePage;
-    QTreeWidget *ranges;
-    QTreeWidget *zones;
-    QPushButton *addButton, *deleteButton, *defaultButton;
-    QPushButton *addZoneButton, *deleteZoneButton;
-};
-
-class HrZonePage : public QWidget
-{
-    Q_OBJECT
-    G_OBJECT
-
-
-public:
-
-    HrZonePage(MainWindow *);
-    void saveClicked();
-
-    //ZoneScheme scheme;
-    HrZones zones;
-
-    // Children talk to each other
-    HrSchemePage *schemePage;
-    LTPage *ltPage;
-
-    public slots:
-
-
-protected:
-
-    MainWindow *main;
-    bool changed;
-
-    QTabWidget *tabs;
-
-    // local versions for modification
-};
-#endif
 
 #endif
