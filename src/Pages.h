@@ -71,6 +71,7 @@ class GeneralPage : public QWidget
         QComboBox *wheelSizeCombo;
         QCheckBox *garminSmartRecord;
         QLineEdit *garminHWMarkedit;
+        QLineEdit *hystedit;
         QLineEdit *BSdaysEdit;
         QComboBox *bsModeCombo;
         QLineEdit *workoutDirectory;

@@ -17,6 +17,7 @@
  */
 
 #include "RideMetric.h"
+#include "Settings.h"
 #include "LTMOutliers.h"
 #include "Units.h"
 #include "math.h"
@@ -195,8 +196,12 @@ class ElevationGain : public RideMetric {
     void compute(const RideFile *ride, const Zones *, int,
                  const HrZones *, int,
                  const QHash<QString,RideMetric*> &,
-                 const MainWindow *) {
-        const double hysteresis = 3.0;
+                 const MainWindow *main) {
+
+        // hysteresis can be configured, we default to 3.0
+        double hysteresis = appsettings->value((QObject*)main, GC_ELEVATION_HYSTERESIS).toDouble();
+        if (hysteresis <= 0.1) hysteresis = 3.00;
+
         bool first = true;
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             if (first) {

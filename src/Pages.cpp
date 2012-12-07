@@ -180,6 +180,18 @@ GeneralPage::GeneralPage(MainWindow *main) : main(main)
     configLayout->addWidget(BSModeLabel, 6,0, Qt::AlignRight);
     configLayout->addWidget(bsModeCombo, 6,1, Qt::AlignLeft);
 
+    // Elevation hysterisis  GC_ELEVATION_HYSTERISIS
+    QVariant elevationHysteresis = appsettings->value(this, GC_ELEVATION_HYSTERESIS);
+    if (elevationHysteresis.isNull() || elevationHysteresis.toFloat() == 0.0)
+       elevationHysteresis.setValue(3.0);  // default is 1 meter
+
+    QLabel *hystlabel = new QLabel(tr("Elevation gain hysteresis (meters):"));
+    hystedit = new QLineEdit(elevationHysteresis.toString(),this);
+    hystedit->setInputMask("9.00");
+    
+    configLayout->addWidget(hystlabel, 7,0, Qt::AlignRight);
+    configLayout->addWidget(hystedit, 7,1, Qt::AlignLeft);
+    
     //
     // Performance manager
     //
@@ -208,13 +220,13 @@ GeneralPage::GeneralPage(MainWindow *main) : main(main)
     showSBToday = new QCheckBox(tr("PMC Stress Balance Today"), this);
     showSBToday->setChecked(appsettings->cvalue(main->cyclist, GC_SB_TODAY).toInt());
 
-    configLayout->addWidget(perfManStartLabel, 7,0, Qt::AlignRight);
-    configLayout->addWidget(perfManStart, 7,1, Qt::AlignLeft);
-    configLayout->addWidget(perfManSTSLabel, 8,0, Qt::AlignRight);
-    configLayout->addWidget(perfManSTSavg, 8,1, Qt::AlignLeft);
-    configLayout->addWidget(perfManLTSLabel, 9,0, Qt::AlignRight);
-    configLayout->addWidget(perfManLTSavg, 9,1, Qt::AlignLeft);
-    configLayout->addWidget(showSBToday, 10,1, Qt::AlignLeft);
+    configLayout->addWidget(perfManStartLabel, 8,0, Qt::AlignRight);
+    configLayout->addWidget(perfManStart, 8,1, Qt::AlignLeft);
+    configLayout->addWidget(perfManSTSLabel, 9,0, Qt::AlignRight);
+    configLayout->addWidget(perfManSTSavg, 9,1, Qt::AlignLeft);
+    configLayout->addWidget(perfManLTSLabel, 10,0, Qt::AlignRight);
+    configLayout->addWidget(perfManLTSavg, 10,1, Qt::AlignLeft);
+    configLayout->addWidget(showSBToday, 11,1, Qt::AlignLeft);
 
     //
     // Workout directory (train view)
@@ -226,9 +238,9 @@ GeneralPage::GeneralPage(MainWindow *main) : main(main)
     workoutBrowseButton = new QPushButton(tr("Browse"));
     workoutBrowseButton->setFixedWidth(70);
 
-    configLayout->addWidget(workoutLabel, 11,0, Qt::AlignRight);
-    configLayout->addWidget(workoutDirectory, 11,1);
-    configLayout->addWidget(workoutBrowseButton, 12,1);
+    configLayout->addWidget(workoutLabel, 12,0, Qt::AlignRight);
+    configLayout->addWidget(workoutDirectory, 12,1);
+    configLayout->addWidget(workoutBrowseButton, 13,1);
 
     connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
 
@@ -259,6 +271,7 @@ GeneralPage::saveClicked()
     appsettings->setValue(GC_BIKESCOREDAYS, BSdaysEdit->text());
     appsettings->setValue(GC_BIKESCOREMODE, bsModeCombo->currentText());
     appsettings->setValue(GC_WORKOUTDIR, workoutDirectory->text());
+    appsettings->setValue(GC_ELEVATION_HYSTERESIS, hystedit->text());
 
     // Performance Manager
     appsettings->setCValue(main->cyclist, GC_INITIAL_STS, perfManStart->text());

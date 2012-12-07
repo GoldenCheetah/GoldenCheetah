@@ -19,6 +19,7 @@
 #include <QMessageBox>
 #include "Zones.h"
 #include "Colors.h"
+#include "Settings.h"
 #include "TimeUtils.h"
 #include <QtGui>
 #include <QtAlgorithms>
@@ -849,5 +850,5 @@ Zones::getFingerprint() const
             CRC.process_bytes(&x, sizeof(int));
         }
     }
-    return CRC.checksum();
+    return CRC.checksum() + (appsettings->value(this, GC_ELEVATION_HYSTERESIS).toDouble()*10);
 }
