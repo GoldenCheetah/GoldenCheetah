@@ -22,6 +22,7 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
     setFixedSize(525,600);
 #else
     QToolBar *head = addToolBar("Options");
+    head->setMovable(false); // oops!
     setFixedSize(530,580);
 #endif
 
