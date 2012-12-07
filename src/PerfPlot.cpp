@@ -66,9 +66,9 @@ PerfPlot::PerfPlot() : STScurve(NULL), LTScurve(NULL), SBcurve(NULL), DAYcurve(N
     setAxisScaleDraw(QwtPlot::xBottom, xsd);
 
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
-    setAxisTitle(yLeft, "Exponentially Weighted Average Stress");
-    setAxisTitle(xBottom, "Time (days)");
-    setAxisTitle(yRight, "Daily Stress");
+    setAxisTitle(yLeft, tr("Exponentially Weighted Average Stress"));
+    setAxisTitle(xBottom, tr("Time (days)"));
+    setAxisTitle(yRight, tr("Daily Stress"));
     enableAxis(yRight, true);
     canvas()->setFrameStyle(QFrame::NoFrame);
 
