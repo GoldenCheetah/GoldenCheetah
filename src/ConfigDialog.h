@@ -13,7 +13,144 @@ class QStackedWidget;
 class MainWindow;
 class Zones;
 
-class ConfigDialog : public QDialog
+// GENERAL PAGE
+class GeneralConfig : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        GeneralConfig(QDir home, Zones *zones, MainWindow *mainWindow);
+
+    public slots:
+        void saveClicked();
+
+    private:
+        QDir home;
+        Zones *zones;
+        MainWindow *mainWindow;
+
+        GeneralPage *generalPage;
+};
+
+// ATHLETE PAGE
+class AthleteConfig : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        AthleteConfig(QDir home, Zones *zones, MainWindow *mainWindow);
+
+    public slots:
+        void saveClicked();
+    
+    private:
+        QDir home;
+        Zones *zones;
+        MainWindow *mainWindow;
+
+        // about me, power ones and hr zones
+        RiderPage *athletePage;
+        ZonePage *zonePage;
+        HrZonePage *hrZonePage;
+};
+
+// APPEARANCE PAGE
+class AppearanceConfig : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        AppearanceConfig(QDir home, Zones *zones, MainWindow *mainWindow);
+
+    public slots:
+        void saveClicked();
+    
+    private:
+        QDir home;
+        Zones *zones;
+        MainWindow *mainWindow;
+
+        ColorsPage *appearancePage;
+};
+
+// PASSWORDS PAGE
+class PasswordConfig : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        PasswordConfig(QDir home, Zones *zones, MainWindow *mainWindow);
+
+    public slots:
+        void saveClicked();
+    
+    private:
+        QDir home;
+        Zones *zones;
+        MainWindow *mainWindow;
+
+        CredentialsPage *passwordPage;
+};
+
+// METADATA PAGE
+class DataConfig : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        DataConfig(QDir home, Zones *zones, MainWindow *mainWindow);
+
+    public slots:
+        void saveClicked();
+    
+    private:
+        QDir home;
+        Zones *zones;
+        MainWindow *mainWindow;
+
+        MetadataPage *dataPage;
+};
+
+// METRIC PAGE
+class MetricConfig : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        MetricConfig(QDir home, Zones *zones, MainWindow *mainWindow);
+
+    public slots:
+        void saveClicked();
+    
+    private:
+        QDir home;
+        Zones *zones;
+        MainWindow *mainWindow;
+
+        IntervalMetricsPage *intervalsPage;
+        SummaryMetricsPage *summaryPage;
+};
+
+// DEVICE PAGE
+class DeviceConfig : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        DeviceConfig(QDir home, Zones *zones, MainWindow *mainWindow);
+
+    public slots:
+        void saveClicked();
+    
+    private:
+        QDir home;
+        Zones *zones;
+        MainWindow *mainWindow;
+
+        DevicePage *devicePage;
+};
+
+class ConfigDialog : public QMainWindow
 {
     Q_OBJECT
     G_OBJECT
@@ -22,64 +159,26 @@ class ConfigDialog : public QDialog
         ConfigDialog(QDir home, Zones *zones, MainWindow *mainWindow);
 
     public slots:
-        void changePage(QListWidgetItem *current, QListWidgetItem *previous);
-        void save_Clicked();
-
-        // device config slots
-        void changedType(int);
-        void devaddClicked();
-        void devpairClicked();
-        void devdelClicked();
-        void firmwareClicked();
+        void changePage(int);
+        void saveClicked();
 
     private:
-        void createIcons();
-        void calculateZones();
-	void createNewRange();
-	void moveCalendarToCurrentRange();
-
-        MainWindow *mainWindow;
-        ConfigurationPage *configPage;
-        CyclistPage *cyclistPage;
-        DevicePage *devicePage;
-        QPushButton *saveButton;
-        QStackedWidget *pagesWidget;
-	QPushButton *closeButton;
-	QHBoxLayout *horizontalLayout;
-	QHBoxLayout *buttonsLayout;
-	QVBoxLayout *mainLayout;
-        QListWidget *contentsWidget;
-
         QSettings *settings;
         QDir home;
         Zones *zones;
-
-        // used by device config
-    QList<QTreeWidgetItem> twiNames, twiSpecs, twiTypes, twiDefaults;
-    QString fortiusFirmware;
-};
-
-class FortiusDialog : public QDialog
-{
-    Q_OBJECT
-
-    public:
-        FortiusDialog(MainWindow *, QString &path);
-
-    public slots:
-        void okClicked();
-        void cancelClicked();
-        void browseClicked();
-
-    private:
-        QCheckBox *copy;
-        QPushButton *ok, *cancel;
-        QPushButton *browse;
-        QLabel *help;
-        QLabel *file;
-        QLineEdit *name;
-        QString &path;
         MainWindow *mainWindow;
-};
 
+        QStackedWidget *pagesWidget;
+        QPushButton *saveButton;
+	    QPushButton *closeButton;
+
+        // the config pages
+        GeneralConfig *general;
+        AthleteConfig *athlete;
+        AppearanceConfig *appearance;
+        PasswordConfig *password;
+        DataConfig *data;
+        MetricConfig *metric;
+        DeviceConfig *device;
+};
 #endif

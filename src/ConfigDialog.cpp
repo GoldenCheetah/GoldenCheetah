@@ -11,67 +11,112 @@
 #include "AddDeviceWizard.h"
 
 
-/* cyclist dialog protocol redesign:
- * no zones:
- *    calendar disabled
- *    automatically go into "new" mode
- * zone(s) defined:
- *    click on calendar: sets current zone to that associated with date
- * save clicked:
- *    if new mode, create a new zone starting at selected date, or for all dates
- *    if this is only zone.
- * delete clicked:
- *    deletes currently selected zone
- */
-
 ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
-    mainWindow(mainWindow), zones(_zones)
+    home(_home), zones(_zones), mainWindow(mainWindow)
 {
     setAttribute(Qt::WA_DeleteOnClose);
 
-    home = _home;
+#ifdef Q_OS_MAC
+    setUnifiedTitleAndToolBarOnMac(true);
+    QToolBar *head = addToolBar("Preferences");
+    setFixedSize(525,600);
+#else
+    QToolBar *head = addToolBar("Options");
+#endif
 
-    cyclistPage = new CyclistPage(mainWindow);
+    // icons
+    static QIcon generalIcon(QPixmap(":images/toolbar/GeneralPreferences.png"));
+    static QIcon athleteIcon(QPixmap(":/images/toolbar/user.png"));
+    static QIcon passwordIcon(QPixmap(":/images/toolbar/passwords.png"));
+    static QIcon appearanceIcon(QPixmap(":/images/toolbar/color.png"));
+    static QIcon dataIcon(QPixmap(":/images/toolbar/data.png"));
+    static QIcon metricsIcon(QPixmap(":/images/toolbar/abacus.png"));
+    static QIcon devicesIcon(QPixmap(":/images/devices/kickr.png"));
 
-    contentsWidget = new QListWidget;
-    contentsWidget->setViewMode(QListView::IconMode);
-    contentsWidget->setIconSize(QSize(96, 84));
-    contentsWidget->setMovement(QListView::Static);
-    contentsWidget->setMinimumWidth(112);
-    contentsWidget->setMaximumWidth(112);
-    //contentsWidget->setMinimumHeight(200);
-    contentsWidget->setSpacing(12);
-    contentsWidget->setUniformItemSizes(true);
+    // Setup the signal mapping so the right config
+    // widget is displayed when the icon is clicked
+    QSignalMapper *iconMapper = new QSignalMapper(this); // maps each option
+    connect(iconMapper, SIGNAL(mapped(int)), this, SLOT(changePage(int)));
+    head->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
-    configPage = new ConfigurationPage(mainWindow);
-    devicePage = new DevicePage(this);
+    QAction *added;
 
-    pagesWidget = new QStackedWidget;
-    pagesWidget->addWidget(configPage);
-    pagesWidget->addWidget(cyclistPage);
-    pagesWidget->addWidget(devicePage);
+    // General settings
+    added = head->addAction(generalIcon, "General");
+    connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
+    iconMapper->setMapping(added, 0);
+
+    added =head->addAction(athleteIcon, "Athlete");
+    connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
+    iconMapper->setMapping(added, 1);
+
+    added =head->addAction(passwordIcon, "Passwords");
+    connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
+    iconMapper->setMapping(added, 2);
+
+    added =head->addAction(appearanceIcon, "Appearance");
+    connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
+    iconMapper->setMapping(added, 3);
+
+    added =head->addAction(dataIcon, "Data Fields");
+    connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
+    iconMapper->setMapping(added, 4);
+
+    added =head->addAction(metricsIcon, "Metrics");
+    connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
+    iconMapper->setMapping(added, 5);
+
+    added =head->addAction(devicesIcon, "Train Devices");
+    connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
+    iconMapper->setMapping(added, 6);
+
+    pagesWidget = new QStackedWidget(this);
+
+    // create those config pages
+    general = new GeneralConfig(_home, _zones, mainWindow);
+    pagesWidget->addWidget(general);
+
+    athlete = new AthleteConfig(_home, _zones, mainWindow);
+    pagesWidget->addWidget(athlete);
+
+    password = new PasswordConfig(_home, _zones, mainWindow);
+    pagesWidget->addWidget(password);
+
+    appearance = new AppearanceConfig(_home, _zones, mainWindow);
+    pagesWidget->addWidget(appearance);
+
+    data = new DataConfig(_home, _zones, mainWindow);
+    pagesWidget->addWidget(data);
+
+    metric = new MetricConfig(_home, _zones, mainWindow);
+    pagesWidget->addWidget(metric);
+
+    device = new DeviceConfig(_home, _zones, mainWindow);
+    pagesWidget->addWidget(device);
+
 
     closeButton = new QPushButton(tr("Close"));
     saveButton = new QPushButton(tr("Save"));
 
-    createIcons();
-    contentsWidget->setCurrentItem(contentsWidget->item(0));
-
-    horizontalLayout = new QHBoxLayout;
-    horizontalLayout->addWidget(contentsWidget);
+    QHBoxLayout *horizontalLayout = new QHBoxLayout;
     horizontalLayout->addWidget(pagesWidget, 1);
 
-    buttonsLayout = new QHBoxLayout;
-    buttonsLayout->addStretch(1);
+    QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    buttonsLayout->addStretch();
+    buttonsLayout->setSpacing(5);
     buttonsLayout->addWidget(closeButton);
     buttonsLayout->addWidget(saveButton);
 
-    mainLayout = new QVBoxLayout;
+    QWidget *contents = new QWidget(this);
+    setCentralWidget(contents);
+    contents->setContentsMargins(0,0,0,0);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(horizontalLayout);
-    //mainLayout->addStretch(1);
-    //mainLayout->addSpacing(12);
+    mainLayout->addStretch();
     mainLayout->addLayout(buttonsLayout);
-    setLayout(mainLayout);
+    mainLayout->setSpacing(0);
+    contents->setLayout(mainLayout);
 
     // We go fixed width to ensure a consistent layout for
     // tabs, sub-tabs and internal widgets and lists
@@ -80,287 +125,172 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
 #else
     setWindowTitle(tr("Options"));
 #endif
-    setFixedSize(QSize(800, 600));
 
-    fortiusFirmware = appsettings->value(this, FORTIUS_FIRMWARE, "").toString();
-    connect(closeButton, SIGNAL(clicked()), this, SLOT(accept()));
-    connect(devicePage->addButton, SIGNAL(clicked()), this, SLOT(devaddClicked()));
-    connect(devicePage->delButton, SIGNAL(clicked()), this, SLOT(devdelClicked()));
-    connect(contentsWidget, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
-            this, SLOT(changePage(QListWidgetItem *, QListWidgetItem*)));
-    connect(saveButton, SIGNAL(clicked()), this, SLOT(save_Clicked()));
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
+    connect(saveButton, SIGNAL(clicked()), this, SLOT(saveClicked()));
 }
 
-void ConfigDialog::createIcons()
+void ConfigDialog::changePage(int index)
 {
-    QListWidgetItem *configButton = new QListWidgetItem(contentsWidget);
-    configButton->setIcon(QIcon(":/images/config.png"));
-    configButton->setText(tr("Settings"));
-    configButton->setTextAlignment(Qt::AlignHCenter);
-    configButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-
-
-    QListWidgetItem *cyclistButton = new QListWidgetItem(contentsWidget);
-    cyclistButton->setIcon(QIcon(":images/cyclist.png"));
-    cyclistButton->setText(tr("Athlete"));
-    cyclistButton->setTextAlignment(Qt::AlignHCenter);
-    cyclistButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-
-    QListWidgetItem *realtimeButton = new QListWidgetItem(contentsWidget);
-    realtimeButton->setIcon(QIcon(":images/arduino.png"));
-    realtimeButton->setText(tr("Devices"));
-    realtimeButton->setTextAlignment(Qt::AlignHCenter);
-    realtimeButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-
-    connect(contentsWidget,
-            SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
-            this, SLOT(changePage(QListWidgetItem *, QListWidgetItem*)));
-}
-
-
-void ConfigDialog::changePage(QListWidgetItem *current, QListWidgetItem *previous)
-{
-    if (!current)
-        current = previous;
-
-    pagesWidget->setCurrentIndex(contentsWidget->row(current));
+    pagesWidget->setCurrentIndex(index);
 }
 
 // if save is clicked, we want to:
 //   new mode:   create a new zone starting at the selected date (which may be null, implying BEGIN
 //   ! new mode: change the CP associated with the present mode
-void ConfigDialog::save_Clicked()
+void ConfigDialog::saveClicked()
 {
-    if (configPage->langCombo->currentIndex()==0)
-        appsettings->setValue(GC_LANG, "en");
-    else if (configPage->langCombo->currentIndex()==1)
-        appsettings->setValue(GC_LANG, "fr");
-    else if (configPage->langCombo->currentIndex()==2)
-        appsettings->setValue(GC_LANG, "ja");
-    else if (configPage->langCombo->currentIndex()==3)
-        appsettings->setValue(GC_LANG, "pt-br");
-    else if (configPage->langCombo->currentIndex()==4)
-        appsettings->setValue(GC_LANG, "it");
-    else if (configPage->langCombo->currentIndex()==5)
-        appsettings->setValue(GC_LANG, "de");
-    else if (configPage->langCombo->currentIndex()==6)
-        appsettings->setValue(GC_LANG, "ru");
-    else if (configPage->langCombo->currentIndex()==7)
-        appsettings->setValue(GC_LANG, "cs");
-    else if (configPage->langCombo->currentIndex()==8)
-        appsettings->setValue(GC_LANG, "es");
-    else if (configPage->langCombo->currentIndex()==9)
-        appsettings->setValue(GC_LANG, "pt");
+    general->saveClicked();
+    athlete->saveClicked();
+    appearance->saveClicked();
+    password->saveClicked();
+    metric->saveClicked();
+    data->saveClicked();
+    device->saveClicked();
 
-    appsettings->setValue(GC_GARMIN_HWMARK, configPage->garminHWMarkedit->text().toInt());
-    appsettings->setValue(GC_GARMIN_SMARTRECORD, configPage->garminSmartRecord->checkState());
-    appsettings->setValue(GC_CRANKLENGTH, configPage->crankLengthCombo->currentText());
+    hide();
 
-    // save wheel size
-    int wheelSize;
-    switch (configPage->wheelSizeCombo->currentIndex()) {
-    default:
-    case 0: wheelSize = 2100 ; break;
-    case 1: wheelSize = 1960 ; break;
-    case 2: wheelSize = 1985 ; break;
-    case 3: wheelSize = 1750 ; break;
-    }
-    appsettings->setValue(GC_WHEELSIZE, wheelSize);
-
-    appsettings->setValue(GC_BIKESCOREDAYS, configPage->BSdaysEdit->text());
-    appsettings->setValue(GC_BIKESCOREMODE, configPage->bsModeCombo->currentText());
-    appsettings->setValue(GC_WORKOUTDIR, configPage->workoutDirectory->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_INITIAL_STS, cyclistPage->perfManStart->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_INITIAL_LTS, cyclistPage->perfManStart->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_STS_DAYS, cyclistPage->perfManSTSavg->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_LTS_DAYS, cyclistPage->perfManLTSavg->text());
-    appsettings->setCValue(mainWindow->cyclist, GC_SB_TODAY, (int) cyclistPage->showSBToday->isChecked());
-
-    // set default stress names if not set:
-    appsettings->setValue(GC_STS_NAME, appsettings->value(this, GC_STS_NAME,tr("Short Term Stress")));
-    appsettings->setValue(GC_STS_ACRONYM, appsettings->value(this, GC_STS_ACRONYM,tr("STS")));
-    appsettings->setValue(GC_LTS_NAME, appsettings->value(this, GC_LTS_NAME,tr("Long Term Stress")));
-    appsettings->setValue(GC_LTS_ACRONYM, appsettings->value(this, GC_LTS_ACRONYM,tr("LTS")));
-    appsettings->setValue(GC_SB_NAME, appsettings->value(this, GC_SB_NAME,tr("Stress Balance")));
-    appsettings->setValue(GC_SB_ACRONYM, appsettings->value(this, GC_SB_ACRONYM,tr("SB")));
-
-    // Save Cyclist page stuff
-    cyclistPage->saveClicked();
-
-    // save interval metrics and ride data pages
-    configPage->saveClicked();
-
-    // Save the device configuration...
-    DeviceConfigurations all;
-    all.writeConfig(devicePage->deviceListModel->Configuration);
-    appsettings->setValue(FORTIUS_FIRMWARE, fortiusFirmware);
-    appsettings->setValue(TRAIN_MULTI, devicePage->multiCheck->isChecked());
-
-    // Tell MainWindow we changed config, so it can emit the signal
-    // configChanged() to all its children
+    // do the zones first..
     mainWindow->notifyConfigChanged();
-
-    // close
-    accept();
+    close();
 }
 
-//
-// DEVICE CONFIG STUFF
-//
-
-void
-ConfigDialog::changedType(int)
+// GENERAL CONFIG
+GeneralConfig::GeneralConfig(QDir home, Zones *zones, MainWindow *mainWindow) :
+    home(home), zones(zones), mainWindow(mainWindow)
 {
-// THIS CODE IS DISABLED FOR THIS RELEASE XXX
-//    // disable/enable default checkboxes
-//    if (devicePage->devices.at(index).download == false) {
-//        devicePage->isDefaultDownload->setEnabled(false);
-//        devicePage->isDefaultDownload->setCheckState(Qt::Unchecked);
-//    } else {
-//        devicePage->isDefaultDownload->setEnabled(true);
-//    }
-//    if (devicePage->devices.at(index).realtime == false) {
-//        devicePage->isDefaultRealtime->setEnabled(false);
-//        devicePage->isDefaultRealtime->setCheckState(Qt::Unchecked);
-//    } else {
-//        devicePage->isDefaultRealtime->setEnabled(true);
-//    }
-    devicePage->setConfigPane();
+    generalPage = new GeneralPage(mainWindow);
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->addWidget(generalPage);
+
+    layout->setSpacing(0);
+    setContentsMargins(0,0,0,0);
 }
 
-void
-ConfigDialog::devaddClicked()
+void GeneralConfig::saveClicked()
 {
-    DeviceConfiguration add;
-    AddDeviceWizard *p = new AddDeviceWizard(mainWindow, add);
-    if (p->exec() == QDialog::Accepted) {
-        devicePage->deviceListModel->add(add);
-    }
+    generalPage->saveClicked();
 }
 
-void
-ConfigDialog::devdelClicked()
+// ATHLETE CONFIG
+AthleteConfig::AthleteConfig(QDir home, Zones *zones, MainWindow *mainWindow) :
+    home(home), zones(zones), mainWindow(mainWindow)
 {
-    devicePage->deviceListModel->del();
+    // the widgets
+    athletePage = new RiderPage(this, mainWindow);
+    zonePage = new ZonePage(mainWindow);
+    hrZonePage = new HrZonePage(mainWindow);
+
+    setContentsMargins(0,0,0,0);
+    QHBoxLayout *mainLayout = new QHBoxLayout(this);
+    mainLayout->setSpacing(0);
+    mainLayout->setContentsMargins(0,0,0,0);
+
+    QTabWidget *tabs = new QTabWidget(this);
+    tabs->addTab(athletePage, tr("About"));
+    tabs->addTab(zonePage, tr("Power"));
+    tabs->addTab(hrZonePage, tr("Heartrate"));
+
+    mainLayout->addWidget(tabs);
 }
 
-void
-ConfigDialog::devpairClicked()
+void AthleteConfig::saveClicked()
 {
-    // replaced by wizard.
+    athletePage->saveClicked();
+    zonePage->saveClicked();
+    hrZonePage->saveClicked();
 }
 
-void
-ConfigDialog::firmwareClicked()
+// APPEARANCE CONFIG
+AppearanceConfig::AppearanceConfig(QDir home, Zones *zones, MainWindow *mainWindow) :
+    home(home), zones(zones), mainWindow(mainWindow)
 {
-    // replaced by wizard
+    appearancePage = new ColorsPage(this);
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->addWidget(appearancePage);
+
+    layout->setSpacing(0);
+    setContentsMargins(0,0,0,0);
 }
 
-//
-// Choose the firmware to use with a Fortius trainer
-//
-FortiusDialog::FortiusDialog(MainWindow *mainWindow, QString &path) : path(path), mainWindow(mainWindow)
+void AppearanceConfig::saveClicked()
 {
-    setAttribute(Qt::WA_DeleteOnClose);
-    setWindowModality(Qt::WindowModal);
-    setWindowTitle("Select Firmware File");
-
-    // create widgets
-    browse = new QPushButton("Browse", this);
-    cancel = new QPushButton("Cancel", this);
-    ok = new QPushButton("OK", this);
-    copy = new QCheckBox("Copy to Library");
-    copy->setChecked(true);
-
-    help = new QLabel(this);
-    help->setWordWrap(true);
-    help->setText("Tacx Fortius trainers require a firmware file "
-                  "which is provided by Tacx BV. This file is a "
-                  "copyrighted file and cannot be distributed with "
-                  "GoldenCheetah.\n\n"
-                  "On windows it is typically installed in C:\\Windows\\system32 "
-                  "and is called 'FortiusSWPID1942Renum.hex'.\n\n"
-                  "On Linux and Apple computers you will need to "
-                  "extract it from the Virtual Reality Software CD that "
-                  "is distributed with the device. The file that "
-                  "we need is contained within the 'data2.cab' file.\n\n"
-                  "The 'data2.cab' file is an InstallShield file. To read "
-                  "this file and extract the FortiusSWPID1942Renum.hex file we need "
-                  "you will need to use the 'unshield' tool.\n\n"
-                  "Please take care to ensure that the file is the latest version "
-                  "of the Firmware file.\n\n"
-                  "If you choose to copy to library the file will be copied into the "
-                  "GoldenCheetah library, otherwise we will reference it. We recommend "
-                  "that you copy the file, but can reference it where it may be updated "
-                  "by the standard Tacx software.\n\n");
-
-    file = new QLabel("File:", this);
-
-    name= new QLineEdit(this);
-    name->setEnabled(false);
-    name->setText(path);
-
-    // Layout widgets
-    QHBoxLayout *buttons = new QHBoxLayout;
-    QHBoxLayout *filedetails = new QHBoxLayout;
-    filedetails->addWidget(file);
-    filedetails->addWidget(name);
-    filedetails->addWidget(browse);
-    filedetails->addStretch();
-
-    buttons->addWidget(copy);
-    buttons->addStretch();
-    buttons->addWidget(cancel);
-    buttons->addWidget(ok);
-
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->addLayout(filedetails);
-    mainLayout->addWidget(help);
-    mainLayout->addLayout(buttons);
-
-    // connect widgets
-    connect(ok, SIGNAL(clicked()), this, SLOT(okClicked()));
-    connect(cancel, SIGNAL(clicked()), this, SLOT(cancelClicked()));
-    connect(browse, SIGNAL(clicked()), this, SLOT(browseClicked()));
+    appearancePage->saveClicked();
 }
 
-void
-FortiusDialog::okClicked()
+// PASSWORD CONFIG
+PasswordConfig::PasswordConfig(QDir home, Zones *zones, MainWindow *mainWindow) :
+    home(home), zones(zones), mainWindow(mainWindow)
 {
-    QString filePath = name->text();
-    if (!QFile(filePath).exists()) {
+    passwordPage = new CredentialsPage(this, mainWindow);
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->addWidget(passwordPage);
 
-        QMessageBox::critical(0, "No File Selected",
-        QString("You must select a firmware file, typically called ") +
-                 "FortiusSWPID1942Renum.hex");
-        return;
-    }
-
-    // either copy it, or reference it!
-    if (copy->isChecked()) {
-
-        QString fileName = QFileInfo(filePath).fileName();
-        QString targetFileName = QFileInfo(mainWindow->home.absolutePath() + "/../").absolutePath() + "/" + fileName;
-
-        // if the current file exists, wipe it
-        if (QFile(targetFileName).exists()) QFile(targetFileName).remove();
-        QFile(filePath).copy(targetFileName);
-
-        name->setText(targetFileName);
-    }
-    path = name->text();
-    accept();
+    layout->setSpacing(0);
+    setContentsMargins(0,0,0,0);
 }
 
-void
-FortiusDialog::cancelClicked()
+void PasswordConfig::saveClicked()
 {
-    reject();
+    passwordPage->saveClicked();
 }
 
-void
-FortiusDialog::browseClicked()
+// METADATA CONFIG
+DataConfig::DataConfig(QDir home, Zones *zones, MainWindow *mainWindow) :
+    home(home), zones(zones), mainWindow(mainWindow)
 {
-    QString file = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("Intel Firmware File (*.hex)"));
-    if (file != "") name->setText(file);
+    dataPage = new MetadataPage(mainWindow);
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->addWidget(dataPage);
+
+    layout->setSpacing(0);
+    setContentsMargins(0,0,0,0);
+}
+
+void DataConfig::saveClicked()
+{
+    dataPage->saveClicked();
+}
+
+// GENERAL CONFIG
+MetricConfig::MetricConfig(QDir home, Zones *zones, MainWindow *mainWindow) :
+    home(home), zones(zones), mainWindow(mainWindow)
+{
+    // the widgets
+    intervalsPage = new IntervalMetricsPage(this);
+    summaryPage = new SummaryMetricsPage(this);
+
+    setContentsMargins(0,0,0,0);
+    QHBoxLayout *mainLayout = new QHBoxLayout(this);
+    mainLayout->setSpacing(0);
+    mainLayout->setContentsMargins(0,0,0,0);
+
+    QTabWidget *tabs = new QTabWidget(this);
+    tabs->addTab(summaryPage, tr("Summary"));
+    tabs->addTab(intervalsPage, tr("Intervals"));
+
+    mainLayout->addWidget(tabs);
+}
+
+void MetricConfig::saveClicked()
+{
+    summaryPage->saveClicked();
+    intervalsPage->saveClicked();
+}
+
+// GENERAL CONFIG
+DeviceConfig::DeviceConfig(QDir home, Zones *zones, MainWindow *mainWindow) :
+    home(home), zones(zones), mainWindow(mainWindow)
+{
+    devicePage = new DevicePage(this, mainWindow);
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->addWidget(devicePage);
+
+    layout->setSpacing(0);
+    setContentsMargins(0,0,0,0);
+}
+
+void DeviceConfig::saveClicked()
+{
+    devicePage->saveClicked();
 }
