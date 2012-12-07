@@ -380,12 +380,12 @@ quindi clicca  &quot;Rescan&quot; per avviare la ricerca.</translation>
     </message>
     <message>
         <location filename="../AerolabWindow.cpp" line="203"/>
-        <source>&amp;Estimate Cda and Crr</source>
+        <source>&amp;Estimate CdA and Crr</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../AerolabWindow.cpp" line="489"/>
-        <source>Estimate Cda and Crr</source>
+        <source>Estimate CdA and Crr</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2968,9 +2968,34 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../LTMSidebar.cpp" line="530"/>
+        <source>Totals</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMSidebar.cpp" line="535"/>
+        <source>Averages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMSidebar.cpp" line="540"/>
+        <source>Maximums</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMSidebar.cpp" line="545"/>
+        <source>Metrics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../LTMSidebar.cpp" line="565"/>
         <source>^(Average|Max) </source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMSidebar.cpp" line="569"/>
+        <source>seconds</source>
+        <translation type="unfinished">secondi</translation>
     </message>
 </context>
 <context>
@@ -4845,6 +4870,21 @@ Do you want to continue?</source>
 <context>
     <name>PerfPlot</name>
     <message>
+        <location filename="../PerfPlot.cpp" line="69"/>
+        <source>Exponentially Weighted Average Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../PerfPlot.cpp" line="70"/>
+        <source>Time (days)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../PerfPlot.cpp" line="71"/>
+        <source>Daily Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../PerfPlot.cpp" line="147"/>
         <source>Daily</source>
         <translation></translation>
@@ -4925,6 +4965,16 @@ Do you want to continue?</source>
     <message>
         <source>no cadence</source>
         <translation type="obsolete">no cadenza</translation>
+    </message>
+    <message>
+        <location filename="../PfPvPlot.cpp" line="128"/>
+        <source>Average Effective Pedal Force (N)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../PfPvPlot.cpp" line="130"/>
+        <source>Circumferential Pedal Velocity (m/s)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
