@@ -863,7 +863,7 @@ AllPlot::setYMax()
             xytick[QwtScaleDiv::MinorTick]<<i;
 #endif
 
-        setAxisTitle(yLeft, "Watts");
+        setAxisTitle(yLeft, tr("Watts"));
         //setAxisScale(yLeft, 0.0, maxY);
         setAxisScaleDiv(QwtPlot::yLeft,QwtScaleDiv(0.0,maxY,xytick));
         setAxisLabelRotation(yLeft,270);
@@ -873,21 +873,21 @@ AllPlot::setYMax()
         double ymax = 0;
         QStringList labels;
         if (hrCurve->isVisible()) {
-            labels << "BPM";
+            labels << tr("BPM");
             if (referencePlot == NULL)
                 ymax = hrCurve->maxYValue();
             else
                 ymax = referencePlot->hrCurve->maxYValue();
         }
         if (cadCurve->isVisible()) {
-            labels << "RPM";
+            labels << tr("RPM");
             if (referencePlot == NULL)
                 ymax = qMax(ymax, cadCurve->maxYValue());
             else
                 ymax = qMax(ymax, referencePlot->cadCurve->maxYValue());
         }
         if (balanceLCurve->isVisible()) {
-            labels << "% left";
+            labels << tr("% left");
             if (referencePlot == NULL)
                 ymax = qMax(ymax, balanceLCurve->maxYValue());
             else
@@ -1157,8 +1157,8 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
     wattsArray.clear();
 
     RideFile *ride = rideItem->ride();
-    if (ride && ride->deviceType() != QString("Manual CSV")) {
-
+    if (ride && ride->deviceType() != QString("Manual CSV") &&
+                ride->deviceType() != tr("Manual CSV")) {
         const RideFileDataPresent *dataPresent = ride->areDataPresent();
         int npoints = ride->dataPoints().size();
         wattsArray.resize(dataPresent->watts ? npoints : 0);

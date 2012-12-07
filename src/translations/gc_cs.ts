@@ -268,6 +268,17 @@
 <context>
     <name>Aerolab</name>
     <message>
+        <location filename="../Aerolab.cpp" line="253"/>
+        <location filename="../Aerolab.cpp" line="524"/>
+        <source>Elevation (m)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Aerolab.cpp" line="255"/>
+        <source>Distance (km)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../Aerolab.cpp" line="258"/>
         <source>V-Elevation</source>
         <translation>V-Výška</translation>
@@ -276,6 +287,11 @@
         <location filename="../Aerolab.cpp" line="259"/>
         <source>Elevation</source>
         <translation>Výška </translation>
+    </message>
+    <message>
+        <location filename="../Aerolab.cpp" line="532"/>
+        <source>Elevation (&apos;)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Aerolab.cpp" line="597"/>
@@ -424,6 +440,26 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../AllPlot.cpp" line="866"/>
+        <source>Watts</source>
+        <translation type="unfinished">Watty</translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="876"/>
+        <source>BPM</source>
+        <translation type="unfinished">BPM</translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="883"/>
+        <source>RPM</source>
+        <translation type="unfinished">RPM</translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="890"/>
+        <source>% left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../AllPlot.cpp" line="909"/>
         <source>KPH</source>
         <translation>km/h</translation>
@@ -461,6 +497,11 @@
     <message>
         <location filename="../AllPlot.cpp" line="983"/>
         <source>Time (Hours:Minutes)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../AllPlot.cpp" line="1161"/>
+        <source>Manual CSV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

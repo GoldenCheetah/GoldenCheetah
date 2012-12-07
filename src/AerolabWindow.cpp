@@ -200,7 +200,7 @@ AerolabWindow::AerolabWindow(MainWindow *mainWindow) :
   comboDistance->setCurrentIndex(1);
   smoothLayout->addWidget(comboDistance);
 
-  QPushButton *btnEstCdACrr = new QPushButton(tr("&Estimate Cda and Crr"), this);
+  QPushButton *btnEstCdACrr = new QPushButton(tr("&Estimate CdA and Crr"), this);
   smoothLayout->addWidget(btnEstCdACrr);
 
   // Add to leftControls:
@@ -486,7 +486,7 @@ AerolabWindow::doEstCdACrr()
         aerolab->setData(ride, false);
     } else {
         /* report error: insufficient data to estimate Cda&Crr */
-        QMessageBox::warning(this, tr("Estimate Cda and Crr"), errMsg);
+        QMessageBox::warning(this, tr("Estimate CdA and Crr"), errMsg);
     }
 }
 
