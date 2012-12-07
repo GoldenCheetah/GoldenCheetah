@@ -185,7 +185,7 @@ GeneralPage::GeneralPage(MainWindow *main) : main(main)
     if (elevationHysteresis.isNull() || elevationHysteresis.toFloat() == 0.0)
        elevationHysteresis.setValue(3.0);  // default is 1 meter
 
-    QLabel *hystlabel = new QLabel(tr("Elevation gain hysteresis (meters):"));
+    QLabel *hystlabel = new QLabel(tr("Elevation hysteresis (meters):"));
     hystedit = new QLineEdit(elevationHysteresis.toString(),this);
     hystedit->setInputMask("9.00");
     
