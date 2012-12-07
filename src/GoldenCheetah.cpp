@@ -264,6 +264,9 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
             bg = GColor(CTILEBAR);
             painter.drawPixmap(bar, aluBarDark);
         }
+        } else {
+            painter.setPen(Qt::darkGray);
+            painter.drawRect(QRect(0,0,width()-1,height()-1));
         }
 
         // heading
@@ -288,13 +291,11 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         // border
         painter.setBrush(Qt::NoBrush);
         if (underMouse()) {
-#if 0
+
             QPixmap sized = closeImage.scaled(QSize(contentsMargins().top()-6,
                                                     contentsMargins().top()-6));
-            painter.setPen(Qt::black);
-            //painter.drawRect(QRect(0,0,width()-1,height()-1));//XXX pointless 
-            painter.drawPixmap(width()-3-sized.width(), 3, sized.width(), sized.height(), sized);
-#endif
+            //painter.drawPixmap(width()-3-sized.width(), 3, sized.width(), sized.height(), sized);
+
         } else {
             painter.setPen(Qt::darkGray);
             //painter.drawRect(QRect(0,0,width()-1,height()-1)); //XXX pointless
