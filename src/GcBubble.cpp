@@ -196,7 +196,7 @@ GcBubble::paintEvent(QPaintEvent *)
     painter.setBrush(linearGradient);
 
     // border gray and opaque
-    QColor borderColor = QColor(150,150,150);
+    QColor borderColor = QColor(240,240,240,200);
     QPen border = QPen(borderColor);
     border.setWidth(lineWidth);
     painter.setPen(border);
