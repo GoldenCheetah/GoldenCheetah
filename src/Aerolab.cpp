@@ -250,9 +250,9 @@ Aerolab::Aerolab(
   canvas()->setFrameStyle(QFrame::NoFrame);
 
   setXTitle();
-  setAxisTitle(yLeft, "Elevation (m)");
+  setAxisTitle(yLeft, tr("Elevation (m)"));
   setAxisScale(yLeft, -300, 300);
-  setAxisTitle(xBottom, "Distance (km)");
+  setAxisTitle(xBottom, tr("Distance (km)"));
   setAxisScale(xBottom, 0, 60);
 
   veCurve = new QwtPlotCurve(tr("V-Elevation"));
@@ -521,7 +521,7 @@ Aerolab::setYMax(bool new_zoom)
 
              {
 
-                 setAxisTitle( yLeft, "Elevation (m)" );
+                 setAxisTitle( yLeft, tr("Elevation (m)") );
 
              }
 
@@ -529,7 +529,7 @@ Aerolab::setYMax(bool new_zoom)
 
              {
 
-                 setAxisTitle( yLeft, "Elevation (')" );
+                 setAxisTitle( yLeft, tr("Elevation (')") );
 
              }
 
