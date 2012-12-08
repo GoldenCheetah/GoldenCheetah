@@ -926,7 +926,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             metricValue += (rideNavigator->main->useMetricUnits) ? 0 : m->conversionSum();
 
             // format with the right precision
-            if (m->units(true) == "seconds") {
+            if (m->units(true) == "seconds" || m->units(true) == tr("seconds")) {
                 value = QTime(0,0,0,0).addSecs(metricValue).toString("hh:mm:ss");
             } else {
                 value = QString("%1").arg(metricValue, 0, 'f', m->precision());

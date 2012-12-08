@@ -25,6 +25,11 @@
 #include "MainWindow.h"
 #include "RideItem.h"
 
+// acccess to metrics
+#include "RideMetric.h"
+#include "MetricAggregator.h"
+#include "DBAccess.h"
+
 #ifdef GC_HAVE_LIBOAUTH
 extern "C" {
 #include <oauth.h>
@@ -66,6 +71,7 @@ private:
 
      RideItem *ride;
      QString getTwitterMessage();
+     QString metricToString(const RideMetric *m, SummaryMetrics &metrics, bool metricUnits);
 };
 
 #endif // TWITTERDIALOG_H

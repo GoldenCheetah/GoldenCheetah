@@ -126,7 +126,13 @@ RideSummaryWindow::htmlSummary() const
     QString summary("");
 
     RideItem *rideItem = myRideItem;
-    RideFile *ride = rideItem->ride();
+    RideFile *ride;
+
+    if (!rideItem && !ridesummary) return ""; // nothing selected!
+    else ride = rideItem->ride();
+
+    if (!ride && !ridesummary) return ""; // didn't parse!
+
     bool useMetricUnits = mainWindow->useMetricUnits;
 
     // ride summary and there were ridefile read errors?

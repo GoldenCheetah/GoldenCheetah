@@ -66,11 +66,11 @@ ToolsRhoEstimator::ToolsRhoEstimator(MainWindow *mainWindow, QWidget *parent) : 
   tempSpinBox->setDecimals(2);
   tempSpinBox->setRange(-200, 200);
   if (useMetricUnits) {
-    tempLabel = new QLabel("Temperature (C):");
+    tempLabel = new QLabel(tr("Temperature (C):"));
     thl->addWidget(tempLabel);
     tempSpinBox->setValue(15);
   } else {
-    tempLabel = new QLabel("Temperature (F):");
+    tempLabel = new QLabel(tr("Temperature (F):"));
     thl->addWidget(tempLabel);
     tempSpinBox->setValue(59);
   }
@@ -87,11 +87,11 @@ ToolsRhoEstimator::ToolsRhoEstimator(MainWindow *mainWindow, QWidget *parent) : 
   pressSpinBox->setDecimals(2);
   pressSpinBox->setRange(0, 2000);
   if (useMetricUnits) {
-    pressLabel = new QLabel("Air Pressure (hPa):");
+    pressLabel = new QLabel(tr("Air Pressure (hPa):"));
     phl->addWidget(pressLabel);
     pressSpinBox->setValue(1018);
   } else {
-    pressLabel = new QLabel("Air Pressure (inHg):");
+    pressLabel = new QLabel(tr("Air Pressure (inHg):"));
     phl->addWidget(pressLabel);
     pressSpinBox->setValue(30.06);
   }
@@ -108,11 +108,11 @@ ToolsRhoEstimator::ToolsRhoEstimator(MainWindow *mainWindow, QWidget *parent) : 
   dewpSpinBox->setDecimals(2);
   dewpSpinBox->setRange(-200, 200);
   if (useMetricUnits) {
-    dewpLabel = new QLabel("Dewpoint (C):");
+    dewpLabel = new QLabel(tr("Dewpoint (C):"));
     dhl->addWidget(dewpLabel);
     dewpSpinBox->setValue(7.5);
   } else {
-    dewpLabel = new QLabel("Dewpoint (F):");
+    dewpLabel = new QLabel(tr("Dewpoint (F):"));
     dhl->addWidget(dewpLabel);
     dewpSpinBox->setValue(45.5);
   }
@@ -167,22 +167,22 @@ void ToolsRhoEstimator::on_radio_toggled(bool checked) {
     // we just changed from metric --> imperial, so relabel and do the
     // field conversions for the user.
     tempSpinBox->setValue(celsius_to_fahrenheit(tempSpinBox->value()));
-    tempLabel->setText("Temperature (F):");
+    tempLabel->setText(tr("Temperature (F):"));
     pressSpinBox->setValue(
         hectopascals_to_inchesmercury(pressSpinBox->value()));
-    pressLabel->setText("Air Pressure (inHg):");
+    pressLabel->setText(tr("Air Pressure (inHg):"));
     dewpSpinBox->setValue(celsius_to_fahrenheit(dewpSpinBox->value()));
-    dewpLabel->setText("Dewpoint (F):");
+    dewpLabel->setText(tr("Dewpoint (F):"));
   } else {
     // we just changed from imperial --> metric, so relabel and do the
     // field conversions for the user.
     tempSpinBox->setValue(fahrenheit_to_celsius(tempSpinBox->value()));
-    tempLabel->setText("Temperature (C):");
+    tempLabel->setText(tr("Temperature (C):"));
     pressSpinBox->setValue(
         inchesmercury_to_hectopascals(pressSpinBox->value()));
-    pressLabel->setText("Air Pressure (hPa):");
+    pressLabel->setText(tr("Air Pressure (hPa):"));
     dewpSpinBox->setValue(fahrenheit_to_celsius(dewpSpinBox->value()));
-    dewpLabel->setText("Dewpoint (C):");
+    dewpLabel->setText(tr("Dewpoint (C):"));
   }
 
   // Relay the "something has changed" signal to

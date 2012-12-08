@@ -62,16 +62,8 @@
 	<chart id="25" name="RT Plot" title="Performance" >
 		<property name="instanceName" type="QString" value="RT Plot" />
 		<property name="title" type="QString" value="Performance" />
-		<property name="subtitle" type="QString" value="Workout" />
-		<property name="widthFactor" type="double" value="1.78571" />
-		<property name="heightFactor" type="double" value="1.35135" />
-		<property name="resizable" type="bool" value="1" />
-	</chart>
-	<chart id="24" name="RT Plot" title="Last 10 seconds" >
-		<property name="instanceName" type="QString" value="RT Plot" />
-		<property name="title" type="QString" value="Last 60 seconds" />
 		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="2.27273" />
+		<property name="widthFactor" type="double" value="1" />
 		<property name="heightFactor" type="double" value="1.35135" />
 		<property name="resizable" type="bool" value="1" />
 	</chart>
