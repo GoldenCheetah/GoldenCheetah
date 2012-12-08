@@ -116,6 +116,8 @@ class LTMTool : public QWidget
 
         QwtPlotCurve::CurveStyle curveStyle(RideMetric::MetricType);
         QwtSymbol::Style symbolStyle(RideMetric::MetricType);
+        // Helper function for default charts translation
+        void translateDefaultCharts(QList<LTMSettings>&charts);
 
         const QDir home;
         MainWindow *main;
