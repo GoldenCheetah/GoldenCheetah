@@ -620,6 +620,24 @@
     </message>
 </context>
 <context>
+    <name>AthleteConfig</name>
+    <message>
+        <location filename="../ConfigDialog.cpp" line="192"/>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ConfigDialog.cpp" line="193"/>
+        <source>Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ConfigDialog.cpp" line="194"/>
+        <source>Heartrate</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AthleteTool</name>
     <message>
         <location filename="../AthleteTool.cpp" line="42"/>
@@ -826,54 +844,66 @@
 <context>
     <name>CPPage</name>
     <message>
-        <location filename="../Pages.cpp" line="2457"/>
         <source>Add CP</source>
-        <translation>Přidej CP</translation>
+        <translation type="obsolete">Přidej CP</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2458"/>
         <source>Delete CP</source>
-        <translation>Smaž CP</translation>
+        <translation type="obsolete">Smaž CP</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2459"/>
         <source>Default</source>
-        <translation>Základní</translation>
+        <translation type="obsolete">Základní</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2462"/>
         <source>Add Zone</source>
-        <translation>Přidej zónu</translation>
+        <translation type="obsolete">Přidej zónu</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2463"/>
         <source>Delete Zone</source>
-        <translation>Smaž zónu</translation>
+        <translation type="obsolete">Smaž zónu</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2477"/>
-        <location filename="../Pages.cpp" line="2495"/>
+        <location filename="../Pages.cpp" line="2287"/>
+        <location filename="../Pages.cpp" line="2292"/>
+        <source>+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2288"/>
+        <location filename="../Pages.cpp" line="2293"/>
+        <source>-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2289"/>
+        <source>Def</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2309"/>
+        <location filename="../Pages.cpp" line="2327"/>
         <source>From Date</source>
         <translation>Od </translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2478"/>
-        <location filename="../Pages.cpp" line="2496"/>
+        <location filename="../Pages.cpp" line="2310"/>
+        <location filename="../Pages.cpp" line="2328"/>
         <source>Critical Power</source>
         <translation>Kriticky výkon CP</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2525"/>
+        <location filename="../Pages.cpp" line="2357"/>
         <source>Short</source>
         <translation>Setřiď</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2526"/>
+        <location filename="../Pages.cpp" line="2358"/>
         <source>Long</source>
         <translation>Dlouhý</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2527"/>
+        <location filename="../Pages.cpp" line="2359"/>
         <source>From Watts</source>
         <translation>Od watů</translation>
     </message>
@@ -1027,47 +1057,47 @@
 <context>
     <name>ColorsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="1163"/>
+        <location filename="../Pages.cpp" line="1016"/>
         <source>Line Width</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1164"/>
+        <location filename="../Pages.cpp" line="1017"/>
         <source>Antialias</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1165"/>
+        <location filename="../Pages.cpp" line="1018"/>
         <source>Shade Zones</source>
         <translation type="unfinished">Schovej zónu</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1167"/>
+        <location filename="../Pages.cpp" line="1020"/>
         <source>Default</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1168"/>
+        <location filename="../Pages.cpp" line="1021"/>
         <source>Title</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1169"/>
+        <location filename="../Pages.cpp" line="1022"/>
         <source>Chart Markers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1170"/>
+        <location filename="../Pages.cpp" line="1023"/>
         <source>Chart Labels</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1171"/>
+        <location filename="../Pages.cpp" line="1024"/>
         <source>Calendar Text</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1172"/>
+        <location filename="../Pages.cpp" line="1025"/>
         <source>Popup Text</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1075,73 +1105,64 @@
 <context>
     <name>ConfigDialog</name>
     <message>
-        <location filename="../ConfigDialog.cpp" line="54"/>
+        <location filename="../ConfigDialog.cpp" line="100"/>
         <source>Close</source>
         <translation>Zavřít</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="55"/>
+        <location filename="../ConfigDialog.cpp" line="101"/>
         <source>Save</source>
         <translation>Uložit</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="79"/>
+        <location filename="../ConfigDialog.cpp" line="126"/>
         <source>Preferences</source>
         <translation>Možnosti</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="81"/>
+        <location filename="../ConfigDialog.cpp" line="128"/>
         <source>Options</source>
         <translation>Volby</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="98"/>
         <source>Settings</source>
-        <translation>Nastavení</translation>
+        <translation type="obsolete">Nastavení</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="105"/>
         <source>Athlete</source>
-        <translation>Sportovec</translation>
+        <translation type="obsolete">Sportovec</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="111"/>
         <source>Devices</source>
-        <translation>Zařízení</translation>
+        <translation type="obsolete">Zařízení</translation>
     </message>
     <message>
         <source>Twitter</source>
         <translation type="obsolete">Twitter</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="180"/>
         <source>Short Term Stress</source>
-        <translation>Short Term Stress</translation>
+        <translation type="obsolete">Short Term Stress</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="181"/>
         <source>STS</source>
-        <translation>STS</translation>
+        <translation type="obsolete">STS</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="182"/>
         <source>Long Term Stress</source>
-        <translation>Long Term Stress</translation>
+        <translation type="obsolete">Long Term Stress</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="183"/>
         <source>LTS</source>
-        <translation>LTS</translation>
+        <translation type="obsolete">LTS</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="184"/>
         <source>Stress Balance</source>
-        <translation>Stress Balance</translation>
+        <translation type="obsolete">Stress Balance</translation>
     </message>
     <message>
-        <location filename="../ConfigDialog.cpp" line="185"/>
         <source>SB</source>
-        <translation>SB</translation>
+        <translation type="obsolete">SB</translation>
     </message>
 </context>
 <context>
@@ -1155,59 +1176,28 @@
         <translation type="obsolete">Barvy</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="35"/>
         <source>Interval Metrics</source>
-        <translation>Metrika - Intervaly</translation>
+        <translation type="obsolete">Metrika - Intervaly</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="36"/>
         <source>Ride Data</source>
-        <translation>Položky záznamu</translation>
+        <translation type="obsolete">Položky záznamu</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="40"/>
         <source>Language:</source>
-        <translation>Jazyk:</translation>
+        <translation type="obsolete">Jazyk:</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="43"/>
         <source>English</source>
-        <translation>Angličtina</translation>
+        <translation type="obsolete">Angličtina</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="44"/>
         <source>French</source>
-        <translation>Francouština</translation>
+        <translation type="obsolete">Francouština</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="45"/>
         <source>Japanese</source>
-        <translation>Japonština</translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="46"/>
-        <source>Portugese (Brazil)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="47"/>
-        <source>Italian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="48"/>
-        <source>German</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="49"/>
-        <source>Russian</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="50"/>
-        <source>Czech</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Japonština</translation>
     </message>
     <message>
         <source>Unit of Measurement:</source>
@@ -1222,103 +1212,64 @@
         <translation type="obsolete">Imperiální (stopy, míle)</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="81"/>
         <source>Crank Length:</source>
-        <translation>Délka klik:</translation>
+        <translation type="obsolete">Délka klik:</translation>
     </message>
     <message>
         <source>Sort ride list ascending.</source>
         <translation type="obsolete">Řadit od nejstaršího.</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="32"/>
         <source>Settings</source>
-        <translation type="unfinished">Nastavení</translation>
+        <translation type="obsolete">Nastavení</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="33"/>
-        <source>Appearance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="34"/>
-        <source>Summary Metrics</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="37"/>
-        <source>Athlete Data</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="51"/>
-        <source>Spanish</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="52"/>
-        <source>Portugese</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="142"/>
         <source>Use Garmin Smart Recording.</source>
-        <translation>Použij &quot;Garmin Smart Recording&quot;.</translation>
+        <translation type="obsolete">Použij &quot;Garmin Smart Recording&quot;.</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="149"/>
         <source>Smart Recording Threshold </source>
-        <translation>Hranice pro &quot;Garmin Smart Recording&quot;.</translation>
+        <translation type="obsolete">Hranice pro &quot;Garmin Smart Recording&quot;.</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="150"/>
         <source> secs.</source>
-        <translation>sek.</translation>
+        <translation type="obsolete">sek.</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="159"/>
         <source>Requires Restart To Take Effect</source>
-        <translation>Vyžaduje restart</translation>
+        <translation type="obsolete">Vyžaduje restart</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="182"/>
         <source>BikeScore Estimate: use rides within last </source>
-        <translation>Výpočet BikeScore : výpočet z posledních </translation>
+        <translation type="obsolete">Výpočet BikeScore : výpočet z posledních </translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="183"/>
         <source> days</source>
-        <translation>dny</translation>
+        <translation type="obsolete">dny</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="187"/>
         <source>BikeScore estimate mode: </source>
-        <translation>Režim výpočtu BikeScore dle: </translation>
+        <translation type="obsolete">Režim výpočtu BikeScore dle: </translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="189"/>
         <source>time</source>
-        <translation>času</translation>
+        <translation type="obsolete">času</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="190"/>
         <source>distance</source>
-        <translation>vzdálenosti</translation>
+        <translation type="obsolete">vzdálenosti</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="205"/>
         <source>Workout Library</source>
-        <translation>Adresář se záznamy</translation>
+        <translation type="obsolete">Adresář se záznamy</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="208"/>
         <source>Browse</source>
-        <translation>Najít</translation>
+        <translation type="obsolete">Najít</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="246"/>
         <source>Select Workout Library</source>
-        <translation>Vyber adresář</translation>
+        <translation type="obsolete">Vyber adresář</translation>
     </message>
 </context>
 <context>
@@ -1425,130 +1376,130 @@ Prosím o strpení, bude chvíli trvat.
 <context>
     <name>CredentialsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="449"/>
+        <location filename="../Pages.cpp" line="297"/>
         <source>Golden Cheetah Racing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="454"/>
-        <location filename="../Pages.cpp" line="461"/>
-        <location filename="../Pages.cpp" line="469"/>
-        <location filename="../Pages.cpp" line="494"/>
-        <location filename="../Pages.cpp" line="501"/>
+        <location filename="../Pages.cpp" line="302"/>
+        <location filename="../Pages.cpp" line="309"/>
+        <location filename="../Pages.cpp" line="317"/>
+        <location filename="../Pages.cpp" line="342"/>
+        <location filename="../Pages.cpp" line="349"/>
         <source>Website</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="455"/>
-        <location filename="../Pages.cpp" line="462"/>
-        <location filename="../Pages.cpp" line="476"/>
-        <location filename="../Pages.cpp" line="482"/>
-        <location filename="../Pages.cpp" line="488"/>
+        <location filename="../Pages.cpp" line="303"/>
+        <location filename="../Pages.cpp" line="310"/>
+        <location filename="../Pages.cpp" line="324"/>
+        <location filename="../Pages.cpp" line="330"/>
+        <location filename="../Pages.cpp" line="336"/>
         <source>Username</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="456"/>
-        <location filename="../Pages.cpp" line="463"/>
-        <location filename="../Pages.cpp" line="477"/>
-        <location filename="../Pages.cpp" line="483"/>
-        <location filename="../Pages.cpp" line="489"/>
-        <location filename="../Pages.cpp" line="503"/>
+        <location filename="../Pages.cpp" line="304"/>
+        <location filename="../Pages.cpp" line="311"/>
+        <location filename="../Pages.cpp" line="325"/>
+        <location filename="../Pages.cpp" line="331"/>
+        <location filename="../Pages.cpp" line="337"/>
+        <location filename="../Pages.cpp" line="351"/>
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="458"/>
+        <location filename="../Pages.cpp" line="306"/>
         <source>TrainingPeaks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="464"/>
+        <location filename="../Pages.cpp" line="312"/>
         <source>Account Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="466"/>
+        <location filename="../Pages.cpp" line="314"/>
         <source>Twitter</source>
         <translation type="unfinished">Twitter</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="470"/>
+        <location filename="../Pages.cpp" line="318"/>
         <source>Authorise</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="471"/>
+        <location filename="../Pages.cpp" line="319"/>
         <source>PIN</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="473"/>
+        <location filename="../Pages.cpp" line="321"/>
         <source>Strava</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="479"/>
+        <location filename="../Pages.cpp" line="327"/>
         <source>RideWithGPS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="485"/>
+        <location filename="../Pages.cpp" line="333"/>
         <source>Trainingstagebuch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="491"/>
+        <location filename="../Pages.cpp" line="339"/>
         <source>Withings Wifi Scales</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="495"/>
+        <location filename="../Pages.cpp" line="343"/>
         <source>User Id</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="496"/>
+        <location filename="../Pages.cpp" line="344"/>
         <source>Public Key</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="498"/>
+        <location filename="../Pages.cpp" line="346"/>
         <source>Zeo Sleep Data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="502"/>
+        <location filename="../Pages.cpp" line="350"/>
         <source>User</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="506"/>
+        <location filename="../Pages.cpp" line="354"/>
         <source>Web Calendar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="508"/>
+        <location filename="../Pages.cpp" line="356"/>
         <source>Webcal URL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="510"/>
+        <location filename="../Pages.cpp" line="358"/>
         <source>CalDAV Calendar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="512"/>
+        <location filename="../Pages.cpp" line="360"/>
         <source>CalDAV URL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="513"/>
+        <location filename="../Pages.cpp" line="361"/>
         <source>CalDAV User Id</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="514"/>
+        <location filename="../Pages.cpp" line="362"/>
         <source>CalDAV Password</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1650,59 +1601,36 @@ Prosím o strpení, bude chvíli trvat.
 <context>
     <name>CyclistPage</name>
     <message>
-        <location filename="../Pages.cpp" line="269"/>
-        <location filename="../Pages.cpp" line="293"/>
         <source>Performance Manager</source>
-        <translation>Správce výkonosti PM</translation>
+        <translation type="obsolete">Správce výkonosti PM</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="266"/>
         <source>Power Zones</source>
-        <translation>Zóny výkonu</translation>
+        <translation type="obsolete">Zóny výkonu</translation>
     </message>
     <message>
         <source>Rider</source>
         <translation type="obsolete">Závodník</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="265"/>
-        <source>About Me</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="267"/>
         <source>HR Zones</source>
-        <translation>Zóny tepu</translation>
+        <translation type="obsolete">Zóny tepu</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="268"/>
-        <source>Seasons</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="270"/>
-        <source>Passwords</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="294"/>
         <source>Show Stress Balance Today</source>
-        <translation>Zobrazit dnešní Stress Balance</translation>
+        <translation type="obsolete">Zobrazit dnešní Stress Balance</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="297"/>
         <source>Starting LTS</source>
-        <translation>Začátek LTS</translation>
+        <translation type="obsolete">Začátek LTS</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="298"/>
         <source>STS average (days)</source>
-        <translation>STS průměr (dny)</translation>
+        <translation type="obsolete">STS průměr (dny)</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="299"/>
         <source>LTS average (days)</source>
-        <translation>LTS průměr (days)</translation>
+        <translation type="obsolete">LTS průměr (days)</translation>
     </message>
 </context>
 <context>
@@ -1806,9 +1734,8 @@ Zmáčkni tlačítko Zrušit</translation>
 <context>
     <name>DevicePage</name>
     <message>
-        <location filename="../Pages.cpp" line="867"/>
         <source>Devices</source>
-        <translation>Zařízení</translation>
+        <translation type="obsolete">Zařízení</translation>
     </message>
     <message>
         <source>Device Name</source>
@@ -1827,18 +1754,26 @@ Zmáčkni tlačítko Zrušit</translation>
         <translation type="obsolete">Profil zařízení</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="876"/>
         <source>Add</source>
-        <translation>Přidej</translation>
+        <translation type="obsolete">Přidej</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="877"/>
         <source>Delete</source>
-        <translation>Smaž</translation>
+        <translation type="obsolete">Smaž</translation>
     </message>
     <message>
         <source>Pair</source>
         <translation type="obsolete">Navaž spojení</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="718"/>
+        <source>+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="719"/>
+        <source>-</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2049,6 +1984,111 @@ then click &quot;Rescan&quot; to check again.</source>
         <translation>Nastavení</translation>
     </message>
     <message>
+        <location filename="../LTMTool.cpp" line="718"/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="719"/>
+        <source>Axis Label / Units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="725"/>
+        <source>Curve</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="727"/>
+        <source>Bar</source>
+        <translation type="unfinished">Sloupcový graf</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="728"/>
+        <source>Line</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="729"/>
+        <source>Sticks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="730"/>
+        <source>Dots</source>
+        <translation type="unfinished">Spojnicový</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="740"/>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="741"/>
+        <source>Circle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="742"/>
+        <source>Square</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="743"/>
+        <source>Diamond</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="744"/>
+        <source>Triangle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="745"/>
+        <source>Cross</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="746"/>
+        <source>Hexagon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="747"/>
+        <source>Star</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="750"/>
+        <source>Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="757"/>
+        <source>Highlight Best</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="765"/>
+        <source>Highlight Outliers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="773"/>
+        <source>Baseline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="781"/>
+        <source>Smooth Curve</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="784"/>
+        <source>Trend Line</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../LTMTool.cpp" line="814"/>
         <source>&amp;OK</source>
         <translation>&amp; OK</translation>
@@ -2162,52 +2202,67 @@ then click &quot;Rescan&quot; to check again.</source>
 <context>
     <name>FieldsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="1981"/>
         <source>Move up</source>
-        <translation>Pohyb nahoru</translation>
+        <translation type="obsolete">Pohyb nahoru</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1982"/>
         <source>Move down</source>
-        <translation>Pohyb dolů</translation>
+        <translation type="obsolete">Pohyb dolů</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1983"/>
         <source>Insert</source>
-        <translation>Vložit</translation>
+        <translation type="obsolete">Vložit</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1984"/>
         <source>Rename</source>
-        <translation>Přejmenovat</translation>
+        <translation type="obsolete">Přejmenovat</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1985"/>
         <source>Delete</source>
-        <translation>Odstranit</translation>
+        <translation type="obsolete">Odstranit</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1996"/>
+        <location filename="../Pages.cpp" line="1835"/>
+        <source>Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1836"/>
+        <source>Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1837"/>
+        <source>+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1838"/>
+        <source>-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1848"/>
         <source>Screen Tab</source>
         <translation>Obrazovka Tab Nerovný</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1997"/>
+        <location filename="../Pages.cpp" line="1849"/>
         <source>Field</source>
         <translation>Pole</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1998"/>
+        <location filename="../Pages.cpp" line="1850"/>
         <source>Type</source>
         <translation>Typ</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1999"/>
+        <location filename="../Pages.cpp" line="1851"/>
         <source>Values</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2000"/>
+        <location filename="../Pages.cpp" line="1852"/>
         <source>Diary</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2392,19 +2447,6 @@ NEJASNE</translation>
     </message>
 </context>
 <context>
-    <name>FortiusDialog</name>
-    <message>
-        <location filename="../ConfigDialog.cpp" line="364"/>
-        <source>Open File</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../ConfigDialog.cpp" line="364"/>
-        <source>Intel Firmware File (*.hex)</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>GcCalendar</name>
     <message>
         <location filename="../GcCalendar.cpp" line="668"/>
@@ -2456,6 +2498,164 @@ NEJASNE</translation>
         <location filename="../GcWindowTool.cpp" line="42"/>
         <source>Chart</source>
         <translation type="unfinished">Graf</translation>
+    </message>
+</context>
+<context>
+    <name>GeneralPage</name>
+    <message>
+        <location filename="../Pages.cpp" line="54"/>
+        <source>Language:</source>
+        <translation type="unfinished">Jazyk:</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="56"/>
+        <source>English</source>
+        <translation type="unfinished">Angličtina</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="57"/>
+        <source>French</source>
+        <translation type="unfinished">Francouština</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="58"/>
+        <source>Japanese</source>
+        <translation type="unfinished">Japonština</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="59"/>
+        <source>Portugese (Brazil)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="60"/>
+        <source>Italian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="61"/>
+        <source>German</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="62"/>
+        <source>Russian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="63"/>
+        <source>Czech</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="64"/>
+        <source>Spanish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="65"/>
+        <source>Portugese</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="88"/>
+        <source>Crank Length:</source>
+        <translation type="unfinished">Délka klik:</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="145"/>
+        <source>Use Garmin Smart Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="151"/>
+        <source>Threshold (secs):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="166"/>
+        <source>BikeScore Estimate (days):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="173"/>
+        <source>BikeScore Estimate by:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="175"/>
+        <source>time</source>
+        <translation type="unfinished">času</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="176"/>
+        <source>distance</source>
+        <translation type="unfinished">vzdálenosti</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="187"/>
+        <source>Starting LTS:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="188"/>
+        <source>STS average (days):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="189"/>
+        <source>LTS average (days):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="208"/>
+        <source>PMC Stress Balance Today</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="223"/>
+        <source>Workout Library:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="226"/>
+        <source>Browse</source>
+        <translation type="unfinished">Najít</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="271"/>
+        <source>Short Term Stress</source>
+        <translation type="unfinished">Short Term Stress</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="272"/>
+        <source>STS</source>
+        <translation type="unfinished">STS</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="273"/>
+        <source>Long Term Stress</source>
+        <translation type="unfinished">Long Term Stress</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="274"/>
+        <source>LTS</source>
+        <translation type="unfinished">LTS</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="275"/>
+        <source>Stress Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="276"/>
+        <source>SB</source>
+        <translation type="unfinished">SB</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="282"/>
+        <source>Select Workout Library</source>
+        <translation type="unfinished">Vyber adresář</translation>
     </message>
 </context>
 <context>
@@ -2632,38 +2832,45 @@ NEJASNE</translation>
 <context>
     <name>HrSchemePage</name>
     <message>
-        <location filename="../Pages.cpp" line="2828"/>
         <source>Add</source>
-        <translation>Přidej</translation>
+        <translation type="obsolete">Přidej</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2829"/>
         <source>Rename</source>
-        <translation>Přejmenuj</translation>
+        <translation type="obsolete">Přejmenuj</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2830"/>
         <source>Delete</source>
-        <translation>Smaž</translation>
+        <translation type="obsolete">Smaž</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2839"/>
+        <location filename="../Pages.cpp" line="2660"/>
+        <source>+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2661"/>
+        <source>-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2669"/>
         <source>Short</source>
         <translation>Třiď</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2840"/>
+        <location filename="../Pages.cpp" line="2670"/>
         <source>Long</source>
         <translation>Délka</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2841"/>
+        <location filename="../Pages.cpp" line="2671"/>
         <source>Percent of LT</source>
         <translatorcomment>いまいち</translatorcomment>
         <translation>Procento z LT</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2842"/>
+        <location filename="../Pages.cpp" line="2672"/>
         <source>Trimp k</source>
         <translatorcomment>でいいのかな？</translatorcomment>
         <translation>Trimp k</translation>
@@ -2672,14 +2879,22 @@ NEJASNE</translation>
 <context>
     <name>HrZonePage</name>
     <message>
-        <location filename="../Pages.cpp" line="2811"/>
         <source>Lactic Threshold History</source>
-        <translation>Historie LT</translation>
+        <translation type="obsolete">Historie LT</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2812"/>
         <source>Default Zones</source>
-        <translation>Základní zóny</translation>
+        <translation type="obsolete">Základní zóny</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2643"/>
+        <source>Lactic Threshold</source>
+        <translation type="unfinished">Laktátový práh</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2644"/>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2910,24 +3125,24 @@ NEJASNE
 <context>
     <name>IntervalMetricsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="1366"/>
+        <location filename="../Pages.cpp" line="1223"/>
         <source>Available Metrics</source>
         <translation>Dostupná metrika</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1371"/>
+        <location filename="../Pages.cpp" line="1228"/>
         <source>Selected Metrics</source>
         <translation>Vybraná metrika</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1421"/>
-        <location filename="../Pages.cpp" line="1431"/>
+        <location filename="../Pages.cpp" line="1278"/>
+        <location filename="../Pages.cpp" line="1288"/>
         <source>&amp;#8482;</source>
         <translation>&amp;#8482;</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1421"/>
-        <location filename="../Pages.cpp" line="1431"/>
+        <location filename="../Pages.cpp" line="1278"/>
+        <location filename="../Pages.cpp" line="1288"/>
         <source> (TM)</source>
         <translation> (TM)</translation>
     </message>
@@ -2953,43 +3168,108 @@ NEJASNE
 <context>
     <name>KeywordsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="1773"/>
+        <location filename="../Pages.cpp" line="1630"/>
         <source>Field</source>
         <translation type="unfinished">Pole</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1780"/>
+        <location filename="../Pages.cpp" line="1637"/>
+        <source>Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1638"/>
+        <source>Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1639"/>
+        <source>+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1640"/>
+        <source>-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Move up</source>
-        <translation>Přesuň nahoru</translation>
+        <translation type="obsolete">Přesuň nahoru</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1781"/>
         <source>Move down</source>
-        <translation>Posun dolů</translation>
+        <translation type="obsolete">Posun dolů</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1782"/>
         <source>Insert</source>
-        <translation>Vložit</translation>
+        <translation type="obsolete">Vložit</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1783"/>
         <source>Rename</source>
-        <translation>Přejmenovat</translation>
+        <translation type="obsolete">Přejmenovat</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1784"/>
         <source>Delete</source>
-        <translation>Smazat</translation>
+        <translation type="obsolete">Smazat</translation>
     </message>
 </context>
 <context>
     <name>LTMPlot</name>
     <message>
+        <location filename="../LTMPlot.cpp" line="56"/>
+        <location filename="../LTMPlot.cpp" line="132"/>
+        <source>Date</source>
+        <translation type="unfinished">Datum</translation>
+    </message>
+    <message>
+        <location filename="../LTMPlot.cpp" line="134"/>
+        <source>Time of Day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMPlot.cpp" line="444"/>
+        <source>%1 trend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMPlot.cpp" line="494"/>
+        <source>%1 Top %2 Outliers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMPlot.cpp" line="498"/>
+        <source>%1 Outlier</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMPlot.cpp" line="555"/>
+        <source>%1 Best %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMPlot.cpp" line="559"/>
+        <source>Best %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../LTMPlot.cpp" line="731"/>
-        <location filename="../LTMPlot.cpp" line="1123"/>
+        <location filename="../LTMPlot.cpp" line="1127"/>
         <source>watts</source>
         <translation>waty</translation>
+    </message>
+    <message>
+        <location filename="../LTMPlot.cpp" line="777"/>
+        <location filename="../LTMPlot.cpp" line="857"/>
+        <location filename="../LTMPlot.cpp" line="985"/>
+        <location filename="../LTMPlot.cpp" line="1072"/>
+        <source>seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMPlot.cpp" line="784"/>
+        <location filename="../LTMPlot.cpp" line="882"/>
+        <source>Ramp</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3168,6 +3448,135 @@ NEJASNE
         <translation type="unfinished">Spravovat</translation>
     </message>
     <message>
+        <location filename="../LTMTool.cpp" line="172"/>
+        <source>Skiba Long Term Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="173"/>
+        <location filename="../LTMTool.cpp" line="187"/>
+        <location filename="../LTMTool.cpp" line="244"/>
+        <location filename="../LTMTool.cpp" line="258"/>
+        <location filename="../LTMTool.cpp" line="386"/>
+        <location filename="../LTMTool.cpp" line="400"/>
+        <source>Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="186"/>
+        <source>Skiba Short Term Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="200"/>
+        <source>Skiba Stress Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="201"/>
+        <location filename="../LTMTool.cpp" line="272"/>
+        <location filename="../LTMTool.cpp" line="414"/>
+        <source>Stress Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="214"/>
+        <source>Skiba STS Ramp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="215"/>
+        <location filename="../LTMTool.cpp" line="229"/>
+        <location filename="../LTMTool.cpp" line="286"/>
+        <location filename="../LTMTool.cpp" line="300"/>
+        <location filename="../LTMTool.cpp" line="357"/>
+        <location filename="../LTMTool.cpp" line="371"/>
+        <location filename="../LTMTool.cpp" line="428"/>
+        <location filename="../LTMTool.cpp" line="442"/>
+        <source>Ramp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="228"/>
+        <source>Skiba LTS Ramp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="243"/>
+        <source>Daniels Long Term Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="257"/>
+        <source>Daniels Short Term Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="271"/>
+        <source>Daniels Stress Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="285"/>
+        <source>Daniels STS Ramp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="299"/>
+        <source>Daniels LTS Ramp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="314"/>
+        <source>Coggan Chronic Training Load</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="328"/>
+        <source>Coggan Acute Training Load</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="342"/>
+        <source>Coggan Training Stress Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="356"/>
+        <source>Coggan STS Ramp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="370"/>
+        <source>Coggan LTS Ramp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="385"/>
+        <source>TRIMP Long Term Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="399"/>
+        <source>TRIMP Short Term Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="413"/>
+        <source>TRIMP Stress Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="427"/>
+        <source>TRIMP STS Ramp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="441"/>
+        <source>TRIMP LTS Ramp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../LTMTool.cpp" line="518"/>
         <source>Basic</source>
         <translation type="unfinished"></translation>
@@ -3191,6 +3600,66 @@ NEJASNE
         <location filename="../LTMTool.cpp" line="608"/>
         <source>Settings</source>
         <translation>Nastavení</translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="913"/>
+        <source>Aerobic Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="914"/>
+        <source>Anaerobic Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="915"/>
+        <source>Critical Power Trend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="916"/>
+        <source>Power &amp; Speed Trend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="917"/>
+        <source>Cardiovascular Response</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="918"/>
+        <source>Training Mix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="919"/>
+        <source>Tempo &amp; Threshold Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="920"/>
+        <source>Time &amp; Distance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="921"/>
+        <source>Daniels Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="922"/>
+        <source>Skiba Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="923"/>
+        <source>Skiba PM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../LTMTool.cpp" line="924"/>
+        <source>Daniels PM</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3231,71 +3700,83 @@ NEJASNE
 <context>
     <name>LTPage</name>
     <message>
-        <location filename="../Pages.cpp" line="3003"/>
         <source>Add LT</source>
-        <translation>Přidej LT</translation>
+        <translation type="obsolete">Přidej LT</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3004"/>
         <source>Delete LT</source>
-        <translation>Smaž LT</translation>
+        <translation type="obsolete">Smaž LT</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3005"/>
         <source>Default</source>
-        <translation>Výchozí</translation>
+        <translation type="obsolete">Výchozí</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3008"/>
         <source>Add Zone</source>
-        <translation>Přidej zónu</translation>
+        <translation type="obsolete">Přidej zónu</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3009"/>
         <source>Delete Zone</source>
-        <translation>Smaž zónu</translation>
+        <translation type="obsolete">Smaž zónu</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3023"/>
-        <location filename="../Pages.cpp" line="3063"/>
+        <location filename="../Pages.cpp" line="2832"/>
+        <location filename="../Pages.cpp" line="2837"/>
+        <source>+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2833"/>
+        <location filename="../Pages.cpp" line="2838"/>
+        <source>-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2834"/>
+        <source>Def</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2852"/>
+        <location filename="../Pages.cpp" line="2892"/>
         <source>From Date</source>
         <translation>Od data</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3024"/>
-        <location filename="../Pages.cpp" line="3064"/>
+        <location filename="../Pages.cpp" line="2853"/>
+        <location filename="../Pages.cpp" line="2893"/>
         <source>Lactic Threshold</source>
         <translation>Laktátový práh</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3041"/>
-        <location filename="../Pages.cpp" line="3065"/>
+        <location filename="../Pages.cpp" line="2870"/>
+        <location filename="../Pages.cpp" line="2894"/>
         <source>Rest HR</source>
         <translation>Klidový tep</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3042"/>
-        <location filename="../Pages.cpp" line="3066"/>
+        <location filename="../Pages.cpp" line="2871"/>
+        <location filename="../Pages.cpp" line="2895"/>
         <source>Max HR</source>
         <translation>Maximální tep</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3103"/>
+        <location filename="../Pages.cpp" line="2932"/>
         <source>Short</source>
         <translation>Krátký</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3104"/>
+        <location filename="../Pages.cpp" line="2933"/>
         <source>Long</source>
         <translation>Dlouhý</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3105"/>
+        <location filename="../Pages.cpp" line="2934"/>
         <source>From BPM</source>
         <translation>Od bpm</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3106"/>
+        <location filename="../Pages.cpp" line="2935"/>
         <source>Trimp k</source>
         <translation>Trimp k</translation>
     </message>
@@ -3321,7 +3802,7 @@ NEJASNE
         <translation type="obsolete">Špatný název souboru se záznamem</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2216"/>
+        <location filename="../MainWindow.cpp" line="2215"/>
         <source>Invalid date/time in filename:
 %1
 Skipping file...</source>
@@ -3331,13 +3812,13 @@ Přeskakuji soubor...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="281"/>
-        <location filename="../MainWindow.cpp" line="2236"/>
+        <location filename="../MainWindow.cpp" line="2235"/>
         <source>Zones File Error</source>
         <translation>Chyba v souboru se zónami</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="284"/>
-        <location filename="../MainWindow.cpp" line="2240"/>
+        <location filename="../MainWindow.cpp" line="2239"/>
         <source>Reading Zones File</source>
         <translation>Načítám soubor se zónami</translation>
     </message>
@@ -3416,13 +3897,13 @@ Přeskakuji soubor...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="291"/>
-        <location filename="../MainWindow.cpp" line="2247"/>
+        <location filename="../MainWindow.cpp" line="2246"/>
         <source>HR Zones File Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="294"/>
-        <location filename="../MainWindow.cpp" line="2251"/>
+        <location filename="../MainWindow.cpp" line="2250"/>
         <source>Reading HR Zones File</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3613,40 +4094,40 @@ Přeskakuji soubor...</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1698"/>
+        <location filename="../MainWindow.cpp" line="1697"/>
         <source>Select Activity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1698"/>
-        <location filename="../MainWindow.cpp" line="1784"/>
-        <location filename="../MainWindow.cpp" line="1792"/>
+        <location filename="../MainWindow.cpp" line="1697"/>
+        <location filename="../MainWindow.cpp" line="1783"/>
+        <location filename="../MainWindow.cpp" line="1791"/>
         <source>No activity selected!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1709"/>
+        <location filename="../MainWindow.cpp" line="1708"/>
         <source>Export Activity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1722"/>
+        <location filename="../MainWindow.cpp" line="1721"/>
         <source>Export Failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1723"/>
+        <location filename="../MainWindow.cpp" line="1722"/>
         <source>Failed to export ride, please check permissions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2194"/>
+        <location filename="../MainWindow.cpp" line="2193"/>
         <source>Range from %1 to %2
 Athlete CP set to %3 watts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2215"/>
+        <location filename="../MainWindow.cpp" line="2214"/>
         <source>Invalid Activity File Name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3844,13 +4325,13 @@ Athlete CP set to %3 watts</source>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1176"/>
-        <location filename="../MainWindow.cpp" line="1792"/>
+        <location filename="../MainWindow.cpp" line="1791"/>
         <source>Delete Activity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="1185"/>
-        <location filename="../MainWindow.cpp" line="1784"/>
+        <location filename="../MainWindow.cpp" line="1783"/>
         <source>Split Activity</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3860,7 +4341,7 @@ Athlete CP set to %3 watts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1618"/>
+        <location filename="../MainWindow.cpp" line="1617"/>
         <source>Can&apos;t rename %1 to %2</source>
         <translation>Nelze přejmenovat %1 na %2</translation>
     </message>
@@ -3929,42 +4410,42 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">Soubor %1 nelze otevřít pro zápis</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1745"/>
+        <location filename="../MainWindow.cpp" line="1744"/>
         <source>Import from File</source>
         <translation>Import ze soubouru</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1762"/>
+        <location filename="../MainWindow.cpp" line="1761"/>
         <source>No Activity To Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1763"/>
+        <location filename="../MainWindow.cpp" line="1762"/>
         <source>There is no currently selected ride to save.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1797"/>
+        <location filename="../MainWindow.cpp" line="1796"/>
         <source>Are you sure you want to delete the activity:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1851"/>
+        <location filename="../MainWindow.cpp" line="1850"/>
         <source>Export Metrics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1851"/>
+        <location filename="../MainWindow.cpp" line="1850"/>
         <source>Comma Separated Variables (*.csv)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1926"/>
+        <location filename="../MainWindow.cpp" line="1925"/>
         <source>Workout Directory Invalid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1983"/>
+        <location filename="../MainWindow.cpp" line="1982"/>
         <source> (%1 watts)</source>
         <translation> (%1 wattů)</translation>
     </message>
@@ -4050,7 +4531,7 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">Nemohu zapsat poznámky do %1</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="2193"/>
+        <location filename="../MainWindow.cpp" line="2192"/>
         <source>CP saved</source>
         <translation>CP uložen</translation>
     </message>
@@ -4073,7 +4554,7 @@ CP závodníka nastaven na %3 wattů</translation>
         <translation type="obsolete">Opravdu chceš smazat záznam?:</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cpp" line="1799"/>
+        <location filename="../MainWindow.cpp" line="1798"/>
         <source>Delete</source>
         <translation>Smazat</translation>
     </message>
@@ -4387,42 +4868,41 @@ CP závodníka nastaven na %3 wattů</translation>
 <context>
     <name>MeasuresPage</name>
     <message>
-        <location filename="../Pages.cpp" line="3397"/>
-        <source>Move up</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="3398"/>
-        <source>Move down</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="3399"/>
         <source>Insert</source>
-        <translation type="unfinished">Vložit</translation>
+        <translation type="obsolete">Vložit</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3400"/>
-        <source>Rename</source>
+        <location filename="../Pages.cpp" line="3226"/>
+        <source>Up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3401"/>
-        <source>Delete</source>
+        <location filename="../Pages.cpp" line="3227"/>
+        <source>Down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3412"/>
+        <location filename="../Pages.cpp" line="3228"/>
+        <source>+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="3229"/>
+        <source>-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="3239"/>
         <source>Screen Tab</source>
         <translation type="unfinished">Obrazovka Tab Nerovný</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3413"/>
+        <location filename="../Pages.cpp" line="3240"/>
         <source>Measure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3414"/>
+        <location filename="../Pages.cpp" line="3241"/>
         <source>Type</source>
         <translation type="unfinished">Typ</translation>
     </message>
@@ -4430,17 +4910,17 @@ CP závodníka nastaven na %3 wattů</translation>
 <context>
     <name>MetadataPage</name>
     <message>
-        <location filename="../Pages.cpp" line="1726"/>
+        <location filename="../Pages.cpp" line="1583"/>
         <source>Fields</source>
         <translation>Položky</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1727"/>
+        <location filename="../Pages.cpp" line="1584"/>
         <source>Notes Keywords</source>
         <translation>Klíčová slova</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1728"/>
+        <location filename="../Pages.cpp" line="1585"/>
         <source>Processing</source>
         <translation>Zpracovávám</translation>
     </message>
@@ -4468,6 +4948,19 @@ Started</source>
 Elapsed: %1
 %2</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MetricConfig</name>
+    <message>
+        <location filename="../ConfigDialog.cpp" line="271"/>
+        <source>Summary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ConfigDialog.cpp" line="272"/>
+        <source>Intervals</source>
+        <translation type="unfinished">Intervaly</translation>
     </message>
 </context>
 <context>
@@ -5517,72 +6010,29 @@ Chcete pokračovat?</translation>
 <context>
     <name>ProcessorPage</name>
     <message>
-        <location filename="../Pages.cpp" line="2200"/>
+        <location filename="../Pages.cpp" line="2032"/>
         <source>Processor</source>
         <translation>Procesor</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2201"/>
+        <location filename="../Pages.cpp" line="2033"/>
         <source>Apply</source>
         <translation>Provést</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2202"/>
+        <location filename="../Pages.cpp" line="2034"/>
         <source>Settings</source>
         <translation>Nastavení</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2226"/>
+        <location filename="../Pages.cpp" line="2058"/>
         <source>Manual</source>
         <translation>Ruční</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2227"/>
+        <location filename="../Pages.cpp" line="2059"/>
         <source>Auto</source>
         <translation>Auto</translation>
-    </message>
-</context>
-<context>
-    <name>ProxyPage</name>
-    <message>
-        <location filename="../Pages.cpp" line="361"/>
-        <source>Proxy Type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="362"/>
-        <source>Hostname</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="363"/>
-        <source>Port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="364"/>
-        <source>Username</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="365"/>
-        <source>Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="368"/>
-        <source>Direct</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="369"/>
-        <source>Open</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="370"/>
-        <source>Authenticated</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6953,12 +7403,12 @@ Chcete pokračovat?</translation>
 <context>
     <name>RiderPage</name>
     <message>
-        <location filename="../Pages.cpp" line="736"/>
+        <location filename="../Pages.cpp" line="584"/>
         <source>Nickname</source>
         <translation>Jméno</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="737"/>
+        <location filename="../Pages.cpp" line="585"/>
         <source>Date of Birth</source>
         <translation>Datum narození</translation>
     </message>
@@ -6967,66 +7417,66 @@ Chcete pokračovat?</translation>
         <translation type="obsolete">Pohlaví</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="738"/>
+        <location filename="../Pages.cpp" line="586"/>
         <source>Sex</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="739"/>
+        <location filename="../Pages.cpp" line="587"/>
         <source>Unit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="740"/>
+        <location filename="../Pages.cpp" line="588"/>
         <source>Bio</source>
         <translation>Bio</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="742"/>
-        <location filename="../Pages.cpp" line="832"/>
-        <location filename="../Pages.cpp" line="837"/>
+        <location filename="../Pages.cpp" line="590"/>
+        <location filename="../Pages.cpp" line="680"/>
+        <location filename="../Pages.cpp" line="685"/>
         <source>Weight (%1)</source>
         <translation>Hmotnost (%1)</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="742"/>
-        <location filename="../Pages.cpp" line="832"/>
+        <location filename="../Pages.cpp" line="590"/>
+        <location filename="../Pages.cpp" line="680"/>
         <source>kg</source>
         <translation>kg</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="742"/>
-        <location filename="../Pages.cpp" line="837"/>
+        <location filename="../Pages.cpp" line="590"/>
+        <location filename="../Pages.cpp" line="685"/>
         <source>lb</source>
         <translation>lb</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="752"/>
+        <location filename="../Pages.cpp" line="600"/>
         <source>Male</source>
         <translation>Muž</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="753"/>
+        <location filename="../Pages.cpp" line="601"/>
         <source>Female</source>
         <translation>Žena</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="761"/>
+        <location filename="../Pages.cpp" line="609"/>
         <source>Metric</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="762"/>
+        <location filename="../Pages.cpp" line="610"/>
         <source>Imperial</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="818"/>
+        <location filename="../Pages.cpp" line="666"/>
         <source>Choose Picture</source>
         <translation>Vyber si fotku kde vypadáš hezky :-D</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="819"/>
+        <location filename="../Pages.cpp" line="667"/>
         <source>Images (*.png *.jpg *.bmp</source>
         <translation>Obrázky (*.png *.jpg *.bmp</translation>
     </message>
@@ -7199,32 +7649,39 @@ Chceš to udělat?
 <context>
     <name>SchemePage</name>
     <message>
-        <location filename="../Pages.cpp" line="2297"/>
         <source>Add</source>
-        <translation>Přidat</translation>
+        <translation type="obsolete">Přidat</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2298"/>
         <source>Rename</source>
-        <translation>Přejmenovat</translation>
+        <translation type="obsolete">Přejmenovat</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2299"/>
         <source>Delete</source>
-        <translation>Smazat</translation>
+        <translation type="obsolete">Smazat</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2308"/>
+        <location filename="../Pages.cpp" line="2129"/>
+        <source>+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2130"/>
+        <source>-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2138"/>
         <source>Short</source>
         <translation>Krátký</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2309"/>
+        <location filename="../Pages.cpp" line="2139"/>
         <source>Long</source>
         <translation>Délka</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2310"/>
+        <location filename="../Pages.cpp" line="2140"/>
         <source>Percent of CP</source>
         <translation>Procento z CP</translation>
     </message>
@@ -7309,42 +7766,42 @@ Chceš to udělat?
 <context>
     <name>SeasonsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="3675"/>
-        <source>Move up</source>
+        <location filename="../Pages.cpp" line="3501"/>
+        <source>Up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3676"/>
-        <source>Move down</source>
+        <location filename="../Pages.cpp" line="3502"/>
+        <source>Down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3677"/>
-        <source>Add</source>
+        <location filename="../Pages.cpp" line="3503"/>
+        <source>+</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3678"/>
-        <source>Delete</source>
+        <location filename="../Pages.cpp" line="3504"/>
+        <source>-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3687"/>
+        <location filename="../Pages.cpp" line="3513"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3688"/>
+        <location filename="../Pages.cpp" line="3514"/>
         <source>Type</source>
         <translation type="unfinished">Typ</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3689"/>
+        <location filename="../Pages.cpp" line="3515"/>
         <source>From</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3690"/>
+        <location filename="../Pages.cpp" line="3516"/>
         <source>To</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7960,24 +8417,24 @@ Chceš to udělat?
 <context>
     <name>SummaryMetricsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="1544"/>
+        <location filename="../Pages.cpp" line="1401"/>
         <source>Available Metrics</source>
         <translation type="unfinished">Dostupná metrika</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1549"/>
+        <location filename="../Pages.cpp" line="1406"/>
         <source>Selected Metrics</source>
         <translation type="unfinished">Vybraná metrika</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1595"/>
-        <location filename="../Pages.cpp" line="1605"/>
+        <location filename="../Pages.cpp" line="1452"/>
+        <location filename="../Pages.cpp" line="1462"/>
         <source>&amp;#8482;</source>
         <translation type="unfinished">&amp;#8482;</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1595"/>
-        <location filename="../Pages.cpp" line="1605"/>
+        <location filename="../Pages.cpp" line="1452"/>
+        <location filename="../Pages.cpp" line="1462"/>
         <source> (TM)</source>
         <translation type="unfinished"> (TM)</translation>
     </message>
@@ -8944,14 +9401,22 @@ Tento vygenerovaný PIN vlož do políčka. K dokončení stiskni tlačítko Ulo
 <context>
     <name>ZonePage</name>
     <message>
-        <location filename="../Pages.cpp" line="2280"/>
         <source>Critical Power History</source>
-        <translation>Historie kritického výkonu</translation>
+        <translation type="obsolete">Historie kritického výkonu</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2281"/>
         <source>Default Zones</source>
-        <translation>Výchozí zóny</translation>
+        <translation type="obsolete">Výchozí zóny</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2112"/>
+        <source>Critical Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2113"/>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9182,27 +9647,27 @@ NEJASNE
 <context>
     <name>deviceModel</name>
     <message>
-        <location filename="../Pages.cpp" line="1002"/>
+        <location filename="../Pages.cpp" line="855"/>
         <source>Device Name</source>
         <translation>Jméno zařízení</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1004"/>
+        <location filename="../Pages.cpp" line="857"/>
         <source>Device Type</source>
         <translation>Typ zařízení</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1006"/>
+        <location filename="../Pages.cpp" line="859"/>
         <source>Port Spec</source>
         <translation>Specifikace portu</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1008"/>
+        <location filename="../Pages.cpp" line="861"/>
         <source>Profile</source>
         <translation>Profil</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1010"/>
+        <location filename="../Pages.cpp" line="863"/>
         <source>Virtual</source>
         <translation type="unfinished"></translation>
     </message>

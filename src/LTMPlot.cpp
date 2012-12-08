@@ -53,7 +53,7 @@ LTMPlot::LTMPlot(LTMPlotContainer *parent, MainWindow *main, QDir home) : bg(NUL
 
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setAxisTitle(yLeft, tr(""));
-    setAxisTitle(xBottom, "Date");
+    setAxisTitle(xBottom, tr("Date"));
     setAxisMaxMinor(QwtPlot::xBottom,-1);
     setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(QDateTime::currentDateTime(), 0, LTM_DAY));
 
@@ -129,9 +129,9 @@ LTMPlot::setData(LTMSettings *set)
 
     //setTitle(settings->title);
     if (settings->groupBy != LTM_TOD)
-        setAxisTitle(xBottom, "Date");
+        setAxisTitle(xBottom, tr("Date"));
     else
-        setAxisTitle(xBottom, "Time of Day");
+        setAxisTitle(xBottom, tr("Time of Day"));
 
     // wipe existing curves/axes details
     QHashIterator<QString, QwtPlotCurve*> c(curves);
@@ -441,7 +441,7 @@ LTMPlot::setData(LTMSettings *set)
         // need more than 2 points for a trend line
         if (metricDetail.trend == true && count > 2) {
 
-            QString trendName = QString("%1 trend").arg(metricDetail.uname);
+            QString trendName = QString(tr("%1 trend")).arg(metricDetail.uname);
             QString trendSymbol = QString("%1_trend").arg(metricDetail.symbol);
             QwtPlotCurve *trend = new QwtPlotCurve(trendName);
 
@@ -491,11 +491,11 @@ LTMPlot::setData(LTMSettings *set)
             // lets setup a curve with this data then!
             QString outName;
             if (metricDetail.topOut > 1)
-                outName = QString("%1 Top %2 Outliers")
+                outName = QString(tr("%1 Top %2 Outliers"))
                           .arg(metricDetail.uname)
                           .arg(metricDetail.topOut);
             else
-                outName = QString("%1 Outlier").arg(metricDetail.uname);
+                outName = QString(tr("%1 Outlier")).arg(metricDetail.uname);
 
             QString outSymbol = QString("%1_outlier").arg(metricDetail.symbol);
             QwtPlotCurve *out = new QwtPlotCurve(outName);
@@ -552,11 +552,11 @@ LTMPlot::setData(LTMSettings *set)
             // lets setup a curve with this data then!
             QString topName;
             if (counter > 1)
-                topName = QString("%1 Best %2")
+                topName = QString(tr("%1 Best %2"))
                           .arg(metricDetail.uname)
                           .arg(counter); // starts from zero
             else
-                topName = QString("Best %1").arg(metricDetail.uname);
+                topName = QString(tr("Best %1")).arg(metricDetail.uname);
 
             QString topSymbol = QString("%1_topN").arg(metricDetail.symbol);
             QwtPlotCurve *top = new QwtPlotCurve(topName);
@@ -773,13 +773,15 @@ LTMPlot::createTODCurveData(LTMSettings *settings, MetricDetail metricDetail, QV
             }
 
             // convert seconds to hours
-            if (metricDetail.metric->units(true) == "seconds") value /= 3600;
+            if (metricDetail.metric->units(true) == "seconds" ||
+                metricDetail.metric->units(true) == tr("seconds")) value /= 3600;
         }
 
         int array = rideMetrics.getRideDate().time().hour();
         int type = metricDetail.metric ? metricDetail.metric->type() : RideMetric::Average;
 
-        if (metricDetail.uunits == "Ramp") type = RideMetric::Total;
+        if (metricDetail.uunits == "Ramp" ||
+            metricDetail.uunits == tr("Ramp")) type = RideMetric::Total;
 
         switch (type) {
         case RideMetric::Total:
@@ -851,7 +853,8 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
             }
 
             // convert seconds to hours
-            if (metricDetail.metric->units(true) == "seconds") value /= 3600;
+            if (metricDetail.metric->units(true) == "seconds" ||
+                metricDetail.metric->units(true) == tr("seconds")) value /= 3600;
         }
 
         if (value || wantZero) {
@@ -875,7 +878,8 @@ LTMPlot::createCurveData(LTMSettings *settings, MetricDetail metricDetail, QVect
                 // sum totals, average averages and choose best for Peaks
                 int type = metricDetail.metric ? metricDetail.metric->type() : RideMetric::Average;
 
-                if (metricDetail.uunits == "Ramp") type = RideMetric::Total;
+                if (metricDetail.uunits == "Ramp" ||
+                    metricDetail.uunits == tr("Ramp")) type = RideMetric::Total;
 
                 switch (type) {
                 case RideMetric::Total:
@@ -978,7 +982,7 @@ LTMPlot::chooseYAxis(QString units)
     if ((chosen = axes.value(units, -1)) != -1) return chosen;
     else if (axes.count() < 8) {
         chosen = supported_axes[axes.count()];
-        if (units == "seconds") setAxisTitle(chosen, "hours"); // we convert seconds to hours
+        if (units == "seconds" || units == tr("seconds")) setAxisTitle(chosen, "hours"); // we convert seconds to hours
         else setAxisTitle(chosen, units);
         enableAxis(chosen, true);
         axes.insert(units, chosen);
@@ -1065,7 +1069,7 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
         }
 
         // convert seconds to hours for the LTM plot
-        if (units == "seconds") {
+        if (units == "seconds" || units == tr("seconds")) {
             units = "hours"; // we translate from seconds to hours
             value = ceil(value*10.0)/10.0;
             precision = 1; // need more precision now
