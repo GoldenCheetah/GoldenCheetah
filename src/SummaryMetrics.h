@@ -23,9 +23,11 @@
 #include <QString>
 #include <QMap>
 #include <QDateTime>
+#include <QApplication>
 
 class SummaryMetrics
 {
+    Q_DECLARE_TR_FUNCTIONS(SummaryMetrics)
 	public:
         // filename
 	    QString getFileName() const { return fileName; }
