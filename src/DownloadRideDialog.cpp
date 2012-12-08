@@ -34,7 +34,7 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     action(actionIdle)
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowTitle("Download Ride Data");
+    setWindowTitle(tr("Download Ride Data"));
 
     deviceCombo = new QComboBox(this);
     QList<QString> deviceTypes = Devices::typeNames();
@@ -109,9 +109,9 @@ DownloadRideDialog::setReadyInstruct()
         DevicesPtr devtype = Devices::getType(deviceCombo->currentText());
         QString inst = devtype->downloadInstructions();
         if (inst.size() == 0)
-            statusLabel->setPlainText("Click Download to begin downloading.");
+            statusLabel->setPlainText(tr("Click Download to begin downloading."));
         else
-            statusLabel->setPlainText(inst + ", \nthen click Download.");
+            statusLabel->setPlainText(inst + tr(", \nthen click Download."));
 
         updateAction( actionIdle );
     }
@@ -124,9 +124,9 @@ DownloadRideDialog::scanCommPorts()
     QString err;
     devList = CommPort::listCommPorts(err);
     if (err != "") {
-        QString msg = "Warning(s):\n\n" + err + "\n\nYou may need to (re)install "
-            "the FTDI or PL2303 drivers before downloading.";
-        QMessageBox::warning(0, "Error Loading Device Drivers", msg,
+        QString msg = tr("Warning(s):\n\n") + err + tr("\n\nYou may need to (re)install "
+            "the FTDI or PL2303 drivers before downloading.");
+        QMessageBox::warning(0, tr("Error Loading Device Drivers"), msg,
                              QMessageBox::Ok, QMessageBox::NoButton);
     }
 
@@ -287,7 +287,7 @@ DownloadRideDialog::downloadClicked()
     DevicePtr device = devtype->newDevice( dev,
         boost::bind(&DownloadRideDialog::updateStatus, this, _1) );
 
-    updateStatus("getting summary ...");
+    updateStatus(tr("getting summary ..."));
     if( ! device->preview( err ) ){
 
         QMessageBox::information(this, tr("Preview failed"), err);
@@ -303,7 +303,7 @@ DownloadRideDialog::downloadClicked()
         }
     }
 
-    updateStatus("getting data ...");
+    updateStatus(tr("getting data ..."));
     if (!device->download( home, files,
             boost::bind(&DownloadRideDialog::isCancelled, this),
             boost::bind(&DownloadRideDialog::updateProgress, this, _1),

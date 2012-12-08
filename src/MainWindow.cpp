@@ -819,7 +819,8 @@ MainWindow::MainWindow(const QDir &home) :
         i.toFront();
         while (i.hasNext()) {
             i.next();
-            QAction *action = new QAction(QString("%1...").arg(i.key()), this);
+            // The localized processor name is shown in menu
+            QAction *action = new QAction(QString("%1...").arg(i.value()->name()), this);
             optionsMenu->addAction(action);
             connect(action, SIGNAL(triggered()), toolMapper, SLOT(map()));
             toolMapper->setMapping(action, i.key());

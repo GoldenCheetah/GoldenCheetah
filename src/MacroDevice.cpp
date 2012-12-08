@@ -46,8 +46,8 @@ static bool macroRegistered =
 QString
 MacroDevices::downloadInstructions() const
 {
-    return ("Make sure the Macro unit is turned\n"
-            "on and that its display says, \"PC Link\"");
+    return (tr("Make sure the Macro unit is turned\n"
+            "on and that its display says, \"PC Link\""));
 }
 
 DevicePtr
