@@ -2063,8 +2063,8 @@ ProcessorPage::ProcessorPage(MainWindow *main) : main(main)
         add = new QTreeWidgetItem(processorTree->invisibleRootItem());
         add->setFlags(add->flags() & ~Qt::ItemIsEditable);
 
-        // Processor Name
-        add->setText(0, i.key());
+        // Processor Name: it shows the localized name
+        add->setText(0, i.value()->name());
 
         // Auto or Manual run?
         QComboBox *comboButton = new QComboBox(this);
