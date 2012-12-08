@@ -1,5 +1,609 @@
 <charts>
 	<LTM-chart>
+		<chartname>"PMC"</chartname>
+		<metric>
+			<metricdesc>"L3 Time in Zone"</metricdesc>
+			<metricname>time_in_zone_L3</metricname>
+			<metricuname>"L3 Time in Zone"</metricuname>
+			<metricuunits>"seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>1</metricstack>
+			<metricpencolor red="195" green="195" blue="195"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"L4 Time in Zone"</metricdesc>
+			<metricname>time_in_zone_L4</metricname>
+			<metricuname>"L4 Time in Zone"</metricuname>
+			<metricuunits>"seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>1</metricstack>
+			<metricpencolor red="212" green="217" blue="247"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"L5 Time in Zone"</metricdesc>
+			<metricname>time_in_zone_L5</metricname>
+			<metricuname>"L5 Time in Zone"</metricuname>
+			<metricuunits>"seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>1</metricstack>
+			<metricpencolor red="255" green="238" blue="239"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"Coggan Acute Training Load"</metricdesc>
+			<metricname>coggan_atl</metricname>
+			<metricuname>"Coggan Acute Training Load"</metricuname>
+			<metricuunits>"Stress"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="255" green="0" blue="255"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"Coggan Chronic Training Load"</metricdesc>
+			<metricname>coggan_ctl</metricname>
+			<metricuname>"Coggan Chronic Training Load"</metricuname>
+			<metricuunits>"Stress"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="0" green="0" blue="255"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"Coggan Training Stress Balance"</metricdesc>
+			<metricname>coggan_tsb</metricname>
+			<metricuname>"Coggan Training Stress Balance"</metricuname>
+			<metricuunits>"Stress"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>999</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="0" green="203" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+	</LTM-chart>
+	<LTM-chart>
+		<chartname>"Track Weight"</chartname>
+		<metric>
+			<metricdesc>"Lean Mass"</metricdesc>
+			<metricname>Lean Mass</metricname>
+			<metricuname>"Lean Mass"</metricuname>
+			<metricuunits>""</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>1</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>-1</metricsymbol>
+			<metricstack>1</metricstack>
+			<metricpencolor red="143" green="145" blue="255"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"Fat Mass"</metricdesc>
+			<metricname>Fat Mass</metricname>
+			<metricuname>"Fat Mass"</metricuname>
+			<metricuunits>""</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>-1</metricsymbol>
+			<metricstack>1</metricstack>
+			<metricpencolor red="255" green="154" blue="39"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"Weight"</metricdesc>
+			<metricname>Weight</metricname>
+			<metricuname>"Weight"</metricuname>
+			<metricuunits>""</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>1</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>4</metriccurve>
+			<metricsymbol>-1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="170" green="85" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+	</LTM-chart>
+	<LTM-chart>
+		<chartname>"Time In Power Zone (Stacked)"</chartname>
+		<metric>
+			<metricdesc>"L3 Time in Zone"</metricdesc>
+			<metricname>time_in_zone_L3</metricname>
+			<metricuname>"L3 Time in Zone"</metricuname>
+			<metricuunits>"seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>1</metricstack>
+			<metricpencolor red="205" green="217" blue="255"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"L4 Time in Zone"</metricdesc>
+			<metricname>time_in_zone_L4</metricname>
+			<metricuname>"L4 Time in Zone"</metricuname>
+			<metricuunits>"seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>1</metricstack>
+			<metricpencolor red="85" green="96" blue="255"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"L5 Time in Zone"</metricdesc>
+			<metricname>time_in_zone_L5</metricname>
+			<metricuname>"L5 Time in Zone"</metricuname>
+			<metricuunits>"seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>1</metricstack>
+			<metricpencolor red="255" green="192" blue="90"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+	</LTM-chart>
+	<LTM-chart>
+		<chartname>"Time In Power Zone (Bar)"</chartname>
+		<metric>
+			<metricdesc>"L3 Time in Zone"</metricdesc>
+			<metricname>time_in_zone_L3</metricname>
+			<metricuname>"L3 Time in Zone"</metricuname>
+			<metricuunits>"seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="205" green="217" blue="255"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"L4 Time in Zone"</metricdesc>
+			<metricname>time_in_zone_L4</metricname>
+			<metricuname>"L4 Time in Zone"</metricuname>
+			<metricuunits>"seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="85" green="96" blue="255"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"L5 Time in Zone"</metricdesc>
+			<metricname>time_in_zone_L5</metricname>
+			<metricuname>"L5 Time in Zone"</metricuname>
+			<metricuunits>"seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="255" green="192" blue="90"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+	</LTM-chart>
+	<LTM-chart>
+		<chartname>"Time In HR Zone"</chartname>
+		<metric>
+			<metricdesc>"H1 Time in Zone"</metricdesc>
+			<metricname>time_in_zone_H1</metricname>
+			<metricuname>"H1 Time in Zone"</metricuname>
+			<metricuunits>"seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>1</metricstack>
+			<metricpencolor red="255" green="153" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"H2 Time in Zone"</metricdesc>
+			<metricname>time_in_zone_H2</metricname>
+			<metricuname>"H2 Time in Zone"</metricuname>
+			<metricuunits>"seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>1</metricstack>
+			<metricpencolor red="255" green="230" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"H3 Time in Zone"</metricdesc>
+			<metricname>time_in_zone_H3</metricname>
+			<metricuname>"H3 Time in Zone"</metricuname>
+			<metricuunits>"seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>1</metricstack>
+			<metricpencolor red="204" green="255" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"H4 Time in Zone"</metricdesc>
+			<metricname>time_in_zone_H4</metricname>
+			<metricuname>"H4 Time in Zone"</metricuname>
+			<metricuunits>"seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>1</metricstack>
+			<metricpencolor red="128" green="255" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"H5 Time in Zone"</metricdesc>
+			<metricname>time_in_zone_H5</metricname>
+			<metricuname>"H5 Time in Zone"</metricuname>
+			<metricuunits>"seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>1</metricstack>
+			<metricpencolor red="255" green="0" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+	</LTM-chart>
+	<LTM-chart>
+		<chartname>"Power Distribution"</chartname>
+		<metric>
+			<metricdesc>"L2 Time in Zone"</metricdesc>
+			<metricname>time_in_zone_L2</metricname>
+			<metricuname>"L2 Time in Zone"</metricuname>
+			<metricuunits>"seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="255" green="170" blue="255"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"L3 Time in Zone"</metricdesc>
+			<metricname>time_in_zone_L3</metricname>
+			<metricuname>"L3 Time in Zone"</metricuname>
+			<metricuunits>"seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="170" green="0" blue="127"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"L4 Time in Zone"</metricdesc>
+			<metricname>time_in_zone_L4</metricname>
+			<metricuname>"L4 Time in Zone"</metricuname>
+			<metricuunits>"seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="103" green="50" blue="125"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+	</LTM-chart>
+	<LTM-chart>
+		<chartname>"KPI Tracker"</chartname>
+		<metric>
+			<metricdesc>"5 min Peak Power"</metricdesc>
+			<metricname>5m_critical_power</metricname>
+			<metricuname>"5 min Peak Power"</metricuname>
+			<metricuunits>"watts"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>1</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="64" green="255" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"20 min Peak Power"</metricdesc>
+			<metricname>20m_critical_power</metricname>
+			<metricuname>"20 min Peak Power"</metricuname>
+			<metricuunits>"watts"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>1</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="255" green="66" blue="69"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"60 min Peak Power"</metricdesc>
+			<metricname>60m_critical_power</metricname>
+			<metricuname>"60 min Peak Power"</metricuname>
+			<metricuunits>"watts"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>1</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="0" green="0" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"Weight"</metricdesc>
+			<metricname>Weight</metricname>
+			<metricuname>"Weight"</metricuname>
+			<metricuunits>""</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>1</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>4</metriccurve>
+			<metricsymbol>14</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="122" green="122" blue="122"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"1 min Peak Power"</metricdesc>
+			<metricname>1m_critical_power</metricname>
+			<metricuname>"1 min Peak Power"</metricuname>
+			<metricuunits>"watts"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>1</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="170" green="170" blue="127"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+	</LTM-chart>
+	<LTM-chart>
+		<chartname>"Critical Power Trend"</chartname>
+		<metric>
+			<metricdesc>"60 min Peak Power"</metricdesc>
+			<metricname>60m_critical_power</metricname>
+			<metricuname>"60 min Peak Power"</metricuname>
+			<metricuunits>"watts"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>1</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>4</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="255" green="0" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+	</LTM-chart>
+	<LTM-chart>
 		<chartname>"Aerobic Power"</chartname>
 		<metric>
 			<metricdesc>"60 min Peak Power"</metricdesc>
@@ -9,9 +613,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="255" green="0" blue="0"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -27,9 +633,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="85" green="170" blue="255"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -45,9 +653,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="0" green="85" blue="127"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -63,10 +673,241 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="0" green="170" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+	</LTM-chart>
+	<LTM-chart>
+		<chartname>"Aerobic WPK"</chartname>
+		<metric>
+			<metricdesc>"10 min Peak WPK"</metricdesc>
+			<metricname>10m_peak_wpk</metricname>
+			<metricuname>"10 min Peak WPK"</metricuname>
+			<metricuunits>"wpk"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="255" green="213" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"30 min Peak WPK"</metricdesc>
+			<metricname>30m_peak_wpk</metricname>
+			<metricuname>"30 min Peak WPK"</metricuname>
+			<metricuunits>"wpk"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="85" green="255" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"20 min Peak WPK"</metricdesc>
+			<metricname>20m_peak_wpk</metricname>
+			<metricuname>"20 min Peak WPK"</metricuname>
+			<metricuunits>"wpk"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="191" green="255" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"60 min Peak WPK"</metricdesc>
+			<metricname>60m_peak_wpk</metricname>
+			<metricuname>"60 min Peak WPK"</metricuname>
+			<metricuunits>"wpk"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="0" green="255" blue="21"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"5 min Peak WPK"</metricdesc>
+			<metricname>5m_peak_wpk</metricname>
+			<metricuname>"5 min Peak WPK"</metricuname>
+			<metricuunits>"wpk"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="255" green="106" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+	</LTM-chart>
+	<LTM-chart>
+		<chartname>"Power Variance"</chartname>
+		<metric>
+			<metricdesc>"Average Power Variance"</metricdesc>
+			<metricname>meanpowervariance</metricname>
+			<metricuname>"Average Power Variance"</metricuname>
+			<metricuunits>"watts change"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>1</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="64" green="255" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"Max Power Variance"</metricdesc>
+			<metricname>maxpowervariance</metricname>
+			<metricuname>"Max Power Variance"</metricuname>
+			<metricuunits>"watts change"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>1</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="255" green="0" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+	</LTM-chart>
+	<LTM-chart>
+		<chartname>"Power Profile"</chartname>
+		<metric>
+			<metricdesc>"1 min Peak Power"</metricdesc>
+			<metricname>1m_critical_power</metricname>
+			<metricuname>"1 min Peak Power"</metricuname>
+			<metricuunits>"watts"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="255" green="98" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"5 min Peak Power"</metricdesc>
+			<metricname>5m_critical_power</metricname>
+			<metricuname>"5 min Peak Power"</metricuname>
+			<metricuunits>"watts"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="255" green="196" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"60 min Peak Power"</metricdesc>
+			<metricname>60m_critical_power</metricname>
+			<metricuname>"60 min Peak Power"</metricuname>
+			<metricuunits>"watts"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="255" green="0" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"20 min Peak Power"</metricdesc>
+			<metricname>20m_critical_power</metricname>
+			<metricuname>"20 min Peak Power"</metricuname>
+			<metricuunits>"watts"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="119" green="255" blue="0"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
 			<metricpenstyle>0</metricpenstyle>
@@ -84,9 +925,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="255" green="170" blue="0"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -102,9 +945,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="255" green="0" blue="0"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -120,9 +965,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="0" green="255" blue="0"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -138,9 +985,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="0" green="170" blue="0"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -156,9 +1005,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="0" green="170" blue="255"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -174,9 +1025,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="170" green="85" blue="255"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -186,19 +1039,121 @@
 		</metric>
 	</LTM-chart>
 	<LTM-chart>
-		<chartname>"Critical Power Trend"</chartname>
+		<chartname>"Anaerobic WPK"</chartname>
 		<metric>
-			<metricdesc>"60 min Peak Power"</metricdesc>
-			<metricname>60m_critical_power</metricname>
-			<metricuname>"60 min Peak Power"</metricuname>
-			<metricuunits>"watts"</metricuunits>
+			<metricdesc>"1 min Peak WPK"</metricdesc>
+			<metricname>1m_peak_wpk</metricname>
+			<metricuname>"1 min Peak WPK"</metricuname>
+			<metricuunits>"wpk"</metricuunits>
 			<metricsmooth>0</metricsmooth>
-			<metrictrend>1</metrictrend>
-			<metrictopn>10</metrictopn>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
-			<metriccurve>4</metriccurve>
-			<metricsymbol>0</metricsymbol>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="255" green="0" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"1 sec Peak WPK"</metricdesc>
+			<metricname>1s_peak_wpk</metricname>
+			<metricuname>"1 sec Peak WPK"</metricuname>
+			<metricuunits>"wpk"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="255" green="0" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"10 sec Peak WPK"</metricdesc>
+			<metricname>10s_peak_wpk</metricname>
+			<metricuname>"10 sec Peak WPK"</metricuname>
+			<metricuunits>"wpk"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="255" green="213" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"15 sec Peak WPK"</metricdesc>
+			<metricname>15s_peak_wpk</metricname>
+			<metricuname>"15 sec Peak WPK"</metricuname>
+			<metricuunits>"wpk"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="191" green="255" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"20 sec Peak WPK"</metricdesc>
+			<metricname>20s_peak_wpk</metricname>
+			<metricuname>"20 sec Peak WPK"</metricuname>
+			<metricuunits>"wpk"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="85" green="255" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"30 sec Peak WPK"</metricdesc>
+			<metricname>30s_peak_wpk</metricname>
+			<metricuname>"30 sec Peak WPK"</metricuname>
+			<metricuunits>"wpk"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="0" green="255" blue="21"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
 			<metricpenstyle>0</metricpenstyle>
@@ -216,9 +1171,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>1</metrictrend>
 			<metrictopn>25</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>4</metriccurve>
 			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="255" green="0" blue="0"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -234,9 +1191,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>1</metrictrend>
 			<metrictopn>25</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>4</metriccurve>
 			<metricsymbol>2</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="0" green="85" blue="255"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -248,16 +1207,18 @@
 	<LTM-chart>
 		<chartname>"Cardiovascular Response"</chartname>
 		<metric>
-			<metricdesc>"95% Heart Rate"</metricdesc>
+			<metricdesc>"95% Heartrate"</metricdesc>
 			<metricname>ninety_five_percent_hr</metricname>
-			<metricuname>"95% Heart Rate"</metricuname>
+			<metricuname>"95% Heartrate"</metricuname>
 			<metricuunits>"bpm"</metricuunits>
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="170" green="170" blue="170"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -273,9 +1234,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>3</metriccurve>
 			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="255" green="170" blue="255"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -291,9 +1254,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="255" green="0" blue="0"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -309,10 +1274,75 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="0" green="0" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"Estimated VO2MAX"</metricdesc>
+			<metricname>vo2max</metricname>
+			<metricuname>"Estimated VO2MAX"</metricuname>
+			<metricuunits>"ml/min/kg"</metricuunits>
+			<metricsmooth>1</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="0" green="0" blue="255"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+	</LTM-chart>
+	<LTM-chart>
+		<chartname>"Tempo &amp; Threshold Time"</chartname>
+		<metric>
+			<metricdesc>"L4 Time in Zone"</metricdesc>
+			<metricname>time_in_zone_L4</metricname>
+			<metricuname>"L4 Time in Zone"</metricuname>
+			<metricuunits>"seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="0" green="85" blue="127"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"L5 Time in Zone"</metricdesc>
+			<metricname>time_in_zone_L5</metricname>
+			<metricuname>"L5 Time in Zone"</metricuname>
+			<metricuunits>"seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="119" green="255" blue="0"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
 			<metricpenstyle>0</metricpenstyle>
@@ -330,9 +1360,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="255" green="0" blue="0"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -348,9 +1380,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="0" green="255" blue="102"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -366,49 +1400,12 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>3</metriccurve>
 			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="255" green="170" blue="0"></metricpencolor>
-			<metricpenalpha>0</metricpenalpha>
-			<metricpenwidth>1</metricpenwidth>
-			<metricpenstyle>0</metricpenstyle>
-			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
-			<metricbrushalpha>0</metricbrushalpha>
-		</metric>
-	</LTM-chart>
-	<LTM-chart>
-		<chartname>"Tempo &amp; Threshold Time"</chartname>
-		<metric>
-			<metricdesc>"L3 Time in Zone"</metricdesc>
-			<metricname>time_in_zone_L3</metricname>
-			<metricuname>"L3 Time in Zone"</metricuname>
-			<metricuunits>"seconds"</metricuunits>
-			<metricsmooth>0</metricsmooth>
-			<metrictrend>0</metrictrend>
-			<metrictopn>5</metrictopn>
-			<metricbaseline>0</metricbaseline>
-			<metriccurve>3</metriccurve>
-			<metricsymbol>0</metricsymbol>
-			<metricpencolor red="255" green="170" blue="127"></metricpencolor>
-			<metricpenalpha>0</metricpenalpha>
-			<metricpenwidth>1</metricpenwidth>
-			<metricpenstyle>0</metricpenstyle>
-			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
-			<metricbrushalpha>0</metricbrushalpha>
-		</metric>
-		<metric>
-			<metricdesc>"L4 Time in Zone"</metricdesc>
-			<metricname>time_in_zone_L4</metricname>
-			<metricuname>"L4 Time in Zone"</metricuname>
-			<metricuunits>"seconds"</metricuunits>
-			<metricsmooth>0</metricsmooth>
-			<metrictrend>0</metrictrend>
-			<metrictopn>5</metrictopn>
-			<metricbaseline>0</metricbaseline>
-			<metriccurve>3</metriccurve>
-			<metricsymbol>0</metricsymbol>
-			<metricpencolor red="0" green="85" blue="127"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
 			<metricpenstyle>0</metricpenstyle>
@@ -426,9 +1423,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>3</metriccurve>
 			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="0" green="255" blue="255"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -444,9 +1443,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>1</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="170" green="0" blue="0"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -462,49 +1463,12 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>3</metriccurve>
 			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="0" green="85" blue="127"></metricpencolor>
-			<metricpenalpha>0</metricpenalpha>
-			<metricpenwidth>1</metricpenwidth>
-			<metricpenstyle>0</metricpenstyle>
-			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
-			<metricbrushalpha>0</metricbrushalpha>
-		</metric>
-	</LTM-chart>
-	<LTM-chart>
-		<chartname>"Daniels Power"</chartname>
-		<metric>
-			<metricdesc>"Daniels EqP"</metricdesc>
-			<metricname>daniels_equivalent_power</metricname>
-			<metricuname>"Daniels EqP"</metricuname>
-			<metricuunits>"watts"</metricuunits>
-			<metricsmooth>0</metricsmooth>
-			<metrictrend>0</metrictrend>
-			<metrictopn>5</metrictopn>
-			<metricbaseline>0</metricbaseline>
-			<metriccurve>1</metriccurve>
-			<metricsymbol>0</metricsymbol>
-			<metricpencolor red="170" green="85" blue="0"></metricpencolor>
-			<metricpenalpha>0</metricpenalpha>
-			<metricpenwidth>1</metricpenwidth>
-			<metricpenstyle>0</metricpenstyle>
-			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
-			<metricbrushalpha>0</metricbrushalpha>
-		</metric>
-		<metric>
-			<metricdesc>"Daniels Points"</metricdesc>
-			<metricname>daniels_points</metricname>
-			<metricuname>"Daniels Points"</metricuname>
-			<metricuunits>"Daniels Points"</metricuunits>
-			<metricsmooth>0</metricsmooth>
-			<metrictrend>0</metrictrend>
-			<metrictopn>0</metrictopn>
-			<metricbaseline>0</metricbaseline>
-			<metriccurve>3</metriccurve>
-			<metricsymbol>-1</metricsymbol>
-			<metricpencolor red="255" green="170" blue="0"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
 			<metricpenstyle>0</metricpenstyle>
@@ -522,9 +1486,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>3</metriccurve>
 			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="0" green="170" blue="0"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -540,10 +1506,138 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="255" green="0" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+	</LTM-chart>
+	<LTM-chart>
+		<chartname>"Daniels Power"</chartname>
+		<metric>
+			<metricdesc>"Daniels EqP"</metricdesc>
+			<metricname>daniels_equivalent_power</metricname>
+			<metricuname>"Daniels EqP"</metricuname>
+			<metricuunits>"watts"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="170" green="85" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"Daniels Points"</metricdesc>
+			<metricname>daniels_points</metricname>
+			<metricuname>"Daniels Points"</metricuname>
+			<metricuunits>"Daniels Points"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>-1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="255" green="170" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+	</LTM-chart>
+	<LTM-chart>
+		<chartname>"PM Ramp &amp; Peak"</chartname>
+		<metric>
+			<metricdesc>"Skiba Long Term Stress"</metricdesc>
+			<metricname>skiba_lts</metricname>
+			<metricuname>"Skiba Long Term Stress"</metricuname>
+			<metricuunits>"Stress"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>1</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>4</metriccurve>
+			<metricsymbol>-1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="0" green="0" blue="255"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"Skiba Short Term Stress"</metricdesc>
+			<metricname>skiba_sts</metricname>
+			<metricuname>"Skiba Short Term Stress"</metricuname>
+			<metricuunits>"Stress"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>1</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>4</metriccurve>
+			<metricsymbol>-1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="255" green="0" blue="255"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"Skiba LTS Ramp"</metricdesc>
+			<metricname>skiba_lr</metricname>
+			<metricuname>"Skiba LTS Ramp"</metricuname>
+			<metricuunits>"Ramp"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>1</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>4</metriccurve>
+			<metricsymbol>-1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="0" green="0" blue="128"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"Skiba STS Ramp"</metricdesc>
+			<metricname>skiba_sr</metricname>
+			<metricuname>"Skiba STS Ramp"</metricuname>
+			<metricuunits>"Ramp"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>1</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>4</metriccurve>
+			<metricsymbol>-1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="0" green="128" blue="0"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
 			<metricpenstyle>0</metricpenstyle>
@@ -561,9 +1655,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>-1</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="0" green="0" blue="255"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -579,9 +1675,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>-1</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="255" green="0" blue="255"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -597,9 +1695,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>1</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>3</metriccurve>
 			<metricsymbol>-1</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="255" green="255" blue="0"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -615,9 +1715,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>5</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>3</metriccurve>
 			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="85" green="0" blue="255"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -636,9 +1738,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>2</metriccurve>
 			<metricsymbol>-1</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="255" green="0" blue="0"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -654,9 +1758,11 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>-1</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="0" green="255" blue="0"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -668,13 +1774,15 @@
 			<metricdesc>"Daniels Stress Balance"</metricdesc>
 			<metricname>daniels_sb</metricname>
 			<metricuname>"Daniels Stress Balance"</metricuname>
-			<metricuunits>"Stress"</metricuunits>
+			<metricuunits>"Stress Balance"</metricuunits>
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>-1</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="0" green="0" blue="0"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
@@ -690,10 +1798,264 @@
 			<metricsmooth>0</metricsmooth>
 			<metrictrend>0</metrictrend>
 			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
 			<metricbaseline>0</metricbaseline>
 			<metriccurve>1</metriccurve>
 			<metricsymbol>-1</metricsymbol>
+			<metricstack>0</metricstack>
 			<metricpencolor red="0" green="85" blue="255"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+	</LTM-chart>
+	<LTM-chart>
+		<chartname>"Device Reliability"</chartname>
+		<metric>
+			<metricdesc>"Dropout Time"</metricdesc>
+			<metricname>Dropout_Time</metricname>
+			<metricuname>"Dropout Time"</metricuname>
+			<metricuunits>"Seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>2</metriccurve>
+			<metricsymbol>-1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="255" green="170" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"Dropouts"</metricdesc>
+			<metricname>Dropouts</metricname>
+			<metricuname>"Dropouts"</metricuname>
+			<metricuunits>"Dropouts"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>1</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>4</metriccurve>
+			<metricsymbol>14</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="255" green="255" blue="255"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"Spikes"</metricdesc>
+			<metricname>Spikes</metricname>
+			<metricuname>"Spikes"</metricuname>
+			<metricuunits>"Spikes"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>4</metriccurve>
+			<metricsymbol>12</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="255" green="0" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"Spike Time"</metricdesc>
+			<metricname>Spike_Time</metricname>
+			<metricuname>"Spike Time"</metricuname>
+			<metricuunits>"Seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>2</metriccurve>
+			<metricsymbol>-1</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="0" green="170" blue="255"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+	</LTM-chart>
+	<LTM-chart>
+		<chartname>"Withings Weight"</chartname>
+		<metric>
+			<metricdesc>"Weight"</metricdesc>
+			<metricname>Weight</metricname>
+			<metricuname>"Weight"</metricuname>
+			<metricuunits>""</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>1</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>4</metriccurve>
+			<metricsymbol>14</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="122" green="122" blue="122"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"Lean Mass"</metricdesc>
+			<metricname>Lean Mass</metricname>
+			<metricuname>"Lean Mass"</metricuname>
+			<metricuunits>"kg"</metricuunits>
+			<metricsmooth>1</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>14</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="0" green="255" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"Fat Mass"</metricdesc>
+			<metricname>Fat Mass</metricname>
+			<metricuname>"Fat Mass"</metricuname>
+			<metricuunits>"kg"</metricuunits>
+			<metricsmooth>1</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>14</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="84" green="84" blue="84"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"Fat Ratio"</metricdesc>
+			<metricname>Fat Ratio</metricname>
+			<metricuname>"Fat Ratio"</metricuname>
+			<metricuunits>"%"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>1</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>4</metriccurve>
+			<metricsymbol>2</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="170" green="85" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+	</LTM-chart>
+	<LTM-chart>
+		<chartname>"Stress and Distance"</chartname>
+		<metric>
+			<metricdesc>"TSS"</metricdesc>
+			<metricname>coggan_tss</metricname>
+			<metricuname>"TSS"</metricuname>
+			<metricuunits>"TSS"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="255" green="255" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"Distance"</metricdesc>
+			<metricname>total_distance</metricname>
+			<metricuname>"Distance"</metricuname>
+			<metricuunits>"km"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>4</metriccurve>
+			<metricsymbol>2</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="255" green="0" blue="0"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+	</LTM-chart>
+	<LTM-chart>
+		<chartname>"Calories vs Duration"</chartname>
+		<metric>
+			<metricdesc>"Work"</metricdesc>
+			<metricname>total_work</metricname>
+			<metricuname>"Work"</metricuname>
+			<metricuunits>"kJ"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>0</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>1</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="0" green="0" blue="127"></metricpencolor>
+			<metricpenalpha>0</metricpenalpha>
+			<metricpenwidth>1</metricpenwidth>
+			<metricpenstyle>0</metricpenstyle>
+			<metricbrushcolor red="0" green="0" blue="0"></metricbrushcolor>
+			<metricbrushalpha>0</metricbrushalpha>
+		</metric>
+		<metric>
+			<metricdesc>"Duration"</metricdesc>
+			<metricname>workout_time</metricname>
+			<metricuname>"Duration"</metricuname>
+			<metricuunits>"seconds"</metricuunits>
+			<metricsmooth>0</metricsmooth>
+			<metrictrend>0</metrictrend>
+			<metrictopn>2</metrictopn>
+			<metricoutn>0</metricoutn>
+			<metricbaseline>0</metricbaseline>
+			<metriccurve>3</metriccurve>
+			<metricsymbol>0</metricsymbol>
+			<metricstack>0</metricstack>
+			<metricpencolor red="78" green="155" blue="255"></metricpencolor>
 			<metricpenalpha>0</metricpenalpha>
 			<metricpenwidth>1</metricpenwidth>
 			<metricpenstyle>0</metricpenstyle>

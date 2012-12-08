@@ -1,24 +1,60 @@
 <layout name="diary" style="0">
-	<chart id="30" name="" title="Activity Log" >
-		<property name="instanceName" type="QString" value="" />
-		<property name="title" type="QString" value="Activity Log" />
-		<property name="subtitle" type="QString" value="" />
+	<chart id="32" name="Ride Summary Window" title="Summary" >
+		<property name="instanceName" type="QString" value="Ride Summary Window" />
+		<property name="title" type="QString" value="Summary" />
+		<property name="subtitle" type="QString" value="December 2008" />
 		<property name="widthFactor" type="double" value="1.92308" />
-		<property name="heightFactor" type="double" value="1" />
+		<property name="heightFactor" type="double" value="1.85185" />
 		<property name="resizable" type="bool" value="0" />
-		<property name="sortByIndex" type="int" value="4" />
-		<property name="sortByOrder" type="int" value="1" />
-		<property name="groupBy" type="int" value="91" />
-		<property name="columns" type="QString" value="*|Date|Sport|Duration|Distance|NP|TSS|VI|Data|" />
-		<property name="widths" type="QString" value="0|67|67|60|37|31|28|60|85|" />
 	</chart>
 	<chart id="4" name="Diary Window" title="Calendar" >
 		<property name="instanceName" type="QString" value="Diary Window" />
 		<property name="title" type="QString" value="Calendar" />
 		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="2" />
-		<property name="heightFactor" type="double" value="1" />
+		<property name="widthFactor" type="double" value="2.17391" />
+		<property name="heightFactor" type="double" value="1.85185" />
 		<property name="resizable" type="bool" value="0" />
 		<property name="view" type="int" value="0" />
+	</chart>
+	<chart id="30" name="" title="Activity Log" >
+		<property name="instanceName" type="QString" value="" />
+		<property name="title" type="QString" value="Activity Log" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="1" />
+		<property name="heightFactor" type="double" value="2.27273" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="sortByIndex" type="int" value="4" />
+		<property name="sortByOrder" type="int" value="1" />
+		<property name="groupBy" type="int" value="-1" />
+		<property name="columns" type="QString" value="*|Date|Sport|Duration|Distance|NP|TSS|VI|" />
+		<property name="widths" type="QString" value="0|140|126|182|137|103|73|112|" />
+	</chart>
+	<chart id="7" name="Metric Window" title="Time and Distance" >
+		<property name="instanceName" type="QString" value="Metric Window" />
+		<property name="title" type="QString" value="Time and Distance" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="chart" type="int" value="7" />
+		<property name="bin" type="int" value="0" />
+		<property name="shade" type="bool" value="0" />
+		<property name="legend" type="bool" value="1" />
+		<property name="filter" type="QString" value="search:" />
+		<property name="settings" type="LTMSettings" value="/////wAAAEYAVwBlAGUAawAgAEMAbwBtAG0AZQBuAGMAaQBuAGcAIABNAG8AbgBkAGEAeQAgAFMAZQBwAHQAZQBtAGIAZQByACAAMgA3ACV3qwAAAAD/ACV3sQAAAAD/AAAAAQAB//////////8AAAADAAAAAQAAAAAYAHcAbwByAGsAbwB1AHQAXwB0AGkAbQBlAAAAEABEAHUAcgBhAHQAaQBvAG4AAAAQAEQAdQByAGEAdABpAG8AbgAAAA4AcwBlAGMAbwBuAGQAcwAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAQWhoAAAAH//X7/AIAAAAAEAAAAAAf//AAD/////AAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAAQAAAAAcAHQAbwB0AGEAbABfAGQAaQBzAHQAYQBuAGMAZQAAABAARABpAHMAdABhAG4AYwBlAAAAEABEAGkAcwB0AGEAbgBjAGUAAAAEAGsAbQAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAQWhoAAAAH//X7/AIP////8AAAABAf//qqoAAAAAAAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAAQAAAAAWAHQAaQBtAGUAXwByAGkAZABpAG4AZwAAABYAVABpAG0AZQAgAFIAaQBkAGkAbgBnAAAAFgBUAGkAbQBlACAAUgBpAGQAaQBuAGcAAAAOAHMAZQBjAG8AbgBkAHMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAEFoaAAAAB//1+/wCAAAAABAAAAAAH//wAAVVV/fwAAAAAAAD/wAAAAAAAAAAAAAAH//wAAAAAAAAAAAAAAAA==" />
+	</chart>
+	<chart id="7" name="Metric Window" title="Training Mix" >
+		<property name="instanceName" type="QString" value="Metric Window" />
+		<property name="title" type="QString" value="Training Mix" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="chart" type="int" value="30" />
+		<property name="bin" type="int" value="0" />
+		<property name="shade" type="bool" value="0" />
+		<property name="legend" type="bool" value="0" />
+		<property name="filter" type="QString" value="search:" />
+		<property name="settings" type="LTMSettings" value="/////wAAABoARABlAGMAZQBtAGIAZQByACAAMgAwADAAOAAldRIAAAAA/wAldTAAAAAA/wAAAAEAAf//////////AAAAAwAAAAEAAAAALgBzAGsAaQBiAGEAXwB2AGEAcgBpAGEAYgBpAGwAaQB0AHkAXwBpAG4AZABlAHgAAAAQAFMAawBpAGIAYQAgAFYASQAAABAAUwBrAGkAYgBhACAAVgBJAAAAEABTAGsAaQBiAGEAIABWAEkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAEEi1IAAAB//1+/q3D/////AAAAAAH/////AAAAAAAAAAAAAD/wAAAAAAAAAAAAAAH//wAAAAAAAAAAAAAAAAAAAAEAAAAAMABzAGsAaQBiAGEAXwByAGUAbABhAHQAaQB2AGUAXwBpAG4AdABlAG4AcwBpAHQAeQAAACQAUgBlAGwAYQB0AGkAdgBlACAASQBuAHQAZQBuAHMAaQB0AHkAAAAkAFIAZQBsAGEAdABpAHYAZQAgAEkAbgB0AGUAbgBzAGkAdAB5AAAAJABSAGUAbABhAHQAaQB2AGUAIABJAG4AdABlAG4AcwBpAHQAeQAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAQSLUgAAAH//X7+rcP////8AAAAAAf//AAD//2ZmAAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAAQAAAAAUAHQAbwB0AGEAbABfAHcAbwByAGsAAAAIAFcAbwByAGsAAAAIAFcAbwByAGsAAAAEAGsASgAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAQSLUgAAAH//X7+rcAAAAAEAAAAAAf////+qqgAAAAAAAAAAP/AAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAA" />
 	</chart>
 </layout>
