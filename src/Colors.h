@@ -38,7 +38,7 @@ class GCColor : public QObject
     Q_OBJECT
     G_OBJECT
 
-
+        void setupColors();
     public:
         GCColor(MainWindow*);
         static QColor getColor(int);

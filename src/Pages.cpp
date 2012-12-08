@@ -1006,8 +1006,8 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
     colors = new QTreeWidget;
-    colors->headerItem()->setText(0, "Color");
-    colors->headerItem()->setText(1, "Select");
+    colors->headerItem()->setText(0, tr("Color"));
+    colors->headerItem()->setText(1, tr("Select"));
     colors->setColumnCount(2);
     colors->setSelectionMode(QAbstractItemView::NoSelection);
     //colors->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
