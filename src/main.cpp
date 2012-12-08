@@ -93,12 +93,21 @@ main(int argc, char *argv[])
             home.cd(libraryPath);
         }
     }
+
+    // install QT Translator to enable QT Dialogs translation
+    QTranslator qtTranslator;
+    qtTranslator.load("qt_" + QLocale::system().name(),
+             QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+    app.installTranslator(&qtTranslator);
+
     // Language setting (default to system locale)
     QVariant lang = appsettings->value(NULL, GC_LANG, QLocale::system().name());
+
     // Load specific translation
     QTranslator gcTranslator;
     gcTranslator.load(":translations/gc_" + lang.toString() + ".qm");
     app.installTranslator(&gcTranslator);
+
     // Initialize metics once the translator is installed
     RideMetricFactory::instance().initialize();
 

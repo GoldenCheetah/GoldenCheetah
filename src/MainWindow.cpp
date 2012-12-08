@@ -269,7 +269,9 @@ MainWindow::MainWindow(const QDir &home) :
 
     QVariant unit = appsettings->cvalue(cyclist, GC_UNIT);
     if (unit == 0) {
-        unit = appsettings->value(this, GC_UNIT);
+        // Default to system locale
+        unit = appsettings->value(this, GC_UNIT,
+             QLocale::system().measurementSystem() == QLocale::MetricSystem ? GC_UNIT_METRIC : GC_UNIT_IMPERIAL);
         appsettings->setCValue(cyclist, GC_UNIT, unit);
     }
     useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
@@ -819,7 +821,8 @@ MainWindow::MainWindow(const QDir &home) :
         i.toFront();
         while (i.hasNext()) {
             i.next();
-            QAction *action = new QAction(QString("%1...").arg(i.key()), this);
+            // The localized processor name is shown in menu
+            QAction *action = new QAction(QString("%1...").arg(i.value()->name()), this);
             optionsMenu->addAction(action);
             connect(action, SIGNAL(triggered()), toolMapper, SLOT(map()));
             toolMapper->setMapping(action, i.key());

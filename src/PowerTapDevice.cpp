@@ -34,8 +34,8 @@ PowerTapDevices::newDevice( CommPortPtr dev, Device::StatusCallback cb)
 QString
 PowerTapDevices::downloadInstructions() const
 {
-    return ("Make sure the PowerTap unit is turned\n"
-            "on and that its display says, \"Host\"");
+    return (tr("Make sure the PowerTap unit is turned\n"
+            "on and that its display says, \"Host\""));
 }
 
 static bool
