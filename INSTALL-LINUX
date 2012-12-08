@@ -237,9 +237,15 @@ You will need to install libgl and extensions, this can be done with;
 $ sudo apt-get install libgl1-mesa-dev
 $ sudo apt-get install libglu-dev
 
+On Ubuntu 12.10 I also ran
+$ sudo apt-get install freeglut3 freeglut3-dev
+
 $ cd ~/Projects/qwtplot3d
 Edit the qwtplot3d.pri and add
 CONFIG += staticlib
+
+You will find that on modern Linuxes you also need to fix include/qwt3d_global.h by adding the line:
+#include <GL/glu.h>
 
 then build
 $ qmake
