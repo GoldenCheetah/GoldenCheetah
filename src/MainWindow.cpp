@@ -269,7 +269,9 @@ MainWindow::MainWindow(const QDir &home) :
 
     QVariant unit = appsettings->cvalue(cyclist, GC_UNIT);
     if (unit == 0) {
-        unit = appsettings->value(this, GC_UNIT);
+        // Default to system locale
+        unit = appsettings->value(this, GC_UNIT,
+             QLocale::system().measurementSystem() == QLocale::MetricSystem ? GC_UNIT_METRIC : GC_UNIT_IMPERIAL);
         appsettings->setCValue(cyclist, GC_UNIT, unit);
     }
     useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
