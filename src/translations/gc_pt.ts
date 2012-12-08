@@ -3684,6 +3684,16 @@ Torque Adjust - isto define um valor absoluto em pontos por polegada quadrada ou
         <translation>Métricas selecionadas</translation>
     </message>
     <message>
+        <location filename="../Pages.cpp" line="1243"/>
+        <source>Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1244"/>
+        <source>Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Move up</source>
         <translation type="obsolete">Mover para cima</translation>
     </message>
@@ -5634,148 +5644,188 @@ Elapsed: %1
 <context>
     <name>ModelDataProvider</name>
     <message>
+        <location filename="../ModelPlot.cpp" line="255"/>
         <source>Power (watts)</source>
-        <translation type="obsolete">Potência (Watts)</translation>
+        <translation type="unfinished">Potência (Watts)</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="256"/>
         <source>Cadence (rpm)</source>
-        <translation type="obsolete">Cadência (rpm)</translation>
+        <translation type="unfinished">Cadência (rpm)</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="257"/>
         <source>Heartrate (bpm)</source>
-        <translation type="obsolete">Frequência Cardíaca (bpm)</translation>
+        <translation type="unfinished">Frequência Cardíaca (bpm)</translation>
     </message>
     <message>
         <source>Speed (km/h)</source>
         <translation type="obsolete">Velocidade (km/h)</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="260"/>
+        <source>Speed (kph)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ModelPlot.cpp" line="262"/>
         <source>Speed (mph)</source>
-        <translation type="obsolete">Velocidade (mph)</translation>
+        <translation type="unfinished">Velocidade (mph)</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="266"/>
         <source>Altitude (meters)</source>
-        <translation type="obsolete">Altitude (metros)</translation>
+        <translation type="unfinished">Altitude (metros)</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="268"/>
         <source>Altitude (feet)</source>
-        <translation type="obsolete">Altitude (pés)</translation>
+        <translation type="unfinished">Altitude (pés)</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="270"/>
         <source>Torque (N)</source>
-        <translation type="obsolete">Torque (N)</translation>
+        <translation type="unfinished">Torque (N)</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="271"/>
         <source>Elapsed Time (secs)</source>
-        <translation type="obsolete">Tempo decorrido (segs)</translation>
+        <translation type="unfinished">Tempo decorrido (segs)</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="274"/>
         <source>Elapsed Distance (km)</source>
-        <translation type="obsolete">Distância decorrido (km)</translation>
+        <translation type="unfinished">Distância decorrido (km)</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="276"/>
         <source>Elapsed Distance (mi)</source>
-        <translation type="obsolete">Distância decorrido (mi)</translation>
+        <translation type="unfinished">Distância decorrido (mi)</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="278"/>
         <source>Interval Number</source>
-        <translation type="obsolete">Número do intervalo</translation>
+        <translation type="unfinished">Número do intervalo</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="279"/>
         <source>Latitude (degree x 1000)</source>
-        <translation type="obsolete">Latitude (degraus x 1000)</translation>
+        <translation type="unfinished">Latitude (degraus x 1000)</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="280"/>
         <source>Longitude (degree x 1000)</source>
-        <translation type="obsolete">Longitude (degraus x 1000)</translation>
+        <translation type="unfinished">Longitude (degraus x 1000)</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="281"/>
         <source>Circumferential Pedal Velocity (cm/s)</source>
-        <translation type="obsolete">Velocity de pedal circunferencial (m / s)</translation>
+        <translation type="unfinished">Velocity de pedal circunferencial (m / s)</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="282"/>
         <source>Average Effective Pedal Force (N)</source>
-        <translation type="obsolete">Força Pedal efectiva média (N)</translation>
+        <translation type="unfinished">Força Pedal efectiva média (N)</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="286"/>
         <source>Time at X/Y (%)</source>
-        <translation type="obsolete">Tempo em X/Y (%)</translation>
+        <translation type="unfinished">Tempo em X/Y (%)</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="287"/>
         <source>Power Zone</source>
-        <translation type="obsolete">Zona de potência</translation>
+        <translation type="unfinished">Zona de potência</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="289"/>
         <source>Unknown</source>
-        <translation type="obsolete">Desconhecido</translation>
+        <translation type="unfinished">Desconhecido</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="293"/>
         <source>Power</source>
-        <translation type="obsolete">Potência</translation>
+        <translation type="unfinished">Potência</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="294"/>
         <source>Cadence</source>
-        <translation type="obsolete">Cadência</translation>
+        <translation type="unfinished">Cadência</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="295"/>
         <source>Heartrate</source>
-        <translation type="obsolete">Frequência Cardíaca</translation>
+        <translation type="unfinished">Frequência Cardíaca</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="296"/>
         <source>Speed</source>
-        <translation type="obsolete">Velocidade</translation>
+        <translation type="unfinished">Velocidade</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="297"/>
         <source>Altitude</source>
-        <translation type="obsolete">Altitude</translation>
+        <translation type="unfinished">Altitude</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="298"/>
         <source>Pedal Force</source>
-        <translation type="obsolete">Força Pedal</translation>
+        <translation type="unfinished">Força Pedal</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="299"/>
         <source>Time</source>
-        <translation type="obsolete">Tempo</translation>
+        <translation type="unfinished">Tempo</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="300"/>
         <source>Distance</source>
-        <translation type="obsolete">Distância</translation>
+        <translation type="unfinished">Distância</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="301"/>
         <source>Interval</source>
-        <translation type="obsolete">Intervalo</translation>
+        <translation type="unfinished">Intervalo</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="302"/>
         <source>Latitude</source>
-        <translation type="obsolete">Latitude</translation>
+        <translation type="unfinished">Latitude</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="303"/>
         <source>Longitude</source>
-        <translation type="obsolete">Longitude</translation>
+        <translation type="unfinished">Longitude</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="304"/>
         <source>Time at X/Y</source>
-        <translation type="obsolete">Tempo em X/Y</translation>
+        <translation type="unfinished">Tempo em X/Y</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="305"/>
         <source>Zone</source>
-        <translation type="obsolete">Zona</translation>
+        <translation type="unfinished">Zona</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="306"/>
         <source>CPV</source>
-        <translation type="obsolete">CPV</translation>
+        <translation type="unfinished">CPV</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="307"/>
         <source>AEPF</source>
-        <translation type="obsolete">AEPF</translation>
+        <translation type="unfinished">AEPF</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="309"/>
         <source>None</source>
-        <translation type="obsolete">Nenhum</translation>
+        <translation type="unfinished">Nenhum</translation>
     </message>
     <message>
+        <location filename="../ModelPlot.cpp" line="478"/>
         <source>No data or bin size too large</source>
-        <translation type="obsolete">Falta de dados ou tamanho do bin grande demais</translation>
+        <translation type="unfinished">Falta de dados ou tamanho do bin grande demais</translation>
     </message>
 </context>
 <context>
@@ -5841,24 +5891,29 @@ Elapsed: %1
         <translation>Longitude</translation>
     </message>
     <message>
+        <location filename="../ModelWindow.cpp" line="335"/>
         <source>User Defined</source>
-        <translation type="obsolete">Definido pelo usador</translation>
+        <translation type="unfinished">Definido pelo usador</translation>
     </message>
     <message>
+        <location filename="../ModelWindow.cpp" line="336"/>
         <source>Natural Cadence Selection</source>
-        <translation type="obsolete">Seleção natural de cadência</translation>
+        <translation type="unfinished">Seleção natural de cadência</translation>
     </message>
     <message>
+        <location filename="../ModelWindow.cpp" line="337"/>
         <source>Route Visualisation</source>
-        <translation type="obsolete">Visualização da rota</translation>
+        <translation type="unfinished">Visualização da rota</translation>
     </message>
     <message>
+        <location filename="../ModelWindow.cpp" line="338"/>
         <source>Power Fatigue</source>
-        <translation type="obsolete">Quebra de potência</translation>
+        <translation type="unfinished">Quebra de potência</translation>
     </message>
     <message>
+        <location filename="../ModelWindow.cpp" line="339"/>
         <source>Impact of Altitude</source>
-        <translation type="obsolete">Impacto de altitude</translation>
+        <translation type="unfinished">Impacto de altitude</translation>
     </message>
     <message>
         <location filename="../ModelWindow.cpp" line="74"/>
@@ -9354,6 +9409,16 @@ Quer continuar?</translation>
         <location filename="../Pages.cpp" line="1419"/>
         <source>Selected Metrics</source>
         <translation>Métricas selecionadas</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1421"/>
+        <source>Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1422"/>
+        <source>Down</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Move up</source>

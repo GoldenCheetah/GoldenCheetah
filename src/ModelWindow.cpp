@@ -300,22 +300,15 @@ ModelWindow::setClean()
 }
 
 //
-// Prepare some preset analysis
+// Prepare some preset analysis (initialization moved to fillPresets to enable translation)
 //
-static struct preset {
+typedef struct preset {
     QString name;       // QComboBox value
     int x, y, z, color; // values for xselector, yselector and zselector and color
     bool ignore;
     int bin;            // value for binwidth
-} presets[] = {
-
-    { "User Defined", 0, 0, 0, 0, true, 20 },
-    { "Natural Cadence Selection", 0, 1, 12, 12, false, 5 }, // don't ignore zero for cadences!
-    { "Route Visualisation", 11, 10, 4, 4, false, 5 }, // don't ignore zero for cadences!
-    { "Power Fatigue", 9, 0, 12, 12, true, 5 },
-    { "Impact of Altitude", 4, 2, 0, 12, true, 10 },
-    { "", 0, 0, 0, 0, false, 0 }
-};
+} t_preset;
+static t_preset *presets;
 
 void
 ModelWindow::applyPreset(int index)
@@ -337,6 +330,16 @@ ModelWindow::applyPreset(int index)
 void
 ModelWindow::fillPresets(QComboBox *p)
 {
+    static t_preset presetsInit[] = {
+
+        { tr("User Defined"), 0, 0, 0, 0, true, 20 },
+        { tr("Natural Cadence Selection"), 0, 1, 12, 12, false, 5 }, // don't ignore zero for cadences!
+        { tr("Route Visualisation"), 11, 10, 4, 4, false, 5 }, // don't ignore zero for cadences!
+        { tr("Power Fatigue"), 9, 0, 12, 12, true, 5 },
+        { tr("Impact of Altitude"), 4, 2, 0, 12, true, 10 },
+        { "", 0, 0, 0, 0, false, 0 }
+    };
+    presets = presetsInit;
     for (int i=0; presets[i].name != ""; i++) {
         p->addItem(presets[i].name);
     }
