@@ -103,13 +103,15 @@ void IntervalSummaryWindow::calcInterval(IntervalItem* interval, QString& html)
 
         // right column (values)
         QString s("<td align=\"center\">%1</td>");
-        if (m->units(metricUnits) == "seconds")
+        if (m->units(metricUnits) == "seconds" ||
+            m->units(metricUnits) == tr("seconds"))
             html += s.arg(time_to_string(m->value(metricUnits)));
         else
             html += s.arg(m->value(metricUnits), 0, 'f', m->precision());
 
         html += "<td align=\"left\" valign=\"bottom\">";
-        if (m->units(metricUnits) == "seconds")
+        if (m->units(metricUnits) == "seconds" ||
+            m->units(metricUnits) == tr("seconds"))
             ; // don't do anything
         else if (m->units(metricUnits).size() > 0)
             html += m->units(metricUnits);
