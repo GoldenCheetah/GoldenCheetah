@@ -1057,6 +1057,16 @@
 <context>
     <name>ColorsPage</name>
     <message>
+        <location filename="../Pages.cpp" line="1009"/>
+        <source>Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1010"/>
+        <source>Select</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../Pages.cpp" line="1029"/>
         <source>Line Width</source>
         <translation type="unfinished"></translation>
@@ -1701,6 +1711,44 @@ Click Cancel to exit.</source>
         <location filename="../DatePickerDialog.cpp" line="101"/>
         <source>Comma Separated Values (*.csv)</source>
         <translation>Comma Separated Values (*.csv)</translation>
+    </message>
+</context>
+<context>
+    <name>DaysScaleDraw</name>
+    <message>
+        <location filename="../DaysScaleDraw.h" line="40"/>
+        <source>Mon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../DaysScaleDraw.h" line="43"/>
+        <source>Tue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../DaysScaleDraw.h" line="46"/>
+        <source>Wed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../DaysScaleDraw.h" line="49"/>
+        <source>Thu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../DaysScaleDraw.h" line="52"/>
+        <source>Fri</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../DaysScaleDraw.h" line="55"/>
+        <source>Sat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../DaysScaleDraw.h" line="58"/>
+        <source>Sun</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2515,6 +2563,329 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../RideMetadata.cpp" line="546"/>
         <source>You entered &apos;%1&apos; which is not an expected value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GCColor</name>
+    <message>
+        <location filename="../Colors.cpp" line="40"/>
+        <source>Plot Background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="41"/>
+        <source>Ride Plot Background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="42"/>
+        <source>Plot Thumbnail Background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="43"/>
+        <source>Plot Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="44"/>
+        <source>Plot Selection Pen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="45"/>
+        <source>Plot TrackerPen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="46"/>
+        <source>Plot Markers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="47"/>
+        <source>Plot Grid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="48"/>
+        <source>Interval Highlighter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="49"/>
+        <source>Heart Rate</source>
+        <translation type="unfinished">ЧСС</translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="50"/>
+        <source>Speed</source>
+        <translation type="unfinished">Скорость</translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="51"/>
+        <source>Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="52"/>
+        <source>Critical Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="53"/>
+        <source>Cadence</source>
+        <translation type="unfinished">Каденс</translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="54"/>
+        <source>Altitude</source>
+        <translation type="unfinished">Высота</translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="55"/>
+        <source>Altitude Shading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="56"/>
+        <source>Wind Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="57"/>
+        <source>Torque</source>
+        <translation type="unfinished">Крутящий момент</translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="58"/>
+        <source>Short Term Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="59"/>
+        <source>Long Term Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="60"/>
+        <source>Stress Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="61"/>
+        <source>Daily Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="62"/>
+        <source>Calendar Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="63"/>
+        <source>Power Zone 1 Shading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="64"/>
+        <source>Power Zone 2 Shading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="65"/>
+        <source>Power Zone 3 Shading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="66"/>
+        <source>Power Zone 4 Shading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="67"/>
+        <source>Power Zone 5 Shading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="68"/>
+        <source>Power Zone 6 Shading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="69"/>
+        <source>Power Zone 7 Shading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="70"/>
+        <source>Power Zone 8 Shading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="71"/>
+        <source>Power Zone 9 Shading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="72"/>
+        <source>Power Zone 10 Shading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="73"/>
+        <source>HR Zone 1 Shading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="74"/>
+        <source>HR Zone 2 Shading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="75"/>
+        <source>HR Zone 3 Shading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="76"/>
+        <source>HR Zone 4 Shading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="77"/>
+        <source>HR Zone 5 Shading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="78"/>
+        <source>HR Zone 6 Shading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="79"/>
+        <source>HR Zone 7 Shading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="80"/>
+        <source>HR Zone 8 Shading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="81"/>
+        <source>HR Zone 9 Shading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="82"/>
+        <source>HR Zone 10 Shading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="83"/>
+        <source>Aerolab VE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="84"/>
+        <source>Aerolab Elevation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="85"/>
+        <source>Calendar background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="86"/>
+        <source>Calendar heading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="87"/>
+        <source>Calendar Current Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="88"/>
+        <source>Calendar Actual Workout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="89"/>
+        <source>Calendar Planned Workout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="90"/>
+        <source>Calendar Today</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="91"/>
+        <source>Pop Up Windows Background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="92"/>
+        <source>Pop Up Windows Foreground</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="93"/>
+        <source>Chart Bar Unselected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="94"/>
+        <source>Chart Bar Selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="95"/>
+        <source>ToolBar Background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="96"/>
+        <source>Activity History Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="97"/>
+        <source>SpinScan Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="98"/>
+        <source>SpinScan Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="99"/>
+        <source>Temperature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="100"/>
+        <source>Default Dial Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="101"/>
+        <source>Alternate Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="102"/>
+        <source>Left Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Colors.cpp" line="103"/>
+        <source>Right Balance</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
