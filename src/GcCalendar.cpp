@@ -669,6 +669,7 @@ GcCalendar::setSummary()
 
                 // don't show units for time values
                 if (metric && (metric->units(useMetricUnits) == "seconds" ||
+                               metric->units(useMetricUnits) == tr("seconds") ||
                                metric->units(useMetricUnits) == "")) {
 
                     summaryText += QString("<tr><td>%1:</td><td align=\"right\"> %2</td>")

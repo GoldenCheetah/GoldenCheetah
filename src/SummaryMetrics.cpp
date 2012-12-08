@@ -75,7 +75,7 @@ SummaryMetrics::getStringForSymbol(QString symbol, bool UseMetric) const
             value += m->conversionSum();
         }
 
-        if (m->units(true) == "seconds") {
+        if (m->units(true) == "seconds" || m->units(true) == tr("seconds")) {
             // format time values...
             QChar zero = QLatin1Char('0');
             int secs = value;
@@ -156,7 +156,8 @@ QString SummaryMetrics::getAggregated(QString name, const QList<SummaryMetrics> 
 
     // Format appropriately
     QString result;
-    if (metric->units(useMetricUnits) == "seconds") {
+    if (metric->units(useMetricUnits) == "seconds" ||
+        metric->units(useMetricUnits) == tr("seconds")) {
         if (nofmt) result = QString("%1").arg(rvalue);
         else result = time_to_string(rvalue);
 
