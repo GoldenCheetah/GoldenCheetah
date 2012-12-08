@@ -1240,8 +1240,8 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
     QVBoxLayout *selectedLayout = new QVBoxLayout;
     selectedLayout->addWidget(new QLabel(tr("Selected Metrics")));
     selectedLayout->addWidget(selectedList);
-    upButton = new QPushButton("Up");
-    downButton = new QPushButton("Down");
+    upButton = new QPushButton(tr("Up"));
+    downButton = new QPushButton(tr("Down"));
     leftButton = new QPushButton("<<");
     rightButton = new QPushButton(">>");
     QVBoxLayout *buttonGrid = new QVBoxLayout;
@@ -1418,8 +1418,8 @@ SummaryMetricsPage::SummaryMetricsPage(QWidget *parent) :
     QVBoxLayout *selectedLayout = new QVBoxLayout;
     selectedLayout->addWidget(new QLabel(tr("Selected Metrics")));
     selectedLayout->addWidget(selectedList);
-    upButton = new QPushButton("Up");
-    downButton = new QPushButton("Down");
+    upButton = new QPushButton(tr("Up"));
+    downButton = new QPushButton(tr("Down"));
     leftButton = new QPushButton("<<");
     rightButton = new QPushButton(">>");
     QVBoxLayout *buttonGrid = new QVBoxLayout;
