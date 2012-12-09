@@ -108,7 +108,7 @@ struct Bin2FileReaderState
         QDateTime date = read_date(bytes_read, sum);
 
         read_bytes(1, bytes_read, sum); // dummy
-        int time_moving = read_bytes(4, bytes_read, sum);
+        read_bytes(4, bytes_read, sum); // time_moving
         *secs = double(read_bytes(4, bytes_read, sum));
         read_bytes(16, bytes_read, sum);  // dummy
 
@@ -129,10 +129,10 @@ struct Bin2FileReaderState
     void read_detail_record(double *secs, int *bytes_read = NULL, int *sum = NULL)
     {
         int cad = read_bytes(1, bytes_read, sum);
-        int pedal_smoothness = read_bytes(1, bytes_read, sum);
+        read_bytes(1, bytes_read, sum); // pedal_smoothness
         int lrbal = read_bytes(1, bytes_read, sum);
         int hr = read_bytes(1, bytes_read, sum);
-        int dummy = read_bytes(1, bytes_read, sum);
+        read_bytes(1, bytes_read, sum); // dummy
         int watts = read_bytes(2, bytes_read, sum);
         int nm = read_bytes(2, bytes_read, sum);
         double kph = read_bytes(2, bytes_read, sum);
@@ -191,8 +191,8 @@ struct Bin2FileReaderState
 
     void read_ride_summary(int *bytes_read = NULL, int *sum = NULL)
     {
-        char data_version = read_bytes(1, bytes_read, sum);
-        char firmware_minor_version = read_bytes(1, bytes_read, sum);
+        read_bytes(1, bytes_read, sum); // data_version
+        read_bytes(1, bytes_read, sum); // firmware_minor_version
 
         QDateTime t = read_date(bytes_read, sum);
 
@@ -219,7 +219,7 @@ struct Bin2FileReaderState
         int smartbelt_A = read_bytes(2, bytes_read, sum);
         int smartbelt_B = read_bytes(2, bytes_read, sum);
         int smartbelt_C = read_bytes(2, bytes_read, sum);
-        //deviceInfo += QString("Smartbelt %1-%2-%3\n").arg(smartbelt_A).arg(smartbelt_B).arg(smartbelt_C);
+        deviceInfo += QString("Smartbelt %1-%2-%3\n").arg(smartbelt_A).arg(smartbelt_B).arg(smartbelt_C);
 
         read_bytes(42, bytes_read, sum);
     }
@@ -231,10 +231,8 @@ struct Bin2FileReaderState
             if (device_type < 255)  {
                 QString text = read_text(20, bytes_read, sum);
                 while(text.endsWith( QChar(0) )) text.chop(1);
-                QChar *chr = text.end();
-                int i = chr->toAscii();
 
-                int flag = read_bytes(1, bytes_read, sum);
+                read_bytes(1, bytes_read, sum); // flag
                 uint16_t id = read_bytes(2, bytes_read, sum);
                 read_bytes(2, bytes_read, sum);
                 read_bytes(2, bytes_read, sum);
@@ -281,7 +279,7 @@ struct Bin2FileReaderState
                     read_bytes(1, &bytes_read, &sum); // to finish
                 }
 
-                char checksum = read_bytes(1, &bytes_read, &sum);
+                read_bytes(1, &bytes_read, &sum); // checksum
 
             } else {
                // not a summary page !
@@ -304,7 +302,7 @@ struct Bin2FileReaderState
 
         if (header1 == 0x10 && header2 == 0x02 && command == 0x2022)
         {
-            uint16_t length = read_bytes(2, &bytes_read, &sum);
+            read_bytes(2, &bytes_read, &sum); // length
             uint16_t page_number = read_bytes(2, &bytes_read, &sum); // Page #
 
             if (page_number > 0) {
@@ -342,7 +340,7 @@ struct Bin2FileReaderState
                     }
 
                 }
-                char checksum = read_bytes(1, &bytes_read, &sum);
+                read_bytes(1, &bytes_read, &sum); // checksum
 
             }
 
@@ -362,7 +360,7 @@ struct Bin2FileReaderState
 
         if (header == START && command == UNIT_VERSION)
         {
-            uint16_t length = read_bytes(2, &bytes_read, &sum);
+            read_bytes(2, &bytes_read, &sum); // length
 
             int major_version = read_bytes(1, &bytes_read, &sum);
             int minor_version = read_bytes(2, &bytes_read, &sum);
@@ -371,7 +369,7 @@ struct Bin2FileReaderState
             QString version = QString(minor_version<100?"%1.0%2 (%3)":"%1.%2 (%3)").arg(major_version).arg(minor_version).arg(data_version);
             deviceInfo += rideFile->deviceType()+QString(" Version %1\n").arg(version);
 
-            char checksum = read_bytes(1, &bytes_read, &sum);
+            read_bytes(1, &bytes_read, &sum); // checksum
         }
         return bytes_read;
     }
@@ -387,13 +385,13 @@ struct Bin2FileReaderState
 
         if (header == START && command == SYSTEM_INFO)
         {
-            uint16_t length = read_bytes(2, &bytes_read, &sum);
+            read_bytes(2, &bytes_read, &sum); // length
 
             read_bytes(52, &bytes_read, &sum);
             uint16_t odometer = read_bytes(8, &bytes_read, &sum);
             deviceInfo += QString("Odometer %1km\n").arg(odometer/1000.0);
 
-            char checksum = read_bytes(1, &bytes_read, &sum);
+            read_bytes(1, &bytes_read, &sum); // checksum
         }
         return bytes_read;
     }

@@ -143,7 +143,9 @@ DiaryWindow::rideSelected()
     QDate when = ride->dateTime.date();
     int month = when.month();
     int year = when.year();
+#if 0
     int weekNumber = when.weekNumber();
+#endif
 
     // monthly view updates
     calendarModel->setMonth(when.month(), when.year());

@@ -93,7 +93,7 @@ readOneByOne(CommPortPtr dev, void *buf, size_t nbyte, QString &err)
     char * data = ((char *)buf);
     int rtn=0;
 
-    for (int i = 0; i < nbyte; i++)
+    for (size_t i = 0; i < nbyte; i++)
     {
         int n = dev->read(data + i, 1, err);
         if (n <= 0) {
@@ -144,7 +144,7 @@ JouleDevice::download( const QDir &tmpdir,
         return false;
 
     for (int i=0; i<trainings.count(); i++) {
-        statusCallback(QString("Read ride detail for ride %1/%2").arg(i+1).arg(trainings.count()));
+        progressCallback(QString("Read ride detail for ride %1/%2").arg(i+1).arg(trainings.count()));
         JoulePacket request(READ_RIDE_DETAIL);
         int id1 = (trainings.at(i).id>255?trainings.at(i).id-255:trainings.at(i).id);
         int id2 = (trainings.at(i).id>255?trainings.at(i).id%255:0);
@@ -317,7 +317,7 @@ JouleDevice::getSystemInfo(JoulePacket &response, QString &err)
 
         if (response.payload.length()>3) {
             //array = response.dataArray();
-            int serial = qByteArray2Int(response.payload.left(4));
+            //int  = qByteArray2Int(response.payload.left(4));
             //QString system = QString("%1").arg(serial);
 
             return true;
@@ -344,8 +344,11 @@ JouleDevice::getUnitFreeSpace(QString &memory, QString &err)
             int total = qByteArray2Int(response1.payload.right(2));
             int percentage = 100 * empty / total;
             memory = QString("%1/%2 (%3%)").arg(empty).arg(total).arg(percentage);
+
+            return true;
         }
     }
+    return false;
 }
 
 bool

@@ -116,8 +116,10 @@ int
 RideFileCache::decimalsFor(RideFile::SeriesType series)
 {
     switch (series) {
+        case RideFile::secs : return 0; break;
         case RideFile::cad : return 0; break;
         case RideFile::hr : return 0; break;
+        case RideFile::km : return 3; break;
         case RideFile::kph : return 1; break;
         case RideFile::nm : return 2; break;
         case RideFile::watts : return 0; break;
@@ -132,6 +134,7 @@ RideFileCache::decimalsFor(RideFile::SeriesType series)
         case RideFile::interval : return 0; break;
         case RideFile::vam : return 0; break;
         case RideFile::wattsKg : return 2; break;
+        case RideFile::lrbalance : return 1; break;
         case RideFile::none : break;
     }
     return 2; // default

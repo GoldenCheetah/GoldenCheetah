@@ -547,6 +547,7 @@ RideFile::decimalsFor(SeriesType series)
         case interval : return 0; break;
         case vam : return 0; break;
         case wattsKg : return 2; break;
+        case lrbalance : return 1; break;
         case none : break;
     }
     return 2; // default
@@ -574,6 +575,7 @@ RideFile::maximumFor(SeriesType series)
         case interval : return 999; break;
         case vam : return 9999; break;
         case wattsKg : return 50; break;
+        case lrbalance : return 100; break;
         case none : break;
     }
     return 9999; // default
@@ -601,6 +603,7 @@ RideFile::minimumFor(SeriesType series)
         case interval : return 0; break;
         case vam : return 0; break;
         case wattsKg : return 0; break;
+        case lrbalance : return 0; break;
         case none : break;
     }
     return 0; // default

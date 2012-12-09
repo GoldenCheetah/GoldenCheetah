@@ -1021,7 +1021,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     double *smoothA = &plot->smoothAltitude[startidx];
     double *smoothD = &plot->smoothDistance[startidx];
     double *smoothTE = &plot->smoothTemp[startidx];
-    double *smoothWND = &plot->smoothWind[startidx];
+    //double *smoothWND = &plot->smoothWind[startidx];
     double *smoothNM = &plot->smoothTorque[startidx];
     double *smoothBALL = &plot->smoothBalanceL[startidx];
     double *smoothBALR = &plot->smoothBalanceR[startidx];
