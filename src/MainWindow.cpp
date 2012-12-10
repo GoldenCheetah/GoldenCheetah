@@ -149,6 +149,13 @@ MainWindow::MainWindow(const QDir &home) :
 
     setAttribute(Qt::WA_DeleteOnClose);
 
+    // need to restore geometry before setUnifiedToolBar.. on Mac
+    appsettings->setValue(GC_SETTINGS_LAST, home.dirName());
+    QVariant geom = appsettings->value(this, GC_SETTINGS_MAIN_GEOM);
+    if (geom == QVariant()) resize(640, 480);
+    else setGeometry(geom.toRect());
+
+
 #ifdef Q_OS_MAC // MAC NATIVE TOOLBAR
     static CocoaInitializer cocoaInitializer; // we only need one
     setUnifiedTitleAndToolBarOnMac(true);
@@ -237,11 +244,6 @@ MainWindow::MainWindow(const QDir &home) :
     setWindowTitle(home.dirName());
     setContentsMargins(0,0,0,0);
     setAcceptDrops(true);
-
-    appsettings->setValue(GC_SETTINGS_LAST, home.dirName());
-    QVariant geom = appsettings->value(this, GC_SETTINGS_MAIN_GEOM);
-    if (geom == QVariant()) resize(640, 480);
-    else setGeometry(geom.toRect());
 
     GCColor *GCColorSet = new GCColor(this); // get/keep colorset
     GCColorSet->colorSet(); // shut up the compiler

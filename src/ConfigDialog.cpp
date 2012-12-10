@@ -17,9 +17,9 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
     setAttribute(Qt::WA_DeleteOnClose);
 
 #ifdef Q_OS_MAC
-    setUnifiedTitleAndToolBarOnMac(true);
     QToolBar *head = addToolBar("Preferences");
-    setFixedSize(525,600);
+    setFixedSize(525,540);
+    setUnifiedTitleAndToolBarOnMac(true);
 #else
     QToolBar *head = addToolBar("Options");
     head->setMovable(false); // oops!
