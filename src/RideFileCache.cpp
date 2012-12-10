@@ -879,7 +879,7 @@ static void distAggregate(QVector<double> &into, QVector<double> &other)
 }
 
 RideFileCache::RideFileCache(MainWindow *main, QDate start, QDate end, bool filter, QStringList files)
-               : main(main), rideFileName(""), ride(0), start(start), end(end)
+               : start(start), end(end), main(main), rideFileName(""), ride(0) 
 {
 
     // Oh lets get from the cache if we can
