@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2011 Mark Liversedge (liversedge@gmail.com)
  *
@@ -157,13 +156,13 @@ NewCyclistDialog::unitChanged(int currentIndex)
     if (currentIndex == 0) {
         QString weighttext = QString(tr("Weight (%1)")).arg(tr("kg"));
         weightlabel->setText(weighttext);
-        weight->setValue(weight->value() * LB_PER_KG);
+        weight->setValue(weight->value() / LB_PER_KG);
         useMetricUnits = true;
     }
     else {
         QString weighttext = QString(tr("Weight (%1)")).arg(tr("lb"));
         weightlabel->setText(weighttext);
-        weight->setValue(weight->value() / LB_PER_KG);
+        weight->setValue(weight->value() * LB_PER_KG);
         useMetricUnits = false;
     }
 }
