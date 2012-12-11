@@ -160,7 +160,7 @@ class SplitBackground: public QwtPlotItem
 {
     private:
         SplitActivityWizard *parent;
-        mutable QList<QwtPlotMarker*> labs;
+        //XXX mutable QList<QwtPlotMarker*> labs; //XXX disabled as causes QWT6 to crash (!)
 
     public:
 
@@ -185,8 +185,8 @@ class SplitBackground: public QwtPlotItem
             int segment = 0;
 
             // clear the labels
-            foreach(QwtPlotMarker *l, labs) { l->detach(); delete l; }
-            labs.clear();
+            //XXX foreach(QwtPlotMarker *l, labs) { l->detach(); delete l; }
+            //XXX labs.clear();
 
             // create a sorted list of markers, since we
             // may have duplicates and the sequence is
@@ -230,16 +230,16 @@ class SplitBackground: public QwtPlotItem
                         painter->fillRect(r, segment%2 ? QColor(216,233,255,200) : QColor(233,255,222,200));
 
                         // segment number
-                        QwtText text(QString("%1").arg(segment));
-                        text.setFont(QFont("Helvetica", 48, QFont::Bold));
-                        text.setColor(Qt::lightGray);
+                        //XXX QwtText text(QString("%1").arg(segment));
+                        //XXX text.setFont(QFont("Helvetica", 48, QFont::Bold));
+                        //XXX text.setColor(Qt::lightGray);
 
                         // place the text in the geometric mean in time, at a decent power
-                        QwtPlotMarker *label = new QwtPlotMarker;
-                        label->setValue((lastmark+mark)/2, 200);
-                        label->setLabel(text);
-                        label->attach(plot());
-                        labs.append(label);
+                        //XXX QwtPlotMarker *label = new QwtPlotMarker;
+                        //XXX label->setValue((lastmark+mark)/2, 200);
+                        //XXX label->setLabel(text);
+                        //XXX label->attach(plot());
+                        //XXX labs.append(label);
                     }
 
                 }
