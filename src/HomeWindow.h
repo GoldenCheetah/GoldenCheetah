@@ -133,6 +133,7 @@ class HomeWindow : public GcWindow
 
         bool loaded;
 
+        void translateChartTitles(QList<GcWindow*> charts);
 };
 
 // setup the chart
