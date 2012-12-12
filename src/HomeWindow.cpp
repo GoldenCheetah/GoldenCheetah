@@ -18,6 +18,7 @@
 
 
 #include "HomeWindow.h"
+#include "LTMTool.h"
 #include "LTMSettings.h"
 #include "Settings.h"
 
@@ -1573,8 +1574,14 @@ void HomeWindow::translateChartTitles(QList<GcWindow*> charts)
     titleMap.insert("W/kg", tr("W/kg"));
     titleMap.insert("Workout", tr("Workout"));
 
+    LTMTool* ltmTool = new LTMTool(mainWindow, mainWindow->home);
+    // use ltmTool->metricDetails(symbol) to translate metric name and units
+    // correct units in PeakPower et al
     foreach(GcWindow *chart, charts) {
         QString chartTitle = chart->property("title").toString();
         chart->setProperty("title", titleMap.value(chartTitle, chartTitle));
+        // ltmTool->metricDetails(metricSymbol) gives access to translated name and units
+        // should unpack "LTMSettings" property, translate and pack again?
     }
+    delete ltmTool;
 }

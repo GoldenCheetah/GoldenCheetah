@@ -949,15 +949,23 @@ LTMTool::translateDefaultCharts(QList<LTMSettings>&charts)
         for (int j=0; j<charts[i].metrics.count(); j++) {
             if (charts[i].metrics[j].uname == charts[i].metrics[j].name) {
                 // Default uname
-                for (int k=0; k<metrics.count(); k++) // Look in metrics list
-                    if (metrics[k].symbol == charts[i].metrics[j].symbol) {
-                        // Replace with default translated values
-                        charts[i].metrics[j].name = metrics[k].name;
-                        charts[i].metrics[j].uname = metrics[k].uname;
-                        charts[i].metrics[j].uunits = metrics[k].uunits;
-                        break;
-                    }
+                MetricDetail* mdp = metricDetails(charts[i].metrics[j].symbol);
+                if (mdp != NULL) {
+                    // Replace with default translated values
+                    charts[i].metrics[j].name = mdp->name;
+                    charts[i].metrics[j].uname = mdp->uname;
+                    charts[i].metrics[j].uunits = mdp->uunits;
+                }
             }
         }
     }
+}
+
+MetricDetail*
+LTMTool::metricDetails(QString symbol)
+{
+    for(int i = 0; i < metrics.count(); i++)
+        if (metrics[i].symbol == symbol)
+            return &metrics[i];
+    return NULL;
 }
