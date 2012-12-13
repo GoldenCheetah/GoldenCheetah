@@ -1157,8 +1157,7 @@ AllPlot::setDataFromRide(RideItem *_rideItem)
     wattsArray.clear();
 
     RideFile *ride = rideItem->ride();
-    if (ride && ride->deviceType() != QString("Manual CSV") &&
-                ride->deviceType() != tr("Manual CSV")) {
+    if (ride && ride->dataPoints().size()) {
         const RideFileDataPresent *dataPresent = ride->areDataPresent();
         int npoints = ride->dataPoints().size();
         wattsArray.resize(dataPresent->watts ? npoints : 0);

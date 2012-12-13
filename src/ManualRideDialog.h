@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2009 Eric Murray (ericm@lne.com)
+ *               2012 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -30,39 +31,50 @@ class ManualRideDialog : public QDialog
     Q_OBJECT
     G_OBJECT
 
-
     public:
-        ManualRideDialog(MainWindow *mainWindow, const QDir &home,
-		bool useMetric);
+        ManualRideDialog(MainWindow *mainWindow);
 
     private slots:
-        void enterClicked();
+        void okClicked();
         void cancelClicked();
-	void bsEstChanged();
-	void setBsEst();
+
+        void estimate();          // estimate TSS et al when method/duration/distance changes
+        void deriveFactors();        // calculate factors to use for estimate
 
     private:
 
-	void estBSFromDistance();
-	void estBSFromTime();
-
-	bool useMetricUnits;
-	double timeBS, distanceBS, timeDP, distanceDP;
         MainWindow *mainWindow;
-        QDir home;
-        QPushButton *enterButton, *cancelButton;
-        QLabel *label;
-
-	QLabel *hrslbl, *minslbl, *secslbl;
-	QLineEdit *hrsentry, *minsentry, *secsentry;
-	QLabel * distancelbl;
-	QLineEdit *distanceentry;
-	QLineEdit *HRentry, *BSentry, *DPentry;
-	QDateTimeEdit *dateTimeEdit;
-	QRadioButton *estBSbyTimeButton, *estBSbyDistButton;
-
         QVector<unsigned char> records;
         QString filename, filepath;
+
+        // factors for estimator
+        double timeBS, distanceBS,  // Bikescore (use same for TSS)
+               timeDP, distanceDP,  // Daniel Points
+               timeTSS, distanceTSS,  // Coggan TSS
+               timeKJ, distanceKJ;  // Work
+
+        QPushButton *okButton, *cancelButton;
+
+        QDateEdit *dateEdit;  // start date
+        QTimeEdit *timeEdit;  // start time
+
+        QLineEdit *wcode;     // workout code
+        QLineEdit *sport;     // sport
+        QTextEdit *notes;     // capture some notes at least
+
+        QTimeEdit *duration;  // ride duration as a time edit
+        QDoubleSpinBox *distance, // ride distance
+                       *avgBPM,   // heartrate
+                       *avgKPH,   // speed
+                       *avgRPM,   // cadence
+                       *avgWatts; // power
+
+        QRadioButton *byDistance, *byDuration, *byManual;
+
+        QDoubleSpinBox *BS,       // skiba
+                       *DP,       // rhea
+                       *TSS,      // coggan
+                       *KJ;       // work
 };
 
 #endif // _GC_ManualRideDialog_h
