@@ -142,16 +142,24 @@ CriticalPowerWindow::newRideAdded(RideItem *here)
     // mine just got Zapped, a new rideitem would not be my current item
     if (here == currentRide) currentRide = NULL;
 
-    Season season = seasons->seasons.at(cComboSeason->currentIndex());
+    if (rangemode) {
 
-    // Refresh global curve if a ride is added during those dates
-    if ((here->dateTime.date() >= season.getStart() || season.getStart() == QDate())
-        && (here->dateTime.date() <= season.getEnd() || season.getEnd() == QDate()))
-        cpintPlot->changeSeason(season.getStart(), season.getEnd());
+        // force replot...
+        stale = true;
+        dateRangeChanged(myDateRange); 
 
-    // if visible make the changes visible
-    // rideSelected is easiest way
-    if (amVisible()) rideSelected();
+    } else {
+        Season season = seasons->seasons.at(cComboSeason->currentIndex());
+
+        // Refresh global curve if a ride is added during those dates
+        if ((here->dateTime.date() >= season.getStart() || season.getStart() == QDate())
+            && (here->dateTime.date() <= season.getEnd() || season.getEnd() == QDate()))
+            cpintPlot->changeSeason(season.getStart(), season.getEnd());
+
+        // if visible make the changes visible
+        // rideSelected is easiest way
+        if (amVisible()) rideSelected();
+    }
 }
 
 void
