@@ -27,271 +27,344 @@
 #include <boost/bind.hpp>
 #include "Units.h"
 
-ManualRideDialog::ManualRideDialog(MainWindow *mainWindow,
-                                   const QDir &home, bool useMetric) :
-    mainWindow(mainWindow), home(home)
+#include "MetricAggregator.h"
+
+//
+// Get the estimate factors
+//
+void 
+ManualRideDialog::deriveFactors()
 {
-    useMetricUnits = useMetric;
-    int row;
+    // working variables
+    timeKJ = distanceKJ = timeTSS = distanceTSS = timeBS = distanceBS = timeDP = distanceDP = 0.0;
 
-    mainWindow->getBSFactors(timeBS,distanceBS,timeDP,distanceDP);
+    // by default look back no more than 30 days
+    QVariant BSdays = appsettings->value(this, GC_BIKESCOREDAYS);
+    if (BSdays.isNull() || BSdays.toInt() == 0) BSdays.setValue(30); 
 
+    // whats the most recent ride?
+    QList<SummaryMetrics> metrics = mainWindow->metricDB->getAllMetricsFor(QDateTime(), QDateTime());
+
+    // do we have any rides?
+    if (metrics.count()) {
+
+        // last 'n' days calculation
+        double seconds, distance, bs, dp, tss, kj;
+        distance = tss = kj = bs = dp = 0;
+        int rides = 0;
+
+        // fall back to 'all time' calculation
+        double totalseconds, totaldistance, totalbs, totaldp, totaltss, totalkj;
+        totaldistance = totaltss = totalkj = totalbs = totaldp = 0;
+
+        // just use the metricDB versions, nice 'n fast
+        foreach (SummaryMetrics metric, mainWindow->metricDB->getAllMetricsFor(QDateTime() , QDateTime())) {
+
+            // skip those with no time or distance values (not comparing doubles)
+            if (metric.getForSymbol("time_riding") == 0 || metric.getForSymbol("total_distance") == 0) continue;
+
+            // how many days ago was it?
+            int days =  metric.getRideDate().daysTo(QDateTime::currentDateTime());
+
+            // only use rides in last 'n' days
+            if (days >= 0 && days < BSdays.toInt()) {
+
+                bs += metric.getForSymbol("skiba_bike_score");
+                seconds += metric.getForSymbol("time_riding");
+                distance += metric.getForSymbol("total_distance");
+                dp += metric.getForSymbol("daniels_points");
+                tss += metric.getForSymbol("coggan_tss");
+                kj += metric.getForSymbol("total_work");
+
+                rides++;
+            } 
+            totalbs += metric.getForSymbol("skiba_bike_score");
+            totalseconds += metric.getForSymbol("time_riding");
+            totaldistance += metric.getForSymbol("total_distance");
+            totaldp += metric.getForSymbol("daniels_points");
+            totaltss += metric.getForSymbol("coggan_tss");
+            totalkj += metric.getForSymbol("total_work");
+
+        }
+
+        // total values, not just last 'n' days -- but avoid divide by zero
+        if (totalseconds && totaldistance) {
+            if (!mainWindow->useMetricUnits) totaldistance *= MILES_PER_KM;
+            timeBS = (totalbs * 3600) / totalseconds;  // BS per hour
+            distanceBS = totalbs / totaldistance;  // BS per mile or km
+            timeDP = (totaldp * 3600) / totalseconds;  // DP per hour
+            distanceDP = totaldp / totaldistance;  // DP per mile or km
+            timeTSS = (totaltss * 3600) / totalseconds;  // DP per hour
+            distanceTSS = totaltss / totaldistance;  // DP per mile or km
+            timeKJ = (totalkj * 3600) / totalseconds;  // DP per hour
+            distanceKJ = totalkj / totaldistance;  // DP per mile or km
+        }
+
+        // don't use defaults if we have rides in last 'n' days
+        if (rides) {
+            if (!mainWindow->useMetricUnits) distance *= MILES_PER_KM;
+            timeBS = (bs * 3600) / seconds;  // BS per hour
+            distanceBS = bs / distance;  // BS per mile or km
+            timeDP = (dp * 3600) / seconds;  // DP per hour
+            distanceDP = dp / distance;  // DP per mile or km
+            timeTSS = (tss * 3600) / seconds;  // DP per hour
+            distanceTSS = tss / distance;  // DP per mile or km
+            timeKJ = (kj * 3600) / seconds;  // DP per hour
+            distanceKJ = kj / distance;  // DP per mile or km
+        }
+    }
+}
+
+ManualRideDialog::ManualRideDialog(MainWindow *mainWindow) : mainWindow(mainWindow)
+{
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowTitle(tr("Manually Enter Ride Data"));
-
-    // ride date
-    QLabel *manualDateLabel = new QLabel(tr("Ride date: "), this);
-    dateTimeEdit = new QDateTimeEdit( QDateTime::currentDateTime(), this );
-    // Wed 6/24/09 6:55 AM
-    dateTimeEdit->setDisplayFormat(tr("ddd MMM d, yyyy  h:mm AP"));
-    dateTimeEdit->setAlignment(Qt::AlignCenter);
-    dateTimeEdit->setCalendarPopup(true);
-
-    // ride length
-    QLabel *manualLengthLabel = new QLabel(tr("Ride length: "), this);
-    QHBoxLayout *manualLengthLayout = new QHBoxLayout;
-    hrslbl = new QLabel(tr("hours"),this);
-    hrslbl->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    hrsentry = new QLineEdit(this);
-    QIntValidator * hoursValidator = new QIntValidator(0,99,this);
-    //hrsentry->setInputMask("09");
-    hrsentry->setValidator(hoursValidator);
-    hrsentry->setPlaceholderText("00");
-    hrsentry->setMaxLength(2);
-    hrsentry->setAlignment(Qt::AlignCenter);
-    manualLengthLayout->addWidget(hrslbl);
-    manualLengthLayout->addWidget(hrsentry);
-
-    minslbl = new QLabel(tr("mins"),this);
-    minslbl->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    minsentry = new QLineEdit(this);
-    QIntValidator * mins_secsValidator = new QIntValidator(0,59,this);
-    //minsentry->setInputMask("00");
-    minsentry->setValidator(mins_secsValidator);
-    minsentry->setPlaceholderText("00");
-    minsentry->setMaxLength(2);
-    minsentry->setAlignment(Qt::AlignCenter);
-    manualLengthLayout->addWidget(minslbl);
-    manualLengthLayout->addWidget(minsentry);
-
-    secslbl = new QLabel(tr("secs"),this);
-    secslbl->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    secsentry = new QLineEdit(this);
-    //secsentry->setInputMask("00");
-    secsentry->setValidator(mins_secsValidator);
-    secsentry->setPlaceholderText("00");
-    secsentry->setMaxLength(2);
-    secsentry->setAlignment(Qt::AlignCenter);
-    manualLengthLayout->addWidget(secslbl);
-    manualLengthLayout->addWidget(secsentry);
-
-    QLabel *manualLengthHint = new QLabel(tr("(1 sec to 99:59:59) "), this);
-    manualLengthLayout->addWidget(manualLengthHint);
-
-    // ride distance
-    QString *DistanceString = new QString(tr("Distance "));
-    if (useMetricUnits)
-        DistanceString->append("(" + tr("km") + "):");
-    else
-        DistanceString->append("(" + tr("miles") + "):");
-
-    QLabel *DistanceLabel = new QLabel(*DistanceString, this);
-    QDoubleValidator * distanceValidator = new QDoubleValidator(0,9999,2,this);
-    distanceentry = new QLineEdit(this);
-    //distanceentry->setInputMask("009.00");
-    distanceentry->setValidator(distanceValidator);
-    distanceentry->setMaxLength(6);
-    distanceentry->setPlaceholderText("0");
-    distanceentry->setAlignment(Qt::AlignCenter);
-
-    QLabel *manualDistanceHint = new QLabel(tr("(0-9999) "), this);
-    QHBoxLayout *distanceLayout = new QHBoxLayout;
-    distanceLayout->addWidget(distanceentry);
-    distanceLayout->addWidget(manualDistanceHint);
-
-
-
-    // AvgHR
-    QLabel *HRLabel = new QLabel(tr("Average HR: "), this);
-    QIntValidator * hrValidator =  new QIntValidator(30,199,this);
-    HRentry = new QLineEdit(this);
-    //HRentry->setInputMask("099");
-    HRentry->setValidator(hrValidator);
-    HRentry->setPlaceholderText("0");
-    HRentry->setAlignment(Qt::AlignCenter);
-
-    QLabel *manualHRHint = new QLabel(tr("(30-199) "), this);
-    QHBoxLayout *hrLayout = new QHBoxLayout;
-    hrLayout->addWidget(HRentry);
-    hrLayout->addWidget(manualHRHint);
-
-    // how to estimate BikeScore:
-    QLabel *BSEstLabel = NULL;
-
-    QVariant BSmode = appsettings->value(this, GC_BIKESCOREMODE);
-
-    estBSbyTimeButton = NULL;
-    estBSbyDistButton = NULL;
-    if (timeBS || distanceBS)  {
-        BSEstLabel = new QLabel(tr("Estimate BikeScore by: "));
-        if (timeBS) {
-            estBSbyTimeButton = new QRadioButton(tr("Time"));
-            // default to time based unless no timeBS factor
-            if (BSmode.toString() != "distance")
-                estBSbyTimeButton->setDown(true);
-        }
-        if (distanceBS) {
-            estBSbyDistButton = new QRadioButton(tr("Distance"));
-            if (BSmode.toString() == "distance" || ! timeBS)
-                estBSbyDistButton->setDown(true);
-        }
-    }
-
-    // BikeScore
-    QLabel *ManualBSLabel = new QLabel(tr("BikeScore: "), this);
-    QDoubleValidator * bsValidator = new QDoubleValidator(0,9999,2,this);
-    BSentry = new QLineEdit(this);
-    BSentry->setValidator(bsValidator);
-    BSentry->setMaxLength(6);
-    BSentry->setPlaceholderText("0");
-    BSentry->setAlignment(Qt::AlignCenter);
-    BSentry->clear();
-
-    QLabel *manualBSHint = new QLabel(tr("(0-9999) "), this);
-    QHBoxLayout *bsLayout = new QHBoxLayout;
-    bsLayout->addWidget(BSentry);
-    bsLayout->addWidget(manualBSHint);
-
-    // DanielsPoints
-    QLabel *ManualDPLabel = new QLabel(tr("Daniels Points: "), this);
-    QDoubleValidator * dpValidator = new QDoubleValidator(0,9999,2,this);
-    DPentry = new QLineEdit(this);
-    DPentry->setValidator(dpValidator);
-    DPentry->setMaxLength(6);
-    DPentry->setPlaceholderText("0");
-    DPentry->setAlignment(Qt::AlignCenter);
-    DPentry->clear();
-    QLabel *manualDPHint = new QLabel(tr("(0-9999) "), this);
-    QHBoxLayout *dpLayout = new QHBoxLayout;
-    dpLayout->addWidget(DPentry);
-    dpLayout->addWidget(manualDPHint);
-
-    // buttons
-    enterButton = new QPushButton(tr("&OK"), this);
-    cancelButton = new QPushButton(tr("&Cancel"), this);
-    // don't let Enter write a new (and possibly incomplete) manual file:
-    enterButton->setDefault(false);
-    cancelButton->setDefault(true);
-
-    // Set up the layout:
-    QGridLayout *glayout = new QGridLayout(this);
-    row = 0;
-    glayout->addWidget(manualDateLabel, row, 0);
-    glayout->addWidget(dateTimeEdit, row, 1, 1, -1);
-    row++;
-
-    glayout->addWidget(manualLengthLabel, row, 0);
-    glayout->addLayout(manualLengthLayout,row,1,1,-1);
-    row++;
-
-    glayout->addWidget(DistanceLabel,row,0);
-    glayout->addLayout(distanceLayout,row,1,1,-1);
-    row++;
-
-    glayout->addWidget(HRLabel,row,0);
-    glayout->addLayout(hrLayout,row,1,1,-1);
-    row++;
-
-    if (timeBS || distanceBS) {
-        glayout->addWidget(BSEstLabel,row,0);
-        if (estBSbyTimeButton)
-            glayout->addWidget(estBSbyTimeButton,row,1,1,-1);
-        if (estBSbyDistButton)
-            glayout->addWidget(estBSbyDistButton,row,2,1,-1);
-        row++;
-    }
-
-    glayout->addWidget(ManualBSLabel,row,0);
-    glayout->addLayout(bsLayout,row,1,1,-1);
-    row++;
-
-    glayout->addWidget(ManualDPLabel,row,0);
-    glayout->addLayout(dpLayout,row,1,1,-1);
-    row++;
-
-    glayout->addWidget(enterButton,row,1);
-    glayout->addWidget(cancelButton,row,2);
-
-// Mac has sizing issues. This allows it to grow bigger to fit things in.
+    setWindowTitle(tr("Manual Activity Entry"));
 #ifdef Q_OS_MAC
-    setMinimumHeight(275);
-    setMinimumWidth(400);
+    setFixedSize(610,415);
 #endif
 
-    connect(enterButton, SIGNAL(clicked()), this, SLOT(enterClicked()));
+    // used by the estimator, lets get them just once.
+    deriveFactors();
+
+    //
+    // Create the GUI widgets
+    //
+
+    // BASIC DATA
+
+    // ride start date and start time
+    QLabel *dateLabel = new QLabel(tr("Ride date:"), this);
+    dateEdit = new QDateEdit(this);
+    dateEdit->setDate(QDate::currentDate());
+
+    QLabel *timeLabel = new QLabel(tr("Start time:"), this);
+    timeEdit = new QTimeEdit(this);
+    timeEdit->setDisplayFormat("hh:mm:ss");
+    timeEdit->setTime(QTime::currentTime().addSecs(-4 * 3600)); // 4 hours ago by default
+
+    // ride duration
+    QLabel *durationLabel = new QLabel(tr("Duration:"), this);
+    duration = new QTimeEdit(this);
+    duration->setDisplayFormat("hh:mm:ss");
+
+    // ride distance
+    QString distanceString = QString(tr("Distance (%1):")).arg(mainWindow->useMetricUnits ? "km" : "miles");
+    QLabel *distanceLabel = new QLabel(distanceString, this);
+    distance = new QDoubleSpinBox(this);
+    distance->setSingleStep(10.0);
+    distance->setDecimals(0);
+    distance->setMinimum(0);
+    distance->setMaximum(999);
+
+    QLabel *sportLabel = new QLabel(tr("Sport:"), this);
+    sport = new QLineEdit(this);
+    QLabel *wcodeLabel = new QLabel(tr("Workout Code:"), this);
+    wcode = new QLineEdit(this);
+    QLabel *notesLabel = new QLabel(tr("Notes:"), this);
+    notes = new QTextEdit(this);
+
+    // METRICS
+
+    // average heartrate
+    QLabel *avgBPMLabel = new QLabel(tr("Average HR:"), this);
+    avgBPM = new QDoubleSpinBox(this);
+    avgBPM->setSingleStep(1.0);
+    avgBPM->setDecimals(0);
+    avgBPM->setMinimum(0);
+    avgBPM->setMaximum(250);
+
+    // average power
+    QLabel *avgWattsLabel = new QLabel(tr("Average Watts:"), this);
+    avgWatts = new QDoubleSpinBox(this);
+    avgWatts->setSingleStep(1.0);
+    avgWatts->setDecimals(0);
+    avgWatts->setMinimum(0);
+    avgWatts->setMaximum(2500);
+
+    // average cadence
+    QLabel *avgRPMLabel = new QLabel(tr("Average Cadence:"), this);
+    avgRPM = new QDoubleSpinBox(this);
+    avgRPM->setSingleStep(1.0);
+    avgRPM->setDecimals(0);
+    avgRPM->setMinimum(0);
+    avgRPM->setMaximum(250);
+
+    // average speed
+    QLabel *avgKPHLabel = new QLabel(tr("Average Speed:"), this);
+    avgKPH = new QDoubleSpinBox(this);
+    avgKPH->setSingleStep(1.0);
+    avgKPH->setDecimals(0);
+    avgKPH->setMinimum(0);
+    avgKPH->setMaximum(100);
+
+    // how to estimate stress
+    QLabel *modeLabel = new QLabel(tr("Estmate Stress by:"), this);
+    byDuration = new QRadioButton(tr("Duration"));
+    byDistance = new QRadioButton(tr("Distance"));
+    byManual = new QRadioButton(tr("Manually"));
+
+    // What mode to use by default -- why not just remember what we used last time (?) XXX
+    //                                this setting is not used anywhere else
+    QVariant BSmode = appsettings->value(this, GC_BIKESCOREMODE); // remember from before
+    if (BSmode.toString() == "time") byDuration->setChecked(true);
+    else byDistance->setChecked(true);
+
+    // Derived metrics
+    QLabel *BSLabel = new QLabel(tr("BikeScore: "), this);
+    BS = new QDoubleSpinBox(this);
+    BS->setSingleStep(1.0);
+    BS->setDecimals(0);
+    BS->setMinimum(0);
+    BS->setMaximum(999);
+    
+    QLabel *DPLabel = new QLabel(tr("Daniel Points: "), this);
+    DP = new QDoubleSpinBox(this);
+    DP->setSingleStep(1.0);
+    DP->setDecimals(0);
+    DP->setMinimum(0);
+    DP->setMaximum(999);
+
+    QLabel *TSSLabel = new QLabel(tr("TSS: "), this);
+    TSS = new QDoubleSpinBox(this);
+    TSS->setSingleStep(1.0);
+    TSS->setDecimals(0);
+    TSS->setMinimum(0);
+    TSS->setMaximum(999);
+
+    QLabel *KJLabel = new QLabel(tr("Work (KJ):"), this);
+    KJ = new QDoubleSpinBox(this);
+    KJ->setSingleStep(1.0);
+    KJ->setDecimals(0);
+    KJ->setMinimum(0);
+    KJ->setMaximum(9999);
+
+    // buttons
+    okButton = new QPushButton(tr("&OK"), this);
+    cancelButton = new QPushButton(tr("&Cancel"), this);
+
+    // save by default -- we don't overwrite and
+    // the user will expect enter to save file
+    okButton->setDefault(true);
+    cancelButton->setDefault(false);
+
+    //
+    // LAY OUT THE GUI
+    //
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    QHBoxLayout *squeeze = new QHBoxLayout;
+    mainLayout->addLayout(squeeze);
+    QGridLayout *basicLayout = new QGridLayout;
+    squeeze->addLayout(basicLayout);
+    QGridLayout *notesLayout = new QGridLayout;
+    squeeze->addLayout(notesLayout);
+
+    notesLayout->addWidget(sportLabel, 0,0, Qt::AlignLeft);
+    notesLayout->addWidget(sport, 0,1, Qt::AlignLeft);
+    notesLayout->addWidget(wcodeLabel, 1,0, Qt::AlignLeft);
+    notesLayout->addWidget(wcode, 1,1, Qt::AlignLeft);
+    notesLayout->addWidget(notesLabel, 2,0, Qt::AlignTop|Qt::AlignLeft);
+    notesLayout->addWidget(notes, 2,1, Qt::AlignLeft);
+
+    basicLayout->addWidget(dateLabel, 0,0,Qt::AlignLeft);
+    basicLayout->addWidget(dateEdit, 0,1,Qt::AlignLeft);
+    basicLayout->addWidget(timeLabel, 1,0,Qt::AlignLeft);
+    basicLayout->addWidget(timeEdit, 1,1,Qt::AlignLeft);
+    basicLayout->addWidget(durationLabel, 2,0,Qt::AlignLeft);
+    basicLayout->addWidget(duration, 2,1, Qt::AlignLeft);
+    basicLayout->addWidget(distanceLabel, 3,0, Qt::AlignLeft);
+    basicLayout->addWidget(distance, 3,1, Qt::AlignLeft);
+
+    QGroupBox *metricBox = new QGroupBox(tr("Metrics"),this);
+    QGridLayout *metricLayout = new QGridLayout;
+    metricBox->setLayout(metricLayout);
+    mainLayout->addWidget(metricBox);
+
+    metricLayout->addWidget(avgBPMLabel, 0,0,Qt::AlignLeft);
+    metricLayout->addWidget(avgBPM, 0,1,Qt::AlignLeft);
+    metricLayout->addWidget(avgWattsLabel, 1,0,Qt::AlignLeft);
+    metricLayout->addWidget(avgWatts, 1,1,Qt::AlignLeft);
+    metricLayout->addWidget(avgRPMLabel, 2,0,Qt::AlignLeft);
+    metricLayout->addWidget(avgRPM, 2,1,Qt::AlignLeft);
+    metricLayout->addWidget(avgKPHLabel, 3,0,Qt::AlignLeft);
+    metricLayout->addWidget(avgKPH, 3,1,Qt::AlignLeft);
+
+    QHBoxLayout *estimateby = new QHBoxLayout;
+    estimateby->addWidget(modeLabel);
+    estimateby->addWidget(byDuration);
+    estimateby->addWidget(byDistance);
+    estimateby->addWidget(byManual);
+
+    metricLayout->addLayout(estimateby, 0,2,1,-1,Qt::AlignLeft);
+
+    metricLayout->addWidget(TSSLabel, 1,2, Qt::AlignLeft);
+    metricLayout->addWidget(TSS, 1,3, Qt::AlignLeft);
+    metricLayout->addWidget(KJLabel, 1,4, Qt::AlignLeft);
+    metricLayout->addWidget(KJ, 1,5, Qt::AlignLeft);
+    metricLayout->addWidget(BSLabel, 2,2, Qt::AlignLeft);
+    metricLayout->addWidget(BS, 2,3, Qt::AlignLeft);
+    metricLayout->addWidget(DPLabel, 2,4, Qt::AlignLeft);
+    metricLayout->addWidget(DP, 2,5, Qt::AlignLeft);
+
+    QHBoxLayout *buttons = new QHBoxLayout;
+    mainLayout->addLayout(buttons);
+    buttons->addStretch();
+    buttons->addWidget(okButton);
+    buttons->addWidget(cancelButton);
+
+    // if any of the fields used to determine estimation are changed then
+    // lets re-calculate and apply
+    connect(distance, SIGNAL(valueChanged(double)), this, SLOT(estimate()));
+    connect(duration, SIGNAL(timeChanged(QTime)), this, SLOT(estimate()));
+    connect(byDistance, SIGNAL(toggled(bool)), this, SLOT(estimate()));
+    connect(byDuration, SIGNAL(toggled(bool)), this, SLOT(estimate()));
+    connect(byManual, SIGNAL(toggled(bool)), this, SLOT(estimate()));
+
+    // dialog buttons
+    connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
-    connect(hrsentry, SIGNAL(editingFinished()), this, SLOT(setBsEst()));
-    //connect(secsentry, SIGNAL(editingFinished()), this, SLOT(setBsEst()));
-    connect(minsentry, SIGNAL(editingFinished()), this, SLOT(setBsEst()));
-    connect(distanceentry, SIGNAL(editingFinished()), this, SLOT(setBsEst()));
-    if (estBSbyTimeButton)
-        connect(estBSbyTimeButton,SIGNAL(clicked()),this, SLOT(bsEstChanged()));
-    if (estBSbyDistButton)
-        connect(estBSbyDistButton,SIGNAL(clicked()),this, SLOT(bsEstChanged()));
+
+    // initialise estimates / widgets enabled
+    estimate();
 }
 
 void
-ManualRideDialog::estBSFromDistance()
+ManualRideDialog::estimate()
 {
-    // calculate distance-based BS estimate
-    if (distanceBS) {
-        double dist = distanceentry->text().toFloat();
-        // cast to int so QLineEdit doesn't interpret "51.3" as "513"
-        BSentry->clear();
-        BSentry->insert(QString("%1").arg((int) (dist * distanceBS)));
-        DPentry->clear();
-        DPentry->insert(QString("%1").arg((int) (dist * distanceDP)));
-    }
-}
+    if (byManual->isChecked()) {
+        BS->setEnabled(true);
+        DP->setEnabled(true);
+        TSS->setEnabled(true);
+        KJ->setEnabled(true);
 
-void
-ManualRideDialog::estBSFromTime()
-{
-    // calculate time-based BS estimate
-    if (timeBS) {
-        double hrs = hrsentry->text().toInt()
-            + minsentry->text().toInt() / 60.0
-            + secsentry->text().toInt() / 3600.0;
-        BSentry->clear();
-        BSentry->insert(QString("%1").arg((int)(hrs * timeBS)));
-        DPentry->clear();
-        DPentry->insert(QString("%1").arg((int)(hrs * timeDP)));
+        return; // no calculation - manually entered by user
+    } else {
+
+        BS->setEnabled(false);
+        DP->setEnabled(false);
+        TSS->setEnabled(false);
+        KJ->setEnabled(false);
     }
 
-}
+    if (byDuration->isChecked()) {
+        // by time
+        QTime time = duration->time();
+        double hours = (time.hour()) + (time.minute() / 60.00) + (time.second() / 3600.00);
 
-void
-ManualRideDialog::bsEstChanged()
-{
-    if (estBSbyDistButton) {
-        if (estBSbyDistButton->isChecked())
-            estBSFromDistance();
-        else
-            estBSFromTime();
+        BS->setValue(hours * timeBS);
+        DP->setValue(hours * timeDP);
+        TSS->setValue(hours * timeTSS);
+        KJ->setValue(hours * timeKJ);
+
+    } else {
+        // by distance
+        double dist = distance->value();
+
+        BS->setValue(dist * distanceBS);
+        DP->setValue(dist * distanceDP);
+        TSS->setValue(dist * distanceTSS);
+        KJ->setValue(dist * distanceKJ);
     }
 }
-
-void
-ManualRideDialog::setBsEst()
-{
-    if (estBSbyDistButton) {
-        if (estBSbyDistButton->isChecked())
-            estBSFromDistance();
-        else
-            estBSFromTime();
-    }
-}
-
 
 void
 ManualRideDialog::cancelClicked()
@@ -300,176 +373,112 @@ ManualRideDialog::cancelClicked()
 }
 
 void
-ManualRideDialog::enterClicked()
+ManualRideDialog::okClicked()
 {
+    // create a new ridefile
+    RideFile *rideFile = new RideFile();
 
-  if (!( ( BSentry->text().isEmpty() || BSentry->hasAcceptableInput() ) &&
-     ( DPentry->text().isEmpty() || DPentry->hasAcceptableInput() ) &&
-     ( HRentry->text().isEmpty() || HRentry->hasAcceptableInput() ) &&
-     ( distanceentry->text().isEmpty() || distanceentry->hasAcceptableInput() ) ) ) {
-        QMessageBox::warning( this,
-            tr("Values out of range"),
-            tr("The values you've entered in:\n ")
-            +((!distanceentry->hasAcceptableInput() && !distanceentry->text().isEmpty() )
-                ? "  Distance (max 9999)\n " : "")
-            +((!HRentry->hasAcceptableInput() && !HRentry->text().isEmpty() )
-                ? " Average HR (30-199 bpm)\n " : "")
-            +((!BSentry->hasAcceptableInput() && !BSentry->text().isEmpty() )
-                ? "  BikeScore (max 9999)\n " : "")
-            +((!DPentry->hasAcceptableInput() && !DPentry->text().isEmpty() )
-                ? "  Daniels Points (max 9999)\n " : "")
-            + tr("are invalid, please fix.")
-        );
-        return;
+    // set the first class variables
+    QDateTime rideDateTime = QDateTime(dateEdit->date(), timeEdit->time());
+    rideFile->setStartTime(rideDateTime);
+    rideFile->setRecIntSecs(0.00);
+    rideFile->setDeviceType("Manual");
+    rideFile->setFileFormat("GoldenCheetah Json");
+
+    // basic data
+    if (distance->value()) {
+        QMap<QString,QString> override;
+        override.insert("value", QString("%1").arg(distance->value()));
+        rideFile->metricOverrides.insert("total_distance", override);
     }
 
-    // write data to manual entry file
-
-    // use user's time for file:
-    QDateTime lt = dateTimeEdit->dateTime().toLocalTime();
-
-    if (filename == "") {
-        char tmp[32];
-
-
-        sprintf(tmp, "%04d_%02d_%02d_%02d_%02d_%02d.gc",
-                lt.date().year(), lt.date().month(),
-                lt.date().day(), lt.time().hour(),
-                lt.time().minute(),
-                lt.time().second());
-
-        filename = tmp;
-        filepath = home.absolutePath() + "/" + filename;
-        FILE *out = fopen(filepath.toAscii().constData(), "r");
-        if (out) {
-            fclose(out);
-            if (QMessageBox::warning(
-                    this,
-                    tr("Ride Already Downloaded"),
-                    tr("This ride appears to have already ")
-                    + tr("been downloaded.  Do you want to ")
-                    + tr("download it again and overwrite ")
-                    + tr("the previous download?"),
-                    tr("&Overwrite"), tr("&Cancel"),
-                    QString(), 1, 1) == 1) {
-                reject();
-                return ;
-            }
-        }
+    QTime time = duration->time();
+    double seconds = (time.hour() * 3600) + (time.minute() * 60.00) + (time.second());
+    if (seconds) {
+        QMap<QString,QString> override;
+        override.insert("value", QString("%1").arg(seconds));
+        rideFile->metricOverrides.insert("workout_time", override);
+        rideFile->metricOverrides.insert("time_riding", override);
     }
 
-    QString tmpname;
-    {
-        // QTemporaryFile doesn't actually close the file on .close(); it
-        // closes the file when in its destructor.  On Windows, we can't
-        // rename an open file.  So let tmp go out of scope before calling
-        // rename.
+    // basic metadata
+    rideFile->setTag("Sport", sport->text());
+    rideFile->setTag("Workout Code", wcode->text());
+    rideFile->setTag("Notes", notes->toPlainText());
 
-        QString tmpl = home.absoluteFilePath(".ptdl.XXXXXX");
-        QTemporaryFile tmp(tmpl);
-        tmp.setAutoRemove(false);
-        if (!tmp.open()) {
-            QMessageBox::critical(this, tr("Error"),
-                                  tr("Failed to create temporary file ")
-                                  + tmpl + ": " + tmp.error());
-            reject();
-            return;
-        }
-        QTextStream out(&tmp);
-
-        tmpname = tmp.fileName(); // after close(), tmp.fileName() is ""
-
-        /*
-         *  File format:
-         * <!DOCTYPE GoldenCheetah>
-         * <ride>
-         *     <attributes>
-         *         <attribute key="Start time" value="2010/03/18 21:29:43 UTC"/>
-         *         <attribute key="Device type" value="Manual CSV"/>
-         *     </attributes>
-         *     <override>
-         *         <metric value="14" name="daniels_points"/>
-         *         <metric value="39" name="skiba_bike_score"/>
-         *         <metric value="3600" name="time_riding"/>
-         *         <metric value="200" name="total_distance"/>
-         *         <metric value="145" name="average_heartrate"/>
-         *     </override>
-         * </ride>
-
-         */
-
-#define DATETIME_FORMAT "yyyy/MM/dd hh:mm:ss' UTC'"
-        double secs = (hrsentry->text().toInt() * 3600) +
-            (minsentry->text().toInt() * 60) +
-            (secsentry->text().toInt());
-
-        out << "<!DOCTYPE GoldenCheetah>\n"
-            << "<ride>\n"
-            << "\t<attributes>\n"
-            << "\t\t<attribute key=\"Start time\" value=\""
-            << lt.toUTC().toString(DATETIME_FORMAT) <<"\"/>\n"
-            << "\t\t<attribute key=\"Device type\" value=\"Manual CSV\"/>\n"
-            << "\t</attributes>\n"
-            << "\t<override>\n"
-
-            << "\t\t<metric value=\"" << QString("%1").arg(DPentry->text().toInt())
-            << "\" name=\"daniels_points\"/>\n"
-
-            << "\t\t<metric value=\"" << QString("%1").arg(BSentry->text().toInt())
-            << "\" name=\"skiba_bike_score\"/>\n"
-
-            << "\t\t<metric value=\"" << QString("%1").arg(secs)
-            << "\" name=\"workout_time\"/>\n"
-
-            << "\t\t<metric value=\"" << QString("%1").arg(secs)
-            << "\" name=\"time_riding\"/>\n"
-
-            << "\t\t<metric value=\"" << QString("%1").arg(useMetricUnits ?
-                                               distanceentry->text().toFloat() :
-                                               (1.00/MILES_PER_KM) * distanceentry->text().toFloat())
-            << "\" name=\"total_distance\"/>\n"
-
-            << "\t\t<metric value=\"" << QString("%1").arg(HRentry->text().toInt())
-            << "\" name=\"average_hr\"/>\n"
-
-            << "\t</override>\n"
-            << "</ride>\n"
-            ;
-
-        tmp.close();
-
-        // QTemporaryFile initially has permissions set to 0600.
-        // Make it readable by everyone.
-        tmp.setPermissions(tmp.permissions()
-                           | QFile::ReadOwner | QFile::ReadUser
-                           | QFile::ReadGroup | QFile::ReadOther);
+    // average metrics
+    if (avgBPM->value()) {
+        QMap<QString,QString> override;
+        override.insert("value", QString("%1").arg(avgBPM->value()));
+        rideFile->metricOverrides.insert("average_hr", override);
+    }
+    if (avgRPM->value()) {
+        QMap<QString,QString> override;
+        override.insert("value", QString("%1").arg(avgRPM->value()));
+        rideFile->metricOverrides.insert("average_cad", override);
+    }
+    if (avgKPH->value()) {
+        QMap<QString,QString> override;
+        override.insert("value", QString("%1").arg(avgKPH->value()));
+        rideFile->metricOverrides.insert("average_speed", override);
+    }
+    if (avgWatts->value()) {
+        QMap<QString,QString> override;
+        override.insert("value", QString("%1").arg(avgWatts->value()));
+        rideFile->metricOverrides.insert("average_power", override);
     }
 
-#ifdef __WIN32__
-    // Windows ::rename won't overwrite an existing file.
-    if (QFile::exists(filepath)) {
-        QFile old(filepath);
-        if (!old.remove()) {
-            QMessageBox::critical(this, tr("Error"),
-                                  tr("Failed to remove existing file ")
-                                  + filepath + ": " + old.error());
-            QFile::remove(tmpname);
-            reject();
-        }
+    // stress metrics
+    if (BS->value()) {
+        QMap<QString,QString> override;
+        override.insert("value", QString("%1").arg(BS->value()));
+        rideFile->metricOverrides.insert("skiba_bike_score", override);
     }
-#endif
-
-    // Use ::rename() instead of QFile::rename() to get forced overwrite.
-    if (rename(QFile::encodeName(tmpname), QFile::encodeName(filepath)) < 0) {
-        QMessageBox::critical(this, tr("Error"),
-                              tr("Failed to rename ") + tmpname + tr(" to ")
-                              + filepath + ": " + strerror(errno));
-        QFile::remove(tmpname);
-        reject();
-        return;
+    if (DP->value()) {
+        QMap<QString,QString> override;
+        override.insert("value", QString("%1").arg(DP->value()));
+        rideFile->metricOverrides.insert("daniels_points", override);
+    }
+    if (TSS->value()) {
+        QMap<QString,QString> override;
+        override.insert("value", QString("%1").arg(TSS->value()));
+        rideFile->metricOverrides.insert("coggan_tss", override);
+    }
+    if (KJ->value()) {
+        QMap<QString,QString> override;
+        override.insert("value", QString("%1").arg(KJ->value()));
+        rideFile->metricOverrides.insert("total_work", override);
     }
 
-    mainWindow->addRide(filename);
-    accept();
+    // what should the filename be?
+    QChar zero = QLatin1Char ('0');
+    QString basename = QString ("%1_%2_%3_%4_%5_%6")
+                           .arg (rideDateTime.date().year(), 4, 10, zero)
+                           .arg (rideDateTime.date().month(), 2, 10, zero)
+                           .arg (rideDateTime.date().day(), 2, 10, zero)
+                           .arg (rideDateTime.time().hour(), 2, 10, zero)
+                           .arg (rideDateTime.time().minute(), 2, 10, zero)
+                           .arg (rideDateTime.time().second(), 2, 10, zero);
+
+    QString filename = mainWindow->home.absolutePath() + "/" + basename + ".json";
+
+    QFile out(filename);
+    bool success = RideFileFactory::instance().writeRideFile(mainWindow, rideFile, out, "json");
+    delete rideFile;
+
+    if (success) {
+
+        // refresh metric db etc
+        mainWindow->addRide(basename + ".json");
+        accept();
+
+    } else {
+
+        // rather than dance around renaming existing rides, this time we will let the user
+        // work it out -- they may actually want to keep an existing ride, so we shouldn't
+        // rename it silently.
+        QMessageBox oops(QMessageBox::Critical, tr("Unable to save"),
+                         tr("There is already an activity with the same start time or you do not have permissions to save a file."));
+        oops.exec();
+    }
 }
-

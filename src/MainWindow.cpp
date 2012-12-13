@@ -1674,7 +1674,7 @@ MainWindow::downloadRide()
 void
 MainWindow::manualRide()
 {
-    (new ManualRideDialog(this, home, useMetricUnits))->show();
+    (new ManualRideDialog(this))->show();
 }
 
 const RideFile *
@@ -2121,50 +2121,6 @@ MainWindow::intervalTreeWidgetSelectionChanged()
  * Utility
  *--------------------------------------------------------------------*/
 
-void MainWindow::getBSFactors(double &timeBS, double &distanceBS,
-                              double &timeDP, double &distanceDP)
-{
-    int rides;
-    double seconds, distance, bs, dp;
-    seconds = rides = 0;
-    distance = bs = dp = 0;
-    timeBS = distanceBS = timeDP = distanceDP = 0.0;
-
-    QVariant BSdays = appsettings->value(this, GC_BIKESCOREDAYS);
-    if (BSdays.isNull() || BSdays.toInt() == 0)
-        BSdays.setValue(30); // by default look back no more than 30 days
-
-    // if there are rides, find most recent ride so we count back from there:
-    if (allRides->childCount() == 0)
-        return;
-
-    RideItem *lastRideItem = (RideItem*) allRides->child(allRides->childCount() - 1);
-
-    // just use the metricDB versions, nice 'n fast
-    foreach (SummaryMetrics metric, metricDB->getAllMetricsFor(QDateTime() , QDateTime())) {
-
-        int days =  metric.getRideDate().daysTo(lastRideItem->dateTime);
-        if (days >= 0 && days < BSdays.toInt()) {
-
-            bs += metric.getForSymbol("skiba_bike_score");
-            seconds += metric.getForSymbol("time_riding");
-            distance += metric.getForSymbol("total_distance");
-            dp += metric.getForSymbol("daniels_points");
-
-            rides++;
-        }
-    }
-
-    // if we got any...
-    if (rides) {
-        if (!useMetricUnits)
-            distance *= MILES_PER_KM;
-        timeBS = (bs * 3600) / seconds;  // BS per hour
-        distanceBS = bs / distance;  // BS per mile or km
-        timeDP = (dp * 3600) / seconds;  // DP per hour
-        distanceDP = dp / distance;  // DP per mile or km
-    }
-}
 
 // set the rider value of CP to the value derived from the CP model extraction
 void

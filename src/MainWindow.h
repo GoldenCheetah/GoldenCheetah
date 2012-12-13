@@ -99,12 +99,6 @@ class MainWindow : public QMainWindow
         Seasons *seasons;
         QList<RideFileCache*> cpxCache;
 
-        // athlete's ride library
-        void addRide(QString name, bool bSelect=true);
-        void removeCurrentRide();
-        void getBSFactors(double &timeBS, double &distanceBS,
-                          double &timeDP, double &distanceDP);
-
         // athlete's calendar
         CalendarDownload *calendarDownload;
 #ifdef GC_HAVE_ICAL
@@ -116,25 +110,33 @@ class MainWindow : public QMainWindow
         // ATHLETE RIDE LIBRARY
         // *********************************************
 
+        // athlete's ride library
+        void addRide(QString name, bool bSelect=true);
+        void removeCurrentRide();
+
         // save a ride to disk
         void saveSilent(RideItem *);
         bool saveRideSingleDialog(RideItem *);
 
-        // currently selected ride item, files, metadata
+        // currently selected ride item, ride list
         void selectRideFile(QString);
         QTreeWidget *rideTreeWidget() { return treeWidget; }
         const QTreeWidgetItem *allRideItems() { return allRides; }
         RideItem *rideItem() const { return ride; }
         const RideFile *currentRide();
         const RideItem *currentRideItem() { return ride; }
+
+        // last date range selected in diary/home view
         DateRange currentDateRange() { return _dr; }
-        void updateRideFileIntervals();
-        RideMetadata *rideMetadata() { return _rideMetadata; }
 
         // ride intervals
         const QTreeWidgetItem *allIntervalItems() { return allIntervals; }
         QTreeWidget *intervalTreeWidget() { return intervalWidget; }
         QTreeWidgetItem *mutableIntervalItems() { return allIntervals; }
+        void updateRideFileIntervals();
+
+        // ride metadata definitions
+        RideMetadata *rideMetadata() { return _rideMetadata; }
 
         // *********************************************
         // MAINWINDOW STATE / GUI DATA
