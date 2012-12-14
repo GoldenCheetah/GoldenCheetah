@@ -50,12 +50,12 @@ ManualRideDialog::deriveFactors()
 
         // last 'n' days calculation
         double seconds, distance, bs, dp, tss, kj;
-        distance = tss = kj = bs = dp = 0;
+        seconds = distance = tss = kj = bs = dp = 0;
         int rides = 0;
 
         // fall back to 'all time' calculation
         double totalseconds, totaldistance, totalbs, totaldp, totaltss, totalkj;
-        totaldistance = totaltss = totalkj = totalbs = totaldp = 0;
+        totalseconds = totaldistance = totaltss = totalkj = totalbs = totaldp = 0;
 
         // just use the metricDB versions, nice 'n fast
         foreach (SummaryMetrics metric, mainWindow->metricDB->getAllMetricsFor(QDateTime() , QDateTime())) {
@@ -121,6 +121,8 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow) : mainWindow(mainWind
     setWindowTitle(tr("Manual Activity Entry"));
 #ifdef Q_OS_MAC
     setFixedSize(610,415);
+#else
+    setFixedSize(615,360);
 #endif
 
     // used by the estimator, lets get them just once.
