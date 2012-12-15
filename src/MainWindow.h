@@ -243,6 +243,7 @@ class MainWindow : public QMainWindow
         void checkCPX(RideItem*);
         void showTreeContextMenuPopup(const QPoint &);
         void closeAll();
+        void addDevice();
 
     private slots:
         void rideTreeWidgetSelectionChanged();
