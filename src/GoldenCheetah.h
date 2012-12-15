@@ -41,10 +41,10 @@ class GcWindow;
 #include "GcWindowRegistry.h"
 
 
-Q_DECLARE_METATYPE(QWidget*);
-Q_DECLARE_METATYPE(RideItem*);
-Q_DECLARE_METATYPE(GcWinID);
-Q_DECLARE_METATYPE(DateRange);
+Q_DECLARE_METATYPE(QWidget*)
+Q_DECLARE_METATYPE(RideItem*)
+Q_DECLARE_METATYPE(GcWinID)
+Q_DECLARE_METATYPE(DateRange)
 
 
 class GcWindow : public QFrame
@@ -72,15 +72,15 @@ private:
     Q_PROPERTY(RideItem* ride READ rideItem WRITE setRideItem NOTIFY rideItemChanged)
 
     // all charts have a date range, they don't all implement it
-    Q_PROPERTY(DateRange dateRange READ dateRange WRITE setDateRange NOTIFY dateRangeChanged);
+    Q_PROPERTY(DateRange dateRange READ dateRange WRITE setDateRange NOTIFY dateRangeChanged)
 
     // geometry factor
-    Q_PROPERTY(double widthFactor READ widthFactor WRITE setWidthFactor NOTIFY widthFactorChanged USER true);
-    Q_PROPERTY(double heightFactor READ heightFactor WRITE setHeightFactor NOTIFY heightFactorChanged USER true);
+    Q_PROPERTY(double widthFactor READ widthFactor WRITE setWidthFactor NOTIFY widthFactorChanged USER true)
+    Q_PROPERTY(double heightFactor READ heightFactor WRITE setHeightFactor NOTIFY heightFactorChanged USER true)
 
     // can be resized
-    Q_PROPERTY(bool resizable READ resizable WRITE setResizable USER true);
-    Q_PROPERTY(bool gripped READ gripped WRITE setGripped);
+    Q_PROPERTY(bool resizable READ resizable WRITE setResizable USER true)
+    Q_PROPERTY(bool gripped READ gripped WRITE setGripped)
 
     QWidget *_controls;
     QString _title;
