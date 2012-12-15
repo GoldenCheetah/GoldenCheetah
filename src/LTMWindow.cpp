@@ -202,7 +202,7 @@ LTMWindow::metricSelected()
 
 void
 LTMWindow::dateRangeChanged(DateRange range)
-{
+{ Q_UNUSED( range )
     if (!amVisible() && !dirty) return;
 
     settings.data = &results;

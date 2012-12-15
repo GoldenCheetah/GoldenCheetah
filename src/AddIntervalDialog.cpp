@@ -271,7 +271,7 @@ intervalDuration(const RideFilePoint *start, const RideFilePoint *stop, const Ri
 }
 
 static double
-intervalDistance(const RideFilePoint *start, const RideFilePoint *stop, const RideFile *ride)
+intervalDistance(const RideFilePoint *start, const RideFilePoint *stop, const RideFile *)
 {
     return 1000*(stop->km - start->km);// + (ride->recIntSecs()*stop->kph/3600));
 }

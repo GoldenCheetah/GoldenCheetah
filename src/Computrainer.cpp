@@ -1004,7 +1004,6 @@ int Computrainer::rawRead(uint8_t bytes[], int size)
 // returns true if the device exists and false if not
 bool Computrainer::discover(QString filename)
 {
-    bool returning = false;
     uint8_t *greeting = (uint8_t *)"RacerMate";
     uint8_t handshake[7];
     int rc;

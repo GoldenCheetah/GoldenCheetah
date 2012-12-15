@@ -708,7 +708,7 @@ GcCalendar::setSummary()
 }
 
 void
-GcCalendar::splitterMoved(int pos, int /*index*/)
+GcCalendar::splitterMoved(int /*pos*/, int /*index*/)
 {
     appsettings->setCValue(main->cyclist, GC_SETTINGS_CALSPLITTER_SIZES, splitter->saveState());
 }
