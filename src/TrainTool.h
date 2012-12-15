@@ -130,6 +130,12 @@ class TrainTool : public GcWindow
         void workoutTreeWidgetSelectionChanged();
         void mediaTreeWidgetSelectionChanged();
 
+        void deviceTreeMenuPopup(const QPoint &);
+        void deleteDevice();
+
+        //XXX void workoutTreeMenuPopup(const QPoint &);
+        //XXX void mediaTreeMenuPopup(const QPoint &);
+
     public slots:
         void configChanged();
 

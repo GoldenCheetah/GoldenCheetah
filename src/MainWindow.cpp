@@ -68,6 +68,8 @@
 #include "WorkoutWizard.h"
 #include "ErgDB.h"
 #include "ErgDBDownloadDialog.h"
+#include "DeviceConfiguration.h"
+#include "AddDeviceWizard.h"
 #include "TrainTool.h"
 
 #include "GcWindowTool.h"
@@ -1810,6 +1812,30 @@ MainWindow::deleteRide()
 }
 
 /*----------------------------------------------------------------------
+ * Realtime Devices and Workouts
+ *--------------------------------------------------------------------*/
+void
+MainWindow::addDevice()
+{
+    // get device config
+    DeviceConfigurations all;
+    DeviceConfiguration add;
+
+    // lets get a new one
+    AddDeviceWizard *p = new AddDeviceWizard(this, add);
+    if (p->exec() == QDialog::Accepted) {
+        QList<DeviceConfiguration> list = all.getList();
+        list.insert(0, add);
+
+        // call device add wizard.
+        all.writeConfig(list);
+
+        // tell everyone
+        emit configChanged();
+    }
+}
+
+/*----------------------------------------------------------------------
  * Cyclists
  *--------------------------------------------------------------------*/
 
@@ -2346,5 +2372,4 @@ MainWindow::actionClicked(int index)
 
     }
 }
-
 #endif

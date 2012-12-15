@@ -104,6 +104,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     allDevices = new QTreeWidgetItem(deviceTree, HEAD_TYPE);
     allDevices->setText(0, tr("Devices"));
     deviceTree->expandItem(allDevices);
+    deviceTree->setContextMenuPolicy(Qt::CustomContextMenu);
 
     workoutTree = new QTreeWidget;
     workoutTree->setFrameStyle(QFrame::NoFrame);
@@ -272,6 +273,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     // handle config changes
     //connect(serverTree,SIGNAL(itemSelectionChanged()), this, SLOT(serverTreeWidgetSelectionChanged()));
     connect(deviceTree,SIGNAL(itemSelectionChanged()), this, SLOT(deviceTreeWidgetSelectionChanged()));
+    connect(deviceTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(deviceTreeMenuPopup(const QPoint &)));
     connect(workoutTree,SIGNAL(itemSelectionChanged()), this, SLOT(workoutTreeWidgetSelectionChanged()));
 #if defined Q_OS_MAC || defined GC_HAVE_VLC
     connect(mediaTree,SIGNAL(itemSelectionChanged()), this, SLOT(mediaTreeWidgetSelectionChanged()));
@@ -1569,4 +1571,54 @@ void
 MultiDeviceDialog::cancelClicked()
 {
     reject();
+}
+
+void
+TrainTool::deviceTreeMenuPopup(const QPoint &pos)
+{
+    QMenu menu(deviceTree);
+    QAction *addDevice = new QAction(tr("Add Device"), deviceTree);
+    connect(addDevice, SIGNAL(triggered(void)), main, SLOT(addDevice()));
+    menu.addAction(addDevice);
+
+    if (deviceTree->selectedItems().size() == 1) {
+        QAction *delDevice = new QAction(tr("Delete Device"), deviceTree);
+        connect(delDevice, SIGNAL(triggered(void)), this, SLOT(deleteDevice()));
+        menu.addAction(delDevice);
+    }
+
+    menu.exec(deviceTree->mapToGlobal(pos));
+}
+
+void
+TrainTool::deleteDevice()
+{
+    // get the configuration
+    DeviceConfigurations all;
+    QList<DeviceConfiguration>list = all.getList();
+
+    // Delete the selected device
+    QTreeWidgetItem *selected = deviceTree->selectedItems().first();
+    int index = allDevices->indexOfChild(selected);
+
+    if (index < 0 || index > list.size()) return;
+
+    // make sure they really mean this!
+    QMessageBox msgBox;
+    msgBox.setText(tr("Are you sure you want to delete this device?"));
+    msgBox.setInformativeText(list[index].name);
+    QPushButton *deleteButton = msgBox.addButton(tr("Delete"),QMessageBox::YesRole);
+    msgBox.setStandardButtons(QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
+    msgBox.setIcon(QMessageBox::Critical);
+    msgBox.exec();
+
+    if(msgBox.clickedButton() != deleteButton) return;
+
+    // find this one and delete it
+    list.removeAt(index);
+    all.writeConfig(list);
+
+    // tell everyone
+    main->notifyConfigChanged();
 }
