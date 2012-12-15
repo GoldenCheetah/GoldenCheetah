@@ -43,7 +43,6 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors, QList
      *	minutes,mph,watts,miles,hr,bikeScore    # data
      */
     QRegExp manualCSV("manual", Qt::CaseInsensitive);
-    bool manual = false;
 
     double rideSec = 0;
 
@@ -73,7 +72,6 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors, QList
 
 	    if (lineno == 1) {
 		if (manualCSV.indexIn(line) != -1) {
-		    manual = true;
             rideFile->setDeviceType("Manual");
             rideFile->setFileFormat("Manual CSV (csv)");
 		    ++lineno;

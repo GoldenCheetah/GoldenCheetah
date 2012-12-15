@@ -329,8 +329,8 @@ public:
             return sourceModel()->setHeaderData(section-2, orientation, value, role); // accomodate virtual columns
         else if (section == 1) // set header for virtual column ride_time
             starttimeHeader = value.toString();
-        else
-            return true;
+
+        return true;
     }
 
     int columnCount(const QModelIndex &/*parent*/ = QModelIndex()) const {

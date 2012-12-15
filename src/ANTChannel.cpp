@@ -675,7 +675,7 @@ void ANTChannel::burstData(unsigned char *ant_message) {
 }
 
 // choose this one..
-void ANTChannel::setChannelID(int device_number, int device_id, int txtype)
+void ANTChannel::setChannelID(int device_number, int device_id, int /*txtype*/)
 {
     parent->sendMessage(ANTMessage::setChannelID(number, device_number, device_id, 0)); // lets go back to allowing anything
     parent->sendMessage(ANTMessage::open(number)); // lets go back to allowing anything
@@ -758,7 +758,7 @@ void ANTChannel::attemptTransition(int message_id)
 }
 
 // set channel timeout
-int ANTChannel::setTimeout(int seconds)
+void ANTChannel::setTimeout(int seconds)
 {
     parent->sendMessage(ANTMessage::setSearchTimeout(number, seconds/2.5));
 }
