@@ -319,7 +319,7 @@ Serial::name() const
 
 bool
 Serial::setBaudRate(int speed, QString &err)
-{
+{   Q_UNUSED(speed); Q_UNUSED(err);
     /* not yet implemented
 
     struct termios tty;
@@ -328,6 +328,7 @@ Serial::setBaudRate(int speed, QString &err)
         assert(0);
     }
     */
+    return false;
 }
 
 #ifndef Q_OS_WIN32
