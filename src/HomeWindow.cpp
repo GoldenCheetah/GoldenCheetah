@@ -18,6 +18,7 @@
 
 
 #include "HomeWindow.h"
+#include "LTMTool.h"
 #include "LTMSettings.h"
 #include "Settings.h"
 
@@ -254,7 +255,7 @@ qDebug()<<"removing from layouts!";
 void
 HomeWindow::rightClick(const QPoint & /*pos*/)
 {
-    QMenu chartMenu("Add Chart");
+    QMenu chartMenu(tr("Add Chart"));
     unsigned int mask;
     // called when chart menu about to be shown
     // setup to only show charts that are relevant
@@ -264,7 +265,7 @@ HomeWindow::rightClick(const QPoint & /*pos*/)
     if (mainWindow->currentWindow == mainWindow->diaryWindow) mask = VIEW_DIARY;
     if (mainWindow->currentWindow == mainWindow->homeWindow) mask = VIEW_HOME;
 
-    chartMenu.addAction("Add Chart.."); // "kind of" a title... :)
+    chartMenu.addAction(tr("Add Chart..")); // "kind of" a title... :)
     for(int i=0; GcWindows[i].relevance; i++) {
         if (GcWindows[i].relevance & mask) 
             chartMenu.addAction(GcWindows[i].name);
@@ -1237,7 +1238,7 @@ GcWindowDialog::GcWindowDialog(GcWinID type, MainWindow *mainWindow) : mainWindo
 {
     //setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-    setWindowTitle("Chart Setup");
+    setWindowTitle(tr("Chart Setup"));
     setMinimumHeight(500);
     setMinimumWidth(800);
     setWindowModality(Qt::ApplicationModal);
@@ -1264,8 +1265,8 @@ GcWindowDialog::GcWindowDialog(GcWinID type, MainWindow *mainWindow) : mainWindo
     width->setSingleStep(1);
     width->setValue(2);
 
-    controlLayout->addRow(new QLabel("Height Factor",this), height);
-    controlLayout->addRow(new QLabel("Width Factor",this), width);
+    controlLayout->addRow(new QLabel(tr("Height Factor"),this), height);
+    controlLayout->addRow(new QLabel(tr("Width Factor"),this), width);
     if (win->controls()) controlLayout->addRow(win->controls());
     layout->addLayout(controlLayout);
 
@@ -1281,8 +1282,8 @@ GcWindowDialog::GcWindowDialog(GcWinID type, MainWindow *mainWindow) : mainWindo
     mainLayout->addLayout(buttons);
 
     buttons->addStretch();
-    buttons->addWidget((cancel=new QPushButton("Cancel", this)));
-    buttons->addWidget((ok=new QPushButton("OK", this)));
+    buttons->addWidget((cancel=new QPushButton(tr("Cancel"), this)));
+    buttons->addWidget((ok=new QPushButton(tr("OK"), this)));
 
     connect(ok, SIGNAL(clicked()), this, SLOT(okClicked()));
     connect(cancel, SIGNAL(clicked()), this, SLOT(cancelClicked()));
@@ -1440,6 +1441,8 @@ HomeWindow::restoreState(bool useDefault)
 
     // parse and instantiate the charts
     xmlReader.parse(source);
+    // translate the titles
+    translateChartTitles(handler.charts);
 
     // layout the results
     styleChanged(handler.style);
@@ -1536,4 +1539,42 @@ bool ViewParser::endDocument()
 void HomeWindow::closeWindow(GcWindow*thisone)
 {
     if (charts.contains(thisone)) removeChart(charts.indexOf(thisone));
+}
+
+void HomeWindow::translateChartTitles(QList<GcWindow*> charts)
+{
+    // Map default (english) title to external (Localized) name, new default
+    // charts in *layout.xml need to be added to this list to be translated
+    QMap<QString, QString> titleMap;
+    titleMap.insert("Activity Log", tr("Activity Log"));
+    titleMap.insert("Aerobic Power", tr("Aerobic Power"));
+    titleMap.insert("Anaerobic Power", tr("Anaerobic Power"));
+    titleMap.insert("Cadence", tr("Cadence"));
+    titleMap.insert("Calendar", tr("Calendar"));
+    titleMap.insert("CP", tr("CP"));
+    titleMap.insert("Details", tr("Details"));
+    titleMap.insert("Distance", tr("Distance"));
+    titleMap.insert("Edit", tr("Edit"));
+    titleMap.insert("Elapsed Time", tr("Elapsed Time"));
+    titleMap.insert("Heartrate", tr("Heartrate"));
+    titleMap.insert("Lap", tr("Lap"));
+    titleMap.insert("Map", tr("Map"));
+    titleMap.insert("Performance", tr("Performance"));
+    titleMap.insert("PMC", tr("PMC"));
+    titleMap.insert("Power", tr("Power"));
+    titleMap.insert("QA", tr("QA"));
+    titleMap.insert("Ride", tr("Ride"));
+    titleMap.insert("Speed", tr("Speed"));
+    titleMap.insert("Summary", tr("Summary"));
+    titleMap.insert("Target Power", tr("Target Power"));
+    titleMap.insert("Time and Distance", tr("Time and Distance"));
+    titleMap.insert("Time In Zone", tr("Time In Zone"));
+    titleMap.insert("Training Mix", tr("Training Mix"));
+    titleMap.insert("W/kg", tr("W/kg"));
+    titleMap.insert("Workout", tr("Workout"));
+
+    foreach(GcWindow *chart, charts) {
+        QString chartTitle = chart->property("title").toString();
+        chart->setProperty("title", titleMap.value(chartTitle, chartTitle));
+    }
 }

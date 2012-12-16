@@ -32,8 +32,6 @@ class PeakPower : public RideMetric {
     PeakPower() : watts(0.0), secs(0.0)
     {
         setType(RideMetric::Peak);
-        setMetricUnits(tr("watts"));
-        setImperialUnits(tr("watts"));
     }
     void setSecs(double secs) { this->secs=secs; }
     void compute(const RideFile *ride, const Zones *, int,
@@ -65,6 +63,8 @@ class CriticalPower : public PeakPower {
         }
         void initialize () {
             setName(tr("60 min Peak Power"));
+            setMetricUnits(tr("watts"));
+            setImperialUnits(tr("watts"));
         }
         RideMetric *clone() const { return new CriticalPower(*this); }
 };
@@ -80,6 +80,8 @@ class PeakPower1s : public PeakPower {
         }
         void initialize () {
             setName(tr("1 sec Peak Power"));
+            setMetricUnits(tr("watts"));
+            setImperialUnits(tr("watts"));
         }
         RideMetric *clone() const { return new PeakPower1s(*this); }
 };
@@ -95,6 +97,8 @@ class PeakPower5s : public PeakPower {
         }
         void initialize () {
             setName(tr("5 sec Peak Power"));
+            setMetricUnits(tr("watts"));
+            setImperialUnits(tr("watts"));
         }
         RideMetric *clone() const { return new PeakPower5s(*this); }
 };
@@ -110,6 +114,8 @@ class PeakPower10s : public PeakPower {
         }
         void initialize () {
             setName(tr("10 sec Peak Power"));
+            setMetricUnits(tr("watts"));
+            setImperialUnits(tr("watts"));
         }
         RideMetric *clone() const { return new PeakPower10s(*this); }
 };
@@ -125,6 +131,8 @@ class PeakPower15s : public PeakPower {
         }
         void initialize () {
             setName(tr("15 sec Peak Power"));
+            setMetricUnits(tr("watts"));
+            setImperialUnits(tr("watts"));
         }
         RideMetric *clone() const { return new PeakPower15s(*this); }
 };
@@ -140,6 +148,8 @@ class PeakPower20s : public PeakPower {
         }
         void initialize () {
             setName(tr("20 sec Peak Power"));
+            setMetricUnits(tr("watts"));
+            setImperialUnits(tr("watts"));
         }
         RideMetric *clone() const { return new PeakPower20s(*this); }
 };
@@ -155,6 +165,8 @@ class PeakPower30s : public PeakPower {
         }
         void initialize () {
             setName(tr("30 sec Peak Power"));
+            setMetricUnits(tr("watts"));
+            setImperialUnits(tr("watts"));
         }
         RideMetric *clone() const { return new PeakPower30s(*this); }
 };
@@ -170,6 +182,8 @@ class PeakPower1m : public PeakPower {
         }
         void initialize () {
             setName(tr("1 min Peak Power"));
+            setMetricUnits(tr("watts"));
+            setImperialUnits(tr("watts"));
         }
         RideMetric *clone() const { return new PeakPower1m(*this); }
 };
@@ -185,6 +199,8 @@ class PeakPower5m : public PeakPower {
         }
         void initialize () {
             setName(tr("5 min Peak Power"));
+            setMetricUnits(tr("watts"));
+            setImperialUnits(tr("watts"));
         }
         RideMetric *clone() const { return new PeakPower5m(*this); }
 };
@@ -200,6 +216,8 @@ class PeakPower10m : public PeakPower {
         }
         void initialize () {
             setName(tr("10 min Peak Power"));
+            setMetricUnits(tr("watts"));
+            setImperialUnits(tr("watts"));
         }
         RideMetric *clone() const { return new PeakPower10m(*this); }
 };
@@ -215,6 +233,8 @@ class PeakPower20m : public PeakPower {
         }
         void initialize () {
             setName(tr("20 min Peak Power"));
+            setMetricUnits(tr("watts"));
+            setImperialUnits(tr("watts"));
         }
         RideMetric *clone() const { return new PeakPower20m(*this); }
 };
@@ -230,6 +250,8 @@ class PeakPower30m : public PeakPower {
         }
         void initialize () {
             setName(tr("30 min Peak Power"));
+            setMetricUnits(tr("watts"));
+            setImperialUnits(tr("watts"));
         }
         RideMetric *clone() const { return new PeakPower30m(*this); }
 };
