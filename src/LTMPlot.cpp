@@ -1102,7 +1102,7 @@ LTMPlot::pointClicked(QwtPlotCurve *curve, int index)
 // start of date range selection
 void
 LTMPlot::pickerAppended(QPoint pos)
-{
+{ Q_UNUSED( pos )
 #if 0 //XXX deprecating using the ltm plot to create a date range for now...
 
     // ony work once we have a chart to do it on
@@ -1175,7 +1175,7 @@ LTMPlot::pickerAppended(QPoint pos)
 // end of date range selection
 void
 LTMPlot::pickerMoved(QPoint pos)
-{
+{ Q_UNUSED( pos )
 #if 0
     if (settings == NULL || settings->groupBy == LTM_TOD) return;
 

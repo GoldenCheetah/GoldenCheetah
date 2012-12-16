@@ -364,7 +364,7 @@ HomeWindow::rideSelected()
 
 void
 HomeWindow::dateRangeChanged(DateRange dr)
-{
+{ Q_UNUSED( dr )
     if (amVisible()) {
 
         for (int i=0; i < charts.count(); i++) {
@@ -884,7 +884,6 @@ HomeWindow::eventFilter(QObject *object, QEvent *e)
         }
     } else if (e->type() == QEvent::MouseButtonPress) {
 
-        int x = ((QMouseEvent*)(e))->pos().x();
         int y = ((QMouseEvent*)(e))->pos().y();
 
         if (y<=15) {

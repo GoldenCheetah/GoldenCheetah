@@ -156,7 +156,7 @@ class ANTChannel : public QObject {
         void setId();
         void requestCalibrate();
         void attemptTransition(int message_code);
-        int setTimeout(int seconds);
+        void setTimeout(int seconds);
 
         // telemetry for this channel
         double channelValue() { return value; }

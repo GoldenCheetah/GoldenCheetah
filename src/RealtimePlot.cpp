@@ -50,7 +50,7 @@ QRectF RealtimePwrData::boundingRect() const
 // 30 second Power rolling avg
 double Realtime30PwrData::x(size_t i) const { return i ? 0 : MAXSAMPLES; }
 
-double Realtime30PwrData::y(size_t i) const { double pwr30=0; for (int x=0; x<150; x++) { pwr30+=pwrData[x]; } pwr30 /= 150; return pwr30; }
+double Realtime30PwrData::y(size_t /*i*/) const { double pwr30=0; for (int x=0; x<150; x++) { pwr30+=pwrData[x]; } pwr30 /= 150; return pwr30; }
 size_t Realtime30PwrData::size() const { return 150; }
 //QwtSeriesData *Realtime30PwrData::copy() const { return new Realtime30PwrData(const_cast<Realtime30PwrData*>(this)); }
 void Realtime30PwrData::init() { pwrCur=0; for (int i=0; i<150; i++) pwrData[i]=0; }
