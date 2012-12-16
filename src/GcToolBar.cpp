@@ -42,6 +42,14 @@ GcToolBar::addAction(QAction *a)
 }
 
 void
+GcToolBar::select(int index)
+{
+    foreach(GcToolButton *p, buttons) p->selected = false;
+    buttons[index]->selected = true;
+    repaint();
+}
+
+void
 GcToolBar::addStretch()
 {
     layout->addStretch();

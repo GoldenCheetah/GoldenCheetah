@@ -58,6 +58,7 @@ public slots:
     void addAction(QAction *);
     void addWidget(QWidget *); // any widget but doesn't toggle selection
     void addStretch();
+    void select(int index);
 
 private:
     QHBoxLayout *layout;

@@ -1418,6 +1418,11 @@ MainWindow::selectAnalysis()
     trainTool->getToolbarButtons()->hide();
 #ifndef Q_OS_MAC
     analButtons->show();
+#ifdef GC_HAVE_ICAL
+    toolbar->select(2);
+#else
+    toolbar->select(1);
+#endif
 #else
     scopebar->selected(2);
 #endif
@@ -1435,6 +1440,11 @@ MainWindow::selectTrain()
     trainTool->getToolbarButtons()->show();
 #ifndef Q_OS_MAC
     analButtons->hide();
+#ifdef GC_HAVE_ICAL
+    toolbar->select(3);
+#else
+    toolbar->select(2);
+#endif
 #else
     scopebar->selected(3);
 #endif
@@ -1452,6 +1462,7 @@ MainWindow::selectDiary()
     trainTool->getToolbarButtons()->hide();
 #ifndef Q_OS_MAC
     analButtons->hide();
+    toolbar->select(1);
 #else
     scopebar->selected(1);
 #endif
@@ -1470,6 +1481,7 @@ MainWindow::selectHome()
     trainTool->getToolbarButtons()->hide();
 #ifndef Q_OS_MAC
     analButtons->hide();
+    toolbar->select(0);
 #else
     scopebar->selected(0);
 #endif
