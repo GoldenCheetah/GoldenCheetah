@@ -96,12 +96,8 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
     settings.ltmTool = ltmTool;
     settings.data = NULL;
     settings.groupBy = LTM_DAY;
-    settings.legend = true;
-    if (appsettings->value(this, GC_SHADEZONES, true).toBool()==true)
-        settings.shadeZones = true;
-    else
-        settings.shadeZones = false;
-
+    settings.legend = ltmTool->showLegend->isChecked();
+    settings.shadeZones = ltmTool->shadeZones->isChecked();
     cl->addWidget(ltmTool);
 
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
