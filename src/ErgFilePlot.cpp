@@ -347,7 +347,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
 }
 
 void
-ErgFilePlot::setNow(long msecs)
+ErgFilePlot::setNow(long /*msecs*/)
 {
     replot(); // and update
 }
