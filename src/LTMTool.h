@@ -58,6 +58,7 @@ class LTMTool : public QWidget
         QString metricName(QTreeWidgetItem *);
         QString metricSymbol(QTreeWidgetItem *);
         MetricDetail metricDetails(QTreeWidgetItem *);
+        MetricDetail* metricDetails(QString symbol);
         void selectMetric(QString symbol);
 
         // allow others to create and update season structures

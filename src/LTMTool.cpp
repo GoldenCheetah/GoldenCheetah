@@ -945,19 +945,16 @@ LTMTool::translateDefaultCharts(QList<LTMSettings>&charts)
     for(int i=0; i<charts.count(); i++) {
         // Replace chart name for localized version, default to english name
         charts[i].name = chartNameMap.value(charts[i].name, charts[i].name);
-        // For each metric in chart
-        for (int j=0; j<charts[i].metrics.count(); j++) {
-            if (charts[i].metrics[j].uname == charts[i].metrics[j].name) {
-                // Default uname
-                for (int k=0; k<metrics.count(); k++) // Look in metrics list
-                    if (metrics[k].symbol == charts[i].metrics[j].symbol) {
-                        // Replace with default translated values
-                        charts[i].metrics[j].name = metrics[k].name;
-                        charts[i].metrics[j].uname = metrics[k].uname;
-                        charts[i].metrics[j].uunits = metrics[k].uunits;
-                        break;
-                    }
-            }
-        }
     }
+}
+
+// metricDetails gives access to the metric details catalog by symbol
+// enables translation of metrics names and units in LTMPlot
+MetricDetail*
+LTMTool::metricDetails(QString symbol)
+{
+    for(int i = 0; i < metrics.count(); i++)
+        if (metrics[i].symbol == symbol)
+            return &metrics[i];
+    return NULL;
 }
