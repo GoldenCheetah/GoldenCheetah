@@ -999,12 +999,12 @@
     <message>
         <location filename="../ChartSettings.cpp" line="26"/>
         <source>Chart Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Propiedades del Gráfico</translation>
     </message>
     <message>
         <location filename="../ChartSettings.cpp" line="41"/>
         <source>Done</source>
-        <translation type="unfinished">Listo</translation>
+        <translation>Listo</translation>
     </message>
 </context>
 <context>
@@ -1549,13 +1549,15 @@ Puede demorar.
 <context>
     <name>CriticalPower</name>
     <message>
-        <location filename="../PeakPower.cpp" line="67"/>
+        <location filename="../PeakPower.cpp" line="65"/>
         <source>60 min Peak Power</source>
         <translation>Potencia Máx. 60 min</translation>
     </message>
     <message>
+        <location filename="../PeakPower.cpp" line="66"/>
+        <location filename="../PeakPower.cpp" line="67"/>
         <source>watts</source>
-        <translation type="obsolete">vatios</translation>
+        <translation type="unfinished">vatios</translation>
     </message>
 </context>
 <context>
@@ -3054,14 +3056,42 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../GoldenCheetah.cpp" line="41"/>
         <source>Chart Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Propiedades de Gráfico</translation>
     </message>
     <message>
         <location filename="../GoldenCheetah.cpp" line="42"/>
         <location filename="../GoldenCheetah.cpp" line="178"/>
         <location filename="../GoldenCheetah.cpp" line="213"/>
         <source>Close</source>
-        <translation type="unfinished">Cerrar</translation>
+        <translation>Cerrar</translation>
+    </message>
+</context>
+<context>
+    <name>GcWindowDialog</name>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1242"/>
+        <source>Chart Setup</source>
+        <translation>Configuración de Gráfico</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1269"/>
+        <source>Height Factor</source>
+        <translation>Factor de Alto</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1270"/>
+        <source>Width Factor</source>
+        <translation>Factor de Ancho</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1286"/>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1287"/>
+        <source>OK</source>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -3364,14 +3394,154 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
 <context>
     <name>HomeWindow</name>
     <message>
-        <location filename="../HomeWindow.cpp" line="713"/>
-        <source>Are you sure you want to remove the chart?</source>
+        <location filename="../HomeWindow.cpp" line="258"/>
+        <source>Add Chart</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="268"/>
+        <source>Add Chart..</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../HomeWindow.cpp" line="714"/>
+        <source>Are you sure you want to remove the chart?</source>
+        <translation>Confirma elminación del gráfico?</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="715"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1550"/>
+        <source>Activity Log</source>
+        <translation>Registro de Actividades</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1551"/>
+        <source>Aerobic Power</source>
+        <translation>Potencia Aeróbica</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1552"/>
+        <source>Anaerobic Power</source>
+        <translation>Potencia Anaeróbica</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1553"/>
+        <source>Cadence</source>
+        <translation>Cadencia</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1554"/>
+        <source>Calendar</source>
+        <translation>Calendario</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1555"/>
+        <source>CP</source>
+        <translation>PC</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1556"/>
+        <source>Details</source>
+        <translation>Detalles</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1557"/>
+        <source>Distance</source>
+        <translation>Distancia</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1558"/>
+        <source>Edit</source>
+        <translation>Editar</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1559"/>
+        <source>Elapsed Time</source>
+        <translation>Tiempo Transcurrido</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1560"/>
+        <source>Heartrate</source>
+        <translation>Frec. Cardíaca</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1561"/>
+        <source>Lap</source>
+        <translation>Vuelta</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1562"/>
+        <source>Map</source>
+        <translation>Mapa</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1563"/>
+        <source>Performance</source>
+        <translation>Rendimiento</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1564"/>
+        <source>PMC</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1565"/>
+        <source>Power</source>
+        <translation>Potencia</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1566"/>
+        <source>QA</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1567"/>
+        <source>Ride</source>
+        <translation>Gráfico</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1568"/>
+        <source>Speed</source>
+        <translation>Velocidad</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1569"/>
+        <source>Summary</source>
+        <translation>Resúmen</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1570"/>
+        <source>Target Power</source>
+        <translation>Potencia Objectivo</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1571"/>
+        <source>Time and Distance</source>
+        <translation>Tiempo y Distancia</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1572"/>
+        <source>Time In Zone</source>
+        <translation>Tiempo por Zonas</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1573"/>
+        <source>Training Mix</source>
+        <translation>Mezcla de Entrenamiento</translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1574"/>
+        <source>W/kg</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../HomeWindow.cpp" line="1575"/>
+        <source>Workout</source>
+        <translation>Entrenamiento</translation>
     </message>
 </context>
 <context>
@@ -5676,7 +5846,7 @@ Elapsed: %1
     <message>
         <location filename="../ConfigDialog.cpp" line="289"/>
         <source>Summary</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Resúmen</translation>
     </message>
     <message>
         <location filename="../ConfigDialog.cpp" line="290"/>
@@ -6430,58 +6600,64 @@ Do you want to continue?</source>
 <context>
     <name>PeakPower</name>
     <message>
-        <location filename="../PeakPower.cpp" line="35"/>
-        <location filename="../PeakPower.cpp" line="36"/>
         <source>watts</source>
-        <translation type="unfinished">vatios</translation>
+        <translation type="obsolete">vatios</translation>
     </message>
 </context>
 <context>
     <name>PeakPower10m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="202"/>
+        <location filename="../PeakPower.cpp" line="218"/>
         <source>10 min Peak Power</source>
         <translation>Potencia Máx. 10 min</translation>
     </message>
     <message>
+        <location filename="../PeakPower.cpp" line="219"/>
+        <location filename="../PeakPower.cpp" line="220"/>
         <source>watts</source>
-        <translation type="obsolete">vatios</translation>
+        <translation type="unfinished">vatios</translation>
     </message>
 </context>
 <context>
     <name>PeakPower10s</name>
     <message>
-        <location filename="../PeakPower.cpp" line="112"/>
+        <location filename="../PeakPower.cpp" line="116"/>
         <source>10 sec Peak Power</source>
         <translation>Potencia Máx. 10 seg</translation>
     </message>
     <message>
+        <location filename="../PeakPower.cpp" line="117"/>
+        <location filename="../PeakPower.cpp" line="118"/>
         <source>watts</source>
-        <translation type="obsolete">vatios</translation>
+        <translation type="unfinished">vatios</translation>
     </message>
 </context>
 <context>
     <name>PeakPower15s</name>
     <message>
-        <location filename="../PeakPower.cpp" line="127"/>
+        <location filename="../PeakPower.cpp" line="133"/>
         <source>15 sec Peak Power</source>
         <translation>Potencia Máx. 15 seg</translation>
     </message>
     <message>
+        <location filename="../PeakPower.cpp" line="134"/>
+        <location filename="../PeakPower.cpp" line="135"/>
         <source>watts</source>
-        <translation type="obsolete">vatios</translation>
+        <translation type="unfinished">vatios</translation>
     </message>
 </context>
 <context>
     <name>PeakPower1m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="172"/>
+        <location filename="../PeakPower.cpp" line="184"/>
         <source>1 min Peak Power</source>
         <translation>Potencia Máx. 1 min</translation>
     </message>
     <message>
+        <location filename="../PeakPower.cpp" line="185"/>
+        <location filename="../PeakPower.cpp" line="186"/>
         <source>watts</source>
-        <translation type="obsolete">vatios</translation>
+        <translation type="unfinished">vatios</translation>
     </message>
 </context>
 <context>
@@ -6492,92 +6668,106 @@ Do you want to continue?</source>
         <translation>Potencia Máx. 1 seg</translation>
     </message>
     <message>
+        <location filename="../PeakPower.cpp" line="83"/>
+        <location filename="../PeakPower.cpp" line="84"/>
         <source>watts</source>
-        <translation type="obsolete">vatios</translation>
+        <translation type="unfinished">vatios</translation>
     </message>
 </context>
 <context>
     <name>PeakPower20m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="217"/>
+        <location filename="../PeakPower.cpp" line="235"/>
         <source>20 min Peak Power</source>
         <translation>Potencia Máx. 20 min</translation>
     </message>
     <message>
+        <location filename="../PeakPower.cpp" line="236"/>
+        <location filename="../PeakPower.cpp" line="237"/>
         <source>watts</source>
-        <translation type="obsolete">vatios</translation>
+        <translation type="unfinished">vatios</translation>
     </message>
 </context>
 <context>
     <name>PeakPower20s</name>
     <message>
-        <location filename="../PeakPower.cpp" line="142"/>
+        <location filename="../PeakPower.cpp" line="150"/>
         <source>20 sec Peak Power</source>
         <translation>Potencia Máx. 20 seg</translation>
     </message>
     <message>
+        <location filename="../PeakPower.cpp" line="151"/>
+        <location filename="../PeakPower.cpp" line="152"/>
         <source>watts</source>
-        <translation type="obsolete">vatios</translation>
+        <translation type="unfinished">vatios</translation>
     </message>
 </context>
 <context>
     <name>PeakPower30m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="232"/>
+        <location filename="../PeakPower.cpp" line="252"/>
         <source>30 min Peak Power</source>
         <translation>Potencia Máx. 30 min</translation>
     </message>
     <message>
+        <location filename="../PeakPower.cpp" line="253"/>
+        <location filename="../PeakPower.cpp" line="254"/>
         <source>watts</source>
-        <translation type="obsolete">vatios</translation>
+        <translation type="unfinished">vatios</translation>
     </message>
 </context>
 <context>
     <name>PeakPower30s</name>
     <message>
-        <location filename="../PeakPower.cpp" line="157"/>
+        <location filename="../PeakPower.cpp" line="167"/>
         <source>30 sec Peak Power</source>
         <translation>Potencia Máx. 30 seg</translation>
     </message>
     <message>
+        <location filename="../PeakPower.cpp" line="168"/>
+        <location filename="../PeakPower.cpp" line="169"/>
         <source>watts</source>
-        <translation type="obsolete">vatios</translation>
+        <translation type="unfinished">vatios</translation>
     </message>
 </context>
 <context>
     <name>PeakPower5m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="187"/>
+        <location filename="../PeakPower.cpp" line="201"/>
         <source>5 min Peak Power</source>
         <translation>Potencia Máx. 5 min</translation>
     </message>
     <message>
+        <location filename="../PeakPower.cpp" line="202"/>
+        <location filename="../PeakPower.cpp" line="203"/>
         <source>watts</source>
-        <translation type="obsolete">vatios</translation>
+        <translation type="unfinished">vatios</translation>
     </message>
 </context>
 <context>
     <name>PeakPower5s</name>
     <message>
-        <location filename="../PeakPower.cpp" line="97"/>
+        <location filename="../PeakPower.cpp" line="99"/>
         <source>5 sec Peak Power</source>
         <translation>Potencia Máx. 5 seg</translation>
     </message>
     <message>
+        <location filename="../PeakPower.cpp" line="100"/>
+        <location filename="../PeakPower.cpp" line="101"/>
         <source>watts</source>
-        <translation type="obsolete">vatios</translation>
+        <translation type="unfinished">vatios</translation>
     </message>
 </context>
 <context>
     <name>PeakPowerHr10m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="324"/>
+        <location filename="../PeakPower.cpp" line="346"/>
         <source>10 min Peak Power HR</source>
         <translation>FC en Potencia Máx.10 min</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="325"/>
-        <location filename="../PeakPower.cpp" line="326"/>
+        <location filename="../PeakPower.cpp" line="347"/>
+        <location filename="../PeakPower.cpp" line="348"/>
         <source>bpm</source>
         <translation>ppm</translation>
     </message>
@@ -6585,13 +6775,13 @@ Do you want to continue?</source>
 <context>
     <name>PeakPowerHr1m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="288"/>
+        <location filename="../PeakPower.cpp" line="310"/>
         <source>1 min Peak Power HR</source>
         <translation>FC en Potencia Máx. 1 min</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="289"/>
-        <location filename="../PeakPower.cpp" line="290"/>
+        <location filename="../PeakPower.cpp" line="311"/>
+        <location filename="../PeakPower.cpp" line="312"/>
         <source>bpm</source>
         <translation>ppm</translation>
     </message>
@@ -6599,13 +6789,13 @@ Do you want to continue?</source>
 <context>
     <name>PeakPowerHr20m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="342"/>
+        <location filename="../PeakPower.cpp" line="364"/>
         <source>20 min Peak Power HR</source>
         <translation>FC en Potencia Máx. 20 min</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="343"/>
-        <location filename="../PeakPower.cpp" line="344"/>
+        <location filename="../PeakPower.cpp" line="365"/>
+        <location filename="../PeakPower.cpp" line="366"/>
         <source>bpm</source>
         <translation>ppm</translation>
     </message>
@@ -6613,13 +6803,13 @@ Do you want to continue?</source>
 <context>
     <name>PeakPowerHr30m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="360"/>
+        <location filename="../PeakPower.cpp" line="382"/>
         <source>30 min Peak Power HR</source>
         <translation>FC en Potencia Máx. 30 min</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="361"/>
-        <location filename="../PeakPower.cpp" line="362"/>
+        <location filename="../PeakPower.cpp" line="383"/>
+        <location filename="../PeakPower.cpp" line="384"/>
         <source>bpm</source>
         <translation>ppm</translation>
     </message>
@@ -6627,13 +6817,13 @@ Do you want to continue?</source>
 <context>
     <name>PeakPowerHr5m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="306"/>
+        <location filename="../PeakPower.cpp" line="328"/>
         <source>5 min Peak Power HR</source>
         <translation>FC en Potencia Máx. 5 min</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="307"/>
-        <location filename="../PeakPower.cpp" line="308"/>
+        <location filename="../PeakPower.cpp" line="329"/>
+        <location filename="../PeakPower.cpp" line="330"/>
         <source>bpm</source>
         <translation>ppm</translation>
     </message>
@@ -6641,13 +6831,13 @@ Do you want to continue?</source>
 <context>
     <name>PeakPowerHr60m</name>
     <message>
-        <location filename="../PeakPower.cpp" line="379"/>
+        <location filename="../PeakPower.cpp" line="401"/>
         <source>60 min Peak Power HR</source>
         <translation>FC en Potencia Máx. 60 min</translation>
     </message>
     <message>
-        <location filename="../PeakPower.cpp" line="380"/>
-        <location filename="../PeakPower.cpp" line="381"/>
+        <location filename="../PeakPower.cpp" line="402"/>
+        <location filename="../PeakPower.cpp" line="403"/>
         <source>bpm</source>
         <translation>ppm</translation>
     </message>
@@ -7082,7 +7272,7 @@ y que muestra la palabra &quot;Host&quot;</translation>
     <message>
         <location filename="../RealtimeData.cpp" line="248"/>
         <source>Lap</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vuelta</translation>
     </message>
     <message>
         <location filename="../RealtimeData.cpp" line="251"/>
@@ -7177,7 +7367,7 @@ y que muestra la palabra &quot;Host&quot;</translation>
     <message>
         <location filename="../RealtimeData.cpp" line="305"/>
         <source>Target Power</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Potencia Objectivo</translation>
     </message>
     <message>
         <location filename="../RealtimeData.cpp" line="308"/>
@@ -8873,7 +9063,7 @@ formato GoldenCheetah. ¿Confirmar?</translation>
     <message>
         <location filename="../SpecialFields.cpp" line="32"/>
         <source>Summary</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Resúmen</translation>
     </message>
     <message>
         <location filename="../SpecialFields.cpp" line="33"/>
@@ -10493,7 +10683,7 @@ Press F3 on Controller when done.</source>
     <message>
         <location filename="../WorkoutWizard.cpp" line="96"/>
         <source>Lap</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vuelta</translation>
     </message>
 </context>
 <context>
