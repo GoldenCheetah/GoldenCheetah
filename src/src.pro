@@ -233,6 +233,7 @@ HEADERS += \
         BinRideFile.h \
         Bin2RideFile.h \
         BingMap.h \
+        BlankState.h \
         CalendarDownload.h \
         ChartSettings.h \
         ChooseCyclistDialog.h \
@@ -423,6 +424,7 @@ SOURCES += \
         BinRideFile.cpp \
         Bin2RideFile.cpp \
         BingMap.cpp \
+        BlankState.cpp \
         CalendarDownload.cpp \
         ChartSettings.cpp \
         ChooseCyclistDialog.cpp \

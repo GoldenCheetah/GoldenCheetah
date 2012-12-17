@@ -33,6 +33,8 @@ public:
     GcScopeBar(QWidget *parent, QWidget *traintool);
     ~GcScopeBar();
 
+    void setEnabledHideButton(bool showHideButton);
+
 public slots:
     void paintEvent (QPaintEvent *event);
 

@@ -21,6 +21,7 @@
 #include "AddIntervalDialog.h"
 #include "AthleteTool.h"
 #include "BestIntervalDialog.h"
+#include "BlankState.h"
 #include "ChooseCyclistDialog.h"
 #include "Colors.h"
 #include "ConfigDialog.h"
@@ -688,6 +689,13 @@ MainWindow::MainWindow(const QDir &home) :
     analysisControls->addWidget(analWindow->controls());
     currentWindow = analWindow;
 
+    // NO RIDE WINDOW - Replace analysis, home and train window when no ride
+    blankStateAnalysisPage = new BlankStateAnalysisPage(this);
+    blankStateHomePage = new BlankStateHomePage(this);
+    blankStateDiaryPage = new BlankStateDiaryPage(this);
+    blankStateTrainPage = new BlankStateTrainPage(this);
+
+
     // POPULATE TOOLBOX
 
     // do controllers after home windows -- they need their first signals caught
@@ -722,7 +730,13 @@ MainWindow::MainWindow(const QDir &home) :
     views->addWidget(diaryWindow);
     views->addWidget(homeWindow);
 
-    views->setCurrentIndex(0);          // default to Analysis
+    // add Blank State pages
+    views->addWidget(blankStateAnalysisPage);
+    views->addWidget(blankStateHomePage);
+    views->addWidget(blankStateDiaryPage);
+    views->addWidget(blankStateTrainPage);
+
+    //views->setCurrentIndex(0);
     views->setContentsMargins(0,0,0,0);
 
 
@@ -906,6 +920,9 @@ MainWindow::MainWindow(const QDir &home) :
     // selects the latest ride in the list:
     if (allRides->childCount() != 0)
         treeWidget->setCurrentItem(allRides->child(allRides->childCount()-1));
+
+    // default to Analysis
+    selectAnalysis();
 
     // now we're up and runnning lets connect the signals
     connect(treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(rideTreeWidgetSelectionChanged()));
@@ -1435,11 +1452,29 @@ MainWindow::helpView()
 void
 MainWindow::selectAnalysis()
 {
-    masterControls->setCurrentIndex(0);
-    views->setCurrentIndex(0);
-    analWindow->selected(); // tell it!
-    currentWindow = analWindow;
-    trainTool->getToolbarButtons()->hide();
+    // No ride - no analysis view
+    if (allRides->childCount() == 0) {
+        masterControls->setVisible(false);
+        toolBox->hide();
+#ifndef Q_OS_MAC
+        side->setEnabled(false);
+#else
+        scopebar->setEnabledHideButton(false);
+#endif
+        views->setCurrentWidget(blankStateAnalysisPage);
+    } else {
+        masterControls->setVisible(true);
+        toolBox->show();
+#ifndef Q_OS_MAC
+        side->setEnabled(true);
+#else
+        scopebar->setEnabledHideButton(true);
+#endif
+        masterControls->setCurrentIndex(0);
+        views->setCurrentIndex(0);
+        analWindow->selected(); // tell it!
+        currentWindow = analWindow;
+        trainTool->getToolbarButtons()->hide();
 #ifndef Q_OS_MAC
     analButtons->show();
 #ifdef GC_HAVE_ICAL
@@ -1448,69 +1483,113 @@ MainWindow::selectAnalysis()
     toolbar->select(1);
 #endif
 #else
-    scopebar->selected(2);
+        scopebar->selected(2);
 #endif
-    toolBox->setCurrentIndex(0);
-    setStyle();
+        toolBox->setCurrentIndex(0);
+        setStyle();
+    }
 }
 
 void
 MainWindow::selectTrain()
 {
-    masterControls->setCurrentIndex(1);
-    views->setCurrentIndex(1);
-    trainWindow->selected(); // tell it!
-    currentWindow = trainWindow;
-    trainTool->getToolbarButtons()->show();
+    if (allRides->childCount() == 0) {
+        masterControls->setVisible(false);
+        toolBox->hide();
 #ifndef Q_OS_MAC
-    analButtons->hide();
-#ifdef GC_HAVE_ICAL
-    toolbar->select(3);
+        side->setEnabled(false);
 #else
-    toolbar->select(2);
+        scopebar->setEnabledHideButton(false);
 #endif
-#else
-    scopebar->selected(3);
-#endif
-    toolBox->setCurrentIndex(2);
-    setStyle();
+        views->setCurrentWidget(blankStateTrainPage);
+    } else {
+        masterControls->setVisible(true);
+        toolBox->show();
+        side->setEnabled(true);
+        masterControls->setCurrentIndex(1);
+        views->setCurrentIndex(1);
+        trainWindow->selected(); // tell it!
+        currentWindow = trainWindow;
+        trainTool->getToolbarButtons()->show();
+    #ifndef Q_OS_MAC
+        analButtons->hide();
+    #ifdef GC_HAVE_ICAL
+        toolbar->select(3);
+    #else
+        toolbar->select(2);
+    #endif
+    #else
+        scopebar->selected(3);
+    #endif
+        toolBox->setCurrentIndex(2);
+        setStyle();
+    }
 }
 
 void
 MainWindow::selectDiary()
 {
-    masterControls->setCurrentIndex(2);
-    views->setCurrentIndex(2);
-    diaryWindow->selected(); // tell it!
-    currentWindow = diaryWindow;
-    trainTool->getToolbarButtons()->hide();
+    if (allRides->childCount() == 0) {
+        masterControls->setVisible(false);
+        toolBox->hide();
 #ifndef Q_OS_MAC
-    analButtons->hide();
-    toolbar->select(1);
+        side->setEnabled(false);
 #else
-    scopebar->selected(1);
+        scopebar->setEnabledHideButton(false);
 #endif
-    toolBox->setCurrentIndex(1);
-    gcCalendar->refresh(); // get that signal with the date range...
-    setStyle();
+        views->setCurrentWidget(blankStateDiaryPage);
+    } else {
+        masterControls->setVisible(true);
+        toolBox->show();
+        side->show();
+        masterControls->setCurrentIndex(2);
+        views->setCurrentIndex(2);
+        diaryWindow->selected(); // tell it!
+        currentWindow = diaryWindow;
+        trainTool->getToolbarButtons()->hide();
+    #ifndef Q_OS_MAC
+        analButtons->hide();
+        toolbar->select(1);
+    #else
+        scopebar->selected(1);
+    #endif
+        toolBox->setCurrentIndex(1);
+        gcCalendar->refresh(); // get that signal with the date range...
+        setStyle();
+    }
 }
 
 void
 MainWindow::selectHome()
 {
-    masterControls->setCurrentIndex(3);
-    views->setCurrentIndex(3);
-    homeWindow->selected(); // tell it!
-    currentWindow = homeWindow;
-    trainTool->getToolbarButtons()->hide();
+    // No ride - no analysis view
+    if (allRides->childCount() == 0) {
+        masterControls->setVisible(false);
+        toolBox->hide();
 #ifndef Q_OS_MAC
-    analButtons->hide();
-    toolbar->select(0);
+        side->setEnabled(false);
 #else
-    scopebar->selected(0);
+        scopebar->setEnabledHideButton(false);
 #endif
-    toolBox->setCurrentIndex(3);
-    setStyle();
+        views->setCurrentWidget(blankStateHomePage);
+    } else {
+        masterControls->setVisible(true);
+        toolBox->show();
+        side->setEnabled(true);
+        masterControls->setCurrentIndex(3);
+        views->setCurrentIndex(3);
+        homeWindow->selected(); // tell it!
+        currentWindow = homeWindow;
+        trainTool->getToolbarButtons()->hide();
+    #ifndef Q_OS_MAC
+        analButtons->hide();
+        toolbar->select(0);
+    #else
+        scopebar->selected(0);
+    #endif
+        toolBox->setCurrentIndex(3);
+        setStyle();
+    }
 }
 void
 MainWindow::selectAthlete()

@@ -70,6 +70,10 @@ class QtMacSegmentedButton;
 class GcScopeBar;
 class RideFileCache;
 class Library;
+class BlankStateAnalysisPage;
+class BlankStateHomePage;
+class BlankStateDiaryPage;
+class BlankStateTrainPage;
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 
@@ -148,6 +152,12 @@ class MainWindow : public QMainWindow
         HomeWindow *trainWindow;
         HomeWindow *analWindow;
         HomeWindow *currentWindow;  // tracks the curerntly showing window
+
+        BlankStateAnalysisPage *blankStateAnalysisPage;
+        BlankStateHomePage *blankStateHomePage;
+        BlankStateDiaryPage *blankStateDiaryPage;
+        BlankStateTrainPage *blankStateTrainPage;
+
         ChartSettings *chartSettings;
 
         // state data
