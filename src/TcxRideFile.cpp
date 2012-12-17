@@ -74,12 +74,12 @@ TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile
 
     // time
     QDomElement id = doc.createElement("Id");
-    text = doc.createTextNode(ride->startTime().toUTC().toString(Qt::ISODate)+"Z");
+    text = doc.createTextNode(ride->startTime().toUTC().toString(Qt::ISODate));
     id.appendChild(text);
     activity.appendChild(id);
 
     QDomElement lap = doc.createElement("Lap");
-    lap.setAttribute("StartTime", ride->startTime().toUTC().toString(Qt::ISODate)+"Z");
+    lap.setAttribute("StartTime", ride->startTime().toUTC().toString(Qt::ISODate));
     activity.appendChild(lap);
 
     const char *metrics[] = {
