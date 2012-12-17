@@ -239,17 +239,33 @@ ErgFilePlot::setData(ErgFile *ergfile)
 
         if (bydist == true) {
 
-            QColor brush_color = QColor(Qt::gray);
-            brush_color.setAlpha(64);
-            LodCurve->setBrush(brush_color);   // fill below the line
+            QColor brush_color1 = QColor(Qt::gray);
+            brush_color1.setAlpha(200);
+            QColor brush_color2 = QColor(Qt::gray);
+            brush_color2.setAlpha(64);
+
+            QLinearGradient linearGradient(0, 0, 0, height());
+            linearGradient.setColorAt(0.0, brush_color1);
+            linearGradient.setColorAt(1.0, brush_color2);
+            linearGradient.setSpread(QGradient::PadSpread);
+
+            LodCurve->setBrush(linearGradient);   // fill below the line
             QPen Lodpen = QPen(Qt::gray, 1.0);
             LodCurve->setPen(Lodpen);
 
         } else {
 
-            QColor brush_color = QColor(Qt::blue);
-            brush_color.setAlpha(64);
-            LodCurve->setBrush(brush_color);   // fill below the line
+            QColor brush_color1 = QColor(Qt::blue);
+            brush_color1.setAlpha(200);
+            QColor brush_color2 = QColor(Qt::blue);
+            brush_color2.setAlpha(64);
+
+            QLinearGradient linearGradient(0, 0, 0, height());
+            linearGradient.setColorAt(0.0, brush_color1);
+            linearGradient.setColorAt(1.0, brush_color2);
+            linearGradient.setSpread(QGradient::PadSpread);
+
+            LodCurve->setBrush(linearGradient);   // fill below the line
             QPen Lodpen = QPen(Qt::blue, 1.0);
             LodCurve->setPen(Lodpen);
 
