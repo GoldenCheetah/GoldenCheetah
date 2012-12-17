@@ -193,3 +193,9 @@ GcScopeBar::showHideClicked()
     emit showSideBar(state);
     setShowSidebar(state);
 }
+
+void
+GcScopeBar::setEnabledHideButton(bool EnableHideButton) {
+    showHide->setEnabled(EnableHideButton);
+}
+
