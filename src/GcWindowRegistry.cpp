@@ -61,39 +61,48 @@
 #define VIEW_DIARY    0x04
 #define VIEW_HOME     0x08
 
-GcWindowRegistry GcWindows[] = {
+// GcWindows initialization is done in initialize method to enable translations
+GcWindowRegistry* GcWindows;
+
+void
+GcWindowRegistry::initialize()
+{
+  static GcWindowRegistry GcWindowsInit[30] = {
     // name                     GcWinID
-    { VIEW_HOME|VIEW_DIARY, "Long Term Metrics",GcWindowTypes::LTM },
-    { VIEW_HOME, "Performance Manager",GcWindowTypes::PerformanceManager },
-    { VIEW_HOME|VIEW_DIARY, "Collection TreeMap",GcWindowTypes::TreeMap },
-    //{ VIEW_HOME,  "Weekly Summary",GcWindowTypes::WeeklySummary },// DEPRECATED
-    { VIEW_HOME|VIEW_DIARY,  "Critical Mean Maximal",GcWindowTypes::CriticalPowerSummary },
-    { VIEW_ANALYSIS, "Activity Summary",GcWindowTypes::RideSummary },
-    { VIEW_ANALYSIS, "Details",GcWindowTypes::MetadataWindow },
-    { VIEW_ANALYSIS, "Summary and Details",GcWindowTypes::Summary },
-    { VIEW_ANALYSIS, "Editor",GcWindowTypes::RideEditor },
-    { VIEW_ANALYSIS,  "Performance",GcWindowTypes::AllPlot },
-    { VIEW_ANALYSIS,  "Critical Mean Maximals",GcWindowTypes::CriticalPower },
-    { VIEW_ANALYSIS,  "Histogram",GcWindowTypes::Histogram },
-    { VIEW_HOME|VIEW_DIARY,  "Distribution",GcWindowTypes::Distribution },
-    { VIEW_ANALYSIS,  "Pedal Force vs Velocity",GcWindowTypes::PfPv },
-    { VIEW_ANALYSIS,  "Heartrate vs Power",GcWindowTypes::HrPw },
-    { VIEW_ANALYSIS,  "Google Map",GcWindowTypes::GoogleMap },
-    { VIEW_ANALYSIS,  "Bing Map",GcWindowTypes::BingMap },
-    { VIEW_ANALYSIS,  "2d Plot",GcWindowTypes::Scatter },
-    { VIEW_ANALYSIS,  "3d Plot",GcWindowTypes::Model },
-    { VIEW_ANALYSIS, "Aerolab Chung Analysis",GcWindowTypes::Aerolab },
-    { VIEW_DIARY, "Calendar",GcWindowTypes::Diary },
-    { VIEW_DIARY, "Navigator", GcWindowTypes::ActivityNavigator },
-    { VIEW_DIARY|VIEW_HOME, "Summary", GcWindowTypes::DateRangeSummary },
-    { VIEW_TRAIN, "Telemetry",GcWindowTypes::DialWindow },
-    { VIEW_TRAIN, "Workout",GcWindowTypes::WorkoutPlot },
-    { VIEW_TRAIN, "Realtime",GcWindowTypes::RealtimePlot },
-    { VIEW_TRAIN, "Pedal Stroke",GcWindowTypes::SpinScanPlot },
-    { VIEW_TRAIN, "Map", GcWindowTypes::MapWindow },
-    { VIEW_TRAIN, "StreetView", GcWindowTypes::StreetViewWindow },
-    { VIEW_TRAIN, "Video Player",GcWindowTypes::VideoPlayer },
+    { VIEW_HOME|VIEW_DIARY, tr("Long Term Metrics"),GcWindowTypes::LTM },
+    { VIEW_HOME, tr("Performance Manager"),GcWindowTypes::PerformanceManager },
+    { VIEW_HOME|VIEW_DIARY, tr("Collection TreeMap"),GcWindowTypes::TreeMap },
+    //{ VIEW_HOME, tr("Weekly Summary"),GcWindowTypes::WeeklySummary },// DEPRECATED
+    { VIEW_HOME|VIEW_DIARY,  tr("Critical Mean Maximal"),GcWindowTypes::CriticalPowerSummary },
+    { VIEW_ANALYSIS, tr("Activity Summary"),GcWindowTypes::RideSummary },
+    { VIEW_ANALYSIS, tr("Details"),GcWindowTypes::MetadataWindow },
+    { VIEW_ANALYSIS, tr("Summary and Details"),GcWindowTypes::Summary },
+    { VIEW_ANALYSIS, tr("Editor"),GcWindowTypes::RideEditor },
+    { VIEW_ANALYSIS, tr("Performance"),GcWindowTypes::AllPlot },
+    { VIEW_ANALYSIS, tr("Critical Mean Maximals"),GcWindowTypes::CriticalPower },
+    { VIEW_ANALYSIS, tr("Histogram"),GcWindowTypes::Histogram },
+    { VIEW_HOME|VIEW_DIARY, tr("Distribution"),GcWindowTypes::Distribution },
+    { VIEW_ANALYSIS, tr("Pedal Force vs Velocity"),GcWindowTypes::PfPv },
+    { VIEW_ANALYSIS, tr("Heartrate vs Power"),GcWindowTypes::HrPw },
+    { VIEW_ANALYSIS, tr("Google Map"),GcWindowTypes::GoogleMap },
+    { VIEW_ANALYSIS, tr("Bing Map"),GcWindowTypes::BingMap },
+    { VIEW_ANALYSIS, tr("2d Plot"),GcWindowTypes::Scatter },
+    { VIEW_ANALYSIS, tr("3d Plot"),GcWindowTypes::Model },
+    { VIEW_ANALYSIS, tr("Aerolab Chung Analysis"),GcWindowTypes::Aerolab },
+    { VIEW_DIARY, tr("Calendar"),GcWindowTypes::Diary },
+    { VIEW_DIARY, tr("Navigator"), GcWindowTypes::ActivityNavigator },
+    { VIEW_DIARY|VIEW_HOME, tr("Summary"), GcWindowTypes::DateRangeSummary },
+    { VIEW_TRAIN, tr("Telemetry"),GcWindowTypes::DialWindow },
+    { VIEW_TRAIN, tr("Workout"),GcWindowTypes::WorkoutPlot },
+    { VIEW_TRAIN, tr("Realtime"),GcWindowTypes::RealtimePlot },
+    { VIEW_TRAIN, tr("Pedal Stroke"),GcWindowTypes::SpinScanPlot },
+    { VIEW_TRAIN, tr("Map"), GcWindowTypes::MapWindow },
+    { VIEW_TRAIN, tr("StreetView"), GcWindowTypes::StreetViewWindow },
+    { VIEW_TRAIN, tr("Video Player"),GcWindowTypes::VideoPlayer },
     { 0, "", GcWindowTypes::None }};
+  // initialize the global registry
+  GcWindows = GcWindowsInit;
+}
 
 // instantiate a new window
 GcWindow *

@@ -29,7 +29,7 @@
     <message>
         <location filename="../AboutDialog.cpp" line="69"/>
         <source>&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;TSS, NP, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</source>
-        <translation></translation>
+        <translation>&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Programa de Análisis de Potencia en Ciclismo&lt;br&gt;par Linux, Mac, y Windows&lt;p&gt;GoldenCheetah es licenciado bajo la &lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;Licencia Pública General GNU&lt;/a&gt;.&lt;p&gt;El código fuente se puede obtener desde&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Los Archivos de Actividades y otros datos se almacenan en&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Marcas Registradas usadas con permiso&lt;br&gt;TSS, NP, IF cortesía de &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower cortesía de &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed cortesía de Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</translation>
     </message>
 </context>
 <context>
@@ -50,7 +50,7 @@
     <message>
         <location filename="../AddDeviceWizard.cpp" line="44"/>
         <source>Add Device Wizard</source>
-        <translation>Agregar Asistente de Dispositivos</translation>
+        <translation>Asistente para Agregar Dispositivos</translation>
     </message>
 </context>
 <context>
@@ -1419,7 +1419,7 @@ Puede demorar.
     <message>
         <location filename="../Pages.cpp" line="310"/>
         <source>Golden Cheetah Racing</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="315"/>
@@ -1428,7 +1428,7 @@ Puede demorar.
         <location filename="../Pages.cpp" line="355"/>
         <location filename="../Pages.cpp" line="362"/>
         <source>Website</source>
-        <translation type="unfinished"></translation>
+        <translation>Sitio Web</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="316"/>
@@ -1437,7 +1437,7 @@ Puede demorar.
         <location filename="../Pages.cpp" line="343"/>
         <location filename="../Pages.cpp" line="349"/>
         <source>Username</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre Usuario</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="317"/>
@@ -1447,102 +1447,102 @@ Puede demorar.
         <location filename="../Pages.cpp" line="350"/>
         <location filename="../Pages.cpp" line="364"/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Clave</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="319"/>
         <source>TrainingPeaks</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="325"/>
         <source>Account Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo de Cuenta</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="327"/>
         <source>Twitter</source>
-        <translation type="unfinished">Twitter</translation>
+        <translation>Twitter</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="331"/>
         <source>Authorise</source>
-        <translation type="unfinished"></translation>
+        <translation>Autorizar</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="332"/>
         <source>PIN</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="334"/>
         <source>Strava</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="340"/>
         <source>RideWithGPS</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="346"/>
         <source>Trainingstagebuch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="352"/>
         <source>Withings Wifi Scales</source>
-        <translation type="unfinished"></translation>
+        <translation>Balancas Withings WiFi</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="356"/>
         <source>User Id</source>
-        <translation type="unfinished"></translation>
+        <translation>Id Usuario</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="357"/>
         <source>Public Key</source>
-        <translation type="unfinished"></translation>
+        <translation>Clave Pública</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="359"/>
         <source>Zeo Sleep Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Datos Sueño Zeo</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="363"/>
         <source>User</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuario</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="367"/>
         <source>Web Calendar</source>
-        <translation type="unfinished"></translation>
+        <translation>Calendario Web</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="369"/>
         <source>Webcal URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL Webcal</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="371"/>
         <source>CalDAV Calendar</source>
-        <translation type="unfinished"></translation>
+        <translation>Calendario CalDAV</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="373"/>
         <source>CalDAV URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL CalDAV</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="374"/>
         <source>CalDAV User Id</source>
-        <translation type="unfinished"></translation>
+        <translation>Id Usuario CalDAV</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="375"/>
         <source>CalDAV Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Clave CalDAV</translation>
     </message>
 </context>
 <context>
@@ -3144,6 +3144,154 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     </message>
 </context>
 <context>
+    <name>GcWindowRegistry</name>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="73"/>
+        <source>Long Term Metrics</source>
+        <translation>Métricas de Largo Plazo</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="74"/>
+        <source>Performance Manager</source>
+        <translation>Administrador del Rendimiento</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="75"/>
+        <source>Collection TreeMap</source>
+        <translation>Mapa Arborescente</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="77"/>
+        <source>Critical Mean Maximal</source>
+        <translation>Media Máxima Crítica</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="78"/>
+        <source>Activity Summary</source>
+        <translation>Resúmen de Actividad</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="79"/>
+        <source>Details</source>
+        <translation>Detalles</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="80"/>
+        <source>Summary and Details</source>
+        <translation>Resúmen y Detalles</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="81"/>
+        <source>Editor</source>
+        <translation>Editor</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="82"/>
+        <source>Performance</source>
+        <translation>Rendimiento</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="83"/>
+        <source>Critical Mean Maximals</source>
+        <translation>Medias Máximas Críticas</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="84"/>
+        <source>Histogram</source>
+        <translation>Histograma</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="85"/>
+        <source>Distribution</source>
+        <translation>Distribución</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="86"/>
+        <source>Pedal Force vs Velocity</source>
+        <translation>Fuerza vs Velocidad</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="87"/>
+        <source>Heartrate vs Power</source>
+        <translation>FC vs Potencia</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="88"/>
+        <source>Google Map</source>
+        <translation>Mapa Google</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="89"/>
+        <source>Bing Map</source>
+        <translation>Mapa Bing</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="90"/>
+        <source>2d Plot</source>
+        <translation>Gráfico 2d</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="91"/>
+        <source>3d Plot</source>
+        <translation>Gráfico 3d</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="92"/>
+        <source>Aerolab Chung Analysis</source>
+        <translation>Análisis Chung Aerolab</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="93"/>
+        <source>Calendar</source>
+        <translation>Calendario</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="94"/>
+        <source>Navigator</source>
+        <translation>Navegador</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="95"/>
+        <source>Summary</source>
+        <translation>Resúmen</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="96"/>
+        <source>Telemetry</source>
+        <translation>Telemetría</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="97"/>
+        <source>Workout</source>
+        <translation>Entrenamiento</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="98"/>
+        <source>Realtime</source>
+        <translation>Tiempo Real</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="99"/>
+        <source>Pedal Stroke</source>
+        <translation>Pedaleada</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="100"/>
+        <source>Map</source>
+        <translation>Mapa</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="101"/>
+        <source>StreetView</source>
+        <translation>Vista de la calle</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="102"/>
+        <source>Video Player</source>
+        <translation>Video Reproductor</translation>
+    </message>
+</context>
+<context>
     <name>GcWindowTool</name>
     <message>
         <location filename="../GcWindowTool.cpp" line="42"/>
@@ -3216,7 +3364,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../Pages.cpp" line="145"/>
         <source>Use Garmin Smart Recording</source>
-        <translation>Usar Registro Inteligente de Garmin</translation>
+        <translation>Usar Garmin Smart Recording</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="151"/>
@@ -3246,22 +3394,22 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../Pages.cpp" line="188"/>
         <source>Elevation hysteresis (meters):</source>
-        <translation>Histéresis para Altimetría (metros):</translation>
+        <translation>Histéresis Altimetría (metros):</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="199"/>
         <source>Starting LTS:</source>
-        <translation>ELP inicial:</translation>
+        <translation>ELP/CTL inicial:</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="200"/>
         <source>STS average (days):</source>
-        <translation>Constante de tiempo ECP (días):</translation>
+        <translation>Constante ECP/ATL (días):</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="201"/>
         <source>LTS average (days):</source>
-        <translation>Constante de tiempo ELP (días):</translation>
+        <translation>Constante ELP/CTL (días):</translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="220"/>
@@ -9636,109 +9784,110 @@ formato GoldenCheetah. ¿Confirmar?</translation>
     <message>
         <location filename="../StravaDialog.cpp" line="49"/>
         <source>Choose which channels you wish to send: </source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccione los canales que desea enviar:</translation>
     </message>
     <message>
         <location filename="../StravaDialog.cpp" line="52"/>
         <source>Altitude</source>
-        <translation type="unfinished">Altitud</translation>
+        <translation>Altitud</translation>
     </message>
     <message>
         <location filename="../StravaDialog.cpp" line="53"/>
         <source>Power</source>
-        <translation type="unfinished">Potencia</translation>
+        <translation>Potencia</translation>
     </message>
     <message>
         <location filename="../StravaDialog.cpp" line="54"/>
         <source>Cadence</source>
-        <translation type="unfinished">Cadencia</translation>
+        <translation>Cadencia</translation>
     </message>
     <message>
         <location filename="../StravaDialog.cpp" line="55"/>
         <source>Heartrate</source>
-        <translation type="unfinished">Frec. Cardíaca</translation>
+        <translation>Frec. Cardíaca</translation>
     </message>
     <message>
         <location filename="../StravaDialog.cpp" line="87"/>
         <source>&amp;Upload Ride</source>
-        <translation type="unfinished"></translation>
+        <translation>Cargar &amp;Actividad</translation>
     </message>
     <message>
         <location filename="../StravaDialog.cpp" line="93"/>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Cancelar</translation>
+        <translation>&amp;Cancelar</translation>
     </message>
     <message>
         <location filename="../StravaDialog.cpp" line="129"/>
         <source>This Ride is marked as already on Strava. Are you sure you want to upload it?</source>
-        <translation type="unfinished"></translation>
+        <translation>Esta Actividad estámarcada como ya cargada a Strava. ¿Desea cargarla nuevamente?</translation>
     </message>
     <message>
         <location filename="../StravaDialog.cpp" line="132"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../StravaDialog.cpp" line="133"/>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <location filename="../StravaDialog.cpp" line="168"/>
         <source>Successfully uploaded to Strava
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Carga exitosa a Strava</translation>
     </message>
     <message>
         <location filename="../StravaDialog.cpp" line="216"/>
         <source>Login...</source>
-        <translation type="unfinished"></translation>
+        <translation>Inicio Sesión...</translation>
     </message>
     <message>
         <location filename="../StravaDialog.cpp" line="282"/>
         <source>Golden Cheetah-&gt;Preferences</source>
-        <translation type="unfinished">Golden Cheetah-&gt;Preferencias</translation>
+        <translation>Golden Cheetah-&gt;Preferencias</translation>
     </message>
     <message>
         <location filename="../StravaDialog.cpp" line="284"/>
         <source>Tools-&gt;Options</source>
-        <translation type="unfinished">Herramientas-&gt;Opciones</translation>
+        <translation>Herramientas-&gt;Opciones</translation>
     </message>
     <message>
         <location filename="../StravaDialog.cpp" line="286"/>
         <source>Please make sure to fill the Strava login info found under
  %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Asegúrese de completar la información para Strava en
+ %1.</translation>
     </message>
     <message>
         <location filename="../StravaDialog.cpp" line="287"/>
         <source>Strava login Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Error de inicio de sesión en Strava</translation>
     </message>
     <message>
         <location filename="../StravaDialog.cpp" line="299"/>
         <source>Upload ride...</source>
-        <translation type="unfinished"></translation>
+        <translation>Cargar actividad...</translation>
     </message>
     <message>
         <location filename="../StravaDialog.cpp" line="389"/>
         <source>Upload ride... Sending</source>
-        <translation type="unfinished"></translation>
+        <translation>Cargar actividad... Enviando</translation>
     </message>
     <message>
         <location filename="../StravaDialog.cpp" line="399"/>
         <source>Upload finished.</source>
-        <translation type="unfinished"></translation>
+        <translation>Carga finalizada.</translation>
     </message>
     <message>
         <location filename="../StravaDialog.cpp" line="431"/>
         <source>Ride processing...</source>
-        <translation type="unfinished"></translation>
+        <translation>Procesando actividad...</translation>
     </message>
     <message>
         <location filename="../StravaDialog.cpp" line="502"/>
         <source>Searching corresponding Ride</source>
-        <translation type="unfinished"></translation>
+        <translation>Buscando la actividad correspondiente</translation>
     </message>
 </context>
 <context>
@@ -9820,7 +9969,7 @@ formato GoldenCheetah. ¿Confirmar?</translation>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="53"/>
         <source>You must be a premium member to download from TrainingPeaks. Please check your cyclist configurations are correct on the Passwords tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>Necesita ser miembro premium para descargar desde TraningPeaks. Verifique que su configuración sea correcta en la página de credenciales.</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="65"/>
@@ -9828,151 +9977,151 @@ formato GoldenCheetah. ¿Confirmar?</translation>
         <location filename="../TPDownloadDialog.cpp" line="321"/>
         <location filename="../TPDownloadDialog.cpp" line="418"/>
         <source>Download</source>
-        <translation type="unfinished"></translation>
+        <translation>Descargar</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="66"/>
         <location filename="../TPDownloadDialog.cpp" line="325"/>
         <location filename="../TPDownloadDialog.cpp" line="498"/>
         <source>Upload</source>
-        <translation type="unfinished"></translation>
+        <translation>Cargar</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="67"/>
         <location filename="../TPDownloadDialog.cpp" line="329"/>
         <source>Synchronize</source>
-        <translation type="unfinished"></translation>
+        <translation>Sincronizar</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="98"/>
         <source>From:</source>
-        <translation type="unfinished"></translation>
+        <translation>Desde:</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="99"/>
         <source>To:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasta:</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="109"/>
         <source>Refresh Ride List</source>
-        <translation type="unfinished"></translation>
+        <translation>Actualizar lista de Actividades</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="110"/>
         <source>Close</source>
-        <translation type="unfinished">Cerrar</translation>
+        <translation>Cerrar</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="113"/>
         <location filename="../TPDownloadDialog.cpp" line="143"/>
         <location filename="../TPDownloadDialog.cpp" line="173"/>
         <source>Select all</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionar todo</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="176"/>
         <source>Keep all do not delete any rides</source>
-        <translation type="unfinished"></translation>
+        <translation>Mantener todo no borrar ninguna actividad</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="177"/>
         <source>Keep TP.com but delete Local</source>
-        <translation type="unfinished"></translation>
+        <translation>Mantener en TP.com pero borrar copia local</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="178"/>
         <source>Keep Local but delete TP.com</source>
-        <translation type="unfinished"></translation>
+        <translation>Mantener copia local pero borrar en TP.com</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="216"/>
         <source>Overwrite existing files</source>
-        <translation type="unfinished"></translation>
+        <translation>Sobreescribir archivo existente</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="267"/>
         <source>Downloading ride list...</source>
-        <translation type="unfinished"></translation>
+        <translation>Descargando lista de actividades...</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="654"/>
         <source>Processed %1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 de %2 procesado</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="656"/>
         <location filename="../TPDownloadDialog.cpp" line="728"/>
         <source>Downloading</source>
-        <translation type="unfinished"></translation>
+        <translation>Descargando</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="665"/>
         <location filename="../TPDownloadDialog.cpp" line="819"/>
         <source>Uploading</source>
-        <translation type="unfinished"></translation>
+        <translation>Cargando</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="694"/>
         <source>Sync complete</source>
-        <translation type="unfinished"></translation>
+        <translation>Sincronización completa</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="706"/>
         <source>Processed %1 of %2 successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 de %2 procesados correctamente</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="720"/>
         <location filename="../TPDownloadDialog.cpp" line="811"/>
         <source>File exists</source>
-        <translation type="unfinished"></translation>
+        <translation>El archivo ya existe</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="730"/>
         <source>Downloaded %1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 de %2 descargado</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="746"/>
         <source>Downloads complete</source>
-        <translation type="unfinished"></translation>
+        <translation>Descarga completa</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="757"/>
         <source>Downloaded %1 of %2 successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 de %2 descargas correctas</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="769"/>
         <location filename="../TPDownloadDialog.cpp" line="868"/>
         <source>Aborted</source>
-        <translation type="unfinished"></translation>
+        <translation>Cancelado</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="784"/>
         <source>Saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardado</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="821"/>
         <source>Uploaded %1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 de %2 cargado</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="845"/>
         <source>Uploads complete</source>
-        <translation type="unfinished"></translation>
+        <translation>Carga completa</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="856"/>
         <source>Uploaded %1 of %2 successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 de %2 cargados correctamente</translation>
     </message>
     <message>
         <location filename="../TPDownloadDialog.cpp" line="876"/>
         <source>Upload successful</source>
-        <translation type="unfinished"></translation>
+        <translation>Carga exitosa</translation>
     </message>
 </context>
 <context>
@@ -9980,17 +10129,17 @@ formato GoldenCheetah. ¿Confirmar?</translation>
     <message>
         <location filename="../TPUpload.cpp" line="119"/>
         <source>Error:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../TPUpload.cpp" line="122"/>
         <source>Upload successful</source>
-        <translation type="unfinished"></translation>
+        <translation>Carga exitosa</translation>
     </message>
     <message>
         <location filename="../TPUpload.cpp" line="123"/>
         <source>Upload failed - file rejected</source>
-        <translation type="unfinished"></translation>
+        <translation>Falló la carga - archivo rechazado</translation>
     </message>
 </context>
 <context>
@@ -9998,27 +10147,27 @@ formato GoldenCheetah. ¿Confirmar?</translation>
     <message>
         <location filename="../TPUploadDialog.cpp" line="29"/>
         <source>Upload to TrainingPeaks.com</source>
-        <translation type="unfinished"></translation>
+        <translation>Cargar a TrainingPeaks.com</translation>
     </message>
     <message>
         <location filename="../TPUploadDialog.cpp" line="33"/>
         <source>Upload in progress...</source>
-        <translation type="unfinished"></translation>
+        <translation>Carga en curso...</translation>
     </message>
     <message>
         <location filename="../TPUploadDialog.cpp" line="40"/>
         <source>Abort</source>
-        <translation type="unfinished">Abortar</translation>
+        <translation>Abortar</translation>
     </message>
     <message>
         <location filename="../TPUploadDialog.cpp" line="58"/>
         <source>Uploading ride (%1 bytes)...</source>
-        <translation type="unfinished"></translation>
+        <translation>Cargando actividad (%1 bytes)...</translation>
     </message>
     <message>
         <location filename="../TPUploadDialog.cpp" line="77"/>
         <source>Close</source>
-        <translation type="unfinished">Cerrar</translation>
+        <translation>Cerrar</translation>
     </message>
 </context>
 <context>
@@ -10219,17 +10368,17 @@ formato GoldenCheetah. ¿Confirmar?</translation>
     <message>
         <location filename="../TrainTool.cpp" line="77"/>
         <source>Race Servers</source>
-        <translation type="unfinished"></translation>
+        <translation>Servidores de Competencias</translation>
     </message>
     <message>
         <location filename="../TrainTool.cpp" line="90"/>
         <source>Video / Media</source>
-        <translation type="unfinished"></translation>
+        <translation>Video / Medios</translation>
     </message>
     <message>
         <location filename="../TrainTool.cpp" line="105"/>
         <source>Devices</source>
-        <translation type="unfinished">Dispositivos</translation>
+        <translation>Dispositivos</translation>
     </message>
     <message>
         <location filename="../TrainTool.cpp" line="118"/>
@@ -10239,7 +10388,7 @@ formato GoldenCheetah. ¿Confirmar?</translation>
     <message>
         <location filename="../TrainTool.cpp" line="246"/>
         <source>Save workout data</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardar datos de entrenamiento</translation>
     </message>
     <message>
         <location filename="../TrainTool.cpp" line="404"/>
@@ -10254,48 +10403,49 @@ formato GoldenCheetah. ¿Confirmar?</translation>
     <message>
         <location filename="../TrainTool.cpp" line="665"/>
         <source>Cannot Connect to Server %1 on port %2</source>
-        <translation type="unfinished"></translation>
+        <translation>No se puede conectar al Servidor %1 con el puerto %2</translation>
     </message>
     <message>
         <location filename="../TrainTool.cpp" line="1126"/>
         <source>No Devices Configured</source>
-        <translation type="unfinished">Sin Dispositivo Configurado</translation>
+        <translation>Sin Dispositivo Configurado</translation>
     </message>
     <message>
         <location filename="../TrainTool.cpp" line="1168"/>
         <source>Race Over!</source>
-        <translation type="unfinished"></translation>
+        <translation>¡Competencia Finalizada!</translation>
     </message>
     <message>
         <location filename="../TrainTool.cpp" line="1280"/>
         <source>Calibrating...
 Press F3 on Controller when done.</source>
-        <translation type="unfinished"></translation>
+        <translation>Calibrando...
+Presionar F3 en el controlador al finalizar.</translation>
     </message>
     <message>
         <location filename="../TrainTool.cpp" line="1281"/>
         <source>Done</source>
-        <translation type="unfinished">Listo</translation>
+        <translation>Listo</translation>
     </message>
     <message>
         <location filename="../TrainTool.cpp" line="1580"/>
         <source>Add Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Agregar Dispositivo</translation>
     </message>
     <message>
         <location filename="../TrainTool.cpp" line="1585"/>
         <source>Delete Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar Dispositivo</translation>
     </message>
     <message>
         <location filename="../TrainTool.cpp" line="1608"/>
         <source>Are you sure you want to delete this device?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Está seguro de eliminar este dispositivo?</translation>
     </message>
     <message>
         <location filename="../TrainTool.cpp" line="1610"/>
         <source>Delete</source>
-        <translation type="unfinished">Eliminar</translation>
+        <translation>Eliminar</translation>
     </message>
 </context>
 <context>
@@ -10316,22 +10466,22 @@ Press F3 on Controller when done.</source>
     <message>
         <location filename="../TtbDialog.cpp" line="145"/>
         <source>getting Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>obteniendo Configuración...</translation>
     </message>
     <message>
         <location filename="../TtbDialog.cpp" line="169"/>
         <source>getting new Session...</source>
-        <translation type="unfinished"></translation>
+        <translation>obteniendo nueva Sesión...</translation>
     </message>
     <message>
         <location filename="../TtbDialog.cpp" line="195"/>
         <source>preparing upload ...</source>
-        <translation type="unfinished"></translation>
+        <translation>preparando carga ...</translation>
     </message>
     <message>
         <location filename="../TtbDialog.cpp" line="218"/>
         <source>temporary file too large for upload: %1 &gt; %1 bytes</source>
-        <translation type="unfinished"></translation>
+        <translation>archivo temporario demasiado grande para carga: %1 &gt; %1 bytes</translation>
     </message>
     <message>
         <location filename="../TtbDialog.cpp" line="221"/>
@@ -10344,67 +10494,67 @@ Press F3 on Controller when done.</source>
         <location filename="../TtbDialog.cpp" line="418"/>
         <location filename="../TtbDialog.cpp" line="450"/>
         <source>&amp;Close</source>
-        <translation type="unfinished">&amp;Cerrar</translation>
+        <translation>&amp;Cerrar</translation>
     </message>
     <message>
         <location filename="../TtbDialog.cpp" line="235"/>
         <source>uploading ...</source>
-        <translation type="unfinished"></translation>
+        <translation>cargando ...</translation>
     </message>
     <message>
         <location filename="../TtbDialog.cpp" line="268"/>
         <source>request failed: </source>
-        <translation type="unfinished"></translation>
+        <translation>solicitud fallida: </translation>
     </message>
     <message>
         <location filename="../TtbDialog.cpp" line="278"/>
         <source>request failed, Server response: %1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>solicitud fallida, respuesta del Servidor: %1 %2</translation>
     </message>
     <message>
         <location filename="../TtbDialog.cpp" line="345"/>
         <source>failed to parse Settings response: </source>
-        <translation type="unfinished"></translation>
+        <translation>falló el análisis de la respuesta de Configuración: </translation>
     </message>
     <message>
         <location filename="../TtbDialog.cpp" line="352"/>
         <source>failed to get settings: </source>
-        <translation type="unfinished"></translation>
+        <translation>falló la obtención de la configuración: </translation>
     </message>
     <message>
         <location filename="../TtbDialog.cpp" line="401"/>
         <source>failed to parse Session response: </source>
-        <translation type="unfinished"></translation>
+        <translation>falló el análisis de la respuesta al inicio de Sesión: </translation>
     </message>
     <message>
         <location filename="../TtbDialog.cpp" line="408"/>
         <source>failed to get new session: </source>
-        <translation type="unfinished"></translation>
+        <translation>falló la obtención de nueva sesión: </translation>
     </message>
     <message>
         <location filename="../TtbDialog.cpp" line="417"/>
         <source>got empty session</source>
-        <translation type="unfinished"></translation>
+        <translation>sesión vacía</translation>
     </message>
     <message>
         <location filename="../TtbDialog.cpp" line="459"/>
         <source>failed to parse upload response: </source>
-        <translation type="unfinished"></translation>
+        <translation>falló el análisis de la repuesta de carga: </translation>
     </message>
     <message>
         <location filename="../TtbDialog.cpp" line="465"/>
         <source>failed to upload file: </source>
-        <translation type="unfinished"></translation>
+        <translation>falló la carga de archivo: </translation>
     </message>
     <message>
         <location filename="../TtbDialog.cpp" line="473"/>
         <source>got empty exercise</source>
-        <translation type="unfinished"></translation>
+        <translation>se obtuvo un ejercicio vacío</translation>
     </message>
     <message>
         <location filename="../TtbDialog.cpp" line="477"/>
         <source>successfully uploaded as %1</source>
-        <translation type="unfinished"></translation>
+        <translation>carga exitosa: %1</translation>
     </message>
 </context>
 <context>
@@ -10723,7 +10873,7 @@ Press F3 on Controller when done.</source>
     <message>
         <location filename="../WeeklySummaryWindow.cpp" line="288"/>
         <source>&lt;center&gt;&lt;h3&gt;Week of %1 through %2&lt;/h3&gt;&lt;h3&gt;Summary&lt;/h3&gt;&lt;p&gt;&lt;table align=&quot;center&quot; width=&quot;60%&quot; border=0&gt;&lt;tr&gt;&lt;td&gt;Total time riding:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3:%4:%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total distance (%6):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total work (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Daily Average work (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%9&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished">&lt;center&gt;&lt;h2&gt;Semana desde el %1 al %2&lt;/h2&gt;&lt;h2&gt;Resumen&lt;/h2&gt;&lt;p&gt;&lt;table align=&quot;center&quot; width=&quot;60%&quot; border=0&gt;&lt;tr&gt;&lt;td&gt;Tiempo total de entrenamiento:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3:%4:%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Distancia total (%6):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Trabajo total (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Trabajo medio diario (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%9&lt;/td&gt;&lt;/tr&gt; {3&gt;?} {1 ?} {2&lt;?} {3&gt;?} {3&gt;?} {3&gt;?} {60%?} {0&gt;?} {3:%4:%5&lt;?} {6)?} {7&lt;?} {8&lt;?} {9&lt;?}</translation>
+        <translation>&lt;center&gt;&lt;h2&gt;Semana desde el %1 al %2&lt;/h2&gt;&lt;h2&gt;Resumen&lt;/h2&gt;&lt;p&gt;&lt;table align=&quot;center&quot; width=&quot;60%&quot; border=0&gt;&lt;tr&gt;&lt;td&gt;Tiempo total de entrenamiento:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3:%4:%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Distancia total (%6):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Trabajo total (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Trabajo medio diario (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%9&lt;/td&gt;&lt;/tr&gt; {3&gt;?} {1 ?} {2&lt;?} {3&gt;?} {3&gt;?} {3&gt;?} {60%?} {0&gt;?} {3:%4:%5&lt;?} {6)?} {7&lt;?} {8&lt;?} {9&lt;?}</translation>
     </message>
     <message>
         <location filename="../WeeklySummaryWindow.cpp" line="302"/>
@@ -10739,12 +10889,12 @@ Press F3 on Controller when done.</source>
     <message>
         <location filename="../WeeklySummaryWindow.cpp" line="327"/>
         <source>&lt;/table&gt;&lt;h3&gt;Power Zones&lt;/h3&gt;</source>
-        <translation type="unfinished">&lt;/table&gt;&lt;h2&gt;Zonas de Potencia&lt;/h2&gt; {3&gt;?} {3&gt;?}</translation>
+        <translation>&lt;/table&gt;&lt;h2&gt;Zonas de Potencia&lt;/h2&gt; {3&gt;?} {3&gt;?}</translation>
     </message>
     <message>
         <location filename="../WeeklySummaryWindow.cpp" line="333"/>
         <source>&lt;/table&gt;&lt;h3&gt;Heart Rate Zones&lt;/h3&gt;</source>
-        <translation type="unfinished">&lt;/table&gt;&lt;h2&gt;Zonas Frec.Card.&lt;/h2&gt; {3&gt;?} {3&gt;?}</translation>
+        <translation>&lt;/table&gt;&lt;h2&gt;Zonas Frec.Card.&lt;/h2&gt; {3&gt;?} {3&gt;?}</translation>
     </message>
     <message>
         <source>&lt;/table&gt;&lt;h2&gt;Power Zones&lt;/h2&gt;</source>
@@ -10797,12 +10947,12 @@ Press F3 on Controller when done.</source>
         <location filename="../WithingsDownload.cpp" line="40"/>
         <location filename="../WithingsDownload.cpp" line="91"/>
         <source>Withings Data Download</source>
-        <translation type="unfinished"></translation>
+        <translation>Descarga de Datos Withings</translation>
     </message>
     <message>
         <location filename="../WithingsDownload.cpp" line="90"/>
         <source>%1 new on %2 measurements received.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 nuevas medidas recibidas en %2.</translation>
     </message>
 </context>
 <context>
@@ -10810,38 +10960,38 @@ Press F3 on Controller when done.</source>
     <message>
         <location filename="../WorkoutWizard.cpp" line="81"/>
         <source>Delete</source>
-        <translation type="unfinished">Eliminar</translation>
+        <translation>Eliminar</translation>
     </message>
     <message>
         <location filename="../WorkoutWizard.cpp" line="82"/>
         <source>Delete the highlighted row</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar la fila resaltada</translation>
     </message>
     <message>
         <location filename="../WorkoutWizard.cpp" line="86"/>
         <source>Add</source>
-        <translation type="unfinished">Agregar</translation>
+        <translation>Agregar</translation>
     </message>
     <message>
         <location filename="../WorkoutWizard.cpp" line="87"/>
         <source>Add row at end</source>
-        <translation type="unfinished"></translation>
+        <translation>Agregar fila al final</translation>
     </message>
     <message>
         <location filename="../WorkoutWizard.cpp" line="91"/>
         <source>Insert</source>
-        <translation type="unfinished">Insertar</translation>
+        <translation>Insertar</translation>
     </message>
     <message>
         <location filename="../WorkoutWizard.cpp" line="92"/>
         <location filename="../WorkoutWizard.cpp" line="97"/>
         <source>Add a Lap below the highlighted row</source>
-        <translation type="unfinished"></translation>
+        <translation>Agregar una vuelta debajo de la fila resaltada</translation>
     </message>
     <message>
         <location filename="../WorkoutWizard.cpp" line="96"/>
         <source>Lap</source>
-        <translation type="unfinished">Vuelta</translation>
+        <translation>Vuelta</translation>
     </message>
 </context>
 <context>
@@ -10849,7 +10999,7 @@ Press F3 on Controller when done.</source>
     <message>
         <location filename="../WorkoutWizard.h" line="206"/>
         <source>Workout Metrics</source>
-        <translation type="unfinished"></translation>
+        <translation>Métricas de Entrenamiento</translation>
     </message>
 </context>
 <context>
@@ -10871,27 +11021,27 @@ Press F3 on Controller when done.</source>
     <message>
         <location filename="../WorkoutWizard.cpp" line="217"/>
         <source>Workout Creator</source>
-        <translation type="unfinished"></translation>
+        <translation>Creador de Entrenamientos</translation>
     </message>
     <message>
         <location filename="../WorkoutWizard.cpp" line="218"/>
         <source>Select the workout type to be created</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionar el tipo de entrenamiento a ser creado</translation>
     </message>
     <message>
         <location filename="../WorkoutWizard.cpp" line="220"/>
         <source>Absolute Wattage</source>
-        <translation type="unfinished"></translation>
+        <translation>Potencia Absoluta</translation>
     </message>
     <message>
         <location filename="../WorkoutWizard.cpp" line="222"/>
         <source>% FTP Wattage</source>
-        <translation type="unfinished"></translation>
+        <translation>Potencia % FTP</translation>
     </message>
     <message>
         <location filename="../WorkoutWizard.cpp" line="223"/>
         <source>Gradient</source>
-        <translation type="unfinished"></translation>
+        <translation>Pendiente</translation>
     </message>
 </context>
 <context>
@@ -10915,12 +11065,12 @@ Press F3 on Controller when done.</source>
         <location filename="../ZeoDownload.cpp" line="113"/>
         <location filename="../ZeoDownload.cpp" line="149"/>
         <source>Zeo Data Download</source>
-        <translation type="unfinished"></translation>
+        <translation>Descarga Datos Zeo</translation>
     </message>
     <message>
         <location filename="../ZeoDownload.cpp" line="112"/>
         <source>%1 new on %2 measurements received.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 nuevas medidas recibidas en %2.</translation>
     </message>
 </context>
 <context>

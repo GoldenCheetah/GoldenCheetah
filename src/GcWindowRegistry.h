@@ -20,6 +20,7 @@
 #define _GC_GcWindowRegistry_h
 
 #include "GoldenCheetah.h"
+#include <QApplication>
 
 class MainWindow;
 
@@ -70,13 +71,17 @@ typedef enum GcWindowTypes::gcwinid GcWinID;
 #define VIEW_DIARY    0x04
 #define VIEW_HOME     0x08
 
-struct GcWindowRegistry {
+class GcWindowRegistry {
+    Q_DECLARE_TR_FUNCTIONS(GcWindowRegistry)
+    public:
+
     unsigned int relevance;
     QString name;
     GcWinID id;
 
+    static void initialize(); // initialize global registry
     static GcWindow *newGcWindow(GcWinID id, MainWindow *main); //XXX main is gonna go
 };
 
-extern GcWindowRegistry GcWindows[];
+extern GcWindowRegistry* GcWindows;
 #endif
