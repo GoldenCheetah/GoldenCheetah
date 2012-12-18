@@ -257,6 +257,7 @@ signals:
     void searchTimeout(int channel);         // searchTimeount
     void searchComplete(int channel);         // searchComplete
     void signalStrength(int channel, double reliability);
+    void receivedAntMessage(const ANTMessage *message, const struct timeval *timestamp);
 
 public slots:
 
@@ -391,8 +392,6 @@ private:
 
     QQueue<setChannelAtom> channelQueue; // messages for configuring channels from controller
 
-    // antlog.bin ant message stream
-    QFile antlog;
 };
 
 #endif
