@@ -20,6 +20,7 @@
 #include <QProgressDialog>
 #include "ANTlocalController.h"
 #include "ANT.h"
+#include "ANTLogger.h"
 #include "RealtimeData.h"
 
 ANTlocalController::ANTlocalController(TrainTool *parent, DeviceConfiguration *dc) : RealtimeController(parent, dc)
@@ -28,6 +29,9 @@ ANTlocalController::ANTlocalController(TrainTool *parent, DeviceConfiguration *d
     connect(myANTlocal, SIGNAL(foundDevice(int,int,int)), this, SIGNAL(foundDevice(int,int,int)));
     connect(myANTlocal, SIGNAL(lostDevice(int)), this, SIGNAL(lostDevice(int)));
     connect(myANTlocal, SIGNAL(searchTimeout(int)), this, SIGNAL(searchTimeout(int)));
+
+    // Connect a logger
+    connect(myANTlocal, SIGNAL(receivedAntMessage(const ANTMessage *,const timeval *)), &logger, SLOT(logRawAntMessage(const ANTMessage *,const timeval *)));
 }
 
 void
