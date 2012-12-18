@@ -244,9 +244,9 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     summarySelect = new QComboBox(this);
     //summarySelect->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLength); XXX
     summarySelect->setFixedWidth(150); // XXX is it impossible to size constrain qcombos?????
-    summarySelect->addItem("Day Summary");
-    summarySelect->addItem("Weekly Summary");
-    summarySelect->addItem("Monthly Summary");
+    summarySelect->addItem(tr("Day Summary"));
+    summarySelect->addItem(tr("Weekly Summary"));
+    summarySelect->addItem(tr("Monthly Summary"));
     summarySelect->setCurrentIndex(1); // default to weekly
     h->addStretch();
     h->addWidget(summarySelect, Qt::AlignCenter);
@@ -629,22 +629,22 @@ GcCalendar::setSummary()
 
             switch(i) {
                 case 0 : // Totals
-                    aggname = "Totals";
+                    aggname = tr("Totals");
                     list = totalColumn;
                     break;
 
                 case 1 :  // Averages
-                    aggname = "Averages";
+                    aggname = tr("Averages");
                     list = averageColumn;
                     break;
 
                 case 3 :  // Maximums
-                    aggname = "Maximums";
+                    aggname = tr("Maximums");
                     list = maximumColumn;
                     break;
 
                 case 2 :  // User defined.. 
-                    aggname = "Metrics";
+                    aggname = tr("Metrics");
                     list = metricColumn;
                     break;
 
@@ -698,9 +698,9 @@ GcCalendar::setSummary()
 
         // tell everyone the date range changed
         QString name;
-        if (summarySelect->currentIndex() == 0) name = "Day of " + from.toString("dddd MMMM d");
-        else if (summarySelect->currentIndex() == 1) name = QString("Week Commencing %1").arg(from.toString("dddd MMMM d"));
-        else if (summarySelect->currentIndex() == 2) name = from.toString("MMMM yyyy");
+        if (summarySelect->currentIndex() == 0) name = tr("Day of ") + from.toString("dddd MMMM d");
+        else if (summarySelect->currentIndex() == 1) name = QString(tr("Week Commencing %1")).arg(from.toString("dddd MMMM d"));
+        else if (summarySelect->currentIndex() == 2) name = from.toString(tr("MMMM yyyy"));
         
         emit dateRangeChanged(DateRange(from, to, name));
 

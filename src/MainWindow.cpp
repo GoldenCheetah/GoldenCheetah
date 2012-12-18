@@ -496,7 +496,7 @@ MainWindow::MainWindow(const QDir &home) :
     QIcon chartIcon(":images/addchart.png");
     QPushButton *newchart = new QPushButton(chartIcon, "", this);
     newchart->setFocusPolicy(Qt::NoFocus);
-    newchart->setToolTip("Add Chart");
+    newchart->setToolTip(tr("Add Chart"));
     newchart->setIconSize(QSize(15,15));
     newchart->setAutoFillBackground(false);
     newchart->setAutoDefault(false);
@@ -769,15 +769,15 @@ MainWindow::MainWindow(const QDir &home) :
     rideMenu->addAction(tr("Down&load from TrainingPeaks..."), this, SLOT(downloadTP()), tr("Ctrl+L"));
 #endif
 
-    stravaAction = new QAction("Upload to Strava...", this);
+    stravaAction = new QAction(tr("Upload to Strava..."), this);
     connect(stravaAction, SIGNAL(triggered(bool)), this, SLOT(uploadStrava()));
     rideMenu->addAction(stravaAction);
 
-    rideWithGPSAction = new QAction("Upload to RideWithGPS...", this);
+    rideWithGPSAction = new QAction(tr("Upload to RideWithGPS..."), this);
     connect(rideWithGPSAction, SIGNAL(triggered(bool)), this, SLOT(uploadRideWithGPSAction()));
     rideMenu->addAction(rideWithGPSAction);
 
-    ttbAction = new QAction("Upload to Trainingstagebuch...", this);
+    ttbAction = new QAction(tr("Upload to Trainingstagebuch..."), this);
     connect(ttbAction, SIGNAL(triggered(bool)), this, SLOT(uploadTtb()));
     rideMenu->addAction(ttbAction);
 
@@ -859,7 +859,7 @@ MainWindow::MainWindow(const QDir &home) :
     viewMenu->addAction(tr("Diary"), this, SLOT(selectDiary()));
 #endif
     viewMenu->addSeparator();
-    subChartMenu = viewMenu->addMenu("Add Chart");
+    subChartMenu = viewMenu->addMenu(tr("Add Chart"));
     viewMenu->addAction(tr("Reset Layout"), this, SLOT(resetWindowLayout()));
 
     windowMenu = menuBar()->addMenu(tr("&Window"));
