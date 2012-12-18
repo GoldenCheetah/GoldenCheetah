@@ -185,9 +185,6 @@ void ANT::run()
 
     if (openPort() == 0) {
 
-        antlog.setFileName("antlog.bin");
-        antlog.open(QIODevice::WriteOnly | QIODevice::Truncate);
-
         sendMessage(ANTMessage::resetSystem());
         sendMessage(ANTMessage::setNetworkKey(1, key));
 
@@ -312,8 +309,8 @@ ANT::stop()
     Status = 0; // Terminate it!
     pvars.unlock();
 
-    // close debug file
-    antlog.close();
+    // Signal to stop logging
+    emit receivedAntMessage(NULL, NULL);
     return 0;
 }
 
@@ -691,10 +688,9 @@ ANT::processMessage(void) {
 //for(int i=0; i<m.length+3; i++) fprintf(stderr, "%02x ", m.data[i]);
 //fprintf(stderr, "\n");
 
-    QDataStream out(&antlog);
-    for (int i=0; i<ANT_MAX_MESSAGE_SIZE; i++)
-        out<<rxMessage[i];
-    
+    struct timeval timestamp;
+    gettimeofday (&timestamp, NULL);
+    emit receivedAntMessage(&m, &timestamp);
 
     switch (rxMessage[ANT_OFFSET_ID]) {
         case ANT_ACK_DATA:
