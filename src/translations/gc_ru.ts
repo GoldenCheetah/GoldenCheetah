@@ -3020,6 +3020,154 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     </message>
 </context>
 <context>
+    <name>GcWindowRegistry</name>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="73"/>
+        <source>Long Term Metrics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="74"/>
+        <source>Performance Manager</source>
+        <translation type="unfinished">Performance Manager</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="75"/>
+        <source>Collection TreeMap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="77"/>
+        <source>Critical Mean Maximal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="78"/>
+        <source>Activity Summary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="79"/>
+        <source>Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="80"/>
+        <source>Summary and Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="81"/>
+        <source>Editor</source>
+        <translation type="unfinished">Редактор</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="82"/>
+        <source>Performance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="83"/>
+        <source>Critical Mean Maximals</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="84"/>
+        <source>Histogram</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="85"/>
+        <source>Distribution</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="86"/>
+        <source>Pedal Force vs Velocity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="87"/>
+        <source>Heartrate vs Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="88"/>
+        <source>Google Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="89"/>
+        <source>Bing Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="90"/>
+        <source>2d Plot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="91"/>
+        <source>3d Plot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="92"/>
+        <source>Aerolab Chung Analysis</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="93"/>
+        <source>Calendar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="94"/>
+        <source>Navigator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="95"/>
+        <source>Summary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="96"/>
+        <source>Telemetry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="97"/>
+        <source>Workout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="98"/>
+        <source>Realtime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="99"/>
+        <source>Pedal Stroke</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="100"/>
+        <source>Map</source>
+        <translation type="unfinished">Карта</translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="101"/>
+        <source>StreetView</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GcWindowRegistry.cpp" line="102"/>
+        <source>Video Player</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>GcWindowTool</name>
     <message>
         <location filename="../GcWindowTool.cpp" line="42"/>
