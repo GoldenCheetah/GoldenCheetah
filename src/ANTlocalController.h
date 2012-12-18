@@ -20,6 +20,7 @@
 #include "RealtimeController.h"
 #include "DeviceConfiguration.h"
 #include "ANT.h"
+#include "ANTLogger.h"
 #include "ConfigDialog.h"
 
 // Abstract base class for Realtime device controllers
@@ -65,6 +66,8 @@ signals:
 
 private:
     QQueue<setChannelAtom> channelQueue;
+    ANTLogger logger;
+
     
 };
 
