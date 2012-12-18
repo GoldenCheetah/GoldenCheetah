@@ -108,8 +108,11 @@ main(int argc, char *argv[])
     gcTranslator.load(":translations/gc_" + lang.toString() + ".qm");
     app.installTranslator(&gcTranslator);
 
-    // Initialize metics once the translator is installed
+    // Initialize metrics once the translator is installed
     RideMetricFactory::instance().initialize();
+
+    // Initialize global registry once the translator is installed
+    GcWindowRegistry::initialize();
 
     QStringList args( app.arguments() );
 
