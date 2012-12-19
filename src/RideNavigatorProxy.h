@@ -90,6 +90,7 @@ private:
         rankedRows.clear();
     }
 
+    static bool initGroupRanges();
 
 public:
 
