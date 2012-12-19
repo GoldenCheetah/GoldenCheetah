@@ -1112,6 +1112,14 @@ quindi clicca  &quot;Rescan&quot; per avviare la ricerca.</translation>
     </message>
 </context>
 <context>
+    <name>ColumnChooser</name>
+    <message>
+        <location filename="../RideNavigator.cpp" line="1041"/>
+        <source>Column Chooser</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ConfigDialog</name>
     <message>
         <location filename="../ConfigDialog.cpp" line="118"/>
@@ -2982,147 +2990,147 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>GcWindowRegistry</name>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="73"/>
+        <location filename="../GcWindowRegistry.cpp" line="72"/>
         <source>Long Term Metrics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="74"/>
+        <location filename="../GcWindowRegistry.cpp" line="73"/>
         <source>Performance Manager</source>
         <translation type="unfinished">Performance Manager</translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="75"/>
+        <location filename="../GcWindowRegistry.cpp" line="74"/>
         <source>Collection TreeMap</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="77"/>
+        <location filename="../GcWindowRegistry.cpp" line="76"/>
         <source>Critical Mean Maximal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="78"/>
+        <location filename="../GcWindowRegistry.cpp" line="77"/>
         <source>Activity Summary</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="79"/>
+        <location filename="../GcWindowRegistry.cpp" line="78"/>
         <source>Details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="80"/>
+        <location filename="../GcWindowRegistry.cpp" line="79"/>
         <source>Summary and Details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="81"/>
+        <location filename="../GcWindowRegistry.cpp" line="80"/>
         <source>Editor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="82"/>
+        <location filename="../GcWindowRegistry.cpp" line="81"/>
         <source>Performance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="83"/>
+        <location filename="../GcWindowRegistry.cpp" line="82"/>
         <source>Critical Mean Maximals</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="84"/>
+        <location filename="../GcWindowRegistry.cpp" line="83"/>
         <source>Histogram</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="85"/>
+        <location filename="../GcWindowRegistry.cpp" line="84"/>
         <source>Distribution</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="86"/>
+        <location filename="../GcWindowRegistry.cpp" line="85"/>
         <source>Pedal Force vs Velocity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="87"/>
+        <location filename="../GcWindowRegistry.cpp" line="86"/>
         <source>Heartrate vs Power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="88"/>
+        <location filename="../GcWindowRegistry.cpp" line="87"/>
         <source>Google Map</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="89"/>
+        <location filename="../GcWindowRegistry.cpp" line="88"/>
         <source>Bing Map</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="90"/>
+        <location filename="../GcWindowRegistry.cpp" line="89"/>
         <source>2d Plot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="91"/>
+        <location filename="../GcWindowRegistry.cpp" line="90"/>
         <source>3d Plot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="92"/>
+        <location filename="../GcWindowRegistry.cpp" line="91"/>
         <source>Aerolab Chung Analysis</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="93"/>
+        <location filename="../GcWindowRegistry.cpp" line="92"/>
         <source>Calendar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="94"/>
+        <location filename="../GcWindowRegistry.cpp" line="93"/>
         <source>Navigator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="95"/>
+        <location filename="../GcWindowRegistry.cpp" line="94"/>
         <source>Summary</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="96"/>
+        <location filename="../GcWindowRegistry.cpp" line="95"/>
         <source>Telemetry</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="97"/>
+        <location filename="../GcWindowRegistry.cpp" line="96"/>
         <source>Workout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="98"/>
+        <location filename="../GcWindowRegistry.cpp" line="97"/>
         <source>Realtime</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="99"/>
+        <location filename="../GcWindowRegistry.cpp" line="98"/>
         <source>Pedal Stroke</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="100"/>
+        <location filename="../GcWindowRegistry.cpp" line="99"/>
         <source>Map</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="101"/>
+        <location filename="../GcWindowRegistry.cpp" line="100"/>
         <source>StreetView</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../GcWindowRegistry.cpp" line="102"/>
+        <location filename="../GcWindowRegistry.cpp" line="101"/>
         <source>Video Player</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3340,12 +3348,140 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>GroupByModel</name>
     <message>
-        <location filename="../RideNavigator.cpp" line="726"/>
+        <location filename="../RideNavigator.cpp" line="622"/>
+        <location filename="../RideNavigator.cpp" line="633"/>
+        <location filename="../RideNavigator.cpp" line="647"/>
+        <location filename="../RideNavigator.cpp" line="669"/>
+        <source>Zero or not present</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="623"/>
+        <source>Low Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="624"/>
+        <source>Medium Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="625"/>
+        <source>High Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="626"/>
+        <source>Very High Stress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="634"/>
+        <source>Active Recovery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="635"/>
+        <source>Endurance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="636"/>
+        <source>Tempo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="637"/>
+        <source>Threshold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="638"/>
+        <source>VO2Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="639"/>
+        <source>Anaerobic Capacity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="640"/>
+        <source>Maximal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="648"/>
+        <source>Isopower</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="649"/>
+        <source>Steady</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="650"/>
+        <source>Variable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="651"/>
+        <source>Highly Variable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="658"/>
+        <source>Less than an hour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="659"/>
+        <source>Less than 90 minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="660"/>
+        <source>Less than 3 hours</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="661"/>
+        <source>Less than 5 hours</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="662"/>
+        <source>More than 5 hours</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="670"/>
+        <source>Short</source>
+        <translation type="unfinished">Corto</translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="671"/>
+        <source>Medium</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="672"/>
+        <source>Long</source>
+        <translation type="unfinished">Lungo</translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="673"/>
+        <source>Very Long</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="722"/>
         <source>Date</source>
         <translation type="unfinished">Data</translation>
     </message>
     <message>
-        <location filename="../RideNavigatorProxy.h" line="397"/>
+        <location filename="../RideNavigatorProxy.h" line="398"/>
         <source>All Activities</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5844,22 +5980,22 @@ Elapsed: %1
 <context>
     <name>NavigatorCellDelegate</name>
     <message>
-        <location filename="../RideNavigator.cpp" line="929"/>
+        <location filename="../RideNavigator.cpp" line="925"/>
         <source>seconds</source>
         <translation type="unfinished">secondi</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="944"/>
+        <location filename="../RideNavigator.cpp" line="940"/>
         <source>Date</source>
         <translation type="unfinished">Data</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="947"/>
+        <location filename="../RideNavigator.cpp" line="943"/>
         <source>Time</source>
         <translation type="unfinished">Tempo</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="950"/>
+        <location filename="../RideNavigator.cpp" line="946"/>
         <source>Last updated</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7906,22 +8042,52 @@ on and that its display says, &quot;Host&quot;</source>
 <context>
     <name>RideNavigator</name>
     <message>
-        <location filename="../RideNavigator.cpp" line="542"/>
+        <location filename="../RideNavigator.cpp" line="30"/>
+        <source>*|Workout Code|TSS|Date|</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="179"/>
+        <source>File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="180"/>
+        <source>Last updated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="181"/>
+        <source>Date</source>
+        <translation type="unfinished">Data</translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="182"/>
+        <source>Time</source>
+        <translation type="unfinished">Tempo</translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="183"/>
+        <source>Config Checksum</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../RideNavigator.cpp" line="536"/>
         <source>Remove Column</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="548"/>
+        <location filename="../RideNavigator.cpp" line="542"/>
         <source>Column Chooser</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="553"/>
+        <location filename="../RideNavigator.cpp" line="547"/>
         <source>Do Not Show in Groups</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="553"/>
+        <location filename="../RideNavigator.cpp" line="547"/>
         <source>Show In Groups</source>
         <translation type="unfinished"></translation>
     </message>

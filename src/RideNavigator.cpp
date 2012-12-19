@@ -23,19 +23,13 @@
 #include <QtGui>
 #include <QString>
 
-#define tr(s) QObject::tr(s)
-
-// default column layouts etc
-static const QString defaultColumns = QString("*|Workout Code|TSS|Date|");
-static const QString defaultWidths = QString("0|80|50|50|");
-static const int defaultSortBy = 2;
-
 RideNavigator::RideNavigator(MainWindow *parent, bool mainwindow) : main(parent), active(false), _groupBy(-1)
 {
     // get column headings
-    _columns = defaultColumns;
-    _widths = defaultWidths;
-    _sortByIndex = defaultSortBy;
+    // default column layouts etc
+    _columns = QString(tr("*|Workout Code|TSS|Date|"));
+    _widths = QString("0|80|50|50|");
+    _sortByIndex = 2;
     _sortByOrder = 0;
     currentColumn = -1;
     _groupBy = -1;
@@ -182,11 +176,11 @@ RideNavigator::resetView()
     columnMetrics.clear();
 
     // add the standard columns to the map
-    nameMap.insert("filename", "File");
-    nameMap.insert("timestamp", "Last updated");
-    nameMap.insert("ride_date", "Date");
-    nameMap.insert("ride_time", "Time"); // virtual columns show time from ride_date
-    nameMap.insert("fingerprint", "Config Checksum");
+    nameMap.insert("filename", tr("File"));
+    nameMap.insert("timestamp", tr("Last updated"));
+    nameMap.insert("ride_date", tr("Date"));
+    nameMap.insert("ride_time", tr("Time")); // virtual columns show time from ride_date
+    nameMap.insert("fingerprint", tr("Config Checksum"));
 
     // add metrics to the map
     const RideMetricFactory &factory = RideMetricFactory::instance();
@@ -204,7 +198,7 @@ RideNavigator::resetView()
     SpecialFields sp; // all the special fields are in here...
     foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
         if (!sp.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
-            nameMap.insert(QString("Z%1").arg(sp.makeTechName(field.name)), field.name);
+            nameMap.insert(QString("Z%1").arg(sp.makeTechName(field.name)), sp.displayName(field.name));
         }
     }
 
@@ -617,7 +611,8 @@ class groupRange {
 };
 
 static QList<groupRange> groupRanges;
-static bool initGroupRanges()
+bool
+GroupByModel::initGroupRanges()
 {
     groupRange::range add;
     groupRange addColumn;
@@ -682,8 +677,7 @@ static bool initGroupRanges()
 
     return true;
 }
-static bool _initGroupRanges = initGroupRanges();
-
+static bool _initGroupRanges = false;
 
 // Perhaps a groupName function on the metrics would be useful
 // or maybe mix zoning into them... XXX todo
@@ -691,6 +685,8 @@ static bool _initGroupRanges = initGroupRanges();
 QString
 GroupByModel::groupFromValue(QString headingName, QString value, double rank, double count) const
 {
+    if (!_initGroupRanges)
+        _initGroupRanges = initGroupRanges();
     // Check for predefined thresholds / zones / bands for this metric/column
     foreach (groupRange orange, groupRanges) {
         if (orange.column == headingName) {
@@ -1042,7 +1038,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
 {
     // wipe away everything when you close please...
-    setWindowTitle("Column Chooser");
+    setWindowTitle(tr("Column Chooser"));
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
 
