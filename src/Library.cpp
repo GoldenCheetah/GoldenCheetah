@@ -30,7 +30,14 @@
 #ifdef Q_OS_MAC
 #include "QtMacVideoWindow.h"
 #else
+#ifdef GC_HAVE_VLC
 #include "VideoWindow.h"
+#else
+// if no VLC on Windows / Linux then no media!
+class MediaHelper {
+    public: bool isMedia(QString) { return false; }
+};
+#endif
 #endif
 #include "ErgFile.h"
 
@@ -247,6 +254,8 @@ LibrarySearchDialog::search()
         // using what we found...
         updateDB();
         close();
+
+        return;
     }
 
     if (searching) {
@@ -275,8 +284,8 @@ LibrarySearchDialog::search()
 
         setSearching(true);
         workoutCountN = videoCountN = pathIndex = 0;
-        workoutCount->setText(QString("%1").arg(++workoutCountN));
-        mediaCount->setText(QString("%1").arg(++videoCountN));
+        workoutCount->setText(QString("%1").arg(workoutCountN));
+        mediaCount->setText(QString("%1").arg(videoCountN));
         QTreeWidgetItem *item = searchPathTable->invisibleRootItem()->child(pathIndex);
         QString path = item->text(0);
         searcher = new LibrarySearch(path);
