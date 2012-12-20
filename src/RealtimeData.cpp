@@ -21,8 +21,6 @@
 
 #include <QtDebug>
 
-#define tr(s) QObject::tr(s)
-
 RealtimeData::RealtimeData()
 {
     name[0] = '\0';

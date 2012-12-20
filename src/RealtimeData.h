@@ -23,10 +23,11 @@
 
 #include <stdint.h> // uint8_t
 #include <QString>
+#include <QApplication>
 
 class RealtimeData
 {
-
+    Q_DECLARE_TR_FUNCTIONS(RealtimeData)
 
 public:
 

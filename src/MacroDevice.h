@@ -9,6 +9,8 @@ class DeviceFileInfo;
 struct MacroDevices : public Devices
 {
     Q_DECLARE_TR_FUNCTIONS(MacroDevices)
+
+    public:
     virtual DevicePtr newDevice( CommPortPtr dev, Device::StatusCallback cb );
     virtual QString downloadInstructions() const;
     virtual bool canCleanup( void ) {return true; };
@@ -16,6 +18,9 @@ struct MacroDevices : public Devices
 
 struct MacroDevice : public Device
 {
+    Q_DECLARE_TR_FUNCTIONS(MacroDevice)
+
+    public:
     MacroDevice( CommPortPtr dev, StatusCallback cb ) :
         Device( dev, cb ) {};
 
