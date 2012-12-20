@@ -22,8 +22,6 @@
 #include <math.h>
 #include <float.h>
 
-#define tr(s) QObject::tr(s)
-
 // comparing doubles is nasty
 static bool doubles_equal(double a, double b)
 {

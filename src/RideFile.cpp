@@ -36,8 +36,6 @@
     start = point->secs; \
 }
 
-#define tr(s) QObject::tr(s)
-
 RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
             startTime_(startTime), recIntSecs_(recIntSecs),
             deviceType_("unknown"), data(NULL), weight_(0)

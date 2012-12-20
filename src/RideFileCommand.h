@@ -27,6 +27,7 @@
 #include <QList>
 #include <QMap>
 #include <QVector>
+#include <QApplication>
 
 #include "RideFile.h"
 
@@ -126,6 +127,8 @@ class LUWCommand : public RideCommand
 
 class SetPointValueCommand : public RideCommand
 {
+    Q_DECLARE_TR_FUNCTIONS(SetPointValueCommand)
+
     public:
         SetPointValueCommand(RideFile *ride, int row, RideFile::SeriesType series, double oldvalue, double newvalue);
         bool doCommand();
@@ -139,6 +142,8 @@ class SetPointValueCommand : public RideCommand
 
 class DeletePointCommand : public RideCommand
 {
+    Q_DECLARE_TR_FUNCTIONS(DeletePointCommand)
+
     public:
         DeletePointCommand(RideFile *ride, int row, RideFilePoint point);
         bool doCommand();
@@ -151,6 +156,8 @@ class DeletePointCommand : public RideCommand
 
 class DeletePointsCommand : public RideCommand
 {
+    Q_DECLARE_TR_FUNCTIONS(DeletePointsCommand)
+
     public:
         DeletePointsCommand(RideFile *ride, int row, int count,
             QVector<RideFilePoint> current);
@@ -165,6 +172,8 @@ class DeletePointsCommand : public RideCommand
 
 class InsertPointCommand : public RideCommand
 {
+    Q_DECLARE_TR_FUNCTIONS(InsertPointCommand)
+
     public:
         InsertPointCommand(RideFile *ride, int row, RideFilePoint *point);
         bool doCommand();
@@ -176,6 +185,8 @@ class InsertPointCommand : public RideCommand
 };
 class AppendPointsCommand : public RideCommand
 {
+    Q_DECLARE_TR_FUNCTIONS(AppendPointsCommand)
+
     public:
         AppendPointsCommand(RideFile *ride, int row, QVector<RideFilePoint> points);
         bool doCommand();
@@ -186,6 +197,8 @@ class AppendPointsCommand : public RideCommand
 };
 class SetDataPresentCommand : public RideCommand
 {
+    Q_DECLARE_TR_FUNCTIONS(SetDataPresentCommand)
+
     public:
         SetDataPresentCommand(RideFile *ride, RideFile::SeriesType series,
                               bool newvalue, bool oldvalue);
