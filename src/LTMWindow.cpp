@@ -118,7 +118,8 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
 
     // config changes or ride file activities cause a redraw/refresh (but only if visible)
     //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected(void)));
-    connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
+    //XXX no longer needed since we use dateRange not rideItem for LTM plots on home view
+    //XXX connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh(void)));
     connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
     connect(main, SIGNAL(configChanged()), this, SLOT(refresh()));
@@ -142,7 +143,6 @@ LTMWindow::rideSelected()
         // use the first available date range
         ltmTool->selectDateRange(0);
         chartSelected(0);
-#endif
     if (amVisible() == true && dirty == true) {
 
         // plot needs to be redrawn
@@ -150,6 +150,7 @@ LTMWindow::rideSelected()
     } else if (amVisible() == false) {
         popup->hide();
     }
+#endif
 }
 
 void
@@ -204,10 +205,12 @@ LTMWindow::dateRangeChanged(DateRange range)
     settings.data = &results;
     settings.measures = &measures;
 
-    // apply filter to new date range too
+    // apply filter to new date range too -- will refresh plot
     filterChanged();
 
-    refreshPlot();
+    //XXX not needed since filter changed will also
+    //XXX call refreshPlot();
+    //refreshPlot();
 }
 
 void
