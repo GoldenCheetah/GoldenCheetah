@@ -1474,17 +1474,7 @@ AllPlotWindow::setupStackPlots()
         _allPlot->setDataFromPlot(fullPlot, startIndex, stopIndex);
         _allPlot->setAxisScale(QwtPlot::xBottom, _stackWidth*i, _stackWidth*(i+1), 15/stackWidth);
 
-        if (i==0){
-            // First plot view title and legend
-            //_allPlot->setTitle(allPlot->title());
-            //_allPlot->plotLayout()->setLegendPosition(QwtPlot::TopLegend);
-            _allPlot->setFixedHeight(120+stackWidth*2+50);
-        }
-        else {
-           _allPlot->setTitle("");
-           //_allPlot->insertLegend(NULL);
-           _allPlot->setFixedHeight(120+stackWidth*2);
-        }
+        _allPlot->setFixedHeight(120+stackWidth*2);
 
         // No x axis titles
         _allPlot->setAxisTitle(QwtPlot::xBottom,NULL);
