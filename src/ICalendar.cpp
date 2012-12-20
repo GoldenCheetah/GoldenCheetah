@@ -21,12 +21,12 @@
 #include "CalendarDownload.h"
 #include <libical/ical.h>
 
-#define tr(s) QObject::tr(s)
-
-static struct {
+void ICalendar::setICalendarProperties()
+{
+  static struct {
     icalproperty_kind type;
     QString friendly;
-} ICalendarProperties[] = {
+  } ICalendarProperties[] = {
     { ICAL_ACTION_PROPERTY, tr("Action") },
     { ICAL_ALLOWCONFLICT_PROPERTY, tr("Allow Conflict") },
     { ICAL_ATTACH_PROPERTY, tr("Attachment") },
@@ -126,7 +126,8 @@ static struct {
     { ICAL_XLICMIMEFILENAME_PROPERTY, tr("XLI mime filename") },
     { ICAL_XLICMIMEOPTINFO_PROPERTY, tr("XLI mime optional information") },
     { ICAL_NO_PROPERTY, tr("") } //XXX ICAL_NO_PROPERTY must always be last!!
-};
+  };
+}
 
 // convert property to a string
 static QString propertyToString(icalproperty *p)

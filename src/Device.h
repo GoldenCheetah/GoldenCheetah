@@ -22,6 +22,7 @@
 
 #include "CommPort.h"
 #include <boost/function.hpp>
+#include <QApplication>
 
 struct DeviceDownloadFile
 {
@@ -50,6 +51,9 @@ typedef boost::shared_ptr<Device> DevicePtr;
 
 struct Device
 {
+    Q_DECLARE_TR_FUNCTIONS(Device)
+
+    public:
     typedef boost::function<bool (void)> CancelCallback;
     typedef boost::function<void (const QString &statusText)> StatusCallback;
     typedef boost::function<void (const QString &progressText)> ProgressCallback;

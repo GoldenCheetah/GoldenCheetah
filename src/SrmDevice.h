@@ -25,6 +25,9 @@
 
 struct SrmDevices : public Devices
 {
+    Q_DECLARE_TR_FUNCTIONS(SrmDevices)
+
+    public:
     SrmDevices( int protoVersion ) : protoVersion( protoVersion ) {}
 
     virtual DevicePtr newDevice( CommPortPtr dev, Device::StatusCallback cb );
@@ -38,6 +41,9 @@ private:
 
 struct SrmDevice : public Device
 {
+    Q_DECLARE_TR_FUNCTIONS(SrmDevice)
+
+    public:
     SrmDevice( CommPortPtr dev, StatusCallback cb, int protoVersion ) :
         Device( dev, cb ),
         protoVersion( protoVersion ),
