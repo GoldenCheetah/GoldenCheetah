@@ -40,6 +40,7 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
 {
     main = parent;
     setInstanceName("Metric Window");
+    plotted = DateRange(QDate(01,01,01), QDate(01,01,01));
 
     // the plot
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -157,6 +158,7 @@ void
 LTMWindow::refreshPlot()
 {
     if (amVisible() == true) {
+        plotted = myDateRange;
         ltmPlot->setData(&settings);
         dirty = false;
     }
@@ -199,8 +201,12 @@ LTMWindow::metricSelected()
 
 void
 LTMWindow::dateRangeChanged(DateRange range)
-{ Q_UNUSED( range )
+{
     if (!amVisible() && !dirty) return;
+
+    // we already plotted that date range
+    if (range.from == plotted.from &&
+        range.to  == plotted.to) return;
 
     settings.data = &results;
     settings.measures = &measures;
