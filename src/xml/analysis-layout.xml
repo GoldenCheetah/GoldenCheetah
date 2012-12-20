@@ -2,7 +2,7 @@
 	<chart id="14" name="Ride Summary Window" title="Summary" >
 		<property name="instanceName" type="QString" value="Ride Summary Window" />
 		<property name="title" type="QString" value="Summary" />
-		<property name="subtitle" type="QString" value="Saturday July 4, 2009, 6:09 AM" />
+		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="2" />
 		<property name="heightFactor" type="double" value="2" />
 		<property name="resizable" type="bool" value="0" />
@@ -50,7 +50,7 @@
 	<chart id="5" name="Google Map" title="Map" >
 		<property name="instanceName" type="QString" value="Google Map" />
 		<property name="title" type="QString" value="Map" />
-		<property name="subtitle" type="QString" value="Marmotte" />
+		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="2" />
 		<property name="heightFactor" type="double" value="1.38889" />
 		<property name="resizable" type="bool" value="0" />
