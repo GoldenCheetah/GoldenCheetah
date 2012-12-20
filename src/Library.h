@@ -98,7 +98,7 @@ class LibrarySearch : public QThread
     Q_OBJECT
 
     public:
-        LibrarySearch(QString path);
+        LibrarySearch(QString path, bool findMedia, bool findWorkout);
         void run();
 
     public slots:
@@ -114,6 +114,7 @@ class LibrarySearch : public QThread
     private:
         volatile bool aborted;
         QString path;
+        bool findMedia, findWorkout;
 };
 
 #endif // _Library_h
