@@ -47,7 +47,7 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors, QList
     double rideSec = 0;
 
     if (!file.open(QFile::ReadOnly)) {
-	errors << ("Could not open ride file: \""
+	errors << (tr("Could not open ride file: \"")
 		+ file.fileName() + "\"");
 	return NULL;
     }
@@ -84,7 +84,7 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors, QList
 		else if (englishUnits.indexIn(line) != -1)
 		    metric = false;
 		else {
-		    errors << ("Can't find units in first line: \"" + line + "\"");
+		    errors << (tr("Can't find units in first line: \"") + line + "\"");
 		    delete rideFile;
 		    file.close();
 		    return NULL;
@@ -117,7 +117,7 @@ RideFile *ManualFileReader::openRideFile(QFile &file, QStringList &errors, QList
                         rideFile->metricOverrides.insert(columnNames[i], map);
                     }
                     else {
-                        errors << QObject::tr("Unknown ride metric \"%1\".").arg(columnNames[i]);
+                        errors << tr("Unknown ride metric \"%1\".").arg(columnNames[i]);
                     }
                 }
 		cad = nm = 0.0;

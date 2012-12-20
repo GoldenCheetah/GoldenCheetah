@@ -21,8 +21,10 @@
 #include "GoldenCheetah.h"
 
 #include "RideFile.h"
+#include <QApplication>
 
 struct ManualFileReader : public RideFileReader {
+    Q_DECLARE_TR_FUNCTIONS(RideCount)
     virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 
     bool hasWrite() const { return false; }
 };
