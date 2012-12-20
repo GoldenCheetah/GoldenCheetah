@@ -295,6 +295,21 @@ class PeakWPK30m : public PeakWPK {
         RideMetric *clone() const { return new PeakWPK30m(*this); }
 };
 
+class PeakWPK50m : public PeakWPK {
+    Q_DECLARE_TR_FUNCTIONS(PeakWPK50m)
+    public:
+        PeakWPK50m()
+        {
+            setSecs(3000);
+            setSymbol("50m_peak_wpk");
+            setInternalName("50 min Peak WPK");
+        }
+        void initialize () {
+            setName(tr("50 min Peak WPK"));
+        }
+        RideMetric *clone() const { return new PeakWPK50m(*this); }
+};
+
 class Vo2max : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(Vo2max)
     public:
@@ -335,6 +350,7 @@ static bool addAllWPK() {
     RideMetricFactory::instance().addMetric(PeakWPK10m());
     RideMetricFactory::instance().addMetric(PeakWPK20m());
     RideMetricFactory::instance().addMetric(PeakWPK30m());
+    RideMetricFactory::instance().addMetric(PeakWPK50m());
     RideMetricFactory::instance().addMetric(CPWPK());
     QVector<QString> deps;
     deps.append("5m_peak_wpk");
