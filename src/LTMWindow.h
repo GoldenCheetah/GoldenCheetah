@@ -143,6 +143,7 @@ class LTMWindow : public LTMPlotContainer
         // passed from MainWindow
         QDir home;
         bool useMetricUnits;
+        DateRange plotted;
 
         // qwt picker
         LTMToolTip *picker;
