@@ -111,7 +111,13 @@ class HourTimeScaleDraw: public QwtScaleDraw
 public:
     HourTimeScaleDraw() { }
 
-    virtual QwtText label(double v) const { return QString("%1").arg(round(v/60000)); }
+    virtual QwtText label(double v) const { 
+        v /= 1000;
+        QTime t = QTime().addSecs(v);
+        if (scaleMap().sDist() > 5)
+            return t.toString("hh:mm");
+        return t.toString("hh:mm:ss");
+    }
 };
 
 class ErgFilePlot : public QwtPlot

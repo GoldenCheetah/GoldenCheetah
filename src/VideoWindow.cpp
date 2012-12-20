@@ -193,6 +193,25 @@ void VideoWindow::mediaSelected(QString filename)
 
 MediaHelper::MediaHelper()
 {
+    // construct a list of supported types
+    // Using the basic list from the VLC
+    // Wiki here: http://www.videolan.org/vlc/features.html and then looked for
+    // the common extensions used from here: http://www.fileinfo.com/filetypes/video
+    supported << ".3GP";
+    supported << ".ASF";
+    supported << ".AVI";
+    supported << ".DIVX";
+    supported << ".FLV";
+    supported << ".M4V";
+    supported << ".MKV";
+    supported << ".MOV";
+    supported << ".MP4";
+    supported << ".MPEG";
+    supported << ".MPG";
+    supported << ".MXF";
+    supported << ".VOB";
+    supported << ".WMV";
+
 }
 
 MediaHelper::~MediaHelper()
@@ -202,34 +221,7 @@ MediaHelper::~MediaHelper()
 QStringList 
 MediaHelper::listMedia(QDir dir)
 {
-    QStringList supported;
     QStringList returning;
-
-    // construct a list of supported types
-    // Using the basic list from the VLC
-    // Wiki here: http://www.videolan.org/vlc/features.html and then looked for
-    // the common extensions used from here: http://www.fileinfo.com/filetypes/video
-    supported << ".3GP";
-    supported << ".ASF";
-    supported << ".AVI";
-    supported << ".DIVX";
-    supported << ".FLAC";
-    supported << ".FLV";
-    supported << ".M4V";
-    supported << ".MKV";
-    supported << ".MOV";
-    supported << ".MP4";
-    supported << ".MPEG";
-    supported << ".MPG";
-    supported << ".MXF";
-    supported << ".Nut";
-    supported << ".OGG";
-    supported << ".OGM";
-    supported << ".RM";
-    supported << ".VOB";
-    supported << ".WAV";
-    supported << ".WMA";
-    supported << ".WMV";
 
     // go through the sub directories
     QDirIterator directory_walker(dir, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
@@ -251,4 +243,14 @@ MediaHelper::listMedia(QDir dir)
         }
     }
     return returning;
+}
+
+bool
+MediaHelper::isMedia(QString name)
+{
+    foreach (QString extension, supported) {
+        if (name.endsWith(extension, Qt::CaseInsensitive))
+            return true;
+    }
+    return false;
 }

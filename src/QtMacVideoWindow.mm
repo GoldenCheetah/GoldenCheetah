@@ -26,6 +26,28 @@
 
 #include "QtMacVideoWindow.h"
 
+
+static inline NSString *darwinQStringToNSString (const QString &aString)
+{
+    return [reinterpret_cast<const NSString *> (CFStringCreateWithCharacters
+            (0, reinterpret_cast<const UniChar *> (aString.unicode()), aString.length())) autorelease];
+}
+
+static QString qt_mac_NSStringToQString(const NSString *nsstr)
+{
+    NSRange range;
+    range.location = 0;
+    range.length = [nsstr length];
+    QString result(range.length, QChar(0));
+ 
+    unichar *chars = new unichar[range.length];
+    [nsstr getCharacters:chars range:range];
+    result = QString::fromUtf16(chars, range.length);
+    delete[] chars;
+    return result;
+}
+
+
 VideoWindow::VideoWindow(MainWindow *parent, const QDir &home)  :
 GcWindow(parent), home(home), main(parent), hasMovie(false)
 {
@@ -99,13 +121,6 @@ void VideoWindow::seekPlayback(long ms)
     [movie setCurrentTime:newTime];
 }
 
-
-static inline NSString *darwinQStringToNSString (const QString &aString)
-{
-    return [reinterpret_cast<const NSString *> (CFStringCreateWithCharacters
-            (0, reinterpret_cast<const UniChar *> (aString.unicode()), aString.length())) autorelease];
-}
-
 void VideoWindow::mediaSelected(QString filename)
 {
     NativeQTMovieRef old = movie; // so we can invalidate once View has been reset
@@ -141,40 +156,40 @@ void VideoWindow::mediaSelected(QString filename)
     if (old) [old invalidate];
 }
 
-MediaHelper::MediaHelper() { }
+MediaHelper::MediaHelper() 
+{
+    // get a QTMove object to get the extensions we need
+#if 0
+    NSArray *types = [QTMovie movieFileTypes:QTIncludeCommonTypes];
+    for (unsigned int i=0; i<[types count]; ++i) {
+        QString type = qt_mac_NSStringToQString([types objectAtIndex:i]);
+        if (type.startsWith("'")) continue; // skip 'xxx ' types
+
+        // weird file format associations for QTKit (?) .. probably a few others too...
+        if (type == "gif") continue; // skip image formats
+        if (type == "pdf") continue; // skip document formats
+        if (type == "wav") continue; // skip document formats
+        if (type == "snd") continue; // skip sound ..
+        supported << QString(".%1").arg(type); // .xxx added
+    }
+#endif
+    // too many non video formats are returned, so we just list the main
+    // formats we know are video and supported
+    supported << ".mp4";
+    supported << ".mov";
+    supported << ".avi";
+    supported << ".avi";
+    supported << ".3gp";
+    supported << ".3g2";
+}
+
 
 MediaHelper::~MediaHelper() { }
-
-// convert an NSString to a QString
-static QString qt_mac_NSStringToQString(const NSString *nsstr)
-{
-    NSRange range;
-    range.location = 0;
-    range.length = [nsstr length];
-    QString result(range.length, QChar(0));
- 
-    unichar *chars = new unichar[range.length];
-    [nsstr getCharacters:chars range:range];
-    result = QString::fromUtf16(chars, range.length);
-    delete[] chars;
-    return result;
-}
 
 QStringList 
 MediaHelper::listMedia(QDir dir)
 {
-    QStringList supported;
     QStringList returning;
-
-    // get a QTMove object to get the extensions we need
-    NSArray *types = [QTMovie movieFileTypes:QTIncludeCommonTypes];
-    for (unsigned int i=0; i<[types count]; ++i) {
-        QString type = qt_mac_NSStringToQString([types objectAtIndex:i]);
-
-        if (type.startsWith("'")) continue; // skip 'xxx ' types
-
-        supported << QString(".%1").arg(type); // .xxx added
-    }
 
     // go through the sub directories
     QDirIterator directory_walker(dir, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
@@ -196,6 +211,16 @@ MediaHelper::listMedia(QDir dir)
     }
 
     return returning;
+}
+
+bool
+MediaHelper::isMedia(QString filename)
+{
+    foreach(QString extension, supported) {
+        if (filename.endsWith(extension, Qt::CaseInsensitive))
+            return true;
+    }
+    return false;
 }
 
 QtMacMovieView::QtMacMovieView (QWidget *parent) : QMacCocoaViewContainer (0, parent)

@@ -192,8 +192,8 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     intensitySlider = new QSlider(Qt::Horizontal, this);
     intensitySlider->setAutoFillBackground(false);
     intensitySlider->setFocusPolicy(Qt::NoFocus);
-    intensitySlider->setMinimum(50);
-    intensitySlider->setMaximum(150);
+    intensitySlider->setMinimum(75);
+    intensitySlider->setMaximum(125);
     intensitySlider->setValue(100);
     slideLayout->addStretch();
     slideLayout->addWidget(intensitySlider);
