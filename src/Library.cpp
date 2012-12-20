@@ -141,6 +141,10 @@ LibrarySearchDialog::LibrarySearchDialog(MainWindow *mainWindow) : mainWindow(ma
     mediaCount = new QLabel(this);
     workoutCountTitle = new QLabel(tr("Workouts"), this);
     workoutCount = new QLabel(this);
+    mediaCount->setFixedWidth(40);
+    mediaCountTitle->setFixedWidth(40);
+    workoutCount->setFixedWidth(60);
+    workoutCountTitle->setFixedWidth(60);
 
     cancelButton = new QPushButton(tr("Cancel"), this);
     cancelButton->setDefault(false);
@@ -277,7 +281,7 @@ LibrarySearchDialog::search()
 
             QTreeWidgetItem *item = searchPathTable->invisibleRootItem()->child(pathIndex);
             QString path = item->text(0);
-            searcher = new LibrarySearch(path);
+            searcher = new LibrarySearch(path, findMedia->isChecked(), findWorkouts->isChecked());
         }
 
     } else {
@@ -288,7 +292,7 @@ LibrarySearchDialog::search()
         mediaCount->setText(QString("%1").arg(videoCountN));
         QTreeWidgetItem *item = searchPathTable->invisibleRootItem()->child(pathIndex);
         QString path = item->text(0);
-        searcher = new LibrarySearch(path);
+        searcher = new LibrarySearch(path, findMedia->isChecked(), findWorkouts->isChecked());
     }
 
     connect(searcher, SIGNAL(done()), this, SLOT(search()));
@@ -378,7 +382,8 @@ LibrarySearchDialog::updateDB()
 // SEARCH -- traverse a directory looking for files and signal to notify of progress etc
 //
 
-LibrarySearch::LibrarySearch(QString path) : path(path)
+LibrarySearch::LibrarySearch(QString path, bool findMedia, bool findWorkout)
+              : path(path), findMedia(findMedia), findWorkout(findWorkout)
 {
     aborted = false;
 }
@@ -399,9 +404,9 @@ LibrarySearch::run()
         QString name = directory_walker.filePath();
 
         // skip . files
-        if (QFileInfo(name).fileName().startsWith(",")) continue;
+        if (QFileInfo(name).fileName().startsWith(".")) continue;
 
-        emit searching(QFileInfo(name).filePath());
+        if (QFileInfo(name).isDir()) emit searching(name);
 
         // we've been told to stop!
         if (aborted) {
@@ -410,9 +415,9 @@ LibrarySearch::run()
         }
 
         // is a video?
-        if (helper.isMedia(name)) emit foundVideo(name);
+        if (findMedia && helper.isMedia(name)) emit foundVideo(name);
         // is a workout?
-        if (ErgFile::isWorkout(name)) emit foundWorkout(name);
+        if (findWorkout && ErgFile::isWorkout(name)) emit foundWorkout(name);
     }
     emit done();
 };
