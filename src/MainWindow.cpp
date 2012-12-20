@@ -119,8 +119,10 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/version.hpp>
 
-QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
+#include "Library.h"
+#include "LibraryParser.h"
 
+QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 
 MainWindow::MainWindow(const QDir &home) :
     home(home), session(0), isclean(false), ismultisave(false),
@@ -136,7 +138,13 @@ MainWindow::MainWindow(const QDir &home) :
     static const QIcon tileIcon(":images/toolbar/main/tile.png");
     static const QIcon fullIcon(":images/toolbar/main/togglefull.png");
 
-    mainwindows.append(this); // add us to the list of open windows
+    /*----------------------------------------------------------------------
+     *  Basic State / Config
+     *--------------------------------------------------------------------*/
+    mainwindows.append(this);  // add us to the list of open windows
+
+    // search paths
+    Library::initialise(home);
 
     // Network proxy
     QNetworkProxyQuery npq(QUrl("http://www.google.com"));
@@ -800,6 +808,7 @@ MainWindow::MainWindow(const QDir &home) :
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Workout Wizard"), this, SLOT(showWorkoutWizard()));
     optionsMenu->addAction(tr("Get Workouts from ErgDB"), this, SLOT(downloadErgDB()));
+    optionsMenu->addAction(tr("Manage Media/Workout Library"), this, SLOT(manageLibrary()));
 
 #ifdef GC_HAVE_ICAL
     optionsMenu->addSeparator();
@@ -1970,6 +1979,16 @@ MainWindow::downloadErgDB()
         " selected no longer exists.\n\n"
         "Please check your preference settings.");
     }
+}
+
+/*----------------------------------------------------------------------
+ * Workout/Media Library
+ *--------------------------------------------------------------------*/
+void
+MainWindow::manageLibrary()
+{
+    LibrarySearchDialog *search = new LibrarySearchDialog(this);
+    search->exec();
 }
 
 /*----------------------------------------------------------------------

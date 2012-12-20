@@ -288,6 +288,8 @@ HEADERS += \
         IntervalTreeView.h \
         JouleDevice.h \
         JsonRideFile.h \
+        Library.h \
+        LibraryParser.h \
         LogTimeScaleDraw.h \
         LogTimeScaleEngine.h \
         LTMCanvasPicker.h \
@@ -480,6 +482,8 @@ SOURCES += \
         IntervalTreeView.cpp \
         JouleDevice.cpp \
         LeftRightBalance.cpp \
+        Library.cpp \
+        LibraryParser.cpp \
         LogTimeScaleDraw.cpp \
         LogTimeScaleEngine.cpp \
         LTMCanvasPicker.cpp \

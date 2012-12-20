@@ -58,8 +58,10 @@ class MediaHelper
         // get a list of supported media
         // found in the supplied directory
         QStringList listMedia(QDir directory);
+        bool isMedia(QString);
 
     private:
+        QStringList supported;
 };
 
 class QtMacMovieView : public QMacCocoaViewContainer

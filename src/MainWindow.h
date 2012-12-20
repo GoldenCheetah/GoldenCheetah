@@ -70,6 +70,7 @@ class ChartSettings;
 class QtMacSegmentedButton;
 class GcScopeBar;
 class RideFileCache;
+class Library;
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 
@@ -261,6 +262,7 @@ class MainWindow : public QMainWindow
         void uploadRideWithGPSAction();
         void uploadTtb();
         void downloadErgDB();
+        void manageLibrary();
         void manualProcess(QString);
 #ifdef GC_HAVE_SOAP
         void uploadTP();

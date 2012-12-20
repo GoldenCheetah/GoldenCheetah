@@ -72,6 +72,7 @@ class ErgFile
         ~ErgFile();             // delete the contents
 
         static ErgFile *fromContent(QString, MainWindow *); // read from memory
+        static bool isWorkout(QString); // is this a supported workout?
 
         void reload();          // reload after messed about
         void parseComputrainer(QString p = ""); // its an erg,crs or mrc file

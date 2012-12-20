@@ -21,6 +21,25 @@
 #include <stdint.h>
 #include "Units.h"
 
+// Supported file types
+static QStringList supported;
+static bool setSupported()
+{
+    ::supported << ".erg";
+    ::supported << ".mrc";
+    ::supported << ".crs";
+    ::supported << ".pgmf";
+    return true;
+}
+static bool isinit = setSupported();
+bool ErgFile::isWorkout(QString name)
+{
+    foreach(QString extension, supported) {
+        if (name.endsWith(extension, Qt::CaseInsensitive))
+            return true;
+    }
+    return false;
+}
 ErgFile::ErgFile(QString filename, int &mode, double Cp, MainWindow *main) : 
     Cp(Cp), filename(filename), main(main), mode(mode)
 {

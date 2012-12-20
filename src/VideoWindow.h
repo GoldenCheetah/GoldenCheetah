@@ -53,9 +53,10 @@ class MediaHelper
         // get a list of supported media
         // found in the supplied directory
         QStringList listMedia(QDir directory);
+        bool isMedia(QString filename);
 
     private:
-
+        QStringList supported;
         libvlc_instance_t * inst;
 };
 
