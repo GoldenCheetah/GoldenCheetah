@@ -10,6 +10,8 @@ class JoulePacket;
 struct JouleDevices : public Devices
 {
     Q_DECLARE_TR_FUNCTIONS(JouleDevices)
+
+    public:
     virtual DevicePtr newDevice( CommPortPtr dev, Device::StatusCallback cb );
     virtual QString downloadInstructions() const;
     virtual bool canCleanup( void ) {return true; };
@@ -17,6 +19,9 @@ struct JouleDevices : public Devices
 
 struct JouleDevice : public Device
 {
+    Q_DECLARE_TR_FUNCTIONS(JouleDevice)
+
+    public:
     JouleDevice( CommPortPtr dev, StatusCallback cb ) :
         Device( dev, cb ) {};
 

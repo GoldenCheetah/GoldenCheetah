@@ -18,8 +18,6 @@
 
 #include "Device.h"
 
-#define tr(s) QObject::tr(s)
-
 typedef QMap<QString,DevicesPtr> DevicesMap;
 
 static DevicesMap *devicesPtr;

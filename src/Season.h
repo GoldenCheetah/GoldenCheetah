@@ -23,6 +23,7 @@
 #include <QString>
 #include <QDate>
 #include <QFile>
+#include <QApplication>
 
 #include "MainWindow.h"
 
@@ -37,6 +38,8 @@ class SeasonEvent
 
 class Season
 {
+    Q_DECLARE_TR_FUNCTIONS(Season)
+
 	public:
         static QList<QString> types;
         enum SeasonType { season=0, cycle=1, adhoc=2, temporary=3 };

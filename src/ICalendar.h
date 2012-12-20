@@ -60,6 +60,7 @@ class ICalendar : public QWidget
         //           of only one local, one remote.
         QMap<QDate, QList<icalcomponent*>*> localCalendar;
         QMap<QDate, QList<icalcomponent*>*> remoteCalendar;
+        static void setICalendarProperties();
 };
 
 #endif // _GC_ICalendar_h

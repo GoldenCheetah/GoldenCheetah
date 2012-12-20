@@ -25,12 +25,17 @@
 struct PowerTapDevices : public Devices
 {
     Q_DECLARE_TR_FUNCTIONS(PowerTapDevices)
+
+    public:
     virtual DevicePtr newDevice( CommPortPtr dev, Device::StatusCallback cb );
     virtual QString downloadInstructions() const;
 };
 
 struct PowerTapDevice : public Device
 {
+    Q_DECLARE_TR_FUNCTIONS(PowerTapDevices)
+
+    public:
     PowerTapDevice( CommPortPtr dev, StatusCallback cb ) :
         Device( dev, cb ) {};
 
