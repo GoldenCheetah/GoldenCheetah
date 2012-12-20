@@ -24,8 +24,6 @@
 #include <boost/foreach.hpp>
 #include <errno.h>
 
-#define tr(s) QObject::tr(s)
-
 static bool srm5Registered =
     Devices::addType("SRM PCV", DevicesPtr(new SrmDevices( 5 )) );
 static bool srm7Registered =
