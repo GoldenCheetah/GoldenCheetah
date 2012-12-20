@@ -13,6 +13,11 @@
 #CONFIG += console
 #QMAKE_LFLAGS = -mwindows
 
+# To compile translation you need QT tool - lrelease
+# If it is not found using he defaults in src/src.pro
+# then set the full path and filename here.
+#QMAKE_LRELEASE = /usr/bin/lrelease
+
 # We use g++ on all platforms so switch on auto vectorization amongst other
 # things to speed up looping over ride file points
 #QMAKE_CXXFLAGS += -O3
