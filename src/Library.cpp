@@ -308,7 +308,6 @@ LibrarySearchDialog::foundVideo(QString name)
 {
     mediaCount->setText(QString("%1").arg(++videoCountN));
     videosFound << name;
-qDebug()<<"vid:"<<name;
 }
 
 void
