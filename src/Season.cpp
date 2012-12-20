@@ -23,8 +23,6 @@
 #include "SeasonParser.h"
 #include <QXmlSimpleReader>
 
-#define tr(s) QObject::tr(s)
-
 static QList<QString> _setSeasonTypes()
 {
     QList<QString> returning;

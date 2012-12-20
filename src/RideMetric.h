@@ -64,7 +64,7 @@ struct RideMetric {
 
     // A short string suitable for showing to the user in the ride
     // summaries, configuration dialogs, etc.  It should be translated
-    // using QObject::tr().
+    // using tr().
     virtual QString name() const { return name_; }
 
     // English name used in metadata.xml for compatibility
@@ -76,7 +76,7 @@ struct RideMetric {
     virtual MetricType type() const { return type_; }
 
     // The units in which this RideMetric is expressed.  It should be
-    // translated using QObject::tr().
+    // translated using tr().
     virtual QString units(bool metric) const { return metric ? metricUnits_ : imperialUnits_; }
 
     // How many digits after the decimal we should show when displaying the
