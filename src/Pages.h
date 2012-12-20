@@ -72,8 +72,6 @@ class GeneralPage : public QWidget
         QCheckBox *garminSmartRecord;
         QLineEdit *garminHWMarkedit;
         QLineEdit *hystedit;
-        QLineEdit *BSdaysEdit;
-        QComboBox *bsModeCombo;
         QLineEdit *workoutDirectory;
         QPushButton *workoutBrowseButton;
 
@@ -82,15 +80,11 @@ class GeneralPage : public QWidget
         QLabel *warningLabel;
         QLabel *workoutLabel;
 
-        QLabel *perfManLabel;
-        QLabel *perfManStartLabel;
         QLabel *perfManSTSLabel;
         QLabel *perfManLTSLabel;
-        QLineEdit *perfManStart;
         QLineEdit *perfManSTSavg;
         QLineEdit *perfManLTSavg;
         QCheckBox *showSBToday;
-        QIntValidator *perfManStartValidator;
         QIntValidator *perfManSTSavgValidator;
         QIntValidator *perfManLTSavgValidator;
 };
