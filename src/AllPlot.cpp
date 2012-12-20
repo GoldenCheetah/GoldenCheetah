@@ -847,7 +847,7 @@ AllPlot::setYMax()
 
         int axisHeight = qRound( plotLayout()->canvasRect().height() );
         QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(yLeft) );
-        int labelWidth = labelWidthMetric.width( (maxY > 1000) ? "8888 " : "888 " );
+        int labelWidth = labelWidthMetric.width( (maxY > 1000) ? " 8,888 " : " 888 " );
 
         int step = 100;
         while( ( qCeil(maxY / step) * labelWidth ) > axisHeight )
@@ -896,8 +896,24 @@ AllPlot::setYMax()
             balanceLCurve->setBaseline(50);
             balanceRCurve->setBaseline(50);
         }
+
+        int axisHeight = qRound( plotLayout()->canvasRect().height() );
+        QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(yLeft) );
+        int labelWidth = labelWidthMetric.width( "888 " );
+
+        ymax *= 1.05;
+        int step = 10;
+        while( ( qCeil(ymax / step) * labelWidth ) > axisHeight )
+        {
+            nextStep(step);
+        }
+
+        QwtValueList xytick[QwtScaleDiv::NTickTypes];
+        for (int i=0;i<ymax;i+=step)
+            xytick[QwtScaleDiv::MajorTick]<<i;
+
         setAxisTitle(yLeft2, labels.join(" / "));
-        setAxisScale(yLeft2, 0.0, 1.05 * ymax);
+        setAxisScaleDiv(yLeft2,QwtScaleDiv(0, ymax, xytick));
         setAxisLabelRotation(yLeft2,270);
         setAxisLabelAlignment(yLeft2,Qt::AlignVCenter);
     }
