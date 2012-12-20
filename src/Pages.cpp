@@ -156,30 +156,6 @@ GeneralPage::GeneralPage(MainWindow *main) : main(main)
     configLayout->addWidget(garminHWLabel, 4,0, Qt::AlignRight);
     configLayout->addWidget(garminHWMarkedit, 4,1, Qt::AlignLeft);
 
-    //
-    // Bikescore crap
-    //
-    // BikeScore Estimate
-    QVariant BSdays = appsettings->value(this, GC_BIKESCOREDAYS);
-    QVariant BSmode = appsettings->value(this, GC_BIKESCOREMODE);
-
-    QLabel *BSDaysLabel = new QLabel(tr("BikeScore Estimate (days):"));
-    BSdaysEdit = new QLineEdit(BSdays.toString(),this);
-    BSdaysEdit->setInputMask("009");
-
-    configLayout->addWidget(BSDaysLabel, 5,0, Qt::AlignRight);
-    configLayout->addWidget(BSdaysEdit, 5,1, Qt::AlignLeft);
-
-    QLabel *BSModeLabel = new QLabel(tr("BikeScore Estimate by:"));
-    bsModeCombo = new QComboBox();
-    bsModeCombo->addItem(tr("time"));
-    bsModeCombo->addItem(tr("distance"));
-    if (BSmode.toString() == "time") bsModeCombo->setCurrentIndex(0);
-    else bsModeCombo->setCurrentIndex(1);
-
-    configLayout->addWidget(BSModeLabel, 6,0, Qt::AlignRight);
-    configLayout->addWidget(bsModeCombo, 6,1, Qt::AlignLeft);
-
     // Elevation hysterisis  GC_ELEVATION_HYSTERISIS
     QVariant elevationHysteresis = appsettings->value(this, GC_ELEVATION_HYSTERESIS);
     if (elevationHysteresis.isNull() || elevationHysteresis.toFloat() == 0.0)
@@ -196,22 +172,17 @@ GeneralPage::GeneralPage(MainWindow *main) : main(main)
     // Performance manager
     //
 
-    perfManStartLabel = new QLabel(tr("Starting LTS:"));
     perfManSTSLabel = new QLabel(tr("STS average (days):"));
     perfManLTSLabel = new QLabel(tr("LTS average (days):"));
-    perfManStartValidator = new QIntValidator(0,200,this);
     perfManSTSavgValidator = new QIntValidator(1,21,this);
     perfManLTSavgValidator = new QIntValidator(7,56,this);
 
     // get config or set to defaults
-    QVariant perfManStartVal = appsettings->cvalue(main->cyclist, GC_INITIAL_STS);
     QVariant perfManSTSVal = appsettings->cvalue(main->cyclist, GC_STS_DAYS);
     if (perfManSTSVal.isNull() || perfManSTSVal.toInt() == 0) perfManSTSVal = 7;
     QVariant perfManLTSVal = appsettings->cvalue(main->cyclist, GC_LTS_DAYS);
     if (perfManLTSVal.isNull() || perfManLTSVal.toInt() == 0) perfManLTSVal = 42;
 
-    perfManStart = new QLineEdit(perfManStartVal.toString(),this);
-    perfManStart->setValidator(perfManStartValidator);
     perfManSTSavg = new QLineEdit(perfManSTSVal.toString(),this);
     perfManSTSavg->setValidator(perfManSTSavgValidator);
     perfManLTSavg = new QLineEdit(perfManLTSVal.toString(),this);
@@ -220,8 +191,6 @@ GeneralPage::GeneralPage(MainWindow *main) : main(main)
     showSBToday = new QCheckBox(tr("PMC Stress Balance Today"), this);
     showSBToday->setChecked(appsettings->cvalue(main->cyclist, GC_SB_TODAY).toInt());
 
-    configLayout->addWidget(perfManStartLabel, 8,0, Qt::AlignRight);
-    configLayout->addWidget(perfManStart, 8,1, Qt::AlignLeft);
     configLayout->addWidget(perfManSTSLabel, 9,0, Qt::AlignRight);
     configLayout->addWidget(perfManSTSavg, 9,1, Qt::AlignLeft);
     configLayout->addWidget(perfManLTSLabel, 10,0, Qt::AlignRight);
@@ -268,14 +237,10 @@ GeneralPage::saveClicked()
     appsettings->setValue(GC_WHEELSIZE, wheelSizes[wheelSizeCombo->currentIndex()]);
 
     // Bike score estimation
-    appsettings->setValue(GC_BIKESCOREDAYS, BSdaysEdit->text());
-    appsettings->setValue(GC_BIKESCOREMODE, bsModeCombo->currentText());
     appsettings->setValue(GC_WORKOUTDIR, workoutDirectory->text());
     appsettings->setValue(GC_ELEVATION_HYSTERESIS, hystedit->text());
 
     // Performance Manager
-    appsettings->setCValue(main->cyclist, GC_INITIAL_STS, perfManStart->text());
-    appsettings->setCValue(main->cyclist, GC_INITIAL_LTS, perfManStart->text());
     appsettings->setCValue(main->cyclist, GC_STS_DAYS, perfManSTSavg->text());
     appsettings->setCValue(main->cyclist, GC_LTS_DAYS, perfManLTSavg->text());
     appsettings->setCValue(main->cyclist, GC_SB_TODAY, (int) showSBToday->isChecked());

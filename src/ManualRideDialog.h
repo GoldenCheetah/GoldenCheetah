@@ -46,6 +46,7 @@ class ManualRideDialog : public QDialog
         MainWindow *mainWindow;
         QVector<unsigned char> records;
         QString filename, filepath;
+        int daysago; // remember last deriveFactors value
 
         // factors for estimator
         double timeBS, distanceBS,  // Bikescore (use same for TSS)
@@ -57,6 +58,8 @@ class ManualRideDialog : public QDialog
 
         QDateEdit *dateEdit;  // start date
         QTimeEdit *timeEdit;  // start time
+
+        QDoubleSpinBox *days; // how many days to estimate?
 
         QLineEdit *wcode;     // workout code
         QLineEdit *sport;     // sport

@@ -35,12 +35,12 @@
 void 
 ManualRideDialog::deriveFactors()
 {
+    // we already calculated for that day range
+    if (days->value() == daysago) return;
+    else daysago = days->value();
+
     // working variables
     timeKJ = distanceKJ = timeTSS = distanceTSS = timeBS = distanceBS = timeDP = distanceDP = 0.0;
-
-    // by default look back no more than 30 days
-    QVariant BSdays = appsettings->value(this, GC_BIKESCOREDAYS);
-    if (BSdays.isNull() || BSdays.toInt() == 0) BSdays.setValue(30); 
 
     // whats the most recent ride?
     QList<SummaryMetrics> metrics = mainWindow->metricDB->getAllMetricsFor(QDateTime(), QDateTime());
@@ -67,7 +67,7 @@ ManualRideDialog::deriveFactors()
             int days =  metric.getRideDate().daysTo(QDateTime::currentDateTime());
 
             // only use rides in last 'n' days
-            if (days >= 0 && days < BSdays.toInt()) {
+            if (days >= 0 && days < daysago) {
 
                 bs += metric.getForSymbol("skiba_bike_score");
                 seconds += metric.getForSymbol("time_riding");
@@ -125,8 +125,8 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow) : mainWindow(mainWind
     setFixedSize(615,360);
 #endif
 
-    // used by the estimator, lets get them just once.
-    deriveFactors();
+    // we haven't derived factors yet
+    daysago = -1;
 
     //
     // Create the GUI widgets
@@ -205,8 +205,15 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow) : mainWindow(mainWind
     byDistance = new QRadioButton(tr("Distance"));
     byManual = new QRadioButton(tr("Manually"));
 
-    // What mode to use by default -- why not just remember what we used last time (?) XXX
-    //                                this setting is not used anywhere else
+    days = new QDoubleSpinBox(this);
+    days->setSingleStep(1.0);
+    days->setDecimals(0);
+    days->setMinimum(0);
+    days->setMaximum(999);
+    days->setValue(appsettings->value(this, GC_BIKESCOREDAYS, "30").toInt());
+    QLabel *dayLabel = new QLabel(tr("Estimate Stress days:"), this);
+
+    // Restore from last time
     QVariant BSmode = appsettings->value(this, GC_BIKESCOREMODE); // remember from before
     if (BSmode.toString() == "time") byDuration->setChecked(true);
     else byDistance->setChecked(true);
@@ -295,17 +302,22 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow) : mainWindow(mainWind
     estimateby->addWidget(byDuration);
     estimateby->addWidget(byDistance);
     estimateby->addWidget(byManual);
-
     metricLayout->addLayout(estimateby, 0,2,1,-1,Qt::AlignLeft);
 
-    metricLayout->addWidget(TSSLabel, 1,2, Qt::AlignLeft);
-    metricLayout->addWidget(TSS, 1,3, Qt::AlignLeft);
-    metricLayout->addWidget(KJLabel, 1,4, Qt::AlignLeft);
-    metricLayout->addWidget(KJ, 1,5, Qt::AlignLeft);
-    metricLayout->addWidget(BSLabel, 2,2, Qt::AlignLeft);
-    metricLayout->addWidget(BS, 2,3, Qt::AlignLeft);
-    metricLayout->addWidget(DPLabel, 2,4, Qt::AlignLeft);
-    metricLayout->addWidget(DP, 2,5, Qt::AlignLeft);
+
+    QHBoxLayout *daysLayout = new QHBoxLayout;
+    daysLayout->addWidget(dayLabel);
+    daysLayout->addWidget(days);
+    metricLayout->addLayout(daysLayout, 1,2,1,-1,Qt::AlignLeft);
+
+    metricLayout->addWidget(TSSLabel, 2,2, Qt::AlignLeft);
+    metricLayout->addWidget(TSS, 2,3, Qt::AlignLeft);
+    metricLayout->addWidget(KJLabel, 2,4, Qt::AlignLeft);
+    metricLayout->addWidget(KJ, 2,5, Qt::AlignLeft);
+    metricLayout->addWidget(BSLabel, 3,2, Qt::AlignLeft);
+    metricLayout->addWidget(BS, 3,3, Qt::AlignLeft);
+    metricLayout->addWidget(DPLabel, 3,4, Qt::AlignLeft);
+    metricLayout->addWidget(DP, 3,5, Qt::AlignLeft);
 
     QHBoxLayout *buttons = new QHBoxLayout;
     mainLayout->addLayout(buttons);
@@ -320,6 +332,7 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow) : mainWindow(mainWind
     connect(byDistance, SIGNAL(toggled(bool)), this, SLOT(estimate()));
     connect(byDuration, SIGNAL(toggled(bool)), this, SLOT(estimate()));
     connect(byManual, SIGNAL(toggled(bool)), this, SLOT(estimate()));
+    connect(days, SIGNAL(valueChanged(double)), this, SLOT(estimate()));
 
     // dialog buttons
     connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
@@ -346,6 +359,8 @@ ManualRideDialog::estimate()
         TSS->setEnabled(false);
         KJ->setEnabled(false);
     }
+
+    deriveFactors(); // if days changed..
 
     if (byDuration->isChecked()) {
         // by time
@@ -377,6 +392,12 @@ ManualRideDialog::cancelClicked()
 void
 ManualRideDialog::okClicked()
 {
+    // remember parameters
+    appsettings->setValue(GC_BIKESCOREDAYS, days->value());
+    appsettings->setValue(GC_BIKESCOREMODE,
+        byDistance->isChecked() ? "dist" :  
+       (byDuration->isChecked() ? "time" : "manual"));
+
     // create a new ridefile
     RideFile *rideFile = new RideFile();
 
