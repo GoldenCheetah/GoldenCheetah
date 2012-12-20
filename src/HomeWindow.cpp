@@ -1255,28 +1255,20 @@ GcWindowDialog::GcWindowDialog(GcWinID type, MainWindow *mainWindow) : mainWindo
     win = GcWindowRegistry::newGcWindow(type, mainWindow);
     chartLayout->addWidget(win);
 
-    controlLayout = new QFormLayout;
-    height=new QDoubleSpinBox(this);
-    height->setRange(1,10);
-    height->setSingleStep(1);
-    height->setValue(2);
-    width=new QDoubleSpinBox(this);
-    width->setRange(1,10);
-    width->setSingleStep(1);
-    width->setValue(2);
-
-    controlLayout->addRow(new QLabel(tr("Height Factor"),this), height);
-    controlLayout->addRow(new QLabel(tr("Width Factor"),this), width);
-    if (win->controls()) controlLayout->addRow(win->controls());
-    layout->addLayout(controlLayout);
+    // lets not have space for controls if there aren't any
+    layout->setStretch(0, 100);
+    if (win->controls()) {
+        controlLayout = new QFormLayout;
+        controlLayout->addRow(win->controls());
+        layout->addLayout(controlLayout);
+        layout->setStretch(1, 50);
+    }
 
     RideItem *notconst = (RideItem*)mainWindow->currentRideItem();
     win->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
     DateRange dr = mainWindow->currentDateRange();
     win->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
 
-    layout->setStretch(0, 100);
-    layout->setStretch(1, 50);
 
     QHBoxLayout *buttons = new QHBoxLayout;
     mainLayout->addLayout(buttons);
@@ -1303,8 +1295,8 @@ void GcWindowDialog::okClicked()
 
     // set its title property and geometry factors
     win->setProperty("title", title->text());
-    win->setProperty("widthFactor", width->value());
-    win->setProperty("heightFactor", height->value());
+    win->setProperty("widthFactor", 2.00);
+    win->setProperty("heightFactor", 2.00);
     win->setProperty("GcWinID", type);
     accept();
 }
