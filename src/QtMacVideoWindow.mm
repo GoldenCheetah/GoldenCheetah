@@ -177,8 +177,6 @@ MediaHelper::MediaHelper()
     // formats we know are video and supported
     supported << ".mp4";
     supported << ".mov";
-    supported << ".avi";
-    supported << ".avi";
     supported << ".3gp";
     supported << ".3g2";
 }
