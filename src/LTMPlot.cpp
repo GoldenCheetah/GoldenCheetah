@@ -116,7 +116,9 @@ LTMPlot::setData(LTMSettings *set)
                 // Replace with default translated values
                 settings->metrics[j].name = mdp->name;
                 settings->metrics[j].uname = mdp->uname;
-                settings->metrics[j].uunits = mdp->uunits;
+                //XXX need to translate these separately but retain
+                //XXX user adjusted values for units (esp. stress on PMC)
+                //XXX settings->metrics[j].uunits = mdp->uunits;
             }
         }
     }
