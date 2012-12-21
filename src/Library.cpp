@@ -376,6 +376,13 @@ LibrarySearchDialog::updateDB()
 {
     // update the database of workouts and videos
     //XXX update db here...
+    foreach(QString ergFile, workoutsFound) {
+        int mode;
+        ErgFile file(ergFile, mode, mainWindow);
+        if (file.isValid()) {
+            //XXX qDebug()<<"ergfile:"<<QFileInfo(ergFile).fileName()<<file.Duration<<file.TSS<<file.IF;
+        }
+    }
 }
 
 //

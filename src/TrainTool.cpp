@@ -548,7 +548,7 @@ TrainTool::workoutTreeWidgetSelectionChanged()
         QVariant workoutDir = appsettings->value(this, GC_WORKOUTDIR);
         QString fileName = workoutDir.toString() + "/" + currentWorkout()->text(0); // filename
 
-        ergFile = new ErgFile(fileName, mode, FTP, main);
+        ergFile = new ErgFile(fileName, mode, main);
         if (ergFile->isValid()) {
 
             status |= RT_WORKOUT;

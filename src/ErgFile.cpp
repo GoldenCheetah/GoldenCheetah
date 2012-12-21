@@ -40,15 +40,24 @@ bool ErgFile::isWorkout(QString name)
     }
     return false;
 }
-ErgFile::ErgFile(QString filename, int &mode, double Cp, MainWindow *main) : 
-    Cp(Cp), filename(filename), main(main), mode(mode)
+ErgFile::ErgFile(QString filename, int &mode, MainWindow *main) : 
+    filename(filename), main(main), mode(mode)
 {
+    if (main->zones()) {
+        int zonerange = main->zones()->whichRange(QDateTime::currentDateTime().date());
+        if (zonerange >= 0) CP = main->zones()->getCP(zonerange);
+    }
     reload();
 }
 
 ErgFile::ErgFile(MainWindow *main) : main(main), mode(nomode)
 {
-    Cp = 300;
+    if (main->zones()) {
+        int zonerange = main->zones()->whichRange(QDateTime::currentDateTime().date());
+        if (zonerange >= 0) CP = main->zones()->getCP(zonerange);
+    } else {
+        CP = 300;
+    }
     filename ="";
 }
 
@@ -367,6 +376,9 @@ void ErgFile::parseComputrainer(QString p)
                 QRegExp pname("^DESCRIPTION *", Qt::CaseInsensitive);
                 if (pname.exactMatch(settings.cap(1))) Name = settings.cap(2);
 
+                QRegExp sname("^SOURCE *", Qt::CaseInsensitive);
+                if (sname.exactMatch(settings.cap(1))) Source = settings.cap(2);
+
                 QRegExp punit("^UNITS *", Qt::CaseInsensitive);
                 if (punit.exactMatch(settings.cap(1))) {
                     Units = settings.cap(2);
@@ -396,12 +408,12 @@ void ErgFile::parseComputrainer(QString p)
 
                         double watts = add.y;
                         double ftp = Ftp;
-                        watts *= Cp/ftp;
+                        watts *= CP/ftp;
                         add.y = add.val = watts;
                     }
                     break;
                 case MRC:       // its a percent relative to CP (mrc file)
-                    add.y *= Cp;
+                    add.y *= CP;
                     add.y /= 100.00;
                     add.val = add.y;
                     break;
@@ -414,7 +426,7 @@ void ErgFile::parseComputrainer(QString p)
                 // we have a relative watts match
                 ErgFilePoint add;
                 add.x = relativeWatts.cap(1).toDouble() * 60000; // from mins to 1000ths of a second
-                add.val = add.y = (relativeWatts.cap(2).toDouble() /100.00) * Cp;
+                add.val = add.y = (relativeWatts.cap(2).toDouble() /100.00) * CP;
                 Points.append(add);
                 if (add.y > MaxWatts) MaxWatts=add.y;
 
