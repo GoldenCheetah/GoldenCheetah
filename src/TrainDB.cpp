@@ -186,7 +186,7 @@ bool TrainDB::createDatabase()
 void TrainDB::checkDBVersion()
 {
     // can we get a version number?
-    QSqlQuery query("SELECT table_name, schema_version, creation_date, metadata_crc from version;", dbconn);
+    QSqlQuery query("SELECT table_name, schema_version, creation_date from version;", dbconn);
 
     bool rc = query.exec();
 
