@@ -66,7 +66,7 @@ class ErgFileLap
 class ErgFile
 {
     public:
-        ErgFile(QString, int&, double Cp, MainWindow *main);       // constructor uses filename
+        ErgFile(QString, int&, MainWindow *main);       // constructor uses filename
         ErgFile(MainWindow *main); // no filename, going to use a string
 
         ~ErgFile();             // delete the contents
@@ -88,12 +88,14 @@ class ErgFile
                 Units,          // units used
                 Filename,       // filename from inside file
                 filename,       // filename on disk
-                Name;           // workout name
+                Name,           // description in file
+                Source;         // where did this come from
                 
         long    Duration;       // Duration of this workout in msecs
         int     Ftp;            // FTP this file was targetted at
         int     MaxWatts;       // maxWatts in this ergfile (scaling)
         bool valid;             // did it parse ok?
+
 
         int leftPoint, rightPoint;            // current points we are between
 
