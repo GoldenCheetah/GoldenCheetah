@@ -2,7 +2,7 @@
 	<chart id="32" name="Ride Summary Window" title="Summary" >
 		<property name="instanceName" type="QString" value="Ride Summary Window" />
 		<property name="title" type="QString" value="Summary" />
-		<property name="subtitle" type="QString" value="December 2008" />
+		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="1.92308" />
 		<property name="heightFactor" type="double" value="1.85185" />
 		<property name="resizable" type="bool" value="0" />
