@@ -380,6 +380,7 @@ HEADERS += \
         TimeUtils.h \
         ToolsDialog.h \
         ToolsRhoEstimator.h \
+        TrainDB.h \
         TrainTool.h \
         TreeMapWindow.h \
         TreeMapPlot.h \
@@ -575,6 +576,7 @@ SOURCES += \
         TimeUtils.cpp \
         ToolsDialog.cpp \
         ToolsRhoEstimator.cpp \
+        TrainDB.cpp \
         TrainTool.cpp \
         TreeMapWindow.cpp \
         TreeMapPlot.cpp \

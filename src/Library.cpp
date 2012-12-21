@@ -19,6 +19,7 @@
 #include "Library.h"
 #include "Settings.h"
 #include "LibraryParser.h"
+#include "TrainDB.h"
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
@@ -374,15 +375,23 @@ LibrarySearchDialog::removeDirectory()
 void
 LibrarySearchDialog::updateDB()
 {
-    // update the database of workouts and videos
-    //XXX update db here...
+    trainDB->connection().transaction();
+
+    // workouts
     foreach(QString ergFile, workoutsFound) {
         int mode;
         ErgFile file(ergFile, mode, mainWindow);
         if (file.isValid()) {
-            //XXX qDebug()<<"ergfile:"<<QFileInfo(ergFile).fileName()<<file.Duration<<file.TSS<<file.IF;
+            trainDB->importWorkout(ergFile, &file);
         }
     }
+
+    // videos
+    foreach(QString video, videosFound) {
+        trainDB->importVideo(video);
+    }
+
+    trainDB->connection().commit();
 }
 
 //

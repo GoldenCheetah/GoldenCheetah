@@ -22,6 +22,7 @@
 #include "ChooseCyclistDialog.h"
 #include "MainWindow.h"
 #include "Settings.h"
+#include "TrainDB.h"
 
 #ifdef Q_OS_X11
 #include <X11/Xlib.h>
@@ -113,6 +114,9 @@ main(int argc, char *argv[])
 
     // Initialize global registry once the translator is installed
     GcWindowRegistry::initialize();
+
+    // initialise the trainDB
+    trainDB = new TrainDB(home);
 
     QStringList args( app.arguments() );
 
