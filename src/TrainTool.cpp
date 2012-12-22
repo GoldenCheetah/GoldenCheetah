@@ -49,6 +49,7 @@
 #endif
 
 #include <math.h> // isnan and isinf
+#include "TrainDB.h"
 
 TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), home(home), main(parent)
 {
@@ -79,16 +80,35 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
 #endif
 
 #if defined Q_OS_MAC || defined GC_HAVE_VLC
-    mediaTree = new QTreeWidget;
-    mediaTree->setFrameStyle(QFrame::NoFrame);
-    mediaTree->setColumnCount(1);
-    mediaTree->setSelectionMode(QAbstractItemView::SingleSelection);
+    videoModel = new QSqlTableModel(this, trainDB->connection());
+    videoModel->setTable("videos");
+    videoModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    videoModel->select();
+    while (videoModel->canFetchMore(QModelIndex())) videoModel->fetchMore(QModelIndex());
+
+    mediaTree = new QTreeView;
+    mediaTree->setModel(videoModel);
+
+    // hide unwanted columns and header
+    for(int i=0; i<mediaTree->header()->count(); i++)
+        mediaTree->setColumnHidden(i, true);
+    mediaTree->setColumnHidden(1, false); // show filename
     mediaTree->header()->hide();
-    mediaTree->setAlternatingRowColors (false);
-    mediaTree->setIndentation(5);
-    allMedia = new QTreeWidgetItem(mediaTree, HEAD_TYPE);
-    allMedia->setText(0, tr("Video / Media"));
-    mediaTree->expandItem(allMedia);
+
+    mediaTree->setSortingEnabled(true);
+    mediaTree->setAlternatingRowColors(false);
+    mediaTree->setEditTriggers(QAbstractItemView::NoEditTriggers); // read-only
+    mediaTree->expandAll();
+    mediaTree->header()->setCascadingSectionResizes(true); // easier to resize this way
+    mediaTree->setContextMenuPolicy(Qt::CustomContextMenu);
+    mediaTree->header()->setStretchLastSection(true);
+    mediaTree->header()->setMinimumSectionSize(0);
+    mediaTree->header()->setFocusPolicy(Qt::NoFocus);
+    mediaTree->setFrameStyle(QFrame::NoFrame);
+#ifdef Q_OS_MAC
+    mediaTree->header()->setSortIndicatorShown(false); // blue looks nasty
+    mediaTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
 #endif
 
     deviceTree = new QTreeWidget;
@@ -106,17 +126,34 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     deviceTree->expandItem(allDevices);
     deviceTree->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    workoutTree = new QTreeWidget;
-    workoutTree->setFrameStyle(QFrame::NoFrame);
-    workoutTree->setColumnCount(1);
-    workoutTree->setSelectionMode(QAbstractItemView::SingleSelection);
-    workoutTree->header()->hide();
-    workoutTree->setAlternatingRowColors (false);
-    workoutTree->setIndentation(5);
+    workoutModel = new QSqlTableModel(this, trainDB->connection());
+    workoutModel->setTable("workouts");
+    workoutModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    workoutModel->select();
+    while (workoutModel->canFetchMore(QModelIndex())) workoutModel->fetchMore(QModelIndex());
 
-    allWorkouts = new QTreeWidgetItem(workoutTree, HEAD_TYPE);
-    allWorkouts->setText(0, tr("Workout Library"));
-    workoutTree->expandItem(allWorkouts);
+    workoutTree = new QTreeView;
+    workoutTree->setModel(workoutModel);
+
+    // hide unwanted columns and header
+    for(int i=0; i<workoutTree->header()->count(); i++)
+        workoutTree->setColumnHidden(i, true);
+    workoutTree->setColumnHidden(1, false); // show filename
+    workoutTree->header()->hide();
+    workoutTree->setFrameStyle(QFrame::NoFrame);
+    workoutTree->setAlternatingRowColors(false);
+    workoutTree->setEditTriggers(QAbstractItemView::NoEditTriggers); // read-only
+    workoutTree->expandAll();
+    workoutTree->header()->setCascadingSectionResizes(true); // easier to resize this way
+    workoutTree->setContextMenuPolicy(Qt::CustomContextMenu);
+    workoutTree->header()->setStretchLastSection(true);
+    workoutTree->header()->setMinimumSectionSize(0);
+    workoutTree->header()->setFocusPolicy(Qt::NoFocus);
+    workoutTree->setFrameStyle(QFrame::NoFrame);
+#ifdef Q_OS_MAC
+    workoutTree->header()->setSortIndicatorShown(false); // blue looks nasty
+    workoutTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
 
     // TOOLBAR BUTTONS ETC
     QHBoxLayout *toolallbuttons=new QHBoxLayout; // on toolbar
@@ -274,21 +311,16 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     //connect(serverTree,SIGNAL(itemSelectionChanged()), this, SLOT(serverTreeWidgetSelectionChanged()));
     connect(deviceTree,SIGNAL(itemSelectionChanged()), this, SLOT(deviceTreeWidgetSelectionChanged()));
     connect(deviceTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(deviceTreeMenuPopup(const QPoint &)));
-    connect(workoutTree,SIGNAL(itemSelectionChanged()), this, SLOT(workoutTreeWidgetSelectionChanged()));
 #if defined Q_OS_MAC || defined GC_HAVE_VLC
-    connect(mediaTree,SIGNAL(itemSelectionChanged()), this, SLOT(mediaTreeWidgetSelectionChanged()));
+    connect(mediaTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
+                            this, SLOT(mediaTreeWidgetSelectionChanged()));
 #endif
     connect(main, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(trainDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
 
+    connect(workoutTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(workoutTreeWidgetSelectionChanged()));
     // add a watch on all directories
     QVariant workoutDir = appsettings->value(NULL, GC_WORKOUTDIR);
-#if 0 //XXX Performance issues with this
-    watcher = boost::shared_ptr<QFileSystemWatcher>(new QFileSystemWatcher());
-    watcher->addPaths(workoutDir.toStringList());
-
-    connect(&*watcher,SIGNAL(directoryChanged(QString)),this,SLOT(configChanged()));
-    connect(&*watcher,SIGNAL(fileChanged(QString)),this,SLOT(configChanged()));
-#endif
 
     // set home
     main = parent;
@@ -335,6 +367,15 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     toolbarButtons->hide();
 #endif
 
+}
+
+void
+TrainTool::refresh()
+{
+    videoModel->select();
+    while (videoModel->canFetchMore(QModelIndex())) videoModel->fetchMore(QModelIndex());
+    workoutModel->select();
+    while (workoutModel->canFetchMore(QModelIndex())) workoutModel->fetchMore(QModelIndex());
 }
 
 void
@@ -393,46 +434,6 @@ TrainTool::configChanged()
     if (Devices.count()) {
         deviceTree->setCurrentItem(allDevices->child(0));
     }
-
-    // WORKOUTS
-    // zap whats there
-    QList<QTreeWidgetItem *> workouts = allWorkouts->takeChildren();
-    for (int i=0; i<workouts.count(); i++) delete workouts.at(i);
-
-    // standard workouts - ergo and slope
-    QTreeWidgetItem *ergomode = new QTreeWidgetItem(allWorkouts, WORKOUT_TYPE);
-    ergomode->setText(0, tr("Manual Ergo Mode"));
-    QTreeWidgetItem *slopemode = new QTreeWidgetItem(allWorkouts, WORKOUT_TYPE);
-    slopemode->setText(0, tr("Manual Slope  Mode"));
-
-    // add all the workouts in the library
-    QVariant workoutDir = appsettings->value(this, GC_WORKOUTDIR);
-    QStringListIterator w(listWorkoutFiles(workoutDir.toString()));
-    while (w.hasNext()) {
-        QString name = w.next();
-        QTreeWidgetItem *work = new QTreeWidgetItem(allWorkouts, WORKOUT_TYPE);
-        work->setText(0, name);
-    }
-
-#if defined Q_OS_MAC || defined GC_HAVE_VLC
-    // MEDIA
-    QList<QTreeWidgetItem *> media = allMedia->takeChildren();
-    for (int i=0; i<media.count(); i++) delete media.at(i);
-
-#ifndef Q_OS_MAC
-    // add dvd playback via VLC
-    QTreeWidgetItem *dvd = new QTreeWidgetItem(allMedia, WORKOUT_TYPE);
-    dvd->setText(0, "DVD");
-#endif
-
-    MediaHelper mediaHelper;
-    foreach(QString video, mediaHelper.listMedia(QDir(workoutDir.toString()))) {
-
-        // add a media line for the video (it might be a song though...)
-        QTreeWidgetItem *media = new QTreeWidgetItem(allMedia, WORKOUT_TYPE);
-        media->setText(0, video);
-    }
-#endif
 
     // Athlete
     FTP=285; // default to 285 if zones are not set
@@ -501,18 +502,8 @@ TrainTool::devices()
 void
 TrainTool::workoutTreeWidgetSelectionChanged()
 {
-    assert(workoutTree->selectedItems().size() <= 1);
-    if (workoutTree->selectedItems().isEmpty())
-        workout = NULL;
-    else {
-        QTreeWidgetItem *which = workoutTree->selectedItems().first();
-        if (which->type() != WORKOUT_TYPE)
-            workout = NULL;
-        else
-            workout = which;
-    }
-
-    //int mode;
+    QModelIndex current = workoutTree->currentIndex();
+    QString filename = workoutModel->data(workoutModel->index(current.row(), 0), Qt::DisplayRole).toString();
 
     // wip away the current selected workout
     if (ergFile) {
@@ -520,15 +511,8 @@ TrainTool::workoutTreeWidgetSelectionChanged()
         ergFile = NULL;
     }
 
-    // which one is selected?
-    if (currentWorkout() == NULL || currentWorkout()->type() != WORKOUT_TYPE) {
-        main->notifyErgFileSelected(NULL);
-        setLabels();
-        return;
-    }
-
     // is it the auto mode?
-    int index = workoutItems()->indexOfChild((QTreeWidgetItem *)currentWorkout());
+    int index = current.row();
     if (index == 0) {
         // ergo mode
         main->notifyErgFileSelected(NULL);
@@ -545,10 +529,7 @@ TrainTool::workoutTreeWidgetSelectionChanged()
         //ergPlot->setVisible(false);
     } else {
         // workout mode
-        QVariant workoutDir = appsettings->value(this, GC_WORKOUTDIR);
-        QString fileName = workoutDir.toString() + "/" + currentWorkout()->text(0); // filename
-
-        ergFile = new ErgFile(fileName, mode, main);
+        ergFile = new ErgFile(filename, mode, main);
         if (ergFile->isValid()) {
 
             status |= RT_WORKOUT;
@@ -604,26 +585,9 @@ TrainTool::listWorkoutFiles(const QDir &dir) const
 void
 TrainTool::mediaTreeWidgetSelectionChanged()
 {
-    assert(mediaTree->selectedItems().size() <= 1);
-    if (mediaTree->selectedItems().isEmpty())
-        media = NULL;
-    else {
-        QTreeWidgetItem *which = mediaTree->selectedItems().first();
-        if (which->type() != WORKOUT_TYPE)
-            media = NULL;
-        else
-            media = which;
-    }
-
-    // which one is selected?
-    if (currentMedia() == NULL || currentMedia()->type() != WORKOUT_TYPE) {
-        main->notifyMediaSelected("");
-        return;
-    }
-
-    QVariant workoutDir = appsettings->value(this, GC_WORKOUTDIR);
-    QString fileName = workoutDir.toString() + "/" + currentMedia()->text(0); // filename
-    main->notifyMediaSelected(fileName);
+    QModelIndex current = mediaTree->currentIndex();
+    QString filename = videoModel->data(videoModel->index(current.row(), 0), Qt::DisplayRole).toString();
+    main->notifyMediaSelected(filename);
 }
 
 /*--------------------------------------------------------------------------------

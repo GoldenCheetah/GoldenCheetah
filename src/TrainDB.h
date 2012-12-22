@@ -26,8 +26,10 @@
 #include <QtSql>
 
 class ErgFile;
-class TrainDB
+class TrainDB : public QObject
 {
+
+    Q_OBJECT
 
 	public:
 
@@ -44,8 +46,14 @@ class TrainDB
 	TrainDB(QDir home);
     ~TrainDB();
 
+    void startLUW() { dbconn.transaction(); }
+    void endLUW() { dbconn.commit(); emit dataChanged(); }
+
     bool importWorkout(QString pathname, ErgFile *ergFile);
     bool importVideo(QString pathname); //XXX simple for now
+
+    signals:
+        void dataChanged();
 
 	private:
         QDir home;
