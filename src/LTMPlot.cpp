@@ -329,8 +329,8 @@ LTMPlot::setData(LTMSettings *set)
                 brushColor1.setAlpha(255);
 
                 QLinearGradient linearGradient(0, 0, 0, height());
-                linearGradient.setColorAt(0.0, brushColor);
-                linearGradient.setColorAt(1.0, brushColor1);
+                linearGradient.setColorAt(0.0, brushColor1);
+                linearGradient.setColorAt(1.0, brushColor);
                 linearGradient.setSpread(QGradient::PadSpread);
                 current->setBrush(linearGradient);
             }
@@ -617,8 +617,8 @@ LTMPlot::setData(LTMSettings *set)
             QColor brushColor1 = metricDetail.penColor;
             brushColor1.setAlpha(255); // now side by side, less transparency required
             QLinearGradient linearGradient(0, 0, 0, height());
-            linearGradient.setColorAt(0.0, brushColor);
-            linearGradient.setColorAt(1.0, brushColor1);
+            linearGradient.setColorAt(0.0, brushColor1);
+            linearGradient.setColorAt(1.0, brushColor);
             linearGradient.setSpread(QGradient::PadSpread);
             current->setBrush(linearGradient);
             current->setPen(Qt::NoPen);
