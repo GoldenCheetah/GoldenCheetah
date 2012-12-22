@@ -144,16 +144,23 @@ PowerHist::configChanged()
         curveSelected->setRenderHint(QwtPlotItem::RenderAntialiased);
     }
 
+    // use a linear gradient
+    brush_color.setAlpha(240);
+    QColor brush_color1 = brush_color;
+    brush_color1.setAlpha(40);
+    QLinearGradient linearGradient(0, 0, 0, height());
+    linearGradient.setColorAt(0.0, brush_color);
+    linearGradient.setColorAt(1.0, brush_color1);
+    linearGradient.setSpread(QGradient::PadSpread);
+    curve->setBrush(linearGradient);   // fill below the line
+
     if (zoned == false || (zoned == true && (series != RideFile::watts && series != RideFile::wattsKg && series != RideFile::hr))) {
         pen.setWidth(width);
         curve->setPen(pen);
-        brush_color.setAlpha(64);
-        curve->setBrush(brush_color);   // fill below the line
+
     } else {
         pen.setWidth(width);
         curve->setPen(Qt::NoPen);
-        brush_color.setAlpha(200);
-        curve->setBrush(brush_color);   // fill below the line
     }
 
     // intervalselection
