@@ -434,9 +434,9 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
             curve->attach(thisPlot);
 
             // use a linear gradient
-            color.setAlpha(240);
+            color.setAlpha(180);
             QColor color1 = color;
-            color1.setAlpha(40);
+            color1.setAlpha(64);
             QLinearGradient linearGradient(0, 0, 0, height());
             linearGradient.setColorAt(0.0, color);
             linearGradient.setColorAt(1.0, color1);
