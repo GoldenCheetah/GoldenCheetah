@@ -319,12 +319,22 @@ LTMPlot::setData(LTMSettings *set)
             
             // fill the bars
             QColor brushColor = metricDetail.penColor;
-            if (metricDetail.stack == true)
+            if (metricDetail.stack == true) {
                 brushColor.setAlpha(255);
-            else
-                brushColor.setAlpha(200); // now side by side, less transparency required
-            QBrush brush = QBrush(brushColor);
-            current->setBrush(brush);
+                QBrush brush = QBrush(brushColor);
+                current->setBrush(brush);
+            } else {
+                brushColor.setAlpha(100); // now side by side, less transparency required
+                QColor brushColor1 = brushColor;
+                brushColor1.setAlpha(255);
+
+                QLinearGradient linearGradient(0, 0, 0, height());
+                linearGradient.setColorAt(0.0, brushColor);
+                linearGradient.setColorAt(1.0, brushColor1);
+                linearGradient.setSpread(QGradient::PadSpread);
+                current->setBrush(linearGradient);
+            }
+
             current->setPen(Qt::NoPen);
             current->setCurveAttribute(QwtPlotCurve::Inverted, true);
 
@@ -603,9 +613,14 @@ LTMPlot::setData(LTMSettings *set)
             
             // fill the bars
             QColor brushColor = metricDetail.penColor;
-            brushColor.setAlpha(200); // now side by side, less transparency required
-            QBrush brush = QBrush(brushColor);
-            current->setBrush(brush);
+            brushColor.setAlpha(100); // now side by side, less transparency required
+            QColor brushColor1 = metricDetail.penColor;
+            brushColor1.setAlpha(255); // now side by side, less transparency required
+            QLinearGradient linearGradient(0, 0, 0, height());
+            linearGradient.setColorAt(0.0, brushColor);
+            linearGradient.setColorAt(1.0, brushColor1);
+            linearGradient.setSpread(QGradient::PadSpread);
+            current->setBrush(linearGradient);
             current->setPen(Qt::NoPen);
             current->setCurveAttribute(QwtPlotCurve::Inverted, true);
 
