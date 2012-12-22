@@ -25,7 +25,7 @@ ChartSettings::ChartSettings(QWidget *parent, QWidget *contents) : QDialog(paren
   // Set the main window title.
   setWindowTitle(tr("Chart Settings"));
   setAttribute(Qt::WA_DeleteOnClose);
-  setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::WindowCloseButtonHint);
+  setWindowFlags(windowFlags() | Qt::WindowCloseButtonHint);
   setModal(true);
 
   // Create the main layout box.
