@@ -432,8 +432,17 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
             pen.setWidth(appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble());
             curve->setPen(pen);
             curve->attach(thisPlot);
-            color.setAlpha(64);
-            curve->setBrush(color);  // brush fills below the line
+
+            // use a linear gradient
+            color.setAlpha(240);
+            QColor color1 = color;
+            color1.setAlpha(40);
+            QLinearGradient linearGradient(0, 0, 0, height());
+            linearGradient.setColorAt(0.0, color);
+            linearGradient.setColorAt(1.0, color1);
+            linearGradient.setSpread(QGradient::PadSpread);
+            curve->setBrush(linearGradient);   // fill below the line
+
             if (series == RideFile::none) { // this is Energy mode 
                 curve->setData(time_values.data() + low,
                                energyBests.data() + low, high - low + 1);
@@ -662,7 +671,15 @@ CpintPlot::calculate(RideItem *rideItem)
 
                 allCurve->setPen(line);
                 fill.setAlpha(64);
-                allCurve->setBrush(fill);
+                // use a linear gradient
+                fill.setAlpha(240);
+                QColor fill1 = fill;
+                fill1.setAlpha(40);
+                QLinearGradient linearGradient(0, 0, 0, height());
+                linearGradient.setColorAt(0.0, fill);
+                linearGradient.setColorAt(1.0, fill1);
+                linearGradient.setSpread(QGradient::PadSpread);
+                allCurve->setBrush(linearGradient);
                 allCurve->attach(this);
                 allCurve->setData(timeArray.data() + 1, bests->meanMaxArray(series).constData() + 1, maxNonZero - 1);
             }
