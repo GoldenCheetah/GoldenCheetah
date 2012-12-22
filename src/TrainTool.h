@@ -35,6 +35,7 @@
 #include "math.h" // for round()
 #include "Units.h" // for MILES_PER_KM
 #include <QDebug>
+#include <QSqlTableModel>
 
 // Status settings
 #define RT_MODE_ERGO        0x0001        // load generation modes
@@ -84,7 +85,6 @@ class TrainTool : public GcWindow
         const QTreeWidgetItem *currentWorkout() { return workout; }
         const QTreeWidgetItem *currentMedia() { return media; }
         const QTreeWidgetItem *workoutItems() { return allWorkouts; }
-        const QTreeWidgetItem *mediaItems() { return allMedia; }
         const QTreeWidgetItem *currentServer() { return server; }
         const QTreeWidgetItem *serverItems() { return allServers; }
 
@@ -133,6 +133,8 @@ class TrainTool : public GcWindow
         void deviceTreeMenuPopup(const QPoint &);
         void deleteDevice();
 
+        void refresh(); // when TrainDB is updated...
+
         //XXX void workoutTreeMenuPopup(const QPoint &);
         //XXX void mediaTreeMenuPopup(const QPoint &);
 
@@ -174,13 +176,15 @@ class TrainTool : public GcWindow
 
         QWidget *toolbarButtons;
 
-        QTreeWidget *workoutTree;
+        QSqlTableModel *videoModel;
+        QSqlTableModel *workoutModel;
+
         QTreeWidget *deviceTree;
         QTreeWidget *serverTree;
-        QTreeWidget *mediaTree;
+        QTreeView *workoutTree;
+        QTreeView *mediaTree;
 
         QTreeWidgetItem *allServers;
-        QTreeWidgetItem *allMedia;
         QTreeWidgetItem *allDevices;
         QTreeWidgetItem *server;
         QTreeWidgetItem *allWorkouts;

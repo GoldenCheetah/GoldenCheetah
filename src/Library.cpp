@@ -375,7 +375,7 @@ LibrarySearchDialog::removeDirectory()
 void
 LibrarySearchDialog::updateDB()
 {
-    trainDB->connection().transaction();
+    trainDB->startLUW();
 
     // workouts
     foreach(QString ergFile, workoutsFound) {
@@ -391,7 +391,7 @@ LibrarySearchDialog::updateDB()
         trainDB->importVideo(video);
     }
 
-    trainDB->connection().commit();
+    trainDB->endLUW();
 }
 
 //

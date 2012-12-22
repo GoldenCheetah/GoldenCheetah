@@ -25,7 +25,7 @@
 // Rev Date         Who                What Changed
 // 01  21 Dec 2012  Mark Liversedge    Initial Build
 
-static int TrainDBSchemaVersion = 2;
+static int TrainDBSchemaVersion = 1;
 TrainDB *trainDB;
 
 TrainDB::TrainDB(QDir home) : home(home)
@@ -91,11 +91,15 @@ bool TrainDB::createVideoTable()
     // we need to create it!
     if (rc && createTables) {
 
-        QString createVideoTable = "create table videos (filename varchar primary key,"
+        QString createVideoTable = "create table videos (filepath varchar primary key,"
+                                    "filename varchar,"
                                     "timestamp integer,"
                                     "length integer);";
 
         rc = query.exec(createVideoTable);
+
+        // insert the 'DVD' record for playing currently loaded DVD
+        //XXX rc = query.exec("INSERT INTO videos (filepath, filename) values (\"\", \"DVD\");");
 
         // add row to version database
         query.exec("DELETE FROM version where table_name = \"videos\"");
@@ -131,7 +135,8 @@ bool TrainDB::createWorkoutTable()
     // we need to create it!
     if (rc && createTables) {
 
-        QString createMetricTable = "create table workouts (filename varchar primary key,"
+        QString createMetricTable = "create table workouts (filepath varchar primary key,"
+                                    "filename,"
                                     "timestamp integer,"
                                     "description varchar,"
                                     "source varchar,"
@@ -143,6 +148,14 @@ bool TrainDB::createWorkoutTable()
                                     "grade double );";
 
         rc = query.exec(createMetricTable);
+
+        QString manualErg = QString("INSERT INTO workouts (filepath, filename) values (\"//1\", \"%1\");")
+                         .arg(tr("Manual Erg Mode"));
+        rc = query.exec(manualErg);
+
+        QString manualCrs = QString("INSERT INTO workouts (filepath, filename) values (\"//2\", \"%1\");")
+                         .arg(tr("Manual Slope Mode"));
+        rc = query.exec(manualCrs);
 
         // add row to version database
         query.exec("DELETE FROM version where table_name = \"workouts\"");
@@ -257,12 +270,13 @@ bool TrainDB::importWorkout(QString pathname, ErgFile *ergFile)
     QDateTime timestamp = QDateTime::currentDateTime();
 
     // zap the current row - if there is one
-    query.prepare("DELETE FROM workouts WHERE filename = ?;");
+    query.prepare("DELETE FROM workouts WHERE filepath = ?;");
     query.addBindValue(pathname);
     query.exec();
 
     // construct an insert statement
-    QString insertStatement = "insert into workouts ( filename, "
+    QString insertStatement = "insert into workouts ( filepath, "
+                                    "filename,"
                                     "timestamp,"
                                     "description,"
                                     "source,"
@@ -271,11 +285,12 @@ bool TrainDB::importWorkout(QString pathname, ErgFile *ergFile)
                                     "coggan_tss,"
                                     "coggan_if,"
                                     "elevation,"
-                                    "grade ) values ( ?,?,?,?,?,?,?,?,?,? );";
+                                    "grade ) values ( ?,?,?,?,?,?,?,?,?,?,? );";
 	query.prepare(insertStatement);
 
     // filename, timestamp, ride date
 	query.addBindValue(pathname);
+	query.addBindValue(QFileInfo(pathname).fileName());
 	query.addBindValue(timestamp);
     query.addBindValue(ergFile->Name);
 	query.addBindValue(ergFile->Source);
@@ -298,16 +313,17 @@ bool TrainDB::importVideo(QString pathname)
     QDateTime timestamp = QDateTime::currentDateTime();
 
     // zap the current row - if there is one
-    query.prepare("DELETE FROM videos WHERE filename = ?;");
+    query.prepare("DELETE FROM videos WHERE filepath = ?;");
     query.addBindValue(pathname);
     query.exec();
 
     // construct an insert statement
-    QString insertStatement = "insert into videos ( filename ) values ( ? );";
+    QString insertStatement = "insert into videos ( filepath,filename ) values ( ?,? );";
 	query.prepare(insertStatement);
 
     // filename, timestamp, ride date
 	query.addBindValue(pathname);
+	query.addBindValue(QFileInfo(pathname).fileName());
 
     // go do it!
 	bool rc = query.exec();
