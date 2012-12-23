@@ -55,6 +55,7 @@
 #define GC_BIO                      "bio"
 #define GC_AVATAR                   "avatar"
 #define GC_SETTINGS_LAST_IMPORT_PATH "mainwindow/lastImportPath"
+#define GC_SETTINGS_LAST_WORKOUT_PATH "mainwindow/lastWorkoutPath"
 #define GC_LAST_DOWNLOAD_DEVICE      "mainwindow/lastDownloadDevice"
 #define GC_LAST_DOWNLOAD_PORT        "mainwindow/lastDownloadPort"
 #define GC_CRANKLENGTH              "crankLength"

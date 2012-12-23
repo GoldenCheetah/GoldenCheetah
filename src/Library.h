@@ -34,6 +34,7 @@ class Library
 	public:
         QString name;           // e.g. Media Library
         QList<QString> paths;   // array of search paths for files in this library
+        QList<QString> refs;    // array of drag-n-dropped files referenced not copied
 
         static void initialise(QDir); // init
         static Library *findLibrary(QString);

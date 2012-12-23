@@ -375,6 +375,9 @@ LibrarySearchDialog::removeDirectory()
 void
 LibrarySearchDialog::updateDB()
 {
+    // wipe away all user data before updating
+    trainDB->rebuildDB();
+
     trainDB->startLUW();
 
     // workouts
@@ -435,6 +438,24 @@ LibrarySearch::run()
         // is a workout?
         if (findWorkout && ErgFile::isWorkout(name)) emit foundWorkout(name);
     }
+
+    // Now check and re-add references, if there are any
+    // these are files which were drag-n-dropped into the 
+    // GC train window, but which were referenced not
+    // copied into the workout directory.
+    Library *l = Library::findLibrary("Media Library");
+    if (l) {
+        foreach(QString r, l->refs) {
+
+            if (!QFile(r).exists()) continue;
+
+            // is a video?
+            if (findMedia && helper.isMedia(r)) emit foundVideo(r);
+            // is a workout?
+            if (findWorkout && ErgFile::isWorkout(r)) emit foundWorkout(r);
+        }
+    }
+
     emit done();
 };
 

@@ -70,6 +70,18 @@ TrainDB::initDatabase(QDir home)
     }
 }
 
+// rebuild effectively drops and recreates all tables
+// but not the version table, since its about deleting
+// user data (e.g. when rescanning their hard disk)
+void
+TrainDB::rebuildDB()
+{
+    dropWorkoutTable();
+    createWorkoutTable();
+    dropVideoTable();
+    createVideoTable();
+}
+
 bool TrainDB::createVideoTable()
 {
     QSqlQuery query(dbconn);
@@ -149,12 +161,14 @@ bool TrainDB::createWorkoutTable()
 
         rc = query.exec(createMetricTable);
 
+        // adding a space at the front of string to make manual mode always
+        // appear first in a sorted list is a bit of a hack, but works ok
         QString manualErg = QString("INSERT INTO workouts (filepath, filename) values (\"//1\", \"%1\");")
-                         .arg(tr("Manual Erg Mode"));
+                         .arg(tr(" Manual Erg Mode"));
         rc = query.exec(manualErg);
 
         QString manualCrs = QString("INSERT INTO workouts (filepath, filename) values (\"//2\", \"%1\");")
-                         .arg(tr("Manual Slope Mode"));
+                         .arg(tr(" Manual Slope Mode"));
         rc = query.exec(manualCrs);
 
         // add row to version database

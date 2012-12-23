@@ -40,6 +40,11 @@ bool LibraryParser::endElement( const QString&, const QString&, const QString &q
     if (qName == "path") {
         library->paths.append(buffer.trimmed());
     }
+
+    // a reference
+    if (qName == "ref") {
+        library->refs.append(buffer.trimmed());
+    }
     return TRUE;
 }
 
@@ -86,6 +91,10 @@ LibraryParser::serialize(QDir home)
         // paths...
         foreach(QString p, l->paths)
             out << QString("\t<path>%1</path>\n").arg(p);
+
+        // paths...
+        foreach(QString r, l->refs)
+            out << QString("\t<ref>%1</ref>\n").arg(r);
 
         // end document
         out << "</library>\n";
