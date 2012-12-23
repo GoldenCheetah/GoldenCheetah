@@ -182,6 +182,8 @@ class TrainTool : public GcWindow
         QTreeWidget *deviceTree;
         QTreeWidget *serverTree;
         QTreeView *workoutTree;
+        QSortFilterProxyModel *sortModel;  // sorting workout list
+        QSortFilterProxyModel *vsortModel; // sorting video list
         QTreeView *mediaTree;
 
         QTreeWidgetItem *allServers;

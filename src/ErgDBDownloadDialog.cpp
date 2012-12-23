@@ -17,6 +17,7 @@
  */
 
 #include "ErgDBDownloadDialog.h"
+#include "TrainDB.h"
 
 ErgDBDownloadDialog::ErgDBDownloadDialog(MainWindow *main) : QDialog(main), main(main)
 {
@@ -151,6 +152,9 @@ ErgDBDownloadDialog::downloadFiles()
     // what format to export as?
     QString type = RideFileFactory::instance().writeSuffixes().at(0);
 
+    // for library updating, transactional for 10x performance
+    trainDB->startLUW();
+
     // loop through the table and export all selected
     for(int i=0; i<files->invisibleRootItem()->childCount(); i++) {
 
@@ -158,7 +162,10 @@ ErgDBDownloadDialog::downloadFiles()
         QApplication::processEvents();
 
         // did they?
-        if (aborted == true) return; // user aborted!
+        if (aborted == true) {
+            trainDB->endLUW(); // need to commit whatever was copied.
+            return; // user aborted!
+        }
 
         QTreeWidgetItem *current = files->invisibleRootItem()->child(i);
 
@@ -180,7 +187,6 @@ ErgDBDownloadDialog::downloadFiles()
             // open success?
             if (p->isValid()) {
 
-                delete p; // free memory!
 
                 if (QFile(filename).exists()) {
 
@@ -188,6 +194,7 @@ ErgDBDownloadDialog::downloadFiles()
                         // skip existing files
                         current->setText(5, "Exists already"); QApplication::processEvents();
                         fails++;
+                        delete p; // free memory!
                         continue;
 
                     } else {
@@ -210,12 +217,15 @@ ErgDBDownloadDialog::downloadFiles()
                     downloads++;
                     current->setText(5, "Saved"); QApplication::processEvents();
 
+                    trainDB->importWorkout(filename, p); // add to library
+
                 } else {
 
                     fails++;
                     current->setText(5, "Write failed"); QApplication::processEvents();
                 }
 
+                delete p; // free memory!
 
             // couldn't parse
             } else {
@@ -228,4 +238,6 @@ ErgDBDownloadDialog::downloadFiles()
 
         }
     }
+    // for library updating, transactional for 10x performance
+    trainDB->endLUW();
 }

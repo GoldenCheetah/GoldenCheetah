@@ -272,6 +272,7 @@ class MainWindow : public QMainWindow
         void uploadCalendar(); // upload ride to calendar
 #endif
         void importFile();
+        void importWorkout();
         void findBestIntervals();
         void addIntervals();
         void addIntervalForPowerPeaksForSecs(RideFile *ride, int windowSizeSecs, QString name);

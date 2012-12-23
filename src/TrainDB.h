@@ -52,6 +52,9 @@ class TrainDB : public QObject
     bool importWorkout(QString pathname, ErgFile *ergFile);
     bool importVideo(QString pathname); //XXX simple for now
 
+    // drop and recreate tables
+    void rebuildDB();
+
     signals:
         void dataChanged();
 

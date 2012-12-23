@@ -806,9 +806,10 @@ MainWindow::MainWindow(const QDir &home) :
     optionsMenu->addAction(tr("Get &Zeo Data..."), this,
                         SLOT (downloadMeasuresFromZeo()));
     optionsMenu->addSeparator();
-    optionsMenu->addAction(tr("Workout Wizard"), this, SLOT(showWorkoutWizard()));
-    optionsMenu->addAction(tr("Get Workouts from ErgDB"), this, SLOT(downloadErgDB()));
-    optionsMenu->addAction(tr("Manage Media/Workout Library"), this, SLOT(manageLibrary()));
+    optionsMenu->addAction(tr("Create a new workout..."), this, SLOT(showWorkoutWizard()));
+    optionsMenu->addAction(tr("Download workouts from ErgDB..."), this, SLOT(downloadErgDB()));
+    optionsMenu->addAction(tr("Import workouts or videos..."), this, SLOT(importWorkout()));
+    optionsMenu->addAction(tr("Scan disk for videos and workouts..."), this, SLOT(manageLibrary()));
 
 #ifdef GC_HAVE_ICAL
     optionsMenu->addSeparator();
@@ -1556,9 +1557,13 @@ MainWindow::dropEvent(QDropEvent *event)
     QList<QUrl> urls = event->mimeData()->urls();
     if (urls.isEmpty()) return;
 
-    // We have something to process then
-    RideImportWizard *dialog = new RideImportWizard (&urls, home, this);
-    dialog->process(); // do it!
+    if (currentWindow != trainWindow) {
+        // We have something to process then
+        RideImportWizard *dialog = new RideImportWizard (&urls, home, this);
+        dialog->process(); // do it!
+    } else {
+        //XXX hook for workout importer HERE
+    }
     return;
 }
 
@@ -1959,6 +1964,36 @@ MainWindow::uploadTtb()
     }
 }
 
+/*----------------------------------------------------------------------
+ * Import Workout from Disk
+ *--------------------------------------------------------------------*/
+void
+MainWindow::importWorkout()
+{
+    // go look at last place we imported workouts from...
+    QVariant lastDirVar = appsettings->value(this, GC_SETTINGS_LAST_WORKOUT_PATH);
+    QString lastDir = (lastDirVar != QVariant())
+        ? lastDirVar.toString() : QDir::homePath();
+
+    // anything for now, we could add filters later
+    QStringList allFormats;
+    allFormats << "All files (*.*)";
+    QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Import from File"), lastDir,
+                                                                          allFormats.join(";;"));
+
+    // lets process them 
+    if (!fileNames.isEmpty()) {
+
+        // save away last place we looked
+        lastDir = QFileInfo(fileNames.front()).absolutePath();
+        appsettings->setValue(GC_SETTINGS_LAST_WORKOUT_PATH, lastDir);
+
+        QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
+
+        // import them via the workoutimporter
+        //XXX hook for workout importer HERE
+    }
+}
 /*----------------------------------------------------------------------
  * ErgDB
  *--------------------------------------------------------------------*/

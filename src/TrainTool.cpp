@@ -86,8 +86,13 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     videoModel->select();
     while (videoModel->canFetchMore(QModelIndex())) videoModel->fetchMore(QModelIndex());
 
+    vsortModel = new QSortFilterProxyModel(this);
+    vsortModel->setSourceModel(videoModel);
+    vsortModel->setDynamicSortFilter(true);
+    vsortModel->sort(1, Qt::AscendingOrder); //filename order
+
     mediaTree = new QTreeView;
-    mediaTree->setModel(videoModel);
+    mediaTree->setModel(vsortModel);
 
     // hide unwanted columns and header
     for(int i=0; i<mediaTree->header()->count(); i++)
@@ -95,7 +100,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     mediaTree->setColumnHidden(1, false); // show filename
     mediaTree->header()->hide();
 
-    mediaTree->setSortingEnabled(true);
+    mediaTree->setSortingEnabled(false);
     mediaTree->setAlternatingRowColors(false);
     mediaTree->setEditTriggers(QAbstractItemView::NoEditTriggers); // read-only
     mediaTree->expandAll();
@@ -132,8 +137,13 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     workoutModel->select();
     while (workoutModel->canFetchMore(QModelIndex())) workoutModel->fetchMore(QModelIndex());
 
+    sortModel = new QSortFilterProxyModel(this);
+    sortModel->setSourceModel(workoutModel);
+    sortModel->setDynamicSortFilter(true);
+    sortModel->sort(1, Qt::AscendingOrder); //filename order
+
     workoutTree = new QTreeView;
-    workoutTree->setModel(workoutModel);
+    workoutTree->setModel(sortModel);
 
     // hide unwanted columns and header
     for(int i=0; i<workoutTree->header()->count(); i++)
@@ -503,7 +513,8 @@ void
 TrainTool::workoutTreeWidgetSelectionChanged()
 {
     QModelIndex current = workoutTree->currentIndex();
-    QString filename = workoutModel->data(workoutModel->index(current.row(), 0), Qt::DisplayRole).toString();
+    QModelIndex target = sortModel->mapToSource(current);
+    QString filename = workoutModel->data(workoutModel->index(target.row(), 0), Qt::DisplayRole).toString();
 
     // wip away the current selected workout
     if (ergFile) {
@@ -511,8 +522,13 @@ TrainTool::workoutTreeWidgetSelectionChanged()
         ergFile = NULL;
     }
 
+    if (filename == "") {
+        main->notifyErgFileSelected(NULL);
+        return;
+    }
+
     // is it the auto mode?
-    int index = current.row();
+    int index = target.row();
     if (index == 0) {
         // ergo mode
         main->notifyErgFileSelected(NULL);
@@ -585,8 +601,10 @@ TrainTool::listWorkoutFiles(const QDir &dir) const
 void
 TrainTool::mediaTreeWidgetSelectionChanged()
 {
+
     QModelIndex current = mediaTree->currentIndex();
-    QString filename = videoModel->data(videoModel->index(current.row(), 0), Qt::DisplayRole).toString();
+    QModelIndex target = vsortModel->mapToSource(current);
+    QString filename = videoModel->data(videoModel->index(target.row(), 0), Qt::DisplayRole).toString();
     main->notifyMediaSelected(filename);
 }
 
