@@ -351,7 +351,7 @@ find_devices(char *result[], int capacity)
     // /dev/ANTUSBStick.slabvcp        - Silicon Labs Virtual Com driver for Garmin USB1 stick on a Mac
     // /dev/SLAB_USBtoUART             - Silicon Labs Driver for USB/Serial
     // /dev/usbmodem[0-9A-F]+          - Usb modem module driver (generic)
-    // /dev/usbserial-[0-9A-F]+        - usbserial module driver (generic)
+    // /dev/usbserial-[0-9A-Z]+        - usbserial module driver (generic)
     // /dev/KeySerial[0-9]             - Keyspan USB/Serial driver
     // /dev/ttyU[0-9]                  - Open BSD usb serial devices
     // /dev/ttyUSB[0-9]                - Standard USB/Serial device on Linux/Mac
@@ -360,7 +360,7 @@ find_devices(char *result[], int capacity)
     // /dev/ttyMI*                     - MOXA PCI cards
     // /dev/rfcomm*                    - Bluetooth devices
     if (regcomp(&reg, 
-                "^(cu\\.(PL2303-[0-9A-F]+|ANTUSBStick.slabvcp|SLAB_USBtoUART|usbmodem[0-9A-F]+|usbserial-[0-9A-G]+|KeySerial[0-9])|ttyU[0-9]|ttyUSB[0-9]|ttyS[0-2]|ttyACM*|ttyMI*|rfcomm*)$",
+                "^(cu\\.(PL2303-[0-9A-F]+|ANTUSBStick.slabvcp|SLAB_USBtoUART|usbmodem[0-9A-F]+|usbserial-[0-9A-Z]+|KeySerial[0-9])|ttyU[0-9]|ttyUSB[0-9]|ttyS[0-2]|ttyACM*|ttyMI*|rfcomm*)$",
                 REG_EXTENDED|REG_NOSUB)) {
         assert(0);
     }
