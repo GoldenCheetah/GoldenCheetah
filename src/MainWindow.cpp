@@ -370,7 +370,6 @@ MainWindow::MainWindow(const QDir &home) :
     side->setFixedWidth(20);
     side->setToolTip("Show/Hide Sidebar");
     side->setAutoFillBackground(false);
-    side->setAutoDefault(false);
     side->setFlat(true);
     lspacerLayout->addWidget(side);
     connect(side, SIGNAL(clicked()), this, SLOT(toggleSidebar()));
@@ -502,16 +501,25 @@ MainWindow::MainWindow(const QDir &home) :
     chartMenu = new QMenu(this);
     
     QIcon chartIcon(":images/addchart.png");
+#ifndef Q_OS_MAC
     QPushButton *newchart = new QPushButton(chartIcon, "", this);
+    rspacerLayout->addWidget(newchart);
+    newchart->setIconSize(QSize(15,15));
+    newchart->setFixedWidth(20);
+#else
+    QCleanlooksStyle *styler = new QCleanlooksStyle();
+    QPushButton *newchart = new QPushButton("+", this);
+    scopebar->addWidget(newchart);
+    newchart->setStyle(styler);
+    newchart->setFixedWidth(25);
+    newchart->setFixedHeight(20);
+#endif
+    newchart->setFlat(true);
     newchart->setFocusPolicy(Qt::NoFocus);
     newchart->setToolTip(tr("Add Chart"));
-    newchart->setIconSize(QSize(15,15));
     newchart->setAutoFillBackground(false);
     newchart->setAutoDefault(false);
-    newchart->setFixedWidth(20);
-    newchart->setFlat(true);
     newchart->setMenu(chartMenu);
-    rspacerLayout->addWidget(newchart);
     connect(chartMenu, SIGNAL(aboutToShow()), this, SLOT(setChartMenu()));
     connect(chartMenu, SIGNAL(triggered(QAction*)), this, SLOT(addChart(QAction*)));
 

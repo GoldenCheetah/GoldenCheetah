@@ -47,6 +47,7 @@ public slots:
 
     // main window tells us the sidebar state
     void setShowSidebar(bool showSidebar);
+    void addWidget(QWidget*);
 
 signals:
     void selectHome();
@@ -56,9 +57,12 @@ signals:
 
     void showSideBar(bool);
 
+    void addChart();
+
 private:
     void paintBackground(QPaintEvent *);
 
+    QHBoxLayout *layout;
     QtMacButton *home, *diary, *anal, *train;
     QtMacButton *showHide;
     bool state;

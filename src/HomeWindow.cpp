@@ -255,6 +255,8 @@ qDebug()<<"removing from layouts!";
 void
 HomeWindow::rightClick(const QPoint & /*pos*/)
 {
+    return; //XXX deprecate right click on homewindow -- bad UX
+
     QMenu chartMenu(tr("Add Chart"));
     unsigned int mask;
     // called when chart menu about to be shown

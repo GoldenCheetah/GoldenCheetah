@@ -24,7 +24,7 @@ GcScopeBar::GcScopeBar(QWidget *parent, QWidget *traintool) : QWidget(parent)
 {
     setFixedHeight(25);
     setContentsMargins(10,0,10,0);
-    QHBoxLayout *layout = new QHBoxLayout(this);
+    layout = new QHBoxLayout(this);
     layout->setSpacing(2);
     layout->setContentsMargins(0,0,0,0);
 
@@ -68,6 +68,12 @@ GcScopeBar::GcScopeBar(QWidget *parent, QWidget *traintool) : QWidget(parent)
     layout->addStretch();
     layout->addWidget(traintool);
     layout->addStretch();
+}
+
+void
+GcScopeBar::addWidget(QWidget *p)
+{
+    layout->addWidget(p);
 }
 
 GcScopeBar::~GcScopeBar()
