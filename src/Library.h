@@ -29,8 +29,10 @@
 #include <QTreeWidgetItem>
 #include <QThread>
 
-class Library
+class Library : QObject
 {
+    Q_OBJECT
+
 	public:
         QString name;           // e.g. Media Library
         QList<QString> paths;   // array of search paths for files in this library
@@ -38,6 +40,7 @@ class Library
 
         static void initialise(QDir); // init
         static Library *findLibrary(QString);
+        static void importFiles(QStringList files);
 };
 
 extern QList<Library *> libraries;        // keep track of all Library search paths for all users
