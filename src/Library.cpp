@@ -92,6 +92,31 @@ Library::initialise(QDir home)
     }
 }
 
+void
+Library::importFiles(QStringList files)
+{
+    QStringList videos, workouts;
+    MediaHelper helper;
+
+    // sort the wheat from the chaff
+    foreach(QString file, files) {
+        if (helper.isMedia(file)) videos << file;
+        if (ErgFile::isWorkout(file)) workouts << file;
+    }
+
+    // nothing to dialog about...
+    if (!videos.count() && !workouts.count()) {
+
+        QMessageBox::warning(NULL, tr("Import Videos and Workouts"), 
+            "No valid videos or workouts were found to import");
+
+        return;
+    }
+
+    // we have a list of files to import, lets kick off the importer...
+    //XXX todo importer dialog
+}
+
 //
 // SEARCHDIALOG -- user select paths and files and run a search
 //

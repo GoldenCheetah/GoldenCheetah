@@ -1562,7 +1562,10 @@ MainWindow::dropEvent(QDropEvent *event)
         RideImportWizard *dialog = new RideImportWizard (&urls, home, this);
         dialog->process(); // do it!
     } else {
-        //XXX hook for workout importer HERE
+        QStringList filenames;
+        for (int i=0; i<urls.count(); i++)
+            filenames.append(QFileInfo(urls.value(i).toLocalFile()).absoluteFilePath());
+        Library::importFiles(filenames);
     }
     return;
 }
@@ -1991,7 +1994,7 @@ MainWindow::importWorkout()
         QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
 
         // import them via the workoutimporter
-        //XXX hook for workout importer HERE
+        Library::importFiles(fileNamesCopy);
     }
 }
 /*----------------------------------------------------------------------
