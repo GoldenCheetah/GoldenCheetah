@@ -112,7 +112,9 @@ where you got it from of course!).
 ----------------------
 
 GoldenCheetah is developed using the Nokia QT toolkit, it is large and will
-need to be downloaded and installed from there website.
+need to be downloaded and installed from their website. Alternatively, you 
+can intall qt via macports (http://www.macports.org) as described in section 
+1.5.1. 
 
 As of today, the latest stable release is 4.7.4, we need 4.7 or higher so
 go ahead and download the offline installer - it has everything you need
@@ -144,6 +146,17 @@ it can be found. So, we need to create a link from what we just installed in the
 user programs folder. For QT SDK1.1 (4.7.4) we need to:
 
 $ sudo ln -s ~/QtSDK/Desktop/Qt/474/gcc/bin/qmake /usr/bin/qmake
+
+1.5.1 Install via Mac Ports
+---------------------------
+
+If you have macports installed, you can install the qt dependices 
+with the following commands: 
+
+$ sudo port install qt4-mac
+$ sudo port install qt4-mac-sqlite3-plugin
+
+
 
 1.6 Install Boost
 -----------------
