@@ -326,6 +326,8 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
                             this, SLOT(mediaTreeWidgetSelectionChanged()));
 #endif
     connect(main, SIGNAL(configChanged()), this, SLOT(configChanged()));
+    connect(main, SIGNAL(selectWorkout(QString)), this, SLOT(selectWorkout(QString)));
+    connect(main, SIGNAL(selectMedia(QString)), this, SLOT(selectVideo(QString)));
     connect(trainDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
 
     connect(workoutTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(workoutTreeWidgetSelectionChanged()));
@@ -1603,4 +1605,34 @@ TrainTool::deleteDevice()
 
     // tell everyone
     main->notifyConfigChanged();
+}
+
+// we have been told to select this video (usually because
+// the user just dragndropped it in)
+void
+TrainTool::selectVideo(QString fullpath)
+{
+    // look at each entry in the top workoutTree
+    for (int i=0; i<mediaTree->model()->rowCount(); i++) {
+        QString path = mediaTree->model()->data(mediaTree->model()->index(i,0)).toString();
+        if (path == fullpath) {
+            mediaTree->setCurrentIndex(mediaTree->model()->index(i,0));
+            break;
+        }
+    }
+}
+
+// we have been told to select this workout (usually because
+// the user just dragndropped it in)
+void
+TrainTool::selectWorkout(QString fullpath)
+{
+    // look at each entry in the top workoutTree
+    for (int i=0; i<workoutTree->model()->rowCount(); i++) {
+        QString path = workoutTree->model()->data(workoutTree->model()->index(i,0)).toString();
+        if (path == fullpath) {
+            workoutTree->setCurrentIndex(workoutTree->model()->index(i,0));
+            break;
+        }
+    }
 }

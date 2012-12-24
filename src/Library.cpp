@@ -93,15 +93,27 @@ Library::initialise(QDir home)
 }
 
 void
-Library::importFiles(QStringList files)
+Library::importFiles(MainWindow *mainWindow, QStringList files)
 {
     QStringList videos, workouts;
     MediaHelper helper;
 
     // sort the wheat from the chaff
     foreach(QString file, files) {
+
+        // they must exist!!
+        if (!QFile(file).exists()) continue;
+
+        // media just check file name
         if (helper.isMedia(file)) videos << file;
-        if (ErgFile::isWorkout(file)) workouts << file;
+
+        // if it is a workout we parse it to check
+        if (ErgFile::isWorkout(file)) {
+            int mode;
+            ErgFile *p = new ErgFile(file, mode, mainWindow);
+            if (p->isValid()) workouts << file;
+            delete p;
+        }
     }
 
     // nothing to dialog about...
@@ -113,8 +125,75 @@ Library::importFiles(QStringList files)
         return;
     }
 
-    // we have a list of files to import, lets kick off the importer...
-    //XXX todo importer dialog
+    // with only 1 of each max, lets import without any
+    // fuss and select the items imported
+    if (videos.count()<=1 && workouts.count() <= 1) {
+
+        trainDB->startLUW();
+
+        Library *l = Library::findLibrary("Media Library");
+
+        // import the video...
+        if (videos.count()) {
+
+            if (l->refs.contains(videos[0])) {
+
+                // do nothing .. this is harmless!
+
+                //QMessageBox::warning(NULL, tr("Video already known"), 
+                //    QString("%1 already exists in workout library").arg(QFileInfo(videos[0]).fileName()));
+
+            } else {
+                l->refs.append(videos[0]);
+            }
+            // still add it, it may not have been scanned
+            trainDB->importVideo(videos[0]);
+        }
+
+        QString target;
+        if (workouts.count()) {
+
+            QFile source(workouts[0]);
+
+            // set target directory
+            QString workoutDir = appsettings->value(NULL, GC_WORKOUTDIR).toString();
+            if (workoutDir == "") {
+                QDir root = mainWindow->home;
+                root.cdUp();
+                workoutDir = root.absolutePath();
+            }
+
+            // set target filename
+            target = workoutDir + "/" + QFileInfo(source).fileName();
+
+            if (!source.copy(target)) {
+
+                QMessageBox::warning(NULL, tr("Copy Workout Failed"), 
+                    QString("%1 already exists in workout library").arg(QFileInfo(target).fileName()));
+            }
+
+            // still add it, it may noit have been scanned...
+            int mode;
+            ErgFile file(target, mode, mainWindow);
+            trainDB->importWorkout(target, &file);
+
+        }
+
+        trainDB->endLUW();
+
+        // now write to disk.. any refs we added
+        LibraryParser::serialize(mainWindow->home);
+
+        // Tell traintool to select what was imported
+        if (videos.count()) mainWindow->notifySelectVideo(videos[0]);
+        if (workouts.count()) mainWindow->notifySelectWorkout(target);
+
+    } else {
+
+        // we have a list of files to import, lets kick off the importer...
+        WorkoutImportDialog *p = new WorkoutImportDialog(mainWindow, files);
+        p->exec();
+    }
 }
 
 //
@@ -135,9 +214,11 @@ LibrarySearchDialog::LibrarySearchDialog(MainWindow *mainWindow) : mainWindow(ma
 
     addPath = new QPushButton("+", this);
     removePath = new QPushButton("-", this);
+    removeRef = new QPushButton("-", this);
 #ifndef Q_OS_MAC
     addPath->setFixedSize(20,20);
     removePath->setFixedSize(20,20);
+    removeRef->setFixedSize(20,20);
 #endif
 
     searchPathTable = new QTreeWidget(this);
@@ -157,6 +238,25 @@ LibrarySearchDialog::LibrarySearchDialog(MainWindow *mainWindow) : mainWindow(ma
         foreach (QString path, library->paths) {
             QTreeWidgetItem *item = new QTreeWidgetItem(searchPathTable->invisibleRootItem(), i++);
             item->setText(0, path);
+        }
+    }
+
+    refTable = new QTreeWidget(this);
+#ifdef Q_OS_MAC
+    // get rid of annoying focus rectangle
+    refTable->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
+    refTable->setColumnCount(1);
+    refTable->setIndentation(0);
+    refTable->headerItem()->setText(0, tr("Video references"));
+    refTable->setSelectionMode(QAbstractItemView::SingleSelection);
+    refTable->setAlternatingRowColors (false);
+
+    if (library) {
+        int i=1;
+        foreach (QString ref, library->refs) {
+            QTreeWidgetItem *item = new QTreeWidgetItem(refTable->invisibleRootItem(), i++);
+            item->setText(0, ref);
         }
     }
 
@@ -194,6 +294,11 @@ LibrarySearchDialog::LibrarySearchDialog(MainWindow *mainWindow) : mainWindow(ma
     tableLayout->setSpacing(2);
     tableLayout->addWidget(searchPathTable);
     tableLayout->addLayout(editButtons);
+    QHBoxLayout *editButtons2 = new QHBoxLayout;
+    editButtons2->addWidget(removeRef);
+    editButtons2->addStretch();
+    tableLayout->addWidget(refTable);
+    tableLayout->addLayout(editButtons2);
     mainLayout->addLayout(tableLayout);
 
     QGridLayout *progressLayout = new QGridLayout;
@@ -220,6 +325,7 @@ LibrarySearchDialog::LibrarySearchDialog(MainWindow *mainWindow) : mainWindow(ma
 
     connect(addPath, SIGNAL(clicked()), this, SLOT(addDirectory()));
     connect(removePath, SIGNAL(clicked()), this, SLOT(removeDirectory()));
+    connect(removeRef, SIGNAL(clicked()), this, SLOT(removeReference()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancel()));
     connect(searchButton, SIGNAL(clicked()), this, SLOT(search()));
 }
@@ -234,6 +340,8 @@ LibrarySearchDialog::setWidgets()
         searchPathTable->hide();
         addPath->hide();
         removePath->hide();
+        removeRef->hide();
+        refTable->hide();
 
         pathLabelTitle->show();
         pathLabel->show();
@@ -243,12 +351,14 @@ LibrarySearchDialog::setWidgets()
         workoutCount->show();
 
     } else {
-        setFixedHeight(300);
+        setFixedHeight(400);
         searchButton->show();
         cancelButton->setText(tr("Cancel"));
         searchPathTable->show();
         addPath->show();
         removePath->show();
+        removeRef->show();
+        refTable->show();
 
         pathLabelTitle->hide();
         pathLabel->hide();
@@ -274,6 +384,15 @@ LibrarySearchDialog::search()
 
                 library->paths.append(path);
             }
+
+            library->refs.clear();
+            for(int i=0; i<refTable->invisibleRootItem()->childCount(); i++) {
+                QTreeWidgetItem *item = refTable->invisibleRootItem()->child(i);
+                QString ref = item->text(0);
+
+                library->refs.append(ref);
+            }
+
 
             // now write to disk..
             LibraryParser::serialize(mainWindow->home);
@@ -398,6 +517,19 @@ LibrarySearchDialog::removeDirectory()
 }
 
 void
+LibrarySearchDialog::removeReference()
+{
+    // remove the currently selected item
+    if (refTable->selectedItems().isEmpty()) return;
+
+    QTreeWidgetItem *which = refTable->selectedItems().first();
+    if (which) {
+        refTable->invisibleRootItem()->removeChild(which);
+        delete which;
+    }
+}
+
+void
 LibrarySearchDialog::updateDB()
 {
     // wipe away all user data before updating
@@ -419,6 +551,30 @@ LibrarySearchDialog::updateDB()
         trainDB->importVideo(video);
     }
 
+    // Now check and re-add references, if there are any
+    // these are files which were drag-n-dropped into the 
+    // GC train window, but which were referenced not
+    // copied into the workout directory.
+    if (library) {
+        MediaHelper helper;
+
+        foreach(QString r, library->refs) {
+
+            if (!QFile(r).exists()) continue;
+
+            // is a video?
+            if (helper.isMedia(r)) trainDB->importVideo(r);
+
+            // is a workout?
+            if (ErgFile::isWorkout(r)) {
+                int mode;
+                ErgFile file(r, mode, mainWindow);
+                if (file.isValid()) {
+                    trainDB->importWorkout(r, &file);
+                }
+            }
+        }
+    }
     trainDB->endLUW();
 }
 
@@ -464,22 +620,6 @@ LibrarySearch::run()
         if (findWorkout && ErgFile::isWorkout(name)) emit foundWorkout(name);
     }
 
-    // Now check and re-add references, if there are any
-    // these are files which were drag-n-dropped into the 
-    // GC train window, but which were referenced not
-    // copied into the workout directory.
-    Library *l = Library::findLibrary("Media Library");
-    if (l) {
-        foreach(QString r, l->refs) {
-
-            if (!QFile(r).exists()) continue;
-
-            // is a video?
-            if (findMedia && helper.isMedia(r)) emit foundVideo(r);
-            // is a workout?
-            if (findWorkout && ErgFile::isWorkout(r)) emit foundWorkout(r);
-        }
-    }
 
     emit done();
 };
@@ -488,4 +628,154 @@ void
 LibrarySearch::abort()
 {
     aborted = true;
+}
+
+//
+// LIBRARY IMPORT DIALOG...
+//
+WorkoutImportDialog::WorkoutImportDialog(MainWindow *main, QStringList files) :
+    main(main), files(files)
+{
+    setAttribute(Qt::WA_DeleteOnClose);
+    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+
+    setWindowTitle(tr("Import to Library"));
+    setFixedSize(450, 450);
+
+    MediaHelper helper;
+
+    // sort the wheat from the chaff
+    foreach(QString file, files) {
+
+        // they must exist!!
+        if (!QFile(file).exists()) continue;
+
+        // media just check file name
+        if (helper.isMedia(file)) videos << file;
+
+        // if it is a workout we parse it to check
+        if (ErgFile::isWorkout(file)) {
+            int mode;
+            ErgFile *p = new ErgFile(file, mode, main);
+            if (p->isValid()) workouts << file;
+            delete p;
+        }
+    }
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+
+    QLabel *notice = new QLabel(this);
+    notice->setWordWrap(true);
+    notice->setText("Please note, that when importing or drag and dropping "
+                    "videos into the library we DO NOT copy the file into "
+                    "the GoldenCheetah library, instead we add a REFERENCE "
+                    "to it. We DO copy workout files, since they are smaller.\n\n"
+                    "You can remove references when managing the library "
+                    "via the tools menu option");
+
+    fileTable = new QTreeWidget(this);
+#ifdef Q_OS_MAC
+    // get rid of annoying focus rectangle
+    fileTable->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
+    fileTable->setColumnCount(1);
+    fileTable->setIndentation(0);
+    fileTable->headerItem()->setText(0, tr("Files"));
+    fileTable->setSelectionMode(QAbstractItemView::SingleSelection);
+    fileTable->setAlternatingRowColors (false);
+    fileTable->setTextElideMode(Qt::ElideMiddle);
+
+    foreach (QString file, files) {
+        QTreeWidgetItem *item = new QTreeWidgetItem(fileTable->invisibleRootItem(), 0);
+        item->setText(0, file);
+    }
+
+    cancelButton = new QPushButton(tr("Cancel"), this);
+    cancelButton->setDefault(false);
+    okButton = new QPushButton(tr("OK"), this);
+    okButton->setDefault(true);
+
+    // if importing workoouts..
+    overwrite = new QCheckBox(tr("Overwite existing files"),this);
+    if (!workouts.count()) overwrite->hide();
+
+    if (videos.count() == 0) notice->hide();
+
+    mainLayout->addWidget(notice);
+    mainLayout->addWidget(fileTable);
+    //mainLayout->addStretch();
+
+    QHBoxLayout *buttons = new QHBoxLayout;
+    buttons->addWidget(overwrite);
+    buttons->addStretch();
+    buttons->addWidget(cancelButton);
+    buttons->addWidget(okButton);
+
+    // Cancel, OK
+    mainLayout->addLayout(buttons);
+
+    connect (cancelButton, SIGNAL(clicked()), this, SLOT(accept()));
+    connect (okButton, SIGNAL(clicked()), this, SLOT(import()));
+}
+
+void
+WorkoutImportDialog::import()
+{
+    Library *l = Library::findLibrary("Media Library");
+
+    if (!l) accept(); // not possible
+
+    trainDB->startLUW();
+
+    // videos are easy, just add a reference, if its already
+    // there then do nothing
+    foreach(QString video, videos) {
+
+        // if we don't already have it, add it
+        if (!l->refs.contains(video)) {
+            l->refs.append(video);
+            trainDB->importVideo(video);
+        }
+    }
+
+    // now write to disk..
+    LibraryParser::serialize(main->home);
+
+    // set target directory
+    QString workoutDir = appsettings->value(NULL, GC_WORKOUTDIR).toString();
+    if (workoutDir == "") {
+        QDir root = main->home;
+        root.cdUp();
+        workoutDir = root.absolutePath();
+    }
+
+
+    // now import those workouts
+    foreach(QString workout, workouts) {
+
+        // if doesn't exist then skip
+        if (!QFile(workout).exists()) continue;
+
+        // cannot read or not valid
+        int mode;
+        ErgFile file(workout, mode, main);
+        if (!file.isValid()) continue;
+
+        // get target name
+        QString target = workoutDir + "/" + QFileInfo(workout).fileName();
+
+        // don't overwrite existing
+        if (QFile(target).exists() && !overwrite->isChecked()) continue;
+
+        // wipe and copy
+        if (QFile(target).exists()) QFile::remove(target); // zap it
+        QFile(workout).copy(target);
+
+        // add to library now
+        trainDB->importWorkout(target, &file);
+    }
+
+    trainDB->endLUW();
+
+    accept();
 }

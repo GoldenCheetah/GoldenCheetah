@@ -193,6 +193,8 @@ class MainWindow : public QMainWindow
         void notifyErgFileSelected(ErgFile *x) { workout=x; ergFileSelected(x); }
         ErgFile *currentErgFile() { return workout; }
         void notifyMediaSelected( QString x) { mediaSelected(x); }
+        void notifySelectVideo(QString x) { selectMedia(x); }
+        void notifySelectWorkout(QString x) { selectWorkout(x); }
         void notifySetNow(long x) { now = x; setNow(x); }
         long getNow() { return now; }
         void notifyNewLap() { emit newLap(); }
@@ -232,6 +234,8 @@ class MainWindow : public QMainWindow
         void telemetryUpdate(RealtimeData rtData);
         void ergFileSelected(ErgFile *);
         void mediaSelected(QString);
+        void selectWorkout(QString); // ask traintool to select this
+        void selectMedia(QString); // ask traintool to select this
         void setNow(long);
         void seek(long);
         void newLap();
