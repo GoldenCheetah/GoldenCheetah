@@ -384,10 +384,26 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
 void
 TrainTool::refresh()
 {
+    // remember selection
+    int row = mediaTree->currentIndex().row();
+    QString videoPath = mediaTree->model()->data(mediaTree->model()->index(row,0)).toString();
+
+    // refresh data
     videoModel->select();
     while (videoModel->canFetchMore(QModelIndex())) videoModel->fetchMore(QModelIndex());
+
+    // restore selection
+    selectVideo(videoPath);
+
+
+    row = workoutTree->currentIndex().row();
+    QString workoutPath = workoutTree->model()->data(workoutTree->model()->index(row,0)).toString();
+
     workoutModel->select();
     while (workoutModel->canFetchMore(QModelIndex())) workoutModel->fetchMore(QModelIndex());
+
+    // restore selection
+    selectWorkout(workoutPath);
 }
 
 void
