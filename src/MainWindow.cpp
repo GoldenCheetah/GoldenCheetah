@@ -1565,7 +1565,7 @@ MainWindow::dropEvent(QDropEvent *event)
         QStringList filenames;
         for (int i=0; i<urls.count(); i++)
             filenames.append(QFileInfo(urls.value(i).toLocalFile()).absoluteFilePath());
-        Library::importFiles(filenames);
+        Library::importFiles(this, filenames);
     }
     return;
 }
@@ -1994,7 +1994,7 @@ MainWindow::importWorkout()
         QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
 
         // import them via the workoutimporter
-        Library::importFiles(fileNamesCopy);
+        Library::importFiles(this, fileNamesCopy);
     }
 }
 /*----------------------------------------------------------------------

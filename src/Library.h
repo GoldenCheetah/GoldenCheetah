@@ -40,7 +40,7 @@ class Library : QObject
 
         static void initialise(QDir); // init
         static Library *findLibrary(QString);
-        static void importFiles(QStringList files);
+        static void importFiles(MainWindow *mainWindow, QStringList files);
 };
 
 extern QList<Library *> libraries;        // keep track of all Library search paths for all users
@@ -63,7 +63,7 @@ class LibrarySearchDialog : public QDialog
 
         void addDirectory();
         void removeDirectory();
-
+        void removeReference();
         void updateDB();
 
     private:
@@ -89,7 +89,10 @@ class LibrarySearchDialog : public QDialog
                   *findMedia;
         QPushButton *addPath,
                     *removePath;
+        QPushButton *removeRef;
         QTreeWidget *searchPathTable;
+        QTreeWidget *refTable;
+        QTreeWidgetItem *allRefs;
         QTreeWidgetItem *allPaths;
         QLabel *pathLabelTitle, *mediaCountTitle, *workoutCountTitle;
         QLabel *pathLabel, *mediaCount, *workoutCount;
@@ -119,6 +122,28 @@ class LibrarySearch : public QThread
         volatile bool aborted;
         QString path;
         bool findMedia, findWorkout;
+};
+
+class WorkoutImportDialog : public QDialog
+{
+    Q_OBJECT
+
+    public:
+        WorkoutImportDialog(MainWindow *main, QStringList files);
+
+    public slots:
+        void import();
+
+    private:
+        MainWindow *main;
+        QStringList files;
+ 
+        QStringList videos, workouts;
+
+        QTreeWidget *fileTable;
+        QPushButton *okButton, *cancelButton;
+
+        QCheckBox *overwrite;
 };
 
 #endif // _Library_h

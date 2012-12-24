@@ -135,6 +135,8 @@ class TrainTool : public GcWindow
 
         void refresh(); // when TrainDB is updated...
 
+        void selectVideo(QString fullpath);
+        void selectWorkout(QString fullpath);
         //XXX void workoutTreeMenuPopup(const QPoint &);
         //XXX void mediaTreeMenuPopup(const QPoint &);
 
