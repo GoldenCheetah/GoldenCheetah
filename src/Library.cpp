@@ -120,7 +120,7 @@ Library::importFiles(MainWindow *mainWindow, QStringList files)
     if (!videos.count() && !workouts.count()) {
 
         QMessageBox::warning(NULL, tr("Import Videos and Workouts"), 
-            "No valid videos or workouts were found to import");
+            "No supported videos or workouts were found to import");
 
         return;
     }

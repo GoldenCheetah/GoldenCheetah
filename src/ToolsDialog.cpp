@@ -59,8 +59,10 @@ QHBoxLayout *setupMinsSecs(ToolsDialog *dialog,
 
 ToolsDialog::ToolsDialog(QWidget *parent) : QDialog(parent)
 {
-    setWindowTitle(tr("Critical Power Calculator"));
+    setWindowTitle(tr("Critical Power Estimator"));
     setAttribute(Qt::WA_DeleteOnClose);
+
+    setFixedSize(300, 240);
 
     QVBoxLayout *mainVBox = new QVBoxLayout(this);
 
@@ -71,18 +73,22 @@ ToolsDialog::ToolsDialog(QWidget *parent) : QDialog(parent)
     mainVBox->addWidget(new QLabel(tr("Your best long effort (15-60 min):")));
     mainVBox->addLayout(setupMinsSecs(this, longMinsSpinBox, longSecsSpinBox,
                                       longWattsSpinBox, 60.0, 20.0));
+    mainVBox->addStretch();
 
     QHBoxLayout *cpHBox = new QHBoxLayout;
     cpHBox->addWidget(new QLabel(tr("Your critical power:")));
     txtCP = new QLineEdit(this);
     txtCP->setAlignment(Qt::AlignRight);
     txtCP->setReadOnly(true);
-    cpHBox->addWidget(txtCP);
+    cpHBox->addWidget(txtCP, Qt::AlignLeft);
     mainVBox->addLayout(cpHBox);
+
+    mainVBox->addStretch();
 
     QHBoxLayout *buttonHBox = new QHBoxLayout;
     btnCalculate = new QPushButton(this);
-    btnCalculate->setText(tr("Calculate CP"));
+    btnCalculate->setText(tr("Estimate CP"));
+    buttonHBox->addStretch();
     buttonHBox->addWidget(btnCalculate);
     btnOK = new QPushButton(this);
     btnOK->setText(tr("Done"));

@@ -324,10 +324,10 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
 #if defined Q_OS_MAC || defined GC_HAVE_VLC
     connect(mediaTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
                             this, SLOT(mediaTreeWidgetSelectionChanged()));
+    connect(main, SIGNAL(selectMedia(QString)), this, SLOT(selectVideo(QString)));
 #endif
     connect(main, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(main, SIGNAL(selectWorkout(QString)), this, SLOT(selectWorkout(QString)));
-    connect(main, SIGNAL(selectMedia(QString)), this, SLOT(selectVideo(QString)));
     connect(trainDB, SIGNAL(dataChanged()), this, SLOT(refresh()));
 
     connect(workoutTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(workoutTreeWidgetSelectionChanged()));
@@ -384,10 +384,29 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
 void
 TrainTool::refresh()
 {
+    int row;
+
+#if defined Q_OS_MAC || defined GC_HAVE_VLC
+    // remember selection
+    row = mediaTree->currentIndex().row();
+    QString videoPath = mediaTree->model()->data(mediaTree->model()->index(row,0)).toString();
+
+    // refresh data
     videoModel->select();
     while (videoModel->canFetchMore(QModelIndex())) videoModel->fetchMore(QModelIndex());
+
+    // restore selection
+    selectVideo(videoPath);
+#endif
+
+    row = workoutTree->currentIndex().row();
+    QString workoutPath = workoutTree->model()->data(workoutTree->model()->index(row,0)).toString();
+
     workoutModel->select();
     while (workoutModel->canFetchMore(QModelIndex())) workoutModel->fetchMore(QModelIndex());
+
+    // restore selection
+    selectWorkout(workoutPath);
 }
 
 void
