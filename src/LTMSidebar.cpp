@@ -246,31 +246,47 @@ LTMSidebar::dateRangePopup(QPoint pos)
         // out of bounds or not user defined
         int index = allDateRanges->indexOfChild(item);
         if (index == -1 || index >= seasons->seasons.count()
-            || seasons->seasons[index].getType() == Season::temporary)
-            return;
+            || seasons->seasons[index].getType() == Season::temporary) {
+            // on system date we just offer to add a Season, since its
+            // the only way of doing it when no seasons are defined!!
+            activeDateRange = NULL;
 
-        // save context
-        activeDateRange = item;
+            // create context menu
+            QMenu menu(dateRangeTree);
+            QAction *add = new QAction(tr("Add season"), dateRangeTree);
+            menu.addAction(add);
 
-        // create context menu
-        QMenu menu(dateRangeTree);
-        QAction *add = new QAction(tr("Add season"), dateRangeTree);
-        QAction *edit = new QAction(tr("Edit season"), dateRangeTree);
-        QAction *del = new QAction(tr("Delete season"), dateRangeTree);
-        QAction *event = new QAction(tr("Add Event"), dateRangeTree);
-        menu.addAction(add);
-        menu.addAction(edit);
-        menu.addAction(del);
-        menu.addAction(event);
+            // connect menu to functions
+            connect(add, SIGNAL(triggered(void)), this, SLOT(addRange(void)));
 
-        // connect menu to functions
-        connect(add, SIGNAL(triggered(void)), this, SLOT(addRange(void)));
-        connect(edit, SIGNAL(triggered(void)), this, SLOT(editRange(void)));
-        connect(del, SIGNAL(triggered(void)), this, SLOT(deleteRange(void)));
-        connect(event, SIGNAL(triggered(void)), this, SLOT(addEvent(void)));
+            // execute the menu
+            menu.exec(dateRangeTree->mapToGlobal(pos));
 
-        // execute the menu
-        menu.exec(dateRangeTree->mapToGlobal(pos));
+        } else {
+
+            // save context
+            activeDateRange = item;
+
+            // create context menu
+            QMenu menu(dateRangeTree);
+            QAction *add = new QAction(tr("Add season"), dateRangeTree);
+            QAction *edit = new QAction(tr("Edit season"), dateRangeTree);
+            QAction *del = new QAction(tr("Delete season"), dateRangeTree);
+            QAction *event = new QAction(tr("Add Event"), dateRangeTree);
+            menu.addAction(add);
+            menu.addAction(edit);
+            menu.addAction(del);
+            menu.addAction(event);
+
+            // connect menu to functions
+            connect(add, SIGNAL(triggered(void)), this, SLOT(addRange(void)));
+            connect(edit, SIGNAL(triggered(void)), this, SLOT(editRange(void)));
+            connect(del, SIGNAL(triggered(void)), this, SLOT(deleteRange(void)));
+            connect(event, SIGNAL(triggered(void)), this, SLOT(addEvent(void)));
+
+            // execute the menu
+            menu.exec(dateRangeTree->mapToGlobal(pos));
+        }
     }
 }
 
