@@ -1208,6 +1208,7 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
     QVBoxLayout *selectedLayout = new QVBoxLayout;
     selectedLayout->addWidget(new QLabel(tr("Selected Metrics")));
     selectedLayout->addWidget(selectedList);
+#ifndef Q_OS_MAC
     upButton = new QToolButton(this);
     downButton = new QToolButton(this);
     leftButton = new QToolButton(this);
@@ -1216,11 +1217,15 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
     downButton->setArrowType(Qt::DownArrow);
     leftButton->setArrowType(Qt::LeftArrow);
     rightButton->setArrowType(Qt::RightArrow);
-#ifndef Q_OS_MAC
     upButton->setFixedSize(20,20);
     downButton->setFixedSize(20,20);
     leftButton->setFixedSize(20,20);
     rightButton->setFixedSize(20,20);
+#else
+    upButton = new QPushButton(tr("Up"));
+    downButton = new QPushButton(tr("Down"));
+    leftButton = new QPushButton("<");
+    rightButton = new QPushButton(">");
 #endif
     QVBoxLayout *buttonGrid = new QVBoxLayout;
     QHBoxLayout *upLayout = new QHBoxLayout;
@@ -1396,6 +1401,7 @@ SummaryMetricsPage::SummaryMetricsPage(QWidget *parent) :
     QVBoxLayout *selectedLayout = new QVBoxLayout;
     selectedLayout->addWidget(new QLabel(tr("Selected Metrics")));
     selectedLayout->addWidget(selectedList);
+#ifndef Q_OS_MAC
     upButton = new QToolButton(this);
     downButton = new QToolButton(this);
     leftButton = new QToolButton(this);
@@ -1404,11 +1410,15 @@ SummaryMetricsPage::SummaryMetricsPage(QWidget *parent) :
     downButton->setArrowType(Qt::DownArrow);
     leftButton->setArrowType(Qt::LeftArrow);
     rightButton->setArrowType(Qt::RightArrow);
-#ifndef Q_OS_MAC
     upButton->setFixedSize(20,20);
     downButton->setFixedSize(20,20);
     leftButton->setFixedSize(20,20);
     rightButton->setFixedSize(20,20);
+#else
+    upButton = new QPushButton(tr("Up"));
+    downButton = new QPushButton(tr("Down"));
+    leftButton = new QPushButton("<");
+    rightButton = new QPushButton(">");
 #endif
     QVBoxLayout *buttonGrid = new QVBoxLayout;
     QHBoxLayout *upLayout = new QHBoxLayout;
@@ -1635,17 +1645,20 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
     field->addStretch();
     mainLayout->addLayout(field);
 
+    addButton = new QPushButton(tr("+"));
+    deleteButton = new QPushButton(tr("-"));
+#ifndef Q_OS_MAC
     upButton = new QToolButton(this);
     downButton = new QToolButton(this);
     upButton->setArrowType(Qt::UpArrow);
     downButton->setArrowType(Qt::DownArrow);
-    addButton = new QPushButton(tr("+"));
-    deleteButton = new QPushButton(tr("-"));
-#ifndef Q_OS_MAC
     upButton->setFixedSize(20,20);
     downButton->setFixedSize(20,20);
     addButton->setFixedSize(20,20);
     deleteButton->setFixedSize(20,20);
+#else
+    upButton = new QPushButton(tr("Up"));
+    downButton = new QPushButton(tr("Down"));
 #endif
 
     QHBoxLayout *actionButtons = new QHBoxLayout;
@@ -1842,17 +1855,20 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
 {
     QGridLayout *mainLayout = new QGridLayout(this);
 
+    addButton = new QPushButton(tr("+"));
+    deleteButton = new QPushButton(tr("-"));
+#ifndef Q_OS_MAC
     upButton = new QToolButton(this);
     downButton = new QToolButton(this);
     upButton->setArrowType(Qt::UpArrow);
     downButton->setArrowType(Qt::DownArrow);
-    addButton = new QPushButton(tr("+"));
-    deleteButton = new QPushButton(tr("-"));
-#ifndef Q_OS_MAC
     upButton->setFixedSize(20,20);
     downButton->setFixedSize(20,20);
     addButton->setFixedSize(20,20);
     deleteButton->setFixedSize(20,20);
+#else
+    upButton = new QPushButton(tr("Up"));
+    downButton = new QPushButton(tr("Down"));
 #endif
     QHBoxLayout *actionButtons = new QHBoxLayout;
     actionButtons->setSpacing(2);
@@ -3271,17 +3287,20 @@ MeasuresPage::MeasuresPage(MainWindow *main) : main(main)
 {
     QGridLayout *mainLayout = new QGridLayout(this);
 
+    addButton = new QPushButton(tr("+"));
+    deleteButton = new QPushButton(tr("-"));
+#ifndef Q_OS_MAC
     upButton = new QToolButton(this);
     downButton = new QToolButton(this);
     upButton->setArrowType(Qt::UpArrow);
     downButton->setArrowType(Qt::DownArrow);
-    addButton = new QPushButton(tr("+"));
-    deleteButton = new QPushButton(tr("-"));
-#ifndef Q_OS_MAC
     upButton->setFixedSize(20,20);
     downButton->setFixedSize(20,20);
     addButton->setFixedSize(20,20);
     deleteButton->setFixedSize(20,20);
+#else
+    upButton = new QPushButton(tr("Up"));
+    downButton = new QPushButton(tr("Down"));
 #endif
 
     QHBoxLayout *actionButtons = new QHBoxLayout;
@@ -3555,17 +3574,20 @@ SeasonsPage::SeasonsPage(QWidget *parent, MainWindow *mainWindow) : QWidget(pare
     editLayout->addRow(new QLabel("From"), fromEdit);
     editLayout->addRow(new QLabel("To"), toEdit);
 
+    addButton = new QPushButton(tr("+"));
+    deleteButton = new QPushButton(tr("-"));
+#ifndef Q_OS_MAC
     upButton = new QToolButton(this);
     downButton = new QToolButton(this);
     upButton->setArrowType(Qt::UpArrow);
     downButton->setArrowType(Qt::DownArrow);
-    addButton = new QPushButton(tr("+"));
-    deleteButton = new QPushButton(tr("-"));
-#ifndef Q_OS_MAC
     upButton->setFixedSize(20,20);
     downButton->setFixedSize(20,20);
     addButton->setFixedSize(20,20);
     deleteButton->setFixedSize(20,20);
+#else
+    upButton = new QPushButton(tr("Up"));
+    downButton = new QPushButton(tr("Down"));
 #endif
 
     QVBoxLayout *actionButtons = new QVBoxLayout;
