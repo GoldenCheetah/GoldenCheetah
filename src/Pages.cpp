@@ -1868,6 +1868,11 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     fields->headerItem()->setText(2, tr("Type"));
     fields->headerItem()->setText(3, tr("Values"));
     fields->headerItem()->setText(4, tr("Diary"));
+    fields->setColumnWidth(0,80);
+    fields->setColumnWidth(1,100);
+    fields->setColumnWidth(2,100);
+    fields->setColumnWidth(3,80);
+    fields->setColumnWidth(4,20);
     fields->setColumnCount(5);
     fields->setSelectionMode(QAbstractItemView::SingleSelection);
     fields->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
