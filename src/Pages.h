@@ -265,10 +265,17 @@ class IntervalMetricsPage : public QWidget
         bool changed;
         QListWidget *availList;
         QListWidget *selectedList;
+#ifndef Q_OS_MAC
         QToolButton *upButton;
         QToolButton *downButton;
         QToolButton *leftButton;
         QToolButton *rightButton;
+#else
+        QPushButton *upButton;
+        QPushButton *downButton;
+        QPushButton *leftButton;
+        QPushButton *rightButton;
+#endif
 };
 
 class SummaryMetricsPage : public QWidget
@@ -294,10 +301,17 @@ class SummaryMetricsPage : public QWidget
         bool changed;
         QListWidget *availList;
         QListWidget *selectedList;
+#ifndef Q_OS_MAC
         QToolButton *upButton;
         QToolButton *downButton;
         QToolButton *leftButton;
         QToolButton *rightButton;
+#else
+        QPushButton *upButton;
+        QPushButton *downButton;
+        QPushButton *leftButton;
+        QPushButton *rightButton;
+#endif
 };
 
 
@@ -325,7 +339,11 @@ class KeywordsPage : public QWidget
 
         QTreeWidget *keywords;
 
+#ifndef Q_OS_MAC
         QToolButton *upButton, *downButton;
+#else
+        QPushButton *upButton, *downButton;
+#endif
         QPushButton *addButton, *renameButton, *deleteButton;
         QLabel *fieldLabel;
         QComboBox *fieldChooser;
@@ -395,7 +413,11 @@ class FieldsPage : public QWidget
 
         QTreeWidget *fields;
 
+#ifndef Q_OS_MAC
         QToolButton *upButton, *downButton;
+#else
+        QPushButton *upButton, *downButton;
+#endif
         QPushButton *addButton, *renameButton, *deleteButton;
 };
 
@@ -654,8 +676,11 @@ class SeasonsPage : public QWidget
         QLineEdit *nameEdit;
         QComboBox *typeEdit;
         QDateEdit *fromEdit, *toEdit;
-
+#ifndef Q_OS_MAC
         QToolButton *upButton, *downButton;
+#else
+        QPushButton *upButton, *downButton;
+#endif
         QPushButton *addButton, *renameButton, *deleteButton;
 
         QList<Season> array;
@@ -683,7 +708,11 @@ class MeasuresPage : public QWidget
 
         MainWindow *main;
         QTreeWidget *fields;
+#ifndef Q_OS_MAC
         QToolButton *upButton, *downButton;
+#else
+        QPushButton *upButton, *downButton;
+#endif
         QPushButton *addButton, *renameButton, *deleteButton;
 };
 
