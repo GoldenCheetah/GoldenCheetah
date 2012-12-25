@@ -977,6 +977,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     colors->headerItem()->setText(0, tr("Color"));
     colors->headerItem()->setText(1, tr("Select"));
     colors->setColumnCount(2);
+    colors->setColumnWidth(0,310);
     colors->setSelectionMode(QAbstractItemView::NoSelection);
     //colors->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     colors->setUniformRowHeights(true);
