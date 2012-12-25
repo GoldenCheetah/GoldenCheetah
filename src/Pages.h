@@ -265,10 +265,10 @@ class IntervalMetricsPage : public QWidget
         bool changed;
         QListWidget *availList;
         QListWidget *selectedList;
-        QPushButton *upButton;
-        QPushButton *downButton;
-        QPushButton *leftButton;
-        QPushButton *rightButton;
+        QToolButton *upButton;
+        QToolButton *downButton;
+        QToolButton *leftButton;
+        QToolButton *rightButton;
 };
 
 class SummaryMetricsPage : public QWidget
@@ -294,10 +294,10 @@ class SummaryMetricsPage : public QWidget
         bool changed;
         QListWidget *availList;
         QListWidget *selectedList;
-        QPushButton *upButton;
-        QPushButton *downButton;
-        QPushButton *leftButton;
-        QPushButton *rightButton;
+        QToolButton *upButton;
+        QToolButton *downButton;
+        QToolButton *leftButton;
+        QToolButton *rightButton;
 };
 
 
@@ -325,7 +325,8 @@ class KeywordsPage : public QWidget
 
         QTreeWidget *keywords;
 
-        QPushButton *upButton, *downButton, *addButton, *renameButton, *deleteButton;
+        QToolButton *upButton, *downButton;
+        QPushButton *addButton, *renameButton, *deleteButton;
         QLabel *fieldLabel;
         QComboBox *fieldChooser;
 
@@ -394,7 +395,8 @@ class FieldsPage : public QWidget
 
         QTreeWidget *fields;
 
-        QPushButton *upButton, *downButton, *addButton, *renameButton, *deleteButton;
+        QToolButton *upButton, *downButton;
+        QPushButton *addButton, *renameButton, *deleteButton;
 };
 
 class ProcessorPage : public QWidget
@@ -653,7 +655,8 @@ class SeasonsPage : public QWidget
         QComboBox *typeEdit;
         QDateEdit *fromEdit, *toEdit;
 
-        QPushButton *upButton, *downButton, *addButton, *renameButton, *deleteButton;
+        QToolButton *upButton, *downButton;
+        QPushButton *addButton, *renameButton, *deleteButton;
 
         QList<Season> array;
 };
@@ -680,7 +683,8 @@ class MeasuresPage : public QWidget
 
         MainWindow *main;
         QTreeWidget *fields;
-        QPushButton *upButton, *downButton, *addButton, *renameButton, *deleteButton;
+        QToolButton *upButton, *downButton;
+        QPushButton *addButton, *renameButton, *deleteButton;
 };
 
 #endif
