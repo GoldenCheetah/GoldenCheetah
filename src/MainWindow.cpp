@@ -508,16 +508,14 @@ MainWindow::MainWindow(const QDir &home) :
     // add chart button with a menu
     chartMenu = new QMenu(this);
     
-    QIcon chartIcon(":images/addchart.png");
 #ifndef Q_OS_MAC
-    QPushButton *newchart = new QPushButton(chartIcon, "", this);
+    QPushButton *newchart = new QPushButton("+", this);
     rspacerLayout->addWidget(newchart);
     newchart->setFocusPolicy(Qt::NoFocus);
-    newchart->setIconSize(QSize(20,20));
     newchart->setAutoFillBackground(false);
     newchart->setAutoDefault(false);
     newchart->setFlat(true);
-    newchart->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    newchart->setStyleSheet("color: white; background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
 #else
     QCleanlooksStyle *styler = new QCleanlooksStyle();
     QPushButton *newchart = new QPushButton("+", this);
