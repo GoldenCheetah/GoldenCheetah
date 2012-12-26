@@ -365,36 +365,43 @@ MainWindow::MainWindow(const QDir &home) :
 
     // show hide sidebar
     side = new QPushButton(hideIcon, "", this);
-    side->setFocusPolicy(Qt::NoFocus);
-    side->setIconSize(QSize(15,15));
-    side->setFixedWidth(20);
     side->setToolTip("Show/Hide Sidebar");
+    side->setFocusPolicy(Qt::NoFocus);
+    side->setIconSize(QSize(20,20));
     side->setAutoFillBackground(false);
+    side->setAutoDefault(false);
     side->setFlat(true);
+    side->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    side->setAutoRepeat(true);
+    side->setAutoRepeatDelay(200);
     lspacerLayout->addWidget(side);
     connect(side, SIGNAL(clicked()), this, SLOT(toggleSidebar()));
 
     // switch tab/tile
     style = new QPushButton(tabIcon, "", this);
-    style->setFocusPolicy(Qt::NoFocus);
     style->setToolTip("Toggle Tabbed Mode");
-    style->setIconSize(QSize(15,15));
+    style->setFocusPolicy(Qt::NoFocus);
+    style->setIconSize(QSize(20,20));
     style->setAutoFillBackground(false);
     style->setAutoDefault(false);
-    style->setFixedWidth(20);
     style->setFlat(true);
+    style->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    style->setAutoRepeat(true);
+    style->setAutoRepeatDelay(200);
     lspacerLayout->addWidget(style);
     connect(style, SIGNAL(clicked()), this, SLOT(toggleStyle()));
 
 #ifndef Q_OS_MAC // full screen is in the unified title and toolbar on a Mac
     full = new QPushButton(fullIcon, "", this);
-    full->setFocusPolicy(Qt::NoFocus);
     full->setToolTip("Toggle Full Screen");
-    full->setIconSize(QSize(15,15));
+    full->setFocusPolicy(Qt::NoFocus);
+    full->setIconSize(QSize(20,20));
     full->setAutoFillBackground(false);
     full->setAutoDefault(false);
-    full->setFixedWidth(20);
     full->setFlat(true);
+    full->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    full->setAutoRepeat(true);
+    full->setAutoRepeatDelay(200);
     lspacerLayout->addWidget(full);
     connect(full, SIGNAL(clicked()), this, SLOT(toggleFullScreen()));
 #endif
@@ -425,24 +432,25 @@ MainWindow::MainWindow(const QDir &home) :
     saveButton->setContentsMargins(0,0,0,0);
     saveButton->setFocusPolicy(Qt::NoFocus);
     saveButton->setIconSize(QSize(20,20));
-    saveButton->setFixedWidth(24);
     saveButton->setAutoFillBackground(false);
     saveButton->setAutoDefault(false);
     saveButton->setFlat(true);
     saveButton->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    saveButton->setAutoRepeat(true);
+    saveButton->setAutoRepeatDelay(200);
     toolbuttons->addWidget(saveButton);
     connect(saveButton, SIGNAL(clicked()), this, SLOT(saveRide()));
 
     QIcon openIcon(":images/oxygen/open.png");
     QPushButton *open = new QPushButton(openIcon, "", this);
-    open->setContentsMargins(0,0,0,0);
     open->setFocusPolicy(Qt::NoFocus);
     open->setIconSize(QSize(20,20));
-    open->setFixedWidth(24);
     open->setAutoFillBackground(false);
     open->setAutoDefault(false);
     open->setFlat(true);
     open->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    open->setAutoRepeat(true);
+    open->setAutoRepeatDelay(200);
     toolbuttons->addWidget(open);
     QMenu *openMenu = new QMenu(this);
     open->setMenu(openMenu);
@@ -504,21 +512,24 @@ MainWindow::MainWindow(const QDir &home) :
 #ifndef Q_OS_MAC
     QPushButton *newchart = new QPushButton(chartIcon, "", this);
     rspacerLayout->addWidget(newchart);
-    newchart->setIconSize(QSize(15,15));
-    newchart->setFixedWidth(20);
+    newchart->setFocusPolicy(Qt::NoFocus);
+    newchart->setIconSize(QSize(20,20));
+    newchart->setAutoFillBackground(false);
+    newchart->setAutoDefault(false);
+    newchart->setFlat(true);
+    newchart->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
 #else
     QCleanlooksStyle *styler = new QCleanlooksStyle();
     QPushButton *newchart = new QPushButton("+", this);
     scopebar->addWidget(newchart);
     newchart->setStyle(styler);
-    newchart->setFixedWidth(25);
     newchart->setFixedHeight(20);
-#endif
     newchart->setFlat(true);
     newchart->setFocusPolicy(Qt::NoFocus);
     newchart->setToolTip(tr("Add Chart"));
     newchart->setAutoFillBackground(false);
     newchart->setAutoDefault(false);
+#endif
     newchart->setMenu(chartMenu);
     connect(chartMenu, SIGNAL(aboutToShow()), this, SLOT(setChartMenu()));
     connect(chartMenu, SIGNAL(triggered(QAction*)), this, SLOT(addChart(QAction*)));

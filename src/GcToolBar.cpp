@@ -20,10 +20,10 @@
 
 GcToolBar::GcToolBar(QWidget *parent) : QWidget(parent)
 {
-    setFixedHeight(40);
+    setFixedHeight(44);
     setContentsMargins(0,0,0,0);
     layout = new QHBoxLayout(this);
-    layout->setSpacing(0);
+    layout->setSpacing(10);
     layout->setContentsMargins(0,0,0,0);
     installEventFilter(this);
 }
