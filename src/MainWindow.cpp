@@ -522,6 +522,7 @@ MainWindow::MainWindow(const QDir &home) :
     scopebar->addWidget(newchart);
     newchart->setStyle(styler);
     newchart->setFixedHeight(20);
+    newchart->setFixedWidth(24);
     newchart->setFlat(true);
     newchart->setFocusPolicy(Qt::NoFocus);
     newchart->setToolTip(tr("Add Chart"));
