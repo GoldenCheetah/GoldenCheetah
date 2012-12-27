@@ -832,6 +832,7 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     virtualPower->addItem("Power - Minoura V100 Trainer (2)");
     virtualPower->addItem("Power - Minoura V100 Trainer (1)");
     virtualPower->addItem("Power - Minoura V100 Trainer (L)");
+    virtualPower->addItem("Power - Saris Powerbeam Pro");
 
     wheelSize->addItem("Road/Cross (700C/622)"); // 2100mm
     wheelSize->addItem("Tri/TT (650C)"); // 1960mm
