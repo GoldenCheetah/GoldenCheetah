@@ -171,6 +171,12 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
+    case 14 : //SARIS POWERBEAM PRO
+        {
+        double V = rtData.getSpeed();
+        // 14 = 0.0008x^3 + 0.145x^2 + 2.5299x + 14.641 where x = speed in kph
+        rtData.setWatts(pow(0.0008*V, 3) + pow(0.145*V, 2) + (2.5299*V) + 14.641);
+        }
 
     default : // unknown - do nothing
         break;
