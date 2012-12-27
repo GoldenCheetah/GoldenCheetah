@@ -26,8 +26,6 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QLocale>
 
-#include <boost/scoped_array.hpp>
-
 static QString tptypestrings[]= { "SharedFree", "CoachedFree", "SelfCoachedPremium",
                                   "SharedSelfCoachedPremium", "CoachedPremium",
                                   "SharedCoachedPremium"

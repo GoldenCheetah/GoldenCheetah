@@ -34,7 +34,6 @@
 #include "RideMetadata.h"
 #include "SpecialFields.h"
 
-#include <boost/scoped_array.hpp>
 #include <boost/crc.hpp>
 
 // DB Schema Version - YOU MUST UPDATE THIS IF THE SCHEMA VERSION CHANGES!!!
@@ -133,7 +132,7 @@ computeFileCRC(QString filename)
     if (!file.open(QFile::ReadOnly)) return 0;
 
     // allocate space
-    boost::scoped_array<char> data(new char[file.size()]);
+    QScopedArrayPointer<char> data(new char[file.size()]);
 
     // read entire file into memory
     QDataStream *rawstream(new QDataStream(&file));
@@ -142,6 +141,7 @@ computeFileCRC(QString filename)
 
     // calculate the CRC
     boost::crc_optimal<16, 0x1021, 0xFFFF, 0, false, false> CRC;
+
     CRC.process_bytes(&data[0], file.size());
 
     return CRC.checksum();

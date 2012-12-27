@@ -182,7 +182,6 @@
 
 #include <QSettings>
 #include <QFileInfo>
-#include <boost/shared_ptr.hpp>
 
 // wrap the standard QSettings so we can offer members
 // to get global or cyclist specific settings

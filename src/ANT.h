@@ -55,6 +55,8 @@
 #include <fcntl.h>
 #include <sys/types.h>
 
+#include <stdint.h> //uint8_t
+
 #ifdef WIN32
 #include <windows.h>
 #include <winbase.h>

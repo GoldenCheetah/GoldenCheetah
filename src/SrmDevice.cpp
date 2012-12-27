@@ -20,8 +20,6 @@
 #include "SrmRideFile.h"
 #include <srmio.h>
 #include <QMessageBox>
-#include <boost/scoped_ptr.hpp>
-#include <boost/foreach.hpp>
 #include <errno.h>
 
 static bool srm5Registered =

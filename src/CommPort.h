@@ -21,10 +21,10 @@
 #include "GoldenCheetah.h"
 
 #include <QtCore>
-#include <boost/shared_ptr.hpp>
 
 class CommPort;
-typedef boost::shared_ptr<CommPort> CommPortPtr;
+
+typedef QSharedPointer<CommPort> CommPortPtr;
 
 class CommPort
 {

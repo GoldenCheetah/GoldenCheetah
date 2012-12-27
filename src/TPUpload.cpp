@@ -27,8 +27,6 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QLocale>
 
-#include <boost/scoped_array.hpp>
-
 #include <zlib.h>
 
 //

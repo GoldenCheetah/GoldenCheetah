@@ -28,52 +28,52 @@
 #include "ProtocolHandler.h"
 
 //////// Main parser; does bulk of parsing in constructor of subclasses.
-boost::shared_ptr<ProtocolMessage> ProtocolHandler::parseLine(QString line) {
+QSharedPointer<ProtocolMessage> ProtocolHandler::parseLine(QString line) {
   try {
     if (line.startsWith("hello ") == true) {
-      boost::shared_ptr<ProtocolMessage> hm(new HelloMessage(line));
+      QSharedPointer<ProtocolMessage> hm(new HelloMessage(line));
       return hm;
     } else if (line.startsWith("hellofail ") == true) {
-      boost::shared_ptr<ProtocolMessage> hfm(new HelloFailMessage(line));
+      QSharedPointer<ProtocolMessage> hfm(new HelloFailMessage(line));
       return hfm;
     } else if (line.startsWith("hellosucceed ") == true) {
-      boost::shared_ptr<ProtocolMessage> hsm(new HelloSucceedMessage(line));
+      QSharedPointer<ProtocolMessage> hsm(new HelloSucceedMessage(line));
       return hsm;
     } else if (line.startsWith("clientlist ") == true) {
-      boost::shared_ptr<ProtocolMessage> clm(new ClientListMessage(line));
+      QSharedPointer<ProtocolMessage> clm(new ClientListMessage(line));
       return clm;
     } else if (line.startsWith("client ") == true) {
-      boost::shared_ptr<ProtocolMessage> cm(new ClientMessage(line));
+      QSharedPointer<ProtocolMessage> cm(new ClientMessage(line));
       return cm;
     } else if (line.startsWith("telemetry ") == true) {
-      boost::shared_ptr<ProtocolMessage> tm(new TelemetryMessage(line));
+      QSharedPointer<ProtocolMessage> tm(new TelemetryMessage(line));
       return tm;
     } else if (line.startsWith("standings ") == true) {
-      boost::shared_ptr<ProtocolMessage> sm(new StandingsMessage(line));
+      QSharedPointer<ProtocolMessage> sm(new StandingsMessage(line));
       return sm;
     } else if (line.startsWith("racer ") == true) {
-      boost::shared_ptr<ProtocolMessage> rm(new RacerMessage(line));
+      QSharedPointer<ProtocolMessage> rm(new RacerMessage(line));
       return rm;
     } else if (line.startsWith("raceconcluded ") == true) {
-      boost::shared_ptr<ProtocolMessage> rcm(new RaceConcludedMessage(line));
+      QSharedPointer<ProtocolMessage> rcm(new RaceConcludedMessage(line));
       return rcm;
     } else if (line.startsWith("result ") == true) {
-      boost::shared_ptr<ProtocolMessage> resm(new ResultMessage(line));
+      QSharedPointer<ProtocolMessage> resm(new ResultMessage(line));
       return resm;
     } else if (line.startsWith("goodbye ") == true) {
-      boost::shared_ptr<ProtocolMessage> gm(new GoodbyeMessage(line));
+      QSharedPointer<ProtocolMessage> gm(new GoodbyeMessage(line));
       return gm;
     }
   } catch (std::invalid_argument& ia) {
     // couldn't parse, so return an unknownmessage.  pass along
     // the error message embedded in the exception.
-    boost::shared_ptr<ProtocolMessage> um(new UnknownMessage(ia.what()));
+    QSharedPointer<ProtocolMessage> um(new UnknownMessage(ia.what()));
     return um;
   }
 
   // couldn't figure out what kind of message this is, so return
   // an UnknownMessage.
-  boost::shared_ptr<ProtocolMessage> um(new UnknownMessage("unknown protocol message"));
+  QSharedPointer<ProtocolMessage> um(new UnknownMessage("unknown protocol message"));
   return um;
 }
 
@@ -474,32 +474,32 @@ QString GoodbyeMessage::toString() {
 ////////////// Test code; assumes you've compiled so stdout appears at a terminal.
 void ProtocolHandler::test() {
   // Test "Unknown" message type
-  boost::shared_ptr<ProtocolMessage> msg = ProtocolHandler::parseLine("blah");
+  QSharedPointer<ProtocolMessage> msg = ProtocolHandler::parseLine("blah");
   if (msg->message_type == ProtocolMessage::UNKNOWN) {
-    boost::shared_ptr<UnknownMessage> um =
-      boost::shared_dynamic_cast<UnknownMessage>(msg);
+    QSharedPointer<UnknownMessage> um =
+      qSharedPointerDynamicCast<UnknownMessage>(msg);
     printf("UNKNOWN -- %s\n", um->toString().toAscii().constData());
   } else {
     printf("!! expected UNKNOWN, but didn't get it...\n");
   }
 
   // Test broken "Hello" message
-  boost::shared_ptr<ProtocolMessage> msg2 = ProtocolHandler::parseLine("hello there\n");
+  QSharedPointer<ProtocolMessage> msg2 = ProtocolHandler::parseLine("hello there\n");
   if (msg2->message_type == ProtocolMessage::UNKNOWN) {
-    boost::shared_ptr<UnknownMessage> um =
-      boost::shared_dynamic_cast<UnknownMessage>(msg2);
+    QSharedPointer<UnknownMessage> um =
+      qSharedPointerDynamicCast<UnknownMessage>(msg2);
     printf("broken hello --> UNKNOWN -- %s", um->toString().toAscii().constData());
   } else {
     printf("!! expected broken hello --> UNKNOWN, but didn't get it...\n");
   }
 
   // Test valid "Hello" message
-  boost::shared_ptr<ProtocolMessage> msg3 = ProtocolHandler::parseLine(
+  QSharedPointer<ProtocolMessage> msg3 = ProtocolHandler::parseLine(
      "hello 0.1 raceid='18d1a1bcd104ee116a772310bbc61211' ridername='Steve G' ftp='213' weight='74.8'\n"
                                                                        );
   if (msg3->message_type == ProtocolMessage::HELLO) {
-    boost::shared_ptr<HelloMessage> hm =
-      boost::shared_dynamic_cast<HelloMessage>(msg3);
+    QSharedPointer<HelloMessage> hm =
+      qSharedPointerDynamicCast<HelloMessage>(msg3);
     printf("HELLO:  %s", hm->toString().toAscii().constData());
   } else {
     printf("!! expected hello, but didn't get it...\n");
@@ -509,120 +509,120 @@ void ProtocolHandler::test() {
   printf("cons'ed up hellomessage: %s", hm2.toString().toAscii().constData());
 
   // Test valid HelloFail message
-  boost::shared_ptr<ProtocolMessage> msg4 = ProtocolHandler::parseLine(
+  QSharedPointer<ProtocolMessage> msg4 = ProtocolHandler::parseLine(
      "hellofail 0.1 nosuchrace raceid='18d1a1bcd104ee116a772310bbc61211'\n"
                                                                        );
   if (msg4->message_type == ProtocolMessage::HELLOFAIL) {
-    boost::shared_ptr<HelloFailMessage> hfm =
-      boost::shared_dynamic_cast<HelloFailMessage>(msg4);
+    QSharedPointer<HelloFailMessage> hfm =
+      qSharedPointerDynamicCast<HelloFailMessage>(msg4);
     printf("HELLOFAIL:  %s", hfm->toString().toAscii().constData());
   } else {
     printf("!! expected hellofail, but didn't get it...\n");
   }
 
   // Test valid HelloSucceed message
-  boost::shared_ptr<ProtocolMessage> msg5 = ProtocolHandler::parseLine(
+  QSharedPointer<ProtocolMessage> msg5 = ProtocolHandler::parseLine(
      "hellosucceed 0.1 raceid='18d1a1bcd104ee116a772310bbc61211' riderid='123212321232123a' racedistance='180.0'\n"
                                                                        );
   if (msg5->message_type == ProtocolMessage::HELLOSUCCEED) {
-    boost::shared_ptr<HelloSucceedMessage> hsm =
-      boost::shared_dynamic_cast<HelloSucceedMessage>(msg5);
+    QSharedPointer<HelloSucceedMessage> hsm =
+      qSharedPointerDynamicCast<HelloSucceedMessage>(msg5);
     printf("HELLOSUCCEED:  %s", hsm->toString().toAscii().constData());
   } else {
     printf("!! expected hellosucceed, but didn't get it...\n");
   }
 
   // Test valid ClientList message
-  boost::shared_ptr<ProtocolMessage> msg6 = ProtocolHandler::parseLine(
+  QSharedPointer<ProtocolMessage> msg6 = ProtocolHandler::parseLine(
      "clientlist raceid='18d1a1bcd104ee116a772310bbc61211' numclients='5'\n"
                                                                        );
   if (msg6->message_type == ProtocolMessage::CLIENTLIST) {
-    boost::shared_ptr<ClientListMessage> clm =
-      boost::shared_dynamic_cast<ClientListMessage>(msg6);
+    QSharedPointer<ClientListMessage> clm =
+      qSharedPointerDynamicCast<ClientListMessage>(msg6);
     printf("CLIENTLIST:  %s", clm->toString().toAscii().constData());
   } else {
     printf("!! expected clientlist, but didn't get it...\n");
   }
 
   // Test valid Client message
-  boost::shared_ptr<ProtocolMessage> msg7 = ProtocolHandler::parseLine(
+  QSharedPointer<ProtocolMessage> msg7 = ProtocolHandler::parseLine(
      "client ridername='Steve G' riderid='123212321232123a' ftp='213' weight='75.8'"
                                                                        );
   if (msg7->message_type == ProtocolMessage::CLIENT) {
-    boost::shared_ptr<ClientMessage> cm =
-      boost::shared_dynamic_cast<ClientMessage>(msg7);
+    QSharedPointer<ClientMessage> cm =
+      qSharedPointerDynamicCast<ClientMessage>(msg7);
     printf("CLIENT:  %s", cm->toString().toAscii().constData());
   } else {
     printf("!! expected client, but didn't get it...\n");
   }
 
   // Test valid Telemetry message
-  boost::shared_ptr<ProtocolMessage> msg8 = ProtocolHandler::parseLine(
+  QSharedPointer<ProtocolMessage> msg8 = ProtocolHandler::parseLine(
      "telemetry raceid='18d1a1bcd104ee116a772310bbc61211' riderid='123212321232123a' power='250' cadence='85' distance='5.41' heartrate='155' speed='31.5'\n"
                                                                        );
   if (msg8->message_type == ProtocolMessage::TELEMETRY) {
-    boost::shared_ptr<TelemetryMessage> tm =
-      boost::shared_dynamic_cast<TelemetryMessage>(msg8);
+    QSharedPointer<TelemetryMessage> tm =
+      qSharedPointerDynamicCast<TelemetryMessage>(msg8);
     printf("TELEMETRY:  %s", tm->toString().toAscii().constData());
   } else {
     printf("!! expected telemetry, but didn't get it...\n");
   }
 
   // Test valid Standings message
-  boost::shared_ptr<ProtocolMessage> msg9 = ProtocolHandler::parseLine(
+  QSharedPointer<ProtocolMessage> msg9 = ProtocolHandler::parseLine(
      "standings raceid='18d1a1bcd104ee116a772310bbc61211' numclients='5'\n"
                                                                        );
   if (msg9->message_type == ProtocolMessage::STANDINGS) {
-    boost::shared_ptr<StandingsMessage> sm =
-      boost::shared_dynamic_cast<StandingsMessage>(msg9);
+    QSharedPointer<StandingsMessage> sm =
+      qSharedPointerDynamicCast<StandingsMessage>(msg9);
     printf("STANDINGS:  %s", sm->toString().toAscii().constData());
   } else {
     printf("!! expected standings, but didn't get it...\n");
   }
 
   // Test valid Racer message
-  boost::shared_ptr<ProtocolMessage> msg10 = ProtocolHandler::parseLine(
+  QSharedPointer<ProtocolMessage> msg10 = ProtocolHandler::parseLine(
      "racer riderid='123212321232123a' power='250' cadence='85' distance='5.41' heartrate='155' speed='31.5' place='1'\n"
                                                                        );
   if (msg10->message_type == ProtocolMessage::RACER) {
-    boost::shared_ptr<RacerMessage> rm =
-      boost::shared_dynamic_cast<RacerMessage>(msg10);
+    QSharedPointer<RacerMessage> rm =
+      qSharedPointerDynamicCast<RacerMessage>(msg10);
     printf("RACER:  %s", rm->toString().toAscii().constData());
   } else {
     printf("!! expected racer, but didn't get it...\n");
   }
 
   // Test valid RaceConcluded message
-  boost::shared_ptr<ProtocolMessage> msg11 = ProtocolHandler::parseLine(
+  QSharedPointer<ProtocolMessage> msg11 = ProtocolHandler::parseLine(
      "raceconcluded raceid='18d1a1bcd104ee116a772310bbc61211' numclients='5'\n"
                                                                        );
   if (msg11->message_type == ProtocolMessage::RACECONCLUDED) {
-    boost::shared_ptr<RaceConcludedMessage> rcm =
-      boost::shared_dynamic_cast<RaceConcludedMessage>(msg11);
+    QSharedPointer<RaceConcludedMessage> rcm =
+      qSharedPointerDynamicCast<RaceConcludedMessage>(msg11);
     printf("RACECONCLUDED:  %s", rcm->toString().toAscii().constData());
   } else {
     printf("!! expected raceconclded, but didn't get it...\n");
   }
 
   // Test valid Result message
-  boost::shared_ptr<ProtocolMessage> msg12 = ProtocolHandler::parseLine(
+  QSharedPointer<ProtocolMessage> msg12 = ProtocolHandler::parseLine(
      "result riderid='123212321232123a' distance='5.41' place='1'\n"
                                                                        );
   if (msg12->message_type == ProtocolMessage::RESULT) {
-    boost::shared_ptr<ResultMessage> resm =
-      boost::shared_dynamic_cast<ResultMessage>(msg12);
+    QSharedPointer<ResultMessage> resm =
+      qSharedPointerDynamicCast<ResultMessage>(msg12);
     printf("RESULT:  %s", resm->toString().toAscii().constData());
   } else {
     printf("!! expected result, but didn't get it...\n");
   }
 
   // Test valid Goodbye message
-  boost::shared_ptr<ProtocolMessage> msg13 = ProtocolHandler::parseLine(
+  QSharedPointer<ProtocolMessage> msg13 = ProtocolHandler::parseLine(
      "goodbye raceid='18d1a1bcd104ee116a772310bbc61211' riderid='123212321232123a'\n"
                                                                        );
   if (msg13->message_type == ProtocolMessage::GOODBYE) {
-    boost::shared_ptr<GoodbyeMessage> gbm =
-      boost::shared_dynamic_cast<GoodbyeMessage>(msg13);
+    QSharedPointer<GoodbyeMessage> gbm =
+      qSharedPointerDynamicCast<GoodbyeMessage>(msg13);
     printf("GOODBYE:  %s", gbm->toString().toAscii().constData());
   } else {
     printf("!! expected goodbye, but didn't get it...\n");

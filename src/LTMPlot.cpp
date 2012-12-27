@@ -39,7 +39,6 @@
 #include <qwt_symbol.h>
 
 #include <math.h> // for isinf() isnan()
-#include <boost/shared_ptr.hpp>
 
 static int supported_axes[] = { QwtPlot::yLeft, QwtPlot::yRight, QwtPlot::yLeft1, QwtPlot::yRight1, QwtPlot::yLeft2, QwtPlot::yRight2, QwtPlot::yLeft3, QwtPlot::yRight3 };
 

@@ -30,7 +30,6 @@
 #include <QSettings>
 
 #include <math.h> // for isinf() isnan()
-#include <boost/shared_ptr.hpp>
 
 // Treemap sorter - reversed to do descending
 bool TreeMapLessThan(const TreeMap *a, const TreeMap *b) {

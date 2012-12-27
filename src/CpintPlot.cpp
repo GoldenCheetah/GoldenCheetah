@@ -38,7 +38,6 @@
 #include "LTMCanvasPicker.h"
 #include "TimeUtils.h"
 
-#include <boost/scoped_ptr.hpp>
 #include <algorithm> // for std::lower_bound
 
 #define USE_T0_IN_CP_MODEL 0 // added djconnel 08Apr2009: allow 3-parameter CP model
