@@ -22,7 +22,7 @@
 BatchExportDialog::BatchExportDialog(MainWindow *main) : QDialog(main), main(main)
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+    //setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint); // must stop using this flag!
     setWindowTitle(tr("Activity Batch Export"));
 
     // make the dialog a resonable size
@@ -125,11 +125,14 @@ BatchExportDialog::BatchExportDialog(MainWindow *main) : QDialog(main), main(mai
 void
 BatchExportDialog::selectClicked()
 {
+    QString before = dirName->text();
     QString dir = QFileDialog::getExistingDirectory(this, tr("Select Target Directory"),
-                                                 dirName->text(),
+                                                 before,
                                                  QFileDialog::ShowDirsOnly
                                                  | QFileDialog::DontResolveSymlinks);
-    if (dir!="") dirName->setText(dir);
+    if (dir!="") {
+        dirName->setText(dir);
+    }
     return;
 }
 
