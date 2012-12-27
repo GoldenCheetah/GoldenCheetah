@@ -80,7 +80,7 @@ class PerformanceManagerWindow : public GcWindow
 	QLineEdit *PMdateRangefrom, *PMdateRangeto;
         QSlider *PMleftSlider, *PMrightSlider;
         QComboBox *metricCombo;
-	boost::shared_ptr<QSettings> settings;
+	QSharedPointer<QSettings> settings;
 
 	void setPMSliderDates();
 

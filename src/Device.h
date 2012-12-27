@@ -44,10 +44,10 @@ struct DeviceRideItem
     QDateTime   endTime; // optional, check with isValid()
     unsigned    work;   // for progress indication
 };
-typedef boost::shared_ptr<DeviceRideItem> DeviceRideItemPtr;
+typedef QSharedPointer<DeviceRideItem> DeviceRideItemPtr;
 
 struct Device;
-typedef boost::shared_ptr<Device> DevicePtr;
+typedef QSharedPointer<Device> DevicePtr;
 
 struct Device
 {
@@ -81,7 +81,7 @@ protected:
 };
 
 struct Devices;
-typedef boost::shared_ptr<Devices> DevicesPtr;
+typedef QSharedPointer<Devices> DevicesPtr;
 
 struct Devices
 {

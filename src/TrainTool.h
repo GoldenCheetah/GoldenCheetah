@@ -241,7 +241,7 @@ class TrainTool : public GcWindow
         int mode;
         // everyone else wants this
         QCheckBox   *recordSelector;
-        boost::shared_ptr<QFileSystemWatcher> watcher;
+        QSharedPointer<QFileSystemWatcher> watcher;
         bool calibrating;
 };
 

@@ -25,7 +25,6 @@
 #include <QProgressBar>
 #include <QList>
 #include <QListIterator>
-#include <boost/scoped_ptr.hpp>
 #include "MainWindow.h"
 
 // Dialog class to show filenames, import progress and to capture user input
