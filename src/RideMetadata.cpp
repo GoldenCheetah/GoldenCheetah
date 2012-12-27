@@ -339,6 +339,8 @@ Form::arrange()
     //                 this is how the "Notes" tab is created
     if (fields.count() == 1 && fields[0]->definition.type == FIELD_TEXTBOX) {
         hlayout->addWidget(fields[0]->widget, 0, 0);
+        ((QTextEdit*)(fields[0]->widget))->setFrameStyle(QFrame::NoFrame);
+        ((QTextEdit*)(fields[0]->widget))->viewport()->setAutoFillBackground(false);
         return;
     } else {
         vlayout1 = new QVBoxLayout;
