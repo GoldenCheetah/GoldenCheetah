@@ -243,8 +243,10 @@ void QtMacButton::setText(const QString &text)
 void QtMacButton::setImage(const QPixmap &image)
 {
     Q_ASSERT(qtw);
-    if (qtw)
+    if (qtw) {
         [qtw->nsButton setImage:fromQPixmap(image)];
+        [qtw->nsButton setAlternateImage:fromQPixmap(image)];
+    }
 }
 
 void QtMacButton::setChecked(bool checked)

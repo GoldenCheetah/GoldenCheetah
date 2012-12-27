@@ -217,8 +217,10 @@ void QtMacPopUpButton::setText(const QString &text)
 void QtMacPopUpButton::setImage(const QPixmap &image)
 {
     Q_ASSERT(qtw);
-    if (qtw)
+    if (qtw) {
         [qtw->nsPopUpButton setImage:fromQPixmap(image)];
+        [qtw->nsPopUpButton setAlternateImage:fromQPixmap(image)];
+    }
 }
 
 void QtMacPopUpButton::setChecked(bool checked)
