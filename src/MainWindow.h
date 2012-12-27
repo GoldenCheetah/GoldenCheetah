@@ -33,7 +33,6 @@
 #include "RealtimeData.h"
 #include "SpecialFields.h"
 #include "TimeUtils.h"
-#include <boost/shared_ptr.hpp>
 
 #ifdef Q_OS_MAC
 // What versions are supported by this SDK?
@@ -356,7 +355,7 @@ class MainWindow : public QMainWindow
         static QString notesFileName(QString rideFileName);
 
     private:
-        boost::shared_ptr<QSettings> settings;
+        QSharedPointer<QSettings> settings;
         IntervalItem *activeInterval; // currently active for context menu popup
         RideItem *activeRide; // currently active for context menu popup
         RideItem *ride;  // the currently selected ride

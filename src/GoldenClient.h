@@ -30,8 +30,6 @@
 #include <QMutex>
 #include <QWaitCondition>
 
-#include <boost/shared_ptr.hpp>
-
 #include "ProtocolHandler.h"
 
 typedef struct {
@@ -128,7 +126,7 @@ class GoldenClient : public QThread {
 
   // The client can enqueue a message to be sent to the server
   // on here by calling sendTelemetry().
-  QQueue<boost::shared_ptr<ProtocolMessage> > write_queue;
+  QQueue<QSharedPointer<ProtocolMessage> > write_queue;
 
   // connect() will spawn a child thread when it successfully
   // connects to a server.  The child thread will enter this
@@ -151,13 +149,13 @@ class GoldenClient : public QThread {
   // handle various messages from the server.  returns false if things
   // go wrong, in which case caller should bork out.
   bool handle_message(QMutexLocker &locker, QTcpSocket &server,
-                      boost::shared_ptr<ProtocolMessage> msg);
+                      QSharedPointer<ProtocolMessage> msg);
   bool handle_clientlist(QMutexLocker &locker, QTcpSocket &server,
-                         boost::shared_ptr<ClientListMessage> msg);
+                         QSharedPointer<ClientListMessage> msg);
   bool handle_standings(QMutexLocker &locker, QTcpSocket &server,
-                        boost::shared_ptr<StandingsMessage> msg);
+                        QSharedPointer<StandingsMessage> msg);
   bool handle_raceconcluded(QMutexLocker &locker, QTcpSocket &server,
-                            boost::shared_ptr<RaceConcludedMessage> msg);
+                            QSharedPointer<RaceConcludedMessage> msg);
 };
 
 #endif // _GC_GoldenClient_h

@@ -32,7 +32,6 @@
 #include <QLCDNumber>
 #include <QDebug>
 #include <QSpinBox>
-#include <boost/shared_ptr.hpp>
 #include "RideFile.h"
 #include "MainWindow.h"
 #include "GoldenCheetah.h"
