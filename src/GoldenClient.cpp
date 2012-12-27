@@ -19,6 +19,7 @@
 
 #include "GoldenClient.h"
 #include <QMutexLocker>
+#include <QSharedPointer>
 
 bool GoldenClient::connect(QString server_hostname, quint16 server_port,
                            QString raceid, QString ridername, int ftp_watts,
@@ -82,7 +83,7 @@ void GoldenClient::sendTelemetry(int power_watts, int cadence_rpm,
                                  float speed_kph) {
   QMutexLocker locker(&client_lock);
 
-  boost::shared_ptr<ProtocolMessage> tm(
+  QSharedPointer<ProtocolMessage> tm(
      new TelemetryMessage(rider_raceid, rider_id, power_watts,
                           cadence_rpm, distance_km, heartrate_bpm,
                           speed_kph) );
@@ -130,13 +131,13 @@ void GoldenClient::run() {
     client_cond.wakeOne();
     return;
   }
-  boost::shared_ptr<ProtocolMessage> server_response =
+  QSharedPointer<ProtocolMessage> server_response =
     ProtocolHandler::parseLine(server_response_text);
   if (server_response->message_type == ProtocolMessage::HELLOFAIL) {
     // server didn't recognize our race id, presumably.  in any case,
     // return out of thread after indicating failure.
-    boost::shared_ptr<HelloFailMessage> hfm =
-      boost::shared_dynamic_cast<HelloFailMessage>(server_response);
+      QSharedPointer<HelloFailMessage> hfm =
+        qSharedPointerDynamicCast<HelloFailMessage>(server_response);
     server.disconnectFromHost();
     running = connected = false;
     client_cond.wakeOne();
@@ -144,8 +145,8 @@ void GoldenClient::run() {
   } else if (server_response->message_type == ProtocolMessage::HELLOSUCCEED) {
     // server completed the handshake!  stash aside our riderid and
     // the race distance.
-    boost::shared_ptr<HelloSucceedMessage> hsm =
-      boost::shared_dynamic_cast<HelloSucceedMessage>(server_response);
+    QSharedPointer<HelloSucceedMessage> hsm =
+      qSharedPointerDynamicCast<HelloSucceedMessage>(server_response);
     rider_id = hsm->riderid;
     race_distance_km = hsm->racedistance_km;
   } else {
@@ -178,7 +179,7 @@ void GoldenClient::run() {
     // Try non-blocking read from the network.
     QString nextline;
     if (read_line(locker, server, false, nextline)) {
-      boost::shared_ptr<ProtocolMessage> server_msg =
+      QSharedPointer<ProtocolMessage> server_msg =
         ProtocolHandler::parseLine(nextline);
       if (!handle_message(locker, server, server_msg)) {
         server.disconnectFromHost();
@@ -195,7 +196,7 @@ void GoldenClient::run() {
 
     // Do I have any data to send?
     while(!write_queue.empty()) {
-      boost::shared_ptr<ProtocolMessage> sndmsg = write_queue.dequeue();
+      QSharedPointer<ProtocolMessage> sndmsg = write_queue.dequeue();
       if (!write_line(locker, server,
                       sndmsg->toString())) {
         // write failed, close up shop.
@@ -268,23 +269,23 @@ bool GoldenClient::write_line(QMutexLocker &locker, QTcpSocket &server,
 }
 
 bool GoldenClient::handle_message(QMutexLocker &locker, QTcpSocket &server,
-                                  boost::shared_ptr<ProtocolMessage> msg) {
+                                  QSharedPointer<ProtocolMessage> msg) {
   if (msg->message_type == ProtocolMessage::CLIENTLIST) {
     return handle_clientlist(
-            locker, server, boost::shared_dynamic_cast<ClientListMessage>(msg));
+            locker, server, qSharedPointerDynamicCast<ClientListMessage>(msg));
   } else if (msg->message_type == ProtocolMessage::STANDINGS) {
     return handle_standings(
-            locker, server, boost::shared_dynamic_cast<StandingsMessage>(msg));
+            locker, server, qSharedPointerDynamicCast<StandingsMessage>(msg));
   } else if (msg->message_type == ProtocolMessage::RACECONCLUDED) {
     return handle_raceconcluded(
-            locker, server, boost::shared_dynamic_cast<RaceConcludedMessage>(msg));
+            locker, server, qSharedPointerDynamicCast<RaceConcludedMessage>(msg));
   } else {
     return false;
   }
 }
 
 bool GoldenClient::handle_clientlist(QMutexLocker &locker, QTcpSocket &server,
-                                     boost::shared_ptr<ClientListMessage> msg) {
+                                     QSharedPointer<ClientListMessage> msg) {
   int numclients = msg->numclients;
   int i;
   RaceStatus new_status;
@@ -301,12 +302,12 @@ bool GoldenClient::handle_clientlist(QMutexLocker &locker, QTcpSocket &server,
       printf("readline failed\n");
       return false;
     }
-    boost::shared_ptr<ProtocolMessage> next_msg =
+    QSharedPointer<ProtocolMessage> next_msg =
       ProtocolHandler::parseLine(nextline);
     if (next_msg->message_type != ProtocolMessage::CLIENT)
       return false;
-    boost::shared_ptr<ClientMessage> client_msg =
-      boost::shared_dynamic_cast<ClientMessage>(next_msg);
+    QSharedPointer<ClientMessage> client_msg =
+      qSharedPointerDynamicCast<ClientMessage>(next_msg);
 
     // initialize the rider data struct
     RiderData rider_data = {
@@ -338,7 +339,7 @@ bool GoldenClient::handle_clientlist(QMutexLocker &locker, QTcpSocket &server,
   return true;
 }
 bool GoldenClient::handle_standings(QMutexLocker &locker, QTcpSocket &server,
-                                    boost::shared_ptr<StandingsMessage> msg) {
+                                    QSharedPointer<StandingsMessage> msg) {
   int numclients = msg->numclients;
   int i;
   RaceStatus new_status;
@@ -353,12 +354,12 @@ bool GoldenClient::handle_standings(QMutexLocker &locker, QTcpSocket &server,
 
     if (!read_line(locker, server, true, nextline))
       return false;
-    boost::shared_ptr<ProtocolMessage> next_msg =
+    QSharedPointer<ProtocolMessage> next_msg =
       ProtocolHandler::parseLine(nextline);
     if (next_msg->message_type != ProtocolMessage::RACER)
       return false;
-    boost::shared_ptr<RacerMessage> racer_msg =
-      boost::shared_dynamic_cast<RacerMessage>(next_msg);
+    QSharedPointer<RacerMessage> racer_msg =
+      qSharedPointerDynamicCast<RacerMessage>(next_msg);
 
     // get old rider data
     if (!race_status.riders_status.contains(racer_msg->riderid)) {
@@ -389,7 +390,7 @@ bool GoldenClient::handle_standings(QMutexLocker &locker, QTcpSocket &server,
   return true;
 }
 bool GoldenClient::handle_raceconcluded(QMutexLocker &locker, QTcpSocket &server,
-                                        boost::shared_ptr<RaceConcludedMessage> msg) {
+                                        QSharedPointer<RaceConcludedMessage> msg) {
   int numclients = msg->numclients;
   int i;
   RaceStatus new_status;
@@ -404,12 +405,12 @@ bool GoldenClient::handle_raceconcluded(QMutexLocker &locker, QTcpSocket &server
 
     if (!read_line(locker, server, true, nextline))
       return false;
-    boost::shared_ptr<ProtocolMessage> next_msg =
+    QSharedPointer<ProtocolMessage> next_msg =
       ProtocolHandler::parseLine(nextline);
     if (next_msg->message_type != ProtocolMessage::RESULT)
       return false;
-    boost::shared_ptr<ResultMessage> result_msg =
-      boost::shared_dynamic_cast<ResultMessage>(next_msg);
+    QSharedPointer<ResultMessage> result_msg =
+      qSharedPointerDynamicCast<ResultMessage>(next_msg);
 
     // update old rider data with new final standings
     RiderData old_data = race_status.riders_status.value(result_msg->riderid);

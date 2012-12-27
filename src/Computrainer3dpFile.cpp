@@ -33,7 +33,7 @@
 
 #include <algorithm>            // for std::sort
 #include <assert.h>
-#include <boost/cstdint.hpp>    // for int8_t, int16_t, etc.
+#include <stdint.h>    // for int8_t, int16_t, etc.
 #include <iostream>
 
 #include "math.h"

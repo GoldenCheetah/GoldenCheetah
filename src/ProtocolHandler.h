@@ -24,8 +24,6 @@
 #include <QString>
 #include <QDebug>
 
-#include <boost/shared_ptr.hpp>
-
 // This abstract base class represents a protocol message. There is
 // one subclass per message type.
 class ProtocolMessage {
@@ -51,7 +49,7 @@ class ProtocolHandler {
   ProtocolHandler() { }
   ~ProtocolHandler() { }
 
-  static boost::shared_ptr<ProtocolMessage> parseLine(QString line);
+  static QSharedPointer<ProtocolMessage> parseLine(QString line);
   static void test();
 };
 

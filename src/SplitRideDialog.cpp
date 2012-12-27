@@ -24,7 +24,6 @@
 #include <string.h>
 #include <errno.h>
 #include <QtGui>
-#include <boost/scoped_ptr.hpp>
 
 namespace
 {
@@ -158,7 +157,7 @@ SplitRideDialog::CreateNewRideFile(const RideFile *ride, int nRecStart, int nRec
     newStart = newStart.addSecs(offset);
 
     // create the ridefile in memory
-    boost::scoped_ptr<RideFile> newRideFile(new RideFile(newStart, ride->recIntSecs()));
+    QScopedPointer<RideFile> newRideFile(new RideFile(newStart, ride->recIntSecs()));
     for (int nItem = nRecStart; nItem<nRecEnd; ++nItem)
     {
         RideFilePoint *pPoint = ride->dataPoints().at(nItem);
@@ -189,7 +188,7 @@ SplitRideDialog::CreateNewRideFile(const RideFile *ride, int nRecStart, int nRec
 
     // write to disk
     GcFileReader f;
-    f.writeRideFile(mainWindow, newRideFile.get(), file);
+    f.writeRideFile(mainWindow, newRideFile.data(), file);
 
     // add to the ride list
     mainWindow->addRide(fileName, false);

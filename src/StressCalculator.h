@@ -49,7 +49,7 @@ class StressCalculator:public QObject {
 	void calculate(int daysIndex);
 	void addRideData(double BS, QDateTime rideDate);
 
-    boost::shared_ptr<QSettings> settings;
+    QSharedPointer<QSettings> settings;
 
     public:
 
