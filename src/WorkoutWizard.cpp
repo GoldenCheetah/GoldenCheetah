@@ -298,7 +298,7 @@ void AbsWattagePage::updateMetrics()
 
     int curSecs = 0;
     // create rideFile
-    boost::shared_ptr<RideFile> workout(new RideFile());
+    QSharedPointer<RideFile> workout(new RideFile());
     workout->setRecIntSecs(1);
     double curMin = 0;
     for(int i = 0; i < data.size() ; i++)
@@ -428,7 +428,7 @@ void RelWattagePage::updateMetrics()
 
     int curSecs = 0;
     // create rideFile
-    boost::shared_ptr<RideFile> workout(new RideFile());
+    QSharedPointer<RideFile> workout(new RideFile());
     workout->setRecIntSecs(1);
     for(int i = 0; i < data.size() ; i++)
     {
@@ -547,7 +547,7 @@ void GradientPage::updateMetrics()
     double gain = 0;
     int elevation = 0;
     // create rideFile
-    boost::shared_ptr<RideFile> workout(new RideFile());
+    QSharedPointer<RideFile> workout(new RideFile());
     workout->setRecIntSecs(1);
     for(int i = 0; i < data.size() ; i++)
     {

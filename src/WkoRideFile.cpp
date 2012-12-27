@@ -65,7 +65,7 @@ WkoParser::WkoParser(QFile &file, QStringList &errors, QList<RideFile*>*rides)
     }
 
     bufferSize = file.size();
-    boost::scoped_array<WKO_UCHAR> entirefile(new WKO_UCHAR[bufferSize]);
+    QScopedArrayPointer<WKO_UCHAR> entirefile(new WKO_UCHAR[bufferSize]);
     QDataStream *rawstream(new QDataStream(&file));
     headerdata = &entirefile[0];
     rawstream->readRawData(reinterpret_cast<char *>(headerdata), file.size());

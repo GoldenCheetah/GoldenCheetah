@@ -23,7 +23,6 @@
 #include <time.h>
 #include <iostream>
 #include <string>
-#include "boost/scoped_ptr.hpp"
 #include "kml/base/date_time.h"
 #include "kml/base/expat_parser.h"
 #include "kml/base/file.h"

@@ -26,7 +26,6 @@
 #include <errno.h>
 #include <QtGui>
 #include <boost/bind.hpp>
-#include <boost/foreach.hpp>
 
 DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
                                        const QDir &home) :
@@ -39,7 +38,7 @@ DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
     deviceCombo = new QComboBox(this);
     QList<QString> deviceTypes = Devices::typeNames();
     assert(deviceTypes.size() > 0);
-    BOOST_FOREACH(QString device, deviceTypes) {
+    Q_FOREACH(QString device, deviceTypes) {
         deviceCombo->addItem(device);
     }
     QString defaultDevice = appsettings->value( NULL, GC_LAST_DOWNLOAD_DEVICE).toString();

@@ -116,8 +116,6 @@
 #include <qwt_plot_picker.h>
 #include <qwt_plot_grid.h>
 #include <qwt_series_data.h>
-#include <boost/scoped_ptr.hpp>
-#include <boost/version.hpp>
 
 #include "Library.h"
 #include "LibraryParser.h"

@@ -25,8 +25,7 @@
 #include <QDataStream>
 #include <string.h>
 #include <math.h>
-#include <boost/scoped_ptr.hpp>
-#include <boost/scoped_array.hpp>
+#include <memory>
 #include <QtEndian>
 
 struct WkoFileReader : public RideFileReader {
