@@ -29,7 +29,7 @@
 class ProtocolMessage {
  public:
   ProtocolMessage() { }
-  ~ProtocolMessage() { }
+  virtual ~ProtocolMessage() { }
 
   enum {
     HELLO, HELLOFAIL, HELLOSUCCEED, CLIENTLIST, CLIENT, TELEMETRY,

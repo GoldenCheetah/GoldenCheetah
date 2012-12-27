@@ -85,6 +85,7 @@ typedef QSharedPointer<Devices> DevicesPtr;
 
 struct Devices
 {
+    virtual ~Devices() {}
     virtual DevicePtr newDevice( CommPortPtr, Device::StatusCallback ) = 0;
 
     // port *might* be supported by this device type implementation:
