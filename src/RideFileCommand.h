@@ -46,7 +46,7 @@ class RideFileCommand : public QObject
 
     public:
         RideFileCommand(RideFile *ride);
-        ~RideFileCommand();
+        virtual ~RideFileCommand();
 
         void setPointValue(int index, RideFile::SeriesType series, double value);
         void deletePoint(int index);
@@ -97,7 +97,9 @@ class RideCommand
         enum commandtype { NoOp, LUW, SetPointValue, DeletePoint, DeletePoints, InsertPoint, AppendPoints, SetDataPresent };
         typedef enum commandtype CommandType;
 
+
         RideCommand(RideFile *ride) : type(NoOp), ride(ride), docount(0) {}
+        virtual ~RideCommand() {}
         virtual bool doCommand() { return true; }
         virtual bool undoCommand() { return true; }
 
