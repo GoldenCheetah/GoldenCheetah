@@ -28,9 +28,9 @@ static bool srm7Registered =
     Devices::addType("SRM PCVI/7", DevicesPtr(new SrmDevices( 7 )));
 
 DevicePtr
-SrmDevices::newDevice( CommPortPtr dev, Device::StatusCallback cb )
+SrmDevices::newDevice( CommPortPtr dev )
 {
-    return DevicePtr( new SrmDevice( dev, cb, protoVersion));
+    return DevicePtr( new SrmDevice( dev, protoVersion));
 }
 
 bool
@@ -97,11 +97,18 @@ SrmDevice::~SrmDevice()
     close();
 }
 
+// translate C callback function to method emitting signal
 static void logfunc( const char *msg, void *data )
 {
-    Device::StatusCallback *cb = reinterpret_cast<Device::StatusCallback*>(data);
+    SrmDevice *dev = reinterpret_cast<SrmDevice*>(data);
 
-    (*cb)( msg );
+    dev->_emit_updateStatus( msg );
+}
+
+void
+SrmDevice::_emit_updateStatus( QString statusText )
+{
+    emit updateStatus( statusText );
 }
 
 bool
@@ -156,13 +163,13 @@ SrmDevice::open( QString &err )
 
     switch( protoVersion ){
       case 5:
-        statusCallback( tr("opening PCV at %1").arg(dev->name()) );
+        emit updateStatus( tr("opening PCV at %1").arg(dev->name()) );
         pc = srmio_pc5_new( &serr );
         break;
 
       case 6:
       case 7:
-        statusCallback( tr("opening PC6/7 at %1").arg(dev->name()) );
+        emit updateStatus( tr("opening PC6/7 at %1").arg(dev->name()) );
         pc = srmio_pc7_new( &serr );
         break;
 
@@ -185,7 +192,7 @@ SrmDevice::open( QString &err )
     }
 
     if( ! srmio_pc_set_logfunc( pc, logfunc,
-        reinterpret_cast<void*>( &statusCallback ), &serr ) ){
+        reinterpret_cast<void*>( this ), &serr ) ){
 
         err = tr("Couldn't set logging function: %1")
             .arg(serr.message);
@@ -269,7 +276,7 @@ SrmDevice::preview( QString &err )
             .arg(serr.message);
         goto fail;
     }
-    statusCallback(tr("found %1 ride blocks").arg(block_cnt));
+    emit updateStatus(tr("found %1 ride blocks").arg(block_cnt));
 
 
     while( srmio_pc_xfer_block_next( pc, &block )){
@@ -311,8 +318,6 @@ fail:
 bool
 SrmDevice::download( const QDir &tmpdir,
                     QList<DeviceDownloadFile> &files,
-                    CancelCallback cancelCallback,
-                    ProgressCallback progressCallback,
                     QString &err)
 {
     srmio_error_t serr;
@@ -344,7 +349,7 @@ SrmDevice::download( const QDir &tmpdir,
         goto fail;
     }
 
-    if( cancelCallback() ){
+    if( m_Cancelled ){
         err = tr("download cancelled");
         goto fail;
     }
@@ -386,7 +391,7 @@ SrmDevice::download( const QDir &tmpdir,
         }
 
         if( ! wanted ){
-            statusCallback(tr("skipping unselected ride block %1")
+            emit updateStatus(tr("skipping unselected ride block %1")
                 .arg(block_num +1));
             ++block_num;
             continue;
@@ -412,7 +417,7 @@ SrmDevice::download( const QDir &tmpdir,
         }
 
         while( srmio_pc_xfer_chunk_next( pc, &chunk, &is_int, &is_first  ) ){
-            if( cancelCallback() ){
+            if( m_Cancelled ){
                 err = tr("download cancelled");
                 goto fail1;
             }
@@ -432,7 +437,7 @@ SrmDevice::download( const QDir &tmpdir,
                         + 1000 * block.total / block_done;
                 }
 
-                progressCallback( tr("progress: %1/%2")
+                emit updateProgress( tr("progress: %1/%2")
                     .arg(block_done)
                     .arg(prog_total));
             }
@@ -497,9 +502,9 @@ SrmDevice::download( const QDir &tmpdir,
         goto fail;
     }
 
-    statusCallback( tr("got %1 records").arg(data->cused) );
+    emit updateStatus( tr("got %1 records").arg(data->cused) );
 
-    if( cancelCallback() ){
+    if( m_Cancelled ){
         err = tr("download cancelled");
         goto fail;
     }
@@ -608,7 +613,7 @@ SrmDevice::cleanup( QString &err )
             goto cleanup;
     }
 
-    statusCallback( tr("cleaning device ..."));
+    emit updateStatus( tr("cleaning device ..."));
 
     if( ! srmio_pc_cmd_clear( pc, &serr ) ){
         err = tr("failed to clear Powercontrol memory: %1")

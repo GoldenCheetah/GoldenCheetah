@@ -30,7 +30,7 @@ struct SrmDevices : public Devices
     public:
     SrmDevices( int protoVersion ) : protoVersion( protoVersion ) {}
 
-    virtual DevicePtr newDevice( CommPortPtr dev, Device::StatusCallback cb );
+    virtual DevicePtr newDevice( CommPortPtr dev );
     virtual bool canCleanup( void ) {return true; };
     virtual bool supportsPort( CommPortPtr dev );
     virtual bool exclusivePort( CommPortPtr dev );
@@ -44,8 +44,8 @@ struct SrmDevice : public Device
     Q_DECLARE_TR_FUNCTIONS(SrmDevice)
 
     public:
-    SrmDevice( CommPortPtr dev, StatusCallback cb, int protoVersion ) :
-        Device( dev, cb ),
+    SrmDevice( CommPortPtr dev, int protoVersion ) :
+        Device( dev ),
         protoVersion( protoVersion ),
         is_open( false ),
         io( NULL ), pc( NULL ) { };
@@ -55,11 +55,12 @@ struct SrmDevice : public Device
 
     virtual bool download( const QDir &tmpdir,
                           QList<DeviceDownloadFile> &files,
-                          CancelCallback cancelCallback,
-                          ProgressCallback progressCallback,
                           QString &err);
 
     virtual bool cleanup( QString &err );
+
+    // hack for translating C callback to signal:
+    void _emit_updateStatus( QString statusText );
 
 private:
     int protoVersion;

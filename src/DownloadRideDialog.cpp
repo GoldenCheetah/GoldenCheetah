@@ -416,6 +416,10 @@ DownloadRideDialog::eraseClicked()
     DevicesPtr devtype = Devices::getType(deviceCombo->currentText());
     DevicePtr device = devtype->newDevice( dev );
 
+    connect( device.data(), SIGNAL(updateStatus(QString)), this, SLOT(updateStatus(QString)));
+    connect( this, SIGNAL(cancel()), device.data(), SLOT(cancelled()) );
+    connect( device.data(), SIGNAL(updateProgress(QString)), this, SLOT(updateProgress(QString)));
+
     QString err;
     if( device->cleanup( err) )
         updateStatus( tr("cleaned data") );
