@@ -21,7 +21,7 @@
 #include "GoldenCheetah.h"
 
 #include "CommPort.h"
-#include <boost/function.hpp>
+#include <QObject>
 #include <QApplication>
 
 struct DeviceDownloadFile
@@ -46,20 +46,16 @@ struct DeviceRideItem
 };
 typedef QSharedPointer<DeviceRideItem> DeviceRideItemPtr;
 
-struct Device;
+class Device;
 typedef QSharedPointer<Device> DevicePtr;
 
-struct Device
+class Device : public QObject
 {
-    Q_DECLARE_TR_FUNCTIONS(Device)
+    Q_OBJECT
 
-    public:
-    typedef boost::function<bool (void)> CancelCallback;
-    typedef boost::function<void (const QString &statusText)> StatusCallback;
-    typedef boost::function<void (const QString &progressText)> ProgressCallback;
-
-    Device( CommPortPtr dev, StatusCallback cb )
-        : dev( dev ), statusCallback( cb )
+public:
+    Device( CommPortPtr dev )
+        : dev( dev ), m_Cancelled( false )
         {};
     virtual ~Device();
 
@@ -68,16 +64,21 @@ struct Device
 
     virtual bool download( const QDir &tmpdir,
                           QList<DeviceDownloadFile> &files,
-                          CancelCallback cancelCallback,
-                          ProgressCallback progressCallback,
                           QString &err) = 0;
 
     virtual bool cleanup( QString &err );
 
+signals:
+    void updateStatus( QString statusText );
+    void updateProgress( QString progressText );
+
+public slots:
+    virtual void cancelled();
+
 protected:
     QList<DeviceRideItemPtr> rideList;
     CommPortPtr dev;
-    StatusCallback statusCallback;
+    bool m_Cancelled;
 };
 
 struct Devices;
@@ -86,7 +87,7 @@ typedef QSharedPointer<Devices> DevicesPtr;
 struct Devices
 {
     virtual ~Devices() {}
-    virtual DevicePtr newDevice( CommPortPtr, Device::StatusCallback ) = 0;
+    virtual DevicePtr newDevice( CommPortPtr ) = 0;
 
     // port *might* be supported by this device type implementation:
     virtual bool supportsPort( CommPortPtr dev ) { (void)dev; return true; };

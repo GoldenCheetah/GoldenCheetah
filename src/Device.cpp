@@ -17,6 +17,7 @@
  */
 
 #include "Device.h"
+#include "assert.h"
 
 typedef QMap<QString,DevicesPtr> DevicesMap;
 
@@ -39,7 +40,6 @@ Device::~Device()
 bool
 Device::preview( QString &err )
 {
-    (void) statusCallback;
     (void) err;
 
     return true;
@@ -58,6 +58,12 @@ Device::cleanup( QString &err )
     err = tr("cleanup is not supported");
 
     return false;
+}
+
+void
+Device::cancelled()
+{
+    m_Cancelled = true;
 }
 
 

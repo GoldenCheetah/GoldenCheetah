@@ -3,6 +3,7 @@
 
 #include "CommPort.h"
 #include "Device.h"
+#include "stdint.h"
 
 class DeviceFileInfo;
 class JoulePacket;
@@ -12,7 +13,7 @@ struct JouleDevices : public Devices
     Q_DECLARE_TR_FUNCTIONS(JouleDevices)
 
     public:
-    virtual DevicePtr newDevice( CommPortPtr dev, Device::StatusCallback cb );
+    virtual DevicePtr newDevice( CommPortPtr dev );
     virtual QString downloadInstructions() const;
     virtual bool canCleanup( void ) {return true; };
 };
@@ -22,13 +23,11 @@ struct JouleDevice : public Device
     Q_DECLARE_TR_FUNCTIONS(JouleDevice)
 
     public:
-    JouleDevice( CommPortPtr dev, StatusCallback cb ) :
-        Device( dev, cb ) {};
+    JouleDevice( CommPortPtr dev ) :
+        Device( dev ) {};
 
     virtual bool download( const QDir &tmpdir,
                           QList<DeviceDownloadFile> &files,
-                          CancelCallback cancelCallback,
-                          ProgressCallback progressCallback,
                           QString &err);
 
     virtual bool cleanup( QString &err );

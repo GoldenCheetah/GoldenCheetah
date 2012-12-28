@@ -11,7 +11,7 @@ struct MacroDevices : public Devices
     Q_DECLARE_TR_FUNCTIONS(MacroDevices)
 
     public:
-    virtual DevicePtr newDevice( CommPortPtr dev, Device::StatusCallback cb );
+    virtual DevicePtr newDevice( CommPortPtr dev );
     virtual QString downloadInstructions() const;
     virtual bool canCleanup( void ) {return true; };
 };
@@ -21,13 +21,11 @@ struct MacroDevice : public Device
     Q_DECLARE_TR_FUNCTIONS(MacroDevice)
 
     public:
-    MacroDevice( CommPortPtr dev, StatusCallback cb ) :
-        Device( dev, cb ) {};
+    MacroDevice( CommPortPtr dev ) :
+        Device( dev ) {};
 
     virtual bool download( const QDir &tmpdir,
                           QList<DeviceDownloadFile> &files,
-                          CancelCallback cancelCallback,
-                          ProgressCallback progressCallback,
                           QString &err);
 
     virtual bool cleanup( QString &err );

@@ -19,6 +19,7 @@
 #include "PowerTapDevice.h"
 #include "PowerTapUtil.h"
 #include <math.h>
+#include "assert.h"
 
 #define PT_DEBUG false
 
@@ -26,9 +27,9 @@ static bool powerTapRegistered =
     Devices::addType("PowerTap", DevicesPtr(new PowerTapDevices()) );
 
 DevicePtr
-PowerTapDevices::newDevice( CommPortPtr dev, Device::StatusCallback cb)
+PowerTapDevices::newDevice( CommPortPtr dev )
 {
-    return DevicePtr( new PowerTapDevice( dev, cb ));
+    return DevicePtr( new PowerTapDevice( dev ));
 }
 
 QString
@@ -122,8 +123,6 @@ readUntilNewline(CommPortPtr dev, char *buf, int len, QString &err)
 bool
 PowerTapDevice::download( const QDir &tmpdir,
                          QList<DeviceDownloadFile> &files,
-                         CancelCallback cancelCallback,
-                         ProgressCallback progressCallback,
                          QString &err)
 {
     if (!dev->open(err)) {
@@ -141,9 +140,9 @@ PowerTapDevice::download( const QDir &tmpdir,
 	if (!doWrite(dev, 0x56, false, err)) // 'V'
 	    return false;
 
-	statusCallback( "Reading version..." );
-	if (cancelCallback()) {
-	    err = "download cancelled";
+    emit updateStatus( "Reading version..." );
+    if(m_Cancelled) {
+        err = "download cancelled";
 	    return false;
 	}
 
@@ -173,8 +172,8 @@ PowerTapDevice::download( const QDir &tmpdir,
     bool hwecho = version.indexOf('V') < veridx;
     if (PT_DEBUG) printf("hwecho=%s\n", hwecho ? "true" : "false");
 
-    statusCallback( "Reading header..." );
-    if (cancelCallback()) {
+    emit updateStatus( "Reading header..." );
+    if(m_Cancelled) {
         err = "download cancelled";
         return false;
     }
@@ -199,8 +198,8 @@ PowerTapDevice::download( const QDir &tmpdir,
     for (size_t i = 0; i < sizeof(header); ++i)
         records.append(header[i]);
 
-    statusCallback( "Reading ride data..." );
-    if (cancelCallback()) {
+    emit updateStatus( "Reading ride data..." );
+    if(m_Cancelled) {
         err = "download cancelled";
         return false;
     }
@@ -265,11 +264,11 @@ PowerTapDevice::download( const QDir &tmpdir,
         }
         if (recIntSecs != 0.0) {
             int min = (int) round(records.size() / 6 * recIntSecs);
-            progressCallback( QString("progress: %1:%2")
+            emit updateProgress( QString("progress: %1:%2")
                 .arg(min / 60)
                 .arg(min % 60, 2, 10, QLatin1Char('0')));
         }
-        if (cancelCallback()) {
+        if(m_Cancelled){
             err = "download cancelled";
             return false;
         }
@@ -328,4 +327,3 @@ PowerTapDevice::download( const QDir &tmpdir,
     files << file;
     return true;
 }
-
