@@ -49,9 +49,9 @@ JouleDevices::downloadInstructions() const
 }
 
 DevicePtr
-JouleDevices::newDevice( CommPortPtr dev, Device::StatusCallback cb )
+JouleDevices::newDevice( CommPortPtr dev )
 {
-    return DevicePtr( new JouleDevice( dev, cb ));
+    return DevicePtr( new JouleDevice( dev ));
 }
 
 static QString
@@ -113,8 +113,6 @@ readOneByOne(CommPortPtr dev, void *buf, size_t nbyte, QString &err)
 bool
 JouleDevice::download( const QDir &tmpdir,
                          QList<DeviceDownloadFile> &files,
-                         CancelCallback cancelCallback,
-                         ProgressCallback progressCallback,
                          QString &err)
 {
     if (JOULE_DEBUG) printf("download Joule 1.0 or GPS");
@@ -137,14 +135,14 @@ JouleDevice::download( const QDir &tmpdir,
     }
 
     bool isJouleGPS = getJouleGPS(versionResponse);
-    statusCallback(QString("Joule %1 indentified").arg(isJouleGPS?"GPS":"1.0"));
+    emit updateStatus(QString("Joule %1 indentified").arg(isJouleGPS?"GPS":"1.0"));
 
     QList<DeviceStoredRideItem> trainings;
     if (!getDownloadableRides(trainings, isJouleGPS, err))
         return false;
 
     for (int i=0; i<trainings.count(); i++) {
-        progressCallback(QString("Read ride detail for ride %1/%2").arg(i+1).arg(trainings.count()));
+        emit updateProgress(QString("Read ride detail for ride %1/%2").arg(i+1).arg(trainings.count()));
         JoulePacket request(READ_RIDE_DETAIL);
         int id1 = (trainings.at(i).id>255?trainings.at(i).id-255:trainings.at(i).id);
         int id2 = (trainings.at(i).id>255?trainings.at(i).id%255:0);
@@ -156,7 +154,7 @@ JouleDevice::download( const QDir &tmpdir,
         if (!request.write(dev, err))
             return false;
 
-        if (cancelCallback())
+        if(m_Cancelled)
         {
             err = "download cancelled";
             return false;
@@ -276,7 +274,7 @@ JouleDevice::download( const QDir &tmpdir,
 bool
 JouleDevice::getUnitVersion(JoulePacket &response, QString &err)
 {
-    statusCallback("Get Unit Software Version...");
+    emit updateStatus("Get Unit Software Version...");
     if (JOULE_DEBUG) printf("Get Unit Software Version\n");
 
     JoulePacket request(READ_UNIT_VERSION);
@@ -295,7 +293,7 @@ JouleDevice::getUnitVersion(JoulePacket &response, QString &err)
                 data_version = qByteArray2Int(response.payload.right(2));
 
             QString version = QString(minor_version<100?"%1.0%2 (%3)":"%1.%2 (%3)").arg(major_version).arg(minor_version).arg(data_version);
-            statusCallback("Version"+version);
+            emit updateStatus("Version"+version);
             return true;
         }
     }
@@ -305,7 +303,7 @@ JouleDevice::getUnitVersion(JoulePacket &response, QString &err)
 bool
 JouleDevice::getSystemInfo(JoulePacket &response, QString &err)
 {
-    statusCallback("Get System info...");
+    emit updateStatus("Get System info...");
     if (JOULE_DEBUG) printf("Get System info\n");
 
     JoulePacket request(READ_SYSTEM_INFO);
@@ -329,7 +327,7 @@ JouleDevice::getSystemInfo(JoulePacket &response, QString &err)
 bool
 JouleDevice::getUnitFreeSpace(QString &memory, QString &err)
 {
-    statusCallback("Get Unit Free Space...");
+    emit updateStatus("Get Unit Free Space...");
     if (JOULE_DEBUG) printf("Get Unit Free Space\n");
 
     JoulePacket request1(GET_FREE_SPACE);
@@ -354,7 +352,7 @@ JouleDevice::getUnitFreeSpace(QString &memory, QString &err)
 bool
 JouleDevice::getDownloadableRides(QList<DeviceStoredRideItem> &rides, bool isJouleGPS, QString &err)
 {
-    statusCallback("Read ride summary...");
+    emit updateStatus("Read ride summary...");
     if (JOULE_DEBUG) printf("Read ride summary\n");
 
     JoulePacket request(READ_RIDE_SUMMARY);
@@ -386,7 +384,7 @@ JouleDevice::getDownloadableRides(QList<DeviceStoredRideItem> &rides, bool isJou
                 rides.append(ride);
             }
         }
-        statusCallback(QString("%1 detailled rides").arg(rides.count()));
+        emit updateStatus(QString("%1 detailled rides").arg(rides.count()));
         return true;
     }
     return false;
@@ -394,7 +392,7 @@ JouleDevice::getDownloadableRides(QList<DeviceStoredRideItem> &rides, bool isJou
 
 bool
 JouleDevice::cleanup( QString &err ) {
-    statusCallback("Erase all records on computer");
+    emit updateStatus("Erase all records on computer");
     if (JOULE_DEBUG) printf("Erase all records on computer\n");
 
     if (!dev->open(err)) {
@@ -412,7 +410,7 @@ JouleDevice::cleanup( QString &err ) {
         return false;
 
     for (int i=0; i<trainings.count(); i++) {
-        statusCallback(QString("Delete ride detail for ride %1/%2").arg(i+1).arg(trainings.count()));
+        emit updateStatus(QString("Delete ride detail for ride %1/%2").arg(i+1).arg(trainings.count()));
         JoulePacket request(ERASE_RIDE_DETAIL);
         int id1 = (trainings.at(i).id>255?trainings.at(i).id-255:trainings.at(i).id);
         int id2 = (trainings.at(i).id>255?trainings.at(i).id%255:0);

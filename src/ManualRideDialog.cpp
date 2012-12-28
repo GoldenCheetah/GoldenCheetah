@@ -24,7 +24,6 @@
 #include <errno.h>
 #include <QtGui>
 #include <math.h>
-#include <boost/bind.hpp>
 #include "Units.h"
 
 #include "MetricAggregator.h"

@@ -51,9 +51,9 @@ MacroDevices::downloadInstructions() const
 }
 
 DevicePtr
-MacroDevices::newDevice( CommPortPtr dev, Device::StatusCallback cb )
+MacroDevices::newDevice( CommPortPtr dev )
 {
-    return DevicePtr( new MacroDevice( dev, cb ));
+    return DevicePtr( new MacroDevice( dev ));
 }
 
 static QString
@@ -93,8 +93,6 @@ hexHex2Int(char c, char c2)
 bool
 MacroDevice::download( const QDir &tmpdir,
                          QList<DeviceDownloadFile> &files,
-                         CancelCallback cancelCallback,
-                         ProgressCallback progressCallback,
                          QString &err)
 {
     if (MACRO_DEBUG) printf("download O-Synce Macro");
@@ -104,7 +102,7 @@ MacroDevice::download( const QDir &tmpdir,
         return false;
     }
 
-    statusCallback("Request number of training...");
+    emit updateStatus("Request number of training...");
     if (MACRO_DEBUG) printf("Request number of training\n");
 
     MacroPacket cmd(NUMBER_OF_TRAINING_REQUESTS);
@@ -112,7 +110,7 @@ MacroDevice::download( const QDir &tmpdir,
 
     if (!cmd.write(dev, err)) return false;
 
-    if (cancelCallback())
+    if(m_Cancelled)
     {
         err = "download cancelled";
         return false;
@@ -143,7 +141,7 @@ MacroDevice::download( const QDir &tmpdir,
         return false;
     }
 
-    if (cancelCallback())
+    if(m_Cancelled)
     {
         err = "download cancelled";
         return false;
@@ -187,10 +185,10 @@ MacroDevice::download( const QDir &tmpdir,
     for (int i = 0; i < count; i++)
     {
         if (MACRO_DEBUG) printf("Request training %d\n",i);
-        statusCallback( QString("Request datas of training %1 / %2...")
+        emit updateStatus( QString("Request datas of training %1 / %2...")
             .arg(i+1).arg((int)count) );
 
-        if (cancelCallback())
+        if(m_Cancelled)
         {
             err = "download cancelled";
             return false;
@@ -200,7 +198,7 @@ MacroDevice::download( const QDir &tmpdir,
         cmd.addToPayload(i);
         if (!cmd.write(dev, err)) return false;
 
-        if (cancelCallback())
+        if(m_Cancelled)
         {
             err = "download cancelled";
             return false;
@@ -222,11 +220,11 @@ MacroDevice::download( const QDir &tmpdir,
 
             //int training_flag = hex2Int(response2.payload.at(43));
             tmp.write(response2.dataArray());
-            progressCallback( QString("training %1/%2... (%3 Bytes)")
+            emit updateProgress( QString("training %1/%2... (%3 Bytes)")
                 .arg(i+1)
                 .arg((int)count)
                 .arg(tmp.size()) );
-            if (cancelCallback())
+            if(m_Cancelled)
             {
                 err = "download cancelled";
                 return false;

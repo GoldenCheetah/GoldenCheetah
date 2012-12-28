@@ -25,7 +25,6 @@
 #include <assert.h>
 #include <errno.h>
 #include <QtGui>
-#include <boost/bind.hpp>
 
 DownloadRideDialog::DownloadRideDialog(MainWindow *mainWindow,
                                        const QDir &home) :
@@ -283,8 +282,11 @@ DownloadRideDialog::downloadClicked()
     QList<DeviceDownloadFile> files;
 
     DevicesPtr devtype = Devices::getType(deviceCombo->currentText());
-    DevicePtr device = devtype->newDevice( dev,
-        boost::bind(&DownloadRideDialog::updateStatus, this, _1) );
+    DevicePtr device = devtype->newDevice( dev );
+
+    connect( device.data(), SIGNAL(updateStatus(QString)), this, SLOT(updateStatus(QString)));
+    connect( this, SIGNAL(cancel()), device.data(), SLOT(cancelled()) );
+    connect( device.data(), SIGNAL(updateProgress(QString)), this, SLOT(updateProgress(QString)));
 
     updateStatus(tr("getting summary ..."));
     if( ! device->preview( err ) ){
@@ -303,10 +305,7 @@ DownloadRideDialog::downloadClicked()
     }
 
     updateStatus(tr("getting data ..."));
-    if (!device->download( home, files,
-            boost::bind(&DownloadRideDialog::isCancelled, this),
-            boost::bind(&DownloadRideDialog::updateProgress, this, _1),
-            err))
+    if (!device->download( home, files, err))
     {
         if (cancelled) {
             QMessageBox::information(this, tr("Download canceled"),
@@ -415,8 +414,7 @@ DownloadRideDialog::eraseClicked()
     }
     assert(dev);
     DevicesPtr devtype = Devices::getType(deviceCombo->currentText());
-    DevicePtr device = devtype->newDevice( dev,
-            boost::bind(&DownloadRideDialog::updateStatus, this, _1) );
+    DevicePtr device = devtype->newDevice( dev );
 
     QString err;
     if( device->cleanup( err) )
@@ -438,6 +436,7 @@ DownloadRideDialog::cancelClicked()
 
       default:
         cancelled = true;
+        emit cancel();
         break;
      }
 }

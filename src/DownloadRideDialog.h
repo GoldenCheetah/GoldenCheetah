@@ -35,8 +35,9 @@ class DownloadRideDialog : public QDialog
         DownloadRideDialog(MainWindow *mainWindow, const QDir &home);
 
         bool isCancelled();
-        void updateStatus(const QString &statusText);
-        void updateProgress(const QString &progressText);
+
+    signals:
+        void cancel();
 
     private slots:
         void downloadClicked();
@@ -46,6 +47,8 @@ class DownloadRideDialog : public QDialog
         void setReadyInstruct();
         void scanCommPorts();
         void deviceChanged(QString);
+        void updateStatus(const QString &statusText);
+        void updateProgress(const QString &progressText);
 
     private:
 
