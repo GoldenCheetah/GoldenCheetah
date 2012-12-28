@@ -447,8 +447,6 @@ MainWindow::MainWindow(const QDir &home) :
     open->setAutoDefault(false);
     open->setFlat(true);
     open->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
-    open->setAutoRepeat(true);
-    open->setAutoRepeatDelay(200);
     toolbuttons->addWidget(open);
     QMenu *openMenu = new QMenu(this);
     open->setMenu(openMenu);
