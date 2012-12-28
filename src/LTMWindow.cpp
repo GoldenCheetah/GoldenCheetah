@@ -226,6 +226,7 @@ LTMWindow::filterChanged()
     settings.end   = QDateTime(myDateRange.to, QTime(24,0,0));
     settings.title = myDateRange.name;
     settings.data = &results;
+    settings.measures = &measures;
 
     // if we want weeks and start is not a monday go back to the monday
     int dow = myDateRange.from.dayOfWeek();
@@ -235,6 +236,8 @@ LTMWindow::filterChanged()
     // we need to get data again and apply filter
     results.clear(); // clear any old data
     results = main->metricDB->getAllMetricsFor(settings.start, settings.end);
+    measures.clear(); // clear any old data
+    measures = main->metricDB->getAllMeasuresFor(settings.start, settings.end);
 
     // loop through results removing any not in stringlist..
     if (ltmTool->isFiltered()) {
@@ -246,6 +249,7 @@ LTMWindow::filterChanged()
         }
         results = filteredresults;
         settings.data = &results;
+        settings.measures = &measures;
     }
 
     refreshPlot();
