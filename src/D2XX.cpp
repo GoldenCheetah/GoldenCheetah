@@ -18,6 +18,7 @@
 
 #include "D2XX.h"
 #include <dlfcn.h>
+#include <assert.h>
 
 // D2XXWrapper is a wrapper around libftd2xx to make it amenable to loading
 // with dlopen().
