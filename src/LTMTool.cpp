@@ -487,7 +487,8 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
             measure.smooth = false;
             measure.trend = false;
             measure.topN = 5;
-            measure.uname = measure.name = field.name;
+            measure.uname = "";
+            measure.name = QString("%1 (m)").arg(field.name);
             measure.uunits = "";
             metrics.append(measure);
         }
