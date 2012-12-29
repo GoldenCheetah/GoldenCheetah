@@ -2104,122 +2104,122 @@ Wählen Sie dann &quot;Erneut suchen&quot; um fortzufahren.</translation>
 <context>
     <name>EditMetricDetailDialog</name>
     <message>
-        <location filename="../LTMTool.cpp" line="727"/>
+        <location filename="../LTMTool.cpp" line="726"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="744"/>
+        <location filename="../LTMTool.cpp" line="743"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="745"/>
+        <location filename="../LTMTool.cpp" line="744"/>
         <source>Axis Label / Units</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="751"/>
+        <location filename="../LTMTool.cpp" line="750"/>
         <source>Curve</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="753"/>
+        <location filename="../LTMTool.cpp" line="752"/>
         <source>Bar</source>
         <translation type="unfinished">Balken</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="754"/>
+        <location filename="../LTMTool.cpp" line="753"/>
         <source>Line</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="755"/>
+        <location filename="../LTMTool.cpp" line="754"/>
         <source>Sticks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="756"/>
+        <location filename="../LTMTool.cpp" line="755"/>
         <source>Dots</source>
         <translation type="unfinished">Punkte</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="766"/>
+        <location filename="../LTMTool.cpp" line="765"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="767"/>
+        <location filename="../LTMTool.cpp" line="766"/>
         <source>Circle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="768"/>
+        <location filename="../LTMTool.cpp" line="767"/>
         <source>Square</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="769"/>
+        <location filename="../LTMTool.cpp" line="768"/>
         <source>Diamond</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="770"/>
+        <location filename="../LTMTool.cpp" line="769"/>
         <source>Triangle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="771"/>
+        <location filename="../LTMTool.cpp" line="770"/>
         <source>Cross</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="772"/>
+        <location filename="../LTMTool.cpp" line="771"/>
         <source>Hexagon</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="773"/>
+        <location filename="../LTMTool.cpp" line="772"/>
         <source>Star</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="776"/>
+        <location filename="../LTMTool.cpp" line="775"/>
         <source>Color</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="783"/>
+        <location filename="../LTMTool.cpp" line="782"/>
         <source>Highlight Best</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="791"/>
+        <location filename="../LTMTool.cpp" line="790"/>
         <source>Highlight Outliers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="799"/>
+        <location filename="../LTMTool.cpp" line="798"/>
         <source>Baseline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="807"/>
+        <location filename="../LTMTool.cpp" line="806"/>
         <source>Smooth Curve</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="810"/>
+        <location filename="../LTMTool.cpp" line="809"/>
         <source>Trend Line</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="840"/>
+        <location filename="../LTMTool.cpp" line="839"/>
         <source>&amp;OK</source>
         <translation>&amp;OK</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="841"/>
+        <location filename="../LTMTool.cpp" line="840"/>
         <source>&amp;Cancel</source>
         <translation>Abbre&amp;chen</translation>
     </message>
@@ -4880,8 +4880,8 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation type="obsolete">Letzten 12 Monate</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="600"/>
-        <location filename="../LTMTool.cpp" line="608"/>
+        <location filename="../LTMTool.cpp" line="599"/>
+        <location filename="../LTMTool.cpp" line="607"/>
         <source>Unknown Metric</source>
         <translation>Unbekannte Eigenschaft</translation>
     </message>
@@ -5047,167 +5047,167 @@ Drehmomentkorrektur - Dies definiert einen Linearfaktor in Nm (oder Pfund pro Qu
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="544"/>
+        <location filename="../LTMTool.cpp" line="543"/>
         <source>Basic</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="545"/>
+        <location filename="../LTMTool.cpp" line="544"/>
         <source>Preset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="546"/>
+        <location filename="../LTMTool.cpp" line="545"/>
         <source>Custom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="633"/>
+        <location filename="../LTMTool.cpp" line="632"/>
         <source>Pick Color</source>
         <translation>Farbe auswählen</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="634"/>
+        <location filename="../LTMTool.cpp" line="633"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="939"/>
+        <location filename="../LTMTool.cpp" line="938"/>
         <source>PMC</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="940"/>
+        <location filename="../LTMTool.cpp" line="939"/>
         <source>Track Weight</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="941"/>
+        <location filename="../LTMTool.cpp" line="940"/>
         <source>Time In Power Zone (Stacked)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="942"/>
+        <location filename="../LTMTool.cpp" line="941"/>
         <source>Time In Power Zone (Bar)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="943"/>
+        <location filename="../LTMTool.cpp" line="942"/>
         <source>Time In HR Zone</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="944"/>
+        <location filename="../LTMTool.cpp" line="943"/>
         <source>Power Distribution</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="945"/>
+        <location filename="../LTMTool.cpp" line="944"/>
         <source>KPI Tracker</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="947"/>
+        <location filename="../LTMTool.cpp" line="946"/>
         <source>Aerobic Power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="948"/>
+        <location filename="../LTMTool.cpp" line="947"/>
         <source>Aerobic WPK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="949"/>
+        <location filename="../LTMTool.cpp" line="948"/>
         <source>Power Variance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="950"/>
+        <location filename="../LTMTool.cpp" line="949"/>
         <source>Power Profile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="951"/>
+        <location filename="../LTMTool.cpp" line="950"/>
         <source>Anaerobic Power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="963"/>
+        <location filename="../LTMTool.cpp" line="962"/>
         <source>Device Reliability</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="964"/>
+        <location filename="../LTMTool.cpp" line="963"/>
         <source>Withings Weight</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="965"/>
+        <location filename="../LTMTool.cpp" line="964"/>
         <source>Stress and Distance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="966"/>
+        <location filename="../LTMTool.cpp" line="965"/>
         <source>Calories vs Duration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="946"/>
+        <location filename="../LTMTool.cpp" line="945"/>
         <source>Critical Power Trend</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="952"/>
+        <location filename="../LTMTool.cpp" line="951"/>
         <source>Anaerobic WPK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="953"/>
+        <location filename="../LTMTool.cpp" line="952"/>
         <source>Power &amp; Speed Trend</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="954"/>
+        <location filename="../LTMTool.cpp" line="953"/>
         <source>Cardiovascular Response</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="956"/>
+        <location filename="../LTMTool.cpp" line="955"/>
         <source>Training Mix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="955"/>
+        <location filename="../LTMTool.cpp" line="954"/>
         <source>Tempo &amp; Threshold Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="957"/>
+        <location filename="../LTMTool.cpp" line="956"/>
         <source>Time &amp; Distance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="959"/>
+        <location filename="../LTMTool.cpp" line="958"/>
         <source>Daniels Power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="958"/>
+        <location filename="../LTMTool.cpp" line="957"/>
         <source>Skiba Power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="960"/>
+        <location filename="../LTMTool.cpp" line="959"/>
         <source>PM Ramp &amp; Peak</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="961"/>
+        <location filename="../LTMTool.cpp" line="960"/>
         <source>Skiba PM</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="962"/>
+        <location filename="../LTMTool.cpp" line="961"/>
         <source>Daniels PM</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10073,28 +10073,58 @@ Möchten Sie fortfahren?</translation>
         <source>Data</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../SpecialFields.cpp" line="49"/>
+        <source>Lean Mass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../SpecialFields.cpp" line="50"/>
+        <source>Fat Mass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../SpecialFields.cpp" line="51"/>
+        <source>Fat Ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../SpecialFields.cpp" line="52"/>
+        <source>Height</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../SpecialFields.cpp" line="53"/>
+        <source>BMI</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SpecialTabs</name>
     <message>
-        <location filename="../SpecialFields.cpp" line="130"/>
+        <location filename="../SpecialFields.cpp" line="135"/>
         <source>Workout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SpecialFields.cpp" line="131"/>
+        <location filename="../SpecialFields.cpp" line="136"/>
         <source>Notes</source>
         <translation type="unfinished">Bemerkungen</translation>
     </message>
     <message>
-        <location filename="../SpecialFields.cpp" line="132"/>
+        <location filename="../SpecialFields.cpp" line="137"/>
         <source>Metric</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SpecialFields.cpp" line="133"/>
+        <location filename="../SpecialFields.cpp" line="138"/>
         <source>Extra</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../SpecialFields.cpp" line="139"/>
+        <source>Athlete</source>
+        <translation type="unfinished">Sportler</translation>
     </message>
 </context>
 <context>
