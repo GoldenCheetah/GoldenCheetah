@@ -1671,9 +1671,9 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
     actionButtons->addWidget(deleteButton);
 
     keywords = new QTreeWidget;
-    keywords->headerItem()->setText(0, "Keyword");
-    keywords->headerItem()->setText(1, "Color");
-    keywords->headerItem()->setText(2, "Related Notes Words");
+    keywords->headerItem()->setText(0, tr("Keyword"));
+    keywords->headerItem()->setText(1, tr("Color"));
+    keywords->headerItem()->setText(2, tr("Related Notes Words"));
     keywords->setColumnCount(3);
     keywords->setSelectionMode(QAbstractItemView::SingleSelection);
     keywords->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
@@ -1800,15 +1800,15 @@ KeywordsPage::addClicked()
     int index = keywords->invisibleRootItem()->indexOfChild(keywords->currentItem());
     if (index < 0) index = 0;
     QTreeWidgetItem *add;
-    ColorButton *colorButton = new ColorButton(this, "New", QColor(Qt::blue));
+    ColorButton *colorButton = new ColorButton(this, tr("New"), QColor(Qt::blue));
     add = new QTreeWidgetItem;
     keywords->invisibleRootItem()->insertChild(index, add);
     add->setFlags(add->flags() | Qt::ItemIsEditable);
 
     // keyword
-    QString text = "New";
+    QString text = tr("New");
     for (int i=0; keywords->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
-        text = QString("New (%1)").arg(i+1);
+        text = QString(tr("New (%1)")).arg(i+1);
     }
     add->setText(0, text);
 

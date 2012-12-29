@@ -1122,13 +1122,43 @@
 <context>
     <name>ColumnChooser</name>
     <message>
-        <location filename="../RideNavigator.cpp" line="1041"/>
+        <location filename="../RideNavigator.cpp" line="1057"/>
         <source>Column Chooser</source>
         <translation type="unfinished">Choisir une colonne</translation>
     </message>
 </context>
 <context>
     <name>ConfigDialog</name>
+    <message>
+        <location filename="../ConfigDialog.cpp" line="65"/>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ConfigDialog.cpp" line="73"/>
+        <source>Passwords</source>
+        <translation type="unfinished">Mots de passe</translation>
+    </message>
+    <message>
+        <location filename="../ConfigDialog.cpp" line="77"/>
+        <source>Appearance</source>
+        <translation type="unfinished">Apparence</translation>
+    </message>
+    <message>
+        <location filename="../ConfigDialog.cpp" line="81"/>
+        <source>Data Fields</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ConfigDialog.cpp" line="85"/>
+        <source>Metrics</source>
+        <translation type="unfinished">Métriques</translation>
+    </message>
+    <message>
+        <location filename="../ConfigDialog.cpp" line="89"/>
+        <source>Train Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <location filename="../ConfigDialog.cpp" line="118"/>
         <source>Close</source>
@@ -1140,11 +1170,13 @@
         <translation>Sauver</translation>
     </message>
     <message>
+        <location filename="../ConfigDialog.cpp" line="38"/>
         <location filename="../ConfigDialog.cpp" line="144"/>
         <source>Preferences</source>
         <translation>Préférences</translation>
     </message>
     <message>
+        <location filename="../ConfigDialog.cpp" line="42"/>
         <location filename="../ConfigDialog.cpp" line="146"/>
         <source>Options</source>
         <translation>Options</translation>
@@ -1154,8 +1186,9 @@
         <translation type="obsolete">Préférences</translation>
     </message>
     <message>
+        <location filename="../ConfigDialog.cpp" line="69"/>
         <source>Athlete</source>
-        <translation type="obsolete">Athlètes</translation>
+        <translation type="unfinished">Athlètes</translation>
     </message>
     <message>
         <source>Devices</source>
@@ -3461,135 +3494,135 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
 <context>
     <name>GroupByModel</name>
     <message>
-        <location filename="../RideNavigator.cpp" line="622"/>
-        <location filename="../RideNavigator.cpp" line="633"/>
-        <location filename="../RideNavigator.cpp" line="647"/>
-        <location filename="../RideNavigator.cpp" line="669"/>
+        <location filename="../RideNavigator.cpp" line="638"/>
+        <location filename="../RideNavigator.cpp" line="649"/>
+        <location filename="../RideNavigator.cpp" line="663"/>
+        <location filename="../RideNavigator.cpp" line="685"/>
         <source>Zero or not present</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="623"/>
+        <location filename="../RideNavigator.cpp" line="639"/>
         <source>Low Stress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="624"/>
+        <location filename="../RideNavigator.cpp" line="640"/>
         <source>Medium Stress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="625"/>
+        <location filename="../RideNavigator.cpp" line="641"/>
         <source>High Stress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="626"/>
+        <location filename="../RideNavigator.cpp" line="642"/>
         <source>Very High Stress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="634"/>
+        <location filename="../RideNavigator.cpp" line="650"/>
         <source>Active Recovery</source>
         <translation type="unfinished">Récupération active</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="635"/>
+        <location filename="../RideNavigator.cpp" line="651"/>
         <source>Endurance</source>
         <translation type="unfinished">Endurance</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="636"/>
+        <location filename="../RideNavigator.cpp" line="652"/>
         <source>Tempo</source>
         <translation type="unfinished">Tempo</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="637"/>
+        <location filename="../RideNavigator.cpp" line="653"/>
         <source>Threshold</source>
         <translation type="unfinished">Seuil</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="638"/>
+        <location filename="../RideNavigator.cpp" line="654"/>
         <source>VO2Max</source>
         <translation type="unfinished">VO2 max</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="639"/>
+        <location filename="../RideNavigator.cpp" line="655"/>
         <source>Anaerobic Capacity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="640"/>
+        <location filename="../RideNavigator.cpp" line="656"/>
         <source>Maximal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="648"/>
+        <location filename="../RideNavigator.cpp" line="664"/>
         <source>Isopower</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="649"/>
+        <location filename="../RideNavigator.cpp" line="665"/>
         <source>Steady</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="650"/>
+        <location filename="../RideNavigator.cpp" line="666"/>
         <source>Variable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="651"/>
+        <location filename="../RideNavigator.cpp" line="667"/>
         <source>Highly Variable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="658"/>
+        <location filename="../RideNavigator.cpp" line="674"/>
         <source>Less than an hour</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="659"/>
+        <location filename="../RideNavigator.cpp" line="675"/>
         <source>Less than 90 minutes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="660"/>
+        <location filename="../RideNavigator.cpp" line="676"/>
         <source>Less than 3 hours</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="661"/>
+        <location filename="../RideNavigator.cpp" line="677"/>
         <source>Less than 5 hours</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="662"/>
+        <location filename="../RideNavigator.cpp" line="678"/>
         <source>More than 5 hours</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="670"/>
+        <location filename="../RideNavigator.cpp" line="686"/>
         <source>Short</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="671"/>
+        <location filename="../RideNavigator.cpp" line="687"/>
         <source>Medium</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="672"/>
+        <location filename="../RideNavigator.cpp" line="688"/>
         <source>Long</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="673"/>
+        <location filename="../RideNavigator.cpp" line="689"/>
         <source>Very Long</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="722"/>
+        <location filename="../RideNavigator.cpp" line="738"/>
         <source>Date</source>
         <translation>Date</translation>
     </message>
@@ -4694,6 +4727,32 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
         <location filename="../Pages.cpp" line="1662"/>
         <source>Down</source>
         <translation>Vers le bas</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1674"/>
+        <source>Keyword</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1675"/>
+        <source>Color</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1676"/>
+        <source>Related Notes Words</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1803"/>
+        <location filename="../Pages.cpp" line="1809"/>
+        <source>New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1811"/>
+        <source>New (%1)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="1649"/>
@@ -7047,22 +7106,22 @@ Effectuées: %1
 <context>
     <name>NavigatorCellDelegate</name>
     <message>
-        <location filename="../RideNavigator.cpp" line="925"/>
+        <location filename="../RideNavigator.cpp" line="941"/>
         <source>seconds</source>
         <translation>secondes</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="940"/>
+        <location filename="../RideNavigator.cpp" line="956"/>
         <source>Date</source>
         <translation>Date</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="943"/>
+        <location filename="../RideNavigator.cpp" line="959"/>
         <source>Time</source>
         <translation>Temps</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="946"/>
+        <location filename="../RideNavigator.cpp" line="962"/>
         <source>Last updated</source>
         <translation>Derniers changements</translation>
     </message>
@@ -9262,47 +9321,52 @@ Watts par kg</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="179"/>
+        <location filename="../RideNavigator.cpp" line="182"/>
+        <location filename="../RideNavigator.cpp" line="183"/>
         <source>File</source>
         <translation type="unfinished">Fichier</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="180"/>
+        <location filename="../RideNavigator.cpp" line="184"/>
+        <location filename="../RideNavigator.cpp" line="185"/>
         <source>Last updated</source>
         <translation type="unfinished">Derniers changements</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="181"/>
+        <location filename="../RideNavigator.cpp" line="186"/>
+        <location filename="../RideNavigator.cpp" line="187"/>
         <source>Date</source>
         <translation type="unfinished">Date</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="182"/>
+        <location filename="../RideNavigator.cpp" line="188"/>
+        <location filename="../RideNavigator.cpp" line="189"/>
         <source>Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="183"/>
+        <location filename="../RideNavigator.cpp" line="190"/>
+        <location filename="../RideNavigator.cpp" line="191"/>
         <source>Config Checksum</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="536"/>
+        <location filename="../RideNavigator.cpp" line="552"/>
         <source>Remove Column</source>
         <translation>Retirer la column</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="542"/>
+        <location filename="../RideNavigator.cpp" line="558"/>
         <source>Column Chooser</source>
         <translation>Choisir une colonne</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="547"/>
+        <location filename="../RideNavigator.cpp" line="563"/>
         <source>Do Not Show in Groups</source>
         <translation>Ne pas grouper</translation>
     </message>
     <message>
-        <location filename="../RideNavigator.cpp" line="547"/>
+        <location filename="../RideNavigator.cpp" line="563"/>
         <source>Show In Groups</source>
         <translation>Grouper</translation>
     </message>
