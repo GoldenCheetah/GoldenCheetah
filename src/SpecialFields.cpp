@@ -46,6 +46,11 @@ SpecialFields::SpecialFields()
     namesmap.insert("Change History", tr("Change History"));         // set by RideFileCommand
     namesmap.insert("Calendar Text", tr("Calendar Text"));           // set by openRideFile and rideMetadata
     namesmap.insert("Data", tr("Data"));                             // set by openRideFile for areDataPresent
+    namesmap.insert("Lean Mass", tr("Lean Mass"));                   // measure
+    namesmap.insert("Fat Mass", tr("Fat Mass"));                     // measure
+    namesmap.insert("Fat Ratio", tr("Fat Ratio"));                   // measure
+    namesmap.insert("Height", tr("Height"));                         // measure
+    namesmap.insert("BMI", tr("BMI"));                               // measure
 
     // now add all the metric fields (for metric overrides)
     const RideMetricFactory &factory = RideMetricFactory::instance();
@@ -131,6 +136,7 @@ SpecialTabs::SpecialTabs()
     namesmap.insert("Notes", tr("Notes"));
     namesmap.insert("Metric", tr("Metric"));
     namesmap.insert("Extra", tr("Extra"));
+    namesmap.insert("Athlete", tr("Athlete"));
 }
 
 QString
