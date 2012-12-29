@@ -140,6 +140,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
 
         // set default for the user overiddable fields
         adds.uname  = adds.name;
+        adds.units = "";
         adds.uunits = adds.metric->units(useMetricUnits);
 
         // default units to metric name if it is blank
@@ -163,6 +164,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     skibaLTS.trend = false;
     skibaLTS.topN = 5;
     skibaLTS.uname = skibaLTS.name = tr("Skiba Long Term Stress");
+    skibaLTS.units = "Stress";
     skibaLTS.uunits = tr("Stress");
     metrics.append(skibaLTS);
 
@@ -177,6 +179,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     skibaSTS.trend = false;
     skibaSTS.topN = 5;
     skibaSTS.uname = skibaSTS.name = tr("Skiba Short Term Stress");
+    skibaSTS.units = "Stress";
     skibaSTS.uunits = tr("Stress");
     metrics.append(skibaSTS);
 
@@ -191,6 +194,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     skibaSB.trend = false;
     skibaSB.topN = 1;
     skibaSB.uname = skibaSB.name = tr("Skiba Stress Balance");
+    skibaSB.units = "Stress Balance";
     skibaSB.uunits = tr("Stress Balance");
     metrics.append(skibaSB);
 
@@ -205,6 +209,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     skibaSTR.trend = false;
     skibaSTR.topN = 1;
     skibaSTR.uname = skibaSTR.name = tr("Skiba STS Ramp");
+    skibaSTR.units = "Ramp";
     skibaSTR.uunits = tr("Ramp");
     metrics.append(skibaSTR);
 
@@ -219,6 +224,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     skibaLTR.trend = false;
     skibaLTR.topN = 1;
     skibaLTR.uname = skibaLTR.name = tr("Skiba LTS Ramp");
+    skibaLTR.units = "Ramp";
     skibaLTR.uunits = tr("Ramp");
     metrics.append(skibaLTR);
 
@@ -234,6 +240,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     danielsLTS.trend = false;
     danielsLTS.topN = 5;
     danielsLTS.uname = danielsLTS.name = tr("Daniels Long Term Stress");
+    danielsLTS.units = "Stress";
     danielsLTS.uunits = tr("Stress");
     metrics.append(danielsLTS);
 
@@ -248,6 +255,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     danielsSTS.trend = false;
     danielsSTS.topN = 5;
     danielsSTS.uname = danielsSTS.name = tr("Daniels Short Term Stress");
+    danielsSTS.units = "Stress";
     danielsSTS.uunits = tr("Stress");
     metrics.append(danielsSTS);
 
@@ -262,6 +270,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     danielsSB.trend = false;
     danielsSB.topN = 1;
     danielsSB.uname = danielsSB.name = tr("Daniels Stress Balance");
+    danielsSB.units = "Stress Balance";
     danielsSB.uunits = tr("Stress Balance");
     metrics.append(danielsSB);
 
@@ -276,6 +285,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     danielsSTR.trend = false;
     danielsSTR.topN = 1;
     danielsSTR.uname = danielsSTR.name = tr("Daniels STS Ramp");
+    danielsSTR.units = "Ramp";
     danielsSTR.uunits = tr("Ramp");
     metrics.append(danielsSTR);
 
@@ -290,6 +300,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     danielsLTR.trend = false;
     danielsLTR.topN = 1;
     danielsLTR.uname = danielsLTR.name = tr("Daniels LTS Ramp");
+    danielsLTR.units = "Ramp";
     danielsLTR.uunits = tr("Ramp");
     metrics.append(danielsLTR);
 
@@ -305,6 +316,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     cogganCTL.trend = false;
     cogganCTL.topN = 5;
     cogganCTL.uname = cogganCTL.name = tr("Coggan Chronic Training Load");
+    cogganCTL.units = "CTL";
     cogganCTL.uunits = "CTL";
     metrics.append(cogganCTL);
 
@@ -319,6 +331,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     cogganATL.trend = false;
     cogganATL.topN = 5;
     cogganATL.uname = cogganATL.name = tr("Coggan Acute Training Load");
+    cogganATL.units = "ATL";
     cogganATL.uunits = "ATL";
     metrics.append(cogganATL);
 
@@ -333,6 +346,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     cogganTSB.trend = false;
     cogganTSB.topN = 1;
     cogganTSB.uname = cogganTSB.name = tr("Coggan Training Stress Balance");
+    cogganTSB.units = "TSB";
     cogganTSB.uunits = "TSB";
     metrics.append(cogganTSB);
 
@@ -347,6 +361,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     cogganSTR.trend = false;
     cogganSTR.topN = 1;
     cogganSTR.uname = cogganSTR.name = tr("Coggan STS Ramp");
+    cogganSTR.units = "Ramp";
     cogganSTR.uunits = tr("Ramp");
     metrics.append(cogganSTR);
 
@@ -361,6 +376,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     cogganLTR.trend = false;
     cogganLTR.topN = 1;
     cogganLTR.uname = cogganLTR.name = tr("Coggan LTS Ramp");
+    cogganLTR.units = "Ramp";
     cogganLTR.uunits = tr("Ramp");
     metrics.append(cogganLTR);
 
@@ -390,6 +406,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     trimpSTS.trend = false;
     trimpSTS.topN = 5;
     trimpSTS.uname = trimpSTS.name = tr("TRIMP Short Term Stress");
+    trimpSTS.units = "Stress";
     trimpSTS.uunits = tr("Stress");
     metrics.append(trimpSTS);
 
@@ -404,6 +421,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     trimpSB.trend = false;
     trimpSB.topN = 1;
     trimpSB.uname = trimpSB.name = tr("TRIMP Stress Balance");
+    trimpSB.units = "Stress Balance";
     trimpSB.uunits = tr("Stress Balance");
     metrics.append(trimpSB);
 
@@ -418,6 +436,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     trimpSTR.trend = false;
     trimpSTR.topN = 1;
     trimpSTR.uname = trimpSTR.name = tr("TRIMP STS Ramp");
+    trimpSTR.units = "Ramp";
     trimpSTR.uunits = tr("Ramp");
     metrics.append(trimpSTR);
 
@@ -432,6 +451,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     trimpLTR.trend = false;
     trimpLTR.topN = 1;
     trimpLTR.uname = trimpLTR.name = tr("TRIMP LTS Ramp");
+    trimpLTR.units = "Ramp";
     trimpLTR.uunits = tr("Ramp");
     metrics.append(trimpLTR);
 
@@ -451,6 +471,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
             metametric.trend = false;
             metametric.topN = 5;
             metametric.uname = metametric.name = sp.displayName(field.name);
+            metametric.units = "";
             metametric.uunits = "";
             metrics.append(metametric);
         }
@@ -489,6 +510,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
             measure.topN = 5;
             measure.uname = "";
             measure.name = QString("%1 (m)").arg(field.name);
+            measure.units = "";
             measure.uunits = "";
             metrics.append(measure);
         }
@@ -950,7 +972,6 @@ LTMTool::translateDefaultCharts(QList<LTMSettings>&charts)
 }
 
 // metricDetails gives access to the metric details catalog by symbol
-// enables translation of metrics names and units in LTMPlot
 MetricDetail*
 LTMTool::metricDetails(QString symbol)
 {
@@ -958,4 +979,32 @@ LTMTool::metricDetails(QString symbol)
         if (metrics[i].symbol == symbol)
             return &metrics[i];
     return NULL;
+}
+
+void
+LTMTool::translateMetrics(MainWindow *main, const QDir &home, LTMSettings *settings)
+{
+    static QMap<QString, QString> unitsMap;
+    // LTMTool instance is created to have access to metrics catalog
+    LTMTool* ltmTool = new LTMTool(main, home, false);
+    if (unitsMap.isEmpty()) {
+        foreach(MetricDetail metric, ltmTool->metrics)
+            if (metric.units != "")
+	            unitsMap.insert(metric.units, metric.uunits);
+    }
+    for (int j=0; j < settings->metrics.count(); j++) {
+        if (settings->metrics[j].uname == settings->metrics[j].name) {
+            MetricDetail* mdp = ltmTool->metricDetails(settings->metrics[j].symbol);
+            if (mdp != NULL) {
+                // Replace with default translated name
+                settings->metrics[j].name = mdp->name;
+                settings->metrics[j].uname = mdp->uname;
+                // replace with translated units, if available
+                if (settings->metrics[j].uunits != "")
+                    settings->metrics[j].uunits = unitsMap.value(settings->metrics[j].uunits,
+                                                                 mdp->uunits);
+            }
+        }
+    }
+    delete ltmTool;
 }
