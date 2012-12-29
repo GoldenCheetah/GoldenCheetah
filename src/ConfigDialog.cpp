@@ -35,11 +35,11 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
     setAttribute(Qt::WA_DeleteOnClose);
 
 #ifdef Q_OS_MAC
-    QToolBar *head = addToolBar("Preferences");
+    QToolBar *head = addToolBar(tr("Preferences"));
     setFixedSize(525,540);
     setUnifiedTitleAndToolBarOnMac(true);
 #else
-    QToolBar *head = addToolBar("Options");
+    QToolBar *head = addToolBar(tr("Options"));
     head->setMovable(false); // oops!
     setFixedSize(530,580);
 #endif
@@ -62,31 +62,31 @@ ConfigDialog::ConfigDialog(QDir _home, Zones *_zones, MainWindow *mainWindow) :
     QAction *added;
 
     // General settings
-    added = head->addAction(generalIcon, "General");
+    added = head->addAction(generalIcon, tr("General"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 0);
 
-    added =head->addAction(athleteIcon, "Athlete");
+    added =head->addAction(athleteIcon, tr("Athlete"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 1);
 
-    added =head->addAction(passwordIcon, "Passwords");
+    added =head->addAction(passwordIcon, tr("Passwords"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 2);
 
-    added =head->addAction(appearanceIcon, "Appearance");
+    added =head->addAction(appearanceIcon, tr("Appearance"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 3);
 
-    added =head->addAction(dataIcon, "Data Fields");
+    added =head->addAction(dataIcon, tr("Data Fields"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 4);
 
-    added =head->addAction(metricsIcon, "Metrics");
+    added =head->addAction(metricsIcon, tr("Metrics"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 5);
 
-    added =head->addAction(devicesIcon, "Train Devices");
+    added =head->addAction(devicesIcon, tr("Train Devices"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 6);
 
