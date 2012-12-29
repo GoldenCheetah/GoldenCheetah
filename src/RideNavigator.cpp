@@ -172,15 +172,23 @@ RideNavigator::resetView()
 
     QList<QString> cols = _columns.split("|", QString::SkipEmptyParts);
 
+    // to account for translations
+    QMap <QString, QString> internalNameMap;
+
     nameMap.clear();
     columnMetrics.clear();
 
     // add the standard columns to the map
     nameMap.insert("filename", tr("File"));
+    internalNameMap.insert("File", tr("File"));
     nameMap.insert("timestamp", tr("Last updated"));
+    internalNameMap.insert("Last updated", tr("Last updated"));
     nameMap.insert("ride_date", tr("Date"));
+    internalNameMap.insert("Date", tr("Date"));
     nameMap.insert("ride_time", tr("Time")); // virtual columns show time from ride_date
+    internalNameMap.insert("Time", tr("Time"));
     nameMap.insert("fingerprint", tr("Config Checksum"));
+    internalNameMap.insert("Config Checksum", tr("Config Checksum"));
 
     // add metrics to the map
     const RideMetricFactory &factory = RideMetricFactory::instance();
@@ -189,6 +197,9 @@ RideNavigator::resetView()
 
         // from sql column name to friendly metric name
         nameMap.insert(QString("X%1").arg(factory.metricName(i)), converted);
+
+        // from (english) internalName to (translated) Name
+        internalNameMap.insert(factory.rideMetric(factory.metricName(i))->internalName(), converted);
 
         // from friendly metric name to metric pointer
         columnMetrics.insert(converted, factory.rideMetric(factory.metricName(i)));
@@ -199,8 +210,13 @@ RideNavigator::resetView()
     foreach(FieldDefinition field, main->rideMetadata()->getFields()) {
         if (!sp.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
             nameMap.insert(QString("Z%1").arg(sp.makeTechName(field.name)), sp.displayName(field.name));
+            internalNameMap.insert(field.name, sp.displayName(field.name));
         }
     }
+
+    // cols list needs to be mapped to match logicalHeadings
+    for (int i = 0; i < cols.count(); i++)
+        cols[i] = internalNameMap.value(cols[i], cols[i]);
 
     logicalHeadings.clear();
     tableView->reset();
