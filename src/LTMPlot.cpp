@@ -105,23 +105,8 @@ LTMPlot::setData(LTMSettings *set)
 {
     settings = set;
 
-    // For each metric in chart, translate name and units if default uname
-    // LTMTool instance is created to have access to metrics catalog
-    LTMTool* ltmTool = new LTMTool(main, home, false);
-    for (int j=0; j < settings->metrics.count(); j++) {
-        if (settings->metrics[j].uname == settings->metrics[j].name) {
-            MetricDetail* mdp = ltmTool->metricDetails(settings->metrics[j].symbol);
-            if (mdp != NULL) {
-                // Replace with default translated values
-                settings->metrics[j].name = mdp->name;
-                settings->metrics[j].uname = mdp->uname;
-                //XXX need to translate these separately but retain
-                //XXX user adjusted values for units (esp. stress on PMC)
-                //XXX settings->metrics[j].uunits = mdp->uunits;
-            }
-        }
-    }
-    delete ltmTool;
+    // For each metric in chart, translate units and name if default uname
+    LTMTool::translateMetrics(main, home, settings);
 
     // crop dates to at least within a year of the data available, but only if we have some data
     if (settings->data != NULL && (*settings->data).count() != 0) {
@@ -1014,7 +999,7 @@ LTMPlot::chooseYAxis(QString units)
     if ((chosen = axes.value(units, -1)) != -1) return chosen;
     else if (axes.count() < 8) {
         chosen = supported_axes[axes.count()];
-        if (units == "seconds" || units == tr("seconds")) setAxisTitle(chosen, "hours"); // we convert seconds to hours
+        if (units == "seconds" || units == tr("seconds")) setAxisTitle(chosen, tr("hours")); // we convert seconds to hours
         else setAxisTitle(chosen, units);
         enableAxis(chosen, true);
         axes.insert(units, chosen);
