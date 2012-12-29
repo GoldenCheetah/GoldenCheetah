@@ -25,7 +25,6 @@
 #include <qcolor.h>
 #include <assert.h>
 #include <math.h>
-#include <boost/crc.hpp>
 
 
 // the infinity endpoints are indicated with extreme date ranges
@@ -850,29 +849,27 @@ int HrZones::insertRangeAtDate(QDate date, int lt) {
     return rnum;
 }
 
-unsigned long
+quint16
 HrZones::getFingerprint() const
 {
-    boost::crc_optimal<16, 0x1021, 0xFFFF, 0, false, false> CRC;
+    quint64 x = 0;
     for (int i=0; i<ranges.size(); i++) {
 
         // from
-        int x = ranges[i].begin.toJulianDay();
-        CRC.process_bytes(&x, sizeof(int));
+        x += ranges[i].begin.toJulianDay();
 
         // to
-        x = ranges[i].end.toJulianDay();
-        CRC.process_bytes(&x, sizeof(int));
+        x += ranges[i].end.toJulianDay();
 
         // CP
-        x = ranges[i].lt;
-        CRC.process_bytes(&x, sizeof(int));
+        x += ranges[i].lt;
 
         // each zone definition (manual edit/default changed)
         for (int j=0; j<ranges[i].zones.count(); j++) {
-            x = ranges[i].zones[j].lo;
-            CRC.process_bytes(&x, sizeof(int));
+            x += ranges[i].zones[j].lo;
+
         }
     }
-    return CRC.checksum();
+    QByteArray ba = QByteArray::number(x);
+    return qChecksum(ba, ba.length());
 }
