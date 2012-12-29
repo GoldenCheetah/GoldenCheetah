@@ -8,8 +8,6 @@ TARGET = GoldenCheetah
 !isEmpty( APP_NAME ) { TARGET = $${APP_NAME} }
 DEPENDPATH += .
 
-!isEmpty( BOOST_INCLUDE ) { INCLUDEPATH += $${BOOST_INCLUDE} }
-
 INCLUDEPATH += ../qwt/src ../qxt/src $${LIBZ_INCLUDE}
 QT += xml sql network webkit script
 LIBS += ../qwt/lib/libqwt.a

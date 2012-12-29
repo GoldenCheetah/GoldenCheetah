@@ -3,7 +3,6 @@
 #include "DBAccess.h"
 #include "MetricAggregator.h"
 #include <QtSql>
-#include <boost/version.hpp>
 
 #ifndef GC_VERSION
 #define GC_VERSION "(developer build)"
@@ -221,26 +220,24 @@ VersionPage::VersionPage(MainWindow *main, QDir home) : main(main), home(home)
             "<table>"
             "<tr><td colspan=\"2\">QT</td><td>%1</td></tr>"
             "<tr><td colspan=\"2\">QWT</td><td>%2</td></tr>"
-            "<tr><td colspan=\"2\">BOOST</td><td>%3</td></tr>"
-            "<tr><td colspan=\"2\">GCC</td><td>%4</td></tr>"
-            "<tr><td colspan=\"2\">SRMIO</td><td>%5</td></tr>"
-            "<tr><td colspan=\"2\">OAUTH</td><td>%6</td></tr>"
-            "<tr><td colspan=\"2\">D2XX</td><td>%7</td></tr>"
-            "<tr><td colspan=\"2\">QWTPLOT3D</td><td>%8</td></tr>"
-            "<tr><td colspan=\"2\">KML</td><td>%9</td></tr>"
-            "<tr><td colspan=\"2\">ICAL</td><td>%10</td></tr>"
-            "<tr><td colspan=\"2\">USBXPRESS</td><td>%11</td></tr>"
-            "<tr><td colspan=\"2\">LIBUSB</td><td>%12</td></tr>"
-            "<tr><td colspan=\"2\">VLC</td><td>%13</td></tr>"
-            "<tr><td colspan=\"2\">LUCENE</td><td>%14</td></tr>"
+            "<tr><td colspan=\"2\">GCC</td><td>%3</td></tr>"
+            "<tr><td colspan=\"2\">SRMIO</td><td>%4</td></tr>"
+            "<tr><td colspan=\"2\">OAUTH</td><td>%5</td></tr>"
+            "<tr><td colspan=\"2\">D2XX</td><td>%6</td></tr>"
+            "<tr><td colspan=\"2\">QWTPLOT3D</td><td>%7</td></tr>"
+            "<tr><td colspan=\"2\">KML</td><td>%8</td></tr>"
+            "<tr><td colspan=\"2\">ICAL</td><td>%9</td></tr>"
+            "<tr><td colspan=\"2\">USBXPRESS</td><td>%10</td></tr>"
+            "<tr><td colspan=\"2\">LIBUSB</td><td>%11</td></tr>"
+            "<tr><td colspan=\"2\">VLC</td><td>%12</td></tr>"
+            "<tr><td colspan=\"2\">LUCENE</td><td>%13</td></tr>"
             #ifdef Q_OS_MAC
-            "<tr><td colspan=\"2\">LION SUPPORT</td><td>%15</td></tr>"
+            "<tr><td colspan=\"2\">LION SUPPORT</td><td>%14</td></tr>"
             #endif
             "</table>"
             )
             .arg(QT_VERSION_STR)
             .arg(QWT_VERSION_STR)
-            .arg(BOOST_LIB_VERSION)
             .arg(GCC_VERSION)
             .arg(srmio)
             .arg(oauth)
