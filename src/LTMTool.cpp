@@ -477,16 +477,6 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
         }
     }
 
-    // read charts.xml and populate the picker
-    LTMSettings reader;
-    reader.readChartXML(home, presets);
-    // translateDefaultCharts uses metrics for translation,
-    // so it needs to be called after metrics initialization
-    translateDefaultCharts(presets);
-    for(int i=0; i<presets.count(); i++)
-        presetPicker->addItem(presets[i].name, i);
-    presetPicker->setCurrentIndex(-1);
-
     // measures
     QList<FieldDefinition> measureDefinitions;
     QList<KeywordDefinition> keywordDefinitions; //NOTE: not used in measures.xml
@@ -509,7 +499,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
             measure.trend = false;
             measure.topN = 5;
             measure.uname = "";
-            measure.name = QString("%1 (m)").arg(field.name);
+            measure.name = QString("%1 (m)").arg(sp.displayName(field.name));
             measure.units = "";
             measure.uunits = "";
             metrics.append(measure);
@@ -525,6 +515,15 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
         add->setText(0, metric.name);
     }
     metricTree->expandItem(allMetrics);
+
+    // read charts.xml and populate the picker
+    LTMSettings reader;
+    reader.readChartXML(home, presets);
+    // translate default chart names
+    translateDefaultCharts(presets);
+    for(int i=0; i<presets.count(); i++)
+        presetPicker->addItem(presets[i].name, i);
+    presetPicker->setCurrentIndex(-1);
 
     configChanged(); // will reset the metric tree
 

@@ -2132,42 +2132,42 @@ Puede ser necesario (re)instalar el controlador FTDI o PL2303 antes de descargar
 <context>
     <name>EditMetricDetailDialog</name>
     <message>
-        <location filename="../LTMTool.cpp" line="727"/>
+        <location filename="../LTMTool.cpp" line="726"/>
         <source>Settings</source>
         <translation>Ajustes</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="744"/>
+        <location filename="../LTMTool.cpp" line="743"/>
         <source>Name</source>
         <translation>Nombre</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="745"/>
+        <location filename="../LTMTool.cpp" line="744"/>
         <source>Axis Label / Units</source>
         <translation>Rótulo Eje / Unidades</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="751"/>
+        <location filename="../LTMTool.cpp" line="750"/>
         <source>Curve</source>
         <translation>Curva</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="753"/>
+        <location filename="../LTMTool.cpp" line="752"/>
         <source>Bar</source>
         <translation>Barra</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="754"/>
+        <location filename="../LTMTool.cpp" line="753"/>
         <source>Line</source>
         <translation>Línea</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="755"/>
+        <location filename="../LTMTool.cpp" line="754"/>
         <source>Sticks</source>
         <translation>Palos</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="756"/>
+        <location filename="../LTMTool.cpp" line="755"/>
         <source>Dots</source>
         <translation>Puntos</translation>
     </message>
@@ -2176,82 +2176,82 @@ Puede ser necesario (re)instalar el controlador FTDI o PL2303 antes de descargar
         <translation type="obsolete">Símbolo</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="766"/>
+        <location filename="../LTMTool.cpp" line="765"/>
         <source>None</source>
         <translation>Ninguno</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="767"/>
+        <location filename="../LTMTool.cpp" line="766"/>
         <source>Circle</source>
         <translation>Círculo</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="768"/>
+        <location filename="../LTMTool.cpp" line="767"/>
         <source>Square</source>
         <translation>Cuadrado</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="769"/>
+        <location filename="../LTMTool.cpp" line="768"/>
         <source>Diamond</source>
         <translation>Rombo</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="770"/>
+        <location filename="../LTMTool.cpp" line="769"/>
         <source>Triangle</source>
         <translation>Triángulo</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="771"/>
+        <location filename="../LTMTool.cpp" line="770"/>
         <source>Cross</source>
         <translation>Cruz</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="772"/>
+        <location filename="../LTMTool.cpp" line="771"/>
         <source>Hexagon</source>
         <translation>Hexágono</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="773"/>
+        <location filename="../LTMTool.cpp" line="772"/>
         <source>Star</source>
         <translation>Estrella</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="776"/>
+        <location filename="../LTMTool.cpp" line="775"/>
         <source>Color</source>
         <translation>Color</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="783"/>
+        <location filename="../LTMTool.cpp" line="782"/>
         <source>Highlight Best</source>
         <translation>Resaltar Mejores</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="791"/>
+        <location filename="../LTMTool.cpp" line="790"/>
         <source>Highlight Outliers</source>
         <translation>Resaltar Atípicos</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="799"/>
+        <location filename="../LTMTool.cpp" line="798"/>
         <source>Baseline</source>
         <translation>Linea Base</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="807"/>
+        <location filename="../LTMTool.cpp" line="806"/>
         <source>Smooth Curve</source>
         <translation>Suavizar Curva</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="810"/>
+        <location filename="../LTMTool.cpp" line="809"/>
         <source>Trend Line</source>
         <translation>Línea de Tendencia</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="840"/>
+        <location filename="../LTMTool.cpp" line="839"/>
         <source>&amp;OK</source>
         <translation>&amp;OK</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="841"/>
+        <location filename="../LTMTool.cpp" line="840"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Cancelar</translation>
     </message>
@@ -4852,7 +4852,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../LTMPlot.cpp" line="1002"/>
         <source>hours</source>
-        <translation type="unfinished">horas</translation>
+        <translation>horas</translation>
     </message>
     <message>
         <location filename="../LTMPlot.cpp" line="748"/>
@@ -5081,22 +5081,22 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>TRIMP: Rampa ELP</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="963"/>
+        <location filename="../LTMTool.cpp" line="962"/>
         <source>Device Reliability</source>
         <translation>Confiabilidad de Dispositivo</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="964"/>
+        <location filename="../LTMTool.cpp" line="963"/>
         <source>Withings Weight</source>
         <translation>Peso Withings</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="965"/>
+        <location filename="../LTMTool.cpp" line="964"/>
         <source>Stress and Distance</source>
         <translation>Estrés y Distancia</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="966"/>
+        <location filename="../LTMTool.cpp" line="965"/>
         <source>Calories vs Duration</source>
         <translation>Calorías vs Duración</translation>
     </message>
@@ -5141,8 +5141,8 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation type="obsolete">Últimos 12 meses</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="600"/>
-        <location filename="../LTMTool.cpp" line="608"/>
+        <location filename="../LTMTool.cpp" line="599"/>
+        <location filename="../LTMTool.cpp" line="607"/>
         <source>Unknown Metric</source>
         <translation>Métrica desconocida</translation>
     </message>
@@ -5179,147 +5179,147 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
         <translation>Administrar</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="544"/>
+        <location filename="../LTMTool.cpp" line="543"/>
         <source>Basic</source>
-        <translation>Básicos</translation>
+        <translation>Básico</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="545"/>
+        <location filename="../LTMTool.cpp" line="544"/>
         <source>Preset</source>
         <translation>Predefinidos</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="546"/>
+        <location filename="../LTMTool.cpp" line="545"/>
         <source>Custom</source>
         <translation>Personalizados</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="633"/>
+        <location filename="../LTMTool.cpp" line="632"/>
         <source>Pick Color</source>
         <translation>Seleccionar Color</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="634"/>
+        <location filename="../LTMTool.cpp" line="633"/>
         <source>Settings</source>
         <translation>Ajustes</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="939"/>
+        <location filename="../LTMTool.cpp" line="938"/>
         <source>PMC</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="940"/>
+        <location filename="../LTMTool.cpp" line="939"/>
         <source>Track Weight</source>
         <translation>Seguimiento de Peso</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="941"/>
+        <location filename="../LTMTool.cpp" line="940"/>
         <source>Time In Power Zone (Stacked)</source>
         <translation>Tiempo en Zonas de Potencia (Apilado)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="942"/>
+        <location filename="../LTMTool.cpp" line="941"/>
         <source>Time In Power Zone (Bar)</source>
         <translation>Tiempo en Zonas de Potencia (Barras)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="943"/>
+        <location filename="../LTMTool.cpp" line="942"/>
         <source>Time In HR Zone</source>
         <translation>Tiempo en Zonas de FC</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="944"/>
+        <location filename="../LTMTool.cpp" line="943"/>
         <source>Power Distribution</source>
         <translation>Distribución de Potencia</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="945"/>
+        <location filename="../LTMTool.cpp" line="944"/>
         <source>KPI Tracker</source>
         <translation>Seguimiento KPI</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="947"/>
+        <location filename="../LTMTool.cpp" line="946"/>
         <source>Aerobic Power</source>
         <translation>Potencia Aeróbica</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="948"/>
+        <location filename="../LTMTool.cpp" line="947"/>
         <source>Aerobic WPK</source>
         <translation>WPK Aeróbico</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="949"/>
+        <location filename="../LTMTool.cpp" line="948"/>
         <source>Power Variance</source>
         <translation>Variación de Potencia</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="950"/>
+        <location filename="../LTMTool.cpp" line="949"/>
         <source>Power Profile</source>
         <translation>Perfil de Potencia</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="951"/>
+        <location filename="../LTMTool.cpp" line="950"/>
         <source>Anaerobic Power</source>
         <translation>Potencia Anaeróbica</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="946"/>
+        <location filename="../LTMTool.cpp" line="945"/>
         <source>Critical Power Trend</source>
         <translation>Tendencia de la Potencia Crítica</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="952"/>
+        <location filename="../LTMTool.cpp" line="951"/>
         <source>Anaerobic WPK</source>
         <translation>WKP Anaeróbico</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="953"/>
+        <location filename="../LTMTool.cpp" line="952"/>
         <source>Power &amp; Speed Trend</source>
         <translation>Tendencia de Potencia y Velocidad</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="954"/>
+        <location filename="../LTMTool.cpp" line="953"/>
         <source>Cardiovascular Response</source>
         <translation>Respuesta Cardiovascular</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="956"/>
+        <location filename="../LTMTool.cpp" line="955"/>
         <source>Training Mix</source>
         <translation>Mezcla de Entrenamiento</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="955"/>
+        <location filename="../LTMTool.cpp" line="954"/>
         <source>Tempo &amp; Threshold Time</source>
         <translation>Tiempo en Tempo y Umbral</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="957"/>
+        <location filename="../LTMTool.cpp" line="956"/>
         <source>Time &amp; Distance</source>
         <translation>Tiempo y Distancia</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="959"/>
+        <location filename="../LTMTool.cpp" line="958"/>
         <source>Daniels Power</source>
         <translation>Potencia (Daniels)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="958"/>
+        <location filename="../LTMTool.cpp" line="957"/>
         <source>Skiba Power</source>
         <translation>Potencia (Skiba)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="960"/>
+        <location filename="../LTMTool.cpp" line="959"/>
         <source>PM Ramp &amp; Peak</source>
         <translation>AR Rampa y Pico</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="961"/>
+        <location filename="../LTMTool.cpp" line="960"/>
         <source>Skiba PM</source>
         <translation>AR (Skiba)</translation>
     </message>
     <message>
-        <location filename="../LTMTool.cpp" line="962"/>
+        <location filename="../LTMTool.cpp" line="961"/>
         <source>Daniels PM</source>
         <translation>AR (Daniels)</translation>
     </message>
@@ -5462,12 +5462,12 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../Library.cpp" line="122"/>
         <source>Import Videos and Workouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Importar Videos y Entrenamientos</translation>
     </message>
     <message>
         <location filename="../Library.cpp" line="171"/>
         <source>Copy Workout Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Falló Copia de Entrenamiento</translation>
     </message>
 </context>
 <context>
@@ -5495,7 +5495,7 @@ Ajuste de Par - define un valor fijo en libras por pulgada o newton por metro pa
     <message>
         <location filename="../Library.cpp" line="251"/>
         <source>Video references</source>
-        <translation type="unfinished"></translation>
+        <translation>Referencias Video</translation>
     </message>
     <message>
         <location filename="../Library.cpp" line="263"/>
@@ -5835,27 +5835,27 @@ Saltando archivo...</translation>
     <message>
         <location filename="../MainWindow.cpp" line="814"/>
         <source>Critical Power Estimator...</source>
-        <translation type="unfinished"></translation>
+        <translation>Estimador de Potencia Crítica...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="823"/>
         <source>Create a new workout...</source>
-        <translation type="unfinished"></translation>
+        <translation>Crear nuevo entrenamiento...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="824"/>
         <source>Download workouts from ErgDB...</source>
-        <translation type="unfinished"></translation>
+        <translation>Descargar entrenamientos desde ErgDB...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="825"/>
         <source>Import workouts or videos...</source>
-        <translation type="unfinished"></translation>
+        <translation>Importar entrenamientos o videos...</translation>
     </message>
     <message>
         <location filename="../MainWindow.cpp" line="826"/>
         <source>Scan disk for videos and workouts...</source>
-        <translation type="unfinished"></translation>
+        <translation>Buscar videos y entrenamientos en el disco...</translation>
     </message>
     <message>
         <source>Critical Power Calculator...</source>
@@ -10211,28 +10211,58 @@ formato GoldenCheetah. ¿Confirmar?</translation>
         <source>Data</source>
         <translation>Datos</translation>
     </message>
+    <message>
+        <location filename="../SpecialFields.cpp" line="49"/>
+        <source>Lean Mass</source>
+        <translation>Masa Magra</translation>
+    </message>
+    <message>
+        <location filename="../SpecialFields.cpp" line="50"/>
+        <source>Fat Mass</source>
+        <translation>Masa Grasa</translation>
+    </message>
+    <message>
+        <location filename="../SpecialFields.cpp" line="51"/>
+        <source>Fat Ratio</source>
+        <translation>Porcentaje Graso</translation>
+    </message>
+    <message>
+        <location filename="../SpecialFields.cpp" line="52"/>
+        <source>Height</source>
+        <translation>Altura</translation>
+    </message>
+    <message>
+        <location filename="../SpecialFields.cpp" line="53"/>
+        <source>BMI</source>
+        <translation>IMC</translation>
+    </message>
 </context>
 <context>
     <name>SpecialTabs</name>
     <message>
-        <location filename="../SpecialFields.cpp" line="130"/>
+        <location filename="../SpecialFields.cpp" line="135"/>
         <source>Workout</source>
         <translation>Entrenamiento</translation>
     </message>
     <message>
-        <location filename="../SpecialFields.cpp" line="131"/>
+        <location filename="../SpecialFields.cpp" line="136"/>
         <source>Notes</source>
         <translation>Notas</translation>
     </message>
     <message>
-        <location filename="../SpecialFields.cpp" line="132"/>
+        <location filename="../SpecialFields.cpp" line="137"/>
         <source>Metric</source>
         <translation>Métricas</translation>
     </message>
     <message>
-        <location filename="../SpecialFields.cpp" line="133"/>
+        <location filename="../SpecialFields.cpp" line="138"/>
         <source>Extra</source>
         <translation></translation>
+    </message>
+    <message>
+        <location filename="../SpecialFields.cpp" line="139"/>
+        <source>Athlete</source>
+        <translation>Atleta</translation>
     </message>
 </context>
 <context>
@@ -11001,7 +11031,7 @@ formato GoldenCheetah. ¿Confirmar?</translation>
     <message>
         <location filename="../ToolsDialog.cpp" line="62"/>
         <source>Critical Power Estimator</source>
-        <translation type="unfinished"></translation>
+        <translation>Estimador de Potencia Crítica</translation>
     </message>
     <message>
         <location filename="../ToolsDialog.cpp" line="69"/>
@@ -11021,7 +11051,7 @@ formato GoldenCheetah. ¿Confirmar?</translation>
     <message>
         <location filename="../ToolsDialog.cpp" line="90"/>
         <source>Estimate CP</source>
-        <translation type="unfinished"></translation>
+        <translation>Estimar PC</translation>
     </message>
     <message>
         <source>Calculate CP</source>
@@ -11149,7 +11179,7 @@ formato GoldenCheetah. ¿Confirmar?</translation>
     <message>
         <location filename="../TrainDB.cpp" line="60"/>
         <source>Cannot open database</source>
-        <translation type="unfinished">No se puede abrir la base de datos</translation>
+        <translation>No se puede abrir la base de datos</translation>
     </message>
     <message>
         <location filename="../TrainDB.cpp" line="61"/>
@@ -11157,7 +11187,7 @@ formato GoldenCheetah. ¿Confirmar?</translation>
 This feature requires SQLite support. Please read the Qt SQL driver documentation for information how to build it.
 
 Click Cancel to exit.</source>
-        <translation type="unfinished">No se puede conectar a la base de datos.
+        <translation>No se puede conectar a la base de datos.
 Esta característica requiere SQLite. Por favor lea la documentación del Qt SQLdriver para más información.
 
 Cancelar para salir.</translation>
@@ -11165,12 +11195,12 @@ Cancelar para salir.</translation>
     <message>
         <location filename="../TrainDB.cpp" line="167"/>
         <source> Manual Erg Mode</source>
-        <translation type="unfinished"></translation>
+        <translation> Modo Ergómetro Manual</translation>
     </message>
     <message>
         <location filename="../TrainDB.cpp" line="171"/>
         <source> Manual Slope Mode</source>
-        <translation type="unfinished"></translation>
+        <translation> Modo Pendiente Manual</translation>
     </message>
 </context>
 <context>
@@ -11812,27 +11842,27 @@ Presionar F3 en el controlador al finalizar.</translation>
     <message>
         <location filename="../Library.cpp" line="642"/>
         <source>Import to Library</source>
-        <translation type="unfinished"></translation>
+        <translation>Importar a la Biblioteca</translation>
     </message>
     <message>
         <location filename="../Library.cpp" line="683"/>
         <source>Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivos</translation>
     </message>
     <message>
         <location filename="../Library.cpp" line="693"/>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <location filename="../Library.cpp" line="695"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../Library.cpp" line="699"/>
         <source>Overwite existing files</source>
-        <translation type="unfinished"></translation>
+        <translation>Reemplazar archivos existentes</translation>
     </message>
 </context>
 <context>
