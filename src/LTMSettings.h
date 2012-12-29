@@ -64,7 +64,7 @@ class MetricDetail {
     int type;
     bool stack; // should this be stacked?
 
-    QString symbol, name;
+    QString symbol, name, units;
     const RideMetric *metric;
 
     QString uname, uunits; // user specified name and units (axis choice)
