@@ -4,22 +4,22 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../AboutDialog.cpp" line="37"/>
+        <location filename="../AboutDialog.cpp" line="36"/>
         <source>About GoldenCheetah</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AboutDialog.cpp" line="46"/>
+        <location filename="../AboutDialog.cpp" line="45"/>
         <source>About</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AboutDialog.cpp" line="47"/>
+        <location filename="../AboutDialog.cpp" line="46"/>
         <source>Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AboutDialog.cpp" line="48"/>
+        <location filename="../AboutDialog.cpp" line="47"/>
         <source>Contributors</source>
         <translation type="unfinished"></translation>
     </message>
@@ -27,7 +27,7 @@
 <context>
     <name>AboutPage</name>
     <message>
-        <location filename="../AboutDialog.cpp" line="69"/>
+        <location filename="../AboutDialog.cpp" line="68"/>
         <source>&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;TSS, NP, IF courtesy of &lt;a href=&quot;http://www.peaksware.com&quot;&gt;Peaksware LLC&lt;/a&gt;.&lt;br&gt;BikeScore, xPower courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;Analytic Cycling&lt;/a&gt;.&lt;/center&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -838,6 +838,19 @@ quindi clicca  &quot;Rescan&quot; per avviare la ricerca.</translation>
         <location filename="../BikeScore.cpp" line="196"/>
         <source>BikeScore&amp;#8482;</source>
         <translation>BikeScore&amp;#8482;</translation>
+    </message>
+</context>
+<context>
+    <name>BingMap</name>
+    <message>
+        <location filename="../BingMap.cpp" line="71"/>
+        <source>Route</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../BingMap.cpp" line="111"/>
+        <source>No GPS Data Present</source>
+        <translation type="unfinished">Nessun dato GPS presente</translation>
     </message>
 </context>
 <context>
@@ -1683,12 +1696,12 @@ quindi clicca  &quot;Rescan&quot; per avviare la ricerca.</translation>
 <context>
     <name>DBAccess</name>
     <message>
-        <location filename="../DBAccess.cpp" line="112"/>
+        <location filename="../DBAccess.cpp" line="110"/>
         <source>Cannot open database</source>
         <translation>Non può aprire il database</translation>
     </message>
     <message>
-        <location filename="../DBAccess.cpp" line="113"/>
+        <location filename="../DBAccess.cpp" line="111"/>
         <source>Unable to establish a database connection.
 This feature requires SQLite support. Please read the Qt SQL driver documentation for information how to build it.
 
@@ -1878,156 +1891,156 @@ Click Cancel to exit.</source>
         <translation type="obsolete">Istruzioni:</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="62"/>
+        <location filename="../DownloadRideDialog.cpp" line="61"/>
         <source>&amp;Download</source>
         <translation>&amp;Download</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="63"/>
+        <location filename="../DownloadRideDialog.cpp" line="62"/>
         <source>&amp;Erase Ride(s)</source>
         <translation>&amp;Cancella Allenamento(i)</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="64"/>
+        <location filename="../DownloadRideDialog.cpp" line="63"/>
         <source>&amp;Rescan</source>
         <translation>&amp;Rescan</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="65"/>
+        <location filename="../DownloadRideDialog.cpp" line="64"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Cancella</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="86"/>
+        <location filename="../DownloadRideDialog.cpp" line="85"/>
         <source>Select port:</source>
         <translation>Seleziona porta:</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="84"/>
+        <location filename="../DownloadRideDialog.cpp" line="83"/>
         <source>Select device type:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="36"/>
+        <location filename="../DownloadRideDialog.cpp" line="35"/>
         <source>Download Ride Data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="66"/>
+        <location filename="../DownloadRideDialog.cpp" line="65"/>
         <source>&amp;Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="88"/>
+        <location filename="../DownloadRideDialog.cpp" line="87"/>
         <source>Info:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="102"/>
+        <location filename="../DownloadRideDialog.cpp" line="101"/>
         <source>No devices found.  Make sure the device
 unit is plugged into the computer,
 then click &quot;Rescan&quot; to check again.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="111"/>
+        <location filename="../DownloadRideDialog.cpp" line="110"/>
         <source>Click Download to begin downloading.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="113"/>
+        <location filename="../DownloadRideDialog.cpp" line="112"/>
         <source>, 
 then click Download.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="126"/>
+        <location filename="../DownloadRideDialog.cpp" line="125"/>
         <source>Warning(s):
 
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="126"/>
+        <location filename="../DownloadRideDialog.cpp" line="125"/>
         <source>
 
 You may need to (re)install the FTDI or PL2303 drivers before downloading.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="128"/>
+        <location filename="../DownloadRideDialog.cpp" line="127"/>
         <source>Error Loading Device Drivers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="289"/>
+        <location filename="../DownloadRideDialog.cpp" line="291"/>
         <source>getting summary ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="292"/>
+        <location filename="../DownloadRideDialog.cpp" line="294"/>
         <source>Preview failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="305"/>
+        <location filename="../DownloadRideDialog.cpp" line="307"/>
         <source>getting data ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="312"/>
+        <location filename="../DownloadRideDialog.cpp" line="311"/>
         <source>Download canceled</source>
         <translation>Download cancellato</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="313"/>
+        <location filename="../DownloadRideDialog.cpp" line="312"/>
         <source>Cancel clicked by user.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="317"/>
-        <location filename="../DownloadRideDialog.cpp" line="319"/>
+        <location filename="../DownloadRideDialog.cpp" line="316"/>
+        <location filename="../DownloadRideDialog.cpp" line="318"/>
         <source>Download failed</source>
         <translation>Download fallito</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="329"/>
+        <location filename="../DownloadRideDialog.cpp" line="328"/>
         <source>file %1 has no valid timestamp, falling back to &apos;now&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="341"/>
+        <location filename="../DownloadRideDialog.cpp" line="340"/>
         <source>Ride Already Downloaded</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="342"/>
+        <location filename="../DownloadRideDialog.cpp" line="341"/>
         <source>The ride starting at %1 appears to have already been downloaded.  Do you want to overwrite the previous download?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="361"/>
+        <location filename="../DownloadRideDialog.cpp" line="360"/>
         <source>Failed to remove existing file %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="365"/>
-        <location filename="../DownloadRideDialog.cpp" line="383"/>
+        <location filename="../DownloadRideDialog.cpp" line="364"/>
+        <location filename="../DownloadRideDialog.cpp" line="382"/>
         <source>failed to rename %1 to %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="379"/>
+        <location filename="../DownloadRideDialog.cpp" line="378"/>
         <source>Failed to rename %1 to %2: %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="396"/>
+        <location filename="../DownloadRideDialog.cpp" line="395"/>
         <source>download completed successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="423"/>
+        <location filename="../DownloadRideDialog.cpp" line="425"/>
         <source>cleaned data</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2036,23 +2049,23 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
         <translation type="obsolete">sovrascrivi il precedente download?</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="346"/>
+        <location filename="../DownloadRideDialog.cpp" line="345"/>
         <source>&amp;Overwrite</source>
         <translation>&amp;Sovrascrivi</translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="346"/>
+        <location filename="../DownloadRideDialog.cpp" line="345"/>
         <source>&amp;Skip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="349"/>
+        <location filename="../DownloadRideDialog.cpp" line="348"/>
         <source>skipped file %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../DownloadRideDialog.cpp" line="360"/>
-        <location filename="../DownloadRideDialog.cpp" line="378"/>
+        <location filename="../DownloadRideDialog.cpp" line="359"/>
+        <location filename="../DownloadRideDialog.cpp" line="377"/>
         <source>Error</source>
         <translation>Errore</translation>
     </message>
@@ -3315,8 +3328,14 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>GoogleMapControl</name>
     <message>
+        <location filename="../GoogleMapControl.cpp" line="73"/>
+        <source>Route</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../GoogleMapControl.cpp" line="113"/>
         <source>No GPS Data Present</source>
-        <translation type="obsolete">Nessun dato GPS presente</translation>
+        <translation type="unfinished">Nessun dato GPS presente</translation>
     </message>
     <message>
         <source>KPH</source>
@@ -3882,112 +3901,112 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>HrZones</name>
     <message>
-        <location filename="../HrZones.cpp" line="188"/>
+        <location filename="../HrZones.cpp" line="187"/>
         <source>line %1: read new range without reading any zones for previous one</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="247"/>
+        <location filename="../HrZones.cpp" line="246"/>
         <source>line %1: read zone without preceeding date range</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="262"/>
+        <location filename="../HrZones.cpp" line="261"/>
         <source>attempt to set zone based on % of LT without setting LT in line number %1.
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="297"/>
+        <location filename="../HrZones.cpp" line="296"/>
         <source>file ended without reading any zones for last range</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="346"/>
+        <location filename="../HrZones.cpp" line="345"/>
         <source>Setting end date of range %1 to start date of range %2.
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="357"/>
+        <location filename="../HrZones.cpp" line="356"/>
         <source>Extending final range %1 to infinite to include present date.
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="364"/>
+        <location filename="../HrZones.cpp" line="363"/>
         <source>LT must be greater than zero in zone range %1 of hr.zones</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="383"/>
+        <location filename="../HrZones.cpp" line="382"/>
         <source>Range %1: matching top of zone %2 (%3) to bottom of zone %4 (%5).
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="397"/>
+        <location filename="../HrZones.cpp" line="396"/>
         <source>Range %1: setting top of zone %2 from %3 to MAX.
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="612"/>
+        <location filename="../HrZones.cpp" line="611"/>
         <source>Threshold (bpm): %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="620"/>
+        <location filename="../HrZones.cpp" line="619"/>
         <source>&lt;td align=&quot;center&quot;&gt;Low (bpm)&lt;/td&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="621"/>
+        <location filename="../HrZones.cpp" line="620"/>
         <source>&lt;td align=&quot;center&quot;&gt;High (bpm)&lt;/td&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="623"/>
+        <location filename="../HrZones.cpp" line="622"/>
         <source>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="618"/>
+        <location filename="../HrZones.cpp" line="617"/>
         <source>&lt;td align=&quot;center&quot;&gt;Zone&lt;/td&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="46"/>
+        <location filename="../HrZones.cpp" line="45"/>
         <source>Active Recovery</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="46"/>
+        <location filename="../HrZones.cpp" line="45"/>
         <source>Endurance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="46"/>
+        <location filename="../HrZones.cpp" line="45"/>
         <source>Tempo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="46"/>
+        <location filename="../HrZones.cpp" line="45"/>
         <source>Threshold</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="47"/>
+        <location filename="../HrZones.cpp" line="46"/>
         <source>VO2Max</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="619"/>
+        <location filename="../HrZones.cpp" line="618"/>
         <source>&lt;td align=&quot;center&quot;&gt;Description&lt;/td&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../HrZones.cpp" line="622"/>
+        <location filename="../HrZones.cpp" line="621"/>
         <source>&lt;td align=&quot;center&quot;&gt;Time&lt;/td&gt;</source>
         <translation></translation>
     </message>
@@ -5882,132 +5901,132 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">km</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="121"/>
+        <location filename="../ManualRideDialog.cpp" line="120"/>
         <source>Manual Activity Entry</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="138"/>
+        <location filename="../ManualRideDialog.cpp" line="137"/>
         <source>Ride date:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="142"/>
+        <location filename="../ManualRideDialog.cpp" line="141"/>
         <source>Start time:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="148"/>
+        <location filename="../ManualRideDialog.cpp" line="147"/>
         <source>Duration:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="153"/>
+        <location filename="../ManualRideDialog.cpp" line="152"/>
         <source>Distance (%1):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="161"/>
+        <location filename="../ManualRideDialog.cpp" line="160"/>
         <source>Sport:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="163"/>
+        <location filename="../ManualRideDialog.cpp" line="162"/>
         <source>Workout Code:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="165"/>
+        <location filename="../ManualRideDialog.cpp" line="164"/>
         <source>Notes:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="171"/>
+        <location filename="../ManualRideDialog.cpp" line="170"/>
         <source>Average HR:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="179"/>
+        <location filename="../ManualRideDialog.cpp" line="178"/>
         <source>Average Watts:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="187"/>
+        <location filename="../ManualRideDialog.cpp" line="186"/>
         <source>Average Cadence:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="195"/>
+        <location filename="../ManualRideDialog.cpp" line="194"/>
         <source>Average Speed:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="203"/>
+        <location filename="../ManualRideDialog.cpp" line="202"/>
         <source>Estmate Stress by:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="204"/>
+        <location filename="../ManualRideDialog.cpp" line="203"/>
         <source>Duration</source>
         <translation type="unfinished">Durata</translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="205"/>
+        <location filename="../ManualRideDialog.cpp" line="204"/>
         <source>Distance</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="206"/>
+        <location filename="../ManualRideDialog.cpp" line="205"/>
         <source>Manually</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="214"/>
+        <location filename="../ManualRideDialog.cpp" line="213"/>
         <source>Estimate Stress days:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="222"/>
+        <location filename="../ManualRideDialog.cpp" line="221"/>
         <source>BikeScore: </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="229"/>
+        <location filename="../ManualRideDialog.cpp" line="228"/>
         <source>Daniel Points: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="236"/>
+        <location filename="../ManualRideDialog.cpp" line="235"/>
         <source>TSS: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="243"/>
+        <location filename="../ManualRideDialog.cpp" line="242"/>
         <source>Work (KJ):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="286"/>
+        <location filename="../ManualRideDialog.cpp" line="285"/>
         <source>Metrics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="503"/>
+        <location filename="../ManualRideDialog.cpp" line="502"/>
         <source>Unable to save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="504"/>
+        <location filename="../ManualRideDialog.cpp" line="503"/>
         <source>There is already an activity with the same start time or you do not have permissions to save a file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="251"/>
+        <location filename="../ManualRideDialog.cpp" line="250"/>
         <source>&amp;OK</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ManualRideDialog.cpp" line="252"/>
+        <location filename="../ManualRideDialog.cpp" line="251"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Cancella</translation>
     </message>
@@ -6197,18 +6216,18 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">Ricaricando il database dei campi</translation>
     </message>
     <message>
-        <location filename="../MetricAggregator.cpp" line="115"/>
+        <location filename="../MetricAggregator.cpp" line="116"/>
         <source>Refreshing Ride Statistics...
 Started</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../MetricAggregator.cpp" line="116"/>
+        <location filename="../MetricAggregator.cpp" line="117"/>
         <source>Abort</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../MetricAggregator.cpp" line="147"/>
+        <location filename="../MetricAggregator.cpp" line="148"/>
         <source>Refreshing Ride Statistics...
 Elapsed: %1
 %2</source>
@@ -7547,7 +7566,7 @@ Do you want to continue?</source>
 <context>
     <name>PowerTapDevices</name>
     <message>
-        <location filename="../PowerTapDevice.cpp" line="37"/>
+        <location filename="../PowerTapDevice.cpp" line="38"/>
         <source>Make sure the PowerTap unit is turned
 on and that its display says, &quot;Host&quot;</source>
         <translation type="unfinished"></translation>
@@ -9489,6 +9508,11 @@ native format. Should we do so?
     </message>
     <message>
         <location filename="../SpecialFields.cpp" line="139"/>
+        <source>Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../SpecialFields.cpp" line="140"/>
         <source>Athlete</source>
         <translation type="unfinished">Atleta</translation>
     </message>
@@ -9656,163 +9680,163 @@ native format. Should we do so?
 <context>
     <name>SrmDevice</name>
     <message>
-        <location filename="../SrmDevice.cpp" line="119"/>
         <location filename="../SrmDevice.cpp" line="126"/>
-        <location filename="../SrmDevice.cpp" line="141"/>
+        <location filename="../SrmDevice.cpp" line="133"/>
+        <location filename="../SrmDevice.cpp" line="148"/>
         <source>failed to allocate device handle: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="131"/>
-        <location filename="../SrmDevice.cpp" line="146"/>
-        <location filename="../SrmDevice.cpp" line="152"/>
+        <location filename="../SrmDevice.cpp" line="138"/>
+        <location filename="../SrmDevice.cpp" line="153"/>
+        <location filename="../SrmDevice.cpp" line="159"/>
         <source>device type %1 is unsupported</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="159"/>
+        <location filename="../SrmDevice.cpp" line="166"/>
         <source>opening PCV at %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="165"/>
+        <location filename="../SrmDevice.cpp" line="172"/>
         <source>opening PC6/7 at %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="170"/>
+        <location filename="../SrmDevice.cpp" line="177"/>
         <source>unsupported SRM Protocl version: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="175"/>
+        <location filename="../SrmDevice.cpp" line="182"/>
         <source>failed to allocate Powercontrol handle: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="181"/>
+        <location filename="../SrmDevice.cpp" line="188"/>
         <source>Couldn&apos;t open device %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="190"/>
+        <location filename="../SrmDevice.cpp" line="197"/>
         <source>Couldn&apos;t set logging function: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="196"/>
+        <location filename="../SrmDevice.cpp" line="203"/>
         <source>failed to set Powercontrol io handle: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="202"/>
+        <location filename="../SrmDevice.cpp" line="209"/>
         <source>failed to initialize Powercontrol communication: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="262"/>
-        <location filename="../SrmDevice.cpp" line="353"/>
+        <location filename="../SrmDevice.cpp" line="269"/>
+        <location filename="../SrmDevice.cpp" line="358"/>
         <source>failed to start download: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="268"/>
-        <location filename="../SrmDevice.cpp" line="359"/>
+        <location filename="../SrmDevice.cpp" line="275"/>
+        <location filename="../SrmDevice.cpp" line="364"/>
         <source>failed to get number of data blocks: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="272"/>
+        <location filename="../SrmDevice.cpp" line="279"/>
         <source>found %1 ride blocks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="292"/>
-        <location filename="../SrmDevice.cpp" line="298"/>
+        <location filename="../SrmDevice.cpp" line="299"/>
+        <location filename="../SrmDevice.cpp" line="305"/>
         <source>preview failed: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="342"/>
+        <location filename="../SrmDevice.cpp" line="347"/>
         <source>failed to allocate data handle: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="348"/>
-        <location filename="../SrmDevice.cpp" line="416"/>
-        <location filename="../SrmDevice.cpp" line="503"/>
+        <location filename="../SrmDevice.cpp" line="353"/>
+        <location filename="../SrmDevice.cpp" line="421"/>
+        <location filename="../SrmDevice.cpp" line="508"/>
         <source>download cancelled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="389"/>
+        <location filename="../SrmDevice.cpp" line="394"/>
         <source>skipping unselected ride block %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="435"/>
+        <location filename="../SrmDevice.cpp" line="440"/>
         <source>progress: %1/%2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="441"/>
+        <location filename="../SrmDevice.cpp" line="446"/>
         <source>adding chunk failed: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="451"/>
-        <location filename="../SrmDevice.cpp" line="469"/>
+        <location filename="../SrmDevice.cpp" line="456"/>
+        <location filename="../SrmDevice.cpp" line="474"/>
         <source>adding marker failed: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="489"/>
-        <location filename="../SrmDevice.cpp" line="495"/>
+        <location filename="../SrmDevice.cpp" line="494"/>
+        <location filename="../SrmDevice.cpp" line="500"/>
         <source>download failed: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="500"/>
+        <location filename="../SrmDevice.cpp" line="505"/>
         <source>got %1 records</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="508"/>
+        <location filename="../SrmDevice.cpp" line="513"/>
         <source>no data available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="514"/>
+        <location filename="../SrmDevice.cpp" line="519"/>
         <source>Couldn&apos;t split data: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="532"/>
+        <location filename="../SrmDevice.cpp" line="537"/>
         <source>Couldn&apos;t fixup data: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="549"/>
+        <location filename="../SrmDevice.cpp" line="554"/>
         <source>Couldn&apos;t get start time of data: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="558"/>
+        <location filename="../SrmDevice.cpp" line="563"/>
         <source>failed to open file %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="566"/>
+        <location filename="../SrmDevice.cpp" line="571"/>
         <source>Couldn&apos;t write to file %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="611"/>
+        <location filename="../SrmDevice.cpp" line="616"/>
         <source>cleaning device ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SrmDevice.cpp" line="614"/>
+        <location filename="../SrmDevice.cpp" line="619"/>
         <source>failed to clear Powercontrol memory: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10855,13 +10879,13 @@ Press F3 on Controller when done.</source>
 <context>
     <name>VersionPage</name>
     <message>
-        <location filename="../AboutDialog.cpp" line="208"/>
+        <location filename="../AboutDialog.cpp" line="207"/>
         <source>&lt;p&gt;Build date: %1 %2&lt;br&gt;Version: %3&lt;br&gt;DB Schema: %4&lt;br&gt;OS: %5&lt;br&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AboutDialog.cpp" line="220"/>
-        <source>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;BOOST&lt;/td&gt;&lt;td&gt;%3&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;GCC&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;OAUTH&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWTPLOT3D&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LUCENE&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LION SUPPORT&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</source>
+        <location filename="../AboutDialog.cpp" line="219"/>
+        <source>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;GCC&lt;/td&gt;&lt;td&gt;%3&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;OAUTH&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWTPLOT3D&lt;/td&gt;&lt;td&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LUCENE&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LION SUPPORT&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11165,123 +11189,123 @@ Press F3 on Controller when done.</source>
 <context>
     <name>Zones</name>
     <message>
-        <location filename="../Zones.cpp" line="177"/>
+        <location filename="../Zones.cpp" line="176"/>
         <source>line %1: read new range without reading any zones for previous one</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="228"/>
+        <location filename="../Zones.cpp" line="227"/>
         <source>line %1: read zone without preceeding date range</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="242"/>
-        <location filename="../Zones.cpp" line="264"/>
+        <location filename="../Zones.cpp" line="241"/>
+        <location filename="../Zones.cpp" line="263"/>
         <source>attempt to set zone based on % of CP without setting CP in line number %1.
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="296"/>
+        <location filename="../Zones.cpp" line="295"/>
         <source>file ended without reading any zones for last range</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="344"/>
+        <location filename="../Zones.cpp" line="343"/>
         <source>Setting end date of range %1 to start date of range %2.
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="355"/>
+        <location filename="../Zones.cpp" line="354"/>
         <source>Extending final range %1 to infinite to include present date.
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="362"/>
+        <location filename="../Zones.cpp" line="361"/>
         <source>CP must be greater than zero in zone range %1 of power.zones</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="381"/>
+        <location filename="../Zones.cpp" line="380"/>
         <source>Range %1: matching top of zone %2 (%3) to bottom of zone %4 (%5).
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="395"/>
+        <location filename="../Zones.cpp" line="394"/>
         <source>Range %1: setting top of zone %2 from %3 to MAX.
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="572"/>
+        <location filename="../Zones.cpp" line="571"/>
         <source>Critical Power (watts): %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="580"/>
+        <location filename="../Zones.cpp" line="579"/>
         <source>&lt;td align=&quot;center&quot;&gt;Low (watts)&lt;/td&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="581"/>
+        <location filename="../Zones.cpp" line="580"/>
         <source>&lt;td align=&quot;center&quot;&gt;High (watts)&lt;/td&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="583"/>
+        <location filename="../Zones.cpp" line="582"/>
         <source>&lt;td align=&quot;center&quot;&gt;%&lt;/td&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="578"/>
+        <location filename="../Zones.cpp" line="577"/>
         <source>&lt;td align=&quot;center&quot;&gt;Zone&lt;/td&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="44"/>
+        <location filename="../Zones.cpp" line="43"/>
         <source>Active Recovery</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="44"/>
+        <location filename="../Zones.cpp" line="43"/>
         <source>Endurance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="44"/>
+        <location filename="../Zones.cpp" line="43"/>
         <source>Tempo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="44"/>
+        <location filename="../Zones.cpp" line="43"/>
         <source>Threshold</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="45"/>
+        <location filename="../Zones.cpp" line="44"/>
         <source>VO2Max</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="45"/>
+        <location filename="../Zones.cpp" line="44"/>
         <source>Anaerobic</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="45"/>
+        <location filename="../Zones.cpp" line="44"/>
         <source>Neuromuscular</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="579"/>
+        <location filename="../Zones.cpp" line="578"/>
         <source>&lt;td align=&quot;center&quot;&gt;Description&lt;/td&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Zones.cpp" line="582"/>
+        <location filename="../Zones.cpp" line="581"/>
         <source>&lt;td align=&quot;center&quot;&gt;Time&lt;/td&gt;</source>
         <translation></translation>
     </message>

@@ -987,9 +987,12 @@ LTMTool::translateMetrics(MainWindow *main, const QDir &home, LTMSettings *setti
     // LTMTool instance is created to have access to metrics catalog
     LTMTool* ltmTool = new LTMTool(main, home, false);
     if (unitsMap.isEmpty()) {
-        foreach(MetricDetail metric, ltmTool->metrics)
-            if (metric.units != "")
+        foreach(MetricDetail metric, ltmTool->metrics) {
+            if (metric.units != "")  // translate units
 	            unitsMap.insert(metric.units, metric.uunits);
+            if (metric.uunits != "") // keep already translated the same
+	            unitsMap.insert(metric.uunits, metric.uunits);
+        }
     }
     for (int j=0; j < settings->metrics.count(); j++) {
         if (settings->metrics[j].uname == settings->metrics[j].name) {
