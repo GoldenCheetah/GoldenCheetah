@@ -193,7 +193,7 @@ class Zones : public QObject
         // calculate a CRC for the zones data - used to see if zones
         // data is changed since last referenced in Metric code
         // could also be used in Configuration pages (later)
-        unsigned long getFingerprint() const;
+        quint16 getFingerprint() const;
 };
 
 QColor zoneColor(int zone, int num_zones);

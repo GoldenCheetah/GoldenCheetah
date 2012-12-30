@@ -106,7 +106,8 @@ void MetricAggregator::refreshMetrics(QDateTime forceAfterThisDate)
         }
     }
 
-    unsigned long zoneFingerPrint = zones->getFingerprint() + hrzones->getFingerprint(); // crc of *all* zone data (HR and Power)
+    unsigned long zoneFingerPrint = static_cast<unsigned long>(zones->getFingerprint())
+                                  + static_cast<unsigned long>(hrzones->getFingerprint()); // checksum of *all* zone data (HR and Power)
 
     // update statistics for ride files which are out of date
     // showing a progress bar as we go
