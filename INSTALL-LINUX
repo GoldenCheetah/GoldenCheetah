@@ -14,7 +14,6 @@ should be largely the same for any Linux distro.
 CONTENTS
 
 1. BASIC INSTALLATION WITH MANDATORY DEPENDENCIES
-   - boost
    - QT
    - git
 
@@ -50,11 +49,6 @@ Run the Qt installer (need to chmod +x it first) and install to default location
 Put qmake in path (e.g. sudo cp ~/QtSDK/Desktop/Qt/473/gcc/bin/qmake /usr/local/bin)
 Test qmake is ok with: qmake --version (should report 4.7.0 or higher)
 
-Download Boost 1.46.1 from http://sourceforge.net/projects/boost/files/boost/1.46.1/
-Extract files with archive manager into home directory (~/boost_1_46_1/) or you
-may be able to install with
-$ sudo apt-get install libboost1.42-dev
-
 Install git with:
 $ sudo apt-get install git
 Said Y to prompt about all git files installed (git-gui et al)
@@ -77,19 +71,8 @@ $ vi gcconfig.pri
 Comment out the D2XX_INCLUDE and SRMIO_INSTALL lines for now (put # in first character of the line
 to comment out), we will install that in a moment, if we need to.
 
-Adjust the boost location to the location we installed to (home), so it should read something
-like below (my home directory is markl)
-
-BOOST_INSTALL=/home/markl/boost_1_46_1
-
-also, BOOST_INCLUDE should not have a trailing include on it, this is a legacy setting
-that a lot of other users have used in the past, look for it towards the end if gcconfig.pri
-and it should read like this (take off trailing /include):
-
-BOOST_INCLUDE=$${BOOST_INSTALL)
-
 If you are building for your local host you may find that you get better performance if
-compiling with gcc -O3 (tree vectorization can have a significat impact)
+compiling with gcc -O3 (tree vectorization can have a significat impact) [or -Ofast]
 
 If so you might like to uncomment:
 

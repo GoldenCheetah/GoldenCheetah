@@ -16,7 +16,6 @@ CONTENTS
 1. BASIC INSTALLATION WITH MANDATORY DEPENDENCIES
    - Xcode
    - Qt
-   - boost
 
 2. ADDING OPTIONAL DEPENDENCIES
    - FTDI D2XX
@@ -156,54 +155,10 @@ with the following commands:
 $ sudo port install qt4-mac
 $ sudo port install qt4-mac-sqlite3-plugin
 
+1.6 DEPRECATED
+--------------
 
-
-1.6 Install Boost
------------------
-
-We still use boost in some parts of the code. We are looking to remove this
-dependency since it doesn't add much over QT for our purposes. You will need
-to install the latest there, currently that is 1.48.
-
-The URL for downloading it is: www.boost.org, click on the download right there
-on the front page and it will take you to sourceforge where the boost project
-is hosted. Click on the boost_1_48_0.tar.gz and let that download. It is typically
-around 50MB in size.
-
-I typically install boost in /usr/local, to do this from terminal change directory
-to /usr/local
-
-$ cd /usr/local
-
-If it complains that it does not exist, lets go ahead and create it, but we will
-need to do this with admin rights.
-
-$ sudo mkdir -p /usr/local
-$ cd /usr/local
-
-Now lets extract the boost files, you will need to make a note of where the file
-was downloaded to, I run Chrome and it was downloaded into ~/Downloads so
-
-$ sudo tar -xvzf ~/Downloads/boost_1_48_0.tar.gz
-
-This will extract all the boost files into /usr/local/boost_1_48_0, we need to 
-remember that since we will be updating the GC build file to tell the build
-system where to find boost. More on that later.
-
-Before carrying on change directory back to the GC project diretory we created
-earlier - we don't want to get confused here.
-
-$ cd ~/Projects/GoldenCheetah
-$ ls
-
-You will be back where we were before, with the INSTALL docs and directories
-listed.
-
-We now have all the mandatory dependencies installed and can build GoldenCheetah
-for the first time!
-
-Lets go ahead and do that, then we can add optional dependencies as you decide
-which features you want to build GoldenCheetah with.
+No longer need this step (install boost)
 
 1.7 Configure and Build GoldenCheetah (with no optional dependencies)
 ---------------------------------------------------------------------
@@ -220,13 +175,7 @@ $ vi gcconfig.pri
 
 In that last step you can use whatever editor you feel most comfortable with.
 
-For the setup we have we need to set the directory that Boost was installed to
-by changing the following lines:
-
-BOOST_INSTALL = /usr/local/boost_1_48_0
-BOOST_INCLUDE = $${BOOST_INSTALL}
-
-and for now we will comment out some of the dependencies we have not installed
+For now we will comment out some of the dependencies we have not installed
 support for yet:
 
 #SRMIO_INSTALL = /usr/local/srmio

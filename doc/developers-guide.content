@@ -35,12 +35,6 @@ on GitHub.</p>
   <td>libqt4-dev</td>
 </tr>
 <tr>
-  <td><a href="http://www.boost.org/users/download/">Boost</a></td>
-  <td>1.38.0 or later</td>
-  <td>boost</td>
-  <td>libboost-dev</td>
-</tr>
-<tr>
   <td><a href="http://git-scm.com/download">git</a></td>
   <td>any</td>
   <td>git-core</td>
@@ -137,18 +131,16 @@ git show --color abcd0123
 variable, declare it <code>static</code> within a .cpp file.
 
 <li>Only call C++'s operator <code>new</code> within the constructors and
-<code>reset</code> functions of <code>std::auto_ptr</code>,
-<code>boost::scoped_pointer</code>, etc. or when passing a parent pointer to a
-Qt class (so that the parent deletes the child).  Never call
-<code>delete</code> explicitly.
+<code>reset</code> functions of <code>std::auto_ptr</code> etc. 
+or when passing a parent pointer to a Qt class (so that the parent
+deletes the child).  Never call <code>delete</code> explicitly.
 
 <li>Do not use <code>malloc</code> or <code>free</code> unless forced to by an
 external C library.
 
 <li>Allocate large buffers on the heap, not on the stack.
 
-<li>When the C++ standard library has an appropriate function, use it.
-Likewise for Qt and Boost.
+<li>When the Qt or C++ standard library has an appropriate function, use it.
 
 <li>Only use external libraries with GPL-compatible licenses.
 
