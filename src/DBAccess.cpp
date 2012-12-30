@@ -34,8 +34,6 @@
 #include "RideMetadata.h"
 #include "SpecialFields.h"
 
-#include <boost/crc.hpp>
-
 // DB Schema Version - YOU MUST UPDATE THIS IF THE SCHEMA VERSION CHANGES!!!
 // Schema version will change if a) the default metadata.xml is updated
 //                            or b) new metrics are added / old changed
@@ -139,12 +137,7 @@ computeFileCRC(QString filename)
     rawstream->readRawData(&data[0], file.size());
     file.close();
 
-    // calculate the CRC
-    boost::crc_optimal<16, 0x1021, 0xFFFF, 0, false, false> CRC;
-
-    CRC.process_bytes(&data[0], file.size());
-
-    return CRC.checksum();
+    return qChecksum(&data[0], file.size());
 }
 
 bool DBAccess::createMetricsTable()

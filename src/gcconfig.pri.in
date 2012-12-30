@@ -32,12 +32,6 @@
 #  QMAKE_DEL_FILE = rm -f
 #}
 
-# Set path to the root of the boost include files. 
-# If the files are in /usr/include/boost then set
-# BOOST_INCLUDE = /usr/include
-# If you do not define BOOST_INCLUDE the application may or may not compile.
-BOOST_INCLUDE = 
-
 # If you want SRM download support you must install SRMIO
 #     http://www.zuto.de/project/srmio/
 # Set path to the root of the SRMIO installation
