@@ -20,11 +20,6 @@ Download Qt SDK from:
  (File I am using is qt-sdk-win-opensource-2010.02.1.exe)
 - Install in D:\Coding\Qt
 
-Download latest Boost from:
- http://sourceforge.net/projects/boost/files/boost/
- (File I am using is boost_1_42_0.zip)
-- Install in D:\Coding\Boost
-
 Download the D2XX drivers:
  http://www.ftdichip.com/Drivers/D2XX.htm
  (File I am using is: CDM 202.06.00 WHQL Certified.zip)
@@ -59,10 +54,8 @@ Download GoldenCheetah source
 
 Copy D:\Coding\GoldenCheetah\src\gccconfig.pri.in
   to D:\Coding\GoldenCheetah\src\gccconfig.pri and edit
-- Set: BOOST_INSTALL = d:/coding/boost
 - Set: D2XX_INCLUDE = d:/coding/D2XX
 - Comment out #SRMIO_INSTALL
-- Set: BOOST_INCLUDE = $${BOOST_INSTALL}/
 - Comment out: CONFIG += debug
 - Uncomment: CONFIG += static
 
