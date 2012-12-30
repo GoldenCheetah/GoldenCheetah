@@ -68,7 +68,7 @@ BingMap::rideSelected()
     else current = ride;
 
     // Route metadata ...
-    setSubTitle(ride->ride()->getTag("Route", "Route"));
+    setSubTitle(ride->ride()->getTag("Route", tr("Route")));
 
     range =ride->zoneRange();
     if(range < 0) rideCP = 300;  // default cp to 300 watts
@@ -108,7 +108,7 @@ void BingMap::createHtml()
 
     // No GPS data, so sorry no map
     if(!ride || !ride->ride() || ride->ride()->areDataPresent()->lat == false || ride->ride()->areDataPresent()->lon == false) {
-        currentPage = "No GPS Data Present";
+        currentPage = tr("No GPS Data Present");
         return;
     }
 

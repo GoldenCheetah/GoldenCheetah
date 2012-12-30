@@ -136,6 +136,7 @@ SpecialTabs::SpecialTabs()
     namesmap.insert("Notes", tr("Notes"));
     namesmap.insert("Metric", tr("Metric"));
     namesmap.insert("Extra", tr("Extra"));
+    namesmap.insert("Device", tr("Device"));
     namesmap.insert("Athlete", tr("Athlete"));
 }
 
