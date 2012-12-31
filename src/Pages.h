@@ -401,6 +401,7 @@ class FieldsPage : public QWidget
     public:
         FieldsPage(QWidget *parent, QList<FieldDefinition>);
         void getDefinitions(QList<FieldDefinition>&);
+        static void addFieldTypes(QComboBox *p);
 
     public slots:
         void addClicked();
