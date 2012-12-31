@@ -1619,16 +1619,17 @@ MetadataPage::saveClicked()
 
 // little helper since we create/recreate combos
 // for field types all over the place (init, move up, move down)
-static void addFieldTypes(QComboBox *p)
+void
+FieldsPage::addFieldTypes(QComboBox *p)
 {
-    p->addItem("Text");
-    p->addItem("Textbox");
-    p->addItem("ShortText");
-    p->addItem("Integer");
-    p->addItem("Double");
-    p->addItem("Date");
-    p->addItem("Time");
-    p->addItem("Checkbox");
+    p->addItem(tr("Text"));
+    p->addItem(tr("Textbox"));
+    p->addItem(tr("ShortText"));
+    p->addItem(tr("Integer"));
+    p->addItem(tr("Double"));
+    p->addItem(tr("Date"));
+    p->addItem(tr("Time"));
+    p->addItem(tr("Checkbox"));
 }
 
 //
@@ -1723,11 +1724,12 @@ KeywordsPage::KeywordsPage(MetadataPage *parent, QList<KeywordDefinition>keyword
 void
 KeywordsPage::pageSelected()
 {
+    SpecialFields sp;
     QString prev = "";
 
     // remember what was selected, if anything?
     if (fieldChooser->count()) {
-        prev = fieldChooser->itemText(fieldChooser->currentIndex());
+        prev = sp.internalName(fieldChooser->itemText(fieldChooser->currentIndex()));
         parent->colorfield = prev;
     } else prev = parent->colorfield;
     // load in texts from metadata
@@ -1737,16 +1739,17 @@ KeywordsPage::pageSelected()
     QList<FieldDefinition> fromFieldsPage;
     parent->fieldsPage->getDefinitions(fromFieldsPage);
     foreach(FieldDefinition x, fromFieldsPage) {
-        if (x.type < 3) fieldChooser->addItem(x.name);
+        if (x.type < 3) fieldChooser->addItem(sp.displayName(x.name));
     }
-    fieldChooser->setCurrentIndex(fieldChooser->findText(prev));
+    fieldChooser->setCurrentIndex(fieldChooser->findText(sp.displayName(prev)));
 }
 
 void
 KeywordsPage::colorfieldChanged()
 {
+    SpecialFields sp;
     int index = fieldChooser->currentIndex();
-    if (index >=0) parent->colorfield = fieldChooser->itemText(fieldChooser->currentIndex());
+    if (index >=0) parent->colorfield = sp.internalName(fieldChooser->itemText(fieldChooser->currentIndex()));
 }
 
 
@@ -3340,7 +3343,7 @@ MeasuresPage::MeasuresPage(MainWindow *main) : main(main)
         QTreeWidgetItem *add;
         QComboBox *comboButton = new QComboBox(this);
 
-        addFieldTypes(comboButton);
+        FieldsPage::addFieldTypes(comboButton);
         comboButton->setCurrentIndex(field.type);
 
         add = new QTreeWidgetItem(fields->invisibleRootItem());
@@ -3377,7 +3380,7 @@ MeasuresPage::upClicked()
         // movin on up!
         QWidget *button = fields->itemWidget(fields->currentItem(),2);
         QComboBox *comboButton = new QComboBox(this);
-        addFieldTypes(comboButton);
+        FieldsPage::addFieldTypes(comboButton);
         comboButton->setCurrentIndex(((QComboBox*)button)->currentIndex());
         QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
         fields->invisibleRootItem()->insertChild(index-1, moved);
@@ -3395,7 +3398,7 @@ MeasuresPage::downClicked()
 
         QWidget *button = fields->itemWidget(fields->currentItem(),2);
         QComboBox *comboButton = new QComboBox(this);
-        addFieldTypes(comboButton);
+        FieldsPage::addFieldTypes(comboButton);
         comboButton->setCurrentIndex(((QComboBox*)button)->currentIndex());
         QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
         fields->invisibleRootItem()->insertChild(index+1, moved);
@@ -3418,7 +3421,7 @@ MeasuresPage::addClicked()
     if (index < 0) index = 0;
     QTreeWidgetItem *add;
     QComboBox *comboButton = new QComboBox(this);
-    addFieldTypes(comboButton);
+    FieldsPage::addFieldTypes(comboButton);
 
     add = new QTreeWidgetItem;
     fields->invisibleRootItem()->insertChild(index, add);

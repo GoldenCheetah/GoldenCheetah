@@ -856,46 +856,46 @@
         <translation type="obsolete">Padrão</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2331"/>
-        <location filename="../Pages.cpp" line="2340"/>
+        <location filename="../Pages.cpp" line="2332"/>
+        <location filename="../Pages.cpp" line="2341"/>
         <source>+</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2332"/>
-        <location filename="../Pages.cpp" line="2341"/>
+        <location filename="../Pages.cpp" line="2333"/>
+        <location filename="../Pages.cpp" line="2342"/>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2337"/>
+        <location filename="../Pages.cpp" line="2338"/>
         <source>Def</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2361"/>
-        <location filename="../Pages.cpp" line="2379"/>
+        <location filename="../Pages.cpp" line="2362"/>
+        <location filename="../Pages.cpp" line="2380"/>
         <source>From Date</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2362"/>
-        <location filename="../Pages.cpp" line="2380"/>
+        <location filename="../Pages.cpp" line="2363"/>
+        <location filename="../Pages.cpp" line="2381"/>
         <source>Critical Power</source>
         <translation>Potência Crítica</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2409"/>
+        <location filename="../Pages.cpp" line="2410"/>
         <source>Short</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2410"/>
+        <location filename="../Pages.cpp" line="2411"/>
         <source>Long</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2411"/>
+        <location filename="../Pages.cpp" line="2412"/>
         <source>From Watts</source>
         <translation></translation>
     </message>
@@ -2194,47 +2194,87 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
         <translation type="obsolete">Excluir</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1871"/>
+        <location filename="../Pages.cpp" line="1872"/>
         <source>Up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1872"/>
+        <location filename="../Pages.cpp" line="1873"/>
         <source>Down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1859"/>
+        <location filename="../Pages.cpp" line="1860"/>
         <source>+</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1860"/>
+        <location filename="../Pages.cpp" line="1625"/>
+        <source>Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1626"/>
+        <source>Textbox</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1627"/>
+        <source>ShortText</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1628"/>
+        <source>Integer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1629"/>
+        <source>Double</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1630"/>
+        <source>Date</source>
+        <translation type="unfinished">Data</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1631"/>
+        <source>Time</source>
+        <translation type="unfinished">Tempo</translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1632"/>
+        <source>Checkbox</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="1861"/>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1883"/>
+        <location filename="../Pages.cpp" line="1884"/>
         <source>Screen Tab</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1884"/>
+        <location filename="../Pages.cpp" line="1885"/>
         <source>Field</source>
         <translation>Campo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1885"/>
+        <location filename="../Pages.cpp" line="1886"/>
         <source>Type</source>
         <translation>Tipo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1886"/>
+        <location filename="../Pages.cpp" line="1887"/>
         <source>Values</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1887"/>
+        <location filename="../Pages.cpp" line="1888"/>
         <source>Diary</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3635,33 +3675,33 @@ Ajuste de Torque - define um valor absoluto em libra força por polegada quadrad
         <translation type="obsolete">Excluir</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2712"/>
+        <location filename="../Pages.cpp" line="2713"/>
         <source>+</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2713"/>
+        <location filename="../Pages.cpp" line="2714"/>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2725"/>
+        <location filename="../Pages.cpp" line="2726"/>
         <source>Short</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2726"/>
+        <location filename="../Pages.cpp" line="2727"/>
         <source>Long</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2727"/>
+        <location filename="../Pages.cpp" line="2728"/>
         <source>Percent of LT</source>
         <translatorcomment>いまいち</translatorcomment>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2728"/>
+        <location filename="../Pages.cpp" line="2729"/>
         <source>Trimp k</source>
         <translatorcomment>でいいのかな？</translatorcomment>
         <translation></translation>
@@ -3670,12 +3710,12 @@ Ajuste de Torque - define um valor absoluto em libra força por polegada quadrad
 <context>
     <name>HrZonePage</name>
     <message>
-        <location filename="../Pages.cpp" line="2695"/>
+        <location filename="../Pages.cpp" line="2696"/>
         <source>Lactic Threshold</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2696"/>
+        <location filename="../Pages.cpp" line="2697"/>
         <source>Default</source>
         <translation type="unfinished">Padrão</translation>
     </message>
@@ -4429,53 +4469,53 @@ Ajuste de Torque - define um valor absoluto em libra força por polegada quadrad
 <context>
     <name>KeywordsPage</name>
     <message>
-        <location filename="../Pages.cpp" line="1642"/>
+        <location filename="../Pages.cpp" line="1643"/>
         <source>Field</source>
         <translation type="unfinished">Campo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1661"/>
+        <location filename="../Pages.cpp" line="1662"/>
         <source>Up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1662"/>
+        <location filename="../Pages.cpp" line="1663"/>
         <source>Down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1674"/>
+        <location filename="../Pages.cpp" line="1675"/>
         <source>Keyword</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1675"/>
+        <location filename="../Pages.cpp" line="1676"/>
         <source>Color</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1676"/>
+        <location filename="../Pages.cpp" line="1677"/>
         <source>Related Notes Words</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1803"/>
-        <location filename="../Pages.cpp" line="1809"/>
+        <location filename="../Pages.cpp" line="1804"/>
+        <location filename="../Pages.cpp" line="1810"/>
         <source>New</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1811"/>
+        <location filename="../Pages.cpp" line="1812"/>
         <source>New (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1649"/>
+        <location filename="../Pages.cpp" line="1650"/>
         <source>+</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="1650"/>
+        <location filename="../Pages.cpp" line="1651"/>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5049,63 +5089,63 @@ Ajuste de Torque - define um valor absoluto em libra força por polegada quadrad
         <translation type="obsolete">Padrão</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2888"/>
-        <location filename="../Pages.cpp" line="2897"/>
+        <location filename="../Pages.cpp" line="2889"/>
+        <location filename="../Pages.cpp" line="2898"/>
         <source>+</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2889"/>
-        <location filename="../Pages.cpp" line="2898"/>
+        <location filename="../Pages.cpp" line="2890"/>
+        <location filename="../Pages.cpp" line="2899"/>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2894"/>
+        <location filename="../Pages.cpp" line="2895"/>
         <source>Def</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2917"/>
-        <location filename="../Pages.cpp" line="2957"/>
+        <location filename="../Pages.cpp" line="2918"/>
+        <location filename="../Pages.cpp" line="2958"/>
         <source>From Date</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2918"/>
-        <location filename="../Pages.cpp" line="2958"/>
-        <source>Lactic Threshold</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../Pages.cpp" line="2935"/>
+        <location filename="../Pages.cpp" line="2919"/>
         <location filename="../Pages.cpp" line="2959"/>
-        <source>Rest HR</source>
+        <source>Lactic Threshold</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../Pages.cpp" line="2936"/>
         <location filename="../Pages.cpp" line="2960"/>
+        <source>Rest HR</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Pages.cpp" line="2937"/>
+        <location filename="../Pages.cpp" line="2961"/>
         <source>Max HR</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2997"/>
+        <location filename="../Pages.cpp" line="2998"/>
         <source>Short</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2998"/>
+        <location filename="../Pages.cpp" line="2999"/>
         <source>Long</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2999"/>
+        <location filename="../Pages.cpp" line="3000"/>
         <source>From BPM</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3000"/>
+        <location filename="../Pages.cpp" line="3001"/>
         <source>Trimp k</source>
         <translation></translation>
     </message>
@@ -6262,37 +6302,37 @@ Athlete CP set to %3 watts</source>
         <translation type="obsolete">Excluir</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3303"/>
+        <location filename="../Pages.cpp" line="3304"/>
         <source>Up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3304"/>
+        <location filename="../Pages.cpp" line="3305"/>
         <source>Down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3291"/>
+        <location filename="../Pages.cpp" line="3292"/>
         <source>+</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3292"/>
+        <location filename="../Pages.cpp" line="3293"/>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3316"/>
+        <location filename="../Pages.cpp" line="3317"/>
         <source>Screen Tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3317"/>
+        <location filename="../Pages.cpp" line="3318"/>
         <source>Measure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3318"/>
+        <location filename="../Pages.cpp" line="3319"/>
         <source>Type</source>
         <translation type="unfinished">Tipo</translation>
     </message>
@@ -7687,27 +7727,27 @@ on and that its display says, &quot;Host&quot;</source>
 <context>
     <name>ProcessorPage</name>
     <message>
-        <location filename="../Pages.cpp" line="2072"/>
+        <location filename="../Pages.cpp" line="2073"/>
         <source>Processor</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2073"/>
+        <location filename="../Pages.cpp" line="2074"/>
         <source>Apply</source>
         <translation>Aplicar</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2074"/>
+        <location filename="../Pages.cpp" line="2075"/>
         <source>Settings</source>
         <translation>Ajustes</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2098"/>
+        <location filename="../Pages.cpp" line="2099"/>
         <source>Manual</source>
         <translation>Manual</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2099"/>
+        <location filename="../Pages.cpp" line="2100"/>
         <source>Auto</source>
         <translation>Automático</translation>
     </message>
@@ -9338,27 +9378,27 @@ native format. Should we do so?
         <translation type="obsolete">Excluir</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2169"/>
+        <location filename="../Pages.cpp" line="2170"/>
         <source>+</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2170"/>
+        <location filename="../Pages.cpp" line="2171"/>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2182"/>
+        <location filename="../Pages.cpp" line="2183"/>
         <source>Short</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2183"/>
+        <location filename="../Pages.cpp" line="2184"/>
         <source>Long</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2184"/>
+        <location filename="../Pages.cpp" line="2185"/>
         <source>Percent of CP</source>
         <translation></translation>
     </message>
@@ -9459,42 +9499,42 @@ native format. Should we do so?
         <translation type="obsolete">Excluir</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3590"/>
+        <location filename="../Pages.cpp" line="3591"/>
         <source>Up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3591"/>
+        <location filename="../Pages.cpp" line="3592"/>
         <source>Down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3578"/>
+        <location filename="../Pages.cpp" line="3579"/>
         <source>+</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3579"/>
+        <location filename="../Pages.cpp" line="3580"/>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3602"/>
+        <location filename="../Pages.cpp" line="3603"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3603"/>
+        <location filename="../Pages.cpp" line="3604"/>
         <source>Type</source>
         <translation type="unfinished">Tipo</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3604"/>
+        <location filename="../Pages.cpp" line="3605"/>
         <source>From</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="3605"/>
+        <location filename="../Pages.cpp" line="3606"/>
         <source>To</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11283,12 +11323,12 @@ Press F3 on Controller when done.</source>
 <context>
     <name>ZonePage</name>
     <message>
-        <location filename="../Pages.cpp" line="2152"/>
+        <location filename="../Pages.cpp" line="2153"/>
         <source>Critical Power</source>
         <translation type="unfinished">Potência Crítica</translation>
     </message>
     <message>
-        <location filename="../Pages.cpp" line="2153"/>
+        <location filename="../Pages.cpp" line="2154"/>
         <source>Default</source>
         <translation type="unfinished">Padrão</translation>
     </message>
