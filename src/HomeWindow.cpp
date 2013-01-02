@@ -1392,6 +1392,7 @@ HomeWindow::saveState()
 
                 if (QString(p.typeName()) == "int") out<<p.read(chart).toInt();
                 if (QString(p.typeName()) == "double") out<<p.read(chart).toDouble();
+                if (QString(p.typeName()) == "QDate") out<<p.read(chart).toDate().toString();
                 if (QString(p.typeName()) == "QString") out<<xmlprotect(p.read(chart).toString());
                 if (QString(p.typeName()) == "bool") out<<p.read(chart).toBool();
                 if (QString(p.typeName()) == "LTMSettings") {
@@ -1505,6 +1506,7 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
 
         // deprecate dateRange asa chart propert THAT IS DSAVED IN STATE
         if (type == "QString" && name != "dateRange") chart->setProperty(name.toLatin1(), QVariant(QString(value)));
+        if (type == "QDate") chart->setProperty(name.toLatin1(), QVariant(QDate::fromString(value)));
         if (type == "bool") chart->setProperty(name.toLatin1(), QVariant(value.toInt() ? true : false));
         if (type == "LTMSettings") {
             QByteArray base64(value.toLatin1());

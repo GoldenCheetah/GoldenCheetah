@@ -90,12 +90,16 @@ class LTMTool : public QWidget
         QCheckBox *showLegend;
         QPushButton *saveButton;
         QPushButton *manageButton;
+        QRadioButton *radioSelected, *radioCustom;
+        QDateEdit *fromDateEdit, *toDateEdit;
 
     signals:
 
         //void dateRangeSelected(const Season *);
         void filterChanged();
         void metricSelected();
+        void useCustomRange(DateRange); // use the range passed...
+        void useStandardRange();        // fall back to standard date range...
 
     private slots:
         //void dateRangeTreeWidgetSelectionChanged();
@@ -113,6 +117,7 @@ class LTMTool : public QWidget
 
         void clearFilter();
         void setFilter(QStringList);
+        void setDateSettings(); // when settings are updated wrt date selections
 
     private:
 
