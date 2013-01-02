@@ -96,9 +96,12 @@ class LTMWindow : public LTMPlotContainer
 #ifdef GC_HAVE_LUCENE
     Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
 #endif
-    Q_PROPERTY(bool useSelected READ useSelected WRITE setUseSelected USER true)
+    Q_PROPERTY(int useSelected READ useSelected WRITE setUseSelected USER true)
     Q_PROPERTY(QDate fromDate READ fromDate WRITE setFromDate USER true)
     Q_PROPERTY(QDate toDate READ toDate WRITE setToDate USER true)
+    Q_PROPERTY(QDate startDate READ startDate WRITE setStartDate USER true)
+    Q_PROPERTY(int lastN READ lastN WRITE setLastN USER true)
+    Q_PROPERTY(int lastNX READ lastNX WRITE setLastNX USER true)
     Q_PROPERTY(LTMSettings settings READ getSettings WRITE applySettings USER true)
 
     public:
@@ -117,14 +120,20 @@ class LTMWindow : public LTMPlotContainer
         bool legend() const { return ltmTool->showLegend->isChecked(); }
         void setLegend(bool x) { ltmTool->showLegend->setChecked(x); }
 
-        bool useSelected() { return ltmTool->radioSelected->isChecked(); }
-        void setUseSelected(bool x) { ltmTool->radioSelected->setChecked(x);
-                                      ltmTool->radioCustom->setChecked(!x);
-                                    }
+        int useSelected() { return ltmTool->useSelected(); }
+        void setUseSelected(int x) { ltmTool->setUseSelected(x); }
+
         QDate fromDate() { return ltmTool->fromDateEdit->date(); }
         void setFromDate(QDate date)  { return ltmTool->fromDateEdit->setDate(date); }
         QDate toDate() { return ltmTool->toDateEdit->date(); }
         void setToDate(QDate date)  { return ltmTool->toDateEdit->setDate(date); }
+        QDate startDate() { return ltmTool->startDateEdit->date(); }
+        void setStartDate(QDate date)  { return ltmTool->startDateEdit->setDate(date); }
+
+        int lastN() { return ltmTool->lastn->value(); }
+        void setLastN(int x) { ltmTool->lastn->setValue(x); }
+        int lastNX() { return ltmTool->lastnx->currentIndex(); }
+        void setLastNX(int x) { ltmTool->lastnx->setCurrentIndex(x); }
 
 #ifdef GC_HAVE_LUCENE
         QString filter() const { return ltmTool->searchBox->filter(); }
@@ -152,6 +161,7 @@ class LTMWindow : public LTMPlotContainer
 
         void useCustomRange(DateRange);
         void useStandardRange();
+        void useThruToday();
 
     private:
         // passed from MainWindow

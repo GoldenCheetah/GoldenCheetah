@@ -112,6 +112,7 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
     connect(ltmTool->shadeZones, SIGNAL(stateChanged(int)), this, SLOT(shadeZonesClicked(int)));
     connect(ltmTool->showLegend, SIGNAL(stateChanged(int)), this, SLOT(showLegendClicked(int)));
     connect(ltmTool, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
+    connect(ltmTool, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
     connect(ltmTool, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
 
     // connect pickers to ltmPlot
@@ -181,6 +182,16 @@ LTMWindow::useStandardRange()
 {
     useCustom = false;
     dateRangeChanged(myDateRange);
+}
+
+void
+LTMWindow::useThruToday()
+{
+    // plot using the supplied range
+    useCustom = true;
+    custom = myDateRange;
+    if (custom.to > QDate::currentDate()) custom.to = QDate::currentDate();
+    dateRangeChanged(custom);
 }
 
 // total redraw, reread data etc

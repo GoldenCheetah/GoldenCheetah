@@ -73,6 +73,9 @@ class LTMTool : public QWidget
         //void setDateRange(QString);
         //QString _dateRange() const;
 
+        void setUseSelected(int);;
+        int useSelected();
+
         bool isFiltered() { return _amFiltered; }
         QStringList &filters() { return filenames; }
 
@@ -90,8 +93,10 @@ class LTMTool : public QWidget
         QCheckBox *showLegend;
         QPushButton *saveButton;
         QPushButton *manageButton;
-        QRadioButton *radioSelected, *radioCustom;
-        QDateEdit *fromDateEdit, *toDateEdit;
+        QRadioButton *radioSelected, *radioToday, *radioCustom, *radioLast, *radioFrom;
+        QDateEdit *fromDateEdit, *toDateEdit, *startDateEdit;
+        QDoubleSpinBox *lastn;
+        QComboBox *lastnx;
 
     signals:
 
@@ -100,6 +105,7 @@ class LTMTool : public QWidget
         void metricSelected();
         void useCustomRange(DateRange); // use the range passed...
         void useStandardRange();        // fall back to standard date range...
+        void useThruToday();        // fall back to standard date range thru today
 
     private slots:
         //void dateRangeTreeWidgetSelectionChanged();
