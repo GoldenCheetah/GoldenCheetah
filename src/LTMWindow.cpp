@@ -40,6 +40,7 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
 {
     main = parent;
     setInstanceName("Metric Window");
+    useCustom = false;
     plotted = DateRange(QDate(01,01,01), QDate(01,01,01));
 
     // the plot
@@ -110,6 +111,8 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
     connect(ltmTool->presetPicker, SIGNAL(currentIndexChanged(int)), this, SLOT(chartSelected(int)));
     connect(ltmTool->shadeZones, SIGNAL(stateChanged(int)), this, SLOT(shadeZonesClicked(int)));
     connect(ltmTool->showLegend, SIGNAL(stateChanged(int)), this, SLOT(showLegendClicked(int)));
+    connect(ltmTool, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
+    connect(ltmTool, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
 
     // connect pickers to ltmPlot
     connect(_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), ltmPlot, SLOT(pointHover(QwtPlotCurve*, int)));
@@ -158,10 +161,26 @@ void
 LTMWindow::refreshPlot()
 {
     if (amVisible() == true) {
-        plotted = myDateRange;
+        plotted = DateRange(settings.start.date(), settings.end.date());
         ltmPlot->setData(&settings);
         dirty = false;
     }
+}
+
+void
+LTMWindow::useCustomRange(DateRange range)
+{
+    // plot using the supplied range
+    useCustom = true;
+    custom = range;
+    dateRangeChanged(custom);
+}
+
+void
+LTMWindow::useStandardRange()
+{
+    useCustom = false;
+    dateRangeChanged(myDateRange);
 }
 
 // total redraw, reread data etc
@@ -222,8 +241,13 @@ LTMWindow::dateRangeChanged(DateRange range)
 void
 LTMWindow::filterChanged()
 {
-    settings.start = QDateTime(myDateRange.from, QTime(0,0));
-    settings.end   = QDateTime(myDateRange.to, QTime(24,0,0));
+    if (useCustom) {
+        settings.start = QDateTime(custom.from, QTime(0,0));
+        settings.end   = QDateTime(custom.to, QTime(24,0,0));
+    } else {
+        settings.start = QDateTime(myDateRange.from, QTime(0,0));
+        settings.end   = QDateTime(myDateRange.to, QTime(24,0,0));
+    }
     settings.title = myDateRange.name;
     settings.data = &results;
     settings.measures = &measures;

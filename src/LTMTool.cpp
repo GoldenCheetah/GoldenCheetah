@@ -72,8 +72,28 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     QHBoxLayout *presetrow = new QHBoxLayout;
     presetrow->addWidget(presetLabel);
     presetrow->addWidget(presetPicker);
+    presetrow->addStretch();
     basicLayout->addLayout(presetrow);
     basicLayout->addStretch();
+
+    radioSelected = new QRadioButton(tr("Current Selection"), this);
+    radioSelected->setChecked(true);
+    QHBoxLayout *selected = new QHBoxLayout; // use same layout mechanism as custom so they align
+    selected->addWidget(radioSelected);
+    selected->addStretch();
+    basicsettingsLayout->addRow(new QLabel("Date Range"), selected);
+
+    radioCustom = new QRadioButton(tr("From"), this);
+    radioCustom->setChecked(false);
+    fromDateEdit = new QDateEdit(this);
+    toDateEdit = new QDateEdit(this);
+    QHBoxLayout *custom = new QHBoxLayout;
+    custom->addWidget(radioCustom);
+    custom->addWidget(fromDateEdit);
+    custom->addWidget(new QLabel(tr("to")));
+    custom->addWidget(toDateEdit);
+    custom->addStretch();
+    basicsettingsLayout->addRow(new QLabel(""), custom);
 
     groupBy = new QComboBox;
     groupBy->addItem("Days", LTM_DAY);
@@ -85,10 +105,10 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     basicsettingsLayout->addRow(new QLabel("Group by"), groupBy);
 
     shadeZones = new QCheckBox("Shade Zones");
-    basicsettingsLayout->addRow(shadeZones);
+    basicsettingsLayout->addRow(new QLabel(""), shadeZones);
 
     showLegend = new QCheckBox("Show Legend");
-    basicsettingsLayout->addRow(showLegend);
+    basicsettingsLayout->addRow(new QLabel(""), showLegend);
 
     // controls
     saveButton = new QPushButton(tr("Add"));
@@ -550,6 +570,12 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
             this, SLOT(configChanged()));
     connect(metricTree,SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(metricTreePopup(const QPoint &)));
+
+    // switched between one or other
+    connect(radioSelected, SIGNAL(toggled(bool)), this, SLOT(setDateSettings()));
+    connect(fromDateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(setDateSettings()));
+    connect(toDateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(setDateSettings()));
+
 }
 
 QwtPlotCurve::CurveStyle
@@ -927,6 +953,27 @@ LTMTool::setFilter(QStringList files)
         filenames = files;
 
         emit filterChanged();
+}
+
+void 
+LTMTool::setDateSettings()
+{
+    // the date selection types have changed
+    if (radioCustom->isChecked()) {
+        fromDateEdit->setEnabled(true);
+        toDateEdit->setEnabled(true);
+
+        // set date range using custom values
+        emit useCustomRange(DateRange(fromDateEdit->date(), toDateEdit->date()));
+
+    } else {
+
+        fromDateEdit->setEnabled(false);
+        toDateEdit->setEnabled(false);
+
+        emit useStandardRange();
+    }
+
 }
 
 void

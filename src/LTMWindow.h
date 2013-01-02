@@ -96,6 +96,9 @@ class LTMWindow : public LTMPlotContainer
 #ifdef GC_HAVE_LUCENE
     Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
 #endif
+    Q_PROPERTY(bool useSelected READ useSelected WRITE setUseSelected USER true)
+    Q_PROPERTY(QDate fromDate READ fromDate WRITE setFromDate USER true)
+    Q_PROPERTY(QDate toDate READ toDate WRITE setToDate USER true)
     Q_PROPERTY(LTMSettings settings READ getSettings WRITE applySettings USER true)
 
     public:
@@ -113,6 +116,15 @@ class LTMWindow : public LTMPlotContainer
         void setShade(bool x) { ltmTool->shadeZones->setChecked(x); }
         bool legend() const { return ltmTool->showLegend->isChecked(); }
         void setLegend(bool x) { ltmTool->showLegend->setChecked(x); }
+
+        bool useSelected() { return ltmTool->radioSelected->isChecked(); }
+        void setUseSelected(bool x) { ltmTool->radioSelected->setChecked(x);
+                                      ltmTool->radioCustom->setChecked(!x);
+                                    }
+        QDate fromDate() { return ltmTool->fromDateEdit->date(); }
+        void setFromDate(QDate date)  { return ltmTool->fromDateEdit->setDate(date); }
+        QDate toDate() { return ltmTool->toDateEdit->date(); }
+        void setToDate(QDate date)  { return ltmTool->toDateEdit->setDate(date); }
 
 #ifdef GC_HAVE_LUCENE
         QString filter() const { return ltmTool->searchBox->filter(); }
@@ -138,12 +150,17 @@ class LTMWindow : public LTMPlotContainer
         void pointClicked(QwtPlotCurve*, int);
         int groupForDate(QDate, int);
 
+        void useCustomRange(DateRange);
+        void useStandardRange();
 
     private:
         // passed from MainWindow
         QDir home;
         bool useMetricUnits;
         DateRange plotted;
+
+        bool useCustom;
+        DateRange custom; // custom date range supplied
 
         // qwt picker
         LTMToolTip *picker;
