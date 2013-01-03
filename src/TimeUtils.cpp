@@ -204,10 +204,10 @@ DateSettingsEdit::DateSettingsEdit(QWidget *parent) : parent(parent), active(tru
     connect(radioCustom, SIGNAL(toggled(bool)), this, SLOT(setDateSettings()));
     connect(radioLast, SIGNAL(toggled(bool)), this, SLOT(setDateSettings()));
     connect(radioFrom, SIGNAL(toggled(bool)), this, SLOT(setDateSettings()));
-    connect(fromDateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(setDateSettings()));
-    connect(toDateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(setDateSettings()));
-    connect(startDateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(setDateSettings()));
-    connect(lastn, SIGNAL(valueChanged(double)), this, SLOT(setDateSettings()));
+    connect(fromDateEdit, SIGNAL(editingFinished()), this, SLOT(setDateSettings()));
+    connect(toDateEdit, SIGNAL(editingFinished()), this, SLOT(setDateSettings()));
+    connect(startDateEdit, SIGNAL(editingFinished()), this, SLOT(setDateSettings()));
+    connect(lastn, SIGNAL(editingFinished()), this, SLOT(setDateSettings()));
     connect(lastnx, SIGNAL(currentIndexChanged(int)), this, SLOT(setDateSettings()));
 }
 
