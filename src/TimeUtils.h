@@ -20,9 +20,13 @@
 #define _TimeUtils_h
 
 #include <QObject>
-#include <QDateTime>
 #include <QDate>
+#include <QDateEdit>
+#include <QDateTime>
 #include <QString>
+#include <QRadioButton>
+#include <QDoubleSpinBox>
+#include <QComboBox>
 
 QString interval_to_str(double secs);  // output like 1h 2m 3s
 double str_to_interval(QString s);     // convert 1h 2m 3s -> 3123.0 , e.g.
@@ -45,6 +49,53 @@ class DateRange : QObject
 
     signals:
         void changed(QDate from, QDate to);
+};
+
+class DateSettingsEdit : public QWidget
+{
+    Q_OBJECT
+
+    private:
+        QWidget *parent;
+        bool active;
+
+        // editing components
+        QRadioButton *radioSelected, *radioToday, *radioCustom, *radioLast, *radioFrom;
+        QDateEdit *fromDateEdit, *toDateEdit, *startDateEdit;
+        QDoubleSpinBox *lastn;
+        QComboBox *lastnx;
+
+    public:
+
+        DateSettingsEdit(QWidget *parent);
+
+        void setMode(int);
+        int mode();
+
+        // betweem from and to
+        void setFromDate(QDate x) { fromDateEdit->setDate(x); }
+        QDate fromDate() { return fromDateEdit->date(); }
+        void setToDate(QDate x) { toDateEdit->setDate(x); }
+        QDate toDate() { return toDateEdit->date(); }
+
+        // start date till today
+        void setStartDate(QDate x) { startDateEdit->setDate(x); }
+        QDate startDate() { return startDateEdit->date(); }
+
+        // last n of days/weeks/months/years
+        int lastN() { return lastn->value(); }
+        void setLastN(int x)  { lastn->setValue(x); }
+        int lastNX() { return lastnx->currentIndex(); }
+        void setLastNX(int x)  { lastnx->setCurrentIndex(x); }
+
+    private slots:
+        void setDateSettings();
+
+    signals:
+        void useStandardRange();
+        void useThruToday();
+        void useCustomRange(DateRange);
+
 };
 
 #endif // _TimeUtils_h

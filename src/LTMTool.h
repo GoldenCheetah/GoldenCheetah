@@ -93,10 +93,8 @@ class LTMTool : public QWidget
         QCheckBox *showLegend;
         QPushButton *saveButton;
         QPushButton *manageButton;
-        QRadioButton *radioSelected, *radioToday, *radioCustom, *radioLast, *radioFrom;
-        QDateEdit *fromDateEdit, *toDateEdit, *startDateEdit;
-        QDoubleSpinBox *lastn;
-        QComboBox *lastnx;
+
+        DateSettingsEdit *dateSetting;
 
     signals:
 
@@ -123,7 +121,6 @@ class LTMTool : public QWidget
 
         void clearFilter();
         void setFilter(QStringList);
-        void setDateSettings(); // when settings are updated wrt date selections
 
     private:
 

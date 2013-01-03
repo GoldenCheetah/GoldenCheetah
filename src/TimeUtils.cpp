@@ -19,6 +19,8 @@
 #include "TimeUtils.h"
 #include <math.h>
 #include <QRegExpValidator>
+#include <QFormLayout>
+#include <QLabel>
 
 QString time_to_string(double secs)
 {
@@ -120,3 +122,208 @@ DateRange& DateRange::operator=(const DateRange &other)
 
     return *this;
 }
+
+DateSettingsEdit::DateSettingsEdit(QWidget *parent) : parent(parent), active(true)
+{
+    setContentsMargins(0,0,0,0);
+    QFormLayout *mainLayout = new QFormLayout(this);
+    mainLayout->setContentsMargins(0,0,0,0);
+    mainLayout->setSpacing(0);
+
+    QFont sameFont;
+#ifdef Q_OS_MAC
+    sameFont.setPointSize(sameFont.pointSize() + 2);
+#endif
+
+    radioSelected = new QRadioButton(tr("Current selection"), this);
+    radioSelected->setChecked(true);
+    radioSelected->setFont(sameFont);
+    QHBoxLayout *selected = new QHBoxLayout; // use same layout mechanism as custom so they align
+    selected->addWidget(radioSelected);
+    selected->addStretch();
+    mainLayout->addRow(selected);
+
+    radioToday = new QRadioButton(tr("Current selection thru today"), this);
+    radioToday->setChecked(false);
+    radioToday->setFont(sameFont);
+    QHBoxLayout *today = new QHBoxLayout; // use same layout mechanism as custom so they align
+    today->addWidget(radioToday);
+    today->addStretch();
+    mainLayout->addRow(today);
+
+    radioFrom = new QRadioButton(tr("From"), this);
+    radioFrom->setChecked(false);
+    radioFrom->setFont(sameFont);
+    startDateEdit = new QDateEdit(this);
+    startDateEdit->setDate(QDate::currentDate().addMonths(-3));
+    QHBoxLayout *from = new QHBoxLayout;
+    from->addWidget(radioFrom);
+    from->addWidget(startDateEdit);
+    from->addWidget(new QLabel(tr("to today")));
+    from->addStretch();
+    mainLayout->addRow(from);
+
+    radioCustom = new QRadioButton(tr("Between"), this);
+    radioCustom->setFont(sameFont);
+    radioCustom->setChecked(false);
+    fromDateEdit = new QDateEdit(this);
+    toDateEdit = new QDateEdit(this);
+    QHBoxLayout *custom = new QHBoxLayout;
+    custom->addWidget(radioCustom);
+    custom->addWidget(fromDateEdit);
+    custom->addWidget(new QLabel(tr("and")));
+    custom->addWidget(toDateEdit);
+    custom->addStretch();
+    mainLayout->addRow(custom);
+
+    radioLast = new QRadioButton(tr("Last"), this);
+    radioLast->setFont(sameFont);
+    radioLast->setChecked(false);
+    lastn = new QDoubleSpinBox(this);
+    lastn->setSingleStep(1.0);
+    lastn->setDecimals(0);
+    lastn->setMinimum(0);
+    lastn->setMaximum(999);
+    lastn->setValue(7);
+    lastnx = new QComboBox(this);
+    lastnx->addItem(tr("days"));
+    lastnx->addItem(tr("weeks"));
+    lastnx->addItem(tr("months"));
+    lastnx->addItem(tr("years"));
+    lastnx->setCurrentIndex(0);
+    QHBoxLayout *last = new QHBoxLayout;
+    last->addWidget(radioLast);
+    last->addWidget(lastn);
+    last->addWidget(lastnx);
+    last->addStretch();
+    mainLayout->addRow(last);
+
+    // switched between one or other
+    connect(radioSelected, SIGNAL(toggled(bool)), this, SLOT(setDateSettings()));
+    connect(radioToday, SIGNAL(toggled(bool)), this, SLOT(setDateSettings()));
+    connect(radioCustom, SIGNAL(toggled(bool)), this, SLOT(setDateSettings()));
+    connect(radioLast, SIGNAL(toggled(bool)), this, SLOT(setDateSettings()));
+    connect(radioFrom, SIGNAL(toggled(bool)), this, SLOT(setDateSettings()));
+    connect(fromDateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(setDateSettings()));
+    connect(toDateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(setDateSettings()));
+    connect(startDateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(setDateSettings()));
+    connect(lastn, SIGNAL(valueChanged(double)), this, SLOT(setDateSettings()));
+    connect(lastnx, SIGNAL(currentIndexChanged(int)), this, SLOT(setDateSettings()));
+}
+
+void 
+DateSettingsEdit::setDateSettings()
+{
+    if (active) return;
+
+    // first lets disable everything
+    active = true;
+    fromDateEdit->setEnabled(false);
+    toDateEdit->setEnabled(false);
+    startDateEdit->setEnabled(false);
+    lastn->setEnabled(false);
+    lastnx->setEnabled(false);
+
+    // the date selection types have changed
+    if (radioSelected->isChecked()) {
+
+        // current selection
+        emit useStandardRange();
+
+    } else if (radioCustom->isChecked()) {
+
+        // between x and y
+        fromDateEdit->setEnabled(true);
+        toDateEdit->setEnabled(true);
+
+        // set date range using custom values
+        emit useCustomRange(DateRange(fromDateEdit->date(), toDateEdit->date()));
+
+    } else if (radioToday->isChecked()) {
+
+        // current selected thru to today
+        emit useThruToday();
+
+    } else if (radioLast->isChecked()) {
+
+        // last n 'weeks etc'
+        lastn->setEnabled(true);
+        lastnx->setEnabled(true);
+
+        QDate from;
+        QDate today = QDate::currentDate();
+
+        // calculate range up to today...
+        switch(lastnx->currentIndex()) {
+            case 0 : // days
+                from = today.addDays(lastn->value() * -1);
+                break;
+
+            case 1 :  // weeks
+                from = today.addDays(lastn->value() * -7);
+                break;
+
+            case 2 :  // months
+                from = today.addMonths(lastn->value() * -1);
+                break;
+
+            case 3 : // years
+                from = today.addYears(lastn->value() * -1);
+                break;
+        }
+
+        emit useCustomRange(DateRange(from, today));
+
+    } else if (radioFrom->isChecked()) {
+
+        // from date - today
+        startDateEdit->setEnabled(true);
+        emit useCustomRange(DateRange(startDateEdit->date(), QDate::currentDate()));
+
+    }
+    active = false;
+
+}
+
+int
+DateSettingsEdit::mode()
+{
+    if (radioSelected->isChecked()) return 0;
+    if (radioFrom->isChecked()) return 1;
+    if (radioCustom->isChecked()) return 2;
+    if (radioLast->isChecked()) return 3;
+    if (radioToday->isChecked()) return 4;
+
+    return 0; // keep compiler happy
+}
+
+void
+DateSettingsEdit::setMode(int x)
+{
+    active = true;
+    radioSelected->setChecked(false);
+    radioFrom->setChecked(false);
+    radioCustom->setChecked(false);
+    radioLast->setChecked(false);
+    radioToday->setChecked(false);
+    active = false;
+
+    switch(x) {
+    case 0:
+        radioSelected->setChecked(true);
+        break;
+    case 1:
+        radioFrom->setChecked(true);
+        break;
+    case 2:
+        radioCustom->setChecked(true);
+        break;
+    case 3:
+        radioLast->setChecked(true);
+        break;
+    case 4:
+        radioToday->setChecked(true);
+        break;
+    }
+}
+
