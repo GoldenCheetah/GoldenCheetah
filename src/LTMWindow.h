@@ -120,20 +120,20 @@ class LTMWindow : public LTMPlotContainer
         bool legend() const { return ltmTool->showLegend->isChecked(); }
         void setLegend(bool x) { ltmTool->showLegend->setChecked(x); }
 
-        int useSelected() { return ltmTool->useSelected(); }
-        void setUseSelected(int x) { ltmTool->setUseSelected(x); }
+        int useSelected() { return ltmTool->dateSetting->mode(); }
+        void setUseSelected(int x) { ltmTool->dateSetting->setMode(x); }
 
-        QDate fromDate() { return ltmTool->fromDateEdit->date(); }
-        void setFromDate(QDate date)  { return ltmTool->fromDateEdit->setDate(date); }
-        QDate toDate() { return ltmTool->toDateEdit->date(); }
-        void setToDate(QDate date)  { return ltmTool->toDateEdit->setDate(date); }
-        QDate startDate() { return ltmTool->startDateEdit->date(); }
-        void setStartDate(QDate date)  { return ltmTool->startDateEdit->setDate(date); }
+        QDate fromDate() { return ltmTool->dateSetting->fromDate(); }
+        void setFromDate(QDate date)  { return ltmTool->dateSetting->setFromDate(date); }
+        QDate toDate() { return ltmTool->dateSetting->toDate(); }
+        void setToDate(QDate date)  { return ltmTool->dateSetting->setToDate(date); }
+        QDate startDate() { return ltmTool->dateSetting->startDate(); }
+        void setStartDate(QDate date)  { return ltmTool->dateSetting->setStartDate(date); }
 
-        int lastN() { return ltmTool->lastn->value(); }
-        void setLastN(int x) { ltmTool->lastn->setValue(x); }
-        int lastNX() { return ltmTool->lastnx->currentIndex(); }
-        void setLastNX(int x) { ltmTool->lastnx->setCurrentIndex(x); }
+        int lastN() { return ltmTool->dateSetting->lastN(); }
+        void setLastN(int x) { ltmTool->dateSetting->setLastN(x); }
+        int lastNX() { return ltmTool->dateSetting->lastNX(); }
+        void setLastNX(int x) { ltmTool->dateSetting->setLastNX(x); }
 
 #ifdef GC_HAVE_LUCENE
         QString filter() const { return ltmTool->searchBox->filter(); }
