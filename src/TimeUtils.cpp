@@ -22,7 +22,6 @@
 #include <QRegExpValidator>
 #include <QFormLayout>
 #include <QLabel>
-#include <QDebug>
 
 QString time_to_string(double secs)
 {
@@ -324,7 +323,6 @@ DateSettingsEdit::setDateSettings()
                 int dow = today.dayOfWeek(); // 1-7, where 1=monday
                 from = today.addDays(-1 * (dow-1));
                 to = from.addDays(6);
-qDebug()<<"preperiod="<<prevperiod->value();
                 // prevperiods
                 from = from.addDays(prevperiod->value() * -7);
                 to = to.addDays(prevperiod->value() * -7);
