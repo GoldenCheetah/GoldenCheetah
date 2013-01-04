@@ -96,13 +96,14 @@ class LTMWindow : public LTMPlotContainer
 #ifdef GC_HAVE_LUCENE
     Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
 #endif
-    Q_PROPERTY(int useSelected READ useSelected WRITE setUseSelected USER true)
     Q_PROPERTY(QDate fromDate READ fromDate WRITE setFromDate USER true)
     Q_PROPERTY(QDate toDate READ toDate WRITE setToDate USER true)
     Q_PROPERTY(QDate startDate READ startDate WRITE setStartDate USER true)
     Q_PROPERTY(int lastN READ lastN WRITE setLastN USER true)
     Q_PROPERTY(int lastNX READ lastNX WRITE setLastNX USER true)
+    Q_PROPERTY(int prevN READ prevN WRITE setPrevN USER true)
     Q_PROPERTY(LTMSettings settings READ getSettings WRITE applySettings USER true)
+    Q_PROPERTY(int useSelected READ useSelected WRITE setUseSelected USER true) // !! must be last property !!
 
     public:
 
@@ -134,6 +135,9 @@ class LTMWindow : public LTMPlotContainer
         void setLastN(int x) { ltmTool->dateSetting->setLastN(x); }
         int lastNX() { return ltmTool->dateSetting->lastNX(); }
         void setLastNX(int x) { ltmTool->dateSetting->setLastNX(x); }
+
+        int prevN() { return ltmTool->dateSetting->prevN(); }
+        void setPrevN(int x) { ltmTool->dateSetting->setPrevN(x); }
 
 #ifdef GC_HAVE_LUCENE
         QString filter() const { return ltmTool->searchBox->filter(); }

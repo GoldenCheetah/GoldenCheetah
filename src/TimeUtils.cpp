@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2007 Sean C. Rhea (srhea@srhea.net)
+ * Copyright (c) 2012 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -21,6 +22,7 @@
 #include <QRegExpValidator>
 #include <QFormLayout>
 #include <QLabel>
+#include <QDebug>
 
 QString time_to_string(double secs)
 {
@@ -198,17 +200,42 @@ DateSettingsEdit::DateSettingsEdit(QWidget *parent) : parent(parent), active(tru
     last->addStretch();
     mainLayout->addRow(last);
 
+    radioThis = new QRadioButton(tr("This"), this);
+    radioThis->setFont(sameFont);
+    radioThis->setChecked(false);
+    thisperiod = new QComboBox(this);
+    thisperiod->addItem(tr("week"));
+    thisperiod->addItem(tr("month"));
+    thisperiod->addItem(tr("year"));
+    thisperiod->setCurrentIndex(0);
+    prevperiod = new QDoubleSpinBox(this);
+    prevperiod->setSingleStep(1.0);
+    prevperiod->setDecimals(0);
+    prevperiod->setMinimum(0);
+    prevperiod->setMaximum(999);
+    prevperiod->setValue(0);
+    QHBoxLayout *thisl = new QHBoxLayout;
+    thisl->addWidget(radioThis);
+    thisl->addWidget(thisperiod);
+    thisl->addWidget(new QLabel(tr("prior")));
+    thisl->addWidget(prevperiod);
+    thisl->addStretch();
+    mainLayout->addRow(thisl);
+
     // switched between one or other
     connect(radioSelected, SIGNAL(toggled(bool)), this, SLOT(setDateSettings()));
     connect(radioToday, SIGNAL(toggled(bool)), this, SLOT(setDateSettings()));
     connect(radioCustom, SIGNAL(toggled(bool)), this, SLOT(setDateSettings()));
     connect(radioLast, SIGNAL(toggled(bool)), this, SLOT(setDateSettings()));
     connect(radioFrom, SIGNAL(toggled(bool)), this, SLOT(setDateSettings()));
+    connect(radioThis, SIGNAL(toggled(bool)), this, SLOT(setDateSettings()));
     connect(fromDateEdit, SIGNAL(editingFinished()), this, SLOT(setDateSettings()));
     connect(toDateEdit, SIGNAL(editingFinished()), this, SLOT(setDateSettings()));
     connect(startDateEdit, SIGNAL(editingFinished()), this, SLOT(setDateSettings()));
     connect(lastn, SIGNAL(editingFinished()), this, SLOT(setDateSettings()));
     connect(lastnx, SIGNAL(currentIndexChanged(int)), this, SLOT(setDateSettings()));
+    connect(thisperiod, SIGNAL(currentIndexChanged(int)), this, SLOT(setDateSettings()));
+    connect(prevperiod, SIGNAL(editingFinished()), this, SLOT(setDateSettings()));
 }
 
 void 
@@ -221,6 +248,8 @@ DateSettingsEdit::setDateSettings()
     fromDateEdit->setEnabled(false);
     toDateEdit->setEnabled(false);
     startDateEdit->setEnabled(false);
+    thisperiod->setEnabled(false);
+    prevperiod->setEnabled(false);
     lastn->setEnabled(false);
     lastnx->setEnabled(false);
 
@@ -280,9 +309,46 @@ DateSettingsEdit::setDateSettings()
         startDateEdit->setEnabled(true);
         emit useCustomRange(DateRange(startDateEdit->date(), QDate::currentDate()));
 
+    } else if (radioThis->isChecked()) {
+
+        thisperiod->setEnabled(true);
+        prevperiod->setEnabled(true);
+
+        QDate today = QDate::currentDate();
+        QDate from, to;
+
+        switch(thisperiod->currentIndex()) {
+
+        case 0 : // weeks
+            {
+                int dow = today.dayOfWeek(); // 1-7, where 1=monday
+                from = today.addDays(-1 * (dow-1));
+                to = from.addDays(6);
+qDebug()<<"preperiod="<<prevperiod->value();
+                // prevperiods
+                from = from.addDays(prevperiod->value() * -7);
+                to = to.addDays(prevperiod->value() * -7);
+            }
+            break;
+
+        case 1 : // months
+            from = QDate(today.year(), today.month(), 1);
+            to = from.addMonths(1).addDays(-1);
+            from = from.addMonths(prevperiod->value() * -1);
+            to = to.addMonths(prevperiod->value() * -1);
+            break;
+
+        case 2 : // years
+            from = QDate(today.year(), 1, 1);
+            to = from.addYears(1).addDays(-1);
+            from = from.addYears(prevperiod->value() * -1);
+            to = to.addYears(prevperiod->value() * -1);
+            break;
+
+        }
+        emit useCustomRange(DateRange(from, to));
     }
     active = false;
-
 }
 
 int
@@ -293,6 +359,7 @@ DateSettingsEdit::mode()
     if (radioCustom->isChecked()) return 2;
     if (radioLast->isChecked()) return 3;
     if (radioToday->isChecked()) return 4;
+    if (radioThis->isChecked()) return 5;
 
     return 0; // keep compiler happy
 }
@@ -306,6 +373,7 @@ DateSettingsEdit::setMode(int x)
     radioCustom->setChecked(false);
     radioLast->setChecked(false);
     radioToday->setChecked(false);
+    radioThis->setChecked(false);
     active = false;
 
     switch(x) {
@@ -323,6 +391,9 @@ DateSettingsEdit::setMode(int x)
         break;
     case 4:
         radioToday->setChecked(true);
+        break;
+    case 5:
+        radioThis->setChecked(true);
         break;
     }
 }
