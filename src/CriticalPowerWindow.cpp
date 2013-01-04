@@ -34,7 +34,7 @@
 #include <QXmlSimpleReader>
 
 CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, bool rangemode) :
-    GcWindow(parent), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), mainWindow(parent), currentRide(NULL), rangemode(rangemode), stale(true)
+    GcWindow(parent), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), mainWindow(parent), currentRide(NULL), rangemode(rangemode), stale(true), useCustom(false)
 {
     setInstanceName("Critical Power Window");
 
@@ -46,7 +46,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
 
     // controls
     QWidget *c = new QWidget;
-    QVBoxLayout *cl = new QVBoxLayout(c);
+    QFormLayout *cl = new QFormLayout(c);
     setControls(c);
 
 #ifdef GC_HAVE_LUCENE
@@ -56,11 +56,11 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     connect(searchBox, SIGNAL(searchResults(QStringList)), cpintPlot, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(filterChanged()));
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(filterChanged()));
-    cl->addWidget(searchBox);
+    cl->addRow(new QLabel(tr("Filter")), searchBox);
+    cl->addWidget(new QLabel("")); //spacing
 #endif
 
     // picker details
-    QFormLayout *cpintPickerLayout = new QFormLayout;
     QLabel *cpintTimeLabel = new QLabel(tr("Duration:"), this);
     cpintTimeValue = new QLineEdit("0 s");
     QLabel *cpintTodayLabel = new QLabel(tr("Today:"), this);
@@ -86,11 +86,11 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     cpintAllValue->setFont(font);
     cpintCPValue->setFont(font);
 
-    cpintPickerLayout->addRow(cpintTimeLabel, cpintTimeValue);
-    cpintPickerLayout->addRow(cpintTodayLabel, cpintTodayValue);
-    cpintPickerLayout->addRow(cpintAllLabel, cpintAllValue);
-    cpintPickerLayout->addRow(cpintCPLabel, cpintCPValue);
-    cl->addLayout(cpintPickerLayout);
+    cl->addRow(cpintTimeLabel, cpintTimeValue);
+    cl->addRow(cpintTodayLabel, cpintTodayValue);
+    cl->addRow(cpintAllLabel, cpintAllValue);
+    cl->addRow(cpintCPLabel, cpintCPValue);
+    cl->addWidget(new QLabel("")); //spacing
 
     // tools /properties
     seriesCombo = new QComboBox(this);
@@ -98,14 +98,28 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     cComboSeason = new QComboBox(this);
     seasons = parent->seasons;
     resetSeasons();
-    if (rangemode) cComboSeason->hide();
+    QLabel *label = new QLabel(tr("Date range"));
+    QLabel *label2 = new QLabel(tr("Date range"));
+    if (rangemode) {
+        cComboSeason->hide();
+        label2->hide();
+    }
 
     cpintSetCPButton = new QPushButton(tr("&Save CP value"), this);
     cpintSetCPButton->setEnabled(false);
-    cl->addWidget(cpintSetCPButton);
-    cl->addWidget(cComboSeason);
-    cl->addWidget(seriesCombo);
-    cl->addStretch();
+    cl->addRow(label2, cComboSeason);
+
+    dateSetting = new DateSettingsEdit(this);
+    cl->addRow(label, dateSetting);
+
+    if (rangemode == false) {
+        dateSetting->hide();
+        label->hide();
+    }
+
+    cl->addWidget(new QLabel("")); //spacing
+    cl->addRow(new QLabel(tr("Data series")), seriesCombo);
+    cl->addRow(new QLabel(""), cpintSetCPButton);
 
     picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
                                QwtPicker::VLineRubberBand,
@@ -116,10 +130,11 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     connect(picker, SIGNAL(moved(const QPoint &)), SLOT(pickerMoved(const QPoint &)));
     connect(cpintTimeValue, SIGNAL(editingFinished()), this, SLOT(cpintTimeValueEntered()));
     connect(cpintSetCPButton, SIGNAL(clicked()), this, SLOT(cpintSetCPButtonClicked()));
-    if (rangemode)
+    if (rangemode) {
         connect(this, SIGNAL(dateRangeChanged(DateRange)), SLOT(dateRangeChanged(DateRange)));
-    else
+    } else {
         connect(cComboSeason, SIGNAL(currentIndexChanged(int)), this, SLOT(seasonSelected(int)));
+    }
 
     connect(seriesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setSeries(int)));
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
@@ -131,6 +146,10 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
     connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
+
+    connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
+    connect(dateSetting, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
+    connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
 }
 
 void
@@ -382,10 +401,40 @@ CriticalPowerWindow::resetSeasons()
 }
 
 void
+CriticalPowerWindow::useCustomRange(DateRange range)
+{
+    // plot using the supplied range
+    useCustom = true;
+    custom = range;
+    dateRangeChanged(custom);
+}
+
+void
+CriticalPowerWindow::useStandardRange()
+{
+    useCustom = false;
+    dateRangeChanged(myDateRange);
+}
+
+void
+CriticalPowerWindow::useThruToday()
+{
+    // plot using the supplied range
+    useCustom = true;
+    custom = myDateRange;
+    if (custom.to > QDate::currentDate()) custom.to = QDate::currentDate();
+    dateRangeChanged(custom);
+}
+
+void
 CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
 {
     if (!amVisible()) return;
 
+    // it will either be sidebar or custom...
+    if (useCustom) dateRange = custom;
+    else dateRange = myDateRange;
+    
     if (dateRange.from == cfrom && dateRange.to == cto && !stale) return;
 
     cpintPlot->changeSeason(dateRange.from, dateRange.to);
