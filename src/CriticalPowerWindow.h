@@ -46,6 +46,14 @@ class CriticalPowerWindow : public GcWindow
     // for retro compatibility
     Q_PROPERTY(QString season READ season WRITE setSeason USER true)
 
+    Q_PROPERTY(QDate fromDate READ fromDate WRITE setFromDate USER true)
+    Q_PROPERTY(QDate toDate READ toDate WRITE setToDate USER true)
+    Q_PROPERTY(QDate startDate READ startDate WRITE setStartDate USER true)
+    Q_PROPERTY(int lastN READ lastN WRITE setLastN USER true)
+    Q_PROPERTY(int lastNX READ lastNX WRITE setLastNX USER true)
+    Q_PROPERTY(int prevN READ prevN WRITE setPrevN USER true)
+    Q_PROPERTY(int useSelected READ useSelected WRITE setUseSelected USER true) // !! must be last property !!
+
     public:
 
         CriticalPowerWindow(const QDir &home, MainWindow *parent, bool range = false);
@@ -78,6 +86,24 @@ class CriticalPowerWindow : public GcWindow
                 (seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
         }
 
+        int useSelected() { return dateSetting->mode(); }
+        void setUseSelected(int x) { dateSetting->setMode(x); }
+
+        QDate fromDate() { return dateSetting->fromDate(); }
+        void setFromDate(QDate date)  { return dateSetting->setFromDate(date); }
+        QDate toDate() { return dateSetting->toDate(); }
+        void setToDate(QDate date)  { return dateSetting->setToDate(date); }
+        QDate startDate() { return dateSetting->startDate(); }
+        void setStartDate(QDate date)  { return dateSetting->setStartDate(date); }
+
+        int lastN() { return dateSetting->lastN(); }
+        void setLastN(int x) { dateSetting->setLastN(x); }
+        int lastNX() { return dateSetting->lastNX(); }
+        void setLastNX(int x) { dateSetting->setLastNX(x); }
+
+        int prevN() { return dateSetting->prevN(); }
+        void setPrevN(int x) { dateSetting->setPrevN(x); }
+
     protected slots:
         void newRideAdded(RideItem*);
         void cpintTimeValueEntered();
@@ -89,6 +115,10 @@ class CriticalPowerWindow : public GcWindow
         void resetSeasons();
         void filterChanged();
         void dateRangeChanged(DateRange);
+
+        void useCustomRange(DateRange);
+        void useStandardRange();
+        void useThruToday();
 
     private:
         void updateCpint(double minutes);
@@ -120,6 +150,10 @@ class CriticalPowerWindow : public GcWindow
         bool rangemode;
         QDate cfrom, cto;
         bool stale;
+        bool useCustom;
+        DateRange custom;
+
+        DateSettingsEdit *dateSetting;
 };
 
 #endif // _GC_CriticalPowerWindow_h
