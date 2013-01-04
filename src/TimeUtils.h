@@ -60,10 +60,11 @@ class DateSettingsEdit : public QWidget
         bool active;
 
         // editing components
-        QRadioButton *radioSelected, *radioToday, *radioCustom, *radioLast, *radioFrom;
+        QRadioButton *radioSelected, *radioToday, *radioCustom, *radioLast, *radioFrom, *radioThis;
         QDateEdit *fromDateEdit, *toDateEdit, *startDateEdit;
-        QDoubleSpinBox *lastn;
+        QDoubleSpinBox *lastn,*prevperiod;
         QComboBox *lastnx;
+        QComboBox *thisperiod;
 
     public:
 
@@ -87,6 +88,12 @@ class DateSettingsEdit : public QWidget
         void setLastN(int x)  { lastn->setValue(x); }
         int lastNX() { return lastnx->currentIndex(); }
         void setLastNX(int x)  { lastnx->setCurrentIndex(x); }
+
+        // this week/month/year
+        int thisN() { return thisperiod->currentIndex(); }
+        void setThisN(int x) { thisperiod->setCurrentIndex(x); }
+        int prevN() { return prevperiod->value(); }
+        void setPrevN(int x) { return prevperiod->setValue(x); }
 
     private slots:
         void setDateSettings();
