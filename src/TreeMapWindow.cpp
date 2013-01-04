@@ -36,7 +36,7 @@
 
 TreeMapWindow::TreeMapWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) :
             GcWindow(parent), main(parent), home(home),
-            useMetricUnits(useMetricUnits), active(false), dirty(true)
+            useMetricUnits(useMetricUnits), active(false), dirty(true), useCustom(false)
 {
     setInstanceName("Treemap Window");
 
@@ -84,6 +84,7 @@ TreeMapWindow::TreeMapWindow(MainWindow *parent, bool useMetricUnits, const QDir
 
     cl->addRow(new QLabel("First"), field1);
     cl->addRow(new QLabel("Second"), field2);
+    cl->addRow(new QLabel(tr(""))); // spacing
 
     // metric selector .. just ride metrics
     metricTree = new QTreeWidget;
@@ -120,6 +121,10 @@ TreeMapWindow::TreeMapWindow(MainWindow *parent, bool useMetricUnits, const QDir
     }
     metricTree->expandItem(allMetrics);
     cl->addRow(new QLabel("Metric"), metricTree);
+    dateSetting = new DateSettingsEdit(this);
+    cl->addRow(new QLabel(tr(""))); // spacing
+    cl->addRow(new QLabel("Date range"), dateSetting);
+    cl->addRow(new QLabel(tr(""))); // spacing
 
     // chart settings changed
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
@@ -135,6 +140,11 @@ TreeMapWindow::TreeMapWindow(MainWindow *parent, bool useMetricUnits, const QDir
 
     // user clicked on a cell in the plot
     connect(ltmPlot, SIGNAL(clicked(QString,QString)), this, SLOT(cellClicked(QString,QString)));
+
+    // date settings
+    connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
+    connect(dateSetting, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
+    connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
 
     // lets refresh / setup state
     refresh();
@@ -156,6 +166,32 @@ TreeMapWindow::refreshPlot()
     ltmPlot->setData(&settings);
 }
 
+void
+TreeMapWindow::useCustomRange(DateRange range)
+{
+    // plot using the supplied range
+    useCustom = true;
+    custom = range;
+    dateRangeChanged(custom);
+}
+
+void
+TreeMapWindow::useStandardRange()
+{
+    useCustom = false;
+    dateRangeChanged(myDateRange);
+}
+
+void
+TreeMapWindow::useThruToday()
+{
+    // plot using the supplied range
+    useCustom = true;
+    custom = myDateRange;
+    if (custom.to > QDate::currentDate()) custom.to = QDate::currentDate();
+    dateRangeChanged(custom);
+}
+
 // total redraw, reread data etc
 void
 TreeMapWindow::refresh()
@@ -174,16 +210,22 @@ TreeMapWindow::refresh()
                 settings.symbol = symbol;
             }
         }
-        settings.from = myDateRange.from;
-        settings.to = myDateRange.to;
+
+        if (useCustom) {
+            settings.from = custom.from;
+            settings.to = custom.to;
+        } else {
+            settings.from = myDateRange.from;
+            settings.to = myDateRange.to;
+        }
         settings.field1 = field1->currentText();
         settings.field2 = field2->currentText();
         settings.data = &results;
 
         // get the data
         results.clear(); // clear any old data
-        results = main->metricDB->getAllMetricsFor(QDateTime(myDateRange.from, QTime(0,0,0)),
-                                                   QDateTime(myDateRange.to, QTime(0,0,0)));
+        results = main->metricDB->getAllMetricsFor(QDateTime(settings.from, QTime(0,0,0)),
+                                                   QDateTime(settings.to, QTime(0,0,0)));
 
         refreshPlot();
     }

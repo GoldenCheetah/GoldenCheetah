@@ -52,6 +52,13 @@ class TreeMapWindow : public GcWindow
     Q_PROPERTY(QString f1 READ f1 WRITE setf1 USER true)
     Q_PROPERTY(QString f2 READ f2 WRITE setf2 USER true)
     Q_PROPERTY(QString metric READ symbol WRITE setsymbol USER true)
+    Q_PROPERTY(QDate fromDate READ fromDate WRITE setFromDate USER true)
+    Q_PROPERTY(QDate toDate READ toDate WRITE setToDate USER true)
+    Q_PROPERTY(QDate startDate READ startDate WRITE setStartDate USER true)
+    Q_PROPERTY(int lastN READ lastN WRITE setLastN USER true)
+    Q_PROPERTY(int lastNX READ lastNX WRITE setLastNX USER true)
+    Q_PROPERTY(int prevN READ prevN WRITE setPrevN USER true)
+    Q_PROPERTY(int useSelected READ useSelected WRITE setUseSelected USER true) // !! must be last property !!
 
     public:
 
@@ -63,6 +70,23 @@ class TreeMapWindow : public GcWindow
         void setf1(QString x) const { field1->setCurrentIndex(field1->findText(x)); }
         QString f2() const { return field2->currentText(); }
         void setf2(QString x) const { field2->setCurrentIndex(field1->findText(x)); }
+        int useSelected() { return dateSetting->mode(); }
+        void setUseSelected(int x) { dateSetting->setMode(x); }
+
+        QDate fromDate() { return dateSetting->fromDate(); }
+        void setFromDate(QDate date)  { return dateSetting->setFromDate(date); }
+        QDate toDate() { return dateSetting->toDate(); }
+        void setToDate(QDate date)  { return dateSetting->setToDate(date); }
+        QDate startDate() { return dateSetting->startDate(); }
+        void setStartDate(QDate date)  { return dateSetting->setStartDate(date); }
+
+        int lastN() { return dateSetting->lastN(); }
+        void setLastN(int x) { dateSetting->setLastN(x); }
+        int lastNX() { return dateSetting->lastNX(); }
+        void setLastNX(int x) { dateSetting->setLastNX(x); }
+
+        int prevN() { return dateSetting->prevN(); }
+        void setPrevN(int x) { dateSetting->setPrevN(x); }
 
         QString symbol() const {
             // we got a selection?
@@ -96,11 +120,16 @@ class TreeMapWindow : public GcWindow
         void fieldSelected(int);
         void cellClicked(QString, QString); // cell clicked
 
+        void useCustomRange(DateRange);
+        void useStandardRange();
+        void useThruToday();
+
     private:
         // passed from MainWindow
         QDir home;
         bool useMetricUnits;
         TMSettings settings;
+        DateSettingsEdit *dateSetting;
 
         // popup - the GcPane to display within
         //         and the LTMPopup contents widdget
@@ -110,6 +139,8 @@ class TreeMapWindow : public GcWindow
         // local state
         bool active;
         bool dirty;
+        bool useCustom;
+        DateRange custom; // custom date range supplied
         QList<KeywordDefinition> keywordDefinitions;
         QList<FieldDefinition>   fieldDefinitions;
         QList<SummaryMetrics> results;
