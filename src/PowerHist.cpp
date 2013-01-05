@@ -377,7 +377,7 @@ PowerHist::recalc(bool force)
         const double zero = 0;
         curve->setData(&zero, &zero, 0);
         curveSelected->setData(&zero, &zero, 0);
-        replot();
+        updatePlot();
         return;
     }
 
@@ -543,7 +543,7 @@ PowerHist::recalc(bool force)
 
     setYMax();
     configChanged(); // setup the curve colors to appropriate values
-    replot();
+    updatePlot();
 }
 
 void
@@ -626,6 +626,13 @@ PowerHist::setData(RideFileCache *cache)
     }
 
     curveSelected->hide();
+}
+
+void
+PowerHist::updatePlot()
+{
+    replot();
+    zoomer->setZoomBase();
 }
 
 void
@@ -808,7 +815,7 @@ PowerHist::setData(RideItem *_rideItem, bool force)
         const double zero = 0;
         curve->setData(&zero, &zero, 0);
         curveSelected->setData(&zero, &zero, 0);
-        replot();
+        updatePlot();
     }
     curveSelected->show();
     zoomer->setZoomBase();
@@ -896,7 +903,7 @@ PowerHist::setlnY(bool value)
 
     }
     setYMax();
-    replot();
+    updatePlot();
 }
 
 void
