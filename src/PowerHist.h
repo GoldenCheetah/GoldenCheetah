@@ -132,6 +132,9 @@ class PowerHist : public QwtPlot
         void recalc(bool force=false);
         void refreshZoneLabels();
 
+        // redraw, reset zoom base
+        void updatePlot();
+
     protected:
 
         void refreshHRZoneLabels();
