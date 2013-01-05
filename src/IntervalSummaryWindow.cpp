@@ -106,7 +106,9 @@ void IntervalSummaryWindow::calcInterval(IntervalItem* interval, QString& html)
         if (m->units(metricUnits) == "seconds" ||
             m->units(metricUnits) == tr("seconds"))
             html += s.arg(time_to_string(m->value(metricUnits)));
-        else
+        else if (m->internalName() == "Pace") {
+            html += s.arg(QTime(0,0,0,0).addSecs(m->value(metricUnits)*60).toString("mm:ss"));
+        } else
             html += s.arg(m->value(metricUnits), 0, 'f', m->precision());
 
         html += "<td align=\"left\" valign=\"bottom\">";
