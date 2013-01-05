@@ -29,7 +29,7 @@
 
 static inline NSString *darwinQStringToNSString (const QString &aString)
 {
-    return [reinterpret_cast<const NSString *> (CFStringCreateWithCharacters
+    return [(CFStringCreateWithCharacters
             (0, reinterpret_cast<const UniChar *> (aString.unicode()), aString.length())) autorelease];
 }
 
