@@ -33,11 +33,29 @@
 #include <math.h>
 
 RideSummaryWindow::RideSummaryWindow(MainWindow *mainWindow, bool ridesummary) :
-     GcWindow(mainWindow), mainWindow(mainWindow), ridesummary(ridesummary)
+     GcWindow(mainWindow), mainWindow(mainWindow), ridesummary(ridesummary), useCustom(false)
 {
     setInstanceName("Ride Summary Window");
-    setControls(NULL);
     setRideItem(NULL);
+
+    // allow user to select date range if in summary mode
+    dateSetting = new DateSettingsEdit(this);
+    if (ridesummary) {
+
+        setControls(NULL);
+        dateSetting->hide(); // not needed, but holds property values
+
+    } else {
+
+        QWidget *c = new QWidget;
+        c->setContentsMargins(0,0,0,0);
+        QFormLayout *cl = new QFormLayout(c);
+        cl->setContentsMargins(0,0,0,0);
+        cl->setSpacing(0);
+        setControls(c);
+
+        cl->addRow(new QLabel(tr("Date range")), dateSetting);
+    }
 
     QVBoxLayout *vlayout = new QVBoxLayout;
     vlayout->setSpacing(0);
@@ -55,13 +73,22 @@ RideSummaryWindow::RideSummaryWindow(MainWindow *mainWindow, bool ridesummary) :
     vlayout->addWidget(rideSummary);
 
     if (ridesummary) {
+
         connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideItemChanged()));
         connect(mainWindow, SIGNAL(zonesChanged()), this, SLOT(refresh()));
         connect(mainWindow, SIGNAL(intervalsChanged()), this, SLOT(refresh()));
+
     } else {
+
         connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
         connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
         connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
+
+        // date settings
+        connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
+        connect(dateSetting, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
+        connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
+
     }
     setLayout(vlayout);
 }
@@ -434,6 +461,31 @@ RideSummaryWindow::htmlSummary() const
     return summary;
 }
 
+void
+RideSummaryWindow::useCustomRange(DateRange range)
+{
+    // plot using the supplied range
+    useCustom = true;
+    custom = range;
+    dateRangeChanged(custom);
+}
+
+void
+RideSummaryWindow::useStandardRange()
+{
+    useCustom = false;
+    dateRangeChanged(myDateRange);
+}
+
+void
+RideSummaryWindow::useThruToday()
+{
+    // plot using the supplied range
+    useCustom = true;
+    custom = myDateRange;
+    if (custom.to > QDate::currentDate()) custom.to = QDate::currentDate();
+    dateRangeChanged(custom);
+}
 void RideSummaryWindow::dateRangeChanged(DateRange dr)
 {
     if (!amVisible()) return;
@@ -442,6 +494,8 @@ void RideSummaryWindow::dateRangeChanged(DateRange dr)
     if (dr.from == current.from && dr.to == current.to) return;
     else current = dr;
 
-    data = mainWindow->metricDB->getAllMetricsFor(myDateRange);
+    if (useCustom) data = mainWindow->metricDB->getAllMetricsFor(custom);
+    else data = mainWindow->metricDB->getAllMetricsFor(myDateRange);
+
     refresh();
 }
