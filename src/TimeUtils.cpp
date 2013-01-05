@@ -124,7 +124,7 @@ DateRange& DateRange::operator=(const DateRange &other)
     return *this;
 }
 
-DateSettingsEdit::DateSettingsEdit(QWidget *parent) : parent(parent), active(true)
+DateSettingsEdit::DateSettingsEdit(QWidget *parent) : parent(parent), active(false)
 {
     setContentsMargins(0,0,0,0);
     QFormLayout *mainLayout = new QFormLayout(this);
