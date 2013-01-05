@@ -402,6 +402,7 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
 {
     QString units;
     enabled = NULL;
+    isTime = false;
 
     if (meta->sp.isMetric(field.name)) {
         field.type = FIELD_DOUBLE; // whatever they say, we want a double!
@@ -463,10 +464,24 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
         ((QDoubleSpinBox*)widget)->setSingleStep(0.01);
         ((QDoubleSpinBox*)widget)->setMaximum(999999.99);
         if (meta->sp.isMetric(field.name)) {
+
             enabled = new QCheckBox(this);
             connect(enabled, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
+            units = meta->sp.rideMetric(field.name)->units(meta->main->useMetricUnits);
+
+            if (units == "seconds") {
+                // we need to use a TimeEdit instead
+                delete widget;
+                widget = new QTimeEdit(this);
+                ((QTimeEdit*)widget)->setDisplayFormat("hh:mm:ss");
+                connect(widget, SIGNAL(timeChanged(QTime)), this, SLOT(dataChanged()));
+                isTime = true;
+            } else {
+                connect (widget, SIGNAL(valueChanged(double)), this, SLOT(dataChanged()));
+            }
+        } else {
+            connect (widget, SIGNAL(valueChanged(double)), this, SLOT(dataChanged()));
         }
-        connect (widget, SIGNAL(valueChanged(double)), this, SLOT(dataChanged()));
         connect (widget, SIGNAL(editingFinished()), this, SLOT(editFinished()));
         break;
 
@@ -511,7 +526,11 @@ FormField::~FormField()
                                  delete ((QTextEdit*)widget);
                              break;
         case FIELD_INTEGER : delete ((QSpinBox*)widget); break;
-        case FIELD_DOUBLE : delete ((QDoubleSpinBox*)widget); break;
+        case FIELD_DOUBLE : {
+                                if (!isTime) delete ((QDoubleSpinBox*)widget); 
+                                else delete ((QTimeEdit*)widget);
+                            }
+                            break;
         case FIELD_DATE : delete ((QDateEdit*)widget); break;
         case FIELD_TIME : delete ((QTimeEdit*)widget); break;
         case FIELD_CHECKBOX : delete ((QCheckBox*)widget); break;
@@ -555,7 +574,13 @@ FormField::editFinished()
         }
 
     case FIELD_INTEGER : text = QString("%1").arg(((QSpinBox*)widget)->value()); break;
-    case FIELD_DOUBLE : text = QString("%1").arg(((QDoubleSpinBox*)widget)->value()); break;
+    case FIELD_DOUBLE : {
+                            if (!isTime) text = QString("%1").arg(((QDoubleSpinBox*)widget)->value());
+                            else {
+                                text = QString("%1").arg(QTime(0,0,0,0).secsTo(((QTimeEdit*)widget)->time()));
+                            }
+                        }
+                        break;
     case FIELD_DATE : text = ((QDateEdit*)widget)->date().toString("dd.MM.yyyy"); break;
     case FIELD_TIME : text = ((QTimeEdit*)widget)->time().toString("hh:mm:ss.zzz"); break;
     }
@@ -659,7 +684,8 @@ FormField::stateChanged(int state)
 
         // clear and reset override value for this metric
         override.insert("value", QString("%1").arg(0.0)); // add metric value
-        ((QDoubleSpinBox *)widget)->setValue(0.0);
+        if (isTime) ((QTimeEdit*)widget)->setTime(QTime(0,0,0,0));
+        else ((QDoubleSpinBox *)widget)->setValue(0.0);
 
     } else if (override.contains("value")) // clear override value
          override.remove("value");
@@ -741,7 +767,8 @@ FormField::metadataChanged()
         break;
 
     case FIELD_DOUBLE : // double
-        ((QDoubleSpinBox*)widget)->setValue(value.toDouble());
+        if (isTime) ((QTimeEdit*)widget)->setTime(QTime(0,0,0,0).addSecs(value.toDouble()));
+        else ((QDoubleSpinBox*)widget)->setValue(value.toDouble());
         break;
 
     case FIELD_DATE : // date
