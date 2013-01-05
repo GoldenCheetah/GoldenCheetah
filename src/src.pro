@@ -64,7 +64,7 @@ LIBS += -lm $${LIBZ_LIBS}
                       $${KML_INSTALL}/lib/libkmlengine.a \
                       $${KML_INSTALL}/lib/libkmlbase.a
     }
-    INCLUDEPATH += $${KML_INCLUDE}
+    INCLUDEPATH += $${KML_INCLUDE} $${BOOST_INCLUDE}
     LIBS        += $${KML_LIBS}
     DEFINES     += GC_HAVE_KML
     SOURCES     += KmlRideFile.cpp
