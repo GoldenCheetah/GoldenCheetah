@@ -33,11 +33,34 @@ class RideSummaryWindow : public GcWindow
     Q_OBJECT
     G_OBJECT
 
+    Q_PROPERTY(QDate fromDate READ fromDate WRITE setFromDate USER true)
+    Q_PROPERTY(QDate toDate READ toDate WRITE setToDate USER true)
+    Q_PROPERTY(QDate startDate READ startDate WRITE setStartDate USER true)
+    Q_PROPERTY(int lastN READ lastN WRITE setLastN USER true)
+    Q_PROPERTY(int lastNX READ lastNX WRITE setLastNX USER true)
+    Q_PROPERTY(int prevN READ prevN WRITE setPrevN USER true)
+    Q_PROPERTY(int useSelected READ useSelected WRITE setUseSelected USER true) // !! must be last property !!
 
     public:
 
         // two modes - summarise ride or summarise date range
         RideSummaryWindow(MainWindow *parent, bool ridesummary = true);
+
+        // properties
+        int useSelected() { return dateSetting->mode(); }
+        void setUseSelected(int x) { dateSetting->setMode(x); }
+        QDate fromDate() { return dateSetting->fromDate(); }
+        void setFromDate(QDate date)  { return dateSetting->setFromDate(date); }
+        QDate toDate() { return dateSetting->toDate(); }
+        void setToDate(QDate date)  { return dateSetting->setToDate(date); }
+        QDate startDate() { return dateSetting->startDate(); }
+        void setStartDate(QDate date)  { return dateSetting->setStartDate(date); }
+        int lastN() { return dateSetting->lastN(); }
+        void setLastN(int x) { dateSetting->setLastN(x); }
+        int lastNX() { return dateSetting->lastNX(); }
+        void setLastNX(int x) { dateSetting->setLastNX(x); }
+        int prevN() { return dateSetting->prevN(); }
+        void setPrevN(int x) { dateSetting->setPrevN(x); }
 
     protected slots:
 
@@ -46,6 +69,11 @@ class RideSummaryWindow : public GcWindow
         void dateRangeChanged(DateRange);
         void rideItemChanged();
         void metadataChanged();
+
+        // date settings
+        void useCustomRange(DateRange);
+        void useStandardRange();
+        void useThruToday();
 
     protected:
 
@@ -59,6 +87,10 @@ class RideSummaryWindow : public GcWindow
 
         QList<SummaryMetrics> data; // when in date range mode
         DateRange current;
+
+        DateSettingsEdit *dateSetting;
+        bool useCustom;
+        DateRange custom;
 };
 
 #endif // _GC_RideSummaryWindow_h
