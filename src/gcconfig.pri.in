@@ -107,6 +107,10 @@
 #KML_INSTALL = /usr/local
 #KML_INCLUDE = 
 #KML_LIBS    = 
+# Since KML also requires BOOST you will need to install
+# that too and then set BOOST_INCLUDE to that location
+# If the files are in /usr/include/boost then set
+#BOOST_INCLUDE = /usr/include
 
 # If you want support for downloading from iCal calendars you will need libical
 #     http://sourceforge.net/projects/freeassociation/
