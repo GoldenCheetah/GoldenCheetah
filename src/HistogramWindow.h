@@ -49,6 +49,13 @@ class HistogramWindow : public GcWindow
 #ifdef GC_HAVE_LUCENE
     Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
 #endif
+    Q_PROPERTY(QDate fromDate READ fromDate WRITE setFromDate USER true)
+    Q_PROPERTY(QDate toDate READ toDate WRITE setToDate USER true)
+    Q_PROPERTY(QDate startDate READ startDate WRITE setStartDate USER true)
+    Q_PROPERTY(int lastN READ lastN WRITE setLastN USER true)
+    Q_PROPERTY(int lastNX READ lastNX WRITE setLastNX USER true)
+    Q_PROPERTY(int prevN READ prevN WRITE setPrevN USER true)
+    Q_PROPERTY(int useSelected READ useSelected WRITE setUseSelected USER true) // !! must be last property !!
 
     public:
 
@@ -73,6 +80,21 @@ class HistogramWindow : public GcWindow
         QString filter() const { return searchBox->filter(); }
         void setFilter(QString x) { searchBox->setFilter(x); }
 #endif
+        // properties
+        int useSelected() { return dateSetting->mode(); }
+        void setUseSelected(int x) { dateSetting->setMode(x); }
+        QDate fromDate() { return dateSetting->fromDate(); }
+        void setFromDate(QDate date)  { return dateSetting->setFromDate(date); }
+        QDate toDate() { return dateSetting->toDate(); }
+        void setToDate(QDate date)  { return dateSetting->setToDate(date); }
+        QDate startDate() { return dateSetting->startDate(); }
+        void setStartDate(QDate date)  { return dateSetting->setStartDate(date); }
+        int lastN() { return dateSetting->lastN(); }
+        void setLastN(int x) { dateSetting->setLastN(x); }
+        int lastNX() { return dateSetting->lastNX(); }
+        void setLastNX(int x) { dateSetting->setLastNX(x); }
+        int prevN() { return dateSetting->prevN(); }
+        void setPrevN(int x) { dateSetting->setPrevN(x); }
 
     public slots:
 
@@ -84,6 +106,10 @@ class HistogramWindow : public GcWindow
         void clearFilter();
         void setFilter(QStringList files);
 #endif
+        // date settings
+        void useCustomRange(DateRange);
+        void useStandardRange();
+        void useThruToday();
         void dateRangeChanged(DateRange);
 
     protected slots:
@@ -125,6 +151,9 @@ class HistogramWindow : public GcWindow
 #endif
 
         bool rangemode;
+        DateSettingsEdit *dateSetting;
+        bool useCustom;
+        DateRange custom;
 };
 
 #endif // _GC_HistogramWindow_h

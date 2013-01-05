@@ -30,12 +30,12 @@
 #include "Zones.h"
 #include "HrZones.h"
 
-HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWindow(mainWindow), mainWindow(mainWindow), stale(true), source(NULL), rangemode(rangemode)
+HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWindow(mainWindow), mainWindow(mainWindow), stale(true), source(NULL), rangemode(rangemode), useCustom(false)
 {
     setInstanceName("Histogram Window");
 
     QWidget *c = new QWidget;
-    QVBoxLayout *cl = new QVBoxLayout(c);
+    QFormLayout *cl = new QFormLayout(c);
     setControls(c);
 
     // plot
@@ -50,8 +50,21 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
     searchBox = new SearchFilterBox(this, mainWindow);
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
-    cl->addWidget(searchBox);
+    cl->addRow(new QLabel(tr("Filter")), searchBox);
 #endif
+
+    // spacing if we have a range
+    if (rangemode) cl->addWidget(new QLabel(""));
+
+    // date selection
+    dateSetting = new DateSettingsEdit(this);
+    cl->addRow(new QLabel(tr("Date Range")), dateSetting);
+
+    // data series
+    cl->addWidget(new QLabel("")); // spacing
+    seriesCombo = new QComboBox();
+    addSeries();
+    cl->addRow(new QLabel(tr("Data Series")), seriesCombo);
 
     // bin width
     QHBoxLayout *binWidthLayout = new QHBoxLayout;
@@ -59,7 +72,6 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
     binWidthLineEdit = new QLineEdit(this);
     binWidthLineEdit->setFixedWidth(30);
 
-    binWidthLayout->addWidget(binWidthLabel);
     binWidthLayout->addWidget(binWidthLineEdit);
     binWidthSlider = new QSlider(Qt::Horizontal);
     binWidthSlider->setTickPosition(QSlider::TicksBelow);
@@ -67,35 +79,32 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
     binWidthSlider->setMinimum(1);
     binWidthSlider->setMaximum(100);
     binWidthLayout->addWidget(binWidthSlider);
-    cl->addLayout(binWidthLayout);
-
-    showLnY = new QCheckBox;
-    showLnY->setText(tr("Log Y"));
-    cl->addWidget(showLnY);
-
-    showZeroes = new QCheckBox;
-    showZeroes->setText(tr("With zeros"));
-    cl->addWidget(showZeroes);
-
-    shadeZones = new QCheckBox;
-    shadeZones->setText(tr("Shade zones"));
-    shadeZones->setChecked(powerHist->shade);
-    cl->addWidget(shadeZones);
-
-    showInZones = new QCheckBox;
-    showInZones->setText(tr("Show in zones"));
-    cl->addWidget(showInZones);
-
-    seriesCombo = new QComboBox();
-    addSeries();
-    cl->addWidget(seriesCombo);
+    cl->addRow(binWidthLabel, binWidthLayout);
 
     showSumY = new QComboBox();
     showSumY->addItem(tr("Absolute Time"));
     showSumY->addItem(tr("Percentage Time"));
 
-    cl->addWidget(showSumY);
-    cl->addStretch();
+    cl->addWidget(new QLabel("")); // spacing
+    cl->addRow(new QLabel("Show"), showSumY);
+
+    showLnY = new QCheckBox;
+    showLnY->setText(tr("Log Y"));
+    cl->addRow(new QLabel(""), showLnY);
+
+    showZeroes = new QCheckBox;
+    showZeroes->setText(tr("With zeros"));
+    cl->addRow(new QLabel(""), showZeroes);
+
+    shadeZones = new QCheckBox;
+    shadeZones->setText(tr("Shade zones"));
+    shadeZones->setChecked(powerHist->shade);
+    cl->addRow(new QLabel(""), shadeZones);
+
+    showInZones = new QCheckBox;
+    showInZones->setText(tr("Show in zones"));
+    cl->addRow(new QLabel(""), showInZones);
+
 
     // sort out default values
     setHistTextValidator();
@@ -113,8 +122,10 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
     connect(binWidthLineEdit, SIGNAL(editingFinished()), this, SLOT(setBinWidthFromLineEdit()));
 
     // when season changes we need to retrieve data from the cache then update the chart
-    if (rangemode) connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
-    else {
+    if (rangemode) {
+        connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
+    } else {
+        dateSetting->hide();
         connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
         connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     }
@@ -181,6 +192,32 @@ HistogramWindow::zonesChanged()
 
     powerHist->refreshZoneLabels();
     powerHist->replot();
+}
+
+void
+HistogramWindow::useCustomRange(DateRange range)
+{
+    // plot using the supplied range
+    useCustom = true;
+    custom = range;
+    dateRangeChanged(custom);
+}
+
+void
+HistogramWindow::useStandardRange()
+{
+    useCustom = false;
+    dateRangeChanged(myDateRange);
+}
+
+void
+HistogramWindow::useThruToday()
+{
+    // plot using the supplied range
+    useCustom = true;
+    custom = myDateRange;
+    if (custom.to > QDate::currentDate()) custom.to = QDate::currentDate();
+    dateRangeChanged(custom);
 }
 
 void HistogramWindow::dateRangeChanged(DateRange dateRange)
@@ -270,13 +307,15 @@ HistogramWindow::updateChart()
 
         if (rangemode) {
 
+            DateRange use = useCustom ? custom : myDateRange;
+
 #ifdef GC_HAVE_LUCENE
-            source = new RideFileCache(mainWindow, myDateRange.from, myDateRange.to, isFiltered, files);
+            source = new RideFileCache(mainWindow, use.from, use.to, isFiltered, files);
 #else
-            source = new RideFileCache(mainWindow, myDateRange.from, myDateRange.to);
+            source = new RideFileCache(mainWindow, use.from, use.to);
 #endif
-            cfrom = myDateRange.from;
-            cto = myDateRange.to;
+            cfrom = use.from;
+            cto = use.to;
             stale = false;
 
             if (old) delete old; // guarantee source pointer changes
