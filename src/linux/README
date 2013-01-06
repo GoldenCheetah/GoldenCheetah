@@ -11,6 +11,6 @@ On UBUNTU and other Debian based distros this is achieved by
 writing a rules file and placing it in /etc/udev/rules.d.
 
 We have createed that file (51-garmin-usb.rules) here and 
-you will need to copy it into /dev/udev/rules.d for the
+you will need to copy it into /etc/udev/rules.d for the
 Garmin stick to be accessable from GoldenCheetah when run
 as a normal (not root) user.
