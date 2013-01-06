@@ -121,7 +121,6 @@ TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile
     lap_triggerMethod.appendChild(text);
     lap.appendChild(lap_triggerMethod);
 
-
     // samples
     // data points: timeoffset, dist, hr, spd, pwr, torq, cad, lat, lon, alt
     if (!ride->dataPoints().empty()) {
@@ -134,7 +133,7 @@ TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile
 
             // time
             QDomElement time = doc.createElement("Time");
-            text = doc.createTextNode(ride->startTime().toUTC().addSecs(point->secs).toString(Qt::ISODate)+"Z");
+            text = doc.createTextNode(ride->startTime().toUTC().addSecs(point->secs).toString(Qt::ISODate));
             time.appendChild(text);
             trackpoint.appendChild(time);
 
