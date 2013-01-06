@@ -320,6 +320,7 @@ HomeWindow::selected()
 
     resizeEvent(NULL); // force a relayout
     rideSelected();
+    dateRangeChanged(DateRange());
 
     setUpdatesEnabled(true);
     update();
