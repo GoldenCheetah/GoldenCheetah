@@ -195,7 +195,7 @@ BlankStateTrainPage::BlankStateTrainPage(MainWindow *main) : BlankStatePage(main
     ShortCut scAddDevice;
     // - add a realtime device
     // - find video and workouts
-    scAddDevice.label = tr("Scan and add device for realtime.");
+    scAddDevice.label = tr("Find and add a training devices.");
     scAddDevice.buttonLabel = tr("Add device");
     scAddDevice.buttonIconPath = ":images/mac/download.png";
     QPushButton *addDeviceButton = addToShortCuts(scAddDevice);
@@ -203,9 +203,9 @@ BlankStateTrainPage::BlankStateTrainPage(MainWindow *main) : BlankStatePage(main
 
 
     ShortCut scImportWorkout;
-    scImportWorkout.label = tr("Import Video or Workout from Disk.");
-    scImportWorkout.buttonLabel = tr("Import Video/Workout");
-    scImportWorkout.buttonIconPath = ":images/mac/download.png";
+    scImportWorkout.label = tr("Find and Import your videos and workouts.");
+    scImportWorkout.buttonLabel = tr("Scan hard drives");
+    scImportWorkout.buttonIconPath = ":images/toolbar/Disk.png";
     QPushButton *importWorkoutButton = addToShortCuts(scImportWorkout);
-    connect(importWorkoutButton, SIGNAL(clicked()), main, SLOT(importWorkout()));
+    connect(importWorkoutButton, SIGNAL(clicked()), main, SLOT(manageLibrary()));
 }
