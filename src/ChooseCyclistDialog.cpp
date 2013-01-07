@@ -59,10 +59,11 @@ ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) :
             this, SLOT(accept()));
 
     QHBoxLayout *buttonLayout = new QHBoxLayout;
-    buttonLayout->addWidget(okButton);
     if (allowNew)
         buttonLayout->addWidget(newButton);
+    buttonLayout->addStretch();
     buttonLayout->addWidget(cancelButton);
+    buttonLayout->addWidget(okButton);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(listWidget);
