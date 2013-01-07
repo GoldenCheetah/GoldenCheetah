@@ -688,7 +688,8 @@ MainWindow::MainWindow(const QDir &home) :
     // ANALYSIS WINDOW & CONTRAOLS
     analWindow = new HomeWindow(this, "analysis", "Analysis");
     analysisControls->addWidget(analWindow->controls());
-    currentWindow = analWindow;
+
+    currentWindow = NULL;
 
     // NO RIDE WINDOW - Replace analysis, home and train window when no ride
     blankStateAnalysisPage = new BlankStateAnalysisPage(this);
@@ -942,7 +943,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     // Kick off
     rideTreeWidgetSelectionChanged();
-    analWindow->selected();
+    selectAnalysis();
 #ifdef Q_OS_MAC
     scopebar->setShowSidebar(true);
 #endif
@@ -996,7 +997,7 @@ MainWindow::showToolbar(bool want)
 void
 MainWindow::setChartMenu()
 {
-    unsigned int mask;
+    unsigned int mask=0;
     // called when chart menu about to be shown
     // setup to only show charts that are relevant
     // to this view
@@ -1006,6 +1007,8 @@ MainWindow::setChartMenu()
     if (currentWindow == homeWindow) mask = VIEW_HOME;
 
     chartMenu->clear();
+    if (!mask) return;
+
     for(int i=0; GcWindows[i].relevance; i++) {
         if (GcWindows[i].relevance & mask) 
             chartMenu->addAction(GcWindows[i].name);
@@ -1015,7 +1018,7 @@ MainWindow::setChartMenu()
 void
 MainWindow::setSubChartMenu()
 {
-    unsigned int mask;
+    unsigned int mask=0;
     // called when chart menu about to be shown
     // setup to only show charts that are relevant
     // to this view
@@ -1025,6 +1028,8 @@ MainWindow::setSubChartMenu()
     if (currentWindow == homeWindow) mask = VIEW_HOME;
 
     subChartMenu->clear();
+    if (!mask) return;
+
     for(int i=0; GcWindows[i].relevance; i++) {
         if (GcWindows[i].relevance & mask) 
             subChartMenu->addAction(GcWindows[i].name);
