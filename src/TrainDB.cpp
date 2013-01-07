@@ -256,6 +256,21 @@ void TrainDB::checkDBVersion()
     if (dropVideo) dropVideoTable();
 }
 
+int TrainDB::getCount()
+{
+    // how many workouts are there?
+    QSqlQuery query("SELECT count(*) from workouts;", dbconn);
+    bool rc = query.exec();
+
+    if (rc) {
+        while (query.next()) {
+            return query.value(0).toInt();
+        }
+    }
+
+    return 0;
+}
+
 int TrainDB::getDBVersion()
 {
     int schema_version = -1;

@@ -120,6 +120,7 @@
 
 #include "Library.h"
 #include "LibraryParser.h"
+#include "TrainDB.h"
 
 QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 
@@ -1493,7 +1494,9 @@ MainWindow::selectAnalysis()
 void
 MainWindow::selectTrain()
 {
-    if (allRides->childCount() == 0) {
+    // no devices configured -or- only the manual mode workouts defined
+    // we need to get setup properly...
+    if (appsettings->value(this, GC_DEV_COUNT) == 0 || trainDB->getCount() <= 2) {
         masterControls->setVisible(false);
         toolBox->hide();
 #ifndef Q_OS_MAC
