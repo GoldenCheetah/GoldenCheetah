@@ -57,6 +57,7 @@ BlankStatePage::BlankStatePage(MainWindow *main) : main(main)
     right->setLayout(rightLayout);
 
     img = new QToolButton(this);
+    img->setFocusPolicy(Qt::NoFocus);
     img->setToolButtonStyle(Qt::ToolButtonIconOnly);
     img->setStyleSheet("QToolButton {text-align: left;color : blue;background: transparent}");
     rightLayout->addWidget(img);
@@ -94,6 +95,7 @@ BlankStatePage::addToShortCuts(ShortCut shortCut)
     leftLayout->addWidget(shortCutLabel);
 
     QPushButton *shortCutButton = new QPushButton(this);
+    shortCutButton->setFocusPolicy(Qt::NoFocus);
     shortCutButton->setText(shortCut.buttonLabel);
     shortCutButton->setIcon(QPixmap(shortCut.buttonIconPath));
     shortCutButton->setIconSize(QSize(60,60));
