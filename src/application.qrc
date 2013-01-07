@@ -124,5 +124,8 @@
         <file>images/mac/show.png</file>
         <file>images/nogps.png</file>
         <file>images/analysis.png</file>
+        <file>images/home.png</file>
+        <file>images/diary.png</file>
+        <file>images/train.png</file>
     </qresource>
 </RCC>
