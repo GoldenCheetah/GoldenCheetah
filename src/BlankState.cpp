@@ -187,7 +187,7 @@ BlankStateDiaryPage::BlankStateDiaryPage(MainWindow *main) : BlankStatePage(main
 BlankStateTrainPage::BlankStateTrainPage(MainWindow *main) : BlankStatePage(main)
 {
     welcomeTitle->setText("Train");
-    welcomeText->setText("No ride ?\nLet's start with some data.");
+    welcomeText->setText("No devices or workouts ?\nLet's get you setup.");
 
     img->setIcon(QPixmap(":images/train.png"));
     img->setIconSize(QSize(800,330));
@@ -195,7 +195,7 @@ BlankStateTrainPage::BlankStateTrainPage(MainWindow *main) : BlankStatePage(main
     ShortCut scAddDevice;
     // - add a realtime device
     // - find video and workouts
-    scAddDevice.label = tr("Find and add a training devices.");
+    scAddDevice.label = tr("Find and add training devices.");
     scAddDevice.buttonLabel = tr("Add device");
     scAddDevice.buttonIconPath = ":images/mac/download.png";
     QPushButton *addDeviceButton = addToShortCuts(scAddDevice);
@@ -208,4 +208,11 @@ BlankStateTrainPage::BlankStateTrainPage(MainWindow *main) : BlankStatePage(main
     scImportWorkout.buttonIconPath = ":images/toolbar/Disk.png";
     QPushButton *importWorkoutButton = addToShortCuts(scImportWorkout);
     connect(importWorkoutButton, SIGNAL(clicked()), main, SLOT(manageLibrary()));
+
+    ShortCut scDownloadWorkout;
+    scDownloadWorkout.label = tr("Download workout files from the Erg DB.");
+    scDownloadWorkout.buttonLabel = tr("Download workouts");
+    scDownloadWorkout.buttonIconPath = ":images/mac/download.png";
+    QPushButton *downloadWorkoutButton = addToShortCuts(scDownloadWorkout);
+    connect(downloadWorkoutButton, SIGNAL(clicked()), main, SLOT(downloadErgDB()));
 }
