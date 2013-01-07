@@ -41,6 +41,7 @@ class TrainDB : public QObject
 
     // get schema version
     int getDBVersion();
+    int getCount();
 
     // create and drop connections
 	TrainDB(QDir home);
