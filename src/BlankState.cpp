@@ -193,6 +193,8 @@ BlankStateTrainPage::BlankStateTrainPage(MainWindow *main) : BlankStatePage(main
     img->setIconSize(QSize(800,330));
 
     ShortCut scAddDevice;
+    // - add a realtime device
+    // - find video and workouts
     scAddDevice.label = tr("Scan and add device for realtime.");
     scAddDevice.buttonLabel = tr("Add device");
     scAddDevice.buttonIconPath = ":images/mac/download.png";
