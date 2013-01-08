@@ -29,7 +29,7 @@
 SearchBox::SearchBox(MainWindow *main, QWidget *parent)
     : QLineEdit(parent), main(main)
 {
-
+    setFixedHeight(26);
     //clear button
     clearButton = new QToolButton(this);
     QPixmap pixmap(":images/toolbar/clear.png");
@@ -70,21 +70,18 @@ SearchBox::SearchBox(MainWindow *main, QWidget *parent)
     setStyleSheet(QString( //"QLineEdit { padding-right: %1px; } "
                           "QLineEdit#SearchBox {"
                           "    selection-color: white;   "
-                          //"    border: 0px groove gray;"
-                          "    border-radius: 5px;"
+                          "    border: 1px groove lightGray;"
                           "    padding: 0px %1px;"
                           "}"
                           "QLineEdit#SearchBox:focus {"
                           "    selection-color: white;   "
-                          //"    border: 0px groove gray;"
-                          "    border-radius: 5px;"
+                          "    border: 1px groove lightGray;"
                           "    padding: 0px %1px;"
                           "}"
                           ""
                           "QLineEdit#SearchBox:edit-focus {"
                           "    selection-color: white;   "
-                          //"    border: 0px groove gray;"
-                          "    border-radius: 5px;"
+                          "    border: 1px groove lightGray;"
                           "    padding: 0px %1px;"
                           "}"
                           "QMenu { background-color: white; color: black; }"
