@@ -123,6 +123,7 @@
 #include "TrainDB.h"
 
 QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
+QDesktopWidget *desktop = NULL;
 
 MainWindow::MainWindow(const QDir &home) :
     home(home), session(0), isclean(false), ismultisave(false),
@@ -130,6 +131,7 @@ MainWindow::MainWindow(const QDir &home) :
     ride(NULL), workout(NULL)
 {
 
+    if (desktop == NULL) desktop = QApplication::desktop();
     static const QIcon hideIcon(":images/toolbar/main/hideside.png");
     static const QIcon rhideIcon(":images/toolbar/main/hiderside.png");
     static const QIcon showIcon(":images/toolbar/main/showside.png");
@@ -159,11 +161,38 @@ MainWindow::MainWindow(const QDir &home) :
 
     setAttribute(Qt::WA_DeleteOnClose);
 
+
     // need to restore geometry before setUnifiedToolBar.. on Mac
     appsettings->setValue(GC_SETTINGS_LAST, home.dirName());
     QVariant geom = appsettings->value(this, GC_SETTINGS_MAIN_GEOM);
-    if (geom == QVariant()) resize(640, 480);
-    else setGeometry(geom.toRect());
+    if (geom == QVariant()) {
+
+        // first run -- lets set some sensible defaults...
+        // lets put it in the middle of screen 1
+        QRect size = desktop->availableGeometry();
+        struct Appearance app = GCColor::defaultSizes(size.height(), size.width());
+
+        // center on the available screen (minus toolbar/sidebar)
+        move((size.width()-size.x())/2 - app.width/2,
+             (size.height()-size.y())/2 - app.height/2);
+
+        // set to the right default
+        resize(app.width, app.height);
+
+        // set all the default font sizes
+        appsettings->setValue(GC_FONT_DEFAULT_SIZE, app.defaultFont);
+        appsettings->setValue(GC_FONT_TITLES_SIZE, app.titleFont);
+        appsettings->setValue(GC_FONT_CHARTMARKERS_SIZE, app.markerFont);
+        appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, app.labelFont);
+        appsettings->setValue(GC_FONT_CALENDAR_SIZE, app.calendarFont);
+        appsettings->setValue(GC_FONT_POPUP_SIZE, app.popupFont);
+
+        // set the default fontsize
+        QFont font;
+        font.setPointSize(app.defaultFont);
+        QApplication::setFont(font);
+
+    } else setGeometry(geom.toRect());
 
 
 #ifdef Q_OS_MAC // MAC NATIVE TOOLBAR

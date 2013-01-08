@@ -76,6 +76,7 @@ class BlankStateDiaryPage;
 class BlankStateTrainPage;
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
+extern QDesktopWidget *desktop;         // how many screens / res etc
 
 class MainWindow : public QMainWindow
 {
