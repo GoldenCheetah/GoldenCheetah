@@ -36,6 +36,7 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
 
     QWidget *c = new QWidget;
     QFormLayout *cl = new QFormLayout(c);
+    cl->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     setControls(c);
 
     // plot

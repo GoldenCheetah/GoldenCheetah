@@ -50,6 +50,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     QWidget *basicsettings = new QWidget(this);
     mainLayout->addWidget(basicsettings);
     QFormLayout *basicsettingsLayout = new QFormLayout(basicsettings);
+    basicsettingsLayout->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
 
 #ifdef GC_HAVE_LUCENE
     searchBox = new SearchFilterBox(this, main);
