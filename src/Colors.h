@@ -27,7 +27,7 @@
 class MainWindow;
 
 // set appearace defaults based upon screen size
-struct Appearance {
+struct SizeSettings {
 
     // this applies up to the following geometry
     int maxheight,
@@ -46,7 +46,7 @@ struct Appearance {
         height;
 };
 
-extern Appearance defaultAppearance[];
+extern SizeSettings defaultAppearance[];
 struct Colors
 {
         QString name,
@@ -67,7 +67,7 @@ class GCColor : public QObject
         static const Colors *defaultColorSet();
         static void resetColors();
         static QColor invert(QColor);
-        static struct Appearance defaultSizes(int width, int height);
+        static struct SizeSettings defaultSizes(int width, int height);
 
     public slots:
         void readConfig();
