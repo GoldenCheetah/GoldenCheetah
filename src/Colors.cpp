@@ -108,6 +108,38 @@ void GCColor::setupColors()
     copyArray(init, ColorList);
 }
 
+// default settings for fonts etc
+struct Appearance defaultAppearance[] ={
+
+    // small screens include netbooks and old vga 800x600, 1024x768
+    { 1024, 768,  8,8,8,8,8,8,    800, 600 },
+
+    // medium screen size includes typical 16:9 pc formats and TV screens
+    { 1280, 800,  8,8,8,8,8,8,    800, 600},
+
+    // high resolution screens 
+    { 1650, 1080,  11,11,11,11,11,11,   1024,650 },
+
+    // very big panels, incl. e.g.  mac 27"
+    { 9999, 9999,  11,11,11,11,11,11,   1280,700 },
+
+    { 0,0,0,0,0,0,0,0,0,0 },
+};
+
+struct Appearance
+GCColor::defaultSizes(int width, int height)
+{
+    for (int i=0; defaultAppearance[i].maxheight; i++) {
+
+        if (height > defaultAppearance[i].maxheight && width > defaultAppearance[i].maxwidth)
+            continue;
+
+        else return defaultAppearance[i];
+
+    }
+    return defaultAppearance[0]; // shouldn't get here
+}
+
 GCColor::GCColor(MainWindow *main) : QObject(main)
 {
     setupColors();
