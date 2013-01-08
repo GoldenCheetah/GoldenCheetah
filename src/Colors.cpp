@@ -109,7 +109,7 @@ void GCColor::setupColors()
 }
 
 // default settings for fonts etc
-struct Appearance defaultAppearance[] ={
+struct SizeSettings defaultAppearance[] ={
 
     // small screens include netbooks and old vga 800x600, 1024x768
     { 1024, 768,  8,8,8,8,8,8,    800, 600 },
@@ -126,7 +126,7 @@ struct Appearance defaultAppearance[] ={
     { 0,0,0,0,0,0,0,0,0,0 },
 };
 
-struct Appearance
+struct SizeSettings
 GCColor::defaultSizes(int width, int height)
 {
     for (int i=0; defaultAppearance[i].maxheight; i++) {
