@@ -90,6 +90,7 @@ BlankStatePage::addToShortCuts(ShortCut shortCut)
     // Create text and button
     //
     QLabel *shortCutLabel = new QLabel(this);
+    shortCutLabel->setWordWrap(true);
     shortCutLabel->setText(shortCut.label);
     shortCutLabel->setFont(QFont("Helvetica", 16, QFont::Light, false));
     leftLayout->addWidget(shortCutLabel);
@@ -120,7 +121,7 @@ BlankStateAnalysisPage::BlankStateAnalysisPage(MainWindow *main) : BlankStatePag
     img->setIconSize(QSize(800,330));
 
     ShortCut scImport;
-    scImport.label = tr("Import files from your disc or usb device");
+    scImport.label = tr("Import files from your disk or usb device");
     scImport.buttonLabel = tr("Import data");
     scImport.buttonIconPath = ":images/mac/download.png";
     QPushButton *importButton = addToShortCuts(scImport);
