@@ -23,7 +23,8 @@
 #include <QDir>
 #include "Settings.h"
 
-static Colors ColorList[65], DefaultColorList[65];
+// Number of confugurable metric colors + 1 for sentinel value
+static Colors ColorList[CNUMOFCFGCOLORS+1], DefaultColorList[CNUMOFCFGCOLORS+1];
 
 static void copyArray(Colors source[], Colors target[])
 {
@@ -36,7 +37,7 @@ void GCColor::setupColors()
 {
     // consider removing when we can guarantee extended initialisation support in gcc
     // (c++0x not supported by Qt currently and not planned for 4.8 or 5.0)
-    Colors init[65] = {
+    Colors init[CNUMOFCFGCOLORS+1] = {
         { tr("Plot Background"), "COLORPLOTBACKGROUND", Qt::white },
         { tr("Ride Plot Background"), "COLORRIDEPLOTBACKGROUND", Qt::black },
         { tr("Plot Thumbnail Background"), "COLORPLOTTHUMBNAIL", Qt::gray },
@@ -55,10 +56,13 @@ void GCColor::setupColors()
         { tr("Altitude Shading"), "COLORALTITUDESHADE", QColor(124,91,31) },
         { tr("Wind Speed"), "COLORWINDSPEED", Qt::darkGreen },
         { tr("Torque"), "COLORTORQUE", Qt::magenta },
+        { tr("Load"), "COLORLOAD", Qt::yellow },
+        { tr("TSS"), "COLORTSS", Qt::green },
         { tr("Short Term Stress"), "COLORSTS", Qt::blue },
         { tr("Long Term Stress"), "COLORLTS", Qt::green },
         { tr("Stress Balance"), "COLORSB", Qt::black },
         { tr("Daily Stress"), "COLORDAILYSTRESS", Qt::red },
+        { tr("Bike Score"), "COLORBIKESCORE", Qt::gray },
         { tr("Calendar Text"), "COLORCALENDARTEXT", Qt::black },
         { tr("Power Zone 1 Shading"), "COLORZONE1", QColor(255,0,255) },
         { tr("Power Zone 2 Shading"), "COLORZONE2", QColor(42,0,255) },
