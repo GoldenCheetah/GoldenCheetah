@@ -485,9 +485,15 @@ void DialWindow::seriesChanged()
             break;
 
     case RealtimeData::Load:
+            foreground = GColor(CLOAD);
+            break;
+
     case RealtimeData::BikeScore:
+            foreground = GColor(CBIKESCORE);
+            break;
+
     case RealtimeData::TSS:
-            foreground = Qt::blue;
+            foreground = GColor(CTSS);
             break;
 
     case RealtimeData::XPower:
