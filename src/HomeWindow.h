@@ -78,6 +78,7 @@ class HomeWindow : public GcWindow
 
         // window wants to close...
         void closeWindow(GcWindow*);
+        void showControls();
 
         // save / restore window state
         void saveState();
