@@ -59,7 +59,7 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
 
     // date selection
     dateSetting = new DateSettingsEdit(this);
-    cl->addRow(new QLabel(tr("Date Range")), dateSetting);
+    if (rangemode) cl->addRow(new QLabel(tr("Date Range")), dateSetting);
 
     // data series
     cl->addWidget(new QLabel("")); // spacing
