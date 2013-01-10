@@ -53,18 +53,27 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     setInstanceName("Ride Plot Window");
 
     QWidget *c = new QWidget;
-    QVBoxLayout *cl = new QVBoxLayout(c);
+    QVBoxLayout *clv = new QVBoxLayout(c);
+    QHBoxLayout *cl = new QHBoxLayout;
+    QFormLayout *cl1 = new QFormLayout;
+    QFormLayout *cl2 = new QFormLayout;
+    QFormLayout *cl3 = new QFormLayout;
+    cl->addLayout(cl1);
+    cl->addLayout(cl2);
+    clv->addLayout(cl3);
+    clv->addWidget(new QLabel("")); //spacer
+    clv->addLayout(cl);
+    clv->addStretch();
     setControls(c);
 
     setContentsMargins(0,0,0,0);
 
     // setup the controls
     QLabel *showLabel = new QLabel(tr("Show"), c);
-    cl->addWidget(showLabel);
 
     showStack = new QCheckBox(tr("Stacked view"), this);
     showStack->setCheckState(Qt::Unchecked);
-    cl->addWidget(showStack);
+    cl1->addRow(showLabel, showStack);
 
     stackWidth = 15;
     stackZoomUp = new QwtArrowButton(1, Qt::UpArrow,this);
@@ -73,7 +82,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     stackZoomUp->setEnabled(false);
     stackZoomUp->setContentsMargins(0,0,0,0);
     stackZoomUp->setFlat(true);
-    cl->addWidget(stackZoomUp);
+    cl1->addRow(new QLabel(""),stackZoomUp);
 
     stackZoomDown = new QwtArrowButton(1, Qt::DownArrow,this);
     stackZoomDown->setFixedHeight(15);
@@ -81,70 +90,68 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     stackZoomDown->setEnabled(false);
     stackZoomDown->setContentsMargins(0,0,0,0);
     stackZoomDown->setFlat(true);
-    cl->addWidget(stackZoomDown);
+    cl1->addRow(new QLabel(""), stackZoomDown);
 
     showFull = new QCheckBox(tr("Full plot"), this);
     showFull->setCheckState(Qt::Checked);
-    cl->addWidget(showFull);
+    cl1->addRow(new QLabel(""), showFull);
 
     paintBrush = new QCheckBox(tr("Fill Curves"), this);
     paintBrush->setCheckState(Qt::Unchecked);
-    cl->addWidget(paintBrush);
+    cl1->addRow(new QLabel(""), paintBrush);
 
     showGrid = new QCheckBox(tr("Grid"), this);
     showGrid->setCheckState(Qt::Checked);
-    cl->addWidget(showGrid);
+    cl1->addRow(new QLabel(""), showGrid);
 
     showHr = new QCheckBox(tr("Heart Rate"), this);
     showHr->setCheckState(Qt::Checked);
-    cl->addWidget(showHr);
+    cl2->addRow(new QLabel(tr("Data series")), showHr);
 
     showSpeed = new QCheckBox(tr("Speed"), this);
     showSpeed->setCheckState(Qt::Checked);
-    cl->addWidget(showSpeed);
+    cl2->addRow(new QLabel(""), showSpeed);
 
     showCad = new QCheckBox(tr("Cadence"), this);
     showCad->setCheckState(Qt::Checked);
-    cl->addWidget(showCad);
+    cl2->addRow(new QLabel(""), showCad);
 
     showAlt = new QCheckBox(tr("Altitude"), this);
     showAlt->setCheckState(Qt::Checked);
-    cl->addWidget(showAlt);
+    cl2->addRow(new QLabel(""), showAlt);
 
     showTemp = new QCheckBox(tr("Temperature"), this);
     showTemp->setCheckState(Qt::Checked);
-    cl->addWidget(showTemp);
+    cl2->addRow(new QLabel(""), showTemp);
 
     showWind = new QCheckBox(tr("Headwind"), this);
     showWind->setCheckState(Qt::Checked);
-    cl->addWidget(showWind);
+    cl2->addRow(new QLabel(""), showWind);
 
     showTorque = new QCheckBox(tr("Torque"), this);
     showTorque->setCheckState(Qt::Checked);
-    cl->addWidget(showTorque);
+    cl2->addRow(new QLabel(""), showTorque);
 
     showBalance = new QCheckBox(tr("Power balance"), this);
     showBalance->setCheckState(Qt::Checked);
-    cl->addWidget(showBalance);
+    cl2->addRow(new QLabel(""), showBalance);
 
     showPower = new QComboBox();
     showPower->addItem(tr("Power + shade"));
     showPower->addItem(tr("Power - shade"));
     showPower->addItem(tr("No Power"));
-    cl->addWidget(showPower);
+    cl3->addRow(new QLabel(tr("Shading")), showPower);
     showPower->setCurrentIndex(0);
 
     comboDistance = new QComboBox();
-    comboDistance->addItem(tr("X Axis Shows Time"));
-    comboDistance->addItem(tr("X Axis Shows Distance"));
-    cl->addWidget(comboDistance);
+    comboDistance->addItem(tr("Time"));
+    comboDistance->addItem(tr("Distance"));
+    cl3->addRow(new QLabel(tr("X Axis")), comboDistance);
 
-    QLabel *smoothLabel = new QLabel(tr("Smoothing (secs)"), this);
+    QLabel *smoothLabel = new QLabel(tr("Smooth"), this);
     smoothLineEdit = new QLineEdit(this);
     smoothLineEdit->setFixedWidth(40);
 
-    cl->addWidget(smoothLabel);
-    cl->addWidget(smoothLineEdit);
     smoothSlider = new QSlider(Qt::Horizontal);
     smoothSlider->setTickPosition(QSlider::TicksBelow);
     smoothSlider->setTickInterval(10);
@@ -153,8 +160,10 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     smoothLineEdit->setValidator(new QIntValidator(smoothSlider->minimum(),
                                                    smoothSlider->maximum(),
                                                    smoothLineEdit));
-    cl->addWidget(smoothSlider);
-    cl->addStretch();
+    QHBoxLayout *smoothLayout = new QHBoxLayout;
+    smoothLayout->addWidget(smoothLineEdit);
+    smoothLayout->addWidget(smoothSlider);
+    cl3->addRow(smoothLabel, smoothLayout);
 
     allPlot = new AllPlot(this, mainWindow);
     allPlot->setInstanceName("allPlot");

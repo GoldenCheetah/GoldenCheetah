@@ -599,6 +599,13 @@ HomeWindow::dropEvent(QDropEvent *event)
 }
 
 void
+HomeWindow::showControls()
+{
+    mainWindow->chartSettings->adjustSize();
+    mainWindow->chartSettings->show();
+}
+
+void
 HomeWindow::addChart(GcWindow* newone)
 {
     int chartnum = charts.count();
@@ -613,7 +620,7 @@ HomeWindow::addChart(GcWindow* newone)
         QWidget *c = (x != NULL) ? x : new QWidget(this);
 
         // link settings button to show controls
-        connect(newone, SIGNAL(showControls()), mainWindow->chartSettings, SLOT(show()));
+        connect(newone, SIGNAL(showControls()), this, SLOT(showControls()));
         connect(newone, SIGNAL(closeWindow(GcWindow*)), this, SLOT(closeWindow(GcWindow*)));
 
         if (currentStyle == 2 && chartCursor >= 0)
