@@ -2277,9 +2277,12 @@ MainWindow::deleteInterval()
         if (ds > oindex) it->setDisplaySequence(ds-1);
     }
 
-    // now delete!
-    int index = allIntervals->indexOfChild(activeInterval);
-    delete allIntervals->takeChild(index);
+    // now delete highlighted!
+    for (int i=0; i<allIntervals->childCount();) {
+        if (allIntervals->child(i)->isSelected()) delete allIntervals->takeChild(i);
+        else i++;
+    }
+
     updateRideFileIntervals(); // will emit intervalChanged() signal
 }
 
