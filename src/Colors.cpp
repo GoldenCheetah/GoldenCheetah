@@ -115,19 +115,20 @@ void GCColor::setupColors()
 }
 
 // default settings for fonts etc
+// we err on the side of caution -- smaller is better
 struct SizeSettings defaultAppearance[] ={
 
     // small screens include netbooks and old vga 800x600, 1024x768
-    { 1024, 768,  8,8,8,8,8,8,    800, 600 },
+    { 1024, 768,  8,8,6,6,6,6,    800, 600 },
 
     // medium screen size includes typical 16:9 pc formats and TV screens
-    { 1280, 800,  8,8,8,8,8,8,    800, 600},
+    { 1280, 800,  8,8,6,6,6,6,    800, 600},
 
     // high resolution screens 
-    { 1650, 1080,  11,11,11,11,11,11,   1024,650 },
+    { 1650, 1080,  10,10,8,8,8,8,   1024,650 },
 
     // very big panels, incl. e.g.  mac 27"
-    { 9999, 9999,  11,11,11,11,11,11,   1280,700 },
+    { 9999, 9999,  10,10,8,8,8,8,   1280,700 },
 
     { 0,0,0,0,0,0,0,0,0,0 },
 };
