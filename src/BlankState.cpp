@@ -31,6 +31,7 @@ BlankStatePage::BlankStatePage(MainWindow *main) : main(main)
     QHBoxLayout *homeLayout = new QHBoxLayout(this);
     homeLayout->setAlignment(Qt::AlignCenter);
     homeLayout->addSpacing(20); // left margin
+    setProperty("nomenu", true);
 
     // left part
     QWidget *left = new QWidget(this);
