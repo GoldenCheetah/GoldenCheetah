@@ -100,8 +100,8 @@ ErgFilePlot::ErgFilePlot(MainWindow *main) : main(main)
     //setAxisScaleDraw(QwtPlot::yLeft, sd);
 
     QPalette pal;
-    pal.setColor(QPalette::WindowText, GColor(CPOWER));
-    pal.setColor(QPalette::Text, GColor(CPOWER));
+    pal.setColor(QPalette::WindowText, GColor(CRIDEPLOTYAXIS));
+    pal.setColor(QPalette::Text, GColor(CRIDEPLOTYAXIS));
     axisWidget(QwtPlot::yLeft)->setPalette(pal);
 
     QFont stGiles;
@@ -128,8 +128,8 @@ ErgFilePlot::ErgFilePlot(MainWindow *main) : main(main)
     QwtPlot::setAxisFont(xBottom, stGiles);
     QwtPlot::setAxisTitle(xBottom, title);
 
-    pal.setColor(QPalette::WindowText, Qt::blue);
-    pal.setColor(QPalette::Text, Qt::blue);
+    pal.setColor(QPalette::WindowText, GColor(CRIDEPLOTXAXIS));
+    pal.setColor(QPalette::Text, GColor(CRIDEPLOTXAXIS));
     axisWidget(QwtPlot::xBottom)->setPalette(pal);
 
 
@@ -330,8 +330,8 @@ ErgFilePlot::setData(ErgFile *ergfile)
                 QwtPlot::setAxisFont(xBottom, stGiles);
                 QwtPlot::setAxisTitle(xBottom, title);
 
-                pal.setColor(QPalette::WindowText, Qt::blue);
-                pal.setColor(QPalette::Text, Qt::blue);
+                pal.setColor(QPalette::WindowText, GColor(CRIDEPLOTXAXIS));
+                pal.setColor(QPalette::Text, GColor(CRIDEPLOTXAXIS));
                 axisWidget(QwtPlot::xBottom)->setPalette(pal);
 
                 // only allocate a new one if its not the current (they get freed by Qwt)
@@ -351,8 +351,8 @@ ErgFilePlot::setData(ErgFile *ergfile)
         QwtPlot::setAxisFont(xBottom, stGiles);
         QwtPlot::setAxisTitle(xBottom, title);
 
-        pal.setColor(QPalette::WindowText, Qt::blue);
-        pal.setColor(QPalette::Text, Qt::blue);
+        pal.setColor(QPalette::WindowText, GColor(CRIDEPLOTXAXIS));
+        pal.setColor(QPalette::Text, GColor(CRIDEPLOTXAXIS));
         axisWidget(QwtPlot::xBottom)->setPalette(pal);
 
         // set the axis so we default to an hour workout
