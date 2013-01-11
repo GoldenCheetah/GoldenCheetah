@@ -713,7 +713,7 @@ void TrainTool::Start()       // when start button is pressed
         load_msecs += load_period.restart();
 
 #if defined Q_OS_MAC || defined GC_HAVE_VLC
-        // enable media tree so we can change movie
+        // enable media tree so we can change movie - mid workout
         mediaTree->setEnabled(true);
 #endif
 
@@ -874,7 +874,7 @@ void TrainTool::Stop(int deviceStatus)        // when stop button is pressed
 
     if ((status&RT_RUNNING) == 0) return;
 
-    status &= ~RT_RUNNING;
+    status &= ~(RT_RUNNING|RT_PAUSED);
 
     // Stop users from selecting different devices
     // media or workouts whilst a workout is in progress
