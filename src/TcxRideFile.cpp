@@ -173,7 +173,7 @@ TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile
             }
 
             // hr
-            if (ride->areDataPresent()->hr) {
+            if (ride->areDataPresent()->hr && point->hr >0.00) {
                 QDomElement hr = doc.createElement("HeartRateBpm");
                 hr.setAttribute("xsi:type", "HeartRateInBeatsPerMinute_t");
                 QDomElement value = doc.createElement("Value");
