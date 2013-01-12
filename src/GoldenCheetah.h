@@ -163,6 +163,12 @@ public:
 
     virtual bool amVisible();
 
+    // popover controls
+    virtual bool hasPopOver() { return false;}
+    virtual void showPopOver() {}
+    virtual void hidePopOver() {}
+    bool popOverOpen;
+
     // for sorting... we look at x
     bool operator< (GcWindow right) const { return geometry().x() < right.geometry().x(); }
 

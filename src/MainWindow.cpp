@@ -721,10 +721,23 @@ MainWindow::MainWindow(const QDir &home) :
     currentWindow = NULL;
 
     // NO RIDE WINDOW - Replace analysis, home and train window when no ride
+
+    // did we say we din't want to see this?
+    showBlankTrain = !(appsettings->cvalue(cyclist, GC_BLANK_TRAIN, false).toBool());
+    showBlankHome = !(appsettings->cvalue(cyclist, GC_BLANK_HOME, false).toBool());
+    showBlankAnal = !(appsettings->cvalue(cyclist, GC_BLANK_ANALYSIS, false).toBool());
+    showBlankDiary = !(appsettings->cvalue(cyclist, GC_BLANK_DIARY, false).toBool());
+
+    // setup the blank pages
     blankStateAnalysisPage = new BlankStateAnalysisPage(this);
     blankStateHomePage = new BlankStateHomePage(this);
     blankStateDiaryPage = new BlankStateDiaryPage(this);
     blankStateTrainPage = new BlankStateTrainPage(this);
+
+    connect(blankStateDiaryPage, SIGNAL(closeClicked()), this, SLOT(closeBlankDiary()));
+    connect(blankStateHomePage, SIGNAL(closeClicked()), this, SLOT(closeBlankHome()));
+    connect(blankStateAnalysisPage, SIGNAL(closeClicked()), this, SLOT(closeBlankAnal()));
+    connect(blankStateTrainPage, SIGNAL(closeClicked()), this, SLOT(closeBlankTrain()));
 
 
     // POPULATE TOOLBOX
@@ -1381,9 +1394,16 @@ MainWindow::closeEvent(QCloseEvent* event)
         // clear the clipboard if neccessary
         QApplication::clipboard()->setText("");
 
+        // blank state settings
+        appsettings->setCValue(cyclist, GC_BLANK_ANALYSIS, blankStateAnalysisPage->dontShow->isChecked());
+        appsettings->setCValue(cyclist, GC_BLANK_DIARY, blankStateDiaryPage->dontShow->isChecked());
+        appsettings->setCValue(cyclist, GC_BLANK_HOME, blankStateHomePage->dontShow->isChecked());
+        appsettings->setCValue(cyclist, GC_BLANK_TRAIN, blankStateTrainPage->dontShow->isChecked());
+
         // now remove from the list
         if(mainwindows.removeOne(this) == false)
             qDebug()<<"closeEvent: mainwindows list error";
+
     }
 }
 
@@ -1485,10 +1505,38 @@ MainWindow::helpView()
 }
 
 void
+MainWindow::closeBlankTrain()
+{
+    showBlankTrain = false;
+    selectTrain();
+}
+
+void 
+MainWindow::closeBlankAnal()
+{
+    showBlankAnal = false;
+    selectAnalysis();
+}
+
+void 
+MainWindow::closeBlankDiary()
+{
+    showBlankDiary = false;
+    selectDiary();
+}
+
+void 
+MainWindow::closeBlankHome()
+{
+    showBlankHome = false;
+    selectHome();
+}
+
+void
 MainWindow::selectAnalysis()
 {
     // No ride - no analysis view
-    if (allRides->childCount() == 0) {
+    if (allRides->childCount() == 0 && showBlankAnal == true) {
         masterControls->setVisible(false);
         toolBox->hide();
 #ifndef Q_OS_MAC
@@ -1530,7 +1578,7 @@ MainWindow::selectTrain()
 {
     // no devices configured -or- only the manual mode workouts defined
     // we need to get setup properly...
-    if (appsettings->value(this, GC_DEV_COUNT) == 0 || trainDB->getCount() <= 2) {
+    if ((appsettings->value(this, GC_DEV_COUNT) == 0 || trainDB->getCount() <= 2) && showBlankTrain == true) {
         masterControls->setVisible(false);
         toolBox->hide();
 #ifndef Q_OS_MAC
@@ -1566,7 +1614,7 @@ MainWindow::selectTrain()
 void
 MainWindow::selectDiary()
 {
-    if (allRides->childCount() == 0) {
+    if (allRides->childCount() == 0 && showBlankDiary == true) {
         masterControls->setVisible(false);
         toolBox->hide();
 #ifndef Q_OS_MAC
@@ -1600,7 +1648,7 @@ void
 MainWindow::selectHome()
 {
     // No ride - no analysis view
-    if (allRides->childCount() == 0) {
+    if (allRides->childCount() == 0 && showBlankHome == true) {
         masterControls->setVisible(false);
         toolBox->hide();
 #ifndef Q_OS_MAC
