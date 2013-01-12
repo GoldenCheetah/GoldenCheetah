@@ -20,6 +20,7 @@
 #define BLANKSTATE_H
 
 #include "GoldenCheetah.h"
+#include "Settings.h"
 #include <QtGui>
 
 struct ShortCut
@@ -40,6 +41,10 @@ class BlankStatePage : public GcWindow
         BlankStatePage(MainWindow *main);
 
         QPushButton *addToShortCuts(ShortCut shortCut);
+        QCheckBox       *dontShow;
+
+    signals:
+        void closeClicked();
 
     protected:
         MainWindow      *main;
@@ -50,6 +55,7 @@ class BlankStatePage : public GcWindow
 
         QToolButton     *img;
 
+        QPushButton     *closeButton;
 
 
     private:

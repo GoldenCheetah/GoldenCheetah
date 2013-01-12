@@ -28,7 +28,10 @@
 //
 BlankStatePage::BlankStatePage(MainWindow *main) : main(main)
 {
-    QHBoxLayout *homeLayout = new QHBoxLayout(this);
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->addStretch();
+    QHBoxLayout *homeLayout = new QHBoxLayout;
+    mainLayout->addLayout(homeLayout);
     homeLayout->setAlignment(Qt::AlignCenter);
     homeLayout->addSpacing(20); // left margin
     setProperty("nomenu", true);
@@ -67,7 +70,20 @@ BlankStatePage::BlankStatePage(MainWindow *main) : main(main)
     // right margin
     homeLayout->addSpacing(20);
 
-    setLayout(homeLayout);
+    // control if shown or not in future
+    QHBoxLayout *bottomRow = new QHBoxLayout;
+    mainLayout->addSpacing(20);
+    mainLayout->addLayout(bottomRow);
+
+    dontShow = new QCheckBox(tr("Don't show this next time."), this);
+    dontShow->setFocusPolicy(Qt::NoFocus);
+    closeButton = new QPushButton(tr("Close"), this);
+    closeButton->setFocusPolicy(Qt::NoFocus);
+    bottomRow->addWidget(dontShow);
+    bottomRow->addStretch();
+    bottomRow->addWidget(closeButton);
+
+    connect(closeButton, SIGNAL(clicked()), this, SIGNAL(closeClicked()));
 }
 
 QPushButton*
@@ -93,7 +109,7 @@ BlankStatePage::addToShortCuts(ShortCut shortCut)
     QLabel *shortCutLabel = new QLabel(this);
     shortCutLabel->setWordWrap(true);
     shortCutLabel->setText(shortCut.label);
-    shortCutLabel->setFont(QFont("Helvetica", 16, QFont::Light, false));
+    shortCutLabel->setFont(QFont("Helvetica", 14, QFont::Light, false));
     leftLayout->addWidget(shortCutLabel);
 
     QPushButton *shortCutButton = new QPushButton(this);
@@ -115,6 +131,7 @@ BlankStatePage::addToShortCuts(ShortCut shortCut)
 //
 BlankStateAnalysisPage::BlankStateAnalysisPage(MainWindow *main) : BlankStatePage(main)
 {  
+    dontShow->setChecked(appsettings->cvalue(main->cyclist, GC_BLANK_ANALYSIS, false).toBool());
     welcomeTitle->setText("Analysis");
     welcomeText->setText("No ride ?\nLet's start with some data.");
 
@@ -142,6 +159,7 @@ BlankStateAnalysisPage::BlankStateAnalysisPage(MainWindow *main) : BlankStatePag
 //
 BlankStateHomePage::BlankStateHomePage(MainWindow *main) : BlankStatePage(main)
 {
+    dontShow->setChecked(appsettings->cvalue(main->cyclist, GC_BLANK_HOME, false).toBool());
     welcomeTitle->setText("Home");
     welcomeText->setText("No ride ?\nLet's start with some data.");
 
@@ -166,6 +184,7 @@ BlankStateHomePage::BlankStateHomePage(MainWindow *main) : BlankStatePage(main)
 //
 BlankStateDiaryPage::BlankStateDiaryPage(MainWindow *main) : BlankStatePage(main)
 {
+    dontShow->setChecked(appsettings->cvalue(main->cyclist, GC_BLANK_DIARY, false).toBool());
     welcomeTitle->setText("Diary");
     welcomeText->setText("No ride ?\nLet's start with some data.");
 
@@ -190,6 +209,7 @@ BlankStateDiaryPage::BlankStateDiaryPage(MainWindow *main) : BlankStatePage(main
 //
 BlankStateTrainPage::BlankStateTrainPage(MainWindow *main) : BlankStatePage(main)
 {
+    dontShow->setChecked(appsettings->cvalue(main->cyclist, GC_BLANK_TRAIN, false).toBool());
     welcomeTitle->setText("Train");
     welcomeText->setText("No devices or workouts ?\nLet's get you setup.");
 

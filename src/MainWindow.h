@@ -159,6 +159,11 @@ class MainWindow : public QMainWindow
         BlankStateDiaryPage *blankStateDiaryPage;
         BlankStateTrainPage *blankStateTrainPage;
 
+        bool showBlankAnal;
+        bool showBlankTrain;
+        bool showBlankHome;
+        bool showBlankDiary;
+
         ChartSettings *chartSettings;
 
         // state data
@@ -259,6 +264,11 @@ class MainWindow : public QMainWindow
         void showTreeContextMenuPopup(const QPoint &);
         void closeAll();
         void addDevice();
+
+        void closeBlankTrain();
+        void closeBlankAnal();
+        void closeBlankDiary();
+        void closeBlankHome();
 
     private slots:
         void rideTreeWidgetSelectionChanged();

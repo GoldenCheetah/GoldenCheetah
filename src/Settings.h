@@ -78,6 +78,10 @@
 #define GC_WORKOUTDIR      "workoutDir"
 #define GC_TRAIN_SPLITTER_SIZES  "trainwindow/splitterSizes"
 #define GC_LTM_SPLITTER_SIZES  "ltmwindow/splitterSizes"
+#define GC_BLANK_ANALYSIS "blank/analysis"
+#define GC_BLANK_TRAIN    "blank/train"
+#define GC_BLANK_HOME     "blank/home"
+#define GC_BLANK_DIARY    "blank/diary"
 #define GC_LINEWIDTH      "linewidth"
 #define GC_ANTIALIAS      "antialias"
 #define GC_DROPSHADOW     "dropshadow"
@@ -191,6 +195,7 @@ class GSettings : public QSettings
     public:
     GSettings(QString org, QString scope) : QSettings(org,scope) { }
     GSettings(QString file, Format format) : QSettings(file,format) { }
+    ~GSettings() { QSettings::sync(); }
 
     // standard access to global config
     QVariant value(const QObject *me, const QString key, const QVariant def = 0) const ;
