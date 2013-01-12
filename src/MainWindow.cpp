@@ -985,6 +985,10 @@ MainWindow::MainWindow(const QDir &home) :
 
     // when metricDB updates check if BlankState needs to be closed
     connect(metricDB, SIGNAL(dataChanged()), this, SLOT(checkBlankState()));
+    // when config changes see if Train View BlankState needs to be closed
+    connect(this, SIGNAL(configChanged()), this, SLOT(checkBlankState()));
+    // when trainDB updates check if BlankState needs to be closed
+    connect(trainDB, SIGNAL(dataChanged()), this, SLOT(checkBlankState()));
 
     // Kick off
     rideTreeWidgetSelectionChanged();

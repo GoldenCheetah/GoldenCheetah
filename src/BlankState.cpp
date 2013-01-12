@@ -166,17 +166,19 @@ BlankStateHomePage::BlankStateHomePage(MainWindow *main) : BlankStatePage(main)
     img->setIcon(QPixmap(":images/home.png"));
     img->setIconSize(QSize(800,330));
 
-    /*ShortCut scImport;
-    scImport.label = tr("Import files from your disc or usb device");
+    ShortCut scImport;
+    scImport.label = tr("Import files from your disk or usb device");
     scImport.buttonLabel = tr("Import data");
     scImport.buttonIconPath = ":images/mac/download.png";
-    addToShortCuts(scImport);
+    QPushButton *importButton = addToShortCuts(scImport);
+    connect(importButton, SIGNAL(clicked()), main, SLOT(importFile()));
 
     ShortCut scDownload;
     scDownload.label = tr("Download from serial device.");
     scDownload.buttonLabel = tr("Download from device");
     scDownload.buttonIconPath = ":images/mac/download.png";
-    addToShortCuts(scDownload);*/
+    QPushButton *downloadButton = addToShortCuts(scDownload);
+    connect(downloadButton, SIGNAL(clicked()), main, SLOT(downloadRide()));
 }
 
 //
@@ -191,17 +193,19 @@ BlankStateDiaryPage::BlankStateDiaryPage(MainWindow *main) : BlankStatePage(main
     img->setIcon(QPixmap(":images/diary.png"));
     img->setIconSize(QSize(800,330));
 
-    /*ShortCut scImport;
-    scImport.label = tr("Import files from your disc or usb device");
+    ShortCut scImport;
+    scImport.label = tr("Import files from your disk or usb device");
     scImport.buttonLabel = tr("Import data");
     scImport.buttonIconPath = ":images/mac/download.png";
-    addToShortCuts(scImport);
+    QPushButton *importButton = addToShortCuts(scImport);
+    connect(importButton, SIGNAL(clicked()), main, SLOT(importFile()));
 
     ShortCut scDownload;
     scDownload.label = tr("Download from serial device.");
     scDownload.buttonLabel = tr("Download from device");
     scDownload.buttonIconPath = ":images/mac/download.png";
-    addToShortCuts(scDownload);*/
+    QPushButton *downloadButton = addToShortCuts(scDownload);
+    connect(downloadButton, SIGNAL(clicked()), main, SLOT(downloadRide()));
 }
 
 //
