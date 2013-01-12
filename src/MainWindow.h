@@ -265,6 +265,7 @@ class MainWindow : public QMainWindow
         void closeAll();
         void addDevice();
 
+        void checkBlankState();
         void closeBlankTrain();
         void closeBlankAnal();
         void closeBlankDiary();

@@ -983,6 +983,9 @@ MainWindow::MainWindow(const QDir &home) :
     connect(this,SIGNAL(rideAdded(RideItem*)),this,SLOT(checkCPX(RideItem*)));
     connect(this,SIGNAL(rideDeleted(RideItem*)),this,SLOT(checkCPX(RideItem*)));
 
+    // when metricDB updates check if BlankState needs to be closed
+    connect(metricDB, SIGNAL(dataChanged()), this, SLOT(checkBlankState()));
+
     // Kick off
     rideTreeWidgetSelectionChanged();
     selectAnalysis();
@@ -1502,6 +1505,31 @@ void
 MainWindow::helpView()
 {
     QDesktopServices::openUrl(QUrl("http://www.goldencheetah.org/wiki.html"));
+}
+
+void
+MainWindow::checkBlankState()
+{
+    // Home?
+    if (views->currentWidget() == blankStateHomePage) {
+        // should it be closed?
+        if (allRides->childCount() > 0) closeBlankHome();
+    }
+    // Diary?
+    if (views->currentWidget() == blankStateDiaryPage) {
+        // should it be closed?
+        if (allRides->childCount() > 0) closeBlankDiary();
+    }
+    // Analysis??
+    if (views->currentWidget() == blankStateAnalysisPage) {
+        // should it be closed?
+        if (allRides->childCount() > 0) closeBlankAnal();
+    }
+    // Train??
+    if (views->currentWidget() == blankStateTrainPage) {
+        // should it be closed?
+        if (appsettings->value(this, GC_DEV_COUNT).toInt() > 0 && trainDB->getCount() > 2) closeBlankTrain();
+    }
 }
 
 void
