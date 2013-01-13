@@ -208,7 +208,7 @@ TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile
                 // pwr
                 if (ride->areDataPresent()->watts) {
                     QDomElement pwr = doc.createElement("Watts");
-                    text = doc.createTextNode(QString("%1").arg(point->watts));
+                    text = doc.createTextNode(QString("%1").arg((int)point->watts));
                     pwr.appendChild(text);
                     tpx.appendChild(pwr);
                 }
@@ -234,7 +234,7 @@ TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile
     creator_unitId.appendChild(text);
     creator.appendChild(creator_unitId);
 
-    QDomElement creator_productId = doc.createElement("ProductId");
+    QDomElement creator_productId = doc.createElement("ProductID");
     text = doc.createTextNode("0");
     creator_productId.appendChild(text);
     creator.appendChild(creator_productId);
@@ -305,8 +305,14 @@ TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile
     author_type.appendChild(text);
     author_build.appendChild(author_type);
 
+    QDomElement author_lang = doc.createElement("LangID");
+    QVariant lang = appsettings->value(NULL, GC_LANG, QLocale::system().name());
+    text = doc.createTextNode(lang.toString());
+    author_lang.appendChild(text);
+    author.appendChild(author_lang);
+
     QDomElement author_part_number = doc.createElement("PartNumber");
-    text = doc.createTextNode("0");
+    text = doc.createTextNode("000-00000-00");
     author_part_number.appendChild(text);
     author.appendChild(author_part_number);
 
