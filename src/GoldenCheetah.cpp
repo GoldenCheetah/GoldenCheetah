@@ -157,7 +157,7 @@ GcWindow::GcWindow()
     qRegisterMetaType<QColor>("color");
     qRegisterMetaType<DateRange>("dateRange");
     qRegisterMetaType<bool>("nomenu");
-    popOverOpen = false;
+    revealed = false;
     setControls(NULL);
     setRideItem(NULL);
     setTitle("");
@@ -192,7 +192,7 @@ GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
     qRegisterMetaType<QColor>("color");
     qRegisterMetaType<DateRange>("dateRange");
     qRegisterMetaType<bool>("nomenu");
-    popOverOpen = false;
+    revealed = false;
     setParent(parent);
     setControls(NULL);
     setRideItem(NULL);

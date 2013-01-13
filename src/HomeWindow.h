@@ -31,6 +31,8 @@
 #include "QtMacSegmentedButton.h"
 #endif
 
+extern QApplication *application;
+
 class HomeWindow : public GcWindow
 {
     Q_OBJECT
