@@ -61,6 +61,11 @@ class HistogramWindow : public GcWindow
 
         HistogramWindow(MainWindow *mainWindow, bool rangemode = false);
 
+        // reveal
+        bool hasReveal() { return true; }
+        void reveal() { rWidth->show(); rBinEdit->show(); rBinSlider->show(); rShade->show(); rZones->show(); }
+        void unreveal() { rWidth->hide(); rBinEdit->hide(); rBinSlider->hide(); rShade->hide(); rZones->hide(); }
+
         // get/set properties
         int series() const { return seriesCombo->currentIndex(); }
         void setSeries(int x) { seriesCombo->setCurrentIndex(x); }
@@ -112,8 +117,13 @@ class HistogramWindow : public GcWindow
         void useThruToday();
         void dateRangeChanged(DateRange);
 
+        void setZoned(int);
+        void setShade(int);
+
     protected slots:
 
+        void setrBinWidthFromSlider();
+        void setrBinWidthFromLineEdit();
         void setBinWidthFromSlider();
         void setBinWidthFromLineEdit();
         void updateChart();
@@ -134,6 +144,12 @@ class HistogramWindow : public GcWindow
         QCheckBox *shadeZones;      // Shade zone background
         QCheckBox *showInZones;       // Plot by Zone
         QComboBox *seriesCombo;         // Which data series to plot
+
+        // reveal widgets
+        QLabel *rWidth;
+        QLineEdit *rBinEdit;    // set Bin Width from the line edit
+        QSlider *rBinSlider;        // seet Bin Width from a slider
+        QCheckBox *rShade, *rZones;
 
         QList<RideFile::SeriesType> seriesList;
         void addSeries();
