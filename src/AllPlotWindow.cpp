@@ -198,8 +198,11 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     allPlot->setInstanceName("allPlot");
     allPlot->setContentsMargins(0,0,0,0);
 
+    // sort out default values
     smoothSlider->setValue(allPlot->smooth);
     smoothLineEdit->setText(QString("%1").arg(allPlot->smooth));
+    rSmoothSlider->setValue(allPlot->smooth);
+    rSmoothEdit->setText(QString("%1").arg(allPlot->smooth));
 
     allZoomer = new QwtPlotZoomer(allPlot->canvas());
     allZoomer->setRubberBand(QwtPicker::RectRubberBand);
@@ -695,6 +698,7 @@ void
 AllPlotWindow::setStacked(int value)
 {
     showStack->setChecked(value);
+    rStack->setChecked(value);
 }
 
 void
@@ -709,6 +713,7 @@ AllPlotWindow::setSmoothingFromSlider()
     if (allPlot->smooth != smoothSlider->value()) {
         setSmoothing(smoothSlider->value());
         smoothLineEdit->setText(QString("%1").arg(fullPlot->smooth));
+        rSmoothEdit->setText(QString("%1").arg(fullPlot->smooth));
         rSmoothSlider->setValue(rSmoothSlider->value());
     }
     active = false;
@@ -727,6 +732,7 @@ AllPlotWindow::setrSmoothingFromSlider()
         setSmoothing(rSmoothSlider->value());
         rSmoothEdit->setText(QString("%1").arg(fullPlot->smooth));
         smoothSlider->setValue(rSmoothSlider->value());
+        smoothLineEdit->setText(QString("%1").arg(fullPlot->smooth));
     }
     active = false;
 }
