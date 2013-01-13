@@ -148,6 +148,7 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
     showLnY->setChecked(powerHist->islnY());
     showZeroes->setChecked(powerHist->withZeros());
     binWidthSlider->setValue(powerHist->binWidth());
+    rBinSlider->setValue(powerHist->binWidth());
     setHistBinWidthText();
 
     // set the defaults etc
@@ -296,6 +297,7 @@ HistogramWindow::setBinWidthFromSlider()
         powerHist->setBinWidth(binWidthSlider->value());
         setHistBinWidthText();
         rBinEdit->setText(binWidthLineEdit->text());
+        rBinSlider->setValue(binWidthSlider->value());
         updateChart();
     }
 }
@@ -315,6 +317,8 @@ void
 HistogramWindow::setHistBinWidthText()
 {
     binWidthLineEdit->setText(QString("%1").arg(powerHist->getBinWidthRealUnits(), 0, 'g', 3));
+    rBinEdit->setText(QString("%1").arg(powerHist->getBinWidthRealUnits(), 0, 'g', 3));
+
 }
 
 void
