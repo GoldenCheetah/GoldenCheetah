@@ -219,6 +219,7 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     // watch drop operations
     //setMouseTracking(true);
     installEventFilter(this);
+    application->installEventFilter(this);
 }
 
 HomeWindow::~HomeWindow()
@@ -841,6 +842,40 @@ HomeWindow::resizeEvent(QResizeEvent * /* e */)
 bool
 HomeWindow::eventFilter(QObject *object, QEvent *e)
 {
+    if (isHidden()) return false; // ignore when we aren't visible
+
+    // mouse moved and tabbed -- should we show/hide chart popup controls?
+    if (e->type() == QEvent::MouseMove && currentStyle == 0 && tabbed->currentIndex() >= 0) {
+
+        QPoint pos = tabbed->widget(tabbed->currentIndex())->mapFromGlobal(QCursor::pos());
+        GcWindow *us = charts[tabbed->currentIndex()];
+
+        // lots of nested if statements to breakout as quickly as possible
+        // this code gets called A LOT, since mouse events are from the 
+        // application
+        if (us->hasReveal()) { // does  this chart have reveal controls?
+
+            if (us->underMouse()) { // is it even under the cursor?
+
+                // mouse towards top so reveal
+                if (us->revealed == false && pos.y() < 50) {
+                    us->reveal();
+                    us->revealed = true;
+                }
+
+                // hide as mouse moves away
+                if (us->revealed == true && pos.y() > 50) {
+                    us->unreveal();
+                    us->revealed = false;
+                }
+
+            } else if (us->revealed) { // not under cursor but revealed
+                us->unreveal();
+                us->revealed = false;
+            }
+        }
+    }
+
     // we watch the mouse when
     // dropping charts, to update
     // the cursor position

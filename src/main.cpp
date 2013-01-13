@@ -28,6 +28,8 @@
 #include <X11/Xlib.h>
 #endif
 
+QApplication *application;
+
 int
 main(int argc, char *argv[])
 {
@@ -35,12 +37,12 @@ main(int argc, char *argv[])
     XInitThreads();
 #endif
 
-    QApplication app(argc, argv);
+    application = new QApplication(argc, argv);
 
     QFont font;
     font.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, QFont().toString()).toString());
     font.setPointSize(appsettings->value(NULL, GC_FONT_DEFAULT_SIZE, 12).toInt());
-    app.setFont(font); // set default font
+    application->setFont(font); // set default font
 
     //this is the path within the current directory where GC will look for
     //files to allow USB stick support
@@ -99,7 +101,7 @@ main(int argc, char *argv[])
     QTranslator qtTranslator;
     qtTranslator.load("qt_" + QLocale::system().name(),
              QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    app.installTranslator(&qtTranslator);
+    application->installTranslator(&qtTranslator);
 
     // Language setting (default to system locale)
     QVariant lang = appsettings->value(NULL, GC_LANG, QLocale::system().name());
@@ -107,7 +109,7 @@ main(int argc, char *argv[])
     // Load specific translation
     QTranslator gcTranslator;
     gcTranslator.load(":translations/gc_" + lang.toString() + ".qm");
-    app.installTranslator(&gcTranslator);
+    application->installTranslator(&gcTranslator);
 
     // Initialize metrics once the translator is installed
     RideMetricFactory::instance().initialize();
@@ -118,7 +120,7 @@ main(int argc, char *argv[])
     // initialise the trainDB
     trainDB = new TrainDB(home);
 
-    QStringList args( app.arguments() );
+    QStringList args( application->arguments() );
 
     QVariant lastOpened;
     if( args.size() > 1 ){
@@ -157,5 +159,5 @@ main(int argc, char *argv[])
         MainWindow *mainWindow = new MainWindow(home);
         mainWindow->show();
     }
-    return app.exec();
+    return application->exec();
 }
