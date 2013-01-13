@@ -68,6 +68,35 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
 
     setContentsMargins(0,0,0,0);
 
+    // reveal controls
+    rSmooth = new QLabel(tr("Smooth"), this);
+    rSmoothEdit = new QLineEdit(this);
+    rSmoothEdit->setFixedWidth(30);
+    rSmoothSlider = new QSlider(Qt::Horizontal, this);
+    rSmoothSlider->setTickPosition(QSlider::TicksBelow);
+    rSmoothSlider->setTickInterval(10);
+    rSmoothSlider->setMinimum(1);
+    rSmoothSlider->setMaximum(100);
+    rStack = new QCheckBox(tr("Stacked"), this);
+
+    // layout reveal controls
+    QHBoxLayout *r = new QHBoxLayout;
+    r->setSpacing(4);
+    r->setContentsMargins(0,0,0,0);
+    r->addStretch();
+    r->addWidget(rSmooth);
+    r->addWidget(rSmoothEdit);
+    r->addWidget(rSmoothSlider);
+    r->addSpacing(5);
+    r->addWidget(rStack);
+    r->addStretch();
+
+    // hide them initially
+    rSmooth->hide();
+    rSmoothEdit->hide();
+    rSmoothSlider->hide();
+    rStack->hide();
+
     // setup the controls
     QLabel *showLabel = new QLabel(tr("Show"), c);
 
@@ -300,6 +329,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     fullPlot = new AllPlot(this, mainWindow);
     fullPlot->setInstanceName("fullPlot");
     fullPlot->grid->enableY(false);
+    fullPlot->setFixedHeight(100);
     QPalette def;
     //fullPlot->setCanvasBackground(def.color(QPalette::Window));
     fullPlot->setCanvasBackground(Qt::white);
@@ -338,8 +368,9 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     allPlotLayout->setStretch(1,20);
 
     QVBoxLayout *vlayout = new QVBoxLayout(this);
-    vlayout->setContentsMargins(2,2,2,2);
+    vlayout->setContentsMargins(2,10,2,2);
     vlayout->setSpacing(0);
+    vlayout->addLayout(r);
     vlayout->addWidget(allPlotFrame);
     vlayout->addWidget(stackFrame);
     vlayout->setSpacing(1);
@@ -360,10 +391,13 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     connect(showGrid, SIGNAL(stateChanged(int)), this, SLOT(setShowGrid(int)));
     connect(showFull, SIGNAL(stateChanged(int)), this, SLOT(setShowFull(int)));
     connect(showStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
+    connect(rStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
     connect(paintBrush, SIGNAL(stateChanged(int)), this, SLOT(setPaintBrush(int)));
     connect(comboDistance, SIGNAL(currentIndexChanged(int)), this, SLOT(setByDistance(int)));
     connect(smoothSlider, SIGNAL(valueChanged(int)), this, SLOT(setSmoothingFromSlider()));
     connect(smoothLineEdit, SIGNAL(editingFinished()), this, SLOT(setSmoothingFromLineEdit()));
+    connect(rSmoothSlider, SIGNAL(valueChanged(int)), this, SLOT(setrSmoothingFromSlider()));
+    connect(rSmoothEdit, SIGNAL(editingFinished()), this, SLOT(setrSmoothingFromLineEdit()));
 
     // normal view
     connect(spanSlider, SIGNAL(lowerPositionChanged(int)), this, SLOT(zoomChanged()));
@@ -675,6 +709,24 @@ AllPlotWindow::setSmoothingFromSlider()
     if (allPlot->smooth != smoothSlider->value()) {
         setSmoothing(smoothSlider->value());
         smoothLineEdit->setText(QString("%1").arg(fullPlot->smooth));
+        rSmoothSlider->setValue(rSmoothSlider->value());
+    }
+    active = false;
+}
+
+void
+AllPlotWindow::setrSmoothingFromSlider()
+{
+    // active tells us we have been triggered by
+    // the setSmoothingFromLineEdit which will also
+    // recalculates smoothing, lets not double up...
+    if (active) return;
+    else active = true;
+
+    if (allPlot->smooth != rSmoothSlider->value()) {
+        setSmoothing(rSmoothSlider->value());
+        rSmoothEdit->setText(QString("%1").arg(fullPlot->smooth));
+        smoothSlider->setValue(rSmoothSlider->value());
     }
     active = false;
 }
@@ -690,6 +742,25 @@ AllPlotWindow::setSmoothingFromLineEdit()
 
     int value = smoothLineEdit->text().toInt();
     if (value != fullPlot->smooth) {
+        smoothSlider->setValue(value);
+        rSmoothSlider->setValue(value);
+        setSmoothing(value);
+    }
+    active = false;
+}
+
+void
+AllPlotWindow::setrSmoothingFromLineEdit()
+{
+    // active tells us we have been triggered by
+    // the setSmoothingFromSlider which will also
+    // recalculates smoothing, lets not double up...
+    if (active) return;
+    else active = true;
+
+    int value = rSmoothEdit->text().toInt();
+    if (value != fullPlot->smooth) {
+        rSmoothSlider->setValue(value);
         smoothSlider->setValue(value);
         setSmoothing(value);
     }
@@ -1384,6 +1455,9 @@ void
 AllPlotWindow::showStackChanged(int value)
 {
     if (!current) return;
+
+    showStack->setCheckState((Qt::CheckState)value);
+    rStack->setCheckState((Qt::CheckState)value);
 
     // when we swap from normal to
     // stacked view, save the mode so

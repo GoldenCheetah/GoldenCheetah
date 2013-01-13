@@ -101,6 +101,8 @@ class AllPlotWindow : public GcWindow
         // set properties
         void setSmoothingFromSlider();
         void setSmoothingFromLineEdit();
+        void setrSmoothingFromSlider();
+        void setrSmoothingFromLineEdit();
         void setStackZoomUp();
         void setStackZoomDown();
         void setShowPower(int state);
@@ -125,6 +127,25 @@ class AllPlotWindow : public GcWindow
         void moveLeft();
         void moveRight();
         void showStackChanged(int state);
+
+        // reveal
+        bool hasReveal() { return true; }
+        void reveal() { 
+            rSmooth->show();
+            rSmoothSlider->show();
+            rSmoothSlider->show();
+            rSmoothEdit->show();
+            rStack->show();
+            return;
+        }
+        void unreveal() {
+            rSmooth->hide();
+            rSmoothSlider->hide();
+            rSmoothSlider->hide();
+            rSmoothEdit->hide();
+            rStack->hide();
+            return;
+        }
 
     protected:
 
@@ -177,6 +198,12 @@ class AllPlotWindow : public GcWindow
         QSlider *smoothSlider;
         QLineEdit *smoothLineEdit;
         QxtSpanSlider *spanSlider;
+
+        // reveal controls
+        QLabel *rSmooth;
+        QSlider *rSmoothSlider;
+        QLineEdit *rSmoothEdit;
+        QCheckBox *rStack;
 
     private:
         // reset/redraw all the plots
