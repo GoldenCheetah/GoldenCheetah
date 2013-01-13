@@ -39,8 +39,44 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
     cl->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     setControls(c);
 
+    // reveal controls
+    rWidth = new QLabel(tr("Bin Width"), this);
+    rBinEdit = new QLineEdit(this);
+    rBinEdit->setFixedWidth(30);
+    rBinSlider = new QSlider(Qt::Horizontal, this);
+    rBinSlider->setTickPosition(QSlider::TicksBelow);
+    rBinSlider->setTickInterval(10);
+    rBinSlider->setMinimum(1);
+    rBinSlider->setMaximum(100);
+    rShade = new QCheckBox(tr("Shade zones"), this);
+    rZones = new QCheckBox(tr("Show in zones"), this);
+
+    // layout reveal controls
+    QHBoxLayout *r = new QHBoxLayout;
+    r->setSpacing(4);
+    r->setContentsMargins(0,0,0,0);
+    r->addStretch();
+    r->addWidget(rWidth);
+    r->addWidget(rBinEdit);
+    r->addWidget(rBinSlider);
+    QVBoxLayout *v = new QVBoxLayout;
+    v->addWidget(rShade);
+    v->addWidget(rZones);
+    r->addSpacing(20);
+    r->addLayout(v);
+    r->addStretch();
+
+    // hide them initially
+    rWidth->hide();
+    rBinEdit->hide();
+    rBinSlider->hide();
+    rShade->hide();
+    rZones->hide();
+
     // plot
     QVBoxLayout *vlayout = new QVBoxLayout;
+    vlayout->setSpacing(10);
+    vlayout->addLayout(r);
     powerHist = new PowerHist(mainWindow);
     vlayout->addWidget(powerHist);
     setLayout(vlayout);
@@ -121,6 +157,10 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
     // only the input box triggers an update to the chart
     connect(binWidthSlider, SIGNAL(valueChanged(int)), this, SLOT(setBinWidthFromSlider()));
     connect(binWidthLineEdit, SIGNAL(editingFinished()), this, SLOT(setBinWidthFromLineEdit()));
+    connect(rBinSlider, SIGNAL(valueChanged(int)), this, SLOT(setrBinWidthFromSlider()));
+    connect(rBinEdit, SIGNAL(editingFinished()), this, SLOT(setrBinWidthFromLineEdit()));
+    connect(rZones, SIGNAL(stateChanged(int)), this, SLOT(setZoned(int)));
+    connect(rShade, SIGNAL(stateChanged(int)), this, SLOT(setShade(int)));
 
     // when season changes we need to retrieve data from the cache then update the chart
     if (rangemode) {
@@ -135,7 +175,9 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
     connect(showLnY, SIGNAL(stateChanged(int)), this, SLOT(updateChart()));
     connect(showZeroes, SIGNAL(stateChanged(int)), this, SLOT(updateChart()));
     connect(seriesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(updateChart()));
+    connect(showInZones, SIGNAL(stateChanged(int)), this, SLOT(setZoned(int)));
     connect(showInZones, SIGNAL(stateChanged(int)), this, SLOT(updateChart()));
+    connect(shadeZones, SIGNAL(stateChanged(int)), this, SLOT(setShade(int)));
     connect(shadeZones, SIGNAL(stateChanged(int)), this, SLOT(updateChart()));
     connect(showSumY, SIGNAL(currentIndexChanged(int)), this, SLOT(updateChart()));
 
@@ -253,7 +295,18 @@ HistogramWindow::setBinWidthFromSlider()
         //RideFile::SeriesType series = static_cast<RideFile::SeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
         powerHist->setBinWidth(binWidthSlider->value());
         setHistBinWidthText();
+        rBinEdit->setText(binWidthLineEdit->text());
+        updateChart();
+    }
+}
 
+void
+HistogramWindow::setrBinWidthFromSlider()
+{
+    if (powerHist->binWidth() != rBinSlider->value()) {
+        powerHist->setBinWidth(rBinSlider->value());
+        setHistBinWidthText();
+        rBinEdit->setText(binWidthLineEdit->text());
         updateChart();
     }
 }
@@ -284,6 +337,7 @@ HistogramWindow::setHistTextValidator()
                                          binWidthLineEdit);
     }
     binWidthLineEdit->setValidator(validator);
+    rBinEdit->setValidator(validator);
 }
 
 void
@@ -292,10 +346,37 @@ HistogramWindow::setBinWidthFromLineEdit()
     double value = binWidthLineEdit->text().toDouble();
     if (value != powerHist->binWidth()) {
         binWidthSlider->setValue(powerHist->setBinWidthRealUnits(value));
+        rBinSlider->setValue(powerHist->setBinWidthRealUnits(value));
         setHistBinWidthText();
 
         updateChart();
     }
+}
+
+void
+HistogramWindow::setrBinWidthFromLineEdit()
+{
+    double value = rBinEdit->text().toDouble();
+    if (value != powerHist->binWidth()) {
+        rBinSlider->setValue(powerHist->setBinWidthRealUnits(value));
+        binWidthSlider->setValue(powerHist->setBinWidthRealUnits(value));
+        updateChart();
+    }
+}
+
+void
+HistogramWindow::setZoned(int x)
+{
+    rZones->setCheckState((Qt::CheckState)x);
+    showInZones->setCheckState((Qt::CheckState)x);
+    
+}
+
+void
+HistogramWindow::setShade(int x)
+{
+    rShade->setCheckState((Qt::CheckState)x);
+    shadeZones->setCheckState((Qt::CheckState)x);
 }
 
 void
