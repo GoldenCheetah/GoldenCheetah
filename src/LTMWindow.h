@@ -174,6 +174,7 @@ class LTMWindow : public LTMPlotContainer
         DateRange plotted;
 
         bool useCustom;
+        bool useToToday; // truncate to today
         DateRange custom; // custom date range supplied
 
         // qwt picker
