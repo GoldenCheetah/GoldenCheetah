@@ -858,7 +858,7 @@ HomeWindow::eventFilter(QObject *object, QEvent *e)
             if (us->underMouse()) { // is it even under the cursor?
 
                 // mouse towards top so reveal
-                if (us->revealed == false && pos.y() < 90) {
+                if (us->revealed == false && pos.y() < 50) {
                     us->reveal();
                     us->revealed = true;
                 }
