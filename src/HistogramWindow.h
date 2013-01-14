@@ -63,8 +63,8 @@ class HistogramWindow : public GcWindow
 
         // reveal
         bool hasReveal() { return true; }
-        void reveal() { rWidth->show(); rBinEdit->show(); rBinSlider->show(); rShade->show(); rZones->show(); }
-        void unreveal() { rWidth->hide(); rBinEdit->hide(); rBinSlider->hide(); rShade->hide(); rZones->hide(); }
+        void reveal() { revealControls->show(); }
+        void unreveal() { revealControls->hide(); }
 
         // get/set properties
         int series() const { return seriesCombo->currentIndex(); }
@@ -145,7 +145,8 @@ class HistogramWindow : public GcWindow
         QCheckBox *showInZones;       // Plot by Zone
         QComboBox *seriesCombo;         // Which data series to plot
 
-        // reveal widgets
+        // reveal controls
+        QWidget *revealControls;
         QLabel *rWidth;
         QLineEdit *rBinEdit;    // set Bin Width from the line edit
         QSlider *rBinSlider;        // seet Bin Width from a slider

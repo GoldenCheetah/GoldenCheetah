@@ -59,6 +59,11 @@ class HrPwWindow : public GcWindow
         double corr(QVector<double> &Xi, QVector<double> &Yi,int n);
         double moyenne(QVector<double> &Xi,int n);
 
+        // reveal
+        bool hasReveal() { return true; }
+        void reveal() { revealControls->show(); }
+        void unreveal() { revealControls->hide(); }
+
         int smooth;
 
     public slots:
@@ -70,8 +75,13 @@ class HrPwWindow : public GcWindow
         void setDelayFromSlider();
         void setSmoothingFromLineEdit();
         void setSmoothingFromSlider();
+        void setrDelayFromLineEdit();
+        void setrDelayFromSlider();
+        void setrSmoothingFromLineEdit();
+        void setrSmoothingFromSlider();
         void setShadeZones();
         void setSmooth(int);
+        void setDelay(int);
 
     protected:
         MainWindow *mainWindow;
@@ -90,6 +100,14 @@ class HrPwWindow : public GcWindow
         QLineEdit *smoothEdit;
 
     private:
+        // reveal controls
+        QWidget *revealControls;
+        QLabel *rSmooth;
+        QSlider *rSmoothSlider;
+        QLineEdit *rSmoothEdit;
+        QLabel *rDelay;
+        QSlider *rDelaySlider;
+        QLineEdit *rDelayEdit;
 
         // Maths functions used by the plots
         QVector<double> tab_temp; //Déclaration d'un tableau temporaire

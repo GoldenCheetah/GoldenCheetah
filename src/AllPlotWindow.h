@@ -130,22 +130,8 @@ class AllPlotWindow : public GcWindow
 
         // reveal
         bool hasReveal() { return true; }
-        void reveal() { 
-            rSmooth->show();
-            rSmoothSlider->show();
-            rSmoothSlider->show();
-            rSmoothEdit->show();
-            rStack->show();
-            return;
-        }
-        void unreveal() {
-            rSmooth->hide();
-            rSmoothSlider->hide();
-            rSmoothSlider->hide();
-            rSmoothEdit->hide();
-            rStack->hide();
-            return;
-        }
+        void reveal() { revealControls->show(); }
+        void unreveal() { revealControls->hide(); }
 
     protected:
 
@@ -199,13 +185,14 @@ class AllPlotWindow : public GcWindow
         QLineEdit *smoothLineEdit;
         QxtSpanSlider *spanSlider;
 
+    private:
         // reveal controls
+        QWidget *revealControls;
         QLabel *rSmooth;
         QSlider *rSmoothSlider;
         QLineEdit *rSmoothEdit;
         QCheckBox *rStack;
 
-    private:
         // reset/redraw all the plots
         void setupStackPlots();
         void redrawAllPlot();

@@ -36,8 +36,63 @@ HrPwWindow::HrPwWindow(MainWindow *mainWindow) :
     setControls(NULL);
     setInstanceName("HrPw");
 
+    // Main layout
+    QGridLayout *mainLayout = new QGridLayout(this);
+    mainLayout->setContentsMargins(0,0,0,0);
+
+    //
+    // reveal controls widget
+    //
+
+    // reveal widget
+    revealControls = new QWidget(this);
+    revealControls->setFixedHeight(50);
+    //revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 10%)");
+    revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    // reveal controls
+    rDelay = new QLabel(tr("HR Delay"), revealControls);
+    rDelayEdit = new QLineEdit(revealControls);
+    rDelayEdit->setFixedWidth(30);
+    rDelaySlider = new QSlider(Qt::Horizontal, revealControls);
+    rDelaySlider->setTickPosition(QSlider::TicksBelow);
+    rDelaySlider->setTickInterval(10);
+    rDelaySlider->setMinimum(1);
+    rDelaySlider->setMaximum(100);
+    rDelayEdit->setValidator(new QIntValidator(rDelaySlider->minimum(),
+                                                 rDelaySlider->maximum(),
+                                                 rDelayEdit));
+    rSmooth = new QLabel(tr("Smooth"), revealControls);
+    rSmoothEdit = new QLineEdit(revealControls);
+    rSmoothEdit->setFixedWidth(30);
+    rSmoothSlider = new QSlider(Qt::Horizontal, revealControls);
+    rSmoothSlider->setTickPosition(QSlider::TicksBelow);
+    rSmoothSlider->setTickInterval(50);
+    rSmoothSlider->setMinimum(1);
+    rSmoothSlider->setMaximum(500);
+    rSmoothEdit->setValidator(new QIntValidator(rSmoothSlider->minimum(),
+                                                rSmoothSlider->maximum(),
+                                                rSmoothEdit));
+
+    // layout reveal controls
+    QHBoxLayout *r = new QHBoxLayout;
+    r->setSpacing(4);
+    r->setContentsMargins(0,0,0,0);
+    r->addStretch();
+    r->addWidget(rDelay);
+    r->addWidget(rDelayEdit);
+    r->addWidget(rDelaySlider);
+    r->addSpacing(5);
+    r->addWidget(rSmooth);
+    r->addWidget(rSmoothEdit);
+    r->addWidget(rSmoothSlider);
+    r->addStretch();
+    revealControls->setLayout(r);
+
+    //
+    // Chart layout
+    //
 	QVBoxLayout *vlayout = new QVBoxLayout;
-    setLayout(vlayout);
 
     // just the hr and power as a plot
     smallPlot = new SmallPlot(this);
@@ -72,7 +127,14 @@ HrPwWindow::HrPwWindow(MainWindow *mainWindow) :
     vlayout->addWidget(hrPwPlot);
     vlayout->setStretch(1, 100);
 
+    mainLayout->addLayout(vlayout,0,0);
+    mainLayout->addWidget(revealControls,0,0, Qt::AlignTop);
+    revealControls->raise();
+    setLayout(mainLayout);
+
+    //
     // the controls
+    //
     QWidget *c = new QWidget(this);
     setControls(c);
     QFormLayout *cl = new QFormLayout(c);
@@ -129,6 +191,10 @@ HrPwWindow::HrPwWindow(MainWindow *mainWindow) :
     connect(smoothSlider, SIGNAL(valueChanged(int)), this, SLOT(setSmoothingFromSlider()));
     connect(delayEdit, SIGNAL(editingFinished()), this, SLOT(setDelayFromLineEdit()));
     connect(delaySlider, SIGNAL(valueChanged(int)), this, SLOT(setDelayFromSlider()));
+    connect(rSmoothEdit, SIGNAL(editingFinished()), this, SLOT(setrSmoothingFromLineEdit()));
+    connect(rSmoothSlider, SIGNAL(valueChanged(int)), this, SLOT(setrSmoothingFromSlider()));
+    connect(rDelayEdit, SIGNAL(editingFinished()), this, SLOT(setrDelayFromLineEdit()));
+    connect(rDelaySlider, SIGNAL(valueChanged(int)), this, SLOT(setrDelayFromSlider()));
     //connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
 }
@@ -176,7 +242,9 @@ HrPwWindow::setSmooth(int _smooth)
 {
     smooth = _smooth;
     smoothSlider->setValue(_smooth);
+    rSmoothSlider->setValue(_smooth);
     smoothEdit->setText(QString("%1").arg(_smooth));
+    rSmoothEdit->setText(QString("%1").arg(_smooth));
     hrPwPlot->recalc();
 }
 
@@ -188,30 +256,61 @@ HrPwWindow::setSmoothingFromLineEdit()
 }
 
 void
+HrPwWindow::setrSmoothingFromLineEdit()
+{
+    int _smooth = rSmoothEdit->text().toInt();
+    setSmooth(_smooth);
+}
+
+void
 HrPwWindow::setSmoothingFromSlider()
 {
     setSmooth(smoothSlider->value());
 }
 
 void
-HrPwWindow::setDelayFromLineEdit()
+HrPwWindow::setrSmoothingFromSlider()
 {
-    int delay = delayEdit->text().toInt();
+    setSmooth(rSmoothSlider->value());
+}
+
+void
+HrPwWindow::setDelay(int delay)
+{
     if (hrPwPlot->delay != delay) {
         delaySlider->setValue(delay);
-        hrPwPlot->delay = delaySlider->value();
+        delayEdit->setText(QString("%1").arg(delay));
+        rDelaySlider->setValue(delay);
+        rDelayEdit->setText(QString("%1").arg(delay));
+        hrPwPlot->delay = delay;
         hrPwPlot->recalc();
     }
 }
 
 void
+HrPwWindow::setDelayFromLineEdit()
+{
+    int delay = delayEdit->text().toInt();
+    setDelay(delay);
+}
+
+void
+HrPwWindow::setrDelayFromLineEdit()
+{
+    int delay = delayEdit->text().toInt();
+    setDelay(delay);
+}
+
+void
 HrPwWindow::setDelayFromSlider()
 {
-    if (hrPwPlot->delay != delaySlider->value()) {
-        delayEdit->setText(QString("%1").arg(delaySlider->value()));
-        hrPwPlot->delay = delaySlider->value();
-        hrPwPlot->recalc();
-    }
+    setDelay(delaySlider->value());
+}
+
+void
+HrPwWindow::setrDelayFromSlider()
+{
+    setDelay(rDelaySlider->value());
 }
 
 int
@@ -241,7 +340,9 @@ HrPwWindow::findDelay(QVector<double> &wattsArray, QVector<double> &hrArray, int
         }
     }
     delayEdit->setText(QString("%1").arg(delay));
+    rDelayEdit->setText(QString("%1").arg(delay));
     delaySlider->setValue(delay);
+    rDelaySlider->setValue(delay);
     return delay;
 }
 
