@@ -140,6 +140,7 @@ class TreeMapWindow : public GcWindow
         bool active;
         bool dirty;
         bool useCustom;
+        bool useToToday;
         DateRange custom; // custom date range supplied
         QList<KeywordDefinition> keywordDefinitions;
         QList<FieldDefinition>   fieldDefinitions;
