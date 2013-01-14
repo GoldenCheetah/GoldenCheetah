@@ -33,7 +33,7 @@
 #include <math.h>
 
 RideSummaryWindow::RideSummaryWindow(MainWindow *mainWindow, bool ridesummary) :
-     GcWindow(mainWindow), mainWindow(mainWindow), ridesummary(ridesummary), useCustom(false)
+     GcWindow(mainWindow), mainWindow(mainWindow), ridesummary(ridesummary), useCustom(false), useToToday(false)
 {
     setInstanceName("Ride Summary Window");
     setRideItem(NULL);
@@ -476,6 +476,7 @@ RideSummaryWindow::useCustomRange(DateRange range)
 {
     // plot using the supplied range
     useCustom = true;
+    useToToday = false;
     custom = range;
     dateRangeChanged(custom);
 }
@@ -483,7 +484,7 @@ RideSummaryWindow::useCustomRange(DateRange range)
 void
 RideSummaryWindow::useStandardRange()
 {
-    useCustom = false;
+    useToToday = useCustom = false;
     dateRangeChanged(myDateRange);
 }
 
@@ -491,7 +492,8 @@ void
 RideSummaryWindow::useThruToday()
 {
     // plot using the supplied range
-    useCustom = true;
+    useCustom = false;
+    useToToday = true;
     custom = myDateRange;
     if (custom.to > QDate::currentDate()) custom.to = QDate::currentDate();
     dateRangeChanged(custom);
@@ -504,8 +506,16 @@ void RideSummaryWindow::dateRangeChanged(DateRange dr)
     if (dr.from == current.from && dr.to == current.to) return;
     else current = dr;
 
-    if (useCustom) data = mainWindow->metricDB->getAllMetricsFor(custom);
-    else data = mainWindow->metricDB->getAllMetricsFor(myDateRange);
+    if (useCustom) {
+        data = mainWindow->metricDB->getAllMetricsFor(custom);
+    } else if (useToToday) {
+
+        DateRange use = myDateRange;
+        QDate today = QDate::currentDate();
+        if (use.to > today) use.to = today;
+        data = mainWindow->metricDB->getAllMetricsFor(use);
+
+    } else data = mainWindow->metricDB->getAllMetricsFor(myDateRange);
 
     refresh();
 }

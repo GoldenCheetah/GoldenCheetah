@@ -90,6 +90,7 @@ class RideSummaryWindow : public GcWindow
 
         DateSettingsEdit *dateSetting;
         bool useCustom;
+        bool useToToday;
         DateRange custom;
 };
 
