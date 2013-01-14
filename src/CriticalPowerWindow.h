@@ -151,6 +151,7 @@ class CriticalPowerWindow : public GcWindow
         QDate cfrom, cto;
         bool stale;
         bool useCustom;
+        bool useToToday;
         DateRange custom;
 
         DateSettingsEdit *dateSetting;
