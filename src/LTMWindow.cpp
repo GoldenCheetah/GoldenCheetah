@@ -40,7 +40,7 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
 {
     main = parent;
     setInstanceName("Metric Window");
-    useCustom = false;
+    useToToday = useCustom = false;
     plotted = DateRange(QDate(01,01,01), QDate(01,01,01));
 
     // the plot
@@ -173,6 +173,7 @@ LTMWindow::useCustomRange(DateRange range)
 {
     // plot using the supplied range
     useCustom = true;
+    useToToday = false;
     custom = range;
     dateRangeChanged(custom);
 }
@@ -180,7 +181,7 @@ LTMWindow::useCustomRange(DateRange range)
 void
 LTMWindow::useStandardRange()
 {
-    useCustom = false;
+    useToToday = useCustom = false;
     dateRangeChanged(myDateRange);
 }
 
@@ -188,7 +189,8 @@ void
 LTMWindow::useThruToday()
 {
     // plot using the supplied range
-    useCustom = true;
+    useCustom = false;
+    useToToday = true;
     custom = myDateRange;
     if (custom.to > QDate::currentDate()) custom.to = QDate::currentDate();
     dateRangeChanged(custom);
@@ -253,11 +255,23 @@ void
 LTMWindow::filterChanged()
 {
     if (useCustom) {
+
         settings.start = QDateTime(custom.from, QTime(0,0));
         settings.end   = QDateTime(custom.to, QTime(24,0,0));
-    } else {
+
+    } else if (useToToday) {
+
         settings.start = QDateTime(myDateRange.from, QTime(0,0));
         settings.end   = QDateTime(myDateRange.to, QTime(24,0,0));
+
+        QDate today = QDate::currentDate();
+        if (settings.end.date() > today) settings.end = QDateTime(today, QTime(24,0,0));
+
+    } else {
+
+        settings.start = QDateTime(myDateRange.from, QTime(0,0));
+        settings.end   = QDateTime(myDateRange.to, QTime(24,0,0));
+
     }
     settings.title = myDateRange.name;
     settings.data = &results;
