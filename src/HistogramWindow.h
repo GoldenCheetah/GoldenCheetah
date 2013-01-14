@@ -169,6 +169,7 @@ class HistogramWindow : public GcWindow
         bool rangemode;
         DateSettingsEdit *dateSetting;
         bool useCustom;
+        bool useToToday;
         DateRange custom;
 };
 

@@ -30,7 +30,7 @@
 #include "Zones.h"
 #include "HrZones.h"
 
-HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWindow(mainWindow), mainWindow(mainWindow), stale(true), source(NULL), rangemode(rangemode), useCustom(false)
+HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWindow(mainWindow), mainWindow(mainWindow), stale(true), source(NULL), rangemode(rangemode), useCustom(false), useToToday(false)
 {
     setInstanceName("Histogram Window");
 
@@ -243,6 +243,7 @@ HistogramWindow::useCustomRange(DateRange range)
 {
     // plot using the supplied range
     useCustom = true;
+    useToToday = false;
     custom = range;
     dateRangeChanged(custom);
 }
@@ -250,7 +251,7 @@ HistogramWindow::useCustomRange(DateRange range)
 void
 HistogramWindow::useStandardRange()
 {
-    useCustom = false;
+    useToToday= useCustom = false;
     dateRangeChanged(myDateRange);
 }
 
@@ -258,7 +259,8 @@ void
 HistogramWindow::useThruToday()
 {
     // plot using the supplied range
-    useCustom = true;
+    useCustom = false;
+    useToToday = true;
     custom = myDateRange;
     if (custom.to > QDate::currentDate()) custom.to = QDate::currentDate();
     dateRangeChanged(custom);
@@ -393,7 +395,21 @@ HistogramWindow::updateChart()
 
         if (rangemode) {
 
-            DateRange use = useCustom ? custom : myDateRange;
+            DateRange use;
+            if (useCustom) {
+
+                use = custom;
+
+            } else if (useToToday) {
+
+                use = myDateRange;
+                QDate today = QDate::currentDate();
+                if (use.to > today) use.to = today;
+
+            } else {
+
+                use = myDateRange;
+            }
 
 #ifdef GC_HAVE_LUCENE
             source = new RideFileCache(mainWindow, use.from, use.to, isFiltered, files);
