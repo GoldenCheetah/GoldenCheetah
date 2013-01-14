@@ -36,7 +36,7 @@
 
 TreeMapWindow::TreeMapWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) :
             GcWindow(parent), main(parent), home(home),
-            useMetricUnits(useMetricUnits), active(false), dirty(true), useCustom(false)
+            useMetricUnits(useMetricUnits), active(false), dirty(true), useCustom(false), useToToday(false)
 {
     setInstanceName("Treemap Window");
 
@@ -171,6 +171,7 @@ TreeMapWindow::useCustomRange(DateRange range)
 {
     // plot using the supplied range
     useCustom = true;
+    useToToday = false;
     custom = range;
     dateRangeChanged(custom);
 }
@@ -178,7 +179,7 @@ TreeMapWindow::useCustomRange(DateRange range)
 void
 TreeMapWindow::useStandardRange()
 {
-    useCustom = false;
+    useToToday = useCustom = false;
     dateRangeChanged(myDateRange);
 }
 
@@ -186,7 +187,8 @@ void
 TreeMapWindow::useThruToday()
 {
     // plot using the supplied range
-    useCustom = true;
+    useCustom = false;
+    useToToday = true;
     custom = myDateRange;
     if (custom.to > QDate::currentDate()) custom.to = QDate::currentDate();
     dateRangeChanged(custom);
@@ -214,6 +216,10 @@ TreeMapWindow::refresh()
         if (useCustom) {
             settings.from = custom.from;
             settings.to = custom.to;
+        } else if (useToToday) {
+            QDate today = QDate::currentDate();
+            settings.from = myDateRange.from;
+            settings.to = myDateRange.to > today ? today : myDateRange.to;
         } else {
             settings.from = myDateRange.from;
             settings.to = myDateRange.to;
