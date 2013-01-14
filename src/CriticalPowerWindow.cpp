@@ -34,7 +34,7 @@
 #include <QXmlSimpleReader>
 
 CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, bool rangemode) :
-    GcWindow(parent), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), mainWindow(parent), currentRide(NULL), rangemode(rangemode), stale(true), useCustom(false)
+    GcWindow(parent), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), mainWindow(parent), currentRide(NULL), rangemode(rangemode), stale(true), useCustom(false), useToToday(false)
 {
     setInstanceName("Critical Power Window");
 
@@ -405,6 +405,7 @@ CriticalPowerWindow::useCustomRange(DateRange range)
 {
     // plot using the supplied range
     useCustom = true;
+    useToToday = false;
     custom = range;
     dateRangeChanged(custom);
 }
@@ -412,7 +413,7 @@ CriticalPowerWindow::useCustomRange(DateRange range)
 void
 CriticalPowerWindow::useStandardRange()
 {
-    useCustom = false;
+    useToToday = useCustom = false;
     dateRangeChanged(myDateRange);
 }
 
@@ -420,7 +421,8 @@ void
 CriticalPowerWindow::useThruToday()
 {
     // plot using the supplied range
-    useCustom = true;
+    useCustom = false;
+    useToToday = true;
     custom = myDateRange;
     if (custom.to > QDate::currentDate()) custom.to = QDate::currentDate();
     dateRangeChanged(custom);
@@ -433,7 +435,13 @@ CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
 
     // it will either be sidebar or custom...
     if (useCustom) dateRange = custom;
-    else dateRange = myDateRange;
+    else if (useToToday) {
+
+        dateRange = myDateRange;
+        QDate today = QDate::currentDate();
+        if (dateRange.to > today) dateRange.to = today;
+
+    } else dateRange = myDateRange;
     
     if (dateRange.from == cfrom && dateRange.to == cto && !stale) return;
 
