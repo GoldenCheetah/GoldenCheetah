@@ -39,17 +39,32 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
     cl->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     setControls(c);
 
+
+    // Main layout
+    QGridLayout *mainLayout = new QGridLayout(this);
+    mainLayout->setContentsMargins(0,0,0,0);
+
+    //
+    // reveal controls widget
+    //
+
+    // reveal widget
+    revealControls = new QWidget(this);
+    revealControls->setFixedHeight(50);
+    //revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 10%)");
+    revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+
     // reveal controls
-    rWidth = new QLabel(tr("Bin Width"), this);
-    rBinEdit = new QLineEdit(this);
+    rWidth = new QLabel(tr("Bin Width"), revealControls);
+    rBinEdit = new QLineEdit(revealControls);
     rBinEdit->setFixedWidth(30);
-    rBinSlider = new QSlider(Qt::Horizontal, this);
+    rBinSlider = new QSlider(Qt::Horizontal, revealControls);
     rBinSlider->setTickPosition(QSlider::TicksBelow);
     rBinSlider->setTickInterval(10);
     rBinSlider->setMinimum(1);
     rBinSlider->setMaximum(100);
-    rShade = new QCheckBox(tr("Shade zones"), this);
-    rZones = new QCheckBox(tr("Show in zones"), this);
+    rShade = new QCheckBox(tr("Shade zones"), revealControls);
+    rZones = new QCheckBox(tr("Show in zones"), revealControls);
 
     // layout reveal controls
     QHBoxLayout *r = new QHBoxLayout;
@@ -65,21 +80,21 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
     r->addSpacing(20);
     r->addLayout(v);
     r->addStretch();
+    revealControls->setLayout(r);
 
     // hide them initially
-    rWidth->hide();
-    rBinEdit->hide();
-    rBinSlider->hide();
-    rShade->hide();
-    rZones->hide();
+    revealControls->hide();
 
     // plot
     QVBoxLayout *vlayout = new QVBoxLayout;
     vlayout->setSpacing(10);
-    vlayout->addLayout(r);
     powerHist = new PowerHist(mainWindow);
     vlayout->addWidget(powerHist);
-    setLayout(vlayout);
+
+    mainLayout->addLayout(vlayout,0,0);
+    mainLayout->addWidget(revealControls,0,0, Qt::AlignTop);
+    revealControls->raise();
+    setLayout(mainLayout);
 
 #ifdef GC_HAVE_LUCENE
     // search filter box
@@ -135,7 +150,6 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
 
     shadeZones = new QCheckBox;
     shadeZones->setText(tr("Shade zones"));
-    shadeZones->setChecked(powerHist->shade);
     cl->addRow(new QLabel(""), shadeZones);
 
     showInZones = new QCheckBox;
@@ -147,8 +161,10 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
     setHistTextValidator();
     showLnY->setChecked(powerHist->islnY());
     showZeroes->setChecked(powerHist->withZeros());
+    shadeZones->setChecked(powerHist->shade);
     binWidthSlider->setValue(powerHist->binWidth());
     rBinSlider->setValue(powerHist->binWidth());
+    rShade->setChecked(powerHist->shade);
     setHistBinWidthText();
 
     // set the defaults etc

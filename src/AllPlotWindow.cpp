@@ -68,16 +68,30 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
 
     setContentsMargins(0,0,0,0);
 
+    // Main layout
+    QGridLayout *mainLayout = new QGridLayout(this);
+    mainLayout->setContentsMargins(0,0,0,0);
+
+    //
+    // reveal controls widget
+    //
+
+    // reveal widget
+    revealControls = new QWidget(this);
+    revealControls->setFixedHeight(50);
+    //revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 20%)");
+    revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+
     // reveal controls
-    rSmooth = new QLabel(tr("Smooth"), this);
-    rSmoothEdit = new QLineEdit(this);
+    rSmooth = new QLabel(tr("Smooth"), revealControls);
+    rSmoothEdit = new QLineEdit(revealControls);
     rSmoothEdit->setFixedWidth(30);
-    rSmoothSlider = new QSlider(Qt::Horizontal, this);
+    rSmoothSlider = new QSlider(Qt::Horizontal, revealControls);
     rSmoothSlider->setTickPosition(QSlider::TicksBelow);
     rSmoothSlider->setTickInterval(10);
     rSmoothSlider->setMinimum(1);
     rSmoothSlider->setMaximum(100);
-    rStack = new QCheckBox(tr("Stacked"), this);
+    rStack = new QCheckBox(tr("Stacked"), revealControls);
 
     // layout reveal controls
     QHBoxLayout *r = new QHBoxLayout;
@@ -90,12 +104,10 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     r->addSpacing(5);
     r->addWidget(rStack);
     r->addStretch();
+    revealControls->setLayout(r);
 
     // hide them initially
-    rSmooth->hide();
-    rSmoothEdit->hide();
-    rSmoothSlider->hide();
-    rStack->hide();
+    revealControls->hide();
 
     // setup the controls
     QLabel *showLabel = new QLabel(tr("Show"), c);
@@ -370,16 +382,17 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     allPlotLayout->setStretch(0,100);
     allPlotLayout->setStretch(1,20);
 
-    QVBoxLayout *vlayout = new QVBoxLayout(this);
-    vlayout->setContentsMargins(2,10,2,2);
+    QVBoxLayout *vlayout = new QVBoxLayout;
+    vlayout->setContentsMargins(2,0,2,2);
     vlayout->setSpacing(0);
-    vlayout->addLayout(r);
     vlayout->addWidget(allPlotFrame);
     vlayout->addWidget(stackFrame);
     vlayout->setSpacing(1);
-    setLayout(vlayout);
 
-    setContentsMargins(0,0,0,0);
+    mainLayout->addLayout(vlayout,0,0);
+    mainLayout->addWidget(revealControls,0,0, Qt::AlignTop);
+    revealControls->raise();
+    setLayout(mainLayout);
 
     // common controls
     connect(showPower, SIGNAL(currentIndexChanged(int)), this, SLOT(setShowPower(int)));
