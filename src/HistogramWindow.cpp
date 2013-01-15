@@ -42,7 +42,7 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
 
     // Main layout
     QGridLayout *mainLayout = new QGridLayout(this);
-    mainLayout->setContentsMargins(0,0,0,0);
+    mainLayout->setContentsMargins(2,2,2,2);
 
     //
     // reveal controls widget
