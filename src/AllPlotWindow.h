@@ -191,7 +191,7 @@ class AllPlotWindow : public GcWindow
         QLabel *rSmooth;
         QSlider *rSmoothSlider;
         QLineEdit *rSmoothEdit;
-        QCheckBox *rStack;
+        QCheckBox *rStack, *rFull;
 
         // reset/redraw all the plots
         void setupStackPlots();

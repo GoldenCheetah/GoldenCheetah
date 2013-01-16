@@ -92,6 +92,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     rSmoothSlider->setMinimum(1);
     rSmoothSlider->setMaximum(100);
     rStack = new QCheckBox(tr("Stacked"), revealControls);
+    rFull = new QCheckBox(tr("Fullplot"), revealControls);
 
     // layout reveal controls
     QHBoxLayout *r = new QHBoxLayout;
@@ -102,7 +103,11 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     r->addWidget(rSmoothEdit);
     r->addWidget(rSmoothSlider);
     r->addSpacing(5);
-    r->addWidget(rStack);
+    QVBoxLayout *v = new QVBoxLayout;
+    v->setSpacing(5);
+    v->addWidget(rStack);
+    v->addWidget(rFull);
+    r->addLayout(v);
     r->addStretch();
     revealControls->setLayout(r);
 
@@ -408,6 +413,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     connect(showFull, SIGNAL(stateChanged(int)), this, SLOT(setShowFull(int)));
     connect(showStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
     connect(rStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
+    connect(rFull, SIGNAL(stateChanged(int)), this, SLOT(setShowFull(int)));
     connect(paintBrush, SIGNAL(stateChanged(int)), this, SLOT(setPaintBrush(int)));
     connect(comboDistance, SIGNAL(currentIndexChanged(int)), this, SLOT(setByDistance(int)));
     connect(smoothSlider, SIGNAL(valueChanged(int)), this, SLOT(setSmoothingFromSlider()));
@@ -1301,6 +1307,7 @@ AllPlotWindow::setShowBalance(int value)
 void
 AllPlotWindow::setShowFull(int value)
 {
+    rFull->setChecked(value);
     showFull->setChecked(value);
     if (showFull->isChecked()) {
         fullPlot->show();
