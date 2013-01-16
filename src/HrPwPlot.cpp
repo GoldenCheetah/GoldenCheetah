@@ -308,7 +308,7 @@ HrPwPlot::recalc()
 
     r_mrk1->setValue(0,0);
     r_mrk1->setLineStyle(QwtPlotMarker::VLine);
-    r_mrk1->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
+    r_mrk1->setLabelAlignment(Qt::AlignRight | Qt::AlignBottom);
     r_mrk1->setLinePen(QPen(Qt::black, 0, Qt::DashDotLine));
     double moyennewatt = hrPwWindow->moyenne(clipWatts, clipWatts.size());
     r_mrk1->setValue(moyennewatt, 0.0);
