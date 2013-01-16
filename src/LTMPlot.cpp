@@ -172,6 +172,9 @@ LTMPlot::setData(LTMSettings *set)
         // remove the shading if it exists
         refreshZoneLabels(-1);
 
+        // remove the old markers
+        refreshMarkers(settings->start.date(), settings->end.date(), settings->groupBy);
+
         replot();
         return;
     }
