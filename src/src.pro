@@ -458,6 +458,7 @@ SOURCES += \
         FixGPS.cpp \
         FixSpikes.cpp \
         FixTorque.cpp \
+        FixHRSpikes.cpp \
         GcBubble.cpp \
         GcCalendar.cpp \
         GcPane.cpp \
