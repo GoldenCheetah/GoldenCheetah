@@ -38,7 +38,7 @@ HrPwWindow::HrPwWindow(MainWindow *mainWindow) :
 
     // Main layout
     QGridLayout *mainLayout = new QGridLayout(this);
-    mainLayout->setContentsMargins(0,0,0,0);
+    mainLayout->setContentsMargins(2,2,2,2);
 
     //
     // reveal controls widget
@@ -94,13 +94,6 @@ HrPwWindow::HrPwWindow(MainWindow *mainWindow) :
     //
 	QVBoxLayout *vlayout = new QVBoxLayout;
 
-    // just the hr and power as a plot
-    smallPlot = new SmallPlot(this);
-    smallPlot->setMaximumHeight(200);
-    smallPlot->setMinimumHeight(100);
-    vlayout->addWidget(smallPlot);
-    vlayout->setStretch(0, 20);
-
     // main plot
     hrPwPlot = new HrPwPlot(mainWindow, this);
 
@@ -125,7 +118,14 @@ HrPwWindow::HrPwWindow(MainWindow *mainWindow) :
     hrPwPlot->tooltip->setRubberBandPen(inv);
     hrPwPlot->tooltip->setEnabled(true);
     vlayout->addWidget(hrPwPlot);
-    vlayout->setStretch(1, 100);
+    vlayout->setStretch(0, 100);
+
+    // just the hr and power as a plot
+    smallPlot = new SmallPlot(this);
+    smallPlot->setMaximumHeight(200);
+    smallPlot->setMinimumHeight(100);
+    vlayout->addWidget(smallPlot);
+    vlayout->setStretch(1, 20);
 
     mainLayout->addLayout(vlayout,0,0);
     mainLayout->addWidget(revealControls,0,0, Qt::AlignTop);
