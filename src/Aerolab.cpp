@@ -325,7 +325,7 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
   if( ride ) {
 
     const RideFileDataPresent *dataPresent = ride->areDataPresent();
-    setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
+    //setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
 
     if( dataPresent->watts ) {
 
@@ -419,7 +419,7 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
     recalc(new_zoom);
     adjustEoffset();
   } else {
-    setTitle("no data");
+    //setTitle("no data");
 
   }
 }
