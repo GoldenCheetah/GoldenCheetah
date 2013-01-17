@@ -1092,8 +1092,14 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
         // set now to current time when not using a workout
         // but limit to almost every second (account for
         // slight timing errors of 100ms or so)
-        if (!(status&RT_WORKOUT) && rtData.getMsecs()%1000 < 100) {
-            main->notifySetNow(rtData.getMsecs());
+
+		// Do some rounding to the hundreds because as time goes by, rtData.getMsecs() drifts just below and then it does not pass the mod 1000 < 100 test
+		// For example:  msecs = 42199.  Mod 1000 = 199 versus msecs = 42000.  Mod 1000 = 0
+		// With this, it will now call tick just about every second
+		long rmsecs = round((rtData.getMsecs() + 99) / 100) * 100;
+		// Test for <= 100ms
+		if (!(status&RT_WORKOUT) && ((rmsecs % 1000) <= 100)) {
+			main->notifySetNow(rtData.getMsecs());
         }
     }
 }
