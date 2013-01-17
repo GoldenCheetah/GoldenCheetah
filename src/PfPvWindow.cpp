@@ -33,11 +33,56 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
     QVBoxLayout *cl = new QVBoxLayout(c);
     setControls(c);
 
+    // Main layout
+    QGridLayout *mainLayout = new QGridLayout(this);
+    mainLayout->setContentsMargins(0,0,0,0);
+
+    //
+    // reveal controls widget
+    //
+
+    // reveal widget
+    revealControls = new QWidget(this);
+    revealControls->setFixedHeight(50);
+    //revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 10%)");
+    revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    // layout reveal controls
+    QHBoxLayout *revealLayout = new QHBoxLayout;
+    revealLayout->setContentsMargins(0,0,0,0);
+    revealLayout->addStretch();
+
+    rShade = new QCheckBox(tr("Shade zones"), revealControls);
+    if (appsettings->value(this, GC_SHADEZONES, true).toBool() == true)
+        rShade->setCheckState(Qt::Checked);
+    else
+        rShade->setCheckState(Qt::Unchecked);
+    rMergeInterval = new QCheckBox;
+    rMergeInterval->setText(tr("Merge intervals"));
+    rMergeInterval->setCheckState(Qt::Unchecked);
+    rFrameInterval = new QCheckBox;
+    rFrameInterval->setText(tr("Frame intervals"));
+    rFrameInterval->setCheckState(Qt::Checked);
+
+    revealLayout->addWidget(rShade);
+    revealLayout->addWidget(rMergeInterval);
+    revealLayout->addWidget(rFrameInterval);
+    revealLayout->addStretch();
+
+    revealControls->setLayout(revealLayout);
+
+    // hide them initially
+    revealControls->hide();
+
     // the plot
     QVBoxLayout *vlayout = new QVBoxLayout;
     pfPvPlot = new PfPvPlot(mainWindow);
     vlayout->addWidget(pfPvPlot);
-    setLayout(vlayout);
+
+    mainLayout->addLayout(vlayout,0,0);
+    mainLayout->addWidget(revealControls,0,0, Qt::AlignTop);
+    revealControls->raise();
+    setLayout(mainLayout);
 
     // allow zooming
     pfpvZoomer = new QwtPlotZoomer(pfPvPlot->canvas());
@@ -100,10 +145,16 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
 	    this, SLOT(setQaCLFromLineEdit()));
     connect(shadeZonesPfPvCheckBox, SIGNAL(stateChanged(int)),
             this, SLOT(setShadeZonesPfPvFromCheckBox()));
+    connect(rShade, SIGNAL(stateChanged(int)),
+            this, SLOT(setrShadeZonesPfPvFromCheckBox()));
     connect(mergeIntervalPfPvCheckBox, SIGNAL(stateChanged(int)),
                 this, SLOT(setMergeIntervalsPfPvFromCheckBox()));
+    connect(rMergeInterval, SIGNAL(stateChanged(int)),
+                this, SLOT(setrMergeIntervalsPfPvFromCheckBox()));
     connect(frameIntervalPfPvCheckBox, SIGNAL(stateChanged(int)),
                 this, SLOT(setFrameIntervalsPfPvFromCheckBox()));
+    connect(rFrameInterval, SIGNAL(stateChanged(int)),
+                this, SLOT(setrFrameIntervalsPfPvFromCheckBox()));
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
@@ -152,6 +203,17 @@ PfPvWindow::setShadeZonesPfPvFromCheckBox()
 {
     if (pfPvPlot->shadeZones() != shadeZonesPfPvCheckBox->isChecked()) {
         pfPvPlot->setShadeZones(shadeZonesPfPvCheckBox->isChecked());
+        rShade->setChecked(shadeZonesPfPvCheckBox->isChecked());
+    }
+    pfPvPlot->replot();
+}
+
+void
+PfPvWindow::setrShadeZonesPfPvFromCheckBox()
+{
+    if (pfPvPlot->shadeZones() != rShade->isChecked()) {
+        pfPvPlot->setShadeZones(rShade->isChecked());
+        shadeZonesPfPvCheckBox->setChecked(rShade->isChecked());
     }
     pfPvPlot->replot();
 }
@@ -161,6 +223,16 @@ PfPvWindow::setMergeIntervalsPfPvFromCheckBox()
 {
     if (pfPvPlot->mergeIntervals() != mergeIntervalPfPvCheckBox->isChecked()) {
         pfPvPlot->setMergeIntervals(mergeIntervalPfPvCheckBox->isChecked());
+        rMergeInterval->setChecked(mergeIntervalPfPvCheckBox->isChecked());
+    }
+}
+
+void
+PfPvWindow::setrMergeIntervalsPfPvFromCheckBox()
+{
+    if (pfPvPlot->mergeIntervals() != rMergeInterval->isChecked()) {
+        pfPvPlot->setMergeIntervals(rMergeInterval->isChecked());
+        mergeIntervalPfPvCheckBox->setChecked(rMergeInterval->isChecked());
     }
 }
 
@@ -169,6 +241,16 @@ PfPvWindow::setFrameIntervalsPfPvFromCheckBox()
 {
     if (pfPvPlot->frameIntervals() != frameIntervalPfPvCheckBox->isChecked()) {
         pfPvPlot->setFrameIntervals(frameIntervalPfPvCheckBox->isChecked());
+        rFrameInterval->setChecked(frameIntervalPfPvCheckBox->isChecked());
+    }
+}
+
+void
+PfPvWindow::setrFrameIntervalsPfPvFromCheckBox()
+{
+    if (pfPvPlot->frameIntervals() != rFrameInterval->isChecked()) {
+        pfPvPlot->setFrameIntervals(rFrameInterval->isChecked());
+        frameIntervalPfPvCheckBox->setChecked(rFrameInterval->isChecked());
     }
 }
 
