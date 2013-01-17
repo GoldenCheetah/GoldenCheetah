@@ -172,6 +172,9 @@ LTMPlot::setData(LTMSettings *set)
         // remove the shading if it exists
         refreshZoneLabels(-1);
 
+        // remove the old markers
+        refreshMarkers(settings->start.date(), settings->end.date(), settings->groupBy);
+
         replot();
         return;
     }
@@ -282,7 +285,7 @@ LTMPlot::setData(LTMSettings *set)
         // left and right offset for bars
         double left = 0;
         double right = 0;
-        double middle = 0;
+
         if (metricDetail.curveStyle == QwtPlotCurve::Steps) {
 
             int barn = metricDetail.stack ? stacknum : barnum;
@@ -292,7 +295,7 @@ LTMPlot::setData(LTMSettings *set)
             double width = space * 0.90;
             left = (space * barn) + (gap / 2) + 0.1;
             right = left + width;
-            middle = ((left+right) / double(2)) - 0.5;
+
             if (metricDetail.stack && donestack == false) {
                 barnum++;
                 donestack = true;
