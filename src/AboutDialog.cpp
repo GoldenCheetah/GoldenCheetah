@@ -294,6 +294,7 @@ ContributorsPage::ContributorsPage(MainWindow *main, QDir home) : main(main), ho
     contributors.append("Gareth Coco");
     contributors.append("Greg Lonnon");
     contributors.append("Ilja Booij");
+    contributors.append("Jaime Jofre");
     contributors.append("Jamie Kimberley");
     contributors.append("Jim Ley");
     contributors.append("John Ehrlinger");
