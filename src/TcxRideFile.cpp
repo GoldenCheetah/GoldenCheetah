@@ -86,6 +86,14 @@ TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile
         "total_distance",
         "workout_time",
         "total_work",
+        "average_hr",
+        "max_heartrate",
+        "average_cad",
+        "max_cadence",
+        "average_power",
+        "max_power",
+        "max_speed",
+        "average_speed",
         NULL
     };
 
@@ -106,10 +114,29 @@ TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile
     lap_distance.appendChild(text);
     lap.appendChild(lap_distance);
 
+    QDomElement max_speed = doc.createElement("MaximumSpeed");
+    text = doc.createTextNode(QString("%1").arg(computed.value("max_speed")->value(true)));
+    max_speed.appendChild(text);
+    lap.appendChild(max_speed);
+
     QDomElement lap_calories = doc.createElement("Calories");
     text = doc.createTextNode(QString("%1").arg((int)computed.value("total_work")->value(true)));
     lap_calories.appendChild(text);
     lap.appendChild(lap_calories);
+
+    QDomElement avg_heartrate = doc.createElement("AverageHeartRateBpm");
+    QDomElement value = doc.createElement("Value");
+    text = doc.createTextNode(QString("%1").arg((int)computed.value("average_hr")->value(true)));
+    value.appendChild(text);
+    avg_heartrate.appendChild(value);
+    lap.appendChild(avg_heartrate);
+
+    QDomElement max_heartrate = doc.createElement("MaximumHeartRateBpm");
+    value = doc.createElement("Value");
+    text = doc.createTextNode(QString("%1").arg((int)computed.value("max_heartrate")->value(true)));
+    value.appendChild(text);
+    max_heartrate.appendChild(value);
+    lap.appendChild(max_heartrate);
 
     QDomElement lap_intensity = doc.createElement("Intensity");
     text = doc.createTextNode("Active");
@@ -172,16 +199,22 @@ TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile
                 trackpoint.appendChild(dist);
             }
 
-            // hr
+            // HeartRate hack for Garmin Training Center
+            // It needs an hr datapoint for every trackpoint or else the 
+            // hr graph in TC won't display. Schema defines the datapoint
+            // as a positive int (> 0)
+
+            int tHr = 1;
             if (ride->areDataPresent()->hr && point->hr >0.00) {
-                QDomElement hr = doc.createElement("HeartRateBpm");
-                hr.setAttribute("xsi:type", "HeartRateInBeatsPerMinute_t");
-                QDomElement value = doc.createElement("Value");
-                text = doc.createTextNode(QString("%1").arg((int)point->hr));
-                value.appendChild(text);
-                hr.appendChild(value);
-                trackpoint.appendChild(hr);
+                tHr = (int)point->hr;
             }
+            QDomElement hr = doc.createElement("HeartRateBpm");
+            hr.setAttribute("xsi:type", "HeartRateInBeatsPerMinute_t");
+            QDomElement value = doc.createElement("Value");
+            text = doc.createTextNode(QString("%1").arg(tHr));
+            value.appendChild(text);
+            hr.appendChild(value);
+            trackpoint.appendChild(hr);
 
             // cad
             if (ride->areDataPresent()->cad && point->cad < 255) { //xsd maxInclusive value="254"
@@ -216,6 +249,44 @@ TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile
         }
     }
 
+    QDomElement extensions = doc.createElement("Extensions");
+    lap.appendChild(extensions);
+    QDomElement lx = doc.createElement("LX");
+    lx.setAttribute("xmlns", "http://www.garmin.com/xmlschemas/ActivityExtension/v2");
+    extensions.appendChild(lx);
+
+    QDomElement max_cad = doc.createElement("MaxBikeCadence");
+    text = doc.createTextNode(QString("%1").arg(computed.value("max_cadence")->value(true)));
+    max_cad.appendChild(text);
+    lx.appendChild(max_cad);
+
+    lx = doc.createElement("LX");
+    lx.setAttribute("xmlns", "http://www.garmin.com/xmlschemas/ActivityExtension/v2");
+    extensions.appendChild(lx);
+
+    QDomElement avg_speed = doc.createElement("AvgSpeed");
+    text = doc.createTextNode(QString("%1").arg(computed.value("average_speed")->value(true)));
+    avg_speed.appendChild(text);
+    lx.appendChild(avg_speed);
+
+    lx = doc.createElement("LX");
+    lx.setAttribute("xmlns", "http://www.garmin.com/xmlschemas/ActivityExtension/v2");
+    extensions.appendChild(lx);
+
+    QDomElement avg_power = doc.createElement("AvgWatts");
+    text = doc.createTextNode(QString("%1").arg((int)computed.value("average_power")->value(true)));
+    avg_power.appendChild(text);
+    lx.appendChild(avg_power);
+
+    lx = doc.createElement("LX");
+    lx.setAttribute("xmlns", "http://www.garmin.com/xmlschemas/ActivityExtension/v2");
+    extensions.appendChild(lx);
+
+    QDomElement max_power = doc.createElement("MaxWatts");
+    text = doc.createTextNode(QString("%1").arg((int)computed.value("max_power")->value(true)));
+    max_power.appendChild(text);
+    lx.appendChild(max_power);
+
     // Creator - Device
     QDomElement creator = doc.createElement("Creator");
     creator.setAttribute("xsi:type", "Device_t");
@@ -225,7 +296,7 @@ TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile
     if (ride->deviceType() != "")
         text = doc.createTextNode(ride->deviceType());
     else
-        text = doc.createTextNode("Unknow");
+        text = doc.createTextNode("Unknown");
     creator_name.appendChild(text);
     creator.appendChild(creator_name);
 
@@ -238,7 +309,6 @@ TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile
     text = doc.createTextNode("0");
     creator_productId.appendChild(text);
     creator.appendChild(creator_productId);
-
 
     QDomElement creator_version = doc.createElement("Version");
     creator.appendChild(creator_version);
@@ -262,7 +332,6 @@ TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile
     text = doc.createTextNode("0");
     creator_version_build_minor.appendChild(text);
     creator_version.appendChild(creator_version_build_minor);
-
 
     // Author - Application
     QDomElement author = doc.createElement("Author");
