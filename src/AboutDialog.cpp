@@ -38,12 +38,14 @@ AboutDialog::AboutDialog(MainWindow *mainWindow, QDir home) : mainWindow(mainWin
     aboutPage = new AboutPage(mainWindow, home);
     versionPage = new VersionPage(mainWindow, home);
     contributorsPage = new ContributorsPage(mainWindow, home);
+    configPage = new ConfigPage(mainWindow, home);
 
     tabWidget = new QTabWidget;
     tabWidget->setContentsMargins(0,0,0,0);
 
     tabWidget->addTab(aboutPage, tr("About"));
     tabWidget->addTab(versionPage, tr("Version"));
+    tabWidget->addTab(configPage, tr("Config"));
     tabWidget->addTab(contributorsPage, tr("Contributors"));
 
     mainLayout = new QVBoxLayout;
@@ -335,6 +337,26 @@ ContributorsPage::ContributorsPage(MainWindow *main, QDir home) : main(main), ho
     text=new QLabel(this);
     text->setContentsMargins(0,0,0,0);
     text->setText(contributorsTable);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->setSpacing(0);
+    mainLayout->setContentsMargins(0,0,0,0);
+    mainLayout->addWidget(text);
+
+    setLayout(mainLayout);
+}
+
+ConfigPage::ConfigPage(MainWindow *main, QDir home) : main(main), home(home)
+{
+    QTextEdit *text = new QTextEdit(this);
+    text->setContentsMargins(0,0,0,0);
+
+    QFile file(":gcconfig.pri");
+    file.open(QFile::ReadOnly);
+    QTextStream stream(&file);
+    QString contents = stream.readAll();
+    file.close();
+    text->setText(contents);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setSpacing(0);
