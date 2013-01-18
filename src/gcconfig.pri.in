@@ -207,6 +207,9 @@ macx {
 
     # Uncomment this line if you have SDK 10.7 or higher
     #DEFINES += GC_HAVE_LION
+
+    # Uncomment this line if you have the Mac OSX Wahoo API installed (Kickr)
+    #HAVE_WFAPI = true
 }
 
 #if you want a 'robot' to test realtime code without having
