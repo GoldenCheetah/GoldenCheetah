@@ -288,6 +288,7 @@ ContributorsPage::ContributorsPage(MainWindow *main, QDir home) : main(main), ho
     contributors.append("Dag Gruneau");
     contributors.append("Damien Grauser");
     contributors.append("Darren Hague");
+    contributors.append("Dean Junk");
     contributors.append("Eric Brandt");
     contributors.append("Eric Murray");
     contributors.append("Frank Zschockelt");
