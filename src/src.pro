@@ -153,6 +153,12 @@ macx {
 
     SOURCES +=  GcScopeBar.cpp
 
+    # on a mac we may install the Wahoo API for BTLE/Kickr support
+    !isEmpty(HAVE_WFAPI) {
+        DEFINES += GC_HAVE_WFAPI
+        LIBS += -framework WFConnector
+    }
+
 } else {
     # not a mac? then F12 to toggle full screen using
     # standard QT showFullScreen / showNormal
