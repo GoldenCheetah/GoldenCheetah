@@ -349,6 +349,11 @@ ContributorsPage::ContributorsPage(MainWindow *main, QDir home) : main(main), ho
 ConfigPage::ConfigPage(MainWindow *main, QDir home) : main(main), home(home)
 {
     QTextEdit *text = new QTextEdit(this);
+    text->setAutoFillBackground(false);
+#ifdef Q_OS_MAC
+    text->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
+    text->setFrameStyle(QFrame::NoFrame);
     text->setContentsMargins(0,0,0,0);
 
     QFile file(":gcconfig.pri");
