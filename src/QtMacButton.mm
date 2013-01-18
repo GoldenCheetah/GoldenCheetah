@@ -18,7 +18,6 @@
 
 #include "QtMacButton.h"
 
-#import "Foundation/NSAutoreleasePool.h"
 #import "AppKit/NSButton.h"
 #import "AppKit/NSFont.h"
 
@@ -196,8 +195,6 @@ QtMacButton::QtMacButton(QWidget *parent, BezelStyle bezelStyle) : QWidget(paren
 {
     setContentsMargins(0,0,0,0);
 
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
     NSButton *button = [[NSButton alloc] init];
     qtw = new QtMacButtonWidget(this, button, bezelStyle);
 
@@ -210,8 +207,6 @@ QtMacButton::QtMacButton(QWidget *parent, BezelStyle bezelStyle) : QWidget(paren
     setupLayout(button, this);
 
     [button release];
-
-    [pool drain];
 }
 
 void QtMacButton::setWidth(int x)
@@ -235,9 +230,7 @@ void QtMacButton::setText(const QString &text)
     if (!qtw)
         return;
 
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     [qtw->nsButton setTitle:fromQString(text)];
-    [pool drain];
 }
 
 void QtMacButton::setImage(const QPixmap &image)

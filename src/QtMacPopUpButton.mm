@@ -18,7 +18,6 @@
 
 #include "QtMacPopUpButton.h"
 
-#import "Foundation/NSAutoreleasePool.h"
 #import "AppKit/NSPopUpButton.h"
 #import "AppKit/NSFont.h"
 
@@ -180,8 +179,6 @@ QtMacPopUpButton::QtMacPopUpButton(QWidget *parent, BezelStyle bezelStyle) : QWi
 {
     setContentsMargins(0,0,0,0);
 
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
     NSPopUpButton *button = [[NSPopUpButton alloc] init];
     qtw = new QtMacPopUpButtonWidget(this, button, bezelStyle);
 
@@ -194,8 +191,6 @@ QtMacPopUpButton::QtMacPopUpButton(QWidget *parent, BezelStyle bezelStyle) : QWi
     setupLayout(button, this);
 
     [button release];
-
-    [pool drain];
 }
 
 void QtMacPopUpButton::setToolTip(const QString &text)
@@ -209,9 +204,7 @@ void QtMacPopUpButton::setText(const QString &text)
     if (!qtw)
         return;
 
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     [qtw->nsPopUpButton setTitle:fromQString(text)];
-    [pool drain];
 }
 
 void QtMacPopUpButton::setImage(const QPixmap &image)
