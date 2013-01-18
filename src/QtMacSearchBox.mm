@@ -65,10 +65,6 @@ SearchWidget::SearchWidget(QtMacSearchBox *parent)
 {
     setContentsMargins(0,0,0,0);
 
-    // Many Cocoa objects create temporary autorelease objects,
-    // so create a pool to catch them.
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
     // Setup the delegate
     QSearchDelegate *delegate = [[QSearchDelegate alloc] init];
     delegate->qtw = this;
@@ -87,9 +83,6 @@ SearchWidget::SearchWidget(QtMacSearchBox *parent)
     // Release our reference, since our super class takes ownership and we
     // don't need it anymore.
     [search release];
-
-    // Clean up our pool as we no longer need it.
-    [pool release];
 }
 
 SearchWidget::~SearchWidget()
