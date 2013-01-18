@@ -8,6 +8,7 @@
 class MainWindow;
 class AboutPage;
 class VersionPage;
+class ConfigPage;
 class ContributorsPage;
 
 class AboutDialog: public QDialog
@@ -24,6 +25,7 @@ class AboutDialog: public QDialog
 
         AboutPage *aboutPage;
         VersionPage *versionPage;
+        ConfigPage *configPage;
         ContributorsPage *contributorsPage;
 
         QTabWidget *tabWidget;
@@ -57,7 +59,18 @@ class VersionPage : public QWidget
     private:
         MainWindow *main;
         QDir home;
+};
 
+class ConfigPage : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        ConfigPage(MainWindow*main, QDir home);
+
+    private:
+        MainWindow *main;
+        QDir home;
 };
 
 class ContributorsPage : public QWidget
