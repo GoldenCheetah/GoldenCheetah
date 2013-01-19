@@ -106,6 +106,7 @@ static QString toQString(const NSString *nsstr)
 
 - (void)hardwareConnector:(WFHardwareConnector*)hwConnector stateChanged:(WFHardwareConnectorState_t)currentState
 {
+    qtw->stateChanged();
 }
 
 - (void)hardwareConnectorHasData
@@ -191,3 +192,8 @@ WFApi::hasFirmwareUpdateAvalableForConnection()
 qDebug()<<"hasFormware...";
 }
 
+void
+WFApi::stateChanged()
+{
+qDebug()<<"state changed...";
+}

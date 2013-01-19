@@ -65,6 +65,7 @@ public:
     bool discoverDevicesOfType(int eSensorType, int eNetworkType, int timeout);
 
 public slots:
+    void stateChanged();
     void connectedSensor(void*);
     void didDiscoverDevices();
     void disconnectedSensor(void*);
