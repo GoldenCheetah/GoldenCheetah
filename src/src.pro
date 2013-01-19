@@ -153,17 +153,30 @@ macx {
 
     SOURCES +=  GcScopeBar.cpp
 
-    # on a mac we may install the Wahoo API for BTLE/Kickr support
+    # on a mac we need to install the Wahoo API for BTLE/Kickr support
+    # This requires **v3.0 (beta)** of the WF API which is not yet
+    # in general release 
     !isEmpty(HAVE_WFAPI) {
+
         DEFINES += GC_HAVE_WFAPI
-        LIBS += -framework WFConnector
+        LIBS += -framework WFConnector -framework IOBluetooth
+
+        # We have an abstraction layer for the Wahoo Fitness API
+        # At present this only works on Mac -- since support for 
+        # BTLE on Linux and Windows is emerging and there is no
+        # Linux or Windows support for the WF API from Wahoo (yet)
+        HEADERS += WFApi.h
+        OBJECTIVE_SOURCES += WFApi.mm
+
     }
 
 } else {
+
     # not a mac? then F12 to toggle full screen using
     # standard QT showFullScreen / showNormal
     HEADERS += QTFullScreen.h
     SOURCES += QTFullScreen.cpp
+
 }
 
 !win32 {
