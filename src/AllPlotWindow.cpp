@@ -110,7 +110,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     r->addLayout(v);
     r->addStretch();
     revealControls->setLayout(r);
-
+    
     // hide them initially
     revealControls->hide();
 
@@ -442,6 +442,9 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     connect(mainWindow, SIGNAL(configChanged()), allPlot, SLOT(configChanged()));
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
     connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideDeleted(RideItem*)));
+
+    // set initial colors
+    configChanged();
 }
 
 void
@@ -449,6 +452,33 @@ AllPlotWindow::configChanged()
 {
     //We now use the window background color
     //fullPlot->setCanvasBackground(GColor(CPLOTTHUMBNAIL));
+    QColor bgColor = GColor(CRIDEPLOTBACKGROUND);
+    QColor fgColor;
+
+    if (bgColor == Qt::black) fgColor = Qt::white;
+    else if (bgColor == Qt::white) fgColor = Qt::black;
+    else {
+
+        QColor cRGB = bgColor.convertTo(QColor::Rgb);
+        // lets work it out..
+        int r = cRGB.red() < 128 ? 255 : 0;
+        int g = cRGB.green() < 128 ? 255 : 0;
+        int b = cRGB.blue() < 128 ? 255 : 0;
+        fgColor = QColor(r,g,b);
+    }
+
+    QString styleSheet = QString("background-color: transparent;"
+                                 "color: rgb(%1,%2,%3);")
+                        .arg(fgColor.red())
+                        .arg(fgColor.green())
+                        .arg(fgColor.blue());
+
+    // set the color
+    rSmooth->setStyleSheet(styleSheet);
+    //XXX always has white Background --> rSmoothEdit->setStyleSheet(styleSheet);
+    rSmoothSlider->setStyleSheet(styleSheet);
+    rStack->setStyleSheet(styleSheet);
+    rFull->setStyleSheet(styleSheet);
 
     // we're going to replot, but only if we're active
     // and all the other guff
