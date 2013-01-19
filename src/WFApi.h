@@ -52,11 +52,31 @@ public:
 
     static WFApi *getInstance() { return _gc_wfapi; } // singleton
 
+    // what version?
+    QString apiVersion();
+
+    // status of BTLE
+    bool hasBTLESupport();
+    bool isBTLEEnabled();
+    bool enableBTLE(bool enable, bool bondingmode);
+    bool isCommunicationHWReady();
+
+    // scan
+    bool discoverDevicesOfType(int eSensorType, int eNetworkType, int timeout);
+
+public slots:
+    void connectedSensor(void*);
+    void didDiscoverDevices();
+    void disconnectedSensor(void*);
+    void hasData();
+    void hasFirmwareUpdateAvalableForConnection();
+
+
 signals:
 
 public slots:
 
-private:
+public:
 
     // the native api bridge -- private implementation in
     // WFApi.mm -- bridge between the QT/C++ world and the
@@ -64,7 +84,7 @@ private:
 #ifdef __OBJC__
     WFBridge *wf; // when included in objc sources
 #else /* __OBJC__ */
-    void *wb;       // when included in C++ sources
+    void *wf;       // when included in C++ sources
 #endif /* __OBJC__ */
 
 };
