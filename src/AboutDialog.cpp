@@ -31,6 +31,10 @@
 #include "Lucene.h"
 #endif
 
+#ifdef GC_HAVE_WFAPI
+#include "WFApi.h"
+#endif
+
 AboutDialog::AboutDialog(MainWindow *mainWindow, QDir home) : mainWindow(mainWindow), home(home)
 {
     setWindowTitle(tr("About GoldenCheetah"));
@@ -206,6 +210,12 @@ VersionPage::VersionPage(MainWindow *main, QDir home) : main(main), home(home)
     #endif
     #endif
 
+    #ifdef GC_HAVE_WFAPI
+    QString wfapi = WFApi::getInstance()->apiVersion();
+    #else
+    QString wfapi = QString("none");
+    #endif
+
     QString gc_version = tr(
             "<p>Build date: %1 %2"
             "<br>Version: %3"
@@ -231,10 +241,11 @@ VersionPage::VersionPage(MainWindow *main, QDir home) : main(main), home(home)
             "<tr><td colspan=\"2\">ICAL</td><td>%9</td></tr>"
             "<tr><td colspan=\"2\">USBXPRESS</td><td>%10</td></tr>"
             "<tr><td colspan=\"2\">LIBUSB</td><td>%11</td></tr>"
-            "<tr><td colspan=\"2\">VLC</td><td>%12</td></tr>"
-            "<tr><td colspan=\"2\">LUCENE</td><td>%13</td></tr>"
+            "<tr><td colspan=\"2\">Wahoo API</td><td>%12</td></tr>"
+            "<tr><td colspan=\"2\">VLC</td><td>%13</td></tr>"
+            "<tr><td colspan=\"2\">LUCENE</td><td>%14</td></tr>"
             #ifdef Q_OS_MAC
-            "<tr><td colspan=\"2\">LION SUPPORT</td><td>%14</td></tr>"
+            "<tr><td colspan=\"2\">LION SUPPORT</td><td>%15</td></tr>"
             #endif
             "</table>"
             )
@@ -249,6 +260,7 @@ VersionPage::VersionPage(MainWindow *main, QDir home) : main(main), home(home)
             .arg(ical)
             .arg(usbxpress)
             .arg(libusb)
+            .arg(wfapi)
             .arg(vlc)
             .arg(clucene)
             #ifdef Q_OS_MAC
