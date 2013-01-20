@@ -61,8 +61,14 @@ public:
     bool enableBTLE(bool enable, bool bondingmode);
     bool isCommunicationHWReady();
 
+    // current state
+    int currentState();
+
     // scan
     bool discoverDevicesOfType(int eSensorType, int eNetworkType, int timeout);
+
+signals:
+    void currentStateChanged(int); // hardware conncector state changed
 
 public slots:
     void stateChanged();
@@ -89,5 +95,28 @@ public:
 #endif /* __OBJC__ */
 
 };
+
+//
+// We need to define the constants from the WF API headers because they
+// assume you are building with OBJ C. And fail to compile with gcc/g++
+//
+
+// Hardware Connector states
+typedef enum
+{
+    /** The fisica device is not physically connected to the iPod. */
+    WFAPI_HWCONN_STATE_NOT_CONNECTED                = 0,
+    /** The fisica device is physically connected to the iPod. */
+    WFAPI_HWCONN_STATE_CONNECTED                    = 0x01,
+    /** The fisica device is connected and communication is established (norml operating mode). */
+    WFAPI_HWCONN_STATE_ACTIVE                       = 0x02,
+    /** The fisica device is performing a reset operation. */
+    WFAPI_HWCONN_STATE_RESET                        = 0x04,
+    /** The BTLE hardware is enabled. */
+    WFAPI_HWCONN_STATE_BT40_ENABLED                 = 0x08,
+    /** The BTLE controller is in bonding mode. */
+    WFAPI_HWCONN_STATE_BT_BONDING_MODE              = 0x10,
+    
+} WFConnState;
 
 #endif

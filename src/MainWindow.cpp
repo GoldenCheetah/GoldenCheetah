@@ -122,6 +122,8 @@
 #include "LibraryParser.h"
 #include "TrainDB.h"
 
+#include "WFApi.h"
+
 QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 QDesktopWidget *desktop = NULL;
 
@@ -130,6 +132,8 @@ MainWindow::MainWindow(const QDir &home) :
     zones_(new Zones), hrzones_(new HrZones),
     ride(NULL), workout(NULL)
 {
+    qDebug()<<"currentstate="<<WFApi::getInstance()->currentState();
+    WFApi::getInstance()->enableBTLE(true, true);
 
     if (desktop == NULL) desktop = QApplication::desktop();
     static const QIcon hideIcon(":images/toolbar/main/hideside.png");

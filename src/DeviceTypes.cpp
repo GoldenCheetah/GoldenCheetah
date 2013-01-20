@@ -49,6 +49,11 @@ static DeviceType SupportedDevices[] =
         "to a USB port. Please make sure you have device firmware to hand." ,
         ":images/devices/fortius.png" },
 #endif
+#ifdef GC_HAVE_WFAPI
+      { DEV_KICKR,    DEV_BTLE,     (char *) "Wahoo Kickr", true,   false,
+        "The Wahoo Fitness Kickr cyling trainer via its Bluetooth smart interface. ",
+        ":images/devices/kickr.png" },
+#endif
 #ifdef GC_WANT_ROBOT
       { DEV_NULL,     DEV_TCP,     (char *) "Robot", false,   false,
         "Testing device used for development only. If an ERG file is selected it will "

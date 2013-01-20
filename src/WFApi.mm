@@ -90,6 +90,8 @@ static QString toQString(const NSString *nsstr)
 // ready to scan
 -(BOOL)isCommunicationHWReady { return [[WFHardwareConnector sharedConnector] isCommunicationHWReady]; }
 
+// current State
+-(int)currentState { return [[WFHardwareConnector sharedConnector] currentState]; }
 // scan
 -(BOOL)discoverDevicesOfType:(WFSensorType_t)eSensorType onNetwork:(WFNetworkType_t)eNetworkType searchTimeout:(NSTimeInterval)timeout
 {
@@ -173,6 +175,7 @@ bool WFApi::isCommunicationHWReady() { return [wf isCommunicationHWReady]; }
 bool WFApi::enableBTLE(bool enable, bool bondingmode) {
     return [wf enableBTLE:enable inBondingMode:bondingmode];
 }
+int WFApi::currentState() { return [wf currentState]; }
 
 bool
 WFApi::discoverDevicesOfType(int eSensorType, int eNetworkType, int timeout)
@@ -218,5 +221,6 @@ qDebug()<<"hasFormware...";
 void
 WFApi::stateChanged()
 {
-qDebug()<<"state changed...";
+qDebug()<<"state changed..." << currentState();
+emit currentStateChanged(currentState());
 }
