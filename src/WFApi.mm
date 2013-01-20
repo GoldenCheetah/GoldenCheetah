@@ -53,15 +53,12 @@ static QString toQString(const NSString *nsstr)
     QPointer<WFApi> qtw; // the QT QObject public class
 
 @private
-    WFHardwareConnector *sharedConnector;
 }
 
-@property (retain) WFHardwareConnector *sharedConnector;
 @end
 
 @implementation WFBridge
 
-@synthesize sharedConnector;
 
 //**********************************************************************
 // METHODS
@@ -70,36 +67,36 @@ static QString toQString(const NSString *nsstr)
 // initialise by getting the WF API singleton
 -(id)init
 {
-
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc]init];
-
     // initialise
-    self.sharedConnector = [WFHardwareConnector sharedConnector];
-    [self.sharedConnector setDelegate:self];
-   
-    [pool drain]; 
+    [[WFHardwareConnector sharedConnector] setDelegate:self];
     return self;
 }
 
 //version
--(NSString *) apiVersion { return [self.sharedConnector apiVersion]; }
+-(NSString *) apiVersion { return [[WFHardwareConnector sharedConnector] apiVersion]; }
 
 // State of BTLE support and hardware
--(BOOL)hasBTLESupport { return [self.sharedConnector hasBTLESupport]; }
+-(BOOL)hasBTLESupport { return [[WFHardwareConnector sharedConnector] hasBTLESupport]; }
 
 // By default BTLE is disabled
--(BOOL)isBTLEEnabled { return [self.sharedConnector isBTLEEnabled]; }
+-(BOOL)isBTLEEnabled { return [[WFHardwareConnector sharedConnector] isBTLEEnabled]; }
 -(BOOL)enableBTLE:(BOOL)bEnable inBondingMode:(BOOL)bBondingMode {
-    return [self.sharedConnector enableBTLE:bEnable inBondingMode:bBondingMode];
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    bool result = [[WFHardwareConnector sharedConnector] enableBTLE:bEnable inBondingMode:bBondingMode];
+    [pool drain];
+    return result;
 }
 
 // ready to scan
--(BOOL)isCommunicationHWReady { return [self.sharedConnector isCommunicationHWReady]; }
+-(BOOL)isCommunicationHWReady { return [[WFHardwareConnector sharedConnector] isCommunicationHWReady]; }
 
 // scan
 -(BOOL)discoverDevicesOfType:(WFSensorType_t)eSensorType onNetwork:(WFNetworkType_t)eNetworkType searchTimeout:(NSTimeInterval)timeout
 {
-    return [self.sharedConnector discoverDevicesOfType:eSensorType onNetwork:eNetworkType searchTimeout:timeout];
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    [[WFHardwareConnector sharedConnector] discoverDevicesOfType:eSensorType onNetwork:eNetworkType searchTimeout:timeout]; //XXX ignoringreturn
+    [pool drain];
+    return true;
 }
 
 //**********************************************************************
@@ -153,8 +150,10 @@ WFApi *_gc_wfapi = _gc_wfapi_init();
 // Construct the bridge to the WF API
 WFApi::WFApi()
 {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     wf = [[WFBridge alloc] init];
     wf->qtw = this;
+    [pool drain];
 }
 
 // Destroy the bridge to the WF API
