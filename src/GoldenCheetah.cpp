@@ -257,19 +257,19 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
 
         // fill in the title bar
         QRect bar(0,0,width(),contentsMargins().top());
-        if (contentsMargins().top() < 25) {
-        QColor bg;
-        if (property("active").toBool() == true) {
-            bg = GColor(CTILEBARSELECT);
-            painter.drawPixmap(bar, aluBar);
-        } else {
-            bg = GColor(CTILEBAR);
-            painter.drawPixmap(bar, aluBarDark);
-        }
-        } else {
+        //if (contentsMargins().top() < 25) {
+        //QColor bg;
+        //if (property("active").toBool() == true) {
+            //bg = GColor(CTILEBARSELECT);
+            //painter.drawPixmap(bar, aluBar);
+        //} else {
+            //bg = GColor(CTILEBAR);
+            //painter.drawPixmap(bar, aluBarDark);
+        //}
+        //} else {
             painter.setPen(Qt::darkGray);
             painter.drawRect(QRect(0,0,width()-1,height()-1));
-        }
+        //}
 
         // heading
         QFont font;
@@ -281,13 +281,29 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         QString heading = subtitle != "" ? subtitle : title;
 
         // embossed...
-        QRect shad = bar;
-        shad.setY(bar.y()+2);
+        //QRect shad = bar;
+        //shad.setY(bar.y()+2);
         //shad.setX(bar.x()+2);
-        painter.setPen(QColor(255,255,255,180));
-        painter.drawText(shad, heading, Qt::AlignVCenter | Qt::AlignCenter);
+        //painter.setPen(QColor(255,255,255,180));
+        //painter.drawText(shad, heading, Qt::AlignVCenter | Qt::AlignCenter);
 
-        painter.setPen(QColor(0,0,0,200));
+        // pen color needs to contrast to background color
+        QColor bgColor = property("color").value<QColor>();
+        QColor fgColor;
+
+        if (bgColor == Qt::black) fgColor = Qt::white;
+        else if (bgColor == Qt::white) fgColor = Qt::black;
+        else {
+
+            QColor cRGB = bgColor.convertTo(QColor::Rgb);
+            // lets work it out..
+            int r = cRGB.red() < 128 ? 255 : 0;
+            int g = cRGB.green() < 128 ? 255 : 0;
+            int b = cRGB.blue() < 128 ? 255 : 0;
+            fgColor = QColor(r,g,b);
+        }
+
+        painter.setPen(fgColor);
         painter.drawText(bar, heading, Qt::AlignVCenter | Qt::AlignCenter);
 
         // border

@@ -24,6 +24,9 @@
 
 #include <QGraphicsDropShadowEffect>
 
+static const int tileMargin = 20;
+static const int tileSpacing = 10;
+
 HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowtitle */) :
     GcWindow(mainWindow), mainWindow(mainWindow), name(name), active(false),
     clicked(NULL), dropPending(false), chartCursor(-2), loaded(false)
@@ -173,8 +176,8 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     winWidget->setContentsMargins(0,0,0,0);
     winWidget->setPalette(palette);
 
-    winFlow = new GcWindowLayout(winWidget, 0, 20, 20);
-    winFlow->setContentsMargins(20,20,20,20);
+    winFlow = new GcWindowLayout(winWidget, 0, tileSpacing, tileSpacing);
+    winFlow->setContentsMargins(tileMargin,tileMargin,tileMargin,tileMargin);
 
     winArea = new QScrollArea(this);
     winArea->setAutoFillBackground(false);
@@ -666,13 +669,13 @@ HomeWindow::addChart(GcWindow* newone)
                 // divided by the number of items
 
                 double newwidth = (winArea->width() - 20 /* scrollbar */
-                               - 40 /* left and right marings */
-                               - ((widthFactor-1) * 20) /* internal spacing */
+                               - (tileMargin*2) /* left and right marings */
+                               - ((widthFactor-1) * tileSpacing) /* internal spacing */
                                ) / widthFactor;
 
                 double newheight = (winArea->height()
-                               - 40 /* top and bottom marings */
-                               - ((heightFactor-1) * 20) /* internal spacing */
+                               - (tileMargin*2) /* top and bottom marings */
+                               - ((heightFactor-1) * tileSpacing) /* internal spacing */
                                ) / heightFactor;
 
                 int minWidth = 10;
@@ -815,13 +818,13 @@ HomeWindow::resizeEvent(QResizeEvent * /* e */)
 
 
             double newwidth = (winArea->width() - 20 /* scrollbar */
-                           - 40 /* left and right marings */
-                           - ((widthFactor-1) * 20) /* internal spacing */
+                           - (tileMargin*2) /* left and right marings */
+                           - ((widthFactor-1) * tileSpacing) /* internal spacing */
                            ) / widthFactor;
 
             double newheight = (winArea->height()
-                           - 40 /* top and bottom marings */
-                           - ((heightFactor-1) * 20) /* internal spacing */
+                           - (tileMargin*2) /* top and bottom marings */
+                           - ((heightFactor-1) * tileSpacing) /* internal spacing */
                            ) / heightFactor;
 
             int minWidth = 10;
