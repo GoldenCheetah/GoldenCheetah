@@ -1587,7 +1587,6 @@ MainWindow::selectAnalysis()
         masterControls->setCurrentIndex(0);
         views->setCurrentIndex(0);
         analWindow->selected(); // tell it!
-        currentWindow = analWindow;
         trainTool->getToolbarButtons()->hide();
 #ifndef Q_OS_MAC
     analButtons->show();
@@ -1602,6 +1601,7 @@ MainWindow::selectAnalysis()
         toolBox->setCurrentIndex(0);
         setStyle();
     }
+    currentWindow = analWindow;
 }
 
 void
@@ -1625,7 +1625,6 @@ MainWindow::selectTrain()
         masterControls->setCurrentIndex(1);
         views->setCurrentIndex(1);
         trainWindow->selected(); // tell it!
-        currentWindow = trainWindow;
         trainTool->getToolbarButtons()->show();
     #ifndef Q_OS_MAC
         analButtons->hide();
@@ -1640,6 +1639,7 @@ MainWindow::selectTrain()
         toolBox->setCurrentIndex(2);
         setStyle();
     }
+    currentWindow = trainWindow;
 }
 
 void
@@ -1661,7 +1661,6 @@ MainWindow::selectDiary()
         masterControls->setCurrentIndex(2);
         views->setCurrentIndex(2);
         diaryWindow->selected(); // tell it!
-        currentWindow = diaryWindow;
         trainTool->getToolbarButtons()->hide();
     #ifndef Q_OS_MAC
         analButtons->hide();
@@ -1673,6 +1672,7 @@ MainWindow::selectDiary()
         gcCalendar->refresh(); // get that signal with the date range...
         setStyle();
     }
+    currentWindow = diaryWindow;
 }
 
 void
@@ -1695,7 +1695,6 @@ MainWindow::selectHome()
         masterControls->setCurrentIndex(3);
         views->setCurrentIndex(3);
         homeWindow->selected(); // tell it!
-        currentWindow = homeWindow;
         trainTool->getToolbarButtons()->hide();
     #ifndef Q_OS_MAC
         analButtons->hide();
@@ -1706,6 +1705,7 @@ MainWindow::selectHome()
         toolBox->setCurrentIndex(3);
         setStyle();
     }
+    currentWindow = homeWindow;
 }
 void
 MainWindow::selectAthlete()
@@ -2537,7 +2537,6 @@ MainWindow::notifyRideSelected() {}
 void
 MainWindow::recordMeasure()
 {
-qDebug()<<"manually record measurements...";
 }
 
 void
