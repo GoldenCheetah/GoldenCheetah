@@ -124,6 +124,7 @@ AddType::clicked(QString p)
     if (wizard->found == false) next =20;
     else {
         switch(wizard->deviceTypes.Supported[wizard->current].type) {
+        case DEV_KICKR : 
         case DEV_ANTLOCAL : next = 50; break; // pair 
         default:
         case DEV_CT : next = 60; break; // confirm and add 
@@ -181,6 +182,7 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
 #endif
     case DEV_NULL : wizard->controller = new NullController(NULL, NULL); break;
     case DEV_ANTLOCAL : wizard->controller = new ANTlocalController(NULL, NULL); break;
+    case DEV_KICKR : wizard->controller = new KickrController(NULL, NULL); break;
 
     default: wizard->controller = NULL; break;
 

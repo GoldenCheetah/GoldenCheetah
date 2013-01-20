@@ -34,6 +34,9 @@
 #include "ANTplusController.h"
 #include "ANTlocalController.h"
 #include "NullController.h"
+#ifdef GC_HAVE_WFAPI
+#include "KickrController.h"
+#endif
 #ifdef GC_HAVE_LIBUSB
 #include "FortiusController.h"
 #endif
@@ -457,6 +460,8 @@ TrainTool::configChanged()
                 Devices[i].controller = new NullController(this, &Devices[i]);
             } else if (Devices.at(i).type == DEV_ANTLOCAL) {
                 Devices[i].controller = new ANTlocalController(this, &Devices[i]);
+            } else if (Devices.at(i).type == DEV_KICKR) {
+                Devices[i].controller = new KickrController(this, &Devices[i]);
             }
         }
     }

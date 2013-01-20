@@ -167,7 +167,8 @@ macx {
         # At present this only works on Mac -- since support for 
         # BTLE on Linux and Windows is emerging and there is no
         # Linux or Windows support for the WF API from Wahoo (yet)
-        HEADERS += WFApi.h
+        HEADERS += WFApi.h Kickr.h KickrController.h
+        SOURCES += Kickr.cpp KickrController.cpp
         OBJECTIVE_SOURCES += WFApi.mm
 
     }

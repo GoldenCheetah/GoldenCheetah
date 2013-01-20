@@ -24,6 +24,9 @@
 #include "DeviceTypes.h"
 #include "Serial.h"
 #include "RealtimeController.h"
+#ifdef GC_HAVE_WFAPI
+#include "KickrController.h"
+#endif
 #ifdef GC_HAVE_LIBUSB
 #include "FortiusController.h"
 #endif
