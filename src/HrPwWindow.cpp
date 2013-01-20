@@ -89,6 +89,9 @@ HrPwWindow::HrPwWindow(MainWindow *mainWindow) :
     r->addStretch();
     revealControls->setLayout(r);
 
+    // hide them initially
+    revealControls->hide();
+
     //
     // Chart layout
     //

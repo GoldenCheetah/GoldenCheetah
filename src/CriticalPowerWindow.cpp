@@ -38,11 +38,42 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
 {
     setInstanceName("Critical Power Window");
 
+    // Main layout
+    QGridLayout *mainLayout = new QGridLayout(this);
+    mainLayout->setContentsMargins(0,0,0,0);
+
+    //
+    // reveal controls widget
+    //
+
+    // reveal widget
+    revealControls = new QWidget(this);
+    revealControls->setFixedHeight(50);
+    //revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 10%)");
+    revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    // layout reveal controls
+    QHBoxLayout *revealLayout = new QHBoxLayout;
+    revealLayout->setContentsMargins(0,0,0,0);
+    revealLayout->addStretch();
+
+    rCpintSetCPButton = new QPushButton(tr("&Save CP value"), this);
+    rCpintSetCPButton->setEnabled(false);
+
+    revealLayout->addWidget(rCpintSetCPButton);
+    revealLayout->addStretch();
+
+    revealControls->setLayout(revealLayout);
+
+    // hide them initially
+    revealControls->hide();
+
+
     // main plot area
     QVBoxLayout *vlayout = new QVBoxLayout;
     cpintPlot = new CpintPlot(mainWindow, home.path(), mainWindow->zones());
     vlayout->addWidget(cpintPlot);
-    setLayout(vlayout);
+
 
     // controls
     QWidget *c = new QWidget;
@@ -59,6 +90,20 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     cl->addRow(new QLabel(tr("Filter")), searchBox);
     cl->addWidget(new QLabel("")); //spacing
 #endif
+
+    //
+    // picker
+    //
+
+    // picker widget
+    QWidget *pickerControls = new QWidget(this);
+    pickerControls->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+
+    // picker layout
+    QVBoxLayout *pickerLayout = new QVBoxLayout(pickerControls);
+    QFormLayout *pcl = new QFormLayout;
+    pickerLayout->addSpacing(50);
+    pickerLayout->addLayout(pcl);
 
     // picker details
     QLabel *cpintTimeLabel = new QLabel(tr("Duration:"), this);
@@ -86,11 +131,11 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     cpintAllValue->setFont(font);
     cpintCPValue->setFont(font);
 
-    cl->addRow(cpintTimeLabel, cpintTimeValue);
-    cl->addRow(cpintTodayLabel, cpintTodayValue);
-    cl->addRow(cpintAllLabel, cpintAllValue);
-    cl->addRow(cpintCPLabel, cpintCPValue);
-    cl->addWidget(new QLabel("")); //spacing
+    pcl->addRow(cpintTimeLabel, cpintTimeValue);
+    pcl->addRow(cpintTodayLabel, cpintTodayValue);
+    pcl->addRow(cpintAllLabel, cpintAllValue);
+    pcl->addRow(cpintCPLabel, cpintCPValue);
+    pcl->addWidget(new QLabel("")); //spacing
 
     // tools /properties
     seriesCombo = new QComboBox(this);
@@ -119,7 +164,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
 
     cl->addWidget(new QLabel("")); //spacing
     cl->addRow(new QLabel(tr("Data series")), seriesCombo);
-    cl->addRow(new QLabel(""), cpintSetCPButton);
+    pcl->addRow(new QLabel(""), cpintSetCPButton);
 
     picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
                                QwtPicker::VLineRubberBand,
@@ -127,9 +172,18 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     picker->setStateMachine(new QwtPickerDragPointMachine);
     picker->setRubberBandPen(GColor(CPLOTTRACKER));
 
+    mainLayout->addLayout(vlayout, 0, 0);
+    mainLayout->addWidget(pickerControls, 0, 0, Qt::AlignTop | Qt::AlignRight);
+    mainLayout->addWidget(revealControls,0,0, Qt::AlignTop);
+    pickerControls->raise();
+    revealControls->raise();
+    setLayout(mainLayout);
+
     connect(picker, SIGNAL(moved(const QPoint &)), SLOT(pickerMoved(const QPoint &)));
     connect(cpintTimeValue, SIGNAL(editingFinished()), this, SLOT(cpintTimeValueEntered()));
     connect(cpintSetCPButton, SIGNAL(clicked()), this, SLOT(cpintSetCPButtonClicked()));
+    connect(rCpintSetCPButton, SIGNAL(clicked()), this, SLOT(cpintSetCPButtonClicked()));
+
     if (rangemode) {
         connect(this, SIGNAL(dateRangeChanged(DateRange)), SLOT(dateRangeChanged(DateRange)));
     } else {
@@ -193,6 +247,7 @@ CriticalPowerWindow::rideSelected()
         // apply latest colors
         picker->setRubberBandPen(GColor(CPLOTTRACKER));
         cpintSetCPButton->setEnabled(cpintPlot->cp > 0);
+        rCpintSetCPButton->setEnabled(cpintPlot->cp > 0);
     }
 }
 
@@ -366,10 +421,12 @@ void CriticalPowerWindow::addSeries()
                << RideFile::none; // XXX actually this shows energy (hack)
 
     foreach (RideFile::SeriesType x, seriesList) {
-        if (x==RideFile::none)
+        if (x==RideFile::none) {
             seriesCombo->addItem(tr("Energy"), static_cast<int>(x));
-        else
+        }
+        else {
             seriesCombo->addItem(RideFile::seriesName(x), static_cast<int>(x));
+        }
     }
 }
 
@@ -397,7 +454,9 @@ CriticalPowerWindow::resetSeasons()
     }
     // restore previous selection
     int index = cComboSeason->findText(prev);
-    if (index != -1) cComboSeason->setCurrentIndex(index);
+    if (index != -1)  {
+        cComboSeason->setCurrentIndex(index);
+    }
 }
 
 void

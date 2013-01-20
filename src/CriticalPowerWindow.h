@@ -58,6 +58,11 @@ class CriticalPowerWindow : public GcWindow
 
         CriticalPowerWindow(const QDir &home, MainWindow *parent, bool range = false);
 
+        // reveal
+        bool hasReveal() { return true; }
+        void reveal() { revealControls->show(); }
+        void unreveal() { revealControls->hide(); }
+
         void deleteCpiFile(QString filename);
 
         // set/get properties
@@ -121,6 +126,9 @@ class CriticalPowerWindow : public GcWindow
         void useThruToday();
 
     private:
+        // reveal controls
+        QWidget *revealControls;
+
         void updateCpint(double minutes);
 
         QString _dateRange;
@@ -137,6 +145,7 @@ class CriticalPowerWindow : public GcWindow
         QComboBox *seriesCombo;
         QComboBox *cComboSeason;
         QPushButton *cpintSetCPButton;
+        QPushButton *rCpintSetCPButton;
         QwtPlotPicker *picker;
         void addSeries();
         Seasons *seasons;

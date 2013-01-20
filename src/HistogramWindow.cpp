@@ -68,7 +68,6 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
 
     // layout reveal controls
     QHBoxLayout *r = new QHBoxLayout;
-    r->setSpacing(4);
     r->setContentsMargins(0,0,0,0);
     r->addStretch();
     r->addWidget(rWidth);

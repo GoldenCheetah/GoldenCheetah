@@ -43,6 +43,11 @@ class PfPvWindow : public GcWindow
 
         PfPvWindow(MainWindow *mainWindow);
 
+        // reveal
+        bool hasReveal() { return true; }
+        void reveal() { revealControls->show(); }
+        void unreveal() { revealControls->hide(); }
+
         // get/set properties
         QString watts() const { return qaCPValue->text(); }
         void setWatts(QString x) { qaCPValue->setText(x); }
@@ -69,8 +74,11 @@ class PfPvWindow : public GcWindow
         void setQaCADFromLineEdit();
         void setQaCLFromLineEdit();
         void setShadeZonesPfPvFromCheckBox();
+        void setrShadeZonesPfPvFromCheckBox();
         void setMergeIntervalsPfPvFromCheckBox();
+        void setrMergeIntervalsPfPvFromCheckBox();
         void setFrameIntervalsPfPvFromCheckBox();
+        void setrFrameIntervalsPfPvFromCheckBox();
 
     protected:
 
@@ -84,6 +92,11 @@ class PfPvWindow : public GcWindow
         QLineEdit *qaCadValue;
         QLineEdit *qaClValue;
         RideItem *current;
+
+    private:
+        // reveal controls
+        QWidget *revealControls;
+        QCheckBox *rShade, *rMergeInterval, *rFrameInterval;
 };
 
 #endif // _GC_PfPvWindow_h
