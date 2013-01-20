@@ -9,7 +9,7 @@ TARGET = GoldenCheetah
 DEPENDPATH += .
 
 INCLUDEPATH += ../qwt/src ../qxt/src $${LIBZ_INCLUDE}
-QT += xml sql network webkit script
+QT += xml sql network webkit script svg
 LIBS += ../qwt/lib/libqwt.a
 LIBS += -lm $${LIBZ_LIBS}
 
@@ -135,7 +135,7 @@ LIBS += -lm $${LIBZ_LIBS}
 # Lion fullscreen playback
 # search box for title bar
 macx {
-    LIBS    += -lobjc -framework Carbon -framework IOKit -framework AppKit -framework QTKit
+    LIBS    += -lobjc -framework IOKit -framework AppKit -framework QTKit
     HEADERS +=  QtMacVideoWindow.h \
                 LionFullScreen.h \
                 QtMacSegmentedButton.h \
@@ -159,7 +159,9 @@ macx {
     !isEmpty(HAVE_WFAPI) {
 
         DEFINES += GC_HAVE_WFAPI
-        LIBS += -framework WFConnector -framework IOBluetooth
+        LIBS += -framework WFConnector 
+        LIBS += -framework IOBluetooth -framework Foundation
+        LIBS += -lstdc++ -all_load
 
         # We have an abstraction layer for the Wahoo Fitness API
         # At present this only works on Mac -- since support for 

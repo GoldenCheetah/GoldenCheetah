@@ -63,13 +63,21 @@ static QString toQString(const NSString *nsstr)
 
 @synthesize sharedConnector;
 
+//**********************************************************************
+// METHODS
+//**********************************************************************
+
 // initialise by getting the WF API singleton
 -(id)init
 {
 
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc]init];
+
     // initialise
     self.sharedConnector = [WFHardwareConnector sharedConnector];
     [self.sharedConnector setDelegate:self];
+   
+    [pool drain]; 
     return self;
 }
 
@@ -78,43 +86,53 @@ static QString toQString(const NSString *nsstr)
 
 // State of BTLE support and hardware
 -(BOOL)hasBTLESupport { return [self.sharedConnector hasBTLESupport]; }
+
+// By default BTLE is disabled
 -(BOOL)isBTLEEnabled { return [self.sharedConnector isBTLEEnabled]; }
 -(BOOL)enableBTLE:(BOOL)bEnable inBondingMode:(BOOL)bBondingMode {
     return [self.sharedConnector enableBTLE:bEnable inBondingMode:bBondingMode];
 }
+
+// ready to scan
 -(BOOL)isCommunicationHWReady { return [self.sharedConnector isCommunicationHWReady]; }
+
+// scan
 -(BOOL)discoverDevicesOfType:(WFSensorType_t)eSensorType onNetwork:(WFNetworkType_t)eNetworkType searchTimeout:(NSTimeInterval)timeout
 {
     return [self.sharedConnector discoverDevicesOfType:eSensorType onNetwork:eNetworkType searchTimeout:timeout];
 }
 
+//**********************************************************************
+// EVENTS / SIGNALS
+//**********************************************************************
+
 // WFHardwareConnectorDelegate Functions
-- (void)hardwareConnector:(WFHardwareConnector*)hwConnector connectedSensor:(WFSensorConnection*)connectionInfo
+-(void)hardwareConnector:(WFHardwareConnector*)hwConnector connectedSensor:(WFSensorConnection*)connectionInfo
 {
     qtw->connectedSensor(connectionInfo);
 }
 
-- (void)hardwareConnector:(WFHardwareConnector*)hwConnector didDiscoverDevices:(NSSet*)connectionParams searchCompleted:(BOOL)bCompleted
+-(void)hardwareConnector:(WFHardwareConnector*)hwConnector didDiscoverDevices:(NSSet*)connectionParams searchCompleted:(BOOL)bCompleted
 {
     qtw->didDiscoverDevices(); //XXX convert array
 }
 
-- (void)hardwareConnector:(WFHardwareConnector*)hwConnector disconnectedSensor:(WFSensorConnection*)connectionInfo
+-(void)hardwareConnector:(WFHardwareConnector*)hwConnector disconnectedSensor:(WFSensorConnection*)connectionInfo
 {
     qtw->disconnectedSensor(connectionInfo);
 }
 
-- (void)hardwareConnector:(WFHardwareConnector*)hwConnector stateChanged:(WFHardwareConnectorState_t)currentState
+-(void)hardwareConnector:(WFHardwareConnector*)hwConnector stateChanged:(WFHardwareConnectorState_t)currentState
 {
     qtw->stateChanged();
 }
 
-- (void)hardwareConnectorHasData
+-(void)hardwareConnectorHasData
 {
     qtw->hasData();
 }
 
-- (void) hardwareConnector:(WFHardwareConnector*)hwConnector hasFirmwareUpdateAvailableForConnection:(WFSensorConnection*)connectionInfo required:(BOOL)required withWahooUtilityAppURL:(NSURL *)wahooUtilityAppURL
+-(void) hardwareConnector:(WFHardwareConnector*)hwConnector hasFirmwareUpdateAvailableForConnection:(WFSensorConnection*)connectionInfo required:(BOOL)required withWahooUtilityAppURL:(NSURL *)wahooUtilityAppURL
 {
     qtw->hasFirmwareUpdateAvalableForConnection(); //XXX do what?
 }
@@ -145,7 +163,10 @@ WFApi::~WFApi()
     [wf release];
 }
 
-// Methods
+//**********************************************************************
+// METHODS
+//**********************************************************************
+
 QString WFApi::apiVersion() { return toQString([wf apiVersion]); }
 bool WFApi::isBTLEEnabled() { return [wf isBTLEEnabled]; }
 bool WFApi::hasBTLESupport() { return [wf hasBTLESupport]; }
@@ -161,7 +182,10 @@ WFApi::discoverDevicesOfType(int eSensorType, int eNetworkType, int timeout)
     return [wf discoverDevicesOfType:WF_SENSORTYPE_BIKE_POWER onNetwork:WF_NETWORKTYPE_BTLE searchTimeout:15.00];
 }
 
-// slots
+//**********************************************************************
+// SLOTS
+//**********************************************************************
+
 void
 WFApi::connectedSensor(void*)
 {
