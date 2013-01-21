@@ -123,6 +123,10 @@
 #include "LibraryParser.h"
 #include "TrainDB.h"
 
+#ifdef GC_HAVE_WFAPI
+#include "WFApi.h"
+#endif
+
 QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 QDesktopWidget *desktop = NULL;
 
@@ -131,6 +135,10 @@ MainWindow::MainWindow(const QDir &home) :
     zones_(new Zones), hrzones_(new HrZones),
     ride(NULL), workout(NULL)
 {
+    #ifdef GC_HAVE_WFAPI
+    WFApi *w = WFApi::getInstance(); // ensure created on main thread
+    w->apiVersion();//shutup compiler
+    #endif
     if (desktop == NULL) desktop = QApplication::desktop();
     static const QIcon hideIcon(":images/toolbar/main/hideside.png");
     static const QIcon rhideIcon(":images/toolbar/main/hiderside.png");
@@ -2062,6 +2070,7 @@ MainWindow::addDevice()
 
     // lets get a new one
     AddDeviceWizard *p = new AddDeviceWizard(this, add);
+
     if (p->exec() == QDialog::Accepted) {
         QList<DeviceConfiguration> list = all.getList();
         list.insert(0, add);

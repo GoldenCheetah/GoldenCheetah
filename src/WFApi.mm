@@ -64,13 +64,6 @@ static QString toQString(const NSString *nsstr)
 // METHODS
 //**********************************************************************
 
-// initialise by getting the WF API singleton
--(id)init
-{
-    // initialise
-    [[WFHardwareConnector sharedConnector] setDelegate:self];
-    return self;
-}
 
 //version
 -(NSString *) apiVersion { return [[WFHardwareConnector sharedConnector] apiVersion]; }
@@ -87,6 +80,14 @@ static QString toQString(const NSString *nsstr)
     return result;
 }
 
+// initialise by getting the WF API singleton
+-(id)init
+{
+    // initialise
+    [[WFHardwareConnector sharedConnector] setDelegate:self];
+    [self enableBTLE:TRUE inBondingMode:false];
+    return self;
+}
 // ready to scan
 -(BOOL)isCommunicationHWReady { return [[WFHardwareConnector sharedConnector] isCommunicationHWReady]; }
 
@@ -113,7 +114,7 @@ static QString toQString(const NSString *nsstr)
 
 -(void)hardwareConnector:(WFHardwareConnector*)hwConnector didDiscoverDevices:(NSSet*)connectionParams searchCompleted:(BOOL)bCompleted
 {
-    qtw->didDiscoverDevices(); //XXX convert array
+    qtw->didDiscoverDevices([connectionParams count], bCompleted); //XXX convert array
 }
 
 -(void)hardwareConnector:(WFHardwareConnector*)hwConnector disconnectedSensor:(WFSensorConnection*)connectionInfo
@@ -142,12 +143,7 @@ static QString toQString(const NSString *nsstr)
 // C++ Public interface
 //----------------------------------------------------------------------
 
-// Iniiialise the singleton at startup
-static WFApi *_gc_wfapi_init()
-{
-    return new WFApi;
-}
-WFApi *_gc_wfapi = _gc_wfapi_init();
+WFApi *_gc_wfapi = NULL;
 
 // Construct the bridge to the WF API
 WFApi::WFApi()
@@ -181,7 +177,8 @@ bool
 WFApi::discoverDevicesOfType(int eSensorType, int eNetworkType, int timeout)
 {
     // ignore ehat was passed for now...
-    return [wf discoverDevicesOfType:WF_SENSORTYPE_BIKE_POWER onNetwork:WF_NETWORKTYPE_BTLE searchTimeout:15.00];
+    devices = 0;
+    return [wf discoverDevicesOfType:WF_SENSORTYPE_BIKE_POWER onNetwork:WF_NETWORKTYPE_BTLE searchTimeout:5.00];
 }
 
 //**********************************************************************
@@ -195,9 +192,11 @@ qDebug()<<"connectedSensor";
 }
 
 void
-WFApi::didDiscoverDevices()
+WFApi::didDiscoverDevices(int count, bool finished)
 {
-qDebug()<<"didDiscoverDevices";
+qDebug()<<"didDiscoverDevices"<<count<<finished;
+    devices = count;
+    emit discoveredDevices(count,finished);
 }
 
 void
@@ -221,6 +220,6 @@ qDebug()<<"hasFormware...";
 void
 WFApi::stateChanged()
 {
-qDebug()<<"state changed..." << currentState();
+qDebug()<<"state changed...";
 emit currentStateChanged(currentState());
 }
