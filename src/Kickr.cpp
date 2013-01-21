@@ -178,11 +178,9 @@ Kickr::find()
 int
 Kickr::connectKickr()
 {
-qDebug()<<"connect";
     // discover first...
     if (scanned == false) find();
 
-qDebug()<<"did we find?"<<devConf->portSpec;
     // connect
     bool found = false;
     WFApi *w = WFApi::getInstance();
@@ -195,9 +193,7 @@ qDebug()<<"did we find?"<<devConf->portSpec;
     }
     if (found == false) return -1;
 
-qDebug()<<"found, so call connect"<<i;
     w->connectDevice(i);
-
     return 0;
 }
 
