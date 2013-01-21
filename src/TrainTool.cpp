@@ -460,8 +460,10 @@ TrainTool::configChanged()
                 Devices[i].controller = new NullController(this, &Devices[i]);
             } else if (Devices.at(i).type == DEV_ANTLOCAL) {
                 Devices[i].controller = new ANTlocalController(this, &Devices[i]);
+#ifdef GC_HAVE_WFAPI
             } else if (Devices.at(i).type == DEV_KICKR) {
                 Devices[i].controller = new KickrController(this, &Devices[i]);
+#endif
             }
         }
     }
