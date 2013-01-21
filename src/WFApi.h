@@ -42,15 +42,14 @@ extern WFApi *_gc_wfapi;
 
 class WFApi : public QObject // QOBject for signals
 {
-
    Q_OBJECT
-
 
 public:
     WFApi(); // single instance
     ~WFApi();
 
-    static WFApi *getInstance() { return _gc_wfapi; } // singleton
+    static WFApi *getInstance() { if (_gc_wfapi) return _gc_wfapi;
+                                  else return (_gc_wfapi = new WFApi); } // singleton
 
     // what version?
     QString apiVersion();
@@ -66,14 +65,16 @@ public:
 
     // scan
     bool discoverDevicesOfType(int eSensorType, int eNetworkType, int timeout);
+    int deviceCount() { return devices; }
 
 signals:
     void currentStateChanged(int); // hardware conncector state changed
+    int discoveredDevices(int,bool);
 
 public slots:
     void stateChanged();
     void connectedSensor(void*);
-    void didDiscoverDevices();
+    void didDiscoverDevices(int count, bool finished);
     void disconnectedSensor(void*);
     void hasData();
     void hasFirmwareUpdateAvalableForConnection();
@@ -93,7 +94,7 @@ public:
 #else /* __OBJC__ */
     void *wf;       // when included in C++ sources
 #endif /* __OBJC__ */
-
+    int devices;
 };
 
 //

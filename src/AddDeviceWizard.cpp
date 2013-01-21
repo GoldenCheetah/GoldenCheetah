@@ -35,6 +35,7 @@ AddDeviceWizard::AddDeviceWizard(MainWindow *main, DeviceConfiguration &here) : 
 #endif
 
     // delete when done
+    //setWindowModality(Qt::NonModal); // avoid blocking WFAPI calls for kickr
     setAttribute(Qt::WA_DeleteOnClose);
 
     setFixedHeight(500);
@@ -118,7 +119,13 @@ AddType::clicked(QString p)
         i++;
     }
 
-    wizard->found = wizard->scanner->quickScan(false); // do a quick scan
+    // we don't do a quick scan for a kickr since it takes 15 seconds
+    // to timeout and we don't want to get stuck on the front page for
+    // that long -- it will seem like it has not worked / crashed
+    if (wizard->deviceTypes.Supported[wizard->current].type != DEV_KICKR)
+        wizard->found = wizard->scanner->quickScan(false); // do a quick scan
+    else
+        wizard->found = false;
 
     // Still no dice. Go to the not found dialog
     if (wizard->found == false) next =20;
@@ -147,7 +154,7 @@ DeviceScanner::run()
 #ifdef WIN32
         Sleep(1000);
 #else
-        sleep(1);
+        sleep(5);
 #endif
         result = quickScan(false);
     }
@@ -189,7 +196,6 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
     default: wizard->controller = NULL; break;
 
     }
-
 
     //----------------------------------------------------------------------
     // Search for USB devices
@@ -356,7 +362,7 @@ AddSearch::scanFinished(bool result)
     bar->setMaximum(100);
     bar->setMinimum(0);
     bar->setValue(0);
-    stop->setText("Search again");
+    stop->setText("Search Again");
 
     if (result == true) { // woohoo we found one
         bar->hide();

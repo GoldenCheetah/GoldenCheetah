@@ -28,8 +28,11 @@
 #include "RealtimeController.h"
 #include "DeviceConfiguration.h"
 
+#include "WFApi.h"
+
 class Kickr : public QThread
 {
+    Q_OBJECT
 
 public:
     Kickr(QObject *parent=0, DeviceConfiguration * devConf=0);       // pass device
@@ -54,8 +57,8 @@ public:
         double gradient=1);
 
     bool find();
-    int connect();
-    int disconnect();
+    int connectKickr();
+    int disconnectKickr();
 
     int getMode();
     double getGradient();

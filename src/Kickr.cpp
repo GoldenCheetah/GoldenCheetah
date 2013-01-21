@@ -134,7 +134,7 @@ int Kickr::quit(int code)
 void Kickr::run()
 {
     // Connect to the device
-    if (connect()) {
+    if (connectKickr()) {
         quit(2);
         return; // open failed!
     }
@@ -148,7 +148,7 @@ void Kickr::run()
         msleep(10);
     }
 
-    disconnect();
+    disconnectKickr();
 
     quit(0);
 }
@@ -156,11 +156,23 @@ void Kickr::run()
 bool
 Kickr::find()
 {
-    return false;
+    WFApi *w = WFApi::getInstance();
+
+    if (w->discoverDevicesOfType(1,1,1) == false) return false;
+
+qDebug()<<"kicked off find";
+
+    QEventLoop loop;
+    connect(w, SIGNAL(discoveredDevices(int,bool)), &loop, SLOT(quit()));
+    loop.exec();
+
+qDebug()<<"now returning";
+    if (w->deviceCount()) return true;
+    else return false;
 }
 
 int
-Kickr::connect()
+Kickr::connectKickr()
 {
     // connect
 
@@ -170,7 +182,7 @@ Kickr::connect()
 }
 
 int
-Kickr::disconnect()
+Kickr::disconnectKickr()
 {
     // disconnect
 
