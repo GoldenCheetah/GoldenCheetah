@@ -28,14 +28,14 @@
 //
 
 // Main wizard
-AddDeviceWizard::AddDeviceWizard(MainWindow *main, DeviceConfiguration &here) : QWizard(main), main(main), here(here)
+AddDeviceWizard::AddDeviceWizard(MainWindow *main) : QWizard(main), main(main)
 {
 #ifdef Q_OS_MAC
     setWizardStyle(QWizard::ModernStyle);
 #endif
 
     // delete when done
-    //setWindowModality(Qt::NonModal); // avoid blocking WFAPI calls for kickr
+    setWindowModality(Qt::NonModal); // avoid blocking WFAPI calls for kickr
     setAttribute(Qt::WA_DeleteOnClose);
 
     setFixedHeight(500);
@@ -879,26 +879,39 @@ AddFinal::validatePage()
 {
     if (name->text() != "") {
 
+        DeviceConfigurations all;
+        DeviceConfiguration add;
+
+
         // lets update 'here' with what we did then...
-        wizard->here.type = wizard->type;
-        wizard->here.name = name->text();
-        wizard->here.portSpec = port->text();
-        wizard->here.deviceProfile = profile->text();
-        wizard->here.defaultString = QString(defWatts->isChecked() ? "P" : "") +
+        add.type = wizard->type;
+        add.name = name->text();
+        add.portSpec = port->text();
+        add.deviceProfile = profile->text();
+        add.defaultString = QString(defWatts->isChecked() ? "P" : "") +
                                      QString(defBPM->isChecked() ? "H" : "") +
                                      QString(defRPM->isChecked() ? "C" : "") +
                                      QString(defKPH->isChecked() ? "S" : "");
-        wizard->here.postProcess = virtualPower->currentIndex();
+        add.postProcess = virtualPower->currentIndex();
 
         switch (wheelSize->currentIndex()) {
 
             default:
-            case 0: wizard->here.wheelSize = 2100 ; break;
-            case 1: wizard->here.wheelSize = 1960 ; break;
-            case 2: wizard->here.wheelSize = 1985 ; break;
-            case 3: wizard->here.wheelSize = 1750 ; break;
+            case 0: add.wheelSize = 2100 ; break;
+            case 1: add.wheelSize = 1960 ; break;
+            case 2: add.wheelSize = 1985 ; break;
+            case 3: add.wheelSize = 1750 ; break;
         }
 
+        QList<DeviceConfiguration> list = all.getList();
+        list.insert(0, add);
+
+        // call device add wizard.
+        all.writeConfig(list);
+
+        // tell everyone
+        wizard->main->notifyConfigChanged();
+ 
         // shut down the controller, if it is there, since it will
         // still be connected to the device (in case we hit the back button)
         if (wizard->controller) {
