@@ -240,6 +240,10 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
 
     } while (!isfound && deep && count++ < 2);
 
+    // save away the device UUID, so we can choose it when connecting.
+    if (isfound && wizard->deviceTypes.Supported[wizard->current].type == DEV_KICKR) 
+        wizard->portSpec = ((KickrController*)(wizard->controller))->id();
+
     return isfound;
 
 }
@@ -371,7 +375,7 @@ AddSearch::scanFinished(bool result)
         label->hide();
         label1->hide();
         if (wizard->portSpec != "")
-            label2->setText(QString("\nDevice found on %1.\nPress Next to Continue\n").arg(wizard->portSpec));
+            label2->setText(QString("\nDevice found (%1).\nPress Next to Continue\n").arg(wizard->portSpec));
         else
             label2->setText("\nDevice found.\nPress Next to Continue\n");
         label2->show();
@@ -419,6 +423,7 @@ AddSearch::nextId() const
         switch(wizard->deviceTypes.Supported[wizard->current].type) {
         case DEV_ANTLOCAL : return 50; break; // pair 
         default:
+        case DEV_KICKR :
         case DEV_CT : return 60; break; // confirm and add 
         case DEV_FORTIUS : return 30; break; // confirm and add 
         }

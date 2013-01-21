@@ -20,6 +20,8 @@
 
 // WF API Headers
 #import <WFConnector/WFHardwareConnector.h>
+#import <WFConnector/WFConnectionParams.h>
+#import <WFConnector/WFDeviceParams.h>
 #import <WFConnector/hardware_connector_types.h>
 
 // Utility
@@ -53,6 +55,7 @@ static QString toQString(const NSString *nsstr)
     QPointer<WFApi> qtw; // the QT QObject public class
 
 @private
+    NSMutableArray* discoveredSensors;
 }
 
 @end
@@ -84,6 +87,7 @@ static QString toQString(const NSString *nsstr)
 -(id)init
 {
     // initialise
+    discoveredSensors = [[NSMutableArray arrayWithCapacity:10] retain];
     [[WFHardwareConnector sharedConnector] setDelegate:self];
     [self enableBTLE:TRUE inBondingMode:false];
     return self;
@@ -97,9 +101,16 @@ static QString toQString(const NSString *nsstr)
 -(BOOL)discoverDevicesOfType:(WFSensorType_t)eSensorType onNetwork:(WFNetworkType_t)eNetworkType searchTimeout:(NSTimeInterval)timeout
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    [discoveredSensors removeAllObjects];
     [[WFHardwareConnector sharedConnector] discoverDevicesOfType:eSensorType onNetwork:eNetworkType searchTimeout:timeout]; //XXX ignoringreturn
     [pool drain];
     return true;
+}
+-(int)deviceCount { return [discoveredSensors count]; }
+-(NSString*)deviceUUID:(int)n
+{
+    WFDeviceParams* devParams = (WFDeviceParams*)[discoveredSensors objectAtIndex:n];
+    return devParams.deviceUUIDString;
 }
 
 //**********************************************************************
@@ -114,6 +125,11 @@ static QString toQString(const NSString *nsstr)
 
 -(void)hardwareConnector:(WFHardwareConnector*)hwConnector didDiscoverDevices:(NSSet*)connectionParams searchCompleted:(BOOL)bCompleted
 {
+    // add discovered devices.
+    for (WFConnectionParams* connParams in connectionParams) {   
+        [discoveredSensors addObject:connParams.device1];
+    }   
+
     qtw->didDiscoverDevices([connectionParams count], bCompleted); //XXX convert array
 }
 
@@ -177,8 +193,13 @@ bool
 WFApi::discoverDevicesOfType(int eSensorType, int eNetworkType, int timeout)
 {
     // ignore ehat was passed for now...
-    devices = 0;
     return [wf discoverDevicesOfType:WF_SENSORTYPE_BIKE_POWER onNetwork:WF_NETWORKTYPE_BTLE searchTimeout:5.00];
+}
+
+QString WFApi::deviceUUID(int n)
+{
+    if (n>=0 && n<deviceCount()) return toQString([wf deviceUUID:n]);
+    else return "";
 }
 
 //**********************************************************************
@@ -194,9 +215,13 @@ qDebug()<<"connectedSensor";
 void
 WFApi::didDiscoverDevices(int count, bool finished)
 {
-qDebug()<<"didDiscoverDevices"<<count<<finished;
-    devices = count;
     emit discoveredDevices(count,finished);
+}
+
+int
+WFApi::deviceCount()
+{
+    return [wf deviceCount];
 }
 
 void
