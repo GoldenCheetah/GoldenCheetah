@@ -154,7 +154,7 @@ DeviceScanner::run()
 #ifdef WIN32
         Sleep(1000);
 #else
-        sleep(5);
+        sleep(1);
 #endif
         result = quickScan(false);
     }
