@@ -160,15 +160,14 @@ Kickr::find()
 
     if (w->discoverDevicesOfType(1,1,1) == false) return false;
 
-qDebug()<<"kicked off find";
-
     QEventLoop loop;
     connect(w, SIGNAL(discoveredDevices(int,bool)), &loop, SLOT(quit()));
     loop.exec();
 
-qDebug()<<"now returning";
-    if (w->deviceCount()) return true;
-    else return false;
+    if (w->deviceCount()) {
+        deviceUUID = w->deviceUUID(0);
+        return true;
+    } else return false;
 }
 
 int

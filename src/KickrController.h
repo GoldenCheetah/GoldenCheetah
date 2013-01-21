@@ -50,6 +50,8 @@ public:
     void pushRealtimeData(RealtimeData &rtData);
     void setLoad(double) { return; }
 
+    QString id() { return myKickr->id(); }
+
 signals:
 
 private:

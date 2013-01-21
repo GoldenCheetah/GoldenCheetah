@@ -65,7 +65,8 @@ public:
 
     // scan
     bool discoverDevicesOfType(int eSensorType, int eNetworkType, int timeout);
-    int deviceCount() { return devices; }
+    int deviceCount();
+    QString deviceUUID(int); // return the UUID for device n
 
 signals:
     void currentStateChanged(int); // hardware conncector state changed
@@ -94,7 +95,6 @@ public:
 #else /* __OBJC__ */
     void *wf;       // when included in C++ sources
 #endif /* __OBJC__ */
-    int devices;
 };
 
 //

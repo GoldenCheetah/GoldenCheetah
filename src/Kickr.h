@@ -65,6 +65,8 @@ public:
     double getLoad();
     void getRealtimeData(RealtimeData &rtData);
 
+    QString id() { return deviceUUID; }
+
 private:
     void run();                                 // called by start to kick off the CT comtrol thread
 
@@ -79,6 +81,7 @@ private:
     volatile double load;
     volatile double gradient;
 
+    QString deviceUUID;
 };
 
 #endif // _GC_Kickr_h
