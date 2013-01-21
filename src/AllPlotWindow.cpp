@@ -79,7 +79,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     // reveal widget
     revealControls = new QWidget(this);
     revealControls->setFixedHeight(50);
-    revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 70%)");
+    //revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 70%)");
     revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     // reveal controls
@@ -96,14 +96,14 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
 
     // layout reveal controls
     QHBoxLayout *r = new QHBoxLayout;
-    r->setContentsMargins(0,0,0,0);
+    r->setContentsMargins(0,15,0,0);
     r->addStretch();
     r->addWidget(rSmooth);
     r->addWidget(rSmoothEdit);
     r->addWidget(rSmoothSlider);
-    r->addSpacing(5);
+    r->addSpacing(0);
     QVBoxLayout *v = new QVBoxLayout;
-    v->setSpacing(5);
+    v->setSpacing(3);
     v->addWidget(rStack);
     v->addWidget(rFull);
     r->addLayout(v);
