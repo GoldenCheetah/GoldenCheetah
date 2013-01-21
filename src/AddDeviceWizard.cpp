@@ -182,7 +182,9 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
 #endif
     case DEV_NULL : wizard->controller = new NullController(NULL, NULL); break;
     case DEV_ANTLOCAL : wizard->controller = new ANTlocalController(NULL, NULL); break;
+#ifdef GC_HAVE_WFAPI
     case DEV_KICKR : wizard->controller = new KickrController(NULL, NULL); break;
+#endif
 
     default: wizard->controller = NULL; break;
 
