@@ -24,7 +24,8 @@
 Kickr::Kickr(QObject *parent,  DeviceConfiguration *devConf) : QThread(parent)
 {
     this->parent = parent;
-    this->devConf = devConf;
+    this->devConf = devConf;    
+    scanned = false;
 }
 
 Kickr::~Kickr()
@@ -145,7 +146,9 @@ void Kickr::run()
         // send load
         //XXX todo
 
-        msleep(10);
+        sleep(1);
+
+        qDebug()<<"has data"<<WFApi::getInstance()->hasData();
     }
 
     disconnectKickr();
@@ -164,6 +167,8 @@ Kickr::find()
     connect(w, SIGNAL(discoveredDevices(int,bool)), &loop, SLOT(quit()));
     loop.exec();
 
+    scanned = true;
+
     if (w->deviceCount()) {
         deviceUUID = w->deviceUUID(0);
         return true;
@@ -173,11 +178,27 @@ Kickr::find()
 int
 Kickr::connectKickr()
 {
-    // connect
+qDebug()<<"connect";
+    // discover first...
+    if (scanned == false) find();
 
-    //failed
-    connected = false;
-    return -1;
+qDebug()<<"did we find?"<<devConf->portSpec;
+    // connect
+    bool found = false;
+    WFApi *w = WFApi::getInstance();
+    int i;
+    for (i=0; i<w->deviceCount(); i++) {
+        if (w->deviceUUID(i) == devConf->portSpec) {
+            found = true;
+            break;
+        }
+    }
+    if (found == false) return -1;
+
+qDebug()<<"found, so call connect"<<i;
+    w->connectDevice(i);
+
+    return 0;
 }
 
 int

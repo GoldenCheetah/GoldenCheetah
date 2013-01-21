@@ -22,6 +22,8 @@
 #import <WFConnector/WFHardwareConnector.h>
 #import <WFConnector/WFConnectionParams.h>
 #import <WFConnector/WFDeviceParams.h>
+#import <WFConnector/WFSensorConnection.h>
+#import <WFConnector/WFBikePowerConnection.h>
 #import <WFConnector/hardware_connector_types.h>
 
 // Utility
@@ -49,19 +51,20 @@ static QString toQString(const NSString *nsstr)
 // Objective C -- Private interface / Bridge to WF API classes
 //----------------------------------------------------------------------
 
-@interface WFBridge : NSObject <WFHardwareConnectorDelegate> {
-
+@interface WFBridge : NSObject <WFHardwareConnectorDelegate, WFSensorConnectionDelegate> {
 @public
     QPointer<WFApi> qtw; // the QT QObject public class
-
-@private
-    NSMutableArray* discoveredSensors;
+    NSMutableArray *discoveredSensors;
+    WFBikePowerConnection *sensorConnection; // a connection XXX only 1 at a time for now
 }
+
+@property (retain, nonatomic) WFBikePowerConnection *sensorConnection;
 
 @end
 
 @implementation WFBridge
 
+@synthesize sensorConnection;
 
 //**********************************************************************
 // METHODS
@@ -87,7 +90,7 @@ static QString toQString(const NSString *nsstr)
 -(id)init
 {
     // initialise
-    discoveredSensors = [[NSMutableArray arrayWithCapacity:10] retain];
+    discoveredSensors = [[NSMutableArray alloc] init];
     [[WFHardwareConnector sharedConnector] setDelegate:self];
     [self enableBTLE:TRUE inBondingMode:false];
     return self;
@@ -109,9 +112,50 @@ static QString toQString(const NSString *nsstr)
 -(int)deviceCount { return [discoveredSensors count]; }
 -(NSString*)deviceUUID:(int)n
 {
-    WFDeviceParams* devParams = (WFDeviceParams*)[discoveredSensors objectAtIndex:n];
-    return devParams.deviceUUIDString;
+    WFDeviceParams* connParams = (WFDeviceParams*)[discoveredSensors objectAtIndex:n];
+    return connParams.deviceUUIDString;
 }
+
+-(BOOL)connectDevice: (int)n
+{
+    //NSAutoreleasePool *pool = [[NSAutoreleasePool alloc]init];
+
+    WFDeviceParams* dev = (WFDeviceParams*)[discoveredSensors objectAtIndex:n];
+    WFConnectionParams* params = [[WFConnectionParams alloc] init];
+    params.sensorType = WF_SENSORTYPE_BIKE_POWER;
+    params.networkType = WF_NETWORKTYPE_BTLE;
+    params.sensorSubType = WF_SENSOR_SUBTYPE_BIKE_POWER_KICKR;
+    params.searchTimeout = 15;
+    params.device1 = dev;
+
+    // request the sensor connection.
+    self.sensorConnection = (WFBikePowerConnection*)[[WFHardwareConnector sharedConnector] requestSensorConnection:params];
+
+    // set delegate to receive connection status changes.
+    self.sensorConnection.delegate = self;
+
+qDebug()<<"isValid"<<[self.sensorConnection isValid];
+qDebug()<<"hasError"<<[self.sensorConnection hasError];
+qDebug()<<"error"<<[self.sensorConnection error];
+qDebug()<<"signal Efficiency"<<[self.sensorConnection signalEfficiency];
+    //[pool drain];
+
+    return true;
+}
+
+- (void)connection:(WFSensorConnection*)connectionInfo stateChanged:(WFSensorConnectionStatus_t)connState
+{
+qDebug()<<"connected!";
+    qtw->connectionState(connState);
+}
+
+- (void)connectionDidTimeout:(WFSensorConnection*)connectionInfo
+{
+qDebug()<<"tiemout";
+    qtw->connectionTimeout();
+}
+
+- (BOOL) hasData { return [sensorConnection hasData]; }
 
 //**********************************************************************
 // EVENTS / SIGNALS
@@ -126,7 +170,7 @@ static QString toQString(const NSString *nsstr)
 -(void)hardwareConnector:(WFHardwareConnector*)hwConnector didDiscoverDevices:(NSSet*)connectionParams searchCompleted:(BOOL)bCompleted
 {
     // add discovered devices.
-    for (WFConnectionParams* connParams in connectionParams) {   
+    for (WFConnectionParams* connParams in connectionParams) {
         [discoveredSensors addObject:connParams.device1];
     }   
 
@@ -145,7 +189,8 @@ static QString toQString(const NSString *nsstr)
 
 -(void)hardwareConnectorHasData
 {
-    qtw->hasData();
+qDebug()<<"delegate says has data";
+    qtw->connectorHasData();
 }
 
 -(void) hardwareConnector:(WFHardwareConnector*)hwConnector hasFirmwareUpdateAvailableForConnection:(WFSensorConnection*)connectionInfo required:(BOOL)required withWahooUtilityAppURL:(NSURL *)wahooUtilityAppURL
@@ -218,6 +263,13 @@ WFApi::didDiscoverDevices(int count, bool finished)
     emit discoveredDevices(count,finished);
 }
 
+bool
+WFApi::connectDevice(int n)
+{
+    // connect with the device n in the discovered array
+    return [wf connectDevice:n];
+}
+
 int
 WFApi::deviceCount()
 {
@@ -230,10 +282,10 @@ WFApi::disconnectedSensor(void*)
 qDebug()<<"disconnectedSensor";
 }
 
-void
+bool
 WFApi::hasData()
 {
-qDebug()<<"hasData";
+return [wf hasData];
 }
 
 void
@@ -247,4 +299,23 @@ WFApi::stateChanged()
 {
 qDebug()<<"state changed...";
 emit currentStateChanged(currentState());
+}
+
+void
+WFApi::connectionState(int status)
+{
+qDebug()<<"connection state changed..."<<status;
+}
+
+void
+WFApi::connectionTimeout()
+{
+qDebug()<<"connection timed out...";
+}
+
+void
+WFApi::connectorHasData()
+{
+qDebug()<<"connector has data...";
+emit connectionHasData();
 }

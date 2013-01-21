@@ -76,7 +76,7 @@ private:
     // Mutex for controlling accessing private data
     QMutex pvars;
 
-    bool running, connected;
+    bool scanned, running, connected;
     volatile int mode;
     volatile double load;
     volatile double gradient;

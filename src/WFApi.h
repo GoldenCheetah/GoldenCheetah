@@ -68,18 +68,30 @@ public:
     int deviceCount();
     QString deviceUUID(int); // return the UUID for device n
 
+    // connect and disconnect
+    bool connectDevice(int n); // connect the device n
+    bool disconnectDevice();   // disconnect
+
+    // has data?
+    bool hasData();
+
 signals:
     void currentStateChanged(int); // hardware conncector state changed
     int discoveredDevices(int,bool);
+    void connectionHasData();
 
 public slots:
+
+    // connecting...
     void stateChanged();
+    void connectionState(int status);
+    void connectionTimeout();
+
     void connectedSensor(void*);
     void didDiscoverDevices(int count, bool finished);
     void disconnectedSensor(void*);
-    void hasData();
     void hasFirmwareUpdateAvalableForConnection();
-
+    void connectorHasData();
 
 signals:
 
