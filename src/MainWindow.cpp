@@ -113,6 +113,7 @@
 #include <QApplication>
 #include <QtGui>
 #include <QRegExp>
+#include <QNetworkProxyQuery>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_picker.h>
 #include <qwt_plot_grid.h>
