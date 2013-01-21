@@ -746,10 +746,8 @@ void
 DevicePage::devaddClicked()
 {
     DeviceConfiguration add;
-    AddDeviceWizard *p = new AddDeviceWizard(mainWindow, add);
-    if (p->exec() == QDialog::Accepted) {
-        deviceListModel->add(add);
-    }
+    AddDeviceWizard *p = new AddDeviceWizard(mainWindow);
+    p->show();
 }
 
 void

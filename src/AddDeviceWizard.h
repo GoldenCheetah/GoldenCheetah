@@ -45,14 +45,11 @@ class AddDeviceWizard : public QWizard
     Q_OBJECT
 
 public:
-    AddDeviceWizard(MainWindow *main, DeviceConfiguration &here);
+    AddDeviceWizard(MainWindow *main);
 
     MainWindow *main;
     bool done; // have we finished?
     RealtimeController *controller; // for working with devices
-
-    // Put configuration details..
-    DeviceConfiguration &here;
 
     // supported device types
     DeviceTypes deviceTypes;

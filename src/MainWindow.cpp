@@ -2064,23 +2064,11 @@ MainWindow::deleteRide()
 void
 MainWindow::addDevice()
 {
-    // get device config
-    DeviceConfigurations all;
-    DeviceConfiguration add;
 
     // lets get a new one
-    AddDeviceWizard *p = new AddDeviceWizard(this, add);
+    AddDeviceWizard *p = new AddDeviceWizard(this);
+    p->show();
 
-    if (p->exec() == QDialog::Accepted) {
-        QList<DeviceConfiguration> list = all.getList();
-        list.insert(0, add);
-
-        // call device add wizard.
-        all.writeConfig(list);
-
-        // tell everyone
-        emit configChanged();
-    }
 }
 
 /*----------------------------------------------------------------------
