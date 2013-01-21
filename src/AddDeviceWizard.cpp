@@ -240,9 +240,11 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
 
     } while (!isfound && deep && count++ < 2);
 
+#ifdef GC_HAVE_WFAPI
     // save away the device UUID, so we can choose it when connecting.
     if (isfound && wizard->deviceTypes.Supported[wizard->current].type == DEV_KICKR) 
         wizard->portSpec = ((KickrController*)(wizard->controller))->id();
+#endif
 
     return isfound;
 
