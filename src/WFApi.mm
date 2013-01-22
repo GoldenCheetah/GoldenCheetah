@@ -248,21 +248,10 @@ QString WFApi::deviceUUID(int n)
     if (n>=0 && n<deviceCount()) return toQString([wf deviceUUID:n]);
     else return "";
 }
-
-//**********************************************************************
-// SLOTS
-//**********************************************************************
-
-void
-WFApi::connectedSensor(void*)
+bool
+WFApi::hasData()
 {
-qDebug()<<"connectedSensor";
-}
-
-void
-WFApi::didDiscoverDevices(int count, bool finished)
-{
-    emit discoveredDevices(count,finished);
+    return [wf hasData];
 }
 
 bool
@@ -284,48 +273,56 @@ WFApi::deviceCount()
     return [wf deviceCount];
 }
 
+//**********************************************************************
+// SLOTS
+//**********************************************************************
+
+void
+WFApi::connectedSensor(void*)
+{
+qDebug()<<"connectedSensor";
+}
+
+void
+WFApi::didDiscoverDevices(int count, bool finished)
+{
+    emit discoveredDevices(count,finished);
+}
+
 void
 WFApi::disconnectedSensor(void*)
 {
 qDebug()<<"disconnectedSensor";
 }
 
-bool
-WFApi::hasData()
-{
-return [wf hasData];
-}
-
 void
 WFApi::hasFirmwareUpdateAvalableForConnection()
 {
-qDebug()<<"hasFormware...";
+qDebug()<<"hasFirmwareUpdate...";
 }
 
 void
 WFApi::stateChanged()
 {
-qDebug()<<"state changed...";
-emit currentStateChanged(currentState());
+    emit currentStateChanged(currentState());
 }
 
 void
 WFApi::connectionState(int status)
 {
-qDebug()<<"connection state changed..."<<status;
+    qDebug()<<"connection state changed..."<<status;
 }
 
 void
 WFApi::connectionTimeout()
 {
-qDebug()<<"connection timed out...";
+    qDebug()<<"connection timed out...";
 }
 
 void
 WFApi::connectorHasData()
 {
-qDebug()<<"connector has data...";
-emit connectionHasData();
+    emit connectionHasData();
 }
 
 void
