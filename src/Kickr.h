@@ -82,6 +82,7 @@ private:
     volatile double gradient;
 
     QString deviceUUID;
+    RealtimeData rt;
 };
 
 #endif // _GC_Kickr_h

@@ -100,7 +100,7 @@ double Kickr::getGradient()
 void
 Kickr::getRealtimeData(RealtimeData &rtData)
 {
-    rtData.setWatts(0); // XXX watts only...
+    rtData = rt;
 }
 
 int
@@ -146,9 +146,9 @@ void Kickr::run()
         // send load
         //XXX todo
 
-        sleep(1);
+        msleep(100);
 
-        qDebug()<<"has data"<<WFApi::getInstance()->hasData();
+        if (WFApi::getInstance()->hasData()) WFApi::getInstance()->getRealtimeData(&rt);
     }
 
     disconnectKickr();
@@ -204,7 +204,7 @@ int
 Kickr::disconnectKickr()
 {
     // disconnect
-
+    WFApi::getInstance()->disconnectDevice();
     connected = false;
     return 0;
 }
