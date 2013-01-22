@@ -24,6 +24,7 @@
 #include "Settings.h"
 #include "RealtimeData.h"
 #include "DeviceConfiguration.h"
+#include "RealtimeData.h"
 
 // QT
 #include <QPointer>
@@ -74,6 +75,7 @@ public:
 
     // has data?
     bool hasData();
+    void getRealtimeData(RealtimeData *p);
 
 signals:
     void currentStateChanged(int); // hardware conncector state changed

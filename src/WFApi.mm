@@ -23,6 +23,8 @@
 #import <WFConnector/WFConnectionParams.h>
 #import <WFConnector/WFDeviceParams.h>
 #import <WFConnector/WFSensorConnection.h>
+#import <WFConnector/WFSensorData.h>
+#import <WFConnector/WFBikePowerData.h>
 #import <WFConnector/WFBikePowerConnection.h>
 #import <WFConnector/hardware_connector_types.h>
 
@@ -136,15 +138,12 @@ static QString toQString(const NSString *nsstr)
     // set delegate to receive connection status changes.
     self.sensorConnection.delegate = self;
 
-qDebug()<<"isValid"<<[self.sensorConnection isValid];
-qDebug()<<"hasError"<<[self.sensorConnection hasError];
-qDebug()<<"error"<<[self.sensorConnection error];
-qDebug()<<"signal Efficiency"<<[self.sensorConnection signalEfficiency];
     //[pool drain];
 
     return true;
 }
 
+- (BOOL)disconnectDevice { [sensorConnection disconnect]; return true; }
 - (void)connection:(WFSensorConnection*)connectionInfo stateChanged:(WFSensorConnectionStatus_t)connState
 {
 qDebug()<<"connected!";
@@ -158,6 +157,7 @@ qDebug()<<"tiemout";
 }
 
 - (BOOL) hasData { return [sensorConnection hasData]; }
+- (WFBikePowerData*) getData { return (WFBikePowerData*)[sensorConnection getData]; }
 
 //**********************************************************************
 // EVENTS / SIGNALS
@@ -272,6 +272,12 @@ WFApi::connectDevice(int n)
     return [wf connectDevice:n];
 }
 
+bool
+WFApi::disconnectDevice()
+{
+    return [wf disconnectDevice];
+}
+
 int
 WFApi::deviceCount()
 {
@@ -320,4 +326,13 @@ WFApi::connectorHasData()
 {
 qDebug()<<"connector has data...";
 emit connectionHasData();
+}
+
+void
+WFApi::getRealtimeData(RealtimeData *rt)
+{
+    WFBikePowerData *sd = [wf getData];
+    rt->setWatts((int)[sd instantPower]);
+    rt->setCadence((int)[sd instantCadence]);
+    rt->setWheelRpm((int)[sd instantWheelRPM]);
 }
