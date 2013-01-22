@@ -178,6 +178,9 @@ Kickr::find()
 int
 Kickr::connectKickr()
 {
+    // do we even have BTLE hardware?
+    if (WFApi::getInstance()->isBTLEEnabled() == false) return (-1);
+
     // discover first...
     if (scanned == false) find();
 
