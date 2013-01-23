@@ -146,18 +146,37 @@ static QString toQString(const NSString *nsstr)
 - (BOOL)disconnectDevice { [sensorConnection disconnect]; return true; }
 - (void)connection:(WFSensorConnection*)connectionInfo stateChanged:(WFSensorConnectionStatus_t)connState
 {
-qDebug()<<"connected!";
     qtw->connectionState(connState);
 }
 
 - (void)connectionDidTimeout:(WFSensorConnection*)connectionInfo
 {
-qDebug()<<"tiemout";
     qtw->connectionTimeout();
 }
 
 - (BOOL) hasData { return [sensorConnection hasData]; }
 - (WFBikePowerData*) getData { return (WFBikePowerData*)[sensorConnection getData]; }
+
+- (void) setSlopeMode 
+{
+    [sensorConnection trainerSetSimMode:85 rollingResistance:0.0004 windResistance:0.6];
+}
+
+- (void) setErgoMode
+{
+    [sensorConnection trainerSetErgMode:100];
+}
+
+- (void) setSlope:(double)slope
+{
+    [sensorConnection trainerSetGrade:slope];
+}
+
+- (void) setLoad:(int)load
+{
+    [sensorConnection trainerSetErgMode:load];
+}
+
 
 //**********************************************************************
 // EVENTS / SIGNALS
@@ -191,7 +210,6 @@ qDebug()<<"tiemout";
 
 -(void)hardwareConnectorHasData
 {
-qDebug()<<"delegate says has data";
     qtw->connectorHasData();
 }
 
@@ -273,6 +291,32 @@ WFApi::deviceCount()
     return [wf deviceCount];
 }
 
+// set slope or ergo mode
+void
+WFApi::setSlopeMode()
+{
+    [wf setSlopeMode];
+}
+
+void
+WFApi::setErgoMode()
+{
+    [wf setErgoMode];
+}
+
+// set resistance slope or load
+void
+WFApi::setSlope(double n)
+{
+    [wf setSlope:n];
+}
+
+void
+WFApi::setLoad(int n)
+{
+    [wf setLoad:n];
+}
+
 //**********************************************************************
 // SLOTS
 //**********************************************************************
@@ -280,7 +324,6 @@ WFApi::deviceCount()
 void
 WFApi::connectedSensor(void*)
 {
-qDebug()<<"connectedSensor";
 }
 
 void
@@ -292,13 +335,11 @@ WFApi::didDiscoverDevices(int count, bool finished)
 void
 WFApi::disconnectedSensor(void*)
 {
-qDebug()<<"disconnectedSensor";
 }
 
 void
 WFApi::hasFirmwareUpdateAvalableForConnection()
 {
-qDebug()<<"hasFirmwareUpdate...";
 }
 
 void
@@ -310,13 +351,11 @@ WFApi::stateChanged()
 void
 WFApi::connectionState(int status)
 {
-    qDebug()<<"connection state changed..."<<status;
 }
 
 void
 WFApi::connectionTimeout()
 {
-    qDebug()<<"connection timed out...";
 }
 
 void
