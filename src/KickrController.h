@@ -48,7 +48,10 @@ public:
     bool doesPush(), doesPull(), doesLoad();
     void getRealtimeData(RealtimeData &rtData);
     void pushRealtimeData(RealtimeData &rtData);
-    void setLoad(double) { return; }
+
+    void setLoad(double x) { myKickr->setLoad(x); }
+    void setGradient(double x) { myKickr->setGradient(x); }
+    void setMode(int x) { myKickr->setMode(x); }
 
     QString id() { return myKickr->id(); }
 

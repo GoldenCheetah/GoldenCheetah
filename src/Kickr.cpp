@@ -26,6 +26,9 @@ Kickr::Kickr(QObject *parent,  DeviceConfiguration *devConf) : QThread(parent)
     this->parent = parent;
     this->devConf = devConf;    
     scanned = false;
+    mode = -1;
+    load = 100;
+    slope = 1.0;
 }
 
 Kickr::~Kickr()
@@ -45,7 +48,7 @@ void Kickr::setMode(int mode, double load, double gradient)
     pvars.lock();
     this->mode = mode;
     this->load = load;
-    this->gradient = gradient;
+    this->slope = gradient;
     pvars.unlock();
 }
 
@@ -61,7 +64,7 @@ void Kickr::setLoad(double load)
 void Kickr::setGradient(double gradient)
 {
     pvars.lock();
-    this->gradient = gradient;
+    this->slope = gradient;
     pvars.unlock();
 }
 
@@ -92,7 +95,7 @@ double Kickr::getGradient()
 {
     double tmp;
     pvars.lock();
-    tmp = gradient;
+    tmp = slope;
     pvars.unlock();
     return tmp;
 }
@@ -136,6 +139,10 @@ int Kickr::quit(int code)
  *----------------------------------------------------------------------*/
 void Kickr::run()
 {
+    int currentmode = -1;
+    int currentload = -1;
+    double currentslope= -1;
+
     // Connect to the device
     if (connectKickr()) {
         quit(2);
@@ -145,8 +152,36 @@ void Kickr::run()
     running = true;
     while(running) {
 
-        // send load
-        //XXX todo
+        // make sure we are the right mode
+        if (currentmode != mode) {
+
+            switch (mode) {
+
+            default:
+            case RT_MODE_ERGO :
+                currentmode = RT_MODE_ERGO;
+                WFApi::getInstance()->setErgoMode();
+                break;
+
+            case RT_MODE_SLOPE :
+                currentmode = RT_MODE_SLOPE;
+                WFApi::getInstance()->setSlopeMode();
+                break;
+
+            }
+        }
+
+        // set load
+        if (mode == RT_MODE_ERGO && currentload != load) {
+            WFApi::getInstance()->setLoad(load);
+            currentload = load;
+        }
+
+        // set slope
+        if (mode == RT_MODE_SLOPE && currentslope != slope) {
+            WFApi::getInstance()->setSlope(slope);
+            currentslope = slope;
+        }
 
         msleep(100);
 
@@ -163,7 +198,6 @@ void Kickr::run()
     }
 
     disconnectKickr();
-
     quit(0);
 }
 
