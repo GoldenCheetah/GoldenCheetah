@@ -215,6 +215,7 @@ SOURCES += ../qxt/src/qxtspanslider.cpp \
            ../qxt/src/qxtscheduleviewheadermodel_p.cpp \
            ../qxt/src/qxtscheduleitemdelegate.cpp \
            ../qxt/src/qxtstyleoptionscheduleviewitem.cpp \
+           ../qxt/src/qxtstringspinbox.cpp \
 
 isEmpty( QTSOAP_INSTALL ) {
     include( ../qtsolutions/soap/qtsoap.pri )
@@ -232,7 +233,8 @@ HEADERS += ../qxt/src/qxtspanslider.h \
            ../qxt/src/qxtscheduleheaderwidget.h \
            ../qxt/src/qxtscheduleviewheadermodel_p.h \
            ../qxt/src/qxtscheduleitemdelegate.h \
-           ../qxt/src/qxtstyleoptionscheduleviewitem.h
+           ../qxt/src/qxtstyleoptionscheduleviewitem.h \
+           ../qxt/src/qxtstringspinbox.h \
 
 HEADERS += \
         AboutDialog.h \
