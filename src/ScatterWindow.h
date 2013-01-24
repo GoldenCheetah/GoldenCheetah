@@ -137,8 +137,6 @@ class ScatterWindow : public GcWindow
 
         void addStandardChannels(QComboBox *);
         void addrStandardChannels(QxtStringSpinBox *box);
-
-        bool _lockReveal;
 };
 
 #endif // _GC_ScatterWindow_h

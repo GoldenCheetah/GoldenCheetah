@@ -82,6 +82,18 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 100%)");
     revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
+    revealAnim = new QPropertyAnimation(revealControls, "pos");
+    revealAnim->setDuration(500);
+    revealAnim->setKeyValueAt(0,QPoint(2,-50));
+    revealAnim->setKeyValueAt(0.5,QPoint(2,15));
+    revealAnim->setKeyValueAt(1,QPoint(2,20));
+
+    unrevealAnim = new QPropertyAnimation(revealControls, "pos");
+    unrevealAnim->setDuration(500);
+    unrevealAnim->setKeyValueAt(0,QPoint(2,20));
+    unrevealAnim->setKeyValueAt(0.5,QPoint(2,15));
+    unrevealAnim->setKeyValueAt(1,QPoint(2,-50));
+
     // reveal controls
     rSmooth = new QLabel(tr("Smooth"), revealControls);
     rSmoothEdit = new QLineEdit(revealControls);
