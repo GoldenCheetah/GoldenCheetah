@@ -79,6 +79,7 @@ CpintPlot::CpintPlot(MainWindow *main, QString p, const Zones *zones) :
     curveTitle.attach(this);
     curveTitle.setXValue(5);
     curveTitle.setYValue(20);
+    curveTitle.setLabel(QwtText("", QwtText::PlainText)); // default to no title
 
     zoomer = new penTooltip(this->canvas());
     zoomer->setMousePattern(QwtEventPattern::MouseSelect1,
@@ -537,7 +538,6 @@ CpintPlot::calculate(RideItem *rideItem)
     //
     // PLOT MODEL CURVE (DERIVED)
     //
-    curveTitle.setLabel(QwtText("", QwtText::PlainText)); // default to no title
     if (series == RideFile::xPower || series == RideFile::NP || series == RideFile::watts  || series == RideFile::wattsKg || series == RideFile::none) {
 
         if (bests->meanMaxArray(series).size() > 1) {
