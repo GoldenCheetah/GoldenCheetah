@@ -217,6 +217,9 @@ void ScatterPlot::setData (ScatterSettings *settings)
     sym.setSize(6);
     sym.setPen(GCColor::invert(GColor(CPLOTBACKGROUND)));
     sym.setBrush(QBrush(Qt::NoBrush));
+    QPen p;
+    p.setColor(Qt::gray);
+    sym.setPen(p);
 
     // wipe away existing
 	if (all) {
