@@ -88,9 +88,18 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
         parent->Stop(1);
         return;
     }
+
     // get latest telemetry
     myComputrainer->getTelemetry(Power, HeartRate, Cadence, Speed,
                         RRC, calibration, Buttons, ss, Status);
+
+	// Check CT if F3 has been pressed for Calibration mode FIRST befoire we do anything else
+    if (Buttons&CT_F3) {
+        parent->Calibrate();
+    }
+
+    // ignore other buttons and anything else if calibrating
+    if (parent->calibrating) return;
 
     //
     // PASS BACK TELEMETRY
@@ -113,14 +122,6 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
     //
     // BUTTONS
     //
-
-    // toggle calibration
-    if (Buttons&CT_F3) {
-        parent->Calibrate();
-    }
-
-    // ignore other buttons if calibrating
-    if (parent->calibrating) return;
 
     // ADJUST LOAD
     Load = myComputrainer->getLoad();
