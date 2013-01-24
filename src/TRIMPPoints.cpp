@@ -70,14 +70,18 @@ class TRIMPPoints : public RideMetric {
         restHr = rideFile->getTag("Rest HR", QString("%1").arg(restHr)).toDouble();
 
         assert(deps.contains("time_riding"));
+        assert(deps.contains("workout_time"));
         assert(deps.contains("average_hr"));
         //const RideMetric *workoutTimeMetric = deps.value("workout_time");
         const RideMetric *timeRidingMetric = deps.value("time_riding");
         const RideMetric *averageHrMetric = deps.value("average_hr");
+        const RideMetric *durationMetric = deps.value("workout_time");
         assert(timeRidingMetric);
+        assert(durationMetric);
         assert(averageHrMetric);
 
-        double secs = timeRidingMetric->value(true);
+        double secs = timeRidingMetric->value(true) ? timeRidingMetric->value(true) :
+                                                      durationMetric->value(true);;
         double hr = averageHrMetric->value(true);
 
         //TRIMP: = t x %HRR x 0.64e1,92(%HRR)
