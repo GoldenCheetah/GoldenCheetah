@@ -24,6 +24,7 @@
 #include "Settings.h"
 #include "RealtimeData.h"
 #include "DeviceConfiguration.h"
+#include "RealtimeData.h"
 
 // QT
 #include <QPointer>
@@ -74,6 +75,15 @@ public:
 
     // has data?
     bool hasData();
+    void getRealtimeData(RealtimeData *p);
+
+    // set slope or ergo mode
+    void setSlopeMode();
+    void setErgoMode();
+
+    // set resistance slope or load
+    void setSlope(double slope);
+    void setLoad(int watts);
 
 signals:
     void currentStateChanged(int); // hardware conncector state changed

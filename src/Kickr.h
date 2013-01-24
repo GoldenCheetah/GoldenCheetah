@@ -26,6 +26,7 @@
 #include <QMutex>
 #include <QFile>
 #include "RealtimeController.h"
+#include "TrainTool.h"
 #include "DeviceConfiguration.h"
 
 #include "WFApi.h"
@@ -77,11 +78,13 @@ private:
     QMutex pvars;
 
     bool scanned, running, connected;
+
     volatile int mode;
     volatile double load;
-    volatile double gradient;
+    volatile double slope;
 
     QString deviceUUID;
+    RealtimeData rt;
 };
 
 #endif // _GC_Kickr_h

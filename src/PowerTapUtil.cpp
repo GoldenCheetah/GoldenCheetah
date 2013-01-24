@@ -17,6 +17,7 @@
  */
 
 #include "PowerTapUtil.h"
+#include "RideFile.h"
 #include "Units.h"
 #include <QString>
 #include <math.h>
@@ -131,6 +132,10 @@ PowerTapUtil::unpack_data(unsigned char *buf, double rec_int_secs,
         else
         {
             *watts = ((buf[2] & 0x0f) << 8) | buf[3];
+
+            // clear out of bounds power values
+            if(*watts > RideFile::maximumFor(RideFile::watts)) *watts = 0.0;
+            
             *cad = buf[4];
             if (*cad == 0xff)
                 *cad = 0;

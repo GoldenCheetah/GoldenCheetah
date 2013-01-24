@@ -45,10 +45,72 @@ ScatterWindow::addStandardChannels(QComboBox *box)
     //box->addItem(tr("Longitude"), MODEL_LONG); //XXX weird values make the plot ugly
 }
 
+void
+ScatterWindow::addrStandardChannels(QxtStringSpinBox *box)
+{
+    QStringList list;
+    list.append(tr("Power"));
+    list.append(tr("Cadence"));
+    list.append(tr("Heartrate"));
+    list.append(tr("Speed"));
+    list.append(tr("Altitude"));
+    list.append(tr("Torque"));
+    list.append(tr("AEPF"));
+    list.append(tr("CPV"));
+    list.append(tr("Time"));
+    list.append(tr("Distance"));
+    box->setStrings(list);
+}
+
 ScatterWindow::ScatterWindow(MainWindow *parent, const QDir &home) :
     GcWindow(parent), home(home), main(parent), ride(NULL), current(NULL)
 {
     setInstanceName("2D Window");
+
+    // Main layout
+    QGridLayout *mainLayout = new QGridLayout(this);
+    mainLayout->setContentsMargins(2,2,2,2);
+
+    //
+    // reveal controls widget
+    //
+
+    // reveal widget
+    revealControls = new QWidget(this);
+    revealControls->setFixedHeight(50);
+    revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 80%)");
+    revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    // reveal controls
+    QLabel *rxLabel = new QLabel(tr("X-Axis:"), this);
+    rxSelector = new QxtStringSpinBox(revealControls);
+    addrStandardChannels(rxSelector);
+
+    QLabel *ryLabel = new QLabel(tr("Y-Axis:"), this);
+    rySelector = new QxtStringSpinBox(revealControls);
+    addrStandardChannels(rySelector);
+
+    rIgnore = new QCheckBox(tr("Ignore Zero"));
+    rIgnore->setChecked(true);
+    rFrameInterval = new QCheckBox(tr("Frame intervals"));
+    rFrameInterval->setChecked(true);
+
+    // layout reveal controls
+    QHBoxLayout *r = new QHBoxLayout;
+    r->setContentsMargins(0,0,0,0);
+    r->addStretch();
+    r->addWidget(rxLabel);
+    r->addWidget(rxSelector);
+    r->addWidget(ryLabel);
+    r->addWidget(rySelector);
+    r->addSpacing(5);
+    r->addWidget(rIgnore);
+    r->addWidget(rFrameInterval);
+    r->addStretch();
+    revealControls->setLayout(r);
+
+    // hide them initially
+    revealControls->hide();
 
     QWidget *c = new QWidget;
     QFormLayout *cl = new QFormLayout(c);
@@ -56,8 +118,12 @@ ScatterWindow::ScatterWindow(MainWindow *parent, const QDir &home) :
 
     // the plot widget
     scatterPlot= new ScatterPlot(main);
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(scatterPlot);
+    QVBoxLayout *vlayout = new QVBoxLayout;
+    vlayout->addWidget(scatterPlot);
+
+    mainLayout->addLayout(vlayout,0,0);
+    mainLayout->addWidget(revealControls,0,0, Qt::AlignTop);
+    revealControls->raise();
     setLayout(mainLayout);
 
     // labels
@@ -65,12 +131,14 @@ ScatterWindow::ScatterWindow(MainWindow *parent, const QDir &home) :
     xSelector = new QComboBox;
     addStandardChannels(xSelector);
     xSelector->setCurrentIndex(0); // power
+    rxSelector->setValue(0);
     cl->addRow(xLabel, xSelector);
 
     yLabel = new QLabel(tr("Y-Axis:"), this);
     ySelector = new QComboBox;
     addStandardChannels(ySelector);
     ySelector->setCurrentIndex(2); // heartrate
+    rySelector->setValue(2);
     cl->addRow(yLabel, ySelector);
 
     timeLabel = new QLabel(tr("00:00:00"), this);
@@ -104,11 +172,16 @@ ScatterWindow::ScatterWindow(MainWindow *parent, const QDir &home) :
     connect(main, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
     connect(xSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setData()));
     connect(ySelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setData()));
+    connect(rxSelector, SIGNAL(valueChanged(int)), this, SLOT(rxSelectorChanged(int)));
+    connect(rySelector, SIGNAL(valueChanged(int)), this, SLOT(rySelectorChanged(int)));
     connect(timeSlider, SIGNAL(valueChanged(int)), this, SLOT(setTime(int)));
     connect(grid, SIGNAL(stateChanged(int)), this, SLOT(setGrid()));
     //connect(legend, SIGNAL(stateChanged(int)), this, SLOT(setLegend()));
     connect(frame, SIGNAL(stateChanged(int)), this, SLOT(setFrame()));
     connect(ignore, SIGNAL(stateChanged(int)), this, SLOT(setIgnore()));
+    connect(rFrameInterval, SIGNAL(stateChanged(int)), this, SLOT(setrFrame()));
+    connect(rIgnore, SIGNAL(stateChanged(int)), this, SLOT(setrIgnore()));
+
 }
 
 void
@@ -143,6 +216,15 @@ void
 ScatterWindow::setFrame()
 {
     settings.frame = frame->isChecked();
+    rFrameInterval->setChecked(frame->isChecked());
+    setData();
+}
+
+void
+ScatterWindow::setrFrame()
+{
+    settings.frame = rFrameInterval->isChecked();
+    frame->setChecked(rFrameInterval->isChecked());
     setData();
 }
 
@@ -150,6 +232,15 @@ void
 ScatterWindow::setIgnore()
 {
     settings.ignore = ignore->isChecked();
+    rIgnore->setChecked(ignore->isChecked());
+    setData();
+}
+
+void
+ScatterWindow::setrIgnore()
+{
+    settings.ignore = rIgnore->isChecked();
+    ignore->setChecked(rIgnore->isChecked());
     setData();
 }
 
@@ -170,6 +261,20 @@ ScatterWindow::setTime(int value)
                                           .arg(value%60,2,10,zero);
     timeLabel->setText(time);
     scatterPlot->showTime(&settings, value, 30);
+}
+
+void
+ScatterWindow::rxSelectorChanged(int value)
+{
+    xSelector->setCurrentIndex(value);
+    setData();
+}
+
+void
+ScatterWindow::rySelectorChanged(int value)
+{
+    ySelector->setCurrentIndex(value);
+    setData();
 }
 
 void

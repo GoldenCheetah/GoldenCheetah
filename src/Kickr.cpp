@@ -26,6 +26,9 @@ Kickr::Kickr(QObject *parent,  DeviceConfiguration *devConf) : QThread(parent)
     this->parent = parent;
     this->devConf = devConf;    
     scanned = false;
+    mode = -1;
+    load = 100;
+    slope = 1.0;
 }
 
 Kickr::~Kickr()
@@ -45,7 +48,7 @@ void Kickr::setMode(int mode, double load, double gradient)
     pvars.lock();
     this->mode = mode;
     this->load = load;
-    this->gradient = gradient;
+    this->slope = gradient;
     pvars.unlock();
 }
 
@@ -61,7 +64,7 @@ void Kickr::setLoad(double load)
 void Kickr::setGradient(double gradient)
 {
     pvars.lock();
-    this->gradient = gradient;
+    this->slope = gradient;
     pvars.unlock();
 }
 
@@ -92,7 +95,7 @@ double Kickr::getGradient()
 {
     double tmp;
     pvars.lock();
-    tmp = gradient;
+    tmp = slope;
     pvars.unlock();
     return tmp;
 }
@@ -100,7 +103,9 @@ double Kickr::getGradient()
 void
 Kickr::getRealtimeData(RealtimeData &rtData)
 {
-    rtData.setWatts(0); // XXX watts only...
+    pvars.lock();
+    rtData = rt;
+    pvars.unlock();
 }
 
 int
@@ -134,6 +139,10 @@ int Kickr::quit(int code)
  *----------------------------------------------------------------------*/
 void Kickr::run()
 {
+    int currentmode = -1;
+    int currentload = -1;
+    double currentslope= -1;
+
     // Connect to the device
     if (connectKickr()) {
         quit(2);
@@ -143,16 +152,52 @@ void Kickr::run()
     running = true;
     while(running) {
 
-        // send load
-        //XXX todo
+        // make sure we are the right mode
+        if (currentmode != mode) {
 
-        sleep(1);
+            switch (mode) {
 
-        qDebug()<<"has data"<<WFApi::getInstance()->hasData();
+            default:
+            case RT_MODE_ERGO :
+                currentmode = RT_MODE_ERGO;
+                WFApi::getInstance()->setErgoMode();
+                break;
+
+            case RT_MODE_SLOPE :
+                currentmode = RT_MODE_SLOPE;
+                WFApi::getInstance()->setSlopeMode();
+                break;
+
+            }
+        }
+
+        // set load
+        if (mode == RT_MODE_ERGO && currentload != load) {
+            WFApi::getInstance()->setLoad(load);
+            currentload = load;
+        }
+
+        // set slope
+        if (mode == RT_MODE_SLOPE && currentslope != slope) {
+            WFApi::getInstance()->setSlope(slope);
+            currentslope = slope;
+        }
+
+        msleep(100);
+
+        if (WFApi::getInstance()->hasData()) {
+            pvars.lock();
+            WFApi::getInstance()->getRealtimeData(&rt);
+
+            // set speed from wheelRpm and configured wheelsize
+            double x = rt.getWheelRpm();
+            if (devConf) rt.setSpeed(x * (devConf->wheelSize/1000) * 60 / 1000);
+            else rt.setSpeed(x * 2.10 * 60 / 1000);
+            pvars.unlock();
+        }
     }
 
     disconnectKickr();
-
     quit(0);
 }
 
@@ -204,7 +249,7 @@ int
 Kickr::disconnectKickr()
 {
     // disconnect
-
+    WFApi::getInstance()->disconnectDevice();
     connected = false;
     return 0;
 }

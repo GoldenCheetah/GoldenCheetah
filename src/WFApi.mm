@@ -23,6 +23,8 @@
 #import <WFConnector/WFConnectionParams.h>
 #import <WFConnector/WFDeviceParams.h>
 #import <WFConnector/WFSensorConnection.h>
+#import <WFConnector/WFSensorData.h>
+#import <WFConnector/WFBikePowerData.h>
 #import <WFConnector/WFBikePowerConnection.h>
 #import <WFConnector/hardware_connector_types.h>
 
@@ -136,28 +138,45 @@ static QString toQString(const NSString *nsstr)
     // set delegate to receive connection status changes.
     self.sensorConnection.delegate = self;
 
-qDebug()<<"isValid"<<[self.sensorConnection isValid];
-qDebug()<<"hasError"<<[self.sensorConnection hasError];
-qDebug()<<"error"<<[self.sensorConnection error];
-qDebug()<<"signal Efficiency"<<[self.sensorConnection signalEfficiency];
     //[pool drain];
 
     return true;
 }
 
+- (BOOL)disconnectDevice { [sensorConnection disconnect]; return true; }
 - (void)connection:(WFSensorConnection*)connectionInfo stateChanged:(WFSensorConnectionStatus_t)connState
 {
-qDebug()<<"connected!";
     qtw->connectionState(connState);
 }
 
 - (void)connectionDidTimeout:(WFSensorConnection*)connectionInfo
 {
-qDebug()<<"tiemout";
     qtw->connectionTimeout();
 }
 
 - (BOOL) hasData { return [sensorConnection hasData]; }
+- (WFBikePowerData*) getData { return (WFBikePowerData*)[sensorConnection getData]; }
+
+- (void) setSlopeMode 
+{
+    [sensorConnection trainerSetSimMode:85 rollingResistance:0.0004 windResistance:0.6];
+}
+
+- (void) setErgoMode
+{
+    [sensorConnection trainerSetErgMode:100];
+}
+
+- (void) setSlope:(double)slope
+{
+    [sensorConnection trainerSetGrade:slope];
+}
+
+- (void) setLoad:(int)load
+{
+    [sensorConnection trainerSetErgMode:load];
+}
+
 
 //**********************************************************************
 // EVENTS / SIGNALS
@@ -191,7 +210,6 @@ qDebug()<<"tiemout";
 
 -(void)hardwareConnectorHasData
 {
-qDebug()<<"delegate says has data";
     qtw->connectorHasData();
 }
 
@@ -248,21 +266,10 @@ QString WFApi::deviceUUID(int n)
     if (n>=0 && n<deviceCount()) return toQString([wf deviceUUID:n]);
     else return "";
 }
-
-//**********************************************************************
-// SLOTS
-//**********************************************************************
-
-void
-WFApi::connectedSensor(void*)
+bool
+WFApi::hasData()
 {
-qDebug()<<"connectedSensor";
-}
-
-void
-WFApi::didDiscoverDevices(int count, bool finished)
-{
-    emit discoveredDevices(count,finished);
+    return [wf hasData];
 }
 
 bool
@@ -272,52 +279,96 @@ WFApi::connectDevice(int n)
     return [wf connectDevice:n];
 }
 
+bool
+WFApi::disconnectDevice()
+{
+    return [wf disconnectDevice];
+}
+
 int
 WFApi::deviceCount()
 {
     return [wf deviceCount];
 }
 
+// set slope or ergo mode
+void
+WFApi::setSlopeMode()
+{
+    [wf setSlopeMode];
+}
+
+void
+WFApi::setErgoMode()
+{
+    [wf setErgoMode];
+}
+
+// set resistance slope or load
+void
+WFApi::setSlope(double n)
+{
+    [wf setSlope:n];
+}
+
+void
+WFApi::setLoad(int n)
+{
+    [wf setLoad:n];
+}
+
+//**********************************************************************
+// SLOTS
+//**********************************************************************
+
+void
+WFApi::connectedSensor(void*)
+{
+}
+
+void
+WFApi::didDiscoverDevices(int count, bool finished)
+{
+    emit discoveredDevices(count,finished);
+}
+
 void
 WFApi::disconnectedSensor(void*)
 {
-qDebug()<<"disconnectedSensor";
-}
-
-bool
-WFApi::hasData()
-{
-return [wf hasData];
 }
 
 void
 WFApi::hasFirmwareUpdateAvalableForConnection()
 {
-qDebug()<<"hasFormware...";
 }
 
 void
 WFApi::stateChanged()
 {
-qDebug()<<"state changed...";
-emit currentStateChanged(currentState());
+    emit currentStateChanged(currentState());
 }
 
 void
 WFApi::connectionState(int status)
 {
-qDebug()<<"connection state changed..."<<status;
 }
 
 void
 WFApi::connectionTimeout()
 {
-qDebug()<<"connection timed out...";
 }
 
 void
 WFApi::connectorHasData()
 {
-qDebug()<<"connector has data...";
-emit connectionHasData();
+    emit connectionHasData();
+}
+
+void
+WFApi::getRealtimeData(RealtimeData *rt)
+{
+    WFBikePowerData *sd = [wf getData];
+    rt->setWatts((int)[sd instantPower]);
+    rt->setCadence((int)[sd instantCadence]);
+    rt->setWheelRpm((int)[sd instantWheelRPM]);
 }

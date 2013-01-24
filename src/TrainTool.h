@@ -40,6 +40,7 @@
 // Status settings
 #define RT_MODE_ERGO        0x0001        // load generation modes
 #define RT_MODE_SPIN        0x0002        // spinscan like modes
+#define RT_MODE_SLOPE       0x0002        // same as spinscan but not so CT specific
 #define RT_MODE_CALIBRATE   0x0004        // calibrate
 
 #define RT_RUNNING      0x0100        // is running now

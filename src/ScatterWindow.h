@@ -22,7 +22,9 @@
 
 #include <QtGui>
 #include <QTimer>
+#include "qxtstringspinbox.h"
 #include "MainWindow.h"
+
 
 class ScatterPlot; // we don't include the header because it uses namespaces
 class ScatterDataColor;
@@ -58,11 +60,16 @@ class ScatterWindow : public GcWindow
 
         ScatterWindow(MainWindow *, const QDir &);
 
+        // reveal
+        bool hasReveal() { return true; }
+        void reveal() { revealControls->show(); }
+        void unreveal() { revealControls->hide(); }
+
         // set/get properties
         int xseries() const { return xSelector->currentIndex(); }
-        void setXSeries(int x) { xSelector->setCurrentIndex(x); }
+        void setXSeries(int x) { xSelector->setCurrentIndex(x); rxSelector->setValue(x); }
         int yseries() const { return ySelector->currentIndex(); }
-        void setYSeries(int x) { ySelector->setCurrentIndex(x); }
+        void setYSeries(int x) { ySelector->setCurrentIndex(x); rySelector->setValue(x); }
         bool isGrid() const { return grid->isChecked(); }
         void set_Grid(bool x) { grid->setChecked(x); }
         bool isIgnore() const { return ignore->isChecked(); }
@@ -77,10 +84,15 @@ class ScatterWindow : public GcWindow
         void intervalSelected();
         void setData();
 
+        void rxSelectorChanged(int);
+        void rySelectorChanged(int);
+
         // these set the plot when the properties change
         void setGrid();
         void setFrame();
         void setIgnore();
+        void setrFrame();
+        void setrIgnore();
         void setTime(int);
 
     protected:
@@ -116,8 +128,17 @@ class ScatterWindow : public GcWindow
         RideItem *current;
 
     private:
+        // reveal controls
+        QWidget *revealControls;
+        QxtStringSpinBox    *rxSelector,
+                            *rySelector;
+        QCheckBox           *rFrameInterval,
+                            *rIgnore;
 
         void addStandardChannels(QComboBox *);
+        void addrStandardChannels(QxtStringSpinBox *box);
+
+        bool _lockReveal;
 };
 
 #endif // _GC_ScatterWindow_h
