@@ -59,8 +59,9 @@
 // 40  20  Oct 2012 Mark Liversedge    Lucene search/filter and checkbox metadata field
 // 41  27  Oct 2012 Mark Liversedge    Lucene switched to StandardAnalyzer and search all texts by default
 // 42  03  Dec 2012 Mark Liversedge    W/KG ridefilecache changes - force a rebuild.
+// 43  24  Jan 2012 Mark Liversedge    TRIMP update
 
-static int DBSchemaVersion = 42;
+static int DBSchemaVersion = 43;
 
 DBAccess::DBAccess(MainWindow* main, QDir home) : main(main), home(home)
 {

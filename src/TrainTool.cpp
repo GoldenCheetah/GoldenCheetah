@@ -748,7 +748,7 @@ void TrainTool::Start()       // when start button is pressed
                 return;
             }
         } else if (deviceTree->selectedItems().count() == 1) {
-            bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry = 
+            bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry =
             deviceTree->selectedItems().first()->type();
         } else {
             return;
@@ -1003,123 +1003,122 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
 
     // get latest telemetry from devices
     if (status&RT_RUNNING) {
-		if(calibrating) {
-			foreach(int dev, devices()) { // Do for Computrainers only.  Need to check with other devices
-				RealtimeData local = rtData;
-				if (Devices[dev].type == DEV_CT)
-				  Devices[dev].controller->getRealtimeData(local); // See if the F3 button has been pressed
-			}
-			// and exit.  Nothing else to do until we finish calibrating
-			return;
-		} else {
-			rtData.setLoad(load); // always set load..
-			rtData.setSlope(slope); // always set load..
+        if(calibrating) {
+            foreach(int dev, devices()) { // Do for Computrainers only.  Need to check with other devices
+                RealtimeData local = rtData;
+                if (Devices[dev].type == DEV_CT)
+                  Devices[dev].controller->getRealtimeData(local); // See if the F3 button has been pressed
+            }
+            // and exit.  Nothing else to do until we finish calibrating
+            return;
+        } else {
+            rtData.setLoad(load); // always set load..
+            rtData.setSlope(slope); // always set load..
 
-			// fetch the right data from each device...
-			foreach(int dev, devices()) {
+            // fetch the right data from each device...
+            foreach(int dev, devices()) {
 
-				RealtimeData local = rtData;
-				Devices[dev].controller->getRealtimeData(local);
+                RealtimeData local = rtData;
+                Devices[dev].controller->getRealtimeData(local);
 
-				// get spinscan data from a computrainer?
-				if (Devices[dev].type == DEV_CT) {
-					memcpy((uint8_t*)rtData.spinScan, (uint8_t*)local.spinScan, 24);
-					rtData.setLoad(local.getLoad()); // and get load in case it was adjusted
-					// to within defined limits
-				}
+                // get spinscan data from a computrainer?
+                if (Devices[dev].type == DEV_CT) {
+                    memcpy((uint8_t*)rtData.spinScan, (uint8_t*)local.spinScan, 24);
+                    rtData.setLoad(local.getLoad()); // and get load in case it was adjusted
+                    // to within defined limits
+                }
 
-				// what are we getting from this one?
-				if (dev == bpmTelemetry) rtData.setHr(local.getHr());
-				if (dev == rpmTelemetry) rtData.setCadence(local.getCadence());
-				if (dev == kphTelemetry) {
-					rtData.setSpeed(local.getSpeed());
-					rtData.setDistance(local.getDistance());
-				}
-				if (dev == wattsTelemetry) {
-					rtData.setWatts(local.getWatts());
-					rtData.setAltWatts(local.getAltWatts());
-				}
-			}
+                // what are we getting from this one?
+                if (dev == bpmTelemetry) rtData.setHr(local.getHr());
+                if (dev == rpmTelemetry) rtData.setCadence(local.getCadence());
+                if (dev == kphTelemetry) {
+                    rtData.setSpeed(local.getSpeed());
+                    rtData.setDistance(local.getDistance());
+                }
+                if (dev == wattsTelemetry) {
+                    rtData.setWatts(local.getWatts());
+                    rtData.setAltWatts(local.getAltWatts());
+                }
+            }
 
-			// Distance assumes current speed for the last second. from km/h to km/sec
-			displayDistance += displaySpeed / (5 * 3600); // XXX assumes 200ms refreshrate
-			displayWorkoutDistance += displaySpeed / (5 * 3600); // XXX assumes 200ms refreshrate
-			rtData.setDistance(displayDistance);
+            // Distance assumes current speed for the last second. from km/h to km/sec
+            displayDistance += displaySpeed / (5 * 3600); // XXX assumes 200ms refreshrate
+            displayWorkoutDistance += displaySpeed / (5 * 3600); // XXX assumes 200ms refreshrate
+            rtData.setDistance(displayDistance);
 
-			// time
-			total_msecs = session_elapsed_msec + session_time.elapsed();
-			lap_msecs = lap_elapsed_msec + lap_time.elapsed();
+            // time
+            total_msecs = session_elapsed_msec + session_time.elapsed();
+            lap_msecs = lap_elapsed_msec + lap_time.elapsed();
 
-			rtData.setMsecs(total_msecs);
-			rtData.setLapMsecs(lap_msecs);
+            rtData.setMsecs(total_msecs);
+            rtData.setLapMsecs(lap_msecs);
 
-			long lapTimeRemaining;
-			if (ergFile) lapTimeRemaining = ergFile->nextLap(load_msecs) - load_msecs;
-			else lapTimeRemaining = 0;
+            long lapTimeRemaining;
+            if (ergFile) lapTimeRemaining = ergFile->nextLap(load_msecs) - load_msecs;
+            else lapTimeRemaining = 0;
 
-			if(lapTimeRemaining < 0)
-				{
-					if (ergFile) lapTimeRemaining =  ergFile->Duration - load_msecs;
-					if(lapTimeRemaining < 0)
-						lapTimeRemaining = 0;
-				}
-			rtData.setLapMsecsRemaining(lapTimeRemaining);
+            if(lapTimeRemaining < 0) {
+                    if (ergFile) lapTimeRemaining =  ergFile->Duration - load_msecs;
+                    if(lapTimeRemaining < 0)
+                        lapTimeRemaining = 0;
+            }
+            rtData.setLapMsecsRemaining(lapTimeRemaining);
 
-			// local stuff ...
-			displayPower = rtData.getWatts();
-			displayCadence = rtData.getCadence();
-			displayHeartRate = rtData.getHr();
-			displaySpeed = rtData.getSpeed();
-			load = rtData.getLoad();
+            // local stuff ...
+            displayPower = rtData.getWatts();
+            displayCadence = rtData.getCadence();
+            displayHeartRate = rtData.getHr();
+            displaySpeed = rtData.getSpeed();
+            load = rtData.getLoad();
 
-			// virtual speed
-			double crr = 0.004f; // typical for asphalt surfaces
-			double g = 9.81;     // g constant 9.81 m/s
-			double weight = appsettings->cvalue(main->cyclist, GC_WEIGHT, 0.0).toDouble();
-			double m = weight ? weight + 8 : 83; // default to 75kg weight, plus 8kg bike
-			double sl = slope / 100; // 10% = 0.1
-			double ad = 1.226f; // default air density at sea level
-			double cdA = 0.5f; // typical
-			double pw = rtData.getWatts();
+            // virtual speed
+            double crr = 0.004f; // typical for asphalt surfaces
+            double g = 9.81;     // g constant 9.81 m/s
+            double weight = appsettings->cvalue(main->cyclist, GC_WEIGHT, 0.0).toDouble();
+            double m = weight ? weight + 8 : 83; // default to 75kg weight, plus 8kg bike
+            double sl = slope / 100; // 10% = 0.1
+            double ad = 1.226f; // default air density at sea level
+            double cdA = 0.5f; // typical
+            double pw = rtData.getWatts();
 
-			// algorithm supplied by Tom Compton
-			// from www.AnalyticCycling.com
-			// 3.6 * ... converts from meters per second to kph
-			double vs = 3.6f * (
+            // algorithm supplied by Tom Compton
+            // from www.AnalyticCycling.com
+            // 3.6 * ... converts from meters per second to kph
+            double vs = 3.6f * (
             (-2*pow(2,0.3333333333333333)*(crr*m + g*m*sl)) /
-				pow(54*pow(ad,2)*pow(cdA,2)*pw + 
-				sqrt(2916*pow(ad,4)*pow(cdA,4)*pow(pw,2) + 
-				864*pow(ad,3)*pow(cdA,3)*pow(crr*m +
-				g*m*sl,3)),0.3333333333333333) + 
-				pow(54*pow(ad,2)*pow(cdA,2)*pw + 
-				sqrt(2916*pow(ad,4)*pow(cdA,4)*pow(pw,2) + 
-				864*pow(ad,3)*pow(cdA,3)*pow(crr*m +
-				g*m*sl,3)),0.3333333333333333)/
-				(3.*pow(2,0.3333333333333333)*ad*cdA));
+                pow(54*pow(ad,2)*pow(cdA,2)*pw +
+                sqrt(2916*pow(ad,4)*pow(cdA,4)*pow(pw,2) +
+                864*pow(ad,3)*pow(cdA,3)*pow(crr*m +
+                g*m*sl,3)),0.3333333333333333) +
+                pow(54*pow(ad,2)*pow(cdA,2)*pw +
+                sqrt(2916*pow(ad,4)*pow(cdA,4)*pow(pw,2) +
+                864*pow(ad,3)*pow(cdA,3)*pow(crr*m +
+                g*m*sl,3)),0.3333333333333333)/
+                (3.*pow(2,0.3333333333333333)*ad*cdA));
 
-			// just in case...
-			if (isnan(vs) || isinf(vs)) vs = 0.00f;
+            // just in case...
+            if (isnan(vs) || isinf(vs)) vs = 0.00f;
 
-			rtData.setVirtualSpeed(vs);
-        
+            rtData.setVirtualSpeed(vs);
 
-			// go update the displays...
-			main->notifyTelemetryUpdate(rtData); // signal everyone to update telemetry
 
-			// set now to current time when not using a workout
-			// but limit to almost every second (account for
-			// slight timing errors of 100ms or so)
+            // go update the displays...
+            main->notifyTelemetryUpdate(rtData); // signal everyone to update telemetry
 
-			// Do some rounding to the hundreds because as time goes by, rtData.getMsecs() drifts just below and then it does not pass the mod 1000 < 100 test
-			// For example:  msecs = 42199.  Mod 1000 = 199 versus msecs = 42000.  Mod 1000 = 0
-			// With this, it will now call tick just about every second
-			long rmsecs = round((rtData.getMsecs() + 99) / 100) * 100;
-			// Test for <= 100ms
-			if (!(status&RT_WORKOUT) && ((rmsecs % 1000) <= 100)) {
-				main->notifySetNow(rtData.getMsecs());
-        	}
-		}
-	}
+            // set now to current time when not using a workout
+            // but limit to almost every second (account for
+            // slight timing errors of 100ms or so)
+
+            // Do some rounding to the hundreds because as time goes by, rtData.getMsecs() drifts just below and then it does not pass the mod 1000 < 100 test
+            // For example:  msecs = 42199.  Mod 1000 = 199 versus msecs = 42000.  Mod 1000 = 0
+            // With this, it will now call tick just about every second
+            long rmsecs = round((rtData.getMsecs() + 99) / 100) * 100;
+            // Test for <= 100ms
+            if (!(status&RT_WORKOUT) && ((rmsecs % 1000) <= 100)) {
+                main->notifySetNow(rtData.getMsecs());
+            }
+        }
+    }
 }
 
 // can be called from the controller - when user presses "Lap" button
@@ -1316,7 +1315,7 @@ void TrainTool::Calibrate()
         bar->show();
 
         // pause gui/load, streaming and recording
-		// but keep the gui ticking so we get realtime telemetry to detect the F3 keypad =button press
+        // but keep the gui ticking so we get realtime telemetry to detect the F3 keypad =button press
         session_elapsed_msec += session_time.elapsed();
         lap_elapsed_msec += lap_time.elapsed();
 
@@ -1470,7 +1469,7 @@ void TrainTool::adjustIntensity()
 
     bool insertedNow = main->getNow() ? false : true; // don't add if at start
 
-//XXX what about gradient courses?
+    //XXX what about gradient courses?
     ErgFilePoint last;
     for(int i = 0; i < main->currentErgFile()->Points.count(); i++) {
 
