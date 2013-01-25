@@ -78,7 +78,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
 
     // reveal widget
     revealControls = new QWidget(this);
-    revealControls->setFixedHeight(55);
+    revealControls->setFixedHeight(50);
     revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 100%)");
     revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
