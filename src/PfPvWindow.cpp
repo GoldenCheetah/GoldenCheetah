@@ -77,6 +77,7 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
     rFrameInterval->setCheckState(Qt::Checked);
 
     QVBoxLayout *checks = new QVBoxLayout;
+    checks->addStretch();
     checks->addWidget(rShade);
     checks->addWidget(rMergeInterval);
     checks->addWidget(rFrameInterval);
