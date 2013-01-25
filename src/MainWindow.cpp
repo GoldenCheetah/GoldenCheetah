@@ -1385,6 +1385,8 @@ MainWindow::moveEvent(QMoveEvent*)
 void
 MainWindow::closeEvent(QCloseEvent* event)
 {
+	// Ensure we stop TrainTool if it is running
+	trainTool->Stop();
     if (saveRideExitDialog() == false) event->ignore();
     else {
 
