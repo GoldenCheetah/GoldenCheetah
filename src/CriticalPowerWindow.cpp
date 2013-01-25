@@ -40,7 +40,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
 
     // Main layout
     QGridLayout *mainLayout = new QGridLayout(this);
-    mainLayout->setContentsMargins(0,0,0,0);
+    mainLayout->setContentsMargins(2,2,2,2);
 
     //
     // reveal controls widget
@@ -49,7 +49,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     // reveal widget
     revealControls = new QWidget(this);
     revealControls->setFixedHeight(50);
-    //revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 10%)");
+    //revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 100%)");
     revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     // layout reveal controls
@@ -102,12 +102,12 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     // picker layout
     QVBoxLayout *pickerLayout = new QVBoxLayout(pickerControls);
     QFormLayout *pcl = new QFormLayout;
-    pickerLayout->addSpacing(50);
     pickerLayout->addLayout(pcl);
+    pickerLayout->addStretch(); // get labels at top right
 
     // picker details
     QLabel *cpintTimeLabel = new QLabel(tr("Duration:"), this);
-    cpintTimeValue = new QLineEdit("0 s");
+    cpintTimeValue = new QLabel("0 s");
     QLabel *cpintTodayLabel = new QLabel(tr("Today:"), this);
     cpintTodayValue = new QLabel(tr("no data"));
     QLabel *cpintAllLabel = new QLabel(tr("Best:"), this);
@@ -120,22 +120,31 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     //cpintAllValue->setFixedWidth(width);
     //cpintCPValue->setFixedWidth(width); // so lines up nicely
 
-    cpintTimeValue->setReadOnly(false);
+    //cpintTimeValue->setReadOnly(false);
     //cpintTodayValue->setReadOnly(true);
     //cpintAllValue->setReadOnly(true);
     //cpintCPValue->setReadOnly(true);
 
+    // chart overlayed values in smaller font
     QFont font = cpintTimeValue->font();
-    font.setPointSize(font.pointSize());
+    font.setPointSize(font.pointSize()-2);
     cpintTodayValue->setFont(font);
     cpintAllValue->setFont(font);
     cpintCPValue->setFont(font);
+    cpintTimeValue->setFont(font);
+    cpintTimeLabel->setFont(font);
+    cpintTodayLabel->setFont(font);
+    cpintAllLabel->setFont(font);
+    cpintCPLabel->setFont(font);
 
     pcl->addRow(cpintTimeLabel, cpintTimeValue);
     pcl->addRow(cpintTodayLabel, cpintTodayValue);
+    if (rangemode) {
+        cpintTodayLabel->hide();
+        cpintTodayValue->hide();
+    }
     pcl->addRow(cpintAllLabel, cpintAllValue);
     pcl->addRow(cpintCPLabel, cpintCPValue);
-    pcl->addWidget(new QLabel("")); //spacing
 
     // tools /properties
     seriesCombo = new QComboBox(this);
@@ -152,6 +161,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
 
     cpintSetCPButton = new QPushButton(tr("&Save CP value"), this);
     cpintSetCPButton->setEnabled(false);
+    cpintSetCPButton->hide();
     cl->addRow(label2, cComboSeason);
 
     dateSetting = new DateSettingsEdit(this);
@@ -180,7 +190,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     setLayout(mainLayout);
 
     connect(picker, SIGNAL(moved(const QPoint &)), SLOT(pickerMoved(const QPoint &)));
-    connect(cpintTimeValue, SIGNAL(editingFinished()), this, SLOT(cpintTimeValueEntered()));
+    //connect(cpintTimeValue, SIGNAL(editingFinished()), this, SLOT(cpintTimeValueEntered()));
     connect(cpintSetCPButton, SIGNAL(clicked()), this, SLOT(cpintSetCPButtonClicked()));
     connect(rCpintSetCPButton, SIGNAL(clicked()), this, SLOT(cpintSetCPButtonClicked()));
 

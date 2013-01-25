@@ -78,7 +78,7 @@ ScatterWindow::ScatterWindow(MainWindow *parent, const QDir &home) :
     // reveal widget
     revealControls = new QWidget(this);
     revealControls->setFixedHeight(50);
-    revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 80%)");
+    revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 100%)");
     revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     // reveal controls
@@ -92,6 +92,7 @@ ScatterWindow::ScatterWindow(MainWindow *parent, const QDir &home) :
 
     rIgnore = new QCheckBox(tr("Ignore Zero"));
     rIgnore->setChecked(true);
+    rIgnore->hide();
     rFrameInterval = new QCheckBox(tr("Frame intervals"));
     rFrameInterval->setChecked(true);
 

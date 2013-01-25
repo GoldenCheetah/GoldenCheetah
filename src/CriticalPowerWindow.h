@@ -138,7 +138,7 @@ class CriticalPowerWindow : public GcWindow
         QDir home;
         CpintPlot *cpintPlot;
         MainWindow *mainWindow;
-        QLineEdit *cpintTimeValue;
+        QLabel *cpintTimeValue;
         QLabel *cpintTodayValue;
         QLabel *cpintAllValue;
         QLabel *cpintCPValue;
