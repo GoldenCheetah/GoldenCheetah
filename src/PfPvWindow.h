@@ -45,8 +45,8 @@ class PfPvWindow : public GcWindow
 
         // reveal
         bool hasReveal() { return true; }
-        void reveal() { revealControls->show(); }
-        void unreveal() { revealControls->hide(); }
+        void reveal() { revealControls->show(); revealAnim->start(); }
+        void unreveal() { unrevealAnim->start(); revealControls->hide(); }
 
         // get/set properties
         QString watts() const { return qaCPValue->text(); }
@@ -84,6 +84,7 @@ class PfPvWindow : public GcWindow
 
         MainWindow *mainWindow;
         PfPvPlot *pfPvPlot;
+        QPropertyAnimation *revealAnim, *unrevealAnim;
         QwtPlotZoomer *pfpvZoomer;
         QCheckBox *shadeZonesPfPvCheckBox;
         QCheckBox *mergeIntervalPfPvCheckBox;
