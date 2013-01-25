@@ -138,10 +138,11 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     cpintCPLabel->setFont(font);
 
     pcl->addRow(cpintTimeLabel, cpintTimeValue);
-    pcl->addRow(cpintTodayLabel, cpintTodayValue);
     if (rangemode) {
         cpintTodayLabel->hide();
         cpintTodayValue->hide();
+    } else {
+        pcl->addRow(cpintTodayLabel, cpintTodayValue);
     }
     pcl->addRow(cpintAllLabel, cpintAllValue);
     pcl->addRow(cpintCPLabel, cpintCPValue);
