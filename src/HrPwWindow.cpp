@@ -52,6 +52,7 @@ HrPwWindow::HrPwWindow(MainWindow *mainWindow) :
 
     revealAnim = new QPropertyAnimation(revealControls, "pos");
     revealAnim->setDuration(500);
+    revealAnim->setEasingCurve(QEasingCurve(QEasingCurve::InSine));
     revealAnim->setKeyValueAt(0,QPoint(2,-50));
     revealAnim->setKeyValueAt(0.5,QPoint(2,15));
     revealAnim->setKeyValueAt(1,QPoint(2,20));
