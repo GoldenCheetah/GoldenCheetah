@@ -131,7 +131,7 @@ class AllPlotWindow : public GcWindow
         // reveal
         bool hasReveal() { return true; }
         void reveal() { revealControls->show(); revealAnim->start(); }
-        void unreveal() { unrevealAnim->start(); }
+        void unreveal() { unrevealAnim->start(); revealControls->hide(); }
 
     protected:
 
