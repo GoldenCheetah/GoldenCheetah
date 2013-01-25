@@ -63,8 +63,8 @@ class HistogramWindow : public GcWindow
 
         // reveal
         bool hasReveal() { return true; }
-        void reveal() { revealControls->show(); }
-        void unreveal() { revealControls->hide(); }
+        void reveal() { revealControls->show(); revealAnim->start(); }
+        void unreveal() { unrevealAnim->start(); revealControls->hide(); }
 
         // get/set properties
         int series() const { return seriesCombo->currentIndex(); }
@@ -147,6 +147,7 @@ class HistogramWindow : public GcWindow
 
         // reveal controls
         QWidget *revealControls;
+        QPropertyAnimation *revealAnim, *unrevealAnim;
         QLabel *rWidth;
         QLineEdit *rBinEdit;    // set Bin Width from the line edit
         QSlider *rBinSlider;        // seet Bin Width from a slider
