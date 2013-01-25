@@ -70,7 +70,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
 
     // Main layout
     QGridLayout *mainLayout = new QGridLayout(this);
-    mainLayout->setContentsMargins(0,0,0,0);
+    mainLayout->setContentsMargins(2,2,2,2);
 
     //
     // reveal controls widget
@@ -78,8 +78,8 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
 
     // reveal widget
     revealControls = new QWidget(this);
-    revealControls->setFixedHeight(50);
-    //revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 70%)");
+    revealControls->setFixedHeight(55);
+    revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 100%)");
     revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     // reveal controls
@@ -106,6 +106,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     v->setSpacing(3);
     v->addWidget(rStack);
     v->addWidget(rFull);
+    v->addStretch(8); // a bit of space
     r->addLayout(v);
     r->addStretch();
     revealControls->setLayout(r);
@@ -449,36 +450,6 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
 void
 AllPlotWindow::configChanged()
 {
-    //We now use the window background color
-    //fullPlot->setCanvasBackground(GColor(CPLOTTHUMBNAIL));
-    QColor bgColor = GColor(CRIDEPLOTBACKGROUND);
-    QColor fgColor;
-
-    if (bgColor == Qt::black) fgColor = Qt::white;
-    else if (bgColor == Qt::white) fgColor = Qt::black;
-    else {
-
-        QColor cRGB = bgColor.convertTo(QColor::Rgb);
-        // lets work it out..
-        int r = cRGB.red() < 128 ? 255 : 0;
-        int g = cRGB.green() < 128 ? 255 : 0;
-        int b = cRGB.blue() < 128 ? 255 : 0;
-        fgColor = QColor(r,g,b);
-    }
-
-    QString styleSheet = QString("background-color: transparent;"
-                                 "color: rgb(%1,%2,%3);")
-                        .arg(fgColor.red())
-                        .arg(fgColor.green())
-                        .arg(fgColor.blue());
-
-    // set the color
-    rSmooth->setStyleSheet(styleSheet);
-    //XXX always has white Background --> rSmoothEdit->setStyleSheet(styleSheet);
-    rSmoothSlider->setStyleSheet(styleSheet);
-    rStack->setStyleSheet(styleSheet);
-    rFull->setStyleSheet(styleSheet);
-
     // we're going to replot, but only if we're active
     // and all the other guff
     RideItem *ride = myRideItem;

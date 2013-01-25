@@ -35,7 +35,7 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
 
     // Main layout
     QGridLayout *mainLayout = new QGridLayout(this);
-    mainLayout->setContentsMargins(0,0,0,0);
+    mainLayout->setContentsMargins(2,2,2,2);
 
     //
     // reveal controls widget
@@ -44,13 +44,12 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
     // reveal widget
     revealControls = new QWidget(this);
     revealControls->setFixedHeight(50);
-    //revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 10%)");
+    revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 100%)");
     revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     // layout reveal controls
     QHBoxLayout *revealLayout = new QHBoxLayout;
     revealLayout->setContentsMargins(0,0,0,0);
-    revealLayout->addStretch();
 
     rShade = new QCheckBox(tr("Shade zones"), revealControls);
     if (appsettings->value(this, GC_SHADEZONES, true).toBool() == true)
@@ -60,13 +59,19 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
     rMergeInterval = new QCheckBox;
     rMergeInterval->setText(tr("Merge intervals"));
     rMergeInterval->setCheckState(Qt::Unchecked);
+    rMergeInterval->hide(); // lets not - its not that useful
     rFrameInterval = new QCheckBox;
     rFrameInterval->setText(tr("Frame intervals"));
     rFrameInterval->setCheckState(Qt::Checked);
 
-    revealLayout->addWidget(rShade);
-    revealLayout->addWidget(rMergeInterval);
-    revealLayout->addWidget(rFrameInterval);
+    QVBoxLayout *checks = new QVBoxLayout;
+    checks->addWidget(rShade);
+    checks->addWidget(rMergeInterval);
+    checks->addWidget(rFrameInterval);
+    checks->addStretch();
+
+    revealLayout->addStretch();
+    revealLayout->addLayout(checks);
     revealLayout->addStretch();
 
     revealControls->setLayout(revealLayout);
