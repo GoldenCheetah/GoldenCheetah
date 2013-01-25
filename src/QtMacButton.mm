@@ -240,7 +240,7 @@ void QtMacButton::setImage(const QPixmap &image)
     Q_ASSERT(qtw);
     if (qtw) {
         [qtw->nsButton setImage:fromQPixmap(image)];
-        [qtw->nsButton setAlternateImage:fromQPixmap(image)];
+        //[qtw->nsButton setAlternateImage:fromQPixmap(image)];
         [qtw->nsButton setButtonType:NSMomentaryPushButton];
     }
 }
