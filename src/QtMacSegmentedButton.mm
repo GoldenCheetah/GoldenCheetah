@@ -50,11 +50,13 @@ inline NSString *darwinQStringToNSString (const QString &aString)
     return [(CFStringCreateWithCharacters (0, reinterpret_cast<const UniChar *> (aString.unicode()), aString.length())) autorelease];
 }
 
-static NSImage* fromQPixmap(const QPixmap &pixmap)
+static NSImage *fromQPixmap(const QPixmap &pixmap)
 {
-    CGImageRef cgImage = pixmap.toMacCGImageRef();
-    NSImage *image =[[NSImage alloc] initWithCGImage:cgImage size:NSZeroSize];
+    NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithCGImage:pixmap.toMacCGImageRef()];
+    NSImage *image = [[NSImage alloc] init];
+    [image addRepresentation:bitmapRep];
     [image setTemplate:true];
+    [bitmapRep release];
     return image;
 }
 
