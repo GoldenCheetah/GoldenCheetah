@@ -35,6 +35,7 @@
 #include <QVariant>
 #include <QMetaType>
 #include <QFrame>
+#include <QtGui>
 
 class RideItem;
 class GcWindow;
@@ -83,6 +84,7 @@ private:
     Q_PROPERTY(bool gripped READ gripped WRITE setGripped)
 
     QWidget *_controls;
+
     QString _title;
     QString _subtitle;
     QString _instanceName;
@@ -191,6 +193,41 @@ public:
     QToolButton *menuButton;
     QMenu *menu;
 };
+
+class GcChartWindow : public GcWindow
+{
+private:
+    Q_OBJECT
+
+    QStackedLayout *_layout;
+    QGridLayout *_mainLayout;
+    QLayout *_chartLayout,
+            *_revealLayout;
+    QWidget *_mainWidget;
+    QWidget *_blank;
+    QWidget *_chart;
+
+    // reveal controls
+    QWidget *_revealControls;
+    QPropertyAnimation *_revealAnim,
+                       *_unrevealAnim;
+    QTimer *_showTimer;
+
+    // reveal
+    bool virtual hasReveal() { return false; }
+    void reveal();
+    void unreveal();
+
+public:
+    GcChartWindow(QWidget *p);
+
+    QWidget *mainWidget() { return _mainWidget; }
+
+    void setChartLayout(QLayout *layout);
+    void setRevealLayout(QLayout *layout);
+
+};
+
 
 
 #endif

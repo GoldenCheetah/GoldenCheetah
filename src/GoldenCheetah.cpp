@@ -180,6 +180,7 @@ GcWindow::GcWindow()
 
     menuButton->hide();
 
+
 #ifndef Q_OS_MAC // spacing ..
     menuButton->move(0,0);
 #endif
@@ -676,4 +677,75 @@ void
 GcWindow::_closeWindow()
 {
     emit closeWindow(this);
+}
+
+GcChartWindow::GcChartWindow(QWidget *parent) : GcWindow(parent) {
+    //
+    // Default layout
+    //
+    setContentsMargins(0,0,0,0);
+
+    // Main layout
+    _layout = new QStackedLayout();
+    setLayout(_layout);
+
+    _mainWidget = new QWidget(this);
+    _mainWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    _blank = new QWidget(this);
+    _blank->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    _layout->addWidget(_blank);
+    _layout->addWidget(_mainWidget);
+    _layout->setCurrentWidget(_mainWidget);
+
+    _mainLayout = new QGridLayout();
+    _mainLayout->setContentsMargins(2,2,2,2);
+
+    // reveal widget
+    _revealControls = new QWidget();
+    _revealControls->setFixedHeight(50);
+    _revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 100%)");
+    _revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    _revealAnim = new QPropertyAnimation(_revealControls, "pos");
+    _revealAnim->setDuration(200);
+    _revealAnim->setEasingCurve(QEasingCurve(QEasingCurve::InSine));
+    _revealAnim->setKeyValueAt(0,QPoint(2,-50));
+    _revealAnim->setKeyValueAt(0.5,QPoint(2,-5));
+    _revealAnim->setKeyValueAt(1,QPoint(2,0));
+
+    _unrevealAnim = new QPropertyAnimation(_revealControls, "pos");
+    _unrevealAnim->setDuration(150);
+    _unrevealAnim->setEasingCurve(QEasingCurve(QEasingCurve::InSine));
+    _unrevealAnim->setKeyValueAt(0,QPoint(2,0));
+    _unrevealAnim->setKeyValueAt(0.5,QPoint(2,-5));
+    _unrevealAnim->setKeyValueAt(1,QPoint(2,-50));
+
+    _mainLayout->addWidget(_revealControls,0,0, Qt::AlignTop);
+    _mainWidget->setLayout(_mainLayout);
+}
+
+void GcChartWindow:: setChartLayout(QLayout *layout)
+{
+    _chartLayout = layout;
+    _mainLayout->addLayout(_chartLayout,0,0, Qt::AlignTop);
+}
+
+void GcChartWindow:: setRevealLayout(QLayout *layout)
+{
+    _revealLayout = layout;
+    _revealControls->setLayout(_revealLayout);
+}
+
+void GcChartWindow:: reveal()
+{
+    _revealControls->raise();
+    _revealControls->show();
+    _revealAnim->start();
+}
+
+void GcChartWindow:: unreveal()
+{
+    _unrevealAnim->start();
+    //_revealControls->hide();
 }
