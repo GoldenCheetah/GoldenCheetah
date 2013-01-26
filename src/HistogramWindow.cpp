@@ -49,9 +49,11 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
     //
 
     // reveal widget
+    revealBackground = new QWidget(this);
+    revealBackground->setStyleSheet("background-color: rgba(100%, 100%, 100%, 100%)");
     revealControls = new QWidget(this);
     revealControls->setFixedHeight(50);
-    revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 100%)");
+    revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 0%)");
     revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     revealAnim = new QPropertyAnimation(revealControls, "pos");
@@ -61,11 +63,13 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
     revealAnim->setKeyValueAt(0.5,QPoint(2,15));
     revealAnim->setKeyValueAt(1,QPoint(2,20));
 
-    unrevealAnim = new QPropertyAnimation(revealControls, "pos");
-    unrevealAnim->setDuration(500);
-    unrevealAnim->setKeyValueAt(0,QPoint(2,20));
-    unrevealAnim->setKeyValueAt(0.5,QPoint(2,15));
-    unrevealAnim->setKeyValueAt(1,QPoint(2,-50));
+    revealBgAnim = new QPropertyAnimation(revealBackground, "geometry");
+    revealBgAnim->setEasingCurve(QEasingCurve(QEasingCurve::InSine));
+    revealBgAnim->setDuration(500);
+
+    groupAnim = new QParallelAnimationGroup();
+    groupAnim->addAnimation(revealAnim);
+    groupAnim->addAnimation(revealBgAnim);
 
     // reveal controls
     rWidth = new QLabel(tr("Bin Width"), revealControls);
@@ -104,7 +108,9 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
     vlayout->addWidget(powerHist);
 
     mainLayout->addLayout(vlayout,0,0);
+    mainLayout->addWidget(revealBackground,0,0, Qt::AlignTop);
     mainLayout->addWidget(revealControls,0,0, Qt::AlignTop);
+    revealBackground->raise();
     revealControls->raise();
     setLayout(mainLayout);
 
@@ -411,6 +417,14 @@ HistogramWindow::setShade(int x)
 {
     rShade->setCheckState((Qt::CheckState)x);
     shadeZones->setCheckState((Qt::CheckState)x);
+}
+
+void
+HistogramWindow::resizeEvent(QResizeEvent *)
+{
+    revealBgAnim->setKeyValueAt(0, QRect(2, contentsMargins().top(), width()-4, 0));
+    revealBgAnim->setKeyValueAt(0.5, QRect(2, contentsMargins().top(), width()-4, 45));
+    revealBgAnim->setKeyValueAt(1, QRect(2, contentsMargins().top(), width()-4, 50));
 }
 
 void
