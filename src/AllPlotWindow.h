@@ -140,6 +140,7 @@ class AllPlotWindow : public GcWindow
         friend class MainWindow;
 
         void setAllPlotWidgets(RideItem *rideItem);
+        void resizeEvent(QResizeEvent *);
 
         // cached state
         RideItem *current;

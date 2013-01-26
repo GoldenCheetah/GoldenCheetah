@@ -286,6 +286,7 @@ PwxFileReader::writeRideFile(MainWindow *main, const RideFile *ride, QFile &file
 
     // pwx
     QDomElement pwx = doc.createElementNS("http://www.peaksware.com/PWX/1/0", "pwx");
+    pwx.setAttribute("creator", "Golden Cheetah");
     pwx.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
     pwx.setAttribute("xmlns:xsd", "http://www.w3.org/2001/XMLSchema");
     pwx.setAttribute("xsi:schemaLocation", "http://www.peaksware.com/PWX/1/0 http://www.peaksware.com/PWX/1/0/pwx.xsd");
@@ -312,8 +313,12 @@ PwxFileReader::writeRideFile(MainWindow *main, const RideFile *ride, QFile &file
 
     // sport
     QString sport = ride->getTag("Sport", "Bike");
+    if (sport == QObject::tr("Biking") || sport == QObject::tr("Cycling") || sport == QObject::tr("Cycle") || sport == QObject::tr("Bike")) {
+        sport = "Bike";
+    }
     QDomElement sportType = doc.createElement("sportType");
-    text = doc.createTextNode(sport); sportType.appendChild(text);
+    text = doc.createTextNode(sport); 
+    sportType.appendChild(text);
     root.appendChild(sportType);
 
     // notes

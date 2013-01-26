@@ -60,8 +60,8 @@ class CriticalPowerWindow : public GcWindow
 
         // reveal
         bool hasReveal() { return true; }
-        void reveal() { revealControls->show(); }
-        void unreveal() { revealControls->hide(); }
+        void reveal() { revealControls->show(); revealAnim->start(); }
+        void unreveal() { unrevealAnim->start(); revealControls->hide(); }
 
         void deleteCpiFile(QString filename);
 
@@ -128,6 +128,8 @@ class CriticalPowerWindow : public GcWindow
     private:
         // reveal controls
         QWidget *revealControls;
+        QPropertyAnimation *revealAnim, *unrevealAnim;
+        QPushButton *rCpintSetCPButton;
 
         void updateCpint(double minutes);
 
@@ -145,7 +147,6 @@ class CriticalPowerWindow : public GcWindow
         QComboBox *seriesCombo;
         QComboBox *cComboSeason;
         QPushButton *cpintSetCPButton;
-        QPushButton *rCpintSetCPButton;
         QwtPlotPicker *picker;
         void addSeries();
         Seasons *seasons;

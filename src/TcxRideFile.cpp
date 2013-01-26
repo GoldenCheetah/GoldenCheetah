@@ -66,10 +66,14 @@ TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile
     doc.appendChild(tcx);
 
     // activities, we just serialise one ride
+    QString sport = ride->getTag("Sport", "Biking");
+    if (sport == QObject::tr("Biking") || sport == QObject::tr("Cycling") || sport == QObject::tr("Cycle") || sport == QObject::tr("Bike")) {
+        sport = "Biking";
+    }
     QDomElement activities = doc.createElement("Activities");
     tcx.appendChild(activities);
     QDomElement activity = doc.createElement("Activity");
-    activity.setAttribute("Sport", "Biking"); // was ride->getTag("Sport", "Biking") but must be Biking, Running or Other
+    activity.setAttribute("Sport", sport); // was ride->getTag("Sport", "Biking") but must be Biking, Running or Other
     activities.appendChild(activity);
 
     // time
