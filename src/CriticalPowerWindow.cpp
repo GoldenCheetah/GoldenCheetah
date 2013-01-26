@@ -49,15 +49,28 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     // reveal widget
     revealControls = new QWidget(this);
     revealControls->setFixedHeight(50);
-    //revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 100%)");
+    revealControls->setStyleSheet("QWidget  { background-color: rgba(100%, 100%, 100%, 100%); }");
     revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    revealAnim = new QPropertyAnimation(revealControls, "pos");
+    revealAnim->setDuration(500);
+    revealAnim->setKeyValueAt(0,QPoint(2,-50));
+    revealAnim->setKeyValueAt(0.5,QPoint(2,15));
+    revealAnim->setKeyValueAt(1,QPoint(2,20));
+
+    unrevealAnim = new QPropertyAnimation(revealControls, "pos");
+    unrevealAnim->setDuration(500);
+    unrevealAnim->setKeyValueAt(0,QPoint(2,20));
+    unrevealAnim->setKeyValueAt(0.5,QPoint(2,15));
+    unrevealAnim->setKeyValueAt(1,QPoint(2,-50));
 
     // layout reveal controls
     QHBoxLayout *revealLayout = new QHBoxLayout;
     revealLayout->setContentsMargins(0,0,0,0);
     revealLayout->addStretch();
 
-    rCpintSetCPButton = new QPushButton(tr("&Save CP value"), this);
+    rCpintSetCPButton = new QPushButton(tr("&Save CP value"));
+    rCpintSetCPButton->setStyleSheet("QPushButton {border-radius: 3px;border-style: outset; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #DDDDDD, stop: 1 #BBBBBB); border-width: 1px; border-color: #555555;} QPushButton:pressed {background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #BBBBBB, stop: 1 #999999); }");
     rCpintSetCPButton->setEnabled(false);
 
     revealLayout->addWidget(rCpintSetCPButton);
