@@ -1618,9 +1618,9 @@ MainWindow::selectAnalysis()
         scopebar->selected(2);
 #endif
         toolBox->setCurrentIndex(0);
-        setStyle();
     }
     currentWindow = analWindow;
+    setStyle();
 }
 
 void
@@ -1661,9 +1661,9 @@ MainWindow::selectTrain()
         scopebar->selected(3);
     #endif
         toolBox->setCurrentIndex(2);
-        setStyle();
     }
     currentWindow = trainWindow;
+    setStyle();
 }
 
 void
@@ -1699,9 +1699,9 @@ MainWindow::selectDiary()
     #endif
         toolBox->setCurrentIndex(1);
         gcCalendar->refresh(); // get that signal with the date range...
-        setStyle();
     }
     currentWindow = diaryWindow;
+    setStyle();
 }
 
 void
@@ -1737,9 +1737,9 @@ MainWindow::selectHome()
         scopebar->selected(0);
     #endif
         toolBox->setCurrentIndex(3);
-        setStyle();
     }
     currentWindow = homeWindow;
+    setStyle();
 }
 void
 MainWindow::selectAthlete()
