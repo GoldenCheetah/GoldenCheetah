@@ -77,16 +77,17 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     //
 
     // reveal widget
+    revealBackground = new QWidget(this);
     revealControls = new QWidget(this);
-    //revealControls->setFixedHeight(50);
-    revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 100%)");
+    revealControls->setFixedHeight(50);
+    revealBackground->setStyleSheet("background-color: rgba(100%, 100%, 100%, 100%)");
     revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-    revealAnim = new QPropertyAnimation(revealControls, "geometry");
+    revealAnim = new QPropertyAnimation(revealBackground, "geometry");
     revealAnim->setDuration(500);
     revealAnim->setEasingCurve(QEasingCurve(QEasingCurve::InSine));
 
-    unrevealAnim = new QPropertyAnimation(revealControls, "geometry");
+    unrevealAnim = new QPropertyAnimation(revealBackground, "geometry");
     unrevealAnim->setDuration(250);
 
     // reveal controls
@@ -400,7 +401,9 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     vlayout->setSpacing(1);
 
     mainLayout->addLayout(vlayout,0,0);
+    mainLayout->addWidget(revealBackground,0,0, Qt::AlignTop);
     mainLayout->addWidget(revealControls,0,0, Qt::AlignTop);
+    revealBackground->raise();
     revealControls->raise();
     setLayout(mainLayout);
 

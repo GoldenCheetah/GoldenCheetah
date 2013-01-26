@@ -188,8 +188,10 @@ class AllPlotWindow : public GcWindow
 
     private:
         // reveal controls
-        QWidget *revealControls;
-        QPropertyAnimation *revealAnim, *unrevealAnim;
+        QWidget *revealControls,
+                *revealBackground;
+        QPropertyAnimation *revealAnim,
+                           *unrevealAnim;
         QLabel *rSmooth;
         QSlider *rSmoothSlider;
         QLineEdit *rSmoothEdit;
