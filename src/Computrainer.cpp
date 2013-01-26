@@ -441,10 +441,6 @@ int Computrainer::stop()
     pvars.lock();
     deviceStatus = 0; // Terminate it!
     pvars.unlock();
-	// Ok, let's wrap it up
-	closePort(); // need to release that file handle!!
-	quit(0);
-	QThread::wait();			// wait to avoid race conditions
     return 0;
 }
 
