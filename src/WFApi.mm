@@ -143,12 +143,12 @@ static QString toQString(const NSString *nsstr)
 
 - (BOOL)disconnectDevice { [sensorConnection disconnect]; return true; }
 - (void)connection:(WFSensorConnection*)connectionInfo stateChanged:(WFSensorConnectionStatus_t)connState
-{
+{   Q_UNUSED(connectionInfo);
     qtw->connectionState(connState);
 }
 
 - (void)connectionDidTimeout:(WFSensorConnection*)connectionInfo
-{
+{   Q_UNUSED(connectionInfo);
     qtw->connectionTimeout();
 }
 
@@ -182,12 +182,12 @@ static QString toQString(const NSString *nsstr)
 
 // WFHardwareConnectorDelegate Functions
 -(void)hardwareConnector:(WFHardwareConnector*)hwConnector connectedSensor:(WFSensorConnection*)connectionInfo
-{
+{   Q_UNUSED(hwConnector);
     qtw->connectedSensor(connectionInfo);
 }
 
 -(void)hardwareConnector:(WFHardwareConnector*)hwConnector didDiscoverDevices:(NSSet*)connectionParams searchCompleted:(BOOL)bCompleted
-{
+{   Q_UNUSED(hwConnector);
     // add discovered devices.
     for (WFConnectionParams* connParams in connectionParams) {
         [discoveredSensors addObject:connParams.device1];
@@ -197,12 +197,13 @@ static QString toQString(const NSString *nsstr)
 }
 
 -(void)hardwareConnector:(WFHardwareConnector*)hwConnector disconnectedSensor:(WFSensorConnection*)connectionInfo
-{
+{   Q_UNUSED(hwConnector);
     qtw->disconnectedSensor(connectionInfo);
 }
 
 -(void)hardwareConnector:(WFHardwareConnector*)hwConnector stateChanged:(WFHardwareConnectorState_t)currentState
-{
+{   Q_UNUSED(hwConnector);
+    Q_UNUSED(currentState);
     qtw->stateChanged();
 }
 
@@ -212,7 +213,10 @@ static QString toQString(const NSString *nsstr)
 }
 
 -(void) hardwareConnector:(WFHardwareConnector*)hwConnector hasFirmwareUpdateAvailableForConnection:(WFSensorConnection*)connectionInfo required:(BOOL)required withWahooUtilityAppURL:(NSURL *)wahooUtilityAppURL
-{
+{   Q_UNUSED(hwConnector);
+    Q_UNUSED(connectionInfo);
+    Q_UNUSED(required);
+    Q_UNUSED(wahooUtilityAppURL);
     qtw->hasFirmwareUpdateAvalableForConnection(); //XXX do what?
 }
 
@@ -254,7 +258,10 @@ int WFApi::currentState() { return [wf currentState]; }
 
 bool
 WFApi::discoverDevicesOfType(int eSensorType, int eNetworkType, int timeout)
-{
+{   Q_UNUSED(eSensorType);
+    Q_UNUSED(eNetworkType);
+    Q_UNUSED(timeout);
+
     // ignore ehat was passed for now...
     return [wf discoverDevicesOfType:WF_SENSORTYPE_BIKE_POWER onNetwork:WF_NETWORKTYPE_BTLE searchTimeout:5.00];
 }
@@ -348,7 +355,7 @@ WFApi::stateChanged()
 
 void
 WFApi::connectionState(int status)
-{
+{   Q_UNUSED(status);
 }
 
 void
