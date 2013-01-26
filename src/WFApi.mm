@@ -117,6 +117,9 @@ static QString toQString(const NSString *nsstr)
 
 -(BOOL)connectDevice: (int)n
 {
+    // it takes far too long!
+    [[WFHardwareConnector sharedConnector] disableFirmwareCheck];
+
     // just in case there is a discovery in action, lets cancel it...
     [[WFHardwareConnector sharedConnector] cancelDiscoveryOnNetwork:WF_NETWORKTYPE_BTLE];
 
