@@ -80,6 +80,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     revealBackground = new QWidget(this);
     revealControls = new QWidget(this);
     revealControls->setFixedHeight(50);
+    revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 100%)");
     revealBackground->setStyleSheet("background-color: rgba(100%, 100%, 100%, 100%)");
     revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -89,6 +90,9 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
 
     unrevealAnim = new QPropertyAnimation(revealBackground, "geometry");
     unrevealAnim->setDuration(250);
+
+    showTimer = new QTimer();
+    connect(showTimer, SIGNAL(timeout()), this, SLOT(showRevealControls()));
 
     // reveal controls
     rSmooth = new QLabel(tr("Smooth"), revealControls);
@@ -1689,4 +1693,10 @@ AllPlotWindow:: resizeEvent(QResizeEvent *)
     unrevealAnim->setKeyValueAt(0, QRect(2, contentsMargins().top(), width()-4, 50));
     unrevealAnim->setKeyValueAt(0.5, QRect(2, contentsMargins().top(), width()-4, 45));
     unrevealAnim->setKeyValueAt(1, QRect(2, contentsMargins().top(), width()-4, 0));
+}
+
+void
+AllPlotWindow:: showRevealControls()
+{
+    revealControls->show();
 }

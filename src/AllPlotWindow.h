@@ -130,8 +130,8 @@ class AllPlotWindow : public GcWindow
 
         // reveal
         bool hasReveal() { return true; }
-        void reveal() { revealControls->show(); revealAnim->start(); }
-        void unreveal() { unrevealAnim->start(); revealControls->hide(); }
+        void reveal() {  showTimer->start(500); revealAnim->start(); } //
+        void unreveal() { unrevealAnim->start(); revealControls->hide(); showTimer->stop();}
 
     protected:
 
@@ -192,6 +192,7 @@ class AllPlotWindow : public GcWindow
                 *revealBackground;
         QPropertyAnimation *revealAnim,
                            *unrevealAnim;
+        QTimer *showTimer;
         QLabel *rSmooth;
         QSlider *rSmoothSlider;
         QLineEdit *rSmoothEdit;
@@ -218,6 +219,8 @@ class AllPlotWindow : public GcWindow
 
         void plotPickerMoved(const QPoint &);
         void plotPickerSelected(const QPoint &);
+
+        void showRevealControls();
 };
 
 #endif // _GC_AllPlotWindow_h
