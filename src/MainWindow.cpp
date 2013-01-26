@@ -1388,6 +1388,9 @@ MainWindow::closeEvent(QCloseEvent* event)
     if (saveRideExitDialog() == false) event->ignore();
     else {
 
+        // stop any active realtime conneection
+        trainTool->Stop();
+
         // save ride list config
         appsettings->setCValue(cyclist, GC_SORTBY, listView->sortByIndex());
         appsettings->setCValue(cyclist, GC_SORTBYORDER, listView->sortByOrder());
