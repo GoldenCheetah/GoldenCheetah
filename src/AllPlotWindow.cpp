@@ -78,22 +78,16 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
 
     // reveal widget
     revealControls = new QWidget(this);
-    revealControls->setFixedHeight(50);
+    //revealControls->setFixedHeight(50);
     revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 100%)");
     revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-    revealAnim = new QPropertyAnimation(revealControls, "pos");
+    revealAnim = new QPropertyAnimation(revealControls, "geometry");
     revealAnim->setDuration(500);
     revealAnim->setEasingCurve(QEasingCurve(QEasingCurve::InSine));
-    revealAnim->setKeyValueAt(0,QPoint(2,-50));
-    revealAnim->setKeyValueAt(0.5,QPoint(2,15));
-    revealAnim->setKeyValueAt(1,QPoint(2,20));
 
-    unrevealAnim = new QPropertyAnimation(revealControls, "pos");
-    unrevealAnim->setDuration(500);
-    unrevealAnim->setKeyValueAt(0,QPoint(2,20));
-    unrevealAnim->setKeyValueAt(0.5,QPoint(2,15));
-    unrevealAnim->setKeyValueAt(1,QPoint(2,-50));
+    unrevealAnim = new QPropertyAnimation(revealControls, "geometry");
+    unrevealAnim->setDuration(250);
 
     // reveal controls
     rSmooth = new QLabel(tr("Smooth"), revealControls);
@@ -114,12 +108,10 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     r->addWidget(rSmooth);
     r->addWidget(rSmoothEdit);
     r->addWidget(rSmoothSlider);
-    r->addSpacing(0);
     QVBoxLayout *v = new QVBoxLayout;
-    v->setSpacing(3);
     v->addWidget(rStack);
     v->addWidget(rFull);
-    v->addStretch(8); // a bit of space
+    r->addSpacing(20);
     r->addLayout(v);
     r->addStretch();
     revealControls->setLayout(r);
@@ -1682,4 +1674,16 @@ AllPlotWindow::addPickers(AllPlot *_allPlot)
     connect(_allPlot->_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), _allPlot, SLOT(pointHover(QwtPlotCurve*, int)));
     connect(_allPlot->tooltip, SIGNAL(moved(const QPoint &)), this, SLOT(plotPickerMoved(const QPoint &)));
     connect(_allPlot->tooltip, SIGNAL(appended(const QPoint &)), this, SLOT(plotPickerSelected(const QPoint &)));
+}
+
+void
+AllPlotWindow:: resizeEvent(QResizeEvent *)
+{
+    revealAnim->setKeyValueAt(0, QRect(2, contentsMargins().top(), width()-4, 0));
+    revealAnim->setKeyValueAt(0.5, QRect(2, contentsMargins().top(), width()-4, 45));
+    revealAnim->setKeyValueAt(1, QRect(2, contentsMargins().top(), width()-4, 50));
+
+    unrevealAnim->setKeyValueAt(0, QRect(2, contentsMargins().top(), width()-4, 50));
+    unrevealAnim->setKeyValueAt(0.5, QRect(2, contentsMargins().top(), width()-4, 45));
+    unrevealAnim->setKeyValueAt(1, QRect(2, contentsMargins().top(), width()-4, 0));
 }
