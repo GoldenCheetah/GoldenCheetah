@@ -135,6 +135,11 @@ MainWindow::MainWindow(const QDir &home) :
     zones_(new Zones), hrzones_(new HrZones),
     ride(NULL), workout(NULL)
 {
+    #ifdef Q_OS_MAC
+    // get an autorelease pool setup
+    static CocoaInitializer cocoaInitializer;
+    #endif
+
     #ifdef GC_HAVE_WFAPI
     WFApi *w = WFApi::getInstance(); // ensure created on main thread
     w->apiVersion();//shutup compiler
@@ -204,7 +209,6 @@ MainWindow::MainWindow(const QDir &home) :
 
 
 #ifdef Q_OS_MAC // MAC NATIVE TOOLBAR
-    static CocoaInitializer cocoaInitializer; // we only need one
     setUnifiedTitleAndToolBarOnMac(true);
     head = addToolBar(cyclist);
     head->setContentsMargins(0,0,0,0);
@@ -220,13 +224,15 @@ MainWindow::MainWindow(const QDir &home) :
     QHBoxLayout *lb = new QHBoxLayout(macAnalButtons);
     lb->setContentsMargins(0,0,0,0);
     lb->setSpacing(0);
-    QtMacButton *import = new QtMacButton(this, QtMacButton::TexturedRounded);
-    import->setImage(QPixmap(":images/mac/download.png"));
+    import = new QtMacButton(this, QtMacButton::TexturedRounded);
+    QPixmap importImg(":images/mac/download.png");
+    import->setImage(importImg);
     import->setToolTip("Download");
     lb->addWidget(import);
     lb->addWidget(new Spacer(this));
-    QtMacButton *compose = new QtMacButton(this, QtMacButton::TexturedRounded);
-    compose->setImage(QPixmap(":images/mac/compose.png"));
+    compose = new QtMacButton(this, QtMacButton::TexturedRounded);
+    QPixmap composeImg(":images/mac/compose.png");
+    compose->setImage(composeImg);
     compose->setToolTip("Create");
     lb->addWidget(compose);
 

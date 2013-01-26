@@ -67,6 +67,7 @@ class Lucene;
 class NamedSearches;
 class ChartSettings;
 class QtMacSegmentedButton;
+class QtMacButton;
 class GcScopeBar;
 class RideFileCache;
 class Library;
@@ -444,6 +445,7 @@ class MainWindow : public QMainWindow
         // Mac Native Support
         QWidget *toolBarWidgets;
         QWidget *macAnalButtons;
+        QtMacButton *import, *compose;
         QtMacSegmentedButton *styleSelector;
         QToolBar *head;
         GcScopeBar *scopebar;

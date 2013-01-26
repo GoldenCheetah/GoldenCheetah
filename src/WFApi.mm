@@ -53,6 +53,7 @@ static QString toQString(const NSString *nsstr)
 // Objective C -- Private interface / Bridge to WF API classes
 //----------------------------------------------------------------------
 
+
 @interface WFBridge : NSObject <WFHardwareConnectorDelegate, WFSensorConnectionDelegate> {
 @public
     QPointer<WFApi> qtw; // the QT QObject public class
@@ -82,9 +83,7 @@ static QString toQString(const NSString *nsstr)
 // By default BTLE is disabled
 -(BOOL)isBTLEEnabled { return [[WFHardwareConnector sharedConnector] isBTLEEnabled]; }
 -(BOOL)enableBTLE:(BOOL)bEnable inBondingMode:(BOOL)bBondingMode {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     bool result = [[WFHardwareConnector sharedConnector] enableBTLE:bEnable inBondingMode:bBondingMode];
-    [pool drain];
     return result;
 }
 
@@ -105,10 +104,8 @@ static QString toQString(const NSString *nsstr)
 // scan
 -(BOOL)discoverDevicesOfType:(WFSensorType_t)eSensorType onNetwork:(WFNetworkType_t)eNetworkType searchTimeout:(NSTimeInterval)timeout
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     [discoveredSensors removeAllObjects];
     [[WFHardwareConnector sharedConnector] discoverDevicesOfType:eSensorType onNetwork:eNetworkType searchTimeout:timeout]; //XXX ignoringreturn
-    [pool drain];
     return true;
 }
 -(int)deviceCount { return [discoveredSensors count]; }
@@ -120,7 +117,6 @@ static QString toQString(const NSString *nsstr)
 
 -(BOOL)connectDevice: (int)n
 {
-    //NSAutoreleasePool *pool = [[NSAutoreleasePool alloc]init];
     // just in case there is a discovery in action, lets cancel it...
     [[WFHardwareConnector sharedConnector] cancelDiscoveryOnNetwork:WF_NETWORKTYPE_BTLE];
 
@@ -138,7 +134,6 @@ static QString toQString(const NSString *nsstr)
     // set delegate to receive connection status changes.
     self.sensorConnection.delegate = self;
 
-    //[pool drain];
 
     return true;
 }
@@ -218,6 +213,8 @@ static QString toQString(const NSString *nsstr)
     qtw->hasFirmwareUpdateAvalableForConnection(); //XXX do what?
 }
 
+-(NSAutoreleasePool*) getPool { return [[NSAutoreleasePool alloc] init]; }
+-(void) freePool:(NSAutoreleasePool*)pool { [pool release]; }
 @end
 
 //----------------------------------------------------------------------
@@ -229,10 +226,8 @@ WFApi *_gc_wfapi = NULL;
 // Construct the bridge to the WF API
 WFApi::WFApi()
 {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     wf = [[WFBridge alloc] init];
     wf->qtw = this;
-    [pool drain];
 }
 
 // Destroy the bridge to the WF API
@@ -371,4 +366,16 @@ WFApi::getRealtimeData(RealtimeData *rt)
     rt->setWatts((int)[sd instantPower]);
     rt->setCadence((int)[sd instantCadence]);
     rt->setWheelRpm((int)[sd instantWheelRPM]);
+}
+
+void *
+WFApi::getPool()
+{
+    return (void*)[wf getPool];
+}
+
+void
+WFApi::freePool(void *pool)
+{
+    [wf freePool:(NSAutoreleasePool*)pool];
 }
