@@ -83,7 +83,9 @@ static QString toQString(const NSString *nsstr)
 // By default BTLE is disabled
 -(BOOL)isBTLEEnabled { return [[WFHardwareConnector sharedConnector] isBTLEEnabled]; }
 -(BOOL)enableBTLE:(BOOL)bEnable inBondingMode:(BOOL)bBondingMode {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc]init];
     bool result = [[WFHardwareConnector sharedConnector] enableBTLE:bEnable inBondingMode:bBondingMode];
+    [pool drain];
     return result;
 }
 
