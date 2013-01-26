@@ -57,15 +57,15 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
     revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     revealAnim = new QPropertyAnimation(revealControls, "pos");
-    revealAnim->setDuration(500);
+    revealAnim->setDuration(200);
     revealAnim->setEasingCurve(QEasingCurve(QEasingCurve::InSine));
-    revealAnim->setKeyValueAt(0,QPoint(2,-50));
+    revealAnim->setKeyValueAt(0,QPoint(2,-20));
     revealAnim->setKeyValueAt(0.5,QPoint(2,15));
     revealAnim->setKeyValueAt(1,QPoint(2,20));
 
     revealBgAnim = new QPropertyAnimation(revealBackground, "geometry");
     revealBgAnim->setEasingCurve(QEasingCurve(QEasingCurve::InSine));
-    revealBgAnim->setDuration(500);
+    revealBgAnim->setDuration(200);
 
     groupAnim = new QParallelAnimationGroup();
     groupAnim->addAnimation(revealAnim);
