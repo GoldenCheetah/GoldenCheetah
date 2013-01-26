@@ -25,23 +25,15 @@
 #import <AppKit/NSSegmentedControl.h>
 #import <AppKit/NSBezierPath.h>
 
-/*----------------------------------------------------------------------
- * Utility functions
- *----------------------------------------------------------------------*/
-class CocoaInitializer::Private
-{
-    public:
-};
-
 CocoaInitializer::CocoaInitializer()
 {
-    d = new CocoaInitializer::Private();
+    pool = [[NSAutoreleasePool alloc] init];
     NSApplicationLoad();
 }
 
 CocoaInitializer::~CocoaInitializer()
 {
-    delete d;
+    [pool release];
 }
 
 
@@ -56,7 +48,6 @@ static NSImage *fromQPixmap(const QPixmap &pixmap)
     NSImage *image = [[NSImage alloc] init];
     [image addRepresentation:bitmapRep];
     [image setTemplate:true];
-    [bitmapRep release];
     return image;
 }
 

@@ -79,10 +79,6 @@ SearchWidget::SearchWidget(QtMacSearchBox *parent)
     //QMenu *qtMenu = createMenu(this);
     //NSMenu *nsMenu = qtMenu->macMenu(0);
     //[[search cell] setSearchMenuTemplate:nsMenu];
-
-    // Release our reference, since our super class takes ownership and we
-    // don't need it anymore.
-    [search release];
 }
 
 SearchWidget::~SearchWidget()

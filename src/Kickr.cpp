@@ -223,8 +223,14 @@ Kickr::find()
 int
 Kickr::connectKickr()
 {
+    // get a pool for this thread
+    pool = WFApi::getInstance()->getPool();
+
     // do we even have BTLE hardware?
-    if (WFApi::getInstance()->isBTLEEnabled() == false) return (-1);
+    if (WFApi::getInstance()->isBTLEEnabled() == false) {
+        WFApi::getInstance()->freePool(pool);
+        return (-1);
+    }
 
     // discover first...
     if (scanned == false) find();
@@ -239,7 +245,10 @@ Kickr::connectKickr()
             break;
         }
     }
-    if (found == false) return -1;
+    if (found == false) {
+        WFApi::getInstance()->freePool(pool);
+        return (-1);
+    }
 
     w->connectDevice(i);
     return 0;
@@ -251,6 +260,10 @@ Kickr::disconnectKickr()
     // disconnect
     WFApi::getInstance()->disconnectDevice();
     connected = false;
+
+    // clear that pool now we're done
+    WFApi::getInstance()->freePool(pool);
+
     return 0;
 }
 

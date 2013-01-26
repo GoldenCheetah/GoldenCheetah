@@ -21,26 +21,8 @@
 
 #include <QMacCocoaViewContainer>
 
-//----------------------------------------------------------------------
-// Cocoa / OBJC helpers etc
-//
-// this is a utility -- since this source file
-// is included in C++ and Objective-C code the
-// declaration of native components is referenced
-// directly or just as a void *
-//----------------------------------------------------------------------
-
-class CocoaInitializer
-{
-    public:
-        CocoaInitializer();
-        ~CocoaInitializer();
-
-    private:
-        class Private;
-        Private* d;
-};
-
+// macros for compile time, depending if included in an obj-c
+// or a c++ source file. Changes declaration of class types.
 #ifdef __OBJC__
 # define ADD_COCOA_NATIVE_REF(CocoaClass) \
     @class CocoaClass; \
@@ -49,12 +31,18 @@ class CocoaInitializer
 # define ADD_COCOA_NATIVE_REF(CocoaClass) typedef void *Native##CocoaClass##Ref
 #endif /* __OBJC__ */
 
-// The above is merely to do the following, but
-// we may add more native widgets in the future
-ADD_COCOA_NATIVE_REF (NSSegmentedControl);
+ADD_COCOA_NATIVE_REF (NSAutoreleasePool);
+class CocoaInitializer
+{
+    public:
+        CocoaInitializer();
+        ~CocoaInitializer();
 
-// The native Cocoa segmented button is held within
-// a QMacCocoaView container.
+    private:
+    NativeNSAutoreleasePoolRef pool;
+};
+
+ADD_COCOA_NATIVE_REF (NSSegmentedControl);
 class QtMacSegmentedButton : public QMacCocoaViewContainer
 {
     Q_OBJECT;

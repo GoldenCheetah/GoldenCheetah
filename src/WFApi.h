@@ -85,6 +85,15 @@ public:
     void setSlope(double slope);
     void setLoad(int watts);
 
+    // NOTE: There is an application wide NSAutoreleasePool maintained
+    //       in cocoa initialiser, but it is only to support activity on
+    //       the main thread.
+    //       The application code (e.g. Kickr.cpp) needs to get and free a
+    //       pool for each thread, this is why we have a getPool/freePool
+    //       method in WFApi, but never allocate a pool ourselves.
+    void *getPool();
+    void freePool(void*);
+
 signals:
     void currentStateChanged(int); // hardware conncector state changed
     int discoveredDevices(int,bool);

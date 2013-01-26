@@ -27,7 +27,6 @@ static NSImage *fromQPixmap(const QPixmap &pixmap)
     NSImage *image = [[NSImage alloc] init];
     [image addRepresentation:bitmapRep];
     [image setTemplate:true];
-    [bitmapRep release];
     return image;
 }
 
@@ -191,8 +190,6 @@ QtMacPopUpButton::QtMacPopUpButton(QWidget *parent, BezelStyle bezelStyle) : QWi
     [button setAction:@selector(clicked)];
 
     setupLayout(button, this);
-
-    [button release];
 }
 
 void QtMacPopUpButton::setToolTip(const QString &text)

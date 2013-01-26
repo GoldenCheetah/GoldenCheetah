@@ -85,6 +85,8 @@ private:
 
     QString deviceUUID;
     RealtimeData rt;
+
+    void *pool;
 };
 
 #endif // _GC_Kickr_h
