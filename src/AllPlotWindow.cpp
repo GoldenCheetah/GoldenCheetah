@@ -48,7 +48,7 @@
 #include "LTMWindow.h"
 
 AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
-    GcWindow(mainWindow), current(NULL), mainWindow(mainWindow), active(false), stale(true)
+    GcChartWindow(mainWindow), current(NULL), mainWindow(mainWindow), active(false), stale(true)
 {
     setInstanceName("Ride Plot Window");
 
@@ -69,42 +69,24 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     setContentsMargins(0,0,0,0);
 
     // Main layout
-    QGridLayout *mainLayout = new QGridLayout(this);
-    mainLayout->setContentsMargins(2,2,2,2);
+    //QGridLayout *mainLayout = new QGridLayout();
+    //mainLayout->setContentsMargins(2,2,2,2);
 
     //
     // reveal controls widget
     //
 
-    // reveal widget
-    revealBackground = new QWidget(this);
-    revealControls = new QWidget(this);
-    revealControls->setFixedHeight(50);
-    revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 100%)");
-    revealBackground->setStyleSheet("background-color: rgba(100%, 100%, 100%, 100%)");
-    revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-    revealAnim = new QPropertyAnimation(revealBackground, "geometry");
-    revealAnim->setDuration(500);
-    revealAnim->setEasingCurve(QEasingCurve(QEasingCurve::InSine));
-
-    unrevealAnim = new QPropertyAnimation(revealBackground, "geometry");
-    unrevealAnim->setDuration(250);
-
-    showTimer = new QTimer();
-    connect(showTimer, SIGNAL(timeout()), this, SLOT(showRevealControls()));
-
     // reveal controls
-    rSmooth = new QLabel(tr("Smooth"), revealControls);
-    rSmoothEdit = new QLineEdit(revealControls);
+    rSmooth = new QLabel(tr("Smooth"));
+    rSmoothEdit = new QLineEdit();
     rSmoothEdit->setFixedWidth(30);
-    rSmoothSlider = new QSlider(Qt::Horizontal, revealControls);
+    rSmoothSlider = new QSlider(Qt::Horizontal);
     rSmoothSlider->setTickPosition(QSlider::TicksBelow);
     rSmoothSlider->setTickInterval(10);
     rSmoothSlider->setMinimum(1);
     rSmoothSlider->setMaximum(100);
-    rStack = new QCheckBox(tr("Stacked"), revealControls);
-    rFull = new QCheckBox(tr("Fullplot"), revealControls);
+    rStack = new QCheckBox(tr("Stacked"));
+    rFull = new QCheckBox(tr("Fullplot"));
 
     // layout reveal controls
     QHBoxLayout *r = new QHBoxLayout;
@@ -119,10 +101,11 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     r->addSpacing(20);
     r->addLayout(v);
     r->addStretch();
-    revealControls->setLayout(r);
+    setRevealLayout(r);
+    //revealControls->setLayout(r);
     
     // hide them initially
-    revealControls->hide();
+    //revealControls->hide();
 
     // setup the controls
     QLabel *showLabel = new QLabel(tr("Show"), c);
@@ -404,12 +387,12 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
     vlayout->addWidget(stackFrame);
     vlayout->setSpacing(1);
 
-    mainLayout->addLayout(vlayout,0,0);
-    mainLayout->addWidget(revealBackground,0,0, Qt::AlignTop);
-    mainLayout->addWidget(revealControls,0,0, Qt::AlignTop);
-    revealBackground->raise();
-    revealControls->raise();
-    setLayout(mainLayout);
+    //mainLayout->addLayout(vlayout,0,0);
+    //mainLayout->addWidget(revealBackground,0,0, Qt::AlignTop);
+    //mainLayout->addWidget(revealControls,0,0, Qt::AlignTop);
+    //revealBackground->raise();
+    //revealControls->raise();
+    setChartLayout(vlayout);
 
     // common controls
     connect(showPower, SIGNAL(currentIndexChanged(int)), this, SLOT(setShowPower(int)));
@@ -1681,22 +1664,4 @@ AllPlotWindow::addPickers(AllPlot *_allPlot)
     connect(_allPlot->_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), _allPlot, SLOT(pointHover(QwtPlotCurve*, int)));
     connect(_allPlot->tooltip, SIGNAL(moved(const QPoint &)), this, SLOT(plotPickerMoved(const QPoint &)));
     connect(_allPlot->tooltip, SIGNAL(appended(const QPoint &)), this, SLOT(plotPickerSelected(const QPoint &)));
-}
-
-void
-AllPlotWindow:: resizeEvent(QResizeEvent *)
-{
-    revealAnim->setKeyValueAt(0, QRect(2, contentsMargins().top(), width()-4, 0));
-    revealAnim->setKeyValueAt(0.5, QRect(2, contentsMargins().top(), width()-4, 45));
-    revealAnim->setKeyValueAt(1, QRect(2, contentsMargins().top(), width()-4, 50));
-
-    unrevealAnim->setKeyValueAt(0, QRect(2, contentsMargins().top(), width()-4, 50));
-    unrevealAnim->setKeyValueAt(0.5, QRect(2, contentsMargins().top(), width()-4, 45));
-    unrevealAnim->setKeyValueAt(1, QRect(2, contentsMargins().top(), width()-4, 0));
-}
-
-void
-AllPlotWindow:: showRevealControls()
-{
-    revealControls->show();
 }
