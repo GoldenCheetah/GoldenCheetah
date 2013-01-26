@@ -210,6 +210,12 @@ Once this is done you can kick off the build:
 $ qmake
 $ make
 
+If make fails to find a Makefile then qmake is configured, by default, to create
+an xcode project file. You will need to change the qmake command above to tell it
+to create a makefile with the following:
+$ qmake -spec macx-g++
+$ make
+
 Once this completes you will have a GoldenCheetah.app in the src directory which
 can be launched:
 
