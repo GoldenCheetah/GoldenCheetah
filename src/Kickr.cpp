@@ -140,41 +140,35 @@ void Kickr::run()
     running = true;
     while(running) {
 
-        // make sure we are the right mode
-        if (currentmode != mode) {
+        // only get busy if we're actually connected
+        if (WFApi::getInstance()->isConnected()) {
 
-            switch (mode) {
+            // We ALWAYS set load for each loop. This is because
+            // even though the device reports as connected we need
+            // to wait before it really is. So we just keep on
+            // sending the current mode/load. It doesn't cost us
+            // anything since all devices are powered.
 
-            default:
-            case RT_MODE_ERGO :
-                currentmode = RT_MODE_ERGO;
+            // it does generate a few error messages though..
+            // and the connection takes about 25 secs to get
+            // up to speed.
+
+            // set load - reset it if generated watts don't match .. 
+            if (mode == RT_MODE_ERGO) {
                 WFApi::getInstance()->setErgoMode();
-                break;
+                WFApi::getInstance()->setLoad(load);
+                currentload = load;
+                currentmode = mode;
+            }
 
-            case RT_MODE_SLOPE :
-                currentmode = RT_MODE_SLOPE;
+            // set slope
+            if (mode == RT_MODE_SLOPE && currentslope) {
                 WFApi::getInstance()->setSlopeMode();
-                break;
-
+                WFApi::getInstance()->setSlope(slope);
+                currentslope = slope;
+                currentmode = mode;
             }
         }
-
-        // set load - reset it if generated watts don't match .. 
-        if (mode == RT_MODE_ERGO && 
-           ((rt.getWatts() > load*1.5) || (rt.getWatts() < load/2)
-           || currentload != load)) {
-
-            WFApi::getInstance()->setLoad(load);
-            currentload = load;
-        }
-
-        // set slope
-        if (mode == RT_MODE_SLOPE && currentslope != slope) {
-            WFApi::getInstance()->setSlope(slope);
-            currentslope = slope;
-        }
-
-        msleep(100);
 
         if (WFApi::getInstance()->hasData()) {
             pvars.lock();
@@ -186,6 +180,9 @@ void Kickr::run()
             else rt.setSpeed(x * 2.10 * 60 / 1000);
             pvars.unlock();
         }
+
+        // lets not hog cpu
+        msleep(100);
     }
 
     disconnectKickr();
