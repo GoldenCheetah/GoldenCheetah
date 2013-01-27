@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2009 Mark Rages
- * Copyright (c) 2009 Mark Liversedge (liversedge@gmail.com)
+ * Copyright (c) 2013 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -19,8 +18,6 @@
 
 #include <QProgressDialog>
 #include "KickrController.h"
-#include "ANT.h"
-#include "ANTLogger.h"
 #include "RealtimeData.h"
 
 KickrController::KickrController(TrainTool *parent, DeviceConfiguration *dc) : RealtimeController(parent, dc)

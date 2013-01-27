@@ -18,9 +18,6 @@
 
 #include "Kickr.h"
 
-/* ----------------------------------------------------------------------
- * CONSTRUCTOR/DESRTUCTOR
- * ---------------------------------------------------------------------- */
 Kickr::Kickr(QObject *parent,  DeviceConfiguration *devConf) : QThread(parent)
 {
     this->parent = parent;
@@ -35,13 +32,8 @@ Kickr::~Kickr()
 {
 }
 
-/* ----------------------------------------------------------------------
- * SET
- * ---------------------------------------------------------------------- */
-void Kickr::setDevice(QString)
-{
-    // not required
-}
+// not required
+void Kickr::setDevice(QString) { }
 
 void Kickr::setMode(int mode, double load, double gradient)
 {
@@ -68,10 +60,6 @@ void Kickr::setGradient(double gradient)
     pvars.unlock();
 }
 
-
-/* ----------------------------------------------------------------------
- * GET
- * ---------------------------------------------------------------------- */
 
 int Kickr::getMode()
 {
@@ -135,7 +123,7 @@ int Kickr::quit(int code)
 }
 
 /*----------------------------------------------------------------------
- * THREADED CODE - READS TELEMETRY AND SENDS COMMANDS TO KEEP CT ALIVE
+ * MAIN THREAD - READS TELEMETRY AND UPDATES LOAD/GRADIENT ON KICKR
  *----------------------------------------------------------------------*/
 void Kickr::run()
 {
@@ -171,8 +159,11 @@ void Kickr::run()
             }
         }
 
-        // set load
-        if (mode == RT_MODE_ERGO && currentload != load) {
+        // set load - reset it if generated watts don't match .. 
+        if (mode == RT_MODE_ERGO && 
+           ((rt.getWatts() > load*1.5) || (rt.getWatts() < load/2)
+           || currentload != load)) {
+
             WFApi::getInstance()->setLoad(load);
             currentload = load;
         }
