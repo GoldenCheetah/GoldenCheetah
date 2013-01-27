@@ -187,16 +187,15 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 // mmm... didn't get much data
                 if (values.count() < 2) continue;
 
-                // extract out each value
-                double secs = timeIndex > -1 ? values[timeIndex].toDouble() / (double) 1000 : 0.0;
-                double watts = wattsIndex > -1 ? values[wattsIndex].toDouble() : 0.0;
-                double cad = cadIndex > -1 ? values[cadIndex].toDouble() : 0.0;
-                double hr = hrIndex > -1 ? values[hrIndex].toDouble() : 0.0;
-                double km = kmIndex > -1 ? values[kmIndex].toDouble() : 0.0;
-                double kph = kphIndex > -1 ? values[kphIndex].toDouble() : 0.0;
-                double miles = milesIndex > -1 ? values[milesIndex].toDouble() : 0.0;
-                double headwind = headwindIndex > -1 ? values[headwindIndex].toDouble() : 0.0;
-
+                // extract out each value.  Remove double quotes if they are there (Newer Racermate TXT files)
+                double secs = timeIndex > -1 ? values[timeIndex].remove("\"").toDouble() / (double) 1000 : 0.0;
+                double watts = wattsIndex > -1 ? values[wattsIndex].remove("\"").toDouble() : 0.0;
+                double cad = cadIndex > -1 ? values[cadIndex].remove("\"").toDouble() : 0.0;
+                double hr = hrIndex > -1 ? values[hrIndex].remove("\"").toDouble() : 0.0;
+                double km = kmIndex > -1 ? values[kmIndex].remove("\"").toDouble() : 0.0;
+                double kph = kphIndex > -1 ? values[kphIndex].remove("\"").toDouble() : 0.0;
+                double miles = milesIndex > -1 ? values[milesIndex].remove("\"").toDouble() : 0.0;
+                double headwind = headwindIndex > -1 ? values[headwindIndex].remove("\"").toDouble() : 0.0;
                 if (miles != 0) {
                     // imperial!
                     kph *= KM_PER_MILE;
