@@ -141,7 +141,7 @@ void Kickr::run()
     while(running) {
 
         // only get busy if we're actually connected
-        if (WFApi::getInstance()->isConnected()) {
+        if (WFApi::getInstance()->isConnected(sd)) {
 
             // We ALWAYS set load for each loop. This is because
             // even though the device reports as connected we need
@@ -155,24 +155,24 @@ void Kickr::run()
 
             // set load - reset it if generated watts don't match .. 
             if (mode == RT_MODE_ERGO) {
-                WFApi::getInstance()->setErgoMode();
-                WFApi::getInstance()->setLoad(load);
+                WFApi::getInstance()->setErgoMode(sd);
+                WFApi::getInstance()->setLoad(sd, load);
                 currentload = load;
                 currentmode = mode;
             }
 
             // set slope
             if (mode == RT_MODE_SLOPE && currentslope) {
-                WFApi::getInstance()->setSlopeMode();
-                WFApi::getInstance()->setSlope(slope);
+                WFApi::getInstance()->setSlopeMode(sd);
+                WFApi::getInstance()->setSlope(sd, slope);
                 currentslope = slope;
                 currentmode = mode;
             }
         }
 
-        if (WFApi::getInstance()->hasData()) {
+        if (WFApi::getInstance()->hasData(sd)) {
             pvars.lock();
-            WFApi::getInstance()->getRealtimeData(&rt);
+            WFApi::getInstance()->getRealtimeData(sd, &rt);
 
             // set speed from wheelRpm and configured wheelsize
             double x = rt.getWheelRpm();
@@ -213,7 +213,7 @@ Kickr::connectKickr()
 {
     // get a pool for this thread
     pool = WFApi::getInstance()->getPool();
-    WFApi::getInstance()->connectDevice(devConf->portSpec);
+    sd = WFApi::getInstance()->connectDevice(devConf->portSpec);
     return 0;
 }
 
@@ -221,7 +221,7 @@ int
 Kickr::disconnectKickr()
 {
     // disconnect
-    WFApi::getInstance()->disconnectDevice();
+    WFApi::getInstance()->disconnectDevice(sd);
     connected = false;
 
     // clear that pool now we're done
