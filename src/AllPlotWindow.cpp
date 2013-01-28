@@ -90,7 +90,7 @@ AllPlotWindow::AllPlotWindow(MainWindow *mainWindow) :
 
     // layout reveal controls
     QHBoxLayout *r = new QHBoxLayout;
-    r->setContentsMargins(0,15,0,0);
+    r->setContentsMargins(0,0,0,0);
     r->addStretch();
     r->addWidget(rSmooth);
     r->addWidget(rSmoothEdit);
