@@ -148,6 +148,13 @@ DeviceScanner::run()
 {
     active = true;
     bool result = false;
+
+#ifdef GC_HAVE_WFAPI
+    void *pool;
+    // get an autorelease pool for this thread!
+    if (wizard->deviceTypes.Supported[wizard->current].type == DEV_KICKR) pool = WFApi::getInstance()->getPool();
+#endif
+
     for (int i=0; active && !result && i<50; i++) { // search for longer
 
         // better to wait a while, esp. if its just a USB device
@@ -159,6 +166,10 @@ DeviceScanner::run()
         result = quickScan(false);
     }
     if (active) emit finished(result); // only signal if we weren't aborted!
+
+#ifdef GC_HAVE_WFAPI
+    WFApi::getInstance()->freePool(pool);
+#endif
 }
 
 void
