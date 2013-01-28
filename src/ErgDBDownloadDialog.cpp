@@ -179,8 +179,13 @@ ErgDBDownloadDialog::downloadFiles()
 
             // get the id
             int id = current->text(6).toInt();
-            QString content = ergdb.getFile(id, 300);
-
+            int ftp = 300;
+            int range = main->zones()->whichRange(QDate::currentDate());
+            if (range != -1)
+            {
+                ftp = main->zones()->getCP(range);
+            }
+            QString content = ergdb.getFile(id, ftp);
             QString filename = workoutDir + "/" + current->text(1) + ".erg";
             ErgFile *p = ErgFile::fromContent(content, main);
 
