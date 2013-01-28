@@ -34,7 +34,7 @@ class QSlider;
 #include "LTMWindow.h" // for tooltip/canvaspicker
 
 
-class HrPwWindow : public GcWindow
+class HrPwWindow : public GcChartWindow
 {
     Q_OBJECT
     G_OBJECT
@@ -61,8 +61,6 @@ class HrPwWindow : public GcWindow
 
         // reveal
         bool hasReveal() { return true; }
-        void reveal() { revealControls->show(); revealAnim->start(); }
-        void unreveal() { unrevealAnim->start(); revealControls->hide(); }
 
         int smooth;
 
@@ -101,8 +99,6 @@ class HrPwWindow : public GcWindow
 
     private:
         // reveal controls
-        QWidget *revealControls;
-        QPropertyAnimation *revealAnim, *unrevealAnim;
         QLabel *rSmooth;
         QSlider *rSmoothSlider;
         QLineEdit *rSmoothEdit;
