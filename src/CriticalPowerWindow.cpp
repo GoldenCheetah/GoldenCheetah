@@ -170,7 +170,10 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     picker->setStateMachine(new QwtPickerDragPointMachine);
     picker->setRubberBandPen(GColor(CPLOTTRACKER));
 
-    setChartLayout(vlayout);
+    QGridLayout *mainLayout = new QGridLayout();
+    mainLayout->addLayout(vlayout, 0, 0);
+    mainLayout->addWidget(pickerControls, 0, 0, Qt::AlignTop | Qt::AlignRight);
+    setChartLayout(mainLayout);
 
     connect(picker, SIGNAL(moved(const QPoint &)), SLOT(pickerMoved(const QPoint &)));
     //connect(cpintTimeValue, SIGNAL(editingFinished()), this, SLOT(cpintTimeValueEntered()));
