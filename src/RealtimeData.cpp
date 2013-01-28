@@ -24,8 +24,9 @@
 RealtimeData::RealtimeData()
 {
     name[0] = '\0';
-    lap = altWatts = watts = hr = speed = wheelRpm = cadence  = load = 0;
-    msecs = lapMsecs = /* bikeScore = joules =*/ lapMsecsRemaining = 0;
+	hr, watts, altWatts, speed, wheelRpm, load, slope = 0.0;
+	cadence = distance = virtualSpeed = 0.0;
+	lap = msecs = lapMsecs = lapMsecsRemaining = 0;
 
     memset(spinScan, 0, 24);
 }
