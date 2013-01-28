@@ -25,7 +25,7 @@
 #include <QtGui>
 
 PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
-    GcWindow(mainWindow), mainWindow(mainWindow), current(NULL)
+    GcChartWindow(mainWindow), mainWindow(mainWindow), current(NULL)
 {
     setInstanceName("Pf/Pv Window");
 
@@ -33,38 +33,15 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
     QVBoxLayout *cl = new QVBoxLayout(c);
     setControls(c);
 
-    // Main layout
-    QGridLayout *mainLayout = new QGridLayout(this);
-    mainLayout->setContentsMargins(2,2,2,2);
-
     //
     // reveal controls widget
     //
-
-    // reveal widget
-    revealControls = new QWidget(this);
-    revealControls->setFixedHeight(50);
-    revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 100%)");
-    revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-    revealAnim = new QPropertyAnimation(revealControls, "pos");
-    revealAnim->setDuration(500);
-    revealAnim->setEasingCurve(QEasingCurve(QEasingCurve::InSine));
-    revealAnim->setKeyValueAt(0,QPoint(2,-50));
-    revealAnim->setKeyValueAt(0.5,QPoint(2,15));
-    revealAnim->setKeyValueAt(1,QPoint(2,20));
-
-    unrevealAnim = new QPropertyAnimation(revealControls, "pos");
-    unrevealAnim->setDuration(500);
-    unrevealAnim->setKeyValueAt(0,QPoint(2,20));
-    unrevealAnim->setKeyValueAt(0.5,QPoint(2,15));
-    unrevealAnim->setKeyValueAt(1,QPoint(2,-50));
 
     // layout reveal controls
     QHBoxLayout *revealLayout = new QHBoxLayout;
     revealLayout->setContentsMargins(0,0,0,0);
 
-    rShade = new QCheckBox(tr("Shade zones"), revealControls);
+    rShade = new QCheckBox(tr("Shade zones"));
     if (appsettings->value(this, GC_SHADEZONES, true).toBool() == true)
         rShade->setCheckState(Qt::Checked);
     else
@@ -88,20 +65,14 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
     revealLayout->addLayout(checks);
     revealLayout->addStretch();
 
-    revealControls->setLayout(revealLayout);
-
-    // hide them initially
-    revealControls->hide();
+    setRevealLayout(revealLayout);
 
     // the plot
     QVBoxLayout *vlayout = new QVBoxLayout;
     pfPvPlot = new PfPvPlot(mainWindow);
     vlayout->addWidget(pfPvPlot);
 
-    mainLayout->addLayout(vlayout,0,0);
-    mainLayout->addWidget(revealControls,0,0, Qt::AlignTop);
-    revealControls->raise();
-    setLayout(mainLayout);
+    setChartLayout(vlayout);
 
     // allow zooming
     pfpvZoomer = new QwtPlotZoomer(pfPvPlot->canvas());

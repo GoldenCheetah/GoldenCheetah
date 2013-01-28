@@ -31,43 +31,20 @@
 // tooltip
 
 HrPwWindow::HrPwWindow(MainWindow *mainWindow) :
-     GcWindow(mainWindow), mainWindow(mainWindow), current(NULL)
+     GcChartWindow(mainWindow), mainWindow(mainWindow), current(NULL)
 {
     setControls(NULL);
     setInstanceName("HrPw");
-
-    // Main layout
-    QGridLayout *mainLayout = new QGridLayout(this);
-    mainLayout->setContentsMargins(2,2,2,2);
 
     //
     // reveal controls widget
     //
 
-    // reveal widget
-    revealControls = new QWidget(this);
-    revealControls->setFixedHeight(50);
-    revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 100%)");
-    revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-    revealAnim = new QPropertyAnimation(revealControls, "pos");
-    revealAnim->setDuration(500);
-    revealAnim->setEasingCurve(QEasingCurve(QEasingCurve::InSine));
-    revealAnim->setKeyValueAt(0,QPoint(2,-50));
-    revealAnim->setKeyValueAt(0.5,QPoint(2,15));
-    revealAnim->setKeyValueAt(1,QPoint(2,20));
-
-    unrevealAnim = new QPropertyAnimation(revealControls, "pos");
-    unrevealAnim->setDuration(500);
-    unrevealAnim->setKeyValueAt(0,QPoint(2,20));
-    unrevealAnim->setKeyValueAt(0.5,QPoint(2,15));
-    unrevealAnim->setKeyValueAt(1,QPoint(2,-50));
-
     // reveal controls
-    rDelay = new QLabel(tr("HR Delay"), revealControls);
-    rDelayEdit = new QLineEdit(revealControls);
+    rDelay = new QLabel(tr("HR Delay"));
+    rDelayEdit = new QLineEdit();
     rDelayEdit->setFixedWidth(30);
-    rDelaySlider = new QSlider(Qt::Horizontal, revealControls);
+    rDelaySlider = new QSlider(Qt::Horizontal);
     rDelaySlider->setTickPosition(QSlider::TicksBelow);
     rDelaySlider->setTickInterval(10);
     rDelaySlider->setMinimum(1);
@@ -75,10 +52,10 @@ HrPwWindow::HrPwWindow(MainWindow *mainWindow) :
     rDelayEdit->setValidator(new QIntValidator(rDelaySlider->minimum(),
                                                  rDelaySlider->maximum(),
                                                  rDelayEdit));
-    rSmooth = new QLabel(tr("Smooth"), revealControls);
-    rSmoothEdit = new QLineEdit(revealControls);
+    rSmooth = new QLabel(tr("Smooth"));
+    rSmoothEdit = new QLineEdit();
     rSmoothEdit->setFixedWidth(30);
-    rSmoothSlider = new QSlider(Qt::Horizontal, revealControls);
+    rSmoothSlider = new QSlider(Qt::Horizontal);
     rSmoothSlider->setTickPosition(QSlider::TicksBelow);
     rSmoothSlider->setTickInterval(50);
     rSmoothSlider->setMinimum(1);
@@ -100,10 +77,7 @@ HrPwWindow::HrPwWindow(MainWindow *mainWindow) :
     r->addWidget(rSmoothEdit);
     r->addWidget(rSmoothSlider);
     r->addStretch();
-    revealControls->setLayout(r);
-
-    // hide them initially
-    revealControls->hide();
+    setRevealLayout(r);
 
     //
     // Chart layout
@@ -143,10 +117,7 @@ HrPwWindow::HrPwWindow(MainWindow *mainWindow) :
     vlayout->addWidget(smallPlot);
     vlayout->setStretch(1, 20);
 
-    mainLayout->addLayout(vlayout,0,0);
-    mainLayout->addWidget(revealControls,0,0, Qt::AlignTop);
-    revealControls->raise();
-    setLayout(mainLayout);
+    setChartLayout(vlayout);
 
     //
     // the controls
