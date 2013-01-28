@@ -73,13 +73,13 @@ public:
 
     // connection state
     typedef enum {
-    WF_SENSOR_CONNECTION_STATUS_IDLE = 0,
-    WF_SENSOR_CONNECTION_STATUS_CONNECTING = 1,
-    WF_SENSOR_CONNECTION_STATUS_CONNECTED = 2,
-    WF_SENSOR_CONNECTION_STATUS_INTERRUPTED = 3,
-    WF_SENSOR_CONNECTION_STATUS_DISCONNECTING = 4 };
-    int connectionStatus();
-    bool isConnected();
+        WF_SENSOR_CONNECTION_STATUS_IDLE = 0,
+        WF_SENSOR_CONNECTION_STATUS_CONNECTING = 1,
+        WF_SENSOR_CONNECTION_STATUS_CONNECTED = 2,
+        WF_SENSOR_CONNECTION_STATUS_INTERRUPTED = 3,
+        WF_SENSOR_CONNECTION_STATUS_DISCONNECTING = 4 };
+    int connectionStatus(int sd);
+    bool isConnected(int sd);
 
     // scan
     bool discoverDevicesOfType(int eSensorType, int eNetworkType, int timeout);
@@ -87,20 +87,20 @@ public:
     QString deviceUUID(int); // return the UUID for device n
 
     // connect and disconnect
-    bool connectDevice(QString uuid); // connect the device n
-    bool disconnectDevice();   // disconnect
+    int connectDevice(QString uuid); // connect the device n
+    bool disconnectDevice(int sd);   // disconnect
 
     // has data?
-    bool hasData();
-    void getRealtimeData(RealtimeData *p);
+    bool hasData(int sd);
+    void getRealtimeData(int sd, RealtimeData *p);
 
     // set slope or ergo mode
-    void setSlopeMode();
-    void setErgoMode();
+    void setSlopeMode(int sd);
+    void setErgoMode(int sd);
 
     // set resistance slope or load
-    void setSlope(double slope);
-    void setLoad(int watts);
+    void setSlope(int sd, double slope);
+    void setLoad(int sd, int watts);
 
     // NOTE: There is an application wide NSAutoreleasePool maintained
     //       in cocoa initialiser, but it is only to support activity on
@@ -144,12 +144,6 @@ public:
 #else /* __OBJC__ */
     void *wf;       // when included in C++ sources
 #endif /* __OBJC__ */
+    QVector <void *> connections;
 };
-
-//
-// We need to define the constants from the WF API headers because they
-// assume you are building with OBJ C. And fail to compile with gcc/g++
-//
-
-
 #endif

@@ -84,6 +84,8 @@ private:
     volatile double slope;
 
     QString deviceUUID;
+    int sd; // sensor descriptor aka an index into the connections array
+            // mimics the fd index used by open/close syscalls.
     RealtimeData rt;
 
     void *pool;
