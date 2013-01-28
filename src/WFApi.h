@@ -87,7 +87,7 @@ public:
     QString deviceUUID(int); // return the UUID for device n
 
     // connect and disconnect
-    bool connectDevice(int n); // connect the device n
+    bool connectDevice(QString uuid); // connect the device n
     bool disconnectDevice();   // disconnect
 
     // has data?

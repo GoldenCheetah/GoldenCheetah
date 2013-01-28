@@ -213,32 +213,7 @@ Kickr::connectKickr()
 {
     // get a pool for this thread
     pool = WFApi::getInstance()->getPool();
-
-    // do we even have BTLE hardware?
-    if (WFApi::getInstance()->isBTLEEnabled() == false) {
-        WFApi::getInstance()->freePool(pool);
-        return (-1);
-    }
-
-    // discover first...
-    if (scanned == false) find();
-
-    // connect
-    bool found = false;
-    WFApi *w = WFApi::getInstance();
-    int i;
-    for (i=0; i<w->deviceCount(); i++) {
-        if (w->deviceUUID(i) == devConf->portSpec) {
-            found = true;
-            break;
-        }
-    }
-    if (found == false) {
-        WFApi::getInstance()->freePool(pool);
-        return (-1);
-    }
-
-    w->connectDevice(i);
+    WFApi::getInstance()->connectDevice(devConf->portSpec);
     return 0;
 }
 
