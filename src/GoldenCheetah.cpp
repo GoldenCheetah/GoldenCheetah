@@ -721,6 +721,9 @@ GcChartWindow::GcChartWindow(QWidget *parent) : GcWindow(parent) {
     _unrevealAnim->setKeyValueAt(0.5,QPoint(2,-5));
     _unrevealAnim->setKeyValueAt(1,QPoint(2,-50));
 
+    _unrevealTimer = new QTimer();
+    connect(_unrevealTimer, SIGNAL(timeout()), this, SLOT(hideRevealControls()));
+
     _mainLayout->addWidget(_revealControls,0,0, Qt::AlignTop);
     _mainWidget->setLayout(_mainLayout);
 }
@@ -739,6 +742,7 @@ void GcChartWindow:: setRevealLayout(QLayout *layout)
 
 void GcChartWindow:: reveal()
 {
+    _unrevealTimer->stop();
     _revealControls->raise();
     _revealControls->show();
     _revealAnim->start();
@@ -747,5 +751,11 @@ void GcChartWindow:: reveal()
 void GcChartWindow:: unreveal()
 {
     _unrevealAnim->start();
+    _unrevealTimer->start(150);
     //_revealControls->hide();
+}
+
+void GcChartWindow:: hideRevealControls()
+{
+    _revealControls->hide();
 }

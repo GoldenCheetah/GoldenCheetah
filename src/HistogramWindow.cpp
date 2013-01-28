@@ -30,7 +30,7 @@
 #include "Zones.h"
 #include "HrZones.h"
 
-HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWindow(mainWindow), mainWindow(mainWindow), stale(true), source(NULL), rangemode(rangemode), useCustom(false), useToToday(false)
+HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcChartWindow(mainWindow), mainWindow(mainWindow), stale(true), source(NULL), rangemode(rangemode), useCustom(false), useToToday(false)
 {
     setInstanceName("Histogram Window");
 
@@ -39,49 +39,21 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
     cl->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     setControls(c);
 
-
-    // Main layout
-    QGridLayout *mainLayout = new QGridLayout(this);
-    mainLayout->setContentsMargins(2,2,2,2);
-
     //
     // reveal controls widget
     //
 
-    // reveal widget
-    revealBackground = new QWidget(this);
-    revealBackground->setStyleSheet("background-color: rgba(100%, 100%, 100%, 100%)");
-    revealControls = new QWidget(this);
-    revealControls->setFixedHeight(50);
-    revealControls->setStyleSheet("background-color: rgba(100%, 100%, 100%, 0%)");
-    revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-    revealAnim = new QPropertyAnimation(revealControls, "pos");
-    revealAnim->setDuration(200);
-    revealAnim->setEasingCurve(QEasingCurve(QEasingCurve::InSine));
-    revealAnim->setKeyValueAt(0,QPoint(2,-20));
-    revealAnim->setKeyValueAt(0.5,QPoint(2,15));
-    revealAnim->setKeyValueAt(1,QPoint(2,20));
-
-    revealBgAnim = new QPropertyAnimation(revealBackground, "geometry");
-    revealBgAnim->setEasingCurve(QEasingCurve(QEasingCurve::InSine));
-    revealBgAnim->setDuration(200);
-
-    groupAnim = new QParallelAnimationGroup();
-    groupAnim->addAnimation(revealAnim);
-    groupAnim->addAnimation(revealBgAnim);
-
     // reveal controls
-    rWidth = new QLabel(tr("Bin Width"), revealControls);
-    rBinEdit = new QLineEdit(revealControls);
+    rWidth = new QLabel(tr("Bin Width"));
+    rBinEdit = new QLineEdit();
     rBinEdit->setFixedWidth(30);
-    rBinSlider = new QSlider(Qt::Horizontal, revealControls);
+    rBinSlider = new QSlider(Qt::Horizontal);
     rBinSlider->setTickPosition(QSlider::TicksBelow);
     rBinSlider->setTickInterval(10);
     rBinSlider->setMinimum(1);
     rBinSlider->setMaximum(100);
-    rShade = new QCheckBox(tr("Shade zones"), revealControls);
-    rZones = new QCheckBox(tr("Show in zones"), revealControls);
+    rShade = new QCheckBox(tr("Shade zones"));
+    rZones = new QCheckBox(tr("Show in zones"));
 
     // layout reveal controls
     QHBoxLayout *r = new QHBoxLayout;
@@ -96,10 +68,7 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
     r->addSpacing(20);
     r->addLayout(v);
     r->addStretch();
-    revealControls->setLayout(r);
-
-    // hide them initially
-    revealControls->hide();
+    setRevealLayout(r);
 
     // plot
     QVBoxLayout *vlayout = new QVBoxLayout;
@@ -107,12 +76,7 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcWin
     powerHist = new PowerHist(mainWindow);
     vlayout->addWidget(powerHist);
 
-    mainLayout->addLayout(vlayout,0,0);
-    mainLayout->addWidget(revealBackground,0,0, Qt::AlignTop);
-    mainLayout->addWidget(revealControls,0,0, Qt::AlignTop);
-    revealBackground->raise();
-    revealControls->raise();
-    setLayout(mainLayout);
+    setChartLayout(vlayout);
 
 #ifdef GC_HAVE_LUCENE
     // search filter box
@@ -417,14 +381,6 @@ HistogramWindow::setShade(int x)
 {
     rShade->setCheckState((Qt::CheckState)x);
     shadeZones->setCheckState((Qt::CheckState)x);
-}
-
-void
-HistogramWindow::resizeEvent(QResizeEvent *)
-{
-    revealBgAnim->setKeyValueAt(0, QRect(2, contentsMargins().top(), width()-4, 0));
-    revealBgAnim->setKeyValueAt(0.5, QRect(2, contentsMargins().top(), width()-4, 45));
-    revealBgAnim->setKeyValueAt(1, QRect(2, contentsMargins().top(), width()-4, 50));
 }
 
 void

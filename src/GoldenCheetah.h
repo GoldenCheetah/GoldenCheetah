@@ -211,7 +211,7 @@ private:
     QWidget *_revealControls;
     QPropertyAnimation *_revealAnim,
                        *_unrevealAnim;
-    QTimer *_showTimer;
+    QTimer *_unrevealTimer;
 
     // reveal
     bool virtual hasReveal() { return false; }
@@ -226,6 +226,8 @@ public:
     void setChartLayout(QLayout *layout);
     void setRevealLayout(QLayout *layout);
 
+public slots:
+    void hideRevealControls();
 };
 
 
