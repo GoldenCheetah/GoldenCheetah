@@ -31,7 +31,7 @@ class MainWindow;
 class RideItem;
 class QwtPlotPicker;
 
-class CriticalPowerWindow : public GcWindow
+class CriticalPowerWindow : public GcChartWindow
 {
     Q_OBJECT
     G_OBJECT
@@ -60,8 +60,6 @@ class CriticalPowerWindow : public GcWindow
 
         // reveal
         bool hasReveal() { return true; }
-        void reveal() { revealControls->show(); revealAnim->start(); }
-        void unreveal() { unrevealAnim->start(); revealControls->hide(); }
 
         void deleteCpiFile(QString filename);
 
@@ -127,8 +125,6 @@ class CriticalPowerWindow : public GcWindow
 
     private:
         // reveal controls
-        QWidget *revealControls;
-        QPropertyAnimation *revealAnim, *unrevealAnim;
         QPushButton *rCpintSetCPButton;
 
         void updateCpint(double minutes);

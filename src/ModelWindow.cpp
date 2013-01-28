@@ -45,7 +45,7 @@ ModelWindow::addStandardChannels(QComboBox *box)
 }
 
 ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) :
-    GcWindow(parent), home(home), main(parent), ride(NULL), current(NULL)
+    GcChartWindow(parent), home(home), main(parent), ride(NULL), current(NULL)
 {
     setInstanceName("3D Window");
 
@@ -56,6 +56,24 @@ ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) :
     // hidden text when plot invalid
     nodata = new QLabel(tr("No data or bin size too large."), this);
     nodata->hide();
+
+    //
+    // reveal controls
+    //
+    rpresetLabel = new QLabel(tr("Analyse"), this);
+    rpresetValues = new QComboBox;
+    fillPresets(rpresetValues);
+    rpresetValues->setCurrentIndex(1);
+
+    // layout reveal controls
+    QHBoxLayout *r = new QHBoxLayout;
+    r->setSpacing(4);
+    r->setContentsMargins(0,0,0,0);
+    r->addStretch();
+    r->addWidget(rpresetLabel);
+    r->addWidget(rpresetValues);
+    r->addStretch();
+    setRevealLayout(r);
 
     // the plot widget
     QHBoxLayout *mainLayout = new QHBoxLayout;
@@ -68,7 +86,7 @@ ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) :
     mainLayout->addWidget(zpane);
     mainLayout->addWidget(modelPlot);
     mainLayout->addWidget(nodata);
-    setLayout(mainLayout);
+    setChartLayout(mainLayout);
 
     // preset Values
     presetLabel = new QLabel(tr("Analyse"), this);
