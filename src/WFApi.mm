@@ -43,6 +43,13 @@ static QString toQString(const NSString *nsstr)
     return result;
 }
 
+static inline NSString* fromQString(const QString &string)
+{
+    const QByteArray utf8 = string.toUtf8();
+    const char* cString = utf8.constData();
+    return [[NSString alloc] initWithUTF8String:cString];
+}
+
 // Thi source file contains the private objc interface (WFBridge) that
 // sits atop the Wahoo Fitness APIs at the top of the source file.
 //
@@ -116,7 +123,7 @@ static QString toQString(const NSString *nsstr)
 //============================================================================
 
 // connect and disconnect a device
--(BOOL)connectDevice: (int)n
+-(BOOL)connectDevice: (NSString *)uuid
 {
     // it takes far too long!
     [[WFHardwareConnector sharedConnector] disableFirmwareCheck];
@@ -124,12 +131,15 @@ static QString toQString(const NSString *nsstr)
     // just in case there is a discovery in action, lets cancel it...
     [[WFHardwareConnector sharedConnector] cancelDiscoveryOnNetwork:WF_NETWORKTYPE_BTLE];
 
-    WFDeviceParams* dev = (WFDeviceParams*)[discoveredSensors objectAtIndex:n];
+    WFDeviceParams* dev = [[WFDeviceParams alloc] init];
+    dev.deviceUUIDString = uuid;
+    dev.networkType = WF_NETWORKTYPE_BTLE;
+
     WFConnectionParams* params = [[WFConnectionParams alloc] init];
     params.sensorType = WF_SENSORTYPE_BIKE_POWER;
     params.networkType = WF_NETWORKTYPE_BTLE;
     params.sensorSubType = WF_SENSOR_SUBTYPE_BIKE_POWER_KICKR;
-    params.searchTimeout = 15;
+    params.searchTimeout = 5;
     params.device1 = dev;
 
     // request the sensor connection.
@@ -265,7 +275,7 @@ QString WFApi::deviceUUID(int n)
 int WFApi::connectionStatus() { return [wf connectionStatus]; }
 bool WFApi::isConnected() { return [wf isConnected]; }
 bool WFApi::hasData() { return [wf hasData]; }
-bool WFApi::connectDevice(int n) { return [wf connectDevice:n]; }
+bool WFApi::connectDevice(QString uuid) { return [wf connectDevice: fromQString(uuid)]; }
 bool WFApi::disconnectDevice() { return [wf disconnectDevice]; }
 int WFApi::deviceCount() { return [wf deviceCount]; }
 
