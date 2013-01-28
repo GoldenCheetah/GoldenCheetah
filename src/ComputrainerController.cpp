@@ -76,7 +76,7 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
 {
     int Buttons, Status;
     bool calibration;
-    double Power, HeartRate, Cadence, Speed, RRC, Load;
+    double Power, HeartRate, Cadence, Speed, RRC, Load, Gradient;
     uint8_t ss[24];
 
     if(!myComputrainer->isRunning())
@@ -123,8 +123,10 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
     // BUTTONS
     //
 
-    // ADJUST LOAD
+    // ADJUST LOAD & GRADIENT
     Load = myComputrainer->getLoad();
+    Gradient = myComputrainer->getGradient();
+	// the calls to the parent will determine which mode we are on (ERG/SPIN) and adjust load/slop appropiately
     if ((Buttons&CT_PLUS) && !(Buttons&CT_F3)) {
             parent->Higher();
     }
@@ -132,6 +134,7 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
             parent->Lower();
     }
     rtData.setLoad(Load);
+	rtData.setSlope(Gradient);
 
 #if 0 // F3 now toggles calibration
     // FFWD/REWIND
