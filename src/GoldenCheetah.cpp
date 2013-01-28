@@ -724,6 +724,8 @@ GcChartWindow::GcChartWindow(QWidget *parent) : GcWindow(parent) {
     _unrevealTimer = new QTimer();
     connect(_unrevealTimer, SIGNAL(timeout()), this, SLOT(hideRevealControls()));
 
+    _revealControls->hide();
+
     _mainLayout->addWidget(_revealControls,0,0, Qt::AlignTop);
     _mainWidget->setLayout(_mainLayout);
 }

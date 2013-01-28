@@ -27,7 +27,7 @@ class MainWindow;
 class PfPvPlot;
 class RideItem;
 
-class PfPvWindow : public GcWindow
+class PfPvWindow : public GcChartWindow
 {
     Q_OBJECT
     G_OBJECT
@@ -45,8 +45,6 @@ class PfPvWindow : public GcWindow
 
         // reveal
         bool hasReveal() { return true; }
-        void reveal() { revealControls->show(); revealAnim->start(); }
-        void unreveal() { unrevealAnim->start(); revealControls->hide(); }
 
         // get/set properties
         QString watts() const { return qaCPValue->text(); }
@@ -84,7 +82,6 @@ class PfPvWindow : public GcWindow
 
         MainWindow *mainWindow;
         PfPvPlot *pfPvPlot;
-        QPropertyAnimation *revealAnim, *unrevealAnim;
         QwtPlotZoomer *pfpvZoomer;
         QCheckBox *shadeZonesPfPvCheckBox;
         QCheckBox *mergeIntervalPfPvCheckBox;
@@ -96,7 +93,6 @@ class PfPvWindow : public GcWindow
 
     private:
         // reveal controls
-        QWidget *revealControls;
         QCheckBox *rShade, *rMergeInterval, *rFrameInterval;
 };
 
