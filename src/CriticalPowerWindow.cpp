@@ -34,35 +34,13 @@
 #include <QXmlSimpleReader>
 
 CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, bool rangemode) :
-    GcWindow(parent), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), mainWindow(parent), currentRide(NULL), rangemode(rangemode), stale(true), useCustom(false), useToToday(false)
+    GcChartWindow(parent), _dateRange("{00000000-0000-0000-0000-000000000001}"), home(home), mainWindow(parent), currentRide(NULL), rangemode(rangemode), stale(true), useCustom(false), useToToday(false)
 {
     setInstanceName("Critical Power Window");
-
-    // Main layout
-    QGridLayout *mainLayout = new QGridLayout(this);
-    mainLayout->setContentsMargins(2,2,2,2);
 
     //
     // reveal controls widget
     //
-
-    // reveal widget
-    revealControls = new QWidget(this);
-    revealControls->setFixedHeight(50);
-    revealControls->setStyleSheet("QWidget  { background-color: rgba(100%, 100%, 100%, 100%); }");
-    revealControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-    revealAnim = new QPropertyAnimation(revealControls, "pos");
-    revealAnim->setDuration(500);
-    revealAnim->setKeyValueAt(0,QPoint(2,-50));
-    revealAnim->setKeyValueAt(0.5,QPoint(2,15));
-    revealAnim->setKeyValueAt(1,QPoint(2,20));
-
-    unrevealAnim = new QPropertyAnimation(revealControls, "pos");
-    unrevealAnim->setDuration(500);
-    unrevealAnim->setKeyValueAt(0,QPoint(2,20));
-    unrevealAnim->setKeyValueAt(0.5,QPoint(2,15));
-    unrevealAnim->setKeyValueAt(1,QPoint(2,-50));
 
     // layout reveal controls
     QHBoxLayout *revealLayout = new QHBoxLayout;
@@ -76,11 +54,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     revealLayout->addWidget(rCpintSetCPButton);
     revealLayout->addStretch();
 
-    revealControls->setLayout(revealLayout);
-
-    // hide them initially
-    revealControls->hide();
-
+    setRevealLayout(revealLayout);
 
     // main plot area
     QVBoxLayout *vlayout = new QVBoxLayout;
@@ -196,12 +170,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     picker->setStateMachine(new QwtPickerDragPointMachine);
     picker->setRubberBandPen(GColor(CPLOTTRACKER));
 
-    mainLayout->addLayout(vlayout, 0, 0);
-    mainLayout->addWidget(pickerControls, 0, 0, Qt::AlignTop | Qt::AlignRight);
-    mainLayout->addWidget(revealControls,0,0, Qt::AlignTop);
-    pickerControls->raise();
-    revealControls->raise();
-    setLayout(mainLayout);
+    setChartLayout(vlayout);
 
     connect(picker, SIGNAL(moved(const QPoint &)), SLOT(pickerMoved(const QPoint &)));
     //connect(cpintTimeValue, SIGNAL(editingFinished()), this, SLOT(cpintTimeValueEntered()));
