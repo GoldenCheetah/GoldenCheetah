@@ -360,7 +360,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     recordFile = NULL;
     status = 0;
     status |= RT_MODE_ERGO;         // ergo mode by default
-	mode = ERG;
+    mode = ERG;
 
     displayWorkoutLap = displayLap = 0;
     pwrcount = 0;
@@ -474,9 +474,9 @@ TrainTool::configChanged()
     if (Devices.count()) {
         deviceTree->setCurrentItem(allDevices->child(0));
     }
-	// And select default workout to Ergo
-	QModelIndex firstWorkout = sortModel->index(0, 0, QModelIndex());
-	workoutTree->setCurrentIndex(firstWorkout);
+    // And select default workout to Ergo
+    QModelIndex firstWorkout = sortModel->index(0, 0, QModelIndex());
+    workoutTree->setCurrentIndex(firstWorkout);
     // Athlete
     FTP=285; // default to 285 if zones are not set
     int range = main->zones()->whichRange(QDate::currentDate());
@@ -1075,7 +1075,7 @@ void TrainTool::guiUpdate()           // refreshes the telemetry
             displayHeartRate = rtData.getHr();
             displaySpeed = rtData.getSpeed();
             load = rtData.getLoad();
-			slope = rtData.getSlope();
+            slope = rtData.getSlope();
 
             // virtual speed
             double crr = 0.004f; // typical for asphalt surfaces

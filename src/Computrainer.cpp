@@ -879,9 +879,9 @@ int Computrainer::openPort()
     QString portSpec;
     int portnum = deviceFilename.midRef(3).toString().toInt();
     if (portnum < 10)
-	   portSpec = deviceFilename;
+       portSpec = deviceFilename;
     else
-	   portSpec = "\\\\.\\" + deviceFilename;
+       portSpec = "\\\\.\\" + deviceFilename;
     wchar_t deviceFilenameW[32]; // \\.\COM32 needs 9 characters, 32 should be enough?
     MultiByteToWideChar(CP_ACP, 0, portSpec.toAscii(), -1, (LPWSTR)deviceFilenameW,
                     sizeof(deviceFilenameW));
