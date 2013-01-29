@@ -39,6 +39,14 @@ static DeviceType SupportedDevices[] =
         "speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick" ,
         ":images/devices/garminusb.png" },
 #endif
+#ifdef GC_HAVE_WFAPI
+      { DEV_BT40,    DEV_BTLE,     (char *) "Bluetooth 4.0", true,   false,
+        "Bluetooth Low Energy devices such as KK Inride, Stages PM, Blue HR and Blue SC",
+        ":images/devices/btle.png" },
+      { DEV_KICKR,    DEV_BTLE,     (char *) "Wahoo Kickr", true,   false,
+        "The Wahoo Fitness Kickr cyling trainer via its Bluetooth smart interface. ",
+        ":images/devices/kickr.png" },
+#endif
       { DEV_CT,       DEV_SERIAL,  (char *) "Racermate Computrainer",true,    false,
         "Racermate Computrainer Lab or Pro bike trainer with the handlebar controller "
         "connected via a USB adaptor or directly connected to a local serial port." ,
@@ -48,11 +56,6 @@ static DeviceType SupportedDevices[] =
         "Tacx Fortius/iMagic bike trainer with the handlebar controller connected "
         "to a USB port. Please make sure you have device firmware to hand." ,
         ":images/devices/fortius.png" },
-#endif
-#ifdef GC_HAVE_WFAPI
-      { DEV_KICKR,    DEV_BTLE,     (char *) "Wahoo Kickr", true,   false,
-        "The Wahoo Fitness Kickr cyling trainer via its Bluetooth smart interface. ",
-        ":images/devices/kickr.png" },
 #endif
 #ifdef GC_WANT_ROBOT
       { DEV_NULL,     DEV_TCP,     (char *) "Robot", false,   false,

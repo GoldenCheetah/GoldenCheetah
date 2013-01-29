@@ -16,9 +16,9 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "Kickr.h"
+#include "BT40.h"
 
-Kickr::Kickr(QObject *parent,  DeviceConfiguration *devConf) : QThread(parent)
+BT40::BT40(QObject *parent,  DeviceConfiguration *devConf) : QThread(parent)
 {
     this->parent = parent;
     this->devConf = devConf;    
@@ -28,14 +28,14 @@ Kickr::Kickr(QObject *parent,  DeviceConfiguration *devConf) : QThread(parent)
     slope = 1.0;
 }
 
-Kickr::~Kickr()
+BT40::~BT40()
 {
 }
 
 // not required
-void Kickr::setDevice(QString) { }
+void BT40::setDevice(QString) { }
 
-void Kickr::setMode(int mode, double load, double gradient)
+void BT40::setMode(int mode, double load, double gradient)
 {
     pvars.lock();
     this->mode = mode;
@@ -44,7 +44,7 @@ void Kickr::setMode(int mode, double load, double gradient)
     pvars.unlock();
 }
 
-void Kickr::setLoad(double load)
+void BT40::setLoad(double load)
 {
     pvars.lock();
     if (load > 1500) load = 1500;
@@ -53,7 +53,7 @@ void Kickr::setLoad(double load)
     pvars.unlock();
 }
 
-void Kickr::setGradient(double gradient)
+void BT40::setGradient(double gradient)
 {
     pvars.lock();
     this->slope = gradient;
@@ -61,7 +61,7 @@ void Kickr::setGradient(double gradient)
 }
 
 
-int Kickr::getMode()
+int BT40::getMode()
 {
     int  tmp;
     pvars.lock();
@@ -70,7 +70,7 @@ int Kickr::getMode()
     return tmp;
 }
 
-double Kickr::getLoad()
+double BT40::getLoad()
 {
     double tmp;
     pvars.lock();
@@ -79,7 +79,7 @@ double Kickr::getLoad()
     return tmp;
 }
 
-double Kickr::getGradient()
+double BT40::getGradient()
 {
     double tmp;
     pvars.lock();
@@ -89,7 +89,7 @@ double Kickr::getGradient()
 }
 
 void
-Kickr::getRealtimeData(RealtimeData &rtData)
+BT40::getRealtimeData(RealtimeData &rtData)
 {
     pvars.lock();
     rtData = rt;
@@ -97,17 +97,17 @@ Kickr::getRealtimeData(RealtimeData &rtData)
 }
 
 int
-Kickr::start()
+BT40::start()
 {
     QThread::start();
     return 0;
 }
 
 // does nothing - neither does pause
-int Kickr::restart() { return 0; }
-int Kickr::pause() { return 0; }
+int BT40::restart() { return 0; }
+int BT40::pause() { return 0; }
 
-int Kickr::stop()
+int BT40::stop()
 {
     running = false;
     return 0;
@@ -115,7 +115,7 @@ int Kickr::stop()
 
 // used by thread to set variables and emit event if needed
 // on unexpected exit
-int Kickr::quit(int code)
+int BT40::quit(int code)
 {
     // event code goes here!
     exit(code);
@@ -125,14 +125,14 @@ int Kickr::quit(int code)
 /*----------------------------------------------------------------------
  * MAIN THREAD - READS TELEMETRY AND UPDATES LOAD/GRADIENT ON KICKR
  *----------------------------------------------------------------------*/
-void Kickr::run()
+void BT40::run()
 {
     int currentmode = -1;
     int currentload = -1;
     double currentslope= -1;
 
     // Connect to the device
-    if (connectKickr()) {
+    if (connectBT40()) {
         quit(2);
         return; // open failed!
     }
@@ -185,16 +185,16 @@ void Kickr::run()
         msleep(100);
     }
 
-    disconnectKickr();
+    disconnectBT40();
     quit(0);
 }
 
 bool
-Kickr::find()
+BT40::find()
 {
     WFApi *w = WFApi::getInstance();
 
-    if (w->discoverDevicesOfType(WFApi::WF_SENSORTYPE_BIKE_POWER) == false) return false;
+    if (w->discoverDevicesOfType(WFApi::WF_SENSORTYPE_NONE) == false) return false;
 
     QEventLoop loop;
     connect(w, SIGNAL(discoveredDevices(int,bool)), &loop, SLOT(quit()));
@@ -209,7 +209,7 @@ Kickr::find()
 }
 
 int
-Kickr::connectKickr()
+BT40::connectBT40()
 {
     // get a pool for this thread
     pool = WFApi::getInstance()->getPool();
@@ -218,7 +218,7 @@ Kickr::connectKickr()
 }
 
 int
-Kickr::disconnectKickr()
+BT40::disconnectBT40()
 {
     // disconnect
     WFApi::getInstance()->disconnectDevice(sd);
@@ -232,7 +232,7 @@ Kickr::disconnectKickr()
 
 // check to see of there is a port at the device specified
 // returns true if the device exists and false if not
-bool Kickr::discover(QString)
+bool BT40::discover(QString)
 {
     return false;
 }

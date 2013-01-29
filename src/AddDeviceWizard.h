@@ -26,6 +26,7 @@
 #include "RealtimeController.h"
 #ifdef GC_HAVE_WFAPI
 #include "KickrController.h"
+#include "BT40Controller.h"
 #endif
 #ifdef GC_HAVE_LIBUSB
 #include "FortiusController.h"

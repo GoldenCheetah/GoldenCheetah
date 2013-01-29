@@ -38,7 +38,7 @@ AddDeviceWizard::AddDeviceWizard(MainWindow *main) : QWizard(main), main(main)
     setWindowModality(Qt::NonModal); // avoid blocking WFAPI calls for kickr
     setAttribute(Qt::WA_DeleteOnClose);
 
-    setFixedHeight(500);
+    setFixedHeight(530);
     setFixedWidth(550);
 
     // title
@@ -122,7 +122,7 @@ AddType::clicked(QString p)
     // we don't do a quick scan for a kickr since it takes 15 seconds
     // to timeout and we don't want to get stuck on the front page for
     // that long -- it will seem like it has not worked / crashed
-    if (wizard->deviceTypes.Supported[wizard->current].type != DEV_KICKR)
+    if (wizard->deviceTypes.Supported[wizard->current].connector != DEV_BTLE)
         wizard->found = wizard->scanner->quickScan(false); // do a quick scan
     else
         wizard->found = false;
@@ -132,6 +132,7 @@ AddType::clicked(QString p)
     else {
         switch(wizard->deviceTypes.Supported[wizard->current].type) {
         case DEV_KICKR : 
+        case DEV_BT40 : 
         case DEV_ANTLOCAL : next = 50; break; // pair 
         default:
         case DEV_CT : next = 60; break; // confirm and add 
@@ -152,7 +153,7 @@ DeviceScanner::run()
 #ifdef GC_HAVE_WFAPI
     void *pool;
     // get an autorelease pool for this thread!
-    if (wizard->deviceTypes.Supported[wizard->current].type == DEV_KICKR) pool = WFApi::getInstance()->getPool();
+    if (wizard->deviceTypes.Supported[wizard->current].connector == DEV_BTLE) pool = WFApi::getInstance()->getPool();
 #endif
 
     for (int i=0; active && !result && i<50; i++) { // search for longer
@@ -202,6 +203,7 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
     case DEV_ANTLOCAL : wizard->controller = new ANTlocalController(NULL, NULL); break;
 #ifdef GC_HAVE_WFAPI
     case DEV_KICKR : wizard->controller = new KickrController(NULL, NULL); break;
+    case DEV_BT40 : wizard->controller = new BT40Controller(NULL, NULL); break;
 #endif
 
     default: wizard->controller = NULL; break;
@@ -253,7 +255,7 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
 
 #ifdef GC_HAVE_WFAPI
     // save away the device UUID, so we can choose it when connecting.
-    if (isfound && wizard->deviceTypes.Supported[wizard->current].type == DEV_KICKR) 
+    if (isfound && wizard->deviceTypes.Supported[wizard->current].connector == DEV_BTLE) 
         wizard->portSpec = ((KickrController*)(wizard->controller))->id();
 #endif
 
@@ -435,6 +437,7 @@ AddSearch::nextId() const
     else {
         switch(wizard->deviceTypes.Supported[wizard->current].type) {
         case DEV_ANTLOCAL : return 50; break; // pair 
+        case DEV_BT40 : //XXX need a BT40 pair screen
         default:
         case DEV_KICKR :
         case DEV_CT : return 60; break; // confirm and add 
