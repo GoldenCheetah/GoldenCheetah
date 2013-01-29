@@ -61,6 +61,11 @@ public:
     bool enableBTLE(bool enable, bool bondingmode);
     bool isCommunicationHWReady();
 
+    // we don't use the WF API header "hardware_connector_types.h" because it
+    // references Objc types (NSUInteger) that fail when compiling C++.
+    // Instead we redeclare them here, but only the ones we absolutely need
+    // and hopefully they won't change too often
+
     // current state
     typedef enum {
         WFAPI_HWCONN_STATE_NOT_CONNECTED                = 0,
@@ -81,8 +86,12 @@ public:
     int connectionStatus(int sd);
     bool isConnected(int sd);
 
+    // just the types we need
+    enum {
+        WF_SENSORTYPE_NONE = 0,
+        WF_SENSORTYPE_BIKE_POWER = 1 };
     // scan
-    bool discoverDevicesOfType(int eSensorType, int eNetworkType, int timeout);
+    bool discoverDevicesOfType(int eSensorType);
     int deviceCount();
     QString deviceUUID(int); // return the UUID for device n
 

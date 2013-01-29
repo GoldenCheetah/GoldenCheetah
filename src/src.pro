@@ -169,6 +169,8 @@ macx {
         # Linux or Windows support for the WF API from Wahoo (yet)
         HEADERS += WFApi.h Kickr.h KickrController.h
         SOURCES += Kickr.cpp KickrController.cpp
+        HEADERS += BT40.h BT40Controller.h
+        SOURCES += BT40.cpp BT40Controller.cpp
         OBJECTIVE_SOURCES += WFApi.mm
 
     }

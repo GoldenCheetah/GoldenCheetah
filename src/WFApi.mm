@@ -252,13 +252,10 @@ bool WFApi::enableBTLE(bool enable, bool bondingmode) {
 int WFApi::currentState() { return [wf currentState]; }
 
 bool
-WFApi::discoverDevicesOfType(int eSensorType, int eNetworkType, int timeout)
-{   Q_UNUSED(eSensorType);
-    Q_UNUSED(eNetworkType);
-    Q_UNUSED(timeout);
-
+WFApi::discoverDevicesOfType(int eSensorType)
+{
     // ignore ehat was passed for now...
-    return [wf discoverDevicesOfType:WF_SENSORTYPE_BIKE_POWER onNetwork:WF_NETWORKTYPE_BTLE searchTimeout:5.00];
+    return [wf discoverDevicesOfType:(WFSensorType_t)eSensorType onNetwork:WF_NETWORKTYPE_BTLE searchTimeout:5.00];
 }
 
 QString WFApi::deviceUUID(int n)
