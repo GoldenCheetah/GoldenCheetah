@@ -86,14 +86,42 @@ public:
     int connectionStatus(int sd);
     bool isConnected(int sd);
 
-    // just the types we need
+    // all the sensor types just the types we need
     enum {
-        WF_SENSORTYPE_NONE = 0,
-        WF_SENSORTYPE_BIKE_POWER = 1 };
+        WF_SENSORTYPE_NONE                           = 0,
+        WF_SENSORTYPE_BIKE_POWER                     = 0x00000001, // kickr, inride etc
+        WF_SENSORTYPE_BIKE_SPEED                     = 0x00000002,
+        WF_SENSORTYPE_BIKE_CADENCE                   = 0x00000004,
+        WF_SENSORTYPE_BIKE_SPEED_CADENCE             = 0x00000008,
+        WF_SENSORTYPE_FOOTPOD                        = 0x00000010,
+        WF_SENSORTYPE_HEARTRATE                      = 0x00000020,
+        WF_SENSORTYPE_WEIGHT_SCALE                   = 0x00000040,
+        WF_SENSORTYPE_ANT_FS                         = 0x00000080,
+        WF_SENSORTYPE_LOCATION                       = 0x00000100,
+        WF_SENSORTYPE_CALORIMETER                    = 0x00000200,
+        WF_SENSORTYPE_GEO_CACHE                      = 0x00000400,
+        WF_SENSORTYPE_FITNESS_EQUIPMENT              = 0x00000800,
+        WF_SENSORTYPE_MULTISPORT_SPEED_DISTANCE      = 0x00001000,
+        WF_SENSORTYPE_PROXIMITY                      = 0x00002000,
+        WF_SENSORTYPE_HEALTH_THERMOMETER             = 0x00004000,
+        WF_SENSORTYPE_BLOOD_PRESSURE                 = 0x00008000,
+        WF_SENSORTYPE_BTLE_GLUCOSE                   = 0x00010000,
+        WF_SENSORTYPE_GLUCOSE                        = 0x00020000,
+        WF_SENSORTYPE_DISPLAY                        = 0x00800000  };
+
+    // subtypes -- esp. power
+    enum {
+        WF_SENSOR_SUBTYPE_UNSPECIFIED                = 0,
+        WF_SENSOR_SUBTYPE_BIKE_POWER_KICKR           = 1,
+        WF_SENSOR_SUBTYPE_BIKE_POWER_STAGE_ONE       = 2,
+        WF_SENSOR_SUBTYPE_BIKE_POWER_IN_RIDE         = 3 };
+
     // scan
     bool discoverDevicesOfType(int eSensorType);
     int deviceCount();
     QString deviceUUID(int); // return the UUID for device n
+    int deviceType(int); // return the device type
+    int deviceSubType(int); // return the subtype found
 
     // connect and disconnect
     int connectDevice(QString uuid); // connect the device n

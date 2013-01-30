@@ -26,6 +26,8 @@ BT40::BT40(QObject *parent,  DeviceConfiguration *devConf) : QThread(parent)
     mode = -1;
     load = 100;
     slope = 1.0;
+
+    connect(WFApi::getInstance(), SIGNAL(discoveredDevices(int,bool)), this, SLOT(discoveredDevices(int,bool)));
 }
 
 BT40::~BT40()
@@ -187,6 +189,24 @@ void BT40::run()
 
     disconnectBT40();
     quit(0);
+}
+
+void
+BT40::discoveredDevices(int n, bool finished)
+{
+    WFApi *w = WFApi::getInstance();
+
+    // need to emit signal with device uuid and type
+    // this is used by the add device wizard.
+    // but only emit as they are found, not at the end
+    // when search times out -- we want them as they
+    // arrive.
+    if (!finished && w->deviceSubType(n-1) != WFApi::WF_SENSOR_SUBTYPE_BIKE_POWER_KICKR) { 
+        qDebug()<<"BT40 discovered a bluetooth device.."
+                <<w->deviceUUID(n-1)
+                <<w->deviceType(n-1);
+        emit foundDevice(w->deviceUUID(n-1), w->deviceType(n-1));
+    }
 }
 
 bool

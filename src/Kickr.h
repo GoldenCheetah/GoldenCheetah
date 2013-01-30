@@ -68,6 +68,12 @@ public:
 
     QString id() { return deviceUUID; }
 
+signals:
+    void foundDevice(QString uuid, int type);
+
+private slots:
+    void discoveredDevices(int,bool);
+
 private:
     void run();                                 // called by start to kick off the CT comtrol thread
 

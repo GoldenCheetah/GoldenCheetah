@@ -109,8 +109,18 @@ static inline NSString* fromQString(const QString &string)
 -(int)deviceCount { return [discoveredSensors count]; }
 -(NSString*)deviceUUID:(int)n
 {
-    WFDeviceParams* connParams = (WFDeviceParams*)[discoveredSensors objectAtIndex:n];
-    return connParams.deviceUUIDString;
+    WFConnectionParams* connParams = (WFConnectionParams*)[discoveredSensors objectAtIndex:n];
+    return connParams.device1.deviceUUIDString;
+}
+-(int)deviceType:(int)n
+{
+    WFConnectionParams* connParams = (WFConnectionParams*)[discoveredSensors objectAtIndex:n];
+    return (int)connParams.sensorType;
+}
+-(int)deviceSubType:(int)n
+{
+    WFConnectionParams* connParams = (WFConnectionParams*)[discoveredSensors objectAtIndex:n];
+    return (int)connParams.sensorSubType;
 }
 
 //============================================================================
@@ -214,10 +224,13 @@ static inline NSString* fromQString(const QString &string)
 // devices discovered
 -(void)hardwareConnector:(WFHardwareConnector*)hwConnector didDiscoverDevices:(NSSet*)connectionParams searchCompleted:(BOOL)bCompleted
 {   Q_UNUSED(hwConnector);
-    // add discovered devices.
-    for (WFConnectionParams* connParams in connectionParams) {
-        [discoveredSensors addObject:connParams.device1];
-    }   
+
+    if (!bCompleted) {
+        // add discovered devices -- as they are discovered, not at the end.
+        for (WFConnectionParams* connParams in connectionParams) {
+            [discoveredSensors addObject:connParams];
+        }   
+    }
 
     qtw->didDiscoverDevices([connectionParams count], bCompleted);
 }
@@ -262,6 +275,16 @@ QString WFApi::deviceUUID(int n)
 {
     if (n>=0 && n<deviceCount()) return toQString([wf deviceUUID:n]);
     else return "";
+}
+int WFApi::deviceType(int n)
+{
+    if (n>=0 && n<deviceCount()) return (int)[wf deviceType:n];
+    else return -1;
+}
+int WFApi::deviceSubType(int n)
+{
+    if (n>=0 && n<deviceCount()) return (int)[wf deviceSubType:n];
+    else return -1;
 }
 
 int WFApi::connectionStatus(int sd) { return [wf connectionStatus:(WFSensorConnection*)connections.at(sd)]; }

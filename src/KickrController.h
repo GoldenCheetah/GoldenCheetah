@@ -56,6 +56,7 @@ public:
     QString id() { return myKickr->id(); }
 
 signals:
+    void foundDevice(QString uuid, int type);
 
 private:
     
