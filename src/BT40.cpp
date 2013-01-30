@@ -32,6 +32,7 @@ BT40::BT40(QObject *parent,  DeviceConfiguration *devConf) : QThread(parent)
 
 BT40::~BT40()
 {
+    stop();
 }
 
 // not required
@@ -202,10 +203,13 @@ BT40::discoveredDevices(int n, bool finished)
     // when search times out -- we want them as they
     // arrive.
     if (!finished && w->deviceSubType(n-1) != WFApi::WF_SENSOR_SUBTYPE_BIKE_POWER_KICKR) { 
-        qDebug()<<"BT40 discovered a bluetooth device.."
-                <<w->deviceUUID(n-1)
-                <<w->deviceType(n-1);
-        emit foundDevice(w->deviceUUID(n-1), w->deviceType(n-1));
+
+        for(int i=0; i<n; i++) {
+        qDebug()<<this<<"BT40 discovered a bluetooth device.."<<i
+                <<w->deviceUUID(i)
+                <<w->deviceType(i);
+        emit foundDevice(w->deviceUUID(i), w->deviceType(i));
+        }
     }
 }
 
@@ -217,7 +221,7 @@ BT40::find()
     if (w->discoverDevicesOfType(WFApi::WF_SENSORTYPE_NONE) == false) return false;
 
     QEventLoop loop;
-    connect(w, SIGNAL(discoveredDevices(int,bool)), &loop, SLOT(quit()));
+    connect(w, SIGNAL(discoverFinished()), &loop, SLOT(quit()));
     loop.exec();
 
     scanned = true;

@@ -26,6 +26,12 @@ BT40Controller::BT40Controller(TrainTool *parent, DeviceConfiguration *dc) : Rea
     connect(myBT40, SIGNAL(foundDevice(QString,int)), this, SIGNAL(foundDevice(QString,int)));
 }
 
+BT40Controller::~BT40Controller()
+{
+    myBT40->stop();
+    myBT40->deleteLater();
+}
+
 void
 BT40Controller::setDevice(QString)
 {

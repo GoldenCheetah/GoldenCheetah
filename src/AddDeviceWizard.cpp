@@ -187,6 +187,7 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
                                        // for now deep just means try 3 time before giving up, but we
                                        // may want to change that to include scanning more devices?
 {
+
     // get controller
     if (wizard->controller) {
         delete wizard->controller;
@@ -345,7 +346,6 @@ AddSearch::chooseCOMPort()
 void
 AddSearch::initializePage()
 {
-    active = true;
     setTitle(QString(tr("%1 Search")).arg(wizard->deviceTypes.Supported[wizard->current].name));
 
     // we only ask for the device file if it is a serial device
@@ -386,16 +386,24 @@ AddSearch::scanFinished(bool result)
     stop->setText("Search Again");
 
     if (result == true) { // woohoo we found one
-        bar->hide();
-        stop->hide();
-        manual->hide();
-        label->hide();
-        label1->hide();
-        if (wizard->portSpec != "")
-            label2->setText(QString("\nDevice found (%1).\nPress Next to Continue\n").arg(wizard->portSpec));
-        else
-            label2->setText("\nDevice found.\nPress Next to Continue\n");
-        label2->show();
+
+        if (wizard->deviceTypes.Supported[wizard->current].type == DEV_BT40) {
+            // ok we've started finding devices, lets go straight into the
+            // pair screen since we now want to see the data etc.
+            wizard->next();
+        } else {
+
+            bar->hide();
+            stop->hide();
+            manual->hide();
+            label->hide();
+            label1->hide();
+            if (wizard->portSpec != "")
+                label2->setText(QString("\nDevice found (%1).\nPress Next to Continue\n").arg(wizard->portSpec));
+            else
+                label2->setText("\nDevice found.\nPress Next to Continue\n");
+            label2->show();
+        }
     } 
     QApplication::processEvents();
     emit completeChanged();
@@ -849,6 +857,8 @@ AddPairBTLE::cleanupPage()
 void
 AddPairBTLE::initializePage()
 {
+qDebug()<<"found this many devices:"<<WFApi::getInstance()->deviceCount();
+
     // setup the controller and start it off so we can
     // manipulate it
     if (wizard->controller) delete wizard->controller;
