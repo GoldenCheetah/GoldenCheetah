@@ -23,6 +23,7 @@
 KickrController::KickrController(TrainTool *parent, DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
     myKickr = new Kickr(parent, dc);
+    connect(myKickr, SIGNAL(foundDevice(QString,int)), this, SIGNAL(foundDevice(QString,int)));
 }
 
 void

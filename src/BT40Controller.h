@@ -56,6 +56,7 @@ public:
     QString id() { return myBT40->id(); }
 
 signals:
+    void foundDevice(QString uuid, int type);
 
 private:
     
