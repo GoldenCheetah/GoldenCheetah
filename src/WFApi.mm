@@ -102,7 +102,11 @@ static inline NSString* fromQString(const QString &string)
 // scan for devices and stored details
 -(BOOL)discoverDevicesOfType:(WFSensorType_t)eSensorType onNetwork:(WFNetworkType_t)eNetworkType searchTimeout:(NSTimeInterval)timeout
 {
+    // get rid of past scans / stop any in progress
     [discoveredSensors removeAllObjects];
+    [[WFHardwareConnector sharedConnector] cancelDiscoveryOnNetwork:WF_NETWORKTYPE_BTLE];
+
+    // go looking
     [[WFHardwareConnector sharedConnector] discoverDevicesOfType:eSensorType onNetwork:eNetworkType searchTimeout:timeout]; //XXX ignoringreturn
     return true;
 }
@@ -232,7 +236,7 @@ static inline NSString* fromQString(const QString &string)
         }   
     }
 
-    qtw->didDiscoverDevices([connectionParams count], bCompleted);
+    qtw->didDiscoverDevices([discoveredSensors count], bCompleted);
 }
 
 -(NSAutoreleasePool*) getPool { return [[NSAutoreleasePool alloc] init]; }
@@ -268,7 +272,7 @@ bool
 WFApi::discoverDevicesOfType(int eSensorType)
 {
     // ignore ehat was passed for now...
-    return [wf discoverDevicesOfType:(WFSensorType_t)eSensorType onNetwork:WF_NETWORKTYPE_BTLE searchTimeout:5.00];
+    return [wf discoverDevicesOfType:(WFSensorType_t)eSensorType onNetwork:WF_NETWORKTYPE_BTLE searchTimeout:15.00];
 }
 
 QString WFApi::deviceUUID(int n)
@@ -308,7 +312,8 @@ void WFApi::setLoad(int sd, int n) { [wf setLoad:(WFBikePowerConnection*)connect
 // methods called by delegate on updates
 //============================================================================
 void WFApi::connectedSensor(void*) { }
-void WFApi::didDiscoverDevices(int count, bool finished) { emit discoveredDevices(count,finished); }
+void WFApi::didDiscoverDevices(int count, bool finished) { if (finished) emit discoverFinished();
+                                                           else emit discoveredDevices(count,finished); }
 void WFApi::disconnectedSensor(void*) { }
 void WFApi::hasFirmwareUpdateAvalableForConnection() { }
 void WFApi::stateChanged() { emit currentStateChanged(currentState()); }

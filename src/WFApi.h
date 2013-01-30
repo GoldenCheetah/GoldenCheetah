@@ -151,7 +151,8 @@ public:
 signals:
     void currentStateChanged(int); // hardware conncector state changed
     void connectionStateChanged(int status);
-    int discoveredDevices(int,bool);
+    void discoveredDevices(int,bool);
+    void discoverFinished();
     void connectionHasData();
 
 public slots:
