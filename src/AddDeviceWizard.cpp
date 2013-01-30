@@ -857,7 +857,9 @@ AddPairBTLE::cleanupPage()
 void
 AddPairBTLE::initializePage()
 {
+#ifdef GC_HAVE_WFAPI
 qDebug()<<"found this many devices:"<<WFApi::getInstance()->deviceCount();
+#endif
 
     // setup the controller and start it off so we can
     // manipulate it
