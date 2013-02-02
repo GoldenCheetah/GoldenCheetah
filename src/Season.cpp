@@ -359,3 +359,30 @@ Seasons::writeSeasons()
 
     seasonsChanged(); // signal!
 }
+
+SeasonTreeView::SeasonTreeView()
+{
+    setDragDropMode(QAbstractItemView::InternalMove);
+    setDragDropOverwriteMode(true);
+#ifdef Q_OS_MAC
+    setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
+
+}
+
+void
+SeasonTreeView::dropEvent(QDropEvent* event)
+{
+    // item and original position
+    QTreeWidgetItem *item = currentItem();
+    int idx1 = currentItem()->parent()->indexOfChild(item);
+
+    // finalise drop event
+    QTreeWidget::dropEvent(event);
+
+    // new position
+    int idx2 = currentItem()->parent()->indexOfChild(item);
+
+    // emit the itemMoved signal
+    Q_EMIT itemMoved(item, idx1, idx2);
+}

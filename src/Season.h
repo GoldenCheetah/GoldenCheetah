@@ -138,4 +138,22 @@ class Seasons : public QObject {
     private:
         QDir home;
 };
+
+class SeasonTreeView : public QTreeWidget
+{
+    Q_OBJECT
+
+    public:
+        SeasonTreeView();
+
+    Q_SIGNALS:
+        void itemMoved(QTreeWidgetItem* item, int previous, int actual);
+
+    protected:
+        void dropEvent(QDropEvent* event);
+
+
+};
+
+
 #endif /* SEASON_H_ */

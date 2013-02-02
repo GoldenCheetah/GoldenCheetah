@@ -49,8 +49,10 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     mainLayout->setSpacing(0);
     setContentsMargins(0,0,0,0);
 
-    dateRangeTree = new QTreeWidget;
+    dateRangeTree = new SeasonTreeView;
     allDateRanges = new QTreeWidgetItem(dateRangeTree, ROOT_TYPE);
+    // Drop for Seasons
+    allDateRanges->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDropEnabled);
     allDateRanges->setText(0, tr("Date Ranges"));
     dateRangeTree->setFrameStyle(QFrame::NoFrame);
     dateRangeTree->setColumnCount(1);
@@ -122,6 +124,7 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     connect(dateRangeTree,SIGNAL(itemSelectionChanged()), this, SLOT(dateRangeTreeWidgetSelectionChanged()));
     connect(dateRangeTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(dateRangePopup(const QPoint &)));
     connect(dateRangeTree,SIGNAL(itemChanged(QTreeWidgetItem *,int)), this, SLOT(dateRangeChanged(QTreeWidgetItem*, int)));
+    connect(dateRangeTree,SIGNAL(itemMoved(QTreeWidgetItem *,int, int)), this, SLOT(dateRangeMoved(QTreeWidgetItem*, int, int)));
     connect(eventTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(eventPopup(const QPoint &)));
     // GC signal
     connect(main, SIGNAL(configChanged()), this, SLOT(configChanged()));
@@ -208,6 +211,11 @@ LTMSidebar::resetSeasons()
     for (i=0; i <seasons->seasons.count(); i++) {
         Season season = seasons->seasons.at(i);
         QTreeWidgetItem *add = new QTreeWidgetItem(allDateRanges, season.getType());
+        // No Drag/Drop for temporary  Season
+        if (season.getType() == Season::temporary)
+            add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        else
+            add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDragEnabled);
         add->setText(0, season.getName());
     }
 
@@ -351,6 +359,30 @@ LTMSidebar::dateRangeChanged(QTreeWidgetItem*item, int)
 
     // signal date selected changed
     //dateRangeSelected(&seasons->seasons[index]);
+}
+
+void
+LTMSidebar::dateRangeMoved(QTreeWidgetItem*item, int oldposition, int newposition)
+{
+    // no drop in the temporary seasons
+    if (newposition>allDateRanges->childCount()-12) {
+        newposition = allDateRanges->childCount()-12;
+        allDateRanges->removeChild(item);
+        allDateRanges->insertChild(newposition, item);
+    }
+
+    // report the move in the seasons
+    seasons->seasons.move(oldposition, newposition);
+
+    // save changes away
+    active = true;
+    seasons->writeSeasons();
+    active = false;
+
+    // deselect actual selection
+    dateRangeTree->selectedItems().first()->setSelected(false);
+    // select the move/drop item
+    item->setSelected(true);
 }
 
 void
