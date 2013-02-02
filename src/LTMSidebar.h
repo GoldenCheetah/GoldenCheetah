@@ -67,6 +67,7 @@ class LTMSidebar : public QWidget
         void dateRangeTreeWidgetSelectionChanged();
         void dateRangePopup(QPoint);
         void dateRangeChanged(QTreeWidgetItem *, int);
+        void dateRangeMoved(QTreeWidgetItem *, int, int);
         void addRange();
         void renameRange();
         void editRange();
@@ -93,7 +94,7 @@ class LTMSidebar : public QWidget
         QDate from, to; // so we don't repeat update...
 
         Seasons *seasons;
-        QTreeWidget *dateRangeTree;
+        SeasonTreeView *dateRangeTree;
         QTreeWidgetItem *allDateRanges;
         QTreeWidgetItem *activeDateRange; // when using context menus
 
