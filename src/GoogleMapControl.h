@@ -79,7 +79,7 @@ class WebBridge : public QObject
         void drawIntervals();
 };
 
-class GoogleMapControl : public GcWindow
+class GoogleMapControl : public GcChartWindow
 {
     Q_OBJECT
     G_OBJECT

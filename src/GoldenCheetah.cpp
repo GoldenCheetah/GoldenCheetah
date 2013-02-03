@@ -730,19 +730,34 @@ GcChartWindow::GcChartWindow(QWidget *parent) : GcWindow(parent) {
     _mainWidget->setLayout(_mainLayout);
 }
 
-void GcChartWindow:: setChartLayout(QLayout *layout)
+void
+GcChartWindow:: setChartLayout(QLayout *layout)
 {
     _chartLayout = layout;
     _mainLayout->addLayout(_chartLayout,0,0, Qt::AlignTop);
 }
 
-void GcChartWindow:: setRevealLayout(QLayout *layout)
+void
+GcChartWindow:: setRevealLayout(QLayout *layout)
 {
     _revealLayout = layout;
     _revealControls->setLayout(_revealLayout);
 }
 
-void GcChartWindow:: reveal()
+void
+GcChartWindow:: setBlankLayout(QLayout *layout)
+{
+    _blank->setLayout(layout);
+}
+
+void
+GcChartWindow:: setIsBlank(bool value)
+{
+    _layout->setCurrentWidget(value?_blank:_mainWidget);
+}
+
+void
+GcChartWindow:: reveal()
 {
     _unrevealTimer->stop();
     _revealControls->raise();
