@@ -225,6 +225,9 @@ public:
 
     void setChartLayout(QLayout *layout);
     void setRevealLayout(QLayout *layout);
+    void setBlankLayout(QLayout *layout);
+
+    void setIsBlank(bool value);
 
 public slots:
     void hideRevealControls();
