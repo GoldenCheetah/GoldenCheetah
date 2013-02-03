@@ -932,13 +932,13 @@ LTMPlot::createPMCCurveData(LTMSettings *settings, MetricDetail metricDetail,
     QString scoreType;
 
     // create a custom set of summary metric data!
-    if (metricDetail.name.startsWith("Skiba")) {
+    if (metricDetail.symbol.startsWith("skiba")) {
         scoreType = "skiba_bike_score";
-    } else if (metricDetail.name.startsWith("Coggan")) {
+    } else if (metricDetail.symbol.startsWith("coggan")) {
         scoreType = "coggan_tss";
-    } else if (metricDetail.name.startsWith("Daniels")) {
+    } else if (metricDetail.symbol.startsWith("daniels")) {
         scoreType = "daniels_points";
-    } else if (metricDetail.name.startsWith("TRIMP")) {
+    } else if (metricDetail.symbol.startsWith("trimp")) {
         scoreType = "trimp_points";
     }
 
