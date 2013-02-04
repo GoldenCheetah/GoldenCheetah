@@ -201,8 +201,12 @@ private:
 
     QStackedLayout *_layout;
     QGridLayout *_mainLayout;
+    QVBoxLayout *_defaultBlankLayout;
+
     QLayout *_chartLayout,
-            *_revealLayout;
+            *_revealLayout,
+            *_blankLayout;
+
     QWidget *_mainWidget;
     QWidget *_blank;
     QWidget *_chart;
