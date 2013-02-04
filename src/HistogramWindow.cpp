@@ -439,8 +439,17 @@ HistogramWindow::updateChart()
     powerHist->setWithZeros(showZeroes->isChecked() ? true : false);
     powerHist->setSumY(showSumY->currentIndex()== 0 ? true : false);
 
+    // Selected series
+    RideFile::SeriesType series = static_cast<RideFile::SeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
     // and which series to plot
-    powerHist->setSeries(static_cast<RideFile::SeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt()));
+    powerHist->setSeries(series);
+
+    // is data present for selected series
+    RideFile::SeriesType baseSeries = (series == RideFile::wattsKg) ? RideFile::watts : series;
+    if (rideItem() != NULL && rideItem()->ride()->isDataPresent(baseSeries))
+        setIsBlank(false);
+    else
+        setIsBlank(true);
 
     // Correct binWidth if not valid for the selected series
     if (binWidthLineEdit->text().toDouble()<powerHist->getDelta())
