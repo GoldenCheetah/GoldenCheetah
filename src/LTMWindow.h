@@ -93,6 +93,7 @@ class LTMWindow : public LTMPlotContainer
     Q_PROPERTY(int bin READ bin WRITE setBin USER true)
     Q_PROPERTY(bool shade READ shade WRITE setShade USER true)
     Q_PROPERTY(bool legend READ legend WRITE setLegend USER true)
+    Q_PROPERTY(bool events READ events WRITE setEvents USER true)
 #ifdef GC_HAVE_LUCENE
     Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
 #endif
@@ -120,6 +121,8 @@ class LTMWindow : public LTMPlotContainer
         void setShade(bool x) { ltmTool->shadeZones->setChecked(x); }
         bool legend() const { return ltmTool->showLegend->isChecked(); }
         void setLegend(bool x) { ltmTool->showLegend->setChecked(x); }
+        bool events() const { return ltmTool->showEvents->isChecked(); }
+        void setEvents(bool x) { ltmTool->showEvents->setChecked(x); }
 
         int useSelected() { return ltmTool->dateSetting->mode(); }
         void setUseSelected(int x) { ltmTool->dateSetting->setMode(x); }
@@ -155,6 +158,7 @@ class LTMWindow : public LTMPlotContainer
         void metricSelected();
         void groupBySelected(int);
         void shadeZonesClicked(int);
+        void showEventsClicked(int);
         void showLegendClicked(int);
         void chartSelected(int);
         void saveClicked();

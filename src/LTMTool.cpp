@@ -102,6 +102,9 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
     showLegend = new QCheckBox("Show Legend");
     basicsettingsLayout->addRow(new QLabel(""), showLegend);
 
+    showEvents = new QCheckBox("Show Events");
+    basicsettingsLayout->addRow(new QLabel(""), showEvents);
+
     // controls
     saveButton = new QPushButton(tr("Add"));
     manageButton = new QPushButton(tr("Manage"));
