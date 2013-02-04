@@ -193,9 +193,12 @@ HrPwWindow::rideSelected()
         return;
 
     RideItem *ride = myRideItem;
-    if (!ride || !ride->ride()) return;
-
-    setData(ride);
+    if (!ride || !ride->ride() || !ride->ride()->isDataPresent(RideFile::watts) || !ride->ride()->isDataPresent(RideFile::hr))
+        setIsBlank(true);
+    else {
+        setIsBlank(false);
+        setData(ride);
+    }
 }
 
 void
