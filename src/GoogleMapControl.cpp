@@ -52,26 +52,6 @@ GoogleMapControl::GoogleMapControl(MainWindow *mw) : GcChartWindow(mw), main(mw)
     webBridge = new WebBridge(mw, this);
 
     //
-    // Blank layout (no GPS data)
-    //
-    QVBoxLayout *blanklayout = new QVBoxLayout();
-    blanklayout->setAlignment(Qt::AlignCenter);
-    blanklayout->setContentsMargins(70,70,70,70);
-
-    QToolButton *blankImg = new QToolButton(this);
-    blankImg->setFocusPolicy(Qt::NoFocus);
-    blankImg->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    blankImg->setStyleSheet("QToolButton {text-align: left;color : blue;background: transparent}");
-
-    blankImg->setIcon(QPixmap(":/images/nogps.png"));
-    blankImg->setIconSize(QSize(475,610));
-
-    blanklayout->addStretch();
-    blanklayout->addWidget(blankImg);
-    blanklayout->addStretch();
-    setBlankLayout(blanklayout);
-
-    //
     // connects
     //
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
