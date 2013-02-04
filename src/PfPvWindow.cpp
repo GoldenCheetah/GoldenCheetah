@@ -161,8 +161,17 @@ PfPvWindow::rideSelected()
 
 
     RideItem *ride = myRideItem;
-    if (ride == current || !ride || !ride->ride())
+    if (ride == current)
         return;
+
+    if (!ride || !ride->ride() || !ride->ride()->isDataPresent(RideFile::watts) || !ride->ride()->isDataPresent(RideFile::cad)) {
+        setIsBlank(true);
+        current = NULL;
+        return;
+    }
+    else {
+        setIsBlank(false);
+    }
 
     pfPvPlot->setData(ride);
 
