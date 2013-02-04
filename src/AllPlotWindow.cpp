@@ -593,8 +593,11 @@ AllPlotWindow::rideSelected()
     // ignore if null, or manual / empty
     if (!ride || !ride->ride() || !ride->ride()->dataPoints().count()) {
         current = NULL;
+        setIsBlank(true);
         return;
     }
+    else
+        setIsBlank(false);
 
     // we already plotted it!
     if (ride == current && stale == false) return;
