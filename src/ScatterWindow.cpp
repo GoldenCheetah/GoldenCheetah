@@ -177,7 +177,14 @@ ScatterWindow::rideSelected()
 
     ride = myRideItem;
 
-    if (!ride || !ride->ride() || ride == current) return;
+    if (ride == current) return;
+
+    if (!ride || !ride->ride() || !ride->ride()->dataPoints().count()) {
+        current = NULL;
+        setIsBlank(true);
+        return;
+    } else
+        setIsBlank(false);
 
     current = ride;
 
@@ -271,6 +278,19 @@ ScatterWindow::setData()
     settings.ignore = ignore->isChecked();
     settings.gridlines = grid->isChecked();
     settings.frame = frame->isChecked();
+
+    /* Not a blank state ? Just no data and we can change series ?
+    if ((setting.x == MODEL_POWER || setting.y == MODEL_POWER ) && !ride->ride()->isDataPresent(RideFile::watts))
+        setIsBlank(true);
+    else if ((setting.x == MODEL_CADENCE || setting.y == MODEL_CADENCE ) && !ride->ride()->isDataPresent(RideFile::cad))
+        setIsBlank(true);
+    else if ((setting.x == MODEL_HEARTRATE || setting.y == MODEL_HEARTRATE ) && !ride->ride()->isDataPresent(RideFile::hr))
+        setIsBlank(true);
+    else if ((setting.x == MODEL_SPEED || setting.y == MODEL_SPEED ) && !ride->ride()->isDataPresent(RideFile::kph))
+        setIsBlank(true);
+    else
+        setIsBlank(false);
+    */
 
     // any intervals to plot?
     settings.intervals.clear();
