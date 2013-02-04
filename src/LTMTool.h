@@ -91,6 +91,7 @@ class LTMTool : public QWidget
         QComboBox *groupBy;
         QCheckBox *shadeZones;
         QCheckBox *showLegend;
+        QCheckBox *showEvents;
         QPushButton *saveButton;
         QPushButton *manageButton;
 

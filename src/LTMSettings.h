@@ -123,6 +123,7 @@ class LTMSettings {
         int groupBy;
         bool shadeZones;
         bool legend;
+        bool events;
         QList<MetricDetail> metrics;
         QList<SummaryMetrics> *data;
         QList<SummaryMetrics> *measures;

@@ -99,6 +99,7 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
     settings.data = NULL;
     settings.groupBy = LTM_DAY;
     settings.legend = ltmTool->showLegend->isChecked();
+    settings.events = ltmTool->showEvents->isChecked();
     settings.shadeZones = ltmTool->shadeZones->isChecked();
     cl->addWidget(ltmTool);
 
@@ -111,6 +112,7 @@ LTMWindow::LTMWindow(MainWindow *parent, bool useMetricUnits, const QDir &home) 
     connect(ltmTool->presetPicker, SIGNAL(currentIndexChanged(int)), this, SLOT(chartSelected(int)));
     connect(ltmTool->shadeZones, SIGNAL(stateChanged(int)), this, SLOT(shadeZonesClicked(int)));
     connect(ltmTool->showLegend, SIGNAL(stateChanged(int)), this, SLOT(showLegendClicked(int)));
+    connect(ltmTool->showEvents, SIGNAL(stateChanged(int)), this, SLOT(showEventsClicked(int)));
     connect(ltmTool, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
     connect(ltmTool, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
     connect(ltmTool, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
@@ -324,6 +326,13 @@ void
 LTMWindow::showLegendClicked(int state)
 {
     settings.legend = state;
+    refreshPlot();
+}
+
+void
+LTMWindow::showEventsClicked(int state)
+{
+    settings.events = state;
     refreshPlot();
 }
 
