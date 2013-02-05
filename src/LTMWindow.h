@@ -43,6 +43,8 @@ class QwtPlotZoomer;
 #include <qwt_picker_machine.h>
 #include <qwt_compat.h>
 
+#include "qxtstringspinbox.h" // for reveal control groupby selection
+
 // track the cursor and display the value for the chosen axis
 class LTMToolTip : public QwtPlotPicker
 {
@@ -75,16 +77,7 @@ class LTMToolTip : public QwtPlotPicker
     QString tip;
 };
 
-class LTMPlotContainer : public GcWindow
-{
-    public:
-        LTMPlotContainer(QWidget *parent) : GcWindow(parent) {}
-        virtual LTMToolTip *toolTip() = 0;
-        virtual void pointClicked(QwtPlotCurve *, int) = 0;
-        MainWindow *main;
-};
-
-class LTMWindow : public LTMPlotContainer
+class LTMWindow : public GcChartWindow
 {
     Q_OBJECT
     G_OBJECT
@@ -112,11 +105,17 @@ class LTMWindow : public LTMPlotContainer
         ~LTMWindow();
         LTMToolTip *toolTip() { return picker; }
 
+        // reveal
+        bool hasReveal() { return true; }
+
+        // used by children
+        MainWindow *main;
+
         // get/set properties
         int chart() const { return ltmTool->presetPicker->currentIndex(); }
         void setChart(int x) { ltmTool->presetPicker->setCurrentIndex(x); }
         int bin() const { return ltmTool->groupBy->currentIndex(); }
-        void setBin(int x) { ltmTool->groupBy->setCurrentIndex(x); }
+        void setBin(int x) { rGroupBy->setValue(x); ltmTool->groupBy->setCurrentIndex(x); }
         bool shade() const { return ltmTool->shadeZones->isChecked(); }
         void setShade(bool x) { ltmTool->shadeZones->setChecked(x); }
         bool legend() const { return ltmTool->showLegend->isChecked(); }
@@ -157,6 +156,7 @@ class LTMWindow : public LTMPlotContainer
         void filterChanged();
         void metricSelected();
         void groupBySelected(int);
+        void rGroupBySelected(int);
         void shadeZonesClicked(int);
         void showEventsClicked(int);
         void showLegendClicked(int);
@@ -200,6 +200,11 @@ class LTMWindow : public LTMPlotContainer
         LTMPlot *ltmPlot;
         QwtPlotZoomer *ltmZoomer;
         LTMTool *ltmTool;
+
+        // reveal controls
+        QxtStringSpinBox    *rGroupBy;
+        QCheckBox           *rShade,
+                            *rEvents;
 };
 
 #endif // _GC_LTMWindow_h
