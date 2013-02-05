@@ -38,7 +38,7 @@ void GcWindow::setControls(QWidget *x)
 
     if (x != NULL) {
         menu->clear();
-        menu->addAction(tr("Chart Settings"), this, SIGNAL(showControls()));
+        menu->addAction(tr("All Chart Settings"), this, SIGNAL(showControls()));
         menu->addAction(tr("Close"), this, SLOT(_closeWindow()));
     }
 }
