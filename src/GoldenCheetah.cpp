@@ -743,10 +743,14 @@ GcChartWindow::GcChartWindow(QWidget *parent) : GcWindow(parent) {
     blankImg->setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::MinimumExpanding);
 
     blankImg->setIcon(QPixmap(":/images/gc-blank.png"));
-    blankImg->setIconSize(QSize(300,300)); //512
+    blankImg->setIconSize(QSize(200,200)); //512
 
     QLabel *blankLabel = new QLabel(tr("No data available"));
     blankLabel->setAlignment(Qt::AlignCenter);
+    QFont font;
+    font.setPointSize(font.pointSize() + 4);
+    font.setWeight(QFont::Bold);
+    blankLabel->setFont(font);
 
     _defaultBlankLayout->addStretch();
     _defaultBlankLayout->addWidget(blankImg);
