@@ -42,7 +42,7 @@
 
 static int supported_axes[] = { QwtPlot::yLeft, QwtPlot::yRight, QwtPlot::yLeft1, QwtPlot::yRight1, QwtPlot::yLeft2, QwtPlot::yRight2, QwtPlot::yLeft3, QwtPlot::yRight3 };
 
-LTMPlot::LTMPlot(LTMPlotContainer *parent, MainWindow *main, QDir home) : bg(NULL), parent(parent), main(main),
+LTMPlot::LTMPlot(LTMWindow *parent, MainWindow *main, QDir home) : bg(NULL), parent(parent), main(main),
                                                                    home(home), highlighter(NULL)
 {
     setInstanceName("Metric Plot");

@@ -109,6 +109,22 @@ public:
         WF_SENSORTYPE_GLUCOSE                        = 0x00020000,
         WF_SENSORTYPE_DISPLAY                        = 0x00800000  };
 
+    const QString sensorDescription(int id) const {
+        QString returning(tr("Unknown"));
+        switch (id) {
+        case 0x0 : returning = tr("None"); break;
+        case 0x1 : returning = tr("Power Meter"); break;
+        case 0x2 : returning = tr("Bike Speed"); break;
+        case 0x4 : returning = tr("Bike Cadence"); break;
+        case 0x8 : returning = tr("Speed and Cadence"); break;
+        case 0x10 : returning = tr("FootPod"); break;
+        case 0x20 : returning = tr("Heart Rate"); break;
+        case 0x800000 : returning = tr("RFKLT Display"); break;
+        }
+        return returning;
+    }
+
+
     // subtypes -- esp. power
     enum {
         WF_SENSOR_SUBTYPE_UNSPECIFIED                = 0,
