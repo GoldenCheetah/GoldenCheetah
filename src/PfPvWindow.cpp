@@ -24,6 +24,45 @@
 #include "Colors.h"
 #include <QtGui>
 
+#define PI M_PI
+
+PfPvDoubleClickPicker::PfPvDoubleClickPicker( PfPvPlot *plot):
+    QwtPlotPicker( plot->canvas() ), pfPvPlot(plot)
+{
+    setRubberBand(QwtPicker::CrossRubberBand);
+    setTrackerMode(QwtPicker::AlwaysOn);
+}
+
+void
+PfPvDoubleClickPicker::widgetMouseDoubleClickEvent( QMouseEvent *me )
+{
+    QPointF p1 = invTransform(me->pos());
+    QPoint p2 = pfPvTransform(p1);
+
+    // emit the itemMoved signal
+    Q_EMIT doubleClicked(p2.x(), p2.y());
+}
+
+QPoint
+PfPvDoubleClickPicker::pfPvTransform( const QPointF p ) const
+{
+    double cad = p.x() * 60.0 / pfPvPlot->getCL() / 2.0 / PI;
+    double watts = p.y() * cad * pfPvPlot->getCL()  * 2.0 * PI / 60.0;
+
+    return QPoint(cad , watts);
+}
+
+QwtText
+PfPvDoubleClickPicker::trackerTextF( const QPointF &pos ) const
+{
+    QPointF p = pfPvTransform(pos);
+
+    //text.sprintf( tr("%.2f m/s (%.0f rpm), %.2f N (%.0f watts)"), pos.x(), p.x(), pos.y(), p.y() );
+    QString text = QString(tr("%1 rpm, %2 watts")).arg(p.x()).arg(p.y());
+
+    return QwtText( text );
+}
+
 PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
     GcChartWindow(mainWindow), mainWindow(mainWindow), current(NULL)
 {
@@ -83,6 +122,9 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
     pfpvZoomer->setMousePattern(QwtEventPattern::MouseSelect1, Qt::LeftButton);
     pfpvZoomer->setMousePattern(QwtEventPattern::MouseSelect2, Qt::RightButton, Qt::ControlModifier);
     pfpvZoomer->setMousePattern(QwtEventPattern::MouseSelect3, Qt::RightButton);
+
+    // double click
+    doubleClickPicker = new PfPvDoubleClickPicker(pfPvPlot);
 
     // the controls
     QFormLayout *f = new QFormLayout;
@@ -146,6 +188,7 @@ PfPvWindow::PfPvWindow(MainWindow *mainWindow) :
     connect(rFrameInterval, SIGNAL(stateChanged(int)),
                 this, SLOT(setrFrameIntervalsPfPvFromCheckBox()));
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
+    connect(doubleClickPicker, SIGNAL(doubleClicked(int, int)), this, SLOT(doubleClicked(int, int)));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     connect(mainWindow, SIGNAL(intervalsChanged()), this, SLOT(intervalSelected()));
@@ -277,4 +320,11 @@ PfPvWindow::setQaCLFromLineEdit()
     pfPvPlot->replot();
 }
 
+void
+PfPvWindow::doubleClicked(int cad, int watts)
+{
+    pfPvPlot->setCP(watts);
+    pfPvPlot->setCAD(cad);
+    pfPvPlot->replot();
+}
 
