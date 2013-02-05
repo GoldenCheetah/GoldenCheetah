@@ -31,6 +31,7 @@ class EditorData;
 class CellDelegate;
 class RideModel;
 class FindDialog;
+class AnomalyDialog;
 class PasteSpecialDialog;
 
 class RideEditor : public GcWindow
@@ -40,6 +41,7 @@ class RideEditor : public GcWindow
 
 
     friend class ::FindDialog;
+    friend class ::AnomalyDialog;
     friend class ::PasteSpecialDialog;
     friend class ::CellDelegate;
 
@@ -76,7 +78,7 @@ class RideEditor : public GcWindow
         void undo();
         void redo();
         void find();
-        void check();
+        void anomalies();
 
         // anomaly list
         void anomalySelected();
@@ -92,6 +94,9 @@ class RideEditor : public GcWindow
         void paste();
         void pasteSpecial();
         void clear();
+
+        // need to hide find tool when we hide
+        void hideEvent(QHideEvent *event);
 
         // trap QTableView signals
         bool eventFilter(QObject *, QEvent *);
@@ -119,7 +124,7 @@ class RideEditor : public GcWindow
         RideFileTableModel *model;
         QStringList copyHeadings;
         FindDialog *findTool;
-        QTableWidget *anomalyList;
+        AnomalyDialog *anomalyTool;
 
     private:
         MainWindow *main;
@@ -192,6 +197,26 @@ private:
 
 };
 
+class AnomalyDialog : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+    public:
+        AnomalyDialog(RideEditor*);
+        ~AnomalyDialog();
+
+        void closeEvent(QCloseEvent*event);
+        QTableWidget *anomalyList;
+
+    public slots:
+        void reject();
+        void check();
+
+    private:
+        RideEditor *rideEditor;
+};
+
 //
 // Dialog for finding values across the ride
 //
@@ -206,6 +231,8 @@ class FindDialog : public QWidget
         FindDialog(RideEditor *);
         ~FindDialog();
 
+        void closeEvent(QCloseEvent* event);
+
     private slots:
         void find();
         void clear();
@@ -214,6 +241,7 @@ class FindDialog : public QWidget
         void dataChanged();
 
     public slots:
+        void reject();
         void rideSelected();
 
     private:
