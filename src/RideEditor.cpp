@@ -56,6 +56,7 @@ static void secsMsecs(double value, int &secs, int &msecs)
 RideEditor::RideEditor(MainWindow *main) : GcWindow(main), data(NULL), ride(NULL), main(main), inLUW(false), colMapper(NULL)
 {
     setInstanceName("Ride Editor");
+    setControls(NULL);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(0);
@@ -75,6 +76,7 @@ RideEditor::RideEditor(MainWindow *main) : GcWindow(main), data(NULL), ride(NULL
     toolbar = new QToolBar(this);
     toolbar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     toolbar->setFloatable(true);
+    toolbar->setIconSize(QSize(18,18));
     toolbar->setStyleSheet("background: white;"
                            "border: 0px;");
 
@@ -83,21 +85,7 @@ RideEditor::RideEditor(MainWindow *main) : GcWindow(main), data(NULL), ride(NULL
     connect(saveAct, SIGNAL(triggered()), this, SLOT(saveFile()));
     toolbar->addAction(saveAct);
 
-    //QIcon findIcon(":images/toolbar/search.png");
-    //searchAct = new QAction(findIcon, tr("Find"), this);
-    //connect(searchAct, SIGNAL(triggered()), this, SLOT(find()));
-    //toolbar->addAction(searchAct);
-
-    // *****************************************************
-    // REMOVED MANUALLY RUNNING A CHECK SINCE IT IS NOW
-    // PRETTY EFFICIENT AND UPDATES AUTOMATICALLY WHEN
-    // A COMMAND COMPLETES. IF THIS BECOMES TOO MUCH OF A
-    // PERFORMANCE OVERHEAD THEN WE CAN RE-ADD THIS
-    // *****************************************************
-    //QIcon checkIcon(":images/toolbar/splash green.png");
-    //checkAct = new QAction(checkIcon, tr("Check"), this);
-    //connect(checkAct, SIGNAL(triggered()), this, SLOT(check()));
-    //toolbar->addAction(checkAct);
+    toolbar->addSeparator();
 
     // undo and redo deliberately at a distance from the
     // save icon, since accidentally hitting the wrong
@@ -111,6 +99,18 @@ RideEditor::RideEditor(MainWindow *main) : GcWindow(main), data(NULL), ride(NULL
     redoAct = new QAction(redoIcon, tr("Redo"), this);
     connect(redoAct, SIGNAL(triggered()), this, SLOT(redo()));
     toolbar->addAction(redoAct);
+    
+    toolbar->addSeparator();
+
+    QIcon findIcon(":images/toolbar/search.png");
+    searchAct = new QAction(findIcon, tr("Find"), this);
+    connect(searchAct, SIGNAL(triggered()), this, SLOT(find()));
+    toolbar->addAction(searchAct);
+
+    QIcon checkIcon(":images/toolbar/splash green.png");
+    checkAct = new QAction(checkIcon, tr("Anomalies"), this);
+    connect(checkAct, SIGNAL(triggered()), this, SLOT(anomalies()));
+    toolbar->addAction(checkAct);
 
     // empty model
     model = new RideFileTableModel(NULL);
@@ -145,32 +145,12 @@ RideEditor::RideEditor(MainWindow *main) : GcWindow(main), data(NULL), ride(NULL
 
     // put find tool and anomaly list in the controls
     findTool = new FindDialog(this);
-
-    anomalyList = new QTableWidget(this);
-    anomalyList->setColumnCount(2);
-    anomalyList->setColumnHidden(0, true);
-    anomalyList->setSortingEnabled(false);
-    QStringList header;
-    header << "Id" << "Anomalies";
-    anomalyList->setHorizontalHeaderLabels(header);
-    anomalyList->horizontalHeader()->setStretchLastSection(true);
-    anomalyList->verticalHeader()->hide();
-    anomalyList->setShowGrid(false);
-    anomalyList->setSelectionMode(QAbstractItemView::SingleSelection);
-    anomalyList->setSelectionBehavior(QAbstractItemView::SelectRows);
-
-    QSplitter *controlSplitter = new QSplitter(Qt::Vertical, main);
-    controlSplitter->setHandleWidth(1);
-    //controlSplitter->setStyleSheet("background-color: white; border: none;");
-    controlSplitter->setFrameStyle(QFrame::NoFrame);
-    controlSplitter->setAutoFillBackground(true);
-    controlSplitter->setOrientation(Qt::Vertical);
-    controlSplitter->addWidget(findTool);
-    controlSplitter->addWidget(anomalyList);
-    setControls(controlSplitter);
+    findTool->hide();
+    anomalyTool = new AnomalyDialog(this);
+    anomalyTool->hide();
 
     // allow us to jump to an anomaly
-    connect(anomalyList, SIGNAL(itemSelectionChanged()), this, SLOT(anomalySelected()));
+    connect(anomalyTool->anomalyList, SIGNAL(itemSelectionChanged()), this, SLOT(anomalySelected()));
 }
 
 void
@@ -308,36 +288,48 @@ RideEditor::redo()
 }
 
 void
-RideEditor::find()
+RideEditor::hideEvent(QHideEvent *)
 {
-    // look for a value in a range and allow user to next/previous across
-    //RideEditorFindDialog finder(this, table);
-    //finder.exec();
-    //FindDialog *finder = new FindDialog(this);
-
-    // clear when a new ride is selected
-    //connect(main, SIGNAL(rideSelected()), finder, SLOT(clear()));
-    //finder->show();
+    findTool->hide();
+    anomalyTool->hide();
 }
 
 void
-RideEditor::check()
+RideEditor::find()
+{
+    // find only valid if we have data points to search across
+    if (ride && ride->ride() && ride->ride()->dataPoints().count())
+        findTool->show();
+}
+
+void
+RideEditor::anomalies()
+{
+    // show anomalies list .. hidden when tab changed or ride selected
+    if (ride && ride->ride() && ride->ride()->dataPoints().count())
+        anomalyTool->show();
+    
+}
+
+void
+AnomalyDialog::check()
 {
     // run through all the available channels and find anomalies
-    data->anomalies.clear();
+    rideEditor->data->anomalies.clear();
 
     // clear the list
     anomalyList->clear();
-    QStringList header;
-    header << "Id" << "Anomalies";
-    anomalyList->setHorizontalHeaderLabels(header);
+    //QStringList header;
+    //header << "Id" << "Anomalies";
+    //anomalyList->setHorizontalHeaderLabels(header);
+    anomalyList->horizontalHeader()->hide();
 
     QVector<double> power;
     QVector<double> secs;
     double lastdistance=9;
     int count = 0;
 
-    foreach (RideFilePoint *point, ride->ride()->dataPoints()) {
+    foreach (RideFilePoint *point, rideEditor->ride->ride()->dataPoints()) {
         power.append(point->watts);
         secs.append(point->secs);
 
@@ -346,15 +338,15 @@ RideEditor::check()
             // whilst we are here we might as well check for gaps in recording
             // anything bigger than a second is of a material concern
             // and we assume time always flows forward ;-)
-            double diff = secs[count] - (secs[count-1] + ride->ride()->recIntSecs());
+            double diff = secs[count] - (secs[count-1] + rideEditor->ride->ride()->recIntSecs());
             if (diff > (double)1.0 || diff < (double)-1.0 || secs[count] < secs[count-1]) {
-                data->anomalies.insert(xsstring(count, RideFile::secs),
+                rideEditor->data->anomalies.insert(xsstring(count, RideFile::secs),
                                        tr("Invalid recording gap"));
             }
 
             // and on the same theme what about distance going backwards?
             if (point->km < lastdistance)
-                data->anomalies.insert(xsstring(count, RideFile::km),
+                rideEditor->data->anomalies.insert(xsstring(count, RideFile::km),
                                        tr("Distance goes backwards."));
 
         }
@@ -362,27 +354,27 @@ RideEditor::check()
 
         // suspicious values
         if (point->cad > 150) {
-            data->anomalies.insert(xsstring(count, RideFile::cad),
+            rideEditor->data->anomalies.insert(xsstring(count, RideFile::cad),
                                    tr("Suspiciously high cadence"));
         }
         if (point->hr > 200) {
-            data->anomalies.insert(xsstring(count, RideFile::hr),
+            rideEditor->data->anomalies.insert(xsstring(count, RideFile::hr),
                                    tr("Suspiciously high heartrate"));
         }
         if (point->kph > 100) {
-            data->anomalies.insert(xsstring(count, RideFile::kph),
+            rideEditor->data->anomalies.insert(xsstring(count, RideFile::kph),
                                    tr("Suspiciously high speed"));
         }
         if (point->lat > 90 || point->lat < -90) {
-            data->anomalies.insert(xsstring(count, RideFile::lat),
+            rideEditor->data->anomalies.insert(xsstring(count, RideFile::lat),
                                    tr("Out of bounds value"));
         }
         if (point->lon > 180 || point->lon < -180) {
-            data->anomalies.insert(xsstring(count, RideFile::lon),
+            rideEditor->data->anomalies.insert(xsstring(count, RideFile::lon),
                                    tr("Out of bounds value"));
         }
-        if (ride->ride()->areDataPresent()->cad && point->nm && !point->cad) {
-            data->anomalies.insert(xsstring(count, RideFile::nm),
+        if (rideEditor->ride->ride()->areDataPresent()->cad && point->nm && !point->cad) {
+            rideEditor->data->anomalies.insert(xsstring(count, RideFile::nm),
                                    tr("Non-zero torque but zero cadence"));
 
         }
@@ -390,8 +382,8 @@ RideEditor::check()
     }
 
     // lets look at the Power Column if its there and has enough data
-    int column = model->headings().indexOf(tr("Power"));
-    if (column >= 0 && ride->ride()->dataPoints().count() >= 30) {
+    int column = rideEditor->model->headings().indexOf(tr("Power"));
+    if (column >= 0 && rideEditor->ride->ride()->dataPoints().count() >= 30) {
 
         // get spike config
         double max = appsettings->value(this, GC_DPFS_MAX, "1500").toDouble();
@@ -410,16 +402,16 @@ RideEditor::check()
             if (outliers->getYForRank(i) < max) continue;
 
             // which one is it
-            data->anomalies.insert(xsstring(outliers->getIndexForRank(i), RideFile::watts), tr("Data spike candidate"));
+            rideEditor->data->anomalies.insert(xsstring(outliers->getIndexForRank(i), RideFile::watts), tr("Data spike candidate"));
         }
     }
 
     // now fill in the anomaly list
     anomalyList->setRowCount(0); // <<< fixes crash at ZZZZ
-    anomalyList->setRowCount(data->anomalies.count()); // <<< ZZZZ
+    anomalyList->setRowCount(rideEditor->data->anomalies.count()); // <<< ZZZZ
 
     int counter = 0;
-    QMapIterator<QString,QString> f(data->anomalies);
+    QMapIterator<QString,QString> f(rideEditor->data->anomalies);
     while (f.hasNext()) {
 
         f.next();
@@ -442,7 +434,7 @@ RideEditor::check()
     // some may have been highlighted previouslt. This is
     // an expensive operation, but then so is the check()
     // function.
-    model->forceRedraw();
+    rideEditor->model->forceRedraw();
 }
 
 //----------------------------------------------------------------------
@@ -1150,6 +1142,9 @@ RideEditor::intervalSelected()
 void
 RideEditor::rideSelected()
 {
+    findTool->hide(); // hide the dialog!
+    anomalyTool->hide();
+
     RideItem *current = myRideItem;
     if (!current || !current->ride()) {
         model->setRide(NULL);
@@ -1195,7 +1190,7 @@ RideEditor::rideSelected()
     else undoAct->setEnabled(true);
 
     // look for anomalies
-    check();
+    anomalyTool->check();
 
     // update finder pane to show available channels
     findTool->rideSelected();
@@ -1204,12 +1199,12 @@ RideEditor::rideSelected()
 void
 RideEditor::anomalySelected()
 {
-    if (anomalyList->currentRow() < 0) return;
+    if (anomalyTool->anomalyList->currentRow() < 0) return;
 
     // jump to the found item in the main table
     int row;
     RideFile::SeriesType series;
-    unxsstring(anomalyList->item(anomalyList->currentRow(), 0)->text(), row, series);
+    unxsstring(anomalyTool->anomalyList->item(anomalyTool->anomalyList->currentRow(), 0)->text(), row, series);
     table->setCurrentIndex(model->index(row,model->columnFor(series)));
 }
 
@@ -1405,7 +1400,7 @@ RideEditor::endCommand(bool undo, RideCommand *cmd)
         default:
             break;
     }
-    if (!inLUW) check(); // refresh the anomalies...
+    if (!inLUW) anomalyTool->check(); // refresh the anomalies...
 }
 
 void
@@ -1583,9 +1578,9 @@ EditorData::insertRows(int row, int count)
 FindDialog::FindDialog(RideEditor *rideEditor) : rideEditor(rideEditor)
 {
     // setup the basic window settings; nonmodal, ontop and delete on close
-    //setWindowTitle("Search");
+    setWindowTitle("Search");
     //setAttribute(Qt::WA_DeleteOnClose);
-    //setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
+    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
 
     // create UI components
     QLabel *look = new QLabel(tr("Find values"), this);
@@ -1686,6 +1681,21 @@ FindDialog::typeChanged(int index)
         to->hide();
         andLabel->hide();
     }
+}
+
+// close doesnt really close, just hides
+void
+FindDialog::closeEvent(QCloseEvent* event)
+{
+    event->ignore();
+    rideSelected(); // reset the search...
+    hide();
+}
+
+void
+FindDialog::reject()
+{
+    hide();
 }
 
 void
@@ -2352,4 +2362,47 @@ PasteSpecialDialog::columnChanged()
         QString lookup = "colmap/" + sourceHeadings[column];
         appsettings->setValue(lookup, headings[column]);
     }
+}
+
+AnomalyDialog::AnomalyDialog(RideEditor *rideEditor) : rideEditor(rideEditor)
+{
+    // setup the basic window settings; nonmodal, ontop and delete on close
+    setWindowTitle("Anomalies");
+    //setAttribute(Qt::WA_DeleteOnClose);
+    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
+    QVBoxLayout *main = new QVBoxLayout(this);
+    main->setContentsMargins(0,0,0,0);
+    main->setSpacing(0);
+
+    anomalyList = new QTableWidget(this);
+    main->addWidget(anomalyList);
+    anomalyList->setColumnCount(2);
+    anomalyList->setColumnHidden(0, true);
+    anomalyList->setSortingEnabled(false);
+    QStringList header;
+    header << "Id" << "Anomalies";
+    anomalyList->setHorizontalHeaderLabels(header);
+    anomalyList->horizontalHeader()->setStretchLastSection(true);
+    anomalyList->verticalHeader()->hide();
+    anomalyList->setShowGrid(false);
+    anomalyList->setSelectionMode(QAbstractItemView::SingleSelection);
+    anomalyList->setSelectionBehavior(QAbstractItemView::SelectRows);
+}
+
+AnomalyDialog::~AnomalyDialog()
+{
+}
+
+// close doesnt really close, just hides
+void
+AnomalyDialog::closeEvent(QCloseEvent* event)
+{
+    event->ignore();
+    hide();
+}
+
+void
+AnomalyDialog::reject()
+{
+    hide();
 }
