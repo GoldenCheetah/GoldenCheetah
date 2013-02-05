@@ -324,7 +324,9 @@ void
 PfPvWindow::doubleClicked(int cad, int watts)
 {
     pfPvPlot->setCP(watts);
+    qaCPValue->setText(QString("%1").arg(watts));
     pfPvPlot->setCAD(cad);
+    qaCadValue->setText(QString("%1").arg(cad));
     pfPvPlot->replot();
 }
 
