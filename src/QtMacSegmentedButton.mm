@@ -48,6 +48,7 @@ static NSImage *fromQPixmap(const QPixmap &pixmap)
     NSImage *image = [[NSImage alloc] init];
     [image addRepresentation:bitmapRep];
     [image setTemplate:true];
+    [image retain];
     return image;
 }
 
@@ -102,7 +103,7 @@ QtMacSegmentedButton::QtMacSegmentedButton (int aCount, QWidget *aParent /* = 0 
     NSRect frame = [mNativeRef frame];
     resize (frame.size.width, frame.size.height);
     setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
-
+    [mNativeRef retain];
     setCocoaView (mNativeRef);
 }
 
