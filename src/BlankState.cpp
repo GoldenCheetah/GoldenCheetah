@@ -116,11 +116,11 @@ BlankStatePage::addToShortCuts(ShortCut shortCut)
     shortCutButton->setFocusPolicy(Qt::NoFocus);
     shortCutButton->setText(shortCut.buttonLabel);
     shortCutButton->setIcon(QPixmap(shortCut.buttonIconPath));
-    shortCutButton->setIconSize(QSize(60,60));
+    shortCutButton->setIconSize(QSize(40,40));
     //importButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     //importButton->setStyleSheet("QToolButton {text-align: left;color : blue;background: transparent}");
     shortCutButton->setStyleSheet("QPushButton {border-radius: 10px;border-style: outset; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #DDDDDD, stop: 1 #BBBBBB); border-width: 1px; border-color: #555555;} QPushButton:pressed {background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #BBBBBB, stop: 1 #999999);}");
-    shortCutButton->setFixedWidth(200);
+    shortCutButton->setFixedSize(200, 60);
     leftLayout->addWidget(shortCutButton);
 
     return shortCutButton;
@@ -225,7 +225,7 @@ BlankStateTrainPage::BlankStateTrainPage(MainWindow *main) : BlankStatePage(main
     // - find video and workouts
     scAddDevice.label = tr("Find and add training devices.");
     scAddDevice.buttonLabel = tr("Add device");
-    scAddDevice.buttonIconPath = ":images/mac/download.png";
+    scAddDevice.buttonIconPath = ":images/devices/kickr.png";
     QPushButton *addDeviceButton = addToShortCuts(scAddDevice);
     connect(addDeviceButton, SIGNAL(clicked()), main, SLOT(addDevice()));
 
