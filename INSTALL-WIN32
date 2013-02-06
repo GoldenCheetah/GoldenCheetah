@@ -69,7 +69,7 @@ Copy D:\Coding\GoldenCheetah\qwt\qwtconfig.pri.in
 Using the “Qt Command Prompt” window from before:
 
 cd d:\coding\GoldenCheetah
-qmake -win32
+qmake -win32 -recursive
 mingw32-make release
 
 Go back to checking your email or favourite web sites while this builds.
