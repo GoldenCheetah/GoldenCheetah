@@ -34,7 +34,7 @@ class FindDialog;
 class AnomalyDialog;
 class PasteSpecialDialog;
 
-class RideEditor : public GcWindow
+class RideEditor : public GcChartWindow
 {
     Q_OBJECT
     G_OBJECT

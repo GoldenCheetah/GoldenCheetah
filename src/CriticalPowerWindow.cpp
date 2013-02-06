@@ -234,8 +234,8 @@ CriticalPowerWindow::newRideAdded(RideItem *here)
 void
 CriticalPowerWindow::rideSelected()
 {
-    if (!amVisible())
-        return;
+    if (!amVisible()) return;
+
     currentRide = myRideItem;
     if (currentRide) {
         cpintPlot->calculate(currentRide);
@@ -244,6 +244,10 @@ CriticalPowerWindow::rideSelected()
         picker->setRubberBandPen(GColor(CPLOTTRACKER));
         cpintSetCPButton->setEnabled(cpintPlot->cp > 0);
         rCpintSetCPButton->setEnabled(cpintPlot->cp > 0);
+
+        setIsBlank(false);
+    } else if (!rangemode) {
+        setIsBlank(true);
     }
 }
 

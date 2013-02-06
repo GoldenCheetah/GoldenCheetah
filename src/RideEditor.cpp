@@ -53,14 +53,15 @@ static void secsMsecs(double value, int &secs, int &msecs)
     msecs = round((value - secs) * 100) * 10;
 }
 
-RideEditor::RideEditor(MainWindow *main) : GcWindow(main), data(NULL), ride(NULL), main(main), inLUW(false), colMapper(NULL)
+RideEditor::RideEditor(MainWindow *main) : GcChartWindow(main), data(NULL), ride(NULL), main(main), inLUW(false), colMapper(NULL)
 {
     setInstanceName("Ride Editor");
     setControls(NULL);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(2,0,2,2);
+    setChartLayout(mainLayout);
 
     //Left in the code to display a title, but
     //its a waste of screen estate, maybe uncomment
@@ -702,12 +703,9 @@ void
 RideEditor::delRow()
 {
     // run through the selected rows and zap them
-    bool changed = false;
     QList<QModelIndex> selection = table->selectionModel()->selection().indexes();
 
     if (selection.count() > 0) {
-
-        changed = true;
 
         // delete from table - we do in one hit since row-by-row is VERY slow
         ride->ride()->command->startLUW("Delete Rows");
@@ -722,12 +720,9 @@ void
 RideEditor::delColumn()
 {
     // run through the selected columns and "zap" them
-    bool changed = false;
     QList<QModelIndex> selection = table->selectionModel()->selection().indexes();
 
     if (selection.count() > 0) {
-
-        changed = true;
 
         // Delete each column by its SeriesType
         ride->ride()->command->startLUW("Delete Columns");
@@ -918,12 +913,9 @@ RideEditor::pasteSpecial()
 void
 RideEditor::clear()
 {
-    bool changed = false;
-
     // Set the selected cells to zero
     ride->ride()->command->startLUW("Clear cells");
     foreach (QModelIndex current, table->selectionModel()->selection().indexes()) {
-        changed = true;
         setModelValue(current.row(), current.column(), (double)0.0);
     }
     ride->ride()->command->endLUW();
@@ -1146,14 +1138,17 @@ RideEditor::rideSelected()
     anomalyTool->hide();
 
     RideItem *current = myRideItem;
-    if (!current || !current->ride()) {
+    if (!current || !current->ride() || !current->ride()->dataPoints().count()) {
         model->setRide(NULL);
         if (data) {
             delete data;
             data = NULL;
         }
+        setIsBlank(true);
         findTool->rideSelected();
         return;
+    } else {
+        setIsBlank(false);
     }
 
     ride = current;
