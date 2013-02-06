@@ -28,7 +28,7 @@
 #include "SummaryMetrics.h"
 
 
-class RideSummaryWindow : public GcWindow
+class RideSummaryWindow : public GcChartWindow
 {
     Q_OBJECT
     G_OBJECT

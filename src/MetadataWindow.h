@@ -23,7 +23,7 @@
 
 class MainWindow;
 
-class MetadataWindow : public GcWindow
+class MetadataWindow : public GcChartWindow
 {
     Q_OBJECT
     G_OBJECT

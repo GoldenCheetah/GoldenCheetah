@@ -33,7 +33,7 @@
 #include <math.h>
 
 RideSummaryWindow::RideSummaryWindow(MainWindow *mainWindow, bool ridesummary) :
-     GcWindow(mainWindow), mainWindow(mainWindow), ridesummary(ridesummary), useCustom(false), useToToday(false)
+     GcChartWindow(mainWindow), mainWindow(mainWindow), ridesummary(ridesummary), useCustom(false), useToToday(false)
 {
     setInstanceName("Ride Summary Window");
     setRideItem(NULL);
@@ -90,7 +90,7 @@ RideSummaryWindow::RideSummaryWindow(MainWindow *mainWindow, bool ridesummary) :
         connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
 
     }
-    setLayout(vlayout);
+    setChartLayout(vlayout);
 }
 
 void
@@ -111,7 +111,10 @@ RideSummaryWindow::rideItemChanged()
     if (_connected) { // in case it was set to null!
         connect (_connected, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
         // and now refresh
+        setIsBlank(false);
         refresh();
+    } else {
+        setIsBlank(true);
     }
 }
 

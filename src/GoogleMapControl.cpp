@@ -66,9 +66,14 @@ GoogleMapControl::GoogleMapControl(MainWindow *mw) : GcChartWindow(mw), main(mw)
 void
 GoogleMapControl::rideSelected()
 {
-    // skip display if data drawn or invalid
-    if (myRideItem == NULL || !amVisible()) return;
     RideItem * ride = myRideItem;
+
+    // set/unset blank then decide what to do next
+    if (!ride || !ride->ride() || !ride->ride()->dataPoints().count()) setIsBlank(true);
+    else setIsBlank(false);
+
+    // skip display if data already drawn or invalid
+    if (myRideItem == NULL || !amVisible()) return;
     if (ride == current || !ride || !ride->ride()) return;
     else current = ride;
 
