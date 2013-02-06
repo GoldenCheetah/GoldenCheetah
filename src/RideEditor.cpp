@@ -1140,10 +1140,6 @@ RideEditor::rideSelected()
     RideItem *current = myRideItem;
     if (!current || !current->ride() || !current->ride()->dataPoints().count()) {
         model->setRide(NULL);
-        if (data) {
-            delete data;
-            data = NULL;
-        }
         setIsBlank(true);
         findTool->rideSelected();
         return;
