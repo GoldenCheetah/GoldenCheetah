@@ -544,8 +544,6 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
     unsigned long julian, sincemidnight;
     WKO_UCHAR *goal=NULL, *notes=NULL, *code=NULL; // save location of WKO metadata
 
-    enum configtype lastchart;
-
     /* utility holders */
     WKO_ULONG num;
     WKO_ULONG ul;
@@ -790,13 +788,10 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
     num=0;
 
     while (charts) {     // keep parsing until we have no charts left
-        WKO_ULONG prev=0;
         enum configtype type=INVALID;
 
-        prev=num;
         p += donumber(p, &ul);
         num = ul;
-        lastchart = OTHER;
 
         // Each config section is preceded with
         // 0xff 0xff 0x01 0x00 
@@ -810,14 +805,14 @@ WkoParser::parseHeaderData(WKO_UCHAR *fb)
             p += us;
 
             /* What type? */
-            if (!strcmp(buf, "CRideSettingsConfig")) lastchart=type=CRIDESETTINGSCONFIG;
-            if (!strcmp(buf, "CRideGoalConfig")) lastchart=type=CRIDEGOALCONFIG;
-            if (!strcmp(buf, "CRideNotesConfig")) lastchart=type=CRIDENOTESCONFIG;
-            if (!strcmp(buf, "CDistributionChartConfig")) lastchart=type=CDISTRIBUTIONCHARTCONFIG;
-            if (!strcmp(buf, "CRideSummaryConfig")) lastchart=type=CRIDESUMMARYCONFIG;
-            if (!strcmp(buf, "CMeanMaxChartConfig"))lastchart=type=CMEANMAXCHARTCONFIG;
-            if (!strcmp(buf, "CMeanMaxChartCache")) lastchart=type=CMEANMAXCHARTCACHE;
-            if (!strcmp(buf, "CDistributionChartCache")) lastchart=type=CDISTRIBUTIONCHARTCACHE;
+            if (!strcmp(buf, "CRideSettingsConfig")) type=CRIDESETTINGSCONFIG;
+            if (!strcmp(buf, "CRideGoalConfig")) type=CRIDEGOALCONFIG;
+            if (!strcmp(buf, "CRideNotesConfig")) type=CRIDENOTESCONFIG;
+            if (!strcmp(buf, "CDistributionChartConfig")) type=CDISTRIBUTIONCHARTCONFIG;
+            if (!strcmp(buf, "CRideSummaryConfig")) type=CRIDESUMMARYCONFIG;
+            if (!strcmp(buf, "CMeanMaxChartConfig"))type=CMEANMAXCHARTCONFIG;
+            if (!strcmp(buf, "CMeanMaxChartCache")) type=CMEANMAXCHARTCACHE;
+            if (!strcmp(buf, "CDistributionChartCache")) type=CDISTRIBUTIONCHARTCACHE;
 
             if (type == CDISTRIBUTIONCHARTCACHE) {
 

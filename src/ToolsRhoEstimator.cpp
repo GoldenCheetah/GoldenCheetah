@@ -160,8 +160,7 @@ ToolsRhoEstimator::ToolsRhoEstimator(MainWindow *mainWindow, QWidget *parent) : 
   this->on_valueChanged(0.0);
 }
 
-void ToolsRhoEstimator::on_radio_toggled(bool checked) {
-  checked = true;  // hack to avoid the "unused parameter" g++ warning
+void ToolsRhoEstimator::on_radio_toggled(bool /* checked */) {
 
   if (impBut->isChecked()) {
     // we just changed from metric --> imperial, so relabel and do the

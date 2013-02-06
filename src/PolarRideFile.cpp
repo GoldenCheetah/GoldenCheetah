@@ -53,7 +53,6 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
     bool altitude = false;
     bool power = false;
     bool balance = false;
-    bool pedaling_index = false;
 
 
     int recInterval = 1;
@@ -153,8 +152,7 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
                         power = true;
                     if (smode.length()>3 && smode.at(4)=='1')
                         balance = true;
-                    if (smode.length()>4 && smode.at(5)=='1')
-                        pedaling_index = true;
+                    //if (smode.length()>4 && smode.at(5)=='1') pedaling_index = true;
 
 /*
 It appears that the Polar CS600 exports its data alays in metric when downloaded from the

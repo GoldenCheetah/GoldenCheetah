@@ -354,7 +354,6 @@ ScatterPlot::configChanged()
 {
     // setColors bg
     setCanvasBackground(GColor(CPLOTBACKGROUND));
-    QColor grid = GColor(CPLOTGRID);
 }
 
 void

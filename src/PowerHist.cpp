@@ -43,6 +43,7 @@
 #include "LTMCanvasPicker.h" // for tooltip
 
 PowerHist::PowerHist(MainWindow *mainWindow):
+    minX(0),
     rideItem(NULL),
     mainWindow(mainWindow),
     series(RideFile::watts),
@@ -52,7 +53,6 @@ PowerHist::PowerHist(MainWindow *mainWindow):
     binw(3),
     withz(true),
     dt(1),
-    minX(0),
     absolutetime(true),
     cache(NULL),
     source(Ride)

@@ -399,10 +399,8 @@ AddIntervalDialog::findFirsts(bool typeTime, const RideFile *ride, double window
     QList<const RideFilePoint*> window;
 
     // ride is shorter than the window size!
-    if (typeTime)
-        if (windowSize > ride->dataPoints().last()->secs + secsDelta) return;
-    else
-        if (windowSize > ride->dataPoints().last()->km*1000) return;
+    if (typeTime && windowSize > ride->dataPoints().last()->secs + secsDelta) return;
+    else if (windowSize > ride->dataPoints().last()->km*1000) return;
 
     double rest = 0;
     // We're looking for intervals with durations in [windowSizeSecs, windowSizeSecs + secsDelta).
@@ -521,10 +519,8 @@ AddIntervalDialog::findBests(bool typeTime, const RideFile *ride, double windowS
     QList<const RideFilePoint*> window;
 
     // ride is shorter than the window size!
-    if (typeTime)
-        if (windowSize > ride->dataPoints().last()->secs + secsDelta) return;
-    else
-        if (windowSize > ride->dataPoints().last()->km*1000) return;
+    if (typeTime && windowSize > ride->dataPoints().last()->secs + secsDelta) return;
+    else if (windowSize > ride->dataPoints().last()->km*1000) return;
 
     // We're looking for intervals with durations in [windowSizeSecs, windowSizeSecs + secsDelta).
     foreach (const RideFilePoint *point, ride->dataPoints()) {

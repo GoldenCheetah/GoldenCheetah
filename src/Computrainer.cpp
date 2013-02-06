@@ -430,13 +430,6 @@ int Computrainer::restart()
 
 int Computrainer::stop()
 {
-    int status;
-
-    // get current status
-    pvars.lock();
-    status = this->deviceStatus;
-    pvars.unlock();
-
     // what state are we in anyway?
     pvars.lock();
     deviceStatus = 0; // Terminate it!
@@ -491,11 +484,10 @@ void Computrainer::run()
     int ss1,ss2,ss3, buttons, type, value8, value12;
 
     // newly read values - compared against cached values
-    int changed;
     int newmode;
     double newload, newgradient;
     double newspeed, newRRC;
-    bool newcalibrated, newhrconnected, newcadconnected;
+    bool newhrconnected, newcadconnected;
     bool isDeviceOpen = false;
 
     // Cached current values
@@ -509,11 +501,9 @@ void Computrainer::run()
     double curCadence;                    // current cadence in RPM
     double curSpeed;                      // current speef in KPH
     double curRRC;                        // calibrated Rolling Resistance
-    bool curcalibrated;                   // is it calibrated?
     bool curhrconnected;                  // is HR sensor connected?
     bool curcadconnected;                 // is CAD sensor connected?
     int curButtons;                       // Button status
-    int curStatus;                        // Device status running, paused, disconnected
 
 
     // initialise local cache & main vars
@@ -528,7 +518,6 @@ void Computrainer::run()
     curSpeed = this->deviceSpeed = 0;
     curButtons = this->deviceButtons;
     curRRC = this->deviceRRC = 0;
-    curcalibrated = false;
     this->deviceCalibrated = false;
     curhrconnected = false;
     this->deviceHRConnected = false;
@@ -536,7 +525,6 @@ void Computrainer::run()
     this->deviceCADConnected = false;
     curButtons = 0;
     this->deviceButtons = 0;
-    curStatus = this->deviceStatus;
     pvars.unlock();
 
 
@@ -568,7 +556,6 @@ void Computrainer::run()
                 // UPDATE BASIC TELEMETRY (HR, CAD, SPD et al)
                 //----------------------------------------------------------------
 
-               changed = 0;
                unpackTelemetry(ss1, ss2, ss3, buttons, type, value8, value12);
 
                switch (type) {
@@ -578,8 +565,6 @@ void Computrainer::run()
                             pvars.lock();
                             this->deviceHeartRate = curHeartRate;
                             pvars.unlock();
-
-                            changed=1;
                         }
                         break;
 
@@ -589,8 +574,6 @@ void Computrainer::run()
                             pvars.lock();
                             this->devicePower = curPower;
                             pvars.unlock();
-
-                            changed=1;
                         }
                         break;
 
@@ -600,8 +583,6 @@ void Computrainer::run()
                             pvars.lock();
                             this->deviceCadence = curCadence;
                             pvars.unlock();
-
-                            changed=1;
                         }
                         break;
 
@@ -615,13 +596,11 @@ void Computrainer::run()
                             pvars.lock();
                             this->deviceSpeed = curSpeed = newspeed;
                             pvars.unlock();
-
-                            changed=1;
                         }
                         break;
 
                     case CT_RRC :
-                        newcalibrated = value12&2048 ? true : false;
+                        //newcalibrated = value12&2048 ? true : false;
                         newRRC = value12&~2048; // only use 11bits
                         newRRC /= 256;
 
@@ -629,8 +608,6 @@ void Computrainer::run()
                             pvars.lock();
                             this->deviceRRC = curRRC = newRRC;
                             pvars.unlock();
-
-                            changed=1;
                         }
                         break;
 
@@ -643,8 +620,6 @@ void Computrainer::run()
                             this->deviceHRConnected=curhrconnected=newhrconnected;
                             this->deviceCADConnected=curcadconnected=newcadconnected;
                             pvars.unlock();
-
-                            changed=1;
                         }
                         break;
 
