@@ -167,7 +167,6 @@ WeeklySummaryWindow::refresh()
     QDate wstart = ride->dateTime.date();
     wstart = wstart.addDays(Qt::Monday - wstart.dayOfWeek());
     assert(wstart.dayOfWeek() == Qt::Monday);
-    QDate wend = wstart.addDays(7);
 
     // weekly values
     QVector<double> time_in_zone; // max 10 zones supported

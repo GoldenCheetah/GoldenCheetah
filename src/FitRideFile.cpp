@@ -238,7 +238,6 @@ struct FitFileReaderState
     }
 
     void decodeEvent(const FitDefinition &def, int, const std::vector<fit_value_t> values) {
-        time_t time = 0;
         int event = -1;
         int event_type = -1;
         int i = 0;
@@ -249,7 +248,8 @@ struct FitFileReaderState
                 continue;
 
             switch (field.num) {
-                case 253: time = value + qbase_time.toTime_t(); break;
+                case 253: //time = value + qbase_time.toTime_t();
+                          break;
                 case 0: event = value; break;
                 case 1: event_type = value; break;
                 default: ; // do nothing
@@ -326,8 +326,8 @@ struct FitFileReaderState
         time_t time = 0;
         if (time_offset > 0)
             time = last_time + time_offset;
-        double alt = 0, cad = 0, km = 0, grade = 0, hr = 0, lat = 0, lng = 0, badgps = 0, lrbalance = 0;
-        double resistance = 0, kph = 0, temperature = RideFile::noTemp, time_from_course = 0, watts = 0;
+        double alt = 0, cad = 0, km = 0, hr = 0, lat = 0, lng = 0, badgps = 0, lrbalance = 0;
+        double kph = 0, temperature = RideFile::noTemp, watts = 0;
         fit_value_t lati = NA_VALUE, lngi = NA_VALUE;
         int i = 0;
         foreach(const FitField &field, def.fields) {
@@ -352,9 +352,12 @@ struct FitFileReaderState
                 case 6: kph = value * 3.6 / 1000.0; break;
                 case 7: watts = value; break;
                 case 8: break; // XXX packed speed/dist
-                case 9: grade = value / 100.0; break;
-                case 10: resistance = value; break;
-                case 11: time_from_course = value / 1000.0; break;
+                case 9: //grade = value / 100.0;
+                        break;
+                case 10: //resistance = value;
+                        break;
+                case 11: //time_from_course = value / 1000.0;
+                         break;
                 case 12: break; // XXX "cycle_length"
                 case 13: temperature = value; break;
                 case 30: lrbalance = (value & 0x80 ? 100 - (value & 0x7F) : value & 0x7F);break;

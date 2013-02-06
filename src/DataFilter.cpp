@@ -254,9 +254,9 @@ bool Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m)
 
     case Leaf::Operation : 
     {
-        double lhsdouble, rhsdouble;
+        double lhsdouble=0.00, rhsdouble=0.00;
         QString lhsstring, rhsstring;
-        bool lhsisNumber, rhsisNumber;
+        bool lhsisNumber=false, rhsisNumber=false;
 
         // GET LHS VALUE
         switch (leaf->lvalue.l->type) {

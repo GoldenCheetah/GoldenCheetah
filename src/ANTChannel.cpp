@@ -224,11 +224,9 @@ void ANTChannel::channelEvent(unsigned char *ant_message) {
 void ANTChannel::checkCinqo()
 {
 
-    int version_hi, version_lo, swab_version;
+    int version_hi, version_lo;
     version_hi=(product_version >> 8) &0xff;
     version_lo=(product_version & 0xff);
-
-    swab_version=version_lo | (version_hi<<8);
 
     if (!(mi.first_time_manufacturer || mi.first_time_product)) {
         if ((product_id == 1) && (manufacturer_id==7)) {

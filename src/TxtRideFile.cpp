@@ -70,6 +70,10 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     bool metric = true;   // are the values in metric or imperial?
     QDateTime startTime;  // parsed from filename
 
+    // just to quieten the compiler, since we don't seem to
+    // use the metric bool anywhere in the code at present
+    if (metric) { }
+
     // Lets make sure we can open the file
     if (!file.open(QFile::ReadOnly)) {
         errors << ("Could not open ride file: \"" + file.fileName() + "\"");

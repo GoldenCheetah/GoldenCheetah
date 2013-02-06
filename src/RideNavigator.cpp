@@ -324,7 +324,6 @@ void RideNavigator::setWidth(int x)
     // proportionally to fit into new
     // layout
     int setwidth=0;
-    int last=0;
     int newwidth=0;
     for (int i=1; i<tableView->header()->count(); i++) {
         if (tableView->header()->isSectionHidden(i) == false) {
@@ -334,7 +333,6 @@ void RideNavigator::setWidth(int x)
             if (columnName == "*") newwidth = 0;
             tableView->setColumnWidth(i, newwidth);
             setwidth += newwidth;
-            last = i;
         }
     }
 

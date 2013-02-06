@@ -32,7 +32,7 @@ static const int spikeMargin = 40;
 #include "Settings.h"
 #include "Units.h"
 
-GcBubble::GcBubble(MainWindow *parent) : QWidget(parent, Qt::FramelessWindowHint), borderWidth(3), mainWindow(parent), parent(parent), orientation(Qt::Horizontal)
+GcBubble::GcBubble(MainWindow *parent) : QWidget(parent, Qt::FramelessWindowHint), mainWindow(parent), borderWidth(3), parent(parent), orientation(Qt::Horizontal)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setAttribute(Qt::WA_TranslucentBackground);

@@ -64,13 +64,11 @@ void QuarqdClient::run()
 {
     qDebug() << "Starting thread...";
     int status; // control commands from controller
-    bool isPortOpen = false;
 
     Status = ANT_RUNNING;
     QString strBuf;
 
     openPort();
-    isPortOpen = true;
     elapsedTime.start();
 
     while(1)
@@ -286,13 +284,6 @@ QuarqdClient::pause()
 int
 QuarqdClient::stop()
 {
-    int status;
-
-    // get current status
-    pvars.lock();
-    status = this->Status;
-    pvars.unlock();
-
     // what state are we in anyway?
     pvars.lock();
     Status = 0; // Terminate it!
