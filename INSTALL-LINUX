@@ -83,7 +83,7 @@ Save and exit
 $ cd ..
 
 BUILD WITH BASIC CONFIGURATION
-$ qmake
+$ qmake -recursive
 $ make
 
 Congratulations you have now build a basic GoldenCheetah and can run this safely. See below for

@@ -207,13 +207,14 @@ And comment out line 320 (or thereabouts):
 
 Once this is done you can kick off the build:
 
-$ qmake
+$ cd .. #this should put you in the top level dir containing this file
+$ qmake -recursive
 $ make
 
 If make fails to find a Makefile then qmake is configured, by default, to create
 an xcode project file. You will need to change the qmake command above to tell it
 to create a makefile with the following:
-$ qmake -spec macx-g++
+$ qmake -spec macx-g++ -recursive
 $ make
 
 Once this completes you will have a GoldenCheetah.app in the src directory which
