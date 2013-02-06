@@ -1302,12 +1302,17 @@ void TrainTool::Calibrate()
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         main->notifyUnPause(); // get video started again, amongst other things
 
-        // back to ergo/slope mode
+        // back to ergo/slope mode and restore load/gradient
         if (status&RT_MODE_ERGO)
-            foreach(int dev, devices()) Devices[dev].controller->setMode(RT_MODE_ERGO);
+            foreach(int dev, devices()) {
+				Devices[dev].controller->setMode(RT_MODE_ERGO);
+				Devices[dev].controller->setLoad(load);
+			}
         else
-            foreach(int dev, devices()) Devices[dev].controller->setMode(RT_MODE_SPIN);
-
+            foreach(int dev, devices()) {
+				Devices[dev].controller->setMode(RT_MODE_SPIN);
+				Devices[dev].controller->setGradient(slope);
+			}
     } else {
 
         if (bar == NULL) {
