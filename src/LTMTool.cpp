@@ -477,7 +477,7 @@ LTMTool::LTMTool(MainWindow *parent, const QDir &home, bool multi) : QWidget(par
             MetricDetail metametric;
             metametric.type = METRIC_META;
             QString underscored = field.name;
-            metametric.symbol = underscored.replace(" ", "_"); //XXX other special chars!!!
+            metametric.symbol = underscored.replace(" ", "_");
             metametric.metric = NULL; // not a factory metric
             metametric.penColor = QColor(Qt::blue);
             metametric.curveStyle = QwtPlotCurve::Lines;

@@ -116,7 +116,7 @@ static QString unprotect(QString buffer)
     s.replace( "&#8482;", tm );
 
     // html special chars are automatically handled
-    // XXX other special characters will not work
+    // other special characters will not work
     // cross-platform but will work locally, so not a biggie
     // i.e. if thedefault charts.xml has a special character
     // in it it should be added here

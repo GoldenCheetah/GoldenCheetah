@@ -201,10 +201,13 @@ LTMPlot::setData(LTMSettings *set)
     // of a stack, when in fact its just bars of descending
     // order (with values aggregated)
 
-    // stack - first just get all curve data
-    stackX.clear();//XXX mem leak - need to delete the xdata and ydata
-    stackY.clear();//XXX mem leak - need to delete the xdata and ydata
+    // free stack memory
+    foreach(QVector<double>*p, stackX) delete p;
+    foreach(QVector<double>*q, stackY) delete q;
+    stackX.clear();
+    stackY.clear();
     stacks.clear();
+
     int r=0;
     foreach (MetricDetail metricDetail, settings->metrics) {
         if (metricDetail.stack == true) {
@@ -329,7 +332,7 @@ LTMPlot::setData(LTMSettings *set)
             current->setSymbol(new QwtSymbol(sym));
 
             // fudge for date ranges, not for time of day graph
-            // XXX FUDGE QWT's LACK OF A BAR CHART
+            // and fudge qwt'S lack of a decent bar chart
             // add a zero point at the head and tail so the
             // histogram columns look nice.
             // and shift all the x-values left by 0.5 so that
@@ -406,9 +409,6 @@ LTMPlot::setData(LTMSettings *set)
             createCurveData(settings, metricDetail, xdata, ydata, count);
         else
             createTODCurveData(settings, metricDetail, xdata, ydata, count);
-
-        // no data to plot!
-        // if (count <= 0) continue; //XXX
 
         // Create a curve
         QwtPlotCurve *current = new QwtPlotCurve(metricDetail.uname);
@@ -615,7 +615,7 @@ LTMPlot::setData(LTMSettings *set)
             current->setSymbol(new QwtSymbol(sym));
 
             // fudge for date ranges, not for time of day graph
-            // XXX FUDGE QWT's LACK OF A BAR CHART
+            // fudge qwt'S lack of a decent bar chart
             // add a zero point at the head and tail so the
             // histogram columns look nice.
             // and shift all the x-values left by 0.5 so that
@@ -1119,119 +1119,6 @@ LTMPlot::pointClicked(QwtPlotCurve *curve, int index)
     }
 }
 
-// start of date range selection
-void
-LTMPlot::pickerAppended(QPoint pos)
-{ Q_UNUSED( pos )
-#if 0 //XXX deprecating using the ltm plot to create a date range for now...
-
-    // ony work once we have a chart to do it on
-    if (settings == NULL || settings->groupBy == LTM_TOD) return;
-
-    // allow user to select a date range across the plot
-    if (highlighter) {
-        // detach and delete
-        highlighter->detach();
-        delete highlighter;
-    }
-    highlighter = new QwtPlotCurve("Date Selection");
-    double curveDataX[4]; // simple 4 point line
-    double curveDataY[4]; // simple 4 point line
-
-    // get x
-    int x = invTransform(xBottom, pos.x());
-
-    // trying to select a range on anull plot
-    if (maxY[yLeft] == 0) {
-        enableAxis(yLeft, true);
-        setAxisTitle(yLeft, tr("watts")); // as good as any
-        setAxisScale(yLeft, 0, 1000);
-        maxY[yLeft] = 1000;
-    }
-
-    // get min/max y
-    curveDataX[0]=x;
-    curveDataY[0]=minY[yLeft];
-    curveDataX[1]=x;
-    curveDataY[1]=maxY[yLeft];
-
-    // no right then down - updated by pickerMoved
-    curveDataX[2]=curveDataX[1];
-    curveDataY[2]=curveDataY[1];
-    curveDataX[3]=curveDataX[0];
-    curveDataY[3]=curveDataY[3];
-
-    // color
-    QColor ccol(GColor(CINTERVALHIGHLIGHTER));
-    ccol.setAlpha(64);
-    QPen cpen = QPen(ccol);
-    cpen.setWidth(1.0);
-    QBrush cbrush = QBrush(ccol);
-    highlighter->setPen(cpen);
-    highlighter->setBrush(cbrush);
-    highlighter->setStyle(QwtPlotCurve::Lines);
-
-    highlighter->setData(curveDataX,curveDataY, 4);
-
-    // axis etc
-    highlighter->setYAxis(QwtPlot::yLeft);
-    highlighter->attach(this);
-    highlighter->show();
-
-    // what is the start date?
-    LTMScaleDraw *lsd = new LTMScaleDraw(settings->start,
-                            groupForDate(settings->start.date(),
-                            settings->groupBy),
-                            settings->groupBy);
-    start = lsd->toDate((int)x);
-    end = start.addYears(10);
-    name = QString("%1 - ").arg(start.toString("d MMM yy"));
-    seasonid = settings->ltmTool->newSeason(name, start, end, Season::adhoc);
-
-    replot();
-#endif
-}
-
-// end of date range selection
-void
-LTMPlot::pickerMoved(QPoint pos)
-{ Q_UNUSED( pos )
-#if 0
-    if (settings == NULL || settings->groupBy == LTM_TOD) return;
-
-    // allow user to select a date range across the plot
-    double curveDataX[4]; // simple 4 point line
-    double curveDataY[4]; // simple 4 point line
-
-    // get x
-    int x = invTransform(xBottom, pos.x());
-
-    // update to reflect new x position
-    curveDataX[0]=highlighter->sample(0).x();
-    curveDataY[0]=highlighter->sample(0).y();
-    curveDataX[1]=highlighter->sample(0).x();
-    curveDataY[1]=highlighter->sample(1).y();
-    curveDataX[2]=x;
-    curveDataY[2]=curveDataY[1];
-    curveDataX[3]=x;
-    curveDataY[3]=curveDataY[3];
-
-    // what is the end date?
-    LTMScaleDraw *lsd = new LTMScaleDraw(settings->start,
-                            groupForDate(settings->start.date(),
-                            settings->groupBy),
-                            settings->groupBy);
-    end = lsd->toDate((int)x);
-    name = QString("%1 - %2").arg(start.toString("d MMM yy"))
-                             .arg(end.toString("d MMM yy"));
-    settings->ltmTool->updateSeason(seasonid, name, start, end, Season::adhoc);
-
-    // update and replot highlighter
-    highlighter->setData(curveDataX,curveDataY, 4);
-    replot();
-#endif
-}
-
 // aggregate curve data, adds w to a and
 // updates a directly. arrays MUST be of
 // equal dimensions
@@ -1242,13 +1129,6 @@ LTMPlot::aggregateCurves(QVector<double> &a, QVector<double>&w)
 
     // add them in!
     for(int i=0; i<a.size(); i++) a[i] += w[i];
-}
-
-void
-LTMPlot::changeValue(QwtPlotCurve*, int, double)
-{
-    // point moved, so emit signal with curve name, date and value
-    // XXX does nothing right now
 }
 
 /*----------------------------------------------------------------------
@@ -1285,17 +1165,10 @@ class LTMPlotBackground: public QwtPlotItem
         const Zones *zones       = parent->parent->main->zones();
         int zone_range_size     = parent->parent->main->zones()->getRangeSize();
 
-        //fprintf(stderr, "size: %d\n",zone_range_size);
         if (zone_range_size >= 0) { //parent->shadeZones() &&
             for (int i = 0; i < zone_range_size; i ++) {
             int zone_range = i;
-            //int zone_range = zones->whichRange(parent->settings->start.addDays((parent->settings->end.date().toJulianDay()-parent->settings->start.date().toJulianDay())/2).date()); // XXX Damien fixup
-
             int left = xMap.transform(parent->groupForDate(zones->getStartDate(zone_range), parent->settings->groupBy)- parent->groupForDate(parent->settings->start.date(), parent->settings->groupBy));
-
-            //fprintf(stderr, "%d left: %d\n",i,left);
-            //int right = xMap.transform(parent->groupForDate(zones->getEndDate(zone_range), parent->settings->groupBy)- parent->groupForDate(parent->settings->start.date(), parent->settings->groupBy));
-            //fprintf(stderr, "%d right: %d\n",i,right);
 
             /* The +50 pixels is for a QWT bug? cover the little gap on the right? */
             int right = xMap.transform(parent->maxX + 0.5) + 50;
@@ -1348,7 +1221,7 @@ class LTMPlotZoneLabel: public QwtPlotItem
 
             const Zones *zones       = parent->parent->main->zones();
             //int zone_range     = 0; //parent->parent->mainWindow->zoneRange();
-            int zone_range     = zones->whichRange(settings->start.addDays((settings->end.date().toJulianDay()-settings->start.date().toJulianDay())/2).date()); // XXX Damien Fixup
+            int zone_range     = zones->whichRange(settings->start.addDays((settings->end.date().toJulianDay()-settings->start.date().toJulianDay())/2).date());
 
             // which axis has watts?
             //setAxis(QwtPlot::xBottom, axisid);
