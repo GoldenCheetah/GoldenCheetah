@@ -24,10 +24,9 @@
 static NSImage *fromQPixmap(const QPixmap &pixmap)
 {
     NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithCGImage:pixmap.toMacCGImageRef()];
-    NSImage *image = [[NSImage alloc] init];
+    NSImage *image = [[[NSImage alloc] init] autorelease];
     [image addRepresentation:bitmapRep];
     [image setTemplate:true];
-    [image retain];
     return image;
 }
 
@@ -197,7 +196,7 @@ QtMacButton::QtMacButton(QWidget *parent, BezelStyle bezelStyle) : QWidget(paren
 {
     setContentsMargins(0,0,0,0);
 
-    NSButton *button = [[NSButton alloc] init];
+    NSButton *button = [[[NSButton alloc] init] autorelease];
     qtw = new QtMacButtonWidget(this, button, bezelStyle);
 
     QtMacButtonTarget *target = [[QtMacButtonTarget alloc] init];
@@ -206,7 +205,6 @@ QtMacButton::QtMacButton(QWidget *parent, BezelStyle bezelStyle) : QWidget(paren
 
     [button setAction:@selector(clicked)];
     setupLayout(button, this);
-    [button retain];
 }
 
 void QtMacButton::setWidth(int x)
@@ -240,7 +238,6 @@ void QtMacButton::setImage(const QPixmap &image)
         [qtw->nsButton setImage:fromQPixmap(image)];
         [qtw->nsButton setAlternateImage:fromQPixmap(image)];
         [qtw->nsButton setButtonType:NSMomentaryPushButton];
-        [qtw->nsButton retain];
     }
 }
 
