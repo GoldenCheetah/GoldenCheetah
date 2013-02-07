@@ -65,7 +65,7 @@
 #include <termios.h> // unix!!
 #include <unistd.h> // unix!!
 #include <sys/ioctl.h>
-#ifndef N_TTY // for OpenBSD, this is a hack XXX
+#ifndef N_TTY // for OpenBSD
 #define N_TTY 0
 #endif
 #endif
@@ -293,9 +293,9 @@ public slots:
 public:
 
     static int interpretSuffix(char c); // utility to convert e.g. 'c' to CHANNEL_TYPE_CADENCE
-    static const char *deviceTypeDescription(int type); // utility to convert CHANNEL_TYPE_XXX to human string
-    static char deviceTypeCode(int type); // utility to convert CHANNEL_TYPE_XXX to 'c', 'p' et al
-    static char deviceIdCode(int type); // utility to convert CHANNEL_TYPE_XXX to 'c', 'p' et al
+    static const char *deviceTypeDescription(int type); // utility to convert CHANNEL_TYPE_X to human string
+    static char deviceTypeCode(int type); // utility to convert CHANNEL_TYPE_X to 'c', 'p' et al
+    static char deviceIdCode(int type); // utility to convert CHANNEL_TYPE_X to 'c', 'p' et al
 
     // debug enums
     enum { DEBUG_LEVEL_ERRORS=1,
@@ -313,7 +313,6 @@ public:
     int removeDevice(int device_number, int channel_type);
     ANTChannel *findDevice(int device_number, int channel_type);
     int startWaitingSearch();
-    void report();
     void associateControlChannels();
 
     // transmission
