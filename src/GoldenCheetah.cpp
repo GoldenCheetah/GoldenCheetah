@@ -224,7 +224,6 @@ GcWindow::GcWindow(QWidget *parent) : QFrame(parent), dragState(None) {
 
 GcWindow::~GcWindow()
 {
-    //qDebug()<<"deleting.."<<property("title").toString()<<property("instanceName").toString()<<_type;
 }
 
 bool
@@ -232,7 +231,7 @@ GcWindow::amVisible()
 {
     // if we're hidden then say false!
     if (isHidden()) return false;
-    return true; // XXX need to sort this!!
+    return true;
 }
 
 
@@ -241,12 +240,7 @@ void
 GcWindow::paintEvent(QPaintEvent * /*event*/)
 {
     static QPixmap closeImage = QPixmap(":images/toolbar/popbutton.png");
-    static QPixmap aluBar = QPixmap(":images/aluBar.png");
-    static QPixmap aluBarDark = QPixmap(":images/aluBarDark.png");
-    static QPixmap aluLight = QPixmap(":images/aluLight.jpg");
-    static QPixmap carbon = QPixmap(":images/carbon.jpg");
     static QPalette defaultPalette;
-
 
     // setup a painter and the area to paint
     QPainter painter(this);
@@ -258,19 +252,8 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
 
         // fill in the title bar
         QRect bar(0,0,width(),contentsMargins().top());
-        //if (contentsMargins().top() < 25) {
-        //QColor bg;
-        //if (property("active").toBool() == true) {
-            //bg = GColor(CTILEBARSELECT);
-            //painter.drawPixmap(bar, aluBar);
-        //} else {
-            //bg = GColor(CTILEBAR);
-            //painter.drawPixmap(bar, aluBarDark);
-        //}
-        //} else {
-            painter.setPen(Qt::darkGray);
-            painter.drawRect(QRect(0,0,width()-1,height()-1));
-        //}
+        painter.setPen(Qt::darkGray);
+        painter.drawRect(QRect(0,0,width()-1,height()-1));
 
         // heading
         QFont font;
@@ -280,13 +263,6 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         QString subtitle = property("subtitle").toString();
         QString title = property("title").toString();
         QString heading = subtitle != "" ? subtitle : title;
-
-        // embossed...
-        //QRect shad = bar;
-        //shad.setY(bar.y()+2);
-        //shad.setX(bar.x()+2);
-        //painter.setPen(QColor(255,255,255,180));
-        //painter.drawText(shad, heading, Qt::AlignVCenter | Qt::AlignCenter);
 
         // pen color needs to contrast to background color
         QColor bgColor = property("color").value<QColor>();
@@ -313,21 +289,16 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
 
             QPixmap sized = closeImage.scaled(QSize(contentsMargins().top()-6,
                                                     contentsMargins().top()-6));
-            //painter.drawPixmap(width()-3-sized.width(), 3, sized.width(), sized.height(), sized);
 
         } else {
             painter.setPen(Qt::darkGray);
-            //painter.drawRect(QRect(0,0,width()-1,height()-1)); //XXX pointless
         }
     } else {
         // is this a layout manager?
         // background light gray for now?
         QRect all(0,0,width(),height());
         if (property("isManager").toBool() == true) {
-            //painter.drawTiledPixmap(all, carbon);
             painter.fillRect(all, QColor("#B3B4BA"));
-        } else {
-            //painter.drawTiledPixmap(all, aluLight);
         }
     }
 }
@@ -372,12 +343,9 @@ GcWindow::mousePressEvent(QMouseEvent *e)
     // is it on the close icon?
     if (h == Close) {
         setDragState(None);
-        //hide();
-        //emit exit();
         return;
     } else if (h == Flip) {
         setDragState(None);
-        //flip();
     }
 
     // get current window state
@@ -426,7 +394,7 @@ GcWindow::spotHotSpot(QMouseEvent *e)
     int corner = 9;
     int borderWidth = 3;
 
-    // account for offset XXX map to GcWindow geom
+    // account for offset by mapping to GcWindow geom
     int _y = e->y();
     int _x = e->x();
     int _height = height();
@@ -464,7 +432,6 @@ GcWindow::mouseMoveEvent(QMouseEvent *e)
 
     default:
     case Move :
-        //move(oX + relx, oY + rely);
 #if QT_VERSION < 0x040700
         setCursor(Qt::ClosedHandCursor);
 #else
@@ -581,8 +548,6 @@ GcWindow::mouseMoveEvent(QMouseEvent *e)
 
     oX = pos().x();
     oY = pos().y();
-    //repaint();
-    //QApplication::processEvents(); // flicker...
 }
 
 void
@@ -645,7 +610,6 @@ GcWindow::setCursorShape(DragState d)
         setCursor(Qt::SizeBDiagCursor);
         break;
     case Move:
-        //setCursor(Qt::OpenHandCursor); //XXX sub widgets don't set the cursor...
         setCursor(Qt::ArrowCursor);
         break;
     default:
@@ -799,7 +763,6 @@ void GcChartWindow:: unreveal()
 {
     _unrevealAnim->start();
     _unrevealTimer->start(150);
-    //_revealControls->hide();
 }
 
 void GcChartWindow:: hideRevealControls()
