@@ -681,7 +681,10 @@ LTMTool::colorPicker()
     int index = allMetrics->indexOfChild(activeMetric);
     QColorDialog picker(main);
     picker.setCurrentColor(metrics[index].penColor);
-    QColor color = picker.getColor();
+
+    // don't use native dialog, since there is a nasty bug causing focus loss
+    // see https://bugreports.qt-project.org/browse/QTBUG-14889
+    QColor color = picker.getColor(metrics[index].penColor, this, tr("Choose Metric Color"), QColorDialog::DontUseNativeDialog);
 
     // if we got a good color use it and notify others
     if (color.isValid()) {
@@ -905,7 +908,10 @@ EditMetricDetailDialog::colorClicked()
 {
     QColorDialog picker(mainWindow);
     picker.setCurrentColor(penColor);
-    QColor color = picker.getColor();
+
+    // don't use native dialog, since there is a nasty bug causing focus loss
+    // see https://bugreports.qt-project.org/browse/QTBUG-14889
+    QColor color = picker.getColor(metricDetail->penColor, this, tr("Choose Metric Color"), QColorDialog::DontUseNativeDialog);
 
     if (color.isValid()) {
         setButtonIcon(penColor=color);
