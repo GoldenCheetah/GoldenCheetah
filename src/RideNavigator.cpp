@@ -44,7 +44,6 @@ RideNavigator::RideNavigator(MainWindow *parent, bool mainwindow) : main(parent)
 
     sqlModel = new QSqlTableModel(this, main->metricDB->db()->connection());
     sqlModel->setTable("metrics");
-    //sqlModel->setSort(2, Qt::AscendingOrder); // date backwards
     sqlModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
     sqlModel->select();
     while (sqlModel->canFetchMore(QModelIndex())) sqlModel->fetchMore(QModelIndex());
@@ -58,7 +57,6 @@ RideNavigator::RideNavigator(MainWindow *parent, bool mainwindow) : main(parent)
     sortModel = new BUGFIXQSortFilterProxyModel(this);
     sortModel->setSourceModel(groupByModel);
     sortModel->setDynamicSortFilter(true);
-    //sortModel->setSort(2, Qt::AscendingOrder); // date backwards
 
 #ifdef GC_HAVE_LUCENE
     if (!mainwindow) {
@@ -77,31 +75,20 @@ RideNavigator::RideNavigator(MainWindow *parent, bool mainwindow) : main(parent)
     tableView->setEditTriggers(QAbstractItemView::NoEditTriggers); // read-only
     mainLayout->addWidget(tableView);
     tableView->expandAll();
-    //XXXtableView->horizontalScrollBar()->setDisabled(true);
-    //XXXtableView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     tableView->header()->setCascadingSectionResizes(true); // easier to resize this way
     tableView->setContextMenuPolicy(Qt::CustomContextMenu);
     tableView->header()->setStretchLastSection(false);
     tableView->header()->setMinimumSectionSize(0);
     tableView->header()->setFocusPolicy(Qt::NoFocus);
-    //tableView->header()->setHighlightSections(false);
 #ifdef Q_OS_MAC
     tableView->header()->setSortIndicatorShown(false); // blue looks nasty
     tableView->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
-    //tableView->setUniformRowHeights(true);
     tableView->installEventFilter(this);
     tableView->viewport()->installEventFilter(this);
     tableView->setMouseTracking(true);
     tableView->setFrameStyle(QFrame::NoFrame);
 
-#if 0
-    tableView->header()->setStyleSheet( "::section { background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-                                        "stop: 0 #CFCFCF, stop: 1.0 #AEAFB1);"
-                                        "border: 2px; border-color: #AEAFB1; "
-                                        "color: #535353;"
-                                        "font-weight: bold; }");
-#endif
     // good to go
     tableView->show();
     resetView();
@@ -339,7 +326,6 @@ void RideNavigator::setWidth(int x)
     // UGH. Now account for the fact that the smaller columns
     //      didn't take their fair share of a negative resize
     //      so we need to snip off from the larger columns.
-    // XXX this is a hack, we should use stretch factors...
     if (setwidth != x) {
         // how many columns we got to snip from?
         int colsleft = 0;
@@ -359,7 +345,6 @@ void RideNavigator::setWidth(int x)
         }
     }
 
-    //tableView->setColumnWidth(last, newwidth + (x-setwidth)); // account for rounding errors
     if (setwidth < x)
         delegate->setWidth(pwidth=setwidth);
     else
@@ -372,7 +357,6 @@ void RideNavigator::setWidth(int x)
 void
 RideNavigator::showEvent(QShowEvent *)
 {
-    //resetView();//XXX cocks up on sidebar?
     init = true;
     setWidth(geometry().width());
 }
@@ -433,8 +417,6 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
     {
         case QEvent::ContextMenu:
         {
-            //ColumnChooser *selector = new ColumnChooser(logicalHeadings);
-            //selector->show();
             borderMenu(((QMouseEvent *)e)->pos());
             return true; // I'll take that thanks
             break;
@@ -694,8 +676,6 @@ GroupByModel::initGroupRanges()
 static bool _initGroupRanges = false;
 
 // Perhaps a groupName function on the metrics would be useful
-// or maybe mix zoning into them... XXX todo
-//
 QString
 GroupByModel::groupFromValue(QString headingName, QString value, double rank, double count) const
 {
@@ -751,21 +731,7 @@ GroupByModel::groupFromValue(QString headingName, QString value, double rank, do
             else {
                 return dateTime.toString("yyyy-MM (MMMM)");
             }
-        } /*else if (headingName == tr("Time")) {
-
-            // get the date from value string
-            QDateTime dateTime = QDateTime::fromString(value, Qt::ISODate);
-
-            if (dateTime.time().hour()>=6 && dateTime.time().hour()<13)
-                return "Morning";
-            else if (dateTime.time().hour()>=13 && dateTime.time().hour()<16)
-                return "Afternoon";
-            else if (dateTime.time().hour()>=16 && dateTime.time().hour()<21)
-                return "Evening";
-            else {
-                return "Night";
-            }
-        }*/
+        }
 
         // not a metric, i.e. metadata
         return value;
@@ -820,8 +786,7 @@ void
 RideNavigator::selectRow()
 {
     // this is fugly and either a bug in QtreeView sorting
-    // or a bug in our QAbstractProxyModel. I suspect the
-    // latter. XXX fixme
+    // or a bug in our QAbstractProxyModel.
     rideTreeSelectionChanged(); // reset from ridelist
 }
 
@@ -854,7 +819,6 @@ RideNavigator::rideTreeSelectionChanged()
                     QItemSelection row(tableView->model()->index(j,0,group),
                                        tableView->model()->index(j,tableView->model()->columnCount()-1, group));
                     tableView->selectionModel()->select(row, QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
-                    //tableView->selectionModel()->setCurrentIndex(tableView->model()->index(j,0,group), QItemSelectionModel::NoUpdate);
                     tableView->selectionModel()->setCurrentIndex(tableView->model()->index(j,0,group), QItemSelectionModel::NoUpdate);
                     tableView->scrollTo(tableView->model()->index(j,3,group), QAbstractItemView::PositionAtCenter);
                     active = false;
@@ -908,10 +872,6 @@ QSize NavigatorCellDelegate::sizeHint(const QStyleOptionViewItem & /*option*/, c
         rideNavigator->groupByModel->data(rideNavigator->sortModel->mapToSource(index), Qt::UserRole).toString() != "") {
         s.setHeight((rideNavigator->fontHeight+2) * 3);
     } else s.setHeight(rideNavigator->fontHeight + 2);
-#if 0
-    if (rideNavigator->tableView->model()->data(index, Qt::UserRole).toString() != "") s.setHeight(18);
-    else s.setHeight(36);
-#endif
     return s;
 }
 
@@ -1010,13 +970,10 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             myOption.rect.setHeight(rideNavigator->fontHeight * 2); //was 36
             myOption.font.setPointSize(myOption.font.pointSize());
             myOption.font.setWeight(QFont::Normal);
-            //myOption.font.setStyle(QFont::StyleItalic);
             painter->fillRect(myOption.rect, background);
-            //drawFocus(painter, myOption, myOption.rect);
             drawDisplay(painter, myOption, myOption.rect, "");
             myOption.rect.setX(10); // wider notes display
             myOption.rect.setWidth(pwidth-20);// wider notes display
-            //drawDisplay(painter, myOption, myOption.rect, calendarText);
             painter->setFont(myOption.font);
             QPen isColor = painter->pen();
             if (isColor.color() == Qt::black) painter->setPen(Qt::darkGray);
@@ -1032,21 +989,9 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             myOption.rect.setHeight(rideNavigator->fontHeight + 2);
             myOption.rect.setWidth(rideNavigator->pwidth);
             painter->fillRect(myOption.rect, GColor(CRIDEGROUP));
-#if 0
-            painter->drawLine(0,myOption.rect.y()+myOption.rect.height()-1,rideNavigator->pwidth,myOption.rect.y()+myOption.rect.height()-1);
-#endif
-            //drawFocus(painter, myOption, myOption.rect);
-            //myOption.font.setPointSize(10);
-            //myOption.font.setWeight(QFont::Bold);
-            //painter->drawText(myOption.rect, Qt::AlignLeft | Qt::AlignVCenter, value);
         }
         drawDisplay(painter, myOption, myOption.rect, value);
     }
-
-
-#if 0
-    QStyledItemDelegate::paint(painter, option, index);
-#endif
 }
 
 ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
@@ -1091,7 +1036,6 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
             x = 0;
         }
     }
-    //QSignalMapper *clicked;
 }
 
 void
