@@ -82,7 +82,10 @@ class LTMWindow : public GcChartWindow
     Q_OBJECT
     G_OBJECT
 
-    Q_PROPERTY(int chart READ chart WRITE setChart USER true) //XXX hack for now (chart list can change!)
+    Q_PROPERTY(int chart READ chart WRITE setChart USER true) // adding/deleting charts will cause this index to fail
+                                                              // not a big issue since the preset is APPLIED when it is
+                                                              // selected. We don't really need to remember what was used
+                                                              // but it may be helpful to some users
     Q_PROPERTY(int bin READ bin WRITE setBin USER true)
     Q_PROPERTY(bool shade READ shade WRITE setShade USER true)
     Q_PROPERTY(bool legend READ legend WRITE setLegend USER true)

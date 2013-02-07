@@ -53,9 +53,6 @@ class LTMPlot : public QwtPlot
     public slots:
         void pointHover(QwtPlotCurve*, int);
         void pointClicked(QwtPlotCurve*, int); // point clicked
-        void changeValue(QwtPlotCurve*, int, double); // point moved
-        void pickerMoved(QPoint);
-        void pickerAppended(QPoint);
         void configUpdate();
 
     protected:

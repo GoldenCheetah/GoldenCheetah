@@ -220,10 +220,7 @@ LTMSidebar::resetSeasons()
     }
 
     // get current back!
-    if (now != "") ; //XXX 
-    else {
-        allDateRanges->child(0)->setSelected(true); // just select first child
-    }
+    if (now == "") allDateRanges->child(0)->setSelected(true); // just select first child
     active = false;
 }
 
@@ -334,14 +331,6 @@ LTMSidebar::eventPopup(QPoint pos)
 
     // execute the menu
     menu.exec(eventTree->mapToGlobal(pos));
-}
-
-void
-LTMSidebar::renameRange() //XXX deprecated
-{
-    // go edit the name
-    activeDateRange->setFlags(activeDateRange->flags() | Qt::ItemIsEditable);
-    dateRangeTree->editItem(activeDateRange, 0);
 }
 
 void
@@ -568,7 +557,7 @@ LTMSidebar::setSummary(DateRange dateRange)
                               "<body>"
                               "<center>");
 
-        for (int i=0; i<4; i++) { //XXX taken out maximums -- too much info -- looks ugly
+        for (int i=0; i<4; i++) {
 
             QString aggname;
             QStringList list;
