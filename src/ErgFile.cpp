@@ -585,7 +585,8 @@ ErgFile::gradientAt(long x, int &lapnum)
             if (x>=Laps.at(i).x) lap += 1;
         }
         lapnum = lap;
-    }
+
+    } else lapnum = 0;
 
     // find right section of the file
     while (x < Points.at(leftPoint).x || x > Points.at(rightPoint).x) {
