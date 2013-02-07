@@ -639,7 +639,7 @@ AddPair::initializePage()
     if (signalMapper) delete signalMapper;
     wizard->controller = new ANTlocalController(NULL,NULL);
     dynamic_cast<ANTlocalController*>(wizard->controller)->setDevice(wizard->portSpec);
-    dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->setConfigurationMode(true); //XXX
+    dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->setConfigurationMode(true);
     wizard->controller->start();
     wizard->profile=""; // clear any thing thats there now
     signalMapper = new QSignalMapper(this);
@@ -867,7 +867,7 @@ qDebug()<<"found this many devices:"<<WFApi::getInstance()->deviceCount();
     if (signalMapper) delete signalMapper;
     wizard->controller = new ANTlocalController(NULL,NULL);
     dynamic_cast<ANTlocalController*>(wizard->controller)->setDevice(wizard->portSpec);
-    dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->setConfigurationMode(true); //XXX
+    dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->setConfigurationMode(true);
     wizard->controller->start();
     wizard->profile=""; // clear any thing thats there now
     signalMapper = new QSignalMapper(this);
@@ -1084,9 +1084,9 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     QFormLayout *form2layout = new QFormLayout;
     form2layout->addRow(new QLabel("Virtual", this), (virtualPower=new QComboBox(this)));
     form2layout->addRow(new QLabel("Wheel Size", this), (wheelSize=new QComboBox(this)));
-    // XXX NOTE: THESE MUST CORRESPOND TO THE CODE
-    //           IN RealtimeController.cpp WHICH
-    //           POST-PROCESSES INBOUND TELEMETRY
+
+    // NOTE: These must correspond to the code in RealtimeController.cpp that
+    //       post-processes inbound telemetry.
     virtualPower->addItem("None");
     virtualPower->addItem("Power - Kurt Kinetic Cyclone");
     virtualPower->addItem("Power - Kurt Kinetic Road Machine");
