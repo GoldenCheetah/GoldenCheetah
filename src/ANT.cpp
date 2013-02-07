@@ -361,7 +361,6 @@ ANT::addDevice(int device_number, int device_type, int channel_number)
             if (((antChannel[i]->channel_type & 0xf ) == device_type) &&
                 (antChannel[i]->device_number == device_number)) {
                 // send the channel found...
-                //XXX antChannel[i]->channelInfo();
                 return 1;
             }
         }
@@ -460,14 +459,6 @@ ANT::startWaitingSearch()
 }
 
 void
-ANT::report()
-{
-    for (int i=0; i<channels; i++)
-        //XXX antChannel[i]->channelInfo();
-        ;
-}
-
-void
 ANT::associateControlChannels() {
 
     // first, unassociate all control channels
@@ -529,9 +520,9 @@ ANT::discover(QString name)
 
     // All we can do for USB1 sticks is see if the cp210x driver module
     // is loaded for this device, and if it is, we will use the device
-    // XXX need a better way of probing this device, but USB1 sticks
-    //     are getting rarer, so maybe we can just make do with this
-    //     until we deprecate them altogether
+    // they are getting rarer and rarer these days (no longer sold by
+    // Garmin anyway) so no need to expend to much energy extending this
+    // especially since the Linux user community is relatively small.
     struct stat s;
     if (stat(name.toLatin1(), &s) == -1) return false;
     int maj = major(s.st_rdev);
@@ -613,7 +604,8 @@ ANT::sendMessage(ANTMessage m) {
 
     rawWrite((uint8_t*)m.data, m.length);
 
-    // this padding is important, for some reason XXX find out why?
+    // this padding is important - do not remove it
+    // we need to be sure the message is at least 12 bytes
     rawWrite((uint8_t*)padding, 5);
 }
 
@@ -704,7 +696,6 @@ ANT::processMessage(void) {
         case ANT_CHANNEL_EVENT:
           switch (rxMessage[ANT_OFFSET_MESSAGE_CODE]) {
           case EVENT_TRANSFER_TX_FAILED:
-            //XXX remember last message ... ANT_SendAckMessage();
             break;
           case EVENT_TRANSFER_TX_COMPLETED:
             // fall through
@@ -946,7 +937,7 @@ int ANT::interpretSuffix(char c)
     return -1;
 }
 
-// convert ANT value to 'p' 'c' values // XXX this and below are named wrong, legacy from quarqd code.
+// convert ANT value to 'p' 'c' values
 char ANT::deviceIdCode(int type)
 {
     const ant_sensor_type_t *st=ant_sensor_types;

@@ -117,9 +117,6 @@ void ANTChannel::close()
 //
 // The main read loop is in ANT.cpp, it will pass us
 // the inbound message received for our channel.
-// XXX fix this up to re-use ANTMessage for decoding
-// all the inbound messages
-//
 void ANTChannel::receiveMessage(unsigned char *ant_message)
 {
     switch (ant_message[2]) {
@@ -139,7 +136,7 @@ void ANTChannel::receiveMessage(unsigned char *ant_message)
         burstData(ant_message);
         break;
     default:
-        break; //XXX should trap error here, but silently ignored for now
+        break; //errors silently ignored for now, would indicate hardware fault.
     }
 
     if (get_timestamp() > blanking_timestamp + timeout_blanking) {
@@ -153,8 +150,9 @@ void ANTChannel::receiveMessage(unsigned char *ant_message)
 
 
 // process a channel event message
-// XXX should re-use ANTMessage rather than
-// raw message data
+// would be good to refactor to use ANTMessage at some point
+// but not compelling reason to do so at this point and might
+// break existing code.
 void ANTChannel::channelEvent(unsigned char *ant_message) {
 
     unsigned char *message=ant_message+2;
@@ -192,8 +190,6 @@ void ANTChannel::channelEvent(unsigned char *ant_message) {
             parent->sendMessage(ANTMessage::unassignChannel(number));
         }
 
-        //XXX channel_manager_start_waiting_search(self->parent);
-
     } else if (MESSAGE_IS_EVENT_RX_FAIL(message)) {
 
         messages_dropped++;
@@ -210,13 +206,8 @@ void ANTChannel::channelEvent(unsigned char *ant_message) {
         exit(-10);
 
     } else if (MESSAGE_IS_EVENT_TRANSFER_TX_COMPLETED(message)) {
-
-        if (tx_ack_disposition) {} //XXX tx_ack_disposition();
-
-    } else {
-
-        // XXX not handled!
-    }
+        // do nothing
+    } 
 }
 
 // if this is a quarq cinqo then record that fact
@@ -235,7 +226,6 @@ void ANTChannel::checkCinqo()
 
             // are we an old-version or new-version cinqo?
             is_old_cinqo = ((version_hi <= 17) && (version_lo==10));
-            //XXX channel_manager_associate_control_channels(self->parent);
         }
     }
 }
@@ -247,7 +237,7 @@ void ANTChannel::sendCinqoSuccess() {}
 // We got a broadcast event -- this is where inbound
 // telemetry gets processed, and for many message types
 // we need to remember previous messages to look at the
-// deltas during the period XXX this needs fixing!
+// deltas during the period
 //
 void ANTChannel::broadcastEvent(unsigned char *ant_message)
 {
@@ -351,7 +341,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                             }
                             break;
 
-                        default: //XXX need to support Powertap/Quarq too!!
+                        default: 
                             break;
                     }
 
@@ -376,7 +366,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                         float cadence = 2000.0 * 60 * (antMessage.eventCount - lastMessage.eventCount) / period;
                         float power = 3.14159 * nm_torque * cadence / 30;
 
-                        // ignore the occassional spikes XXX is this a boundary error on event count ?
+                        // ignore the occassional spikes (reed switch)
                         if (power >= 0 && power < 2501 && cadence >=0 && cadence < 256) {
                             value2 = value = power;
                             is_alt ? parent->setAltWatts(power) : parent->setWatts(power);
@@ -386,8 +376,6 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                     } else {
 
                         nullCount++;
-                        //antMessage.type = 0; // we need a new data pair XXX bad!!!
-
                         if (nullCount >= 4) { // 4 messages on an SRM
                             value2 = value = 0;
                             is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
@@ -421,7 +409,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                     } else {
                         nullCount++;
 
-                        if (nullCount >= 4) { // 4 messages on Powertap ? XXX validate this
+                        if (nullCount >= 4) { // 4 messages on Powertap according to specs
                             parent->setWheelRpm(0);
                             value2 = value = 0;
                             is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
@@ -448,7 +436,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                         parent->setCadence(antMessage.instantCadence); // cadence
                     } else {
                        stdNullCount++;
-                       if (stdNullCount >= 6) { //XXX 6 for standard power?
+                       if (stdNullCount >= 6) { //6 for standard power according to specs
                            parent->setCadence(0);
                            is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
                            value2 = value = 0;
@@ -482,7 +470,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 
                     } else {
                         nullCount++;
-                        if (nullCount >= 4) { //XXX 4 on a quarq??? validate this
+                        if (nullCount >= 4) { // 4 on a quarq according to specs
                             parent->setCadence(0);
                             is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
                             value2 = value = 0;
@@ -491,7 +479,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 }
                 break;
 
-                default: // UNKNOWN POWER DEVICE? XXX Garmin (Metrigear) Vector????
+                default: // UNKNOWN
                     break;
             }
             break;
@@ -622,10 +610,6 @@ void ANTChannel::channelId(unsigned char *ant_message) {
         parent->sendMessage(ANTMessage::setSearchTimeout(number, (int)(timeout_lost/2.5)));
     }
     channel_type_flags &= ~CHANNEL_TYPE_QUICK_SEARCH;
-
-    //XXX channel_manager_start_waiting_search(self->parent);
-    // if we are quarq channel, hook up with the ant+ channel we are connected to
-    //XXX channel_manager_associate_control_channels(self->parent);
 }
 
 // get ready to burst
@@ -650,7 +634,7 @@ void ANTChannel::burstData(unsigned char *ant_message) {
     const unsigned char next_sequence[4]={1,2,3,1};
 
     if (seq!=rx_burst_next_sequence) {
-        // XXX handle errors
+        // we don't handle burst data at present.
     } else {
 
         int len=ant_message[ANT_OFFSET_LENGTH]-3;
@@ -666,7 +650,7 @@ void ANTChannel::burstData(unsigned char *ant_message) {
 
     if (last) {
         if (rx_burst_disposition) {
-          //XXX what does this do? rx_burst_disposition();
+          // we don't handle burst data at present.
         }
         burstInit();
     }
@@ -761,20 +745,7 @@ void ANTChannel::setTimeout(int seconds)
     parent->sendMessage(ANTMessage::setSearchTimeout(number, seconds/2.5));
 }
 
-#if 0 // ARE NOW SIGNALS
-// These should emit signals to notify the channel manager
-// but for now we just ignore XXX fix this
-void ANTChannel::searchComplete() {}
-void ANTChannel::searchTimeout() {}
-void ANTChannel::staleInfo() {}
-void ANTChannel::lostInfo() {}
-void ANTChannel::dropInfo() {}
-void ANTChannel::channelInfo() {}
-#endif
-
-//
-// Calibrate... XXX not used at present
-//
+// Calibrate... needs fixing in version 3.1
 // request the device on this channel calibrates itselt
 void ANTChannel::requestCalibrate() {
   parent->sendMessage(ANTMessage::requestCalibrate(number));

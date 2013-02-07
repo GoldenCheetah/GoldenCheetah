@@ -313,9 +313,9 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
             // the data page identifier tells us what to
             // expect, but USAGE DIFFERS BY DEVICE TYPE:
             //
-            // XXX at present we just extract the basic telemetry
+            //     at present we just extract the basic telemetry
             //     based upon device type, these pages need to be
-            //     supported in the next update
+            //     supported in the next update (possibly v3.1)
             //
             // HEARTRATE (high bit is used to indicate data changed)
             //           (every 65th message is a background data message)
@@ -372,7 +372,7 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                 break;
 
 /*
- * these are not supported at present! XXX
+ * these are not supported at present:
  * power         calibration_request None,channel,0x01,0xAA,None,None,None,None,None,None
  * power         srm_zero_response   None,channel,0x01,0x10,0x01,None,None,None,uint16_be:offset
  * power         calibration_pass    None,channel,0x01,0xAC,uint8:autozero_status,None,None,None,uint16_le:calibration_data
@@ -465,7 +465,7 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                             autoZeroStatus = message[6] & 0x02;
                             break;
 
-                        default: // XXX calib support for Quarq/PT
+                        default: 
                             break;
 
                     }
