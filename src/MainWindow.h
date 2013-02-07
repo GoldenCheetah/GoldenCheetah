@@ -195,6 +195,7 @@ class MainWindow : public QMainWindow
         void addIntervalForPowerPeaksForSecs(RideFile *ride, int windowSizeSecs, QString name);
         void findPowerPeaks();
         void splitRide();
+        void mergeRide();
         void deleteRide();
         void aboutDialog();
         void saveRide();                        // save current ride menu item

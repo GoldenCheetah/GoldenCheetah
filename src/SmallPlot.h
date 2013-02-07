@@ -26,6 +26,7 @@ class QwtPlotCurve;
 class QwtPlotGrid;
 class QwtPlotMarker;
 class RideItem;
+class RideFile;
 
 class SmallPlot : public QwtPlot
 {
@@ -37,7 +38,8 @@ class SmallPlot : public QwtPlot
 
 
         int smoothing() const { return smooth; }
-        void setData(RideItem *ride);
+        void setData(RideItem *rideItem);
+        void setData(RideFile *rideFile);
         void setAxisTitle(int axis, QString label);
         void recalc();
         void setYMax();
@@ -54,10 +56,12 @@ class SmallPlot : public QwtPlot
         QwtPlotGrid *grid;
         QwtPlotCurve *wattsCurve;
         QwtPlotCurve *hrCurve;
+        QwtPlotCurve *altCurve;
 
         QwtPlotMarker* d_mrk;
         QVector<double> hrArray;
         QVector<double> wattsArray;
+        QVector<double> altArray;
         QVector<double> timeArray;
         QVector<QwtPlotCurve*> timeCurves;
         int arrayLength;
