@@ -38,15 +38,10 @@ class HomeWindow : public GcWindow
     Q_OBJECT
     G_OBJECT
 
-    //Q_PROPERTY(int view READ view WRITE setView)
-
     public:
 
         HomeWindow(MainWindow *, QString name, QString title);
         ~HomeWindow();
-
-        //int view() const { return viewMode->currentIndex(); }
-        //void setView(int x) { viewMode->setCurrentIndex(x); }
 
         void resetLayout();
 
@@ -111,11 +106,7 @@ class HomeWindow : public GcWindow
         QLabel *title;
         QLineEdit *titleEdit;
 
-#if 0
-        QtMacSegmentedButton *styleSelector;
-#else
         QComboBox *styleSelector;
-#endif
         QStackedWidget *style; // tab, freeform, tiled
         QStackedWidget *controlStack; // window controls
 

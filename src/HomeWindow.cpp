@@ -67,66 +67,24 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     bigandbold.setWeight(QFont::Bold);
 
     QHBoxLayout *titleBar = new QHBoxLayout;
-#if 0
-    title = new QLabel(windowtitle, this);
-    title->setFont(bigandbold);
-    title->setStyleSheet("QLabel {"
-                           "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-                           "stop: 0 #FFFFFF, stop: 0.4 #DDDDDD,"
-                           "stop: 0.5 #D8D8D8, stop: 1.0 #CCCCCC);"
-                           "color: #535353;"
-                           "font-weight: bold; }");
 
-    QPalette mypalette;
-    mypalette.setColor(title->foregroundRole(), Qt::white);
-    title->setPalette(mypalette);
-#endif
-
-#if 0
-    static CocoaInitializer cocoaInitializer; // we only need one
-    styleSelector = new QtMacSegmentedButton (3, this);
-    styleSelector->setTitle(0, "Tab");
-    styleSelector->setTitle(1, "Scroll");
-    styleSelector->setTitle(2, "Tile");
-    styleSelector = new QComboBox(this);
-    styleSelector->addItem("Tab");
-    styleSelector->addItem("Scroll");
-    styleSelector->addItem("Tile");
-    QFont small;
-    small.setPointSize(8);
-    styleSelector->setFont(small);
-    styleSelector->setFixedHeight(20);
-#else
-    //styleSelector->hide(); //XXX hack whilst playing
     QLabel *space = new QLabel("", this);
     space->setFixedHeight(20);
     titleBar->addWidget(space);
-
-#endif
 
     style = new QStackedWidget(this);
     style->setAutoFillBackground(false);
     layout->setSpacing(0);
     layout->setContentsMargins(0,0,0,0);
-#if 0
-    titleBar->addStretch();
-    titleBar->addWidget(styleSelector);
-    layout->addLayout(titleBar);
-#endif
     layout->addWidget(style);
 
     QPalette palette;
-    //palette.setBrush(backgroundRole(), QBrush(QImage(":/images/carbon.jpg")));
     palette.setBrush(backgroundRole(), QColor("#B3B4B6"));
-    //setPalette(palette);
     setAutoFillBackground(false);
 
     // each style has its own container widget
     QWidget *tabArea = new QWidget(this);
     tabArea->setContentsMargins(20,20,20,20);
-    //tabArea->setAutoFillBackground(false);
-    //tabArea->setPalette(palette);
-    //tabArea->setFrameStyle(QFrame::NoFrame);
     QVBoxLayout *tabLayout = new QVBoxLayout(tabArea);
     tabLayout->setContentsMargins(0,0,0,0);
     tabLayout->setSpacing(0);
@@ -156,8 +114,6 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     tileWidget->setAutoFillBackground(false);
     tileWidget->setPalette(palette);
     tileWidget->setContentsMargins(0,0,0,0);
-    //tileWidget->setMouseTracking(true);
-    //tileWidget->installEventFilter(this);
 
     tileGrid = new QGridLayout(tileWidget);
     tileGrid->setSpacing(0);
@@ -192,18 +148,11 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
 
     // enable right click to add a chart
     winArea->setContextMenuPolicy(Qt::CustomContextMenu);
-    //tabbed->setContextMenuPolicy(Qt::CustomContextMenu);
     tabArea->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(winArea,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(rightClick(const QPoint &)));
-    //connect(tabbed,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(rightClick(const QPoint &)));
     connect(tabArea,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(rightClick(const QPoint &)));
 
     currentStyle=-1;
-#if 0
-    styleSelector->setSelected(2);
-#else
-    //styleSelector->setCurrentIndex(2);
-#endif
     styleChanged(2);
 
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
@@ -212,83 +161,20 @@ HomeWindow::HomeWindow(MainWindow *mainWindow, QString name, QString /* windowti
     connect(tabbed, SIGNAL(currentChanged(int)), this, SLOT(tabSelected(int)));
     connect(tabbed, SIGNAL(tabCloseRequested(int)), this, SLOT(removeChart(int)));
     connect(tb, SIGNAL(tabMoved(int,int)), this, SLOT(tabMoved(int,int)));
-#if 0
-    connect(styleSelector, SIGNAL(clicked(int,bool)), SLOT(styleChanged(int)));
-#else
-    //connect(styleSelector, SIGNAL(currentIndexChanged(int)), SLOT(styleChanged(int)));
-#endif
     connect(titleEdit, SIGNAL(textChanged(const QString&)), SLOT(titleChanged()));
 
-    // watch drop operations
-    //setMouseTracking(true);
     installEventFilter(this);
     application->installEventFilter(this);
 }
 
 HomeWindow::~HomeWindow()
 {
-#if 0
-disconnect(this);
-qDebug()<<"removing from layouts!";
-    // remove from our layouts -- they'reowned by mainwindow
-    for (int i=0; i<charts.count(); i++) {
-        // remove from old style
-        switch (currentStyle) {
-        case 0 : // they are tabs in a TabWidget
-            {
-            int tabnum = tabbed->indexOf(charts[i]);
-            tabbed->removeTab(tabnum);
-            }
-            break;
-        case 1 : // they are lists in a GridLayout
-            {
-            tileGrid->removeWidget(charts[i]);
-            }
-            break;
-        case 2 : // they are in a FlowLayout
-            {
-            winFlow->removeWidget(charts[i]);
-            }
-        default:
-            break;
-        }
-    }
-#endif
 }
 
 void
 HomeWindow::rightClick(const QPoint & /*pos*/)
 {
-    return; //XXX deprecate right click on homewindow -- bad UX
-
-    QMenu chartMenu(tr("Add Chart"));
-    unsigned int mask;
-    // called when chart menu about to be shown
-    // setup to only show charts that are relevant
-    // to this view
-    if (mainWindow->currentWindow == mainWindow->analWindow) mask = VIEW_ANALYSIS;
-    if (mainWindow->currentWindow == mainWindow->trainWindow) mask = VIEW_TRAIN;
-    if (mainWindow->currentWindow == mainWindow->diaryWindow) mask = VIEW_DIARY;
-    if (mainWindow->currentWindow == mainWindow->homeWindow) mask = VIEW_HOME;
-
-    chartMenu.addAction(tr("Add Chart..")); // "kind of" a title... :)
-    for(int i=0; GcWindows[i].relevance; i++) {
-        if (GcWindows[i].relevance & mask) 
-            chartMenu.addAction(GcWindows[i].name);
-    }
-    connect(&chartMenu, SIGNAL(triggered(QAction*)), this, SLOT(addChartFromMenu(QAction*)));
-
-    // set cursor...
-    if (currentStyle == 0) { // tabbed
-        chartCursor = tabbed->currentIndex();
-    } else { // tiked
-        QPoint pos = winWidget->mapFromGlobal(QCursor::pos());
-        chartCursor = pointTile(pos);
-    }
-
-    chartMenu.exec(QCursor::pos()); // blocks -- so deleted after choice made and allocated on stack!
-
-    chartCursor = -2;
+    return; //deprecated right click on homewindow -- bad UX
 }
 
 void
@@ -454,7 +340,7 @@ HomeWindow::styleChanged(int id)
 
     // block updates as it is butt ugly
     setUpdatesEnabled(false);
-    tabbed->hide(); //XXX QTABWidget setUpdatesEnabled bug (?)
+    tabbed->hide(); //This is a QTabWidget setUpdatesEnabled bug (?)
 
     // move the windows from there current
     // position to there new position
@@ -516,12 +402,12 @@ HomeWindow::styleChanged(int id)
     active = false;
 
     if (currentStyle == 0 && charts.count()) tabSelected(0);
-    resizeEvent(NULL); // XXX watch out in case resize event uses this!!
+    resizeEvent(NULL); // watch out in case resize event uses this!!
 
     // now refresh as we are done
     setUpdatesEnabled(true);
-    tabbed->show(); // XXX QTabWidget setUpdatesEnabled bug (?)
-                    //     and resize artefact too.. tread carefully.
+    tabbed->show(); // QTabWidget setUpdatesEnabled bug
+                    // and resize artefact too.. tread carefully.
     update();
 }
 
@@ -537,23 +423,6 @@ HomeWindow::dragEnterEvent(QDragEnterEvent *event)
 void
 HomeWindow::appendChart(GcWinID id)
 {
-#if 0
-    GcWindow *newone = GcWindowRegistry::newGcWindow(id, mainWindow);
-    for(int i=0; GcWindows[i].relevance; i++) {
-        if (GcWindows[i].id == id) {
-            newone->setProperty("title", GcWindows[i].name);
-            break;
-        }
-    }
-    newone->setProperty("widthFactor", (double)2.0);
-    newone->setProperty("heightFactor", (double)2.0);
-    newone->setProperty("GcWinID", id);
-    if (currentStyle == 2) newone->setResizable(true);
-    addChart(newone);
-    newone->show();
-    newone->setProperty("ride", property("ride"));
-    resizeEvent(NULL);
-#else
     // GcWindowDialog is delete on close, so no need to delete
     GcWindowDialog *f = new GcWindowDialog(id, mainWindow);
     GcWindow *newone = f->exec();
@@ -566,7 +435,6 @@ HomeWindow::appendChart(GcWinID id)
 
     // now wipe it
     delete f;
-#endif
 
     // before we return lets turn the cursor off
     chartCursor = -2;
@@ -617,7 +485,6 @@ HomeWindow::addChart(GcWindow* newone)
     active = true;
 
     if (newone) {
-        //GcWindow *newone = GcWindowRegistry::newGcWindow(GcWindows[i].id, mainWindow);
 
         // add the controls
         QWidget *x = dynamic_cast<GcWindow*>(newone)->controls();
@@ -775,13 +642,11 @@ HomeWindow::resetLayout()
 {
     setUpdatesEnabled(false);
     int numCharts = charts.count();
-    for(int i = numCharts - 1; i >= 0; i--) // need to remove the charts from the end to the front
-    {
+    for(int i = numCharts - 1; i >= 0; i--) {
         removeChart(i,false);
     }
     restoreState(true);
-    for(int i = 0; i < charts.count(); i++)
-    {
+    for(int i = 0; i < charts.count(); i++) {
         charts[i]->show();
     }
     setUpdatesEnabled(true);
@@ -1065,7 +930,6 @@ HomeWindow::windowMoved(GcWindow*w)
                 break;
             }
         }
-        //winFlow->doLayout(winFlow->geometry(), false);
         winFlow->update();
         chartCursor = -2;
         winWidget->repaint();
@@ -1091,149 +955,6 @@ HomeWindow::windowMoving(GcWindow* /*w*/)
     chartCursor = pointTile(pos);
     winWidget->repaint(); // show cursor
 
-#if 0
-    // code for bumping tiles movement
-    // disaobled for now in preference for
-    // a drag operation with a cursor that
-    // highlights where the window will be
-    // moved to...
-    winArea->ensureVisible(pos.x(), pos.y(), 20, 20);
-
-    // since the widget has moved, the mouse is no longer
-    // in the same position relevant to the widget, so
-    // move the mouse back to the same position relevant
-    // to the widget
-    QCursor::setPos(winWidget->mapToGlobal(pos));
-
-    // Move the other windows out the way...
-    for(int i=0; i<charts.count(); i++) {
-        if (charts[i] != w && !charts[i]->gripped() && charts[i]->geometry().intersects(w->geometry())) {
-            // shift whilst we move then
-            QRect inter = charts[i]->geometry().intersected(w->geometry());
-            // move left
-            if (charts[i]->geometry().x() < w->geometry().x()) {
-                int newx = inter.x() - 20 - charts[i]->geometry().width();
-                if (charts[i]->geometry().x() > newx)
-                    charts[i]->move(newx, charts[i]->geometry().y());
-            } else {
-                int newx = inter.x()+inter.width() + 20;
-                if (charts[i]->geometry().x() < newx)
-                charts[i]->move(newx, charts[i]->geometry().y());
-            }
-            windowMoving(charts[i]); // move the rest...
-        }
-    }
-
-    // now if any are off the screen try and get them
-    // back on the screen without disturbing the other
-    // charts (unless they are off the screen too)
-    for(int i=0; i<charts.count(); i++) {
-
-        if (!charts[i]->gripped() && (charts[i]->x() < 20 || (charts[i]->x()+charts[i]->width()) > winArea->geometry().width())) {
-
-            // to the left...
-            if (charts[i]->geometry().x() < 20) {
-
-                QRect back(20, charts[i]->geometry().y(),
-                           charts[i]->geometry().width(),
-                           charts[i]->geometry().height());
-
-                // loop through the other charts and see
-                // how far it can sneak back on...
-                for(int j=0; j<charts.count(); j++) {
-                    if (charts[j] != charts[i]) {
-                        if (back.intersects(charts[j]->geometry())) {
-                            QRect inter = back.intersected(charts[j]->geometry());
-                            int newx = inter.x() - back.width() - 20;
-                            if (back.x() > newx) {
-                                back.setX(newx);
-                                back.setWidth(charts[i]->width());
-                            }
-                        }
-                    }
-                }
-#if 0
-                // any space?
-                if (back.x() < 20) {
-                    // we're still off screen so
-                    // lets shift all the windows to the
-                    // right if we can
-                    QList<GcWindow*> obstacles;
-                    QRect fback(20, charts[i]->geometry().y(),
-                            charts[i]->geometry().width(),
-                            charts[i]->geometry().height());
-
-
-                    // order obstacles left to right
-                    for(int j=0; j<charts.count(); j++) {
-                        if (charts[j] != charts[i] &&
-                            fback.intersects(charts[j]->geometry()))
-                        obstacles.append(charts[j]);
-                        qSort(obstacles);
-                    }
-
-                    // where to stop? all or is the
-                    // gripped window in there
-                    // or stop if offscreen already
-                    int stop=0;
-                    while (stop < obstacles.count()) {
-                        if (obstacles[stop]->gripped() ||
-                            (obstacles[stop]->geometry().x() + obstacles[stop]->width()) > winArea->width())
-                            break;
-                        stop++;
-                    }
-
-                    // at this point we know that members
-                    // 0 - stop are possibly in our way
-                    // we need to move the leftmost, if it
-                    // fits we stop, if not we move the next one
-                    // and the leftmost, then the next one
-                    // until we have exhausted all candidates
-
-                    // try again!
-                    // loop through the other charts and see
-                    // how far it can sneak back on...
-                    back = QRect(20, charts[i]->geometry().y(),
-                           charts[i]->geometry().width(),
-                           charts[i]->geometry().height());
-                    for(int j=0; j<charts.count(); j++) {
-                        if (charts[j] != charts[i]) {
-                            if (back.intersects(charts[j]->geometry())) {
-                                QRect inter = back.intersected(charts[j]->geometry());
-                                back.setX(inter.x()-back.width()-20);
-                            }
-                        }
-                    }
-                }
-#endif
-
-                charts[i]->move(back.x(), back.y());
-
-            } else {
-
-                QRect back(winArea->width() - charts[i]->width() - 20,
-                           charts[i]->geometry().y(),
-                           charts[i]->geometry().width(),
-                           charts[i]->geometry().height());
-
-                // loop through the other charts and see
-                // how far it can sneak back on...
-                for(int j=0; j<charts.count(); j++) {
-                    if (charts[j] != charts[i]) {
-                        if (back.intersects(charts[j]->geometry())) {
-                            QRect inter = back.intersected(charts[j]->geometry());
-                            int newx = inter.x() + inter.width() + 20;
-                            if (back.x() < newx) back.setX(newx);
-                        }
-                    }
-                }
-
-                // any space?
-                charts[i]->move(back.x(), back.y());
-            }
-        }
-    }
-#endif
 }
 
 void
@@ -1337,9 +1058,6 @@ void GcWindowDialog::okClicked()
     // note that in reject they are not and will
     // get deleted (this has been verfied with
     // some debug statements in ~GcWindow).
-    //chartLayout->removeWidget(win); // remove from layout!
-    //win->setParent(mainWindow); // already is!
-    //if (win->controls()) win->controls()->setParent(mainWindow);
 
     // set its title property and geometry factors
     win->setProperty("title", title->text());
@@ -1394,7 +1112,7 @@ static QString unprotect(QString buffer)
     s.replace( "&#8482;", tm );
 
     // html special chars are automatically handled
-    // XXX other special characters will not work
+    // NOTE: other special characters will not work
     // cross-platform but will work locally, so not a biggie
     // i.e. if thedefault charts.xml has a special character
     // in it it should be added here
@@ -1407,7 +1125,7 @@ HomeWindow::saveState()
     // run through each chart and save its USER properties
     // we do not save all the other Qt properties since
     // we're not interested in them
-    // XXX currently we support QString, int, double and bool types - beware custom types!!
+    // NOTE: currently we support QString, int, double and bool types - beware custom types!!
     if (charts.count() == 0) return; // don't save empty, use default instead
 
     QString filename = mainWindow->home.absolutePath() + "/" + name + "-layout.xml";
