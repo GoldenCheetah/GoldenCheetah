@@ -36,8 +36,6 @@ TPDownloadDialog::TPDownloadDialog(MainWindow *main) : QDialog(main, Qt::Dialog)
                   appsettings->cvalue(main->cyclist, GC_TPUSER, "null").toString(),
                   appsettings->cvalue(main->cyclist, GC_TPPASS, "null").toString());
 
-    //setMinimumWidth(850); //XXX not friendly to netbooks, but avoids horiz scrollbar
-
     QWidget::hide(); // don't show just yet...
 }
 

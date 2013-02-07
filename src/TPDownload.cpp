@@ -203,11 +203,6 @@ TPDownload::download(QString cyclist, int personId, int workoutId)
     current.addMethodArgument("password", "", appsettings->cvalue(cyclist, GC_TPPASS).toString());
     current.addMethodArgument("personId", "", personId);
 
-    //XXX QtSoapArray seems to like causing a SEGV, will use a DomElement for now...
-    //QtSoapArray workouts(QtSoapQName("workoutIds"), QtSoapType::Int, 1);
-    //workouts.insert(0, new QtSoapSimpleType(QtSoapQName("int"), workoutId));
-    //current.addMethodArgument(&workouts);
-
     QtSoapStruct *ints = new QtSoapStruct; // gets taken over by message and free'd there
                                            // if you pass a pointer it all goes boom!
 
