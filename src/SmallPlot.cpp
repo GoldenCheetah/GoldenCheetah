@@ -54,6 +54,14 @@ SmallPlot::SmallPlot(QWidget *parent) : QwtPlot(parent), d_mrk(NULL), smooth(30)
     hrCurve->setPen(QPen(GColor(CHEARTRATE)));
     hrCurve->attach(this);
 
+    altCurve = new QwtPlotCurve(tr("Altitude"));
+    altCurve->setPen(QPen(GColor(CALTITUDE)));
+    QColor brush_color = GColor(CALTITUDEBRUSH);
+    brush_color.setAlpha(180);
+    altCurve->setBrush(brush_color);
+    altCurve->setYAxis(yLeft1);
+    altCurve->attach(this);
+
     // grid lines on such a small plot look AWFUL
     //grid = new QwtPlotGrid();
     //grid->enableX(false);
@@ -83,10 +91,10 @@ SmallPlot::SmallPlot(QWidget *parent) : QwtPlot(parent), d_mrk(NULL), smooth(30)
 }
 
 struct DataPoint {
-    double time, hr, watts;
+    double time, hr, alt, watts;
     int inter;
-    DataPoint(double t, double h, double w, int i) :
-        time(t), hr(h), watts(w), inter(i) {}
+    DataPoint(double t, double h, double w, double a, int i) :
+             time(t), hr(h), watts(w), alt(a), inter(i) {}
 };
 
 void
@@ -99,16 +107,19 @@ SmallPlot::recalc()
         QwtArray<double> data;
         wattsCurve->setData(data, data);
         hrCurve->setData(data, data);
+        altCurve->setData(data, data);
         return;
     }
 
     double totalWatts = 0.0;
     double totalHr = 0.0;
+    double totalAlt = 0.0;
     QList<DataPoint*> list;
     int i = 0;
 
     QVector<double> smoothWatts(rideTimeSecs + 1);
     QVector<double> smoothHr(rideTimeSecs + 1);
+    QVector<double> smoothAlt(rideTimeSecs + 1);
     QVector<double> smoothTime(rideTimeSecs + 1);
 
     QList<double> interList; //Just store the time that it happened.
@@ -119,13 +130,15 @@ SmallPlot::recalc()
     for (int secs = 0; ((secs < smooth) && (secs < rideTimeSecs)); ++secs) {
         smoothWatts[secs] = 0.0;
         smoothHr[secs]    = 0.0;
+        smoothAlt[secs]    = 0.0;
     }
     for (int secs = smooth; secs <= rideTimeSecs; ++secs) {
         while ((i < arrayLength) && (timeArray[i] <= secs)) {
             DataPoint *dp =
-                new DataPoint(timeArray[i], hrArray[i], wattsArray[i], interArray[i]);
+                new DataPoint(timeArray[i], hrArray[i], wattsArray[i], altArray[i], interArray[i]);
             totalWatts += wattsArray[i];
             totalHr    += hrArray[i];
+            totalAlt    += altArray[i];
             list.append(dp);
             //Figure out when and if we have a new interval..
             if(lastInterval != interArray[i]) {
@@ -139,6 +152,7 @@ SmallPlot::recalc()
             list.removeFirst();
             totalWatts -= dp->watts;
             totalHr    -= dp->hr;
+            totalAlt    -= dp->alt;
             delete dp;
         }
         // TODO: this is wrong.  We should do a weighted average over the
@@ -146,15 +160,18 @@ SmallPlot::recalc()
         if (list.empty()) {
             smoothWatts[secs] = 0.0;
             smoothHr[secs]    = 0.0;
+            smoothAlt[secs]    = 0.0;
         }
         else {
             smoothWatts[secs]    = totalWatts / list.size();
             smoothHr[secs]       = totalHr / list.size();
+            smoothAlt[secs]       = totalAlt / list.size();
         }
         smoothTime[secs]  = secs / 60.0;
     }
     wattsCurve->setData(smoothTime.constData(), smoothWatts.constData(), rideTimeSecs + 1);
     hrCurve->setData(smoothTime.constData(), smoothHr.constData(), rideTimeSecs + 1);
+    altCurve->setData(smoothTime.constData(), smoothAlt.constData(), rideTimeSecs + 1);
     setAxisScale(xBottom, 0.0, smoothTime[rideTimeSecs]);
 
     setYMax();
@@ -165,7 +182,9 @@ void
 SmallPlot::setYMax()
 {
     double ymax = 0;
+    double y1max = 0;
     QString ylabel = "";
+    QString y1label = "";
     if (wattsCurve->isVisible()) {
         ymax = max(ymax, wattsCurve->maxYValue());
         ylabel += QString((ylabel == "") ? "" : " / ") + "Watts";
@@ -174,8 +193,14 @@ SmallPlot::setYMax()
         ymax = max(ymax, hrCurve->maxYValue());
         ylabel += QString((ylabel == "") ? "" : " / ") + "BPM";
     }
+    if (altCurve->isVisible()) {
+         y1max = altCurve->maxYValue();
+         y1label = "m";
+    }
     setAxisScale(yLeft, 0.0, ymax * 1.1);
     setAxisTitle(yLeft, ylabel);
+    setAxisScale(yLeft1, 0.0, y1max * 1.1);
+    setAxisTitle(yLeft1, y1label);
     enableAxis(yLeft, false); // hide for a small plot
 }
 
@@ -203,9 +228,16 @@ void
 SmallPlot::setData(RideItem *rideItem)
 {
     RideFile *ride = rideItem->ride();
+    setData(ride);
+}
+
+void
+SmallPlot::setData(RideFile *ride)
+{
 
     wattsArray.resize(ride->dataPoints().size());
     hrArray.resize(ride->dataPoints().size());
+    altArray.resize(ride->dataPoints().size());
     timeArray.resize(ride->dataPoints().size());
     interArray.resize(ride->dataPoints().size());
 
@@ -214,6 +246,7 @@ SmallPlot::setData(RideItem *rideItem)
         timeArray[arrayLength]  = point->secs;
         wattsArray[arrayLength] = max(0, point->watts);
         hrArray[arrayLength]    = max(0, point->hr);
+        altArray[arrayLength]    = max(0, point->alt);
         interArray[arrayLength] = point->interval;
         ++arrayLength;
     }

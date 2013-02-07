@@ -59,6 +59,7 @@
 #include "ToolsRhoEstimator.h"
 #include "MetricAggregator.h"
 #include "SplitActivityWizard.h"
+#include "MergeActivityWizard.h"
 #include "BatchExportDialog.h"
 #include "RideWithGPSDialog.h"
 #include "TtbDialog.h"
@@ -690,6 +691,7 @@ MainWindow::MainWindow(const QDir &home) :
     rideMenu->addAction(tr("&Save activity"), this, SLOT(saveRide()), tr("Ctrl+S"));
     rideMenu->addAction(tr("D&elete activity..."), this, SLOT(deleteRide()));
     rideMenu->addAction(tr("Split &activity..."), this, SLOT(splitRide()));
+    rideMenu->addAction(tr("Merge activities..."), this, SLOT(mergeRide()));
     rideMenu->addSeparator ();
 
     QMenu *optionsMenu = menuBar()->addMenu(tr("&Tools"));
@@ -1053,6 +1055,9 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
 
         QAction *actSplitRide = new QAction(tr("Split Activity"), context->athlete->treeWidget);
         connect(actSplitRide, SIGNAL(triggered(void)), this, SLOT(splitRide()));
+
+        QAction *actMergeRide = new QAction(tr("Merge Activities"), treeWidget);
+        connect(actMergeRide, SIGNAL(triggered(void)), this, SLOT(mergeRide()));
 
         if (rideItem->isDirty() == true) {
           menu.addAction(actSaveRide);
@@ -1687,6 +1692,18 @@ MainWindow::splitRide()
             QMessageBox::critical(this, tr("Split Activity"), tr("No activity selected"));
         else
             QMessageBox::critical(this, tr("Split Activity"), tr("Current activity contains no data to split"));
+    }
+}
+
+void
+MainWindow::mergeRide()
+{
+    if (context->ride && context->ride->ride() && context->ride->ride()->dataPoints().count()) (new MergeActivityWizard(context))->exec();
+    else {
+        if (!context->ride || !context->ride->ride())
+            QMessageBox::critical(this, tr("Split Activity"), tr("No activity selected"));
+        else
+            QMessageBox::critical(this, tr("Split Activity"), tr("Current activity contains no data to merge"));
     }
 }
 

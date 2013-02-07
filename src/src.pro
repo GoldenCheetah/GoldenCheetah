@@ -319,6 +319,7 @@ HEADERS += \
         MainWindow.h \
         ManualRideDialog.h \
         ManualRideFile.h \
+        MergeActivityWizard.h \
         MetadataWindow.h \
         MetricAggregator.h \
         NewCyclistDialog.h \
@@ -508,6 +509,7 @@ SOURCES += \
         MainWindow.cpp \
         ManualRideDialog.cpp \
         ManualRideFile.cpp \
+        MergeActivityWizard.cpp \
         MetadataWindow.cpp \
         MetricAggregator.cpp \
         NewCyclistDialog.cpp \
