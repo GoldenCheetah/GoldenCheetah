@@ -158,7 +158,7 @@ DeviceScanner::run()
     if (wizard->deviceTypes.Supported[wizard->current].connector == DEV_BTLE) pool = WFApi::getInstance()->getPool();
 #endif
 
-    for (int i=0; active && !result && i<50; i++) { // search for longer
+    for (int i=0; active && !result && i<10; i++) { // search for longer
 
         // better to wait a while, esp. if its just a USB device
 #ifdef WIN32

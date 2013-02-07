@@ -139,6 +139,8 @@ void Kickr::run()
         return; // open failed!
     }
 
+    int connectionloops =0;
+
     running = true;
     while(running) {
 
@@ -169,6 +171,12 @@ void Kickr::run()
                 WFApi::getInstance()->setSlope(sd, slope);
                 currentslope = slope;
                 currentmode = mode;
+            }
+        } else {
+            // 100ms in each loop, 30secs is 300 loops
+            if (++connectionloops > 300) {
+                // give up waiting for connection
+                quit(-1);
             }
         }
 
@@ -231,8 +239,13 @@ Kickr::find()
 int
 Kickr::connectKickr()
 {
+    // is BTLE even enabled?
+    if (WFApi::getInstance()->isBTLEEnabled() == false) return -1;
+
     // get a pool for this thread
     pool = WFApi::getInstance()->getPool();
+
+    // kick off connection and assume it is gonna be ok
     sd = WFApi::getInstance()->connectDevice(devConf->portSpec);
     return 0;
 }

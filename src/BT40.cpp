@@ -218,14 +218,28 @@ BT40::find()
 {
     WFApi *w = WFApi::getInstance();
 
+    // do we even have BTLE hardware available?
+    if (w->isBTLEEnabled() ==false) {
+
+        // lets try and enable it
+        // won't complete for a while but hopefully before next attempt to find is made
+        // by user or device scanner in AddDeviceWizard
+        w->enableBTLE(true, false);
+
+        return false;
+    }
+
+    // can we kick off a search?
     if (w->discoverDevicesOfType(WFApi::WF_SENSORTYPE_NONE) == false) return false;
 
+    // wait for it to return something, anything
     QEventLoop loop;
     connect(w, SIGNAL(discoverFinished()), &loop, SLOT(quit()));
     loop.exec();
 
     scanned = true;
 
+    // what did we get?
     if (w->deviceCount()) {
         deviceUUID = w->deviceUUID(0);
         return true;
