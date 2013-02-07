@@ -107,13 +107,36 @@ public:
         WF_SENSORTYPE_BLOOD_PRESSURE                 = 0x00008000,
         WF_SENSORTYPE_BTLE_GLUCOSE                   = 0x00010000,
         WF_SENSORTYPE_GLUCOSE                        = 0x00020000,
-        WF_SENSORTYPE_DISPLAY                        = 0x00800000  };
+        WF_SENSORTYPE_DISPLAY                        = 0x00800000  }; // rflkt
 
-    const QString sensorDescription(int id) const {
+    const QString sensorDescription(int id, int sub) const {
         QString returning(tr("Unknown"));
         switch (id) {
         case 0x0 : returning = tr("None"); break;
-        case 0x1 : returning = tr("Power Meter"); break;
+        case 0x1 : 
+            {
+                switch(sub) {
+
+                    case  0:
+                    default:
+                        returning = tr("Power Meter");
+                        break;
+
+                    case 1:
+                        returning = tr("Wahoo KICKR trainer");
+                        break;
+
+                    case 2:
+                        returning = tr("Stage ONE Crank Power Meter");
+                        break;
+
+                    case 3:
+                        returning = tr("Kurt Kinetic InRide Power Meter");
+                        break;
+                }
+            }
+            break;
+
         case 0x2 : returning = tr("Bike Speed"); break;
         case 0x4 : returning = tr("Bike Cadence"); break;
         case 0x8 : returning = tr("Speed and Cadence"); break;
