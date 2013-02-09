@@ -32,7 +32,7 @@ MetadataWindow::MetadataWindow(MainWindow *mainWindow) :
     QFont font;
     font.setPointSize(font.pointSize());
     rideMetadata->setFont(font);
-    rideMetadata->setContentsMargins(0,0,0,0);
+    rideMetadata->setContentsMargins(20,0,20,20);
     vlayout->addWidget(rideMetadata);
     setChartLayout(vlayout);
 
