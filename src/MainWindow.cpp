@@ -2058,8 +2058,13 @@ MainWindow::revertRide()
 void
 MainWindow::splitRide()
 {
-    if (ride) (new SplitActivityWizard(this))->exec();
-    else QMessageBox::critical(this, tr("Split Activity"), tr("No activity selected!"));
+    if (ride && ride->ride() && ride->ride()->dataPoints().count()) (new SplitActivityWizard(this))->exec();
+    else {
+        if (!ride || !ride->ride())
+            QMessageBox::critical(this, tr("Split Activity"), tr("No activity selected"));
+        else
+            QMessageBox::critical(this, tr("Split Activity"), tr("Current activity contains no data to split"));
+    }
 }
 
 void
