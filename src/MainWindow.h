@@ -443,7 +443,6 @@ class MainWindow : public QMainWindow
 
 #ifdef Q_OS_MAC
         // Mac Native Support
-        QWidget *toolBarWidgets;
         QWidget *macAnalButtons;
         QtMacButton *import, *compose;
         QtMacSegmentedButton *styleSelector;

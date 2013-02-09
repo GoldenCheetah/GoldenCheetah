@@ -214,9 +214,6 @@ MainWindow::MainWindow(const QDir &home) :
     head->setContentsMargins(0,0,0,0);
 
     // widgets
-    toolBarWidgets = new QWidget(this);
-    toolBarWidgets->setContentsMargins(0,0,0,0);
-
     macAnalButtons = new QWidget(this);
     macAnalButtons->setContentsMargins(0,0,20,0);
 
@@ -257,6 +254,7 @@ MainWindow::MainWindow(const QDir &home) :
     actbuttons->setImage(2, new QPixmap(":images/mac/trash.png"));
     pp->addWidget(actbuttons);
     lb->addWidget(acts);
+    lb->addStretch();
     connect(actbuttons, SIGNAL(clicked(int,bool)), this, SLOT(actionClicked(int)));
 
     lb->addWidget(new Spacer(this));
@@ -274,13 +272,8 @@ MainWindow::MainWindow(const QDir &home) :
     connect(styleSelector, SIGNAL(clicked(int,bool)), this, SLOT(toggleStyle()));
 
     // setup Mac thetoolbar
-    toolBarWidgets->setContentsMargins(0,0,0,0);
-    QHBoxLayout *l = new QHBoxLayout(toolBarWidgets);
-    l->setSpacing(0);
-    l->setContentsMargins(0,0,0,0);
     head->addWidget(macAnalButtons);
     head->addWidget(new Spacer(this));
-    head->addWidget(toolBarWidgets);
     head->addWidget(new Spacer(this));
     head->addWidget(viewsel);
 
