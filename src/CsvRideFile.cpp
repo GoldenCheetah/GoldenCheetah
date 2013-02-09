@@ -35,7 +35,12 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 {
     QRegExp metricUnits("(km|kph|km/h)", Qt::CaseInsensitive);
     QRegExp englishUnits("(miles|mph|mp/h)", Qt::CaseInsensitive);
+    QRegExp degCUnits("Temperature .*C", Qt::CaseInsensitive);
+    QRegExp degFUnits("Temperature .*F", Qt::CaseInsensitive);
     bool metric = true;
+    enum temperature { degF, degC, degNone };
+    typedef enum temperature Temperature;
+    static Temperature tempType = degNone;
     QDateTime startTime;
 
     // TODO: a more robust regex for ergomo files
@@ -57,6 +62,18 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     int total_pause = 0;
     int currentInterval = 0;
     int prevInterval = 0;
+
+    /* Joule 1.0
+    Version,Date/Time,Km,Minutes,RPE,Tags,"Weight, kg","Work, kJ",FTP,"Sample Rate, s",Device Type,Firmware Version,Last Updated,Category 1,Category 2
+    6,2012-11-27 13:40:41,0,0,0,,55.8,788,227,1,Joule,18.018,,0,
+    User Name,Power Zone 1,Power Zone 2,Power Zone 3,Power Zone 4,Power Zone 5,Power Zone 6,HR Zone 1,HR Zone 2,HR Zone 3,HR Zone 4,HR Zone 5,Calc Power A,Calc Power B,Calc Power 
+    ,0,0,0,0,0,0,150,160,170,180,250,0,-0,
+    Minutes, Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID,Altitude (m),Temperature (�C),"Grade, %",Latitude,Longitude,Power Calc'd,Calc Power,Right Pedal,Pedal Power %,Cad. Smoot
+    0,0,0,45,0,0,69,0,62,16.7,0,0,0,0,0,0,0,
+    */
+    QRegExp jouleCSV("Device Type,Firmware Version", Qt::CaseInsensitive);
+    QRegExp jouleMetriCSV(",Km,", Qt::CaseInsensitive);
+    bool joule = false;
 
     // TODO: with all these formats, should the logic change to a switch/case structure?
     // The iBike format CSV file has five lines of headers (data begins on line 6)
@@ -116,28 +133,40 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     ++lineno;
                     continue;
                 }
-                else {
-                    if(iBikeCSV.indexIn(line) != -1) {
-                        iBike = true;
-                        rideFile->setDeviceType("iBike");
-                        rideFile->setFileFormat("iBike CSV (csv)");
-                        unitsHeader = 5;
-                        iBikeVersion = line.section( ',', 1, 1 ).toInt();
-                        ++lineno;
-                        continue;
-                    } else if(motoActvCSV.indexIn(line) != -1) {
-                     ++lineno;
+                else if(iBikeCSV.indexIn(line) != -1) {
+                    iBike = true;
+                    rideFile->setDeviceType("iBike");
+                    rideFile->setFileFormat("iBike CSV (csv)");
+                    unitsHeader = 5;
+                    iBikeVersion = line.section( ',', 1, 1 ).toInt();
+                    ++lineno;
+                    continue;
+                 }
+                 else if(motoActvCSV.indexIn(line) != -1) {
                      motoActv = true;
                      rideFile->setDeviceType("MotoACTV");
                      rideFile->setFileFormat("MotoACTV CSV (csv)");
                      unitsHeader = -1;
                      /* MotoACTV files are always metric */
                      metric = true;
+                     ++lineno;
                      continue;
-                   }
-                    rideFile->setDeviceType("PowerTap");
-                    rideFile->setFileFormat("PowerTap CSV (csv)");
-                }
+                 }
+                 else if(jouleCSV.indexIn(line) != -1) {
+                     joule = true;
+                     rideFile->setDeviceType("Joule");
+                     rideFile->setFileFormat("Joule CSV (csv)");
+                     if(jouleMetriCSV.indexIn(line) != -1) {
+                         unitsHeader = 5;
+                         metric = true;
+                     }
+                     else { /* ? */ }
+                     ++lineno;
+                     continue;
+                 }
+                 // default
+                 rideFile->setDeviceType("PowerTap");
+                 rideFile->setFileFormat("PowerTap CSV (csv)");
             }
             if (iBike && lineno == 2) {
                 QStringList f = line.split(",");
@@ -154,6 +183,13 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 // the number is in the format 5.000000
                 recInterval = (int)line.section(',',4,4).toDouble();
             }
+            if (joule && lineno == 2) {
+                // 6,2012-11-27 13:40:41,0,0,0,,55.8,788,227,1,Joule,18.018,,0,
+                QStringList f = line.split(",");
+                if (f.size() >= 2) {
+                    startTime = QDateTime::fromString(f[1], "yyyy-MM-dd H:mm:ss");
+                }
+            }
             if (lineno == unitsHeader) {
                 if (metricUnits.indexIn(line) != -1)
                     metric = true;
@@ -165,9 +201,14 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     file.close();
                     return NULL;
                 }
+                if (degCUnits.indexIn(line) != -1)
+                    tempType = degC;
+                else if (degFUnits.indexIn(line) != -1)
+                    tempType = degF;
             }
             else if (lineno > unitsHeader) {
                 double minutes=0,nm,kph,watts,km,cad,alt,hr,dfpm, seconds=0.0;
+                double temp=RideFile::noTemp;
                 bool ok;
                 double lat = 0.0, lon = 0.0;
                 double headwind = 0.0;
@@ -185,6 +226,16 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                      hr = line.section(',', 6, 6).toDouble();
                      interval = line.section(',', 7, 7).toInt();
                      alt = line.section(',', 8, 8).toDouble();
+                    if (joule && tempType != degNone) {
+                        // is the position always the same?
+                        // should we read the header and assign positions
+                        // to each item instead?
+                        temp = line.section(',', 9, 9).toDouble();
+                        if (tempType == degF) {
+                           // convert to deg C
+                           temp *= FAHRENHEIT_PER_CENTIGRADE + FAHRENHEIT_ADD_CENTIGRADE;
+                        }
+                    }
                     if (!metric) {
                         km *= KM_PER_MILE;
                         kph *= KM_PER_MILE;
@@ -308,11 +359,11 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                if(motoActv)
                     rideFile->appendPoint(seconds, cad, hr, km,
                                           kph, nm, watts, alt, lon, lat, 0.0,
-                                          0.0, RideFile::noTemp, 0.0, interval);
+                                          0.0, temp, 0.0, interval);
                else
                     rideFile->appendPoint(minutes * 60.0, cad, hr, km,
                                           kph, nm, watts, alt, lon, lat,
-                                          headwind, 0.0, RideFile::noTemp, 0.0,
+                                          headwind, 0.0, temp, 0.0,
                                           interval);
             }
             ++lineno;
