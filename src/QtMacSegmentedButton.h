@@ -57,7 +57,7 @@ public:
     void setSelected(int index, bool value) const;
     void animateClick (int aSegment);
     void onClicked (int aSegment);
-    void setImage(int index, const QPixmap &image, int swidth = 35);
+    void setImage(int index, const QPixmap *image, int swidth = 35);
     void setNoSelect();
 
     void setWidth(int);

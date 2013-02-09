@@ -172,8 +172,8 @@ GcScopeBar::selected(int index)
 void
 GcScopeBar::setShowSidebar(bool showSidebar)
 {
-    static QPixmap hide(":images/mac/hide.png");
-    static QPixmap show(":images/mac/show.png");
+    static QPixmap *hide = new QPixmap(":images/mac/hide.png");
+    static QPixmap *show = new QPixmap(":images/mac/show.png");
 
     state = showSidebar;
     if (showSidebar == false) {

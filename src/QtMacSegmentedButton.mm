@@ -42,9 +42,9 @@ inline NSString *darwinQStringToNSString (const QString &aString)
     return [(CFStringCreateWithCharacters (0, reinterpret_cast<const UniChar *> (aString.unicode()), aString.length())) autorelease];
 }
 
-static NSImage *fromQPixmap(const QPixmap &pixmap)
+static NSImage *fromQPixmap(const QPixmap *pixmap)
 {
-    NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithCGImage:pixmap.toMacCGImageRef()];
+    NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithCGImage:pixmap->toMacCGImageRef()];
     NSImage *image = [[[NSImage alloc] init] autorelease];
     [image addRepresentation:bitmapRep];
     [image setTemplate:true];
@@ -127,7 +127,7 @@ void QtMacSegmentedButton::setSelected(int index, bool value) const
     [mNativeRef setSelected:value forSegment:index];
 }
 
-void QtMacSegmentedButton::setImage(int index, const QPixmap &image, int swidth)
+void QtMacSegmentedButton::setImage(int index, const QPixmap *image, int swidth)
 {
     [mNativeRef setImage:fromQPixmap(image) forSegment:index];
     [mNativeRef setWidth:swidth forSegment:index];
