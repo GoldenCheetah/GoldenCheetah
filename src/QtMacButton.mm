@@ -21,9 +21,9 @@
 #import "AppKit/NSButton.h"
 #import "AppKit/NSFont.h"
 
-static NSImage *fromQPixmap(const QPixmap &pixmap)
+static NSImage *fromQPixmap(const QPixmap *pixmap)
 {
-    NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithCGImage:pixmap.toMacCGImageRef()];
+    NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithCGImage:pixmap->toMacCGImageRef()];
     NSImage *image = [[[NSImage alloc] init] autorelease];
     [image addRepresentation:bitmapRep];
     [image setTemplate:true];
@@ -231,7 +231,7 @@ void QtMacButton::setText(const QString &text)
     [qtw->nsButton setTitle:fromQString(text)];
 }
 
-void QtMacButton::setImage(const QPixmap &image)
+void QtMacButton::setImage(const QPixmap *image)
 {
     Q_ASSERT(qtw);
     if (qtw) {

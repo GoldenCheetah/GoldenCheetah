@@ -225,13 +225,13 @@ MainWindow::MainWindow(const QDir &home) :
     lb->setContentsMargins(0,0,0,0);
     lb->setSpacing(0);
     import = new QtMacButton(this, QtMacButton::TexturedRounded);
-    QPixmap importImg(":images/mac/download.png");
+    QPixmap *importImg = new QPixmap(":images/mac/download.png");
     import->setImage(importImg);
     import->setToolTip("Download");
     lb->addWidget(import);
     lb->addWidget(new Spacer(this));
     compose = new QtMacButton(this, QtMacButton::TexturedRounded);
-    QPixmap composeImg(":images/mac/compose.png");
+    QPixmap *composeImg = new QPixmap(":images/mac/compose.png");
     compose->setImage(composeImg);
     compose->setToolTip("Create");
     lb->addWidget(compose);
@@ -252,9 +252,9 @@ MainWindow::MainWindow(const QDir &home) :
     QtMacSegmentedButton *actbuttons = new QtMacSegmentedButton(3, acts);
     actbuttons->setWidth(115);
     actbuttons->setNoSelect();
-    actbuttons->setImage(0, QPixmap(":images/mac/stop.png"));
-    actbuttons->setImage(1, QPixmap(":images/mac/split.png"));
-    actbuttons->setImage(2, QPixmap(":images/mac/trash.png"));
+    actbuttons->setImage(0, new QPixmap(":images/mac/stop.png"));
+    actbuttons->setImage(1, new QPixmap(":images/mac/split.png"));
+    actbuttons->setImage(2, new QPixmap(":images/mac/trash.png"));
     pp->addWidget(actbuttons);
     lb->addWidget(acts);
     connect(actbuttons, SIGNAL(clicked(int,bool)), this, SLOT(actionClicked(int)));
@@ -268,8 +268,8 @@ MainWindow::MainWindow(const QDir &home) :
     pq->setSpacing(0);
     styleSelector = new QtMacSegmentedButton(2, viewsel);
     styleSelector->setWidth(80); // actually its 80 but we want a 30px space between is and the searchbox
-    styleSelector->setImage(0, QPixmap(":images/mac/tabbed.png"), 24);
-    styleSelector->setImage(1, QPixmap(":images/mac/tiled.png"), 24);
+    styleSelector->setImage(0, new QPixmap(":images/mac/tabbed.png"), 24);
+    styleSelector->setImage(1, new QPixmap(":images/mac/tiled.png"), 24);
     pq->addWidget(styleSelector);
     connect(styleSelector, SIGNAL(clicked(int,bool)), this, SLOT(toggleStyle()));
 
