@@ -223,21 +223,21 @@ void MetricAggregator::update() {
 
 bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, unsigned long fingerprint, bool modify)
 {
-    SummaryMetrics *summaryMetric = new SummaryMetrics();
+    SummaryMetrics summaryMetric;
     QFile file(path.absolutePath() + "/" + fileName);
 
     QRegExp rx = RideFileFactory::instance().rideFileRegExp();
     if (!rx.exactMatch(fileName)) {
         return false; // not a ridefile!
     }
-    summaryMetric->setFileName(fileName);
+    summaryMetric.setFileName(fileName);
     assert(rx.numCaptures() == 7);
     QDate date(rx.cap(1).toInt(), rx.cap(2).toInt(),rx.cap(3).toInt());
     QTime time(rx.cap(4).toInt(), rx.cap(5).toInt(),rx.cap(6).toInt());
     QDateTime dateTime(date, time);
 
-    summaryMetric->setRideDate(dateTime);
-    summaryMetric->setId(ride->id());
+    summaryMetric.setRideDate(dateTime);
+    summaryMetric.setId(ride->id());
 
     const RideMetricFactory &factory = RideMetricFactory::instance();
     QStringList metrics;
@@ -251,17 +251,16 @@ bool MetricAggregator::importRide(QDir path, RideFile *ride, QString fileName, u
     // get metrics into summaryMetric QMap
     for(int i = 0; i < factory.metricCount(); ++i) {
         // check for override
-        summaryMetric->setForSymbol(factory.metricName(i), computed.value(factory.metricName(i))->value(true));
+        summaryMetric.setForSymbol(factory.metricName(i), computed.value(factory.metricName(i))->value(true));
     }
 
     // what color will this ride be?
     QColor color = colorEngine->colorFor(ride->getTag(main->rideMetadata()->getColorField(), ""));
 
-    dbaccess->importRide(summaryMetric, ride, color, fingerprint, modify);
+    dbaccess->importRide(&summaryMetric, ride, color, fingerprint, modify);
 #ifdef GC_HAVE_LUCENE
-    main->lucene->importRide(summaryMetric, ride, color, fingerprint, modify);
+    main->lucene->importRide(&summaryMetric, ride, color, fingerprint, modify);
 #endif
-    delete summaryMetric;
 
     return true;
 }
