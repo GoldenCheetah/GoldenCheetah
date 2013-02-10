@@ -49,8 +49,6 @@ VideoWindow::VideoWindow(MainWindow *parent, const QDir &home)  :
     //vlc_exceptions(&exceptions);
 
     /* Create a new item */
-    // XXX need to add controls - not everyone is going to want to play a video from
-    //                            my desktop!!!
 
     m = NULL;
     //vlc_exceptions(&exceptions);
@@ -73,10 +71,6 @@ VideoWindow::VideoWindow(MainWindow *parent, const QDir &home)  :
      container = new QWidget(this);
      layout->addWidget(container);
      libvlc_media_player_set_hwnd (mp, container->winId());
-#endif
-
-#if 0 // XXX what abut mac!!!
-     libvlc_media_player_set_nsobject (mp, view);
 #endif
 
     connect(main, SIGNAL(stop()), this, SLOT(stopPlayback()));
