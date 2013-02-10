@@ -1253,8 +1253,8 @@ RideEditor::endCommand(bool undo, RideCommand *cmd)
 
             // move cursor to point updated
             QModelIndex cursor = model->index(spv->row, model->columnFor(spv->series));
-            // NOTE: This is to circumvent a performance issue with multiple
-            //       calls to setCurrentIndex XXX still TODO...
+            // NOTE: This is to circumvent a performance issue with multiple calls to setCurrentIndex 
+
             if (inLUW) { // remember and do it at the end -- otherwise major performance impact!!
                 itemselection << cursor;
             } else {

@@ -53,15 +53,10 @@ RideMetadata::RideMetadata(MainWindow *parent, bool singlecolumn) :
     tabs->setMovable(true);
     tabs->setPalette(palette);
     tabs->setAutoFillBackground(false);
-#if 0
-    tabs->setStyleSheet("QTabBar { alignment: center; }"
-                          "QTabWidget::pane { top: 0px; }"
-                       );
-#endif
     mainLayout->addWidget(tabs);
 
     // read in metadata.xml and setup the tabs etc
-    qRegisterMetaType<RideItem*>("ride"); // XXX we're first here... bit of a hack
+    qRegisterMetaType<RideItem*>("ride");
 
     extraForm = new Form(this);
 
@@ -441,8 +436,6 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
 
         if (field.name == "Change History") {
             dynamic_cast<QTextEdit*>(widget)->setReadOnly(true);
-            // pick up when ride saved - since it gets updated then
-            // XXX ? connect (main, SIGNAL(rideClean()), this, SLOT(rideSelected()));
         } else {
             connect (widget, SIGNAL(textChanged()), this, SLOT(editFinished()));
         }
