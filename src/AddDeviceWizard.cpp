@@ -1102,6 +1102,11 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     virtualPower->addItem("Power - Minoura V100 Trainer (1)");
     virtualPower->addItem("Power - Minoura V100 Trainer (L)");
     virtualPower->addItem("Power - Saris Powerbeam Pro");
+    virtualPower->addItem("Power - Tacx Satori (2)");
+    virtualPower->addItem("Power - Tacx Satori (4)");
+    virtualPower->addItem("Power - Tacx Satori (6)");
+    virtualPower->addItem("Power - Tacx Satori (8)");
+    virtualPower->addItem("Power - Tacx Satori (10)");
 
     wheelSize->addItem("Road/Cross (700C/622)"); // 2100mm
     wheelSize->addItem("Tri/TT (650C)"); // 1960mm
