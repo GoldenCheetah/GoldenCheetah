@@ -418,7 +418,7 @@ void CriticalPowerWindow::addSeries()
                << RideFile::cad
                << RideFile::nm
                << RideFile::vam
-               << RideFile::none; // XXX actually this shows energy (hack)
+               << RideFile::none; // this shows energy (hack)
 
     foreach (RideFile::SeriesType x, seriesList) {
         if (x==RideFile::none) {
