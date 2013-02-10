@@ -118,10 +118,7 @@ FixGPS::postProcess(RideFile *ride, DataProcessorConfig *)
             ride->command->setPointValue(j, RideFile::lon, ride->dataPoints()[lastgood]->lon);
             errors++;
         }
-    } else {
-        // they are all bad!!
-        // XXX do nothing?
-    }
+    } 
     ride->command->endLUW();
 
     if (errors) {
