@@ -41,7 +41,6 @@
 #include "PerformanceManagerWindow.h"
 #include "PfPvWindow.h"
 #include "HrPwWindow.h"
-#include "RaceWindow.h" // XXX not done
 #include "RideEditor.h"
 #include "RideNavigator.h"
 #include "RideSummaryWindow.h"
@@ -106,7 +105,7 @@ GcWindowRegistry::initialize()
 
 // instantiate a new window
 GcWindow *
-GcWindowRegistry::newGcWindow(GcWinID id, MainWindow *main) //XXX mainWindow will go soon
+GcWindowRegistry::newGcWindow(GcWinID id, MainWindow *main)
 {
     GcWindow *returning = NULL;
 
