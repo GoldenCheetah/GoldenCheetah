@@ -165,9 +165,6 @@ FixHRSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0)
             ride->command->setPointValue(j, RideFile::hr, ride->dataPoints()[lastgood]->hr);
             spikes++;
         }
-    } else {
-        // they are all bad!!
-        // XXX do nothing?
     }
 
     ride->command->endLUW();	// End of LogicalUnitOfWork
