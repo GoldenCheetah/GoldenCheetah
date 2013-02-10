@@ -1912,9 +1912,6 @@ MainWindow::removeCurrentRide()
         rideTreeWidgetSelectionChanged(); // notifies children
     }
 
-    // added djconnel: remove old cpi file, then update bests which are associated with the file
-    //XXX need to clean up in metricaggregator criticalPowerWindow->deleteCpiFile(strOldFileName);
-
     treeWidget->setCurrentItem(itemToSelect);
     rideTreeWidgetSelectionChanged();
 }
