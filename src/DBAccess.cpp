@@ -369,7 +369,7 @@ void DBAccess::checkDBVersion()
     }
 
     // "measures" table, is it up-to-date? - export - recreate - import ....
-    // XXX gets wiped away for now, will fix later
+    // gets wiped away for now, will fix as part of v3.1
     if (dropMeasures) {
         dropMeasuresTable();
         createMeasuresTable();
@@ -466,7 +466,7 @@ bool DBAccess::importRide(SummaryMetrics *summaryMetrics, RideFile *ride, QColor
         if (!main->specialFields.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
             query.addBindValue(ride->getTag(field.name, "0.0").toDouble());
         } else if (!main->specialFields.isMetric(field.name)) {
-            if (field.name == "Recording Interval")  // XXX Special - need a better way...
+            if (field.name == "Recording Interval") 
                 query.addBindValue(ride->recIntSecs());
         }
     }
@@ -548,7 +548,6 @@ DBAccess::getRide(QString filename, SummaryMetrics &summaryMetrics, QColor&color
                 i++;
             } else if (!main->specialFields.isMetric(field.name) && field.type < 3) {
                 QString underscored = field.name;
-                // ignore texts for now XXX todo if want metadata from Summary Metrics
                 summaryMetrics.setText(underscored.replace("_"," "), query.value(i+4).toString());
                 i++;
             }
@@ -603,7 +602,6 @@ QList<SummaryMetrics> DBAccess::getAllMetricsFor(QDateTime start, QDateTime end)
                 i++;
             } else if (!main->specialFields.isMetric(field.name) && (field.type < 3 || field.type == 7)) {
                 QString underscored = field.name;
-                // ignore texts for now XXX todo if want metadata from Summary Metrics
                 summaryMetrics.setText(underscored.replace("_"," "), query.value(i+3).toString());
                 i++;
             }
@@ -648,7 +646,6 @@ SummaryMetrics DBAccess::getRideMetrics(QString filename)
                 summaryMetrics.setForSymbol(underscored.replace(" ","_"), query.value(i+2).toDouble());
                 i++;
             } else if (!main->specialFields.isMetric(field.name) && (field.type < 3 || field.type == 7)) {
-                // ignore texts for now XXX todo if want metadata from Summary Metrics
                 QString underscored = field.name;
                 summaryMetrics.setText(underscored.replace("_"," "), query.value(i+2).toString());
                 i++;
