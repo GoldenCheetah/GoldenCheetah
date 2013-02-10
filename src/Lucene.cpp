@@ -164,7 +164,7 @@ int Lucene::search(QString query)
         hits = searcher->search(lquery);
         filenames.clear();
 
-        for (int i=0; i< hits->length(); i++) {
+        for (size_t i=0; i< hits->length(); i++) {
             Document *d = &hits->doc(i);
             filenames << QString::fromWCharArray(d->get(_T("Filename")));
         }
