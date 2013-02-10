@@ -218,7 +218,7 @@ icalcomponent *createEvent(RideItem *rideItem)
     atime.hour = utc.time().hour();
     atime.minute = utc.time().minute();
     atime.second = utc.time().second();
-    atime.is_utc = 1; // this is UTC //XXX is_utc is redundant need to investiage further
+    atime.is_utc = 1; // this is UTC is_utc is redundant but kept for completeness
     atime.is_date = 0; // this is a date AND time
     atime.is_daylight = 0; // no daylight savings - its UTC
     atime.zone = icaltimezone_get_utc_timezone(); // set UTC timezone
@@ -257,10 +257,8 @@ icalcomponent *createEvent(RideItem *rideItem)
     icalcomponent_set_description(event, rideItem->ride()->getTag("Calendar Text", "").toLatin1());
 
     // attach ridefile
-    // XXX todo -- google doesn't suport
-    //             attachments properly .. yet
-    //             there is a labs option to use
-    //             google docs.. will check hotmail...
+    // google doesn't suport attachments yet. There is a labs option to use google docs
+    // but it is only available to Google Apps customers.
 
     // put the event into root
     icalcomponent_add_component(root, event);
@@ -364,7 +362,7 @@ CalDAV::requestReply(QNetworkReply *reply)
     case Options:
     case PropFind:
     case Put:
-        //nothing at the moment XXX FIXME need some diags / error checking
+        //nothing at the moment
         break;
     }
     mode = None;
