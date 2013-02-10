@@ -57,7 +57,6 @@ CpintPlot::CpintPlot(MainWindow *main, QString p, const Zones *zones) :
     setInstanceName("CP Plot");
     assert(!USE_T0_IN_CP_MODEL); // doesn't work with energyMode=true
 
-    //insertLegend(new QwtLegend(), QwtPlot::BottomLegend); //XXX ugly in small, needs fixing
     setAxisTitle(xBottom, tr("Interval Length"));
     LogTimeScaleDraw *ld = new LogTimeScaleDraw;
     ld->setTickLength(QwtScaleDiv::MajorTick, 3);
@@ -340,7 +339,7 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
         double x = (double) i / (curve_points - 1);
         double t = pow(tmax, x) * pow(tmin, 1-x);
         cp_curve_time[i] = t;
-        if (series == RideFile::none) //XXX this is ENERGY
+        if (series == RideFile::none) //this is ENERGY
             cp_curve_power[i] = (cp * t + cp * tau) * 60.0 / 1000.0;
         else
             cp_curve_power[i] = cp * (1 + tau / (t + t0));
