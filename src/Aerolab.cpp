@@ -362,7 +362,6 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
       double t = 0.0;
       double vlast = 0.0;
       double e     = 0.0;
-      //double d = 0; //XXX not used?
       arrayLength = 0;
       foreach(const RideFilePoint *p1, ride->dataPoints()) {
       if ( arrayLength == 0 )
