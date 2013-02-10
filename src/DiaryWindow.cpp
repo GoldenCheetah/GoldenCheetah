@@ -273,11 +273,11 @@ DiaryWindow::eventFilter(QObject *object, QEvent *e)
         QRect c = monthlyView->visualRect(index);
 
         // clicked on heading
-        if (y <= (c.y()+15)) return true; // XXX clicked on heading we may need to trap this!
+        if (y <= (c.y()+15)) return true; // clicked on heading 
 
         // clicked on cell contents
         if (files.count() == 1) {
-            if (files[0] == "calendar") ; // XXX handle planned rides
+            if (files[0] == "calendar") ; // handle planned rides
             else mainWindow->selectRideFile(QFileInfo(files[0]).fileName());
 
         } else if (files.count()) {
@@ -287,11 +287,11 @@ DiaryWindow::eventFilter(QObject *object, QEvent *e)
             int i;
             for(i=files.count()-1; i>=0; i--) if (y > (c.y()+15+(h*i))) break;
 
-            if (files[i] == "calendar") ; // XXX handle planned rides
+            if (files[i] == "calendar") ; // handle planned rides
             else mainWindow->selectRideFile(QFileInfo(files[i]).fileName());
         }
 
-        // force a repaint XXX this is a hack!
+        // force a repaint 
         calendarModel->setMonth(calendarModel->getMonth(), calendarModel->getYear());
         return true;
         }
@@ -312,7 +312,7 @@ DiaryWindow::eventFilter(QObject *object, QEvent *e)
 
                 // Popup bubble for ride
                 if (files.count() == 1) {
-                    if (files[0] == "calendar") ; // XXX handle planned rides
+                    if (files[0] == "calendar") ; // handle planned rides
                     else mainWindow->setBubble(files.at(0), monthlyView->viewport()->mapToGlobal(pos));
 
                 } else if (files.count()) {
@@ -329,7 +329,7 @@ DiaryWindow::eventFilter(QObject *object, QEvent *e)
                         return true;
                     }
 
-                    if (files.at(i) == "calendar") ; // XXX handle planned rides
+                    if (files.at(i) == "calendar") ; // handle planned rides
                     else mainWindow->setBubble(files.at(i), monthlyView->viewport()->mapToGlobal(pos));
                 } else {
                     mainWindow->setBubble("");

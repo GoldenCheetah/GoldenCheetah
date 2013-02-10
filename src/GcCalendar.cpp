@@ -242,8 +242,7 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     QHBoxLayout *h = new QHBoxLayout();
     h->setSpacing(5);
     summarySelect = new QComboBox(this);
-    //summarySelect->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLength); XXX
-    summarySelect->setFixedWidth(150); // XXX is it impossible to size constrain qcombos?????
+    summarySelect->setFixedWidth(150); // is it impossible to size constrain qcombos?
     summarySelect->addItem(tr("Day Summary"));
     summarySelect->addItem(tr("Weekly Summary"));
     summarySelect->addItem(tr("Monthly Summary"));
@@ -336,7 +335,7 @@ GcCalendar::event(QEvent *e)
 
                 // Popup bubble for ride
                 if (files.count()) {
-                    if (files[0] == "calendar") ; // XXX handle planned rides
+                    if (files[0] == "calendar") ; // handle planned rides
                     else main->setBubble(files.at(0), mapToGlobal(pos+QPoint(+2,+2)));
                 }
             }
@@ -359,7 +358,7 @@ GcCalendar::dayClicked(int i)
     QModelIndex p = calendarModel->index(row,col);
     QStringList files = calendarModel->data(p, GcCalendarModel::FilenamesRole).toStringList();
 
-    if (files.count()) // XXX if more than one file cycle through them?
+    if (files.count()) // if more than one file cycle through them?
         main->selectRideFile(QFileInfo(files[0]).fileName());
 
 }
@@ -622,7 +621,7 @@ GcCalendar::setSummary()
                               "<body>"
                               "<center>");
 
-        for (int i=0; i<4; i++) { //XXX taken out maximums -- too much info -- looks ugly
+        for (int i=0; i<4; i++) { //taken out maximums -- too much info -- looks ugly
 
             QString aggname;
             QStringList list;
