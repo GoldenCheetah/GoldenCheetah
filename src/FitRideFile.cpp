@@ -49,7 +49,9 @@ struct FitDefinition {
 
 /* FIT has uint32 as largest integer type. So qint64 is large enough to
  * store all integer types - no matter if they're signed or not */
-// XXX this needs to get changed to support non-integer values
+
+// this will need to change if float or other non-integer values are 
+// introduced into the file format
 typedef qint64 fit_value_t;
 #define NA_VALUE std::numeric_limits<fit_value_t>::max()
 
@@ -83,7 +85,6 @@ struct FitFileReaderState
     void read_unknown( int size, int *count = NULL ){
         char c[size+1];
 
-        // XXX: just seek instead of read?
         if (file.read(c, size ) != size)
             throw TruncatedRead();
         if (count)
@@ -351,14 +352,14 @@ struct FitFileReaderState
                 case 5: km = value / 100000.0; break;
                 case 6: kph = value * 3.6 / 1000.0; break;
                 case 7: watts = value; break;
-                case 8: break; // XXX packed speed/dist
+                case 8: break; // packed speed/dist
                 case 9: //grade = value / 100.0;
                         break;
                 case 10: //resistance = value;
                         break;
                 case 11: //time_from_course = value / 1000.0;
                          break;
-                case 12: break; // XXX "cycle_length"
+                case 12: break; // "cycle_length"
                 case 13: temperature = value; break;
                 case 30: lrbalance = (value & 0x80 ? 100 - (value & 0x7F) : value & 0x7F);break;
 
@@ -388,7 +389,7 @@ struct FitFileReaderState
             badgps = 1;
         }
         if (start_time == 0) {
-            start_time = time - 1; // XXX: recording interval?
+            start_time = time - 1; // recording interval?
             QDateTime t;
             t.setTime_t(start_time);
             rideFile->setStartTime(t);
@@ -524,7 +525,7 @@ struct FitFileReaderState
                     case 10: v = read_uint8z(&count); break;
                     case 11: v = read_uint16z(def.is_big_endian, &count); break;
                     case 12: v = read_uint32z(def.is_big_endian, &count); break;
-                    //XXX: support float, string + byte base types
+                    // we may need to add support for float, string + byte base types here
                     default:
                         read_unknown( field.size, &count );
                         v = NA_VALUE;
@@ -562,8 +563,8 @@ struct FitFileReaderState
 
     RideFile * run() {
         rideFile = new RideFile;
-        rideFile->setDeviceType("Garmin FIT"); // XXX: read from device msg?
-        rideFile->setRecIntSecs(1.0); // XXX: always?
+        rideFile->setDeviceType("Garmin FIT");
+        rideFile->setRecIntSecs(1.0); // this is a terrible assumption!
         if (!file.open(QIODevice::ReadOnly)) {
             delete rideFile;
             return NULL;

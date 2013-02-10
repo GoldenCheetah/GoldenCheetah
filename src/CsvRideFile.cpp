@@ -445,7 +445,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
                 // NO DICE
 
-                // XXX Note: qWarning("Failed to set start time");
+                // Note: qWarning("Failed to set start time");
                 // console messages are no use, so commented out
                 // this problem will ONLY occur during the import
                 // process which traps these and corrects them
