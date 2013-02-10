@@ -893,8 +893,8 @@ MainWindow::MainWindow(const QDir &home) :
 #ifdef GC_HAVE_ICAL
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Upload Activity to Calendar"), this, SLOT(uploadCalendar()), tr (""));
-    optionsMenu->addAction(tr("Import Calendar..."), this, SLOT(importCalendar()), tr (""));
-    optionsMenu->addAction(tr("Export Calendar..."), this, SLOT(exportCalendar()), tr (""));
+    //optionsMenu->addAction(tr("Import Calendar..."), this, SLOT(importCalendar()), tr ("")); // planned for v3.1
+    //optionsMenu->addAction(tr("Export Calendar..."), this, SLOT(exportCalendar()), tr ("")); // planned for v3.1
     optionsMenu->addAction(tr("Refresh Calendar"), this, SLOT(refreshCalendar()), tr (""));
 #endif
     optionsMenu->addSeparator();
