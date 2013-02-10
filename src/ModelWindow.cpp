@@ -243,9 +243,9 @@ ModelWindow::setData(bool adjustPlot)
     settings.y = ySelector->itemData(ySelector->currentIndex()).toInt();
     settings.z = zSelector->itemData(zSelector->currentIndex()).toInt();
     settings.color = colorSelector->itemData(colorSelector->currentIndex()).toInt();
-    settings.xbin = binWidthSlider->value(); // XXX fixed to single bin width
-    settings.ybin = binWidthSlider->value(); // XXX due to issues with bar geometry
-    settings.crop = false; // XXX not implemented
+    settings.xbin = binWidthSlider->value();
+    settings.ybin = binWidthSlider->value();
+    settings.crop = false; // not implemented yet
     settings.zpane = 0;
     settings.ignore = ignore->isChecked();
     settings.gridlines = grid->isChecked();

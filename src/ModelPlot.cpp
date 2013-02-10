@@ -275,7 +275,7 @@ ModelDataProvider::describeType(int type, bool longer)
                 }else {
                     return tr("Elapsed Distance (mi)");
                 }
-            case MODEL_INTERVAL : return tr("Interval Number"); // XXX implemented differently
+            case MODEL_INTERVAL : return tr("Interval Number");
             case MODEL_LAT : return tr("Latitude (degree x 1000)");
             case MODEL_LONG : return tr("Longitude (degree x 1000)");
             case MODEL_CPV : return tr("Circumferential Pedal Velocity (cm/s)");
@@ -293,12 +293,12 @@ ModelDataProvider::describeType(int type, bool longer)
             case MODEL_POWER : return tr("Power");
             case MODEL_CADENCE : return tr("Cadence");
             case MODEL_HEARTRATE : return tr("Heartrate");
-            case MODEL_SPEED : return tr("Speed"); //XXX metric / imperial!
-            case MODEL_ALT : return tr("Altitude"); // XXX metric / imperial
+            case MODEL_SPEED : return tr("Speed");
+            case MODEL_ALT : return tr("Altitude");
             case MODEL_TORQUE : return tr("Pedal Force");
             case MODEL_TIME : return tr("Time");
-            case MODEL_DISTANCE : return tr("Distance");//XXX metric/imperial
-            case MODEL_INTERVAL : return tr("Interval"); // XXX implemented differently
+            case MODEL_DISTANCE : return tr("Distance");
+            case MODEL_INTERVAL : return tr("Interval");
             case MODEL_LAT : return tr("Latitude");
             case MODEL_LONG : return tr("Longitude");
             case MODEL_XYTIME : return tr("Time at X/Y");
@@ -430,7 +430,7 @@ ModelDataProvider::ModelDataProvider (BasicModelPlot &plot, ModelSettings *setti
             plot.intervals_ = SHOW_INTERVALS;
             if (settings->frame == true) plot.intervals_ |= SHOW_FRAME;
 
-            QString lookup = xystring(binx, biny); // XXX SEGV on QString in multiple hashes!!!! XXX
+            QString lookup = xystring(binx, biny);
 
             // filter for interval
             for(int i=0; i<settings->intervals.count(); i++) {
