@@ -111,7 +111,7 @@ static QString describeType(int type, bool longer, bool useMetricUnits)
                 }else {
                     return ("Elapsed Distance (mi)");
                 }
-            case MODEL_INTERVAL : return ("Interval Number"); // XXX implemented differently
+            case MODEL_INTERVAL : return ("Interval Number");
             case MODEL_LAT : return ("Latitude (degree offset)");
             case MODEL_LONG : return ("Longitude (degree offset)");
             case MODEL_CPV : return ("Circumferential Pedal Velocity (cm/s)");
@@ -129,12 +129,12 @@ static QString describeType(int type, bool longer, bool useMetricUnits)
             case MODEL_POWER : return ("Power");
             case MODEL_CADENCE : return ("Cadence");
             case MODEL_HEARTRATE : return ("Heartrate");
-            case MODEL_SPEED : return ("Speed"); //XXX metric / imperial!
-            case MODEL_ALT : return ("Altitude"); // XXX metric / imperial
+            case MODEL_SPEED : return ("Speed");
+            case MODEL_ALT : return ("Altitude");
             case MODEL_TORQUE : return ("Pedal Force");
             case MODEL_TIME : return ("Time");
-            case MODEL_DISTANCE : return ("Distance");//XXX metric/imperial
-            case MODEL_INTERVAL : return ("Interval"); // XXX implemented differently
+            case MODEL_DISTANCE : return ("Distance");
+            case MODEL_INTERVAL : return ("Interval");
             case MODEL_LAT : return ("Latitude");
             case MODEL_LONG : return ("Longitude");
             case MODEL_XYTIME : return ("Time at X/Y");
