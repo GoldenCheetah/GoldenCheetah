@@ -192,9 +192,9 @@ PwxFileReader::PwxFromDomDoc(QDomDocument doc, QStringList &errors) const
             QDomElement pwr = node.firstChildElement("pwr");
             if (!pwr.isNull()) {
                 add.watts = pwr.text().toDouble();
-                // XXX undo the fudge to set zero values to
-                //     1 in the writer (below). This is to keep
-                //     the TP upload web-service happy
+                // NOTE! undo the fudge to set zero values to
+                //       1 in the writer (below). This is to keep
+                //       the TP upload web-service happy with zero values
                 if (add.watts == 1) add.watts = 0.0;
             } else add.watts = 0.0;
             // torq

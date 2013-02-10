@@ -219,7 +219,7 @@ KmlFileReader::writeRideFile(MainWindow *, const RideFile * ride, QFile &file) c
     //
     foreach (RideFilePoint *datapoint, ride->dataPoints()) {
 
-        // lots of arsing around with dates XXX clean this up
+        // lots of arsing around with dates 
         QDateTime timestamp(ride->startTime().addSecs(datapoint->secs));
         string stdctimestamp = timestamp.toString(Qt::ISODate).toStdString() + "Z"; //<< 'Z' fixes crash!
         kmlbase::DateTime *when = kmlbase::DateTime::Create(stdctimestamp.data());
