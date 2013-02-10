@@ -33,6 +33,9 @@ ErgDBDownloadDialog::ErgDBDownloadDialog(MainWindow *main) : QDialog(main), main
     setLayout(layout);
 
     files = new QTreeWidget;
+#ifdef Q_OS_MAC
+    files->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
     files->headerItem()->setText(0, tr(""));
     files->headerItem()->setText(1, tr("Name"));
     files->headerItem()->setText(2, tr("Type"));
