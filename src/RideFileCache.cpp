@@ -78,9 +78,6 @@ RideFileCache::RideFileCache(MainWindow *main, QString fileName, RideFile *passe
             // is it as recent as we are?
             if (head.version == RideFileCacheVersion) {
 
-                // Are the CP/LTHR values still correct
-                // XXX todo
-
                 // WE'RE GOOD
                 if (check == false) readCache(); // if check is false we aren't just checking
                 return;
@@ -483,8 +480,8 @@ void RideFileCache::RideFileCache::compute()
 data_t *
 MeanMaxComputer::integrate_series(cpintdata &data)
 {
-
-    data_t *integrated= (data_t *)malloc(sizeof(data_t)*(data.points.size()+1)); //XXX use QVector... todo
+    // would be better to do pure QT and use QVector -- but no memory leak
+    data_t *integrated= (data_t *)malloc(sizeof(data_t)*(data.points.size()+1)); 
     int i;
     data_t acc=0;
 
