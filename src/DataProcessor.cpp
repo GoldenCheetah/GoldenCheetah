@@ -107,7 +107,7 @@ void
 ManualDataProcessorDialog::okClicked()
 {
     if (processor->postProcess((RideFile *)ride->ride(), config) == true) {
-        main->notifyRideSelected();     // XXX to remain compatible with rest of GC for now
+        main->notifyRideSelected();     // to remain compatible with rest of GC for now
     }
     accept();
 }
