@@ -19,10 +19,6 @@
 #include <QtGui>
 #include "MainWindow.h"
 
-#ifdef Q_OS_MAC
-#include "QtMacButton.h" // mac
-#endif
-
 //
 // Replace home window when no ride
 //

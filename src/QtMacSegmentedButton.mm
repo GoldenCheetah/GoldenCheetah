@@ -47,6 +47,7 @@ static NSImage *fromQPixmap(const QPixmap *pixmap)
     NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithCGImage:pixmap->toMacCGImageRef()];
     NSImage *image = [[[NSImage alloc] init] autorelease];
     [image addRepresentation:bitmapRep];
+    [bitmapRep release];
     [image setTemplate:true];
     return image;
 }
@@ -87,7 +88,7 @@ QtMacSegmentedButton::QtMacSegmentedButton (int aCount, QWidget *aParent /* = 0 
 #if QT_VERSION >= 0x040800 // see QT-BUG 22574, QMacCocoaContainer on 4.8 is "broken"
     setAttribute(Qt::WA_NativeWindow);
 #endif
-    mNativeRef = [[NSSegmentedControl alloc] init];
+    mNativeRef = [[[NSSegmentedControl alloc] init] autorelease];
     [mNativeRef setSegmentCount:aCount];
     [mNativeRef setSegmentStyle:NSSegmentStyleTexturedRounded];
     [[mNativeRef cell] setTrackingMode: NSSegmentSwitchTrackingSelectOne];
@@ -95,8 +96,9 @@ QtMacSegmentedButton::QtMacSegmentedButton (int aCount, QWidget *aParent /* = 0 
         [NSFont systemFontSizeForControlSize: NSSmallControlSize]]];
     [mNativeRef sizeToFit];
 
-    NSSegmentedButtonTarget *bt = [[NSSegmentedButtonTarget alloc] initWithObject1:this];
+    NSSegmentedButtonTarget *bt = [[[NSSegmentedButtonTarget alloc] initWithObject1:this] autorelease];
     [mNativeRef setTarget:bt];
+
     [mNativeRef setAction:@selector(segControlClicked:)];
 
     NSRect frame = [mNativeRef frame];
