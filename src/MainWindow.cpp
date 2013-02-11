@@ -969,9 +969,6 @@ MainWindow::MainWindow(const QDir &home) :
     if (allRides->childCount() != 0)
         treeWidget->setCurrentItem(allRides->child(allRides->childCount()-1));
 
-    // default to Analysis
-    selectAnalysis();
-
     // now we're up and runnning lets connect the signals
     connect(treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(rideTreeWidgetSelectionChanged()));
     connect(intervalWidget,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showContextMenuPopup(const QPoint &)));
