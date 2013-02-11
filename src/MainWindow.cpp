@@ -19,7 +19,6 @@
 #include "MainWindow.h"
 #include "AboutDialog.h"
 #include "AddIntervalDialog.h"
-#include "AthleteTool.h"
 #include "BestIntervalDialog.h"
 #include "BlankState.h"
 #include "ChooseCyclistDialog.h"
@@ -52,7 +51,6 @@
 #include "Units.h"
 #include "Zones.h"
 
-#include "RideCalendar.h"
 #include "DatePickerDialog.h"
 #include "ToolsDialog.h"
 #include "ToolsRhoEstimator.h"
@@ -664,11 +662,10 @@ MainWindow::MainWindow(const QDir &home) :
     QTreeWidgetItem *last = NULL;
     QStringListIterator i(RideFileFactory::instance().listRideFiles(home));
     while (i.hasNext()) {
-        QString name = i.next(), notesFileName;
+        QString name = i.next();
         QDateTime dt;
-        if (parseRideFileName(name, &notesFileName, &dt)) {
-            last = new RideItem(RIDE_TYPE, home.path(),
-                                name, dt, zones(), hrZones(), notesFileName, this);
+        if (parseRideFileName(name, &dt)) {
+            last = new RideItem(RIDE_TYPE, home.path(), name, dt, zones(), hrZones(), this);
             allRides->addChild(last);
         }
     }
@@ -971,9 +968,6 @@ MainWindow::MainWindow(const QDir &home) :
     // selects the latest ride in the list:
     if (allRides->childCount() != 0)
         treeWidget->setCurrentItem(allRides->child(allRides->childCount()-1));
-
-    // default to Analysis
-    selectAnalysis();
 
     // now we're up and runnning lets connect the signals
     connect(treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(rideTreeWidgetSelectionChanged()));
@@ -1813,13 +1807,12 @@ MainWindow::dropEvent(QDropEvent *event)
 void
 MainWindow::addRide(QString name, bool /* bSelect =true*/)
 {
-    QString notesFileName;
     QDateTime dt;
-    if (!parseRideFileName(name, &notesFileName, &dt)) {
+    if (!parseRideFileName(name, &dt)) {
         fprintf(stderr, "bad name: %s\n", name.toAscii().constData());
         assert(false);
     }
-    RideItem *last = new RideItem(RIDE_TYPE, home.path(), name, dt, zones(), hrZones(), notesFileName, this);
+    RideItem *last = new RideItem(RIDE_TYPE, home.path(), name, dt, zones(), hrZones(), this);
 
     int index = 0;
     while (index < allRides->childCount()) {
@@ -2485,7 +2478,7 @@ MainWindow::setCriticalPower(int cp)
 }
 
 bool
-MainWindow::parseRideFileName(const QString &name, QString *notesFileName, QDateTime *dt)
+MainWindow::parseRideFileName(const QString &name, QDateTime *dt)
 {
     static char rideFileRegExp[] = "^((\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)"
                                    "_(\\d\\d)_(\\d\\d)_(\\d\\d))\\.(.+)$";
@@ -2503,7 +2496,6 @@ MainWindow::parseRideFileName(const QString &name, QString *notesFileName, QDate
 	return false;
     }
     *dt = QDateTime(date, time);
-    *notesFileName = rx.cap(1) + ".notes";
     return true;
 }
 

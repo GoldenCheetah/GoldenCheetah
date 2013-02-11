@@ -28,16 +28,10 @@
 
 RideItem::RideItem(int type,
                    QString path, QString fileName, const QDateTime &dateTime,
-                   const Zones *zones, const HrZones *hrZones, QString notesFileName, MainWindow *main) :
+                   const Zones *zones, const HrZones *hrZones, MainWindow *main) :
     QTreeWidgetItem(type), ride_(NULL), main(main), isdirty(false), isedit(false), path(path), fileName(fileName),
-    dateTime(dateTime), zones(zones), hrZones(hrZones), notesFileName(notesFileName)
-{
-    setText(0, dateTime.toString("ddd"));
-    setText(1, dateTime.toString("MMM d, yyyy"));
-    setText(2, dateTime.toString("h:mm AP"));
-    setTextAlignment(1, Qt::AlignRight);
-    setTextAlignment(2, Qt::AlignRight);
-}
+    dateTime(dateTime), zones(zones), hrZones(hrZones)
+{ }
 
 RideFile *RideItem::ride()
 {

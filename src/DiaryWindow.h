@@ -31,11 +31,6 @@
 // list view
 #include "RideNavigator.h"
 
-// weekly view
-#include "qxtscheduleview.h"
-#include "QxtScheduleViewProxy.h"
-#include "WeeklyViewItemDelegate.h"
-
 // monthly view
 #include <QTableView>
 #include "GcCalendarModel.h"
@@ -63,7 +58,6 @@ class DiaryWindow : public GcWindow
         void configChanged();
         void nextClicked();
         void prevClicked();
-        void weeklySelected(QModelIndex);
         void setDefaultView(int);
         bool eventFilter(QObject *object, QEvent *e); // traps monthly view
 
@@ -78,9 +72,6 @@ class DiaryWindow : public GcWindow
 
         QTableView *monthlyView;
         GcCalendarModel *calendarModel;
-
-        QxtScheduleView *weeklyView;
-        QxtScheduleViewProxy *weeklyViewProxy;
 
         bool active;
         QList<FieldDefinition> fieldDefinitions;

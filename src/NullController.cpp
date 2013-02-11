@@ -20,7 +20,6 @@
 #include <stdio.h>
 
 #include "NullController.h"
-#include "RaceDispatcher.h"
 #include "RealtimeData.h"
 
 #include <math.h>
