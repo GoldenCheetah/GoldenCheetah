@@ -19,7 +19,6 @@
 #include "MainWindow.h"
 #include "AboutDialog.h"
 #include "AddIntervalDialog.h"
-#include "AthleteTool.h"
 #include "BestIntervalDialog.h"
 #include "BlankState.h"
 #include "ChooseCyclistDialog.h"
@@ -52,7 +51,6 @@
 #include "Units.h"
 #include "Zones.h"
 
-#include "RideCalendar.h"
 #include "DatePickerDialog.h"
 #include "ToolsDialog.h"
 #include "ToolsRhoEstimator.h"

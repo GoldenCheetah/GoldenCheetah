@@ -48,17 +48,6 @@ DiaryWindow::DiaryWindow(MainWindow *mainWindow) :
     prev->setFlat(true);
 #endif
 
-#if 0
-    // viewMode - monthly or weekly
-    viewMode = new QComboBox;
-    viewMode->addItem("View Month");
-    viewMode->addItem("View Week"); // we can add more later...
-    viewMode->addItem("View Ride"); // we can add more later...
-    viewMode->setFixedWidth(120);
-
-    viewMode->setCurrentIndex(appsettings->cvalue(mainWindow->cyclist, GC_DIARY_VIEW, "1").toInt());
-#endif
-
     controls->addWidget(prev);
     controls->addWidget(next);
     controls->addStretch();
@@ -84,19 +73,8 @@ DiaryWindow::DiaryWindow(MainWindow *mainWindow) :
     monthlyView->setGridStyle(Qt::DotLine);
     monthlyView->setFrameStyle(QFrame::NoFrame);
 
-    // weekly view via QxtScheduleView
-    weeklyView = new QxtScheduleView;
-    weeklyViewProxy = new QxtScheduleViewProxy(this, &fieldDefinitions, mainWindow);
-    weeklyViewProxy->setSourceModel(mainWindow->listView->sqlModel);
-    weeklyView->setCurrentZoomDepth (30, Qxt::Minute);
-    weeklyView->setDateRange(QDate(2010,9,2), QDate(2010,9,8));
-    weeklyView->setModel(weeklyViewProxy);
-
-    RideSummaryWindow *rideSummary = new RideSummaryWindow(mainWindow);
     allViews = new QStackedWidget(this);
     allViews->addWidget(monthlyView);
-    allViews->addWidget(weeklyView);
-    allViews->addWidget(rideSummary);
     //allViews->setCurrentIndex(viewMode->currentIndex());
     allViews->setCurrentIndex(0);
 
@@ -108,7 +86,6 @@ DiaryWindow::DiaryWindow(MainWindow *mainWindow) :
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(configChanged()), this, SLOT(configChanged()));
-    connect(weeklyView, SIGNAL(indexSelected(QModelIndex)), this, SLOT(weeklySelected(QModelIndex)));
     connect(next, SIGNAL(clicked()), this, SLOT(nextClicked()));
     connect(prev, SIGNAL(clicked()), this, SLOT(prevClicked()));
 }
@@ -151,8 +128,6 @@ DiaryWindow::rideSelected()
     calendarModel->setMonth(when.month(), when.year());
 
     when = when.addDays(Qt::Monday - when.dayOfWeek());
-    weeklyView->setDateRange(when, when.addDays(6));
-    weeklyView->setViewMode(QxtScheduleView::DayView);
 
 #if 0
     // ok update title
@@ -236,20 +211,6 @@ DiaryWindow::nextClicked()
         break;
     }
 #endif
-}
-
-void
-DiaryWindow::weeklySelected(QModelIndex index)
-{
-    if (active) return;
-
-    // lets select it in the ride list then!
-    QString filename = weeklyViewProxy->data(index, QxtScheduleViewProxy::FilenameRole).toString();
-    active = true;
-    mainWindow->selectRideFile(QFileInfo(filename).fileName());
-    //weeklyView->setViewMode(QxtScheduleView::DayView);
-    active = false;
-    rideSelected();
 }
 
 bool
