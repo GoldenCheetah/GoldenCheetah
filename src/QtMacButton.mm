@@ -26,6 +26,7 @@ static NSImage *fromQPixmap(const QPixmap *pixmap)
     NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithCGImage:pixmap->toMacCGImageRef()];
     NSImage *image = [[[NSImage alloc] init] autorelease];
     [image addRepresentation:bitmapRep];
+    [bitmapRep release];
     [image setTemplate:true];
     return image;
 }
