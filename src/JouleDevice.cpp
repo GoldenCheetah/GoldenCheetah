@@ -178,7 +178,7 @@ JouleDevice::download( const QDir &tmpdir,
 
             if (page < 65535) {
                 // create temporary file
-                QString tmpl = tmpdir.absoluteFilePath(".joule.XXXXXX"); //".joulegps.XXXXXX"
+                QString tmpl = tmpdir.absoluteFilePath(".joule.XXXXXX"); // temp file
                 QTemporaryFile tmp(tmpl);
                 tmp.setAutoRemove(false);
 

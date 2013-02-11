@@ -37,7 +37,9 @@ bool
 SrmDevices::supportsPort( CommPortPtr dev )
 {
 #if defined(SRMIO_HAVE_TERMIOS) || defined(SRMIO_HAVE_WINCOM)
-    // XXX: check device name starts with "com" or "/dev"?
+    // we could check device name starts with "com" or "/dev"
+    // but we wouldn't have got here unless it was a supported
+    // serial port anyway.
     if( dev->type() == "Serial" )
         return true;
 #endif
@@ -60,7 +62,6 @@ SrmDevices::exclusivePort( CommPortPtr dev )
 {
     switch( protoVersion ){
       case 5:
-        // XXX: this has to go, once we have other devices using prolific
         if( dev->type() == "Serial" && dev->name().contains( "PL2303" ) )
             return true;
         break;
@@ -118,7 +119,9 @@ SrmDevice::open( QString &err )
 
     if( dev->type() == "Serial" ){
 
-        // XXX: check device name starts with "com" or "/dev"?
+        // no need to check device name starts with "com" or "/dev"
+        // since we wouldn't get this far unless it was a supported
+        // serial port device anyway.
 
 #ifdef SRMIO_HAVE_WINCOM
         io = srmio_iow32_new( dev->name().toAscii().constData(), &serr );
@@ -329,7 +332,7 @@ SrmDevice::download( const QDir &tmpdir,
     size_t block_cnt, block_num( 0 );
     size_t prog_sum( 0 ), prog_prev( 0 );
     size_t chunks_done( 0 );
-    srmio_time_t splitGap( 72000 ); // 2h - XXX: make this configurable
+    srmio_time_t splitGap( 72000 ); // 2h - NOTE: we could make this configurable
 
     if( ! is_open ){
         if( ! open( err ) )

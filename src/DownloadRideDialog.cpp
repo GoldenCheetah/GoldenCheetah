@@ -298,7 +298,8 @@ DownloadRideDialog::downloadClicked()
 
     QList<DeviceRideItemPtr> &rides( device->rides() );
     if( ! rides.empty() ){
-        // XXX: let user select, which rides he wants to download
+        // we should let user select, which rides he wants to download
+        // rather than download them all. Fix in v3.1
         for( int i = 0; i < rides.size(); ++i ){
             rides.at(i)->wanted = true;
         }
