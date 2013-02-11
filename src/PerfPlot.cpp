@@ -152,8 +152,8 @@ void PerfPlot::plot() {
     DAYcurve->setPen(daypen);
     DAYcurve->setStyle(QwtPlotCurve::Sticks);
 
-    // XXX Note: the days are offset by 1 without the -1 in the
-    //           line below  --------------+
+    // Note: the days are offset by 1 without the -1 in the
+    //       line below  ------------------+
     //                                     |
     //                                     V
     DAYcurve->setData(_sc->getDays()+xmin -1 ,_sc->getDAYvalues()+xmin,num);

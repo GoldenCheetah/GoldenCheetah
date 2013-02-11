@@ -40,9 +40,9 @@ ScatterWindow::addStandardChannels(QComboBox *box)
     box->addItem(tr("CPV"), MODEL_CPV);
     box->addItem(tr("Time"), MODEL_TIME);
     box->addItem(tr("Distance"), MODEL_DISTANCE);
-    //box->addItem(tr("Interval"), MODEL_INTERVAL); //XXX supported differently for now
-    //box->addItem(tr("Latitude"), MODEL_LAT); //XXX weird values make the plot ugly
-    //box->addItem(tr("Longitude"), MODEL_LONG); //XXX weird values make the plot ugly
+    //box->addItem(tr("Interval"), MODEL_INTERVAL); //supported differently for now
+    //box->addItem(tr("Latitude"), MODEL_LAT); //weird values make the plot ugly
+    //box->addItem(tr("Longitude"), MODEL_LONG); //weird values make the plot ugly
 }
 
 void

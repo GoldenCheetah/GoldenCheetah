@@ -528,14 +528,14 @@ PowerHist::recalc(bool force)
         if (source == Cache && zoned && (series == RideFile::watts || series == RideFile::wattsKg) && mainWindow->zones()) {
             setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(mainWindow->zones(), 0));
             if (mainWindow->zones()->getRangeSize())
-                setAxisScale(QwtPlot::xBottom, -0.99, mainWindow->zones()->numZones(0), 1); // XXX use zones from first defined range
+                setAxisScale(QwtPlot::xBottom, -0.99, mainWindow->zones()->numZones(0), 1); // use zones from first defined range
         }
 
         // hr zoned for a time range
         if (source == Cache && zoned && series == RideFile::hr && mainWindow->hrZones()) {
             setAxisScaleDraw(QwtPlot::xBottom, new HrZoneScaleDraw(mainWindow->hrZones(), 0));
             if (mainWindow->hrZones()->getRangeSize())
-                setAxisScale(QwtPlot::xBottom, -0.99, mainWindow->hrZones()->numZones(0), 1); // XXX use zones from first defined range
+                setAxisScale(QwtPlot::xBottom, -0.99, mainWindow->hrZones()->numZones(0), 1); // use zones from first defined range
         }
 
         setAxisMaxMinor(QwtPlot::xBottom, 0);
