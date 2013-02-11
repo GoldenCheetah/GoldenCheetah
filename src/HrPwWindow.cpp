@@ -169,11 +169,18 @@ HrPwWindow::HrPwWindow(MainWindow *mainWindow) :
     setShadeZones();
     cl->addRow(shadeZones);
 
+    fullplot = new QCheckBox(this);;
+    fullplot->setText(tr("Show Full Plot"));
+    fullplot->setCheckState(Qt::Checked);
+    showHidePlot();
+    cl->addRow(fullplot);
+
     // connect them all up now initialised
     connect(hrPwPlot->_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)),
                             hrPwPlot, SLOT(pointHover(QwtPlotCurve*, int)));
     connect(joinlineCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setJoinLineFromCheckBox()));
     connect(shadeZones, SIGNAL(stateChanged(int)), this, SLOT(setShadeZones()));
+    connect(fullplot, SIGNAL(stateChanged(int)), this, SLOT(showHidePlot()));
     connect(smoothEdit, SIGNAL(editingFinished()), this, SLOT(setSmoothingFromLineEdit()));
     connect(smoothSlider, SIGNAL(valueChanged(int)), this, SLOT(setSmoothingFromSlider()));
     connect(delayEdit, SIGNAL(editingFinished()), this, SLOT(setDelayFromLineEdit()));
@@ -225,6 +232,13 @@ HrPwWindow::setShadeZones()
         hrPwPlot->setShadeZones(shadeZones->isChecked());
         hrPwPlot->replot();
     }
+}
+
+void
+HrPwWindow::showHidePlot()
+{
+    if (fullplot->isChecked()) smallPlot->show();
+    else smallPlot->hide();
 }
 
 void

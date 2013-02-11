@@ -41,11 +41,14 @@ class HrPwWindow : public GcChartWindow
 
     Q_PROPERTY(int shadeZones READ isShadeZones WRITE setShadeZones USER true)
     Q_PROPERTY(int joinLine READ isJoinLine WRITE setJoinLine USER true)
+    Q_PROPERTY(int fullplot READ showFullplot WRITE setFullplot USER true)
 
     int isJoinLine() const { return joinlineCheckBox->checkState(); }
     void setJoinLine(int x) { joinlineCheckBox->setCheckState(x ? Qt::Checked : Qt::Unchecked); }
     int isShadeZones() const { return shadeZones->checkState(); }
     void setShadeZones(int x) { shadeZones->setCheckState(x ? Qt::Checked : Qt::Unchecked); }
+    int showFullplot() const { return fullplot->checkState(); }
+    void setFullplot(int x) { fullplot->setCheckState(x ? Qt::Checked : Qt::Unchecked); }
 
     public:
 
@@ -79,6 +82,7 @@ class HrPwWindow : public GcChartWindow
         void setrSmoothingFromSlider();
         void setShadeZones();
         void setSmooth(int);
+        void showHidePlot();
         void setDelay(int);
 
     protected:
@@ -90,6 +94,7 @@ class HrPwWindow : public GcChartWindow
 
         QCheckBox *joinlineCheckBox;
         QCheckBox *shadeZones;
+        QCheckBox *fullplot;
 
         QSlider *delaySlider;
         QLineEdit *delayEdit;
