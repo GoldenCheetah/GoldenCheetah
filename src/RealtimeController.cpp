@@ -224,6 +224,50 @@ RealtimeController::processRealtimeData(RealtimeData &rtData)
         }
         break;
 
+    case 20 : //  TACX FLOW SETTING 0
+        {
+        double V = rtData.getSpeed();
+        double slope = 7.75;
+        double intercept = -47.27;
+        rtData.setWatts((slope * V) + intercept);
+        }
+        break;
+
+    case 21 : //  TACX FLOW SETTING 2
+        {
+        double V = rtData.getSpeed();
+        double slope = 9.51;
+        double intercept = -66.69;
+        rtData.setWatts((slope * V) + intercept);
+        }
+        break;
+
+    case 22 : //  TACX FLOW SETTING 4
+        {
+        double V = rtData.getSpeed();
+        double slope = 11.03;
+        double intercept = -71.59;
+        rtData.setWatts((slope * V) + intercept);
+        }
+        break;
+
+    case 23 : //  TACX FLOW SETTING 6
+        {
+        double V = rtData.getSpeed();
+        double slope = 12.81;
+        double intercept = -95.05;
+        rtData.setWatts((slope * V) + intercept);
+        }
+        break;
+
+    case 24 : //  TACX FLOW SETTING 8
+        {
+        double V = rtData.getSpeed();
+        double slope = 14.37;
+        double intercept = -102.43;
+        rtData.setWatts((slope * V) + intercept);
+        }
+        break;
 
     default : // unknown - do nothing
         break;
