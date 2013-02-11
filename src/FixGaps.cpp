@@ -145,11 +145,6 @@ FixGaps::postProcess(RideFile *ride, DataProcessorConfig *config=0)
     // if the number of duration / number of samples
     // equals the recording interval then we don't need
     // to post-process for gaps
-    // XXX commented out since it is not always true and
-    //     is purely to improve performance
-    //if ((ride->recIntSecs() + ride->dataPoints()[ride->dataPoints().count()-1]->secs -
-    //    ride->dataPoints()[0]->secs) / (double) ride->dataPoints().count() == ride->recIntSecs())
-    //    return false;
 
     // Additionally, If there are less than 2 dataPoints then there
     // is no way of post processing anyway (e.g. manual workouts)

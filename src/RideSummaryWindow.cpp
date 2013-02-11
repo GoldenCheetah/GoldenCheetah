@@ -127,8 +127,7 @@ RideSummaryWindow::metadataChanged()
 void
 RideSummaryWindow::refresh()
 {
-    // XXX: activeTab is never equaly to RideSummaryWindow right now because
-    // it's wrapped in the summarySplitter in MainWindow.
+    // if we're summarising a ride but have no ride to summarise
     if (ridesummary && !myRideItem) {
 	    rideSummary->page()->mainFrame()->setHtml("");
         return;
@@ -360,7 +359,7 @@ RideSummaryWindow::htmlSummary() const
             else time_in_zone[i] = SummaryMetrics::getAggregated(timeInZones[i], data, useMetricUnits, true).toDouble();
         }
         summary += tr("<h3>Power Zones</h3>");
-        summary += mainWindow->zones()->summarize(rideItem->zoneRange(), time_in_zone); //XXX aggregating?
+        summary += mainWindow->zones()->summarize(rideItem->zoneRange(), time_in_zone); //aggregating
     }
 
     //
@@ -376,7 +375,7 @@ RideSummaryWindow::htmlSummary() const
         }
 
         summary += tr("<h3>Heart Rate Zones</h3>");
-        summary += mainWindow->hrZones()->summarize(rideItem->hrZoneRange(), time_in_zone); //XXX aggregating
+        summary += mainWindow->hrZones()->summarize(rideItem->hrZoneRange(), time_in_zone); //aggregating
     }
 
     // Only get interval summary for a ride summary
