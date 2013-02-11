@@ -891,11 +891,10 @@ class MeanPowerVariance : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(MeanPowerVariance)
 
     public:
-    LTMOutliers *outliers;
+    double topRank;
 
     MeanPowerVariance()
     {
-        outliers = NULL;
         setSymbol("meanpowervariance");
         setInternalName("Average Power Variance");
     }
@@ -912,9 +911,10 @@ class MeanPowerVariance : public RideMetric {
                  const MainWindow *) {
 
         // Less than 30s don't bother
-        if (ride->dataPoints().count() < 30)
+        if (ride->dataPoints().count() < 30) {
             setValue(0);
-        else {
+            topRank=0.00;
+        } else {
 
             QVector<double> power;
             QVector<double> secs;
@@ -923,9 +923,9 @@ class MeanPowerVariance : public RideMetric {
                 secs.append(point->secs);
             }
 
-            if (outliers) delete outliers;
-            outliers = new LTMOutliers(secs.data(), power.data(), power.count(), 30, false);
-            setValue(outliers->getStdDeviation());
+            LTMOutliers outliers(secs.data(), power.data(), power.count(), 30, false);
+            setValue(outliers.getStdDeviation());
+            topRank = outliers.getYForRank(0);
         }
     }
     RideMetric *clone() const { return new MeanPowerVariance(*this); }
@@ -966,7 +966,7 @@ class MaxPowerVariance : public RideMetric {
         if (ride->dataPoints().count() < 30)
             setValue(0);
         else
-            setValue(mean->outliers->getYForRank(0));
+            setValue(mean->topRank);
     }
     RideMetric *clone() const { return new MaxPowerVariance(*this); }
 };
