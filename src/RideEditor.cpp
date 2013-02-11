@@ -390,20 +390,20 @@ AnomalyDialog::check()
         double max = appsettings->value(this, GC_DPFS_MAX, "1500").toDouble();
         double variance = appsettings->value(this, GC_DPFS_VARIANCE, "1000").toDouble();
 
-        LTMOutliers *outliers = new LTMOutliers(secs.data(), power.data(), power.count(), 30, false);
+        LTMOutliers outliers(secs.data(), power.data(), power.count(), 30, false);
 
         // run through the ranked list
         for (int i=0; i<secs.count(); i++) {
 
             // is this over variance threshold?
-            if (outliers->getDeviationForRank(i) < variance) break;
+            if (outliers.getDeviationForRank(i) < variance) break;
 
             // ok, so its highly variant but is it over
             // the max value we are willing to accept?
-            if (outliers->getYForRank(i) < max) continue;
+            if (outliers.getYForRank(i) < max) continue;
 
             // which one is it
-            rideEditor->data->anomalies.insert(xsstring(outliers->getIndexForRank(i), RideFile::watts), tr("Data spike candidate"));
+            rideEditor->data->anomalies.insert(xsstring(outliers.getIndexForRank(i), RideFile::watts), tr("Data spike candidate"));
         }
     }
 
