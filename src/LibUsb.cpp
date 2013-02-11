@@ -180,7 +180,6 @@ int LibUsb::write(char *buf, int bytes)
         // Report timeouts - previously we ignored -110 errors. This masked a serious
         // problem with write on Linux/Mac, the USB stick needed a reset to avoid
         // these error messages, so we DO report them now
-        // XXX if (rc != -110) qDebug()<<"usb_interrupt_write Error writing: "<< usb_strerror();
         qDebug()<<"usb_interrupt_write Error writing ["<<rc<<"]: "<< usb_strerror();
     }
 
@@ -282,8 +281,9 @@ struct usb_dev_handle* LibUsb::OpenFortius()
     // been programmed it will present itself again with a
     // different PID. But it takes its time, so we sleep for
     // 3 seconds. This may be too short on some operating
-    // systems [XXX validate this]. On my Linux host running
-    // a v3 kernel on an AthlonXP 2 seconds is not long enough.
+    // systems. We can fix if issues are reported.  On my Linux
+    // host running a v3 kernel on an AthlonXP 2 seconds is not
+    // long enough.
     // 
     // Given this is only required /the first time/ the Fortius
     // is connected, it can't be that bad?
