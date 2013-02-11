@@ -203,15 +203,6 @@ GcBubble::paintEvent(QPaintEvent *)
 
     // draw the background
     painter.drawPath(path);
-
-#if 0
-    // debugging
-    painter.setBrush(Qt::NoBrush);
-    painter.setPen(Qt::red);
-    painter.drawRect(1,1,width()-2, height()-2);
-    painter.setPen(Qt::blue);
-    painter.drawRect(display->geometry());
-#endif
 }
 
 void

@@ -1983,11 +1983,6 @@ PasteSpecialDialog::PasteSpecialDialog(RideEditor *rideEditor, QWidget *parent) 
     contents->setLayout(contentsLayout);
     contents->setFlat(false);
 
-#if 0
-        QDoubleSpinBox *atRow;
-        QComboBox *textDelimeter;
-#endif
-
     okButton = new QPushButton(tr("OK"));
     cancelButton = new QPushButton(tr("Cancel"));
     QHBoxLayout *buttons = new QHBoxLayout;

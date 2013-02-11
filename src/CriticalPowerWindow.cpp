@@ -379,9 +379,6 @@ CriticalPowerWindow::updateCpint(double minutes)
           double a = pow(10,RideFileCache::decimalsFor(series()));
           value = ((int)((0.5/a + value) * a))/a;
 
-#if 0
-              label = QString("%1 kJ (%2)").arg(watts * minutes * 60.0 / 1000.0, 0, 'f', 0);
-#endif
               label = QString("%1 %2 (%3)").arg(value).arg(units)
                       .arg(date.isValid() ? date.toString(tr("MM/dd/yyyy")) : tr("no date"));
       }

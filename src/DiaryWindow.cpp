@@ -53,9 +53,6 @@ DiaryWindow::DiaryWindow(MainWindow *mainWindow) :
     controls->addStretch();
     controls->addWidget(title, Qt::AlignCenter | Qt::AlignVCenter);
     controls->addStretch();
-#if 0
-    controls->addWidget(viewMode);
-#endif
 
     vlayout->addLayout(controls);
 
@@ -120,97 +117,35 @@ DiaryWindow::rideSelected()
     QDate when = ride->dateTime.date();
     int month = when.month();
     int year = when.year();
-#if 0
-    int weekNumber = when.weekNumber();
-#endif
 
     // monthly view updates
     calendarModel->setMonth(when.month(), when.year());
 
     when = when.addDays(Qt::Monday - when.dayOfWeek());
 
-#if 0
-    // ok update title
-    switch (viewMode->currentIndex()) {
-    case 0 : // monthly
-#endif
-        title->setText(QString("%1 %2").arg(QDate::longMonthName(month)).arg(year));
-        next->show();
-        prev->show();
-#if 0
-        break;
-    case 1 : // weekly
-        title->setText(QString("Week %1 %2").arg(weekNumber).arg(year));
-        next->show();
-        prev->show();
-        break;
-
-    default:
-    case 2 : //ride
-        title->setText("");
-        next->hide();
-        prev->hide();
-        break;
-    }
-#endif
+    title->setText(QString("%1 %2").arg(QDate::longMonthName(month)).arg(year));
+    next->show();
+    prev->show();
 }
 
 void
 DiaryWindow::prevClicked()
 {
-#if 0
-    switch (viewMode->currentIndex()) {
-    case 0 : // monthly
-        {
-#endif
-        int month = calendarModel->getMonth();
-        int year = calendarModel->getYear();
-        QDate when = QDate(year, month, 1).addDays(-1);
-        calendarModel->setMonth(when.month(), when.year());
-        title->setText(QString("%1 %2").arg(QDate::longMonthName(when.month())).arg(when.year()));
-#if 0
-        }
-        break;
-    case 1 : // weekly
-        {
-        QDateTime when = weeklyView->getStartTime();
-        when = when.addDays(-7);
-        weeklyView->setDateRange(when.date(), when.addDays(6).date());
-        weeklyView->setViewMode(QxtScheduleView::DayView);
-        title->setText(QString("Week %1 %2").arg(when.date().weekNumber()).arg(when.date().year()));
-        }
-        break;
-    }
-#endif
+    int month = calendarModel->getMonth();
+    int year = calendarModel->getYear();
+    QDate when = QDate(year, month, 1).addDays(-1);
+    calendarModel->setMonth(when.month(), when.year());
+    title->setText(QString("%1 %2").arg(QDate::longMonthName(when.month())).arg(when.year()));
 }
 
 void
 DiaryWindow::nextClicked()
 {
-#if 0
-    switch (viewMode->currentIndex()) {
-    case 0 : // monthly
-        {
-#endif
-        int month = calendarModel->getMonth();
-        int year = calendarModel->getYear();
-        QDate when = QDate(year, month, 1).addMonths(1);
-        calendarModel->setMonth(when.month(), when.year());
-        title->setText(QString("%1 %2").arg(QDate::longMonthName(when.month())).arg(when.year()));
-#if 0
-        }
-        break;
-    case 1 : // weekly
-        {
-        QDateTime when = weeklyView->getStartTime();
-        when = when.addDays(7);
-        weeklyView->setDateRange(when.date(), when.addDays(6).date());
-        weeklyView->setViewMode(QxtScheduleView::DayView);
-        title->setText(QString("Week %1 %2").arg(when.date().weekNumber()).arg(when.date().year()));
-        }
-        break;
-    }
-#endif
+    int month = calendarModel->getMonth();
+    int year = calendarModel->getYear();
+    QDate when = QDate(year, month, 1).addMonths(1);
+    calendarModel->setMonth(when.month(), when.year());
+    title->setText(QString("%1 %2").arg(QDate::longMonthName(when.month())).arg(when.year()));
 }
 
 bool
@@ -219,8 +154,6 @@ DiaryWindow::eventFilter(QObject *object, QEvent *e)
 
     if (e->type() != QEvent::ToolTip && e->type() != QEvent::Paint && e->type() != QEvent::Destroy)
         mainWindow->setBubble("");
-
-    //if (object != (QObject *)monthlyView) return false;
 
     switch (e->type()) {
     case QEvent::MouseButtonPress:

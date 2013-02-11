@@ -93,16 +93,9 @@ void ANTChannel::open(int device, int chan_type)
     channel_type=chan_type;
     channel_type_flags = CHANNEL_TYPE_QUICK_SEARCH ;
     device_number=device;
-
     setId();
 
-#if 0
-    if (channel_assigned) {
-        parent->sendMessage(ANTMessage::unassignChannel(number));
-    } else {
-#endif
-        attemptTransition(ANT_UNASSIGN_CHANNEL);
-    //}
+    attemptTransition(ANT_UNASSIGN_CHANNEL);
 }
 
 // close an ant channel assignment

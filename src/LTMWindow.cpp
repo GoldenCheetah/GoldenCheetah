@@ -165,25 +165,7 @@ LTMWindow::~LTMWindow()
 }
 
 void
-LTMWindow::rideSelected()
-{
-#if 0
-    if (active == true) {
-
-        // mimic user first selection now that
-        // we are active - choose a chart and
-        // use the first available date range
-        ltmTool->selectDateRange(0);
-        chartSelected(0);
-    if (amVisible() == true && dirty == true) {
-
-        // plot needs to be redrawn
-        refresh();
-    } else if (amVisible() == false) {
-        popup->hide();
-    }
-#endif
-}
+LTMWindow::rideSelected() { } // deprecated
 
 void
 LTMWindow::refreshPlot()

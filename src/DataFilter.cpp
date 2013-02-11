@@ -225,15 +225,6 @@ void DataFilter::configUpdate()
                 lookupType.insert(underscored.replace(" ","_"), (field.type > 2)); // true if is number
             }
     }
-
-#if 0
-    QMapIterator<QString, QString>r(lookupMap);
-    while(r.hasNext()) {
-
-        r.next();
-        qDebug()<<"Lookup"<<r.key()<<"to get"<<r.value();
-    }
-#endif
 }
 
 bool Leaf::eval(DataFilter *df, Leaf *leaf, SummaryMetrics m)

@@ -858,13 +858,8 @@ AllPlot::setYMax()
         QwtValueList xytick[QwtScaleDiv::NTickTypes];
         for (int i=0;i<maxY;i+=step)
             xytick[QwtScaleDiv::MajorTick]<<i;
-#if 0
-        for (int i=0;i<maxY;i+=25)
-            xytick[QwtScaleDiv::MinorTick]<<i;
-#endif
 
         setAxisTitle(yLeft, tr("Watts"));
-        //setAxisScale(yLeft, 0.0, maxY);
         setAxisScaleDiv(QwtPlot::yLeft,QwtScaleDiv(0.0,maxY,xytick));
         setAxisLabelRotation(yLeft,270);
         setAxisLabelAlignment(yLeft,Qt::AlignVCenter);
