@@ -383,7 +383,6 @@ GcPane::setCursorShape(DragState d)
         setCursor(Qt::SizeBDiagCursor);
         break;
     case Move:
-        //setCursor(Qt::OpenHandCursor); //XXX sub widgets don't set the cursor...
         setCursor(Qt::ArrowCursor);
         break;
     default:
@@ -408,28 +407,4 @@ GcPane::resizeEvent (QResizeEvent *)
 }
 
 void
-GcPane::flip()
-{
-#if 0
-// XXX broken!
-    QStateMachine *machine = new QStateMachine(this);
-    QState *s0 = new QState();
-    s0->assignProperty(scene, "rotation", 0);
-    QState *s1 = new QState();
-    s1->assignProperty(scene, "rotation", 90);
-    QAbstractTransition *t1 = s0->addTransition(widget, SIGNAL(flipRequest()), s1);
-    QPropertyAnimation *yRotationAnim = new QPropertyAnimation(scene, "rotation");
-    yRotationAnim->setDuration(250);
-    t1->addAnimation(yRotationAnim);
-    QState *s2 = new QState();
-    //QObject::connect(s2, SIGNAL(entered()), this, SLOT(togglePage()));
-    s2->assignProperty(scene, "rotation", -90);
-    s1->addTransition(s1, SIGNAL(polished()), s2);
-    QAbstractTransition *t2 = s2->addTransition(s0);
-    t2->addAnimation(yRotationAnim);
-    machine->addState(s0);
-    machine->addState(s1);
-    machine->addState(s2);
-    machine->start();
-#endif
-}
+GcPane::flip() { }

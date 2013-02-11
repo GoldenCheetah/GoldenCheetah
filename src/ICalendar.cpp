@@ -125,7 +125,7 @@ void ICalendar::setICalendarProperties()
     { ICAL_XLICMIMEENCODING_PROPERTY, tr("XLI mime encoding") },
     { ICAL_XLICMIMEFILENAME_PROPERTY, tr("XLI mime filename") },
     { ICAL_XLICMIMEOPTINFO_PROPERTY, tr("XLI mime optional information") },
-    { ICAL_NO_PROPERTY, tr("") } //XXX ICAL_NO_PROPERTY must always be last!!
+    { ICAL_NO_PROPERTY, tr("") } // ICAL_NO_PROPERTY must always be last!!
   };
 }
 

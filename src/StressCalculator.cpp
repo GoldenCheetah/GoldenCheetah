@@ -197,7 +197,7 @@ void StressCalculator::calculate(int daysIndex) {
     stsvalues[daysIndex] = (list[daysIndex] * (1.0 - ste)) + (lastSTS * ste);
 
     // SB (stress balance)  long term - short term
-    // XXX FIXED BUG WHERE SB WAS NOT SHOWN ON THE NEXT DAY!
+    // FIXED BUG WHERE SB WAS NOT SHOWN ON THE NEXT DAY!
     if (daysIndex == 0) sbvalues[daysIndex]=0;
     sbvalues[daysIndex+(showSBToday ? 0 : 1)] =  ltsvalues[daysIndex] - stsvalues[daysIndex] ;
 

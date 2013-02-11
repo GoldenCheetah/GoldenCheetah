@@ -159,7 +159,7 @@ GcToolButton::GcToolButton(QWidget *parent, QAction *action) : QWidget(parent), 
     label = new QLabel(action->iconText(), this);
     mlayout->addWidget(label);
 
-    //XXX quick hack
+    // quick hack -- default when open is always analysis
     if (action->iconText() == "Analysis") selected = true;
     else selected = false;
 }
