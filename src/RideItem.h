@@ -74,11 +74,10 @@ class RideItem : public QObject, public QTreeWidgetItem //<< for signals/slots
         const QStringList errors() { return errors_; }
         const Zones *zones;
         const HrZones *hrZones;
-        QString notesFileName;
 
         RideItem(int type, QString path,
                  QString fileName, const QDateTime &dateTime,
-                 const Zones *zones, const HrZones *hrZones, QString notesFileName, MainWindow *main);
+                 const Zones *zones, const HrZones *hrZones, MainWindow *main);
 
         void setDirty(bool);
         bool isDirty() { return isdirty; }
