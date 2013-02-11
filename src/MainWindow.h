@@ -375,8 +375,6 @@ class MainWindow : public QMainWindow
 
     protected:
 
-        static QString notesFileName(QString rideFileName);
-
     private:
         QSharedPointer<QSettings> settings;
         IntervalItem *activeInterval; // currently active for context menu popup
@@ -439,7 +437,7 @@ class MainWindow : public QMainWindow
         QSignalMapper *toolMapper;
         WithingsDownload *withingsDownload;
         ZeoDownload *zeoDownload;
-        bool parseRideFileName(const QString &name, QString *notesFileName, QDateTime *dt);
+        bool parseRideFileName(const QString &name, QDateTime *dt);
 
 #ifdef Q_OS_MAC
         // Mac Native Support

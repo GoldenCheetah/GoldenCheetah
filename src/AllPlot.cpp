@@ -249,7 +249,7 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     if (appsettings->value(this, GC_SHADEZONES, true).toBool()==false)
         shade_zones = false;
 
-    if (smooth < 1) smooth = 1;
+    smooth = 1;
 
     // create a background object for shading
     bg = new AllPlotBackground(this);
