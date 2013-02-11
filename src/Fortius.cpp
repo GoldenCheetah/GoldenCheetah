@@ -362,13 +362,6 @@ void Fortius::run()
                 // heartrate
                 curHeartRate = buf[12];
 
-#if 0
-                // debug
-                fprintf(stderr,"%08d:", timer.elapsed());
-                for(int i=0; i<48; i++) fprintf(stderr, "%02x ", buf[i]);
-                fprintf(stderr, "\n");
-#endif
-
             } else {
 
                 // no data available!? It should block in libusb.. but lets sleep anyway

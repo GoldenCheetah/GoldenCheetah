@@ -48,36 +48,6 @@ CalendarDownload::download()
     return true;
 }
 
-#if 0
-static QString propertyToString(icalproperty *p)
-{
-    if (p) {
-        icalvalue *v = icalproperty_get_value(p);
-        QString converted(icalvalue_as_ical_string(v));
-
-        // some special characters are escaped in the text
-        converted.replace("\\n", "\n");
-        converted.replace("\\;", ";");
-
-        return converted;
-    } else {
-        return QString("");
-    }
-}
-
-static QDate propertyToDate(icalproperty *p)
-{
-    if (p) {
-        icalvalue *v = icalproperty_get_value(p);
-        struct icaltimetype date = icalvalue_get_datetime(v);
-        QDate when(date.year, date.month, date.day);
-        return when;
-    } else {
-        return QDate();
-    }
-}
-#endif
-
 void
 CalendarDownload::downloadFinished(QNetworkReply *reply)
 {

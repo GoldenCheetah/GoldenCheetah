@@ -47,15 +47,6 @@ using namespace Qwt3D; // namespace ref is only visible in this file (is not in 
 
 // util function to create an x/y key for QHash, effective and quick enough
 static QString xystring(double x, double y) { return QString("%1:%2").arg((int)x).arg((int)y); }
-#if 0
-static void unxystring(QString val, double &x, double &y)
-{
-    QRegExp it("^([^:]*):([^:]*)$");
-    it.exactMatch(val);
-    x = it.cap(1).toDouble();
-    y = it.cap(2).toDouble();
-}
-#endif
 
 // returns the color for an xyz point
 class ModelDataColor : public Color

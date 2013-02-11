@@ -146,28 +146,6 @@ int RideItem::numHrZones()
     return (hr_zone_range >= 0) ? hrZones->numZones(hr_zone_range) : 0;
 }
 
-#if 0
-
-double RideItem::timeInZone(int zone)
-{
-    if (!ride())
-        return 0.0;
-    assert(zone < numZones());
-    //return time_in_zone[zone];
-    return 0;
-}
-
-
-double RideItem::timeInHrZone(int zone)
-{
-    computeMetrics();
-    if (!ride())
-        return 0.0;
-    assert(zone < numHrZones());
-    return time_in_hr_zone[zone];
-}
-#endif
-
 void
 RideItem::freeMemory()
 {
@@ -176,61 +154,6 @@ RideItem::freeMemory()
         ride_ = NULL;
     }
 }
-
-#if 0
-void
-RideItem::computeMetrics()
-{
-    const QDateTime nilTime;
-    if ((computeMetricsTime != nilTime) &&
-        (computeMetricsTime >= zones->modificationTime)) {
-        return;
-    }
-
-    if (!ride()) return;
-
-    computeMetricsTime = QDateTime::currentDateTime();
-
-    int zone_range = zoneRange();
-    int num_zones = numZones();
-    time_in_zone.clear();
-    if (zone_range >= 0) {
-        num_zones = zones->numZones(zone_range);
-        time_in_zone.resize(num_zones);
-    }
-    int hr_zone_range = hrZoneRange();
-    int num_hr_zones = numHrZones();
-    time_in_hr_zone.clear();
-    if (hr_zone_range >= 0) {
-        num_hr_zones = hrZones->numZones(hr_zone_range);
-        time_in_hr_zone.resize(num_hr_zones);
-    }
-
-    double secs_delta = ride()->recIntSecs();
-    foreach (const RideFilePoint *point, ride()->dataPoints()) {
-        if (point->watts >= 0.0) {
-            if (num_zones > 0) {
-                int zone = zones->whichZone(zone_range, point->watts);
-                if (zone >= 0)
-                    time_in_zone[zone] += secs_delta;
-            }
-        }
-        if (point->hr >= 0.0) {
-            if (num_hr_zones > 0) {
-                int hrZone = hrZones->whichZone(hr_zone_range, point->hr);
-                if (hrZone >= 0)
-                    time_in_hr_zone[hrZone] += secs_delta;
-            }
-        }
-    }
-
-    QStringList allMetrics;
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-    for (int i = 0; i < factory.metricCount(); ++i)
-        allMetrics.append(factory.metricName(i));
-    metrics = RideMetric::computeMetrics(ride(), zones, hrZones, allMetrics);
-}
-#endif
 
 void
 RideItem::setStartTime(QDateTime newDateTime)

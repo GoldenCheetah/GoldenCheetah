@@ -102,31 +102,6 @@ SmallPlot::recalc()
         return;
     }
 
-#if 0
-    int nbpoints2 = (int)floor(rideTimeSecs/60/36)+2;
-    //fprintf(stderr, "rideTimeSecs : %d, nbpoints2 : %d",rideTimeSecs/60, nbpoints2);
-
-    QVector<double>datatime(nbpoints2);
-    double *time[36];
-
-    for (int i = 0; i < 36; ++i) {
-        time[i]= new double[nbpoints2];
-    }
-
-    for (int secs = 0; secs < nbpoints2; ++secs) {
-        datatime[secs] = 1;
-
-        for (int i = 0; i < 36; ++i) {
-            //fprintf(stderr, "\ni : %d, time : %d",i, secs + i*(nbpoints2-1));
-            time[i][secs] =  secs + i*(nbpoints2-1);
-        }
-    }
-
-    for (int i = 0; i < 36; ++i) {
-    	timeCurves[i]->setData(time[i], datatime, nbpoints2);
-    }
-#endif
-
     double totalWatts = 0.0;
     double totalHr = 0.0;
     QList<DataPoint*> list;
@@ -183,33 +158,6 @@ SmallPlot::recalc()
     setAxisScale(xBottom, 0.0, smoothTime[rideTimeSecs]);
 
     setYMax();
-
-
-#if 0
-    QString label[interList.size()];
-    QwtText text[interList.size()];
-
-    // arrays are safe since not passed
-    // as a conyiguous array
-    if (d_mrk) delete [] d_mrk;
-    d_mrk = new QwtPlotMarker[interList.size()];
-    for(int x = 0; x < interList.size(); x++) {
-        // marker
-        d_mrk[x].setValue(0,0);
-        d_mrk[x].setLineStyle(QwtPlotMarker::VLine);
-        d_mrk[x].setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
-        d_mrk[x].setLinePen(QPen(Qt::black, 0, Qt::DashDotLine));
-        d_mrk[x].attach(this);
-        label[x].setNum(x+1);
-        text[x] = QwtText(label[x]);
-        text[x].setFont(QFont("Helvetica", 10, QFont::Bold));
-        text[x].setColor(Qt::black);
-
-        d_mrk[x].setValue(interList.at(x), 0.0);
-        d_mrk[x].setLabel(text[x]);
-    }
-#endif
-
     replot();
 }
 
