@@ -1281,7 +1281,7 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
         connect(actDeleteRide, SIGNAL(triggered(void)), this, SLOT(deleteRide()));
 
         QAction *actBestInt = new QAction(tr("Find Best Intervals"), treeWidget);
-        connect(actBestInt, SIGNAL(triggered(void)), this, SLOT(findBestIntervals()));
+        connect(actBestInt, SIGNAL(triggered(void)), this, SLOT(addIntervals()));
 
         QAction *actPowerPeaks = new QAction(tr("Find Power Peaks"), treeWidget);
         connect(actPowerPeaks, SIGNAL(triggered(void)), this, SLOT(findPowerPeaks()));
@@ -2276,19 +2276,21 @@ MainWindow::downloadTP()
  *--------------------------------------------------------------------*/
 
 void
-MainWindow::findBestIntervals()
-{
-    BestIntervalDialog *p = new BestIntervalDialog(this);
-    p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
-    p->exec();
-}
-
-void
 MainWindow::addIntervals()
 {
-    AddIntervalDialog *p = new AddIntervalDialog(this);
-    p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
-    p->exec();
+    if (ride && ride->ride() && ride->ride()->dataPoints().count()) {
+
+        AddIntervalDialog *p = new AddIntervalDialog(this);
+        p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
+        p->exec();
+
+    } else {
+
+        if (!ride || !ride->ride())
+            QMessageBox::critical(this, tr("Find Best Intervals"), tr("No activity selected"));
+        else
+            QMessageBox::critical(this, tr("Find Best Intervals"), tr("Current activity contains no data"));
+    }
 }
 
 void
@@ -2319,20 +2321,29 @@ MainWindow::findPowerPeaks()
         return;
     }
 
-    addIntervalForPowerPeaksForSecs(ride->ride(), 5, "Peak 5s");
-    addIntervalForPowerPeaksForSecs(ride->ride(), 10, "Peak 10s");
-    addIntervalForPowerPeaksForSecs(ride->ride(), 20, "Peak 20s");
-    addIntervalForPowerPeaksForSecs(ride->ride(), 30, "Peak 30s");
-    addIntervalForPowerPeaksForSecs(ride->ride(), 60, "Peak 1min");
-    addIntervalForPowerPeaksForSecs(ride->ride(), 120, "Peak 2min");
-    addIntervalForPowerPeaksForSecs(ride->ride(), 300, "Peak 5min");
-    addIntervalForPowerPeaksForSecs(ride->ride(), 600, "Peak 10min");
-    addIntervalForPowerPeaksForSecs(ride->ride(), 1200, "Peak 20min");
-    addIntervalForPowerPeaksForSecs(ride->ride(), 1800, "Peak 30min");
-    addIntervalForPowerPeaksForSecs(ride->ride(), 3600, "Peak 60min");
+    if (ride && ride->ride() && ride->ride()->dataPoints().count()) {
 
-    // now update the RideFileIntervals
-    updateRideFileIntervals();
+        addIntervalForPowerPeaksForSecs(ride->ride(), 5, "Peak 5s");
+        addIntervalForPowerPeaksForSecs(ride->ride(), 10, "Peak 10s");
+        addIntervalForPowerPeaksForSecs(ride->ride(), 20, "Peak 20s");
+        addIntervalForPowerPeaksForSecs(ride->ride(), 30, "Peak 30s");
+        addIntervalForPowerPeaksForSecs(ride->ride(), 60, "Peak 1min");
+        addIntervalForPowerPeaksForSecs(ride->ride(), 120, "Peak 2min");
+        addIntervalForPowerPeaksForSecs(ride->ride(), 300, "Peak 5min");
+        addIntervalForPowerPeaksForSecs(ride->ride(), 600, "Peak 10min");
+        addIntervalForPowerPeaksForSecs(ride->ride(), 1200, "Peak 20min");
+        addIntervalForPowerPeaksForSecs(ride->ride(), 1800, "Peak 30min");
+        addIntervalForPowerPeaksForSecs(ride->ride(), 3600, "Peak 60min");
+
+        // now update the RideFileIntervals
+        updateRideFileIntervals();
+
+    } else {
+        if (!ride || !ride->ride())
+            QMessageBox::critical(this, tr("Find Power Peaks"), tr("No activity selected"));
+        else
+            QMessageBox::critical(this, tr("Find Power Peaks"), tr("Current activity contains no data"));
+    }
 }
 
 void
