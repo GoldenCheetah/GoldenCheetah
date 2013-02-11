@@ -352,7 +352,6 @@ HEADERS += \
         QuarqRideFile.h \
         QxtScheduleViewProxy.h \
         RawRideFile.h \
-        RaceDispatcher.h \
         RealtimeData.h \
         RealtimePlotWindow.h \
         RealtimeController.h \
@@ -380,8 +379,6 @@ HEADERS += \
         SeasonParser.h \
         Serial.h \
         Settings.h \
-        SimpleNetworkController.h \
-        SimpleNetworkClient.h \
         SpecialFields.h \
         SpinScanPlot.h \
         SpinScanPolarPlot.h \
@@ -548,7 +545,6 @@ SOURCES += \
         QuarqdClient.cpp \
         QuarqParser.cpp \
         QuarqRideFile.cpp \
-        RaceDispatcher.cpp \
         RawRideFile.cpp \
         RealtimeData.cpp \
         RealtimeController.cpp \
@@ -575,8 +571,6 @@ SOURCES += \
         SeasonParser.cpp \
         Serial.cpp \
         Settings.cpp \
-        SimpleNetworkController.cpp \
-        SimpleNetworkClient.cpp \
         SmallPlot.cpp \
         SpecialFields.cpp \
         SpinScanPlot.cpp \
