@@ -349,6 +349,7 @@ static bool added() {
     QVector<QString> deps;
     deps.append("time_riding");
     deps.append("average_hr");
+    deps.append("workout_time");
     RideMetricFactory::instance().addMetric(TRIMPPoints(), &deps);
 
     deps.clear();
