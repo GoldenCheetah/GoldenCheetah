@@ -135,16 +135,7 @@ HrPwPlot::recalc()
         return;
     }
 
-
-
-
-    // Find Hr Delay
-    //int delayori = findDelay(wattsArray, hrArray, rideTimeSecs/5);
-    //int delay  = 0;
-
-
     // ------ smoothing -----
-    // ----------------------
     double totalWatts = 0.0;
     double totalHr = 0.0;
     QList<DataPoint*> list;
@@ -154,44 +145,41 @@ HrPwPlot::recalc()
     QVector<double> smoothTime(rideTimeSecs + 1);
     int decal=0;
 
-    /*for (int secs = 0; ((secs < smooth) && (secs < rideTimeSecs)); ++secs) {
-        smoothWatts[secs] = 0.0;
-        smoothHr[secs]    = 0.0;
-    }*/
-
     //int interval = 0;
     int smooth = hrPwWindow->smooth;
 
     for (int secs = smooth; secs <= rideTimeSecs; ++secs) {
+
         while ((i < arrayLength) && (timeArray[i] <= secs)) {
-            DataPoint *dp =
-                new DataPoint(timeArray[i], hrArray[i], wattsArray[i], interArray[i]);
-	
+
+            DataPoint *dp = new DataPoint(timeArray[i], hrArray[i], wattsArray[i], interArray[i]);
             totalWatts += wattsArray[i];
-                totalHr    += hrArray[i];
-	        list.append(dp);
+            totalHr    += hrArray[i];
+            list.append(dp);
 
             ++i;
         }
+
         while (!list.empty() && (list.front()->time < secs - smooth)) {
+
             DataPoint *dp = list.front();
             list.removeFirst();
             totalWatts -= dp->watts;
             totalHr    -= dp->hr;
             delete dp;
         }
-        if (list.empty()) {
-            ++decal;
-        }
+
+        if (list.empty()) ++decal;
         else {
             smoothWatts[secs-decal]    = totalWatts / list.size();
             smoothHr[secs-decal]       = totalHr / list.size();
-            // Utiliser interval du fichier
-            //if (smooth/list.size()>0)
-            //	interval = smooth/list.size();
         }
         smoothTime[secs]  = secs / 60.0;
     }
+
+    // Delete temporary list
+    qDeleteAll(list);
+    list.clear();
 
     rideTimeSecs = rideTimeSecs-decal;
     smoothWatts.resize(rideTimeSecs);
@@ -201,29 +189,21 @@ HrPwPlot::recalc()
     QVector<double> clipWatts(rideTimeSecs);
     QVector<double> clipHr(rideTimeSecs);
 
-    /*for (int secs = 0; secs < rideTimeSecs; ++secs) {
-        clipWatts[secs] = 0.0;
-        clipHr[secs] = 0.0;
-    }*/
-
     decal = 0;
     for (int secs = 0; secs < rideTimeSecs; ++secs) {
-                if (smoothHr[secs]>= minHr && smoothWatts[secs]>= minWatt && smoothWatts[secs]<maxWatt) {
-                        clipWatts[secs-decal]    = smoothWatts[secs];
-                        clipHr[secs-decal]    = smoothHr[secs];
-                }
-                else
-                        decal ++;
-        }
+
+        if (smoothHr[secs]>= minHr && smoothWatts[secs]>= minWatt && smoothWatts[secs]<maxWatt) {
+            clipWatts[secs-decal]    = smoothWatts[secs];
+            clipHr[secs-decal]    = smoothHr[secs];
+         } else decal ++;
+    }
+
     rideTimeSecs = rideTimeSecs-decal;
     clipWatts.resize(rideTimeSecs);
     clipHr.resize(rideTimeSecs);
 
-
-
     // Find Hr Delay
-    if (delay == -1)
-       delay = hrPwWindow->findDelay(clipWatts, clipHr, clipWatts.size());
+    if (delay == -1) delay = hrPwWindow->findDelay(clipWatts, clipHr, clipWatts.size());
 
     // Apply delay
     QVector<double> delayWatts(rideTimeSecs-delay);
@@ -240,7 +220,6 @@ HrPwPlot::recalc()
     double maxr = hrPwWindow->corr(delayWatts, delayHr, delayWatts.size());
 
     // ----- limit plotted points ---
-    // ----------------------
     int intpoints = 10; // could be ride length dependent
     int nbpoints = (int)floor(rideTimeSecs/intpoints);
 
@@ -270,17 +249,21 @@ HrPwPlot::recalc()
         }
     }
 
-
     for (int i = 0; i < 36; ++i) {
 
-    	if (nbpoints-i*nbpoints2>0) {
+        if (nbpoints-i*nbpoints2>0) {
 
-                hrCurves[i]->setData(plotedWattsArray[i], plotedHrArray[i], (nbpoints-i*nbpoints2<nbpoints2?nbpoints-i*nbpoints2:nbpoints2));
-    		hrCurves[i]->setVisible(true);
-    	} else
-    		hrCurves[i]->setVisible(false);
+            hrCurves[i]->setData(plotedWattsArray[i], plotedHrArray[i], (nbpoints-i*nbpoints2<nbpoints2?nbpoints-i*nbpoints2:nbpoints2));
+            hrCurves[i]->setVisible(true);
+
+        } else hrCurves[i]->setVisible(false);
     }
 
+    // Clean up memory
+    for (int i = 0; i < 36; ++i) {
+        delete plotedWattsArray[i];
+        delete plotedHrArray[i];
+    }       
 
     setAxisScale(xBottom, 0.0, maxWatt);
 
@@ -336,10 +319,9 @@ HrPwPlot::setYMax()
     double ymax = 0;
     QString ylabel = "";
     for (int i = 0; i < 36; ++i) {
-	    if (hrCurves[i]->isVisible()) {
-	        ymax = max(ymax, hrCurves[i]->maxYValue());
-	        //ylabel += QString((ylabel == "") ? "" : " / ") + "BPM";
-	    }
+        if (hrCurves[i]->isVisible()) {
+            ymax = max(ymax, hrCurves[i]->maxYValue());
+        }
     }
     setAxisScale(yLeft, minHr, ymax * 1.2);
     setAxisTitle(yLeft, tr("Heart Rate(BPM)"));
@@ -374,13 +356,13 @@ HrPwPlot::addWattStepCurve(QVector<double> &finalWatts, int nbpoints)
 
     int t;
     for (t = 1; t < nbSteps; ++t) {
-    	int low = t * 10;
-    	int high = low + 10;
+        int low = t * 10;
+        int high = low + 10;
 
         smoothWattsStep[t] = low;
         smoothTimeStep[t]  = minHr;
         while (low < high) {
-        	smoothTimeStep[t] += array[low++]/ nbpoints * 300;
+            smoothTimeStep[t] += array[low++]/ nbpoints * 300;
         }
     }
     smoothTimeStep[t] = 0.0;
@@ -424,7 +406,7 @@ HrPwPlot::addHrStepCurve(QVector<double> &finalHr, int nbpoints)
         smoothHrStep[t] = low;
         smoothTimeStep2[t]  = 0.0;
         while (low < high) {
-        	smoothTimeStep2[t] += array[low++]/ nbpoints * 500;
+            smoothTimeStep2[t] += array[low++]/ nbpoints * 500;
         }
     }
     smoothTimeStep2[t] = 0.0;
