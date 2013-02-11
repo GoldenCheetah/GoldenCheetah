@@ -150,8 +150,9 @@ RideFileCommand::doCommand(RideCommand *cmd, bool noexec)
 
     // place onto stack
     if (stack.count()) {
+        // wipe away commands we can no longer redo
+        for (int i=stackptr; i<stack.count(); i++) delete stack.at(i);
         stack.remove(stackptr, stack.count() - stackptr);
-        // XXX mem leak need to delete
     }
     stack.append(cmd);
     stackptr++;
