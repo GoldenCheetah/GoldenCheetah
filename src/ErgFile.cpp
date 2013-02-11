@@ -71,7 +71,7 @@ ErgFile::fromContent(QString contents, MainWindow *main)
 
 void ErgFile::reload()
 {
-    // which parser to call? XXX should look at moving to an ergfile factory
+    // which parser to call? NOTE: we should look at moving to an ergfile factory
     // like we do with ride files if we end up with lots of different formats
     if (filename.endsWith(".pgmf", Qt::CaseInsensitive)) parseTacx();
     else parseComputrainer();
