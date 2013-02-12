@@ -528,7 +528,8 @@ CpintPlot::calculate(RideItem *rideItem)
     QDir dir(path);
     QFileInfo file(fileName);
 
-    // get current ride statistics
+    // zap any existing ridefilecache then get new one
+    if (current) delete current;
     current = new RideFileCache(mainWindow, mainWindow->home.absolutePath() + "/" + fileName);
 
     // get aggregates - incase not initialised from date change
