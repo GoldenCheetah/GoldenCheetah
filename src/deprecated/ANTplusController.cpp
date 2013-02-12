@@ -57,9 +57,9 @@ ANTplusController::stop()
 
 
 bool
-ANTplusController::discover(DeviceConfiguration *dc, QProgressDialog *progress)
+ANTplusController::discover(QString)
 {
-    return myANTplus->discover(dc, progress);
+    return myANTplus->discover(QString);
 }
 
 

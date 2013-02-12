@@ -23,6 +23,8 @@
 
 void ICalendar::setICalendarProperties()
 {
+#if 0 // keeping it for later, we will eventually use this
+      // commented out to reduce compiler warnings
   static struct {
     icalproperty_kind type;
     QString friendly;
@@ -127,6 +129,7 @@ void ICalendar::setICalendarProperties()
     { ICAL_XLICMIMEOPTINFO_PROPERTY, tr("XLI mime optional information") },
     { ICAL_NO_PROPERTY, tr("") } // ICAL_NO_PROPERTY must always be last!!
   };
+#endif
 }
 
 // convert property to a string

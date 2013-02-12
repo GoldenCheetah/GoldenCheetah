@@ -36,7 +36,7 @@ class QwtPlotCurve;
 class QwtPlotGrid;
 class MainWindow;
 class RideItem;
-class RideFilePoint;
+struct RideFilePoint;
 class RideFileCache;
 class HistogramWindow;
 class PowerHistBackground;

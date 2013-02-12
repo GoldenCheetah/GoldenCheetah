@@ -261,7 +261,7 @@ class TreeMapPlot : public QWidget
         MainWindow *main;
         QDir home;
         bool useMetricUnits;
-        struct TMSettings *settings;
+        TMSettings *settings;
 
         TreeMap *root;      // the tree map data structure
         TreeMap *highlight; // currently needs to be highlighted

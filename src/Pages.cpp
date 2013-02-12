@@ -28,7 +28,6 @@
 #include "AddDeviceWizard.h"
 #include "DeviceTypes.h"
 #include "DeviceConfiguration.h"
-#include "ANTplusController.h"
 #include "ColorButton.h"
 #include "SpecialFields.h"
 #include "DataProcessor.h"

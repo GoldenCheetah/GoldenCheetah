@@ -47,8 +47,9 @@ struct SizeSettings {
 };
 
 extern SizeSettings defaultAppearance[];
-struct Colors
+class Colors
 {
+public:
         QString name,
                 setting;
         QColor  color;

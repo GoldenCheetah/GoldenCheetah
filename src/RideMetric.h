@@ -37,7 +37,9 @@ class MainWindow;
 class RideMetric;
 typedef QSharedPointer<RideMetric> RideMetricPtr;
 
-struct RideMetric {
+class RideMetric {
+
+public:
 
     enum metrictype { Total, Average, Peak } types;
     typedef enum metrictype MetricType;

@@ -59,7 +59,7 @@ class ZoneTime : public RideMetric {
         setValue(seconds);
     }
 
-    bool canAggregate() const { return false; }
+    bool canAggregate() { return false; }
     void aggregateWith(const RideMetric &) {}
     RideMetric *clone() const { return new ZoneTime(*this); }
 };

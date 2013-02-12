@@ -197,7 +197,6 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
     switch (wizard->deviceTypes.Supported[wizard->current].type) {
 
     // we will need a factory for this soon..
-    case DEV_ANTPLUS : wizard->controller = new ANTplusController(NULL, NULL); break;
     case DEV_CT : wizard->controller = new ComputrainerController(NULL, NULL); break;
 #ifdef GC_HAVE_LIBUSB
     case DEV_FORTIUS : wizard->controller = new FortiusController(NULL, NULL); break;
