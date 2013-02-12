@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Damien.Grauser (damien.grauser@pev-geneve.ch)
+ * Copyright (c) 2013 Damien.Grauser (damien.grauser@pev-geneve.ch)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,8 +16,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef STRAVADIALOG_H
-#define STRAVADIALOG_H
+#ifndef STRAVADOWNLOADDIALOG_H
+#define STRAVADOWNLOADDIALOG_H
 #include "GoldenCheetah.h"
 
 #include <QObject>
@@ -31,33 +31,29 @@ extern "C" {
 }
 #endif
 
-class StravaDialog : public QDialog
+class StravaDownloadDialog : public QDialog
 {
     Q_OBJECT
     G_OBJECT
 
 public:
-     StravaDialog(MainWindow *mainWindow, RideItem *item);
-
-signals:
-
-public slots:
-     void uploadToStrava();
+     StravaDownloadDialog(MainWindow *mainWindow);
 
 private slots:
-     void getActivityFromStrava();
 
      void requestLogin();
      void requestLoginFinished(QNetworkReply *reply);
 
-     void requestUpload();
-     void requestUploadFinished(QNetworkReply *reply);
+     void downloadRide();
 
-     void requestVerifyUpload();
-     void requestVerifyUploadFinished(QNetworkReply *reply);
+     void requestRideDetail();
+     void requestRideDetailFinished(QNetworkReply *reply);
 
-     void requestSearchRide();
-     void requestSearchRideFinished(QNetworkReply *reply);
+     void requestDownloadRide();
+     void requestDownloadRideFinished(QNetworkReply *reply);
+
+     void requestListRides();
+     void requestListRidesFinished(QNetworkReply *reply);
 
      void okClicked();
      void cancelClicked();
@@ -65,35 +61,31 @@ private slots:
 private:
      QDialog *dialog;
 
-     QPushButton *uploadButton;
-     QPushButton *searchActivityButton;
-     QPushButton *getActivityButton;
+     QLineEdit *activityIdEdit;
+
+     QPushButton *downloadButton;
      QPushButton *cancelButton;
      MainWindow *mainWindow;
-
-     //QCheckBox *gpsChk;
-     QCheckBox *altitudeChk;
-     QCheckBox *powerChk;
-     QCheckBox *cadenceChk;
-     QCheckBox *heartrateChk;
-
-     QLineEdit *twitterMessageEdit;
 
      QProgressBar *progressBar;
      QLabel *progressLabel;
 
-     RideItem *ride;
+     QTemporaryFile *tmp;
+     QStringList *fileNames;
+     RideFile *rideFile;
+
+     int count;
 
      QString athleteId;
      QString token;
-     QString uploadId;
      QString activityId;
-     QString uploadStatus;
-     QString uploadProgress;
 
-     QString STRAVA_URL1, STRAVA_URL2, STRAVA_URL_SSL;
+     QString err;
+     QString STRAVA_URL_V1,
+             STRAVA_URL_V2, STRAVA_URL_V2_SSL,
+             STRAVA_URL_V3;
 
-     bool overwrite, loggedIn, uploadSuccessful;
+     bool loggedIn;
 };
 
-#endif // STRAVADIALOG_H
+#endif // STRAVADOWNLOADDIALOG_H

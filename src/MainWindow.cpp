@@ -57,7 +57,8 @@
 #include "MetricAggregator.h"
 #include "SplitActivityWizard.h"
 #include "BatchExportDialog.h"
-#include "StravaDialog.h"
+#include "StravaUploadDialog.h"
+#include "StravaDownloadDialog.h"
 #include "RideWithGPSDialog.h"
 #include "TtbDialog.h"
 #include "TwitterDialog.h"
@@ -853,6 +854,7 @@ MainWindow::MainWindow(const QDir &home) :
     stravaAction = new QAction(tr("Upload to Strava..."), this);
     connect(stravaAction, SIGNAL(triggered(bool)), this, SLOT(uploadStrava()));
     rideMenu->addAction(stravaAction);
+    rideMenu->addAction(tr("Download from Strava..."), this, SLOT(downloadStrava()));
 
     rideWithGPSAction = new QAction(tr("Upload to RideWithGPS..."), this);
     connect(rideWithGPSAction, SIGNAL(triggered(bool)), this, SLOT(uploadRideWithGPSAction()));
@@ -2143,9 +2145,16 @@ MainWindow::uploadStrava()
     RideItem *item = dynamic_cast<RideItem*>(_item);
 
     if (item) { // menu is disabled anyway, but belt and braces
-        StravaDialog d(this, item);
+        StravaUploadDialog d(this, item);
         d.exec();
     }
+}
+
+void
+MainWindow::downloadStrava()
+{
+    StravaDownloadDialog d(this);
+    d.exec();
 }
 
 /*----------------------------------------------------------------------
