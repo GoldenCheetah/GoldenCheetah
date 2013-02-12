@@ -28,7 +28,7 @@
 // forward references
 class RideFile;
 class RideItem;
-class RideFilePoint;
+struct RideFilePoint;
 class QwtPlotCurve;
 class QwtPlotMarker;
 class MainWindow;

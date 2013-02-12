@@ -60,7 +60,7 @@ FortiusController::find()
 }
 
 bool
-FortiusController::discover(DeviceConfiguration *) {return false; } // NOT IMPLEMENTED YET
+FortiusController::discover(QString) {return false; } // NOT IMPLEMENTED YET
 
 
 bool FortiusController::doesPush() { return false; }

@@ -239,7 +239,6 @@ HEADERS += \
         ANTMessage.h \
         ANTMessages.h \
         ANTlocalController.h \
-        ANTplusController.h \
         BatchExportDialog.h \
         BestIntervalDialog.h \
         BinRideFile.h \
@@ -320,7 +319,6 @@ HEADERS += \
         MetadataWindow.h \
         MetricAggregator.h \
         NewCyclistDialog.h \
-        MultiWindow.h \
         NullController.h \
         Pages.h \
         PerfPlot.h \
@@ -333,7 +331,6 @@ HEADERS += \
         PowerTapUtil.h \
         PwxRideFile.h \
         ProtocolHandler.h \
-        QuarqdClient.h \
         QuarqParser.h \
         QuarqRideFile.h \
         RawRideFile.h \
@@ -421,7 +418,6 @@ SOURCES += \
         ANTLogger.cpp \
         ANTMessage.cpp \
         ANTlocalController.cpp \
-        ANTplusController.cpp \
         BasicRideMetrics.cpp \
         BatchExportDialog.cpp \
         BestIntervalDialog.cpp \
@@ -510,7 +506,6 @@ SOURCES += \
         MetadataWindow.cpp \
         MetricAggregator.cpp \
         NewCyclistDialog.cpp \
-        MultiWindow.cpp \
         NullController.cpp \
         Pages.cpp \
         PeakPower.cpp \
@@ -524,7 +519,6 @@ SOURCES += \
         PowerTapUtil.cpp \
         Protocolhandler.cpp \
         PwxRideFile.cpp \
-        QuarqdClient.cpp \
         QuarqParser.cpp \
         QuarqRideFile.cpp \
         RawRideFile.cpp \

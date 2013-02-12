@@ -33,7 +33,6 @@
 #endif
 #include "ComputrainerController.h"
 #include "ANTlocalController.h"
-#include "ANTplusController.h"
 #include "ANTChannel.h"
 #include "NullController.h"
 #include "Settings.h"

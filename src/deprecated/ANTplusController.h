@@ -40,7 +40,7 @@ public:
     int restart();                              // restart after paused
     int pause();                                // pauses data collection, inbound telemetry is discarded
     int stop();                                 // stops data collection thread
-    bool discover(DeviceConfiguration *dc =0, QProgressDialog *progress = 0);              // tell if a device is present at the address/port passed
+    bool discover(QString);
                                                 // port is specified as ipname:port e.g. 192.168.2.1:8168
     // telemetry push pull
     bool doesPush(), doesPull(), doesLoad();

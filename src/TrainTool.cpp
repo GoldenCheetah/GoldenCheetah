@@ -31,7 +31,6 @@
 // Three current realtime device types supported are:
 #include "RealtimeController.h"
 #include "ComputrainerController.h"
-#include "ANTplusController.h"
 #include "ANTlocalController.h"
 #include "NullController.h"
 #ifdef GC_HAVE_WFAPI
@@ -431,9 +430,7 @@ TrainTool::configChanged()
         // Create the controllers for each device
         // we can call upon each of these when we need
         // to interact with the device
-        if (Devices.at(i).type == DEV_ANTPLUS) {
-            Devices[i].controller = new ANTplusController(this, &Devices[i]);
-        } else if (Devices.at(i).type == DEV_CT) {
+        if (Devices.at(i).type == DEV_CT) {
             Devices[i].controller = new ComputrainerController(this, &Devices[i]);
 #ifdef GC_HAVE_LIBUSB
         } else if (Devices.at(i).type == DEV_FORTIUS) {

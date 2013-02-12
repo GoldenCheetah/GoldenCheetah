@@ -39,7 +39,7 @@ public:
     int stop();                                 // stops data collection thread
 
     bool find();
-    bool discover(DeviceConfiguration *);              // tell if a device is present at port passed
+    bool discover(QString);              // tell if a device is present at port passed
 
 
     // telemetry push pull

@@ -29,7 +29,6 @@
 #include "IntervalItem.h"
 #include "IntervalTreeView.h"
 #include "GcWindowRegistry.h"
-#include "QuarqdClient.h"
 #include "RealtimeData.h"
 #include "SpecialFields.h"
 #include "TimeUtils.h"
@@ -432,7 +431,6 @@ class MainWindow : public QMainWindow
         IntervalTreeView *intervalWidget;
 
         // Miscellany
-        QuarqdClient *client;
         QSignalMapper *toolMapper;
         WithingsDownload *withingsDownload;
         ZeoDownload *zeoDownload;

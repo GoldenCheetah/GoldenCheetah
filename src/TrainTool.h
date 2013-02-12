@@ -63,7 +63,6 @@
 
 class RealtimeController;
 class ComputrainerController;
-class ANTplusController;
 class ANTlocalController;
 class NullController;
 class RealtimePlot;

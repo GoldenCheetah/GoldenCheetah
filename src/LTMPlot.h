@@ -69,7 +69,7 @@ class LTMPlot : public QwtPlot
         MainWindow *main;
         QDir home;
         bool useMetricUnits;
-        struct LTMSettings *settings;
+        LTMSettings *settings;
 
         // date range selection
         int selection, seasonid;

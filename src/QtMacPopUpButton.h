@@ -23,7 +23,7 @@
 #include <QVBoxLayout>
 #include <QPointer>
 #include <QMenu>
-#include <QMacCocoaViewContainer>>
+#include <QMacCocoaViewContainer>
 
 
 // Qocoa already dit this, so re-used their code, saved a bit of effort!

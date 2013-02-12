@@ -167,7 +167,7 @@ class RelativeIntensity : public RideMetric {
     }
 
     // added djconnel: allow RI to be combined across rides
-    bool canAggregate() const { return true; }
+    bool canAggregate() { return true; }
     void aggregateWith(const RideMetric &other) {
         assert(symbol() == other.symbol());
 	    const RelativeIntensity &ap = dynamic_cast<const RelativeIntensity&>(other);

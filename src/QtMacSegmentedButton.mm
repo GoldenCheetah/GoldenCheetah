@@ -73,7 +73,7 @@ static NSImage *fromQPixmap(const QPixmap *pixmap)
     return self;
 }
 
--(IBAction)segControlClicked:(id)sender;
+-(IBAction)segControlClicked:(id)sender
 {
     mRealTarget->onClicked([sender selectedSegment]);
 }
