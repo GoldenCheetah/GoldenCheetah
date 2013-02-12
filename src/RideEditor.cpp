@@ -431,6 +431,10 @@ AnomalyDialog::check()
         counter++;
     }
 
+    // enable the toolbar / disable for anomalies found
+    if (counter) rideEditor->checkAct->setEnabled(true);
+    else rideEditor->checkAct->setEnabled(false);
+
     // redraw - even if no anomalies were found since
     // some may have been highlighted previouslt. This is
     // an expensive operation, but then so is the check()
