@@ -372,7 +372,10 @@ HEADERS += \
         SmfRideFile.h \
         SrdRideFile.h \
         SrmRideFile.h \
-        StravaDialog.h \
+        StravaDownloadDialog.h \
+        StravaParser.h \
+        StravaRideFile.h \
+        StravaUploadDialog.h \
         StressCalculator.h \
         SummaryMetrics.h \
         SummaryWindow.h \
@@ -558,7 +561,10 @@ SOURCES += \
         SmfRideFile.cpp \
         SrdRideFile.cpp \
         SrmRideFile.cpp \
-        StravaDialog.cpp \
+        StravaDownloadDialog.cpp \
+        StravaParser.cpp \
+        StravaRideFile.cpp \
+        StravaUploadDialog.cpp \
         StressCalculator.cpp \
         SummaryMetrics.cpp \
         SummaryWindow.cpp \

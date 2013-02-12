@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2011 Justin F. Knotzke (jknotzke@shampoo.ca),
- *                    Damien.Grauser (damien.grauser@pev-geneve.ch)
+ * Copyright (c) 2011-2013 Justin F. Knotzke (jknotzke@shampoo.ca),
+ *                         Damien.Grauser (damien.grauser@pev-geneve.ch)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -17,7 +17,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "StravaDialog.h"
+#include "StravaUploadDialog.h"
 #include "Settings.h"
 #include <QHttp>
 #include <QUrl>
@@ -31,7 +31,7 @@
 #include "DBAccess.h"
 #include "TcxRideFile.h"
 
-StravaDialog::StravaDialog(MainWindow *mainWindow, RideItem *item) :
+StravaUploadDialog::StravaUploadDialog(MainWindow *mainWindow, RideItem *item) :
     mainWindow(mainWindow)
 {
     STRAVA_URL1 = "http://www.strava.com/api/v1/";
@@ -112,7 +112,7 @@ StravaDialog::StravaDialog(MainWindow *mainWindow, RideItem *item) :
 
 
 void
-StravaDialog::uploadToStrava()
+StravaUploadDialog::uploadToStrava()
 {
     show();
     overwrite = true;
@@ -173,7 +173,7 @@ StravaDialog::uploadToStrava()
 }
 
 void
-StravaDialog::getActivityFromStrava()
+StravaUploadDialog::getActivityFromStrava()
 {
     if (token.length()==0)
         requestLogin();
@@ -196,14 +196,14 @@ StravaDialog::getActivityFromStrava()
 }
 
 void
-StravaDialog::okClicked()
+StravaUploadDialog::okClicked()
 {
     dialog->accept();
     return;
 }
 
 void
-StravaDialog::cancelClicked()
+StravaUploadDialog::cancelClicked()
 {
     dialog->reject();
     return;
@@ -211,7 +211,7 @@ StravaDialog::cancelClicked()
 
 
 void
-StravaDialog::requestLogin()
+StravaUploadDialog::requestLogin()
 {
     progressLabel->setText(tr("Login..."));
     progressBar->setValue(5);
@@ -247,7 +247,7 @@ StravaDialog::requestLogin()
 }
 
 void
-StravaDialog::requestLoginFinished(QNetworkReply *reply)
+StravaUploadDialog::requestLoginFinished(QNetworkReply *reply)
 {
     loggedIn = false;
 
@@ -294,7 +294,7 @@ StravaDialog::requestLoginFinished(QNetworkReply *reply)
 // https://strava.pbworks.com/w/page/39241255/v2%20upload%20create
 
 void
-StravaDialog::requestUpload()
+StravaUploadDialog::requestUpload()
 {
     progressLabel->setText(tr("Upload ride..."));
     progressBar->setValue(10);
@@ -393,7 +393,7 @@ StravaDialog::requestUpload()
 }
 
 void
-StravaDialog::requestUploadFinished(QNetworkReply *reply)
+StravaUploadDialog::requestUploadFinished(QNetworkReply *reply)
 {
     progressBar->setValue(90);
     progressLabel->setText(tr("Upload finished."));
@@ -425,7 +425,7 @@ StravaDialog::requestUploadFinished(QNetworkReply *reply)
 }
 
 void
-StravaDialog::requestVerifyUpload()
+StravaUploadDialog::requestVerifyUpload()
 {
     progressBar->setValue(0);
     progressLabel->setText(tr("Ride processing..."));
@@ -447,7 +447,7 @@ StravaDialog::requestVerifyUpload()
 }
 
 void
-StravaDialog::requestVerifyUploadFinished(QNetworkReply *reply)
+StravaUploadDialog::requestVerifyUploadFinished(QNetworkReply *reply)
 {
     uploadSuccessful = false;
     if (reply->error() != QNetworkReply::NoError)
@@ -496,7 +496,7 @@ StravaDialog::requestVerifyUploadFinished(QNetworkReply *reply)
 }
 
 void
-StravaDialog::requestSearchRide()
+StravaUploadDialog::requestSearchRide()
 {
     progressBar->setValue(0);
     progressLabel->setText(tr("Searching corresponding Ride"));
@@ -519,7 +519,7 @@ StravaDialog::requestSearchRide()
 }
 
 void
-StravaDialog::requestSearchRideFinished(QNetworkReply *reply)
+StravaUploadDialog::requestSearchRideFinished(QNetworkReply *reply)
 {
     uploadSuccessful = false;
     if (reply->error() != QNetworkReply::NoError)

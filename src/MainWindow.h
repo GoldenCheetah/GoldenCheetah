@@ -284,6 +284,7 @@ class MainWindow : public QMainWindow
         void exportBatch();
         void exportMetrics();
         void uploadStrava();
+        void downloadStrava();
         void uploadRideWithGPSAction();
         void uploadTtb();
         void downloadErgDB();
