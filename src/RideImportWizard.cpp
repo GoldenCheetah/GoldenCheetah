@@ -197,7 +197,7 @@ RideImportWizard::init(QList<QString> files, QDir &home, MainWindow * /*mainWind
     // on Leopard, no doubt not so good on Windows
     resize(920 +
            ((files.count() > 16 ? 24 : 0) +
-           (files.count() > 9 && files.count() < 17) ? 8 : 0),
+           ((files.count() > 9 && files.count() < 17) ? 8 : 0)),
            118 + (files.count() > 16 ? 17*20 : (files.count()+1) * 20));
 
     tableWidget->adjustSize();
@@ -294,8 +294,8 @@ RideImportWizard::process()
                  // resize dialog according to the number of rows we expect
                  int willhave = filenames.count() + rides.count();
                  resize(920 + ((willhave > 16 ? 24 : 0) +
-                     (willhave > 9 && willhave < 17) ? 8 : 0),
-                     118 + (willhave > 16 ? 17*20 : (willhave+1) * 20));
+                     ((willhave > 9 && willhave < 17) ? 8 : 0)),
+                     118 + ((willhave > 16 ? 17*20 : (willhave+1) * 20)));
 
 
                  // ok so create a temporary file and add to the tableWidget
