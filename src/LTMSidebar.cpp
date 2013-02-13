@@ -500,9 +500,6 @@ LTMSidebar::editEvent()
 void
 LTMSidebar::setSummary(DateRange dateRange)
 {
-    // are we metric?
-    bool useMetricUnits = (appsettings->value(this, GC_UNIT).toString() == "Metric");
-
     // where we construct the text
     QString summaryText("");
 
@@ -596,15 +593,15 @@ LTMSidebar::setSummary(DateRange dateRange)
 
                 const RideMetric *metric = RideMetricFactory::instance().rideMetric(metricname);
 
-                QString value = SummaryMetrics::getAggregated(metricname, results, useMetricUnits);
+                QString value = SummaryMetrics::getAggregated(metricname, results, main->useMetricUnits);
 
                 // Maximum Max and Average Average looks nasty, remove from name for display
                 QString s = metric ? metric->name().replace(QRegExp(tr("^(Average|Max) ")), "") : "unknown";
 
                 // don't show units for time values
-                if (metric && (metric->units(useMetricUnits) == "seconds" ||
-                               metric->units(useMetricUnits) == tr("seconds") ||
-                               metric->units(useMetricUnits) == "")) {
+                if (metric && (metric->units(main->useMetricUnits) == "seconds" ||
+                               metric->units(main->useMetricUnits) == tr("seconds") ||
+                               metric->units(main->useMetricUnits) == "")) {
 
                     summaryText += QString("<tr><td>%1:</td><td align=\"right\"> %2</td>")
                                             .arg(s)
@@ -613,7 +610,7 @@ LTMSidebar::setSummary(DateRange dateRange)
                 } else {
                     summaryText += QString("<tr><td>%1(%2):</td><td align=\"right\"> %3</td>")
                                             .arg(s)
-                                            .arg(metric ? metric->units(useMetricUnits) : "unknown")
+                                            .arg(metric ? metric->units(main->useMetricUnits) : "unknown")
                                             .arg(value);
                 }
             }
