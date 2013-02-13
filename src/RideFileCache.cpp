@@ -666,7 +666,8 @@ MeanMaxComputer::run()
 
             // NOTE: It is 360 not 3600 because Altitude is factored for decimal places
             //       since it is the base data series, but we are calculating VAM
-            double vam = (((data.points[i].value - lastAlt) * 360)/ride->recIntSecs());
+            //       And we multiply by 10 at the end!
+            double vam = (((data.points[i].value - lastAlt) * 360)/ride->recIntSecs()) * 10;
             if (vam < 0) vam = 0;
             lastAlt = data.points[i].value;
             data.points[i].value = vam;
