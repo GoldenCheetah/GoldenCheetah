@@ -172,22 +172,6 @@ class PowerHist : public QwtPlot
         // source cache
         RideFileCache *cache;
 
-        // discritized unit for smoothing
-        static const double wattsDelta = 1.0;
-        static const double wattsKgDelta = 0.01;
-        static const double nmDelta    = 0.1;
-        static const double hrDelta    = 1.0;
-        static const double kphDelta   = 0.1;
-        static const double cadDelta   = 1.0;
-
-        // digits for text entry validator
-        static const int wattsDigits = 0;
-        static const int wattsKgDigits = 2;
-        static const int nmDigits    = 1;
-        static const int hrDigits    = 0;
-        static const int kphDigits   = 1;
-        static const int cadDigits   = 0;
-
         // storage for data counts
         QVector<unsigned int> wattsArray, wattsZoneArray, wattsKgArray, nmArray, hrArray,
                               hrZoneArray, kphArray, cadArray;
