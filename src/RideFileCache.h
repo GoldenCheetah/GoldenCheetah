@@ -165,11 +165,6 @@ class RideFileCache
         int CP;
         int LTHR;
 
-        // Should be 1 regardless of the rideFile::recIntSecs
-        // this might change in the future - but at the moment
-        // means that the data is "smoothed" to 1s samples
-        static const double _meanMaxBinSize = 1.0;
-
         //
         // MEAN MAXIMAL VALUES
         //
