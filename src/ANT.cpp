@@ -504,6 +504,10 @@ ANT::associateControlChannels() {
 bool
 ANT::discover(QString name)
 {
+#ifdef WIN32
+Q_UNUSED(name);
+#endif
+
 #ifdef Q_OS_LINUX
 
     // All we can do for USB1 sticks is see if the cp210x driver module
