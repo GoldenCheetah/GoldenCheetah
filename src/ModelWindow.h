@@ -68,7 +68,7 @@ class ModelWindow : public GcChartWindow
         ModelWindow(MainWindow *, const QDir &);
 
         // reveal
-        bool hasReveal() { return true; }
+        bool hasReveal() { return false; }
 
         // set/get properties
         int preset() const { return presetValues->currentIndex(); }
@@ -139,8 +139,7 @@ class ModelWindow : public GcChartWindow
                *rpresetLabel;
 
         // top of screen selectors
-        QComboBox   *presetValues,
-                    *rpresetValues;
+        QComboBox   *presetValues;
 
         // bottom selectors
         QComboBox   *xSelector,
