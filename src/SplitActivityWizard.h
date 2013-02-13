@@ -160,7 +160,6 @@ class SplitBackground: public QwtPlotItem
 {
     private:
         SplitActivityWizard *parent;
-        //XXX mutable QList<QwtPlotMarker*> labs; //XXX disabled as causes QWT6 to crash (!)
 
     public:
 
@@ -183,10 +182,6 @@ class SplitBackground: public QwtPlotItem
 
             double lastmark = -1;
             int segment = 0;
-
-            // clear the labels
-            //XXX foreach(QwtPlotMarker *l, labs) { l->detach(); delete l; }
-            //XXX labs.clear();
 
             // create a sorted list of markers, since we
             // may have duplicates and the sequence is
@@ -228,18 +223,6 @@ class SplitBackground: public QwtPlotItem
                         segment++; // starts at 0 so increment before use to start from 1
 
                         painter->fillRect(r, segment%2 ? QColor(216,233,255,200) : QColor(233,255,222,200));
-
-                        // segment number
-                        //XXX QwtText text(QString("%1").arg(segment));
-                        //XXX text.setFont(QFont("Helvetica", 48, QFont::Bold));
-                        //XXX text.setColor(Qt::lightGray);
-
-                        // place the text in the geometric mean in time, at a decent power
-                        //XXX QwtPlotMarker *label = new QwtPlotMarker;
-                        //XXX label->setValue((lastmark+mark)/2, 200);
-                        //XXX label->setLabel(text);
-                        //XXX label->attach(plot());
-                        //XXX labs.append(label);
                     }
 
                 }
