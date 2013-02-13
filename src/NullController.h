@@ -47,7 +47,7 @@ class NullController : public RealtimeController
   int pause();
   int restart();
   bool find();
-  bool discover(char *) {  return true;  }
+  bool discover(QString) {  return true;  }
   bool doesPush() {  return false; }
   bool doesPull() {  return true; }
   bool doesLoad() {  return false; }

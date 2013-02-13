@@ -324,7 +324,7 @@ public:
     enum { WW_WorkoutTypePage, WW_AbsWattagePage, WW_RelWattagePage, WW_GradientPage, WW_ImportPage };
 
     WorkoutWizard(QWidget *parent = NULL);
-    int nextId();
+
     // called at the end of the wizard...
     void accept();
 };

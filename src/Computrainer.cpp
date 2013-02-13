@@ -908,7 +908,7 @@ int Computrainer::openPort()
 
 int Computrainer::rawWrite(uint8_t *bytes, int size) // unix!!
 {
-    int rc=0,ibytes;
+    int rc=0;
 
 #ifdef WIN32
     DWORD cBytes;
@@ -917,7 +917,7 @@ int Computrainer::rawWrite(uint8_t *bytes, int size) // unix!!
     return rc;
 
 #else
-
+    int ibytes;
     ioctl(devicePort, FIONREAD, &ibytes);
 
     // timeouts are less critical for writing, since vols are low
