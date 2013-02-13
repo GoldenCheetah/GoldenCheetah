@@ -137,8 +137,6 @@ class TrainTool : public GcWindow
 
         void selectVideo(QString fullpath);
         void selectWorkout(QString fullpath);
-        //XXX void workoutTreeMenuPopup(const QPoint &);
-        //XXX void mediaTreeMenuPopup(const QPoint &);
 
     public slots:
         void configChanged();
