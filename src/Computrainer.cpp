@@ -939,7 +939,7 @@ int Computrainer::rawRead(uint8_t bytes[], int size)
     int rc=0;
 
 #ifdef WIN32
-
+Q_UNUSED(size);
     // Readfile deals with timeouts and readyread issues
     DWORD cBytes;
     rc = ReadFile(devicePort, bytes, 7, &cBytes, NULL);

@@ -168,12 +168,12 @@ struct Bin2FileReaderState
         if (alt == 0x8000)
             alt = 0;
 
-        if ((long)lat == -2147483648L) //2147483648
+        if ((long)lat == (long)0x80000000) //2147483648
             lat = 0;
         else
             lat = lat/10000000.0;
 
-        if ((long)lng == -2147483648L) //0x80000000
+        if ((long)lng == (long)0x80000000) //0x80000000
             lng = 0;
         else
             lng = lng/10000000.0;
