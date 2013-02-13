@@ -59,7 +59,7 @@ public:
 
 //// Workout Editor
 
-WorkoutEditorBase::WorkoutEditorBase(QStringList &colms, QWidget *parent =0 ) :QFrame(parent)
+WorkoutEditorBase::WorkoutEditorBase(QStringList &colms, QWidget *parent) :QFrame(parent)
 {
     QVBoxLayout *layout = new QVBoxLayout();
     QHBoxLayout *row1Layout = new QHBoxLayout();
@@ -208,7 +208,7 @@ void WorkoutMetricsSummary::updateMetrics(QMap<QString, QString> &map)
 
 /// WorkoutTypePage
 
-WorkoutTypePage::WorkoutTypePage(QWidget *parent =0) : QWizardPage(parent)
+WorkoutTypePage::WorkoutTypePage(QWidget *parent) : QWizardPage(parent)
 {
 }
 
@@ -258,8 +258,7 @@ int WorkoutTypePage::nextId() const
 
 //// AbsWattagePage
 
-AbsWattagePage::AbsWattagePage(QWidget *parent = NULL) : WorkoutPage(parent)
-{}
+AbsWattagePage::AbsWattagePage(QWidget *parent) : WorkoutPage(parent) {}
 
 void AbsWattagePage::initializePage()
 {
@@ -382,8 +381,7 @@ void AbsWattagePage::SaveWorkout()
 
 /// RelativeWattagePage
 
-RelWattagePage::RelWattagePage(QWidget *parent = NULL) : WorkoutPage(parent)
-{}
+RelWattagePage::RelWattagePage(QWidget *parent) : WorkoutPage(parent) {}
 
 void RelWattagePage::initializePage()
 {
@@ -508,8 +506,7 @@ void RelWattagePage::SaveWorkout()
 }
 
 /// GradientPage
-GradientPage::GradientPage(QWidget *parent = NULL) : WorkoutPage(parent)
-{}
+GradientPage::GradientPage(QWidget *parent) : WorkoutPage(parent) {}
 
 void GradientPage::initializePage()
 {
@@ -598,8 +595,7 @@ void GradientPage::SaveWorkout()
 
 
 
-ImportPage::ImportPage(QWidget *parent = 0) : WorkoutPage(parent)
-{}
+ImportPage::ImportPage(QWidget *parent) : WorkoutPage(parent) {}
 
 void ImportPage::initializePage()
 {
