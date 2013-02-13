@@ -876,8 +876,6 @@ int ANT::rawWrite(uint8_t *bytes, int size) // unix!!
 
 int ANT::rawRead(uint8_t bytes[], int size)
 {
-    int rc=0;
-
 #ifdef WIN32
     switch (usbMode) {
     case USB1:
@@ -887,7 +885,6 @@ int ANT::rawRead(uint8_t bytes[], int size)
         return usb2->read((char *)bytes, size);
         break;
     default:
-        rc = 0;
         break;
     }
 
@@ -904,13 +901,14 @@ int ANT::rawRead(uint8_t bytes[], int size)
     // read one byte at a time sleeping when no data ready
     // until we timeout waiting then return error
     for (i=0; i<size; i++) {
-        rc = read(devicePort, &byte, 1);
+        int rc = read(devicePort, &byte, 1);
         if (rc == -1 || rc == 0) return -1; // error!
         else bytes[i] = byte;
     }
     return i;
 
 #endif
+    return -1; // keep compiler happy.
 }
 
 // convert 'p' 'c' etc into ANT values for device type
