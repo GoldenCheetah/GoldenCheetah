@@ -36,10 +36,10 @@ CocoaInitializer::~CocoaInitializer()
     [pool release];
 }
 
-
-inline NSString *darwinQStringToNSString (const QString &aString)
+static inline NSString *darwinQStringToNSString (const QString &aString)
 {
-    return [(CFStringCreateWithCharacters (0, reinterpret_cast<const UniChar *> (aString.unicode()), aString.length())) autorelease];
+    return (NSString*)CFStringCreateWithCharacters
+    (0, reinterpret_cast<const UniChar *> (aString.unicode()), aString.length());
 }
 
 static NSImage *fromQPixmap(const QPixmap *pixmap)

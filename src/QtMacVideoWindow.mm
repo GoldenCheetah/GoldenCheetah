@@ -29,24 +29,9 @@
 
 static inline NSString *darwinQStringToNSString (const QString &aString)
 {
-    return [(CFStringCreateWithCharacters
-            (0, reinterpret_cast<const UniChar *> (aString.unicode()), aString.length())) autorelease];
+    return (NSString*)CFStringCreateWithCharacters
+    (0, reinterpret_cast<const UniChar *> (aString.unicode()), aString.length());
 }
-
-static QString qt_mac_NSStringToQString(const NSString *nsstr)
-{
-    NSRange range;
-    range.location = 0;
-    range.length = [nsstr length];
-    QString result(range.length, QChar(0));
- 
-    unichar *chars = new unichar[range.length];
-    [nsstr getCharacters:chars range:range];
-    result = QString::fromUtf16(chars, range.length);
-    delete[] chars;
-    return result;
-}
-
 
 VideoWindow::VideoWindow(MainWindow *parent, const QDir &home)  :
 GcWindow(parent), home(home), main(parent), hasMovie(false)
