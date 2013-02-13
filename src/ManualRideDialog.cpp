@@ -266,10 +266,10 @@ ManualRideDialog::ManualRideDialog(MainWindow *mainWindow) : mainWindow(mainWind
     QGridLayout *notesLayout = new QGridLayout;
     squeeze->addLayout(notesLayout);
 
-    notesLayout->addWidget(sportLabel, 0,0, Qt::AlignLeft);
-    notesLayout->addWidget(sport, 0,1, Qt::AlignLeft);
-    notesLayout->addWidget(wcodeLabel, 1,0, Qt::AlignLeft);
-    notesLayout->addWidget(wcode, 1,1, Qt::AlignLeft);
+    notesLayout->addWidget(wcodeLabel, 0,0, Qt::AlignLeft);
+    notesLayout->addWidget(wcode, 0,1, Qt::AlignLeft);
+    notesLayout->addWidget(sportLabel, 1,0, Qt::AlignLeft);
+    notesLayout->addWidget(sport, 1,1, Qt::AlignLeft);
     notesLayout->addWidget(notesLabel, 2,0, Qt::AlignTop|Qt::AlignLeft);
     notesLayout->addWidget(notes, 2,1, Qt::AlignLeft);
 
