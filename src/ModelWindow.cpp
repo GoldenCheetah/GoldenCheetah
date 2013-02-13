@@ -57,24 +57,6 @@ ModelWindow::ModelWindow(MainWindow *parent, const QDir &home) :
     nodata = new QLabel(tr("No data or bin size too large."), this);
     nodata->hide();
 
-    //
-    // reveal controls
-    //
-    rpresetLabel = new QLabel(tr("Analyse"), this);
-    rpresetValues = new QComboBox;
-    fillPresets(rpresetValues);
-    rpresetValues->setCurrentIndex(1);
-
-    // layout reveal controls
-    QHBoxLayout *r = new QHBoxLayout;
-    r->setSpacing(4);
-    r->setContentsMargins(0,0,0,0);
-    r->addStretch();
-    r->addWidget(rpresetLabel);
-    r->addWidget(rpresetValues);
-    r->addStretch();
-    setRevealLayout(r);
-
     // the plot widget
     QHBoxLayout *mainLayout = new QHBoxLayout;
     modelPlot= new ModelPlot(main, NULL);
