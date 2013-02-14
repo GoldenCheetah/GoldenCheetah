@@ -229,6 +229,9 @@ struct FitFileReaderState
                 case 1036: rideFile->setDeviceType("Garmin Edge 500"); break;
                 case 1124: rideFile->setDeviceType("Garmin FR110"); break;
                 case 1169: rideFile->setDeviceType("Garmin Edge 800"); break;
+                case 1325: rideFile->setDeviceType("Garmin Edge 200"); break;
+                case 20119: rideFile->setDeviceType("Garmin Training Center"); break;
+                case 65534: rideFile->setDeviceTpe("Garmin Connect Website"); break;
                 default: rideFile->setDeviceType(QString("Unknown Garmin Device %1").arg(prod));
             }
         }
