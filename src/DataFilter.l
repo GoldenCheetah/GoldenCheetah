@@ -69,5 +69,3 @@ void DataFilter_clearString()
     DataFilterlex_destroy();
 }
 
-static int _suppress = yyinput();
-

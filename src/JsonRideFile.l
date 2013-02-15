@@ -71,5 +71,3 @@
 [ \n\t\r]           ;               /* we just ignore whitespace */
 .                   return JsonRideFiletext[0]; /* any other character, typically :, { or } */
 %%
-
-static int _suppress = yyinput();
