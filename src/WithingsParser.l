@@ -74,3 +74,5 @@ void WithingsParser_reset()
 {
     WithingsParser_delete_buffer (my_state);
 }
+
+static int _suppress = yyinput();
