@@ -57,34 +57,25 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
 
     setRevealLayout(revealLayout);
 
+    //
     // main plot area
+    //
     QVBoxLayout *vlayout = new QVBoxLayout;
     cpintPlot = new CpintPlot(mainWindow, home.path(), mainWindow->zones());
     vlayout->addWidget(cpintPlot);
 
+    QGridLayout *mainLayout = new QGridLayout();
+    mainLayout->addLayout(vlayout, 0, 0);
+    setChartLayout(mainLayout);
 
-    // controls
-    QWidget *c = new QWidget;
-    QFormLayout *cl = new QFormLayout(c);
-    setControls(c);
-
-#ifdef GC_HAVE_LUCENE
-    // searchbox
-    searchBox = new SearchFilterBox(this, parent);
-    connect(searchBox, SIGNAL(searchClear()), cpintPlot, SLOT(clearFilter()));
-    connect(searchBox, SIGNAL(searchResults(QStringList)), cpintPlot, SLOT(setFilter(QStringList)));
-    connect(searchBox, SIGNAL(searchClear()), this, SLOT(filterChanged()));
-    connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(filterChanged()));
-    cl->addRow(new QLabel(tr("Filter")), searchBox);
-    cl->addWidget(new QLabel("")); //spacing
-#endif
 
     //
-    // picker
+    // picker - on chart controls/display
     //
 
     // picker widget
     QWidget *pickerControls = new QWidget(this);
+    mainLayout->addWidget(pickerControls, 0, 0, Qt::AlignTop | Qt::AlignRight);
     pickerControls->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     // picker layout
@@ -102,16 +93,6 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     cpintAllValue = new QLabel(tr("no data"));
     QLabel *cpintCPLabel = new QLabel(tr("CP Curve:"), this);
     cpintCPValue = new QLabel(tr("no data"));
-
-    //QFontMetrics metrics(QApplication::font());
-    //int width = metrics.width("8888 watts (88/88/8888)") + 10;
-    //cpintAllValue->setFixedWidth(width);
-    //cpintCPValue->setFixedWidth(width); // so lines up nicely
-
-    //cpintTimeValue->setReadOnly(false);
-    //cpintTodayValue->setReadOnly(true);
-    //cpintAllValue->setReadOnly(true);
-    //cpintCPValue->setReadOnly(true);
 
     // chart overlayed values in smaller font
     QFont font = cpintTimeValue->font();
@@ -135,9 +116,32 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     pcl->addRow(cpintAllLabel, cpintAllValue);
     pcl->addRow(cpintCPLabel, cpintCPValue);
 
-    // tools /properties
+
+    //
+    // Chart settings
+    //
+
+    // controls widget and layout
+    QWidget *c = new QWidget;
+    QFormLayout *cl = new QFormLayout(c);
+    setControls(c);
+
+#ifdef GC_HAVE_LUCENE
+    // filter / searchbox
+    searchBox = new SearchFilterBox(this, parent);
+    connect(searchBox, SIGNAL(searchClear()), cpintPlot, SLOT(clearFilter()));
+    connect(searchBox, SIGNAL(searchResults(QStringList)), cpintPlot, SLOT(setFilter(QStringList)));
+    connect(searchBox, SIGNAL(searchClear()), this, SLOT(filterChanged()));
+    connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(filterChanged()));
+    cl->addRow(new QLabel(tr("Filter")), searchBox);
+    cl->addWidget(new QLabel("")); //spacing
+#endif
+
+    // series
     seriesCombo = new QComboBox(this);
     addSeries();
+
+    // data -- season / daterange edit
     cComboSeason = new QComboBox(this);
     seasons = parent->seasons;
     resetSeasons();
@@ -147,10 +151,16 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
         cComboSeason->hide();
         label2->hide();
     }
+    cl->addRow(label2, cComboSeason);
+    dateSetting = new DateSettingsEdit(this);
+    cl->addRow(label, dateSetting);
+    if (rangemode == false) {
+        dateSetting->hide();
+        label->hide();
+    }
 
     cl->addWidget(new QLabel("")); //spacing
     cl->addRow(new QLabel(tr("Data series")), seriesCombo);
-    pcl->addRow(new QLabel(""), cpintSetCPButton);
 
     // shading
     shadeCombo = new QComboBox(this);
@@ -161,27 +171,13 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     shadeCombo->setCurrentIndex(2);
     cl->addRow(shading, shadeCombo);
 
-    dateSetting = new DateSettingsEdit(this);
-    cl->addRow(label, dateSetting);
-    if (rangemode == false) {
-        dateSetting->hide();
-        label->hide();
-    }
-
     picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
                                QwtPicker::VLineRubberBand,
                                QwtPicker::AlwaysOff, cpintPlot->canvas());
     picker->setStateMachine(new QwtPickerDragPointMachine);
     picker->setRubberBandPen(GColor(CPLOTTRACKER));
 
-    QGridLayout *mainLayout = new QGridLayout();
-    mainLayout->addLayout(vlayout, 0, 0);
-    mainLayout->addWidget(pickerControls, 0, 0, Qt::AlignTop | Qt::AlignRight);
-    setChartLayout(mainLayout);
-
     connect(picker, SIGNAL(moved(const QPoint &)), SLOT(pickerMoved(const QPoint &)));
-    //connect(cpintTimeValue, SIGNAL(editingFinished()), this, SLOT(cpintTimeValueEntered()));
-    connect(cpintSetCPButton, SIGNAL(clicked()), this, SLOT(cpintSetCPButtonClicked()));
     connect(rCpintSetCPButton, SIGNAL(clicked()), this, SLOT(cpintSetCPButtonClicked()));
 
     if (rangemode) {
@@ -191,7 +187,6 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     }
 
     connect(seriesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setSeries(int)));
-    //connect(mainWindow, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(mainWindow, SIGNAL(configChanged()), cpintPlot, SLOT(configChanged()));
 
@@ -253,7 +248,6 @@ CriticalPowerWindow::rideSelected()
 
         // apply latest colors
         picker->setRubberBandPen(GColor(CPLOTTRACKER));
-        cpintSetCPButton->setEnabled(cpintPlot->cp > 0);
         rCpintSetCPButton->setEnabled(cpintPlot->cp > 0);
 
         setIsBlank(false);

@@ -148,7 +148,6 @@ class CriticalPowerWindow : public GcChartWindow
         QComboBox *seriesCombo;
         QComboBox *cComboSeason;
         QComboBox *shadeCombo;
-        QPushButton *cpintSetCPButton;
         QwtPlotPicker *picker;
         void addSeries();
         Seasons *seasons;
