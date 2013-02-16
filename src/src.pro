@@ -278,6 +278,7 @@ HEADERS += \
         GcCalendarModel.h \
         GcPane.h \
         GcRideFile.h \
+        GcSideBarItem.h \
         GcToolBar.h \
         GcWindowLayout.h \
         GcWindowRegistry.h \
@@ -464,6 +465,7 @@ SOURCES += \
         GcCalendar.cpp \
         GcPane.cpp \
         GcRideFile.cpp \
+        GcSideBarItem.cpp \
         GcToolBar.cpp \
         GcWindowLayout.cpp \
         GcWindowRegistry.cpp \
