@@ -87,10 +87,12 @@ class CpintPlot : public QwtPlot
         const QwtPlotCurve *getCPCurve() const { return CPCurve; }
 
         double cp, tau, t0; // CP model parameters
+        double shadingCP; // the CP value we use to draw the shade
         void deriveCPParameters();
         void changeSeason(const QDate &start, const QDate &end);
         void setAxisTitle(int axis, QString label);
         void setSeries(RideFile::SeriesType);
+
 
         QVector<double> getBests() { return bests->meanMaxArray(series); }
         QVector<QDate> getBestDates() { return bests->meanMaxDates(series); }
@@ -103,6 +105,8 @@ class CpintPlot : public QwtPlot
         void plot_allCurve(CpintPlot *plot, int n_values, const double *power_values);
         void configChanged();
         void pointHover(QwtPlotCurve *curve, int index);
+        void setShadeMode(int x);
+        void setDateCP(int x) { dateCP = x; }
         void clearFilter();
         void setFilter(QStringList);
 
@@ -121,6 +125,7 @@ class CpintPlot : public QwtPlot
         QDate startDate;
         QDate endDate;
         const Zones *zones;
+        int dateCP;
         RideFile::SeriesType series;
         MainWindow *mainWindow;
 
@@ -130,6 +135,7 @@ class CpintPlot : public QwtPlot
 
         QStringList files;
         bool isFiltered;
+        int shadeMode;
 };
 
 #endif // _GC_CpintPlot_h

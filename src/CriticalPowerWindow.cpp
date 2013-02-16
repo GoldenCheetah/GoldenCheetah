@@ -30,6 +30,7 @@
 #include "Season.h"
 #include "SeasonParser.h"
 #include "Colors.h"
+#include "Zones.h"
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
 
@@ -147,22 +148,25 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
         label2->hide();
     }
 
-    cpintSetCPButton = new QPushButton(tr("&Save CP value"), this);
-    cpintSetCPButton->setEnabled(false);
-    cpintSetCPButton->hide();
-    cl->addRow(label2, cComboSeason);
+    cl->addWidget(new QLabel("")); //spacing
+    cl->addRow(new QLabel(tr("Data series")), seriesCombo);
+    pcl->addRow(new QLabel(""), cpintSetCPButton);
+
+    // shading
+    shadeCombo = new QComboBox(this);
+    shadeCombo->addItem(tr("None"));
+    shadeCombo->addItem(tr("Using CP"));
+    shadeCombo->addItem(tr("Using derived CP"));
+    QLabel *shading = new QLabel(tr("Power Shading"));
+    shadeCombo->setCurrentIndex(2);
+    cl->addRow(shading, shadeCombo);
 
     dateSetting = new DateSettingsEdit(this);
     cl->addRow(label, dateSetting);
-
     if (rangemode == false) {
         dateSetting->hide();
         label->hide();
     }
-
-    cl->addWidget(new QLabel("")); //spacing
-    cl->addRow(new QLabel(tr("Data series")), seriesCombo);
-    pcl->addRow(new QLabel(""), cpintSetCPButton);
 
     picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
                                QwtPicker::VLineRubberBand,
@@ -196,7 +200,7 @@ CriticalPowerWindow::CriticalPowerWindow(const QDir &home, MainWindow *parent, b
     connect(mainWindow, SIGNAL(rideAdded(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
     connect(mainWindow, SIGNAL(rideDeleted(RideItem*)), this, SLOT(newRideAdded(RideItem*)));
     connect(seasons, SIGNAL(seasonsChanged()), this, SLOT(resetSeasons()));
-
+    connect(shadeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(shadingSelected(int)));
     connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
     connect(dateSetting, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
     connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
@@ -238,6 +242,13 @@ CriticalPowerWindow::rideSelected()
 
     currentRide = myRideItem;
     if (currentRide) {
+        if (mainWindow->zones()) {
+            int zoneRange = mainWindow->zones()->whichRange(currentRide->dateTime.date());
+            int CP = zoneRange >= 0 ? mainWindow->zones()->getCP(zoneRange) : 0;
+            cpintPlot->setDateCP(CP);
+        } else {
+            cpintPlot->setDateCP(0);
+        }
         cpintPlot->calculate(currentRide);
 
         // apply latest colors
@@ -501,11 +512,25 @@ CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
     
     if (dateRange.from == cfrom && dateRange.to == cto && !stale) return;
 
+    cfrom = dateRange.from;
+    cto = dateRange.to;
+
+    // lets work out the average CP configure value
+    if (mainWindow->zones()) {
+        int fromZoneRange = mainWindow->zones()->whichRange(cfrom);
+        int toZoneRange = mainWindow->zones()->whichRange(cto);
+
+        int CPfrom = fromZoneRange >= 0 ? mainWindow->zones()->getCP(fromZoneRange) : 0;
+        int CPto = toZoneRange >= 0 ? mainWindow->zones()->getCP(toZoneRange) : CPfrom;
+        if (CPfrom == 0) CPfrom = CPto;
+        int dateCP = (CPfrom + CPto) / 2;
+
+        cpintPlot->setDateCP(dateCP);
+    }
+
     cpintPlot->changeSeason(dateRange.from, dateRange.to);
     cpintPlot->calculate(currentRide);
 
-    cfrom = dateRange.from;
-    cto = dateRange.to;
     stale = false;
 }
 
@@ -521,4 +546,12 @@ void CriticalPowerWindow::seasonSelected(int iSeason)
 void CriticalPowerWindow::filterChanged()
 {
     cpintPlot->calculate(currentRide);
+}
+
+void
+CriticalPowerWindow::shadingSelected(int shading)
+{
+    cpintPlot->setShadeMode(shading);
+    if (rangemode) dateRangeChanged(DateRange());
+    else cpintPlot->calculate(currentRide);
 }

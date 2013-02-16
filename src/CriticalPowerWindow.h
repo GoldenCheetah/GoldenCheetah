@@ -52,6 +52,7 @@ class CriticalPowerWindow : public GcChartWindow
     Q_PROPERTY(int lastN READ lastN WRITE setLastN USER true)
     Q_PROPERTY(int lastNX READ lastNX WRITE setLastNX USER true)
     Q_PROPERTY(int prevN READ prevN WRITE setPrevN USER true)
+    Q_PROPERTY(int shading READ shading WRITE setShading USER true)
     Q_PROPERTY(int useSelected READ useSelected WRITE setUseSelected USER true) // !! must be last property !!
 
     public:
@@ -107,6 +108,9 @@ class CriticalPowerWindow : public GcChartWindow
         int prevN() { return dateSetting->prevN(); }
         void setPrevN(int x) { dateSetting->setPrevN(x); }
 
+        int shading() { return shadeCombo->currentIndex(); }
+        void setShading(int x) { return shadeCombo->setCurrentIndex(x); }
+
     protected slots:
         void newRideAdded(RideItem*);
         void cpintTimeValueEntered();
@@ -114,6 +118,7 @@ class CriticalPowerWindow : public GcChartWindow
         void pickerMoved(const QPoint &pos);
         void rideSelected();
         void seasonSelected(int season);
+        void shadingSelected(int shading);
         void setSeries(int index);
         void resetSeasons();
         void filterChanged();
@@ -142,6 +147,7 @@ class CriticalPowerWindow : public GcChartWindow
         QLabel *cpintCPValue;
         QComboBox *seriesCombo;
         QComboBox *cComboSeason;
+        QComboBox *shadeCombo;
         QPushButton *cpintSetCPButton;
         QwtPlotPicker *picker;
         void addSeries();

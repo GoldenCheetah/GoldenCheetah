@@ -52,7 +52,8 @@ CpintPlot::CpintPlot(MainWindow *main, QString p, const Zones *zones) :
     mainWindow(main),
     current(NULL),
     bests(NULL),
-    isFiltered(false)
+    isFiltered(false),
+    shadeMode(2)
 {
     setInstanceName("CP Plot");
     assert(!USE_T0_IN_CP_MODEL); // doesn't work with energyMode=true
@@ -366,7 +367,7 @@ CpintPlot::plot_CP_curve(CpintPlot *thisPlot,     // the plot we're currently di
     if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
         CPCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     QPen pen(GColor(CCP));
-    pen.setWidth(appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble());
+    pen.setWidth(2.0);
     pen.setStyle(Qt::DashLine);
     CPCurve->setPen(pen);
     CPCurve->setData(cp_curve_time.data(), cp_curve_power.data(), curve_points);
@@ -391,6 +392,7 @@ CpintPlot::clear_CP_Curves()
     }
 }
 
+// plot the all curve, with shading according to the shade mode
 void
 CpintPlot::plot_allCurve(CpintPlot *thisPlot,
                          int n_values,
@@ -406,10 +408,26 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
         energyBests[t] = power_values[t] * time_values[t] * 60.0 / 1000.0;
     }
 
-    // generate zones from derived CP value
-    if (cp > 0) {
+    // lets work out how we are shading it
+    switch(shadeMode) {
+        case 0 : // not shading!!
+            break;
+
+        case 1 : // value for current date
+                 // or average for date range if a range
+            shadingCP = dateCP;
+            break;
+
+        default:
+        case 2 : // derived value
+            shadingCP = cp;
+            break;
+    }
+
+    // generate zones from shading CP value
+    if (shadingCP > 0) {
         QList <int> power_zone;
-        int n_zones = zones->lowsFromCP(&power_zone, (int) int(cp));
+        int n_zones = zones->lowsFromCP(&power_zone, (int) int(shadingCP));
         int high = n_values - 1;
         int zone = 0;
         while (zone < n_zones && high > 0) {
@@ -428,19 +446,21 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
             if (appsettings->value(this, GC_ANTIALIAS, false).toBool() == true)
                 curve->setRenderHint(QwtPlotItem::RenderAntialiased);
             QPen pen(color.darker(200));
-            pen.setWidth(appsettings->value(this, GC_LINEWIDTH, 2.0).toDouble());
+            pen.setWidth(2.0);
             curve->setPen(pen);
             curve->attach(thisPlot);
 
             // use a linear gradient
-            color.setAlpha(180);
-            QColor color1 = color;
-            color1.setAlpha(64);
-            QLinearGradient linearGradient(0, 0, 0, height());
-            linearGradient.setColorAt(0.0, color);
-            linearGradient.setColorAt(1.0, color1);
-            linearGradient.setSpread(QGradient::PadSpread);
-            curve->setBrush(linearGradient);   // fill below the line
+            if (shadeMode && shadingCP) { // 0 value means no shading please - and only if proper value for shadingCP
+                color.setAlpha(180);
+                QColor color1 = color;
+                color1.setAlpha(64);
+                QLinearGradient linearGradient(0, 0, 0, height());
+                linearGradient.setColorAt(0.0, color);
+                linearGradient.setColorAt(1.0, color1);
+                linearGradient.setSpread(QGradient::PadSpread);
+                curve->setBrush(linearGradient);   // fill below the line
+            }
 
             if (series == RideFile::none) { // this is Energy mode 
                 curve->setData(time_values.data() + low,
@@ -451,7 +471,7 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
             }
             allCurves.append(curve);
 
-            if (series != RideFile::none || energyBests[high] > 100.0) {
+            if (shadeMode && (series != RideFile::none || energyBests[high] > 100.0)) {
                 QwtText text(name);
                 text.setFont(QFont("Helvetica", 20, QFont::Bold));
                 color.setAlpha(255);
@@ -554,7 +574,7 @@ CpintPlot::calculate(RideItem *rideItem)
             else {
                 // make sure color reflects latest config
                 QPen pen(GColor(CCP));
-                pen.setWidth(2.0);
+                pen.setWidth(4.0);
                 pen.setStyle(Qt::DashLine);
                 CPCurve->setPen(pen);
             }
@@ -791,4 +811,10 @@ CpintPlot::setFilter(QStringList list)
     files = list;
     delete bests;
     bests = NULL;
+}
+
+void
+CpintPlot::setShadeMode(int x)
+{
+    shadeMode = x;
 }
