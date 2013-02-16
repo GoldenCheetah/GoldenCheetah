@@ -49,8 +49,21 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     mainLayout->setSpacing(0);
     setContentsMargins(0,0,0,0);
 
+    seasonsWidget = new GcSideBarItem(tr("Date Ranges"), this);
+
+    QAction *addSeasonAct = new QAction(tr("+"), this);
+    seasonsWidget->addAction(addSeasonAct);
+    connect(addSeasonAct, SIGNAL(triggered(void)), this, SLOT(addRange(void)));
+    QAction *removeSeasonAct = new QAction(tr("-"), this);
+    seasonsWidget->addAction(removeSeasonAct);
+    connect(removeSeasonAct, SIGNAL(triggered(void)), this, SLOT(deleteRange(void)));
+    QAction *moreSeasonAct = new QAction(tr(">>"), this);
+    seasonsWidget->addAction(moreSeasonAct);
+    connect(moreSeasonAct, SIGNAL(triggered(void)), this, SLOT(dateRangePopup(void)));
+
     dateRangeTree = new SeasonTreeView;
-    allDateRanges = new QTreeWidgetItem(dateRangeTree, ROOT_TYPE);
+    //allDateRanges = new QTreeWidgetItem(dateRangeTree, ROOT_TYPE);
+    allDateRanges=dateRangeTree->invisibleRootItem();
     // Drop for Seasons
     allDateRanges->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDropEnabled);
     allDateRanges->setText(0, tr("Date Ranges"));
@@ -64,9 +77,24 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
 #ifdef Q_OS_MAC
     dateRangeTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
+    seasonsWidget->addWidget(dateRangeTree);
+
+
+    eventsWidget = new GcSideBarItem(tr("Events"), this);
+
+    QAction *addEventAct = new QAction(tr("+"), this);
+    eventsWidget->addAction(addEventAct);
+    QAction *removeEventAct = new QAction(tr("-"), this);
+    eventsWidget->addAction(removeEventAct);
+    QAction *moreEventAct = new QAction(tr(">>"), this);
+    eventsWidget->addAction(moreSeasonAct);
+    connect(moreEventAct, SIGNAL(triggered(void)), this, SLOT(eventPopup(void)));
+
+
 
     eventTree = new QTreeWidget;
-    allEvents = new QTreeWidgetItem(eventTree, ROOT_TYPE);
+    //allEvents = new QTreeWidgetItem(eventTree, ROOT_TYPE);
+    allEvents = eventTree->invisibleRootItem();
     allEvents->setText(0, tr("Events"));
     eventTree->setFrameStyle(QFrame::NoFrame);
     eventTree->setColumnCount(2);
@@ -80,6 +108,7 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
 #ifdef Q_OS_MAC
     eventTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
+    eventsWidget->addWidget(eventTree);
 
     seasons = parent->seasons;
     resetSeasons(); // reset the season list
@@ -91,9 +120,11 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     splitter->setFrameStyle(QFrame::NoFrame);
     splitter->setContentsMargins(0,0,0,0);
     splitter->setOrientation(Qt::Vertical);
-    splitter->addWidget(dateRangeTree);
-    splitter->addWidget(eventTree);
+    splitter->addWidget(seasonsWidget);
+    splitter->addWidget(eventsWidget);
     connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
+
+    GcSideBarItem *summaryWidget = new GcSideBarItem(tr("Sumary"), this);
 
     summary = new QWebView(this);
     summary->setContentsMargins(0,0,0,0);
@@ -101,10 +132,12 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     summary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     summary->setAcceptDrops(false);
 
+    summaryWidget->addWidget(summary);
+
     QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
     summary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize());
     summary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
-    splitter->addWidget(summary);
+    splitter->addWidget(summaryWidget);
 
     mainLayout->addWidget(splitter);
 
@@ -296,6 +329,39 @@ LTMSidebar::dateRangePopup(QPoint pos)
 }
 
 void
+LTMSidebar::dateRangePopup()
+{
+    // no current season selected
+    if (dateRangeTree->selectedItems().isEmpty()) return;
+
+    QTreeWidgetItem *item = dateRangeTree->selectedItems().at(0);
+
+    // OK - we are working with a specific event..
+    QMenu menu(dateRangeTree);
+    QAction *add = new QAction(tr("Add season"), dateRangeTree);
+    menu.addAction(add);
+    connect(add, SIGNAL(triggered(void)), this, SLOT(addRange(void)));
+
+    if (item != NULL && item->type() != ROOT_TYPE && allDateRanges->indexOfChild(item) != -1) {
+        QAction *edit = new QAction(tr("Edit season"), dateRangeTree);
+        QAction *del = new QAction(tr("Delete season"), dateRangeTree);
+        QAction *event = new QAction(tr("Add Event"), dateRangeTree);
+
+        menu.addAction(edit);
+        menu.addAction(del);
+        menu.addAction(event);
+
+        // connect menu to functions
+
+        connect(edit, SIGNAL(triggered(void)), this, SLOT(editRange(void)));
+        connect(del, SIGNAL(triggered(void)), this, SLOT(deleteRange(void)));
+        connect(event, SIGNAL(triggered(void)), this, SLOT(addEvent(void)));
+    }
+    // execute the menu
+    menu.exec(dateRangeTree->mapToGlobal(QPoint(dateRangeTree->pos().x()+dateRangeTree->width()-30,seasonsWidget->pos().y()-30)));
+}
+
+void
 LTMSidebar::eventPopup(QPoint pos)
 {
     // no current season selected
@@ -331,6 +397,37 @@ LTMSidebar::eventPopup(QPoint pos)
 
     // execute the menu
     menu.exec(eventTree->mapToGlobal(pos));
+}
+
+void
+LTMSidebar::eventPopup()
+{
+    // no current season selected
+    if (eventTree->selectedItems().isEmpty()) return;
+
+    QTreeWidgetItem *item = eventTree->selectedItems().at(0);
+
+    // OK - we are working with a specific event..
+    QMenu menu(eventTree);
+    if (item != NULL && item->type() != ROOT_TYPE && allEvents->indexOfChild(item) != -1) {
+
+        QAction *edit = new QAction(tr("Edit details"), eventTree);
+        QAction *del = new QAction(tr("Delete event"), eventTree);
+        menu.addAction(edit);
+        menu.addAction(del);
+
+        // connect menu to functions
+        connect(edit, SIGNAL(triggered(void)), this, SLOT(editEvent(void)));
+        connect(del, SIGNAL(triggered(void)), this, SLOT(deleteEvent(void)));
+    }
+
+    // we can always add, regardless of any event being selected...
+    QAction *addEvent = new QAction(tr("Add event"), eventTree);
+    menu.addAction(addEvent);
+    connect(addEvent, SIGNAL(triggered(void)), this, SLOT(addEvent(void)));
+
+    // execute the menu
+    menu.exec(eventTree->mapToGlobal(QPoint(eventTree->pos().x()+eventTree->width()-30,eventTree->pos().y()-30)));
 }
 
 void
