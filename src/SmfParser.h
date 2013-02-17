@@ -45,18 +45,6 @@ private:
     QDateTime	start_time;
     QDateTime	last_time;
     QDateTime	time;
-    double	lastDistance;
-    double	distance;
-
-    int		lap;
-    double	power;
-    double	cadence;
-    double	hr;
-    double      lastAltitude;
-    double      alt;
-    double      lat;
-    double      lon;
-    double      headwind;
 };
 
 #endif // _SmfParser_h

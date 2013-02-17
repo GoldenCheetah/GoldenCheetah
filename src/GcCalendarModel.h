@@ -63,8 +63,6 @@ private:
 
     QMap <QDate, QVector<int>* > dateToRows; // map a date to SQL rows
 
-    QxtScheduleView *rideNavigator;
-    QList<FieldDefinition> *fieldDefinitions;
     QList<QString> columns; // what columns in the sql model
     MainWindow *mainWindow;
     int filenameIndex, durationIndex, dateIndex, textIndex, colorIndex;
@@ -126,7 +124,7 @@ public slots:
 
 public:
 
-    GcCalendarModel(QWidget *parent, QList<FieldDefinition> *fields, MainWindow *main) : QAbstractProxyModel(parent), fieldDefinitions(fields), mainWindow(main) {
+    GcCalendarModel(QWidget *parent, QList<FieldDefinition> *, MainWindow *main) : QAbstractProxyModel(parent), mainWindow(main) {
         setParent(parent);
 
         QDate today = QDateTime::currentDateTime().date();
