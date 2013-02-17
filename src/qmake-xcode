@@ -1,0 +1,13 @@
+:
+# zap existing if already there
+rm -rf ./GoldenCheetah.xcodeproj
+qmake -spec macx-xcode src.pro
+
+#if that worked update the project file created
+if [ -d ./GoldenCheetah.xcodeproj ]
+then
+    # update project file for Xcode 4.6
+    sed 's/isa = PBXFrameworkReference/lastKnownFileType = wrapper.framework; isa = PBXFileReference/g' <GoldenCheetah.xcodeproj/project.pbxproj >tmp
+
+    mv tmp GoldenCheetah.xcodeproj/project.pbxproj
+fi
