@@ -61,7 +61,6 @@ private:
     double hr;
     double speed;
     double torque;
-    double lastAltitude;
     double alt;
     double lat;
     double lon;

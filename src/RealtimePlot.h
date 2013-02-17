@@ -38,7 +38,6 @@ class Realtime30PwrData : public QwtSeriesData<QPointF>
 {
     int pwrCur_; 
     int &pwrCur;
-    double pwr30;
     double pwrData_[150];
     double (&pwrData)[150];
 

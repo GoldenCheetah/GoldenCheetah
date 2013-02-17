@@ -72,7 +72,6 @@ public:
 class Rider
 {
 private:
-    Bike bike;
     Route route;
 
 };
@@ -86,15 +85,11 @@ class BikePhysicsEngine
     double weight; // kg rider + bike
     double wind; // head wind only
     double cda; // areo
-    double alt;
     double temp; // C
     double air; // air pressure
     double speed;
     double grade;
 
-    // calcuated values
-    double f_air;
-    double f_roll;
 protected:
 
     double calcFAir(double speed)
@@ -283,7 +278,6 @@ class RealtimeRider: public RiderBridge
     Q_OBJECT;
     //Route route;
     BikePhysicsEngine engine;
-    double prevMSecs;
 
 protected:
     int findCurrentPosition()

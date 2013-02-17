@@ -65,10 +65,6 @@ class Leaf {
             Leaf *l;
         } lvalue, rvalue;
         int op;
-
-    private:
-
-        SymbolDef symbol; // hold information about symbols
 };
 
 class DataFilter : public QObject

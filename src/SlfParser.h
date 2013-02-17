@@ -48,12 +48,10 @@ private:
     int		wheelSize;
     double	samplingRate;
 
-    double	lastDistance;
     double	distance;
 
     int		lap;
     double	hr;
-    double      lastAltitude;
     double      alt;
     double	speed;
     double	rotations;

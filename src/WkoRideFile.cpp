@@ -240,7 +240,7 @@ WkoParser::parseRawData(WKO_UCHAR *fb)
     for (i=0; WKO_GRAPHS[i] != '\0'; i++) {
         WKO_nullval[i] = nullvals(WKO_GRAPHS[i], version); // setup nullvalue
         if ((WKO_graphbits[i] = bitsize(WKO_GRAPHS[i], WKO_device, version)) == 0) { // setup & check field size
-            errors << ("Unknown channel " + WKO_GRAPHS[i]);
+            errors << QString("Unknown channel %1").arg(WKO_GRAPHS[i]);
             return (NULL);
         }
     }
