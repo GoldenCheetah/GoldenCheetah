@@ -25,9 +25,10 @@ GcSideBarTitle::GcSideBarTitle(QString title, GcSideBarItem *parent) : QWidget(p
     setFixedHeight(24);
 
     titleLayout = new QHBoxLayout(this);
-    titleLayout->setContentsMargins(0,0,0,0);
+    titleLayout->setContentsMargins(2,2,2,2);
 
     titleLabel = new QLabel(title, this);
+    titleLabel->setFont(QFont("Helvetica", 10, QFont::Normal));
     parent->state = false;
 
     showHide = new QPushButton(this);
@@ -94,14 +95,17 @@ GcSideBarTitle::setExpanded(bool expanded)
         if (parent->content != NULL) {
             parent->content->hide();
             fullHeight = parent->height();
-            parent->setFixedHeight(24);
+            parent->setFixedSize(parent->width(), 24);
+
         }
     } else {
         showHide->setIcon(QIcon(*hide));
         titleLabel->setStyleSheet("QLabel { color: black; }");
         if (parent->content != NULL) {
             parent->content->show();
-            parent->setFixedHeight(fullHeight);
+            parent->setBaseSize(parent->width(), fullHeight);
+            parent->setMaximumSize(QWIDGETSIZE_MAX,QWIDGETSIZE_MAX);
+            parent->setMinimumSize(0,0);
         }
     }
     showHide->setChecked(false);
