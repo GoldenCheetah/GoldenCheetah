@@ -38,14 +38,13 @@ GcSideBarTitle::GcSideBarTitle(QString title, GcSideBarItem *parent) : QWidget(p
     titleLayout->addWidget(showHide);
     connect(showHide, SIGNAL(clicked(bool)), this, SLOT(showHideClicked()));
 
-    titleLayout->addSpacing(5);
-
     titleLayout->addWidget(titleLabel);
     titleLayout->addStretch();
 
     titleToolbar = new QToolBar(this);
-    titleToolbar->setFixedHeight(12);
+    titleToolbar->setFixedHeight(20);
     titleToolbar->setToolButtonStyle(Qt::ToolButtonTextOnly);
+    titleToolbar->setFocusPolicy(Qt::NoFocus);
 
     titleLayout->addWidget(titleToolbar);
 }
@@ -124,6 +123,7 @@ GcSideBarItem::GcSideBarItem(QString title, QWidget *parent) : QWidget(parent)
     setContentsMargins(0,0,0,0);
     layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(0);
 
     content = NULL;
     titleBar = new GcSideBarTitle(title, this);
