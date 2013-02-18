@@ -146,7 +146,7 @@ class SeasonTreeView : public QTreeWidget
     public:
         SeasonTreeView();
 
-    Q_SIGNALS:
+    signals:
         void itemMoved(QTreeWidgetItem* item, int previous, int actual);
 
     protected:
