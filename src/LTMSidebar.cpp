@@ -124,7 +124,7 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     splitter->addWidget(eventsWidget);
     connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
 
-    GcSideBarItem *summaryWidget = new GcSideBarItem(tr("Sumary"), this);
+    GcSideBarItem *summaryWidget = new GcSideBarItem(tr("Summary"), this);
 
     summary = new QWebView(this);
     summary->setContentsMargins(0,0,0,0);
