@@ -23,58 +23,78 @@
 #include <QList>
 #include <QAction>
 
-class GcSideBarItem;
+class GcSplitterItem;
+class GcSplitter;
 
-class GcSideBarTitle : public QWidget
+class GcSplitterHandle : public QSplitterHandle
 {
     Q_OBJECT
 
 public:
+    GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Orientation orientation, GcSplitter *parent = 0);
 
-    GcSideBarTitle(QString title,GcSideBarItem *parent);
-    ~GcSideBarTitle();
-
+    QSize sizeHint() const;
+    GcSplitter *splitter() const;
     void addAction(QAction *action);
+    void addActions(QList<QAction*> actions);
+protected:
+    void paintEvent(QPaintEvent *);
 
 public slots:
-    void paintEvent (QPaintEvent *event);
-
     void showHideClicked();
 
     void setExpanded(bool expanded);
 
-signals:
-    void showSideBar(bool);
-
-    void addChart();
-
 private:
     void paintBackground(QPaintEvent *);
 
-    GcSideBarItem *parent;
+     GcSplitter *gcSplitter;
+     GcSplitterItem *widget;
 
-    QHBoxLayout *titleLayout;
-    QLabel *titleLabel;
-    QToolBar *titleToolbar;
-    QPushButton *showHide;
+     QHBoxLayout *titleLayout;
+     QLabel *titleLabel;
+     QToolBar *titleToolbar;
+     QPushButton *showHide;
 
-    int fullHeight;
+     QString title;
+     int index;
+     int fullHeight;
+     bool state;
 };
 
-class GcSideBarItem : public QWidget
+class GcSplitter : public QSplitter
+{
+    Q_OBJECT
+
+public:
+    GcSplitter(Qt::Orientation orientation, QWidget *parent = 0);
+
+    void addWidget(QWidget *widget);
+    void insertWidget(int index, QWidget *widget);
+
+protected:
+    QSplitterHandle *createHandle();
+
+private:
+    QList<QString> titles;
+    QWidget * _insertedWidget;
+
+};
+
+class GcSplitterItem : public QWidget
 {
     Q_OBJECT
 
 public:
 
-    GcSideBarItem(QString title, QWidget *parent);
-    ~GcSideBarItem();
-
-    void addAction(QAction *action);
+    GcSplitterItem(QString title, QWidget *parent);
+    ~GcSplitterItem();
 
     QWidget *content;
+    GcSplitterHandle *splitterHandle;
 
     bool state;
+    QString title;
 
 public slots:
 
@@ -83,7 +103,7 @@ public slots:
 private:
     QVBoxLayout *layout;
 
-    GcSideBarTitle *titleBar;
+
 
 };
 
