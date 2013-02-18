@@ -19,10 +19,12 @@
 #include "GcSideBarItem.h"
 #include "GcCalendar.h"
 
-GcSideBarTitle::GcSideBarTitle(QString title, GcSideBarItem *parent) : QWidget(parent), parent(parent)
+GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Orientation orientation, GcSplitter *parent) : QSplitterHandle(orientation, parent), title(title), widget(widget)
 {
     setContentsMargins(0,0,0,0);
     setFixedHeight(24);
+
+    gcSplitter = parent;
 
     titleLayout = new QHBoxLayout(this);
     titleLayout->setContentsMargins(2,2,2,2);
@@ -34,38 +36,53 @@ GcSideBarTitle::GcSideBarTitle(QString title, GcSideBarItem *parent) : QWidget(p
 #else
     titleLabel->setFont(QFont("Helvetica", 10, QFont::Normal));
 #endif
-    parent->state = false;
 
     showHide = new QPushButton(this);
     showHide->setStyleSheet("QPushButton {color : blue;background: transparent}");
     showHide->setFixedWidth(20);
+    state = false;
     showHideClicked();
     titleLayout->addWidget(showHide);
     connect(showHide, SIGNAL(clicked(bool)), this, SLOT(showHideClicked()));
+
+    titleLayout->addSpacing(5);
 
     titleLayout->addWidget(titleLabel);
     titleLayout->addStretch();
 
     titleToolbar = new QToolBar(this);
-    titleToolbar->setFixedHeight(20);
+    titleToolbar->setFixedHeight(12);
     titleToolbar->setToolButtonStyle(Qt::ToolButtonTextOnly);
-    titleToolbar->setFocusPolicy(Qt::NoFocus);
 
     titleLayout->addWidget(titleToolbar);
 }
 
+QSize
+GcSplitterHandle::sizeHint() const
+{
+    return QSize(200, 24);
+}
+
+GcSplitter*
+GcSplitterHandle::splitter() const
+{
+    return gcSplitter;
+}
+
 void
-GcSideBarTitle::addAction(QAction *action)
+GcSplitterHandle::addAction(QAction *action)
 {
     titleToolbar->addAction(action);
 }
 
-GcSideBarTitle::~GcSideBarTitle()
+void
+GcSplitterHandle::addActions(QList<QAction*> actions)
 {
+    titleToolbar->addActions(actions);
 }
 
 void
-GcSideBarTitle::paintEvent (QPaintEvent *event)
+GcSplitterHandle::paintEvent(QPaintEvent *event)
 {
     // paint the darn thing!
     paintBackground(event);
@@ -73,7 +90,7 @@ GcSideBarTitle::paintEvent (QPaintEvent *event)
 }
 
 void
-GcSideBarTitle::paintBackground(QPaintEvent *)
+GcSplitterHandle::paintBackground(QPaintEvent *)
 {
     static QPixmap active = QPixmap(":images/mac/scope-active.png");
     static QPixmap inactive = QPixmap(":images/scope-inactive.png");
@@ -83,47 +100,77 @@ GcSideBarTitle::paintBackground(QPaintEvent *)
 
     // background light gray for now?
     QRect all(0,0,width(),height());
-    painter.drawTiledPixmap(all, parent->state ? active : inactive);
+    painter.drawTiledPixmap(all, state ? active : inactive);
 }
 
 void
-GcSideBarTitle::setExpanded(bool expanded)
+GcSplitterHandle::setExpanded(bool expanded)
 {
     static QPixmap *hide = new QPixmap(":images/mac/hide.png");
     static QPixmap *show = new QPixmap(":images/mac/show.png");
 
-    parent->state = expanded;
+    state = expanded;
     if (expanded == false) {
         showHide->setIcon(QIcon(*show));
         titleLabel->setStyleSheet("QLabel { color: gray; }");
-        if (parent->content != NULL) {
-            parent->content->hide();
-            fullHeight = parent->height();
-            parent->setFixedSize(parent->width(), 24);
-
-        }
+        fullHeight = widget->height();
+        widget->setFixedHeight(0);
     } else {
         showHide->setIcon(QIcon(*hide));
         titleLabel->setStyleSheet("QLabel { color: black; }");
-        if (parent->content != NULL) {
-            parent->content->show();
-            parent->setBaseSize(parent->width(), fullHeight);
-            parent->setMaximumSize(QWIDGETSIZE_MAX,QWIDGETSIZE_MAX);
-            parent->setMinimumSize(0,0);
-        }
+        widget->setBaseSize(widget->width(), fullHeight);
+        widget->setMaximumSize(QWIDGETSIZE_MAX,QWIDGETSIZE_MAX);
+        widget->setMinimumSize(0,0);
     }
     showHide->setChecked(false);
     repaint();
 }
 
 void
-GcSideBarTitle::showHideClicked()
+GcSplitterHandle::showHideClicked()
 {
-    parent->state = !parent->state;
-    setExpanded(parent->state);
+    state = !state;
+    setExpanded(state);
 }
 
-GcSideBarItem::GcSideBarItem(QString title, QWidget *parent) : QWidget(parent)
+GcSplitter::GcSplitter(Qt::Orientation orientation, QWidget *parent) : QSplitter(orientation, parent)
+{
+    _insertedWidget = NULL;
+    QLabel *fake = new QLabel("fake");
+    fake->setFixedHeight(0);
+
+    addWidget(fake);
+}
+
+void
+GcSplitter::addWidget(QWidget *widget)
+{
+    _insertedWidget = widget;
+    QSplitter::addWidget(widget);
+}
+
+void
+GcSplitter::insertWidget(int index, QWidget *widget)
+{
+    _insertedWidget = widget;
+    QSplitter::insertWidget(index, widget);
+}
+
+QSplitterHandle*
+GcSplitter::createHandle()
+{
+    if(_insertedWidget != 0) {
+        GcSplitterItem* _item = dynamic_cast<GcSplitterItem*>(_insertedWidget);
+        if(_item != 0) {
+            _item->splitterHandle = new GcSplitterHandle(_item->title, _item, orientation(), this);
+            _item->splitterHandle->addActions(actions());
+            return _item->splitterHandle;
+        }
+    }
+    return QSplitter::createHandle();
+}
+
+GcSplitterItem::GcSplitterItem(QString title, QWidget *parent) : QWidget(parent), title(title)
 {
     setContentsMargins(0,0,0,0);
     layout = new QVBoxLayout(this);
@@ -131,24 +178,18 @@ GcSideBarItem::GcSideBarItem(QString title, QWidget *parent) : QWidget(parent)
     layout->setSpacing(0);
 
     content = NULL;
-    titleBar = new GcSideBarTitle(title, this);
-    layout->addWidget(titleBar);
+    //titleBar = new GcSideBarTitle(title, this);
+    //layout->addWidget(titleBar);
 }
 
 void
-GcSideBarItem::addWidget(QWidget *p)
+GcSplitterItem::addWidget(QWidget *p)
 {
     content = p;
     layout->addWidget(p);
 }
 
-void
-GcSideBarItem::addAction(QAction *action)
-{
-    titleBar->addAction(action);
-}
-
-GcSideBarItem::~GcSideBarItem()
+GcSplitterItem::~GcSplitterItem()
 {
 }
 

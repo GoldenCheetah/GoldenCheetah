@@ -49,7 +49,7 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     mainLayout->setSpacing(0);
     setContentsMargins(0,0,0,0);
 
-    seasonsWidget = new GcSideBarItem(tr("Date Ranges"), this);
+    seasonsWidget = new GcSplitterItem(tr("Date Ranges"), this);
 
     QAction *addSeasonAct = new QAction(tr("+"), this);
     seasonsWidget->addAction(addSeasonAct);
@@ -80,7 +80,7 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     seasonsWidget->addWidget(dateRangeTree);
 
 
-    eventsWidget = new GcSideBarItem(tr("Events"), this);
+    eventsWidget = new GcSplitterItem(tr("Events"), this);
 
     QAction *addEventAct = new QAction(tr("+"), this);
     eventsWidget->addAction(addEventAct);
@@ -115,7 +115,7 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
 
     configChanged(); // will reset the metric tree
 
-    splitter = new QSplitter;
+    splitter = new GcSplitter(Qt::Vertical);
     splitter->setHandleWidth(1);
     splitter->setFrameStyle(QFrame::NoFrame);
     splitter->setContentsMargins(0,0,0,0);
@@ -125,7 +125,7 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     splitter->setStyleSheet(" QSplitter::handle { background-color: white; color: white; }");
     connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
 
-    GcSideBarItem *summaryWidget = new GcSideBarItem(tr("Summary"), this);
+    GcSplitterItem *summaryWidget = new GcSplitterItem(tr("Summary"), this);
 
     summary = new QWebView(this);
     summary->setContentsMargins(0,0,0,0);
