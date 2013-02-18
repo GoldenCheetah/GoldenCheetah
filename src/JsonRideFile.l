@@ -38,6 +38,7 @@
 %}
 %option noyywrap
 %option nounput
+%option noinput
 %%
 \"RIDE\"            return RIDE;
 \"STARTTIME\"       return STARTTIME;

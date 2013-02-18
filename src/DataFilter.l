@@ -28,6 +28,7 @@
 %}
 %option noyywrap
 %option nounput
+%option noinput
 %%
 
 "="                                         DataFilterlval.op = EQ; return EQ;

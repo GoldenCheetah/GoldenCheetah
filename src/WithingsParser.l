@@ -39,6 +39,7 @@
 %}
 %option noyywrap
 %option nounput
+%option noinput
 %%
 \"status\"            return STATUS;
 \"body\"              return BODY;
