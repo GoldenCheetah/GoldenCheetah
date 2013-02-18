@@ -121,6 +121,10 @@ RideFileTableModel::setHeadings(RideFile::SeriesType series)
             headings_ << tr("Temperature");
             headingsType << RideFile::temp;
         }
+        if (series == RideFile::lrbalance || ride->areDataPresent()->lrbalance) {
+            headings_ << tr("Left/Right Balance");
+            headingsType << RideFile::lrbalance;
+        }
         if (series == RideFile::interval || ride->areDataPresent()->interval) {
             headings_ << tr("Interval");
             headingsType << RideFile::interval;

@@ -64,6 +64,7 @@
 \"HEADWIND\"        return HEADWIND;
 \"SLOPE\"           return SLOPE;
 \"TEMP\"            return TEMP;
+\"LRBALANCE\"       return LRBALANCE;
 [-+]?[0-9]+            return INTEGER;
 [-+]?[0-9]+e-[0-9]+    return FLOAT;
 [-+]?[0-9]+\.[-e0-9]*  return FLOAT;
