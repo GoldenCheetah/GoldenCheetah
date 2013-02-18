@@ -122,6 +122,7 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     splitter->setOrientation(Qt::Vertical);
     splitter->addWidget(seasonsWidget);
     splitter->addWidget(eventsWidget);
+    splitter->setStyleSheet(" QSplitter::handle { background-color: white; color: white; }");
     connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
 
     GcSideBarItem *summaryWidget = new GcSideBarItem(tr("Summary"), this);
