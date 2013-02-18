@@ -806,10 +806,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     splitter->setChildrenCollapsible(false); // QT BUG crash QTextLayout do not undo this
     splitter->setHandleWidth(1);
-#ifndef Q_OS_MAC // not on Mac thanks
-    splitter->setStyleSheet(" QSplitter::handle { background-color: #B3B4BA; "
-                            "                     color: #B3B4BA; }");
-#endif
+    splitter->setStyleSheet(" QSplitter::handle { background-color: black; color: black; }");
     splitter->setFrameStyle(QFrame::NoFrame);
     splitter->setContentsMargins(0, 0, 0, 0); // attempting to follow some UI guides
 
