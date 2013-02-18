@@ -375,13 +375,11 @@ SeasonTreeView::dropEvent(QDropEvent* event)
 {
     // item and original position
     QTreeWidgetItem *item = currentItem();
-    int idx1 = currentItem()->parent()->indexOfChild(item);
+    int idx1 = invisibleRootItem()->indexOfChild(item);
+    int idx2 = indexAt(event->pos()).row();
 
     // finalise drop event
     QTreeWidget::dropEvent(event);
-
-    // new position
-    int idx2 = currentItem()->parent()->indexOfChild(item);
 
     // emit the itemMoved signal
     Q_EMIT itemMoved(item, idx1, idx2);
