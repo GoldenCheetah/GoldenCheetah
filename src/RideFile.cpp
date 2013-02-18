@@ -75,6 +75,7 @@ RideFile::seriesName(SeriesType series)
     case RideFile::headwind: return QString(tr("Headwind"));
     case RideFile::slope: return QString(tr("Slope"));
     case RideFile::temp: return QString(tr("Temperature"));
+    case RideFile::lrbalance: return QString(tr("Left/Right Balance"));
     case RideFile::interval: return QString(tr("Interval"));
     case RideFile::vam: return QString(tr("VAM"));
     case RideFile::wattsKg: return QString(tr("Watts per Kilogram"));
@@ -103,6 +104,7 @@ RideFile::unitName(SeriesType series, MainWindow *main)
     case RideFile::headwind: return QString(tr("kph"));
     case RideFile::slope: return QString(tr("%"));
     case RideFile::temp: return QString(tr("°C"));
+    case RideFile::lrbalance: return QString(tr("%"));
     case RideFile::interval: return QString(tr("Interval"));
     case RideFile::vam: return QString(tr("meters per hour"));
     case RideFile::wattsKg: return QString(useMetricUnits ? tr("watts/kg") : tr("watts/lb"));
@@ -350,7 +352,8 @@ RideFile *RideFileFactory::openRideFile(MainWindow *main, QFile &file,
         else flags += '-';
         if (result->areDataPresent()->temp) flags += 'E'; // Temperature
         else flags += '-';
-
+        if (result->areDataPresent()->lrbalance) flags += 'B'; // Left/Right Balance, TODO Walibu, unsure about this flag? 'B' ok?
+        else flags += '-';
         result->setTag("Data", flags);
 
     }
@@ -454,6 +457,9 @@ RideFile::isDataPresent(SeriesType series)
         case lon : return dataPresent.lon; break;
         case lat : return dataPresent.lat; break;
         case headwind : return dataPresent.headwind; break;
+        case slope : return dataPresent.slope; break;
+        case temp : return dataPresent.temp; break;
+        case lrbalance : return dataPresent.lrbalance; break;
         case interval : return dataPresent.interval; break;
         default:
         case none : return false; break;
@@ -475,6 +481,9 @@ RideFile::setPointValue(int index, SeriesType series, double value)
         case lon : dataPoints_[index]->lon = value; break;
         case lat : dataPoints_[index]->lat = value; break;
         case headwind : dataPoints_[index]->headwind = value; break;
+        case slope : dataPoints_[index]->slope = value; break;
+        case temp : dataPoints_[index]->temp = value; break;
+        case lrbalance : dataPoints_[index]->lrbalance = value; break;
         case interval : dataPoints_[index]->interval = value; break;
         default:
         case none : break;
@@ -498,6 +507,7 @@ RideFilePoint::value(RideFile::SeriesType series) const
         case RideFile::headwind : return headwind; break;
         case RideFile::slope : return slope; break;
         case RideFile::temp : return temp; break;
+        case RideFile::lrbalance : return lrbalance; break;
         case RideFile::interval : return interval; break;
 
         default:
