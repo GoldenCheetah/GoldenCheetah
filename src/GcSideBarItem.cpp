@@ -28,7 +28,12 @@ GcSideBarTitle::GcSideBarTitle(QString title, GcSideBarItem *parent) : QWidget(p
     titleLayout->setContentsMargins(2,2,2,2);
 
     titleLabel = new QLabel(title, this);
+#ifdef Q_OS_MAC
+    titleLabel->setFixedHeight(18);
+    titleLabel->setFont(QFont("Helvetica", 11, QFont::Normal));
+#else
     titleLabel->setFont(QFont("Helvetica", 10, QFont::Normal));
+#endif
     parent->state = false;
 
     showHide = new QPushButton(this);
