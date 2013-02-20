@@ -19,7 +19,7 @@
 #include "GcSideBarItem.h"
 #include "GcCalendar.h"
 
-GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Orientation orientation, GcSplitter *parent) : QSplitterHandle(orientation, parent), title(title), widget(widget)
+GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Orientation orientation, GcSplitter *parent) : QSplitterHandle(orientation, parent), widget(widget), title(title)
 {
     setContentsMargins(0,0,0,0);
     setFixedHeight(24);
@@ -27,11 +27,12 @@ GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Or
     gcSplitter = parent;
 
     titleLayout = new QHBoxLayout(this);
-    titleLayout->setContentsMargins(2,2,2,2);
+    titleLayout->setContentsMargins(0,0,0,0);
+    titleLayout->setSpacing(0);
 
     titleLabel = new QLabel(title, this);
 #ifdef Q_OS_MAC
-    titleLabel->setFixedHeight(18);
+    titleLabel->setFixedHeight(16);
     titleLabel->setFont(QFont("Helvetica", 11, QFont::Normal));
 #else
     titleLabel->setFont(QFont("Helvetica", 10, QFont::Normal));
@@ -51,7 +52,7 @@ GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Or
     titleLayout->addStretch();
 
     titleToolbar = new QToolBar(this);
-    titleToolbar->setFixedHeight(12);
+    titleToolbar->setFixedHeight(16);
     titleToolbar->setToolButtonStyle(Qt::ToolButtonTextOnly);
 
     titleLayout->addWidget(titleToolbar);
@@ -60,7 +61,7 @@ GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Or
 QSize
 GcSplitterHandle::sizeHint() const
 {
-    return QSize(200, 24);
+    return QSize(200, 20);
 }
 
 GcSplitter*
@@ -138,7 +139,7 @@ GcSplitter::GcSplitter(Qt::Orientation orientation, QWidget *parent) : QSplitter
     _insertedWidget = NULL;
     QLabel *fake = new QLabel("fake");
     fake->setFixedHeight(0);
-
+    setHandleWidth(0);
     addWidget(fake);
 }
 
@@ -176,7 +177,6 @@ GcSplitterItem::GcSplitterItem(QString title, QWidget *parent) : QWidget(parent)
     layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(0);
-
     content = NULL;
     //titleBar = new GcSideBarTitle(title, this);
     //layout->addWidget(titleBar);
@@ -186,6 +186,7 @@ void
 GcSplitterItem::addWidget(QWidget *p)
 {
     content = p;
+    p->setContentsMargins(0,0,0,0);
     layout->addWidget(p);
 }
 
