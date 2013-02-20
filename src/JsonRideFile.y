@@ -50,8 +50,11 @@ static double JsonNumber;
 static QStringList JsonRideFileerrors;
 static QMap <QString, QString> JsonOverrides;
 
-// Standard yacc/lex variables / functions
+// Lex scanner
 extern int JsonRideFilelex(); // the lexer aka yylex()
+extern int JsonRideFilelex_destroy(void); // the cleaner for lexer
+
+// yacc parser
 extern void JsonRideFilerestart (FILE *input_file); // the lexer file restart aka yyrestart()
 extern FILE *JsonRideFilein; // used by the lexer aka yyin
 extern char *JsonRideFiletext; // set by the lexer aka yytext
@@ -263,6 +266,9 @@ JsonFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*
 
     // release the file handle
     fclose(JsonRideFilein);
+
+    // clean up
+    JsonRideFilelex_destroy();
 
     // Only get errors so fail if we have any
     if (errors.count()) {
