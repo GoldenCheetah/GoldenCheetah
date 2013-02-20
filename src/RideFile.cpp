@@ -19,6 +19,7 @@
 
 #include "RideFile.h"
 #include "DataProcessor.h"
+#include "RideEditor.h"
 #include "RideMetadata.h"
 #include "MetricAggregator.h"
 #include "SummaryMetrics.h"
@@ -54,6 +55,7 @@ RideFile::~RideFile()
     foreach(RideFilePoint *point, dataPoints_)
         delete point;
     delete command;
+    if (data) delete data;
 }
 
 QString
