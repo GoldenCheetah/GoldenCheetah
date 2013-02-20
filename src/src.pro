@@ -284,7 +284,6 @@ HEADERS += \
         GcWindowRegistry.h \
         GcWindowTool.h \
         GoldenCheetah.h \
-        GoldenClient.h \
         GoogleMapControl.h \
         GpxParser.h \
         GpxRideFile.h \
@@ -331,7 +330,6 @@ HEADERS += \
         PowerTapDevice.h \
         PowerTapUtil.h \
         PwxRideFile.h \
-        ProtocolHandler.h \
         QuarqParser.h \
         QuarqRideFile.h \
         RawRideFile.h \
@@ -471,7 +469,6 @@ SOURCES += \
         GcWindowRegistry.cpp \
         GcWindowTool.cpp \
         GoldenCheetah.cpp \
-        GoldenClient.cpp \
         GoogleMapControl.cpp \
         GpxParser.cpp \
         GpxRideFile.cpp \
@@ -519,7 +516,6 @@ SOURCES += \
         PowerHist.cpp \
         PowerTapDevice.cpp \
         PowerTapUtil.cpp \
-        Protocolhandler.cpp \
         PwxRideFile.cpp \
         QuarqParser.cpp \
         QuarqRideFile.cpp \

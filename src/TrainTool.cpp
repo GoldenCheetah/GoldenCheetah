@@ -324,7 +324,6 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
 
     // set home
     main = parent;
-    streamController = NULL;
     ergFile = NULL;
     calibrating = false;
 
@@ -359,7 +358,6 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
 
     connect(gui_timer, SIGNAL(timeout()), this, SLOT(guiUpdate()));
     connect(disk_timer, SIGNAL(timeout()), this, SLOT(diskUpdate()));
-    connect(stream_timer, SIGNAL(timeout()), this, SLOT(streamUpdate()));
     connect(load_timer, SIGNAL(timeout()), this, SLOT(loadUpdate()));
 
     configChanged(); // will reset the workout tree
@@ -621,45 +619,6 @@ TrainTool::mediaTreeWidgetSelectionChanged()
  * Was realtime window, now local and manages controller and chart updates etc
  *------------------------------------------------------------------------------*/
 
-// open a connection to the GoldenServer via a GoldenClient
-void TrainTool::setStreamController()
-{
-    int deviceno = selectedServerNumber();
-
-    if (deviceno == -1) return;
-
-    // zap the current one
-    if (streamController != NULL) {
-        delete streamController;
-        streamController = NULL;
-    }
-
-    if (Devices.count() > 0) {
-        DeviceConfiguration config = Devices.at(deviceno);
-        streamController = new GoldenClient;
-
-        // connect
-        QStringList speclist = config.portSpec.split(":", QString::SkipEmptyParts);
-        bool rc = streamController->connect(speclist[0], // host
-                                  speclist[1].toInt(),   // port
-                                  "9cf638294030cea7b1590a4ca32e7f58", // raceid
-                                  appsettings->cvalue(main->cyclist, GC_NICKNAME).toString(), // name
-                                  FTP, // CP60
-                                  appsettings->cvalue(main->cyclist, GC_WEIGHT).toDouble()); // weight
-
-        // no connection
-        if (rc == false) {
-            streamController->closeAndExit();
-            streamController = NULL;
-            status &= ~RT_STREAMING;
-            QMessageBox msgBox;
-            msgBox.setText(QString(tr("Cannot Connect to Server %1 on port %2").arg(speclist[0]).arg(speclist[1])));
-            msgBox.setIcon(QMessageBox::Critical);
-            msgBox.exec();
-        }
-    }
-}
-
 void TrainTool::Start()       // when start button is pressed
 {
     static QIcon playIcon(":images/oxygen/play.png");
@@ -758,9 +717,6 @@ void TrainTool::Start()       // when start button is pressed
 
         // we're away!
         status |=RT_RUNNING;
-
-        // should we be streaming too?
-        if (streamController != NULL) status |= RT_STREAMING;
 
         load_period.restart();
         session_time.start();
@@ -896,13 +852,6 @@ void TrainTool::Stop(int deviceStatus)        // when stop button is pressed
             name = recordFile->fileName();
             main->addRide(QFileInfo(name).fileName(), true);
         }
-    }
-
-    if (status & RT_STREAMING) {
-        stream_timer->stop();
-        streamController->closeAndExit();
-        delete streamController;
-        streamController = NULL;
     }
 
     if (status & RT_WORKOUT) {
@@ -1124,39 +1073,6 @@ void TrainTool::nextDisplayMode()
 void TrainTool::warnnoConfig()
 {
     QMessageBox::warning(this, tr("No Devices Configured"), "Please configure a device in Preferences.");
-}
-
-//----------------------------------------------------------------------
-// STREAMING FUNCTION
-//----------------------------------------------------------------------
-void
-TrainTool::streamUpdate()
-{
-    // send over the wire...
-    if (streamController) {
-
-        // send my data
-        streamController->sendTelemetry(displayPower,
-                                        displayCadence,
-                                        displayDistance,
-                                        displayHeartRate,
-                                        displaySpeed);
-
-        // get standings for everyone else
-        RaceStatus current = streamController->getStandings();
-
-        // send out to all the widgets...
-        notifyRaceStandings(current);
-
-        // has the race finished?
-        if (current.race_finished == true) {
-            Stop(0); // all over dude
-            QMessageBox msgBox;
-            msgBox.setText(tr("Race Over!"));
-            msgBox.setIcon(QMessageBox::Information);
-            msgBox.exec();
-        }
-    }
 }
 
 //----------------------------------------------------------------------
