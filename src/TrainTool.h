@@ -21,7 +21,6 @@
 #include "GoldenCheetah.h"
 
 #include "MainWindow.h"
-#include "GoldenClient.h"
 #include "RealtimeData.h"
 #include "RealtimePlot.h"
 #include "DeviceConfiguration.h"
@@ -80,7 +79,6 @@ class TrainTool : public GcWindow
         QStringList listWorkoutFiles(const QDir &) const;
 
         QList<int> devices(); // convenience function for iterating over active devices
-        GoldenClient       *streamController;   // send out to
 
         const QTreeWidgetItem *currentWorkout() { return workout; }
         const QTreeWidgetItem *currentMedia() { return media; }
@@ -93,9 +91,6 @@ class TrainTool : public GcWindow
 
         // set labels when ergfile selected etc
         void setLabels();
-
-        // notify widgets of race update
-        void notifyRaceStandings(RaceStatus x) { raceStandings(x); }
 
         // was realtimewindow,merged into tool
         // update charts/dials and manage controller
@@ -119,7 +114,6 @@ class TrainTool : public GcWindow
 
         void deviceSelected();
         void serverSelected();
-        void raceStandings(RaceStatus);
         void start();
         void pause();
         void stop();
@@ -157,7 +151,6 @@ class TrainTool : public GcWindow
         // Timed actions
         void guiUpdate();           // refreshes the telemetry
         void diskUpdate();          // writes to CSV file
-        void streamUpdate();        // writes to remote Peer
         void loadUpdate();          // sets Load on CT like devices
 
         // When no config has been setup
