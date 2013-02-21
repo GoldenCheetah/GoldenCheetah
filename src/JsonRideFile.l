@@ -73,3 +73,9 @@
 [ \n\t\r]           ;               /* we just ignore whitespace */
 .                   return JsonRideFiletext[0]; /* any other character, typically :, { or } */
 %%
+
+// Older versions of flex (prior to 2.5.9) do not have the destroy function
+// Or We're not using GNU flex then we also won't have a destroy function
+#if !defined(FLEX_SCANNER) || (YY_FLEX_SUBMINOR_VERSION < 9)
+int JsonRideFilelex_destroy(void) { return 0; }
+#endif
