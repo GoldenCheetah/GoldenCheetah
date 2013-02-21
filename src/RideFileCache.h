@@ -264,11 +264,12 @@ class MeanMaxComputer : public QThread
     private:
 
         // Mark Rages' algorithm for fast find of mean max
-        data_t *integrate_series(cpintdata &data);
-        data_t partial_max_mean(data_t *dataseries_i, int start, int end, int length, int *offset);
-        data_t divided_max_mean(data_t *dataseries_i, int datalength, int length, int *offset);
+        void integrate_series(cpintdata &data);
+        data_t partial_max_mean(int start, int end, int length, int *offset);
+        data_t divided_max_mean(int datalength, int length, int *offset);
 
         RideFile *ride;
+        QVector<data_t> integrated;
         QVector<float> &array;
         QVector<data_t> integratedArray;
 

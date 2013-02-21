@@ -477,11 +477,11 @@ void RideFileCache::RideFileCache::compute()
 
 */
 
-data_t *
+void
 MeanMaxComputer::integrate_series(cpintdata &data)
 {
     // would be better to do pure QT and use QVector -- but no memory leak
-    data_t *integrated= (data_t *)malloc(sizeof(data_t)*(data.points.size()+1)); 
+    integrated.resize(data.points.size()+1);
     int i;
     data_t acc=0;
 
@@ -491,11 +491,11 @@ MeanMaxComputer::integrate_series(cpintdata &data)
     }
     integrated[i]=acc;
 
-    return integrated;
+    return;
 }
 
 data_t
-MeanMaxComputer::partial_max_mean(data_t *dataseries_i, int start, int end, int length, int *offset)
+MeanMaxComputer::partial_max_mean(int start, int end, int length, int *offset)
 {
     int i=0;
     data_t candidate=0;
@@ -503,7 +503,7 @@ MeanMaxComputer::partial_max_mean(data_t *dataseries_i, int start, int end, int 
     int best_i=0;
 
     for (i=start; i<(1+end-length); i++) {
-        data_t test_energy=dataseries_i[length+i]-dataseries_i[i];
+        data_t test_energy=integrated[length+i]-integrated[i];
         if (test_energy>candidate) {
             candidate=test_energy;
             best_i=i;
@@ -516,7 +516,7 @@ MeanMaxComputer::partial_max_mean(data_t *dataseries_i, int start, int end, int 
 
 
 data_t
-MeanMaxComputer::divided_max_mean(data_t *dataseries_i, int datalength, int length, int *offset)
+MeanMaxComputer::divided_max_mean(int datalength, int length, int *offset)
 {
     int shift=length;
 
@@ -537,12 +537,12 @@ MeanMaxComputer::divided_max_mean(data_t *dataseries_i, int datalength, int leng
 
     for (start=0; start+window_length<=datalength; start+=shift) {
         end=start+window_length;
-        energy=dataseries_i[end]-dataseries_i[start];
+        energy=integrated[end]-integrated[start];
 
         if (energy < candidate) {
           continue;
         }
-        data_t window_mm=partial_max_mean(dataseries_i, start, end, length, &this_offset);
+        data_t window_mm=partial_max_mean(start, end, length, &this_offset);
 
         if (window_mm>candidate) {
             candidate=window_mm;
@@ -556,11 +556,11 @@ MeanMaxComputer::divided_max_mean(data_t *dataseries_i, int datalength, int leng
     if (end<datalength) {
         start=datalength-window_length;
         end=datalength;
-        energy=dataseries_i[end]-dataseries_i[start];
+        energy=integrated[end]-integrated[start];
 
         if (energy >= candidate) {
 
-            data_t window_mm=partial_max_mean(dataseries_i, start, end, length, &this_offset);
+            data_t window_mm=partial_max_mean(start, end, length, &this_offset);
 
             if (window_mm>candidate) {
                 candidate=window_mm;
@@ -748,12 +748,12 @@ MeanMaxComputer::run()
     // the bests go in here...
     QVector <double> ride_bests(total_secs + 1);
 
-    data_t *dataseries_i = integrate_series(data);
+    integrate_series(data);
 
     for (int i=1; i<data.points.size(); i++) {
 
         int offset;
-        data_t c=divided_max_mean(dataseries_i,data.points.size(),i,&offset);
+        data_t c=divided_max_mean(data.points.size(),i,&offset);
 
         // snaffle it away
         int sec = i*ride->recIntSecs();
@@ -766,7 +766,6 @@ MeanMaxComputer::run()
                 ride_bests[sec] = val;
         }
     }
-    free(dataseries_i);
 
     //
     // FILL IN THE GAPS AND FILL TARGET ARRAY
