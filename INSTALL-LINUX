@@ -53,6 +53,32 @@ Install git with:
 $ sudo apt-get install git
 Said Y to prompt about all git files installed (git-gui et al)
 
+Install FLEX and BISON
+----------------------
+
+You will need flex v2.5.9 or later
+$ sudo apt-get install bison
+$ sudo apt-get install flex
+$ vi gcconfig.pri
+
+Ensure you have the following lines (which are now also in gcconfig.pri.in which has
+been updated to reflect the new dependencies in version 3)
+
+QMAKE_LEX  = flex
+QMAKE_YACC = bison
+win32 {
+  QMAKE_YACC = bison --file-prefix=y -t
+  QMAKE_MOVE = cmd /c move
+  QMAKE_DEL_FILE = rm -f
+}
+
+Build!
+------
+$ make clean
+$ qmake
+$ make
+
+You will now have a release3 binary but with none of the release3 dependencies compiled in.
 Get latest GOLDEN CHEETAH source files
 --------------------------------------
 $ mkdir -p ~/Projects/Live
@@ -292,44 +318,6 @@ You can now export rides to Google Earth kml format.
 ADDING OPTIONAL DEPENDENCIES WHEN BUILDING VERSION 3
 ====================================================
 
-Checking out the Release 3 branch & bulding with MANDATORY dependencies
------------------------------------------------------------------------
-
-Release 3 is being maintained as a branch (master is currently the v2 branch). To
-checkout the latest v3 source:
-
-First create a local tracking branch
-$ git branch --track release_3.0.0dev origin/release_3.0.0dev
-
-Now checkout the release3 code
-$ git checkout release_3.0.0dev
-
-You will now be on the release 3 branch. So lets build afresh. Note that the v3 code
-requires flex/bison to be installed, but these will not be available as standard on most
-Linux distros.
-
-$ sudo apt-get install bison
-$ sudo apt-get install flex
-$ vi gcconfig.pri
-
-Ensure you have the following lines (which are now also in gcconfig.pri.in which has
-been updated to reflect the new dependencies in version 3)
-
-QMAKE_LEX  = flex
-QMAKE_YACC = bison
-win32 {
-  QMAKE_YACC = bison --file-prefix=y -t
-  QMAKE_MOVE = cmd /c move
-  QMAKE_DEL_FILE = rm -f
-}
-
-Obviously, the win32 piece is not relevant for Linux builds :)
-
-$ make clean
-$ qmake
-$ make
-
-You will now have a release3 binary but with none of the release3 dependencies compiled in.
 
 NOTE: When you run version 3 it will refresh ride metrics and CP files -- this only occurs the
       first time it runs (and will refresh only rides that change after that). I find it is best
