@@ -46,9 +46,10 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
 
     // cal widget
     QWidget *cal = new QWidget(this);
-    cal->setContentsMargins(0,0,0,0);
+    cal->setContentsMargins(20,10,20,20);
     layout = new QVBoxLayout(cal);
     layout->setSpacing(0);
+    layout->setContentsMargins(0,0,0,0);
     splitter->addWidget(cal);
 
     // summary widget
@@ -95,12 +96,15 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     dayDate->setAlignment(Qt::AlignLeft);
     layout->addWidget(dayDate);
 
+    layout->addSpacing(20);
+
     //GcLabel *spacer1 = new GcLabel("", this);
     //spacer1->setFixedHeight(20);
     //layout->addWidget(spacer1);
 
     QHBoxLayout *line = new QHBoxLayout;
-    line->setSpacing(5);
+    line->setSpacing(0);
+    line->setContentsMargins(0,0,0,0);
 
     //GcLabel *spacer2 = new GcLabel("", this);
     //spacer2->setFixedHeight(10);
@@ -137,10 +141,11 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
 
     QWidget *month = new QWidget(this);
     month->setContentsMargins(0,0,0,0);
-    month->setFixedWidth(200);
-    month->setFixedHeight(200);
+    month->setFixedWidth(180);
+    month->setFixedHeight(180);
     dayLayout = new QGridLayout(month);
     dayLayout->setSpacing(1);
+    dayLayout->setContentsMargins(0,0,0,0);
     dayLayout->addLayout(line, 0,0,1,7);
     layout->addWidget(month, Qt::AlignCenter);
 
