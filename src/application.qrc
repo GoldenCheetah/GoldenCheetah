@@ -128,5 +128,10 @@
         <file>images/home.png</file>
         <file>images/diary.png</file>
         <file>images/train.png</file>
+        <file>images/sidebar/bookmark.png</file>
+        <file>images/sidebar/calendar.png</file>
+        <file>images/sidebar/dashboard.png</file>
+        <file>images/sidebar/minus.png</file>
+        <file>images/sidebar/plus.png</file>
     </qresource>
 </RCC>

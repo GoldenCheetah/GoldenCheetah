@@ -49,12 +49,12 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     mainLayout->setSpacing(0);
     setContentsMargins(0,0,0,0);
 
-    seasonsWidget = new GcSplitterItem(tr("Date Ranges"), this);
+    seasonsWidget = new GcSplitterItem(tr("Date Ranges"), QIcon(QPixmap(":images/sidebar/calendar.png")), this);
 
-    QAction *addSeasonAct = new QAction(tr("+"), this);
+    QAction *addSeasonAct = new QAction(QIcon(QPixmap(":images/sidebar/plus.png")), tr("+"), this);
     seasonsWidget->addAction(addSeasonAct);
     connect(addSeasonAct, SIGNAL(triggered(void)), this, SLOT(addRange(void)));
-    QAction *removeSeasonAct = new QAction(tr("-"), this);
+    QAction *removeSeasonAct = new QAction(QIcon(QPixmap(":images/sidebar/minus.png")), tr("-"), this);
     seasonsWidget->addAction(removeSeasonAct);
     connect(removeSeasonAct, SIGNAL(triggered(void)), this, SLOT(deleteRange(void)));
     QAction *moreSeasonAct = new QAction(tr(">>"), this);
@@ -80,11 +80,11 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     seasonsWidget->addWidget(dateRangeTree);
 
 
-    eventsWidget = new GcSplitterItem(tr("Events"), this);
+    eventsWidget = new GcSplitterItem(tr("Events"), QIcon(QPixmap(":images/sidebar/bookmark.png")), this);
 
-    QAction *addEventAct = new QAction(tr("+"), this);
+    QAction *addEventAct = new QAction(QIcon(QPixmap(":images/sidebar/plus.png")), tr("+"), this);
     eventsWidget->addAction(addEventAct);
-    QAction *removeEventAct = new QAction(tr("-"), this);
+    QAction *removeEventAct = new QAction(QIcon(QPixmap(":images/sidebar/minus.png")), tr("-"), this);
     eventsWidget->addAction(removeEventAct);
     QAction *moreEventAct = new QAction(tr(">>"), this);
     eventsWidget->addAction(moreSeasonAct);
@@ -93,6 +93,7 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
 
 
     eventTree = new QTreeWidget;
+    eventTree->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     //allEvents = new QTreeWidgetItem(eventTree, ROOT_TYPE);
     allEvents = eventTree->invisibleRootItem();
     allEvents->setText(0, tr("Events"));
@@ -116,16 +117,12 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     configChanged(); // will reset the metric tree
 
     splitter = new GcSplitter(Qt::Vertical);
-    splitter->setHandleWidth(1);
-    splitter->setFrameStyle(QFrame::NoFrame);
-    splitter->setContentsMargins(0,0,0,0);
-    splitter->setOrientation(Qt::Vertical);
     splitter->addWidget(seasonsWidget);
     splitter->addWidget(eventsWidget);
-    splitter->setStyleSheet(" QSplitter::handle { background-color: white; color: white; }");
+    //splitter->setStyleSheet(" QSplitter::handle { background-color: white; color: white; }");
     connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
 
-    GcSplitterItem *summaryWidget = new GcSplitterItem(tr("Summary"), this);
+    GcSplitterItem *summaryWidget = new GcSplitterItem(tr("Summary"), QIcon(QPixmap(":images/sidebar/dashboard.png")), this);
 
     summary = new QWebView(this);
     summary->setContentsMargins(0,0,0,0);

@@ -23,18 +23,67 @@
 #include <QList>
 #include <QAction>
 
+class GcSubSplitter;
+class GcSplitterControl;
 class GcSplitterItem;
-class GcSplitter;
+
+class GcSplitter : public QWidget
+{
+    Q_OBJECT
+
+public:
+    GcSplitter(Qt::Orientation orientation, QWidget *parent = 0);
+
+    void addWidget(QWidget *widget);
+    void insertWidget(int index, QWidget *widget);
+
+    void setOpaqueResize(bool opaque = true);
+    void setSizes(const QList<int> &list);
+
+    QByteArray saveState() const;
+    bool restoreState(const QByteArray &state);
+
+Q_SIGNALS:
+    void splitterMoved(int pos, int index);
+
+public slots:
+    void subSplitterMoved(int pos, int index);
+
+private:
+    GcSubSplitter *splitter;
+    GcSplitterControl *control;
+};
+
+class GcSubSplitter : public QSplitter
+{
+    Q_OBJECT
+
+public:
+    GcSubSplitter(Qt::Orientation orientation, GcSplitterControl *control, QWidget *parent = 0);
+
+    void addWidget(QWidget *widget);
+    void insertWidget(int index, QWidget *widget);
+
+protected:
+    QSplitterHandle *createHandle();
+
+private:
+    QList<QString> titles;
+    QWidget * _insertedWidget;
+
+    GcSplitterControl *control;
+
+};
 
 class GcSplitterHandle : public QSplitterHandle
 {
     Q_OBJECT
 
 public:
-    GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Orientation orientation, GcSplitter *parent = 0);
+    GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Orientation orientation, GcSubSplitter *parent = 0);
 
     QSize sizeHint() const;
-    GcSplitter *splitter() const;
+    GcSubSplitter *splitter() const;
     void addAction(QAction *action);
     void addActions(QList<QAction*> actions);
 protected:
@@ -48,7 +97,7 @@ public slots:
 private:
     void paintBackground(QPaintEvent *);
 
-     GcSplitter *gcSplitter;
+     GcSubSplitter *gcSplitter;
      GcSplitterItem *widget;
 
      QHBoxLayout *titleLayout;
@@ -62,23 +111,22 @@ private:
      bool state;
 };
 
-class GcSplitter : public QSplitter
+class GcSplitterControl : public QWidget
 {
     Q_OBJECT
 
 public:
-    GcSplitter(Qt::Orientation orientation, QWidget *parent = 0);
+    GcSplitterControl(QWidget *parent);
 
-    void addWidget(QWidget *widget);
-    void insertWidget(int index, QWidget *widget);
-
+    void addAction(QAction *action);
 protected:
-    QSplitterHandle *createHandle();
+    void paintEvent(QPaintEvent *);
 
 private:
-    QList<QString> titles;
-    QWidget * _insertedWidget;
+    void paintBackground(QPaintEvent *);
 
+     QHBoxLayout *titleLayout;
+     QToolBar *titleToolbar;
 };
 
 class GcSplitterItem : public QWidget
@@ -87,7 +135,7 @@ class GcSplitterItem : public QWidget
 
 public:
 
-    GcSplitterItem(QString title, QWidget *parent);
+    GcSplitterItem(QString title, QIcon icon, QWidget *parent);
     ~GcSplitterItem();
 
     QWidget *content;
@@ -95,13 +143,17 @@ public:
 
     bool state;
     QString title;
+    QIcon icon;
 
 public slots:
 
     void addWidget(QWidget*);
+    void selectHandle();
 
 private:
     QVBoxLayout *layout;
+
+
 
 
 
