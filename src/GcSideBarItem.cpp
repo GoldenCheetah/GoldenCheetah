@@ -19,7 +19,110 @@
 #include "GcSideBarItem.h"
 #include "GcCalendar.h"
 
-GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Orientation orientation, GcSplitter *parent) : QSplitterHandle(orientation, parent), widget(widget), title(title)
+GcSplitter::GcSplitter(Qt::Orientation orientation, QWidget *parent) : QWidget(parent)
+{
+    setContentsMargins(0,0,0,0);
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setAlignment(Qt::AlignTop);
+    layout->setSpacing(0);
+    layout->setContentsMargins(0,0,0,0);
+
+    control = new GcSplitterControl(this);
+    layout->addWidget(control);
+
+    splitter = new GcSubSplitter(orientation, control, this);
+    splitter->setHandleWidth(1);
+    splitter->setFrameStyle(QFrame::NoFrame);
+    splitter->setContentsMargins(0,0,0,0);
+    layout->addWidget(splitter);
+
+    connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(subSplitterMoved(int,int)));
+}
+
+void
+GcSplitter::setOpaqueResize(bool opaque)
+{
+    return splitter->setOpaqueResize(opaque);
+}
+
+void
+GcSplitter::setSizes(const QList<int> &list)
+{
+    return splitter->setSizes(list);
+}
+
+QByteArray
+GcSplitter::saveState() const
+{
+    return splitter->saveState();
+}
+
+bool
+GcSplitter::restoreState(const QByteArray &state)
+{
+    return splitter->restoreState(state);
+}
+
+void
+GcSplitter::subSplitterMoved(int pos, int index)
+{
+   emit splitterMoved(pos, index);
+}
+
+void
+GcSplitter::addWidget(QWidget *widget)
+{
+   splitter->addWidget(widget);
+}
+
+void
+GcSplitter::insertWidget(int index, QWidget *widget)
+{
+    splitter->insertWidget(index, widget);
+}
+
+GcSubSplitter::GcSubSplitter(Qt::Orientation orientation, GcSplitterControl *control, QWidget *parent) : QSplitter(orientation, parent), control(control)
+{
+    _insertedWidget = NULL;
+    QLabel *fake = new QLabel("fake");
+    fake->setFixedHeight(0);
+    setHandleWidth(0);
+    QSplitter::addWidget(fake);
+}
+
+void
+GcSubSplitter::addWidget(QWidget *widget)
+{
+    _insertedWidget = widget;
+    QSplitter::addWidget(widget);
+}
+
+void
+GcSubSplitter::insertWidget(int index, QWidget *widget)
+{
+    _insertedWidget = widget;
+    QSplitter::insertWidget(index, widget);
+}
+
+QSplitterHandle*
+GcSubSplitter::createHandle()
+{
+    if(_insertedWidget != 0) {
+        GcSplitterItem* _item = dynamic_cast<GcSplitterItem*>(_insertedWidget);
+        if(_item != 0) {
+            _item->splitterHandle = new GcSplitterHandle(_item->title, _item, orientation(), this);
+            _item->splitterHandle->addActions(_item->actions());
+            QAction *action = new QAction(_item->icon, _item->title, this);
+            control->addAction(action);
+            connect(action, SIGNAL(triggered(void)), _item, SLOT(selectHandle(void)));
+            return _item->splitterHandle;
+        }
+    }
+
+    return QSplitter::createHandle();
+}
+
+GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Orientation orientation, GcSubSplitter *parent) : QSplitterHandle(orientation, parent), widget(widget), title(title)
 {
     setContentsMargins(0,0,0,0);
     setFixedHeight(24);
@@ -28,7 +131,7 @@ GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Or
 
     titleLayout = new QHBoxLayout(this);
     titleLayout->setContentsMargins(0,0,0,0);
-    titleLayout->setSpacing(0);
+    titleLayout->setSpacing(2);
 
     titleLabel = new QLabel(title, this);
 #ifdef Q_OS_MAC
@@ -40,20 +143,20 @@ GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Or
 
     showHide = new QPushButton(this);
     showHide->setStyleSheet("QPushButton {color : blue;background: transparent}");
-    showHide->setFixedWidth(20);
-    state = false;
-    showHideClicked();
-    titleLayout->addWidget(showHide);
-    connect(showHide, SIGNAL(clicked(bool)), this, SLOT(showHideClicked()));
+    showHide->setFixedWidth(16);
+    state = true;
+    //showHideClicked();
+    //titleLayout->addWidget(showHide);
+    //connect(showHide, SIGNAL(clicked(bool)), this, SLOT(showHideClicked()));
 
-    titleLayout->addSpacing(5);
+    titleLayout->addSpacing(10);
 
     titleLayout->addWidget(titleLabel);
     titleLayout->addStretch();
 
     titleToolbar = new QToolBar(this);
-    titleToolbar->setFixedHeight(16);
-    titleToolbar->setToolButtonStyle(Qt::ToolButtonTextOnly);
+    titleToolbar->setFixedHeight(10);
+    titleToolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
     titleLayout->addWidget(titleToolbar);
 }
@@ -64,7 +167,7 @@ GcSplitterHandle::sizeHint() const
     return QSize(200, 20);
 }
 
-GcSplitter*
+GcSubSplitter*
 GcSplitterHandle::splitter() const
 {
     return gcSplitter;
@@ -112,12 +215,12 @@ GcSplitterHandle::setExpanded(bool expanded)
 
     state = expanded;
     if (expanded == false) {
-        showHide->setIcon(QIcon(*show));
+        showHide->setIcon(widget->icon);//QIcon(*show));
         titleLabel->setStyleSheet("QLabel { color: gray; }");
         fullHeight = widget->height();
         widget->setFixedHeight(0);
     } else {
-        showHide->setIcon(QIcon(*hide));
+        showHide->setIcon(widget->icon);//QIcon(*hide));
         titleLabel->setStyleSheet("QLabel { color: black; }");
         widget->setBaseSize(widget->width(), fullHeight);
         widget->setMaximumSize(QWIDGETSIZE_MAX,QWIDGETSIZE_MAX);
@@ -134,44 +237,58 @@ GcSplitterHandle::showHideClicked()
     setExpanded(state);
 }
 
-GcSplitter::GcSplitter(Qt::Orientation orientation, QWidget *parent) : QSplitter(orientation, parent)
+GcSplitterControl::GcSplitterControl(QWidget *parent) : QWidget(parent)
 {
-    _insertedWidget = NULL;
-    QLabel *fake = new QLabel("fake");
-    fake->setFixedHeight(0);
-    setHandleWidth(0);
-    addWidget(fake);
+    setContentsMargins(0,0,0,0);
+    setFixedHeight(24);
+
+    titleLayout = new QHBoxLayout(this);
+    titleLayout->setContentsMargins(0,0,0,0);
+
+    titleToolbar = new QToolBar(this);
+    titleToolbar->setFixedHeight(16);
+    titleToolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+
+    titleLayout->addWidget(titleToolbar);
+    titleLayout->addStretch();
 }
 
 void
-GcSplitter::addWidget(QWidget *widget)
+GcSplitterControl::addAction(QAction *action)
 {
-    _insertedWidget = widget;
-    QSplitter::addWidget(widget);
+    titleToolbar->addAction(action);
 }
 
 void
-GcSplitter::insertWidget(int index, QWidget *widget)
+GcSplitterControl::paintEvent(QPaintEvent *event)
 {
-    _insertedWidget = widget;
-    QSplitter::insertWidget(index, widget);
+    // paint the darn thing!
+    paintBackground(event);
+    QWidget::paintEvent(event);
 }
 
-QSplitterHandle*
-GcSplitter::createHandle()
+void
+GcSplitterControl::paintBackground(QPaintEvent *)
 {
-    if(_insertedWidget != 0) {
-        GcSplitterItem* _item = dynamic_cast<GcSplitterItem*>(_insertedWidget);
-        if(_item != 0) {
-            _item->splitterHandle = new GcSplitterHandle(_item->title, _item, orientation(), this);
-            _item->splitterHandle->addActions(actions());
-            return _item->splitterHandle;
-        }
-    }
-    return QSplitter::createHandle();
+    static QPixmap active = QPixmap(":images/mac/scope-active.png");
+
+    // setup a painter and the area to paint
+    QPainter painter(this);
+
+    // background light gray for now?
+    QRect all(0,0,width(),height());
+    painter.drawTiledPixmap(all, active);
 }
 
-GcSplitterItem::GcSplitterItem(QString title, QWidget *parent) : QWidget(parent), title(title)
+void
+GcSplitterControl::selectAction()
+{
+    this->setVisible(!this->isVisible());
+    /*this->setBaseSize(width(), parentWidget()->height());
+    this->setMaximumSize(QWIDGETSIZE_MAX,QWIDGETSIZE_MAX);*/
+}
+
+GcSplitterItem::GcSplitterItem(QString title, QIcon icon, QWidget *parent) : QWidget(parent), title(title), icon(icon)
 {
     setContentsMargins(0,0,0,0);
     layout = new QVBoxLayout(this);
@@ -188,6 +305,14 @@ GcSplitterItem::addWidget(QWidget *p)
     content = p;
     p->setContentsMargins(0,0,0,0);
     layout->addWidget(p);
+}
+
+void
+GcSplitterItem::selectHandle()
+{
+    this->setVisible(!this->isVisible());
+    /*this->setBaseSize(width(), parentWidget()->height());
+    this->setMaximumSize(QWIDGETSIZE_MAX,QWIDGETSIZE_MAX);*/
 }
 
 GcSplitterItem::~GcSplitterItem()
