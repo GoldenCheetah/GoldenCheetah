@@ -314,9 +314,8 @@ LTMPlot::setData(LTMSettings *set)
                 QBrush brush = QBrush(brushColor);
                 current->setBrush(brush);
             } else {
-                brushColor.setAlpha(100); // now side by side, less transparency required
-                QColor brushColor1 = brushColor;
-                brushColor1.setAlpha(255);
+                brushColor.setAlpha(64); // now side by side, less transparency required
+                QColor brushColor1 = brushColor.darker();
 
                 QLinearGradient linearGradient(0, 0, 0, height());
                 linearGradient.setColorAt(0.0, brushColor1);
@@ -600,9 +599,8 @@ LTMPlot::setData(LTMSettings *set)
             
             // fill the bars
             QColor brushColor = metricDetail.penColor;
-            brushColor.setAlpha(100); // now side by side, less transparency required
-            QColor brushColor1 = metricDetail.penColor;
-            brushColor1.setAlpha(255); // now side by side, less transparency required
+            brushColor.setAlpha(64); // now side by side, less transparency required
+            QColor brushColor1 = metricDetail.penColor.darker();
             QLinearGradient linearGradient(0, 0, 0, height());
             linearGradient.setColorAt(0.0, brushColor1);
             linearGradient.setColorAt(1.0, brushColor);

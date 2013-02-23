@@ -452,9 +452,8 @@ CpintPlot::plot_allCurve(CpintPlot *thisPlot,
 
             // use a linear gradient
             if (shadeMode && shadingCP) { // 0 value means no shading please - and only if proper value for shadingCP
-                color.setAlpha(180);
-                QColor color1 = color;
-                color1.setAlpha(64);
+                color.setAlpha(64);
+                QColor color1 = color.darker();
                 QLinearGradient linearGradient(0, 0, 0, height());
                 linearGradient.setColorAt(0.0, color);
                 linearGradient.setColorAt(1.0, color1);
@@ -691,9 +690,8 @@ CpintPlot::calculate(RideItem *rideItem)
                 allCurve->setPen(line);
                 fill.setAlpha(64);
                 // use a linear gradient
-                fill.setAlpha(240);
-                QColor fill1 = fill;
-                fill1.setAlpha(40);
+                fill.setAlpha(64);
+                QColor fill1 = fill.darker();
                 QLinearGradient linearGradient(0, 0, 0, height());
                 linearGradient.setColorAt(0.0, fill);
                 linearGradient.setColorAt(1.0, fill1);
