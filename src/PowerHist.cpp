@@ -161,9 +161,8 @@ PowerHist::configChanged()
     }
 
     // use a linear gradient
-    brush_color.setAlpha(240);
-    QColor brush_color1 = brush_color;
-    brush_color1.setAlpha(40);
+    brush_color.setAlpha(64);
+    QColor brush_color1 = brush_color.darker();
     QLinearGradient linearGradient(0, 0, 0, height());
     linearGradient.setColorAt(0.0, brush_color);
     linearGradient.setColorAt(1.0, brush_color1);

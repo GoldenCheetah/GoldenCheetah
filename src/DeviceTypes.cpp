@@ -40,9 +40,11 @@ static DeviceType SupportedDevices[] =
         ":images/devices/garminusb.png" },
 #endif
 #ifdef GC_HAVE_WFAPI
+#if 0
       { DEV_BT40,    DEV_BTLE,     (char *) "Bluetooth 4.0", true,   false,
         "Bluetooth Low Energy devices such as KK Inride, Stages PM, Blue HR and Blue SC",
         ":images/devices/btle.png" },
+#endif
       { DEV_KICKR,    DEV_BTLE,     (char *) "Wahoo Kickr", true,   false,
         "The Wahoo Fitness Kickr cyling trainer via its Bluetooth smart interface. ",
         ":images/devices/kickr.png" },
