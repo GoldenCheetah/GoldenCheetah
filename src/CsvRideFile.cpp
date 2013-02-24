@@ -187,7 +187,17 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 // 6,2012-11-27 13:40:41,0,0,0,,55.8,788,227,1,Joule,18.018,,0,
                 QStringList f = line.split(",");
                 if (f.size() >= 2) {
-                    startTime = QDateTime::fromString(f[1], "yyyy-MM-dd H:mm:ss");
+                    int f0l;
+                    QStringList f0 = f[1].split("|");
+                    // new format? due to new PowerAgent version (7.5.7.34)?
+                    // 6,2011-01-02 21:22:20|2011-01-02 21:22|01/02/2011 21:22|2011-01-02 21-22-20,0,0, ...
+
+                    f0l = f0.size();
+                    if (f0l >= 2) {
+                       startTime = QDateTime::fromString(f0[0], "yyyy-MM-dd H:mm:ss");
+                    } else {
+                       startTime = QDateTime::fromString(f[1], "yyyy-MM-dd H:mm:ss");
+                    }
                 }
             }
             if (lineno == unitsHeader) {
