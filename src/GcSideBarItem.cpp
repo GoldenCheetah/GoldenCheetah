@@ -210,8 +210,8 @@ GcSplitterHandle::paintBackground(QPaintEvent *)
 void
 GcSplitterHandle::setExpanded(bool expanded)
 {
-    static QPixmap *hide = new QPixmap(":images/mac/hide.png");
-    static QPixmap *show = new QPixmap(":images/mac/show.png");
+    //XXX static QPixmap *hide = new QPixmap(":images/mac/hide.png");
+    //XXX static QPixmap *show = new QPixmap(":images/mac/show.png");
 
     state = expanded;
     if (expanded == false) {

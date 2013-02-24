@@ -119,6 +119,8 @@ public:
     GcSplitterControl(QWidget *parent);
 
     void addAction(QAction *action);
+    void selectAction();
+
 protected:
     void paintEvent(QPaintEvent *);
 
