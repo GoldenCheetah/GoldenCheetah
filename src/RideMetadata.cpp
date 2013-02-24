@@ -22,6 +22,7 @@
 #include "MainWindow.h"
 #include "RideSummaryWindow.h"
 #include "Settings.h"
+#include "Units.h"
 
 #include <QXmlDefaultHandler>
 #include <QtGui>
@@ -405,6 +406,11 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
         if (units != "") units = QString(" (%1)").arg(units);
     }
 
+    // we need to show what units we use for weight...
+    if (field.name == "Weight" && field.type == FIELD_DOUBLE) {
+        units = meta->main->useMetricUnits ? tr(" (kg)") : tr (" (lbs)");
+    }
+
     label = new QLabel(QString("%1%2").arg(meta->sp.displayName(field.name)).arg(units), this);
     //label->setFont(font);
     //label->setFixedHeight(18);
@@ -632,6 +638,14 @@ FormField::editFinished()
             // get widgets updated with new override
             ourRideItem->notifyRideMetadataChanged();
         } else {
+
+            // we need to convert from display value to 
+            // stored value for the Weight field:
+            if (definition.type == FIELD_DOUBLE && definition.name == "Weight" && meta->main->useMetricUnits == false) {
+                double kg = text.toDouble() / LB_PER_KG;
+                text = QString("%1").arg(kg);
+            }
+
             // just update the tags QMap!
             ourRideItem->ride()->setTag(definition.name, text);
         }
@@ -761,7 +775,13 @@ FormField::metadataChanged()
 
     case FIELD_DOUBLE : // double
         if (isTime) ((QTimeEdit*)widget)->setTime(QTime(0,0,0,0).addSecs(value.toDouble()));
-        else ((QDoubleSpinBox*)widget)->setValue(value.toDouble());
+        else {
+            if (definition.name == "Weight" && meta->main->useMetricUnits == false) {
+                double lbs = value.toDouble() * LB_PER_KG;
+                value = QString("%1").arg(lbs);
+            }
+            ((QDoubleSpinBox*)widget)->setValue(value.toDouble());
+        }
         break;
 
     case FIELD_DATE : // date
