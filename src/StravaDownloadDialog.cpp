@@ -52,7 +52,7 @@ StravaDownloadDialog::StravaDownloadDialog(MainWindow *mainWindow) :
     setWindowTitle("Strava download");
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
-    QGroupBox *groupBox = new QGroupBox(tr("Choose rideid to download: "));
+    QGroupBox *groupBox = new QGroupBox(tr("Choose activityId to download: "));
 
     QHBoxLayout *hbox = new QHBoxLayout();
     activityIdEdit = new QLineEdit();
@@ -89,6 +89,15 @@ void
 StravaDownloadDialog::downloadRide()
 {
     activityId = activityIdEdit->text();
+    if (activityId.trimmed().isEmpty()) {
+        progressLabel->setText(tr("Enter an activity Id"));
+        return;
+    }
+
+    if (activityId.toLong() == 0)  {
+        progressLabel->setText(tr("Enter a valid activity Id"));
+        return;
+    }
 
     fileNames = new QStringList();
 
@@ -109,8 +118,8 @@ StravaDownloadDialog::requestRideDetail()
     tmp->setAutoRemove(true);
 
     if (!tmp->open()) {
-        err = "Failed to create temporary file "
-            + tmp->fileName() + ": " + tmp->error();
+       progressLabel->setText(tr("Failed to create temporary file ")
+            + tmp->fileName() + ": " + tmp->error());
 
         return;
     }
@@ -139,9 +148,19 @@ StravaDownloadDialog::requestRideDetailFinished(QNetworkReply *reply)
     progressBar->setValue(15);
 
     if (reply->error() != QNetworkReply::NoError)
-        qDebug() << "Error from ride details " << reply->error();
+        progressLabel->setText(tr("Error from ride details " + reply->error()));
     else {
         QString response = reply->readLine();
+
+        QScriptValue sc;
+        QScriptEngine se;
+
+        sc = se.evaluate("("+response+")");
+        QString error = sc.property("error").toString();
+        if (!error.isEmpty()) {
+            progressLabel->setText(error);
+            return;
+        }
 
         tmp->write(response.toAscii());
         progressBar->setValue(progressBar->value()+10/count);
@@ -178,7 +197,7 @@ StravaDownloadDialog::requestDownloadRideFinished(QNetworkReply *reply)
     progressBar->setValue(60);
 
     if (reply->error() != QNetworkReply::NoError)
-        qDebug() << "Error from upload " <<reply->error();
+        progressLabel->setText("Error from upload " + reply->error());
     else {
         QString response = reply->readLine();
 
