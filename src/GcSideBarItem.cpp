@@ -156,6 +156,7 @@ GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Or
 
     titleToolbar = new QToolBar(this);
     titleToolbar->setFixedHeight(10);
+    titleToolbar->setIconSize(QSize(8,8));
     titleToolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
     titleLayout->addWidget(titleToolbar);
@@ -204,7 +205,7 @@ GcSplitterHandle::paintBackground(QPaintEvent *)
 
     // background light gray for now?
     QRect all(0,0,width(),height());
-    painter.drawTiledPixmap(all, state ? active : inactive);
+    painter.drawTiledPixmap(all, isActiveWindow() ? active : inactive);
 }
 
 void
@@ -237,26 +238,14 @@ GcSplitterHandle::showHideClicked()
     setExpanded(state);
 }
 
-GcSplitterControl::GcSplitterControl(QWidget *parent) : QWidget(parent)
+GcSplitterControl::GcSplitterControl(QWidget *parent) : QToolBar(parent)
 {
     setContentsMargins(0,0,0,0);
-    setFixedHeight(24);
+    setFixedHeight(25);
+    setIconSize(QSize(18,18));
+    setToolButtonStyle(Qt::ToolButtonIconOnly);
+    setAutoFillBackground(false);
 
-    titleLayout = new QHBoxLayout(this);
-    titleLayout->setContentsMargins(0,0,0,0);
-
-    titleToolbar = new QToolBar(this);
-    titleToolbar->setFixedHeight(16);
-    titleToolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
-
-    titleLayout->addWidget(titleToolbar);
-    titleLayout->addStretch();
-}
-
-void
-GcSplitterControl::addAction(QAction *action)
-{
-    titleToolbar->addAction(action);
 }
 
 void
@@ -264,20 +253,21 @@ GcSplitterControl::paintEvent(QPaintEvent *event)
 {
     // paint the darn thing!
     paintBackground(event);
-    QWidget::paintEvent(event);
+    //QToolBar::paintEvent(event);
 }
 
 void
 GcSplitterControl::paintBackground(QPaintEvent *)
 {
     static QPixmap active = QPixmap(":images/mac/scope-active.png");
+    static QPixmap inactive = QPixmap(":images/scope-inactive.png");
 
     // setup a painter and the area to paint
     QPainter painter(this);
 
     // background light gray for now?
     QRect all(0,0,width(),height());
-    painter.drawTiledPixmap(all, active);
+    painter.drawTiledPixmap(all, isActiveWindow() ? active : inactive);
 }
 
 void

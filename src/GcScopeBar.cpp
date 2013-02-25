@@ -28,6 +28,7 @@ GcScopeBar::GcScopeBar(QWidget *parent, QWidget *traintool) : QWidget(parent)
     layout->setSpacing(2);
     layout->setContentsMargins(0,0,0,0);
 
+#if 0 // moving to the main toolbar
     showHide = new QtMacButton(this, QtMacButton::Recessed);
     showHide->setWidth(60);
     showHide->setIconAndText();
@@ -40,7 +41,8 @@ GcScopeBar::GcScopeBar(QWidget *parent, QWidget *traintool) : QWidget(parent)
     sep->setFixedWidth(4);
     sep->setYOff(1);
     layout->addWidget(sep);
-    
+#endif
+   
     home = new QtMacButton(this, QtMacButton::Recessed);
     home->setText("Home");
     layout->addWidget(home);
@@ -172,6 +174,7 @@ GcScopeBar::selected(int index)
 void
 GcScopeBar::setShowSidebar(bool showSidebar)
 {
+    return; //XXX moving to main toolbar
     static QPixmap *hide = new QPixmap(":images/mac/hide.png");
     static QPixmap *show = new QPixmap(":images/mac/show.png");
 
@@ -189,6 +192,7 @@ GcScopeBar::setShowSidebar(bool showSidebar)
 void
 GcScopeBar::showHideClicked()
 {
+    return; //XXX moving to main toolbar
     state = !state;
     emit showSideBar(state);
     setShowSidebar(state);
@@ -196,6 +200,7 @@ GcScopeBar::showHideClicked()
 
 void
 GcScopeBar::setEnabledHideButton(bool EnableHideButton) {
+    return;; //XXX moving to toolbar
     showHide->setEnabled(EnableHideButton);
 }
 

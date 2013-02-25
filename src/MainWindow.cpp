@@ -679,6 +679,7 @@ MainWindow::MainWindow(const QDir &home) :
     toolBox->setFrameStyle(QFrame::NoFrame);
     toolBox->setContentsMargins(0,0,0,0);
     toolBox->layout()->setSpacing(0);
+    splitter->addWidget(toolBox);
 
     // CONTAINERS FOR TOOLBOX
     masterControls = new QStackedWidget(this);
@@ -788,10 +789,22 @@ MainWindow::MainWindow(const QDir &home) :
     //views->setCurrentIndex(0);
     views->setContentsMargins(0,0,0,0);
 
-
-    // SPLITTER
-    splitter->addWidget(toolBox);
+    // on a mac the scope bar is at the top of the central view
+    // with the icon bar to the left in the toolbox, but on other
+    // platforms there is no scope bar.
+#ifdef Q_OS_MAC
+    QWidget *sviews = new QWidget(this);
+    sviews->setContentsMargins(0,0,0,0);
+    QVBoxLayout *sviewLayout = new QVBoxLayout(sviews);
+    sviewLayout->setContentsMargins(0,0,0,0);
+    sviewLayout->setSpacing(0);
+    sviewLayout->addWidget(scopebar);
+    sviewLayout->addWidget(views);
+    splitter->addWidget(sviews);
+#else
     splitter->addWidget(views);
+#endif
+
     QVariant splitterSizes = appsettings->cvalue(cyclist, GC_SETTINGS_SPLITTER_SIZES); 
     if (splitterSizes.toByteArray().size() > 1 ) {
         splitter->restoreState(splitterSizes.toByteArray());
@@ -807,7 +820,7 @@ MainWindow::MainWindow(const QDir &home) :
 
     splitter->setChildrenCollapsible(false); // QT BUG crash QTextLayout do not undo this
     splitter->setHandleWidth(1);
-    splitter->setStyleSheet(" QSplitter::handle { background-color: darkGray; color: darkGray; }");
+    splitter->setStyleSheet(" QSplitter::handle { background-color: rgb(120,120,120); color: darkGray; }");
     splitter->setFrameStyle(QFrame::NoFrame);
     splitter->setContentsMargins(0, 0, 0, 0); // attempting to follow some UI guides
 
@@ -820,9 +833,6 @@ MainWindow::MainWindow(const QDir &home) :
     centralLayout->setSpacing(0);
     centralLayout->setContentsMargins(0,0,0,0);
     centralLayout->addWidget(toolbar);
-#ifdef Q_OS_MAC
-    centralLayout->addWidget(scopebar);
-#endif
     centralLayout->addWidget(splitter);
 
     setCentralWidget(central);
