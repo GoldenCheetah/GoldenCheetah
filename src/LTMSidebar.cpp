@@ -119,7 +119,6 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     splitter = new GcSplitter(Qt::Vertical);
     splitter->addWidget(seasonsWidget);
     splitter->addWidget(eventsWidget);
-    //splitter->setStyleSheet(" QSplitter::handle { background-color: white; color: white; }");
     connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
 
     GcSplitterItem *summaryWidget = new GcSplitterItem(tr("Summary"), QIcon(QPixmap(":images/sidebar/dashboard.png")), this);

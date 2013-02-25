@@ -112,9 +112,11 @@ GcSubSplitter::createHandle()
         if(_item != 0) {
             _item->splitterHandle = new GcSplitterHandle(_item->title, _item, orientation(), this);
             _item->splitterHandle->addActions(_item->actions());
-            QAction *action = new QAction(_item->icon, _item->title, this);
-            control->addAction(action);
-            connect(action, SIGNAL(triggered(void)), _item, SLOT(selectHandle(void)));
+            _item->controlAction = new QAction(_item->icon, _item->title, this);
+            _item->controlAction->setStatusTip(_item->title);
+            control->addAction(_item->controlAction);
+
+            connect(_item->controlAction, SIGNAL(triggered(void)), _item, SLOT(selectHandle(void)));
             return _item->splitterHandle;
         }
     }
@@ -278,6 +280,8 @@ void
 GcSplitterControl::selectAction()
 {
     this->setVisible(!this->isVisible());
+
+
     /*this->setBaseSize(width(), parentWidget()->height());
     this->setMaximumSize(QWIDGETSIZE_MAX,QWIDGETSIZE_MAX);*/
 }
@@ -305,6 +309,7 @@ void
 GcSplitterItem::selectHandle()
 {
     this->setVisible(!this->isVisible());
+    controlAction->setChecked(this->isVisible());
     /*this->setBaseSize(width(), parentWidget()->height());
     this->setMaximumSize(QWIDGETSIZE_MAX,QWIDGETSIZE_MAX);*/
 }
