@@ -142,6 +142,7 @@ public:
     bool state;
     QString title;
     QIcon icon;
+    QAction *controlAction;
 
 public slots:
 
@@ -150,10 +151,6 @@ public slots:
 
 private:
     QVBoxLayout *layout;
-
-
-
-
 
 };
 
