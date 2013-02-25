@@ -27,6 +27,7 @@
 #include "DeviceTypes.h"
 #include "ErgFile.h"
 #include "ErgFilePlot.h"
+#include "GcSideBarItem.h"
 
 // standard stuff
 #include <QDir>
@@ -83,11 +84,8 @@ class TrainTool : public GcWindow
         const QTreeWidgetItem *currentWorkout() { return workout; }
         const QTreeWidgetItem *currentMedia() { return media; }
         const QTreeWidgetItem *workoutItems() { return allWorkouts; }
-        const QTreeWidgetItem *currentServer() { return server; }
-        const QTreeWidgetItem *serverItems() { return allServers; }
 
         int selectedDeviceNumber();
-        int selectedServerNumber();
 
         // set labels when ergfile selected etc
         void setLabels();
@@ -113,13 +111,11 @@ class TrainTool : public GcWindow
     signals:
 
         void deviceSelected();
-        void serverSelected();
         void start();
         void pause();
         void stop();
 
     private slots:
-        void serverTreeWidgetSelectionChanged();
         void deviceTreeWidgetSelectionChanged();
         void workoutTreeWidgetSelectionChanged();
         void mediaTreeWidgetSelectionChanged();
@@ -165,7 +161,10 @@ class TrainTool : public GcWindow
 
         const QDir home;
         MainWindow *main;
-        QSplitter   *trainSplitter;
+        GcSplitter   *trainSplitter;
+        GcSplitterItem *deviceItem,
+                       *workoutItem,
+                       *mediaItem;
 
         QWidget *toolbarButtons;
 
@@ -173,15 +172,11 @@ class TrainTool : public GcWindow
         QSqlTableModel *workoutModel;
 
         QTreeWidget *deviceTree;
-        QTreeWidget *serverTree;
         QTreeView *workoutTree;
         QSortFilterProxyModel *sortModel;  // sorting workout list
         QSortFilterProxyModel *vsortModel; // sorting video list
         QTreeView *mediaTree;
 
-        QTreeWidgetItem *allServers;
-        QTreeWidgetItem *allDevices;
-        QTreeWidgetItem *server;
         QTreeWidgetItem *allWorkouts;
         QTreeWidgetItem *workout;
         QTreeWidgetItem *media;
@@ -224,7 +219,6 @@ class TrainTool : public GcWindow
         QTime session_time, lap_time;
 
         QTimer      *gui_timer,     // refresh the gui
-                    *stream_timer,  // send telemetry to server
                     *load_timer,    // change the load on the device
                     *disk_timer;    // write to .CSV file
 

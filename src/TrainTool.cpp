@@ -115,9 +115,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     deviceTree->header()->hide();
     deviceTree->setAlternatingRowColors (false);
     deviceTree->setIndentation(5);
-    allDevices = new QTreeWidgetItem(deviceTree, HEAD_TYPE);
-    allDevices->setText(0, tr("Devices"));
-    deviceTree->expandItem(allDevices);
+    deviceTree->expandItem(deviceTree->invisibleRootItem());
     deviceTree->setContextMenuPolicy(Qt::CustomContextMenu);
 
     workoutModel = new QSqlTableModel(this, trainDB->connection());
@@ -283,19 +281,20 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     recordSelector->setChecked(Qt::Checked);
     recordSelector->hide(); // we don't let users change this for now
 
-    trainSplitter = new QSplitter;
-    trainSplitter->setHandleWidth(1);
-    trainSplitter->setFrameStyle(QFrame::NoFrame);
-    trainSplitter->setOrientation(Qt::Vertical);
+    trainSplitter = new GcSplitter(Qt::Vertical);
     trainSplitter->setContentsMargins(0,0,0,0);
-    trainSplitter->setLineWidth(0);
-    trainSplitter->setMidLineWidth(0);
-
+    deviceItem = new GcSplitterItem(tr("Devices"), QIcon(QPixmap(":images/sidebar/power.png")), this);
+    workoutItem = new GcSplitterItem(tr("Workouts"), QIcon(QPixmap(":images/sidebar/folder.png")), this);
+    deviceItem->addWidget(deviceTree);
+    trainSplitter->addWidget(deviceItem);
+    workoutItem->addWidget(workoutTree);
+    trainSplitter->addWidget(workoutItem);
     cl->addWidget(trainSplitter);
-    trainSplitter->addWidget(deviceTree);
-    trainSplitter->addWidget(workoutTree);
+
 #if defined Q_OS_MAC || defined GC_HAVE_VLC
-    trainSplitter->addWidget(mediaTree);
+    mediaItem = new GcSplitterItem(tr("Media"), QIcon(QPixmap(":images/sidebar/movie.png")), this);
+    mediaItem->addWidget(mediaTree);
+    trainSplitter->addWidget(mediaItem);
 #endif
 
 #ifdef Q_OS_MAC
@@ -333,7 +332,6 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     // now the GUI is setup lets sort our control variables
     gui_timer = new QTimer(this);
     disk_timer = new QTimer(this);
-    stream_timer = new QTimer(this);
     load_timer = new QTimer(this);
 
     session_time = QTime();
@@ -405,7 +403,7 @@ TrainTool::configChanged()
     // DEVICES
 
     // zap whats there
-    QList<QTreeWidgetItem *> devices = allDevices->takeChildren();
+    QList<QTreeWidgetItem *> devices = deviceTree->invisibleRootItem()->takeChildren();
     for (int i=0; i<devices.count(); i++) delete devices.at(i);
 
     if (appsettings->value(this, TRAIN_MULTI, false).toBool() == true)
@@ -422,7 +420,7 @@ TrainTool::configChanged()
     for (int i=0; i<Devices.count(); i++) {
 
         // add to the selection tree
-        QTreeWidgetItem *device = new QTreeWidgetItem(allDevices, i);
+        QTreeWidgetItem *device = new QTreeWidgetItem(deviceTree->invisibleRootItem(), i);
         device->setText(0, Devices.at(i).name);
 
         // Create the controllers for each device
@@ -447,7 +445,7 @@ TrainTool::configChanged()
 
     // select the first device
     if (Devices.count()) {
-        deviceTree->setCurrentItem(allDevices->child(0));
+        deviceTree->setCurrentItem(deviceTree->invisibleRootItem()->child(0));
     }
     // And select default workout to Ergo
     QModelIndex firstWorkout = sortModel->index(0, 0, QModelIndex());
@@ -459,26 +457,6 @@ TrainTool::configChanged()
 
     // metric or imperial changed?
     useMetricUnits = main->useMetricUnits;
-}
-
-/*----------------------------------------------------------------------
- * Race Server Selected
- *----------------------------------------------------------------------*/
-void
-TrainTool::serverTreeWidgetSelectionChanged()
-{
-    serverSelected();
-}
-
-int
-TrainTool::selectedServerNumber()
-{
-    if (serverTree->selectedItems().isEmpty()) return -1;
-
-    QTreeWidgetItem *selected = serverTree->selectedItems().first();
-
-    if (selected->type() == HEAD_TYPE) return -1;
-    else return selected->type();
 }
 
 /*----------------------------------------------------------------------
@@ -634,7 +612,6 @@ void TrainTool::Start()       // when start button is pressed
         status &=~RT_PAUSED;
         foreach(int dev, devices()) Devices[dev].controller->restart();
         gui_timer->start(REFRESHRATE);
-        if (status & RT_STREAMING) stream_timer->start(STREAMRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         load_period.restart();
         if (status & RT_WORKOUT) load_timer->start(LOADRATE);
@@ -656,7 +633,6 @@ void TrainTool::Start()       // when start button is pressed
         foreach(int dev, devices()) Devices[dev].controller->pause();
         status |=RT_PAUSED;
         gui_timer->stop();
-        if (status & RT_STREAMING) stream_timer->stop();
         if (status & RT_RECORDING) disk_timer->stop();
         if (status & RT_WORKOUT) load_timer->stop();
         load_msecs += load_period.restart();
@@ -753,12 +729,6 @@ void TrainTool::Start()       // when start button is pressed
                 disk_timer->start(SAMPLERATE);  // start screen
             }
         }
-
-        // stream
-        if (status & RT_STREAMING) {
-            stream_timer->start(STREAMRATE);
-        }
-
         gui_timer->start(REFRESHRATE);      // start recording
 
     }
@@ -776,7 +746,6 @@ void TrainTool::Pause()        // pause capture to recalibrate
         status &=~RT_PAUSED;
         foreach(int dev, devices()) Devices[dev].controller->restart();
         gui_timer->start(REFRESHRATE);
-        if (status & RT_STREAMING) stream_timer->start(STREAMRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         load_period.restart();
         if (status & RT_WORKOUT) load_timer->start(LOADRATE);
@@ -795,7 +764,6 @@ void TrainTool::Pause()        // pause capture to recalibrate
         foreach(int dev, devices()) Devices[dev].controller->pause();
         status |=RT_PAUSED;
         gui_timer->stop();
-        if (status & RT_STREAMING) stream_timer->stop();
         if (status & RT_RECORDING) disk_timer->stop();
         if (status & RT_WORKOUT) load_timer->stop();
         load_msecs += load_period.restart();
@@ -1169,7 +1137,6 @@ void TrainTool::Calibrate()
         lap_time.start();
         load_period.restart();
         if (status & RT_WORKOUT) load_timer->start(LOADRATE);
-        if (status & RT_STREAMING) stream_timer->start(STREAMRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         main->notifyUnPause(); // get video started again, amongst other things
 
@@ -1205,7 +1172,6 @@ void TrainTool::Calibrate()
         session_elapsed_msec += session_time.elapsed();
         lap_elapsed_msec += lap_time.elapsed();
 
-        if (status & RT_STREAMING) stream_timer->stop();
         if (status & RT_RECORDING) disk_timer->stop();
         if (status & RT_WORKOUT) load_timer->stop();
         load_msecs += load_period.restart();
@@ -1518,7 +1484,7 @@ TrainTool::deleteDevice()
 
     // Delete the selected device
     QTreeWidgetItem *selected = deviceTree->selectedItems().first();
-    int index = allDevices->indexOfChild(selected);
+    int index = deviceTree->invisibleRootItem()->indexOfChild(selected);
 
     if (index < 0 || index > list.size()) return;
 
