@@ -155,7 +155,11 @@ GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Or
     titleLayout->addStretch();
 
     titleToolbar = new QToolBar(this);
+#ifndef Q_OS_MAC
+    titleToolbar->setFixedHeight(20);
+#else
     titleToolbar->setFixedHeight(10);
+#endif
     titleToolbar->setIconSize(QSize(8,8));
     titleToolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
