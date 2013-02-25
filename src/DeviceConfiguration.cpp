@@ -69,22 +69,33 @@ DeviceConfigurations::readConfig()
         count = configVal.toInt();
     }
 
+    // get list of supported devices
+    DeviceTypes all;
+
     // for each device
     for (int i=0; i< count; i++) {
 
             DeviceConfiguration Entry;
 
-            QString configStr = QString("%1%2").arg(GC_DEV_NAME).arg(i+1);
+            QString configStr = QString("%1%2").arg(GC_DEV_TYPE).arg(i+1);
+            configVal = appsettings->value(NULL, configStr);
+            Entry.type = configVal.toInt();
+
+            bool supported = false;
+            foreach(DeviceType s, all.getList()) {
+                if (s.type == Entry.type) supported = true;
+            }
+
+            // skip unsupported devices
+            if (supported == false) continue;
+
+            configStr = QString("%1%2").arg(GC_DEV_NAME).arg(i+1);
             configVal = appsettings->value(NULL, configStr);
             Entry.name = configVal.toString();
 
             configStr = QString("%1%2").arg(GC_DEV_SPEC).arg(i+1);
             configVal = appsettings->value(NULL, configStr);
             Entry.portSpec = configVal.toString();
-
-            configStr = QString("%1%2").arg(GC_DEV_TYPE).arg(i+1);
-            configVal = appsettings->value(NULL, configStr);
-            Entry.type = configVal.toInt();
 
             configStr = QString("%1%2").arg(GC_DEV_WHEEL).arg(i+1);
             configVal = appsettings->value(NULL, configStr);
