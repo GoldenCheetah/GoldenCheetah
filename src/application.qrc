@@ -133,5 +133,6 @@
         <file>images/sidebar/dashboard.png</file>
         <file>images/sidebar/minus.png</file>
         <file>images/sidebar/plus.png</file>
+        <file>images/sidebar/extra.png</file>
     </qresource>
 </RCC>

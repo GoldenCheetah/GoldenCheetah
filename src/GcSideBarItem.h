@@ -111,14 +111,12 @@ private:
      bool state;
 };
 
-class GcSplitterControl : public QWidget
+class GcSplitterControl : public QToolBar
 {
     Q_OBJECT
 
 public:
     GcSplitterControl(QWidget *parent);
-
-    void addAction(QAction *action);
     void selectAction();
 
 protected:
@@ -127,8 +125,6 @@ protected:
 private:
     void paintBackground(QPaintEvent *);
 
-     QHBoxLayout *titleLayout;
-     QToolBar *titleToolbar;
 };
 
 class GcSplitterItem : public QWidget
