@@ -47,6 +47,12 @@ GcSplitter::setOpaqueResize(bool opaque)
     return splitter->setOpaqueResize(opaque);
 }
 
+QList<int>
+GcSplitter::sizes() const
+{
+    return splitter->sizes();
+}
+
 void
 GcSplitter::setSizes(const QList<int> &list)
 {
