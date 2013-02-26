@@ -21,10 +21,11 @@
 
 GcSplitter::GcSplitter(Qt::Orientation orientation, QWidget *parent) : QWidget(parent)
 {
+
     setContentsMargins(0,0,0,0);
     QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setAlignment(Qt::AlignTop);
     layout->setSpacing(0);
+    layout->setAlignment(Qt::AlignTop);
     layout->setContentsMargins(0,0,0,0);
 
     control = new GcSplitterControl(this);
@@ -34,6 +35,7 @@ GcSplitter::GcSplitter(Qt::Orientation orientation, QWidget *parent) : QWidget(p
     splitter->setHandleWidth(1);
     splitter->setFrameStyle(QFrame::NoFrame);
     splitter->setContentsMargins(0,0,0,0);
+    splitter->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     layout->addWidget(splitter);
 
     connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(subSplitterMoved(int,int)));
@@ -88,6 +90,7 @@ GcSubSplitter::GcSubSplitter(Qt::Orientation orientation, GcSplitterControl *con
     fake->setFixedHeight(0);
     setHandleWidth(0);
     QSplitter::addWidget(fake);
+    //setStretchFactor(0,0);
 }
 
 void
@@ -95,6 +98,7 @@ GcSubSplitter::addWidget(QWidget *widget)
 {
     _insertedWidget = widget;
     QSplitter::addWidget(widget);
+    //setStretchFactor(indexOf(widget), 1);
 }
 
 void
@@ -308,6 +312,7 @@ GcSplitterItem::addWidget(QWidget *p)
 void
 GcSplitterItem::selectHandle()
 {
+    //splitterHandle->gcSplitter->setStretchFactor(splitterHandle->index, this->isVisible() ? 0 : 1);
     this->setVisible(!this->isVisible());
     controlAction->setChecked(this->isVisible());
     /*this->setBaseSize(width(), parentWidget()->height());
