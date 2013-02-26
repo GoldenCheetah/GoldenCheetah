@@ -84,10 +84,12 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
 
     QAction *addEventAct = new QAction(QIcon(QPixmap(":images/sidebar/plus.png")), tr("+"), this);
     eventsWidget->addAction(addEventAct);
+    connect(addEventAct, SIGNAL(triggered(void)), this, SLOT(addEvent(void)));
     QAction *removeEventAct = new QAction(QIcon(QPixmap(":images/sidebar/minus.png")), tr("-"), this);
     eventsWidget->addAction(removeEventAct);
-    QAction *moreEventAct = new QAction(tr(">>"), this);
-    eventsWidget->addAction(moreSeasonAct);
+    connect(removeEventAct, SIGNAL(triggered(void)), this, SLOT(deleteEvent(void)));
+    QAction *moreEventAct = new QAction(QIcon(QPixmap(":images/sidebar/extra.png")), tr(">>"), this);
+    eventsWidget->addAction(moreEventAct);
     connect(moreEventAct, SIGNAL(triggered(void)), this, SLOT(eventPopup(void)));
 
 
@@ -355,7 +357,7 @@ LTMSidebar::dateRangePopup()
         connect(event, SIGNAL(triggered(void)), this, SLOT(addEvent(void)));
     }
     // execute the menu
-    menu.exec(dateRangeTree->mapToGlobal(QPoint(dateRangeTree->pos().x()+dateRangeTree->width()-30,seasonsWidget->pos().y()-30)));
+    menu.exec(splitter->mapToGlobal(QPoint(seasonsWidget->pos().x()+seasonsWidget->width()-30,seasonsWidget->pos().y()+20)));
 }
 
 void
@@ -424,7 +426,7 @@ LTMSidebar::eventPopup()
     connect(addEvent, SIGNAL(triggered(void)), this, SLOT(addEvent(void)));
 
     // execute the menu
-    menu.exec(eventTree->mapToGlobal(QPoint(eventTree->pos().x()+eventTree->width()-30,eventTree->pos().y()-30)));
+    menu.exec(splitter->mapToGlobal(QPoint(eventsWidget->pos().x()+eventsWidget->width()-30,eventsWidget->pos().y()+20)));
 }
 
 void

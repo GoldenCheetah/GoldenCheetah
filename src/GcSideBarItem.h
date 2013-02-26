@@ -38,6 +38,7 @@ public:
     void insertWidget(int index, QWidget *widget);
 
     void setOpaqueResize(bool opaque = true);
+    QList<int> sizes() const;
     void setSizes(const QList<int> &list);
 
     QByteArray saveState() const;
