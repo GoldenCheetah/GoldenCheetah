@@ -23,20 +23,21 @@ GcSplitter::GcSplitter(Qt::Orientation orientation, QWidget *parent) : QWidget(p
 {
 
     setContentsMargins(0,0,0,0);
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->setSpacing(0);
-    layout->setAlignment(Qt::AlignTop);
-    layout->setContentsMargins(0,0,0,0);
 
     control = new GcSplitterControl(this);
-    layout->addWidget(control);
 
     splitter = new GcSubSplitter(orientation, control, this);
-    splitter->setHandleWidth(1);
+    splitter->setHandleWidth(23);
     splitter->setFrameStyle(QFrame::NoFrame);
     splitter->setContentsMargins(0,0,0,0);
     splitter->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setSpacing(0);
+    layout->setAlignment(Qt::AlignBottom);
+    layout->setContentsMargins(0,0,0,0);
     layout->addWidget(splitter);
+    layout->addWidget(control);
 
     connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(subSplitterMoved(int,int)));
 }
@@ -137,7 +138,7 @@ GcSubSplitter::createHandle()
 GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Orientation orientation, GcSubSplitter *parent) : QSplitterHandle(orientation, parent), widget(widget), title(title)
 {
     setContentsMargins(0,0,0,0);
-    setFixedHeight(24);
+    setFixedHeight(23);
 
     gcSplitter = parent;
 
@@ -168,7 +169,7 @@ GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Or
 
     titleToolbar = new QToolBar(this);
 #ifndef Q_OS_MAC
-    titleToolbar->setFixedHeight(20);
+    titleToolbar->setFixedHeight(23);
 #else
     titleToolbar->setFixedHeight(10);
 #endif
@@ -181,7 +182,7 @@ GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Or
 QSize
 GcSplitterHandle::sizeHint() const
 {
-    return QSize(200, 20);
+    return QSize(200, 23);
 }
 
 GcSubSplitter*
@@ -220,8 +221,13 @@ GcSplitterHandle::paintBackground(QPaintEvent *)
     QPainter painter(this);
 
     // background light gray for now?
+    painter.save();
     QRect all(0,0,width(),height());
     painter.drawTiledPixmap(all, isActiveWindow() ? active : inactive);
+    QPen black(QColor(100,100,100));
+    painter.setPen(black);
+    painter.drawLine(0,height()-1, width()-1, height()-1);
+    painter.restore();
 }
 
 void
@@ -257,8 +263,8 @@ GcSplitterHandle::showHideClicked()
 GcSplitterControl::GcSplitterControl(QWidget *parent) : QToolBar(parent)
 {
     setContentsMargins(0,0,0,0);
-    setFixedHeight(25);
-    setIconSize(QSize(18,18));
+    setFixedHeight(20);
+    setIconSize(QSize(16,16));
     setToolButtonStyle(Qt::ToolButtonIconOnly);
     setAutoFillBackground(false);
 
