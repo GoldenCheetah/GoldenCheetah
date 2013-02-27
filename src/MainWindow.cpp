@@ -173,7 +173,6 @@ MainWindow::MainWindow(const QDir &home) :
 
     setAttribute(Qt::WA_DeleteOnClose);
 
-
     // need to restore geometry before setUnifiedToolBar.. on Mac
     appsettings->setValue(GC_SETTINGS_LAST, home.dirName());
     QVariant geom = appsettings->value(this, GC_SETTINGS_MAIN_GEOM);
@@ -643,21 +642,25 @@ MainWindow::MainWindow(const QDir &home) :
     intervalSplitter = new QSplitter(this);
     intervalSplitter->setHandleWidth(1);
     intervalSplitter->setOrientation(Qt::Vertical);
-    intervalSplitter->addWidget(activityHistory);
     intervalSplitter->addWidget(intervalWidget);
     intervalSplitter->addWidget(intervalSummaryWindow);
     intervalSplitter->setFrameStyle(QFrame::NoFrame);
+    intervalSplitter->setCollapsible(0, false);
+    intervalSplitter->setCollapsible(1, false);
 
-    QVariant intervalSplitterSizes = appsettings->cvalue(cyclist, GC_SETTINGS_INTERVALSPLITTER_SIZES); 
-    if (intervalSplitterSizes != QVariant()) {
-        intervalSplitter->restoreState(intervalSplitterSizes.toByteArray());
-        intervalSplitter->setOpaqueResize(true); // redraw when released, snappier UI
-    } else {
-        QList<int> sizes;
-        sizes.append(400);
-        sizes.append(200);
-        sizes.append(200);
-        intervalSplitter->setSizes(sizes);
+    analItem = new GcSplitterItem(tr("Activities"), QIcon(QPixmap(":images/sidebar/folder.png")), this);
+    analItem->addWidget(activityHistory);
+    intervalItem = new GcSplitterItem(tr("Intervals"), QIcon(QPixmap(":images/mac/stop.png")), this);
+    intervalItem->addWidget(intervalSplitter);
+
+    analSidebar = new GcSplitter(Qt::Vertical);
+    analSidebar->addWidget(analItem);
+    analSidebar->addWidget(intervalItem);
+
+    QVariant analSplitterSizes = appsettings->cvalue(cyclist, GC_SETTINGS_INTERVALSPLITTER_SIZES); 
+    if (analSplitterSizes != QVariant()) {
+        analSidebar->restoreState(analSplitterSizes.toByteArray());
+        analSidebar->setOpaqueResize(true); // redraw when released, snappier UI
     }
 
     QTreeWidgetItem *last = NULL;
@@ -756,7 +759,7 @@ MainWindow::MainWindow(const QDir &home) :
     connect(ltmSidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChangedLTM(DateRange)));
     ltmSidebar->dateRangeTreeWidgetSelectionChanged(); // force an update to get first date range shown
 
-    toolBox->addWidget(intervalSplitter);
+    toolBox->addWidget(analSidebar);
     toolBox->addWidget(gcCalendar);
     toolBox->addWidget(trainTool->controls());
     toolBox->addWidget(ltmSidebar);
@@ -984,7 +987,7 @@ MainWindow::MainWindow(const QDir &home) :
     connect(intervalWidget,SIGNAL(itemSelectionChanged()), this, SLOT(intervalTreeWidgetSelectionChanged()));
     connect(intervalWidget,SIGNAL(itemChanged(QTreeWidgetItem *,int)), this, SLOT(intervalEdited(QTreeWidgetItem*, int)));
     connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
-    connect(intervalSplitter,SIGNAL(splitterMoved(int,int)), this, SLOT(intervalSplitterMoved(int,int)));
+    connect(analSidebar,SIGNAL(splitterMoved(int,int)), this, SLOT(analSidebarMoved(int,int)));
 
     connect(this, SIGNAL(rideDirty()), this, SLOT(enableSaveButton()));
     connect(this, SIGNAL(rideClean()), this, SLOT(enableSaveButton()));
@@ -1359,9 +1362,9 @@ MainWindow::resizeEvent(QResizeEvent*)
 }
 
 void
-MainWindow::intervalSplitterMoved(int /* pos */, int /*index*/)
+MainWindow::analSidebarMoved(int /* pos */, int /*index*/)
 {
-    appsettings->setCValue(cyclist, GC_SETTINGS_INTERVALSPLITTER_SIZES, intervalSplitter->saveState());
+    appsettings->setCValue(cyclist, GC_SETTINGS_INTERVALSPLITTER_SIZES, analSidebar->saveState());
 }
 
 void

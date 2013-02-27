@@ -93,6 +93,9 @@ GcSplitter::insertWidget(int index, QWidget *widget)
 GcSubSplitter::GcSubSplitter(Qt::Orientation orientation, GcSplitterControl *control, QWidget *parent) : QSplitter(orientation, parent), control(control)
 {
     _insertedWidget = NULL;
+
+    // we add a fake widget to ensure the first real widget
+    // that is added has a handle (even though it cannot be moved)
     QLabel *fake = new QLabel("fake");
     fake->setFixedHeight(0);
     setHandleWidth(0);
@@ -317,7 +320,7 @@ void
 GcSplitterItem::addWidget(QWidget *p)
 {
     content = p;
-    p->setContentsMargins(0,0,0,0);
+    //p->setContentsMargins(0,0,0,0);
     layout->addWidget(p);
 }
 

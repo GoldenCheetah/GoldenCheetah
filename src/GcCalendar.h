@@ -30,6 +30,8 @@
 #include "RideItem.h"
 #include "RideNavigator.h"
 
+#include "GcSideBarItem.h"
+
 // Catch signal, no background and do embossed text
 class GcLabel : public QLabel
 {
@@ -113,7 +115,9 @@ class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
         QList<FieldDefinition> fieldDefinitions;
         GcCalendarModel *calendarModel;
 
-        QSplitter *splitter; // calendar vs summary
+        GcSplitter *splitter; // calendar vs summary
+        GcSplitterItem *calendarItem,
+                       *summaryItem;
 
         QComboBox *summarySelect;
         QWebView *summary;

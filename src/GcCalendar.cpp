@@ -27,7 +27,6 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     setContentsMargins(0,0,0,0);
     setAutoFillBackground(true);
 
-    setStyleSheet("QLabel { color: gray; }");
     month = year = 0;
     _ride = NULL;
 
@@ -36,28 +35,32 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     mainLayout->setSpacing(0);
 
     // Splitter - cal at top, summary at bottom
-    splitter = new QSplitter(this);
-    splitter->setHandleWidth(1);
-    splitter->setOrientation(Qt::Vertical);
-    splitter->setFrameStyle(QFrame::NoFrame);
-
+    splitter = new GcSplitter(Qt::Vertical);
     mainLayout->addWidget(splitter);
     connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
 
+    // calendar
+    calendarItem = new GcSplitterItem(tr("Calendar"), QIcon(QPixmap(":images/sidebar/calendar.png")), this);
+    summaryItem = new GcSplitterItem(tr("Summary"), QIcon(QPixmap(":images/sidebar/dashboard.png")), this);
+
     // cal widget
     QWidget *cal = new QWidget(this);
-    cal->setContentsMargins(20,10,20,20);
+    cal->setContentsMargins(10,5,10,10);
+    cal->setStyleSheet("QLabel { color: gray; }");
     layout = new QVBoxLayout(cal);
     layout->setSpacing(0);
     layout->setContentsMargins(0,0,0,0);
-    splitter->addWidget(cal);
+    calendarItem->addWidget(cal);
 
     // summary widget
     QWidget *sum = new QWidget(this);
     sum->setContentsMargins(0,0,0,0);
     QVBoxLayout *slayout = new QVBoxLayout(sum);
     slayout->setSpacing(0);
-    splitter->addWidget(sum);
+    summaryItem->addWidget(sum);
+
+    splitter->addWidget(calendarItem);
+    splitter->addWidget(summaryItem);
 
     black.setColor(QPalette::WindowText, Qt::gray);
     white.setColor(QPalette::WindowText, Qt::white);
@@ -274,11 +277,6 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     if (splitterSizes != QVariant()) {
         splitter->restoreState(splitterSizes.toByteArray());
         splitter->setOpaqueResize(true); // redraw when released, snappier UI
-    } else {
-        QList<int> sizes;
-        sizes.append(400);
-        sizes.append(400);
-        splitter->setSizes(sizes);
     }
 
     // summary mode changed
