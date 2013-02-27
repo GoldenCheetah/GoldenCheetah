@@ -41,9 +41,6 @@
 
 LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), home(home), main(parent), active(false)
 {
-    setStyleSheet("QFrame { FrameStyle = QFrame::NoFrame };"
-                  "QWidget { background = Qt::white; border:0 px; margin: 2px; };");
-
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0,0,0,0);
     mainLayout->setSpacing(0);
@@ -91,7 +88,6 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     QAction *moreEventAct = new QAction(QIcon(QPixmap(":images/sidebar/extra.png")), tr(">>"), this);
     eventsWidget->addAction(moreEventAct);
     connect(moreEventAct, SIGNAL(triggered(void)), this, SLOT(eventPopup(void)));
-
 
 
     eventTree = new QTreeWidget;
@@ -145,11 +141,6 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     if (splitterSizes != QVariant()) {
         splitter->restoreState(splitterSizes.toByteArray());
         splitter->setOpaqueResize(true); // redraw when released, snappier UI
-    } else {
-        QList<int> sizes;
-        sizes.append(400);
-        sizes.append(400);
-        splitter->setSizes(sizes);
     }
 
     // our date ranges

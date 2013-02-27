@@ -30,7 +30,7 @@
 #define GC_SETTINGS_MAIN_Y          "mainwindow/y"
 #define GC_SETTINGS_MAIN_GEOM       "mainwindow/geometry"
 #define GC_SETTINGS_CALSPLITTER_SIZES  "mainwindow/calsplitterSizes"
-#define GC_SETTINGS_LTMSPLITTER_SIZES  "mainwindow/ltmsplitterSizes"
+#define GC_SETTINGS_LTMSPLITTER_SIZES  "mainwindow/ltmSideBarSizes"
 #define GC_SETTINGS_INTERVALSPLITTER_SIZES  "mainwindow/intervalsplitterSizes"
 #define GC_SETTINGS_SPLITTER_SIZES  "mainwindow/splitterSizes"
 #define GC_SETTINGS_SUMMARYSPLITTER_SIZES "mainwindow/summarysplittersizes"

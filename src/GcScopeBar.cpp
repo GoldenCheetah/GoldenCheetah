@@ -22,7 +22,7 @@
 
 GcScopeBar::GcScopeBar(QWidget *parent, QWidget *traintool) : QWidget(parent)
 {
-    setFixedHeight(25);
+    setFixedHeight(23);
     setContentsMargins(10,0,10,0);
     layout = new QHBoxLayout(this);
     layout->setSpacing(2);
@@ -99,9 +99,16 @@ GcScopeBar::paintBackground(QPaintEvent *)
     // setup a painter and the area to paint
     QPainter painter(this);
 
+    painter.save();
+
     // background light gray for now?
     QRect all(0,0,width(),height());
     painter.drawTiledPixmap(all, isActiveWindow() ? active : inactive);
+    QPen black(QColor(100,100,100));
+    painter.setPen(black);
+    painter.drawLine(0,height()-1,width()-1,height()-1);
+
+    painter.restore();
 }
 
 void
