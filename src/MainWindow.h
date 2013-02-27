@@ -74,6 +74,8 @@ class BlankStateAnalysisPage;
 class BlankStateHomePage;
 class BlankStateDiaryPage;
 class BlankStateTrainPage;
+class GcSplitter;
+class GcSplitterItem;
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 extern QDesktopWidget *desktop;         // how many screens / res etc
@@ -275,7 +277,7 @@ class MainWindow : public QMainWindow
         void rideTreeWidgetSelectionChanged();
         void intervalTreeWidgetSelectionChanged();
         void splitterMoved(int, int);
-        void intervalSplitterMoved(int, int);
+        void analSidebarMoved(int, int);
         void newCyclist();
         void openCyclist();
         void downloadRide();
@@ -428,6 +430,11 @@ class MainWindow : public QMainWindow
         QSplitter *splitter;
         QSplitter *metaSplitter;
         QTreeWidget *treeWidget;
+
+        // sidebar splitter
+        GcSplitter *analSidebar;
+        GcSplitterItem *analItem, *intervalItem;
+
         QSplitter *intervalSplitter;
         IntervalTreeView *intervalWidget;
 
