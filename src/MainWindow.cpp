@@ -623,11 +623,11 @@ MainWindow::MainWindow(const QDir &home) :
     intervalWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     intervalWidget->setFrameStyle(QFrame::NoFrame);
 
-    allIntervals = new QTreeWidgetItem(intervalWidget, FOLDER_TYPE);
+    //allIntervals = new QTreeWidgetItem(intervalWidget, FOLDER_TYPE);
+    allIntervals = intervalWidget->invisibleRootItem();
     allIntervals->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsDropEnabled);
 
     allIntervals->setText(0, tr("Intervals"));
-    intervalWidget->expandItem(allIntervals);
 
     QWidget *activityHistory = new QWidget(this);
     activityHistory->setContentsMargins(0,0,0,0);
