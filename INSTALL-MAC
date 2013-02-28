@@ -277,6 +277,11 @@ note: the added CXXFLAGS helped clear the -Werror flag that stopped compilation.
 ------------------------------------------
 
 libusb (0.1.12)
+
+To compile on OSX you need to apply the patch here:
+https://trac.macports.org/browser/trunk/dports/devel/libusb-legacy/files?rev=97840
+
+Then:
 ./configure --prefix=/opt/libusb/ CFLAGS="-arch x86_64" CXXFLAGS="-arch x86_64" --disable-dependency-tracking
 then 
 sed -i 'bak' 's|CC -dynamiclib|CC -dynamiclib -arch x86_64|g' libtool
