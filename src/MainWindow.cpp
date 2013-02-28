@@ -812,16 +812,12 @@ MainWindow::MainWindow(const QDir &home) :
     if (splitterSizes.toByteArray().size() > 1 ) {
         splitter->restoreState(splitterSizes.toByteArray());
         splitter->setOpaqueResize(true); // redraw when released, snappier UI
-    } else {
-        QList<int> sizes;
-        sizes.append(150); // narrow as possible
-        sizes.append(390);
-        splitter->setSizes(sizes);
     }
+
     splitter->setStretchFactor(0,0);
     splitter->setStretchFactor(1,1);
-
-    splitter->setChildrenCollapsible(false); // QT BUG crash QTextLayout do not undo this
+    splitter->setCollapsible(0, true);
+    splitter->setCollapsible(1, false);
     splitter->setHandleWidth(1);
     splitter->setStyleSheet(" QSplitter::handle { background-color: rgb(120,120,120); color: darkGray; }");
     splitter->setFrameStyle(QFrame::NoFrame);
@@ -1035,9 +1031,24 @@ MainWindow::showSidebar(bool want)
     static const QIcon showIcon(":images/toolbar/main/showside.png");
 
     if (want) {
+
         toolBox->show();
         side->setIcon(hideIcon);
+
+        // if it was collapsed we need set to at least 200
+        // unless the mainwindow isn't big enough
+        if (toolBox->width()<10) {
+            int size = width() - 200;
+            if (size>200) size = 200;
+
+            QList<int> sizes;
+            sizes.append(size);
+            sizes.append(width()-size);
+            splitter->setSizes(sizes);
+        }
+
     } else {
+
         toolBox->hide();
         side->setIcon(showIcon);
     }
@@ -1370,6 +1381,9 @@ MainWindow::analSidebarMoved(int /* pos */, int /*index*/)
 void
 MainWindow::splitterMoved(int pos, int /*index*/)
 {
+    // show / hide sidebar as dragged..
+    if ((pos == 0  && toolBox->isVisible()) || (pos>10 && !toolBox->isVisible())) toggleSidebar();
+
     listView->setWidth(pos);
     appsettings->setCValue(cyclist, GC_SETTINGS_SPLITTER_SIZES, splitter->saveState());
 }
