@@ -180,6 +180,8 @@ GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Or
     titleToolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
     titleLayout->addWidget(titleToolbar);
+
+    setCursor(Qt::ArrowCursor);
 }
 
 QSize
