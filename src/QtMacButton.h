@@ -58,6 +58,7 @@ public slots:
     void setImage(const QPixmap *image);
     void setChecked(bool checked);
     void setWidth(int x);
+    void setSelected(bool x);
     void setIconAndText();
 
 public:

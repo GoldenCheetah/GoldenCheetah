@@ -448,6 +448,7 @@ class MainWindow : public QMainWindow
         // Mac Native Support
         QWidget *macAnalButtons;
         QtMacButton *import, *compose;
+        QtMacButton *sidebar;
         QtMacSegmentedButton *styleSelector;
         QToolBar *head;
         GcScopeBar *scopebar;
