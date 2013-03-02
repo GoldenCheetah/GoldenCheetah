@@ -117,7 +117,6 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     splitter = new GcSplitter(Qt::Vertical);
     splitter->addWidget(seasonsWidget);
     splitter->addWidget(eventsWidget);
-    connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
 
     GcSplitterItem *summaryWidget = new GcSplitterItem(tr("Summary"), iconFromPNG(":images/sidebar/dashboard.png"), this);
 
@@ -136,12 +135,7 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
 
     mainLayout->addWidget(splitter);
 
-    // restore splitter
-    QVariant splitterSizes = appsettings->cvalue(main->cyclist, GC_SETTINGS_LTMSPLITTER_SIZES); 
-    if (splitterSizes != QVariant()) {
-        splitter->restoreState(splitterSizes.toByteArray());
-        splitter->setOpaqueResize(true); // redraw when released, snappier UI
-    }
+    splitter->prepare(main->cyclist, "LTM");
 
     // our date ranges
     connect(dateRangeTree,SIGNAL(itemSelectionChanged()), this, SLOT(dateRangeTreeWidgetSelectionChanged()));
@@ -716,10 +710,4 @@ LTMSidebar::setSummary(DateRange dateRange)
         summary->page()->mainFrame()->setHtml(summaryText);
 
     }
-}
-
-void
-LTMSidebar::splitterMoved(int, int)
-{
-    appsettings->setCValue(main->cyclist, GC_SETTINGS_LTMSPLITTER_SIZES, splitter->saveState());
 }

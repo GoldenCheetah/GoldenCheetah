@@ -37,7 +37,6 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     // Splitter - cal at top, summary at bottom
     splitter = new GcSplitter(Qt::Vertical);
     mainLayout->addWidget(splitter);
-    connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
 
     // calendar
     calendarItem = new GcSplitterItem(tr("Calendar"), iconFromPNG(":images/sidebar/calendar.png"), this);
@@ -61,6 +60,8 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
 
     splitter->addWidget(calendarItem);
     splitter->addWidget(summaryItem);
+
+    splitter->prepare(main->cyclist, "diary");
 
     black.setColor(QPalette::WindowText, Qt::gray);
     white.setColor(QPalette::WindowText, Qt::white);
@@ -271,13 +272,6 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     summary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
     slayout->addWidget(summary);
     slayout->addStretch();
-
-    // restore splitter
-    QVariant splitterSizes = appsettings->cvalue(main->cyclist, GC_SETTINGS_CALSPLITTER_SIZES); 
-    if (splitterSizes != QVariant()) {
-        splitter->restoreState(splitterSizes.toByteArray());
-        splitter->setOpaqueResize(true); // redraw when released, snappier UI
-    }
 
     // summary mode changed
     connect(summarySelect, SIGNAL(currentIndexChanged(int)), this, SLOT(refresh()));
@@ -707,10 +701,4 @@ GcCalendar::setSummary()
         emit dateRangeChanged(DateRange(from, to, name));
 
     }
-}
-
-void
-GcCalendar::splitterMoved(int /*pos*/, int /*index*/)
-{
-    appsettings->setCValue(main->cyclist, GC_SETTINGS_CALSPLITTER_SIZES, splitter->saveState());
 }

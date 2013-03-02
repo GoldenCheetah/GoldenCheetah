@@ -667,12 +667,7 @@ MainWindow::MainWindow(const QDir &home) :
     analSidebar = new GcSplitter(Qt::Vertical);
     analSidebar->addWidget(analItem);
     analSidebar->addWidget(intervalItem);
-
-    QVariant analSplitterSizes = appsettings->cvalue(cyclist, GC_SETTINGS_INTERVALSPLITTER_SIZES); 
-    if (analSplitterSizes != QVariant()) {
-        analSidebar->restoreState(analSplitterSizes.toByteArray());
-        analSidebar->setOpaqueResize(true); // redraw when released, snappier UI
-    }
+    analSidebar->prepare(cyclist, "analysis");
 
     QTreeWidgetItem *last = NULL;
     QStringListIterator i(RideFileFactory::instance().listRideFiles(home));
@@ -994,7 +989,6 @@ MainWindow::MainWindow(const QDir &home) :
     connect(intervalWidget,SIGNAL(itemSelectionChanged()), this, SLOT(intervalTreeWidgetSelectionChanged()));
     connect(intervalWidget,SIGNAL(itemChanged(QTreeWidgetItem *,int)), this, SLOT(intervalEdited(QTreeWidgetItem*, int)));
     connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
-    connect(analSidebar,SIGNAL(splitterMoved(int,int)), this, SLOT(analSidebarMoved(int,int)));
 
     connect(this, SIGNAL(rideDirty()), this, SLOT(enableSaveButton()));
     connect(this, SIGNAL(rideClean()), this, SLOT(enableSaveButton()));
@@ -1384,12 +1378,6 @@ MainWindow::resizeEvent(QResizeEvent*)
     head->updateGeometry();
     repaint();
 #endif
-}
-
-void
-MainWindow::analSidebarMoved(int /* pos */, int /*index*/)
-{
-    appsettings->setCValue(cyclist, GC_SETTINGS_INTERVALSPLITTER_SIZES, analSidebar->saveState());
 }
 
 void

@@ -86,7 +86,6 @@ class LTMSidebar : public QWidget
 
         // gui components
         void setSummary(DateRange);
-        void splitterMoved(int, int);
 
     private:
 

@@ -45,15 +45,21 @@ public:
     QByteArray saveState() const;
     bool restoreState(const QByteArray &state);
 
-Q_SIGNALS:
+    void prepare(QString cyclist, QString name); // get ready for first show, you're now configured
+                                // I'm gonna call you "name" -- which is used to
+                                // save and restore state
+
+signals:
     void splitterMoved(int pos, int index);
 
 public slots:
     void subSplitterMoved(int pos, int index);
+    void saveSettings();
 
 private:
     GcSubSplitter *splitter;
     GcSplitterControl *control;
+    QString cyclist, name;
 };
 
 class GcSubSplitter : public QSplitter
@@ -61,7 +67,7 @@ class GcSubSplitter : public QSplitter
     Q_OBJECT
 
 public:
-    GcSubSplitter(Qt::Orientation orientation, GcSplitterControl *control, QWidget *parent = 0);
+    GcSubSplitter(Qt::Orientation orientation, GcSplitterControl *control, GcSplitter *parent);
 
     void addWidget(QWidget *widget);
     void insertWidget(int index, QWidget *widget);
@@ -74,6 +80,7 @@ private:
     QWidget * _insertedWidget;
 
     GcSplitterControl *control;
+    GcSplitter *gcSplitter;
 
 };
 

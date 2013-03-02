@@ -85,9 +85,6 @@ class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
         bool event(QEvent *e);
         void setSummary(); // set the summary at the bottom
 
-        // summary metrics aggregator -- refactor later
-        void splitterMoved(int pos, int index);
-
     signals:
         void dateRangeChanged(DateRange);
 
