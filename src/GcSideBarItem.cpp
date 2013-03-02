@@ -235,7 +235,11 @@ GcSplitterHandle::paintBackground(QPaintEvent *)
     QRect all(0,0,width(),height());
 
     // fill with a linear gradient
+#ifdef Q_OS_MAC
     int shade = isActiveWindow() ? 178 : 225;
+#else
+    int shade = isActiveWindow() ? 200 : 250;
+#endif
     QLinearGradient linearGradient(0, 0, 0, height());
     linearGradient.setColorAt(0.0, QColor(shade,shade,shade, 100));
     linearGradient.setColorAt(0.5, QColor(shade,shade,shade, 180));
@@ -305,7 +309,11 @@ GcSplitterControl::paintBackground(QPaintEvent *)
     QPainter painter(this);
 
     // fill with a linear gradient
+#ifdef Q_OS_MAC
     int shade = isActiveWindow() ? 178 : 225;
+#else
+    int shade = isActiveWindow() ? 200 : 250;
+#endif
     QLinearGradient linearGradient(0, 0, 0, height());
     linearGradient.setColorAt(0.0, QColor(shade,shade,shade, 100));
     linearGradient.setColorAt(0.5, QColor(shade,shade,shade, 180));
