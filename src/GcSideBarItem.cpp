@@ -159,7 +159,7 @@ GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Or
     font.setFamily("Lucida Grande");
     font.setPointSize(11);
 #else
-    titleLabel->setYOff(1);
+    titleLabel->setYOff(2);
     font.setFamily("Helvetica");
     font.setPointSize(10);
 #endif
