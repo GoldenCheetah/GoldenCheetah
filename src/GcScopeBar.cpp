@@ -93,20 +93,24 @@ GcScopeBar::paintEvent (QPaintEvent *event)
 void
 GcScopeBar::paintBackground(QPaintEvent *)
 {
-    static QPixmap active = QPixmap(":images/mac/scope-active.png");
-    static QPixmap inactive = QPixmap(":images/scope-inactive.png");
-
-    // setup a painter and the area to paint
     QPainter painter(this);
 
     painter.save();
-
-    // background light gray for now?
     QRect all(0,0,width(),height());
-    painter.drawTiledPixmap(all, isActiveWindow() ? active : inactive);
+
+    // fill with a linear gradient
+    int shade = isActiveWindow() ? 178 : 225;
+    QLinearGradient linearGradient(0, 0, 0, height());
+    linearGradient.setColorAt(0.0, QColor(shade,shade,shade, 100));
+    linearGradient.setColorAt(0.5, QColor(shade,shade,shade, 180));
+    linearGradient.setColorAt(1.0, QColor(shade,shade,shade, 255));
+    linearGradient.setSpread(QGradient::PadSpread);
+    painter.setPen(Qt::NoPen);
+    painter.fillRect(all, linearGradient);
+
     QPen black(QColor(100,100,100));
     painter.setPen(black);
-    painter.drawLine(0,height()-1,width()-1,height()-1);
+    painter.drawLine(0,height()-1, width()-1, height()-1);
 
     painter.restore();
 }
