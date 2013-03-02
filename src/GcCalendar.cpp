@@ -40,8 +40,8 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
 
     // calendar
-    calendarItem = new GcSplitterItem(tr("Calendar"), QIcon(QPixmap(":images/sidebar/calendar.png")), this);
-    summaryItem = new GcSplitterItem(tr("Summary"), QIcon(QPixmap(":images/sidebar/dashboard.png")), this);
+    calendarItem = new GcSplitterItem(tr("Calendar"), iconFromPNG(":images/sidebar/calendar.png"), this);
+    summaryItem = new GcSplitterItem(tr("Summary"), iconFromPNG(":images/sidebar/dashboard.png"), this);
 
     // cal widget
     QWidget *cal = new QWidget(this);

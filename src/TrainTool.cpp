@@ -283,8 +283,8 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
 
     trainSplitter = new GcSplitter(Qt::Vertical);
     trainSplitter->setContentsMargins(0,0,0,0);
-    deviceItem = new GcSplitterItem(tr("Devices"), QIcon(QPixmap(":images/sidebar/power.png")), this);
-    workoutItem = new GcSplitterItem(tr("Workouts"), QIcon(QPixmap(":images/sidebar/folder.png")), this);
+    deviceItem = new GcSplitterItem(tr("Devices"), iconFromPNG(":images/sidebar/power.png"), this);
+    workoutItem = new GcSplitterItem(tr("Workouts"), iconFromPNG(":images/sidebar/folder.png"), this);
     deviceItem->addWidget(deviceTree);
     trainSplitter->addWidget(deviceItem);
     workoutItem->addWidget(workoutTree);
@@ -292,7 +292,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     cl->addWidget(trainSplitter);
 
 #if defined Q_OS_MAC || defined GC_HAVE_VLC
-    mediaItem = new GcSplitterItem(tr("Media"), QIcon(QPixmap(":images/sidebar/movie.png")), this);
+    mediaItem = new GcSplitterItem(tr("Media"), iconFromPNG(":images/sidebar/movie.png"), this);
     mediaItem->addWidget(mediaTree);
     trainSplitter->addWidget(mediaItem);
 #endif
