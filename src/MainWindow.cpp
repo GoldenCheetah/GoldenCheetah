@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2006 Sean C. Rhea (srhea@srhea.net)
+ * Copyright (c) 2013 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -243,7 +244,15 @@ MainWindow::MainWindow(const QDir &home) :
     QHBoxLayout *pp = new QHBoxLayout(acts);
     pp->setContentsMargins(0,0,0,0);
     pp->setContentsMargins(0,0,0,0);
-    pp->setSpacing(0);
+    pp->setSpacing(5);
+    sidebar = new QtMacButton(this, QtMacButton::TexturedRounded);
+    QPixmap *sidebarImg = new QPixmap(":images/mac/sidebar.png");
+    sidebar->setImage(sidebarImg);
+    sidebar->setMinimumSize(25, 25);
+    sidebar->setMaximumSize(25, 25);
+    sidebar->setToolTip("Sidebar");
+    sidebar->setSelected(true); // assume always start up with sidebar selected
+
     QtMacSegmentedButton *actbuttons = new QtMacSegmentedButton(3, acts);
     actbuttons->setWidth(115);
     actbuttons->setNoSelect();
@@ -261,12 +270,14 @@ MainWindow::MainWindow(const QDir &home) :
     viewsel->setContentsMargins(0,0,0,0);
     QHBoxLayout *pq = new QHBoxLayout(viewsel);
     pq->setContentsMargins(0,0,0,0);
-    pq->setSpacing(0);
+    pq->setSpacing(5);
+    pq->addWidget(sidebar);
     styleSelector = new QtMacSegmentedButton(2, viewsel);
     styleSelector->setWidth(80); // actually its 80 but we want a 30px space between is and the searchbox
     styleSelector->setImage(0, new QPixmap(":images/mac/tabbed.png"), 24);
     styleSelector->setImage(1, new QPixmap(":images/mac/tiled.png"), 24);
     pq->addWidget(styleSelector);
+    connect(sidebar, SIGNAL(clicked(bool)), this, SLOT(toggleSidebar()));
     connect(styleSelector, SIGNAL(clicked(int,bool)), this, SLOT(toggleStyle()));
 
     // setup Mac thetoolbar
@@ -1022,6 +1033,9 @@ void
 MainWindow::toggleSidebar()
 {
     showSidebar(!toolBox->isVisible());
+#ifdef Q_OS_MAC
+    sidebar->setSelected(toolBox->isVisible());
+#endif
 }
 
 void

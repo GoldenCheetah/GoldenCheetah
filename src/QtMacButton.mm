@@ -232,6 +232,15 @@ void QtMacButton::setText(const QString &text)
     [qtw->nsButton setTitle:fromQString(text)];
 }
 
+void QtMacButton::setSelected(bool x)
+{
+    Q_ASSERT(qtw);
+    if (qtw) {
+        [qtw->nsButton setButtonType:NSOnOffButton];
+        [qtw->nsButton setState:(x ? NSOnState : NSOffState)];
+    }
+}
+
 void QtMacButton::setImage(const QPixmap *image)
 {
     Q_ASSERT(qtw);
