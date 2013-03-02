@@ -536,7 +536,7 @@ GcLabel::paintEvent(QPaintEvent *e)
     }
 
     QPalette r; // want gray
-    r.setColor(QPalette::WindowText, QColor(0,0,0,200));
+    r.setColor(QPalette::WindowText, QColor(0,0,0,170));
     setPalette(r);
     QLabel::paintEvent(e);
 }
