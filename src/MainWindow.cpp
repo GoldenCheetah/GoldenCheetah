@@ -1611,13 +1611,13 @@ MainWindow::selectAnalysis()
         views->setCurrentWidget(blankStateAnalysisPage);
     } else {
         masterControls->setVisible(true);
-        toolBox->show();
+        //toolBox->show();
 #ifndef Q_OS_MAC
         side->setEnabled(true);
 #else
         scopebar->setEnabledHideButton(true);
 #endif
-		this->showSidebar(true);
+		//this->showSidebar(true);
         masterControls->setCurrentIndex(0);
         views->setCurrentIndex(0);
         analWindow->selected(); // tell it!
@@ -1654,13 +1654,13 @@ MainWindow::selectTrain()
         views->setCurrentWidget(blankStateTrainPage);
     } else {
         masterControls->setVisible(true);
-        toolBox->show();
+        //toolBox->show();
 #ifndef Q_OS_MAC
         side->setEnabled(true);
 #else
         scopebar->setEnabledHideButton(true);
 #endif
-		this->showSidebar(true);
+		//this->showSidebar(true);
         masterControls->setCurrentIndex(1);
         views->setCurrentIndex(1);
         trainWindow->selected(); // tell it!
@@ -1695,13 +1695,13 @@ MainWindow::selectDiary()
         views->setCurrentWidget(blankStateDiaryPage);
     } else {
         masterControls->setVisible(true);
-        toolBox->show();
+        //toolBox->show();
 #ifndef Q_OS_MAC
         side->setEnabled(true);
 #else
         scopebar->setEnabledHideButton(true);
 #endif
-		this->showSidebar(true);
+		//this->showSidebar(true);
         masterControls->setCurrentIndex(2);
         views->setCurrentIndex(2);
         diaryWindow->selected(); // tell it!
@@ -1734,13 +1734,13 @@ MainWindow::selectHome()
         views->setCurrentWidget(blankStateHomePage);
     } else {
         masterControls->setVisible(true);
-        toolBox->show();
+        //toolBox->show();
 #ifndef Q_OS_MAC
         side->setEnabled(true);
 #else
         scopebar->setEnabledHideButton(true);
 #endif
-		this->showSidebar(true);
+		//this->showSidebar(true);
         masterControls->setCurrentIndex(3);
         views->setCurrentIndex(3);
         homeWindow->selected(); // tell it!
