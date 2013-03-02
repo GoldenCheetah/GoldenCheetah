@@ -19,6 +19,19 @@
 #include "GcSideBarItem.h"
 #include "GcCalendar.h"
 
+QIcon iconFromPNG(QString filename)
+{
+    QImage pngImage;
+    pngImage.load(filename);
+
+    // use muted dark gray color
+    QImage result = pngImage.convertToFormat(QImage::Format_Indexed8);
+    result.setColor(0, QColor(80,80,80, 255).rgb());
+
+    QIcon icon(QPixmap::fromImage(result));
+    return icon;
+}
+
 GcSplitter::GcSplitter(Qt::Orientation orientation, QWidget *parent) : QWidget(parent)
 {
 
@@ -286,7 +299,7 @@ GcSplitterControl::GcSplitterControl(QWidget *parent) : QToolBar(parent)
 {
     setContentsMargins(0,0,0,0);
     setFixedHeight(20);
-    setIconSize(QSize(16,16));
+    setIconSize(QSize(14,14));
     setToolButtonStyle(Qt::ToolButtonIconOnly);
     setAutoFillBackground(false);
 

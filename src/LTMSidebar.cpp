@@ -46,15 +46,15 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     mainLayout->setSpacing(0);
     setContentsMargins(0,0,0,0);
 
-    seasonsWidget = new GcSplitterItem(tr("Date Ranges"), QIcon(QPixmap(":images/sidebar/calendar.png")), this);
+    seasonsWidget = new GcSplitterItem(tr("Date Ranges"), iconFromPNG(":images/sidebar/calendar.png"), this);
 
-    QAction *addSeasonAct = new QAction(QIcon(QPixmap(":images/sidebar/plus.png")), tr("Add Date Range"), this);
+    QAction *addSeasonAct = new QAction(iconFromPNG(":images/sidebar/plus.png"), tr("Add Date Range"), this);
     seasonsWidget->addAction(addSeasonAct);
     connect(addSeasonAct, SIGNAL(triggered(void)), this, SLOT(addRange(void)));
-    QAction *removeSeasonAct = new QAction(QIcon(QPixmap(":images/sidebar/minus.png")), tr("Delete Date Range"), this);
+    QAction *removeSeasonAct = new QAction(iconFromPNG(":images/sidebar/minus.png"), tr("Delete Date Range"), this);
     seasonsWidget->addAction(removeSeasonAct);
     connect(removeSeasonAct, SIGNAL(triggered(void)), this, SLOT(deleteRange(void)));
-    QAction *moreSeasonAct = new QAction(QIcon(QPixmap(":images/sidebar/extra.png")), tr("Menu"), this);
+    QAction *moreSeasonAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
     seasonsWidget->addAction(moreSeasonAct);
     connect(moreSeasonAct, SIGNAL(triggered(void)), this, SLOT(dateRangePopup(void)));
 
@@ -77,15 +77,15 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     seasonsWidget->addWidget(dateRangeTree);
 
 
-    eventsWidget = new GcSplitterItem(tr("Events"), QIcon(QPixmap(":images/sidebar/bookmark.png")), this);
+    eventsWidget = new GcSplitterItem(tr("Events"), iconFromPNG(":images/sidebar/bookmark.png"), this);
 
-    QAction *addEventAct = new QAction(QIcon(QPixmap(":images/sidebar/plus.png")), tr("Add Event"), this);
+    QAction *addEventAct = new QAction(iconFromPNG(":images/sidebar/plus.png"), tr("Add Event"), this);
     eventsWidget->addAction(addEventAct);
     connect(addEventAct, SIGNAL(triggered(void)), this, SLOT(addEvent(void)));
-    QAction *removeEventAct = new QAction(QIcon(QPixmap(":images/sidebar/minus.png")), tr("Delete Event"), this);
+    QAction *removeEventAct = new QAction(iconFromPNG(":images/sidebar/minus.png"), tr("Delete Event"), this);
     eventsWidget->addAction(removeEventAct);
     connect(removeEventAct, SIGNAL(triggered(void)), this, SLOT(deleteEvent(void)));
-    QAction *moreEventAct = new QAction(QIcon(QPixmap(":images/sidebar/extra.png")), tr("Menu"), this);
+    QAction *moreEventAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
     eventsWidget->addAction(moreEventAct);
     connect(moreEventAct, SIGNAL(triggered(void)), this, SLOT(eventPopup(void)));
 
@@ -119,7 +119,7 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     splitter->addWidget(eventsWidget);
     connect(splitter,SIGNAL(splitterMoved(int,int)), this, SLOT(splitterMoved(int,int)));
 
-    GcSplitterItem *summaryWidget = new GcSplitterItem(tr("Summary"), QIcon(QPixmap(":images/sidebar/dashboard.png")), this);
+    GcSplitterItem *summaryWidget = new GcSplitterItem(tr("Summary"), iconFromPNG(":images/sidebar/dashboard.png"), this);
 
     summary = new QWebView(this);
     summary->setContentsMargins(0,0,0,0);

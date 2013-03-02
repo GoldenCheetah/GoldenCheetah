@@ -159,4 +159,5 @@ private:
 
 };
 
+extern QIcon iconFromPNG(QString filename);
 #endif

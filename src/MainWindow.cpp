@@ -659,9 +659,9 @@ MainWindow::MainWindow(const QDir &home) :
     intervalSplitter->setCollapsible(0, false);
     intervalSplitter->setCollapsible(1, false);
 
-    analItem = new GcSplitterItem(tr("Activities"), QIcon(QPixmap(":images/sidebar/folder.png")), this);
+    analItem = new GcSplitterItem(tr("Activities"), iconFromPNG(":images/sidebar/folder.png"), this);
     analItem->addWidget(activityHistory);
-    intervalItem = new GcSplitterItem(tr("Intervals"), QIcon(QPixmap(":images/mac/stop.png")), this);
+    intervalItem = new GcSplitterItem(tr("Intervals"), iconFromPNG(":images/mac/stop.png"), this);
     intervalItem->addWidget(intervalSplitter);
 
     analSidebar = new GcSplitter(Qt::Vertical);
