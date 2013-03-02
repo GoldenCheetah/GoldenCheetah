@@ -355,7 +355,7 @@ LTMPlot::setData(LTMSettings *set)
                 double y = (double) ydata[i];
 
                 xaxis[offset] = x +left;
-                yaxis[offset] = 0;
+                yaxis[offset] = metricDetail.baseline; // use baseline not 0, default is 0
                 offset++;
                 xaxis[offset] = x+left;
                 yaxis[offset] = y;
@@ -364,7 +364,7 @@ LTMPlot::setData(LTMSettings *set)
                 yaxis[offset] = y;
                 offset++;
                 xaxis[offset] = x +right;
-                yaxis[offset] = 0;
+                yaxis[offset] = metricDetail.baseline;; // use baseline not 0, default is 0
                 offset++;
             }
             xdata = xaxis;
@@ -639,7 +639,7 @@ LTMPlot::setData(LTMSettings *set)
                 double y = (double) ydata[i];
 
                 xaxis[offset] = x +left;
-                yaxis[offset] = 0;
+                yaxis[offset] = metricDetail.baseline;; // use baseline not 0, default is 0
                 offset++;
                 xaxis[offset] = x+left;
                 yaxis[offset] = y;
@@ -648,7 +648,7 @@ LTMPlot::setData(LTMSettings *set)
                 yaxis[offset] = y;
                 offset++;
                 xaxis[offset] = x +right;
-                yaxis[offset] = 0;
+                yaxis[offset] = metricDetail.baseline;; // use baseline not 0, default is 0
                 offset++;
             }
             xdata = xaxis;
