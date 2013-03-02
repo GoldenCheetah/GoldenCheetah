@@ -56,6 +56,46 @@ GcSplitter::GcSplitter(Qt::Orientation orientation, QWidget *parent) : QWidget(p
 }
 
 void
+GcSplitter::prepare(QString cyclist, QString name)
+{
+    this->name = name;
+    this->cyclist = cyclist;
+
+    // get saved state
+    QString statesetting = QString("splitter/%1/sizes").arg(name);
+    QVariant sizes = appsettings->cvalue(cyclist, statesetting); 
+    if (sizes != QVariant()) {
+        splitter->restoreState(sizes.toByteArray());
+        splitter->setOpaqueResize(true); // redraw when released, snappier UI
+    }
+
+    // should we hide / show each widget?
+    for(int i=0; i<splitter->count(); i++) {
+        QString hidesetting = QString("splitter/%1/hide/%2").arg(name).arg(i);
+        QVariant hidden = appsettings->cvalue(cyclist, hidesetting);
+        if (i && hidden != QVariant()) {
+            if (hidden.toBool() == true) {
+                splitter->widget(i)->hide();
+            }
+        }
+    }
+}
+
+void
+GcSplitter::saveSettings()
+{
+    // get saved state
+    QString statesetting = QString("splitter/%1/sizes").arg(name);
+    appsettings->setCValue(cyclist, statesetting, splitter->saveState()); 
+
+    // should we hide / show each widget?
+    for(int i=0; i<splitter->count(); i++) {
+        QString hidesetting = QString("splitter/%1/hide/%2").arg(name).arg(i);
+        appsettings->setCValue(cyclist, hidesetting, QVariant(splitter->widget(i)->isHidden()));
+    }
+}
+
+void
 GcSplitter::setOpaqueResize(bool opaque)
 {
     return splitter->setOpaqueResize(opaque);
@@ -88,6 +128,7 @@ GcSplitter::restoreState(const QByteArray &state)
 void
 GcSplitter::subSplitterMoved(int pos, int index)
 {
+   saveSettings();
    emit splitterMoved(pos, index);
 }
 
@@ -103,7 +144,7 @@ GcSplitter::insertWidget(int index, QWidget *widget)
     splitter->insertWidget(index, widget);
 }
 
-GcSubSplitter::GcSubSplitter(Qt::Orientation orientation, GcSplitterControl *control, QWidget *parent) : QSplitter(orientation, parent), control(control)
+GcSubSplitter::GcSubSplitter(Qt::Orientation orientation, GcSplitterControl *control, GcSplitter *parent) : QSplitter(orientation, parent), control(control), gcSplitter (parent)
 {
     _insertedWidget = NULL;
 
@@ -144,6 +185,7 @@ GcSubSplitter::createHandle()
             control->addAction(_item->controlAction);
 
             connect(_item->controlAction, SIGNAL(triggered(void)), _item, SLOT(selectHandle(void)));
+            connect(_item->controlAction, SIGNAL(triggered(void)), gcSplitter, SLOT(saveSettings()));
             return _item->splitterHandle;
         }
     }
@@ -340,7 +382,6 @@ void
 GcSplitterControl::selectAction()
 {
     this->setVisible(!this->isVisible());
-
 
     /*this->setBaseSize(width(), parentWidget()->height());
     this->setMaximumSize(QWIDGETSIZE_MAX,QWIDGETSIZE_MAX);*/

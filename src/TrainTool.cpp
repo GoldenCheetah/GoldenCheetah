@@ -296,6 +296,7 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     mediaItem->addWidget(mediaTree);
     trainSplitter->addWidget(mediaItem);
 #endif
+    trainSplitter->prepare(main->cyclist, "train");
 
 #ifdef Q_OS_MAC
     // get rid of annoying focus rectangle for sidebar components
