@@ -26,6 +26,7 @@
 class GcSubSplitter;
 class GcSplitterControl;
 class GcSplitterItem;
+class GcLabel;
 
 class GcSplitter : public QWidget
 {
@@ -106,7 +107,7 @@ private:
      GcSplitterItem *widget;
 
      QHBoxLayout *titleLayout;
-     QLabel *titleLabel;
+     GcLabel *titleLabel;
      QToolBar *titleToolbar;
      QPushButton *showHide;
 

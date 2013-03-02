@@ -526,7 +526,7 @@ GcLabel::paintEvent(QPaintEvent *e)
         // adjust for emboss
         setContentsMargins(x+xoff,y+yoff,w,l);
         QPalette r;
-        r.setColor(QPalette::WindowText, QColor(127,127,127,160));
+        r.setColor(QPalette::WindowText, QColor(220,220,220,160));
         setPalette(r);
         QLabel::paintEvent(e);
 
@@ -536,7 +536,7 @@ GcLabel::paintEvent(QPaintEvent *e)
     }
 
     QPalette r; // want gray
-    r.setColor(QPalette::WindowText, QColor(127,127,127,160));
+    r.setColor(QPalette::WindowText, QColor(0,0,0,200));
     setPalette(r);
     QLabel::paintEvent(e);
 }
