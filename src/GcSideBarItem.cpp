@@ -25,10 +25,22 @@ QIcon iconFromPNG(QString filename)
     pngImage.load(filename);
 
     // use muted dark gray color
-    QImage result = pngImage.convertToFormat(QImage::Format_Indexed8);
-    result.setColor(0, QColor(80,80,80, 255).rgb());
+    QImage gray8 = pngImage.convertToFormat(QImage::Format_Indexed8);
+    QImage white8 = pngImage.convertToFormat(QImage::Format_Indexed8);
+    gray8.setColor(0, QColor(80,80,80, 255).rgb());
+    white8.setColor(0, QColor(255,255,255, 100).rgb());
 
-    QIcon icon(QPixmap::fromImage(result));
+    // now convert to a format we can paint with!
+    QImage white = white8.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    QImage gray = gray8.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+
+    QPainter painter;
+    painter.begin(&white);
+    painter.setBackgroundMode(Qt::TransparentMode);
+    painter.drawImage(0,-1, gray);
+    painter.end();
+
+    QIcon icon(QPixmap::fromImage(white));
     return icon;
 }
 
