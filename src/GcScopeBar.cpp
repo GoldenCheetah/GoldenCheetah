@@ -112,6 +112,10 @@ GcScopeBar::paintBackground(QPaintEvent *)
     painter.setPen(black);
     painter.drawLine(0,height()-1, width()-1, height()-1);
 
+    QPen gray(QColor(230,230,230));
+    painter.setPen(gray);
+    painter.drawLine(0,0, width()-1, 0);
+
     painter.restore();
 }
 
