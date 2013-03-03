@@ -59,7 +59,7 @@ GcSplitter::GcSplitter(Qt::Orientation orientation, QWidget *parent) : QWidget(p
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setSpacing(0);
-    layout->setAlignment(Qt::AlignBottom);
+    layout->setAlignment(Qt::AlignBottom|Qt::AlignHCenter);
     layout->setContentsMargins(0,0,0,0);
     layout->addWidget(splitter);
     layout->addWidget(control);
@@ -72,6 +72,11 @@ GcSplitter::prepare(QString cyclist, QString name)
 {
     this->name = name;
     this->cyclist = cyclist;
+
+    QWidget *spacer = new QWidget(this);
+    spacer->setAutoFillBackground(false);
+    spacer->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    control->addWidget(spacer);
 
     // get saved state
     QString statesetting = QString("splitter/%1/sizes").arg(name);
@@ -356,7 +361,10 @@ GcSplitterControl::GcSplitterControl(QWidget *parent) : QToolBar(parent)
     setIconSize(QSize(14,14));
     setToolButtonStyle(Qt::ToolButtonIconOnly);
     setAutoFillBackground(false);
-
+    QWidget *spacer = new QWidget(this);
+    spacer->setAutoFillBackground(false);
+    spacer->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    addWidget(spacer);
 }
 
 void
