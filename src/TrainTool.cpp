@@ -284,12 +284,21 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     trainSplitter = new GcSplitter(Qt::Vertical);
     trainSplitter->setContentsMargins(0,0,0,0);
     deviceItem = new GcSplitterItem(tr("Devices"), iconFromPNG(":images/sidebar/power.png"), this);
+    // devices splitter actions
+    QAction *addDeviceAct = new QAction(iconFromPNG(":images/sidebar/plus.png"), tr("Add Device"), this);
+    deviceItem->addAction(addDeviceAct);
+    connect(addDeviceAct, SIGNAL(triggered(void)), main, SLOT(addDevice()));
+    QAction *removeDeviceAct = new QAction(iconFromPNG(":images/sidebar/minus.png"), tr("Delete Device"), this);
+    deviceItem->addAction(removeDeviceAct);
+    connect(removeDeviceAct, SIGNAL(triggered(void)), this, SLOT(deleteDevice(void)));
+
     workoutItem = new GcSplitterItem(tr("Workouts"), iconFromPNG(":images/sidebar/folder.png"), this);
     deviceItem->addWidget(deviceTree);
     trainSplitter->addWidget(deviceItem);
     workoutItem->addWidget(workoutTree);
     trainSplitter->addWidget(workoutItem);
     cl->addWidget(trainSplitter);
+
 
 #if defined Q_OS_MAC || defined GC_HAVE_VLC
     mediaItem = new GcSplitterItem(tr("Media"), iconFromPNG(":images/sidebar/movie.png"), this);
