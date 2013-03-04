@@ -99,12 +99,10 @@ class LTMSidebar : public QWidget
         GcSplitterItem *seasonsWidget;
         SeasonTreeView *dateRangeTree;
         QTreeWidgetItem *allDateRanges;
-        QTreeWidgetItem *activeDateRange; // when using context menus
 
         GcSplitterItem *eventsWidget;
         QTreeWidget *eventTree;
         QTreeWidgetItem *allEvents;
-        QTreeWidgetItem *activeEvent; // when using context menus
 
         QWebView *summary;
 
