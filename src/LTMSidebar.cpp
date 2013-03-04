@@ -514,8 +514,13 @@ LTMSidebar::deleteRange()
 void
 LTMSidebar::addEvent()
 {
+    if (dateRangeTree->selectedItems().count() == 0) return; // need a season selected!
+
+    int seasonindex = allDateRanges->indexOfChild(dateRangeTree->selectedItems().first());
+
+    if (seasons->seasons[seasonindex].getType() == Season::temporary) return; // must be a user season
+
     SeasonEvent myevent("", QDate());
-    int seasonindex = allDateRanges->indexOfChild(activeDateRange);
     EditSeasonEventDialog dialog(main, &myevent);
 
     if (dialog.exec()) {
@@ -541,17 +546,26 @@ LTMSidebar::deleteEvent()
 {
     active = true;
 
-    // now delete!
-    int seasonindex = allDateRanges->indexOfChild(activeDateRange);
-    int eventindex = allEvents->indexOfChild(activeEvent);
+    if (dateRangeTree->selectedItems().count()) {
 
-    // wipe them away
-    delete allEvents->takeChild(eventindex);
-    seasons->seasons[seasonindex].events.removeAt(eventindex);
+        int seasonindex = allDateRanges->indexOfChild(dateRangeTree->selectedItems().first());
 
-    // save changes away
-    seasons->writeSeasons();
+        // only delete those that are selected
+        if (eventTree->selectedItems().count() > 0) {
 
+            // wipe them away
+            foreach(QTreeWidgetItem *d, eventTree->selectedItems()) {
+                int index = allEvents->indexOfChild(d);
+
+                delete allEvents->takeChild(index);
+                seasons->seasons[seasonindex].events.removeAt(index);
+            }
+        }
+
+        // save changes away
+        seasons->writeSeasons();
+
+    }
     active = false;
 }
 
