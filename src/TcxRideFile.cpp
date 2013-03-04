@@ -50,8 +50,8 @@ RideFile *TcxFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     return rideFile;
 }
 
-bool
-TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile &file) const
+QByteArray
+TcxFileReader::toByteArray(MainWindow *mainWindow, const RideFile *ride) const
 {
     QDomText text;
     QDomDocument doc;
@@ -204,7 +204,7 @@ TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile
             }
 
             // HeartRate hack for Garmin Training Center
-            // It needs an hr datapoint for every trackpoint or else the 
+            // It needs an hr datapoint for every trackpoint or else the
             // hr graph in TC won't display. Schema defines the datapoint
             // as a positive int (> 0)
 
@@ -390,7 +390,14 @@ TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile
     author.appendChild(author_part_number);
 
 
-    QByteArray xml = doc.toByteArray(4);
+    return doc.toByteArray(4);
+}
+
+bool
+TcxFileReader::writeRideFile(MainWindow *mainWindow, const RideFile *ride, QFile &file) const
+{
+    QByteArray xml = toByteArray(mainWindow, ride);
+
     if (!file.open(QIODevice::WriteOnly)) return(false);
     if (file.write(xml) != xml.size()) return(false);
     file.close();
