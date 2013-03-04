@@ -318,77 +318,102 @@ StravaUploadDialog::requestUpload()
 
     connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestUploadFinished(QNetworkReply*)));
     connect(&networkMgr, SIGNAL(finished(QNetworkReply *)), &eventLoop, SLOT(quit()));
-    QString out;
 
-    QVector<RideFilePoint*> vectorPoints = ride->ride()->dataPoints();
-    int totalSize = vectorPoints.size();
+    bool json = false;
 
-    int size = 0;
+    if (json) {
+        QString out;
 
-    out += "{\"token\": \"" + token + "\",\"data\":[";
-    foreach (const RideFilePoint *point, ride->ride()->dataPoints())
-    {
-        size++;
+        QVector<RideFilePoint*> vectorPoints = ride->ride()->dataPoints();
+        int totalSize = vectorPoints.size();
 
-        if (point->secs == 0.0)
-            continue;
+        int size = 0;
 
-        diffSecs = point->secs - prevSecs;
-        prevSecs = point->secs;
-        rideDateTime = rideDateTime.addSecs(diffSecs);
+        out += "{\"token\": \"" + token + "\",\"data\":[";
+        foreach (const RideFilePoint *point, ride->ride()->dataPoints())
+        {
+            size++;
 
-        out += "[\"";
-        out += rideDateTime.toUTC().toString(Qt::ISODate);
-        out += "\",";
-        out += QString("%1").arg(point->lat,0,'f',GPS_COORD_TO_STRING);
-        out += ",";
-        out += QString("%1").arg(point->lon,0,'f',GPS_COORD_TO_STRING);
+            if (point->secs == 0.0)
+                continue;
 
-        if (altitudeChk->isChecked()) {
+            diffSecs = point->secs - prevSecs;
+            prevSecs = point->secs;
+            rideDateTime = rideDateTime.addSecs(diffSecs);
+
+            out += "[\"";
+            out += rideDateTime.toUTC().toString(Qt::ISODate);
+            out += "\",";
+            out += QString("%1").arg(point->lat,0,'f',GPS_COORD_TO_STRING);
             out += ",";
-            out += QString("%1").arg(point->alt);
+            out += QString("%1").arg(point->lon,0,'f',GPS_COORD_TO_STRING);
 
+            if (altitudeChk->isChecked()) {
+                out += ",";
+                out += QString("%1").arg(point->alt);
+
+            }
+            if (powerChk->isChecked()) {
+                out += ",";
+                out += QString("%1").arg(point->watts);
+            }
+            if (altitudeChk->isChecked()) {
+                out += ",";
+                out += QString("%1").arg(point->cad);
+            }
+            if (heartrateChk->isChecked()) {
+                out += ",";
+                out += QString("%1").arg(point->hr);
+            }
+            out += "]";
+            if(totalSize == size)
+                out += "],";
+           else
+               out += ",";
         }
-        if (powerChk->isChecked()) {
-            out += ",";
-            out += QString("%1").arg(point->watts);
-        }
-        if (altitudeChk->isChecked()) {
-            out += ",";
-            out += QString("%1").arg(point->cad);
-        }
-        if (heartrateChk->isChecked()) {
-            out += ",";
-            out += QString("%1").arg(point->hr);
-        }
-        out += "]";
-        if(totalSize == size)
-            out += "],";
-       else
-           out += ",";
+        out += "\"type\": \"json\", ";
+        out += "\"data_fields\": \[\"time\", \"latitude\", \"longitude\"";
+
+        if (altitudeChk->isChecked())
+            out += ", \"elevation\"";
+        if (powerChk->isChecked())
+            out += ", \"watts\"";
+        if (cadenceChk->isChecked())
+            out += ", \"cadence\"";
+        if (heartrateChk->isChecked())
+            out += ", \"heartrate\"";
+        out += "]}";
+
+        QUrl url = QUrl(STRAVA_URL2 + "/upload");
+        QNetworkRequest request = QNetworkRequest(url);
+        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+        progressBar->setValue(40);
+        progressLabel->setText(tr("Upload ride... Sending"));
+
+        networkMgr.post( request, out.toAscii());
+    } else {
+        QByteArray data;
+        QUrl params;
+        TcxFileReader reader;
+
+        params.addQueryItem("token", token);
+        params.addQueryItem("type", "tcx");
+        params.addQueryItem("data", reader.toByteArray(mainWindow, ride->ride()));
+        data = params.encodedQuery();
+
+        QUrl url = QUrl(STRAVA_URL2 + "/upload");
+        QNetworkRequest request = QNetworkRequest(url);
+        request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
+
+        progressBar->setValue(40);
+        progressLabel->setText(tr("Upload ride... Sending"));
+
+        networkMgr.post( request, data);
     }
-    out += "\"type\": \"json\", ";
-    out += "\"data_fields\": \[\"time\", \"latitude\", \"longitude\"";
-
-    if (altitudeChk->isChecked())
-        out += ", \"elevation\"";
-    if (powerChk->isChecked())
-        out += ", \"watts\"";
-    if (cadenceChk->isChecked())
-        out += ", \"cadence\"";
-    if (heartrateChk->isChecked())
-        out += ", \"heartrate\"";
-    out += "]}";
-
-    QUrl url = QUrl(STRAVA_URL2 + "/upload");
-    QNetworkRequest request = QNetworkRequest(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
     //qDebug() << out;
-    progressBar->setValue(40);
-    progressLabel->setText(tr("Upload ride... Sending"));
 
-    networkMgr.post( request, out.toAscii());
     eventLoop.exec();
 }
 
