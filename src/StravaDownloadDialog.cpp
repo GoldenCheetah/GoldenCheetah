@@ -148,7 +148,7 @@ StravaDownloadDialog::requestRideDetailFinished(QNetworkReply *reply)
     progressBar->setValue(15);
 
     if (reply->error() != QNetworkReply::NoError)
-        progressLabel->setText(tr("Error from ride details " + reply->error()));
+        progressLabel->setText(QString(tr("Error from ride details %1")).arg(reply->error()));
     else {
         QString response = reply->readLine();
 
@@ -197,7 +197,7 @@ StravaDownloadDialog::requestDownloadRideFinished(QNetworkReply *reply)
     progressBar->setValue(60);
 
     if (reply->error() != QNetworkReply::NoError)
-        progressLabel->setText("Error from upload " + reply->error());
+        progressLabel->setText(QString(tr("Error from upload %1")).arg(reply->error()));
     else {
         QString response = reply->readLine();
 
