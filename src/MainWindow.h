@@ -277,6 +277,9 @@ class MainWindow : public QMainWindow
         void manageLibrary();
         void showWorkoutWizard();
 
+        void analysisPopup();
+        void intervalPopup();
+
     private slots:
         void rideTreeWidgetSelectionChanged();
         void intervalTreeWidgetSelectionChanged();

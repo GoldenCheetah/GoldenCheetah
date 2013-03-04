@@ -660,8 +660,15 @@ MainWindow::MainWindow(const QDir &home) :
     intervalSplitter->setCollapsible(1, false);
 
     analItem = new GcSplitterItem(tr("Activities"), iconFromPNG(":images/sidebar/folder.png"), this);
+    QAction *moreAnalAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
+    analItem->addAction(moreAnalAct);
+    connect(moreAnalAct, SIGNAL(triggered(void)), this, SLOT(analysisPopup()));
+
     analItem->addWidget(activityHistory);
     intervalItem = new GcSplitterItem(tr("Intervals"), iconFromPNG(":images/mac/stop.png"), this);
+    QAction *moreIntervalAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
+    intervalItem->addAction(moreIntervalAct);
+    connect(moreIntervalAct, SIGNAL(triggered(void)), this, SLOT(intervalPopup()));
     intervalItem->addWidget(intervalSplitter);
 
     analSidebar = new GcSplitter(Qt::Vertical);
@@ -1293,6 +1300,11 @@ MainWindow::enableSaveButton()
 }
 
 void
+MainWindow::analysisPopup()
+{
+}
+
+void
 MainWindow::showTreeContextMenuPopup(const QPoint &pos)
 {
     if (treeWidget->selectedItems().size() == 0) return; //none selected!
@@ -1341,6 +1353,11 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
 #endif
         menu.exec(pos);
     }
+}
+
+void
+MainWindow::intervalPopup()
+{
 }
 
 void
