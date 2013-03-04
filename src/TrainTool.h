@@ -123,6 +123,9 @@ class TrainTool : public GcWindow
         void deviceTreeMenuPopup(const QPoint &);
         void deleteDevice();
 
+        void workoutPopup();
+        void mediaPopup();
+
         void refresh(); // when TrainDB is updated...
 
         void selectVideo(QString fullpath);

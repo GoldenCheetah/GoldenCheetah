@@ -293,6 +293,10 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     connect(removeDeviceAct, SIGNAL(triggered(void)), this, SLOT(deleteDevice(void)));
 
     workoutItem = new GcSplitterItem(tr("Workouts"), iconFromPNG(":images/sidebar/folder.png"), this);
+    QAction *moreWorkoutAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
+    workoutItem->addAction(moreWorkoutAct);
+    connect(moreWorkoutAct, SIGNAL(triggered(void)), this, SLOT(workoutPopup(void)));
+
     deviceItem->addWidget(deviceTree);
     trainSplitter->addWidget(deviceItem);
     workoutItem->addWidget(workoutTree);
@@ -302,6 +306,9 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
 
 #if defined Q_OS_MAC || defined GC_HAVE_VLC
     mediaItem = new GcSplitterItem(tr("Media"), iconFromPNG(":images/sidebar/movie.png"), this);
+    QAction *moreMediaAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
+    mediaItem->addAction(moreMediaAct);
+    connect(moreMediaAct, SIGNAL(triggered(void)), this, SLOT(mediaPopup(void)));
     mediaItem->addWidget(mediaTree);
     trainSplitter->addWidget(mediaItem);
 #endif
@@ -403,6 +410,52 @@ TrainTool::refresh()
 
     // restore selection
     selectWorkout(workoutPath);
+}
+
+void
+TrainTool::workoutPopup()
+{
+    // OK - we are working with a specific event..
+    QMenu menu(workoutTree);
+    QAction *import = new QAction(tr("Import Workout from File"), workoutTree);
+    QAction *download = new QAction(tr("Get Workouts from ErgDB"), workoutTree);
+    QAction *wizard = new QAction(tr("Create Workout via Wizard"), workoutTree);
+    QAction *scan = new QAction(tr("Scan for Workouts"), workoutTree);
+
+    menu.addAction(import);
+    menu.addAction(download);
+    menu.addAction(wizard);
+    menu.addAction(scan);
+
+    // connect menu to functions
+    connect(import, SIGNAL(triggered(void)), main, SLOT(importWorkout(void)));
+    connect(wizard, SIGNAL(triggered(void)), main, SLOT(showWorkoutWizard(void)));
+    connect(download, SIGNAL(triggered(void)), main, SLOT(downloadErgDB(void)));
+    connect(scan, SIGNAL(triggered(void)), main, SLOT(manageLibrary(void)));
+
+    // execute the menu
+    menu.exec(trainSplitter->mapToGlobal(QPoint(workoutItem->pos().x()+workoutItem->width()-20,
+                                           workoutItem->pos().y())));
+}
+
+void
+TrainTool::mediaPopup()
+{
+    // OK - we are working with a specific event..
+    QMenu menu(mediaTree);
+    QAction *import = new QAction(tr("Import Video from File"), mediaTree);
+    QAction *scan = new QAction(tr("Scan for Videos"), mediaTree);
+
+    menu.addAction(import);
+    menu.addAction(scan);
+
+    // connect menu to functions
+    connect(import, SIGNAL(triggered(void)), main, SLOT(importWorkout(void)));
+    connect(scan, SIGNAL(triggered(void)), main, SLOT(manageLibrary(void)));
+
+    // execute the menu
+    menu.exec(trainSplitter->mapToGlobal(QPoint(mediaItem->pos().x()+mediaItem->width()-20,
+                                           mediaItem->pos().y())));
 }
 
 void

@@ -273,6 +273,10 @@ class MainWindow : public QMainWindow
         void closeBlankDiary();
         void closeBlankHome();
 
+        void downloadErgDB();
+        void manageLibrary();
+        void showWorkoutWizard();
+
     private slots:
         void rideTreeWidgetSelectionChanged();
         void intervalTreeWidgetSelectionChanged();
@@ -288,8 +292,6 @@ class MainWindow : public QMainWindow
         void downloadStrava();
         void uploadRideWithGPSAction();
         void uploadTtb();
-        void downloadErgDB();
-        void manageLibrary();
         void manualProcess(QString);
 #ifdef GC_HAVE_SOAP
         void uploadTP();
@@ -316,7 +318,6 @@ class MainWindow : public QMainWindow
         void toggleSidebar();
         void showSidebar(bool want);
         void showToolbar(bool want);
-        void showWorkoutWizard();
         void resetWindowLayout();
         void dateChanged(const QDate &);
         void showContextMenuPopup(const QPoint &);
