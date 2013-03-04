@@ -271,7 +271,6 @@ LTMSidebar::dateRangePopup(QPoint pos)
             || seasons->seasons[index].getType() == Season::temporary) {
             // on system date we just offer to add a Season, since its
             // the only way of doing it when no seasons are defined!!
-            activeDateRange = NULL;
 
             // create context menu
             QMenu menu(dateRangeTree);
@@ -285,9 +284,6 @@ LTMSidebar::dateRangePopup(QPoint pos)
             menu.exec(dateRangeTree->mapToGlobal(pos));
 
         } else {
-
-            // save context
-            activeDateRange = item;
 
             // create context menu
             QMenu menu(dateRangeTree);
@@ -356,10 +352,7 @@ LTMSidebar::eventPopup(QPoint pos)
 
     // save context - which season and event are we working with?
     QTreeWidgetItem *which = dateRangeTree->selectedItems().first();
-    if (which && which != allDateRanges) {
-        activeDateRange = which;
-        activeEvent = item;
-    } else return;
+    if (!which || which == allDateRanges) return;
 
     // OK - we are working with a specific event..
     QMenu menu(eventTree);
@@ -419,7 +412,7 @@ LTMSidebar::eventPopup()
 void
 LTMSidebar::dateRangeChanged(QTreeWidgetItem*item, int)
 {
-    if (item != activeDateRange || active == true) return;
+    if (active == true) return;
 
     int index = allDateRanges->indexOfChild(item);
     seasons->seasons[index].setName(item->text(0));
@@ -482,8 +475,9 @@ void
 LTMSidebar::editRange()
 {
     // throw up modal dialog box to edit all the season
-    // fields.
-    int index = allDateRanges->indexOfChild(activeDateRange);
+    if (dateRangeTree->selectedItems().count() != 1) return;
+
+    int index = allDateRanges->indexOfChild(dateRangeTree->selectedItems().first());
     EditSeasonDialog dialog(main, &seasons->seasons[index]);
 
     if (dialog.exec()) {
@@ -491,22 +485,22 @@ LTMSidebar::editRange()
         active = true;
 
         // update name
-        activeDateRange->setText(0, seasons->seasons[index].getName());
+        dateRangeTree->selectedItems().first()->setText(0, seasons->seasons[index].getName());
 
         // save changes away
         seasons->writeSeasons();
         active = false;
 
-        // signal its changed!
-        //dateRangeSelected(&seasons->seasons[index]);
     }
 }
 
 void
 LTMSidebar::deleteRange()
 {
+    if (dateRangeTree->selectedItems().count() != 1) return;
+    int index = allDateRanges->indexOfChild(dateRangeTree->selectedItems().first());
+
     // now delete!
-    int index = allDateRanges->indexOfChild(activeDateRange);
     delete allDateRanges->takeChild(index);
     seasons->deleteSeason(index);
 }
