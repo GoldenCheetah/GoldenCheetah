@@ -572,26 +572,32 @@ LTMSidebar::deleteEvent()
 void
 LTMSidebar::editEvent()
 {
-    int seasonindex = allDateRanges->indexOfChild(activeDateRange);
-    int eventindex = allEvents->indexOfChild(activeEvent);
+    active = true;
 
-    EditSeasonEventDialog dialog(main, &seasons->seasons[seasonindex].events[eventindex]);
+    if (dateRangeTree->selectedItems().count()) {
 
-    if (dialog.exec()) {
+        int seasonindex = allDateRanges->indexOfChild(dateRangeTree->selectedItems().first());
 
-        active = true;
+        // only delete those that are selected
+        if (eventTree->selectedItems().count() == 1) {
 
-        // update name
-        activeEvent->setText(0, seasons->seasons[seasonindex].events[eventindex].name);
-        activeEvent->setText(1, seasons->seasons[seasonindex].events[eventindex].date.toString("MMM d, yyyy"));
+            QTreeWidgetItem *ours = eventTree->selectedItems().first();
+            int index = allEvents->indexOfChild(ours);
 
-        // save changes away
-        seasons->writeSeasons();
-        active = false;
+            EditSeasonEventDialog dialog(main, &seasons->seasons[seasonindex].events[index]);
 
-        // signal its changed!
-        //dateRangeSelected(&seasons->seasons[index]);
+            if (dialog.exec()) {
+
+                // update name
+                ours->setText(0, seasons->seasons[seasonindex].events[index].name);
+                ours->setText(1, seasons->seasons[seasonindex].events[index].date.toString("MMM d, yyyy"));
+
+                // save changes away
+                seasons->writeSeasons();
+            }
+        }
     }
+    active = false;
 }
 
 void
