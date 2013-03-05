@@ -284,13 +284,11 @@ TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), h
     trainSplitter = new GcSplitter(Qt::Vertical);
     trainSplitter->setContentsMargins(0,0,0,0);
     deviceItem = new GcSplitterItem(tr("Devices"), iconFromPNG(":images/sidebar/power.png"), this);
+
     // devices splitter actions
-    QAction *addDeviceAct = new QAction(iconFromPNG(":images/sidebar/plus.png"), tr("Add Device"), this);
-    deviceItem->addAction(addDeviceAct);
-    connect(addDeviceAct, SIGNAL(triggered(void)), main, SLOT(addDevice()));
-    QAction *removeDeviceAct = new QAction(iconFromPNG(":images/sidebar/minus.png"), tr("Delete Device"), this);
-    deviceItem->addAction(removeDeviceAct);
-    connect(removeDeviceAct, SIGNAL(triggered(void)), this, SLOT(deleteDevice(void)));
+    QAction *moreDeviceAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
+    deviceItem->addAction(moreDeviceAct);
+    connect(moreDeviceAct, SIGNAL(triggered(void)), this, SLOT(devicePopup(void)));
 
     workoutItem = new GcSplitterItem(tr("Workouts"), iconFromPNG(":images/sidebar/folder.png"), this);
     QAction *moreWorkoutAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
@@ -1521,6 +1519,26 @@ MultiDeviceDialog::cancelClicked()
     reject();
 }
 
+void
+TrainTool::devicePopup()
+{
+    // OK - we are working with a specific event..
+    QMenu menu(deviceTree);
+
+    QAction *addDevice = new QAction(tr("Add Device"), deviceTree);
+    connect(addDevice, SIGNAL(triggered(void)), main, SLOT(addDevice()));
+    menu.addAction(addDevice);
+
+    if (deviceTree->selectedItems().size() == 1) {
+        QAction *delDevice = new QAction(tr("Delete Device"), deviceTree);
+        connect(delDevice, SIGNAL(triggered(void)), this, SLOT(deleteDevice()));
+        menu.addAction(delDevice);
+    }
+
+    // execute the menu
+    menu.exec(trainSplitter->mapToGlobal(QPoint(deviceItem->pos().x()+deviceItem->width()-20,
+                                           deviceItem->pos().y())));
+}
 void
 TrainTool::deviceTreeMenuPopup(const QPoint &pos)
 {

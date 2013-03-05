@@ -123,6 +123,7 @@ class TrainTool : public GcWindow
         void deviceTreeMenuPopup(const QPoint &);
         void deleteDevice();
 
+        void devicePopup();
         void workoutPopup();
         void mediaPopup();
 
