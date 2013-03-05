@@ -1302,6 +1302,8 @@ MainWindow::enableSaveButton()
 void
 MainWindow::analysisPopup()
 {
+    // set the point for the menu and call below
+    showTreeContextMenuPopup(analSidebar->mapToGlobal(QPoint(analItem->pos().x()+analItem->width()-20, analItem->pos().y())));
 }
 
 void
