@@ -183,6 +183,8 @@ LTMSidebar::dateRangeTreeWidgetSelectionChanged()
 
         // make sure they fit
         eventTree->header()->resizeSections(QHeaderView::ResizeToContents);
+        appsettings->setCValue(main->cyclist, GC_LTM_LAST_DATE_RANGE, dateRange->id().toString());
+
     }
 
     // Let the view know its changed....
@@ -200,20 +202,18 @@ LTMSidebar::resetSeasons()
 {
     if (active == true) return;
 
-    QString now;
-
-    // remember currebt
-    if (dateRangeTree->selectedItems().count())
-        now = dateRangeTree->selectedItems().first()->text(0);
-
     active = true;
     int i;
     for (i=allDateRanges->childCount(); i > 0; i--) {
         delete allDateRanges->takeChild(0);
     }
+    QString id = appsettings->cvalue(main->cyclist, GC_LTM_LAST_DATE_RANGE, seasons->seasons.at(0).id().toString()).toString();
     for (i=0; i <seasons->seasons.count(); i++) {
         Season season = seasons->seasons.at(i);
         QTreeWidgetItem *add = new QTreeWidgetItem(allDateRanges, season.getType());
+        if (season.id().toString()==id)
+            add->setSelected(true);
+
         // No Drag/Drop for temporary  Season
         if (season.getType() == Season::temporary)
             add->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
@@ -222,8 +222,6 @@ LTMSidebar::resetSeasons()
         add->setText(0, season.getName());
     }
 
-    // get current back!
-    if (now == "") allDateRanges->child(0)->setSelected(true); // just select first child
     active = false;
 }
 
