@@ -46,7 +46,7 @@ static DeviceType SupportedDevices[] =
         ":images/devices/btle.png" },
 #endif
       { DEV_KICKR,    DEV_BTLE,     (char *) "Wahoo Kickr", true,   false,
-        "The Wahoo Fitness Kickr cyling trainer via its Bluetooth smart interface. ",
+        "The Wahoo Fitness Kickr cycling trainer via its Bluetooth smart interface. ",
         ":images/devices/kickr.png" },
 #endif
       { DEV_CT,       DEV_SERIAL,  (char *) "Racermate Computrainer",true,    false,
