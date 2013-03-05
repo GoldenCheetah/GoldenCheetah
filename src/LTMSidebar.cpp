@@ -47,13 +47,6 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     setContentsMargins(0,0,0,0);
 
     seasonsWidget = new GcSplitterItem(tr("Date Ranges"), iconFromPNG(":images/sidebar/calendar.png"), this);
-
-    QAction *addSeasonAct = new QAction(iconFromPNG(":images/sidebar/plus.png"), tr("Add Date Range"), this);
-    seasonsWidget->addAction(addSeasonAct);
-    connect(addSeasonAct, SIGNAL(triggered(void)), this, SLOT(addRange(void)));
-    QAction *removeSeasonAct = new QAction(iconFromPNG(":images/sidebar/minus.png"), tr("Delete Date Range"), this);
-    seasonsWidget->addAction(removeSeasonAct);
-    connect(removeSeasonAct, SIGNAL(triggered(void)), this, SLOT(deleteRange(void)));
     QAction *moreSeasonAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
     seasonsWidget->addAction(moreSeasonAct);
     connect(moreSeasonAct, SIGNAL(triggered(void)), this, SLOT(dateRangePopup(void)));
@@ -78,13 +71,6 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
 
 
     eventsWidget = new GcSplitterItem(tr("Events"), iconFromPNG(":images/sidebar/bookmark.png"), this);
-
-    QAction *addEventAct = new QAction(iconFromPNG(":images/sidebar/plus.png"), tr("Add Event"), this);
-    eventsWidget->addAction(addEventAct);
-    connect(addEventAct, SIGNAL(triggered(void)), this, SLOT(addEvent(void)));
-    QAction *removeEventAct = new QAction(iconFromPNG(":images/sidebar/minus.png"), tr("Delete Event"), this);
-    eventsWidget->addAction(removeEventAct);
-    connect(removeEventAct, SIGNAL(triggered(void)), this, SLOT(deleteEvent(void)));
     QAction *moreEventAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
     eventsWidget->addAction(moreEventAct);
     connect(moreEventAct, SIGNAL(triggered(void)), this, SLOT(eventPopup(void)));
@@ -380,13 +366,24 @@ LTMSidebar::eventPopup(QPoint pos)
 void
 LTMSidebar::eventPopup()
 {
-    // no current season selected
-    if (eventTree->selectedItems().isEmpty()) return;
+    // events are against a selected season
+    if (dateRangeTree->selectedItems().count() == 0) return; // need a season selected!
 
-    QTreeWidgetItem *item = eventTree->selectedItems().at(0);
+    // and the season must be user defined not temporary
+    int seasonindex = allDateRanges->indexOfChild(dateRangeTree->selectedItems().first());
+    if (seasons->seasons[seasonindex].getType() == Season::temporary) return;
 
-    // OK - we are working with a specific event..
+    // have we selected an event?
+    QTreeWidgetItem *item = NULL;
+    if (!eventTree->selectedItems().isEmpty()) item = eventTree->selectedItems().at(0);
+
     QMenu menu(eventTree);
+
+    // we can always add, regardless of any event being selected...
+    QAction *addEvent = new QAction(tr("Add event"), eventTree);
+    menu.addAction(addEvent);
+    connect(addEvent, SIGNAL(triggered(void)), this, SLOT(addEvent(void)));
+
     if (item != NULL && item->type() != ROOT_TYPE && allEvents->indexOfChild(item) != -1) {
 
         QAction *edit = new QAction(tr("Edit details"), eventTree);
@@ -399,14 +396,8 @@ LTMSidebar::eventPopup()
         connect(del, SIGNAL(triggered(void)), this, SLOT(deleteEvent(void)));
     }
 
-    // we can always add, regardless of any event being selected...
-    QAction *addEvent = new QAction(tr("Add event"), eventTree);
-    menu.addAction(addEvent);
-    connect(addEvent, SIGNAL(triggered(void)), this, SLOT(addEvent(void)));
-
     // execute the menu
-    menu.exec(splitter->mapToGlobal(QPoint(eventsWidget->pos().x()+eventsWidget->width()-20,
-                                           eventsWidget->pos().y())));
+    menu.exec(splitter->mapToGlobal(QPoint(eventsWidget->pos().x()+eventsWidget->width()-20, eventsWidget->pos().y())));
 }
 
 void
