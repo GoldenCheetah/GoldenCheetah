@@ -135,6 +135,7 @@ class TrainTool : public GcWindow
     public slots:
         void configChanged();
         void deleteWorkouts(); // deletes selected workouts
+        void deleteVideos(); // deletes selected workouts
 
         void Start();       // when start button is pressed
         void Pause();       // when Paude is pressed

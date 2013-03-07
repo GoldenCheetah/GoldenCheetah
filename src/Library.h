@@ -41,6 +41,7 @@ class Library : QObject
         static void initialise(QDir); // init
         static Library *findLibrary(QString);
         static void importFiles(MainWindow *mainWindow, QStringList files);
+        void removeRef(MainWindow *mainWindow, QString ref);
 };
 
 extern QList<Library *> libraries;        // keep track of all Library search paths for all users

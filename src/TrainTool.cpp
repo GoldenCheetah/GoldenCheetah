@@ -52,6 +52,7 @@
 
 #include <math.h> // isnan and isinf
 #include "TrainDB.h"
+#include "Library.h"
 
 TrainTool::TrainTool(MainWindow *parent, const QDir &home) : GcWindow(parent), home(home), main(parent)
 {
@@ -461,6 +462,15 @@ TrainTool::mediaPopup()
     connect(import, SIGNAL(triggered(void)), main, SLOT(importWorkout(void)));
     connect(scan, SIGNAL(triggered(void)), main, SLOT(manageLibrary(void)));
 
+    QModelIndex current = mediaTree->currentIndex();
+    QModelIndex target = vsortModel->mapToSource(current);
+    QString filename = videoModel->data(videoModel->index(target.row(), 0), Qt::DisplayRole).toString();
+    if (QFileInfo(filename).exists()) {
+        QAction *del = new QAction(tr("Delete selected video"), workoutTree);
+        menu.addAction(del);
+        connect(del, SIGNAL(triggered(void)), this, SLOT(deleteVideos(void)));
+    }
+
     // execute the menu
     menu.exec(trainSplitter->mapToGlobal(QPoint(mediaItem->pos().x()+mediaItem->width()-20,
                                            mediaItem->pos().y())));
@@ -654,6 +664,39 @@ TrainTool::listWorkoutFiles(const QDir &dir) const
     return dir.entryList(filters, QDir::Files, QDir::Name);
 }
 
+void
+TrainTool::deleteVideos()
+{
+    QModelIndex current = mediaTree->currentIndex();
+    QModelIndex target = vsortModel->mapToSource(current);
+    QString filename = videoModel->data(videoModel->index(target.row(), 0), Qt::DisplayRole).toString();
+
+    if (QFileInfo(filename).exists()) {
+        // are you sure?
+        QMessageBox msgBox;
+        msgBox.setText(tr("Are you sure you want to delete this video?"));
+        msgBox.setInformativeText(filename);
+        QPushButton *deleteButton = msgBox.addButton(tr("Delete"),QMessageBox::YesRole);
+        msgBox.setStandardButtons(QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Cancel);
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
+
+        if(msgBox.clickedButton() != deleteButton) return;
+
+        // delete from disk
+        //XXX QFile(filename).remove(); // lets not for now..
+
+        // remove any reference (from drag and drop)
+        Library *l = Library::findLibrary("Media Library");
+        if (l) l->removeRef(main, filename);
+
+        // delete from DB
+        trainDB->startLUW();
+        trainDB->deleteVideo(filename);
+        trainDB->endLUW();
+    }
+}
 void
 TrainTool::deleteWorkouts()
 {

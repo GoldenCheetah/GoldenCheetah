@@ -350,6 +350,17 @@ bool TrainDB::importWorkout(QString pathname, ErgFile *ergFile)
 	return rc;
 }
 
+bool TrainDB::deleteVideo(QString pathname)
+{
+	QSqlQuery query(dbconn);
+    QDateTime timestamp = QDateTime::currentDateTime();
+
+    // zap the current row - if there is one
+    query.prepare("DELETE FROM videos WHERE filepath = ?;");
+    query.addBindValue(pathname);
+    return query.exec();
+}
+
 bool TrainDB::importVideo(QString pathname)
 {
 	QSqlQuery query(dbconn);

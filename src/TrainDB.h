@@ -54,6 +54,7 @@ class TrainDB : public QObject
     bool deleteWorkout(QString pathname);
 
     bool importVideo(QString pathname);
+    bool deleteVideo(QString pathname);
 
     // drop and recreate tables
     void rebuildDB();
