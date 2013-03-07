@@ -1360,6 +1360,43 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
 void
 MainWindow::intervalPopup()
 {
+    // always show the 'find best' 'find peaks' options
+    QMenu menu(intervalItem);
+
+    RideItem *rideItem = (RideItem *)treeWidget->selectedItems().first();
+
+    if (rideItem != NULL && rideItem->ride() && rideItem->ride()->dataPoints().count()) {
+        QAction *actFindPeak = new QAction(tr("Find Peak Intervals"), intervalItem);
+        QAction *actFindBest = new QAction(tr("Find Best Intervals"), intervalItem);
+        connect(actFindPeak, SIGNAL(triggered(void)), this, SLOT(findPowerPeaks(void)));
+        connect(actFindBest, SIGNAL(triggered(void)), this, SLOT(addIntervals(void)));
+        menu.addAction(actFindPeak);
+        menu.addAction(actFindBest);
+    }
+
+    if (intervalWidget->selectedItems().count() == 1) {
+
+        // we can zoom, rename etc if only 1 interval is selected
+        QAction *actZoomInt = new QAction(tr("Zoom to interval"), intervalWidget);
+        QAction *actRenameInt = new QAction(tr("Rename interval"), intervalWidget);
+        QAction *actDeleteInt = new QAction(tr("Delete interval"), intervalWidget);
+        connect(actRenameInt, SIGNAL(triggered(void)), this, SLOT(renameIntervalSelected(void)));
+        connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteIntervalSelected(void)));
+        connect(actZoomInt, SIGNAL(triggered(void)), this, SLOT(zoomIntervalSelected(void)));
+
+        menu.addAction(actZoomInt);
+        menu.addAction(actRenameInt);
+        menu.addAction(actDeleteInt);
+    }
+
+    if (intervalWidget->selectedItems().count() > 1) {
+
+        QAction *actDeleteInt = new QAction(tr("Delete selected intervals"), intervalWidget);
+        connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteIntervalSelected(void)));
+        menu.addAction(actDeleteInt);
+    }
+
+    menu.exec(analSidebar->mapToGlobal((QPoint(intervalItem->pos().x()+intervalItem->width()-20, intervalItem->pos().y()))));
 }
 
 void
@@ -2422,16 +2459,16 @@ MainWindow::updateRideFileIntervals()
 }
 
 void
+MainWindow::deleteIntervalSelected()
+{
+    // delete the intervals that are selected (from the menu)
+    // the normal delete intervals does that already
+    deleteInterval();
+}
+
+void
 MainWindow::deleteInterval()
 {
-    // renumber remaining
-    int oindex = activeInterval->displaySequence;
-    for (int i=0; i<allIntervals->childCount(); i++) {
-        IntervalItem *it = (IntervalItem *)allIntervals->child(i);
-        int ds = it->displaySequence;
-        if (ds > oindex) it->setDisplaySequence(ds-1);
-    }
-
     // now delete highlighted!
     for (int i=0; i<allIntervals->childCount();) {
         if (allIntervals->child(i)->isSelected()) delete allIntervals->takeChild(i);
@@ -2439,6 +2476,19 @@ MainWindow::deleteInterval()
     }
 
     updateRideFileIntervals(); // will emit intervalChanged() signal
+}
+
+void
+MainWindow::renameIntervalSelected()
+{
+    // go edit the name
+    for (int i=0; i<allIntervals->childCount();) {
+        if (allIntervals->child(i)->isSelected()) {
+            allIntervals->child(i)->setFlags(activeInterval->flags() | Qt::ItemIsEditable);
+            intervalWidget->editItem(allIntervals->child(i), 0);
+            break;
+        } else i++;
+    }
 }
 
 void
@@ -2452,6 +2502,18 @@ void
 MainWindow::intervalEdited(QTreeWidgetItem *, int) {
     // the user renamed the interval
     updateRideFileIntervals(); // will emit intervalChanged() signal
+}
+
+void
+MainWindow::zoomIntervalSelected()
+{
+    // zoom the one interval that is selected via popup menu
+    for (int i=0; i<allIntervals->childCount();) {
+        if (allIntervals->child(i)->isSelected()) {
+            emit intervalZoom((IntervalItem*)(allIntervals->child(i)));
+            break;
+        } else i++;
+    }
 }
 
 void
