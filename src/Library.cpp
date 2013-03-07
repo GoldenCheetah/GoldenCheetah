@@ -196,6 +196,17 @@ Library::importFiles(MainWindow *mainWindow, QStringList files)
     }
 }
 
+void
+Library::removeRef(MainWindow *mainWindow, QString ref)
+{
+    // remove a previous reference
+    int index = refs.indexOf(ref);
+    if (index >= 0) {
+        refs.removeAt(index);
+        LibraryParser::serialize(mainWindow->home);
+    }
+}
+
 //
 // SEARCHDIALOG -- user select paths and files and run a search
 //
