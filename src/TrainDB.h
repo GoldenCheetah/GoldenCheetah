@@ -51,7 +51,9 @@ class TrainDB : public QObject
     void endLUW() { dbconn.commit(); emit dataChanged(); }
 
     bool importWorkout(QString pathname, ErgFile *ergFile);
-    bool importVideo(QString pathname); //XXX simple for now
+    bool deleteWorkout(QString pathname);
+
+    bool importVideo(QString pathname);
 
     // drop and recreate tables
     void rebuildDB();

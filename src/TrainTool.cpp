@@ -425,6 +425,16 @@ TrainTool::workoutPopup()
     menu.addAction(wizard);
     menu.addAction(scan);
 
+    // we can delete too
+    QModelIndex current = workoutTree->currentIndex();
+    QModelIndex target = sortModel->mapToSource(current);
+    QString filename = workoutModel->data(workoutModel->index(target.row(), 0), Qt::DisplayRole).toString();
+    if (QFileInfo(filename).exists()) {
+        QAction *del = new QAction(tr("Delete selected workout"), workoutTree);
+        menu.addAction(del);
+        connect(del, SIGNAL(triggered(void)), this, SLOT(deleteWorkouts(void)));
+    }
+
     // connect menu to functions
     connect(import, SIGNAL(triggered(void)), main, SLOT(importWorkout(void)));
     connect(wizard, SIGNAL(triggered(void)), main, SLOT(showWorkoutWizard(void)));
@@ -642,6 +652,35 @@ TrainTool::listWorkoutFiles(const QDir &dir) const
     filters << "*.pgmf";
 
     return dir.entryList(filters, QDir::Files, QDir::Name);
+}
+
+void
+TrainTool::deleteWorkouts()
+{
+    QModelIndex current = workoutTree->currentIndex();
+    QModelIndex target = sortModel->mapToSource(current);
+    QString filename = workoutModel->data(workoutModel->index(target.row(), 0), Qt::DisplayRole).toString();
+
+    if (QFileInfo(filename).exists()) {
+        // are you sure?
+        QMessageBox msgBox;
+        msgBox.setText(tr("Are you sure you want to delete this workout?"));
+        msgBox.setInformativeText(filename);
+        QPushButton *deleteButton = msgBox.addButton(tr("Delete"),QMessageBox::YesRole);
+        msgBox.setStandardButtons(QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Cancel);
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
+
+        if(msgBox.clickedButton() != deleteButton) return;
+
+        // delete from disk
+        QFile(filename).remove();
+        // delete from DB
+        trainDB->startLUW();
+        trainDB->deleteWorkout(filename);
+        trainDB->endLUW();
+    }
 }
 
 void
