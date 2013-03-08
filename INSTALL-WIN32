@@ -1,3 +1,12 @@
+Please note: This is an old build instruction set for Version 2.x.
+
+Most of it is still fairly valid for version 3.x.
+
+Minimum build requirements are: Qt 4.8 with Qt.4.8.4 recommended.
+
+All other libs are find the best that you can except for libusb which requires 0.1.12.
+
+I have found that the cross compiler at http://mxe.cc/ to be great for building GC and SRMIO.
 
                                  +++++++++++++++++++++++
                                  WIN32 BUILD WALKTHROUGH
