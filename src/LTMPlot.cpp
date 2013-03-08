@@ -1048,14 +1048,11 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
 
         LTMScaleDraw *lsd = new LTMScaleDraw(settings->start, groupForDate(settings->start.date(), settings->groupBy), settings->groupBy);
         QwtText startText = lsd->label((int)(curve->sample(index).x()+0.5));
-        QwtText endText;
-        endText   = lsd->label((int)(curve->sample(index).x()+1.5));
-
 
         if (settings->groupBy != LTM_WEEK)
             datestr = startText.text();
         else
-            datestr = QString("%1 - %2").arg(startText.text()).arg(endText.text());
+            datestr = QString(tr("Week Commencing %1")).arg(startText.text());
 
         datestr = datestr.replace('\n', ' ');
 
