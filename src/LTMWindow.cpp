@@ -243,6 +243,8 @@ LTMWindow::metricSelected()
 void
 LTMWindow::dateRangeChanged(DateRange range)
 {
+    if (useCustom || useToToday) range = custom;
+
     if (!amVisible() && !dirty) return;
 
     // we already plotted that date range
@@ -283,8 +285,8 @@ LTMWindow::filterChanged()
     settings.measures = &measures;
 
     // if we want weeks and start is not a monday go back to the monday
-    int dow = myDateRange.from.dayOfWeek();
-    if (settings.groupBy == LTM_WEEK && dow >1 && myDateRange.from != QDate())
+    int dow = settings.start.date().dayOfWeek();
+    if (settings.groupBy == LTM_WEEK && dow >1 && settings.start != QDateTime(QDate(), QTime(0,0)))
         settings.start = settings.start.addDays(-1*(dow-1));
 
     // we need to get data again and apply filter
