@@ -2484,7 +2484,7 @@ MainWindow::renameIntervalSelected()
     // go edit the name
     for (int i=0; i<allIntervals->childCount();) {
         if (allIntervals->child(i)->isSelected()) {
-            allIntervals->child(i)->setFlags(activeInterval->flags() | Qt::ItemIsEditable);
+            allIntervals->child(i)->setFlags(allIntervals->child(i)->flags() | Qt::ItemIsEditable);
             intervalWidget->editItem(allIntervals->child(i), 0);
             break;
         } else i++;
