@@ -124,7 +124,6 @@ RideNavigator::RideNavigator(MainWindow *parent, bool mainwindow) : main(parent)
 
     // we accept drag and drop operations
     setAcceptDrops(true);
-    columnsChanged(); // set visual headings etc
 }
 
 RideNavigator::~RideNavigator()
@@ -261,6 +260,8 @@ RideNavigator::resetView()
 
     // Select the current ride
     rideTreeSelectionChanged();
+
+    columnsChanged();
 }
 
 void RideNavigator::searchStrings(QStringList list)
