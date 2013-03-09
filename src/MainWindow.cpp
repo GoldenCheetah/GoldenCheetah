@@ -133,7 +133,7 @@ QDesktopWidget *desktop = NULL;
 MainWindow::MainWindow(const QDir &home) :
     home(home), session(0), isclean(false), ismultisave(false),
     zones_(new Zones), hrzones_(new HrZones),
-    ride(NULL), workout(NULL)
+    ride(NULL), workout(NULL), groupByMapper(NULL)
 {
     #ifdef Q_OS_MAC
     // get an autorelease pool setup
@@ -1353,6 +1353,42 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
         connect(actUploadCalendar, SIGNAL(triggered(void)), this, SLOT(uploadCalendar()));
         menu.addAction(actUploadCalendar);
 #endif
+        menu.addSeparator();
+
+        // ride navigator stuff
+        QAction *colChooser = new QAction(tr("Show Column Chooser"), treeWidget);
+        connect(colChooser, SIGNAL(triggered(void)), listView, SLOT(showColumnChooser()));
+        menu.addAction(colChooser);
+
+        if (listView->groupBy() >= 0) {
+
+            // already grouped lets ungroup
+            QAction *nogroups = new QAction(tr("Do Not Show In Groups"), treeWidget);
+            connect(nogroups, SIGNAL(triggered(void)), listView, SLOT(noGroups()));
+            menu.addAction(nogroups);
+
+        } else {
+
+            QMenu *groupByMenu = new QMenu(tr("Group By"), treeWidget);
+            groupByMenu->setEnabled(true);
+            menu.addMenu(groupByMenu);
+
+            // add menu options for each column
+            if (groupByMapper) delete groupByMapper;
+            groupByMapper = new QSignalMapper(this);
+            connect(groupByMapper, SIGNAL(mapped(const QString &)), listView, SLOT(setGroupByColumnName(QString)));
+
+            foreach(QString heading, listView->columnNames()) {
+                if (heading == "*") continue; // special hidden column
+
+                QAction *groupByAct = new QAction(heading, treeWidget);
+                connect(groupByAct, SIGNAL(triggered()), groupByMapper, SLOT(map()));
+                groupByMenu->addAction(groupByAct);
+
+                // map action to column heading
+                groupByMapper->setMapping(groupByAct, heading);
+            }
+        }
         menu.exec(pos);
     }
 }
