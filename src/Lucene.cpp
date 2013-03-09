@@ -71,7 +71,8 @@ bool Lucene::importRide(SummaryMetrics *, RideFile *ride, QColor , unsigned long
 
     // add Filename special field (unique)
     std::wstring cname = ride->getTag("Filename","").toStdWString();
-    doc.add( *_CLNEW Field(_T("Filename"), cname.c_str(), Field::STORE_YES | Field::INDEX_UNTOKENIZED));
+    Field *fadd = new Field(_T("Filename"), cname.c_str(), Field::STORE_YES | Field::INDEX_UNTOKENIZED);
+    doc.add( *fadd );
 
     QString alltexts;
 
@@ -84,13 +85,15 @@ bool Lucene::importRide(SummaryMetrics *, RideFile *ride, QColor , unsigned long
             std::wstring value = ride->getTag(field.name,"").toStdWString();
 
             alltexts += ride->getTag(field.name,"") + " ";
-            doc.add( *_CLNEW Field(name.c_str(), value.c_str(), Field::STORE_YES | Field::INDEX_TOKENIZED));
+            Field *add = new Field(name.c_str(), value.c_str(), Field::STORE_YES | Field::INDEX_TOKENIZED);
+            doc.add( *add );
         }
     }
 
     // add a catchall text which is concat of all text fields
     std::wstring value = alltexts.toStdWString();
-    doc.add( *_CLNEW Field(_T("contents"), value.c_str(), Field::STORE_YES | Field::INDEX_TOKENIZED));
+    Field *cadd = new Field(_T("contents"), value.c_str(), Field::STORE_YES | Field::INDEX_TOKENIZED);
+    doc.add( *cadd );
     
     // delete if already in the index
     deleteRide(ride->getTag("Filename", ""));
@@ -120,7 +123,8 @@ bool Lucene::deleteRide(QString name)
     try {
 
         IndexReader *reader = IndexReader::open(dir.canonicalPath().toLocal8Bit().data());
-        reader->deleteDocuments(new Term(_T("Filename"), cname.c_str()));
+        Term del = Term(_T("Filename"), cname.c_str());
+        reader->deleteDocuments(&del);
         reader->close();
         delete reader;
 
