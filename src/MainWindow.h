@@ -445,6 +445,7 @@ class MainWindow : public QMainWindow
         IntervalTreeView *intervalWidget;
 
         // Miscellany
+        QSignalMapper *groupByMapper;
         QSignalMapper *toolMapper;
         WithingsDownload *withingsDownload;
         ZeoDownload *zeoDownload;

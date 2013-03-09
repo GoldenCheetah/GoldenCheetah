@@ -124,6 +124,7 @@ RideNavigator::RideNavigator(MainWindow *parent, bool mainwindow) : main(parent)
 
     // we accept drag and drop operations
     setAcceptDrops(true);
+    columnsChanged(); // set visual headings etc
 }
 
 RideNavigator::~RideNavigator()
@@ -359,6 +360,31 @@ RideNavigator::showEvent(QShowEvent *)
 {
     init = true;
     setWidth(geometry().width());
+}
+
+// routines called by the sidebar to let the user
+// update the columns/grouping without using right-click
+QStringList
+RideNavigator::columnNames() const
+{
+    return visualHeadings;
+}
+
+void
+RideNavigator::setGroupByColumnName(QString name)
+{
+    if (name == "") {
+
+        noGroups();
+
+    } else {
+
+        int logical = logicalHeadings.indexOf(name);
+        if (logical >= 0) {
+            currentColumn = logical;
+            setGroupByColumn();
+        }
+    }
 }
 
 void
