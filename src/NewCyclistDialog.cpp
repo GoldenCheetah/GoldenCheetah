@@ -196,7 +196,8 @@ NewCyclistDialog::saveClicked()
                 // Setup Power Zones
                 Zones zones;
                 zones.addZoneRange(QDate(1900, 01, 01), cp->value());
-                zones.write(QDir(home.path() + "/" + name->text()));
+                QFile zonesFile(home.path() + "/" + name->text() + "/power.zones");
+                zones.write(zonesFile);
 
                 // HR Zones too!
                 HrZones hrzones;

@@ -2159,7 +2159,8 @@ void
 ZonePage::saveClicked()
 {
     zones.setScheme(schemePage->getScheme());
-    zones.write(main->home);
+    QFile zonesFile(main->home.absolutePath() + "/power.zones");
+    zones.write(zonesFile);
 }
 
 SchemePage::SchemePage(ZonePage* zonePage) : zonePage(zonePage)
