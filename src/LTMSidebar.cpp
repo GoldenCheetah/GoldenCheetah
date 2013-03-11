@@ -109,6 +109,7 @@ LTMSidebar::LTMSidebar(MainWindow *parent, const QDir &home) : QWidget(parent), 
     summary = new QWebView(this);
     summary->setContentsMargins(0,0,0,0);
     summary->page()->view()->setContentsMargins(0,0,0,0);
+    summary->page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
     summary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     summary->setAcceptDrops(false);
 

@@ -660,8 +660,8 @@ MainWindow::MainWindow(const QDir &home) :
     intervalSplitter->setCollapsible(1, false);
 
     GcSplitterItem *calendarItem = new GcSplitterItem(tr("Calendar"), iconFromPNG(":images/sidebar/calendar.png"), this);
-    gcMiniCalendar = new GcMiniCalendar(this);
-    calendarItem->addWidget(gcMiniCalendar);
+    gcMultiCalendar = new GcMultiCalendar(this);
+    calendarItem->addWidget(gcMultiCalendar);
 
     analItem = new GcSplitterItem(tr("Activities"), iconFromPNG(":images/sidebar/folder.png"), this);
     QAction *moreAnalAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
@@ -826,12 +826,6 @@ MainWindow::MainWindow(const QDir &home) :
     splitter->addWidget(views);
 #endif
 
-    QVariant splitterSizes = appsettings->cvalue(cyclist, GC_SETTINGS_SPLITTER_SIZES); 
-    if (splitterSizes.toByteArray().size() > 1 ) {
-        splitter->restoreState(splitterSizes.toByteArray());
-        splitter->setOpaqueResize(true); // redraw when released, snappier UI
-    }
-
     splitter->setStretchFactor(0,0);
     splitter->setStretchFactor(1,1);
     splitter->setCollapsible(0, true);
@@ -841,6 +835,11 @@ MainWindow::MainWindow(const QDir &home) :
     splitter->setFrameStyle(QFrame::NoFrame);
     splitter->setContentsMargins(0, 0, 0, 0); // attempting to follow some UI guides
 
+    QVariant splitterSizes = appsettings->cvalue(cyclist, GC_SETTINGS_SPLITTER_SIZES); 
+    if (splitterSizes.toByteArray().size() > 1 ) {
+        splitter->restoreState(splitterSizes.toByteArray());
+        splitter->setOpaqueResize(true); // redraw when released, snappier UI
+    }
 
     // CENTRAL LAYOUT
     QWidget *central = new QWidget(this);
@@ -1240,7 +1239,7 @@ MainWindow::rideTreeWidgetSelectionChanged()
     diaryWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
     trainWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
     gcCalendar->setRide(ride);
-    gcMiniCalendar->setRide(ride);
+    gcMultiCalendar->setRide(ride);
 
     enableSaveButton(); // should it be enabled or not?
 
