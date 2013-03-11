@@ -659,12 +659,16 @@ MainWindow::MainWindow(const QDir &home) :
     intervalSplitter->setCollapsible(0, false);
     intervalSplitter->setCollapsible(1, false);
 
+    GcSplitterItem *calendarItem = new GcSplitterItem(tr("Calendar"), iconFromPNG(":images/sidebar/calendar.png"), this);
+    gcMiniCalendar = new GcMiniCalendar(this);
+    calendarItem->addWidget(gcMiniCalendar);
+
     analItem = new GcSplitterItem(tr("Activities"), iconFromPNG(":images/sidebar/folder.png"), this);
     QAction *moreAnalAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
     analItem->addAction(moreAnalAct);
     connect(moreAnalAct, SIGNAL(triggered(void)), this, SLOT(analysisPopup()));
-
     analItem->addWidget(activityHistory);
+
     intervalItem = new GcSplitterItem(tr("Intervals"), iconFromPNG(":images/mac/stop.png"), this);
     QAction *moreIntervalAct = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
     intervalItem->addAction(moreIntervalAct);
@@ -672,6 +676,7 @@ MainWindow::MainWindow(const QDir &home) :
     intervalItem->addWidget(intervalSplitter);
 
     analSidebar = new GcSplitter(Qt::Vertical);
+    analSidebar->addWidget(calendarItem);
     analSidebar->addWidget(analItem);
     analSidebar->addWidget(intervalItem);
     analSidebar->prepare(cyclist, "analysis");
@@ -1235,6 +1240,7 @@ MainWindow::rideTreeWidgetSelectionChanged()
     diaryWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
     trainWindow->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
     gcCalendar->setRide(ride);
+    gcMiniCalendar->setRide(ride);
 
     enableSaveButton(); // should it be enabled or not?
 

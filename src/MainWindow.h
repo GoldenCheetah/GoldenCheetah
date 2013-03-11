@@ -57,6 +57,7 @@ class IntervalSummaryWindow;
 class RideNavigator;
 class GcToolBar;
 class GcCalendar;
+class GcMiniCalendar;
 class GcBubble;
 class LTMSidebar;
 class LionFullScreen;
@@ -415,6 +416,7 @@ class MainWindow : public QMainWindow
         QMenu *windowMenu;
         GcBubble *bubble;
         GcCalendar *gcCalendar;
+        GcMiniCalendar *gcMiniCalendar;
 
         // each view has its own controls XXX more to come
         QStackedWidget *masterControls,
