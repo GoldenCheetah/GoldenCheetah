@@ -615,7 +615,7 @@ QString Zones::summarize(int rnum, QVector<double> &time_in_zone) const
 }
 
 #define USE_SHORT_POWER_ZONES_FORMAT true   /* whether a less redundent format should be used */
-void Zones::write(QDir home)
+void Zones::write(QFile &file)
 {
     QString strzones;
 
@@ -670,7 +670,6 @@ void Zones::write(QDir home)
         #endif
     }
 
-    QFile file(home.absolutePath() + "/power.zones");
     if (file.open(QFile::WriteOnly))
     {
         QTextStream stream(&file);

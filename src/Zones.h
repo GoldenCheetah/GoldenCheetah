@@ -148,7 +148,7 @@ class Zones : public QObject
         // read and write power.zones
         //
         bool read(QFile &file);
-        void write(QDir home);
+        void write(QFile &file);
         const QString &errorString() const { return err; }
         const QString &warningString() const { return warning; }
 

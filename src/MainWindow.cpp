@@ -2643,7 +2643,9 @@ MainWindow::setCriticalPower(int cp)
 
   zones_->setCP(range, cp);        // update the CP value
   zones_->setZonesFromCP(range);   // update the zones based on the value of CP
-  zones_->write(home);             // write the output file
+
+  QFile zonesFile(home.absolutePath() + "/power.zones");
+  zones_->write(zonesFile);             // write the output file
 
   QDate startDate = zones_->getStartDate(range);
   QDate endDate   =  zones_->getEndDate(range);
