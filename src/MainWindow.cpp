@@ -2122,9 +2122,11 @@ MainWindow::importFile()
     foreach(QString suffix, rff.suffixes())
         allFormats << QString("%1 (*.%2)").arg(rff.description(suffix)).arg(suffix);
     allFormats << "All files (*.*)";
-    fileNames = QFileDialog::getOpenFileNames(
-        this, tr("Import from File"), lastDir,
-        allFormats.join(";;"));
+#ifdef Q_OS_LINUX // native dialog borked
+    fileNames = QFileDialog::getOpenFileNames( this, tr("Import from File"), lastDir, allFormats.join(";;"), 0, QFileDialog::DontUseNativeDialog);
+#else
+    fileNames = QFileDialog::getOpenFileNames( this, tr("Import from File"), lastDir, allFormats.join(";;"));
+#endif
     if (!fileNames.isEmpty()) {
         lastDir = QFileInfo(fileNames.front()).absolutePath();
         appsettings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
@@ -2328,8 +2330,11 @@ MainWindow::importWorkout()
     // anything for now, we could add filters later
     QStringList allFormats;
     allFormats << "All files (*.*)";
-    QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Import from File"), lastDir,
-                                                                          allFormats.join(";;"));
+#ifdef Q_OS_LINUX
+    QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Import from File"), lastDir, allFormats.join(";;"), 0, QFileDialog::DontUseNativeDialog);
+#else
+    QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Import from File"), lastDir, allFormats.join(";;"));
+#endif
 
     // lets process them 
     if (!fileNames.isEmpty()) {
