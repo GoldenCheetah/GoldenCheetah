@@ -103,11 +103,6 @@ protected:
     GcSubSplitter *gcSplitter;
     int index;
 
-public slots:
-    void showHideClicked();
-
-    void setExpanded(bool expanded);
-
 private:
     void paintBackground(QPaintEvent *);
 
@@ -116,11 +111,9 @@ private:
     QHBoxLayout *titleLayout;
     GcLabel *titleLabel;
     QToolBar *titleToolbar;
-    QPushButton *showHide;
 
     QString title;
     int fullHeight;
-    bool state;
     QLinearGradient active, inactive;
 };
 
