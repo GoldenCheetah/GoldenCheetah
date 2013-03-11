@@ -702,3 +702,360 @@ GcCalendar::setSummary()
 
     }
 }
+
+GcMiniCalendar::GcMiniCalendar(MainWindow *main) : main(main)
+{
+    setContentsMargins(0,0,0,0);
+    setAutoFillBackground(true);
+
+    month = year = 0;
+    _ride = NULL;
+
+    setStyleSheet("QLabel { color: gray; }");
+    layout = new QVBoxLayout(this);
+    layout->setSpacing(0);
+    layout->setContentsMargins(10,10,10,10);
+
+    black.setColor(QPalette::WindowText, Qt::gray);
+    white.setColor(QPalette::WindowText, Qt::white);
+    grey.setColor(QPalette::WindowText, Qt::gray);
+
+    // get the model
+    fieldDefinitions = main->rideMetadata()->getFields();
+    calendarModel = new GcCalendarModel(this, &fieldDefinitions, main);
+    calendarModel->setSourceModel(main->listView->sqlModel);
+
+    QHBoxLayout *line = new QHBoxLayout;
+    line->setSpacing(0);
+    line->setContentsMargins(0,0,0,0);
+
+    QFont font;
+    font.setPointSize(12);
+    left = new GcLabel("<", this);
+    left->setAutoFillBackground(false);
+    left->setPalette(white);
+    left->setFont(font);
+    left->setAlignment(Qt::AlignLeft);
+    line->addWidget(left);
+    connect (left, SIGNAL(clicked()), this, SLOT(previous()));
+
+    font.setPointSize(12);
+    monthName = new GcLabel("January 2012", this);
+    monthName->setAutoFillBackground(false);
+    monthName->setPalette(white);
+    monthName->setFont(font);
+    monthName->setAlignment(Qt::AlignCenter);
+    line->addWidget(monthName);
+
+    font.setPointSize(12);
+    right = new GcLabel(">", this);
+    right->setAutoFillBackground(false);
+    right->setPalette(white);
+    right->setFont(font);
+    right->setAlignment(Qt::AlignRight);
+    line->addWidget(right);
+    connect (right, SIGNAL(clicked()), this, SLOT(next()));
+
+    QWidget *month = new QWidget(this);
+    month->setContentsMargins(0,0,0,0);
+    month->setFixedWidth(180);
+    month->setFixedHeight(180);
+    QGridLayout *dayLayout = new QGridLayout(month);
+    dayLayout->setSpacing(1);
+    dayLayout->setContentsMargins(0,0,0,0);
+    dayLayout->addLayout(line, 0,0,1,7);
+    layout->addWidget(month, Qt::AlignCenter);
+
+    font.setWeight(QFont::Normal);
+
+    // Mon
+    font.setPointSize(9);
+    GcLabel *day = new GcLabel("Mon", this);
+    day->setFont(font);
+    day->setAutoFillBackground(false);
+    day->setPalette(white);
+    day->setFont(font);
+    day->setAlignment(Qt::AlignCenter);
+    dayLayout->addWidget(day, 1, 0);
+
+    // Tue
+    day = new GcLabel("Tue", this);
+    day->setFont(font);
+    day->setAutoFillBackground(false);
+    day->setPalette(white);
+    day->setFont(font);
+    day->setAlignment(Qt::AlignCenter);
+    dayLayout->addWidget(day, 1, 1);
+
+    // Wed
+    day = new GcLabel("Wed", this);
+    day->setFont(font);
+    day->setAutoFillBackground(false);
+    day->setPalette(white);
+    day->setFont(font);
+    day->setAlignment(Qt::AlignCenter);
+    dayLayout->addWidget(day, 1, 2);
+
+    // Thu
+    day = new GcLabel("Thu", this);
+    day->setFont(font);
+    day->setAutoFillBackground(false);
+    day->setPalette(white);
+    day->setFont(font);
+    day->setAlignment(Qt::AlignCenter);
+    dayLayout->addWidget(day, 1, 3);
+
+    // Fri
+    day = new GcLabel("Fri", this);
+    day->setFont(font);
+    day->setAutoFillBackground(false);
+    day->setPalette(white);
+    day->setFont(font);
+    day->setAlignment(Qt::AlignCenter);
+    dayLayout->addWidget(day, 1, 4);
+
+    // Sat
+    day = new GcLabel("Sat", this);
+    day->setFont(font);
+    day->setAutoFillBackground(false);
+    day->setPalette(white);
+    day->setFont(font);
+    day->setAlignment(Qt::AlignCenter);
+    dayLayout->addWidget(day, 1, 5);
+
+    // Sun
+    day = new GcLabel("Sun", this);
+    day->setFont(font);
+    day->setAutoFillBackground(false);
+    day->setPalette(white);
+    day->setFont(font);
+    day->setAlignment(Qt::AlignCenter);
+    dayLayout->addWidget(day, 1, 6);
+
+    signalMapper = new QSignalMapper(this);
+    font.setPointSize(11);
+    for (int row=2; row<8; row++) {
+
+        for (int col=0; col < 7; col++) {
+
+            GcLabel *d = new GcLabel(QString("%1").arg((row-2)*7+col), this);
+            d->setFont(font);
+            d->setAutoFillBackground(false);
+            d->setPalette(grey);
+            d->setStyleSheet("color: gray;");
+            d->setAlignment(Qt::AlignCenter);
+            dayLayout->addWidget(d,row,col);
+
+            // we like squares
+            d->setFixedHeight(22);
+            d->setFixedWidth(22);
+
+            dayLabels << d;
+
+            if (row== 3 && col == 4) d->setSelected(true);
+
+            connect (d, SIGNAL(clicked()), signalMapper, SLOT(map()));
+            signalMapper->setMapping(d, (row-2)*7+col);
+        }
+    }
+    layout->addStretch();
+
+    // day clicked
+    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(dayClicked(int)));
+
+    // refresh on these events...
+    connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
+    connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
+    connect(main, SIGNAL(configChanged()), this, SLOT(refresh()));
+
+    // set up for current selections
+    refresh();
+}
+
+void
+GcMiniCalendar::refresh()
+{
+    calendarModel->setMonth(month, year);
+    repaint();
+}
+
+bool
+GcMiniCalendar::event(QEvent *e)
+{
+    if (e->type() != QEvent::ToolTip && e->type() != QEvent::Paint && e->type() != QEvent::Destroy &&
+        e->type() != QEvent::LayoutRequest) {
+        main->setBubble("");
+        //qDebug()<<"event"<<e->type();
+    }
+
+    if (e->type() == QEvent::Paint) {
+        // fill the background
+        QPainter painter(this);
+        QRect all(0,0,width(),height());
+        //painter.fillRect(all, QColor("#B3B4BA"));
+        painter.fillRect(all, QColor(Qt::white));
+    }
+
+    int n=0;
+    if (e->type() == QEvent::ToolTip) {
+
+        // are we hovering over a label?
+        foreach(GcLabel *label, dayLabels) {
+            if (label->underMouse()) {
+                if (dayLabels.at(n)->text() == "") return false;
+
+                // select a ride if there is one for this one?
+                int row = n / 7;
+                int col = n % 7;
+
+                QModelIndex p = calendarModel->index(row,col);
+                QStringList files = calendarModel->data(p, GcCalendarModel::FilenamesRole).toStringList();
+
+                QPoint pos = dynamic_cast<QHelpEvent*>(e)->pos();
+
+                // Popup bubble for ride
+                if (files.count()) {
+                    if (files[0] == "calendar") ; // handle planned rides
+                    else main->setBubble(files.at(0), mapToGlobal(pos+QPoint(+2,+2)));
+                }
+            }
+            n++;
+        }
+    }
+    return QWidget::event(e);
+}
+
+void
+GcMiniCalendar::dayClicked(int i)
+{
+    if (dayLabels.at(i)->text() == "") return;
+
+    // select a ride if there is one for this one?
+    int row = i / 7;
+    int col = i % 7;
+
+
+    QModelIndex p = calendarModel->index(row,col);
+    QStringList files = calendarModel->data(p, GcCalendarModel::FilenamesRole).toStringList();
+
+    if (files.count()) // if more than one file cycle through them?
+        main->selectRideFile(QFileInfo(files[0]).fileName());
+
+}
+
+void
+GcMiniCalendar::previous()
+{
+    QList<QDateTime> allDates = main->metricDB->db()->getAllDates();
+    qSort(allDates);
+
+    // begin of month
+    QDateTime bom(QDate(year,month,01), QTime(0,0,0));
+    for(int i=allDates.count()-1; i>0; i--) {
+        if (allDates.at(i) < bom) {
+
+            QDate date = allDates.at(i).date();
+            calendarModel->setMonth(date.month(), date.year());
+
+            // find the day in the calendar...
+            for (int day=42; day>0;day--) {
+
+                QModelIndex p = calendarModel->index(day/7,day%7);
+                QDate heredate = calendarModel->date(p);
+                if (date == heredate) {
+                    // select this ride...
+                    QStringList files = calendarModel->data(p, GcCalendarModel::FilenamesRole).toStringList();
+                    if (files.count()) main->selectRideFile(QFileInfo(files[0]).fileName());
+                }
+            }
+            break;
+        }
+    }
+}
+
+void
+GcMiniCalendar::next()
+{
+    QList<QDateTime> allDates = main->metricDB->db()->getAllDates();
+    qSort(allDates);
+
+    // end of month
+    QDateTime eom(QDate(year,month,01).addMonths(1), QTime(00,00,00));
+    for(int i=0; i<allDates.count(); i++) {
+        if (allDates.at(i) >= eom) {
+
+            QDate date = allDates.at(i).date();
+            calendarModel->setMonth(date.month(), date.year());
+
+            // find the day in the calendar...
+            for (int day=0; day<42;day++) {
+
+                QModelIndex p = calendarModel->index(day/7,day%7);
+                QDate heredate = calendarModel->date(p);
+                if (date == heredate) {
+                    // select this ride...
+                    QStringList files = calendarModel->data(p, GcCalendarModel::FilenamesRole).toStringList();
+                    if (files.count()) main->selectRideFile(QFileInfo(files[0]).fileName());
+                }
+            }
+            break;
+        }
+    }
+}
+
+void
+GcMiniCalendar::setRide(RideItem *ride)
+{
+    _ride = ride;
+
+    QDate when;
+    if (_ride && _ride->ride()) when = _ride->dateTime.date();
+    else when = QDate::currentDate();
+
+    // refresh the model
+    if (when.month() != month || when.year() != year) {
+        calendarModel->setMonth(when.month(), when.year());
+        year = when.year();
+        month = when.month();
+
+        monthName->setText(when.toString("MMMM yyyy"));
+    }
+
+    // now reapply for each row/col of calendar...
+    for (int row=0; row<6; row++) {
+        for (int col=0; col < 7; col++) {
+
+            GcLabel *d = dayLabels.at(row*7+col);
+            QModelIndex p = calendarModel->index(row,col);
+            QDate date = calendarModel->date(p);
+
+            if (date.month() != month || date.year() != year) {
+                d->setText("");
+                d->setBg(false);
+                d->setSelected(false);
+            } else {
+                d->setText(QString("%1").arg(date.day()));
+
+                // what color should it be?
+                // for taste we /currently/ just set to bg to
+                // highlight there is a ride there, colors /will/ come
+                // back later when worked out a way of making it look
+                // nice and not garish 
+                QList<QColor> colors = p.data(Qt::BackgroundRole).value<QList<QColor> >();
+                if (colors.count()) {
+                    d->setBg(true);
+                    d->setPalette(black);
+                    d->setBgColor(colors.at(0)); // use first always
+                } else {
+                    d->setBg(false);
+                    d->setPalette(white);
+                }
+                if (date == when) {
+                    d->setSelected(true);
+                    d->setPalette(white);
+                } else d->setSelected(false);
+            }
+        }
+    }
+    refresh();
+}
