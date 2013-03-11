@@ -52,7 +52,7 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
     // cal widget
     QWidget *cal = new QWidget(this);
     cal->setPalette(pal);
-    cal->setContentsMargins(10,5,10,10);
+    cal->setContentsMargins(0,0,0,0);
     cal->setStyleSheet("QLabel { color: gray; }");
     layout = new QVBoxLayout(cal);
     layout->setSpacing(0);
@@ -69,42 +69,12 @@ GcCalendar::GcCalendar(MainWindow *main) : main(main)
 
     splitter->addWidget(calendarItem);
     splitter->addWidget(summaryItem);
-
     splitter->prepare(main->cyclist, "diary");
 
     black.setColor(QPalette::WindowText, Qt::gray);
     white.setColor(QPalette::WindowText, Qt::white);
     grey.setColor(QPalette::WindowText, Qt::gray);
 
-    QFont font;
-    font.setPointSize(40);
-    dayNumber = new GcLabel("4", this);
-    //dayNumber->setYOff(-1);
-    dayNumber->setAutoFillBackground(false);
-    dayNumber->setPalette(white);
-    dayNumber->setFont(font);
-    dayNumber->setAlignment(Qt::AlignLeft);
-    layout->addWidget(dayNumber);
-
-    font.setPointSize(20);
-    dayName = new GcLabel("Sunday", this);
-    //dayName->setYOff(-1);
-    dayName->setAutoFillBackground(false);
-    dayName->setPalette(white);
-    dayName->setFont(font);
-    dayName->setAlignment(Qt::AlignLeft);
-    layout->addWidget(dayName);
-
-    font.setPointSize(12);
-    font.setWeight(QFont::Bold);
-    dayDate = new GcLabel("4th January 2012", this);
-    dayDate->setAutoFillBackground(false);
-    dayDate->setPalette(grey);
-    dayDate->setFont(font);
-    dayDate->setAlignment(Qt::AlignLeft);
-    layout->addWidget(dayDate);
-
-    layout->addSpacing(20);
     multiCalendar = new GcMultiCalendar(main);
     layout->addWidget(multiCalendar);
 
@@ -164,12 +134,7 @@ GcCalendar::setRide(RideItem *ride)
     if (_ride && _ride->ride()) when = _ride->dateTime.date();
     else when = QDate::currentDate();
 
-    dayNumber->setText(when.toString("d"));
-    dayName->setText(when.toString("dddd"));
-    dayDate->setText(when.toString("d MMMM yyyy"));
-
     multiCalendar->setRide(ride);
-
     setSummary();
 }
 
