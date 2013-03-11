@@ -2093,7 +2093,11 @@ MainWindow::exportRide()
         allFormats << QString("%1 (*.%2)").arg(rff.description(suffix)).arg(suffix);
 
     QString suffix; // what was selected?
+#ifdef Q_OS_LINUX
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export Activity"), QDir::homePath(), allFormats.join(";;"), &suffix, QFileDialog::DontUseNativeDialog);
+#else
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export Activity"), QDir::homePath(), allFormats.join(";;"), &suffix);
+#endif
 
     if (fileName.length() == 0) return;
 
@@ -2254,8 +2258,11 @@ MainWindow::openCyclist()
 void
 MainWindow::exportMetrics()
 {
-    QString fileName = QFileDialog::getSaveFileName(
-        this, tr("Export Metrics"), QDir::homePath(), tr("Comma Separated Variables (*.csv)"));
+#ifdef Q_OS_LINUX
+    QString fileName = QFileDialog::getSaveFileName( this, tr("Export Metrics"), QDir::homePath(), tr("Comma Separated Variables (*.csv)"), 0, QFileDialog::DontUseNativeDialog);
+#else
+    QString fileName = QFileDialog::getSaveFileName( this, tr("Export Metrics"), QDir::homePath(), tr("Comma Separated Variables (*.csv)"));
+#endif
     if (fileName.length() == 0)
         return;
     metricDB->writeAsCSV(fileName);
