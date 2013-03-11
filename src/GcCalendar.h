@@ -70,7 +70,11 @@ class GcMiniCalendar : public QWidget
 
     public:
 
-        GcMiniCalendar(MainWindow *);
+        GcMiniCalendar(MainWindow *, bool master);
+
+        void setDate(int month, int year);
+        void getDate(int &_month, int &_year) { _month = month; _year = year; }
+        void clearRide();
 
     public slots:
 
@@ -84,6 +88,7 @@ class GcMiniCalendar : public QWidget
         bool event(QEvent *e);
 
     signals:
+        void dateChanged(int month, int year);
 
     protected:
         MainWindow *main;
@@ -103,6 +108,28 @@ class GcMiniCalendar : public QWidget
         QPalette black, grey, white;
         QList<FieldDefinition> fieldDefinitions;
         GcCalendarModel *calendarModel;
+        bool master;
+};
+
+class GcMultiCalendar : public QScrollArea
+{
+    Q_OBJECT
+
+    public:
+
+        GcMultiCalendar(MainWindow*);
+        void refresh();
+
+    public slots:
+        void dateChanged(int month, int year);
+        void setRide(RideItem *ride);
+        void resizeEvent(QResizeEvent*);
+
+    private:
+        QVBoxLayout *layout;
+        QVector<GcMiniCalendar*> calendars;
+        MainWindow *main;
+        int showing;
 };
 
 class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
@@ -118,12 +145,6 @@ class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
 
         void setRide(RideItem *ride);
         void refresh(); 
-
-        void dayClicked(int num); // for when a day is selected
-        void next();
-        void previous();
-
-        bool event(QEvent *e);
         void setSummary(); // set the summary at the bottom
 
     signals:
@@ -141,17 +162,9 @@ class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
         GcLabel *dayName;   // what day of the week
         GcLabel *dayDate;   // Date string
 
-        GcLabel *left, *right; // < ... >
-        GcLabel *monthName; // January 2012
-        GcLabel *dayNames[7]; // Mon .. Sun
-
-        QList<GcLabel*> dayLabels; // 1 .. 31
-
-        QSignalMapper *signalMapper; // for mapping dayLabels "clicked"
+        GcMultiCalendar *multiCalendar;
 
         QPalette black, grey, white;
-        QList<FieldDefinition> fieldDefinitions;
-        GcCalendarModel *calendarModel;
 
         GcSplitter *splitter; // calendar vs summary
         GcSplitterItem *calendarItem,
