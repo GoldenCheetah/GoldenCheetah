@@ -315,7 +315,7 @@ void
 LTMWindow::rGroupBySelected(int selected)
 {
     if (selected >= 0) {
-        settings.groupBy = selected;
+        settings.groupBy = ltmTool->groupBy->itemData(selected).toInt();
         ltmTool->groupBy->setCurrentIndex(selected);
     }
 }
