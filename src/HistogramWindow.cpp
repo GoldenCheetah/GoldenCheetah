@@ -164,6 +164,9 @@ HistogramWindow::HistogramWindow(MainWindow *mainWindow, bool rangemode) : GcCha
     // when season changes we need to retrieve data from the cache then update the chart
     if (rangemode) {
         connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
+        connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
+        connect(dateSetting, SIGNAL(useThruToday()), this, SLOT(useThruToday()));
+        connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
     } else {
         dateSetting->hide();
         connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
@@ -266,6 +269,9 @@ HistogramWindow::useThruToday()
 
 void HistogramWindow::dateRangeChanged(DateRange dateRange)
 {
+    // if we're using a custom one lets keep it
+    if (rangemode && (useCustom || useToToday)) dateRange = custom;
+
     // has it changed?
     if (dateRange.from != cfrom || dateRange.to != cto) 
         stale = true;
