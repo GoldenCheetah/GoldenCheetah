@@ -111,16 +111,17 @@ public slots:
 private:
     void paintBackground(QPaintEvent *);
 
-     GcSplitterItem *widget;
+    GcSplitterItem *widget;
 
-     QHBoxLayout *titleLayout;
-     GcLabel *titleLabel;
-     QToolBar *titleToolbar;
-     QPushButton *showHide;
+    QHBoxLayout *titleLayout;
+    GcLabel *titleLabel;
+    QToolBar *titleToolbar;
+    QPushButton *showHide;
 
-     QString title;
-     int fullHeight;
-     bool state;
+    QString title;
+    int fullHeight;
+    bool state;
+    QLinearGradient active, inactive;
 };
 
 class GcSplitterControl : public QToolBar
@@ -136,6 +137,7 @@ protected:
 
 private:
     void paintBackground(QPaintEvent *);
+    QLinearGradient active, inactive;
 
 };
 

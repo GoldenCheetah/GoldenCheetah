@@ -224,6 +224,24 @@ GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Or
     titleLabel = new GcLabel(title, this);
     titleLabel->setXOff(1);
 
+#ifdef Q_OS_MAC
+    int shade = 178;
+    int inshade = 225;
+#else
+    int shade = 200;
+    int inshade = 250;
+#endif
+    active = QLinearGradient(0, 0, 0, 23);
+    active.setColorAt(0.0, QColor(shade,shade,shade, 100));
+    active.setColorAt(0.5, QColor(shade,shade,shade, 180));
+    active.setColorAt(1.0, QColor(shade,shade,shade, 255));
+    active.setSpread(QGradient::PadSpread);
+    inactive = QLinearGradient(0, 0, 0, 23);
+    inactive.setColorAt(0.0, QColor(inshade,inshade,inshade, 100));
+    inactive.setColorAt(0.5, QColor(inshade,inshade,inshade, 180));
+    inactive.setColorAt(1.0, QColor(inshade,inshade,inshade, 255));
+    inactive.setSpread(QGradient::PadSpread);
+
     QFont font;
 #ifdef Q_OS_MAC
     titleLabel->setFixedHeight(16);
@@ -307,18 +325,8 @@ GcSplitterHandle::paintBackground(QPaintEvent *)
     QRect all(0,0,width(),height());
 
     // fill with a linear gradient
-#ifdef Q_OS_MAC
-    int shade = isActiveWindow() ? 178 : 225;
-#else
-    int shade = isActiveWindow() ? 200 : 250;
-#endif
-    QLinearGradient linearGradient(0, 0, 0, height());
-    linearGradient.setColorAt(0.0, QColor(shade,shade,shade, 100));
-    linearGradient.setColorAt(0.5, QColor(shade,shade,shade, 180));
-    linearGradient.setColorAt(1.0, QColor(shade,shade,shade, 255));
-    linearGradient.setSpread(QGradient::PadSpread);
     painter.setPen(Qt::NoPen);
-    painter.fillRect(all, linearGradient);
+    painter.fillRect(all, isActiveWindow() ? active : inactive);
 
     QPen black(QColor(100,100,100,200));
     painter.setPen(black);
@@ -366,6 +374,25 @@ GcSplitterControl::GcSplitterControl(QWidget *parent) : QToolBar(parent)
     setIconSize(QSize(14,14));
     setToolButtonStyle(Qt::ToolButtonIconOnly);
     setAutoFillBackground(false);
+
+#ifdef Q_OS_MAC
+    int shade = 178;
+    int inshade = 225;
+#else
+    int shade = 200;
+    int inshade = 250;
+#endif
+    active = QLinearGradient(0, 0, 0, 20);
+    active.setColorAt(0.0, QColor(shade,shade,shade, 100));
+    active.setColorAt(0.5, QColor(shade,shade,shade, 180));
+    active.setColorAt(1.0, QColor(shade,shade,shade, 255));
+    active.setSpread(QGradient::PadSpread);
+    inactive = QLinearGradient(0, 0, 0, 20);
+    inactive.setColorAt(0.0, QColor(inshade,inshade,inshade, 100));
+    inactive.setColorAt(0.5, QColor(inshade,inshade,inshade, 180));
+    inactive.setColorAt(1.0, QColor(inshade,inshade,inshade, 255));
+    inactive.setSpread(QGradient::PadSpread);
+
     QWidget *spacer = new QWidget(this);
     spacer->setAutoFillBackground(false);
     spacer->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
@@ -389,18 +416,8 @@ GcSplitterControl::paintBackground(QPaintEvent *)
     QPainter painter(this);
 
     // fill with a linear gradient
-#ifdef Q_OS_MAC
-    int shade = isActiveWindow() ? 178 : 225;
-#else
-    int shade = isActiveWindow() ? 200 : 250;
-#endif
-    QLinearGradient linearGradient(0, 0, 0, height());
-    linearGradient.setColorAt(0.0, QColor(shade,shade,shade, 100));
-    linearGradient.setColorAt(0.5, QColor(shade,shade,shade, 180));
-    linearGradient.setColorAt(1.0, QColor(shade,shade,shade, 255));
-    linearGradient.setSpread(QGradient::PadSpread);
     painter.setPen(Qt::NoPen);
-    painter.fillRect(all, linearGradient);
+    painter.fillRect(all, isActiveWindow() ? active : inactive);
     QPen gray(QColor(230,230,230));
     painter.setPen(gray);
     painter.drawLine(0,0, width()-1, 0);
