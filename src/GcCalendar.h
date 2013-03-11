@@ -158,14 +158,9 @@ class GcCalendar : public QWidget // not a GcWindow - belongs on sidebar
         QVBoxLayout *layout;
         QGridLayout *dayLayout; // contains the day names and days
 
-        GcLabel *dayNumber; // the big NUmber at top
-        GcLabel *dayName;   // what day of the week
-        GcLabel *dayDate;   // Date string
-
         GcMultiCalendar *multiCalendar;
 
         QPalette black, grey, white;
-
         GcSplitter *splitter; // calendar vs summary
         GcSplitterItem *calendarItem,
                        *summaryItem;
