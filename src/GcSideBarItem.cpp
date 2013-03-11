@@ -256,16 +256,7 @@ GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Or
     font.setWeight(QFont::Black);
     titleLabel->setFont(font);
 
-    showHide = new QPushButton(this);
-    showHide->setStyleSheet("QPushButton {color : blue;background: transparent}");
-    showHide->setFixedWidth(16);
-    state = true;
-    //showHideClicked();
-    //titleLayout->addWidget(showHide);
-    //connect(showHide, SIGNAL(clicked(bool)), this, SLOT(showHideClicked()));
-
     titleLayout->addSpacing(10);
-
     titleLayout->addWidget(titleLabel);
     titleLayout->addStretch();
 
@@ -337,34 +328,6 @@ GcSplitterHandle::paintBackground(QPaintEvent *)
     painter.drawLine(0,0, width()-1, 0);
 
     painter.restore();
-}
-
-void
-GcSplitterHandle::setExpanded(bool expanded)
-{
-
-    state = expanded;
-    if (expanded == false) {
-        showHide->setIcon(widget->icon);//QIcon(*show));
-        titleLabel->setStyleSheet("QLabel { color: gray; }");
-        fullHeight = widget->height();
-        widget->setFixedHeight(0);
-    } else {
-        showHide->setIcon(widget->icon);//QIcon(*hide));
-        titleLabel->setStyleSheet("QLabel { color: black; }");
-        widget->setBaseSize(widget->width(), fullHeight);
-        widget->setMaximumSize(QWIDGETSIZE_MAX,QWIDGETSIZE_MAX);
-        widget->setMinimumSize(0,0);
-    }
-    showHide->setChecked(false);
-    repaint();
-}
-
-void
-GcSplitterHandle::showHideClicked()
-{
-    state = !state;
-    setExpanded(state);
 }
 
 GcSplitterControl::GcSplitterControl(QWidget *parent) : QToolBar(parent)
