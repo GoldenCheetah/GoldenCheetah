@@ -247,7 +247,8 @@ JsonFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*
     // JsonRideFilein is the FILE * used by the lexer
     JsonRideFilein = fopen(file.fileName().toLatin1(), "r");
     if (JsonRideFilein == NULL) {
-        errors << "unable to open file" + file.fileName();
+        errors << "unable to open file (locale?)" + file.fileName();
+        return NULL; // failed to open the file ? 
     }
     // inform the parser/lexer we have a new file
     JsonRideFilerestart(JsonRideFilein);
