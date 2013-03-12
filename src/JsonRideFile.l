@@ -79,3 +79,8 @@
 #if !defined(FLEX_SCANNER) || (YY_FLEX_SUBMINOR_VERSION < 9)
 int JsonRideFilelex_destroy(void) { return 0; }
 #endif
+
+void JsonRideFile_setString(QString p)
+{
+    JsonRideFile_scan_string(p.toLatin1().data());
+}
