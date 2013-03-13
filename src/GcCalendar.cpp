@@ -147,13 +147,12 @@ GcLabel::event(QEvent *e)
 }
 
 void
-GcLabel::paintEvent(QPaintEvent *e)
+GcLabel::paintEvent(QPaintEvent *)
 {
-    int x,y,w,l;
-
+    QPainter painter(this);
+    painter.save();
 
     if (bg) {
-        QPainter painter(this);
         // setup a painter and the area to paint
         QRect all(0,0,width(),height());
         if (!underMouse()) painter.fillRect(all, bgColor);
@@ -164,32 +163,23 @@ GcLabel::paintEvent(QPaintEvent *e)
     }
 
     if (selected) {
-        QPainter painter(this);
         QRect all(0,0,width(),height());
         painter.fillRect(all, GColor(CCALCURRENT));
     }
 
     if (xoff || yoff) {
-        // save settings
-        QPalette p = palette();
-        getContentsMargins(&x,&y,&w,&l);
 
-        // adjust for emboss
-        setContentsMargins(x+xoff,y+yoff,w,l);
-        QPalette r;
-        r.setColor(QPalette::WindowText, QColor(220,220,220,160));
-        setPalette(r);
-        QLabel::paintEvent(e);
-
-        // Now normal
-        setContentsMargins(x,y,w,l);
-        setPalette(p);
+        // draw text in white behind...
+        QRectF off(xoff,yoff,width(),height());
+        painter.setPen(QColor(220,220,220,160));
+        painter.drawText(off, alignment(), text());
     }
 
-    QPalette r; // want gray
-    r.setColor(QPalette::WindowText, QColor(0,0,0,170));
-    setPalette(r);
-    QLabel::paintEvent(e);
+    QRectF norm(0,0,width(),height());
+    painter.setPen(QColor(0,0,0,170));
+    painter.drawText(norm, alignment(), text());
+
+    painter.restore();
 }
 
 void
