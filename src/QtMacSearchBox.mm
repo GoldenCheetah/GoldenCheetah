@@ -138,14 +138,3 @@ QSize QtMacSearchBox::sizeHint() const
     return s->sizeHint() + QSize(6, 2);
 }
 
-Spacer::Spacer(QWidget *parent)
-:QWidget(parent)
-{
-    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    setSizePolicy(sizePolicy);
-}
-
-QSize Spacer::sizeHint() const
-{
-    return QSize(10, 1);
-}

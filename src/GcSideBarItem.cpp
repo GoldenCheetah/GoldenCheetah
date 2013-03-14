@@ -27,8 +27,8 @@ QIcon iconFromPNG(QString filename)
     // use muted dark gray color
     QImage gray8 = pngImage.convertToFormat(QImage::Format_Indexed8);
     QImage white8 = pngImage.convertToFormat(QImage::Format_Indexed8);
-    gray8.setColor(0, QColor(80,80,80, 255).rgb());
-    white8.setColor(0, QColor(255,255,255, 100).rgb());
+    gray8.setColor(0, QColor(80,80,80, 170).rgb());
+    white8.setColor(0, QColor(255,255,255, 255).rgb());
 
     // now convert to a format we can paint with!
     QImage white = white8.convertToFormat(QImage::Format_ARGB32_Premultiplied);

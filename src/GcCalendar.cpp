@@ -151,6 +151,7 @@ GcLabel::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.save();
+    painter.setRenderHints(QPainter::Antialiasing|QPainter::TextAntialiasing, true);
 
     if (bg) {
         // setup a painter and the area to paint
@@ -160,12 +161,12 @@ GcLabel::paintEvent(QPaintEvent *)
 
         painter.setPen(Qt::gray);
         painter.drawRect(QRect(0,0,width()-1,height()-1));
-    }
+    }   
 
     if (selected) {
         QRect all(0,0,width(),height());
         painter.fillRect(all, GColor(CCALCURRENT));
-    }
+    }   
 
     if (xoff || yoff) {
 

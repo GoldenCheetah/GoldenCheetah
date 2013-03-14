@@ -29,10 +29,11 @@
 SearchBox::SearchBox(MainWindow *main, QWidget *parent)
     : QLineEdit(parent), main(main)
 {
-    setFixedHeight(26);
+    setFixedHeight(23);
     //clear button
     clearButton = new QToolButton(this);
     QPixmap pixmap(":images/toolbar/clear.png");
+    pixmap = pixmap.scaled(16,16);
     clearButton->setIcon(QIcon(pixmap));
     clearButton->setIconSize(pixmap.size());
     clearButton->setCursor(Qt::ArrowCursor);
@@ -51,6 +52,7 @@ SearchBox::SearchBox(MainWindow *main, QWidget *parent)
     // search button
     searchButton = new QToolButton(this);
     QPixmap search(":images/toolbar/search.png");
+    search = search.scaled(16,16);
     searchButton->setIcon(QIcon(search));
     searchButton->setIconSize(search.size());
     searchButton->setCursor(Qt::ArrowCursor);
@@ -69,29 +71,9 @@ SearchBox::SearchBox(MainWindow *main, QWidget *parent)
     setObjectName("SearchBox");
     setStyleSheet(QString( //"QLineEdit { padding-right: %1px; } "
                           "QLineEdit#SearchBox {"
-                          "    selection-color: white;   "
-                          "    border: 1px groove lightGray;"
                           "    padding: 0px %1px;"
                           "}"
-                          "QLineEdit#SearchBox:focus {"
-                          "    selection-color: white;   "
-                          "    border: 1px groove lightGray;"
-                          "    padding: 0px %1px;"
-                          "}"
-                          ""
-                          "QLineEdit#SearchBox:edit-focus {"
-                          "    selection-color: white;   "
-                          "    border: 1px groove lightGray;"
-                          "    padding: 0px %1px;"
-                          "}"
-                          "QMenu { background-color: white; color: black; }"
-                          "QMenu::item:selected { background-color: gray; color: white; }"
-                          "QToolTip { background: yellow; color: black; }"
                  ).arg(clearButton->sizeHint().width() + frameWidth + 8));
-
-    QSize msz = minimumSizeHint();
-    setMinimumSize(qMax(msz.width(), clearButton->sizeHint().height() + frameWidth * 2 + 2),
-                   qMax(msz.height(), clearButton->sizeHint().height() /* + frameWidth * 2 + -2*/));
 
     setPlaceholderText("Search...");
     mode = Search;
