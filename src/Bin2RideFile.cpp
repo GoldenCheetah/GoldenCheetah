@@ -137,7 +137,7 @@ struct Bin2FileReaderState
         int nm = read_bytes(2, bytes_read, sum);
         double kph = read_bytes(2, bytes_read, sum);
         int alt = read_bytes(2, bytes_read, sum);
-        double temp = read_bytes(2, bytes_read, sum)/10.0;
+        double temp = read_bytes(2, bytes_read, sum); // °C × 10
         double lat = read_bytes(4, bytes_read, sum);
         double lng = read_bytes(4, bytes_read, sum);
         double km = read_bytes(8, bytes_read, sum)/1000.0/1000.0;
@@ -162,8 +162,12 @@ struct Bin2FileReaderState
         else
             kph = kph/10.0;
 
-        if (temp == 0x8000)
-            temp = 0;
+        if (temp == 0x8000) //0x8000
+            temp = RideFile::noTemp;
+        else if (temp > 0x7FFF) // Negative
+            temp = (temp-0xFFFF)/10.0; //199A
+        else
+            temp = temp/10.0;
 
         if (alt == 0x8000)
             alt = 0;
