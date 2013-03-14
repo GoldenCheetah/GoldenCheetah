@@ -23,7 +23,33 @@
 #include <QList>
 #include <QAction>
 
+#ifdef Q_OS_MAC
 class QtMacButton;
+#else
+class GcScopeButton : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        GcScopeButton(QWidget *parent);
+        void setText(QString _text) { text = _text; }
+        void setChecked(bool _checked) { checked = _checked; repaint(); }
+        void setWidth(int x) { setFixedWidth(x); }
+
+    signals:
+        void clicked(bool);
+
+    public slots:
+        void paintEvent(QPaintEvent *);
+        bool event(QEvent *e);
+
+    private:
+        bool checked;
+        QString text;
+};
+
+#endif
+
 class GcScopeBar : public QWidget
 {
     Q_OBJECT
@@ -33,8 +59,6 @@ public:
     GcScopeBar(QWidget *parent, QWidget *traintool);
     ~GcScopeBar();
 
-    void setEnabledHideButton(bool showHideButton);
-
 public slots:
     void paintEvent (QPaintEvent *event);
 
@@ -42,13 +66,9 @@ public slots:
     void clickedAnal();
     void clickedTrain();
     void clickedDiary();
-    void showHideClicked();
 
     // mainwindow tells us when it switched without user clicking.
     void selected(int index);
-
-    // main window tells us the sidebar state
-    void setShowSidebar(bool showSidebar);
     void addWidget(QWidget*);
 
 signals:
@@ -57,16 +77,17 @@ signals:
     void selectTrain();
     void selectDiary();
 
-    void showSideBar(bool);
-
     void addChart();
 
 private:
     void paintBackground(QPaintEvent *);
 
     QHBoxLayout *layout;
+#ifdef Q_OS_MAC
     QtMacButton *home, *diary, *anal, *train;
-    QtMacButton *showHide;
+#else
+    GcScopeButton *home, *diary, *anal, *train;
+#endif
     bool state;
 };
 

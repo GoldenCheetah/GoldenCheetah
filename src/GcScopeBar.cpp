@@ -28,41 +28,39 @@ GcScopeBar::GcScopeBar(QWidget *parent, QWidget *traintool) : QWidget(parent)
     layout->setSpacing(2);
     layout->setContentsMargins(0,0,0,0);
 
-#if 0 // moving to the main toolbar
-    showHide = new QtMacButton(this, QtMacButton::Recessed);
-    showHide->setWidth(60);
-    showHide->setIconAndText();
-    state = true;
-    showHideClicked();
-    layout->addWidget(showHide);
-    connect(showHide, SIGNAL(clicked(bool)), this, SLOT(showHideClicked()));
-
-    GcLabel *sep = new GcLabel("|");
-    sep->setFixedWidth(4);
-    sep->setYOff(1);
-    layout->addWidget(sep);
-#endif
-   
+    // Mac uses QtMacButton - recessed etc
+#ifdef Q_OS_MAC
     home = new QtMacButton(this, QtMacButton::Recessed);
+#ifdef GC_HAVE_ICAL
+    diary = new QtMacButton(this, QtMacButton::Recessed);
+#endif
+    anal = new QtMacButton(this, QtMacButton::Recessed);
+    train = new QtMacButton(this, QtMacButton::Recessed);
+#else
+    // Windows / Linux uses GcScopeButton - pushbutton
+    home = new GcScopeButton(this);
+#ifdef GC_HAVE_ICAL
+    diary = new GcScopeButton(this);
+#endif
+    anal = new GcScopeButton(this);
+    train = new GcScopeButton(this);
+#endif
+
+    // now set the text for each one
     home->setText("Home");
     layout->addWidget(home);
     connect(home, SIGNAL(clicked(bool)), this, SLOT(clickedHome()));
 
-#ifdef GC_HAVE_ICAL
-    diary = new QtMacButton(this, QtMacButton::Recessed);
     diary->setText("Diary");
     layout->addWidget(diary);
     connect(diary, SIGNAL(clicked(bool)), this, SLOT(clickedDiary()));
-#endif
 
-    anal = new QtMacButton(this, QtMacButton::Recessed);
     anal->setText("Analysis");
     anal->setWidth(70);
     anal->setChecked(true);
     layout->addWidget(anal);
     connect(anal, SIGNAL(clicked(bool)), this, SLOT(clickedAnal()));
 
-    train = new QtMacButton(this, QtMacButton::Recessed);
     train->setText("Train");
     layout->addWidget(train);
     connect(train, SIGNAL(clicked(bool)), this, SLOT(clickedTrain()));
@@ -99,8 +97,12 @@ GcScopeBar::paintBackground(QPaintEvent *)
     QRect all(0,0,width(),height());
 
     // fill with a linear gradient
+#ifdef Q_OS_MAC
     int shade = isActiveWindow() ? 178 : 225;
-    QLinearGradient linearGradient(0, 0, 0, height());
+#else
+    int shade = isActiveWindow() ? 200 : 250;
+#endif
+    QLinearGradient linearGradient(0, 0, 0, 23);
     linearGradient.setColorAt(0.0, QColor(shade,shade,shade, 100));
     linearGradient.setColorAt(0.5, QColor(shade,shade,shade, 180));
     linearGradient.setColorAt(1.0, QColor(shade,shade,shade, 255));
@@ -186,36 +188,60 @@ GcScopeBar::selected(int index)
     }
 }
 
-void
-GcScopeBar::setShowSidebar(bool showSidebar)
+GcScopeButton::GcScopeButton(QWidget *parent) : QWidget(parent)
 {
-    return; //XXX moving to main toolbar
-    static QPixmap *hide = new QPixmap(":images/mac/hide.png");
-    static QPixmap *show = new QPixmap(":images/mac/show.png");
+    setFixedHeight(20);
+    setFixedWidth(60);
+    checked = false;
+    QFont font;
+    font.setFamily("Helvetica");
+    font.setPointSize(10);
+    font.setWeight(QFont::Black);
+    setFont(font);
+}
 
-    state = showSidebar;
-    if (showSidebar == false) {
-        showHide->setImage(show);
-        showHide->setText("Show");
-    } else {
-        showHide->setImage(hide);
-        showHide->setText("Hide");
+void
+GcScopeButton::paintEvent(QPaintEvent *)
+{
+    QPainter painter(this);
+    painter.save();
+    painter.setRenderHints(QPainter::Antialiasing|QPainter::TextAntialiasing, true);
+
+    // widget rectangle
+    QRectF body(0,0,width(), height());
+    QRectF off(0,1,width(), height());
+    QRectF inside(0,2,width(), height()-4);
+
+    QPainterPath clip;
+    clip.addRect(inside);
+    painter.setClipPath(clip);
+    painter.setPen(Qt::NoPen);
+
+    if (checked && underMouse()) {
+        painter.setBrush(QBrush(QColor(150,150,150)));     
+        painter.drawRoundedRect(body, 19, 11);
+    } else if (checked && !underMouse()) {
+        painter.setBrush(QBrush(QColor(120,120,120)));     
+        painter.drawRoundedRect(body, 19, 11);
+    } else if (!checked && underMouse()) {
+        painter.setBrush(QBrush(QColor(180,180,180)));     
+        painter.drawRoundedRect(body, 19, 11);
+    } else if (!checked && !underMouse()) {
     }
-    showHide->setChecked(false);
+
+    // now paint the text
+    painter.setPen((underMouse() || checked) ? QColor(50,50,50) : Qt::white);
+    painter.drawText(off, text, Qt::AlignVCenter | Qt::AlignCenter);
+    painter.setPen((underMouse() || checked) ? QColor(240,240,240) : QColor(30,30,30,200));
+    painter.drawText(body, text, Qt::AlignVCenter | Qt::AlignCenter);
+    painter.restore();
 }
 
-void
-GcScopeBar::showHideClicked()
+bool
+GcScopeButton::event(QEvent *e)
 {
-    return; //XXX moving to main toolbar
-    state = !state;
-    emit showSideBar(state);
-    setShowSidebar(state);
+    // entry / exit event repaint for hover color
+    if (e->type() == QEvent::Leave || e->type() == QEvent::Enter) repaint();
+    if (e->type() == QEvent::MouseButtonPress && underMouse()) emit clicked(checked);
+    return QWidget::event(e);
 }
-
-void
-GcScopeBar::setEnabledHideButton(bool EnableHideButton) {
-    return;; //XXX moving to toolbar
-    showHide->setEnabled(EnableHideButton);
-}
-

@@ -58,12 +58,4 @@ signals:
     void editFinished();
 };
 
-class Spacer : public QWidget
-{
-Q_OBJECT
-public:
-    Spacer(QWidget *parent = 0);
-    QSize sizeHint() const;
-};
-
 #endif

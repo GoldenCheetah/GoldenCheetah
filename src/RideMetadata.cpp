@@ -439,6 +439,7 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
 
         // rich text hangs 'fontd' for some users
         dynamic_cast<QTextEdit*>(widget)->setAcceptRichText(false); 
+        dynamic_cast<QTextEdit*>(widget)->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); 
 
         if (field.name == "Change History") {
             dynamic_cast<QTextEdit*>(widget)->setReadOnly(true);

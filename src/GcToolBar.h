@@ -23,26 +23,6 @@
 #include <QList>
 #include <QAction>
 
-class GcToolButton : public QWidget
-{
-    Q_OBJECT
-
-public:
-
-    GcToolButton(QWidget *parent, QAction *);
-    bool selected;
-    QAction *action;
-
-public slots:
-    void paintEvent (QPaintEvent *event);
-
-private:
-
-    void paintBackground(QPaintEvent *event);
-    QLabel *label;
-
-};
-
 class GcToolBar : public QWidget
 {
     Q_OBJECT
@@ -50,20 +30,14 @@ class GcToolBar : public QWidget
 public:
 
     GcToolBar(QWidget *parent);
-    ~GcToolBar();
 
 public slots:
-    bool eventFilter(QObject *o,QEvent *e);
     void paintEvent (QPaintEvent *event);
-    void addAction(QAction *);
     void addWidget(QWidget *); // any widget but doesn't toggle selection
     void addStretch();
-    void select(int index);
 
 private:
     QHBoxLayout *layout;
-    QList<GcToolButton*> buttons;
-
     void paintBackground(QPaintEvent *);
 };
 
