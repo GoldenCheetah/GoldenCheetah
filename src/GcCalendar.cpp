@@ -168,6 +168,8 @@ GcLabel::paintEvent(QPaintEvent *)
         painter.fillRect(all, GColor(CCALCURRENT));
     }
 
+    painter.setFont(this->font());
+
     if (xoff || yoff) {
 
         // draw text in white behind...
@@ -381,7 +383,11 @@ GcMiniCalendar::GcMiniCalendar(MainWindow *main, bool master) : main(main), mast
     line->setContentsMargins(0,0,0,0);
 
     QFont font;
+#ifdef WIN32
+    font.setPointSize(10);
+#else
     font.setPointSize(12);
+#endif
 
     if (master) {
         left = new GcLabel("<", this);
@@ -393,7 +399,6 @@ GcMiniCalendar::GcMiniCalendar(MainWindow *main, bool master) : main(main), mast
         connect (left, SIGNAL(clicked()), this, SLOT(previous()));
     }
 
-    font.setPointSize(12);
     monthName = new GcLabel("January 2012", this);
     monthName->setAutoFillBackground(false);
     monthName->setPalette(white);
@@ -402,7 +407,6 @@ GcMiniCalendar::GcMiniCalendar(MainWindow *main, bool master) : main(main), mast
     line->addWidget(monthName);
 
     if (master) {
-        font.setPointSize(12);
         right = new GcLabel(">", this);
         right->setAutoFillBackground(false);
         right->setPalette(white);
@@ -425,7 +429,11 @@ GcMiniCalendar::GcMiniCalendar(MainWindow *main, bool master) : main(main), mast
     font.setWeight(QFont::Normal);
 
     // Mon
+#ifdef WIN32
+    font.setPointSize(8);
+#else
     font.setPointSize(9);
+#endif
     GcLabel *day = new GcLabel("Mon", this);
     day->setFont(font);
     day->setAutoFillBackground(false);
@@ -489,7 +497,11 @@ GcMiniCalendar::GcMiniCalendar(MainWindow *main, bool master) : main(main), mast
     dayLayout->addWidget(day, 1, 6);
 
     signalMapper = new QSignalMapper(this);
+#ifdef WIN32
+    font.setPointSize(8);
+#else
     font.setPointSize(11);
+#endif
     for (int row=2; row<8; row++) {
 
         for (int col=0; col < 7; col++) {
