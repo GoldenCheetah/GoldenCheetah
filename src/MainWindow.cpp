@@ -479,6 +479,7 @@ MainWindow::MainWindow(const QDir &home) :
 #ifdef GC_HAVE_LUCENE
     // add a search box on far right, but with a little space too
     SearchFilterBox *searchBox = new SearchFilterBox(this,this);
+    searchBox->setStyle(toolStyle);
     searchBox->setFixedWidth(250);
     head->addWidget(searchBox);
     Spacer *spacer = new Spacer(this);
@@ -1617,9 +1618,9 @@ MainWindow::selectAnalysis()
         analWindow->selected(); // tell it!
         trainTool->getToolbarButtons()->hide();
 #ifdef GC_HAVE_ICAL
-        scopebar->selected(1);
-#else
         scopebar->selected(2);
+#else
+        scopebar->selected(1);
 #endif
         toolBox->setCurrentIndex(0);
     }
@@ -1644,9 +1645,9 @@ MainWindow::selectTrain()
         trainWindow->selected(); // tell it!
         trainTool->getToolbarButtons()->show();
 #ifdef GC_HAVE_ICAL
-        scopebar->selected(2);
-#else
         scopebar->selected(3);
+#else
+        scopebar->selected(2);
 #endif
         toolBox->setCurrentIndex(2);
     }
@@ -1697,10 +1698,6 @@ MainWindow::selectHome()
     }
     currentWindow = homeWindow;
     setStyle();
-}
-void
-MainWindow::selectAthlete()
-{
 }
 
 void

@@ -374,7 +374,6 @@ class MainWindow : public QMainWindow
         void selectDiary();
         void selectAnalysis();
         void selectTrain();
-        void selectAthlete();
 
         void setActivityMenu();
         void setWindowMenu();
