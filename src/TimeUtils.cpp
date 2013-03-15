@@ -129,7 +129,7 @@ DateSettingsEdit::DateSettingsEdit(QWidget *parent) : parent(parent), active(fal
     setContentsMargins(0,0,0,0);
     QFormLayout *mainLayout = new QFormLayout(this);
     mainLayout->setContentsMargins(0,0,0,0);
-    mainLayout->setSpacing(0);
+    mainLayout->setSpacing(5);
 
     QFont sameFont;
 #ifdef Q_OS_MAC
