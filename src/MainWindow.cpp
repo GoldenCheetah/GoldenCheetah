@@ -409,6 +409,8 @@ MainWindow::MainWindow(const QDir &home) :
 
     head = new GcToolBar(this);
 
+    QCleanlooksStyle *toolStyle = new QCleanlooksStyle();
+
     // get those icons
     importIcon = iconFromPNG(":images/mac/download.png");
     composeIcon = iconFromPNG(":images/mac/compose.png");
@@ -427,21 +429,25 @@ MainWindow::MainWindow(const QDir &home) :
     import->setIcon(importIcon);
     import->setIconSize(isize);
     import->setFixedHeight(25);
+    import->setStyle(toolStyle);
     connect(import, SIGNAL(clicked(bool)), this, SLOT(downloadRide()));
 
     compose = new QPushButton(this);
     compose->setIcon(composeIcon);
     compose->setIconSize(isize);
     compose->setFixedHeight(25);
+    compose->setStyle(toolStyle);
     connect(compose, SIGNAL(clicked(bool)), this, SLOT(manualRide()));
 
     sidebar = new QPushButton(this);
     sidebar->setIcon(sidebarIcon);
     sidebar->setIconSize(isize);
     sidebar->setFixedHeight(25);
+    sidebar->setStyle(toolStyle);
     connect(sidebar, SIGNAL(clicked(bool)), this, SLOT(toggleSidebar()));
 
     actbuttons = new QtSegmentControl(this);
+    actbuttons->setStyle(toolStyle);
     actbuttons->setIconSize(isize);
     actbuttons->setCount(3);
     actbuttons->setSegmentIcon(0, intervalIcon);
@@ -452,6 +458,7 @@ MainWindow::MainWindow(const QDir &home) :
     connect(actbuttons, SIGNAL(segmentSelected(int)), this, SLOT(actionClicked(int)));
 
     styleSelector = new QtSegmentControl(this);
+    styleSelector->setStyle(toolStyle);
     styleSelector->setIconSize(isize);
     styleSelector->setCount(2);
     styleSelector->setSegmentIcon(0, tabbedIcon);
