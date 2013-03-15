@@ -188,6 +188,7 @@ GcScopeBar::selected(int index)
     }
 }
 
+#ifndef Q_OS_MAC
 GcScopeButton::GcScopeButton(QWidget *parent) : QWidget(parent)
 {
     setFixedHeight(20);
@@ -245,3 +246,4 @@ GcScopeButton::event(QEvent *e)
     if (e->type() == QEvent::MouseButtonPress && underMouse()) emit clicked(checked);
     return QWidget::event(e);
 }
+#endif
