@@ -222,7 +222,7 @@ GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Or
     titleLayout->setSpacing(2);
 
     titleLabel = new GcLabel(title, this);
-    titleLabel->setXOff(1);
+    titleLabel->setXOff(0);
 
 #ifdef Q_OS_MAC
     int shade = 178;
@@ -245,13 +245,17 @@ GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Or
     QFont font;
 #ifdef Q_OS_MAC
     titleLabel->setFixedHeight(16);
-    titleLabel->setYOff(2);
+    titleLabel->setYOff(1);
     font.setFamily("Lucida Grande");
     font.setPointSize(11);
 #else
-    titleLabel->setYOff(2);
+    titleLabel->setYOff(1);
     font.setFamily("Helvetica");
+#ifdef WIN32
+    font.setPointSize(8);
+#else
     font.setPointSize(10);
+#endif
 #endif
     font.setWeight(QFont::Black);
     titleLabel->setFont(font);
@@ -268,6 +272,7 @@ GcSplitterHandle::GcSplitterHandle(QString title, GcSplitterItem *widget, Qt::Or
 #endif
     titleToolbar->setIconSize(QSize(8,8));
     titleToolbar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    titleToolbar->setAutoFillBackground(false);
 
     titleLayout->addWidget(titleToolbar);
 

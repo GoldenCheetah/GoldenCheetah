@@ -172,7 +172,7 @@ GcLabel::paintEvent(QPaintEvent *)
 
         // draw text in white behind...
         QRectF off(xoff,yoff,width(),height());
-        painter.setPen(QColor(220,220,220,160));
+        painter.setPen(QColor(255,255,255,200));
         painter.drawText(off, alignment(), text());
     }
 
