@@ -160,7 +160,7 @@ GcLabel::paintEvent(QPaintEvent *)
         else painter.fillRect(all, Qt::lightGray);
 
         painter.setPen(Qt::gray);
-        painter.drawRect(QRect(0,0,width()-1,height()-1));
+        painter.drawRect(QRect(0,0,width(),height()));
     }
 
     if (selected) {
