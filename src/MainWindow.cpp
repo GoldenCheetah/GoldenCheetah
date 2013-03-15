@@ -465,7 +465,7 @@ MainWindow::MainWindow(const QDir &home) :
     styleSelector->setSegmentIcon(1, tiledIcon);
     styleSelector->setSelectionBehavior(QtSegmentControl::SelectOne); //wince. spelling. ugh
     styleSelector->setFixedHeight(25);
-    //connect(styleSelector, SIGNAL(segmentSelected(int)), this, SLOT(toggleStyle()));
+    connect(styleSelector, SIGNAL(segmentSelected(int)), this, SLOT(setStyleFromSegment(int))); //avoid toggle infinitely
 
     head->addWidget(spacerl);
     head->addWidget(import);
@@ -1118,6 +1118,14 @@ MainWindow::selectWindow(QAction *act)
 }
 
 void
+MainWindow::setStyleFromSegment(int segment)
+{
+    if (!currentWindow) return;
+    currentWindow->setStyle(segment ? 2 : 0);
+    styleAction->setChecked(!segment);
+}
+
+void
 MainWindow::toggleStyle()
 {
     if (!currentWindow) return;
@@ -1713,7 +1721,8 @@ MainWindow::setStyle()
 #ifdef Q_OS_MAC
     styleSelector->setSelected(select, true);
 #else
-    styleSelector->setSegmentSelected(select, true);
+    if (styleSelector->isSegmentSelected(select) == false)
+        styleSelector->setSegmentSelected(select, true);
 #endif
 }
 
@@ -2577,11 +2586,11 @@ MainWindow::exportMeasures()
     start.fromTime_t(0);
 
     foreach (SummaryMetrics x, metricDB->db()->getAllMeasuresFor(start, end)) {
-qDebug()<<x.getDateTime();
-qDebug()<<x.getText("Weight", "0.0").toDouble();
-qDebug()<<x.getText("Lean Mass", "0.0").toDouble();
-qDebug()<<x.getText("Fat Mass", "0.0").toDouble();
-qDebug()<<x.getText("Fat Ratio", "0.0").toDouble();
+//qDebug()<<x.getDateTime();
+//qDebug()<<x.getText("Weight", "0.0").toDouble();
+//qDebug()<<x.getText("Lean Mass", "0.0").toDouble();
+//qDebug()<<x.getText("Fat Mass", "0.0").toDouble();
+//qDebug()<<x.getText("Fat Ratio", "0.0").toDouble();
     }
 }
 
