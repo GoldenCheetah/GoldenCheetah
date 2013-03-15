@@ -65,7 +65,7 @@ class FixHRSpikesConfig : public DataProcessorConfig
         QString explain() {
             return(QString(tr("Occasionally heart rate sensors will erroneously "
                            "report high values for heart rate or drop out (0). "
-                           "This function will look for spikes anddropouts "
+                           "This function will look for spikes and dropouts "
                            "in heart rate data and replace the erroneous data "
                            "by interpolating the data from either "
                            "side of the point in question\n\n"
@@ -134,7 +134,7 @@ FixHRSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0)
 
     ride->command->startLUW("Fix Spikes in Recording"); // Start LogicalUnitOfWork
 
-    int lastgood = -1;  // where did we last have decent GPS data?
+    int lastgood = -1;  // where did we last have decent HR data?
     for (int i=0; i<ride->dataPoints().count(); i++) {
       // If we have a non-zero HR that is not above the specified MAX
       if(ride->dataPoints()[i]->hr > 0 and ride->dataPoints()[i]->hr <= max) {
