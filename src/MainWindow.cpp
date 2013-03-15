@@ -481,7 +481,6 @@ MainWindow::MainWindow(const QDir &home) :
 #else
     head->addStretch();
 #endif
-xxxxx
 #endif
 
     /*----------------------------------------------------------------------
