@@ -51,9 +51,11 @@ GcScopeBar::GcScopeBar(QWidget *parent, QWidget *traintool) : QWidget(parent)
     layout->addWidget(home);
     connect(home, SIGNAL(clicked(bool)), this, SLOT(clickedHome()));
 
+#ifdef GC_HAVE_ICAL
     diary->setText("Diary");
     layout->addWidget(diary);
     connect(diary, SIGNAL(clicked(bool)), this, SLOT(clickedDiary()));
+#endif
 
     anal->setText("Analysis");
     anal->setWidth(70);
