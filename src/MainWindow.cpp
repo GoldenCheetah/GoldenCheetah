@@ -430,6 +430,7 @@ MainWindow::MainWindow(const QDir &home) :
     import->setIconSize(isize);
     import->setFixedHeight(25);
     import->setStyle(toolStyle);
+    import->setToolTip(tr("Download from Device"));
     connect(import, SIGNAL(clicked(bool)), this, SLOT(downloadRide()));
 
     compose = new QPushButton(this);
@@ -437,6 +438,7 @@ MainWindow::MainWindow(const QDir &home) :
     compose->setIconSize(isize);
     compose->setFixedHeight(25);
     compose->setStyle(toolStyle);
+    compose->setToolTip(tr("Create Manual Activity"));
     connect(compose, SIGNAL(clicked(bool)), this, SLOT(manualRide()));
 
     sidebar = new QPushButton(this);
@@ -444,6 +446,7 @@ MainWindow::MainWindow(const QDir &home) :
     sidebar->setIconSize(isize);
     sidebar->setFixedHeight(25);
     sidebar->setStyle(toolStyle);
+    sidebar->setToolTip(tr("Toggle Sidebar"));
     connect(sidebar, SIGNAL(clicked(bool)), this, SLOT(toggleSidebar()));
 
     actbuttons = new QtSegmentControl(this);
@@ -455,6 +458,9 @@ MainWindow::MainWindow(const QDir &home) :
     actbuttons->setSegmentIcon(2, deleteIcon);
     actbuttons->setSelectionBehavior(QtSegmentControl::SelectNone); //wince. spelling. ugh
     actbuttons->setFixedHeight(25);
+    actbuttons->setSegmentToolTip(0, tr("Find Intervals"));
+    actbuttons->setSegmentToolTip(1, tr("Split Activity"));
+    actbuttons->setSegmentToolTip(2, tr("Delete Activity"));
     connect(actbuttons, SIGNAL(segmentSelected(int)), this, SLOT(actionClicked(int)));
 
     styleSelector = new QtSegmentControl(this);
@@ -463,6 +469,8 @@ MainWindow::MainWindow(const QDir &home) :
     styleSelector->setCount(2);
     styleSelector->setSegmentIcon(0, tabbedIcon);
     styleSelector->setSegmentIcon(1, tiledIcon);
+    styleSelector->setSegmentToolTip(0, tr("Tabbed View"));
+    styleSelector->setSegmentToolTip(1, tr("Tiled View"));
     styleSelector->setSelectionBehavior(QtSegmentControl::SelectOne); //wince. spelling. ugh
     styleSelector->setFixedHeight(25);
     connect(styleSelector, SIGNAL(segmentSelected(int)), this, SLOT(setStyleFromSegment(int))); //avoid toggle infinitely
@@ -482,13 +490,10 @@ MainWindow::MainWindow(const QDir &home) :
     searchBox->setStyle(toolStyle);
     searchBox->setFixedWidth(250);
     head->addWidget(searchBox);
+#endif
     Spacer *spacer = new Spacer(this);
     spacer->setFixedWidth(5);
-    //spacer->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     head->addWidget(spacer);
-#else
-    head->addStretch();
-#endif
 #endif
 
     /*----------------------------------------------------------------------
