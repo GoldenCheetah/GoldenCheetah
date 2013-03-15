@@ -500,6 +500,8 @@ GcMiniCalendar::GcMiniCalendar(MainWindow *main, bool master) : main(main), mast
             d->setPalette(grey);
             d->setStyleSheet("color: gray;");
             d->setAlignment(Qt::AlignCenter);
+            d->setXOff(0);
+            d->setYOff(0);
             dayLayout->addWidget(d,row,col);
 
             // we like squares
