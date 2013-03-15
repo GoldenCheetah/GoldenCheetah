@@ -149,6 +149,9 @@ MainWindow::MainWindow(const QDir &home) :
     zones_(new Zones), hrzones_(new HrZones),
     ride(NULL), workout(NULL), groupByMapper(NULL)
 {
+    cyclist = home.dirName();
+    setInstanceName(cyclist);
+
     #ifdef Q_OS_MAC
     // get an autorelease pool setup
     static CocoaInitializer cocoaInitializer;
@@ -302,7 +305,6 @@ MainWindow::MainWindow(const QDir &home) :
 
 #ifdef GC_HAVE_LUCENE
     QtMacSearchBox *searchBox = new QtMacSearchBox(this);
-    searchBox->setFixedWidth(200);
     head->addWidget(searchBox);
     connect(searchBox, SIGNAL(textChanged(QString)), this, SLOT(searchTextChanged(QString)));
 #endif
@@ -335,8 +337,6 @@ MainWindow::MainWindow(const QDir &home) :
      *  Athlete details
      *--------------------------------------------------------------------*/
 
-    cyclist = home.dirName();
-    setInstanceName(cyclist);
     seasons = new Seasons(home);
 
     QVariant unit = appsettings->cvalue(cyclist, GC_UNIT);
@@ -481,6 +481,7 @@ MainWindow::MainWindow(const QDir &home) :
 #else
     head->addStretch();
 #endif
+xxxxx
 #endif
 
     /*----------------------------------------------------------------------
@@ -579,7 +580,7 @@ MainWindow::MainWindow(const QDir &home) :
     QWidget *activityHistory = new QWidget(this);
     activityHistory->setContentsMargins(0,0,0,0);
 #ifndef Q_OS_MAC // not on mac thanks
-    //XXX activityHistory->setStyleSheet("padding: 0px; border: 0px; margin: 0px;");
+    activityHistory->setStyleSheet("padding: 0px; border: 0px; margin: 0px;");
 #endif
     QVBoxLayout *activityLayout = new QVBoxLayout(activityHistory);
     activityLayout->setSpacing(0);
@@ -777,7 +778,10 @@ MainWindow::MainWindow(const QDir &home) :
     QVBoxLayout *centralLayout = new QVBoxLayout(central);
     centralLayout->setSpacing(0);
     centralLayout->setContentsMargins(0,0,0,0);
+#ifndef Q_OS_MAC // nonmac toolbar on main view -- its not 
+                 // unified with the title bar.
     centralLayout->addWidget(head);
+#endif
     centralLayout->addWidget(splitter);
 
     setCentralWidget(central);
@@ -948,9 +952,6 @@ MainWindow::MainWindow(const QDir &home) :
     // Kick off
     rideTreeWidgetSelectionChanged();
     selectAnalysis();
-#ifdef Q_OS_MAC
-    scopebar->setShowSidebar(true);
-#endif
     setStyle();
 }
 
@@ -1610,9 +1611,9 @@ MainWindow::selectAnalysis()
         analWindow->selected(); // tell it!
         trainTool->getToolbarButtons()->hide();
 #ifdef GC_HAVE_ICAL
-        //XXX scopebar->selected(1);
+        scopebar->selected(1);
 #else
-        //XXX scopebar->selected(2);
+        scopebar->selected(2);
 #endif
         toolBox->setCurrentIndex(0);
     }
@@ -1637,9 +1638,9 @@ MainWindow::selectTrain()
         trainWindow->selected(); // tell it!
         trainTool->getToolbarButtons()->show();
 #ifdef GC_HAVE_ICAL
-        //XXX scopebar->selected(2);
+        scopebar->selected(2);
 #else
-        //XXX scopebar->selected(3);
+        scopebar->selected(3);
 #endif
         toolBox->setCurrentIndex(2);
     }
@@ -1661,7 +1662,7 @@ MainWindow::selectDiary()
         views->setCurrentIndex(2);
         diaryWindow->selected(); // tell it!
         trainTool->getToolbarButtons()->hide();
-        //XXX scopebar->selected(1);
+        scopebar->selected(1);
         toolBox->setCurrentIndex(1);
         gcCalendar->refresh(); // get that signal with the date range...
     }
@@ -1685,7 +1686,7 @@ MainWindow::selectHome()
         views->setCurrentIndex(3);
         homeWindow->selected(); // tell it!
         trainTool->getToolbarButtons()->hide();
-        //XXX scopebar->selected(0);
+        scopebar->selected(0);
         toolBox->setCurrentIndex(3);
     }
     currentWindow = homeWindow;
