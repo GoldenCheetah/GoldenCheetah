@@ -796,6 +796,11 @@ MainWindow::MainWindow(const QDir &home) :
     /*----------------------------------------------------------------------
      * Application Menus
      *--------------------------------------------------------------------*/
+#ifdef WIN32
+    menuBar()->setStyleSheet("QMenuBar { background: rgba(225,225,225); }"
+		    	     "QMenuBar::item { background: rgba(225,225,225); }");
+    menuBar()->setContentsMargins(0,0,0,0);
+#endif
 
     QMenu *fileMenu = menuBar()->addMenu(tr("&Athlete"));
     fileMenu->addAction(tr("&New..."), this, SLOT(newCyclist()), tr("Ctrl+N"));

@@ -20,7 +20,11 @@
 
 GcToolBar::GcToolBar(QWidget *parent) : QWidget(parent)
 {
+#ifdef WIN32
+    setFixedHeight(40);
+#else
     setFixedHeight(50);
+#endif
     setContentsMargins(0,0,0,0);
     layout = new QHBoxLayout(this);
     layout->setSpacing(10);
@@ -72,7 +76,9 @@ GcToolBar::paintBackground(QPaintEvent *)
     painter.setPen(black);
     painter.drawLine(0,height()-1, width()-1, height()-1);
 
+#ifndef WIN32 // not on windows clashes with menu
     QPen gray(QColor(230,230,230));
     painter.setPen(gray);
     painter.drawLine(0,0, width()-1, 0);
+#endif
 }
