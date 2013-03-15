@@ -198,7 +198,11 @@ GcScopeButton::GcScopeButton(QWidget *parent) : QWidget(parent)
     checked = false;
     QFont font;
     font.setFamily("Helvetica");
+#ifdef WIN32
+    font.setPointSize(8);
+#else
     font.setPointSize(10);
+#endif
     font.setWeight(QFont::Black);
     setFont(font);
 }
