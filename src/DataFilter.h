@@ -72,7 +72,7 @@ class DataFilter : public QObject
     Q_OBJECT
 
     public:
-        DataFilter(QObject *parent, MainWindow *main);
+        DataFilter(QObject *parent, MainWindow *mainWindow);
         QStringList &files() { return filenames; }
 
         // used by Leaf
@@ -93,7 +93,7 @@ class DataFilter : public QObject
         void results(QStringList);
 
     private:
-        MainWindow *main;
+        MainWindow *mainWindow;
         Leaf *treeRoot;
         QStringList errors;
 
