@@ -149,6 +149,9 @@ GcLabel::event(QEvent *e)
 void
 GcLabel::paintEvent(QPaintEvent *)
 {
+    static QIcon left = iconFromPNG(":images/mac/left.png");
+    static QIcon right = iconFromPNG(":images/mac/right.png");
+
     QPainter painter(this);
     painter.save();
     painter.setRenderHints(QPainter::Antialiasing|QPainter::TextAntialiasing, true);
@@ -187,8 +190,7 @@ GcLabel::paintEvent(QPaintEvent *)
     } else {
 
         // use standard icons
-        QIcon icon = text() == "<" ?  style()->standardIcon(QStyle::SP_ArrowLeft) :
-                                      style()->standardIcon(QStyle::SP_ArrowRight);
+        QIcon &icon = text() == "<" ?  left : right;
         Qt::AlignmentFlag alignment = text() == "<" ? Qt::AlignLeft : Qt::AlignRight;
 
         icon.paint(&painter, all, alignment|Qt::AlignVCenter);
