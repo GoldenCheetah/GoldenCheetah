@@ -153,9 +153,13 @@ GcLabel::paintEvent(QPaintEvent *)
     painter.save();
     painter.setRenderHints(QPainter::Antialiasing|QPainter::TextAntialiasing, true);
 
+    // grr. some want a rect others want a rectf
+    QRectF norm(0,0,width(),height());
+    QRect all(0,0,width(),height());
+
     if (bg) {
+
         // setup a painter and the area to paint
-        QRect all(0,0,width(),height());
         if (!underMouse()) painter.fillRect(all, bgColor);
         else painter.fillRect(all, Qt::lightGray);
 
@@ -164,23 +168,31 @@ GcLabel::paintEvent(QPaintEvent *)
     }
 
     if (selected) {
-        QRect all(0,0,width(),height());
         painter.fillRect(all, GColor(CCALCURRENT));
     }
 
-    painter.setFont(this->font());
+    if (text() != "<" && text() != ">") {
+        painter.setFont(this->font());
 
-    if (xoff || yoff) {
+        if (xoff || yoff) {
 
-        // draw text in white behind...
-        QRectF off(xoff,yoff,width(),height());
-        painter.setPen(QColor(255,255,255,200));
-        painter.drawText(off, alignment(), text());
+            // draw text in white behind...
+            QRectF off(xoff,yoff,width(),height());
+            painter.setPen(QColor(255,255,255,200));
+            painter.drawText(off, alignment(), text());
+        }
+
+        painter.setPen(QColor(0,0,0,170));
+        painter.drawText(norm, alignment(), text());
+    } else {
+
+        // use standard icons
+        QIcon icon = text() == "<" ?  style()->standardIcon(QStyle::SP_ArrowLeft) :
+                                      style()->standardIcon(QStyle::SP_ArrowRight);
+        Qt::AlignmentFlag alignment = text() == "<" ? Qt::AlignLeft : Qt::AlignRight;
+
+        icon.paint(&painter, all, alignment|Qt::AlignVCenter);
     }
-
-    QRectF norm(0,0,width(),height());
-    painter.setPen(QColor(0,0,0,170));
-    painter.drawText(norm, alignment(), text());
 
     painter.restore();
 }
@@ -390,7 +402,7 @@ GcMiniCalendar::GcMiniCalendar(MainWindow *main, bool master) : main(main), mast
 #endif
 
     if (master) {
-        left = new GcLabel("<", this);
+        left = new GcLabel("<",this);
         left->setAutoFillBackground(false);
         left->setPalette(white);
         left->setFont(font);
