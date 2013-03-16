@@ -147,6 +147,8 @@ void Kickr::run()
         // only get busy if we're actually connected
         if (WFApi::getInstance()->isConnected(sd)) {
 
+            connectionloops = 0;
+
             // We ALWAYS set load for each loop. This is because
             // even though the device reports as connected we need
             // to wait before it really is. So we just keep on
@@ -172,6 +174,19 @@ void Kickr::run()
                 currentslope = slope;
                 currentmode = mode;
             }
+
+            // get telemetry
+            if (WFApi::getInstance()->hasData(sd)) {
+                pvars.lock();
+                WFApi::getInstance()->getRealtimeData(sd, &rt);
+
+                // set speed from wheelRpm and configured wheelsize
+                double x = rt.getWheelRpm();
+                if (devConf) rt.setSpeed(x * (devConf->wheelSize/1000) * 60 / 1000);
+                else rt.setSpeed(x * 2.10 * 60 / 1000);
+                pvars.unlock();
+            }
+
         } else {
             // 100ms in each loop, 30secs is 300 loops
             if (++connectionloops > 300) {
@@ -179,18 +194,6 @@ void Kickr::run()
                 quit(-1);
             }
         }
-
-        if (WFApi::getInstance()->hasData(sd)) {
-            pvars.lock();
-            WFApi::getInstance()->getRealtimeData(sd, &rt);
-
-            // set speed from wheelRpm and configured wheelsize
-            double x = rt.getWheelRpm();
-            if (devConf) rt.setSpeed(x * (devConf->wheelSize/1000) * 60 / 1000);
-            else rt.setSpeed(x * 2.10 * 60 / 1000);
-            pvars.unlock();
-        }
-
         // lets not hog cpu
         msleep(100);
     }

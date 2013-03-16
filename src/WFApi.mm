@@ -134,9 +134,6 @@ static inline NSString* fromQString(const QString &string)
 // connect and disconnect a device
 -(WFSensorConnection *)connectDevice: (NSString *)uuid
 {
-    // it takes far too long!
-    [[WFHardwareConnector sharedConnector] disableFirmwareCheck];
-
     // just in case there is a discovery in action, lets cancel it...
     [[WFHardwareConnector sharedConnector] cancelDiscoveryOnNetwork:WF_NETWORKTYPE_BTLE];
 
