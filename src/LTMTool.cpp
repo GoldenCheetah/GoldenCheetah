@@ -798,6 +798,10 @@ EditMetricDetailDialog::EditMetricDetailDialog(MainWindow *mainWindow, MetricDet
     QLabel *color = new QLabel(tr("Color"));
     curveColor = new QPushButton(this);
 
+    QLabel *fill = new QLabel(tr("Fill curve"));
+    fillCurve = new QCheckBox("", this);
+    fillCurve->setChecked(metricDetail->fillCurve);
+ 
     // color background...
     penColor = metricDetail->penColor;
     setButtonIcon(penColor);
@@ -845,14 +849,16 @@ EditMetricDetailDialog::EditMetricDetailDialog(MainWindow *mainWindow, MetricDet
     grid->addWidget(stack, 4, 1);
     grid->addWidget(color, 5,0);
     grid->addWidget(curveColor, 5,1);
-    grid->addWidget(topN, 6,0);
-    grid->addWidget(showBest, 6,1);
-    grid->addWidget(outN, 7,0);
-    grid->addWidget(showOut, 7,1);
-    grid->addWidget(baseline, 8, 0);
-    grid->addWidget(baseLine, 8,1);
-    grid->addWidget(curveSmooth, 9,1);
-    grid->addWidget(curveTrend, 10,1);
+    grid->addWidget(fill, 6,0);
+    grid->addWidget(fillCurve, 6,1);
+    grid->addWidget(topN, 7,0);
+    grid->addWidget(showBest, 7,1);
+    grid->addWidget(outN, 8,0);
+    grid->addWidget(showOut, 8,1);
+    grid->addWidget(baseline, 9, 0);
+    grid->addWidget(baseLine, 9,1);
+    grid->addWidget(curveSmooth, 10,1);
+    grid->addWidget(curveTrend, 11,1);
 
     mainLayout->addLayout(grid);
 
@@ -892,6 +898,7 @@ EditMetricDetailDialog::applyClicked()
     metricDetail->curveStyle = styleMap[curveStyle->currentIndex()];
     metricDetail->symbolStyle = symbolMap[curveSymbol->currentIndex()];
     metricDetail->penColor = penColor;
+    metricDetail->fillCurve = fillCurve;
     metricDetail->uname = userName->text();
     metricDetail->uunits = userUnits->text();
     metricDetail->stack = stack->isChecked();
