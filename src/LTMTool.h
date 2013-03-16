@@ -179,6 +179,7 @@ class EditMetricDetailDialog : public QDialog
                   *curveSymbol;
         QCheckBox *stack;
         QPushButton *curveColor;
+        QCheckBox *fillCurve;
         QDoubleSpinBox *showBest,
                        *showOut,
                        *baseLine;

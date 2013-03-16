@@ -344,6 +344,8 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
     out<<settings.legend;
     out<<settings.field1;
     out<<settings.field2;
+    out<<int(-1);
+    out<<int(1);
     out<<settings.metrics.count();
     foreach(MetricDetail metric, settings.metrics) {
         out<<metric.type;
@@ -369,6 +371,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
         out<<metric.penStyle;
         out<<metric.brushColor;
         out<<metric.brushAlpha;
+        out<<metric.fillCurve;
     }
     return out;
 }
@@ -377,6 +380,7 @@ QDataStream &operator>>(QDataStream &in, LTMSettings &settings)
 {
     RideMetricFactory &factory = RideMetricFactory::instance();
     int counter=0;
+    int version=0;
 
     // all the basic fields first
     in>>settings.name;
@@ -389,6 +393,14 @@ QDataStream &operator>>(QDataStream &in, LTMSettings &settings)
     in>>settings.field1;
     in>>settings.field2;
     in>>counter;
+
+    // we now add version number before the counter
+    // if counter is -1 -- to make settings extensible
+    if (counter == -1) {
+        in>>version;
+        in>>counter;
+    }
+
     while(counter--) {
         MetricDetail m;
         in>>m.type;
@@ -415,6 +427,13 @@ QDataStream &operator>>(QDataStream &in, LTMSettings &settings)
         in>>m.penStyle;
         in>>m.brushColor;
         in>>m.brushAlpha;
+
+        // added curve filling in v1.0
+        if (version >=1) {
+            in>>m.fillCurve;
+        } else {
+            m.fillCurve = false;
+        }
         // get a metric pointer (if it exists)
         m.metric = factory.rideMetric(m.symbol);
         settings.metrics.append(m);

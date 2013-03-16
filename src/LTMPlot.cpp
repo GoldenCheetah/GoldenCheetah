@@ -667,6 +667,13 @@ LTMPlot::setData(LTMSettings *set)
             current->setSymbol(new QwtSymbol(sym));
             current->setPen(cpen);
 
+            // fill below the line
+            if (metricDetail.fillCurve) {
+                QColor fillColor = metricDetail.penColor;
+                fillColor.setAlpha(60);
+                current->setBrush(fillColor);
+            }
+
 
         } else if (metricDetail.curveStyle == QwtPlotCurve::Dots) {
             sym.setSize(6);
