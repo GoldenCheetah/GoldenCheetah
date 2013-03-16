@@ -217,5 +217,6 @@ extern int OperatingSystem;
 #define WINDOWS 1
 #define LINUX   2
 #define OSX     3
+#define OPENBSD 4
 
 #endif // _GC_Settings_h

@@ -9,6 +9,8 @@ int OperatingSystem = OSX;
 int OperatingSystem = WINDOWS;
 #elif defined Q_OS_LINUX
 int OperatingSystem = LINUX;
+#elif defined Q_OS_OPENBSD
+int OperatingSystem = OPENBSD;
 #endif
 
 static GSettings *GetApplicationSettings()
