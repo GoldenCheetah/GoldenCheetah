@@ -2396,6 +2396,8 @@ MainWindow::renameIntervalsSelected()
             if (allIntervals->child(i)->isSelected())
                 allIntervals->child(i)->setText(0, QString("%1%2").arg(string).arg(number++));
         }
+
+        updateRideFileIntervals(); // will emit intervalChanged() signal
     }
 }
 
@@ -2430,6 +2432,7 @@ MainWindow::renameIntervalSelected()
             break;
         } else i++;
     }
+    updateRideFileIntervals(); // will emit intervalChanged() signal
 }
 
 void
@@ -2455,9 +2458,12 @@ MainWindow::editIntervalSelected()
 void
 MainWindow::editInterval()
 {
-    EditIntervalDialog dialog(this, activeInterval);
+    IntervalItem temp = *activeInterval;
+    EditIntervalDialog dialog(this, temp);
 
     if (dialog.exec()) {
+        *activeInterval = temp;
+        updateRideFileIntervals(); // will emit intervalChanged() signal
     }
 }
 
