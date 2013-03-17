@@ -24,6 +24,7 @@
 #include "RideFile.h"
 #include "RideItem.h"
 #include "IntervalItem.h"
+#include "IntervalTreeView.h"
 #include "TimeUtils.h"
 #include "Settings.h"
 #include "Units.h" // for MILES_PER_KM

@@ -1334,6 +1334,13 @@ MainWindow::intervalPopup()
         menu.addAction(actFindPeak);
         menu.addAction(actFindBest);
 
+        // sort but only if 2 or more intervals
+        if (allIntervals->childCount() > 1) {
+            QAction *actSort = new QAction(tr("Sort Intervals"), intervalItem);
+            connect(actSort, SIGNAL(triggered(void)), this, SLOT(sortIntervals(void)));
+            menu.addAction(actSort);
+        }
+
         if (intervalWidget->selectedItems().count()) menu.addSeparator();
     }
 
@@ -2356,6 +2363,36 @@ MainWindow::updateRideFileIntervals()
 
     // set dirty
     which->setDirty(true);
+}
+
+bool
+lessItem(const IntervalItem *s1, const IntervalItem *s2) {
+    return s1->start < s2->start;
+}
+
+void
+MainWindow::sortIntervals()
+{
+    // sort them chronologically
+    QList<IntervalItem*> intervals;
+
+    // set string to first interval selected
+    for (int i=0; i<allIntervals->childCount();i++)
+        intervals.append((IntervalItem*)(allIntervals->child(i)));
+
+    // now sort them into start time order
+    qStableSort(intervals.begin(), intervals.end(), lessItem);
+
+    // empty allIntervals
+    allIntervals->takeChildren();
+
+    // and put em back in chronological sequence
+    foreach(IntervalItem* item, intervals) {
+        allIntervals->addChild(item);
+    }
+
+    // now update the ridefile
+    updateRideFileIntervals(); // will emit intervalChanged() signal
 }
 
 // rename multiple intervals

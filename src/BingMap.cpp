@@ -20,6 +20,7 @@
 
 #include "RideItem.h"
 #include "RideFile.h"
+#include "IntervalItem.h"
 #include "MainWindow.h"
 #include "Zones.h"
 #include "Settings.h"

@@ -18,6 +18,7 @@
 
 #include "AddIntervalDialog.h"
 #include "MainWindow.h"
+#include "IntervalItem.h"
 #include "RideFile.h"
 #include <QMap>
 #include <assert.h>

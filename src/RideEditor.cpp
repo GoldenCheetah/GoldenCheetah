@@ -18,6 +18,7 @@
 
 #include "RideEditor.h"
 #include "LTMOutliers.h"
+#include "IntervalItem.h"
 #include "MainWindow.h"
 #include "Settings.h"
 
