@@ -18,6 +18,7 @@
 
 #include "ModelPlot.h"
 #include "ModelWindow.h"
+#include "IntervalItem.h"
 #include "MainWindow.h"
 #include "Settings.h"
 #include "Zones.h"
