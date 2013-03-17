@@ -55,7 +55,7 @@ RideFile::~RideFile()
     foreach(RideFilePoint *point, dataPoints_)
         delete point;
     delete command;
-    if (data) delete data;
+    //!!! if (data) delete data; // need a mechanism to notify the editor
 }
 
 QString

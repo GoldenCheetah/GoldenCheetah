@@ -40,7 +40,7 @@ static DeviceType SupportedDevices[] =
         ":images/devices/garminusb.png" },
 #endif
 #ifdef GC_HAVE_WFAPI
-#if 0
+#if 0 //!!! Deferred until v3.1 or as an update to v3.0 when Wahoo support ANT+
       { DEV_BT40,    DEV_BTLE,     (char *) "Bluetooth 4.0", true,   false,
         "Bluetooth Low Energy devices such as KK Inride, Stages PM, Blue HR and Blue SC",
         ":images/devices/btle.png" },
