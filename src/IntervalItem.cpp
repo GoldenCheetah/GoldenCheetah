@@ -27,7 +27,7 @@ IntervalItem::IntervalItem(const RideFile *ride, QString name, double start, dou
 /*----------------------------------------------------------------------
  * Edit Interval dialog
  *--------------------------------------------------------------------*/
-EditIntervalDialog::EditIntervalDialog(QWidget *parent, IntervalItem *interval) :
+EditIntervalDialog::EditIntervalDialog(QWidget *parent, IntervalItem &interval) :
     QDialog(parent, Qt::Dialog), interval(interval)
 {
     setWindowTitle(tr("Edit Interval"));
@@ -40,13 +40,15 @@ EditIntervalDialog::EditIntervalDialog(QWidget *parent, IntervalItem *interval) 
     QLabel *to = new QLabel("To");
 
     nameEdit = new QLineEdit(this);
-    nameEdit->setText(interval->text(0));
+    nameEdit->setText(interval.text(0));
 
-    fromEdit = new QLineEdit(this);
-    fromEdit->setText(QString("%1").arg(interval->start));
+    fromEdit = new QTimeEdit(this);
+    fromEdit->setDisplayFormat("hh:mm:ss");
+    fromEdit->setTime(QTime(0,0,0,0).addSecs(interval.start));
 
-    toEdit = new QLineEdit(this);
-    toEdit->setText(QString("%1").arg(interval->stop));
+    toEdit = new QTimeEdit(this);
+    toEdit->setDisplayFormat("hh:mm:ss");
+    toEdit->setTime(QTime(0,0,0,0).addSecs(interval.stop));
 
     grid->addWidget(name, 0,0);
     grid->addWidget(nameEdit, 0,1);
@@ -75,9 +77,9 @@ void
 EditIntervalDialog::applyClicked()
 {
     // get the values back
-    interval->setText(0, nameEdit->text());
-    interval->start = fromEdit->text().toInt();
-    interval->stop = toEdit->text().toInt();
+    interval.setText(0, nameEdit->text());
+    interval.start = QTime(0,0,0).secsTo(fromEdit->time());
+    interval.stop = QTime(0,0,0).secsTo(toEdit->time());
     accept();
 }
 void

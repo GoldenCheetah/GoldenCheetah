@@ -61,18 +61,18 @@ class EditIntervalDialog : public QDialog
 
 
     public:
-        EditIntervalDialog(QWidget *, IntervalItem *);
+        EditIntervalDialog(QWidget *, IntervalItem &);
 
     public slots:
         void applyClicked();
         void cancelClicked();
 
     private:
-        IntervalItem *interval;
+        IntervalItem &interval;
 
         QPushButton *applyButton, *cancelButton;
         QLineEdit *nameEdit;
-        QLineEdit *fromEdit, *toEdit;
+        QTimeEdit *fromEdit, *toEdit;
 };
 
 #endif // _GC_IntervalItem_h
