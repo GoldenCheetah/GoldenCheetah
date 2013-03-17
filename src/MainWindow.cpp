@@ -1258,12 +1258,6 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
         QAction *actDeleteRide = new QAction(tr("Delete Activity"), treeWidget);
         connect(actDeleteRide, SIGNAL(triggered(void)), this, SLOT(deleteRide()));
 
-        QAction *actBestInt = new QAction(tr("Find Best Intervals"), treeWidget);
-        connect(actBestInt, SIGNAL(triggered(void)), this, SLOT(addIntervals()));
-
-        QAction *actPowerPeaks = new QAction(tr("Find Power Peaks"), treeWidget);
-        connect(actPowerPeaks, SIGNAL(triggered(void)), this, SLOT(findPowerPeaks()));
-
         QAction *actSplitRide = new QAction(tr("Split Activity"), treeWidget);
         connect(actSplitRide, SIGNAL(triggered(void)), this, SLOT(splitRide()));
 
@@ -1273,8 +1267,6 @@ MainWindow::showTreeContextMenuPopup(const QPoint &pos)
         }
 
         menu.addAction(actDeleteRide);
-        menu.addAction(actBestInt);
-        menu.addAction(actPowerPeaks);
         menu.addAction(actSplitRide);
 #ifdef GC_HAVE_LIBOAUTH
         QAction *actTweetRide = new QAction(tr("Tweet Activity"), treeWidget);
@@ -1341,7 +1333,10 @@ MainWindow::intervalPopup()
         connect(actFindBest, SIGNAL(triggered(void)), this, SLOT(addIntervals(void)));
         menu.addAction(actFindPeak);
         menu.addAction(actFindBest);
+
+        if (intervalWidget->selectedItems().count()) menu.addSeparator();
     }
+
 
     if (intervalWidget->selectedItems().count() == 1) {
 
@@ -1363,6 +1358,10 @@ MainWindow::intervalPopup()
         QAction *actDeleteInt = new QAction(tr("Delete selected intervals"), intervalWidget);
         connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteIntervalSelected(void)));
         menu.addAction(actDeleteInt);
+
+        QAction *actRenameInt = new QAction(tr("Rename selected intervals"), intervalWidget);
+        connect(actRenameInt, SIGNAL(triggered(void)), this, SLOT(renameIntervalsSelected(void)));
+        menu.addAction(actRenameInt);
     }
 
     menu.exec(analSidebar->mapToGlobal((QPoint(intervalItem->pos().x()+intervalItem->width()-20, intervalItem->pos().y()))));
@@ -2351,6 +2350,47 @@ MainWindow::updateRideFileIntervals()
 
     // set dirty
     which->setDirty(true);
+}
+
+// rename multiple intervals
+void
+MainWindow::renameIntervalsSelected()
+{
+    QString string;
+
+    // set string to first interval selected
+    for (int i=0; i<allIntervals->childCount();i++) {
+        if (allIntervals->child(i)->isSelected()) {
+            string = allIntervals->child(i)->text(0);
+            break;
+        }
+    }
+
+    // type in a name and we will renumber all the intervals
+    // in the same fashion -- esp if the last characters are
+    RenameIntervalDialog dialog(string, this);
+    dialog.setFixedWidth(320);
+
+    if (dialog.exec()) {
+
+        int number = 1;
+
+        // does it end in a number?
+        // if so we use that to renumber from
+        QRegExp ends("^(.*[^0-9])([0-9]+)$");
+        if (ends.exactMatch(string)) {
+
+            string = ends.cap(1);
+            number = ends.cap(2).toInt();
+
+        } else if (!string.endsWith(" ")) string += " ";
+
+        // now go and renumber from 'number' with prefix 'string'
+        for (int i=0; i<allIntervals->childCount();i++) {
+            if (allIntervals->child(i)->isSelected())
+                allIntervals->child(i)->setText(0, QString("%1%2").arg(string).arg(number++));
+        }
+    }
 }
 
 void

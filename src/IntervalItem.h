@@ -35,5 +35,24 @@ class IntervalItem : public QTreeWidgetItem
         IntervalItem(const RideFile *, QString, double, double, double, double, int);
         void setDisplaySequence(int seq) { displaySequence = seq; }
 };
+
+class RenameIntervalDialog : public QDialog
+{
+    Q_OBJECT
+    G_OBJECT
+
+
+    public:
+        RenameIntervalDialog(QString &, QWidget *);
+
+    public slots:
+        void applyClicked();
+        void cancelClicked();
+
+    private:
+        QString &string;
+        QPushButton *applyButton, *cancelButton;
+        QLineEdit *nameEdit;
+};
 #endif // _GC_IntervalItem_h
 

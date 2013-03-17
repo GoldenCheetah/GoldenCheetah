@@ -346,6 +346,7 @@ class MainWindow : public QMainWindow
         void renameInterval(); // from right click
         void zoomInterval(); // from right click
         void renameIntervalSelected(void); // from menu popup
+        void renameIntervalsSelected(void); // from menu popup -- rename a series
         void deleteIntervalSelected(void); // from menu popup
         void zoomIntervalSelected(void); // from menu popup
         void frontInterval();
