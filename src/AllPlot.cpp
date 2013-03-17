@@ -278,7 +278,10 @@ AllPlot::AllPlot(AllPlotWindow *parent, MainWindow *mainWindow):
     altCurve->setYAxis(yRight2);
 
     tempCurve = new QwtPlotCurve(tr("Temperature"));
-    tempCurve->setYAxis(yRight);
+    if (useMetricUnits)
+        tempCurve->setYAxis(yRight); // with speed
+    else
+        tempCurve->setYAxis(yLeft2); // with cadence
 
     windCurve = new QwtPlotIntervalCurve(tr("Wind"));
     windCurve->setYAxis(yRight);
@@ -730,7 +733,7 @@ AllPlot::recalc()
             smoothTime.append(dp->secs/60);
             smoothDistance.append(useMetricUnits ? dp->km : dp->km * MILES_PER_KM);
             smoothAltitude.append(useMetricUnits ? dp->alt : dp->alt * FEET_PER_METER);
-            smoothTemp.append(dp->temp);
+            smoothTemp.append(useMetricUnits ? dp->temp : dp->temp * FAHRENHEIT_PER_CENTIGRADE + FAHRENHEIT_ADD_CENTIGRADE);
             smoothWind.append(useMetricUnits ? dp->headwind : dp->headwind * MILES_PER_KM);
             smoothTorque.append(dp->nm);
 
@@ -781,7 +784,11 @@ AllPlot::recalc()
 
     } if (!tempArray.empty()) {
         tempCurve->setData(xaxis.data() + startingIndex, smoothTemp.data() + startingIndex, totalPoints);
-        intervalHighlighterCurve->setYAxis(yRight);
+        if (useMetricUnits)
+            intervalHighlighterCurve->setYAxis(yRight);
+        else
+            intervalHighlighterCurve->setYAxis(yLeft2);
+
 
     } if (!windArray.empty()) {
         windCurve->setData(new QwtIntervalSeriesData(smoothRelSpeed));
@@ -864,8 +871,8 @@ AllPlot::setYMax()
         setAxisLabelRotation(yLeft,270);
         setAxisLabelAlignment(yLeft,Qt::AlignVCenter);
     }
-    if (hrCurve->isVisible() || cadCurve->isVisible() || balanceLCurve->isVisible()) {
-        double ymax = 0;
+    if (hrCurve->isVisible() || cadCurve->isVisible() || (!useMetricUnits && tempCurve->isVisible()) || balanceLCurve->isVisible()) {
+        double ymin, ymax = 0;
         QStringList labels;
         if (hrCurve->isVisible()) {
             labels << tr("BPM");
@@ -880,6 +887,19 @@ AllPlot::setYMax()
                 ymax = qMax(ymax, cadCurve->maxYValue());
             else
                 ymax = qMax(ymax, referencePlot->cadCurve->maxYValue());
+        }
+        if (tempCurve->isVisible() && !useMetricUnits) {
+
+            labels << QString::fromUtf8("°F");
+
+            if (referencePlot == NULL) {
+                ymin = qMin(ymin, tempCurve->minYValue());
+                ymax = qMax(ymax, tempCurve->maxYValue());
+            }
+            else {
+                ymin = qMin(ymin, referencePlot->tempCurve->minYValue());
+                ymax = qMax(ymax, referencePlot->tempCurve->maxYValue());
+            }
         }
         if (balanceLCurve->isVisible()) {
             labels << tr("% left");
@@ -908,12 +928,13 @@ AllPlot::setYMax()
             xytick[QwtScaleDiv::MajorTick]<<i;
 
         setAxisTitle(yLeft2, labels.join(" / "));
-        setAxisScaleDiv(yLeft2,QwtScaleDiv(0, ymax, xytick));
+        setAxisScaleDiv(yLeft2,QwtScaleDiv(ymin, ymax, xytick));
         setAxisLabelRotation(yLeft2,270);
         setAxisLabelAlignment(yLeft2,Qt::AlignVCenter);
     }
-    if (speedCurve->isVisible() || tempCurve->isVisible() || torqueCurve->isVisible()) {
-        double ymax = 0;
+    if (speedCurve->isVisible() || (useMetricUnits && tempCurve->isVisible()) || torqueCurve->isVisible()) {
+        double ymin, ymax = 0;
+
         QStringList labels;
 
         if (speedCurve->isVisible()) {
@@ -924,13 +945,18 @@ AllPlot::setYMax()
             else
                 ymax = referencePlot->speedCurve->maxYValue();
         }
-        if (tempCurve->isVisible()) {
+        if (tempCurve->isVisible() && useMetricUnits) {
+
             labels << QString::fromUtf8("°C");
 
-            if (referencePlot == NULL)
+            if (referencePlot == NULL) {
+                ymin = qMin(ymin, tempCurve->minYValue());
                 ymax = qMax(ymax, tempCurve->maxYValue());
-            else
+            }
+            else {
+                ymin = qMin(ymin, referencePlot->tempCurve->minYValue());
                 ymax = qMax(ymax, referencePlot->tempCurve->maxYValue());
+            }
         }
         if (torqueCurve->isVisible()) {
             labels << (useMetricUnits ? tr("Nm") : tr("ftLb"));
@@ -941,7 +967,7 @@ AllPlot::setYMax()
                 ymax = qMax(ymax, referencePlot->torqueCurve->maxYValue());
         }
         setAxisTitle(yRight, labels.join(" / "));
-        setAxisScale(yRight, 0.0, 1.05 * ymax);
+        setAxisScale(yRight, ymin, 1.05 * ymax);
         setAxisLabelRotation(yRight,90);
         setAxisLabelAlignment(yRight,Qt::AlignVCenter);
     }
