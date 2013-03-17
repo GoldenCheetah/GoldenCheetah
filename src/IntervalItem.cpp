@@ -23,3 +23,52 @@ IntervalItem::IntervalItem(const RideFile *ride, QString name, double start, dou
 {
     setText(0, name);
 }
+
+/*----------------------------------------------------------------------
+ * Interval rename dialog
+ *--------------------------------------------------------------------*/
+RenameIntervalDialog::RenameIntervalDialog(QString &string, QWidget *parent) :
+    QDialog(parent, Qt::Dialog), string(string)
+{
+    setWindowTitle(tr("Renumber Intervals"));
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+
+    // Grid
+    QGridLayout *grid = new QGridLayout;
+    QLabel *name = new QLabel("Name");
+
+    nameEdit = new QLineEdit(this);
+    nameEdit->setText(string);
+
+    grid->addWidget(name, 0,0);
+    grid->addWidget(nameEdit, 0,1);
+
+    mainLayout->addLayout(grid);
+
+    // Buttons
+    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    buttonLayout->addStretch();
+    applyButton = new QPushButton(tr("&OK"), this);
+    cancelButton = new QPushButton(tr("&Cancel"), this);
+    buttonLayout->addWidget(cancelButton);
+    buttonLayout->addWidget(applyButton);
+    mainLayout->addLayout(buttonLayout);
+
+    // connect up slots
+    connect(applyButton, SIGNAL(clicked()), this, SLOT(applyClicked()));
+    connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+}
+
+void
+RenameIntervalDialog::applyClicked()
+{
+    // get the values back
+    string = nameEdit->text();
+    accept();
+}
+
+void
+RenameIntervalDialog::cancelClicked()
+{
+    reject();
+}
