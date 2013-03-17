@@ -20,6 +20,7 @@
 #include "MainWindow.h"
 #include "AerolabWindow.h"
 #include "Aerolab.h"
+#include "IntervalItem.h"
 #include "RideItem.h"
 #include "Colors.h"
 #include <QtGui>

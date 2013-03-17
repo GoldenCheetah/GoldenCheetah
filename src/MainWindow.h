@@ -26,8 +26,6 @@
 #include <QNetworkReply>
 #include <qwt_plot_curve.h>
 #include "RideItem.h"
-#include "IntervalItem.h"
-#include "IntervalTreeView.h"
 #include "GcWindowRegistry.h"
 #include "RealtimeData.h"
 #include "SpecialFields.h"
@@ -78,6 +76,8 @@ class BlankStateTrainPage;
 class GcSplitter;
 class GcSplitterItem;
 class QtSegmentControl;
+class IntervalItem;
+class IntervalTreeView;
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
 extern QDesktopWidget *desktop;         // how many screens / res etc
@@ -141,7 +141,7 @@ class MainWindow : public QMainWindow
 
         // ride intervals
         const QTreeWidgetItem *allIntervalItems() { return allIntervals; }
-        QTreeWidget *intervalTreeWidget() { return intervalWidget; }
+        IntervalTreeView *intervalTreeWidget() { return intervalWidget; }
         QTreeWidgetItem *mutableIntervalItems() { return allIntervals; }
         void updateRideFileIntervals();
 
@@ -346,6 +346,7 @@ class MainWindow : public QMainWindow
         void deleteInterval(); // from right click
         void renameInterval(); // from right click
         void zoomInterval(); // from right click
+        void sortIntervals(); // from menu popup
         void renameIntervalSelected(void); // from menu popup
         void renameIntervalsSelected(void); // from menu popup -- rename a series
         void editIntervalSelected(); // from menu popup

@@ -34,6 +34,11 @@ class IntervalItem : public QTreeWidgetItem
 
         IntervalItem(const RideFile *, QString, double, double, double, double, int);
         void setDisplaySequence(int seq) { displaySequence = seq; }
+
+        // used by qSort()
+        bool operator< (IntervalItem right) const {
+            return (start < right.start);
+        }
 };
 
 class RenameIntervalDialog : public QDialog

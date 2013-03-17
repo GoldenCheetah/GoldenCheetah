@@ -19,6 +19,7 @@
 #include "Aerolab.h"
 #include "AerolabWindow.h"
 #include "MainWindow.h"
+#include "IntervalItem.h"
 #include "RideFile.h"
 #include "RideItem.h"
 #include "Settings.h"
