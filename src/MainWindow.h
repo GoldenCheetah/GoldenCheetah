@@ -342,11 +342,13 @@ class MainWindow : public QMainWindow
         void resetWindowLayout();
         void dateChanged(const QDate &);
         void showContextMenuPopup(const QPoint &);
+        void editInterval(); // from right click
         void deleteInterval(); // from right click
         void renameInterval(); // from right click
         void zoomInterval(); // from right click
         void renameIntervalSelected(void); // from menu popup
         void renameIntervalsSelected(void); // from menu popup -- rename a series
+        void editIntervalSelected(); // from menu popup
         void deleteIntervalSelected(void); // from menu popup
         void zoomIntervalSelected(void); // from menu popup
         void frontInterval();
