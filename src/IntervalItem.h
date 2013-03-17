@@ -41,7 +41,6 @@ class RenameIntervalDialog : public QDialog
     Q_OBJECT
     G_OBJECT
 
-
     public:
         RenameIntervalDialog(QString &, QWidget *);
 
@@ -54,5 +53,27 @@ class RenameIntervalDialog : public QDialog
         QPushButton *applyButton, *cancelButton;
         QLineEdit *nameEdit;
 };
+
+class EditIntervalDialog : public QDialog
+{
+    Q_OBJECT
+    G_OBJECT
+
+
+    public:
+        EditIntervalDialog(QWidget *, IntervalItem *);
+
+    public slots:
+        void applyClicked();
+        void cancelClicked();
+
+    private:
+        IntervalItem *interval;
+
+        QPushButton *applyButton, *cancelButton;
+        QLineEdit *nameEdit;
+        QLineEdit *fromEdit, *toEdit;
+};
+
 #endif // _GC_IntervalItem_h
 

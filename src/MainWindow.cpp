@@ -1343,25 +1343,28 @@ MainWindow::intervalPopup()
         // we can zoom, rename etc if only 1 interval is selected
         QAction *actZoomInt = new QAction(tr("Zoom to interval"), intervalWidget);
         QAction *actRenameInt = new QAction(tr("Rename interval"), intervalWidget);
+        QAction *actEditInt = new QAction(tr("Edit interval"), intervalWidget);
         QAction *actDeleteInt = new QAction(tr("Delete interval"), intervalWidget);
-        connect(actRenameInt, SIGNAL(triggered(void)), this, SLOT(renameIntervalSelected(void)));
-        connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteIntervalSelected(void)));
+
         connect(actZoomInt, SIGNAL(triggered(void)), this, SLOT(zoomIntervalSelected(void)));
+        connect(actRenameInt, SIGNAL(triggered(void)), this, SLOT(renameIntervalSelected(void)));
+        connect(actEditInt, SIGNAL(triggered(void)), this, SLOT(editIntervalSelected(void)));
+        connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteIntervalSelected(void)));
 
         menu.addAction(actZoomInt);
+        menu.addAction(actEditInt);
         menu.addAction(actRenameInt);
         menu.addAction(actDeleteInt);
     }
 
     if (intervalWidget->selectedItems().count() > 1) {
-
-        QAction *actDeleteInt = new QAction(tr("Delete selected intervals"), intervalWidget);
-        connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteIntervalSelected(void)));
-        menu.addAction(actDeleteInt);
-
         QAction *actRenameInt = new QAction(tr("Rename selected intervals"), intervalWidget);
         connect(actRenameInt, SIGNAL(triggered(void)), this, SLOT(renameIntervalsSelected(void)));
+        QAction *actDeleteInt = new QAction(tr("Delete selected intervals"), intervalWidget);
+        connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteIntervalSelected(void)));
+
         menu.addAction(actRenameInt);
+        menu.addAction(actDeleteInt);
     }
 
     menu.exec(analSidebar->mapToGlobal((QPoint(intervalItem->pos().x()+intervalItem->width()-20, intervalItem->pos().y()))));
@@ -1377,17 +1380,20 @@ MainWindow::showContextMenuPopup(const QPoint &pos)
         activeInterval = (IntervalItem *)trItem;
 
         QAction *actRenameInt = new QAction(tr("Rename interval"), intervalWidget);
+        QAction *actEditInt = new QAction(tr("Edit interval"), intervalWidget);
         QAction *actDeleteInt = new QAction(tr("Delete interval"), intervalWidget);
         QAction *actZoomInt = new QAction(tr("Zoom to interval"), intervalWidget);
         QAction *actFrontInt = new QAction(tr("Bring to Front"), intervalWidget);
         QAction *actBackInt = new QAction(tr("Send to back"), intervalWidget);
         connect(actRenameInt, SIGNAL(triggered(void)), this, SLOT(renameInterval(void)));
+        connect(actEditInt, SIGNAL(triggered(void)), this, SLOT(editInterval(void)));
         connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteInterval(void)));
         connect(actZoomInt, SIGNAL(triggered(void)), this, SLOT(zoomInterval(void)));
         connect(actFrontInt, SIGNAL(triggered(void)), this, SLOT(frontInterval(void)));
         connect(actBackInt, SIGNAL(triggered(void)), this, SLOT(backInterval(void)));
 
         menu.addAction(actZoomInt);
+        menu.addAction(actEditInt);
         menu.addAction(actRenameInt);
         menu.addAction(actDeleteInt);
         menu.exec(intervalWidget->mapToGlobal( pos ));
@@ -2431,6 +2437,28 @@ MainWindow::renameInterval() {
     // go edit the name
     activeInterval->setFlags(activeInterval->flags() | Qt::ItemIsEditable);
     intervalWidget->editItem(activeInterval, 0);
+}
+
+void
+MainWindow::editIntervalSelected()
+{
+    // go edit the interval
+    for (int i=0; i<allIntervals->childCount();) {
+        if (allIntervals->child(i)->isSelected()) {
+            activeInterval = (IntervalItem*)allIntervals->child(i);
+            editInterval();
+            break;
+        } else i++;
+    }
+}
+
+void
+MainWindow::editInterval()
+{
+    EditIntervalDialog dialog(this, activeInterval);
+
+    if (dialog.exec()) {
+    }
 }
 
 void
