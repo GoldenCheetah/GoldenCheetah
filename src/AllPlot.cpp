@@ -872,7 +872,9 @@ AllPlot::setYMax()
         setAxisLabelAlignment(yLeft,Qt::AlignVCenter);
     }
     if (hrCurve->isVisible() || cadCurve->isVisible() || (!useMetricUnits && tempCurve->isVisible()) || balanceLCurve->isVisible()) {
-        double ymin, ymax = 0;
+        double ymin = 0;
+        double ymax = 0;
+
         QStringList labels;
         if (hrCurve->isVisible()) {
             labels << tr("BPM");
@@ -933,7 +935,8 @@ AllPlot::setYMax()
         setAxisLabelAlignment(yLeft2,Qt::AlignVCenter);
     }
     if (speedCurve->isVisible() || (useMetricUnits && tempCurve->isVisible()) || torqueCurve->isVisible()) {
-        double ymin, ymax = 0;
+        double ymin = 0;
+        double ymax = 0;
 
         QStringList labels;
 
