@@ -1,0 +1,262 @@
+\input texinfo   @c -*-texinfo-*-
+@c %**start of header
+@setfilename Release Notes.texinfo
+@settitle Golden Cheetah v3.0 Release Notes
+@c %**end of header
+
+@titlepage
+@title Golden Cheetah v3.0 Release Notes
+@c @subtitle subtitle-if-any
+@c @subtitle second-subtitle
+@author Mark Liversedge
+
+@end titlepage
+
+@c So the toc is printed at the start.
+@contents
+
+@ifnottex
+@node Top,Top,Top,
+@top title
+
+These release notes are for GoldenCheetah, version 3.0.
+@end ifnottex
+
+@menu
+* WHATS NEW::  What's new in V3.0
+* CONTRIBUTORS::  List of Contributors to V3.0
+@end menu
+
+@node WHATS NEW,CONTRIBUTORS,CONTRIBUTORS,Top
+@chapter Whats New
+
+@section 500+ bug fixes and minor enhancements
+
+Over the last 3 years the performance and stability of GoldenCheetah
+has been improved considerably. One of the major criticisms of the 
+software was it crashing.
+
+We have fixed 46 serious issues and over 400 bugs in over 1,500 different
+commits. GoldenCheetah is now over 100,000 lines of code and is used by
+1000s of users around the world, from Santiago to Singapore and Auckland
+to Aberdeen.
+
+In addition to addressing stability issues we have also looked closely at
+performance. Whilst the new metric functionality and database means that
+a modern PC is recommended, the code is still efficient enough to run on
+a netbook.
+
+We have introduced pre-computed metrics alongside a cache of ride bests across
+all the main data series to ensure that analysis of long term data is
+as quick and responsive as possible. We also introduced our own file format
+using JSON as an open file format, with a custom parser. We can now read
+a 1hr ride 20x faster using our native format than using an equivalent
+and very popular XML format.
+
+In short, we've squashed the big bugs and made it run much faster.
+
+@section Redesigned UI and UX
+
+One of the most immediate changes you will notice with v3.0 are the 
+major changes to the user experience and user interface. From the
+initial help screens for new users through to the redesigned preferences
+pane for advanced users, it is slicker and more professional.
+
+We wanted an elegant and clean user interface that was intuitive to
+use and revealed complexity when it was required. We think we've
+come pretty close.
+
+There are 4 views available with specific and detailed sidebars for
+peformancee tracking (home), short term tracking (diary) as well as
+the well known analysis and training views from earlier releases.
+
+We now allow you to view charts tabbed and tiled, you can resize and
+move charts around and customise them using roll-over controls. The
+activity list is fully configurable and can be configured to show any
+number of columns. We have overhauled and introduced friendly wizards
+for adding devices and athletes through to manual activity entry.
+
+The UI is largely native on a Mac and the same UI and UX has been
+replicated on Linux and Windows. We also support full screen including
+Lion fullscreen support on a Mac.
+
+We have been through many, many iterations to get to this UX and it has
+been widely tested and critiqued by a large community of GC users.
+
+We think this is the best looking and most intuitive version of GoldenCheetah
+ever released.
+
+@section Support for the latest bike computers
+
+We have added direct download support for the Cyclops Joule and Joule GPS
+as well as the latest SRM Powercontrol 6 and 7. We also added support for
+the O-sync Macro and Macro X.
+
+In addition to this we also fixed a few issues related to importing from
+newer Garmin devices since the file format changed.
+
+@section Support for more telemetry
+
+Alongside the support for the latest bike computers we also added the ability to
+track and plot new data series, including; Headwind, LR Balance, Temperature and
+Slope.
+
+@section Export and Batch Export as well as lots of new file formats
+
+We will now export and batch export your data to a wide variety of file 
+formats. We believe it is your data and it should not be locked into any
+sotfware. We support open formats such as TCX, PWX, JSON and XML as well
+as FITLOG and GPX.
+
+We have also added support for reading files from SportTracks, GPX, Tacx
+CAF and the SLF/SMF file formats. We have also added legacy WKO+ file 
+format support (CP 1.0 and 1.1) as well as import of Wattbike TXT exports.
+
+@section Support for a wide selection of Cloud services
+
+We can now upload and download data from cloud services offered by; Withings,
+Zeo, Strava, TrainingPeaks, Training Stage Buch, RideWithGPS as well
+as Internet based calendars (calDAV) such as Google Calendar.
+
+@section Improvements to Aerolab
+
+There is now an autosolver for CdA and Crr Estimation in Aerolab that
+removes a lot of the guesswork from curve fitting in Virtual Elevation
+as well as a handy Air Density (Rho) estimator.
+
+@section Realtime training significantly enhanced
+
+We now support Native ANT+ removing the need for quarqd. Video Playback
+is built in using VLC/QTKit. We manage a media library to make sure you
+can re-use any content you may have from Tacx Ergvideos through Sufferfest.
+
+We support Virtual Power for popular devices from KK, LeMond and many other
+trainers.  We have added support for the amazing new Wahoo Fitness Kickr trainer
+as well as the old Tacx Fortius.
+
+In the train view we have added lots of new ways to ride on the trainer including;
+Streetview, SpinScan (on Computrainer) and an enhanced Workout Plot that plots
+telemetry against the workout as you ride.
+
+Finally we've added Computrainer calibration, a workout wizard and download 
+from ErgDB as well as Multi-device Support allowing you to ride with with
+your ANT+ powermeter on your Computrainer, Kickr or Fortius.
+
+@section Advanced search and data filtering
+
+We now offer the ability to use free text search across all ativities, enabling
+lightning quick searches for past activities.  We use a well proven and lightning fast
+indexing tool (CLucene) to index all the details of your activities seamlessly.
+
+Additionally we have introduced a data filter (using the same search box) to allow
+you to filter activities for specific properties, for example for all rides with a
+TSS > 300 or perhaps those with an IF >0.9 and a duration of > 1hr.
+
+Both the search and filter functions can be applied to the charts -- which means that
+you can plot a PMC only where sport is "Bike" or perhaps power distribution but only
+where the workout code is FTPTEST.
+
+We are still discovering how powerful these tools are when applied to long term
+performance tracking.
+
+@section Lots of new charts
+
+It wouldn't be a new release of GoldenCheeth if we didn't introduce some new 
+charts for detailed forensic data analysis.
+
+We've added a new HR to Power analysis as well as a more utilitarian 2d scatter
+plot. We've added Bing as map provider for the Map chart.
+
+But the single most asked for feature, and one that has been on the GC wish list
+since it was first released is the ability to plot a distribution for a date range.
+We can now do that -- allowing you to plot power distribution for a season or month
+or any number of sophisticated date ranges (we also added lots of advance ways to
+express date ranges).
+
+Lastly, we have also extended the CP curve to plot more than just power. It will
+now plot a mean max curve for HR, Power, Speed, Cadence, xPower, NP et al. And we
+even added VAM too, for you mountain goats.
+
+@section New metrics, including TrainingPeaks' TSS and NP
+
+Yes, we've been granted permission by our friends at TrainingPeaks to use their
+cylcing metrics in the latest version of GoldenCheetah. We know that it is one of
+the most popular additions.
+
+Not only have we added them as metrics to plot and track, we've also added them to
+the realtime training so you can target an intensity of stress for a workout and
+monitor and adjust the intensity of the workout as you ride.
+
+We have also added a whole host of new metrics, there are now over 100 different
+metrics and measures you can work with including things like; Pace, Maximums,
+Gradient, VAM, wpk, time in HR Zones and many, many more.
+
+@section Build and Platform support
+
+For the technical amongst you we have removed mandatory Boost Dependency, which means
+you can build GC with nothing more than QT4.8 installed (we will support QT5 in v3.1).  
+We now support OpenBSD and have moved to using version 6.1 of the QWT library.
+
+On a related note, you can see all the versions used, contributors involved and build
+settigs as we have improved the about box to give much more useful information to
+developers.
+
+@section We wrote some documentation!
+
+Shock. We now have an FAQ covering over 50 of the most commonly asked questions about
+GoldenCheetah. And a full user manual to compliment the existing wiki for user generated
+content.
+
+One of the other criticisms we often heard about GoldenCheetah was how hard it was to
+use, and how you needed to be a cycling nerd to understand it. We feel that the new UI
+and User Experience coupled with much better documentation and help mean this should
+make this version of GoldenCheetah the easiest to use yet.
+
+
+@node CONTRIBUTORS,WHATS NEW,WHATS NEW,Top
+@chapter Contributors
+
+@section Credits and Contributors
+
+Literally thousands of people regularly download, install, develop, critique and discuss
+GoldenCheetah and its features and functions.
+
+By far and away the biggest contributors to this project are Damien Grauser and Mark Liversedge.
+Between the two of them they have committed almost 90% of all code to GoldenCheetah in the
+last 3 years. Often working on stuff for others they are the reason this release is
+written for you the cyclsit .. and not us the developers.
+
+Of equal importance is Gareth Coco our devops guru. With unfathomable patience he has built
+countless release candidates and development builds for the last 3 years. He has worked with an
+ever changing and hideous array of wacky dependencies across Windows, Mac and Linux. He is pretty
+much the only reason you can download and install our software. Big, big thanks to Gareth.
+
+Thats not to say that there aren't many other significant contributions too; Ale Martinez
+has masterminded and developed multi-language support in V3. Translations have been undertaken
+by Ale himself, but also by Til Schmiedeberg, Keisuke Yamaguchi, Marco Piccirilli, Sergei Chekhovskii
+and Rafael Oliveira Ribeiro.
+
+A large number of developers have contributed small and large bits of code, and many clever
+coaches and athletes have donated their ideas and best practices. I must shout out to
+Dr Andrea Morelli the professional coach, for his encouragement and insight over the last
+3 years and Greg Steele for some of the most interesting and inspriring thoughts.
+
+Here are all the contributors, all of them have made this version of GoldenCheetah the best yet;
+
+Alejandro Martinez, Andrew Bryson, Andy Froncioni, Austin Roach, Berend De Schouwer, Bruno Assis,
+Chris Cleeland, Claus Assmann, Dag Gruneau, Damien Grauser, Darren Hague, Dean Junk, Eric Brandt,
+Eric Murray, Frank Zschockelt, Gareth Coco, Greg Lonnon, Ilja Booij, Jaime Jofre, Jamie Kimberley,
+Jim Ley, John Ehrlinger, Josef Gebel, Julian Baumgartner, Julian Simioni, Justin Knotzke, Keisuke Yamaguchi,
+Ken Sallot, Luke NRG, Magnus Gille, Marc Boudreau, Mark Liversedge, Mark Rages, Mitsukuni Sato,
+Ned Harding, Patrick McNerthney, Rainer Clasen, Robb Romans, Robert Carlsen, Roberto Massa, Ron Alford,
+Sean Rhea, Steven Gribble, Thomas Weichmann, Walter Burki.
+
+Finally a big shout out to three amazing people; Jamie Kimberley who has been the glue
+that held the GoldenCheetah community together, Robert Carlsen who has always been the
+cool guy in the glasses that does the cool stuff. And last but not least, my friend Justin
+Knotzke who demands and gets the best from all of us.
+
+Jamie, Robert and Justin have stepped away from regular involvement in GoldenCheetah, but their
+contributions have set the standard and will not be forgotten. Cheers guys.
+
+@bye
