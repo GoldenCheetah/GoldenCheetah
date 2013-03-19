@@ -10,7 +10,6 @@ The details chart on the analysis view allows you to override metrics on the met
 By default the most common metrics are listed, including average HR, distance and so on.
 From v3.0 the default setup will also include TSS as a metric you can override here.
 
-
 If the metric is not there you will need to configure GoldenCheetah to allow it to be shown.
 This is simple to do and described in 3.8 below.
 
@@ -20,16 +19,16 @@ This is simple to do and described in 3.8 below.
 
 Weight can be maintained in 3 ways;
 
-i. Every athlete is setup with a weight value -- this is the fallback value should no
-other weight measure be available. It can be found under preferences and athlete.
+    i. Every athlete is setup with a weight value -- this is the fallback value should no
+    other weight measure be available. It can be found under preferences and athlete.
 
-ii. The 'Weight' field can be maintained in the details screen. This is found on the 
-'Workout' tab in the details screen by default. Any entry here will be used for this ride
-ONLY.
+    ii. The 'Weight' field can be maintained in the details screen. This is found on the 
+    'Workout' tab in the details screen by default. Any entry here will be used for this ride
+    ONLY.
 
-iii. You can download weight from a withings scale. This is performed manually via the
-menu option Tools->Get Withings Data. This is then used to update the local measures
-database.
+    iii. You can download weight from a withings scale. This is performed manually via the
+    menu option Tools->Get Withings Data. This is then used to update the local measures
+    database.
 
 When calculating W/KG the Activity value is used if present, if not we then fall back to
 the last Withing measure that was collected, and if that is not available we then fall
@@ -213,9 +212,14 @@ BikeScore will be accurate, but TSS will be overstated.
 
 
 
-3.3 Why does my CP chart show better numbers for a longer duration?
+3.3 Why does my CP chart show higher watts for a longer duration?
 
-<hunt down the mailing list post with some good examples for this one>
+A higher power average for a longer time is possible if an effort has been "book ended".
+If, for example, you did a massive 30 second effort, followed by freewheeling for 29:30
+then another massive 30 second effort, then your best average for a continuous 30 minutes
+would in fact be lower that your best average for a continuous 30minutes and 30 seconds.
+(Thanks for Jon Hill from the Golden Cheetah Users mailing list for this example).
+
 
 
 3.4 Can I set a different CP/FTP for different reasons e.g. CP/FTP on a trainer?
@@ -366,9 +370,11 @@ shown on. To remove a field set the field tab to blank.
 There are a number of fields that when maintained in the details screen will be used
 elsewhere in the code to calculate metrics or for other purposes.
 
-Some examples include; Weight - used in W/KG calculations, Sport and Workout code are
-used  when exporting to other file formats, Identifier is used to assign a UUID to the
-activity when it is uploaded to online services and so on.
+Some examples include;
+
+    Weight - used in W/KG calculations, Sport and Workout code are
+    used  when exporting to other file formats, Identifier is used to assign a UUID to the
+    activity when it is uploaded to online services and so on.
 
 There is a full list of special fields and their meaning in the Golden Cheetah user
 guide appendices.
@@ -426,7 +432,12 @@ using a free service they do not let you retrieve your data.
 
 5.3 Why is data uploaded to Strava all wrong?
 
-<ask Damien for a response to this one>
+In general Strava will only use GPS data. If your ride does not contain GPS data then
+Strava is not likely to play nice. In addition many of the other data series will be
+ignored. This is related to Strava data processing in V2.0 of their API.
+
+We always upload as TCX since the JSON flavour of their API appears to have less
+functionality.
 
 
 
@@ -436,7 +447,7 @@ The upload to Google Calendar uses their CalDAV API, and as such needs to specif
 collection. This means when entering the details in the passwords pane of preferences
 you should use the following for the caldav url:
     
-https://www.google.com/calendar/dav/xxxx@gmail.com/events/
+    https://www.google.com/calendar/dav/xxxx@gmail.com/events/
 
 Where xxxx is your username. The username will need to be repeated in the username
 field and obviously set the password too.
@@ -480,13 +491,47 @@ prior '2' is a month 2 months ago, whilst 'This' 'month' and prior '1' is last m
 
 7.2 How does the mean max chart calculate CP when showing power?
 
-<read code! and update.. think its just 3min and 20min but need to check>
+The CP algorithm searches your best power for two durations; for anaerobic efforts it 
+looks between 15s and 1min, for aerobic it looks for best efforts between 10mins and
+an hour.
+
+Once it has found these two best values it will curve fit the two to enable the
+60min value to be extracted. Bear in mind this is a theoretical number and as described
+above is applicable to the BikeScore algorithm. The value for FTP that the TSS algorithm
+requires is simply the highest value for 60mins for the time period, assuming you have
+performed a 60minute test recently.
 
 
 
 7.3 How should I use Aerolab?
 
-<summarise recent discussion on list from Robert Chung>
+The following is a brief piece of advice from Robert Chung, from a discussion on the
+Golden Cheetah Users mailing list:
+
+    Ideally, you'll want calm conditions (both in terms of wind and traffic) but here's a
+    quickie test you can do just to get a handle on what to do. Try to find a loop without
+    stop signs, or an out-and-back with maybe a little dip or something in the middle. Make
+    sure you won't get hit by a car and have good sight lines. I just go around my block a
+    few times. Do a loop in the drops, then another loop faster, then a loop slower; then
+    repeat with your hands on the hoods.
+
+    Weigh yourself and the bike and ballpark the air density. 
+
+    See whether you can come close to modeling the "true" elevation profile by sliding the
+    CdA slider around. Even with this informal test, as long as the wind isn't blowing too
+    hard, you ought to be able to see a difference between the loops where you were in the
+    drops and the loops where you on the hoods, and to spot little bumps and dips in the road. 
+
+There is also an overview of Virtual Elevation to measure aerodynamics in this
+YouTube video from the power seminar at Interbike 2011 given by Jim Meyer the founder
+of Quarq:
+
+    http://www.youtube.com/watch?v=b8tJnFE_BFg&feature=youtu.be&t=27m58s
+
+Finally, Robert Chung's original paper is included in the docs section of the GoldenCheetah
+repository, you can it up here:
+
+    https://github.com/GoldenCheetah/GoldenCheetah/blob/master/doc/contrib/ChungVE.pdf
 
 
 
