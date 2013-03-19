@@ -28,13 +28,24 @@ Copyright @copyright{} 2013 Mark Liversedge
 @contents
 
 @ifnottex
-@node Top
+@node Top,Top,Top,
 @top title
 
 This manual is for GoldenCheetah, version 3.0.
 @end ifnottex
 
-@node MOST COMMON QUESTIONS OF ALL
+@menu
+* MOST COMMON QUESTIONS OF ALL::    Most common questions
+* GENERAL:: General Questions
+* DATA::    Working with Data
+* METRICS:: Working with Metrics
+* UPLOADING AND DOWNLOADING::   Uploading and Downloading Data
+* SEASONS AND EVENTS::  Seasons and Events
+* CHARTS::  Configuring and Using Charts
+* INDEX::   Index
+@end menu
+
+@node MOST COMMON QUESTIONS OF ALL,GENERAL,INDEX,Top
 @chapter MOST COMMON QUESTIONS OF ALL
 
 
@@ -118,7 +129,8 @@ All chart settings can be found under the drop down menu that appears in the top
 corner of a chart when you mouse over it. They will appear as a popup dialog box.
 
 Additionally, when you move the cursor towards the title of a chart in a view that is tabbed
-(not tiled) then a number of oft used settings will appear for convenience.
+(not tiled) then a small selection of the most important settings for the chart will appear
+for convenience.
 
 
 @section How do I change the colour of the rides on the calendar/list?
@@ -136,7 +148,7 @@ word (e.g. ATTEMPT contains 'TT' and graceful contains 'race'.
 
 
 
-@node GENERAL
+@node GENERAL,METRICS,MOST COMMON QUESTIONS OF ALL,Top
 @chapter GENERAL
 
 
@@ -236,7 +248,7 @@ translations if you can.
 
 
 
-@node METRICS
+@node METRICS,DATA,GENERAL,Top
 @chapter METRICS
 
 
@@ -342,7 +354,7 @@ interval summary in the analysis sidebar.
 
 
 
-@section How do I add a metric to the details screen (so I can ovveride it) ?
+@section How do I add a metric to the details screen (so I can override it) ?
 @cindex override
 
 If the metric you want (e.g. TSS) is not shown then you will need to add it via the
@@ -383,7 +395,7 @@ as CSV to export to a format you can use in a spreadsheet program.
 
 
 
-@node DATA
+@node DATA,UPLOADING AND DOWNLOADING,METRICS,Top
 @chapter DATA
 
 
@@ -495,7 +507,7 @@ system. Please ensure you do this when GoldenCheetah is not running.
 
 
 
-@node UPLOADING AND DOWNLOADING
+@node UPLOADING AND DOWNLOADING,SEASONS AND EVENTS,DATA,Top
 @chapter UPLOADING AND DOWNLOADING
 
 
@@ -545,7 +557,7 @@ field and obviously set the password too.
 
 
 
-@node SEASONS AND EVENTS
+@node SEASONS AND EVENTS,CHARTS,UPLOADING AND DOWNLOADING,Top
 @chapter SEASONS AND EVENTS
 
 
@@ -571,7 +583,7 @@ race, a training camp or just a day that was particularly meaningful e.g. illnes
 
 
 
-@node CHARTS
+@node CHARTS,INDEX,SEASONS AND EVENTS,Top
 @chapter CHARTS
 
 
@@ -699,7 +711,7 @@ zoomed out.
 You should check in the editor if the data series is present. if the activity is a
 manual activity entry it will contain no data.
 
-@node Index
+@node INDEX,MOST COMMON QUESTIONS OF ALL,CHARTS,Top
 @unnumbered Index
 
 @printindex cp
