@@ -5,7 +5,7 @@
 all: FAQ
 	rm -f *.aux *.cp *.cps *.fn *.ky *.log *.pg *.toc *.tp *.vr
 
-FAQ: FAQ.pdf FAQ.html FAQ.info
+FAQ: GC3-FAQ.pdf GC3-FAQ.html GC3-FAQ.info
 
 ## The basic commands, good on Linux/Mac
 ## need mingw on Windows
