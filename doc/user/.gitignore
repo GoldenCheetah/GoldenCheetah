@@ -1,3 +1,10 @@
-*.info
-*.pdf
-*.html
+*.aux
+*.cp
+*.cps
+*.fn
+*.ky
+*.log
+*.pg
+*.toc
+*.tp
+*.vr
