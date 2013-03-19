@@ -410,6 +410,8 @@ MainWindow::MainWindow(const QDir &home) :
     head = new GcToolBar(this);
 
     QCleanlooksStyle *toolStyle = new QCleanlooksStyle();
+    QPalette metal;
+    metal.setColor(QPalette::Button, QColor(215,215,215));
 
     // get those icons
     importIcon = iconFromPNG(":images/mac/download.png");
@@ -431,6 +433,7 @@ MainWindow::MainWindow(const QDir &home) :
     import->setFixedHeight(25);
     import->setStyle(toolStyle);
     import->setToolTip(tr("Download from Device"));
+    import->setPalette(metal);
     connect(import, SIGNAL(clicked(bool)), this, SLOT(downloadRide()));
 
     compose = new QPushButton(this);
@@ -439,6 +442,7 @@ MainWindow::MainWindow(const QDir &home) :
     compose->setFixedHeight(25);
     compose->setStyle(toolStyle);
     compose->setToolTip(tr("Create Manual Activity"));
+    compose->setPalette(metal);
     connect(compose, SIGNAL(clicked(bool)), this, SLOT(manualRide()));
 
     sidebar = new QPushButton(this);
@@ -447,6 +451,7 @@ MainWindow::MainWindow(const QDir &home) :
     sidebar->setFixedHeight(25);
     sidebar->setStyle(toolStyle);
     sidebar->setToolTip(tr("Toggle Sidebar"));
+    sidebar->setPalette(metal);
     connect(sidebar, SIGNAL(clicked(bool)), this, SLOT(toggleSidebar()));
 
     actbuttons = new QtSegmentControl(this);
@@ -461,6 +466,7 @@ MainWindow::MainWindow(const QDir &home) :
     actbuttons->setSegmentToolTip(0, tr("Find Intervals"));
     actbuttons->setSegmentToolTip(1, tr("Split Activity"));
     actbuttons->setSegmentToolTip(2, tr("Delete Activity"));
+    actbuttons->setPalette(metal);
     connect(actbuttons, SIGNAL(segmentSelected(int)), this, SLOT(actionClicked(int)));
 
     styleSelector = new QtSegmentControl(this);
@@ -473,6 +479,7 @@ MainWindow::MainWindow(const QDir &home) :
     styleSelector->setSegmentToolTip(1, tr("Tiled View"));
     styleSelector->setSelectionBehavior(QtSegmentControl::SelectOne); //wince. spelling. ugh
     styleSelector->setFixedHeight(25);
+    styleSelector->setPalette(metal);
     connect(styleSelector, SIGNAL(segmentSelected(int)), this, SLOT(setStyleFromSegment(int))); //avoid toggle infinitely
 
     head->addWidget(spacerl);
