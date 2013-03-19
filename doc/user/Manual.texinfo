@@ -1,0 +1,61 @@
+GoldenCheetah User Guide
+
+Table of Contents
+
+1. Quick start Guide
+- What it is,latest version
+- downloading and installing
+- getting going (new athlete, import data)
+
+2. Getting around GoldenCheetah
+- The toolbar, views and sidebar
+- What the 4 views are and what they are for
+- Adding and adjusting the charts and view
+- Searching and filtering
+
+3. Importing, Downloading and Creating Data
+- Download from device
+- Import from file
+- Manual activity
+- Bulk import and export
+- Uploading data
+
+4. Using GoldenCheetah
+
+- Analysis View
+   - Activities and Intervals
+   - Sidebar actions and context menus
+     o activities
+     o intervals
+   - Editing and adjusting data
+   - description of a chart and its settings x n
+
+- Home View
+   - Date Ranges, Seasons and Events
+   - Sidebar actions and context menus
+     o date ranges
+     o events
+   - Using the LTM Chart - indepth howto e.g. setting up a PMC++
+   - description of all other charts and their settings x n
+
+- Diary View
+   - Summarising for Day / Week / Month
+   - Longer term purpose (planning)
+
+- Train View
+   - Devices, Workouts and Media (incl. libraries)
+   - Sidebar actions and context menus
+     o devices
+     o workouts
+     o media
+   - Setting up and starting a workout
+   - Using CT handlebar controller
+   - controlling workout from mouse + keyboard
+   - description of charts and dials x n
+
+5. Configuring GoldenCheetah
+   - Section on each preferences tab
+
+Appendixes
+A Supported Devices, File Formats and Services
+B Glossary and Useful Resources (incl. link to FAQ)
