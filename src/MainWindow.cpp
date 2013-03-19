@@ -1349,18 +1349,15 @@ MainWindow::intervalPopup()
 
         // we can zoom, rename etc if only 1 interval is selected
         QAction *actZoomInt = new QAction(tr("Zoom to interval"), intervalWidget);
-        QAction *actRenameInt = new QAction(tr("Rename interval"), intervalWidget);
         QAction *actEditInt = new QAction(tr("Edit interval"), intervalWidget);
         QAction *actDeleteInt = new QAction(tr("Delete interval"), intervalWidget);
 
         connect(actZoomInt, SIGNAL(triggered(void)), this, SLOT(zoomIntervalSelected(void)));
-        connect(actRenameInt, SIGNAL(triggered(void)), this, SLOT(renameIntervalSelected(void)));
         connect(actEditInt, SIGNAL(triggered(void)), this, SLOT(editIntervalSelected(void)));
         connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteIntervalSelected(void)));
 
         menu.addAction(actZoomInt);
         menu.addAction(actEditInt);
-        menu.addAction(actRenameInt);
         menu.addAction(actDeleteInt);
     }
 
@@ -1386,13 +1383,11 @@ MainWindow::showContextMenuPopup(const QPoint &pos)
 
         activeInterval = (IntervalItem *)trItem;
 
-        QAction *actRenameInt = new QAction(tr("Rename interval"), intervalWidget);
         QAction *actEditInt = new QAction(tr("Edit interval"), intervalWidget);
         QAction *actDeleteInt = new QAction(tr("Delete interval"), intervalWidget);
         QAction *actZoomInt = new QAction(tr("Zoom to interval"), intervalWidget);
         QAction *actFrontInt = new QAction(tr("Bring to Front"), intervalWidget);
         QAction *actBackInt = new QAction(tr("Send to back"), intervalWidget);
-        connect(actRenameInt, SIGNAL(triggered(void)), this, SLOT(renameInterval(void)));
         connect(actEditInt, SIGNAL(triggered(void)), this, SLOT(editInterval(void)));
         connect(actDeleteInt, SIGNAL(triggered(void)), this, SLOT(deleteInterval(void)));
         connect(actZoomInt, SIGNAL(triggered(void)), this, SLOT(zoomInterval(void)));
@@ -1401,7 +1396,6 @@ MainWindow::showContextMenuPopup(const QPoint &pos)
 
         menu.addAction(actZoomInt);
         menu.addAction(actEditInt);
-        menu.addAction(actRenameInt);
         menu.addAction(actDeleteInt);
         menu.exec(intervalWidget->mapToGlobal( pos ));
     }
