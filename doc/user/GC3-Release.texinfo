@@ -221,10 +221,22 @@ make this version of GoldenCheetah the easiest to use yet.
 Literally thousands of people regularly download, install, develop, critique and discuss
 GoldenCheetah and its features and functions.
 
-By far and away the biggest contributors to this project are Damien Grauser and Mark Liversedge.
-Between the two of them they have committed almost 90% of all code to GoldenCheetah in the
-last 3 years. Often working on stuff for others they are the reason this release is
-written for you the cyclsit .. and not us the developers.
+Back in 2006 a stupendously gifted guy (and Cat 1 racer) called Sean Rhea bought a 
+Powertap. Frustrated with the software that was available he set about writing some
+utilities to plot the data. But first he had to reverse engineer the protocol to talk to it. 
+Back then, and to a lesser degree now, these sports and cycling products are closed. You buy 
+their product and you're stuck with their software. Sean did something amazing -- he open 
+sourced his code. By doing that he changed power analysis completely. 
+
+Here in 2013 with ANT+, BTLE, Wahoo, TrainerRoad, PerfPro and of course GoldenCheetah things 
+look very different. The cycling world has gone open. Sean can take some of the credit for that. 
+
+We stand on his shoulders.
+
+Here in 2013 by far and away the biggest contributors to this project are Damien Grauser and 
+Mark Liversedge.  Between the two of them they have committed almost 90% of all code to 
+GoldenCheetah in the last 3 years. Often working on stuff for others they are the reason this 
+release is written for you the cyclist .. and not us the developers.
 
 Of equal importance is Gareth Coco our devops guru. With unfathomable patience he has built
 countless release candidates and development builds for the last 3 years. He has worked with an
@@ -257,6 +269,6 @@ cool guy in the glasses that does the cool stuff. And last but not least, my fri
 Knotzke who demands and gets the best from all of us.
 
 Jamie, Robert and Justin have stepped away from regular involvement in GoldenCheetah, but their
-contributions have set the standard and will not be forgotten. Cheers guys.
+contributions have set the standard and will not be forgotten. Cheers Guys.
 
 @bye
