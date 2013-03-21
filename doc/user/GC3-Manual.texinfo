@@ -1,61 +1,148 @@
-GoldenCheetah User Guide
+GOLDENCHEETAH USER GUIDE
+ 
+CONTENTS
+ 
+0. WELCOME TO GOLDENCHEETAH
 
-Table of Contents
+- what it is, latest version
+- mailing list and community
+- reporting bugs and requesting features
+ 
+1. QUICK START GUIDE
+- setting up a new athlete
+- basic configuration (season, CP, weight)
+- importing a ride from device
+- importing data from other applications
+- uploading and sending your data
 
-1. Quick start Guide
-- What it is,latest version
-- downloading and installing
-- getting going (new athlete, import data)
-
-2. Getting around GoldenCheetah
-- The toolbar, views and sidebar
-- What the 4 views are and what they are for
-- Adding and adjusting the charts and view
-- Searching and filtering
-
-3. Importing, Downloading and Creating Data
+2. GETTING AROUND GOLDENCHEETAH
+- the mainwindow, the toolbar, views and sidebar
+- Going fullscreen
+- Adding and adjusting charts
+- The Metric database
+ 
+3. IMPORTING, EXPORTING, DOWNLOADING AND CREATING DATA
 - Download from device
 - Import from file
 - Manual activity
-- Bulk import and export
-- Uploading data
+- Editing and Saving changes
+- Import and export
+   i A single ride
+  ii Multiple rides
+- Uploading and Downloading from the Cloud
+   i TrainingPeaks
+  ii Strava
+ iii TrainingStage Buch
+  iv RideWithGPS
 
-4. Using GoldenCheetah
+4. USING GOLDENCHEETAH
 
-- Analysis View
-   - Activities and Intervals
-   - Sidebar actions and context menus
-     o activities
-     o intervals
-   - Editing and adjusting data
-   - description of a chart and its settings x n
+- ANALYSIS VIEW
+ 
+   - About Activities and Intervals
+ 
+    - Sidebar actions and context menus
+      o activities
+      o intervals
 
-- Home View
-   - Date Ranges, Seasons and Events
-   - Sidebar actions and context menus
-     o date ranges
-     o events
-   - Using the LTM Chart - indepth howto e.g. setting up a PMC++
-   - description of all other charts and their settings x n
+    - Editing and adjusting data
+     o using the editor
+       i basics
+      ii anomalies
+     iii find
+     o advanced editor functions
+       i the 'fix' tools
+      ii copying, cutting and pasting
 
-- Diary View
-   - Summarising for Day / Week / Month
-   - Longer term purpose (planning)
+   - Analysis Charts
+       i Activity Summary
+      ii Details
+     iii Summary and Details
+      iv Editor
+       v Performance
+      vi Critical Mean Maximals
+     vii Histogram
+    viii Pedal Force vs Velocity
+      ix Heartrate vs Power
+       x Google Map
+      xi Bing Map
+     xii 2d Plot
+    xiii 3d Plot
+     xiv Aerolab Chung Analysis
 
-- Train View
-   - Devices, Workouts and Media (incl. libraries)
-   - Sidebar actions and context menus
-     o devices
-     o workouts
-     o media
-   - Setting up and starting a workout
-   - Using CT handlebar controller
-   - controlling workout from mouse + keyboard
-   - description of charts and dials x n
+- HOME VIEW
 
-5. Configuring GoldenCheetah
-   - Section on each preferences tab
+   - About Date Ranges, Seasons and Events
+   - Performance Tracking Charts
+       i Long Term Metrics
+         - indepth howto incl. setting up a PMC++
+      ii Performance Manager
+     iii Collection TreeMap
+      iv Critical Mean Maximal
+       v Distribution
 
-Appendixes
+- DIARY VIEW
+    - Summarising for Day / Week / Month
+    - Longer term purpose (planning)
+ 
+- TRAIN VIEW
+
+   - About Devices, Workouts and Video
+
+    - Sidebar actions and context menus
+      o devices
+      o workouts
+      o media
+
+   - Managing the Workout Library
+   - Creating a new Workout
+   - Getting Workouts from ErgDB
+   
+    - Setting up and starting a workout
+    - Using CT handlebar controller
+    - controlling workout from mouse + keyboard
+
+    - Training View Charts
+        i Telemetry
+       ii Workout
+      iii Realtime
+       iv Pedal Stroke
+        v Map
+       vi StreetView
+      vii Video Player
+
+
+5. CONFIGURING
+
+   - Opening the Preferences Pane
+
+   - General
+
+   - Athlete
+     i About
+    ii Power Zones
+   iii HR Zones
+
+   - Passwords
+    i General
+   ii Withings
+  iii Zeo
+   iv Google Calendar (calDAV)
+
+   - Appearance
+
+   - Data Fields
+   i Fields
+  ii Notes Keywords
+ iii Processing
+
+   - Metrics
+   
+   - Train Devices
+   i Using Multiple Devices
+  ii Adding a device
+ 
+Appendices
 A Supported Devices, File Formats and Services
 B Glossary and Useful Resources (incl. link to FAQ)
+C OS Specifics (Directories, Drivers and Permissions)
