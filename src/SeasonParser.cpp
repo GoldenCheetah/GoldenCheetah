@@ -48,6 +48,8 @@ bool SeasonParser::endElement( const QString&, const QString&, const QString &qN
         season.load().resize(loadcount+1);
         season.load()[loadcount] = buffer.trimmed().toInt();
         loadcount++;
+    } else if (qName == "seed") {
+        season.setSeed(buffer.trimmed().toInt());
     } else if (qName == "event") {
 
         season.events.append(SeasonEvent(unquote(buffer.trimmed()), seasonDateToDate(dateString)));
@@ -147,11 +149,13 @@ SeasonParser::serialize(QString filename, QList<Season>Seasons)
                   "\t\t<startdate>%2</startdate>\n"
                   "\t\t<enddate>%3</enddate>\n"
                   "\t\t<type>%4</type>\n"
-                  "\t\t<id>%5</id>\n") .arg(season.getName())
+                  "\t\t<id>%5</id>\n"
+                  "\t\t<seed>%6</seed>\n") .arg(season.getName())
                                            .arg(season.getStart().toString("yyyy-MM-dd"))
                                            .arg(season.getEnd().toString("yyyy-MM-dd"))
                                            .arg(season.getType())
-                                           .arg(season.id().toString());
+                                           .arg(season.id().toString())
+                                           .arg(season.getSeed());
                                     
 
             // load profile
