@@ -39,7 +39,7 @@ including average HR, distance and so on.  From v3.0 the default setup
 will also include TSS as a metric you can override here.
 
    If the metric is not there you will need to configure GoldenCheetah
-to allow it to be shown.  This is simple to do and described in 3.8
+to allow it to be shown.  This is simple to do and described in 3.9
 below.
 
 1.2 Can I enter my weight and track/plot it?
@@ -279,7 +279,15 @@ the concept of multiple CP values. But we do recognise the ongoing
 debate regarding physiological stress from working on a trainer vs on
 the road.
 
-3.5 Why is elevation different in GoldenCheetah to my other training software / website?
+3.5 How do I seed the CTL for my PMC?
+=====================================
+
+You can seed the starting CTL (we call it LTS, for long term stress)
+when you define a season. That way it is re-usable in a number of
+places. To do this you edit the season (date range) in the Home View
+and can set the Starting LTS.
+
+3.6 Why is elevation different in GoldenCheetah to my other training software / website?
 ========================================================================================
 
 Different programs will use different hysteresis values to smooth the
@@ -288,7 +296,7 @@ small changes in altitude. In GC we use a hysteresis value of 3m.
    If this is of great concern you can adjust the hysteresis value in
 preferences under the general tab.
 
-3.6 Why is a metric e.g. TSS or average power different in GoldenCheetah to Garmin Connect?
+3.7 Why is a metric e.g. TSS or average power different in GoldenCheetah to Garmin Connect?
 ===========================================================================================
 
 The algorithms for calculating TSS, AP etc are static. They are
@@ -310,7 +318,7 @@ not as you would expect you will need to correct the data. We do not
 'silently' fix the data for you. There is no secret sauce in
 GoldenCheetah, we are open and transparent with your data.
 
-3.7 How do I set the metrics shown for intervals in the various summaries?
+3.8 How do I set the metrics shown for intervals in the various summaries?
 ==========================================================================
 
 In the GoldenCheetah preference pane under the Metrics tab you can
@@ -318,7 +326,7 @@ choose the metrics that will be shown in the ride summary charts and
 the metrics that will be shown in the interval summary in the analysis
 sidebar.
 
-3.8 How do I add a metric to the details screen (so I can override it) ?
+3.9 How do I add a metric to the details screen (so I can override it) ?
 ========================================================================
 
 If the metric you want (e.g. TSS) is not shown then you will need to
@@ -345,12 +353,12 @@ can be entered in the dialog) you should go to the details tab to
 maintain any other specific fields. The manual entry dialog is designed
 to be simple and accept only the most common of entries.
 
-3.9 Can you calculate gradient, virtual power or other derived series from the ride data?
-=========================================================================================
+3.10 Can you calculate gradient, virtual power or other derived series from the ride data?
+==========================================================================================
 
 Not in 3.0. We may introduce derived data series in the future.
 
-3.10 Can I export metrics or access the metric database GC uses?
+3.11 Can I export metrics or access the metric database GC uses?
 ================================================================
 
 The metrics are stored within a Sqlite 3 Database called 'metricDBv3'
@@ -664,7 +672,7 @@ Index
                                                               (line  54)
 * algorithm:                             CHARTS.              (line  19)
 * anomalies:                             DATA.                (line  23)
-* AP:                                    METRICS.             (line  73)
+* AP:                                    METRICS.             (line  81)
 * best:                                  MOST COMMON QUESTIONS OF ALL.
                                                               (line  46)
 * bug:                                   GENERAL.             (line  66)
@@ -677,31 +685,34 @@ Index
 * CP <1>:                                CHARTS.              (line  19)
 * CP:                                    METRICS.             (line  22)
 * CSV:                                   DATA.                (line  88)
+* CTL:                                   METRICS.             (line  64)
 * cycle:                                 SEASONS AND EVENTS.  (line   9)
 * Daniels:                               METRICS.             (line   9)
 * donate:                                GENERAL.             (line  85)
 * download <1>:                          UPLOADING AND DOWNLOADING.
                                                               (line  16)
 * download:                              GENERAL.             (line  31)
-* elevation:                             METRICS.             (line  64)
+* elevation:                             METRICS.             (line  72)
 * EqP:                                   METRICS.             (line   9)
 * event:                                 SEASONS AND EVENTS.  (line  18)
 * feature:                               GENERAL.             (line  66)
 * FITLOG:                                DATA.                (line  88)
 * FTP:                                   METRICS.             (line  22)
-* Garmin Connect:                        METRICS.             (line  73)
+* Garmin Connect:                        METRICS.             (line  81)
 * github:                                GENERAL.             (line  40)
 * Google:                                UPLOADING AND DOWNLOADING.
                                                               (line  33)
 * install:                               GENERAL.             (line  31)
 * join:                                  DATA.                (line   9)
 * JSON:                                  DATA.                (line  88)
+* LTS:                                   METRICS.             (line  64)
 * mail:                                  GENERAL.             (line  56)
 * map:                                   CHARTS.              (line  69)
 * merge:                                 DATA.                (line   9)
 * month:                                 CHARTS.              (line   9)
 * NP:                                    METRICS.             (line   9)
-* override:                              METRICS.             (line 103)
+* override:                              METRICS.             (line 111)
+* PMC <1>:                               METRICS.             (line  64)
 * PMC:                                   MOST COMMON QUESTIONS OF ALL.
                                                               (line  54)
 * prior:                                 CHARTS.              (line   9)
@@ -721,7 +732,7 @@ Index
                                                               (line   9)
 * treemap:                               CHARTS.              (line  77)
 * triathlete:                            GENERAL.             (line  47)
-* TSS <1>:                               METRICS.             (line  73)
+* TSS <1>:                               METRICS.             (line  81)
 * TSS:                                   MOST COMMON QUESTIONS OF ALL.
                                                               (line   9)
 * unzoom:                                CHARTS.              (line 109)
@@ -742,10 +753,10 @@ Node: Top167
 Node: MOST COMMON QUESTIONS OF ALL612
 Node: GENERAL4989
 Node: METRICS8636
-Node: DATA15348
-Node: UPLOADING AND DOWNLOADING19305
-Node: SEASONS AND EVENTS21077
-Node: CHARTS21936
-Node: INDEX26765
+Node: DATA15662
+Node: UPLOADING AND DOWNLOADING19619
+Node: SEASONS AND EVENTS21391
+Node: CHARTS22250
+Node: INDEX27079
 
 End Tag Table

@@ -57,7 +57,7 @@ By default the most common metrics are listed, including average HR, distance an
 From v3.0 the default setup will also include TSS as a metric you can override here.
 
 If the metric is not there you will need to configure GoldenCheetah to allow it to be shown.
-This is simple to do and described in 3.8 below.
+This is simple to do and described in 3.9 below.
 
 
  
@@ -312,6 +312,14 @@ CP values. But we do recognise the ongoing debate regarding physiological stress
 working on a trainer vs on the road.
 
 
+@section How do I seed the CTL for my PMC?
+@cindex PMC
+@cindex CTL
+@cindex LTS
+
+You can seed the starting CTL (we call it LTS, for long term stress) when you define a
+season. That way it is re-usable in a number of places. To do this you edit the season
+(date range) in the Home View and can set the Starting LTS.
 
 @section Why is elevation different in GoldenCheetah to my other training software / website?
 @cindex elevation
