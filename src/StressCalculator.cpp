@@ -101,6 +101,18 @@ void StressCalculator::calculateStress(MainWindow *main, QString, const QString 
     ltsramp.resize(maxarray);
     stsramp.resize(maxarray);
 
+    // clear data add in the seeds
+    ltsvalues.fill(0);
+    stsvalues.fill(0);
+    foreach(Season x, main->seasons->seasons) {
+        if (x.getSeed()) {
+            int offset = startDate.date().daysTo(x.getStart());
+            ltsvalues[offset] = x.getSeed();
+            stsvalues[offset] = x.getSeed();
+        }
+    }
+
+    
     for (int i=0; i<results.count(); i++)
         addRideData(results[i].getForSymbol(metric), results[i].getRideDate());
 
@@ -180,21 +192,24 @@ void StressCalculator::addRideData(double BS, QDateTime rideDate) {
 void StressCalculator::calculate(int daysIndex) {
     double lastLTS, lastSTS;
 
-    // LTS
-    if (daysIndex == 0)
-        lastLTS = initialLTS;
-    else
-        lastLTS = ltsvalues[daysIndex-1];
+    // if its seeded leave it alone
+    if (!ltsvalues[daysIndex] || !stsvalues[daysIndex]) {
+        // LTS
+        if (daysIndex == 0)
+            lastLTS = initialLTS;
+        else
+            lastLTS = ltsvalues[daysIndex-1];
 
-    ltsvalues[daysIndex] = (list[daysIndex] * (1.0 - lte)) + (lastLTS * lte);
+        ltsvalues[daysIndex] = (list[daysIndex] * (1.0 - lte)) + (lastLTS * lte);
 
-    // STS
-    if (daysIndex == 0)
-        lastSTS = initialSTS;
-    else
-        lastSTS = stsvalues[daysIndex-1];
+        // STS
+        if (daysIndex == 0)
+            lastSTS = initialSTS;
+        else
+            lastSTS = stsvalues[daysIndex-1];
 
-    stsvalues[daysIndex] = (list[daysIndex] * (1.0 - ste)) + (lastSTS * ste);
+        stsvalues[daysIndex] = (list[daysIndex] * (1.0 - ste)) + (lastSTS * ste);
+    }
 
     // SB (stress balance)  long term - short term
     // FIXED BUG WHERE SB WAS NOT SHOWN ON THE NEXT DAY!
