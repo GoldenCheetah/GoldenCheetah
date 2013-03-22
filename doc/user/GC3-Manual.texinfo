@@ -27,17 +27,6 @@ Copyright @copyright{} 2013 Mark Liversedge
 @c So the toc is printed at the start.
 @contents
 
-@ifnottex
-@node Top,Top,Top,
-@top title
-
-This manual is for GoldenCheetah, version 3.0.
-@end ifnottex
-
-@menu
-@end menu
-
-
 @c ********************************************************************************
 @c Welcome chapter
 @c ********************************************************************************
@@ -112,7 +101,7 @@ why, what, where, refreshing, exporting
 @c Working with Data
 @c ********************************************************************************
 
-@chapter IMPORTING, EXPORTING, DOWNLOADING AND CREATING DATA
+@chapter IMPORTING EXPORTING DOWNLOADING AND CREATING DATA
 @node DATA
 
 @section Download from device
@@ -289,3 +278,5 @@ Intro and explain opening the Preferences Pane
 @section B Data Filtering Reference
 @section C Glossary and Useful Resources (incl. link to FAQ)
 @section D OS Specifics (Directories, Drivers and Permissions)
+
+@bye
