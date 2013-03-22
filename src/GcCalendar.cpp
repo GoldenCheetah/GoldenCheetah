@@ -547,11 +547,6 @@ GcMiniCalendar::GcMiniCalendar(MainWindow *main, bool master) : main(main), mast
     // day clicked
     connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(dayClicked(int)));
 
-    // refresh on these events...XXX multi controls now!
-    //connect(main, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
-    //connect(main, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh()));
-    //connect(main, SIGNAL(configChanged()), this, SLOT(refresh()));
-
     // set up for current selections
     refresh();
 }
@@ -559,8 +554,7 @@ GcMiniCalendar::GcMiniCalendar(MainWindow *main, bool master) : main(main), mast
 void
 GcMiniCalendar::refresh()
 {
-    calendarModel->setMonth(month, year);
-    repaint();
+    setDate(month, year);
 }
 
 bool
@@ -765,7 +759,6 @@ GcMiniCalendar::setDate(int _month, int _year)
             }
         }
     }
-    refresh();
 }
 
 //********************************************************************************
@@ -890,5 +883,9 @@ GcMultiCalendar::setRide(RideItem *ride)
 void
 GcMultiCalendar::refresh()
 {
-    for(int i=0; i<showing; i++) calendars.at(i)->refresh();
+    setUpdatesEnabled(false);
+    for(int i=0; i<showing; i++) {
+        calendars.at(i)->refresh();
+    }
+    setUpdatesEnabled(true);
 }
