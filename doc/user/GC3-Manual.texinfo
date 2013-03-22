@@ -1,51 +1,154 @@
-GOLDENCHEETAH USER GUIDE
- 
-CONTENTS
- 
-0. WELCOME TO GOLDENCHEETAH
+\input texinfo   @c -*-texinfo-*-
+@c %**start of header
+@setfilename GC3-Manual.texinfo
+@settitle Golden Cheetah User Manual
+@c %**end of header
 
-- what it is, latest version
-- mailing list and community
-- reporting bugs and requesting features
- 
-1. QUICK START GUIDE
-- setting up a new athlete
-- basic configuration (season, CP, weight)
-- importing a ride from device
-- importing data from other applications
-- uploading and sending your data
+@copying
+This manual is for Golden Cheetah, version 3.0.
 
-2. GETTING AROUND GOLDENCHEETAH
-- the mainwindow, the toolbar, views and sidebar
-- Going fullscreen
-- Adding and adjusting charts
-- The Metric database
+Copyright @copyright{} 2013 Mark Liversedge
+@end copying
+
+@titlepage
+@title Golden Cheetah User Manual
+@c @subtitle subtitle-if-any
+@c @subtitle second-subtitle
+@author Mark Liversedge
+
+@c  The following two commands
+@c  start the copyright page.
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+
+@end titlepage
+
+@c So the toc is printed at the start.
+@contents
+
+@ifnottex
+@node Top,Top,Top,
+@top title
+
+This manual is for GoldenCheetah, version 3.0.
+@end ifnottex
+
+@menu
+@end menu
+
+
+@c ********************************************************************************
+@c Welcome chapter
+@c ********************************************************************************
+@chapter WELCOME TO GOLDENCHEETAH
+@node WELCOME
+
+open up with wha is gc and power analysis, cycling, hr training, training journal etc
+
+@section About this latest version, V3.0
+whats new -- basic summary of release notes (headings only?)
+
+@section Mailing list and community
+google groups
+
+@section Reporting bugs and requesting new features
+github
+
+@section Bit of Past, Present and Future
+sean, mark, v3, v3.1 plans
  
-3. IMPORTING, EXPORTING, DOWNLOADING AND CREATING DATA
-- Download from device
-- Import from file
-- Manual activity
-- Editing and Saving changes
-- Import and export
+
+@c ********************************************************************************
+@c Quick start guide
+@c ********************************************************************************
+@chapter QUICK START GUIDE
+@node QUICK
+
+open up with running for the first time, adding an athlete, bank state screens etc
+
+@section basic configuration 
+seasons, CP, LTHR
+
+@section importing a ride from device
+download dialog
+
+@section importing data from file or other applications
+drag and drop
+
+@section uploading and sending your data
+upload to TP.com, export file
+
+
+@c ********************************************************************************
+@c Basic Navigation
+@c ********************************************************************************
+@chapter GETTING AROUND GOLDENCHEETAH
+@node NAVIGATION
+
+open up with screen shot and a description of all the basic ui elements, one per athlete etc
+
+@section The Toolbar
+what the buttons do
+
+@section Views & Sidebar
+scopebar, sidebar, tab/tiled, add chart menu
+
+@section Searching and Filtering
+free text search and basics of data filtering
+
+@section Adding and adjusting charts
+the dialog, title, settings, finding them again
+
+@section Going fullscreen
+key sequences, hiding and showing the toolbar
+screensaver?
+
+@section The Metric database
+why, what, where, refreshing, exporting 
+
+
+@c ********************************************************************************
+@c Working with Data
+@c ********************************************************************************
+
+@chapter IMPORTING, EXPORTING, DOWNLOADING AND CREATING DATA
+@node DATA
+
+@section Download from device
+download dialog, basics for each device (plugging in etc)
+
+@section Import from file
+selecting a file, the import wizard
+
+@section Manual activity
+the manual activity dialog and refer to details screen for more "indepth" (need a better word) stuff
+
+@section Exporting data
    i A single ride
   ii Multiple rides
-- Uploading and Downloading from the Cloud
+
+@section Uploading and Downloading from the Cloud
    i TrainingPeaks
   ii Strava
  iii TrainingStage Buch
   iv RideWithGPS
 
-4. USING GOLDENCHEETAH
 
-- ANALYSIS VIEW
+@c ********************************************************************************
+@c ANALYSIS
+@c ********************************************************************************
+
+@chapter THE ANALYSIS VIEW
+@node ANALYSIS
  
-   - About Activities and Intervals
+@section About Activities and Intervals
  
-    - Sidebar actions and context menus
+@section Sidebar actions and context menus
       o activities
       o intervals
 
-    - Editing and adjusting data
+@section Editing and adjusting data
      o using the editor
        i basics
       ii anomalies
@@ -54,7 +157,11 @@ CONTENTS
        i the 'fix' tools
       ii copying, cutting and pasting
 
-   - Analysis Charts
+@c ********************************************************************************
+@c ANALYSIS CHARTS
+@c ********************************************************************************
+@chapter Analysis View Charts
+@node ANALYSIS CHARTS
        i Activity Summary
       ii Details
      iii Summary and Details
@@ -70,10 +177,19 @@ CONTENTS
     xiii 3d Plot
      xiv Aerolab Chung Analysis
 
-- HOME VIEW
+@c ********************************************************************************
+@c HOME
+@c ********************************************************************************
+@chapter THE HOME VIEW
+@node HOME
 
-   - About Date Ranges, Seasons and Events
-   - Performance Tracking Charts
+@section About Date Ranges, Seasons and Events
+
+@c ********************************************************************************
+@c HOME CHARTS
+@c ********************************************************************************
+@chapter Performance Tracking Charts
+@node HOME CHARTS
        i Long Term Metrics
          - indepth howto incl. setting up a PMC++
       ii Performance Manager
@@ -81,28 +197,44 @@ CONTENTS
       iv Critical Mean Maximal
        v Distribution
 
-- DIARY VIEW
-    - Summarising for Day / Week / Month
-    - Longer term purpose (planning)
+@c ********************************************************************************
+@c DIARY
+@c ********************************************************************************
+@chapter THE DIARY VIEW
+@node DIARY
+
+@section Purpose
+
+@section Summarising for Day / Week / Month
+
+@section Longer term purpose (planning)
  
-- TRAIN VIEW
+@c ********************************************************************************
+@c TRAIN
+@c ********************************************************************************
+@chapter THE TRAIN VIEW
+@node TRAIN
 
-   - About Devices, Workouts and Video
+@section About Devices, Workouts and Video
 
-    - Sidebar actions and context menus
+@section Sidebar actions and context menus
       o devices
       o workouts
       o media
 
-   - Managing the Workout Library
+@section Working with the Workout Library
    - Creating a new Workout
    - Getting Workouts from ErgDB
    
-    - Setting up and starting a workout
+@section Setting up and starting a workout
     - Using CT handlebar controller
     - controlling workout from mouse + keyboard
 
-    - Training View Charts
+@c ********************************************************************************
+@c TRAIN CHARTS
+@c ********************************************************************************
+@chapter Training View Charts
+@node TRAIN CHARTS
         i Telemetry
        ii Workout
       iii Realtime
@@ -112,37 +244,48 @@ CONTENTS
       vii Video Player
 
 
-5. CONFIGURING
+@c ********************************************************************************
+@c Configuration
+@c ********************************************************************************
+@chapter CONFIGURING
+@node CONFIG
 
-   - Opening the Preferences Pane
+Intro and explain opening the Preferences Pane
 
-   - General
+@section General
 
-   - Athlete
+@section Athlete
      i About
     ii Power Zones
    iii HR Zones
 
-   - Passwords
+@section Passwords
     i General
    ii Withings
   iii Zeo
    iv Google Calendar (calDAV)
 
-   - Appearance
+@section Appearance
 
-   - Data Fields
+@section Data Fields
    i Fields
   ii Notes Keywords
  iii Processing
 
-   - Metrics
+@section Metrics
    
-   - Train Devices
+@section Train Devices
    i Using Multiple Devices
   ii Adding a device
  
-Appendices
-A Supported Devices, File Formats and Services
-B Glossary and Useful Resources (incl. link to FAQ)
-C OS Specifics (Directories, Drivers and Permissions)
+@c ********************************************************************************
+@c Appendices
+@c ********************************************************************************
+@chapter APPENDICES
+@node APPENDICES
+
+@section A Supported Devices, File Formats and Services
+@section B Metrics Reference
+@section B Data Filtering Reference
+@section C Glossary and Useful Resources (incl. link to FAQ)
+@section D OS Specifics (Directories, Drivers and Permissions)
